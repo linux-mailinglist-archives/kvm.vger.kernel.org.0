@@ -2,198 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A0D4689C2D
-	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 15:49:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 66A51689C2C
+	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 15:49:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233089AbjBCOtR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Feb 2023 09:49:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59928 "EHLO
+        id S233493AbjBCOtQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Feb 2023 09:49:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233338AbjBCOtO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S233076AbjBCOtO (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 3 Feb 2023 09:49:14 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E92CE1F5EC;
-        Fri,  3 Feb 2023 06:49:12 -0800 (PST)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 313Eg6b5020482;
-        Fri, 3 Feb 2023 14:49:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : references : from : subject : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=otsSqWtNyr6skvlJKHQVwPBgVdpvIRkyLd68VyEGcx8=;
- b=iNRE5xJrjlupJTLU33v3tIEhPD5OqMWX+UrPUhjlG9hsFjS42LGSWqevpDjarKGAlyL9
- j1GUphn+jLTqA1uvgvvWNfGZ9AIuVO00hljBQOrIp8Zq8iGni39IGN+XndIFUXGP3ChS
- Ahi44HU52lHG9brzwa57lUf+UdpxUpZxHs0EYT0Pd0MzCzaWH+LeYDa2vDIcJ3VB4LVc
- Ux9cU5xtSQqHJOEh2epHjr20avMmbta+4hombr+clB1ghHAIoPwU2dvPXX8DvbkDF8yR
- 1DIlxkRNK3A6DfxQdA7qVmhHtyJ2KHwZ6GTtdsSIQaI4Pc1LuVoW4lNA6QNSk7+xKepr Vg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nh48r0594-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Feb 2023 14:49:03 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 313EhLSI022720;
-        Fri, 3 Feb 2023 14:49:03 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nh48r0588-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Feb 2023 14:49:03 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 313ABMnG027465;
-        Fri, 3 Feb 2023 14:49:00 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3ncvttyhdr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Feb 2023 14:49:00 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 313Emuj548431476
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 3 Feb 2023 14:48:56 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9CAB420043;
-        Fri,  3 Feb 2023 14:48:56 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B56A920040;
-        Fri,  3 Feb 2023 14:48:55 +0000 (GMT)
-Received: from [9.171.75.139] (unknown [9.171.75.139])
-        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri,  3 Feb 2023 14:48:55 +0000 (GMT)
-Message-ID: <f1b28707-c525-7cd1-64d5-6717bac5d711@linux.ibm.com>
-Date:   Fri, 3 Feb 2023 15:48:55 +0100
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2F9991187
+        for <kvm@vger.kernel.org>; Fri,  3 Feb 2023 06:49:11 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 79C1261F45
+        for <kvm@vger.kernel.org>; Fri,  3 Feb 2023 14:49:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95DA9C433D2;
+        Fri,  3 Feb 2023 14:49:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1675435750;
+        bh=t52WNbigMsu1xdZ9Xsrfgwd5bZv6hgeD/DpkiTQjQjk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Hv/zdG/mrzVzwPHwFNAMrfOEyD1QqzfVCGct2zQit8OdBQSprEyAHWt2DJOA4KOWT
+         gptShfk4rLUJ/GP7nGWK9et+KyrpbYJwoT0LFY+g9RXecNmq3zxAdRhTH/lTRw1TXB
+         PzX9lKZyjxCKKGB5bJmz+9ZgpDHX7apXUi+p+dyDFq03V7kvCMfCbkSTlIfl3GdeMg
+         TfIOeCr6LdsiQef2bGUPP2of0/hyn9oNj2fRnCMmC3C88vVn4StsJ82KXrUjzQrRh+
+         qoYV9RKLLicQkr0MqdzVUxPUiYujodmeCGjqjRf2bTBVqNAsdzlV9PKNPFrOyVZjCI
+         /2V/4Dc0qpITA==
+Date:   Fri, 3 Feb 2023 14:49:04 +0000
+From:   Mark Brown <broonie@kernel.org>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
+        pbonzini@redhat.com, maz@kernel.org, seanjc@google.com,
+        alexandru.elisei@arm.com, eric.auger@redhat.com, oupton@google.com,
+        reijiw@google.com, rananta@google.com, bgardon@google.com,
+        dmatlack@google.com, axelrasmussen@google.com
+Subject: Re: [PATCH v10 00/14] KVM: selftests: Add aarch64/page_fault_test
+Message-ID: <Y90e4IluvCYSnShh@sirena.org.uk>
+References: <20221017195834.2295901-1-ricarkol@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Sven Schnelle <svens@linux.ibm.com>
-References: <20230125212608.1860251-1-scgl@linux.ibm.com>
- <20230125212608.1860251-11-scgl@linux.ibm.com>
-Content-Language: en-US
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v6 10/14] KVM: s390: Refactor absolute vm mem_op function
-In-Reply-To: <20230125212608.1860251-11-scgl@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: -01CFyzKLS6ybLixwOxbYZ7g97oI5V7u
-X-Proofpoint-ORIG-GUID: qfS7nfAf9MB8z_Op_n1vqvROJUZ5KKZU
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-02-03_13,2023-02-03_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 spamscore=0
- priorityscore=1501 malwarescore=0 impostorscore=0 bulkscore=0
- mlxlogscore=758 lowpriorityscore=0 phishscore=0 mlxscore=0 adultscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302030134
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="Wp5b5pNXdJZ10V7t"
+Content-Disposition: inline
+In-Reply-To: <20221017195834.2295901-1-ricarkol@google.com>
+X-Cookie: Colorless green ideas sleep furiously.
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/25/23 22:26, Janis Schoetterl-Glausch wrote:
-> Remove code duplication with regards to the CHECK_ONLY flag.
-> Decrease the number of indents.
-> No functional change indented.
-> 
-> Suggested-by: Janosch Frank <frankja@linux.ibm.com>
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-> ---
-> 
-> 
-> Cosmetic only, can be dropped.
-> 
-> 
->   arch/s390/kvm/kvm-s390.c | 43 ++++++++++++++++------------------------
->   1 file changed, 17 insertions(+), 26 deletions(-)
-> 
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 588cf70dc81e..cfd09cb43ef6 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -2794,6 +2794,7 @@ static void *mem_op_alloc_buf(struct kvm_s390_mem_op *mop)
->   static int kvm_s390_vm_mem_op_abs(struct kvm *kvm, struct kvm_s390_mem_op *mop)
->   {
->   	void __user *uaddr = (void __user *)mop->buf;
-> +	enum gacc_mode acc_mode;
->   	void *tmpbuf = NULL;
->   	int r, srcu_idx;
->   
-> @@ -2813,33 +2814,23 @@ static int kvm_s390_vm_mem_op_abs(struct kvm *kvm, struct kvm_s390_mem_op *mop)
->   		goto out_unlock;
->   	}
->   
-> -	switch (mop->op) {
-> -	case KVM_S390_MEMOP_ABSOLUTE_READ: {
-> -		if (mop->flags & KVM_S390_MEMOP_F_CHECK_ONLY) {
-> -			r = check_gpa_range(kvm, mop->gaddr, mop->size, GACC_FETCH, mop->key);
-> -		} else {
-> -			r = access_guest_abs_with_key(kvm, mop->gaddr, tmpbuf,
-> -						      mop->size, GACC_FETCH, mop->key);
-> -			if (r == 0) {
-> -				if (copy_to_user(uaddr, tmpbuf, mop->size))
-> -					r = -EFAULT;
-> -			}
-> -		}
-> -		break;
-> -	}
-> -	case KVM_S390_MEMOP_ABSOLUTE_WRITE: {
-> -		if (mop->flags & KVM_S390_MEMOP_F_CHECK_ONLY) {
-> -			r = check_gpa_range(kvm, mop->gaddr, mop->size, GACC_STORE, mop->key);
-> -		} else {
-> -			if (copy_from_user(tmpbuf, uaddr, mop->size)) {
-> -				r = -EFAULT;
-> -				break;
-> -			}
-> -			r = access_guest_abs_with_key(kvm, mop->gaddr, tmpbuf,
-> -						      mop->size, GACC_STORE, mop->key);
-> +	acc_mode = mop->op == KVM_S390_MEMOP_ABSOLUTE_READ ? GACC_FETCH : GACC_STORE;
 
-Would the line be too long if that variable would be initialized where 
-it's defined?
+--Wp5b5pNXdJZ10V7t
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> +	if (mop->flags & KVM_S390_MEMOP_F_CHECK_ONLY) {
-> +		r = check_gpa_range(kvm, mop->gaddr, mop->size, acc_mode, mop->key);
+On Mon, Oct 17, 2022 at 07:58:20PM +0000, Ricardo Koller wrote:
+> This series adds a new aarch64 selftest for testing stage 2 fault handling
+> for various combinations of guest accesses (e.g., write, S1PTW), backing
+> sources (e.g., anon), and types of faults (e.g., read on hugetlbfs with a
+> hole, write on a readonly memslot). Each test tries a different combination
+> and then checks that the access results in the right behavior (e.g., uffd
+> faults with the right address and write/read flag). Some interesting
+> combinations are:
 
-We should early return i.e. goto out_unlock.
+I'm seeing issues with the page_fault_test tests in both -next and
+mainline all the way back to v6.1 when they were introduced running on
+both the fast model and hardware.  With -next the reports come back as:
 
-IMHO else if, else patterns should either be switches (testing the same 
-variable) or kept as short as possible / be avoided.
+# selftests: kvm: page_fault_test
+# ==== Test Assertion Failure ====
+#   aarch64/page_fault_test.c:316: __a == __b
+#   pid=851 tid=860 errno=0 - Success
+#      1	0x0000000000402253: uffd_generic_handler at page_fault_test.c:316
+#      2	0x000000000040be07: uffd_handler_thread_fn at userfaultfd_util.c:97
+#      3	0x0000ffff8b39edd7: ?? ??:0
+#      4	0x0000ffff8b407e9b: ?? ??:0
+#   ASSERT_EQ(!!(flags & UFFD_PAGEFAULT_FLAG_WRITE), expect_write) failed.
+# 	!!(flags & UFFD_PAGEFAULT_FLAG_WRITE) is 0
+# 	expect_write is 0x1
+not ok 6 selftests: kvm: page_fault_test # exit=254
 
-> +	} else if (acc_mode == GACC_FETCH) {
-> +		r = access_guest_abs_with_key(kvm, mop->gaddr, tmpbuf,
-> +					      mop->size, GACC_FETCH, mop->key);
+(addr2line seemed to be not doing much, I've not poked too hard at
+that).  I've been unable to find any case where the program passes.
+Is this expected?
 
-I'd guess it's personal taste whether you use GACC_FETCH or access_mode 
-but if you don't use it here then we can remove the variable all 
-together, no?
+Some random full runs on hardware:
 
-> +		if (r)
-> +			goto out_unlock;
-> +		if (copy_to_user(uaddr, tmpbuf, mop->size))
-> +			r = -EFAULT;
-> +	} else {
-> +		if (copy_from_user(tmpbuf, uaddr, mop->size)) {
-> +			r = -EFAULT;
-> +			goto out_unlock;
->   		}
-> -		break;
-> -	}
-> +		r = access_guest_abs_with_key(kvm, mop->gaddr, tmpbuf,
-> +					      mop->size, GACC_STORE, mop->key);
->   	}
->   
->   out_unlock:
+4xA53: https://lava.sirena.org.uk/scheduler/job/244678
+4xA72: https://lkft.validation.linaro.org/scheduler/job/6114427
 
+--Wp5b5pNXdJZ10V7t
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmPdHt8ACgkQJNaLcl1U
+h9DHpgf/SSO7Y9qBYH/EO0C504/xjrEXbYwmL/VfTQ4PylF1AWCcorRiDlfVyaAd
+//4RErLun4RDmVH+qH7cZenIop3gUDG6rXINxwVdlqy2tkvHQzynEQ9a/PhB7ptz
+ZtIM1hV02RMfIvtd4nGP5yzRiz5jUpdzjbKE4bXXfeo66IX+aFyKMSdbZel7Atas
+vSehH7PRAwgxfmzTFTcyTomDSfnS6XzwPLw1PEP1i28EtwG78/7SE9BszVamBqjE
+xYsUxwhuolk3nE868Y+TucUs+oQicSDiP3C4+/8NbcHMwN1cO/WMRCwCeSb5d1GV
+grGQNh47n/UE8Se0CLc4tpBOz/GU/Q==
+=DlC0
+-----END PGP SIGNATURE-----
+
+--Wp5b5pNXdJZ10V7t--
