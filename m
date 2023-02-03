@@ -2,144 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 24B90688BB3
-	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 01:24:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AE223688C95
+	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 02:33:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232937AbjBCAYw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Feb 2023 19:24:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52700 "EHLO
+        id S231855AbjBCBdx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Feb 2023 20:33:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232879AbjBCAYr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Feb 2023 19:24:47 -0500
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51DB281B2C
-        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 16:24:44 -0800 (PST)
-Received: by mail-pl1-x633.google.com with SMTP id jh15so3653502plb.8
-        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 16:24:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dabbelt-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/S7e5WEqMk16Ay2DoIKqyJpIuF5AJjNAAjV63IUL/tk=;
-        b=hQHP9qyZHVA+a+uHuTsMO8GZ8HIvjBwROyn/IiLj4UlR5kumKYQZiOaP0yjAA/1OSG
-         C3MjFbaOYsrz20pQoZpTAzls1PAfIviVRvp3Q7r8Xwja45vzqoZLvAU0isd2qEdg9C9n
-         G5MNgZKFWHjl+Qr7/mk/lTfoukCH46J1tvzyn3Y/sN3cqY1SJkbCpJ2lnecR/OO73t/I
-         cM1IibAIrbvSVCWv5TbN7WvpARB41Vlge16J+7pGQy3k6qVx0zEauexfdpR3gA42h0nI
-         ykfx23+DrjARrWRdmejWAqveHSHaMPBFdC44rz6oiK/2k2mP6PLIHKuJ4GQeSXLs69+h
-         BDuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/S7e5WEqMk16Ay2DoIKqyJpIuF5AJjNAAjV63IUL/tk=;
-        b=NhLk7T+B1RaK19+NdVhRj8FvT+P5g1dXO4lTfjhIDCw3xrBI1k53ex+m4Nl2wpJARa
-         utclmHN1BAu/hWozOBTEdMfcCbmx8x9mFyxI/1dWthNc6NHwX4zLpUXEVjIy+5iuWeDX
-         Nt2iWmdDtkqbdS/7F77tm1w3/uk3XTyJyQXZR2Cf6BBM/7tqHBRFZgxk2d4H/cHZrvOk
-         802VbZIe3ubV0zIG+cbegriYwwT11XJvyguSb9RY7l4HETcAjsbSRWtVr5NbpVJt74NY
-         7N03CRGYSbmsSMjz62+qiV7FgeZaU+5VjQVzKBzeOAV8yTqNz5qZYPWEp5KA5NN5rGDI
-         jBOA==
-X-Gm-Message-State: AO0yUKXRbnaXhN3fXTBH1yDV5GjlISNGQVAkOD8bsouthLeXQ4R0XJwq
-        O6PtU9mZTVAASbG0s/NTxXG0kg==
-X-Google-Smtp-Source: AK7set+rJWfbsNd7M3rDZo/kVRyVpyV17Qy08I1XQbG1fnSbrgJIKhyrLKBmh0Ll2t6sRL/UrW+9uw==
-X-Received: by 2002:a17:902:ec8c:b0:191:3098:8b with SMTP id x12-20020a170902ec8c00b001913098008bmr3437192plg.58.1675383883696;
-        Thu, 02 Feb 2023 16:24:43 -0800 (PST)
-Received: from localhost ([135.180.226.51])
-        by smtp.gmail.com with ESMTPSA id q13-20020a170902a3cd00b001948ae7501asm238241plb.298.2023.02.02.16.24.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Feb 2023 16:24:43 -0800 (PST)
-Date:   Thu, 02 Feb 2023 16:24:43 -0800 (PST)
-X-Google-Original-Date: Thu, 02 Feb 2023 16:24:14 PST (-0800)
-Subject:     Re: [PATCH v2 2/7] RISC-V: Detect AIA CSRs from ISA string
-In-Reply-To: <20230128072737.2995881-3-apatel@ventanamicro.com>
-CC:     pbonzini@redhat.com, atishp@atishpatra.org,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        ajones@ventanamicro.com, anup@brainfault.org, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, apatel@ventanamicro.com
-From:   Palmer Dabbelt <palmer@dabbelt.com>
-To:     apatel@ventanamicro.com
-Message-ID: <mhng-0f9bdf58-5289-4db4-8fd7-38898824c44f@palmer-ri-x1c9>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S230496AbjBCBdv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Feb 2023 20:33:51 -0500
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51B036B00E;
+        Thu,  2 Feb 2023 17:33:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1675388030; x=1706924030;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=WJ6u+bSQfkFJ6nD8V86oF3q/j3AxY6FQANJ6lvw+ZS0=;
+  b=VW45wwYRTS07OprqbS0UksuM8qwL46NAGeryg6ruByXfyMw+qmLtfM5Z
+   GvmT7/E+feJKCAPkF7D5KB4ScG354SA1xPYIWFF8DTFA7F0Lj6uJ1CWvt
+   t7Q0bIOWybx3InY29zc1VE13navb4yZO7YYA33BSe8p6kx8zFU8gfbklC
+   nPVcwwYnSP9dhi3+1WFCKrXKcnPJeA1SrbBPAf80ySKeQH6BuM6KjqT6Z
+   WMx9CJ/3gfABS8uDhCSuQ5eFdL+Z5pM4fmbUx+b/N+TKymvRPnH55eC9c
+   0zpA0A+eo2s32H/lf19HGEk5YC/fyLEyr5PpOSsFaIf633VLqoYz9diNz
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10609"; a="316627898"
+X-IronPort-AV: E=Sophos;i="5.97,269,1669104000"; 
+   d="scan'208";a="316627898"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2023 17:33:49 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10609"; a="734145077"
+X-IronPort-AV: E=Sophos;i="5.97,269,1669104000"; 
+   d="scan'208";a="734145077"
+Received: from yujiepan-mobl.ccr.corp.intel.com (HELO [10.254.208.253]) ([10.254.208.253])
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2023 17:33:46 -0800
+Message-ID: <58837041-c0ea-2c65-4ed5-6b2d2189415e@linux.intel.com>
+Date:   Fri, 3 Feb 2023 09:33:44 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Cc:     baolu.lu@linux.intel.com, jgg@nvidia.com, kevin.tian@intel.com,
+        joro@8bytes.org, will@kernel.org, robin.murphy@arm.com,
+        alex.williamson@redhat.com, shuah@kernel.org, yi.l.liu@intel.com,
+        linux-kernel@vger.kernel.org, iommu@lists.linux.dev,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v1 2/8] iommu: Introduce a new
+ iommu_group_replace_domain() API
+To:     Nicolin Chen <nicolinc@nvidia.com>
+References: <cover.1675320212.git.nicolinc@nvidia.com>
+ <a98e622f41d76b64f5a7d0c758d8bda5e8043013.1675320212.git.nicolinc@nvidia.com>
+ <d5147b2f-4698-b39f-e956-84db122e9822@linux.intel.com>
+ <Y9wLmBZzkZk2Mkh9@Asurada-Nvidia>
+Content-Language: en-US
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <Y9wLmBZzkZk2Mkh9@Asurada-Nvidia>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 27 Jan 2023 23:27:32 PST (-0800), apatel@ventanamicro.com wrote:
-> We have two extension names for AIA ISA support: Smaia (M-mode AIA CSRs)
-> and Ssaia (S-mode AIA CSRs).
+On 2023/2/3 3:14, Nicolin Chen wrote:
+> On Thu, Feb 02, 2023 at 06:21:20PM +0800, Baolu Lu wrote:
+>> External email: Use caution opening links or attachments
+>>
+>>
+>> On 2023/2/2 15:05, Nicolin Chen wrote:
+>>> +/**
+>>> + * iommu_group_replace_domain - replace the domain that a group is attached to
+>>> + * @new_domain: new IOMMU domain to replace with
+>>> + * @group: IOMMU group that will be attached to the new domain
+>>> + *
+>>> + * This API allows the group to switch domains without being forced to go to
+>>> + * the blocking domain in-between.
+>>> + *
+>>> + * If the attached domain is a core domain (e.g. a default_domain), it will act
+>>> + * just like the iommu_attach_group().
+>> I am not following above two lines. Why and how could iommufd set a
+>> core domain to an iommu_group?
+> Perhaps this isn't the best narrative. What it's supposed to say
+> is that this function acts as an iommu_attach_group() call if the
+> device is "detached", yet we have changed the semantics about the
+> word "detach". So, what should the correct way to write such a
+> note?
 
-This has pretty much the same problem that we had with the other 
-AIA-related ISA string patches, where there's that ambiguity with the 
-non-ratified chapters.  IIRC when this came up in GCC the rough idea was 
-to try and document that we're going to interpret the standard ISA 
-strings that way, but now that we're doing custom ISA extensions it 
-seems saner to just define on here that removes the ambiguity.
+How could this interface be used as detaching a domain from a group?
+Even it could be used, doesn't it act as an iommu_detach_group()?
 
-I just sent
-<https://lore.kernel.org/r/20230203001201.14770-1-palmer@rivosinc.com/> 
-which documents that.
-
-> We extend the ISA string parsing to detect Smaia and Ssaia extensions.
->
-> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-> ---
->  arch/riscv/include/asm/hwcap.h | 2 ++
->  arch/riscv/kernel/cpu.c        | 2 ++
->  arch/riscv/kernel/cpufeature.c | 2 ++
->  3 files changed, 6 insertions(+)
->
-> diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
-> index 86328e3acb02..341ef30a3718 100644
-> --- a/arch/riscv/include/asm/hwcap.h
-> +++ b/arch/riscv/include/asm/hwcap.h
-> @@ -59,6 +59,8 @@ enum riscv_isa_ext_id {
->  	RISCV_ISA_EXT_ZIHINTPAUSE,
->  	RISCV_ISA_EXT_SSTC,
->  	RISCV_ISA_EXT_SVINVAL,
-> +	RISCV_ISA_EXT_SMAIA,
-> +	RISCV_ISA_EXT_SSAIA,
->  	RISCV_ISA_EXT_ID_MAX
->  };
->  static_assert(RISCV_ISA_EXT_ID_MAX <= RISCV_ISA_EXT_MAX);
-> diff --git a/arch/riscv/kernel/cpu.c b/arch/riscv/kernel/cpu.c
-> index 1b9a5a66e55a..a215ec929160 100644
-> --- a/arch/riscv/kernel/cpu.c
-> +++ b/arch/riscv/kernel/cpu.c
-> @@ -162,6 +162,8 @@ arch_initcall(riscv_cpuinfo_init);
->   *    extensions by an underscore.
->   */
->  static struct riscv_isa_ext_data isa_ext_arr[] = {
-> +	__RISCV_ISA_EXT_DATA(smaia, RISCV_ISA_EXT_SMAIA),
-> +	__RISCV_ISA_EXT_DATA(ssaia, RISCV_ISA_EXT_SSAIA),
-
-This will conflict with that ISA string refactoring I just merged.  It 
-should be a pretty mechanical merge conflict, but if you want we can do 
-a shared tag with the first few patches and I can handle the merge 
-conflict locally.
-
->  	__RISCV_ISA_EXT_DATA(sscofpmf, RISCV_ISA_EXT_SSCOFPMF),
->  	__RISCV_ISA_EXT_DATA(sstc, RISCV_ISA_EXT_SSTC),
->  	__RISCV_ISA_EXT_DATA(svinval, RISCV_ISA_EXT_SVINVAL),
-> diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
-> index 93e45560af30..3c5b51f519d5 100644
-> --- a/arch/riscv/kernel/cpufeature.c
-> +++ b/arch/riscv/kernel/cpufeature.c
-> @@ -228,6 +228,8 @@ void __init riscv_fill_hwcap(void)
->  				SET_ISA_EXT_MAP("zihintpause", RISCV_ISA_EXT_ZIHINTPAUSE);
->  				SET_ISA_EXT_MAP("sstc", RISCV_ISA_EXT_SSTC);
->  				SET_ISA_EXT_MAP("svinval", RISCV_ISA_EXT_SVINVAL);
-> +				SET_ISA_EXT_MAP("smaia", RISCV_ISA_EXT_SMAIA);
-> +				SET_ISA_EXT_MAP("ssaia", RISCV_ISA_EXT_SSAIA);
->  			}
->  #undef SET_ISA_EXT_MAP
->  		}
+Best regards,
+baolu
