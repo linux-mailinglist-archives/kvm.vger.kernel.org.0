@@ -2,91 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D62BF68A242
-	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 19:49:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5326868A2F2
+	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 20:28:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232476AbjBCSt5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Feb 2023 13:49:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40460 "EHLO
+        id S232983AbjBCT22 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Feb 2023 14:28:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232291AbjBCSt4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Feb 2023 13:49:56 -0500
-Received: from out-225.mta1.migadu.com (out-225.mta1.migadu.com [IPv6:2001:41d0:203:375::e1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B707AA8A27
-        for <kvm@vger.kernel.org>; Fri,  3 Feb 2023 10:49:54 -0800 (PST)
-Date:   Fri, 3 Feb 2023 18:49:45 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1675450192;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=wN4paWkwXIa3CFgztXV8SjaEAKuP+2RoDhhtXu4cIuU=;
-        b=jO6B/3uutUTT+e3ZPGeCi9N2WzRphHCd8Zvt0BZnk3yz3hqj0/QgdlY4HYzBqDa7nYVYR4
-        y3EIPzceLl6k9iZPGNf8CLHnL6iIYKEUTXzCerI9p/kEgRr/r62o7EW1USVsS6OZnqey0/
-        4+MyUYmWm61ViF9E8I8/vrzR7q8kJ1Q=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     shahuang@redhat.com, kvm@vger.kernel.org,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        David Matlack <dmatlack@google.com>,
-        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <kvmarm@lists.linux.dev>,
-        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <kvmarm@lists.cs.columbia.edu>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] KVM: selftests: Remove redundant setbuf()
-Message-ID: <Y91XSZaRyqJjsg8o@google.com>
-References: <20230203061038.277655-1-shahuang@redhat.com>
- <Y91VV+WWrakREsN6@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y91VV+WWrakREsN6@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231160AbjBCT21 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Feb 2023 14:28:27 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18D8B1C594
+        for <kvm@vger.kernel.org>; Fri,  3 Feb 2023 11:28:26 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id s7-20020a257707000000b0085600c7c70cso5686574ybc.5
+        for <kvm@vger.kernel.org>; Fri, 03 Feb 2023 11:28:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=HYLbgv7PVml2TewJA39IQMx5unqixaCZm+fzISzoQck=;
+        b=MgHXL1T0AXZF0y1gq0TZV5NccJ6+f+xPNHRDSplMsbk2zAu+iuQSSjXQim55qlV6h3
+         J5BW9kwO39dl0DDltWIVGmC79n7ioUTCHgdkosNuKFGf3wVF5A5pnhPx5OdJHrrrX3Cz
+         xQeKJSrNWA5vgguVlHbPoul8GTEXnmhUk7re+cseIeXl7gez+iS2VhCfK/Ok0wPNiXdK
+         nHmljn7nW0Sqsxk7EVjaL98w20RQf1849MlevOLP8abKDVh87rbMt/Eecdiz5FuLAEXF
+         nnY0dwqCP63oZU4lwAqAEFEGABZiksibqZbclqOW/p9rlvLzf8M9x3uFV5vitlozfRML
+         Jzvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HYLbgv7PVml2TewJA39IQMx5unqixaCZm+fzISzoQck=;
+        b=gAR4gM4lqMJJcvIcpLxktWh1drXOBCEj3ehKi9t9glAkC7Oz6fJx8ngbq+bCXqlJu0
+         ye1dDODjWhV6yCAbBevL/LcKvSSgMlqLvH6HrUqSmwgobfFZsa6hWLwtTYfcIcYPUKda
+         cJ/IwKj+0mqOacg8wCye8zUOrsTAwgmBF2ocasGBoEAVanKP2lH3ZFJB49jw9kkgDaac
+         kt8zM4bA48n+wELNj2AjysjIOJ2N+UrzR562Ci/DuJ4hWxXikfLMFMuxgibRuMrcek0V
+         qTpgPBk04vohhjv2e44T341H4mfieuLQlo+T4S30vFUJFZa/ANdENM7LYS01mWuHxG0M
+         GesQ==
+X-Gm-Message-State: AO0yUKXQkw1bQCfCo7HItk8bvTupBFzX2R6IKYtjiiF6K7PLPx4k3WfG
+        huXggpvaCyDcqRBmPIxIJ2tizniUz5A4
+X-Google-Smtp-Source: AK7set9tMt2ictEwC0laTJjdU9Gpl1wadKBy8dHydjqUNDIzhAF9w3jVmI1LdZ8KKfYqfs166mHqCEt8qjfK
+X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
+ (user=vipinsh job=sendgmr) by 2002:a81:449:0:b0:524:3a4d:14b1 with SMTP id
+ 70-20020a810449000000b005243a4d14b1mr532193ywe.174.1675452505354; Fri, 03 Feb
+ 2023 11:28:25 -0800 (PST)
+Date:   Fri,  3 Feb 2023 11:28:17 -0800
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.1.519.gcb327c4b5f-goog
+Message-ID: <20230203192822.106773-1-vipinsh@google.com>
+Subject: [Patch v2 0/5] Optimize clear dirty log
+From:   Vipin Sharma <vipinsh@google.com>
+To:     seanjc@google.com, pbonzini@redhat.com, bgardon@google.com,
+        dmatlack@google.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Vipin Sharma <vipinsh@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 03, 2023 at 06:41:27PM +0000, Sean Christopherson wrote:
-> On Fri, Feb 03, 2023, shahuang@redhat.com wrote:
-> > From: Shaoqin Huang <shahuang@redhat.com>
-> > 
-> > Since setbuf(stdout, NULL) has been called in kvm_util.c with
-> > __attribute((constructor)). Selftests no need to setup it in their own
-> > code.
-> > 
-> > Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
-> > ---
-> 
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
+Hi,
 
-Thanks!
+This patch series has optimized control flow of clearing dirty log and
+improved its performance by ~38%. Patch 2 has more details about
+optimization.
 
-> Oliver/Marc, want to grab this one?  I doubt there will be conflicts, but IIRC
-> there are a handful of in-flight changes for aarch64/page_fault_test.c.
+It also got rid of many variants of the handle_changed_spte family of
+functions and converged logic to one handle_changed_spte() function. It
+also remove tdp_mmu_set_spte_no_[acc_track|dirty_log] and various
+booleans for controlling them.
 
-That is indeed the plan.
+Thanks
+Vipin
 
-Applying patches for arm64 has taken a bit longer because I don't
-yet have push access to kvmarm so I need Marc to pull from me. The net
-effect is emailed thankyous are delayed by a few days, but that wont be
-an issue going forward.
+v2:
+- Clear dirty log and age gfn range does not go through
+  handle_changed_spte, they handle their SPTE changes locally to improve
+  their speed.
+- Clear only specific bits atomically when updating SPTEs in clearing
+  dirty log and aging gfn range functions.
+- Removed tdp_mmu_set_spte_no_[acc_track|dirty_log] APIs.
+- Converged all handle_changed_spte related functions to one place.
+
+v1: https://lore.kernel.org/lkml/20230125213857.824959-1-vipinsh@google.com/
+
+Vipin Sharma (5):
+  KVM: x86/mmu: Make separate function to check for SPTEs atomic write
+    conditions
+  KVM: x86/mmu: Optimize SPTE change flow for clear-dirty-log
+  KVM: x86/mmu: Optimize SPTE change for aging gfn range
+  KVM: x86/mmu: Remove handle_changed_spte_dirty_log()
+  KVM: x86/mmu: Merge all handle_changed_pte* functions.
+
+ arch/x86/kvm/mmu/tdp_iter.h |  29 +++++--
+ arch/x86/kvm/mmu/tdp_mmu.c  | 163 +++++++++++-------------------------
+ 2 files changed, 72 insertions(+), 120 deletions(-)
 
 -- 
-Thanks,
-Oliver
+2.39.1.519.gcb327c4b5f-goog
+
