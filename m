@@ -2,75 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 83355689DC6
-	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 16:17:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E8F05689E12
+	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 16:24:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234345AbjBCPKg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Feb 2023 10:10:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51822 "EHLO
+        id S233312AbjBCPYJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Feb 2023 10:24:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234113AbjBCPJq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Feb 2023 10:09:46 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5867A7ED8;
-        Fri,  3 Feb 2023 07:08:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=hrqLS9VRJdwWgQKPMrZrcg15ZPJuMvt1hsLhaUGAnIc=; b=BFKATpqtVunXubdNNkJ5PWdGdR
-        w5eGqcr1X3knNS9rr6k9oWENyIENlbi6OonNovYL8ZHpJJjUDwpcHhHTonjJY90oiMj+zCg0GCLCT
-        ZgNdYtwQXm0LQxe0W+f7iZTRogn9U/K+/3e+BH4ejOUB6/fIsWrQ9/00S1gnU4+Kd1mny+mtvIcKf
-        JBQbwIHCn96cgHxD69nkGyasiOfbHuKn0hnE8rzKpZB3qBEEW9iNbSwkEF+umPMiYEN99kqyv25Ra
-        OyRlO6fWHiMfP1LpyRoEaKpRG1PL6hAcJNC4/vgMJdlJJBo2kCaI7cWoF5XwWHzsLSZZ3Jn/itg0Q
-        3+X6SEYg==;
-Received: from [2001:4bb8:19a:272a:910:bb67:7287:f956] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pNxfT-002bcT-3j; Fri, 03 Feb 2023 15:07:59 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Ilya Dryomov <idryomov@gmail.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Keith Busch <kbusch@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        David Howells <dhowells@redhat.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Xiubo Li <xiubli@redhat.com>, Steve French <sfrench@samba.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-        target-devel@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        devel@lists.orangefs.org, io-uring@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 23/23] libceph: use bvec_set_page to initialize bvecs
-Date:   Fri,  3 Feb 2023 16:06:34 +0100
-Message-Id: <20230203150634.3199647-24-hch@lst.de>
-X-Mailer: git-send-email 2.39.0
-In-Reply-To: <20230203150634.3199647-1-hch@lst.de>
-References: <20230203150634.3199647-1-hch@lst.de>
+        with ESMTP id S232691AbjBCPXz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Feb 2023 10:23:55 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50B1AAE877
+        for <kvm@vger.kernel.org>; Fri,  3 Feb 2023 07:21:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675437588;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3g9NXrofpUX/HnzotWG0ahi/8nrSPeNR8z5upflUFxU=;
+        b=WGKjnvzIQzjdRjWwJ6nujUB1BLCGEovHtqv9hk/+9ETg+KkKouj9ajVjfG/MGZVXl13EvY
+        E5jUEMTaKyTv+3O6dzpChC6mskEBub/eFchzpYcvmNNS4aMnSgCH4CDoXqCHxXYUK7PpgI
+        lgNE7mQ7DyRMSsxrkEvBcqexKyLdjSw=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-22-56W50NjgMky0NSeivu9t4Q-1; Fri, 03 Feb 2023 10:19:47 -0500
+X-MC-Unique: 56W50NjgMky0NSeivu9t4Q-1
+Received: by mail-io1-f72.google.com with SMTP id n8-20020a6bf608000000b007048850aa92so3146464ioh.10
+        for <kvm@vger.kernel.org>; Fri, 03 Feb 2023 07:19:47 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3g9NXrofpUX/HnzotWG0ahi/8nrSPeNR8z5upflUFxU=;
+        b=T22UFb+iMErIHiw0b9ukC1Xc/5UWSupSDqTsi/mEOlniAcJbUTRXW8+RjlWJAKH74n
+         SO/atDL1x23wIg5NXkIDs609znEztid58Vg/3sM08TtKPPnPCsuibYLxzSHvVhfxa97h
+         ebhtaXtqOGKi+WxpMB96cRRtGlYYfzX4hmx48S7PodyFJkyOL5dSUBs2o3L+QqwpHLKA
+         3dBOGpKCXM18QP+MrINDyg6/3s5skr7N+8NfOaLruHqLVSRf9rZuYghx4j3/7UK49aYh
+         7DYqTgM8naVJQYctz7IhlfJVcpLC4UDbiOUItcTNVXvm9KmWzLrHNraCyUNOCDR0FytK
+         pMTw==
+X-Gm-Message-State: AO0yUKUKNoOcXqxgGtOjsCpuvsHAFF0LFpvSgoCXDJEp5emXD7yWr2IT
+        Dgs5HFyHHSjk23chHQZ9k2FpvnbDITkEcJytAf9lCKIeTAiU8U4dzMrWY9txY+mVsk0Zzj9eDZR
+        WhW4RASh3UDov
+X-Received: by 2002:a05:6e02:1bee:b0:310:dff1:f55a with SMTP id y14-20020a056e021bee00b00310dff1f55amr7898146ilv.1.1675437586788;
+        Fri, 03 Feb 2023 07:19:46 -0800 (PST)
+X-Google-Smtp-Source: AK7set9xS0+fDEKN1aTi0x42bIUmxvuWn31TlGlTEr16+4yc8RCliFt2/XQVRKmY908DNmVjPFwjDA==
+X-Received: by 2002:a05:6e02:1bee:b0:310:dff1:f55a with SMTP id y14-20020a056e021bee00b00310dff1f55amr7898130ilv.1.1675437586483;
+        Fri, 03 Feb 2023 07:19:46 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id r6-20020a922a06000000b0031093e9c7fasm830954ile.85.2023.02.03.07.19.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Feb 2023 07:19:45 -0800 (PST)
+Date:   Fri, 3 Feb 2023 08:19:42 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "farman@linux.ibm.com" <farman@linux.ibm.com>,
+        "pmorel@linux.ibm.com" <pmorel@linux.ibm.com>,
+        "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
+        "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
+        "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
+        "jjherne@linux.ibm.com" <jjherne@linux.ibm.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3] vfio: fix deadlock between group lock and kvm lock
+Message-ID: <20230203081942.64fbf9f1.alex.williamson@redhat.com>
+In-Reply-To: <DS0PR11MB75297154376388A3698C5CCAC3D79@DS0PR11MB7529.namprd11.prod.outlook.com>
+References: <20230202162442.78216-1-mjrosato@linux.ibm.com>
+        <20230202124210.476adaf8.alex.williamson@redhat.com>
+        <BN9PR11MB527618E281BEB8E479ABB0418CD69@BN9PR11MB5276.namprd11.prod.outlook.com>
+        <20230202161307.0c6aa23e.alex.williamson@redhat.com>
+        <BN9PR11MB5276017F9CEBB4BAE58C40E88CD79@BN9PR11MB5276.namprd11.prod.outlook.com>
+        <DS0PR11MB7529050661FCE4A5AC4B17C3C3D79@DS0PR11MB7529.namprd11.prod.outlook.com>
+        <20230203064940.435e4d65.alex.williamson@redhat.com>
+        <DS0PR11MB75297154376388A3698C5CCAC3D79@DS0PR11MB7529.namprd11.prod.outlook.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,104 +106,103 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use the bvec_set_page helper to initialize bvecs.
+On Fri, 3 Feb 2023 14:54:44 +0000
+"Liu, Yi L" <yi.l.liu@intel.com> wrote:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Ilya Dryomov <idryomov@gmail.com>
----
- net/ceph/messenger_v1.c |  7 ++-----
- net/ceph/messenger_v2.c | 28 +++++++++++-----------------
- 2 files changed, 13 insertions(+), 22 deletions(-)
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Friday, February 3, 2023 9:50 PM
+> >=20
+> > On Fri, 3 Feb 2023 13:32:09 +0000
+> > "Liu, Yi L" <yi.l.liu@intel.com> wrote:
+> >  =20
+> > > > From: Tian, Kevin <kevin.tian@intel.com>
+> > > > Sent: Friday, February 3, 2023 10:00 AM
+> > > > =20
+> > > > > From: Alex Williamson <alex.williamson@redhat.com>
+> > > > > Sent: Friday, February 3, 2023 7:13 AM
+> > > > >
+> > > > > On Thu, 2 Feb 2023 23:04:10 +0000
+> > > > > "Tian, Kevin" <kevin.tian@intel.com> wrote:
+> > > > > =20
+> > > > > > > From: Alex Williamson <alex.williamson@redhat.com>
+> > > > > > > Sent: Friday, February 3, 2023 3:42 AM
+> > > > > > >
+> > > > > > >
+> > > > > > > LGTM.  I'm not sure moving the functions to vfio_main really =
+buys =20
+> > us =20
+> > > > > > > anything since we're making so much use of group fields.  The=
+ cdev
+> > > > > > > approach will necessarily be different, so the bulk of the ge=
+t code =20
+> > will =20
+> > > > > > > likely need to move back to group.c anyway.
+> > > > > > > =20
+> > > > > >
+> > > > > > well my last comment was based on Matthew's v2 where the get =20
+> > code =20
+> > > > > > gets a kvm passed in instead of implicitly retrieving group ref=
+_lock
+> > > > > > internally. In that case the get/put helpers only contain devic=
+e logic
+> > > > > > thus fit in vfio_main.c.
+> > > > > >
+> > > > > > with v3 then they have to be in group.c since we don't want to =
+use
+> > > > > > group fields in vfio_main.c.
+> > > > > >
+> > > > > > but I still think v2 of the helpers is slightly better. The onl=
+y difference
+> > > > > > between cdev and group when handling this race is using differe=
+nt
+> > > > > > ref_lock. the symbol get/put part is exactly same. So even if we
+> > > > > > merge v3 like this, very likely Yi has to change it back to v2 =
+style
+> > > > > > to share the get/put helpers while just leaving the ref_lock pa=
+rt
+> > > > > > handled differently between the two path. =20
+> > > > >
+> > > > > I'm not really a fan of the asymmetry of the v2 version where the=
+ get
+> > > > > helper needs to be called under the new kvm_ref_lock, but the put
+> > > > > helper does not.  Having the get helper handle that makes the cal=
+ler
+> > > > > much cleaner.  Thanks,
+> > > > > =20
+> > > >
+> > > > What about passing the lock pointer into the helper? it's still sli=
+ghtly
+> > > > asymmetry as the put helper doesn't carry the lock pointer but it
+> > > > could also be interpreted as if the pointer has been saved in the g=
+et
+> > > > then if it needs to be referenced by the put there is no need to pa=
+ss
+> > > > it in again. =20
+> > >
+> > > For cdev, I may modify vfio_device_get_kvm_safe() to accept
+> > > struct kvm and let its caller hold a kvm_ref_lock (field within
+> > > struct vfio_device_file). Meanwhile, the group path holds
+> > > the group->kvm_ref_lock before invoking vfio_device_get_kvm_safe().
+> > > vfio_device_get_kvm_safe() just includes the symbol get/put and
+> > > the device->kvm and put_kvm set. =20
+> >=20
+> > Sounds a lot like v2 :-\  =20
+>=20
+> Yes, like v2. =F0=9F=98=8A
+>=20
+> > I'd look more towards group and cdev specific
+> > helpers that handle the locking so that the callers aren't exposed to
+> > the asymmetry of get vs put, and reduce a new
+> > _vfio_device_get_kvm_safe() in common code that only does the symbol
+> > work.  Thanks, =20
+>=20
+> If so, looks like Matthew needs a v4. I'm waiting for the final version
+> of this patch and sending a new cdev series based on it. wish to see
+> it soon ^_^.
 
-diff --git a/net/ceph/messenger_v1.c b/net/ceph/messenger_v1.c
-index d1787d7d33ef9a..d664cb1593a777 100644
---- a/net/ceph/messenger_v1.c
-+++ b/net/ceph/messenger_v1.c
-@@ -40,15 +40,12 @@ static int ceph_tcp_recvmsg(struct socket *sock, void *buf, size_t len)
- static int ceph_tcp_recvpage(struct socket *sock, struct page *page,
- 		     int page_offset, size_t length)
- {
--	struct bio_vec bvec = {
--		.bv_page = page,
--		.bv_offset = page_offset,
--		.bv_len = length
--	};
-+	struct bio_vec bvec;
- 	struct msghdr msg = { .msg_flags = MSG_DONTWAIT | MSG_NOSIGNAL };
- 	int r;
- 
- 	BUG_ON(page_offset + length > PAGE_SIZE);
-+	bvec_set_page(&bvec, page, length, page_offset);
- 	iov_iter_bvec(&msg.msg_iter, ITER_DEST, &bvec, 1, length);
- 	r = sock_recvmsg(sock, &msg, msg.msg_flags);
- 	if (r == -EAGAIN)
-diff --git a/net/ceph/messenger_v2.c b/net/ceph/messenger_v2.c
-index 3009028c4fa28f..301a991dc6a68e 100644
---- a/net/ceph/messenger_v2.c
-+++ b/net/ceph/messenger_v2.c
-@@ -149,10 +149,10 @@ static int do_try_sendpage(struct socket *sock, struct iov_iter *it)
- 
- 	while (iov_iter_count(it)) {
- 		/* iov_iter_iovec() for ITER_BVEC */
--		bv.bv_page = it->bvec->bv_page;
--		bv.bv_offset = it->bvec->bv_offset + it->iov_offset;
--		bv.bv_len = min(iov_iter_count(it),
--				it->bvec->bv_len - it->iov_offset);
-+		bvec_set_page(&bv, it->bvec->bv_page,
-+			      min(iov_iter_count(it),
-+				  it->bvec->bv_len - it->iov_offset),
-+			      it->bvec->bv_offset + it->iov_offset);
- 
- 		/*
- 		 * sendpage cannot properly handle pages with
-@@ -286,9 +286,8 @@ static void set_out_bvec_zero(struct ceph_connection *con)
- 	WARN_ON(iov_iter_count(&con->v2.out_iter));
- 	WARN_ON(!con->v2.out_zero);
- 
--	con->v2.out_bvec.bv_page = ceph_zero_page;
--	con->v2.out_bvec.bv_offset = 0;
--	con->v2.out_bvec.bv_len = min(con->v2.out_zero, (int)PAGE_SIZE);
-+	bvec_set_page(&con->v2.out_bvec, ceph_zero_page,
-+		      min(con->v2.out_zero, (int)PAGE_SIZE), 0);
- 	con->v2.out_iter_sendpage = true;
- 	iov_iter_bvec(&con->v2.out_iter, ITER_SOURCE, &con->v2.out_bvec, 1,
- 		      con->v2.out_bvec.bv_len);
-@@ -863,10 +862,7 @@ static void get_bvec_at(struct ceph_msg_data_cursor *cursor,
- 
- 	/* get a piece of data, cursor isn't advanced */
- 	page = ceph_msg_data_next(cursor, &off, &len);
--
--	bv->bv_page = page;
--	bv->bv_offset = off;
--	bv->bv_len = len;
-+	bvec_set_page(bv, page, len, off);
- }
- 
- static int calc_sg_cnt(void *buf, int buf_len)
-@@ -1855,9 +1851,8 @@ static void prepare_read_enc_page(struct ceph_connection *con)
- 	     con->v2.in_enc_resid);
- 	WARN_ON(!con->v2.in_enc_resid);
- 
--	bv.bv_page = con->v2.in_enc_pages[con->v2.in_enc_i];
--	bv.bv_offset = 0;
--	bv.bv_len = min(con->v2.in_enc_resid, (int)PAGE_SIZE);
-+	bvec_set_page(&bv, con->v2.in_enc_pages[con->v2.in_enc_i],
-+		      min(con->v2.in_enc_resid, (int)PAGE_SIZE), 0);
- 
- 	set_in_bvec(con, &bv);
- 	con->v2.in_enc_i++;
-@@ -2998,9 +2993,8 @@ static void queue_enc_page(struct ceph_connection *con)
- 	     con->v2.out_enc_resid);
- 	WARN_ON(!con->v2.out_enc_resid);
- 
--	bv.bv_page = con->v2.out_enc_pages[con->v2.out_enc_i];
--	bv.bv_offset = 0;
--	bv.bv_len = min(con->v2.out_enc_resid, (int)PAGE_SIZE);
-+	bvec_set_page(&bv, con->v2.out_enc_pages[con->v2.out_enc_i],
-+		      min(con->v2.out_enc_resid, (int)PAGE_SIZE), 0);
- 
- 	set_out_bvec(con, &bv, false);
- 	con->v2.out_enc_i++;
--- 
-2.39.0
+cdev support is a future feature, why does it become a requirement for
+a fix to the current base?  The refactoring could also happen in the
+cdev series.  Thanks,
+
+Alex
 
