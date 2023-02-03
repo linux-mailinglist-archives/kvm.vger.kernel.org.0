@@ -2,442 +2,496 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 34B646892A0
-	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 09:49:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D7C286892E4
+	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 09:58:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232403AbjBCIrm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Feb 2023 03:47:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48250 "EHLO
+        id S232142AbjBCI6S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Feb 2023 03:58:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232084AbjBCIrl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Feb 2023 03:47:41 -0500
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80DD584F9B
-        for <kvm@vger.kernel.org>; Fri,  3 Feb 2023 00:47:39 -0800 (PST)
-Received: by mail-pg1-x52c.google.com with SMTP id 141so3213729pgc.0
-        for <kvm@vger.kernel.org>; Fri, 03 Feb 2023 00:47:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=atishpatra.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=YLIGlrDvLBHkMp12DzvuAdmrifvGeQa/SJZdzkO0+I8=;
-        b=J4e4Gtvo/CUsIZ6Q8lE8YAc3YACloAqE+yPsy+hXg7oJKPAKud3lU5CtcliSjGf9to
-         fHwQXNIvugJnpGR3d57eFy7qpGYSh1fDzbRimZRZ5vG5swRWra+d5N/5PTBM8p2SmqHo
-         /snsAhCQlWKUPdUm3FYDgsXqRy68dL4oqwcDo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YLIGlrDvLBHkMp12DzvuAdmrifvGeQa/SJZdzkO0+I8=;
-        b=B2Iadu1wfNG86ozpiXEtpwUeNjDQnSR7Uy8PyFIav8sqzh5M3ub82XYxiaRZxx1PXA
-         NZ/MdD4AEHla/0vPAEZRK8TvPRjy4C5YN2RJ2uTfcVBlkVySGHi4t0zNtRVCG4/tuwtR
-         3tW2hFgzkT5NX1d8/QRC4obiRp3DE1LeRfgBwztIbLTfxz25FkRAIRy8ifY9IGU6MAD/
-         hC7LFYHWTzV9F/pbDaw1owqLWZlFa9bc0IVqakZjd9BHH597ugQFaZ0oInOeV8Qv6XoN
-         QLsf6a7TULVzrBfMRo3pnXatUBYloXq/4InC7zSlgxZ6IQNH/Hbur96v5XE6dckfAttS
-         5jLA==
-X-Gm-Message-State: AO0yUKUipKJ8swfvcVt3dJC27DWwWHSkL25oi9plxR4+bnSXBcUtMFQj
-        zi+OceseB/5Lykng4htpJMemC1YmzDr64rZCtNtl
-X-Google-Smtp-Source: AK7set81cTVO4MDrU89ipqLMeWlMsn73sidftGcwdL/VccrDnQEhzgZiZ/JD3egiJUbJbuU1+1ny33blARlRCn3Tujg=
-X-Received: by 2002:a62:e30c:0:b0:592:8390:8b97 with SMTP id
- g12-20020a62e30c000000b0059283908b97mr1876871pfh.15.1675414058953; Fri, 03
- Feb 2023 00:47:38 -0800 (PST)
+        with ESMTP id S230456AbjBCI6Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Feb 2023 03:58:16 -0500
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33A4116320;
+        Fri,  3 Feb 2023 00:58:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1675414694; x=1706950694;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=TA7E4um/srWI8yohOJKACm+0mMuEiz5pQ4gqcHVPCUQ=;
+  b=YJkWO49/BM/rXEHyWbUHuLBct4hhi8lK07mDflq8yzxxK+HVieaUSp4s
+   qLXviY2YKYOHIEBh4P7InqdEOMe3JglGcnC31H1zZHRsvsHa8AIMqvkh6
+   2cANBcs+Lz1emU5YANqV5/V6M5Gb1sqv1pXEJ3gmflkFD/9ny2WDIx6TG
+   jhlviRRe2aKkSVH09IBUqkWvTYjvVugk8H2/qYwjrlPLMS9Xubrtfx9jn
+   Xw9bfG/3l2K+5ZviCSWPdJbrqQpQ5H1KAmo97ZRFIXUxT3AYlxO6229E4
+   2seDbI+B8KeAJIWWrUsmoY0/P6qDHMNY0gLyfCPEqmWyK1sMLSSgA66qF
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10609"; a="329982650"
+X-IronPort-AV: E=Sophos;i="5.97,269,1669104000"; 
+   d="scan'208";a="329982650"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2023 00:58:13 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10609"; a="665653607"
+X-IronPort-AV: E=Sophos;i="5.97,269,1669104000"; 
+   d="scan'208";a="665653607"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orsmga002.jf.intel.com with ESMTP; 03 Feb 2023 00:58:13 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Fri, 3 Feb 2023 00:58:13 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16 via Frontend Transport; Fri, 3 Feb 2023 00:58:13 -0800
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.42) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.16; Fri, 3 Feb 2023 00:58:13 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EgAJc2SwmKvu0Opp65Pw2iqBIztQkK5z/r5R2c6L0Q7kgYedac0wgmwwZeMFh6tHEnsdmQZI5/G0ZdBwfMdSVVPsfH2fi6dDEiYzb8ITQ6POBiAarlR9HA26uCYKVTZjFDZZNqK3jIHbZTkyKZC/IJecT5IatFoI/V5I0FbuyCUY+ODQP17JX/HfSWekcgMSMqfAjIV+EmqvR3l7m3nk6iL+xgqsHhT3CV9drurbnaj1zojnc7wQwsNL9mHZ1eZ7WSQkF6Rh/eYI8aftCVnnE8Ig+eepSRao6e6zHvMb68LQAA40eCHGxZntavKbr/mEqF4oI8cnRD/e6ITdgOirAg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HWUH+iFS7kUG1loC8xULl3lGKnFCBHsZO6TRIHJwsk4=;
+ b=nywbCFPaOgY5lFJ3H6JODZz+Eu+8MS6Hwwu9q9/PFNK7+fPxvp0bfpTq621qbwy5Sg66Jc77yAhIQCLWOvT9h6LhiPnYaFHfzMleIj3UaDcdXRXcMPifgnBoTBTsTizRmuL3aaWh80lhC5zOGB4qZF/j54FGxetQPVGTpGur/KWkDx6eVqo3VSN4d+6GvQe8kz8DRCSh5cBImzKYpkyqkFr/9UKKubXCufX6eKmhg3eshYYzNDgkHocnXL2HED7vxJ14RDAeSTYoxnoKRmGOgnKcAWWf7HWIYT8eD+Hw+lONt3qWdwEzIgqhSHTvOfa517vUhK+VK3/1YrJyggHZAg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by PH7PR11MB6475.namprd11.prod.outlook.com (2603:10b6:510:1f1::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6064.27; Fri, 3 Feb
+ 2023 08:58:10 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::e1fa:abbe:2009:b0a3]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::e1fa:abbe:2009:b0a3%4]) with mapi id 15.20.6064.024; Fri, 3 Feb 2023
+ 08:58:10 +0000
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>
+CC:     "cohuck@redhat.com" <cohuck@redhat.com>,
+        "farman@linux.ibm.com" <farman@linux.ibm.com>,
+        "pmorel@linux.ibm.com" <pmorel@linux.ibm.com>,
+        "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
+        "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
+        "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
+        "jjherne@linux.ibm.com" <jjherne@linux.ibm.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v3] vfio: fix deadlock between group lock and kvm lock
+Thread-Topic: [PATCH v3] vfio: fix deadlock between group lock and kvm lock
+Thread-Index: AQHZNyMjAB7EXHsi0Ue5s99XWjtHT6687BlA
+Date:   Fri, 3 Feb 2023 08:58:09 +0000
+Message-ID: <DS0PR11MB75295F851A74ACE7CAFB0ACCC3D79@DS0PR11MB7529.namprd11.prod.outlook.com>
+References: <20230202162442.78216-1-mjrosato@linux.ibm.com>
+In-Reply-To: <20230202162442.78216-1-mjrosato@linux.ibm.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS0PR11MB7529:EE_|PH7PR11MB6475:EE_
+x-ms-office365-filtering-correlation-id: 0ab63254-68ee-448b-28e8-08db05c4c633
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 0IjnufiUGXYUMbvfEOF21DZF8Z5tJCy0QvjM5ugVWRPVgRDvXqbipl8OkgmvyqPYwGZrtPnajZ79OltLCC3FL8BKDPDQmID72Zrh52ETd85AIgAlBh8g+IC5JKTUz3HVgqczeJbfdwULP3yYcNCTnRVr6AYRqsqQznbvNU4NkDRpxwOCOvQAtPlg+6DAat5KUx7AJLFsh5ie6ZoWa8ADwFaxNDLoRbkWlGgtlYspgEA89SvFBxXjL+61bWJqIGEniPsLDK6dIvgvaOKNSOuTKlwkfBY7pKxRjY66f9pYRhEPy1TKLCN5mbKeObH9gAZ4DTVfB8KSD+sGU665L1YR+29ng0uqSMNG/uusGp7nFWCJTES/QpSYn1Xl1WcaCaic1iP0ryzlST1tbFHHdSv4zj4HxVam5LjlCOqzP2N4VpkZEad1PGzRWcZKMUcjLntmthfTuKvD75ZdSoCUHRQ7dmE4f30tL+510oFQYYuCpJy46lWM3PT3gCVBaAOaQEwYOh05q/P+D8qoQ7wbqKAXCi0XX2Gcv2iZjtsvML6gdzMjEAUT3tlgA9D8WRG+nXqNPp97oGEeLcVKM/HbU6nlwPRbIGUWMuPDKZhPLh052yBz3/7m5gqL9gOUwM5AgUpwiYPtYx01Cvd+yXuvE/bkusRNMAuLzCLWSVXyaMF2UzYFn488B27brAXm06jXyibfHGNL+sMZV7jVjY50LEJhyaAsHMs7nrB37IP6L660HJU=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(346002)(376002)(136003)(396003)(39860400002)(366004)(451199018)(110136005)(26005)(41300700001)(55016003)(186003)(9686003)(6506007)(82960400001)(38100700002)(54906003)(122000001)(8936002)(38070700005)(316002)(2906002)(71200400001)(7696005)(76116006)(52536014)(66556008)(66946007)(33656002)(66476007)(83380400001)(86362001)(7416002)(8676002)(5660300002)(64756008)(66446008)(4326008)(478600001)(13296009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?6SmUpTy0Un5+HALjYZMvl/DfVPIc9v8j45Zpo3ZLD9LA/GGgKEkNjY95skZY?=
+ =?us-ascii?Q?hyTSVK2AhYe5ImuDGTlWuV35wmpBxBo4zC5Y0bN9b0rrMyOi+pj0GlzNtz0S?=
+ =?us-ascii?Q?gUjE0ZnumeqF5r5fmcPfYXqnhsK9SRVCdaW2XfTMxpjkKpEnfMzVDGiEOH+T?=
+ =?us-ascii?Q?Q5SIGvXKhPgSIyKsh94hYvKyZ+HUVYPpjQN0PmkIS51qvPs+5LYRa65j/kww?=
+ =?us-ascii?Q?AGsmmVBqRajMciL6oUbReyhIc7Ysw4wGNOU48/8J8YeK07VbVHNiCDExuXmk?=
+ =?us-ascii?Q?s04ytfyInFXnuZTYkir0G2ktrrLFYDKQpOJWVrl/L+MCaejZJ6WdRTjn1f81?=
+ =?us-ascii?Q?NXazlw5byqmYPHs/yrArUDv0tnDiOaa9tYNnc6uEOaJ5vLzZ7fSvWkoy88AU?=
+ =?us-ascii?Q?vusRNOcfJWMenrPucSneuRpdx1KMYJIpAUJME7Ic01D08/74meZf2nmowKpi?=
+ =?us-ascii?Q?szWogMYJQbrloFe7IhSM8We8JsnP08/xZAyCLZUiaGCYbAmq3DGXjr5KElU/?=
+ =?us-ascii?Q?UPC1RZe/FUwY1xraDffgS5R8Uot+mUfCopNGvapfJV6UK3febWwTPXEKUBhK?=
+ =?us-ascii?Q?PGISNychkp6GkS9A54LkGv0DUCC1FUw9cAMjnoSLv8ZdCAWzS4tVDaPYd4c+?=
+ =?us-ascii?Q?O5E2gKPnhegKBRgrWP9jeKlJUFx0+i+1jyKTYCgLR878baxPUasbK8cGF4gN?=
+ =?us-ascii?Q?huwr4035eJaN1etWj2A3B7+zZmPsXTRrPPEpRg4UJ50J5BCWMDhKVgIQ+MxK?=
+ =?us-ascii?Q?3aUy2E+Xt9H+dSH+PtTIhWo/ole9DBZrlsQkpLNXHY9egQjNwyTOxhesW5zR?=
+ =?us-ascii?Q?E0VTEn5hyFY6qGXnt6Ux9VVv/AobHCqooqWNeC4VUL1AppwEDrRkxdGNZGOb?=
+ =?us-ascii?Q?tuVn3/upEdUuiSHGDJcQNyD2VwItIf2orCaZycKtADznO64PYbHdjfIjuxaV?=
+ =?us-ascii?Q?4RMA+GnPCO3km9Dm41H2no/ykTILcTLDxCOAzOSzVRHDg39adM9O+IUQacuh?=
+ =?us-ascii?Q?s02KBPR/JPVNiLVJsGCfdbRkdpBEF6euV4DFn6B/zv+Ms7TMho7N3sPzoTcL?=
+ =?us-ascii?Q?7h+kpvj7Ofpybn+KvPls3jCEXh+pmCyxgy0CNVkXNEwfCjfNf9XEbttSxIoO?=
+ =?us-ascii?Q?ShoTTK/yNqTL07MRjb5C1XxsdJTqZv4VgQ1lRrG0GnSV5O7sh3pgCj/xojsw?=
+ =?us-ascii?Q?dx2kidWB7vpIqKeby/mpsmo46jHLO3oRwvmp+FyWbhpoxZaivLYsdcW+Ux+T?=
+ =?us-ascii?Q?ZJfOAPFZJ/afy1Ty37EJ7O0sXM9VTEIJWhwDhGULybEG/T6jCavatUOCrjD5?=
+ =?us-ascii?Q?IOWu1ItDuGSxGo9mlvACAdFEOQiLwuGotgAFBofF5r9tZignH0KFf+0/2MeI?=
+ =?us-ascii?Q?J0dzktoObnXLVyiu+9ZAXaUbtEUpCsQIIOcqrGmj13Zkdi+5AcxJ7EcYgdn6?=
+ =?us-ascii?Q?CF/W6XaDF+TDiu0kOP/Eh4/GdEF20UEwcOWpHNRY0phkttCRC/hOoTBEPtDW?=
+ =?us-ascii?Q?UuapLSBPUz6ouplJu0x2KjjO9f5obQh/KMYN8zEv5xQZ4d3E4wBsMb67IXEp?=
+ =?us-ascii?Q?8Scm+wBxS4becA50W8p0miTUVCQEohPW3uQglKZ0?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20230201231250.3806412-1-atishp@rivosinc.com> <20230201231250.3806412-8-atishp@rivosinc.com>
- <20230202170345.uwi72dauzunlzxex@orel>
-In-Reply-To: <20230202170345.uwi72dauzunlzxex@orel>
-From:   Atish Patra <atishp@atishpatra.org>
-Date:   Fri, 3 Feb 2023 00:47:27 -0800
-Message-ID: <CAOnJCUJfc8y729GiUdtqhv+PZu8v9rH+kfpwPwdW=GQPEs9FNw@mail.gmail.com>
-Subject: Re: [PATCH v4 07/14] RISC-V: KVM: Add skeleton support for perf
-To:     Andrew Jones <ajones@ventanamicro.com>
-Cc:     Atish Patra <atishp@rivosinc.com>, linux-kernel@vger.kernel.org,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Anup Patel <anup@brainfault.org>,
-        Eric Lin <eric.lin@sifive.com>, Guo Ren <guoren@kernel.org>,
-        Heiko Stuebner <heiko@sntech.de>,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        linux-riscv@lists.infradead.org,
-        Mark Rutland <mark.rutland@arm.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Will Deacon <will@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0ab63254-68ee-448b-28e8-08db05c4c633
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Feb 2023 08:58:09.9871
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: bPtY97npnlEVMMy5D4jq0QWugr+EIgy5HSiua4MWygelQRCXToJUYW4Vjcdo/tmuSx1sn34jhbZxko35kehIIQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6475
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 2, 2023 at 9:03 AM Andrew Jones <ajones@ventanamicro.com> wrote:
->
-> On Wed, Feb 01, 2023 at 03:12:43PM -0800, Atish Patra wrote:
-> > This patch only adds barebone structure of perf implementation. Most of
-> > the function returns zero at this point and will be implemented
-> > fully in the future.
-> >
-> > Signed-off-by: Atish Patra <atishp@rivosinc.com>
-> > ---
-> >  arch/riscv/include/asm/kvm_host.h     |   4 +
-> >  arch/riscv/include/asm/kvm_vcpu_pmu.h |  78 +++++++++++++++
-> >  arch/riscv/kvm/Makefile               |   1 +
-> >  arch/riscv/kvm/vcpu.c                 |   7 ++
-> >  arch/riscv/kvm/vcpu_pmu.c             | 136 ++++++++++++++++++++++++++
-> >  5 files changed, 226 insertions(+)
-> >  create mode 100644 arch/riscv/include/asm/kvm_vcpu_pmu.h
-> >  create mode 100644 arch/riscv/kvm/vcpu_pmu.c
-> >
-> > diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-> > index 93f43a3..b90be9a 100644
-> > --- a/arch/riscv/include/asm/kvm_host.h
-> > +++ b/arch/riscv/include/asm/kvm_host.h
-> > @@ -18,6 +18,7 @@
-> >  #include <asm/kvm_vcpu_insn.h>
-> >  #include <asm/kvm_vcpu_sbi.h>
-> >  #include <asm/kvm_vcpu_timer.h>
-> > +#include <asm/kvm_vcpu_pmu.h>
-> >
-> >  #define KVM_MAX_VCPUS                        1024
-> >
-> > @@ -228,6 +229,9 @@ struct kvm_vcpu_arch {
-> >
-> >       /* Don't run the VCPU (blocked) */
-> >       bool pause;
-> > +
-> > +     /* Performance monitoring context */
-> > +     struct kvm_pmu pmu_context;
-> >  };
-> >
-> >  static inline void kvm_arch_hardware_unsetup(void) {}
-> > diff --git a/arch/riscv/include/asm/kvm_vcpu_pmu.h b/arch/riscv/include/asm/kvm_vcpu_pmu.h
-> > new file mode 100644
-> > index 0000000..e2b4038
-> > --- /dev/null
-> > +++ b/arch/riscv/include/asm/kvm_vcpu_pmu.h
-> > @@ -0,0 +1,78 @@
-> > +/* SPDX-License-Identifier: GPL-2.0-only */
-> > +/*
-> > + * Copyright (c) 2023 Rivos Inc
-> > + *
-> > + * Authors:
-> > + *     Atish Patra <atishp@rivosinc.com>
-> > + */
-> > +
-> > +#ifndef __KVM_VCPU_RISCV_PMU_H
-> > +#define __KVM_VCPU_RISCV_PMU_H
-> > +
-> > +#include <linux/perf/riscv_pmu.h>
-> > +#include <asm/kvm_vcpu_sbi.h>
-> > +#include <asm/sbi.h>
-> > +
-> > +#ifdef CONFIG_RISCV_PMU_SBI
-> > +#define RISCV_KVM_MAX_FW_CTRS        32
-> > +
-> > +#if RISCV_KVM_MAX_FW_CTRS > 32
-> > +#error "Maximum firmware counter can't exceed 32 without increasing the RISCV_MAX_COUNTERS"
->
-> "The number of firmware counters cannot exceed 32 without increasing RISCV_MAX_COUNTERS"
->
-> > +#endif
-> > +
-> > +#define RISCV_MAX_COUNTERS      64
->
-> But instead of that message, what I think we need is something like
->
->  #define RISCV_KVM_MAX_HW_CTRS  32
->  #define RISCV_KVM_MAX_FW_CTRS  32
->  #define RISCV_MAX_COUNTERS     (RISCV_KVM_MAX_HW_CTRS + RISCV_KVM_MAX_FW_CTRS)
->
->  static_assert(RISCV_MAX_COUNTERS <= 64)
->
-> And then in pmu_sbi_device_probe() should ensure
->
->   num_counters <= RISCV_MAX_COUNTERS
->
-> and pmu_sbi_get_ctrinfo() should ensure
->
->   num_hw_ctr <= RISCV_KVM_MAX_HW_CTRS
->   num_fw_ctr <= RISCV_KVM_MAX_FW_CTRS
->
-> which has to be done at runtime.
->
+Hi Matthew,
 
-Sure. I will add the additional sanity checks.
+> From: Matthew Rosato <mjrosato@linux.ibm.com>
+> Sent: Friday, February 3, 2023 12:25 AM
+>=20
+> After 51cdc8bc120e, we have another deadlock scenario between the
+> kvm->lock and the vfio group_lock with two different codepaths acquiring
+> the locks in different order.  Specifically in vfio_open_device, vfio
+> holds the vfio group_lock when issuing device->ops->open_device but
+> some
+> drivers (like vfio-ap) need to acquire kvm->lock during their open_device
+> routine;  Meanwhile, kvm_vfio_release will acquire the kvm->lock first
+> before calling vfio_file_set_kvm which will acquire the vfio group_lock.
+>=20
+> To resolve this, let's remove the need for the vfio group_lock from the
+> kvm_vfio_release codepath.  This is done by introducing a new spinlock to
+> protect modifications to the vfio group kvm pointer, and acquiring a kvm
+> ref from within vfio while holding this spinlock, with the reference held
+> until the last close for the device in question.
+>=20
+> Fixes: 51cdc8bc120e ("kvm/vfio: Fix potential deadlock on vfio group_lock=
+")
+> Reported-by: Anthony Krowiak <akrowiak@linux.ibm.com>
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> ---
+> Changes from v2:
+> * Relocate the new functions back to vfio_main and externalize to call
+>   from group (Kevin) since cdev will need this too
+> * s/vfio_kvm_*_kvm/vfio_device_*_kvm/ and only pass device as input.
+>   Handle new kvm_ref_lock directly inside vfio_device_get_kvm (Alex)
+> * Add assert_lockdep_held for dev_set lock (Alex)
+> * Internalize error paths for vfio_device_get_kvm_safe and now return
+>   void - either device->kvm is set with a ref taken or is NULL (Alex)
+> * Other flow suggestions to make the call path cleaner - Thanks! (Alex)
+> * Can't pass group->kvm to vfio_device_open, as it references the value
+>   outside of new lock.  Pass device->kvm to minimize changes in this
+>   fix (Alex, Yi)
+> Changes from v1:
+> * use spin_lock instead of spin_lock_irqsave (Jason)
+> * clear device->kvm_put as part of vfio_kvm_put_kvm (Yi)
+> * Re-arrange code to avoid referencing the group contents from within
+>   vfio_main (Kevin) which meant moving most of the code in this patch
+>   to group.c along with getting/dropping of the dev_set lock
+> ---
+>  drivers/vfio/group.c     | 32 ++++++++++++++----
+>  drivers/vfio/vfio.h      | 14 ++++++++
+>  drivers/vfio/vfio_main.c | 70
+> ++++++++++++++++++++++++++++++++++++----
+>  include/linux/vfio.h     |  2 +-
+>  4 files changed, 103 insertions(+), 15 deletions(-)
+>=20
+> diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
+> index bb24b2f0271e..7fed4233ca23 100644
+> --- a/drivers/vfio/group.c
+> +++ b/drivers/vfio/group.c
+> @@ -164,13 +164,23 @@ static int vfio_device_group_open(struct
+> vfio_device *device)
+>  		goto out_unlock;
+>  	}
+>=20
+> +	mutex_lock(&device->dev_set->lock);
+> +
+>  	/*
+> -	 * Here we pass the KVM pointer with the group under the lock.  If
+> the
+> -	 * device driver will use it, it must obtain a reference and release it
+> -	 * during close_device.
+> +	 * Before the first device open, get the KVM pointer currently
+> +	 * associated with the group (if there is one) and obtain a reference
+> +	 * now that will be held until the open_count reaches 0 again.  Save
+> +	 * the pointer in the device for use by drivers.
+>  	 */
+> -	ret =3D vfio_device_open(device, device->group->iommufd,
+> -			       device->group->kvm);
+> +	if (device->open_count =3D=3D 0)
+> +		vfio_device_get_kvm_safe(device);
+> +
+> +	ret =3D vfio_device_open(device, device->group->iommufd, device-
+> >kvm);
+> +
+> +	if (device->open_count =3D=3D 0)
+> +		vfio_device_put_kvm(device);
+> +
+> +	mutex_unlock(&device->dev_set->lock);
+>=20
+>  out_unlock:
+>  	mutex_unlock(&device->group->group_lock);
+> @@ -180,7 +190,14 @@ static int vfio_device_group_open(struct
+> vfio_device *device)
+>  void vfio_device_group_close(struct vfio_device *device)
+>  {
+>  	mutex_lock(&device->group->group_lock);
+> +	mutex_lock(&device->dev_set->lock);
+> +
+>  	vfio_device_close(device, device->group->iommufd);
+> +
+> +	if (device->open_count =3D=3D 0)
+> +		vfio_device_put_kvm(device);
+> +
+> +	mutex_unlock(&device->dev_set->lock);
+>  	mutex_unlock(&device->group->group_lock);
+>  }
+>=20
+> @@ -450,6 +467,7 @@ static struct vfio_group *vfio_group_alloc(struct
+> iommu_group *iommu_group,
+>=20
+>  	refcount_set(&group->drivers, 1);
+>  	mutex_init(&group->group_lock);
+> +	spin_lock_init(&group->kvm_ref_lock);
+>  	INIT_LIST_HEAD(&group->device_list);
+>  	mutex_init(&group->device_lock);
+>  	group->iommu_group =3D iommu_group;
+> @@ -803,9 +821,9 @@ void vfio_file_set_kvm(struct file *file, struct kvm
+> *kvm)
+>  	if (!vfio_file_is_group(file))
+>  		return;
+>=20
+> -	mutex_lock(&group->group_lock);
+> +	spin_lock(&group->kvm_ref_lock);
+>  	group->kvm =3D kvm;
+> -	mutex_unlock(&group->group_lock);
+> +	spin_unlock(&group->kvm_ref_lock);
+>  }
+>  EXPORT_SYMBOL_GPL(vfio_file_set_kvm);
+>=20
+> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+> index f8219a438bfb..20d715b0a3a8 100644
+> --- a/drivers/vfio/vfio.h
+> +++ b/drivers/vfio/vfio.h
+> @@ -74,6 +74,7 @@ struct vfio_group {
+>  	struct file			*opened_file;
+>  	struct blocking_notifier_head	notifier;
+>  	struct iommufd_ctx		*iommufd;
+> +	spinlock_t			kvm_ref_lock;
+>  };
+>=20
+>  int vfio_device_set_group(struct vfio_device *device,
+> @@ -251,4 +252,17 @@ extern bool vfio_noiommu __read_mostly;
+>  enum { vfio_noiommu =3D false };
+>  #endif
+>=20
+> +#ifdef CONFIG_HAVE_KVM
+> +void vfio_device_get_kvm_safe(struct vfio_device *device);
+> +void vfio_device_put_kvm(struct vfio_device *device);
+> +#else
+> +static inline void vfio_device_get_kvm_safe(struct vfio_device *device)
+> +{
+> +}
+> +
+> +static inline void vfio_device_put_kvm(struct vfio_device *device)
+> +{
+> +}
+> +#endif
+> +
+>  #endif
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index 5177bb061b17..4762550e9f42 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -16,6 +16,9 @@
+>  #include <linux/fs.h>
+>  #include <linux/idr.h>
+>  #include <linux/iommu.h>
+> +#ifdef CONFIG_HAVE_KVM
+> +#include <linux/kvm_host.h>
+> +#endif
+>  #include <linux/list.h>
+>  #include <linux/miscdevice.h>
+>  #include <linux/module.h>
+> @@ -338,6 +341,62 @@ void vfio_unregister_group_dev(struct vfio_device
+> *device)
+>  }
+>  EXPORT_SYMBOL_GPL(vfio_unregister_group_dev);
+>=20
+> +#ifdef CONFIG_HAVE_KVM
+> +void vfio_device_get_kvm_safe(struct vfio_device *device)
+> +{
+> +	void (*pfn)(struct kvm *kvm);
+> +	bool (*fn)(struct kvm *kvm);
+> +	bool ret;
+> +
+> +	lockdep_assert_held(&device->dev_set->lock);
+> +
+> +	spin_lock(&device->group->kvm_ref_lock);
+> +	if (!device->group->kvm)
+> +		goto unlock;
+> +
+> +	pfn =3D symbol_get(kvm_put_kvm);
+> +	if (WARN_ON(!pfn))
+> +		goto unlock;
+> +
+> +	fn =3D symbol_get(kvm_get_kvm_safe);
+> +	if (WARN_ON(!fn)) {
+> +		symbol_put(kvm_put_kvm);
+> +		goto unlock;
+> +	}
+> +
+> +	ret =3D fn(device->group->kvm);
+> +	symbol_put(kvm_get_kvm_safe);
+> +	if (!ret) {
+> +		symbol_put(kvm_put_kvm);
+> +		goto unlock;
+> +	}
+> +
+> +	device->put_kvm =3D pfn;
+> +	device->kvm =3D device->group->kvm;
+> +
+> +unlock:
+> +	spin_unlock(&device->group->kvm_ref_lock);
+> +}
+> +
+> +void vfio_device_put_kvm(struct vfio_device *device)
+> +{
+> +	lockdep_assert_held(&device->dev_set->lock);
+> +
+> +	if (!device->kvm)
+> +		return;
+> +
+> +	if (WARN_ON(!device->put_kvm))
+> +		goto clear;
+> +
+> +	device->put_kvm(device->kvm);
+> +	device->put_kvm =3D NULL;
+> +	symbol_put(kvm_put_kvm);
+> +
+> +clear:
+> +	device->kvm =3D NULL;
+> +}
+> +#endif
+> +
+>  /* true if the vfio_device has open_device() called but not close_device=
+()
+> */
+>  static bool vfio_assert_device_open(struct vfio_device *device)
+>  {
+> @@ -361,7 +420,6 @@ static int vfio_device_first_open(struct vfio_device
+> *device,
+>  	if (ret)
+>  		goto err_module_put;
+>=20
+> -	device->kvm =3D kvm;
 
-> > +
-> > +/* Per virtual pmu counter data */
-> > +struct kvm_pmc {
-> > +     u8 idx;
-> > +     struct perf_event *perf_event;
-> > +     uint64_t counter_val;
-> > +     union sbi_pmu_ctr_info cinfo;
-> > +     /* Event monitoring status */
-> > +     bool started;
-> > +};
-> > +
-> > +/* PMU data structure per vcpu */
-> > +struct kvm_pmu {
-> > +     struct kvm_pmc pmc[RISCV_MAX_COUNTERS];
-> > +     /* Number of the virtual firmware counters available */
-> > +     int num_fw_ctrs;
-> > +     /* Number of the virtual hardware counters available */
-> > +     int num_hw_ctrs;
-> > +     /* A flag to indicate that pmu initialization is done */
-> > +     bool init_done;
-> > +     /* Bit map of all the virtual counter used */
-> > +     DECLARE_BITMAP(pmc_in_use, RISCV_MAX_COUNTERS);
-> > +};
-> > +
-> > +#define vcpu_to_pmu(vcpu) (&(vcpu)->arch.pmu_context)
-> > +#define pmu_to_vcpu(pmu)  (container_of((pmu), struct kvm_vcpu, arch.pmu_context))
-> > +
-> > +int kvm_riscv_vcpu_pmu_num_ctrs(struct kvm_vcpu *vcpu, struct kvm_vcpu_sbi_return *retdata);
-> > +int kvm_riscv_vcpu_pmu_ctr_info(struct kvm_vcpu *vcpu, unsigned long cidx,
-> > +                             struct kvm_vcpu_sbi_return *retdata);
-> > +int kvm_riscv_vcpu_pmu_ctr_start(struct kvm_vcpu *vcpu, unsigned long ctr_base,
-> > +                              unsigned long ctr_mask, unsigned long flag, uint64_t ival,
-> > +                              struct kvm_vcpu_sbi_return *retdata);
-> > +int kvm_riscv_vcpu_pmu_ctr_stop(struct kvm_vcpu *vcpu, unsigned long ctr_base,
-> > +                             unsigned long ctr_mask, unsigned long flag,
-> > +                             struct kvm_vcpu_sbi_return *retdata);
-> > +int kvm_riscv_vcpu_pmu_ctr_cfg_match(struct kvm_vcpu *vcpu, unsigned long ctr_base,
-> > +                                  unsigned long ctr_mask, unsigned long flag,
-> > +                                  unsigned long eidx, uint64_t evtdata,
-> > +                                  struct kvm_vcpu_sbi_return *retdata);
->
-> s/flag/flags/ for all the above prototypes and all the implementations
-> below.
->
+Since you've deleted the only usage of kvm pointer in this function, I
+guess you can remove the kvm parameter from vfio_device_open()
+and vfio_device_first_open(). :-) if it makes this patch too big, may
+just have another patch to do it.
 
-Fixed.
-
-> > +int kvm_riscv_vcpu_pmu_ctr_read(struct kvm_vcpu *vcpu, unsigned long cidx,
-> > +                             struct kvm_vcpu_sbi_return *retdata);
-> > +void kvm_riscv_vcpu_pmu_init(struct kvm_vcpu *vcpu);
-> > +void kvm_riscv_vcpu_pmu_deinit(struct kvm_vcpu *vcpu);
-> > +void kvm_riscv_vcpu_pmu_reset(struct kvm_vcpu *vcpu);
-> > +
-> > +#else
-> > +struct kvm_pmu {
-> > +};
-> > +
-> > +static inline void kvm_riscv_vcpu_pmu_init(struct kvm_vcpu *vcpu) {}
-> > +static inline void kvm_riscv_vcpu_pmu_deinit(struct kvm_vcpu *vcpu) {}
-> > +static inline void kvm_riscv_vcpu_pmu_reset(struct kvm_vcpu *vcpu) {}
-> > +#endif /* CONFIG_RISCV_PMU_SBI */
-> > +#endif /* !__KVM_VCPU_RISCV_PMU_H */
-> > diff --git a/arch/riscv/kvm/Makefile b/arch/riscv/kvm/Makefile
-> > index 019df920..5de1053 100644
-> > --- a/arch/riscv/kvm/Makefile
-> > +++ b/arch/riscv/kvm/Makefile
-> > @@ -25,3 +25,4 @@ kvm-y += vcpu_sbi_base.o
-> >  kvm-y += vcpu_sbi_replace.o
-> >  kvm-y += vcpu_sbi_hsm.o
-> >  kvm-y += vcpu_timer.o
-> > +kvm-$(CONFIG_RISCV_PMU_SBI) += vcpu_pmu.o
-> > diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> > index 7c08567..7d010b0 100644
-> > --- a/arch/riscv/kvm/vcpu.c
-> > +++ b/arch/riscv/kvm/vcpu.c
-> > @@ -138,6 +138,8 @@ static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
-> >       WRITE_ONCE(vcpu->arch.irqs_pending, 0);
-> >       WRITE_ONCE(vcpu->arch.irqs_pending_mask, 0);
-> >
-> > +     kvm_riscv_vcpu_pmu_reset(vcpu);
-> > +
-> >       vcpu->arch.hfence_head = 0;
-> >       vcpu->arch.hfence_tail = 0;
-> >       memset(vcpu->arch.hfence_queue, 0, sizeof(vcpu->arch.hfence_queue));
-> > @@ -194,6 +196,9 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
-> >       /* Setup VCPU timer */
-> >       kvm_riscv_vcpu_timer_init(vcpu);
-> >
-> > +     /* setup performance monitoring */
-> > +     kvm_riscv_vcpu_pmu_init(vcpu);
-> > +
-> >       /* Reset VCPU */
-> >       kvm_riscv_reset_vcpu(vcpu);
-> >
-> > @@ -216,6 +221,8 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
-> >       /* Cleanup VCPU timer */
-> >       kvm_riscv_vcpu_timer_deinit(vcpu);
-> >
-> > +     kvm_riscv_vcpu_pmu_deinit(vcpu);
-> > +
-> >       /* Free unused pages pre-allocated for G-stage page table mappings */
-> >       kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
-> >  }
-> > diff --git a/arch/riscv/kvm/vcpu_pmu.c b/arch/riscv/kvm/vcpu_pmu.c
-> > new file mode 100644
-> > index 0000000..2dad37f
-> > --- /dev/null
-> > +++ b/arch/riscv/kvm/vcpu_pmu.c
-> > @@ -0,0 +1,136 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * Copyright (c) 2023 Rivos Inc
-> > + *
-> > + * Authors:
-> > + *     Atish Patra <atishp@rivosinc.com>
-> > + */
-> > +
-> > +#include <linux/errno.h>
-> > +#include <linux/err.h>
-> > +#include <linux/kvm_host.h>
-> > +#include <linux/perf/riscv_pmu.h>
-> > +#include <asm/csr.h>
-> > +#include <asm/kvm_vcpu_sbi.h>
-> > +#include <asm/kvm_vcpu_pmu.h>
-> > +#include <linux/kvm_host.h>
-> > +
-> > +#define kvm_pmu_num_counters(pmu) ((pmu)->num_hw_ctrs + (pmu)->num_fw_ctrs)
-> > +
-> > +int kvm_riscv_vcpu_pmu_num_ctrs(struct kvm_vcpu *vcpu, struct kvm_vcpu_sbi_return *retdata)
-> > +{
-> > +     struct kvm_pmu *kvpmu = vcpu_to_pmu(vcpu);
-> > +
-> > +     retdata->out_val = kvm_pmu_num_counters(kvpmu);
-> > +
-> > +     return 0;
-> > +}
-> > +
-> > +int kvm_riscv_vcpu_pmu_ctr_info(struct kvm_vcpu *vcpu, unsigned long cidx,
-> > +                             struct kvm_vcpu_sbi_return *retdata)
-> > +{
-> > +     struct kvm_pmu *kvpmu = vcpu_to_pmu(vcpu);
-> > +
-> > +     if (cidx > RISCV_MAX_COUNTERS || cidx == 1) {
-> > +             retdata->err_val = SBI_ERR_INVALID_PARAM;
-> > +             return 0;
-> > +     }
-> > +
-> > +     retdata->out_val = kvpmu->pmc[cidx].cinfo.value;
-> > +
-> > +     return 0;
-> > +}
-> > +
-> > +int kvm_riscv_vcpu_pmu_ctr_start(struct kvm_vcpu *vcpu, unsigned long ctr_base,
-> > +                              unsigned long ctr_mask, unsigned long flag, uint64_t ival,
-> > +                              struct kvm_vcpu_sbi_return *retdata)
-> > +{
-> > +     /* TODO */
-> > +     return 0;
-> > +}
-> > +
-> > +int kvm_riscv_vcpu_pmu_ctr_stop(struct kvm_vcpu *vcpu, unsigned long ctr_base,
-> > +                             unsigned long ctr_mask, unsigned long flag,
-> > +                             struct kvm_vcpu_sbi_return *retdata)
-> > +{
-> > +     /* TODO */
-> > +     return 0;
-> > +}
-> > +
-> > +int kvm_riscv_vcpu_pmu_ctr_cfg_match(struct kvm_vcpu *vcpu, unsigned long ctr_base,
-> > +                                  unsigned long ctr_mask, unsigned long flag,
-> > +                                  unsigned long eidx, uint64_t evtdata,
-> > +                                  struct kvm_vcpu_sbi_return *retdata)
-> > +{
-> > +     /* TODO */
-> > +     return 0;
-> > +}
-> > +
-> > +int kvm_riscv_vcpu_pmu_ctr_read(struct kvm_vcpu *vcpu, unsigned long cidx,
-> > +                             struct kvm_vcpu_sbi_return *retdata)
-> > +{
-> > +     /* TODO */
-> > +     return 0;
-> > +}
-> > +
-> > +void kvm_riscv_vcpu_pmu_init(struct kvm_vcpu *vcpu)
-> > +{
-> > +     int i = 0, ret, num_hw_ctrs = 0, hpm_width = 0;
-> > +     struct kvm_pmu *kvpmu = vcpu_to_pmu(vcpu);
-> > +     struct kvm_pmc *pmc;
-> > +
-> > +     ret = riscv_pmu_get_hpm_info(&hpm_width, &num_hw_ctrs);
-> > +     if (ret < 0 || !hpm_width || !num_hw_ctrs)
-> > +             return;
-> > +
-> > +     /*
-> > +      * It is guranteed that RISCV_KVM_MAX_FW_CTRS can't exceed 32 as
-> > +      * that may exceed total number of counters more than RISCV_MAX_COUNTERS
-> > +      */
-> > +     kvpmu->num_hw_ctrs = num_hw_ctrs;
-> > +     kvpmu->num_fw_ctrs = RISCV_KVM_MAX_FW_CTRS;
->
-> If we sanity check that num_hw_ctrs <= 32 and num_fw_ctrs <= 32 at sbi_pmu
-> probe time, then we can also return num_fw_ctrs (or num_ctrs) along with
-> num_hw_ctrs from riscv_pmu_get_hpm_info(). Then, we can put the exact
-> number here into kvmpmu->num_fw_ctrs, rather than using its max.
->
-
-The firmware counter information retrieved from PMU driver will be the
-number of firmware
-counter host supports (i.e. M-mode firmware supports). The number of
-counters supported for a
-guest is entirely up to the hypervisor. There shouldn't be any
-relation with the host's firmware counter.
-
-Looking at it again, we should probably set kvpmu->num_fw_ctrs to
-SBI_PMU_FW_MAX instead of RISCV_KVM_MAX_FW_CTRS.
-We already have a sanity check for SBI_PMU_FW_MAX in the code.
-> > +
-> > +     /*
-> > +      * There is no correlation between the logical hardware counter and virtual counters.
-> > +      * However, we need to encode a hpmcounter CSR in the counter info field so that
-> > +      * KVM can trap n emulate the read. This works well in the migration use case as
-> > +      * KVM doesn't care if the actual hpmcounter is available in the hardware or not.
-> > +      */
-> > +     for (i = 0; i < kvm_pmu_num_counters(kvpmu); i++) {
-> > +             /* TIME CSR shouldn't be read from perf interface */
-> > +             if (i == 1)
-> > +                     continue;
-> > +             pmc = &kvpmu->pmc[i];
-> > +             pmc->idx = i;
-> > +             if (i < kvpmu->num_hw_ctrs) {
-> > +                     pmc->cinfo.type = SBI_PMU_CTR_TYPE_HW;
-> > +                     if (i < 3)
-> > +                             /* CY, IR counters */
-> > +                             pmc->cinfo.width = 63;
-> > +                     else
-> > +                             pmc->cinfo.width = hpm_width;
-> > +                     /*
-> > +                      * The CSR number doesn't have any relation with the logical
-> > +                      * hardware counters. The CSR numbers are encoded sequentially
-> > +                      * to avoid maintaining a map between the virtual counter
-> > +                      * and CSR number.
-> > +                      */
-> > +                     pmc->cinfo.csr = CSR_CYCLE + i;
-> > +             } else {
-> > +                     pmc->cinfo.type = SBI_PMU_CTR_TYPE_FW;
-> > +                     pmc->cinfo.width = BITS_PER_LONG - 1;
-> > +             }
-> > +     }
-> > +
-> > +     kvpmu->init_done = true;
-> > +}
-> > +
-> > +void kvm_riscv_vcpu_pmu_deinit(struct kvm_vcpu *vcpu)
-> > +{
-> > +     /* TODO */
-> > +}
-> > +
-> > +void kvm_riscv_vcpu_pmu_reset(struct kvm_vcpu *vcpu)
-> > +{
-> > +     kvm_riscv_vcpu_pmu_deinit(vcpu);
-> > +}
-> > --
-> > 2.25.1
-> >
->
-> Thanks,
-> drew
-
-
-
--- 
 Regards,
-Atish
+Yi Liu
+>  	if (device->ops->open_device) {
+>  		ret =3D device->ops->open_device(device);
+>  		if (ret)
+> @@ -370,7 +428,6 @@ static int vfio_device_first_open(struct vfio_device
+> *device,
+>  	return 0;
+>=20
+>  err_unuse_iommu:
+> -	device->kvm =3D NULL;
+>  	if (iommufd)
+>  		vfio_iommufd_unbind(device);
+>  	else
+> @@ -387,7 +444,6 @@ static void vfio_device_last_close(struct vfio_device
+> *device,
+>=20
+>  	if (device->ops->close_device)
+>  		device->ops->close_device(device);
+> -	device->kvm =3D NULL;
+>  	if (iommufd)
+>  		vfio_iommufd_unbind(device);
+>  	else
+> @@ -400,14 +456,14 @@ int vfio_device_open(struct vfio_device *device,
+>  {
+>  	int ret =3D 0;
+>=20
+> -	mutex_lock(&device->dev_set->lock);
+> +	lockdep_assert_held(&device->dev_set->lock);
+> +
+>  	device->open_count++;
+>  	if (device->open_count =3D=3D 1) {
+>  		ret =3D vfio_device_first_open(device, iommufd, kvm);
+>  		if (ret)
+>  			device->open_count--;
+>  	}
+> -	mutex_unlock(&device->dev_set->lock);
+>=20
+>  	return ret;
+>  }
+> @@ -415,12 +471,12 @@ int vfio_device_open(struct vfio_device *device,
+>  void vfio_device_close(struct vfio_device *device,
+>  		       struct iommufd_ctx *iommufd)
+>  {
+> -	mutex_lock(&device->dev_set->lock);
+> +	lockdep_assert_held(&device->dev_set->lock);
+> +
+>  	vfio_assert_device_open(device);
+>  	if (device->open_count =3D=3D 1)
+>  		vfio_device_last_close(device, iommufd);
+>  	device->open_count--;
+> -	mutex_unlock(&device->dev_set->lock);
+>  }
+>=20
+>  /*
+> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> index 35be78e9ae57..87ff862ff555 100644
+> --- a/include/linux/vfio.h
+> +++ b/include/linux/vfio.h
+> @@ -46,7 +46,6 @@ struct vfio_device {
+>  	struct vfio_device_set *dev_set;
+>  	struct list_head dev_set_list;
+>  	unsigned int migration_flags;
+> -	/* Driver must reference the kvm during open_device or never
+> touch it */
+>  	struct kvm *kvm;
+>=20
+>  	/* Members below here are private, not for driver use */
+> @@ -58,6 +57,7 @@ struct vfio_device {
+>  	struct list_head group_next;
+>  	struct list_head iommu_entry;
+>  	struct iommufd_access *iommufd_access;
+> +	void (*put_kvm)(struct kvm *kvm);
+>  #if IS_ENABLED(CONFIG_IOMMUFD)
+>  	struct iommufd_device *iommufd_device;
+>  	struct iommufd_ctx *iommufd_ictx;
+> --
+> 2.39.1
+
