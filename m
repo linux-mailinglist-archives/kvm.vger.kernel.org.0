@@ -2,196 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CDB356898FA
-	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 13:41:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 80E77689935
+	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 13:51:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232369AbjBCMlv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Feb 2023 07:41:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50134 "EHLO
+        id S232602AbjBCMvR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Feb 2023 07:51:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231871AbjBCMlu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Feb 2023 07:41:50 -0500
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFBA69AFF1
-        for <kvm@vger.kernel.org>; Fri,  3 Feb 2023 04:41:48 -0800 (PST)
-Received: by mail-pl1-x633.google.com with SMTP id e6so5057943plg.12
-        for <kvm@vger.kernel.org>; Fri, 03 Feb 2023 04:41:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20210112.gappssmtp.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=PmhZbfaBCYnUBaqFFWgt+daRvNTSOHEWpNLsE9kD9iA=;
-        b=w7nGNOg/j9vd2+0iAaSM73Ri37dDGhv3cg4WN0kL6gIIhiw9/vLn6AlXh75w6Rudhw
-         wDm6ACQ+gHJTtUWtdy25Z3YeknRf8HIrvzW9p2w9oYsMnPkAp9xDh5FbPJtz7BH5kB/E
-         vDR5GbUWjDdNNv3hzj+3Qot73ZJOLfjOE7QnzGBe+H60hSk3/W1JthvvGfJn4uc1T5AK
-         8SE3sANXXZ+z4raBzV9HgzkdwBfPWexgVGvoSXdL5CcGb1ptqLT1LreMwKSShk9g0OQa
-         NPfwIXD/HAtZ7BPWvzl9YCooE2zOCYO/BpirH5jXpFebBIVr9HMVLPxUu8tRKKHIvDQj
-         CgsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PmhZbfaBCYnUBaqFFWgt+daRvNTSOHEWpNLsE9kD9iA=;
-        b=CUXvTOYpPltMjsep25EQhfDFYAVElAcQYYS8O8Jdn2+sqq+q5Ri+8JpvDlTq7eiAxZ
-         oQqhKwcBBhG2+wmI+06eaTqtQu+I2eHq1MIfi852/hfnnRKK8i9LS3p7dl9biTP25ItZ
-         efxNaWpPGQrTg7cagKVTvYS/IDiEp0sUA3AqKHE6crjZkg1cY2iXFSEvLl/5Kwa8rlRr
-         D/wVbjVPHM7qnHzaI3SOu0ExeJgqmFVpFZ0NDwk5itnKZCynufj10ZMQ2cj1AlzXC4q4
-         QdTz486LpikWwHhKAxFFSLyD5qUDwKoOvkrpk8e6MphqBJq4r0QYfb8Sb67NIAxpjBA/
-         3FUg==
-X-Gm-Message-State: AO0yUKV6QzrH6PRlPWd4eCIFnKWhbESwYgInAtuNN6dLvUmONuE4gjUB
-        DpwU5dvFpQ4UQG6N1m304nGpwKnPcE3B/Slyc3fyRg==
-X-Google-Smtp-Source: AK7set9f/cw42j8DC442Jabj0KWetMACXxAmE9465IfbCbTwwODGWEEiv7lKI2+RtivOtbldE4RyiO1NwZXnDBHejmk=
-X-Received: by 2002:a17:90a:2d0:b0:22c:19cb:948a with SMTP id
- d16-20020a17090a02d000b0022c19cb948amr1308497pjd.98.1675428108313; Fri, 03
- Feb 2023 04:41:48 -0800 (PST)
+        with ESMTP id S233098AbjBCMvM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Feb 2023 07:51:12 -0500
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2088.outbound.protection.outlook.com [40.107.95.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82ACB9A803
+        for <kvm@vger.kernel.org>; Fri,  3 Feb 2023 04:51:08 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EvVllHT/+UAHkAD95NTkadmOKHuKgKBat5gBV7FefkG375gf4h4UoxCEXhtRgGWiQbBxQSUZReFKx3RUy2OGjNhNKzkjL2GwlTrcOQFo5ucy/gUUpmfPBk5Dfl6bCc5tyPS57MHcN0ir67aprbVoIL5eGi4v9Eq8iTVdaJBMZarRLVVH9P+B/YajEe0wToyUkzWGI8/LSvYM4HQPv6miqdtSsn2m4C3t759KLXe/nN+zUuejqMufyoxDkbOI87bgFpnxsixKY1I1kXg/JhpJaGWkcDZTLXTamXjcBEM3vK5vBrG8XqwdkxVni6bRpU1mIaqeaDeo4goWSb1ybQ0/uQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zMrxZ6w1X2L/L5jh1v8pXYO1hP90AAAjCdEBTpmF/5Q=;
+ b=mh8onuIMgWtlqNORUIXXdb3E6MU9VGkphfCmmArXrZAheuGIDipjT7JTHnhWFxrNWLjlbM0wbBI41RY1ak29qgN2jIhZDYtCbT8YVuZ0pTGn329uOmhg9TDOmjSurkYtGvxLwH9jqyghm7p3QarFE3tYDn/UOHjlPolz+2WaCor1rF6FcbYz9/BppJ/clIFRGzMNfZb2PPhx7Db1dMSnDDfW6spcxIwbjqSkZ1khjxR4AKeWWDdZnOCMrdz7hQMhxQqhQy8LvMr9ZG3V77TRAU0uG0Ak40fYhNRUr7emJpEkNwEGk3Ecej1+g1RN03fW7vBD6FNpSNdm7DSYb5x11w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zMrxZ6w1X2L/L5jh1v8pXYO1hP90AAAjCdEBTpmF/5Q=;
+ b=Gm7SCFSn0knurqWDh5eWEDG1YxbYZFj+wUaFDGbdtvzKasAtmeYAMlay7tMwlJxb6QxMuq6UDC6JlWLI/uZvHyxJnzJcmd/MIp5C1c4QPqxlhPnkWx8YvEq2LNg5YEVEgmVKRbup5dNInL8D/B/2C6sC+gB1w5Tm32dKvxXwA5Us3HMeKDIVNbyq+EDQJGocohoS/5e7yNht2uFcHxpqFMLfzq2GLnRvrJHOrkDHLS56Hi3tnUZ/hPmqiJ2XcSK0WVcsaDiqrN/qtFrBIo33Ey9n0YGgwJJruSrc4MbvweOQTbKFmqnpxSv3pG5/v1fjDeZAubfkL7AeNr8StiIgKg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by PH7PR12MB7284.namprd12.prod.outlook.com (2603:10b6:510:20b::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6064.23; Fri, 3 Feb
+ 2023 12:51:05 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3cb3:2fce:5c8f:82ee]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3cb3:2fce:5c8f:82ee%4]) with mapi id 15.20.6064.031; Fri, 3 Feb 2023
+ 12:51:05 +0000
+Date:   Fri, 3 Feb 2023 08:51:04 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Eric Auger <eric.auger@redhat.com>
+Cc:     eric.auger.pro@gmail.com, yi.l.liu@intel.com, yi.y.sun@intel.com,
+        alex.williamson@redhat.com, clg@redhat.com, qemu-devel@nongnu.org,
+        david@gibson.dropbear.id.au, thuth@redhat.com,
+        farman@linux.ibm.com, mjrosato@linux.ibm.com,
+        akrowiak@linux.ibm.com, pasic@linux.ibm.com, jjherne@linux.ibm.com,
+        jasowang@redhat.com, kvm@vger.kernel.org, nicolinc@nvidia.com,
+        kevin.tian@intel.com, chao.p.peng@intel.com, peterx@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, zhangfei.gao@linaro.org,
+        berrange@redhat.com, apopple@nvidia.com,
+        suravee.suthikulpanit@amd.com
+Subject: Re: [RFC v3 18/18] vfio/as: Allow the selection of a given iommu
+ backend
+Message-ID: <Y90DOL2pnYxHHNzL@nvidia.com>
+References: <20230131205305.2726330-1-eric.auger@redhat.com>
+ <20230131205305.2726330-19-eric.auger@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230131205305.2726330-19-eric.auger@redhat.com>
+X-ClientProxiedBy: MN2PR15CA0055.namprd15.prod.outlook.com
+ (2603:10b6:208:237::24) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-References: <20230202191301.588804-1-rkanwal@rivosinc.com> <Y9za1tUnQR8jpZoA@monolith.localdoman>
-In-Reply-To: <Y9za1tUnQR8jpZoA@monolith.localdoman>
-From:   Rajnesh Kanwal <rkanwal@rivosinc.com>
-Date:   Fri, 3 Feb 2023 12:41:37 +0000
-Message-ID: <CAECbVCvSQh_rsWdLNNYSp1emJTLYeQ4vKYvnEjDromCD-AKx=g@mail.gmail.com>
-Subject: Re: [PATCH v3 kvmtool 1/1] riscv: Move serial and rtc from IO port
- space to MMIO area.
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     apatel@ventanamicro.com, atishp@rivosinc.com,
-        andre.przywara@arm.com, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH7PR12MB7284:EE_
+X-MS-Office365-Filtering-Correlation-Id: bf64cf26-f08a-4682-d396-08db05e55021
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: x4DBWuFhH7kQQe4ymQdmYoK86xmOFrEZjwbN1iO9+2NooqflobG6vZ1aU3H3PgtU0AnmNxI7TGQ+o/l1b7q+08s3W8+nnop8kg1iWfVaousKQFyUuXT07pgEqayiSLAbBEQM7hkWl70PID33hvStliGQi1vB6OZJPzRAQFsHG4VpLu6ZOavXJz5mUx767clAd4mHiTEZ1ZEOAh6eH5/rxVhxbp126N/ACLpC5uMFZCVRn2ZtBbrlNMzXVPyv95knQSLyO5uKEilESFqAFIRUV7jp77d3lgHSn0Zkb9cZcjIOHJrgIjg1e+xU0RluLm/KAtP4f+rHjeyif/0tfv2H72LYkhnZ4a6KCaEkkF4PCj1fSF8j18Edw5wI+DtqwI9yz4vjPu/jUt2CxFFQLjvK81UhD9FCGSN/cZpBypHuPASd0g2/a5sGK3xO34tWaZ+SMWm3SmyzGwlp4AnOd2oGRwwOJ4u0q3TEJ5NYOVz70H+xdpnzRewQ3Vnj+CcLx52uO5Z+RtnNq+Pn73KBfpWa6bDnwN8WF57/ZfnJrPz/XazSXrknMzK8XnGOgoA2aZ/60EiN6DAeqb8plgV7iHceZmt9YP3NoXlGfnQwDgsPXvwWmCSdRfQN11fy1aeksZzPZwVYVX36u5LiqcRpWT1a/g==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(136003)(39860400002)(366004)(346002)(396003)(376002)(451199018)(4326008)(66946007)(6916009)(66556008)(8676002)(4744005)(26005)(8936002)(41300700001)(6506007)(6512007)(5660300002)(7416002)(186003)(66476007)(2906002)(316002)(38100700002)(2616005)(6486002)(86362001)(478600001)(36756003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?7nmh0qzriQnpvcvA5ybO4EeAmqYn0Xg2WQLwS/rQSo/cO9HhX9uU7hHYcqeI?=
+ =?us-ascii?Q?rLqaZv4mLuSHIrA/iZeZnB/vXogE4bgg2FAZvfJmcDvzdvnkvzkH77rwhBRY?=
+ =?us-ascii?Q?UsYP6zf4GLxsTTeuviOJOcukpOkn679nwP6fuVOWdXYc/pdI5KPQxF5HyCsP?=
+ =?us-ascii?Q?mx3OOMsnJGvOT3Fxz37oMh8Qu4eovjbxMLjvHR2mUW6PMW0Fi7acZCMMsUh8?=
+ =?us-ascii?Q?BtAAm9LS8nd4wO5otsbzIQZx/jsfwsdNZU9vwfTjWbTH+TYpf7pFbkWZ7hB7?=
+ =?us-ascii?Q?IGTtQtxLVYK6zNG9FHOTQPurZACty2UHJnnXYiRVAZabVHpweVN2A4FvdoNv?=
+ =?us-ascii?Q?H0jStmyZpgqG3oT51vb+8MRE09YcQ48086KuAv+6qZMe4jDrpxnmV9eVnpFR?=
+ =?us-ascii?Q?ORcNmrv5Fop7YpYMxNsYlJVGKhwUYBG0xkKTdg5ZJdgXPezOzi/PFteITXNA?=
+ =?us-ascii?Q?Dj1wuFWLltZeeWs3YL+Z7SY74CxIsZxKKKPEk9/5npxBI1Tpa8bf0ak/Y1qP?=
+ =?us-ascii?Q?msAElHK59tF7o0CsO1E5+VGbYFTG0mECuxQM05j0DwvccIs09b10+y6oZkNY?=
+ =?us-ascii?Q?z0agnEFUxHExNBuFC764rLaoRtkI9lFOgWqEO5Y639kzw8TtpB70tR5y+m2s?=
+ =?us-ascii?Q?FLNumSHMiPngDgZAdV+DxFByBwFG/n0QGeS82ZLsZ41+SYg5GiYi3q9WK7B1?=
+ =?us-ascii?Q?M4U2IoHgGMxeaEV8mxTUP//Zxj2BBSljOXNgpgcRB+zqTACYhET7Bcte3K0G?=
+ =?us-ascii?Q?we2VCPREr5Gq5IDaFksNzjJtcfjwXlox3YOjDGDknF99THgFr92pjtKCBBge?=
+ =?us-ascii?Q?UkShxvALaYhHyRSmkm6m3aURyrgS3d3F9wH53ed/3nycNE/MrV4EDvQF/bIT?=
+ =?us-ascii?Q?MIwZimtIoCZw/JWeGMlqJcNgkgp+qCwaRyCxdPeGxg0wztFHb12KLZ2NUckZ?=
+ =?us-ascii?Q?YeM5n0gKlDMad+v8vPCjiAmD/eOufX/mBMFQxoKNwmgDt3+rpCcU3RCRB8bj?=
+ =?us-ascii?Q?RRppnqufnkV5aqmmOtsCqhy9jW2SGFbpr53NMGOXjJZ/0o1eRpm08hQRR3K4?=
+ =?us-ascii?Q?UzvEmjCrguKlx4hr80OguiHHGvDFcTxPTxwiw1sNTXQJBCNJZYYgCbX8liKT?=
+ =?us-ascii?Q?DRL5QnT3Cj3GmKrFUbM8C+2OTt+FuRbFxHk5ylOlt/OPwsPisy8f+VzuGkNE?=
+ =?us-ascii?Q?cs9Fg2n3j4Sw98i4oMfgBQhEAdR3kQC9r1A/Z073WFsKNpHFZQUN+8hdvHsy?=
+ =?us-ascii?Q?ZmGPHQcJQFBBaphq+kLu9m49GOqRzWVyXqiUf2gufR+TJN4nwRpjFZY9e48D?=
+ =?us-ascii?Q?jq+RborJ1BeyTGmWjCTg2L2XHKPar6Phy4Wue+zjAh9f/2otq0fcB7lZQUww?=
+ =?us-ascii?Q?hg2luAbPF8QlpO0s72xiIOr+MCKPt5rot52BbedRgEDgG0qXsTwS+ahlY4CR?=
+ =?us-ascii?Q?swLFT771r7Pzmdxdyvs0KnQBaueMCxdUk27iNQtBVFg1OyisDr8E2B5HQR4f?=
+ =?us-ascii?Q?0luUcshaiud9LPnlYcFivEwyBRAP8XGm05qEeM4dNcd25s3D7DtLi/gPl4GL?=
+ =?us-ascii?Q?nRbQH1ph1BpbaXGF6i6ukqyVZpAJA5wPdo28iA0Q?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bf64cf26-f08a-4682-d396-08db05e55021
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Feb 2023 12:51:05.5288
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: lx7g/QBGC6bqXlyhykVbFlb6ZIyWwnlm0XiMF//3hSLi/qtztrFlc2BEWtyPmcJF
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7284
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 3, 2023 at 9:58 AM Alexandru Elisei
-<alexandru.elisei@arm.com> wrote:
->
-> Hi,
->
-> On Thu, Feb 02, 2023 at 07:13:01PM +0000, Rajnesh Kanwal wrote:
-> > The default serial and rtc IO region overlaps with PCI IO bar
-> > region leading bar 0 activation to fail. Moving these devices
-> > to MMIO region similar to ARM.
-> >
-> > Given serial has been moved from 0x3f8 to 0x10000000, this
-> > requires us to now pass earlycon=uart8250,mmio,0x10000000
-> > from cmdline rather than earlycon=uart8250,mmio,0x3f8.
-> >
-> > To avoid the need to change the address every time the tool
-> > is updated, we can also just pass "earlycon" from cmdline
-> > and guest then finds the type and base address by following
-> > the Device Tree's stdout-path property.
-> >
-> > Signed-off-by: Rajnesh Kanwal <rkanwal@rivosinc.com>
-> > Tested-by: Atish Patra <atishp@rivosinc.com>
-> > Reviewed-by: Atish Patra <atishp@rivosinc.com>
-> > ---
-> > v3: https://lore.kernel.org/all/20230201160137.486622-1-rkanwal@rivosinc.com/
-> >     Incorporated feedback from Andre Przywara and Alexandru Elisei.
-> >       Mainly updated the commit message to specify that we can simply pass
-> >       just "earlycon" from cmdline and avoid the need to specify uart address.
-> >     Also added Tested-by and Reviewed-by tags by Atish Patra.
-> >
-> > v2: https://lore.kernel.org/all/20230201160137.486622-1-rkanwal@rivosinc.com/
-> >     Added further details in the commit message regarding the
-> >     UART address change required in kernel cmdline parameter.
-> >
-> > v1: https://lore.kernel.org/all/20230124155251.1417682-1-rkanwal@rivosinc.com/
-> >
-> >  hw/rtc.c                     |  3 +++
-> >  hw/serial.c                  |  4 ++++
-> >  riscv/include/kvm/kvm-arch.h | 10 ++++++++--
-> >  3 files changed, 15 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/hw/rtc.c b/hw/rtc.c
-> > index 9b8785a..da696e1 100644
-> > --- a/hw/rtc.c
-> > +++ b/hw/rtc.c
-> > @@ -9,6 +9,9 @@
-> >  #if defined(CONFIG_ARM) || defined(CONFIG_ARM64)
-> >  #define RTC_BUS_TYPE         DEVICE_BUS_MMIO
-> >  #define RTC_BASE_ADDRESS     ARM_RTC_MMIO_BASE
-> > +#elif defined(CONFIG_RISCV)
-> > +#define RTC_BUS_TYPE         DEVICE_BUS_MMIO
-> > +#define RTC_BASE_ADDRESS     RISCV_RTC_MMIO_BASE
-> >  #else
-> >  /* PORT 0070-007F - CMOS RAM/RTC (REAL TIME CLOCK) */
-> >  #define RTC_BUS_TYPE         DEVICE_BUS_IOPORT
-> > diff --git a/hw/serial.c b/hw/serial.c
-> > index 3d53362..b6263a0 100644
-> > --- a/hw/serial.c
-> > +++ b/hw/serial.c
-> > @@ -17,6 +17,10 @@
-> >  #define serial_iobase(nr)    (ARM_UART_MMIO_BASE + (nr) * 0x1000)
-> >  #define serial_irq(nr)               (32 + (nr))
-> >  #define SERIAL8250_BUS_TYPE  DEVICE_BUS_MMIO
-> > +#elif defined(CONFIG_RISCV)
-> > +#define serial_iobase(nr)    (RISCV_UART_MMIO_BASE + (nr) * 0x1000)
-> > +#define serial_irq(nr)               (1 + (nr))
-> > +#define SERIAL8250_BUS_TYPE  DEVICE_BUS_MMIO
-> >  #else
-> >  #define serial_iobase_0              (KVM_IOPORT_AREA + 0x3f8)
-> >  #define serial_iobase_1              (KVM_IOPORT_AREA + 0x2f8)
-> > diff --git a/riscv/include/kvm/kvm-arch.h b/riscv/include/kvm/kvm-arch.h
-> > index 3f96d00..620c796 100644
-> > --- a/riscv/include/kvm/kvm-arch.h
-> > +++ b/riscv/include/kvm/kvm-arch.h
-> > @@ -11,7 +11,7 @@
-> >  #define RISCV_IOPORT         0x00000000ULL
-> >  #define RISCV_IOPORT_SIZE    SZ_64K
-> >  #define RISCV_IRQCHIP                0x08000000ULL
-> > -#define RISCV_IRQCHIP_SIZE           SZ_128M
-> > +#define RISCV_IRQCHIP_SIZE   SZ_128M
->
-> That's strange, for me the latest upstream commit is e17d182ad3f7 ("riscv: Add
-> --disable-<xyz> options to allow user disable extensions"), and I can't seem to
-> find those defines in the file. In fact, grep -r IRQCHIP riscv doesn't find
-> anything. Does this patch depend on another patch which hasn't been merged yet?
+On Tue, Jan 31, 2023 at 09:53:05PM +0100, Eric Auger wrote:
+> Now we support two types of iommu backends, let's add the capability
+> to select one of them. This depends on whether an iommufd object has
+> been linked with the vfio-pci device:
+> 
+> if the user wants to use the legacy backend, it shall not
+> link the vfio-pci device with any iommufd object:
+> 
+> -device vfio-pci,host=0000:02:00.0
+> 
+> This is called the legacy mode/backend.
+> 
+> If the user wants to use the iommufd backend (/dev/iommu) it
+> shall pass an iommufd object id in the vfio-pci device options:
+> 
+>  -object iommufd,id=iommufd0
+>  -device vfio-pci,host=0000:02:00.0,iommufd=iommufd0
+> 
+> Note the /dev/iommu device may have been pre-opened by a
+> management tool such as libvirt. This mode is no more considered
+> for the legacy backend. So let's remove the "TODO" comment.
 
-Extremely sorry. My bad. The change was based on AIA IRQCHIP changes but those
-haven't merged yet and this fix doesn't depend on it. I have rebased
-the changes and
-sent another patch. I have also fixed the problem you have mentioned below.
-Thanks for the review.
-https://lore.kernel.org/all/20230203122934.18714-1-rkanwal@rivosinc.com/
+The vfio cdev should also be pre-openable like iommufd?
 
-I also retested everything on a pristine setup using instruction in
-https://github.com/kvm-riscv/howto/wiki/KVM-RISCV64-on-QEMU.
-
-Thanks
-Rajnesh
-
->
-> >  #define RISCV_MMIO           0x10000000ULL
-> >  #define RISCV_MMIO_SIZE              SZ_512M
-> >  #define RISCV_PCI            0x30000000ULL
-> > @@ -35,10 +35,16 @@
-> >  #define RISCV_MAX_MEMORY(kvm)        RISCV_LOMAP_MAX_MEMORY
-> >  #endif
-> >
-> > +#define RISCV_UART_MMIO_BASE RISCV_MMIO
-> > +#define RISCV_UART_MMIO_SIZE 0x10000
-> > +
-> > +#define RISCV_RTC_MMIO_BASE  (RISCV_UART_MMIO_BASE + RISCV_UART_MMIO_SIZE)
-> > +#define RISCV_RTC_MMIO_SIZE  0x10000
-> > +
-> >  #define KVM_IOPORT_AREA              RISCV_IOPORT
-> >  #define KVM_PCI_CFG_AREA     RISCV_PCI
-> >  #define KVM_PCI_MMIO_AREA    (KVM_PCI_CFG_AREA + RISCV_PCI_CFG_SIZE)
-> > -#define KVM_VIRTIO_MMIO_AREA RISCV_MMIO
-> > +#define KVM_VIRTIO_MMIO_AREA (RISCV_RTC_MMIO_BASE + RISCV_UART_MMIO_SIZE)
->
-> That should be RISCV_RTC_MMIO_SIZE, not RISCV_**UART**_MMIO_SIZE.
->
-> Thanks,
-> Alex
->
-> >
-> >  #define KVM_IOEVENTFD_HAS_PIO        0
-> >
-> > --
-> > 2.25.1
-> >
+Jason
