@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CDC4D68A2F9
-	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 20:28:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EBAA368A2FC
+	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 20:28:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233713AbjBCT2k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Feb 2023 14:28:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33408 "EHLO
+        id S233142AbjBCT2p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Feb 2023 14:28:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233411AbjBCT2g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Feb 2023 14:28:36 -0500
+        with ESMTP id S233595AbjBCT2i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Feb 2023 14:28:38 -0500
 Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCE08A8A1E
-        for <kvm@vger.kernel.org>; Fri,  3 Feb 2023 11:28:32 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id n9-20020a170902d2c900b001968dcee881so2970950plc.8
-        for <kvm@vger.kernel.org>; Fri, 03 Feb 2023 11:28:32 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A655AA8A23
+        for <kvm@vger.kernel.org>; Fri,  3 Feb 2023 11:28:34 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id p10-20020a170902eaca00b00198dd431ec1so1535467pld.3
+        for <kvm@vger.kernel.org>; Fri, 03 Feb 2023 11:28:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AcI5nZSY78YItFhCkcPCsgYpVHXo4G2xX3PARLK9PNY=;
-        b=jnIgJE609c2sptSoHjjd3x7jZtT7KKK/MLWWeUqiS8WA2JDk4FeRouptRJICfrxIiL
-         ltXurNvSD6sG3igKDh2jIDvC139/r0ohRfJJG6pQnedSojgn6p86/PzyD7KtkRoozEMs
-         kQk/oF3N032gLlif8xUP5eDhlBX1h9Xgbe6TauMdaNiztnykutoA6logtvV9fpbOhff/
-         n6fE5UFqDNwzbhaTz5ygCEMGiXIgDXG7fGIjHp4wkMPYAh1YXKf21kdIrLMzALj8a3u4
-         tudd1dArJcrxBZaQnyHLlr0CksaMvJ3/TD4Fet8r0s0LPkO4YK/ew1sp3r98Mpuf0rDv
-         KtMQ==
+        bh=SZBOzrPag9qrBF2hWUY6jbrMh9ikRhKVuoUM3SUVBlw=;
+        b=pJq3E8HxuEK4dyqvrQfPM3ldp+gHJEW5GZjifURYqJ01MpDIVkBLWa20dx4quPs/sZ
+         1ZUgW86Qrb0XAtmmgbtsUN3EfbGwRGdh491O5khsZH4C5htGRlm7IaO5OU/7ViPc2DEc
+         ICQpGLr0Xr/56wm7CFTxlfob8bjIcM8StLtysDeewJRgBwjiXoz9EROyyswUUNnlVmL1
+         c3oR075IT+ksuaTfm1gJjZ3VqvuZcL0V7DSyrW6LZv3GRhc8i4lFNS3QD05JwJHm+HTZ
+         M8MGZRFd8uoyUJ3BrQe81xgQpwD8qPJEl9bS7KD5u3wkEsXyHu6yR2Usv771+y13Mqhh
+         fDhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AcI5nZSY78YItFhCkcPCsgYpVHXo4G2xX3PARLK9PNY=;
-        b=HgY12MGPm+nfxbXe0fBCNxbViOq8sAgVIt6NF2DkVYt5ViDhV2LY8sNErBRteNfjC6
-         WgFjLYU9snZgtF9G0E8SD9PST/VYJZ3acFCW0DRvlIGtO1WllLO147G6mApGgDmNL8Tz
-         6fL0TbqenTCuR8I0oCuCSe4nUi7mX1lHAIGw1BmWamTv+WKlCNtrdngdhyNVPPthxOIJ
-         u1noOPdQR6Ms8+XBQb8e6OZrfxU1dpN37OwB6KQ4gkXuFOydie5srCVJqmMlu0mgnLYr
-         EUPHjpGoNJftNJUM2yif3vt1EXbs+HnEatDV5c/hdZkYBf8hR5YYFgiouaAXufKiGooS
-         ztyQ==
-X-Gm-Message-State: AO0yUKXyn1TQ4+feORNz7CbEx8LUOfJ03IivsqaJuJ+kyulkU4M1d2fl
-        VacrK7SYuYs/loFZsxwFY/IjzjKibHp2
-X-Google-Smtp-Source: AK7set9zAa9sYfJsDzK4yP/WJL7nNxNfkHIisp6zMJ819xF4knFbVeKi6XawXk1CUgZr6LmYrZOoVWgl9aQn
+        bh=SZBOzrPag9qrBF2hWUY6jbrMh9ikRhKVuoUM3SUVBlw=;
+        b=6CUuYnAJQltT6JYq0ohF41GrfGlgqDyXjPBsxHK4BpJJ5ED2Z1f+DCQqCU69WYC7Eb
+         ULWJFc627iAELhhOM7EIVMnb6g7MKAZ1aRp/F/829wirAPkBk2Y3SveyjyPZCv1ZA++L
+         jLtuplNpATQbjM/UQTHQYfteOCtBfpPnyzyveJFlJjHVENPeIN4lfVu5q+pOY6+OQtcT
+         2kRiPmYa7/HvSkR6zBQIpZr5gizofAaMyRvRA3AlDnrNihSSafqJUQ9jR5Bphc7fUc0+
+         PQCnrfTkpxIKdbENURROJO56Rn0uO/od4qmsowAMKWdbHVDWtDFzgQ0irQRG0clGqM7b
+         3wfA==
+X-Gm-Message-State: AO0yUKWOD8zKUX84f4xlz3EPfkDs2Ha7c8V704ghh/MBTvXDrLM1i+H5
+        5kpxrMXZyM4SMpojgRHVYMNxaUHrIGcs
+X-Google-Smtp-Source: AK7set9l9TJm2dZktMJyX6mkgCljxrkCu2PY9spP3pxWA4XSjvY7UUJsKm+DEEt+hDjuw+ey9m80gEj+jR/M
 X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
- (user=vipinsh job=sendgmr) by 2002:a17:902:ea03:b0:196:6b0d:752b with SMTP id
- s3-20020a170902ea0300b001966b0d752bmr2649815plg.19.1675452512414; Fri, 03 Feb
- 2023 11:28:32 -0800 (PST)
-Date:   Fri,  3 Feb 2023 11:28:21 -0800
+ (user=vipinsh job=sendgmr) by 2002:a05:6a00:705:b0:594:2b99:77ad with SMTP id
+ 5-20020a056a00070500b005942b9977admr1968810pfl.4.1675452514299; Fri, 03 Feb
+ 2023 11:28:34 -0800 (PST)
+Date:   Fri,  3 Feb 2023 11:28:22 -0800
 In-Reply-To: <20230203192822.106773-1-vipinsh@google.com>
 Mime-Version: 1.0
 References: <20230203192822.106773-1-vipinsh@google.com>
 X-Mailer: git-send-email 2.39.1.519.gcb327c4b5f-goog
-Message-ID: <20230203192822.106773-5-vipinsh@google.com>
-Subject: [Patch v2 4/5] KVM: x86/mmu: Remove handle_changed_spte_dirty_log()
+Message-ID: <20230203192822.106773-6-vipinsh@google.com>
+Subject: [Patch v2 5/5] KVM: x86/mmu: Merge all handle_changed_pte* functions.
 From:   Vipin Sharma <vipinsh@google.com>
 To:     seanjc@google.com, pbonzini@redhat.com, bgardon@google.com,
         dmatlack@google.com
@@ -68,61 +68,122 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove handle_changed_spte_dirty_log() as there is no code flow which
-sets leaf SPTE writable and hit this path.
+__handle_changed_pte() and handle_changed_spte_acc_track() are always
+used together. Merge these two functions and name the new function
+handle_changed_pte(). Remove the existing handle_changed_pte() function
+which just calls __handle_changed_pte and
+handle_changed_spte_acc_track().
+
+This converges SPTEs change handling code to a single place.
 
 Signed-off-by: Vipin Sharma <vipinsh@google.com>
 ---
- arch/x86/kvm/mmu/tdp_mmu.c | 22 ----------------------
- 1 file changed, 22 deletions(-)
+ arch/x86/kvm/mmu/tdp_mmu.c | 42 +++++++++++---------------------------
+ 1 file changed, 12 insertions(+), 30 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 18630a06fa1f..afe0dcb1859e 100644
+index afe0dcb1859e..9b0c81a28f97 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -345,24 +345,6 @@ static void handle_changed_spte_acc_track(u64 old_spte, u64 new_spte, int level)
- 		kvm_set_pfn_accessed(spte_to_pfn(old_spte));
- }
+@@ -334,17 +334,6 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+ 				u64 old_spte, u64 new_spte, int level,
+ 				bool shared);
  
--static void handle_changed_spte_dirty_log(struct kvm *kvm, int as_id, gfn_t gfn,
--					  u64 old_spte, u64 new_spte, int level)
+-static void handle_changed_spte_acc_track(u64 old_spte, u64 new_spte, int level)
 -{
--	bool pfn_changed;
--	struct kvm_memory_slot *slot;
--
--	if (level > PG_LEVEL_4K)
+-	if (!is_shadow_present_pte(old_spte) || !is_last_spte(old_spte, level))
 -		return;
 -
--	pfn_changed = spte_to_pfn(old_spte) != spte_to_pfn(new_spte);
--
--	if ((!is_writable_pte(old_spte) || pfn_changed) &&
--	    is_writable_pte(new_spte)) {
--		slot = __gfn_to_memslot(__kvm_memslots(kvm, as_id), gfn);
--		mark_page_dirty_in_slot(kvm, slot, gfn);
--	}
+-	if (is_accessed_spte(old_spte) &&
+-	    (!is_shadow_present_pte(new_spte) || !is_accessed_spte(new_spte) ||
+-	     spte_to_pfn(old_spte) != spte_to_pfn(new_spte)))
+-		kvm_set_pfn_accessed(spte_to_pfn(old_spte));
 -}
 -
  static void tdp_account_mmu_page(struct kvm *kvm, struct kvm_mmu_page *sp)
  {
  	kvm_account_pgtable_pages((void *)sp->spt, +1);
-@@ -614,8 +596,6 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
- 	__handle_changed_spte(kvm, as_id, gfn, old_spte, new_spte, level,
- 			      shared);
- 	handle_changed_spte_acc_track(old_spte, new_spte, level);
--	handle_changed_spte_dirty_log(kvm, as_id, gfn, old_spte,
--				      new_spte, level);
+@@ -487,7 +476,7 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
+ }
+ 
+ /**
+- * __handle_changed_spte - handle bookkeeping associated with an SPTE change
++ * handle_changed_spte - handle bookkeeping associated with an SPTE change
+  * @kvm: kvm instance
+  * @as_id: the address space of the paging structure the SPTE was a part of
+  * @gfn: the base GFN that was mapped by the SPTE
+@@ -501,9 +490,9 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
+  * Handle bookkeeping that might result from the modification of a SPTE.
+  * This function must be called for all TDP SPTE modifications.
+  */
+-static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+-				  u64 old_spte, u64 new_spte, int level,
+-				  bool shared)
++static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
++				u64 old_spte, u64 new_spte, int level,
++				bool shared)
+ {
+ 	bool was_present = is_shadow_present_pte(old_spte);
+ 	bool is_present = is_shadow_present_pte(new_spte);
+@@ -587,15 +576,10 @@ static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+ 	if (was_present && !was_leaf &&
+ 	    (is_leaf || !is_present || WARN_ON_ONCE(pfn_changed)))
+ 		handle_removed_pt(kvm, spte_to_child_pt(old_spte, level), shared);
+-}
+ 
+-static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+-				u64 old_spte, u64 new_spte, int level,
+-				bool shared)
+-{
+-	__handle_changed_spte(kvm, as_id, gfn, old_spte, new_spte, level,
+-			      shared);
+-	handle_changed_spte_acc_track(old_spte, new_spte, level);
++	if (was_leaf && is_accessed_spte(old_spte) &&
++	    (!is_present || !is_accessed_spte(new_spte) || pfn_changed))
++		kvm_set_pfn_accessed(spte_to_pfn(old_spte));
  }
  
  /*
-@@ -727,8 +707,6 @@ static u64 _tdp_mmu_set_spte(struct kvm *kvm, int as_id, tdp_ptep_t sptep,
+@@ -638,9 +622,8 @@ static inline int tdp_mmu_set_spte_atomic(struct kvm *kvm,
+ 	if (!try_cmpxchg64(sptep, &iter->old_spte, new_spte))
+ 		return -EBUSY;
  
- 	__handle_changed_spte(kvm, as_id, gfn, old_spte, new_spte, level, false);
- 	handle_changed_spte_acc_track(old_spte, new_spte, level);
--	handle_changed_spte_dirty_log(kvm, as_id, gfn, old_spte, new_spte,
--				      level);
+-	__handle_changed_spte(kvm, iter->as_id, iter->gfn, iter->old_spte,
+-			      new_spte, iter->level, true);
+-	handle_changed_spte_acc_track(iter->old_spte, new_spte, iter->level);
++	handle_changed_spte(kvm, iter->as_id, iter->gfn, iter->old_spte,
++			    new_spte, iter->level, true);
+ 
+ 	return 0;
+ }
+@@ -705,8 +688,7 @@ static u64 _tdp_mmu_set_spte(struct kvm *kvm, int as_id, tdp_ptep_t sptep,
+ 
+ 	old_spte = kvm_tdp_mmu_write_spte(sptep, old_spte, new_spte, level);
+ 
+-	__handle_changed_spte(kvm, as_id, gfn, old_spte, new_spte, level, false);
+-	handle_changed_spte_acc_track(old_spte, new_spte, level);
++	handle_changed_spte(kvm, as_id, gfn, old_spte, new_spte, level, false);
  	return old_spte;
  }
  
+@@ -1273,7 +1255,7 @@ static bool set_spte_gfn(struct kvm *kvm, struct tdp_iter *iter,
+ 	 * Note, when changing a read-only SPTE, it's not strictly necessary to
+ 	 * zero the SPTE before setting the new PFN, but doing so preserves the
+ 	 * invariant that the PFN of a present * leaf SPTE can never change.
+-	 * See __handle_changed_spte().
++	 * See handle_changed_spte().
+ 	 */
+ 	tdp_mmu_set_spte(kvm, iter, 0);
+ 
+@@ -1298,7 +1280,7 @@ bool kvm_tdp_mmu_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ 	/*
+ 	 * No need to handle the remote TLB flush under RCU protection, the
+ 	 * target SPTE _must_ be a leaf SPTE, i.e. cannot result in freeing a
+-	 * shadow page.  See the WARN on pfn_changed in __handle_changed_spte().
++	 * shadow page. See the WARN on pfn_changed in handle_changed_spte().
+ 	 */
+ 	return kvm_tdp_mmu_handle_gfn(kvm, range, set_spte_gfn);
+ }
 -- 
 2.39.1.519.gcb327c4b5f-goog
 
