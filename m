@@ -2,163 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D73E689F18
-	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 17:24:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9788168A00C
+	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 18:14:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232166AbjBCQYQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Feb 2023 11:24:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47044 "EHLO
+        id S233700AbjBCROh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Feb 2023 12:14:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231526AbjBCQYN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Feb 2023 11:24:13 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D53519E9C5
-        for <kvm@vger.kernel.org>; Fri,  3 Feb 2023 08:24:11 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CA93E1596;
-        Fri,  3 Feb 2023 08:24:53 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 939073F71E;
-        Fri,  3 Feb 2023 08:24:10 -0800 (PST)
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     andrew.jones@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc:     Nikita Venkatesh <Nikita.Venkatesh@arm.com>
-Subject: [kvm-unit-tests PATCH v6 2/2] arm/psci: Add PSCI CPU_OFF test case
-Date:   Fri,  3 Feb 2023 16:23:53 +0000
-Message-Id: <20230203162353.34876-3-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.39.1
-In-Reply-To: <20230203162353.34876-1-alexandru.elisei@arm.com>
-References: <20230203162353.34876-1-alexandru.elisei@arm.com>
+        with ESMTP id S233519AbjBCROg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Feb 2023 12:14:36 -0500
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF2A98D42F;
+        Fri,  3 Feb 2023 09:14:34 -0800 (PST)
+Received: by mail-ej1-x631.google.com with SMTP id lu11so17227703ejb.3;
+        Fri, 03 Feb 2023 09:14:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=piXirJB1ocWVRzhs3blzzKk9+m92CHpoGy9Z2k+SCeM=;
+        b=Fb0zwCwCJOeiTQEIlhQwff7G7k9ElObO1R+33i0wPXCrqwIBrpEt840BslhPeWvhej
+         RNm1AhkBApvOqVaG8WlS647E04HIjv8QXHbrx4efowZpI0TaabZ8LMgSoh/aq8KjxxRH
+         ymR8pWmWjw/LsMUWJ9rofMDzzzyZxS3bG6pr5yuXBaSNOMLnBMDA9JK7UsqZLm4fTbdz
+         3JONOsnKCVpep3uis1ESPNXO4PXE5PboF2NqB2yAqmji5Wmfqm6IMWogBRXHCGUo+evy
+         5FIXmxmK0Q+tgY6yH5xQu0jB1ogx5Xoz2NijnyXZiUzSOhVkO+fo8Fi/9WHvdy2fnh/f
+         yg0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=piXirJB1ocWVRzhs3blzzKk9+m92CHpoGy9Z2k+SCeM=;
+        b=jdmnbkrMiyjXQk7PKMylQSXxePDm20sjtJjN0YfXIUoGbcu/Q+SLGejPF3zXgLYmMy
+         cWAxD1LTIOz5kILKRqorGt5Mg4zqonWs6UvUk1vl0RAyFjCMM9MlbeEDee+hA+19L8s0
+         diIzEEqd8eLKqHjmDCny5ScmQ6KF8RUv7Y+WuwPLaD9MqWyV88k8EVNtjmtMiClx79JB
+         /ANrJeyiGsanxGMrQHH1Cue1SBzva+TXbhEg4e/9alVQNIEO/lGXsPltm04uKFKasjMx
+         /vU9kcJVd/QvpB5nO+RhDbIo4CUAI31tLFsyJxWMSAc17ttYKUxVwfg+IcVVBhtXuAyG
+         eipA==
+X-Gm-Message-State: AO0yUKUKIQkAoGv+aEVboqAHc8lyX6KBEvwFhjvLF7OWMvaeJHvFkasU
+        HsRqE0+NWIcin8KsPEhS3OyECsk2vEZOLSLDHQI=
+X-Google-Smtp-Source: AK7set/+j+io9+OTuTc3zxO0OENdkhbzE8/JIAWcegXUIkecBeeVYLPG3d1104QBp1VROkgVOtVScA3k2o3zdZ2WZFo=
+X-Received: by 2002:a17:907:9917:b0:878:5f93:e797 with SMTP id
+ ka23-20020a170907991700b008785f93e797mr2680768ejc.4.1675444473257; Fri, 03
+ Feb 2023 09:14:33 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20230203150634.3199647-1-hch@lst.de> <20230203150634.3199647-13-hch@lst.de>
+In-Reply-To: <20230203150634.3199647-13-hch@lst.de>
+From:   Ilya Dryomov <idryomov@gmail.com>
+Date:   Fri, 3 Feb 2023 18:14:21 +0100
+Message-ID: <CAOi1vP-HNmphq-_KakcGnmGYDY3rWbqmu0vWWS9vmYMLxgj1DQ@mail.gmail.com>
+Subject: Re: [PATCH 12/23] ceph: use bvec_set_page to initialize a bvec
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        David Howells <dhowells@redhat.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Xiubo Li <xiubli@redhat.com>, Steve French <sfrench@samba.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        devel@lists.orangefs.org, io-uring@vger.kernel.org,
+        linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Nikita Venkatesh <Nikita.Venkatesh@arm.com>
+On Fri, Feb 3, 2023 at 4:07 PM Christoph Hellwig <hch@lst.de> wrote:
+>
+> Use the bvec_set_page helper to initialize a bvec.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  fs/ceph/file.c | 12 ++++--------
+>  1 file changed, 4 insertions(+), 8 deletions(-)
+>
+> diff --git a/fs/ceph/file.c b/fs/ceph/file.c
+> index 764598e1efd91f..90b2aa7963bf29 100644
+> --- a/fs/ceph/file.c
+> +++ b/fs/ceph/file.c
+> @@ -103,14 +103,10 @@ static ssize_t __iter_get_bvecs(struct iov_iter *iter, size_t maxsize,
+>                 size += bytes;
+>
+>                 for ( ; bytes; idx++, bvec_idx++) {
+> -                       struct bio_vec bv = {
+> -                               .bv_page = pages[idx],
+> -                               .bv_len = min_t(int, bytes, PAGE_SIZE - start),
+> -                               .bv_offset = start,
+> -                       };
+> -
+> -                       bvecs[bvec_idx] = bv;
+> -                       bytes -= bv.bv_len;
+> +                       int len = min_t(int, bytes, PAGE_SIZE - start);
+> +
+> +                       bvec_set_page(&bvecs[bvec_idx], pages[idx], len, start);
+> +                       bytes -= len;
+>                         start = 0;
+>                 }
+>         }
+> --
+> 2.39.0
+>
 
-The test uses the following method.
+Reviewed-by: Ilya Dryomov <idryomov@gmail.com>
 
-The primary CPU brings up all the secondary CPUs, which are held in a wait
-loop. Once the primary releases the CPUs, each of the secondary CPUs
-proceed to issue CPU_OFF.
+Thanks,
 
-The primary CPU then checks for the status of the individual CPU_OFF
-request. There is a chance that some CPUs might return from the CPU_OFF
-function call after the primary CPU has finished the scan. There is no
-foolproof method to handle this, but the test tries its best to
-eliminate these false positives by introducing an extra delay if all the
-CPUs are reported offline after the initial scan.
-
-Signed-off-by: Nikita Venkatesh <Nikita.Venkatesh@arm.com>
-[ Alex E: Skip CPU_OFF test if cpu onlining failed, drop cpu_off_success in
-          favour of checking AFFINITY_INFO, commit message tweaking ]
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- arm/psci.c | 71 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 70 insertions(+), 1 deletion(-)
-
-diff --git a/arm/psci.c b/arm/psci.c
-index f7238f8e0bbd..55308c8f4766 100644
---- a/arm/psci.c
-+++ b/arm/psci.c
-@@ -72,8 +72,9 @@ static bool psci_affinity_info_off(void)
- }
- 
- static int cpu_on_ret[NR_CPUS];
--static cpumask_t cpu_on_ready, cpu_on_done;
-+static cpumask_t cpu_on_ready, cpu_on_done, cpu_off_done;
- static volatile int cpu_on_start;
-+static volatile int cpu_off_start;
- 
- extern void secondary_entry(void);
- static void cpu_on_do_wake_target(void)
-@@ -171,6 +172,67 @@ static bool psci_cpu_on_test(void)
- 	return !failed;
- }
- 
-+static void cpu_off_secondary_entry(void *data)
-+{
-+	int cpu = smp_processor_id();
-+
-+	while (!cpu_off_start)
-+		cpu_relax();
-+	cpumask_set_cpu(cpu, &cpu_off_done);
-+	cpu_psci_cpu_die();
-+}
-+
-+static bool psci_cpu_off_test(void)
-+{
-+	bool failed = false;
-+	int i, count, cpu;
-+
-+	for_each_present_cpu(cpu) {
-+		if (cpu == 0)
-+			continue;
-+		on_cpu_async(cpu, cpu_off_secondary_entry, NULL);
-+	}
-+
-+	cpumask_set_cpu(0, &cpu_off_done);
-+
-+	cpu_off_start = 1;
-+	report_info("waiting for the CPUs to be offlined...");
-+	while (!cpumask_full(&cpu_off_done))
-+		cpu_relax();
-+
-+	/* Allow all the other CPUs to complete the operation */
-+	for (i = 0; i < 100; i++) {
-+		mdelay(10);
-+
-+		count = 0;
-+		for_each_present_cpu(cpu) {
-+			if (cpu == 0)
-+				continue;
-+			if (psci_affinity_info(cpus[cpu], 0) != PSCI_0_2_AFFINITY_LEVEL_OFF)
-+				count++;
-+		}
-+		if (count == 0)
-+			break;
-+	}
-+
-+	/* Try to catch CPUs that return from CPU_OFF. */
-+	if (count == 0)
-+		mdelay(100);
-+
-+	for_each_present_cpu(cpu) {
-+		if (cpu == 0)
-+			continue;
-+		if (cpu_idle(cpu)) {
-+			report_info("CPU%d failed to be offlined", cpu);
-+			if (psci_affinity_info(cpus[cpu], 0) == PSCI_0_2_AFFINITY_LEVEL_OFF)
-+				report_info("AFFINITY_INFO incorrectly reports CPU%d as offline", cpu);
-+			failed = true;
-+		}
-+	}
-+
-+	return !failed;
-+}
-+
- int main(void)
- {
- 	int ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
-@@ -193,6 +255,13 @@ int main(void)
- 	else
- 		report_skip("Skipping unsafe cpu-on test. Set ERRATA_6c7a5dce22b3=y to enable.");
- 
-+	assert(!cpu_idle(0));
-+
-+	if (!ERRATA(6c7a5dce22b3) || cpumask_weight(&cpu_idle_mask) == nr_cpus - 1)
-+		report(psci_cpu_off_test(), "cpu-off");
-+	else
-+		report_skip("Skipping cpu-off test because the cpu-on test failed");
-+
- done:
- #if 0
- 	report_summary();
--- 
-2.39.1
-
+                Ilya
