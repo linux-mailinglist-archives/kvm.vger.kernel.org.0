@@ -2,62 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DB856899F9
-	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 14:45:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C08C689A25
+	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 14:51:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232866AbjBCNph (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Feb 2023 08:45:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56658 "EHLO
+        id S233000AbjBCNuk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Feb 2023 08:50:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232618AbjBCNpg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Feb 2023 08:45:36 -0500
+        with ESMTP id S232701AbjBCNuj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Feb 2023 08:50:39 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5343A8DAD7
-        for <kvm@vger.kernel.org>; Fri,  3 Feb 2023 05:44:53 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A91BD9A82A
+        for <kvm@vger.kernel.org>; Fri,  3 Feb 2023 05:49:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675431892;
+        s=mimecast20190719; t=1675432184;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=TsdM1DzmWzl5u6AEiSJP9wIhXJfQoDhSrqrTsDyV7Mk=;
-        b=fZuJUls5u2/K3rZdA/XZAXO3M2z3ZotzgsO9W0ntKaX6Fdq6rI3ACrv02+Sz80e1fPORee
-        hRfoA1i6leU2HLBbhBO+0rQuRZ/d6Aod7ciXka/4vztoIbFHmuc5RAEui2flzJrGbRklkm
-        S5DbDJ0vXGgdt8HcVLI+7Ji3QsPmIQo=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-630-4ihHZMeTMDyTpHDh5P87dQ-1; Fri, 03 Feb 2023 08:44:51 -0500
-X-MC-Unique: 4ihHZMeTMDyTpHDh5P87dQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9208B3804067;
-        Fri,  3 Feb 2023 13:44:50 +0000 (UTC)
-Received: from gondolin.redhat.com (unknown [10.39.192.149])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A0FA740168B7;
-        Fri,  3 Feb 2023 13:44:48 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Peter Maydell <peter.maydell@linaro.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>
-Cc:     qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Eric Auger <eauger@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Juan Quintela <quintela@redhat.com>,
-        Gavin Shan <gshan@redhat.com>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>
-Subject: [PATCH v5 3/3] qtests/arm: add some mte tests
-Date:   Fri,  3 Feb 2023 14:44:33 +0100
-Message-Id: <20230203134433.31513-4-cohuck@redhat.com>
-In-Reply-To: <20230203134433.31513-1-cohuck@redhat.com>
-References: <20230203134433.31513-1-cohuck@redhat.com>
+        bh=DMeV+PbsytnfwB8y571EgKoPuO8SIcRtHzLsbHY4Ecg=;
+        b=KjgdONbwq0qnsfWljn+3WnKm/To2xvnXo+IQ+ZJiSecruGym+JHqxlx+Hac+26QJoUAvvL
+        0QpPdmjQYjng+QAhRfpmal4LZhCjHmUCqZKeHMd1KlFR7EaVL7PfNp4NoZTklD288din01
+        5/tJFU4dXlh+SEdFW8gcpo9tEXdYBqM=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-594-suGLPLblMlKt3e4lCnfhPw-1; Fri, 03 Feb 2023 08:49:43 -0500
+X-MC-Unique: suGLPLblMlKt3e4lCnfhPw-1
+Received: by mail-il1-f200.google.com with SMTP id b4-20020a92c564000000b00313942dcd86so1405726ilj.12
+        for <kvm@vger.kernel.org>; Fri, 03 Feb 2023 05:49:43 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DMeV+PbsytnfwB8y571EgKoPuO8SIcRtHzLsbHY4Ecg=;
+        b=tsQxLBYr+C3ZPwkThMdQm+8UpM9zO0JiVZOjL6ZbhiwVPAjQMac2JwuuJIhyyt3Wrf
+         OOgBWrsR2F1B7S16BfpyaFhu2i9+4HRSBMFlGwkdsKEplBFjCAU/GdgDcsqJNZi4eZJO
+         NGm1Lf45Ua07q/t7No3Six4zyye8+9nP6lcfH0knt84RfUGA2gcRG0oMfB59fQp9L8EN
+         8lRyC8qpVrsGp+an2ZAKr1Efw40ow75V5gtuWY0vu+sZ/MFVAzTpP6EM+qwpX69apyQi
+         XOpboxoHFjl1kuziu1cyaQGh6XwMJxc5CEzrvVpal5kiDIiVC6X1Fq3XCKfPwgswe6FU
+         KGkQ==
+X-Gm-Message-State: AO0yUKX+FGL4ubRdHwp/p8FM7Lba3LSP7MPsW/n8f6JYPjNkD+Cs0ube
+        QQ2n7CfGpghvEWMw4jiRaMa34uOog4j5A8v9RQ8lhogZluGw+BEzj5tHYLRmacnZ3R3hRfwlpxL
+        YEpyzX+MSzgS6
+X-Received: by 2002:a05:6e02:b29:b0:312:75a8:befd with SMTP id e9-20020a056e020b2900b0031275a8befdmr7401945ilu.31.1675432183116;
+        Fri, 03 Feb 2023 05:49:43 -0800 (PST)
+X-Google-Smtp-Source: AK7set+DXLFqJ2WVCxfMNKF0qA9WvYBQ4q7md2UoZyoOfbxX57I1uo2kCZVCiLHw1lEdIjP9+dyEFw==
+X-Received: by 2002:a05:6e02:b29:b0:312:75a8:befd with SMTP id e9-20020a056e020b2900b0031275a8befdmr7401929ilu.31.1675432182869;
+        Fri, 03 Feb 2023 05:49:42 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id h22-20020a022b16000000b003a958069dbfsm853822jaa.8.2023.02.03.05.49.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Feb 2023 05:49:42 -0800 (PST)
+Date:   Fri, 3 Feb 2023 06:49:40 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "farman@linux.ibm.com" <farman@linux.ibm.com>,
+        "pmorel@linux.ibm.com" <pmorel@linux.ibm.com>,
+        "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
+        "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
+        "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
+        "jjherne@linux.ibm.com" <jjherne@linux.ibm.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3] vfio: fix deadlock between group lock and kvm lock
+Message-ID: <20230203064940.435e4d65.alex.williamson@redhat.com>
+In-Reply-To: <DS0PR11MB7529050661FCE4A5AC4B17C3C3D79@DS0PR11MB7529.namprd11.prod.outlook.com>
+References: <20230202162442.78216-1-mjrosato@linux.ibm.com>
+        <20230202124210.476adaf8.alex.williamson@redhat.com>
+        <BN9PR11MB527618E281BEB8E479ABB0418CD69@BN9PR11MB5276.namprd11.prod.outlook.com>
+        <20230202161307.0c6aa23e.alex.williamson@redhat.com>
+        <BN9PR11MB5276017F9CEBB4BAE58C40E88CD79@BN9PR11MB5276.namprd11.prod.outlook.com>
+        <DS0PR11MB7529050661FCE4A5AC4B17C3C3D79@DS0PR11MB7529.namprd11.prod.outlook.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
@@ -68,155 +104,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Acked-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- tests/qtest/arm-cpu-features.c | 75 ++++++++++++++++++++++++++++++++++
- 1 file changed, 75 insertions(+)
+On Fri, 3 Feb 2023 13:32:09 +0000
+"Liu, Yi L" <yi.l.liu@intel.com> wrote:
 
-diff --git a/tests/qtest/arm-cpu-features.c b/tests/qtest/arm-cpu-features.c
-index 8691802950ca..c5dbf66e938a 100644
---- a/tests/qtest/arm-cpu-features.c
-+++ b/tests/qtest/arm-cpu-features.c
-@@ -22,6 +22,7 @@
- 
- #define MACHINE     "-machine virt,gic-version=max -accel tcg "
- #define MACHINE_KVM "-machine virt,gic-version=max -accel kvm -accel tcg "
-+#define MACHINE_MTE "-machine virt,gic-version=max,mte=on -accel tcg "
- #define QUERY_HEAD  "{ 'execute': 'query-cpu-model-expansion', " \
-                     "  'arguments': { 'type': 'full', "
- #define QUERY_TAIL  "}}"
-@@ -156,6 +157,18 @@ static bool resp_get_feature(QDict *resp, const char *feature)
-     g_assert(qdict_get_bool(_props, feature) == (expected_value));     \
- })
- 
-+#define resp_assert_feature_str(resp, feature, expected_value)         \
-+({                                                                     \
-+    QDict *_props;                                                     \
-+                                                                       \
-+    g_assert(_resp);                                                   \
-+    g_assert(resp_has_props(_resp));                                   \
-+    _props = resp_get_props(_resp);                                    \
-+    g_assert(qdict_get(_props, feature));                              \
-+    g_assert_cmpstr(qdict_get_try_str(_props, feature), ==,            \
-+                    expected_value);                                   \
-+})
-+
- #define assert_feature(qts, cpu_type, feature, expected_value)         \
- ({                                                                     \
-     QDict *_resp;                                                      \
-@@ -166,6 +179,16 @@ static bool resp_get_feature(QDict *resp, const char *feature)
-     qobject_unref(_resp);                                              \
- })
- 
-+#define assert_feature_str(qts, cpu_type, feature, expected_value)     \
-+({                                                                     \
-+    QDict *_resp;                                                      \
-+                                                                       \
-+    _resp = do_query_no_props(qts, cpu_type);                          \
-+    g_assert(_resp);                                                   \
-+    resp_assert_feature_str(_resp, feature, expected_value);           \
-+    qobject_unref(_resp);                                              \
-+})
-+
- #define assert_set_feature(qts, cpu_type, feature, value)              \
- ({                                                                     \
-     const char *_fmt = (value) ? "{ %s: true }" : "{ %s: false }";     \
-@@ -177,6 +200,17 @@ static bool resp_get_feature(QDict *resp, const char *feature)
-     qobject_unref(_resp);                                              \
- })
- 
-+#define assert_set_feature_str(qts, cpu_type, feature, value, _fmt)    \
-+({                                                                     \
-+    const char *__fmt = _fmt;                                          \
-+    QDict *_resp;                                                      \
-+                                                                       \
-+    _resp = do_query(qts, cpu_type, __fmt, feature);                   \
-+    g_assert(_resp);                                                   \
-+    resp_assert_feature_str(_resp, feature, value);                    \
-+    qobject_unref(_resp);                                              \
-+})
-+
- #define assert_has_feature_enabled(qts, cpu_type, feature)             \
-     assert_feature(qts, cpu_type, feature, true)
- 
-@@ -413,6 +447,24 @@ static void sve_tests_sve_off_kvm(const void *data)
-     qtest_quit(qts);
- }
- 
-+static void mte_tests_tag_memory_on(const void *data)
-+{
-+    QTestState *qts;
-+
-+    qts = qtest_init(MACHINE_MTE "-cpu max");
-+
-+    /*
-+     * With tag memory, "mte" should default to on, and explicitly specifying
-+     * either on or off should be fine.
-+     */
-+    assert_has_feature(qts, "max", "mte");
-+
-+    assert_set_feature_str(qts, "max", "mte", "off", "{ 'mte': 'off' }");
-+    assert_set_feature_str(qts, "max", "mte", "on", "{ 'mte': 'on' }");
-+
-+    qtest_quit(qts);
-+}
-+
- static void pauth_tests_default(QTestState *qts, const char *cpu_type)
- {
-     assert_has_feature_enabled(qts, cpu_type, "pauth");
-@@ -425,6 +477,19 @@ static void pauth_tests_default(QTestState *qts, const char *cpu_type)
-                  "{ 'pauth': false, 'pauth-impdef': true }");
- }
- 
-+static void mte_tests_default(QTestState *qts, const char *cpu_type)
-+{
-+    assert_has_feature(qts, cpu_type, "mte");
-+
-+    /*
-+     * Without tag memory, mte will be off under tcg.
-+     * Explicitly enabling it yields an error.
-+     */
-+    assert_set_feature_str(qts, "max", "mte", "off", "{ 'mte': 'off' }");
-+    assert_error(qts, cpu_type, "mte=on requires tag memory",
-+                 "{ 'mte': 'on' }");
-+}
-+
- static void test_query_cpu_model_expansion(const void *data)
- {
-     QTestState *qts;
-@@ -474,6 +539,7 @@ static void test_query_cpu_model_expansion(const void *data)
- 
-         sve_tests_default(qts, "max");
-         pauth_tests_default(qts, "max");
-+        mte_tests_default(qts, "max");
- 
-         /* Test that features that depend on KVM generate errors without. */
-         assert_error(qts, "max",
-@@ -517,6 +583,13 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
-         assert_set_feature(qts, "host", "pmu", false);
-         assert_set_feature(qts, "host", "pmu", true);
- 
-+        /*
-+         * Unfortunately, there's no easy way to test whether this instance
-+         * of KVM supports MTE. So we can only assert that the feature
-+         * is present, but not whether it can be toggled.
-+         */
-+        assert_has_feature(qts, "host", "mte");
-+
-         /*
-          * Some features would be enabled by default, but they're disabled
-          * because this instance of KVM doesn't support them. Test that the
-@@ -631,6 +704,8 @@ int main(int argc, char **argv)
-                             NULL, sve_tests_sve_off);
-         qtest_add_data_func("/arm/kvm/query-cpu-model-expansion/sve-off",
-                             NULL, sve_tests_sve_off_kvm);
-+        qtest_add_data_func("/arm/max/query-cpu-model-expansion/tag-memory",
-+                            NULL, mte_tests_tag_memory_on);
-     }
- 
-     return g_test_run();
--- 
-2.39.1
+> > From: Tian, Kevin <kevin.tian@intel.com>
+> > Sent: Friday, February 3, 2023 10:00 AM
+> >   
+> > > From: Alex Williamson <alex.williamson@redhat.com>
+> > > Sent: Friday, February 3, 2023 7:13 AM
+> > >
+> > > On Thu, 2 Feb 2023 23:04:10 +0000
+> > > "Tian, Kevin" <kevin.tian@intel.com> wrote:
+> > >  
+> > > > > From: Alex Williamson <alex.williamson@redhat.com>
+> > > > > Sent: Friday, February 3, 2023 3:42 AM
+> > > > >
+> > > > >
+> > > > > LGTM.  I'm not sure moving the functions to vfio_main really buys us
+> > > > > anything since we're making so much use of group fields.  The cdev
+> > > > > approach will necessarily be different, so the bulk of the get code will
+> > > > > likely need to move back to group.c anyway.
+> > > > >  
+> > > >
+> > > > well my last comment was based on Matthew's v2 where the get code
+> > > > gets a kvm passed in instead of implicitly retrieving group ref_lock
+> > > > internally. In that case the get/put helpers only contain device logic
+> > > > thus fit in vfio_main.c.
+> > > >
+> > > > with v3 then they have to be in group.c since we don't want to use
+> > > > group fields in vfio_main.c.
+> > > >
+> > > > but I still think v2 of the helpers is slightly better. The only difference
+> > > > between cdev and group when handling this race is using different
+> > > > ref_lock. the symbol get/put part is exactly same. So even if we
+> > > > merge v3 like this, very likely Yi has to change it back to v2 style
+> > > > to share the get/put helpers while just leaving the ref_lock part
+> > > > handled differently between the two path.  
+> > >
+> > > I'm not really a fan of the asymmetry of the v2 version where the get
+> > > helper needs to be called under the new kvm_ref_lock, but the put
+> > > helper does not.  Having the get helper handle that makes the caller
+> > > much cleaner.  Thanks,
+> > >  
+> > 
+> > What about passing the lock pointer into the helper? it's still slightly
+> > asymmetry as the put helper doesn't carry the lock pointer but it
+> > could also be interpreted as if the pointer has been saved in the get
+> > then if it needs to be referenced by the put there is no need to pass
+> > it in again.  
+> 
+> For cdev, I may modify vfio_device_get_kvm_safe() to accept
+> struct kvm and let its caller hold a kvm_ref_lock (field within
+> struct vfio_device_file). Meanwhile, the group path holds
+> the group->kvm_ref_lock before invoking vfio_device_get_kvm_safe().
+> vfio_device_get_kvm_safe() just includes the symbol get/put and
+> the device->kvm and put_kvm set.
+
+Sounds a lot like v2 :-\  I'd look more towards group and cdev specific
+helpers that handle the locking so that the callers aren't exposed to
+the asymmetry of get vs put, and reduce a new
+_vfio_device_get_kvm_safe() in common code that only does the symbol
+work.  Thanks,
+
+Alex
 
