@@ -2,262 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3506968A893
-	for <lists+kvm@lfdr.de>; Sat,  4 Feb 2023 07:24:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D8B2D68A919
+	for <lists+kvm@lfdr.de>; Sat,  4 Feb 2023 09:56:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232989AbjBDGYA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 4 Feb 2023 01:24:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52762 "EHLO
+        id S233074AbjBDI4n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 4 Feb 2023 03:56:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbjBDGX7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 4 Feb 2023 01:23:59 -0500
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E6BE885DA;
-        Fri,  3 Feb 2023 22:23:58 -0800 (PST)
+        with ESMTP id S230101AbjBDI4m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 4 Feb 2023 03:56:42 -0500
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DAFF3754F
+        for <kvm@vger.kernel.org>; Sat,  4 Feb 2023 00:56:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1675491838; x=1707027838;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=a4RIp32ZP48FWHUjJO4WhA9g7Ha02faAdYWXCZDUA4s=;
-  b=VZLmXlgY4HbbdFTpENSVxmwVgStvfvUff0KOmMxIoTERZSoc3BcfJc5s
-   W7liBZc/3x8TroA2YDTme7zKlJdE2aKqH0hPlo//yUDvxB4A7np/denho
-   UrBInrAA4ZRP0FwqKJvxWc3m/CFYLNwoogkSqqqVWAc01YAP2DF+Zx6Lw
-   Xd/teIovJnfGqKUy8w1ycdQP26ewYfDSwid8fpsbrBwhWoFW3sYmfL4x6
-   UBnYwETfReY96UoLKH6essXz3pLnOPfXglUV14uTzZWd+YWLG6xoZ5AnR
-   eMJhyMs/Rvmxmon4JkRSbRNHMQd7fpUIYiNLWDMc737pqPuDcHIXbJ8Vm
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10610"; a="312578730"
+  t=1675501001; x=1707037001;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=z1Os81dv7xzZJVvTa+yNC5+XR3mnTuAq7NYN1yvO0T0=;
+  b=a9ioOq2bV3O+i/NkvbtCt3Pk+KLWJxAgyoVBnG8bvQOHlDhRfl4Yo4Y9
+   2Ox6JHSB0VTBbwKcuzsU02YEXMwrXoogGJ0nvFipDJoTP5NWosGxrkFhL
+   v2aEQaokyhxtj/9VHj+y3PSdkCwvFl0gdkdcU4gjoNAoiIW/pbMvV1bYs
+   mIV98Ztibzowe7MRZRlQM0WUJCXMZqfaftuCjkWXIljKdCnQCPsDJ6JU6
+   wD22qlybVHFCrEhuhccnyAk6eq0lAvvnLB5uRYc8Gsc3C9+cqvFebcfZL
+   lqlvz5JFWvdlfjn/+Zi/DybXE/NYrzv5VHEYzmZ9cPnkyZqcy9DcOiqwe
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10610"; a="356275531"
 X-IronPort-AV: E=Sophos;i="5.97,272,1669104000"; 
-   d="scan'208";a="312578730"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2023 22:23:57 -0800
+   d="scan'208";a="356275531"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2023 00:56:40 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10610"; a="615933427"
+X-IronPort-AV: E=McAfee;i="6500,9779,10610"; a="808599382"
 X-IronPort-AV: E=Sophos;i="5.97,272,1669104000"; 
-   d="scan'208";a="615933427"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orsmga003.jf.intel.com with ESMTP; 03 Feb 2023 22:23:56 -0800
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Fri, 3 Feb 2023 22:23:56 -0800
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Fri, 3 Feb 2023 22:23:55 -0800
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16 via Frontend Transport; Fri, 3 Feb 2023 22:23:55 -0800
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.16; Fri, 3 Feb 2023 22:23:54 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=k+4/TXkNWbIJKfT5bO73IrwvsAo1jLlEzCI37bYX1AjTKZnWP3cZKFbvHg2TeMpBA0NGQ7AdBu7WazgIYE8EOGfBN0Rnst/gyGxdFhfyBxoclBd42gJSULfAfEaK4Co8a9v6lGSYVyyy0ZvKcxjjOzYpnxi0v5DDzXceBChTwlRBwRtT0cVQaNnReYFU30G44aHAbm5yKNNPGR7Ix8XUomaQ29vbKyoy6OqxUTBb47JyRgfdj8i5nopoH5eWi8CQiPLQygi5fl26c9uY8zQ+6LyPgiSfeH8eZ5OlkpUsRLmbKNla6l+4DG21V0pwIYEozm4aMVNqDMJek04Uv6WhUQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AE6eQ3fhpZ96KQnB6v5UGtCicgSGGhHZiMEXHWbhL8s=;
- b=hto5m/oXoS5vmE9rhvejH9qAt9yXcMCqmtt+xfCPmPBcwf7S7wQB1SgjWNt7tz3tiKJastvqDOleJj2/Y7CQYwOPd1hamVtmzP0txQZOW62KhqGg6kKMRtmh/1Q86yJOs7K0yCUwBWTD8aeXtxcBhq0/ad0VujswpYOoBOjVyWk70EAo9TjM/WkEBxlSVVIwYpd1HEEPwqW8OHaNSR0ej4KD4279HCxaR7AF93k9zH1RTNuqw2BEivCpcGNLPkHHnXpVw7dcMjZi9VnUST9y/5DZqv2XTFqj6AObgr449bvfCzx0ny6XgPc6ZvQ9hizeSU/jd9TJVCIUKYTDt9tSXA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
- by BL3PR11MB6315.namprd11.prod.outlook.com (2603:10b6:208:3b2::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6064.27; Sat, 4 Feb
- 2023 06:23:52 +0000
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::e1fa:abbe:2009:b0a3]) by DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::e1fa:abbe:2009:b0a3%4]) with mapi id 15.20.6064.024; Sat, 4 Feb 2023
- 06:23:52 +0000
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>
-CC:     "cohuck@redhat.com" <cohuck@redhat.com>,
-        "farman@linux.ibm.com" <farman@linux.ibm.com>,
-        "pmorel@linux.ibm.com" <pmorel@linux.ibm.com>,
-        "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
-        "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
-        "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
-        "david@redhat.com" <david@redhat.com>,
-        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
-        "jjherne@linux.ibm.com" <jjherne@linux.ibm.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v4 2/2] vfio: no need to pass kvm pointer during device
- open
-Thread-Topic: [PATCH v4 2/2] vfio: no need to pass kvm pointer during device
- open
-Thread-Index: AQHZOBmTn221w5MAG0K+5msUC0tdgK6+Uf8g
-Date:   Sat, 4 Feb 2023 06:23:51 +0000
-Message-ID: <DS0PR11MB7529C0AF0C079748413999C3C3D49@DS0PR11MB7529.namprd11.prod.outlook.com>
-References: <20230203215027.151988-1-mjrosato@linux.ibm.com>
- <20230203215027.151988-3-mjrosato@linux.ibm.com>
-In-Reply-To: <20230203215027.151988-3-mjrosato@linux.ibm.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS0PR11MB7529:EE_|BL3PR11MB6315:EE_
-x-ms-office365-filtering-correlation-id: cd61d9ea-c9b6-4752-e366-08db0678625c
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 8vuAk5B/UO7guHBAaLhMwyWpgz8gUl51ogzivEdAe7MzsitttAegzl4OuG2C4hiO8y+uPVgX0rdZ9ujyuB3DsVzldssZ6DixtqoLkDVo0Kq6uc5/Wzg+HGTO4Ck52/77TEovosGPsNiTupmorXommGbV0Lj1pZqhZDvbqdDk7tLYNHyikWFWiCkwW5k0LGZObd624U6mzesxD9h7Oz0wZQlBuc9JALxPv7HLev8fYOk5m4INJ6Mn6BMaC4T+Yh3jEBesFRbMSS/X4EkPKIZOJruD+4jn3MlU0WFmW+/M9UReZ5rE6StgPlcBA7j3PBnbW2MDMs+WQSZ3xoH3LiFGZsHhK9yVv0EE+dWqK0xm0F/SH2liJj1XuzWqnC/5XXE+tR4ICO6uN9n75/rYBzYjxpvCheG4J68DVfMCdQ4lGqsHqjMV/o8WcHGKrNv78rM6Gd/17dQxAxj2YyUYQrJ3UFzaAl4fsySf0GTF1QgO6OK0wtStOvZzKKXgKSSD1beyFiwYswFNa7q5b1lmvb/DBBe9EPH3ef25K7zh5lWBrTmXF6lDyw/zvQUxQ0cp4uT9nve7VDBoMozlhRk/aBY+AVTwN6cB6zEBsNpAjKg21LmPX8H4xE6y7RV2wnkrQ/opKNa31800juDVghpRdKj/KnfawBqwcv6YQW7Z6It+iTK0XZYVhDi+d1qA8KKId1wzLLLF9BJzUN0z7awFggkafNADpbVwJo9L9Vc+hvpQZws=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(346002)(136003)(376002)(396003)(39860400002)(366004)(451199018)(41300700001)(478600001)(33656002)(82960400001)(66556008)(38100700002)(122000001)(4326008)(66476007)(8676002)(83380400001)(54906003)(64756008)(316002)(66446008)(110136005)(5660300002)(186003)(71200400001)(26005)(7416002)(76116006)(9686003)(6506007)(86362001)(38070700005)(52536014)(7696005)(55016003)(8936002)(66946007)(2906002)(13296009);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?fR0yqHQWolRJ8LLZWjuWE7Gik6BxsVh4zRLXEg6zDrrBkANfXOLYspNARB2r?=
- =?us-ascii?Q?Q94KZ5JSOYYyocj3ZeaLyvX4J8HvZJJ9t4xH2EVAk3k80uX7P3WUI9GIAQjl?=
- =?us-ascii?Q?Mz321hmbnLrlApugeqHVyTVUCMSktTEinQLKlqHkAeRBDjW0h7odHKDW7v/v?=
- =?us-ascii?Q?X4V0wB6+sK/Oy7QACbDCKquiRCOw602v9vpysFToRewJN7WclnZNZpNR7kyH?=
- =?us-ascii?Q?7oSxQtKjkOJCL6c/zrX3J9XXpzRsURUQtp5RGOQvUiycbe5MPq3BTp/P/pQQ?=
- =?us-ascii?Q?rrhGCWMqhQIddE7Ow/hLo8IGeKDOF9vnE/aBkzHlOYRk6HQGoyHjbjAcvXHq?=
- =?us-ascii?Q?gQ7HqFLtdYf4ew2XYCH46i/qYirWuH35uTZNsQGKdxQVCIQPBWu1Jrg/NOfH?=
- =?us-ascii?Q?+Lhd9GzelWf6z+9QucGM4PowOwGcF7UlZfkFfcV5h0GI4X5leWSKtN9P6ipY?=
- =?us-ascii?Q?cKyDXwqf0Z5mUXY/qVJNFH7HMT5npX+TUCuk43yiGgkf/kC+NWUB0JL1ZaRK?=
- =?us-ascii?Q?2yf3bSu3xUllIvzjUbMcBICZFIs1YhFxqFkeV4mbrbzZrPBft5olweb5+MD5?=
- =?us-ascii?Q?c3aChKCnFXtMyEghHmQPCIB+i7GSJ/x+s+Mq9J4aDnmEjit5UHamB8oTt0B7?=
- =?us-ascii?Q?9+ywU8tqyG+o3GJ7Rm6o2D3bLT7qZTMa32onMed23v624HaD9d/6YWWY3F06?=
- =?us-ascii?Q?+OkUHRZEPeIlIWbCOrGr4XHoWTW2HEufJb6cGKrXoy0rTiZVdJfhJ9oV8YU0?=
- =?us-ascii?Q?XHgxnyMK7a0SizD2io6c95kR/kDsnOpJCAr54sBDDXzq6zzUoANfGZwCg/+X?=
- =?us-ascii?Q?fNx/BYk90ryEY2sHXsGZP7FKCxaqO6NKD4EM92PDfgIZirq/Aih2xvFnEdi6?=
- =?us-ascii?Q?+at3q8Z8NXNOwFUJMt7P3rhTB2isreSjATrbL/xgn5kuyV3qwMpFtwW+/ms3?=
- =?us-ascii?Q?8kkYBRT2Tf0tIJ0Gxazw2cUMDqsza1jWz2HfRZ9fiSaIQdX+y4ad+ZxTyRWD?=
- =?us-ascii?Q?s5PFWsiaKyCbey7csHfuCrhZrhkTPun/4hClDYMCdUrdqbYyqrv53mcz5B/D?=
- =?us-ascii?Q?OykUdvKiQl2M6eo8Fp/NUp6JxTe58P+JZuaxUAbm1bJrk93IrVI3h1xT8GrM?=
- =?us-ascii?Q?xxDjcFbc8hymtgP5daVnmUniPK9ytKnraG90s5XbjP1gyFjuBfGS52jUbY1d?=
- =?us-ascii?Q?0ZV7mtjz1NR3kQ6e9dwmM8TzNEjtPJuoliRPcQtmmS+eOlI1r9RJIUBe3SSH?=
- =?us-ascii?Q?UL4rATggLOGc31L532ye324toRBa2wEUxx/XA+lJ2yFEBiveTnpEZ0N5nCdv?=
- =?us-ascii?Q?JkB7chkRQRAxwrLj+BIQ0MVBxwsMq3Qkbk8ABnsIzcc2xqwcQ7gyQ0HBkBtS?=
- =?us-ascii?Q?hbvUmNKKh3+G1uCFPgsh8IAnXRGp7gHg4vCdf5hxyRTQUnAAH0/LYERqpS4B?=
- =?us-ascii?Q?FouVMrgil1gFcOn2F+3Bg4b3uZyoFjYBIYM1pnRjs4cxrt4jdOnZXRY0ZIv2?=
- =?us-ascii?Q?XooQ4H3B4OAuP5txu5nBJ1XwcnZuaI8yOc4XQwOyd2Obs8VxCa4m7F5Az8Cu?=
- =?us-ascii?Q?ItnDFM9HCueYNepR23EFl3ku1PTOGtKPhE+4FhYF?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+   d="scan'208";a="808599382"
+Received: from lkp-server01.sh.intel.com (HELO 4455601a8d94) ([10.239.97.150])
+  by fmsmga001.fm.intel.com with ESMTP; 04 Feb 2023 00:56:38 -0800
+Received: from kbuild by 4455601a8d94 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pOELd-0001BE-2R;
+        Sat, 04 Feb 2023 08:56:37 +0000
+Date:   Sat, 4 Feb 2023 16:56:18 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Yi Liu <yi.l.liu@intel.com>, alex.williamson@redhat.com,
+        jgg@nvidia.com
+Cc:     oe-kbuild-all@lists.linux.dev, kevin.tian@intel.com,
+        chao.p.peng@linux.intel.com, eric.auger@redhat.com,
+        yi.l.liu@intel.com, yi.y.sun@linux.intel.com, kvm@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] docs: vfio: Update vfio.rst per latest interfaces
+Message-ID: <202302041603.N8YkuJks-lkp@intel.com>
+References: <20230203083345.711443-3-yi.l.liu@intel.com>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cd61d9ea-c9b6-4752-e366-08db0678625c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Feb 2023 06:23:51.8685
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 8OucVwq0R8zIwRIR2dGt8Z+j4VSVu0gExEZcoiZHyLvusgKYIZ306eKOy2DHvkNzwd1rpD07mIKlEupg6Ef3zw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR11MB6315
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230203083345.711443-3-yi.l.liu@intel.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Matthew Rosato <mjrosato@linux.ibm.com>
-> Sent: Saturday, February 4, 2023 5:50 AM
->=20
-> Nothing uses this value during vfio_device_open anymore so it's safe
-> to remove it.
->=20
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> ---
->  drivers/vfio/group.c     | 2 +-
->  drivers/vfio/vfio.h      | 3 +--
->  drivers/vfio/vfio_main.c | 7 +++----
->  3 files changed, 5 insertions(+), 7 deletions(-)
+Hi Yi,
 
-Reviewed-by: Yi Liu <yi.l.liu@intel.com>
+Thank you for the patch! Perhaps something to improve:
 
-Regards,
-Yi Liu
+[auto build test WARNING on awilliam-vfio/for-linus]
+[also build test WARNING on linus/master v6.2-rc6 next-20230203]
+[cannot apply to awilliam-vfio/next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-> diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
-> index 98621ac082f0..0e9036e2b9c4 100644
-> --- a/drivers/vfio/group.c
-> +++ b/drivers/vfio/group.c
-> @@ -187,7 +187,7 @@ static int vfio_device_group_open(struct vfio_device
-> *device)
->  	if (device->open_count =3D=3D 0)
->  		vfio_device_group_get_kvm_safe(device);
->=20
-> -	ret =3D vfio_device_open(device, device->group->iommufd, device-
-> >kvm);
-> +	ret =3D vfio_device_open(device, device->group->iommufd);
->=20
->  	if (device->open_count =3D=3D 0)
->  		vfio_device_put_kvm(device);
-> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
-> index 24d6cd285945..4f39ab549a80 100644
-> --- a/drivers/vfio/vfio.h
-> +++ b/drivers/vfio/vfio.h
-> @@ -18,8 +18,7 @@ struct vfio_container;
->=20
->  void vfio_device_put_registration(struct vfio_device *device);
->  bool vfio_device_try_get_registration(struct vfio_device *device);
-> -int vfio_device_open(struct vfio_device *device,
-> -		     struct iommufd_ctx *iommufd, struct kvm *kvm);
-> +int vfio_device_open(struct vfio_device *device, struct iommufd_ctx
-> *iommufd);
->  void vfio_device_close(struct vfio_device *device,
->  		       struct iommufd_ctx *iommufd);
->=20
-> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-> index 28c47cd6a6b5..3a597e799918 100644
-> --- a/drivers/vfio/vfio_main.c
-> +++ b/drivers/vfio/vfio_main.c
-> @@ -397,7 +397,7 @@ static bool vfio_assert_device_open(struct
-> vfio_device *device)
->  }
->=20
->  static int vfio_device_first_open(struct vfio_device *device,
-> -				  struct iommufd_ctx *iommufd, struct kvm
-> *kvm)
-> +				  struct iommufd_ctx *iommufd)
->  {
->  	int ret;
->=20
-> @@ -444,8 +444,7 @@ static void vfio_device_last_close(struct vfio_device
-> *device,
->  	module_put(device->dev->driver->owner);
->  }
->=20
-> -int vfio_device_open(struct vfio_device *device,
-> -		     struct iommufd_ctx *iommufd, struct kvm *kvm)
-> +int vfio_device_open(struct vfio_device *device, struct iommufd_ctx
-> *iommufd)
->  {
->  	int ret =3D 0;
->=20
-> @@ -453,7 +452,7 @@ int vfio_device_open(struct vfio_device *device,
->=20
->  	device->open_count++;
->  	if (device->open_count =3D=3D 1) {
-> -		ret =3D vfio_device_first_open(device, iommufd, kvm);
-> +		ret =3D vfio_device_first_open(device, iommufd);
->  		if (ret)
->  			device->open_count--;
->  	}
-> --
-> 2.39.1
+url:    https://github.com/intel-lab-lkp/linux/commits/Yi-Liu/vfio-Update-the-kdoc-for-vfio_device_ops/20230203-163612
+base:   https://github.com/awilliam/linux-vfio.git for-linus
+patch link:    https://lore.kernel.org/r/20230203083345.711443-3-yi.l.liu%40intel.com
+patch subject: [PATCH v2 2/2] docs: vfio: Update vfio.rst per latest interfaces
+reproduce:
+        # https://github.com/intel-lab-lkp/linux/commit/8db2c0d3414387502a6c743d6fa383cec960e3ba
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Yi-Liu/vfio-Update-the-kdoc-for-vfio_device_ops/20230203-163612
+        git checkout 8db2c0d3414387502a6c743d6fa383cec960e3ba
+        make menuconfig
+        # enable CONFIG_COMPILE_TEST, CONFIG_WARN_MISSING_DOCUMENTS, CONFIG_WARN_ABI_ERRORS
+        make htmldocs
 
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+
+All warnings (new ones prefixed by >>):
+
+>> Documentation/driver-api/vfio.rst:264: WARNING: Inline emphasis start-string without end-string.
+>> Documentation/driver-api/vfio.rst:296: WARNING: Literal block ends without a blank line; unexpected unindent.
+>> Documentation/driver-api/vfio.rst:305: WARNING: Unexpected indentation.
+>> Documentation/driver-api/vfio.rst:306: WARNING: Block quote ends without a blank line; unexpected unindent.
+
+vim +264 Documentation/driver-api/vfio.rst
+
+   263	
+ > 264		vfio_alloc_device(dev_struct, member, dev, ops);
+   265		void vfio_put_device(struct vfio_device *device);
+   266	
+   267	vfio_register_group_dev() indicates to the core to begin tracking the
+   268	iommu_group of the specified dev and register the dev as owned by a VFIO bus
+   269	driver. Once vfio_register_group_dev() returns it is possible for userspace to
+   270	start accessing the driver, thus the driver should ensure it is completely
+   271	ready before calling it. The driver provides an ops structure for callbacks
+   272	similar to a file operations structure::
+   273	
+   274		struct vfio_device_ops {
+   275			char	*name;
+   276			int	(*init)(struct vfio_device *vdev);
+   277			void	(*release)(struct vfio_device *vdev);
+   278			int	(*bind_iommufd)(struct vfio_device *vdev,
+   279						struct iommufd_ctx *ictx, u32 *out_device_id);
+   280			void	(*unbind_iommufd)(struct vfio_device *vdev);
+   281			int	(*attach_ioas)(struct vfio_device *vdev, u32 *pt_id);
+   282			int	(*open_device)(struct vfio_device *vdev);
+   283			void	(*close_device)(struct vfio_device *vdev);
+   284			ssize_t	(*read)(struct vfio_device *vdev, char __user *buf,
+   285					size_t count, loff_t *ppos);
+   286			ssize_t	(*write)(struct vfio_device *vdev, const char __user *buf,
+   287				 size_t count, loff_t *size);
+   288			long	(*ioctl)(struct vfio_device *vdev, unsigned int cmd,
+   289					 unsigned long arg);
+   290			int	(*mmap)(struct vfio_device *vdev, struct vm_area_struct *vma);
+   291			void	(*request)(struct vfio_device *vdev, unsigned int count);
+   292			int	(*match)(struct vfio_device *vdev, char *buf);
+   293			void	(*dma_unmap)(struct vfio_device *vdev, u64 iova, u64 length);
+   294			int	(*device_feature)(struct vfio_device *device, u32 flags,
+   295						  void __user *arg, size_t argsz);
+ > 296	};
+   297	
+   298	Each function is passed the vdev that was originally registered
+   299	in the vfio_register_group_dev() or vfio_register_emulated_iommu_dev()
+   300	call above.  This allows the bus driver to obtain its private data using
+   301	container_of().
+   302	- The init/release callbacks are issued when vfio_device is initialized
+   303	- and released.
+   304	- The open/close_device callbacks are issued when a new file descriptor is
+ > 305	  created for a device (via VFIO_GROUP_GET_DEVICE_FD).
+ > 306	- The ioctl interface provides a direct pass through for VFIO_DEVICE_* ioctls.
+   307	- The [un]bind_iommufd callbacks are issued when the device is bound to
+   308	- and unbound from iommufd.
+   309	- The attach_ioas callback is issued when the device is attached to an IOAS
+   310	  managed by the bound iommufd. The attached IOAS is automatically detached
+   311	  when the device is unbound from the iommufd.
+   312	- The read/write/mmap interfaces implement the device region access defined by
+   313	  the device's own VFIO_DEVICE_GET_REGION_INFO ioctl.
+   314	- The request callback is issued when device is going to be unregistered.
+   315	- The dma_unmap callback is issued when a range of iova's are unmapped in
+   316	  the container or IOAS attached by the device. Drivers which care about
+   317	  DMA unmap can implement this callback and must tolerate receiving unmap
+   318	  notifications before the device is opened.
+   319	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
