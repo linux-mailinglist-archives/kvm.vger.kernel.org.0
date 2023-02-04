@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7031168A925
-	for <lists+kvm@lfdr.de>; Sat,  4 Feb 2023 10:08:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 28C2368A95D
+	for <lists+kvm@lfdr.de>; Sat,  4 Feb 2023 11:10:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229516AbjBDJIP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 4 Feb 2023 04:08:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59844 "EHLO
+        id S233716AbjBDKKP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 4 Feb 2023 05:10:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbjBDJIN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 4 Feb 2023 04:08:13 -0500
+        with ESMTP id S233625AbjBDKJx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 4 Feb 2023 05:09:53 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08BEC19F20;
-        Sat,  4 Feb 2023 01:08:10 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 338226A716;
+        Sat,  4 Feb 2023 02:09:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=TKwAUDcTJPnaGbcRYAq1msm/KPgHYV1OegkVyHA/hIg=; b=EAIv3YZQ1IiHkbtB00OBp5t8c0
-        uOpXlRQ5ZcXbnqtpumJTiENv5XRBPlrjVTmU3oipCRU+iLiUp6lvnPjldv71phTwO1GP+AM6+RQi1
-        D8YxHOsEdezJVZ4TJdPhoyeYH6eAB0YqgOEhfu4h+2JQBFxRLfTBFrmnQ6r1DoEDPh2N8lbjqkyLe
-        Jik1gElTtCT0lK3yqBulXUdI6N5+6ikCiAt0joFY385YM78/WsNVfXChkXkf7DTodJx6ZfG9WjpxG
-        4URgXVmdgnoZJu2A5XpOKbZiyxtk+FcymynOmFF8BpxD5X+ddbFCRZB48TruRTe2bQP2pLYmKrpgy
-        8U/kmQJg==;
+        bh=rkdS3e/CDXt4ULzF7aE5UQVsl0abBhAiBhvW4qfc3iM=; b=Tt/vvhhSyB01gGgGii/I8IO9Df
+        I4TRNIYUlgw8/IK7uR1C6RT2wmO82BlRQY4PFqrl4Q35Tggle+2/77HddGxDmj3NRXXbLdN5D0LLU
+        qcgZrXA9apzmfELnfXc8qqGYONocNdRV0zQWob/zk7fw7ZuZ9x5LT9AJBfD8PFHhW23RLXrMBxNtv
+        Pqx/aCaGC+Jy4BxLzKGXFc6BjMuBNeqcI3Q62p9gxKAluZH+wz2jlZkXrFbk2ZFVEDlh4jfkrkL8R
+        0tpQZkY63PVgHc0lBDW1fn6ncKfZLwClmzMI9tP5QuQKfG53Vzr/+9L6JwAYs0fu2b3bF1R81yV+g
+        oJgtoEWw==;
 Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.ant.amazon.com)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pOEW3-00F3b6-Gq; Sat, 04 Feb 2023 09:07:24 +0000
-Message-ID: <970faea15f724939dbae47d309bffcb92d12c6c2.camel@infradead.org>
+        id 1pOFTh-00F5b8-IY; Sat, 04 Feb 2023 10:09:02 +0000
+Message-ID: <675d56c5e9dbbe32a0142a3a5290b0c35c52c568.camel@infradead.org>
 Subject: Re: [PATCH v6 07/11] x86/smpboot: Disable parallel boot for AMD CPUs
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Kim Phillips <kim.phillips@amd.com>,
@@ -41,13 +41,13 @@ Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
         pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
         punit.agrawal@bytedance.com, simon.evans@bytedance.com,
         liangma@liangbit.com, Mario Limonciello <Mario.Limonciello@amd.com>
-Date:   Sat, 04 Feb 2023 09:07:21 +0000
+Date:   Sat, 04 Feb 2023 10:09:00 +0000
 In-Reply-To: <b3d9fbbf-e760-5d1d-9182-44c144abd1bf@amd.com>
 References: <20230202215625.3248306-1-usama.arif@bytedance.com>
          <20230202215625.3248306-8-usama.arif@bytedance.com>
          <b3d9fbbf-e760-5d1d-9182-44c144abd1bf@amd.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-ssbNaxIjiinJLAw7EyQy"
+        boundary="=-SFrINvRE+lDv0B/prUnO"
 User-Agent: Evolution 3.44.4-0ubuntu1 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -61,195 +61,47 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-ssbNaxIjiinJLAw7EyQy
+--=-SFrINvRE+lDv0B/prUnO
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Fri, 2023-02-03 at 13:48 -0600, Kim Phillips wrote:
-> +Mario
->=20
-> Hi,
->=20
-> On 2/2/23 3:56 PM, Usama Arif wrote:
-> > From: David Woodhouse <dwmw@amazon.co.uk>
-> >=20
-> > Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> > ---
->=20
-> I'd like to nack this, but can't (and not because it doesn't have
-> commit text):
->=20
-> If I:
->=20
-> =C2=A0 - take dwmw2's parallel-6.2-rc6 branch (commit 459d1c46dbd1)
-> =C2=A0 - remove the set_cpu_bug(c, X86_BUG_NO_PARALLEL_BRINGUP) line from=
- amd.c
->=20
-> Then:
->=20
-> =C2=A0 - a Ryzen 3000 (Picasso A1/Zen+) notebook I have access to fails t=
-o boot.
-> =C2=A0 - Zen 2,3,4-based servers boot fine
-> =C2=A0 - a Zen1-based server doesn't boot.
->=20
-> This is what's left on its serial port:
->=20
-> [=C2=A0=C2=A0=C2=A0 3.199633] smp: Bringing up secondary CPUs ...
-> [=C2=A0=C2=A0=C2=A0 3.200732] x86: Booting SMP configuration:
-> [=C2=A0=C2=A0=C2=A0 3.204242] .... node=C2=A0 #0, CPUs:=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 #1
-> [=C2=A0=C2=A0=C2=A0 3.204301] CPU 1 to 93/x86/cpu:kick in 63 21 -11401430=
-7645 0 . 0 0 0 0 . 0 114025055970
-> [=C2=A0=C2=A0=C2=A0 3.204478] ------------[ cut here ]------------
-> [=C2=A0=C2=A0=C2=A0 3.204481] WARNING: CPU: 0 PID: 1 at arch/x86/kernel/c=
-pu/common.c:2122 cpu_init+0x2d/0x1f0
-> [=C2=A0=C2=A0=C2=A0 3.204490] Modules linked in:
-> [=C2=A0=C2=A0=C2=A0 3.204493] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 6=
-.2.0-rc6+ #19
-> [=C2=A0=C2=A0=C2=A0 3.204496] Hardware name: AMD Corporation Speedway/Spe=
-edway, BIOS RSW1009C 07/27/2018
-> [=C2=A0=C2=A0=C2=A0 3.204498] RIP: 0010:cpu_init+0x2d/0x1f0
-> [=C2=A0=C2=A0=C2=A0 3.204502] Code: e5 41 56 41 55 41 54 53 65 48 8b 1c 2=
-5 80 2e 1f 00 65 44 8b 35 20 e4 39 55 48 8b 05 5d f7 51 02 44 89 f2 f0 48 0=
-f ab 10 73 06 <0f> 0b eb 02 f3 90 48 8b 05 3e f7 51 02 48 0f a3 10 73 f1 45=
- 85 f6
-> [=C2=A0=C2=A0=C2=A0 3.204504] RSP: 0000:ffffffffac803d70 EFLAGS: 00010083
-> [=C2=A0=C2=A0=C2=A0 3.204506] RAX: ffff8d293eef6e40 RBX: ffff8d1d40010000=
- RCX: 0000000000000008
-> [=C2=A0=C2=A0=C2=A0 3.204508] RDX: 0000000000000000 RSI: ffff8d1d1c40b048=
- RDI: ffffffffac566418
-> [=C2=A0=C2=A0=C2=A0 3.204509] RBP: ffffffffac803d90 R08: 00000000fffffe14=
- R09: ffff8d1d1c406078
-> [=C2=A0=C2=A0=C2=A0 3.204510] R10: ffffffffac803dc0 R11: 0000000000000000=
- R12: 0000000000000000
-> [=C2=A0=C2=A0=C2=A0 3.204511] R13: 0000000000000000 R14: 0000000000000000=
- R15: 0000000000000000
-> [=C2=A0=C2=A0=C2=A0 3.204512] FS:=C2=A0 0000000000000000(0000) GS:ffff8d1=
-d1c400000(0000) knlGS:0000000000000000
-> [=C2=A0=C2=A0=C2=A0 3.204514] CS:=C2=A0 0010 DS: 0000 ES: 0000 CR0: 00000=
-00080050033
-> [=C2=A0=C2=A0=C2=A0 3.204515] CR2: 0000000000000000 CR3: 0000800daec12000=
- CR4: 00000000003100a0
-> [=C2=A0=C2=A0=C2=A0 3.204517] Call Trace:
-> [=C2=A0=C2=A0=C2=A0 3.204519] ---[ end trace 0000000000000000 ]---
 > [=C2=A0=C2=A0=C2=A0 3.204580] [Firmware Bug]: CPU0: APIC id mismatch. Fir=
-mware: 0 APIC: 2
+mware: 0
+> APIC: 2
 
 
-So this is where it all starts to go wrong, and we didn't really change
-this in the less-tested later part of the series. So even though I'd
-like to be sure you've tested with just '-part1' to be sure, I suspect
-that isn't the issue.
+Could it just be that some processors have CPUID leaves above 0xb but
+don't actually support 0xb?
 
-The warning you highlighted the end of the end of the log is just
-complaining that a given AP is *already* marked as initialized when
-it's trying to come up, and that's just fallout of the fact that they
-don't know which CPU they are. They *all* come up thinking they're
-CPU#0.
+What does this do?
 
-So that's weird. Now, what we do in this series is stop *telling* the
-AP which CPU# it is in a global variable as we bring them up one at a
-time, and instead we let them get their own APIC ID from CPUID leaf 0xb
-and look up their per-cpu data that way.
-
-The commit message for 'Support parallel startup of secondary CPUs'
-(currently commit 0f52d4eaaf0c) explains that in a bit more detail.
-
-Please could you try parallel-6.2-rc6-part1 with something like this?
-If I boot this in qemu with a weird topology to stop it being a 1:1
-mapping, I do see a series of BbCcDdDeEeFfIgJh... showing the APIC ID
-and CPU# that each AP finds as it starts up.
-
-qemu-system-x86_64 -kernel arch/x86/boot/bzImage -smp 24,sockets=3D4,cores=
-=3D3,threads=3D2 -append "console=3DttyS0,115200 lpj=3D16528321 earlyprintk=
-=3DttyS0" -serial mon:stdio -display none -m 1G -accel kvm,kernel-irqchip=
-=3Dsplit
-
-...
-[    0.570022] x86: Booting SMP configuration:
-BbCc[    0.570923] .... node  #0, CPUs:        #1  #2
-[    0.711468] Callback from call_rcu_tasks_rude() invoked.
-DdEe[    0.713316]   #3  #4
-[    0.854459] Callback from call_rcu_tasks() invoked.
-FfIgJhKiLjMkNlQmRnSoTpUqVrYsZt[u\v]w^x[    0.856289]   #5  #6  #7  #8  #9 #=
-10 #11 #12 #13 #14 #15 #16 #17 #18 #19 #20 #21 #22 #23
-
-
-
-diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
-index d07f694691d2..c3219dc2a201 100644
---- a/arch/x86/kernel/head_64.S
-+++ b/arch/x86/kernel/head_64.S
-@@ -247,8 +247,8 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify, SYM_L_G=
-LOBAL)
- 	 * Is this the boot CPU coming up? If so everything is available
- 	 * in initial_gs, initial_stack and early_gdt_descr.
- 	 */
--	movl	smpboot_control(%rip), %eax
--	testl	%eax, %eax
-+	movl	smpboot_control(%rip), %edx
-+	testl	%edx, %edx
- 	jz	.Lsetup_cpu
+--- a/arch/x86/kernel/smpboot.c
++++ b/arch/x86/kernel/smpboot.c
+@@ -1578,6 +1578,18 @@ void __init native_smp_prepare_cpus(unsigned int max=
+_cpus)
+ 	    cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT))
+ 		do_parallel_bringup =3D false;
 =20
- 	/*
-@@ -259,30 +259,45 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify, SYM_L=
-_GLOBAL)
- 	 * Bit 30	STARTUP_SECONDARY flag
- 	 * Bit 31	STARTUP_PARALLEL flag (use CPUID 0x0b for APIC ID)
- 	 */
--	testl	$STARTUP_PARALLEL, %eax
-+	testl	$STARTUP_PARALLEL, %edx
- 	jnz	.Luse_cpuid_0b
--	andl	$0x0FFFFFFF, %eax
-+	andl	$0x0FFFFFFF, %edx
- 	jmp	.Lsetup_AP
-=20
- .Luse_cpuid_0b:
- 	mov	$0x0B, %eax
- 	xorl	%ecx, %ecx
- 	cpuid
--	mov	%edx, %eax
++	if (do_parallel_bringup) {
++		/* Check that CPUID 0x0B really does look sane. */
++		unsigned int eax, ebx, ecx, edx;
 +
-+/* test hack: print 'a' + APICID */
-=20
- .Lsetup_AP:
--	/* EAX contains the APICID of the current CPU */
-+	/* EDX contains the APICID of the current CPU */
++		cpuid_count(0xb, 0, &eax, &ebx, &ecx, &edx);
++		printk("CPUID 0xB level 0: %x %x %x %x\n", eax, ebx, ecx, edx);
++		if (!eax && !ebx) {
++			pr_info("Disabling parallel bringup because CPUID 0xb looks untrustwort=
+hy\n");
++			do_parallel_bringup =3D false;
++		}
++	}
 +
-+	/* Test hack: Print APIC ID and then CPU# when we find it. */
-+	mov	%edx, %ecx
-+	mov	%edx, %eax
-+	addb	$'A', %al
-+	mov	$0x3f8, %dx
-+	outb    %al, %dx
-+	mov	%ecx, %edx
-+	mov	$'a', %al
-+
- 	xorl	%ecx, %ecx
- 	leaq	cpuid_to_apicid(%rip), %rbx
-=20
- .Lfind_cpunr:
--	cmpl	(%rbx), %eax
-+	cmpl	(%rbx), %edx
- 	jz	.Linit_cpu_data
- 	addq	$4, %rbx
- 	addq	$8, %rcx
-+	addb	$1, %al
- 	jmp	.Lfind_cpunr
-=20
- .Linit_cpu_data:
-+	mov	$0x3f8, %dx
-+	outb    %al, %dx
-+
- 	/* Get the per cpu offset */
- 	leaq	__per_cpu_offset(%rip), %rbx
- 	addq	%rcx, %rbx
+ 	if (do_parallel_bringup &&
+ 	    boot_cpu_has_bug(X86_BUG_NO_PARALLEL_BRINGUP)) {
+ 		pr_info("Disabling parallel bringup due to CPU bugs\n");
 
 
-
-
-
---=-ssbNaxIjiinJLAw7EyQy
+--=-SFrINvRE+lDv0B/prUnO
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -341,24 +193,24 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMjA0MDkwNzIxWjAvBgkqhkiG9w0BCQQxIgQg7jtNUUKZ
-hBNEaMzOiKv1TT5Ngu0YRtvrL8TNR3ENIFwwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMjA0MTAwOTAwWjAvBgkqhkiG9w0BCQQxIgQgnaxjJ47C
+8J5Om+gFbdFWwAWpkleg2n154XGfKt9/iBowgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAQUPwFAXzt0ZY0BTPvjAE9A9q0tezFo650
-vld9qIkttIjvMhG+6Nj1RziwvS+YTDuIdGx5+0B8zGtLZ52Jn8K4d9SNomFEGbAGojbhvqiQQcd7
-G8URK+GdgBPHkppg0zbkhEHFNWLFIs+EojqM49dhX/tMrKoHAG7OLqXkCp64vlbT5f0Aji8vxTkR
-ny9xlrGTsUiXDrGt5PnvspPKCZx5ztduSzByCJuU0qDMZyGS9Ijml8ZU8DzC/3mefL7FAjO0akQb
-b+rnjE7Y/9eXUrb1O+1ZKege4CdZKMx3VV+Ymjq33rAMxi0ouQlQC4GNf7QSoL9mgfn4h5sZDe0r
-bt8zE6CvaHs7mk45T5lFXQDuF/9l1rI0LS3uubo8QxD8M0TIFDDvJgslEk3xwXyg0AR3EFObNx58
-UlhrO7Bx5B0WQdhCZUTnINw/LQsiX2wWgaW/PqHZIrcoEPjXZ8O90LTPcuE6/71cOOMcXFT4oX2a
-Thy5+ns9W2MobO/lnikQjkxAKzLcxyEymImV+fkH9XhtbvSq93XSMNxS+BDfjagaf5K4JCLMahck
-5AVE+dJksgbI8uKWLS/C4uShPYtGFMebhQncn1i4TlkXqGwBQjiYvszBkSjECaYM3xr7MzRMdF6H
-BIwaRzu55S16mxewxlakCJ8s0hgUC55CtCupaW96pAAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBLX7s+jcMst0s1Sp+NsQEb14et4AjRd9u/
+0EgnrTEpFOKCWNs4SCuJYcg6ER6Ik3N53+SgY05CbmRchDN15bPGjqy4piQwQoLUHHXnspvv+by9
+vf7io/9u6LboHppjAK//aAflY7fOcgRrADreA4H/3M66onfAaTZMEwr089XfykiSIK86Jpzs5tFS
+gAQVb4LwCc6TJqpAoRlLXFq+1X7NqOXJunT5vU0nVB/pBdoopFQBKJyijdeO/OEzQbwUiw6/F8dB
+x/nhim9jPbOn74ErHkisXKzjBzrj8zlj3gXBjkGpjKtK2L9AUiH9iE233m1QFTkiw6CmdGF2ZMc9
+oWWle+Z/zB5oseGM0q1rbef/oGXEH0fw4EA/DXzyQSTCnNCZU/MBmC53JmG/ueIi3GlwwvDsetvP
+dMAyYTRSYCTazDMx/vU50hFDmx0YzAZ64mIXgC1SbJ3jOLnm6d6Euw4K0Ys6KC+F/mcmzvHHoc47
+PmVCR134hdVSG+II/CMvrPD94EJlGk6KO0d34MyZwOINGN5pSXwnyGWkHUgHhqZBd8GI4LgW1gUu
+qUlopf7lK0ltu4YE+iRjUUoXgxRFfFDcXsQunFAq84kztTpjYPELEuwRzw/IBYDqdNYgRal7jpmz
+rwf9S9OlJN3aXgXBTAhmvPRoYk1SVqHkR3e771LrxgAAAAAAAA==
 
 
---=-ssbNaxIjiinJLAw7EyQy--
+--=-SFrINvRE+lDv0B/prUnO--
