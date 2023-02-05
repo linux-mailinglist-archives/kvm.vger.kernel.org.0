@@ -2,167 +2,232 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 08FDA68AF51
-	for <lists+kvm@lfdr.de>; Sun,  5 Feb 2023 11:13:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7285D68AF59
+	for <lists+kvm@lfdr.de>; Sun,  5 Feb 2023 11:31:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229540AbjBEKNA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 5 Feb 2023 05:13:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54872 "EHLO
+        id S229544AbjBEKbM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 5 Feb 2023 05:31:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229485AbjBEKM7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 5 Feb 2023 05:12:59 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 679F2B771;
-        Sun,  5 Feb 2023 02:12:56 -0800 (PST)
+        with ESMTP id S229437AbjBEKbL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 5 Feb 2023 05:31:11 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D5A47A8C;
+        Sun,  5 Feb 2023 02:31:06 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 90128CE0E7F;
-        Sun,  5 Feb 2023 10:12:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C7B5C433EF;
-        Sun,  5 Feb 2023 10:12:52 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 23DA7B80B22;
+        Sun,  5 Feb 2023 10:31:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C01C6C433EF;
+        Sun,  5 Feb 2023 10:31:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1675591972;
-        bh=07vseOO+bkMKl0Rl1FzCfpn6EqMSEMLBKqQXGh3SEPk=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=DoOsgC0qRgto2YORcUBWvV6iOdL3uElZk9c1nP4vdvnW7UJ0cfOzO3KFQKeGO+VoT
-         lG5o4CEP2bYQB54SUPK+LBFo7FMjbKUplHCl4bDIwWpTzEouuKsF0rpYgMtLrj6WDp
-         H9n6I/CA4cHgLaFDNCbQYTT7vcyhGFJmYijImsPsI/4Q5uIWFpOnPAJAD6OWCAYpbq
-         XW4C2a1Bp+bMsIAU2ZYwpWCbNJq7RPvEn3rPCgoAGbT4jFAUAilaaXkOZe3H9OPJI5
-         ENvwnY/2trtsxGYReAVlXWGJZfv291skBc8Gm3ylJfKUd99TlZf+kkTBtBIuHPTHhY
-         1rRJCG3l8FGQA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1pOc0w-007W73-29;
-        Sun, 05 Feb 2023 10:12:50 +0000
-Date:   Sun, 05 Feb 2023 10:12:49 +0000
-Message-ID: <865ycg1kv2.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     James Morse <james.morse@arm.com>
-Cc:     linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
-        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-ia64@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, x86@kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Lorenzo Pieralisi <lpieralisi@kernel.org>,
+        s=k20201202; t=1675593063;
+        bh=PGFxYrAEoYN20dScq2uhkhexNS0NhI0876YLZFMUG7Q=;
+        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+        b=uZet9uP9DfuEbYpxeeu6k4ELAvNv0/VGYJRWADVnUiHp2RzoSuxtcSYFBlG6C87uJ
+         ic3iWgTeQyhAOf4u0o5t3VIuelAodHlrh+QvS4IB7di5Cb+hQrUx5sHUdlsbrb9Kkh
+         rfyZwA6ITWgvFhBcgCeoUs2vgag+ZZivjNb4nL+zPp/A2dNls5NuLLGdLoApu8myyI
+         js3iBzZpvb6KROPraG/3DZGXf1Qm/3J4K+v45HUUqjtf7xwwGSgp00cnZ8eKzjWsUP
+         0HzJJ91kUIgrx+hEFofQl6CNTnoCrZ7wJvzOb4p9VX0yIgRK6JpshqKdcXTvruxGLn
+         +LTaOjTLGdezQ==
+Date:   Sun, 05 Feb 2023 11:30:56 +0100
+From:   Conor Dooley <conor@kernel.org>
+To:     Atish Patra <atishp@rivosinc.com>, linux-kernel@vger.kernel.org
+CC:     Anup Patel <anup@brainfault.org>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Guo Ren <guoren@kernel.org>, Heiko Stuebner <heiko@sntech.de>,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-riscv@lists.infradead.org,
         Mark Rutland <mark.rutland@arm.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Borislav Petkov <bp@alien8.de>, H Peter Anvin <hpa@zytor.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Len Brown <lenb@kernel.org>,
-        Rafael Wysocki <rafael@kernel.org>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Salil Mehta <salil.mehta@huawei.com>,
-        Russell King <linux@armlinux.org.uk>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>
-Subject: Re: [RFC PATCH 29/32] KVM: arm64: Pass hypercalls to userspace
-In-Reply-To: <20230203135043.409192-30-james.morse@arm.com>
-References: <20230203135043.409192-1-james.morse@arm.com>
-        <20230203135043.409192-30-james.morse@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: james.morse@arm.com, linux-pm@vger.kernel.org, loongarch@lists.linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org, linux-ia64@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, x86@kernel.org, tglx@linutronix.de, lpieralisi@kernel.org, mark.rutland@arm.com, sudeep.holla@arm.com, bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com, mingo@redhat.com, will@kernel.org, catalin.marinas@arm.com, chenhuacai@kernel.org, suzuki.poulose@arm.com, oliver.upton@linux.dev, lenb@kernel.org, rafael@kernel.org, kernel@xen0n.name, salil.mehta@huawei.com, linux@armlinux.org.uk, jean-philippe@linaro.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v5 08/14] RISC-V: KVM: Add SBI PMU extension support
+User-Agent: K-9 Mail for Android
+In-Reply-To: <20230205011515.1284674-9-atishp@rivosinc.com>
+References: <20230205011515.1284674-1-atishp@rivosinc.com> <20230205011515.1284674-9-atishp@rivosinc.com>
+Message-ID: <F8326D42-00ED-4639-91E7-5CF8E84469E7@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 03 Feb 2023 13:50:40 +0000,
-James Morse <james.morse@arm.com> wrote:
-> 
-> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> 
-> When capability KVM_CAP_ARM_HVC_TO_USER is available, userspace can
-> request to handle all hypercalls that aren't handled by KVM. With the
-> help of another capability, this will allow userspace to handle PSCI
-> calls.
-> 
-> Suggested-by: James Morse <james.morse@arm.com>
-> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> Signed-off-by: James Morse <james.morse@arm.com>
-> 
-> ---
-> 
 
-On top of Oliver's ask not to make this a blanket "steal everything",
-but instead to have an actual request for ranges of forwarded
-hypercalls:
 
-> Notes on this implementation:
-> 
-> * A similar mechanism was proposed for SDEI some time ago [1]. This RFC
->   generalizes the idea to all hypercalls, since that was suggested on
->   the list [2, 3].
-> 
-> * We're reusing kvm_run.hypercall. I copied x0-x5 into
->   kvm_run.hypercall.args[] to help userspace but I'm tempted to remove
->   this, because:
->   - Most user handlers will need to write results back into the
->     registers (x0-x3 for SMCCC), so if we keep this shortcut we should
->     go all the way and read them back on return to kernel.
->   - QEMU doesn't care about this shortcut, it pulls all vcpu regs before
->     handling the call.
->   - SMCCC uses x0-x16 for parameters.
->   x0 does contain the SMCCC function ID and may be useful for fast
->   dispatch, we could keep that plus the immediate number.
-> 
-> * Add a flag in the kvm_run.hypercall telling whether this is HVC or
->   SMC?  Can be added later in those bottom longmode and pad fields.
-
-We definitely need this. A nested hypervisor can (and does) use SMCs
-as the conduit. The question is whether they represent two distinct
-namespaces or not. I *think* we can unify them, but someone should
-check and maybe get clarification from the owners of the SMCCC spec.
-
+On 5 February 2023 02:15:09 GMT+01:00, Atish Patra <atishp@rivosinc=2Ecom>=
+ wrote:
+>SBI PMU extension allows KVM guests to configure/start/stop/query about
+>the PMU counters in virtualized enviornment as well=2E
 >
-> * On top of this we could share with userspace which HVC ranges are
->   available and which ones are handled by KVM. That can actually be added
->   independently, through a vCPU/VM device attribute which doesn't consume
->   a new ioctl:
->   - userspace issues HAS_ATTR ioctl on the vcpu fd to query whether this
->     feature is available.
->   - userspace queries the number N of HVC ranges using one GET_ATTR.
->   - userspace passes an array of N ranges using another GET_ATTR. The
->     array is filled and returned by KVM.
+>In order to allow that, KVM implements the entire SBI PMU extension=2E
+>
+>Reviewed-by: Anup Patel <anup@brainfault=2Eorg>
+>Signed-off-by: Atish Patra <atishp@rivosinc=2Ecom>
 
-As mentioned above, I think this interface should go both ways.
-Userspace should request the forwarding of a certain range of
-hypercalls via a similar SET_ATTR interface.
+Hey Atish,
+CI is still complaining about something in this patch:
+https://gist=2Egithub=2Ecom/conor-pwbot/8f8d6a60a65b0b44d96c9c3b220e3efd
 
-Another question is how we migrate VMs that have these forwarding
-requirements. Do we expect the VMM to replay the forwarding as part of
-the setting up on the other side? Or do we save/restore this via a
-firmware pseudo-register?
+I'm without a laptop this weekend, so apologies for
+the lack of investigation as to whether there's a
+reason for it=2E
 
-> 
-> * Enabling this using a vCPU arch feature rather than the whole-VM
->   capability would be fine, but it would be difficult to do the same for
->   the following psci-in-user capability. So let's enable everything at
->   the VM scope.
+Cheers,
+Conor=2E
 
-Absolutely.
 
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+>---
+> arch/riscv/kvm/Makefile       |  2 +-
+> arch/riscv/kvm/vcpu_sbi=2Ec     | 11 +++++
+> arch/riscv/kvm/vcpu_sbi_pmu=2Ec | 87 +++++++++++++++++++++++++++++++++++
+> 3 files changed, 99 insertions(+), 1 deletion(-)
+> create mode 100644 arch/riscv/kvm/vcpu_sbi_pmu=2Ec
+>
+>diff --git a/arch/riscv/kvm/Makefile b/arch/riscv/kvm/Makefile
+>index 5de1053=2E=2E278e97c 100644
+>--- a/arch/riscv/kvm/Makefile
+>+++ b/arch/riscv/kvm/Makefile
+>@@ -25,4 +25,4 @@ kvm-y +=3D vcpu_sbi_base=2Eo
+> kvm-y +=3D vcpu_sbi_replace=2Eo
+> kvm-y +=3D vcpu_sbi_hsm=2Eo
+> kvm-y +=3D vcpu_timer=2Eo
+>-kvm-$(CONFIG_RISCV_PMU_SBI) +=3D vcpu_pmu=2Eo
+>+kvm-$(CONFIG_RISCV_PMU_SBI) +=3D vcpu_pmu=2Eo vcpu_sbi_pmu=2Eo
+>diff --git a/arch/riscv/kvm/vcpu_sbi=2Ec b/arch/riscv/kvm/vcpu_sbi=2Ec
+>index fe2897e=2E=2E15fde15 100644
+>--- a/arch/riscv/kvm/vcpu_sbi=2Ec
+>+++ b/arch/riscv/kvm/vcpu_sbi=2Ec
+>@@ -20,6 +20,16 @@ static const struct kvm_vcpu_sbi_extension vcpu_sbi_ex=
+t_v01 =3D {
+> };
+> #endif
+>=20
+>+#ifdef CONFIG_RISCV_PMU_SBI
+>+extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_pmu;
+>+#else
+>+static const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_pmu =3D {
+>+	=2Eextid_start =3D -1UL,
+>+	=2Eextid_end =3D -1UL,
+>+	=2Ehandler =3D NULL,
+>+};
+>+#endif
+>+
+> static const struct kvm_vcpu_sbi_extension *sbi_ext[] =3D {
+> 	&vcpu_sbi_ext_v01,
+> 	&vcpu_sbi_ext_base,
+>@@ -28,6 +38,7 @@ static const struct kvm_vcpu_sbi_extension *sbi_ext[] =
+=3D {
+> 	&vcpu_sbi_ext_rfence,
+> 	&vcpu_sbi_ext_srst,
+> 	&vcpu_sbi_ext_hsm,
+>+	&vcpu_sbi_ext_pmu,
+> 	&vcpu_sbi_ext_experimental,
+> 	&vcpu_sbi_ext_vendor,
+> };
+>diff --git a/arch/riscv/kvm/vcpu_sbi_pmu=2Ec b/arch/riscv/kvm/vcpu_sbi_pm=
+u=2Ec
+>new file mode 100644
+>index 0000000=2E=2E9fdc1e1
+>--- /dev/null
+>+++ b/arch/riscv/kvm/vcpu_sbi_pmu=2Ec
+>@@ -0,0 +1,87 @@
+>+// SPDX-License-Identifier: GPL-2=2E0
+>+/*
+>+ * Copyright (c) 2023 Rivos Inc
+>+ *
+>+ * Authors:
+>+ *     Atish Patra <atishp@rivosinc=2Ecom>
+>+ */
+>+
+>+#include <linux/errno=2Eh>
+>+#include <linux/err=2Eh>
+>+#include <linux/kvm_host=2Eh>
+>+#include <asm/csr=2Eh>
+>+#include <asm/sbi=2Eh>
+>+#include <asm/kvm_vcpu_sbi=2Eh>
+>+
+>+static int kvm_sbi_ext_pmu_handler(struct kvm_vcpu *vcpu, struct kvm_run=
+ *run,
+>+				   struct kvm_vcpu_sbi_return *retdata)
+>+{
+>+	int ret =3D 0;
+>+	struct kvm_cpu_context *cp =3D &vcpu->arch=2Eguest_context;
+>+	struct kvm_pmu *kvpmu =3D vcpu_to_pmu(vcpu);
+>+	unsigned long funcid =3D cp->a6;
+>+	u64 temp;
+>+
+>+	/* Return not supported if PMU is not initialized */
+>+	if (!kvpmu->init_done) {
+>+		retdata->err_val =3D SBI_ERR_NOT_SUPPORTED;
+>+		return 0;
+>+	}
+>+
+>+	switch (funcid) {
+>+	case SBI_EXT_PMU_NUM_COUNTERS:
+>+		ret =3D kvm_riscv_vcpu_pmu_num_ctrs(vcpu, retdata);
+>+		break;
+>+	case SBI_EXT_PMU_COUNTER_GET_INFO:
+>+		ret =3D kvm_riscv_vcpu_pmu_ctr_info(vcpu, cp->a0, retdata);
+>+		break;
+>+	case SBI_EXT_PMU_COUNTER_CFG_MATCH:
+>+#if defined(CONFIG_32BIT)
+>+		temp =3D ((uint64_t)cp->a5 << 32) | cp->a4;
+>+#else
+>+		temp =3D cp->a4;
+>+#endif
+>+		/*
+>+		 * This can fail if perf core framework fails to create an event=2E
+>+		 * Forward the error to userspace because it's an error happened
+>+		 * within the host kernel=2E The other option would be to convert
+>+		 * this an SBI error and forward to the guest=2E
+>+		 */
+>+		ret =3D kvm_riscv_vcpu_pmu_ctr_cfg_match(vcpu, cp->a0, cp->a1,
+>+						       cp->a2, cp->a3, temp, retdata);
+>+		break;
+>+	case SBI_EXT_PMU_COUNTER_START:
+>+#if defined(CONFIG_32BIT)
+>+		temp =3D ((uint64_t)cp->a4 << 32) | cp->a3;
+>+#else
+>+		temp =3D cp->a3;
+>+#endif
+>+		ret =3D kvm_riscv_vcpu_pmu_ctr_start(vcpu, cp->a0, cp->a1, cp->a2,
+>+						   temp, retdata);
+>+		break;
+>+	case SBI_EXT_PMU_COUNTER_STOP:
+>+		ret =3D kvm_riscv_vcpu_pmu_ctr_stop(vcpu, cp->a0, cp->a1, cp->a2, retd=
+ata);
+>+		break;
+>+	case SBI_EXT_PMU_COUNTER_FW_READ:
+>+		ret =3D kvm_riscv_vcpu_pmu_ctr_read(vcpu, cp->a0, retdata);
+>+		break;
+>+	default:
+>+		retdata->err_val =3D SBI_ERR_NOT_SUPPORTED;
+>+	}
+>+
+>+	return ret;
+>+}
+>+
+>+static unsigned long kvm_sbi_ext_pmu_probe(struct kvm_vcpu *vcpu)
+>+{
+>+	struct kvm_pmu *kvpmu =3D vcpu_to_pmu(vcpu);
+>+
+>+	return kvpmu->init_done;
+>+}
+>+
+>+const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_pmu =3D {
+>+	=2Eextid_start =3D SBI_EXT_PMU,
+>+	=2Eextid_end =3D SBI_EXT_PMU,
+>+	=2Ehandler =3D kvm_sbi_ext_pmu_handler,
+>+	=2Eprobe =3D kvm_sbi_ext_pmu_probe,
+>+};
