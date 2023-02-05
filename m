@@ -2,232 +2,276 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7285D68AF59
-	for <lists+kvm@lfdr.de>; Sun,  5 Feb 2023 11:31:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F04A468B01E
+	for <lists+kvm@lfdr.de>; Sun,  5 Feb 2023 14:57:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229544AbjBEKbM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 5 Feb 2023 05:31:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57780 "EHLO
+        id S229519AbjBEN5X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 5 Feb 2023 08:57:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbjBEKbL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 5 Feb 2023 05:31:11 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D5A47A8C;
-        Sun,  5 Feb 2023 02:31:06 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 23DA7B80B22;
-        Sun,  5 Feb 2023 10:31:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C01C6C433EF;
-        Sun,  5 Feb 2023 10:31:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1675593063;
-        bh=PGFxYrAEoYN20dScq2uhkhexNS0NhI0876YLZFMUG7Q=;
-        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-        b=uZet9uP9DfuEbYpxeeu6k4ELAvNv0/VGYJRWADVnUiHp2RzoSuxtcSYFBlG6C87uJ
-         ic3iWgTeQyhAOf4u0o5t3VIuelAodHlrh+QvS4IB7di5Cb+hQrUx5sHUdlsbrb9Kkh
-         rfyZwA6ITWgvFhBcgCeoUs2vgag+ZZivjNb4nL+zPp/A2dNls5NuLLGdLoApu8myyI
-         js3iBzZpvb6KROPraG/3DZGXf1Qm/3J4K+v45HUUqjtf7xwwGSgp00cnZ8eKzjWsUP
-         0HzJJ91kUIgrx+hEFofQl6CNTnoCrZ7wJvzOb4p9VX0yIgRK6JpshqKdcXTvruxGLn
-         +LTaOjTLGdezQ==
-Date:   Sun, 05 Feb 2023 11:30:56 +0100
-From:   Conor Dooley <conor@kernel.org>
-To:     Atish Patra <atishp@rivosinc.com>, linux-kernel@vger.kernel.org
-CC:     Anup Patel <anup@brainfault.org>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Guo Ren <guoren@kernel.org>, Heiko Stuebner <heiko@sntech.de>,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        linux-riscv@lists.infradead.org,
-        Mark Rutland <mark.rutland@arm.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v5 08/14] RISC-V: KVM: Add SBI PMU extension support
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20230205011515.1284674-9-atishp@rivosinc.com>
-References: <20230205011515.1284674-1-atishp@rivosinc.com> <20230205011515.1284674-9-atishp@rivosinc.com>
-Message-ID: <F8326D42-00ED-4639-91E7-5CF8E84469E7@kernel.org>
+        with ESMTP id S229475AbjBEN5W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 5 Feb 2023 08:57:22 -0500
+Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 969F11E2A1
+        for <kvm@vger.kernel.org>; Sun,  5 Feb 2023 05:57:14 -0800 (PST)
+Received: by mail-yb1-xb34.google.com with SMTP id 79so1576737ybe.6
+        for <kvm@vger.kernel.org>; Sun, 05 Feb 2023 05:57:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=K0j+KI6qhg+Cc+DWsKFDToe+0K5p4v0WOmhERTS4SqU=;
+        b=AEKVNFIY03VskELNgWAWFSgKbFSkbfifYL7rzfJrQzSFXzGw99SJmj1F+cxddEmAIL
+         OC2UoIVmCYcZgcK7aPJdJXyvTqj9unc7jEj+SgKUkWv1DvyoVYdcEE/9gPcUeeex7tOR
+         ImfS/w0YucA9XOSdw1GHL0gQKQBoWZEPZnLhid7Poq72vscVWM7TzbzPMEw+w0gD5qHl
+         geT/lKLn4A2FiKSwUpF6ZPk+NzGCsUZoZAnH8fWe+cwb/dDfG5PaGbcV5dxjcT1OaO6h
+         wl1GukJGi4gWeb1oQ3K2m8+CEXXkR2zNNeirbZ08FeYZ/P5EJZ02KvmlsSM3KSCTuw4k
+         Fo5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=K0j+KI6qhg+Cc+DWsKFDToe+0K5p4v0WOmhERTS4SqU=;
+        b=K3GnR1h86jK+PtnbrKh6oNSoq1eQI+y2z5keiTYEc+q7dzcTNfvkk2TchM5FW1/7wF
+         mSlAnkGIFKh4mTxKuKbRaFgXAw1XCrlXhw73DJjQ/XixLrWGX0V7Toz0duAMROQ3xBE3
+         N/j3lliw+WvtnEr8R9/0AHZDIPmHl07lGQfiTU0vOYxIV8NG5nQ+S8uVGEpbdHn/JRoK
+         N3AL36yRZbicA2YQmOpyNZk0X3HYCJbL9a3u0pP5qHECAw5eBq/nr4rwgBHIis5mNmIv
+         EDB8I4OgPYbpQQDU3ilMgw2z8dQYegrCM+UJjaRLgSlW/6rC6SbWSJl/Lf1N4Qy3chog
+         7tow==
+X-Gm-Message-State: AO0yUKXvZ7wJJq9mpM9gVZB6gKOW+9jGoBs/4NGG2Gc/7o6zgrodOCmL
+        UpZrEtum+aa6/MwSdIS9fJPDURGJVeBsoAqC/ns=
+X-Google-Smtp-Source: AK7set+hCHdOIXpVGcbEtMjRz4GLsDpSIcwRxHO9UMhKhzQ2KIW2XZzBUDptW7sDz1yorHpmNQRdYisSSi82EUEAAiE=
+X-Received: by 2002:a5b:910:0:b0:897:7d29:3eee with SMTP id
+ a16-20020a5b0910000000b008977d293eeemr37333ybq.58.1675605433679; Sun, 05 Feb
+ 2023 05:57:13 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <CAJSP0QUuuZLC0DJNEfZ7amyd3XnRhRNr1k+1OgLfDeF77X1ZDQ@mail.gmail.com>
+ <CAJaqyWd+g5fso6AEGKwj0ByxFVc8EpCS9+ezoMpnjyMo5tbj8Q@mail.gmail.com>
+In-Reply-To: <CAJaqyWd+g5fso6AEGKwj0ByxFVc8EpCS9+ezoMpnjyMo5tbj8Q@mail.gmail.com>
+From:   Stefan Hajnoczi <stefanha@gmail.com>
+Date:   Sun, 5 Feb 2023 08:57:01 -0500
+Message-ID: <CAJSP0QXyO4qXJseMzbgsVdXK-4-W4U9DxPcxr6wX45d6VBTeWQ@mail.gmail.com>
+Subject: Re: Call for GSoC and Outreachy project ideas for summer 2023
+To:     Eugenio Perez Martin <eperezma@redhat.com>
+Cc:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
+        Rust-VMM Mailing List <rust-vmm@lists.opendev.org>,
+        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+        Thomas Huth <thuth@redhat.com>, John Snow <jsnow@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Florescu, Andreea" <fandree@amazon.com>,
+        Damien <damien.lemoal@opensource.wdc.com>,
+        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
+        Hanna Reitz <hreitz@redhat.com>,
+        Alberto Faria <afaria@redhat.com>,
+        Daniel Henrique Barboza <danielhb413@gmail.com>,
+        =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+        Bernhard Beschow <shentey@gmail.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, gmaglione@redhat.com,
+        Jason Wang <jasowang@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 5 February 2023 02:15:09 GMT+01:00, Atish Patra <atishp@rivosinc=2Ecom>=
- wrote:
->SBI PMU extension allows KVM guests to configure/start/stop/query about
->the PMU counters in virtualized enviornment as well=2E
+On Sun, 5 Feb 2023 at 03:15, Eugenio Perez Martin <eperezma@redhat.com> wrote:
 >
->In order to allow that, KVM implements the entire SBI PMU extension=2E
+> On Fri, Jan 27, 2023 at 4:18 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> >
+> > Dear QEMU, KVM, and rust-vmm communities,
+> > QEMU will apply for Google Summer of Code 2023
+> > (https://summerofcode.withgoogle.com/) and has been accepted into
+> > Outreachy May 2023 (https://www.outreachy.org/). You can now
+> > submit internship project ideas for QEMU, KVM, and rust-vmm!
+> >
+> > Please reply to this email by February 6th with your project ideas.
+> >
+> > If you have experience contributing to QEMU, KVM, or rust-vmm you can
+> > be a mentor. Mentors support interns as they work on their project. It's a
+> > great way to give back and you get to work with people who are just
+> > starting out in open source.
+> >
+> > Good project ideas are suitable for remote work by a competent
+> > programmer who is not yet familiar with the codebase. In
+> > addition, they are:
+> > - Well-defined - the scope is clear
+> > - Self-contained - there are few dependencies
+> > - Uncontroversial - they are acceptable to the community
+> > - Incremental - they produce deliverables along the way
+> >
+> > Feel free to post ideas even if you are unable to mentor the project.
+> > It doesn't hurt to share the idea!
+> >
+> > I will review project ideas and keep you up-to-date on QEMU's
+> > acceptance into GSoC.
+> >
+> > Internship program details:
+> > - Paid, remote work open source internships
+> > - GSoC projects are 175 or 350 hours, Outreachy projects are 30
+> > hrs/week for 12 weeks
+> > - Mentored by volunteers from QEMU, KVM, and rust-vmm
+> > - Mentors typically spend at least 5 hours per week during the coding period
+> >
+> > For more background on QEMU internships, check out this video:
+> > https://www.youtube.com/watch?v=xNVCX7YMUL8
+> >
+> > Please let me know if you have any questions!
+> >
+> > Stefan
+> >
 >
->Reviewed-by: Anup Patel <anup@brainfault=2Eorg>
->Signed-off-by: Atish Patra <atishp@rivosinc=2Ecom>
+> Appending the different ideas here.
 
-Hey Atish,
-CI is still complaining about something in this patch:
-https://gist=2Egithub=2Ecom/conor-pwbot/8f8d6a60a65b0b44d96c9c3b220e3efd
+Hi Eugenio,
+Thanks for sharing your project ideas. I have added some questions
+below before we add them to the ideas list wiki page.
 
-I'm without a laptop this weekend, so apologies for
-the lack of investigation as to whether there's a
-reason for it=2E
+> VIRTIO_F_IN_ORDER feature support for virtio devices
+> ===
+> This was already a project the last year, and it produced a few series
+> upstream but was never merged. The previous series are totally useful
+> to start with, so it's not starting from scratch with them [1]:
 
-Cheers,
-Conor=2E
+Has Zhi Guo stopped working on the patches?
 
+What is the state of the existing patches? What work remains to be done?
 
->---
-> arch/riscv/kvm/Makefile       |  2 +-
-> arch/riscv/kvm/vcpu_sbi=2Ec     | 11 +++++
-> arch/riscv/kvm/vcpu_sbi_pmu=2Ec | 87 +++++++++++++++++++++++++++++++++++
-> 3 files changed, 99 insertions(+), 1 deletion(-)
-> create mode 100644 arch/riscv/kvm/vcpu_sbi_pmu=2Ec
 >
->diff --git a/arch/riscv/kvm/Makefile b/arch/riscv/kvm/Makefile
->index 5de1053=2E=2E278e97c 100644
->--- a/arch/riscv/kvm/Makefile
->+++ b/arch/riscv/kvm/Makefile
->@@ -25,4 +25,4 @@ kvm-y +=3D vcpu_sbi_base=2Eo
-> kvm-y +=3D vcpu_sbi_replace=2Eo
-> kvm-y +=3D vcpu_sbi_hsm=2Eo
-> kvm-y +=3D vcpu_timer=2Eo
->-kvm-$(CONFIG_RISCV_PMU_SBI) +=3D vcpu_pmu=2Eo
->+kvm-$(CONFIG_RISCV_PMU_SBI) +=3D vcpu_pmu=2Eo vcpu_sbi_pmu=2Eo
->diff --git a/arch/riscv/kvm/vcpu_sbi=2Ec b/arch/riscv/kvm/vcpu_sbi=2Ec
->index fe2897e=2E=2E15fde15 100644
->--- a/arch/riscv/kvm/vcpu_sbi=2Ec
->+++ b/arch/riscv/kvm/vcpu_sbi=2Ec
->@@ -20,6 +20,16 @@ static const struct kvm_vcpu_sbi_extension vcpu_sbi_ex=
-t_v01 =3D {
-> };
-> #endif
->=20
->+#ifdef CONFIG_RISCV_PMU_SBI
->+extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_pmu;
->+#else
->+static const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_pmu =3D {
->+	=2Eextid_start =3D -1UL,
->+	=2Eextid_end =3D -1UL,
->+	=2Ehandler =3D NULL,
->+};
->+#endif
->+
-> static const struct kvm_vcpu_sbi_extension *sbi_ext[] =3D {
-> 	&vcpu_sbi_ext_v01,
-> 	&vcpu_sbi_ext_base,
->@@ -28,6 +38,7 @@ static const struct kvm_vcpu_sbi_extension *sbi_ext[] =
-=3D {
-> 	&vcpu_sbi_ext_rfence,
-> 	&vcpu_sbi_ext_srst,
-> 	&vcpu_sbi_ext_hsm,
->+	&vcpu_sbi_ext_pmu,
-> 	&vcpu_sbi_ext_experimental,
-> 	&vcpu_sbi_ext_vendor,
-> };
->diff --git a/arch/riscv/kvm/vcpu_sbi_pmu=2Ec b/arch/riscv/kvm/vcpu_sbi_pm=
-u=2Ec
->new file mode 100644
->index 0000000=2E=2E9fdc1e1
->--- /dev/null
->+++ b/arch/riscv/kvm/vcpu_sbi_pmu=2Ec
->@@ -0,0 +1,87 @@
->+// SPDX-License-Identifier: GPL-2=2E0
->+/*
->+ * Copyright (c) 2023 Rivos Inc
->+ *
->+ * Authors:
->+ *     Atish Patra <atishp@rivosinc=2Ecom>
->+ */
->+
->+#include <linux/errno=2Eh>
->+#include <linux/err=2Eh>
->+#include <linux/kvm_host=2Eh>
->+#include <asm/csr=2Eh>
->+#include <asm/sbi=2Eh>
->+#include <asm/kvm_vcpu_sbi=2Eh>
->+
->+static int kvm_sbi_ext_pmu_handler(struct kvm_vcpu *vcpu, struct kvm_run=
- *run,
->+				   struct kvm_vcpu_sbi_return *retdata)
->+{
->+	int ret =3D 0;
->+	struct kvm_cpu_context *cp =3D &vcpu->arch=2Eguest_context;
->+	struct kvm_pmu *kvpmu =3D vcpu_to_pmu(vcpu);
->+	unsigned long funcid =3D cp->a6;
->+	u64 temp;
->+
->+	/* Return not supported if PMU is not initialized */
->+	if (!kvpmu->init_done) {
->+		retdata->err_val =3D SBI_ERR_NOT_SUPPORTED;
->+		return 0;
->+	}
->+
->+	switch (funcid) {
->+	case SBI_EXT_PMU_NUM_COUNTERS:
->+		ret =3D kvm_riscv_vcpu_pmu_num_ctrs(vcpu, retdata);
->+		break;
->+	case SBI_EXT_PMU_COUNTER_GET_INFO:
->+		ret =3D kvm_riscv_vcpu_pmu_ctr_info(vcpu, cp->a0, retdata);
->+		break;
->+	case SBI_EXT_PMU_COUNTER_CFG_MATCH:
->+#if defined(CONFIG_32BIT)
->+		temp =3D ((uint64_t)cp->a5 << 32) | cp->a4;
->+#else
->+		temp =3D cp->a4;
->+#endif
->+		/*
->+		 * This can fail if perf core framework fails to create an event=2E
->+		 * Forward the error to userspace because it's an error happened
->+		 * within the host kernel=2E The other option would be to convert
->+		 * this an SBI error and forward to the guest=2E
->+		 */
->+		ret =3D kvm_riscv_vcpu_pmu_ctr_cfg_match(vcpu, cp->a0, cp->a1,
->+						       cp->a2, cp->a3, temp, retdata);
->+		break;
->+	case SBI_EXT_PMU_COUNTER_START:
->+#if defined(CONFIG_32BIT)
->+		temp =3D ((uint64_t)cp->a4 << 32) | cp->a3;
->+#else
->+		temp =3D cp->a3;
->+#endif
->+		ret =3D kvm_riscv_vcpu_pmu_ctr_start(vcpu, cp->a0, cp->a1, cp->a2,
->+						   temp, retdata);
->+		break;
->+	case SBI_EXT_PMU_COUNTER_STOP:
->+		ret =3D kvm_riscv_vcpu_pmu_ctr_stop(vcpu, cp->a0, cp->a1, cp->a2, retd=
-ata);
->+		break;
->+	case SBI_EXT_PMU_COUNTER_FW_READ:
->+		ret =3D kvm_riscv_vcpu_pmu_ctr_read(vcpu, cp->a0, retdata);
->+		break;
->+	default:
->+		retdata->err_val =3D SBI_ERR_NOT_SUPPORTED;
->+	}
->+
->+	return ret;
->+}
->+
->+static unsigned long kvm_sbi_ext_pmu_probe(struct kvm_vcpu *vcpu)
->+{
->+	struct kvm_pmu *kvpmu =3D vcpu_to_pmu(vcpu);
->+
->+	return kvpmu->init_done;
->+}
->+
->+const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_pmu =3D {
->+	=2Eextid_start =3D SBI_EXT_PMU,
->+	=2Eextid_end =3D SBI_EXT_PMU,
->+	=2Ehandler =3D kvm_sbi_ext_pmu_handler,
->+	=2Eprobe =3D kvm_sbi_ext_pmu_probe,
->+};
+> Summary
+> ---
+> Implement VIRTIO_F_IN_ORDER in QEMU and Linux (vhost and virtio drivers)
+>
+> The VIRTIO specification defines a feature bit (VIRTIO_F_IN_ORDER)
+> that devices and drivers can negotiate when the device uses
+> descriptors in the same order in which they were made available by the
+> driver.
+>
+> This feature can simplify device and driver implementations and
+> increase performance. For example, when VIRTIO_F_IN_ORDER is
+> negotiated, it may be easier to create a batch of buffers and reduce
+> DMA transactions when the device uses a batch of buffers.
+>
+> Currently the devices and drivers available in Linux and QEMU do not
+> support this feature. An implementation is available in DPDK for the
+> virtio-net driver.
+>
+> Goals
+> ---
+> Implement VIRTIO_F_IN_ORDER for a single device/driver in QEMU and
+> Linux (virtio-net or virtio-serial are good starting points).
+> Generalize your approach to the common virtio core code for split and
+> packed virtqueue layouts.
+> If time allows, support for the packed virtqueue layout can be added
+> to Linux vhost, QEMU's libvhost-user, and/or QEMU's virtio qtest code.
+>
+> Shadow Virtqueue missing virtio features
+> ===
+>
+> Summary
+> ---
+> Some VirtIO devices like virtio-net have a control virtqueue (CVQ)
+> that allows them to dynamically change a number of parameters like MAC
+> or number of active queues. Changes to passthrough devices using vDPA
+> using CVQ are inherently hard to track if CVQ is handled as
+> passthrough data queues, because qemu is not aware of that
+> communication for performance reasons. In this situation, qemu is not
+> able to migrate these devices, as it is not able to tell the actual
+> state of the device.
+>
+> Shadow Virtqueue (SVQ) allows qemu to offer an emulated queue to the
+> device, effectively forwarding the descriptors of that communication,
+> tracking the device internal state, and being able to migrate it to a
+> new destination qemu.
+>
+> To restore that state in the destination, SVQ is able to send these
+> messages as regular CVQ commands. The code to understand and parse
+> virtio-net CVQ commands is already in qemu as part of its emulated
+> device, but the code to send the some of the new state is not, and
+> some features are missing. There is already code to restore basic
+> commands like mac or multiqueue, and it is easy to use it as a
+> template.
+>
+> Goals
+> ---
+> To implement missing virtio-net commands sending:
+> * VIRTIO_NET_CTRL_RX family, to control receive mode.
+> * VIRTIO_NET_CTRL_GUEST_OFFLOADS
+> * VIRTIO_NET_CTRL_VLAN family
+> * VIRTIO_NET_CTRL_MQ_HASH config
+> * VIRTIO_NET_CTRL_MQ_RSS config
+
+Is there enough work here for a 350 hour or 175 hour GSoC project?
+
+The project description mentions "there is already code to restore
+basic commands like mac and multiqueue", please include a link.
+
+> Shadow Virtqueue performance optimization
+> ===
+> Summary
+> ---
+> To perform a virtual machine live migration with an external device to
+> qemu, qemu needs a way to know which memory the device modifies so it
+> is able to resend it. Otherwise the guest would resume with invalid /
+> outdated memory in the destination.
+>
+> This is especially hard with passthrough hardware devices, as
+> transports like PCI imposes a few security and performance challenges.
+> As a method to overcome this for virtio devices, qemu can offer an
+> emulated virtqueue to the device, called Shadow Virtqueue (SVQ),
+> instead of allowing the device to communicate directly with the guest.
+> SVQ will then forward the writes to the guest, being the effective
+> writer in the guest memory and knowing when a portion of it needs to
+> be resent.
+>
+> As this is effectively breaking the passthrough and it adds extra
+> steps in the communication, this comes with a performance penalty in
+> some forms: Context switches, more memory reads and writes increasing
+> cache pressure, etc.
+>
+> At this moment the SVQ code is not optimized. It cannot forward
+> buffers in parallel using multiqueue and multithread, and it does not
+> use posted interrupts to notify the device skipping the host kernel
+> context switch (doorbells).
+>
+> The SVQ code requires minimal modifications for the multithreading,
+> and these are examples of multithreaded devices already like
+> virtio-blk which can be used as a template-alike. Regarding the posted
+> interrupts, DPDK is able to use them so that code can also be used as
+> a template.
+>
+> Goals
+> ---
+> * Measure the latest SVQ performance compared to non-SVQ.
+
+Which benchmark workload and which benchmarking tool do you recommend?
+Someone unfamiliar with QEMU and SVQ needs more details in order to
+know what to do.
+
+> * Add multithreading to SVQ, extracting the code from the Big QEMU Lock (BQL).
+
+What do you have in mind? Allowing individual virtqueues to be
+assigned to IOThreads? Or processing all virtqueues in a single
+IOThread (like virtio-blk and virtio-scsi do today)?
+
+> * Add posted thread capabilities to QEMU, following the model of DPDK to it.
+
+What is this about? I thought KVM uses posted interrupts when
+available, so what needs to be done here? Please also include a link
+to the relevant DPDK code.
+
+>
+> Thanks!
+>
+> [1] https://wiki.qemu.org/Google_Summer_of_Code_2022#VIRTIO_F_IN_ORDER_support_for_virtio_devices
+>
