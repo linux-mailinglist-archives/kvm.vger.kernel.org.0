@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B94668ADD2
-	for <lists+kvm@lfdr.de>; Sun,  5 Feb 2023 02:15:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 638F168ADD4
+	for <lists+kvm@lfdr.de>; Sun,  5 Feb 2023 02:15:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231230AbjBEBPk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 4 Feb 2023 20:15:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56080 "EHLO
+        id S232120AbjBEBPm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 4 Feb 2023 20:15:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229687AbjBEBPa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 4 Feb 2023 20:15:30 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7AFC25BBC
-        for <kvm@vger.kernel.org>; Sat,  4 Feb 2023 17:15:28 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id d2so4876927pjd.5
-        for <kvm@vger.kernel.org>; Sat, 04 Feb 2023 17:15:28 -0800 (PST)
+        with ESMTP id S230402AbjBEBPb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 4 Feb 2023 20:15:31 -0500
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F96425977
+        for <kvm@vger.kernel.org>; Sat,  4 Feb 2023 17:15:29 -0800 (PST)
+Received: by mail-pl1-x634.google.com with SMTP id e19so958536plc.9
+        for <kvm@vger.kernel.org>; Sat, 04 Feb 2023 17:15:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=rivosinc-com.20210112.gappssmtp.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ftjzo1H3FSQK6nlSJ/UNwcx+VG5+qh9HaSWdvHiu3Mw=;
-        b=Wqv0VCYBT/eZRIVHgZAKk8jllOoiS3tck0aCycEyLk+TEp/cCUl/oMiBm7B7uf2vXf
-         6TtQp97kwNT2v8R0Fqdh9F8E2FmBeJwNrAnNz08XsJhb2kI+t7KCf7OKchjL4p0qGSMO
-         WbLCLLCzm2Kk6act7vA+7X2JC6mBKquUj0YWI6j7fOT0gezDWrdZsOe2C1coV0IZtkpv
-         LvaWmMGzBF4qbd5j9TaXd/yhqdXRK2fdanBjOp7+UfDhMhIJOmI0tqDlYaYvsIeRv15T
-         A8eZgGCLszuzgoiQ+lwWMeSdoX1IPlf9BbKGhwUB4p5vovvHWa6lnWLIYz13Kgbebbq7
-         xhBA==
+        bh=fmRF2fKcTKxsdNB0xClj8TkKk5+mI7LC2HC2JBle1ss=;
+        b=7vOgc6jqkos/iEUATBq3CTWXeZetSpBFp9iVcekISsVOuLwmgKriv/QlavY+7YhBjK
+         Q9JlHxwi2veXZdt7xVl/W5KkaU9zqQFKzYxnVymflVnV89gbkoyWuwNbSN278vclGUzf
+         Uy85AGS1UBM0MTC+9kiEntwGk+MNz8nSlVl/ha0n2oqU+9CFiFzGqaZsYFRUaWgH7XQI
+         gB9cE+MqUNfYYicU0osciGK4qbf2XfFNhdWpQfArojRSXj5wHqlDOWpokxrePqZ5UvuT
+         j5KcJAxg0Vk51EtiR96drg5FwM6ord9eaDUqeicg1uLcGOM4n6Ldkno6CZG2wFIa+IvW
+         sRgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Ftjzo1H3FSQK6nlSJ/UNwcx+VG5+qh9HaSWdvHiu3Mw=;
-        b=RuebPDT+7dS8HUeDVf2H5TdWvSqFjnm2zT9qGmSl3XjfSPEJJ51GwcwRziCI/eWNp4
-         1bGbYqhOg7DAJQrL2FXrQ3lFHZLN1ZxYw5RIhvV62Lt3Fx0yTx9qY2Y+3uBANPmCKPs5
-         nclbI+rMNUk6+3gaZKsuUoajesBioS9TFFq9OjY9i1+Ef2K4Il5zpidzMAm+iB9p0UD/
-         h5Eish0pvTQWfFAw6OsK8llM7c8HI6e++Vmmun72mgtSbF1uTHmICshSklk6ShvGhEUl
-         sIHceg2JUtN0xCNdLMOuoIq9ijjXxkPWWsyypcIlfYcgqg23LbCIFcD48x0nNjmnR1k3
-         ZsQw==
-X-Gm-Message-State: AO0yUKWmPgVCL2UYHH9wgPpe6iWPqgTguNdGptenBi2jBt0+P2YBXb89
-        4ffdkqiW+DA2ix6BGeWLpZrurw==
-X-Google-Smtp-Source: AK7set+bCLWQP70iTzsPtWVWXhmA87ohkMEJ/2AH5fxn6qVOaKhdCWZry0Ba/F7dzV6YBeKr3vLwrQ==
-X-Received: by 2002:a17:90b:384d:b0:229:2427:532f with SMTP id nl13-20020a17090b384d00b002292427532fmr16483153pjb.40.1675559728140;
-        Sat, 04 Feb 2023 17:15:28 -0800 (PST)
+        bh=fmRF2fKcTKxsdNB0xClj8TkKk5+mI7LC2HC2JBle1ss=;
+        b=ho5+iWZrhWnT7+JQOreBp07vnZJLgi4ogigzb2wqWYX864O//wieLmZCo54Q38/31A
+         gDLxXC7s0TF8jCN72Ib+vq7SS7idFUR2/jLF8+V9z8yvVhhOSt/lp4xYP8xTu0qRgK4p
+         PoGUKBQa/YtRreEiZrcCDVy9HmQWlxSe7lpdRv4oSPw1rNTwsHVfJaxanZJacP1gPjl5
+         xVvweuyl//BNjjYN9VmzIPbCJdOxN/4eXua8+xX3EuIvDN6uNejm8cWEyaCF5M21tM3H
+         q0eRjHQCeW7dLcAkA4mHaFRjE0hrkgq6nWY6u9vloOwPuPZlIGYo8u4jSYV7dvjC6GZy
+         URHw==
+X-Gm-Message-State: AO0yUKURrqfzs7gN5BWxDGdkAM7iIb8Si6BsUoBDR6th6xuKlfmd1DK+
+        8cBlx12w8kWu0pJz5JUYtUHMaQ==
+X-Google-Smtp-Source: AK7set8uIqjK+J4fh7eb+26IB5cNPDD+YoITwEkJus8B2PKiyK6PLXxSGPD8Nn741c0hzxJqlkxr+Q==
+X-Received: by 2002:a17:90b:4c02:b0:230:a39f:4992 with SMTP id na2-20020a17090b4c0200b00230a39f4992mr1135832pjb.11.1675559729079;
+        Sat, 04 Feb 2023 17:15:29 -0800 (PST)
 Received: from atishp.ba.rivosinc.com ([66.220.2.162])
-        by smtp.gmail.com with ESMTPSA id c7-20020a17090a020700b0023080c4c3bcsm2721917pjc.31.2023.02.04.17.15.27
+        by smtp.gmail.com with ESMTPSA id c7-20020a17090a020700b0023080c4c3bcsm2721917pjc.31.2023.02.04.17.15.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 04 Feb 2023 17:15:27 -0800 (PST)
+        Sat, 04 Feb 2023 17:15:28 -0800 (PST)
 From:   Atish Patra <atishp@rivosinc.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     Atish Patra <atishp@rivosinc.com>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
         Anup Patel <anup@brainfault.org>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Andrew Jones <ajones@ventanamicro.com>,
         Atish Patra <atishp@atishpatra.org>,
         Guo Ren <guoren@kernel.org>, Heiko Stuebner <heiko@sntech.de>,
         kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
@@ -63,9 +63,9 @@ Cc:     Atish Patra <atishp@rivosinc.com>,
         Palmer Dabbelt <palmer@dabbelt.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
         Will Deacon <will@kernel.org>
-Subject: [PATCH v5 06/14] RISC-V: KVM: Modify SBI extension handler to return SBI error code
-Date:   Sat,  4 Feb 2023 17:15:07 -0800
-Message-Id: <20230205011515.1284674-7-atishp@rivosinc.com>
+Subject: [PATCH v5 07/14] RISC-V: KVM: Add skeleton support for perf
+Date:   Sat,  4 Feb 2023 17:15:08 -0800
+Message-Id: <20230205011515.1284674-8-atishp@rivosinc.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230205011515.1284674-1-atishp@rivosinc.com>
 References: <20230205011515.1284674-1-atishp@rivosinc.com>
@@ -80,513 +80,310 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently, the SBI extension handle is expected to return Linux error code.
-The top SBI layer converts the Linux error code to SBI specific error code
-that can be returned to guest invoking the SBI calls. This model works
-as long as SBI error codes have 1-to-1 mappings between them.
-However, that may not be true always. This patch attempts to disassociate
-both these error codes by allowing the SBI extension implementation to
-return SBI specific error codes as well.
+This patch only adds barebone structure of perf implementation. Most of
+the function returns zero at this point and will be implemented
+fully in the future.
 
-The extension will continue to return the Linux error specific code which
-will indicate any problem *with* the extension emulation while the
-SBI specific error will indicate the problem *of* the emulation.
-
-Suggested-by: Andrew Jones <ajones@ventanamicro.com>
+Reviewed-by: Anup Patel <anup@brainfault.org>
 Signed-off-by: Atish Patra <atishp@rivosinc.com>
 ---
- arch/riscv/include/asm/kvm_vcpu_sbi.h | 10 ++++-
- arch/riscv/kvm/vcpu_sbi.c             | 61 +++++++++++----------------
- arch/riscv/kvm/vcpu_sbi_base.c        | 22 +++++-----
- arch/riscv/kvm/vcpu_sbi_hsm.c         | 28 ++++++------
- arch/riscv/kvm/vcpu_sbi_replace.c     | 43 +++++++++----------
- arch/riscv/kvm/vcpu_sbi_v01.c         | 17 +++-----
- 6 files changed, 83 insertions(+), 98 deletions(-)
+ arch/riscv/include/asm/kvm_host.h     |   4 +
+ arch/riscv/include/asm/kvm_vcpu_pmu.h |  78 +++++++++++++++
+ arch/riscv/kvm/Makefile               |   1 +
+ arch/riscv/kvm/vcpu.c                 |   7 ++
+ arch/riscv/kvm/vcpu_pmu.c             | 135 ++++++++++++++++++++++++++
+ 5 files changed, 225 insertions(+)
+ create mode 100644 arch/riscv/include/asm/kvm_vcpu_pmu.h
+ create mode 100644 arch/riscv/kvm/vcpu_pmu.c
 
-diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi.h b/arch/riscv/include/asm/kvm_vcpu_sbi.h
-index 45ba341..8425556 100644
---- a/arch/riscv/include/asm/kvm_vcpu_sbi.h
-+++ b/arch/riscv/include/asm/kvm_vcpu_sbi.h
-@@ -18,6 +18,13 @@ struct kvm_vcpu_sbi_context {
- 	int return_handled;
+diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
+index 93f43a3..b90be9a 100644
+--- a/arch/riscv/include/asm/kvm_host.h
++++ b/arch/riscv/include/asm/kvm_host.h
+@@ -18,6 +18,7 @@
+ #include <asm/kvm_vcpu_insn.h>
+ #include <asm/kvm_vcpu_sbi.h>
+ #include <asm/kvm_vcpu_timer.h>
++#include <asm/kvm_vcpu_pmu.h>
+ 
+ #define KVM_MAX_VCPUS			1024
+ 
+@@ -228,6 +229,9 @@ struct kvm_vcpu_arch {
+ 
+ 	/* Don't run the VCPU (blocked) */
+ 	bool pause;
++
++	/* Performance monitoring context */
++	struct kvm_pmu pmu_context;
  };
  
-+struct kvm_vcpu_sbi_return {
-+	unsigned long out_val;
-+	unsigned long err_val;
-+	struct kvm_cpu_trap *utrap;
-+	bool uexit;
+ static inline void kvm_arch_hardware_unsetup(void) {}
+diff --git a/arch/riscv/include/asm/kvm_vcpu_pmu.h b/arch/riscv/include/asm/kvm_vcpu_pmu.h
+new file mode 100644
+index 0000000..40905db
+--- /dev/null
++++ b/arch/riscv/include/asm/kvm_vcpu_pmu.h
+@@ -0,0 +1,78 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright (c) 2023 Rivos Inc
++ *
++ * Authors:
++ *     Atish Patra <atishp@rivosinc.com>
++ */
++
++#ifndef __KVM_VCPU_RISCV_PMU_H
++#define __KVM_VCPU_RISCV_PMU_H
++
++#include <linux/perf/riscv_pmu.h>
++#include <asm/kvm_vcpu_sbi.h>
++#include <asm/sbi.h>
++
++#ifdef CONFIG_RISCV_PMU_SBI
++#define RISCV_KVM_MAX_FW_CTRS	32
++
++#if RISCV_KVM_MAX_FW_CTRS > 32
++#error "Maximum firmware counter can not exceed 32 without increasing the RISCV_MAX_COUNTERS"
++#endif
++
++#define RISCV_MAX_COUNTERS 64
++
++/* Per virtual pmu counter data */
++struct kvm_pmc {
++	u8 idx;
++	struct perf_event *perf_event;
++	u64 counter_val;
++	union sbi_pmu_ctr_info cinfo;
++	/* Event monitoring status */
++	bool started;
 +};
 +
- struct kvm_vcpu_sbi_extension {
- 	unsigned long extid_start;
- 	unsigned long extid_end;
-@@ -27,8 +34,7 @@ struct kvm_vcpu_sbi_extension {
- 	 * specific error codes.
- 	 */
- 	int (*handler)(struct kvm_vcpu *vcpu, struct kvm_run *run,
--		       unsigned long *out_val, struct kvm_cpu_trap *utrap,
--		       bool *exit);
-+		       struct kvm_vcpu_sbi_return *retdata);
++/* PMU data structure per vcpu */
++struct kvm_pmu {
++	struct kvm_pmc pmc[RISCV_MAX_COUNTERS];
++	/* Number of the virtual firmware counters available */
++	int num_fw_ctrs;
++	/* Number of the virtual hardware counters available */
++	int num_hw_ctrs;
++	/* A flag to indicate that pmu initialization is done */
++	bool init_done;
++	/* Bit map of all the virtual counter used */
++	DECLARE_BITMAP(pmc_in_use, RISCV_MAX_COUNTERS);
++};
++
++#define vcpu_to_pmu(vcpu) (&(vcpu)->arch.pmu_context)
++#define pmu_to_vcpu(pmu)  (container_of((pmu), struct kvm_vcpu, arch.pmu_context))
++
++int kvm_riscv_vcpu_pmu_num_ctrs(struct kvm_vcpu *vcpu, struct kvm_vcpu_sbi_return *retdata);
++int kvm_riscv_vcpu_pmu_ctr_info(struct kvm_vcpu *vcpu, unsigned long cidx,
++				struct kvm_vcpu_sbi_return *retdata);
++int kvm_riscv_vcpu_pmu_ctr_start(struct kvm_vcpu *vcpu, unsigned long ctr_base,
++				 unsigned long ctr_mask, unsigned long flags, u64 ival,
++				 struct kvm_vcpu_sbi_return *retdata);
++int kvm_riscv_vcpu_pmu_ctr_stop(struct kvm_vcpu *vcpu, unsigned long ctr_base,
++				unsigned long ctr_mask, unsigned long flags,
++				struct kvm_vcpu_sbi_return *retdata);
++int kvm_riscv_vcpu_pmu_ctr_cfg_match(struct kvm_vcpu *vcpu, unsigned long ctr_base,
++				     unsigned long ctr_mask, unsigned long flags,
++				     unsigned long eidx, u64 evtdata,
++				     struct kvm_vcpu_sbi_return *retdata);
++int kvm_riscv_vcpu_pmu_ctr_read(struct kvm_vcpu *vcpu, unsigned long cidx,
++				struct kvm_vcpu_sbi_return *retdata);
++void kvm_riscv_vcpu_pmu_init(struct kvm_vcpu *vcpu);
++void kvm_riscv_vcpu_pmu_deinit(struct kvm_vcpu *vcpu);
++void kvm_riscv_vcpu_pmu_reset(struct kvm_vcpu *vcpu);
++
++#else
++struct kvm_pmu {
++};
++
++static inline void kvm_riscv_vcpu_pmu_init(struct kvm_vcpu *vcpu) {}
++static inline void kvm_riscv_vcpu_pmu_deinit(struct kvm_vcpu *vcpu) {}
++static inline void kvm_riscv_vcpu_pmu_reset(struct kvm_vcpu *vcpu) {}
++#endif /* CONFIG_RISCV_PMU_SBI */
++#endif /* !__KVM_VCPU_RISCV_PMU_H */
+diff --git a/arch/riscv/kvm/Makefile b/arch/riscv/kvm/Makefile
+index 019df920..5de1053 100644
+--- a/arch/riscv/kvm/Makefile
++++ b/arch/riscv/kvm/Makefile
+@@ -25,3 +25,4 @@ kvm-y += vcpu_sbi_base.o
+ kvm-y += vcpu_sbi_replace.o
+ kvm-y += vcpu_sbi_hsm.o
+ kvm-y += vcpu_timer.o
++kvm-$(CONFIG_RISCV_PMU_SBI) += vcpu_pmu.o
+diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+index 7c08567..7d010b0 100644
+--- a/arch/riscv/kvm/vcpu.c
++++ b/arch/riscv/kvm/vcpu.c
+@@ -138,6 +138,8 @@ static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
+ 	WRITE_ONCE(vcpu->arch.irqs_pending, 0);
+ 	WRITE_ONCE(vcpu->arch.irqs_pending_mask, 0);
  
- 	/* Extension specific probe function */
- 	unsigned long (*probe)(struct kvm_vcpu *vcpu);
-diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
-index f96991d..fe2897e 100644
---- a/arch/riscv/kvm/vcpu_sbi.c
-+++ b/arch/riscv/kvm/vcpu_sbi.c
-@@ -12,26 +12,6 @@
- #include <asm/sbi.h>
- #include <asm/kvm_vcpu_sbi.h>
++	kvm_riscv_vcpu_pmu_reset(vcpu);
++
+ 	vcpu->arch.hfence_head = 0;
+ 	vcpu->arch.hfence_tail = 0;
+ 	memset(vcpu->arch.hfence_queue, 0, sizeof(vcpu->arch.hfence_queue));
+@@ -194,6 +196,9 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ 	/* Setup VCPU timer */
+ 	kvm_riscv_vcpu_timer_init(vcpu);
  
--static int kvm_linux_err_map_sbi(int err)
--{
--	switch (err) {
--	case 0:
--		return SBI_SUCCESS;
--	case -EPERM:
--		return SBI_ERR_DENIED;
--	case -EINVAL:
--		return SBI_ERR_INVALID_PARAM;
--	case -EFAULT:
--		return SBI_ERR_INVALID_ADDRESS;
--	case -EOPNOTSUPP:
--		return SBI_ERR_NOT_SUPPORTED;
--	case -EALREADY:
--		return SBI_ERR_ALREADY_AVAILABLE;
--	default:
--		return SBI_ERR_FAILURE;
--	};
--}
--
- #ifndef CONFIG_RISCV_SBI_V01
- static const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_v01 = {
- 	.extid_start = -1UL,
-@@ -125,11 +105,14 @@ int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
- {
- 	int ret = 1;
- 	bool next_sepc = true;
--	bool userspace_exit = false;
- 	struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
- 	const struct kvm_vcpu_sbi_extension *sbi_ext;
--	struct kvm_cpu_trap utrap = { 0 };
--	unsigned long out_val = 0;
-+	struct kvm_cpu_trap utrap = {0};
-+	struct kvm_vcpu_sbi_return sbi_ret = {
-+		.out_val = 0,
-+		.err_val = 0,
-+		.utrap = &utrap,
-+	};
- 	bool ext_is_v01 = false;
++	/* setup performance monitoring */
++	kvm_riscv_vcpu_pmu_init(vcpu);
++
+ 	/* Reset VCPU */
+ 	kvm_riscv_reset_vcpu(vcpu);
  
- 	sbi_ext = kvm_vcpu_sbi_find_ext(cp->a7);
-@@ -139,42 +122,46 @@ int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		    cp->a7 <= SBI_EXT_0_1_SHUTDOWN)
- 			ext_is_v01 = true;
- #endif
--		ret = sbi_ext->handler(vcpu, run, &out_val, &utrap, &userspace_exit);
-+		ret = sbi_ext->handler(vcpu, run, &sbi_ret);
- 	} else {
- 		/* Return error for unsupported SBI calls */
- 		cp->a0 = SBI_ERR_NOT_SUPPORTED;
- 		goto ecall_done;
- 	}
+@@ -216,6 +221,8 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+ 	/* Cleanup VCPU timer */
+ 	kvm_riscv_vcpu_timer_deinit(vcpu);
  
++	kvm_riscv_vcpu_pmu_deinit(vcpu);
++
+ 	/* Free unused pages pre-allocated for G-stage page table mappings */
+ 	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
+ }
+diff --git a/arch/riscv/kvm/vcpu_pmu.c b/arch/riscv/kvm/vcpu_pmu.c
+new file mode 100644
+index 0000000..4919255
+--- /dev/null
++++ b/arch/riscv/kvm/vcpu_pmu.c
+@@ -0,0 +1,135 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (c) 2023 Rivos Inc
++ *
++ * Authors:
++ *     Atish Patra <atishp@rivosinc.com>
++ */
++
++#include <linux/errno.h>
++#include <linux/err.h>
++#include <linux/kvm_host.h>
++#include <linux/perf/riscv_pmu.h>
++#include <asm/csr.h>
++#include <asm/kvm_vcpu_sbi.h>
++#include <asm/kvm_vcpu_pmu.h>
++#include <linux/kvm_host.h>
++
++#define kvm_pmu_num_counters(pmu) ((pmu)->num_hw_ctrs + (pmu)->num_fw_ctrs)
++
++int kvm_riscv_vcpu_pmu_num_ctrs(struct kvm_vcpu *vcpu, struct kvm_vcpu_sbi_return *retdata)
++{
++	struct kvm_pmu *kvpmu = vcpu_to_pmu(vcpu);
++
++	retdata->out_val = kvm_pmu_num_counters(kvpmu);
++
++	return 0;
++}
++
++int kvm_riscv_vcpu_pmu_ctr_info(struct kvm_vcpu *vcpu, unsigned long cidx,
++				struct kvm_vcpu_sbi_return *retdata)
++{
++	struct kvm_pmu *kvpmu = vcpu_to_pmu(vcpu);
++
++	if (cidx > RISCV_MAX_COUNTERS || cidx == 1) {
++		retdata->err_val = SBI_ERR_INVALID_PARAM;
++		return 0;
++	}
++
++	retdata->out_val = kvpmu->pmc[cidx].cinfo.value;
++
++	return 0;
++}
++
++int kvm_riscv_vcpu_pmu_ctr_start(struct kvm_vcpu *vcpu, unsigned long ctr_base,
++				 unsigned long ctr_mask, unsigned long flags, u64 ival,
++				 struct kvm_vcpu_sbi_return *retdata)
++{
++	/* TODO */
++	return 0;
++}
++
++int kvm_riscv_vcpu_pmu_ctr_stop(struct kvm_vcpu *vcpu, unsigned long ctr_base,
++				unsigned long ctr_mask, unsigned long flags,
++				struct kvm_vcpu_sbi_return *retdata)
++{
++	/* TODO */
++	return 0;
++}
++
++int kvm_riscv_vcpu_pmu_ctr_cfg_match(struct kvm_vcpu *vcpu, unsigned long ctr_base,
++				     unsigned long ctr_mask, unsigned long flags,
++				     unsigned long eidx, u64 evtdata,
++				     struct kvm_vcpu_sbi_return *retdata)
++{
++	/* TODO */
++	return 0;
++}
++
++int kvm_riscv_vcpu_pmu_ctr_read(struct kvm_vcpu *vcpu, unsigned long cidx,
++				struct kvm_vcpu_sbi_return *retdata)
++{
++	/* TODO */
++	return 0;
++}
++
++void kvm_riscv_vcpu_pmu_init(struct kvm_vcpu *vcpu)
++{
++	int i = 0, ret, num_hw_ctrs = 0, hpm_width = 0;
++	struct kvm_pmu *kvpmu = vcpu_to_pmu(vcpu);
++	struct kvm_pmc *pmc;
++
++	ret = riscv_pmu_get_hpm_info(&hpm_width, &num_hw_ctrs);
++	if (ret < 0 || !hpm_width || !num_hw_ctrs)
++		return;
++
 +	/*
-+	 * When the SBI extension returns a Linux error code, it exits the ioctl
-+	 * loop and forwards the error to userspace.
++	 * Increase the number of hardware counters to offset the time counter.
 +	 */
-+	if (ret < 0) {
-+		next_sepc = false;
-+		goto ecall_done;
++	kvpmu->num_hw_ctrs = num_hw_ctrs + 1;
++	kvpmu->num_fw_ctrs = SBI_PMU_FW_MAX;
++
++	/*
++	 * There is no correlation between the logical hardware counter and virtual counters.
++	 * However, we need to encode a hpmcounter CSR in the counter info field so that
++	 * KVM can trap n emulate the read. This works well in the migration use case as
++	 * KVM doesn't care if the actual hpmcounter is available in the hardware or not.
++	 */
++	for (i = 0; i < kvm_pmu_num_counters(kvpmu); i++) {
++		/* TIME CSR shouldn't be read from perf interface */
++		if (i == 1)
++			continue;
++		pmc = &kvpmu->pmc[i];
++		pmc->idx = i;
++		if (i < kvpmu->num_hw_ctrs) {
++			pmc->cinfo.type = SBI_PMU_CTR_TYPE_HW;
++			if (i < 3)
++				/* CY, IR counters */
++				pmc->cinfo.width = 63;
++			else
++				pmc->cinfo.width = hpm_width;
++			/*
++			 * The CSR number doesn't have any relation with the logical
++			 * hardware counters. The CSR numbers are encoded sequentially
++			 * to avoid maintaining a map between the virtual counter
++			 * and CSR number.
++			 */
++			pmc->cinfo.csr = CSR_CYCLE + i;
++		} else {
++			pmc->cinfo.type = SBI_PMU_CTR_TYPE_FW;
++			pmc->cinfo.width = BITS_PER_LONG - 1;
++		}
 +	}
 +
- 	/* Handle special error cases i.e trap, exit or userspace forward */
--	if (utrap.scause) {
-+	if (sbi_ret.utrap->scause) {
- 		/* No need to increment sepc or exit ioctl loop */
- 		ret = 1;
--		utrap.sepc = cp->sepc;
--		kvm_riscv_vcpu_trap_redirect(vcpu, &utrap);
-+		sbi_ret.utrap->sepc = cp->sepc;
-+		kvm_riscv_vcpu_trap_redirect(vcpu, sbi_ret.utrap);
- 		next_sepc = false;
- 		goto ecall_done;
- 	}
- 
- 	/* Exit ioctl loop or Propagate the error code the guest */
--	if (userspace_exit) {
-+	if (sbi_ret.uexit) {
- 		next_sepc = false;
- 		ret = 0;
- 	} else {
--		/**
--		 * SBI extension handler always returns an Linux error code. Convert
--		 * it to the SBI specific error code that can be propagated the SBI
--		 * caller.
--		 */
--		ret = kvm_linux_err_map_sbi(ret);
--		cp->a0 = ret;
-+		cp->a0 = sbi_ret.err_val;
- 		ret = 1;
- 	}
- ecall_done:
- 	if (next_sepc)
- 		cp->sepc += 4;
--	if (!ext_is_v01)
--		cp->a1 = out_val;
-+	/* a1 should only be updated when we continue the ioctl loop */
-+	if (!ext_is_v01 && ret == 1)
-+		cp->a1 = sbi_ret.out_val;
- 
- 	return ret;
- }
-diff --git a/arch/riscv/kvm/vcpu_sbi_base.c b/arch/riscv/kvm/vcpu_sbi_base.c
-index be47828..9945aff 100644
---- a/arch/riscv/kvm/vcpu_sbi_base.c
-+++ b/arch/riscv/kvm/vcpu_sbi_base.c
-@@ -14,12 +14,11 @@
- #include <asm/kvm_vcpu_sbi.h>
- 
- static int kvm_sbi_ext_base_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
--				    unsigned long *out_val,
--				    struct kvm_cpu_trap *trap, bool *exit)
-+				    struct kvm_vcpu_sbi_return *retdata)
- {
--	int ret = 0;
- 	struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
- 	const struct kvm_vcpu_sbi_extension *sbi_ext;
-+	unsigned long *out_val = &retdata->out_val;
- 
- 	switch (cp->a6) {
- 	case SBI_EXT_BASE_GET_SPEC_VERSION:
-@@ -43,10 +42,11 @@ static int kvm_sbi_ext_base_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 			 * forward it to the userspace
- 			 */
- 			kvm_riscv_vcpu_sbi_forward(vcpu, run);
--			*exit = true;
-+			retdata->uexit = true;
- 		} else {
- 			sbi_ext = kvm_vcpu_sbi_find_ext(cp->a0);
--			*out_val = sbi_ext && sbi_ext->probe ? sbi_ext->probe(vcpu) : !!sbi_ext;
-+			*out_val = sbi_ext && sbi_ext->probe ?
-+					   sbi_ext->probe(vcpu) : !!sbi_ext;
- 		}
- 		break;
- 	case SBI_EXT_BASE_GET_MVENDORID:
-@@ -59,11 +59,11 @@ static int kvm_sbi_ext_base_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 		*out_val = vcpu->arch.mimpid;
- 		break;
- 	default:
--		ret = -EOPNOTSUPP;
-+		retdata->err_val = SBI_ERR_NOT_SUPPORTED;
- 		break;
- 	}
- 
--	return ret;
-+	return 0;
- }
- 
- const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_base = {
-@@ -73,17 +73,15 @@ const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_base = {
- };
- 
- static int kvm_sbi_ext_forward_handler(struct kvm_vcpu *vcpu,
--					struct kvm_run *run,
--					unsigned long *out_val,
--					struct kvm_cpu_trap *utrap,
--					bool *exit)
-+				       struct kvm_run *run,
-+				       struct kvm_vcpu_sbi_return *retdata)
- {
- 	/*
- 	 * Both SBI experimental and vendor extensions are
- 	 * unconditionally forwarded to userspace.
- 	 */
- 	kvm_riscv_vcpu_sbi_forward(vcpu, run);
--	*exit = true;
-+	retdata->uexit = true;
- 	return 0;
- }
- 
-diff --git a/arch/riscv/kvm/vcpu_sbi_hsm.c b/arch/riscv/kvm/vcpu_sbi_hsm.c
-index 619ac0f..7dca0e9 100644
---- a/arch/riscv/kvm/vcpu_sbi_hsm.c
-+++ b/arch/riscv/kvm/vcpu_sbi_hsm.c
-@@ -21,9 +21,9 @@ static int kvm_sbi_hsm_vcpu_start(struct kvm_vcpu *vcpu)
- 
- 	target_vcpu = kvm_get_vcpu_by_id(vcpu->kvm, target_vcpuid);
- 	if (!target_vcpu)
--		return -EINVAL;
-+		return SBI_ERR_INVALID_PARAM;
- 	if (!target_vcpu->arch.power_off)
--		return -EALREADY;
-+		return SBI_ERR_ALREADY_AVAILABLE;
- 
- 	reset_cntx = &target_vcpu->arch.guest_reset_context;
- 	/* start address */
-@@ -42,7 +42,7 @@ static int kvm_sbi_hsm_vcpu_start(struct kvm_vcpu *vcpu)
- static int kvm_sbi_hsm_vcpu_stop(struct kvm_vcpu *vcpu)
- {
- 	if (vcpu->arch.power_off)
--		return -EACCES;
-+		return SBI_ERR_FAILURE;
- 
- 	kvm_riscv_vcpu_power_off(vcpu);
- 
-@@ -57,7 +57,7 @@ static int kvm_sbi_hsm_vcpu_get_status(struct kvm_vcpu *vcpu)
- 
- 	target_vcpu = kvm_get_vcpu_by_id(vcpu->kvm, target_vcpuid);
- 	if (!target_vcpu)
--		return -EINVAL;
-+		return SBI_ERR_INVALID_PARAM;
- 	if (!target_vcpu->arch.power_off)
- 		return SBI_HSM_STATE_STARTED;
- 	else if (vcpu->stat.generic.blocking)
-@@ -67,9 +67,7 @@ static int kvm_sbi_hsm_vcpu_get_status(struct kvm_vcpu *vcpu)
- }
- 
- static int kvm_sbi_ext_hsm_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
--				   unsigned long *out_val,
--				   struct kvm_cpu_trap *utrap,
--				   bool *exit)
-+				   struct kvm_vcpu_sbi_return *retdata)
- {
- 	int ret = 0;
- 	struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
-@@ -88,27 +86,29 @@ static int kvm_sbi_ext_hsm_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 	case SBI_EXT_HSM_HART_STATUS:
- 		ret = kvm_sbi_hsm_vcpu_get_status(vcpu);
- 		if (ret >= 0) {
--			*out_val = ret;
--			ret = 0;
-+			retdata->out_val = ret;
-+			retdata->err_val = 0;
- 		}
--		break;
-+		return 0;
- 	case SBI_EXT_HSM_HART_SUSPEND:
- 		switch (cp->a0) {
- 		case SBI_HSM_SUSPEND_RET_DEFAULT:
- 			kvm_riscv_vcpu_wfi(vcpu);
- 			break;
- 		case SBI_HSM_SUSPEND_NON_RET_DEFAULT:
--			ret = -EOPNOTSUPP;
-+			ret = SBI_ERR_NOT_SUPPORTED;
- 			break;
- 		default:
--			ret = -EINVAL;
-+			ret = SBI_ERR_INVALID_PARAM;
- 		}
- 		break;
- 	default:
--		ret = -EOPNOTSUPP;
-+		ret = SBI_ERR_NOT_SUPPORTED;
- 	}
- 
--	return ret;
-+	retdata->err_val = ret;
++	kvpmu->init_done = true;
++}
 +
-+	return 0;
- }
- 
- const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_hsm = {
-diff --git a/arch/riscv/kvm/vcpu_sbi_replace.c b/arch/riscv/kvm/vcpu_sbi_replace.c
-index 03a0198..38fa4c0 100644
---- a/arch/riscv/kvm/vcpu_sbi_replace.c
-+++ b/arch/riscv/kvm/vcpu_sbi_replace.c
-@@ -14,15 +14,15 @@
- #include <asm/kvm_vcpu_sbi.h>
- 
- static int kvm_sbi_ext_time_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
--				    unsigned long *out_val,
--				    struct kvm_cpu_trap *utrap, bool *exit)
-+				    struct kvm_vcpu_sbi_return *retdata)
- {
--	int ret = 0;
- 	struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
- 	u64 next_cycle;
- 
--	if (cp->a6 != SBI_EXT_TIME_SET_TIMER)
--		return -EINVAL;
-+	if (cp->a6 != SBI_EXT_TIME_SET_TIMER) {
-+		retdata->err_val = SBI_ERR_INVALID_PARAM;
-+		return 0;
-+	}
- 
- #if __riscv_xlen == 32
- 	next_cycle = ((u64)cp->a1 << 32) | (u64)cp->a0;
-@@ -31,7 +31,7 @@ static int kvm_sbi_ext_time_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
- #endif
- 	kvm_riscv_vcpu_timer_next_event(vcpu, next_cycle);
- 
--	return ret;
-+	return 0;
- }
- 
- const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_time = {
-@@ -41,8 +41,7 @@ const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_time = {
- };
- 
- static int kvm_sbi_ext_ipi_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
--				   unsigned long *out_val,
--				   struct kvm_cpu_trap *utrap, bool *exit)
-+				   struct kvm_vcpu_sbi_return *retdata)
- {
- 	int ret = 0;
- 	unsigned long i;
-@@ -51,8 +50,10 @@ static int kvm_sbi_ext_ipi_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 	unsigned long hmask = cp->a0;
- 	unsigned long hbase = cp->a1;
- 
--	if (cp->a6 != SBI_EXT_IPI_SEND_IPI)
--		return -EINVAL;
-+	if (cp->a6 != SBI_EXT_IPI_SEND_IPI) {
-+		retdata->err_val = SBI_ERR_INVALID_PARAM;
-+		return 0;
-+	}
- 
- 	kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
- 		if (hbase != -1UL) {
-@@ -76,10 +77,8 @@ const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_ipi = {
- };
- 
- static int kvm_sbi_ext_rfence_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
--				      unsigned long *out_val,
--				      struct kvm_cpu_trap *utrap, bool *exit)
-+				      struct kvm_vcpu_sbi_return *retdata)
- {
--	int ret = 0;
- 	struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
- 	unsigned long hmask = cp->a0;
- 	unsigned long hbase = cp->a1;
-@@ -116,10 +115,10 @@ static int kvm_sbi_ext_rfence_handler(struct kvm_vcpu *vcpu, struct kvm_run *run
- 		 */
- 		break;
- 	default:
--		ret = -EOPNOTSUPP;
-+		retdata->err_val = SBI_ERR_NOT_SUPPORTED;
- 	}
- 
--	return ret;
-+	return 0;
- }
- 
- const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_rfence = {
-@@ -130,14 +129,12 @@ const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_rfence = {
- 
- static int kvm_sbi_ext_srst_handler(struct kvm_vcpu *vcpu,
- 				    struct kvm_run *run,
--				    unsigned long *out_val,
--				    struct kvm_cpu_trap *utrap, bool *exit)
-+				    struct kvm_vcpu_sbi_return *retdata)
- {
- 	struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
- 	unsigned long funcid = cp->a6;
- 	u32 reason = cp->a1;
- 	u32 type = cp->a0;
--	int ret = 0;
- 
- 	switch (funcid) {
- 	case SBI_EXT_SRST_RESET:
-@@ -146,24 +143,24 @@ static int kvm_sbi_ext_srst_handler(struct kvm_vcpu *vcpu,
- 			kvm_riscv_vcpu_sbi_system_reset(vcpu, run,
- 						KVM_SYSTEM_EVENT_SHUTDOWN,
- 						reason);
--			*exit = true;
-+			retdata->uexit = true;
- 			break;
- 		case SBI_SRST_RESET_TYPE_COLD_REBOOT:
- 		case SBI_SRST_RESET_TYPE_WARM_REBOOT:
- 			kvm_riscv_vcpu_sbi_system_reset(vcpu, run,
- 						KVM_SYSTEM_EVENT_RESET,
- 						reason);
--			*exit = true;
-+			retdata->uexit = true;
- 			break;
- 		default:
--			ret = -EOPNOTSUPP;
-+			retdata->err_val = SBI_ERR_NOT_SUPPORTED;
- 		}
- 		break;
- 	default:
--		ret = -EOPNOTSUPP;
-+		retdata->err_val = SBI_ERR_NOT_SUPPORTED;
- 	}
- 
--	return ret;
-+	return 0;
- }
- 
- const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_srst = {
-diff --git a/arch/riscv/kvm/vcpu_sbi_v01.c b/arch/riscv/kvm/vcpu_sbi_v01.c
-index 489f225..8f4c4fa 100644
---- a/arch/riscv/kvm/vcpu_sbi_v01.c
-+++ b/arch/riscv/kvm/vcpu_sbi_v01.c
-@@ -14,9 +14,7 @@
- #include <asm/kvm_vcpu_sbi.h>
- 
- static int kvm_sbi_ext_v01_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
--				      unsigned long *out_val,
--				      struct kvm_cpu_trap *utrap,
--				      bool *exit)
-+				   struct kvm_vcpu_sbi_return *retdata)
- {
- 	ulong hmask;
- 	int i, ret = 0;
-@@ -24,6 +22,7 @@ static int kvm_sbi_ext_v01_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 	struct kvm_vcpu *rvcpu;
- 	struct kvm *kvm = vcpu->kvm;
- 	struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
-+	struct kvm_cpu_trap *utrap = retdata->utrap;
- 
- 	switch (cp->a7) {
- 	case SBI_EXT_0_1_CONSOLE_GETCHAR:
-@@ -33,7 +32,7 @@ static int kvm_sbi_ext_v01_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 		 * handled in kernel so we forward these to user-space
- 		 */
- 		kvm_riscv_vcpu_sbi_forward(vcpu, run);
--		*exit = true;
-+		retdata->uexit = true;
- 		break;
- 	case SBI_EXT_0_1_SET_TIMER:
- #if __riscv_xlen == 32
-@@ -48,8 +47,7 @@ static int kvm_sbi_ext_v01_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 		break;
- 	case SBI_EXT_0_1_SEND_IPI:
- 		if (cp->a0)
--			hmask = kvm_riscv_vcpu_unpriv_read(vcpu, false, cp->a0,
--							   utrap);
-+			hmask = kvm_riscv_vcpu_unpriv_read(vcpu, false, cp->a0, utrap);
- 		else
- 			hmask = (1UL << atomic_read(&kvm->online_vcpus)) - 1;
- 		if (utrap->scause)
-@@ -65,14 +63,13 @@ static int kvm_sbi_ext_v01_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 	case SBI_EXT_0_1_SHUTDOWN:
- 		kvm_riscv_vcpu_sbi_system_reset(vcpu, run,
- 						KVM_SYSTEM_EVENT_SHUTDOWN, 0);
--		*exit = true;
-+		retdata->uexit = true;
- 		break;
- 	case SBI_EXT_0_1_REMOTE_FENCE_I:
- 	case SBI_EXT_0_1_REMOTE_SFENCE_VMA:
- 	case SBI_EXT_0_1_REMOTE_SFENCE_VMA_ASID:
- 		if (cp->a0)
--			hmask = kvm_riscv_vcpu_unpriv_read(vcpu, false, cp->a0,
--							   utrap);
-+			hmask = kvm_riscv_vcpu_unpriv_read(vcpu, false, cp->a0, utrap);
- 		else
- 			hmask = (1UL << atomic_read(&kvm->online_vcpus)) - 1;
- 		if (utrap->scause)
-@@ -103,7 +100,7 @@ static int kvm_sbi_ext_v01_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 		}
- 		break;
- 	default:
--		ret = -EINVAL;
-+		retdata->err_val = SBI_ERR_NOT_SUPPORTED;
- 		break;
- 	}
- 
++void kvm_riscv_vcpu_pmu_deinit(struct kvm_vcpu *vcpu)
++{
++	/* TODO */
++}
++
++void kvm_riscv_vcpu_pmu_reset(struct kvm_vcpu *vcpu)
++{
++	kvm_riscv_vcpu_pmu_deinit(vcpu);
++}
 -- 
 2.25.1
 
