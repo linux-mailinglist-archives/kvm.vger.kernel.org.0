@@ -2,276 +2,300 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F04A468B01E
-	for <lists+kvm@lfdr.de>; Sun,  5 Feb 2023 14:57:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A2BF68B155
+	for <lists+kvm@lfdr.de>; Sun,  5 Feb 2023 20:19:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229519AbjBEN5X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 5 Feb 2023 08:57:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47896 "EHLO
+        id S229523AbjBETTu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 5 Feb 2023 14:19:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229475AbjBEN5W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 5 Feb 2023 08:57:22 -0500
-Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 969F11E2A1
-        for <kvm@vger.kernel.org>; Sun,  5 Feb 2023 05:57:14 -0800 (PST)
-Received: by mail-yb1-xb34.google.com with SMTP id 79so1576737ybe.6
-        for <kvm@vger.kernel.org>; Sun, 05 Feb 2023 05:57:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=K0j+KI6qhg+Cc+DWsKFDToe+0K5p4v0WOmhERTS4SqU=;
-        b=AEKVNFIY03VskELNgWAWFSgKbFSkbfifYL7rzfJrQzSFXzGw99SJmj1F+cxddEmAIL
-         OC2UoIVmCYcZgcK7aPJdJXyvTqj9unc7jEj+SgKUkWv1DvyoVYdcEE/9gPcUeeex7tOR
-         ImfS/w0YucA9XOSdw1GHL0gQKQBoWZEPZnLhid7Poq72vscVWM7TzbzPMEw+w0gD5qHl
-         geT/lKLn4A2FiKSwUpF6ZPk+NzGCsUZoZAnH8fWe+cwb/dDfG5PaGbcV5dxjcT1OaO6h
-         wl1GukJGi4gWeb1oQ3K2m8+CEXXkR2zNNeirbZ08FeYZ/P5EJZ02KvmlsSM3KSCTuw4k
-         Fo5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=K0j+KI6qhg+Cc+DWsKFDToe+0K5p4v0WOmhERTS4SqU=;
-        b=K3GnR1h86jK+PtnbrKh6oNSoq1eQI+y2z5keiTYEc+q7dzcTNfvkk2TchM5FW1/7wF
-         mSlAnkGIFKh4mTxKuKbRaFgXAw1XCrlXhw73DJjQ/XixLrWGX0V7Toz0duAMROQ3xBE3
-         N/j3lliw+WvtnEr8R9/0AHZDIPmHl07lGQfiTU0vOYxIV8NG5nQ+S8uVGEpbdHn/JRoK
-         N3AL36yRZbicA2YQmOpyNZk0X3HYCJbL9a3u0pP5qHECAw5eBq/nr4rwgBHIis5mNmIv
-         EDB8I4OgPYbpQQDU3ilMgw2z8dQYegrCM+UJjaRLgSlW/6rC6SbWSJl/Lf1N4Qy3chog
-         7tow==
-X-Gm-Message-State: AO0yUKXvZ7wJJq9mpM9gVZB6gKOW+9jGoBs/4NGG2Gc/7o6zgrodOCmL
-        UpZrEtum+aa6/MwSdIS9fJPDURGJVeBsoAqC/ns=
-X-Google-Smtp-Source: AK7set+hCHdOIXpVGcbEtMjRz4GLsDpSIcwRxHO9UMhKhzQ2KIW2XZzBUDptW7sDz1yorHpmNQRdYisSSi82EUEAAiE=
-X-Received: by 2002:a5b:910:0:b0:897:7d29:3eee with SMTP id
- a16-20020a5b0910000000b008977d293eeemr37333ybq.58.1675605433679; Sun, 05 Feb
- 2023 05:57:13 -0800 (PST)
+        with ESMTP id S229379AbjBETTs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 5 Feb 2023 14:19:48 -0500
+Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D8AD16334;
+        Sun,  5 Feb 2023 11:19:44 -0800 (PST)
+Received: from pps.filterd (m0150241.ppops.net [127.0.0.1])
+        by mx0a-002e3701.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 315H2B1h001313;
+        Sun, 5 Feb 2023 19:17:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=date : from : to : cc :
+ subject : message-id : reply-to : references : content-type : in-reply-to
+ : mime-version; s=pps0720;
+ bh=/POUzDsNAzZmgB38XRQ9Q1+F/l0WFLjnGY0FhdNtSeI=;
+ b=m9atYK1CpYua2d7MpvgSMhzz7UVCfzrHd+mjRc/ZuBhGQmyNiqwyze2jjH6ocVYrjQ8D
+ SmJUd2rp2cPCU1WmmGSKbDOv/1rEqzNrMSOuzhUAwBI47NBgIQrlzeILxpQcqVXQA7M9
+ bcuvfruwzWsp3SLXckzA4jzV5tgzvxiKQ+5TcpaAJZWjHhLH7+zEqzvmuzn/V3oKYTZZ
+ 5Eto9l5FR66GgtwEl8z1wYlDE0hLK0svW4j9QMPNRptezj1JY+1/clX1YPSC2mN2EPtt
+ slQULaUFFTld/681ZmVKJPGa69HbV1zLno1s9H4QWn6Ey90MRu2k0YzyhqJvh4ZT7F8W 8Q== 
+Received: from p1lg14878.it.hpe.com (p1lg14878.it.hpe.com [16.230.97.204])
+        by mx0a-002e3701.pphosted.com (PPS) with ESMTPS id 3nhdwqrcj5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 05 Feb 2023 19:17:42 +0000
+Received: from p1lg14886.dc01.its.hpecorp.net (unknown [10.119.18.237])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by p1lg14878.it.hpe.com (Postfix) with ESMTPS id 0F1BA1317D;
+        Sun,  5 Feb 2023 19:17:41 +0000 (UTC)
+Received: from hpe.com (unknown [16.231.227.36])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by p1lg14886.dc01.its.hpecorp.net (Postfix) with ESMTPS id 6019980C476;
+        Sun,  5 Feb 2023 19:17:36 +0000 (UTC)
+Date:   Sun, 5 Feb 2023 13:17:34 -0600
+From:   Russ Anderson <rja@hpe.com>
+To:     Usama Arif <usama.arif@bytedance.com>
+Cc:     dwmw2@infradead.org, tglx@linutronix.de, arjan@linux.intel.com,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        hpa@zytor.com, x86@kernel.org, pbonzini@redhat.com,
+        paulmck@kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, rcu@vger.kernel.org, mimoja@mimoja.de,
+        hewenliang4@huawei.com, thomas.lendacky@amd.com, seanjc@google.com,
+        pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
+        punit.agrawal@bytedance.com, simon.evans@bytedance.com,
+        liangma@liangbit.com
+Subject: Re: [PATCH v6 00/11] Parallel CPU bringup for x86_64
+Message-ID: <20230205191734.GA6027@hpe.com>
+Reply-To: Russ Anderson <rja@hpe.com>
+References: <20230202215625.3248306-1-usama.arif@bytedance.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230202215625.3248306-1-usama.arif@bytedance.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Proofpoint-GUID: IyAX6uTtoj-xOImoZcMKghLb-c0-AeXN
+X-Proofpoint-ORIG-GUID: IyAX6uTtoj-xOImoZcMKghLb-c0-AeXN
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-References: <CAJSP0QUuuZLC0DJNEfZ7amyd3XnRhRNr1k+1OgLfDeF77X1ZDQ@mail.gmail.com>
- <CAJaqyWd+g5fso6AEGKwj0ByxFVc8EpCS9+ezoMpnjyMo5tbj8Q@mail.gmail.com>
-In-Reply-To: <CAJaqyWd+g5fso6AEGKwj0ByxFVc8EpCS9+ezoMpnjyMo5tbj8Q@mail.gmail.com>
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-Date:   Sun, 5 Feb 2023 08:57:01 -0500
-Message-ID: <CAJSP0QXyO4qXJseMzbgsVdXK-4-W4U9DxPcxr6wX45d6VBTeWQ@mail.gmail.com>
-Subject: Re: Call for GSoC and Outreachy project ideas for summer 2023
-To:     Eugenio Perez Martin <eperezma@redhat.com>
-Cc:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
-        Rust-VMM Mailing List <rust-vmm@lists.opendev.org>,
-        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
-        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
-        Thomas Huth <thuth@redhat.com>, John Snow <jsnow@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Florescu, Andreea" <fandree@amazon.com>,
-        Damien <damien.lemoal@opensource.wdc.com>,
-        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
-        Hanna Reitz <hreitz@redhat.com>,
-        Alberto Faria <afaria@redhat.com>,
-        Daniel Henrique Barboza <danielhb413@gmail.com>,
-        =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
-        Bernhard Beschow <shentey@gmail.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, gmaglione@redhat.com,
-        Jason Wang <jasowang@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-HPE-SCL: -1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-02-05_06,2023-02-03_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
+ clxscore=1011 suspectscore=0 impostorscore=0 phishscore=0
+ lowpriorityscore=0 priorityscore=1501 mlxscore=0 mlxlogscore=999
+ bulkscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302050167
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 5 Feb 2023 at 03:15, Eugenio Perez Martin <eperezma@redhat.com> wrote:
->
-> On Fri, Jan 27, 2023 at 4:18 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> >
-> > Dear QEMU, KVM, and rust-vmm communities,
-> > QEMU will apply for Google Summer of Code 2023
-> > (https://summerofcode.withgoogle.com/) and has been accepted into
-> > Outreachy May 2023 (https://www.outreachy.org/). You can now
-> > submit internship project ideas for QEMU, KVM, and rust-vmm!
-> >
-> > Please reply to this email by February 6th with your project ideas.
-> >
-> > If you have experience contributing to QEMU, KVM, or rust-vmm you can
-> > be a mentor. Mentors support interns as they work on their project. It's a
-> > great way to give back and you get to work with people who are just
-> > starting out in open source.
-> >
-> > Good project ideas are suitable for remote work by a competent
-> > programmer who is not yet familiar with the codebase. In
-> > addition, they are:
-> > - Well-defined - the scope is clear
-> > - Self-contained - there are few dependencies
-> > - Uncontroversial - they are acceptable to the community
-> > - Incremental - they produce deliverables along the way
-> >
-> > Feel free to post ideas even if you are unable to mentor the project.
-> > It doesn't hurt to share the idea!
-> >
-> > I will review project ideas and keep you up-to-date on QEMU's
-> > acceptance into GSoC.
-> >
-> > Internship program details:
-> > - Paid, remote work open source internships
-> > - GSoC projects are 175 or 350 hours, Outreachy projects are 30
-> > hrs/week for 12 weeks
-> > - Mentored by volunteers from QEMU, KVM, and rust-vmm
-> > - Mentors typically spend at least 5 hours per week during the coding period
-> >
-> > For more background on QEMU internships, check out this video:
-> > https://www.youtube.com/watch?v=xNVCX7YMUL8
-> >
-> > Please let me know if you have any questions!
-> >
-> > Stefan
-> >
->
-> Appending the different ideas here.
+On Thu, Feb 02, 2023 at 09:56:14PM +0000, Usama Arif wrote:
+> Doing INIT/SIPI/SIPI in parallel brings down the time for smpboot from ~700ms
+> to 100ms (85% improvement) on a server with 128 CPUs split across 2 NUMA nodes.
+> The parallel CPU bringup is disabled for all AMD CPUs in this version: 
+> (see discussions: https://lore.kernel.org/all/bc3f2b1332c4bb77558df8aa36493a55542fe5b9.camel@infradead.org/ and
+> https://lore.kernel.org/all/3b6ac86fdc800cac5806433daf14a9095be101e9.camel@infradead.org/).
+> 
+> The last patch reuses the timer calibration from CPU 0 for secondary CPUs
+> which brings down the time for parallel smpboot from 100ms to 30ms. It is
+> missing a sign-off from the author, which hopefully Arjan will add.
+> 
+> Changes across versions:
+> v2: Cut it back to just INIT/SIPI/SIPI in parallel for now, nothing more
+> v3: Clean up x2apic patch, add MTRR optimisation, lock topology update
+>     in preparation for more parallelisation.
+> v4: Fixes to the real mode parallelisation patch spotted by SeanC, to
+>     avoid scribbling on initial_gs in common_cpu_up(), and to allow all
+>     24 bits of the physical X2APIC ID to be used. That patch still needs
+>     a Signed-off-by from its original author, who once claimed not to
+>     remember writing it at all. But now we've fixed it, hopefully he'll
+>     admit it now :)
+> v5: rebase to v6.1 and remeasure performance, disable parallel bringup
+>     for AMD CPUs.
+> v6: rebase to v6.2-rc6, disabled parallel boot on amd as a cpu bug and
+>     reused timer calibration for secondary CPUs.
+> 
+> Arjan van de Ven (1):
+>   x86/smpboot: reuse timer calibration
+> 
+> David Woodhouse (9):
+>   x86/apic/x2apic: Fix parallel handling of cluster_mask
+>   cpu/hotplug: Move idle_thread_get() to <linux/smpboot.h>
+>   cpu/hotplug: Add dynamic parallel bringup states before
+>     CPUHP_BRINGUP_CPU
+>   x86/smpboot: Reference count on smpboot_setup_warm_reset_vector()
+>   x86/smpboot: Split up native_cpu_up into separate phases and document
+>     them
+>   x86/smpboot: Disable parallel boot for AMD CPUs
+>   x86/smpboot: Send INIT/SIPI/SIPI to secondary CPUs in parallel
+>   x86/mtrr: Avoid repeated save of MTRRs on boot-time CPU bringup
+>   x86/smpboot: Serialize topology updates for secondary bringup
+> 
+> Thomas Gleixner (1):
+>   x86/smpboot: Support parallel startup of secondary CPUs
+> 
+>  arch/x86/include/asm/cpufeatures.h    |   1 +
+>  arch/x86/include/asm/realmode.h       |   3 +
+>  arch/x86/include/asm/smp.h            |  13 +-
+>  arch/x86/include/asm/topology.h       |   2 -
+>  arch/x86/kernel/acpi/sleep.c          |   1 +
+>  arch/x86/kernel/apic/apic.c           |   2 +-
+>  arch/x86/kernel/apic/x2apic_cluster.c | 108 +++++----
+>  arch/x86/kernel/cpu/amd.c             |  11 +
+>  arch/x86/kernel/cpu/common.c          |   6 +-
+>  arch/x86/kernel/cpu/mtrr/mtrr.c       |   9 +
+>  arch/x86/kernel/head_64.S             |  75 ++++++
+>  arch/x86/kernel/smpboot.c             | 333 ++++++++++++++++++--------
+>  arch/x86/kernel/tsc.c                 |   3 +
+>  arch/x86/realmode/init.c              |   3 +
+>  arch/x86/realmode/rm/trampoline_64.S  |  14 ++
+>  arch/x86/xen/smp_pv.c                 |   4 +-
+>  include/linux/cpuhotplug.h            |   2 +
+>  include/linux/smpboot.h               |   7 +
+>  kernel/cpu.c                          |  27 ++-
+>  kernel/smpboot.c                      |   2 +-
+>  kernel/smpboot.h                      |   2 -
+>  21 files changed, 469 insertions(+), 159 deletions(-)
+> 
+> -- 
+> 2.25.1
 
-Hi Eugenio,
-Thanks for sharing your project ideas. I have added some questions
-below before we add them to the ideas list wiki page.
+Gave the v6 patchset a try on a system with 1920 logocal cpus (sixteen 60 core Sapphire Rapids sockets with Hyperthreadding enabled).
 
-> VIRTIO_F_IN_ORDER feature support for virtio devices
-> ===
-> This was already a project the last year, and it produced a few series
-> upstream but was never merged. The previous series are totally useful
-> to start with, so it's not starting from scratch with them [1]:
+Without the patchset it took 71 seconds to start all the cpus.
+With the v6 patchset it took 14 seconds to start all the cpus,
+a reduction of 57 seconds.  That is impressive.
 
-Has Zhi Guo stopped working on the patches?
+Full boot, to root login prompt, without patches takes 223 seconds.
+This patchset reduces the full boot time by 57 seconds, a 25% reduction.
 
-What is the state of the existing patches? What work remains to be done?
+Well done.
 
->
-> Summary
-> ---
-> Implement VIRTIO_F_IN_ORDER in QEMU and Linux (vhost and virtio drivers)
->
-> The VIRTIO specification defines a feature bit (VIRTIO_F_IN_ORDER)
-> that devices and drivers can negotiate when the device uses
-> descriptors in the same order in which they were made available by the
-> driver.
->
-> This feature can simplify device and driver implementations and
-> increase performance. For example, when VIRTIO_F_IN_ORDER is
-> negotiated, it may be easier to create a batch of buffers and reduce
-> DMA transactions when the device uses a batch of buffers.
->
-> Currently the devices and drivers available in Linux and QEMU do not
-> support this feature. An implementation is available in DPDK for the
-> virtio-net driver.
->
-> Goals
-> ---
-> Implement VIRTIO_F_IN_ORDER for a single device/driver in QEMU and
-> Linux (virtio-net or virtio-serial are good starting points).
-> Generalize your approach to the common virtio core code for split and
-> packed virtqueue layouts.
-> If time allows, support for the packed virtqueue layout can be added
-> to Linux vhost, QEMU's libvhost-user, and/or QEMU's virtio qtest code.
->
-> Shadow Virtqueue missing virtio features
-> ===
->
-> Summary
-> ---
-> Some VirtIO devices like virtio-net have a control virtqueue (CVQ)
-> that allows them to dynamically change a number of parameters like MAC
-> or number of active queues. Changes to passthrough devices using vDPA
-> using CVQ are inherently hard to track if CVQ is handled as
-> passthrough data queues, because qemu is not aware of that
-> communication for performance reasons. In this situation, qemu is not
-> able to migrate these devices, as it is not able to tell the actual
-> state of the device.
->
-> Shadow Virtqueue (SVQ) allows qemu to offer an emulated queue to the
-> device, effectively forwarding the descriptors of that communication,
-> tracking the device internal state, and being able to migrate it to a
-> new destination qemu.
->
-> To restore that state in the destination, SVQ is able to send these
-> messages as regular CVQ commands. The code to understand and parse
-> virtio-net CVQ commands is already in qemu as part of its emulated
-> device, but the code to send the some of the new state is not, and
-> some features are missing. There is already code to restore basic
-> commands like mac or multiqueue, and it is easy to use it as a
-> template.
->
-> Goals
-> ---
-> To implement missing virtio-net commands sending:
-> * VIRTIO_NET_CTRL_RX family, to control receive mode.
-> * VIRTIO_NET_CTRL_GUEST_OFFLOADS
-> * VIRTIO_NET_CTRL_VLAN family
-> * VIRTIO_NET_CTRL_MQ_HASH config
-> * VIRTIO_NET_CTRL_MQ_RSS config
 
-Is there enough work here for a 350 hour or 175 hour GSoC project?
+Output with the patchset:
+--------------------------------------------------------------------------
+2023-02-05 18:12:19Z [    1.172564][    T1] smp: Bringing up secondary CPUs ...
+2023-02-05 18:12:19Z [    1.179316][    T1] x86: Booting SMP configuration:
+2023-02-05 18:12:19Z [    1.179634][    T1] .... node   #0, CPUs:            #1    #2    #3    #4    #5    #6    #7    #8    #9   #10   #11   #12   #13   #14   #15   #16   #17   #18   #19   #20   #21   #22   #23   #24   #25   #26   #27   #28   #29   #30   #31   #32   #33   #34   #35   #36   #37   #38   #39   #40   #41   #42   #43   #44   #45   #46   #47   #48   #49   #50   #51   #52   #53   #54   #55   #56   #57   #58   #59
+2023-02-05 18:12:20Z [    1.267650][    T1] .... node   #1, CPUs:     #60   #61   #62   #63   #64   #65   #66   #67   #68   #69   #70   #71   #72   #73   #74   #75   #76   #77   #78   #79   #80   #81   #82   #83   #84   #85   #86   #87   #88   #89   #90   #91   #92   #93   #94   #95   #96   #97   #98   #99  #100  #101  #102  #103  #104  #105  #106  #107  #108  #109  #110  #111  #112  #113  #114  #115  #116  #117  #118  #119
+2023-02-05 18:12:20Z [    1.315633][    T1] .... node   #2, CPUs:    #120  #121  #122  #123  #124  #125  #126  #127  #128  #129  #130  #131  #132  #133  #134  #135  #136  #137  #138  #139  #140  #141  #142  #143  #144  #145  #146  #147  #148  #149  #150  #151  #152  #153  #154  #155  #156  #157  #158  #159  #160  #161  #162  #163  #164  #165  #166  #167  #168  #169  #170  #171  #172  #173  #174  #175  #176  #177  #178  #179
+2023-02-05 18:12:20Z [    1.363634][    T1] .... node   #3, CPUs:    #180  #181  #182  #183  #184  #185  #186  #187  #188  #189  #190  #191  #192  #193  #194  #195  #196  #197  #198  #199  #200  #201  #202  #203  #204  #205  #206  #207  #208  #209  #210  #211  #212  #213  #214  #215  #216  #217  #218  #219  #220  #221  #222  #223  #224  #225  #226  #227  #228  #229  #230  #231  #232  #233  #234  #235  #236  #237  #238  #239
+2023-02-05 18:12:20Z [    1.411634][    T1] .... node   #4, CPUs:    #240  #241  #242  #243  #244  #245  #246  #247  #248  #249  #250  #251  #252  #253  #254  #255  #256  #257  #258  #259  #260  #261  #262  #263  #264  #265  #266  #267  #268  #269  #270  #271  #272  #273  #274  #275  #276  #277  #278  #279  #280  #281  #282  #283  #284  #285  #286  #287  #288  #289  #290  #291  #292  #293  #294  #295  #296  #297  #298  #299
+2023-02-05 18:12:20Z [    1.459634][    T1] .... node   #5, CPUs:    #300  #301  #302  #303  #304  #305  #306  #307  #308  #309  #310  #311  #312  #313  #314  #315  #316  #317  #318  #319  #320  #321  #322  #323  #324  #325  #326  #327  #328  #329  #330  #331  #332  #333  #334  #335  #336  #337  #338  #339  #340  #341  #342  #343  #344  #345  #346  #347  #348  #349  #350  #351  #352  #353  #354  #355  #356  #357  #358  #359
+2023-02-05 18:12:20Z [    1.507634][    T1] .... node   #6, CPUs:    #360  #361  #362  #363  #364  #365  #366  #367  #368  #369  #370  #371  #372  #373  #374  #375  #376  #377  #378  #379  #380  #381  #382  #383  #384  #385  #386  #387  #388  #389  #390  #391  #392  #393  #394  #395  #396  #397  #398  #399  #400  #401  #402  #403  #404  #405  #406  #407  #408  #409  #410  #411  #412  #413  #414  #415  #416  #417  #418  #419
+2023-02-05 18:12:20Z [    1.555634][    T1] .... node   #7, CPUs:    #420  #421  #422  #423  #424  #425  #426  #427  #428  #429  #430  #431  #432  #433  #434  #435  #436  #437  #438  #439  #440  #441  #442  #443  #444  #445  #446  #447  #448  #449  #450  #451  #452  #453  #454  #455  #456  #457  #458  #459  #460  #461  #462  #463  #464  #465  #466  #467  #468  #469  #470  #471  #472  #473  #474  #475  #476  #477  #478  #479
+2023-02-05 18:12:20Z [    1.603634][    T1] .... node   #8, CPUs:    #480  #481  #482  #483  #484  #485  #486  #487  #488  #489  #490  #491  #492  #493  #494  #495  #496  #497  #498  #499  #500  #501  #502  #503  #504  #505  #506  #507  #508  #509  #510  #511  #512  #513  #514  #515  #516  #517  #518  #519  #520  #521  #522  #523  #524  #525  #526  #527  #528  #529  #530  #531  #532  #533  #534  #535  #536  #537  #538  #539
+2023-02-05 18:12:20Z [    1.655634][    T1] .... node   #9, CPUs:    #540  #541  #542  #543  #544  #545  #546  #547  #548  #549  #550  #551  #552  #553  #554  #555  #556  #557  #558  #559  #560  #561  #562  #563  #564  #565  #566  #567  #568  #569  #570  #571  #572  #573  #574  #575  #576  #577  #578  #579  #580  #581  #582  #583  #584  #585  #586  #587  #588  #589  #590  #591  #592  #593  #594  #595  #596  #597  #598  #599
+2023-02-05 18:12:20Z [    1.707633][    T1] .... node  #10, CPUs:    #600  #601  #602  #603  #604  #605  #606  #607  #608  #609  #610  #611  #612  #613  #614  #615  #616  #617  #618  #619  #620  #621  #622  #623  #624  #625  #626  #627  #628  #629  #630  #631  #632  #633  #634  #635  #636  #637  #638  #639  #640  #641  #642  #643  #644  #645  #646  #647  #648  #649  #650  #651  #652  #653  #654  #655  #656  #657  #658  #659
+2023-02-05 18:12:20Z [    1.755634][    T1] .... node  #11, CPUs:    #660  #661  #662  #663  #664  #665  #666  #667  #668  #669  #670  #671  #672  #673  #674  #675  #676  #677  #678  #679  #680  #681  #682  #683  #684  #685  #686  #687  #688  #689  #690  #691  #692  #693  #694  #695  #696  #697  #698  #699  #700  #701  #702  #703  #704  #705  #706  #707  #708  #709  #710  #711  #712  #713  #714  #715  #716  #717  #718  #719
+2023-02-05 18:12:20Z [    1.803634][    T1] .... node  #12, CPUs:    #720  #721  #722  #723  #724  #725  #726  #727  #728  #729  #730  #731  #732  #733  #734  #735  #736  #737  #738  #739  #740  #741  #742  #743  #744  #745  #746  #747  #748  #749  #750  #751  #752  #753  #754  #755  #756  #757  #758  #759  #760  #761  #762  #763  #764  #765  #766  #767  #768  #769  #770  #771  #772  #773  #774  #775  #776  #777  #778  #779
+2023-02-05 18:12:21Z [    1.855634][    T1] .... node  #13, CPUs:    #780  #781  #782  #783  #784  #785  #786  #787  #788  #789  #790  #791  #792  #793  #794  #795  #796  #797  #798  #799  #800  #801  #802  #803  #804  #805  #806  #807  #808  #809  #810  #811  #812  #813  #814  #815  #816  #817  #818  #819  #820  #821  #822  #823  #824  #825  #826  #827  #828  #829  #830  #831  #832  #833  #834  #835  #836  #837  #838  #839
+2023-02-05 18:12:21Z [    1.903641][    T1] .... node  #14, CPUs:    #840  #841  #842  #843  #844  #845  #846  #847  #848  #849  #850  #851  #852  #853  #854  #855  #856  #857  #858  #859  #860  #861  #862  #863  #864  #865  #866  #867  #868  #869  #870  #871  #872  #873  #874  #875  #876  #877  #878  #879  #880  #881  #882  #883  #884  #885  #886  #887  #888  #889  #890  #891  #892  #893  #894  #895  #896  #897  #898  #899
+2023-02-05 18:12:21Z [    1.951634][    T1] .... node  #15, CPUs:    #900  #901  #902  #903  #904  #905  #906  #907  #908  #909  #910  #911  #912  #913  #914  #915  #916  #917  #918  #919  #920  #921  #922  #923  #924  #925  #926  #927  #928  #929  #930  #931  #932  #933  #934  #935  #936  #937  #938  #939  #940  #941  #942  #943  #944  #945  #946  #947  #948  #949  #950  #951  #952  #953  #954  #955  #956  #957  #958  #959
+2023-02-05 18:12:21Z [    1.999634][    T1] .... node   #0, CPUs:    #960  #961  #962  #963  #964  #965  #966  #967  #968  #969  #970  #971  #972  #973  #974  #975  #976  #977  #978  #979  #980  #981  #982  #983  #984  #985  #986  #987  #988  #989  #990  #991  #992  #993  #994  #995  #996  #997  #998  #999 #1000 #1001 #1002 #1003 #1004 #1005 #1006 #1007 #1008 #1009 #1010 #1011 #1012 #1013 #1014 #1015 #1016 #1017 #1018 #1019
+2023-02-05 18:12:21Z [    2.079642][    T1] .... node   #1, CPUs:   #1020 #1021 #1022 #1023 #1024 #1025 #1026 #1027 #1028 #1029 #1030 #1031 #1032 #1033 #1034 #1035 #1036 #1037 #1038 #1039 #1040 #1041 #1042 #1043 #1044 #1045 #1046 #1047 #1048 #1049 #1050 #1051 #1052 #1053 #1054 #1055 #1056 #1057 #1058 #1059 #1060 #1061 #1062 #1063 #1064 #1065 #1066 #1067 #1068 #1069 #1070 #1071 #1072 #1073 #1074 #1075 #1076 #1077 #1078 #1079
+2023-02-05 18:12:21Z [    2.119634][    T1] .... node   #2, CPUs:   #1080 #1081 #1082 #1083 #1084 #1085 #1086 #1087 #1088 #1089 #1090 #1091 #1092 #1093 #1094 #1095 #1096 #1097 #1098 #1099 #1100 #1101 #1102 #1103 #1104 #1105 #1106 #1107 #1108 #1109 #1110 #1111 #1112 #1113 #1114 #1115 #1116 #1117 #1118 #1119 #1120 #1121 #1122 #1123 #1124 #1125 #1126 #1127 #1128 #1129 #1130 #1131 #1132 #1133 #1134 #1135 #1136 #1137 #1138 #1139
+2023-02-05 18:12:21Z [    2.155634][    T1] .... node   #3, CPUs:   #1140 #1141 #1142 #1143 #1144 #1145 #1146 #1147 #1148 #1149 #1150 #1151 #1152 #1153 #1154 #1155 #1156 #1157 #1158 #1159 #1160 #1161 #1162 #1163 #1164 #1165 #1166 #1167 #1168 #1169 #1170 #1171 #1172 #1173 #1174 #1175 #1176 #1177 #1178 #1179 #1180 #1181 #1182 #1183 #1184 #1185 #1186 #1187 #1188 #1189 #1190 #1191 #1192 #1193 #1194 #1195 #1196 #1197 #1198 #1199
+2023-02-05 18:12:21Z [    2.195634][    T1] .... node   #4, CPUs:   #1200 #1201 #1202 #1203 #1204 #1205 #1206 #1207 #1208 #1209 #1210 #1211 #1212 #1213 #1214 #1215 #1216 #1217 #1218 #1219 #1220 #1221 #1222 #1223 #1224 #1225 #1226 #1227 #1228 #1229 #1230 #1231 #1232 #1233 #1234 #1235 #1236 #1237 #1238 #1239 #1240 #1241 #1242 #1243 #1244 #1245 #1246 #1247 #1248 #1249 #1250 #1251 #1252 #1253 #1254 #1255 #1256 #1257 #1258 #1259
+2023-02-05 18:12:21Z [    2.235635][    T1] .... node   #5, CPUs:   #1260 #1261 #1262 #1263 #1264 #1265 #1266 #1267 #1268 #1269 #1270 #1271 #1272 #1273 #1274 #1275 #1276 #1277 #1278 #1279 #1280 #1281 #1282 #1283 #1284 #1285 #1286 #1287 #1288 #1289 #1290 #1291 #1292 #1293 #1294 #1295 #1296 #1297 #1298 #1299 #1300 #1301 #1302 #1303 #1304 #1305 #1306 #1307 #1308 #1309 #1310 #1311 #1312 #1313 #1314 #1315 #1316 #1317 #1318 #1319
+2023-02-05 18:12:21Z [    2.275634][    T1] .... node   #6, CPUs:   #1320 #1321 #1322 #1323 #1324 #1325 #1326 #1327 #1328 #1329 #1330 #1331 #1332 #1333 #1334 #1335 #1336 #1337 #1338 #1339 #1340 #1341 #1342 #1343 #1344 #1345 #1346 #1347 #1348 #1349 #1350 #1351 #1352 #1353 #1354 #1355 #1356 #1357 #1358 #1359 #1360 #1361 #1362 #1363 #1364 #1365 #1366 #1367 #1368 #1369 #1370 #1371 #1372 #1373 #1374 #1375 #1376 #1377 #1378 #1379
+2023-02-05 18:12:21Z [    2.320561][    T1] .... node   #7, CPUs:   #1380 #1381 #1382 #1383 #1384 #1385 #1386 #1387 #1388 #1389 #1390 #1391 #1392 #1393 #1394 #1395 #1396 #1397 #1398 #1399 #1400 #1401 #1402 #1403 #1404 #1405 #1406 #1407 #1408 #1409 #1410 #1411 #1412 #1413 #1414 #1415 #1416 #1417 #1418 #1419 #1420 #1421 #1422 #1423 #1424 #1425 #1426 #1427 #1428 #1429 #1430 #1431 #1432 #1433 #1434 #1435 #1436 #1437 #1438 #1439
+2023-02-05 18:12:21Z [    2.363647][    T1] .... node   #8, CPUs:   #1440 #1441 #1442 #1443 #1444 #1445 #1446 #1447 #1448 #1449 #1450 #1451 #1452 #1453 #1454 #1455 #1456 #1457 #1458 #1459 #1460 #1461 #1462 #1463 #1464 #1465 #1466 #1467 #1468 #1469 #1470 #1471 #1472 #1473 #1474 #1475 #1476 #1477 #1478 #1479 #1480 #1481 #1482 #1483 #1484 #1485 #1486 #1487 #1488 #1489 #1490 #1491 #1492 #1493 #1494 #1495 #1496 #1497 #1498 #1499
+2023-02-05 18:12:22Z [    2.407636][    T1] .... node   #9, CPUs:   #1500 #1501 #1502 #1503 #1504 #1505 #1506 #1507 #1508 #1509 #1510 #1511 #1512 #1513 #1514 #1515 #1516 #1517 #1518 #1519 #1520 #1521 #1522 #1523 #1524 #1525 #1526 #1527 #1528 #1529 #1530 #1531 #1532 #1533 #1534 #1535 #1536 #1537 #1538 #1539 #1540 #1541 #1542 #1543 #1544 #1545 #1546 #1547 #1548 #1549 #1550 #1551 #1552 #1553 #1554 #1555 #1556 #1557 #1558 #1559
+2023-02-05 18:12:22Z [    2.451644][    T1] .... node  #10, CPUs:   #1560 #1561 #1562 #1563 #1564 #1565 #1566 #1567 #1568 #1569 #1570 #1571 #1572 #1573 #1574 #1575 #1576 #1577 #1578 #1579 #1580 #1581 #1582 #1583 #1584 #1585 #1586 #1587 #1588 #1589 #1590 #1591 #1592 #1593 #1594 #1595 #1596 #1597 #1598 #1599 #1600 #1601 #1602 #1603 #1604 #1605 #1606 #1607 #1608 #1609 #1610 #1611 #1612 #1613 #1614 #1615 #1616 #1617 #1618 #1619
+2023-02-05 18:12:22Z [    2.495648][    T1] .... node  #11, CPUs:   #1620 #1621 #1622 #1623 #1624 #1625 #1626 #1627 #1628 #1629 #1630 #1631 #1632 #1633 #1634 #1635 #1636 #1637 #1638 #1639 #1640 #1641 #1642 #1643 #1644 #1645 #1646 #1647 #1648 #1649 #1650 #1651 #1652 #1653 #1654 #1655 #1656 #1657 #1658 #1659 #1660 #1661 #1662 #1663 #1664 #1665 #1666 #1667 #1668 #1669 #1670 #1671 #1672 #1673 #1674 #1675 #1676 #1677 #1678 #1679
+2023-02-05 18:12:22Z [    2.539634][    T1] .... node  #12, CPUs:   #1680 #1681 #1682 #1683 #1684 #1685 #1686 #1687 #1688 #1689 #1690 #1691 #1692 #1693 #1694 #1695 #1696 #1697 #1698 #1699 #1700 #1701 #1702 #1703 #1704 #1705 #1706 #1707 #1708 #1709 #1710 #1711 #1712 #1713 #1714 #1715 #1716 #1717 #1718 #1719 #1720 #1721 #1722 #1723 #1724 #1725 #1726 #1727 #1728 #1729 #1730 #1731 #1732 #1733 #1734 #1735 #1736 #1737 #1738 #1739
+2023-02-05 18:12:22Z [    2.583644][    T1] .... node  #13, CPUs:   #1740 #1741 #1742 #1743 #1744 #1745 #1746 #1747 #1748 #1749 #1750 #1751 #1752 #1753 #1754 #1755 #1756 #1757 #1758 #1759 #1760 #1761 #1762 #1763 #1764 #1765 #1766 #1767 #1768 #1769 #1770 #1771 #1772 #1773 #1774 #1775 #1776 #1777 #1778 #1779 #1780 #1781 #1782 #1783 #1784 #1785 #1786 #1787 #1788 #1789 #1790 #1791 #1792 #1793 #1794 #1795 #1796 #1797 #1798 #1799
+2023-02-05 18:12:22Z [    2.627635][    T1] .... node  #14, CPUs:   #1800 #1801 #1802 #1803 #1804 #1805 #1806 #1807 #1808 #1809 #1810 #1811 #1812 #1813 #1814 #1815 #1816 #1817 #1818 #1819 #1820 #1821 #1822 #1823 #1824 #1825 #1826 #1827 #1828 #1829 #1830 #1831 #1832 #1833 #1834 #1835 #1836 #1837 #1838 #1839 #1840 #1841 #1842 #1843 #1844 #1845 #1846 #1847 #1848 #1849 #1850 #1851 #1852 #1853 #1854 #1855 #1856 #1857 #1858 #1859
+2023-02-05 18:12:22Z [    2.675650][    T1] .... node  #15, CPUs:   #1860 #1861 #1862 #1863 #1864 #1865 #1866 #1867 #1868 #1869 #1870 #1871 #1872 #1873 #1874 #1875 #1876 #1877 #1878 #1879 #1880 #1881 #1882 #1883 #1884 #1885 #1886 #1887 #1888 #1889 #1890 #1891 #1892 #1893 #1894 #1895 #1896 #1897 #1898 #1899 #1900 #1901 #1902 #1903 #1904 #1905 #1906 #1907 #1908 #1909 #1910 #1911 #1912 #1913 #1914 #1915 #1916 #1917 #1918 #1919
+2023-02-05 18:12:22Z [    0.000000][    T0] smpboot: CPU 60 Converting physical 0 to logical die 1
+2023-02-05 18:12:22Z [    0.000000][    T0] smpboot: CPU 120 Converting physical 0 to logical die 2
+2023-02-05 18:12:22Z [    0.000000][    T0] smpboot: CPU 180 Converting physical 0 to logical die 3
+2023-02-05 18:12:23Z [    0.000000][    T0] smpboot: CPU 240 Converting physical 0 to logical die 4
+2023-02-05 18:12:23Z [    0.000000][    T0] smpboot: CPU 300 Converting physical 0 to logical die 5
+2023-02-05 18:12:23Z [    0.000000][    T0] smpboot: CPU 360 Converting physical 0 to logical die 6
+2023-02-05 18:12:23Z [    0.000000][    T0] smpboot: CPU 420 Converting physical 0 to logical die 7
+2023-02-05 18:12:23Z [    0.000000][    T0] smpboot: CPU 480 Converting physical 0 to logical die 8
+2023-02-05 18:12:23Z [    0.000000][    T0] smpboot: CPU 540 Converting physical 0 to logical die 9
+2023-02-05 18:12:24Z [    0.000000][    T0] smpboot: CPU 600 Converting physical 0 to logical die 10
+2023-02-05 18:12:24Z [    0.000000][    T0] smpboot: CPU 660 Converting physical 0 to logical die 11
+2023-02-05 18:12:24Z [    0.000000][    T0] smpboot: CPU 720 Converting physical 0 to logical die 12
+2023-02-05 18:12:25Z [    0.000000][    T0] smpboot: CPU 780 Converting physical 0 to logical die 13
+2023-02-05 18:12:25Z [    0.000000][    T0] smpboot: CPU 840 Converting physical 0 to logical die 14
+2023-02-05 18:12:25Z [    0.000000][    T0] smpboot: CPU 900 Converting physical 0 to logical die 15
+2023-02-05 18:12:35Z [   15.213189][    T1] smp: Brought up 16 nodes, 1920 CPUs
+2023-02-05 18:12:35Z [   15.215637][    T1] smpboot: Max logical packages: 16
+2023-02-05 18:12:35Z [   15.219750][    T1] smpboot: Total of 1920 processors activated (7296000.00 BogoMIPS)
+--------------------------------------------------------------------------
 
-The project description mentions "there is already code to restore
-basic commands like mac and multiqueue", please include a link.
 
-> Shadow Virtqueue performance optimization
-> ===
-> Summary
-> ---
-> To perform a virtual machine live migration with an external device to
-> qemu, qemu needs a way to know which memory the device modifies so it
-> is able to resend it. Otherwise the guest would resume with invalid /
-> outdated memory in the destination.
->
-> This is especially hard with passthrough hardware devices, as
-> transports like PCI imposes a few security and performance challenges.
-> As a method to overcome this for virtio devices, qemu can offer an
-> emulated virtqueue to the device, called Shadow Virtqueue (SVQ),
-> instead of allowing the device to communicate directly with the guest.
-> SVQ will then forward the writes to the guest, being the effective
-> writer in the guest memory and knowing when a portion of it needs to
-> be resent.
->
-> As this is effectively breaking the passthrough and it adds extra
-> steps in the communication, this comes with a performance penalty in
-> some forms: Context switches, more memory reads and writes increasing
-> cache pressure, etc.
->
-> At this moment the SVQ code is not optimized. It cannot forward
-> buffers in parallel using multiqueue and multithread, and it does not
-> use posted interrupts to notify the device skipping the host kernel
-> context switch (doorbells).
->
-> The SVQ code requires minimal modifications for the multithreading,
-> and these are examples of multithreaded devices already like
-> virtio-blk which can be used as a template-alike. Regarding the posted
-> interrupts, DPDK is able to use them so that code can also be used as
-> a template.
->
-> Goals
-> ---
-> * Measure the latest SVQ performance compared to non-SVQ.
+Output without the patchset:
+--------------------------------------------------------------------------
+2023-02-03 11:06:49Z [    1.157637][    T1] smp: Bringing up secondary CPUs ...
+2023-02-03 11:06:49Z [    1.162807][    T1] x86: Booting SMP configuration:
+2023-02-03 11:06:51Z [    1.164299][    T1] .... node   #0, CPUs:            #1    #2    #3    #4    #5    #6    #7    #8    #9   #10   #11   #12   #13   #14   #15   #16   #17   #18   #19   #20   #21   #22   #23   #24   #25   #26   #27   #28   #29   #30   #31   #32   #33   #34   #35   #36   #37   #38   #39   #40   #41   #42   #43   #44   #45   #46   #47   #48   #49   #50   #51   #52   #53   #54   #55   #56   #57   #58   #59
+2023-02-03 11:06:51Z [    3.052299][    T1] .... node   #1, CPUs:     #60
+2023-02-03 11:06:51Z [    0.000000][    T0] smpboot: CPU 60 Converting physical 0 to logical die 1
+2023-02-03 11:06:53Z [    3.133499][    T1]    #61   #62   #63   #64   #65   #66   #67   #68   #69   #70   #71   #72   #73   #74   #75   #76   #77   #78   #79   #80   #81   #82   #83   #84   #85   #86   #87   #88   #89   #90   #91   #92   #93   #94   #95   #96   #97   #98   #99  #100  #101  #102  #103  #104  #105  #106  #107  #108  #109  #110  #111  #112  #113  #114  #115  #116  #117  #118  #119
+2023-02-03 11:06:53Z [    4.984298][    T1] .... node   #2, CPUs:    #120
+2023-02-03 11:06:53Z [    0.000000][    T0] smpboot: CPU 120 Converting physical 0 to logical die 2
+2023-02-03 11:06:55Z [    5.065813][    T1]   #121  #122  #123  #124  #125  #126  #127  #128  #129  #130  #131  #132  #133  #134  #135  #136  #137  #138  #139  #140  #141  #142  #143  #144  #145  #146  #147  #148  #149  #150  #151  #152  #153  #154  #155  #156  #157  #158  #159  #160  #161  #162  #163  #164  #165  #166  #167  #168  #169  #170  #171  #172  #173  #174  #175  #176  #177  #178  #179
+2023-02-03 11:06:55Z [    6.920298][    T1] .... node   #3, CPUs:    #180
+2023-02-03 11:06:55Z [    0.000000][    T0] smpboot: CPU 180 Converting physical 0 to logical die 3
+2023-02-03 11:06:57Z [    7.002019][    T1]   #181  #182  #183  #184  #185  #186  #187  #188  #189  #190  #191  #192  #193  #194  #195  #196  #197  #198  #199  #200  #201  #202  #203  #204  #205  #206  #207  #208  #209  #210  #211  #212  #213  #214  #215  #216  #217  #218  #219  #220  #221  #222  #223  #224  #225  #226  #227  #228  #229  #230  #231  #232  #233  #234  #235  #236  #237  #238  #239
+2023-02-03 11:06:57Z [    8.880299][    T1] .... node   #4, CPUs:    #240
+2023-02-03 11:06:57Z [    0.000000][    T0] smpboot: CPU 240 Converting physical 0 to logical die 4
+2023-02-03 11:06:59Z [    8.991204][    T1]   #241  #242  #243  #244  #245  #246  #247  #248  #249  #250  #251  #252  #253  #254  #255  #256  #257  #258  #259  #260  #261  #262  #263  #264  #265  #266  #267  #268  #269  #270  #271  #272  #273  #274  #275  #276  #277  #278  #279  #280  #281  #282  #283  #284  #285  #286  #287  #288  #289  #290  #291  #292  #293  #294  #295  #296  #297  #298  #299
+2023-02-03 11:06:59Z [   10.944299][    T1] .... node   #5, CPUs:    #300
+2023-02-03 11:06:59Z [    0.000000][    T0] smpboot: CPU 300 Converting physical 0 to logical die 5
+2023-02-03 11:07:01Z [   11.027023][    T1]   #301  #302  #303  #304  #305  #306  #307  #308  #309  #310  #311  #312  #313  #314  #315  #316  #317  #318  #319  #320  #321  #322  #323  #324  #325  #326  #327  #328  #329  #330  #331  #332  #333  #334  #335  #336  #337  #338  #339  #340  #341  #342  #343  #344  #345  #346  #347  #348  #349  #350  #351  #352  #353  #354  #355  #356  #357  #358  #359
+2023-02-03 11:07:01Z [   12.964299][    T1] .... node   #6, CPUs:    #360
+2023-02-03 11:07:01Z [    0.000000][    T0] smpboot: CPU 360 Converting physical 0 to logical die 6
+2023-02-03 11:07:03Z [   13.047169][    T1]   #361  #362  #363  #364  #365  #366  #367  #368  #369  #370  #371  #372  #373  #374  #375  #376  #377  #378  #379  #380  #381  #382  #383  #384  #385  #386  #387  #388  #389  #390  #391  #392  #393  #394  #395  #396  #397  #398  #399  #400  #401  #402  #403  #404  #405  #406  #407  #408  #409  #410  #411  #412  #413  #414  #415  #416  #417  #418  #419
+2023-02-03 11:07:03Z [   14.996299][    T1] .... node   #7, CPUs:    #420
+2023-02-03 11:07:03Z [    0.000000][    T0] smpboot: CPU 420 Converting physical 0 to logical die 7
+2023-02-03 11:07:05Z [   15.079323][    T1]   #421  #422  #423  #424  #425  #426  #427  #428  #429  #430  #431  #432  #433  #434  #435  #436  #437  #438  #439  #440  #441  #442  #443  #444  #445  #446  #447  #448  #449  #450  #451  #452  #453  #454  #455  #456  #457  #458  #459  #460  #461  #462  #463  #464  #465  #466  #467  #468  #469  #470  #471  #472  #473  #474  #475  #476  #477  #478  #479
+2023-02-03 11:07:06Z [   17.048299][    T1] .... node   #8, CPUs:    #480
+2023-02-03 11:07:06Z [    0.000000][    T0] smpboot: CPU 480 Converting physical 0 to logical die 8
+2023-02-03 11:07:08Z [   17.161077][    T1]   #481  #482  #483  #484  #485  #486  #487  #488  #489  #490  #491  #492  #493  #494  #495  #496  #497  #498  #499  #500  #501  #502  #503  #504  #505  #506  #507  #508  #509  #510  #511  #512  #513  #514  #515  #516  #517  #518  #519  #520  #521  #522  #523  #524  #525  #526  #527  #528  #529  #530  #531  #532  #533  #534  #535  #536  #537  #538  #539
+2023-02-03 11:07:08Z [   19.196298][    T1] .... node   #9, CPUs:    #540
+2023-02-03 11:07:08Z [    0.000000][    T0] smpboot: CPU 540 Converting physical 0 to logical die 9
+2023-02-03 11:07:10Z [   19.281098][    T1]   #541  #542  #543  #544  #545  #546  #547  #548  #549  #550  #551  #552  #553  #554  #555  #556  #557  #558  #559  #560  #561  #562  #563  #564  #565  #566  #567  #568  #569  #570  #571  #572  #573  #574  #575  #576  #577  #578  #579  #580  #581  #582  #583  #584  #585  #586  #587  #588  #589  #590  #591  #592  #593  #594  #595  #596  #597  #598  #599
+2023-02-03 11:07:10Z [   21.324298][    T1] .... node  #10, CPUs:    #600
+2023-02-03 11:07:10Z [    0.000000][    T0] smpboot: CPU 600 Converting physical 0 to logical die 10
+2023-02-03 11:07:12Z [   21.409074][    T1]   #601  #602  #603  #604  #605  #606  #607  #608  #609  #610  #611  #612  #613  #614  #615  #616  #617  #618  #619  #620  #621  #622  #623  #624  #625  #626  #627  #628  #629  #630  #631  #632  #633  #634  #635  #636  #637  #638  #639  #640  #641  #642  #643  #644  #645  #646  #647  #648  #649  #650  #651  #652  #653  #654  #655  #656  #657  #658  #659
+2023-02-03 11:07:12Z [   23.468298][    T1] .... node  #11, CPUs:    #660
+2023-02-03 11:07:12Z [    0.000000][    T0] smpboot: CPU 660 Converting physical 0 to logical die 11
+2023-02-03 11:07:14Z [   23.553115][    T1]   #661  #662  #663  #664  #665  #666  #667  #668  #669  #670  #671  #672  #673  #674  #675  #676  #677  #678  #679  #680  #681  #682  #683  #684  #685  #686  #687  #688  #689  #690  #691  #692  #693  #694  #695  #696  #697  #698  #699  #700  #701  #702  #703  #704  #705  #706  #707  #708  #709  #710  #711  #712  #713  #714  #715  #716  #717  #718  #719
+2023-02-03 11:07:14Z [   25.624298][    T1] .... node  #12, CPUs:    #720
+2023-02-03 11:07:14Z [    0.000000][    T0] smpboot: CPU 720 Converting physical 0 to logical die 12
+2023-02-03 11:07:17Z [   25.741550][    T1]   #721  #722  #723  #724  #725  #726  #727  #728  #729  #730  #731  #732  #733  #734  #735  #736  #737  #738  #739  #740  #741  #742  #743  #744  #745  #746  #747  #748  #749  #750  #751  #752  #753  #754  #755  #756  #757  #758  #759  #760  #761  #762  #763  #764  #765  #766  #767  #768  #769  #770  #771  #772  #773  #774  #775  #776  #777  #778  #779
+2023-02-03 11:07:17Z [   27.876299][    T1] .... node  #13, CPUs:    #780
+2023-02-03 11:07:17Z [    0.000000][    T0] smpboot: CPU 780 Converting physical 0 to logical die 13
+2023-02-03 11:07:19Z [   27.962255][    T1]   #781  #782  #783  #784  #785  #786  #787  #788  #789  #790  #791  #792  #793  #794  #795  #796  #797  #798  #799  #800  #801  #802  #803  #804  #805  #806  #807  #808  #809  #810  #811  #812  #813  #814  #815  #816  #817  #818  #819  #820  #821  #822  #823  #824  #825  #826  #827  #828  #829  #830  #831  #832  #833  #834  #835  #836  #837  #838  #839
+2023-02-03 11:07:19Z [   30.096299][    T1] .... node  #14, CPUs:    #840
+2023-02-03 11:07:19Z [    0.000000][    T0] smpboot: CPU 840 Converting physical 0 to logical die 14
+2023-02-03 11:07:21Z [   30.182443][    T1]   #841  #842  #843  #844  #845  #846  #847  #848  #849  #850  #851  #852  #853  #854  #855  #856  #857  #858  #859  #860  #861  #862  #863  #864  #865  #866  #867  #868  #869  #870  #871  #872  #873  #874  #875  #876  #877  #878  #879  #880  #881  #882  #883  #884  #885  #886  #887  #888  #889  #890  #891  #892  #893  #894  #895  #896  #897  #898  #899
+2023-02-03 11:07:21Z [   32.332299][    T1] .... node  #15, CPUs:    #900
+2023-02-03 11:07:21Z [    0.000000][    T0] smpboot: CPU 900 Converting physical 0 to logical die 15
+2023-02-03 11:07:23Z [   32.420700][    T1]   #901  #902  #903  #904  #905  #906  #907  #908  #909  #910  #911  #912  #913  #914  #915  #916  #917  #918  #919  #920  #921  #922  #923  #924  #925  #926  #927  #928  #929  #930  #931  #932  #933  #934  #935  #936  #937  #938  #939  #940  #941  #942  #943  #944  #945  #946  #947  #948  #949  #950  #951  #952  #953  #954  #955  #956  #957  #958  #959
+2023-02-03 11:07:26Z [   34.584298][    T1] .... node   #0, CPUs:    #960  #961  #962  #963  #964  #965  #966  #967  #968  #969  #970  #971  #972  #973  #974  #975  #976  #977  #978  #979  #980  #981  #982  #983  #984  #985  #986  #987  #988  #989  #990  #991  #992  #993  #994  #995  #996  #997  #998  #999 #1000 #1001 #1002 #1003 #1004 #1005 #1006 #1007 #1008 #1009 #1010 #1011 #1012 #1013 #1014 #1015 #1016 #1017 #1018 #1019
+2023-02-03 11:07:28Z [   36.792301][    T1] .... node   #1, CPUs:   #1020 #1021 #1022 #1023 #1024 #1025 #1026 #1027 #1028 #1029 #1030 #1031 #1032 #1033 #1034 #1035 #1036 #1037 #1038 #1039 #1040 #1041 #1042 #1043 #1044 #1045 #1046 #1047 #1048 #1049 #1050 #1051 #1052 #1053 #1054 #1055 #1056 #1057 #1058 #1059 #1060 #1061 #1062 #1063 #1064 #1065 #1066 #1067 #1068 #1069 #1070 #1071 #1072 #1073 #1074 #1075 #1076 #1077 #1078 #1079
+2023-02-03 11:07:30Z [   38.980298][    T1] .... node   #2, CPUs:   #1080 #1081 #1082 #1083 #1084 #1085 #1086 #1087 #1088 #1089 #1090 #1091 #1092 #1093 #1094 #1095 #1096 #1097 #1098 #1099 #1100 #1101 #1102 #1103 #1104 #1105 #1106 #1107 #1108 #1109 #1110 #1111 #1112 #1113 #1114 #1115 #1116 #1117 #1118 #1119 #1120 #1121 #1122 #1123 #1124 #1125 #1126 #1127 #1128 #1129 #1130 #1131 #1132 #1133 #1134 #1135 #1136 #1137 #1138 #1139
+2023-02-03 11:07:32Z [   41.180298][    T1] .... node   #3, CPUs:   #1140 #1141 #1142 #1143 #1144 #1145 #1146 #1147 #1148 #1149 #1150 #1151 #1152 #1153 #1154 #1155 #1156 #1157 #1158 #1159 #1160 #1161 #1162 #1163 #1164 #1165 #1166 #1167 #1168 #1169 #1170 #1171 #1172 #1173 #1174 #1175 #1176 #1177 #1178 #1179 #1180 #1181 #1182 #1183 #1184 #1185 #1186 #1187 #1188 #1189 #1190 #1191 #1192 #1193 #1194 #1195 #1196 #1197 #1198 #1199
+2023-02-03 11:07:35Z [   43.408300][    T1] .... node   #4, CPUs:   #1200 #1201 #1202 #1203 #1204 #1205 #1206 #1207 #1208 #1209 #1210 #1211 #1212 #1213 #1214 #1215 #1216 #1217 #1218 #1219 #1220 #1221 #1222 #1223 #1224 #1225 #1226 #1227 #1228 #1229 #1230 #1231 #1232 #1233 #1234 #1235 #1236 #1237 #1238 #1239 #1240 #1241 #1242 #1243 #1244 #1245 #1246 #1247 #1248 #1249 #1250 #1251 #1252 #1253 #1254 #1255 #1256 #1257 #1258 #1259
+2023-02-03 11:07:37Z [   45.744298][    T1] .... node   #5, CPUs:   #1260 #1261 #1262 #1263 #1264 #1265 #1266 #1267 #1268 #1269 #1270 #1271 #1272 #1273 #1274 #1275 #1276 #1277 #1278 #1279 #1280 #1281 #1282 #1283 #1284 #1285 #1286 #1287 #1288 #1289 #1290 #1291 #1292 #1293 #1294 #1295 #1296 #1297 #1298 #1299 #1300 #1301 #1302 #1303 #1304 #1305 #1306 #1307 #1308 #1309 #1310 #1311 #1312 #1313 #1314 #1315 #1316 #1317 #1318 #1319
+2023-02-03 11:07:39Z [   48.056299][    T1] .... node   #6, CPUs:   #1320 #1321 #1322 #1323 #1324 #1325 #1326 #1327 #1328 #1329 #1330 #1331 #1332 #1333 #1334 #1335 #1336 #1337 #1338 #1339 #1340 #1341 #1342 #1343 #1344 #1345 #1346 #1347 #1348 #1349 #1350 #1351 #1352 #1353 #1354 #1355 #1356 #1357 #1358 #1359 #1360 #1361 #1362 #1363 #1364 #1365 #1366 #1367 #1368 #1369 #1370 #1371 #1372 #1373 #1374 #1375 #1376 #1377 #1378 #1379
+2023-02-03 11:07:42Z [   50.380298][    T1] .... node   #7, CPUs:   #1380 #1381 #1382 #1383 #1384 #1385 #1386 #1387 #1388 #1389 #1390 #1391 #1392 #1393 #1394 #1395 #1396 #1397 #1398 #1399 #1400 #1401 #1402 #1403 #1404 #1405 #1406 #1407 #1408 #1409 #1410 #1411 #1412 #1413 #1414 #1415 #1416 #1417 #1418 #1419 #1420 #1421 #1422 #1423 #1424 #1425 #1426 #1427 #1428 #1429 #1430 #1431 #1432 #1433 #1434 #1435 #1436 #1437 #1438 #1439
+2023-02-03 11:07:44Z [   52.736298][    T1] .... node   #8, CPUs:   #1440 #1441 #1442 #1443 #1444 #1445 #1446 #1447 #1448 #1449 #1450 #1451 #1452 #1453 #1454 #1455 #1456 #1457 #1458 #1459 #1460 #1461 #1462 #1463 #1464 #1465 #1466 #1467 #1468 #1469 #1470 #1471 #1472 #1473 #1474 #1475 #1476 #1477 #1478 #1479 #1480 #1481 #1482 #1483 #1484 #1485 #1486 #1487 #1488 #1489 #1490 #1491 #1492 #1493 #1494 #1495 #1496 #1497 #1498 #1499
+2023-02-03 11:07:47Z [   55.164301][    T1] .... node   #9, CPUs:   #1500 #1501 #1502 #1503 #1504 #1505 #1506 #1507 #1508 #1509 #1510 #1511 #1512 #1513 #1514 #1515 #1516 #1517 #1518 #1519 #1520 #1521 #1522 #1523 #1524 #1525 #1526 #1527 #1528 #1529 #1530 #1531 #1532 #1533 #1534 #1535 #1536 #1537 #1538 #1539 #1540 #1541 #1542 #1543 #1544 #1545 #1546 #1547 #1548 #1549 #1550 #1551 #1552 #1553 #1554 #1555 #1556 #1557 #1558 #1559
+2023-02-03 11:07:49Z [   57.592298][    T1] .... node  #10, CPUs:   #1560 #1561 #1562 #1563 #1564 #1565 #1566 #1567 #1568 #1569 #1570 #1571 #1572 #1573 #1574 #1575 #1576 #1577 #1578 #1579 #1580 #1581 #1582 #1583 #1584 #1585 #1586 #1587 #1588 #1589 #1590 #1591 #1592 #1593 #1594 #1595 #1596 #1597 #1598 #1599 #1600 #1601 #1602 #1603 #1604 #1605 #1606 #1607 #1608 #1609 #1610 #1611 #1612 #1613 #1614 #1615 #1616 #1617 #1618 #1619
+2023-02-03 11:07:52Z [   60.032299][    T1] .... node  #11, CPUs:   #1620 #1621 #1622 #1623 #1624 #1625 #1626 #1627 #1628 #1629 #1630 #1631 #1632 #1633 #1634 #1635 #1636 #1637 #1638 #1639 #1640 #1641 #1642 #1643 #1644 #1645 #1646 #1647 #1648 #1649 #1650 #1651 #1652 #1653 #1654 #1655 #1656 #1657 #1658 #1659 #1660 #1661 #1662 #1663 #1664 #1665 #1666 #1667 #1668 #1669 #1670 #1671 #1672 #1673 #1674 #1675 #1676 #1677 #1678 #1679
+2023-02-03 11:07:54Z [   62.484298][    T1] .... node  #12, CPUs:   #1680 #1681 #1682 #1683 #1684 #1685 #1686 #1687 #1688 #1689 #1690 #1691 #1692 #1693 #1694 #1695 #1696 #1697 #1698 #1699 #1700 #1701 #1702 #1703 #1704 #1705 #1706 #1707 #1708 #1709 #1710 #1711 #1712 #1713 #1714 #1715 #1716 #1717 #1718 #1719 #1720 #1721 #1722 #1723 #1724 #1725 #1726 #1727 #1728 #1729 #1730 #1731 #1732 #1733 #1734 #1735 #1736 #1737 #1738 #1739
+2023-02-03 11:07:57Z [   65.024298][    T1] .... node  #13, CPUs:   #1740 #1741 #1742 #1743 #1744 #1745 #1746 #1747 #1748 #1749 #1750 #1751 #1752 #1753 #1754 #1755 #1756 #1757 #1758 #1759 #1760 #1761 #1762 #1763 #1764 #1765 #1766 #1767 #1768 #1769 #1770 #1771 #1772 #1773 #1774 #1775 #1776 #1777 #1778 #1779 #1780 #1781 #1782 #1783 #1784 #1785 #1786 #1787 #1788 #1789 #1790 #1791 #1792 #1793 #1794 #1795 #1796 #1797 #1798 #1799
+2023-02-03 11:07:59Z [   67.544299][    T1] .... node  #14, CPUs:   #1800 #1801 #1802 #1803 #1804 #1805 #1806 #1807 #1808 #1809 #1810 #1811 #1812 #1813 #1814 #1815 #1816 #1817 #1818 #1819 #1820 #1821 #1822 #1823 #1824 #1825 #1826 #1827 #1828 #1829 #1830 #1831 #1832 #1833 #1834 #1835 #1836 #1837 #1838 #1839 #1840 #1841 #1842 #1843 #1844 #1845 #1846 #1847 #1848 #1849 #1850 #1851 #1852 #1853 #1854 #1855 #1856 #1857 #1858 #1859
+2023-02-03 11:08:02Z [   70.084299][    T1] .... node  #15, CPUs:   #1860 #1861 #1862 #1863 #1864 #1865 #1866 #1867 #1868 #1869 #1870 #1871 #1872 #1873 #1874 #1875 #1876 #1877 #1878 #1879 #1880 #1881 #1882 #1883 #1884 #1885 #1886 #1887 #1888 #1889 #1890 #1891 #1892 #1893 #1894 #1895 #1896 #1897 #1898 #1899 #1900 #1901 #1902 #1903 #1904 #1905 #1906 #1907 #1908 #1909 #1910 #1911 #1912 #1913 #1914 #1915 #1916 #1917 #1918 #1919
+2023-02-03 11:08:02Z [   72.634158][    T1] smp: Brought up 16 nodes, 1920 CPUs
+2023-02-03 11:08:02Z [   72.640299][    T1] smpboot: Max logical packages: 16
+2023-02-03 11:08:02Z [   72.644444][    T1] smpboot: Total of 1920 processors activated (7275848.16 BogoMIPS)
+--------------------------------------------------------------------------
 
-Which benchmark workload and which benchmarking tool do you recommend?
-Someone unfamiliar with QEMU and SVQ needs more details in order to
-know what to do.
-
-> * Add multithreading to SVQ, extracting the code from the Big QEMU Lock (BQL).
-
-What do you have in mind? Allowing individual virtqueues to be
-assigned to IOThreads? Or processing all virtqueues in a single
-IOThread (like virtio-blk and virtio-scsi do today)?
-
-> * Add posted thread capabilities to QEMU, following the model of DPDK to it.
-
-What is this about? I thought KVM uses posted interrupts when
-available, so what needs to be done here? Please also include a link
-to the relevant DPDK code.
-
->
-> Thanks!
->
-> [1] https://wiki.qemu.org/Google_Summer_of_Code_2022#VIRTIO_F_IN_ORDER_support_for_virtio_devices
->
+Thanks.
+-- 
+Russ Anderson,  SuperDome Flex Linux Kernel Group Manager
+HPE - Hewlett Packard Enterprise (formerly SGI)  rja@hpe.com
