@@ -2,129 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 140D368BC1B
-	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 12:54:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0918B68BC29
+	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 12:58:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229940AbjBFLyw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Feb 2023 06:54:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34306 "EHLO
+        id S229973AbjBFL6G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Feb 2023 06:58:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230015AbjBFLyu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Feb 2023 06:54:50 -0500
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57B4113509
-        for <kvm@vger.kernel.org>; Mon,  6 Feb 2023 03:54:48 -0800 (PST)
-Received: by mail-wm1-x331.google.com with SMTP id m16-20020a05600c3b1000b003dc4050c94aso8551035wms.4
-        for <kvm@vger.kernel.org>; Mon, 06 Feb 2023 03:54:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=f32i0UtHmpYTxPyacuTVXQLMyNqvR3s0aoWUZXvnOLk=;
-        b=Q5WSa6Sjy/zZV9ruut5vijr1P+Y42JVVn0xvkzpI2EGUIxm1doohtqPcWLEFd4/yy6
-         r5c7TWMiRKl2jjF/H8ql65T5E1aipiVedwxtHEYPmFrCyzmK+Sq19W4W3JXpxMRGjdM4
-         7cMGpmrKyk6gwQmN02oqWeWKBoKeARUpjKYoFjhL7NF+6Nq8O+/3Kex2S4x1K7rPI4Mc
-         s+9IaNsGunC0z8UC3IVBANq5yi5t1qB9ohH/c1cl1YckxrOIEbn6Pq/ia1DUtHyy3uK6
-         pQX98u1P6o1OzK2DNVRxzqHdTZOAN9m1g6583Gq74tP31tpt64iYlV3eZNJBeHbZs+gy
-         pWfg==
+        with ESMTP id S229841AbjBFL6F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Feb 2023 06:58:05 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A048A9ED2
+        for <kvm@vger.kernel.org>; Mon,  6 Feb 2023 03:57:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675684642;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=uS4CtaqrUMD/f6x0WCVMDIkGkH5LrLtOJTV7xMEM8Mw=;
+        b=aCXA+1SlM01nApaco/xD/u3LPUuDQ8BbKp3dGvdZDoeW6W9RRMmsJ+WD+RlMwl15RI5i6w
+        ejkP6qTRYMq5YJ4MxyS+8zhwUKpUuUS7NULJf14d2Rir8oZTqO2DlKk5yKockAERfy8DA7
+        P7tkulbIVbTFOjhCEYx+9Fq8JZuD1p4=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-54-KO8KPzSHMhu0BlIw8a3-gw-1; Mon, 06 Feb 2023 06:57:21 -0500
+X-MC-Unique: KO8KPzSHMhu0BlIw8a3-gw-1
+Received: by mail-qt1-f199.google.com with SMTP id f2-20020ac80682000000b003b6364059d2so6267362qth.9
+        for <kvm@vger.kernel.org>; Mon, 06 Feb 2023 03:57:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f32i0UtHmpYTxPyacuTVXQLMyNqvR3s0aoWUZXvnOLk=;
-        b=ei0rWuZPZYouX4hcGSFmxc457Zzr9IwfVW+TXr6qybMlzFcMC1j5W/HoNis32AD8Ij
-         8ICbfBT8FEGm3FWN0NbVu18L4syF59AKwtdmzCx+qJnkSUlRiN1A98uQSZE3GifCvk/K
-         TV0LGITglqxxbYkTocLyaCOiGNit8G/bri/gYsEfCiFnuGIEryAK7i5X9cCKzr9+gqP9
-         hgLxvkw/GBeAIKKhcq6KJ9fS1Ttx4hxs8ush2Ut0mdHanm1KP3mz5yk5I8PmzKFxt7xS
-         EuMzrCVTI47wTkgG1GeuH6x2kdAtqRnClCOIWcLA2uD8BIDfqUthQbsd77OTZPKrYije
-         vvLg==
-X-Gm-Message-State: AO0yUKUfsS1LAh1OkR+fQF7scMoLrINV6+HTQU3Wy4VlFgI61egUYJBk
-        xpjWItW4I/ocEsaf0oERNXdQoQ==
-X-Google-Smtp-Source: AK7set8q5TEDigFlaoXKvGEyXmW7/pfWOHSWGReOGdbnXfUkXZCqKPhMWAalL3vq95IQNXfwjr3xIA==
-X-Received: by 2002:a05:600c:1c96:b0:3df:9858:c032 with SMTP id k22-20020a05600c1c9600b003df9858c032mr10856043wms.7.1675684486906;
-        Mon, 06 Feb 2023 03:54:46 -0800 (PST)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id bg21-20020a05600c3c9500b003db06493ee7sm17491455wmb.47.2023.02.06.03.54.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Feb 2023 03:54:46 -0800 (PST)
-Date:   Mon, 6 Feb 2023 12:54:45 +0100
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Atish Patra <atishp@rivosinc.com>
-Cc:     linux-kernel@vger.kernel.org, Albert Ou <aou@eecs.berkeley.edu>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Guo Ren <guoren@kernel.org>, Heiko Stuebner <heiko@sntech.de>,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        linux-riscv@lists.infradead.org,
-        Mark Rutland <mark.rutland@arm.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v5 11/14] RISC-V: KVM: Implement trap & emulate for
- hpmcounters
-Message-ID: <20230206115445.4deembtvetojslee@orel>
-References: <20230205011515.1284674-1-atishp@rivosinc.com>
- <20230205011515.1284674-12-atishp@rivosinc.com>
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uS4CtaqrUMD/f6x0WCVMDIkGkH5LrLtOJTV7xMEM8Mw=;
+        b=ELJxoAuHymWAtMW3zXWVPkVZWrLLGTcya9V56uqc3VjB2zZ9hs3aWXQzeOb3IO+gFZ
+         n6Y40gwV+MZmk/tOBGyV9K776NFqQHC2lWM4u/L3tDHUKhdGBB9k77rYL8SXdm44iRUB
+         7JKgCoz/VnpoPPaJKZWeFFUWfaHDq8AxzHuA2d1aw50YnbTWlsGSQOc40OgS7N7+Q5Iy
+         2T8HjVC1AMwFTZgKquXMmcJSQkNomSvdyi8ZPO390LRyyIUNn+LuL4bPvM4JuFawy6W0
+         QBJRrb7rl/GPZQ+Nqd+5xF/B09Oqaqyg7BEu08hwwfqS5g+UDcUgUFEqPmYbACHw+Buq
+         W0pQ==
+X-Gm-Message-State: AO0yUKXo8OWPYCzkI4HZ24Hk+LeRmrlI5o28oYx1x8oBeLODYwyZDttd
+        +0X+TmmVgYhL/wzSBMXHZIrDkb3V5meHGmIgU65j89gmuHfDn7vorh1My2K1lgcGKuk6PbPZw/Y
+        bBI5X6pog8Ast
+X-Received: by 2002:ac8:73d9:0:b0:3b9:bc8c:c20b with SMTP id v25-20020ac873d9000000b003b9bc8cc20bmr16176792qtp.22.1675684641053;
+        Mon, 06 Feb 2023 03:57:21 -0800 (PST)
+X-Google-Smtp-Source: AK7set/Vdvgis8O0hl0sM5kvVlwPCy3C6j4RuwO89/z5o31Vk/ib9lywMQfxvIWNgX+uhayn0cNynA==
+X-Received: by 2002:ac8:73d9:0:b0:3b9:bc8c:c20b with SMTP id v25-20020ac873d9000000b003b9bc8cc20bmr16176779qtp.22.1675684640812;
+        Mon, 06 Feb 2023 03:57:20 -0800 (PST)
+Received: from [192.168.0.2] (ip-109-43-177-71.web.vodafone.de. [109.43.177.71])
+        by smtp.gmail.com with ESMTPSA id s20-20020a05620a16b400b0071f40a59fe5sm7205403qkj.127.2023.02.06.03.57.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 06 Feb 2023 03:57:20 -0800 (PST)
+Message-ID: <b74543e8-5646-49da-2fab-8c5c69169d97@redhat.com>
+Date:   Mon, 6 Feb 2023 12:57:16 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230205011515.1284674-12-atishp@rivosinc.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [PATCH v15 07/11] target/s390x/cpu topology: activating CPU
+ topology
+Content-Language: en-US
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
+        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
+        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
+        nsg@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
+        clg@kaod.org
+References: <20230201132051.126868-1-pmorel@linux.ibm.com>
+ <20230201132051.126868-8-pmorel@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20230201132051.126868-8-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Feb 04, 2023 at 05:15:12PM -0800, Atish Patra wrote:
-> As the KVM guests only see the virtual PMU counters, all hpmcounter
-> access should trap and KVM emulates the read access on behalf of guests.
+On 01/02/2023 14.20, Pierre Morel wrote:
+> The KVM capability KVM_CAP_S390_CPU_TOPOLOGY is used to
+> activate the S390_FEAT_CONFIGURATION_TOPOLOGY feature and
+> the topology facility in the host CPU model for the guest
+> in the case the topology is available in QEMU and in KVM.
 > 
-> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> The feature is disabled by default and fenced for SE
+> (secure execution).
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 > ---
->  arch/riscv/include/asm/kvm_vcpu_pmu.h | 16 ++++++++
->  arch/riscv/kvm/vcpu_insn.c            |  4 +-
->  arch/riscv/kvm/vcpu_pmu.c             | 59 ++++++++++++++++++++++++++-
->  3 files changed, 77 insertions(+), 2 deletions(-)
+>   hw/s390x/cpu-topology.c   |  2 +-
+>   target/s390x/cpu_models.c |  1 +
+>   target/s390x/kvm/kvm.c    | 12 ++++++++++++
+>   3 files changed, 14 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/riscv/include/asm/kvm_vcpu_pmu.h b/arch/riscv/include/asm/kvm_vcpu_pmu.h
-> index 40905db..344a3ad 100644
-> --- a/arch/riscv/include/asm/kvm_vcpu_pmu.h
-> +++ b/arch/riscv/include/asm/kvm_vcpu_pmu.h
-> @@ -48,6 +48,19 @@ struct kvm_pmu {
->  #define vcpu_to_pmu(vcpu) (&(vcpu)->arch.pmu_context)
->  #define pmu_to_vcpu(pmu)  (container_of((pmu), struct kvm_vcpu, arch.pmu_context))
->  
-> +#if defined(CONFIG_32BIT)
-> +#define KVM_RISCV_VCPU_HPMCOUNTER_CSR_FUNCS \
-> +{.base = CSR_CYCLEH,     .count = 31, .func = kvm_riscv_vcpu_pmu_read_hpm }, \
-> +{.base = CSR_CYCLE,      .count = 31, .func = kvm_riscv_vcpu_pmu_read_hpm },
-                      ^ should be tabs?
+> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+> index 1028bf4476..c33378577b 100644
+> --- a/hw/s390x/cpu-topology.c
+> +++ b/hw/s390x/cpu-topology.c
+> @@ -55,7 +55,7 @@ int s390_socket_nb(S390CPU *cpu)
+>    */
+>   bool s390_has_topology(void)
+>   {
+> -    return false;
+> +    return s390_has_feat(S390_FEAT_CONFIGURATION_TOPOLOGY);
+>   }
+>   
+>   /**
+> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+> index 065ec6d66c..aca2c5c96b 100644
+> --- a/target/s390x/cpu_models.c
+> +++ b/target/s390x/cpu_models.c
+> @@ -254,6 +254,7 @@ bool s390_has_feat(S390Feat feat)
+>           case S390_FEAT_SIE_CMMA:
+>           case S390_FEAT_SIE_PFMFI:
+>           case S390_FEAT_SIE_IBS:
+> +        case S390_FEAT_CONFIGURATION_TOPOLOGY:
+>               return false;
+>               break;
+>           default:
+> diff --git a/target/s390x/kvm/kvm.c b/target/s390x/kvm/kvm.c
+> index fb63be41b7..808e35a7bd 100644
+> --- a/target/s390x/kvm/kvm.c
+> +++ b/target/s390x/kvm/kvm.c
+> @@ -2470,6 +2470,18 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
+>           set_bit(S390_FEAT_UNPACK, model->features);
+>       }
+>   
+> +    /*
+> +     * If we have kernel support for CPU Topology indicate the
+> +     * configuration-topology facility.
+> +     */
+> +    if (kvm_check_extension(kvm_state, KVM_CAP_S390_CPU_TOPOLOGY)) {
+> +        if (kvm_vm_enable_cap(kvm_state, KVM_CAP_S390_CPU_TOPOLOGY, 0) < 0) {
+> +            error_setg(errp, "KVM: Error enabling KVM_CAP_S390_CPU_TOPOLOGY");
+> +            return;
+> +        }
+> +        set_bit(S390_FEAT_CONFIGURATION_TOPOLOGY, model->features);
+> +    }
 
-> +#else
-> +#define KVM_RISCV_VCPU_HPMCOUNTER_CSR_FUNCS \
-> +{.base = CSR_CYCLE,      .count = 31, .func = kvm_riscv_vcpu_pmu_read_hpm },
-                      ^ here too
-> +#endif
-> +
-> +int kvm_riscv_vcpu_pmu_read_hpm(struct kvm_vcpu *vcpu, unsigned int csr_num,
-> +				unsigned long *val, unsigned long new_val,
-> +				unsigned long wr_mask);
-> +
->  int kvm_riscv_vcpu_pmu_num_ctrs(struct kvm_vcpu *vcpu, struct kvm_vcpu_sbi_return *retdata);
->  int kvm_riscv_vcpu_pmu_ctr_info(struct kvm_vcpu *vcpu, unsigned long cidx,
->  				struct kvm_vcpu_sbi_return *retdata);
-> @@ -71,6 +84,9 @@ void kvm_riscv_vcpu_pmu_reset(struct kvm_vcpu *vcpu);
->  struct kvm_pmu {
->  };
->  
-> +#define KVM_RISCV_VCPU_HPMCOUNTER_CSR_FUNCS \
-> +{ .base = 0,      .count = 0, .func = NULL },
-               ^ and here and aligned with the ones above?
+Not sure, but for the other capabilities, the kvm_vm_enable_cap() is rather 
+done in kvm_arch_init() instead ... likely that it is properly available in 
+case you don't run with the "host" cpu model? So should the 
+kvm_vm_enable_cap(KVM_CAP_S390_CPU_TOPOLOGY) also be moved there (but of 
+course keep the set_bit() here in kvm_s390_get_host_cpu_model())?
 
-Thanks,
-drew
+  Thomas
+
