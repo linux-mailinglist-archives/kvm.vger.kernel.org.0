@@ -2,142 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 447C068B21F
-	for <lists+kvm@lfdr.de>; Sun,  5 Feb 2023 23:14:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D734668B406
+	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 02:59:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229634AbjBEWOP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 5 Feb 2023 17:14:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45720 "EHLO
+        id S229561AbjBFByM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 5 Feb 2023 20:54:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229484AbjBEWOO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 5 Feb 2023 17:14:14 -0500
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 069C51A97F
-        for <kvm@vger.kernel.org>; Sun,  5 Feb 2023 14:13:45 -0800 (PST)
-Received: by mail-wm1-x333.google.com with SMTP id f47-20020a05600c492f00b003dc584a7b7eso9546507wmp.3
-        for <kvm@vger.kernel.org>; Sun, 05 Feb 2023 14:13:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZLcR+Tb9prra+Se7ZuzrntYvfyrN/MR5XtNW3aD8zyw=;
-        b=4ft5GDnoVp+w6TaJwMkAsxpPQJs54iYqt69woNnt+VDD6uj8d0NY+XX0PxfeUJQ2KV
-         7GJTDuhhJfsYVyfKsETcCx/vXW3tp6mxf/i81QsgCIMldUuaOT+2jHcxaZnkm+H0UICy
-         Jp874j9n9em2PZP3lV3FCGSdX/u5D2J6BWDXZXvl9JWnE7uSAB/3QHHZdwwOWNt+wPfm
-         ar8XIxg2efnKf3+df0/IKqeg4K4mug9NCokBGuv52N1fi4U8klnx1sCxtP7nqELJydso
-         stUMGSuFF9ESdJFN1cT+WmzpNl9RuKzBPsohEa+iqtQOkA9UrKeh8QE2nxOxwKIEsFzV
-         efpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZLcR+Tb9prra+Se7ZuzrntYvfyrN/MR5XtNW3aD8zyw=;
-        b=nsW+Vb6SIM2cQV2oejI2PwIU046zEclaBcd2/gZLiL8NTG6k+6D9sTS+mEqMfEgYZe
-         K493Y3pGWWg4yDICJgMMgRiKu61ZLx/ksn7kp8MbA1xmdLz7k0vUL77Fj44REoNZBPGz
-         EIzfi1o8NEbQ+gUTMIroKj9faf/v7301/n0JfWST8dnIrmNeGdgrZjinqlqbZaum4tHD
-         IuG4/d7dY1MCa1UcBv4oEG96I7KLMsVeoeZiCi5WjzgGq+aGxPzMlaa0pvg08J9/2g00
-         +WANuGlw7TRMsCjCOTgi6T1/Kn3LtZONcLPxOW6zu6fKA6EQBl72kRUnXvwYlNTPBfUC
-         aS6A==
-X-Gm-Message-State: AO0yUKWql3N0bck9/rKoSHAMgfoCU/N0FzTIa90D7TiSBnx8VRAhSsG+
-        k1Lk61QczWE1Pm7MTr1iGWmafA==
-X-Google-Smtp-Source: AK7set9AzQNdF1lQ6lMPa+waBDd2VLHlnzjxaAqKEWNBXxg7rJbBtilA7tgGYY9tgS0YLeyWNvnDCg==
-X-Received: by 2002:a05:600c:c06:b0:3dc:5a7c:f8ad with SMTP id fm6-20020a05600c0c0600b003dc5a7cf8admr21135260wmb.21.1675635223505;
-        Sun, 05 Feb 2023 14:13:43 -0800 (PST)
-Received: from ?IPV6:2a02:6b6a:b566:0:56a5:4a1b:a896:763a? ([2a02:6b6a:b566:0:56a5:4a1b:a896:763a])
-        by smtp.gmail.com with ESMTPSA id u16-20020a05600c19d000b003dd1b00bd9asm9746157wmq.32.2023.02.05.14.13.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 05 Feb 2023 14:13:42 -0800 (PST)
-Message-ID: <434b4b74-54ab-68a3-4a81-9cc02ea75e39@bytedance.com>
-Date:   Sun, 5 Feb 2023 22:13:42 +0000
+        with ESMTP id S229452AbjBFByL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 5 Feb 2023 20:54:11 -0500
+X-Greylist: delayed 1809 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 05 Feb 2023 17:54:09 PST
+Received: from baidu.com (mx21.baidu.com [220.181.3.85])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DFDC1ABDD
+        for <kvm@vger.kernel.org>; Sun,  5 Feb 2023 17:54:09 -0800 (PST)
+From:   "Li,Rongqing" <lirongqing@baidu.com>
+To:     Sean Christopherson <seanjc@google.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>
+Subject: RE: [PATCH] KVM: x86: Enable PIT shutdown quirk
+Thread-Topic: [PATCH] KVM: x86: Enable PIT shutdown quirk
+Thread-Index: AQHZOBEKfsBAYAffHkmBEn97vOu1fK7BISpg
+Date:   Mon, 6 Feb 2023 01:23:20 +0000
+Message-ID: <2e4432dbe340436095d8cee8bfebe7c5@baidu.com>
+References: <1675395710-37220-1-git-send-email-lirongqing@baidu.com>
+ <Y91zXD++4pSHKo6c@google.com>
+In-Reply-To: <Y91zXD++4pSHKo6c@google.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.22.206.20]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [External] Re: [PATCH v6 07/11] x86/smpboot: Disable parallel
- boot for AMD CPUs
-Content-Language: en-US
-To:     David Woodhouse <dwmw2@infradead.org>,
-        Arjan van de Ven <arjan@linux.intel.com>,
-        Kim Phillips <kim.phillips@amd.com>, tglx@linutronix.de,
-        rja@hpe.com
-Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        hpa@zytor.com, x86@kernel.org, pbonzini@redhat.com,
-        paulmck@kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, rcu@vger.kernel.org, mimoja@mimoja.de,
-        hewenliang4@huawei.com, thomas.lendacky@amd.com, seanjc@google.com,
-        pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
-        punit.agrawal@bytedance.com, simon.evans@bytedance.com,
-        liangma@liangbit.com, Mario Limonciello <Mario.Limonciello@amd.com>
-References: <20230202215625.3248306-1-usama.arif@bytedance.com>
- <20230202215625.3248306-8-usama.arif@bytedance.com>
- <b3d9fbbf-e760-5d1d-9182-44c144abd1bf@amd.com>
- <d3ec562fd2e03c3aef9534f64915a14a8cb89ae1.camel@infradead.org>
- <5ba476f3-e0ac-d630-ce1d-18ab9885496f@linux.intel.com>
- <E2286684-F8AD-4708-9A3D-74C5EAE183B4@infradead.org>
-From:   Usama Arif <usama.arif@bytedance.com>
-In-Reply-To: <E2286684-F8AD-4708-9A3D-74C5EAE183B4@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-FEAS-Client-IP: 172.31.51.54
+X-FE-Last-Public-Client-IP: 100.100.100.38
+X-FE-Policy-ID: 15:10:21:SYSTEM
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 04/02/2023 22:31, David Woodhouse wrote:
-> 
-> 
-> On 4 February 2023 18:18:55 GMT, Arjan van de Ven <arjan@linux.intel.com> wrote:
->>>
->>> However...
->>>
->>> Even though we *can* support non-X2APIC processors, we *might* want to
->>> play it safe and not go back that far; only enabling parallel bringup
->>> on machines with X2APIC which roughly correlates with "lots of CPUs"
->>> since that's where the benefit is.
->>
->> I think that this is the right approach, at least on the initial patch series.
->> KISS principle; do all the easy-but-important cases first, get it stable and working
->> and in later series/kernels the range can be expanded.... if it matters.
-> 
-> Agreed. I'll split it to do it only with X2APIC for the initial series, and then hold the CPUID 0x1 part back for the next phase.
-
-This was an interesting find! I tested the latest branch 
-parallel-6.2-rc6 and it works well. The numbers from Russ makes the 
-patch series look so much better! :)
-
-If we do it with x2apic only and not support non-x2apic CPUID 0x1 case, 
-maybe we apply the following diff to part 1?
-
-diff --git a/arch/x86/kernel/smpboot.c b/arch/x86/kernel/smpboot.c
-index f53a060a899b..f6b89cf40076 100644
---- a/arch/x86/kernel/smpboot.c
-+++ b/arch/x86/kernel/smpboot.c
-@@ -1564,7 +1564,7 @@ void __init native_smp_prepare_cpus(unsigned int 
-max_cpus)
-          * sufficient). Otherwise it's too hard. And not for SEV-ES
-          * guests because they can't use CPUID that early.
-          */
--       if (IS_ENABLED(CONFIG_X86_32) || boot_cpu_data.cpuid_level < 1 ||
-+       if (IS_ENABLED(CONFIG_X86_32) || !x2apic_mode ||
-             (x2apic_mode && boot_cpu_data.cpuid_level < 0xb) ||
-             cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT))
-                 do_parallel_bringup = false;
-
-
-
-For reusing timer calibration, calibrate_delay ends up being used in 
-start_kernel, smp_callin, debug_calc_bogomips and check_cx686_slop. I 
-think reusing timer calibration would be ok in the first 2 uses? but not 
-really sure about the other 2. cx686 seems to be quite old so not sure 
-if anyone will have it to test or will ever run 6.2 kernel on it :).  I 
-guess if unsure, better to leave out initially and try and get part1 merged?
-
-Thanks,
-Usama
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogU2VhbiBDaHJpc3RvcGhl
+cnNvbiA8c2VhbmpjQGdvb2dsZS5jb20+DQo+IFNlbnQ6IFNhdHVyZGF5LCBGZWJydWFyeSA0LCAy
+MDIzIDQ6NTAgQU0NCj4gVG86IExpLFJvbmdxaW5nIDxsaXJvbmdxaW5nQGJhaWR1LmNvbT4NCj4g
+Q2M6IGt2bUB2Z2VyLmtlcm5lbC5vcmc7IHg4NkBrZXJuZWwub3JnDQo+IFN1YmplY3Q6IFJlOiBb
+UEFUQ0hdIEtWTTogeDg2OiBFbmFibGUgUElUIHNodXRkb3duIHF1aXJrDQo+IA0KPiBQbGVhc2Ug
+dXNlICJ4ODYva3ZtOiIgZm9yIGd1ZXN0IHNpZGUgY2hhbmdlcy4NCj4gDQo+IE9uIEZyaSwgRmVi
+IDAzLCAyMDIzLCBsaXJvbmdxaW5nQGJhaWR1LmNvbSB3cm90ZToNCj4gPiBGcm9tOiBMaSBSb25n
+UWluZyA8bGlyb25ncWluZ0BiYWlkdS5jb20+DQo+ID4NCj4gPiBLVk0gZW11bGF0aW9uIG9mIHRo
+ZSBQSVQgaGFzIGEgcXVpcmsgc3VjaCB0aGF0IHRoZSBub3JtYWwgUElUIHNodXRkb3duDQo+ID4g
+cGF0aCBkb2Vzbid0IHdvcmssIGJlY2F1c2UgY2xlYXJpbmcgdGhlIGNvdW50ZXIgcmVnaXN0ZXIg
+cmVzdGFydHMgdGhlDQo+ID4gdGltZXIuDQo+ID4NCj4gPiBEaXNhYmxlIHRoZSBjb3VudGVyIGNs
+ZWFyaW5nIG9uIFBJVCBzaHV0ZG93biBhcyBpbiBIeXBlci1WDQo+ID4NCj4gPiBTaWduZWQtb2Zm
+LWJ5OiBMaSBSb25nUWluZyA8bGlyb25ncWluZ0BiYWlkdS5jb20+DQo+ID4gLS0tDQo+ID4gIGFy
+Y2gveDg2L2tlcm5lbC9rdm0uYyB8IDQgKysrKw0KPiA+ICAxIGZpbGUgY2hhbmdlZCwgNCBpbnNl
+cnRpb25zKCspDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYva2VybmVsL2t2bS5jIGIv
+YXJjaC94ODYva2VybmVsL2t2bS5jIGluZGV4DQo+ID4gMWNjZWFjNS4uMTQ0MTFiNiAxMDA2NDQN
+Cj4gPiAtLS0gYS9hcmNoL3g4Ni9rZXJuZWwva3ZtLmMNCj4gPiArKysgYi9hcmNoL3g4Ni9rZXJu
+ZWwva3ZtLmMNCj4gPiBAQCAtNDMsNiArNDMsNyBAQA0KPiA+ICAjaW5jbHVkZSA8YXNtL3JlYm9v
+dC5oPg0KPiA+ICAjaW5jbHVkZSA8YXNtL3N2bS5oPg0KPiA+ICAjaW5jbHVkZSA8YXNtL2U4MjAv
+YXBpLmg+DQo+ID4gKyNpbmNsdWRlIDxsaW51eC9pODI1My5oPg0KPiA+DQo+ID4gIERFRklORV9T
+VEFUSUNfS0VZX0ZBTFNFKGt2bV9hc3luY19wZl9lbmFibGVkKTsNCj4gPg0KPiA+IEBAIC05Nzgs
+NiArOTc5LDkgQEAgc3RhdGljIHZvaWQgX19pbml0IGt2bV9pbml0X3BsYXRmb3JtKHZvaWQpDQo+
+ID4gIAkJCXdybXNybChNU1JfS1ZNX01JR1JBVElPTl9DT05UUk9MLA0KPiA+ICAJCQkgICAgICAg
+S1ZNX01JR1JBVElPTl9SRUFEWSk7DQo+ID4gIAl9DQo+ID4gKw0KPiA+ICsJaTgyNTNfY2xlYXJf
+Y291bnRlcl9vbl9zaHV0ZG93biA9IGZhbHNlOw0KPiANCj4gQUZBSUNULCB6ZXJvaW5nIHRoZSBj
+b3VudGVyIGlzbid0IGFjdHVhbGx5IHN1cHBvc2VkIHRvIHN0b3AgaXQgZnJvbSBjb3VudGluZy4N
+Cj4gQ29weSBwYXN0aW5nIGZyb20gdGhlIEtWTSBob3N0LXNpZGUgcGF0Y2hbKl06DQo+IA0KPiAg
+IFRoZSBsYXJnZXN0IHBvc3NpYmxlIGluaXRpYWwgY291bnQgaXMgMDsgdGhpcyBpcyBlcXVpdmFs
+ZW50IHRvIDIxNiBmb3INCj4gICBiaW5hcnkgY291bnRpbmcgYW5kIDEwNCBmb3IgQkNEIGNvdW50
+aW5nLg0KPiANCj4gICBUaGUgQ291bnRlciBkb2VzIG5vdCBzdG9wIHdoZW4gaXQgcmVhY2hlcyB6
+ZXJvLiBJbiBNb2RlcyAwLCAxLCA0LCBhbmQgNSB0aGUNCj4gICBDb3VudGVyIOKAmOKAmHdyYXBz
+IGFyb3VuZOKAmeKAmSB0byB0aGUgaGlnaGVzdCBjb3VudCwgZWl0aGVyIEZGRkYgaGV4IGZvciBi
+aW5hcnkNCj4gY291bnQtDQo+ICAgaW5nIG9yIDk5OTkgZm9yIEJDRCBjb3VudGluZywgYW5kIGNv
+bnRpbnVlcyBjb3VudGluZy4NCj4gDQo+ICAgTW9kZSAwIGlzIHR5cGljYWxseSB1c2VkIGZvciBl
+dmVudCBjb3VudGluZy4gQWZ0ZXIgdGhlIENvbnRyb2wgV29yZCBpcyB3cml0dGVuLA0KPiAgIE9V
+VCBpcyBpbml0aWFsbHkgbG93LCBhbmQgd2lsbCByZW1haW4gbG93IHVudGlsIHRoZSBDb3VudGVy
+IHJlYWNoZXMgemVyby4gT1VUDQo+ICAgdGhlbiBnb2VzIGhpZ2ggYW5kIHJlbWFpbnMgaGlnaCB1
+bnRpbCBhIG5ldyBjb3VudCBvciBhIG5ldyBNb2RlIDAgQ29udHJvbA0KPiBXb3JkDQo+ICAgaXMg
+d3JpdHRlbiBpbnRvIHRoZSBDb3VudGVyLg0KPiANCj4gQ2FuIHdlIHNpbXBseSBkZWxldGUgaTgy
+NTNfY2xlYXJfY291bnRlcl9vbl9zaHV0ZG93biBhbmQgdGhlIGNvZGUgaXQNCj4gd3JhcHM/DQo+
+IA0KDQpUaGUgZ2l0IGxvZyBkaWQgbm90IHJlY29yZCB3aHkgY291bnRlciByZWdpc3RlciBzaG91
+bGQgYmUgemVyb2VkDQoNCkkgd2lsbCB0cnkgdG8gZGVsZXRlIHRoZSB6ZXJvaW5nIGNvdW50ZXIg
+cmVnaXN0ZXIgY29kZXMNCg0KVGhhbmtzDQoNCi1MaQ0KDQoNCj4gWypdIGh0dHBzOi8vbG9yZS5r
+ZXJuZWwub3JnL2t2bS9ZOTF5THQzRVpMQTMyY3NwQGdvb2dsZS5jb20NCg==
