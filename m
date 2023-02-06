@@ -2,43 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 40BB168B56E
-	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 07:06:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6722E68B570
+	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 07:06:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229695AbjBFGGb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Feb 2023 01:06:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55324 "EHLO
+        id S229720AbjBFGGg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Feb 2023 01:06:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229686AbjBFGGa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Feb 2023 01:06:30 -0500
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2077.outbound.protection.outlook.com [40.107.244.77])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EC46199E7;
-        Sun,  5 Feb 2023 22:06:21 -0800 (PST)
+        with ESMTP id S229686AbjBFGGd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Feb 2023 01:06:33 -0500
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on20625.outbound.protection.outlook.com [IPv6:2a01:111:f400:7eaa::625])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D522F15CB7;
+        Sun,  5 Feb 2023 22:06:29 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=U6EmanKsIBkDjq1NPT9FYaVL2z+UqxcDHaM27HVs57CBWDq8IYpRAhmHIKxBgyvDd2f7L/fs8k3PCruLysX1kjs9+JdqZpY8TWi77bDiIFQSFErEj8jzOQoJWADEfCZWGBJD1R7KMTKuBHM/UuHmGidnO/yVult9b8OQeZCMT6sz50Ae+8FAIiOcLfDoWMf5ddY/IiYiz1XzAiJioj+7ydqPz83pt+UYyDQ3LfilOCFFjATC7LZM0rHaZ69X5mH1kIr0T6+ajqR7rlLHwVsG0ex/CYumiVNYhRBh1ZwI/7R5gmjkiUgk06sSQDImcNbPfy5b7bmMWL1TucMh9nzcMA==
+ b=SPQi0EUTxANsl1ghJskY4ImUlJ1U6N3bq3UkVP9GAudQHhwjK0OwfGTnvXfhmEkFuYKE+8vBXKthS8wUwn16W7bzK2iwvE3r3n57Jo5mBkgHrpWenSGiE+Ss3HGNRZpr0SSd1MmktUXnignEQLCj6OD24pznsgofK0MjpY+wxVGq4V9jgzmtEqZyeHxXJCkR/hfuJ+EgT0Z0zeIfYlcoxw6e0/8p805lQVB1YQA7HLr5pNOtKGNKFDmZswQiEdPqLMucX2m1H+iRPj54OjXl2tZtW3e85uliY723+lywxCAMPRVD/vUWKUOY2r5Aeb/NbJKQY7R6rXGbNSeqU4EnBA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dmm7OMSsPQY39WozqzvNmQYqOIGmZ/xyDPcmLLxaADI=;
- b=WSqzla6NXSt7BS8ZE2FcdI1hR8Ix1fAl7tvFlI6n8nng/pulyLyw2vgYGjz262/IthxH0+uMGlIj0yB5VTIvxZeyGR9kK0pffkTyQ7KfqSQ9gFEXwRjDMDU/CmFgIhgCSyDnqSEz5aeiX0kqy1HuamolJbMkXgPEwWmsrvKaFLlb6dtVDOyP8UZQmOtn/VtPXN9wY8t1Z+vznf+xJ0DkcO7Oy31nWnw9w5kcCfjnfgGzg6UrhXIVLXap0wABAM3eDPqnwGDLVfBx36NZIpAEsVEEvzlj13fx7PhNBaiulO2PiLBnHoCw6N9j9YGD5tnQNmj4y4nhjrCqPwS6v1M25Q==
+ bh=yrHQWAsMXo/ODo6YB767R3B13h+9ApjBys6yYfgSTwg=;
+ b=mmZ5+peDzqTRRx4BoTrEpnXV9iC2REObD/lo6P5RblNmFAy6lpoPaFr1Xhv3z4bQfILqmW/1Two0VjEtEtsSK+qXDoViah6AblwF7GJfk+CB6MNFh3MKMp0H7khhnUEwAnuZduVgo7nztOZSxiK5N8uo3IeEdPOH5gxlGVMfasFlYO4RNby+1Gw17JVloUatTU/Aqctaa2l38pWmO/OSfIwgjn9j7i7ZFv3sfafJUpC7PuzRvIH2+71mSBmeqMVBWi/5CUjtSRWm5x5PdolEQ67Nny01qr/+H42V6BW9U3aulUgAmVrGdjZX8zmOGF9d33xaLeqKXsm6UroMHSYDiA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dmm7OMSsPQY39WozqzvNmQYqOIGmZ/xyDPcmLLxaADI=;
- b=OCoBNpJqVgcB0sTeLnIrw81nyDggDzB/7l6N1Y95cZWPQaYVzmrazl1dupbeVbFQa4xD9TH2aMm6KyLveAfqp5Uh9B12f1Kw73gduajYSZpVaMaWX+gCmlLkdYC5sRYVV0GzRt+l5bCRDGoRUCmSDqpK0IhbtMiyOlf31DZPmdk=
-Received: from DM6PR21CA0015.namprd21.prod.outlook.com (2603:10b6:5:174::25)
- by IA0PR12MB8205.namprd12.prod.outlook.com (2603:10b6:208:400::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6064.32; Mon, 6 Feb
- 2023 06:06:18 +0000
-Received: from DM6NAM11FT016.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:174:cafe::1a) by DM6PR21CA0015.outlook.office365.com
- (2603:10b6:5:174::25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.0 via Frontend
- Transport; Mon, 6 Feb 2023 06:06:18 +0000
+ bh=yrHQWAsMXo/ODo6YB767R3B13h+9ApjBys6yYfgSTwg=;
+ b=efO3luZhJoz2/benujdAzvhEIBpAvzRFtfh+OdUxu7JHSTjHJaPep1mYoAi33GQRZ7TR0VJP8LHgMqBBPkuBLrT+YFxlhaPLQv9Lrc/UXQTQeWrBEqewIOhxC8ZbOIox26VAZbOg/lOkxe405G5Dnd0c9/J+KacS5Li1IuMLXM8=
+Received: from DS7PR05CA0048.namprd05.prod.outlook.com (2603:10b6:8:2f::19) by
+ DM6PR12MB4484.namprd12.prod.outlook.com (2603:10b6:5:28f::24) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6064.34; Mon, 6 Feb 2023 06:06:24 +0000
+Received: from DM6NAM11FT094.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:8:2f:cafe::60) by DS7PR05CA0048.outlook.office365.com
+ (2603:10b6:8:2f::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.14 via Frontend
+ Transport; Mon, 6 Feb 2023 06:06:24 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -46,13 +45,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT016.mail.protection.outlook.com (10.13.173.139) with Microsoft SMTP
+ DM6NAM11FT094.mail.protection.outlook.com (10.13.172.195) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6064.34 via Frontend Transport; Mon, 6 Feb 2023 06:06:18 +0000
+ 15.20.6064.34 via Frontend Transport; Mon, 6 Feb 2023 06:06:24 +0000
 Received: from brahmaputra.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 6 Feb
- 2023 00:05:55 -0600
+ 2023 00:06:17 -0600
 From:   Manali Shukla <manali.shukla@amd.com>
 To:     <linux-kernel@vger.kernel.org>
 CC:     <peterz@infradead.org>, <mingo@redhat.com>, <acme@kernel.org>,
@@ -65,9 +64,9 @@ CC:     <peterz@infradead.org>, <mingo@redhat.com>, <acme@kernel.org>,
         <ravi.bangoria@amd.com>, <eranian@google.com>,
         <irogers@google.com>, <kvm@vger.kernel.org>, <x86@kernel.org>,
         <linux-perf-users@vger.kernel.org>, <manali.shukla@amd.com>
-Subject: [RFC PATCH kernel 1/2] perf/x86/amd: Add amd_prevent_hostibs_window() to set per-cpu ibs_flags
-Date:   Mon, 6 Feb 2023 06:05:44 +0000
-Message-ID: <20230206060545.628502-2-manali.shukla@amd.com>
+Subject: [RFC PATCH kernel 2/2] KVM: SEV: PreventHostIBS enablement for SEV-ES and SNP guest
+Date:   Mon, 6 Feb 2023 06:05:45 +0000
+Message-ID: <20230206060545.628502-3-manali.shukla@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230206060545.628502-1-manali.shukla@amd.com>
 References: <20230206060545.628502-1-manali.shukla@amd.com>
@@ -79,186 +78,166 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT016:EE_|IA0PR12MB8205:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2593ba35-0b5e-424f-6589-08db08084358
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT094:EE_|DM6PR12MB4484:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3d1eed82-6680-4292-83e6-08db080846cc
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Hgl/l1sM9YYQ09g87P/dXOVGJG0EbqOcsO+6yXbczMZyPgZGsNVRvgsYQxwfYddZFuAGGJOZvE7RT5D7pteJTyfBGKJuSl1y251bsdWQ7+lXeTYcASkdRB5uhvxLAm1qS+bdNMY+shHjIUconMB0dPxnIEcoi9VybzirPneTlVS+zSSeCbS/feOj+LNcyr4giG8cfG0isP6Gw8ZS0WnKtw8JYFUV+rdTMXAFU6RBOqglKXcXEaSgXEhwG8Ca5tynGFBA5Hw4P9W9U4DosQ95uxgdxaTCw5ybqyiWijTyq8vdv4LHDkgZauXKlb+SqNyoB3YexDNABPNm9WYUDJ9AQVxsLGTEdRiKEUAkpCfFeuuVI6tv1JVyqIhMrHHr1oQJKysboiXercxCPpNZnztdufOhU4eG5Dn7WunZrnLcTHI5nk6o9Yh0pQ1tXGsWzdtnJhjZjtX5ndrC/ROT4c7iSJHJ6j7NEj1XpKJVFzN5+6pXss8tSylWYNxOuHoA1ZfojXIXRiPBTn2sUKcxUh3GXrMwpiFrOOVG2FK8sE+kPXr8YbrMZKbsQxE1QVvchgZ+Kv3RaZX1d/j/x0dFXDxIWvaQMcR5m+u1R6QJxvMVsvYXymdibB+nqtyDjMj1U7fgG/WNwfztwVXH/ThVVyPsvGfpKGlF9lPvN3nUkSzGAkYVNHMxyDrmbjRMeQWK+TXF5ws3tRBpBYmjx9mWMU9LZ9HzhHzGVv8VQZz0sA5hX38=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(136003)(396003)(376002)(39860400002)(346002)(451199018)(36840700001)(40470700004)(46966006)(82310400005)(40460700003)(316002)(6666004)(40480700001)(2616005)(478600001)(1076003)(16526019)(26005)(186003)(4326008)(8676002)(6916009)(70206006)(7696005)(36756003)(54906003)(356005)(86362001)(82740400003)(70586007)(47076005)(83380400001)(2906002)(426003)(36860700001)(336012)(44832011)(5660300002)(7416002)(41300700001)(8936002)(81166007)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: caMx9yF2ZYtx31yhZ68Yq8m1eeveFt22WLQKppN4U4JppNsa7HCIiLmOakRLKDfgYgb4sb3KEi3h8bVBpXObkb3gsgxTXWEOvcZel9PaKHV07HOHiAGFsI4zEW5mRq7iTpNlMo6zhZRpWENyUmb5cOmtekwfpfsw0rPNhxYZIDQH8Rf6751kgtVvw4cvIlaVz7nQy+fHVZgxoU8rngkBcV8it5mGnIJoNmRXK1QP9KCqnJ4SmOaq1NfhwB71KIUwd9iTim7VtLaCfEEdf7CLCTuEIsUCMNbKJup8C/bw2blHs2IgqwAyTCYlf/CWVp7uHANpLeaz36Fg/SIwpTt360r1RzFUIagHCCUndx6Wh4bzK7006K0byMtqwX7oAhdwwIeEwpWj5NtwEVPRIrosB1IaP5NuyijKWx/taxriifRu+vXkX4R6hOgBlorzPb7C3yrcVHRPZSPyGxvwYanWQq1wL3Z0PI1iffqYglxKtbZUOINK3jLn0ieEbP+3JG6Oeij2cEvntMNtKN+Und39x4RXOf6mZ2UKhC+1Pa12pwtcabqXWHV2RTHi+VmuP9XDcu+L2mN5t9da8xW/B/xOApc0SlvmeXmoUlgVDgUeaUeZ1qKY5KjBe6h24dZLuoasgSaHZzyejLjM0K3L9D3XmhSlibR6MItG2UX0bqHMtNheW/MYA96gLUfpfx3T/Gleh3a1JuS4fKI5ueoHLqDW/OL+lhbuV35gKroKnc29O14=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(39860400002)(346002)(376002)(136003)(396003)(451199018)(46966006)(36840700001)(40470700004)(356005)(81166007)(82740400003)(47076005)(82310400005)(6666004)(1076003)(186003)(26005)(40460700003)(16526019)(36756003)(478600001)(86362001)(83380400001)(8676002)(336012)(2616005)(426003)(70206006)(70586007)(6916009)(4326008)(316002)(36860700001)(7416002)(54906003)(7696005)(44832011)(2906002)(41300700001)(8936002)(5660300002)(40480700001)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Feb 2023 06:06:18.4903
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Feb 2023 06:06:24.2844
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2593ba35-0b5e-424f-6589-08db08084358
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3d1eed82-6680-4292-83e6-08db080846cc
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT016.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT094.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8205
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4484
 X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,SPF_HELO_PASS,
+        SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a function to set per-cpu ibs_flags based on an active or inactive
-PreventHostIBS window.
+Currently, the hypervisor is able to inspect instruction based samples
+from a guest and gather execution information. SEV-ES and SNP guests
+can disallow the use of instruction based sampling by hypervisor by
+enabling the PreventHostIBS feature for the guest.  (More information
+in Section 15.36.17 APM Volume 2)
 
-MSR_AMD64_IBSFETCHCTL[IbsFetchEn] and MSR_AMD64_IBSOPCTL[IbsOpEn] bits
-need to be cleared for PreventHostIBS feature to be enabled before VMRUN
-is executed.
+The MSR_AMD64_IBSFETCHCTL[IbsFetchEn] and MSR_AMD64_IBSOPCTL[IbsOpEn]
+bits need to be disabled before VMRUN is called when PreventHostIBS
+feature is enabled. If either of these bits are not 0, VMRUN will fail
+with VMEXIT_INVALID error code.
 
-ENABLE bit and VALID bit for MSR_AMD64_IBSFETCHCTL are contained in the
-same MSR and same is the case with MSR_AMD64_IBSOPCTL.
-
-Consider the following scenario:
-- The IBS MSR which has ENABLE bit set and VALID bit clear is read.
-- During the process of clearing the ENABLE bit and writing the IBS MSR
-  to disable IBS, an IBS event can occur that sets the VALID bit.
-- The write operation on IBS MSR can clear the newly set VALID bit.
-- Since this situation is occurring in the CLGI/STGI window
-  (PreventHostIBS window), the actual NMI is not taken.
-- Once VMRUN is issued, it will exit with VMEXIT_NMI. As soon as STGI is
-  executed, the pending NMI will trigger.
-- The IBS NMI handler checks for the VALID bit to determine if the NMI
-  is generated because of IBS.
-- Since VALID bit is now clear, it doesn't recognize that an IBS event
-  is occurred. Due to this reason, the dazed and confused unknown NMI
-  messages are generated.
-
-amd_prevent_hostibs_window() is added to avoid these messages when
-PreventHostIBS window is active and PreventHostIBS feature is enabled
-for the guest.
+Because of an IBS race condition when disabling IBS, KVM needs to
+indicate when it is in a PreventHostIBS window. Activate the window
+based on whether IBS is currently active or inactive.
 
 Signed-off-by: Manali Shukla <manali.shukla@amd.com>
 ---
- arch/x86/events/amd/ibs.c         | 64 +++++++++++++++++++++++++++++++
- arch/x86/include/asm/perf_event.h | 20 ++++++++++
- 2 files changed, 84 insertions(+)
+ arch/x86/include/asm/cpufeatures.h |  1 +
+ arch/x86/kvm/svm/sev.c             | 10 ++++++++
+ arch/x86/kvm/svm/svm.c             | 39 ++++++++++++++++++++++++++++--
+ arch/x86/kvm/svm/svm.h             |  1 +
+ 4 files changed, 49 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/events/amd/ibs.c b/arch/x86/events/amd/ibs.c
-index da3f5ebac4e1..e96a4c9ff4ba 100644
---- a/arch/x86/events/amd/ibs.c
-+++ b/arch/x86/events/amd/ibs.c
-@@ -30,7 +30,9 @@ static u32 ibs_caps;
- 
- #define IBS_FETCH_CONFIG_MASK	(IBS_FETCH_RAND_EN | IBS_FETCH_MAX_CNT)
- #define IBS_OP_CONFIG_MASK	IBS_OP_MAX_CNT
-+#define PREVENT_HOSTIBS_WINDOW  BIT(0)
- 
-+static DEFINE_PER_CPU(unsigned int, ibs_flags);
+diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+index 61012476d66e..1812e74f846a 100644
+--- a/arch/x86/include/asm/cpufeatures.h
++++ b/arch/x86/include/asm/cpufeatures.h
+@@ -425,6 +425,7 @@
+ #define X86_FEATURE_SEV_ES		(19*32+ 3) /* AMD Secure Encrypted Virtualization - Encrypted State */
+ #define X86_FEATURE_V_TSC_AUX		(19*32+ 9) /* "" Virtual TSC_AUX */
+ #define X86_FEATURE_SME_COHERENT	(19*32+10) /* "" AMD hardware-enforced cache coherency */
++#define X86_FEATURE_PREVENT_HOST_IBS	(19*32+15) /* "" AMD prevent host ibs */
  
  /*
-  * IBS states:
-@@ -1035,6 +1037,18 @@ static int perf_ibs_handle_irq(struct perf_ibs *perf_ibs, struct pt_regs *iregs)
- 		if (test_and_clear_bit(IBS_STOPPED, pcpu->state))
- 			return 1;
+  * BUG word(s)
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 86d6897f4806..b348b8931721 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -569,6 +569,12 @@ static int sev_es_sync_vmsa(struct vcpu_svm *svm)
+ 	if (svm->vcpu.guest_debug || (svm->vmcb->save.dr7 & ~DR7_FIXED_1))
+ 		return -EINVAL;
  
-+		/*
-+		 * Catch NMIs generated in an active PreventHostIBS window:
-+		 * incoming NMIs from an active PreventHostIBS window might have
-+		 * the VALID bit cleared when it is supposed to be set due to
-+		 * a race. The reason for the race is ENABLE and VALID bits for
-+		 * MSR_AMD64_IBSFETCHCTL and MSR_AMD64_IBSOPCTL being in their
-+		 * same respective MSRs.  Ignore all such NMIs and treat them as
-+		 * handled.
-+		 */
-+		if (__this_cpu_read(ibs_flags) & PREVENT_HOSTIBS_WINDOW)
-+			return 1;
++	if (sev_es_guest(svm->vcpu.kvm) &&
++	    guest_cpuid_has(&svm->vcpu, X86_FEATURE_PREVENT_HOST_IBS)) {
++		save->sev_features |= BIT(6);
++		svm->prevent_hostibs_enabled = true;
++	}
 +
- 		return 0;
- 	}
- 
-@@ -1540,3 +1554,53 @@ static __init int amd_ibs_init(void)
- 
- /* Since we need the pci subsystem to init ibs we can't do this earlier: */
- device_initcall(amd_ibs_init);
+ 	/*
+ 	 * SEV-ES will use a VMSA that is pointed to by the VMCB, not
+ 	 * the traditional VMSA that is part of the VMCB. Copy the
+@@ -2158,6 +2164,10 @@ void __init sev_set_cpu_caps(void)
+ 		kvm_cpu_cap_clear(X86_FEATURE_SEV);
+ 	if (!sev_es_enabled)
+ 		kvm_cpu_cap_clear(X86_FEATURE_SEV_ES);
 +
-+void amd_prevent_hostibs_window(bool active)
-+{
-+	if (active)
-+		__this_cpu_write(ibs_flags,
-+				 __this_cpu_read(ibs_flags) |
-+				 PREVENT_HOSTIBS_WINDOW);
-+	else
-+		__this_cpu_write(ibs_flags,
-+				 __this_cpu_read(ibs_flags) &
-+				 ~PREVENT_HOSTIBS_WINDOW);
-+}
-+EXPORT_SYMBOL_GPL(amd_prevent_hostibs_window);
-+
-+bool amd_disable_ibs_fetch(u64 *ibs_fetch_ctl)
-+{
-+	*ibs_fetch_ctl = __rdmsr(MSR_AMD64_IBSFETCHCTL);
-+	if (!(*ibs_fetch_ctl & IBS_FETCH_ENABLE))
-+		return false;
-+
-+	native_wrmsrl(MSR_AMD64_IBSFETCHCTL,
-+		      *ibs_fetch_ctl & ~IBS_FETCH_ENABLE);
-+
-+	return true;
-+}
-+EXPORT_SYMBOL(amd_disable_ibs_fetch);
-+
-+bool amd_disable_ibs_op(u64 *ibs_op_ctl)
-+{
-+	*ibs_op_ctl = __rdmsr(MSR_AMD64_IBSOPCTL);
-+	if (!(*ibs_op_ctl & IBS_OP_ENABLE))
-+		return false;
-+
-+	native_wrmsrl(MSR_AMD64_IBSOPCTL, *ibs_op_ctl & ~IBS_OP_ENABLE);
-+
-+	return true;
-+}
-+EXPORT_SYMBOL(amd_disable_ibs_op);
-+
-+void amd_restore_ibs_fetch(u64 ibs_fetch_ctl)
-+{
-+	native_wrmsrl(MSR_AMD64_IBSFETCHCTL, ibs_fetch_ctl);
-+}
-+EXPORT_SYMBOL(amd_restore_ibs_fetch);
-+
-+void amd_restore_ibs_op(u64 ibs_op_ctl)
-+{
-+	native_wrmsrl(MSR_AMD64_IBSOPCTL, ibs_op_ctl);
-+}
-+EXPORT_SYMBOL(amd_restore_ibs_op);
-diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
-index 5d0f6891ae61..1005505e23b1 100644
---- a/arch/x86/include/asm/perf_event.h
-+++ b/arch/x86/include/asm/perf_event.h
-@@ -561,6 +561,26 @@ static inline void intel_pt_handle_vmx(int on)
++	/* Enable PreventhostIBS feature for SEV-ES and higher guests */
++	if (sev_es_enabled)
++		kvm_cpu_cap_set(X86_FEATURE_PREVENT_HOST_IBS);
  }
- #endif
  
-+#if defined(CONFIG_X86_LOCAL_APIC) && defined(CONFIG_CPU_SUP_AMD)
-+extern void amd_prevent_hostibs_window(bool active);
-+extern bool amd_disable_ibs_fetch(u64 *ibs_fetch_ctl);
-+extern bool amd_disable_ibs_op(u64 *ibs_op_ctl);
-+extern void amd_restore_ibs_fetch(u64 ibs_fetch_ctl);
-+extern void amd_restore_ibs_op(u64 ibs_op_ctl);
-+#else
-+static inline void amd_prevent_hostibs_window(bool active) {}
-+static inline bool amd_disable_ibs_fetch(u64 *ibs_fetch_ctl)
-+{
-+	return false;
-+}
-+static inline bool amd_disable_ibs_op(u64 *ibs_op_ctl)
-+{
-+	return false;
-+}
-+static inline void amd_restore_ibs_fetch(u64 ibs_fetch_ctl) {}
-+static inline void amd_restore_ibs_op(u64 ibs_op_ctl) {}
-+#endif
+ void __init sev_hardware_setup(void)
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 9a194aa1a75a..47c1e0fff23e 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3914,10 +3914,39 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu, bool spec_ctrl_in
+ 
+ 	guest_state_enter_irqoff();
+ 
+-	if (sev_es_guest(vcpu->kvm))
++	if (sev_es_guest(vcpu->kvm)) {
++		bool ibs_fetch_active, ibs_op_active;
++		u64 ibs_fetch_ctl, ibs_op_ctl;
 +
- #if defined(CONFIG_PERF_EVENTS) && defined(CONFIG_CPU_SUP_AMD)
-  extern void amd_pmu_enable_virt(void);
-  extern void amd_pmu_disable_virt(void);
++		if (svm->prevent_hostibs_enabled) {
++			/*
++			 * With PreventHostIBS enabled, IBS profiling cannot
++			 * be active when VMRUN is executed. Disable IBS before
++			 * executing VMRUN and, because of a race condition,
++			 * enable the PreventHostIBS window if IBS profiling was
++			 * active.
++			 */
++			ibs_fetch_active =
++				amd_disable_ibs_fetch(&ibs_fetch_ctl);
++			ibs_op_active =
++				amd_disable_ibs_op(&ibs_op_ctl);
++
++			amd_prevent_hostibs_window(ibs_fetch_active ||
++						   ibs_op_active);
++		}
++
+ 		__svm_sev_es_vcpu_run(svm, spec_ctrl_intercepted);
+-	else
++
++		if (svm->prevent_hostibs_enabled) {
++			if (ibs_fetch_active)
++				amd_restore_ibs_fetch(ibs_fetch_ctl);
++
++			if (ibs_op_active)
++				amd_restore_ibs_op(ibs_op_ctl);
++		}
++	} else {
+ 		__svm_vcpu_run(svm, spec_ctrl_intercepted);
++	}
+ 
+ 	guest_state_exit_irqoff();
+ }
+@@ -4008,6 +4037,12 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
+ 
+ 	/* Any pending NMI will happen here */
+ 
++	/*
++	 * Disable the PreventHostIBS window since any pending IBS NMIs will
++	 * have been handled.
++	 */
++	amd_prevent_hostibs_window(false);
++
+ 	if (unlikely(svm->vmcb->control.exit_code == SVM_EXIT_NMI))
+ 		kvm_after_interrupt(vcpu);
+ 
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 4826e6cc611b..71f32fcfd219 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -254,6 +254,7 @@ struct vcpu_svm {
+ 	bool pause_filter_enabled         : 1;
+ 	bool pause_threshold_enabled      : 1;
+ 	bool vgif_enabled                 : 1;
++	bool prevent_hostibs_enabled      : 1;
+ 
+ 	u32 ldr_reg;
+ 	u32 dfr_reg;
 -- 
 2.34.1
 
