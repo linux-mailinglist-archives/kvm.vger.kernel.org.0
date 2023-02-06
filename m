@@ -2,210 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A860E68B87E
-	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 10:21:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C11A68B881
+	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 10:22:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229590AbjBFJVZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Feb 2023 04:21:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58230 "EHLO
+        id S230059AbjBFJWK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Feb 2023 04:22:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230088AbjBFJVS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Feb 2023 04:21:18 -0500
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5493D4C2C
-        for <kvm@vger.kernel.org>; Mon,  6 Feb 2023 01:21:10 -0800 (PST)
-Received: from dggpeml500005.china.huawei.com (unknown [172.30.72.56])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4P9LLM228jzJsJ0;
-        Mon,  6 Feb 2023 17:19:23 +0800 (CST)
-Received: from [10.174.186.51] (10.174.186.51) by
- dggpeml500005.china.huawei.com (7.185.36.59) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.34; Mon, 6 Feb 2023 17:21:02 +0800
-Subject: Re: [PATCH 3/9] KVM: arm64: Add kvm_pgtable_stage2_split()
-To:     Ricardo Koller <ricarkol@google.com>, <pbonzini@redhat.com>,
-        <maz@kernel.org>, <oupton@google.com>, <yuzenghui@huawei.com>,
-        <dmatlack@google.com>
-CC:     <kvm@vger.kernel.org>, <kvmarm@lists.linux.dev>,
-        <qperret@google.com>, <catalin.marinas@arm.com>,
-        <andrew.jones@linux.dev>, <seanjc@google.com>,
-        <alexandru.elisei@arm.com>, <suzuki.poulose@arm.com>,
-        <eric.auger@redhat.com>, <gshan@redhat.com>, <reijiw@google.com>,
-        <rananta@google.com>, <bgardon@google.com>, <ricarkol@gmail.com>,
-        Xiexiangyou <xiexiangyou@huawei.com>, <yezhenyu2@huawei.com>
-References: <20230113035000.480021-1-ricarkol@google.com>
- <20230113035000.480021-4-ricarkol@google.com>
-From:   Zheng Chuan <zhengchuan@huawei.com>
-Message-ID: <59f0d41e-d8ac-dab3-9136-af48efe55578@huawei.com>
-Date:   Mon, 6 Feb 2023 17:20:42 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        with ESMTP id S229547AbjBFJWJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Feb 2023 04:22:09 -0500
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3E1F12F11
+        for <kvm@vger.kernel.org>; Mon,  6 Feb 2023 01:22:06 -0800 (PST)
+Received: by mail-wm1-x329.google.com with SMTP id n13so8145787wmr.4
+        for <kvm@vger.kernel.org>; Mon, 06 Feb 2023 01:22:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=h3/29hABhm9XLu3Rv4E2s416ZzobvTLA9/Se1Cqam/I=;
+        b=WI4D8Out1HjIQVrO/FV9gjJNBFw7MjrXUgijfPA13egtBA1GHPTZXvsBLROC5JtR8Q
+         fbWdPu9tLzA+KlMHzJcHOfwUVbMQ/AkRgQztMcSyfGfkWZFsgFz077cgBGq8Kf9WpAya
+         BR/3SwJcYVPatEVrXi927F4xH78Sq0otcGlqBBaDyu3+Vuhui3Lx/sy0zyQlAkek2pRF
+         wGA5W6RuODcPJFwKmeZnUTy9lRMCR+zr5rpRVv1jOrnDYUrITHFZcmELB3io5LSAqUh9
+         JacHCtXTyUUImDe+M4hG7pVZSOii1zmFJ84qGdsb7+qbFvEn6R5t+oM8OCviytDfrd2i
+         JI9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=h3/29hABhm9XLu3Rv4E2s416ZzobvTLA9/Se1Cqam/I=;
+        b=A+zy48YelawU3Hc8i4TnpNL9qOjObwsSUTI9FKA/NcT5XazWkaxH/CmkoxSsJNwFoj
+         KeApR/YdDNZ/kkZBhVPfzCVJ7ez8wXATw+gZyzYkW5QYUXXaLP6xOan/FjnbCUIy/n3y
+         KBkOHzoAS0qvhEDd4M8/Id0+U6BF0PPfy9IMKfinbYyv5IytG0Ju7paUK9Tr8K0NgpV7
+         agejU9f0VXQOJpUOBMr7FXpWZ+xLxvj4IXy2Om9ayGOVap7sFtRXF0Qb1k4rcg8b0PB6
+         l/3TlMjjfahV2KpAYc4mNfI25eIs+IQ1O5EDzYOVaYuxkmsLjLwJD7fL7eDEgzf0cg7A
+         rl0A==
+X-Gm-Message-State: AO0yUKX3vfOE9tUK28rB2Q/14AUHh4NjkuaiFXtbWPqoyUBbmWe+mrvM
+        LtW5M959yhpghtpw/Rht3ZEGwQ==
+X-Google-Smtp-Source: AK7set81zyYOD4pHEoWMQOkNV1bM2HP8Wb+ewmqDF1dAPQAsKrrMrfEeL1eYsVwOIFBZTQL6TkdbNw==
+X-Received: by 2002:a05:600c:3c9a:b0:3dc:c5c:b94f with SMTP id bg26-20020a05600c3c9a00b003dc0c5cb94fmr18269461wmb.39.1675675325243;
+        Mon, 06 Feb 2023 01:22:05 -0800 (PST)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id h16-20020a05600c351000b003dc521f336esm10868423wmq.14.2023.02.06.01.22.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Feb 2023 01:22:04 -0800 (PST)
+Date:   Mon, 6 Feb 2023 10:22:04 +0100
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Atish Patra <atishp@atishpatra.org>
+Cc:     Atish Patra <atishp@rivosinc.com>, linux-kernel@vger.kernel.org,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup@brainfault.org>,
+        Eric Lin <eric.lin@sifive.com>, Guo Ren <guoren@kernel.org>,
+        Heiko Stuebner <heiko@sntech.de>,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-riscv@lists.infradead.org,
+        Mark Rutland <mark.rutland@arm.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v4 07/14] RISC-V: KVM: Add skeleton support for perf
+Message-ID: <20230206092204.aiyo43uxlm4xdmgn@orel>
+References: <20230201231250.3806412-1-atishp@rivosinc.com>
+ <20230201231250.3806412-8-atishp@rivosinc.com>
+ <20230202170345.uwi72dauzunlzxex@orel>
+ <CAOnJCUJfc8y729GiUdtqhv+PZu8v9rH+kfpwPwdW=GQPEs9FNw@mail.gmail.com>
+ <CAOnJCUKn_pLKqYO71S6MrZd=rnTdSShZk+XksX2uxTiVtthmTA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20230113035000.480021-4-ricarkol@google.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.186.51]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpeml500005.china.huawei.com (7.185.36.59)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOnJCUKn_pLKqYO71S6MrZd=rnTdSShZk+XksX2uxTiVtthmTA@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, Ricardo
+On Sat, Feb 04, 2023 at 11:37:47PM -0800, Atish Patra wrote:
+> On Fri, Feb 3, 2023 at 12:47 AM Atish Patra <atishp@atishpatra.org> wrote:
+> >
+> > On Thu, Feb 2, 2023 at 9:03 AM Andrew Jones <ajones@ventanamicro.com> wrote:
+> > >
+> > > On Wed, Feb 01, 2023 at 03:12:43PM -0800, Atish Patra wrote:
+> > > > This patch only adds barebone structure of perf implementation. Most of
+> > > > the function returns zero at this point and will be implemented
+> > > > fully in the future.
+> > > >
+> > > > Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> > > > ---
+> > > >  arch/riscv/include/asm/kvm_host.h     |   4 +
+> > > >  arch/riscv/include/asm/kvm_vcpu_pmu.h |  78 +++++++++++++++
+> > > >  arch/riscv/kvm/Makefile               |   1 +
+> > > >  arch/riscv/kvm/vcpu.c                 |   7 ++
+> > > >  arch/riscv/kvm/vcpu_pmu.c             | 136 ++++++++++++++++++++++++++
+> > > >  5 files changed, 226 insertions(+)
+> > > >  create mode 100644 arch/riscv/include/asm/kvm_vcpu_pmu.h
+> > > >  create mode 100644 arch/riscv/kvm/vcpu_pmu.c
+> > > >
+> > > > diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
+> > > > index 93f43a3..b90be9a 100644
+> > > > --- a/arch/riscv/include/asm/kvm_host.h
+> > > > +++ b/arch/riscv/include/asm/kvm_host.h
+> > > > @@ -18,6 +18,7 @@
+> > > >  #include <asm/kvm_vcpu_insn.h>
+> > > >  #include <asm/kvm_vcpu_sbi.h>
+> > > >  #include <asm/kvm_vcpu_timer.h>
+> > > > +#include <asm/kvm_vcpu_pmu.h>
+> > > >
+> > > >  #define KVM_MAX_VCPUS                        1024
+> > > >
+> > > > @@ -228,6 +229,9 @@ struct kvm_vcpu_arch {
+> > > >
+> > > >       /* Don't run the VCPU (blocked) */
+> > > >       bool pause;
+> > > > +
+> > > > +     /* Performance monitoring context */
+> > > > +     struct kvm_pmu pmu_context;
+> > > >  };
+> > > >
+> > > >  static inline void kvm_arch_hardware_unsetup(void) {}
+> > > > diff --git a/arch/riscv/include/asm/kvm_vcpu_pmu.h b/arch/riscv/include/asm/kvm_vcpu_pmu.h
+> > > > new file mode 100644
+> > > > index 0000000..e2b4038
+> > > > --- /dev/null
+> > > > +++ b/arch/riscv/include/asm/kvm_vcpu_pmu.h
+> > > > @@ -0,0 +1,78 @@
+> > > > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > > > +/*
+> > > > + * Copyright (c) 2023 Rivos Inc
+> > > > + *
+> > > > + * Authors:
+> > > > + *     Atish Patra <atishp@rivosinc.com>
+> > > > + */
+> > > > +
+> > > > +#ifndef __KVM_VCPU_RISCV_PMU_H
+> > > > +#define __KVM_VCPU_RISCV_PMU_H
+> > > > +
+> > > > +#include <linux/perf/riscv_pmu.h>
+> > > > +#include <asm/kvm_vcpu_sbi.h>
+> > > > +#include <asm/sbi.h>
+> > > > +
+> > > > +#ifdef CONFIG_RISCV_PMU_SBI
+> > > > +#define RISCV_KVM_MAX_FW_CTRS        32
+> > > > +
+> > > > +#if RISCV_KVM_MAX_FW_CTRS > 32
+> > > > +#error "Maximum firmware counter can't exceed 32 without increasing the RISCV_MAX_COUNTERS"
+> > >
+> > > "The number of firmware counters cannot exceed 32 without increasing RISCV_MAX_COUNTERS"
+> > >
+> > > > +#endif
+> > > > +
+> > > > +#define RISCV_MAX_COUNTERS      64
+> > >
+> > > But instead of that message, what I think we need is something like
+> > >
+> > >  #define RISCV_KVM_MAX_HW_CTRS  32
+> > >  #define RISCV_KVM_MAX_FW_CTRS  32
+> > >  #define RISCV_MAX_COUNTERS     (RISCV_KVM_MAX_HW_CTRS + RISCV_KVM_MAX_FW_CTRS)
+> > >
+> > >  static_assert(RISCV_MAX_COUNTERS <= 64)
+> > >
+> > > And then in pmu_sbi_device_probe() should ensure
+> > >
+> > >   num_counters <= RISCV_MAX_COUNTERS
+> > >
+> > > and pmu_sbi_get_ctrinfo() should ensure
+> > >
+> > >   num_hw_ctr <= RISCV_KVM_MAX_HW_CTRS
+> > >   num_fw_ctr <= RISCV_KVM_MAX_FW_CTRS
+> > >
+> > > which has to be done at runtime.
+> > >
+> >
+> > Sure. I will add the additional sanity checks.
+> >
+> 
+> As explained above, I feel we shouldn't mix the firmware number of
+> counters that the host gets and it exposes to a guest.
+> So I have not included this suggestion in the v5.
+> I have changed the num_fw_ctrs to PMU_FW_MAX though to accurately
+> reflect the firmware counters KVM is actually using.
 
-On 2023/1/13 11:49, Ricardo Koller wrote:
-> Add a new stage2 function, kvm_pgtable_stage2_split(), for splitting a
-> range of huge pages. This will be used for eager-splitting huge pages
-> into PAGE_SIZE pages. The goal is to avoid having to split huge pages
-> on write-protection faults, and instead use this function to do it
-> ahead of time for large ranges (e.g., all guest memory in 1G chunks at
-> a time).
-> 
-> No functional change intended. This new function will be used in a
-> subsequent commit.
-> 
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> ---
->  arch/arm64/include/asm/kvm_pgtable.h | 29 ++++++++++++
->  arch/arm64/kvm/hyp/pgtable.c         | 67 ++++++++++++++++++++++++++++
->  2 files changed, 96 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 8ad78d61af7f..5fbdc1f259fd 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -644,6 +644,35 @@ bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr);
->   */
->  int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size);
->  
-> +/**
-> + * kvm_pgtable_stage2_split() - Split a range of huge pages into leaf PTEs pointing
-> + *				to PAGE_SIZE guest pages.
-> + * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
-> + * @addr:	Intermediate physical address from which to split.
-> + * @size:	Size of the range.
-> + * @mc:		Cache of pre-allocated and zeroed memory from which to allocate
-> + *		page-table pages.
-> + *
-> + * @addr and the end (@addr + @size) are effectively aligned down and up to
-> + * the top level huge-page block size. This is an exampe using 1GB
-> + * huge-pages and 4KB granules.
-> + *
-> + *                          [---input range---]
-> + *                          :                 :
-> + * [--1G block pte--][--1G block pte--][--1G block pte--][--1G block pte--]
-> + *                          :                 :
-> + *                   [--2MB--][--2MB--][--2MB--][--2MB--]
-> + *                          :                 :
-> + *                   [ ][ ][:][ ][ ][ ][ ][ ][:][ ][ ][ ]
-> + *                          :                 :
-> + *
-> + * Return: 0 on success, negative error code on failure. Note that
-> + * kvm_pgtable_stage2_split() is best effort: it tries to break as many
-> + * blocks in the input range as allowed by the size of the memcache. It
-> + * will fail it wasn't able to break any block.
-> + */
-> +int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size, void *mc);
-> +
->  /**
->   * kvm_pgtable_walk() - Walk a page-table.
->   * @pgt:	Page-table structure initialised by kvm_pgtable_*_init().
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 0dee13007776..db9d1a28769b 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -1229,6 +1229,73 @@ int kvm_pgtable_stage2_create_removed(struct kvm_pgtable *pgt,
->  	return 0;
->  }
->  
-> +struct stage2_split_data {
-> +	struct kvm_s2_mmu		*mmu;
-> +	void				*memcache;
-> +};
-> +
-> +static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
-> +			       enum kvm_pgtable_walk_flags visit)
-> +{
-> +	struct stage2_split_data *data = ctx->arg;
-> +	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
-> +	kvm_pte_t pte = ctx->old, new, *childp;
-> +	enum kvm_pgtable_prot prot;
-> +	void *mc = data->memcache;
-> +	u32 level = ctx->level;
-> +	u64 phys;
-> +	int ret;
-> +
-> +	/* Nothing to split at the last level */
-> +	if (level == KVM_PGTABLE_MAX_LEVELS - 1)
-> +		return 0;
-> +
-> +	/* We only split valid block mappings */
-> +	if (!kvm_pte_valid(pte) || kvm_pte_table(pte, ctx->level))
-> +		return 0;
-> +
-IIUC, It should be !kvm_pte_table(pte, ctx->level)?
-also, the kvm_pte_table includes the level check and kvm_pte_valid, so, it just be like:
--	/* Nothing to split at the last level */
--	if (level == KVM_PGTABLE_MAX_LEVELS - 1)
--		return 0;
--
--	/* We only split valid block mappings */
-+	if (!kvm_pte_table(pte, ctx->level))
-+		return 0;
+Sounds good
 
-> +	phys = kvm_pte_to_phys(pte);
-> +	prot = kvm_pgtable_stage2_pte_prot(pte);
-> +
-> +	ret = kvm_pgtable_stage2_create_removed(data->mmu->pgt, &new, phys,
-> +						level, prot, mc);
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (!stage2_try_break_pte(ctx, data->mmu)) {
-> +		childp = kvm_pte_follow(new, mm_ops);
-> +		kvm_pgtable_stage2_free_removed(mm_ops, childp, level);
-> +		mm_ops->put_page(childp);
-> +		return -EAGAIN;
-> +	}
-> +
-> +	/*
-> +	 * Note, the contents of the page table are guaranteed to be
-> +	 * made visible before the new PTE is assigned because
-> +	 * stage2_make_pte() writes the PTE using smp_store_release().
-> +	 */
-> +	stage2_make_pte(ctx, new);
-> +	dsb(ishst);
-> +	return 0;
-> +}
-> +
-> +int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt,
-> +			     u64 addr, u64 size, void *mc)
-> +{
-> +	struct stage2_split_data split_data = {
-> +		.mmu		= pgt->mmu,
-> +		.memcache	= mc,
-> +	};
-> +
-> +	struct kvm_pgtable_walker walker = {
-> +		.cb	= stage2_split_walker,
-> +		.flags	= KVM_PGTABLE_WALK_LEAF,
-> +		.arg	= &split_data,
-> +	};
-> +
-> +	return kvm_pgtable_walk(pgt, addr, size, &walker);
-> +}
-> +
->  int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
->  			      struct kvm_pgtable_mm_ops *mm_ops,
->  			      enum kvm_pgtable_stage2_flags flags,
-> 
+> I don't know if there is any benefit of static_assert over #error.
+> Please let me know if you feel strongly about that.
 
--- 
-Regards.
-Chuan
+One "normal" line vs. three #-lines?
+
+Thanks,
+drew
