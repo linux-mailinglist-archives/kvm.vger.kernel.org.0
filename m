@@ -2,185 +2,259 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 76B1268B7B2
-	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 09:49:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8431B68B7BC
+	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 09:52:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229844AbjBFItV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Feb 2023 03:49:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36368 "EHLO
+        id S229726AbjBFIwZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Feb 2023 03:52:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229526AbjBFItU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Feb 2023 03:49:20 -0500
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 459FD15CAC;
-        Mon,  6 Feb 2023 00:49:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1675673359; x=1707209359;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=7ZqVv58/drZ8Qm2WSY+SDGRxc1MJjEL1cz/KIxCuv/A=;
-  b=LcpNftc5MViVXMdQ8hF8oOppwhPcf819cQjXaNQWGAIcjet8V6U1Kn8D
-   ErRTnB5RU0zgyI12yW46AzfXQHIatvStsk8WlC7/gd/7osfAaw5DD/tVv
-   zyJgLcZJ/XkmUKFS9D05TeKy5KqOXdYVNwPJoGmwO37k9Vb02/+38SyFo
-   0jC3WLh//HIVErxml7X6k15oxOFvGY+3AeF9jRHr/kdjCd7PumnnJ9Dh9
-   u5bAciG1gHtnwGoJtbwO+x55kE8Jy1TXrfFIo50izVoxmGTmRuvsLcj24
-   puNjMbXKV2Ri2lVS/F6PqITSl2K+1s5yxHNOVYhN13GG1J0rpiKZP5zFQ
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10612"; a="391555363"
-X-IronPort-AV: E=Sophos;i="5.97,276,1669104000"; 
-   d="scan'208";a="391555363"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2023 00:49:18 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10612"; a="755178198"
-X-IronPort-AV: E=Sophos;i="5.97,276,1669104000"; 
-   d="scan'208";a="755178198"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by FMSMGA003.fm.intel.com with ESMTP; 06 Feb 2023 00:49:18 -0800
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Mon, 6 Feb 2023 00:49:18 -0800
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16 via Frontend Transport; Mon, 6 Feb 2023 00:49:18 -0800
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.177)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.16; Mon, 6 Feb 2023 00:49:18 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fLYmwaeTPkMaWtIEiFlkWFZ9KMEOMDJS5X2dk7Hw2C+/bYerynxrJ4/fVYGkseq4RBfsT8RnTbHw6SBGy8KKe4NpGa8CR6dLoYzh797EpS4rySJqokcey9N7b2T3CMjUZ0EyKhh3ExX6AFd5irBpCYvn6xBDfG+HXYF/yb6naicggJBj25qZvDnC19C6gVV0BpCrm9sFMI/bUYoGISdISryKtLsmn7pPj27MI4e2CRFiaULgQB19yjLttWurys4/Fujm615IHSszf1XXLbhGegAbKHxMV7+qmEbkBRXIJRuS+4tkl9dw4WLoGVYj+LJJtPc08tpQKORwncYGLVCLOQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YcFpxS2s9MOcocTBVpMKIUmOxsW7jOdHsE8kPU5z4k4=;
- b=S1E4AiQqpX6hY0U/Lh9uQl20gT4k6IKTrt+hPYnWbrMJv1nLhyu7H5aLGMEetJC1Il3tGNjG0GOEKeX2nO2pXT20v102+FhqEJ4hZT9HVc702hJcZf130mMoNNERr0AmbSi26IvL8OFfb7aQ3G3ChschCsSzvb8k5MALJ7MdHfsnEBdOsKXavuz2yTboyVLiZSyu6J0MasjdJiT5Ebbt0WaC+10bsMq+Y0/VRok4+c3G6FWWU1GcvmhrmJ3aEzKlsQ2+qtgt/JK5WK8nkE6nH8cA63oYfauj2jj9WHBEaxTnZ4nUMXWhAzTJl8bhrp6CJinc6JrAiCQ4qq/EjUDolQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by CH3PR11MB7938.namprd11.prod.outlook.com (2603:10b6:610:12f::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6064.34; Mon, 6 Feb
- 2023 08:49:16 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::6a8d:b95:e1b5:d79d]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::6a8d:b95:e1b5:d79d%8]) with mapi id 15.20.6064.034; Mon, 6 Feb 2023
- 08:49:16 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Nicolin Chen <nicolinc@nvidia.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "will@kernel.org" <will@kernel.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "shuah@kernel.org" <shuah@kernel.org>
-CC:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>
-Subject: RE: [PATCH v1 8/8] vfio-iommufd: Support IO page table replacement
-Thread-Topic: [PATCH v1 8/8] vfio-iommufd: Support IO page table replacement
-Thread-Index: AQHZNtTNAxNBEby0lE2dVGWKZ2MA4q7Bogbg
-Date:   Mon, 6 Feb 2023 08:49:16 +0000
-Message-ID: <BN9PR11MB527655AB356F73CA193300398CDA9@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <cover.1675320212.git.nicolinc@nvidia.com>
- <a85ebe54c2fff9ca134a33cdf8744a7c1d66feef.1675320212.git.nicolinc@nvidia.com>
-In-Reply-To: <a85ebe54c2fff9ca134a33cdf8744a7c1d66feef.1675320212.git.nicolinc@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|CH3PR11MB7938:EE_
-x-ms-office365-filtering-correlation-id: 33f11cd1-c478-4437-a8f9-08db081f076d
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: x31WVj4BLQISvaeBSarjHSoGYNdJ7eQx5wfCkSiCWJks+5lmFmaQsztkypsZEMMWk2muYp3pZblkfNxptPlTzPRzg+++gKXO7nhZmOamvgxz7kyEcaBEPj6CUqQgpywGW64hzL4mWvOD1ai9z3jETfEb7wMYWGvxlUVJ4qqYTJy747yY8exy00rqEEM3Oloq/oLyyRda9ZoMftgmqKOKKofpAnu6p0b0BC1BWqLJjy5zBkMu3+NzQVdhb3hrfJy/P8w/b4UaOvUS2JlEw0+rcDtF0+h8tjExsWpUlZMbZyRmaYEOK5y6tm26T2eUJBJuPvbp1kYnZZw7l3OJqSJyy4zl2KlFuWhaIAqRc/u9BBfHAA9G9ED7lYSBX59kAJHvk75Lzr0BmnlZXdtK4Ql+zKOz0cezHF+j1ZOcnBemKE/vpQeOMKlZPH1UiPSqnXEAtX4wdpCcz2KjxTaSjPFlPOB+imC5BA9YmH6SxKN59izhYnt6gVcVQVywaGCflBkBu9xlmriohTTE+ekkKXKCRX6MtTVeaiL9uMslC/PuECZocDD4oClqBkIqkaO1lYbEuFpoczdyG+BbB55DlL8BvkleJgSiAudy8a+whsldpHETHlmI/qaSpijxmV9N51eFNzPmRcE2jt5Vo/tQ0vVnuZnm21I6JmwETZpUeVktYCl0Iik8fQtrYmOZYYDACIS1K3Yx6NuVBwFNn0EZ7Ag+kA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(396003)(136003)(39860400002)(346002)(366004)(376002)(451199018)(82960400001)(38100700002)(38070700005)(122000001)(86362001)(33656002)(4744005)(478600001)(52536014)(8936002)(5660300002)(7416002)(4326008)(2906002)(66946007)(66476007)(66556008)(66446008)(64756008)(76116006)(41300700001)(8676002)(55016003)(54906003)(26005)(186003)(9686003)(83380400001)(110136005)(6506007)(7696005)(71200400001)(316002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?OXksNhZfSWTE4o8EWO3o1gB75k4ET5aUp/HCC+HREmGY1WYs6erI6ST5bdct?=
- =?us-ascii?Q?ABB17MFy4A1UFvX7VC2/yWM2et2ZYpJD/xSFoY0BdptqyiH//p1U0mCqxm57?=
- =?us-ascii?Q?+PmPzLdArytdQJvf82nqlYHWdbg0AWNU/13UUVEyz9gGMLw5Qo0a+Q7F3km/?=
- =?us-ascii?Q?+L1UiBnbqMf9rG7nzAJgLwnTE0MJJ7DEHDbIVX54LPKD5PHfLtZl9SV7bAkH?=
- =?us-ascii?Q?oz2s3XKot8mGKcTcVB71yrgpnC+O04Cl/XFBewzh/0ShnjGZyOA402iCX0Nw?=
- =?us-ascii?Q?He/6tqkD9069xHK1BTiElsVFP7IGq/44Rer230yQxiWnfV+fTuIohZGqJ2GG?=
- =?us-ascii?Q?X7L2tirRd9Sax/L9iS62kiuxmxroHBtUmhjg++kOCZsYytocM8AWR95zF0VT?=
- =?us-ascii?Q?7chSnH8preBGn5Ernng9lYMnv2moPeZ5UIxAitqRiYnXLI+bzjUPDCaeq30m?=
- =?us-ascii?Q?eKHADGHJKQrRt+Zj5wBqysDQanw37mDzdLBOvi582Q3qzRb2/y3UTeAJ334s?=
- =?us-ascii?Q?SHD7jnFY7MjNsn2CscHE34kyG5bH02nhj2nEUfsT6o4SKeMM+mb6u2nAOhVh?=
- =?us-ascii?Q?0um2+08B+SkihtlRCzK0P0RhdB+fJdMFQ99JaAGW/pGwsgr4Fyqq37VR1fFL?=
- =?us-ascii?Q?IZ4OnykMH1m4A9OaovPQSEdgDZg3lUlzWSjm6Q0PFhhDtvpT27ergb1ws7vL?=
- =?us-ascii?Q?uCCictifDLuIeUGS6XsQY42J41dbotJU/rCtWRzxkKou/aYE5R82PuPXqUPc?=
- =?us-ascii?Q?Iz6EbdfDr32ZKZs/GUCIm4bCNesUBSarLsw1FCPWWE4A6A4NL7mp4eKTSxFy?=
- =?us-ascii?Q?7IjDcTJnvN7GSJc+Uv4Ia8wgYNfL7NfLtGiSN4Z23cAme5e8UNEx56ZMFXas?=
- =?us-ascii?Q?V3TeLwaewGWKgPjxrP+YWpBbOAAYYGWH3vjc3d4ER6CSupmk/nwyeAuouja0?=
- =?us-ascii?Q?nyXE9HfoSpU5YFEHohoJcjYPG4RZ5visnz1t0e7KKKOY6oTmM5xoXcHEnRho?=
- =?us-ascii?Q?pOjoGh05YTjaPq9lcR2evgNZ6tvQBMot8xF5AxZS+J6tiYtzaj/7fHclTQyq?=
- =?us-ascii?Q?bhWwFA9ym5f5DJxGKPgEXlbHNx60dYrbiSZhDIlMjPwOiKalCFxH4sxckTAv?=
- =?us-ascii?Q?PL4wHfu+GxaB06wNWiLdcX+8ALl3hbceLPMZkK+xwiUxLFWf9zyKR8wko3g3?=
- =?us-ascii?Q?8yC8rUKzTD/aeRSx+SUDzOF6CLDBMrrBxiTW5BliCZWvKOiWfLjtx4eE1UIz?=
- =?us-ascii?Q?x98ZByL4FBj5qMoAuR+cNb7LfH5VUYoVkhqZ5qeZM/vkvsWyJfhYMt+Anvrl?=
- =?us-ascii?Q?o4xrxurVUkgXLqIORUTjtbAzm8tr09uwXZHaZMgjyLYQcx6MqNn+mA/c7g9n?=
- =?us-ascii?Q?RhIuIHmMaoEiiBi46Djt70H+oDO6DlGBF5x0Goll5AJtX2Tthga6v5C02Szn?=
- =?us-ascii?Q?8bGaMf3ZBQGheBfELzMfjiJ+F0H2b8RbAdpXwK/4A/Z5zQ5nR+nNsmGthYXH?=
- =?us-ascii?Q?85iHB1o2MFhokMphCefW1gg6VvYwF2B2arqqfWrPD6SUN6m1B+OQTr/pfOjw?=
- =?us-ascii?Q?vQ00kNayuhdFfBQs4ry8ltuwcCF0mpPP7zWxo1B/?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S229526AbjBFIwY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Feb 2023 03:52:24 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CEED113EE;
+        Mon,  6 Feb 2023 00:52:23 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id t12-20020a17090aae0c00b00229f4cff534so12713654pjq.1;
+        Mon, 06 Feb 2023 00:52:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CTwAC18x9cIOiks/6Nlsw3FpytCj0rBSuF+cGpZx0VM=;
+        b=VSd1My/oB2i372ZLnobUBAmRCyztLovO/+nubk400rlkIFAmqIIirSuZKwKufF6Cmz
+         YyrXXRZ/Fz9JRCik4TvEzTcRjqcl116J42OdlFMfI/Zjb4EYIxxQX+kq8eeHYzIEEzGa
+         +7CN/PWyLZamFpgTdiNMIyTZNuglmXDQUJujb3cERr6MA6noRnVzonrjAkKEtO4Dirzs
+         GBY8HlikPGUwpe9oAsu8WGxtFIrCSdlMh5Wd1sg8iDadbGKv42DKush9+BiouOkjlLmH
+         hzc2RxMolbkDJOI0Wdw0i0s/xQZZ/7huJzn6pmK4gpzTFCGrD9JMRm8mfjj4R4FqN0z2
+         9UsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CTwAC18x9cIOiks/6Nlsw3FpytCj0rBSuF+cGpZx0VM=;
+        b=WbZcV7ItBChnfRCtl0kF0t+i387J0RWZMj1YRJAPHa3pTiE82XBWJ6MAWRDipKBUMm
+         7X0vWQq3AjJ57LFFOcX/cOifDQPFUwsUglI7LtSk4rdZFSBTcTnV25wscSZuHqcM71BV
+         jNBTjUotZstFiMalxN/DZKvfhBbqqRwGRdKOcJScZJWp5sa94Bb4U1hvsV5tzAcGW2Vm
+         6qKkFUzhp7qjLEO7n5VaU6+ZT7Ias878Kf0Xigbom0G09mTXJ90jBKba9ynNhOMC7lfY
+         Ddz6lv6+qRBy8goUqjBGhtFByMsRWFEavlquCWFF83spXMeGtokw8ImNbEHMzX5bGwvx
+         H6sQ==
+X-Gm-Message-State: AO0yUKVAR9PctgtrinNkto13y3y225QfC1VvCwb0dkB2h3Tw4R38EWnX
+        2Sz+wZvx+5VrWRHvZkHpgBE=
+X-Google-Smtp-Source: AK7set9NkvBN6SOTcQQAZVe9yJ4NefHT1nYDE0voeiXA81qVuThAhjyaNJuGoqKsWw0DrLlKScPndg==
+X-Received: by 2002:a17:903:1111:b0:196:6ec4:52db with SMTP id n17-20020a170903111100b001966ec452dbmr22503790plh.51.1675673542782;
+        Mon, 06 Feb 2023 00:52:22 -0800 (PST)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id f9-20020a170902e98900b00185402cfedesm4607769plb.246.2023.02.06.00.52.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 06 Feb 2023 00:52:22 -0800 (PST)
+Message-ID: <f0f6dbed-0e1d-059c-11a4-07fd4bec5c99@gmail.com>
+Date:   Mon, 6 Feb 2023 16:52:15 +0800
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 33f11cd1-c478-4437-a8f9-08db081f076d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Feb 2023 08:49:16.4380
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: uorJ+GMSnvEJmIa+BtTk6fl7FqPLqXzsmlLWkWP7NXo2K2EW9aLfC/qPNkMoz7HncpcQqMDT/ZC+bJncW3J0xA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7938
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.6.1
+Subject: Re: [PATCH v2] KVM: x86/pmu: Disable all vPMU features support on
+ Intel hybrid CPUs
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Jianfeng Gao <jianfeng.gao@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>
+References: <20230131085031.88939-1-likexu@tencent.com>
+ <Y9k7eyfmXjqW9lYF@google.com>
+ <afe1fdd8-9f3e-c988-cd38-476a6da26d46@gmail.com>
+ <Y9v7tEXPlki7YOT4@google.com>
+ <7dc66398-aa0c-991f-3fa9-43aac8c710fd@gmail.com>
+ <Y91DUmMjCLzIXlp+@google.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <Y91DUmMjCLzIXlp+@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Nicolin Chen <nicolinc@nvidia.com>
-> Sent: Thursday, February 2, 2023 3:05 PM
->=20
-> Remove the vdev->iommufd_attached check, since the kernel can internally
-> handle a replacement of the IO page table now.
->=20
-> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
-> ---
->  drivers/vfio/iommufd.c | 3 ---
->  1 file changed, 3 deletions(-)
->=20
-> diff --git a/drivers/vfio/iommufd.c b/drivers/vfio/iommufd.c
-> index 7e09defbcffe..f9e89b3eef69 100644
-> --- a/drivers/vfio/iommufd.c
-> +++ b/drivers/vfio/iommufd.c
-> @@ -111,9 +111,6 @@ int vfio_iommufd_physical_attach_ioas(struct
-> vfio_device *vdev, u32 *pt_id)
->  		return 0;
->  	}
->=20
-> -	if (vdev->iommufd_attached)
-> -		return -EBUSY;
-> -
->  	rc =3D iommufd_device_attach(vdev->iommufd_device, pt_id);
->  	if (rc)
->  		return rc;
+On 4/2/2023 1:28 am, Sean Christopherson wrote:
+> On Fri, Feb 03, 2023, Like Xu wrote:
+>> On 3/2/2023 2:06 am, Sean Christopherson wrote:
+>>> On Thu, Feb 02, 2023, Like Xu wrote:
+>>>> On 1/2/2023 12:02 am, Sean Christopherson wrote:
+>>>> The perf interface only provides host PMU capabilities and the logic for
+>>>> choosing to disable (or enable) vPMU based on perf input should be left
+>>>> in the KVM part so that subsequent development work can add most code
+>>>> to the just KVM, which is very helpful for downstream users to upgrade
+>>>> loadable KVM module rather than the entire core kernel.
+>>>>
+>>>> My experience interacting with the perf subsystem has taught me that
+>>>> perf change required from KVM should be made as small as possible.
+>>>
+>>> I don't disagree, but I don't think that's relevant in this case.  Perf doesn't
+>>> provide the necessary bits for KVM to virtualize a hybrid PMU, so unless KVM is
+>>> somehow able to get away with enumerating a very stripped down vPMU, additional
+>>> modifications to perf_get_x86_pmu_capability() will be required.
+>>>
+>>> What I care more about though is this ugliness in perf_get_x86_pmu_capability():
+>>>
+>>> 	/*
+>>> 	 * KVM doesn't support the hybrid PMU yet.
+>>> 	 * Return the common value in global x86_pmu,
+>>> 	 * which available for all cores.
+>>
+>> I would have expected w/ current code base, vpmu (excluding pebs and lbr, intel_pt)
+>> to continue to work on any type of pCPU until you decide to disable them completely.
+> 
+> Didn't follow this.
 
-also update vfio uapi description to explain the replace semantics.
+My expectation is that, if a guest doesn't enable "PEBS, LBR and intel_pt",
+and only has the most basic pmu conters (its number is the lesser number
+of big and small cores supported), with some pmu_event_fileter allow list
+mechanism, vPMU works regardless of the vcpu model and does not
+require cpu pined. Any complaints from users on this usages ?
+
+> 
+>> Moreover, the caller of perf_get_x86_pmu_capability() may be more than just KVM,
+>> it may be technically ebpf helpers. The diff on comments from v1 can be applied to
+>> this version (restrict KVM semantics), and it makes the status quo clearer
+>> to KVM users.
+> 
+> In that case, eBPF is just as hosed, no?  And given that the only people that have
+> touched perf_get_x86_pmu_capability() in its 11+ years of existence are all KVM
+> people, I have a hard time believing there is meaningful use outside of KVM.
+
+Some radical bpf programs will access the pmu directly, although this is
+not  uncommon in upstream. KVM colleagues shouldn't need to care
+about them, but at least don't mislead them.
+
+> 
+>>> 	 */
+>>> 	cap->num_counters_gp	= x86_pmu.num_counters;
+>>>
+>>> I really don't want to leave that comment lying around as it's flat out wrong in
+>>> that it obviously doesn't address the other differences beyond the number of
+>>> counters.  And since there are dependencies on perf, my preference is to disable
+>>> PMU enumeration in perf specifically so that whoever takes on vPMU enabling is
+>>> forced to consider the perf side of things, and get buy in from the perf folks.
+>>
+>> The perf_get_x86_pmu_capability() obviously needs to be revamped,
+>> but until real effective KVM enabling work arrives, any inconsequential intrusion
+>> into perf/core code will only lead to trivial system maintenance.
+> 
+> Trivial doesn't mean useless or unnecessary though.  IMO, there's value in capturing,
+> in code, that perf_get_x86_pmu_capability() doesn't properly support hybrid vPMUs.
+> 
+> That said, poking around perf, checking is_hybrid() is wrong.  This quirk suggests
+> that if E-cores are disabled via BIOS, (a) X86_FEATURE_HYBRID_CPU is _supposed_ to
+> be cleared, and (b) the base PMU will reflect the P-core PMU.  I.e. someone can
+> enable vPMU by disabling E-cores.
+> 
+>                  /*
+>                   * Quirk: For some Alder Lake machine, when all E-cores are disabled in
+>                   * a BIOS, the leaf 0xA will enumerate all counters of P-cores. However,
+>                   * the X86_FEATURE_HYBRID_CPU is still set. The above codes will
+
+Sigh. Then what if E-cores are manually offline via "/.../cpu$/online" and then 
+init kvm module ?
+I suggest leaving these open issues to that enabling guy (or maybe it's still me).
+
+>                   * mistakenly add extra counters for P-cores. Correct the number of
+>                   * counters here.
+>                   */
+>                  if ((pmu->num_counters > 8) || (pmu->num_counters_fixed > 4)) {
+>                          pmu->num_counters = x86_pmu.num_counters;
+>                          pmu->num_counters_fixed = x86_pmu.num_counters_fixed;
+>                  }
+> 
+> Side topic, someone (*cough* Intel) should fix that, e.g. detect the scenario
+> during boot and manually clear X86_FEATURE_HYBRID_CPU.
+
+Maybe they did it on purpose.
+
+> 
+> I'm also ok explicitly disabling support in KVM, but since we need to update
+> perf as well (that KVM comment needs to go), I don't see any reason not to also
+> update perf_get_x86_pmu_capability().
+> 
+> How about this?  Maybe split over two patches to separate the KVM and perf changes?
+
+OK, applying your diff below or mine V2 as a KVM move is both fine to me. Just 
+thanks.
+
+> 
+> diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
+> index 85a63a41c471..d096b04bf80e 100644
+> --- a/arch/x86/events/core.c
+> +++ b/arch/x86/events/core.c
+> @@ -2974,17 +2974,19 @@ unsigned long perf_misc_flags(struct pt_regs *regs)
+>   
+>   void perf_get_x86_pmu_capability(struct x86_pmu_capability *cap)
+>   {
+> -       if (!x86_pmu_initialized()) {
+> +       /* This API doesn't currently support enumerating hybrid PMUs. */
+> +       if (WARN_ON_ONCE(cpu_feature_enabled(X86_FEATURE_HYBRID_CPU)) ||
+> +           !x86_pmu_initialized()) {
+>                  memset(cap, 0, sizeof(*cap));
+>                  return;
+>          }
+>   
+> +       /*
+> +        * Note, hybrid CPU models get tracked as having hybrid PMUs even when
+> +        * all E-cores are disabled via BIOS.  When E-cores are disabled, the
+> +        * base PMU holds the correct number of counters for P-cores.
+> +        */
+>          cap->version            = x86_pmu.version;
+> -       /*
+> -        * KVM doesn't support the hybrid PMU yet.
+> -        * Return the common value in global x86_pmu,
+> -        * which available for all cores.
+> -        */
+>          cap->num_counters_gp    = x86_pmu.num_counters;
+>          cap->num_counters_fixed = x86_pmu.num_counters_fixed;
+>          cap->bit_width_gp       = x86_pmu.cntval_bits;
+> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+> index cdb91009701d..933165663703 100644
+> --- a/arch/x86/kvm/pmu.h
+> +++ b/arch/x86/kvm/pmu.h
+> @@ -165,15 +165,27 @@ static inline void kvm_init_pmu_capability(void)
+>   {
+>          bool is_intel = boot_cpu_data.x86_vendor == X86_VENDOR_INTEL;
+>   
+> -       perf_get_x86_pmu_capability(&kvm_pmu_cap);
+> -
+> -        /*
+> -         * For Intel, only support guest architectural pmu
+> -         * on a host with architectural pmu.
+> -         */
+> -       if ((is_intel && !kvm_pmu_cap.version) || !kvm_pmu_cap.num_counters_gp)
+> +       /*
+> +        * Hybrid PMUs don't play nice with virtualization unless userspace
+> +        * pins vCPUs _and_ can enumerate accurate informations to the guest.
+> +        * Disable vPMU support for hybrid PMUs until KVM gains a way to let
+> +        * userspace opt into the dangers of hybrid vPMUs.
+> +       */
+> +       if (cpu_feature_enabled(X86_FEATURE_HYBRID_CPU))
+>                  enable_pmu = false;
+>   
+> +       if (enable_pmu) {
+> +               perf_get_x86_pmu_capability(&kvm_pmu_cap);
+> +
+> +               /*
+> +                * For Intel, only support guest architectural pmu
+> +                * on a host with architectural pmu.
+> +                */
+> +               if ((is_intel && !kvm_pmu_cap.version) ||
+> +                   !kvm_pmu_cap.num_counters_gp)
+> +                       enable_pmu = false;
+> +       }
+> +
+>          if (!enable_pmu) {
+>                  memset(&kvm_pmu_cap, 0, sizeof(kvm_pmu_cap));
+>                  return;
+> 
