@@ -2,70 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2251368C88D
-	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 22:24:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5088568C905
+	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 22:56:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229663AbjBFVYE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Feb 2023 16:24:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40808 "EHLO
+        id S229718AbjBFV4W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Feb 2023 16:56:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229884AbjBFVYC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Feb 2023 16:24:02 -0500
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CAEEEF83
-        for <kvm@vger.kernel.org>; Mon,  6 Feb 2023 13:23:59 -0800 (PST)
-Received: by mail-pl1-x632.google.com with SMTP id b5so13594461plz.5
-        for <kvm@vger.kernel.org>; Mon, 06 Feb 2023 13:23:59 -0800 (PST)
+        with ESMTP id S229607AbjBFV4V (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Feb 2023 16:56:21 -0500
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6675C2CFFA
+        for <kvm@vger.kernel.org>; Mon,  6 Feb 2023 13:56:19 -0800 (PST)
+Received: by mail-pl1-x631.google.com with SMTP id i2so265199ple.13
+        for <kvm@vger.kernel.org>; Mon, 06 Feb 2023 13:56:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tjRXQ/qonNQW3nkbtuFUrdlBBvSAiIx0cRRrcJJmpv0=;
-        b=pJyqPfUlhjfdu58efNPXYtzfuoMyBtyTVUOlJQCdPDvgLpoGLDksNB233WpM1C7/qO
-         XU819MrT3H3L9PQKOQFDty8cW65kpSTlGA7WrNkSqB+nK0IwchD4iS2WGcwKvDd1+Bfq
-         PKIqFkO7oDp71haOXUN9rsgsg0tI/1lxPd2s9zFMdf5Y7hEB19eynnCdQLPKxftjbgEi
-         Ya+1lJLq/BTm2HhZTij33cBHdq9Qzhe3De4eyBkDtrUk7v/6emF7mWmb3/QICl8tFKPy
-         tp9/uR7ZW0R+epAXHM2jzhgdWd9RP0HufOUuXqrhKtKisSoarOP+b4oalIcyjCikaaN3
-         btfA==
+        bh=oA+FxdNbik0My0S0w1KEYLj8BIpspP5MVk4vSgrFZDY=;
+        b=BHbtL49V7eD3chaeBphkHxjpsci87f5SE3/zKPIc0AfJm1XseNAUVc+uNHO2CcsQGo
+         2kEa2f2Q3aM1JIewTxThJzhiP6NUNxp1Lq3BCR9o2etRJAUPzd6qDCA6ZvO8jPgz0wWt
+         sAPc26FbOdMaQB8ODAiCsA4fcfh9A2+XI8pOHwemq7bBL2dUOHYlbxUWA61iPfP/Zicu
+         zgUa39pMvhabrRgj145XkMYKGZrnENNj4bl/dZe9vR9qA9XiJHNyf5pFns+zrflmlbyM
+         kIACW0t8VnUjTNUP3VfqPgBYM11+C8vU4qwjGffr1JCBBxWaNgn7aN4IrCh0mHlCHXkE
+         K3WQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tjRXQ/qonNQW3nkbtuFUrdlBBvSAiIx0cRRrcJJmpv0=;
-        b=kNwl+dhjyzn0SNhoht+qMJNcoS7sCXlobeIByXzchs/xSbe7VAGLp+wW9OdgGKdP5n
-         fc3Z1tbqtkF8O1SDhttDkypnqF7/wxeO3PrMRisuY0N9H+7gFx8yZDTbVFy2z8f0DHVR
-         Gmin8+8JpSfh8vyJjhLN1ko5qhB3K4ig8MITYZlBK2+KI7S3TBwCRCd5DQgCJmDD0S6V
-         8RZh/XjmjYu7gAMxAeUeR6qCwPMrnRph2PgwBhTx4ckKlBXIkUUPmFAALinmegk1bDdQ
-         z/GMD61w/7jkybOFIFe43B0LCTeE3S/9zbxNmi5hOQXub23yN9znaLK4NmTmkGy7RU49
-         RpPg==
-X-Gm-Message-State: AO0yUKUVJnHUwCc+JWySRSX0g0eznSINbayEVBtjQ0SfYGrtJs8lpMgM
-        AFqrPnAy1lyLja8tVoMelhIysw==
-X-Google-Smtp-Source: AK7set8AfRRIiKtZXq7K8Kz0iylVHBuimpmNO1kC+dPlQrPVd0DozJysgSwmfofyxKr2tQZHNulhnw==
-X-Received: by 2002:a17:902:cf45:b0:199:bd0:c44c with SMTP id e5-20020a170902cf4500b001990bd0c44cmr246208plg.31.1675718638754;
-        Mon, 06 Feb 2023 13:23:58 -0800 (PST)
-Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
-        by smtp.gmail.com with ESMTPSA id s10-20020a170902a50a00b001991f3d85acsm1921117plq.299.2023.02.06.13.23.57
+        bh=oA+FxdNbik0My0S0w1KEYLj8BIpspP5MVk4vSgrFZDY=;
+        b=NCHM6Mgp1oRqxCXoGzKuN+dnfM9UOsArmlkF0ySQgqPb2z86JB9clhw62gFJdN6GqW
+         y6tzkgDuJ3uwyyaAttwu6Krpx+b5XMKnX8B5DzMKCDWS/1LpuvAgyssYqZtuzZVHcXxA
+         Rzn1LdBoAwASjeX/gHkLDW+aK7yHGHCqGTWoeThJqIoNM+341Fm9ub7xJ8KNT0AyxpF8
+         3zXac31T58n2BWIhRyWmaV/QURvw04ska/b/T9ZVCuwnPV2aFnf//y9Cw1ihoVojGsVn
+         rMM00trmtxcHaRISn3+1PazIoxrRTqeQfV2ZVqSvdcXO1w+CEzI8Auh+QxHCn6Xy10av
+         OOvg==
+X-Gm-Message-State: AO0yUKVDeMwCNTvyzHc16dtZUjy1My/G7YOBERtJ+Sg+qdt2LLYbhfAC
+        hvsSri33Tx+mx0zb4r8xpSrjzg==
+X-Google-Smtp-Source: AK7set+nfKw5e0Hzkmy44AwvwG2vbmauGBb7aCLDo77wtcxyHHae1qJWSLm6Ix2gG/rReAwpEbgehQ==
+X-Received: by 2002:a17:902:c111:b0:198:af50:e4e3 with SMTP id 17-20020a170902c11100b00198af50e4e3mr37973pli.9.1675720578672;
+        Mon, 06 Feb 2023 13:56:18 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id d14-20020a170902654e00b0019678eb963fsm2781851pln.145.2023.02.06.13.56.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Feb 2023 13:23:58 -0800 (PST)
-Date:   Mon, 6 Feb 2023 13:23:54 -0800
-From:   David Matlack <dmatlack@google.com>
-To:     Kevin Cheng <chengkev@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Shuah Khan <shuah@kernel.org>
-Subject: Re: [PATCH] KVM: selftests: Added eBPF program and selftest to
- collect vmx exit stat
-Message-ID: <Y+Fv6idxCMkuMf1R@google.com>
-References: <20230126004346.4101944-1-chengkev@google.com>
+        Mon, 06 Feb 2023 13:56:17 -0800 (PST)
+Date:   Mon, 6 Feb 2023 21:56:14 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        alejandro.j.jimenez@oracle.com, mlevitsk@redhat.com,
+        pbonzini@redhat.com, jon.grimm@amd.com, vasant.hegde@amd.com,
+        kishon.vijayabraham@amd.com
+Subject: Re: [PATCH] KVM: SVM: Modify AVIC GATag to support max number of 512
+ vCPUs
+Message-ID: <Y+F3fr1HfC+pmmnF@google.com>
+References: <20230117100821.10116-1-suravee.suthikulpanit@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230126004346.4101944-1-chengkev@google.com>
+In-Reply-To: <20230117100821.10116-1-suravee.suthikulpanit@amd.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,353 +74,174 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 26, 2023 at 12:43:46AM +0000, Kevin Cheng wrote:
-> Introduce a new selftest that loads an eBPF program that stores the
-> number of vmx exit counts per vcpu per vm. A process is created per
-> vm_create to load a separate eBPF program to collect its own stats
-> unique to the pid.
+TL;DR: I'm going to post v2 of this along with some other fixes+hardening.
+
+On Tue, Jan 17, 2023, Suravee Suthikulpanit wrote:
+> AVIC GATag is managed by the SVM driver, and is used by the IOMMU driver
+
+s/SVM driver/KVM
+
+> to program the AMD IOMMU IRTE to provide reference back to SVM in case
+
+s/SVM/KVM
+
+We do sometimes use "VMX" and "SVM" to refer to KVM, but usually only when
+differentiating betwen "KVM x86" and "KVM <vendor>".  In most cases I don't think
+it would matter, but in this particular case, since the GATag is kinda sorta
+consumed by hardware, but IIUC is purely software-defined, knowing whether "SVM"
+means "KVM" or "SVM the architecture" is an important distinction.
+
+> the IOMMU cannot inject interrupt to the non-running vCPU. In such case,
+> the IOMMU hardware notify the IOMMU driver by creating GALog entry with
+
+Definitely a nit, but I would probably omit the info about the IOMMU driver.  That
+information matters if someone is trying to understand _all_ of the pieces, but
+for this specific bug I think it just ends up introducing noise.
+
+> the corresponded GATag. The IOMMU driver processes the GALog entry and
+> notifies SVM to schedule in the target vCPU.
 > 
-> This test aims to serve as a proof-of-concept and example for using eBPF
-> to collect stats that are not provided by the other stats interfaces
-> such as kvm_binary_stats. Since there will be no further stats being
-> added to kvm_binary_stats, developers can use this selftest as a
-> reference for writing their own eBPF program + selftest to collect
-> whatever stat they may need for debugging/monitoring.
+> Currently, SVM uses 8-bit vCPU ID and 24-bit VM ID to encode 32-bit GATag.
+> Since x2AVIC supports upto 512 vCPUs, it requires to use at least 9-bit
+
+"up to"
+
+Nit, x2AVIC doesn't "require" anything.  What matters is what KVM allows.  I get
+what you're saying, but I want to cleanly separate "what's allowed by the spec"
+and "what does KVM actually do".
+
+> vCPU ID.
 > 
-> Signed-off-by: Kevin Cheng <chengkev@google.com>
+> Therefore, modify the GATag enconding to use the number of bits required
+
+s/enconding/encoding
+
+> to support the maximum vCPUs.
+
+Thank you for the explanation of how this all works!  IIUC, this is missing one
+key point though: the GATag is 100% software-defined and never interpreted by
+hardware.  I.e. KVM can shove whatever it wants into the tag.
+
+And while I'm nitpicking, please lead with the "what".  For the changelog as a whole,
+some maintainers/subsystems prefer leading with the "why", but I strongly prefer that
+changelogs state what the patch actually does and then provide the background/justification.
+
+Copy-pasting a prior copy-paste (I really need to save this as a Vim macro formletter)
+
+ : To some extent, it's a personal preference, e.g. I
+ : find it easier to understand the details (why something is a problem) if I have
+ : the extra context of how a problem is fixed (or: what code was broken).
+ :
+ : But beyond personal preference, there are less subjective reasons for stating
+ : what a patch does before diving into details.  First and foremost, what code is
+ : actually being changed is the most important information, and so that information
+ : should be easy to find.  Changelogs that bury the "what's actually changing" in a
+ : one-liner after 3+ paragraphs of background make it very hard to find that information.
+ :
+ : Maybe for initial review one could argue that "what's the bug" is more important,
+ : but for skimming logs and git archeology, the gory details matter less and less.
+ : E.g. when doing a series of "git blame", the details of each change along the way
+ : are useless, the details only matter for the culprit; I just want to quickly
+ : determine whether or not a commit might be of interest.
+ :
+ : Another argument for stating "what's changing" first is that it's almost always
+ : possible to state "what's changing" in a single sentence.  Conversely, all but the
+ : most simple bugs require multiple sentences or paragraphs to fully describe the
+ : problem.  If both the "what's changing" and "what's the bug" are super short then
+ : the order doesn't matter.  But if one is shorter (almost always the "what's changing),
+ : then covering the shorter one first is advantageous because it's less of an
+ : inconvenience for readers/reviewers that have a strict ordering preference.  E.g.
+ : having to skip one sentence to get to the stuff you care about is less painful than
+ : me having to skip three paragraphs to get to the stuff that I care about.
+
+[*] https://lore.kernel.org/all/YurKx+gFAWPvj35L@google.com
+
+> Reported-by: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
+> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
 > ---
->  tools/testing/selftests/kvm/Makefile          |   4 +-
->  tools/testing/selftests/kvm/build_ebpf.sh     |   5 +
->  .../testing/selftests/kvm/kvm_vmx_exit_ebpf.c | 128 ++++++++++++++++++
->  .../selftests/kvm/kvm_vmx_exit_ebpf_kern.c    |  74 ++++++++++
-
-x86-specific tests should go in tools/testing/selftests/kvm/x86_64.
-
->  4 files changed, 210 insertions(+), 1 deletion(-)
->  create mode 100644 tools/testing/selftests/kvm/build_ebpf.sh
->  create mode 100644 tools/testing/selftests/kvm/kvm_vmx_exit_ebpf.c
->  create mode 100644 tools/testing/selftests/kvm/kvm_vmx_exit_ebpf_kern.c
+>  arch/x86/include/asm/svm.h | 3 ++-
+>  arch/x86/kvm/svm/avic.c    | 9 ++++-----
+>  2 files changed, 6 insertions(+), 6 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index 1750f91dd936..d9f56ccbc7bb 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -129,6 +129,7 @@ TEST_GEN_PROGS_x86_64 += set_memory_region_test
->  TEST_GEN_PROGS_x86_64 += steal_time
->  TEST_GEN_PROGS_x86_64 += kvm_binary_stats_test
->  TEST_GEN_PROGS_x86_64 += system_counter_offset_test
-> +TEST_GEN_PROGS_x86_64 += kvm_vmx_exit_ebpf
+> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+> index 0361626841bc..6738faf155e4 100644
+> --- a/arch/x86/include/asm/svm.h
+> +++ b/arch/x86/include/asm/svm.h
+> @@ -256,7 +256,8 @@ enum avic_ipi_failure_cause {
+>  	AVIC_IPI_FAILURE_INVALID_BACKING_PAGE,
+>  };
 >  
->  # Compiled outputs used by test targets
->  TEST_GEN_PROGS_EXTENDED_x86_64 += x86_64/nx_huge_pages_test
-> @@ -176,6 +177,7 @@ TEST_GEN_PROGS_riscv += set_memory_region_test
->  TEST_GEN_PROGS_riscv += kvm_binary_stats_test
->  
->  TEST_PROGS += $(TEST_PROGS_$(ARCH_DIR))
-> +TEST_PROGS := build_ebpf.sh
+> -#define AVIC_PHYSICAL_MAX_INDEX_MASK	GENMASK_ULL(9, 0)
 
-build_ebpf.sh is not be a test program. It should be part of this
-Makefile. i.e. running
+Isn't the existing mask wrong?  The high bit is inclusive, i.e. this is defining
+a mask of 10 bits, not 9.
 
-  make -C tools/testing/selftests/kvm
+Actually, neither 10 nor 9 bits is correct if we are going by the most recent APM,
+i.e. the mask should be 8:0 if we want to tie this to what is actually defined in
+the architecture.
 
-should build tools/lib/bpf and kvm_vmx_exit_ebpf_kern.o. Developers
-can't be expected to run
-tools/testing/testing/selftests/kvm/build_ebpf.sh every time they want
-to build the KVM selftests.
+  All the addresses point to 4-Kbyte aligned data structures. Bits 11:0 are reserved
+  (except for offset 0F8h) and should be set to zero. The lower 8 bits of offset 0F8h
+  are used for the field AVIC_PHYSICAL_MAX_INDEX. VMRUN fails with #VMEXIT(VMEXIT_INVALID)
+  if AVIC_PHYSICAL_MAX_INDEX is greater than 255 in xAVIC mode or greater than 511 in
+  x2AVIC mode.
 
->  TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(ARCH_DIR))
->  TEST_GEN_PROGS_EXTENDED += $(TEST_GEN_PROGS_EXTENDED_$(ARCH_DIR))
->  LIBKVM += $(LIBKVM_$(ARCH_DIR))
-> @@ -208,7 +210,7 @@ no-pie-option := $(call try-run, echo 'int main(void) { return 0; }' | \
->  pgste-option = $(call try-run, echo 'int main(void) { return 0; }' | \
->  	$(CC) -Werror -Wl$(comma)--s390-pgste -x c - -o "$$TMP",-Wl$(comma)--s390-pgste)
->  
-> -LDLIBS += -ldl
-> +LDLIBS += -ldl -L$(top_srcdir)/tools/lib/bpf -lbpf -lelf -lz
+Looking through the discussion history of the x2AVIC enabling, this appears to be
+an off-by-one goof, i.e. not a deliberate speculation on how bits 11:9 will be
+used.
 
-Please add a comment document why the different libraries are needed for
-future readers.
+> +#define AVIC_PHYSICAL_MAX_INDEX_BITS	9
 
->  LDFLAGS += -pthread $(no-pie-option) $(pgste-option)
->  
->  LIBKVM_C := $(filter %.c,$(LIBKVM))
-> diff --git a/tools/testing/selftests/kvm/build_ebpf.sh b/tools/testing/selftests/kvm/build_ebpf.sh
-> new file mode 100644
-> index 000000000000..b8038b0a0da5
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/build_ebpf.sh
-> @@ -0,0 +1,5 @@
-> +#!/bin/sh
-> +# SPDX-License-Identifier: GPL-2.0
-> +clang -g -O2 -target bpf -D__TARGET_ARCH_x86_64 -I . -c kvm_vmx_exit_ebpf_kern.c
-> +        -o kvm_vmx_exit_ebpf_kern.o
-> +make -C ../../../lib/bpf || exit
+This name is misleading/wrong.  As above, the high bit is inclusive.  If we wanted
+to specify the high bit, it would be something like MAX_INDEX_MAX_BIT, which is pretty
+awful.
 
-As mentioned above, this should be part of the Makefile.
+Ha!  We don't need a separate define.  const_hweight.h provides compile-time
+hweight, a.k.a. popcount, macros.  We can use that to compute the shift of the
+VM ID portion of the GATag, then we don't need to come up with a name.
 
-> diff --git a/tools/testing/selftests/kvm/kvm_vmx_exit_ebpf.c b/tools/testing/selftests/kvm/kvm_vmx_exit_ebpf.c
-> new file mode 100644
-> index 000000000000..a4bd2c549207
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/kvm_vmx_exit_ebpf.c
-> @@ -0,0 +1,128 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +
-> +#include <stdio.h>
-> +#include <stdlib.h>
-> +#include <signal.h>
-> +#include <sys/types.h>
-> +#include <sys/wait.h>
-> +#include <unistd.h>
-> +#include <bpf/bpf.h>
-> +#include <../bpf/libbpf.h>
-> +#include <linux/btf.h>
-> +
-> +#include "test_util.h"
-> +
-> +#include "kvm_util.h"
-> +#include "linux/kvm.h"
-> +
-> +#define VCPU_ID         0
-> +
-> +struct stats_map_key {
-> +	__u32 pid;
-> +	__u32 vcpu_id;
-> +	__u32 exit_reason;
-> +};
-> +
-> +static void guest_code(void)
-> +{
-> +	__asm__ __volatile__("cpuid");
-> +}
-> +
-> +int main(int argc, char **argv)
-> +{
-> +	if (argc < 2) {
-> +		fprintf(stderr, "Expected arguments: <number_of_vms>\n");
-> +		return EXIT_FAILURE;
+I'll post the below as v2 on top of the AVIC_PHYSICAL_MAX_INDEX_MASK fix.
 
-Selftests run by default with no arguments. So please provide a default
-number of VMs to run with the test. Otherwise this test will just fail
-by default.
+diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+index ca684979e90d..326341a22153 100644
+--- a/arch/x86/kvm/svm/avic.c
++++ b/arch/x86/kvm/svm/avic.c
+@@ -27,19 +27,29 @@
+ #include "irq.h"
+ #include "svm.h"
+ 
+-/* AVIC GATAG is encoded using VM and VCPU IDs */
+-#define AVIC_VCPU_ID_BITS              8
+-#define AVIC_VCPU_ID_MASK              ((1 << AVIC_VCPU_ID_BITS) - 1)
++/*
++ * Encode the arbitrary VM ID and the vCPU's default APIC ID, i.e the vCPU ID,
++ * into the GATag so that KVM can retrieve the correct vCPU from a GALog entry
++ * if an interrupt can't be delivered, e.g. because the vCPU isn't running.
++ *
++ * For the vCPU ID, use however many bits are currently allowed for the max
++ * guest physical APIC ID (limited by the size of the physical ID table), and
++ * use whatever bits remain to assign arbitrary AVIC IDs to VMs.  Note, the
++ * size of the GATag is defined by hardware (32 bits), but is an opaque value
++ * as far as hardware is concerned.
++ */
++#define AVIC_VCPU_ID_MASK              AVIC_PHYSICAL_MAX_INDEX_MASK
+ 
+-#define AVIC_VM_ID_BITS                        24
+-#define AVIC_VM_ID_NR                  (1 << AVIC_VM_ID_BITS)
+-#define AVIC_VM_ID_MASK                        ((1 << AVIC_VM_ID_BITS) - 1)
++#define AVIC_VM_ID_SHIFT               HWEIGHT32(AVIC_PHYSICAL_MAX_INDEX_MASK)
++#define AVIC_VM_ID_MASK                        (GENMASK(31, AVIC_VM_ID_SHIFT) >> AVIC_VM_ID_SHIFT)
+ 
+-#define AVIC_GATAG(x, y)               (((x & AVIC_VM_ID_MASK) << AVIC_VCPU_ID_BITS) | \
++#define AVIC_GATAG(x, y)               (((x & AVIC_VM_ID_MASK) << AVIC_VM_ID_SHIFT) | \
+                                                (y & AVIC_VCPU_ID_MASK))
+-#define AVIC_GATAG_TO_VMID(x)          ((x >> AVIC_VCPU_ID_BITS) & AVIC_VM_ID_MASK)
++#define AVIC_GATAG_TO_VMID(x)          ((x >> AVIC_VM_ID_SHIFT) & AVIC_VM_ID_MASK)
+ #define AVIC_GATAG_TO_VCPUID(x)                (x & AVIC_VCPU_ID_MASK)
+ 
++static_assert(AVIC_GATAG(AVIC_VM_ID_MASK, AVIC_VCPU_ID_MASK) == -1u);
++
+ static bool force_avic;
+ module_param_unsafe(force_avic, bool, 0444);
+ 
 
-It's common (at least for me) to run all KVM selftests when submitting
-patches. So having one test that always fails will be annoying to deal
-with.
-
-Also, can you provide some details (e.g. in a comment) about why a user
-might want to pick a different number of VMs? What is the value of
-running this test with 1 VM vs. 2 vs. 3 etc.?
-
-> +	}
-> +	int n = atoi(argv[1]);
-> +
-> +	for (int i = 0; i < n; i++) {
-> +		if (fork() == 0) {
-
-Put the implementation of the child process into a helper function to
-reduce indentation.
-
-> +			struct kvm_vm *vm;
-> +			struct kvm_vcpu *vcpu;
-> +
-> +			vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-> +
-> +			// BPF userspace code
-> +			struct bpf_object *obj;
-> +			struct bpf_program *prog;
-> +			struct bpf_map *map_obj;
-> +			struct bpf_link *link = NULL;
-> +
-> +			obj = bpf_object__open_file("kvm_vmx_exit_ebpf_kern.o", NULL);
-> +			if (libbpf_get_error(obj)) {
-> +				fprintf(stderr, "ERROR: opening BPF object file failed\n");
-> +				return 0;
-
-I notice the children and parent always return 0. The test should exit
-with a non-0 return code if it fails.
-
-> +			}
-> +
-> +			map_obj = bpf_object__find_map_by_name(obj, "vmx_exit_map");
-> +			if (!map_obj) {
-> +				fprintf(stderr, "ERROR: loading of vmx BPF map failed\n");
-> +				goto cleanup;
-> +			}
-> +
-> +			struct bpf_map *pid_map = bpf_object__find_map_by_name(obj, "pid_map");
-> +
-> +			if (!pid_map) {
-> +				fprintf(stderr, "ERROR: loading of pid BPF map failed\n");
-> +				goto cleanup;
-> +			}
-> +
-> +			/* load BPF program */
-
-No need for this comment. bpf_object__load() is quite obvious already :)
-
-> +			if (bpf_object__load(obj)) {
-> +				fprintf(stderr, "ERROR: loading BPF object file failed\n");
-> +				goto cleanup;
-> +			}
-> +
-> +			__u32 userspace_pid = (__u32)getpid();
-> +			__u32 val = (__u32)getpid();
-> +
-> +			bpf_map_update_elem(bpf_map__fd(pid_map), &userspace_pid, &val, 0);
-> +
-> +			prog = bpf_object__find_program_by_name(obj, "bpf_exit_prog");
-> +			if (libbpf_get_error(prog)) {
-> +				fprintf(stderr, "ERROR: finding a prog in obj file failed\n");
-> +				goto cleanup;
-> +			}
-> +
-> +			link = bpf_program__attach(prog);
-> +			if (libbpf_get_error(link)) {
-> +				fprintf(stderr, "ERROR: bpf_program__attach failed\n");
-> +				link = NULL;
-> +				goto cleanup;
-> +			}
-> +
-> +			for (int j = 0; j < 10000; j++)
-> +				vcpu_run(vcpu);
-
-It might be interesting to (1) add some timing around this loop and (2)
-run this loop without any bpf programs attached. i.e. Automatically do
-an A/B performance comparison with and without bpf programs.
-
-> +
-> +			struct stats_map_key key = {
-> +				.pid = 0,
-> +				.vcpu_id = 0,
-> +				.exit_reason = 18,
-> +			};
-> +
-> +
-> +			struct stats_map_key next_key, lookup_key;
-> +
-> +			lookup_key = key;
-> +			while (bpf_map_get_next_key(bpf_map__fd(map_obj), &lookup_key, &next_key)
-> +				 == 0) {
-> +				int count;
-> +
-> +				bpf_map_lookup_elem(bpf_map__fd(map_obj), &next_key, &count);
-> +				fprintf(stdout, "exit reason: '%d'\ncount: %d\npid: %d\n",
-> +						next_key.exit_reason, count, next_key.pid);
-
-Instead of printing ot the count, assert that the count has the right
-value.
-
-> +				lookup_key = next_key;
-> +			}
-> +
-> +cleanup:
-> +			bpf_link__destroy(link);
-> +			bpf_object__close(obj);
-> +			kvm_vm_free(vm);
-
-Shouldn't the child process exit here? Otherwise it's going to keep
-looping and creating *more* children?
-
-> +		}
-> +	}
-> +
-> +	for (int i = 0; i < n; i++)
-> +		wait(NULL);
-> +	return 0;
-> +}
-> diff --git a/tools/testing/selftests/kvm/kvm_vmx_exit_ebpf_kern.c b/tools/testing/selftests/kvm/kvm_vmx_exit_ebpf_kern.c
-> new file mode 100644
-> index 000000000000..b9c076f93171
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/kvm_vmx_exit_ebpf_kern.c
-
-I think we should carve out a new directory for bpf programs. If we mix
-this in with the selftest .c files, it will start to get confusing.
-
-e.g. tools/testing/selftests/kvm/bpf/vmx_exit_count.c
-
-Note I dropped the "kvm_" prefix since it's obvious this is a
-KVM-related program since it's under the KVM selftest directory. And I
-also dropped "_ebpf_kern" since that's now obvious from the fact that
-this is in the bpf/ subdirectory (which should only contain bpf
-programs).
-
-> @@ -0,0 +1,73 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +#include <linux/bpf.h>
-> +#include <stdint.h>
-> +#include <bpf/bpf_helpers.h>
-> +#include <bpf/bpf_tracing.h>
-> +#include <bpf/bpf_core_read.h>
-> +
-> +struct kvm_vcpu {
-> +	int vcpu_id;
-> +};
-> +
-> +struct vmx_args {
-> +	__u64 pad;
-> +	unsigned int exit_reason;
-> +	__u32 isa;
-> +	struct kvm_vcpu *vcpu;
-> +};
-> +
-> +struct stats_map_key {
-> +	__u32 pid;
-> +	__u32 vcpu_id;
-> +	__u32 exit_reason;
-> +};
-> +
-> +struct {
-> +	__uint(type, BPF_MAP_TYPE_HASH);
-> +	__uint(max_entries, 1024);
-> +	__type(key, struct stats_map_key);
-> +	__type(value, int);
-> +} vmx_exit_map SEC(".maps");
-> +
-> +struct {
-> +	__uint(type, BPF_MAP_TYPE_HASH);
-> +	__uint(max_entries, 1);
-> +	__type(key, __u32);
-> +	__type(value, __u32);
-> +} pid_map SEC(".maps");
-> +
-> +
-> +SEC("tracepoint/kvm/kvm_exit")
-> +int bpf_exit_prog(struct vmx_args *ctx)
-> +{
-> +	__u32 curr_pid = (bpf_get_current_pid_tgid() >> 32);
-> +
-> +	__u32 *userspace_pid = bpf_map_lookup_elem(&pid_map, &curr_pid);
-> +
-> +	if (!userspace_pid || *userspace_pid != curr_pid)
-> +		return 0;
-> +
-> +	struct kvm_vcpu *vcpu = ctx->vcpu;
-> +	int _vcpu_id = BPF_CORE_READ(vcpu, vcpu_id);
-> +
-> +	struct stats_map_key key = {
-> +		.pid = (bpf_get_current_pid_tgid() >> 32),
-> +		.vcpu_id = _vcpu_id,
-> +		.exit_reason = ctx->exit_reason,
-> +	};
-> +
-> +	int *value = bpf_map_lookup_elem(&vmx_exit_map, &key);
-> +
-> +	if (value) {
-> +		*value = *value + 1;
-> +		bpf_map_update_elem(&vmx_exit_map, &key, value, BPF_ANY);
-> +	} else {
-> +		int temp = 1;
-> +
-> +		bpf_map_update_elem(&vmx_exit_map, &key, &temp, BPF_ANY);
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +char _license[] SEC("license") = "GPL";
-> -- 
-> 2.39.1.456.gfc5497dd1b-goog
-> 
