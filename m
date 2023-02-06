@@ -2,122 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 489E368B4A9
-	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 04:52:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B75F168B4A6
+	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 04:52:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229645AbjBFDwi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 5 Feb 2023 22:52:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47268 "EHLO
+        id S229591AbjBFDwf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 5 Feb 2023 22:52:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229637AbjBFDwg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 5 Feb 2023 22:52:36 -0500
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF5AE17CE8;
-        Sun,  5 Feb 2023 19:52:35 -0800 (PST)
+        with ESMTP id S229485AbjBFDwd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 5 Feb 2023 22:52:33 -0500
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6E7517CE8;
+        Sun,  5 Feb 2023 19:52:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1675655552; x=1707191552;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=n8F7ykFiK3D32FTPIQQi7p3EkOV1gGAWpvJfKmVvkSw=;
+  b=A3nltQ0AScd62lGId217W2c9O/5qN82JEk8vgpa/6b1l7+lcSjE/uYLA
+   2Vp9YMaGzTVj3Pwajoeh+rG2m0Eaep7PfYet1KEWjTVmR1het4Vr1iZcM
+   hV6JueVpyNS+Bmg8pEQJdnsAuJa8awfTfivSAhLRBpNjGGrbLtIbSyNll
+   BdYRqIwXqnLj2R8qVA7pDocyieWvpd7X99MYC4Z9K5iGS4iHxrXjDkzxG
+   uDUv/DTwGHAzb0kOEXzaXmA4zNYgA8Br+RCMEnpgvl0D/6Ch9JdZDx13g
+   WRTW36W6sitiPSyI9GOGwDaT14I+IBC964kp2ssENo/6XpurE8ARAI5lZ
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10612"; a="330417989"
+X-IronPort-AV: E=Sophos;i="5.97,276,1669104000"; 
+   d="scan'208";a="330417989"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2023 19:52:32 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10612"; a="616316225"
+X-IronPort-AV: E=Sophos;i="5.97,276,1669104000"; 
+   d="scan'208";a="616316225"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orsmga003.jf.intel.com with ESMTP; 05 Feb 2023 19:52:31 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Sun, 5 Feb 2023 19:52:31 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Sun, 5 Feb 2023 19:52:30 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16 via Frontend Transport; Sun, 5 Feb 2023 19:52:30 -0800
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.46) by
+ edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.16; Sun, 5 Feb 2023 19:52:29 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mazkdNVQiBu3Y7tSL5vJC5by0TgJmn1mDz8ejOEst05VivkfkmgTUXvLZRzBxCteuK3b7J3HPTLVyMGmp8vxMzN7TVfIlkRggNmxrq5oVEgyNjZ+6m6grew5Z3cq5C1JZcJq0Eo4q26GaxTTI1KsvA8+Pg0qcx2VgBZN0VDN8sI8FU76Vx9Xp5BingTYJ8oYAxqya31r63RVg+zAt2EuXsmF78lLxg+UGB8+ziBdhbgJquAgwzRDrS7427hjUbU2P5xHWymL0QWkHopU5MuTxyTTOEZm6qg2dG952zg+x3EIW0FyYnkxHbZ/QMHHMM+QucAnr/w08DFEo7vol4eh8A==
+ b=kK90/NPnL8RDo8mGBgsl0Yb5KWL8y11sZpfPwkg/KrIa5b/DQ4fB14tptQ6nlAKIHRoEH9bqjSfz8uHKA1L1v7cmR1AebV2PeyTRl9C91w4yZLbnCf4aIP4zH7p1pnaO6xgmrbvsn5HbM4FREr4jOroKyZBaNQ1gusABdhEtcJxej7sQFT7+PH3F+HXWwcvZ3DfrA4tDq5eCT3kiCIRivsh+R5GDK3mitbu9qrF54v4xaVa+0CbmFtEyQrfijnfiTVVDXaUOEIDhtnSZ6XMmkK/tghzdkeMBqZR8BdbliseMBAT/T7WXcVoOE073Lua6ndwC3e9XTM+M1KsUF1HFPQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=V0ZdHvFGAF5ZsnBrL+WYn0OvyL4oE63oY+2y2oW54jk=;
- b=COSppa0vIl6eVTgPgGupRz7j3Kljik/gK8fM5yhoUhLfD4+re6zaHygN4uQVt0X6qvRJZVz4wLHVx5gpCeG9JyDFGnMmO1qHIXGk+D4yqWvhiAxkDozXn/gtuxhtXnB43SZ3JJBh/GdJtz60u6SXcU5f/3BmdlPUf+JSxKrgvZ9cNJu6xqndFKKjf9XTf9GTMGdbEHbdd19X/j3Zuvqh76UFV1/jJzlT6wQBxBGNiT8mudHzAV7gtwrp1rpHA5GbwpkGsLgUMoukS88zs5JIWbwY8N7SDHONsUWzTmjbO2Lh2eysSyt5CLsl8nJsPjyImtQKJsUYrZ2H0Gaz9VXELQ==
+ bh=8UeHWSDGFQm4aEm3+sNvsgXMp7IV0r6A5neDylXNQeM=;
+ b=DE6kJSej3euEFVm6abiBRNRistsFLy/v42Sq5PiLYOo++VXM0A3fBbuHqtTTHxNXtQZKapQGMN0jaM7xJWRJ8Pe2MOBZn1zcyWyfCGgwZFWOIoZ380kT6JGh29sUtvhw6mrmJVAf3XJIiaU7mKjN4oA3CqKHr/EZSfce+M9OPSIbiCdjiIW6T8KyL7Yb5RfTv0q/GtkBg5b1UUPKTkjpAMWSdQesF5MozRRvtWx9exU1R0ROIj2DlNPBQJoh/GywIw4DVvXO/OJ7FH4mpj8f8GpcPgBDgk6fi7AcZADTf1PNeDGYvVKUtqYAySrK31OtP/9YAy2WHoAZrfn00ZwjSg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=V0ZdHvFGAF5ZsnBrL+WYn0OvyL4oE63oY+2y2oW54jk=;
- b=Y7N6mKdhTMezuksGgPsyzM5vmCgWlnAm3OkuXWbEqhWI6sUJk33O8EIUnLnObKiCCV29LWB0D1W9hdj7fRaNfTFUNnnCeRjLWmk6j+x5tPHgWm4nivkwu2rdUSo+9fw4DnO65vAI+0bpxbcSo77k4aacTsfh179gUsp+U5xppJ0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM8PR12MB5445.namprd12.prod.outlook.com (2603:10b6:8:24::7) by
- PH8PR12MB7028.namprd12.prod.outlook.com (2603:10b6:510:1bf::15) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by IA1PR11MB7810.namprd11.prod.outlook.com (2603:10b6:208:3f3::11) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6064.34; Mon, 6 Feb
- 2023 03:52:33 +0000
-Received: from DM8PR12MB5445.namprd12.prod.outlook.com
- ([fe80::c4fa:4cd7:4538:e54b]) by DM8PR12MB5445.namprd12.prod.outlook.com
- ([fe80::c4fa:4cd7:4538:e54b%5]) with mapi id 15.20.6064.034; Mon, 6 Feb 2023
- 03:52:32 +0000
-Message-ID: <d5eeb8c0-3083-89f4-415c-f30a2c4cde39@amd.com>
-Date:   Mon, 6 Feb 2023 10:52:22 +0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH] KVM: SVM: Modify AVIC GATag to support max number of 512
- vCPUs
+ 2023 03:52:26 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::6a8d:b95:e1b5:d79d]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::6a8d:b95:e1b5:d79d%8]) with mapi id 15.20.6064.034; Mon, 6 Feb 2023
+ 03:52:26 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "jgg@nvidia.com" <jgg@nvidia.com>
+CC:     "cohuck@redhat.com" <cohuck@redhat.com>,
+        "farman@linux.ibm.com" <farman@linux.ibm.com>,
+        "pmorel@linux.ibm.com" <pmorel@linux.ibm.com>,
+        "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
+        "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
+        "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
+        "jjherne@linux.ibm.com" <jjherne@linux.ibm.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v4 1/2] vfio: fix deadlock between group lock and kvm lock
+Thread-Topic: [PATCH v4 1/2] vfio: fix deadlock between group lock and kvm
+ lock
+Thread-Index: AQHZOBmQ43ni2TX4OkKomzgfxOFFkq7BTI4w
+Date:   Mon, 6 Feb 2023 03:52:25 +0000
+Message-ID: <BN9PR11MB5276544E7CE1289C6A6FF4098CDA9@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20230203215027.151988-1-mjrosato@linux.ibm.com>
+ <20230203215027.151988-2-mjrosato@linux.ibm.com>
+In-Reply-To: <20230203215027.151988-2-mjrosato@linux.ibm.com>
+Accept-Language: en-US
 Content-Language: en-US
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     seanjc@google.com, alejandro.j.jimenez@oracle.com,
-        mlevitsk@redhat.com, pbonzini@redhat.com, jon.grimm@amd.com,
-        vasant.hegde@amd.com, kishon.vijayabraham@amd.com
-References: <20230117100821.10116-1-suravee.suthikulpanit@amd.com>
-From:   "Suthikulpanit, Suravee" <suravee.suthikulpanit@amd.com>
-In-Reply-To: <20230117100821.10116-1-suravee.suthikulpanit@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SI2PR04CA0011.apcprd04.prod.outlook.com
- (2603:1096:4:197::10) To DM8PR12MB5445.namprd12.prod.outlook.com
- (2603:10b6:8:24::7)
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|IA1PR11MB7810:EE_
+x-ms-office365-filtering-correlation-id: a3efa97d-95bd-48c9-957f-08db07f58f8d
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: mFpftxVjTM1cI95Eku2fvO+Kkt3LDvBQC8JomH7Y188I/BOI0AqI1SKT106N3nran1cqH7L5dpTjsNirMw9c/Myj4S8DMkx7xRySTz2sChyc/XPiivOsLwjx1ALDxhnPhgkjbWrNuONC9Mav68zWJe5T6UnDN5Yha7k6C0EXs6mKYtXnKrx6OnbygPtpVkOWWx11a9jLuBl0VIIrMk/Vo3TeOiuKt1BQhvh5vmcgr+bt8fjdnxF8x72IVvxtIA0O3H33trHdRSzUSKPgbxwiTZPWlFTXV9HBOk/w2XUX35oOoxtCiS9FO/Fr+MLwR/QTqVOoqyVpwX849e3wzwegj/hJMNRi2uKbNcEKhm76Lb0nihQHJ19WKMfAsOF9NRWHG2TW6zh2jTGEUxtqv+fd0afFS3y21rdT6pYUIV4SjfoLsXvztExlk3Q9tqWeWQyPjJuvij3FDSjbfxxX0RgAuN2Ju82iR3vG1QKq2DvYPloLvAfc5MzX1YojPQObuf9X4Ck/Q8HtRHiW+vNSuYeDl01k9dDG7LNNHMyw6tU7vccX8hknHC0xZ/7wbiShOnBrkgaMiwW0dz1kUgode8v8KE4ctF7+PblcXdyg0twbqfxeX6tCr8JwdUjdVpHhb8CjWSceYv5zdXDT6HZG09nWKDaEI5ZNAq5QDyorJCvGDvBGBOw8qkw66zfIlUial2Th4DKOgWxXlmLmjTXHXLrxhQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(346002)(396003)(366004)(376002)(39860400002)(136003)(451199018)(7416002)(5660300002)(52536014)(8936002)(83380400001)(41300700001)(86362001)(38100700002)(38070700005)(55016003)(82960400001)(122000001)(2906002)(186003)(26005)(9686003)(110136005)(54906003)(6506007)(478600001)(71200400001)(7696005)(33656002)(66476007)(76116006)(66446008)(66946007)(66556008)(4326008)(64756008)(8676002)(316002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?qzOXEKbR3h0De9cFB1Ojqo6ukMV/tBpxWVlMyJV+mEcXJa6mLQ0bYV8AXPe6?=
+ =?us-ascii?Q?q/bh1GIUPx3lwTZLEYvlkMxpZ1VY2f33BaQfEoNMG6h17oNVSikOnopAsZf9?=
+ =?us-ascii?Q?lUi0MoypeP4w2iuwtP7XrV6nh9DqaNNF97ZaWFFEq/+B0Fntyw6SpmWsDPFC?=
+ =?us-ascii?Q?MYNP5TCj/z5rwUJgfIJnoBLpvDHOz9xKFk9y7OTpBHCrMl+/uhVFkiK4fvs8?=
+ =?us-ascii?Q?1Y7ZISQ8vur4zbIV7yskgC0UnhCgumwNhWJNE+bMYYlsnYpTMmsWOYtRGfg2?=
+ =?us-ascii?Q?2WacG2m4qXZsqNtGOI+IXRkejxy9MescAgM87FonyzGBi/g7WBhaSHlmqdQX?=
+ =?us-ascii?Q?wnYJmOMXXIpp0dxAPsxQoRtOlc0jBgvbX/xd/DDOUPvf09XFKRLQ4RT4REan?=
+ =?us-ascii?Q?jp/m6TFJcpeNShC7gh/QaSzsXW5DuD1u8ilrL711hgE5WGP+e6w+1Fpb+BKc?=
+ =?us-ascii?Q?ZccN8v11UhsrqxPKmxS+Yppw0q9B8gUI2UClAIRPRZe7fNEMISN1rX+lkeX4?=
+ =?us-ascii?Q?TTRXQwJiI3KmAOFWKhv4MhkNNdrZOLCNGQsrERfr0wCQ2csXaQRYPSsoZiaS?=
+ =?us-ascii?Q?FYSS5kxzsD3YFVBby8Y+hjFci1bj1uwRh5dXw+KPnkYyXa1FrA4GXSMjCNIG?=
+ =?us-ascii?Q?YXE9mWOPGcSzANxUQPCeRMF7QhMpgIYQ0uflD0m5duXyqbfSnu+vem+UVfIX?=
+ =?us-ascii?Q?Icm48lgVLHOu4Q+foWyrL7g8uEFUrrK4YLTYH1BYNzL5JMOEcKtMbS8g/Skk?=
+ =?us-ascii?Q?24Q9ksNTMNy+kUkJQojrpkcP8bb1YFbewwgpmvlm9L0znN4IbVMrM8ZGfreh?=
+ =?us-ascii?Q?U0PoeHoC4CE3UGI5m1Gunysfg0/YWzTRg8KpsGpOLhyzMHsTzJBPADUiWyX6?=
+ =?us-ascii?Q?J2YBQNgBeb5gPyXjv4EVUedHNlYoY8X5k7uxaayf9DUXYStQW1jhAgv0TrnG?=
+ =?us-ascii?Q?eEzYnyVWr2MZfE0/8UYkGOa2SCHm6vrwKww4t4Js99LSRpuqIpIyqy0rIck9?=
+ =?us-ascii?Q?zPuYXoz22068UeQkGuwtJHEz2DnCxTDUFF2K2PC1OMAFJQcQz6t1RuwjlJZq?=
+ =?us-ascii?Q?d6g/FOZLVqaLq0hIFstKwtjSIOQnpVfmlbly/+lnowYblBSLOPtjeOqK4dZD?=
+ =?us-ascii?Q?cyqTQO8zboKk26IAaTrnGwXDCNZAPwhNZwvZ5Z5QTLDwTQFEYsaHOdq40Gck?=
+ =?us-ascii?Q?rFBQiWMBZECu/e9H0dlVmfgxwp9N/y0hKhamhzNRflXk3DLOR8lMVZG1svm+?=
+ =?us-ascii?Q?MNoHqeDeHLZrNi8XSCYJU0vF9FAZtcoMjbWMh5fZDp13HVkMaCoLJfL2iAUc?=
+ =?us-ascii?Q?9Y98PjKSFVqXfvUl2w2O6bJ5/mUfvoyeIfCz4Yy/43TjhpIHMfKfurDZEDZO?=
+ =?us-ascii?Q?8w8NtSr2YYylDg0N3HYFT1v6YhwtLuQ+WKP9nm4QyAMFikrHmUy6QWK7oFde?=
+ =?us-ascii?Q?A74bhEtxfif0cUSIsLrcAI9xEGqATZMfgzkCBE52Ji3BpLKLPDevyb7V6nO8?=
+ =?us-ascii?Q?BHby6mZCwX5QOcnfdegT6bNBn6vYFuZ6X5PrSz5UNqbm0cQgSj2g9PzPAdNU?=
+ =?us-ascii?Q?mdpoNCBBzKgX0rM7RCOS5ZfXlac+3DPG2jLHMhVr?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM8PR12MB5445:EE_|PH8PR12MB7028:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8f12def6-1332-4fcd-2755-08db07f5931d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: pWHabXZS8KsTcVzTn7BWZqK6SK2R7qiJXp0RM5xE0GHwk+A2CX+6TiJsVIYQhVxAZOMTBERPMFPtD9tCUlFzN/s/o4uDarTLYwXLwGpUH23kDS3Xy/L/0FxjJwbagsQU9JCTff539EojbrIMNvCAk3GpBEOTrp/2ZCRQpWDA8Xcp3KsbmSFZxk/PNkYF+OFmeiraO4Ey21E+zNNYgW+ZXNCZ+64KPj1ddF8MurL6WK5xjsZkbLreHnStvOwc+dujGzd+njG81tVP4iXzis0BSCQ0EvVlGZx+FAt1yrz8YWhe6AVZU6hM6PQMx/oE+XyfLC822l+wvEeKw0wEbJtuHZNLb1sB+VeRIEUpBbWBotrn/6xkeC9EknTdP5LysYML9oIFUeQrXQJHhFCdlrSQRooXasFkjjXiUUgbvJwqjDz7aTvYa4KZnGpJ8Cj+oHP5JazPcrj5tIDEbyn4V2XLfomqNNvCJNqxgf4UJydm/rs/w/pPDTpeIdjGwRewpHGk3yj+L07khqgXFyfRf/2yt8ZQ7QUujAXxiNE6GrRbWjortLLrL7EX8U7T0eGGoctvPkMx0C/C5MM6WN2cUND7tH4O4zx5MdzWtaOF1VdGsIeTlANejv2Zi2yKYkxjAUsD1elky7FE6ZSexoD2Oqe+nPnW43IZJS7Q2UC++v7YV3seusJXxdUv39Jivn+/2Q5xSvL6hx9bVPPkg9rd3jHVNvorZ+9MRFIaUWwaa7riMY4=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR12MB5445.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(136003)(346002)(376002)(39860400002)(396003)(366004)(451199018)(6512007)(36756003)(6506007)(186003)(6666004)(53546011)(26005)(38100700002)(316002)(8936002)(41300700001)(5660300002)(2906002)(2616005)(66556008)(4326008)(83380400001)(66476007)(66946007)(31696002)(8676002)(86362001)(6486002)(478600001)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NGN5aG1LVm9BakN5WkZFek8vRXBEc09VQWhUQ3Fib3cvaXNxdmQyM096QkFz?=
- =?utf-8?B?S0NwdDl6VTRMcXVFcmxxeEk4WmxoKzN0MXVrbEtiTnhwQXFmUUk5SDRHcmxZ?=
- =?utf-8?B?M2NVQklvMG1Nc3RDQitjM0JUZDF1endlMG9DeVI3QWhGVlFNQ01Fejk4YUdY?=
- =?utf-8?B?bWY2REVHbE1odnN5dlhNRk5Yanp1QXVSblRQY05BN3AwSnM2SG1Rd2EyQVMz?=
- =?utf-8?B?OU51ZnNzamxIa2dYY1J3NWNxVVM1cjk5U2hVcFA2T3VUUUxCYTFFYm5uRGFz?=
- =?utf-8?B?Nm9qYVZPY3VWWnBOMFgvUi9MRW4xQ3UwSkJZb1lpelV4VWhwQUFhRnZvUjNF?=
- =?utf-8?B?SWcwdjFLMUZBY3g3K3VqT3l6QjlRdWZLNkI1TDM2VDk3bTFBa1l5QmxNYkE2?=
- =?utf-8?B?V09FbmdxZk9PNFRqWC9FNVZ6ZkdpM1ZXc2loQ09JTEFFejFFam5BNy9xdUt4?=
- =?utf-8?B?MzJtMks4OFNpUlFmR1hlQUhtR2IwbCt0VURCc09ra0k0N2hodTByb01DOFB4?=
- =?utf-8?B?VXlicERMUmF2OU9sRVg0bnk2VWN5ejNscHZNdHBzUzBWZTFIZ2dWeFFGVFZj?=
- =?utf-8?B?dVNvM1NBQzFiWkNnYSsxcy8vQlBxaHlnVERWTzZ4eUgwZ0VOSUEvVWpiMFFS?=
- =?utf-8?B?Y1FQakozZ0ZKT3lhSGlmelJYamVIaFZqQkRHRitOS0UyM0t4OVJsNDAzTmlv?=
- =?utf-8?B?VEI2Q1BVd0pvTW9UZVR0Zk1XL0R0czZReHZqcWo3RGNIMHBabkVBczNMS2ty?=
- =?utf-8?B?SXZBZm9LTGJoUjRtNlV2V3liNWF1NEk5RW9PaFJHZDdmdkNNM1pQUkdKeUxY?=
- =?utf-8?B?QkJLOHhUaVk2SnJ2TXZGdlFJNVN2NXJGRUtXK25PdEZQMmo5Mjc3Qzgzc2lB?=
- =?utf-8?B?L3daS3h6OEZVUENPT0NCK3BPVWs0bytjc3ZYV3RyVGVad0JoZGZJdzdWalhS?=
- =?utf-8?B?WmpWSThNVFBQeGVFTWhWZ1l0WmQrZEJOL2syTG50dFNIeXd1VVZXclpxYmRn?=
- =?utf-8?B?UzFOK0lUMEFFeVFNODd2eVlpNXNNSVIwN3hJMFlENC8rM01RQ3Q0MTJnNkFH?=
- =?utf-8?B?VklIWFErckluT2hIcWlIMWUxNklKUDdWQ0pUZTNEeGZad1pRUG5XK055Qlha?=
- =?utf-8?B?VEFJU05aUmtnb0prdk9NaFBDVmZkL2Juc1ZLTGwzaWtDT09oZ2c1MDZyZk84?=
- =?utf-8?B?anBNdnBYNFNFVzNlbXo4KytqeXcyMW1nSld5SERZMzJsbExjS3pBQlhRTGVm?=
- =?utf-8?B?UEYyUStnRXQrZld3VmZaekpoVk8vT2VXRVRsc1lpQVBCK1VncHJLVGVyTlR3?=
- =?utf-8?B?ZHJuK0dROGlpdWtMc0pWSXBZc3lkeFpvMGRmU1htTldmVlVuVzl4czFHOUp2?=
- =?utf-8?B?MFNwWHZkR3EyQXBTcEZPdkNBdFhJYm9QTzdOR1pvRzdHL0hFNCtFbDg4eUgz?=
- =?utf-8?B?Qm1qanZyU21WTlRxd3ZtRTdVSTJ0akR1VEJwQ082Mk5ka2tabGdUNVY3aFF4?=
- =?utf-8?B?VGd3cGFsYXRuSm1nMTNheHMybUpEYTFXOHUycVlLV3orcFlkLzlmSHpnWCtG?=
- =?utf-8?B?SlkrMUVSWktsKzVzRTErckpRNkJPZFY5SWt0OW9hL3duYmhNVCtwc0pxQUpk?=
- =?utf-8?B?SHA2WVQ2MmpENGRtMWl5emx2NytYWkRYK3NIZWRCSDc2T0ZyZUJKeEJ1WWZU?=
- =?utf-8?B?Y0daajU0RXdva0ZIVkl4NURob0ZYSitVWU5DbHF0ZUliKy91UjA0TW9mWVpz?=
- =?utf-8?B?QzJVNGxvKzJzWHhOb1ZqeThXdzRhNi9yeUhTb25BdmZhUVhKOERUUDd5RW1j?=
- =?utf-8?B?QW1WWUQxaVhoOGM1MG1zek44Q200TDZtZzVyMXFFSjJKWldqMGZKV3pCNTlt?=
- =?utf-8?B?T2Yzc1RoVGJUak9abFlaRDIxWGhjZCttNk1xaW9QcTFwem5xSnlDWlJaNk1G?=
- =?utf-8?B?aThvaWZWL0hmTXZKSlgyWGcyMGpOUnJwM3BzZHlQM3RYbHE4ZEFhU3h4Q3A1?=
- =?utf-8?B?NjFpcHRhallCdmxUcDZiQnlNU3doMlhWK09ydlV2dUluYVFRY1QvbE95N3Rx?=
- =?utf-8?B?V2RjQnlQNzhxNlJBTkVIM3E0NzhqVjF1MHRpTWw1TWd3aTFqejk3NXR3UXE2?=
- =?utf-8?Q?CqzU2zWX1jwVGVeiXmpKiloMx?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8f12def6-1332-4fcd-2755-08db07f5931d
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR12MB5445.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Feb 2023 03:52:32.5704
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a3efa97d-95bd-48c9-957f-08db07f58f8d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Feb 2023 03:52:25.9704
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SpGAFWJKk8wOEM/APksmA8ZvZO/BTWfH1ExhqndBkiiUdJmT6GxV4KjQptdhE/BaQBUHndFfuwshgSt0RRb5jw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7028
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: O2PpKrX7m2gVyJjUxUaGPMJAPKy9sRHKf/e6vfrS4MwPf05NkD++dx85DgYK5IR2jXfL9y0Hi8cCZM8oNBFpOg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7810
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -125,71 +173,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sean / Paolo,
+> From: Matthew Rosato <mjrosato@linux.ibm.com>
+> Sent: Saturday, February 4, 2023 5:50 AM
+>=20
+> After 51cdc8bc120e, we have another deadlock scenario between the
+> kvm->lock and the vfio group_lock with two different codepaths acquiring
+> the locks in different order.  Specifically in vfio_open_device, vfio
+> holds the vfio group_lock when issuing device->ops->open_device but some
+> drivers (like vfio-ap) need to acquire kvm->lock during their open_device
+> routine;  Meanwhile, kvm_vfio_release will acquire the kvm->lock first
+> before calling vfio_file_set_kvm which will acquire the vfio group_lock.
+>=20
+> To resolve this, let's remove the need for the vfio group_lock from the
+> kvm_vfio_release codepath.  This is done by introducing a new spinlock to
+> protect modifications to the vfio group kvm pointer, and acquiring a kvm
+> ref from within vfio while holding this spinlock, with the reference held
+> until the last close for the device in question.
+>=20
+> Fixes: 51cdc8bc120e ("kvm/vfio: Fix potential deadlock on vfio group_lock=
+")
+> Reported-by: Anthony Krowiak <akrowiak@linux.ibm.com>
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
 
-Do you have any concerns or questions regarding this patch?
-
-Thanks,
-Suravee
-
-On 1/17/2023 5:08 PM, Suravee Suthikulpanit wrote:
-> AVIC GATag is managed by the SVM driver, and is used by the IOMMU driver
-> to program the AMD IOMMU IRTE to provide reference back to SVM in case
-> the IOMMU cannot inject interrupt to the non-running vCPU. In such case,
-> the IOMMU hardware notify the IOMMU driver by creating GALog entry with
-> the corresponded GATag. The IOMMU driver processes the GALog entry and
-> notifies SVM to schedule in the target vCPU.
-> 
-> Currently, SVM uses 8-bit vCPU ID and 24-bit VM ID to encode 32-bit GATag.
-> Since x2AVIC supports upto 512 vCPUs, it requires to use at least 9-bit
-> vCPU ID.
-> 
-> Therefore, modify the GATag enconding to use the number of bits required
-> to support the maximum vCPUs.
-> 
-> Reported-by: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
-> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-> ---
->   arch/x86/include/asm/svm.h | 3 ++-
->   arch/x86/kvm/svm/avic.c    | 9 ++++-----
->   2 files changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-> index 0361626841bc..6738faf155e4 100644
-> --- a/arch/x86/include/asm/svm.h
-> +++ b/arch/x86/include/asm/svm.h
-> @@ -256,7 +256,8 @@ enum avic_ipi_failure_cause {
->   	AVIC_IPI_FAILURE_INVALID_BACKING_PAGE,
->   };
->   
-> -#define AVIC_PHYSICAL_MAX_INDEX_MASK	GENMASK_ULL(9, 0)
-> +#define AVIC_PHYSICAL_MAX_INDEX_BITS	9
-> +#define AVIC_PHYSICAL_MAX_INDEX_MASK	GENMASK_ULL(AVIC_PHYSICAL_MAX_INDEX_BITS, 0)
->   
->   /*
->    * For AVIC, the max index allowed for physical APIC ID
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index dd0e41d454a7..b1f8f51bbbd9 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -28,16 +28,15 @@
->   #include "svm.h"
->   
->   /* AVIC GATAG is encoded using VM and VCPU IDs */
-> -#define AVIC_VCPU_ID_BITS		8
-> -#define AVIC_VCPU_ID_MASK		((1 << AVIC_VCPU_ID_BITS) - 1)
-> +#define AVIC_VCPU_ID_MASK		((1 << AVIC_PHYSICAL_MAX_INDEX_BITS) - 1)
->   
-> -#define AVIC_VM_ID_BITS			24
-> +#define AVIC_VM_ID_BITS			(32 - AVIC_PHYSICAL_MAX_INDEX_BITS)
->   #define AVIC_VM_ID_NR			(1 << AVIC_VM_ID_BITS)
->   #define AVIC_VM_ID_MASK			((1 << AVIC_VM_ID_BITS) - 1)
->   
-> -#define AVIC_GATAG(x, y)		(((x & AVIC_VM_ID_MASK) << AVIC_VCPU_ID_BITS) | \
-> +#define AVIC_GATAG(x, y)		(((x & AVIC_VM_ID_MASK) << AVIC_PHYSICAL_MAX_INDEX_BITS) | \
->   						(y & AVIC_VCPU_ID_MASK))
-> -#define AVIC_GATAG_TO_VMID(x)		((x >> AVIC_VCPU_ID_BITS) & AVIC_VM_ID_MASK)
-> +#define AVIC_GATAG_TO_VMID(x)		((x >> AVIC_PHYSICAL_MAX_INDEX_BITS) & AVIC_VM_ID_MASK)
->   #define AVIC_GATAG_TO_VCPUID(x)		(x & AVIC_VCPU_ID_MASK)
->   
->   static bool force_avic;
+Reviewed-by: Kevin Tian <kevin.tian@intel.com>
