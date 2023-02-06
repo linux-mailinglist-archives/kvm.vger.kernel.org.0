@@ -2,58 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 84C0168B70C
-	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 09:07:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B292368B759
+	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 09:29:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229827AbjBFIHY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Feb 2023 03:07:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41010 "EHLO
+        id S229693AbjBFI3O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Feb 2023 03:29:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229508AbjBFIHW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Feb 2023 03:07:22 -0500
+        with ESMTP id S229798AbjBFI3L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Feb 2023 03:29:11 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B4AB10C3;
-        Mon,  6 Feb 2023 00:07:16 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DE751ABCC;
+        Mon,  6 Feb 2023 00:29:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=YVVleUhHiv8Z3sHNFcIJazz8ubFLrztMldNWNpxs2G0=; b=A4shMXxSgEbDXw0Uxkce/QA5VE
-        PQu7PZMIuhYdcGqBfZ+MFPI928CvVhEv1moJ/MRpzgljMs/CgQgz8FFKg04a3pJcsTwy2TM5gjgrR
-        KSLicAoCCgPVEF9u+fxhVPYwOG6wSyBNT7OvnIWJ46iILL7qgA9e7fEwNCLaQ22rHb3gftiSxKLb1
-        +HfSKzYFTG4nRkcjsX2K2jUA4uvG7eGhRio5XUjUdU9SVl/fMUljwDv0g8UKa9uGOrLBkNK2szOdH
-        towhmKPLd8gs6Xdfk8YT1ZpWQDggJ17Oou6GlPqdv/v6xKA9mnlYEVT0zfS3wySO88Tr9nQIYTECY
-        m2AnkQrw==;
+        bh=BjY/exeljP1QS+Hd1Vo/eWGLr04rdU+wZoNBPkK+lDQ=; b=EWYL+cdQfHxQ6v6wcfiTLXaHEr
+        C5mMxNfMOwLLebqQ9tIyVYBssQGcYv9fHzsSoMb4F8HPiqNPnAx9fPHZq8aA/u9S+3jTLMpYgtJ4E
+        rH0/RIeRkIwYs4fKkABONeBI3yPvOpvSNdZ/Y387pnI7lqgBSqEnOKHta3pEBEOVb52AcZGFen63a
+        VVcsdtg9dXNLeDkrBgDQPnN/JUiJOZ+nVy+oXm8Gi3Y4FYN949Q2mCmxupOsqTk1yJ6/m99RTlw8Y
+        ULuxRHgbrcYMUGmE1HyPoV5kwiKb9MqI1Y1VUj+B2j33GzpGCoMpVySHlo7BcX62AV1QJppnNUjob
+        2a7D1ZQA==;
 Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.ant.amazon.com)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pOwVk-00GaHc-K7; Mon, 06 Feb 2023 08:06:01 +0000
-Message-ID: <411cbdb2c8255e48f3e65c59a98bc02410f5dfc7.camel@infradead.org>
-Subject: Re: [External] Re: [PATCH v6 07/11] x86/smpboot: Disable parallel
- boot for AMD CPUs
+        id 1pOwrb-00Gb7T-Gg; Mon, 06 Feb 2023 08:28:36 +0000
+Message-ID: <3b626936ccc4d5123cb9113378bec6f77182def3.camel@infradead.org>
+Subject: Re: [PATCH v6 00/11] Parallel CPU bringup for x86_64
 From:   David Woodhouse <dwmw2@infradead.org>
-To:     Usama Arif <usama.arif@bytedance.com>,
-        Arjan van de Ven <arjan@linux.intel.com>,
-        Kim Phillips <kim.phillips@amd.com>, tglx@linutronix.de,
-        rja@hpe.com
-Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        hpa@zytor.com, x86@kernel.org, pbonzini@redhat.com,
-        paulmck@kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, rcu@vger.kernel.org, mimoja@mimoja.de,
-        hewenliang4@huawei.com, thomas.lendacky@amd.com, seanjc@google.com,
-        pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
-        punit.agrawal@bytedance.com, simon.evans@bytedance.com,
-        liangma@liangbit.com, Mario Limonciello <Mario.Limonciello@amd.com>
-Date:   Mon, 06 Feb 2023 08:05:58 +0000
-In-Reply-To: <434b4b74-54ab-68a3-4a81-9cc02ea75e39@bytedance.com>
+To:     Russ Anderson <rja@hpe.com>, Usama Arif <usama.arif@bytedance.com>
+Cc:     tglx@linutronix.de, arjan@linux.intel.com, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        x86@kernel.org, pbonzini@redhat.com, paulmck@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
+        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
+        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
+        simon.evans@bytedance.com, liangma@liangbit.com
+Date:   Mon, 06 Feb 2023 08:28:34 +0000
+In-Reply-To: <20230205191734.GA6027@hpe.com>
 References: <20230202215625.3248306-1-usama.arif@bytedance.com>
-         <20230202215625.3248306-8-usama.arif@bytedance.com>
-         <b3d9fbbf-e760-5d1d-9182-44c144abd1bf@amd.com>
-         <d3ec562fd2e03c3aef9534f64915a14a8cb89ae1.camel@infradead.org>
-         <5ba476f3-e0ac-d630-ce1d-18ab9885496f@linux.intel.com>
-         <E2286684-F8AD-4708-9A3D-74C5EAE183B4@infradead.org>
-         <434b4b74-54ab-68a3-4a81-9cc02ea75e39@bytedance.com>
+         <20230205191734.GA6027@hpe.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-0G8I4vlUP3SHocDQbZAJ"
+        boundary="=-gv2Bd6J2nA65+QZ05n9Y"
 User-Agent: Evolution 3.44.4-0ubuntu1 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -67,112 +58,37 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-0G8I4vlUP3SHocDQbZAJ
+--=-gv2Bd6J2nA65+QZ05n9Y
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, 2023-02-05 at 22:13 +0000, Usama Arif wrote:
+On Sun, 2023-02-05 at 13:17 -0600, Russ Anderson wrote:
 >=20
+> Gave the v6 patchset a try on a system with 1920 logocal cpus
+> (sixteen 60 core Sapphire Rapids sockets with Hyperthreadding
+> enabled).
 >=20
-> On 04/02/2023 22:31, David Woodhouse wrote:
-> >=20
-> >=20
-> > On 4 February 2023 18:18:55 GMT, Arjan van de Ven <arjan@linux.intel.co=
-m> wrote:
-> > > >=20
-> > > > However...
-> > > >=20
-> > > > Even though we *can* support non-X2APIC processors, we *might* want=
- to
-> > > > play it safe and not go back that far; only enabling parallel bring=
-up
-> > > > on machines with X2APIC which roughly correlates with "lots of CPUs=
-"
-> > > > since that's where the benefit is.
-> > >=20
-> > > I think that this is the right approach, at least on the initial patc=
-h series.
-> > > KISS principle; do all the easy-but-important cases first, get it sta=
-ble and working
-> > > and in later series/kernels the range can be expanded.... if it matte=
-rs.
-> >=20
-> > Agreed. I'll split it to do it only with X2APIC for the initial series,=
- and then hold the CPUID 0x1 part back for the next phase.
+> Without the patchset it took 71 seconds to start all the cpus.
+> With the v6 patchset it took 14 seconds to start all the cpus,
+> a reduction of 57 seconds.=C2=A0 That is impressive.
 >=20
-> This was an interesting find! I tested the latest branch=20
-> parallel-6.2-rc6 and it works well. The numbers from Russ makes the=20
-> patch series look so much better! :)
->=20
-> If we do it with x2apic only and not support non-x2apic CPUID 0x1 case,=
-=20
-> maybe we apply the following diff to part 1?
+> Full boot, to root login prompt, without patches takes 223 seconds.
+> This patchset reduces the full boot time by 57 seconds, a 25%
+> reduction.
 
-Using x2apic_mode would also disable parallel boot when the CPU *does*
-have X2APIC support but the kernel just isn't using it at the moment. I
-think boot_cpu_has(X86_FEATURE_X2APIC) is the better criterion?
+Nice; thanks for testing.
 
-I was thinking I'd tweak the 'no_parallel_bringup' command line
-argument into something that also allows us to *enable* it without
-X2APIC being supported.
+Is that with just the "part1" patch series which has been posted, or
+also with the 'parallel part 2' still taking shape in the tree at
+https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/paralle=
+l-6.2-rc6
 
-But I've also been pondering the fact that this is all only for 64-bit
-anyway. It's not like we're doing it for the zoo of ancient i586 and
-even i486 machines where the APICs were hooked up with blue wire and
-duct tape.
+I believe Usama said the second phase of parallelism didn't really help
+much in terms of overall timing? Confirming that *without* all the
+debug prints would be interesting. And we can look for what still
+*could* be made parallel.
 
-Maybe "64-bit only" is good enough, with a command line opt-out. And
-maybe a printk pointing out the existence of that command line option
-before the bringup, just in case?=C2=A0
-
-> diff --git a/arch/x86/kernel/smpboot.c b/arch/x86/kernel/smpboot.c
-> index f53a060a899b..f6b89cf40076 100644
-> --- a/arch/x86/kernel/smpboot.c
-> +++ b/arch/x86/kernel/smpboot.c
-> @@ -1564,7 +1564,7 @@ void __init native_smp_prepare_cpus(unsigned int=
-=20
-> max_cpus)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * sufficient). Oth=
-erwise it's too hard. And not for SEV-ES
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * guests because t=
-hey can't use CPUID that early.
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (IS_ENABLED(CONFIG_X86_32) || bo=
-ot_cpu_data.cpuid_level < 1 ||
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (IS_ENABLED(CONFIG_X86_32) || !x=
-2apic_mode ||
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-(x2apic_mode && boot_cpu_data.cpuid_level < 0xb) ||
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT))
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 do_parallel_bringup =3D false;
->=20
->=20
->=20
-> For reusing timer calibration, calibrate_delay ends up being used in=20
-> start_kernel, smp_callin, debug_calc_bogomips and check_cx686_slop. I
-> think reusing timer calibration would be ok in the first 2 uses?=C2=A0
->=20
-
-It already explicitly allows the calibration to be reused from another
-CPU in the same *core*, but no further. I think we'd need to be sure
-about the correctness of extending that further, and which of the mess
-of constant/invariant/we-really-mean-it-this-time TSC flags need to be
-set for that to be OK.
-
-> but not really sure about the other 2. cx686 seems to be quite old so not=
- sure=20
-> if anyone will have it to test or will ever run 6.2 kernel on it :).=C2=
-=A0 I=20
-> guess if unsure, better to leave out initially and try and get part1 merg=
-ed?
-
-I doubt cx686 advertises constant TSC; the early ones didn't even *have* a =
-TSC.
-Does it even support SMP?
-
---=-0G8I4vlUP3SHocDQbZAJ
+--=-gv2Bd6J2nA65+QZ05n9Y
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -264,24 +180,24 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMjA2MDgwNTU4WjAvBgkqhkiG9w0BCQQxIgQgDL5CQqe7
-xOU+D+FhpFMLeBxiae1iRanesdktKQ/voeEwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMjA2MDgyODM0WjAvBgkqhkiG9w0BCQQxIgQgEEmrGjHL
+kpestw0MIwGR56wc/F1Vr1cJGhtPdR3a5vEwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAh9d0dxTVe4E6h7AsYiNlmcrlpi7FFTlhJ
-/58uTtfGYup+Uq7b+HbMofyCJxxOZPERe5/sW9xzcBlMY0xTzpVkD/IxMtSDFR7QzeeBSx/tHqR7
-ZWpPddNQ0uCwqlA+YF0BDgadWzSZvAgfP/3ELtv2GKDheQe7eG7EN3/dSceLGQe8RcVivGDPM+so
-N/+qUAx9KHoKOPSXEScNdp+CO33626VeWXuZEPG3NG6ZkVR13xX4D12iAPVN+xjQGWjHtN3LaFHT
-TWxDNxTGNHrcR72pnwy3OvXVxQbqsbpTm/1Fp7L5RMLMRcu2VFuPRlpZrAXJW0ASrCBuB4+0vlaZ
-mcRF88cn6m7b6ouJ0gr+jUWk0cJdhD8sRK9wYWwJ6cQliY2JwKB8X0ZjMgOzZZ3jnHsSBDrwmSkE
-H80YInmWZ991XXUjAT76WrI1ZsEUcrlvXlK4AHJHgg4g7v5qzpwEupggNv7BRzNxHqxzXqee3rii
-md9z81SQZk/BEJLunHWFXVQgLzwLJ2nGB8Rc9KLn3jw6e52dQ2JtyAJZVQjYgWZKjVLSLsnf97d9
-G0PUYcsn9A5W7jYjPo+69DfjTMAj4DGEpQsaDQcUkOiG8/tE6WPqfYZ93UF6RR+6F4W5cL9ZdGLK
-D/isBQMpyljYjyVPbyYf2JyALHx3XOMaXGkgIRwkAQAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgB5x7TRlhFAbSZ9Q8bP64y6pQ4XaF5+7Wls
+5tA7z6vNgEB28LKKGmoBWWGrr6NoeKBrcC9CXl+Kp1kAy9woCijRH8xU6xFtOaW050yWs6DFTrt+
+araeWy5N796dh/OdTCBg49hh+7ksOLkUNhBn7a42X/ygjZ/FCS/xrmSLJ9f8WPq8nq4n9XR4T4Dl
++WstM/wXLa5Dj3mBHQjSUuGjP4LL7U8JjDSZeqEd2dCn9yTu3RsxJEeSL1QxLZ+ZCvtdIJE1O+qf
+PQDafxhLGgJEKrcvQBcETNRw7ypaOPOOU+AT4u07l588PTmaTLXQINL/mL5XVSJNVPGOolYjr0BA
+5dC8JyFiCn8M3yGn2rxjPzVJxxpjhc+wOsMRx+vml6sfX8oy59FV2g3N+urkXNaEp/lZ1wdFcu5r
+8ggpMRfg6ofZbVjSzUP++8qYrNzsWnALNw3mi+QhasosrwtMT4zIz2SA0o+qhNLBXEZiE/iTHpSI
+Jy2ZU72wXphiDBA9kg3V+evIuPi2jKBXVTVyRmMPSVLEgdJA0h4eAR8d0GVbEmyyQvWSx1B968f5
++erAIECX8WLc8diK96cZQ5nrFYP1BL27Hp5o8Cgdcsk71ozpxpU4+x1IqePsj76EuudtLVwhrTOy
+3ZYvMLUXnajEXi5lPsbF9Hp41uZ+t0JDZryGGs7i+AAAAAAAAA==
 
 
---=-0G8I4vlUP3SHocDQbZAJ--
+--=-gv2Bd6J2nA65+QZ05n9Y--
