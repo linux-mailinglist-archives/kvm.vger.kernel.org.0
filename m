@@ -2,258 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C12EA68C52D
-	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 18:53:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 457DF68C54C
+	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 18:58:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230154AbjBFRxK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Feb 2023 12:53:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51520 "EHLO
+        id S230102AbjBFR65 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Feb 2023 12:58:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229695AbjBFRxJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Feb 2023 12:53:09 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCE0E125AC
-        for <kvm@vger.kernel.org>; Mon,  6 Feb 2023 09:53:07 -0800 (PST)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 316HkTAd027959;
-        Mon, 6 Feb 2023 17:52:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=I+pJ4WkLtO5FQW8kg6WQZcvUQQJie3J+oP4QT2XKuw0=;
- b=VgLCbUccsGKcz23t+fxIRr7FsO9/ok1dH2kkpbSH+6ZAbcRUY9OFHYe78OwDkgGnxOHy
- +kQOAf6/x0rFnlNEFknUhCcJO+QDyubnbWKfVwT3y/B8Q5CYY2S6o8AMl20JEUrXabwV
- saLZUr+1v1ib2qeOBZz/tgmNZZRP0OdxltAx6gCbwcEUThPE6+8F+oRrEWoxAT1Bbhk3
- lIQA7Uss2ZB0YjCHjGvjzmRXvYh8Y5SKsOq2OEWtR3IT/RZODKeSXKk4Rcr9Qf9RlG+Q
- D5CSomNXlHZ1ow9XIuMOVhs1sJT9bkSiSETbIOhGaXIgWoQh4GvqSSHfRVrrbUUjZ/1P 7A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nk66387dg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 06 Feb 2023 17:52:52 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 316HltBA003696;
-        Mon, 6 Feb 2023 17:52:51 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nk66387cy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 06 Feb 2023 17:52:51 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 316GdVqc022560;
-        Mon, 6 Feb 2023 17:52:48 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3nhemfjpcg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 06 Feb 2023 17:52:48 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 316Hqjem38273530
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 6 Feb 2023 17:52:45 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 07FB520043;
-        Mon,  6 Feb 2023 17:52:45 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 946EF20040;
-        Mon,  6 Feb 2023 17:52:44 +0000 (GMT)
-Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.200.84])
-        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon,  6 Feb 2023 17:52:44 +0000 (GMT)
-Message-ID: <3215597a6916932c26fdbe1dd8daf2fc0c1c1ab5.camel@linux.ibm.com>
-Subject: Re: [PATCH v15 05/11] s390x/cpu topology: resetting the
- Topology-Change-Report
-From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
-        berrange@redhat.com, clg@kaod.org
-Date:   Mon, 06 Feb 2023 18:52:44 +0100
-In-Reply-To: <20230201132051.126868-6-pmorel@linux.ibm.com>
-References: <20230201132051.126868-1-pmorel@linux.ibm.com>
-         <20230201132051.126868-6-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.3 (3.46.3-1.fc37) 
+        with ESMTP id S229571AbjBFR6z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Feb 2023 12:58:55 -0500
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2072.outbound.protection.outlook.com [40.107.243.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AF922CC7B;
+        Mon,  6 Feb 2023 09:58:54 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=J/JLWCbVOkmtNAHkE5R/pfYAkfF7suYzp8mHafT7VuMI8hgPDBlq2miQBOLY/w59opCLUOV43J7nsWAxqqtqBxr3aur9vpZEjAxbJvrYEqPJDaTAiGTpSNUJALmIXOGZf8mGUR9UIq5z9HKoNlDYo7XgnH7lClvJHpUsOsXhKx+zmj/dkOKyIjIKJ1qQBF8D30rZ0FAS4ZEMxe94mP/cTry9+WDaTJwknefUXkGyAkqcNn45MEGBbGG4o1O5gFddJBEGU5Uf8sOyRMUA9AT4PNJ6pS+K3/11pFbdB8VIfh4xTRERllph5VygvTLP4hkwJ6FvGB/gi+jPk2/hpeB5ew==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vhAG3Jatz+EPDmLz8EffQ3IXKaTdg0bdHE1t33/2lko=;
+ b=P4ue3xNV33ZmkLhWtb/bVonnMnksN/xL//MdMtE0hOkJOCUFCntoSvMqnBQrhFtS8OsbTFHQbEaQp/Dh9Cm3BO9Dj7EakEn+RR2c4+yeVrGu05Byg2WYCxwLF7PxUtcOqPlka6fVwZ4Ew73GYBU25oI0c7TbFXZbha2FWZS4LlvRAw8ncuNrjgX4cq+srAihW9KvKSg42ycRMntm6MkGdz3fFBJ4zCUJPjPl4vCj8mWk4hFvtmVgk6NPCtApP9K8W5vkZ43+/PLwYOY3cL62qH+f2CCuxobtLt2fsgV2ggeRBDqxVVn2mi61RuYoz7YHNBhI4Z+1M5MiB/8U9Ii77w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=infradead.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vhAG3Jatz+EPDmLz8EffQ3IXKaTdg0bdHE1t33/2lko=;
+ b=pGoVOOs1HsOtDfSn7o92LuCwojMeHqhLziBk1D9bsng7PS2022HMNISyZ/StVZnNETrr+gm/7qQYlfTwsVlcPem5ZfovazRwVNiTqqk7N/pRVjHLi5VNbBqWs++Em2NjgegU0r5AC/6dVPrnfS5GmtOK29Oicg7K1CEJjrDYWkk=
+Received: from MW3PR05CA0004.namprd05.prod.outlook.com (2603:10b6:303:2b::9)
+ by SJ1PR12MB6098.namprd12.prod.outlook.com (2603:10b6:a03:45f::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6064.35; Mon, 6 Feb
+ 2023 17:58:50 +0000
+Received: from CO1NAM11FT112.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:2b:cafe::6a) by MW3PR05CA0004.outlook.office365.com
+ (2603:10b6:303:2b::9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.15 via Frontend
+ Transport; Mon, 6 Feb 2023 17:58:50 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CO1NAM11FT112.mail.protection.outlook.com (10.13.174.213) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6064.35 via Frontend Transport; Mon, 6 Feb 2023 17:58:49 +0000
+Received: from [10.236.30.70] (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 6 Feb
+ 2023 11:58:47 -0600
+Message-ID: <7abdd9d4-4ce0-458d-93f4-bff575f04345@amd.com>
+Date:   Mon, 6 Feb 2023 11:58:47 -0600
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 3q0ivc2ankn86auKXwKpiw6plqxx09yG
-X-Proofpoint-ORIG-GUID: E9A7GTLtY6iGdjcGRAxlSm8Af7Fyfc3-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-02-06_07,2023-02-06_03,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
- spamscore=0 clxscore=1015 adultscore=0 priorityscore=1501 bulkscore=0
- lowpriorityscore=0 suspectscore=0 impostorscore=0 malwarescore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302060152
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+To:     David Woodhouse <dwmw2@infradead.org>,
+        Usama Arif <usama.arif@bytedance.com>, <tglx@linutronix.de>,
+        <arjan@linux.intel.com>
+CC:     <mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
+        <hpa@zytor.com>, <x86@kernel.org>, <pbonzini@redhat.com>,
+        <paulmck@kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <rcu@vger.kernel.org>, <mimoja@mimoja.de>,
+        <hewenliang4@huawei.com>, <thomas.lendacky@amd.com>,
+        <seanjc@google.com>, <pmenzel@molgen.mpg.de>,
+        <fam.zheng@bytedance.com>, <punit.agrawal@bytedance.com>,
+        <simon.evans@bytedance.com>, <liangma@liangbit.com>,
+        Mario Limonciello <Mario.Limonciello@amd.com>
+References: <20230202215625.3248306-1-usama.arif@bytedance.com>
+ <20230202215625.3248306-8-usama.arif@bytedance.com>
+ <b3d9fbbf-e760-5d1d-9182-44c144abd1bf@amd.com>
+ <d3ec562fd2e03c3aef9534f64915a14a8cb89ae1.camel@infradead.org>
+Content-Language: en-US
+From:   Kim Phillips <kim.phillips@amd.com>
+Subject: Re: [PATCH v6 07/11] x86/smpboot: Disable parallel boot for AMD CPUs
+In-Reply-To: <d3ec562fd2e03c3aef9534f64915a14a8cb89ae1.camel@infradead.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1NAM11FT112:EE_|SJ1PR12MB6098:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3f83e067-5764-4648-6ff7-08db086bcd0c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Tc5844DvxkRAS0SUf34e+zWJm4a4sG6bDKqI+HqC8hmmrpqTeoKrp/iF62BY9UE1mM4e4q1MknXi6jFnv0eKHR/zeQn7RUOAYuCa8JqflIGskMHvHZFOk9vKpZvzGgIYLONSLuzvVER7E85lzaqIP9eMjQZpiKw9O5tNlUNozn4D12CRheailGFPqHWA1s8d4epuObDCWXgec2KXy7AuQeB6/M2+R6SRkqS0B/IP3doGNb9btSvqvqDVpNZp3WIA7D3wNgVlVI7Wt6/hAc+Ge/fpwdJQXLRzKFYQ2AQtxKBiR+Sk8Ew29//1quzX8Pp2q/YH2Ze5OUKTN6bFD6t5qleIuIyfi9t79wGZkIS+EOsvc2gnHP+O0HDNh9je75zrF/D0/i6SvKH+iT3rWDKtM0yy1ugetliATOXfzhbCVFox7HQeqhcSUosV6jUYxXkAsdM+d1RC9psoz+kS01RhyT77MNptyyPEE2e72r3hYkgOqYyXTkIZsz25J22JySqE/HhEoLo4MGafbUPWd2yZVllYe0Z8S2d8EzuS51o876LL2YfIy+qcFcNDJ3Kta1zRcsKdtNpKxWlkSIF472nSGWPeLBYnVI/JTcyjKDdftb0aQXYxz4QjhTREy6IJ0NIRK017V42+t2KUB66Z4VUMFdz2+W4lUfD8LOLZoke+pDJ15ZnBytpsMOYA/MNeQ6lRi6P97wHSnb8SW2JVyEP7d12/dtpzgjJWzjrSy4IcQtfoUAcT62mcB0RLQTLEjkZbAl+4dWP7qVNHP7tDbN4InA==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(346002)(39860400002)(396003)(376002)(136003)(451199018)(46966006)(36840700001)(40470700004)(2906002)(31686004)(4744005)(8936002)(5660300002)(7416002)(36756003)(41300700001)(4326008)(86362001)(40460700003)(8676002)(70586007)(31696002)(40480700001)(70206006)(110136005)(54906003)(356005)(316002)(16576012)(44832011)(82740400003)(336012)(478600001)(81166007)(53546011)(36860700001)(16526019)(26005)(186003)(2616005)(426003)(82310400005)(47076005)(83380400001)(36900700001)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Feb 2023 17:58:49.6005
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3f83e067-5764-4648-6ff7-08db086bcd0c
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT112.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6098
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2023-02-01 at 14:20 +0100, Pierre Morel wrote:
-> During a subsystem reset the Topology-Change-Report is cleared
-> by the machine.
-> Let's ask KVM to clear the Modified Topology Change Report (MTCR)
-> bit of the SCA in the case of a subsystem reset.
->=20
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  include/hw/s390x/cpu-topology.h |  1 +
->  target/s390x/cpu.h              |  1 +
->  target/s390x/kvm/kvm_s390x.h    |  1 +
->  hw/s390x/cpu-topology.c         | 12 ++++++++++++
->  hw/s390x/s390-virtio-ccw.c      |  3 +++
->  target/s390x/cpu-sysemu.c       | 13 +++++++++++++
->  target/s390x/kvm/kvm.c          | 17 +++++++++++++++++
->  7 files changed, 48 insertions(+)
->=20
-> diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topol=
-ogy.h
-> index 1ae7e7c5e3..60e0b9fbfa 100644
-> --- a/include/hw/s390x/cpu-topology.h
-> +++ b/include/hw/s390x/cpu-topology.h
-> @@ -66,5 +66,6 @@ static inline void s390_topology_set_cpu(MachineState *=
-ms,
-> =20
->  extern S390Topology s390_topology;
->  int s390_socket_nb(S390CPU *cpu);
-> +void s390_topology_reset(void);
-> =20
->  #endif
-> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> index e1f6925856..848314d2a9 100644
-> --- a/target/s390x/cpu.h
-> +++ b/target/s390x/cpu.h
-> @@ -641,6 +641,7 @@ typedef struct SysIBTl_cpu {
->  QEMU_BUILD_BUG_ON(sizeof(SysIBTl_cpu) !=3D 16);
-> =20
->  void insert_stsi_15_1_x(S390CPU *cpu, int sel2, __u64 addr, uint8_t ar);
-> +void s390_cpu_topology_reset(void);
+On 2/4/23 9:40 AM, David Woodhouse wrote:
+> On Fri, 2023-02-03 at 13:48 -0600, Kim Phillips wrote:
+>> If I:
+>>
+>>    - take dwmw2's parallel-6.2-rc6 branch (commit 459d1c46dbd1)
+>>    - remove the set_cpu_bug(c, X86_BUG_NO_PARALLEL_BRINGUP) line from amd.c
+>>
+>> Then:
+>>
+>>    - a Ryzen 3000 (Picasso A1/Zen+) notebook I have access to fails to boot.
+>>    - Zen 2,3,4-based servers boot fine
+>>    - a Zen1-based server doesn't boot.
+> 
+> I've changed it to use CPUID 0xb only if we're actually in x2apic mode,
+> which Boris tells me won't be the case on Zen1 because that doesn't
+> support X2APIC.
+> 
+> When we're not in x2apic mode, we can use CPUID 0x1 because the 8 bits
+> of APIC ID we find there are perfectly sufficient.
+> 
+> New tree in the same place as before, commit ce7e2d1e046a for the
+> parallel-6.2-rc6-part1 tag and 17bbd12ee03 for parallel-6.2-rc6.
 
-How about you call this s390_cpu_topology_reset_modified, so it's symmetric
-with the function you define in the next patch. You could also drop the "cp=
-u"
-from the name.
+Thanks, Zen 1 through 4 based servers all boot both those two tree
+commits successfully.
 
-Or maybe even better, you only define a function for setting the modified s=
-tate,
-but make it take a bool argument. This way you also get rid of some code du=
-plication
-and it wouldn't harm readability IMO.
+I'll try that Ryzen again later.
 
-> =20
->  /* MMU defines */
->  #define ASCE_ORIGIN           (~0xfffULL) /* segment table origin       =
-      */
-> diff --git a/target/s390x/kvm/kvm_s390x.h b/target/s390x/kvm/kvm_s390x.h
-> index f9785564d0..649dae5948 100644
-> --- a/target/s390x/kvm/kvm_s390x.h
-> +++ b/target/s390x/kvm/kvm_s390x.h
-> @@ -47,5 +47,6 @@ void kvm_s390_crypto_reset(void);
->  void kvm_s390_restart_interrupt(S390CPU *cpu);
->  void kvm_s390_stop_interrupt(S390CPU *cpu);
->  void kvm_s390_set_diag318(CPUState *cs, uint64_t diag318_info);
-> +int kvm_s390_topology_set_mtcr(uint64_t attr);
-> =20
->  #endif /* KVM_S390X_H */
-> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
-> index a80a1ebf22..cf63f3dd01 100644
-> --- a/hw/s390x/cpu-topology.c
-> +++ b/hw/s390x/cpu-topology.c
-> @@ -85,6 +85,18 @@ static void s390_topology_init(MachineState *ms)
->      QTAILQ_INSERT_HEAD(&s390_topology.list, entry, next);
->  }
-> =20
-> +/**
-> + * s390_topology_reset:
-> + *
-> + * Generic reset for CPU topology, calls s390_topology_reset()
-> + * s390_topology_reset() to reset the kernel Modified Topology
-> + * change record.
-> + */
-> +void s390_topology_reset(void)
-> +{
-
-I'm wondering if you shouldn't move the reset changes you do in the next pa=
-tch
-into this one. I don't see what they have to do with PTF emulation.
-
-> +    s390_cpu_topology_reset();
-> +}
-> +
->  /**
->   * s390_topology_cpu_default:
->   * @cpu: pointer to a S390CPU
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 9bc51a83f4..30fdfe41fa 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -122,6 +122,9 @@ static void subsystem_reset(void)
->              device_cold_reset(dev);
->          }
->      }
-> +    if (s390_has_topology()) {
-> +        s390_topology_reset();
-> +    }
->  }
-> =20
->  static int virtio_ccw_hcall_notify(const uint64_t *args)
-> diff --git a/target/s390x/cpu-sysemu.c b/target/s390x/cpu-sysemu.c
-> index 948e4bd3e0..e27864c5f5 100644
-> --- a/target/s390x/cpu-sysemu.c
-> +++ b/target/s390x/cpu-sysemu.c
-> @@ -306,3 +306,16 @@ void s390_do_cpu_set_diag318(CPUState *cs, run_on_cp=
-u_data arg)
->          kvm_s390_set_diag318(cs, arg.host_ulong);
->      }
->  }
-> +
-> +void s390_cpu_topology_reset(void)
-> +{
-> +    int ret;
-> +
-> +    if (kvm_enabled()) {
-> +        ret =3D kvm_s390_topology_set_mtcr(0);
-> +        if (ret) {
-> +            error_report("Failed to set Modified Topology Change Report:=
- %s",
-> +                         strerror(-ret));
-> +        }
-> +    }
-> +}
-> diff --git a/target/s390x/kvm/kvm.c b/target/s390x/kvm/kvm.c
-> index 5ea358cbb0..bc953151ce 100644
-> --- a/target/s390x/kvm/kvm.c
-> +++ b/target/s390x/kvm/kvm.c
-> @@ -2592,6 +2592,23 @@ int kvm_s390_get_zpci_op(void)
->      return cap_zpci_op;
->  }
-> =20
-> +int kvm_s390_topology_set_mtcr(uint64_t attr)
-> +{
-> +    struct kvm_device_attr attribute =3D {
-> +        .group =3D KVM_S390_VM_CPU_TOPOLOGY,
-> +        .attr  =3D attr,
-> +    };
-> +
-> +    if (!s390_has_feat(S390_FEAT_CONFIGURATION_TOPOLOGY)) {
-> +        return 0;
-> +    }
-> +    if (!kvm_vm_check_attr(kvm_state, KVM_S390_VM_CPU_TOPOLOGY, attr)) {
-> +        return -ENOTSUP;
-> +    }
-> +
-> +    return kvm_vm_ioctl(kvm_state, KVM_SET_DEVICE_ATTR, &attribute);
-> +}
-> +
->  void kvm_arch_accel_class_init(ObjectClass *oc)
->  {
->  }
-
+Kim
