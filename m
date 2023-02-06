@@ -2,185 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 43B7F68BEB3
-	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 14:50:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 66B3C68BE17
+	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 14:26:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230397AbjBFNug (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Feb 2023 08:50:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55338 "EHLO
+        id S229654AbjBFNZs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Feb 2023 08:25:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230381AbjBFNuT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Feb 2023 08:50:19 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B03EF20070
-        for <kvm@vger.kernel.org>; Mon,  6 Feb 2023 05:49:54 -0800 (PST)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 316D0iDE023178;
-        Mon, 6 Feb 2023 13:19:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=7TysIHuiAS7u9S4H3D3syb5td7SVQ48KPfWVAjxwN3E=;
- b=ZwkTN7fC61yGaUe8LWWsqLreLtb6no2zVaoc414ZQ13JHRFlsTW6SsSGAxl9kEzs7w9d
- bzO5YBtdb5NRokkGkH7N4au9i9wtn5jC9HX+c69bmHwjSTAvuKyhGuiEO4qKe1GoXGmK
- di/uTKOympxaPaPz+CAUFFNGX1+AoU51KF3MhXvXdNpa4DxGFPsjoLk2H2NiO//zKhSK
- cNXRj1e0467yGJ2uG90teGkHJTWXTOYzOuzG0yIqes3d8bQJfJTLO7dZtxXshyzOXDgD
- yGB8yKGgaEkvXpbhhbR/IuZw4Ez7XjPVWrjvier8e01KjhI/C3c0AJZrVIeRcOzrMprB rA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nk2268mfu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 06 Feb 2023 13:19:23 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 316D6NJA028058;
-        Mon, 6 Feb 2023 13:19:23 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nk2268mex-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 06 Feb 2023 13:19:22 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3160HbYH023711;
-        Mon, 6 Feb 2023 13:19:21 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3nhf06terr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 06 Feb 2023 13:19:20 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 316DJHHY17826442
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 6 Feb 2023 13:19:17 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4A89020040;
-        Mon,  6 Feb 2023 13:19:17 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F29342004B;
-        Mon,  6 Feb 2023 13:19:15 +0000 (GMT)
-Received: from [9.171.30.242] (unknown [9.171.30.242])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon,  6 Feb 2023 13:19:15 +0000 (GMT)
-Message-ID: <48fc8db0-0e5c-0097-afba-f21a2110f34c@linux.ibm.com>
-Date:   Mon, 6 Feb 2023 14:19:15 +0100
+        with ESMTP id S229698AbjBFNZX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Feb 2023 08:25:23 -0500
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2055.outbound.protection.outlook.com [40.107.220.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C77F7687;
+        Mon,  6 Feb 2023 05:25:21 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fCFS1RWkx1vH24ZxyTMiB1nlTk3BaRmL5R7MPoAsvnz7NoDZnwjj3V/1wYt/QM96eT2h6o3H9oioN9heEmPnfLM7Z26YJ+T7DCFlOjMUjQ9p3czhiHX+Q1zRywD6H3hPCJVvA7OUfe3SENuqewPOaiZ2UWUKz35GYiz8FkT0E1GGRDq+svbD7LpeYGzGWZcMl76t4elW51LqJFe4H+R8GKQJnARZLZqmncvWAotqA2ZucMp20rOWhze4/8Elk+N/SnkeEfTXW+g50TobDkUfDAjdeakarMa6iwbVtzaLp/EqNPUehkrJrmpu2Y1bkcWTL5AWt3amQjLFNevyL4Xwtg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NVf502sn3STVOBBGOfSE8py0qQljcMP5y//7PVVmCYE=;
+ b=Op1AtwZCm/6Xv1tWsbtffZ0RwmQxoIbVAI8ZDz7SkrorrvoCIw5MFIdC7Bc1fGjSwYlyB011gk9aPpInsxIDc1NXv3mRff/t7Tfo4LYq+LIJav1alsnUuKxtdHm7PODRzt6SLM/6biPDUrUbHu3M8o49XjpeauuyhrXcIL536sgp8leHuhIMNzfNJBU/kLNM/76/YagiMVqly1k90FdZGQPhm9Oj0cbus+9CZ23KkLfghfRADyMFSMLYdk7ArVpDbDT3cTbp15V2q9iHyFGVKNMJls8HgKIG5qXtl7VZt9H/tI0f7xxiJyII/MHc1SKuB4j2PL9yvkNkJal9AEW/4g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NVf502sn3STVOBBGOfSE8py0qQljcMP5y//7PVVmCYE=;
+ b=czPu4IhRuBzdVzm8aJj2iI7pf38qYgSINm+tuUJ8y3vv4e/lNMoCbNQLlbDGQD7pR67qBIiax1CCCmNTrrYdUdsGtHpaho1URMeBDZxQ/EugxX2Rr1u1L6bLLLMTDbZFjUDJrt5qFUlgRBUd2/0aHIgqxVFS+35F1m3ZYieAtB3g0xXpmKUt5s7qmuvfl9CHXCpchKJzeWcXgYul0BGVFFb39a5oG6xH33173OtmuKd7F0JZs169rha7LK7vGsjL7mdrzEkjabjM7AA+Fp4LpDIMsuRsgyBvT0SnxUhNUChT40kROW03g7NWy8hqu7EfUrdLWwSiDFhPKgrOZY7Uqw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by CH2PR12MB4939.namprd12.prod.outlook.com (2603:10b6:610:61::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6064.34; Mon, 6 Feb
+ 2023 13:25:18 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3cb3:2fce:5c8f:82ee]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3cb3:2fce:5c8f:82ee%4]) with mapi id 15.20.6064.031; Mon, 6 Feb 2023
+ 13:25:18 +0000
+Date:   Mon, 6 Feb 2023 09:25:17 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Nicolin Chen <nicolinc@nvidia.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "will@kernel.org" <will@kernel.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "shuah@kernel.org" <shuah@kernel.org>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>
+Subject: Re: [PATCH v1 2/8] iommu: Introduce a new
+ iommu_group_replace_domain() API
+Message-ID: <Y+D/vWwRLD27slQz@nvidia.com>
+References: <cover.1675320212.git.nicolinc@nvidia.com>
+ <a98e622f41d76b64f5a7d0c758d8bda5e8043013.1675320212.git.nicolinc@nvidia.com>
+ <BN9PR11MB5276BB497D32073A1F4CBE238CD79@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <Y90iOAmnBtqQtmiA@ziepe.ca>
+ <BN9PR11MB527689447DD190FECE4FDA158CDA9@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB527689447DD190FECE4FDA158CDA9@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: MN2PR17CA0010.namprd17.prod.outlook.com
+ (2603:10b6:208:15e::23) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH v15 07/11] target/s390x/cpu topology: activating CPU
- topology
-Content-Language: en-US
-To:     Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        nsg@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
-        clg@kaod.org
-References: <20230201132051.126868-1-pmorel@linux.ibm.com>
- <20230201132051.126868-8-pmorel@linux.ibm.com>
- <b74543e8-5646-49da-2fab-8c5c69169d97@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <b74543e8-5646-49da-2fab-8c5c69169d97@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: FFnGWNq1JbIGbWJA8QtK3h9dxdUvwzTj
-X-Proofpoint-ORIG-GUID: kBQ_BUjwPFz3iVe19Fo2Z4czeuREvOYw
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-02-06_06,2023-02-06_03,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- priorityscore=1501 impostorscore=0 lowpriorityscore=0 adultscore=0
- spamscore=0 mlxlogscore=999 clxscore=1015 mlxscore=0 bulkscore=0
- phishscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2212070000 definitions=main-2302060111
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH2PR12MB4939:EE_
+X-MS-Office365-Filtering-Correlation-Id: ae7e4e9e-60d6-462a-3af4-08db08459711
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: r9pVA0Pn8AyGFrj+hneD8/MXkKmdw8io9P+GhEHTYL1c9+SttS4tzrRbbh1IB0/pOFHhuy8bOnVqMdBha9BiHukCGObUrCxP10cZwf5TX8q1hnn3e6C/iIo6e8yac79ZNAq/zPmXAf2rgXNTwEewf6NLHJ8REP79/OwXsvJ7wxg9kXfQf5HqJU8jCFUcEt7w/M0vyC7v6l+uPFGbDEZjfVK5Zqg6BJO7V8olycRHKJHhatImELJGOSeex6Ort9OgJ7q1yac5b3slLvkpiewA2lQ44uDq9YVICaqJRwM5AiLWw5NBxTa0Ob5EvyXzkTyj77t6TgNZFr7+q7w0IN4nISANPFZvR4NI7bgcwrV1hstANtK0aYKFYEgwQrPTdeSGIIyDS454VxYhfSIsu7MzQHb1ZZdvyNxl5uM/u/oJDi3V02e8DacfNrxx0bAzsUPvv5TxYaE3AzAnRfWjWsSZkHPoJtI6RN1XJCXd9uiOZkF2ZZpLNV2jm/DObB39xpv3P5i/ZnCLhQdhS3v72maF4PoLzmwSVuGzQhuTvhkbv9Gu+qK4dcX7D+Z3jWlwz0DS+qWcYI0rgB7kFRVVGOVq3atmnOzcfK0Yk5UcMTFIlMQ0yjcKb/YtUMKwwoQ62xsfnSGPhQqTpV/ZU2bSBYpaQA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(366004)(346002)(136003)(396003)(39860400002)(376002)(451199018)(66899018)(36756003)(41300700001)(83380400001)(86362001)(6512007)(38100700002)(26005)(2616005)(186003)(8676002)(6506007)(478600001)(54906003)(7416002)(6486002)(66946007)(316002)(8936002)(6916009)(4326008)(5660300002)(66476007)(66556008)(2906002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?wkqM8VWrvN5sDb97PQLfBK3WN8TkQLSJjz59/9gF5E3kGlN1TyFgtFmZfRQF?=
+ =?us-ascii?Q?2JhIb2aQAsE3E+rmbiEkT2O9+7SNJ4uGN5RKE0R/Dzn2rGm+yyM9Vh5j1B8j?=
+ =?us-ascii?Q?OFK+hmkPqz5796MJGkDTuohZi09/M1s8KP7Yye+ZoLRLNxDCO1OruFR1XAAG?=
+ =?us-ascii?Q?wNZzMKS/nIo7Nq7XIi2a3XLqZK75P6uedQA5E8zzrTa5Ob1TrGSUY6DYacQE?=
+ =?us-ascii?Q?eW5++anoEaW6g0TJB0SI7aPwlqATZ6oGaQB81uQQjj32PkdkZTZ8PyNzKhwt?=
+ =?us-ascii?Q?jpTQjScO0hXV1u4Hy6/eRV6SzT3CCbWtOqI+tGABYuUhPrx6Y5nJA6FFpXNd?=
+ =?us-ascii?Q?UJ6svBdBJ36kyyozjxapxo6RrJT/8U17wWJMTOojDqK4Fec1oXwdEm+UioSt?=
+ =?us-ascii?Q?hNNAjoDHkkdSUq0ifuwLs5D86xrO0zd4tO3n0wRD9byeTgpbZfp5xfTvgkTB?=
+ =?us-ascii?Q?C61c2MFIFfQrF+Mip5dnve+hhZCg3jOXM0JhsooGYA1bBsEhokBMlrKvoxXi?=
+ =?us-ascii?Q?Sf7IFVwiMlo2Z+QnYTUu9b8Px6c5+JvklBBvKhA91CbPi7UdSHfd+YL7T2rA?=
+ =?us-ascii?Q?pzOV8SfLvaRcf+yZoUJixutry5eoeZhpGhuswKTWkaZVxwEW5xxvHq5oR+0N?=
+ =?us-ascii?Q?cVaGErkSHirMfhegEVwtxELfh7cbwF1fkfC9Pgrn9mszcF7OCSZn0T4AunjM?=
+ =?us-ascii?Q?8d0oXuHu6O6J9pU/R+uwc7uvRVtzS1h2cM0igXseYYu1beWgAB3nzSLDcyJ/?=
+ =?us-ascii?Q?SikKt/EjwineeCh8rhx+ieHy7RHUDsrUc2EMlRvHLdwLK26nkUxs9p330FZI?=
+ =?us-ascii?Q?ES6lLL+iSj7MlhEFlwQHEcU/UdEfbJeEJdJ7EzEp+3Ow6n1JtGx0PV2I6dB2?=
+ =?us-ascii?Q?WkRQODzs+OWnUJvgqex2L5I4g/TmNZTXTwMVStbE60s1kvGT1Kuy92zvfSt/?=
+ =?us-ascii?Q?VSjGkGsuTLugttypmLPHQ5GC6CIlEPRJwHV5cyI0FnYqvOquWCIc4YqK+pyv?=
+ =?us-ascii?Q?Q9c1Dwd8sf1tXWRF+laxoThIjlQZWALnu34qZQy+TSp7Vc1LkOQKS5VqOSkZ?=
+ =?us-ascii?Q?8xn9MTPAbffVV3AbdZ5XqGyejQUPFRjqZZSz3+3J53yrbHjeFe1XFYaGc0SP?=
+ =?us-ascii?Q?rPynk95rb4J9Q6vMV1iFqOct94SKX4ssnWdsNWkZdjucG3ZmM4FTHcLhtJAc?=
+ =?us-ascii?Q?eCY+P8GFLWLneMoJ2Hovzse8V6fLfRTv/lcrfS4Sj3QGFMy0X30eB7RFqFvO?=
+ =?us-ascii?Q?g0wTcPQ1ZaLS1Noase13fZBNJaDA2z6acPl+c1pFLbPNyEf551jIDN8/yVwV?=
+ =?us-ascii?Q?JrxzuObG6zZS3FMvBJ6a4Xxg8BPhWNXl7CYkW18u5Y1mMZer2iue5kG2SYxL?=
+ =?us-ascii?Q?ejoZzjpDI5gKsf09JSCja8RNwVdH5EC4QwQj8deIiqDteAsHixbVIWdVox48?=
+ =?us-ascii?Q?Tv2jjxSTR+9RZRZfaqfcOtxGXY03ScD08Vdo1jgEqYo1nco13bnxUgKI5owf?=
+ =?us-ascii?Q?LrreHm2YJ5pIAYITaOLwbCWNJTt7/rktcz6utWedWni/AYlKkkqyrt+KpxHm?=
+ =?us-ascii?Q?+Sx/++M0bibvN+TNui+o+hkSDHqPMoMCGoywu0FG?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ae7e4e9e-60d6-462a-3af4-08db08459711
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Feb 2023 13:25:18.5186
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3TCqgLs3/DodCUtqV6g0aRvVz2ni7E4anlOdJeROXC4WLtbHhXC8lp+iG2cgm17W
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4939
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 2/6/23 12:57, Thomas Huth wrote:
-> On 01/02/2023 14.20, Pierre Morel wrote:
->> The KVM capability KVM_CAP_S390_CPU_TOPOLOGY is used to
->> activate the S390_FEAT_CONFIGURATION_TOPOLOGY feature and
->> the topology facility in the host CPU model for the guest
->> in the case the topology is available in QEMU and in KVM.
->>
->> The feature is disabled by default and fenced for SE
->> (secure execution).
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   hw/s390x/cpu-topology.c   |  2 +-
->>   target/s390x/cpu_models.c |  1 +
->>   target/s390x/kvm/kvm.c    | 12 ++++++++++++
->>   3 files changed, 14 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
->> index 1028bf4476..c33378577b 100644
->> --- a/hw/s390x/cpu-topology.c
->> +++ b/hw/s390x/cpu-topology.c
->> @@ -55,7 +55,7 @@ int s390_socket_nb(S390CPU *cpu)
->>    */
->>   bool s390_has_topology(void)
->>   {
->> -    return false;
->> +    return s390_has_feat(S390_FEAT_CONFIGURATION_TOPOLOGY);
->>   }
->>   /**
->> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
->> index 065ec6d66c..aca2c5c96b 100644
->> --- a/target/s390x/cpu_models.c
->> +++ b/target/s390x/cpu_models.c
->> @@ -254,6 +254,7 @@ bool s390_has_feat(S390Feat feat)
->>           case S390_FEAT_SIE_CMMA:
->>           case S390_FEAT_SIE_PFMFI:
->>           case S390_FEAT_SIE_IBS:
->> +        case S390_FEAT_CONFIGURATION_TOPOLOGY:
->>               return false;
->>               break;
->>           default:
->> diff --git a/target/s390x/kvm/kvm.c b/target/s390x/kvm/kvm.c
->> index fb63be41b7..808e35a7bd 100644
->> --- a/target/s390x/kvm/kvm.c
->> +++ b/target/s390x/kvm/kvm.c
->> @@ -2470,6 +2470,18 @@ void kvm_s390_get_host_cpu_model(S390CPUModel 
->> *model, Error **errp)
->>           set_bit(S390_FEAT_UNPACK, model->features);
->>       }
->> +    /*
->> +     * If we have kernel support for CPU Topology indicate the
->> +     * configuration-topology facility.
->> +     */
->> +    if (kvm_check_extension(kvm_state, KVM_CAP_S390_CPU_TOPOLOGY)) {
->> +        if (kvm_vm_enable_cap(kvm_state, KVM_CAP_S390_CPU_TOPOLOGY, 
->> 0) < 0) {
->> +            error_setg(errp, "KVM: Error enabling 
->> KVM_CAP_S390_CPU_TOPOLOGY");
->> +            return;
->> +        }
->> +        set_bit(S390_FEAT_CONFIGURATION_TOPOLOGY, model->features);
->> +    }
+On Mon, Feb 06, 2023 at 06:57:35AM +0000, Tian, Kevin wrote:
+> > From: Jason Gunthorpe <jgg@nvidia.com>
+> > Sent: Friday, February 3, 2023 11:03 PM
+> > 
+> > On Fri, Feb 03, 2023 at 08:26:44AM +0000, Tian, Kevin wrote:
+> > > > From: Nicolin Chen <nicolinc@nvidia.com>
+> > > > Sent: Thursday, February 2, 2023 3:05 PM
+> > > >
+> > > > All drivers are already required to support changing between active
+> > > > UNMANAGED domains when using their attach_dev ops.
+> > >
+> > > All drivers which don't have *broken* UNMANAGED domain?
+> > 
+> > No, all drivers.. It has always been used by VFIO.
 > 
-> Not sure, but for the other capabilities, the kvm_vm_enable_cap() is 
-> rather done in kvm_arch_init() instead ... likely that it is properly 
-> available in case you don't run with the "host" cpu model? So should the 
-> kvm_vm_enable_cap(KVM_CAP_S390_CPU_TOPOLOGY) also be moved there (but of 
-> course keep the set_bit() here in kvm_s390_get_host_cpu_model())?
+> existing iommu_attach_group() doesn't support changing between
+> two UNMANAGED domains. only from default->unmanaged or
+> blocking->unmanaged.
 
-I think you are right, I do this.
-Thanks.
+Yes, but before we added the blocking domains VFIO was changing
+between unmanaged domains. Blocking domains are so new that no driver
+could have suddenly started to depend on this.
 
-regards,
-PIerre
-
+> > > Can you elaborate the error handling here? Ideally if
+> > > __iommu_group_set_domain() fails then group->domain shouldn't
+> > > be changed.
+> > 
+> > That isn't what it implements though. The internal helper leaves
+> > things in a mess, it is for the caller to fix it, and it depends on
+> > the caller what that means.
 > 
->   Thomas
-> 
+> I didn't see any warning of the mess and the caller's responsibility
+> in __iommu_group_set_domain(). Can it be documented clearly
+> so if someone wants to add a new caller on it he can clearly know
+> what to do?
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+That would be nice..
+ 
+> and why doesn't iommu_attach_group() need to do anything
+> when an attach attempt fails? In the end it calls the same
+> iommu_group_do_attach_device() as __iommu_group_set_domain()
+> does.
+
+That's a bug for sure.
+
+ 
+> btw looking at the code __iommu_group_set_domain():
+> 
+> 	 * Note that this is called in error unwind paths, attaching to a
+> 	 * domain that has already been attached cannot fail.
+> 	 */
+> 	ret = __iommu_group_for_each_dev(group, new_domain,
+> 				iommu_group_do_attach_device);
+> 
+> with that we don't need fall back to core domain in above error
+> unwinding per this comment.
+
+That does make some sense.
+
+I tried to make a patch to consolidate all this error handling once,
+that would be the better way to approach this.
+
+> > In this case the API cannot retain a hidden reference to the new
+> > domain, so it must be purged, one way or another.
+> 
+> Could you elaborate where the hidden reference is retained?
+
+Inside the driver, it can keep track of the domain pointer if
+attach_dev succeeds
+
+Jason
