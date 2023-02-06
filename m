@@ -2,179 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BAAE968BD6F
-	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 14:02:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D02568BD86
+	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 14:10:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229686AbjBFNCm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Feb 2023 08:02:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43972 "EHLO
+        id S230264AbjBFNKt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Feb 2023 08:10:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229525AbjBFNCl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Feb 2023 08:02:41 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1399323326
-        for <kvm@vger.kernel.org>; Mon,  6 Feb 2023 05:02:40 -0800 (PST)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 316D0qCA025061;
-        Mon, 6 Feb 2023 13:02:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=BhLI7FcTDjadHxnMvPsM3UVArQEhPdX7T+OjtiOG8Dw=;
- b=EetWxw7xmdYdFeEOzOM0NB+9ywmyNDwQ/IJf+wcTr+DGclnDm+xa1x8Bib+yu1W664PO
- 1gunMM4vJDp/72PlzjN6eYdLX0NohBMB5mrSltq7yXfv8roOSQgj/ak1naQmGVGGvqRa
- cZCZlpFpNRJlnC+Otw99STZjWA4BBsJv80jFKjYYId/VNmqL5UGIijRA/FHE8/6UivYf
- pmITYcHRWC99fBlflzN0zeMF4Ts8fcDreGoM/Ce5d9535ctdhv1F7/GBwI4Wv2ZyKs39
- AAolLahbo1yIjiBccD5+eFQKK2alALFCvgcN1OlKF3m8xfP9uKv+dFec9d1vM+RiJ3qX mg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nk22681yn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 06 Feb 2023 13:02:27 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 316D1IkZ027920;
-        Mon, 6 Feb 2023 13:02:27 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nk22681sa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 06 Feb 2023 13:02:27 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 315N0mZc022560;
-        Mon, 6 Feb 2023 13:02:16 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3nhemfje3x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 06 Feb 2023 13:02:16 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 316D2CkA39715108
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 6 Feb 2023 13:02:12 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 63E7B20043;
-        Mon,  6 Feb 2023 13:02:12 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1DC1720040;
-        Mon,  6 Feb 2023 13:02:11 +0000 (GMT)
-Received: from [9.171.30.242] (unknown [9.171.30.242])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon,  6 Feb 2023 13:02:11 +0000 (GMT)
-Message-ID: <ffdc5108-b362-8373-f3c6-fc572d0b8f1a@linux.ibm.com>
-Date:   Mon, 6 Feb 2023 14:02:10 +0100
+        with ESMTP id S229759AbjBFNKs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Feb 2023 08:10:48 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66988144B6
+        for <kvm@vger.kernel.org>; Mon,  6 Feb 2023 05:10:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675689004;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0F4n6oRN9d0FXsy2UfnG+aJFu5pdD1XrdXOjIiNSqM4=;
+        b=hFOl7Fg3ePlgSu9RmPzs5YQxIQbMDuAbd/vVi9OnXWmO7zzZ5RrKOTJ6yCfOTTMiBinu4T
+        85aysromAAFrevI2vFYXc6kzvl4gbfVEnsGPurudGQFZwEeEoMii8Y90/0l6iKxMtc+CP0
+        p6qu1seziko4KAkV7UPAjmdwb1cU3j0=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-452-Tqh6h33gPheVKj_eu7qPCQ-1; Mon, 06 Feb 2023 08:10:03 -0500
+X-MC-Unique: Tqh6h33gPheVKj_eu7qPCQ-1
+Received: by mail-qv1-f71.google.com with SMTP id l6-20020ad44446000000b00537721bfd2dso5801313qvt.11
+        for <kvm@vger.kernel.org>; Mon, 06 Feb 2023 05:10:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0F4n6oRN9d0FXsy2UfnG+aJFu5pdD1XrdXOjIiNSqM4=;
+        b=IN/Yaiu1pz8dAE/3pfwHdoAs9oJpYmV8IXjqOGzp/Q9wl9MgIKErjGonVve//LNMvS
+         peg2BfjevzgBjsq0klit3nkBJLgQ4EeMUhCKtebD91gi4zbveKQUUnSoVB4Nx0apK1Vx
+         mfhg0RKn9fWouFNOaqJ16uwW1+hqL6MbimX3BJEdTu1/h0gZbWPEyDNhQpjCxjvt65vU
+         Jgt5tzGFMvO5degjGcwVlY8kdzr/VQ3uqzxFs2qDhb2nWf9MnCj4TpBDbrbcKh83I9y5
+         j7hZvs8tr8M0MUvJJfy0JqIINUrWRfLSeog1Ezo/dwH+T8/iTMIP+YAqUr+HOxyqZbdF
+         MXBQ==
+X-Gm-Message-State: AO0yUKVryUpbEhHEg+jmlHBl9aE+bk65Yui79+qyWgKVsLjKKpaS0qnJ
+        CdTPzHt6ifn2Hvh+WJjt6vYlKk0W8VeoRuHzmjW0bz0mczN3F90KKfNK+5fskuhYPABr5JYiAI4
+        6cTnPc0w5S5zQ
+X-Received: by 2002:ac8:59cb:0:b0:3b8:4951:57b7 with SMTP id f11-20020ac859cb000000b003b8495157b7mr34547879qtf.20.1675689002719;
+        Mon, 06 Feb 2023 05:10:02 -0800 (PST)
+X-Google-Smtp-Source: AK7set9zL72cFuFVsx2BUC3H2ZLsTV1hGvBPE85qDtnjVy85ay2pdSlUopi9QLkabRgin6oMR+J9gQ==
+X-Received: by 2002:ac8:59cb:0:b0:3b8:4951:57b7 with SMTP id f11-20020ac859cb000000b003b8495157b7mr34547838qtf.20.1675689002426;
+        Mon, 06 Feb 2023 05:10:02 -0800 (PST)
+Received: from [192.168.0.2] (ip-109-43-177-71.web.vodafone.de. [109.43.177.71])
+        by smtp.gmail.com with ESMTPSA id d8-20020a05622a100800b003b643951117sm7377910qte.38.2023.02.06.05.09.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 06 Feb 2023 05:10:01 -0800 (PST)
+Message-ID: <e1828071-551a-b5cb-8da5-cea91f075548@redhat.com>
+Date:   Mon, 6 Feb 2023 14:09:57 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH v15 06/11] s390x/cpu topology: interception of PTF
- instruction
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [PATCH v15 09/11] machine: adding s390 topology to query-cpu-fast
 Content-Language: en-US
-To:     Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+To:     =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+        armbru@redhat.com, Michael Roth <michael.roth@amd.com>,
+        Pierre Morel <pmorel@linux.ibm.com>
+Cc:     qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
+        borntraeger@de.ibm.com, pasic@linux.ibm.com,
         richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
         mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
         ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        nsg@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
-        clg@kaod.org
+        seiden@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
+        frankja@linux.ibm.com, clg@kaod.org
 References: <20230201132051.126868-1-pmorel@linux.ibm.com>
- <20230201132051.126868-7-pmorel@linux.ibm.com>
- <92533b03-f07e-736a-4e29-bcdf883f7ec4@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <92533b03-f07e-736a-4e29-bcdf883f7ec4@redhat.com>
+ <20230201132051.126868-10-pmorel@linux.ibm.com>
+ <a7a235d5-4ded-b83d-dcb6-2cf81ad5f283@redhat.com>
+ <Y+D3PH0EkUPshIMO@redhat.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <Y+D3PH0EkUPshIMO@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 7qa0IDZ0-C72yDzK7A0YxqOadoa5jwG8
-X-Proofpoint-ORIG-GUID: SQf9uUKTd32VF4eoGW6F7Z2It97lRmNz
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-02-06_06,2023-02-06_03,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- priorityscore=1501 impostorscore=0 lowpriorityscore=0 adultscore=0
- spamscore=0 mlxlogscore=999 clxscore=1015 mlxscore=0 bulkscore=0
- phishscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2212070000 definitions=main-2302060111
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 2/6/23 12:38, Thomas Huth wrote:
-> On 01/02/2023 14.20, Pierre Morel wrote:
->> When the host supports the CPU topology facility, the PTF
->> instruction with function code 2 is interpreted by the SIE,
->> provided that the userland hypervizor activates the interpretation
-> 
-> s/hypervizor/hypervisor/
-
-grr, I was pretty sure you already said that to me and I did change 
-it... seems I did not.
-
-done now.
-
-> 
->> by using the KVM_CAP_S390_CPU_TOPOLOGY KVM extension.
+On 06/02/2023 13.49, Daniel P. Berrangé wrote:
+> On Mon, Feb 06, 2023 at 01:41:44PM +0100, Thomas Huth wrote:
+>> On 01/02/2023 14.20, Pierre Morel wrote:
+>>> S390x provides two more topology containers above the sockets,
+>>> books and drawers.
+>>>
+>>> Let's add these CPU attributes to the QAPI command query-cpu-fast.
+>>>
+>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>>> ---
+>>>    qapi/machine.json          | 13 ++++++++++---
+>>>    hw/core/machine-qmp-cmds.c |  2 ++
+>>>    2 files changed, 12 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/qapi/machine.json b/qapi/machine.json
+>>> index 3036117059..e36c39e258 100644
+>>> --- a/qapi/machine.json
+>>> +++ b/qapi/machine.json
+>>> @@ -53,11 +53,18 @@
+>>>    #
+>>>    # Additional information about a virtual S390 CPU
+>>>    #
+>>> -# @cpu-state: the virtual CPU's state
+>>> +# @cpu-state: the virtual CPU's state (since 2.12)
+>>> +# @dedicated: the virtual CPU's dedication (since 8.0)
+>>> +# @polarity: the virtual CPU's polarity (since 8.0)
+>>>    #
+>>>    # Since: 2.12
+>>>    ##
+>>> -{ 'struct': 'CpuInfoS390', 'data': { 'cpu-state': 'CpuS390State' } }
+>>> +{ 'struct': 'CpuInfoS390',
+>>> +    'data': { 'cpu-state': 'CpuS390State',
+>>> +              'dedicated': 'bool',
+>>> +              'polarity': 'int'
 >>
->> The PTF instructions with function code 0 and 1 are intercepted
->> and must be emulated by the userland hypervizor.
+>> I think it would also be better to mark the new fields as optional and only
+>> return them if the guest has the topology enabled, to avoid confusing
+>> clients that were written before this change.
 > 
-> dito
+> FWIW, I would say that the general expectation of QMP clients is that
+> they must *always* expect new fields to appear in dicts that are
+> returned in QMP replies. We add new fields at will on a frequent basis.
 
-yes, thx.
+Did we change our policy here? I slightly remember I've been told 
+differently in the past ... but I can't recall where this was, it's 
+certainly been a while.
 
-> 
->> During RESET all CPU of the configuration are placed in
->> horizontal polarity.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
-> ...
->>   /**
->>    * s390_topology_reset:
->>    *
->>    * Generic reset for CPU topology, calls s390_topology_reset()
->>    * s390_topology_reset() to reset the kernel Modified Topology
->>    * change record.
->> + * Then set global and all CPUs polarity to POLARITY_HORIZONTAL.
-> 
-> You describe here already what's going to happen...
-> 
->>    */
->>   void s390_topology_reset(void)
->>   {
->>       s390_cpu_topology_reset();
->> +    /* Set global polarity to POLARITY_HORIZONTAL */
-> 
-> ... then here again ...
-> 
->> +    s390_topology.polarity = POLARITY_HORIZONTAL;
-> 
-> ... and the code is (fortunately) also very self-exaplaining...
-> 
->> +    /* Set all CPU polarity to POLARITY_HORIZONTAL */
->> +    s390_topology_set_cpus_polarity(POLARITY_HORIZONTAL);
-> 
-> ... so I'd rather drop the two comments within the function body.
+So a question to the QAPI maintainers: What's the preferred handling for new 
+fields nowadays in such situations?
 
-OK
+  Thomas
 
-> 
->>   }
-> 
-> (rest of the patch looks fine to me)
-> 
->   Thomas
-> 
-
-Thanks.
-
-Regards,
-Pierre
-
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
