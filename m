@@ -2,85 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 57DE668C47A
-	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 18:22:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AC59C68C48C
+	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 18:24:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229969AbjBFRWF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Feb 2023 12:22:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54684 "EHLO
+        id S229898AbjBFRYE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Feb 2023 12:24:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229990AbjBFRWE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Feb 2023 12:22:04 -0500
-Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 470662917F
-        for <kvm@vger.kernel.org>; Mon,  6 Feb 2023 09:22:01 -0800 (PST)
-Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-520dad0a7d2so165040307b3.5
-        for <kvm@vger.kernel.org>; Mon, 06 Feb 2023 09:22:01 -0800 (PST)
+        with ESMTP id S229615AbjBFRYC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Feb 2023 12:24:02 -0500
+Received: from mail-il1-x149.google.com (mail-il1-x149.google.com [IPv6:2607:f8b0:4864:20::149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0065E7A85
+        for <kvm@vger.kernel.org>; Mon,  6 Feb 2023 09:23:47 -0800 (PST)
+Received: by mail-il1-x149.google.com with SMTP id k13-20020a056e021a8d00b00313951035ccso6570018ilv.22
+        for <kvm@vger.kernel.org>; Mon, 06 Feb 2023 09:23:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=6JU+HqMvj9rTBsqUK7nwQ9sxFLLsZWmVB3Bc71Ax2yI=;
-        b=nyz2M+qFPKQOuO2vvcRi4bxlauc9/I9vaV4MlKW3iWTq8JVh4FsJrQrgKPcvprKQvL
-         CM1TpBQqJEXMf+ZbKhad0GyRKV7XEc3lpkJjwQN3bTlrSVhnduCB7vQBAUYa2zwPFVT9
-         C8MnE0shBPJDXpFUr3yyiUYpwIegrZAiwkb4btjtjfD9q5V12ZwVfMST8jU0WWZdUGc3
-         u20HmaRcR3bnVhBAP3y8L3vj29FCtrb+vT3aVCHhTDC7ltD7kS2dfsqBqr/IAQbOBQ0g
-         Puw4KmfzeQZInseINM1mlc+2Wyfxtx1DkXUowDfKSrGEJpH5DV4BpqP79NDSElV+yyXQ
-         Jc6w==
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=tCF6TwGhxQnyhb8yf01ctYnmoYyzioEblNPgudqLhvI=;
+        b=p/wXgrPNwOmYwnwQi6Qc6gdGccfckZ2RvMBN8pImZaYmTFF4ujhuUJehAV5qMCQ491
+         L6rhQXozyuQ39i8N9WDSfPbwRAjln0vDJSc3p9PBMEYVEJKh6z3rZdDWkQo8cm/D5Fna
+         Z9iPHuQK54hieDrQtk1FAnLpxQN9Nzy0kN7VIDfgIJP/wzjDGXy4Rj8+fAfEwqyNv7Km
+         IHL98kC7sgTyUSO/5dLs6mb1EVQcQlqgX5S/b99uQb1oq5nPHpV9MARL56nHul9Gsgnk
+         9Th8GMa8k51SsbF7VRLwj1i9P8Ql8n2hcMsaMazAJqMNiQnYI7yj+qNUGwgmP0mrK3Fk
+         nLpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6JU+HqMvj9rTBsqUK7nwQ9sxFLLsZWmVB3Bc71Ax2yI=;
-        b=sK9UWLgIbD4hV6nsTWJJO/xfozixx9c7DNgjXsUrkShtX/gWR8rTVutY7TWplP9iHq
-         kjiqqk5tDOEEOgGL+XS9WtUAfIIfH4+yoXqtOHHlOLQ5ZqQ+D7bbAdDkiScc4ZA5KlJ3
-         gLeH9I48A4VvHfwm3TCkFAwrke48ZcD+NUiNXGi2QrcJDqdiaKWVDoY3P12/BMrytAgB
-         iqLU85jxIU+Wuljy1Y7/UZkY1PMiKKFgfieUMxg+uftRwpMev49ebRcRtWQPURB1wVg1
-         ZhFq+1BIoUpTI7LrCPV/99f/C0PFf2dQw5hYhQD0NbgVQfnxgEc9ULNBbDiEwUp+wXIE
-         B7/A==
-X-Gm-Message-State: AO0yUKUl7QI9CALPPQAVeZO6xX5PYuRz4qzvu6zpyt7STGJY5Ak9NsV1
-        hmmmKft2pEphWEV2RhRMaNkF+n8crSGbqmcsLdI=
-X-Google-Smtp-Source: AK7set/JO0GdcwpkyQSG5oBASsXjI6OBXOLFD2w+KazFhABa7SrepaC7EffFCffQhI12MS9GJN3siDJARYdBc7TCcqc=
-X-Received: by 2002:a0d:e6c4:0:b0:527:ad38:2c5b with SMTP id
- p187-20020a0de6c4000000b00527ad382c5bmr862025ywe.336.1675704120311; Mon, 06
- Feb 2023 09:22:00 -0800 (PST)
-MIME-Version: 1.0
-References: <CAJSP0QUuuZLC0DJNEfZ7amyd3XnRhRNr1k+1OgLfDeF77X1ZDQ@mail.gmail.com>
- <CAJaqyWd+g5fso6AEGKwj0ByxFVc8EpCS9+ezoMpnjyMo5tbj8Q@mail.gmail.com>
- <CAJSP0QXyO4qXJseMzbgsVdXK-4-W4U9DxPcxr6wX45d6VBTeWQ@mail.gmail.com>
- <CAJaqyWczFwbxNWrZ8dcFHvYrV2=tH7Tv0Apf=qORT+gzDpBN4Q@mail.gmail.com>
- <CAJSP0QX+mpmdVE-13L9p=02_XbmPFT-mFAbz-JJjqB5V-2ON6Q@mail.gmail.com> <CAJaqyWd8EhfDmTtmLNzuoVDoF641Tq3LL1jvvdXK+DDbAfjccQ@mail.gmail.com>
-In-Reply-To: <CAJaqyWd8EhfDmTtmLNzuoVDoF641Tq3LL1jvvdXK+DDbAfjccQ@mail.gmail.com>
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-Date:   Mon, 6 Feb 2023 12:21:48 -0500
-Message-ID: <CAJSP0QUFR_Nhd2dDkXJ_NjSo=+GNHFswztuGLLJ1QuokqOMUqA@mail.gmail.com>
-Subject: Re: Call for GSoC and Outreachy project ideas for summer 2023
-To:     Eugenio Perez Martin <eperezma@redhat.com>
-Cc:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
-        Rust-VMM Mailing List <rust-vmm@lists.opendev.org>,
-        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
-        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
-        Thomas Huth <thuth@redhat.com>, John Snow <jsnow@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Florescu, Andreea" <fandree@amazon.com>,
-        Damien <damien.lemoal@opensource.wdc.com>,
-        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
-        Hanna Reitz <hreitz@redhat.com>,
-        Alberto Faria <afaria@redhat.com>,
-        Daniel Henrique Barboza <danielhb413@gmail.com>,
-        =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
-        Bernhard Beschow <shentey@gmail.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, gmaglione@redhat.com,
-        Jason Wang <jasowang@redhat.com>
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tCF6TwGhxQnyhb8yf01ctYnmoYyzioEblNPgudqLhvI=;
+        b=PAM2TnF1zQsnuaIj3bo21+Iuy2tJB4ab1K/UQmsJRD72YMfaCo7biMyjC4jvEYL4P/
+         aedul2liX/iRAQUUgOrW4f7XPY/LptrtSwqCugJ7IVifJD7G7WnfI2tF4jlb+5gWKGbP
+         l+jcBB1fxs3GRavm2B7JIgTxmWogSQToJ/fFO5rd4OnQHv1zk4Ecl06SX/H/SuBytwbm
+         WlyFI8SySj98Vx2TwVvp6G43FdYMudRM1Qcx1DH4OIi575nRh28ViDrm4ufZrSx95c6O
+         fx0LU5z/JuXL/grdkecE2pbSS7J80h6hfvLejCond6ZTIz1jTeNBoTjc82UHK/bWrVBa
+         N/7A==
+X-Gm-Message-State: AO0yUKXtfw/7uW6BvfxwREIuOZV2QpQqPkwAsuHh2Ln2rAx0GZmIrYoE
+        uEaOz9N4sCjlpqppyqQ5XcYvixGaoAUP
+X-Google-Smtp-Source: AK7set9DGjb1VmXyo14vzBucOK7rbEBbB63YtEW75mXeAWNEYrP3B1/9EPBtu6jfjfsTUqO3mnPjYm62RBqr
+X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:22b5])
+ (user=rananta job=sendgmr) by 2002:a92:1a47:0:b0:313:d78c:918f with SMTP id
+ z7-20020a921a47000000b00313d78c918fmr1460ill.40.1675704227420; Mon, 06 Feb
+ 2023 09:23:47 -0800 (PST)
+Date:   Mon,  6 Feb 2023 17:23:33 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.1.519.gcb327c4b5f-goog
+Message-ID: <20230206172340.2639971-1-rananta@google.com>
+Subject: [PATCH v2 0/7] KVM: arm64: Add support for FEAT_TLBIRANGE
+From:   Raghavendra Rao Ananta <rananta@google.com>
+To:     Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -88,344 +76,154 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 6 Feb 2023 at 11:47, Eugenio Perez Martin <eperezma@redhat.com> wrote:
->
-> On Mon, Feb 6, 2023 at 3:21 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> >
-> > On Mon, 6 Feb 2023 at 06:53, Eugenio Perez Martin <eperezma@redhat.com> wrote:
-> > >
-> > > On Sun, Feb 5, 2023 at 2:57 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> > > >
-> > > > On Sun, 5 Feb 2023 at 03:15, Eugenio Perez Martin <eperezma@redhat.com> wrote:
-> > > > >
-> > > > > On Fri, Jan 27, 2023 at 4:18 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> > > > > >
-> > > > > > Dear QEMU, KVM, and rust-vmm communities,
-> > > > > > QEMU will apply for Google Summer of Code 2023
-> > > > > > (https://summerofcode.withgoogle.com/) and has been accepted into
-> > > > > > Outreachy May 2023 (https://www.outreachy.org/). You can now
-> > > > > > submit internship project ideas for QEMU, KVM, and rust-vmm!
-> > > > > >
-> > > > > > Please reply to this email by February 6th with your project ideas.
-> > > > > >
-> > > > > > If you have experience contributing to QEMU, KVM, or rust-vmm you can
-> > > > > > be a mentor. Mentors support interns as they work on their project. It's a
-> > > > > > great way to give back and you get to work with people who are just
-> > > > > > starting out in open source.
-> > > > > >
-> > > > > > Good project ideas are suitable for remote work by a competent
-> > > > > > programmer who is not yet familiar with the codebase. In
-> > > > > > addition, they are:
-> > > > > > - Well-defined - the scope is clear
-> > > > > > - Self-contained - there are few dependencies
-> > > > > > - Uncontroversial - they are acceptable to the community
-> > > > > > - Incremental - they produce deliverables along the way
-> > > > > >
-> > > > > > Feel free to post ideas even if you are unable to mentor the project.
-> > > > > > It doesn't hurt to share the idea!
-> > > > > >
-> > > > > > I will review project ideas and keep you up-to-date on QEMU's
-> > > > > > acceptance into GSoC.
-> > > > > >
-> > > > > > Internship program details:
-> > > > > > - Paid, remote work open source internships
-> > > > > > - GSoC projects are 175 or 350 hours, Outreachy projects are 30
-> > > > > > hrs/week for 12 weeks
-> > > > > > - Mentored by volunteers from QEMU, KVM, and rust-vmm
-> > > > > > - Mentors typically spend at least 5 hours per week during the coding period
-> > > > > >
-> > > > > > For more background on QEMU internships, check out this video:
-> > > > > > https://www.youtube.com/watch?v=xNVCX7YMUL8
-> > > > > >
-> > > > > > Please let me know if you have any questions!
-> > > > > >
-> > > > > > Stefan
-> > > > > >
-> > > > >
-> > > > > Appending the different ideas here.
-> > > >
-> > > > Hi Eugenio,
-> > > > Thanks for sharing your project ideas. I have added some questions
-> > > > below before we add them to the ideas list wiki page.
-> >
-> > Thanks for the discussion. Do you want to focus on 1 or 2 project
-> > ideas? 3 might be a bit much to mentor.
-> >
->
-> Right, my idea was to reduce that amount afterwards just in case some
-> of them were rejected. But sure, we can filter out some if needed.
+In certain code paths, KVM/ARM currently invalidates the entire VM's
+page-tables instead of just invalidating a necessary range. For example,
+when collapsing a table PTE to a block PTE, instead of iterating over
+each PTE and flushing them, KVM uses 'vmalls12e1is' TLBI operation to
+flush all the entries. This is inefficient since the guest would have
+to refill the TLBs again, even for the addresses that aren't covered
+by the table entry. The performance impact would scale poorly if many
+addresses in the VM is going through this remapping.
 
-Do you mean in case there is no realistic applicant? You can do that
-if you want, just keep in mind it may be more work for you during the
-application phase. If it turns out there is a strong applicant for
-each project idea you could see if someone else is willing to mentor
-the project(s) you don't have time for.
+For architectures that implement FEAT_TLBIRANGE, KVM can replace such
+inefficient paths by performing the invalidations only on the range of
+addresses that are in scope. This series tries to achieve the same in
+the areas of stage-2 map, unmap and write-protecting the pages.
 
-I'll post the project ideas once you've updated them.
+Patch-1 refactors the core arm64's __flush_tlb_range() to be used by
+other entities.
 
-> > Please send an updated version of the project descriptions and I'll
-> > post it on the wiki.
-> >
-> > > >
-> > > > > VIRTIO_F_IN_ORDER feature support for virtio devices
-> > > > > ===
-> > > > > This was already a project the last year, and it produced a few series
-> > > > > upstream but was never merged. The previous series are totally useful
-> > > > > to start with, so it's not starting from scratch with them [1]:
-> > > >
-> > > > Has Zhi Guo stopped working on the patches?
-> > > >
-> > >
-> > > I can ask him for sure.
-> > >
-> > > > What is the state of the existing patches? What work remains to be done?
-> > > >
-> > >
-> > > There are some pending comments from upstream. However if somebody
-> > > starts it from scratch it needs time to review some of the VirtIO
-> > > standard to understand the virtio in_order feature, both in split and
-> > > packed vq.
-> >
-> > The intern will need to take ownership and deal with code review
-> > feedback for code they didn't write. That can be difficult for someone
-> > who is new unless the requested changes are easy to address.
-> >
->
-> Indeed that is a very good point.
->
-> > It's okay to start from scratch. You're in a better position than an
-> > applicant to decide whether that's the best approach.
-> >
-> > >
-> > >
-> > > > >
-> > > > > Summary
-> > > > > ---
-> > > > > Implement VIRTIO_F_IN_ORDER in QEMU and Linux (vhost and virtio drivers)
-> > > > >
-> > > > > The VIRTIO specification defines a feature bit (VIRTIO_F_IN_ORDER)
-> > > > > that devices and drivers can negotiate when the device uses
-> > > > > descriptors in the same order in which they were made available by the
-> > > > > driver.
-> > > > >
-> > > > > This feature can simplify device and driver implementations and
-> > > > > increase performance. For example, when VIRTIO_F_IN_ORDER is
-> > > > > negotiated, it may be easier to create a batch of buffers and reduce
-> > > > > DMA transactions when the device uses a batch of buffers.
-> > > > >
-> > > > > Currently the devices and drivers available in Linux and QEMU do not
-> > > > > support this feature. An implementation is available in DPDK for the
-> > > > > virtio-net driver.
-> > > > >
-> > > > > Goals
-> > > > > ---
-> > > > > Implement VIRTIO_F_IN_ORDER for a single device/driver in QEMU and
-> > > > > Linux (virtio-net or virtio-serial are good starting points).
-> > > > > Generalize your approach to the common virtio core code for split and
-> > > > > packed virtqueue layouts.
-> > > > > If time allows, support for the packed virtqueue layout can be added
-> > > > > to Linux vhost, QEMU's libvhost-user, and/or QEMU's virtio qtest code.
-> > > > >
-> > > > > Shadow Virtqueue missing virtio features
-> > > > > ===
-> > > > >
-> > > > > Summary
-> > > > > ---
-> > > > > Some VirtIO devices like virtio-net have a control virtqueue (CVQ)
-> > > > > that allows them to dynamically change a number of parameters like MAC
-> > > > > or number of active queues. Changes to passthrough devices using vDPA
-> > > > > using CVQ are inherently hard to track if CVQ is handled as
-> > > > > passthrough data queues, because qemu is not aware of that
-> > > > > communication for performance reasons. In this situation, qemu is not
-> > > > > able to migrate these devices, as it is not able to tell the actual
-> > > > > state of the device.
-> > > > >
-> > > > > Shadow Virtqueue (SVQ) allows qemu to offer an emulated queue to the
-> > > > > device, effectively forwarding the descriptors of that communication,
-> > > > > tracking the device internal state, and being able to migrate it to a
-> > > > > new destination qemu.
-> > > > >
-> > > > > To restore that state in the destination, SVQ is able to send these
-> > > > > messages as regular CVQ commands. The code to understand and parse
-> > > > > virtio-net CVQ commands is already in qemu as part of its emulated
-> > > > > device, but the code to send the some of the new state is not, and
-> > > > > some features are missing. There is already code to restore basic
-> > > > > commands like mac or multiqueue, and it is easy to use it as a
-> > > > > template.
-> > > > >
-> > > > > Goals
-> > > > > ---
-> > > > > To implement missing virtio-net commands sending:
-> > > > > * VIRTIO_NET_CTRL_RX family, to control receive mode.
-> > > > > * VIRTIO_NET_CTRL_GUEST_OFFLOADS
-> > > > > * VIRTIO_NET_CTRL_VLAN family
-> > > > > * VIRTIO_NET_CTRL_MQ_HASH config
-> > > > > * VIRTIO_NET_CTRL_MQ_RSS config
-> > > >
-> > > > Is there enough work here for a 350 hour or 175 hour GSoC project?
-> > > >
-> > >
-> > > I think 175 hour should fit better. If needed more features can be
-> > > added (packed vq, ring reset, etc), but to start contributing a 175
-> > > hour should work.
-> > >
-> > > > The project description mentions "there is already code to restore
-> > > > basic commands like mac and multiqueue", please include a link.
-> > > >
-> > >
-> > > MAC address was merged with ASID support so the whole series is more
-> > > complicated than it should be. Here is it the most relevant patch:
-> > > * https://lists.gnu.org/archive/html/qemu-devel/2022-09/msg00342.html
-> > >
-> > > MQ is way cleaner in that regard, and future series should look more
-> > > similar to this one:
-> > > * https://www.mail-archive.com/qemu-devel@nongnu.org/msg906273.html
-> > >
-> > > > > Shadow Virtqueue performance optimization
-> > > > > ===
-> > > > > Summary
-> > > > > ---
-> > > > > To perform a virtual machine live migration with an external device to
-> > > > > qemu, qemu needs a way to know which memory the device modifies so it
-> > > > > is able to resend it. Otherwise the guest would resume with invalid /
-> > > > > outdated memory in the destination.
-> > > > >
-> > > > > This is especially hard with passthrough hardware devices, as
-> > > > > transports like PCI imposes a few security and performance challenges.
-> > > > > As a method to overcome this for virtio devices, qemu can offer an
-> > > > > emulated virtqueue to the device, called Shadow Virtqueue (SVQ),
-> > > > > instead of allowing the device to communicate directly with the guest.
-> > > > > SVQ will then forward the writes to the guest, being the effective
-> > > > > writer in the guest memory and knowing when a portion of it needs to
-> > > > > be resent.
-> > > > >
-> > > > > As this is effectively breaking the passthrough and it adds extra
-> > > > > steps in the communication, this comes with a performance penalty in
-> > > > > some forms: Context switches, more memory reads and writes increasing
-> > > > > cache pressure, etc.
-> > > > >
-> > > > > At this moment the SVQ code is not optimized. It cannot forward
-> > > > > buffers in parallel using multiqueue and multithread, and it does not
-> > > > > use posted interrupts to notify the device skipping the host kernel
-> > > > > context switch (doorbells).
-> > > > >
-> > > > > The SVQ code requires minimal modifications for the multithreading,
-> > > > > and these are examples of multithreaded devices already like
-> > > > > virtio-blk which can be used as a template-alike. Regarding the posted
-> > > > > interrupts, DPDK is able to use them so that code can also be used as
-> > > > > a template.
-> > > > >
-> > > > > Goals
-> > > > > ---
-> > > > > * Measure the latest SVQ performance compared to non-SVQ.
-> > > >
-> > > > Which benchmark workload and which benchmarking tool do you recommend?
-> > > > Someone unfamiliar with QEMU and SVQ needs more details in order to
-> > > > know what to do.
-> > > >
-> > >
-> > > In my opinion netperf (TCP_STREAM & TCP_RR) or iperf equivalent +
-> > > testpmd in AF_PACKET mode should test these scenarios better. But
-> > > maybe upstream requests additional testings. Feedback on this would be
-> > > appreciated actually.
-> > >
-> > > My intention is not for the intern to develop new tests or anything
-> > > like that, they are just a means to justify the changes in SVQ. This
-> > > part would be very guided, or it can be offloaded from the project. So
-> > > if these tools are not enough descriptive maybe it's better to take
-> > > this out of the goals and add it to the description like that.
-> >
-> > Great, "netperf (TCP_STREAM & TCP_RR) or iperf equivalent + testpmd in
-> > AF_PACKET mode" is enough information.
-> >
-> > >
-> > > > > * Add multithreading to SVQ, extracting the code from the Big QEMU Lock (BQL).
-> > > >
-> > > > What do you have in mind? Allowing individual virtqueues to be
-> > > > assigned to IOThreads? Or processing all virtqueues in a single
-> > > > IOThread (like virtio-blk and virtio-scsi do today)?
-> > > >
-> > >
-> > > My idea was to use iothreads. I thought virtio-blk and virtio-scsi
-> > > were done that way actually, is there a reason / advantage to use just
-> > > a single iothread?
-> >
-> > The reason for only supporting a single IOThread at the moment is
-> > thread-safety. There is multi-queue work in progress that will remove
-> > this limitation in the future.
-> >
-> > I sent a patch series proposing a command-line syntax for multi-queue here:
-> > https://www.mail-archive.com/qemu-devel@nongnu.org/msg933001.html
-> >
-> > The idea is that the same syntax can be used by other devices that
-> > support mapping vqs to multiple IOThreads.
-> >
->
-> Understood. I'll take a look, thanks!
->
-> > >
-> > > > > * Add posted thread capabilities to QEMU, following the model of DPDK to it.
-> > > >
-> > > > What is this about? I thought KVM uses posted interrupts when
-> > > > available, so what needs to be done here? Please also include a link
-> > > > to the relevant DPDK code.
-> > > >
-> > >
-> > > The guest in KVM may use posted interrupts but SVQ code runs in
-> > > userland qemu :). There were no previous uses of HW posted interrupts
-> > > as far as I know so SVQ is only able to use vhost-vdpa kick eventfds
-> > > to notify queues. This has a performance penalty in the form of host
-> > > kernel context switches.
-> > >
-> > > If I'm not wrong this patch adds it to DPDK, but I may be missing
-> > > additional context or versions:
-> > > * https://lore.kernel.org/all/1579539790-3882-31-git-send-email-matan@mellanox.com/
-> > >
-> > > Please let me know if you need further information. Thanks!
-> >
-> > This patch does not appear related to posted interrupts because it's
-> > using the kickfd (available buffer notification) instead of the callfd
-> > (used buffer notification). It's the glue that forwards a virtqueue
-> > kick to hardware.
-> >
->
-> I'm sorry, that's because I confused the terms in my head and I wanted
-> to say "host notifiers memory regions" or "hardware doorbell mapping".
-> Maybe it is clearer that way?
+Patch-2 adds a generic range-based TLBI mechanism for KVM.
 
-The VIRTIO spec calls this memory the Queue Notify address.
+Patch-3 adds support to flush a range of IPAs for KVM.
 
->
-> > I don't think that userspace available buffer notification
-> > interception can be bypassed in the SVQ model. SVQ needs to take a
-> > copy of available buffers so it knows the scatter-gather lists before
-> > forwarding the kick to the vDPA device. If the notification is
-> > bypassed then SVQ cannot reliably capture the scatter-gather list.
-> >
-> > I also don't think it's possible to bypass userspace in the used
-> > buffer notification path. The vDPA used buffer notification must be
-> > intercepted so SVQ can mark memory pages in the scatter-gather list
-> > dirty before it fills in a guest used buffer and sends a guest used
-> > buffer notification.
-> >
-> > The guest used buffer notification should already be a VT-d Posted
-> > Interrupt on hardware that supports the feature. KVM takes care of
-> > that.
-> >
-> > I probably don't understand what the optimization idea is. You want
-> > SVQ to avoid a system call when sending vDPA available buffer
-> > notifications? That's not related to posted interrupts though, so I'm
-> > confused...
-> >
->
-> That's right, you described the idea perfectly that way :). I'll
-> complete the projects summary but I'll be ok if you think it is not
-> qualified, we can leave that part out of the proposal.
+Patch-4 implements the kvm_arch_flush_remote_tlbs_range() for arm64.
 
-Thanks, I think I get it now. The task is to implement the dual of
-QEMU's virtio_queue_set_host_notifier_mr() so SVQ can perform
-virtqueue kicks on the vDPA device via memory store instructions.
+Patch-5 aims to flush only the memslot that undergoes a write-protect,
+instead of the entire VM.
 
-That's a cool feature and I think it should be included in the project idea.
+Patch-6 operates on stage2_try_break_pte() to use the range based
+TLBI instructions when breaking a table entry. The map path is the
+immediate consumer of this when KVM remaps a table entry into a block.
 
-Stefan
+Patch-7 introduces a fast stage-2 unmap path in which, for the right
+conditions, instead of traversing each and every PTE and unmapping them,
+disconnect the PTE at a higher level (say at level-1 for a 4K pagesize)
+and unmap the table entries using free_removed_table(). This would allow
+KVM to use the range based TLBI to flush the entire range governed at
+that level.
+
+The series is based off of upstream v6.2-rc6, and applied David
+Matlack's common API for TLB invalidations[1] on top.
+
+The performance evaluation was done on a hardware that supports
+FEAT_TLBIRANGE, on a VHE configuration, using a modified kvm_page_table_test.
+The modified version updates the guest code in the ADJUST_MAPPINGS case
+to not only access this page but also to access up to 512 pages backwards
+for every new page it iterates through. This is done to test the effect
+of TLBI misses after KVM has handled a fault.
+
+The series captures the impact in the map and unmap paths as described above.
+
+$ kvm_page_table_test -m 2 -v 128 -s anonymous_hugetlb_2mb -b $i
+
++--------+------------------------------+------------------------------+
+| mem_sz |    ADJUST_MAPPINGS (s)       |      Unmap VM (s)            |
+|  (GB)  | Baseline | Baseline + series | Baseline | Baseline + series |
++--------+----------|-------------------+------------------------------+
+|   1    |   4.15   |   4.26            | 0.50     | 0.007             |
+|   2    |   6.09   |   6.08            | 0.50     | 0.009             |
+|   4    |  12.65   |  11.46            | 0.50     | 0.01              |
+|   8    |  25.35   |  24.75            | 0.52     | 0.02              |
+|  16    |  52.17   |  48.23            | 0.53     | 0.03              |
+|  32    | 100.09   |  84.53            | 0.57     | 0.06              |
+|  64    | 176.46   | 166.96            | 0.75     | 0.11              |
+| 128    | 340.22   | 302.82            | 0.81     | 0.20              |
++--------+----------+-------------------+----------+-------------------+
+
+$ kvm_page_table_test -m 2 -b 128G -s anonymous_hugetlb_2mb -v $i
+
++--------+------------------------------+
+| vCPUs  |    ADJUST_MAPPINGS (s)       |
+|        | Baseline | Baseline + series |
++--------+----------|-------------------+
+|   1    | 153.91   | 148.75            |
+|   2    | 188.17   | 176.11            |
+|   4    | 193.15   | 175.77            |
+|   8    | 195.60   | 184.92            |
+|  16    | 183.49   | 170.22            |
+|  32    | 159.37   | 152.70            |
+|  64    | 190.15   | 180.45            |
+| 128    | 340.22   | 302.82            |   
++--------+----------+-------------------+
+
+For the ADJUST_MAPPINGS cases, which maps back the 4K table entries to
+2M hugepages, the series sees an average improvement of ~7%. For unmapping
+2M hugepages, we see at least a 4x improvement.
+
+$ kvm_page_table_test -m 2 -b $i
+
++--------+------------------------------+
+| mem_sz |      Unmap VM (s)            |
+|  (GB)  | Baseline | Baseline + series |
++--------+------------------------------+
+|   1    |  1.03    |  0.58             |
+|   2    |  1.57    |  0.72             |
+|   4    |  2.65    |  0.98             |
+|   8    |  4.77    |  1.54             |
+|  16    |  9.06    |  2.57             |
+|  32    | 17.60    |  4.41             |
+|  64    | 34.72    |  8.92             |
+| 128    | 68.92    | 17.70             |   
++--------+----------+-------------------+
+
+The 4x improvement for unmapping also holds true when the guest is
+backed by PAGE_SIZE (4K) pages.
+
+v2:
+- Rebased the series on top of David Matlack's series for common
+  TLB invalidation API[1].
+- Implement kvm_arch_flush_remote_tlbs_range() for arm64, by extending
+  the support introduced by [1].
+- Use kvm_flush_remote_tlbs_memslot() introduced by [1] to flush
+  only the current memslot after write-protect.
+- Modified the __kvm_tlb_flush_range() macro to accepts 'level' as an
+  argument to calculate the 'stride' instead of just using PAGE_SIZE.
+- Split the patch that introduces the range-based TLBI to KVM and the
+  implementation of IPA-based invalidation into its own patches.
+- Dropped the patch that tries to optimize the mmu notifiers paths.
+- Rename the function kvm_table_pte_flush() to
+  kvm_pgtable_stage2_flush_range(), and accept the range of addresses to
+  flush. [Oliver]
+- Drop the 'tlb_level' argument for stage2_try_break_pte() and directly
+  pass '0' as 'tlb_level' to kvm_pgtable_stage2_flush_range(). [Oliver]
+
+v1: https://lore.kernel.org/all/20230109215347.3119271-1-rananta@google.com/
+
+Thank you.
+Raghavendra
+
+[1]: https://lore.kernel.org/linux-arm-kernel/20230126184025.2294823-1-dmatlack@google.com/
+
+Raghavendra Rao Ananta (7):
+  arm64: tlb: Refactor the core flush algorithm of __flush_tlb_range
+  KVM: arm64: Add FEAT_TLBIRANGE support
+  KVM: arm64: Implement  __kvm_tlb_flush_range_vmid_ipa()
+  KVM: arm64: Implement kvm_arch_flush_remote_tlbs_range()
+  KVM: arm64: Flush only the memslot after write-protect
+  KVM: arm64: Break the table entries using TLBI range instructions
+  KVM: arm64: Create a fast stage-2 unmap path
+
+ arch/arm64/include/asm/kvm_asm.h   |  21 ++++++
+ arch/arm64/include/asm/kvm_host.h  |   3 +
+ arch/arm64/include/asm/tlbflush.h  | 107 +++++++++++++++--------------
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c |  12 ++++
+ arch/arm64/kvm/hyp/nvhe/tlb.c      |  28 ++++++++
+ arch/arm64/kvm/hyp/pgtable.c       |  67 +++++++++++++++++-
+ arch/arm64/kvm/hyp/vhe/tlb.c       |  24 +++++++
+ arch/arm64/kvm/mmu.c               |  17 ++++-
+ 8 files changed, 222 insertions(+), 57 deletions(-)
+
+-- 
+2.39.1.519.gcb327c4b5f-goog
+
