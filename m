@@ -2,64 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ED67668C939
-	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 23:17:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CA12D68C946
+	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 23:22:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229826AbjBFWRV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Feb 2023 17:17:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39038 "EHLO
+        id S229498AbjBFWWO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Feb 2023 17:22:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229765AbjBFWRV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Feb 2023 17:17:21 -0500
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F51D13530
-        for <kvm@vger.kernel.org>; Mon,  6 Feb 2023 14:17:19 -0800 (PST)
-Received: by mail-ej1-x62e.google.com with SMTP id lu11so38518776ejb.3
-        for <kvm@vger.kernel.org>; Mon, 06 Feb 2023 14:17:19 -0800 (PST)
+        with ESMTP id S229910AbjBFWWL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Feb 2023 17:22:11 -0500
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CFA2E388
+        for <kvm@vger.kernel.org>; Mon,  6 Feb 2023 14:22:11 -0800 (PST)
+Received: by mail-pl1-x62a.google.com with SMTP id v23so13754210plo.1
+        for <kvm@vger.kernel.org>; Mon, 06 Feb 2023 14:22:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=nC6xC54EQvps3Ky2cRXzTWC/M+PD3ChLKHO+gA8/xto=;
-        b=KU+umniGYKf1VCPRVo4cc9eVZQ+hD9FcJLgQdHFue9famLT9alPW/pAPgYIltimHRK
-         JOpP3uN5dt6f/H0j+/QPjFGqIjGwmRrcdOdsIAR4fw6O8GTV+hlh1ldwKAskm6m5fYOE
-         3TCrMcdCszZtIhwcVKkiCSHlqX5McGBIdv9cChht330WR2WswpgO3P596U2pUBZBW9Fe
-         IXc6qLRJU7+/9+uk5s1l+1qkzC0IgOUkKVVRDTYl9XCbpg5ibooTBEBuQM9RyLNFjNsS
-         rI85rHcH48LSECTkd7+WSqkaIJPPZN/vd9BZPNaRK7WegvONAffiU7ptOpOH0IT6+TxQ
-         IqCQ==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fR53LRdpHsa0OS9J6+InsxvDOeoDJTyfsS7w/2+Vo04=;
+        b=dIjvomFzCfTfCALm7zrLSGf4knhPf89tKVnyWlfz5L3vtfpf6U5IFCWI2b5nrZaWvu
+         KFtwXa0uqN/oF0SdNpOoX9Ko6CoDnDNQGQlNfM19iNnrnlUqpWs3UGFMxLUmeyfygZK7
+         JkdCDSYSpiLMV/Z5DvCAw6N/G2TnXQQmNcdcBoSUfhj27AkkpizRmQIVPXNNPJnvvlVT
+         em+4I2qmlT16h2phPtUo+9rESvb7seLGFh5Jib+T1wKemddinQnqx0GwP2//fWkkCPv3
+         J7XTYNZHi/hPwyFBl4w2BCUj6QjiH40SUuh76u1FakrsMguz+5Ox8f9YNhy1nT+nuN41
+         DiGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nC6xC54EQvps3Ky2cRXzTWC/M+PD3ChLKHO+gA8/xto=;
-        b=l9Q0RHsO0lhN4k84l6XzDcFHuQ91RA4IL9BMtnr2szLjO5SZxLbvPNVV96nOFxYjp5
-         XICs2eKs4j+JJ2sfPWXPCq5HgXriKRApJRls8KEyjXpdVWVBSlKEitXnTBx66/4TR19w
-         a0UF7bYqMKaxXegnkB2mTimQc9BqQE2ul1aUMUY2SP9BNTi+FqJk6wI09hdsi1sqcsbR
-         V9SIrc8g3Rcjvo+tVu1UFm4d+gefZqjq8AivY7zfSI/zABF0Li2d5maEEhoNXMlfNq74
-         yb1TulDD14YzMgj9+Mejozsaa4JCMRvt9/jgceTY6zm1E0V8FqnSqD3gEl0SOh9hlbZR
-         okTQ==
-X-Gm-Message-State: AO0yUKXJBlrkNVpyB0mVNskbOrPydigq9M/DZdF1sIBglE7S4p2PYPvP
-        O3g/+gLWDSNiWhVfvfk9OYfF2aLLIvOtRD3YS9HZeQ==
-X-Google-Smtp-Source: AK7set9zG3Ji+a3VKGeceKn9IjBVJKG2Ph/BPhBNftp1IcWkdSA8t7OwoZ+mwNNLzTNG+wXfUCJeRJZsl6WKgLBwZ7s=
-X-Received: by 2002:a17:906:3008:b0:878:8bd5:4bdf with SMTP id
- 8-20020a170906300800b008788bd54bdfmr265584ejz.270.1675721837590; Mon, 06 Feb
- 2023 14:17:17 -0800 (PST)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fR53LRdpHsa0OS9J6+InsxvDOeoDJTyfsS7w/2+Vo04=;
+        b=vpA0IWSv9wsFOJ2MMUE/O3275PJI0ZdKHQRR7ynhJvb3ab9hP0fil2pNpQX6Z0cnjG
+         UW8Bjf+F+hFgzTEH97YDfYkXhxUEYLUUbnQX2B4MWisvM6tp/dYlhkfVSoy0cMRwUy/v
+         lGfJOY8/5SvA//yZ41ppRusemrL3aKMNfJekxZ5GBFeIGqStBrcNH5p8qDwdl21h/iXj
+         Kj7h/7/5ijEzUFtza3AYQMLszxhdyTLvFjzuEl86/4d0s5fxB7jbOcbsC13UNIcvKwtU
+         Hfxa3fM+e3dH3z5a8K/OyAsizM1ghzRXGCcvQsWE44yENDqmX4spSoFxA7H9p4A8Zk6p
+         c8aA==
+X-Gm-Message-State: AO0yUKVBgLDq4uF0PD+wm9U9mJFKgPW3skGoHK2q2RoC2Y8hMqaw3beU
+        aAea8unYad0Xi3AntgtD4yM4Kw==
+X-Google-Smtp-Source: AK7set9evUF5Sl1+pVPcT5IkVnllcvIxGpantRKlTFe76Le6AJpwjflWdP2n5D2r1Do1jnO0+YzTvQ==
+X-Received: by 2002:a17:902:c3cc:b0:189:6624:58c0 with SMTP id j12-20020a170902c3cc00b00189662458c0mr2429plj.3.1675722130467;
+        Mon, 06 Feb 2023 14:22:10 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id g10-20020a1709026b4a00b001966eaf7365sm7425792plt.17.2023.02.06.14.22.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Feb 2023 14:22:10 -0800 (PST)
+Date:   Mon, 6 Feb 2023 22:22:06 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Sandipan Das <sandipan.das@amd.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH v3 6/8] KVM: x86/svm/pmu: Add AMD PerfMonV2 support
+Message-ID: <Y+F9jhfJtHEmVXyg@google.com>
+References: <20221111102645.82001-1-likexu@tencent.com>
+ <20221111102645.82001-7-likexu@tencent.com>
+ <Y9BzYzEjAwUA+wuy@google.com>
+ <c7e0a5b1-0fd0-e2b5-20ca-fc86a1d883db@gmail.com>
 MIME-Version: 1.0
-References: <20230203192822.106773-1-vipinsh@google.com> <20230203192822.106773-4-vipinsh@google.com>
-In-Reply-To: <20230203192822.106773-4-vipinsh@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 6 Feb 2023 14:17:06 -0800
-Message-ID: <CANgfPd8NF88V+ddqeCBsz=NRgm-YV7nH1DwDhRsHpA_AnFBB7g@mail.gmail.com>
-Subject: Re: [Patch v2 3/5] KVM: x86/mmu: Optimize SPTE change for aging gfn range
-To:     Vipin Sharma <vipinsh@google.com>
-Cc:     seanjc@google.com, pbonzini@redhat.com, dmatlack@google.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c7e0a5b1-0fd0-e2b5-20ca-fc86a1d883db@gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,32 +75,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 3, 2023 at 11:28 AM Vipin Sharma <vipinsh@google.com> wrote:
->
-> No need to check all of the conditions in __handle_changed_spte(). Aging
-> a gfn range implies resetting access bit or marking spte for access
-> tracking.
->
-> Use atomic operation to only reset those bits. This avoids checking many
-> conditions in __handle_changed_spte() API. Also, clean up code by
-> removing dead code and API parameters.
->
-> Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 68 ++++++++++++++------------------------
->  1 file changed, 25 insertions(+), 43 deletions(-)
->
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 83f15052aa6c..18630a06fa1f 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -697,7 +697,7 @@ static inline int tdp_mmu_zap_spte_atomic(struct kvm *kvm,
->
->
->  /*
-> - * __tdp_mmu_set_spte - Set a TDP MMU SPTE and handle the associated bookkeeping
-> + * _tdp_mmu_set_spte - Set a TDP MMU SPTE and handle the associated bookkeeping
+On Mon, Feb 06, 2023, Like Xu wrote:
+> On 25/1/2023 8:10 am, Sean Christopherson wrote:
+> > > +     }
+> > > +
+> > > +     /* Commitment to minimal PMCs, regardless of CPUID.80000022 */
+> > 
+> > Please expand this comment.  I'm still not entirely sure I've interpreted it correctly,
+> > and I'm not sure that I agree with the code.
+> 
+> In the first version [1], I used almost the same if-elif-else sequence
+> but the concerns from JimM[2] has changed my mind:
+> 
+> "Nonetheless, for compatibility with old software, Fn8000_0022_EBX can never
+> report less than four counters (or six, if Fn8000_0001_ECX[PerfCtrExtCore] is set)."
+> 
+> Both in amd_pmu_refresh() and in __do_cpuid_func(), KVM implements
+> this using the override approach of first applying the semantics of
+> AMD_PMU_V2 and then implementing a minimum number of counters
+> supported based on whether or not guest have  PERFCTR_CORE,
+> the proposed if-elif-else does not fulfill this need.
 
-Nit: Not sure how we got to the point of having a single and double
-underscore of the function, but what do you think about just calling
-this one tdp_mmu_set_spte and the other tdp_mmu_iter_set_spte?
+Jim's comments were in the context of __do_cpuid_func(), i.e. KVM_GET_SUPPORTED_CPUID.
+As far as guest CPUID is concerned, that's userspace's responsibility to get correct.
+
+And for KVM_GET_SUPPORTED_CPUID, overriding kvm_pmu_cap.num_counters_gp is not
+the correct approach.  KVM should sanity check the number of counters enumerated
+by perf and explicitly disable vPMU support if the min isn't met.  E.g. if KVM
+needs 6 counters and perf says there are 4, then something is wrong and enumerating
+6 to the guest is only going to cause more problems.
+
+> [1] 20220905123946.95223-4-likexu@tencent.com/
+> [2] CALMp9eQObuiJGV=YrAU9Fw+KoXfJtZMJ-KUs-qCOVd+R9zGBpw@mail.gmail.com
