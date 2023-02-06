@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 157E568B6AD
-	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 08:49:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CB52368B6BE
+	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 08:50:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229965AbjBFHtF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Feb 2023 02:49:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55498 "EHLO
+        id S229928AbjBFHuC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Feb 2023 02:50:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229879AbjBFHsh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Feb 2023 02:48:37 -0500
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2051.outbound.protection.outlook.com [40.107.220.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2F6618AA0;
-        Sun,  5 Feb 2023 23:48:30 -0800 (PST)
+        with ESMTP id S229921AbjBFHty (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Feb 2023 02:49:54 -0500
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2083.outbound.protection.outlook.com [40.107.95.83])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B96CE1CF75;
+        Sun,  5 Feb 2023 23:49:25 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=g1HGJAAb6x79B/2uO5UNl7Wjc2N7fO6FI2Dh1hbWDDlv+NO5uTH6mAdcm+er4k8nzu8P0Kaskg3FjHIudIEyRFfVc9Xm0Vk4e0HCDKF0MnkAmGYeoOz1TxF9jUHoP5rWgtbNqzdKjT/nhBnQVpGpsOmo11SmN+OhWMVQc8a3pxFwCVuSBKUFpmuYEYL9tW9J4OqExG8v9wf3KR1LoFdsLRxTuFo9mrXN5sxOPEk9l5jiCTs2QJNp66zeZI9ZeDpGsJCib950WH5sOGgsBpMI6sdq/39XLEmNcRQEo0wrXgYinIoFrAcUd1SZ9Tkb0u7ydaqjIuPUMKsr0WAVQ/xlwQ==
+ b=FTNiPCF3AmyP3MYgZuTvz3MSn9Uq9zP3GgybfDDeC3e3lCUyL0UGqIWzr+L5C71E7bgB6hMmGqYga3WpRF56apR1HE3eRZlWxASaqHKXKdrBokTb7Ozg/gO+l2MC4Ld5RljeihEUYBK9IM+kWk+geqtPeyJJkTgdOKsQKcPlNU2CJzCmfZD3HRuO5byjQ3bAfKjWgC2LTdbxt81fe8oUrE5q0F7fKIWmJ4GxjfDOgl2M5gLeYH+QNuhWmmTTyxMbTmy4wRn+SpAGi/WUyBWrFnLE3DX+YUX78/SNDZ+BGjfT8chJUx110ciY+Y5Djwrz6rWHr6YPWf6uMI4gQbl1Cw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=acjFfLRivjpU9Lg3kvi0rHomIWvWZtcIDwMkhY2Ky00=;
- b=WvQHQQY6ns3n0KefoFCSMggyX/x7tUCFBPrbp9NdXBsKIpZia9IjWTqt3eSONUAX+yLUVf/f7jSzoAsBeMeFbcbxdyGcuCNe8fhii7LnJQwbEVhoQP9ez9OILgeKvxr7XE6uG1UX4f3wtfuyx7uueogMthclboyNaqd3qFFXp9gdFuU9z5OQmVn7sX41V3f9gtlgjEpjlE4qtYykdA3BQ0qzRDi9puFRt2fttZpYdTSlTHSwl2yUwb/g78fOqsXXPtwz0BfZPXlM7XilI1VnZOxEpgjccCLr2WPMYZSyjgS55En9q1eQ/dhi5wL5ZcrgPrKpLkHNz+1GhTQZnn1PQw==
+ bh=9EJyBunn0zT5d/t0YMoiL/ukwvRArAw0I+071Y/Pm2k=;
+ b=VDyB2Hv2n45OEPJ8dQ9xlV4KOt3ZfMypAsGfaul0is5oM+cezUOq6+OHZ0fUJovFJF1q4cWJJgOKxMxDGFhGamJggn1ODOBfp0mEGCjfNHnbqtTIbsc94O42ORC7WJJ7pMeTSnqikVAvJ7uTW+vnSfpNgvtObwjqcPrr7oR96GErwF89fjgxsXW3FI0ibBHxFTl55wvrb8NvlK1yP1sgcni4B+6jPZDnPel+17kjARloof10xce5QhXn5ojJwHKo2qYOUHXUIGykKRujWbmldQPbSl2WPmS87CwCt2Yj9P0m2AuSYfTMBu9F2iZ2T8mQ5lZxxGJTdwndM+Tm4KVQJQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=acjFfLRivjpU9Lg3kvi0rHomIWvWZtcIDwMkhY2Ky00=;
- b=fHCzouLaE5kk62Ua+XJqCu+1MTMXe9QNNft5c35YdS0i50bvUAWqQwwDrn6WVqaAYfc5Aidg/xzaQ5SFBBhZ4gA+1ACieJwCaudY6l1BzZjCaxKVgn4qTaBx9hGKlo3/y6J/vkzzjo2G9GpCRfcCOkH2sQmIVJC57BwZg+W0DjiRsab/SpX6BqJr5kYCky0e9uZliBjJYNKp4n5PYxO1SsvltINtqi+iaoiKq/hCDojR1uoXMTeQmZEY3+t1wjV97EZ0mdNWs5YOSNhOa1mvSuEUpJttEznQpB3KvsQ9L9ynFNXmo9SFjZFg14jddI/QyfyTAlVenv/bKHF6vnVsrw==
+ bh=9EJyBunn0zT5d/t0YMoiL/ukwvRArAw0I+071Y/Pm2k=;
+ b=HdDvwTlno/2TJFtEwBIiS5c+AD1oEMvYqSxurzNyHD01OoIabNHwyzh/mIkTTgM9RtXxdonmgc5LImTBneN3gImrJwxvCtO3prL0TKaAWcP2MQIz0mjULA2GezhsbkxUfHouo9nN2zMGi79arJIK2cKCP0k29UU3oY1Vmesh6XMNMyXzk6ZdTnewXJuiGT0l1P6WEaPvoOtgok2ByKpKE+ZvFtpqZ8PxHNcfPKVqlAxX/8758AmEMs0krkoG0pqz0I6A0XwdxrMuKnjldSim9waR2MPiOJ0ZDre6eK3KkIk9o3QjRm4x6CRM0eqLykse91XKNIZp1mbef0MmDS5IEA==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from BYAPR12MB3176.namprd12.prod.outlook.com (2603:10b6:a03:134::26)
- by CY8PR12MB7097.namprd12.prod.outlook.com (2603:10b6:930:63::9) with
+ by DM4PR12MB5118.namprd12.prod.outlook.com (2603:10b6:5:391::12) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6064.34; Mon, 6 Feb
- 2023 07:48:29 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6064.31; Mon, 6 Feb
+ 2023 07:49:00 +0000
 Received: from BYAPR12MB3176.namprd12.prod.outlook.com
  ([fe80::4bd4:de67:b676:67df]) by BYAPR12MB3176.namprd12.prod.outlook.com
  ([fe80::4bd4:de67:b676:67df%6]) with mapi id 15.20.6064.032; Mon, 6 Feb 2023
- 07:48:28 +0000
+ 07:49:00 +0000
 From:   Alistair Popple <apopple@nvidia.com>
 To:     linux-mm@kvack.org, cgroups@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, jgg@nvidia.com, jhubbard@nvidia.com,
@@ -48,68 +48,66 @@ Cc:     linux-kernel@vger.kernel.org, jgg@nvidia.com, jhubbard@nvidia.com,
         "Daniel P . Berrange" <berrange@redhat.com>,
         Alex Williamson <alex.williamson@redhat.com>,
         Alistair Popple <apopple@nvidia.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: [PATCH 02/19] drivers/vhost: Convert to use vm_account
-Date:   Mon,  6 Feb 2023 18:47:39 +1100
-Message-Id: <a513e511b71c67453a6a420d8527fbf9a666f594.1675669136.git-series.apopple@nvidia.com>
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
+Subject: [PATCH 07/19] vfio/type1: Charge pinned pages to pinned_vm instead of locked_vm
+Date:   Mon,  6 Feb 2023 18:47:44 +1100
+Message-Id: <60d8812272042f497b8d661f031f2cb593370b84.1675669136.git-series.apopple@nvidia.com>
 X-Mailer: git-send-email 2.39.0
 In-Reply-To: <cover.c238416f0e82377b449846dbb2459ae9d7030c8e.1675669136.git-series.apopple@nvidia.com>
 References: <cover.c238416f0e82377b449846dbb2459ae9d7030c8e.1675669136.git-series.apopple@nvidia.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: SYYP282CA0007.AUSP282.PROD.OUTLOOK.COM
- (2603:10c6:10:b4::17) To BYAPR12MB3176.namprd12.prod.outlook.com
+X-ClientProxiedBy: SYBPR01CA0191.ausprd01.prod.outlook.com
+ (2603:10c6:10:52::35) To BYAPR12MB3176.namprd12.prod.outlook.com
  (2603:10b6:a03:134::26)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR12MB3176:EE_|CY8PR12MB7097:EE_
-X-MS-Office365-Filtering-Correlation-Id: d3c58a87-391d-4ca5-0a89-08db08168933
+X-MS-TrafficTypeDiagnostic: BYAPR12MB3176:EE_|DM4PR12MB5118:EE_
+X-MS-Office365-Filtering-Correlation-Id: a122e17a-0e75-495d-a900-08db08169bd0
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: qrNBIKLnIaAVk8pRj+5fZdPHiWQLbiCyBMI2zKg2cn/Fb5SIPPTq4lnCgIO9odXsb8ca5CT7XeYfek6V6/WonuEcy5JdMn6sLVlCiVnJ8+Ov1rIIBf9gLZjZuBCjnvH/Wd6xnfauUrOnS+56ZmvqmsGiKMU6TZbflY5PyeUFiyx3IRDXixQZZIT5ym6ZQ7MKh8raEJ/LH1o+UP7NJoPzzuQ48Jb0ifrzKOsxekho/unsBaIl2VV/xLiygpn8AGWQxju5/jRKJnca49WShesGkRCwuOwffP4oE2yAHv1f8cozt4/Yv0H5Uz2ztFJoql8uXWgUwQRX6IUgRTwCE7tQQuLG+Qz4yuo5eO9UsiTTacmJ8Km9Z6QVPwNo0KCrtfKt5095/INsZiz3W/Z6LobWgqDJ54JjdrO5q7VngPFH4X8T9mvvUz8lrVAsBxtlxyWg+EpHxRy7IUxEZP5qoAKo6gPJP0O2ia04BzC700tnSx/zt72yOijmqvpn2vGzxW2oWQqmePxjQduwtPn9uh9Dk2DH6zAoNnmfSHc6IIHnLxiJZaS8qc/la4R7HFKCn5HbPPtBif8eAJAqs5LEH2cvuBbe9xD5r6x0dls19uIBKIJ8FQRsdEQfuF6JagQheOknCfPj5fxaLNnCmWp0X7T88g==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB3176.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(366004)(39860400002)(396003)(136003)(346002)(376002)(451199018)(38100700002)(36756003)(6506007)(6666004)(6512007)(26005)(186003)(478600001)(86362001)(6486002)(8676002)(66476007)(83380400001)(66946007)(2616005)(66556008)(4326008)(316002)(54906003)(7416002)(2906002)(8936002)(5660300002)(41300700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: D19c20F/3H5aBZUJtRuOisDUPLPCb3g6LkxaoePLUkkit594ylhxEln8lwG/d82+XWI05rsnfmCDpC1vsCuFjbdq0T+KCv+KHNH3Z1aAqkjU33XcFrBUQZbMEeFQgtvkBiGTeIJSKIQ2MddZlxG3YfOmSew5kvepMZq48suLfmTQwBEwo33I70s+Ja7PUUn3QNSE2FUThE0XFwbxgUaMIVe9GUF7NxVwc0qy2wj7pQXxrzDJgUHC0Q/JBTDXEsmthnznbrRHDiwJWaA+aWWrSoIXSx0VRQWGcVYheLkGBLu+xXeyIC2Gw18dBemMc1lxOq9jPC/DEAWZgqE7doc79lVQdyjo3KWLVWjm0JFbRAuXGheBNJAPf+5889LNCR5KX85ktUrTfOcg9QmjlEGFM6ixS39AqYugLMq7WkqF9RollRnLkbbzSyyHvE7kVodm3SJcWO9ptdE4zFYUWLipDugvSD+eqj9yI9v3B3/ox962XFxUFNzLjsjNCmQByB6eqtA1ZuSgg2tVdvGMkg9/RJlmsGzydh7de7yXSi9TUo5rfcq4YSgkGmaVEU3CzfVio1l9S/WGrRARhBlmNFsOVmZEcnOu6RLIM+iasIdbBDJLU4TfVxUJv/FRYQK+cf6Yk+LM9OBZtSt76bhD3O/kNw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB3176.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(376002)(39860400002)(366004)(396003)(346002)(136003)(451199018)(66946007)(66476007)(4326008)(41300700001)(8676002)(38100700002)(8936002)(6506007)(6512007)(26005)(316002)(54906003)(7416002)(66556008)(6666004)(5660300002)(478600001)(6486002)(83380400001)(186003)(2616005)(86362001)(36756003)(2906002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?BcZpvnNwT9Gb780Y2kPdCwKodPcm4oSD6aoJb8it9MH7scy9VMdJ8eQmHUo/?=
- =?us-ascii?Q?tYk3av3s2dxZOcg3ogvWJjgYJU4CmqrjLA6eULGYWsluLBw3iUNDcrusaQMg?=
- =?us-ascii?Q?U/JBCYKX4CFq4sbi4garbnQxS/dBlAc5UWaBAEJv37P0BnLLCYvW/Dwx9ye4?=
- =?us-ascii?Q?gQxLpwkc2n5jCYJeEc6WoZby6mWJO568dMYKg2KqFAI8FtEb6Bo9JoSvaYrJ?=
- =?us-ascii?Q?XHnMENDbbxrwkfTQtV8qXbCNBsDq1bG4y4mUzAcpT6ltL5rHPqvzBcfp9a0G?=
- =?us-ascii?Q?vjXvPnCh1LX1l8HQUHGtYt64+hq7tVHXRKdpIcExFvOwAmgADX31MwxqDpZ1?=
- =?us-ascii?Q?EsigM4KMtzPfDVx/vfmJvaGRTwbpGx0EbqDCfRpQ/NiwpLIUmNj2TLoK9Fgq?=
- =?us-ascii?Q?x52KVlNmvkfN/l+nVudtM3k3zgo7LK0zFvA4Opm+lkj5nJUUHw5HsDR07JdM?=
- =?us-ascii?Q?7STkTeJ6+JFp8GUKNp2S3lSzvg+LD0UHH+9NTqzGYQR1OwQmv9X9qGGWuHfF?=
- =?us-ascii?Q?fRshcD81zL7CSri0B6r0PZn2Skm99ITXb4U7QwWYgs8Mvnu0nltCKavJuxcK?=
- =?us-ascii?Q?RHUid7Kc7yBRK6mvMSgyp1Vs1mvQ+0wMs/inEdtR24LXqGfQ2aWUSH4B4rhE?=
- =?us-ascii?Q?UuKmK5VFvCbXiIbnoW07w8zy+rE9MQ4V2KxbUqGETOP/tnKo7LAqgyPnAZ86?=
- =?us-ascii?Q?Evukt1YLLGqhWC9r7V7i+mv4n/P7mgmDR9Jk1VLcWKqTWA7TOBQHOcEGIUkP?=
- =?us-ascii?Q?ABm1MrZhjL02MNgERX18/btiG1nGe6WpG4Hb/+zY3+a16GI9j88p3JSFcs5x?=
- =?us-ascii?Q?MYdMUgaDQElzTqvfLZRqq8dtaxudsmCkpMPccM85x3bsyKBzyUhOP5MgnZ7/?=
- =?us-ascii?Q?qkaCt9tFdWlBIzyV6B0DN/8vtjiFBwpFdpR4rj0IU8zBuus0sVu51D/E4eGn?=
- =?us-ascii?Q?ljmwG46lyuzyj3hbjrpiJxL9cB+tZiZKndr5GDKLeOr5sV1FGNUfePKzE7Zb?=
- =?us-ascii?Q?3cLL2zqzvs68vmMFuSwXCjEGF0hiTUqmUeAceR2buVQ29OrYUgQL5hgOPrjd?=
- =?us-ascii?Q?gQnhr0AOdQyUVu+ZxlHmB9rtkkghCCZvOqN+HZQ5L5Qfu1tumWUtGXKur+We?=
- =?us-ascii?Q?/kQfOlcujaDorNtRdjDJ57GxX1e5QaE153VWR9tbzgD3JE9w4nww7MTRGrth?=
- =?us-ascii?Q?mSwRkuN2D6gN6680FZRM0Px/D0U8S1b+pXvjU36m3/F7jAHDOiewSiudjzHu?=
- =?us-ascii?Q?2kmF/NEChDPlDSFg2JjWnmtwXC4I2NBznXKXqG09yDjvXfhsuspBJRQA5AXn?=
- =?us-ascii?Q?biEbStPOeCzR5Cmb9xR7X17C9fQEW3gmKHacB9XA1q9yijtgrp3HSRHGuDWl?=
- =?us-ascii?Q?C8M7HjTVWQR8WM/jbVCBXk7zyCwt3eX/Ij0h6a/HZhYTBUCfUWznODflv9lg?=
- =?us-ascii?Q?UyMH4VvEt9Ic7Ks70kksherMhreAowx2RXIO+QQfJcDbFi90lmLWQnUx5vZM?=
- =?us-ascii?Q?dmzU90pOXc8Mjtz2U3x5Ed8urI5Ni3+MqGIBprHYtdNtEDAXVR+dp3tWVhl0?=
- =?us-ascii?Q?URpCAcBafVezXDC9KtVY3LizG/14x+HYNs6/KqUA?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?7zc1D3qcVz4pASVKaNOAYrrUtV515FbAbdEHWZkkbDHYjdqtKw0XPemXYJSY?=
+ =?us-ascii?Q?wcfzLz2N9qbtXnZJfs0tBfDB3GSEH1wVwNPZ1X6UY1BJ5KrPEplmF0HpxUZP?=
+ =?us-ascii?Q?sWX/gkHfhPPhl/FvT4t/8RXEzjCW9utzJPt1FSXPpNFy0wJvExmYLYGZliTc?=
+ =?us-ascii?Q?1vfC87bBfJ8P/upzU6ZwIuW0LWEBZ0TU7hNJQUK2ux5fpkRiux5QqH1EpPEL?=
+ =?us-ascii?Q?od6+8+qHoXHKoWqjCAOCNFCIiM5F3sMg3f35sg62LsokIe5xTlMQWHSYlIOt?=
+ =?us-ascii?Q?v5HNIHWZaLJrqiPqD5GHCUJMUoruk4gxNmPkdWy4YTA91t2WFJajEHXQchyN?=
+ =?us-ascii?Q?ePxdNSsLESXHZEPRmIfHIWUa/FXfhK2k5oLJ7EUi/Hz/vg37L2ip9MzKCGP1?=
+ =?us-ascii?Q?f1MtrZem2u0dS/oMmRY8wcCUgiedpGDfPp6TAzB4l3RAwnGq+VoSbkO/OEB1?=
+ =?us-ascii?Q?qAO/IY6mkMicIxQsOK1U7b/1SMMw1k/31EwMPMRVYNpKy3Qi1si8fFkTaNjc?=
+ =?us-ascii?Q?fpUMamA2bQl8HojR4dbZvu+kj2aXstteEXKk7+phR0UYv7Y4isQsqxem2f9Q?=
+ =?us-ascii?Q?EtruYJGvO9qghNvs1VaZ/0iBS+N0UEzwEN663iGblYAGHlYVrnOU8sUd6YsO?=
+ =?us-ascii?Q?SQuba1ohT3+BzDMfhKym0u36eIbfwLYO6tjopztiaoJg77KqGbYGTr1ClDpD?=
+ =?us-ascii?Q?ZH6yI6h/bfpBWef3lfgUoXTqskTgc+xq90tObDDdTXwsIOy6avYGH7xDcfFJ?=
+ =?us-ascii?Q?rWFQgsNt3x1CObnIpEO2yHE+n1kw7WXR/wR8svDv2R8SJ/ycXZTmlZ3WogEY?=
+ =?us-ascii?Q?3gW/hBiaso/oZdTSl76qJGT1pwqVQCFjZsuJyxXjned/0NkrGnTQy9RGjWMW?=
+ =?us-ascii?Q?a3Y7HoamZbppfx3D+cZNoVUH4A7mdhLi/of3bKSbp4gnekkEQAhLOi7cGLz2?=
+ =?us-ascii?Q?UbtrH0Ji1fAe984WujANhSml4Tl4OQjAGSUPKQwWBScmb0mebOu2Ze2Lc6wR?=
+ =?us-ascii?Q?1cbriRon0gWwJNCqCWiyLu+yxeCWaanKbvUwSI3xWAClIRq+F6Hel6j33cT6?=
+ =?us-ascii?Q?17ZUEojAfuS5quvUQH+xd7teq9ytucZb4M52lvZAzsiCjuLODlYHuwwfsEKM?=
+ =?us-ascii?Q?hu7PsKg1viWrQGxHxBax5NhSPmSsFb73FBaBWlSOq4ulWZQo1M0Qs28g3Ijt?=
+ =?us-ascii?Q?oENbr7Wdb2t9E3AFJoaeQYNUzwrSDwOE7ARLQrq7us7gDNOGQR62g+f88SHw?=
+ =?us-ascii?Q?Pq/D/D/hbmBVJYGY0JqE44wM0Zshh2j5g4t1znhkLLxDJuFvfefxHF6Z94MZ?=
+ =?us-ascii?Q?Gwci8zh+bwxhHueDNR/jB1YC5/krCaVWho7fV4J4PEPyfHN9/HhCvdBhhdA9?=
+ =?us-ascii?Q?DbjnXenyy1WwDwj0rojUpYu/JmgUwY578KclsGklzVMkBXHquwuys7EGWL+D?=
+ =?us-ascii?Q?AgJYfIIWMop+ns4bOfJ1/nduNR+t2xGPB8cOeXF132uSMdDue+oaGLwGRzbK?=
+ =?us-ascii?Q?4ltbp+RExjC37GcxTHoXk5J2BXSYY7x4hlNeGz425lHvovqNcU2nJ4s8/HNl?=
+ =?us-ascii?Q?3flko8QKgwAAa8P2g/ug2lOCRA/95k2JHR2Kid1U?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d3c58a87-391d-4ca5-0a89-08db08168933
+X-MS-Exchange-CrossTenant-Network-Message-Id: a122e17a-0e75-495d-a900-08db08169bd0
 X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB3176.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Feb 2023 07:48:28.8589
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Feb 2023 07:49:00.0753
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: XPSgdGbBaHcZDUXMyU+Av5M6xE1fuCzjJ6iTymGC1b4edw5OZwM9c0xmYlltTHFtDUBV871cdAahWmlacV+qeg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7097
+X-MS-Exchange-CrossTenant-UserPrincipalName: wp+R7my8ypqqhhSOfLO+TVLqtpDWGatzGK9uJJC/Lw68ZvcGUlzUXp6UMcD/A7fO22cL5YxY86EhX2g6PtdhlQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5118
 X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
@@ -120,112 +118,180 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Convert vhost to use the new vm_account structure and associated
-account_pinned_vm() functions. This means vhost will start enforcing
-RLIMIT_MEMLOCK when a user does not have CAP_IPC_LOCK and fail the
-mapping request.
+This switches the charge to pinned_vm to be consistent with other
+drivers that pin pages with FOLL_LONGTERM. It also allows the use of
+the vm_account helper struct which makes a future change to implement
+cgroup accounting of pinned pages easier to implement as that requires
+a reference to the cgroup to be maintained.
 
 Signed-off-by: Alistair Popple <apopple@nvidia.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>
 Cc: kvm@vger.kernel.org
-Cc: virtualization@lists.linux-foundation.org
-Cc: netdev@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 ---
- drivers/vhost/vdpa.c  | 17 ++++++++++-------
- drivers/vhost/vhost.c |  2 ++
- drivers/vhost/vhost.h |  2 ++
- 3 files changed, 14 insertions(+), 7 deletions(-)
+ drivers/vfio/vfio_iommu_type1.c | 60 +++++++++-------------------------
+ 1 file changed, 17 insertions(+), 43 deletions(-)
 
-diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-index ec32f78..d970fcc 100644
---- a/drivers/vhost/vdpa.c
-+++ b/drivers/vhost/vdpa.c
-@@ -716,7 +716,7 @@ static void vhost_vdpa_pa_unmap(struct vhost_vdpa *v, struct vhost_iotlb *iotlb,
- 				set_page_dirty_lock(page);
- 			unpin_user_page(page);
- 		}
--		atomic64_sub(PFN_DOWN(map->size), &dev->mm->pinned_vm);
-+		vm_unaccount_pinned(&dev->vm_account, PFN_DOWN(map->size));
- 		vhost_vdpa_general_unmap(v, map, asid);
- 		vhost_iotlb_map_free(iotlb, map);
- 	}
-@@ -780,10 +780,14 @@ static int vhost_vdpa_map(struct vhost_vdpa *v, struct vhost_iotlb *iotlb,
- 	u32 asid = iotlb_to_asid(iotlb);
- 	int r = 0;
- 
-+	if (!vdpa->use_va)
-+		if (vm_account_pinned(&dev->vm_account, PFN_DOWN(size)))
-+			return -ENOMEM;
-+
- 	r = vhost_iotlb_add_range_ctx(iotlb, iova, iova + size - 1,
- 				      pa, perm, opaque);
- 	if (r)
--		return r;
-+		goto out_unaccount;
- 
- 	if (ops->dma_map) {
- 		r = ops->dma_map(vdpa, asid, iova, size, pa, perm, opaque);
-@@ -794,15 +798,14 @@ static int vhost_vdpa_map(struct vhost_vdpa *v, struct vhost_iotlb *iotlb,
- 		r = iommu_map(v->domain, iova, pa, size,
- 			      perm_to_iommu_flags(perm));
- 	}
--	if (r) {
-+	if (r)
- 		vhost_iotlb_del_range(iotlb, iova, iova + size - 1);
--		return r;
--	}
- 
-+out_unaccount:
- 	if (!vdpa->use_va)
--		atomic64_add(PFN_DOWN(size), &dev->mm->pinned_vm);
-+		vm_unaccount_pinned(&dev->vm_account, PFN_DOWN(size));
- 
--	return 0;
-+	return r;
- }
- 
- static void vhost_vdpa_unmap(struct vhost_vdpa *v,
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index cbe72bf..5645c26 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -556,6 +556,7 @@ static void vhost_attach_mm(struct vhost_dev *dev)
- 		dev->mm = current->mm;
- 		mmgrab(dev->mm);
- 	}
-+	vm_account_init_current(&dev->vm_account);
- }
- 
- static void vhost_detach_mm(struct vhost_dev *dev)
-@@ -569,6 +570,7 @@ static void vhost_detach_mm(struct vhost_dev *dev)
- 		mmdrop(dev->mm);
- 
- 	dev->mm = NULL;
-+	vm_account_release(&dev->vm_account);
- }
- 
- /* Caller should have device mutex */
-diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-index d910910..b2434dd 100644
---- a/drivers/vhost/vhost.h
-+++ b/drivers/vhost/vhost.h
-@@ -14,6 +14,7 @@
- #include <linux/atomic.h>
- #include <linux/vhost_iotlb.h>
- #include <linux/irqbypass.h>
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 23c24fe..a3957b8 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -38,6 +38,7 @@
+ #include <linux/workqueue.h>
+ #include <linux/notifier.h>
+ #include <linux/irqdomain.h>
 +#include <linux/vm_account.h>
+ #include "vfio.h"
  
- struct vhost_work;
- typedef void (*vhost_work_fn_t)(struct vhost_work *work);
-@@ -144,6 +145,7 @@ struct vhost_msg_node {
- struct vhost_dev {
- 	struct mm_struct *mm;
- 	struct mutex mutex;
-+	struct vm_account vm_account;
- 	struct vhost_virtqueue **vqs;
- 	int nvqs;
- 	struct eventfd_ctx *log_ctx;
+ #define DRIVER_VERSION  "0.2"
+@@ -95,11 +96,11 @@ struct vfio_dma {
+ 	size_t			size;		/* Map size (bytes) */
+ 	int			prot;		/* IOMMU_READ/WRITE */
+ 	bool			iommu_mapped;
+-	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
+ 	bool			vaddr_invalid;
+ 	struct task_struct	*task;
+ 	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
+ 	unsigned long		*bitmap;
++	struct vm_account       vm_account;
+ };
+ 
+ struct vfio_batch {
+@@ -412,31 +413,6 @@ static int vfio_iova_put_vfio_pfn(struct vfio_dma *dma, struct vfio_pfn *vpfn)
+ 	return ret;
+ }
+ 
+-static int vfio_lock_acct(struct vfio_dma *dma, long npage, bool async)
+-{
+-	struct mm_struct *mm;
+-	int ret;
+-
+-	if (!npage)
+-		return 0;
+-
+-	mm = async ? get_task_mm(dma->task) : dma->task->mm;
+-	if (!mm)
+-		return -ESRCH; /* process exited */
+-
+-	ret = mmap_write_lock_killable(mm);
+-	if (!ret) {
+-		ret = __account_locked_vm(mm, abs(npage), npage > 0, dma->task,
+-					  dma->lock_cap);
+-		mmap_write_unlock(mm);
+-	}
+-
+-	if (async)
+-		mmput(mm);
+-
+-	return ret;
+-}
+-
+ /*
+  * Some mappings aren't backed by a struct page, for example an mmap'd
+  * MMIO range for our own or another device.  These use a different
+@@ -715,16 +691,8 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
+ 			 * externally pinned pages are already counted against
+ 			 * the user.
+ 			 */
+-			if (!rsvd && !vfio_find_vpfn(dma, iova)) {
+-				if (!dma->lock_cap &&
+-				    mm->locked_vm + lock_acct + 1 > limit) {
+-					pr_warn("%s: RLIMIT_MEMLOCK (%ld) exceeded\n",
+-						__func__, limit << PAGE_SHIFT);
+-					ret = -ENOMEM;
+-					goto unpin_out;
+-				}
++			if (!rsvd && !vfio_find_vpfn(dma, iova))
+ 				lock_acct++;
+-			}
+ 
+ 			pinned++;
+ 			npage--;
+@@ -744,7 +712,11 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
+ 	}
+ 
+ out:
+-	ret = vfio_lock_acct(dma, lock_acct, false);
++	if (vm_account_pinned(&dma->vm_account, lock_acct)) {
++		ret = -ENOMEM;
++		lock_acct = 0;
++		pr_warn("%s: RLIMIT_MEMLOCK exceeded\n", __func__);
++	}
+ 
+ unpin_out:
+ 	if (batch->size == 1 && !batch->offset) {
+@@ -759,6 +731,7 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
+ 				put_pfn(pfn, dma->prot);
+ 		}
+ 		vfio_batch_unpin(batch, dma);
++		vm_unaccount_pinned(&dma->vm_account, lock_acct);
+ 
+ 		return ret;
+ 	}
+@@ -782,7 +755,7 @@ static long vfio_unpin_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
+ 	}
+ 
+ 	if (do_accounting)
+-		vfio_lock_acct(dma, locked - unlocked, true);
++		vm_unaccount_pinned(&dma->vm_account, locked - unlocked);
+ 
+ 	return unlocked;
+ }
+@@ -805,7 +778,7 @@ static int vfio_pin_page_external(struct vfio_dma *dma, unsigned long vaddr,
+ 	ret = 0;
+ 
+ 	if (do_accounting && !is_invalid_reserved_pfn(*pfn_base)) {
+-		ret = vfio_lock_acct(dma, 1, true);
++		ret = vm_account_pinned(&dma->vm_account, 1);
+ 		if (ret) {
+ 			put_pfn(*pfn_base, dma->prot);
+ 			if (ret == -ENOMEM)
+@@ -833,7 +806,7 @@ static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
+ 	unlocked = vfio_iova_put_vfio_pfn(dma, vpfn);
+ 
+ 	if (do_accounting)
+-		vfio_lock_acct(dma, -unlocked, true);
++		vm_unaccount_pinned(&dma->vm_account, unlocked);
+ 
+ 	return unlocked;
+ }
+@@ -921,7 +894,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+ 		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn);
+ 		if (ret) {
+ 			if (put_pfn(phys_pfn, dma->prot) && do_accounting)
+-				vfio_lock_acct(dma, -1, true);
++				vm_unaccount_pinned(&dma->vm_account, 1);
+ 			goto pin_unwind;
+ 		}
+ 
+@@ -1162,7 +1135,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
+ 	}
+ 
+ 	if (do_accounting) {
+-		vfio_lock_acct(dma, -unlocked, true);
++		vm_unaccount_pinned(&dma->vm_account, unlocked);
+ 		return 0;
+ 	}
+ 	return unlocked;
+@@ -1674,7 +1647,8 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+ 	 */
+ 	get_task_struct(current->group_leader);
+ 	dma->task = current->group_leader;
+-	dma->lock_cap = capable(CAP_IPC_LOCK);
++	vm_account_init(&dma->vm_account, dma->task, NULL, VM_ACCOUNT_TASK |
++		(capable(CAP_IPC_LOCK) ? VM_ACCOUNT_BYPASS : 0));
+ 
+ 	dma->pfn_list = RB_ROOT;
+ 
+@@ -2398,7 +2372,7 @@ static void vfio_iommu_unmap_unpin_reaccount(struct vfio_iommu *iommu)
+ 			if (!is_invalid_reserved_pfn(vpfn->pfn))
+ 				locked++;
+ 		}
+-		vfio_lock_acct(dma, locked - unlocked, true);
++		vm_unaccount_pinned(&dma->vm_account, locked - unlocked);
+ 	}
+ }
+ 
 -- 
 git-series 0.9.1
