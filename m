@@ -2,246 +2,459 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5088568C905
-	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 22:56:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 20AF268C90C
+	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 22:57:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229718AbjBFV4W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Feb 2023 16:56:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58768 "EHLO
+        id S229963AbjBFV52 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Feb 2023 16:57:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229607AbjBFV4V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Feb 2023 16:56:21 -0500
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6675C2CFFA
-        for <kvm@vger.kernel.org>; Mon,  6 Feb 2023 13:56:19 -0800 (PST)
-Received: by mail-pl1-x631.google.com with SMTP id i2so265199ple.13
-        for <kvm@vger.kernel.org>; Mon, 06 Feb 2023 13:56:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oA+FxdNbik0My0S0w1KEYLj8BIpspP5MVk4vSgrFZDY=;
-        b=BHbtL49V7eD3chaeBphkHxjpsci87f5SE3/zKPIc0AfJm1XseNAUVc+uNHO2CcsQGo
-         2kEa2f2Q3aM1JIewTxThJzhiP6NUNxp1Lq3BCR9o2etRJAUPzd6qDCA6ZvO8jPgz0wWt
-         sAPc26FbOdMaQB8ODAiCsA4fcfh9A2+XI8pOHwemq7bBL2dUOHYlbxUWA61iPfP/Zicu
-         zgUa39pMvhabrRgj145XkMYKGZrnENNj4bl/dZe9vR9qA9XiJHNyf5pFns+zrflmlbyM
-         kIACW0t8VnUjTNUP3VfqPgBYM11+C8vU4qwjGffr1JCBBxWaNgn7aN4IrCh0mHlCHXkE
-         K3WQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oA+FxdNbik0My0S0w1KEYLj8BIpspP5MVk4vSgrFZDY=;
-        b=NCHM6Mgp1oRqxCXoGzKuN+dnfM9UOsArmlkF0ySQgqPb2z86JB9clhw62gFJdN6GqW
-         y6tzkgDuJ3uwyyaAttwu6Krpx+b5XMKnX8B5DzMKCDWS/1LpuvAgyssYqZtuzZVHcXxA
-         Rzn1LdBoAwASjeX/gHkLDW+aK7yHGHCqGTWoeThJqIoNM+341Fm9ub7xJ8KNT0AyxpF8
-         3zXac31T58n2BWIhRyWmaV/QURvw04ska/b/T9ZVCuwnPV2aFnf//y9Cw1ihoVojGsVn
-         rMM00trmtxcHaRISn3+1PazIoxrRTqeQfV2ZVqSvdcXO1w+CEzI8Auh+QxHCn6Xy10av
-         OOvg==
-X-Gm-Message-State: AO0yUKVDeMwCNTvyzHc16dtZUjy1My/G7YOBERtJ+Sg+qdt2LLYbhfAC
-        hvsSri33Tx+mx0zb4r8xpSrjzg==
-X-Google-Smtp-Source: AK7set+nfKw5e0Hzkmy44AwvwG2vbmauGBb7aCLDo77wtcxyHHae1qJWSLm6Ix2gG/rReAwpEbgehQ==
-X-Received: by 2002:a17:902:c111:b0:198:af50:e4e3 with SMTP id 17-20020a170902c11100b00198af50e4e3mr37973pli.9.1675720578672;
-        Mon, 06 Feb 2023 13:56:18 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id d14-20020a170902654e00b0019678eb963fsm2781851pln.145.2023.02.06.13.56.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Feb 2023 13:56:17 -0800 (PST)
-Date:   Mon, 6 Feb 2023 21:56:14 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        alejandro.j.jimenez@oracle.com, mlevitsk@redhat.com,
-        pbonzini@redhat.com, jon.grimm@amd.com, vasant.hegde@amd.com,
-        kishon.vijayabraham@amd.com
-Subject: Re: [PATCH] KVM: SVM: Modify AVIC GATag to support max number of 512
- vCPUs
-Message-ID: <Y+F3fr1HfC+pmmnF@google.com>
-References: <20230117100821.10116-1-suravee.suthikulpanit@amd.com>
+        with ESMTP id S229649AbjBFV51 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Feb 2023 16:57:27 -0500
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2049.outbound.protection.outlook.com [40.107.92.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 386A22D142;
+        Mon,  6 Feb 2023 13:57:24 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NCbHYDtBbF50deQFvoJAHeWEGjax1hpaxIkcIvTg7zEIfZp5oDfbeXzykwFcVFRQoP/7s15IqnDKPnUjrVgVKoM6zro8COZd6EqR01YxzzvwsXVSq+JRXYKUsUwpRjr5HYl1YlQN6YhsecwWE3Gl41x/G5zdvAWmI19LIs17CfFr0mWk5AfpVO4ZenDzu98x5pNS9lgeKabZVMw77bJ/Mr/b0be+so0caWIQxWBRcCq2/PSkjhMNlQEfhxJuH/aPCDIuODYceWZRQfKemeF/Jbn1qGIIPpGpPxGbbvZG/uDOxSvAPtVhAXETn3KXmW8OoG/dmkIrecym8NcnGZD/LA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JiZvIB9nI0Z/pMqWTO/P0xbF3Qi81/RLnIEpjVdOMfw=;
+ b=n/968T8nhE/u93CtW4sbXGmpAkVtVT6Gci3p7xqHdBVm5ZhWlJ/MmTjuX9tslI9Cblu2/keR1L4H4qNxReBNQN8hPnCZNuPvALTQGEQqB5m1txG40rap3Qi7vrPmJWeI9Nx/YShXOYLQe5yTn6FnxAgMorbEk7u74Rk8bHSW8AtyZQIdbjIPrlq3jgkvetXMiyIQ/RRFITj73tSzYQXMWo47/xrux8775scydFlVjAr+jz1BuegzOkHVPgiSFwyVE8/69UdndfV6VJZW8JZoQ9IjtM/juxSwYWFIXI7NPYkfRoi9j82k8eb0HBalv9IBv//fLIQnxgNekdtXwbWWtw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JiZvIB9nI0Z/pMqWTO/P0xbF3Qi81/RLnIEpjVdOMfw=;
+ b=5pzK0sOe7qgeg3Ix/e+PSKQoGyB5t3RBAMYYv2uWTLDK02wlWFKGehNkAMJN6T/1n5+JpQ020ItKP4WbmrMIqN0TeLEsXsiYAIqVMvhxfHgRamOtYA6W/p+mUkBOrQEYo2hPGrG/UXuenIyjULGaafSCAZq01IrZU9Eyk89I434=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by SA1PR12MB7296.namprd12.prod.outlook.com (2603:10b6:806:2ba::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6064.34; Mon, 6 Feb
+ 2023 21:57:22 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::dc5d:6248:1c13:4a3]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::dc5d:6248:1c13:4a3%7]) with mapi id 15.20.6064.029; Mon, 6 Feb 2023
+ 21:57:16 +0000
+Message-ID: <f18fae8b-a928-cd82-e0b3-eac62ad3e106@amd.com>
+Date:   Mon, 6 Feb 2023 15:57:11 -0600
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.1
+Subject: Re: [PATCH kernel] KVM: SVM: Fix SVM_VMGEXIT_EXT_GUEST_REQUEST to
+ follow the rest of API
+Content-Language: en-US
+To:     Alexey Kardashevskiy <aik@amd.com>, kvm@vger.kernel.org
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Michael Roth <michael.roth@amd.com>,
+        John Allen <john.allen@amd.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Dionna Glaze <dionnaglaze@google.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "David S. Miller" <davem@davemloft.net>
+References: <81037a58-6b5c-cde4-79fe-3686d9b8a551@amd.com>
+ <20230206031343.1646916-1-aik@amd.com>
+From:   "Kalra, Ashish" <ashish.kalra@amd.com>
+In-Reply-To: <20230206031343.1646916-1-aik@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CH0PR03CA0304.namprd03.prod.outlook.com
+ (2603:10b6:610:118::28) To SN6PR12MB2767.namprd12.prod.outlook.com
+ (2603:10b6:805:75::23)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230117100821.10116-1-suravee.suthikulpanit@amd.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|SA1PR12MB7296:EE_
+X-MS-Office365-Filtering-Correlation-Id: e4dd7be3-b8db-4743-adfc-08db088d1c0e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: a25Nbslp3e3JYC8fJSwkKPW2Y0+BipXk3ynppu7QU1cxwMTamDRgMmMGxIkKiMxv+B/PwjLt5R6boCes2OIlsjBHUoPQHThlyNpEmdBUkpusznY4ZZIsULeoAU5ixrXsGq/rMFtAwovGaK/FvmEQpMac9yC4DeZu6fNupuW5xyRCVywdzU1npALPXGf0Ra1NMEgojx1uoT32c4f0xbW/FH/pgv2r08rTyAMFdDjLkyQMMp122RYPtT5BDimeQgaaWxPvvVb+0VoZNiDHTKXEj0/oMO+rlAWfV9zxF+S64r0IOScV6sIXyGcNiDuPvAI95QSICpOMnMZIKF//UNqPPcYCuZ2addFl974WYMAE2Yd5UTxi/qz1wqdc931lbzMPhtDySKNMbN3Odg6P9WM2qZ92rVPOGzrK7pNjNdNpT0QnImw3S2k+1a3FQIvXuOxtqDifJlGM7QVvg2pvSfKCHq7nUl62fVc9kSgPrf8/bjbJFjN0yuUgY8RMtlCRi+4LCIVyqksI/R3/45yvB6M77Qa8+wTCRpMQMasJoriGR7aVD45ZPNShO7HcPGTjz8TXZWOJd4O4AbQGu5RKzHLQBqFsTu4Q3nOb0ButshgrbjgtGWoLuwAZ8zM2Thek3rn1IBGz1Haud+i3HiTp8SYckm2UhbNvBa5aE5pecCs9R0qBWKxLNwViZqtOea07i0PnkWmfjF2Buf7caV1D7kWdfO+oiRN1tjw9qu9Y1LarrjKQcYgpBMjRl13e8hgiPPelMmr5vTfQ18A32cYro5JVNOM3RXf+3eLI54wNeNqgjJE=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(136003)(366004)(376002)(39860400002)(346002)(396003)(451199018)(31686004)(316002)(6486002)(966005)(478600001)(54906003)(36756003)(31696002)(86362001)(38100700002)(41300700001)(2616005)(53546011)(6666004)(83380400001)(5660300002)(66556008)(4326008)(66946007)(8676002)(8936002)(30864003)(6506007)(2906002)(7416002)(66476007)(6512007)(186003)(26005)(43740500002)(45980500001)(134885004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ajJqTjdYWTN3dW8yc3JWc0pRSHN3N0ZndTJlTm9qZEU5T1dZemdOZTBUWWRr?=
+ =?utf-8?B?THdiWk9EcGxybGNyeUtWdDgwb0lRMUZMeVpoRnJNem5YRGFNUGs4d0RORkMr?=
+ =?utf-8?B?bDNZQWh4MWQxL3FOdmp6Wkh5Vm9vdlZvN0xHNndpWnNxU3FKTkEzVXZ1Mi9s?=
+ =?utf-8?B?RjU4eENYQUNYYkJtdFE0RGxjejVaM3RvVGZJZDF2TFU3VlhwN0xUZVBQRFJ5?=
+ =?utf-8?B?WHRzMFNiQ0lrOTRDTmVua3krZHNGRlEzTFZiaXBRU2pJMElNMktsb1lHZm15?=
+ =?utf-8?B?MDhFbVBhOGhCbkxpRlAwbktCNFhNZXQvemtqeHRWUXg3TXoxUHgzYTNDSmha?=
+ =?utf-8?B?enNzbklCcmRoYUloc0xqSHpKMHpmQTg2MzYzTkwyWUpRdloyUkgxU01IQVlr?=
+ =?utf-8?B?ZDlGRU9GLzhWTks5WWlrV3hDR3VrSURXZ3NJU00yRUkxSndlZ0pWalNJUHNv?=
+ =?utf-8?B?NDVhVmdFU1o5bnUxU1lEb2dodm1qc1V4WlRIVVRsbmVHdEMzWmhyc0d1OWda?=
+ =?utf-8?B?R25SeWxQdW1oM21LT0VySys0UXhqM3VEQjBrSXdJTHRHWVdPM1pBdW9kQ01T?=
+ =?utf-8?B?QmVuSE5CeWNLZUlFS3Y0WGpUMU5BTU5SQitOb3NGWlFvTC9rbnlPTXlRSDlp?=
+ =?utf-8?B?NU4wUkJLZi9WTUo4REFmQ2Q4RW8wZSs1NEJzczhpZlpBZzhENUZDOUdyUTRE?=
+ =?utf-8?B?RXZJWkxyMmtYUTB0RzFpamlkRFliV1FQOGRzZHJSTVZXbEZTRHJxWkxMV3Nq?=
+ =?utf-8?B?NDhLT0lpM04zdDQ4L1ZLNW0vRFBxb2hpS3FNOWdxY1NjZjN4VUw4NUdhTi9K?=
+ =?utf-8?B?V01vWjJyckdEMHVRc1REQnBYRUViOGpkT0FaZWxMREh5MWZkbDgxOGlPUGhl?=
+ =?utf-8?B?OGtRaVAvNXhsanFkMHpYaGMyVVlzM1Q5cUZIMWduR24wd2kvU3NsM2FieExr?=
+ =?utf-8?B?empiK3RQdlpFcUJndzRCZ0pxcU9TVXYyOWhoRGZBMFNucG5xcFhSU3FjK3ph?=
+ =?utf-8?B?KzNsTGNyMDV5MTRtMWVqSTFJL3hDMWhwMmQwQlE3WmNjZklwMHVPTVNrQmM4?=
+ =?utf-8?B?YUdjeE5Td2hUNHBCeXVFNHlUaWlDYXJXZnVrcVcxN1N5ajVOTmdwVk9sdERY?=
+ =?utf-8?B?N3lEaUh0YS94REtwc3JHZmNvc2N6RE02NnBCL1ZYekZhcnQ4VnMxL1NyUnZr?=
+ =?utf-8?B?TlQ0Zm01L0NyU2NEMjJVaS85cjEyM1cxY2dqeHRPWTdSdzZGQUVUTWhNR3VO?=
+ =?utf-8?B?dlZuM3lHTWFxWXdmdzRFajEwYVZBdnpNME9sSEJCaTUwbHR2dGkySHZ4SEM4?=
+ =?utf-8?B?QmlXRUU5aXQ5QXUzaXdNOGY1WkFnSTZRM0ZheXNXVmFDYkVVUllpNzF2Z2JY?=
+ =?utf-8?B?MjkzNTNVMHVmSVVNaWNpQ3NVdnlJV0grdFBkR2N1ak5zRDRiZUlYKzN5Sytl?=
+ =?utf-8?B?UnRHMTdnemlwL0ovSytZNThBVjZLRWZDOUxESHlCWmQ5WlRNOGZnOWdDdHBS?=
+ =?utf-8?B?eGRYbFBnalNUZDMraUdpOU13a0J5dXY1OTVBZFgxTHUvbDV0M1hNamxaZ0NI?=
+ =?utf-8?B?eXh6TG4xN1RhU2hpdDQwWXR0V1ZBL3I4Z2NTMGZveGF2Sm5RRGRJc2VyYytr?=
+ =?utf-8?B?c2p4ckNtK0kyOXVUWWhjS1lzMldhNmlzN1JRTTZ0UGJaNWJveEpqZlRtR0p2?=
+ =?utf-8?B?YmpraFFNZXVKb3BabjhZQzNQVC9xQ3UyN1UxTkQxQW14UGJ2em9rSDJNZkhU?=
+ =?utf-8?B?OXdkbXFTRitBVWFrc2tvbkkxb0R2cHFFaGxaUEQ5eEs5V0JIc3lGL2hLVERZ?=
+ =?utf-8?B?OG1PdWZucTVlM1NUT1BjL3VRajF5aTQyeXBjcVo3RWYzbllhSHRiNk54TGZZ?=
+ =?utf-8?B?SDRYbWF0SmtJUjhJVGxKZUcyZG5pY3BYcmZKOVlJQ3VhbVNJRWN6UEp4YUdw?=
+ =?utf-8?B?U3RxQ2s4N1VOTXAzdUhGTExmaThDa3lJNjJRRVpiZ1dTRSs4cURRNlhmZlZX?=
+ =?utf-8?B?dFBIb1hJMlhiSFZEcUJCUWhQbHhlSllGMlRkQy9YTno1THhDNUVUQ3hEUlli?=
+ =?utf-8?B?ZHBOYWo5cXlFZXpURUluMlE5UG8rbVVScVV6UTJBYUpCd2Jld2wvK1VRRzJT?=
+ =?utf-8?Q?HnvYkFIDbP7jI+oyICE4lqlN2?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e4dd7be3-b8db-4743-adfc-08db088d1c0e
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Feb 2023 21:57:16.0160
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: EXVjcGCkWmX+bhac6NV3yuCKTuWstd5AaaY9/YnxJXQuritbUOa2NREzXoAjft0QIGVHxI+WYw/lbPhPPZgeiA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7296
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-TL;DR: I'm going to post v2 of this along with some other fixes+hardening.
-
-On Tue, Jan 17, 2023, Suravee Suthikulpanit wrote:
-> AVIC GATag is managed by the SVM driver, and is used by the IOMMU driver
-
-s/SVM driver/KVM
-
-> to program the AMD IOMMU IRTE to provide reference back to SVM in case
-
-s/SVM/KVM
-
-We do sometimes use "VMX" and "SVM" to refer to KVM, but usually only when
-differentiating betwen "KVM x86" and "KVM <vendor>".  In most cases I don't think
-it would matter, but in this particular case, since the GATag is kinda sorta
-consumed by hardware, but IIUC is purely software-defined, knowing whether "SVM"
-means "KVM" or "SVM the architecture" is an important distinction.
-
-> the IOMMU cannot inject interrupt to the non-running vCPU. In such case,
-> the IOMMU hardware notify the IOMMU driver by creating GALog entry with
-
-Definitely a nit, but I would probably omit the info about the IOMMU driver.  That
-information matters if someone is trying to understand _all_ of the pieces, but
-for this specific bug I think it just ends up introducing noise.
-
-> the corresponded GATag. The IOMMU driver processes the GALog entry and
-> notifies SVM to schedule in the target vCPU.
+On 2/5/2023 9:13 PM, Alexey Kardashevskiy wrote:
+> When SVM VM is up, KVM uses sev_issue_cmd_external_user() with an open
+> /dev/sev fd which ensures that the SVM initialization was done correctly.
+> The only helper not following the scheme is snp_guest_ext_guest_request()
+> which bypasses the fd check.
 > 
-> Currently, SVM uses 8-bit vCPU ID and 24-bit VM ID to encode 32-bit GATag.
-> Since x2AVIC supports upto 512 vCPUs, it requires to use at least 9-bit
-
-"up to"
-
-Nit, x2AVIC doesn't "require" anything.  What matters is what KVM allows.  I get
-what you're saying, but I want to cleanly separate "what's allowed by the spec"
-and "what does KVM actually do".
-
-> vCPU ID.
+> Change the SEV API to require passing a file.
 > 
-> Therefore, modify the GATag enconding to use the number of bits required
-
-s/enconding/encoding
-
-> to support the maximum vCPUs.
-
-Thank you for the explanation of how this all works!  IIUC, this is missing one
-key point though: the GATag is 100% software-defined and never interpreted by
-hardware.  I.e. KVM can shove whatever it wants into the tag.
-
-And while I'm nitpicking, please lead with the "what".  For the changelog as a whole,
-some maintainers/subsystems prefer leading with the "why", but I strongly prefer that
-changelogs state what the patch actually does and then provide the background/justification.
-
-Copy-pasting a prior copy-paste (I really need to save this as a Vim macro formletter)
-
- : To some extent, it's a personal preference, e.g. I
- : find it easier to understand the details (why something is a problem) if I have
- : the extra context of how a problem is fixed (or: what code was broken).
- :
- : But beyond personal preference, there are less subjective reasons for stating
- : what a patch does before diving into details.  First and foremost, what code is
- : actually being changed is the most important information, and so that information
- : should be easy to find.  Changelogs that bury the "what's actually changing" in a
- : one-liner after 3+ paragraphs of background make it very hard to find that information.
- :
- : Maybe for initial review one could argue that "what's the bug" is more important,
- : but for skimming logs and git archeology, the gory details matter less and less.
- : E.g. when doing a series of "git blame", the details of each change along the way
- : are useless, the details only matter for the culprit; I just want to quickly
- : determine whether or not a commit might be of interest.
- :
- : Another argument for stating "what's changing" first is that it's almost always
- : possible to state "what's changing" in a single sentence.  Conversely, all but the
- : most simple bugs require multiple sentences or paragraphs to fully describe the
- : problem.  If both the "what's changing" and "what's the bug" are super short then
- : the order doesn't matter.  But if one is shorter (almost always the "what's changing),
- : then covering the shorter one first is advantageous because it's less of an
- : inconvenience for readers/reviewers that have a strict ordering preference.  E.g.
- : having to skip one sentence to get to the stuff you care about is less painful than
- : me having to skip three paragraphs to get to the stuff that I care about.
-
-[*] https://lore.kernel.org/all/YurKx+gFAWPvj35L@google.com
-
-> Reported-by: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
-> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+> Handle errors with care in the SNP Extended Guest Request handler
+> (snp_handle_ext_guest_request()) as there are actually 3 types of errors:
+> - @rc: return code SEV device's sev_issue_cmd() which is int==int32;
+> - @err: a psp return code in sev_issue_cmd(), also int==int32 (probably
+> a mistake but kvm_sev_cmd::error uses __u32 for some time now);
+> - (added by this) @exitcode: GHCB's exit code sw_exit_info_2, uint64.
+> 
+> Use the right types, remove cast to int* and return ENOSPC from SEV
+> device for converting it to the GHCB's exit code
+> SNP_GUEST_REQ_INVALID_LEN==BIT(32).
+> 
+> Fixes: 17f1d0c995ac ("KVM: SVM: Provide support for SNP_GUEST_REQUEST NAE event")
+> While at this, preserve the original error in snp_cleanup_guest_buf().
+> 
+> Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
 > ---
->  arch/x86/include/asm/svm.h | 3 ++-
->  arch/x86/kvm/svm/avic.c    | 9 ++++-----
->  2 files changed, 6 insertions(+), 6 deletions(-)
 > 
-> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-> index 0361626841bc..6738faf155e4 100644
-> --- a/arch/x86/include/asm/svm.h
-> +++ b/arch/x86/include/asm/svm.h
-> @@ -256,7 +256,8 @@ enum avic_ipi_failure_cause {
->  	AVIC_IPI_FAILURE_INVALID_BACKING_PAGE,
->  };
->  
-> -#define AVIC_PHYSICAL_MAX_INDEX_MASK	GENMASK_ULL(9, 0)
+> This can easily be squashed into what it fixes.
+> 
+> The patch is made for
+> https://github.com/AMDESE/linux/commits/upmv10-host-snp-v7-rfc
+> ---
+>   include/linux/psp-sev.h      | 62 +++++++++++---------
+>   arch/x86/kvm/svm/sev.c       | 50 +++++++++++-----
+>   drivers/crypto/ccp/sev-dev.c | 11 ++--
+>   3 files changed, 73 insertions(+), 50 deletions(-)
+> 
+> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+> index 970a9de0ed20..466b1a6e7d7b 100644
+> --- a/include/linux/psp-sev.h
+> +++ b/include/linux/psp-sev.h
+> @@ -848,6 +848,36 @@ int sev_platform_status(struct sev_user_data_status *status, int *error);
+>   int sev_issue_cmd_external_user(struct file *filep, unsigned int id,
+>   				void *data, int *error);
+>   
+> +/**
+> + * sev_issue_cmd_external_user_cert - issue SEV command by other driver with a file
+> + * handle and return certificates set onto SEV device via SNP_SET_EXT_CONFIG;
+> + * intended for use by the SNP extended guest request command defined
+> + * in the GHCB specification.
+> + *
+> + * @filep - SEV device file pointer
+> + * @cmd - command to issue
+> + * @data - command buffer
+> + * @vaddr: address where the certificate blob need to be copied.
+> + * @npages: number of pages for the certificate blob.
+> + *    If the specified page count is less than the certificate blob size, then the
+> + *    required page count is returned with ENOSPC error code.
+> + *    If the specified page count is more than the certificate blob size, then
+> + *    page count is updated to reflect the amount of valid data copied in the
+> + *    vaddr.
+> + *
+> + * @error: SEV command return code
+> + *
+> + * Returns:
+> + * 0 if the sev successfully processed the command
+> + * -%ENODEV    if the sev device is not available
+> + * -%ENOTSUPP  if the sev does not support SEV
+> + * -%ETIMEDOUT if the sev command timed out
+> + * -%EIO       if the sev returned a non-zero return code
+> + * -%ENOSPC    if the specified page count is too small
+> + */
+> +int sev_issue_cmd_external_user_cert(struct file *filep, unsigned int cmd, void *data,
+> +				     unsigned long vaddr, unsigned long *npages, int *error);
+> +
+>   /**
+>    * sev_guest_deactivate - perform SEV DEACTIVATE command
+>    *
+> @@ -945,32 +975,6 @@ void snp_free_firmware_page(void *addr);
+>    */
+>   void snp_mark_pages_offline(unsigned long pfn, unsigned int npages);
+>   
+> -/**
+> - * snp_guest_ext_guest_request - perform the SNP extended guest request command
+> - *  defined in the GHCB specification.
+> - *
+> - * @data: the input guest request structure
+> - * @vaddr: address where the certificate blob need to be copied.
+> - * @npages: number of pages for the certificate blob.
+> - *    If the specified page count is less than the certificate blob size, then the
+> - *    required page count is returned with error code defined in the GHCB spec.
+> - *    If the specified page count is more than the certificate blob size, then
+> - *    page count is updated to reflect the amount of valid data copied in the
+> - *    vaddr.
+> - *
+> - * @sev_ret: sev command return code
+> - *
+> - * Returns:
+> - * 0 if the sev successfully processed the command
+> - * -%ENODEV    if the sev device is not available
+> - * -%ENOTSUPP  if the sev does not support SEV
+> - * -%ETIMEDOUT if the sev command timed out
+> - * -%EIO       if the sev returned a non-zero return code
+> - */
+> -int snp_guest_ext_guest_request(struct sev_data_snp_guest_request *data,
+> -				unsigned long vaddr, unsigned long *npages,
+> -				unsigned long *error);
+> -
+>   #else	/* !CONFIG_CRYPTO_DEV_SP_PSP */
+>   
+>   static inline int
+> @@ -1013,9 +1017,9 @@ static inline void *snp_alloc_firmware_page(gfp_t mask)
+>   
+>   static inline void snp_free_firmware_page(void *addr) { }
+>   
+> -static inline int snp_guest_ext_guest_request(struct sev_data_snp_guest_request *data,
+> -					      unsigned long vaddr, unsigned long *n,
+> -					      unsigned long *error)
+> +static inline int sev_issue_cmd_external_user_cert(struct file *filep, unsigned int cmd,
+> +						   void *data, unsigned long vaddr,
+> +						   unsigned long *npages, int *error)
+>   {
+>   	return -ENODEV;
+>   }
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index d0e58cffd1ed..b268c35efab4 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -394,6 +394,23 @@ static int sev_issue_cmd(struct kvm *kvm, int id, void *data, int *error)
+>   	return __sev_issue_cmd(sev->fd, id, data, error);
+>   }
+>   
+> +static int sev_issue_cmd_cert(struct kvm *kvm, int id, void *data,
+> +			      unsigned long vaddr, unsigned long *npages, int *error)
+> +{
+> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct fd f;
+> +	int ret;
+> +
+> +	f = fdget(sev->fd);
+> +	if (!f.file)
+> +		return -EBADF;
+> +
+> +	ret = sev_issue_cmd_external_user_cert(f.file, id, data, vaddr, npages, error);
+> +
+> +	fdput(f);
+> +	return ret;
+> +}
+> +
+>   static int sev_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>   {
+>   	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> @@ -3587,11 +3604,11 @@ static void snp_cleanup_guest_buf(struct sev_data_snp_guest_request *data, unsig
+>   	int ret;
+>   
+>   	ret = snp_page_reclaim(pfn);
+> -	if (ret)
+> +	if (ret && (*rc == SEV_RET_SUCCESS))
+>   		*rc = SEV_RET_INVALID_ADDRESS;
+>   
+>   	ret = rmp_make_shared(pfn, PG_LEVEL_4K);
+> -	if (ret)
+> +	if (ret && (*rc == SEV_RET_SUCCESS))
+>   		*rc = SEV_RET_INVALID_ADDRESS;
+>   }
 
-Isn't the existing mask wrong?  The high bit is inclusive, i.e. this is defining
-a mask of 10 bits, not 9.
+I believe we need to fix this as per the GHCB specifications.
 
-Actually, neither 10 nor 9 bits is correct if we are going by the most recent APM,
-i.e. the mask should be 8:0 if we want to tie this to what is actually defined in
-the architecture.
+As per GHCB 2.0 specifications:
 
-  All the addresses point to 4-Kbyte aligned data structures. Bits 11:0 are reserved
-  (except for offset 0F8h) and should be set to zero. The lower 8 bits of offset 0F8h
-  are used for the field AVIC_PHYSICAL_MAX_INDEX. VMRUN fails with #VMEXIT(VMEXIT_INVALID)
-  if AVIC_PHYSICAL_MAX_INDEX is greater than 255 in xAVIC mode or greater than 511 in
-  x2AVIC mode.
+SW_EXITINFO2
+...
+State from Hypervisor: Upper
+32-bits (63:32) will contain the
+return code from the hypervisor.
+Lower 32-bits (31:0) will contain
+the return code from the firmware
+call (0 = success)
 
-Looking through the discussion history of the x2AVIC enabling, this appears to be
-an off-by-one goof, i.e. not a deliberate speculation on how bits 11:9 will be
-used.
+So i believe the FW error code (which is the FW error code from 
+SNP_GUEST_REQUEST or *rc here) should be contained in the lower 32-bits 
+and the error code being returned back due to response buffer pages 
+reclaim failure and/or failure to transisition these pages back to 
+shared state is basically hypervisor (error) return code and that should 
+be returned in the upper 32-bit of the exitinfo.
 
-> +#define AVIC_PHYSICAL_MAX_INDEX_BITS	9
+There is work in progress to check conformance of SNP v7 patches to GHCB 
+2.0 specifications, so probably this fix can be included as part of 
+those patches.
 
-This name is misleading/wrong.  As above, the high bit is inclusive.  If we wanted
-to specify the high bit, it would be something like MAX_INDEX_MAX_BIT, which is pretty
-awful.
+>   
+> @@ -3638,8 +3655,9 @@ static void snp_handle_ext_guest_request(struct vcpu_svm *svm, gpa_t req_gpa, gp
+>   	struct kvm *kvm = vcpu->kvm;
+>   	unsigned long data_npages;
+>   	struct kvm_sev_info *sev;
+> -	unsigned long rc, err;
 
-Ha!  We don't need a separate define.  const_hweight.h provides compile-time
-hweight, a.k.a. popcount, macros.  We can use that to compute the shift of the
-VM ID portion of the GATag, then we don't need to come up with a name.
+This needs to be looked at more carefully. The SEV firmware status code 
+is defined as 32-bit, but is being handled as unsigned long in the 
+KVM/SNP code and as int in the CCP driver. So this needs to be fixed 
+consistently across, snp_setup_guest_buf() return value will need to be 
+fixed accordingly.
 
-I'll post the below as v2 on top of the AVIC_PHYSICAL_MAX_INDEX_MASK fix.
+> +	unsigned long exitcode;
+>   	u64 data_gpa;
+> +	int err, rc;
+>   
+>   	if (!sev_snp_guest(vcpu->kvm)) {
+>   		rc = SEV_RET_INVALID_GUEST;
+> @@ -3669,17 +3687,16 @@ static void snp_handle_ext_guest_request(struct vcpu_svm *svm, gpa_t req_gpa, gp
+>   	 */
+>   	if (sev->snp_certs_len) {
+>   		if ((data_npages << PAGE_SHIFT) < sev->snp_certs_len) {
+> -			rc = -EINVAL;
+> -			err = SNP_GUEST_REQ_INVALID_LEN;
+> +			rc = -ENOSPC;
 
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index ca684979e90d..326341a22153 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -27,19 +27,29 @@
- #include "irq.h"
- #include "svm.h"
- 
--/* AVIC GATAG is encoded using VM and VCPU IDs */
--#define AVIC_VCPU_ID_BITS              8
--#define AVIC_VCPU_ID_MASK              ((1 << AVIC_VCPU_ID_BITS) - 1)
-+/*
-+ * Encode the arbitrary VM ID and the vCPU's default APIC ID, i.e the vCPU ID,
-+ * into the GATag so that KVM can retrieve the correct vCPU from a GALog entry
-+ * if an interrupt can't be delivered, e.g. because the vCPU isn't running.
-+ *
-+ * For the vCPU ID, use however many bits are currently allowed for the max
-+ * guest physical APIC ID (limited by the size of the physical ID table), and
-+ * use whatever bits remain to assign arbitrary AVIC IDs to VMs.  Note, the
-+ * size of the GATag is defined by hardware (32 bits), but is an opaque value
-+ * as far as hardware is concerned.
-+ */
-+#define AVIC_VCPU_ID_MASK              AVIC_PHYSICAL_MAX_INDEX_MASK
- 
--#define AVIC_VM_ID_BITS                        24
--#define AVIC_VM_ID_NR                  (1 << AVIC_VM_ID_BITS)
--#define AVIC_VM_ID_MASK                        ((1 << AVIC_VM_ID_BITS) - 1)
-+#define AVIC_VM_ID_SHIFT               HWEIGHT32(AVIC_PHYSICAL_MAX_INDEX_MASK)
-+#define AVIC_VM_ID_MASK                        (GENMASK(31, AVIC_VM_ID_SHIFT) >> AVIC_VM_ID_SHIFT)
- 
--#define AVIC_GATAG(x, y)               (((x & AVIC_VM_ID_MASK) << AVIC_VCPU_ID_BITS) | \
-+#define AVIC_GATAG(x, y)               (((x & AVIC_VM_ID_MASK) << AVIC_VM_ID_SHIFT) | \
-                                                (y & AVIC_VCPU_ID_MASK))
--#define AVIC_GATAG_TO_VMID(x)          ((x >> AVIC_VCPU_ID_BITS) & AVIC_VM_ID_MASK)
-+#define AVIC_GATAG_TO_VMID(x)          ((x >> AVIC_VM_ID_SHIFT) & AVIC_VM_ID_MASK)
- #define AVIC_GATAG_TO_VCPUID(x)                (x & AVIC_VCPU_ID_MASK)
- 
-+static_assert(AVIC_GATAG(AVIC_VM_ID_MASK, AVIC_VCPU_ID_MASK) == -1u);
-+
- static bool force_avic;
- module_param_unsafe(force_avic, bool, 0444);
- 
+Why do we need to introduce ENOSPC error code?
 
+If we continue to use SNP_GUEST_REQ_INVALID_LEN we don't need to map 
+ENOSPC to SNP_GUEST_REQ_INVALID_LEN below.
+
+And the CCP driver can return SNP_GUEST_REQ_INVALID_LEN as earlier via 
+the fw_err parameter.
+
+Thanks,
+Ashish
+
+>   			goto datalen;
+>   		}
+> -		rc = sev_issue_cmd(kvm, SEV_CMD_SNP_GUEST_REQUEST, &req,
+> -				   (int *)&err);
+> +		rc = sev_issue_cmd(kvm, SEV_CMD_SNP_GUEST_REQUEST, &req, &err);
+>   	} else {
+> -		rc = snp_guest_ext_guest_request(&req,
+> -						 (unsigned long)sev->snp_certs_data,
+> -						 &data_npages, &err);
+> +		rc = sev_issue_cmd_cert(kvm, SEV_CMD_SNP_GUEST_REQUEST, &req,
+> +					(unsigned long)sev->snp_certs_data,
+> +					&data_npages, &err);
+>   	}
+> +
+>   datalen:
+>   	if (sev->snp_certs_len)
+>   		data_npages = sev->snp_certs_len >> PAGE_SHIFT;
+> @@ -3689,27 +3706,30 @@ static void snp_handle_ext_guest_request(struct vcpu_svm *svm, gpa_t req_gpa, gp
+>   		 * If buffer length is small then return the expected
+>   		 * length in rbx.
+>   		 */
+> -		if (err == SNP_GUEST_REQ_INVALID_LEN)
+> +		if (rc == -ENOSPC) {
+>   			vcpu->arch.regs[VCPU_REGS_RBX] = data_npages;
+> +			exitcode = SNP_GUEST_REQ_INVALID_LEN;
+> +			goto cleanup;
+> +		}
+>   
+>   		/* pass the firmware error code */
+> -		rc = err;
+> +		exitcode = err;
+>   		goto cleanup;
+>   	}
+>   
+>   	/* Copy the certificate blob in the guest memory */
+>   	if (data_npages &&
+>   	    kvm_write_guest(kvm, data_gpa, sev->snp_certs_data, data_npages << PAGE_SHIFT))
+> -		rc = SEV_RET_INVALID_ADDRESS;
+> +		exitcode = SEV_RET_INVALID_ADDRESS;
+>   
+>   cleanup:
+> -	snp_cleanup_guest_buf(&req, &rc);
+> +	snp_cleanup_guest_buf(&req, &exitcode);
+>   
+>   unlock:
+>   	mutex_unlock(&sev->guest_req_lock);
+>   
+>   e_fail:
+> -	svm_set_ghcb_sw_exit_info_2(vcpu, rc);
+> +	svm_set_ghcb_sw_exit_info_2(vcpu, exitcode);
+>   }
+>   
+>   static kvm_pfn_t gfn_to_pfn_restricted(struct kvm *kvm, gfn_t gfn)
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index 6c4fdcaed72b..73f56c20255c 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -2070,8 +2070,8 @@ int snp_guest_dbg_decrypt_page(u64 gctx_pfn, u64 src_pfn, u64 dst_pfn, int *erro
+>   }
+>   EXPORT_SYMBOL_GPL(snp_guest_dbg_decrypt_page);
+>   
+> -int snp_guest_ext_guest_request(struct sev_data_snp_guest_request *data,
+> -				unsigned long vaddr, unsigned long *npages, unsigned long *fw_err)
+> +int sev_issue_cmd_external_user_cert(struct file *filep, unsigned int cmd, void *data,
+> +				     unsigned long vaddr, unsigned long *npages, int *error)
+>   {
+>   	unsigned long expected_npages;
+>   	struct sev_device *sev;
+> @@ -2093,12 +2093,11 @@ int snp_guest_ext_guest_request(struct sev_data_snp_guest_request *data,
+>   	expected_npages = sev->snp_certs_len >> PAGE_SHIFT;
+>   	if (*npages < expected_npages) {
+>   		*npages = expected_npages;
+> -		*fw_err = SNP_GUEST_REQ_INVALID_LEN;
+>   		mutex_unlock(&sev->snp_certs_lock);
+> -		return -EINVAL;
+> +		return -ENOSPC;
+>   	}
+>   
+> -	rc = sev_do_cmd(SEV_CMD_SNP_GUEST_REQUEST, data, (int *)fw_err);
+> +	rc = sev_issue_cmd_external_user(filep, cmd, data, error);
+>   	if (rc) {
+>   		mutex_unlock(&sev->snp_certs_lock);
+>   		return rc;
+> @@ -2115,7 +2114,7 @@ int snp_guest_ext_guest_request(struct sev_data_snp_guest_request *data,
+>   	mutex_unlock(&sev->snp_certs_lock);
+>   	return rc;
+>   }
+> -EXPORT_SYMBOL_GPL(snp_guest_ext_guest_request);
+> +EXPORT_SYMBOL_GPL(sev_issue_cmd_external_user_cert);
+>   
+>   static void sev_exit(struct kref *ref)
+>   {
+> 
