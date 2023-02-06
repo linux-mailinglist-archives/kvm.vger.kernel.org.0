@@ -2,134 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F32CE68BD32
-	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 13:47:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B7D768BD4A
+	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 13:50:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230134AbjBFMrh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Feb 2023 07:47:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35606 "EHLO
+        id S229990AbjBFMuD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Feb 2023 07:50:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229960AbjBFMrg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Feb 2023 07:47:36 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD42811E81
-        for <kvm@vger.kernel.org>; Mon,  6 Feb 2023 04:46:54 -0800 (PST)
+        with ESMTP id S229488AbjBFMuC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Feb 2023 07:50:02 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB6B12D55
+        for <kvm@vger.kernel.org>; Mon,  6 Feb 2023 04:49:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675687614;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TDRj1e1Of6zXPK6vdEPHmWKOg6uKLmaGGU/8IdkYWus=;
-        b=WQxhDeZCsFAsWjLmtlkYd7yGtQ8FCi+ejeRIq7VSHOLHQ5jxsn1xF8wm6Nj7r0r5dme8MR
-        hbGBqz80Ru2P4i7N3kWPoLS7+S/fNR6q3n9KkBuNbncJBshxETXY/TH1rEdOGnXJACrzEJ
-        6Dq92rYNvRxfl2zqXYQrqZAcvJbnSD4=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-22-2QMJoWD-O1C9FeB4HIee7w-1; Mon, 06 Feb 2023 07:46:52 -0500
-X-MC-Unique: 2QMJoWD-O1C9FeB4HIee7w-1
-Received: by mail-qk1-f197.google.com with SMTP id s7-20020ae9f707000000b007294677a6e8so7759668qkg.17
-        for <kvm@vger.kernel.org>; Mon, 06 Feb 2023 04:46:52 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TDRj1e1Of6zXPK6vdEPHmWKOg6uKLmaGGU/8IdkYWus=;
-        b=IYaliwdHXLfksKuiAn0hpV8FWJqXCheZp+Oy0MOQHfdFB71dr71yfC4A5m1XVK2NPY
-         R9jN6/Yw3Tx8mJBmKOAWYTPcvVv5IzmYIfIxCOB/HQcF1wRatrPe3NNidfa/tc7Jf7T5
-         7Y5RbiugLjIrvaauXB1k/Kpb3LvwZotvBoWHs/Jp9WiLNoZaLpcKPvc17e7Ht03jyZDZ
-         esJZSs2Ipds6UqW7+tl9pPMKtRGLwaimXlOgNLCp8jV22ni3OFkRLdnH5iABDOCu5MN0
-         P+Z1qKDToBjRojG2HkjnX6QQoi0/AhRF+FjExQ+4UAwaeqHsRZYxXD+6xxuGF4VP8ynt
-         If0w==
-X-Gm-Message-State: AO0yUKVaFsmA8unh1S1KXTraoWllBe/fR/Aoxg94B1VP1NXoSoKtHipW
-        4RUtzc6bQu17naK9ASoV5PD2XLg6SC0zAjHHxOknpvwHz5KSTvT/zWCI+STguHgwxZkTWpo1Aoc
-        mirMFil5zhbhh
-X-Received: by 2002:ac8:5711:0:b0:3b8:6788:bf25 with SMTP id 17-20020ac85711000000b003b86788bf25mr35877080qtw.23.1675687612547;
-        Mon, 06 Feb 2023 04:46:52 -0800 (PST)
-X-Google-Smtp-Source: AK7set8VN1fCsEVsMrrJk5rcezoBGLzpuilIg4cn536dUV2elOC61RFW7l0os7cDW0myPi1n4kU73Q==
-X-Received: by 2002:ac8:5711:0:b0:3b8:6788:bf25 with SMTP id 17-20020ac85711000000b003b86788bf25mr35877052qtw.23.1675687612305;
-        Mon, 06 Feb 2023 04:46:52 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id s184-20020ae9dec1000000b006fcaa1eab0esm7260423qkf.123.2023.02.06.04.46.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Feb 2023 04:46:51 -0800 (PST)
-Message-ID: <e6732349-efa8-afbf-6c69-498643250bfc@redhat.com>
-Date:   Mon, 6 Feb 2023 13:46:47 +0100
+        s=mimecast20190719; t=1675687752;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:in-reply-to:in-reply-to:  references:references;
+        bh=X5ecGObh+Ix2p1TiaCThbROvfT36JcK1+DZ9dqHAZBw=;
+        b=GHasWgUS/JzJ5BREh3E3OvvXv+38gdk2btItzR7VrrgN5pIlHXleLG66YAn4FvQfL8SRVQ
+        DNX6VgFkuX9MgiN4/PXcRcvOPgNPI5SuMC82QMs+EJ0dSVUy5H8Xv5LKKXbjcXuRDCRgVL
+        rPIh99JURVEJWJ6OuRkpP7zoE6mEsBQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-463-ix81AwATPEO7-KzbcM8o6w-1; Mon, 06 Feb 2023 07:49:08 -0500
+X-MC-Unique: ix81AwATPEO7-KzbcM8o6w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E4BC5185A794;
+        Mon,  6 Feb 2023 12:49:07 +0000 (UTC)
+Received: from redhat.com (unknown [10.33.36.62])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D4C62C15BA0;
+        Mon,  6 Feb 2023 12:49:04 +0000 (UTC)
+Date:   Mon, 6 Feb 2023 12:49:00 +0000
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     Thomas Huth <thuth@redhat.com>
+Cc:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org,
+        qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
+        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
+        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
+        nsg@linux.ibm.com, frankja@linux.ibm.com, clg@kaod.org
+Subject: Re: [PATCH v15 09/11] machine: adding s390 topology to query-cpu-fast
+Message-ID: <Y+D3PH0EkUPshIMO@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20230201132051.126868-1-pmorel@linux.ibm.com>
+ <20230201132051.126868-10-pmorel@linux.ibm.com>
+ <a7a235d5-4ded-b83d-dcb6-2cf81ad5f283@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [PATCH v5 1/3] arm/virt: don't try to spell out the accelerator
-Content-Language: en-US
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>
-Cc:     qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Juan Quintela <quintela@redhat.com>,
-        Gavin Shan <gshan@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
-        Richard Henderson <richard.henderson@linaro.org>
-References: <20230203134433.31513-1-cohuck@redhat.com>
- <20230203134433.31513-2-cohuck@redhat.com>
-From:   Eric Auger <eauger@redhat.com>
-In-Reply-To: <20230203134433.31513-2-cohuck@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <a7a235d5-4ded-b83d-dcb6-2cf81ad5f283@redhat.com>
+User-Agent: Mutt/2.2.9 (2022-11-12)
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Connie,
-
-On 2/3/23 14:44, Cornelia Huck wrote:
-> Just use current_accel_name() directly.
+On Mon, Feb 06, 2023 at 01:41:44PM +0100, Thomas Huth wrote:
+> On 01/02/2023 14.20, Pierre Morel wrote:
+> > S390x provides two more topology containers above the sockets,
+> > books and drawers.
+> > 
+> > Let's add these CPU attributes to the QAPI command query-cpu-fast.
+> > 
+> > Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> > ---
+> >   qapi/machine.json          | 13 ++++++++++---
+> >   hw/core/machine-qmp-cmds.c |  2 ++
+> >   2 files changed, 12 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/qapi/machine.json b/qapi/machine.json
+> > index 3036117059..e36c39e258 100644
+> > --- a/qapi/machine.json
+> > +++ b/qapi/machine.json
+> > @@ -53,11 +53,18 @@
+> >   #
+> >   # Additional information about a virtual S390 CPU
+> >   #
+> > -# @cpu-state: the virtual CPU's state
+> > +# @cpu-state: the virtual CPU's state (since 2.12)
+> > +# @dedicated: the virtual CPU's dedication (since 8.0)
+> > +# @polarity: the virtual CPU's polarity (since 8.0)
+> >   #
+> >   # Since: 2.12
+> >   ##
+> > -{ 'struct': 'CpuInfoS390', 'data': { 'cpu-state': 'CpuS390State' } }
+> > +{ 'struct': 'CpuInfoS390',
+> > +    'data': { 'cpu-state': 'CpuS390State',
+> > +              'dedicated': 'bool',
+> > +              'polarity': 'int'
 > 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> I think it would also be better to mark the new fields as optional and only
+> return them if the guest has the topology enabled, to avoid confusing
+> clients that were written before this change.
 
-Thanks
+FWIW, I would say that the general expectation of QMP clients is that
+they must *always* expect new fields to appear in dicts that are
+returned in QMP replies. We add new fields at will on a frequent basis.
 
-Eric
-> ---
->  hw/arm/virt.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index ea2413a0bad7..bdc297a4570c 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -2123,21 +2123,21 @@ static void machvirt_init(MachineState *machine)
->      if (vms->secure && (kvm_enabled() || hvf_enabled())) {
->          error_report("mach-virt: %s does not support providing "
->                       "Security extensions (TrustZone) to the guest CPU",
-> -                     kvm_enabled() ? "KVM" : "HVF");
-> +                     current_accel_name());
->          exit(1);
->      }
->  
->      if (vms->virt && (kvm_enabled() || hvf_enabled())) {
->          error_report("mach-virt: %s does not support providing "
->                       "Virtualization extensions to the guest CPU",
-> -                     kvm_enabled() ? "KVM" : "HVF");
-> +                     current_accel_name());
->          exit(1);
->      }
->  
->      if (vms->mte && (kvm_enabled() || hvf_enabled())) {
->          error_report("mach-virt: %s does not support providing "
->                       "MTE to the guest CPU",
-> -                     kvm_enabled() ? "KVM" : "HVF");
-> +                     current_accel_name());
->          exit(1);
->      }
->  
+So personally I'd keep life simple and unconditionally report the new
+fields.
+
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
