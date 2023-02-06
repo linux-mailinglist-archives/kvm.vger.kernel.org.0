@@ -2,387 +2,394 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1663868BFEC
-	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 15:21:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CE8868C018
+	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 15:30:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229939AbjBFOVW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Feb 2023 09:21:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40710 "EHLO
+        id S229528AbjBFOav (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Feb 2023 09:30:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229488AbjBFOVV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Feb 2023 09:21:21 -0500
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EFCFD50A
-        for <kvm@vger.kernel.org>; Mon,  6 Feb 2023 06:21:19 -0800 (PST)
-Received: by mail-yb1-xb31.google.com with SMTP id i2so11333693ybt.2
-        for <kvm@vger.kernel.org>; Mon, 06 Feb 2023 06:21:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=5e1+oZ31M5Bv6rG6uvlMHCKUSzQbP2DUsrb+67iFuXk=;
-        b=o0KR5d5wfu9vD21YcTuucRrLlP5xAyOZ2CePB/+7rgh7HsevTCNsDLHFUhwFTGabG4
-         fItpLlgMjeGiWAAGdT9Hth4VeijNwg4dP3tplOpxaZ0HQxnBtaqNvWalrkck4zYj8wg1
-         RmTs/Q2FAIosEX1rTXCw3NkOllu1FknYQboAqDU/ht1k9syiEuc7IHMeRX5VbXaQqSn7
-         AQUHGHn/Mddjgl+HZKj7pR0w2l1vFqEMt/n3IbJUtaL8x7eFvQ36xF30F0NZYVUWh5C7
-         dcc9VNbz6k6+J7wIPK82ljj3EEXvu8gGgVEDzrgOKxj5zxsLQQnL3Gs+MUyN+drdhkPT
-         q1cQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5e1+oZ31M5Bv6rG6uvlMHCKUSzQbP2DUsrb+67iFuXk=;
-        b=a4ERBuOyRMtZQL07Q1N3FSB2MVh7AZQpZQOFByWkPpRP3Gidq6rYXpRAC1X8RScXOs
-         NZyQAtfNHnF8eSii1Kd1o37KgNzM8vmBlUe4TVJtOdXQjaaYHF3hlExhCV7rAoZ0EmQB
-         Nx1XpLKbv4HPhKVH3S0Ap8Af7RBBxNdy2ekstEKQ5RGd7WcxU6ztHeM10opBeFdExatY
-         sbMHsnOhuQFfotN57ImpjwZggi5G1i8HA0og6588Xrv4jSY5oJ1S1ISdyp0Dih89Sxar
-         lZboO1lf00pnuI/2NCMGgtIaos8+H3tAwQqlOfUNXgCWBqGROSlqAfXd3b0D72mNmRWA
-         7Khw==
-X-Gm-Message-State: AO0yUKW9UoMMuxQfqo9m8I00ulxuc5YrsAoo08yNCTlHUItm+eLsy0EZ
-        ojnzPc3mSbhY0NhW7I3YoCv6JFe4fSNFR3aTBPY=
-X-Google-Smtp-Source: AK7set/izia9dZ6UIXTQMTHptgUbkratdA9v6mc0PSmhEfXBXRolijn8xJRAZ8Aa2UD/U0GaxeYaUGtBK/moT6ZRNE4=
-X-Received: by 2002:a5b:910:0:b0:897:7d29:3eee with SMTP id
- a16-20020a5b0910000000b008977d293eeemr394946ybq.58.1675693278450; Mon, 06 Feb
- 2023 06:21:18 -0800 (PST)
+        with ESMTP id S231358AbjBFOas (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Feb 2023 09:30:48 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E125F1D900;
+        Mon,  6 Feb 2023 06:30:39 -0800 (PST)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 316Dqegl027235;
+        Mon, 6 Feb 2023 14:30:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Xmlhwlv8rTLONN0h2XOQ+YzPsB8oOSdEijMjpmTq+IU=;
+ b=b/uAGfP226KnCYpZPQJjuRgy8l5SKoWy0DqYVC6UWJuxGIgpC2kBcFk5J3ehD8ewcN9I
+ cAaKSSgFUB0l5hTuwGkDU6kSpwcCsHueMTQY+yA+76seDX0Yfna7wJC0jIl6Ry1af5gf
+ yABh5dO+hyFz7pUR6x0S7Sgqb8Fg11kOW9W4DLhWtEGlm6xLXRAKu5z4jiy1TNY4qeHe
+ M9XdQVSEcdbANQKSfh+QflocP8A/b5ljxUAN0GnEhVSygt4uH1YUIsK3ajtpgNT/s6ze
+ UAw01HptdDPMYdUm9zuggEKQ2nMuU8b/hso4aZ9zD0MowarkEug0vD8GkrdA++XXexpK Qw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nk2tbhcsp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 06 Feb 2023 14:30:24 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 316EPxC2007225;
+        Mon, 6 Feb 2023 14:30:23 GMT
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nk2tbhcrm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 06 Feb 2023 14:30:23 +0000
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 316C5AQJ027767;
+        Mon, 6 Feb 2023 14:30:22 GMT
+Received: from smtprelay01.wdc07v.mail.ibm.com ([9.208.129.119])
+        by ppma02wdc.us.ibm.com (PPS) with ESMTPS id 3nhf07k4hr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 06 Feb 2023 14:30:22 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+        by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 316EUK6631654544
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 6 Feb 2023 14:30:20 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8A7BB58059;
+        Mon,  6 Feb 2023 14:30:20 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 261CC5805D;
+        Mon,  6 Feb 2023 14:30:18 +0000 (GMT)
+Received: from [9.65.214.209] (unknown [9.65.214.209])
+        by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Mon,  6 Feb 2023 14:30:18 +0000 (GMT)
+Message-ID: <c5e32a7c-707c-d646-db1e-c1f0124c05a3@linux.ibm.com>
+Date:   Mon, 6 Feb 2023 09:30:17 -0500
 MIME-Version: 1.0
-References: <CAJSP0QUuuZLC0DJNEfZ7amyd3XnRhRNr1k+1OgLfDeF77X1ZDQ@mail.gmail.com>
- <CAJaqyWd+g5fso6AEGKwj0ByxFVc8EpCS9+ezoMpnjyMo5tbj8Q@mail.gmail.com>
- <CAJSP0QXyO4qXJseMzbgsVdXK-4-W4U9DxPcxr6wX45d6VBTeWQ@mail.gmail.com> <CAJaqyWczFwbxNWrZ8dcFHvYrV2=tH7Tv0Apf=qORT+gzDpBN4Q@mail.gmail.com>
-In-Reply-To: <CAJaqyWczFwbxNWrZ8dcFHvYrV2=tH7Tv0Apf=qORT+gzDpBN4Q@mail.gmail.com>
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-Date:   Mon, 6 Feb 2023 09:21:05 -0500
-Message-ID: <CAJSP0QX+mpmdVE-13L9p=02_XbmPFT-mFAbz-JJjqB5V-2ON6Q@mail.gmail.com>
-Subject: Re: Call for GSoC and Outreachy project ideas for summer 2023
-To:     Eugenio Perez Martin <eperezma@redhat.com>
-Cc:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
-        Rust-VMM Mailing List <rust-vmm@lists.opendev.org>,
-        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
-        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
-        Thomas Huth <thuth@redhat.com>, John Snow <jsnow@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Florescu, Andreea" <fandree@amazon.com>,
-        Damien <damien.lemoal@opensource.wdc.com>,
-        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
-        Hanna Reitz <hreitz@redhat.com>,
-        Alberto Faria <afaria@redhat.com>,
-        Daniel Henrique Barboza <danielhb413@gmail.com>,
-        =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
-        Bernhard Beschow <shentey@gmail.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, gmaglione@redhat.com,
-        Jason Wang <jasowang@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH v4 1/2] vfio: fix deadlock between group lock and kvm lock
+Content-Language: en-US
+To:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        alex.williamson@redhat.com, pbonzini@redhat.com,
+        yi.l.liu@intel.com, jgg@nvidia.com
+Cc:     cohuck@redhat.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
+        borntraeger@linux.ibm.com, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com, david@redhat.com, jjherne@linux.ibm.com,
+        pasic@linux.ibm.com, zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
+        seanjc@google.com, kevin.tian@intel.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-kernel@vger.kernel.org
+References: <20230203215027.151988-1-mjrosato@linux.ibm.com>
+ <20230203215027.151988-2-mjrosato@linux.ibm.com>
+From:   Anthony Krowiak <akrowiak@linux.ibm.com>
+In-Reply-To: <20230203215027.151988-2-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: ovFxLcZ9j84kNjr3bREE05JEc3DIUxfB
+X-Proofpoint-GUID: iFuVjfRUGoERPpPhtA3RZ3j8FOmGGoHu
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-02-06_07,2023-02-06_03,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 impostorscore=0
+ mlxlogscore=999 lowpriorityscore=0 adultscore=0 malwarescore=0
+ suspectscore=0 mlxscore=0 priorityscore=1501 clxscore=1015 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302060121
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 6 Feb 2023 at 06:53, Eugenio Perez Martin <eperezma@redhat.com> wrote:
->
-> On Sun, Feb 5, 2023 at 2:57 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> >
-> > On Sun, 5 Feb 2023 at 03:15, Eugenio Perez Martin <eperezma@redhat.com> wrote:
-> > >
-> > > On Fri, Jan 27, 2023 at 4:18 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> > > >
-> > > > Dear QEMU, KVM, and rust-vmm communities,
-> > > > QEMU will apply for Google Summer of Code 2023
-> > > > (https://summerofcode.withgoogle.com/) and has been accepted into
-> > > > Outreachy May 2023 (https://www.outreachy.org/). You can now
-> > > > submit internship project ideas for QEMU, KVM, and rust-vmm!
-> > > >
-> > > > Please reply to this email by February 6th with your project ideas.
-> > > >
-> > > > If you have experience contributing to QEMU, KVM, or rust-vmm you can
-> > > > be a mentor. Mentors support interns as they work on their project. It's a
-> > > > great way to give back and you get to work with people who are just
-> > > > starting out in open source.
-> > > >
-> > > > Good project ideas are suitable for remote work by a competent
-> > > > programmer who is not yet familiar with the codebase. In
-> > > > addition, they are:
-> > > > - Well-defined - the scope is clear
-> > > > - Self-contained - there are few dependencies
-> > > > - Uncontroversial - they are acceptable to the community
-> > > > - Incremental - they produce deliverables along the way
-> > > >
-> > > > Feel free to post ideas even if you are unable to mentor the project.
-> > > > It doesn't hurt to share the idea!
-> > > >
-> > > > I will review project ideas and keep you up-to-date on QEMU's
-> > > > acceptance into GSoC.
-> > > >
-> > > > Internship program details:
-> > > > - Paid, remote work open source internships
-> > > > - GSoC projects are 175 or 350 hours, Outreachy projects are 30
-> > > > hrs/week for 12 weeks
-> > > > - Mentored by volunteers from QEMU, KVM, and rust-vmm
-> > > > - Mentors typically spend at least 5 hours per week during the coding period
-> > > >
-> > > > For more background on QEMU internships, check out this video:
-> > > > https://www.youtube.com/watch?v=xNVCX7YMUL8
-> > > >
-> > > > Please let me know if you have any questions!
-> > > >
-> > > > Stefan
-> > > >
-> > >
-> > > Appending the different ideas here.
-> >
-> > Hi Eugenio,
-> > Thanks for sharing your project ideas. I have added some questions
-> > below before we add them to the ideas list wiki page.
+Tested-by: Tony Krowiak <akrowiak@linux.ibm.com>
 
-Thanks for the discussion. Do you want to focus on 1 or 2 project
-ideas? 3 might be a bit much to mentor.
-
-Please send an updated version of the project descriptions and I'll
-post it on the wiki.
-
-> >
-> > > VIRTIO_F_IN_ORDER feature support for virtio devices
-> > > ===
-> > > This was already a project the last year, and it produced a few series
-> > > upstream but was never merged. The previous series are totally useful
-> > > to start with, so it's not starting from scratch with them [1]:
-> >
-> > Has Zhi Guo stopped working on the patches?
-> >
+On 2/3/23 4:50 PM, Matthew Rosato wrote:
+> After 51cdc8bc120e, we have another deadlock scenario between the
+> kvm->lock and the vfio group_lock with two different codepaths acquiring
+> the locks in different order.  Specifically in vfio_open_device, vfio
+> holds the vfio group_lock when issuing device->ops->open_device but some
+> drivers (like vfio-ap) need to acquire kvm->lock during their open_device
+> routine;  Meanwhile, kvm_vfio_release will acquire the kvm->lock first
+> before calling vfio_file_set_kvm which will acquire the vfio group_lock.
 >
-> I can ask him for sure.
+> To resolve this, let's remove the need for the vfio group_lock from the
+> kvm_vfio_release codepath.  This is done by introducing a new spinlock to
+> protect modifications to the vfio group kvm pointer, and acquiring a kvm
+> ref from within vfio while holding this spinlock, with the reference held
+> until the last close for the device in question.
 >
-> > What is the state of the existing patches? What work remains to be done?
-> >
+> Fixes: 51cdc8bc120e ("kvm/vfio: Fix potential deadlock on vfio group_lock")
+> Reported-by: Anthony Krowiak <akrowiak@linux.ibm.com>
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> ---
+>   drivers/vfio/group.c     | 44 +++++++++++++++++++++++-----
+>   drivers/vfio/vfio.h      | 15 ++++++++++
+>   drivers/vfio/vfio_main.c | 63 +++++++++++++++++++++++++++++++++++-----
+>   include/linux/vfio.h     |  2 +-
+>   4 files changed, 109 insertions(+), 15 deletions(-)
 >
-> There are some pending comments from upstream. However if somebody
-> starts it from scratch it needs time to review some of the VirtIO
-> standard to understand the virtio in_order feature, both in split and
-> packed vq.
-
-The intern will need to take ownership and deal with code review
-feedback for code they didn't write. That can be difficult for someone
-who is new unless the requested changes are easy to address.
-
-It's okay to start from scratch. You're in a better position than an
-applicant to decide whether that's the best approach.
-
->
->
-> > >
-> > > Summary
-> > > ---
-> > > Implement VIRTIO_F_IN_ORDER in QEMU and Linux (vhost and virtio drivers)
-> > >
-> > > The VIRTIO specification defines a feature bit (VIRTIO_F_IN_ORDER)
-> > > that devices and drivers can negotiate when the device uses
-> > > descriptors in the same order in which they were made available by the
-> > > driver.
-> > >
-> > > This feature can simplify device and driver implementations and
-> > > increase performance. For example, when VIRTIO_F_IN_ORDER is
-> > > negotiated, it may be easier to create a batch of buffers and reduce
-> > > DMA transactions when the device uses a batch of buffers.
-> > >
-> > > Currently the devices and drivers available in Linux and QEMU do not
-> > > support this feature. An implementation is available in DPDK for the
-> > > virtio-net driver.
-> > >
-> > > Goals
-> > > ---
-> > > Implement VIRTIO_F_IN_ORDER for a single device/driver in QEMU and
-> > > Linux (virtio-net or virtio-serial are good starting points).
-> > > Generalize your approach to the common virtio core code for split and
-> > > packed virtqueue layouts.
-> > > If time allows, support for the packed virtqueue layout can be added
-> > > to Linux vhost, QEMU's libvhost-user, and/or QEMU's virtio qtest code.
-> > >
-> > > Shadow Virtqueue missing virtio features
-> > > ===
-> > >
-> > > Summary
-> > > ---
-> > > Some VirtIO devices like virtio-net have a control virtqueue (CVQ)
-> > > that allows them to dynamically change a number of parameters like MAC
-> > > or number of active queues. Changes to passthrough devices using vDPA
-> > > using CVQ are inherently hard to track if CVQ is handled as
-> > > passthrough data queues, because qemu is not aware of that
-> > > communication for performance reasons. In this situation, qemu is not
-> > > able to migrate these devices, as it is not able to tell the actual
-> > > state of the device.
-> > >
-> > > Shadow Virtqueue (SVQ) allows qemu to offer an emulated queue to the
-> > > device, effectively forwarding the descriptors of that communication,
-> > > tracking the device internal state, and being able to migrate it to a
-> > > new destination qemu.
-> > >
-> > > To restore that state in the destination, SVQ is able to send these
-> > > messages as regular CVQ commands. The code to understand and parse
-> > > virtio-net CVQ commands is already in qemu as part of its emulated
-> > > device, but the code to send the some of the new state is not, and
-> > > some features are missing. There is already code to restore basic
-> > > commands like mac or multiqueue, and it is easy to use it as a
-> > > template.
-> > >
-> > > Goals
-> > > ---
-> > > To implement missing virtio-net commands sending:
-> > > * VIRTIO_NET_CTRL_RX family, to control receive mode.
-> > > * VIRTIO_NET_CTRL_GUEST_OFFLOADS
-> > > * VIRTIO_NET_CTRL_VLAN family
-> > > * VIRTIO_NET_CTRL_MQ_HASH config
-> > > * VIRTIO_NET_CTRL_MQ_RSS config
-> >
-> > Is there enough work here for a 350 hour or 175 hour GSoC project?
-> >
->
-> I think 175 hour should fit better. If needed more features can be
-> added (packed vq, ring reset, etc), but to start contributing a 175
-> hour should work.
->
-> > The project description mentions "there is already code to restore
-> > basic commands like mac and multiqueue", please include a link.
-> >
->
-> MAC address was merged with ASID support so the whole series is more
-> complicated than it should be. Here is it the most relevant patch:
-> * https://lists.gnu.org/archive/html/qemu-devel/2022-09/msg00342.html
->
-> MQ is way cleaner in that regard, and future series should look more
-> similar to this one:
-> * https://www.mail-archive.com/qemu-devel@nongnu.org/msg906273.html
->
-> > > Shadow Virtqueue performance optimization
-> > > ===
-> > > Summary
-> > > ---
-> > > To perform a virtual machine live migration with an external device to
-> > > qemu, qemu needs a way to know which memory the device modifies so it
-> > > is able to resend it. Otherwise the guest would resume with invalid /
-> > > outdated memory in the destination.
-> > >
-> > > This is especially hard with passthrough hardware devices, as
-> > > transports like PCI imposes a few security and performance challenges.
-> > > As a method to overcome this for virtio devices, qemu can offer an
-> > > emulated virtqueue to the device, called Shadow Virtqueue (SVQ),
-> > > instead of allowing the device to communicate directly with the guest.
-> > > SVQ will then forward the writes to the guest, being the effective
-> > > writer in the guest memory and knowing when a portion of it needs to
-> > > be resent.
-> > >
-> > > As this is effectively breaking the passthrough and it adds extra
-> > > steps in the communication, this comes with a performance penalty in
-> > > some forms: Context switches, more memory reads and writes increasing
-> > > cache pressure, etc.
-> > >
-> > > At this moment the SVQ code is not optimized. It cannot forward
-> > > buffers in parallel using multiqueue and multithread, and it does not
-> > > use posted interrupts to notify the device skipping the host kernel
-> > > context switch (doorbells).
-> > >
-> > > The SVQ code requires minimal modifications for the multithreading,
-> > > and these are examples of multithreaded devices already like
-> > > virtio-blk which can be used as a template-alike. Regarding the posted
-> > > interrupts, DPDK is able to use them so that code can also be used as
-> > > a template.
-> > >
-> > > Goals
-> > > ---
-> > > * Measure the latest SVQ performance compared to non-SVQ.
-> >
-> > Which benchmark workload and which benchmarking tool do you recommend?
-> > Someone unfamiliar with QEMU and SVQ needs more details in order to
-> > know what to do.
-> >
->
-> In my opinion netperf (TCP_STREAM & TCP_RR) or iperf equivalent +
-> testpmd in AF_PACKET mode should test these scenarios better. But
-> maybe upstream requests additional testings. Feedback on this would be
-> appreciated actually.
->
-> My intention is not for the intern to develop new tests or anything
-> like that, they are just a means to justify the changes in SVQ. This
-> part would be very guided, or it can be offloaded from the project. So
-> if these tools are not enough descriptive maybe it's better to take
-> this out of the goals and add it to the description like that.
-
-Great, "netperf (TCP_STREAM & TCP_RR) or iperf equivalent + testpmd in
-AF_PACKET mode" is enough information.
-
->
-> > > * Add multithreading to SVQ, extracting the code from the Big QEMU Lock (BQL).
-> >
-> > What do you have in mind? Allowing individual virtqueues to be
-> > assigned to IOThreads? Or processing all virtqueues in a single
-> > IOThread (like virtio-blk and virtio-scsi do today)?
-> >
->
-> My idea was to use iothreads. I thought virtio-blk and virtio-scsi
-> were done that way actually, is there a reason / advantage to use just
-> a single iothread?
-
-The reason for only supporting a single IOThread at the moment is
-thread-safety. There is multi-queue work in progress that will remove
-this limitation in the future.
-
-I sent a patch series proposing a command-line syntax for multi-queue here:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg933001.html
-
-The idea is that the same syntax can be used by other devices that
-support mapping vqs to multiple IOThreads.
-
->
-> > > * Add posted thread capabilities to QEMU, following the model of DPDK to it.
-> >
-> > What is this about? I thought KVM uses posted interrupts when
-> > available, so what needs to be done here? Please also include a link
-> > to the relevant DPDK code.
-> >
->
-> The guest in KVM may use posted interrupts but SVQ code runs in
-> userland qemu :). There were no previous uses of HW posted interrupts
-> as far as I know so SVQ is only able to use vhost-vdpa kick eventfds
-> to notify queues. This has a performance penalty in the form of host
-> kernel context switches.
->
-> If I'm not wrong this patch adds it to DPDK, but I may be missing
-> additional context or versions:
-> * https://lore.kernel.org/all/1579539790-3882-31-git-send-email-matan@mellanox.com/
->
-> Please let me know if you need further information. Thanks!
-
-This patch does not appear related to posted interrupts because it's
-using the kickfd (available buffer notification) instead of the callfd
-(used buffer notification). It's the glue that forwards a virtqueue
-kick to hardware.
-
-I don't think that userspace available buffer notification
-interception can be bypassed in the SVQ model. SVQ needs to take a
-copy of available buffers so it knows the scatter-gather lists before
-forwarding the kick to the vDPA device. If the notification is
-bypassed then SVQ cannot reliably capture the scatter-gather list.
-
-I also don't think it's possible to bypass userspace in the used
-buffer notification path. The vDPA used buffer notification must be
-intercepted so SVQ can mark memory pages in the scatter-gather list
-dirty before it fills in a guest used buffer and sends a guest used
-buffer notification.
-
-The guest used buffer notification should already be a VT-d Posted
-Interrupt on hardware that supports the feature. KVM takes care of
-that.
-
-I probably don't understand what the optimization idea is. You want
-SVQ to avoid a system call when sending vDPA available buffer
-notifications? That's not related to posted interrupts though, so I'm
-confused...
-
-Stefan
+> diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
+> index bb24b2f0271e..98621ac082f0 100644
+> --- a/drivers/vfio/group.c
+> +++ b/drivers/vfio/group.c
+> @@ -154,6 +154,18 @@ static int vfio_group_ioctl_set_container(struct vfio_group *group,
+>   	return ret;
+>   }
+>   
+> +static void vfio_device_group_get_kvm_safe(struct vfio_device *device)
+> +{
+> +	spin_lock(&device->group->kvm_ref_lock);
+> +	if (!device->group->kvm)
+> +		goto unlock;
+> +
+> +	_vfio_device_get_kvm_safe(device, device->group->kvm);
+> +
+> +unlock:
+> +	spin_unlock(&device->group->kvm_ref_lock);
+> +}
+> +
+>   static int vfio_device_group_open(struct vfio_device *device)
+>   {
+>   	int ret;
+> @@ -164,13 +176,23 @@ static int vfio_device_group_open(struct vfio_device *device)
+>   		goto out_unlock;
+>   	}
+>   
+> +	mutex_lock(&device->dev_set->lock);
+> +
+>   	/*
+> -	 * Here we pass the KVM pointer with the group under the lock.  If the
+> -	 * device driver will use it, it must obtain a reference and release it
+> -	 * during close_device.
+> +	 * Before the first device open, get the KVM pointer currently
+> +	 * associated with the group (if there is one) and obtain a reference
+> +	 * now that will be held until the open_count reaches 0 again.  Save
+> +	 * the pointer in the device for use by drivers.
+>   	 */
+> -	ret = vfio_device_open(device, device->group->iommufd,
+> -			       device->group->kvm);
+> +	if (device->open_count == 0)
+> +		vfio_device_group_get_kvm_safe(device);
+> +
+> +	ret = vfio_device_open(device, device->group->iommufd, device->kvm);
+> +
+> +	if (device->open_count == 0)
+> +		vfio_device_put_kvm(device);
+> +
+> +	mutex_unlock(&device->dev_set->lock);
+>   
+>   out_unlock:
+>   	mutex_unlock(&device->group->group_lock);
+> @@ -180,7 +202,14 @@ static int vfio_device_group_open(struct vfio_device *device)
+>   void vfio_device_group_close(struct vfio_device *device)
+>   {
+>   	mutex_lock(&device->group->group_lock);
+> +	mutex_lock(&device->dev_set->lock);
+> +
+>   	vfio_device_close(device, device->group->iommufd);
+> +
+> +	if (device->open_count == 0)
+> +		vfio_device_put_kvm(device);
+> +
+> +	mutex_unlock(&device->dev_set->lock);
+>   	mutex_unlock(&device->group->group_lock);
+>   }
+>   
+> @@ -450,6 +479,7 @@ static struct vfio_group *vfio_group_alloc(struct iommu_group *iommu_group,
+>   
+>   	refcount_set(&group->drivers, 1);
+>   	mutex_init(&group->group_lock);
+> +	spin_lock_init(&group->kvm_ref_lock);
+>   	INIT_LIST_HEAD(&group->device_list);
+>   	mutex_init(&group->device_lock);
+>   	group->iommu_group = iommu_group;
+> @@ -803,9 +833,9 @@ void vfio_file_set_kvm(struct file *file, struct kvm *kvm)
+>   	if (!vfio_file_is_group(file))
+>   		return;
+>   
+> -	mutex_lock(&group->group_lock);
+> +	spin_lock(&group->kvm_ref_lock);
+>   	group->kvm = kvm;
+> -	mutex_unlock(&group->group_lock);
+> +	spin_unlock(&group->kvm_ref_lock);
+>   }
+>   EXPORT_SYMBOL_GPL(vfio_file_set_kvm);
+>   
+> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+> index f8219a438bfb..24d6cd285945 100644
+> --- a/drivers/vfio/vfio.h
+> +++ b/drivers/vfio/vfio.h
+> @@ -74,6 +74,7 @@ struct vfio_group {
+>   	struct file			*opened_file;
+>   	struct blocking_notifier_head	notifier;
+>   	struct iommufd_ctx		*iommufd;
+> +	spinlock_t			kvm_ref_lock;
+>   };
+>   
+>   int vfio_device_set_group(struct vfio_device *device,
+> @@ -251,4 +252,18 @@ extern bool vfio_noiommu __read_mostly;
+>   enum { vfio_noiommu = false };
+>   #endif
+>   
+> +#ifdef CONFIG_HAVE_KVM
+> +void _vfio_device_get_kvm_safe(struct vfio_device *device, struct kvm *kvm);
+> +void vfio_device_put_kvm(struct vfio_device *device);
+> +#else
+> +static inline void _vfio_device_get_kvm_safe(struct vfio_device *device,
+> +					     struct kvm *kvm)
+> +{
+> +}
+> +
+> +static inline void vfio_device_put_kvm(struct vfio_device *device)
+> +{
+> +}
+> +#endif
+> +
+>   #endif
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index 5177bb061b17..28c47cd6a6b5 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -16,6 +16,9 @@
+>   #include <linux/fs.h>
+>   #include <linux/idr.h>
+>   #include <linux/iommu.h>
+> +#ifdef CONFIG_HAVE_KVM
+> +#include <linux/kvm_host.h>
+> +#endif
+>   #include <linux/list.h>
+>   #include <linux/miscdevice.h>
+>   #include <linux/module.h>
+> @@ -338,6 +341,55 @@ void vfio_unregister_group_dev(struct vfio_device *device)
+>   }
+>   EXPORT_SYMBOL_GPL(vfio_unregister_group_dev);
+>   
+> +#ifdef CONFIG_HAVE_KVM
+> +void _vfio_device_get_kvm_safe(struct vfio_device *device, struct kvm *kvm)
+> +{
+> +	void (*pfn)(struct kvm *kvm);
+> +	bool (*fn)(struct kvm *kvm);
+> +	bool ret;
+> +
+> +	lockdep_assert_held(&device->dev_set->lock);
+> +
+> +	pfn = symbol_get(kvm_put_kvm);
+> +	if (WARN_ON(!pfn))
+> +		return;
+> +
+> +	fn = symbol_get(kvm_get_kvm_safe);
+> +	if (WARN_ON(!fn)) {
+> +		symbol_put(kvm_put_kvm);
+> +		return;
+> +	}
+> +
+> +	ret = fn(kvm);
+> +	symbol_put(kvm_get_kvm_safe);
+> +	if (!ret) {
+> +		symbol_put(kvm_put_kvm);
+> +		return;
+> +	}
+> +
+> +	device->put_kvm = pfn;
+> +	device->kvm = kvm;
+> +}
+> +
+> +void vfio_device_put_kvm(struct vfio_device *device)
+> +{
+> +	lockdep_assert_held(&device->dev_set->lock);
+> +
+> +	if (!device->kvm)
+> +		return;
+> +
+> +	if (WARN_ON(!device->put_kvm))
+> +		goto clear;
+> +
+> +	device->put_kvm(device->kvm);
+> +	device->put_kvm = NULL;
+> +	symbol_put(kvm_put_kvm);
+> +
+> +clear:
+> +	device->kvm = NULL;
+> +}
+> +#endif
+> +
+>   /* true if the vfio_device has open_device() called but not close_device() */
+>   static bool vfio_assert_device_open(struct vfio_device *device)
+>   {
+> @@ -361,7 +413,6 @@ static int vfio_device_first_open(struct vfio_device *device,
+>   	if (ret)
+>   		goto err_module_put;
+>   
+> -	device->kvm = kvm;
+>   	if (device->ops->open_device) {
+>   		ret = device->ops->open_device(device);
+>   		if (ret)
+> @@ -370,7 +421,6 @@ static int vfio_device_first_open(struct vfio_device *device,
+>   	return 0;
+>   
+>   err_unuse_iommu:
+> -	device->kvm = NULL;
+>   	if (iommufd)
+>   		vfio_iommufd_unbind(device);
+>   	else
+> @@ -387,7 +437,6 @@ static void vfio_device_last_close(struct vfio_device *device,
+>   
+>   	if (device->ops->close_device)
+>   		device->ops->close_device(device);
+> -	device->kvm = NULL;
+>   	if (iommufd)
+>   		vfio_iommufd_unbind(device);
+>   	else
+> @@ -400,14 +449,14 @@ int vfio_device_open(struct vfio_device *device,
+>   {
+>   	int ret = 0;
+>   
+> -	mutex_lock(&device->dev_set->lock);
+> +	lockdep_assert_held(&device->dev_set->lock);
+> +
+>   	device->open_count++;
+>   	if (device->open_count == 1) {
+>   		ret = vfio_device_first_open(device, iommufd, kvm);
+>   		if (ret)
+>   			device->open_count--;
+>   	}
+> -	mutex_unlock(&device->dev_set->lock);
+>   
+>   	return ret;
+>   }
+> @@ -415,12 +464,12 @@ int vfio_device_open(struct vfio_device *device,
+>   void vfio_device_close(struct vfio_device *device,
+>   		       struct iommufd_ctx *iommufd)
+>   {
+> -	mutex_lock(&device->dev_set->lock);
+> +	lockdep_assert_held(&device->dev_set->lock);
+> +
+>   	vfio_assert_device_open(device);
+>   	if (device->open_count == 1)
+>   		vfio_device_last_close(device, iommufd);
+>   	device->open_count--;
+> -	mutex_unlock(&device->dev_set->lock);
+>   }
+>   
+>   /*
+> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> index 35be78e9ae57..87ff862ff555 100644
+> --- a/include/linux/vfio.h
+> +++ b/include/linux/vfio.h
+> @@ -46,7 +46,6 @@ struct vfio_device {
+>   	struct vfio_device_set *dev_set;
+>   	struct list_head dev_set_list;
+>   	unsigned int migration_flags;
+> -	/* Driver must reference the kvm during open_device or never touch it */
+>   	struct kvm *kvm;
+>   
+>   	/* Members below here are private, not for driver use */
+> @@ -58,6 +57,7 @@ struct vfio_device {
+>   	struct list_head group_next;
+>   	struct list_head iommu_entry;
+>   	struct iommufd_access *iommufd_access;
+> +	void (*put_kvm)(struct kvm *kvm);
+>   #if IS_ENABLED(CONFIG_IOMMUFD)
+>   	struct iommufd_device *iommufd_device;
+>   	struct iommufd_ctx *iommufd_ictx;
