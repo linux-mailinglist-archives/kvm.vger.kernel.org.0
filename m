@@ -2,82 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BCD568C44D
-	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 18:12:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 80B1768C46E
+	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 18:19:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229791AbjBFRM3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Feb 2023 12:12:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46880 "EHLO
+        id S230089AbjBFRTn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Feb 2023 12:19:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229607AbjBFRM1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Feb 2023 12:12:27 -0500
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [IPv6:2001:41d0:203:375::ab])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E935329E2F
-        for <kvm@vger.kernel.org>; Mon,  6 Feb 2023 09:12:21 -0800 (PST)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+        with ESMTP id S229722AbjBFRTl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Feb 2023 12:19:41 -0500
+Received: from out-87.mta0.migadu.com (out-87.mta0.migadu.com [IPv6:2001:41d0:1004:224b::57])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E8041E1D0
+        for <kvm@vger.kernel.org>; Mon,  6 Feb 2023 09:19:40 -0800 (PST)
+Date:   Mon, 6 Feb 2023 17:19:25 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1675703540;
+        t=1675703978;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=FWcuvINuM57fIe+Z/vXE3oEWwftnU+xQaHXoen2h5uM=;
-        b=f8i2dPWQXobhJUsTkhsWTfunjjbYnRdRZjBT+kOv3oCuHHUcduQH6TrGjt+tPHWuhEsVWw
-        R+w923wyVFy57byaVYtyD845RFZp/Qcsu33iNrdaEb++FkAMCc2PEy7ITmgEbylHNWOp++
-        M1ObWIWXZgoisFVUIkJ9EFih5nAxo5g=
+        bh=HQYDCy4xAq7++DqBp2PrFrzWfoeLMTv7/t3BwVc+5/M=;
+        b=J9ErNIUpPqZIZXdMg30fbXll1h9T0Tvc0m6YwSEjZKdUoEOooQgqWauEEwTKgz5T3W0FTk
+        rki4AZWQsgRfhqb68OZxWvRzYjB94NkQRpb2vk7/ewhW1i4abF/GN+8YazanH4qC5F0Wee
+        Dwv1drNtXNr6gUzp6+ranIztAkcY0no=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From:   Oliver Upton <oliver.upton@linux.dev>
-To:     shahuang@redhat.com, kvm@vger.kernel.org
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 KVM/arm64" 
-        <kvmarm@lists.cs.columbia.edu>,
-        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 KVM/arm64" 
-        <linux-arm-kernel@lists.infradead.org>,
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     James Morse <james.morse@arm.com>, linux-pm@vger.kernel.org,
+        loongarch@lists.linux.dev, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-acpi@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-ia64@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Lorenzo Pieralisi <lpieralisi@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Borislav Petkov <bp@alien8.de>, H Peter Anvin <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        David Matlack <dmatlack@google.com>,
-        Shuah Khan <shuah@kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "open list:KERNEL VIRTUAL MACHINE FOR ARM64 KVM/arm64" 
-        <kvmarm@lists.linux.dev>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH] KVM: selftests: Remove redundant setbuf()
-Date:   Mon,  6 Feb 2023 17:12:08 +0000
-Message-Id: <167570350685.3822534.3390093864852926212.b4-ty@linux.dev>
-In-Reply-To: <20230203061038.277655-1-shahuang@redhat.com>
-References: <20230203061038.277655-1-shahuang@redhat.com>
+        Len Brown <lenb@kernel.org>,
+        Rafael Wysocki <rafael@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Salil Mehta <salil.mehta@huawei.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>
+Subject: Re: [RFC PATCH 29/32] KVM: arm64: Pass hypercalls to userspace
+Message-ID: <Y+E2nVnadj1emNs5@google.com>
+References: <20230203135043.409192-1-james.morse@arm.com>
+ <20230203135043.409192-30-james.morse@arm.com>
+ <865ycg1kv2.wl-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <865ycg1kv2.wl-maz@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 3 Feb 2023 14:10:36 +0800, shahuang@redhat.com wrote:
-> From: Shaoqin Huang <shahuang@redhat.com>
+On Sun, Feb 05, 2023 at 10:12:49AM +0000, Marc Zyngier wrote:
+> On Fri, 03 Feb 2023 13:50:40 +0000,
+> James Morse <james.morse@arm.com> wrote:
+> > 
+> > From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> > 
+> > When capability KVM_CAP_ARM_HVC_TO_USER is available, userspace can
+> > request to handle all hypercalls that aren't handled by KVM. With the
+> > help of another capability, this will allow userspace to handle PSCI
+> > calls.
+> > 
+> > Suggested-by: James Morse <james.morse@arm.com>
+> > Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> > Signed-off-by: James Morse <james.morse@arm.com>
+> > 
+> > ---
+> > 
 > 
-> Since setbuf(stdout, NULL) has been called in kvm_util.c with
-> __attribute((constructor)). Selftests no need to setup it in their own
-> code.
+> On top of Oliver's ask not to make this a blanket "steal everything",
+> but instead to have an actual request for ranges of forwarded
+> hypercalls:
 > 
+> > Notes on this implementation:
+> > 
+> > * A similar mechanism was proposed for SDEI some time ago [1]. This RFC
+> >   generalizes the idea to all hypercalls, since that was suggested on
+> >   the list [2, 3].
+> > 
+> > * We're reusing kvm_run.hypercall. I copied x0-x5 into
+> >   kvm_run.hypercall.args[] to help userspace but I'm tempted to remove
+> >   this, because:
+> >   - Most user handlers will need to write results back into the
+> >     registers (x0-x3 for SMCCC), so if we keep this shortcut we should
+> >     go all the way and read them back on return to kernel.
+> >   - QEMU doesn't care about this shortcut, it pulls all vcpu regs before
+> >     handling the call.
+> >   - SMCCC uses x0-x16 for parameters.
+> >   x0 does contain the SMCCC function ID and may be useful for fast
+> >   dispatch, we could keep that plus the immediate number.
+> > 
+> > * Add a flag in the kvm_run.hypercall telling whether this is HVC or
+> >   SMC?  Can be added later in those bottom longmode and pad fields.
 > 
-> [...]
+> We definitely need this. A nested hypervisor can (and does) use SMCs
+> as the conduit. The question is whether they represent two distinct
+> namespaces or not. I *think* we can unify them, but someone should
+> check and maybe get clarification from the owners of the SMCCC spec.
+> 
+> >
+> > * On top of this we could share with userspace which HVC ranges are
+> >   available and which ones are handled by KVM. That can actually be added
+> >   independently, through a vCPU/VM device attribute which doesn't consume
+> >   a new ioctl:
+> >   - userspace issues HAS_ATTR ioctl on the vcpu fd to query whether this
+> >     feature is available.
+> >   - userspace queries the number N of HVC ranges using one GET_ATTR.
+> >   - userspace passes an array of N ranges using another GET_ATTR. The
+> >     array is filled and returned by KVM.
+> 
+> As mentioned above, I think this interface should go both ways.
+> Userspace should request the forwarding of a certain range of
+> hypercalls via a similar SET_ATTR interface.
+> 
+> Another question is how we migrate VMs that have these forwarding
+> requirements. Do we expect the VMM to replay the forwarding as part of
+> the setting up on the other side? Or do we save/restore this via a
+> firmware pseudo-register?
 
-Applied to kvmarm/next, thanks!
+Personally I'd prefer we left that job to userspace.
 
-[1/1] KVM: selftests: Remove redundant setbuf()
-      https://git.kernel.org/kvmarm/kvmarm/c/6043829fdb71
+We could also implement GET_ATTR, in case userspace has forgotten what
+it wrote to the hypercall filter. The firmware pseudo-registers are
+handy for moving KVM state back and forth 'for free', but I don't think
+we need to bend over backwards to migrate state userspace is directly
+responsible for.
 
---
-Best,
+-- 
+Thanks,
 Oliver
