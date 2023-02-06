@@ -2,142 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 457DF68C54C
-	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 18:58:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CCFDF68C55F
+	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 19:07:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230102AbjBFR65 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Feb 2023 12:58:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55964 "EHLO
+        id S230301AbjBFSHp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Feb 2023 13:07:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229571AbjBFR6z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Feb 2023 12:58:55 -0500
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2072.outbound.protection.outlook.com [40.107.243.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AF922CC7B;
-        Mon,  6 Feb 2023 09:58:54 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=J/JLWCbVOkmtNAHkE5R/pfYAkfF7suYzp8mHafT7VuMI8hgPDBlq2miQBOLY/w59opCLUOV43J7nsWAxqqtqBxr3aur9vpZEjAxbJvrYEqPJDaTAiGTpSNUJALmIXOGZf8mGUR9UIq5z9HKoNlDYo7XgnH7lClvJHpUsOsXhKx+zmj/dkOKyIjIKJ1qQBF8D30rZ0FAS4ZEMxe94mP/cTry9+WDaTJwknefUXkGyAkqcNn45MEGBbGG4o1O5gFddJBEGU5Uf8sOyRMUA9AT4PNJ6pS+K3/11pFbdB8VIfh4xTRERllph5VygvTLP4hkwJ6FvGB/gi+jPk2/hpeB5ew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vhAG3Jatz+EPDmLz8EffQ3IXKaTdg0bdHE1t33/2lko=;
- b=P4ue3xNV33ZmkLhWtb/bVonnMnksN/xL//MdMtE0hOkJOCUFCntoSvMqnBQrhFtS8OsbTFHQbEaQp/Dh9Cm3BO9Dj7EakEn+RR2c4+yeVrGu05Byg2WYCxwLF7PxUtcOqPlka6fVwZ4Ew73GYBU25oI0c7TbFXZbha2FWZS4LlvRAw8ncuNrjgX4cq+srAihW9KvKSg42ycRMntm6MkGdz3fFBJ4zCUJPjPl4vCj8mWk4hFvtmVgk6NPCtApP9K8W5vkZ43+/PLwYOY3cL62qH+f2CCuxobtLt2fsgV2ggeRBDqxVVn2mi61RuYoz7YHNBhI4Z+1M5MiB/8U9Ii77w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=infradead.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vhAG3Jatz+EPDmLz8EffQ3IXKaTdg0bdHE1t33/2lko=;
- b=pGoVOOs1HsOtDfSn7o92LuCwojMeHqhLziBk1D9bsng7PS2022HMNISyZ/StVZnNETrr+gm/7qQYlfTwsVlcPem5ZfovazRwVNiTqqk7N/pRVjHLi5VNbBqWs++Em2NjgegU0r5AC/6dVPrnfS5GmtOK29Oicg7K1CEJjrDYWkk=
-Received: from MW3PR05CA0004.namprd05.prod.outlook.com (2603:10b6:303:2b::9)
- by SJ1PR12MB6098.namprd12.prod.outlook.com (2603:10b6:a03:45f::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6064.35; Mon, 6 Feb
- 2023 17:58:50 +0000
-Received: from CO1NAM11FT112.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:2b:cafe::6a) by MW3PR05CA0004.outlook.office365.com
- (2603:10b6:303:2b::9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.15 via Frontend
- Transport; Mon, 6 Feb 2023 17:58:50 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1NAM11FT112.mail.protection.outlook.com (10.13.174.213) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6064.35 via Frontend Transport; Mon, 6 Feb 2023 17:58:49 +0000
-Received: from [10.236.30.70] (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 6 Feb
- 2023 11:58:47 -0600
-Message-ID: <7abdd9d4-4ce0-458d-93f4-bff575f04345@amd.com>
-Date:   Mon, 6 Feb 2023 11:58:47 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-To:     David Woodhouse <dwmw2@infradead.org>,
-        Usama Arif <usama.arif@bytedance.com>, <tglx@linutronix.de>,
-        <arjan@linux.intel.com>
-CC:     <mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
-        <hpa@zytor.com>, <x86@kernel.org>, <pbonzini@redhat.com>,
-        <paulmck@kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kvm@vger.kernel.org>, <rcu@vger.kernel.org>, <mimoja@mimoja.de>,
-        <hewenliang4@huawei.com>, <thomas.lendacky@amd.com>,
-        <seanjc@google.com>, <pmenzel@molgen.mpg.de>,
-        <fam.zheng@bytedance.com>, <punit.agrawal@bytedance.com>,
-        <simon.evans@bytedance.com>, <liangma@liangbit.com>,
+        with ESMTP id S229722AbjBFSHo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Feb 2023 13:07:44 -0500
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B466234F5
+        for <kvm@vger.kernel.org>; Mon,  6 Feb 2023 10:07:42 -0800 (PST)
+Received: by mail-pj1-x1036.google.com with SMTP id bx22so9496427pjb.3
+        for <kvm@vger.kernel.org>; Mon, 06 Feb 2023 10:07:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=qtgxlCHcEg9/GzAJkVDlK65BAtBBeUjha9tRmSPN4Fk=;
+        b=m0F2ArAPmzZy09CrcjGX7iTzr+uhlPBQ555MwCtERC8mt63i+Xhj7AiosNKzev2DN6
+         c55LVAwhrehy+4ivJEiS0u3Z4e8RtCVNwQ+hUWLBqGM4KLcFfyVkUefMzryCi/WOc6dk
+         mvZ9xkMCr1A19Qu+xTfKPOGtjb4qEmEgE7RuQceNAjCkuY7zZ6Gvm1vxsHW4bFS7fTtR
+         Q2jxmXu3X7kZPVjfEqW6Cn+uJRF9nPh/D0CEse+ZGKymRshTejV6rfl5J//NvCHQWjOY
+         K/T3LABwVp5Knbn/MtITU6ILke3Y54fIkWFBBvXLWkCOMhb56tMI77sCNqON4XcRKEVf
+         HnVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qtgxlCHcEg9/GzAJkVDlK65BAtBBeUjha9tRmSPN4Fk=;
+        b=Z6U3rkvikkgncO2RDCimiqdHU6xqvWwC4ddDdxUEJjl/zS51ZZ7/LlYDPX5pHKyV6g
+         wEhVhkO9KAJGWefln5B91XSuhWjWnmz+Yfz16RXNQOTw0tf6AbC3SAaYqtIC5N2pdsuU
+         NU83Vqe9Pw/1XbIWdbhB9Efg6LtZPrGDr5M+d40bI5dj+NvW+kpUkxgGu0VdQRyQQ20k
+         aASEednS2fuQ3b+u7d5zNwhyFGpLtyGfelzBMOTB9BsvKSaR00/y5MRYPsyfiD6JJUl/
+         yTuJ+tgjLwv9mEJ2Xf5/fBdBdoolab9A9AESBAQhgT39yOwHv57wrfsahMrKFrcaSUE2
+         gvZA==
+X-Gm-Message-State: AO0yUKXnYUxgChLVyn0FyJggjOLxkghIkK5OOhvCAVi9SJDaWUAaUrwt
+        PEskZkTFbYHic66FbQ0/S8040w==
+X-Google-Smtp-Source: AK7set+FNGN/RCOWlSdzdtzluoZ+K/foAvCsXIhYX06GiwX2da2SFNcUJTaK2kNEudSPg/pNZymBaA==
+X-Received: by 2002:a17:903:40ce:b0:189:6624:58c0 with SMTP id t14-20020a17090340ce00b00189662458c0mr39207pld.3.1675706861570;
+        Mon, 06 Feb 2023 10:07:41 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id o6-20020a637306000000b004d346876d37sm6458097pgc.45.2023.02.06.10.07.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Feb 2023 10:07:40 -0800 (PST)
+Date:   Mon, 6 Feb 2023 18:07:37 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Usama Arif <usama.arif@bytedance.com>
+Cc:     David Woodhouse <dwmw2@infradead.org>,
+        Arjan van de Ven <arjan@linux.intel.com>,
+        Kim Phillips <kim.phillips@amd.com>, tglx@linutronix.de,
+        rja@hpe.com, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
+        pbonzini@redhat.com, paulmck@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
+        thomas.lendacky@amd.com, pmenzel@molgen.mpg.de,
+        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
+        simon.evans@bytedance.com, liangma@liangbit.com,
         Mario Limonciello <Mario.Limonciello@amd.com>
+Subject: Re: [External] Re: [PATCH v6 07/11] x86/smpboot: Disable parallel
+ boot for AMD CPUs
+Message-ID: <Y+FB6f6MEBy2g3Ft@google.com>
 References: <20230202215625.3248306-1-usama.arif@bytedance.com>
  <20230202215625.3248306-8-usama.arif@bytedance.com>
  <b3d9fbbf-e760-5d1d-9182-44c144abd1bf@amd.com>
  <d3ec562fd2e03c3aef9534f64915a14a8cb89ae1.camel@infradead.org>
-Content-Language: en-US
-From:   Kim Phillips <kim.phillips@amd.com>
-Subject: Re: [PATCH v6 07/11] x86/smpboot: Disable parallel boot for AMD CPUs
-In-Reply-To: <d3ec562fd2e03c3aef9534f64915a14a8cb89ae1.camel@infradead.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+ <5ba476f3-e0ac-d630-ce1d-18ab9885496f@linux.intel.com>
+ <E2286684-F8AD-4708-9A3D-74C5EAE183B4@infradead.org>
+ <434b4b74-54ab-68a3-4a81-9cc02ea75e39@bytedance.com>
+ <411cbdb2c8255e48f3e65c59a98bc02410f5dfc7.camel@infradead.org>
+ <de7524ce-563c-2ff6-84a5-6a347c36855b@bytedance.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1NAM11FT112:EE_|SJ1PR12MB6098:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3f83e067-5764-4648-6ff7-08db086bcd0c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Tc5844DvxkRAS0SUf34e+zWJm4a4sG6bDKqI+HqC8hmmrpqTeoKrp/iF62BY9UE1mM4e4q1MknXi6jFnv0eKHR/zeQn7RUOAYuCa8JqflIGskMHvHZFOk9vKpZvzGgIYLONSLuzvVER7E85lzaqIP9eMjQZpiKw9O5tNlUNozn4D12CRheailGFPqHWA1s8d4epuObDCWXgec2KXy7AuQeB6/M2+R6SRkqS0B/IP3doGNb9btSvqvqDVpNZp3WIA7D3wNgVlVI7Wt6/hAc+Ge/fpwdJQXLRzKFYQ2AQtxKBiR+Sk8Ew29//1quzX8Pp2q/YH2Ze5OUKTN6bFD6t5qleIuIyfi9t79wGZkIS+EOsvc2gnHP+O0HDNh9je75zrF/D0/i6SvKH+iT3rWDKtM0yy1ugetliATOXfzhbCVFox7HQeqhcSUosV6jUYxXkAsdM+d1RC9psoz+kS01RhyT77MNptyyPEE2e72r3hYkgOqYyXTkIZsz25J22JySqE/HhEoLo4MGafbUPWd2yZVllYe0Z8S2d8EzuS51o876LL2YfIy+qcFcNDJ3Kta1zRcsKdtNpKxWlkSIF472nSGWPeLBYnVI/JTcyjKDdftb0aQXYxz4QjhTREy6IJ0NIRK017V42+t2KUB66Z4VUMFdz2+W4lUfD8LOLZoke+pDJ15ZnBytpsMOYA/MNeQ6lRi6P97wHSnb8SW2JVyEP7d12/dtpzgjJWzjrSy4IcQtfoUAcT62mcB0RLQTLEjkZbAl+4dWP7qVNHP7tDbN4InA==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(346002)(39860400002)(396003)(376002)(136003)(451199018)(46966006)(36840700001)(40470700004)(2906002)(31686004)(4744005)(8936002)(5660300002)(7416002)(36756003)(41300700001)(4326008)(86362001)(40460700003)(8676002)(70586007)(31696002)(40480700001)(70206006)(110136005)(54906003)(356005)(316002)(16576012)(44832011)(82740400003)(336012)(478600001)(81166007)(53546011)(36860700001)(16526019)(26005)(186003)(2616005)(426003)(82310400005)(47076005)(83380400001)(36900700001)(43740500002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Feb 2023 17:58:49.6005
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3f83e067-5764-4648-6ff7-08db086bcd0c
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT112.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6098
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <de7524ce-563c-2ff6-84a5-6a347c36855b@bytedance.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/4/23 9:40 AM, David Woodhouse wrote:
-> On Fri, 2023-02-03 at 13:48 -0600, Kim Phillips wrote:
->> If I:
->>
->>    - take dwmw2's parallel-6.2-rc6 branch (commit 459d1c46dbd1)
->>    - remove the set_cpu_bug(c, X86_BUG_NO_PARALLEL_BRINGUP) line from amd.c
->>
->> Then:
->>
->>    - a Ryzen 3000 (Picasso A1/Zen+) notebook I have access to fails to boot.
->>    - Zen 2,3,4-based servers boot fine
->>    - a Zen1-based server doesn't boot.
+On Mon, Feb 06, 2023, Usama Arif wrote:
 > 
-> I've changed it to use CPUID 0xb only if we're actually in x2apic mode,
-> which Boris tells me won't be the case on Zen1 because that doesn't
-> support X2APIC.
 > 
-> When we're not in x2apic mode, we can use CPUID 0x1 because the 8 bits
-> of APIC ID we find there are perfectly sufficient.
+> On 06/02/2023 08:05, David Woodhouse wrote:
+> > On Sun, 2023-02-05 at 22:13 +0000, Usama Arif wrote:
+> > > 
+> > > 
+> > > On 04/02/2023 22:31, David Woodhouse wrote:
+> > > > 
+> > > > 
+> > > > On 4 February 2023 18:18:55 GMT, Arjan van de Ven <arjan@linux.intel.com> wrote:
+> > > > > > 
+> > > > > > However...
+> > > > > > 
+> > > > > > Even though we *can* support non-X2APIC processors, we *might* want to
+> > > > > > play it safe and not go back that far; only enabling parallel bringup
+> > > > > > on machines with X2APIC which roughly correlates with "lots of CPUs"
+> > > > > > since that's where the benefit is.
+> > > > > 
+> > > > > I think that this is the right approach, at least on the initial patch series.
+> > > > > KISS principle; do all the easy-but-important cases first, get it stable and working
+> > > > > and in later series/kernels the range can be expanded.... if it matters.
+> > > > 
+> > > > Agreed. I'll split it to do it only with X2APIC for the initial series,
+
+And sanity check CPUID.0xB output even when x2APIC is supported, e.g. require
+CPUID.0xB.EBX to be non-zero.  Odds are very good that there are VMs in the wild
+that support x2APIC but have an empty CPUID.0xB due to it being a topology leaf,
+i.e. may be suppressed when vCPUs aren't pinned.  QEMU even has a knob to deliberately
+disable CPUID.0xB, e.g. booting a VM with
+
+ cpu host,host-phys-bits,-cpuid-0xb,+x2apic
+
+works just fine.
+
+> > > > and then hold the CPUID 0x1 part back for the next phase.
+> > > This was an interesting find! I tested the latest branch
+> > > parallel-6.2-rc6 and it works well. The numbers from Russ makes the
+> > > patch series look so much better! :)
+> > > 
+> > > If we do it with x2apic only and not support non-x2apic CPUID 0x1 case,
+> > > maybe we apply the following diff to part 1?
+> > 
+> > Using x2apic_mode would also disable parallel boot when the CPU *does*
+> > have X2APIC support but the kernel just isn't using it at the moment. I
+> > think boot_cpu_has(X86_FEATURE_X2APIC) is the better criterion?
+> > 
 > 
-> New tree in the same place as before, commit ce7e2d1e046a for the
-> parallel-6.2-rc6-part1 tag and 17bbd12ee03 for parallel-6.2-rc6.
+> x2apic_mode is set to 0 only in the case when nox2apic is specified in the
+> kernel cmdline or if x2apic_setup fails. As 0xB leaf gets the "x2apic id"
+> and not the "apic id", I thought it would be better to not use the x2apic id
+> if the user doesnt want to use x2apic (cmdline), or the kernel fails to set
+> it up.
 
-Thanks, Zen 1 through 4 based servers all boot both those two tree
-commits successfully.
+I agree with David that checking boot_cpu_has(X86_FEATURE_X2APIC) is preferred,
+x2APIC goes unused on a lot of platforms due to the kernel's interrupt remapping
+requirement.  I would rather have a single explicit "no_parallel_bringup" option
+than try to infer the user's intentions based on tangentially related params.
 
-I'll try that Ryzen again later.
+> Another thing I noticed from the Intel Architecture Manual CPUID—CPU
+> Identification section:
+> 
+> "CPUID leaf 1FH is a preferred superset to leaf 0BH. Intel recommends first
+> checking for the existence of Leaf 1FH before using leaf 0BH."
+> 
+> So I think we should switch from 0BH to using the 1FH leaf EDX register.
 
-Kim
+I don't think using 0x1F will buy us anything except complexity.  0x1F provides more
+details on the topology, but its x2APIC ID enumeration isn't any more trustworthy
+than 0xB.
+
+> > I was thinking I'd tweak the 'no_parallel_bringup' command line
+> > argument into something that also allows us to *enable* it without
+> > X2APIC being supported.
+> > 
+> > But I've also been pondering the fact that this is all only for 64-bit
+> > anyway. It's not like we're doing it for the zoo of ancient i586 and
+> > even i486 machines where the APICs were hooked up with blue wire and
+> > duct tape.
+
+The only thing I can see benefiting from parallel bringup without x2APIC is large
+VMs running on pre-x2AVIC hardware.  E.g. IIRC, we (Google) hide x2APIC on AMD-based
+VMs so that VMs would take advantage of AVIC acceleration if AVIC were even to be
+enabled.
+
+But that's more of an argument for "try to use CPUID.0x1" than it is an argument
+for trying to use CPUID.0xB without x2APIC.
+
+> > Maybe "64-bit only" is good enough, with a command line opt-out. And
+> > maybe a printk pointing out the existence of that command line option
+> > before the bringup, just in case?
