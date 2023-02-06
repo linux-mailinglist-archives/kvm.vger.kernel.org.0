@@ -2,81 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C6D968C882
-	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 22:22:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2251368C88D
+	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 22:24:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229657AbjBFVWC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Feb 2023 16:22:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39292 "EHLO
+        id S229663AbjBFVYE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Feb 2023 16:24:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229483AbjBFVWB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Feb 2023 16:22:01 -0500
-Received: from mail-yw1-x1132.google.com (mail-yw1-x1132.google.com [IPv6:2607:f8b0:4864:20::1132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3352018B1B
-        for <kvm@vger.kernel.org>; Mon,  6 Feb 2023 13:21:57 -0800 (PST)
-Received: by mail-yw1-x1132.google.com with SMTP id 00721157ae682-520dad0a7d2so173029617b3.5
-        for <kvm@vger.kernel.org>; Mon, 06 Feb 2023 13:21:57 -0800 (PST)
+        with ESMTP id S229884AbjBFVYC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Feb 2023 16:24:02 -0500
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CAEEEF83
+        for <kvm@vger.kernel.org>; Mon,  6 Feb 2023 13:23:59 -0800 (PST)
+Received: by mail-pl1-x632.google.com with SMTP id b5so13594461plz.5
+        for <kvm@vger.kernel.org>; Mon, 06 Feb 2023 13:23:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=leAds0lRa3TQRSKLSosccnuchFtxoTin8+WCJI8nDo0=;
-        b=QmpRj4w7yawVlFoxtS+EF17ZSHyRrJhf7+8bmKkiAOYAXcEH0wWRAExc14Un65IbFe
-         cCl1tH0pKivEEVHp+UUZU2SEe8zadJzsjOE++Rmp7n/JRDYoNt/z0VNA4BNnY7ZH63tP
-         NVC4rpzy8AMy1JQFsLjDYZc93gh3Wh2dOWGUJ/Py/uZOsE7ZyhOKbrqDBgNTqf5Qpd5E
-         ZUlxL5fBaxT35QUJ1rb85wkpNtn8Jnsh67diFojXm/k6eVEV8Y+kB+BC/ngUJmbSN0ov
-         Fs37S1dcypklZAQ/kCFU6BwZrwxlZOthNB83CQVlsD1qvG3Y5rdlcL3z/NJwIKutKIeE
-         ZLhQ==
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tjRXQ/qonNQW3nkbtuFUrdlBBvSAiIx0cRRrcJJmpv0=;
+        b=pJyqPfUlhjfdu58efNPXYtzfuoMyBtyTVUOlJQCdPDvgLpoGLDksNB233WpM1C7/qO
+         XU819MrT3H3L9PQKOQFDty8cW65kpSTlGA7WrNkSqB+nK0IwchD4iS2WGcwKvDd1+Bfq
+         PKIqFkO7oDp71haOXUN9rsgsg0tI/1lxPd2s9zFMdf5Y7hEB19eynnCdQLPKxftjbgEi
+         Ya+1lJLq/BTm2HhZTij33cBHdq9Qzhe3De4eyBkDtrUk7v/6emF7mWmb3/QICl8tFKPy
+         tp9/uR7ZW0R+epAXHM2jzhgdWd9RP0HufOUuXqrhKtKisSoarOP+b4oalIcyjCikaaN3
+         btfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=leAds0lRa3TQRSKLSosccnuchFtxoTin8+WCJI8nDo0=;
-        b=OtPF0VUjFpPMjUhdOP+Gi5jkHnfgNZXvMlvpkN5Hu0vJSXECK0hHIQcP0U7nFH0Ske
-         C2z9fJP5IIN3aClDuPBfb8eRKF3KiZpgZv/anLNzPQ5mFUQ95kkPQK8eUvI86OIgSD5w
-         +8HZR5aqbS2GdBwwwKpAyZPAo207fR+CfRVfvt/cCLn+/v/oEO+mPxWSd16nWStQbLot
-         klKt2gmZF3v4xC5AZhCIT6CcdHv6aSnKFjJNie6wRzHiPz0hw/uwuc48NHhq8+TwU6TN
-         JIjINMJcgaTh2SuxZqvVQL/SWgKYv8iTBzvBvPcTnV178KkOzvh7huaGQxor0PqxmWuI
-         dgSg==
-X-Gm-Message-State: AO0yUKUjGNfE/tSsc+B53yKO92OE6B/a/LSkIxbWO90fXAtE5jYTQ9jF
-        mcLCbQ1GeVX21oGnoZ3aYJJd3FMZjLXq2cOzcXk=
-X-Google-Smtp-Source: AK7set87l2TOphZIurh6Svk7x2EqYjTg+f4BEB4Y8PljERf49ARAy00DktAiPFVPas4tqNbpRbHuBnJ1mBekrjvfWBA=
-X-Received: by 2002:a81:928c:0:b0:52a:7809:4054 with SMTP id
- j134-20020a81928c000000b0052a78094054mr69084ywg.111.1675718516390; Mon, 06
- Feb 2023 13:21:56 -0800 (PST)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tjRXQ/qonNQW3nkbtuFUrdlBBvSAiIx0cRRrcJJmpv0=;
+        b=kNwl+dhjyzn0SNhoht+qMJNcoS7sCXlobeIByXzchs/xSbe7VAGLp+wW9OdgGKdP5n
+         fc3Z1tbqtkF8O1SDhttDkypnqF7/wxeO3PrMRisuY0N9H+7gFx8yZDTbVFy2z8f0DHVR
+         Gmin8+8JpSfh8vyJjhLN1ko5qhB3K4ig8MITYZlBK2+KI7S3TBwCRCd5DQgCJmDD0S6V
+         8RZh/XjmjYu7gAMxAeUeR6qCwPMrnRph2PgwBhTx4ckKlBXIkUUPmFAALinmegk1bDdQ
+         z/GMD61w/7jkybOFIFe43B0LCTeE3S/9zbxNmi5hOQXub23yN9znaLK4NmTmkGy7RU49
+         RpPg==
+X-Gm-Message-State: AO0yUKUVJnHUwCc+JWySRSX0g0eznSINbayEVBtjQ0SfYGrtJs8lpMgM
+        AFqrPnAy1lyLja8tVoMelhIysw==
+X-Google-Smtp-Source: AK7set8AfRRIiKtZXq7K8Kz0iylVHBuimpmNO1kC+dPlQrPVd0DozJysgSwmfofyxKr2tQZHNulhnw==
+X-Received: by 2002:a17:902:cf45:b0:199:bd0:c44c with SMTP id e5-20020a170902cf4500b001990bd0c44cmr246208plg.31.1675718638754;
+        Mon, 06 Feb 2023 13:23:58 -0800 (PST)
+Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
+        by smtp.gmail.com with ESMTPSA id s10-20020a170902a50a00b001991f3d85acsm1921117plq.299.2023.02.06.13.23.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Feb 2023 13:23:58 -0800 (PST)
+Date:   Mon, 6 Feb 2023 13:23:54 -0800
+From:   David Matlack <dmatlack@google.com>
+To:     Kevin Cheng <chengkev@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Shuah Khan <shuah@kernel.org>
+Subject: Re: [PATCH] KVM: selftests: Added eBPF program and selftest to
+ collect vmx exit stat
+Message-ID: <Y+Fv6idxCMkuMf1R@google.com>
+References: <20230126004346.4101944-1-chengkev@google.com>
 MIME-Version: 1.0
-References: <CAJSP0QUuuZLC0DJNEfZ7amyd3XnRhRNr1k+1OgLfDeF77X1ZDQ@mail.gmail.com>
- <CAELaAXysa3M-TPbLMCVCwpt40iqhXpF7PCan_i6SzY_YMafXrg@mail.gmail.com>
-In-Reply-To: <CAELaAXysa3M-TPbLMCVCwpt40iqhXpF7PCan_i6SzY_YMafXrg@mail.gmail.com>
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-Date:   Mon, 6 Feb 2023 16:21:44 -0500
-Message-ID: <CAJSP0QWLdbNqyrGnhRB3AqMpH0xYFK6+=TpWrrytQzn9MGD2zA@mail.gmail.com>
-Subject: Re: Call for GSoC and Outreachy project ideas for summer 2023
-To:     Alberto Faria <afaria@redhat.com>
-Cc:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
-        Rust-VMM Mailing List <rust-vmm@lists.opendev.org>,
-        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
-        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
-        Thomas Huth <thuth@redhat.com>, John Snow <jsnow@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
-        "Florescu, Andreea" <fandree@amazon.com>,
-        Damien <damien.lemoal@opensource.wdc.com>,
-        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
-        Hanna Reitz <hreitz@redhat.com>,
-        Daniel Henrique Barboza <danielhb413@gmail.com>,
-        =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
-        Bernhard Beschow <shentey@gmail.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, gmaglione@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230126004346.4101944-1-chengkev@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,97 +73,353 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 6 Feb 2023 at 14:51, Alberto Faria <afaria@redhat.com> wrote:
->
-> On Fri, Jan 27, 2023 at 3:17 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> > Dear QEMU, KVM, and rust-vmm communities,
-> > QEMU will apply for Google Summer of Code 2023
-> > (https://summerofcode.withgoogle.com/) and has been accepted into
-> > Outreachy May 2023 (https://www.outreachy.org/). You can now
-> > submit internship project ideas for QEMU, KVM, and rust-vmm!
-> >
-> > Please reply to this email by February 6th with your project ideas.
-> >
-> > If you have experience contributing to QEMU, KVM, or rust-vmm you can
-> > be a mentor. Mentors support interns as they work on their project. It's a
-> > great way to give back and you get to work with people who are just
-> > starting out in open source.
-> >
-> > Good project ideas are suitable for remote work by a competent
-> > programmer who is not yet familiar with the codebase. In
-> > addition, they are:
-> > - Well-defined - the scope is clear
-> > - Self-contained - there are few dependencies
-> > - Uncontroversial - they are acceptable to the community
-> > - Incremental - they produce deliverables along the way
-> >
-> > Feel free to post ideas even if you are unable to mentor the project.
-> > It doesn't hurt to share the idea!
-> >
-> > I will review project ideas and keep you up-to-date on QEMU's
-> > acceptance into GSoC.
-> >
-> > Internship program details:
-> > - Paid, remote work open source internships
-> > - GSoC projects are 175 or 350 hours, Outreachy projects are 30
-> > hrs/week for 12 weeks
-> > - Mentored by volunteers from QEMU, KVM, and rust-vmm
-> > - Mentors typically spend at least 5 hours per week during the coding period
-> >
-> > For more background on QEMU internships, check out this video:
-> > https://www.youtube.com/watch?v=xNVCX7YMUL8
-> >
-> > Please let me know if you have any questions!
-> >
-> > Stefan
->
-> FWIW there is some work to be done on libblkio [1] that QEMU could
-> benefit from. Maybe these would be appropriate as QEMU projects?
->
-> One possible project would be to add zoned device support to libblkio
-> and all its drivers [2]. This would allow QEMU to use zoned
-> vhost-user-blk devices, for instance (once general zoned device
-> support lands [3]).
->
-> Another idea would be to add an NVMe driver to libblkio that
-> internally relies on xNVMe [4, 5]. This would enable QEMU users to use
-> the NVMe drivers from SPDK or libvfn.
+On Thu, Jan 26, 2023 at 12:43:46AM +0000, Kevin Cheng wrote:
+> Introduce a new selftest that loads an eBPF program that stores the
+> number of vmx exit counts per vcpu per vm. A process is created per
+> vm_create to load a separate eBPF program to collect its own stats
+> unique to the pid.
+> 
+> This test aims to serve as a proof-of-concept and example for using eBPF
+> to collect stats that are not provided by the other stats interfaces
+> such as kvm_binary_stats. Since there will be no further stats being
+> added to kvm_binary_stats, developers can use this selftest as a
+> reference for writing their own eBPF program + selftest to collect
+> whatever stat they may need for debugging/monitoring.
+> 
+> Signed-off-by: Kevin Cheng <chengkev@google.com>
+> ---
+>  tools/testing/selftests/kvm/Makefile          |   4 +-
+>  tools/testing/selftests/kvm/build_ebpf.sh     |   5 +
+>  .../testing/selftests/kvm/kvm_vmx_exit_ebpf.c | 128 ++++++++++++++++++
+>  .../selftests/kvm/kvm_vmx_exit_ebpf_kern.c    |  74 ++++++++++
 
-Great that you're interesting, Alberto! Both sound feasible. I would
-like to co-mentor the zoned storage project or can at least commit to
-being available to help because zoned storage is currently on my mind
-anyway :).
+x86-specific tests should go in tools/testing/selftests/kvm/x86_64.
 
-Do you want to write up one or both of them using the project template
-below? You can use the other project ideas as a reference for how much
-detail to include: https://wiki.qemu.org/Google_Summer_of_Code_2023
+>  4 files changed, 210 insertions(+), 1 deletion(-)
+>  create mode 100644 tools/testing/selftests/kvm/build_ebpf.sh
+>  create mode 100644 tools/testing/selftests/kvm/kvm_vmx_exit_ebpf.c
+>  create mode 100644 tools/testing/selftests/kvm/kvm_vmx_exit_ebpf_kern.c
+> 
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index 1750f91dd936..d9f56ccbc7bb 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -129,6 +129,7 @@ TEST_GEN_PROGS_x86_64 += set_memory_region_test
+>  TEST_GEN_PROGS_x86_64 += steal_time
+>  TEST_GEN_PROGS_x86_64 += kvm_binary_stats_test
+>  TEST_GEN_PROGS_x86_64 += system_counter_offset_test
+> +TEST_GEN_PROGS_x86_64 += kvm_vmx_exit_ebpf
+>  
+>  # Compiled outputs used by test targets
+>  TEST_GEN_PROGS_EXTENDED_x86_64 += x86_64/nx_huge_pages_test
+> @@ -176,6 +177,7 @@ TEST_GEN_PROGS_riscv += set_memory_region_test
+>  TEST_GEN_PROGS_riscv += kvm_binary_stats_test
+>  
+>  TEST_PROGS += $(TEST_PROGS_$(ARCH_DIR))
+> +TEST_PROGS := build_ebpf.sh
 
-=== TITLE ===
+build_ebpf.sh is not be a test program. It should be part of this
+Makefile. i.e. running
 
- '''Summary:''' Short description of the project
+  make -C tools/testing/selftests/kvm
 
- Detailed description of the project.
+should build tools/lib/bpf and kvm_vmx_exit_ebpf_kern.o. Developers
+can't be expected to run
+tools/testing/testing/selftests/kvm/build_ebpf.sh every time they want
+to build the KVM selftests.
 
- '''Links:'''
- * Wiki links to relevant material
- * External links to mailing lists or web sites
+>  TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(ARCH_DIR))
+>  TEST_GEN_PROGS_EXTENDED += $(TEST_GEN_PROGS_EXTENDED_$(ARCH_DIR))
+>  LIBKVM += $(LIBKVM_$(ARCH_DIR))
+> @@ -208,7 +210,7 @@ no-pie-option := $(call try-run, echo 'int main(void) { return 0; }' | \
+>  pgste-option = $(call try-run, echo 'int main(void) { return 0; }' | \
+>  	$(CC) -Werror -Wl$(comma)--s390-pgste -x c - -o "$$TMP",-Wl$(comma)--s390-pgste)
+>  
+> -LDLIBS += -ldl
+> +LDLIBS += -ldl -L$(top_srcdir)/tools/lib/bpf -lbpf -lelf -lz
 
- '''Details:'''
- * Skill level: beginner or intermediate or advanced
- * Language: C
- * Mentor: Email address and IRC nick
- * Suggested by: Person who suggested the idea
+Please add a comment document why the different libraries are needed for
+future readers.
 
-Thanks,
-Stefan
+>  LDFLAGS += -pthread $(no-pie-option) $(pgste-option)
+>  
+>  LIBKVM_C := $(filter %.c,$(LIBKVM))
+> diff --git a/tools/testing/selftests/kvm/build_ebpf.sh b/tools/testing/selftests/kvm/build_ebpf.sh
+> new file mode 100644
+> index 000000000000..b8038b0a0da5
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/build_ebpf.sh
+> @@ -0,0 +1,5 @@
+> +#!/bin/sh
+> +# SPDX-License-Identifier: GPL-2.0
+> +clang -g -O2 -target bpf -D__TARGET_ARCH_x86_64 -I . -c kvm_vmx_exit_ebpf_kern.c
+> +        -o kvm_vmx_exit_ebpf_kern.o
+> +make -C ../../../lib/bpf || exit
 
->
-> Thanks,
-> Alberto
->
-> [1] https://libblkio.gitlab.io/libblkio/
-> [2] https://gitlab.com/libblkio/libblkio/-/issues/44
-> [3] https://lore.kernel.org/qemu-devel/20230129102850.84731-1-faithilikerun@gmail.com/
-> [4] https://gitlab.com/libblkio/libblkio/-/issues/45
-> [5] https://github.com/OpenMPDK/xNVMe
->
+As mentioned above, this should be part of the Makefile.
+
+> diff --git a/tools/testing/selftests/kvm/kvm_vmx_exit_ebpf.c b/tools/testing/selftests/kvm/kvm_vmx_exit_ebpf.c
+> new file mode 100644
+> index 000000000000..a4bd2c549207
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/kvm_vmx_exit_ebpf.c
+> @@ -0,0 +1,128 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +
+> +#include <stdio.h>
+> +#include <stdlib.h>
+> +#include <signal.h>
+> +#include <sys/types.h>
+> +#include <sys/wait.h>
+> +#include <unistd.h>
+> +#include <bpf/bpf.h>
+> +#include <../bpf/libbpf.h>
+> +#include <linux/btf.h>
+> +
+> +#include "test_util.h"
+> +
+> +#include "kvm_util.h"
+> +#include "linux/kvm.h"
+> +
+> +#define VCPU_ID         0
+> +
+> +struct stats_map_key {
+> +	__u32 pid;
+> +	__u32 vcpu_id;
+> +	__u32 exit_reason;
+> +};
+> +
+> +static void guest_code(void)
+> +{
+> +	__asm__ __volatile__("cpuid");
+> +}
+> +
+> +int main(int argc, char **argv)
+> +{
+> +	if (argc < 2) {
+> +		fprintf(stderr, "Expected arguments: <number_of_vms>\n");
+> +		return EXIT_FAILURE;
+
+Selftests run by default with no arguments. So please provide a default
+number of VMs to run with the test. Otherwise this test will just fail
+by default.
+
+It's common (at least for me) to run all KVM selftests when submitting
+patches. So having one test that always fails will be annoying to deal
+with.
+
+Also, can you provide some details (e.g. in a comment) about why a user
+might want to pick a different number of VMs? What is the value of
+running this test with 1 VM vs. 2 vs. 3 etc.?
+
+> +	}
+> +	int n = atoi(argv[1]);
+> +
+> +	for (int i = 0; i < n; i++) {
+> +		if (fork() == 0) {
+
+Put the implementation of the child process into a helper function to
+reduce indentation.
+
+> +			struct kvm_vm *vm;
+> +			struct kvm_vcpu *vcpu;
+> +
+> +			vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+> +
+> +			// BPF userspace code
+> +			struct bpf_object *obj;
+> +			struct bpf_program *prog;
+> +			struct bpf_map *map_obj;
+> +			struct bpf_link *link = NULL;
+> +
+> +			obj = bpf_object__open_file("kvm_vmx_exit_ebpf_kern.o", NULL);
+> +			if (libbpf_get_error(obj)) {
+> +				fprintf(stderr, "ERROR: opening BPF object file failed\n");
+> +				return 0;
+
+I notice the children and parent always return 0. The test should exit
+with a non-0 return code if it fails.
+
+> +			}
+> +
+> +			map_obj = bpf_object__find_map_by_name(obj, "vmx_exit_map");
+> +			if (!map_obj) {
+> +				fprintf(stderr, "ERROR: loading of vmx BPF map failed\n");
+> +				goto cleanup;
+> +			}
+> +
+> +			struct bpf_map *pid_map = bpf_object__find_map_by_name(obj, "pid_map");
+> +
+> +			if (!pid_map) {
+> +				fprintf(stderr, "ERROR: loading of pid BPF map failed\n");
+> +				goto cleanup;
+> +			}
+> +
+> +			/* load BPF program */
+
+No need for this comment. bpf_object__load() is quite obvious already :)
+
+> +			if (bpf_object__load(obj)) {
+> +				fprintf(stderr, "ERROR: loading BPF object file failed\n");
+> +				goto cleanup;
+> +			}
+> +
+> +			__u32 userspace_pid = (__u32)getpid();
+> +			__u32 val = (__u32)getpid();
+> +
+> +			bpf_map_update_elem(bpf_map__fd(pid_map), &userspace_pid, &val, 0);
+> +
+> +			prog = bpf_object__find_program_by_name(obj, "bpf_exit_prog");
+> +			if (libbpf_get_error(prog)) {
+> +				fprintf(stderr, "ERROR: finding a prog in obj file failed\n");
+> +				goto cleanup;
+> +			}
+> +
+> +			link = bpf_program__attach(prog);
+> +			if (libbpf_get_error(link)) {
+> +				fprintf(stderr, "ERROR: bpf_program__attach failed\n");
+> +				link = NULL;
+> +				goto cleanup;
+> +			}
+> +
+> +			for (int j = 0; j < 10000; j++)
+> +				vcpu_run(vcpu);
+
+It might be interesting to (1) add some timing around this loop and (2)
+run this loop without any bpf programs attached. i.e. Automatically do
+an A/B performance comparison with and without bpf programs.
+
+> +
+> +			struct stats_map_key key = {
+> +				.pid = 0,
+> +				.vcpu_id = 0,
+> +				.exit_reason = 18,
+> +			};
+> +
+> +
+> +			struct stats_map_key next_key, lookup_key;
+> +
+> +			lookup_key = key;
+> +			while (bpf_map_get_next_key(bpf_map__fd(map_obj), &lookup_key, &next_key)
+> +				 == 0) {
+> +				int count;
+> +
+> +				bpf_map_lookup_elem(bpf_map__fd(map_obj), &next_key, &count);
+> +				fprintf(stdout, "exit reason: '%d'\ncount: %d\npid: %d\n",
+> +						next_key.exit_reason, count, next_key.pid);
+
+Instead of printing ot the count, assert that the count has the right
+value.
+
+> +				lookup_key = next_key;
+> +			}
+> +
+> +cleanup:
+> +			bpf_link__destroy(link);
+> +			bpf_object__close(obj);
+> +			kvm_vm_free(vm);
+
+Shouldn't the child process exit here? Otherwise it's going to keep
+looping and creating *more* children?
+
+> +		}
+> +	}
+> +
+> +	for (int i = 0; i < n; i++)
+> +		wait(NULL);
+> +	return 0;
+> +}
+> diff --git a/tools/testing/selftests/kvm/kvm_vmx_exit_ebpf_kern.c b/tools/testing/selftests/kvm/kvm_vmx_exit_ebpf_kern.c
+> new file mode 100644
+> index 000000000000..b9c076f93171
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/kvm_vmx_exit_ebpf_kern.c
+
+I think we should carve out a new directory for bpf programs. If we mix
+this in with the selftest .c files, it will start to get confusing.
+
+e.g. tools/testing/selftests/kvm/bpf/vmx_exit_count.c
+
+Note I dropped the "kvm_" prefix since it's obvious this is a
+KVM-related program since it's under the KVM selftest directory. And I
+also dropped "_ebpf_kern" since that's now obvious from the fact that
+this is in the bpf/ subdirectory (which should only contain bpf
+programs).
+
+> @@ -0,0 +1,73 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +#include <linux/bpf.h>
+> +#include <stdint.h>
+> +#include <bpf/bpf_helpers.h>
+> +#include <bpf/bpf_tracing.h>
+> +#include <bpf/bpf_core_read.h>
+> +
+> +struct kvm_vcpu {
+> +	int vcpu_id;
+> +};
+> +
+> +struct vmx_args {
+> +	__u64 pad;
+> +	unsigned int exit_reason;
+> +	__u32 isa;
+> +	struct kvm_vcpu *vcpu;
+> +};
+> +
+> +struct stats_map_key {
+> +	__u32 pid;
+> +	__u32 vcpu_id;
+> +	__u32 exit_reason;
+> +};
+> +
+> +struct {
+> +	__uint(type, BPF_MAP_TYPE_HASH);
+> +	__uint(max_entries, 1024);
+> +	__type(key, struct stats_map_key);
+> +	__type(value, int);
+> +} vmx_exit_map SEC(".maps");
+> +
+> +struct {
+> +	__uint(type, BPF_MAP_TYPE_HASH);
+> +	__uint(max_entries, 1);
+> +	__type(key, __u32);
+> +	__type(value, __u32);
+> +} pid_map SEC(".maps");
+> +
+> +
+> +SEC("tracepoint/kvm/kvm_exit")
+> +int bpf_exit_prog(struct vmx_args *ctx)
+> +{
+> +	__u32 curr_pid = (bpf_get_current_pid_tgid() >> 32);
+> +
+> +	__u32 *userspace_pid = bpf_map_lookup_elem(&pid_map, &curr_pid);
+> +
+> +	if (!userspace_pid || *userspace_pid != curr_pid)
+> +		return 0;
+> +
+> +	struct kvm_vcpu *vcpu = ctx->vcpu;
+> +	int _vcpu_id = BPF_CORE_READ(vcpu, vcpu_id);
+> +
+> +	struct stats_map_key key = {
+> +		.pid = (bpf_get_current_pid_tgid() >> 32),
+> +		.vcpu_id = _vcpu_id,
+> +		.exit_reason = ctx->exit_reason,
+> +	};
+> +
+> +	int *value = bpf_map_lookup_elem(&vmx_exit_map, &key);
+> +
+> +	if (value) {
+> +		*value = *value + 1;
+> +		bpf_map_update_elem(&vmx_exit_map, &key, value, BPF_ANY);
+> +	} else {
+> +		int temp = 1;
+> +
+> +		bpf_map_update_elem(&vmx_exit_map, &key, &temp, BPF_ANY);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +char _license[] SEC("license") = "GPL";
+> -- 
+> 2.39.1.456.gfc5497dd1b-goog
+> 
