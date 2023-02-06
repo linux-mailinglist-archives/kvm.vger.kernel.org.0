@@ -2,94 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B40768C366
-	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 17:32:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7EF2068C376
+	for <lists+kvm@lfdr.de>; Mon,  6 Feb 2023 17:36:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230064AbjBFQcA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Feb 2023 11:32:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44260 "EHLO
+        id S230177AbjBFQgC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Feb 2023 11:36:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229588AbjBFQb6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Feb 2023 11:31:58 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB5AFCA3E;
-        Mon,  6 Feb 2023 08:31:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-        Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-        bh=STKGoMxckYgPErYVx6yFdSgSELSlqbOgHBPVdzHyyLs=; b=lnerxUi6lBbiYf2Y+UUhZbBPmJ
-        +X6wfgD18WcGyRK12K1LGi+4u2IcH3COxGSJxKyTO3WhCyxZpFOTgyh7DkWwHA5SP9c7HFmRqz+sr
-        prKxyMjd04dQ3MEnxDDqxcayOv+Wl8S54nGC3kQrkERKkDKxj8ir0u4aOvOaULqs1aLf/+3z9+9Yn
-        FwyzCmM1YY3u1iVzvYXjALBg4F2LzqmvdtuPVvf8yxxhqVfVcTqFep+9sH73Pz+gVc4K2pKSv6a/b
-        jvI1L8ldjX3siYx1CmI75FUrOA7K8r3lamLJCGiQJCQvPzOGqUqhmZnCGJ9rZjwBLZ9kqRLhsPIEE
-        bDik9Tsg==;
-Received: from [2601:1c2:d00:6a60::9526]
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pP4P6-009KzI-Gj; Mon, 06 Feb 2023 16:31:40 +0000
-Message-ID: <e76610ec-2efa-4333-1f6d-6072c1412d24@infradead.org>
-Date:   Mon, 6 Feb 2023 08:31:38 -0800
+        with ESMTP id S230209AbjBFQf7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Feb 2023 11:35:59 -0500
+Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B22982448F
+        for <kvm@vger.kernel.org>; Mon,  6 Feb 2023 08:35:56 -0800 (PST)
+Received: by mail-qk1-x72b.google.com with SMTP id r187so5531465qkf.10
+        for <kvm@vger.kernel.org>; Mon, 06 Feb 2023 08:35:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=pJSM6kqcjnSPjdSGT0HvLgqZqIrYtsqkRhyhi3guF6Y=;
+        b=M8+isMLu4lCdK/uvwHfbX/fOotVlr1yruayEoQUgKnNaOGMLDziT9zDXJpoVntYJut
+         fQ6DA2ivKUK+tizCdVMVyFHkU43S+tObzACC8H6Ck3D8SxJpp/LDxVJCnY8zxwN2ioTI
+         OtVRmCVpmsqRloSdebgZ5Jp5A4s9zXmS3Gngx3PxOl0sqsr43y54olC3X6I3b0bllfbY
+         ouDtBIzfDhxy7y8LSYgYAzBfPmgwW8WwUZoQGQap18dHdLdULV9DKSGUtabZSYHhXWRl
+         yL/2NEnAg2yP8LwaDvFngm0hpLeyFyV12IsZEvE5inx1HWUE8iAUxaow5syqzRgCwfO7
+         rlLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pJSM6kqcjnSPjdSGT0HvLgqZqIrYtsqkRhyhi3guF6Y=;
+        b=fNoMix4b+THtWNqjlIyoj1J3l8bBDsx5qI/ZvSBnmhgU75gLIFftJFI1zIwx39IVWb
+         FgwDz3Yq5ImP0yFTncXtLYEf6m1bPd5GrlMCUjVMHkOhGygTBpmHGuGDgeDktwjP6ygk
+         g3nI2yHRzipz4OrgzVMYFgrrwOM8MasrGO2q/uNiMV6KbYvbN+tNlsheReTAonlWO20Z
+         wG7T+wFYM+0j5teDyseRWFYsCi013hqzfySRfJ5yQ9XNR4YhnamOh+1YMDmYFNe8+U/D
+         w21THXxVAvz1AzHanZD+bps7wBtZt1cErocL/BwZyM3PTb1kPuw+TfDPxi5HDHT5peFe
+         o47A==
+X-Gm-Message-State: AO0yUKWhl6HDxzSI328vAjkEQqx/ip8xLKHHWsUn6kquDqNNG7P8suVS
+        z/iKmMKje9om9H8UXZ+AT/LcxeI8N7gYX1zOVQ+fGg==
+X-Google-Smtp-Source: AK7set+s81reoHeglIfhP5y+W2Szu/NtmUcpv6g11YSkDaoDhJKIr+ZuCmsC1PlOUu+GJvolTPPl29WIZKJgLEb07bA=
+X-Received: by 2002:a05:620a:4483:b0:72b:ada6:1295 with SMTP id
+ x3-20020a05620a448300b0072bada61295mr1064250qkp.211.1675701355731; Mon, 06
+ Feb 2023 08:35:55 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH] Documentation: kvm: Correct spelling
-Content-Language: en-US
-To:     Deming Wang <wangdeming@inspur.com>, pbonzini@redhat.com,
-        corbet@lwn.net
-Cc:     kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20230206091120.1618-1-wangdeming@inspur.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20230206091120.1618-1-wangdeming@inspur.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20230113035000.480021-1-ricarkol@google.com> <20230113035000.480021-7-ricarkol@google.com>
+ <Y9BfdgL+JSYCirvm@thinky-boi> <CAOHnOrysMhp_8Kdv=Pe-O8ZGDbhN5HiHWVhBv795_E6+4RAzPw@mail.gmail.com>
+ <86v8ktkqfx.wl-maz@kernel.org> <CAOHnOrx-vvuZ9n8xDRmJTBCZNiqvcqURVyrEt2tDpw5bWT0qew@mail.gmail.com>
+ <86h6w70zhc.wl-maz@kernel.org>
+In-Reply-To: <86h6w70zhc.wl-maz@kernel.org>
+From:   Ricardo Koller <ricarkol@google.com>
+Date:   Mon, 6 Feb 2023 08:35:44 -0800
+Message-ID: <CAOHnOrzQz14MHtnL3_vdbKxhjM66AEBXL4ujMGn_nwfRg3D1cg@mail.gmail.com>
+Subject: Re: [PATCH 6/9] KVM: arm64: Split huge pages when dirty logging is enabled
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Oliver Upton <oliver.upton@linux.dev>, pbonzini@redhat.com,
+        oupton@google.com, yuzenghui@huawei.com, dmatlack@google.com,
+        kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
+        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
+        rananta@google.com, bgardon@google.com, ricarkol@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Hi Marc,
 
-On 2/6/23 01:11, Deming Wang wrote:
-> We shuold use the replace thie.
-> 
-> Signed-off-by: Deming Wang <wangdeming@inspur.com>
-> ---
->  Documentation/virt/kvm/api.rst | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 1b1f721e3fd9..4e164d449906 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -8193,7 +8193,7 @@ the KVM_XEN_ATTR_TYPE_RUNSTATE_UPDATE_FLAG attribute in the KVM_XEN_SET_ATTR
->  and KVM_XEN_GET_ATTR ioctls. This controls whether KVM will set the
->  XEN_RUNSTATE_UPDATE flag in guest memory mapped vcpu_runstate_info during
->  updates of the runstate information. Note that versions of KVM which support
-> -the RUNSTATE feature above, but not thie RUNSTATE_UPDATE_FLAG feature, will
-> +the RUNSTATE feature above, but not the RUNSTATE_UPDATE_FLAG feature, will
->  always set the XEN_RUNSTATE_UPDATE flag when updating the guest structure,
->  which is perhaps counterintuitive. When this flag is advertised, KVM will
->  behave more correctly, not using the XEN_RUNSTATE_UPDATE flag until/unless
+On Tue, Jan 31, 2023 at 2:28 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Fri, 27 Jan 2023 15:45:15 +0000,
+> Ricardo Koller <ricarkol@google.com> wrote:
+> >
+> > > The one thing that would convince me to make it an option is the
+> > > amount of memory this thing consumes. 512+ pages is a huge amount, and
+> > > I'm not overly happy about that. Why can't this be a userspace visible
+> > > option, selectable on a per VM (or memslot) basis?
+> > >
+> >
+> > It should be possible.  I am exploring a couple of ideas that could
+> > help when the hugepages are not 1G (e.g., 2M).  However, they add
+> > complexity and I'm not sure they help much.
+> >
+> > (will be using PAGE_SIZE=4K to make things simpler)
+> >
+> > This feature pre-allocates 513 pages before splitting every 1G range.
+> > For example, it converts 1G block PTEs into trees made of 513 pages.
+> > When not using this feature, the same 513 pages would be allocated,
+> > but lazily over a longer period of time.
+>
+> This is an important difference. It avoids the upfront allocation
+> "thermal shock", giving time to the kernel to reclaim memory from
+> somewhere else. Doing it upfront means you *must* have 2MB+ of
+> immediately available memory for each GB of RAM you guest uses.
+>
+> >
+> > Eager-splitting pre-allocates those pages in order to split huge-pages
+> > into fully populated trees.  Which is needed in order to use FEAT_BBM
+> > and skipping the expensive TLBI broadcasts.  513 is just the number of
+> > pages needed to break a 1G huge-page.
+>
+> I understand that. But it also clear that 1GB huge pages are unlikely
+> to be THPs, and I wonder if we should treat the two differently. Using
+> HugeTLBFS pages is significant here.
+>
+> >
+> > We could optimize for smaller huge-pages, like 2M by splitting 1
+> > huge-page at a time: only preallocate one 4K page at a time.  The
+> > trick is how to know that we are splitting 2M huge-pages.  We could
+> > either get the vma pagesize or use hints from userspace.  I'm not sure
+> > that this is worth it though.  The user will most likely want to split
+> > big ranges of memory (>1G), so optimizing for smaller huge-pages only
+> > converts the left into the right:
+> >
+> > alloc 1 page            |    |  alloc 512 pages
+> > split 2M huge-page      |    |  split 2M huge-page
+> > alloc 1 page            |    |  split 2M huge-page
+> > split 2M huge-page      | => |  split 2M huge-page
+> >                         ...
+> > alloc 1 page            |    |  split 2M huge-page
+> > split 2M huge-page      |    |  split 2M huge-page
+> >
+> > Still thinking of what else to do.
+>
+> I think the 1G case fits your own use case, but I doubt this covers
+> the majority of the users. Most people rely on the kernel ability to
+> use THPs, which are capped at the first level of block mapping.
+>
+> 2MB (and 32MB for 16kB base pages) are the most likely mappings in my
+> experience (512MB with 64kB pages are vanishingly rare).
+>
+> Having to pay an upfront cost for HugeTLBFS doesn't shock me, and it
+> fits the model. For THPs, where everything is opportunistic and the
+> user not involved, this is a lot more debatable.
+>
+> This is why I'd like this behaviour to be a buy-in, either directly (a
+> first class userspace API) or indirectly (the provenance of the
+> memory).
 
-How about these in the same file?
+This all makes sense, thanks for the explanation. I decided to implement
+something for both cases: small caches (~1 page) where the PUDs are
+split one PMD at a time, and bigger caches (>513) where the PUDs can
+be split with a single replacement. The user specifies the size of the cache
+via a capability, and size of 0 implies no eager splitting (the feature is off).
 
-api.rst:581: virutal ==> virtual
-api.rst:2725: excution ==> execution
-api.rst:5207: asynchonous ==> asynchronous
-api.rst:5666: thats ==> that's  [should just be "that"]
-api.rst:7420: priveleged ==> privileged
-api.rst:7838: compatibilty ==> compatibility
-api.rst:8241: implmented ==> implemented
+Thanks,
+Ricardo
 
-and this one:
-halt-polling.rst:17: dependant ==> dependent
-
-and there are more in the subdirectories there.
-
--- 
-~Randy
+>
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
