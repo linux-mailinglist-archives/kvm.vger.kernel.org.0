@@ -2,101 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8674268DA2A
-	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 15:08:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E71868DA86
+	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 15:23:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230480AbjBGOI5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 09:08:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52316 "EHLO
+        id S232553AbjBGOXH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 09:23:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231978AbjBGOIz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 09:08:55 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A30F25256
-        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 06:08:52 -0800 (PST)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 317DUkJv000843;
-        Tue, 7 Feb 2023 14:08:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=HHVghQBlFsm5W8pswKf4ADah+BOuHwoa8u7nzAOhAEU=;
- b=hkQio4GJ7XD4cLVbsgMmUVdAlmWU475cs81oL6+4EJLrWvQmqqKxMUXxb3hqSydlgK9S
- FSplctGw2c8wg768k3z7asuZExFUGontj59YR7PdzWn9mKM1Lx5LS0KRP82rQHWBblLD
- W6Oi/LxeiXgm8p8T41hJ7OCVwPyQpzn2HIgpmTNRDA9UVoN9QW3YaoWPnGZpE14WJ1pF
- bhaKxBIaUx9IkEliq593k9H1UvPlQGWrUMgx9tMuSCJCgR9STRjMiYs0gqbF6fSKJ4LG
- rpULrcY9d1D9hO835tevuCfJ9eOmuo/Znps3Y900ON2PNY2To/EQdeDQvo1jQSAxxAJv 8w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nkqkgh1yr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Feb 2023 14:08:46 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 317DcJu5024039;
-        Tue, 7 Feb 2023 14:08:45 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nkqkgh1xf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Feb 2023 14:08:45 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 317C14WO001883;
-        Tue, 7 Feb 2023 14:08:43 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3nhf06kpjm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Feb 2023 14:08:43 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 317E8dBQ46530968
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 7 Feb 2023 14:08:39 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A26522004B;
-        Tue,  7 Feb 2023 14:08:39 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 57CAC20040;
-        Tue,  7 Feb 2023 14:08:39 +0000 (GMT)
-Received: from [9.152.224.241] (unknown [9.152.224.241])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue,  7 Feb 2023 14:08:39 +0000 (GMT)
-Message-ID: <57096fc5-1ab9-4589-ff1b-6bcc2fdcbd82@linux.ibm.com>
-Date:   Tue, 7 Feb 2023 15:08:39 +0100
+        with ESMTP id S232447AbjBGOW4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 09:22:56 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B2B115C86;
+        Tue,  7 Feb 2023 06:22:54 -0800 (PST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1675779772;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0yPHwM89WlB9ksDyM5+4x220tQNsF9BYJ5JjFvG3NnA=;
+        b=HLJGGT15vgpaLjvpgmwZfhjvsBW+gt8pqgIhwXidTp81MJDht8ARk5zJKTUUKOMV6rKbC5
+        z0tbuZz39cwWl6rU6VAypXS4JDigB2GoMZhNrhhnk6S8sMNRK00oINTc8i9/uiLf7982Kz
+        GXsaH/Ud43qRG+tnCKK8dhTm5EPPN44t8RSPcI2pTjeIzQzyS4sHbxO4/F6KxZQimIXbTA
+        KtPMv6Dw50vBdTlm6M5cTjw+T+qdzATbuTr2zCtTDQYCSekMsRP81RhzNeiyqjaVqXL8Io
+        kmsp0NLV2j+MA/60qxpa05i2M6YDAp0ssqm2dEwcnmaU5C1qY4b3lqXj13stVg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1675779772;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0yPHwM89WlB9ksDyM5+4x220tQNsF9BYJ5JjFvG3NnA=;
+        b=BFDJbgRjxv6R2dl5QNUfFx0gfkUyK3n5Cze1Ilxv1quY+MI8JySPzOq8VP70f9D6Z7KhiD
+        lIzToCVXZyTgZGAg==
+To:     David Woodhouse <dwmw2@infradead.org>,
+        Usama Arif <usama.arif@bytedance.com>, arjan@linux.intel.com
+Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        hpa@zytor.com, x86@kernel.org, pbonzini@redhat.com,
+        paulmck@kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, rcu@vger.kernel.org, mimoja@mimoja.de,
+        hewenliang4@huawei.com, thomas.lendacky@amd.com, seanjc@google.com,
+        pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
+        punit.agrawal@bytedance.com, simon.evans@bytedance.com,
+        liangma@liangbit.com
+Subject: Re: [PATCH v6 01/11] x86/apic/x2apic: Fix parallel handling of
+ cluster_mask
+In-Reply-To: <d37f3af69df09ff542024ed93a37865b28dfa86e.camel@infradead.org>
+References: <20230202215625.3248306-1-usama.arif@bytedance.com>
+ <20230202215625.3248306-2-usama.arif@bytedance.com> <87a61qxtx0.ffs@tglx>
+ <d37f3af69df09ff542024ed93a37865b28dfa86e.camel@infradead.org>
+Date:   Tue, 07 Feb 2023 15:22:52 +0100
+Message-ID: <87y1p9v9kz.ffs@tglx>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH v15 05/11] s390x/cpu topology: resetting the
- Topology-Change-Report
-Content-Language: en-US
-To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
-        berrange@redhat.com, clg@kaod.org
-References: <20230201132051.126868-1-pmorel@linux.ibm.com>
- <20230201132051.126868-6-pmorel@linux.ibm.com>
- <3215597a6916932c26fdbe1dd8daf2fc0c1c1ab5.camel@linux.ibm.com>
- <f4732cd4-67bb-a2a3-0048-3a2118b52fc1@linux.ibm.com>
- <669fea20042a31d009b5f3d9371bcf88f32d5d49.camel@linux.ibm.com>
- <78b4f4c2-511e-f8bd-6f4b-8c13f4d87fe1@linux.ibm.com>
- <d53ff9ed9d3f28abd504763f060c4c6c4f7f9553.camel@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <d53ff9ed9d3f28abd504763f060c4c6c4f7f9553.camel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: zVmsRN8hQTw38xumnn9I9U-fgXoiOEBP
-X-Proofpoint-ORIG-GUID: ouV6lxIgc5KaKiOvLC5kjq3R5DDCz_hy
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-02-07_05,2023-02-06_03,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
- phishscore=0 clxscore=1015 priorityscore=1501 suspectscore=0
- malwarescore=0 mlxlogscore=999 spamscore=0 bulkscore=0 impostorscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302070126
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
         SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -104,154 +66,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+David!
 
+On Tue, Feb 07 2023 at 10:57, David Woodhouse wrote:
+> On Tue, 2023-02-07 at 00:20 +0100, Thomas Gleixner wrote:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/*
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * On post boot hotplug itera=
+te over the present CPUs to handle the
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * case of partial clusters a=
+s they might be presented by
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * virtualization.
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0for_each_present_cpu(cpu_i) {
+>
+>
+> So... if this CPU was *present* at boot time (and if any other CPU in
+> this cluster was present), it will already have a cluster_mask.
+>
+> Which means we get here in two cases:=20
+>
+>  =E2=80=A2 This CPU wasn't actually present (was just 'possible') at boot=
+ time.
+>    (Is that actually a thing that happens?)
 
-On 2/7/23 14:37, Nina Schoetterl-Glausch wrote:
-> On Tue, 2023-02-07 at 13:19 +0100, Pierre Morel wrote:
->>
->> On 2/7/23 11:50, Nina Schoetterl-Glausch wrote:
->>> On Tue, 2023-02-07 at 10:24 +0100, Pierre Morel wrote:
->>>>
->>>> On 2/6/23 18:52, Nina Schoetterl-Glausch wrote:
->>>>> On Wed, 2023-02-01 at 14:20 +0100, Pierre Morel wrote:
->>>>>> During a subsystem reset the Topology-Change-Report is cleared
->>>>>> by the machine.
->>>>>> Let's ask KVM to clear the Modified Topology Change Report (MTCR)
->>>>>> bit of the SCA in the case of a subsystem reset.
->>>>>>
->>>>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->>>>>> ---
->>>>>>     include/hw/s390x/cpu-topology.h |  1 +
->>>>>>     target/s390x/cpu.h              |  1 +
->>>>>>     target/s390x/kvm/kvm_s390x.h    |  1 +
->>>>>>     hw/s390x/cpu-topology.c         | 12 ++++++++++++
->>>>>>     hw/s390x/s390-virtio-ccw.c      |  3 +++
->>>>>>     target/s390x/cpu-sysemu.c       | 13 +++++++++++++
->>>>>>     target/s390x/kvm/kvm.c          | 17 +++++++++++++++++
->>>>>>     7 files changed, 48 insertions(+)
->>>>>>
->>>>>> diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topology.h
->>>>>> index 1ae7e7c5e3..60e0b9fbfa 100644
->>>>>> --- a/include/hw/s390x/cpu-topology.h
->>>>>> +++ b/include/hw/s390x/cpu-topology.h
->>>>>> @@ -66,5 +66,6 @@ static inline void s390_topology_set_cpu(MachineState *ms,
->>>>>>     
->>>>>>     extern S390Topology s390_topology;
->>>>>>     int s390_socket_nb(S390CPU *cpu);
->>>>>> +void s390_topology_reset(void);
->>>>>>     
->>>>>>     #endif
->>>>>> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
->>>>>> index e1f6925856..848314d2a9 100644
->>>>>> --- a/target/s390x/cpu.h
->>>>>> +++ b/target/s390x/cpu.h
->>>>>> @@ -641,6 +641,7 @@ typedef struct SysIBTl_cpu {
->>>>>>     QEMU_BUILD_BUG_ON(sizeof(SysIBTl_cpu) != 16);
->>>>>>     
->>>>>>     void insert_stsi_15_1_x(S390CPU *cpu, int sel2, __u64 addr, uint8_t ar);
->>>>>> +void s390_cpu_topology_reset(void);
->>>>>
->>>>> How about you call this s390_cpu_topology_reset_modified, so it's symmetric
->>>>> with the function you define in the next patch. You could also drop the "cpu"
->>>>> from the name.
->>>>
->>>> I am not sure about this, Thomas already gave his R-B on this patch so I
->>>> prefer to stay on the original name, unless he says it is a good idea to
->>>> change.
->>>> Also in cpu-sysemu.c most of the function are tagged with _cpu_
->>>
->>> IMO, renaming a function would be a small enough change to keep an R-b.
->>>>
->>>>>
->>>>> Or maybe even better, you only define a function for setting the modified state,
->>>>> but make it take a bool argument. This way you also get rid of some code duplication
->>>>> and it wouldn't harm readability IMO.
->>>>
->>>> There is already a single function kvm_s390_topology_set_mtcr(attr) to
->>>> set the "modified state"
->>>
->>> Yes, but that is for KVM only and doesn't do error handling.
->>> So you need at least one function on top of that. What I'm suggesting is to
->>> only have one function instead of two because it gets rid of some code.
->>
->> OK this is right.
->> I rename
->> void s390_cpu_topology_reset(void);
->> to
->> void s390_cpu_topology_set_mtcr(int value);
-> 
-> I don't find mtcr very descriptive and a bit of a SIE/KVM name, it might not
-> fit a possible future tcg implementation.
-> I'd just call it s390_cpu_topology_set_changed/modified, and have it take a bool,
-> because I cannot imagine other int values to make sense.
+It happens on systems which support physical hotplug and AFAIK also
+virtualization has support for "physical" hotplug.
 
-OK
+The same is true the other way round on phsyical unplug. Then the CPU
+is removed from present but is still set in possible.
 
-> 
->>
->> and then:
->>
->> -    s390_cpu_topology_reset();
->> +    s390_cpu_topology_set_mtcr(0);
->>
->>
->>>>
->>>>>
->>>>>>     
->>>>>>     /* MMU defines */
->>>>>>     #define ASCE_ORIGIN           (~0xfffULL) /* segment table origin             */
->>>>>> diff --git a/target/s390x/kvm/kvm_s390x.h b/target/s390x/kvm/kvm_s390x.h
->>>>>> index f9785564d0..649dae5948 100644
->>>>>> --- a/target/s390x/kvm/kvm_s390x.h
->>>>>> +++ b/target/s390x/kvm/kvm_s390x.h
->>>>>> @@ -47,5 +47,6 @@ void kvm_s390_crypto_reset(void);
->>>>>>     void kvm_s390_restart_interrupt(S390CPU *cpu);
->>>>>>     void kvm_s390_stop_interrupt(S390CPU *cpu);
->>>>>>     void kvm_s390_set_diag318(CPUState *cs, uint64_t diag318_info);
->>>>>> +int kvm_s390_topology_set_mtcr(uint64_t attr);
->>>>>>     
->>>>>>     #endif /* KVM_S390X_H */
->>>>>> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
->>>>>> index a80a1ebf22..cf63f3dd01 100644
->>>>>> --- a/hw/s390x/cpu-topology.c
->>>>>> +++ b/hw/s390x/cpu-topology.c
->>>>>> @@ -85,6 +85,18 @@ static void s390_topology_init(MachineState *ms)
->>>>>>         QTAILQ_INSERT_HEAD(&s390_topology.list, entry, next);
->>>>>>     }
->>>>>>     
->>>>>> +/**
->>>>>> + * s390_topology_reset:
->>>>>> + *
->>>>>> + * Generic reset for CPU topology, calls s390_topology_reset()
->>>>>> + * s390_topology_reset() to reset the kernel Modified Topology
->>>>>> + * change record.
->>>>>> + */
->>>>>> +void s390_topology_reset(void)
->>>>>> +{
->>>>>
->>>>> I'm wondering if you shouldn't move the reset changes you do in the next patch
->>>>> into this one. I don't see what they have to do with PTF emulation.
->>>>
->>>> Here in this patch we do not intercept PTF and we have only an
->>>> horizontal polarity.
->>>> So we do not need to reset the polarity for all the vCPUs, we only need
->>>> it when we have vertical polarity.
->>>
->>> Well, with the PTF patch you don't get vertical polarity either, because you
->>> only enable the topology with patch 7.
->>> And since it's about resetting, it fits better in this patch IMO.
->>
->> Not in my opinion, suppose the next patch never get included it has no
->> sense.
-> 
-> Well, yes, but then the series would be broken, since the facility requires PTF to work.
+>  =E2=80=A2 This CPU was present but no other CPU in this cluster was actu=
+ally
+>    brought up at boot time so the cluster_mask wasn't allocated.
 
-Yes, same if the activation of the facility is not included.
+Correct.
 
-Regards,
-Pierre
+> The code looks right, I don't grok the comment about partial clusters
+> and virtualization, and would have worded it something along the above
+> lines?
 
+My worry was that virtualization might be able to phsyically hotplug
+partial clusters. Whether that's possible I don't know, but in context
+of virtualization I always assume the worst case.
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+Thanks,
+
+        tglx
