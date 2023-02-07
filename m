@@ -2,83 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5822F68DD51
-	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 16:49:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E2DC268DD66
+	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 16:56:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232525AbjBGPty (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 10:49:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50174 "EHLO
+        id S232301AbjBGP4U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 10:56:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232418AbjBGPtv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 10:49:51 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83D575FEF
-        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 07:49:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675784946;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZD2lt8E8kUcveEL/JwYuZpmIFmcz1MkWw0PV+9rbNqU=;
-        b=Y4l0cq6LRUGRxbyHyetEm2e4i7PaomczzhaJ39sAVv/9M8Jps4IfZMY9Y5o/B21z5IiAoF
-        giF2Dd+5DXIRr63SBqdgPg0z3Vi3NcVdFk7g9ptBHFSPrIqqT03K5EFSuuLiKcv8XfTUAr
-        AghPhd2J2RMhG+olwYF/CTo6fwsRwSs=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-74-Vf25YmfgOB-axj4BIYVlxw-1; Tue, 07 Feb 2023 10:49:05 -0500
-X-MC-Unique: Vf25YmfgOB-axj4BIYVlxw-1
-Received: by mail-qt1-f200.google.com with SMTP id t5-20020a05622a180500b003b9c03cd525so8879453qtc.20
-        for <kvm@vger.kernel.org>; Tue, 07 Feb 2023 07:49:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZD2lt8E8kUcveEL/JwYuZpmIFmcz1MkWw0PV+9rbNqU=;
-        b=FEJ4JjTtlsrDfjPSYmz63AI5oDIyrlGTijA6paG9Eiv8lxPbvkQwuC7dT9Xde829FQ
-         5rjK+HwgJ2Pfs8zoo/Mw7IbCWkerLZJXZalF/OZ8tf/pZi4tWlLiGBq/X1l5mfJ6YenQ
-         yQT3OeUU47m1OPDaH72phUiFSdw5fw7TNCtohdZnXXdjmofN5gH/b9wxO8utx6mEGZ64
-         LO6fNlfjT2gx1YMWp99opnCXeeLtZaxT5rwLhoTZtO/Sb3j2NwEL27i0surEOb9qNgnr
-         AkRn6t5f7l2M9+hGO643FAwAvTyYGu7vGpecS14c/OUKi8N7j/szaNk+DoIxOC8aeeFY
-         8PXQ==
-X-Gm-Message-State: AO0yUKXwgrCxj7YO4xHvcJpUKQ86KSU9EZLUgAXdN089zl1yNEDzVFS+
-        Sc7DFWDJTX6RyIl6XdZ0bbh/P6qeZ3PuVtKW5GnO9DOT0oANxsCf/65jOlpPY6mqHu3XZpkuuS4
-        L5Ou0fxpkgmSfHYb8yQ==
-X-Received: by 2002:a05:6214:ca8:b0:56b:ec14:e2ad with SMTP id s8-20020a0562140ca800b0056bec14e2admr6348118qvs.28.1675784944310;
-        Tue, 07 Feb 2023 07:49:04 -0800 (PST)
-X-Google-Smtp-Source: AK7set8lU/87XJIUEPgSXD/HoFqa57/4aQofLv8njL4GpD1IqnnGcTDM5dib/Lq7ggYfj25PPqSbjw==
-X-Received: by 2002:a05:6214:ca8:b0:56b:ec14:e2ad with SMTP id s8-20020a0562140ca800b0056bec14e2admr6348067qvs.28.1675784943959;
-        Tue, 07 Feb 2023 07:49:03 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id 67-20020a370846000000b0073185aef96csm6362455qki.51.2023.02.07.07.49.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Feb 2023 07:49:03 -0800 (PST)
-Message-ID: <ea888a30-9247-de34-9f8e-9cc1702fa021@redhat.com>
-Date:   Tue, 7 Feb 2023 16:48:59 +0100
+        with ESMTP id S230480AbjBGP4T (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 10:56:19 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E9CB3D0BD;
+        Tue,  7 Feb 2023 07:56:10 -0800 (PST)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 317F9Yk4012811;
+        Tue, 7 Feb 2023 15:56:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=2VhHk4DzTv5D4v6NQ1Itjt8v41IWzQ0iHRCCkKK4oak=;
+ b=JfJH5acPw4+RjNBwHv7nOH9OsxtQ0nOqJY+OY0sj8HBqUOB36t8s20lBNTkh6Pr9Cd1o
+ SA+Mug0JbO9P+A2pTFJ5WnPU19pAZ73t2dJsCYzeNLo+VrfjHcBMy3w001E1MrOzCuGT
+ Dbkr1grHSTOrqrk1HtLbV+a87MAgzdT5x1uMGaDSbw0P68oXj1N23KzI+KOhhe2TJGZV
+ fePsUNwZa1BAU6HTQyDrzGc83xaeWBbfwifnoFFANIQ/CfDhd4k2WKNPSYJ12KURnpHP
+ 3KU1vxcLfPhB7z6A7X8390IYOvQq2zny0M3SPhq+Uq5Mrve/SE3deJDo6cTzpwAcrCcr GA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nks1rshxf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Feb 2023 15:56:07 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 317FBRG6025112;
+        Tue, 7 Feb 2023 15:56:06 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nks1rshwg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Feb 2023 15:56:06 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 317BZvxA023743;
+        Tue, 7 Feb 2023 15:56:04 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3nhf06utns-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Feb 2023 15:56:04 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 317Fu0BJ25756262
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 7 Feb 2023 15:56:00 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A362720043;
+        Tue,  7 Feb 2023 15:56:00 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E011B20040;
+        Tue,  7 Feb 2023 15:55:59 +0000 (GMT)
+Received: from [9.171.52.227] (unknown [9.171.52.227])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue,  7 Feb 2023 15:55:59 +0000 (GMT)
+Message-ID: <e63d3848-ffa3-3a74-8e14-00e86e4935be@linux.ibm.com>
+Date:   Tue, 7 Feb 2023 16:55:59 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Reply-To: eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v4 3/6] arm: pmu: Rename ALL_SET and
- PRE_OVERFLOW
+ Thunderbird/102.7.1
+Subject: Re: [PATCH v7 13/14] Documentation: KVM: s390: Describe
+ KVM_S390_MEMOP_F_CMPXCHG
 Content-Language: en-US
-To:     Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, andrew.jones@linux.dev
-Cc:     maz@kernel.org, alexandru.elisei@arm.com, oliver.upton@linux.dev,
-        reijiw@google.com
-References: <20230126165351.2561582-1-ricarkol@google.com>
- <20230126165351.2561582-4-ricarkol@google.com>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20230126165351.2561582-4-ricarkol@google.com>
-Content-Type: text/plain; charset=UTF-8
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Sven Schnelle <svens@linux.ibm.com>
+References: <20230206164602.138068-1-scgl@linux.ibm.com>
+ <20230206164602.138068-14-scgl@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20230206164602.138068-14-scgl@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Qcwl2ipESnehQSYV-I_IzkWogvU1fC0P
+X-Proofpoint-GUID: ewaYGIih2a3lUshuJVfNhHwrDQaB-8v3
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-02-07_07,2023-02-06_03,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ lowpriorityscore=0 impostorscore=0 mlxscore=0 mlxlogscore=646 bulkscore=0
+ clxscore=1015 malwarescore=0 phishscore=0 priorityscore=1501 adultscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302070138
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -86,277 +104,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Rocardo,
-
-On 1/26/23 17:53, Ricardo Koller wrote:
-> Given that the arm PMU tests now handle 64-bit counters and overflows,
-> it's better to be precise about what the ALL_SET and PRE_OVERFLOW
-> macros actually are. Given that they are both 32-bit counters,
-> just add _32 to both of them.
-nit: wouldn't have hurt to rename OVERFLOW2 too even if it is only used
-in tests using chain events.
-
-Besides:
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Thanks
-
-Eric
-
->
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+On 2/6/23 17:46, Janis Schoetterl-Glausch wrote:
+> Describe the semantics of the new KVM_S390_MEMOP_F_CMPXCHG flag for
+> absolute vm write memops which allows user space to perform (storage key
+> checked) cmpxchg operations on guest memory.
+> 
+> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
 > ---
->  arm/pmu.c | 78 +++++++++++++++++++++++++++----------------------------
->  1 file changed, 39 insertions(+), 39 deletions(-)
->
-> diff --git a/arm/pmu.c b/arm/pmu.c
-> index 06cbd73..08e956d 100644
-> --- a/arm/pmu.c
-> +++ b/arm/pmu.c
-> @@ -54,9 +54,9 @@
->  #define EXT_COMMON_EVENTS_LOW	0x4000
->  #define EXT_COMMON_EVENTS_HIGH	0x403F
->  
-> -#define ALL_SET			0x00000000FFFFFFFFULL
-> +#define ALL_SET_32			0x00000000FFFFFFFFULL
->  #define ALL_CLEAR		0x0000000000000000ULL
-> -#define PRE_OVERFLOW		0x00000000FFFFFFF0ULL
-> +#define PRE_OVERFLOW_32		0x00000000FFFFFFF0ULL
->  #define PRE_OVERFLOW2		0x00000000FFFFFFDCULL
->  
->  #define PMU_PPI			23
-> @@ -153,11 +153,11 @@ static void pmu_reset(void)
->  	/* reset all counters, counting disabled at PMCR level*/
->  	set_pmcr(pmu.pmcr_ro | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_P);
->  	/* Disable all counters */
-> -	write_sysreg(ALL_SET, PMCNTENCLR);
-> +	write_sysreg(ALL_SET_32, PMCNTENCLR);
->  	/* clear overflow reg */
-> -	write_sysreg(ALL_SET, PMOVSR);
-> +	write_sysreg(ALL_SET_32, PMOVSR);
->  	/* disable overflow interrupts on all counters */
-> -	write_sysreg(ALL_SET, PMINTENCLR);
-> +	write_sysreg(ALL_SET_32, PMINTENCLR);
->  	isb();
->  }
->  
-> @@ -322,7 +322,7 @@ static void irq_handler(struct pt_regs *regs)
->  				pmu_stats.bitmap |= 1 << i;
->  			}
->  		}
-> -		write_sysreg(ALL_SET, pmovsclr_el0);
-> +		write_sysreg(ALL_SET_32, pmovsclr_el0);
->  		isb();
->  	} else {
->  		pmu_stats.unexpected = true;
-> @@ -346,11 +346,11 @@ static void pmu_reset(void)
->  	/* reset all counters, counting disabled at PMCR level*/
->  	set_pmcr(pmu.pmcr_ro | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_P);
->  	/* Disable all counters */
-> -	write_sysreg_s(ALL_SET, PMCNTENCLR_EL0);
-> +	write_sysreg_s(ALL_SET_32, PMCNTENCLR_EL0);
->  	/* clear overflow reg */
-> -	write_sysreg(ALL_SET, pmovsclr_el0);
-> +	write_sysreg(ALL_SET_32, pmovsclr_el0);
->  	/* disable overflow interrupts on all counters */
-> -	write_sysreg(ALL_SET, pmintenclr_el1);
-> +	write_sysreg(ALL_SET_32, pmintenclr_el1);
->  	pmu_reset_stats();
->  	isb();
->  }
-> @@ -463,7 +463,7 @@ static void test_basic_event_count(bool overflow_at_64bits)
->  	write_regn_el0(pmevtyper, 1, INST_RETIRED | PMEVTYPER_EXCLUDE_EL0);
->  
->  	/* disable all counters */
-> -	write_sysreg_s(ALL_SET, PMCNTENCLR_EL0);
-> +	write_sysreg_s(ALL_SET_32, PMCNTENCLR_EL0);
->  	report(!read_sysreg_s(PMCNTENCLR_EL0) && !read_sysreg_s(PMCNTENSET_EL0),
->  		"pmcntenclr: disable all counters");
->  
-> @@ -476,8 +476,8 @@ static void test_basic_event_count(bool overflow_at_64bits)
->  	report(get_pmcr() == (pmu.pmcr_ro | PMU_PMCR_LC), "pmcr: reset counters");
->  
->  	/* Preset counter #0 to pre overflow value to trigger an overflow */
-> -	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> -	report(read_regn_el0(pmevcntr, 0) == PRE_OVERFLOW,
-> +	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
-> +	report(read_regn_el0(pmevcntr, 0) == PRE_OVERFLOW_32,
->  		"counter #0 preset to pre-overflow value");
->  	report(!read_regn_el0(pmevcntr, 1), "counter #1 is 0");
->  
-> @@ -499,11 +499,11 @@ static void test_basic_event_count(bool overflow_at_64bits)
->  		"pmcntenset: just enabled #0 and #1");
->  
->  	/* clear overflow register */
-> -	write_sysreg(ALL_SET, pmovsclr_el0);
-> +	write_sysreg(ALL_SET_32, pmovsclr_el0);
->  	report(!read_sysreg(pmovsclr_el0), "check overflow reg is 0");
->  
->  	/* disable overflow interrupts on all counters*/
-> -	write_sysreg(ALL_SET, pmintenclr_el1);
-> +	write_sysreg(ALL_SET_32, pmintenclr_el1);
->  	report(!read_sysreg(pmintenclr_el1),
->  		"pmintenclr_el1=0, all interrupts disabled");
->  
-> @@ -551,8 +551,8 @@ static void test_mem_access(bool overflow_at_64bits)
->  
->  	pmu_reset();
->  
-> -	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> -	write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
-> +	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
-> +	write_regn_el0(pmevcntr, 1, PRE_OVERFLOW_32);
->  	write_sysreg_s(0x3, PMCNTENSET_EL0);
->  	isb();
->  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> @@ -566,7 +566,7 @@ static void test_mem_access(bool overflow_at_64bits)
->  static void test_sw_incr(bool overflow_at_64bits)
->  {
->  	uint32_t events[] = {SW_INCR, SW_INCR};
-> -	uint64_t cntr0 = (PRE_OVERFLOW + 100) & pmevcntr_mask();
-> +	uint64_t cntr0 = (PRE_OVERFLOW_32 + 100) & pmevcntr_mask();
->  	int i;
->  
->  	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)) ||
-> @@ -580,7 +580,7 @@ static void test_sw_incr(bool overflow_at_64bits)
->  	/* enable counters #0 and #1 */
->  	write_sysreg_s(0x3, PMCNTENSET_EL0);
->  
-> -	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> +	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
->  	isb();
->  
->  	for (i = 0; i < 100; i++)
-> @@ -588,12 +588,12 @@ static void test_sw_incr(bool overflow_at_64bits)
->  
->  	isb();
->  	report_info("SW_INCR counter #0 has value %ld", read_regn_el0(pmevcntr, 0));
-> -	report(read_regn_el0(pmevcntr, 0) == PRE_OVERFLOW,
-> +	report(read_regn_el0(pmevcntr, 0) == PRE_OVERFLOW_32,
->  		"PWSYNC does not increment if PMCR.E is unset");
->  
->  	pmu_reset();
->  
-> -	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> +	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
->  	write_sysreg_s(0x3, PMCNTENSET_EL0);
->  	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
->  	isb();
-> @@ -623,7 +623,7 @@ static void test_chained_counters(bool unused)
->  	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
->  	/* enable counters #0 and #1 */
->  	write_sysreg_s(0x3, PMCNTENSET_EL0);
-> -	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> +	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
->  
->  	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
->  
-> @@ -635,15 +635,15 @@ static void test_chained_counters(bool unused)
->  	pmu_reset();
->  	write_sysreg_s(0x3, PMCNTENSET_EL0);
->  
-> -	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> +	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
->  	write_regn_el0(pmevcntr, 1, 0x1);
->  	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
->  	report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
->  	report(read_regn_el0(pmevcntr, 1) == 2, "CHAIN counter #1 set to 2");
->  	report(read_sysreg(pmovsclr_el0) == 0x1, "overflow recorded for chained incr #2");
->  
-> -	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> -	write_regn_el0(pmevcntr, 1, ALL_SET);
-> +	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
-> +	write_regn_el0(pmevcntr, 1, ALL_SET_32);
->  
->  	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
->  	report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
-> @@ -654,8 +654,8 @@ static void test_chained_counters(bool unused)
->  static void test_chained_sw_incr(bool unused)
->  {
->  	uint32_t events[] = {SW_INCR, CHAIN};
-> -	uint64_t cntr0 = (PRE_OVERFLOW + 100) & pmevcntr_mask();
-> -	uint64_t cntr1 = (ALL_SET + 1) & pmevcntr_mask();
-> +	uint64_t cntr0 = (PRE_OVERFLOW_32 + 100) & pmevcntr_mask();
-> +	uint64_t cntr1 = (ALL_SET_32 + 1) & pmevcntr_mask();
->  	int i;
->  
->  	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-> @@ -668,7 +668,7 @@ static void test_chained_sw_incr(bool unused)
->  	/* enable counters #0 and #1 */
->  	write_sysreg_s(0x3, PMCNTENSET_EL0);
->  
-> -	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> +	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
->  	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
->  	isb();
->  
-> @@ -686,8 +686,8 @@ static void test_chained_sw_incr(bool unused)
->  	pmu_reset();
->  
->  	write_regn_el0(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
-> -	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> -	write_regn_el0(pmevcntr, 1, ALL_SET);
-> +	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
-> +	write_regn_el0(pmevcntr, 1, ALL_SET_32);
->  	write_sysreg_s(0x3, PMCNTENSET_EL0);
->  	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
->  	isb();
-> @@ -725,7 +725,7 @@ static void test_chain_promotion(bool unused)
->  
->  	/* Only enable even counter */
->  	pmu_reset();
-> -	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> +	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
->  	write_sysreg_s(0x1, PMCNTENSET_EL0);
->  	isb();
->  
-> @@ -873,8 +873,8 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
->  	write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
->  	write_regn_el0(pmevtyper, 1, SW_INCR | PMEVTYPER_EXCLUDE_EL0);
->  	write_sysreg_s(0x3, PMCNTENSET_EL0);
-> -	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> -	write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
-> +	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
-> +	write_regn_el0(pmevcntr, 1, PRE_OVERFLOW_32);
->  	isb();
->  
->  	/* interrupts are disabled (PMINTENSET_EL1 == 0) */
-> @@ -893,13 +893,13 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
->  	isb();
->  	report(expect_interrupts(0), "no overflow interrupt after counting");
->  
-> -	/* enable interrupts (PMINTENSET_EL1 <= ALL_SET) */
-> +	/* enable interrupts (PMINTENSET_EL1 <= ALL_SET_32) */
->  
->  	pmu_reset_stats();
->  
-> -	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> -	write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
-> -	write_sysreg(ALL_SET, pmintenset_el1);
-> +	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
-> +	write_regn_el0(pmevcntr, 1, PRE_OVERFLOW_32);
-> +	write_sysreg(ALL_SET_32, pmintenset_el1);
->  	isb();
->  
->  	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-> @@ -916,7 +916,7 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
->  	pmu_reset_stats();
->  
->  	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
-> -	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> +	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
->  	isb();
->  	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
->  	report(expect_interrupts(0x1),
-> @@ -924,8 +924,8 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
->  
->  	/* overflow on odd counter */
->  	pmu_reset_stats();
-> -	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> -	write_regn_el0(pmevcntr, 1, ALL_SET);
-> +	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
-> +	write_regn_el0(pmevcntr, 1, ALL_SET_32);
->  	isb();
->  	mem_access_loop(addr, 400, pmu.pmcr_ro | PMU_PMCR_E);
->  	report(expect_interrupts(0x3),
+>   Documentation/virt/kvm/api.rst | 29 ++++++++++++++++++++++++++---
+>   1 file changed, 26 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 0a67cb738013..d09d7223c2a6 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -3736,7 +3736,8 @@ The fields in each entry are defined as follows:
+>   :Parameters: struct kvm_s390_mem_op (in)
+>   :Returns: = 0 on success,
+>             < 0 on generic error (e.g. -EFAULT or -ENOMEM),
+> -          > 0 if an exception occurred while walking the page tables
+> +          16 bit program exception code if the access causes such an exception,
+> +          other code > 0xffff with special meaning.
+>   
+
+The 0xffff part is rebase damage from an old patch, I've discussed it 
+off list and will remove that line when picking since I see no other 
+reason for a re-spin.
+
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
