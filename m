@@ -2,140 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 83DCA68D2C6
-	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 10:27:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BB63E68D316
+	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 10:42:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231276AbjBGJ1s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 04:27:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40166 "EHLO
+        id S231690AbjBGJmC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 04:42:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229670AbjBGJ1r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 04:27:47 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27C1B65A2
-        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 01:26:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675762008;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/F3qfr1H23q3phH6cljEmKpLs439z5etAwPY/FDcZlA=;
-        b=CxoDAQAo/llAIi5O8DVB/i7BvMRrQOKSg4JtRk4RQY3BDaTG+28dkDEgj8sgWNw/m78J1D
-        cDJl5G3wpiszr22w8em40GxjbJz9/AYIPvQKdn0b+QqJezJqk/gqjBjwZqPvCvlG+MyP/4
-        SlOqurUJxD+0KmGayLT35ZX465GqGuQ=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-484-KR5RChBkNLmtCAQh3PQNnA-1; Tue, 07 Feb 2023 04:26:45 -0500
-X-MC-Unique: KR5RChBkNLmtCAQh3PQNnA-1
-Received: by mail-qk1-f197.google.com with SMTP id w17-20020a05620a425100b00706bf3b459eso9521093qko.11
-        for <kvm@vger.kernel.org>; Tue, 07 Feb 2023 01:26:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/F3qfr1H23q3phH6cljEmKpLs439z5etAwPY/FDcZlA=;
-        b=UrcjJTmgxX4pzp9c0o0AK7U49U+U7jLnZUEhhNHCm2TfzhlGxoRq/19QTDE1V3D7kD
-         Z6WhmQ7ucTtjCxEvDvqtotiNHxhw/tF4GdCsPlfynBK2bdbvB/Komv+IipI0rGIVkcR4
-         YsD1MOgQXQ58I5EzIvKp7SK2e5LtolEwTDsuGm+Id+EMj+1KvAHZ8s782wxEi+kYhnvB
-         Vs3yC5wg0WUg14z39OkjJWY23P7jlbk4R70RwDAfT2XNYuHfvlKuF9ELax7w2qzrrS0T
-         1v7rJPXqvUX8crBHaeNe0W+VUbKWzsqnm40MXxwkYU0ZGbnYJuHwfQhRwxqaEwJcJ5ES
-         KJqA==
-X-Gm-Message-State: AO0yUKVG8O5eh1awTevF0+60tWkR+VwSV2PruSn5Y3GvxZO1uJRD4fVk
-        nAF9wRNW1AIjcjLZgNoMu6PyqSmy7UTpBBe23QSHtmzITrS3zWK/Gn9BFGNSDC0543NAe1x3n43
-        M7jv7cXsenYQL
-X-Received: by 2002:a05:622a:188d:b0:3b9:a441:37f3 with SMTP id v13-20020a05622a188d00b003b9a44137f3mr3131466qtc.64.1675762004507;
-        Tue, 07 Feb 2023 01:26:44 -0800 (PST)
-X-Google-Smtp-Source: AK7set8bB7OmE4JZ0vH4S5PaJ9NaK/oiOhz8aqf0f6ynkAzsxoZg5CO1XDpfEPDTS/rewIBCUB+dtA==
-X-Received: by 2002:a05:622a:188d:b0:3b9:a441:37f3 with SMTP id v13-20020a05622a188d00b003b9a44137f3mr3131454qtc.64.1675762004253;
-        Tue, 07 Feb 2023 01:26:44 -0800 (PST)
-Received: from [192.168.0.2] (ip-109-43-176-120.web.vodafone.de. [109.43.176.120])
-        by smtp.gmail.com with ESMTPSA id dl12-20020a05620a1d0c00b0071323d3e37fsm9034385qkb.133.2023.02.07.01.26.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Feb 2023 01:26:43 -0800 (PST)
-Message-ID: <579f432d-6100-0ba1-5ba4-f72349ec9173@redhat.com>
-Date:   Tue, 7 Feb 2023 10:26:39 +0100
+        with ESMTP id S230149AbjBGJmC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 04:42:02 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DE7CC8A54;
+        Tue,  7 Feb 2023 01:42:00 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E327911FB;
+        Tue,  7 Feb 2023 01:42:42 -0800 (PST)
+Received: from [10.57.75.57] (unknown [10.57.75.57])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3B7BF3F71E;
+        Tue,  7 Feb 2023 01:41:56 -0800 (PST)
+Message-ID: <985abd9c-b3f9-3f9d-eec7-df1f26733762@arm.com>
+Date:   Tue, 7 Feb 2023 09:41:54 +0000
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [PATCH 2/7] KVM: x86: Improve return type handling in
- kvm_vm_ioctl_get_nr_mmu_pages()
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.6.1
+Subject: Re: [RFC PATCH 29/32] KVM: arm64: Pass hypercalls to userspace
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     James Morse <james.morse@arm.com>, linux-pm@vger.kernel.org,
+        loongarch@lists.linux.dev, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-acpi@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-ia64@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Lorenzo Pieralisi <lpieralisi@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Borislav Petkov <bp@alien8.de>, H Peter Anvin <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
         Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        linuxppc-dev@lists.ozlabs.org
-References: <20230203094230.266952-1-thuth@redhat.com>
- <20230203094230.266952-3-thuth@redhat.com> <Y91JAb0kKBYQjO8a@google.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <Y91JAb0kKBYQjO8a@google.com>
+        Len Brown <lenb@kernel.org>,
+        Rafael Wysocki <rafael@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Salil Mehta <salil.mehta@huawei.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>
+References: <20230203135043.409192-1-james.morse@arm.com>
+ <20230203135043.409192-30-james.morse@arm.com> <865ycg1kv2.wl-maz@kernel.org>
+ <cffde8a1-74e4-9b61-1eea-544ba3405ed4@arm.com> <86wn4vynyr.wl-maz@kernel.org>
+From:   Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <86wn4vynyr.wl-maz@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03/02/2023 18.48, Sean Christopherson wrote:
-> On Fri, Feb 03, 2023, Thomas Huth wrote:
->> kvm_vm_ioctl_get_nr_mmu_pages() tries to return a "unsigned long" value,
->> but its caller only stores ther return value in an "int" - which is also
->> what all the other kvm_vm_ioctl_*() functions are returning. So returning
->> values that do not fit into a 32-bit integer anymore does not work here.
->> It's better to adjust the return type, add a sanity check and return an
->> error instead if the value is too big.
+Hi Marc,
+
+On 06/02/2023 12:31, Marc Zyngier wrote:
+> On Mon, 06 Feb 2023 10:10:41 +0000,
+> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
 >>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>   arch/x86/kvm/x86.c | 5 ++++-
->>   1 file changed, 4 insertions(+), 1 deletion(-)
+>> Hi,
 >>
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index da4bbd043a7b..caa2541833dd 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -6007,8 +6007,11 @@ static int kvm_vm_ioctl_set_nr_mmu_pages(struct kvm *kvm,
->>   	return 0;
->>   }
->>   
->> -static unsigned long kvm_vm_ioctl_get_nr_mmu_pages(struct kvm *kvm)
->> +static int kvm_vm_ioctl_get_nr_mmu_pages(struct kvm *kvm)
->>   {
->> +	if (kvm->arch.n_max_mmu_pages > INT_MAX)
->> +		return -EOVERFLOW;
->> +
->>   	return kvm->arch.n_max_mmu_pages;
->>   }
+>> A few cents from the Realm support point of view.
+>>
+>> On 05/02/2023 10:12, Marc Zyngier wrote:
+>>> On Fri, 03 Feb 2023 13:50:40 +0000,
+>>> James Morse <james.morse@arm.com> wrote:
+>>>>
+>>>> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+>>>>
+>>>> When capability KVM_CAP_ARM_HVC_TO_USER is available, userspace can
+>>>> request to handle all hypercalls that aren't handled by KVM. With the
+>>>> help of another capability, this will allow userspace to handle PSCI
+>>>> calls.
+>>>>
+>>>> Suggested-by: James Morse <james.morse@arm.com>
+>>>> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+>>>> Signed-off-by: James Morse <james.morse@arm.com>
+>>>>
+>>>> ---
+>>>>
+>>>
+>>> On top of Oliver's ask not to make this a blanket "steal everything",
+>>> but instead to have an actual request for ranges of forwarded
+>>> hypercalls:
+>>>
+>>>> Notes on this implementation:
+>>>>
+>>>> * A similar mechanism was proposed for SDEI some time ago [1]. This RFC
+>>>>     generalizes the idea to all hypercalls, since that was suggested on
+>>>>     the list [2, 3].
+>>>>
+>>>> * We're reusing kvm_run.hypercall. I copied x0-x5 into
+>>>>     kvm_run.hypercall.args[] to help userspace but I'm tempted to remove
+>>>>     this, because:
+>>>>     - Most user handlers will need to write results back into the
+>>>>       registers (x0-x3 for SMCCC), so if we keep this shortcut we should
+>>>>       go all the way and read them back on return to kernel.
+>>>>     - QEMU doesn't care about this shortcut, it pulls all vcpu regs before
+>>>>       handling the call.
+>>
+>> This may not be always possible, e.g., for Realms. GET_ONE_REG is
+>> not supported. So using an explicit passing down of the args is
+>> preferrable.
 > 
-> My vote is to skip this patch, skip deprecation, and go straight to deleting
-> KVM_GET_NR_MMU_PAGES.  The ioctl() has never worked[*], and none of the VMMs I
-> checked use it (QEMU, Google's internal VMM, kvmtool, CrosVM).
+> What is the blocker for CCA to use GET_ONE_REG? The value obviously
+> exists and is made available to the host. pKVM is perfectly able to
+> use GET_ONE_REG and gets a bunch of zeroes for things that the
+> hypervisor has decided to hide from the host.
+> 
 
-I guess I'm living too much in the QEMU world where things need to be 
-deprecated first before removing them ;-)
-But sure, if everybody agrees that removing this directly is fine, too, I 
-can do this in v2.
+It is not impossible. On a "HOST CALL" (explicit calls to the Host from
+Realm), the GPRs are made available to the host and can be stashed into 
+the vcpu reg state and the request can be serviced. However, it is a bit
+odd, to make this exception - "the GET_ONE_REG is valid now", while in 
+almost all other cases it is invalid (exception of MMIO).
 
-  Thomas
+Of course we could always return what is stashed in the vcpu state,
+which is may be invalid/ 0. But given the construct of "host doesn't
+have access to the register state", it may be a good idea to say, 
+request always fails, to indicate that the Host is probably doing 
+something wrong, than silently passing on incorrect information.
 
 
-PS: Has there ever been a discussion about the other deprecated interfaces 
-in include/uapi/linux/kvm.h ? Most of the stuff there seems to be from 2009 
-... so maybe it's time now to remove that, too?
+> Of course, it requires that the hypervisor (the RMM in your case)
+> knows about the semantics of the hypercall, but that's obviously
+
+RMM doesn't care about the semantics of hypercall, other than
+considering it just like an SMCCC compliant call. The hypercall
+arguments/results are passed down/up by the Realm in a separate structure.
+
+> already a requirement (or you wouldn't be able to use PSCI at all).
+
+Realm PSCI calls are always serviced by the RMM. RMM may request
+the Hyp for specific information in certain cases, but that doesn't
+need to go down to the VMM.
+
+Thanks
+Suzuki
+
+
+> 
+> Thanks,
+> 
+> 	M.
+> 
 
