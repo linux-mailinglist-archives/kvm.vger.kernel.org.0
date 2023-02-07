@@ -2,84 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CFF9168DDC9
-	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 17:18:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8BEE668DDC7
+	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 17:18:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232644AbjBGQSz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 11:18:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40786 "EHLO
+        id S232596AbjBGQSh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 11:18:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232556AbjBGQSo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 11:18:44 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 016902917C
-        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 08:17:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675786672;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=MxEyheqQ0T75cQT5Y5z2FlZtN8LLkRY3F7PTyntFWDA=;
-        b=ZQQNnQ0efrs364gUouyKzbomWZE0k6B7raTJ/0DsVY17WPQ9QVp0NFq/rFRkdUXwwifaXL
-        H9EzYgWtBlc8x8hoG2Ht/RivvQkxp8BdkiickwYjXZjN8Band6WI6RRdoP0JruO+0rAVmr
-        m0sL2qEXMEDn3lIQux1odjyulB+hDQY=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-650-wStrpgLdMUuJ-eZAvwGTGQ-1; Tue, 07 Feb 2023 11:17:50 -0500
-X-MC-Unique: wStrpgLdMUuJ-eZAvwGTGQ-1
-Received: by mail-ed1-f69.google.com with SMTP id p36-20020a056402502400b004aab6614de9so3864299eda.6
-        for <kvm@vger.kernel.org>; Tue, 07 Feb 2023 08:17:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MxEyheqQ0T75cQT5Y5z2FlZtN8LLkRY3F7PTyntFWDA=;
-        b=AIq1gbmiRlSRjhgb9JwvZkeqTn9s2fdmVjQABQxpabu46fHVlliy07JbFCelu2MzKF
-         64D14gX8FPnDRrNbOYsNCytSO/Iz6ZxMVzZMFjpMXur1tFwpBGCkDcW5hitvQa7PW3ye
-         rZBUrSzZLQN3bfDISICDW3/9QgZyr8nnHUbfrJ/95YsSyjPh2oput0Kk55OQMPdUeP/r
-         +KyOqJj6ZoCpFme88F9vVonhkMXe5ebRH5R0wXAUqnQWVTEQUUCrn3CCixIQtpJnsWYj
-         LpoJLvQ6cWZOXvjUw+orKJnIz8/pQZpEMS0kkwsHsVvh9PQye2AkKo3ZdKvq35ao0BgI
-         5D6A==
-X-Gm-Message-State: AO0yUKXBE8KOXWWsUMt3kLGt+5M72QK8VzvvG7hpo/zw21MSQ7fqNfVA
-        KzhQh96Hko6zWZyft2GH6xBB6oEuBP+LkYh2BO/dcA+8Qje5Hc4FxCjNC1C4a1DXul8a5wo5vyz
-        ED0CF4gW754nj
-X-Received: by 2002:a17:906:4f83:b0:87a:542e:53b4 with SMTP id o3-20020a1709064f8300b0087a542e53b4mr4002368eju.64.1675786668676;
-        Tue, 07 Feb 2023 08:17:48 -0800 (PST)
-X-Google-Smtp-Source: AK7set/RHDuqsAOeSb7INMvO7YdalIamEO653PI2leW4ESVfWsZSmriBaqw5+CfV8SJ0xuHRX+ObgQ==
-X-Received: by 2002:a17:906:4f83:b0:87a:542e:53b4 with SMTP id o3-20020a1709064f8300b0087a542e53b4mr4002343eju.64.1675786668475;
-        Tue, 07 Feb 2023 08:17:48 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id h18-20020a50cdd2000000b004aacec09ca6sm926068edj.42.2023.02.07.08.17.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Feb 2023 08:17:47 -0800 (PST)
-Message-ID: <d5ff098a-731c-f336-efd4-b7405c5e776e@redhat.com>
-Date:   Tue, 7 Feb 2023 17:17:46 +0100
+        with ESMTP id S232556AbjBGQSf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 11:18:35 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 132F321966;
+        Tue,  7 Feb 2023 08:18:34 -0800 (PST)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 317FP5Bs011886;
+        Tue, 7 Feb 2023 16:18:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=72gAxDZ/sy65q5jsvYPj880CmIPWhy0WvH5PyoqDNm0=;
+ b=TH21kFhuBu9/nXbmBKaOsxD+Ib6vp2ilmqnPpQXzPFn2xt6NofW/lipAPr1IGd3UyFRj
+ /5qHZsjGJmHkdbVPYiXoOv37gN1iCUmen50dMh2nbDikRq6vsYG2r/+YzbGPRk6pIfLw
+ leKUlMxOoDrT6apTTSLMg4JPDU8P4zxoG4FJz7Odh+7RyCaxV6t+LqGKjv7drqdvfdgC
+ Y0QR5TMfqXtSgk8TCdF9aDtGXXlCXSOyCOF+LGMuoXggmr2yL68Rj7eeMGiUNBoBy9qL
+ 7+wPfVF6qIPVNQ+8KteJAQjPgy2KVLTGmJ0elBRnurNtHxiq4zX3fTAHtOaMG5+SRzCb GA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nks911wjg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Feb 2023 16:18:31 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 317FPJSw013000;
+        Tue, 7 Feb 2023 16:18:31 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nks911wgv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Feb 2023 16:18:31 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 317Fnp30026580;
+        Tue, 7 Feb 2023 16:18:28 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3nhf06tq8w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Feb 2023 16:18:28 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 317GIP0i44827134
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 7 Feb 2023 16:18:25 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 048AB20043;
+        Tue,  7 Feb 2023 16:18:25 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 40A2520049;
+        Tue,  7 Feb 2023 16:18:24 +0000 (GMT)
+Received: from [9.171.52.227] (unknown [9.171.52.227])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue,  7 Feb 2023 16:18:24 +0000 (GMT)
+Message-ID: <f3ee2ae4-a2b4-4dc0-832d-43e5223ad862@linux.ibm.com>
+Date:   Tue, 7 Feb 2023 17:18:24 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH V2 4/8] kvm: x86/mmu: Set mmu->sync_page as NULL for
- direct paging
+ Thunderbird/102.7.1
+Subject: Re: [PATCH v7 14/14] KVM: s390: selftest: memop: Add cmpxchg tests
 Content-Language: en-US
-To:     Lai Jiangshan <jiangshanlai@gmail.com>,
-        linux-kernel@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org
-References: <20230207155735.2845-1-jiangshanlai@gmail.com>
- <20230207155735.2845-5-jiangshanlai@gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20230207155735.2845-5-jiangshanlai@gmail.com>
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Sven Schnelle <svens@linux.ibm.com>
+References: <20230206164602.138068-1-scgl@linux.ibm.com>
+ <20230206164602.138068-15-scgl@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20230206164602.138068-15-scgl@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: d0XMUOgXSW8yndUXBOeS70a09FuMi89_
+X-Proofpoint-ORIG-GUID: vvFdIflMj-ncub3dFlK9xLUkWSxh-D2C
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-02-07_07,2023-02-06_03,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
+ clxscore=1015 malwarescore=0 impostorscore=0 adultscore=0 mlxlogscore=722
+ suspectscore=0 phishscore=0 bulkscore=0 lowpriorityscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302070143
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -87,18 +103,13 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/7/23 16:57, Lai Jiangshan wrote:
-> From: Lai Jiangshan<jiangshan.ljs@antgroup.com>
+On 2/6/23 17:46, Janis Schoetterl-Glausch wrote:
+> Test successful exchange, unsuccessful exchange, storage key protection
+> and invalid arguments.
 > 
-> mmu->sync_page for direct paging is never called.
-> 
-> And both mmu->sync_page and mm->invlpg only make sense in shadowpaging.
-> Setting mmu->sync_page as NULL for direct paging makes it consistent
-> with mm->invlpg which is set NULL for the case.
-> 
-> Signed-off-by: Lai Jiangshan<jiangshan.ljs@antgroup.com>
+> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
 
-I'd rather have a WARN_ON_ONCE in kvm_sync_page(), otherwise looks good.
+I've had checkpatch have a look at this and there's an extra \n and a 
+else after a return as well as a false-positive.
 
-Paolo
-
+Could you provide me with a fixed patch as a reply to this mail?
