@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 09DE668DD77
-	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 16:57:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E0F5068DD7A
+	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 16:57:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232266AbjBGP5r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 10:57:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54644 "EHLO
+        id S232641AbjBGP5w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 10:57:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232475AbjBGP5S (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 10:57:18 -0500
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 504193D93D;
-        Tue,  7 Feb 2023 07:57:01 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id d2so11775572pjd.5;
-        Tue, 07 Feb 2023 07:57:01 -0800 (PST)
+        with ESMTP id S232516AbjBGP5U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 10:57:20 -0500
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80A4D3D904;
+        Tue,  7 Feb 2023 07:57:04 -0800 (PST)
+Received: by mail-pf1-x429.google.com with SMTP id ea13so1791513pfb.13;
+        Tue, 07 Feb 2023 07:57:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FpPbA9xF6oScMvGYfln/2x0CbG9qI6ccW9bRoyYMKlo=;
-        b=FgRxsfcfNNSPl9UUDPrvsGQ/rioCqZMHpfN+fci/cOEObU+HScNFDqKB8NGpnEPw9K
-         j4YGCNwnoxavJhV0Uy5sD7OHyx/1IfAgeeP4d0tNnWqXwlVAjNpLmNKwXdIHdDyad0wt
-         gpBfSsn3yb+Er/jm614kGsoR1nIdmfvvmdnWhuRUIY9HXPAQZICHEWw1wFxpRFCk9oZl
-         ckAHbVj45e0ENExbEijc+8LBpcm64h9lhosAu5GnYUNAIuPeyCB1RaGeZXXsEuPwofY0
-         I+GdGeeTORcyDwfmPoOotUPjFSu1FwSr/0qrvUK6O7IkMDWkc5ruGxK24VosgTtSvoBj
-         VNMw==
+        bh=W618oeFBR26jFkCOGW2ktI8DuH0UezwdqqlJmNvjLzY=;
+        b=TdKwZwkTOw4aMzgL/pQ0BVKPf9xEXoQKqCpxIoxZga4Nn4zeI5+YQCE1q/M2q6uDjL
+         pOHM1tow2f8f5GA7trx3Ub+6E71/0Cn0TN1zKluzTbLlDG7zC2H/51b/inJ8niNs+lh0
+         JoGNLdT4Mg45NTXKBEg1IH02+KT5/mjwd+jaByFgEqm825G3o5kd5hgZSvh4d5NxPwVF
+         hnDbL0j9PK9MLXsF2+ErYM0N7037mWcxkVeEbXXk9jZpCg4rSXFD6w1znQ0mI6SYIbd9
+         N5Ui+sWmB0Oo38neAjwfLR3/VQixI0b3fzEdM3Bc6nDW1QL/v553rwAVvG40Ea4TV5XF
+         R8Bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FpPbA9xF6oScMvGYfln/2x0CbG9qI6ccW9bRoyYMKlo=;
-        b=nu9UUbIdxOXBLjmO624Bmh2tdjGpBHaiY3Nerb1/J7Vp8Noe8zakkY9MxdNTuXWlNc
-         MkrHPXB0m0rcl6/nxUMppKpfAopmNkjve99I9Ipcvo+qUrEXFboL89j5Umm/XVG8f3mI
-         qtAarp/rmE0d65+vWrB7vwVMOkeEMmrdpX4YJBWRiKYf4gJg2JZF6/It/lkxMnPpNLp0
-         7oIpWQXBoqIImYoX7eOle//WqoAqksNPF7gFrOMkpZCFTgpLxf5wftUXEcilox7+TX/H
-         zPCAxotz243cQSd+VdYPHyxGd6VPIby8Gw6DVj2/Ua6WW650AqjfMXikU61ao3nS+gR8
-         9nlw==
-X-Gm-Message-State: AO0yUKXckMlHGi1mbzmbtUMx7xzKNT8ETq1FOYvoWFinOkY/IDIArNXU
-        BpL5SvJBDwFxVpU4sVFH7WVssXxSFkg=
-X-Google-Smtp-Source: AK7set8SJWkiq4MaeBhB9HwD4mo0PT8egLGypFDUBbzvRFNxpmY6WEOO14XCeVQUYS93xk8BZSUOUw==
-X-Received: by 2002:a17:902:ea09:b0:198:fd67:ba46 with SMTP id s9-20020a170902ea0900b00198fd67ba46mr3920789plg.1.1675785408129;
-        Tue, 07 Feb 2023 07:56:48 -0800 (PST)
+        bh=W618oeFBR26jFkCOGW2ktI8DuH0UezwdqqlJmNvjLzY=;
+        b=ZHB0kC+CjU6PNChEkD5Irow0uZ8s5IKsZdEMf7W2UmtKCnoDpiqkGgjnwK1h535LsT
+         XOySj6EK9WHw947EBP2EUTsh/u0eMTUYLMin48KUgAHrL+WEaE4XZu0wz+UBpTB/YpmY
+         td73hHs/blpY3iI0E69VhpYmjvPfDnrnx1WUvZqUTfNZ8ms9rYR8k3uX2DkJEdP312B+
+         wLlHedFPz9pnyUE9xL9xwk0WxeGjcTnnHnQ4igA6XAxuAczIVEicG3Ro+DCKZleotrzI
+         8Cvql5zWNnis4TiCUXW1Dm7dBvqlntnum6kNF39Q8pvCbUpxxA0BHE/h+7zJNRXt1m8C
+         Ys0w==
+X-Gm-Message-State: AO0yUKVSeSSNlJxWpAFRIa0E1Pel33MordlJ8qRrSFni/YVi2WktbNft
+        DV1vxnqWQX7lncV8+1xkkttdapxgKpM=
+X-Google-Smtp-Source: AK7set9yQ3QONY05PNePbYqJFdpCTCpxdbeX01ePwGmNeDpYmNE68460R+df1pwHjYKj7+YpF3jukg==
+X-Received: by 2002:aa7:94b3:0:b0:594:2e35:594e with SMTP id a19-20020aa794b3000000b005942e35594emr3496773pfl.20.1675785412562;
+        Tue, 07 Feb 2023 07:56:52 -0800 (PST)
 Received: from localhost ([47.89.225.180])
-        by smtp.gmail.com with ESMTPSA id jl13-20020a170903134d00b00198fde9178csm5942539plb.197.2023.02.07.07.56.47
+        by smtp.gmail.com with ESMTPSA id 12-20020aa7924c000000b0058bb0fb6295sm1824940pfp.26.2023.02.07.07.56.51
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 07 Feb 2023 07:56:47 -0800 (PST)
+        Tue, 07 Feb 2023 07:56:52 -0800 (PST)
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -58,9 +58,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
         "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org
-Subject: [PATCH V2 7/8] kvm: x86/mmu: Reduce the update to the spte in FNAME(sync_page)
-Date:   Tue,  7 Feb 2023 23:57:33 +0800
-Message-Id: <20230207155735.2845-8-jiangshanlai@gmail.com>
+Subject: [PATCH V2 8/8] kvm: x86/mmu: Remove @no_dirty_log from FNAME(prefetch_gpte)
+Date:   Tue,  7 Feb 2023 23:57:34 +0800
+Message-Id: <20230207155735.2845-9-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20230207155735.2845-1-jiangshanlai@gmail.com>
 References: <20230207155735.2845-1-jiangshanlai@gmail.com>
@@ -78,37 +78,45 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-Sometimes when the guest updates its pagetable, it adds only new gptes
-to it without changing any existed one, so there is no point to update
-the sptes for these existed gptes.
-
-Also when the sptes for these unchanged gptes are updated, the AD
-bits are also removed since make_spte() is called with prefetch=true
-which might result unneeded TLB flushing.
-
-Do nothing if the gpte's permissions are unchanged.
+FNAME(prefetch_gpte) is always called with @no_dirty_log=true.
 
 Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 ---
- arch/x86/kvm/mmu/paging_tmpl.h | 5 +++++
- 1 file changed, 5 insertions(+)
+ arch/x86/kvm/mmu/paging_tmpl.h | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 0031fe22af3d..fca5ce349d9d 100644
+index fca5ce349d9d..e04950015dc4 100644
 --- a/arch/x86/kvm/mmu/paging_tmpl.h
 +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -967,6 +967,11 @@ static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int
- 		drop_spte(vcpu->kvm, &sp->spt[i]);
- 		return 1;
- 	}
-+	/*
-+	 * Do nothing if the permissions are unchanged.
-+	 */
-+	if (kvm_mmu_page_get_access(sp, i) == pte_access)
-+		return 0;
+@@ -519,7 +519,7 @@ static int FNAME(walk_addr)(struct guest_walker *walker,
  
- 	/* Update the shadowed access bits in case they changed. */
- 	kvm_mmu_page_set_access(sp, i, pte_access);
+ static bool
+ FNAME(prefetch_gpte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+-		     u64 *spte, pt_element_t gpte, bool no_dirty_log)
++		     u64 *spte, pt_element_t gpte)
+ {
+ 	struct kvm_memory_slot *slot;
+ 	unsigned pte_access;
+@@ -535,8 +535,7 @@ FNAME(prefetch_gpte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 	pte_access = sp->role.access & FNAME(gpte_access)(gpte);
+ 	FNAME(protect_clean_gpte)(vcpu->arch.mmu, &pte_access, gpte);
+ 
+-	slot = gfn_to_memslot_dirty_bitmap(vcpu, gfn,
+-			no_dirty_log && (pte_access & ACC_WRITE_MASK));
++	slot = gfn_to_memslot_dirty_bitmap(vcpu, gfn, pte_access & ACC_WRITE_MASK);
+ 	if (!slot)
+ 		return false;
+ 
+@@ -605,7 +604,7 @@ static void FNAME(pte_prefetch)(struct kvm_vcpu *vcpu, struct guest_walker *gw,
+ 		if (is_shadow_present_pte(*spte))
+ 			continue;
+ 
+-		if (!FNAME(prefetch_gpte)(vcpu, sp, spte, gptep[i], true))
++		if (!FNAME(prefetch_gpte)(vcpu, sp, spte, gptep[i]))
+ 			break;
+ 	}
+ }
 -- 
 2.19.1.6.gb485710b
 
