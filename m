@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 238A868DD69
-	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 16:56:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D34668DD6B
+	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 16:56:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232647AbjBGP43 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 10:56:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53130 "EHLO
+        id S232630AbjBGP4e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 10:56:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232088AbjBGP4X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 10:56:23 -0500
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F8FE28850;
-        Tue,  7 Feb 2023 07:56:22 -0800 (PST)
-Received: by mail-pg1-x535.google.com with SMTP id 78so10712657pgb.8;
-        Tue, 07 Feb 2023 07:56:22 -0800 (PST)
+        with ESMTP id S232064AbjBGP41 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 10:56:27 -0500
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9221F1DBA5;
+        Tue,  7 Feb 2023 07:56:26 -0800 (PST)
+Received: by mail-pj1-x1032.google.com with SMTP id on9-20020a17090b1d0900b002300a96b358so15417736pjb.1;
+        Tue, 07 Feb 2023 07:56:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=52gmGFk0S/EI3/tgfOzdMgf+mQOxiRfHBzVFZtJM5HI=;
-        b=HjrTclXdWf1pzZiCYqcCUtzZBBqLeOZfUkCvLwpTsrVUEMkg9esqxssiIFn8Ysb+N2
-         V92Q0Q9Llwc46gy4N22/9EBEX5i+buUK8llS9ztKyFUUOChzPBgeEL0ltxUc3yzmbYME
-         D0FTrO2Df1Ong2tsYimdupTUa+lpsnX3kORzFe43gNB/ZFcpUrpfAUSF2HGtfz5Yi/KS
-         iiJk8yYoToQrmzL8g0Sffci+TMK2EQN+hhWCCauxfWc+Oei+7jUXIEexseAtvuodkFKA
-         gnpNw0vwhq7mrPqJigg7/UkzBm03f1J72g1KZ0ArhiVf0BanLxTJjNw5tVB2SI0giD5O
-         BEzg==
+        bh=00EnWk3ZcvlWSt+eqRLR8f7k4INrMYq7M/LxOj8BTmY=;
+        b=i/WILB2TOMxVYBBVBjuXsmnKJfVb94zgDGMBL/RIvs5DS7GLZ6hwhtC9t1FDjk6yoQ
+         QVr/kftMtd8RQiTodOpfr9biP801XloUaScWN3RbR+H3FEZsYdRn3fTr0ckdERqbiCzy
+         tl9yVOBkG7ddLgufjWNX1QbJtxqF9R4W6Hr7RC6l5t9tPReTUwhmFCW4h0XiLgAkbHUy
+         JlP64Bqz0X0SueJz0UBQekkqQKe090jaE7aKyRj20Qyz1Bs1G9ly1Uvk8vHtaVcS1mCa
+         1vKqIHGDpROAZlUu8weoM63rekXJAP7xpzaHDMYSOxGyCulzcQ/WV91GGzt8d2nU7W4A
+         XGew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=52gmGFk0S/EI3/tgfOzdMgf+mQOxiRfHBzVFZtJM5HI=;
-        b=reX5psNJIUca6Vht99Sk7uIVTBE3T2AJaTKG5HuN6Hx5a/l4kJXPsAAMOX0/gXzaE9
-         sc6T3yyfskeawDjdhVN9yHAV7P5GEIeghm0UtgV+8eAU5FkbotNccDwuW310e2dPBJoS
-         LzgNxt/uvn9o/tGW4SGxtAlrLGJHki4CpXpR/kZyJdb1JsDl5QtmaPRP919WGcpNN3vd
-         jhbwfamO/DyiK7fqPdhyn6nPvuhZrTPoqbS1oS6z8uQ8J7VZ2OTrnlKMk1Th7cD2FzHn
-         M8hvBEJ9mcr9C9lUoATojjuNbDk51df19WTUX/PmzVbPTWol0nNu+d7LGNEbBhvX2DtB
-         FtTA==
-X-Gm-Message-State: AO0yUKXGdEcnKx/J4e7XLUmyxae3+KSbX0V//5U7JQex2f/3A/ZQG8ZV
-        QlfmyJaOpHgko2LbQXsPBQ2rkmBBtZU=
-X-Google-Smtp-Source: AK7set/Jd6stMkH3hTzys0MvdDjYSvqdc+G5YoiCol+EIwItiMiesIOcJa9KQQPjvZcYdJInKz4f2Q==
-X-Received: by 2002:a62:1b43:0:b0:593:b37c:c7ad with SMTP id b64-20020a621b43000000b00593b37cc7admr3175876pfb.22.1675785381377;
-        Tue, 07 Feb 2023 07:56:21 -0800 (PST)
-Received: from localhost ([47.88.5.130])
-        by smtp.gmail.com with ESMTPSA id a24-20020aa79718000000b00593b82ea1cesm9351115pfg.49.2023.02.07.07.56.20
+        bh=00EnWk3ZcvlWSt+eqRLR8f7k4INrMYq7M/LxOj8BTmY=;
+        b=HWiKWgiCvxoX+tenH3B8oJLHj36FO2k4jN8LWa0LvdPljS+9/ByDKEK4owqGTxP/Gg
+         m1GQnFM8GQNgqOUeP7QBU4/oXEvJGtmi78Of4CUH64iyyCopxk12dFpiLdeMtQin2811
+         yrumXQsDNxcHayiCtcXsIGrMfPcyiL7wR3AvsiMbGhZ1oHWtzKZOM5OA9tqlDXhf6lts
+         LnG7LQcEvIHEfJDqeCFEoMIPm6xYmvJa8yVGfrYmPldx1EsJQ9tKbJqJF82o6R2+WhFT
+         UQuOLVBK4PZKBxej+++dlRO/dVpnEL/QXEJmKP7ksSPifB7eN3Y5O+TnpTsO+0l0aPeD
+         iHHg==
+X-Gm-Message-State: AO0yUKWxhO06Pdo56WPbje9yXlGcZ6veEEmYqykvtD5NCkUBiG6j7iDT
+        DAgiVk1qp0732S+sbbDDTLsAYmTFy2I=
+X-Google-Smtp-Source: AK7set+sZsv0dwA6ObpBEtm4xzK/yk9gog3oSWr78QTFaDILZO3EgaAPT8ppnTJPSLlcktYUvUcW/A==
+X-Received: by 2002:a05:6a21:980b:b0:be:db40:634f with SMTP id ue11-20020a056a21980b00b000bedb40634fmr2933632pzb.55.1675785385858;
+        Tue, 07 Feb 2023 07:56:25 -0800 (PST)
+Received: from localhost ([47.89.225.180])
+        by smtp.gmail.com with ESMTPSA id j13-20020a170902c3cd00b0019339f3368asm1713221plj.3.2023.02.07.07.56.24
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 07 Feb 2023 07:56:20 -0800 (PST)
+        Tue, 07 Feb 2023 07:56:25 -0800 (PST)
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -58,9 +58,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
         "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org
-Subject: [PATCH V2 1/8] kvm: x86/mmu: Use KVM_MMU_ROOT_XXX for kvm_mmu_invalidate_gva()
-Date:   Tue,  7 Feb 2023 23:57:27 +0800
-Message-Id: <20230207155735.2845-2-jiangshanlai@gmail.com>
+Subject: [PATCH V2 2/8] kvm: x86/mmu: Use kvm_mmu_invalidate_gva() in kvm_mmu_invpcid_gva()
+Date:   Tue,  7 Feb 2023 23:57:28 +0800
+Message-Id: <20230207155735.2845-3-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20230207155735.2845-1-jiangshanlai@gmail.com>
 References: <20230207155735.2845-1-jiangshanlai@gmail.com>
@@ -78,118 +78,54 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-The @root_hpa for kvm_mmu_invalidate_gva() is called with @mmu->root.hpa
-or INVALID_PAGE where @mmu->root.hpa is to invalidate gva for the current
-root (the same meaning as KVM_MMU_ROOT_CURRENT) and INVALID_PAGE is to
-invalidate gva for all roots (the same meaning as KVM_MMU_ROOTS_ALL).
+Use kvm_mmu_invalidate_gva() instead open calls to mmu->invlpg().
 
-Change the argument type of kvm_mmu_invalidate_gva() and use
-KVM_MMU_ROOT_XXX instead so that we can reuse the function for
-kvm_mmu_invpcid_gva() and nested_ept_invalidate_addr() for invalidating
-gva for different set of roots.
-
-No fuctionalities changed.
+No functional change intended.
 
 Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 ---
- arch/x86/include/asm/kvm_host.h |  2 +-
- arch/x86/kvm/mmu/mmu.c          | 39 +++++++++++++++++----------------
- arch/x86/kvm/x86.c              |  2 +-
- 3 files changed, 22 insertions(+), 21 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 21 +++++++--------------
+ 1 file changed, 7 insertions(+), 14 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 4d2bc08794e4..81429a5640d6 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -2026,7 +2026,7 @@ int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 error_code,
- 		       void *insn, int insn_len);
- void kvm_mmu_invlpg(struct kvm_vcpu *vcpu, gva_t gva);
- void kvm_mmu_invalidate_gva(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
--			    gva_t gva, hpa_t root_hpa);
-+			    gva_t gva, unsigned long roots);
- void kvm_mmu_invpcid_gva(struct kvm_vcpu *vcpu, gva_t gva, unsigned long pcid);
- void kvm_mmu_new_pgd(struct kvm_vcpu *vcpu, gpa_t new_pgd);
- 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index c91ee2927dd7..958e8eb977ed 100644
+index 958e8eb977ed..8563b52b8bb7 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5707,10 +5707,12 @@ int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 err
- EXPORT_SYMBOL_GPL(kvm_mmu_page_fault);
- 
- void kvm_mmu_invalidate_gva(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
--			    gva_t gva, hpa_t root_hpa)
-+			    gva_t gva, unsigned long roots)
+@@ -5757,27 +5757,20 @@ EXPORT_SYMBOL_GPL(kvm_mmu_invlpg);
+ void kvm_mmu_invpcid_gva(struct kvm_vcpu *vcpu, gva_t gva, unsigned long pcid)
  {
- 	int i;
+ 	struct kvm_mmu *mmu = vcpu->arch.mmu;
+-	bool tlb_flush = false;
++	unsigned long roots = 0;
+ 	uint i;
  
-+	WARN_ON_ONCE(roots & ~KVM_MMU_ROOTS_ALL);
-+
- 	/* It's actually a GPA for vcpu->arch.guest_mmu.  */
- 	if (mmu != &vcpu->arch.guest_mmu) {
- 		/* INVLPG on a non-canonical address is a NOP according to the SDM.  */
-@@ -5723,31 +5725,30 @@ void kvm_mmu_invalidate_gva(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
- 	if (!mmu->invlpg)
- 		return;
+-	if (pcid == kvm_get_active_pcid(vcpu)) {
+-		if (mmu->invlpg)
+-			mmu->invlpg(vcpu, gva, mmu->root.hpa);
+-		tlb_flush = true;
+-	}
++	if (pcid == kvm_get_active_pcid(vcpu))
++		roots |= KVM_MMU_ROOT_CURRENT;
  
--	if (root_hpa == INVALID_PAGE) {
-+	if ((roots & KVM_MMU_ROOT_CURRENT) && VALID_PAGE(mmu->root.hpa))
- 		mmu->invlpg(vcpu, gva, mmu->root.hpa);
- 
--		/*
--		 * INVLPG is required to invalidate any global mappings for the VA,
--		 * irrespective of PCID. Since it would take us roughly similar amount
--		 * of work to determine whether any of the prev_root mappings of the VA
--		 * is marked global, or to just sync it blindly, so we might as well
--		 * just always sync it.
--		 *
--		 * Mappings not reachable via the current cr3 or the prev_roots will be
--		 * synced when switching to that cr3, so nothing needs to be done here
--		 * for them.
--		 */
--		for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
--			if (VALID_PAGE(mmu->prev_roots[i].hpa))
+ 	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++) {
+ 		if (VALID_PAGE(mmu->prev_roots[i].hpa) &&
+-		    pcid == kvm_get_pcid(vcpu, mmu->prev_roots[i].pgd)) {
+-			if (mmu->invlpg)
 -				mmu->invlpg(vcpu, gva, mmu->prev_roots[i].hpa);
--	} else {
--		mmu->invlpg(vcpu, gva, root_hpa);
-+	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++) {
-+		if ((roots & KVM_MMU_ROOT_PREVIOUS(i)) &&
-+		    VALID_PAGE(mmu->prev_roots[i].hpa))
-+			mmu->invlpg(vcpu, gva, mmu->prev_roots[i].hpa);
+-			tlb_flush = true;
+-		}
++		    pcid == kvm_get_pcid(vcpu, mmu->prev_roots[i].pgd))
++			roots |= KVM_MMU_ROOT_PREVIOUS(i);
  	}
- }
  
- void kvm_mmu_invlpg(struct kvm_vcpu *vcpu, gva_t gva)
- {
--	kvm_mmu_invalidate_gva(vcpu, vcpu->arch.walk_mmu, gva, INVALID_PAGE);
-+	/*
-+	 * INVLPG is required to invalidate any global mappings for the VA,
-+	 * irrespective of PCID. Since it would take us roughly similar amount
-+	 * of work to determine whether any of the prev_root mappings of the VA
-+	 * is marked global, or to just sync it blindly, so we might as well
-+	 * just always sync it.
-+	 *
-+	 * Mappings not reachable via the current cr3 or the prev_roots will be
-+	 * synced when switching to that cr3, so nothing needs to be done here
-+	 * for them.
-+	 */
-+	kvm_mmu_invalidate_gva(vcpu, vcpu->arch.walk_mmu, gva, KVM_MMU_ROOTS_ALL);
+-	if (tlb_flush)
+-		static_call(kvm_x86_flush_tlb_gva)(vcpu, gva);
+-
++	if (roots)
++		kvm_mmu_invalidate_gva(vcpu, mmu, gva, roots);
  	++vcpu->stat.invlpg;
- }
- EXPORT_SYMBOL_GPL(kvm_mmu_invlpg);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 508074e47bc0..a81937a8fe0c 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -799,7 +799,7 @@ void kvm_inject_emulated_page_fault(struct kvm_vcpu *vcpu,
- 	if ((fault->error_code & PFERR_PRESENT_MASK) &&
- 	    !(fault->error_code & PFERR_RSVD_MASK))
- 		kvm_mmu_invalidate_gva(vcpu, fault_mmu, fault->address,
--				       fault_mmu->root.hpa);
-+				       KVM_MMU_ROOT_CURRENT);
  
- 	fault_mmu->inject_page_fault(vcpu, fault);
- }
+ 	/*
 -- 
 2.19.1.6.gb485710b
 
