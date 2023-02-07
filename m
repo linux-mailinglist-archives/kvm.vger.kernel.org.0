@@ -2,129 +2,659 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A849268DE0D
-	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 17:38:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0AA1168DE22
+	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 17:42:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230301AbjBGQiU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 11:38:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56730 "EHLO
+        id S231552AbjBGQmt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 11:42:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229512AbjBGQiS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 11:38:18 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 123D3A4
-        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 08:38:18 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id e19so8290956plc.9
-        for <kvm@vger.kernel.org>; Tue, 07 Feb 2023 08:38:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2So4hv1hi8BG5UUukFb3+REHHKPjn28YFwULPpBOJLk=;
-        b=WD7a0RXfAR2IFHAOllVUw8jakwuoLsXLLs6ixFHKdmY+6Wus3qK8CD/1XDZtC1dIUg
-         RooS0coMvNT1WjlROoiAdP0pX0azC1wONTrncHHJ3s9oDsVzX5WXfUl/lYQkxZheCUEA
-         Jml0u0duRfANlAvmzewqFgpOfW+rkz1gSU4tsz+swQJG9Fo3+BlQXRlbIYkDD+rMNUEw
-         mHlGLJ3F9McQ0HaPNCq0GYqhXdpVom79f1QGeNqqStbsu/5XIrOM7xRen4LQngq5iJSx
-         RLP2fUvsyYdFP0Cep+OZiRVLnmprzZPt/iciVhmbmrAMMNhHek0DJI16UFfCxDFkR///
-         790A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2So4hv1hi8BG5UUukFb3+REHHKPjn28YFwULPpBOJLk=;
-        b=PbtOm+6OHjQrfni4Yg9BPAAP0hE+6gFaJPzhhx/0zWOCpUlC7/L/c7YGm5ppaOyxKV
-         VMkb6q/Bx7ZK051xzmML2avKZqEdEG8eX2xNxHXb1axTx+N81ivrjBqBQEZTGr6hlEV2
-         DlQHknSY3S9YQUMYT1mhwlaEkbVss8TGbwnDhV61+kPdWvyI6GlXYYhiOMFRmWerQquA
-         +U9vgiJ5rBwbyh3wkargRXEzY/Uhxy3HHyDA7NVSBk8xWcYzTbY1iddEOV/+Bv7Ai4UX
-         KUKmGeNfopsGKruwvTMgUHnKzyrum6uYz0WO+r4+iAf1OK0htyDkZJnRb7vmrIkcexS4
-         jswQ==
-X-Gm-Message-State: AO0yUKXBlSzqetBoeI4PpG5PXVwNzyFoqSMG8u6J1TOZCykT3ytVt74K
-        upDBLcaALrHPyiVP8aNHOyvpPw==
-X-Google-Smtp-Source: AK7set8T2dPADRrjmHIwQIhOi9y6Kjuq37Aqt8tThmQ4Y9zHFhM0wAaRxTzdegYDmj8jOjGAFntBsg==
-X-Received: by 2002:a17:902:8697:b0:198:af4f:de0b with SMTP id g23-20020a170902869700b00198af4fde0bmr213146plo.11.1675787897388;
-        Tue, 07 Feb 2023 08:38:17 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id z11-20020a17090a170b00b0023087e8adf8sm6542524pjd.21.2023.02.07.08.38.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Feb 2023 08:38:16 -0800 (PST)
-Date:   Tue, 7 Feb 2023 16:38:13 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Joao Martins <joao.m.martins@oracle.com>
-Cc:     Igor Mammedov <imammedo@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Subject: Re: [PATCH v2 2/3] KVM: SVM: Modify AVIC GATag to support max number
- of 512 vCPUs
-Message-ID: <Y+J+dS8ZRX07kgt7@google.com>
-References: <20230207002156.521736-1-seanjc@google.com>
- <20230207002156.521736-3-seanjc@google.com>
- <20230207093350.5db155ca@imammedo.users.ipa.redhat.com>
- <0e12d654-d388-a0f9-e7f9-7e96921786b7@oracle.com>
+        with ESMTP id S231535AbjBGQmq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 11:42:46 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6C1B7D8C;
+        Tue,  7 Feb 2023 08:42:43 -0800 (PST)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 317GVsBN037208;
+        Tue, 7 Feb 2023 16:42:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=1gtzw2cMC2SgTg/4+moouwNPGvK3vqstmZbDa/uhd/8=;
+ b=jKKo80xK2ApGlLO8e3OsCkTg2yzLq9IUP4w2yaenUDZJaJKq3bmUUWDMl5hZgnhsoThg
+ DiErJ1p/ZtdjMmCDYvXw/9YiR6eoIaPEHucgsa8Iql2GzYQEG8B+R64NRhvaqr/mVe9S
+ vp7IIeq1oXrOKRg4J4orCwAJtftBfmHEIlInV5FCzFn3fTSE+B5tmpDKE2yH0pFACBip
+ pYnqVXIL2C0FES9D32Q0GeoQe/4j8IYLiWsvZxyJNPirnIy9kOG9ZQ6eGA2/bOS+NCnh
+ Y9+x9SFGHY18E0KTIczudjrCBqnnkLlTBSLCAvZe0I1TkPtkpznqz2oMAO/C9CPVYnXz 4A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nkt8drch2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Feb 2023 16:42:38 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 317GWVGV039040;
+        Tue, 7 Feb 2023 16:42:37 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nkt8drcg2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Feb 2023 16:42:37 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 316L8Dtj011173;
+        Tue, 7 Feb 2023 16:42:35 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma04fra.de.ibm.com (PPS) with ESMTPS id 3nhf06tqa2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Feb 2023 16:42:35 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 317GgWsq25821910
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 7 Feb 2023 16:42:32 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 09B6620043;
+        Tue,  7 Feb 2023 16:42:32 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8119120040;
+        Tue,  7 Feb 2023 16:42:31 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue,  7 Feb 2023 16:42:31 +0000 (GMT)
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>
+Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Sven Schnelle <svens@linux.ibm.com>
+Subject: [PATCH v8 14/14] KVM: s390: selftest: memop: Add cmpxchg tests
+Date:   Tue,  7 Feb 2023 17:42:25 +0100
+Message-Id: <20230207164225.2114706-1-scgl@linux.ibm.com>
+X-Mailer: git-send-email 2.37.2
+In-Reply-To: <f3ee2ae4-a2b4-4dc0-832d-43e5223ad862@linux.ibm.com>
+References: <f3ee2ae4-a2b4-4dc0-832d-43e5223ad862@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0e12d654-d388-a0f9-e7f9-7e96921786b7@oracle.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 4n9FuU3Sc_aDxSMHqNTyN4aqBFHaMiY7
+X-Proofpoint-ORIG-GUID: cFEyo1eBX_owOlG_B9R3TQN4VgWqtM7o
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-02-07_08,2023-02-06_03,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ lowpriorityscore=0 spamscore=0 priorityscore=1501 mlxscore=0 phishscore=0
+ bulkscore=0 clxscore=1015 mlxlogscore=999 impostorscore=0 adultscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302070147
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 07, 2023, Joao Martins wrote:
-> On 07/02/2023 08:33, Igor Mammedov wrote:
-> > On Tue,  7 Feb 2023 00:21:55 +0000
-> > Sean Christopherson <seanjc@google.com> wrote:
-> > 
-> >> From: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-> >>
-> >> Define AVIC_VCPU_ID_MASK based on AVIC_PHYSICAL_MAX_INDEX, i.e. the mask
-> >> that effectively controls the largest guest physical APIC ID supported by
-> >> x2AVIC, instead of hardcoding the number of bits to 8 (and the number of
-> >> VM bits to 24).
-> > 
-> > Is there any particular reason not to tie it to max supported by KVM
-> > KVM_MAX_VCPU_IDS?
-> > 
-> > Another question:
-> >  will guest fail to start when configured with more than 512 vCPUs
-> >  or it will start broken?
-> > 
-> 
-> I think the problem is not so much the GATag (which can really be anything at
-> the resolution you want). It's more of an SVM limit AIUI. Provided you can't
-> have GATAgs if you don't have guest-mode/AVIC active, then makes sense have the
-> same limit on both.
+Test successful exchange, unsuccessful exchange, storage key protection
+and invalid arguments.
 
-Yep.  The physical ID table, which is needed to achieve full AVIC benefits for a
-vCPU, is a single 4KiB page that holds 512 64-bit entries.  AIUI, the GATag is
-used if and only if the interrupt target is in the physical ID table, so using
-more GATag bits for vCPU ID is pointless.
+Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+Acked-by: Janosch Frank <frankja@linux.ibm.com>
+---
+ tools/testing/selftests/kvm/s390x/memop.c | 407 +++++++++++++++++++++-
+ 1 file changed, 392 insertions(+), 15 deletions(-)
 
-> SVM seems to be limited to 256 vcpus in xAPIC mode or 512 vcpus in x2APIC
-> mode[0]. IIUC You actually won't be able to create guests with more than
-> 512vcpus as KVM bound checks those max limits very early in the vCPU init (see
-> avic_init_vcpu()). I guess the alternative would an AVIC inhibit if vCPU count
-> goes beyond those limits -- probably a must have once avic flips to 1 by default
-> like Intel.
+diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
+index c5fec84ef3c2..8e4b94d7b8dd 100644
+--- a/tools/testing/selftests/kvm/s390x/memop.c
++++ b/tools/testing/selftests/kvm/s390x/memop.c
+@@ -9,6 +9,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <sys/ioctl.h>
++#include <pthread.h>
+ 
+ #include <linux/bits.h>
+ 
+@@ -26,6 +27,7 @@ enum mop_target {
+ enum mop_access_mode {
+ 	READ,
+ 	WRITE,
++	CMPXCHG,
+ };
+ 
+ struct mop_desc {
+@@ -44,13 +46,16 @@ struct mop_desc {
+ 	enum mop_access_mode mode;
+ 	void *buf;
+ 	uint32_t sida_offset;
++	void *old;
++	uint8_t old_value[16];
++	bool *cmpxchg_success;
+ 	uint8_t ar;
+ 	uint8_t key;
+ };
+ 
+ const uint8_t NO_KEY = 0xff;
+ 
+-static struct kvm_s390_mem_op ksmo_from_desc(const struct mop_desc *desc)
++static struct kvm_s390_mem_op ksmo_from_desc(struct mop_desc *desc)
+ {
+ 	struct kvm_s390_mem_op ksmo = {
+ 		.gaddr = (uintptr_t)desc->gaddr,
+@@ -77,6 +82,11 @@ static struct kvm_s390_mem_op ksmo_from_desc(const struct mop_desc *desc)
+ 			ksmo.op = KVM_S390_MEMOP_ABSOLUTE_READ;
+ 		if (desc->mode == WRITE)
+ 			ksmo.op = KVM_S390_MEMOP_ABSOLUTE_WRITE;
++		if (desc->mode == CMPXCHG) {
++			ksmo.op = KVM_S390_MEMOP_ABSOLUTE_CMPXCHG;
++			ksmo.old_addr = (uint64_t)desc->old;
++			memcpy(desc->old_value, desc->old, desc->size);
++		}
+ 		break;
+ 	case INVALID:
+ 		ksmo.op = -1;
+@@ -135,9 +145,13 @@ static void print_memop(struct kvm_vcpu *vcpu, const struct kvm_s390_mem_op *ksm
+ 	case KVM_S390_MEMOP_ABSOLUTE_WRITE:
+ 		printf("ABSOLUTE, WRITE, ");
+ 		break;
++	case KVM_S390_MEMOP_ABSOLUTE_CMPXCHG:
++		printf("ABSOLUTE, CMPXCHG, ");
++		break;
+ 	}
+-	printf("gaddr=%llu, size=%u, buf=%llu, ar=%u, key=%u",
+-	       ksmo->gaddr, ksmo->size, ksmo->buf, ksmo->ar, ksmo->key);
++	printf("gaddr=%llu, size=%u, buf=%llu, ar=%u, key=%u, old_addr=%llx",
++	       ksmo->gaddr, ksmo->size, ksmo->buf, ksmo->ar, ksmo->key,
++	       ksmo->old_addr);
+ 	if (ksmo->flags & KVM_S390_MEMOP_F_CHECK_ONLY)
+ 		printf(", CHECK_ONLY");
+ 	if (ksmo->flags & KVM_S390_MEMOP_F_INJECT_EXCEPTION)
+@@ -147,24 +161,30 @@ static void print_memop(struct kvm_vcpu *vcpu, const struct kvm_s390_mem_op *ksm
+ 	puts(")");
+ }
+ 
+-static void memop_ioctl(struct test_info info, struct kvm_s390_mem_op *ksmo)
++static int err_memop_ioctl(struct test_info info, struct kvm_s390_mem_op *ksmo,
++			   struct mop_desc *desc)
+ {
+ 	struct kvm_vcpu *vcpu = info.vcpu;
+ 
+ 	if (!vcpu)
+-		vm_ioctl(info.vm, KVM_S390_MEM_OP, ksmo);
++		return __vm_ioctl(info.vm, KVM_S390_MEM_OP, ksmo);
+ 	else
+-		vcpu_ioctl(vcpu, KVM_S390_MEM_OP, ksmo);
++		return __vcpu_ioctl(vcpu, KVM_S390_MEM_OP, ksmo);
+ }
+ 
+-static int err_memop_ioctl(struct test_info info, struct kvm_s390_mem_op *ksmo)
++static void memop_ioctl(struct test_info info, struct kvm_s390_mem_op *ksmo,
++			struct mop_desc *desc)
+ {
+-	struct kvm_vcpu *vcpu = info.vcpu;
++	int r;
+ 
+-	if (!vcpu)
+-		return __vm_ioctl(info.vm, KVM_S390_MEM_OP, ksmo);
+-	else
+-		return __vcpu_ioctl(vcpu, KVM_S390_MEM_OP, ksmo);
++	r = err_memop_ioctl(info, ksmo, desc);
++	if (ksmo->op == KVM_S390_MEMOP_ABSOLUTE_CMPXCHG) {
++		if (desc->cmpxchg_success) {
++			int diff = memcmp(desc->old_value, desc->old, desc->size);
++			*desc->cmpxchg_success = !diff;
++		}
++	}
++	TEST_ASSERT(!r, __KVM_IOCTL_ERROR("KVM_S390_MEM_OP", r));
+ }
+ 
+ #define MEMOP(err, info_p, mop_target_p, access_mode_p, buf_p, size_p, ...)	\
+@@ -187,7 +207,7 @@ static int err_memop_ioctl(struct test_info info, struct kvm_s390_mem_op *ksmo)
+ 	}									\
+ 	__ksmo = ksmo_from_desc(&__desc);					\
+ 	print_memop(__info.vcpu, &__ksmo);					\
+-	err##memop_ioctl(__info, &__ksmo);					\
++	err##memop_ioctl(__info, &__ksmo, &__desc);				\
+ })
+ 
+ #define MOP(...) MEMOP(, __VA_ARGS__)
+@@ -201,6 +221,8 @@ static int err_memop_ioctl(struct test_info info, struct kvm_s390_mem_op *ksmo)
+ #define AR(a) ._ar = 1, .ar = (a)
+ #define KEY(a) .f_key = 1, .key = (a)
+ #define INJECT .f_inject = 1
++#define CMPXCHG_OLD(o) .old = (o)
++#define CMPXCHG_SUCCESS(s) .cmpxchg_success = (s)
+ 
+ #define CHECK_N_DO(f, ...) ({ f(__VA_ARGS__, CHECK_ONLY); f(__VA_ARGS__); })
+ 
+@@ -210,8 +232,8 @@ static int err_memop_ioctl(struct test_info info, struct kvm_s390_mem_op *ksmo)
+ #define CR0_FETCH_PROTECTION_OVERRIDE	(1UL << (63 - 38))
+ #define CR0_STORAGE_PROTECTION_OVERRIDE	(1UL << (63 - 39))
+ 
+-static uint8_t mem1[65536];
+-static uint8_t mem2[65536];
++static uint8_t __aligned(PAGE_SIZE) mem1[65536];
++static uint8_t __aligned(PAGE_SIZE) mem2[65536];
+ 
+ struct test_default {
+ 	struct kvm_vm *kvm_vm;
+@@ -243,6 +265,8 @@ enum stage {
+ 	STAGE_SKEYS_SET,
+ 	/* Guest copied memory (locations up to test case) */
+ 	STAGE_COPIED,
++	/* End of guest code reached */
++	STAGE_DONE,
+ };
+ 
+ #define HOST_SYNC(info_p, stage)					\
+@@ -254,6 +278,9 @@ enum stage {
+ 									\
+ 	vcpu_run(__vcpu);						\
+ 	get_ucall(__vcpu, &uc);						\
++	if (uc.cmd == UCALL_ABORT) {					\
++		REPORT_GUEST_ASSERT_2(uc, "hints: %lu, %lu");		\
++	}								\
+ 	ASSERT_EQ(uc.cmd, UCALL_SYNC);					\
+ 	ASSERT_EQ(uc.args[1], __stage);					\
+ })									\
+@@ -293,6 +320,44 @@ static void default_read(struct test_info copy_cpu, struct test_info mop_cpu,
+ 	ASSERT_MEM_EQ(mem1, mem2, size);
+ }
+ 
++static void default_cmpxchg(struct test_default *test, uint8_t key)
++{
++	for (int size = 1; size <= 16; size *= 2) {
++		for (int offset = 0; offset < 16; offset += size) {
++			uint8_t __aligned(16) new[16] = {};
++			uint8_t __aligned(16) old[16];
++			bool succ;
++
++			prepare_mem12();
++			default_write_read(test->vcpu, test->vcpu, LOGICAL, 16, NO_KEY);
++
++			memcpy(&old, mem1, 16);
++			MOP(test->vm, ABSOLUTE, CMPXCHG, new + offset,
++			    size, GADDR_V(mem1 + offset),
++			    CMPXCHG_OLD(old + offset),
++			    CMPXCHG_SUCCESS(&succ), KEY(key));
++			HOST_SYNC(test->vcpu, STAGE_COPIED);
++			MOP(test->vm, ABSOLUTE, READ, mem2, 16, GADDR_V(mem2));
++			TEST_ASSERT(succ, "exchange of values should succeed");
++			memcpy(mem1 + offset, new + offset, size);
++			ASSERT_MEM_EQ(mem1, mem2, 16);
++
++			memcpy(&old, mem1, 16);
++			new[offset]++;
++			old[offset]++;
++			MOP(test->vm, ABSOLUTE, CMPXCHG, new + offset,
++			    size, GADDR_V(mem1 + offset),
++			    CMPXCHG_OLD(old + offset),
++			    CMPXCHG_SUCCESS(&succ), KEY(key));
++			HOST_SYNC(test->vcpu, STAGE_COPIED);
++			MOP(test->vm, ABSOLUTE, READ, mem2, 16, GADDR_V(mem2));
++			TEST_ASSERT(!succ, "exchange of values should not succeed");
++			ASSERT_MEM_EQ(mem1, mem2, 16);
++			ASSERT_MEM_EQ(&old, mem1, 16);
++		}
++	}
++}
++
+ static void guest_copy(void)
+ {
+ 	GUEST_SYNC(STAGE_INITED);
+@@ -377,6 +442,248 @@ static void test_copy_key(void)
+ 	kvm_vm_free(t.kvm_vm);
+ }
+ 
++static void test_cmpxchg_key(void)
++{
++	struct test_default t = test_default_init(guest_copy_key);
++
++	HOST_SYNC(t.vcpu, STAGE_SKEYS_SET);
++
++	default_cmpxchg(&t, NO_KEY);
++	default_cmpxchg(&t, 0);
++	default_cmpxchg(&t, 9);
++
++	kvm_vm_free(t.kvm_vm);
++}
++
++static __uint128_t cut_to_size(int size, __uint128_t val)
++{
++	switch (size) {
++	case 1:
++		return (uint8_t)val;
++	case 2:
++		return (uint16_t)val;
++	case 4:
++		return (uint32_t)val;
++	case 8:
++		return (uint64_t)val;
++	case 16:
++		return val;
++	}
++	GUEST_ASSERT_1(false, "Invalid size");
++	return 0;
++}
++
++static bool popcount_eq(__uint128_t a, __uint128_t b)
++{
++	unsigned int count_a, count_b;
++
++	count_a = __builtin_popcountl((uint64_t)(a >> 64)) +
++		  __builtin_popcountl((uint64_t)a);
++	count_b = __builtin_popcountl((uint64_t)(b >> 64)) +
++		  __builtin_popcountl((uint64_t)b);
++	return count_a == count_b;
++}
++
++static __uint128_t rotate(int size, __uint128_t val, int amount)
++{
++	unsigned int bits = size * 8;
++
++	amount = (amount + bits) % bits;
++	val = cut_to_size(size, val);
++	return (val << (bits - amount)) | (val >> amount);
++}
++
++const unsigned int max_block = 16;
++
++static void choose_block(bool guest, int i, int *size, int *offset)
++{
++	unsigned int rand;
++
++	rand = i;
++	if (guest) {
++		rand = rand * 19 + 11;
++		*size = 1 << ((rand % 3) + 2);
++		rand = rand * 19 + 11;
++		*offset = (rand % max_block) & ~(*size - 1);
++	} else {
++		rand = rand * 17 + 5;
++		*size = 1 << (rand % 5);
++		rand = rand * 17 + 5;
++		*offset = (rand % max_block) & ~(*size - 1);
++	}
++}
++
++static __uint128_t permutate_bits(bool guest, int i, int size, __uint128_t old)
++{
++	unsigned int rand;
++	int amount;
++	bool swap;
++
++	rand = i;
++	rand = rand * 3 + 1;
++	if (guest)
++		rand = rand * 3 + 1;
++	swap = rand % 2 == 0;
++	if (swap) {
++		int i, j;
++		__uint128_t new;
++		uint8_t byte0, byte1;
++
++		rand = rand * 3 + 1;
++		i = rand % size;
++		rand = rand * 3 + 1;
++		j = rand % size;
++		if (i == j)
++			return old;
++		new = rotate(16, old, i * 8);
++		byte0 = new & 0xff;
++		new &= ~0xff;
++		new = rotate(16, new, -i * 8);
++		new = rotate(16, new, j * 8);
++		byte1 = new & 0xff;
++		new = (new & ~0xff) | byte0;
++		new = rotate(16, new, -j * 8);
++		new = rotate(16, new, i * 8);
++		new = new | byte1;
++		new = rotate(16, new, -i * 8);
++		return new;
++	}
++	rand = rand * 3 + 1;
++	amount = rand % (size * 8);
++	return rotate(size, old, amount);
++}
++
++static bool _cmpxchg(int size, void *target, __uint128_t *old_addr, __uint128_t new)
++{
++	bool ret;
++
++	switch (size) {
++	case 4: {
++			uint32_t old = *old_addr;
++
++			asm volatile ("cs %[old],%[new],%[address]"
++			    : [old] "+d" (old),
++			      [address] "+Q" (*(uint32_t *)(target))
++			    : [new] "d" ((uint32_t)new)
++			    : "cc"
++			);
++			ret = old == (uint32_t)*old_addr;
++			*old_addr = old;
++			return ret;
++		}
++	case 8: {
++			uint64_t old = *old_addr;
++
++			asm volatile ("csg %[old],%[new],%[address]"
++			    : [old] "+d" (old),
++			      [address] "+Q" (*(uint64_t *)(target))
++			    : [new] "d" ((uint64_t)new)
++			    : "cc"
++			);
++			ret = old == (uint64_t)*old_addr;
++			*old_addr = old;
++			return ret;
++		}
++	case 16: {
++			__uint128_t old = *old_addr;
++
++			asm volatile ("cdsg %[old],%[new],%[address]"
++			    : [old] "+d" (old),
++			      [address] "+Q" (*(__uint128_t *)(target))
++			    : [new] "d" (new)
++			    : "cc"
++			);
++			ret = old == *old_addr;
++			*old_addr = old;
++			return ret;
++		}
++	}
++	GUEST_ASSERT_1(false, "Invalid size");
++	return 0;
++}
++
++const unsigned int cmpxchg_iter_outer = 100, cmpxchg_iter_inner = 10000;
++
++static void guest_cmpxchg_key(void)
++{
++	int size, offset;
++	__uint128_t old, new;
++
++	set_storage_key_range(mem1, max_block, 0x10);
++	set_storage_key_range(mem2, max_block, 0x10);
++	GUEST_SYNC(STAGE_SKEYS_SET);
++
++	for (int i = 0; i < cmpxchg_iter_outer; i++) {
++		do {
++			old = 1;
++		} while (!_cmpxchg(16, mem1, &old, 0));
++		for (int j = 0; j < cmpxchg_iter_inner; j++) {
++			choose_block(true, i + j, &size, &offset);
++			do {
++				new = permutate_bits(true, i + j, size, old);
++			} while (!_cmpxchg(size, mem2 + offset, &old, new));
++		}
++	}
++
++	GUEST_SYNC(STAGE_DONE);
++}
++
++static void *run_guest(void *data)
++{
++	struct test_info *info = data;
++
++	HOST_SYNC(*info, STAGE_DONE);
++	return NULL;
++}
++
++static char *quad_to_char(__uint128_t *quad, int size)
++{
++	return ((char *)quad) + (sizeof(*quad) - size);
++}
++
++static void test_cmpxchg_key_concurrent(void)
++{
++	struct test_default t = test_default_init(guest_cmpxchg_key);
++	int size, offset;
++	__uint128_t old, new;
++	bool success;
++	pthread_t thread;
++
++	HOST_SYNC(t.vcpu, STAGE_SKEYS_SET);
++	prepare_mem12();
++	MOP(t.vcpu, LOGICAL, WRITE, mem1, max_block, GADDR_V(mem2));
++	pthread_create(&thread, NULL, run_guest, &t.vcpu);
++
++	for (int i = 0; i < cmpxchg_iter_outer; i++) {
++		do {
++			old = 0;
++			new = 1;
++			MOP(t.vm, ABSOLUTE, CMPXCHG, &new,
++			    sizeof(new), GADDR_V(mem1),
++			    CMPXCHG_OLD(&old),
++			    CMPXCHG_SUCCESS(&success), KEY(1));
++		} while (!success);
++		for (int j = 0; j < cmpxchg_iter_inner; j++) {
++			choose_block(false, i + j, &size, &offset);
++			do {
++				new = permutate_bits(false, i + j, size, old);
++				MOP(t.vm, ABSOLUTE, CMPXCHG, quad_to_char(&new, size),
++				    size, GADDR_V(mem2 + offset),
++				    CMPXCHG_OLD(quad_to_char(&old, size)),
++				    CMPXCHG_SUCCESS(&success), KEY(1));
++			} while (!success);
++		}
++	}
++
++	pthread_join(thread, NULL);
++
++	MOP(t.vcpu, LOGICAL, READ, mem2, max_block, GADDR_V(mem2));
++	TEST_ASSERT(popcount_eq(*(__uint128_t *)mem1, *(__uint128_t *)mem2),
++		    "Must retain number of set bits");
++
++	kvm_vm_free(t.kvm_vm);
++}
++
+ static void guest_copy_key_fetch_prot(void)
+ {
+ 	/*
+@@ -457,6 +764,24 @@ static void test_errors_key(void)
+ 	kvm_vm_free(t.kvm_vm);
+ }
+ 
++static void test_errors_cmpxchg_key(void)
++{
++	struct test_default t = test_default_init(guest_copy_key_fetch_prot);
++	int i;
++
++	HOST_SYNC(t.vcpu, STAGE_INITED);
++	HOST_SYNC(t.vcpu, STAGE_SKEYS_SET);
++
++	for (i = 1; i <= 16; i *= 2) {
++		__uint128_t old = 0;
++
++		ERR_PROT_MOP(t.vm, ABSOLUTE, CMPXCHG, mem2, i, GADDR_V(mem2),
++			     CMPXCHG_OLD(&old), KEY(2));
++	}
++
++	kvm_vm_free(t.kvm_vm);
++}
++
+ static void test_termination(void)
+ {
+ 	struct test_default t = test_default_init(guest_error_key);
+@@ -692,6 +1017,38 @@ static void test_errors(void)
+ 	kvm_vm_free(t.kvm_vm);
+ }
+ 
++static void test_errors_cmpxchg(void)
++{
++	struct test_default t = test_default_init(guest_idle);
++	__uint128_t old;
++	int rv, i, power = 1;
++
++	HOST_SYNC(t.vcpu, STAGE_INITED);
++
++	for (i = 0; i < 32; i++) {
++		if (i == power) {
++			power *= 2;
++			continue;
++		}
++		rv = ERR_MOP(t.vm, ABSOLUTE, CMPXCHG, mem1, i, GADDR_V(mem1),
++			     CMPXCHG_OLD(&old));
++		TEST_ASSERT(rv == -1 && errno == EINVAL,
++			    "ioctl allows bad size for cmpxchg");
++	}
++	for (i = 1; i <= 16; i *= 2) {
++		rv = ERR_MOP(t.vm, ABSOLUTE, CMPXCHG, mem1, i, GADDR((void *)~0xfffUL),
++			     CMPXCHG_OLD(&old));
++		TEST_ASSERT(rv > 0, "ioctl allows bad guest address for cmpxchg");
++	}
++	for (i = 2; i <= 16; i *= 2) {
++		rv = ERR_MOP(t.vm, ABSOLUTE, CMPXCHG, mem1, i, GADDR_V(mem1 + 1),
++			     CMPXCHG_OLD(&old));
++		TEST_ASSERT(rv == -1 && errno == EINVAL,
++			    "ioctl allows bad alignment for cmpxchg");
++	}
++
++	kvm_vm_free(t.kvm_vm);
++}
+ 
+ int main(int argc, char *argv[])
+ {
+@@ -720,6 +1077,16 @@ int main(int argc, char *argv[])
+ 			.test = test_copy_key,
+ 			.requirements_met = extension_cap > 0,
+ 		},
++		{
++			.name = "cmpxchg with storage keys",
++			.test = test_cmpxchg_key,
++			.requirements_met = extension_cap & 0x2,
++		},
++		{
++			.name = "concurrently cmpxchg with storage keys",
++			.test = test_cmpxchg_key_concurrent,
++			.requirements_met = extension_cap & 0x2,
++		},
+ 		{
+ 			.name = "copy with key storage protection override",
+ 			.test = test_copy_key_storage_prot_override,
+@@ -740,6 +1107,16 @@ int main(int argc, char *argv[])
+ 			.test = test_errors_key,
+ 			.requirements_met = extension_cap > 0,
+ 		},
++		{
++			.name = "error checks for cmpxchg with key",
++			.test = test_errors_cmpxchg_key,
++			.requirements_met = extension_cap & 0x2,
++		},
++		{
++			.name = "error checks for cmpxchg",
++			.test = test_errors_cmpxchg,
++			.requirements_met = extension_cap & 0x2,
++		},
+ 		{
+ 			.name = "termination",
+ 			.test = test_termination,
+-- 
+2.37.2
 
-I don't _think_ KVM would have to explicitly inhibit AVIC.  I believe the fallout
-would be that vCPUs >= 512 would simply not be eligible for virtual interrupt
-delivery, e.g. KVM would get a "Invalid Target in IPI" exit.  I haven't dug into
-the IOMMU side of things though, so it's possible something in that world would
-necessitate disabling (x2)AVIC.
-
-> [0] in APM Volume 2 15.29.4.3 Physical Address Pointer Restrictions,
-> 
-> * All the addresses point to 4-Kbyte aligned data structures. Bits 11:0 are
-> reserved (except for offset 0F8h) and should be set to zero. The lower 8 bits of
-> offset 0F8h are used for the field AVIC_PHYSICAL_MAX_INDEX. VMRUN fails with
-> #VMEXIT(VMEXIT_INVALID) if AVIC_PHYSICAL_MAX_INDEX is greater than 255 in xAVIC
-> mode or greater than 511 in x2AVIC mode.
