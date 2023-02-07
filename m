@@ -2,155 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B23B668D3C0
-	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 11:11:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D97668D403
+	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 11:25:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229726AbjBGKLh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 05:11:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43040 "EHLO
+        id S230498AbjBGKZH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 05:25:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49826 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231616AbjBGKLd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 05:11:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D38365A3
-        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 02:10:49 -0800 (PST)
+        with ESMTP id S229625AbjBGKZG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 05:25:06 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F19FB199F8
+        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 02:24:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675764648;
+        s=mimecast20190719; t=1675765458;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=GaJ1eqGYVO2m1fzMUCWDV4TzJSQxwVKtY4hpu6q92yM=;
-        b=DFGHNCTnf/36GodMf+WbL+yhuu7ULj5gkDolB9oUGT76gvT/BMeTg1lHiFeYvio13QQd/A
-        wZyASlJ+PMD33ejTZbxJWXv8YFtzO3zE1K9NTzI1ZmCAmEwQ66HemisJzsIuJsXei+8yWM
-        n0kl+zqDcMe5TBWYKxYkntC3wsQ3Kcg=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=Ep59omg7XPDvU5cqAhe2vkhiB3lKdlJefi1wdWZ76RI=;
+        b=IRwFQclnTisz8XjjIC4rl7btMd0oIfznj6kqN0mnzpdBDwG2pl825aaOQccpwfV5ppHwlX
+        qB50TpWhCkSH5F1VeA+PnT7btVYD0Jw/RtMGN+ktxFexcPQaYfxPe+LsoZ7KiGoj0QeFJw
+        Mcj/ck76cOGYoQd6qlDKZA1QNcIkYI8=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-81-JAseBXVwOZi-k6ubSQow_w-1; Tue, 07 Feb 2023 05:10:47 -0500
-X-MC-Unique: JAseBXVwOZi-k6ubSQow_w-1
-Received: by mail-qt1-f198.google.com with SMTP id v8-20020a05622a144800b003ba0dc5d798so6128684qtx.22
-        for <kvm@vger.kernel.org>; Tue, 07 Feb 2023 02:10:47 -0800 (PST)
+ us-mta-52-D6X0FPpmN5K57B7qJNx7Ew-1; Tue, 07 Feb 2023 05:24:17 -0500
+X-MC-Unique: D6X0FPpmN5K57B7qJNx7Ew-1
+Received: by mail-ej1-f72.google.com with SMTP id wu9-20020a170906eec900b0088e1bbefaeeso10914588ejb.12
+        for <kvm@vger.kernel.org>; Tue, 07 Feb 2023 02:24:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GaJ1eqGYVO2m1fzMUCWDV4TzJSQxwVKtY4hpu6q92yM=;
-        b=CCrFxDfupW7dJ0qoJ7PCNAAYIWM2vxYp3As4asUFwO03DhcGdsMjxyXy6dOGsRCzzZ
-         KYxWpJYJ35SESiuQhfHhh+/+a56hujdmh0JQZkKuxZ6njfEfJwz1FNzQ+LeIIjMfvh5y
-         GUHDLq98ZD2VN5KSENsHPY5bo20cjfIh+YIbIuUJUKWtW9CFDJ48lIBfglIaBuurvjN9
-         1tnUuv8w/TOwj9KamNDJ6r9EpEHwbaNTu0iN+H9WtOzR08QpVb3Zy9Coatr/VJ8hstoI
-         LzCFckegcft/ig12pnYo9v3Gtf37m6QTphu3eCm6frw5qObvetFsW/9UxRJlkmubJfxU
-         OXRg==
-X-Gm-Message-State: AO0yUKW+O/0wosQxBGpG04KoPfCi/OaM3axO23TMKLT0guB0alCQAOQ7
-        1RAvBNojIgVaVRRYPe7KPXaZsmtWiBIbS+6LDYskOVZzfgvPgLqrWMIVsFbYRojfhzkIhA+ahuI
-        sSEOn1JPdcxF8
-X-Received: by 2002:a05:6214:5191:b0:56b:4e51:acd5 with SMTP id kl17-20020a056214519100b0056b4e51acd5mr4038563qvb.12.1675764646775;
-        Tue, 07 Feb 2023 02:10:46 -0800 (PST)
-X-Google-Smtp-Source: AK7set8brvIiymTcOybCkThVC+EK+7hv6UVOws47+1hKcCfznHu8FN7x3UaTighSEXeQRFrtWTpMiA==
-X-Received: by 2002:a05:6214:5191:b0:56b:4e51:acd5 with SMTP id kl17-20020a056214519100b0056b4e51acd5mr4038547qvb.12.1675764646545;
-        Tue, 07 Feb 2023 02:10:46 -0800 (PST)
-Received: from [192.168.0.2] (ip-109-43-176-120.web.vodafone.de. [109.43.176.120])
-        by smtp.gmail.com with ESMTPSA id g12-20020a05620a13cc00b00706a452c074sm8989347qkl.104.2023.02.07.02.10.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Feb 2023 02:10:45 -0800 (PST)
-Message-ID: <969ce73e-1266-7c15-991b-e56c0d748335@redhat.com>
-Date:   Tue, 7 Feb 2023 11:10:41 +0100
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ep59omg7XPDvU5cqAhe2vkhiB3lKdlJefi1wdWZ76RI=;
+        b=oOeeGf7uVSob8Dn8d92Uhn5cfbCA1/wbgDbk9vmR6k5wPOdhW/0ng1WvzK2gpuIAOe
+         XgGQEEuoJ3Ih4eQq5VPXxlPHyJ5qPGtD05ShyGs/Kr07STZu3zAKCO0moBLH8WNfrPL+
+         eZP7/8WMD9ZVnoRn1AFkRDnRO5JmdSRYzDxFrKFyNokQ4XeOLrmEhzAJqI5CjeNP8gj8
+         Tk5G1lxamPGIda7ckvXXNtm6Yd5i1oAKIq17ftcCLG0c6QjV6kcwGB6L60afY3z/EKKV
+         jQ94/QVRUkeq07sX7pOhV7E503yfSm8WDp0wXsYcMGnY3YVeiHyHllJXXNi6FMsCT7CR
+         Ge7g==
+X-Gm-Message-State: AO0yUKXOvtFNdlyfEFYaPgModCDSADkJ4JyF3Tf8Rs6YYTgTSmDDEueD
+        JK27EpXaBZrS9ydOdizxrmil0evXdQ/zon2Smd2Dm2KCJ6h/J2rS5i5R/nl3y70E0ztSqSGE3BU
+        b6LL6V0BvWpErGBDVNhrK2EIENTzR
+X-Received: by 2002:a50:c31e:0:b0:4aa:a4f4:1df with SMTP id a30-20020a50c31e000000b004aaa4f401dfmr690608edb.78.1675765455915;
+        Tue, 07 Feb 2023 02:24:15 -0800 (PST)
+X-Google-Smtp-Source: AK7set/9PribleoazHLYXrivRQOEzMkLB4yrN7FfYcSZZNFVXlwVoj7qT65td0QqRJXWhbFWFaV8JLdbeEtFpLIRAnI=
+X-Received: by 2002:a50:c31e:0:b0:4aa:a4f4:1df with SMTP id
+ a30-20020a50c31e000000b004aaa4f401dfmr690599edb.78.1675765455758; Tue, 07 Feb
+ 2023 02:24:15 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [PATCH v15 09/11] machine: adding s390 topology to query-cpu-fast
-Content-Language: en-US
-To:     =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc:     armbru@redhat.com, Michael Roth <michael.roth@amd.com>,
-        Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org,
-        qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
-        frankja@linux.ibm.com, clg@kaod.org
-References: <20230201132051.126868-1-pmorel@linux.ibm.com>
- <20230201132051.126868-10-pmorel@linux.ibm.com>
- <a7a235d5-4ded-b83d-dcb6-2cf81ad5f283@redhat.com>
- <Y+D3PH0EkUPshIMO@redhat.com>
- <e1828071-551a-b5cb-8da5-cea91f075548@redhat.com>
- <Y+ETxSadUGC/UJGY@redhat.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <Y+ETxSadUGC/UJGY@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <CAJSP0QUuuZLC0DJNEfZ7amyd3XnRhRNr1k+1OgLfDeF77X1ZDQ@mail.gmail.com>
+ <CAELaAXysa3M-TPbLMCVCwpt40iqhXpF7PCan_i6SzY_YMafXrg@mail.gmail.com> <CAJSP0QWLdbNqyrGnhRB3AqMpH0xYFK6+=TpWrrytQzn9MGD2zA@mail.gmail.com>
+In-Reply-To: <CAJSP0QWLdbNqyrGnhRB3AqMpH0xYFK6+=TpWrrytQzn9MGD2zA@mail.gmail.com>
+From:   Alberto Faria <afaria@redhat.com>
+Date:   Tue, 7 Feb 2023 10:23:39 +0000
+Message-ID: <CAELaAXwAF1QSyfFEzqBFJk69VZN9cEC=H=hHh6kvndFm9p0f6w@mail.gmail.com>
+Subject: Re: Call for GSoC and Outreachy project ideas for summer 2023
+To:     Stefan Hajnoczi <stefanha@gmail.com>
+Cc:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
+        Rust-VMM Mailing List <rust-vmm@lists.opendev.org>,
+        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+        Thomas Huth <thuth@redhat.com>, John Snow <jsnow@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+        "Florescu, Andreea" <fandree@amazon.com>,
+        Damien <damien.lemoal@opensource.wdc.com>,
+        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
+        Hanna Reitz <hreitz@redhat.com>,
+        Daniel Henrique Barboza <danielhb413@gmail.com>,
+        =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+        Bernhard Beschow <shentey@gmail.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, gmaglione@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/02/2023 15.50, Daniel P. Berrangé wrote:
-> On Mon, Feb 06, 2023 at 02:09:57PM +0100, Thomas Huth wrote:
->> On 06/02/2023 13.49, Daniel P. Berrangé wrote:
->>> On Mon, Feb 06, 2023 at 01:41:44PM +0100, Thomas Huth wrote:
->>>> On 01/02/2023 14.20, Pierre Morel wrote:
->>>>> S390x provides two more topology containers above the sockets,
->>>>> books and drawers.
->>>>>
->>>>> Let's add these CPU attributes to the QAPI command query-cpu-fast.
->>>>>
->>>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->>>>> ---
->>>>>     qapi/machine.json          | 13 ++++++++++---
->>>>>     hw/core/machine-qmp-cmds.c |  2 ++
->>>>>     2 files changed, 12 insertions(+), 3 deletions(-)
->>>>>
->>>>> diff --git a/qapi/machine.json b/qapi/machine.json
->>>>> index 3036117059..e36c39e258 100644
->>>>> --- a/qapi/machine.json
->>>>> +++ b/qapi/machine.json
->>>>> @@ -53,11 +53,18 @@
->>>>>     #
->>>>>     # Additional information about a virtual S390 CPU
->>>>>     #
->>>>> -# @cpu-state: the virtual CPU's state
->>>>> +# @cpu-state: the virtual CPU's state (since 2.12)
->>>>> +# @dedicated: the virtual CPU's dedication (since 8.0)
->>>>> +# @polarity: the virtual CPU's polarity (since 8.0)
->>>>>     #
->>>>>     # Since: 2.12
->>>>>     ##
->>>>> -{ 'struct': 'CpuInfoS390', 'data': { 'cpu-state': 'CpuS390State' } }
->>>>> +{ 'struct': 'CpuInfoS390',
->>>>> +    'data': { 'cpu-state': 'CpuS390State',
->>>>> +              'dedicated': 'bool',
->>>>> +              'polarity': 'int'
->>>>
->>>> I think it would also be better to mark the new fields as optional and only
->>>> return them if the guest has the topology enabled, to avoid confusing
->>>> clients that were written before this change.
->>>
->>> FWIW, I would say that the general expectation of QMP clients is that
->>> they must *always* expect new fields to appear in dicts that are
->>> returned in QMP replies. We add new fields at will on a frequent basis.
->>
->> Did we change our policy here? I slightly remember I've been told
->> differently in the past ... but I can't recall where this was, it's
->> certainly been a while.
->>
->> So a question to the QAPI maintainers: What's the preferred handling for new
->> fields nowadays in such situations?
-> 
-> I think you're mixing it up with policy for adding new fields to *input*
-> parameters. You can't add a new mandatory field to input params of a
-> command because no existing client will be sending that. Only optional
-> params are viable, without a deprecation cycle. For output parameters
-> such as this case, there's no compatibilty problem.
+On Mon, Feb 6, 2023 at 9:22 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> Great that you're interesting, Alberto! Both sound feasible. I would
+> like to co-mentor the zoned storage project or can at least commit to
+> being available to help because zoned storage is currently on my mind
+> anyway :).
 
-Ah, right, I likely mixed it up with that. Thanks for the clarification!
+Perfect, I'll have time to co-mentor one project, but probably not
+two, so let's leave the NVMe driver project aside for now. If anyone
+wants to take that one over, though, go for it.
 
-  Thomas
+> Do you want to write up one or both of them using the project template
+> below? You can use the other project ideas as a reference for how much
+> detail to include: https://wiki.qemu.org/Google_Summer_of_Code_2023
 
+I feel like this is closer to a 175 hour project than a 350 hour one,
+but I'm not entirely sure.
+
+  === Zoned device support for libblkio ===
+
+   '''Summary:''' Add support for zoned block devices to the libblkio library.
+
+   Zoned block devices are special kinds of disks that are split into several
+   regions called zones, where each zone may only be written
+sequentially and data
+   can't be updated without resetting the entire zone.
+
+   libblkio is a library that provides an API for efficiently accessing block
+   devices using modern high-performance block I/O interfaces like
+Linux io_uring.
+
+   The goal is to extend libblkio so users can use it to access zoned devices
+   properly. This will require adding support for more request types, expanding
+   its API to expose additional metadata about the device, and making the
+   appropriate changes to each libblkio "driver".
+
+   This is important for QEMU since it will soon support zoned devices too and
+   several of its BlockDrivers rely on libblkio. In particular, this
+project would
+   enable QEMU to access zoned vhost-user-blk and vhost-vdpa-blk devices.
+
+   '''Links:'''
+   * https://zonedstorage.io/
+   * https://libblkio.gitlab.io/libblkio/
+   * https://gitlab.com/libblkio/libblkio/-/issues/44
+
+   '''Details:'''
+   * Project size: 175 hours
+   * Skill level: intermediate
+   * Language: Rust, C
+   * Mentor: Alberto Faria <afaria@redhat.com>, Stefan Hajnoczi
+<stefanha@gmail.com>
+   * Suggested by: Alberto Faria <afaria@redhat.com>
+
+Alberto
 
