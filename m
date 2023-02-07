@@ -2,65 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B50968E175
-	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 20:49:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 08E7568E187
+	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 20:54:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232306AbjBGTtH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 14:49:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46806 "EHLO
+        id S231577AbjBGTyE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 14:54:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232212AbjBGTs6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 14:48:58 -0500
+        with ESMTP id S231497AbjBGTyC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 14:54:02 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BB283EC65;
-        Tue,  7 Feb 2023 11:48:36 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 095B538B5F;
+        Tue,  7 Feb 2023 11:53:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=YCqFrZG5knnSJptSjmJ9EzNwMgtK/5YOlM4a8vJ4kcw=; b=Gd8rRxtt4DCXBTRrHdNAetHz/s
-        APLF9cb45DQ03q/S6p7z9Z/t4AwQVcOHtt6UIOxsTh65vJwmEsRivcL/4k2eijwtBsy2xZ8UUzN1K
-        7ECySRHCYYsl1PsCLEsC/yZiBWu6n049zwld9orUfN3CCHZx44n9vPYRRR6p2Pm/hdbR9uFeh/zS/
-        /7GBUZHqpjwKXqCFKAYimkdWLEzDT085qtM0yo4k6U2BKwO0WTqhjZWlmKwCWJWdNqDhPX452I9jz
-        Cdsc6+ft7e0ik70qKYgTRwz4RnFPPpe0qw4kxZfj71bo8ipwJ7llCLulF4b8pcgLUU1FCFJpNZfbH
-        PaobuMhA==;
+        bh=q8C66D/4LD1ZgNb1oLsyt5awMtAs4KzM8RNKbnU2nL4=; b=hA4PHoa8/LIxroHYXkjgKhSbjd
+        ajZPLeARRt3RuJFH+WLjMWm3eG1kg21O23dhOMxLBchHa8ymnjqNGZnpcsuVn3XW32Bkvwr1ptQTA
+        lim5etBMHi/+RiXwSPVThkYizLLyBYxgzxua1GxS6X4catAbVaDfV4iFwl3CyErQv6u/AiiITGXRE
+        5EgU7uFlmefcq0XALxUlzUHITi4uFECwT1eveVeIbv3Ruxzf/ZplwdDLa/Ctl9Er0VmnLfLCxO2m+
+        of5rHPiUcDZfynHAJM9HjAoL3T4Rmpn46sfaIcuTrmGrgUPdcTZZ7K9iOvMPHa8vWA/kFYMWce1No
+        QY8dXNlA==;
 Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.infradead.org)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pPTwl-000VoZ-FU; Tue, 07 Feb 2023 19:48:08 +0000
-Message-ID: <abb08aaf96cbee2ae16852b10a75bf9e865813da.camel@infradead.org>
-Subject: Re: [EXTERNAL][PATCH v6 04/11] x86/smpboot: Reference count on
- smpboot_setup_warm_reset_vector()
+        id 1pPU23-000W92-1T; Tue, 07 Feb 2023 19:53:35 +0000
+Message-ID: <0460d9cd8cdb7be2fcea00579e80ee683920d66d.camel@infradead.org>
+Subject: Re: [PATCH v6 01/11] x86/apic/x2apic: Fix parallel handling of
+ cluster_mask
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Thomas Gleixner <tglx@linutronix.de>,
-        "usama.arif@bytedance.com" <usama.arif@bytedance.com>,
-        "arjan@linux.intel.com" <arjan@linux.intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "fam.zheng@bytedance.com" <fam.zheng@bytedance.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "liangma@liangbit.com" <liangma@liangbit.com>,
-        "pmenzel@molgen.mpg.de" <pmenzel@molgen.mpg.de>,
-        "mimoja@mimoja.de" <mimoja@mimoja.de>,
-        "hewenliang4@huawei.com" <hewenliang4@huawei.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "punit.agrawal@bytedance.com" <punit.agrawal@bytedance.com>,
-        "simon.evans@bytedance.com" <simon.evans@bytedance.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "paulmck@kernel.org" <paulmck@kernel.org>,
-        "rcu@vger.kernel.org" <rcu@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>
-Date:   Tue, 07 Feb 2023 19:48:06 +0000
-In-Reply-To: <87sffhv8to.ffs@tglx>
+        Usama Arif <usama.arif@bytedance.com>, arjan@linux.intel.com
+Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        hpa@zytor.com, x86@kernel.org, pbonzini@redhat.com,
+        paulmck@kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, rcu@vger.kernel.org, mimoja@mimoja.de,
+        hewenliang4@huawei.com, thomas.lendacky@amd.com, seanjc@google.com,
+        pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
+        punit.agrawal@bytedance.com, simon.evans@bytedance.com,
+        liangma@liangbit.com
+Date:   Tue, 07 Feb 2023 19:53:34 +0000
+In-Reply-To: <87v8kdv9i1.ffs@tglx>
 References: <20230202215625.3248306-1-usama.arif@bytedance.com>
-         <20230202215625.3248306-5-usama.arif@bytedance.com> <871qn2xsmf.ffs@tglx>
-         <57195f701f6d1d70ec440c9a28cbee4cfb81dc41.camel@amazon.co.uk>
-         <87sffhv8to.ffs@tglx>
+         <20230202215625.3248306-2-usama.arif@bytedance.com> <87a61qxtx0.ffs@tglx>
+         <d37f3af69df09ff542024ed93a37865b28dfa86e.camel@infradead.org>
+         <921cfe295fcd398168e5454e01193045de312688.camel@infradead.org>
+         <87v8kdv9i1.ffs@tglx>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-o17s7dDwyglLcILnb6Xf"
+        boundary="=-CtJCwOjIAsV799/UfQXL"
 User-Agent: Evolution 3.44.4-0ubuntu1 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -74,89 +63,111 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-o17s7dDwyglLcILnb6Xf
+--=-CtJCwOjIAsV799/UfQXL
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2023-02-07 at 15:39 +0100, Thomas Gleixner wrote:
-> David!
->=20
-> On Tue, Feb 07 2023 at 09:49, David Woodhouse wrote:
->=20
-> Can you please fix your mail client to _NOT_ send multipart/mixed mails?
-> Despite the CC list being insanely large, your replies are dropped by
-> vger and missing in the archives.
->=20
-
-That's not the client; that's the stupid mail system doing it in
-transit. Sorry, I'd already filed a ticket about that idiocy last week
-when I noticed they'd started adding HTML parts to a previously sane
-mail. But obviously they haven't managed to fix it yet.
-
-The correct thing to do in the meantime is use a non-broken mail
-account, and I just forgot this morning until half way through the
-thread, when you'll note the coffee kicked in and I switched.
-
-
-> > On Tue, 2023-02-07 at 00:48 +0100, Thomas Gleixner wrote:
-> > > On Thu, Feb 02 2023 at 21:56, Usama Arif wrote:
-> > > > From: David Woodhouse <dwmw@amazon.co.uk>
-> > > >=20
-> > > > If we want to do parallel CPU bringup, we're going to need to set t=
-his up
-> > > > and leave it until all CPUs are done. Might as well use the RTC spi=
-nlock
-> > > > to protect the refcount, as we need to take it anyway.
+On Tue, 2023-02-07 at 15:24 +0100, Thomas Gleixner wrote:
+> On Tue, Feb 07 2023 at 11:27, David Woodhouse wrote:
+> > On Tue, 2023-02-07 at 10:57 +0000, David Woodhouse wrote:
+> > > =C2=A0=E2=80=A2 This CPU was present but no other CPU in this cluster=
+ was actually
+> > > =C2=A0=C2=A0 brought up at boot time so the cluster_mask wasn't alloc=
+ated.
 > > >=20
-> > > https://www.kernel.org/doc/html/latest/process/maintainer-tip.html#ch=
-angelog
-> > >=20
-> > > Aside of the 'We' this does not explain anything at all.
+> > > The code looks right, I don't grok the comment about partial clusters
+> > > and virtualization, and would have worded it something along the abov=
+e
+> > > lines?
 > >=20
-> > Er, doesn't it?
-> >=20
-> > We refcount the warm reset vector because when we do parallel bringup,
-> > we'll want to set it up once and then put it back to normal (for cold
-> > reset) once all the CPUs are up.
-> >=20
-> > I can rework the phrasing; I'm aware that the whole nonsense about
-> > pronouns and the imperative mood has grown legs in the last couple of
-> > years since I originally wrote it =E2=80=94 but is there anything actua=
-lly
-> > missing?
+> > As I get my head around that, I think the code needs to change too.
+> > What if we *unplug* the only CPU in a cluster (present=E2=86=92possible=
+), then
+> > add a new one in the same cluster? The new one would get a new
+> > cluster_mask. Which is kind of OK for now but then if we re-add the
+> > original CPU it'd continue to use its old cluster_mask.
 >=20
-> We can settle the imperative mood debate over a beer at the next
-> conference, but stuff which goes through tip is required to follow those
-> rules. No exception for you :)
+> Indeed.
 >=20
-> Vs. the content: This changelog lacks context. Changelogs have to be
-> self contained and self explanatory. Assuming that they are
-> understandable due to the context of the patch series is just wrong. I
-> fundamentally hate it when I have to dig out the context when I stare at
-> the changelog of a commit.
+> > Now, that's kind of weird if it's physical CPUs because that cluster is
+> > within a given chip, isn't it? But with virtualization maybe that's
+> > something that could happen, and it doesn't hurt to be completely safe
+> > by using for_each_possible_cpu() instead?
 >=20
-> So something like this:
+> Yes. Virtualization does aweful things....
 >=20
-> =C2=A0=C2=A0 The warm reset vector on X86 is setup through the RTC (CMOS)=
- clock
-> =C2=A0=C2=A0 for each CPU bringup operation and cleared after the CPU cam=
-e online.
+> > Now looks like this:
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/*
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * On post boot hotplug=
+ for a CPU which was not present at boot time,
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * iterate over all pos=
+sible CPUs (even those which are not present
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * any more) to find an=
+y existing cluster mask.
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0for_each_possible_cpu(c=
+pu_i) {
 >=20
-> =C2=A0=C2=A0 Parallel bringup of multiple CPUs requires that the warm res=
-et vector
-> =C2=A0=C2=A0 is valid until all CPUs came online.
->=20
-> =C2=A0=C2=A0 To prepare for that add refcounting for the reset vector and=
- protect
-> =C2=A0=C2=A0 it with the rtc_lock which has to be taken for the setup ope=
-ration
-> =C2=A0=C2=A0 anyway.
->=20
-> gives the full context and is simply factual, no?
+> Looks good!
 
-Ack.
 
---=-o17s7dDwyglLcILnb6Xf
+Thanks. I've reworked and I think I've caught everything. Didn't want
+to elide the credit where Usama had done some of the forward-porting
+work, so I've left those notes and the SoB intact on those patches, on
+the assumption that they will be reposting the series after proper
+testing on hardware again anyway (I'm only spawning it in qemu right
+now).
+
+https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/paralle=
+l-6.2-rc7
+
+The only real code change other than what we've discussed here is to
+implement what we talked about for CPUID 0xb vs. 0x1 etc:
+
+
+	/*
+	 * We can do 64-bit AP bringup in parallel if the CPU reports
+	 * its APIC ID in CPUID (either leaf 0x0B if we need the full
+	 * APIC ID in X2APIC mode, or leaf 0x01 if 8 bits are
+	 * sufficient). Otherwise it's too hard. And not for SEV-ES
+	 * guests because they can't use CPUID that early.
+	 */
+	if (IS_ENABLED(CONFIG_X86_32) || boot_cpu_data.cpuid_level < 1 ||
+	    (x2apic_mode && boot_cpu_data.cpuid_level < 0xb) ||
+	    cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT))
+		do_parallel_bringup =3D false;
+
+	if (do_parallel_bringup && x2apic_mode) {
+		unsigned int eax, ebx, ecx, edx;
+
+		/*
+		 * To support parallel bringup in x2apic mode, the AP will need
+		 * to obtain its APIC ID from CPUID 0x0B, since CPUID 0x01 has
+		 * only 8 bits. Check that it is present and seems correct.
+		 */
+		cpuid_count(0xb, 0, &eax, &ebx, &ecx, &edx);
+
+		/*
+		 * AMD says that if executed with an umimplemented level in
+		 * ECX, then it will return all zeroes in EAX. Intel says it
+		 * will return zeroes in both EAX and EBX. Checking only EAX
+		 * should be sufficient.
+		 */
+		if (eax) {
+			smpboot_control =3D STARTUP_SECONDARY | STARTUP_APICID_CPUID_0B;
+		} else {
+			pr_info("Disabling parallel bringup because CPUID 0xb looks untrustworth=
+y\n");
+			do_parallel_bringup =3D false;
+		}
+	} else if (do_parallel_bringup) {
+		/* Without X2APIC, what's in CPUID 0x01 should suffice. */
+		smpboot_control =3D STARTUP_SECONDARY | STARTUP_APICID_CPUID_01;
+	}
+
+
+
+--=-CtJCwOjIAsV799/UfQXL
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -248,24 +259,24 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMjA3MTk0ODA2WjAvBgkqhkiG9w0BCQQxIgQg7GdOBUZ5
-ygS9CJdQ/pg2cPT3gSDB/IVh82/mo+aSmCIwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMjA3MTk1MzM0WjAvBgkqhkiG9w0BCQQxIgQgmPSZtJi/
+XQ838+jp3DyjUc2eXB/DVwqNHV6xcycbhbEwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBp5UfWsYxHmfI15EM5cyxSboC/fc+MY2JY
-uythzaS5LU69HH4QnICg4K0ulSLCbxn4VASmYaHkN73TpqTqDCs1XY6Eji08L+6/+7eEuqGd6MIC
-CMa2R+/Yd8nDcLddFNar4/cDq92DzoZzf+lSPkTribWKo34NAfRzEwryNssXD25xRYYLF0qiQjdE
-RRxZGV03QKF/dWnuFFZp4r+IVT+Xk7lk6XPMXGiboMZe5XnpaCF+L+crzrTDWwHW4GRPOM1ESn1z
-art4tj1Z96tmEUkMnmJFSQM9Jzv0wGt/8XV63C6kQfBneNv/OB0FWjDP8LpjSvLgiLbZrY0wQtsW
-iQFwJaWWKLpucDQcKJwRzWffKHmI7pdS7DrcLCDixzI26xRZM8ZqMe9vT4d04JOktgWXXGg73Ma0
-bqkI99FFcoIeG2euceACpgMBvUfB2xc8fsPv3eM93On06aIk5JIA4h1wTOQSFYWftbbihRIVKehL
-70IIWt+8QkOgfIiDtUVcr8bSL2KWNhviPU84OrgrJcWCj5H0pQ8lJFWi6F1NQQrTjWkEaEyQd0/4
-CdIg8bV+pnflkmC01vgqxhj4N4DrJ/wRVCNfdt0sgNH70GuFejfxqD6E+DccgFysXkVtYeCWZ371
-aAfSR/NzvOb5TEvR+UPFm7OMaugPHaDDFhCve5lGxgAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAK+Vf07Ltiz7vG9niBtv/+1cnk9zfqVK0+
+FFzsRuSfUsLCigpaYkGEY2Lpo3zQq0XouQVIY/D/mtankrtTqovqYJ8lJIE2SN7lbTiREbMTOV0k
+OgTs8ai8ePf9Ib20RGrwlRqiQGtad4eJFsLUQL+TGXXAgkS2juFM9ahZu7nJJLbbbQ8g8V1j9GZt
+qCOuzVMHWyXQVqN2/Fx7Qu4dVY6ZDErWK8x2iUGBXB+k4X++SknkSVqVcZr5QVKsR13dm/yzAxrd
+MuP4hORVW1dt9raIFnUC3KMi6aYqlIfMA+0kdOvrhx5jM9DdvSMpccw5Qr9EhjZx+ENulCNxUVzQ
+S9lJSBHQ2XLMXO9kLXAjDgaUQnDACeEU9CVE3iGP8lYmarqvdWqUUoSfv8KRoJHxM7rQfwRW1yi6
+obNearwybHx6Rs/1naIGQzWoJd5d5sfz1liAN8Xx/WhGtsZwURSe4DBtoif6FFVrMHbWd6JuKnjJ
+zhiFmeJ+Ob5mX/mZbYWpt2DZNeIIvKZqwi3uI1+zg8JMWGUP2NnrlU5OaVZUecHl0kiArVIC+S/d
+H+prM5Xjr+eUSRfk/QGuVQApWO4imhAs/nomsXdF/Bul8pZo4NWZFnlrdraNePSScVTdu4vXiuxT
+79ewD9oxtlmIjW72xFl7GpUIFh2aoCftT828kd5F9AAAAAAAAA==
 
 
---=-o17s7dDwyglLcILnb6Xf--
+--=-CtJCwOjIAsV799/UfQXL--
