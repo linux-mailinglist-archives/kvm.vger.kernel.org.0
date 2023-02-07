@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A6F068DF2A
-	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 18:42:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CDA3B68DF3A
+	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 18:47:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231690AbjBGRma (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 12:42:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46066 "EHLO
+        id S232019AbjBGRrk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 12:47:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230509AbjBGRm2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 12:42:28 -0500
-Received: from mail-yw1-x112e.google.com (mail-yw1-x112e.google.com [IPv6:2607:f8b0:4864:20::112e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B127ECDF1
-        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 09:42:27 -0800 (PST)
-Received: by mail-yw1-x112e.google.com with SMTP id 00721157ae682-50aa54cc7c0so205189737b3.8
-        for <kvm@vger.kernel.org>; Tue, 07 Feb 2023 09:42:27 -0800 (PST)
+        with ESMTP id S232064AbjBGRri (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 12:47:38 -0500
+Received: from mail-vk1-xa2e.google.com (mail-vk1-xa2e.google.com [IPv6:2607:f8b0:4864:20::a2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BCAAA5E0
+        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 09:47:37 -0800 (PST)
+Received: by mail-vk1-xa2e.google.com with SMTP id t190so8238403vkb.13
+        for <kvm@vger.kernel.org>; Tue, 07 Feb 2023 09:47:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=vYS0rH2Prb4CNt5r3A6oJS0gr0A7wGBLNFVaC7bs/J4=;
-        b=I0IPiTWDtkwAHRjmJmB5BurzNbE3T687O4fja4LkxOF2M/HCzKujwysFi0Wji9Cbcv
-         I4Z26Nm5pJfVR9FXpyY9X4PhGXRHpC3csevLVyfUOGk8WF258uYW9fdbW+CCR9yGWOUp
-         FSqFXbsDkBiNgV1b0KgW4AprYfSwTp97GY5JpcppZIM+JD3MR6cm/wjWPrWcMnIUWu5f
-         O29SYOQ1ozCsHg8Z3phNZ4G7MPnyQFazfsryTjkJwxlo3guQPKuGRi2FGLhA7MLIhfJd
-         zKsDvhntNXhBNHkuQsOyAPf22CJDce8H3odLPH5L1tHlTyZpEnPKF5IKUSnpt66pKHSl
-         v+oQ==
+        bh=CY914VzVqB+fSxy9WxpWVLUSp1jcG757pUUHGil8Hd4=;
+        b=IsvcsNAUCrPf1/y8inlkYZ/NYs/FAlUp3maKwLZlTe6T5Khs/Ziyc/yV0OepHvm4zx
+         lPOZR4HJ4M9VvtqMmHpwabLUvbfVT8m6jeR++Yy6PQJSZQLp8f+UVF0SwvU60JCN4mSJ
+         nbTT4rDe7UfV1P13VpovcPEuqUaJw9UOvc/XOVdzsZIU5yXkEmP4Zsi1/jHEV1sAkn6P
+         BdJyaZ4v3zR7C1+vESwoOtsIpki427+BLRa1336tF9T0NtK65T9w7wsOrC0N5qRXxvHa
+         8H4SpWWktU2HmcEfoNDgp+8G+C/Z1unzafh/nx4n1dRcfxe0i2JEUnrfMTVct12kCaAa
+         OnQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=vYS0rH2Prb4CNt5r3A6oJS0gr0A7wGBLNFVaC7bs/J4=;
-        b=3jcGNj2lwmzJbvXkn4eUh6ZecWWfOA9L+4GYDqa4FaHTzFJTNzEVw/uPXz/W6iYMrs
-         eb1y0zdBm/fk3rrGd3LsAN5u7TbgfjSXaOhfLtbXD74Jet4NvjPAAQ1Il6fUi11rAKT8
-         /uC34jznVz0DDTQ4mUIMVSrmpyY2JPtEcIwqDlanOgjh8ak76E5kjXedN6uxEGuOajOI
-         kE4BjxMBKhHgGiR/hcf/5FDr3yIPTMz01AfJb3STDshgbKXaid6MMbqg28u+OBwd0y66
-         BdNZEusr8XlnhVwzOAcV5VQGOjuwp2B8rfEyrfik8BG49XuT7bMxydByznMhE10HqZSN
-         hZrA==
-X-Gm-Message-State: AO0yUKVxTnGxIOdsipFFFj+VdyI1yssc1VD1Qx+4uSqWyWvTbW9uAVPC
-        ZdDX9BvH0A8t88EscvdT1+IlKqimnG2+ASZRVjOJyw==
-X-Google-Smtp-Source: AK7set8fj/mR29ZWsQ8S7g0deW2NvMZv95xKmBDFaq1RaHMUnPOOtdQtCn7Lnx/cUsmTHjAuynjca9DCOnlObL+O/nw=
-X-Received: by 2002:a81:8004:0:b0:4b0:84a1:3a9d with SMTP id
- q4-20020a818004000000b004b084a13a9dmr487970ywf.66.1675791746607; Tue, 07 Feb
- 2023 09:42:26 -0800 (PST)
+        bh=CY914VzVqB+fSxy9WxpWVLUSp1jcG757pUUHGil8Hd4=;
+        b=Z1bWdqkU/54N5QzOMhqVTpVHZ8L5VQ/0LuRB7c/3DuXAp2mJGWQuECFCPecQpoh/S9
+         FO3WoHCkQMZj0LUYfBvwNgKxJtRrNBsjV3nNMZWg0/PQA5k5y621lb+MT8A7LC4xsXlf
+         u8GO3+21WVDeYnk0s5F4doHnJiAAGfr7ue8dIiqJaZ+glQbFjFiiADf7Goo6brtoYZYq
+         OfKQIOHeKzJ1DkOEXbpkwG7VB7OIi5Af0bwCmzWkYGm4fTIE5lxI2ipTPnGAUoGkne6S
+         XLSaP/xpD9BcH44Knb+YNo/OgBUiVVD5Z8NJj2CGApZcXGHeYTGNx5/XeWLMcaYnL1u8
+         0FRA==
+X-Gm-Message-State: AO0yUKWDczLkKXgWAuMctVwyED0qiX9P9UguvtpBnf3d3gIM8s8gzYXR
+        KZb0WCm47vfgH6QqvKZ1G+NFYGLJi64paSYCHbbIpw==
+X-Google-Smtp-Source: AK7set+u0N05uEmq9E0SdpeF7zfcRTdc9ZgNfmWmpVqNDjLNTyVbkbxMQmMxL3400jLioHuy0QDn5LJEdPsTuSCzdr8=
+X-Received: by 2002:a1f:b60f:0:b0:3dd:fce2:8505 with SMTP id
+ g15-20020a1fb60f000000b003ddfce28505mr574476vkf.40.1675792056062; Tue, 07 Feb
+ 2023 09:47:36 -0800 (PST)
 MIME-Version: 1.0
 References: <20230203192822.106773-1-vipinsh@google.com> <20230203192822.106773-3-vipinsh@google.com>
- <CALzav=d9h-fVgdsK138m74a_qTyay9cprcbdWAJk4GJtw4p6tg@mail.gmail.com>
-In-Reply-To: <CALzav=d9h-fVgdsK138m74a_qTyay9cprcbdWAJk4GJtw4p6tg@mail.gmail.com>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Tue, 7 Feb 2023 09:41:50 -0800
-Message-ID: <CAHVum0ffSwm62Tv9=HbQbMy42iq9Z4skMp1FxTVTothVmTgM5w@mail.gmail.com>
+ <Y+GQNXDlNbJNvDd2@google.com> <CAHVum0d2dRvNaS+AMqdbF35D05dDQrtZ4TBQ1QOYx6he-Cy6YA@mail.gmail.com>
+In-Reply-To: <CAHVum0d2dRvNaS+AMqdbF35D05dDQrtZ4TBQ1QOYx6he-Cy6YA@mail.gmail.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Tue, 7 Feb 2023 09:47:09 -0800
+Message-ID: <CALzav=dw8hzbfOtWFo+tb6aKavrdfjrbuJ-o0_F39o=53u95MQ@mail.gmail.com>
 Subject: Re: [Patch v2 2/5] KVM: x86/mmu: Optimize SPTE change flow for clear-dirty-log
-To:     David Matlack <dmatlack@google.com>
+To:     Vipin Sharma <vipinsh@google.com>
 Cc:     seanjc@google.com, pbonzini@redhat.com, bgardon@google.com,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -68,38 +68,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 6, 2023 at 3:53 PM David Matlack <dmatlack@google.com> wrote:
+On Tue, Feb 7, 2023 at 9:37 AM Vipin Sharma <vipinsh@google.com> wrote:
 >
-> On Fri, Feb 3, 2023 at 11:28 AM Vipin Sharma <vipinsh@google.com> wrote:
+> On Mon, Feb 6, 2023 at 3:41 PM David Matlack <dmatlack@google.com> wrote:
 > >
-> > diff --git a/arch/x86/kvm/mmu/tdp_iter.h b/arch/x86/kvm/mmu/tdp_iter.h
-> > index 30a52e5e68de..21046b34f94e 100644
-> > --- a/arch/x86/kvm/mmu/tdp_iter.h
-> > +++ b/arch/x86/kvm/mmu/tdp_iter.h
-> > @@ -121,4 +121,17 @@ void tdp_iter_start(struct tdp_iter *iter, struct kvm_mmu_page *root,
-> >  void tdp_iter_next(struct tdp_iter *iter);
-> >  void tdp_iter_restart(struct tdp_iter *iter);
+> > On Fri, Feb 03, 2023 at 11:28:19AM -0800, Vipin Sharma wrote:
 > >
-> > +static inline u64 kvm_tdp_mmu_clear_spte_bit(struct tdp_iter *iter, u64 mask)
-> > +{
-> > +       atomic64_t *sptep;
-> > +
-> > +       if (kvm_tdp_mmu_spte_has_volatile_bits(iter->old_spte, iter->level)) {
-> > +               sptep = (atomic64_t *)rcu_dereference(iter->sptep);
-> > +               return (u64)atomic64_fetch_and(~mask, sptep);
+> >         if (wrprot || spte_ad_need_write_protect(iter.old_spte))
+> >                 clear_bits = PT_WRITABLE_MASK;
+> >         else
+> >                 clear_bits = shadow_dirty_mask;
+> >
+> >         if (!(iter->old_spte & clear_bits))
+> >                 continue;
+> >
+> >         iter.old_spte = kvm_tdp_mmu_clear_spte_bit(&iter, clear_bits);
+> >
 >
-> I think you can just set iter->old_spte here and drop the return value?
+> Yeah, this is better. Even better if I just initialize like:
 >
+> u64 clear_bits = shadow_dirty_mask;
+>
+> This will also get rid of the else part.
 
-I can do this. However, my intention was to keep the return contract
-similar to kvm_tdp_mmu_write_spte(). On second thought, should I make
-this function signature similar to kvm_tdp_mmu_write_spte() just to be
-consistent?
+On that topic... Do we need to recalculate clear_bits for every spte?
+wrprot is passed as a parameter so that will not change. And
+spte_ad_need_write_protect() should either return true or false for
+all SPTEs in the TDP MMU. Specifically, make_spte() has this code:
 
+if (sp->role.ad_disabled)
+        spte |= SPTE_TDP_AD_DISABLED_MASK;
+else if (kvm_mmu_page_ad_need_write_protect(sp))
+        spte |= SPTE_TDP_AD_WRPROT_ONLY_MASK;
 
+sp->role.ad_disabled is never modified in TDP MMU pages. So it should
+be constant for all pages. And kvm_mmu_page_ad_need_write_protect()
+will always return false for TDP MMU pages since sp->role.guest_mode
+is always false.
 
-> > +       }
-> > +
-> > +       __kvm_tdp_mmu_write_spte(iter->sptep, iter->old_spte & ~mask);
-> > +       return iter->old_spte;
-> > +}
+So this can just be:
+
+u64 clear_bit = (wrprot || !kvm_ad_enabled()) ? PT_WRITABLE_MASK :
+shadow_dirty_mask;
