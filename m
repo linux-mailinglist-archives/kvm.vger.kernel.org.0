@@ -2,106 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D5DB68DA98
-	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 15:24:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AE19368DBC2
+	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 15:37:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232556AbjBGOYs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 09:24:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38002 "EHLO
+        id S232181AbjBGOhT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 09:37:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232536AbjBGOYp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 09:24:45 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6E3824CB3;
-        Tue,  7 Feb 2023 06:24:39 -0800 (PST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1675779878;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=48zTNCiq8jyQl85rZUjjKFb4zKzbUXhtUJ1Hwi8S0CA=;
-        b=HtKMdz8LlTmkbYTe/u01gq+8liQo8V4y0xKSVfKLz8kWn9e+g+8KTUmW5FlgkQXkCAvrEy
-        tsty9t1gAis6jVlJlKzvbA/bldqioOfgr7EFTfHaoZHRInOBFwRWdXsvsBrar8L5KF2jcz
-        i1jEBvew8OBdyxa44yjZk2uzLCGKreegVF1WBwi94YPOEtLzsu5NGWulfrYCmhzhUCZGYv
-        StO6tmeCMnji+F8/FkVhZhl3QoMgg0lM53MkHjE4af6rDFNk9kQpnxJbLL4F77q1RjnMVf
-        2NMmZl/y482tYELfhSpVRQBAsCqiyHoxlEhyt92HCe3+WeZW6U4NyXe8NeOPyg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1675779878;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=48zTNCiq8jyQl85rZUjjKFb4zKzbUXhtUJ1Hwi8S0CA=;
-        b=d5xsa3caE7KBVhLFcJhb3fyVD5ad+qU4xOetisuvWAC04OuM0Fpg7Htn7w5YXoHaMhmnhI
-        rLi7LspkXjaPaIAA==
-To:     David Woodhouse <dwmw2@infradead.org>,
-        Usama Arif <usama.arif@bytedance.com>, arjan@linux.intel.com
-Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        hpa@zytor.com, x86@kernel.org, pbonzini@redhat.com,
-        paulmck@kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, rcu@vger.kernel.org, mimoja@mimoja.de,
-        hewenliang4@huawei.com, thomas.lendacky@amd.com, seanjc@google.com,
-        pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
-        punit.agrawal@bytedance.com, simon.evans@bytedance.com,
-        liangma@liangbit.com
-Subject: Re: [PATCH v6 01/11] x86/apic/x2apic: Fix parallel handling of
- cluster_mask
-In-Reply-To: <921cfe295fcd398168e5454e01193045de312688.camel@infradead.org>
-References: <20230202215625.3248306-1-usama.arif@bytedance.com>
- <20230202215625.3248306-2-usama.arif@bytedance.com> <87a61qxtx0.ffs@tglx>
- <d37f3af69df09ff542024ed93a37865b28dfa86e.camel@infradead.org>
- <921cfe295fcd398168e5454e01193045de312688.camel@infradead.org>
-Date:   Tue, 07 Feb 2023 15:24:38 +0100
-Message-ID: <87v8kdv9i1.ffs@tglx>
+        with ESMTP id S231888AbjBGOg7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 09:36:59 -0500
+Received: from mail-yw1-x1133.google.com (mail-yw1-x1133.google.com [IPv6:2607:f8b0:4864:20::1133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E54823A874
+        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 06:34:12 -0800 (PST)
+Received: by mail-yw1-x1133.google.com with SMTP id 00721157ae682-4c24993965eso197963607b3.12
+        for <kvm@vger.kernel.org>; Tue, 07 Feb 2023 06:34:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=RTH+aH0oSY3ZVMd9O3U15uYMHnEaKKfdSwajJ12ADOI=;
+        b=OVTQhbegMlYyAF7g4djIvtyt0hHaAhM6URGUcqV79ytkKaJSPqC0WwFghFl2Bz4TeM
+         SmlvTClvHyY+w2+Ln0z9WhuEDQ/MZ3/zF7dx/Y+aLhZ9bjFkFqHZ4f1AFOPsTINeBHl9
+         T7iVdmIS8lIcNcYHHO7QFYIkj3RMdhXYAmAR4RV7SmvNuDGefaks32Mgg+ji1+NaIUyQ
+         oYQ4ZX4cVVrPmGwtVphzMeL/yN4660mDSr/V/udj7Mwuj6imMSlB4ARcHMl10x9CprA7
+         VuulCT68r1CIc0B1MDq+IWJ73ghRaxV5EjRFFbavlGb0GuzRvEwRDfpIbOPh8Wrya7MC
+         d3SA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RTH+aH0oSY3ZVMd9O3U15uYMHnEaKKfdSwajJ12ADOI=;
+        b=WcftUZLlwN+Ljr6PgDYwFvNJH+a7PohIqYNs2lcg9mRwwiBW/HtbNnwTW0VIIdVJ7U
+         TKLX15XwQFaJZWu7sthSInto0HDAbnmwCBy5zwM9WY/WW6HjAQbSyctPuVukw/L4ibqK
+         xLC0WuHTB9Uk6lBGE8jaoXtJVXNaSt2TJeBkyrv5y5VNyEab40neVJqbiC6BnjoI4lNx
+         xOliEmkxknTgi8dXQosz8GtnxHmEgQX6/D6jVdNYtW2KuHiXteKqc/PwOPGIUJ1wfv8u
+         PmPtybrox3No2UXyn8rQODFX7rPLmIhjRSwUN3FsYijj5q8VEOyakx90Uu1w49I199wp
+         R/5A==
+X-Gm-Message-State: AO0yUKUiZg3tEjIWH2087Mdz30PWgPwUj6t6VZY2EpEp1+p6JQMwTsWR
+        UpprHUaxE9bXSVFwy/siepCs203hq9NcpLfKymg=
+X-Google-Smtp-Source: AK7set++S9is4bzsa+KfhYVLzXm962DXR+Of+cTGrOBJRzVHYEGEkM2v3+gXYH3mkJxJfixxV/DpetVZ9yy3PmWI3+Q=
+X-Received: by 2002:a81:a10f:0:b0:527:ac79:7808 with SMTP id
+ y15-20020a81a10f000000b00527ac797808mr301705ywg.239.1675780382820; Tue, 07
+ Feb 2023 06:33:02 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <CAJSP0QUuuZLC0DJNEfZ7amyd3XnRhRNr1k+1OgLfDeF77X1ZDQ@mail.gmail.com>
+ <CAELaAXysa3M-TPbLMCVCwpt40iqhXpF7PCan_i6SzY_YMafXrg@mail.gmail.com>
+ <CAJSP0QWLdbNqyrGnhRB3AqMpH0xYFK6+=TpWrrytQzn9MGD2zA@mail.gmail.com>
+ <CAELaAXwAF1QSyfFEzqBFJk69VZN9cEC=H=hHh6kvndFm9p0f6w@mail.gmail.com> <CAELaAXx6cUhcs+Yi4Kev6BfcG0LO8H_hAKWrCBL77TbmguKO+w@mail.gmail.com>
+In-Reply-To: <CAELaAXx6cUhcs+Yi4Kev6BfcG0LO8H_hAKWrCBL77TbmguKO+w@mail.gmail.com>
+From:   Stefan Hajnoczi <stefanha@gmail.com>
+Date:   Tue, 7 Feb 2023 09:32:50 -0500
+Message-ID: <CAJSP0QXqOkVEza0S=A-Ct_6FqRGe3BQgkJEG6HnqoMAdLhJ5pA@mail.gmail.com>
+Subject: Re: Call for GSoC and Outreachy project ideas for summer 2023
+To:     Alberto Faria <afaria@redhat.com>
+Cc:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
+        Rust-VMM Mailing List <rust-vmm@lists.opendev.org>,
+        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+        Thomas Huth <thuth@redhat.com>, John Snow <jsnow@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+        "Florescu, Andreea" <fandree@amazon.com>,
+        Damien <damien.lemoal@opensource.wdc.com>,
+        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
+        Hanna Reitz <hreitz@redhat.com>,
+        Daniel Henrique Barboza <danielhb413@gmail.com>,
+        =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+        Bernhard Beschow <shentey@gmail.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, gmaglione@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 07 2023 at 11:27, David Woodhouse wrote:
-> On Tue, 2023-02-07 at 10:57 +0000, David Woodhouse wrote:
->> =C2=A0=E2=80=A2 This CPU was present but no other CPU in this cluster wa=
-s actually
->> =C2=A0=C2=A0 brought up at boot time so the cluster_mask wasn't allocate=
-d.
->>=20
->> The code looks right, I don't grok the comment about partial clusters
->> and virtualization, and would have worded it something along the above
->> lines?
+On Tue, 7 Feb 2023 at 05:30, Alberto Faria <afaria@redhat.com> wrote:
 >
-> As I get my head around that, I think the code needs to change too.
-> What if we *unplug* the only CPU in a cluster (present=E2=86=92possible),=
- then
-> add a new one in the same cluster? The new one would get a new
-> cluster_mask. Which is kind of OK for now but then if we re-add the
-> original CPU it'd continue to use its old cluster_mask.
+> On Tue, Feb 7, 2023 at 10:23 AM Alberto Faria <afaria@redhat.com> wrote:
+> > On Mon, Feb 6, 2023 at 9:22 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> > > Great that you're interesting, Alberto! Both sound feasible. I would
+> > > like to co-mentor the zoned storage project or can at least commit to
+> > > being available to help because zoned storage is currently on my mind
+> > > anyway :).
+> >
+> > Perfect, I'll have time to co-mentor one project, but probably not
+> > two, so let's leave the NVMe driver project aside for now. If anyone
+> > wants to take that one over, though, go for it.
+> >
+> > > Do you want to write up one or both of them using the project template
+> > > below? You can use the other project ideas as a reference for how much
+> > > detail to include: https://wiki.qemu.org/Google_Summer_of_Code_2023
+> >
+> > I feel like this is closer to a 175 hour project than a 350 hour one,
+> > but I'm not entirely sure.
+> >
+> >   === Zoned device support for libblkio ===
+> >
+> >    '''Summary:''' Add support for zoned block devices to the libblkio library.
+> >
+> >    Zoned block devices are special kinds of disks that are split into several
+> >    regions called zones, where each zone may only be written
+> > sequentially and data
+> >    can't be updated without resetting the entire zone.
+> >
+> >    libblkio is a library that provides an API for efficiently accessing block
+> >    devices using modern high-performance block I/O interfaces like
+> > Linux io_uring.
+> >
+> >    The goal is to extend libblkio so users can use it to access zoned devices
+> >    properly. This will require adding support for more request types, expanding
+> >    its API to expose additional metadata about the device, and making the
+> >    appropriate changes to each libblkio "driver".
+> >
+> >    This is important for QEMU since it will soon support zoned devices too and
+> >    several of its BlockDrivers rely on libblkio. In particular, this
+> > project would
+> >    enable QEMU to access zoned vhost-user-blk and vhost-vdpa-blk devices.
+>
+> Also, a stretch/bonus goal could be to make the necessary changes to
+> QEMU to actually make use of libblkio's zoned device support.
 
-Indeed.
+Great, I have added it to the wiki and included a list of tasks:
+https://wiki.qemu.org/Internships/ProjectIdeas/LibblkioZonedStorage
 
-> Now, that's kind of weird if it's physical CPUs because that cluster is
-> within a given chip, isn't it? But with virtualization maybe that's
-> something that could happen, and it doesn't hurt to be completely safe
-> by using for_each_possible_cpu() instead?
+Feel free to edit it.
 
-Yes. Virtualization does aweful things....
+I think this project could just as easily be 350 hours, but I'm happy
+to mentor a 175 hour project with a more modest scope.
 
-> Now looks like this:
-> 	/*
-> 	 * On post boot hotplug for a CPU which was not present at boot time,
-> 	 * iterate over all possible CPUs (even those which are not present
-> 	 * any more) to find any existing cluster mask.
-> 	 */
-> 	for_each_possible_cpu(cpu_i) {
-
-Looks good!
-
-      tglx
+Stefan
