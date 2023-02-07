@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CDA3B68DF3A
-	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 18:47:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E2EA168DF43
+	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 18:49:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232019AbjBGRrk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 12:47:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49452 "EHLO
+        id S232173AbjBGRtG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 12:49:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232064AbjBGRri (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 12:47:38 -0500
-Received: from mail-vk1-xa2e.google.com (mail-vk1-xa2e.google.com [IPv6:2607:f8b0:4864:20::a2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BCAAA5E0
-        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 09:47:37 -0800 (PST)
-Received: by mail-vk1-xa2e.google.com with SMTP id t190so8238403vkb.13
-        for <kvm@vger.kernel.org>; Tue, 07 Feb 2023 09:47:37 -0800 (PST)
+        with ESMTP id S232169AbjBGRs7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 12:48:59 -0500
+Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6D46166E6
+        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 09:48:58 -0800 (PST)
+Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-52770ee8cf0so128791777b3.2
+        for <kvm@vger.kernel.org>; Tue, 07 Feb 2023 09:48:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=CY914VzVqB+fSxy9WxpWVLUSp1jcG757pUUHGil8Hd4=;
-        b=IsvcsNAUCrPf1/y8inlkYZ/NYs/FAlUp3maKwLZlTe6T5Khs/Ziyc/yV0OepHvm4zx
-         lPOZR4HJ4M9VvtqMmHpwabLUvbfVT8m6jeR++Yy6PQJSZQLp8f+UVF0SwvU60JCN4mSJ
-         nbTT4rDe7UfV1P13VpovcPEuqUaJw9UOvc/XOVdzsZIU5yXkEmP4Zsi1/jHEV1sAkn6P
-         BdJyaZ4v3zR7C1+vESwoOtsIpki427+BLRa1336tF9T0NtK65T9w7wsOrC0N5qRXxvHa
-         8H4SpWWktU2HmcEfoNDgp+8G+C/Z1unzafh/nx4n1dRcfxe0i2JEUnrfMTVct12kCaAa
-         OnQQ==
+        bh=JrzI39N/h1oUtp7dQNjXU/5GxHTaJKmnRqKdVD7Yatw=;
+        b=McWCOwFTZSfjfKZxB2zQbrS4QvXkfcg90QiOqbpltMP0Oglux0ZDpvlb6SdGo4meHY
+         Hws8k9FsUUFmExTkTohCxagc2RqKNmV/4H4ow7APIp1dKJKdgGfvukWJmUygairDR4K4
+         mIjG2Nc011tAsKGcC/EGcSjwzhRIg88O72MvLQYUz7M5hnYinrFzfVp+bgQAc24AoDCJ
+         8MiW0MmOLw7Z75KwcPKGUgTtVVO7U2djSFs0DZlWG3DVsZIrnbDzU+ZNy6g7D9x0ZokD
+         aEuyKgBcPBLFyLcVw+atxGUpD/XCVnQsU3VnU/TwCt0VsBgtq4crP6KS1/9mZneZwR9u
+         ul8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=CY914VzVqB+fSxy9WxpWVLUSp1jcG757pUUHGil8Hd4=;
-        b=Z1bWdqkU/54N5QzOMhqVTpVHZ8L5VQ/0LuRB7c/3DuXAp2mJGWQuECFCPecQpoh/S9
-         FO3WoHCkQMZj0LUYfBvwNgKxJtRrNBsjV3nNMZWg0/PQA5k5y621lb+MT8A7LC4xsXlf
-         u8GO3+21WVDeYnk0s5F4doHnJiAAGfr7ue8dIiqJaZ+glQbFjFiiADf7Goo6brtoYZYq
-         OfKQIOHeKzJ1DkOEXbpkwG7VB7OIi5Af0bwCmzWkYGm4fTIE5lxI2ipTPnGAUoGkne6S
-         XLSaP/xpD9BcH44Knb+YNo/OgBUiVVD5Z8NJj2CGApZcXGHeYTGNx5/XeWLMcaYnL1u8
-         0FRA==
-X-Gm-Message-State: AO0yUKWDczLkKXgWAuMctVwyED0qiX9P9UguvtpBnf3d3gIM8s8gzYXR
-        KZb0WCm47vfgH6QqvKZ1G+NFYGLJi64paSYCHbbIpw==
-X-Google-Smtp-Source: AK7set+u0N05uEmq9E0SdpeF7zfcRTdc9ZgNfmWmpVqNDjLNTyVbkbxMQmMxL3400jLioHuy0QDn5LJEdPsTuSCzdr8=
-X-Received: by 2002:a1f:b60f:0:b0:3dd:fce2:8505 with SMTP id
- g15-20020a1fb60f000000b003ddfce28505mr574476vkf.40.1675792056062; Tue, 07 Feb
- 2023 09:47:36 -0800 (PST)
+        bh=JrzI39N/h1oUtp7dQNjXU/5GxHTaJKmnRqKdVD7Yatw=;
+        b=uFvFUk3AmY55j5C3/wvTwWFhXBcLitdriuiXtxaDnfZiIkVXdv1rnlme1ClLllGFiw
+         57ToQfaQKI6pzKsdid7jNfUlqGLkffHlAk+cxRXGtBaDAYw+nsb182GVy+BGnHgAzkTV
+         VcjvcVtqa6S14Tr0hcFIkNR7qut92RW7nChNBXPfpvvjiV7QCTLkfLxmjQ3P5sI3oUUG
+         jCJJuoG+0rQeaFMnWp53A1l+ue0kY7V76GfCNUb8p5bIgIGdHCOB5UUqGn954EqOqM5n
+         p9D/ovWn7PBZsMeLYHQ/jvEzsvDLmWENJAKEtQWsyPwSuTlL4xom0GaMkkx5WfB2/thE
+         fYXQ==
+X-Gm-Message-State: AO0yUKUxmjU1bJXF59NMtElOongniboKtDz3T+3BiuWvYLy1ltUi2Z7E
+        gUluF/j/MsYJ51AxhGre/EK3BGN+ZdP9A+5lktakCA==
+X-Google-Smtp-Source: AK7set8KT1SDSOUA1uUK383O0w+mNyRuu+DdczIn0dybdTQww4QdUEiYYR/lvikhWukuGvQ9RZ02VWGFAtdGVCdetpE=
+X-Received: by 2002:a0d:fd86:0:b0:525:d3c2:7258 with SMTP id
+ n128-20020a0dfd86000000b00525d3c27258mr370070ywf.175.1675792137738; Tue, 07
+ Feb 2023 09:48:57 -0800 (PST)
 MIME-Version: 1.0
-References: <20230203192822.106773-1-vipinsh@google.com> <20230203192822.106773-3-vipinsh@google.com>
- <Y+GQNXDlNbJNvDd2@google.com> <CAHVum0d2dRvNaS+AMqdbF35D05dDQrtZ4TBQ1QOYx6he-Cy6YA@mail.gmail.com>
-In-Reply-To: <CAHVum0d2dRvNaS+AMqdbF35D05dDQrtZ4TBQ1QOYx6he-Cy6YA@mail.gmail.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Tue, 7 Feb 2023 09:47:09 -0800
-Message-ID: <CALzav=dw8hzbfOtWFo+tb6aKavrdfjrbuJ-o0_F39o=53u95MQ@mail.gmail.com>
-Subject: Re: [Patch v2 2/5] KVM: x86/mmu: Optimize SPTE change flow for clear-dirty-log
-To:     Vipin Sharma <vipinsh@google.com>
-Cc:     seanjc@google.com, pbonzini@redhat.com, bgardon@google.com,
+References: <20230203192822.106773-1-vipinsh@google.com> <20230203192822.106773-4-vipinsh@google.com>
+ <CANgfPd8NF88V+ddqeCBsz=NRgm-YV7nH1DwDhRsHpA_AnFBB7g@mail.gmail.com>
+In-Reply-To: <CANgfPd8NF88V+ddqeCBsz=NRgm-YV7nH1DwDhRsHpA_AnFBB7g@mail.gmail.com>
+From:   Vipin Sharma <vipinsh@google.com>
+Date:   Tue, 7 Feb 2023 09:48:21 -0800
+Message-ID: <CAHVum0e+Dih_+hx2-k6Cf8V=udWkqcSKT+JoCo=8+0EMOCMKcw@mail.gmail.com>
+Subject: Re: [Patch v2 3/5] KVM: x86/mmu: Optimize SPTE change for aging gfn range
+To:     Ben Gardon <bgardon@google.com>
+Cc:     seanjc@google.com, pbonzini@redhat.com, dmatlack@google.com,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
@@ -68,45 +68,16 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 7, 2023 at 9:37 AM Vipin Sharma <vipinsh@google.com> wrote:
+On Mon, Feb 6, 2023 at 2:17 PM Ben Gardon <bgardon@google.com> wrote:
 >
-> On Mon, Feb 6, 2023 at 3:41 PM David Matlack <dmatlack@google.com> wrote:
-> >
-> > On Fri, Feb 03, 2023 at 11:28:19AM -0800, Vipin Sharma wrote:
-> >
-> >         if (wrprot || spte_ad_need_write_protect(iter.old_spte))
-> >                 clear_bits = PT_WRITABLE_MASK;
-> >         else
-> >                 clear_bits = shadow_dirty_mask;
-> >
-> >         if (!(iter->old_spte & clear_bits))
-> >                 continue;
-> >
-> >         iter.old_spte = kvm_tdp_mmu_clear_spte_bit(&iter, clear_bits);
-> >
+> On Fri, Feb 3, 2023 at 11:28 AM Vipin Sharma <vipinsh@google.com> wrote:
+
+> > - * __tdp_mmu_set_spte - Set a TDP MMU SPTE and handle the associated bookkeeping
+> > + * _tdp_mmu_set_spte - Set a TDP MMU SPTE and handle the associated bookkeeping
 >
-> Yeah, this is better. Even better if I just initialize like:
->
-> u64 clear_bits = shadow_dirty_mask;
->
-> This will also get rid of the else part.
+> Nit: Not sure how we got to the point of having a single and double
+> underscore of the function, but what do you think about just calling
+> this one tdp_mmu_set_spte and the other tdp_mmu_iter_set_spte?
 
-On that topic... Do we need to recalculate clear_bits for every spte?
-wrprot is passed as a parameter so that will not change. And
-spte_ad_need_write_protect() should either return true or false for
-all SPTEs in the TDP MMU. Specifically, make_spte() has this code:
-
-if (sp->role.ad_disabled)
-        spte |= SPTE_TDP_AD_DISABLED_MASK;
-else if (kvm_mmu_page_ad_need_write_protect(sp))
-        spte |= SPTE_TDP_AD_WRPROT_ONLY_MASK;
-
-sp->role.ad_disabled is never modified in TDP MMU pages. So it should
-be constant for all pages. And kvm_mmu_page_ad_need_write_protect()
-will always return false for TDP MMU pages since sp->role.guest_mode
-is always false.
-
-So this can just be:
-
-u64 clear_bit = (wrprot || !kvm_ad_enabled()) ? PT_WRITABLE_MASK :
-shadow_dirty_mask;
+I like your idea. I also don't like the single and double underscore
+prefix on functions.
