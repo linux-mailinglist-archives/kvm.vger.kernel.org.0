@@ -2,69 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 843C268DC1A
-	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 15:52:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F22468DC45
+	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 15:57:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231258AbjBGOwI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 09:52:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37862 "EHLO
+        id S232089AbjBGO5T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 09:57:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229565AbjBGOwG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 09:52:06 -0500
-Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CD997EC2
-        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 06:52:05 -0800 (PST)
-Received: by mail-qt1-x82e.google.com with SMTP id f10so16933537qtv.1
-        for <kvm@vger.kernel.org>; Tue, 07 Feb 2023 06:52:05 -0800 (PST)
+        with ESMTP id S229565AbjBGO5R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 09:57:17 -0500
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB2E41259A
+        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 06:57:15 -0800 (PST)
+Received: by mail-ed1-x532.google.com with SMTP id v13so15818285eda.11
+        for <kvm@vger.kernel.org>; Tue, 07 Feb 2023 06:57:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
+        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ttTXw7V9j7Pt0S/XsqrBdNwvxiyaBtuzcOWre/JfoYI=;
-        b=gVsGrDKVxYTE3aJOan5jFP8X/N5QWNGqJs7XOyEvKfUK6XnXlgroz016B8tye/pHZO
-         gS+LAuqgv78F5DoNKfqufaKX24rzb6rCVNH77Zdu7jI21hR/bqw39AOYNGRp5arJg5t3
-         srL6VpeVek0cD7Pduv5PUA2ilGQZ8WuSwVKED7FkBKX5dt8Dqh1K3eKRNnVxzfeIc3/4
-         5z7i8om+/0tPwd+ApLXs2O6c76Y5vo3Nd+RNAd1wwDOyaecdeI9nJUZRP+LKn/ixC+c2
-         1ASyDfZq5he4txU33z8d/2b4A1bD9JK5HuCFfjSAN3ufIypi1zSDCCEYkU0YyBrj48U8
-         yanw==
+        bh=wKdna/qIh4gNiOALCQ6oDoEjUI1nHMgPmlGIzHYLyjo=;
+        b=G/MGj9AO77jdZtn8vwJWKNLMB2XZi5SD11nBPiczJdmvblximA26YW+lggOUBCTftm
+         YyhCogpvXJ4vwhYDjpZcYllCK/KEjuWSyG7EWS3uV7HdrC1+NWFO1Uq+6Hxc1iVysJBb
+         YzEP5RmE6VipkBNCjSJd8NBUao3MwMCfS1VUHMchaARiGVBd94PFcIxi8KdaPaQ1zzeX
+         NVQUkOyOq2T5mygGekHuMtqkTRhcA3vlHlDKbBpKKJ3PB5DwIEvXB2bhcx6u23jS5TpZ
+         eBjiXR4m5KBrSq31b9QvfS6a+SjB+ArC0MCnY+JrTQEgd5/2NvLC5mNHfcgBd6Gh5sGt
+         aUmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ttTXw7V9j7Pt0S/XsqrBdNwvxiyaBtuzcOWre/JfoYI=;
-        b=JTsCYjL564aKDFwPJKoejoe+vPqGFzoP7LAjCkiL43loZjhpKt+CHbQigZstC75MjH
-         67cdkkAfABZd0Nb1HUOCGPRgJv3bgMW9+EnpOAszP2H16L1WcCBouZnu0Z4/kB2dxuae
-         hMN+eiBDLcv8vAyn2rM9mhOXoEYq9bpYbTSUQTavY1MCx2ijy5IBgFP5NE5u7eM9somj
-         Vc4nJGCw3nYszgAbCQPOzzo4l4WeA8ZPZAa0u6hhd9HvGYvyIji4alfWSURTybJQSnk2
-         7mEg0PBt3VwXlbvFjkOqUSQzOlB/yxyk+VFn69WJAU8gJA++LhZfgME4Rlm+pWcFd/Dj
-         AoXQ==
-X-Gm-Message-State: AO0yUKXmFM+Y6DRnVpB36IWe+pNVbdtbVwhFpyWx4f9Bzcco5LqwLjWH
-        0UoWjoVLLJhtZ2ahM4uVUGcScyY/PMKAzxkq2pcAjdxb6hKfkB65jiU=
-X-Google-Smtp-Source: AK7set+JAIwfk3UdRuULnNSS3/mw0OQCU1VMPQwF12sU8n4bYbPOmdDbGwtcmH+xrBzoWE7jAx8ytFnNJZe1d19V/9M=
-X-Received: by 2002:ac8:7c4e:0:b0:3ab:6bd6:d3bb with SMTP id
- o14-20020ac87c4e000000b003ab6bd6d3bbmr418335qtv.6.1675781524604; Tue, 07 Feb
- 2023 06:52:04 -0800 (PST)
+        bh=wKdna/qIh4gNiOALCQ6oDoEjUI1nHMgPmlGIzHYLyjo=;
+        b=7uCXbz4iBW1VpzjFMLOAgJ61b/RYeWxjYpjr2EKcLtGu1KrtLNFPeVjK2HYUJNz1nY
+         obDf4Z9DMOAjR8VKQGtL5KSNbmFPXo/nDcY6SjPVx5cQXAxk/kfmxkcOaG5scz/8iah6
+         VuiBx22l/dYsAnDxeBCfD3lqwnHrsOrMK/swCNEz4+UtCYtw5ihMNuu2iaS3Z/MpSEEA
+         944654tKCEA60V0DzKoO9A5+nbu3qIeSjTmCtEDID9icP7LrVHKoZ4ANW9jksu8Wvvlk
+         NClq+nRGkYy1Cw8TystyshSwIRp7jUEkWELUd1OExrpao2N43sMYtmQDwioNKDSzq+00
+         kOmg==
+X-Gm-Message-State: AO0yUKUeDLckGoyUKxG+ahwoTQru6fHmG6/1FFEo/0g+EFUK26/vuBU/
+        GqcvXSOsfVWFd4k0fCTy9yzTIlJYz3jp9QahT4SQfg==
+X-Google-Smtp-Source: AK7set8ZTGav0B2O8UxAjGzwtzjm1lGm0utQ5nERgPZboStE5Hmr8P8RiycGqYwDzyZT5SzOvKZwIcTCK1eXc1i4ZOQ=
+X-Received: by 2002:a50:f69c:0:b0:47d:ed8a:af80 with SMTP id
+ d28-20020a50f69c000000b0047ded8aaf80mr683873edn.3.1675781834323; Tue, 07 Feb
+ 2023 06:57:14 -0800 (PST)
 MIME-Version: 1.0
-References: <20230206165851.3106338-1-ricarkol@google.com> <20230206165851.3106338-4-ricarkol@google.com>
-In-Reply-To: <20230206165851.3106338-4-ricarkol@google.com>
-From:   Ricardo Koller <ricarkol@google.com>
-Date:   Tue, 7 Feb 2023 06:51:52 -0800
-Message-ID: <CAOHnOrx8hh77h5UwaRPxRf0xrDC33_UEc4O2npUVCd9v6zkQDg@mail.gmail.com>
-Subject: Re: [PATCH v2 03/12] KVM: arm64: Add helper for creating unlinked
- stage2 subtrees
-To:     pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
-        yuzenghui@huawei.com, dmatlack@google.com
-Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
-        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
-        rananta@google.com, bgardon@google.com, ricarkol@gmail.com
+References: <20230207095529.1787260-1-atishp@rivosinc.com> <20230207095529.1787260-2-atishp@rivosinc.com>
+ <20230207103727.jqgkyugsufgmsjrt@orel>
+In-Reply-To: <20230207103727.jqgkyugsufgmsjrt@orel>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Tue, 7 Feb 2023 20:27:03 +0530
+Message-ID: <CAAhSdy0f7K5G_v_54jABAUr5dEcWsNLMNGTYXHaDbit71bqZvQ@mail.gmail.com>
+Subject: Re: [PATCH v6 1/8] RISC-V: KVM: Add skeleton support for perf
+To:     Andrew Jones <ajones@ventanamicro.com>
+Cc:     Atish Patra <atishp@rivosinc.com>, linux-kernel@vger.kernel.org,
+        Atish Patra <atishp@atishpatra.org>,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-riscv@lists.infradead.org,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,128 +70,334 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 6, 2023 at 8:58 AM Ricardo Koller <ricarkol@google.com> wrote:
->
-> Add a stage2 helper, kvm_pgtable_stage2_create_unlinked(), for creating
-> unlinked tables (the opposite of kvm_pgtable_stage2_free_unlinked()).
-> Creating an unlinked table is useful for splitting block PTEs into
-> subtrees of 4K PTEs.  For example, a 1G block PTE can be split into 4K
-> PTEs by first creating a fully populated tree, and then use it to
-> replace the 1G PTE in a single step.  This will be used in a
-> subsequent commit for eager huge-page splitting (a dirty-logging
-> optimization).
->
-> No functional change intended. This new function will be used in a
-> subsequent commit.
->
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> ---
->  arch/arm64/include/asm/kvm_pgtable.h | 29 +++++++++++++++++
->  arch/arm64/kvm/hyp/pgtable.c         | 47 ++++++++++++++++++++++++++++
->  2 files changed, 76 insertions(+)
->
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 7c45082e6c23..e94c92988745 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -460,6 +460,35 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
->   */
->  void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level);
->
-> +/**
-> + * kvm_pgtable_stage2_create_unlinked() - Create an unlinked stage-2 paging structure.
-> + * @pgt:       Page-table structure initialised by kvm_pgtable_stage2_init*().
-> + * @new:       Unlinked stage-2 paging structure to be created.
-> + * @phys:      Physical address of the memory to map.
-> + * @level:     Level of the stage-2 paging structure to be created.
-> + * @prot:      Permissions and attributes for the mapping.
-> + * @mc:                Cache of pre-allocated and zeroed memory from which to allocate
-> + *             page-table pages.
-> + * @force_pte:  Force mappings to PAGE_SIZE granularity.
-> + *
-> + * Create an unlinked page-table tree under @new. If @force_pte is
-> + * true and @level is the PMD level, then the tree is mapped up to the
+Hi Drew,
 
-typo: this should be: "if @force_pte is true OR @level is the PMD, then
-                       the tree is mapped up to the PAGE_SIZE leaf PTE"
+On Tue, Feb 7, 2023 at 4:07 PM Andrew Jones <ajones@ventanamicro.com> wrote:
+>
+> On Tue, Feb 07, 2023 at 01:55:22AM -0800, Atish Patra wrote:
+> > This patch only adds barebone structure of perf implementation. Most of
+> > the function returns zero at this point and will be implemented
+> > fully in the future.
+> >
+> > Reviewed-by: Anup Patel <anup@brainfault.org>
+> > Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> > Signed-off-by: Atish Patra <atishp@rivosinc.com>
 
-> + * PAGE_SIZE leaf PTE; the tree is mapped up one level otherwise. This
-> + * new page-table tree is not reachable (i.e., it is removed) from the
-> + * root pgd and it's therefore unreachableby the hardware page-table
-> + * walker. No TLB invalidation or CMOs are performed.
-> + *
-> + * If device attributes are not explicitly requested in @prot, then the
-> + * mapping will be normal, cacheable.
-> + *
-> + * Return: 0 only if a fully populated tree was created (all memory
-> + * under @level is mapped), negative error code on failure.
-> + */
-> +int kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
-> +                                      kvm_pte_t *new, u64 phys, u32 level,
-> +                                      enum kvm_pgtable_prot prot, void *mc,
-> +                                      bool force_pte);
-> +
->  /**
->   * kvm_pgtable_stage2_map() - Install a mapping in a guest stage-2 page-table.
->   * @pgt:       Page-table structure initialised by kvm_pgtable_stage2_init*().
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 0a5ef9288371..fed314f2b320 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -1181,6 +1181,53 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
->         return kvm_pgtable_walk(pgt, addr, size, &walker);
->  }
+I will address your comments at the time of merging this patch.
+
+Thanks,
+Anup
+
+> > ---
+> >  arch/riscv/include/asm/kvm_host.h     |   4 +
+> >  arch/riscv/include/asm/kvm_vcpu_pmu.h |  75 ++++++++++++++
+> >  arch/riscv/kvm/Makefile               |   1 +
+> >  arch/riscv/kvm/vcpu.c                 |   7 ++
+> >  arch/riscv/kvm/vcpu_pmu.c             | 138 ++++++++++++++++++++++++++
+> >  5 files changed, 225 insertions(+)
+> >  create mode 100644 arch/riscv/include/asm/kvm_vcpu_pmu.h
+> >  create mode 100644 arch/riscv/kvm/vcpu_pmu.c
+> >
+> > diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
+> > index 93f43a3..b90be9a 100644
+> > --- a/arch/riscv/include/asm/kvm_host.h
+> > +++ b/arch/riscv/include/asm/kvm_host.h
+> > @@ -18,6 +18,7 @@
+> >  #include <asm/kvm_vcpu_insn.h>
+> >  #include <asm/kvm_vcpu_sbi.h>
+> >  #include <asm/kvm_vcpu_timer.h>
+> > +#include <asm/kvm_vcpu_pmu.h>
+> >
+> >  #define KVM_MAX_VCPUS                        1024
+> >
+> > @@ -228,6 +229,9 @@ struct kvm_vcpu_arch {
+> >
+> >       /* Don't run the VCPU (blocked) */
+> >       bool pause;
+> > +
+> > +     /* Performance monitoring context */
+> > +     struct kvm_pmu pmu_context;
+> >  };
+> >
+> >  static inline void kvm_arch_hardware_unsetup(void) {}
+> > diff --git a/arch/riscv/include/asm/kvm_vcpu_pmu.h b/arch/riscv/include/asm/kvm_vcpu_pmu.h
+> > new file mode 100644
+> > index 0000000..0b86a47
+> > --- /dev/null
+> > +++ b/arch/riscv/include/asm/kvm_vcpu_pmu.h
+> > @@ -0,0 +1,75 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > +/*
+> > + * Copyright (c) 2023 Rivos Inc
+> > + *
+> > + * Authors:
+> > + *     Atish Patra <atishp@rivosinc.com>
+> > + */
+> > +
+> > +#ifndef __KVM_VCPU_RISCV_PMU_H
+> > +#define __KVM_VCPU_RISCV_PMU_H
+> > +
+> > +#include <linux/perf/riscv_pmu.h>
+> > +#include <asm/kvm_vcpu_sbi.h>
+> > +#include <asm/sbi.h>
+> > +
+> > +#ifdef CONFIG_RISCV_PMU_SBI
+> > +#define RISCV_KVM_MAX_FW_CTRS        32
+> > +#define RISCV_KVM_MAX_HW_CTRS        32
+> > +#define RISCV_KVM_MAX_COUNTERS       (RISCV_KVM_MAX_HW_CTRS + RISCV_KVM_MAX_FW_CTRS)
+> > +static_assert(RISCV_KVM_MAX_COUNTERS <= 64);
+> > +
+> > +/* Per virtual pmu counter data */
+> > +struct kvm_pmc {
+> > +     u8 idx;
+> > +     struct perf_event *perf_event;
+> > +     u64 counter_val;
+> > +     union sbi_pmu_ctr_info cinfo;
+> > +     /* Event monitoring status */
+> > +     bool started;
+> > +};
+> > +
+> > +/* PMU data structure per vcpu */
+> > +struct kvm_pmu {
+> > +     struct kvm_pmc pmc[RISCV_KVM_MAX_COUNTERS];
+> > +     /* Number of the virtual firmware counters available */
+> > +     int num_fw_ctrs;
+> > +     /* Number of the virtual hardware counters available */
+> > +     int num_hw_ctrs;
+> > +     /* A flag to indicate that pmu initialization is done */
+> > +     bool init_done;
+> > +     /* Bit map of all the virtual counter used */
+> > +     DECLARE_BITMAP(pmc_in_use, RISCV_KVM_MAX_COUNTERS);
+> > +};
+> > +
+> > +#define vcpu_to_pmu(vcpu) (&(vcpu)->arch.pmu_context)
+> > +#define pmu_to_vcpu(pmu)  (container_of((pmu), struct kvm_vcpu, arch.pmu_context))
+> > +
+> > +int kvm_riscv_vcpu_pmu_num_ctrs(struct kvm_vcpu *vcpu, struct kvm_vcpu_sbi_return *retdata);
+> > +int kvm_riscv_vcpu_pmu_ctr_info(struct kvm_vcpu *vcpu, unsigned long cidx,
+> > +                             struct kvm_vcpu_sbi_return *retdata);
+> > +int kvm_riscv_vcpu_pmu_ctr_start(struct kvm_vcpu *vcpu, unsigned long ctr_base,
+> > +                              unsigned long ctr_mask, unsigned long flags, u64 ival,
+> > +                              struct kvm_vcpu_sbi_return *retdata);
+> > +int kvm_riscv_vcpu_pmu_ctr_stop(struct kvm_vcpu *vcpu, unsigned long ctr_base,
+> > +                             unsigned long ctr_mask, unsigned long flags,
+> > +                             struct kvm_vcpu_sbi_return *retdata);
+> > +int kvm_riscv_vcpu_pmu_ctr_cfg_match(struct kvm_vcpu *vcpu, unsigned long ctr_base,
+> > +                                  unsigned long ctr_mask, unsigned long flags,
+> > +                                  unsigned long eidx, u64 evtdata,
+> > +                                  struct kvm_vcpu_sbi_return *retdata);
+> > +int kvm_riscv_vcpu_pmu_ctr_read(struct kvm_vcpu *vcpu, unsigned long cidx,
+> > +                             struct kvm_vcpu_sbi_return *retdata);
+> > +void kvm_riscv_vcpu_pmu_init(struct kvm_vcpu *vcpu);
+> > +void kvm_riscv_vcpu_pmu_deinit(struct kvm_vcpu *vcpu);
+> > +void kvm_riscv_vcpu_pmu_reset(struct kvm_vcpu *vcpu);
+> > +
+> > +#else
+> > +struct kvm_pmu {
+> > +};
+> > +
+> > +static inline void kvm_riscv_vcpu_pmu_init(struct kvm_vcpu *vcpu) {}
+> > +static inline void kvm_riscv_vcpu_pmu_deinit(struct kvm_vcpu *vcpu) {}
+> > +static inline void kvm_riscv_vcpu_pmu_reset(struct kvm_vcpu *vcpu) {}
+> > +#endif /* CONFIG_RISCV_PMU_SBI */
+> > +#endif /* !__KVM_VCPU_RISCV_PMU_H */
+> > diff --git a/arch/riscv/kvm/Makefile b/arch/riscv/kvm/Makefile
+> > index 019df920..5de1053 100644
+> > --- a/arch/riscv/kvm/Makefile
+> > +++ b/arch/riscv/kvm/Makefile
+> > @@ -25,3 +25,4 @@ kvm-y += vcpu_sbi_base.o
+> >  kvm-y += vcpu_sbi_replace.o
+> >  kvm-y += vcpu_sbi_hsm.o
+> >  kvm-y += vcpu_timer.o
+> > +kvm-$(CONFIG_RISCV_PMU_SBI) += vcpu_pmu.o
+> > diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> > index 7c08567..7d010b0 100644
+> > --- a/arch/riscv/kvm/vcpu.c
+> > +++ b/arch/riscv/kvm/vcpu.c
+> > @@ -138,6 +138,8 @@ static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
+> >       WRITE_ONCE(vcpu->arch.irqs_pending, 0);
+> >       WRITE_ONCE(vcpu->arch.irqs_pending_mask, 0);
+> >
+> > +     kvm_riscv_vcpu_pmu_reset(vcpu);
+> > +
+> >       vcpu->arch.hfence_head = 0;
+> >       vcpu->arch.hfence_tail = 0;
+> >       memset(vcpu->arch.hfence_queue, 0, sizeof(vcpu->arch.hfence_queue));
+> > @@ -194,6 +196,9 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+> >       /* Setup VCPU timer */
+> >       kvm_riscv_vcpu_timer_init(vcpu);
+> >
+> > +     /* setup performance monitoring */
+> > +     kvm_riscv_vcpu_pmu_init(vcpu);
+> > +
+> >       /* Reset VCPU */
+> >       kvm_riscv_reset_vcpu(vcpu);
+> >
+> > @@ -216,6 +221,8 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+> >       /* Cleanup VCPU timer */
+> >       kvm_riscv_vcpu_timer_deinit(vcpu);
+> >
+> > +     kvm_riscv_vcpu_pmu_deinit(vcpu);
+> > +
+> >       /* Free unused pages pre-allocated for G-stage page table mappings */
+> >       kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
+> >  }
+> > diff --git a/arch/riscv/kvm/vcpu_pmu.c b/arch/riscv/kvm/vcpu_pmu.c
+> > new file mode 100644
+> > index 0000000..e79721b
+> > --- /dev/null
+> > +++ b/arch/riscv/kvm/vcpu_pmu.c
+> > @@ -0,0 +1,138 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*
+> > + * Copyright (c) 2023 Rivos Inc
+> > + *
+> > + * Authors:
+> > + *     Atish Patra <atishp@rivosinc.com>
+> > + */
+> > +
+> > +#include <linux/errno.h>
+> > +#include <linux/err.h>
+> > +#include <linux/kvm_host.h>
+> > +#include <linux/perf/riscv_pmu.h>
+> > +#include <asm/csr.h>
+> > +#include <asm/kvm_vcpu_sbi.h>
+> > +#include <asm/kvm_vcpu_pmu.h>
+> > +#include <linux/kvm_host.h>
+> > +
+> > +#define kvm_pmu_num_counters(pmu) ((pmu)->num_hw_ctrs + (pmu)->num_fw_ctrs)
+> > +
+> > +int kvm_riscv_vcpu_pmu_num_ctrs(struct kvm_vcpu *vcpu, struct kvm_vcpu_sbi_return *retdata)
+> > +{
+> > +     struct kvm_pmu *kvpmu = vcpu_to_pmu(vcpu);
+> > +
+> > +     retdata->out_val = kvm_pmu_num_counters(kvpmu);
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +int kvm_riscv_vcpu_pmu_ctr_info(struct kvm_vcpu *vcpu, unsigned long cidx,
+> > +                             struct kvm_vcpu_sbi_return *retdata)
+> > +{
+> > +     struct kvm_pmu *kvpmu = vcpu_to_pmu(vcpu);
+> > +
+> > +     if (cidx > RISCV_KVM_MAX_COUNTERS || cidx == 1) {
+> > +             retdata->err_val = SBI_ERR_INVALID_PARAM;
+> > +             return 0;
+> > +     }
+> > +
+> > +     retdata->out_val = kvpmu->pmc[cidx].cinfo.value;
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +int kvm_riscv_vcpu_pmu_ctr_start(struct kvm_vcpu *vcpu, unsigned long ctr_base,
+> > +                              unsigned long ctr_mask, unsigned long flags, u64 ival,
+> > +                              struct kvm_vcpu_sbi_return *retdata)
+> > +{
+> > +     /* TODO */
+> > +     return 0;
+> > +}
+> > +
+> > +int kvm_riscv_vcpu_pmu_ctr_stop(struct kvm_vcpu *vcpu, unsigned long ctr_base,
+> > +                             unsigned long ctr_mask, unsigned long flags,
+> > +                             struct kvm_vcpu_sbi_return *retdata)
+> > +{
+> > +     /* TODO */
+> > +     return 0;
+> > +}
+> > +
+> > +int kvm_riscv_vcpu_pmu_ctr_cfg_match(struct kvm_vcpu *vcpu, unsigned long ctr_base,
+> > +                                  unsigned long ctr_mask, unsigned long flags,
+> > +                                  unsigned long eidx, u64 evtdata,
+> > +                                  struct kvm_vcpu_sbi_return *retdata)
+> > +{
+> > +     /* TODO */
+> > +     return 0;
+> > +}
+> > +
+> > +int kvm_riscv_vcpu_pmu_ctr_read(struct kvm_vcpu *vcpu, unsigned long cidx,
+> > +                             struct kvm_vcpu_sbi_return *retdata)
+> > +{
+> > +     /* TODO */
+> > +     return 0;
+> > +}
+> > +
+> > +void kvm_riscv_vcpu_pmu_init(struct kvm_vcpu *vcpu)
+> > +{
+> > +     int i = 0, ret, num_hw_ctrs = 0, hpm_width = 0;
+> > +     struct kvm_pmu *kvpmu = vcpu_to_pmu(vcpu);
+> > +     struct kvm_pmc *pmc;
+> > +
+> > +     ret = riscv_pmu_get_hpm_info(&hpm_width, &num_hw_ctrs);
+> > +     if (ret < 0 || !hpm_width || !num_hw_ctrs)
+> > +             return;
 >
-> +int kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
-> +                                     kvm_pte_t *new, u64 phys, u32 level,
-> +                                     enum kvm_pgtable_prot prot, void *mc,
-> +                                     bool force_pte)
-> +{
-> +       struct stage2_map_data map_data = {
-> +               .phys           = phys,
-> +               .mmu            = pgt->mmu,
-> +               .memcache       = mc,
-> +               .force_pte      = force_pte,
-> +       };
-> +       struct kvm_pgtable_walker walker = {
-> +               .cb             = stage2_map_walker,
-> +               .flags          = KVM_PGTABLE_WALK_LEAF |
-> +                                 KVM_PGTABLE_WALK_SKIP_BBM |
-> +                                 KVM_PGTABLE_WALK_SKIP_CMO,
-> +               .arg            = &map_data,
-> +       };
-> +       /* .addr (the IPA) is irrelevant for a removed table */
-> +       struct kvm_pgtable_walk_data data = {
-> +               .walker = &walker,
-> +               .addr   = 0,
-> +               .end    = kvm_granule_size(level),
-> +       };
-> +       struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
-> +       kvm_pte_t *pgtable;
-> +       int ret;
-> +
-> +       ret = stage2_set_prot_attr(pgt, prot, &map_data.attr);
-> +       if (ret)
-> +               return ret;
-> +
-> +       pgtable = mm_ops->zalloc_page(mc);
-> +       if (!pgtable)
-> +               return -ENOMEM;
-> +
-> +       ret = __kvm_pgtable_walk(&data, mm_ops, (kvm_pteref_t)pgtable,
-> +                                level + 1);
-> +       if (ret) {
-> +               kvm_pgtable_stage2_free_unlinked(mm_ops, pgtable, level);
-> +               mm_ops->put_page(pgtable);
-> +               return ret;
-> +       }
-> +
-> +       *new = kvm_init_table_pte(pgtable, mm_ops);
-> +       return 0;
-> +}
+> need blank line here
 >
->  int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
->                               struct kvm_pgtable_mm_ops *mm_ops,
-> --
-> 2.39.1.519.gcb327c4b5f-goog
+> > +     /*
+> > +      * Increase the number of hardware counters to offset the time counter.
+> > +      */
+> > +     kvpmu->num_hw_ctrs = num_hw_ctrs + 1;
+> > +     kvpmu->num_fw_ctrs = SBI_PMU_FW_MAX;
+> > +
+> > +     if (kvpmu->num_hw_ctrs > RISCV_KVM_MAX_HW_CTRS) {
+> > +             pr_warn("Limiting the hardware counters to 32 as specified by the ISA");
 >
+> pr_warn_once() and we need to set the prefix.
+>
+> > +             kvpmu->num_hw_ctrs = RISCV_KVM_MAX_HW_CTRS;
+> > +     }
+>
+> need blank line here
+>
+> > +     /*
+> > +      * There is no correlation between the logical hardware counter and virtual counters.
+> > +      * However, we need to encode a hpmcounter CSR in the counter info field so that
+> > +      * KVM can trap n emulate the read. This works well in the migration use case as
+> > +      * KVM doesn't care if the actual hpmcounter is available in the hardware or not.
+> > +      */
+> > +     for (i = 0; i < kvm_pmu_num_counters(kvpmu); i++) {
+> > +             /* TIME CSR shouldn't be read from perf interface */
+> > +             if (i == 1)
+> > +                     continue;
+> > +             pmc = &kvpmu->pmc[i];
+> > +             pmc->idx = i;
+> > +             if (i < kvpmu->num_hw_ctrs) {
+> > +                     pmc->cinfo.type = SBI_PMU_CTR_TYPE_HW;
+> > +                     if (i < 3)
+> > +                             /* CY, IR counters */
+> > +                             pmc->cinfo.width = 63;
+> > +                     else
+> > +                             pmc->cinfo.width = hpm_width;
+> > +                     /*
+> > +                      * The CSR number doesn't have any relation with the logical
+> > +                      * hardware counters. The CSR numbers are encoded sequentially
+> > +                      * to avoid maintaining a map between the virtual counter
+> > +                      * and CSR number.
+> > +                      */
+> > +                     pmc->cinfo.csr = CSR_CYCLE + i;
+> > +             } else {
+> > +                     pmc->cinfo.type = SBI_PMU_CTR_TYPE_FW;
+> > +                     pmc->cinfo.width = BITS_PER_LONG - 1;
+> > +             }
+> > +     }
+> > +
+> > +     kvpmu->init_done = true;
+> > +}
+> > +
+> > +void kvm_riscv_vcpu_pmu_deinit(struct kvm_vcpu *vcpu)
+> > +{
+> > +     /* TODO */
+> > +}
+> > +
+> > +void kvm_riscv_vcpu_pmu_reset(struct kvm_vcpu *vcpu)
+> > +{
+> > +     kvm_riscv_vcpu_pmu_deinit(vcpu);
+> > +}
+> > --
+> > 2.25.1
+> >
+>
+> Thanks,
+> drew
