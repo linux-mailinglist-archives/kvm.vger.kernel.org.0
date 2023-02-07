@@ -2,145 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 087F968D926
-	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 14:18:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D4AE68D92B
+	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 14:18:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232538AbjBGNSP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 08:18:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38746 "EHLO
+        id S232618AbjBGNSZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 08:18:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232670AbjBGNSB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 08:18:01 -0500
-Received: from mr85p00im-ztdg06011801.me.com (mr85p00im-ztdg06011801.me.com [17.58.23.199])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3B111448F
-        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 05:17:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ynddal.dk; s=sig1;
-        t=1675775846; bh=4koTmGFghxH9p515oDZHzYWWym0WdP5hSrTFLNtFnFc=;
-        h=From:To:Subject:Date:Message-Id:MIME-Version;
-        b=ad+QmyY2KXDmrPQYZflyUMKalgPxtJ7P1sp9RSaxfwgDglr9iXp6eSsuTe0ceoJyk
-         mFdFH7TnezK1NuaNsWTuitqb+nH1Gq4uGaqCq1TaQRPub+ZuJJzPxOecp5zue+P21P
-         nWvZ2cLcC89SwAgI43hO0OpdftjAwnWIMd1LLESyRzeXz97CC+TirgYVbIAGP1kK7V
-         7z4ZZHcAJHfcppRbStZ13Nl+WgWaXu0MEV3GcqFQqkJhPJ4SPbI8I6nyR0QUWUhuRS
-         KlGCHzKuPjO6Te790RpMSSM/YjKhvaLPH9VtU1XaUrAgjnm4dSn9PoeEn8OrW1NQyx
-         i2jb+lLOPTajA==
-Received: from localhost.localdomain (mr38p00im-dlb-asmtp-mailmevip.me.com [17.57.152.18])
-        by mr85p00im-ztdg06011801.me.com (Postfix) with ESMTPSA id 0F3A59C10CA;
-        Tue,  7 Feb 2023 13:17:23 +0000 (UTC)
-From:   Mads Ynddal <mads@ynddal.dk>
-To:     qemu-devel@nongnu.org
-Cc:     Eduardo Habkost <eduardo@habkost.net>, kvm@vger.kernel.org,
-        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Mads Ynddal <m.ynddal@samsung.com>
-Subject: [PATCH v2] gdbstub: move update guest debug to accel ops
-Date:   Tue,  7 Feb 2023 14:17:21 +0100
-Message-Id: <20230207131721.49233-1-mads@ynddal.dk>
-X-Mailer: git-send-email 2.38.1
+        with ESMTP id S232689AbjBGNSG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 08:18:06 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C96643431C;
+        Tue,  7 Feb 2023 05:17:47 -0800 (PST)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 317BsenL011595;
+        Tue, 7 Feb 2023 13:17:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=1UXG7ZzdK3LaBZTfrnjDDjBfDLWwLlYA7U49xnGR4EA=;
+ b=UgGihNdCac35Kv/k45sNjRQwveDPcoKrelZe1qzTzf6WDwzGj98ts8KfoKxTlbe/EBA9
+ KyhNGFacpFnLQiCuiSoCjoG9Ymcqybzxt8ihVB5xEn4tM5ymZHWcZAIasaxEhh+1JF3J
+ v3yAV7gbQe2eDd0hVYmq6weuGttyvml83JexY8BfdkB0aj0zFZ06O8GIG+jFW1HNWUJm
+ tj6sGoRGh3Tdf+lH6iolGyFGQLWazESGsxgZaj5JDttkCRCFcgnBhZNGG90R98yud3Qr
+ Gok02Do8njSZY19tJKGtlhQbh8xSl2QQ1Qgjnc9DHUEBZYjVTl47GCXhR21BJ9YdnYMb +w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nkp6fj6ew-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Feb 2023 13:17:42 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 317C09uA000538;
+        Tue, 7 Feb 2023 13:17:41 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nkp6fj6e4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Feb 2023 13:17:41 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 317ClYcR001846;
+        Tue, 7 Feb 2023 13:17:39 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3nhf06kmjb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Feb 2023 13:17:39 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 317DHZt752756956
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 7 Feb 2023 13:17:35 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7313120040;
+        Tue,  7 Feb 2023 13:17:35 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 81C7820043;
+        Tue,  7 Feb 2023 13:17:34 +0000 (GMT)
+Received: from [9.171.52.227] (unknown [9.171.52.227])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue,  7 Feb 2023 13:17:34 +0000 (GMT)
+Message-ID: <b4e4e19e-7c4f-44fe-a655-7052b28c07df@linux.ibm.com>
+Date:   Tue, 7 Feb 2023 14:17:34 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: Cs7l49o46oZmj3kQmNbQQtq474EaCvda
-X-Proofpoint-GUID: Cs7l49o46oZmj3kQmNbQQtq474EaCvda
-X-Proofpoint-Virus-Version: =?UTF-8?Q?vendor=3Dfsecure_engine=3D1.1.170-22c6f66c430a71ce266a39bfe25bc?=
- =?UTF-8?Q?2903e8d5c8f:6.0.138,18.0.572,17.11.62.513.0000000_definitions?=
- =?UTF-8?Q?=3D2020-02-14=5F11:2020-02-14=5F02,2020-02-14=5F11,2021-12-02?=
- =?UTF-8?Q?=5F01_signatures=3D0?=
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 adultscore=0
- mlxlogscore=999 mlxscore=0 clxscore=1030 spamscore=0 malwarescore=0
- suspectscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2209130000 definitions=main-2302070118
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH v7 10/14] KVM: s390: Refactor absolute vm mem_op function
+Content-Language: en-US
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>
+References: <20230206164602.138068-1-scgl@linux.ibm.com>
+ <20230206164602.138068-11-scgl@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20230206164602.138068-11-scgl@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 0EiaRQ2TeK8B15-DvtEC-eo2ztRBdwu6
+X-Proofpoint-ORIG-GUID: 5_ay3k_0tmi5Ad6VAzLngVqmGJBkBfb_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-02-07_05,2023-02-06_03,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ priorityscore=1501 malwarescore=0 mlxlogscore=884 adultscore=0 spamscore=0
+ clxscore=1015 phishscore=0 bulkscore=0 impostorscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
+ definitions=main-2302070116
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Mads Ynddal <m.ynddal@samsung.com>
+On 2/6/23 17:45, Janis Schoetterl-Glausch wrote:
+> Remove code duplication with regards to the CHECK_ONLY flag.
+> Decrease the number of indents.
+> No functional change indented.
+> 
+> Suggested-by: Janosch Frank <frankja@linux.ibm.com>
+> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-Continuing the refactor of a48e7d9e52 (gdbstub: move guest debug support
-check to ops) by removing hardcoded kvm_enabled() from generic cpu.c
-code, and replace it with a property of AccelOpsClass.
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
-Signed-off-by: Mads Ynddal <m.ynddal@samsung.com>
----
- accel/kvm/kvm-accel-ops.c  |  5 +++++
- cpu.c                      | 11 ++++++++---
- include/sysemu/accel-ops.h |  1 +
- 3 files changed, 14 insertions(+), 3 deletions(-)
-
-diff --git a/accel/kvm/kvm-accel-ops.c b/accel/kvm/kvm-accel-ops.c
-index fbf4fe3497..5e0fb42408 100644
---- a/accel/kvm/kvm-accel-ops.c
-+++ b/accel/kvm/kvm-accel-ops.c
-@@ -86,6 +86,10 @@ static bool kvm_cpus_are_resettable(void)
-     return !kvm_enabled() || kvm_cpu_check_are_resettable();
- }
- 
-+static int kvm_update_guest_debug_ops(CPUState *cpu) {
-+    return kvm_update_guest_debug(cpu, 0);
-+}
-+
- static void kvm_accel_ops_class_init(ObjectClass *oc, void *data)
- {
-     AccelOpsClass *ops = ACCEL_OPS_CLASS(oc);
-@@ -99,6 +103,7 @@ static void kvm_accel_ops_class_init(ObjectClass *oc, void *data)
-     ops->synchronize_pre_loadvm = kvm_cpu_synchronize_pre_loadvm;
- 
- #ifdef KVM_CAP_SET_GUEST_DEBUG
-+    ops->update_guest_debug = kvm_update_guest_debug_ops;
-     ops->supports_guest_debug = kvm_supports_guest_debug;
-     ops->insert_breakpoint = kvm_insert_breakpoint;
-     ops->remove_breakpoint = kvm_remove_breakpoint;
-diff --git a/cpu.c b/cpu.c
-index 21cf809614..fb9f0e3d22 100644
---- a/cpu.c
-+++ b/cpu.c
-@@ -31,8 +31,8 @@
- #include "hw/core/sysemu-cpu-ops.h"
- #include "exec/address-spaces.h"
- #endif
-+#include "sysemu/cpus.h"
- #include "sysemu/tcg.h"
--#include "sysemu/kvm.h"
- #include "sysemu/replay.h"
- #include "exec/cpu-common.h"
- #include "exec/exec-all.h"
-@@ -396,9 +396,14 @@ void cpu_single_step(CPUState *cpu, int enabled)
- {
-     if (cpu->singlestep_enabled != enabled) {
-         cpu->singlestep_enabled = enabled;
--        if (kvm_enabled()) {
--            kvm_update_guest_debug(cpu, 0);
-+
-+#if !defined(CONFIG_USER_ONLY)
-+        const AccelOpsClass *ops = cpus_get_accel();
-+        if (ops->update_guest_debug) {
-+            ops->update_guest_debug(cpu);
-         }
-+#endif
-+
-         trace_breakpoint_singlestep(cpu->cpu_index, enabled);
-     }
- }
-diff --git a/include/sysemu/accel-ops.h b/include/sysemu/accel-ops.h
-index 8cc7996def..cd6a4ef7a5 100644
---- a/include/sysemu/accel-ops.h
-+++ b/include/sysemu/accel-ops.h
-@@ -48,6 +48,7 @@ struct AccelOpsClass {
- 
-     /* gdbstub hooks */
-     bool (*supports_guest_debug)(void);
-+    int (*update_guest_debug)(CPUState *cpu);
-     int (*insert_breakpoint)(CPUState *cpu, int type, hwaddr addr, hwaddr len);
-     int (*remove_breakpoint)(CPUState *cpu, int type, hwaddr addr, hwaddr len);
-     void (*remove_all_breakpoints)(CPUState *cpu);
--- 
-2.38.1
+> ---
+> 
+> 
+> Cosmetic only, can be dropped
+> 
+> 
+>   arch/s390/kvm/kvm-s390.c | 43 +++++++++++++++++-----------------------
+>   1 file changed, 18 insertions(+), 25 deletions(-)
+> 
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 707967a296f1..1f94b18f1cb5 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -2782,6 +2782,7 @@ static int mem_op_validate_common(struct kvm_s390_mem_op *mop, u64 supported_fla
+>   static int kvm_s390_vm_mem_op_abs(struct kvm *kvm, struct kvm_s390_mem_op *mop)
+>   {
+>   	void __user *uaddr = (void __user *)mop->buf;
+> +	enum gacc_mode acc_mode;
+>   	void *tmpbuf = NULL;
+>   	int r, srcu_idx;
+>   
+> @@ -2803,33 +2804,25 @@ static int kvm_s390_vm_mem_op_abs(struct kvm *kvm, struct kvm_s390_mem_op *mop)
+>   		goto out_unlock;
+>   	}
+>   
+> -	switch (mop->op) {
+> -	case KVM_S390_MEMOP_ABSOLUTE_READ: {
+> -		if (mop->flags & KVM_S390_MEMOP_F_CHECK_ONLY) {
+> -			r = check_gpa_range(kvm, mop->gaddr, mop->size, GACC_FETCH, mop->key);
+> -		} else {
+> -			r = access_guest_abs_with_key(kvm, mop->gaddr, tmpbuf,
+> -						      mop->size, GACC_FETCH, mop->key);
+> -			if (r == 0) {
+> -				if (copy_to_user(uaddr, tmpbuf, mop->size))
+> -					r = -EFAULT;
+> -			}
+> -		}
+> -		break;
+> +	acc_mode = mop->op == KVM_S390_MEMOP_ABSOLUTE_READ ? GACC_FETCH : GACC_STORE;
+> +	if (mop->flags & KVM_S390_MEMOP_F_CHECK_ONLY) {
+> +		r = check_gpa_range(kvm, mop->gaddr, mop->size, acc_mode, mop->key);
+> +		goto out_unlock;
+>   	}
+> -	case KVM_S390_MEMOP_ABSOLUTE_WRITE: {
+> -		if (mop->flags & KVM_S390_MEMOP_F_CHECK_ONLY) {
+> -			r = check_gpa_range(kvm, mop->gaddr, mop->size, GACC_STORE, mop->key);
+> -		} else {
+> -			if (copy_from_user(tmpbuf, uaddr, mop->size)) {
+> -				r = -EFAULT;
+> -				break;
+> -			}
+> -			r = access_guest_abs_with_key(kvm, mop->gaddr, tmpbuf,
+> -						      mop->size, GACC_STORE, mop->key);
+> +	if (acc_mode == GACC_FETCH) {
+> +		r = access_guest_abs_with_key(kvm, mop->gaddr, tmpbuf,
+> +					      mop->size, GACC_FETCH, mop->key);
+> +		if (r)
+> +			goto out_unlock;
+> +		if (copy_to_user(uaddr, tmpbuf, mop->size))
+> +			r = -EFAULT;
+> +	} else {
+> +		if (copy_from_user(tmpbuf, uaddr, mop->size)) {
+> +			r = -EFAULT;
+> +			goto out_unlock;
+>   		}
+> -		break;
+> -	}
+> +		r = access_guest_abs_with_key(kvm, mop->gaddr, tmpbuf,
+> +					      mop->size, GACC_STORE, mop->key);
+>   	}
+>   
+>   out_unlock:
 
