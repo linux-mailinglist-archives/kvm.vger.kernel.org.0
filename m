@@ -2,98 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EF8A068D370
-	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 11:01:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0BFD868D386
+	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 11:05:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231912AbjBGKBD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 05:01:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59578 "EHLO
+        id S231518AbjBGKFm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 05:05:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231829AbjBGKAh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 05:00:37 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 186047EE7
-        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 02:00:20 -0800 (PST)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31790YIF013189;
-        Tue, 7 Feb 2023 10:00:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=7hkDNQFzrXqgdOpBCNX1R6HlLeqMSdGYKI3nrnddJfA=;
- b=bPwXFM5E0ppH7pUGmB4oto5WqbZywqf4X0imEY6ql82CfUtkt9fTRPMoO2HQcQ60Tj6S
- //J2iLOk36LJgi169Czj/06gXyckCHZ4WIkb14olBk6ems1KXuQ7TT7p2sLX6qN68egH
- F+a3j9Zm3896ivQs2yR6JJnsJkkcLp4+Psk+ePUL3UVd4z+xRSkeY/HfxO1Rt36sc9TZ
- ND6p0Hh14LyXzcAYk/WJI9x80dYAABvQ+7c0Io+Ylzq9ac9ARXsVn56CFRXiCLQV0mR5
- oTID9PBkIP9jIP1X61seD/unYjd8nkl6Tx81vlZns3VVsuflnlDK8hCIkmjeuqQf7hOs FQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nkkmuhgch-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Feb 2023 10:00:07 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3179xDdJ027084;
-        Tue, 7 Feb 2023 10:00:07 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nkkmuhgba-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Feb 2023 10:00:07 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31775Lua021137;
-        Tue, 7 Feb 2023 09:59:33 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3nhf06ke6a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Feb 2023 09:59:33 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3179xTKh53150064
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 7 Feb 2023 09:59:30 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C68D020043;
-        Tue,  7 Feb 2023 09:59:29 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 62C8D20040;
-        Tue,  7 Feb 2023 09:59:29 +0000 (GMT)
-Received: from [9.152.224.241] (unknown [9.152.224.241])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue,  7 Feb 2023 09:59:29 +0000 (GMT)
-Message-ID: <f5c6b04a-0faa-ba36-9019-468662b9fbb2@linux.ibm.com>
-Date:   Tue, 7 Feb 2023 10:59:29 +0100
+        with ESMTP id S231438AbjBGKFk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 05:05:40 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BF4830E4;
+        Tue,  7 Feb 2023 02:05:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=D0GhmIwMmwFa2BiXd+tqMheggPnYzDfXqRySRLhS7hg=; b=V9TpavJRBH34GZYUV4QBwCIpWz
+        7+pnTy+LJRWFN/g/plrPoxhS+ux0hPYryQYIsRUVNxyhQoj9+6gxUQcORecXY7QT6D0v+urMAhQ0x
+        A2eMl48WQXr3nl1PW+dmoL9aNHjctIURlGSMhkfPS0l5Bqx/4PYz5GOP70ES9f0RFlhkQCR5wjGBw
+        esvV/C25lU+9curr20VXPykfO399shMzyqDRNXmo3U4+rl32y9Xp2zUua+Q4preU2TpX4LRansC3W
+        dVL+IuWfsSD+Ll1PIfZ6mGP9VSETpOE/dSVT+oCfcNk+XI9AW69kPoKnGsN5IpcAsv2VafgsU97AH
+        ynpaPlMw==;
+Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.infradead.org)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pPKqD-00035a-Ja; Tue, 07 Feb 2023 10:04:46 +0000
+Message-ID: <9acc229e3d4931fff9106d60b57e0f46941bfb50.camel@infradead.org>
+Subject: Re: [PATCH v6 07/11] x86/smpboot: Disable parallel boot for AMD CPUs
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Usama Arif <usama.arif@bytedance.com>, arjan@linux.intel.com
+Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        hpa@zytor.com, x86@kernel.org, pbonzini@redhat.com,
+        paulmck@kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, rcu@vger.kernel.org, mimoja@mimoja.de,
+        hewenliang4@huawei.com, thomas.lendacky@amd.com, seanjc@google.com,
+        pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
+        punit.agrawal@bytedance.com, simon.evans@bytedance.com,
+        liangma@liangbit.com, Mario Limonciello <Mario.Limonciello@amd.com>
+Date:   Tue, 07 Feb 2023 10:04:44 +0000
+In-Reply-To: <87pmamwcff.ffs@tglx>
+References: <20230202215625.3248306-1-usama.arif@bytedance.com>
+         <20230202215625.3248306-8-usama.arif@bytedance.com>
+         <b3d9fbbf-e760-5d1d-9182-44c144abd1bf@amd.com>
+         <d3ec562fd2e03c3aef9534f64915a14a8cb89ae1.camel@infradead.org>
+         <87pmamwcff.ffs@tglx>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-K3Pib1b0QDYm2F7ldqCr"
+User-Agent: Evolution 3.44.4-0ubuntu1 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH v15 06/11] s390x/cpu topology: interception of PTF
- instruction
-Content-Language: en-US
-To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
-        berrange@redhat.com, clg@kaod.org
-References: <20230201132051.126868-1-pmorel@linux.ibm.com>
- <20230201132051.126868-7-pmorel@linux.ibm.com>
- <5c15ccde659a9849ab3529e08f5e1278508406c8.camel@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <5c15ccde659a9849ab3529e08f5e1278508406c8.camel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: jjM6hP-2bkB90CsR_RC6OfDXj10sQR4o
-X-Proofpoint-ORIG-GUID: FKyWqLecR5BFEXdPn7NMUEHa0eRGcgat
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-02-07_02,2023-02-06_03,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- bulkscore=0 clxscore=1015 suspectscore=0 mlxlogscore=999
- lowpriorityscore=0 mlxscore=0 spamscore=0 adultscore=0 phishscore=0
- malwarescore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2212070000 definitions=main-2302070085
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -101,159 +63,189 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+--=-K3Pib1b0QDYm2F7ldqCr
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2/6/23 19:34, Nina Schoetterl-Glausch wrote:
-> On Wed, 2023-02-01 at 14:20 +0100, Pierre Morel wrote:
->> When the host supports the CPU topology facility, the PTF
->> instruction with function code 2 is interpreted by the SIE,
->> provided that the userland hypervizor activates the interpretation
->> by using the KVM_CAP_S390_CPU_TOPOLOGY KVM extension.
->>
->> The PTF instructions with function code 0 and 1 are intercepted
->> and must be emulated by the userland hypervizor.
->>
->> During RESET all CPU of the configuration are placed in
->> horizontal polarity.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   include/hw/s390x/s390-virtio-ccw.h |   6 ++
->>   target/s390x/cpu.h                 |   1 +
->>   hw/s390x/cpu-topology.c            | 103 +++++++++++++++++++++++++++++
->>   target/s390x/cpu-sysemu.c          |  14 ++++
->>   target/s390x/kvm/kvm.c             |  11 +++
->>   5 files changed, 135 insertions(+)
->>
-> [...]
-> 
->> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
->> index cf63f3dd01..1028bf4476 100644
->> --- a/hw/s390x/cpu-topology.c
->> +++ b/hw/s390x/cpu-topology.c
->> @@ -85,16 +85,104 @@ static void s390_topology_init(MachineState *ms)
->>       QTAILQ_INSERT_HEAD(&s390_topology.list, entry, next);
->>   }
->>   
->> +/**
->> + * s390_topology_set_cpus_polarity:
->> + * @polarity: polarity requested by the caller
->> + *
->> + * Set all CPU entitlement according to polarity and
->> + * dedication.
->> + * Default vertical entitlement is POLARITY_VERTICAL_MEDIUM as
->> + * it does not require host modification of the CPU provisioning
->> + * until the host decide to modify individual CPU provisioning
->> + * using QAPI interface.
->> + * However a dedicated vCPU will have a POLARITY_VERTICAL_HIGH
->> + * entitlement.
->> + */
->> +static void s390_topology_set_cpus_polarity(int polarity)
-> 
-> Since you set the entitlement field I'd prefer _set_cpus_entitlement or similar.
+On Tue, 2023-02-07 at 01:23 +0100, Thomas Gleixner wrote:
+> On Sat, Feb 04 2023 at 15:40, David Woodhouse wrote:
+> > On Fri, 2023-02-03 at 13:48 -0600, Kim Phillips wrote:
+> > > Then:
+> > >=20
+> > > =C2=A0 - a Ryzen 3000 (Picasso A1/Zen+) notebook I have access to fai=
+ls to boot.
+> > > =C2=A0 - Zen 2,3,4-based servers boot fine
+> > > =C2=A0 - a Zen1-based server doesn't boot.
+> >=20
+> > I've changed it to use CPUID 0xb only if we're actually in x2apic mode,
+> > which Boris tells me won't be the case on Zen1 because that doesn't
+> > support X2APIC.
+>=20
+> Correct.
+>=20
+> > When we're not in x2apic mode, we can use CPUID 0x1 because the 8 bits
+> > of APIC ID we find there are perfectly sufficient.
+>=20
+> Is that worth the trouble?
 
-OK if you prefer.
+Well, that's what was being debated. I think the conclusion that was
+bring reached was that it *is* worth the trouble, because there will be
+a number of physical and especially virtual machines which have a high
+CPU count but which don't actually use X2APIC mode. And which might not
+even *support* CPUID 0xb.
 
-> 
->> +{
->> +    CPUState *cs;
->> +
->> +    CPU_FOREACH(cs) {
->> +        if (polarity == POLARITY_HORIZONTAL) {
->> +            S390_CPU(cs)->env.entitlement = 0;
->> +        } else if (S390_CPU(cs)->env.dedicated) {
->> +            S390_CPU(cs)->env.entitlement = POLARITY_VERTICAL_HIGH;
->> +        } else {
->> +            S390_CPU(cs)->env.entitlement = POLARITY_VERTICAL_MEDIUM;
->> +        }
->> +    }
->> +}
->> +
-> [...]
->>   
->>   /**
->> @@ -137,6 +225,21 @@ static void s390_topology_cpu_default(S390CPU *cpu, Error **errp)
->>                             (smp->books * smp->sockets * smp->cores)) %
->>                            smp->drawers;
->>       }
-> 
-> Why are the changes below in this patch?
-
-Because before thos patch we have only horizontal polarization.
-
-> 
->> +
->> +    /*
->> +     * Machine polarity is set inside the global s390_topology structure.
->> +     * In the case the polarity is set as horizontal set the entitlement
-
-Sorry here an error in the comment should be :
-"In the case the polarity is NOT set as horizontal..."
-
->> +     * to POLARITY_VERTICAL_MEDIUM which is the better equivalent when
->> +     * machine polarity is set to vertical or POLARITY_VERTICAL_HIGH if
->> +     * the vCPU is dedicated.
->> +     */
->> +    if (s390_topology.polarity && !env->entitlement) {
-> 
-> It'd be more readable if you compared against enum values by name.
-
-Right, I will change this to
-
-     if (s390_topology.polarity != S390_POLARITY_HORIZONTAL &&
-         env->entitlement == S390_ENTITLEMENT_UNSET) {
-
-> 
-> I don't see why you check s390_topology.polarity. If it is horizontal
-> then the value of the entitlement doesn't matter at all, so you can set it
-> to whatever.
-
-Right, that is why it is done only for vertical polarization (sorry for 
-the wrong comment)
-
-> All you want to do is enforce dedicated -> VERTICAL_HIGH, right?
-> So why don't you just add
-> 
-> +    if (cpu->env.dedicated && cpu->env.entitlement != POLARITY_VERTICAL_HIGH) {
-> +        error_setg(errp, "A dedicated cpu implies high entitlement");
-> +        return;
-> +    } >
-> to s390_topology_check?
-
-Here it is to set the default in the case the values are not provided.
-
-But where you are right is that I should add a verification to the check 
-function.
-
-> 
->> +        if (env->dedicated) {
->> +            env->entitlement = POLARITY_VERTICAL_HIGH;
->> +        } else {
->> +            env->entitlement = POLARITY_VERTICAL_MEDIUM;
->> +        }
-> 
-> If it is horizontal, then setting the entitlement is pointless as it will be
-> reset to medium on PTF.
-
-That is why the polarity is tested (sorry for the bad comment)
-
-> So the current polarization is vertical and a cpu is being hotplugged,
-> but setting the entitlement of the cpu being added is also pointless, because
-> it's determined by the dedication. That seems weird.
-
-No it is not determined by the dedication, if there is no dedication the 
-3 vertical values are possible.
+So using CPUID 0x1 when there is no APIC ID greater than 254 does seem
+to make sense.
 
 
-Regards,
-Pierre
+> > Even though we *can* support non-X2APIC processors, we *might* want to
+> > play it safe and not go back that far; only enabling parallel bringup
+> > on machines with X2APIC which roughly correlates with "lots of CPUs"
+> > since that's where the benefit is.
+>=20
+> The parallel bringup code is complex enough already, so please don't
+> optimize for the non-interesting case in the first place. When this has
+> stabilized then the CPUID 0x1 mechanism can be added if anyone thinks
+> it's interesting. KISS is still the best engineering principle.
 
-> 
->> +    }
->>   }
->>   
-> 
-> [...]
+Actually it ends up being trivial. It probably makes sense to keep it
+in there even if it can only be exercised by a deliberate opt-in on
+older CPUs. I reworked the register usage from your original anyway,
+which helps a little.
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+	testl	$STARTUP_APICID_CPUID_0B, %edx
+	jnz	.Luse_cpuid_0b
+	testl	$STARTUP_APICID_CPUID_01, %edx
+	jnz	.Luse_cpuid_01
+	andl	$0x0FFFFFFF, %edx
+	jmp	.Lsetup_AP
+
+.Luse_cpuid_01:
+	mov	$0x01, %eax
+	cpuid
+	mov	%ebx, %edx
+	shr	$24, %edx
+	jmp	.Lsetup_AP
+
+.Luse_cpuid_0b:
+	mov	$0x0B, %eax
+	xorl	%ecx, %ecx
+	cpuid
+
+.Lsetup_AP:
+	/* EDX contains the APICID of the current CPU */
+
+
+--=-K3Pib1b0QDYm2F7ldqCr
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMjA3MTAwNDQ0WjAvBgkqhkiG9w0BCQQxIgQgWYRpuP5a
+lb0e0a9pAaHn5C9wHNHZJzzg+VkcQq6ghdowgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgC0CMPHQ9RQOEZGVmwtEjVz1wuERsCGHtLW
+nM+ZCUTRTuGbfcBgDhwqioY0GQuwTDjfKNKIuMwXgmpk2Xe3VU9Vksui0Byf/VlsB5YK3mg3YD0q
+IbiaU1a6/6TsUSUTRL2WjnoqNbr0fEVxyf1IzkKnLs4CnQSGPrEE9bNrXri1bLfBx9umzMDdHV1W
+1XrF/7O9uSpvDRdJMHBiO7Y7iSV4tvgkLe1bRifNI0yE4mKEJGnWCyZvSXKle3ZbJHp6xsnW3i1W
+xcrnntKs7ghhs16t2iovT1y/eACSxUbYOZZ1Q43ZxvgJ8l87CPWwOnu+XpGq4WgjhznCr7wB6baV
+zruy7H2xC2MPD8nfpiUUVk2lwvw98eZUJmDcXGpATIlGRRQQZRISncqVsGDGCwEbyRWpKQGvDXV/
+2ESh3mwXW29w+CYUCoZvxX24mFP8baN9EaOIisSB1qRzWhCf3kgP0WXf8t2WPU0HMfeaQ+l6ovY+
+HXNegYTgBFOaGhtrt9ozNKwqTN2lKnpKpe6X7KPwzSHJDxyZRltyExegx9YrFSAH1w5W0nT1gPd8
+BG3CyxHjvhaBm6w3rGggD3oIOBvttHVN/+yEg+hK3SBjsQfkvJQPZ4VKh3CcvY3pgTcZNeZWsp9D
+i6Zis+/0uF1aSqlgxA5IM/SRtmy3xvmoa6YQYa2eGQAAAAAAAA==
+
+
+--=-K3Pib1b0QDYm2F7ldqCr--
