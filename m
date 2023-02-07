@@ -2,62 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C123468DF5C
-	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 18:51:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 467A268DF69
+	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 18:52:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232357AbjBGRv3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 12:51:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53322 "EHLO
+        id S232614AbjBGRwi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 12:52:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232356AbjBGRvX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 12:51:23 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B73533E0B6;
-        Tue,  7 Feb 2023 09:51:12 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8343D1042;
-        Tue,  7 Feb 2023 09:51:54 -0800 (PST)
-Received: from [10.1.196.177] (eglon.cambridge.arm.com [10.1.196.177])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4574E3F71E;
-        Tue,  7 Feb 2023 09:51:08 -0800 (PST)
-Message-ID: <0621bf8e-06f2-70f2-6d2b-f311c5a4ffce@arm.com>
-Date:   Tue, 7 Feb 2023 17:50:59 +0000
+        with ESMTP id S232544AbjBGRwT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 12:52:19 -0500
+Received: from mail-yw1-x112a.google.com (mail-yw1-x112a.google.com [IPv6:2607:f8b0:4864:20::112a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2E523D925
+        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 09:52:01 -0800 (PST)
+Received: by mail-yw1-x112a.google.com with SMTP id 00721157ae682-50aa54cc7c0so205505437b3.8
+        for <kvm@vger.kernel.org>; Tue, 07 Feb 2023 09:52:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=O3E0KsrZ9oAW+b1aCUfQHj96dbPRqwoGdBYkLlh8FMw=;
+        b=BnlnfNpm8hN1xEk3cCUyU216nabUr2USJGPYqGEGpu9FVnmvE+LBsLl0vBVzbzx6Dh
+         9K3q0Aba+vc5xhk4pXnWn5YArjpAxDgk20truk6vqe+TweG3yqckxUHhvvxXVG5Auwt1
+         Mz+upZ2Og7k6QUzLbxhOScEI7MAZLVjwlZRDeZom8EiP0YQMrs4knQKe1wm46leHR3oz
+         iTW578+2yXbBp7Uf3m6IvX03j97+xeZ8V4HitCIRbIz4L/mbdojmLegVU077S2qs5fD5
+         BvIzMBf1LSQYWiM6HlWGGF+B+DQDcTLtoQzMayZfza0C/TBYQGltkAXwY/IVU4OJ2Fy9
+         h7zQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=O3E0KsrZ9oAW+b1aCUfQHj96dbPRqwoGdBYkLlh8FMw=;
+        b=59PPEwFvPfkL9B8yyY6t13tbLfIKyOrS3so/6TXiU29N+dRCGHBu7OPEEAMFZBx1+1
+         gBh8h79HqmoFbsfaTY0n8RimJOYJln9Q/lp2GPqRF/l6bqV+GN9y/ISpk+oDRk7GXHsC
+         vyVDzJHgyH5lLyc+YeCD2xkrruf8qkeb9j/DzAwnImFWH8zcAPhd1iAmuzeKnWfHd30P
+         SwFYAfT8XxMLLtLYwTY8GzOaHUlWmfiVd+a8K+uHrTNMNeDJOEeQcq7QmdIw1mZfS9kQ
+         omNClApf2m5geEEL8nfW+lKBfS6DXbxv5vg75dH04jtpfc7PHZMl0R0mWZuB36luNx/0
+         gCeA==
+X-Gm-Message-State: AO0yUKXBCY+lkb/vqq6P6qkpH8XBNGDV4WRMiogRb2cI7V/5OTTkcGUy
+        O90er7YBRcm0TZWeB3aPA5n9Jq6onvkHdeU93LNhXA==
+X-Google-Smtp-Source: AK7set8Lx4TfwZQ6IKZwYWKjwzYVpo6A0JhqFkkDI5N5RJ1+bZI3EcqyHjlZl2U35xQ+xrfb+VoMHjsIBvvUpfxwCaI=
+X-Received: by 2002:a0d:c745:0:b0:506:39b1:a6e5 with SMTP id
+ j66-20020a0dc745000000b0050639b1a6e5mr374207ywd.398.1675792313944; Tue, 07
+ Feb 2023 09:51:53 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [RFC PATCH 29/32] KVM: arm64: Pass hypercalls to userspace
-Content-Language: en-GB
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
-        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-ia64@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, x86@kernel.org,
-        Marc Zyngier <maz@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Lorenzo Pieralisi <lpieralisi@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Borislav Petkov <bp@alien8.de>, H Peter Anvin <hpa@zytor.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Len Brown <lenb@kernel.org>,
-        Rafael Wysocki <rafael@kernel.org>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Salil Mehta <salil.mehta@huawei.com>,
-        Russell King <linux@armlinux.org.uk>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>
-References: <20230203135043.409192-1-james.morse@arm.com>
- <20230203135043.409192-30-james.morse@arm.com> <Y913sIqWxmf4O5oG@google.com>
-From:   James Morse <james.morse@arm.com>
-In-Reply-To: <Y913sIqWxmf4O5oG@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+References: <20230203192822.106773-1-vipinsh@google.com> <20230203192822.106773-5-vipinsh@google.com>
+ <Y+GUUr/UE0V0WsrR@google.com>
+In-Reply-To: <Y+GUUr/UE0V0WsrR@google.com>
+From:   Vipin Sharma <vipinsh@google.com>
+Date:   Tue, 7 Feb 2023 09:51:18 -0800
+Message-ID: <CAHVum0cyGD+4cC4gO+8YDOrpbkgFA5=VPyNyo5DCvC5jTVV80w@mail.gmail.com>
+Subject: Re: [Patch v2 4/5] KVM: x86/mmu: Remove handle_changed_spte_dirty_log()
+To:     David Matlack <dmatlack@google.com>
+Cc:     seanjc@google.com, pbonzini@redhat.com, bgardon@google.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -65,50 +68,13 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Oliver,
+On Mon, Feb 6, 2023 at 3:59 PM David Matlack <dmatlack@google.com> wrote:
+>
+> On Fri, Feb 03, 2023 at 11:28:21AM -0800, Vipin Sharma wrote:
+> > Remove handle_changed_spte_dirty_log() as there is no code flow which
+> > sets leaf SPTE writable and hit this path.
+>
+> Heh, way too vague again. e.g. This needs to explain how make_spte()
+> marks pages are dirty when constructing new SPTEs for the TDP MMU.
 
-On 03/02/2023 21:08, Oliver Upton wrote:
-> On Fri, Feb 03, 2023 at 01:50:40PM +0000, James Morse wrote:
->> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
->>
->> When capability KVM_CAP_ARM_HVC_TO_USER is available, userspace can
->> request to handle all hypercalls that aren't handled by KVM.
-
-> I would very much prefer we not go down this route. This capability
-> effectively constructs an ABI out of what KVM presently does not
-> implement. What would happen if KVM decides to implement a new set
-> of hypercalls later down the road that were previously forwarded to
-> userspace?
-
-The user-space support would never get called. If we have a wild-west allocation of IDs in
-this area we have bigger problems. I'd hope in this example it would be a VMM or an
-in-kernel implementation of the same feature.
-
-When I floated something like this before for supporting SDEI in guests, Christoffer
-didn't like tie-ing KVM to SMC-CC - hence the all or nothing.
-
-Since then we've had things like Spectre, which I don't think the VMM should
-ever be allowed to handle, which makes the whole thing much murkier.
-
-
-> Instead of a catch-all I think we should take the approach of having
-> userspace explicitly request which hypercalls should be forwarded to
-> userspace. I proposed something similar [1], but never got around to
-> respinning it (oops).
-
-> Let me dust those patches off and align with Marc's suggestions.
-> 
-> [1]: https://lore.kernel.org/kvmarm/20221110015327.3389351-1-oliver.upton@linux.dev/
-
-I've no problem with doing it like this. This approach was based on Christoffer's previous
-feedback, but the world has changed since then.
-
-Let me know if you want me to re-spin that series - I need to get this into some
-shape next week for Salil to look at the Qemu changes, as I can't test the whole thing
-until that is done.
-
-
-
-Thanks,
-
-James
+Okay, I will try to be more detailed in the next version.
