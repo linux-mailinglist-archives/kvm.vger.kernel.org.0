@@ -2,192 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A0C4068E037
-	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 19:39:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A740768E0F4
+	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 20:16:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229551AbjBGSj6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 13:39:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35826 "EHLO
+        id S231179AbjBGTQz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 14:16:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230280AbjBGSjw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 13:39:52 -0500
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2048.outbound.protection.outlook.com [40.107.237.48])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A11C315560;
-        Tue,  7 Feb 2023 10:39:50 -0800 (PST)
+        with ESMTP id S229692AbjBGTQx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 14:16:53 -0500
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B466B747;
+        Tue,  7 Feb 2023 11:16:48 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eKQfHoXkx7HwfCYvvOXFW/jSMl7pSuixLCayMOjVrdWI1G3YTzkD/QYPbXXnypc+tVbqoYW+wNv/tgfUmSd/gXKV1ri+m9HxqV/QvOl2iNqPNsUBG9lyVWwBmD9dJLE0kP4u9R3e5dTXIBGeDaQM9WKMhSrllI4DN30Pu7hwZzTYMqyziEALTYJvs1tbGymR9IAhZzVNqJZ17CuPs8mw2lWsTnwS03LPUy3Ks9njrYrajVv0MAVmkYnwx7AD1MwnR8m7QTLPR+b+7Tx6a12mJc8NX2c0xUl0MyqHURv1GtNbu+rj9MeWzoSZ8n4fTzQBjuQR08g8qj5CRZ3OYMlVnw==
+ b=kG6TJYbUXxSHtncQG22Yem1s2GVE32XvKsampsc0a3Q7q82l8543Z+qHiJHXY8Y4sswfhtrQdMs7v5c5TKM1DAKdzPbE3YKp2ee6zaRWvRbRQPVJXxpbZk9/f/pVEzhPfjndrdp0Q5FXlv912lg28cxiCDioV4KgvHnW6y+RxRbPi3ieG+Cs6pPhRXx8StnHfottQpVG5+uM+MybaRdSg644f5PIucI3+hOUXdVw4GJlJSoc+JsB583PVjQpgNmcg3NOX8Bsvd2TpcWSMZIrYzPDS9YV30vRPyCm6RvIMBLumxvj+HJES+bHhqXl5WJvUq3t0pGc5Z0Jg2Nha9ZSIA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TONsVX6q1qeKmBlewlmdGt2M4V/a/5kFPYBSBZFtLdk=;
- b=coFEMmSGUjgcfHnDfZASXWsDAmzMKyNbGCR20SQXGvO8Z1Yi8sD+1JE+MnPvT5a4uda4axqd6of+0ntsr5PSzM66F2V3/LMctlKDjkdz5zUbsmJ8Pa3IdXdyFw2ONVDpYcQ+QHu18mGmVZdKXEPM1lLtV0vEHnHoI7WIq61/gI22RTuZKEzqcqPDnNuWlzB82bJpuzFP8EUruMti7/rZnavlcQJYn42w9WhsPXD0jJC+3JCkaG9/hqPX3b8K4b/6JA1YyNVd03L4xw7op272VKCk3mPLy6dYo/cvbAd0+t0gXf6FZG+bYwNGqMe5u77q9JgWXE+5SQDalRdEug1FSQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ bh=IsjiSpwU/J0ipeoLCVDoUA18Rmjbe97VN62p99UES5A=;
+ b=CjL0EHzNvIX8XUaSd4wREhwi6Qe+fP10bf6JknBFXnoZtT0aZdY7X26bo/4kJdZwfyLICQEJ40BFTrq3GXvLWwhjGy850214fxqUmKWWRONxL9lTHi9Xhd9P2cPmaz8kM0j1QUIKRytH0lE5LfHTf6mcMoIDYWpE19Y4KKH/zA8iZ6mCCWzYNl7/wTWeHNirCDQ2QLIgaBbwEW5lqIgG1ualH6oYGElGgwO1u1PdZMp+DoZqHJ8UJhplBbeqhpKvrW34FBmjVk++tlo0lS/fm8Pt6WxUJH5I9MhExRdfJQW/Jbt+RN6tqKGjENKYb3oXDmi+1q2K1kCgmaa8+ZJs6g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TONsVX6q1qeKmBlewlmdGt2M4V/a/5kFPYBSBZFtLdk=;
- b=o8k19OX5j2JUvF2/xdeun2x4brLIHYgNG8Og4+n9IyeJwBFoc8PDLhwB4UyJYa7KYja8IMOPlLuXcTGdgUHGt7MQJeGDK4t8LhB2bnuu64tjEW8sdWGmzuoqLuEIEiADmmcOPN/blebjqqK4+rR4hOoGp76YYwT9X8hxgLUWNTk=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by CY8PR12MB8215.namprd12.prod.outlook.com (2603:10b6:930:77::10) with
+ bh=IsjiSpwU/J0ipeoLCVDoUA18Rmjbe97VN62p99UES5A=;
+ b=QDeChHu+s+uIWDEFaUYqi/AFWXW68plGV+vHliSJpMSxsRLumdPeoOEyDReq9/S6o8V0K+zWb3xggzeXVj1wF4p7uvujwjoXFd6oOk7dTrqLOwGBicjXG5MpewrqeYNyxU0EaBwIktt1dxsLkdm1T6bS8H7KQktVZzHTWi2Bou0eg4AbCteIFdMws7w+xTLGcL6O91mpg3VaubkyHuHODUmSEvLa4a44S4jtFAYSabcLYDWIIOP2yGko8OEDIMFu4yt6FDZbfpUBKhL5mAgKUxPiJa94IK/CfLwwFOlMXSmZvGrzdEHAooqmwlQJVhK/KwmlIuwl34O9UixHNjXJdA==
+Received: from MN2PR08CA0020.namprd08.prod.outlook.com (2603:10b6:208:239::25)
+ by MW4PR12MB7141.namprd12.prod.outlook.com (2603:10b6:303:213::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6064.32; Tue, 7 Feb
- 2023 18:39:48 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::6cc0:9c7a:bd00:441c]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::6cc0:9c7a:bd00:441c%5]) with mapi id 15.20.6064.036; Tue, 7 Feb 2023
- 18:39:48 +0000
-Message-ID: <cd13ba15-b1a9-0475-96a8-5500015d8510@amd.com>
-Date:   Tue, 7 Feb 2023 12:39:44 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH V2] KVM: sev: Fix potential overflow
- send|recieve_update_data
-To:     Peter Gonda <pgonda@google.com>, kvm@vger.kernel.org
-Cc:     Andy Nguyen <theflow@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        stable@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20230207171354.4012821-1-pgonda@google.com>
-Content-Language: en-US
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-In-Reply-To: <20230207171354.4012821-1-pgonda@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MN2PR06CA0007.namprd06.prod.outlook.com
- (2603:10b6:208:23d::12) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6064.36; Tue, 7 Feb
+ 2023 19:16:46 +0000
+Received: from BL02EPF0000EE3C.namprd05.prod.outlook.com
+ (2603:10b6:208:239:cafe::1c) by MN2PR08CA0020.outlook.office365.com
+ (2603:10b6:208:239::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6064.36 via Frontend
+ Transport; Tue, 7 Feb 2023 19:16:45 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BL02EPF0000EE3C.mail.protection.outlook.com (10.167.241.132) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6086.16 via Frontend Transport; Tue, 7 Feb 2023 19:16:45 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Tue, 7 Feb 2023
+ 11:16:20 -0800
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Tue, 7 Feb 2023
+ 11:16:19 -0800
+Received: from Asurada-Nvidia (10.127.8.9) by mail.nvidia.com (10.129.68.9)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36 via Frontend
+ Transport; Tue, 7 Feb 2023 11:16:18 -0800
+Date:   Tue, 7 Feb 2023 11:16:17 -0800
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "will@kernel.org" <will@kernel.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "shuah@kernel.org" <shuah@kernel.org>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>
+Subject: Re: [PATCH v1 2/8] iommu: Introduce a new
+ iommu_group_replace_domain() API
+Message-ID: <Y+KjgdNd4gi+6R05@Asurada-Nvidia>
+References: <cover.1675320212.git.nicolinc@nvidia.com>
+ <a98e622f41d76b64f5a7d0c758d8bda5e8043013.1675320212.git.nicolinc@nvidia.com>
+ <BN9PR11MB5276BB497D32073A1F4CBE238CD79@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <Y90iOAmnBtqQtmiA@ziepe.ca>
+ <BN9PR11MB527689447DD190FECE4FDA158CDA9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <Y+D/vWwRLD27slQz@nvidia.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <Y+D/vWwRLD27slQz@nvidia.com>
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|CY8PR12MB8215:EE_
-X-MS-Office365-Filtering-Correlation-Id: 78df30c6-561b-4eb3-5e06-08db093ab01f
+X-MS-TrafficTypeDiagnostic: BL02EPF0000EE3C:EE_|MW4PR12MB7141:EE_
+X-MS-Office365-Filtering-Correlation-Id: 77ee4a4c-6bb4-4cc9-e6ad-08db093fda64
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 5PovsyilkLJo47v5B8rIybUEhf4LlostBZ8tJ5YKxWRk7FETof0tD5fDoIBC2eCjzbrWNzsvjA+GRutajPXy5/pb5+jqIvVQDIz8/9ltc/legUaAiw7GgRf6ox3fk0pcE428OrDmYnQKpnFoTMrFQXDz3pqdbsGmu+HPRA/c/B0Lwyh3vCNar5u2dlpRWCaBL9oWSoLt00I967L2ho6nKDGi3lCVmg8wxxPcKmL6YO8I8eGEzUGYz3nhX+qgsSe3AjRFR6M6peZVPWMpuQSlPztKwNBR9fKiR/uQcRBCyN+VEkVD5raZkyuVH7zcww6dG/rDSeiK/PwU+tjnytLqL/aKN+3IZvhIPTbv+y3grh61jGsmxpGLE98Q4OOmPhIhyOIw6LwHvPH/4/z8PvKD9BjXzY/YSxe4rFBF/RxPM/qkMvqY/5Sdb9ATDWxF7cAXpAjcIOVqJQdoLfmmOWoPBUauyiV3zVT5mj3OyQLCXG5RpQ9VVBVRMI3oY+8ZislBsifEcSREKZVddw0YU1cADdkL3d8SF9FMXsF7U1XzST0DnpEH0W7ffiq0XDlMnP1mBXNeHb5rzAwIZO2oZKznA5PdSLdU7HEc0UAbHNe/HREHCcS3OZzWnemQ7Kn7n50jCPRz0Peq78kF97kTGIWxSg8Ue9mB0sHLsBxxsZJu2mtqy1yIxZ8TTTMEuz2xvRoTVzOkWIrKtrizA+FP6fyXrFCbeD12Twl0EuIRc0+z6oI=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(376002)(346002)(136003)(366004)(396003)(39860400002)(451199018)(31686004)(66476007)(54906003)(66556008)(316002)(66946007)(4326008)(36756003)(86362001)(31696002)(38100700002)(26005)(2616005)(186003)(6512007)(8676002)(478600001)(2906002)(83380400001)(8936002)(41300700001)(5660300002)(6486002)(6666004)(53546011)(6506007)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZktUSnJOcGh5ZzZBdFlhbm5vbXhMYWJIdDZ5UUJiWUo1dFY2ZHlDQXA0czRV?=
- =?utf-8?B?bm9rRko0M09XamRXemtHSWdsUU5kazRzNEJhS2hrSEhtckJ1dHBPcWVoNkdB?=
- =?utf-8?B?R0NkeCt3T2k4Y2lnSE5kc3ZZT1M4MGJ2TS9xVXdiNTNGTlZ0blhMcmI3YUta?=
- =?utf-8?B?NHdjcExDbittSXR6NHI3UFlHY2FKclVZYld1WVRSeVVacnhvcGJqZzdVMWlv?=
- =?utf-8?B?Z0F1NTZ5RXBvd2UwWkQ0UVk3NGo3Q2Q3aDcrRjNCZmtHS1B6TjFIQzh4ZUlT?=
- =?utf-8?B?cXYzcEJFTEVGQkU5dW91NGFFUHhiYjMzYTFuZG90bkxFcHFZR25ueTVyU1hK?=
- =?utf-8?B?bThMa09qRDFoNTR1dFZxRTdwSndoYXVHb2J2V2F1YnNVTmZrK0pKL05WOVJW?=
- =?utf-8?B?REoya1kwWGhCS0FmVlZyejBLMEdRYlQzR2h1eE1zeDdUZ01FV3F2V3llcFBr?=
- =?utf-8?B?c25ScE1GdWVtc05Eb1plUmtKcGphTTVCbHlRcTljNHdnLzR2TG92NGlzUVNl?=
- =?utf-8?B?SXJUWW85dFkwZUhiVWxrdHdUc2ZZdzEzeE5pUlRjdmR4UUNQeFRGK21IejF4?=
- =?utf-8?B?ZEtZUk1lend0dHZMbHphdVlYdDdlOFpZMDVoQzE4c2F1S203WlljYnlKMm1u?=
- =?utf-8?B?ZzhNSUdvZHVEZjNDYjRIWkhyeFJFcytabE0xSEFHdTBjdVdVbHNBOGtLQUVY?=
- =?utf-8?B?UHBORk93dnJqQ0RMRHBNbmhMOFlaWjBycXZGWlJpWms3TTcvTThORUxrYXNs?=
- =?utf-8?B?aTZHQmd3NUhub1dFVnRFNlcyVVNZaGpTTjF6QzExRml1TDFzVEpKYWd2d1cv?=
- =?utf-8?B?QWJRU1RzVnF5aE5Xb3FnWVo5MjV5S2MxVEtMNDFBNXkxbWJFeWxVOE0wZnE5?=
- =?utf-8?B?QXFObU1BUjRmMjRpYXRiN3VNT1FlZmF4YUpoc3haTzViN3Q4OWpTa1BFN2po?=
- =?utf-8?B?V2tzcGU4UUJLS2RENUlzNEovU1RRUS8wclVWSjNiaEJMYk9NM2xXNFZOYURE?=
- =?utf-8?B?YzdlUnJScmlqbmN4cE5yMFpnaEg3aTZXMm1XMlBUTDBXczJZT3MwK29hUmti?=
- =?utf-8?B?YlBKbHF4d3pOMUpxelJSR25XOE1qeExxQVdnZ1ljcU01UXFJZ1AzUGRNejI4?=
- =?utf-8?B?SjJHOWVUdUIxMWJqYUNLdkI4UFdIc2R5UmNacFdZVHQ5N3dVdnEwMEppS3Nh?=
- =?utf-8?B?aThSS2ovTWZVQi9aMkdIYm4rdHBpS3FEZkk2YW96UW93SG5teHZsQlVjUmpY?=
- =?utf-8?B?c2F0Z1N1QndONlNnbGhqT1d3aXpRTE9QaXZTc2JMM3RDOWZ2QW5UazgzSGdE?=
- =?utf-8?B?N3N0QWJRYVNFd3luSHFrdWFMWTYvUWFURjFJVmEveTlXOUNlNTNtalREREY1?=
- =?utf-8?B?S3l2Y2QvVzFzcGV0T2htQzRRSDZJUkIxKzdtZElvWXhMWlRKaGJoMTBmY0M4?=
- =?utf-8?B?UWlWaCtlUTdRS0VWbUVIdGRVZFRQbExRLzJWcFdqSEJ3SllmMFRxRkQvV3Ri?=
- =?utf-8?B?VzVZMzkvVDVLY2lONGU5VGJ1d05EWU1jVUlHY1ljMHJoVmlvRXFhS0Jad2Er?=
- =?utf-8?B?d1o0NkV1NWZXWm0zQmZCdklIQUdpTnZ5ZEdBbzJtRnJ1RFBONDdqdkluOFZQ?=
- =?utf-8?B?UDNNRExRVEUycjFNMXRsTWg0NlIyU01xNUY1MXZqczhDV2ZvenQzSFlBaXFF?=
- =?utf-8?B?b0RFOVBQMXdGbFk2N3hUaUNpS3lpd2xnOEZkMHFJNnZkbzJmdTEyZG50WWNY?=
- =?utf-8?B?ZnJmdXgrZmE4b3VzaE44Lzk4OGlvZS9qR0dwWXJMTE9HK29odlBKTGdEUGJn?=
- =?utf-8?B?STVTbEdhQWtsL3ZqeU9rUXNleVlKN011b2c1cFliSkdVNE9icWQyZXZjdFlK?=
- =?utf-8?B?WUNrcExFTC90Ykx0ZDlVOWZoRnJvdzkybjFpZi9qMUVOck1jZVFlWWdJNDBp?=
- =?utf-8?B?cGxqU3pGbkhSdUVGUmxBckRyaW1MZ3hwclNpOG02UDFiZ1ZId1BIbzFLaGdV?=
- =?utf-8?B?aW5tOW9CWXprQnZ3OTRNL3plQzE5U3ZVTlVtYWhhSytoMGppSFE4RzhJakhQ?=
- =?utf-8?B?QzAyL29BTHZJNFczdS9HVnhYM3JTelBhV1VDb0g0b2NkN1hETHNGdU85dHlQ?=
- =?utf-8?Q?vl4faB8/AneevxH/ZQX41O5tT?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 78df30c6-561b-4eb3-5e06-08db093ab01f
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Feb 2023 18:39:48.2239
+X-Microsoft-Antispam-Message-Info: dLEWLp4uAko/nzvW7LOZIXXF4WMGrrSq/0F7h+2ol+QYOhvfppi7zR161fz7eJy7ImslXe5y+3lY1ssU4xIfmWPvpI1SdcrF7NCHfsgUBCBQS2CSEpokI0RWQDTrbVveFFwu2GSlUwqAR4GJh0u6FUDi8gRmWx88VtZ9JcZljJ7ovyzs0Y7Xqx4EjSxoQWI1mQhXYDt05zCXM0fqHnHZETIxLDRsOgrawqXaT7BmJ4TngyZthjJNaPl9+bxe4Af94YeUHsV97QfJ8Ec2zADHeyqWtyvGpNVXtprRvMPe9S+V9pjJqPhmsBPHtwRvuTDUR7siJeWou4GzMVhl44YHeCgX37MfCaH/pn1VHdbKh1Bn+DugNXKcljG9nk+NwZd8jTHsywbfgMA4fDZXEY09dhb08dpjOx5YGrN5jLOl5HKAtxFwMxp30aSWEpsExo/1mG8GCJ79F5fuIPeiCV1GDD1ewix6RojurJW/PeSFpmnQqjhS59b0h4sFFejkHnDsptYnpSqpKZNq0t4iiYEYCoTjIbwa/lwNJyQLHIQeIIr36MO5VtZUNXym3A2VU3rYvvZpJHAMg8TNjNlHgOYDmtInynjtq/9GTvE/pLem9jA89JUCovcs14DoPn9nxp4OfL2KW/Merhcx6kC3WMfbD8E/ZnrBDXwxifCnzqKz1SeGOeMZTaSbrzdnOWrrOqc8L0L0C5Hh+a9Zw2KYAzcPBw==
+X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230025)(4636009)(346002)(376002)(396003)(136003)(39860400002)(451199018)(46966006)(40470700004)(36840700001)(55016003)(54906003)(6636002)(33716001)(186003)(82310400005)(86362001)(66899018)(47076005)(40480700001)(336012)(426003)(40460700003)(7416002)(5660300002)(36860700001)(70586007)(70206006)(8936002)(6862004)(4326008)(41300700001)(8676002)(9686003)(26005)(478600001)(316002)(82740400003)(2906002)(356005)(7636003)(83380400001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Feb 2023 19:16:45.2505
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: i8YuhyZq8BPR6UTVwWSTlX1S94Bf4R39VGKzIJWeG0zsqG+wf3uyURC2cFqDWeQw7ZE43qSsR3enxUVlpDyOkA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8215
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+X-MS-Exchange-CrossTenant-Network-Message-Id: 77ee4a4c-6bb4-4cc9-e6ad-08db093fda64
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BL02EPF0000EE3C.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7141
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Feb 06, 2023 at 09:25:17AM -0400, Jason Gunthorpe wrote:
 
+> > > > Can you elaborate the error handling here? Ideally if
+> > > > __iommu_group_set_domain() fails then group->domain shouldn't
+> > > > be changed.
+> > > 
+> > > That isn't what it implements though. The internal helper leaves
+> > > things in a mess, it is for the caller to fix it, and it depends on
+> > > the caller what that means.
+> > 
+> > I didn't see any warning of the mess and the caller's responsibility
+> > in __iommu_group_set_domain(). Can it be documented clearly
+> > so if someone wants to add a new caller on it he can clearly know
+> > what to do?
+> 
+> That would be nice..
 
-On 2/7/23 11:13, Peter Gonda wrote:
-> KVM_SEV_SEND_UPDATE_DATA and KVM_SEV_RECEIVE_UPDATE_DATA have an integer
-> overflow issue. Params.guest_len and offset are both 32bite wide, with a
-> large params.guest_len the check to confirm a page boundary is not
-> crossed can falsely pass:
-> 
->      /* Check if we are crossing the page boundary *
->      offset = params.guest_uaddr & (PAGE_SIZE - 1);
->      if ((params.guest_len + offset > PAGE_SIZE))
-> 
-> Add an additional check to this conditional to confirm that
-> params.guest_len itself is not greater than PAGE_SIZE.
-> 
-> The current code is can only overflow with a params.guest_len of greater
-> than 0xfffff000. And the FW spec says these commands fail with lengths
-> greater than 16KB. So this issue should not be a security concern
-> 
-> Fixes: 15fb7de1a7f5 ("KVM: SVM: Add KVM_SEV_RECEIVE_UPDATE_DATA command")
-> Fixes: d3d1af85e2c7 ("KVM: SVM: Add KVM_SEND_UPDATE_DATA command")
-> Reported-by: Andy Nguyen <theflow@google.com>
-> Suggested-by: Thomas Lendacky <thomas.lendacky@amd.com>
-> Signed-off-by: Peter Gonda <pgonda@google.com>
-> Cc: David Rientjes <rientjes@google.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: kvm@vger.kernel.org
-> Cc: stable@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
+I'd expect the doc to come with some other patch/series than this
+replace series, so I think we should be fine without adding a line
+of comments in this patch?
 
-Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+> > btw looking at the code __iommu_group_set_domain():
+> > 
+> > 	 * Note that this is called in error unwind paths, attaching to a
+> > 	 * domain that has already been attached cannot fail.
+> > 	 */
+> > 	ret = __iommu_group_for_each_dev(group, new_domain,
+> > 				iommu_group_do_attach_device);
+> > 
+> > with that we don't need fall back to core domain in above error
+> > unwinding per this comment.
+> 
+> That does make some sense.
+> 
+> I tried to make a patch to consolidate all this error handling once,
+> that would be the better way to approach this.
 
-> ---
-> 
-> V2
->   * Updated conditional based on feedback from Tom.
-> 
-> ---
->   arch/x86/kvm/svm/sev.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 273cba809328..3d74facaead8 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -1294,7 +1294,7 @@ static int sev_send_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
->   
->   	/* Check if we are crossing the page boundary */
->   	offset = params.guest_uaddr & (PAGE_SIZE - 1);
-> -	if ((params.guest_len + offset > PAGE_SIZE))
-> +	if (params.guest_len > PAGE_SIZE || (params.guest_len + offset) > PAGE_SIZE)
->   		return -EINVAL;
->   
->   	/* Pin guest memory */
-> @@ -1474,7 +1474,7 @@ static int sev_receive_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
->   
->   	/* Check if we are crossing the page boundary */
->   	offset = params.guest_uaddr & (PAGE_SIZE - 1);
-> -	if ((params.guest_len + offset > PAGE_SIZE))
-> +	if (params.guest_len > PAGE_SIZE || (params.guest_len + offset) > PAGE_SIZE)
->   		return -EINVAL;
->   
->   	hdr = psp_copy_user_blob(params.hdr_uaddr, params.hdr_len);
+Then, I'll drop the core-domain line. Combining my reply above:
+
++	mutex_lock(&group->mutex);
++	ret = __iommu_group_set_domain(group, new_domain);
++	if (ret)
++		__iommu_group_set_domain(group, group->domain);
++	mutex_unlock(&group->mutex);
+
+Will wrap things up and send v2 today.
+
+Thanks
+Nic
