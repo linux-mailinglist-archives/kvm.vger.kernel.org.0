@@ -2,73 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0297B68DEC1
-	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 18:17:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 541F868DED8
+	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 18:25:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231509AbjBGRRX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 12:17:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50656 "EHLO
+        id S230204AbjBGRZr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 12:25:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231470AbjBGRRC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 12:17:02 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 694EB3EFF8
-        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 09:16:22 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id d2so12030864pjd.5
-        for <kvm@vger.kernel.org>; Tue, 07 Feb 2023 09:16:22 -0800 (PST)
+        with ESMTP id S231134AbjBGRZp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 12:25:45 -0500
+Received: from mail-vs1-xe29.google.com (mail-vs1-xe29.google.com [IPv6:2607:f8b0:4864:20::e29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF3FE113D4
+        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 09:25:37 -0800 (PST)
+Received: by mail-vs1-xe29.google.com with SMTP id v26so9266575vsk.8
+        for <kvm@vger.kernel.org>; Tue, 07 Feb 2023 09:25:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sc8Dzie9A8y8S45kzCPXX5BYzIIhqs78gp47BlQd0i8=;
-        b=Ll2X9VD0OteaIRqAqdVdEYSZyu0gSNQwuSfB9Rrn2fwPWRX1u7pghVhAcREsP2+lGk
-         HVglbUWsQBazz2zBgjvN/8RW4U+/JA80B6vZHzLSpfnPVAPfDwMIlElMZfzna+NTuxPQ
-         FINzOStCndAXqlMJVvndo5XC7u2wsw6HjP3KT1hq9p3C8ghI5p6kxjFDQfEucFV07QF8
-         rEu8eW/zunu6ER3FaTFankMS23LaH3w4X+stdpQPcK/x9izguRwY/NkOOOmf+8cx98r/
-         Uiu+zSf819YyMm4At/RW4mX2rOFl0nazUkwdz9LpmRqqNirNhtXfWtA6HBdqWlUG28Of
-         3sPg==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=D/BcHWrx4Kj+87bqftvm+l0WaUTrm7SbGz6u55o5gw8=;
+        b=AxYpztFQNf6RBscWYrn/sCD0VhszWHIlsJsbTqrvMarIYaLDYoH60g20D7cMtj0Gmm
+         vh6yK+EL8yG1Ter9R6PbEvcPJi0KdnS9ZTS9Z+kvx2xkuQBJii6P2T3tbXEk6dLDITvu
+         m8rWpKy4SSReADrHx/lLtnqS6YedF64/eXunjuNYCqm6GIW/O4Obfn58AqbIfo8oiyBM
+         i9Ihocd2hwCcHDOht+BUou08jozfCKH4fyiYd/wo2bAUjvP4MIDiG0Ee9t8Df9eMcEXb
+         EdfgaCLsNKVDmce4rsUPY7+YPFmMr2WK6iBOv/D2zC7+m1sx9tWRag7TYe+B9X0+BJwZ
+         zq7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sc8Dzie9A8y8S45kzCPXX5BYzIIhqs78gp47BlQd0i8=;
-        b=syOuY+OPnEtKe2P/nPoGoZflh5L7gZJWHGOg5QB/7EtJ+p9iEEr6gDNt2CHpm4/0Ks
-         s1ANPUUNmKrWpot7XvWdz0X3iu7+qAbxQH7rU4UsZh+Y2Jp1UAGpf7YjJOyk7ioCpxQ2
-         COeIR+tvYJUQ6jbZzt0ned0RectBwdy/aRwnSFYKoQufs/fGP7huWBBXMjhAouYY/bIb
-         RCgCYhHSbtn3xjLLwELjjYHxTaUDxou9TeIKvqqsYyMmOrN65jRucG6Wj7oMpsc9Q61s
-         V+WGe4W4p3XDOFEZMER1b/363jzmJTxKXSgnO3BkeB1mKBdVsCrCoOSXh0GeGk/6wEl/
-         ID/w==
-X-Gm-Message-State: AO0yUKWE/+iB35Hu6qZlgpCyPW9cjBtrMzZLfWGu+T2DewYwrevsmjaQ
-        0FLPv5fZGRejY2Ahuxs009ASpg==
-X-Google-Smtp-Source: AK7set+VDV5Y413ktncXB7sF4EsTzFuW3K3pRZJn4EaA5h/D6ZlGr+w9UI/RIwZTZ5Z+S0MJKONyMQ==
-X-Received: by 2002:a17:902:9895:b0:198:af50:e4eb with SMTP id s21-20020a170902989500b00198af50e4ebmr223213plp.17.1675790171184;
-        Tue, 07 Feb 2023 09:16:11 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id 200-20020a6214d1000000b0058de0998f17sm9431054pfu.154.2023.02.07.09.16.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Feb 2023 09:16:10 -0800 (PST)
-Date:   Tue, 7 Feb 2023 17:16:05 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Jianfeng Gao <jianfeng.gao@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH v2] KVM: x86/pmu: Disable all vPMU features support on
- Intel hybrid CPUs
-Message-ID: <Y+KHVdYG3tyBGfuk@google.com>
-References: <20230131085031.88939-1-likexu@tencent.com>
- <Y9k7eyfmXjqW9lYF@google.com>
- <afe1fdd8-9f3e-c988-cd38-476a6da26d46@gmail.com>
- <Y9v7tEXPlki7YOT4@google.com>
- <7dc66398-aa0c-991f-3fa9-43aac8c710fd@gmail.com>
- <Y91DUmMjCLzIXlp+@google.com>
- <f0f6dbed-0e1d-059c-11a4-07fd4bec5c99@gmail.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=D/BcHWrx4Kj+87bqftvm+l0WaUTrm7SbGz6u55o5gw8=;
+        b=MINm5zu70Naus09t7xkXmHU3izuyQzG2D1FiyiJrp2goB7+SDgKltuXUIbD6yVW/9e
+         T8LGROdlXsObWpiCGFGaiadl0EI100i1EtkPJpUVLt5khGySfnv2y5eGjdIO7y+I+V2i
+         W+o1Kpq42OYrm2f78nb2oTG9KSA+3Zqhns/ey71V5rKIUDuxuGgSvtoU3mp6tAhUW3rx
+         5Wn0AjOeqYd4HiN762vhxaRZrFtKMxijwZNTjymbeZYj8Iq1tJ6TeKNxDFPLk4K5dIea
+         e+5EtA9IV0dG1li1OuE60I1Wagoa7sD/8KZ36x6s7rtXePLmmlA2oLzPuLiat2+IXxbn
+         iJuA==
+X-Gm-Message-State: AO0yUKU24CgDk0dwd9ytFl0DVNiFwFmSvdtOOQNF9ZBgneztiLtO3zf/
+        h0XDjZ2GQZaYytmu+0mMlK0tG0lLpP1Iqq8bj51SCw==
+X-Google-Smtp-Source: AK7set9bNSt5xjr6xHdtjJgru9nyPfJ0WS5zOVzwgAyjK0IennvJ1JX+5l/AqqHqkA0zrKFDEQSzFcaKF7Ps8YDqhdE=
+X-Received: by 2002:a67:15c2:0:b0:3e9:e5ce:b491 with SMTP id
+ 185-20020a6715c2000000b003e9e5ceb491mr875595vsv.13.1675790736991; Tue, 07 Feb
+ 2023 09:25:36 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f0f6dbed-0e1d-059c-11a4-07fd4bec5c99@gmail.com>
+References: <202302072055.odjDVd5V-lkp@intel.com>
+In-Reply-To: <202302072055.odjDVd5V-lkp@intel.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Tue, 7 Feb 2023 09:25:10 -0800
+Message-ID: <CALzav=dGuJDdr6s8XoaW8r2U-Fyi1VWoVxe5dOKLam1mJ7k7hg@mail.gmail.com>
+Subject: Re: [linux-next:master 911/10933] arch/x86/kvm/mmu/mmu.c:102:22:
+ sparse: sparse: symbol 'tdp_mmu_allowed' was not declared. Should it be static?
+To:     kernel test robot <lkp@intel.com>
+Cc:     oe-kbuild-all@lists.linux.dev,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -80,95 +76,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 06, 2023, Like Xu wrote:
-> On 4/2/2023 1:28 am, Sean Christopherson wrote:
-> > On Fri, Feb 03, 2023, Like Xu wrote:
-> > > On 3/2/2023 2:06 am, Sean Christopherson wrote:
-> > > > On Thu, Feb 02, 2023, Like Xu wrote:
-> > > > > On 1/2/2023 12:02 am, Sean Christopherson wrote:
-> > > > > The perf interface only provides host PMU capabilities and the logic for
-> > > > > choosing to disable (or enable) vPMU based on perf input should be left
-> > > > > in the KVM part so that subsequent development work can add most code
-> > > > > to the just KVM, which is very helpful for downstream users to upgrade
-> > > > > loadable KVM module rather than the entire core kernel.
-> > > > > 
-> > > > > My experience interacting with the perf subsystem has taught me that
-> > > > > perf change required from KVM should be made as small as possible.
-> > > > 
-> > > > I don't disagree, but I don't think that's relevant in this case.  Perf doesn't
-> > > > provide the necessary bits for KVM to virtualize a hybrid PMU, so unless KVM is
-> > > > somehow able to get away with enumerating a very stripped down vPMU, additional
-> > > > modifications to perf_get_x86_pmu_capability() will be required.
-> > > > 
-> > > > What I care more about though is this ugliness in perf_get_x86_pmu_capability():
-> > > > 
-> > > > 	/*
-> > > > 	 * KVM doesn't support the hybrid PMU yet.
-> > > > 	 * Return the common value in global x86_pmu,
-> > > > 	 * which available for all cores.
-> > > 
-> > > I would have expected w/ current code base, vpmu (excluding pebs and lbr, intel_pt)
-> > > to continue to work on any type of pCPU until you decide to disable them completely.
-> > 
-> > Didn't follow this.
-> 
-> My expectation is that, if a guest doesn't enable "PEBS, LBR and intel_pt",
-> and only has the most basic pmu conters (its number is the lesser number
-> of big and small cores supported), with some pmu_event_fileter allow list
-> mechanism, vPMU works regardless of the vcpu model and does not
-> require cpu pined. Any complaints from users on this usages ?
+On Tue, Feb 7, 2023 at 4:51 AM kernel test robot <lkp@intel.com> wrote:
+>
+> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
+> head:   49a8133221c71b935f36a7c340c0271c2a9ee2db
+> commit: 3af15ff47c4df3af7b36ea8315f43c6b0af49253 [911/10933] KVM: x86/mmu: Change tdp_mmu to a read-only parameter
+> config: x86_64-randconfig-s023-20230206 (https://download.01.org/0day-ci/archive/20230207/202302072055.odjDVd5V-lkp@intel.com/config)
+> compiler: gcc-11 (Debian 11.3.0-8) 11.3.0
+> reproduce:
+>         # apt-get install sparse
+>         # sparse version: v0.6.4-39-gce1a6720-dirty
+>         # https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/?id=3af15ff47c4df3af7b36ea8315f43c6b0af49253
+>         git remote add linux-next https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git
+>         git fetch --no-tags linux-next master
+>         git checkout 3af15ff47c4df3af7b36ea8315f43c6b0af49253
+>         # save the config file
+>         mkdir build_dir && cp config build_dir/.config
+>         make W=1 C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=x86_64 olddefconfig
+>         make W=1 C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=x86_64 SHELL=/bin/bash arch/x86/kvm/
+>
+> If you fix the issue, kindly add following tag where applicable
+> | Reported-by: kernel test robot <lkp@intel.com>
+>
+> sparse warnings: (new ones prefixed by >>)
+> >> arch/x86/kvm/mmu/mmu.c:102:22: sparse: sparse: symbol 'tdp_mmu_allowed' was not declared. Should it be static?
 
-No?  But I highly doubt the average user is even aware of KVM_SET_PMU_EVENT_FILTER,
-let alone knows how to use it.  E.g. AFAICT QEMU doesn't support the ioctl().
-And for people that do use event filters, I doubt they're running on hybrid CPUs.
-
-> > > > I really don't want to leave that comment lying around as it's flat out wrong in
-> > > > that it obviously doesn't address the other differences beyond the number of
-> > > > counters.  And since there are dependencies on perf, my preference is to disable
-> > > > PMU enumeration in perf specifically so that whoever takes on vPMU enabling is
-> > > > forced to consider the perf side of things, and get buy in from the perf folks.
-> > > 
-> > > The perf_get_x86_pmu_capability() obviously needs to be revamped,
-> > > but until real effective KVM enabling work arrives, any inconsequential intrusion
-> > > into perf/core code will only lead to trivial system maintenance.
-> > 
-> > Trivial doesn't mean useless or unnecessary though.  IMO, there's value in capturing,
-> > in code, that perf_get_x86_pmu_capability() doesn't properly support hybrid vPMUs.
-> > 
-> > That said, poking around perf, checking is_hybrid() is wrong.  This quirk suggests
-> > that if E-cores are disabled via BIOS, (a) X86_FEATURE_HYBRID_CPU is _supposed_ to
-> > be cleared, and (b) the base PMU will reflect the P-core PMU.  I.e. someone can
-> > enable vPMU by disabling E-cores.
-> > 
-> >                  /*
-> >                   * Quirk: For some Alder Lake machine, when all E-cores are disabled in
-> >                   * a BIOS, the leaf 0xA will enumerate all counters of P-cores. However,
-> >                   * the X86_FEATURE_HYBRID_CPU is still set. The above codes will
-> 
-> Sigh. Then what if E-cores are manually offline via "/.../cpu$/online" and
-> then init kvm module ?
-
-KVM has to be paranoid and assume those CPUs could be onlined in the future.
-
-> I suggest leaving these open issues to that enabling guy (or maybe it's still me).
-> 
-> >                   * mistakenly add extra counters for P-cores. Correct the number of
-> >                   * counters here.
-> >                   */
-> >                  if ((pmu->num_counters > 8) || (pmu->num_counters_fixed > 4)) {
-> >                          pmu->num_counters = x86_pmu.num_counters;
-> >                          pmu->num_counters_fixed = x86_pmu.num_counters_fixed;
-> >                  }
-> > 
-> > Side topic, someone (*cough* Intel) should fix that, e.g. detect the scenario
-> > during boot and manually clear X86_FEATURE_HYBRID_CPU.
-> 
-> Maybe they did it on purpose.
-
-That seems unlikely.  My interpretation of the comment, specifically the "Quirk" and
-"some ... machine" parts, is that the intended behavior is to clear the HYBRID bit,
-but _some_ platforms fail to do so.
-
-I don't think Intel's intent matters though.  If the kernel benefits from clearing
-HYBRID and there are no downsides, then it should be cleared regardless of what
-Intel intended ucode to do.
+Yes it should be static. I'll send a patch.
