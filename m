@@ -2,95 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9541068DA93
-	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 15:24:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D5DB68DA98
+	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 15:24:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232317AbjBGOYI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 09:24:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37164 "EHLO
+        id S232556AbjBGOYs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 09:24:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232481AbjBGOYH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 09:24:07 -0500
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5927A15C86
-        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 06:24:05 -0800 (PST)
-Received: by mail-wr1-x436.google.com with SMTP id d14so13708480wrr.9
-        for <kvm@vger.kernel.org>; Tue, 07 Feb 2023 06:24:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Hax/XOz6L1HwvWdYp3TmUzlLwg3i5L7wNEbwhLs97i0=;
-        b=xU9L/CufPrpEJQeoIEKk0f/LfRTnrb7OAI6AXlB3jyvC+uC1U3x31QS3OfRr5nkWkW
-         VyRXFPW0dfSN2KIW2Eng6wRZRJInd8eWf/rK4zzBYbCAonM0jUN9IdvySGw33IQbgGX9
-         0PCiGswnmieURiPujlf2PGkNKFKC2PqdbAnKl33rPLeOlK7d2zyKZrf2pk2sPMl6EHew
-         EcPqa41rs8uo2Ml8HHrA5kkvIpG+BUosxGZReonv2ZdWg5jpGYqkQ/ccdraJhFU62eFP
-         EULN9atVYJFenlNUxboxpvGsOzpZNPhk3dC0notwCPNKUREOhvsEBd8UuDrOvLUE25PF
-         aw2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Hax/XOz6L1HwvWdYp3TmUzlLwg3i5L7wNEbwhLs97i0=;
-        b=qQkeEyc9rSexmOat1529huAsEBXszq+URpjfyn9HUuGRomdJXWXwHDKwnQAyhITXxN
-         54/p5yE4hiQv6uYC4eaMkhNjTP6yuh/jWH4RtM1GS8h2jPCD/kO3MxGOSLSW6taEfjI0
-         zj48jL1xoyC+g0IkiVl4PLBJkwBO18IBV53uOTu3WJgzIPLH/XZhlWoyRwF8mbsVKYLP
-         uKhDUXwjuZAGzSOIBFtFRcmvXjrrNX0bQSrN5rX9jch5rHvdnNj4vska6vJnc65UmSxA
-         hwPSvQLF02HcFpvw00sVH98z0xCKkMJPWm7dhhI+xzXkeW2zNwnKZS6DqVx0uqL3CIjD
-         E82Q==
-X-Gm-Message-State: AO0yUKVLHr80+naVeQgm9K/MW/HtIWR3eUbjlwV3aYZHPPju6jZosLlt
-        ecdB72sJZ0GuKmrybhZY9tToqQ+UXmcE4JIX
-X-Google-Smtp-Source: AK7set80AjZcNd2rjhy7uAaSO0ToODxDqACZphTSdCMAQyP7LWCQTgU7JuXFttMtB11ILszB/K+yeA==
-X-Received: by 2002:adf:ea03:0:b0:2c3:ee27:457a with SMTP id q3-20020adfea03000000b002c3ee27457amr2929067wrm.33.1675779844002;
-        Tue, 07 Feb 2023 06:24:04 -0800 (PST)
-Received: from [192.168.30.216] ([81.0.6.76])
-        by smtp.gmail.com with ESMTPSA id j5-20020a5d5645000000b002c3efee2f4bsm3224188wrw.80.2023.02.07.06.24.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Feb 2023 06:24:02 -0800 (PST)
-Message-ID: <5e82a829-0348-e73f-4351-21caa396e402@linaro.org>
-Date:   Tue, 7 Feb 2023 15:24:01 +0100
+        with ESMTP id S232536AbjBGOYp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 09:24:45 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6E3824CB3;
+        Tue,  7 Feb 2023 06:24:39 -0800 (PST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1675779878;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=48zTNCiq8jyQl85rZUjjKFb4zKzbUXhtUJ1Hwi8S0CA=;
+        b=HtKMdz8LlTmkbYTe/u01gq+8liQo8V4y0xKSVfKLz8kWn9e+g+8KTUmW5FlgkQXkCAvrEy
+        tsty9t1gAis6jVlJlKzvbA/bldqioOfgr7EFTfHaoZHRInOBFwRWdXsvsBrar8L5KF2jcz
+        i1jEBvew8OBdyxa44yjZk2uzLCGKreegVF1WBwi94YPOEtLzsu5NGWulfrYCmhzhUCZGYv
+        StO6tmeCMnji+F8/FkVhZhl3QoMgg0lM53MkHjE4af6rDFNk9kQpnxJbLL4F77q1RjnMVf
+        2NMmZl/y482tYELfhSpVRQBAsCqiyHoxlEhyt92HCe3+WeZW6U4NyXe8NeOPyg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1675779878;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=48zTNCiq8jyQl85rZUjjKFb4zKzbUXhtUJ1Hwi8S0CA=;
+        b=d5xsa3caE7KBVhLFcJhb3fyVD5ad+qU4xOetisuvWAC04OuM0Fpg7Htn7w5YXoHaMhmnhI
+        rLi7LspkXjaPaIAA==
+To:     David Woodhouse <dwmw2@infradead.org>,
+        Usama Arif <usama.arif@bytedance.com>, arjan@linux.intel.com
+Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        hpa@zytor.com, x86@kernel.org, pbonzini@redhat.com,
+        paulmck@kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, rcu@vger.kernel.org, mimoja@mimoja.de,
+        hewenliang4@huawei.com, thomas.lendacky@amd.com, seanjc@google.com,
+        pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
+        punit.agrawal@bytedance.com, simon.evans@bytedance.com,
+        liangma@liangbit.com
+Subject: Re: [PATCH v6 01/11] x86/apic/x2apic: Fix parallel handling of
+ cluster_mask
+In-Reply-To: <921cfe295fcd398168e5454e01193045de312688.camel@infradead.org>
+References: <20230202215625.3248306-1-usama.arif@bytedance.com>
+ <20230202215625.3248306-2-usama.arif@bytedance.com> <87a61qxtx0.ffs@tglx>
+ <d37f3af69df09ff542024ed93a37865b28dfa86e.camel@infradead.org>
+ <921cfe295fcd398168e5454e01193045de312688.camel@infradead.org>
+Date:   Tue, 07 Feb 2023 15:24:38 +0100
+Message-ID: <87v8kdv9i1.ffs@tglx>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.6.1
-Subject: Re: [PATCH v2] gdbstub: move update guest debug to accel ops
-Content-Language: en-US
-To:     Mads Ynddal <mads@ynddal.dk>, qemu-devel@nongnu.org
-Cc:     Eduardo Habkost <eduardo@habkost.net>, kvm@vger.kernel.org,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Mads Ynddal <m.ynddal@samsung.com>
-References: <20230207131721.49233-1-mads@ynddal.dk>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
-In-Reply-To: <20230207131721.49233-1-mads@ynddal.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/2/23 14:17, Mads Ynddal wrote:
-> From: Mads Ynddal <m.ynddal@samsung.com>
-> 
-> Continuing the refactor of a48e7d9e52 (gdbstub: move guest debug support
-> check to ops) by removing hardcoded kvm_enabled() from generic cpu.c
-> code, and replace it with a property of AccelOpsClass.
-> 
-> Signed-off-by: Mads Ynddal <m.ynddal@samsung.com>
-> ---
->   accel/kvm/kvm-accel-ops.c  |  5 +++++
->   cpu.c                      | 11 ++++++++---
->   include/sysemu/accel-ops.h |  1 +
->   3 files changed, 14 insertions(+), 3 deletions(-)
+On Tue, Feb 07 2023 at 11:27, David Woodhouse wrote:
+> On Tue, 2023-02-07 at 10:57 +0000, David Woodhouse wrote:
+>> =C2=A0=E2=80=A2 This CPU was present but no other CPU in this cluster wa=
+s actually
+>> =C2=A0=C2=A0 brought up at boot time so the cluster_mask wasn't allocate=
+d.
+>>=20
+>> The code looks right, I don't grok the comment about partial clusters
+>> and virtualization, and would have worded it something along the above
+>> lines?
+>
+> As I get my head around that, I think the code needs to change too.
+> What if we *unplug* the only CPU in a cluster (present=E2=86=92possible),=
+ then
+> add a new one in the same cluster? The new one would get a new
+> cluster_mask. Which is kind of OK for now but then if we re-add the
+> original CPU it'd continue to use its old cluster_mask.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Indeed.
 
+> Now, that's kind of weird if it's physical CPUs because that cluster is
+> within a given chip, isn't it? But with virtualization maybe that's
+> something that could happen, and it doesn't hurt to be completely safe
+> by using for_each_possible_cpu() instead?
+
+Yes. Virtualization does aweful things....
+
+> Now looks like this:
+> 	/*
+> 	 * On post boot hotplug for a CPU which was not present at boot time,
+> 	 * iterate over all possible CPUs (even those which are not present
+> 	 * any more) to find any existing cluster mask.
+> 	 */
+> 	for_each_possible_cpu(cpu_i) {
+
+Looks good!
+
+      tglx
