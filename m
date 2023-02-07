@@ -2,94 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C68CB68DE36
-	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 17:50:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C9EC568DE99
+	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 18:15:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231771AbjBGQup (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 11:50:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36316 "EHLO
+        id S232170AbjBGRO5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 12:14:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230433AbjBGQun (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 11:50:43 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1FBF39BB1
-        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 08:50:42 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id bx22so12705684pjb.3
-        for <kvm@vger.kernel.org>; Tue, 07 Feb 2023 08:50:42 -0800 (PST)
+        with ESMTP id S232258AbjBGROu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 12:14:50 -0500
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 637AB86B1
+        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 09:14:00 -0800 (PST)
+Received: by mail-pf1-x449.google.com with SMTP id z14-20020a056a00240e00b0059395f5a701so8517265pfh.13
+        for <kvm@vger.kernel.org>; Tue, 07 Feb 2023 09:14:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=+pay9IH1iB2E7hJH5exnfAIMLvFSAkaDymDb1a/8yW0=;
-        b=WRIIQDroPKn7SixIu/lLbIkFMP1FfmXQ3yWKUbJP4CeFAVZhv60k+iuaAoarMXO+B5
-         7la2gdOHzNIV4pA5KDZAv8RH/6taSQT/yQytDUonUvberXfIvXRGh8tV0NkkTneyJYhi
-         zMOsiW4/1zFB8cVTiGqjr/YrhLJ27g+af2XXD1eTBV8Rj212SkQrkiVB3NbfZbkh/n2V
-         bozHHHJPVjRiD2Uc/30Qu56PQI6tM7UT4Uyiz+4tZzBN9siextagi+97fGkYa2BnA9wK
-         n+DZ4gmDWtI+fwkWX5ASHlFsOAdfTU4UZrm1PJs1g3cK0ibZrfgZQ16AYa05fTxFftqJ
-         KtJA==
+        h=cc:to:from:subject:mime-version:message-id:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=gaqlkUHlROHo1Iu/mvu/VhOVerpPZOfXGd0nbt/7zs8=;
+        b=aFSF+mDkwXMPhNXoGe9Q/j26WS0JRqyy750UYsBMIHe2uxsn5RTNKfWiXtceSvhxa5
+         jtE+wKy5v7XDg0HNBzSH2kcs5k0RPiVdlmiHEigKt+L/Dx/GRZ95cfV/8haSHCcm6e/6
+         OybLUuEDpssvqVROntd3VOoMTRGRn3FgHA9N+aXExjoJwgShq1wHpm1S9S4NV9pWuTKE
+         i5zm3mZuh6Ca6I6q+iuYH0CnU3MAA2KomIjb8tuhX7oH1H7M0Apn3rrYCm++euStY1AV
+         PNE0SoqrGOrbbcoQEfj7ugB8nDtisZYJRPB0h5jKDccuxm6DHEpGAQlJRqPlDIfjEJLR
+         nlSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+pay9IH1iB2E7hJH5exnfAIMLvFSAkaDymDb1a/8yW0=;
-        b=yykZzVBzI6ylmcMCF/S5eAdJL7L4Dr/MPvOyiPEQvIY8sXKgHp7RfyreGbhpkJ9bDC
-         ozwKGDP/HrvV+yiArZCntSxEwOFBcZhC7UnHTfhPLWZ1dwJYcxQCo88HWgmjgkE4KT18
-         DiGw2RgPPDYQCrUZZRw9END5Ns3PeKsB/FiX5OJ3Jwxm5YpEp37QbFzvQ6O6osN6F2Lc
-         n83iLmAQIt95g7Gk/Ip1qvEirbBLx3O6wcXaHpRduXzN0aCeXicWu8GIuDZ0C7yUdrVl
-         mnkO51rFMdl9uQlC5yB/HWWzlVXuj3PBHoSdb+g5jV427i7ILKXkkFa1EqOsI0GoONYq
-         i6DA==
-X-Gm-Message-State: AO0yUKVrgjiYDys+AGMHL1VUQ28MW33pN6nlRlDQLl/LeRMqw1mfCmvH
-        8T4tLNVYc0hULdXAFNFOHKOZDw==
-X-Google-Smtp-Source: AK7set8FabyKIXpegGDVahMOOCZr4aBGwz6c/q6sIrS1g5yeRY6uxy6dJ/AXqM46UOJbeznrI/i1gw==
-X-Received: by 2002:a17:903:2448:b0:194:d5ff:3ae3 with SMTP id l8-20020a170903244800b00194d5ff3ae3mr278538pls.2.1675788642124;
-        Tue, 07 Feb 2023 08:50:42 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id m6-20020a170902bb8600b00177f25f8ab3sm9143988pls.89.2023.02.07.08.50.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Feb 2023 08:50:41 -0800 (PST)
-Date:   Tue, 7 Feb 2023 16:50:37 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     "Woodhouse, David" <dwmw@amazon.co.uk>,
-        "usama.arif@bytedance.com" <usama.arif@bytedance.com>,
-        "arjan@linux.intel.com" <arjan@linux.intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "fam.zheng@bytedance.com" <fam.zheng@bytedance.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "liangma@liangbit.com" <liangma@liangbit.com>,
-        "pmenzel@molgen.mpg.de" <pmenzel@molgen.mpg.de>,
-        "mimoja@mimoja.de" <mimoja@mimoja.de>,
-        "hewenliang4@huawei.com" <hewenliang4@huawei.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "punit.agrawal@bytedance.com" <punit.agrawal@bytedance.com>,
-        "simon.evans@bytedance.com" <simon.evans@bytedance.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "paulmck@kernel.org" <paulmck@kernel.org>,
-        "rcu@vger.kernel.org" <rcu@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>
-Subject: Re: [PATCH v6 04/11] x86/smpboot: Reference count on
- smpboot_setup_warm_reset_vector()
-Message-ID: <Y+KBXf+IT2pQdF5A@google.com>
-References: <20230202215625.3248306-1-usama.arif@bytedance.com>
- <20230202215625.3248306-5-usama.arif@bytedance.com>
- <871qn2xsmf.ffs@tglx>
- <57195f701f6d1d70ec440c9a28cbee4cfb81dc41.camel@amazon.co.uk>
- <87sffhv8to.ffs@tglx>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87sffhv8to.ffs@tglx>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        h=cc:to:from:subject:mime-version:message-id:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gaqlkUHlROHo1Iu/mvu/VhOVerpPZOfXGd0nbt/7zs8=;
+        b=QxrVk2+9fWeEvFwZsujUCtMzRlBa95s0V1ds7VhK+vpbZsVwpKMDk7LnP2fozWYNaO
+         9k7m/J+wON98OCgH5PQJ5nkL8F+gbDfsz7ySttzT0mVlA4WourrrmRKN8lW2c4RLvR7N
+         vIDOxY90ZnupJF0WsIKS1fffa7KC5STX+2MP7WXF6mbVnMX2Skiv72q0FdOWSxdytmaw
+         YO8rryD1qyuFEBtCchRUfnEnWb5We6GNnrdZFfjs2nTCaO9NM33Wn40lh/6SIJ7dYz3e
+         sFqk9EM6u4lgQmKBRbaN9ZzhfRajOCpT+6LVM72kZpWQYdlopMg51FLLerwKwahRws5b
+         gg1A==
+X-Gm-Message-State: AO0yUKUNZsLTSWzGJI8ctKR+bn/htXxE/BX77i3Nu+QEQYsWtHmwKuhf
+        IzMxSuxcdoPyuduzwE0q4BZluRJV5PaEwKAbr9qxAvtoP6OathtZ3rqBbu4dHSJ7W5e9+IQO293
+        o0IIU6DoaKdPnSs0X3IJZ3Aw6bZTcj+u6mHrIa6tNixXVOVJwhA1CvWl//A==
+X-Google-Smtp-Source: AK7set+er4Uv/iKukfLeR1lCffkTft0lTR8HoB29ISgFrwHdoSYSqGHr9L2MtrFudzW2cCM4F0rt08AXC9k=
+X-Received: from pgonda1.kir.corp.google.com ([2620:0:1008:11:346e:6fd8:c3bf:b38f])
+ (user=pgonda job=sendgmr) by 2002:a17:902:a3ce:b0:196:3672:f24b with SMTP id
+ q14-20020a170902a3ce00b001963672f24bmr868930plb.32.1675790039532; Tue, 07 Feb
+ 2023 09:13:59 -0800 (PST)
+Date:   Tue,  7 Feb 2023 09:13:54 -0800
+Message-Id: <20230207171354.4012821-1-pgonda@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.1.519.gcb327c4b5f-goog
+Subject: [PATCH V2] KVM: sev: Fix potential overflow send|recieve_update_data
+From:   Peter Gonda <pgonda@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Peter Gonda <pgonda@google.com>, Andy Nguyen <theflow@google.com>,
+        Thomas Lendacky <thomas.lendacky@amd.com>,
+        David Rientjes <rientjes@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        stable@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -97,24 +70,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 07, 2023, Thomas Gleixner wrote:
-> On Tue, Feb 07 2023 at 09:49, David Woodhouse wrote:
-> > On Tue, 2023-02-07 at 00:48 +0100, Thomas Gleixner wrote:
-> >> Aside of the 'We' this does not explain anything at all.
-> >
-> > Er, doesn't it?
-> >
-> > We refcount the warm reset vector because when we do parallel bringup,
-> > we'll want to set it up once and then put it back to normal (for cold
-> > reset) once all the CPUs are up.
-> >
-> > I can rework the phrasing; I'm aware that the whole nonsense about
-> > pronouns and the imperative mood has grown legs in the last couple of
-> > years since I originally wrote it — but is there anything actually
-> > missing? 
-> 
-> We can settle the imperative mood debate over a beer at the next
-> conference, but stuff which goes through tip is required to follow those
-> rules. No exception for you :)
+KVM_SEV_SEND_UPDATE_DATA and KVM_SEV_RECEIVE_UPDATE_DATA have an integer
+overflow issue. Params.guest_len and offset are both 32bite wide, with a
+large params.guest_len the check to confirm a page boundary is not
+crossed can falsely pass:
 
-While we're reforming David, same goes for KVM x86.  :-)
+    /* Check if we are crossing the page boundary *
+    offset = params.guest_uaddr & (PAGE_SIZE - 1);
+    if ((params.guest_len + offset > PAGE_SIZE))
+
+Add an additional check to this conditional to confirm that
+params.guest_len itself is not greater than PAGE_SIZE.
+
+The current code is can only overflow with a params.guest_len of greater
+than 0xfffff000. And the FW spec says these commands fail with lengths
+greater than 16KB. So this issue should not be a security concern
+
+Fixes: 15fb7de1a7f5 ("KVM: SVM: Add KVM_SEV_RECEIVE_UPDATE_DATA command")
+Fixes: d3d1af85e2c7 ("KVM: SVM: Add KVM_SEND_UPDATE_DATA command")
+Reported-by: Andy Nguyen <theflow@google.com>
+Suggested-by: Thomas Lendacky <thomas.lendacky@amd.com>
+Signed-off-by: Peter Gonda <pgonda@google.com>
+Cc: David Rientjes <rientjes@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org
+Cc: stable@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+---
+
+V2
+ * Updated conditional based on feedback from Tom.
+
+---
+ arch/x86/kvm/svm/sev.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 273cba809328..3d74facaead8 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -1294,7 +1294,7 @@ static int sev_send_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 
+ 	/* Check if we are crossing the page boundary */
+ 	offset = params.guest_uaddr & (PAGE_SIZE - 1);
+-	if ((params.guest_len + offset > PAGE_SIZE))
++	if (params.guest_len > PAGE_SIZE || (params.guest_len + offset) > PAGE_SIZE)
+ 		return -EINVAL;
+ 
+ 	/* Pin guest memory */
+@@ -1474,7 +1474,7 @@ static int sev_receive_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 
+ 	/* Check if we are crossing the page boundary */
+ 	offset = params.guest_uaddr & (PAGE_SIZE - 1);
+-	if ((params.guest_len + offset > PAGE_SIZE))
++	if (params.guest_len > PAGE_SIZE || (params.guest_len + offset) > PAGE_SIZE)
+ 		return -EINVAL;
+ 
+ 	hdr = psp_copy_user_blob(params.hdr_uaddr, params.hdr_len);
+-- 
+2.39.1.519.gcb327c4b5f-goog
+
