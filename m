@@ -2,226 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F24B68D7E3
-	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 14:04:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9512968D824
+	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 14:06:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232109AbjBGNEC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 08:04:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50514 "EHLO
+        id S232147AbjBGNG2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 08:06:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232096AbjBGND4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 08:03:56 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE4B139B8F
-        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 05:03:54 -0800 (PST)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 317CiYKL008510;
-        Tue, 7 Feb 2023 13:03:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=FD3ng3/DUeIa1ytGfU6rPkqMWcO54YEJNz9R2qDNsgw=;
- b=QsuqE1E66SRKtaz73JrEyra5nqS08p1WLLEA1qprntH2nnyLSlwNIuapGz98XFYJa6Ho
- 02EShjQtANpg6E0rzKuhB1oHCFlduX4ufHeoMIvG4Sze00lFfc6yhcRJQKmy4jnhedzY
- xw5g3Kjzn4RxPpcvq3iqXMJrGM80tQ6lNvE6HN1BCkDUqhpqUJH3hsF2uvBwihw24R38
- dTedYj26oXBUcZvtG08BiNHuomqnM5CJx/aSZAxauMOceDj5ymNvkEIeCR+7b0n5cOaI
- TJvg1CedJVdMZHD1ayha6qK2ZGOE/lc7t11NLIP8q3nofxFiB8dXpf/QBADHXwVCKS7q gQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nkpwp0fpd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Feb 2023 13:03:42 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 317ClbDm023248;
-        Tue, 7 Feb 2023 13:03:41 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nkpwp0fms-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Feb 2023 13:03:41 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 316JlUI0007292;
-        Tue, 7 Feb 2023 13:03:38 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma06fra.de.ibm.com (PPS) with ESMTPS id 3nhemfjjyj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Feb 2023 13:03:38 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 317D3ZWx36897264
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 7 Feb 2023 13:03:35 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 321F920043;
-        Tue,  7 Feb 2023 13:03:35 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D638C20040;
-        Tue,  7 Feb 2023 13:03:34 +0000 (GMT)
-Received: from [9.152.224.241] (unknown [9.152.224.241])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue,  7 Feb 2023 13:03:34 +0000 (GMT)
-Message-ID: <1c0c2806-41cf-3e29-d4d2-02d08015fe32@linux.ibm.com>
-Date:   Tue, 7 Feb 2023 14:03:34 +0100
+        with ESMTP id S232068AbjBGNG1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 08:06:27 -0500
+Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 473553A59F;
+        Tue,  7 Feb 2023 05:05:47 -0800 (PST)
+Received: by mail-io1-xd33.google.com with SMTP id e2so5615937iot.11;
+        Tue, 07 Feb 2023 05:05:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EXW6KJjSl/14WnK5/Cozb5DZDDl3Rz7gP+uZX13BYEQ=;
+        b=kQre80ZXRD/+STet/ShaaHOWuCYLhnjimY+XyKotPv7kf7CTMARAt6HcUCIfk/dazp
+         a5P4x1fTutCe0WLTt4gjd5BRNSCHNBk3+degLasWCbnira/j1WeaqNhMDbq0dqrKGApM
+         3Iord7V1i2lkj9PWc1Uqm92dOofWXdoBb+nckyC6W8dtjokqgMuV6ob4j7g19mSB4icx
+         FbIZRyDOjp6SU8Y/8oV+z3giUTs6WYYzDTQJh8U6SHQBo6V+kcJqXftC1/1/ZsIGT9sv
+         OupNIXTxBl3kHnAA468HqKxiaZzMJqFeK5lBDBeC0svCesNWmonc/Xt6SJV4E4EvDlvu
+         kxVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EXW6KJjSl/14WnK5/Cozb5DZDDl3Rz7gP+uZX13BYEQ=;
+        b=i7STw47tgwg70p0d7ocUIUB6z3jO7UY4hTFaH32FsAOP/YSICUxz2c7oVD9s3nJMyu
+         4XcTJ5vBxA5rFR/WvjcSTMtehWIxg6Ha42+Gr9fwLQILyXpYJ06fRHPFnzdGJ5Uz57TT
+         e31LqwtMwvEgatLVAoPgTvARgYuLqS1EcfvnoD5ECuICwNXkMurUYu/26hLz7oG8EYrO
+         Jn281rEwCIWPR6aAte2ELtdd/iZpGLZ0jCIjzYGLQdkuMOnw/7GjfCG734IzDbCmGREg
+         UKUsTU4+qIoa79+WZlq+F8CcFBwOUeBd3ZV9Njz+Vsd2nUqlOSmR8KCXbGEuLbrOWiK+
+         2JpQ==
+X-Gm-Message-State: AO0yUKXYbzCA4PDegaVFFptDVuCpqY6dEZ2l2R9YAEekqK1mEL0SPzTN
+        1MzEGgPK0ijubacScnwFXQ0=
+X-Google-Smtp-Source: AK7set9VSExZPQRpgj8kPF8t2b8Blfhc41Cf+GeiZjCOQYJkE8FTqJwstgFSOvO9eFEhrOVjsFeNlw==
+X-Received: by 2002:a6b:7d4c:0:b0:715:f031:a7f5 with SMTP id d12-20020a6b7d4c000000b00715f031a7f5mr2288236ioq.1.1675775140895;
+        Tue, 07 Feb 2023 05:05:40 -0800 (PST)
+Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
+        by smtp.gmail.com with ESMTPSA id b8-20020a05663805a800b003c29ccd3019sm1174965jar.44.2023.02.07.05.05.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Feb 2023 05:05:40 -0800 (PST)
+Date:   Tue, 7 Feb 2023 15:05:35 +0200
+From:   Zhi Wang <zhi.wang.linux@gmail.com>
+To:     Mathias Krause <minipli@grsecurity.net>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v3 4/6] KVM: x86: Make use of kvm_read_cr*_bits() when
+ testing bits
+Message-ID: <20230207150535.00004453@gmail.com>
+In-Reply-To: <20230201194604.11135-5-minipli@grsecurity.net>
+References: <20230201194604.11135-1-minipli@grsecurity.net>
+        <20230201194604.11135-5-minipli@grsecurity.net>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH v15 06/11] s390x/cpu topology: interception of PTF
- instruction
-Content-Language: en-US
-To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
-        berrange@redhat.com, clg@kaod.org
-References: <20230201132051.126868-1-pmorel@linux.ibm.com>
- <20230201132051.126868-7-pmorel@linux.ibm.com>
- <5c15ccde659a9849ab3529e08f5e1278508406c8.camel@linux.ibm.com>
- <f5c6b04a-0faa-ba36-9019-468662b9fbb2@linux.ibm.com>
- <b3c206df9dc08c094c0c717b0cb6457d29ed9925.camel@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <b3c206df9dc08c094c0c717b0cb6457d29ed9925.camel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: igNpiRYW8hzTug1W6pdWQtEzUOvoQeve
-X-Proofpoint-GUID: vsMnOJys4OaCRZ7ZR7TgogNEbXPXpv0N
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-02-07_04,2023-02-06_03,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- spamscore=0 priorityscore=1501 phishscore=0 impostorscore=0 malwarescore=0
- clxscore=1015 bulkscore=0 mlxscore=0 mlxlogscore=999 adultscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302070111
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed,  1 Feb 2023 20:46:02 +0100
+Mathias Krause <minipli@grsecurity.net> wrote:
 
-
-On 2/7/23 12:27, Nina Schoetterl-Glausch wrote:
-> On Tue, 2023-02-07 at 10:59 +0100, Pierre Morel wrote:
->>
->> On 2/6/23 19:34, Nina Schoetterl-Glausch wrote:
->>> On Wed, 2023-02-01 at 14:20 +0100, Pierre Morel wrote:
-
-...
-
->>> [...]
->>>>    
->>>>    /**
->>>> @@ -137,6 +225,21 @@ static void s390_topology_cpu_default(S390CPU *cpu, Error **errp)
->>>>                              (smp->books * smp->sockets * smp->cores)) %
->>>>                             smp->drawers;
->>>>        }
->>>
->>> Why are the changes below in this patch?
->>
->> Because before thos patch we have only horizontal polarization.
+> Make use of the kvm_read_cr{0,4}_bits() helper functions when we only
+> want to know the state of certain bits instead of the whole register.
 > 
-> Not really since you only enable topology in the next patch.
->>
->>>
->>>> +
->>>> +    /*
->>>> +     * Machine polarity is set inside the global s390_topology structure.
->>>> +     * In the case the polarity is set as horizontal set the entitlement
->>
->> Sorry here an error in the comment should be :
->> "In the case the polarity is NOT set as horizontal..."
->>
->>>> +     * to POLARITY_VERTICAL_MEDIUM which is the better equivalent when
->>>> +     * machine polarity is set to vertical or POLARITY_VERTICAL_HIGH if
->>>> +     * the vCPU is dedicated.
->>>> +     */
->>>> +    if (s390_topology.polarity && !env->entitlement) {
->>>
->>> It'd be more readable if you compared against enum values by name.
->>
->> Right, I will change this to
->>
->>       if (s390_topology.polarity != S390_POLARITY_HORIZONTAL &&
->>           env->entitlement == S390_ENTITLEMENT_UNSET) {
->>
->>>
->>> I don't see why you check s390_topology.polarity. If it is horizontal
->>> then the value of the entitlement doesn't matter at all, so you can set it
->>> to whatever.
->>
->> Right, that is why it is done only for vertical polarization (sorry for
->> the wrong comment)
+> This not only makes the intend cleaner, it also avoids a VMREAD in case
+> the tested bits aren't guest owned.
+                    ^
+The patch comment is a little confusing. Not sure if I misunderstood here:
+
+Check the code of kvm_read_cr0_bits
+
+static inline ulong kvm_read_cr0_bits(struct kvm_vcpu *vcpu, ulong mask)
+{
+        ulong tmask = mask & KVM_POSSIBLE_CR0_GUEST_BITS;
+        if ((tmask & vcpu->arch.cr0_guest_owned_bits) &&
+            !kvm_register_is_available(vcpu, VCPU_EXREG_CR0))
+                static_call(kvm_x86_cache_reg)(vcpu, VCPU_EXREG_CR0);
+        return vcpu->arch.cr0 & mask;
+}
+
+I suppose the conditions that can avoids a VMREAD is to avoid the vmread in
+static_call(kvm_x86_cache_reg):
+
+Conditions are not triggering vmread:
+
+1) The test bits are guest_owned_bits and cache register is available.
+2) The test bits are *not* guest_owned bits.
+
+I agree that this makes the intend cleaner, but not sure the later statement
+is true in the patch comment. If the test bits are not guest owned, it will
+not reach static_call(kvm_x86_cache_reg).
 > 
-> I'm saying you don't need to check it at all. You adjust the values for
-> vertical polarization, but you could just always do that since the values
-> don't matter at all if the polarization is horizontal.
-
-OK right
-
->>
->>> All you want to do is enforce dedicated -> VERTICAL_HIGH, right?
->>> So why don't you just add
->>>
->>> +    if (cpu->env.dedicated && cpu->env.entitlement != POLARITY_VERTICAL_HIGH) {
->>> +        error_setg(errp, "A dedicated cpu implies high entitlement");
->>> +        return;
->>> +    } >
->>> to s390_topology_check?
->>
->> Here it is to set the default in the case the values are not provided.
+> Signed-off-by: Mathias Krause <minipli@grsecurity.net>
+> ---
+>  arch/x86/kvm/pmu.c     | 4 ++--
+>  arch/x86/kvm/vmx/vmx.c | 4 ++--
+>  2 files changed, 4 insertions(+), 4 deletions(-)
 > 
-> If no values are provided, they default to dedication=false and entitlement=medium,
-> as defined by patch 1, which are fine and don't need to be adjusted.
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index d939d3b84e6f..d9922277df67 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -439,9 +439,9 @@ int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned idx, u64 *data)
+>  	if (!pmc)
+>  		return 1;
+>  
+> -	if (!(kvm_read_cr4(vcpu) & X86_CR4_PCE) &&
+> +	if (!(kvm_read_cr4_bits(vcpu, X86_CR4_PCE)) &&
+>  	    (static_call(kvm_x86_get_cpl)(vcpu) != 0) &&
+> -	    (kvm_read_cr0(vcpu) & X86_CR0_PE))
+> +	    (kvm_read_cr0_bits(vcpu, X86_CR0_PE)))
+>  		return 1;
+>  
+>  	*data = pmc_read_counter(pmc) & mask;
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index c8198c8a9b55..d3b49e0b6c32 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -5487,7 +5487,7 @@ static int handle_cr(struct kvm_vcpu *vcpu)
+>  		break;
+>  	case 3: /* lmsw */
+>  		val = (exit_qualification >> LMSW_SOURCE_DATA_SHIFT) & 0x0f;
+> -		trace_kvm_cr_write(0, (kvm_read_cr0(vcpu) & ~0xful) | val);
+> +		trace_kvm_cr_write(0, (kvm_read_cr0_bits(vcpu, ~0xful) | val));
+>  		kvm_lmsw(vcpu, val);
+>  
+>  		return kvm_skip_emulated_instruction(vcpu);
+> @@ -7547,7 +7547,7 @@ static u8 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
+>  	if (!kvm_arch_has_noncoherent_dma(vcpu->kvm))
+>  		return (MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;
+>  
+> -	if (kvm_read_cr0(vcpu) & X86_CR0_CD) {
+> +	if (kvm_read_cr0_bits(vcpu, X86_CR0_CD)) {
+>  		if (kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_CD_NW_CLEARED))
+>  			cache = MTRR_TYPE_WRBACK;
+>  		else
 
-Right, I think I added this when working on modifying the attributes in 
-QAPI and rebased it in the wrong patch.
-Here it has no sense.
-
-> 
->>
->> But where you are right is that I should add a verification to the check
->> function.
->>
->>>
->>>> +        if (env->dedicated) {
->>>> +            env->entitlement = POLARITY_VERTICAL_HIGH;
->>>> +        } else {
->>>> +            env->entitlement = POLARITY_VERTICAL_MEDIUM;
->>>> +        }
->>>
->>> If it is horizontal, then setting the entitlement is pointless as it will be
->>> reset to medium on PTF.
->>
->> That is why the polarity is tested (sorry for the bad comment)
-> 
-> I said this because I'm fine with setting it pointlessly.
-> 
->>> So the current polarization is vertical and a cpu is being hotplugged,
->>> but setting the entitlement of the cpu being added is also pointless, because
->>> it's determined by the dedication. That seems weird.
->>
->> No it is not determined by the dedication, if there is no dedication the
->> 3 vertical values are possible.
-> 
-> You set it to either high or medium based on the dedication. And for horizontal
-> polarization it obviously doesn't matter.
-
-on PTF yes but not on hotplug, on hotplug all 3 values are possible.
-
-> 
-> As far as I understand you don't need this because the default values are fine.
-> You should add the check that if a dedicated cpu is hotplugged, then the entitlement
-> must be high, to patch 2 and that's it, no additional changes necessary.
-
-Yes, right.
-
-Regards,
-Pierre
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
