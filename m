@@ -2,228 +2,210 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A73468D4D2
-	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 11:51:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C559968D4F0
+	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 11:57:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231803AbjBGKvV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 05:51:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52478 "EHLO
+        id S231887AbjBGK5y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 05:57:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231814AbjBGKvQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 05:51:16 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48B13196BE
-        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 02:51:04 -0800 (PST)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 317AUe51013734;
-        Tue, 7 Feb 2023 10:50:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=CEbkWBEa4rd0ArzSkT+7ZuFO58cLmR1Oo2Thujmj/LE=;
- b=D1XoCA5g2HYu/ALpUb0G5N1Dq5naqz1Dy8ov0VyKgVvyB8MoDmILQXMpg2oQgrIK8fAV
- zIf0kwERNSTLj6JqGMavHlIRlNto4+rbM9QhdIvuCFvKGJZ+79ez4gWAskksicmuBMLT
- +s3Ehf9zXlGWSxupp/jc1NFOwu9Y9HzjYxI+/IPggyUpb/rdu/0ZVLqotTCsdlFw7fPM
- FGzwAEvHjE3zh1JXdTBLC6qyxadpoCw9Ig3VeH5ugetqlQarH7vKlAmywktwgHcyh0Gq
- CYWiz0F6g7LbUwXxobfX71z8dKrWfU4j4b6KQe64gXk2y7lcpMJ3hRaHTR6Rb9K7cTE5 Fg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nkmy28e7r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Feb 2023 10:50:50 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 317AVofd018113;
-        Tue, 7 Feb 2023 10:50:50 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nkmy28e6t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Feb 2023 10:50:50 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3175b4dO010414;
-        Tue, 7 Feb 2023 10:50:48 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3nhf06tfwu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Feb 2023 10:50:48 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 317AoiDm41484558
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 7 Feb 2023 10:50:44 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 63CF320040;
-        Tue,  7 Feb 2023 10:50:44 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 007CE2004B;
-        Tue,  7 Feb 2023 10:50:44 +0000 (GMT)
-Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.169.160])
-        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue,  7 Feb 2023 10:50:43 +0000 (GMT)
-Message-ID: <669fea20042a31d009b5f3d9371bcf88f32d5d49.camel@linux.ibm.com>
-Subject: Re: [PATCH v15 05/11] s390x/cpu topology: resetting the
- Topology-Change-Report
-From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
-        berrange@redhat.com, clg@kaod.org
-Date:   Tue, 07 Feb 2023 11:50:43 +0100
-In-Reply-To: <f4732cd4-67bb-a2a3-0048-3a2118b52fc1@linux.ibm.com>
-References: <20230201132051.126868-1-pmorel@linux.ibm.com>
-         <20230201132051.126868-6-pmorel@linux.ibm.com>
-         <3215597a6916932c26fdbe1dd8daf2fc0c1c1ab5.camel@linux.ibm.com>
-         <f4732cd4-67bb-a2a3-0048-3a2118b52fc1@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.3 (3.46.3-1.fc37) 
+        with ESMTP id S231825AbjBGK5t (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 05:57:49 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CC2439BBD;
+        Tue,  7 Feb 2023 02:57:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Zyfmu6UPbMQ7dAOL0TbUtfOvq7o1ioKQtmz/vntrZlk=; b=d2DyKxSysm7zcy5mftfxyKN1l5
+        Sti2hfLe6g9mDI94ogFj+ZlMWV5hgouYVoC5Ez4lITkuaaILRRF2SI+Lz+1WO6QNObN0PzBUgPr8P
+        w3kGcTRXwLdLYIcxDErtyhGxLOh7X5a44PpdDbFAFB98ulNPoQCOboEBdBih7GSW3Cm1rbXiarpG3
+        IBDRywXm9VRvkp+nV+nb2igVKKe076tCOmguSwbzgfmUzgYXwNNvr/vwjeGXfRUJ8/vRJd/a5K0Gy
+        gy5vsLied8HhFnqrADu2FPYqIUyPWRfRN0GklqA7RQpdYHGp0ubTAH9B4LinnPUL9Bo81j9cOhHsw
+        p2/rX+og==;
+Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.infradead.org)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pPLeu-0005hb-3J; Tue, 07 Feb 2023 10:57:08 +0000
+Message-ID: <d37f3af69df09ff542024ed93a37865b28dfa86e.camel@infradead.org>
+Subject: Re: [PATCH v6 01/11] x86/apic/x2apic: Fix parallel handling of
+ cluster_mask
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Usama Arif <usama.arif@bytedance.com>, arjan@linux.intel.com
+Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        hpa@zytor.com, x86@kernel.org, pbonzini@redhat.com,
+        paulmck@kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, rcu@vger.kernel.org, mimoja@mimoja.de,
+        hewenliang4@huawei.com, thomas.lendacky@amd.com, seanjc@google.com,
+        pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
+        punit.agrawal@bytedance.com, simon.evans@bytedance.com,
+        liangma@liangbit.com
+Date:   Tue, 07 Feb 2023 10:57:05 +0000
+In-Reply-To: <87a61qxtx0.ffs@tglx>
+References: <20230202215625.3248306-1-usama.arif@bytedance.com>
+         <20230202215625.3248306-2-usama.arif@bytedance.com> <87a61qxtx0.ffs@tglx>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-sXYYLHDo3EIodFyasVVr"
+User-Agent: Evolution 3.44.4-0ubuntu1 
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: C5wO0xi20SHltC2M7mHBViFsvlnoGyKR
-X-Proofpoint-GUID: 3wCmX86K_JOzmnW7fh59pqWdyD5QiImr
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-02-07_02,2023-02-06_03,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- clxscore=1015 adultscore=0 mlxlogscore=999 impostorscore=0
- lowpriorityscore=0 spamscore=0 suspectscore=0 bulkscore=0 malwarescore=0
- mlxscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302070094
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2023-02-07 at 10:24 +0100, Pierre Morel wrote:
->=20
-> On 2/6/23 18:52, Nina Schoetterl-Glausch wrote:
-> > On Wed, 2023-02-01 at 14:20 +0100, Pierre Morel wrote:
-> > > During a subsystem reset the Topology-Change-Report is cleared
-> > > by the machine.
-> > > Let's ask KVM to clear the Modified Topology Change Report (MTCR)
-> > > bit of the SCA in the case of a subsystem reset.
-> > >=20
-> > > Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> > > ---
-> > >   include/hw/s390x/cpu-topology.h |  1 +
-> > >   target/s390x/cpu.h              |  1 +
-> > >   target/s390x/kvm/kvm_s390x.h    |  1 +
-> > >   hw/s390x/cpu-topology.c         | 12 ++++++++++++
-> > >   hw/s390x/s390-virtio-ccw.c      |  3 +++
-> > >   target/s390x/cpu-sysemu.c       | 13 +++++++++++++
-> > >   target/s390x/kvm/kvm.c          | 17 +++++++++++++++++
-> > >   7 files changed, 48 insertions(+)
-> > >=20
-> > > diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-t=
-opology.h
-> > > index 1ae7e7c5e3..60e0b9fbfa 100644
-> > > --- a/include/hw/s390x/cpu-topology.h
-> > > +++ b/include/hw/s390x/cpu-topology.h
-> > > @@ -66,5 +66,6 @@ static inline void s390_topology_set_cpu(MachineSta=
-te *ms,
-> > >  =20
-> > >   extern S390Topology s390_topology;
-> > >   int s390_socket_nb(S390CPU *cpu);
-> > > +void s390_topology_reset(void);
-> > >  =20
-> > >   #endif
-> > > diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> > > index e1f6925856..848314d2a9 100644
-> > > --- a/target/s390x/cpu.h
-> > > +++ b/target/s390x/cpu.h
-> > > @@ -641,6 +641,7 @@ typedef struct SysIBTl_cpu {
-> > >   QEMU_BUILD_BUG_ON(sizeof(SysIBTl_cpu) !=3D 16);
-> > >  =20
-> > >   void insert_stsi_15_1_x(S390CPU *cpu, int sel2, __u64 addr, uint8_t=
- ar);
-> > > +void s390_cpu_topology_reset(void);
-> >=20
-> > How about you call this s390_cpu_topology_reset_modified, so it's symme=
-tric
-> > with the function you define in the next patch. You could also drop the=
- "cpu"
-> > from the name.
->=20
-> I am not sure about this, Thomas already gave his R-B on this patch so I=
-=20
-> prefer to stay on the original name, unless he says it is a good idea to=
-=20
-> change.
-> Also in cpu-sysemu.c most of the function are tagged with _cpu_
 
-IMO, renaming a function would be a small enough change to keep an R-b.
->=20
-> >=20
-> > Or maybe even better, you only define a function for setting the modifi=
-ed state,
-> > but make it take a bool argument. This way you also get rid of some cod=
-e duplication
-> > and it wouldn't harm readability IMO.
->=20
-> There is already a single function kvm_s390_topology_set_mtcr(attr) to=
-=20
-> set the "modified state"
+--=-sXYYLHDo3EIodFyasVVr
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
 
-Yes, but that is for KVM only and doesn't do error handling.
-So you need at least one function on top of that. What I'm suggesting is to
-only have one function instead of two because it gets rid of some code.
->=20
-> >=20
-> > >  =20
-> > >   /* MMU defines */
-> > >   #define ASCE_ORIGIN           (~0xfffULL) /* segment table origin  =
-           */
-> > > diff --git a/target/s390x/kvm/kvm_s390x.h b/target/s390x/kvm/kvm_s390=
-x.h
-> > > index f9785564d0..649dae5948 100644
-> > > --- a/target/s390x/kvm/kvm_s390x.h
-> > > +++ b/target/s390x/kvm/kvm_s390x.h
-> > > @@ -47,5 +47,6 @@ void kvm_s390_crypto_reset(void);
-> > >   void kvm_s390_restart_interrupt(S390CPU *cpu);
-> > >   void kvm_s390_stop_interrupt(S390CPU *cpu);
-> > >   void kvm_s390_set_diag318(CPUState *cs, uint64_t diag318_info);
-> > > +int kvm_s390_topology_set_mtcr(uint64_t attr);
-> > >  =20
-> > >   #endif /* KVM_S390X_H */
-> > > diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
-> > > index a80a1ebf22..cf63f3dd01 100644
-> > > --- a/hw/s390x/cpu-topology.c
-> > > +++ b/hw/s390x/cpu-topology.c
-> > > @@ -85,6 +85,18 @@ static void s390_topology_init(MachineState *ms)
-> > >       QTAILQ_INSERT_HEAD(&s390_topology.list, entry, next);
-> > >   }
-> > >  =20
-> > > +/**
-> > > + * s390_topology_reset:
-> > > + *
-> > > + * Generic reset for CPU topology, calls s390_topology_reset()
-> > > + * s390_topology_reset() to reset the kernel Modified Topology
-> > > + * change record.
-> > > + */
-> > > +void s390_topology_reset(void)
-> > > +{
-> >=20
-> > I'm wondering if you shouldn't move the reset changes you do in the nex=
-t patch
-> > into this one. I don't see what they have to do with PTF emulation.
->=20
-> Here in this patch we do not intercept PTF and we have only an=20
-> horizontal polarity.
-> So we do not need to reset the polarity for all the vCPUs, we only need=
-=20
-> it when we have vertical polarity.
+T24gVHVlLCAyMDIzLTAyLTA3IGF0IDAwOjIwICswMTAwLCBUaG9tYXMgR2xlaXhuZXIgd3JvdGU6
+Cj4gCj4gCj4gVEJILiBUaGUgbG9naWMgb2YgdGhpcyBjb2RlIGlzIGFueXRoaW5nIGJ1dCBvYnZp
+b3VzLiBTb21ldGhpbmcgbGlrZSB0aGUKPiB1bmNvbXBpbGVkIGJlbG93IHBlcmhhcHM/CgpMb29r
+cyBzYW5lIHRvIG1lLiBJJ2xsIHR3ZWFrIHRoZSBjb21tZW50cyBhIGJpdCBhbmQgZ2l2ZSBpdCBh
+IHNwaW47CnRoYW5rcy4KCi4uLgoKPiArwqDCoMKgwqDCoMKgwqAgKiBBdCBib290IHRpbWUgQ1BV
+IHByZXNlbnQgbWFzayBpcyBzdGFibGUuIElmIHRoZSBjbHVzdGVyIGlzIG5vdAo+ICvCoMKgwqDC
+oMKgwqDCoCAqIHlldCBpbml0aWFsaXplZCwgYWxsb2NhdGUgdGhlIG1hc2sgYW5kIHByb3BhZ2F0
+ZSBpdCB0byBhbGwKPiArwqDCoMKgwqDCoMKgwqAgKiBzaWJsaW5ncyBpbiB0aGlzIGNsdXN0ZXIu
+Cj4gwqDCoMKgwqDCoMKgwqDCoCAqLwo+IC3CoMKgwqDCoMKgwqDCoGlmIChjbHVzdGVyX2hvdHBs
+dWdfbWFzaykgewo+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBpZiAoY2x1c3Rlcl9o
+b3RwbHVnX21hc2stPm5vZGUgPT0gbm9kZSkKPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoHJldHVybiAwOwo+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqBrZnJlZShjbHVzdGVyX2hvdHBsdWdfbWFzayk7Cj4gLcKgwqDCoMKgwqDCoMKgfQo+ICvC
+oMKgwqDCoMKgwqDCoGlmIChzeXN0ZW1fc3RhdGUgPCBTWVNURU1fUlVOTklORykKPiArwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgZ290byBhbGxvYzsKPiArCj4gK8KgwqDCoMKgwqDCoMKg
+LyoKPiArwqDCoMKgwqDCoMKgwqAgKiBPbiBwb3N0IGJvb3QgaG90cGx1ZyBpdGVyYXRlIG92ZXIg
+dGhlIHByZXNlbnQgQ1BVcyB0byBoYW5kbGUgdGhlCj4gK8KgwqDCoMKgwqDCoMKgICogY2FzZSBv
+ZiBwYXJ0aWFsIGNsdXN0ZXJzIGFzIHRoZXkgbWlnaHQgYmUgcHJlc2VudGVkIGJ5Cj4gK8KgwqDC
+oMKgwqDCoMKgICogdmlydHVhbGl6YXRpb24uCj4gK8KgwqDCoMKgwqDCoMKgICovCj4gK8KgwqDC
+oMKgwqDCoMKgZm9yX2VhY2hfcHJlc2VudF9jcHUoY3B1X2kpIHsKCgpTby4uLiBpZiB0aGlzIENQ
+VSB3YXMgKnByZXNlbnQqIGF0IGJvb3QgdGltZSAoYW5kIGlmIGFueSBvdGhlciBDUFUgaW4KdGhp
+cyBjbHVzdGVyIHdhcyBwcmVzZW50KSwgaXQgd2lsbCBhbHJlYWR5IGhhdmUgYSBjbHVzdGVyX21h
+c2suCgpXaGljaCBtZWFucyB3ZSBnZXQgaGVyZSBpbiB0d28gY2FzZXM6IAoKIOKAoiBUaGlzIENQ
+VSB3YXNuJ3QgYWN0dWFsbHkgcHJlc2VudCAod2FzIGp1c3QgJ3Bvc3NpYmxlJykgYXQgYm9vdCB0
+aW1lLgogICAoSXMgdGhhdCBhY3R1YWxseSBhIHRoaW5nIHRoYXQgaGFwcGVucz8pCgog4oCiIFRo
+aXMgQ1BVIHdhcyBwcmVzZW50IGJ1dCBubyBvdGhlciBDUFUgaW4gdGhpcyBjbHVzdGVyIHdhcyBh
+Y3R1YWxseQogICBicm91Z2h0IHVwIGF0IGJvb3QgdGltZSBzbyB0aGUgY2x1c3Rlcl9tYXNrIHdh
+c24ndCBhbGxvY2F0ZWQuCgpUaGUgY29kZSBsb29rcyByaWdodCwgSSBkb24ndCBncm9rIHRoZSBj
+b21tZW50IGFib3V0IHBhcnRpYWwgY2x1c3RlcnMKYW5kIHZpcnR1YWxpemF0aW9uLCBhbmQgd291
+bGQgaGF2ZSB3b3JkZWQgaXQgc29tZXRoaW5nIGFsb25nIHRoZSBhYm92ZQpsaW5lcz8KCg==
 
-Well, with the PTF patch you don't get vertical polarity either, because yo=
-u
-only enable the topology with patch 7.
-And since it's about resetting, it fits better in this patch IMO.
->=20
-> Regards,
-> Pierre
->=20
 
+--=-sXYYLHDo3EIodFyasVVr
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMjA3MTA1NzA1WjAvBgkqhkiG9w0BCQQxIgQgq2vIuUN+
+O4NqwL11eDARlAy4AkZGOQ3mooSfmQL7pwgwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAKO2seRqTpsuRuVwJdBdZ1VKeOJnCXqyxI
+oHzO/aBVhmn6kOvRRqPPHbJO+o6qvfFiFsYEvSi+4UKx/I0ArHlF1sMo9KApW7VU+/Sbw1rXlezl
+OEByzBbjSJc9xSbmNt5e96BzjPDJyLUud9gZ9ufF97JcY6aaB/Si/KiFTK6U15bcUUqepRPb0+Hb
+guCPYhVVJrC8u9OXt1dN9s3zesbt/iO/Il6CfLuttGfX+8WwbbXaOaXkXXc2PK5qgEWUyr7eL6wC
+NoxZiHBU2izhXIj3DhzvjckTJseHQJl+oOn3lA4wZalJpFDydLs5F0EpCjw2Ft3f13TPXeP5ZR0K
+oJHnbaciErq6l2ZiY2HFfRta4/svj4nQORQfkxLelSnH2FlHyqid46cWJp/XhIMwruTMabOiL1uo
+IF2IbAsJMGvQK+YHYl86UZVCVGKhNoerx5f8igesJ7QxH82SP4Ew8xF2tyZN3cz817NROkOi/uxI
+imxKO0orhT21pIBbRMqx6KZokBTMyHxKiytuKRBTPn4GOdU9UoVvvH7y3UjR0E9kRHXM+4nNz8+k
+YC4p8JvMMLckyuVYCkWD/A+9hmAVvyPjezV8nmWY1ONTxqmaLv6RNRln86OXnHU6IalAM7M0V/iB
+ksnolgBS7UaOo+hHUMK91jrsbYnXLP1vsV1dKyYccwAAAAAAAA==
+
+
+--=-sXYYLHDo3EIodFyasVVr--
