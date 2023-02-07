@@ -2,79 +2,209 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 467A268DF69
-	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 18:52:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9224E68DF8F
+	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 19:05:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232614AbjBGRwi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 12:52:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53206 "EHLO
+        id S232035AbjBGSFY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 13:05:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232544AbjBGRwT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 12:52:19 -0500
-Received: from mail-yw1-x112a.google.com (mail-yw1-x112a.google.com [IPv6:2607:f8b0:4864:20::112a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2E523D925
-        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 09:52:01 -0800 (PST)
-Received: by mail-yw1-x112a.google.com with SMTP id 00721157ae682-50aa54cc7c0so205505437b3.8
-        for <kvm@vger.kernel.org>; Tue, 07 Feb 2023 09:52:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=O3E0KsrZ9oAW+b1aCUfQHj96dbPRqwoGdBYkLlh8FMw=;
-        b=BnlnfNpm8hN1xEk3cCUyU216nabUr2USJGPYqGEGpu9FVnmvE+LBsLl0vBVzbzx6Dh
-         9K3q0Aba+vc5xhk4pXnWn5YArjpAxDgk20truk6vqe+TweG3yqckxUHhvvxXVG5Auwt1
-         Mz+upZ2Og7k6QUzLbxhOScEI7MAZLVjwlZRDeZom8EiP0YQMrs4knQKe1wm46leHR3oz
-         iTW578+2yXbBp7Uf3m6IvX03j97+xeZ8V4HitCIRbIz4L/mbdojmLegVU077S2qs5fD5
-         BvIzMBf1LSQYWiM6HlWGGF+B+DQDcTLtoQzMayZfza0C/TBYQGltkAXwY/IVU4OJ2Fy9
-         h7zQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=O3E0KsrZ9oAW+b1aCUfQHj96dbPRqwoGdBYkLlh8FMw=;
-        b=59PPEwFvPfkL9B8yyY6t13tbLfIKyOrS3so/6TXiU29N+dRCGHBu7OPEEAMFZBx1+1
-         gBh8h79HqmoFbsfaTY0n8RimJOYJln9Q/lp2GPqRF/l6bqV+GN9y/ISpk+oDRk7GXHsC
-         vyVDzJHgyH5lLyc+YeCD2xkrruf8qkeb9j/DzAwnImFWH8zcAPhd1iAmuzeKnWfHd30P
-         SwFYAfT8XxMLLtLYwTY8GzOaHUlWmfiVd+a8K+uHrTNMNeDJOEeQcq7QmdIw1mZfS9kQ
-         omNClApf2m5geEEL8nfW+lKBfS6DXbxv5vg75dH04jtpfc7PHZMl0R0mWZuB36luNx/0
-         gCeA==
-X-Gm-Message-State: AO0yUKXBCY+lkb/vqq6P6qkpH8XBNGDV4WRMiogRb2cI7V/5OTTkcGUy
-        O90er7YBRcm0TZWeB3aPA5n9Jq6onvkHdeU93LNhXA==
-X-Google-Smtp-Source: AK7set8Lx4TfwZQ6IKZwYWKjwzYVpo6A0JhqFkkDI5N5RJ1+bZI3EcqyHjlZl2U35xQ+xrfb+VoMHjsIBvvUpfxwCaI=
-X-Received: by 2002:a0d:c745:0:b0:506:39b1:a6e5 with SMTP id
- j66-20020a0dc745000000b0050639b1a6e5mr374207ywd.398.1675792313944; Tue, 07
- Feb 2023 09:51:53 -0800 (PST)
+        with ESMTP id S231947AbjBGSFU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 13:05:20 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 193323A86F;
+        Tue,  7 Feb 2023 10:05:17 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A637660F71;
+        Tue,  7 Feb 2023 18:05:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D97FFC4339B;
+        Tue,  7 Feb 2023 18:05:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1675793116;
+        bh=H2ys2pYdG89Ku64gAFGM6WT2YOc0n7GzZTdp0ffbLLg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=RxM/tp4CkjXmsq8wO/dTfmLWZ32PQ7NFatNaGZNu+evrSclfmPGJ5PI7W/dcyUa9C
+         8jSqCk1MMOIYzYdL5iGWfpbE2MC6yFctuUL2gzhgssB1hmz5zUW846bjz3498ooOO3
+         i8FEft99VTDkMSvLOX7Lyl8W0KRuVY+Eqq3ci/hfiYhIxSiArKxODBgdiR0Y7pVAV1
+         CgX9rGLWPUjfARygXTMkr6cu+7mg1vQ5kq7sKahG1xyHR7w8Xh3+yCWlHoW/AaEDiA
+         19kw6Ggrc7uw+CiLSjdGJG8YBN/vveiV2qcDENgDdwpzKZosANA5FWc0GsMVkwXg1N
+         kClw+abn+EUqQ==
+Date:   Tue, 7 Feb 2023 18:05:11 +0000
+From:   Conor Dooley <conor@kernel.org>
+To:     Anup Patel <apatel@ventanamicro.com>
+Cc:     Palmer Dabbelt <palmer@dabbelt.com>, pbonzini@redhat.com,
+        atishp@atishpatra.org, Paul Walmsley <paul.walmsley@sifive.com>,
+        ajones@ventanamicro.com, anup@brainfault.org, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 2/7] RISC-V: Detect AIA CSRs from ISA string
+Message-ID: <Y+KS16ZNXrDU+xun@spud>
+References: <20230128072737.2995881-3-apatel@ventanamicro.com>
+ <mhng-0f9bdf58-5289-4db4-8fd7-38898824c44f@palmer-ri-x1c9>
+ <CAK9=C2X8C4yswGhDwe1OzQXTELXQxp8=ayiFxh1aVMk4TxeDjw@mail.gmail.com>
 MIME-Version: 1.0
-References: <20230203192822.106773-1-vipinsh@google.com> <20230203192822.106773-5-vipinsh@google.com>
- <Y+GUUr/UE0V0WsrR@google.com>
-In-Reply-To: <Y+GUUr/UE0V0WsrR@google.com>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Tue, 7 Feb 2023 09:51:18 -0800
-Message-ID: <CAHVum0cyGD+4cC4gO+8YDOrpbkgFA5=VPyNyo5DCvC5jTVV80w@mail.gmail.com>
-Subject: Re: [Patch v2 4/5] KVM: x86/mmu: Remove handle_changed_spte_dirty_log()
-To:     David Matlack <dmatlack@google.com>
-Cc:     seanjc@google.com, pbonzini@redhat.com, bgardon@google.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="m0n7JpZfETbh6abr"
+Content-Disposition: inline
+In-Reply-To: <CAK9=C2X8C4yswGhDwe1OzQXTELXQxp8=ayiFxh1aVMk4TxeDjw@mail.gmail.com>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 6, 2023 at 3:59 PM David Matlack <dmatlack@google.com> wrote:
->
-> On Fri, Feb 03, 2023 at 11:28:21AM -0800, Vipin Sharma wrote:
-> > Remove handle_changed_spte_dirty_log() as there is no code flow which
-> > sets leaf SPTE writable and hit this path.
->
-> Heh, way too vague again. e.g. This needs to explain how make_spte()
-> marks pages are dirty when constructing new SPTEs for the TDP MMU.
 
-Okay, I will try to be more detailed in the next version.
+--m0n7JpZfETbh6abr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Hey Anup, Palmer,
+
+On Fri, Feb 03, 2023 at 05:31:01PM +0530, Anup Patel wrote:
+> On Fri, Feb 3, 2023 at 5:54 AM Palmer Dabbelt <palmer@dabbelt.com> wrote:
+> >
+> > On Fri, 27 Jan 2023 23:27:32 PST (-0800), apatel@ventanamicro.com wrote:
+> > > We have two extension names for AIA ISA support: Smaia (M-mode AIA CS=
+Rs)
+> > > and Ssaia (S-mode AIA CSRs).
+> >
+> > This has pretty much the same problem that we had with the other
+> > AIA-related ISA string patches, where there's that ambiguity with the
+> > non-ratified chapters.  IIRC when this came up in GCC the rough idea was
+> > to try and document that we're going to interpret the standard ISA
+> > strings that way, but now that we're doing custom ISA extensions it
+> > seems saner to just define on here that removes the ambiguity.
+> >
+> > I just sent
+> > <https://lore.kernel.org/r/20230203001201.14770-1-palmer@rivosinc.com/>
+> > which documents that.
+>=20
+> I am not sure why you say that these are custom extensions.
+>=20
+> Multiple folks have clarified that both Smaia and Ssaia are frozen
+> ISA extensions as-per RVI process. The individual chapters which
+> are in the draft state have nothing to do with Smaia and Ssaia CSRs.
+>=20
+> Please refer:
+> https://github.com/riscv/riscv-aia/pull/36
+> https://lists.riscv.org/g/tech-aia/message/336
+> https://lists.riscv.org/g/tech-aia/message/337
+
+All of these links seem to discuss the draft chapters somehow being
+incompatible with the non-draft ones. I would very expect that that,
+as pointed out in several places there, that the draft chapters
+finalisation would not lead to meaningful (and incompatible!) changes
+being made to the non-draft chapters.
+
+Maybe yourself and Palmer are looking at this from different
+perspectives? Looking at his patch from Friday:
+https://lore.kernel.org/linux-riscv/20230203001201.14770-1-palmer@rivosinc.=
+com/
+He specifically mentioned this aspect, as opposed to the aspect that
+your links refer to.
+
+Surely a duo-plic, if that ever comes to be, could be detected from
+compatible strings in DT or w/e - but how do you intend differentiating
+between an implementation of S*aia that contains the IOMMU support in
+Chapter 9 in a finalised form, versus an implementation that may make
+"different decisions" when it comes to that chapter of the spec?
+I thought that would be handled by extension versions, but I am told
+that those are not a thing any more.
+If that's not true, and there'll be a version number that we can pull in
+=66rom a DT and parse which will distinguish between the two, then please
+correct my misunderstanding here!
+
+Thanks,
+Conor.
+
+> > > We extend the ISA string parsing to detect Smaia and Ssaia extensions.
+> > >
+> > > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> > > Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> > > ---
+> > >  arch/riscv/include/asm/hwcap.h | 2 ++
+> > >  arch/riscv/kernel/cpu.c        | 2 ++
+> > >  arch/riscv/kernel/cpufeature.c | 2 ++
+> > >  3 files changed, 6 insertions(+)
+> > >
+> > > diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/=
+hwcap.h
+> > > index 86328e3acb02..341ef30a3718 100644
+> > > --- a/arch/riscv/include/asm/hwcap.h
+> > > +++ b/arch/riscv/include/asm/hwcap.h
+> > > @@ -59,6 +59,8 @@ enum riscv_isa_ext_id {
+> > >       RISCV_ISA_EXT_ZIHINTPAUSE,
+> > >       RISCV_ISA_EXT_SSTC,
+> > >       RISCV_ISA_EXT_SVINVAL,
+> > > +     RISCV_ISA_EXT_SMAIA,
+> > > +     RISCV_ISA_EXT_SSAIA,
+> > >       RISCV_ISA_EXT_ID_MAX
+> > >  };
+> > >  static_assert(RISCV_ISA_EXT_ID_MAX <=3D RISCV_ISA_EXT_MAX);
+> > > diff --git a/arch/riscv/kernel/cpu.c b/arch/riscv/kernel/cpu.c
+> > > index 1b9a5a66e55a..a215ec929160 100644
+> > > --- a/arch/riscv/kernel/cpu.c
+> > > +++ b/arch/riscv/kernel/cpu.c
+> > > @@ -162,6 +162,8 @@ arch_initcall(riscv_cpuinfo_init);
+> > >   *    extensions by an underscore.
+> > >   */
+> > >  static struct riscv_isa_ext_data isa_ext_arr[] =3D {
+> > > +     __RISCV_ISA_EXT_DATA(smaia, RISCV_ISA_EXT_SMAIA),
+> > > +     __RISCV_ISA_EXT_DATA(ssaia, RISCV_ISA_EXT_SSAIA),
+> >
+> > This will conflict with that ISA string refactoring I just merged.  It
+> > should be a pretty mechanical merge conflict, but if you want we can do
+> > a shared tag with the first few patches and I can handle the merge
+> > conflict locally.
+>=20
+> I am planning to send this series as a second PR for Linux-6.3 after your
+> PR (which includes ISA string refactoring) is merged. Is that okay with y=
+ou?
+>=20
+> With that said, it would request you to ACK this patch as well.
+>=20
+> >
+> > >       __RISCV_ISA_EXT_DATA(sscofpmf, RISCV_ISA_EXT_SSCOFPMF),
+> > >       __RISCV_ISA_EXT_DATA(sstc, RISCV_ISA_EXT_SSTC),
+> > >       __RISCV_ISA_EXT_DATA(svinval, RISCV_ISA_EXT_SVINVAL),
+> > > diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufe=
+ature.c
+> > > index 93e45560af30..3c5b51f519d5 100644
+> > > --- a/arch/riscv/kernel/cpufeature.c
+> > > +++ b/arch/riscv/kernel/cpufeature.c
+> > > @@ -228,6 +228,8 @@ void __init riscv_fill_hwcap(void)
+> > >                               SET_ISA_EXT_MAP("zihintpause", RISCV_IS=
+A_EXT_ZIHINTPAUSE);
+> > >                               SET_ISA_EXT_MAP("sstc", RISCV_ISA_EXT_S=
+STC);
+> > >                               SET_ISA_EXT_MAP("svinval", RISCV_ISA_EX=
+T_SVINVAL);
+> > > +                             SET_ISA_EXT_MAP("smaia", RISCV_ISA_EXT_=
+SMAIA);
+> > > +                             SET_ISA_EXT_MAP("ssaia", RISCV_ISA_EXT_=
+SSAIA);
+> > >                       }
+> > >  #undef SET_ISA_EXT_MAP
+> > >               }
+>=20
+> Thanks,
+> Anup
+
+--m0n7JpZfETbh6abr
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCY+KS0wAKCRB4tDGHoIJi
+0vYeAQDID5gy1NNsVol0uOM4K67baVkasU31cYZaNQ0VNxM0gQD+OzIE9sYy8CY/
+keBJVPVev2OwtuUzoEEyRZuB12t4fw0=
+=V2HQ
+-----END PGP SIGNATURE-----
+
+--m0n7JpZfETbh6abr--
