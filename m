@@ -2,182 +2,258 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C728968D35B
-	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 10:57:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EF8A068D370
+	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 11:01:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231756AbjBGJ5B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 04:57:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57586 "EHLO
+        id S231912AbjBGKBD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 05:01:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231743AbjBGJ4i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 04:56:38 -0500
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C70283755B
-        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 01:56:35 -0800 (PST)
-Received: by mail-pl1-x62b.google.com with SMTP id v23so15123222plo.1
-        for <kvm@vger.kernel.org>; Tue, 07 Feb 2023 01:56:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=16iMGPpvEnuS3c0dPnPwj+7kUcc1R6qNdww8oitMdu0=;
-        b=zHrBCSuS7vuO+wfhPSy2R5mWkU98Ej4EbPIAJYMtSwYNE30RsbPiI+ZFGYmu4Oh+eu
-         77Q25J5zQOyPpTHhgUjRAyyI5bBkU6cFvu3C+0xrs9wbB92eXwLU8O8brG/hGDgX8OjH
-         osDZX8HSyVZcMPP3MFU31U0bjQOA3PFMcEAaWiuoJL1aYSmLFsVKV+egZJgSSMqBFFA5
-         VJhWU+0UmEyci/qbuEpkE38+5UXioseArWBvqUoJqDEgQOHi/Z7bOASwjcQayR/50chH
-         952IJrB5nYxEuTSp8MH074s6vMkfHodrGe0rGpXr+aumBVb2SXStE+Cl5deQRecnJBDp
-         XfAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=16iMGPpvEnuS3c0dPnPwj+7kUcc1R6qNdww8oitMdu0=;
-        b=Jt6v99axVZassy2fRm6boghn7IJDc02d3ZNfkSSgsiU811Fd63bNE3R7Sm/zNyhZoK
-         S9QrWx3sPMjyS+B9LHu2KCdVVI3QnhorkX0b5wwrFVsIvUyls2bhWOx+UclwpRLrcxwk
-         zKOf4cNd6cjG1f3YcAwxouGY34hoJVG3hydnUpXneAbn7pCdXO5PfB4Af934HnfvV84J
-         0xCv+ZQ+2PDCa4fnqMYutyDwtdkq8CP+WFrmJ3Y4zcVfJVUA/mo9Bs4EYC+YrhNAd639
-         IMV+p0Mt1/Ml9/xUeA/mThqYkZrXSH/YiVyDZp05f4sClVXm1YZCbVuH7OLCuXcM79F5
-         AWxQ==
-X-Gm-Message-State: AO0yUKUsunsFr06Qm6cIRi+orlxRZxDPIWOVmsWqZ6bqt2tQJZPVttJ2
-        xoH9b1zFNn6OGmonNZiAKlRFpFcASOPGbuCq
-X-Google-Smtp-Source: AK7set+CURig+ktH3WlV7EnqzFklFbVOAZwjjFNFVrszT7hj2WkS9Lx/69A8CjK1ABaYaHx6Rftt6g==
-X-Received: by 2002:a17:902:f2cc:b0:199:2932:6175 with SMTP id h12-20020a170902f2cc00b0019929326175mr1993161plc.20.1675763794923;
-        Tue, 07 Feb 2023 01:56:34 -0800 (PST)
-Received: from atishp.ba.rivosinc.com ([66.220.2.162])
-        by smtp.gmail.com with ESMTPSA id w8-20020a1709027b8800b0019602b2c00csm4030598pll.175.2023.02.07.01.56.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Feb 2023 01:56:34 -0800 (PST)
-From:   Atish Patra <atishp@rivosinc.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Atish Patra <atishp@rivosinc.com>,
-        Anup Patel <anup@brainfault.org>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        linux-riscv@lists.infradead.org,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>
-Subject: [PATCH v6 8/8] RISC-V: KVM: Increment firmware pmu events
-Date:   Tue,  7 Feb 2023 01:55:29 -0800
-Message-Id: <20230207095529.1787260-9-atishp@rivosinc.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230207095529.1787260-1-atishp@rivosinc.com>
-References: <20230207095529.1787260-1-atishp@rivosinc.com>
+        with ESMTP id S231829AbjBGKAh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 05:00:37 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 186047EE7
+        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 02:00:20 -0800 (PST)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31790YIF013189;
+        Tue, 7 Feb 2023 10:00:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=7hkDNQFzrXqgdOpBCNX1R6HlLeqMSdGYKI3nrnddJfA=;
+ b=bPwXFM5E0ppH7pUGmB4oto5WqbZywqf4X0imEY6ql82CfUtkt9fTRPMoO2HQcQ60Tj6S
+ //J2iLOk36LJgi169Czj/06gXyckCHZ4WIkb14olBk6ems1KXuQ7TT7p2sLX6qN68egH
+ F+a3j9Zm3896ivQs2yR6JJnsJkkcLp4+Psk+ePUL3UVd4z+xRSkeY/HfxO1Rt36sc9TZ
+ ND6p0Hh14LyXzcAYk/WJI9x80dYAABvQ+7c0Io+Ylzq9ac9ARXsVn56CFRXiCLQV0mR5
+ oTID9PBkIP9jIP1X61seD/unYjd8nkl6Tx81vlZns3VVsuflnlDK8hCIkmjeuqQf7hOs FQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nkkmuhgch-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Feb 2023 10:00:07 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3179xDdJ027084;
+        Tue, 7 Feb 2023 10:00:07 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nkkmuhgba-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Feb 2023 10:00:07 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31775Lua021137;
+        Tue, 7 Feb 2023 09:59:33 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3nhf06ke6a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Feb 2023 09:59:33 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3179xTKh53150064
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 7 Feb 2023 09:59:30 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C68D020043;
+        Tue,  7 Feb 2023 09:59:29 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 62C8D20040;
+        Tue,  7 Feb 2023 09:59:29 +0000 (GMT)
+Received: from [9.152.224.241] (unknown [9.152.224.241])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue,  7 Feb 2023 09:59:29 +0000 (GMT)
+Message-ID: <f5c6b04a-0faa-ba36-9019-468662b9fbb2@linux.ibm.com>
+Date:   Tue, 7 Feb 2023 10:59:29 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH v15 06/11] s390x/cpu topology: interception of PTF
+ instruction
+Content-Language: en-US
+To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+References: <20230201132051.126868-1-pmorel@linux.ibm.com>
+ <20230201132051.126868-7-pmorel@linux.ibm.com>
+ <5c15ccde659a9849ab3529e08f5e1278508406c8.camel@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <5c15ccde659a9849ab3529e08f5e1278508406c8.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: jjM6hP-2bkB90CsR_RC6OfDXj10sQR4o
+X-Proofpoint-ORIG-GUID: FKyWqLecR5BFEXdPn7NMUEHa0eRGcgat
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-02-07_02,2023-02-06_03,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 clxscore=1015 suspectscore=0 mlxlogscore=999
+ lowpriorityscore=0 mlxscore=0 spamscore=0 adultscore=0 phishscore=0
+ malwarescore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2212070000 definitions=main-2302070085
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM supports firmware events now. Invoke the firmware event increment
-function from appropriate places.
 
-Reviewed-by: Anup Patel <anup@brainfault.org>
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-Signed-off-by: Atish Patra <atishp@rivosinc.com>
----
- arch/riscv/kvm/tlb.c              | 4 ++++
- arch/riscv/kvm/vcpu_sbi_replace.c | 7 +++++++
- 2 files changed, 11 insertions(+)
 
-diff --git a/arch/riscv/kvm/tlb.c b/arch/riscv/kvm/tlb.c
-index 309d79b..b797f7c 100644
---- a/arch/riscv/kvm/tlb.c
-+++ b/arch/riscv/kvm/tlb.c
-@@ -181,6 +181,7 @@ void kvm_riscv_local_tlb_sanitize(struct kvm_vcpu *vcpu)
- 
- void kvm_riscv_fence_i_process(struct kvm_vcpu *vcpu)
- {
-+	kvm_riscv_vcpu_pmu_incr_fw(vcpu, SBI_PMU_FW_FENCE_I_RCVD);
- 	local_flush_icache_all();
- }
- 
-@@ -264,15 +265,18 @@ void kvm_riscv_hfence_process(struct kvm_vcpu *vcpu)
- 						d.addr, d.size, d.order);
- 			break;
- 		case KVM_RISCV_HFENCE_VVMA_ASID_GVA:
-+			kvm_riscv_vcpu_pmu_incr_fw(vcpu, SBI_PMU_FW_HFENCE_VVMA_ASID_RCVD);
- 			kvm_riscv_local_hfence_vvma_asid_gva(
- 						READ_ONCE(v->vmid), d.asid,
- 						d.addr, d.size, d.order);
- 			break;
- 		case KVM_RISCV_HFENCE_VVMA_ASID_ALL:
-+			kvm_riscv_vcpu_pmu_incr_fw(vcpu, SBI_PMU_FW_HFENCE_VVMA_ASID_RCVD);
- 			kvm_riscv_local_hfence_vvma_asid_all(
- 						READ_ONCE(v->vmid), d.asid);
- 			break;
- 		case KVM_RISCV_HFENCE_VVMA_GVA:
-+			kvm_riscv_vcpu_pmu_incr_fw(vcpu, SBI_PMU_FW_HFENCE_VVMA_RCVD);
- 			kvm_riscv_local_hfence_vvma_gva(
- 						READ_ONCE(v->vmid),
- 						d.addr, d.size, d.order);
-diff --git a/arch/riscv/kvm/vcpu_sbi_replace.c b/arch/riscv/kvm/vcpu_sbi_replace.c
-index 38fa4c0..7c4d5d3 100644
---- a/arch/riscv/kvm/vcpu_sbi_replace.c
-+++ b/arch/riscv/kvm/vcpu_sbi_replace.c
-@@ -11,6 +11,7 @@
- #include <linux/kvm_host.h>
- #include <asm/sbi.h>
- #include <asm/kvm_vcpu_timer.h>
-+#include <asm/kvm_vcpu_pmu.h>
- #include <asm/kvm_vcpu_sbi.h>
- 
- static int kvm_sbi_ext_time_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
-@@ -24,6 +25,7 @@ static int kvm_sbi_ext_time_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 		return 0;
- 	}
- 
-+	kvm_riscv_vcpu_pmu_incr_fw(vcpu, SBI_PMU_FW_SET_TIMER);
- #if __riscv_xlen == 32
- 	next_cycle = ((u64)cp->a1 << 32) | (u64)cp->a0;
- #else
-@@ -55,6 +57,7 @@ static int kvm_sbi_ext_ipi_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 		return 0;
- 	}
- 
-+	kvm_riscv_vcpu_pmu_incr_fw(vcpu, SBI_PMU_FW_IPI_SENT);
- 	kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
- 		if (hbase != -1UL) {
- 			if (tmp->vcpu_id < hbase)
-@@ -65,6 +68,7 @@ static int kvm_sbi_ext_ipi_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 		ret = kvm_riscv_vcpu_set_interrupt(tmp, IRQ_VS_SOFT);
- 		if (ret < 0)
- 			break;
-+		kvm_riscv_vcpu_pmu_incr_fw(tmp, SBI_PMU_FW_IPI_RCVD);
- 	}
- 
- 	return ret;
-@@ -87,6 +91,7 @@ static int kvm_sbi_ext_rfence_handler(struct kvm_vcpu *vcpu, struct kvm_run *run
- 	switch (funcid) {
- 	case SBI_EXT_RFENCE_REMOTE_FENCE_I:
- 		kvm_riscv_fence_i(vcpu->kvm, hbase, hmask);
-+		kvm_riscv_vcpu_pmu_incr_fw(vcpu, SBI_PMU_FW_FENCE_I_SENT);
- 		break;
- 	case SBI_EXT_RFENCE_REMOTE_SFENCE_VMA:
- 		if (cp->a2 == 0 && cp->a3 == 0)
-@@ -94,6 +99,7 @@ static int kvm_sbi_ext_rfence_handler(struct kvm_vcpu *vcpu, struct kvm_run *run
- 		else
- 			kvm_riscv_hfence_vvma_gva(vcpu->kvm, hbase, hmask,
- 						  cp->a2, cp->a3, PAGE_SHIFT);
-+		kvm_riscv_vcpu_pmu_incr_fw(vcpu, SBI_PMU_FW_HFENCE_VVMA_SENT);
- 		break;
- 	case SBI_EXT_RFENCE_REMOTE_SFENCE_VMA_ASID:
- 		if (cp->a2 == 0 && cp->a3 == 0)
-@@ -104,6 +110,7 @@ static int kvm_sbi_ext_rfence_handler(struct kvm_vcpu *vcpu, struct kvm_run *run
- 						       hbase, hmask,
- 						       cp->a2, cp->a3,
- 						       PAGE_SHIFT, cp->a4);
-+		kvm_riscv_vcpu_pmu_incr_fw(vcpu, SBI_PMU_FW_HFENCE_VVMA_ASID_SENT);
- 		break;
- 	case SBI_EXT_RFENCE_REMOTE_HFENCE_GVMA:
- 	case SBI_EXT_RFENCE_REMOTE_HFENCE_GVMA_VMID:
+On 2/6/23 19:34, Nina Schoetterl-Glausch wrote:
+> On Wed, 2023-02-01 at 14:20 +0100, Pierre Morel wrote:
+>> When the host supports the CPU topology facility, the PTF
+>> instruction with function code 2 is interpreted by the SIE,
+>> provided that the userland hypervizor activates the interpretation
+>> by using the KVM_CAP_S390_CPU_TOPOLOGY KVM extension.
+>>
+>> The PTF instructions with function code 0 and 1 are intercepted
+>> and must be emulated by the userland hypervizor.
+>>
+>> During RESET all CPU of the configuration are placed in
+>> horizontal polarity.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   include/hw/s390x/s390-virtio-ccw.h |   6 ++
+>>   target/s390x/cpu.h                 |   1 +
+>>   hw/s390x/cpu-topology.c            | 103 +++++++++++++++++++++++++++++
+>>   target/s390x/cpu-sysemu.c          |  14 ++++
+>>   target/s390x/kvm/kvm.c             |  11 +++
+>>   5 files changed, 135 insertions(+)
+>>
+> [...]
+> 
+>> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+>> index cf63f3dd01..1028bf4476 100644
+>> --- a/hw/s390x/cpu-topology.c
+>> +++ b/hw/s390x/cpu-topology.c
+>> @@ -85,16 +85,104 @@ static void s390_topology_init(MachineState *ms)
+>>       QTAILQ_INSERT_HEAD(&s390_topology.list, entry, next);
+>>   }
+>>   
+>> +/**
+>> + * s390_topology_set_cpus_polarity:
+>> + * @polarity: polarity requested by the caller
+>> + *
+>> + * Set all CPU entitlement according to polarity and
+>> + * dedication.
+>> + * Default vertical entitlement is POLARITY_VERTICAL_MEDIUM as
+>> + * it does not require host modification of the CPU provisioning
+>> + * until the host decide to modify individual CPU provisioning
+>> + * using QAPI interface.
+>> + * However a dedicated vCPU will have a POLARITY_VERTICAL_HIGH
+>> + * entitlement.
+>> + */
+>> +static void s390_topology_set_cpus_polarity(int polarity)
+> 
+> Since you set the entitlement field I'd prefer _set_cpus_entitlement or similar.
+
+OK if you prefer.
+
+> 
+>> +{
+>> +    CPUState *cs;
+>> +
+>> +    CPU_FOREACH(cs) {
+>> +        if (polarity == POLARITY_HORIZONTAL) {
+>> +            S390_CPU(cs)->env.entitlement = 0;
+>> +        } else if (S390_CPU(cs)->env.dedicated) {
+>> +            S390_CPU(cs)->env.entitlement = POLARITY_VERTICAL_HIGH;
+>> +        } else {
+>> +            S390_CPU(cs)->env.entitlement = POLARITY_VERTICAL_MEDIUM;
+>> +        }
+>> +    }
+>> +}
+>> +
+> [...]
+>>   
+>>   /**
+>> @@ -137,6 +225,21 @@ static void s390_topology_cpu_default(S390CPU *cpu, Error **errp)
+>>                             (smp->books * smp->sockets * smp->cores)) %
+>>                            smp->drawers;
+>>       }
+> 
+> Why are the changes below in this patch?
+
+Because before thos patch we have only horizontal polarization.
+
+> 
+>> +
+>> +    /*
+>> +     * Machine polarity is set inside the global s390_topology structure.
+>> +     * In the case the polarity is set as horizontal set the entitlement
+
+Sorry here an error in the comment should be :
+"In the case the polarity is NOT set as horizontal..."
+
+>> +     * to POLARITY_VERTICAL_MEDIUM which is the better equivalent when
+>> +     * machine polarity is set to vertical or POLARITY_VERTICAL_HIGH if
+>> +     * the vCPU is dedicated.
+>> +     */
+>> +    if (s390_topology.polarity && !env->entitlement) {
+> 
+> It'd be more readable if you compared against enum values by name.
+
+Right, I will change this to
+
+     if (s390_topology.polarity != S390_POLARITY_HORIZONTAL &&
+         env->entitlement == S390_ENTITLEMENT_UNSET) {
+
+> 
+> I don't see why you check s390_topology.polarity. If it is horizontal
+> then the value of the entitlement doesn't matter at all, so you can set it
+> to whatever.
+
+Right, that is why it is done only for vertical polarization (sorry for 
+the wrong comment)
+
+> All you want to do is enforce dedicated -> VERTICAL_HIGH, right?
+> So why don't you just add
+> 
+> +    if (cpu->env.dedicated && cpu->env.entitlement != POLARITY_VERTICAL_HIGH) {
+> +        error_setg(errp, "A dedicated cpu implies high entitlement");
+> +        return;
+> +    } >
+> to s390_topology_check?
+
+Here it is to set the default in the case the values are not provided.
+
+But where you are right is that I should add a verification to the check 
+function.
+
+> 
+>> +        if (env->dedicated) {
+>> +            env->entitlement = POLARITY_VERTICAL_HIGH;
+>> +        } else {
+>> +            env->entitlement = POLARITY_VERTICAL_MEDIUM;
+>> +        }
+> 
+> If it is horizontal, then setting the entitlement is pointless as it will be
+> reset to medium on PTF.
+
+That is why the polarity is tested (sorry for the bad comment)
+
+> So the current polarization is vertical and a cpu is being hotplugged,
+> but setting the entitlement of the cpu being added is also pointless, because
+> it's determined by the dedication. That seems weird.
+
+No it is not determined by the dedication, if there is no dedication the 
+3 vertical values are possible.
+
+
+Regards,
+Pierre
+
+> 
+>> +    }
+>>   }
+>>   
+> 
+> [...]
+
 -- 
-2.25.1
-
+Pierre Morel
+IBM Lab Boeblingen
