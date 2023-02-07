@@ -2,115 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B79668DEE9
-	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 18:30:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 00F3268DEFC
+	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 18:33:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231509AbjBGRaN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 12:30:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35676 "EHLO
+        id S231733AbjBGRc6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 12:32:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231222AbjBGRaL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 12:30:11 -0500
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 669BB13D75
-        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 09:30:10 -0800 (PST)
-Received: by mail-yb1-xb2c.google.com with SMTP id n139so2164839ybf.11
-        for <kvm@vger.kernel.org>; Tue, 07 Feb 2023 09:30:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=XM1oyJ1Xk37+9GYr1vds8MZHsHc1FKZ95GJ9oGmtxWY=;
-        b=K0Zr8VVi+jFwfkvJYPKANRIg222mVBuPgaxu7uKvSq8HB2OboSpFdlIYeryEgNRArV
-         P4fMq58foV8cI5QLItzuzSCYyVi6V071+POv73rVUbxMvvGQ2PZozP+gqxW++KChWNI6
-         dUQ1TuF2CGIaWZqvNUWBLmKRQS4dI+xfnuDUYOfdEK0w8/lTYnooxNoVZC8bwUi++MEi
-         4nzry92VK00zLyX7H+S1c6pE0KEer0fK0qNLw8vI1wCCU4CAyi9CXayV5kW495T807Yp
-         Li/L8xF5I3zfIBVweQenCnTLGsmI9M3fwZ2+AfYkjZpDonRVdsYFxUG0RtvjM00K1ndZ
-         3mBQ==
+        with ESMTP id S231804AbjBGRcw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 12:32:52 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A44031EBFC
+        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 09:31:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675791118;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7Emp7X43Gv6S0iQe88Vb8e/Pvs1J6U0weHKSQt4vkRo=;
+        b=jBzMds5W05kdttiCMQ0WEGGWQ/ApU54R8jZ2eiJohXFLzudZIDw2WI5MpSUCJvbIeJInAO
+        GIwfpChPnvXC+7G1k0BN7LxxW1vBo7ZvCyCtEgn2CsOPEtBvCcccxodbDUUOryGMmI4lOv
+        m/sY87gRTt8L0Q/CrUOHSpQOYr0zrRg=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-400-06qe-gkEO_avYLLdk9s3kA-1; Tue, 07 Feb 2023 12:31:57 -0500
+X-MC-Unique: 06qe-gkEO_avYLLdk9s3kA-1
+Received: by mail-qk1-f200.google.com with SMTP id x7-20020a05620a098700b007242aa494ddso10253888qkx.19
+        for <kvm@vger.kernel.org>; Tue, 07 Feb 2023 09:31:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=XM1oyJ1Xk37+9GYr1vds8MZHsHc1FKZ95GJ9oGmtxWY=;
-        b=nJGJADUmk4Bjy+sqDBxGjXWmXe8LW3FEBOrUpvF6cUJivrz34oAyWszKdBWsJfl4ip
-         1093f/3axVukfBPOSDU217mWV3Rvim9shA1Fg0G9XQS4PALpYAP4t6buV8pmlrVPanuc
-         Api8EGEGVmvfIYKCwuEfDkU8mRXX5x62G/K2iVMaitE61zpxHgplie/NGQMZ9YsXibYM
-         aKJg6cJGXyOaWpA6bFKLsvdUpBt/KJrCcGfzhxY+8EzaY/CQJmgPcbaIZ49QBtJBjTg1
-         5qmgIcY99M/IO/kHXDXLfvTo975+U2OcK4w7S29LECNw2Q73LIjoMD6rBXZskv5SbwvA
-         SJKQ==
-X-Gm-Message-State: AO0yUKVzhfvD9wrWtHmt+flQoQKsAatjhT7hmyV5sIDm2rycwx4IDNCi
-        8O2n/qzQCbyY12zWZPIx0GI12/Ay2MzvkK2CUfQMZA==
-X-Google-Smtp-Source: AK7set+JikWPdGnJpFMxsCIKsCvblzLW2aRR7/MpG1e5FuSwv+T+/YcUHYSBHITiZBzt0bYpV5RsmXkQfj0J7RO5xsU=
-X-Received: by 2002:a25:e907:0:b0:801:33b9:d9ac with SMTP id
- n7-20020a25e907000000b0080133b9d9acmr286026ybd.2.1675791009330; Tue, 07 Feb
- 2023 09:30:09 -0800 (PST)
+        bh=7Emp7X43Gv6S0iQe88Vb8e/Pvs1J6U0weHKSQt4vkRo=;
+        b=o+A7pDl0I9joaMVTzPMFY7Y6b5q43PdNzWZ/0XVpMV0wc77L7nCioiEdQt0b6m98H8
+         a2G2M1cErzR/Lqk+5KUSK3UmN0ZEiyPlvAyxhId+rcJurt7F0Y04OFrH5PhXU8XYnrtd
+         JQtQqWr0VxjaRu6f4825qz6OJDfruuA6irhOrD8qafHARGwkQr2/cFtLTU6OujadPU4a
+         rgoqfsixFyICxRLY16lrjerkXEjtbfBFKJF9657JtVvQwAzbAZtygrM0cdcCtkmH9fWw
+         u9kl9Qjm5MzSH2jzBGjw0YVSv27c+Fm6KDCh+FeyzMmMx3RwydsDC+OZUjkbkW++R8nE
+         /dsQ==
+X-Gm-Message-State: AO0yUKXkzsyULufW42BL18e3MGLlGK0N66nwBi7NDPO/hEL2CrsnWOSI
+        RZ9azhQrA4p/wv0yXtnASipDm/jyVB7R0a4oZ4V0Uulj2xh87Ib9TN60AzEkGu/VLSLNcv3K4Ak
+        DFKQ70RNOO6Vx
+X-Received: by 2002:ac8:59c1:0:b0:3b9:b2ba:9b3d with SMTP id f1-20020ac859c1000000b003b9b2ba9b3dmr6808796qtf.54.1675791117209;
+        Tue, 07 Feb 2023 09:31:57 -0800 (PST)
+X-Google-Smtp-Source: AK7set9rcKbwD3WF2oVGbNOSRg/intgOsW2YkNms5QyLWSOwVDl4uaTl+11DeZ2v3/KeMawWamox8w==
+X-Received: by 2002:ac8:59c1:0:b0:3b9:b2ba:9b3d with SMTP id f1-20020ac859c1000000b003b9b2ba9b3dmr6808753qtf.54.1675791116759;
+        Tue, 07 Feb 2023 09:31:56 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id bj29-20020a05620a191d00b0071b158849e5sm10008223qkb.46.2023.02.07.09.31.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Feb 2023 09:31:56 -0800 (PST)
+Message-ID: <45ea9f30-9196-88ad-09bb-b72204cb73c8@redhat.com>
+Date:   Tue, 7 Feb 2023 18:31:47 +0100
 MIME-Version: 1.0
-References: <20230203192822.106773-1-vipinsh@google.com> <20230203192822.106773-3-vipinsh@google.com>
- <CANgfPd8en316O=iTijS5jseM8_eCYm822iwT2d-7Q+jhJBy+HQ@mail.gmail.com>
-In-Reply-To: <CANgfPd8en316O=iTijS5jseM8_eCYm822iwT2d-7Q+jhJBy+HQ@mail.gmail.com>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Tue, 7 Feb 2023 09:29:33 -0800
-Message-ID: <CAHVum0d8i=pyiT57a4UHuk33Z5UdKxxx3ApPAqFGxR-Mp3sn7Q@mail.gmail.com>
-Subject: Re: [Patch v2 2/5] KVM: x86/mmu: Optimize SPTE change flow for clear-dirty-log
-To:     Ben Gardon <bgardon@google.com>
-Cc:     seanjc@google.com, pbonzini@redhat.com, dmatlack@google.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Reply-To: eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v4 6/6] arm: pmu: Fix
+ test_overflow_interrupt()
+Content-Language: en-US
+To:     Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, andrew.jones@linux.dev
+Cc:     maz@kernel.org, alexandru.elisei@arm.com, oliver.upton@linux.dev,
+        reijiw@google.com
+References: <20230126165351.2561582-1-ricarkol@google.com>
+ <20230126165351.2561582-7-ricarkol@google.com>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20230126165351.2561582-7-ricarkol@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 6, 2023 at 2:06 PM Ben Gardon <bgardon@google.com> wrote:
->
-> On Fri, Feb 3, 2023 at 11:28 AM Vipin Sharma <vipinsh@google.com> wrote:
-> > diff --git a/arch/x86/kvm/mmu/tdp_iter.h b/arch/x86/kvm/mmu/tdp_iter.h
-> > index 30a52e5e68de..21046b34f94e 100644
-> > --- a/arch/x86/kvm/mmu/tdp_iter.h
-> > +++ b/arch/x86/kvm/mmu/tdp_iter.h
-> > @@ -121,4 +121,17 @@ void tdp_iter_start(struct tdp_iter *iter, struct kvm_mmu_page *root,
-> >  void tdp_iter_next(struct tdp_iter *iter);
-> >  void tdp_iter_restart(struct tdp_iter *iter);
-> >
-> > +static inline u64 kvm_tdp_mmu_clear_spte_bit(struct tdp_iter *iter, u64 mask)
-> > +{
-> > +       atomic64_t *sptep;
-> > +
-> > +       if (kvm_tdp_mmu_spte_has_volatile_bits(iter->old_spte, iter->level)) {
-> > +               sptep = (atomic64_t *)rcu_dereference(iter->sptep);
-> > +               return (u64)atomic64_fetch_and(~mask, sptep);
-> > +       }
-> > +
-> > +       __kvm_tdp_mmu_write_spte(iter->sptep, iter->old_spte & ~mask);
-> > +       return iter->old_spte;
-> > +}
-> > +
->
-> If you do end up sending another version of the series and feel like
-> breaking up this patch, you could probably split this part out since
-> the change to how we set the SPTE and how we handle that change are
-> somewhat independent. I like the switch to atomic64_fetch_and though.
-> No idea if it's faster, but I would believe it could be.
+Hi Ricardo,
 
-David explained in his email why it is not independent.
-
+On 1/26/23 17:53, Ricardo Koller wrote:
+> test_overflow_interrupt() (from arm/pmu.c) has a test that passes
+> because the previous test leaves the state needed to pass: the
+> overflow status register with the expected bits. The test (that should
+> fail) does not enable the PMU after mem_access_loop(), which clears
+> the PMCR, and before writing into the software increment register.
 >
-> Totally optional, but there's currently no validation on the mask.
-> Maybe we're only calling this in one place, but it might be worth
-> clarifying the limits (if any) on what bits can be set in the mask. I
-> don't think there necessarily need to be limits as of this commit, but
-> the handling around this function where it's called here would
-> obviously not be sufficient if the mask were -1UL or something.
+> Fix by clearing the previous test state (pmovsclr_el0) and by enabling
+> the PMU before the sw_incr test.
 >
+> Fixes: 4f5ef94f3aac ("arm: pmu: Test overflow interrupts")
+> Reported-by: Reiji Watanabe <reijiw@google.com>
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-I cannot think of any specific mask to be useful here. Let us keep it
-as it is, we can revisit this API if there is a need to add a mask in
-future. If someone sends -1UL then it will be on them on how they are
-using the API.
+Thank you for the fix!
+
+Eric
+
+> ---
+>  arm/pmu.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/arm/pmu.c b/arm/pmu.c
+> index 1e93ea2..f91b5ca 100644
+> --- a/arm/pmu.c
+> +++ b/arm/pmu.c
+> @@ -914,10 +914,15 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
+>  
+>  	write_regn_el0(pmevcntr, 0, pre_overflow);
+>  	write_regn_el0(pmevcntr, 1, pre_overflow);
+> +	write_sysreg(ALL_SET_32, pmovsclr_el0);
+>  	write_sysreg(ALL_SET_32, pmintenset_el1);
+>  	isb();
+>  
+>  	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+> +
+> +	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+> +	isb();
+> +
+>  	for (i = 0; i < 100; i++)
+>  		write_sysreg(0x3, pmswinc_el0);
+>  
+
