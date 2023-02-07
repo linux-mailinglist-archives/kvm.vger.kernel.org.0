@@ -2,64 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 17C0268DF0C
-	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 18:36:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C154468DF12
+	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 18:37:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231804AbjBGRgN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 12:36:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41472 "EHLO
+        id S231883AbjBGRhh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 12:37:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231847AbjBGRgH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 12:36:07 -0500
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F09663A846
-        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 09:36:00 -0800 (PST)
-Received: by mail-ej1-x634.google.com with SMTP id hx15so44455990ejc.11
-        for <kvm@vger.kernel.org>; Tue, 07 Feb 2023 09:36:00 -0800 (PST)
+        with ESMTP id S230480AbjBGRhg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 12:37:36 -0500
+Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 680C9AD0A
+        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 09:37:35 -0800 (PST)
+Received: by mail-yb1-xb2f.google.com with SMTP id u7so3524971ybi.6
+        for <kvm@vger.kernel.org>; Tue, 07 Feb 2023 09:37:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=BZ6y0HfdU+5U+iTOtrcJ4GxWnnDEHocKk/DZG1/+ooM=;
-        b=TwzAwA2xXYZ/V6lNMp/SIYufRe4LwLnRoZESGvbDUn5HMDW4rguxJJMztGKAYjIk3o
-         fG5Q87YAZYLElVMN9eEVvVnE/NCPzsjekAmPFPkOvVm3geVi4p6X8qk1yD27v2n4nGNI
-         IXwR1ODRM1T5hiuZAeygXR//XQCc+d+f5D3iR7RCnG+W+Xs2nT6UOrVabyBUqW7eebOI
-         kSPnLtV/qflRK/KW73RECl5KPD1uRhbhO9lltyFxaz64DrphZkSRpyy2566HwJ82sJRt
-         bx0bM8qKCigg1JYhFI/YlU9kgCJuEUnPqfCgQqWC4AvqkNQR3R99nsSSd5XYyxhsuH2u
-         57ow==
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=adlYRDbst09nC8apj5bbFfvdjr6JdO6HJ9SMhiS3Xgo=;
+        b=bG9lxqfqs5cUwIiTFihJY8ktvBmy2TL5Q8fweKI6pKPiwTq3u8Ymowr3ZWw6oe+UhE
+         KyKlgc5xzLONXKyo/kIAP/jY4iyiq/oBbjC3w/vi6LtsQ+DasJyMAP49WRrUbvjEgExo
+         Qozb8N2gCjm6epASJpoJpWBQBv5GO0nTuwWtOWkTICmIR/S3belPUPmdlnSnup0hct2J
+         irE03NX0MUer3y1JtcMU4T428ymLKHDtKpx0NTgeq3ZM/kAdvvZFEJ1LveU682oMjFAb
+         ceZN7WMfJ9ERq5nV+rhuyI1bTFxhahBebJ00RuVHwgd9qUCDVLCoX03ga9UczlflEyBv
+         o8hQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BZ6y0HfdU+5U+iTOtrcJ4GxWnnDEHocKk/DZG1/+ooM=;
-        b=3XCEXz8KK8SZk4BJZi7qhpQL4t2fJqni75jDsNC9w3xvaNk6t7DOAAW2hsxpUX0Omq
-         o6zDYod2dhaDnxbHi9U5Hp4sZVeewMnVwz8AIzSfeyG+FVRzzVDqhC0oVKuM9IVGwWNb
-         RvHJZotiKWchgUCZtOsJUSTd5YqzCKeqG+sAskAxaRRAhgpgyb2InqxTAmWAyJ5OhTqc
-         4YW9bdbUJAXC/KgXjMegxjvmUJQxepSnoCOmBNPnvKufa2QOlfrrC0QoMb1b8u3a9Mig
-         Pe8s4v4Z3gzseZrwlv+0/bqy/Nigg2cXJJRyno+aFMz5JZNudMfW8Z/KE7Ohf2KsP72k
-         snVw==
-X-Gm-Message-State: AO0yUKXSjFJIH+96huOmmB800ByXWl5g7zgSvONtMkq4h2z2QenXVV2f
-        Y4vg/3xp102sRuQ0KJo8/Zg8k9SpVMKT/Ft7p1J4JQ==
-X-Google-Smtp-Source: AK7set+1X+nDNSzXfWLcK/qx4Ts9Ui6/V+Vi26x3FAphUtadBkrkCKKfEKwMyQipsGnI8EZHnBdV0FsGtRhAhGiGk4Y=
-X-Received: by 2002:a17:906:3ad1:b0:884:8380:20db with SMTP id
- z17-20020a1709063ad100b00884838020dbmr891330ejd.301.1675791359418; Tue, 07
- Feb 2023 09:35:59 -0800 (PST)
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=adlYRDbst09nC8apj5bbFfvdjr6JdO6HJ9SMhiS3Xgo=;
+        b=qpozmeJ+G825vB8yQM1QUR37hLiolWrEKz5DKFjdFs8jJzO282zJar/NxTUxFgnsG5
+         huUWevXhvr19eaggKmj3alLXpCBlKbjPgddiHy6t/ruDY8wOcLDpVN8V5r2NqOQuG12y
+         LULtLVcgQ6OauJ5iRZG9eCq254jdp8gQnL8VGpmSDaD4cJmbAfgKgUOdyAj+VaYpSPwy
+         mR6oQqbnPLlv2dpQvb+TseZaKyYD++xsVRwztF5pT7rY2LVZIjxNiUuxyZOGKzTlHLzo
+         15daWvZT5LnbW5jzikDY7OUKXnBzAyzS5RT24vbKK8R1mG6/WGW582RDdhaCKZkRTYDD
+         k0Hg==
+X-Gm-Message-State: AO0yUKU6FUjM4Gz3AbDF+vVHOFXROBK8vTP33BKD+ieMmxqG9dfvfO74
+        EadvwNx/kMm2yOSGne7IC/VjHLsvxUG7zDHOef/LUA==
+X-Google-Smtp-Source: AK7set8B979pZvKpTq9FfmtwVgpZSHrm907YAyIRwnDmqapDxV4NJoyXpJWakWdhEHahGCabqP8NGLzum/8cNLVJkwU=
+X-Received: by 2002:a25:e907:0:b0:801:33b9:d9ac with SMTP id
+ n7-20020a25e907000000b0080133b9d9acmr287756ybd.2.1675791454409; Tue, 07 Feb
+ 2023 09:37:34 -0800 (PST)
 MIME-Version: 1.0
-From:   Anup Patel <anup@brainfault.org>
-Date:   Tue, 7 Feb 2023 23:05:48 +0530
-Message-ID: <CAAhSdy25NgCY23u=icRgcZpEZzNgJkyEN92KEVL8D-SvUwTBXg@mail.gmail.com>
-Subject: [GIT PULL] KVM/riscv changes for 6.3
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        KVM General <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>
+References: <20230203192822.106773-1-vipinsh@google.com> <20230203192822.106773-3-vipinsh@google.com>
+ <Y+GQNXDlNbJNvDd2@google.com>
+In-Reply-To: <Y+GQNXDlNbJNvDd2@google.com>
+From:   Vipin Sharma <vipinsh@google.com>
+Date:   Tue, 7 Feb 2023 09:36:58 -0800
+Message-ID: <CAHVum0d2dRvNaS+AMqdbF35D05dDQrtZ4TBQ1QOYx6he-Cy6YA@mail.gmail.com>
+Subject: Re: [Patch v2 2/5] KVM: x86/mmu: Optimize SPTE change flow for clear-dirty-log
+To:     David Matlack <dmatlack@google.com>
+Cc:     seanjc@google.com, pbonzini@redhat.com, bgardon@google.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,91 +68,103 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+On Mon, Feb 6, 2023 at 3:41 PM David Matlack <dmatlack@google.com> wrote:
+>
+> On Fri, Feb 03, 2023 at 11:28:19AM -0800, Vipin Sharma wrote:
+> > No need to check all of the conditions in __handle_changed_spte() as
+> > clearing dirty log only involves resetting dirty or writable bit.
+>
+> Channelling Sean: State what the patch does first.
+>
+> >
+> > Make atomic change to dirty or writable bit and mark pfn dirty.
+>
+> This is way too vague. And the old code already did both of these
+> things. What's changed is that the bits are being cleared with an atomic
+> AND and taking advantage of the fact that that avoids needing to deal
+> with changes to volatile bits.
+>
+> Please also explain what effect this has on @record_dirty_log and why it
+> can be opportunistically cleaned up in this commit.
+>
 
-We have the following KVM RISC-V changes for 6.3:
-1) Fix wrong usage of PGDIR_SIZE to check page sizes
-2) Fix privilege mode setting in kvm_riscv_vcpu_trap_redirect()
-3) Redirect illegal instruction traps to guest
-4) SBI PMU support for guest
+Okay, I will try to be better in the next one.
 
-Please pull.
+> > Iteration 3 clear dirty log time: 1.881043086s
+> > Disabling dirty logging time: 2.930387523s
+> > Get dirty log over 3 iterations took 0.006191681s.
+> > (Avg 0.002063893s/iteration)
+> > Clear dirty log over 3 iterations took 6.148156531s. (Avg 2.049385510s/iteration)
+>
+> Can you trim these results to just show the clear times? (assuming none
+> of the rest are relevant)
 
-I will send another PR for 6.3 containing AIA CSR
-virtualization after Palmer has sent his first PR for 6.3
-so that I can resolve conflicts with arch/riscv changes.
-I hope you are okay with this ??
+I was not sure if just showing clear dirty times will be acceptable or
+not. I will update the message to only show clear dirty log time and
+average.
 
-Regards,
-Anup
+>
+> >
+> > +static inline u64 kvm_tdp_mmu_clear_spte_bit(struct tdp_iter *iter, u64 mask)
+> > +{
+>
+> Make "bit" plural as long as the parameter is a raw mask.
+>
+> Also drop "kvm_" since this is not intended to be called outside the TDP
+> MMU. (It'd be nice to make the same cleanup to the read/write
+> functions if you feel like it.)
+>
 
-The following changes since commit 4ec5183ec48656cec489c49f989c508b68b518e3:
+Sounds good.
 
-  Linux 6.2-rc7 (2023-02-05 13:13:28 -0800)
+> > @@ -1678,7 +1665,7 @@ static void clear_dirty_pt_masked(struct kvm *kvm, struct kvm_mmu_page *root,
+> >                                 gfn_t gfn, unsigned long mask, bool wrprot)
+> >  {
+> >       struct tdp_iter iter;
+> > -     u64 new_spte;
+> > +     u64 clear_bits;
+>
+> nit: clear_bit since it's always a single bit?
 
-are available in the Git repository at:
+Yes.
 
-  https://github.com/kvm-riscv/linux.git tags/kvm-riscv-6.3-1
+>
+> >
+> >       rcu_read_lock();
+> >
+> > @@ -1694,18 +1681,22 @@ static void clear_dirty_pt_masked(struct kvm *kvm, struct kvm_mmu_page *root,
+> >               mask &= ~(1UL << (iter.gfn - gfn));
+> >
+> >               if (wrprot || spte_ad_need_write_protect(iter.old_spte)) {
+> > -                     if (is_writable_pte(iter.old_spte))
+> > -                             new_spte = iter.old_spte & ~PT_WRITABLE_MASK;
+> > -                     else
+> > +                     if (!is_writable_pte(iter.old_spte))
+> >                               continue;
+> > +
+> > +                     clear_bits = PT_WRITABLE_MASK;
+> >               } else {
+> > -                     if (iter.old_spte & shadow_dirty_mask)
+> > -                             new_spte = iter.old_spte & ~shadow_dirty_mask;
+> > -                     else
+> > +                     if (!(iter.old_spte & shadow_dirty_mask))
+> >                               continue;
+>
+> You can factor out the continue check now that you have clear_bits. e.g.
+>
+>         if (wrprot || spte_ad_need_write_protect(iter.old_spte))
+>                 clear_bits = PT_WRITABLE_MASK;
+>         else
+>                 clear_bits = shadow_dirty_mask;
+>
+>         if (!(iter->old_spte & clear_bits))
+>                 continue;
+>
+>         iter.old_spte = kvm_tdp_mmu_clear_spte_bit(&iter, clear_bits);
+>
 
-for you to fetch changes up to c39cea6f38eefe356d64d0bc1e1f2267e282cdd3:
+Yeah, this is better. Even better if I just initialize like:
 
-  RISC-V: KVM: Increment firmware pmu events (2023-02-07 20:36:08 +0530)
+u64 clear_bits = shadow_dirty_mask;
 
-----------------------------------------------------------------
-KVM/riscv changes for 6.3
-
-- Fix wrong usage of PGDIR_SIZE to check page sizes
-- Fix privilege mode setting in kvm_riscv_vcpu_trap_redirect()
-- Redirect illegal instruction traps to guest
-- SBI PMU support for guest
-
-----------------------------------------------------------------
-Alexandre Ghiti (1):
-      KVM: RISC-V: Fix wrong usage of PGDIR_SIZE to check page sizes
-
-Andy Chiu (1):
-      RISC-V: KVM: Redirect illegal instruction traps to guest
-
-Anup Patel (1):
-      RISC-V: KVM: Fix privilege mode setting in kvm_riscv_vcpu_trap_redirect()
-
-Atish Patra (14):
-      perf: RISC-V: Define helper functions expose hpm counter width and count
-      perf: RISC-V: Improve privilege mode filtering for perf
-      RISC-V: Improve SBI PMU extension related definitions
-      RISC-V: KVM: Define a probe function for SBI extension data structures
-      RISC-V: KVM: Return correct code for hsm stop function
-      RISC-V: KVM: Modify SBI extension handler to return SBI error code
-      RISC-V: KVM: Add skeleton support for perf
-      RISC-V: KVM: Add SBI PMU extension support
-      RISC-V: KVM: Make PMU functionality depend on Sscofpmf
-      RISC-V: KVM: Disable all hpmcounter access for VS/VU mode
-      RISC-V: KVM: Implement trap & emulate for hpmcounters
-      RISC-V: KVM: Implement perf support without sampling
-      RISC-V: KVM: Support firmware events
-      RISC-V: KVM: Increment firmware pmu events
-
- arch/riscv/include/asm/kvm_host.h     |   4 +
- arch/riscv/include/asm/kvm_vcpu_pmu.h | 107 ++++++
- arch/riscv/include/asm/kvm_vcpu_sbi.h |  13 +-
- arch/riscv/include/asm/sbi.h          |   7 +-
- arch/riscv/kvm/Makefile               |   1 +
- arch/riscv/kvm/main.c                 |   3 +-
- arch/riscv/kvm/mmu.c                  |   8 +-
- arch/riscv/kvm/tlb.c                  |   4 +
- arch/riscv/kvm/vcpu.c                 |   7 +
- arch/riscv/kvm/vcpu_exit.c            |   9 +
- arch/riscv/kvm/vcpu_insn.c            |   4 +-
- arch/riscv/kvm/vcpu_pmu.c             | 633 ++++++++++++++++++++++++++++++++++
- arch/riscv/kvm/vcpu_sbi.c             |  72 ++--
- arch/riscv/kvm/vcpu_sbi_base.c        |  27 +-
- arch/riscv/kvm/vcpu_sbi_hsm.c         |  28 +-
- arch/riscv/kvm/vcpu_sbi_pmu.c         |  86 +++++
- arch/riscv/kvm/vcpu_sbi_replace.c     |  50 +--
- arch/riscv/kvm/vcpu_sbi_v01.c         |  17 +-
- drivers/perf/riscv_pmu_sbi.c          |  64 +++-
- include/linux/perf/riscv_pmu.h        |   5 +
- 20 files changed, 1035 insertions(+), 114 deletions(-)
- create mode 100644 arch/riscv/include/asm/kvm_vcpu_pmu.h
- create mode 100644 arch/riscv/kvm/vcpu_pmu.c
- create mode 100644 arch/riscv/kvm/vcpu_sbi_pmu.c
+This will also get rid of the else part.
