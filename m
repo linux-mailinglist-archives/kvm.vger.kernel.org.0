@@ -2,142 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BBD4468E2DB
-	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 22:21:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D65868E2BA
+	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 22:18:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230297AbjBGVVE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 16:21:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59930 "EHLO
+        id S229674AbjBGVS5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 16:18:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229984AbjBGVUx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 16:20:53 -0500
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2086.outbound.protection.outlook.com [40.107.92.86])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8BEA3CE04;
-        Tue,  7 Feb 2023 13:20:39 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EOXYcT0aB1YxEj6xTIFmCLTrpmOm8KGwN+yZ5BScUopMsv5YtljW/YvVzpQ9kJQ4BS8PHlOkJpg67afmL37OVEcj97oITt7MJKE0SIzhea3KAF2C/wYTQsY0ASgg4kDe6aH8Siug8eklPGagWq2DaTZcGnMV35RbYxK0S0EZsE78kdHAWGbh29sNuOlbguD0hekBCE6erhX2K3MCdnNSUQ6lzquX8cgbj8k4llB/At4bX3jGB2kRlGeyuK/vXyOU9i0uhr19qdGOVoV9/OP5vFjt/zl+oevhmWyA+ksqK/h5Wb1fjvBpkKPj38mT598G0Qc0ojEd0LR61iJ0TyYNJQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kKLLUvac1wogY7bKkDex3cX9BMQuTYh0UnjpN1D9esI=;
- b=mjIDCSW6/9V85IlqGokC3IMpW1Q9jpUOJN2S7sa5PzVjxoMXOMHnIYeT9kwUrg52r3WgRivIDY3TwGrlAxtg7YLXLcmOf+2lZi944dKFp0kxcw5gVpkVkJE0hE0J+2yb9JZbzeWnGUI/h83UwyEQZzW8eLuhtryQ/IHo7z/y7hpI5XyX8/DNrJUHxHIgPolRmgrvcQzfp29fKieWbpuiDL0hzbHWjqHFW4DT9gT4p2ipgHVMpP0AP8eXixInWy+q7YwRlijNebZeV6QmeXIG1uRCdwcKmfSwRmtYH0lh1ZX0dOG1SQFNDt8/XX5jJiesQoRnvXaF5oNL+xEs2/9qLw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kKLLUvac1wogY7bKkDex3cX9BMQuTYh0UnjpN1D9esI=;
- b=WWetSkabSKKFpC8UTkA/15E2oAZJo2XVDePLjd42KNUfqAo5zwKlEegOKs8BAAyxiJ2465rsR4+4E8pt4VqFsDo/48aw2HgIHdbtjavwLiBGiVGVwyKvzdnlJQpoQV43JXuoTTQL0oB5xr1Xm8u865ObmsOkEnz2BbWmDsfjRQieOSPqunLfQ0kZtlMBJH0co9WYhnne32ylSvOvUSqxI8V3cAOiWk2bbymgUVLToOixa6MhRJkJ+kykLSHmMTeyFgAjM9+fFEyjaEeKW8OCEU/TafCiQKo6kjH3j7m5QLi0ZqBUHErvIvhw/G7NnYyBAL4v/bGPYMzhEMmIUyw+Pg==
-Received: from DM6PR04CA0002.namprd04.prod.outlook.com (2603:10b6:5:334::7) by
- PH7PR12MB6562.namprd12.prod.outlook.com (2603:10b6:510:212::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6064.31; Tue, 7 Feb
- 2023 21:20:37 +0000
-Received: from DM6NAM11FT101.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:334:cafe::f4) by DM6PR04CA0002.outlook.office365.com
- (2603:10b6:5:334::7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6064.36 via Frontend
- Transport; Tue, 7 Feb 2023 21:20:37 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- DM6NAM11FT101.mail.protection.outlook.com (10.13.172.208) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6086.17 via Frontend Transport; Tue, 7 Feb 2023 21:20:37 +0000
-Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Tue, 7 Feb 2023
- 13:20:28 -0800
-Received: from drhqmail201.nvidia.com (10.126.190.180) by
- drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.36; Tue, 7 Feb 2023 13:20:28 -0800
-Received: from Asurada-Nvidia.nvidia.com (10.127.8.9) by mail.nvidia.com
- (10.126.190.180) with Microsoft SMTP Server id 15.2.986.36 via Frontend
- Transport; Tue, 7 Feb 2023 13:20:27 -0800
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     <jgg@nvidia.com>, <kevin.tian@intel.com>, <joro@8bytes.org>,
-        <will@kernel.org>, <robin.murphy@arm.com>,
-        <alex.williamson@redhat.com>, <shuah@kernel.org>
-CC:     <yi.l.liu@intel.com>, <linux-kernel@vger.kernel.org>,
-        <iommu@lists.linux.dev>, <kvm@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>, <baolu.lu@linux.intel.com>
-Subject: [PATCH v2 10/10] vfio: Do not allow !ops->dma_unmap in vfio_pin/unpin_pages()
-Date:   Tue, 7 Feb 2023 13:18:02 -0800
-Message-ID: <59e5eeac675172ab1cb07236a3eb3e166553fe71.1675802050.git.nicolinc@nvidia.com>
-X-Mailer: git-send-email 2.39.1
-In-Reply-To: <cover.1675802050.git.nicolinc@nvidia.com>
-References: <cover.1675802050.git.nicolinc@nvidia.com>
+        with ESMTP id S229590AbjBGVS4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 16:18:56 -0500
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 174F817175
+        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 13:18:55 -0800 (PST)
+Received: by mail-pl1-x631.google.com with SMTP id r8so17082739pls.2
+        for <kvm@vger.kernel.org>; Tue, 07 Feb 2023 13:18:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=l0gc5keUcXf5U42aZBPSOFCzzi7Lkby3WUvehhaBKbA=;
+        b=VqOOoB7rkICaPhrTdeAoRHvNfIQCJ204MGU94d8Ggkr7EJAlzUjNF6kI/HBErZMhOp
+         KGEISZNOzaMddz4lMLtnAVatyKPHy3CSqtNu16mmrONEYSTrN8Kwqg3qIRPRfklPS731
+         3N/FY1m5zvleZ9i8gm1hNsQTd+u1BdBGVp43u3Ilnf7Yk5VLnGotDQ2JDMa09VAcm269
+         sLGzQXo3ZmjltnUG+QjnS67iSMClmBlZ3PtTN5cVAh7WrjrXih9vJ4vZBqBvFtt7Dmll
+         dkT20QzzfY3K0GCQukTcpcog5RDGqcuk3w8cYTDVTpds1IU7PpV4RaeykVv3m6oEg6vk
+         2lRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=l0gc5keUcXf5U42aZBPSOFCzzi7Lkby3WUvehhaBKbA=;
+        b=PyAOESHDfR5eplEswZ/LjXbvSKJ6DBUX1lHoqgB4JK9kt0ce2n9UGpYwOp5NnNwPwG
+         X/N82HQICWT5jRyzY75gjgTtETUjutxiDT0EDPjEnMub/x1wmeTtdWmiZ1z/p8oQUrFM
+         5CDSxR0UK/3q70cNH1gf1Z+TcXCTWvye4AnlxG+z6twtgJJhT/+G0Sb2qkJYqOy82x16
+         qLLZlptTVe5aBjCSFutmS/h2mnTPeRmNeyeHuOGgx61xL6nEh6S0tgnZ/eqt9+kzHh+a
+         bWYzw+Ojrm8D0/aeDILKU7kTILyhvQbVRpcjb8IMo0OBCw+HY/q4y3NER6A5Vxzmlg/R
+         e4xA==
+X-Gm-Message-State: AO0yUKUUYnzKX3NNNpwBI8xgGM4xwhyWJGkjXC2rIrU2J6p6Xc6duEDC
+        ZJgYBIzDZZdSazWcIdOAzGHdvA==
+X-Google-Smtp-Source: AK7set/tcOAwjePvlCcDOHogBghvok/qBEaHnXi93rhmnMJDEPyGUHdl1epz2OQpc7DQKqLl1X7mQg==
+X-Received: by 2002:a17:903:124f:b0:199:1a32:413c with SMTP id u15-20020a170903124f00b001991a32413cmr4865089plh.45.1675804734592;
+        Tue, 07 Feb 2023 13:18:54 -0800 (PST)
+Received: from [192.168.50.116] (c-24-4-73-83.hsd1.ca.comcast.net. [24.4.73.83])
+        by smtp.gmail.com with ESMTPSA id p21-20020a170902ead500b001991fd2faabsm3875816pld.277.2023.02.07.13.18.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Feb 2023 13:18:54 -0800 (PST)
+Message-ID: <91cd3bf5-9c68-df1e-32a8-55f2cfedd84a@rivosinc.com>
+Date:   Tue, 7 Feb 2023 13:18:52 -0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT101:EE_|PH7PR12MB6562:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1a2a19e0-8634-4b56-15d6-08db0951280a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: wgMiTUwFRgZN2uBepAr7zjelh2zIj6nLLyoTs4N2XGWaCNv9yHNriRiPGDveIsPZ+ntACaNqAGVwPrDnKjXrdX85uYumr+LclCAabhvEvZ7qTq9tTpGJIVnHCZyN+WGgzJr0hoBh+qpZQlCbYjLUuiC5A3909rUWHrOTreTEUKy3GNkeYckH0bop+tUGIAZbWvE5FQHMM6Z+trOdv0mkt/3bZV8vwPwXAUI5LN7PTKSUvU8PUkzKfKX/70OIOUgZsweboCfIjdu7MOeUiyLRrrWqFvn65GusaHdAhqVYUAFSDulp7LZyn/MZTTuMBD02ehhK1JDr8dhSBIsu6nPwjXGxsnIFytRf5oRq63brMyEtvEHh8ZqmK1p+t34acso6LhxJzogVZ7kVf4DvFlJDPi4e03X51a1SZe8IHrVTbKKw87uJXqumWHbM5hckGFrKnCLcxPBo6fKxrcfjhNU+GAa8hiAqcE9z+ubnc18EC6vPeuKj5POjSH/O22oPCY8kiErkvPfPdk6XHD6hbJo6Itjr0+2OCt+eJfWBt5/UewFgZ78KCYmOC9crRCgSWpyDGY49dhOwkWNcSUVBKKtEpJ7jwm9fBq/txYHzWD4ffkUS/VNWVv1uDOnqWBs5/PFDQgL4WCF8tC+sylRroxRR69UukgClw586avo5r1ChUNazLkJY4bk4U4oAH5Yt5N4RMle7vs8dFcSoC5/8Nz8ZQg==
-X-Forefront-Antispam-Report: CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230025)(4636009)(136003)(376002)(346002)(396003)(39860400002)(451199018)(40470700004)(46966006)(36840700001)(36756003)(40460700003)(40480700001)(70586007)(316002)(8676002)(478600001)(6666004)(110136005)(7416002)(5660300002)(4326008)(2906002)(54906003)(8936002)(70206006)(82740400003)(26005)(36860700001)(7696005)(186003)(7636003)(356005)(86362001)(41300700001)(2616005)(426003)(336012)(47076005)(82310400005)(83380400001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Feb 2023 21:20:37.0401
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1a2a19e0-8634-4b56-15d6-08db0951280a
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT101.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6562
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH -next v13 10/19] riscv: Allocate user's vector context in
+ the first-use trap
+Content-Language: en-US
+To:     Andy Chiu <andy.chiu@sifive.com>, linux-riscv@lists.infradead.org,
+        palmer@dabbelt.com, anup@brainfault.org, atishp@atishpatra.org,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
+Cc:     greentime.hu@sifive.com, guoren@linux.alibaba.com,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Heiko Stuebner <heiko.stuebner@vrull.eu>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        Jisheng Zhang <jszhang@kernel.org>,
+        Vincent Chen <vincent.chen@sifive.com>,
+        Guo Ren <guoren@kernel.org>,
+        Li Zhengyu <lizhengyu3@huawei.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Changbin Du <changbin.du@intel.com>,
+        Richard Henderson <richard.henderson@linaro.org>
+References: <20230125142056.18356-1-andy.chiu@sifive.com>
+ <20230125142056.18356-11-andy.chiu@sifive.com>
+From:   Vineet Gupta <vineetg@rivosinc.com>
+In-Reply-To: <20230125142056.18356-11-andy.chiu@sifive.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A driver that doesn't implement ops->dma_unmap shouldn't be allowed to do
-vfio_pin/unpin_pages(), though it can use vfio_dma_rw() to access an iova
-range. Deny !ops->dma_unmap cases in vfio_pin/unpin_pages().
+Hi Andy,
 
-Suggested-by: Kevin Tian <kevin.tian@intel.com>
-Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
----
- drivers/vfio/vfio_main.c | 4 ++++
- 1 file changed, 4 insertions(+)
+On 1/25/23 06:20, Andy Chiu wrote:
+> +static bool insn_is_vector(u32 insn_buf)
+> +{
+> +	u32 opcode = insn_buf & __INSN_OPCODE_MASK;
+> +	/*
+> +	 * All V-related instructions, including CSR operations are 4-Byte. So,
+> +	 * do not handle if the instruction length is not 4-Byte.
+> +	 */
+> +	if (unlikely(GET_INSN_LENGTH(insn_buf) != 4))
+> +		return false;
+> +	if (opcode == OPCODE_VECTOR) {
+> +		return true;
+> +	} else if (opcode == OPCODE_LOADFP || opcode == OPCODE_STOREFP) {
+> +		u32 width = EXTRACT_LOAD_STORE_FP_WIDTH(insn_buf);
+> +
+> +		if (width == LSFP_WIDTH_RVV_8 || width == LSFP_WIDTH_RVV_16 ||
+> +		    width == LSFP_WIDTH_RVV_32 || width == LSFP_WIDTH_RVV_64)
+> +			return true;
 
-diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-index 8559c3dfb335..c7f3251ad6e5 100644
---- a/drivers/vfio/vfio_main.c
-+++ b/drivers/vfio/vfio_main.c
-@@ -1543,6 +1543,8 @@ int vfio_pin_pages(struct vfio_device *device, dma_addr_t iova,
- 
- 		if (iova > ULONG_MAX)
- 			return -EINVAL;
-+		if (!device->ops->dma_unmap)
-+			return -EINVAL;
- 		/*
- 		 * VFIO ignores the sub page offset, npages is from the start of
- 		 * a PAGE_SIZE chunk of IOVA. The caller is expected to recover
-@@ -1580,6 +1582,8 @@ void vfio_unpin_pages(struct vfio_device *device, dma_addr_t iova, int npage)
- 	if (device->iommufd_access) {
- 		if (WARN_ON(iova > ULONG_MAX))
- 			return;
-+		if (!device->ops->dma_unmap)
-+			return;
- 		iommufd_access_unpin_pages(device->iommufd_access,
- 					   ALIGN_DOWN(iova, PAGE_SIZE),
- 					   npage * PAGE_SIZE);
--- 
-2.39.1
+What is the purpose of checking FP opcodes here ?
+
+> +	} else if (opcode == RVG_OPCODE_SYSTEM) {
+> +		u32 csr = EXTRACT_SYSTEM_CSR(insn_buf);
+> +
+> +		if ((csr >= CSR_VSTART && csr <= CSR_VCSR) ||
+> +		    (csr >= CSR_VL && csr <= CSR_VLENB))
+> +			return true;
+> +	}
+> +	return false;
+> +}
 
