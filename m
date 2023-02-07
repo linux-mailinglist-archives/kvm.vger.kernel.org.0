@@ -2,80 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9835168D625
-	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 13:05:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 96E1168D544
+	for <lists+kvm@lfdr.de>; Tue,  7 Feb 2023 12:16:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231414AbjBGMFI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 07:05:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43378 "EHLO
+        id S231596AbjBGLQ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 06:16:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229815AbjBGMFH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 07:05:07 -0500
-X-Greylist: delayed 388 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 07 Feb 2023 04:05:06 PST
-Received: from mr85p00im-hyfv06011401.me.com (mr85p00im-hyfv06011401.me.com [17.58.23.191])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73B7027986
-        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 04:05:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ynddal.dk; s=sig1;
-        t=1675771118; bh=Cn0qz0bMHB6vxV8Q4ejxdppqOEkAynR/SkSPXu1IlvI=;
-        h=Content-Type:Mime-Version:Subject:From:Date:Message-Id:To;
-        b=Xr4x63GAslHmhREJ5ScX0ShUVTWttvXUdV+P0RRokExZ+BiNGGhAJQr532uOfCXj1
-         ZqkDVc9iOGpGjBHjWVFxgIwpjsracshofIVX3/1c8bFteBwMssKElDCSl9Wq++grLs
-         1YE8czPPd15jiviooew03Evu38xofTXifMKQYw62JHNKzwacVgifJS64xzMIdmZbsS
-         L6WveY1JxmlZ2fpSB/ClKH8gn6QiJUvvvgt/NdWQKM1L6rXc4EKkV9GtRNNiDcuJoi
-         NCukyy9rq6vHv5GsbMTMqRRH9NhBvTcjFByiC8xHexFZoeyjAggq/BQ0XVsdm38Gnv
-         dBh9CuU3l811g==
-Received: from smtpclient.apple (mr38p00im-dlb-asmtp-mailmevip.me.com [17.57.152.18])
-        by mr85p00im-hyfv06011401.me.com (Postfix) with ESMTPSA id DA007357B5F6;
-        Tue,  7 Feb 2023 11:58:35 +0000 (UTC)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.300.101.1.3\))
-Subject: Re: [PATCH] gdbstub: move update guest debug to accel ops
-From:   Mads Ynddal <mads@ynddal.dk>
-In-Reply-To: <871qn2rjd2.fsf@linaro.org>
-Date:   Tue, 7 Feb 2023 12:58:23 +0100
-Cc:     =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        "open list:Overall KVM CPUs" <kvm@vger.kernel.org>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <35145587-C279-46A1-A2C5-3261A646F225@ynddal.dk>
-References: <20221123121712.72817-1-mads@ynddal.dk>
- <af92080f-e708-f593-7ff5-81b7b264d587@linaro.org>
- <C8BC6E24-F98D-428D-80F8-98BDA40C7B15@ynddal.dk> <87h6xyjcdh.fsf@linaro.org>
- <4B19094C-63DC-4A81-A008-886504256D5D@ynddal.dk> <871qn2rjd2.fsf@linaro.org>
-To:     =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-X-Mailer: Apple Mail (2.3731.300.101.1.3)
-X-Proofpoint-GUID: SyIWDj8aX2WDaQWMsXo-TNJimMYxIvbX
-X-Proofpoint-ORIG-GUID: SyIWDj8aX2WDaQWMsXo-TNJimMYxIvbX
-X-Proofpoint-Virus-Version: =?UTF-8?Q?vendor=3Dfsecure_engine=3D1.1.170-22c6f66c430a71ce266a39bfe25bc?=
- =?UTF-8?Q?2903e8d5c8f:6.0.425,18.0.816,17.11.62.513.0000000_definitions?=
- =?UTF-8?Q?=3D2022-01-18=5F01:2022-01-14=5F01,2022-01-18=5F01,2021-12-02?=
- =?UTF-8?Q?=5F01_signatures=3D0?=
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 clxscore=1030
- suspectscore=0 mlxlogscore=660 adultscore=0 phishscore=0 mlxscore=0
- spamscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2302070107
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231438AbjBGLQX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 06:16:23 -0500
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89FED21A35;
+        Tue,  7 Feb 2023 03:16:21 -0800 (PST)
+Received: from kwepemm600003.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4PB0rs6rZNzJsGb;
+        Tue,  7 Feb 2023 19:14:37 +0800 (CST)
+Received: from huawei.com (10.175.113.32) by kwepemm600003.china.huawei.com
+ (7.193.23.202) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Tue, 7 Feb
+ 2023 19:16:17 +0800
+From:   Nanyong Sun <sunnanyong@huawei.com>
+To:     <joro@8bytes.org>, <will@kernel.org>, <robin.murphy@arm.com>,
+        <mst@redhat.com>, <jasowang@redhat.com>
+CC:     <iommu@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <sunnanyong@huawei.com>,
+        <wangrong68@huawei.com>
+Subject: [PATCH v2] vhost/vdpa: Add MSI translation tables to iommu for software-managed MSI
+Date:   Tue, 7 Feb 2023 20:08:43 +0800
+Message-ID: <20230207120843.1580403-1-sunnanyong@huawei.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.113.32]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600003.china.huawei.com (7.193.23.202)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Rong Wang <wangrong68@huawei.com>
 
->=20
-> Sorry this dropped of my radar. Yes I think the ifdef will do. Are you
-> going to post a v2 with all the various updates?
->=20
+Once enable iommu domain for one device, the MSI
+translation tables have to be there for software-managed MSI.
+Otherwise, platform with software-managed MSI without an
+irq bypass function, can not get a correct memory write event
+from pcie, will not get irqs.
+The solution is to obtain the MSI phy base address from
+iommu reserved region, and set it to iommu MSI cookie,
+then translation tables will be created while request irq.
 
-No worries, I'll make a v2 with the changes.
+Change log
+----------
 
-=E2=80=94
-Mads Ynddal
+v1->v2:
+- add resv iotlb to avoid overlap mapping.
+
+Signed-off-by: Rong Wang <wangrong68@huawei.com>
+Signed-off-by: Nanyong Sun <sunnanyong@huawei.com>
+---
+ drivers/iommu/iommu.c |  1 +
+ drivers/vhost/vdpa.c  | 59 ++++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 57 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+index 5f6a85aea501..af9c064ad8b2 100644
+--- a/drivers/iommu/iommu.c
++++ b/drivers/iommu/iommu.c
+@@ -2623,6 +2623,7 @@ void iommu_get_resv_regions(struct device *dev, struct list_head *list)
+ 	if (ops->get_resv_regions)
+ 		ops->get_resv_regions(dev, list);
+ }
++EXPORT_SYMBOL(iommu_get_resv_regions);
+ 
+ /**
+  * iommu_put_resv_regions - release resered regions
+diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+index ec32f785dfde..a58979da8acd 100644
+--- a/drivers/vhost/vdpa.c
++++ b/drivers/vhost/vdpa.c
+@@ -49,6 +49,7 @@ struct vhost_vdpa {
+ 	struct completion completion;
+ 	struct vdpa_device *vdpa;
+ 	struct hlist_head as[VHOST_VDPA_IOTLB_BUCKETS];
++	struct vhost_iotlb resv_iotlb;
+ 	struct device dev;
+ 	struct cdev cdev;
+ 	atomic_t opened;
+@@ -216,6 +217,8 @@ static int vhost_vdpa_reset(struct vhost_vdpa *v)
+ 
+ 	v->in_batch = 0;
+ 
++	vhost_iotlb_reset(&v->resv_iotlb);
++
+ 	return vdpa_reset(vdpa);
+ }
+ 
+@@ -1013,6 +1016,10 @@ static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
+ 	    msg->iova + msg->size - 1 > v->range.last)
+ 		return -EINVAL;
+ 
++	if (vhost_iotlb_itree_first(&v->resv_iotlb, msg->iova,
++					msg->iova + msg->size - 1))
++		return -EINVAL;
++
+ 	if (vhost_iotlb_itree_first(iotlb, msg->iova,
+ 				    msg->iova + msg->size - 1))
+ 		return -EEXIST;
+@@ -1103,6 +1110,45 @@ static ssize_t vhost_vdpa_chr_write_iter(struct kiocb *iocb,
+ 	return vhost_chr_write_iter(dev, from);
+ }
+ 
++static int vhost_vdpa_resv_iommu_region(struct iommu_domain *domain, struct device *dma_dev,
++	struct vhost_iotlb *resv_iotlb)
++{
++	struct list_head dev_resv_regions;
++	phys_addr_t resv_msi_base = 0;
++	struct iommu_resv_region *region;
++	int ret = 0;
++	bool with_sw_msi = false;
++	bool with_hw_msi = false;
++
++	INIT_LIST_HEAD(&dev_resv_regions);
++	iommu_get_resv_regions(dma_dev, &dev_resv_regions);
++
++	list_for_each_entry(region, &dev_resv_regions, list) {
++		ret = vhost_iotlb_add_range_ctx(resv_iotlb, region->start,
++				region->start + region->length - 1,
++				0, 0, NULL);
++		if (ret) {
++			vhost_iotlb_reset(resv_iotlb);
++			break;
++		}
++
++		if (region->type == IOMMU_RESV_MSI)
++			with_hw_msi = true;
++
++		if (region->type == IOMMU_RESV_SW_MSI) {
++			resv_msi_base = region->start;
++			with_sw_msi = true;
++		}
++	}
++
++	if (!ret && !with_hw_msi && with_sw_msi)
++		ret = iommu_get_msi_cookie(domain, resv_msi_base);
++
++	iommu_put_resv_regions(dma_dev, &dev_resv_regions);
++
++	return ret;
++}
++
+ static int vhost_vdpa_alloc_domain(struct vhost_vdpa *v)
+ {
+ 	struct vdpa_device *vdpa = v->vdpa;
+@@ -1128,11 +1174,16 @@ static int vhost_vdpa_alloc_domain(struct vhost_vdpa *v)
+ 
+ 	ret = iommu_attach_device(v->domain, dma_dev);
+ 	if (ret)
+-		goto err_attach;
++		goto err_alloc_domain;
+ 
+-	return 0;
++	ret = vhost_vdpa_resv_iommu_region(v->domain, dma_dev, &v->resv_iotlb);
++	if (ret)
++		goto err_attach_device;
+ 
+-err_attach:
++	return 0;
++err_attach_device:
++	iommu_detach_device(v->domain, dma_dev);
++err_alloc_domain:
+ 	iommu_domain_free(v->domain);
+ 	return ret;
+ }
+@@ -1385,6 +1436,8 @@ static int vhost_vdpa_probe(struct vdpa_device *vdpa)
+ 		goto err;
+ 	}
+ 
++	vhost_iotlb_init(&v->resv_iotlb, 0, 0);
++
+ 	r = dev_set_name(&v->dev, "vhost-vdpa-%u", minor);
+ 	if (r)
+ 		goto err;
+-- 
+2.25.1
 
