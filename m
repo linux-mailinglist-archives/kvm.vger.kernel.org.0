@@ -2,68 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3AC1B68F119
-	for <lists+kvm@lfdr.de>; Wed,  8 Feb 2023 15:47:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DF39668F125
+	for <lists+kvm@lfdr.de>; Wed,  8 Feb 2023 15:48:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231157AbjBHOq7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Feb 2023 09:46:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55780 "EHLO
+        id S231566AbjBHOsp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Feb 2023 09:48:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231336AbjBHOq4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Feb 2023 09:46:56 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43EA87AB3
-        for <kvm@vger.kernel.org>; Wed,  8 Feb 2023 06:46:54 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id m2-20020a17090a414200b00231173c006fso1939844pjg.5
-        for <kvm@vger.kernel.org>; Wed, 08 Feb 2023 06:46:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=K7RdkiYdEwT5ArxsEoVVFpqBmlXV1ft5ToNCy1aUUX8=;
-        b=Lm+cD966bOaY0FMZUVQREySn37LI5igtbI624yU1j1hZE5MyfF/qG9jYi85t4Ut01P
-         H7DWid2NOoJx5WItVbe8/XFrsRW5EbrqPJWSWXePQSHX6rSJeqBBjcOd2CxMGsj4Qa6N
-         k9G1OX9oGFzLQqYwJVJNLJAEOSMaaXGRYAnMAiexodA3YlRX1I5qCpyFxzywPYudQb68
-         COmpdq9HeBcYujWcSBhLY5u47SvGSREPpynX4qLVzNmOfUzAieNCbC7atwZbBWgAWLqZ
-         EOiU1/GwC6Hu2MJU0pZTfGD4tbIArXSIs14hpssN7vtypkbNdGTcxrv6m+7iVW2AOYLw
-         P/lQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=K7RdkiYdEwT5ArxsEoVVFpqBmlXV1ft5ToNCy1aUUX8=;
-        b=XvHrQuv1jN/bPiL/iNsLPoaCx0EXDcme0FP3Qi25XUxJlM7iTvfqd3EDC8cSH436qc
-         3XixDMqfaiHpjY0TFTm1XafO5fjGctdNaHRGJRtjYUZZwc5EXukiEC8H9zhBRbGi5HPY
-         Qy/YYh+Vxhu35NEa5vEzXFHdbjDXms5XZ1Al7MLCExfGUkGrVZ0KJdb/gIfKDMs64iqR
-         LPjeeP2HOtMydikKrFCqY4HlPAgznWJq6E6I077g1RiEqu90GlQP5Pj4Tp7lWBa0/II7
-         OArJFvEJaoNp0jf0dhcs8hb2+ZeorMOSkeDmuPQxjfm8jzo5YYWjJhoWUBWPBpeXS86M
-         AYkg==
-X-Gm-Message-State: AO0yUKXSYWifpaG9iu2LCkKkhrFmiRfx+X/GW9lirjJHs/RjaKL46PEP
-        FtmUfH7v7mZ8sPycIv51l3uV95lOr2tDRFmb4ec=
-X-Google-Smtp-Source: AK7set9U9frlmZ67ZD4Mkgioyt9UyB1tayDJ9IR+l/gtRBa/1L+qXWUz8qUezgDgempjxvIv69stlQ==
-X-Received: by 2002:a17:902:8a91:b0:198:af50:e4e3 with SMTP id p17-20020a1709028a9100b00198af50e4e3mr231863plo.9.1675867613287;
-        Wed, 08 Feb 2023 06:46:53 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id j12-20020a170902c3cc00b001949b92f8a8sm2404383plj.279.2023.02.08.06.46.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Feb 2023 06:46:52 -0800 (PST)
-Date:   Wed, 8 Feb 2023 14:46:49 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     kvm@vger.kernel.org, Michal Luczaj <mhal@rbox.co>
-Cc:     pbonzini@redhat.com, shuah@kernel.org, dwmw@amazon.co.uk
-Subject: Re: [PATCH] KVM: selftests: Clean up misnomers in xen_shinfo_test
-Message-ID: <Y+O12SuLQYU7Ic05@google.com>
-References: <20230206202430.1898057-1-mhal@rbox.co>
- <167582135973.455074.10130862673762989635.b4-ty@google.com>
+        with ESMTP id S231324AbjBHOsj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Feb 2023 09:48:39 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2F7D5267;
+        Wed,  8 Feb 2023 06:48:38 -0800 (PST)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 318E9wOx027415;
+        Wed, 8 Feb 2023 14:48:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=0Dpp0uD7MgEFHwPxlovGLIyepydLua0J6/J5k8CtH6s=;
+ b=LcoLiUkOUXFgzhY9C3OQXMOCiGT0YbRSl6HOLoaQwOarb7wcdyw3DGVZeDiWpsjkZRxQ
+ KQIGJzYfeWVD9ocGdzxgwDp2BfNYZgDAkrA2h8oCuB0v44AZa4m5Q/2HL5T5EnQHa/Em
+ V6feloi+Ep1mj6BxxO8UDN4nhDeUvMXa1s2UcOKV91Rc9JrC0fEPTDilzZM0eyOdsGEJ
+ DwlCjCWKuHRFzzRj3voF17Ew3lJPr/XlW2G7uDKEEmsFSq28Og2oo5t0V7YqMikyoSzK
+ wdjAtIHQHfOS+/hbnk3XzkK3CiOLE1ej1IZbbPDPIELP0XxAOFFsIpLYpoRJKlwOHzaf Rg== 
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nmcy5sgj9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 08 Feb 2023 14:48:36 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 317KbFEr024491;
+        Wed, 8 Feb 2023 14:48:34 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma06fra.de.ibm.com (PPS) with ESMTPS id 3nhemfkkjt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 08 Feb 2023 14:48:34 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 318EmS4124052452
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 8 Feb 2023 14:48:28 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7CBBB2004F;
+        Wed,  8 Feb 2023 14:48:28 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2ABA720040;
+        Wed,  8 Feb 2023 14:48:28 +0000 (GMT)
+Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Wed,  8 Feb 2023 14:48:28 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     borntraeger@linux.ibm.com, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com, shuah@kernel.org
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Subject: [PATCH v1 0/2] KVM: s390: CMMA migration selftest and small bugfix
+Date:   Wed,  8 Feb 2023 15:48:25 +0100
+Message-Id: <20230208144827.131300-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.39.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <167582135973.455074.10130862673762989635.b4-ty@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: OGRA7vpgN13EkQkbDm2LCcLJq8dwqWBA
+X-Proofpoint-ORIG-GUID: OGRA7vpgN13EkQkbDm2LCcLJq8dwqWBA
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-02-08_06,2023-02-08_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ suspectscore=0 phishscore=0 bulkscore=0 clxscore=1015 mlxlogscore=780
+ spamscore=0 lowpriorityscore=0 mlxscore=0 adultscore=0 malwarescore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302080128
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,24 +80,19 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 08, 2023, Sean Christopherson wrote:
-> On Mon, 06 Feb 2023 21:24:30 +0100, Michal Luczaj wrote:
-> > As discussed[*], relabel the poorly named structs to align with the
-> > current KVM nomenclature.
-> > 
-> > Old names are a leftover from before commit 52491a38b2c2 ("KVM:
-> > Initialize gfn_to_pfn_cache locks in dedicated helper"), which i.a.
-> > introduced kvm_gpc_init() and renamed kvm_gfn_to_pfn_cache_init()/
-> > _destroy() to kvm_gpc_activate()/_deactivate(). Partly in an effort
-> > to avoid implying that the cache really is destroyed/freed.
-> > 
-> > [...]
-> 
-> Applied to kvm-x86 selftests, thanks!
-> 
-> [1/1] KVM: selftests: Clean up misnomers in xen_shinfo_test
->       https://github.com/kvm-x86/linux/commit/5c483f92ea7c
+Add a new selftest for CMMA migration. Also fix a small issue found during
+development of the test.
 
-I force pushed to selftests because of a goof on my end, new SHA-1 is:
+Nico Boehr (2):
+  KVM: s390: selftests: add selftest for CMMA migration
+  KVM: s390: fix KVM_S390_GET_CMMA_BITS for GFNs in memslot holes
 
-  https://github.com/kvm-x86/linux/commit/6c77ae716d54
+ arch/s390/kvm/kvm-s390.c                      |   4 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ tools/testing/selftests/kvm/s390x/cmma_test.c | 679 ++++++++++++++++++
+ 3 files changed, 684 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/s390x/cmma_test.c
+
+-- 
+2.39.1
+
