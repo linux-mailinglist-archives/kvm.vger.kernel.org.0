@@ -2,113 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 53A0268EA2E
-	for <lists+kvm@lfdr.de>; Wed,  8 Feb 2023 09:50:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 24B3F68EA61
+	for <lists+kvm@lfdr.de>; Wed,  8 Feb 2023 10:02:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229648AbjBHIuQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Feb 2023 03:50:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44164 "EHLO
+        id S230307AbjBHJCU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Feb 2023 04:02:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230131AbjBHIuN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Feb 2023 03:50:13 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86C31457CF
-        for <kvm@vger.kernel.org>; Wed,  8 Feb 2023 00:49:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675846169;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=xhxVetMf39eyBYLaK7+c2bWPPz3BvXeYT/Jkcp+eZuU=;
-        b=fKICRazTzyIXGz9B1HXGQ2OWzmKB5qsI3XXX+vM3BUlSLLwCDngr2NkAGGI5SZzeEwOCvp
-        4rVXzgQmclu3/WyhDoYlv+lPvhQsuKAhOU03sGm3yh+CRDCmn7B/nsOJNOrSaPDJvTHtFr
-        xTg0bVCJQqXnxG5s4L4PddZsstcASF0=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-114-5dvcoJ_qPimOmvke9wf4xA-1; Wed, 08 Feb 2023 03:49:26 -0500
-X-MC-Unique: 5dvcoJ_qPimOmvke9wf4xA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S229598AbjBHJCR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Feb 2023 04:02:17 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3084915568;
+        Wed,  8 Feb 2023 01:02:16 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C25D61C07581;
-        Wed,  8 Feb 2023 08:49:25 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.252])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1A495C15BAE;
-        Wed,  8 Feb 2023 08:49:18 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Gavin Shan <gshan@redhat.com>, Thomas Huth <thuth@redhat.com>,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Steven Price <steven.price@arm.com>
-Cc:     kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
+        by ams.source.kernel.org (Postfix) with ESMTPS id CFF1EB81C6A;
+        Wed,  8 Feb 2023 09:02:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 778D4C433A0;
+        Wed,  8 Feb 2023 09:02:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1675846933;
+        bh=Au9MWvR8WSilVR5o+G1SBG0j1tkJGbQ1BYt+vNhmIjE=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=RzQiZ9P6NDDC6vH0trcQ+X2uILhWWJkrt7w+rg5sjO3axMWd9ufymHHtAWCV7eUqM
+         fjAVNVi0+LTcNRR/9g4MpfdnptHZaX9SFbjlPF7S/NDq6hsgVkqHzcWmVNnqaNzrMD
+         MSkofGRklN9fhQfkxl7z7jeZmJqtZRcSCZjdWnHZzr3MpC+TtmwHuRNNS8tDu6i7yz
+         D0ShsgTgsIGKOHCWr2jWrCUf8c6PPX6NLy/tGbT6kWGgYUWy8gDNUwjdBdslnJe24f
+         hj2PWLvbvaqv/tKaepwKx9+ywYeFCX/gY1aRb3iikq4ryc4DBq8BCLhh/NFh6gIMQ3
+         z2Qv8NH9XA0Nw==
+Received: from [104.132.45.110] (helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pPgLD-008bNL-4P;
+        Wed, 08 Feb 2023 09:02:11 +0000
+Date:   Wed, 08 Feb 2023 09:02:09 +0000
+Message-ID: <877cws1qem.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     James Morse <james.morse@arm.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>, linux-pm@vger.kernel.org,
+        loongarch@lists.linux.dev, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-acpi@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-ia64@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Lorenzo Pieralisi <lpieralisi@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Borislav Petkov <bp@alien8.de>, H Peter Anvin <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        linuxppc-dev@lists.ozlabs.org, Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH 6/7] KVM: arm64: Change return type of
- kvm_vm_ioctl_mte_copy_tags() to "int"
-In-Reply-To: <d0b3a1e7-0864-f169-cdea-60ad95951b3f@redhat.com>
-Organization: Red Hat GmbH
-References: <20230203094230.266952-1-thuth@redhat.com>
- <20230203094230.266952-7-thuth@redhat.com>
- <c6e605fe-f251-d8b6-64ed-bd1e17e79512@redhat.com>
- <7b32d58b-846f-b8d7-165b-9f505e5f00f0@redhat.com>
- <d0b3a1e7-0864-f169-cdea-60ad95951b3f@redhat.com>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date:   Wed, 08 Feb 2023 09:49:16 +0100
-Message-ID: <87zg9oleyb.fsf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+        Len Brown <lenb@kernel.org>,
+        Rafael Wysocki <rafael@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Salil Mehta <salil.mehta@huawei.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>
+Subject: Re: [RFC PATCH 29/32] KVM: arm64: Pass hypercalls to userspace
+In-Reply-To: <0621bf8e-06f2-70f2-6d2b-f311c5a4ffce@arm.com>
+References: <20230203135043.409192-1-james.morse@arm.com>
+        <20230203135043.409192-30-james.morse@arm.com>
+        <Y913sIqWxmf4O5oG@google.com>
+        <0621bf8e-06f2-70f2-6d2b-f311c5a4ffce@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 104.132.45.110
+X-SA-Exim-Rcpt-To: james.morse@arm.com, oliver.upton@linux.dev, linux-pm@vger.kernel.org, loongarch@lists.linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org, linux-ia64@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, x86@kernel.org, tglx@linutronix.de, lpieralisi@kernel.org, mark.rutland@arm.com, sudeep.holla@arm.com, bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com, mingo@redhat.com, will@kernel.org, catalin.marinas@arm.com, chenhuacai@kernel.org, suzuki.poulose@arm.com, lenb@kernel.org, rafael@kernel.org, kernel@xen0n.name, salil.mehta@huawei.com, linux@armlinux.org.uk, jean-philippe@linaro.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 08 2023, Gavin Shan <gshan@redhat.com> wrote:
+On Tue, 07 Feb 2023 17:50:59 +0000,
+James Morse <james.morse@arm.com> wrote:
+> 
+> Hi Oliver,
+> 
+> On 03/02/2023 21:08, Oliver Upton wrote:
+> > On Fri, Feb 03, 2023 at 01:50:40PM +0000, James Morse wrote:
+> >> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> >>
+> >> When capability KVM_CAP_ARM_HVC_TO_USER is available, userspace can
+> >> request to handle all hypercalls that aren't handled by KVM.
+> 
+> > I would very much prefer we not go down this route. This capability
+> > effectively constructs an ABI out of what KVM presently does not
+> > implement. What would happen if KVM decides to implement a new set
+> > of hypercalls later down the road that were previously forwarded to
+> > userspace?
+> 
+> The user-space support would never get called. If we have a
+> wild-west allocation of IDs in this area we have bigger
+> problems. I'd hope in this example it would be a VMM or an in-kernel
+> implementation of the same feature.
+> 
+> When I floated something like this before for supporting SDEI in
+> guests, Christoffer didn't like tie-ing KVM to SMC-CC - hence the
+> all or nothing.
+> 
+> Since then we've had things like Spectre, which I don't think the
+> VMM should ever be allowed to handle, which makes the whole thing
+> much murkier.
 
-> On 2/7/23 9:09 PM, Thomas Huth wrote:
->> Oh, drat, I thought I had checked all return statements ... this must have fallen through the cracks, sorry!
->> 
->> Anyway, this is already a problem now: The function is called from kvm_arch_vm_ioctl() (which still returns a long), which in turn is called from kvm_vm_ioctl() in virt/kvm/kvm_main.c. And that functions stores the return value in an "int r" variable. So the upper bits are already lost there.
->> 
->> Also, how is this supposed to work from user space? The normal "ioctl()" libc function just returns an "int" ? Is this ioctl already used in a userspace application somewhere? ... at least in QEMU, I didn't spot it yet...
->> 
+That ship has sailed a long time ago. We also have grown a bunch of
+in-kernel SMCCC services that are KVM specific (the silly PTP stuff,
+for example, not to mention all the pKVM hypercalls...).
 
-We will need it in QEMU to implement migration with MTE (the current
-proposal simply adds a migration blocker when MTE is enabled, as there
-are various other things that need to be figured out for this to work.)
-But maybe other VMMs already use it (and have been lucky because they
-always dealt with shorter lengths?)
+It is also likely that these ranges will grow over time (it has been a
+long time since the last drop of Spectre-like crap, and something must
+be brewing somewhere), so a level of discrimination is important.
 
->
-> The ioctl command KVM_ARM_MTE_COPY_TAGS was merged recently and not used
-> by QEMU yet. I think struct kvm_arm_copy_mte_tags::length needs to be
-> '__u32' instead of '__u64' in order to standardize the return value.
-> Something like below. Documentation/virt/kvm/api.rst::section-4.130
-> needs update accordingly.
->
->     struct kvm_arm_copy_mte_tags {
->          __u64 guest_ipa;
->          __u32 pad;
->          __u32 length;
->          void __user *addr;
->          __u64 flags;
->          __u64 reserved[2];
->    };
+	M.
 
-Can we do this in a more compatible way, as we are dealing with an API?
-Like returning -EINVAL if length is too big?
-
+-- 
+Without deviation from the norm, progress is not possible.
