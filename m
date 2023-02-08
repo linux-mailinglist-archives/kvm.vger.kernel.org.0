@@ -2,141 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A60068F056
-	for <lists+kvm@lfdr.de>; Wed,  8 Feb 2023 15:05:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E7C6068F0B9
+	for <lists+kvm@lfdr.de>; Wed,  8 Feb 2023 15:26:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229843AbjBHOFz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Feb 2023 09:05:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57422 "EHLO
+        id S231334AbjBHO0H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Feb 2023 09:26:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230011AbjBHOFw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Feb 2023 09:05:52 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7D9065FF7;
-        Wed,  8 Feb 2023 06:05:50 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 820751042;
-        Wed,  8 Feb 2023 06:06:32 -0800 (PST)
-Received: from [10.57.12.246] (unknown [10.57.12.246])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AE2293F8C6;
-        Wed,  8 Feb 2023 06:05:47 -0800 (PST)
-Message-ID: <0f6690ec-8b33-866f-536e-3d111523b203@arm.com>
-Date:   Wed, 8 Feb 2023 14:05:46 +0000
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH v2 4/6] KVM: arm64: Limit length in
- kvm_vm_ioctl_mte_copy_tags() to INT_MAX
-Content-Language: en-GB
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
+        with ESMTP id S231280AbjBHOZv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Feb 2023 09:25:51 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AFCB4B1AB;
+        Wed,  8 Feb 2023 06:25:44 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id BAAD9B81E3A;
+        Wed,  8 Feb 2023 14:25:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5819EC433EF;
+        Wed,  8 Feb 2023 14:25:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1675866341;
+        bh=t5jw1fCX4NoFeI2EPmYRhXOtkcVOIpQY0b9/jl5R8zA=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=QgNyeqlpCi/SBDeCi1TjNEdCqZoJFbgr2WJlBzhmFCZPBDl+FvwZLFuUoEtRHiVbv
+         uS4uK4r0XCkRineIPNNP9oNxBtbjMeBbnPgCgvwNC+24iI018JePzQOYQtTUyIy/Mp
+         /qg/12O4pWuU4Ph2uCYFfSRaCoExuPkTdS6885J4+z8cV91aO0N0MHwBMlJryvG9OZ
+         X0le3Z/bcdQT3Q9bcuXnQc0LtSfZRuA6mh3CZD/9kvJpn4wp9UOAU86Mdp+1pChhIx
+         M/bUit0KIlLfw8FTXVwGO//F6H/bwcRj6WGI2Aj+ovZgdrJEnNUillAjBfdPPc/tmo
+         KNXBaoR+knFdw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pPlOF-008gAy-0C;
+        Wed, 08 Feb 2023 14:25:39 +0000
+Date:   Wed, 08 Feb 2023 14:25:38 +0000
+Message-ID: <86h6vwz125.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     James Morse <james.morse@arm.com>
+Cc:     linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-ia64@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, x86@kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Lorenzo Pieralisi <lpieralisi@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Borislav Petkov <bp@alien8.de>, H Peter Anvin <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>
-References: <20230208140105.655814-1-thuth@redhat.com>
- <20230208140105.655814-5-thuth@redhat.com>
-From:   Steven Price <steven.price@arm.com>
-In-Reply-To: <20230208140105.655814-5-thuth@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+        Len Brown <lenb@kernel.org>,
+        Rafael Wysocki <rafael@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Salil Mehta <salil.mehta@huawei.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>
+Subject: Re: [RFC PATCH 29/32] KVM: arm64: Pass hypercalls to userspace
+In-Reply-To: <878rh81rfa.wl-maz@kernel.org>
+References: <20230203135043.409192-1-james.morse@arm.com>
+        <20230203135043.409192-30-james.morse@arm.com>
+        <865ycg1kv2.wl-maz@kernel.org>
+        <7462738f-e837-cd99-f441-8e7c29d250cd@arm.com>
+        <878rh81rfa.wl-maz@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: james.morse@arm.com, linux-pm@vger.kernel.org, loongarch@lists.linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org, linux-ia64@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, x86@kernel.org, tglx@linutronix.de, lpieralisi@kernel.org, mark.rutland@arm.com, sudeep.holla@arm.com, bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com, mingo@redhat.com, will@kernel.org, catalin.marinas@arm.com, chenhuacai@kernel.org, suzuki.poulose@arm.com, oliver.upton@linux.dev, lenb@kernel.org, rafael@kernel.org, kernel@xen0n.name, salil.mehta@huawei.com, linux@armlinux.org.uk, jean-philippe@linaro.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/02/2023 14:01, Thomas Huth wrote:
-> In case of success, this function returns the amount of handled bytes.
-> However, this does not work for large values: The function is called
-> from kvm_arch_vm_ioctl() (which still returns a long), which in turn
-> is called from kvm_vm_ioctl() in virt/kvm/kvm_main.c. And that function
-> stores the return value in an "int r" variable. So the upper 32-bits
-> of the "long" return value are lost there.
+On Wed, 08 Feb 2023 08:40:09 +0000,
+Marc Zyngier <maz@kernel.org> wrote:
 > 
-> KVM ioctl functions should only return "int" values, so let's limit
-> the amount of bytes that can be requested here to INT_MAX to avoid
-> the problem with the truncated return value. We can then also change
-> the return type of the function to "int" to make it clearer that it
-> is not possible to return a "long" here.
+> On Tue, 07 Feb 2023 17:50:58 +0000,
+> James Morse <james.morse@arm.com> wrote:
+> > 
+> > Hi Marc,
+> > 
+> > On 05/02/2023 10:12, Marc Zyngier wrote:
+> > > On Fri, 03 Feb 2023 13:50:40 +0000,
+> > > James Morse <james.morse@arm.com> wrote:
+> > >>
+> > >> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> > >>
+> > >> When capability KVM_CAP_ARM_HVC_TO_USER is available, userspace can
+> > >> request to handle all hypercalls that aren't handled by KVM. With the
+> > >> help of another capability, this will allow userspace to handle PSCI
+> > >> calls.
+> > 
+> > > On top of Oliver's ask not to make this a blanket "steal everything",
+> > > but instead to have an actual request for ranges of forwarded
+> > > hypercalls:
+> > > 
+> > >> Notes on this implementation:
+> > >>
+> > >> * A similar mechanism was proposed for SDEI some time ago [1]. This RFC
+> > >>   generalizes the idea to all hypercalls, since that was suggested on
+> > >>   the list [2, 3].
+> > >>
+> > >> * We're reusing kvm_run.hypercall. I copied x0-x5 into
+> > >>   kvm_run.hypercall.args[] to help userspace but I'm tempted to remove
+> > >>   this, because:
+> > >>   - Most user handlers will need to write results back into the
+> > >>     registers (x0-x3 for SMCCC), so if we keep this shortcut we should
+> > >>     go all the way and read them back on return to kernel.
+> > >>   - QEMU doesn't care about this shortcut, it pulls all vcpu regs before
+> > >>     handling the call.
+> > >>   - SMCCC uses x0-x16 for parameters.
+> > >>   x0 does contain the SMCCC function ID and may be useful for fast
+> > >>   dispatch, we could keep that plus the immediate number.
+> > >>
+> > >> * Add a flag in the kvm_run.hypercall telling whether this is HVC or
+> > >>   SMC?  Can be added later in those bottom longmode and pad fields.
+> > 
+> > > We definitely need this. A nested hypervisor can (and does) use SMCs
+> > > as the conduit.
+> > 
+> > Christoffer's comments last time round on this was that EL2 guests
+> > get SMC with this, and EL1 guests get HVC. The VMM could never get
+> > both...
 > 
-> Fixes: f0376edb1ddc ("KVM: arm64: Add ioctl to fetch/store tags in a guest")
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> I agree with the first half of the statement (EL2 guest using SMC),
+> but limiting EL1 guests to HVC is annoying. On systems that have a
+> secure side, it would make sense to be able to route the guest's SMC
+> calls to userspace and allow it to emulate/proxy/deny such calls.
 
-Thanks for fixing this.
+You also want to look at the TRNG firmware spec (aka DEN0098), which
+explicitly calls out for the use of SMC when EL2 and EL3 are
+implemented (see 1.5 "Invocation considerations").
 
-Reviewed-by: Steven Price <steven.price@arm.com>
+Is it mad? Yes. But madness seems to be the direction of travel these
+days.
 
-> ---
->  Documentation/virt/kvm/api.rst    | 3 ++-
->  arch/arm64/include/asm/kvm_host.h | 4 ++--
->  arch/arm64/kvm/guest.c            | 8 ++++++--
->  3 files changed, 10 insertions(+), 5 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 0a67cb738013..f184427931fa 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -5553,7 +5553,8 @@ with the KVM_XEN_VCPU_GET_ATTR ioctl.
->    };
->  
->  Copies Memory Tagging Extension (MTE) tags to/from guest tag memory. The
-> -``guest_ipa`` and ``length`` fields must be ``PAGE_SIZE`` aligned. The ``addr``
-> +``guest_ipa`` and ``length`` fields must be ``PAGE_SIZE`` aligned.
-> +``length`` must not be bigger than 2^31 - PAGE_SIZE bytes. The ``addr``
->  field must point to a buffer which the tags will be copied to or from.
->  
->  ``flags`` specifies the direction of copy, either ``KVM_ARM_TAGS_TO_GUEST`` or
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 35a159d131b5..b1a16343767f 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -963,8 +963,8 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
->  int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
->  			       struct kvm_device_attr *attr);
->  
-> -long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
-> -				struct kvm_arm_copy_mte_tags *copy_tags);
-> +int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
-> +			       struct kvm_arm_copy_mte_tags *copy_tags);
->  
->  /* Guest/host FPSIMD coordination helpers */
->  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index cf4c495a4321..cadef953046f 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -1013,8 +1013,8 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
->  	return ret;
->  }
->  
-> -long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
-> -				struct kvm_arm_copy_mte_tags *copy_tags)
-> +int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
-> +			       struct kvm_arm_copy_mte_tags *copy_tags)
->  {
->  	gpa_t guest_ipa = copy_tags->guest_ipa;
->  	size_t length = copy_tags->length;
-> @@ -1035,6 +1035,10 @@ long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
->  	if (length & ~PAGE_MASK || guest_ipa & ~PAGE_MASK)
->  		return -EINVAL;
->  
-> +	/* Lengths above INT_MAX cannot be represented in the return value */
-> +	if (length > INT_MAX)
-> +		return -EINVAL;
-> +
->  	gfn = gpa_to_gfn(guest_ipa);
->  
->  	mutex_lock(&kvm->slots_lock);
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
