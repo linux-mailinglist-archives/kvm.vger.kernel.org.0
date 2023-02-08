@@ -2,94 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B8FA68F316
-	for <lists+kvm@lfdr.de>; Wed,  8 Feb 2023 17:23:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4148068F331
+	for <lists+kvm@lfdr.de>; Wed,  8 Feb 2023 17:32:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229874AbjBHQW6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Feb 2023 11:22:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37514 "EHLO
+        id S231292AbjBHQco (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Feb 2023 11:32:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229648AbjBHQW5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Feb 2023 11:22:57 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8D58DBF8
-        for <kvm@vger.kernel.org>; Wed,  8 Feb 2023 08:22:55 -0800 (PST)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 318GCFLK001784;
-        Wed, 8 Feb 2023 16:22:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=dO1eoTw6r5q8sY/BZO3+MUjcwgOEYcbb1h0MO883SGo=;
- b=JwM1WQGYPgpgWikiI3Qp13DA4ABV0j3TD5nPSdOnOUhxQNNC8THYzEG4NJ5mhbwHZGln
- AP544pyNwwDvzK/cbR4LtMeWmrNcUmP+sXl/tFEksi4cPfVQNFEjKtFJw+5jMSZBOuyc
- ww3GX6zp6mZNC8APFgNLyR8HNgk1iY/3KqusrMGfpnYqEKkqWFkvMZ5mrrQC5gW6X+P4
- 0dES+ZQD9x+hrAHOK1NFAf/t0OF5E3D1WDwzoRGLmcCzjPrqjtPTgGEc4O0F+4kGmeBJ
- MO57+sPqnOY3Li89u+njmn7My3UuahgaHehkuVOzhB3dKYlkdHYvGvvJPs1wpNmJhKlM tQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nmf20ravt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Feb 2023 16:22:46 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 318GCrmV004034;
-        Wed, 8 Feb 2023 16:22:46 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nmf20rauv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Feb 2023 16:22:46 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3185t2se021050;
-        Wed, 8 Feb 2023 16:22:43 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3nhemfn587-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Feb 2023 16:22:43 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 318GMekT47317492
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 8 Feb 2023 16:22:40 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EC8A320040;
-        Wed,  8 Feb 2023 16:22:39 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7F5AD2004D;
-        Wed,  8 Feb 2023 16:22:39 +0000 (GMT)
-Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.183.35])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed,  8 Feb 2023 16:22:39 +0000 (GMT)
-Message-ID: <0d7c8c1f3c0a78faf54923274e0099f15c5cda12.camel@linux.ibm.com>
-Subject: Re: [PATCH v15 11/11] docs/s390x/cpu topology: document s390x cpu
- topology
-From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
-        berrange@redhat.com, clg@kaod.org
-Date:   Wed, 08 Feb 2023 17:22:39 +0100
-In-Reply-To: <20230201132051.126868-12-pmorel@linux.ibm.com>
-References: <20230201132051.126868-1-pmorel@linux.ibm.com>
-         <20230201132051.126868-12-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.3 (3.46.3-1.fc37) 
+        with ESMTP id S231206AbjBHQcl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Feb 2023 11:32:41 -0500
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FA423D0AB;
+        Wed,  8 Feb 2023 08:32:37 -0800 (PST)
+Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 318G4o3x027790;
+        Wed, 8 Feb 2023 16:30:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2022-7-12;
+ bh=CkB5mt7BpEoAyYQpdiSDaKbh5Ki7LtebL5JxPMWhQiw=;
+ b=UVPTE6Dr3cO22DZ4lbrlRO3W05u9Y5pnWMNBUqjmdvcU1C7K5YZMfKuuklDxcQoUWPmF
+ JSDExT9tNXWuckkPzdp5Gi8GaFIYtHrt8cyCg8VIy6+0y/7m0tcj9pGrtRaRxILStG9n
+ kLxPlh6mJUet2VFm3BcuH2Rxh8zymKFsVd5MlY3yxOEN5CRUyHiqs8rNY2+ATXG685Qt
+ RI8ugYTr4a+ITdgfZYwhgEbvKmQQ61EWqVATA7843cNuLJQv83eQowQkiddE03Oqor65
+ 6AiAWHTr2Us7xvSC1TW9CN83sVslXJmFsvpuiy3tAOacyVvkFMNm7I23AzAjUKppxJSA kg== 
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3nhe9ngmat-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 08 Feb 2023 16:30:48 +0000
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 318GHoEZ028343;
+        Wed, 8 Feb 2023 16:30:47 GMT
+Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2049.outbound.protection.outlook.com [104.47.66.49])
+        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3nhdtdxwea-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 08 Feb 2023 16:30:46 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=alCCnAxfsf6YyyOWl64alKnjMBxrOlF4ozBOn0z8eO+ENQEMJ6YuJKcbSxIbeiHVlOgRByqk5O/cHFgWtowUnkw/HxK+2aMiAuP5fOqd94HEdlkNg8FzOvA341yVVynDu3MhwajDJhulXdvpGUrO4nkBKQWwaT+X+YelnXOKt33UmNqi2WR1g2k76tQ9TZgRq6VvP5VO12H2LAz2b5UQPjbPiM30w1pHtMnRM+6NecveHeI6uDuCRHmOWmDSFNGwE5fMbG7CaI/sD8jeBY9knqcn41GPmpvRf119M7BRf5tDIyiVlnj7MXTBlA4m8UfPtgO8F6/uWyr7O8aNFt60Jg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CkB5mt7BpEoAyYQpdiSDaKbh5Ki7LtebL5JxPMWhQiw=;
+ b=cuc0qp/Vy25H+7pfIs7pOALQh+tt56z+HGt8jid9PKU39ufnbgtNi+C9kaS+V8zF5HSRNRypoSkNoDD+hef4W39WFg/PvViEVI97QK/CVFmYklO3+wdlFRUxy/VZ5jFbWv1muDiBTxSw17BgwbgP4rIxcqBMvNoUdL8O/uKuAuN5NXCAVFaU3bWvHkJpncPPU3Uw1/hqs8rVKH7Hah8ekbgcJ3+tfOv0Oup006u8G9cP6Bdh41qn0dHriGtVZYa4lLRJsL1FYRBZhf8AOMc41suWyWKmjqBlqmrD7LnBA5FNeI7i6SXfz1Zpb7nTjrEX6tjyX3Ah4BdWd7OVH7EWng==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CkB5mt7BpEoAyYQpdiSDaKbh5Ki7LtebL5JxPMWhQiw=;
+ b=JxsoFnsAEFF05C3cxtWM0lfn+MzLIhuBHn2hl0Ul0997QEnZZr+WmomKLR4Y4MuGXHZD1ZRhDUsAgq1uAa8N0R3+N5grkdp6s6s9+6WF2M5XzHXZyRo4quASf6WB9NgqpUTFI4n8tyBe+2SBDVMieQx0kyGbTVvxZXf7Zp66n/0=
+Received: from BN0PR10MB5030.namprd10.prod.outlook.com (2603:10b6:408:12a::18)
+ by SN4PR10MB5589.namprd10.prod.outlook.com (2603:10b6:806:204::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.15; Wed, 8 Feb
+ 2023 16:30:43 +0000
+Received: from BN0PR10MB5030.namprd10.prod.outlook.com
+ ([fe80::b6b6:21f5:6588:1856]) by BN0PR10MB5030.namprd10.prod.outlook.com
+ ([fe80::b6b6:21f5:6588:1856%7]) with mapi id 15.20.6086.017; Wed, 8 Feb 2023
+ 16:30:43 +0000
+Message-ID: <2f59f974-da7a-4fc5-be44-f3535d986514@oracle.com>
+Date:   Wed, 8 Feb 2023 16:30:16 +0000
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.6.1
+Subject: Re: [PATCH RFC v7 16/64] x86/sev: Add helper functions for RMPUPDATE
+ and PSMASH instruction
+Content-Language: en-US
+To:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
+Cc:     linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+        pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
+        harald@profian.com, Brijesh Singh <brijesh.singh@amd.com>,
+        Liam Merwick <liam.merwick@oracle.com>
+References: <20221214194056.161492-1-michael.roth@amd.com>
+ <20221214194056.161492-17-michael.roth@amd.com>
+From:   Liam Merwick <liam.merwick@oracle.com>
+In-Reply-To: <20221214194056.161492-17-michael.roth@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SI1PR02CA0048.apcprd02.prod.outlook.com
+ (2603:1096:4:1f5::11) To BN0PR10MB5030.namprd10.prod.outlook.com
+ (2603:10b6:408:12a::18)
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: lWI3crC-VVHJXM1-4QQK7eUQl84Jxlld
-X-Proofpoint-ORIG-GUID: _V3HXN0FAqZ6_mptKLQxzTiFNcomxnMl
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN0PR10MB5030:EE_|SN4PR10MB5589:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6e5c9ada-bb3b-4227-5fd1-08db09f1d2d3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ckQMy4EYVkLtu6qpwJnBFVHIM/J9++v1rT0PtByqLj41jPnQk3JkI7QAiJ2TGcbLjL1stC5HsTfBBIRTzZgH6ad+jGtHajooBihJ6uvsyng2855oifXVTft+z4K9jZ6fsAvgHxj/cYUTzZSSmMQGwYwJYzol7fkQkgsNzG4GAiC2C9Zk0yNbo6TA8TTH7qY86Le+3KovpY/IaYKd+D7CKPbcl8/hdu9/ZENmL26phaWBsw4nxvu++AgM5ynBzhfAVL+UZINzZ7HNI5TEhRmKMMjz3N3NEatGGuAa+pabP/AD9lOx19hh+WTh4XjJxZGgx49LzgFMAl9q8mItwSpON/jcgDxkRJkgoEVfVCnlkwG5CvHKdh6uHLucR3qhKXe9uzDbIrmjzchsWSKUBSIEf9SCSdwxCih05yF815NPHk8n8odCLuh8ihS+o1d8sl62EetowDBdf/IhyTqchzgtWXlUUhGghSMGxVEoce8m7D/ireNIKkdt57OVYOpVkRYLKe7XvBe3d1ZsDWuhB1WVMM3IYmmHO+2pVSWk0XBP6OfjgP9E4ITHoUxGDB/uNBvVG8jeQEWuTotk2Vt4C6zhvG4K2qC/vuTPuhQAetgU3OcnIlIPICfgBuu+awXAXxi7iA+DdQlpWgmh2mb0BowUY69Ej7Ecbf2r8VqtZEz4HPZTHFCrgo+o5wMMyScVxj73jAkOuJaX74RnY92Mqo4tYplZb69UCK5+2xWmJl7UJYY=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR10MB5030.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(376002)(396003)(346002)(366004)(39860400002)(136003)(451199018)(7406005)(54906003)(86362001)(2616005)(31696002)(316002)(7416002)(5660300002)(6512007)(186003)(26005)(53546011)(36756003)(478600001)(44832011)(6506007)(6486002)(107886003)(6666004)(31686004)(2906002)(38100700002)(41300700001)(66946007)(66556008)(66476007)(8676002)(4326008)(83380400001)(8936002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MFRCcW5tUVlhaGNUUmMwZjgxZVI4Nk5aUkJoT0cyV2JGTDB6QVJKU3dtK3FD?=
+ =?utf-8?B?ZjNYUGJhQjhNb2RpZG9FRXV4bSs2dmUwY2tjWFQrRUN5ck8xTys1elBTZmVY?=
+ =?utf-8?B?a1p6cVZvMHhKZk5pL1BwUHZ0UGpWSzdUMWFPM2swcll5L1lmWmQvUk0yc3A2?=
+ =?utf-8?B?RFpNSTd1VjJmTVFjbXpLVWI0NkN2LytrYW8xQ21haXhicWhjcTAxNlZ1OVZC?=
+ =?utf-8?B?ZVFUOVRUU0U3c2x2Q0F0OXRlaFEzVmtpM1ZjV1JQcmtQRUVROEh3VUltNElL?=
+ =?utf-8?B?NUc3cVRnV1pTWW9BOTlraE4xU2lna0xkV1N4aS95Y1ViSFl4Q3JZSldYSlVk?=
+ =?utf-8?B?NzVoMndnQ1VZdWFQQzlFbHhtZ2xSUDFuSDFCOEVDNVY4T3BlVjVpWjF5YkJn?=
+ =?utf-8?B?WVRrTXlYcHE1bjc5Z2VreU92RE9iMzZTYmw0bXBJa21Zd3oxcGZvUVZ6Y0dE?=
+ =?utf-8?B?R01DSFFHa3RLMklsR2UzZG5OVVY3SnozaWVGN1A2UWRhZ3JFdHEwOC9INEZp?=
+ =?utf-8?B?eTFjMyt2MGJFS2JPZHFGaDhSMEl2MytiTkpvRVlzMk4zM3A2S1hLYWdwUTBw?=
+ =?utf-8?B?SzlETkZzSjdWelFSY2M0aW9XaW9RWkZvNlZFUmxLc3l6WGJSbnA1UjhaZEV2?=
+ =?utf-8?B?Rld3Slorb1JQSXZRQWRGS0dvRmJiYkZnUDkrT3FlVkxpOGNxc3YwVVd3d1Iy?=
+ =?utf-8?B?NGNaU0NUaktlVHExamxoSUdNQTJveXdiYlVnZFU3ME1Mc21RVjZzaVJXdy9N?=
+ =?utf-8?B?R0hxUm90blVZUXpzb2krcER1ZW54cVBVSjl6cGRCODdkdEovQ0dRZVQ0NXZu?=
+ =?utf-8?B?T2pDOFlvdStoWDJrdk1TKzhORW1Bd1hQRE9GQUQxN2lWdW1FKysza1JCRHJK?=
+ =?utf-8?B?c05EejkwZGxXVWFGTGpCeEpzd216aHllaENSL2N1WHJnTFE3N2pyY3VxVEhB?=
+ =?utf-8?B?ZmhPRGVyTkJ6U3RLaW80SkJzWXAzaEthZkp1TVBoVGUzTVFrWnRrYzlveHBq?=
+ =?utf-8?B?akNLMkN2MEgwSWtsc25qZlU0V1lCY3JjUkN5OHhZYldJMFE3YVNpaWc2b05l?=
+ =?utf-8?B?S2VZQzIxQmp4VmVHVm80ZS93dzF3dk1DYXNSZWpVMnZSZ0UyTmdtdkhRNjQz?=
+ =?utf-8?B?VWgzRnRvczFNUHNhRFlTSWkwZmVIYzZ6dit0aHN6UVdvUkhvczBlS1lkYndu?=
+ =?utf-8?B?ektldi82V25SUEF5VCt5T3pOd011ZEt2VXZwbUxFN1ZvK29PMUZBSDh3MFNw?=
+ =?utf-8?B?bEFBeUhhd20vVEtFT05JVFpod283YlRkT3RwRWlXeDJwOTFGaG5RYVZoU24x?=
+ =?utf-8?B?R0x1aEc5WTNySWxzaXM4cXkwMTQxVXFVb09uWXhuSXFWMC9WSlRPcDdaRnda?=
+ =?utf-8?B?Vi9OdFRtL3RSVUphQjhOVERLK2wxQkR6SVdUTTZDSURtRks1T2diTGdOb2Ux?=
+ =?utf-8?B?WC9NS3I1RFRLSTFYVXBuOU9qNGRBWjIyL2dOUkkyYlo2VFJ6L2NQYjlKb0E2?=
+ =?utf-8?B?NmJrMERQb0JCdjNKQ2w4S1BzQ3hkYmVDd3h3K010MGw0N0xaTzZpMUhKcUlz?=
+ =?utf-8?B?bDZHbFBiaXhLYzJDcC9ySUpRMFMzTzhlWVNtRng1alZJN3Z1N1hjTnppd3JF?=
+ =?utf-8?B?OVZNalQydENsMTFFMlE1MW9ZbEIxRVlleFhVa3Y2dWgvRVkrTzJOSytEMG1x?=
+ =?utf-8?B?dWRmTm5TL2RZTC82SkFpcjZuVUlXaWZ0N3Q5emF0WnpEVGZGWTJ4d2cwbWZ0?=
+ =?utf-8?B?MThjbGtNZFZ1eXB2YXExd29vWjJUbm5sdjFjSnBKc3VGRXJMdWpoNXljRTlC?=
+ =?utf-8?B?VDFIRWRHZVJJZkpMVVNuYUJYdThWbHJONW5XTWxKM3ZXTVJ4dU1wdDVvMUF4?=
+ =?utf-8?B?eEFsS041VUkrYWx0dEwzWDBlakdrZkJQZ0ZSK2F0VEVlUk91RG0xZHpVaUpV?=
+ =?utf-8?B?M0tlL2kxZWo0TzdTZUsxb0lxUDlYMFJNQlpsN3NybURNNmdNKzhSbFVYUkc2?=
+ =?utf-8?B?THhxaUNDRmV3ckFUREY2WUdMVWhTejNDalV6MzBEOEtNRXc0VTF6cjRVNzhj?=
+ =?utf-8?B?UEx3L05lZ1EyVzlDbXBxb0dqV3pGZkZZT1dwMFpmNkl5bmI4RGo5SUM3bUw5?=
+ =?utf-8?B?cHFTOXJtcE5JQkVmNExjQmg4TFZyMjU5bkRBUk1lcHU5WGpjaXJxRzBMelda?=
+ =?utf-8?B?SHc9PQ==?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?utf-8?B?OWdhTy9JdE44Qms0VzRDNEJmcHFHcUFYK3M1d2Rpbm15QmZ0cTNZUlhwTDR6?=
+ =?utf-8?B?OGIreko4R1k1L1F1eEFMajVzcmtRSmVCc29YNlVtNUIrbHNCN0lJUEFMWVA3?=
+ =?utf-8?B?QjB1cVRVUlFQcnFsem5Za2tyS0pWenZxZ3lmWEkrR3I5V1ZIVEdydGxUYlJL?=
+ =?utf-8?B?SldlMHdxRXV3cVNGaklGYjhMQXhENm1RVS9kY0JkZTduRzZZUDJJTWNmZ1Nz?=
+ =?utf-8?B?QUpsNmxsUFExNEZGOWJLMW42VUhPYTNzaWlnQkNCNG1nazlPNU5aN1RYc1Zx?=
+ =?utf-8?B?d3lBVDY4ZXhGVkF0MUN0blVVR3RRSk5lZS9EcTZ5clV4TzlYZ2ppV1BOQldJ?=
+ =?utf-8?B?cmVRRDg3WGYyWGpydjJGSnpFTjBIdkQ4ZEMyQzlueGMvRm1kYnRZL2ZiVUZh?=
+ =?utf-8?B?UjlheStLSDdpOHUxR2RZVFI5V1pYTFVVK3hudkIrZHdHSW1oY3hIV2FTZi9u?=
+ =?utf-8?B?TWw5QklyeVdxMTJNaFpMTWdHY2h2VXpYa3F2TTlmYjd6c0J2U29sQjY1M2hp?=
+ =?utf-8?B?QTl3aEJEaEM1Y1lJMEdGUG5GMXpwZkdkaWN0N0JyZHZheWRnRThDMHFNMmwy?=
+ =?utf-8?B?K3doM01YY1QxanFHU0YvK1F0YkNRQmpPd3d6RkdSME53NFVURGlpYnJySnk3?=
+ =?utf-8?B?dWNZbTJiOFNqZEhaaU5WRE84ZnVTbWJVTFlBbkhMZVNsZUNmeThTY21ZK2cx?=
+ =?utf-8?B?Y09PSHA4eFhNWE9lMFh1WWx4RjZVcGFQczFFKzZDRi9JUXo0TVF1RTFzVDc3?=
+ =?utf-8?B?MHVrOXhIdnVvWlljZTJWRGZqVWk2OGhIdzlmZjZVUUUzMUt1azVvdTlqVVZk?=
+ =?utf-8?B?TGMwaUJkVFVjS3hEeWNFU1RCYXE0akk2cUdnOFFWUEVZUXNXaUNlUzJSN01T?=
+ =?utf-8?B?NjdsWWc1MkUrQlBleFNUaGlqNTNOem5yTk1qb2hSUTdEV1BpZVV6RFF5MGhJ?=
+ =?utf-8?B?aldtRzlUZXVJd2Q4V1ZiRzdvdWJTcjFXWUFvNk1USDkrYms2YjdsODJGMjAr?=
+ =?utf-8?B?Y0VhbHM1WjVDc05WMGhMUXZVMG5PVHN2VVZMNE51bjVZOUdmNXBpTTdoWmVr?=
+ =?utf-8?B?bys2QTF5T201b0dCdUJzTHljMHRGV0krV1lkSGM1aHMzTjFlSVhzT0FkMjNP?=
+ =?utf-8?B?ZVd2YzVSa0dTYzdMY1p3MkRXV0tCdUZnbE1pcGV1VkxKWkszR1ZhK3BKSHlT?=
+ =?utf-8?B?ZGlOVEFKTklvRWdtVXp3ZmtqUExRSWNKLzBoR1ZVS1I2VGthREU4ekhPenB6?=
+ =?utf-8?B?alBWS1pMcHlvZ3FWelZZQXF1ZG54K1pDK0paRnR5cmJEMDF6NldqYXNmY0l0?=
+ =?utf-8?B?dWpxVDdKR05NS21zVWw1ODlIUjVjRUNrQzNodUdkRUsxTC9oeHBzVmVWZW1E?=
+ =?utf-8?B?aVNTdzdpL2ZjYnAyWjY4S010YWExaFlVOVl0a0RxTjNtL2ZaRThvVUlyYk9x?=
+ =?utf-8?B?U3hoeTdOZkFUWHhZM3drdURkNFR2RTZNRFNLQnM4VXUyemFpN2ozazVCamR1?=
+ =?utf-8?B?a0s4ZmZmTmY5bVl5ZEFRMDRTZCtjNFFPYVB6Y1lvaDdhMDEwZ29oNDNQUTND?=
+ =?utf-8?B?TlBTZnhJUi9ybnVaUXlVeHpYOElySzFRSzVRVi9rUEhiZmR5MmdFNE11NUVF?=
+ =?utf-8?B?NjNZOW9WQ0VoWTFPMXh4RmJBVEQxTEtsSXNwYkZmNGMySVQ5ZlpKN2ZJdnFO?=
+ =?utf-8?B?QjNObzlPVXZrL2Ztc21JVCtETjJ4MmVHNXpnYXM3YUoxV3liUW82OHQ1bjNo?=
+ =?utf-8?B?UUhjcFJBclRockdxandqVThTamdKRFN2N2N0aE5ZdDE0WVZubkdqZXRyKy9J?=
+ =?utf-8?B?bnROb3o1anZUWmN6QW5oQT09?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6e5c9ada-bb3b-4227-5fd1-08db09f1d2d3
+X-MS-Exchange-CrossTenant-AuthSource: BN0PR10MB5030.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Feb 2023 16:30:43.6111
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +IC+Ep1TjP+6bgXW+skvSXKf2T/1dW4WQMmSlidzJ9cw1G/XRCwuSoZ31KlRihwrF2FHp54HP50519LU7KambA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR10MB5589
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-02-08_07,2023-02-08_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1015
- mlxscore=0 lowpriorityscore=0 impostorscore=0 suspectscore=0
- mlxlogscore=999 bulkscore=0 malwarescore=0 priorityscore=1501 adultscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302080143
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
+ definitions=2023-02-08_08,2023-02-08_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=999 mlxscore=0
+ adultscore=0 phishscore=0 suspectscore=0 malwarescore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
+ definitions=main-2302080145
+X-Proofpoint-ORIG-GUID: UmpBGBjf0UEiYCSCTjQ826vSPaBD-Dmy
+X-Proofpoint-GUID: UmpBGBjf0UEiYCSCTjQ826vSPaBD-Dmy
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -97,456 +203,82 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2023-02-01 at 14:20 +0100, Pierre Morel wrote:
-> > > > Add some basic examples for the definition of cpu topology
-> > > > in s390x.
-> > > >=20
-> > > > Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> > > > ---
-> > > > =C2=A0docs/system/s390x/cpu-topology.rst | 294 ++++++++++++++++++++=
-+++++++++
-> > > > =C2=A0docs/system/target-s390x.rst       |   1 +
-> > > > =C2=A02 files changed, 295 insertions(+)
-> > > > =C2=A0create mode 100644 docs/system/s390x/cpu-topology.rst
-> > > >=20
-> > > > diff --git a/docs/system/s390x/cpu-topology.rst b/docs/system/s390x=
-/cpu-topology.rst
-> > > > new file mode 100644
-> > > > index 0000000000..e2190318c0
-> > > > --- /dev/null
-> > > > +++ b/docs/system/s390x/cpu-topology.rst
-> > > > @@ -0,0 +1,294 @@
-> > > > +CPU topology on s390x
-> > > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > > +
-> > > > +Since QEMU 8.0, CPU topology on s390x provides up to 4 levels of
-> > > > +topology containers: drawers, books, sockets and cores.
+On 14/12/2022 19:40, Michael Roth wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
+> 
+> The RMPUPDATE instruction writes a new RMP entry in the RMP Table. The
+> hypervisor will use the instruction to add pages to the RMP table. See
+> APM3 for details on the instruction operations.
+> 
+> The PSMASH instruction expands a 2MB RMP entry into a corresponding set
+> of contiguous 4KB-Page RMP entries. The hypervisor will use this
+> instruction to adjust the RMP entry without invalidating the previous
+> RMP entry.
+> 
+> Add the following external interface API functions:
+> 
+> int psmash(u64 pfn);
+> psmash is used to smash a 2MB aligned page into 4K
+> pages while preserving the Validated bit in the RMP.
+> 
+> int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid, bool immutable);
+> Used to assign a page to guest using the RMPUPDATE instruction.
+> 
+> int rmp_make_shared(u64 pfn, enum pg_level level);
+> Used to transition a page to hypervisor/shared state using the RMPUPDATE instruction.
+> 
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> [mdr: add RMPUPDATE retry logic for transient FAIL_OVERLAP errors]
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>   arch/x86/include/asm/sev.h | 24 ++++++++++
+>   arch/x86/kernel/sev.c      | 95 ++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 119 insertions(+)
+> 
 
-Cores isn't a container itself, at least as defined by STSI.
-Maybe use "nodes" instead?
+...
 
-> > > > +
-> > > > +The first three containers define a tree hierarchy, the last one
-> > > > +provides the placement of the CPUs inside the parent container and
-> > > > +3 CPU attributes:
+> +
+> +static int rmpupdate(u64 pfn, struct rmp_state *val)
+> +{
+> +	unsigned long paddr = pfn << PAGE_SHIFT;
+> +	int retries = 0;
+> +	int ret;
+> +
+> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+> +		return -ENXIO;
+> +
+> +retry:
+> +	/* Binutils version 2.36 supports the RMPUPDATE mnemonic. */
+> +	asm volatile(".byte 0xF2, 0x0F, 0x01, 0xFE"
+> +		     : "=a"(ret)
+> +		     : "a"(paddr), "c"((unsigned long)val)
+> +		     : "memory", "cc");
+> +
+> +	if (ret) {
+> +		if (!retries) {
+> +			pr_err("RMPUPDATE failed, ret: %d, pfn: %llx, npages: %d, level: %d, retrying (max: %d)...\n",
+> +			       ret, pfn, npages, level, 2 * num_present_cpus());
 
-The latter half of the sentence is a bit confusing, it's too informed
-by the output of STSI.
-Suggestion:
+This patch isn't bisectable - 'npages' isn't defined in this patch - 
+it's defined later in Patch18
 
-The first three are containers, defining a tree shaped hierarchy.
-There are three attributes associated with each core:
-> > > > +
-> > > > +- CPU type
-> > > > +- polarity entitlement
-> > > > +- dedication
-> > > > +
-> > > > +Note also that since 7.2 threads are no longer supported in the to=
-pology
-> > > > +and the ``-smp`` command line argument accepts only ``threads=3D1`=
-`.
-> > > > +
-> > > > +Prerequisites
-> > > > +-------------
-> > > > +
-> > > > +To use CPU topology a Linux QEMU/KVM machine providing the CPU top=
-ology facility
-> > > > +(STFLE bit 11) is required.
-> > > > +
-> > > > +However, since this facility has been enabled by default in an ear=
-ly version
-> > > > +of QEMU, we use a capability, ``KVM_CAP_S390_CPU_TOPOLOGY``, to no=
-tify KVM
-> > > > +that QEMU is supporting CPU topology.
+otherwise LGTM
 
-supports
-
-> > > > +
-> > > > +Enabling CPU topology
-> > > > +---------------------
-> > > > +
-> > > > +Currently, CPU topology is only enabled in the host model by defau=
-lt.
-> > > > +
-> > > > +Enabling CPU topology in a CPU model is done by setting the CPU fl=
-ag
-> > > > +``ctop`` to ``on`` like in:
-> > > > +
-> > > > +.. code-block:: bash
-> > > > +
-> > > > +   -cpu gen16b,ctop=3Don
-> > > > +
-> > > > +Having the topology disabled by default allows migration between
-> > > > +old and new QEMU without adding new flags.
-> > > > +
-> > > > +Default topology usage
-> > > > +----------------------
-> > > > +
-> > > > +The CPU topology, can be specified on the QEMU command line
-
-Drop the comma.
-
-> > > > +with the ``-smp`` or the ``-device`` QEMU command arguments
-> > > > +without using any new attributes.
-
-Might want to split this up for -smp and -device.
-
-If none of the new attributes (drawers, books) are specified for the
--smp flag, <description of default>
-If none of the new attributes (drawer, book, dedicated, entitlement)
-are specified for the -device cpu flag, the topology will be ...
-
-> > > > +In this case, the topology will be calculated by simply adding
-> > > > +to the topology the cores based on the core-id starting with
-> > > > +core-0 at position 0 of socket-0, book-0, drawer-0 with default
-> > > > +modifier attributes: horizontal polarity and no dedication.
-> > > > +
-> > > > +In the following machine we define 8 sockets with 4 cores each.
-> > > > +Note that s390x QEMU machines do not implement multithreading.
-
-You could drop that since you already said it earlier.
-
-> > > > +
-> > > > +.. code-block:: bash
-> > > > +
-> > > > +  $ qemu-system-s390x -m 2G \
-> > > > +    -cpu gen16b,ctop=3Don \
-> > > > +    -smp cpus=3D5,sockets=3D8,cores=3D4,maxcpus=3D32 \
-> > > > +    -device host-s390x-cpu,core-id=3D14 \
-> > > > +
-> > > > +New CPUs can be plugged using the device_add hmp command like in:
-
-"as in" or "like so" sounds better to my non-native ears.
-Applies to other instances, too.
-
->=20
-> > > > +
-> > > > +.. code-block:: bash
-> > > > +
-> > > > +  (qemu) device_add gen16b-s390x-cpu,core-id=3D9
-> > > > +
-> > > > +The core-id defines the placement of the core in the topology by
-> > > > +starting with core 0 in socket 0 up to maxcpus.
-
-Suggestion:
-The same placement of the CPU is derived from the core-id as described abov=
-e.
-
-> > > > +
-> > > > +In the example above:
-> > > > +
-> > > > +* There are 5 CPUs provided to the guest with the ``-smp`` command=
- line
-> > > > +  They will take the core-ids 0,1,2,3,4
-> > > > +  As we have 4 cores in a socket, we have 4 CPUs provided
-> > > > +  to the guest in socket 0, with core-ids 0,1,2,3.
-> > > > +  The last cpu, with core-id 4, will be on socket 1.
-> > > > +
-> > > > +* the core with ID 14 provided by the ``-device`` command line wil=
-l
-> > > > +  be placed in socket 3, with core-id 14
-> > > > +
-> > > > +* the core with ID 9 provided by the ``device_add`` qmp command wi=
-ll
-
-You said it's a hmp command earlier.
-
-> > > > +  be placed in socket 2, with core-id 9
-> > > > +
-> > > > +Polarity and dedication
-
-s/Polarity/Polarization, same below
-
-> > > > +-----------------------
-> > > > +
-> > > > +Polarity can be of two types: horizontal or vertical.
-> > > > +
-> > > > +The horizontal polarization specifies that all guest's vCPUs get
-> > > > +almost the same amount of provisioning of real CPU by the host.
-> > > > +
-> > > > +The vertical polarization specifies that guest's vCPU can get
-> > > > +different real CPU provisions:
-> > > > +
-
-No reason to capitalize vertical below, is there?
-
-> > > > +- a vCPU with Vertical high entitlement specifies that this
-> > > > +  vCPU gets 100% of the real CPU provisioning.
-> > > > +
-> > > > +- a vCPU with Vertical medium entitlement specifies that this
-> > > > +  vCPU shares the real CPU with other vCPUs.
-> > > > +
-> > > > +- a vCPU with Vertical low entitlement specifies that this
-> > > > +  vCPU only get real CPU provisioning when no other vCPU need it.
-
-getS, vCPUs or needS
-
-> > > > +
-> > > > +In the case a vCPU with vertical high entitlement does not use
-
-In case
-
-> > > > +the real CPU, the unused "slack" can be dispatched to other vCPU
-
-vCPUs
-
-> > > > +with medium or low entitlement.
-> > > > +
-> > > > +A subsystem reset puts all vCPU of the configuration into the
-
-vCPUs
-
-> > > > +horizontal polarization.
-> > > > +
-> > > > +The admin specifies the dedicated bit when the vCPU is dedicated
-> > > > +to a single real CPU.
-> > > > +
-> > > > +As for the Linux admin, the dedicated bit is an indication on the
-
-Drop everything before the comma. indication of
-
-> > > > +affinity of a vCPU for a real CPU while the entitlement indicates =
-the
-
-affinity of a vCPU to a real CPU, while
-
-> > > > +sharing or exclusivity of use.
-> > > > +
-> > > > +Defining the topology on command line
-
-on the command line
-
-> > > > +-------------------------------------
-> > > > +
-> > > > +The topology can be defined entirely during the CPU definition,
-
-The topology can entirely be defined using -device cpu statements,
-
-> > > > +with the exception of CPU 0 which must be defined with the -smp
-> > > > +argument.
-> > > > +
-> > > > +For example, here we set the position of the cores 1,2,3 on
-
-position ... to
-
-> > > > +drawer 1, book 1, socket 2 and cores 0,9 and 14 on drawer 0,
-
-same here, s/on/to
-
-> > > > +book 0, socket 0 with all horizontal polarity and not dedicated.
-> > > > +The core 4, will be set on its default position on socket 1
-
-set to ... in socket 1
-
-> > > > +(since we have 4 core per socket) and we define it with dedication=
- and
-> > > > +vertical high entitlement.
-> > > > +
-> > > > +.. code-block:: bash
-> > > > +
-> > > > +  $ qemu-system-s390x -m 2G \
-> > > > +    -cpu gen16b,ctop=3Don \
-> > > > +    -smp cpus=3D1,sockets=3D8,cores=3D4,maxcpus=3D32 \
-> > > > +    \
-> > > > +    -device gen16b-s390x-cpu,drawer-id=3D1,book-id=3D1,socket-id=
-=3D2,core-id=3D1 \
-> > > > +    -device gen16b-s390x-cpu,drawer-id=3D1,book-id=3D1,socket-id=
-=3D2,core-id=3D2 \
-> > > > +    -device gen16b-s390x-cpu,drawer-id=3D1,book-id=3D1,socket-id=
-=3D2,core-id=3D3 \
-> > > > +    \
-> > > > +    -device gen16b-s390x-cpu,drawer-id=3D0,book-id=3D0,socket-id=
-=3D0,core-id=3D9 \
-> > > > +    -device gen16b-s390x-cpu,drawer-id=3D0,book-id=3D0,socket-id=
-=3D0,core-id=3D14 \
-> > > > +    \
-> > > > +    -device gen16b-s390x-cpu,core-id=3D4,dedicated=3Don,polarity=
-=3D3 \
-> > > > +
-> > > > +QAPI interface for topology
-> > > > +---------------------------
-> > > > +
-> > > > +Let's start QEMU with the following command:
-> > > > +
-> > > > +.. code-block:: bash
-> > > > +
-> > > > + sudo /usr/local/bin/qemu-system-s390x \
-> > > > +    -enable-kvm \
-> > > > +    -cpu z14,ctop=3Don \
-> > > > +    -smp 1,drawers=3D3,books=3D3,sockets=3D2,cores=3D2,maxcpus=3D3=
-6 \
-> > > > +    \
-> > > > +    -device z14-s390x-cpu,core-id=3D19,polarity=3D3 \
-> > > > +    -device z14-s390x-cpu,core-id=3D11,polarity=3D1 \
-> > > > +    -device z14-s390x-cpu,core-id=3D112,polarity=3D3 \
-> > > > +   ...
-> > > > +
-> > > > +and see the result when using of the QAPI interface.
-
-s/of//
-
-> > > > +
-> > > > +addons to query-cpus-fast
-> > > > ++++++++++++++++++++++++++
-> > > > +
-> > > > +The command query-cpus-fast allows the admin to query the topology
-> > > > +tree and modifiers for all configured vCPU.
-
-vCPUs
-
-> > > > +
-> > > > +.. code-block:: QMP
-> > > > +
-> > > > + -> { "execute": "query-cpus-fast" }
-> > > > + {
-> > > > +  "return": [
-> > > > +    {
-> > > > +      "dedicated": false,
-> > > > +      "thread-id": 3631238,
-> > > > +      "props": {
-> > > > +        "core-id": 0,
-> > > > +        "socket-id": 0,
-> > > > +        "drawer-id": 0,
-> > > > +        "book-id": 0
-> > > > +      },
-> > > > +      "cpu-state": "operating",
-> > > > +      "qom-path": "/machine/unattached/device[0]",
-> > > > +      "polarity": 2,
-> > > > +      "cpu-index": 0,
-> > > > +      "target": "s390x"
-> > > > +    },
-> > > > +    {
-> > > > +      "dedicated": false,
-> > > > +      "thread-id": 3631248,
-> > > > +      "props": {
-> > > > +        "core-id": 19,
-> > > > +        "socket-id": 9,
-> > > > +        "drawer-id": 0,
-> > > > +        "book-id": 2
-> > > > +      },
-> > > > +      "cpu-state": "operating",
-> > > > +      "qom-path": "/machine/peripheral-anon/device[0]",
-> > > > +      "polarity": 3,
-> > > > +      "cpu-index": 19,
-> > > > +      "target": "s390x"
-> > > > +    },
-> > > > +    {
-> > > > +      "dedicated": false,
-> > > > +      "thread-id": 3631249,
-> > > > +      "props": {
-> > > > +        "core-id": 11,
-> > > > +        "socket-id": 5,
-> > > > +        "drawer-id": 0,
-> > > > +        "book-id": 1
-> > > > +      },
-> > > > +      "cpu-state": "operating",
-> > > > +      "qom-path": "/machine/peripheral-anon/device[1]",
-> > > > +      "polarity": 1,
-> > > > +      "cpu-index": 11,
-> > > > +      "target": "s390x"
-> > > > +    },
-> > > > +    {
-> > > > +      "dedicated": true,
-> > > > +      "thread-id": 3631250,
-> > > > +      "props": {
-> > > > +        "core-id": 112,
-> > > > +        "socket-id": 56,
-> > > > +        "drawer-id": 3,
-> > > > +        "book-id": 14
-> > > > +      },
-> > > > +      "cpu-state": "operating",
-> > > > +      "qom-path": "/machine/peripheral-anon/device[2]",
-> > > > +      "polarity": 3,
-> > > > +      "cpu-index": 112,
-> > > > +      "target": "s390x"
-> > > > +    }
-> > > > +  ]
-> > > > + }
-> > > > +
-> > > > +x-set-cpu-topology
-> > > > +++++++++++++++++++
-> > > > +
-> > > > +The command x-set-cpu-topology allows the admin to modify the topo=
-logy
-> > > > +tree or the topology modifiers of a vCPU in the configuration.
-> > > > +
-> > > > +.. code-block:: QMP
-> > > > +
-> > > > + -> { "execute": "x-set-cpu-topology",
-> > > > +      "arguments": {
-> > > > +         "core": 11,
-> > > > +         "socket": 0,
-> > > > +         "book": 0,
-> > > > +         "drawer": 0,
-> > > > +         "polarity": 0,
-> > > > +         "dedicated": false
-> > > > +      }
-> > > > +    }
-> > > > + <- {"return": {}}
-> > > > +
-> > > > +
-> > > > +event CPU_POLARITY_CHANGE
-> > > > ++++++++++++++++++++++++++
-> > > > +
-> > > > +When a guest is requesting a modification of the polarity,
-
-requests
-
-> > > > +QEMU sends a CPU_POLARITY_CHANGE event.
-> > > > +
-> > > > +When requesting the change, the guest only specifies horizontal or
-> > > > +vertical polarity.
-> > > > +The dedication and fine grain vertical entitlement depends on admi=
-n
-> > > > +to set according to its response to this event.
-
-It is the job of the admin to set the dedication and fine grained vertical =
-entitlement
-in response to this event.
-
-> > > > +
-> > > > +Note that a vertical polarized dedicated vCPU can only have a high
-> > > > +entitlement, this gives 6 possibilities for a vCPU polarity:
-
-for vCPU polarization.
-
-> > > > +
-> > > > +- Horizontal
-> > > > +- Horizontal dedicated
-> > > > +- Vertical low
-> > > > +- Vertical medium
-> > > > +- Vertical high
-> > > > +- Vertical high dedicated
-> > > > +
-> > > > +Example of the event received when the guest issues the CPU instru=
-ction
-> > > > +Perform Topology Function PTF(0) to request an horizontal polarity=
-:
-> > > > +
-> > > > +.. code-block:: QMP
-> > > > +
-> > > > + <- { "event": "CPU_POLARITY_CHANGE",
-> > > > +      "data": { "polarity": 0 },
-> > > > +      "timestamp": { "seconds": 1401385907, "microseconds": 422329=
- } }
-> > > > +
-> > > > +
-> > > > diff --git a/docs/system/target-s390x.rst b/docs/system/target-s390=
-x.rst
-> > > > index c636f64113..ff0ffe04f3 100644
-> > > > --- a/docs/system/target-s390x.rst
-> > > > +++ b/docs/system/target-s390x.rst
-> > > > @@ -33,3 +33,4 @@ Architectural features
-> > > > =C2=A0.. toctree::
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0s390x/bootdevices
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0s390x/protvirt
-> > > > +   s390x/cpu-topology
+Regards,
+Liam
 
 
-I'm not too big a fan of using "admin", I guess in reality it's mostly goin=
-g to be libvirt
-adjusting things. Maybe reformulate sentences to get rid of it or use
-"outside administrative entity" or something similar. But in the end it's n=
-ot too important.
-
+> +			dump_stack();
+> +		}
+> +		retries++;
+> +		if (retries < 2 * num_present_cpus())
+> +			goto retry;
+> +	} else if (retries > 0) {
+> +		pr_err("RMPUPDATE for pfn %llx succeeded after %d retries\n", pfn, retries);
+> +	}
+> +
+> +	return ret;
+> +}
 
