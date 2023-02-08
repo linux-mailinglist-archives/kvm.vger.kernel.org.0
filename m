@@ -2,43 +2,34 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D08CE68F04C
-	for <lists+kvm@lfdr.de>; Wed,  8 Feb 2023 15:03:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A60068F056
+	for <lists+kvm@lfdr.de>; Wed,  8 Feb 2023 15:05:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231392AbjBHODO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Feb 2023 09:03:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53120 "EHLO
+        id S229843AbjBHOFz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Feb 2023 09:05:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57422 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230365AbjBHODJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Feb 2023 09:03:09 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 067AC9EF8
-        for <kvm@vger.kernel.org>; Wed,  8 Feb 2023 06:01:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675864908;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6/nsobX2ruZfUuZDf5t48MOb356vKr1L1ibFdLfAXYU=;
-        b=RnAqGrjz0rgy0RAL5sDEB48qhdLkudV6vUB7v6Ft5sUm+1u0otZfThWrrK6df/v7aAZ3oa
-        dJkoPZY1/h0VZ0mObYmMdoeakG8P46E7yhcxsGH/98KuguI6t1lxvZXc3akHV7hBnyknsv
-        6/5avGGvl+3Pjwo/nQ2wa+p/tpMODKI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-538-PFqbRkqyPz6WJTX1JMymZg-1; Wed, 08 Feb 2023 09:01:44 -0500
-X-MC-Unique: PFqbRkqyPz6WJTX1JMymZg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2281E885622;
-        Wed,  8 Feb 2023 14:01:42 +0000 (UTC)
-Received: from thuth.com (unknown [10.39.193.64])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A6398140EBF4;
-        Wed,  8 Feb 2023 14:01:38 +0000 (UTC)
-From:   Thomas Huth <thuth@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        with ESMTP id S230011AbjBHOFw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Feb 2023 09:05:52 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7D9065FF7;
+        Wed,  8 Feb 2023 06:05:50 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 820751042;
+        Wed,  8 Feb 2023 06:06:32 -0800 (PST)
+Received: from [10.57.12.246] (unknown [10.57.12.246])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AE2293F8C6;
+        Wed,  8 Feb 2023 06:05:47 -0800 (PST)
+Message-ID: <0f6690ec-8b33-866f-536e-3d111523b203@arm.com>
+Date:   Wed, 8 Feb 2023 14:05:46 +0000
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH v2 4/6] KVM: arm64: Limit length in
+ kvm_vm_ioctl_mte_copy_tags() to INT_MAX
+Content-Language: en-GB
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
 Cc:     kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
         kvm-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
@@ -50,19 +41,15 @@ Cc:     kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
         Janosch Frank <frankja@linux.ibm.com>,
         David Hildenbrand <david@redhat.com>,
         Gavin Shan <gshan@redhat.com>,
-        Steven Price <steven.price@arm.com>,
         Cornelia Huck <cohuck@redhat.com>
-Subject: [PATCH v2 6/6] KVM: Change return type of kvm_arch_vm_ioctl() to "int"
-Date:   Wed,  8 Feb 2023 15:01:05 +0100
-Message-Id: <20230208140105.655814-7-thuth@redhat.com>
-In-Reply-To: <20230208140105.655814-1-thuth@redhat.com>
 References: <20230208140105.655814-1-thuth@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+ <20230208140105.655814-5-thuth@redhat.com>
+From:   Steven Price <steven.price@arm.com>
+In-Reply-To: <20230208140105.655814-5-thuth@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,126 +57,86 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-All kvm_arch_vm_ioctl() implementations now only deal with "int"
-types as return values, so we can change the return type of these
-functions to use "int" instead of "long".
+On 08/02/2023 14:01, Thomas Huth wrote:
+> In case of success, this function returns the amount of handled bytes.
+> However, this does not work for large values: The function is called
+> from kvm_arch_vm_ioctl() (which still returns a long), which in turn
+> is called from kvm_vm_ioctl() in virt/kvm/kvm_main.c. And that function
+> stores the return value in an "int r" variable. So the upper 32-bits
+> of the "long" return value are lost there.
+> 
+> KVM ioctl functions should only return "int" values, so let's limit
+> the amount of bytes that can be requested here to INT_MAX to avoid
+> the problem with the truncated return value. We can then also change
+> the return type of the function to "int" to make it clearer that it
+> is not possible to return a "long" here.
+> 
+> Fixes: f0376edb1ddc ("KVM: arm64: Add ioctl to fetch/store tags in a guest")
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- arch/arm64/kvm/arm.c       | 3 +--
- arch/mips/kvm/mips.c       | 4 ++--
- arch/powerpc/kvm/powerpc.c | 5 ++---
- arch/riscv/kvm/vm.c        | 3 +--
- arch/s390/kvm/kvm-s390.c   | 3 +--
- arch/x86/kvm/x86.c         | 3 +--
- include/linux/kvm_host.h   | 3 +--
- 7 files changed, 9 insertions(+), 15 deletions(-)
+Thanks for fixing this.
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 9c5573bc4614..e791ad6137b8 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1449,8 +1449,7 @@ static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
- 	}
- }
- 
--long kvm_arch_vm_ioctl(struct file *filp,
--		       unsigned int ioctl, unsigned long arg)
-+int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
- {
- 	struct kvm *kvm = filp->private_data;
- 	void __user *argp = (void __user *)arg;
-diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-index a25e0b73ee70..84cadaa2c2d3 100644
---- a/arch/mips/kvm/mips.c
-+++ b/arch/mips/kvm/mips.c
-@@ -1003,9 +1003,9 @@ void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
- 	kvm_flush_remote_tlbs(kvm);
- }
- 
--long kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
-+int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
- {
--	long r;
-+	int r;
- 
- 	switch (ioctl) {
- 	default:
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index 04494a4fb37a..6f6ba55c224f 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -2386,12 +2386,11 @@ static int kvmppc_get_cpu_char(struct kvm_ppc_cpu_char *cp)
- }
- #endif
- 
--long kvm_arch_vm_ioctl(struct file *filp,
--                       unsigned int ioctl, unsigned long arg)
-+int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
- {
- 	struct kvm *kvm __maybe_unused = filp->private_data;
- 	void __user *argp = (void __user *)arg;
--	long r;
-+	int r;
- 
- 	switch (ioctl) {
- 	case KVM_PPC_GET_PVINFO: {
-diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
-index 65a964d7e70d..c13130ab459a 100644
---- a/arch/riscv/kvm/vm.c
-+++ b/arch/riscv/kvm/vm.c
-@@ -87,8 +87,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	return r;
- }
- 
--long kvm_arch_vm_ioctl(struct file *filp,
--		       unsigned int ioctl, unsigned long arg)
-+int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
- {
- 	return -EINVAL;
- }
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 8ad1972b8a73..86ca49814983 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -2850,8 +2850,7 @@ static int kvm_s390_vm_mem_op(struct kvm *kvm, struct kvm_s390_mem_op *mop)
- 	return r;
- }
- 
--long kvm_arch_vm_ioctl(struct file *filp,
--		       unsigned int ioctl, unsigned long arg)
-+int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
- {
- 	struct kvm *kvm = filp->private_data;
- 	void __user *argp = (void __user *)arg;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 2d210ab47e21..52a8c993cd55 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -6645,8 +6645,7 @@ static int kvm_vm_ioctl_set_clock(struct kvm *kvm, void __user *argp)
- 	return 0;
- }
- 
--long kvm_arch_vm_ioctl(struct file *filp,
--		       unsigned int ioctl, unsigned long arg)
-+int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
- {
- 	struct kvm *kvm = filp->private_data;
- 	void __user *argp = (void __user *)arg;
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 4f26b244f6d0..ed2f1f02976b 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1398,8 +1398,7 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
- 			bool line_status);
- int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 			    struct kvm_enable_cap *cap);
--long kvm_arch_vm_ioctl(struct file *filp,
--		       unsigned int ioctl, unsigned long arg);
-+int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg);
- long kvm_arch_vm_compat_ioctl(struct file *filp, unsigned int ioctl,
- 			      unsigned long arg);
- 
--- 
-2.31.1
+Reviewed-by: Steven Price <steven.price@arm.com>
+
+> ---
+>  Documentation/virt/kvm/api.rst    | 3 ++-
+>  arch/arm64/include/asm/kvm_host.h | 4 ++--
+>  arch/arm64/kvm/guest.c            | 8 ++++++--
+>  3 files changed, 10 insertions(+), 5 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 0a67cb738013..f184427931fa 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -5553,7 +5553,8 @@ with the KVM_XEN_VCPU_GET_ATTR ioctl.
+>    };
+>  
+>  Copies Memory Tagging Extension (MTE) tags to/from guest tag memory. The
+> -``guest_ipa`` and ``length`` fields must be ``PAGE_SIZE`` aligned. The ``addr``
+> +``guest_ipa`` and ``length`` fields must be ``PAGE_SIZE`` aligned.
+> +``length`` must not be bigger than 2^31 - PAGE_SIZE bytes. The ``addr``
+>  field must point to a buffer which the tags will be copied to or from.
+>  
+>  ``flags`` specifies the direction of copy, either ``KVM_ARM_TAGS_TO_GUEST`` or
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 35a159d131b5..b1a16343767f 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -963,8 +963,8 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+>  int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+>  			       struct kvm_device_attr *attr);
+>  
+> -long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+> -				struct kvm_arm_copy_mte_tags *copy_tags);
+> +int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+> +			       struct kvm_arm_copy_mte_tags *copy_tags);
+>  
+>  /* Guest/host FPSIMD coordination helpers */
+>  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index cf4c495a4321..cadef953046f 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -1013,8 +1013,8 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+>  	return ret;
+>  }
+>  
+> -long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+> -				struct kvm_arm_copy_mte_tags *copy_tags)
+> +int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+> +			       struct kvm_arm_copy_mte_tags *copy_tags)
+>  {
+>  	gpa_t guest_ipa = copy_tags->guest_ipa;
+>  	size_t length = copy_tags->length;
+> @@ -1035,6 +1035,10 @@ long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+>  	if (length & ~PAGE_MASK || guest_ipa & ~PAGE_MASK)
+>  		return -EINVAL;
+>  
+> +	/* Lengths above INT_MAX cannot be represented in the return value */
+> +	if (length > INT_MAX)
+> +		return -EINVAL;
+> +
+>  	gfn = gpa_to_gfn(guest_ipa);
+>  
+>  	mutex_lock(&kvm->slots_lock);
 
