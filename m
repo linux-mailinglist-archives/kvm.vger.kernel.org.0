@@ -2,196 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 976CC68EED4
-	for <lists+kvm@lfdr.de>; Wed,  8 Feb 2023 13:24:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F8FB68EF32
+	for <lists+kvm@lfdr.de>; Wed,  8 Feb 2023 13:41:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231273AbjBHMY1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Feb 2023 07:24:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59946 "EHLO
+        id S230257AbjBHMlY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Feb 2023 07:41:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230335AbjBHMYZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Feb 2023 07:24:25 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FC576196;
-        Wed,  8 Feb 2023 04:24:24 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id r8so19062699pls.2;
-        Wed, 08 Feb 2023 04:24:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Eww0bGHARNDro+m4qM4alVSDjm0iyW4r5Bw76JD/1d0=;
-        b=UwDzNnVKuF/8eUzNV/aymL9+YcldSIDvjEKmYPNChw9tl/cW29Zad264smZsYHW8Qe
-         3K+A+0a2pom4OZZbxKrjZjNutSB5FHodxpuAzzRchE6kaJcQ+5/lupwMD0s9d0crb4Sa
-         E2m54aLLmCbokqcbW9FYc9zQr3zWZnOqTWppeVRy7ISY2XtRs4xPRjU02s++w/HKJlFl
-         kg04wIBDr54WQd38+rYVn2umHbHARWKII1ybL4idTSuoiziEp1hZqzFvsUqhl59swDNr
-         Yi7r6xIUpqFdwY449R217+sVKup3An5sYZWWhbEK3lIoH3KXY5u5fLczWnZjy4KAyIPb
-         6UgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Eww0bGHARNDro+m4qM4alVSDjm0iyW4r5Bw76JD/1d0=;
-        b=FjzxwuIWI+X52Nuap3dhGGh/vwfwuRrfBzK/su18xW7CFjI1MJ4jKhRRRuCd2Z+3lw
-         zL6DOtpoOKwdaCZTO7hKovU1Ay+z+6DUOvJVsk7AhZ/HahxMJ8sQlUzMx+mBa+b2KCYb
-         KAQpGfGxmUwWDDDt73gB1lUMSmkN/x8NeE9ubBiBwp5W5jIKv7/S8ikFO9IHWfS57rlB
-         W/Sx9NBZ32sLNNoHmog2GFTxWToapXLjl9HLmkrvmPQe6wQregd9nmrJJMJhnIe5T50M
-         PQn4gHuRS2vKwPRDYKl4NVC6snL0H3KJFB10jbSftpiYYCd9glH9rZGHh76Pi7mkFTFW
-         rSKA==
-X-Gm-Message-State: AO0yUKU+Qorcaz27nxD8dK2sfh5hecgixfeIGyyQ+cR+eyxqCXAKWVbN
-        uWEfqrGxQzT2BlaHaeUTbpM=
-X-Google-Smtp-Source: AK7set/EW3iOkejUiaBMrPtlYGHcnCsU5yA10F1vOHdYEM6oZRjOqRVew+hXFhEI9WsmU30z7oOHew==
-X-Received: by 2002:a05:6a21:38c8:b0:be:bf28:b7da with SMTP id yk8-20020a056a2138c800b000bebf28b7damr5858337pzb.20.1675859063311;
-        Wed, 08 Feb 2023 04:24:23 -0800 (PST)
-Received: from localhost ([192.55.54.55])
-        by smtp.gmail.com with ESMTPSA id p22-20020aa78616000000b0058d9b68042fsm1546476pfn.14.2023.02.08.04.24.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Feb 2023 04:24:22 -0800 (PST)
-Date:   Wed, 8 Feb 2023 04:24:21 -0800
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Naoya Horiguchi <naoya.horiguchi@nec.com>,
-        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>, tabba@google.com,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        wei.w.wang@intel.com
-Subject: Re: [PATCH v10 0/9] KVM: mm: fd-based approach for supporting KVM
-Message-ID: <20230208122421.GA4175971@ls.amr.corp.intel.com>
-References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
- <Y8H5Z3e4hZkFxAVS@google.com>
- <20230119111308.GC2976263@ls.amr.corp.intel.com>
- <Y8lg1G2lRIrI/hld@google.com>
- <20230119223704.GD2976263@ls.amr.corp.intel.com>
- <Y880FiYF7YCtsw/i@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+        with ESMTP id S229728AbjBHMlW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Feb 2023 07:41:22 -0500
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2046.outbound.protection.outlook.com [40.107.237.46])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1374A4673D
+        for <kvm@vger.kernel.org>; Wed,  8 Feb 2023 04:41:22 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CS+EwhJxQxOpV9sqr+GkXMtcGI6t9zqE2PjGJaeg5XwyddAIoi/csYgL6+/mmS5dIoa2bf0N0Fhx1+Kg1aa5eevoR88KqPy1l6pOEwrm4piBsbfBLMPrzjoRdpaj6BXmIxT+x+FydSsfKWX4ebZq4Bx0PmMJSV6mF/dIbSbanyr1TDE9wMhDbTvwij45W47FesEttn/xawtVwdw9CDoPwFhpqa2DwjPlknvv23iauxG73iYAtZgVrpy0RNqbchrIQAp4yaYodxlRPCSHPXkpRLeP094VRkQB3xPEEQkkJFwLm7OlVuNrpMVUh8YRWDyWKvLUtjAXwmh8Dl1Mu8IYhQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=oVwY4gLUy3MUjRGdgBHtlh3jk3Ijezc+47OyPJh4MTA=;
+ b=IKssR/EY/syoI4dp/NV9D3NiTdRYqHnZVmwxY1jxSNp8ZBzRZjO1hYW1p/V0B7T3u/Y+po7iY9yWgs7yCy0OgN6oawOjmD316h3OqqiQvbOMHw0/DjxTX/5UiJ+YMDFn7OrpnfyufoUxp8MUjL7ZBWFgJUekarT8MaZTZJDQ3u3qQiAUU1duB2BTbgXPnyK5tblR4tHsnQTpHTyQSd+DZO9TAsTffbmiP6Z9hf9ZU9s0k85RrMTR+OdUdME5Prj5xjpyGSNwp06h99s46gHD5n4+81/43hUEhqF93flhUXRDuR4icpnpF4nRLEG8QBvfWuVB5TUxNfBalYmKPESz4w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oVwY4gLUy3MUjRGdgBHtlh3jk3Ijezc+47OyPJh4MTA=;
+ b=ZE5a5GzgGQFDEeh+U8B0R9RBJxz0J6iMBmwyqZFH8qGqjfl9QIhkij8kpoE6wfWdlePHW81g1owQk/PHM3m8fKR2BYo6fOlHWvJMT0QxOm7nVkNigDsnOicwAaILpeJDH2h2rRg/NadqbnRxk6VaB4WLvsooJqkV05SOfDKSqucc/RFvUmjECUWw1I7FoztHHjCWl3ikubU1b2W0iSgh4MhxCW2fkvwOK9jMA8WJTunLBo2Cfc07RH5ZmCcwGmZrcvuRDhK8LlOlamjE56sq4YWoW9nyqUQGQ2LlBoCtAycXGq6O7aAYoz+aV97Izqg+0yUwriPQtx8EZKu74YTwww==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by DM4PR12MB7528.namprd12.prod.outlook.com (2603:10b6:8:110::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.17; Wed, 8 Feb
+ 2023 12:41:20 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3cb3:2fce:5c8f:82ee]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3cb3:2fce:5c8f:82ee%4]) with mapi id 15.20.6064.031; Wed, 8 Feb 2023
+ 12:41:20 +0000
+Date:   Wed, 8 Feb 2023 08:41:18 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>
+Subject: Re: [PATCH 10/13] vfio: Make vfio_device_open() exclusive between
+ group path and device cdev path
+Message-ID: <Y+OYbkYUmHq46hkX@nvidia.com>
+References: <BN9PR11MB527617553145A90FD72A66958CDA9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <Y+EYaTl4+BMZvJWn@nvidia.com>
+ <DS0PR11MB75298BF1A29E894EBA1852D4C3DA9@DS0PR11MB7529.namprd11.prod.outlook.com>
+ <BN9PR11MB5276FA68E8CAD6394A8887848CDB9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <Y+JOPhSXuzukMlXR@nvidia.com>
+ <DS0PR11MB752996D3E24EBE565B97AEE4C3DB9@DS0PR11MB7529.namprd11.prod.outlook.com>
+ <Y+JQECl0mX4pjWgt@nvidia.com>
+ <DS0PR11MB7529FA831FCFEDC92B0ECBF2C3DB9@DS0PR11MB7529.namprd11.prod.outlook.com>
+ <Y+JRpqIIX8zi2NcH@nvidia.com>
+ <BN9PR11MB5276F8E7172F12B19560AC1F8CD89@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y880FiYF7YCtsw/i@google.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <BN9PR11MB5276F8E7172F12B19560AC1F8CD89@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: BLAPR03CA0006.namprd03.prod.outlook.com
+ (2603:10b6:208:32b::11) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM4PR12MB7528:EE_
+X-MS-Office365-Filtering-Correlation-Id: 15847082-9473-4da5-a298-08db09d1c731
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: w+eLdSsVLZDdLFbPitL00DEk6sg/BI6Kgr4yWykDl3FdBwJCAzcYuAJzJiLCN30McyWwIkk7XuektxG9iwMqkidHypPoUt3p828p/rakRnHHXZLizAYIXi+yOE+ayKAvQFlLTZW54Due4ZLcyZowg7MeYQuZx4SkI/RCZO4ZWJhS1ttv4JYzoAvxtRjQLzSLKWwTdlgGQ1sKh4Mdf5ZjRoLuOCFfG6JKU3pl5sSkjM8xYW35wcKwOn0kyK7n8XpctVR6a225RZHoEPmENhTldBb3FQg/z63r4TLtxvWImYpDdxXZw+ESXdsTcwN0OltHLK6cnytlcBQvHrq0U9WniXvXd+4WidLeg5kkTUUO+RdNjp5a3tB8WFKg6ttb6wxetpBjNF4so51Tk1ePKsHTYJPmOaQou77C2gx2byH1xBuSq82GEPL7hVAoBQ1L2DczNT7C+gVXSTcmj7eVmdiThHDq3UT4f+gniq0Bx7It/M/R13jqryA/K/9Gt7cmFYlTYuTq1YookOyLsu4ujXee+4s8V2ogf0K0b7fGENOCBXvVyC8WR1gtzn9kwTuiAtptEcXNO0TZtd8E8G4nr7PsYrMMhHBG8w9cJrGLBxa8/fXqreZC9rc0ZE8yx9XfxVQTZ/kTv6zkgmuTfVLNdHQJ2SJ2QAa3V6aWb6cE+obQoScvjrdTZNh9JWRuArfv8SLb
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(396003)(346002)(136003)(366004)(376002)(39860400002)(451199018)(83380400001)(2616005)(54906003)(2906002)(316002)(478600001)(6486002)(38100700002)(36756003)(66946007)(66556008)(4326008)(6916009)(41300700001)(6506007)(8936002)(5660300002)(86362001)(7416002)(8676002)(6512007)(186003)(26005)(66476007)(67856001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?kdIvUdx2+PCIJ0/TbJd/PxGGcVS7GaRBHpHrFvLDksEbv85bLm/ImC8smZ0C?=
+ =?us-ascii?Q?lnewr24SDi2FdrmW4KXgExmUva3SACfEQq6qCqnJCkL+RH+gp+ftHTsbG0RS?=
+ =?us-ascii?Q?HGx4Y1A4g1eXGrocrGe+STy0kDR2BCrNJwFwQwXAaFl6INtP3oHoAtIAQxY4?=
+ =?us-ascii?Q?3SuqdBPGEpCKhnRz4GfBzSPAy8ePS/VSNm/RoIsHlv2jKtRrozhgTSsOQIcK?=
+ =?us-ascii?Q?m1u89HQTjclByivuSbkCDV4Usu8WpPpprnr5dnv9YGRkx9dzV7PTiD92zBrm?=
+ =?us-ascii?Q?0Q6jcj7vMrMfxbzVjU3JrT4oPhaY0y1tBcyPM7ANXZyndmyu6FvIYQMxTse4?=
+ =?us-ascii?Q?jfEfp1XnQA5GW1nFqrFe0N03sNBPr/nxep+HiQEh6VM74tALwTdruzhFX6WL?=
+ =?us-ascii?Q?gjZTx2byw+u3z/U4g1fP4JIvNm+5j7VHPLK8Gu8cqnzxE8nVVzeV3IIl5y0a?=
+ =?us-ascii?Q?pXC2xbWgpfMy+bUsaN58s/dqvOdUwdB+jFuHYsUjqpz7tgkvjCEYsLWuqzqW?=
+ =?us-ascii?Q?mC5V2sFP4xNSoLhcDfX8pmhzo+5fHByIQiBpIN7SINv/+fI09z8UAN5/vp1l?=
+ =?us-ascii?Q?ikGCjddzMEjFEZ9fPHUGW01lFMUU0HcSozP4EHA+IKNOV9fw0rzRuRDMbbCT?=
+ =?us-ascii?Q?o2s/FB6nClypcfVdsmV+WwdCLoUub9IPHVSsc9iwJgtf3WPaEsO2eDRhaooJ?=
+ =?us-ascii?Q?hqZS/q2bdY23xpMGhSu852P41wO66e5sn9f8muj1w4t6pAMwrAMXZ3pj97qU?=
+ =?us-ascii?Q?EckGdW6wHuiPunQcoE3WJIEQVI1soClltXKBO+Un3q26fxSCHp/djNtjpElv?=
+ =?us-ascii?Q?PcS3TSrKTxdL1Oy4LI1nSeMvbpzaLg1l4TCLr/AGJTlZyDhYY8C9mn936Ky6?=
+ =?us-ascii?Q?61izI9hxbPMkSdf0mfPBnywrW/8A1T4IIm4lTdvPdgaVCPyfWH0vTRv122JK?=
+ =?us-ascii?Q?Mb3f7ymRZF0ngHtRo0LMprKlXrQ3vV7jqiUMHsc5otzeJ38EoMNPvczB9Y1/?=
+ =?us-ascii?Q?tzEhALCPEv2UMyqsMhLPkvdjQtQ6cDe4fEIx+hMgk5YLvVTZH9KTnjcrTzPr?=
+ =?us-ascii?Q?yyoepQJPFemtDJrIKNEDZUue/EsQvyIHHEDxzjkoqukqWVoo0jBqX64PWEcA?=
+ =?us-ascii?Q?K13RRCDupXSERVKg46k9gCvoEv9uIuXJfvhoQWO3AHAglXxJo3FcL8iUM9lJ?=
+ =?us-ascii?Q?UfnI7purU+G1Mfm9cYGglP5noXY+cP8mkpS3nMWt4CHU/2wWOqBfRO7AMN9q?=
+ =?us-ascii?Q?Z4VfdTg8I72oxvB/pZtKwmc4kVaJ71TT/0KIK+pYwjmhnF34fmFR9qmdC73d?=
+ =?us-ascii?Q?TqA8MySzERy9WWYjZ0DXqpn/YQo43I/Oc5GuYhjQcBnOBw/jbLAFPxYL1/ZJ?=
+ =?us-ascii?Q?ck0AvFmmik62i3Kmg+KNeBxmNeD2JOaf9IcL5uZ75vqi9QTB3QVmxGvwQC+8?=
+ =?us-ascii?Q?WhBQnFWhpFNYskqxdRiPTVg9FaydbXfRcDwBn4FIfsfqteSyWlZF3DoujT5n?=
+ =?us-ascii?Q?rGUqStnKGGjuf/CRK9BtNOhlH51fM2We5c7r9Rw/woFz7d6FrpQY2MA4p7k4?=
+ =?us-ascii?Q?K6gU9KCOdtsyezq/pqLTRCGxrCyWuJUW9nCtNXe6?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 15847082-9473-4da5-a298-08db09d1c731
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Feb 2023 12:41:19.9353
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NNMLMqQDcDZyXgsLeTkOnoTHPwlGZG+JCj2QqYrEQQIeOzIyA+Wnyr7cTZzyZMtq
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7528
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 24, 2023 at 01:27:50AM +0000,
-Sean Christopherson <seanjc@google.com> wrote:
-
-> On Thu, Jan 19, 2023, Isaku Yamahata wrote:
-> > On Thu, Jan 19, 2023 at 03:25:08PM +0000,
-> > Sean Christopherson <seanjc@google.com> wrote:
+On Wed, Feb 08, 2023 at 04:23:16AM +0000, Tian, Kevin wrote:
+> > From: Jason Gunthorpe <jgg@nvidia.com>
+> > Sent: Tuesday, February 7, 2023 9:27 PM
+> > > >
+> > > > No, I mean why can't vfio just call iommufd exactly once regardless of
+> > > > what mode it is running in?
+> > >
+> > > This seems to be moving the DMA owner claim out of
+> > iommufd_device_bind().
+> > > Is it? Then either group and cdev can claim DMA owner with their own
+> > DMA
+> > > marker.
 > > 
-> > > On Thu, Jan 19, 2023, Isaku Yamahata wrote:
-> > > > On Sat, Jan 14, 2023 at 12:37:59AM +0000,
-> > > > Sean Christopherson <seanjc@google.com> wrote:
-> > > > 
-> > > > > On Fri, Dec 02, 2022, Chao Peng wrote:
-> > > > > > This patch series implements KVM guest private memory for confidential
-> > > > > > computing scenarios like Intel TDX[1]. If a TDX host accesses
-> > > > > > TDX-protected guest memory, machine check can happen which can further
-> > > > > > crash the running host system, this is terrible for multi-tenant
-> > > > > > configurations. The host accesses include those from KVM userspace like
-> > > > > > QEMU. This series addresses KVM userspace induced crash by introducing
-> > > > > > new mm and KVM interfaces so KVM userspace can still manage guest memory
-> > > > > > via a fd-based approach, but it can never access the guest memory
-> > > > > > content.
-> > > > > > 
-> > > > > > The patch series touches both core mm and KVM code. I appreciate
-> > > > > > Andrew/Hugh and Paolo/Sean can review and pick these patches. Any other
-> > > > > > reviews are always welcome.
-> > > > > >   - 01: mm change, target for mm tree
-> > > > > >   - 02-09: KVM change, target for KVM tree
-> > > > > 
-> > > > > A version with all of my feedback, plus reworked versions of Vishal's selftest,
-> > > > > is available here:
-> > > > > 
-> > > > >   git@github.com:sean-jc/linux.git x86/upm_base_support
-> > > > > 
-> > > > > It compiles and passes the selftest, but it's otherwise barely tested.  There are
-> > > > > a few todos (2 I think?) and many of the commits need changelogs, i.e. it's still
-> > > > > a WIP.
-> > > > > 
-> > > > > As for next steps, can you (handwaving all of the TDX folks) take a look at what
-> > > > > I pushed and see if there's anything horrifically broken, and that it still works
-> > > > > for TDX?
-> > > > > 
-> > > > > Fuad (and pKVM folks) same ask for you with respect to pKVM.  Absolutely no rush
-> > > > > (and I mean that).
-> > > > > 
-> > > > > On my side, the two things on my mind are (a) tests and (b) downstream dependencies
-> > > > > (SEV and TDX).  For tests, I want to build a lists of tests that are required for
-> > > > > merging so that the criteria for merging are clear, and so that if the list is large
-> > > > > (haven't thought much yet), the work of writing and running tests can be distributed.
-> > > > > 
-> > > > > Regarding downstream dependencies, before this lands, I want to pull in all the
-> > > > > TDX and SNP series and see how everything fits together.  Specifically, I want to
-> > > > > make sure that we don't end up with a uAPI that necessitates ugly code, and that we
-> > > > > don't miss an opportunity to make things simpler.  The patches in the SNP series to
-> > > > > add "legacy" SEV support for UPM in particular made me slightly rethink some minor
-> > > > > details.  Nothing remotely major, but something that needs attention since it'll
-> > > > > be uAPI.
-> > > > 
-> > > > Although I'm still debuging with TDX KVM, I needed the following.
-> > > > kvm_faultin_pfn() is called without mmu_lock held.  the race to change
-> > > > private/shared is handled by mmu_seq.  Maybe dedicated function only for
-> > > > kvm_faultin_pfn().
-> > > 
-> > > Gah, you're not on the other thread where this was discussed[*].  Simply deleting
-> > > the lockdep assertion is safe, for guest types that rely on the attributes to
-> > > define shared vs. private, KVM rechecks the attributes under the protection of
-> > > mmu_seq.
-> > > 
-> > > I'll get a fixed version pushed out today.
-> > > 
-> > > [*] https://lore.kernel.org/all/Y8gpl+LwSuSgBFks@google.com
+> > No, it has nothing to do with DMA ownership
 > > 
-> > Now I have tdx kvm working. I've uploaded at the followings.
-> > It's rebased to v6.2-rc3.
-> >         git@github.com:yamahata/linux.git tdx/upm
-> >         git@github.com:yamahata/qemu.git tdx/upm
+> > Just keep a flag in vfio saying it is in group mode or device mode and
+> > act accordingly.
 > 
-> And I finally got a working, building version updated and pushed out (again to):
+> It cannot be a simple flag. needs to be a refcnt since multiple devices 
+> in the group might be opened via cdev so the device mode should be
+> cleared only when the last device via cdev is closed.
 > 
->   git@github.com:sean-jc/linux.git x86/upm_base_support
+> Yi actually did implement such a flavor before, kind of introducing
+> a vfio_group->cdev_opened_cnt field.
 > 
+> Then cdev bind_iommufd checks whether vfio_group->opened_file
+> has been set in the group open path. If not then increment
+> vfio_group->cdev_opened_cnt.
+> 
+> cdev close decrements vfio_group->cdev_opened_cnt.
+> 
+> group open checks whether vfio_group->cdev_opened_cnt has been
+> set. If not go to set vfio_group->opened_file.
+> 
+> In this case only one path can claim DMA ownership.
+> 
+> Is above what you expect?
 
-Ok, I rebased TDX part to the updated branch.
-        git@github.com:yamahata/linux.git tdx/upm
-        git@github.com:yamahata/qemu.git tdx/upm
+It seems appropriate
 
-Now it's v6.2-rc7 based.
-qemu needs more patches to avoid registering memory slot for SMM. 
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+You could also sweep the device list to see how the indivudal devices are
+open to decice what to do.
+
+> > The iommufd DMA owner check is *only* to be used for protecting
+> > against two unrelated drivers trying to claim the same device.
+> > 
+> 
+> this is just one implementation choice. I don't see why it cannot be
+> extended to allow one driver to protect against two internal paths.
+> Just simply allow the driver to assign an owner instead of assuming
+> iommufd_ctx.
+
+It is really not what it is for, and the owner thing is so ugly I
+don't like the pattern. 
+
+Jason
