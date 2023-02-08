@@ -2,399 +2,216 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 60FBE68EE4E
-	for <lists+kvm@lfdr.de>; Wed,  8 Feb 2023 12:54:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 06ACC68EE6B
+	for <lists+kvm@lfdr.de>; Wed,  8 Feb 2023 13:04:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230288AbjBHLyW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Feb 2023 06:54:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44030 "EHLO
+        id S231138AbjBHMEF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Feb 2023 07:04:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229457AbjBHLyT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Feb 2023 06:54:19 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1C9E4614B
-        for <kvm@vger.kernel.org>; Wed,  8 Feb 2023 03:53:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675857211;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=LDX8JzT0xqTtrdaqpNqWi0h6AcwCPck4Kz++7XMLzjo=;
-        b=f2UVs3nk2FoSJKGv0CUvr7jSmmkZQHDqGutB5OFRQFE4WRgWrE0pmyepZfHLYrcW+cNdvB
-        58zEO9LlQVyHc0qeCBD48g5nwQHxG89dbCrByf7rPqewpqjyaelqpe4vC31+Iip03hpApq
-        LPU2aAFuONAeBlHdB8etEMSU8P+K998=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-36-X7QhsSvDOPWyafQqpb7Ang-1; Wed, 08 Feb 2023 06:53:30 -0500
-X-MC-Unique: X7QhsSvDOPWyafQqpb7Ang-1
-Received: by mail-qv1-f71.google.com with SMTP id ib5-20020a0562141c8500b0053c23b938a0so9601509qvb.17
-        for <kvm@vger.kernel.org>; Wed, 08 Feb 2023 03:53:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LDX8JzT0xqTtrdaqpNqWi0h6AcwCPck4Kz++7XMLzjo=;
-        b=LsMHNht0gib95z5pkDCuhjrVxrMpERjDsLtZ7/c4IMaL6f0pmBfJGibt1mmnHAsPjm
-         aTIwPLyFM29Eb4JUSWylKsbKr2lvkINte3XnBmpRJUsXU/5VkThJuP0U//9Au1Vj40Lh
-         xDu5qzV5MBemoVO4t5RLrJsVX36YH6c0GkdxdMeFQdsoKxGDdlXxFGpSWZWIO/Eyi6sJ
-         GVtnnI7rojnJ/c5h56Pq3fpfrGMaU8isWkktD/sqFLWr42yoRhMQPkLeZWZXEVYqaYsI
-         AL+TsVYJYzRgTYsj+hH3SSkrtrYiomeB48rCkLJYjJ0WuqQXfSBLmmg+CHXQGxUxUjLR
-         D87Q==
-X-Gm-Message-State: AO0yUKUaQZQ+AqJdTWJOZAh1EVc2rAsH2Ssna05FNw7bp1wOVH83Ve45
-        u9pVoG9eMKMVHWG5OtNbxh8EaXLDoik8/gWQLr/Sn9W/uJ+A6/13deD+W3NxuYUZiDFI6DoDzEl
-        CO6mKa88zdIzD
-X-Received: by 2002:ad4:5ca1:0:b0:539:b68e:3444 with SMTP id q1-20020ad45ca1000000b00539b68e3444mr13582380qvh.27.1675857210093;
-        Wed, 08 Feb 2023 03:53:30 -0800 (PST)
-X-Google-Smtp-Source: AK7set87dcpsJmG9A5SqVQU4S6v/ypYe4xIPzvEd0eUM0sqEib2dT866Qi80hgD9ikLTTh/CEqk9Mg==
-X-Received: by 2002:ad4:5ca1:0:b0:539:b68e:3444 with SMTP id q1-20020ad45ca1000000b00539b68e3444mr13582348qvh.27.1675857209742;
-        Wed, 08 Feb 2023 03:53:29 -0800 (PST)
-Received: from [192.168.0.2] (ip-109-43-177-253.web.vodafone.de. [109.43.177.253])
-        by smtp.gmail.com with ESMTPSA id w15-20020a05620a444f00b007296805f607sm11767387qkp.17.2023.02.08.03.53.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Feb 2023 03:53:29 -0800 (PST)
-Message-ID: <96920589-ec3c-6e2d-4eee-a12b50b5c6ca@redhat.com>
-Date:   Wed, 8 Feb 2023 12:53:26 +0100
+        with ESMTP id S229478AbjBHMEE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Feb 2023 07:04:04 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E77004741D;
+        Wed,  8 Feb 2023 04:04:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=o7cNJDxBx8S7R+BQpRQoScAoxQf1ECrH4JN4R2FASiA=; b=sCiygpzb8R9HGWxXCkWslhPp07
+        MPJ+13j6gF10eOHM7qdqjRaAwvzYX95fZLKOUKvdTjtgfVVnaKsFQPunkonxiw0ddRqctwI2pFiuM
+        qrvt9KyBCqOqxjSom5+ndURu3WOl/K5KKdswcW1ALDTIqC0nxjRo7FKD4+cyQ/Tvdy0S+Z5OBQ5wH
+        B534UzjLyfYDrXS47Ps1MxJeNU7zylqDp6laldiaXniQCUfU5VBj8sbBrzcCwXGLh5BwhUDUxlx2H
+        AgtsoJEbBN2v01RCd/qNfJEzw1EZQWONKEVY2Ruylj1z3E8Wg7xZIWHk6sv7En6bikax2B9sCKF0s
+        K/Y89z2Q==;
+Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.infradead.org)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pPjA8-001BcW-AD; Wed, 08 Feb 2023 12:02:56 +0000
+Message-ID: <d0eeb5d0026ed0ecc12ea75b1e6cf03ee2ce068f.camel@infradead.org>
+Subject: Re: [PATCH v7 5/9] x86/smpboot: Split up native_cpu_up into
+ separate phases and document them
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Yuan Yao <yuan.yao@linux.intel.com>,
+        Usama Arif <usama.arif@bytedance.com>
+Cc:     tglx@linutronix.de, kim.phillips@amd.com, arjan@linux.intel.com,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        hpa@zytor.com, x86@kernel.org, pbonzini@redhat.com,
+        paulmck@kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, rcu@vger.kernel.org, mimoja@mimoja.de,
+        hewenliang4@huawei.com, thomas.lendacky@amd.com, seanjc@google.com,
+        pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
+        punit.agrawal@bytedance.com, simon.evans@bytedance.com,
+        liangma@liangbit.com
+Date:   Wed, 08 Feb 2023 12:02:55 +0000
+In-Reply-To: <20230208100336.mdnrvpsssa2sjodu@yy-desk-7060>
+References: <20230207230436.2690891-1-usama.arif@bytedance.com>
+         <20230207230436.2690891-6-usama.arif@bytedance.com>
+         <20230208100336.mdnrvpsssa2sjodu@yy-desk-7060>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-634v5dgMIKepskkQ4ROL"
+User-Agent: Evolution 3.44.4-0ubuntu1 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     frankja@linux.ibm.com, kvm@vger.kernel.org, imbrenda@linux.ibm.com,
-        david@redhat.com, nrb@linux.ibm.com, nsg@linux.ibm.com
-References: <20230202092814.151081-1-pmorel@linux.ibm.com>
- <20230202092814.151081-3-pmorel@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v6 2/2] s390x: topology: Checking
- Configuration Topology Information
-In-Reply-To: <20230202092814.151081-3-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/02/2023 10.28, Pierre Morel wrote:
-> STSI with function code 15 is used to store the CPU configuration
-> topology.
-> 
-> We retrieve the maximum nested level with SCLP and use the
-> topology tree provided by the drawers, books, sockets, cores
-> arguments.
-> 
-> We check :
-> - if the topology stored is coherent between the QEMU -smp
->    parameters and kernel parameters.
-> - the number of CPUs
-> - the maximum number of CPUs
-> - the number of containers of each levels for every STSI(15.1.x)
->    instruction allowed by the machine.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
-...
-> +static inline int cpus_in_tle_mask(uint64_t val)
-> +{
-> +	int i, n;
-> +
-> +	for (i = 0, n = 0; i < 64; i++, val >>= 1)
-> +		if (val & 0x01)
-> +			n++;
-> +	return n;
 
-I'd suggest to use __builtin_popcountl here instead of looping.
+--=-634v5dgMIKepskkQ4ROL
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> +}
-> +
->   #endif  /* _S390X_STSI_H_ */
-> diff --git a/s390x/topology.c b/s390x/topology.c
-> index 20f7ba2..f21c653 100644
-> --- a/s390x/topology.c
-> +++ b/s390x/topology.c
-> @@ -16,6 +16,18 @@
->   #include <smp.h>
->   #include <sclp.h>
->   #include <s390x/hardware.h>
-> +#include <s390x/stsi.h>
-> +
-> +static uint8_t pagebuf[PAGE_SIZE * 2] __attribute__((aligned(PAGE_SIZE * 2)));
-
-Isn't the SYSIB just one page only? Why reserve two pages here?
-
-> +static int max_nested_lvl;
-> +static int number_of_cpus;
-> +static int max_cpus = 1;
-> +
-> +/* Topology level as defined by architecture */
-> +static int arch_topo_lvl[CPU_TOPOLOGY_MAX_LEVEL];
-> +/* Topology nested level as reported in STSI */
-> +static int stsi_nested_lvl[CPU_TOPOLOGY_MAX_LEVEL];
->   
->   #define PTF_REQ_HORIZONTAL	0
->   #define PTF_REQ_VERTICAL	1
-> @@ -122,11 +134,241 @@ end:
->   	report_prefix_pop();
->   }
->   
-> +/*
-> + * stsi_check_maxcpus
-> + * @info: Pointer to the stsi information
-> + *
-> + * The product of the numbers of containers per level
-> + * is the maximum number of CPU allowed by the machine.
-> + */
-> +static void stsi_check_maxcpus(struct sysinfo_15_1_x *info)
-> +{
-> +	int n, i;
-> +
-> +	report_prefix_push("maximum cpus");
-> +
-> +	for (i = 0, n = 1; i < CPU_TOPOLOGY_MAX_LEVEL; i++) {
-> +		report_info("Mag%d: %d", CPU_TOPOLOGY_MAX_LEVEL - i, info->mag[i]);
-> +		n *= info->mag[i] ? info->mag[i] : 1;
-
-You could use the Elvis operator here instead.
-
-> +	}
-> +	report(n == max_cpus, "Maximum CPUs %d expected %d", n, max_cpus);
-> +
-> +	report_prefix_pop();
-> +}
-> +
-> +/*
-> + * stsi_check_tle_coherency
-> + * @info: Pointer to the stsi information
-> + * @sel2: Topology level to check.
-> + *
-> + * We verify that we get the expected number of Topology List Entry
-> + * containers for a specific level.
-> + */
-> +static void stsi_check_tle_coherency(struct sysinfo_15_1_x *info, int sel2)
-> +{
-> +	struct topology_container *tc, *end;
-> +	struct topology_core *cpus;
-> +	int n = 0;
-> +	int i;
-> +
-> +	report_prefix_push("TLE coherency");
-> +
-> +	tc = &info->tle[0].container;
-> +	end = (struct topology_container *)((unsigned long)info + info->length);
-
-s/unsigned long/uintptr_t/ please!
+On Wed, 2023-02-08 at 18:03 +0800, Yuan Yao wrote:
+>=20
+> > =C2=A0 #endif
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/*
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * Sync point with do_wait_c=
+pu_initialized(). On boot, all secondary
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * CPUs reach this stage aft=
+er receiving INIT/SIPI from do_cpu_up()
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * in the x86/cpu:kick cpuhp=
+ stage. At the start of cpu_init() they
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * will wait for do_wait_cpu=
+_initialized() to set their bit in
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * smp_callout_mask to relea=
+se them.
+>=20
+> The last sentence of the comment looks confused. The fact is:
+>=20
+> For serial case, The BSP waits AP to set cpu_initialized_mask from
+> wait_for_master_cpu() after fired INIT/SIPI, then AP starts to wait
+> cpu_callout_mask set by BSP from do_boot_cpu().
+>=20
+> Or the comments below "Bringup step two:..." which also looks clear
+> enough then above.
 
 
-> +
-> +	for (i = 0; i < CPU_TOPOLOGY_MAX_LEVEL; i++)
-> +		stsi_nested_lvl[i] = 0;
+	/*
+	 * Sync point with do_wait_cpu_initialized(). Before proceeding through
+	 * cpu_init(), the AP will call wait_for_master_cpu() which sets its
+	 * bit in cpu_initialized_mask and then waits for the BSP to set its
+	 * bit in cpu_callout_mask to release it.
+	 */
+	cpu_init_secondary();
 
-memset(stsi_nested_lvl, 0, sizeof(stsi_nested_lvl)) ?
 
-> +	while (tc < end) {
-> +		if (tc->nl > 5) {
+Better?
 
-Use ">= CPU_TOPOLOGY_MAX_LEVEL" instead of "> 5" ?
+--=-634v5dgMIKepskkQ4ROL
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-> +			report_abort("Unexpected TL Entry: tle->nl: %d", tc->nl);
-> +			return;
-> +		}
-> +		if (tc->nl == 0) {
-> +			cpus = (struct topology_core *)tc;
-> +			n += cpus_in_tle_mask(cpus->mask);
-> +			report_info("cpu type %02x  d: %d pp: %d", cpus->type, cpus->d, cpus->pp);
-> +			report_info("origin : %04x mask %016lx", cpus->origin, cpus->mask);
-> +		}
-> +
-> +		stsi_nested_lvl[tc->nl]++;
-> +		report_info("level %d: lvl: %d id: %d cnt: %d",
-> +			    tc->nl, tc->nl, tc->id, stsi_nested_lvl[tc->nl]);
-> +
-> +		/* trick: CPU TLEs are twice the size of containers TLE */
-> +		if (tc->nl == 0)
-> +			tc++;
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMjA4MTIwMjU1WjAvBgkqhkiG9w0BCQQxIgQgIdDyVGMd
+DfBu8ShZnRJNK+Yx5XfqLJ/+/Vp3ZRMRSkcwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCMPJeEzlMRVd9QuFNpZNxHIeoKZYT9k4AP
+9lilsu6HnAZlyGJagCpQtHh11M5Qt08YIgG0eV3+c2aexVvJF3jzs4RaI9Pbv0lukQ27mOfEOiDB
+YB1kqo2+FTsOhYsBwudAyfo4oI0jK9cY1DQsj29TmFl7Rcj69J64czY7UsOLzFqusIx+kR97IGpK
+w+xbPm54IA4D1h6VRJ0Om/fpU+eDuyuaDa25FtOexbaZMCB4YJLIlVd1yhieH9zX+96NFrNdRbQl
+qHz0E/m4KUYt//MfXfZ4ve5+s9wL5I3Tom1wvmgCskbwxegaH/5p9yvqV7uzeInZqralzKVts1r0
+K0Xr1ytsfpxe/QFoJwNU1KRfjubfig5270HgKZBxJIlRtvcPXN+H62c9Ok5JkzZA7mszkuxiS1lC
+jzZcTavpSTxtHL2W9x2FFYILKwQhAj7xgKq+PEyIYestjI6C7pp9jNRht3Z82eoZ3tgVW6Nz89Rj
+p8p/DkbMXv+IFJJl1LdvKLd30qbMQNim2YPQAV5/QofQPqPGfiT43PU+WEEEAUtVN/u4Avowt7WT
+UYFS1bi/D/8UsAgY/r81xtff61Ax6vLK5CsG0kGyChakbEm7t2ddki0gH1wsFVsK9GG0G+obEW6a
+ygkKCLPu4RaOzx/Cz1jM9lX0cLNBt3Laf+KjNlu6FAAAAAAAAA==
 
-IMHO it might be cleaner to have a "uint8_t *" or "void *" to the current 
-position in the sysinfo block, and do the pointer arithmetic on that pointer 
-instead... well, it's likely just a matter of taste.
 
-> +		tc++;
-> +	}
-> +	report(n == number_of_cpus, "Number of CPUs  : %d expect %d", n, number_of_cpus);
-> +	/*
-> +	 * For KVM we accept
-> +	 * - only 1 type of CPU
-> +	 * - only horizontal topology
-> +	 * - only dedicated CPUs
-> +	 * This leads to expect the number of entries of level 0 CPU
-> +	 * Topology Level Entry (TLE) to be:
-> +	 * 1 + (number_of_cpus - 1)  / arch_topo_lvl[0]
-> +	 *
-> +	 * For z/VM or LPAR this number can only be greater if different
-> +	 * polarity, CPU types because there may be a nested level 0 CPU TLE
-> +	 * for each of the CPU/polarity/sharing types in a level 1 container TLE.
-> +	 */
-> +	n =  (number_of_cpus - 1)  / arch_topo_lvl[0];
-> +	report(stsi_nested_lvl[0] >=  n + 1,
-> +	       "CPU Type TLE    : %d expect %d", stsi_nested_lvl[0], n + 1);
-> +
-> +	/* For each level found in STSI */
-> +	for (i = 1; i < CPU_TOPOLOGY_MAX_LEVEL; i++) {
-> +		/*
-> +		 * For non QEMU/KVM hypervisor the concatenation of the levels
-> +		 * above level 1 are architecture dependent.
-> +		 * Skip these checks.
-> +		 */
-> +		if (!host_is_kvm() && sel2 != 2)
-> +			continue;
-> +
-> +		/* For QEMU/KVM we expect a simple calculation */
-> +		if (sel2 > i) {
-> +			report(stsi_nested_lvl[i] ==  n + 1,
-> +			       "Container TLE  %d: %d expect %d", i, stsi_nested_lvl[i], n + 1);
-> +			n /= arch_topo_lvl[i];
-> +		}
-> +	}
-> +
-> +	report_prefix_pop();
-> +}
-> +
-> +/*
-> + * check_sysinfo_15_1_x
-> + * @info: pointer to the STSI info structure
-> + * @sel2: the selector giving the topology level to check
-> + *
-> + * Check if the validity of the STSI instruction and then
-> + * calls specific checks on the information buffer.
-> + */
-> +static void check_sysinfo_15_1_x(struct sysinfo_15_1_x *info, int sel2)
-> +{
-> +	int ret;
-> +
-> +	report_prefix_pushf("mnested %d 15_1_%d", max_nested_lvl, sel2);
-> +
-> +	ret = stsi(pagebuf, 15, 1, sel2);
-> +	if (max_nested_lvl >= sel2) {
-> +		report(!ret, "Valid stsi instruction");
-> +	} else {
-> +		report(ret, "Invalid stsi instruction");
-> +		goto end;
-> +	}
-> +
-> +	stsi_check_maxcpus(info);
-> +	stsi_check_tle_coherency(info, sel2);
-
-You could also move the two stsi_check_* calls into the first part of the 
-if-statement, then you could get rid of the goto in the second part.
-
-> +end:
-> +	report_prefix_pop();
-> +}
-> +
-> +static int sclp_get_mnest(void)
-> +{
-> +	ReadInfo *sccb = (void *)_sccb;
-> +
-> +	sclp_mark_busy();
-> +	memset(_sccb, 0, PAGE_SIZE);
-> +	sccb->h.length = PAGE_SIZE;
-> +
-> +	sclp_service_call(SCLP_CMDW_READ_SCP_INFO, sccb);
-> +	assert(sccb->h.response_code == SCLP_RC_NORMAL_READ_COMPLETION);
-> +
-> +	return sccb->stsi_parm;
-> +}
-> +
-> +/*
-> + * test_stsi
-> + *
-> + * Retrieves the maximum nested topology level supported by the architecture
-> + * and the number of CPUs.
-> + * Calls the checking for the STSI instruction in sel2 reverse level order
-> + * from 6 (CPU_TOPOLOGY_MAX_LEVEL) to 2 to have the most interesting level,
-> + * the one triggering a topology-change-report-pending condition, level 2,
-> + * at the end of the report.
-> + *
-> + */
-> +static void test_stsi(void)
-> +{
-> +	int sel2;
-> +
-> +	max_nested_lvl = sclp_get_mnest();
-> +	report_info("SCLP maximum nested level : %d", max_nested_lvl);
-> +
-> +	number_of_cpus = sclp_get_cpu_num();
-> +	report_info("SCLP number of CPU: %d", number_of_cpus);
-> +
-> +	/* STSI selector 2 can takes values between 2 and 6 */
-> +	for (sel2 = 6; sel2 >= 2; sel2--)
-> +		check_sysinfo_15_1_x((struct sysinfo_15_1_x *)pagebuf, sel2);
-> +}
-> +
-> +/*
-> + * parse_topology_args
-> + * @argc: number of arguments
-> + * @argv: argument array
-> + *
-> + * This function initialize the architecture topology levels
-> + * which should be the same as the one provided by the hypervisor.
-> + *
-> + * We use the current names found in IBM/Z literature, Linux and QEMU:
-> + * cores, sockets/packages, books, drawers and nodes to facilitate the
-> + * human machine interface but store the result in a machine abstract
-> + * array of architecture topology levels.
-> + * Note that when QEMU uses socket as a name for the topology level 1
-> + * Linux uses package or physical_package.
-> + */
-> +static void parse_topology_args(int argc, char **argv)
-> +{
-> +	int i;
-> +
-> +	report_info("%d arguments", argc);
-> +	for (i = 1; i < argc; i++) {
-> +		if (!strcmp("-cores", argv[i])) {
-> +			i++;
-> +			if (i >= argc)
-> +				report_abort("-cores needs a parameter");
-> +			arch_topo_lvl[0] = atol(argv[i]);
-> +			report_info("cores: %d", arch_topo_lvl[0]);
-> +		} else if (!strcmp("-sockets", argv[i])) {
-> +			i++;
-> +			if (i >= argc)
-> +				report_abort("-sockets needs a parameter");
-> +			arch_topo_lvl[1] = atol(argv[i]);
-> +			report_info("sockets: %d", arch_topo_lvl[1]);
-> +		} else if (!strcmp("-books", argv[i])) {
-> +			i++;
-> +			if (i >= argc)
-> +				report_abort("-books needs a parameter");
-> +			arch_topo_lvl[2] = atol(argv[i]);
-> +			report_info("books: %d", arch_topo_lvl[2]);
-> +		} else if (!strcmp("-drawers", argv[i])) {
-> +			i++;
-> +			if (i >= argc)
-> +				report_abort("-drawers needs a parameter");
-> +			arch_topo_lvl[3] = atol(argv[i]);
-> +			report_info("drawers: %d", arch_topo_lvl[3]);
-> +		}
-
-Maybe abort on unkown parameters, to avoid that typos go unnoticed?
-
-> +	}
-> +
-> +	for (i = 0; i < CPU_TOPOLOGY_MAX_LEVEL; i++) {
-> +		if (!arch_topo_lvl[i])
-> +			arch_topo_lvl[i] = 1;
-> +		max_cpus *= arch_topo_lvl[i];
-> +	}
-> +}
-
-  Thomas
-
+--=-634v5dgMIKepskkQ4ROL--
