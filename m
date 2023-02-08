@@ -2,202 +2,215 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F098A68E6DB
-	for <lists+kvm@lfdr.de>; Wed,  8 Feb 2023 04:54:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ED48168E703
+	for <lists+kvm@lfdr.de>; Wed,  8 Feb 2023 05:23:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229743AbjBHDyo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Feb 2023 22:54:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55460 "EHLO
+        id S229530AbjBHEXY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Feb 2023 23:23:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229731AbjBHDym (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Feb 2023 22:54:42 -0500
-Received: from mail-vs1-xe30.google.com (mail-vs1-xe30.google.com [IPv6:2607:f8b0:4864:20::e30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CED72528B
-        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 19:54:40 -0800 (PST)
-Received: by mail-vs1-xe30.google.com with SMTP id g3so7211719vsr.10
-        for <kvm@vger.kernel.org>; Tue, 07 Feb 2023 19:54:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=7xy5M3fz0l0X2SQ63fjTJcdMWle8UVBFox2YRH9C6JI=;
-        b=jumaRq+1vVrtJu6P6hw26HaRrK4SG45ip3jbgHbpA60jy280er7eSGAILCyGiQUzRh
-         EG84b13En4l3RmgWNu/l0OU28H6PUaqViXQW1f6xL4jLqOOYJtkJIsiYhKWWV/7Uh/sm
-         tAfX2rlVV0zgoOue8vqoR2kQlD47Pe9Fi0V9ON1mb9DFq3ERNmTpzsuc+F9r+6RsXUpT
-         R362OX9hcDvFHbFIasHsWo2xFAIwAzqE4khoKbQM6yKiPg5YJz+augxWiBsGdh6dxeCe
-         KQCdf85hglNgeUPVmML9U4YWaDNnt+kirGVY7ksayMZa5MvP3GVvwWf+vwXmtBAADGN3
-         pEcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7xy5M3fz0l0X2SQ63fjTJcdMWle8UVBFox2YRH9C6JI=;
-        b=am4Dhaa7mSS5EYhseqO9BhI9CNvVqwqGiF4fzFebtkIC2qDwuc2hllMNljo1bpXbXF
-         LLa+UfuR7kiBHHgUfafW7/LoYIpXcMz6FJLo5CUqrOE+P97VDdN88mNd/Tc3m3D03Nek
-         N4dLfFpq3kOpNInLXHpQEf5MdMIw4tXoH4rdx5XohRwXyXf5JcH5GR1/knAtcgkak3pM
-         +f0S7o+aJJ4VpjLOOiwm+UNVFUY5gWN2Z1NRdqhxXl97DYrfNQsoV8drTlXC1aB2prmN
-         ii76VyRhZvSYDa0CyBJ5B7MIgwCL2vpBs/k5lEFDVyOU3kw8oi7Arw2es6CWCJMnPlKd
-         M5WA==
-X-Gm-Message-State: AO0yUKWaw5ekGcqHNrPHnkyyGfvyvo7zXXL4WtFP9NBlr8PdpPkSmPNJ
-        CcPqz31G/pH2+bKeXimkLcFyrpcFkjEOsqumF4IBnA==
-X-Google-Smtp-Source: AK7set/C8ZIfjQLa79oWDuypbzJUpPrXnbxQF+3h2DlybVI6HNQSdHyFMtbxp9Q39S8NAzXlY7TK0BHpZQle1UIXNzI=
-X-Received: by 2002:a67:d606:0:b0:411:b0da:14be with SMTP id
- n6-20020a67d606000000b00411b0da14bemr478323vsj.55.1675828479268; Tue, 07 Feb
- 2023 19:54:39 -0800 (PST)
+        with ESMTP id S229460AbjBHEXV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Feb 2023 23:23:21 -0500
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6D1230EB3
+        for <kvm@vger.kernel.org>; Tue,  7 Feb 2023 20:23:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1675830200; x=1707366200;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=AEynu03fksbDZJ5ep0Ql3xSXLoqDvMrdPC0rE3pXHgE=;
+  b=e1XSEIX6BEKSK7kHKoR34Wk7sE4nTkdpiGGiKGKYla0MmYOauXjbfWP9
+   DUl7c4WxJKO7I3rFhqJmgYwdYYJgnfCaJ2uGqmTlsriR+KBTpEXEje4Jq
+   BwgrmXNVund4e1uIksxCb8ekElEil26u2kVm8t5oicUGG5AQe7OQSqoy6
+   t8LHNLpQJIFGDcjT5S2jRRIgK/Yxq4/YJyA62u+IvD3B72pG1fl3s0AGv
+   VgnczvGDueBVldpwdd/KijYCp+pHACGLbmHaOl2P1IAx74iumZGewbRle
+   YRn2VAGPQaK6Mp2NH1aBAvwBL0xzPY5QuwhUnskYfWTh/uWeqAPN3LQsk
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10614"; a="331838389"
+X-IronPort-AV: E=Sophos;i="5.97,280,1669104000"; 
+   d="scan'208";a="331838389"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Feb 2023 20:23:20 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10614"; a="730706608"
+X-IronPort-AV: E=Sophos;i="5.97,280,1669104000"; 
+   d="scan'208";a="730706608"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmsmga008.fm.intel.com with ESMTP; 07 Feb 2023 20:23:19 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Tue, 7 Feb 2023 20:23:18 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16 via Frontend Transport; Tue, 7 Feb 2023 20:23:18 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.109)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.16; Tue, 7 Feb 2023 20:23:18 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dQ3fC3kcVlr0L/6GXBbdcXKywwxtoc4x254lhIUrB+VHFH+oREOJDPhluLlhutIkSyTINoKDKiw9avs2RAE2UBAsc6woQzaCaCZcapCAl7vDP2gAgVisFjb5fbw0i6X6AzAPboe3LdguiTstQwecIXsnS0gCHSg9IMDHG7tFSXSO8ycW8CtLfIx/aqD0+uiP0obbjvkFkZWGG4WDxvzgBiJ1tQeipYEilegKBS2UZ54tUnoGAtoAsP+F5JfuJ32j8vwoRDSxypUOCSQsFTizR8Bh7UvcbD8QnNENoPINwhqpZrU1it4pHqMKmv5q74zy6YhS8YTJlP2R2sudQX4afw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=AEynu03fksbDZJ5ep0Ql3xSXLoqDvMrdPC0rE3pXHgE=;
+ b=BxKiH36o+3Cw7uw9lQ7Ceh5D6m9qZj9wYByhIDC/KAo94M4F1PzYfi0y3pXQ2Y9C8YbGj2Rg/wN3J4+DP8k+b4jocS8GEGz75RBiFO5Er5X14Q03pydcDvVZKVfNXFVbhtGKfPn2J8bMXgfQqPRieSewGR59KQq0Sg/5hpNxtVvYOrwE5A3/6GPPXuMUAuzYEZjTh9iMM1/k6luM3ECuIIS8fguATbhU1InxaNvyYqrM7GZIgAnb2OgtxzkNyFz9i0ZSErFIf6QegfhOkliLWMwS8T+kReAX5HX2TXINbtshSSo8Sy4xxBVWaLvlgunvI0XDFTX8Aym2kbctvKSA3g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by BN9PR11MB5275.namprd11.prod.outlook.com (2603:10b6:408:134::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.17; Wed, 8 Feb
+ 2023 04:23:17 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::6a8d:b95:e1b5:d79d]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::6a8d:b95:e1b5:d79d%8]) with mapi id 15.20.6064.034; Wed, 8 Feb 2023
+ 04:23:16 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>, "Liu, Yi L" <yi.l.liu@intel.com>
+CC:     Alex Williamson <alex.williamson@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>
+Subject: RE: [PATCH 10/13] vfio: Make vfio_device_open() exclusive between
+ group path and device cdev path
+Thread-Topic: [PATCH 10/13] vfio: Make vfio_device_open() exclusive between
+ group path and device cdev path
+Thread-Index: AQHZKnqafBBqpcX9SES7NJ4Rmsa6D66mbRKAgBCGzgCABEckgIACXXuAgAPaJICAAFxyQIAAVkaAgAALUYCAAJKEkIAA04QAgAAB3QCAAABPAIAAAO2AgAAA9wCAAPasAA==
+Date:   Wed, 8 Feb 2023 04:23:16 +0000
+Message-ID: <BN9PR11MB5276F8E7172F12B19560AC1F8CD89@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <Y91HQUFrY5jbwoHF@nvidia.com>
+ <DS0PR11MB75291EFC06C5877AF01270CFC3DA9@DS0PR11MB7529.namprd11.prod.outlook.com>
+ <BN9PR11MB527617553145A90FD72A66958CDA9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <Y+EYaTl4+BMZvJWn@nvidia.com>
+ <DS0PR11MB75298BF1A29E894EBA1852D4C3DA9@DS0PR11MB7529.namprd11.prod.outlook.com>
+ <BN9PR11MB5276FA68E8CAD6394A8887848CDB9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <Y+JOPhSXuzukMlXR@nvidia.com>
+ <DS0PR11MB752996D3E24EBE565B97AEE4C3DB9@DS0PR11MB7529.namprd11.prod.outlook.com>
+ <Y+JQECl0mX4pjWgt@nvidia.com>
+ <DS0PR11MB7529FA831FCFEDC92B0ECBF2C3DB9@DS0PR11MB7529.namprd11.prod.outlook.com>
+ <Y+JRpqIIX8zi2NcH@nvidia.com>
+In-Reply-To: <Y+JRpqIIX8zi2NcH@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|BN9PR11MB5275:EE_
+x-ms-office365-filtering-correlation-id: 0a0c2869-5f47-4969-6a1a-08db098c338b
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: UTA2btu1zo0tsF9a49LnEzqfvpHYH7hASIgazAmiZ++Aug+gQWMQrC77aTtSMcS6ap1pNY53b1HvimIHmdZmMTSfZtzsLCGNPzZZyrRGNStj8BXpH83F5XLAvS+zQv4tej334HcfFlNX/znJIkYOqOh5XrB5RXfV2+/HJZPNzbDXZJXW759cW1bE9Pht1aF03r7SGe2D2CSKBU957qnh8q867sQy+IqMZNJwE3sjnnzYhNnrzo9xQ73vlUXFSMf7tUpG5LgeKTaeDEeSUxfrPSLAsq5NjJrOPqWgjjVc9dfJuCvgC8u34ip+B6oyM9PBrnM1FiB/LkIr/O+/306eawmMqtMcOz39Ncbf/sFI7yfjeetlwr8b0MDHovNg+vrx3tfkK9rqoslKX3eRjrR9CnO/m5yw/jiNH0cRVYgx9GtrQnNwZ5mURUrUIxrVqdd96eXyuqGCwqgUG8CbqU5MLzAYA3A29g7EpdquAfaAI9Y//LbMt5QeqNItrDWGxXybzyw1kArTMtAXqrn59HoiWZ6ZW3v2MWHzWBzwKC6kj9aewIY46amtvajiujpnIcnUOQQa5ce5IVBVJgzzzWDL+A51UmBimHGj5uTLBdr3/GSsFxCpJH3C7wpq3AkqHNq4gzBnf9SnPLzixNFnAkXaVVjbF9ZL9sntV8hTs/JqhJYdKGy4NTbmIdUgOZRA77vdUKMBQXSIvXyJNKPgfWwg0A==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(346002)(376002)(396003)(366004)(136003)(39860400002)(451199018)(83380400001)(2906002)(7416002)(82960400001)(8936002)(4326008)(6636002)(54906003)(5660300002)(52536014)(33656002)(41300700001)(110136005)(66946007)(76116006)(64756008)(66556008)(66476007)(8676002)(86362001)(55016003)(316002)(66446008)(38070700005)(9686003)(26005)(186003)(38100700002)(71200400001)(7696005)(478600001)(6506007)(122000001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?cFXqnQIvEzGH7MjVVnTm1vXwX6bWPiSRbJxftKl1CF9wNDB0NaQvU+oixF5R?=
+ =?us-ascii?Q?ZHNi2+TpuxL8x1TI6NtnRsD4I8fH35GEFtO2zvMXWEaoMeq3UVynrrlnNhpU?=
+ =?us-ascii?Q?k+gQohcSOCr57PhILhCnkF//fAcso9r/L9BVgSn3/nBNcCoyQ6TVpG2hnO12?=
+ =?us-ascii?Q?hcEI7PlQMUqIsUZiROYzSTjk6GNytYY+bL0AB0/FcncxwJnBM8m9Zzsq7Egg?=
+ =?us-ascii?Q?/2pBsVxQBylgkw8XSjG4cmeXAX0Htir9hKHMF1nB/RnB/0By4nYEYOy2YlmH?=
+ =?us-ascii?Q?oA3LkAqfi3qa4h9FNKgwDbmxLMh2YKZ/3p/RBzdJZIiuVk0H/huHl96c0d7Y?=
+ =?us-ascii?Q?5N5dady3nLRbzjFg5ZyvyCYmXFeHcP4VoTFT25yW8P9gcGOWfaWUnKTSn0ji?=
+ =?us-ascii?Q?FRs7wPbJZSAd2yVhCIIp7P7cub/6Hs9BQuXj07RZ0bLQMvKwaH8Ny+aucxk+?=
+ =?us-ascii?Q?E5Z9qFPnHl0SCLMfm2d6sjPE4ZY2rjB9w6BB2lymmHKsuMHM/BVnyFD4vBGj?=
+ =?us-ascii?Q?GO9DOwNXCSuNAxuWQf512sII6C3H6yZuG76LvrJIz0OcbqKt5wAH/+egrCFh?=
+ =?us-ascii?Q?uvDAWPkE3bMsFZ/sSu+2Kx0yxYhMI0jg770QkGnA9UHsbeUitVOhVGCYFkuK?=
+ =?us-ascii?Q?xKla9sJHgQqFhmbKauwvyyxN1x+b0uhGi2aNub8+CpwzAMH4r5hX+I6AmQzs?=
+ =?us-ascii?Q?6uNRfpFmrFDucZlz21A94Dle/lCejdKgy4TQj2mAAYKNtlzhLS8iPksEwcOk?=
+ =?us-ascii?Q?3fohWRnDF4KYvfSG3XkU7bUJJH3mPldmIZzBcax2efdEk1rjzbppmUZQeS2j?=
+ =?us-ascii?Q?Mh0ou81A7iEDTggOkpbqhXczjPWygEL4xUm/Jq7ZL+eBByl8PfceFeSoRDkA?=
+ =?us-ascii?Q?b3UIy0B7jwG/FikuFMbzpTPPCdPTgWC3/y4l6CHvqJymkT6Prxe9W9qHFO9y?=
+ =?us-ascii?Q?UfWTPPWQmACtUTpzDFb0kmNqFcWU/bDmJes4SvwpyUGE66ONWSqUXAmETKTm?=
+ =?us-ascii?Q?fP1BtGl6RSRKOkzCWONSH4vOxijEQjN421UzRqzT5J7L3nNdaW+3e3bloXfL?=
+ =?us-ascii?Q?/+mBetlm4ERm4FjJRbXE4zF3CkSfAvF+H8cioDm8wu0BGF0CJBK7Ls6gQRZD?=
+ =?us-ascii?Q?OW4sSRjjrnaXUNtj8omA83ISpnJCRpT554N0YZwSaHwsDyKnpxXOXySq8lTe?=
+ =?us-ascii?Q?SfdighOUBUH0/7bzRwwErI8BZgQ1NTJ4RCpG6DB1jhTn02KstpbcDIVNVci7?=
+ =?us-ascii?Q?Y1/c3185HDX46D00z+ZtSgUuwf0/xiydS32B/QfIXRSlkc3JPIOWcaHe0BMV?=
+ =?us-ascii?Q?GIPrOWbTtvU8K9huiOjLaOaQgcRk7sDDzETEE0IJlFFqJfDdu38cEPLAOVk7?=
+ =?us-ascii?Q?nizJ0crDAy4dnYL2F90AFR+hkXqc6FDCNKJdFn167o0BJUikalGZFGQd2l0Y?=
+ =?us-ascii?Q?earC+fOY8tWo/VI2z7jQfKFbKQ5J+/mNFp9gP0KSQweOt4kJIThXGjJBbNRc?=
+ =?us-ascii?Q?+IyGjaik5JmhdZmN/rhNDaB9b0vgeD1oXBotjQ4lwidg21vqLdWiXCU9h3+J?=
+ =?us-ascii?Q?QfZEw+mr42KP9VGIFgyFWEyHY3vZgw8f0dX5KsPF?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20230128072737.2995881-3-apatel@ventanamicro.com>
- <mhng-0f9bdf58-5289-4db4-8fd7-38898824c44f@palmer-ri-x1c9>
- <CAK9=C2X8C4yswGhDwe1OzQXTELXQxp8=ayiFxh1aVMk4TxeDjw@mail.gmail.com>
- <Y+KS16ZNXrDU+xun@spud> <CAOnJCUKKRRCrKN17ytczYXVLTcMkFaZsg6QXKjPUuSk=PqL6JQ@mail.gmail.com>
- <Y+K3FyGrNUQJZao8@spud>
-In-Reply-To: <Y+K3FyGrNUQJZao8@spud>
-From:   Anup Patel <apatel@ventanamicro.com>
-Date:   Wed, 8 Feb 2023 09:24:28 +0530
-Message-ID: <CAK9=C2VnkK5GNO4D1AWpiNcTE=OrSueN9NAyhR7rj9csuUi4Mg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/7] RISC-V: Detect AIA CSRs from ISA string
-To:     Conor Dooley <conor@kernel.org>
-Cc:     Atish Patra <atishp@atishpatra.org>,
-        Stephano Cetola <stephano@riscv.org>,
-        Jeff Scheel <jeff@riscv.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>, pbonzini@redhat.com,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        ajones@ventanamicro.com, anup@brainfault.org, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0a0c2869-5f47-4969-6a1a-08db098c338b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Feb 2023 04:23:16.7591
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: u0ESG0TzF0mVpCDYU8ti18ZRAmBzxkqU9X1Jracb1KstwmDHpY+m6K+vHMH6NXw8OBPAb9j+9IyR1x+Gixh1Ug==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR11MB5275
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 8, 2023 at 2:09 AM Conor Dooley <conor@kernel.org> wrote:
->
-> On Tue, Feb 07, 2023 at 10:15:22AM -0800, Atish Patra wrote:
-> > On Tue, Feb 7, 2023 at 10:05 AM Conor Dooley <conor@kernel.org> wrote:
-> > > On Fri, Feb 03, 2023 at 05:31:01PM +0530, Anup Patel wrote:
-> > > > On Fri, Feb 3, 2023 at 5:54 AM Palmer Dabbelt <palmer@dabbelt.com> wrote:
-> > > > >
-> > > > > On Fri, 27 Jan 2023 23:27:32 PST (-0800), apatel@ventanamicro.com wrote:
-> > > > > > We have two extension names for AIA ISA support: Smaia (M-mode AIA CSRs)
-> > > > > > and Ssaia (S-mode AIA CSRs).
-> > > > >
-> > > > > This has pretty much the same problem that we had with the other
-> > > > > AIA-related ISA string patches, where there's that ambiguity with the
-> > > > > non-ratified chapters.  IIRC when this came up in GCC the rough idea was
-> > > > > to try and document that we're going to interpret the standard ISA
-> > > > > strings that way, but now that we're doing custom ISA extensions it
-> > > > > seems saner to just define on here that removes the ambiguity.
-> > > > >
-> > > > > I just sent
-> > > > > <https://lore.kernel.org/r/20230203001201.14770-1-palmer@rivosinc.com/>
-> > > > > which documents that.
-> > > >
-> > > > I am not sure why you say that these are custom extensions.
-> > > >
-> > > > Multiple folks have clarified that both Smaia and Ssaia are frozen
-> > > > ISA extensions as-per RVI process. The individual chapters which
-> > > > are in the draft state have nothing to do with Smaia and Ssaia CSRs.
-> > > >
-> > > > Please refer:
-> > > > https://github.com/riscv/riscv-aia/pull/36
-> > > > https://lists.riscv.org/g/tech-aia/message/336
-> > > > https://lists.riscv.org/g/tech-aia/message/337
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Tuesday, February 7, 2023 9:27 PM
 > > >
-> > > All of these links seem to discuss the draft chapters somehow being
-> > > incompatible with the non-draft ones. I would very expect that that,
-> > > as pointed out in several places there, that the draft chapters
-> > > finalisation would not lead to meaningful (and incompatible!) changes
-> > > being made to the non-draft chapters.
-> > >
+> > > No, I mean why can't vfio just call iommufd exactly once regardless o=
+f
+> > > what mode it is running in?
 > >
-> > Here is the status of all RVI specs. It states that the Smaia, Ssaia
-> > extensions are frozen (i.e. public review complete).
-> > https://wiki.riscv.org/display/HOME/Specification+Status
-> >
-> > I have added stephano/Jeff to confirm the same.
-> >
-> > AFAIK, IOMMU spec is close to the public review phase and should be
-> > frozen in this or next quarter.
-> > IIRC, this chapter in AIA will be frozen along with IOMMU spec.
-> >
-> > Anup: Please correct me if that's not correct.
-> >
-> > > Maybe yourself and Palmer are looking at this from different
-> > > perspectives? Looking at his patch from Friday:
-> > > https://lore.kernel.org/linux-riscv/20230203001201.14770-1-palmer@rivosinc.com/
-> > > He specifically mentioned this aspect, as opposed to the aspect that
-> > > your links refer to.
-> > >
-> > > Surely a duo-plic, if that ever comes to be, could be detected from
-> > > compatible strings in DT or w/e - but how do you intend differentiating
-> > > between an implementation of S*aia that contains the IOMMU support in
-> > > Chapter 9 in a finalised form, versus an implementation that may make
-> > > "different decisions" when it comes to that chapter of the spec?
-> >
-> > We will most likely have an extension specific to iommu spec as well.
->
-> Right, but unless I am misunderstanding you, that is an extension for the
-> IOMMU spec, not for Chapter 9 of the AIA spec?
->
-> I would say that it is likely that if you have AIA and IOMMU that you'd
-> want to be implementing Chapter 9, but that would not appear sufficient to
-> draw a conclusion from.
->
-> Maybe the RVI lads that you've added (or Anup for that matter!) can
-> clarify if there is a requirement that if you do AIA and IOMMU that you
-> must do Chapter 9.
-> If not, my prior question about a differentiation mechanism still applies
-> I think!
+> > This seems to be moving the DMA owner claim out of
+> iommufd_device_bind().
+> > Is it? Then either group and cdev can claim DMA owner with their own
+> DMA
+> > marker.
+>=20
+> No, it has nothing to do with DMA ownership
+>=20
+> Just keep a flag in vfio saying it is in group mode or device mode and
+> act accordingly.
 
-For the benefit of everyone, the AIA spec mainly defines three
-modular components:
-1) Extended Local Interrupt CSRs (Smaia and Ssaia extensions)
-    (ISA extension covered by: Chapter 2, Chapter 6, and Chapter 7)
-2) Incoming MSI Controller (IMSIC)
-    (ISA and Non-ISA extension covered by: Chapter 3 and Chapter 8)
-3) Advanced PLIC (APLIC)
-    (Non-ISA extension covered by: Chapter 4)
+It cannot be a simple flag. needs to be a refcnt since multiple devices=20
+in the group might be opened via cdev so the device mode should be
+cleared only when the last device via cdev is closed.
 
-Apart from above, we have Chapter 5 ("Duo-PLIC") and Chapter 9
-("IOMMU Support for MSIs to Virtual Machines") which are in draft
-state.
+Yi actually did implement such a flavor before, kind of introducing
+a vfio_group->cdev_opened_cnt field.
 
-Currently, there are no RISC-V members who have expressed
-interest in implementing Chapter 5 ("Duo-PLIC") so this chapter
-will stay in draft state for a foreseeable future.
+Then cdev bind_iommufd checks whether vfio_group->opened_file
+has been set in the group open path. If not then increment
+vfio_group->cdev_opened_cnt.
 
-The Chapter 9 ("IOMMU Support for MSIs to Virtual Machines")
-defines an optional feature of IOMMU which can be implemented
-by a standard IOMMU (such as RISC-V IOMMU) or a vendor specific
-IOMMU. A RISC-V platform can certainly support device pass-through
-using IMSIC guest files and an IOMMU which does not implement
-Chapter 9. Unfortunately, there is a limit on the maximum number
-of per-HART IMSIC guest files which can further limit the number
-of pass-through devices. The Chapter 9 allows RISC-V platforms
-to support large number of pass-through devices by defining "MRIF
-- memory resident interrupt files" for an IOMMU. Further, the MRIFs
-defined by Chapter 9 are simply interrupt files located in main memory
-and have nothing to do with AIA local interrupt CSRs (Smaia and Ssaia).
+cdev close decrements vfio_group->cdev_opened_cnt.
 
-The presence of S*aia in ISA string only implies that AIA extended
-local interrupt CSRs are implemented by the underlying RISC-V
-implementation.
+group open checks whether vfio_group->cdev_opened_cnt has been
+set. If not go to set vfio_group->opened_file.
 
-I confirm that it is certainly not mandatory for a RISC-V platform to
-implement Chapter 9 of the AIA specification if the RISC-V platform
-already implements AIA and IOMMU.
+In this case only one path can claim DMA ownership.
 
->
-> > > I thought that would be handled by extension versions, but I am told
-> > > that those are not a thing any more.
-> > > If that's not true, and there'll be a version number that we can pull in
-> > > from a DT and parse which will distinguish between the two, then please
-> > > correct my misunderstanding here!
+Is above what you expect?
 
-Regards,
-Anup
+>=20
+> The iommufd DMA owner check is *only* to be used for protecting
+> against two unrelated drivers trying to claim the same device.
+>=20
+
+this is just one implementation choice. I don't see why it cannot be
+extended to allow one driver to protect against two internal paths.
+Just simply allow the driver to assign an owner instead of assuming
+iommufd_ctx.
+
