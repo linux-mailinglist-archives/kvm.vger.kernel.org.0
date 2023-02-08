@@ -2,77 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BF45268F184
-	for <lists+kvm@lfdr.de>; Wed,  8 Feb 2023 16:01:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 37CBF68F192
+	for <lists+kvm@lfdr.de>; Wed,  8 Feb 2023 16:04:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231481AbjBHPBD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Feb 2023 10:01:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36192 "EHLO
+        id S231622AbjBHPEa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Feb 2023 10:04:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230376AbjBHPA7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Feb 2023 10:00:59 -0500
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01C31298DC
-        for <kvm@vger.kernel.org>; Wed,  8 Feb 2023 07:00:58 -0800 (PST)
-Received: by mail-pl1-x62c.google.com with SMTP id z1so19534420plg.6
-        for <kvm@vger.kernel.org>; Wed, 08 Feb 2023 07:00:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9oflZ6zNlZVw9EmQqtsymlsndLRnz7qdnW4kcU4XhjM=;
-        b=TyTWS/m7Pe2sYVsfIBwR88tdeTexgn+w18bj2jrQWwl0SQF29dkYshlSrsV/RQ8eOf
-         xOJ2oFUZxpUeJJGxZgJ86tMlRl4iHU9nCb0FPsYcQkABj007u2lqUSug07Yx4eXQKHdT
-         UDizQVJZy6FaeFNJCSOJH8vp8pB/shodMkYWrWIaopfsQp6zZsGYacJkWZqPILAeZNN9
-         gGciY+60JeeiSbkUnIX+LRKlxwQD4t3JOAhbe2TwwSgFjZFOG2BX7PJokbnTEOIDkRyE
-         bqIbo4Qn2FSkf+Cy1wc/VVk8TjwRhk6vGj9HgMzbjINIwLN+KXVU4cLJriEgaNAgcnpx
-         fX6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9oflZ6zNlZVw9EmQqtsymlsndLRnz7qdnW4kcU4XhjM=;
-        b=1Lhf5JEzm7Ey7g2SWEW5Iyz4MunNB6V+E+LC5oGqFnBHGcZz7Xf0tA6Gpe55Uzhz6p
-         S3A86BCKPcxH0+HRwrbQT+x3NUxD09I5CYoKpyvVo3IKryu6/nWm25jHjzaszevaAJfZ
-         ottzq3JZzDp9a7Mj5Q1mdjEYhFZiri7uuo5jajj9axuUeEVwYARNCxu9HWblWRgz8ayr
-         scVNJBNk6MGIS4wQ707qjhK0ofg3g0We/1mBrrtnPHUSS0iPT6trvwZWjT6YbMyIw/Ks
-         Z7gchEUb0/r+GuNFoecufDlsEKvfM4mQrt7rNy/wbEubqKNqgahlkzkKqqrKz/dj8Poq
-         mX0Q==
-X-Gm-Message-State: AO0yUKVUk3w6MAfMfjcgTeVcwzD+jbp7gdc/1xlYXf07BFm8qBOsHZLN
-        s5xHCimw1o6wGia96ToghBggwggbk6NF+GEQc3s=
-X-Google-Smtp-Source: AK7set/Sg1EKZpPnOVhuAt9KhQSjGh52j1FGM0jG+Z5akg4z80ux7gd3rmlDUGrfknhCAucbOTZxkg==
-X-Received: by 2002:a17:902:e80e:b0:198:af4f:de09 with SMTP id u14-20020a170902e80e00b00198af4fde09mr233575plg.9.1675868457315;
-        Wed, 08 Feb 2023 07:00:57 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id p21-20020a056a000a1500b00593d7db7f29sm11340184pfh.216.2023.02.08.07.00.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Feb 2023 07:00:56 -0800 (PST)
-Date:   Wed, 8 Feb 2023 15:00:53 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     shahuang@redhat.com
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Jones <andrew.jones@linux.dev>,
-        Marc Zyngier <maz@kernel.org>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] KVM: selftests: Remove duplicate macro definition
-Message-ID: <Y+O5JW+Ro3i7iXV3@google.com>
-References: <20230208071801.68620-1-shahuang@redhat.com>
+        with ESMTP id S231660AbjBHPE2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Feb 2023 10:04:28 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA94032506
+        for <kvm@vger.kernel.org>; Wed,  8 Feb 2023 07:03:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675868622;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=qepYHdACOgrn8tjYC+j2h5SwH4vLNyWaHzF3y6ezPbI=;
+        b=daZrf0i4OdBYB73HjwcNGd1QNEtPVOhoPleMCeEDrMMiXluUFobq4nCThacs+eouEI1Jpn
+        /s/weh3M0ikzGnST+hXMGLiJcBzArwJ1eCFrmo17Hr6OeufZP+Tl+HOELgFIJvIBR7llgE
+        eVGYgonkuYBLeWty5JzHTLV5ofGS4Ag=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-454-B2jhMCXXOR6CPl3I80re8g-1; Wed, 08 Feb 2023 10:03:38 -0500
+X-MC-Unique: B2jhMCXXOR6CPl3I80re8g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F19EC299E755;
+        Wed,  8 Feb 2023 15:03:23 +0000 (UTC)
+Received: from localhost (unknown [10.39.193.252])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C519C15BAD;
+        Wed,  8 Feb 2023 15:03:23 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH v2 4/6] KVM: arm64: Limit length in
+ kvm_vm_ioctl_mte_copy_tags() to INT_MAX
+In-Reply-To: <20230208140105.655814-5-thuth@redhat.com>
+Organization: Red Hat GmbH
+References: <20230208140105.655814-1-thuth@redhat.com>
+ <20230208140105.655814-5-thuth@redhat.com>
+User-Agent: Notmuch/0.37 (https://notmuchmail.org)
+Date:   Wed, 08 Feb 2023 16:03:22 +0100
+Message-ID: <87pmakmc79.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230208071801.68620-1-shahuang@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,37 +73,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 08, 2023, shahuang@redhat.com wrote:
-> From: Shaoqin Huang <shahuang@redhat.com>
-> 
-> The KVM_GUEST_PAGE_TABLE_MIN_PADDR macro has been defined in
-> include/kvm_util_base.h. So remove the duplicate definition in
-> lib/kvm_util.c.
-> 
-> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+On Wed, Feb 08 2023, Thomas Huth <thuth@redhat.com> wrote:
+
+> In case of success, this function returns the amount of handled bytes.
+> However, this does not work for large values: The function is called
+> from kvm_arch_vm_ioctl() (which still returns a long), which in turn
+> is called from kvm_vm_ioctl() in virt/kvm/kvm_main.c. And that function
+> stores the return value in an "int r" variable. So the upper 32-bits
+> of the "long" return value are lost there.
+>
+> KVM ioctl functions should only return "int" values, so let's limit
+> the amount of bytes that can be requested here to INT_MAX to avoid
+> the problem with the truncated return value. We can then also change
+> the return type of the function to "int" to make it clearer that it
+> is not possible to return a "long" here.
+>
+> Fixes: f0376edb1ddc ("KVM: arm64: Add ioctl to fetch/store tags in a guest")
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  tools/testing/selftests/kvm/lib/kvm_util.c | 3 ---
->  1 file changed, 3 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index f25b3e9b5a07..3ea24a5f4c43 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -1942,9 +1942,6 @@ vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
->  	return vm_phy_pages_alloc(vm, 1, paddr_min, memslot);
->  }
->  
-> -/* Arbitrary minimum physical address used for virtual translation tables. */
-> -#define KVM_GUEST_PAGE_TABLE_MIN_PADDR 0x180000
+>  Documentation/virt/kvm/api.rst    | 3 ++-
+>  arch/arm64/include/asm/kvm_host.h | 4 ++--
+>  arch/arm64/kvm/guest.c            | 8 ++++++--
+>  3 files changed, 10 insertions(+), 5 deletions(-)
 
-Huh.  There wasn't even a merge conflict or anything, I just added it twice in
-commit cce0c23dd944 ("KVM: selftests: Add wrapper to allocate page table page").
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
-Anyways, applied to kvm-x86 selftests with a Fixes tag.  Thanks!
-
-[1/1] KVM: selftests: Remove duplicate macro definition
-      https://github.com/kvm-x86/linux/commit/695fa5a64cf5
-
---
-https://github.com/kvm-x86/linux/tree/next
-https://github.com/kvm-x86/linux/tree/fixes
