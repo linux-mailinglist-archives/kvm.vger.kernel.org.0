@@ -2,55 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1949368F8F4
+	by mail.lfdr.de (Postfix) with ESMTP id C0B5A68F8F6
 	for <lists+kvm@lfdr.de>; Wed,  8 Feb 2023 21:42:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232160AbjBHUmh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Feb 2023 15:42:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50312 "EHLO
+        id S232169AbjBHUmj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Feb 2023 15:42:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231751AbjBHUmg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Feb 2023 15:42:36 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF8CD24CA9
-        for <kvm@vger.kernel.org>; Wed,  8 Feb 2023 12:42:34 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id m5-20020a17090a414500b00230c1a511a5so4668982pjg.0
-        for <kvm@vger.kernel.org>; Wed, 08 Feb 2023 12:42:34 -0800 (PST)
+        with ESMTP id S232144AbjBHUmh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Feb 2023 15:42:37 -0500
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8331D29152
+        for <kvm@vger.kernel.org>; Wed,  8 Feb 2023 12:42:36 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id u15-20020a170902a60f00b001992a366c3bso66853plq.12
+        for <kvm@vger.kernel.org>; Wed, 08 Feb 2023 12:42:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bBzQfVaxxfY8R5UeaSbbJL6k9hqwUJfY978upbZU7uo=;
-        b=nW6LNcYAxz01hf4BVJu43EjFEuWMnizvHRFQUgCvqb3ZZ52K6Gy2TgPtbSN96RxBr3
-         5lDY6NohjO9Fd4AAYluhW+jYRXcyhz3YqswlPZdi48x8VF3DR8aP9UJIhXiAFU+DgXpR
-         BXH26zaNeKTdx/UgqwLfpx/bQfmPSTgooiLOVaFrxXK7pQbHvX0gU10PVWaym5aeMQfe
-         j1bLHJ7AFbI7t51zryH/GmMvBTYjjDD9SkvZ9AxbOV1H1VhFQEOcm5bEyOt25salCkc/
-         rbFYUrvbmzg+/EDG8Zy+VZmu409JyzCiSb4yqn6Xbut0N/5ui3H7/SsN2VLuHzChOa4b
-         k8mw==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=spQ5K2Y+c+YX5odb0jqHHYNwnHoVUZMaBIr5X38MZv4=;
+        b=IGg5iW9dBxluaPpP9MmOQm07YtAy1EcfamOO4LcrJdDJfwKf0iO600HomKRLImIjez
+         mTB/9lgPvla8ir7pr4Xet/LGie22EOCfZtmsWJ1ylwj4MJw0RdoiYw53iDL8N534wkR2
+         M8RsiprCIS4xlG422ZFSTARxu46pfU4AxOF/C1MS97Nzr393lD+d0OGMrv+gsx/Sgoqj
+         ummSPoA3wuhyFKovza13ay1UPWoVSvkmfsCgRKWoENmDiK44+cUyy35LQYkh/38XMV+J
+         yQPpII9V7ahCwCI4KOUXPS7uRuu+e5cbLGOhURuyU8c4TlVgmlbXdSS0qyGC8tmw9Z6R
+         h8iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bBzQfVaxxfY8R5UeaSbbJL6k9hqwUJfY978upbZU7uo=;
-        b=HY81r/51NWNzXP3b4KhEZ+ljsKPp81hSE/ttJ/TD5zUZ99pPiaGV9nI7PHTY2KN6Cx
-         VRKsxEei16X2RCNTvGm8JHEL16ZAy7rkg6HLEmCAx8XqJrgIPGgjfwAiJmxySjiYUutw
-         rMPIQDJ1XEHKSS1KkUfUgcxe82ZHR9DXxtjZ2hptMg40hJW5F1tbWwSYDbOxZYxX34rL
-         A1Sd4Jn2xv44VwkD0/VxGWyM9RArulxVp8VVp2eJX35ga3HS+HeW3rw2SpL6q1fHu7p/
-         1222Cs3nKjPNIIAd1T+oBzYNPYuIqokS7NlrR52f3sR9/pjGyglSdASrOLBdMfdTVCi0
-         PgdA==
-X-Gm-Message-State: AO0yUKWS29PIMK5XaHq0zMhrcentkLw3k9xa51ZUBNqqHjyWVrIsBTZ0
-        oLYp83F2Tf59A6N5ImXfoRNF8feQMgo=
-X-Google-Smtp-Source: AK7set9m9QMkZ+IQ/fM83QrFqR8Sh6x0KpmEoJ2SepRRpRNLA/Xa5mb14ohO9tbW5Qua/5MMElroKkenIhw=
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=spQ5K2Y+c+YX5odb0jqHHYNwnHoVUZMaBIr5X38MZv4=;
+        b=Cki1Sn83WQPqt4E5gi6UtzJKFxGuKOgkI4HKP589InviVwO8DmyumtQPthTZppbEQ9
+         ERinZCxA+1M5cQcp2bfQXc+/eklU4HEHlgMcUbQ0+mV/OviU757yssWX0wbM3LA8PUE2
+         nzTy5ub7e0xRF7wLw3fr9O67/hKQ71JdRGl1+4Bdn4CZNFkiYg++6DsejBGZWJ6n8x2Q
+         dPpX4a4DKnK4/w3QYVGdVQmHDeD7rlXo9HDowsMartr2FeZUGdtcrpDOIcW2e8s/mm0e
+         f/pOKx8OjMM9uBHQMHKgeeFA9m79ZUHXjTtTjTi7MiuU8GpEkgpF79+/a2ejhRhOgNrW
+         iHCA==
+X-Gm-Message-State: AO0yUKVBvziY7U8vD2mNF4shxocAHNMVwmDa1EoyL7IGMnpcfHsJ95uo
+        l4vQUJJlwQI2Z3DzVpR0Yee1Lwlo/BI=
+X-Google-Smtp-Source: AK7set/XkzJe6v8Fwp4qwGPePLsgeGVy/aC/jLjdx7j/+esPIr6q1kdrgg93gN/k7q+6LJLhNk3Js+GC+vM=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:c202:b0:230:ee6f:28bc with SMTP id
- e2-20020a17090ac20200b00230ee6f28bcmr129308pjt.1.1675888954038; Wed, 08 Feb
- 2023 12:42:34 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:f993:b0:230:cff0:52ef with SMTP id
+ cq19-20020a17090af99300b00230cff052efmr1200025pjb.81.1675888956026; Wed, 08
+ Feb 2023 12:42:36 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  8 Feb 2023 20:42:28 +0000
+Date:   Wed,  8 Feb 2023 20:42:29 +0000
+In-Reply-To: <20230208204230.1360502-1-seanjc@google.com>
 Mime-Version: 1.0
+References: <20230208204230.1360502-1-seanjc@google.com>
 X-Mailer: git-send-email 2.39.1.519.gcb327c4b5f-goog
-Message-ID: <20230208204230.1360502-1-seanjc@google.com>
-Subject: [PATCH v2 0/2] perf/x86: KVM: Disable vPMU on hybrid CPUs
+Message-ID: <20230208204230.1360502-2-seanjc@google.com>
+Subject: [PATCH v2 1/2] KVM: x86/pmu: Disable vPMU support on hybrid CPUs
+ (host PMUs)
 From:   Sean Christopherson <seanjc@google.com>
 To:     Peter Zijlstra <peterz@infradead.org>,
         Ingo Molnar <mingo@redhat.com>,
@@ -77,32 +81,83 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Disable vPMU support in KVM when running on hybrid CPUs to avoid inducing
-#GPs and other issues in guests.  This is intended to be a stopgap to
-prevent unwitting KVM users from shooting themselves in the foot until KVM
-KVM gets proper enabling for hybrid CPUs.
+Disable KVM support for virtualizing PMUs on hosts with hybrid PMUs until
+KVM gains a sane way to enumeration the hybrid vPMU to userspace and/or
+gains a mechanism to let userspace opt-in to the dangers of exposing a
+hybrid vPMU to KVM guests.  Virtualizing a hybrid PMU, or at least part of
+a hybrid PMU, is possible, but it requires careful, deliberate
+configuration from userspace.
 
-Effectively squash exporting PMU capabilities from perf until it too gets
-proper enabling.
+E.g. to expose full functionality, vCPUs need to be pinned to pCPUs to
+prevent migrating a vCPU between a big core and a little core, userspace
+must enumerate a reasonable topology to the guest, and guest CPUID must be
+curated per vCPU to enumerate accurate vPMU capabilities.
 
-v2:
- - Disable vPMU on hybrid CPUs in KVM _and_ in perf. [Like]
- - Use X86_FEATURE_HYBRID_CPU instead of is_hybrid().
- - Tweak comments/changelogs to more clearly state that there are options
-   beyond pinning vCPUs (though they still need KVM support). [Like]
+The last point is especially problematic, as KVM doesn't control which
+pCPU it runs on when enumerating KVM's vPMU capabilities to userspace,
+i.e. userspace can't rely on KVM_GET_SUPPORTED_CPUID in it's current form.
 
-v1: https://lore.kernel.org/all/20230120004051.2043777-1-seanjc@google.com
+Alternatively, userspace could enable vPMU support by enumerating the
+set of features that are common and coherent across all cores, e.g. by
+filtering PMU events and restricting guest capabilities.  But again, that
+requires userspace to take action far beyond reflecting KVM's supported
+feature set into the guest.
 
-Sean Christopherson (2):
-  KVM: x86/pmu: Disable vPMU support on hybrid CPUs (host PMUs)
-  perf/x86: Refuse to export capabilities for hybrid PMUs
+For now, simply disable vPMU support on hybrid CPUs to avoid inducing
+seemingly random #GPs in guests, and punt support for hybrid CPUs to a
+future enabling effort.
 
- arch/x86/events/core.c | 14 ++++++++------
- arch/x86/kvm/pmu.h     | 26 +++++++++++++++++++-------
- 2 files changed, 27 insertions(+), 13 deletions(-)
+Reported-by: Jianfeng Gao <jianfeng.gao@intel.com>
+Cc: stable@vger.kernel.org
+Cc: Andrew Cooper <Andrew.Cooper3@citrix.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Kan Liang <kan.liang@linux.intel.com>
+Cc: Andi Kleen <ak@linux.intel.com>
+Link: https://lore.kernel.org/all/20220818181530.2355034-1-kan.liang@linux.intel.com
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/pmu.h | 26 +++++++++++++++++++-------
+ 1 file changed, 19 insertions(+), 7 deletions(-)
 
-
-base-commit: 7cb79f433e75b05d1635aefaa851cfcd1cb7dc4f
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index cdb91009701d..ee67ba625094 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -165,15 +165,27 @@ static inline void kvm_init_pmu_capability(void)
+ {
+ 	bool is_intel = boot_cpu_data.x86_vendor == X86_VENDOR_INTEL;
+ 
+-	perf_get_x86_pmu_capability(&kvm_pmu_cap);
+-
+-	 /*
+-	  * For Intel, only support guest architectural pmu
+-	  * on a host with architectural pmu.
+-	  */
+-	if ((is_intel && !kvm_pmu_cap.version) || !kvm_pmu_cap.num_counters_gp)
++	/*
++	 * Hybrid PMUs don't play nice with virtualization without careful
++	 * configuration by userspace, and KVM's APIs for reporting supported
++	 * vPMU features do not account for hybrid PMUs.  Disable vPMU support
++	 * for hybrid PMUs until KVM gains a way to let userspace opt-in.
++	 */
++	if (cpu_feature_enabled(X86_FEATURE_HYBRID_CPU))
+ 		enable_pmu = false;
+ 
++	if (enable_pmu) {
++		perf_get_x86_pmu_capability(&kvm_pmu_cap);
++
++		/*
++		 * For Intel, only support guest architectural pmu
++		 * on a host with architectural pmu.
++		 */
++		if ((is_intel && !kvm_pmu_cap.version) ||
++		    !kvm_pmu_cap.num_counters_gp)
++			enable_pmu = false;
++	}
++
+ 	if (!enable_pmu) {
+ 		memset(&kvm_pmu_cap, 0, sizeof(kvm_pmu_cap));
+ 		return;
 -- 
 2.39.1.519.gcb327c4b5f-goog
 
