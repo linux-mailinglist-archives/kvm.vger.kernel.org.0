@@ -2,68 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5929668EC4A
-	for <lists+kvm@lfdr.de>; Wed,  8 Feb 2023 11:04:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E0AA468ED7C
+	for <lists+kvm@lfdr.de>; Wed,  8 Feb 2023 12:06:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230510AbjBHKDy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Feb 2023 05:03:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47430 "EHLO
+        id S230203AbjBHLGm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Feb 2023 06:06:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229527AbjBHKDp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Feb 2023 05:03:45 -0500
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 756B035BB;
-        Wed,  8 Feb 2023 02:03:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1675850623; x=1707386623;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=bnGKIBFnzJZoxrpMrO7/H65H9sV65Kzy8xs7gTUHeW8=;
-  b=b+rbtr69TURczhTOrrJKkbKnHdU3uIbJ67hXhgm8S7VU0Bizd5Y3iJ+D
-   0VlFhVG0H4AuoJ8wz6qVSFTnsnMoawLaGijRtoc251xIfjNdJJGz08lDJ
-   2yKOo7+8NsE2LrFYky8y6S7gRTSMVa5C5YdGd5+3Dp3dRcoeqf/j0rHGY
-   Za7gHo/0QmLgCD7tjXfdFRke4Jyw3JHtbTRbVQDHi6oLvql7HDje6X58R
-   v7IMyzjYkLZXzT5G0VH0FfuYxDg1iqr3RlmfOJT0LmPEprf3eNN9baBUs
-   SywVud1z3438EIO08E623tCRBBSweZ3nKF+AD6PGzsIUonVXyZffecqK2
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10614"; a="357148889"
-X-IronPort-AV: E=Sophos;i="5.97,280,1669104000"; 
-   d="scan'208";a="357148889"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2023 02:03:42 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10614"; a="775947741"
-X-IronPort-AV: E=Sophos;i="5.97,280,1669104000"; 
-   d="scan'208";a="775947741"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by fmsmga002.fm.intel.com with ESMTP; 08 Feb 2023 02:03:37 -0800
-Date:   Wed, 8 Feb 2023 18:03:36 +0800
-From:   Yuan Yao <yuan.yao@linux.intel.com>
-To:     Usama Arif <usama.arif@bytedance.com>
-Cc:     dwmw2@infradead.org, tglx@linutronix.de, kim.phillips@amd.com,
-        arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
-        pbonzini@redhat.com, paulmck@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
-        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
-        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
-        simon.evans@bytedance.com, liangma@liangbit.com,
-        David Woodhouse <dwmw@amazon.co.uk>
-Subject: Re: [PATCH v7 5/9] x86/smpboot: Split up native_cpu_up into separate
- phases and document them
-Message-ID: <20230208100336.mdnrvpsssa2sjodu@yy-desk-7060>
-References: <20230207230436.2690891-1-usama.arif@bytedance.com>
- <20230207230436.2690891-6-usama.arif@bytedance.com>
+        with ESMTP id S229732AbjBHLGl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Feb 2023 06:06:41 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 442F33C04
+        for <kvm@vger.kernel.org>; Wed,  8 Feb 2023 03:05:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675854355;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Ddn3ZHKD3Y1fAHYFvdUXFlfh/V/xujs0Wif2Rwk78Bg=;
+        b=Wf/6fuyjXbOe5Bw6s7HAZq5ucnTdmeXkgVGlDedPhUjYwdyW1qhIhKYB0yZk5hq/wMZZfh
+        Rpv2oOWDdtw8QHAUxcOScQBau/mAiFbDAHVoU4ZxpaDpJnqqh70Pw4EKscr7mkCpSZyidZ
+        MFXR16YacAAyTigLIsCVOz6eo3OjwDo=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-615-AsEauE5EPruvmEn019oLcw-1; Wed, 08 Feb 2023 06:05:48 -0500
+X-MC-Unique: AsEauE5EPruvmEn019oLcw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CBE4029A9D42;
+        Wed,  8 Feb 2023 11:05:47 +0000 (UTC)
+Received: from [10.64.54.63] (vpn2-54-63.bne.redhat.com [10.64.54.63])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EC1CA1121314;
+        Wed,  8 Feb 2023 11:05:40 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v2 08/12] KVM: arm64: Add
+ KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+To:     Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com,
+        maz@kernel.org, oupton@google.com, yuzenghui@huawei.com,
+        dmatlack@google.com
+Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
+        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        eric.auger@redhat.com, reijiw@google.com, rananta@google.com,
+        bgardon@google.com, ricarkol@gmail.com,
+        Oliver Upton <oliver.upton@linux.dev>
+References: <20230206165851.3106338-1-ricarkol@google.com>
+ <20230206165851.3106338-9-ricarkol@google.com>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <58151bf0-1f56-3887-fa22-479c9b84bd4a@redhat.com>
+Date:   Wed, 8 Feb 2023 22:05:37 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230207230436.2690891-6-usama.arif@bytedance.com>
-User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+In-Reply-To: <20230206165851.3106338-9-ricarkol@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,302 +73,146 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 07, 2023 at 11:04:32PM +0000, Usama Arif wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
->
-> There are four logical parts to what native_cpu_up() does on the BSP (or
-> on the controlling CPU for a later hotplug):
->
->  1) Wake the AP by sending the INIT/SIPI/SIPI sequence.
->
->  2) Wait for the AP to make it as far as wait_for_master_cpu() which
->     sets that CPU's bit in cpu_initialized_mask, then sets the bit in
->     cpu_callout_mask to let the AP proceed through cpu_init().
->
->  3) Waits for the AP to finish cpu_init() and get as far as the
->     smp_callin() call, which sets that CPU's bit in cpu_callin_mask.
->
->  4) Perform the TSC synchronization and wait for the AP to actually
->     mark itself online in cpu_online_mask.
->
-> In preparation to allow these phases to operate in parallel on multiple
-> APs, split them out into separate functions and document the interactions
-> a little more clearly in both the BSP and AP code paths.
->
-> No functional change intended.
->
-> [Usama Arif: fixed rebase conflict]
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> Signed-off-by: Usama Arif <usama.arif@bytedance.com>
+Hi Ricardo,
+
+On 2/7/23 3:58 AM, Ricardo Koller wrote:
+> Add a capability for userspace to specify the eager split chunk size.
+> The chunk size specifies how many pages to break at a time, using a
+> single allocation. Bigger the chunk size, more pages need to be
+> allocated ahead of time.
+> 
+> Suggested-by: Oliver Upton <oliver.upton@linux.dev>
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
 > ---
->  arch/x86/kernel/smpboot.c | 182 +++++++++++++++++++++++++++-----------
->  1 file changed, 128 insertions(+), 54 deletions(-)
->
-> diff --git a/arch/x86/kernel/smpboot.c b/arch/x86/kernel/smpboot.c
-> index 3a793772a2aa..eee717086ab7 100644
-> --- a/arch/x86/kernel/smpboot.c
-> +++ b/arch/x86/kernel/smpboot.c
-> @@ -204,6 +204,10 @@ static void smp_callin(void)
->
->  	wmb();
->
-> +	/*
-> +	 * This runs the AP through all the cpuhp states to its target
-> +	 * state (CPUHP_ONLINE in the case of serial bringup).
-> +	 */
->  	notify_cpu_starting(cpuid);
->
->  	/*
-> @@ -231,17 +235,33 @@ static void notrace start_secondary(void *unused)
->  	load_cr3(swapper_pg_dir);
->  	__flush_tlb_all();
->  #endif
-> +	/*
-> +	 * Sync point with do_wait_cpu_initialized(). On boot, all secondary
-> +	 * CPUs reach this stage after receiving INIT/SIPI from do_cpu_up()
-> +	 * in the x86/cpu:kick cpuhp stage. At the start of cpu_init() they
-> +	 * will wait for do_wait_cpu_initialized() to set their bit in
-> +	 * smp_callout_mask to release them.
-
-The last sentence of the comment looks confused. The fact is:
-
-For serial case, The BSP waits AP to set cpu_initialized_mask from
-wait_for_master_cpu() after fired INIT/SIPI, then AP starts to wait
-cpu_callout_mask set by BSP from do_boot_cpu().
-
-Or the comments below "Bringup step two:..." which also looks clear
-enough then above.
-
-> +	 */
->  	cpu_init_secondary();
->  	rcu_cpu_starting(raw_smp_processor_id());
->  	x86_cpuinit.early_percpu_clock_init();
+>   Documentation/virt/kvm/api.rst    | 26 ++++++++++++++++++++++++++
+>   arch/arm64/include/asm/kvm_host.h |  2 ++
+>   arch/arm64/kvm/arm.c              | 22 ++++++++++++++++++++++
+>   arch/arm64/kvm/mmu.c              |  3 +++
+>   include/uapi/linux/kvm.h          |  1 +
+>   5 files changed, 54 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 9807b05a1b57..a9332e331cce 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -8284,6 +8284,32 @@ structure.
+>   When getting the Modified Change Topology Report value, the attr->addr
+>   must point to a byte where the value will be stored or retrieved from.
+>   
+> +8.40 KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+> +---------------------------------------
 > +
-> +	/*
-> +	 * Sync point with do_wait_cpu_callin(). The AP doesn't wait here
-> +	 * but just sets the bit to let the controlling CPU (BSP) know that
-> +	 * it's got this far.
-> +	 */
->  	smp_callin();
->
->  	enable_start_cpu0 = 0;
->
->  	/* otherwise gcc will move up smp_processor_id before the cpu_init */
->  	barrier();
+> +:Capability: KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+> +:Architectures: arm64
+> +:Type: vm
+> +:Parameters: arg[0] is the new chunk size.
+> +:Returns: 0 on success, -EINVAL if any memslot has been created.
 > +
->  	/*
-> -	 * Check TSC synchronization with the boot CPU:
-> +	 * Check TSC synchronization with the boot CPU (or whichever CPU
-> +	 * is controlling the bringup). It will do its part of this from
-> +	 * do_wait_cpu_online(), making it an implicit sync point.
->  	 */
->  	check_tsc_sync_target();
->
-> @@ -254,6 +274,7 @@ static void notrace start_secondary(void *unused)
->  	 * half valid vector space.
->  	 */
->  	lock_vector_lock();
-> +	/* Sync point with do_wait_cpu_online() */
->  	set_cpu_online(smp_processor_id(), true);
->  	lapic_online();
->  	unlock_vector_lock();
-> @@ -1083,7 +1104,6 @@ static int do_boot_cpu(int apicid, int cpu, struct task_struct *idle,
->  	unsigned long start_ip = real_mode_header->trampoline_start;
->
->  	unsigned long boot_error = 0;
-> -	unsigned long timeout;
->
->  #ifdef CONFIG_X86_64
->  	/* If 64-bit wakeup method exists, use the 64-bit mode trampoline IP */
-> @@ -1144,55 +1164,94 @@ static int do_boot_cpu(int apicid, int cpu, struct task_struct *idle,
->  		boot_error = wakeup_cpu_via_init_nmi(cpu, start_ip, apicid,
->  						     cpu0_nmi_registered);
->
-> -	if (!boot_error) {
-> -		/*
-> -		 * Wait 10s total for first sign of life from AP
-> -		 */
-> -		boot_error = -1;
-> -		timeout = jiffies + 10*HZ;
-> -		while (time_before(jiffies, timeout)) {
-> -			if (cpumask_test_cpu(cpu, cpu_initialized_mask)) {
-> -				/*
-> -				 * Tell AP to proceed with initialization
-> -				 */
-> -				cpumask_set_cpu(cpu, cpu_callout_mask);
-> -				boot_error = 0;
-> -				break;
-> -			}
-> -			schedule();
-> -		}
-> -	}
-> +	return boot_error;
-> +}
->
-> -	if (!boot_error) {
-> -		/*
-> -		 * Wait till AP completes initial initialization
-> -		 */
-> -		while (!cpumask_test_cpu(cpu, cpu_callin_mask)) {
-> -			/*
-> -			 * Allow other tasks to run while we wait for the
-> -			 * AP to come online. This also gives a chance
-> -			 * for the MTRR work(triggered by the AP coming online)
-> -			 * to be completed in the stop machine context.
-> -			 */
-> -			schedule();
-> -		}
-> +static int do_wait_cpu_cpumask(unsigned int cpu, const struct cpumask *mask)
-> +{
-> +	unsigned long timeout;
+> +This capability sets the chunk size used in Eager Page Splitting.
 > +
-> +	/*
-> +	 * Wait up to 10s for the CPU to report in.
-> +	 */
-> +	timeout = jiffies + 10*HZ;
-> +	while (time_before(jiffies, timeout)) {
-> +		if (cpumask_test_cpu(cpu, mask))
-> +			return 0;
+> +Eager Page Splitting improves the performance of dirty-logging (used
+> +in live migrations) when guest memory is backed by huge-pages.  This
+> +optimization is enabled by default on arm64. It avoids splitting
+> +huge-pages (into PAGE_SIZE pages) on fault, by doing it eagerly when
+> +enabling dirty logging (with the KVM_MEM_LOG_DIRTY_PAGES flag for a
+> +memory region), or when using KVM_CLEAR_DIRTY_LOG.
 > +
-> +		schedule();
->  	}
-> +	return -1;
-> +}
->
-> -	if (x86_platform.legacy.warm_reset) {
-> -		/*
-> -		 * Cleanup possible dangling ends...
-> -		 */
-> -		smpboot_restore_warm_reset_vector();
-> +/*
-> + * Bringup step two: Wait for the target AP to reach cpu_init_secondary()
-> + * and thus wait_for_master_cpu(), then set cpu_callout_mask to allow it
-> + * to proceed.  The AP will then proceed past setting its 'callin' bit
-> + * and end up waiting in check_tsc_sync_target() until we reach
-> + * do_wait_cpu_online() to tend to it.
-> + */
-> +static int do_wait_cpu_initialized(unsigned int cpu)
-> +{
-> +	/*
-> +	 * Wait for first sign of life from AP.
-> +	 */
-> +	if (do_wait_cpu_cpumask(cpu, cpu_initialized_mask))
-> +		return -1;
+> +The chunk size specifies how many pages to break at a time, using a
+> +single allocation for each chunk. Bigger the chunk size, more pages
+> +need to be allocated ahead of time. A good heuristic is to pick the
+> +size of the huge-pages as the chunk size.
 > +
-> +	cpumask_set_cpu(cpu, cpu_callout_mask);
-> +	return 0;
-> +}
+> +If the chunk size (arg[0]) is zero, then no eager page splitting is
+> +performed. The default value PMD size (e.g., 2M when PAGE_SIZE is 4K).
 > +
-> +/*
-> + * Bringup step three: Wait for the target AP to reach smp_callin().
-> + * The AP is not waiting for us here so we don't need to parallelise
-> + * this step. Not entirely clear why we care about this, since we just
-> + * proceed directly to TSC synchronization which is the next sync
-> + * point with the AP anyway.
-> + */
-> +static int do_wait_cpu_callin(unsigned int cpu)
-> +{
-> +	/*
-> +	 * Wait till AP completes initial initialization.
-> +	 */
-> +	return do_wait_cpu_cpumask(cpu, cpu_callin_mask);
-> +}
+>   9. Known KVM API problems
+>   =========================
+>   
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 35a159d131b5..a69a815719cf 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -153,6 +153,8 @@ struct kvm_s2_mmu {
+>   	/* The last vcpu id that ran on each physical CPU */
+>   	int __percpu *last_vcpu_ran;
+>   
+> +#define KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT	PMD_SIZE
 > +
-> +/*
-> + * Bringup step four: Synchronize the TSC and wait for the target AP
-> + * to reach set_cpu_online() in start_secondary().
-> + */
-> +static int do_wait_cpu_online(unsigned int cpu)
-> +{
-> +	unsigned long flags;
-> +
-> +	/*
-> +	 * Check TSC synchronization with the AP (keep irqs disabled
-> +	 * while doing so):
-> +	 */
-> +	local_irq_save(flags);
-> +	check_tsc_sync_source(cpu);
-> +	local_irq_restore(flags);
-> +
-> +	/*
-> +	 * Wait for the AP to mark itself online. Not entirely
-> +	 * clear why we care, since the generic cpuhp code will
-> +	 * wait for it to each CPUHP_AP_ONLINE_IDLE before going
-> +	 * ahead with the rest of the bringup anyway.
-> +	 */
-> +	while (!cpu_online(cpu)) {
-> +		cpu_relax();
-> +		touch_nmi_watchdog();
->  	}
->
-> -	return boot_error;
-> +	return 0;
->  }
->
-> -int native_cpu_up(unsigned int cpu, struct task_struct *tidle)
-> +static int do_cpu_up(unsigned int cpu, struct task_struct *tidle)
->  {
->  	int apicid = apic->cpu_present_to_apicid(cpu);
->  	int cpu0_nmi_registered = 0;
-> -	unsigned long flags;
->  	int err, ret = 0;
->
->  	lockdep_assert_irqs_enabled();
-> @@ -1239,19 +1298,6 @@ int native_cpu_up(unsigned int cpu, struct task_struct *tidle)
->  		goto unreg_nmi;
->  	}
->
-> -	/*
-> -	 * Check TSC synchronization with the AP (keep irqs disabled
-> -	 * while doing so):
-> -	 */
-> -	local_irq_save(flags);
-> -	check_tsc_sync_source(cpu);
-> -	local_irq_restore(flags);
-> -
-> -	while (!cpu_online(cpu)) {
-> -		cpu_relax();
-> -		touch_nmi_watchdog();
-> -	}
-> -
->  unreg_nmi:
->  	/*
->  	 * Clean up the nmi handler. Do this after the callin and callout sync
-> @@ -1263,6 +1309,34 @@ int native_cpu_up(unsigned int cpu, struct task_struct *tidle)
->  	return ret;
->  }
->
-> +int native_cpu_up(unsigned int cpu, struct task_struct *tidle)
-> +{
-> +	int ret;
-> +
-> +	ret = do_cpu_up(cpu, tidle);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = do_wait_cpu_initialized(cpu);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = do_wait_cpu_callin(cpu);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = do_wait_cpu_online(cpu);
-> +
-> +	if (x86_platform.legacy.warm_reset) {
+>   	struct kvm_arch *arch;
+>   };
+>   
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 9c5573bc4614..c80617ced599 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -101,6 +101,22 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>   		r = 0;
+>   		set_bit(KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED, &kvm->arch.flags);
+>   		break;
+> +	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
+> +		mutex_lock(&kvm->lock);
+> +		mutex_lock(&kvm->slots_lock);
 > +		/*
-> +		 * Cleanup possible dangling ends...
+> +		 * To keep things simple, allow changing the chunk
+> +		 * size only if there are no memslots created.
 > +		 */
-> +		smpboot_restore_warm_reset_vector();
-> +	}
+> +		if (!kvm_are_all_memslots_empty(kvm)) {
+> +			r = -EINVAL;
+> +		} else {
+> +			r = 0;
+> +			kvm->arch.mmu.split_page_chunk_size = cap->args[0];
+> +		}
+> +		mutex_unlock(&kvm->slots_lock);
+> +		mutex_unlock(&kvm->lock);
+> +		break;
+>   	default:
+>   		r = -EINVAL;
+>   		break;
+> @@ -298,6 +314,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>   	case KVM_CAP_ARM_PTRAUTH_GENERIC:
+>   		r = system_has_full_ptr_auth();
+>   		break;
+> +	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
+> +		if (kvm)
+> +			r = kvm->arch.mmu.split_page_chunk_size;
+> +		else
+> +			r = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
+> +		break;
+>   	default:
+>   		r = 0;
+>   	}
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 812633a75e74..e2ada6588017 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -755,6 +755,9 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+>   	for_each_possible_cpu(cpu)
+>   		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
+>   
+> +	mmu->split_page_cache.gfp_zero = __GFP_ZERO;
+> +	mmu->split_page_chunk_size = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
 > +
-> +	return ret;
-> +}
-> +
->  /**
->   * arch_disable_smp_support() - disables SMP support for x86 at runtime
->   */
-> --
-> 2.25.1
->
+>   	mmu->pgt = pgt;
+>   	mmu->pgd_phys = __pa(pgt->pgd);
+>   	return 0;
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 55155e262646..02e05f7918e2 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1175,6 +1175,7 @@ struct kvm_ppc_resize_hpt {
+>   #define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
+>   #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
+>   #define KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP 225
+> +#define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 226
+>   
+>   #ifdef KVM_CAP_IRQ_ROUTING
+>   
+> 
+
+mmu->split_page_cache and mmu->split_page_chunk_size are defined in PATCH[09/12].
+I think you need move the definitions to PATCH[08/12] instead. Otherwise, git-bisect
+is broken.
+
+Thanks,
+Gavin
+
