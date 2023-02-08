@@ -2,67 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E0AA468ED7C
-	for <lists+kvm@lfdr.de>; Wed,  8 Feb 2023 12:06:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F7DC68ED81
+	for <lists+kvm@lfdr.de>; Wed,  8 Feb 2023 12:07:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230203AbjBHLGm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Feb 2023 06:06:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39050 "EHLO
+        id S229663AbjBHLHW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Feb 2023 06:07:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229732AbjBHLGl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Feb 2023 06:06:41 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 442F33C04
-        for <kvm@vger.kernel.org>; Wed,  8 Feb 2023 03:05:56 -0800 (PST)
+        with ESMTP id S229686AbjBHLHU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Feb 2023 06:07:20 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF9814491
+        for <kvm@vger.kernel.org>; Wed,  8 Feb 2023 03:06:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675854355;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
+        s=mimecast20190719; t=1675854391;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Ddn3ZHKD3Y1fAHYFvdUXFlfh/V/xujs0Wif2Rwk78Bg=;
-        b=Wf/6fuyjXbOe5Bw6s7HAZq5ucnTdmeXkgVGlDedPhUjYwdyW1qhIhKYB0yZk5hq/wMZZfh
-        Rpv2oOWDdtw8QHAUxcOScQBau/mAiFbDAHVoU4ZxpaDpJnqqh70Pw4EKscr7mkCpSZyidZ
-        MFXR16YacAAyTigLIsCVOz6eo3OjwDo=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-615-AsEauE5EPruvmEn019oLcw-1; Wed, 08 Feb 2023 06:05:48 -0500
-X-MC-Unique: AsEauE5EPruvmEn019oLcw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CBE4029A9D42;
-        Wed,  8 Feb 2023 11:05:47 +0000 (UTC)
-Received: from [10.64.54.63] (vpn2-54-63.bne.redhat.com [10.64.54.63])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id EC1CA1121314;
-        Wed,  8 Feb 2023 11:05:40 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v2 08/12] KVM: arm64: Add
- KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
-To:     Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com,
-        maz@kernel.org, oupton@google.com, yuzenghui@huawei.com,
-        dmatlack@google.com
-Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
-        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        eric.auger@redhat.com, reijiw@google.com, rananta@google.com,
-        bgardon@google.com, ricarkol@gmail.com,
-        Oliver Upton <oliver.upton@linux.dev>
-References: <20230206165851.3106338-1-ricarkol@google.com>
- <20230206165851.3106338-9-ricarkol@google.com>
-From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <58151bf0-1f56-3887-fa22-479c9b84bd4a@redhat.com>
-Date:   Wed, 8 Feb 2023 22:05:37 +1100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        bh=THAvMDTpqfQY0OQG1jNe64/m+leegxoPjSY/H415Uh4=;
+        b=gYyBJuyCGyG1sIeyRsr+2EA+szbyulzFhkAGZyufGXYm9d5OvgXKdzdce5aAq7GIooCZXU
+        LtSiPa8/pqzZYyv/hNUv+15aw9QNar60+gANueyheUIIMAi0EwZGsw0yrBlIJ8WlbkltJJ
+        HrYUFFXW/1R09WrBdk7kExOK6WJGbj8=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-486-0LsfHybZN0utReFljCT2Xg-1; Wed, 08 Feb 2023 06:06:29 -0500
+X-MC-Unique: 0LsfHybZN0utReFljCT2Xg-1
+Received: by mail-qt1-f199.google.com with SMTP id x16-20020ac87ed0000000b003b82d873b38so10581023qtj.13
+        for <kvm@vger.kernel.org>; Wed, 08 Feb 2023 03:06:29 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=THAvMDTpqfQY0OQG1jNe64/m+leegxoPjSY/H415Uh4=;
+        b=ZTS8LHeE+ru0jZ+daXW2Y5iXB2gghOTwO7LvgrvDmwpVJFOVNs1hExHC7iT0cRxQN5
+         r/4kRu8UDyvBbn5nP6f9KCfaCA+tWI9AbbmsHUkAsAX9ZWGtGQW6Mrf7KNLXw/qxqH+y
+         ZrcFV/PbuHFE8BVhYiBygzVthxqgZ4HAUZxZjQKWK1d0/z/qt73bqyVQ/Hg8pjmm5UNO
+         Crj2cCulJoOoScKqD4w8vvya8K9crhDegmqh4Hhc64Y0aN/DRwFQlEnFFTzAWiHv3Kbn
+         M8kUw7diN+Q5VF2Njh5V5zBIIh6rbg/1ABwHQ6R3IiJEiVOY+3Qb/UlNf2LR20Mm8kMP
+         96cA==
+X-Gm-Message-State: AO0yUKWrSyyQfbzu0lMR/VUu2RzQDv33fkXZ39IaJZS0AXk3E9liCxlj
+        p/hj175pa6qGVbyO2Sx21BXhr0KqiI1pSHd5HHd6SaFj3lzpglZA72+L675tbMy4SS0WXzrNLmr
+        rDu8TYl7M/whI
+X-Received: by 2002:ad4:5be2:0:b0:56c:38e:9764 with SMTP id k2-20020ad45be2000000b0056c038e9764mr11398035qvc.18.1675854389370;
+        Wed, 08 Feb 2023 03:06:29 -0800 (PST)
+X-Google-Smtp-Source: AK7set9jDmQNotvUgghlyrPyJkmnIcS5j7P3SoBNrvGSlrtO8f63BdN7LQofeduBzOOqc+OGuNynXw==
+X-Received: by 2002:ad4:5be2:0:b0:56c:38e:9764 with SMTP id k2-20020ad45be2000000b0056c038e9764mr11397998qvc.18.1675854389045;
+        Wed, 08 Feb 2023 03:06:29 -0800 (PST)
+Received: from [192.168.0.2] (ip-109-43-177-253.web.vodafone.de. [109.43.177.253])
+        by smtp.gmail.com with ESMTPSA id d3-20020ae9ef03000000b007069fde14a6sm465982qkg.25.2023.02.08.03.06.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Feb 2023 03:06:28 -0800 (PST)
+Message-ID: <3a38ca69-ac0a-ce75-4add-256c5996d89c@redhat.com>
+Date:   Wed, 8 Feb 2023 12:06:25 +0100
 MIME-Version: 1.0
-In-Reply-To: <20230206165851.3106338-9-ricarkol@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
 Content-Language: en-US
+To:     Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, kvm@vger.kernel.org, imbrenda@linux.ibm.com,
+        david@redhat.com, nrb@linux.ibm.com, nsg@linux.ibm.com
+References: <20230202092814.151081-1-pmorel@linux.ibm.com>
+ <20230202092814.151081-2-pmorel@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v6 1/2] s390x: topology: Check the Perform
+ Topology Function
+In-Reply-To: <20230202092814.151081-2-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
@@ -73,146 +82,180 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Ricardo,
-
-On 2/7/23 3:58 AM, Ricardo Koller wrote:
-> Add a capability for userspace to specify the eager split chunk size.
-> The chunk size specifies how many pages to break at a time, using a
-> single allocation. Bigger the chunk size, more pages need to be
-> allocated ahead of time.
+On 02/02/2023 10.28, Pierre Morel wrote:
+> We check that the PTF instruction is working correctly when
+> the cpu topology facility is available.
 > 
-> Suggested-by: Oliver Upton <oliver.upton@linux.dev>
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> For KVM only, we test changing of the polarity between horizontal
+> and vertical and that a reset set the horizontal polarity.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 > ---
->   Documentation/virt/kvm/api.rst    | 26 ++++++++++++++++++++++++++
->   arch/arm64/include/asm/kvm_host.h |  2 ++
->   arch/arm64/kvm/arm.c              | 22 ++++++++++++++++++++++
->   arch/arm64/kvm/mmu.c              |  3 +++
->   include/uapi/linux/kvm.h          |  1 +
->   5 files changed, 54 insertions(+)
+>   s390x/Makefile      |   1 +
+>   s390x/topology.c    | 155 ++++++++++++++++++++++++++++++++++++++++++++
+>   s390x/unittests.cfg |   3 +
+>   3 files changed, 159 insertions(+)
+>   create mode 100644 s390x/topology.c
 > 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 9807b05a1b57..a9332e331cce 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -8284,6 +8284,32 @@ structure.
->   When getting the Modified Change Topology Report value, the attr->addr
->   must point to a byte where the value will be stored or retrieved from.
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index 52a9d82..b5fe8a3 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -39,6 +39,7 @@ tests += $(TEST_DIR)/panic-loop-extint.elf
+>   tests += $(TEST_DIR)/panic-loop-pgm.elf
+>   tests += $(TEST_DIR)/migration-sck.elf
+>   tests += $(TEST_DIR)/exittime.elf
+> +tests += $(TEST_DIR)/topology.elf
 >   
-> +8.40 KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
-> +---------------------------------------
-> +
-> +:Capability: KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
-> +:Architectures: arm64
-> +:Type: vm
-> +:Parameters: arg[0] is the new chunk size.
-> +:Returns: 0 on success, -EINVAL if any memslot has been created.
-> +
-> +This capability sets the chunk size used in Eager Page Splitting.
-> +
-> +Eager Page Splitting improves the performance of dirty-logging (used
-> +in live migrations) when guest memory is backed by huge-pages.  This
-> +optimization is enabled by default on arm64. It avoids splitting
-> +huge-pages (into PAGE_SIZE pages) on fault, by doing it eagerly when
-> +enabling dirty logging (with the KVM_MEM_LOG_DIRTY_PAGES flag for a
-> +memory region), or when using KVM_CLEAR_DIRTY_LOG.
-> +
-> +The chunk size specifies how many pages to break at a time, using a
-> +single allocation for each chunk. Bigger the chunk size, more pages
-> +need to be allocated ahead of time. A good heuristic is to pick the
-> +size of the huge-pages as the chunk size.
-> +
-> +If the chunk size (arg[0]) is zero, then no eager page splitting is
-> +performed. The default value PMD size (e.g., 2M when PAGE_SIZE is 4K).
-> +
->   9. Known KVM API problems
->   =========================
+>   pv-tests += $(TEST_DIR)/pv-diags.elf
 >   
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 35a159d131b5..a69a815719cf 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -153,6 +153,8 @@ struct kvm_s2_mmu {
->   	/* The last vcpu id that ran on each physical CPU */
->   	int __percpu *last_vcpu_ran;
->   
-> +#define KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT	PMD_SIZE
+> diff --git a/s390x/topology.c b/s390x/topology.c
+> new file mode 100644
+> index 0000000..20f7ba2
+> --- /dev/null
+> +++ b/s390x/topology.c
+> @@ -0,0 +1,155 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * CPU Topology
+> + *
+> + * Copyright IBM Corp. 2022
+> + *
+> + * Authors:
+> + *  Pierre Morel <pmorel@linux.ibm.com>
+> + */
 > +
->   	struct kvm_arch *arch;
->   };
->   
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 9c5573bc4614..c80617ced599 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -101,6 +101,22 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->   		r = 0;
->   		set_bit(KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED, &kvm->arch.flags);
->   		break;
-> +	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
-> +		mutex_lock(&kvm->lock);
-> +		mutex_lock(&kvm->slots_lock);
-> +		/*
-> +		 * To keep things simple, allow changing the chunk
-> +		 * size only if there are no memslots created.
-> +		 */
-> +		if (!kvm_are_all_memslots_empty(kvm)) {
-> +			r = -EINVAL;
-> +		} else {
-> +			r = 0;
-> +			kvm->arch.mmu.split_page_chunk_size = cap->args[0];
-> +		}
-> +		mutex_unlock(&kvm->slots_lock);
-> +		mutex_unlock(&kvm->lock);
-> +		break;
->   	default:
->   		r = -EINVAL;
->   		break;
-> @@ -298,6 +314,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_ARM_PTRAUTH_GENERIC:
->   		r = system_has_full_ptr_auth();
->   		break;
-> +	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
-> +		if (kvm)
-> +			r = kvm->arch.mmu.split_page_chunk_size;
-> +		else
-> +			r = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
-> +		break;
->   	default:
->   		r = 0;
->   	}
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 812633a75e74..e2ada6588017 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -755,6 +755,9 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
->   	for_each_possible_cpu(cpu)
->   		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
->   
-> +	mmu->split_page_cache.gfp_zero = __GFP_ZERO;
-> +	mmu->split_page_chunk_size = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
+> +#include <libcflat.h>
+> +#include <asm/page.h>
+> +#include <asm/asm-offsets.h>
+> +#include <asm/interrupt.h>
+> +#include <asm/facility.h>
+> +#include <smp.h>
+> +#include <sclp.h>
+> +#include <s390x/hardware.h>
 > +
->   	mmu->pgt = pgt;
->   	mmu->pgd_phys = __pa(pgt->pgd);
->   	return 0;
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 55155e262646..02e05f7918e2 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1175,6 +1175,7 @@ struct kvm_ppc_resize_hpt {
->   #define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
->   #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
->   #define KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP 225
-> +#define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 226
->   
->   #ifdef KVM_CAP_IRQ_ROUTING
->   
-> 
+> +#define PTF_REQ_HORIZONTAL	0
+> +#define PTF_REQ_VERTICAL	1
+> +#define PTF_REQ_CHECK		2
+> +
+> +#define PTF_ERR_NO_REASON	0
+> +#define PTF_ERR_ALRDY_POLARIZED	1
+> +#define PTF_ERR_IN_PROGRESS	2
+> +
+> +extern int diag308_load_reset(u64);
+> +
+> +static int ptf(unsigned long fc, unsigned long *rc)
+> +{
+> +	int cc;
+> +
+> +	asm volatile(
+> +		"       .insn   rre,0xb9a20000,%1,0\n"
 
-mmu->split_page_cache and mmu->split_page_chunk_size are defined in PATCH[09/12].
-I think you need move the definitions to PATCH[08/12] instead. Otherwise, git-bisect
-is broken.
+Why are you specifying the instruction manually? I think both, GCC and Clang 
+should know the "ptf" mnemonic, shouldn't they?
 
-Thanks,
-Gavin
+> +		"       ipm     %0\n"
+> +		"       srl     %0,28\n"
+> +		: "=d" (cc), "+d" (fc)
+> +		:
+> +		: "cc");
+> +
+> +	*rc = fc >> 8;
+> +	return cc;
+> +}
+> +
+> +static void test_ptf(void)
+> +{
+> +	unsigned long rc;
+> +	int cc;
+> +
+> +	/* PTF is a privilege instruction */
+
+s/privilege/privileged/ ?
+
+> +	report_prefix_push("Privilege");
+> +	enter_pstate();
+> +	expect_pgm_int();
+> +	ptf(PTF_REQ_CHECK, &rc);
+> +	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("Wrong fc");
+> +	expect_pgm_int();
+> +	ptf(0xff, &rc);
+> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("Reserved bits");
+> +	expect_pgm_int();
+> +	ptf(0xffffffffffffff00UL, &rc);
+> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+> +	report_prefix_pop();
+
+This function is quite big ... I'd maybe group the above checks for error 
+conditions into a separate function instead.
+
+> +	report_prefix_push("Topology Report pending");
+> +	/*
+> +	 * At this moment the topology may already have changed
+> +	 * since the VM has been started.
+> +	 * However, we can test if a second PTF instruction
+> +	 * reports that the topology did not change since the
+> +	 * preceding PFT instruction.
+> +	 */
+> +	ptf(PTF_REQ_CHECK, &rc);
+> +	cc = ptf(PTF_REQ_CHECK, &rc);
+> +	report(cc == 0, "PTF check should clear topology report");
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("Topology polarisation check");
+> +	/*
+> +	 * We can not assume the state of the polarization for
+
+s/can not/cannot/ ?
+
+Also, you sometimes write polarization with "z" and sometimes with "s". I'd 
+suggest to standardize on "z" (as in "IBM Z" ;-))
+
+> +	 * any Virtual Machine but KVM.
+> +	 * Let's skip the polarisation tests for other VMs.
+> +	 */
+> +	if (!host_is_kvm()) {
+> +		report_skip("Topology polarisation check is done for KVM only");
+> +		goto end;
+> +	}
+> +
+> +	/*
+> +	 * Set vertical polarization to verify that RESET sets
+> +	 * horizontal polarization back.
+> +	 */
+> +	cc = ptf(PTF_REQ_VERTICAL, &rc);
+> +	report(cc == 0, "Set vertical polarization.");
+> +
+> +	report(diag308_load_reset(1), "load normal reset done");
+> +
+> +	cc = ptf(PTF_REQ_CHECK, &rc);
+> +	report(cc == 0, "Reset should clear topology report");
+> +
+> +	cc = ptf(PTF_REQ_HORIZONTAL, &rc);
+> +	report(cc == 2 && rc == PTF_ERR_ALRDY_POLARIZED,
+> +	       "After RESET polarization is horizontal");
+> +
+> +	/* Flip between vertical and horizontal polarization */
+> +	cc = ptf(PTF_REQ_VERTICAL, &rc);
+> +	report(cc == 0, "Change to vertical polarization.");
+> +
+> +	cc = ptf(PTF_REQ_CHECK, &rc);
+> +	report(cc == 1, "Polarization change should set topology report");
+> +
+> +	cc = ptf(PTF_REQ_HORIZONTAL, &rc);
+> +	report(cc == 0, "Change to horizontal polarization.");
+> +
+> +end:
+> +	report_prefix_pop();
+> +}
+
+Apart from the nits, the patch looks fine to me.
+
+  Thomas
 
