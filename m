@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D14E7690FB8
-	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 18:59:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E368690FB2
+	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 18:58:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230162AbjBIR7A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Feb 2023 12:59:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47062 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230016AbjBIR6x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S229742AbjBIR6x (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Thu, 9 Feb 2023 12:58:53 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E96025D3C3
-        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 09:58:51 -0800 (PST)
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47020 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229647AbjBIR6v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Feb 2023 12:58:51 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67B825D3C3
+        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 09:58:50 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 78464B82285
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 00C8661B7C
         for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 17:58:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26E51C433A1;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6690CC433A8;
         Thu,  9 Feb 2023 17:58:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1675965529;
-        bh=tzWKgTRp6aGDHs1UrJIOpDzstSP+fi5dGowkonXSLHI=;
+        bh=bDxJtBbv3EPtICbhn9EntHIP/DYyRvi5Hb9bcUYfVhk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=eyx6YoWWp0P2OdB2V1LQXnfp9LUmzYhcQbsgHDRgk1W4zn4ghXJed6QSBqxKw5im/
-         0qkU2V7a+Fh8W7yDQTXf9v4wI1LtxKhYqMxRWFcBs36REC4y44LqUtufmHvS90Q2KD
-         uarQ363gDh6nglzsWnME/AA3xDZR2CXLf92enwcMf+4Mc0iHvDu72K/exNE2q4Ve9c
-         OnZXuxc9gtmw+Of5YxwzUr7xkKNXJA+8ibeqbVmLK6RjuYumeYAx4AFYPKnc2F5ZWL
-         U7Gi4/9spe9hOmArTsJ1ZjxrCQcbWkQ2MnUtScySYcABKpXXyCu6akOErsNImpyAYQ
-         xOnkxC7b8OrWA==
+        b=ALgXvNLEKbyFx1ns99W6jqFDBYAitcEL0d40uD+KR+73Kk0yN1YknZk9CHDyRVi0N
+         8CpCWw7D+obNO34m4UWCayfZls1CMoqYrc2XQ68Ydg3AZiO2bArclNYzmfCIIqyY7S
+         KlHe1SPyxj0tiVn5LZf8TwHPhk0VzZhdi4kVN6zWStx1dWBiGTPNdfBYp8q22Qusko
+         pCYerEswdcbBQWm2XYoVJgKWWzDw90n4L/N8nS9uFXJDlMtuBK6Nt0iCNuoqomhAg2
+         aUmWOATOW9k7fqbbvPru+HSj6kThjiDhSKsHJbZEzyLHD4zRX7avOdRILtm30sxd1Z
+         OwvcdrBwLhcnw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pQBC3-0093r7-6j;
+        id 1pQBC3-0093r7-Ej;
         Thu, 09 Feb 2023 17:58:47 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -50,9 +50,9 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 06/18] KVM: arm64: nv: Add EL2 system registers to vcpu context
-Date:   Thu,  9 Feb 2023 17:58:08 +0000
-Message-Id: <20230209175820.1939006-7-maz@kernel.org>
+Subject: [PATCH 07/18] KVM: arm64: nv: Add nested virt VCPU primitives for vEL2 VCPU state
+Date:   Thu,  9 Feb 2023 17:58:09 +0000
+Message-Id: <20230209175820.1939006-8-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230209175820.1939006-1-maz@kernel.org>
 References: <20230209175820.1939006-1-maz@kernel.org>
@@ -71,65 +71,88 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add the minimal set of EL2 system registers to the vcpu context.
-Nothing uses them just yet.
+From: Christoffer Dall <christoffer.dall@arm.com>
 
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+When running a nested hypervisor we commonly have to figure out if
+the VCPU mode is running in the context of a guest hypervisor or guest
+guest, or just a normal guest.
+
+Add convenient primitives for this.
+
 Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h | 33 ++++++++++++++++++++++++++++++-
- 1 file changed, 32 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_emulate.h | 56 ++++++++++++++++++++++++++++
+ 1 file changed, 56 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 8919e971abdf..f53473071bcb 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -325,12 +325,43 @@ enum vcpu_sysreg {
- 	TFSR_EL1,	/* Tag Fault Status Register (EL1) */
- 	TFSRE0_EL1,	/* Tag Fault Status Register (EL0) */
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 193583df2d9c..e5d826dc0b63 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -183,6 +183,62 @@ static __always_inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
+ 		vcpu_gp_regs(vcpu)->regs[reg_num] = val;
+ }
  
--	/* 32bit specific registers. Keep them at the end of the range */
-+	/* 32bit specific registers. */
- 	DACR32_EL2,	/* Domain Access Control Register */
- 	IFSR32_EL2,	/* Instruction Fault Status Register */
- 	FPEXC32_EL2,	/* Floating-Point Exception Control Register */
- 	DBGVCR32_EL2,	/* Debug Vector Catch Register */
- 
-+	/* EL2 registers */
-+	VPIDR_EL2,	/* Virtualization Processor ID Register */
-+	VMPIDR_EL2,	/* Virtualization Multiprocessor ID Register */
-+	SCTLR_EL2,	/* System Control Register (EL2) */
-+	ACTLR_EL2,	/* Auxiliary Control Register (EL2) */
-+	HCR_EL2,	/* Hypervisor Configuration Register */
-+	MDCR_EL2,	/* Monitor Debug Configuration Register (EL2) */
-+	CPTR_EL2,	/* Architectural Feature Trap Register (EL2) */
-+	HSTR_EL2,	/* Hypervisor System Trap Register */
-+	HACR_EL2,	/* Hypervisor Auxiliary Control Register */
-+	TTBR0_EL2,	/* Translation Table Base Register 0 (EL2) */
-+	TTBR1_EL2,	/* Translation Table Base Register 1 (EL2) */
-+	TCR_EL2,	/* Translation Control Register (EL2) */
-+	VTTBR_EL2,	/* Virtualization Translation Table Base Register */
-+	VTCR_EL2,	/* Virtualization Translation Control Register */
-+	SPSR_EL2,	/* EL2 saved program status register */
-+	ELR_EL2,	/* EL2 exception link register */
-+	AFSR0_EL2,	/* Auxiliary Fault Status Register 0 (EL2) */
-+	AFSR1_EL2,	/* Auxiliary Fault Status Register 1 (EL2) */
-+	ESR_EL2,	/* Exception Syndrome Register (EL2) */
-+	FAR_EL2,	/* Fault Address Register (EL2) */
-+	HPFAR_EL2,	/* Hypervisor IPA Fault Address Register */
-+	MAIR_EL2,	/* Memory Attribute Indirection Register (EL2) */
-+	AMAIR_EL2,	/* Auxiliary Memory Attribute Indirection Register (EL2) */
-+	VBAR_EL2,	/* Vector Base Address Register (EL2) */
-+	RVBAR_EL2,	/* Reset Vector Base Address Register */
-+	CONTEXTIDR_EL2,	/* Context ID Register (EL2) */
-+	TPIDR_EL2,	/* EL2 Software Thread ID Register */
-+	CNTHCTL_EL2,	/* Counter-timer Hypervisor Control register */
-+	SP_EL2,		/* EL2 Stack Pointer */
++static inline bool vcpu_is_el2_ctxt(const struct kvm_cpu_context *ctxt)
++{
++	switch (ctxt->regs.pstate & (PSR_MODE32_BIT | PSR_MODE_MASK)) {
++	case PSR_MODE_EL2h:
++	case PSR_MODE_EL2t:
++		return true;
++	default:
++		return false;
++	}
++}
 +
- 	NR_SYS_REGS	/* Nothing after this line! */
- };
- 
++static inline bool vcpu_is_el2(const struct kvm_vcpu *vcpu)
++{
++	return vcpu_is_el2_ctxt(&vcpu->arch.ctxt);
++}
++
++static inline bool __vcpu_el2_e2h_is_set(const struct kvm_cpu_context *ctxt)
++{
++	return ctxt_sys_reg(ctxt, HCR_EL2) & HCR_E2H;
++}
++
++static inline bool vcpu_el2_e2h_is_set(const struct kvm_vcpu *vcpu)
++{
++	return __vcpu_el2_e2h_is_set(&vcpu->arch.ctxt);
++}
++
++static inline bool __vcpu_el2_tge_is_set(const struct kvm_cpu_context *ctxt)
++{
++	return ctxt_sys_reg(ctxt, HCR_EL2) & HCR_TGE;
++}
++
++static inline bool vcpu_el2_tge_is_set(const struct kvm_vcpu *vcpu)
++{
++	return __vcpu_el2_tge_is_set(&vcpu->arch.ctxt);
++}
++
++static inline bool __is_hyp_ctxt(const struct kvm_cpu_context *ctxt)
++{
++	/*
++	 * We are in a hypervisor context if the vcpu mode is EL2 or
++	 * E2H and TGE bits are set. The latter means we are in the user space
++	 * of the VHE kernel. ARMv8.1 ARM describes this as 'InHost'
++	 *
++	 * Note that the HCR_EL2.{E2H,TGE}={0,1} isn't really handled in the
++	 * rest of the KVM code, and will result in a misbehaving guest.
++	 */
++	return vcpu_is_el2_ctxt(ctxt) ||
++		(__vcpu_el2_e2h_is_set(ctxt) && __vcpu_el2_tge_is_set(ctxt)) ||
++		__vcpu_el2_tge_is_set(ctxt);
++}
++
++static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
++{
++	return __is_hyp_ctxt(&vcpu->arch.ctxt);
++}
++
+ /*
+  * The layout of SPSR for an AArch32 state is different when observed from an
+  * AArch64 SPSR_ELx or an AArch32 SPSR_*. This function generates the AArch32
 -- 
 2.34.1
 
