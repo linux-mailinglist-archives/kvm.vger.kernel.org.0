@@ -2,70 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 24837690E28
-	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 17:17:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 96A30690E2B
+	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 17:17:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229894AbjBIQRF convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 9 Feb 2023 11:17:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34154 "EHLO
+        id S229917AbjBIQRs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Feb 2023 11:17:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229738AbjBIQRC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Feb 2023 11:17:02 -0500
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D378559E7B;
-        Thu,  9 Feb 2023 08:16:58 -0800 (PST)
-Received: from lhrpeml100006.china.huawei.com (unknown [172.18.147.201])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4PCMMc4S8Lz67ZcT;
-        Fri, 10 Feb 2023 00:12:28 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
- lhrpeml100006.china.huawei.com (7.191.160.224) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.17; Thu, 9 Feb 2023 16:16:55 +0000
-Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
- lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.017;
- Thu, 9 Feb 2023 16:16:55 +0000
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     Nicolin Chen <nicolinc@nvidia.com>
-CC:     Yi Liu <yi.l.liu@intel.com>, "joro@8bytes.org" <joro@8bytes.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>
-Subject: RE: [PATCH 00/17] Add Intel VT-d nested translation
-Thread-Topic: [PATCH 00/17] Add Intel VT-d nested translation
-Thread-Index: AQHZPD95hqLckmeZEk+opw51qnHtYq7GX1jwgABqPwCAAAE1QA==
-Date:   Thu, 9 Feb 2023 16:16:55 +0000
-Message-ID: <7608ccc7c989483c80089e98d64bc1eb@huawei.com>
-References: <20230209043153.14964-1-yi.l.liu@intel.com>
- <0bea6077f0634587b744ec2b421205e1@huawei.com>
- <Y+Ua/KKu9/YuywyN@Asurada-Nvidia>
-In-Reply-To: <Y+Ua/KKu9/YuywyN@Asurada-Nvidia>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.195.245.52]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        with ESMTP id S229738AbjBIQRq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Feb 2023 11:17:46 -0500
+Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 693D05C8B7
+        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 08:17:44 -0800 (PST)
+Received: by mail-qk1-x731.google.com with SMTP id o4so1034124qkk.8
+        for <kvm@vger.kernel.org>; Thu, 09 Feb 2023 08:17:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=l1q8uW0wC/1vWAZXokeTVo9Y4zK7AFLn1ur6xrYX4nk=;
+        b=fIa9y6cFDGARPrJ6HuTtffnePwOxRbuOWLC7qFX5a3jiIz3aI3ik+3aUq0Lo3y6atO
+         AsjYsS14l156jUjaWZM8li0qXoZcJi4T1gHhuBcrwYMS3Lk+rU2D3u2e51rNdn3xtWww
+         FdtZtUHr4rErjRJy8kQ1UG63mCdK5f3LhvgEAtP3A1NWcM53pg1m4LsM5O4+xnBzmd5S
+         HZvdz3j1Vhn46syiQjSd3BTPQ5vs6GQObiIbyqgmRY3DYP3fCUA1/7vsSdz4p7URcBRu
+         /V9e3SbYscRQk8e83DzI375nR2V+5BCXmZOm2Fg7ugFWp27urhJxUeAngTbvXI5cYAFI
+         8foA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=l1q8uW0wC/1vWAZXokeTVo9Y4zK7AFLn1ur6xrYX4nk=;
+        b=ovsTdGntn29NWZC/bh3AXPos/yCVCT681Zxl9L0/jZNZd7vT0ZnNCkw4OEu23vywaC
+         WWRBNd47Np+xiyF2ycRRrJDCmuJdBBqS7HKl7+2qeNfw+evk7su9kvo61MCxxxGgoRYG
+         ZFcxxm6zpbtmJi3NmigsCb8alDMfogYd+8nuxj46r1drc3k311ZL8IECD6Tj/a64Rup7
+         ExtcQ97vEedNs0V27BV8/MPiaL5tHP74uXE4kKnATZwLhR+uh8PBMwaWpjsHxV0ZBG7i
+         mM1Wvh+K+N4zJ/UYaU4i053YdSwXMdiCYvdSLdUVHtYepVMGWv7j/vyXv1168OmlmLH9
+         0fbQ==
+X-Gm-Message-State: AO0yUKUT2sXN55BU65Bjog4X/sf7lxvuiLZYYn+XZt9XZnLJyc+I3nR4
+        XBhm1Lh+GrQvWQ2SGX9XR85k9jmsnLmF65sWrKccMw==
+X-Google-Smtp-Source: AK7set+q5rR8zs3pDnPffpgGO74oRQG7dg4owyQaCmgIY+opp5dyvSdYVuNeefYP2QHG8fZFj8OPgv4nwH550N7P0zs=
+X-Received: by 2002:a37:c8e:0:b0:735:274f:816e with SMTP id
+ 136-20020a370c8e000000b00735274f816emr989957qkm.390.1675959463346; Thu, 09
+ Feb 2023 08:17:43 -0800 (PST)
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS autolearn=ham
+References: <20230206165851.3106338-1-ricarkol@google.com> <20230206165851.3106338-5-ricarkol@google.com>
+ <cae4a1d9-b5c2-2929-6d88-5a3fbe719651@redhat.com> <CAOHnOrxqEsbRD302Wwn9N06d6xj5NWy4p+C9DBjEm6Z4z2FvXg@mail.gmail.com>
+In-Reply-To: <CAOHnOrxqEsbRD302Wwn9N06d6xj5NWy4p+C9DBjEm6Z4z2FvXg@mail.gmail.com>
+From:   Ricardo Koller <ricarkol@google.com>
+Date:   Thu, 9 Feb 2023 08:17:31 -0800
+Message-ID: <CAOHnOrwprM8v3xXCA5sEVD1cHVQRS6vsPvdXiC1NocrzyQcoYw@mail.gmail.com>
+Subject: Re: [PATCH v2 04/12] KVM: arm64: Add kvm_pgtable_stage2_split()
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
+        yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, qperret@google.com,
+        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        eric.auger@redhat.com, reijiw@google.com, rananta@google.com,
+        bgardon@google.com, ricarkol@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,68 +73,111 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+"(> > > +     if (data->mc_capacity < nr_pages)
+> > > +             return -ENOMEM;
+> > > +
+> > > +     phys = kvm_pte_to_phys(pte);
+> > > +     prot = kvm_pgtable_stage2_pte_prot(pte);
+> > > +
+> > > +     ret = kvm_pgtable_stage2_create_unlinked(data->mmu->pgt, &new, phys,
+> > > +                                              level, prot, mc, force_pte);
+> > > +     if (ret)
+> > > +             return ret;
+> > > +
+> > > +     if (!stage2_try_break_pte(ctx, data->mmu)) {
+> > > +             childp = kvm_pte_follow(new, mm_ops);
+> > > +             kvm_pgtable_stage2_free_unlinked(mm_ops, childp, level);
+> > > +             mm_ops->put_page(childp);
+> > > +             return -EAGAIN;
+> > > +     }
+> > > +
+> > > +     /*
+> > > +      * Note, the contents of the page table are guaranteed to be made
+> > > +      * visible before the new PTE is assigned because stage2_make_pte()
+> > > +      * writes the PTE using smp_store_release().
+> > > +      */
+> > > +     stage2_make_pte(ctx, new);
+> > > +     dsb(ishst);
+> > > +     data->mc_capacity -= nr_pages;
+> > > +     return 0;
+> > > +}
+> > > +
+> >
+> > I think it's possible 'data->mc_capability' to be replaced by 'mc->nobjs'
+> > because they're same thing. With this, we needn't to maintain a duplicate
+> > 'data->mc_capability' since 'data->mc' has been existing.
+>
+> Ah, nice, yes. That would be simpler.
+>
 
+Actually, there's a complication. The memcache details are hidden
+inside of pgtable.c,
+so different types of memcaches (for vhe and nvhe) can be used for allocations.
+Specifically, the memcache objects are passed as an opaque pointer ("void *")
+and can be used with "struct hyp_pool" and "struct kvm_mmu_memory_cache".
 
-> -----Original Message-----
-> From: Nicolin Chen [mailto:nicolinc@nvidia.com]
-> Sent: 09 February 2023 16:11
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> Cc: Yi Liu <yi.l.liu@intel.com>; joro@8bytes.org;
-> alex.williamson@redhat.com; jgg@nvidia.com; kevin.tian@intel.com;
-> robin.murphy@arm.com; cohuck@redhat.com; eric.auger@redhat.com;
-> kvm@vger.kernel.org; mjrosato@linux.ibm.com;
-> chao.p.peng@linux.intel.com; yi.y.sun@linux.intel.com; peterx@redhat.com;
-> jasowang@redhat.com; lulu@redhat.com; suravee.suthikulpanit@amd.com;
-> iommu@lists.linux.dev; linux-kernel@vger.kernel.org;
-> linux-kselftest@vger.kernel.org; baolu.lu@linux.intel.com;
-> zhangfei.gao@linaro.org
-> Subject: Re: [PATCH 00/17] Add Intel VT-d nested translation
-> 
-> Hi Shameer,
-> 
-> On Thu, Feb 09, 2023 at 10:11:42AM +0000, Shameerali Kolothum Thodi
-> wrote:
-> 
-> > > This series first introduces new iommu op for allocating domains for
-> > > iommufd,
-> > > and op for syncing iotlb for first stage page table modifications, and then
-> > > add the implementation of the new ops in intel-iommu driver. After this
-> > > preparation, adds kernel-managed and user-managed hw_pagetable
-> > > allocation for
-> > > userspace. Last, add self-test for the new ioctls.
+So, here are all the options that I can think of:
+
+        1. stage2_split_walker() is just used on the VHE case with the
+        "struct kvm_mmu_memory_cache" memcache, so we could just use it
+        instead of a "void *":
+
+                kvm_pgtable_stage2_split(..., struct kvm_mmu_memory_cache *mc);
+
+        However, it could be used for the NVHE case as well, plus
+        this would go against the overall design of pgtable.c which tries
+        to use opaque objects for most things.
+
+        2. add a "get_nobjs()" method to both memcaches. This is tricky
+        because "struct hyp_pool" doesn't directly track its capacity. I
+        would rather not mess with it.
+
+        3. This whole accounting of available pages in the memcache is
+        needed because of the way I implemented stage2_split_walker() and
+        the memcache interface.  stage2_split_walker() tries to allocate
+        as many pages for the new table as allowed by the capacity of the
+        memcache. The issue with blindingly trying until the allocation
+        fails is that kvm_mmu_memory_cache_alloc() WARNs and tries to
+        allocate using GFP_ATOMIC when !nobjs. We don't want to do that,
+        so we could extend kvm_pgtable_mm_ops.zalloc_page() with a
+        NO_GFP_ATOMIC_ON_EMPTY (or similar). This flag would have to be
+        ignored on the hyp side.
+
+        4. what this patch is currently doing: tracking the capacity by
+        hand.
+
+I prefer options 4 and 3. WDYT?
+
+Thanks,
+Ricardo
+
+> Thanks!
+> Ricardo
+>
+> >
+> > > +int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> > > +                          void *mc, u64 mc_capacity)
+> > > +{
+> > > +     struct stage2_split_data split_data = {
+> > > +             .mmu            = pgt->mmu,
+> > > +             .memcache       = mc,
+> > > +             .mc_capacity    = mc_capacity,
+> > > +     };
+> > > +
+> > > +     struct kvm_pgtable_walker walker = {
+> > > +             .cb     = stage2_split_walker,
+> > > +             .flags  = KVM_PGTABLE_WALK_LEAF,
+> > > +             .arg    = &split_data,
+> > > +     };
+> > > +
+> > > +     return kvm_pgtable_walk(pgt, addr, size, &walker);
+> > > +}
+> > > +
+> > >   int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+> > >                             struct kvm_pgtable_mm_ops *mm_ops,
+> > >                             enum kvm_pgtable_stage2_flags flags,
 > > >
-> > > This series is based on "[PATCH 0/6] iommufd: Add iommu capability
-> > > reporting"[1]
-> > > and Nicolin's "[PATCH v2 00/10] Add IO page table replacement
-> support"[2].
-> > > Complete
-> > > code can be found in[3]. Draft Qemu code can be found in[4].
-> > >
-> > > Basic test done with DSA device on VT-d. Where the guest has a vIOMMU
-> > > built
-> > > with nested translation.
-> 
-> > Thanks for sending this out. Will go through this one. As I informed before
-> we keep
-> > an internal branch based on your work and rebase few patches to get the
-> ARM
-> > SMMUv3 nesting support. The recent one is based on your
-> "iommufd-v6.2-rc4-nesting"
-> > branch and is here,
 > >
+> > Thanks,
+> > Gavin
 > >
-> https://github.com/hisilicon/kernel-dev/commits/iommufd-v6.2-rc4-nesting
-> -arm
-> >
-> > Just wondering any chance the latest "Add SMMUv3 nesting support"
-> series will
-> > be send out soon? Please let me know if you need any help with that.
-> 
-> I had an initial discussion with Robin/Jason regarding the SMMUv3
-> nesting series, and I received quite a few inputs so I'd need to
-> finish reworking before sending out -- hopefully we can see them
-> in the maillist in the following weeks.
-
-Thanks for that update. Sure, looking forward to it.
-
-Shameer
