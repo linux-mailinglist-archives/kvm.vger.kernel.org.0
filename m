@@ -2,214 +2,252 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 79565691278
-	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 22:13:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BBB4569128F
+	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 22:19:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230225AbjBIVNd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Feb 2023 16:13:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56168 "EHLO
+        id S230040AbjBIVTP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Feb 2023 16:19:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230034AbjBIVNb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Feb 2023 16:13:31 -0500
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2054.outbound.protection.outlook.com [40.107.220.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD89F5A938;
-        Thu,  9 Feb 2023 13:13:23 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Yne6rBf3HjNzUJ+jGf+PUwWmHD1xFIYeEWAumOhMzjo6pCVpsYAOHt7xNoJANjctcVyL2cTv38WEPMst+oWjMJJQxIYh/ZW/PVEvaOzLMfoqV6gCm+e1qOYrLET0jFk+TOjg0jw5Ks5OUii+UVegD0ZerwpO9sIOQMjUALB+6gTzS+ZWsSTwLiIPe7HLo8e7A3+jqf7dYEHI8PvWuzBrVPutMY0i8ma7xjRuInR/uAPff8CMdK0fuvDdxW/qLB4EqvRFg+Rl+PCG1RphmJheoxhH/tkpcSY2Taw1y7jMxZhw3Df7k+umQpPDLKNWKNeV7q21up/vuNRp1oGPAebI2Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JNycMroQNnZOKOs0he3it1PGl4KT1uZh44RjEsoHY3Q=;
- b=GmqBycw65Ybvi0Fxr6eMUpJcuW+MBsW0Ad875Pe7id+m9SOAcxclrO3uFqhRccQWBEw4IJ2tS5H9/mN55eqtdUF5gDITEFFT4jvboeUvyzeVuth5ofRYLugS8SrCCDaWcoQ9nkfj50LxHi2ZNJaf5MY+9M2JvMwM2WhilFnPvGSc4SPYen0HPJe9OtuGmI8GUEoxnNohZR0edlA02rRk/DsPFmTlrVnTnYRVciDlnRqWYl10wJJ3rarQ9TWn494E7rAdWDODeuLp+94OOK6fDA++WcyGZ6UlYHq+SB/d+ki9B397s+3I5xVskcj+3gOA1ikeNRuvI+lRrFojysBNHQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JNycMroQNnZOKOs0he3it1PGl4KT1uZh44RjEsoHY3Q=;
- b=N+gLJn8OH44MaGu9Igls3Cyg0b7SDnJ6ayigLKqgBAeZ5kVgJXzvAp6qQGbaLSB/da8/kQ7ahEg/B9Gu0UsMjgua0mKcyqaqGwI60LNJQXDzXrLYVZyRblvtwEkhf03zwdmlaZXkzRo5+8RO8uPsdioSKCUxckTxUBDdk47WFZGd0wD8JgrJPCCxbtWHnYareTKirFMzqUtYzUDspAwZ0Vqrw75ug9urwzH1avE6hPSoeVEpeB6Ym/je3ldiWRwohHb05ITO2jiVzNm46K+XpYe2wMPDioNUP/kIsLUHaMbUSt/4dFwPVI7M8EXSyyz35NrOzWPrNUgdg1hMQNiDxg==
-Received: from DS7P222CA0018.NAMP222.PROD.OUTLOOK.COM (2603:10b6:8:2e::33) by
- DS0PR12MB8365.namprd12.prod.outlook.com (2603:10b6:8:f8::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6086.19; Thu, 9 Feb 2023 21:13:21 +0000
-Received: from DM6NAM11FT079.eop-nam11.prod.protection.outlook.com
- (2603:10b6:8:2e:cafe::e2) by DS7P222CA0018.outlook.office365.com
- (2603:10b6:8:2e::33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.18 via Frontend
- Transport; Thu, 9 Feb 2023 21:13:21 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- DM6NAM11FT079.mail.protection.outlook.com (10.13.173.4) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6086.19 via Frontend Transport; Thu, 9 Feb 2023 21:13:21 +0000
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Thu, 9 Feb 2023
- 13:13:10 -0800
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail204.nvidia.com
- (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Thu, 9 Feb 2023
- 13:13:10 -0800
-Received: from Asurada-Nvidia (10.127.8.9) by mail.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36 via Frontend
- Transport; Thu, 9 Feb 2023 13:13:09 -0800
-Date:   Thu, 9 Feb 2023 13:13:07 -0800
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-CC:     "jgg@nvidia.com" <jgg@nvidia.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "will@kernel.org" <will@kernel.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "shuah@kernel.org" <shuah@kernel.org>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>
-Subject: Re: [PATCH v2 08/10] iommufd/device: Use iommu_group_replace_domain()
-Message-ID: <Y+Vh479cDD7LX2x/@Asurada-Nvidia>
-References: <cover.1675802050.git.nicolinc@nvidia.com>
- <4653f009c3dacae8ebf3a4865aaa944aa9c7cc7e.1675802050.git.nicolinc@nvidia.com>
- <BN9PR11MB5276C1807B710CAD3E5820D78CD99@BN9PR11MB5276.namprd11.prod.outlook.com>
+        with ESMTP id S229468AbjBIVTO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Feb 2023 16:19:14 -0500
+Received: from mail-oa1-x34.google.com (mail-oa1-x34.google.com [IPv6:2001:4860:4864:20::34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25D266ADFA
+        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 13:19:13 -0800 (PST)
+Received: by mail-oa1-x34.google.com with SMTP id 586e51a60fabf-142b72a728fso4270200fac.9
+        for <kvm@vger.kernel.org>; Thu, 09 Feb 2023 13:19:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=5CD5MBAy50/HQTaC4Z0bxhS55pp44jwoKE5yWFxZ2ng=;
+        b=Bw8rny6RlAOoA8xTM1bEYnp0x8j5QP8hFDeZ4fvABqjS2TRqfS1t8k8HByrrhFNXuM
+         OZgqDKbzx+iYEstck3FA3ua868xc1EeAlcad8mIzDZrBJ3vj9O8v9+zaATLA2E4a5cHh
+         BHCPE/TfOY4CbtdPEjNYPULIJ5G3IyhuKFrpat7l4u09+n+yQoQGPScKOhdz7ruxZYIu
+         6qYOhlWhdiDM3A+phKUlkfS5iaf5sGSfwWxkCHbKHU4hcsEYnxbZj22faFFYOpKqzPwb
+         syBFrCoq7TuXoepoz7K+gbwtMzeR0O0u33kAiVSyGUFZquWArgva0R40LkHEB89fExa4
+         fFAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5CD5MBAy50/HQTaC4Z0bxhS55pp44jwoKE5yWFxZ2ng=;
+        b=zoxYFZOi4Y3V0RO6N+U87KHmUar9WiYfwiep/u8eMOLuqgONrlwXDHQXetvXVs7eez
+         rTSyShxUH5ToRAXRDHm2cNf4awrVA02fBDJOzOanesc8g+jcpz7QjiQ/0HEI0isrJ/AO
+         5E7LKtjE8WpfqkbAhZRKMrUaHyq0kdrDm27+nDOehKF6ckUHDIom2TrwuSIif+4ZHPoR
+         mEagbdFY+kWHLVBl6B/y7tMw2vZCvWyLnpzqgsKAtFXRcnvtr4geaN70wNKsJ2H9SWYL
+         11jflBHYj7dH0W05LLv3SsdSJkIhibHNegQcUnBn0OT7tEbwEuqXciEyXKUPbvzg1fqy
+         gSAA==
+X-Gm-Message-State: AO0yUKWydJBAjTkfTIexsxMFQKNFxB6nBVVW3GymB7fMyAkEt9haBDpC
+        QGF1rYnv0GS+EVbS93TXLivchJ17cV8LHyUb39Uaeg==
+X-Google-Smtp-Source: AK7set941r0HatphTJb5gFrEjfS0gs4ZskcEWSPeGomxwNcy6L9Qs0p2sIBUHPXcMLigdsYZFjOaeV+Xavd16uJWj/c=
+X-Received: by 2002:a05:6870:b38e:b0:16a:ad40:1840 with SMTP id
+ w14-20020a056870b38e00b0016aad401840mr1108305oap.236.1675977552304; Thu, 09
+ Feb 2023 13:19:12 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB5276C1807B710CAD3E5820D78CD99@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT079:EE_|DS0PR12MB8365:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1454a543-9da0-46e8-5e7b-08db0ae27936
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: xTdb5ajWVJLHfijLT+FQzhiNCdE2ZvzAhelQ8JEGfbjv2j1BTWBqYPonxDuUB3hvzPzlF+CGXqiVUEcqV/TKuBDrYR6o5tBaUdoSSQHFwT1vBPrIqJGaOF0C9LKjw2D6vCdt/hO9dodcZXDOSw1bO/QjEHowJS0wa8ddeKVzpz/85yEXxWSqLEyX3rTGJCbkxxXom19IJaoGAuaK6FrE6GuZzJeZqXZSRqsxVNQYQW3IBPBY2LE+/3GVzl7dfZxJif99HtT9xQ22828a/gB2w1CWsx5QCnNGWrpnqsR/qBg3ZTJNsgos4Gnxm8hW3yYkY50m9Mi/I2/GeOgVZ55dbvnHN92DCN1BUIxHznmFFiD/dNVhXaCPmVWmD47izpKc5MxHdzNWxP9OSIADRopoHlyNeKwJC/p69LLU9ZHrsNzeKcAOLhwq+tuCLBdgRPSav3uSZx7cXktqoQu5u6VDvNGtleK4ZMTEt6Wg+uChZ+4V9waIZ5QPaH8GdCk/yuuqfWI2uaMBHOQVLL9zYhmtaDD6bwv7jwaStQaAstZKQuPdKfDDCFqJc5mg8V3n3cKAuN/PkPp75ESg7HopHqw+UxHgFpTghhxJNTynFsroXHYPGyAhsF+kB6P9M5z5GLcWF04ahtzAQwIVfp2ffnGgw/k0MJZ3umE9EVJiSZEoGsK61nIVAp4a9o6Dzfgs2Cxn3pUxFakVVgGlkWjU5t2Drg==
-X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230025)(4636009)(396003)(346002)(376002)(136003)(39860400002)(451199018)(46966006)(36840700001)(40470700004)(86362001)(33716001)(478600001)(83380400001)(4326008)(70206006)(6916009)(9686003)(70586007)(82310400005)(186003)(336012)(26005)(47076005)(426003)(54906003)(316002)(356005)(7416002)(55016003)(41300700001)(8676002)(36860700001)(2906002)(40480700001)(5660300002)(7636003)(82740400003)(8936002)(40460700003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Feb 2023 21:13:21.4143
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1454a543-9da0-46e8-5e7b-08db0ae27936
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT079.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8365
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+References: <20230201025048.205820-1-jingzhangos@google.com>
+ <20230201025048.205820-4-jingzhangos@google.com> <CAAeT=FzFR4EO4+vWsYvO=+Gj1oSZr6D+y6N6-XUDtQmnKEe=_w@mail.gmail.com>
+In-Reply-To: <CAAeT=FzFR4EO4+vWsYvO=+Gj1oSZr6D+y6N6-XUDtQmnKEe=_w@mail.gmail.com>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Thu, 9 Feb 2023 13:19:01 -0800
+Message-ID: <CAAdAUth_Wou1YQAec7KTjXPhx=rUShudLoniF6P07P2Ve1orQA@mail.gmail.com>
+Subject: Re: [PATCH v1 3/6] KVM: arm64: Use per guest ID register for ID_AA64PFR0_EL1.[CSV2|CSV3]
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oupton@google.com>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 09, 2023 at 04:00:52AM +0000, Tian, Kevin wrote:
- 
-> > From: Nicolin Chen <nicolinc@nvidia.com>
-> > Sent: Wednesday, February 8, 2023 5:18 AM
+On Mon, Feb 6, 2023 at 9:50 PM Reiji Watanabe <reijiw@google.com> wrote:
+>
+> Hi Jing,
+>
+> On Tue, Jan 31, 2023 at 6:51 PM Jing Zhang <jingzhangos@google.com> wrote:
 > >
-> > iommu_group_replace_domain() is introduced to support use cases where
-> > an
-> > iommu_group can be attached to a new domain without getting detached
-> > from
-> > the old one. This replacement feature will be useful, for cases such as:
-> > 1) vPASID mode, when a guest wants to replace a single pasid (PASID=0)
-> >    table with a larger table (PASID=N)
-> > 2) Nesting mode, when switching the attaching device from an S2 domain
-> >    to an S1 domain, or when switching between relevant S1 domains.
-> > as it allows these cases to switch seamlessly without a DMA disruption.
+> > With per guest ID registers, ID_AA64PFR0_EL1.[CSV2|CSV3] settings from
+> > userspace can be stored in its corresponding ID register.
 > >
-> > So, call iommu_group_replace_domain() in the iommufd_device_do_attach().
-> > And add a __iommmufd_device_detach helper to allow the replace routine
-> > to
-> > do a partial detach on the current hwpt that's being replaced. Though the
-> > updated locking logic is overcomplicated, it will be eased, once those
-> > iopt_table_add/remove_ioas and list_add/del calls are moved to hwpt's
-> > allocation/destroy() functions in the coming nesting series, as that'll
-> > depend on a new ->domain_alloc_user op in the iommu core.
-> 
-> then why not moving those changes into this series to make it simple?
-
-The simplification depends on the new ->domain_alloc_user op and
-its implementation in SMMU driver, which would be introduced by
-the nesting series of VT-d and SMMU respectively.
-
-At this point, it's hard to decide the best sequence of our three
-series. Putting this replace series first simply because it seems
-to be closer to get merged than the other two bigger series.
-
-> > Also, block replace operations that are from/to auto_domains, i.e. only
-> > user-allocated hw_pagetables can be replaced or replaced with.
-> 
-> where does this restriction come from? iommu_group_replace_domain()
-> can switch between any two UNMANAGED domains. What is the extra
-> problem in iommufd to support from/to auto domains?
-
-It was my misunderstanding. We should have supported that.
-Will fix in v3 and add the corresponding support.
-
-> > +/**
-> > + * __iommmufd_device_detach - Detach a device from idev->hwpt to
-> > new_hwpt
-> 
-> 'from ... to ...' means a replace semantics. then this should be called
-> iommufd_device_replace_hwpt().
-
-Had a hard time to think about the naming, it's indeed a detach-
-only routine, but it takes a parameter named new_hwpt...
-
-Perhaps I should just follow Yi's suggestion by rephrasing the
-narrative of this function.
-
-> > +static void __iommmufd_device_detach(struct iommufd_device *idev,
-> > +                                  struct iommufd_hw_pagetable
-> > *new_hwpt,
-> > +                                  bool detach_group)
-> > +{
-> > +     struct iommufd_hw_pagetable *hwpt = idev->hwpt;
-> > +     struct iommufd_ioas *new_ioas = NULL;
+> > No functional change intended.
+> >
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h  |  3 +--
+> >  arch/arm64/kvm/arm.c               | 19 +------------------
+> >  arch/arm64/kvm/hyp/nvhe/sys_regs.c |  7 +++----
+> >  arch/arm64/kvm/id_regs.c           | 30 ++++++++++++++++++++++--------
+> >  4 files changed, 27 insertions(+), 32 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index b1beef93465c..fabb30185a4a 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -225,8 +225,6 @@ struct kvm_arch {
+> >
+> >         cpumask_var_t supported_cpus;
+> >
+> > -       u8 pfr0_csv2;
+> > -       u8 pfr0_csv3;
+> >         struct {
+> >                 u8 imp:4;
+> >                 u8 unimp:4;
+> > @@ -249,6 +247,7 @@ struct kvm_arch {
+> >  #define KVM_ARM_ID_REG_NUM     56
+> >  #define IDREG_IDX(id)          (((sys_reg_CRm(id) - 1) << 3) | sys_reg_Op2(id))
+> >  #define IDREG(kvm, id)         kvm->arch.id_regs[IDREG_IDX(id)]
+> > +#define IDREG_RD(kvm, rd)      IDREG(kvm, reg_to_encoding(rd))
+> >         u64 id_regs[KVM_ARM_ID_REG_NUM];
+> >  };
+> >
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index d525b71d0523..d8ba5106bf51 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -104,22 +104,6 @@ static int kvm_arm_default_max_vcpus(void)
+> >         return vgic_present ? kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
+> >  }
+> >
+> > -static void set_default_spectre(struct kvm *kvm)
+> > -{
+> > -       /*
+> > -        * The default is to expose CSV2 == 1 if the HW isn't affected.
+> > -        * Although this is a per-CPU feature, we make it global because
+> > -        * asymmetric systems are just a nuisance.
+> > -        *
+> > -        * Userspace can override this as long as it doesn't promise
+> > -        * the impossible.
+> > -        */
+> > -       if (arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED)
+> > -               kvm->arch.pfr0_csv2 = 1;
+> > -       if (arm64_get_meltdown_state() == SPECTRE_UNAFFECTED)
+> > -               kvm->arch.pfr0_csv3 = 1;
+> > -}
+> > -
+> >  /**
+> >   * kvm_arch_init_vm - initializes a VM data structure
+> >   * @kvm:       pointer to the KVM struct
+> > @@ -151,9 +135,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+> >         /* The maximum number of VCPUs is limited by the host's GIC model */
+> >         kvm->max_vcpus = kvm_arm_default_max_vcpus();
+> >
+> > -       set_default_spectre(kvm);
+> > -       kvm_arm_init_hypercalls(kvm);
+> >         kvm_arm_set_default_id_regs(kvm);
+> > +       kvm_arm_init_hypercalls(kvm);
+> >
+> >         /*
+> >          * Initialise the default PMUver before there is a chance to
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> > index 0f9ac25afdf4..03919d342136 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> > @@ -92,10 +92,9 @@ static u64 get_pvm_id_aa64pfr0(const struct kvm_vcpu *vcpu)
+> >                 PVM_ID_AA64PFR0_RESTRICT_UNSIGNED);
+> >
+> >         /* Spectre and Meltdown mitigation in KVM */
+> > -       set_mask |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2),
+> > -                              (u64)kvm->arch.pfr0_csv2);
+> > -       set_mask |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3),
+> > -                              (u64)kvm->arch.pfr0_csv3);
+> > +       set_mask |= IDREG(kvm, SYS_ID_AA64PFR0_EL1) &
+> > +               (ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2) |
+> > +                       ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3));
+> >
+> >         return (id_aa64pfr0_el1_sys_val & allow_mask) | set_mask;
+> >  }
+> > diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
+> > index f53ce00ab14d..bc5d9bc84eb1 100644
+> > --- a/arch/arm64/kvm/id_regs.c
+> > +++ b/arch/arm64/kvm/id_regs.c
+> > @@ -71,12 +71,6 @@ u64 kvm_arm_read_id_reg_with_encoding(const struct kvm_vcpu *vcpu, u32 id)
+> >                 if (!vcpu_has_sve(vcpu))
+> >                         val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_SVE);
+> >                 val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_AMU);
+> > -               val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2);
+> > -               val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2),
+> > -                                 (u64)vcpu->kvm->arch.pfr0_csv2);
+> > -               val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3);
+> > -               val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3),
+> > -                                 (u64)vcpu->kvm->arch.pfr0_csv3);
+> >                 if (kvm_vgic_global_state.type == VGIC_V3) {
+> >                         val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC);
+> >                         val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC), 1);
+> > @@ -208,6 +202,7 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+> >                                u64 val)
+> >  {
+> >         u8 csv2, csv3;
+> > +       u64 sval = val;
+> >
+> >         /*
+> >          * Allow AA64PFR0_EL1.CSV2 to be set from userspace as long as
+> > @@ -232,8 +227,7 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+> >         if (val)
+> >                 return -EINVAL;
+> >
+> > -       vcpu->kvm->arch.pfr0_csv2 = csv2;
+> > -       vcpu->kvm->arch.pfr0_csv3 = csv3;
+> > +       IDREG_RD(vcpu->kvm, rd) = sval;
+> >
+> >         return 0;
+> >  }
+> > @@ -516,4 +510,24 @@ void kvm_arm_set_default_id_regs(struct kvm *kvm)
+> >                 val = read_sanitised_ftr_reg(id);
+> >                 IDREG(kvm, id) = val;
+> >         }
+> > +       /*
+> > +        * The default is to expose CSV2 == 1 if the HW isn't affected.
+> > +        * Although this is a per-CPU feature, we make it global because
+> > +        * asymmetric systems are just a nuisance.
+> > +        *
+> > +        * Userspace can override this as long as it doesn't promise
+> > +        * the impossible.
+> > +        */
+> > +       val = IDREG(kvm, SYS_ID_AA64PFR0_EL1);
+>
+> Did you deliberately have the code stop explicitly
+> clearing CSV2/CSV3 (unlike the original code) when
+> arm64_get_spectre_v2_state()/arm64_get_meltdown_state() doesn't
+> return SPECTRE_UNAFFECTED ?
+> (It wasn't not apparent from the commit log comment)
+>
+> In terms of the default values of those fields, looking at the
+> kernel code, probably the end result would be the same though.
+>
+Yes, the default value is 0. This is the same way as how
+arch.pfr0_csv[2|3] are handled. No functional change.
+> Thanks,
+> Reiji
+>
+> > +       if (arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED) {
+> > +               val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2);
+> > +               val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2), 1);
+> > +       }
+> > +       if (arm64_get_meltdown_state() == SPECTRE_UNAFFECTED) {
+> > +               val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3);
+> > +               val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3), 1);
+> > +       }
 > > +
-> > +     if (new_hwpt)
-> > +             new_ioas = new_hwpt->ioas;
-> > +
-> > +     mutex_lock(&hwpt->devices_lock);
-> > +     list_del(&idev->devices_item);
-> > +     if (hwpt->ioas != new_ioas)
-> > +             mutex_lock(&hwpt->ioas->mutex);
-> 
-> I think new_ioas->mutext was meant here.
-
-new_hwpt is an input from an replace routine, where it holds the
-new_ioas->mutex already. Yi's right that the code here is a bit
-confusing. I will try to change it a bit for readability.
- 
-> > +     if (!iommufd_hw_pagetable_has_group(hwpt, idev->group)) {
-> > +             if (list_empty(&hwpt->devices)) {
-> > +                     iopt_table_remove_domain(&hwpt->ioas->iopt,
-> > +                                              hwpt->domain);
-> > +                     list_del(&hwpt->hwpt_item);
-> > +             }
-> 
-> I'm not sure how this can be fully shared between detach and replace.
-> Here some work e.g. above needs to be done before calling
-> iommu_group_replace_domain() while others can be done afterwards.
-
-This iopt_table_remove_domain/list_del is supposed to be done in
-the hwpt's destroy() actually. We couldn't move it because it'd
-need the new domain_alloc_user op and its implementation in ARM
-driver. Overall, I think it should be safe to put it behind the
-iommu_group_replace_domain().
-
-Thanks
-Nic
+> > +       IDREG(kvm, SYS_ID_AA64PFR0_EL1) = val;
+> >  }
+> > --
+> > 2.39.1.456.gfc5497dd1b-goog
+> >
