@@ -2,114 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E49B0691338
-	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 23:22:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A96FC691377
+	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 23:38:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230333AbjBIWWu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Feb 2023 17:22:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57266 "EHLO
+        id S230386AbjBIWid (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Feb 2023 17:38:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229945AbjBIWWt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Feb 2023 17:22:49 -0500
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2042.outbound.protection.outlook.com [40.107.100.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 001B328D25;
-        Thu,  9 Feb 2023 14:22:45 -0800 (PST)
+        with ESMTP id S229602AbjBIWic (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Feb 2023 17:38:32 -0500
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2055.outbound.protection.outlook.com [40.107.223.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 233B856EDE;
+        Thu,  9 Feb 2023 14:38:31 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jivxbUw2iD2DqMcx7VMGWyhsSMfhM4UJW+FWmFaehYvtYElVdJuWUvLOQZcHREgwjbpCZDl6sXj/PkrRk/5aJ2g5IIXUBNqof2p9LxKqFWxUwTmRM2aP4Mv2VXsU/rmHpSg+0wW1VSDTUxhv+4tyBO+EaX8CJ/dspEFCvcDCIWuUR0JqkqKuW4nziIYIttlbaqPeLa+OrDH96jyZP9/7hx0TvicU45CXGmZKJ0po+I1ws5sRmobbWEPmKfUvc1BMlXWpEQuZbRR/k8pkXvxCUlpZGE33VXfAqssCvsJ332UySAgweIJPqma734eP6DtIqiZPp1LG2WcHslA6hLMWYw==
+ b=neC5cJov89mLNNSwpqs/RQo9M584zz5Hoy8m2ZsLhIEeDlB+2Lpy+zm9pMIHISGZ0ceUYLXkTwAK2iOe9yaNd89HUHm8jH8vfcQC+pvydaWVF4CV1atA9GKD3XeXzIhk86LFii//O4iGYg/ihofY80JMXifKyU5qsNgNUJPjGMhC2iaeqqqIjImSZeOAzB0VBEBjtxpMqNWqtYZF1IvkURkxrH/mjbAGxZTs5s6F9GdIzl8yYF+NeI67lNHDmGoIMQm6CZY0ubuLEJLqYtJQzyLcv+6msgQl3gmaw0rhz7WZCtWubjE7up/riK9sKoXBQS1+dJWYCzdu5J7vTcGL2A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZpJci/MOr84CuHUgaFR2rBlsD3yrFbu/2oWjvO58eXk=;
- b=AaV/5HEVdIKtWa3ZRbLiNtAIRVMPYa11xzTukQeRmpdARQMRSX7qkgSAWePe0CeVGaiqTjyxm7LsvKl5BFqb8gCqyETsNt9LHFcCKwZoTImZsKRPXvA744tM8c+OeGT+HHYhjLcH2ZoJMHLRsBUzLtIDcu/lHYgEMnFYbRa/8X/V5cOMy5n+3IpPulCjSjrSzjRDGfA54Aqut8EfpG1wEemA5hNmJUTs1TwJmo66q8MKpWoWLWC2xRR1snAZgnBbq9OUNYmOqy4zJaL6DzO0YdlWaSOHiobiQfRrn1B16y7c0oufE2kLLHDfhHJPN5NsUSQa6x8N1ZlSUUKUYyLO9Q==
+ bh=10cxf3AOQcl4E54/idE065bFMSUnOF6E4tfd704wH0o=;
+ b=SlG4Tv/mrLDxK4D9rcMRDXJGmKbpUVb8zW12m/LrZz1UfEsUP2vzoioBgHIqyBwdfCtrZdn8S5I4jYAL8A/T6uXLcGcv+y0301neqYuWjbmmnvO9a+c3pt0pjozw4TRZ8GMQEh82ce9+GaFdHUIWnDENcs54iN+vc5u5DxzMPvcJq2HDhbDDjBQBy/+TwxvdaQ126wpaY5N7t6118VLfv9gropJhmyy0XzsBLCHaJmFX2U/X1vh7BwGxt8VaO0NAYjHIqFWHZtIHtvuaJDZVUydcA2r7RKiA1ud+Q1gEm7gyzU7uvWwa56ul3UR5U2mX0VQmypDPkDNMgKXof2S8pQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ 165.204.84.17) smtp.rcpttodomain=semihalf.com smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZpJci/MOr84CuHUgaFR2rBlsD3yrFbu/2oWjvO58eXk=;
- b=BN6p0MokKUxmM28UGB+Ia9IfN4ni2jcDMGd316zkUb21+Yol0JzqHg2o39jTdLK+phaFRC5FucxIcTUsxsEmafDuurTbQSMfqKtK6G0h2z84bxEroNvPX6PVtG5hYGnZlsO6l/8QIrrVNaqZyyNwlCWfSm53Dqt9JMQ071Dz1Lr/WAFw+c4uGoSxCaepAZaKk/PKO/RZZ0DiHNqeYKJZaxBTzRmuiiRnomITtohpAmXgxTCrba/Vu0POa3e+JhugYUoop98d12Zx+iiTZSqznfM9eyGWwMmtQC6Q9FYTSWjyA6HPigg3RhTq5n5L1RGO2J5dISojmsuUw7BAAi9ibg==
-Received: from MW4PR04CA0046.namprd04.prod.outlook.com (2603:10b6:303:6a::21)
- by BN9PR12MB5195.namprd12.prod.outlook.com (2603:10b6:408:11c::19) with
+ bh=10cxf3AOQcl4E54/idE065bFMSUnOF6E4tfd704wH0o=;
+ b=B9elWmjPxrjuAPrpfkVmOxgDE2g57kJLaTzfVpIWEu7NP//ak/oeP/lckaAVapcr6xjUUwdHGvYuzRfr7mgyn0KKtYez6S+/N+tCnOoMXNxceqtDdlprdYy4pzlqvWCCjuSqQ6H+IOc9pF/NvDTU/dBVq+DtonIgbdDEX+y/w/Y=
+Received: from DS7PR06CA0047.namprd06.prod.outlook.com (2603:10b6:8:54::27) by
+ BL1PR12MB5945.namprd12.prod.outlook.com (2603:10b6:208:398::14) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6064.24; Thu, 9 Feb
- 2023 22:22:43 +0000
-Received: from CO1NAM11FT076.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:6a:cafe::3b) by MW4PR04CA0046.outlook.office365.com
- (2603:10b6:303:6a::21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.18 via Frontend
- Transport; Thu, 9 Feb 2023 22:22:43 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CO1NAM11FT076.mail.protection.outlook.com (10.13.174.152) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6086.19 via Frontend Transport; Thu, 9 Feb 2023 22:22:42 +0000
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Thu, 9 Feb 2023
- 14:22:29 -0800
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail205.nvidia.com
- (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Thu, 9 Feb 2023
- 14:22:29 -0800
-Received: from Asurada-Nvidia (10.127.8.9) by mail.nvidia.com (10.129.68.6)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36 via Frontend
- Transport; Thu, 9 Feb 2023 14:22:27 -0800
-Date:   Thu, 9 Feb 2023 14:22:26 -0800
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     Yi Liu <yi.l.liu@intel.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>, <joro@8bytes.org>,
-        <alex.williamson@redhat.com>, <kevin.tian@intel.com>,
-        <robin.murphy@arm.com>, <cohuck@redhat.com>,
-        <eric.auger@redhat.com>, <kvm@vger.kernel.org>,
-        <chao.p.peng@linux.intel.com>, <yi.y.sun@linux.intel.com>,
-        <peterx@redhat.com>, <jasowang@redhat.com>,
-        <shameerali.kolothum.thodi@huawei.com>, <lulu@redhat.com>,
-        <suravee.suthikulpanit@amd.com>, <iommu@lists.linux.dev>,
-        <linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <baolu.lu@linux.intel.com>
-Subject: Re: [PATCH 06/17] iommufd/hw_pagetable: Use domain_alloc_user op for
- domain allocation
-Message-ID: <Y+VyIvKYmCdMG5i7@Asurada-Nvidia>
-References: <20230209043153.14964-1-yi.l.liu@intel.com>
- <20230209043153.14964-7-yi.l.liu@intel.com>
- <25102c92-1831-be52-677d-60bbf2e11772@linux.ibm.com>
- <Y+U9QX4p5YX3/B3k@nvidia.com>
- <Y+VOw6dTnGapMm9L@Asurada-Nvidia>
- <Y+VaCV7DRR1+mLYY@nvidia.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6064.36; Thu, 9 Feb
+ 2023 22:38:29 +0000
+Received: from DM6NAM11FT038.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:8:54:cafe::57) by DS7PR06CA0047.outlook.office365.com
+ (2603:10b6:8:54::27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.17 via Frontend
+ Transport; Thu, 9 Feb 2023 22:38:29 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DM6NAM11FT038.mail.protection.outlook.com (10.13.173.137) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6086.19 via Frontend Transport; Thu, 9 Feb 2023 22:38:28 +0000
+Received: from AUS-LX-MLIMONCI.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Thu, 9 Feb
+ 2023 16:38:27 -0600
+From:   Mario Limonciello <mario.limonciello@amd.com>
+To:     =?UTF-8?q?Jan=20D=C4=85bro=C5=9B?= <jsd@semihalf.com>,
+        Grzegorz Bernacki <gjb@semihalf.com>,
+        Thomas Rijo-john <Rijo-john.Thomas@amd.com>,
+        "Lendacky Thomas" <Thomas.Lendacky@amd.com>,
+        <herbert@gondor.apana.org.au>,
+        "Andy Shevchenko" <andriy.shevchenko@linux.intel.com>,
+        Mika Westerberg <mika.westerberg@linux.intel.com>,
+        <kvm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-i2c@vger.kernel.org>
+CC:     <linux-kernel@vger.kernel.org>,
+        Mario Limonciello <mario.limonciello@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Sumit Garg <sumit.garg@linaro.org>,
+        <op-tee@lists.trustedfirmware.org>
+Subject: [PATCH 0/6] Export platform features from ccp driver
+Date:   Thu, 9 Feb 2023 16:38:02 -0600
+Message-ID: <20230209223811.4993-1-mario.limonciello@amd.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <Y+VaCV7DRR1+mLYY@nvidia.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1NAM11FT076:EE_|BN9PR12MB5195:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2453d8aa-4a27-401d-6310-08db0aec29a5
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT038:EE_|BL1PR12MB5945:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1eee4d7d-12e4-4562-ebca-08db0aee5d3d
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 2GGUQhypGbKyR4kXqSZ1pETn50TuONJRP9ixZ4i/A563h2wFrDVcaPUzEx02l822+/qQ4nY9ORqBcNC6YTLylaEKFvaD8NaZea7RMgaKjCPknIlwDz9luNJaoIMrkLVsxcAXJUwLEnGr7ZrtMU17StVOs97UF/9lADBEtqddefGeOAYEFVXznOrf35X8RFF54brJWr2cX5cdnG8JClW+lYQWC15zqNJWuIOzXVF1ls6IN2RKqrhYgRszAvRQPHcZK/ijBdSxgErDEDDvsRR0wTRWZrOsSHT5pd3LzpahtceNOM2IHrlIl6qZma36J5bEWOcOiQyosggXucEpQLcYJqgJAqUM4SmMj+bPf59BKxc14LPefqNzKl9MNmBw1RBrq1jzAaNfSnU4dD18SJubj2Elb8jKkbFbFEazjjpFpMwzba7Z9rY5PBU39g3a46gMYxicRmMT9QMY5zpmymuksFxZJz5YlmfBD94T8oVie4aAsmpWMGxNSPUmQUCbTJFYIrapUshvPT5sEEolD9k2shx73PRp5c8ma+rzgLNzsrGQZGKf1x0tjS63lEjNzFF5UM3jkfqFDtZkA7KzYJnoctuHlfgX9Zd8bRGIMX/n37WE2cCBnsQjKJCig/S2GG0pIITgqSSlaTCtVPobVOAcIbzF95x0E5/kfVVA9o65JsZlgQhxo3vpEGcbosjIXhBoaHdoklnZoxkONPFjCQJylQS0PBnQatNLouYKl+IFpnw=
-X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230025)(4636009)(39860400002)(346002)(376002)(396003)(136003)(451199018)(36840700001)(46966006)(40470700004)(9686003)(186003)(2906002)(26005)(7416002)(5660300002)(478600001)(356005)(8936002)(82310400005)(55016003)(41300700001)(40480700001)(6862004)(47076005)(82740400003)(8676002)(336012)(36860700001)(70586007)(4326008)(70206006)(33716001)(83380400001)(6636002)(426003)(86362001)(54906003)(40460700003)(316002)(7636003)(67856001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Feb 2023 22:22:42.9383
+X-Microsoft-Antispam-Message-Info: vfWtBKbxq1+8a4ud44IBfExgbcMQEBz8rusddVlnfa57XubF9hTjAjliDw76LFWnEifWGajZVaEOziz0MQYR02vldom3ju1J0qOzmPBDJ8Zv5ZbkKdmROMB7S4jC4W1uG7C0tL0G9s7aKXcZc30o+1tyJOQ9II1JadyzHrxu0qXLxLOwkRjABvxZcVyNau9o2E1Q1b5o4BN/EYRA2Bnca9lz3QTsE37pjPqy5ZFXGzh4V7Bzi/Y4iOdyoYqQeIYMQOzSACLMD0gl/BHZAg0oRthjp46ic0VTDu+SnY5Tm7Ps6DyR7I+WrXq36W6ioOyDRwmTT23r0WKUZbkHqLYB3zgvDNGo9Ch3kLG8poZVHW1+lQ5LbPAiRwfYZnX0Yxg2QRVZ8LTL0Ckizv7yYg9JCR9jgQ9tDpeBeOhl9fC1j5kc/jXxf/824hHkgFsPlkAXfk5GNP3M8z6UsuIox91s7bUdenimYUn+5qrlsyr9cNdBheEq/5yr48iE0w6sHGsAdbwRtCGCNRRMp+aSK2E3atK4nUApf5/oYvZ8B3Ywk3ZT8pfW6JopJ/rSq5tncXhC3RsMK7/p+K0XdV5H1ALTFXY8DC7meD9DmY8F7doeRuC5apjA5tG2RQzYzVRqXA2oEtXWMv54SLu3VVJj05oJd/jimFO6aBlm9argVgf49I31yJweAiWJtjKNSG1mJS4nQFAEa+3LLDP11N7k8Ub7sCOa/c84ecfn7OCpms+z1J2kmyjxKtCQBZqNJCzHPtax
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(396003)(376002)(136003)(39860400002)(346002)(451199018)(36840700001)(40470700004)(46966006)(426003)(26005)(1076003)(86362001)(6666004)(186003)(36756003)(16526019)(83380400001)(336012)(7696005)(47076005)(70206006)(54906003)(316002)(110136005)(70586007)(8676002)(82310400005)(41300700001)(40480700001)(8936002)(2616005)(36860700001)(4326008)(44832011)(7416002)(921005)(2906002)(40460700003)(356005)(5660300002)(81166007)(82740400003)(478600001)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Feb 2023 22:38:28.5109
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2453d8aa-4a27-401d-6310-08db0aec29a5
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT076.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1eee4d7d-12e4-4562-ebca-08db0aee5d3d
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT038.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5195
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5945
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
         autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -118,68 +107,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 09, 2023 at 04:39:37PM -0400, Jason Gunthorpe wrote:
-> On Thu, Feb 09, 2023 at 11:51:31AM -0800, Nicolin Chen wrote:
-> > On Thu, Feb 09, 2023 at 02:36:49PM -0400, Jason Gunthorpe wrote:
-> > > On Thu, Feb 09, 2023 at 12:59:58PM -0500, Matthew Rosato wrote:
-> > > > really should highlight that).  Otherwise, conditionally calling
-> > > > iommu_domain_alloc(dev->bus) when !ops->domain_alloc_user (instead
-> > > > of returning -EOPNOTSUPP) seems to restore the prior functionality
-> > > > for me.
-> > > 
-> > > Yes, that is right if the input user data is 0 length or full of 0s
-> > > then we should call the normal driver function
-> > 
-> > Maybe I am wrong, yet I recall that doing ops->domain_alloc_user
-> > without a fallback was intentional to rule out drivers that don't
-> > support IOMMUFD?
-> 
-> I think we moved away from that to the idea of using the dma_domain
-> patch I suggested..
-> 
-> > To be backward-compatible and concern about SMMU, we can opt in
-> > ops->domain_alloc_user upon availability and then add a fallback:
-> > 
-> > 	if ((!ops || !ops->domain_alloc_user) && user_data) {
-> > 		rc = -EOPNOTSUPP;
-> > 		goto out_abort;
-> > 	}
-> > 
-> > 	if (ops->domain_alloc_user)
-> > 		hwpt->domain = ops->domain_alloc_user(dev, NULL, NULL);
-> > 	else
-> > 		hwpt->domain = iommu_domain_alloc(dev->bus);
-> > 	if (!hwpt->domain) {
-> > 		rc = -ENOMEM;
-> > 		goto out_abort;
-> > 	}
-> > 
-> > Yet, even by doing so, this series having the PATCH 07/17 that
-> > moves iopt_table_add_domain() would temporally break IOMMUFD on
-> > ARM platforms, until we add the ops->domain_alloc_user to SMMU
-> > drivers.
-> 
-> Drop patch 7 and 8
-> 
-> Change patch 12 so it has a unique flow to allocate and IOAS map a
-> HWPT that does not try to share so much code with the existing flow.
-> 
-> The HWPT flow should always just call allocate and then map with no
-> effort to attach first. This will fail on ARM SMMU at this point, and
-> that is fine.
-> 
-> All the existing code should work exactly as it is now and not have
-> any need to be changed.
-> 
-> Where things when wrong was trying to share
-> "__iommufd_hw_pagetable_alloc", I think.
-> 
-> Don't try to consolidate at this point. Once all the drivers are
-> updated then we could try to consolidate things.
+The i2c-designware-amdpsp driver communicates with a platform
+features mailbox provided by the PSP.  The address used for
+communication is discovered via a non-architecturally
+guaranteed mechanism.
 
-Yea, I think that's the only way out for now. Though I am not
-sure about other drivers yet, hopefully the SMMU driver(s) is
-the last one that we need to update...
+To better scale, export a feature for communication with platform
+features directly from the ccp driver.
 
-Thanks
-Nic
+Mario Limonciello (6):
+  crypto: ccp: Drop TEE support for IRQ handler
+  crypto: ccp: Add a header for multiple drivers to use `__psp_pa`
+  crypto: ccp: Move some PSP mailbox bit definitions into common header
+  crypto: ccp: Add support for an interface for platform features
+  crypto: ccp: Enable platform access interface on client PSP parts
+  i2c: designware: Use PCI PSP driver for communication
+
+ arch/x86/kvm/svm/sev.c                      |   1 +
+ drivers/crypto/ccp/Makefile                 |   3 +-
+ drivers/crypto/ccp/platform-access.c        | 166 ++++++++++++++++++++
+ drivers/crypto/ccp/platform-access.h        |  34 ++++
+ drivers/crypto/ccp/psp-dev.c                |  32 ++--
+ drivers/crypto/ccp/psp-dev.h                |  11 +-
+ drivers/crypto/ccp/sev-dev.c                |  16 +-
+ drivers/crypto/ccp/sev-dev.h                |   2 +-
+ drivers/crypto/ccp/sp-dev.h                 |   7 +
+ drivers/crypto/ccp/sp-pci.c                 |   7 +
+ drivers/crypto/ccp/tee-dev.c                |  17 +-
+ drivers/i2c/busses/Kconfig                  |   2 +-
+ drivers/i2c/busses/i2c-designware-amdpsp.c  | 149 +-----------------
+ drivers/i2c/busses/i2c-designware-core.h    |   1 -
+ drivers/i2c/busses/i2c-designware-platdrv.c |   1 -
+ drivers/tee/amdtee/call.c                   |   2 +-
+ drivers/tee/amdtee/shm_pool.c               |   2 +-
+ include/linux/psp-platform-access.h         |  50 ++++++
+ include/linux/psp-sev.h                     |   8 -
+ include/linux/psp.h                         |  26 +++
+ 20 files changed, 340 insertions(+), 197 deletions(-)
+ create mode 100644 drivers/crypto/ccp/platform-access.c
+ create mode 100644 drivers/crypto/ccp/platform-access.h
+ create mode 100644 include/linux/psp-platform-access.h
+ create mode 100644 include/linux/psp.h
+
+
+base-commit: c7410b425de40e9b163eef781e1bdacf1bf2962e
+-- 
+2.34.1
+
