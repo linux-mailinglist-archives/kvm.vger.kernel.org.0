@@ -2,250 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CFB9969048A
-	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 11:23:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B9CD3690499
+	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 11:25:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229852AbjBIKXI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Feb 2023 05:23:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44778 "EHLO
+        id S230004AbjBIKZR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Feb 2023 05:25:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229721AbjBIKXH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Feb 2023 05:23:07 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 065D966EDB;
-        Thu,  9 Feb 2023 02:23:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=fjp7fS59/GBPxpVMB6rN8JjZAqpxn+PQiMulnHgjMf8=; b=oT6pSlsOiRty5NjsN4B3gZjIE5
-        8SYyjzecTZRSAUIjDjTOyixzxZE+BdL6yi1SfDKOz/CezLrjjsgXTlIzRbZpUSzdOIfn9qjYltnp0
-        6DRtznvMNt2H4Z7YjhD5duadpsjjAnpw1pC7GukEE+Aq/amSuF0/xffl0n+ScGMv7ozlXw4weAPzh
-        SxyQxeo7iDpdXGE5vE8fNfqb0E9V/SHeYoTCg//yeAu47EEx5ZcR51B/TzfNo1b56J4qX13qAEdq6
-        NzX8pluxNdjaWbjqDw0rHHSi4RjpBInsSpT4RgutqTQhBSOvN3BC+CXc1heWYsamj4eu+mwgETn4L
-        ERiTR3MQ==;
-Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.ant.amazon.com)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pQ44V-0026Qa-KP; Thu, 09 Feb 2023 10:22:32 +0000
-Message-ID: <053b048a507610c73a1dceb6ba1ac4b27ca03718.camel@infradead.org>
-Subject: Re: [External] Re: [PATCH v7 0/9] Parallel CPU bringup for x86_64
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Usama Arif <usama.arif@bytedance.com>, paulmck@kernel.org,
-        tglx@linutronix.de
-Cc:     kim.phillips@amd.com, arjan@linux.intel.com, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        x86@kernel.org, pbonzini@redhat.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, rcu@vger.kernel.org, mimoja@mimoja.de,
-        hewenliang4@huawei.com, thomas.lendacky@amd.com, seanjc@google.com,
-        pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
-        punit.agrawal@bytedance.com, simon.evans@bytedance.com,
-        liangma@liangbit.com
-Date:   Thu, 09 Feb 2023 10:22:30 +0000
-In-Reply-To: <4377e0bc-5954-c0c3-0daa-24a4427c144e@bytedance.com>
-References: <20230207230436.2690891-1-usama.arif@bytedance.com>
-         <20230209035300.GA3216394@paulmck-ThinkPad-P17-Gen-1>
-         <8e2f03e2-9517-aeb4-df60-b36ef3ff3a75@bytedance.com>
-         <79fa4d65a0d906dd42c41324dfe065aa8ad06d6f.camel@infradead.org>
-         <4377e0bc-5954-c0c3-0daa-24a4427c144e@bytedance.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-M746ZnUmolNViPf2veW+"
-User-Agent: Evolution 3.44.4-0ubuntu1 
+        with ESMTP id S229572AbjBIKZN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Feb 2023 05:25:13 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15BDE193D6;
+        Thu,  9 Feb 2023 02:25:12 -0800 (PST)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 319AL5mS029426;
+        Thu, 9 Feb 2023 10:25:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=NyzG4HZC/IAgi2zFR56A/daeBoQnV5drt/XBlDIa4Ds=;
+ b=OLj4Uz2ZiaOGk7vJMffFQEcLd2X2H/RJr/RYHjK953wPwJDQ4K8HQyiZ7lgd0pWdBLzS
+ 2kZPELE45Mru1DNmZ91w14TWUo5Y8I63se4So9xVTMRHiTwmyU1EEIEueDwrLBTm1W44
+ A5l2KDao2+pOFs4yXFuaNrE+bg+YfTbd6bcAX8vEqfLZ9o1DtroNOVZZ6O2lsWhM6jHQ
+ SsYwZIEn07PNy0izt48eieB37E3hXRXeGLY4+DrbjqzHBVtClzWOS6vcfcOI4bbdDtL2
+ QgW+VrqHi+e1Y0pfM+OYHryrkBmejexvtpCCXtUgnrTkvHU375EtkQDERix+dMX9ZvgM sQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nmy0m02q9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Feb 2023 10:25:11 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 319AMWmP004410;
+        Thu, 9 Feb 2023 10:25:10 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nmy0m02pg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Feb 2023 10:25:10 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3194sPVe018248;
+        Thu, 9 Feb 2023 10:25:08 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3nhf06m8mv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Feb 2023 10:25:08 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 319AP4AX26280418
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 9 Feb 2023 10:25:05 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D9EF420073;
+        Thu,  9 Feb 2023 10:25:04 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B47D72006A;
+        Thu,  9 Feb 2023 10:25:04 +0000 (GMT)
+Received: from li-9fd7f64c-3205-11b2-a85c-df942b00d78d.ibm.com (unknown [9.152.224.253])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Thu,  9 Feb 2023 10:25:04 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
+        borntraeger@linux.ibm.com, cohuck@redhat.com,
+        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        hca@linux.ibm.com
+Subject: [GIT PULL 00/18] KVM: s390x: KVM s390x changes for 6.3
+Date:   Thu,  9 Feb 2023 11:22:42 +0100
+Message-Id: <20230209102300.12254-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.39.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: R8651w9715NRAn-PGuM3sRA97G6MajtT
+X-Proofpoint-ORIG-GUID: 4aPi6Q4AeutgYPQAT8ZTTyrFbFusn3xP
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-02-09_07,2023-02-08_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 malwarescore=0
+ spamscore=0 priorityscore=1501 bulkscore=0 mlxscore=0 mlxlogscore=566
+ impostorscore=0 adultscore=0 suspectscore=0 lowpriorityscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302090095
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Paolo,
 
---=-M746ZnUmolNViPf2veW+
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+the following changes are ready for pulling for 6.3:
+* Two more V!=R patches
+* The last part of the cmpxchg patches
+* A few fixes
 
-T24gVGh1LCAyMDIzLTAyLTA5IGF0IDEwOjE5ICswMDAwLCBVc2FtYSBBcmlmIHdyb3RlOgo+IAo+
-IAo+IE9uIDA5LzAyLzIwMjMgMTA6MDYsIERhdmlkIFdvb2Rob3VzZSB3cm90ZToKPiA+IE9uIFRo
-dSwgMjAyMy0wMi0wOSBhdCAwOTo0OSArMDAwMCwgVXNhbWEgQXJpZiB3cm90ZToKPiA+ID4gCj4g
-PiA+IC0tLSBhL2FyY2gveDg2L2tlcm5lbC9zbXBib290LmMKPiA+ID4gKysrIGIvYXJjaC94ODYv
-a2VybmVsL3NtcGJvb3QuYwo+ID4gPiBAQCAtMTA4MCw2ICsxMDgwLDcgQEAgd2FrZXVwX2NwdV92
-aWFfaW5pdF9ubWkoaW50IGNwdSwgdW5zaWduZWQgbG9uZwo+ID4gPiBzdGFydF9pcCwgaW50IGFw
-aWNpZCwKPiA+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgd2FrZXVwX2NwdTBfbm1p
-LCAwLCAid2FrZV9jcHUwIik7Cj4gPiA+IAo+ID4gPiDCoMKgwqDCoMKgwqDCoMKgwqAgaWYgKCFi
-b290X2Vycm9yKSB7Cj4gPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGluaXRpYWxf
-Z3MgPSBwZXJfY3B1X29mZnNldChjcHUpOwo+ID4gCj4gPiBUaGF0J3MgZm9yIDY0LWJpdC4KPiA+
-IAo+ID4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGVuYWJsZV9zdGFydF9j
-cHUwID0gMTsKPiA+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqY3B1MF9u
-bWlfcmVnaXN0ZXJlZCA9IDE7Cj4gPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqAgaWQgPSBhcGljLT5kZXN0X21vZGVfbG9naWNhbCA/IGNwdTBfbG9naWNhbF9hcGljaWQgOgo+
-ID4gPiBhcGljaWQ7Cj4gPiA+IEBAIC0xMTg4LDEwICsxMTg5LDE0IEBAIHN0YXRpYyBpbnQgZG9f
-Ym9vdF9jcHUoaW50IGFwaWNpZCwgaW50IGNwdSwKPiA+ID4gc3RydWN0IHRhc2tfc3RydWN0ICpp
-ZGxlLAo+ID4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGJvb3RfZXJyb3Ig
-PSBhcGljLT53YWtldXBfc2Vjb25kYXJ5X2NwdV82NChhcGljaWQsCj4gPiA+IHN0YXJ0X2lwKTsK
-PiA+ID4gwqDCoMKgwqDCoMKgwqDCoMKgIGVsc2UgaWYgKGFwaWMtPndha2V1cF9zZWNvbmRhcnlf
-Y3B1KQo+ID4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGJvb3RfZXJyb3Ig
-PSBhcGljLT53YWtldXBfc2Vjb25kYXJ5X2NwdShhcGljaWQsIHN0YXJ0X2lwKTsKPiA+ID4gLcKg
-wqDCoMKgwqDCoCBlbHNlCj4gPiA+ICvCoMKgwqDCoMKgwqAgZWxzZSB7Cj4gPiA+ICvCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgIGlmKCFjcHUpIHsKPiA+ID4gK8KgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGVhcmx5X2dkdF9kZXNjci5hZGRyZXNzID0gKHVu
-c2lnbmVkIGxvbmcpZ2V0X2NwdV9nZHRfcncoY3B1KTsKPiA+ID4gK8KgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGluaXRpYWxfc3RhY2vCoCA9IGlkbGUtPnRocmVh
-ZC5zcDsKPiA+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfQo+ID4gCj4gPiBBbmQg
-dGhhdCdzIDMyLWJpdC4KPiA+IAo+ID4gVGhlc2Ugd2VyZSBwcmV2aW91c2x5IGRvbmUgaW4gY29t
-bW9uX2NwdV91cCgpIG9yIGRvX2Jvb3RfY3B1KCksIHdoaWNoCj4gPiBtZWFucyB0aGV5IHdlcmUg
-ZG9uZSBub3Qgb25seSBmb3IgdGhlIHdha2V1cF9jcHVfdmlhX2luaXRfbm1pKCkgY29kZQo+ID4g
-cGF0aCwgYnV0IGFsc28gd2hlbiB3ZSBjYWxsIGFwaWMtPndha2V1cF9zZWNvbmRhcnlfY3B1KCkg
-KG9yIF82NCgpKSBmb3IKPiA+IHRoZSBlc290ZXJpYyBVVi9OdW1hQ29ubmVjdCBtYWNoaW5lcy4K
-PiA+IAo+ID4gVGhhbmtzIGZvciBkaWFnbm9zaW5nIGl0IHNvIHF1aWNrbHk7IEknbGwgd29yayB1
-cCBhIHN1YnRseSBkaWZmZXJlbnQKPiA+IGZpeC4KPiA+IAo+IAo+IFllYWgsIHdhcyBqdXN0IGEg
-aGFja3kgZml4IHdoaWxlIEkgd2FzIHRyeWluZyB0byBmaWd1cmUgb3V0IHRoZSBpc3N1ZS4KPiAK
-PiBkb19ib290X2NwdSBpcyBvbmx5IGNhbGxlZCBpbiBjcHUwIGluIGhvdHBsdWcgY2FzZSwgc28g
-SSB0aGluayB0aGlzIGEKPiBtdWNoIGJldHRlciBkaWZmOgo+IAo+IGRpZmYgLS1naXQgYS9hcmNo
-L3g4Ni9rZXJuZWwvc21wYm9vdC5jIGIvYXJjaC94ODYva2VybmVsL3NtcGJvb3QuYwo+IGluZGV4
-IDNlYzUxODJkOTY5OC4uZjdhZTgyOTY5ZWU0IDEwMDY0NAo+IC0tLSBhL2FyY2gveDg2L2tlcm5l
-bC9zbXBib290LmMKPiArKysgYi9hcmNoL3g4Ni9rZXJuZWwvc21wYm9vdC5jCj4gQEAgLTExMzYs
-MTMgKzExMzYsMTYgQEAgc3RhdGljIGludCBkb19ib290X2NwdShpbnQgYXBpY2lkLCBpbnQgY3B1
-LCAKPiBzdHJ1Y3QgdGFza19zdHJ1Y3QgKmlkbGUsCj4gwqDCoMKgwqDCoMKgwqDCoCBpZGxlLT50
-aHJlYWQuc3AgPSAodW5zaWduZWQgbG9uZyl0YXNrX3B0X3JlZ3MoaWRsZSk7Cj4gwqDCoMKgwqDC
-oMKgwqDCoCBpbml0aWFsX2NvZGUgPSAodW5zaWduZWQgbG9uZylzdGFydF9zZWNvbmRhcnk7Cj4g
-Cj4gLcKgwqDCoMKgwqDCoCBpZiAoSVNfRU5BQkxFRChDT05GSUdfWDg2XzMyKSkgewo+ICvCoMKg
-wqDCoMKgwqAgaWYgKElTX0VOQUJMRUQoQ09ORklHX1g4Nl8zMikgfHwgIWNwdSkgewo+IMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGVhcmx5X2dkdF9kZXNjci5hZGRyZXNzID0gKHVu
-c2lnbmVkIAo+IGxvbmcpZ2V0X2NwdV9nZHRfcncoY3B1KTsKPiDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoCBpbml0aWFsX3N0YWNrwqAgPSBpZGxlLT50aHJlYWQuc3A7Cj4gwqDCoMKg
-wqDCoMKgwqDCoCB9IGVsc2UgaWYgKCFkb19wYXJhbGxlbF9icmluZ3VwKSB7Cj4gwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgc21wYm9vdF9jb250cm9sID0gU1RBUlRVUF9TRUNPTkRB
-UlkgfCBhcGljaWQ7Cj4gwqDCoMKgwqDCoMKgwqDCoCB9Cj4gCj4gK8KgwqDCoMKgwqDCoCBpZiAo
-IWNwdSkKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBpbml0aWFsX2dzID0gcGVyX2Nw
-dV9vZmZzZXQoY3B1KTsKPiArCj4gwqDCoMKgwqDCoMKgwqDCoCAvKiBFbmFibGUgdGhlIGVzcGZp
-eCBoYWNrIGZvciB0aGlzIENQVSAqLwo+IMKgwqDCoMKgwqDCoMKgwqAgaW5pdF9lc3BmaXhfYXAo
-Y3B1KTsKPiAKPiAKPiAKPiA+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBi
-b290X2Vycm9yID0gd2FrZXVwX2NwdV92aWFfaW5pdF9ubWkoY3B1LCBzdGFydF9pcCwgYXBpY2lk
-LAo+ID4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqAgY3B1MF9ubWlfcmVnaXN0ZXJlZCk7Cj4gPiA+IC0KPiA+ID4gK8KgwqDCoMKgwqDCoCB9Cj4g
-PiA+IMKgwqDCoMKgwqDCoMKgwqDCoCByZXR1cm4gYm9vdF9lcnJvcjsKPiA+ID4gwqDCoCB9Cj4g
-PiA+IAo+ID4gCgoKSSdtIHRyeWluZyB0byBmaW5kIHRoZSBhY3R1YWwgc3RhcnR1cCBwYXRoIHRo
-YXQgQ1BVMCB0YWtlcyB3aGVuIHdva2VuCmJ5IGFuIE5NSS4KCkNhbid0IHdlIG1ha2UgaXQgdGFr
-ZSB0aGUgc2Vjb25kYXJ5X3N0YXJ0dXBfNjQgcGF0aCB0aGF0IGFjdHVhbGx5CmNoZWNrcyBzbXBi
-b290X2NvbnRyb2wsIHNlZXMgdGhlIFNUQVJUVVBfU0VDT05EQVJZIGZsYWcgc2V0LCBhbmQgdGhl
-bgpnZXRzIGFsbCB0aGVzZSB0aGluZ3MgZnJvbSB0aGUgcGVyLWNwdSBkYXRhIGFzICRERUlUWSAo
-d2VsbCwgVGhvbWFzKQppbnRlbmRlZD8KCg==
+This pull includes the s390 cmpxchg_user_key feature branch which is
+the base for the KVM cmpxchg patches by Janis.
 
+Cheers,
+Janosch
 
---=-M746ZnUmolNViPf2veW+
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+The following changes since commit a2ce98d69fabc7d3758063366fe830f682610cf7:
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMjA5MTAyMjMwWjAvBgkqhkiG9w0BCQQxIgQgAFCww9fH
-doSU8smmmE9lz49w+NxZGJpHvXhz8jBd3DUwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgB5pHJnTxaidxgdvtWPQrSAG/Or8YVJQdBQ
-GWCbi16R+aOQn0HcERE1gC6LgERGQBmPdfhjVHQWUy88YvLeVyVoiD6GRAx7zWnBlcRjMwwI24km
-m693ON1IGffZu9gw2O3AnBxYFczX3NHpboKl0ac7Pdl7xfK59uv+gvkpXOGhLzXY89H0eNE7iUGj
-cUpW101UEPKq+My6WI9qoGhAzl4q9UEXJsQQGB+9FktQE12gHHo15pgjfSOSp6Y0PHho1aR7hupE
-HuIOjL06Vb2Ra57rA8lW8szugGZ3Keivpm5gBKrDhlgKtLDuX8fHDzg5RL2lql7qWgEI0rwL8WKn
-19+HOFt+LUdM9A77doZDBvhn9DjjTKafFpelzYBlcDeEj2zBNQYWWGPMpM2cULXfdpAin9LkN8wL
-EkJPdYpK0h2dBDDinVq0t+/ohZyH5WZwXIogn86aWIeiRqER1JWkXwUyieqxfOlixQaFBi/p4Rc8
-Q0M1GH0f38wgoE08iDCrhwv1zmyF84e5Dy8yb2hv3Y1+ooN2KEsFjY8deL58pYAu5HTgwFLu9LcO
-EJrmArX+8ZH1T9B8lkeJRL6D2BZoh3FOLMrE2CNose8J0Fe0l5DJf5q9pjs8TmmhtksD4yiwHTrQ
-KaqPVknDvDREgS/PKXj03acu3k//zi42usfaSvwU/QAAAAAAAA==
+  Merge remote-tracking branch 'l390-korg/cmpxchg_user_key' into kvm-next (2023-02-07 18:04:23 +0100)
 
+are available in the Git repository at:
 
---=-M746ZnUmolNViPf2veW+--
+  https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git tags/kvm-s390-next-6.3-1
+
+for you to fetch changes up to 5fc5b94a273655128159186c87662105db8afeb5:
+
+  s390/virtio: sort out physical vs virtual pointers usage (2023-02-08 09:59:46 +0100)
+
+----------------------------------------------------------------
+
+Alexander Gordeev (1):
+  s390/virtio: sort out physical vs virtual pointers usage
+
+Janis Schoetterl-Glausch (14):
+  KVM: s390: selftest: memop: Pass mop_desc via pointer
+  KVM: s390: selftest: memop: Replace macros by functions
+  KVM: s390: selftest: memop: Move testlist into main
+  KVM: s390: selftest: memop: Add bad address test
+  KVM: s390: selftest: memop: Fix typo
+  KVM: s390: selftest: memop: Fix wrong address being used in test
+  KVM: s390: selftest: memop: Fix integer literal
+  KVM: s390: Move common code of mem_op functions into function
+  KVM: s390: Dispatch to implementing function at top level of vm mem_op
+  KVM: s390: Refactor absolute vm mem_op function
+  KVM: s390: Refactor vcpu mem_op function
+  KVM: s390: Extend MEM_OP ioctl by storage key checked cmpxchg
+  Documentation: KVM: s390: Describe KVM_S390_MEMOP_F_CMPXCHG
+  KVM: s390: selftest: memop: Add cmpxchg tests
+
+Nico Boehr (2):
+  KVM: s390: disable migration mode when dirty tracking is disabled
+  KVM: s390: GISA: sort out physical vs virtual pointers usage
+
+Nina Schoetterl-Glausch (1):
+  KVM: selftests: Compile s390 tests with -march=z10
+
+ Documentation/virt/kvm/api.rst            |  46 +-
+ Documentation/virt/kvm/devices/vm.rst     |   4 +
+ arch/s390/kvm/gaccess.c                   | 109 ++++
+ arch/s390/kvm/gaccess.h                   |   3 +
+ arch/s390/kvm/interrupt.c                 |  11 +-
+ arch/s390/kvm/kvm-s390.c                  | 268 +++++----
+ drivers/s390/virtio/virtio_ccw.c          |  46 +-
+ include/uapi/linux/kvm.h                  |   8 +
+ tools/testing/selftests/kvm/Makefile      |   3 +
+ tools/testing/selftests/kvm/s390x/memop.c | 676 +++++++++++++++++-----
+ 10 files changed, 889 insertions(+), 285 deletions(-)
+
+-- 
+2.39.1
+
