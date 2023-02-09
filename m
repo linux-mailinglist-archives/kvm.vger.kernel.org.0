@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AC5BD690FB0
-	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 18:58:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 324A9690FB7
+	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 18:59:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229696AbjBIR6v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Feb 2023 12:58:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46998 "EHLO
+        id S230169AbjBIR66 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Feb 2023 12:58:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbjBIR6u (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Feb 2023 12:58:50 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B030C673
-        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 09:58:49 -0800 (PST)
+        with ESMTP id S229975AbjBIR6w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Feb 2023 12:58:52 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A30525D1FE
+        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 09:58:51 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D7A8F61B49
-        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 17:58:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46666C4339E;
+        by ams.source.kernel.org (Postfix) with ESMTPS id 4E6E6B82284
+        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 17:58:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B73C4C433A4;
         Thu,  9 Feb 2023 17:58:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1675965528;
-        bh=caJCdIDxEcs2dm46yIwmQS+/hs5HuoKGvfg5KefJxGc=;
+        bh=TGN/kx23WPPf/qh7QHqU9g0rW5CS/brhHQX6CSmzF54=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=AsGjayBSvfDobZeBEaZsy2KxkoDSQu1qWlpa9sMlMPo9Zh668z8LnP0yGeA/pETSk
-         9zR64flhmSSHLpkdZIlkGQrs9UDyFwe2zkKUID9OME63mz74UF1FSLd3U/0BywOZFE
-         BTOTvjv89+mKMD0p3CdJIA6qEkAjeXt5qQJ6Sb8LJLMPaDg0NEmsADrAKjr6U05dg4
-         piRc/3tJDibw037Tv0AXOA/+cdb+rz+eui3uMqtSMEhNme2v/jRHu0ZwcU1cCx+5Zt
-         +HMWuu0pR2KaP3HmVYuLUNP9494N1I12EnYosj6dgnq1cRDxTZZ7+7+wxwoO25V67E
-         m/22SZ1O5FNEQ==
+        b=Qm7LKbe0Dm6E7/Hw8x9RRY+vJXd7Y+cBb0izxCg7nTUoZiwSH+AsqT7H4asDIwDCQ
+         ECRUX81NS2/kkgjgQKnwbCByU9bds3Fz4x1IhNO5w4mqWRKSaTasClq0tp2GR/rKJj
+         v6jnxfPxcITjUX3gym7CwVnaWVgNAvY3Z9jraEuwRDJyHi+nwGnm4EL111Pq433ULY
+         0rbivuk/ZbHrzA0cBY6v9ad+CmoRCPtR/DgrcZLuvPzjZpqbHhWi/jgtXsRSMDwESc
+         TD3DQnn5FFx1v3K/Eb29B+8YU8owhUsBWqV7YsvHwS3zKFYxv0FgxEZBZLrl5I+8Wh
+         s4NFN3NinwOsw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pQBC2-0093r7-9K;
+        id 1pQBC2-0093r7-HN;
         Thu, 09 Feb 2023 17:58:46 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -50,9 +50,9 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 03/18] KVM: arm64: nv: Introduce nested virtualization VCPU feature
-Date:   Thu,  9 Feb 2023 17:58:05 +0000
-Message-Id: <20230209175820.1939006-4-maz@kernel.org>
+Subject: [PATCH 04/18] KVM: arm64: nv: Reset VCPU to EL2 registers if VCPU nested virt is set
+Date:   Thu,  9 Feb 2023 17:58:06 +0000
+Message-Id: <20230209175820.1939006-5-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230209175820.1939006-1-maz@kernel.org>
 References: <20230209175820.1939006-1-maz@kernel.org>
@@ -73,56 +73,73 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Christoffer Dall <christoffer.dall@arm.com>
 
-Introduce the feature bit and a primitive that checks if the feature is
-set behind a static key check based on the cpus_have_const_cap check.
+Reset the VCPU with PSTATE.M = EL2h when the nested virtualization
+feature is enabled on the VCPU.
 
-Checking vcpu_has_nv() on systems without nested virt enabled
-should have negligible overhead.
-
-We don't yet allow userspace to actually set this feature.
-
-Reviewed-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
 Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+[maz: rework register reset not to use empty data structures]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h | 14 ++++++++++++++
- arch/arm64/include/uapi/asm/kvm.h   |  1 +
- 2 files changed, 15 insertions(+)
- create mode 100644 arch/arm64/include/asm/kvm_nested.h
+ arch/arm64/kvm/reset.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-new file mode 100644
-index 000000000000..fd601ea68d13
---- /dev/null
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -0,0 +1,14 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef __ARM64_KVM_NESTED_H
-+#define __ARM64_KVM_NESTED_H
-+
-+#include <linux/kvm_host.h>
-+
-+static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
-+{
-+	return (!__is_defined(__KVM_NVHE_HYPERVISOR__) &&
-+		cpus_have_final_cap(ARM64_HAS_NESTED_VIRT) &&
-+		test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features));
-+}
-+
-+#endif /* __ARM64_KVM_NESTED_H */
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index a7a857f1784d..f8129c624b07 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -109,6 +109,7 @@ struct kvm_regs {
- #define KVM_ARM_VCPU_SVE		4 /* enable SVE for this CPU */
- #define KVM_ARM_VCPU_PTRAUTH_ADDRESS	5 /* VCPU uses address authentication */
- #define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* VCPU uses generic authentication */
-+#define KVM_ARM_VCPU_HAS_EL2		7 /* Support nested virtualization */
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index e0267f672b8a..d061dcc21578 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -27,6 +27,7 @@
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_mmu.h>
++#include <asm/kvm_nested.h>
+ #include <asm/virt.h>
  
- struct kvm_vcpu_init {
- 	__u32 target;
+ /* Maximum phys_shift supported for any VM on this host */
+@@ -38,6 +39,9 @@ static u32 kvm_ipa_limit;
+ #define VCPU_RESET_PSTATE_EL1	(PSR_MODE_EL1h | PSR_A_BIT | PSR_I_BIT | \
+ 				 PSR_F_BIT | PSR_D_BIT)
+ 
++#define VCPU_RESET_PSTATE_EL2	(PSR_MODE_EL2h | PSR_A_BIT | PSR_I_BIT | \
++				 PSR_F_BIT | PSR_D_BIT)
++
+ #define VCPU_RESET_PSTATE_SVC	(PSR_AA32_MODE_SVC | PSR_AA32_A_BIT | \
+ 				 PSR_AA32_I_BIT | PSR_AA32_F_BIT)
+ 
+@@ -220,6 +224,10 @@ static int kvm_set_vm_width(struct kvm_vcpu *vcpu)
+ 	if (kvm_has_mte(kvm) && is32bit)
+ 		return -EINVAL;
+ 
++	/* NV is incompatible with AArch32 */
++	if (vcpu_has_nv(vcpu) && is32bit)
++		return -EINVAL;
++
+ 	if (is32bit)
+ 		set_bit(KVM_ARCH_FLAG_EL1_32BIT, &kvm->arch.flags);
+ 
+@@ -272,6 +280,12 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 	if (loaded)
+ 		kvm_arch_vcpu_put(vcpu);
+ 
++	/* Disallow NV+SVE for the time being */
++	if (vcpu_has_nv(vcpu) && vcpu_has_feature(vcpu, KVM_ARM_VCPU_SVE)) {
++		ret = -EINVAL;
++		goto out;
++	}
++
+ 	if (!kvm_arm_vcpu_sve_finalized(vcpu)) {
+ 		if (test_bit(KVM_ARM_VCPU_SVE, vcpu->arch.features)) {
+ 			ret = kvm_vcpu_enable_sve(vcpu);
+@@ -294,6 +308,8 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 	default:
+ 		if (vcpu_el1_is_32bit(vcpu)) {
+ 			pstate = VCPU_RESET_PSTATE_SVC;
++		} else if (vcpu_has_nv(vcpu)) {
++			pstate = VCPU_RESET_PSTATE_EL2;
+ 		} else {
+ 			pstate = VCPU_RESET_PSTATE_EL1;
+ 		}
 -- 
 2.34.1
 
