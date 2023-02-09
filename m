@@ -2,164 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BCF8C690885
-	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 13:18:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0056B6908A1
+	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 13:25:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229627AbjBIMSC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Feb 2023 07:18:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58760 "EHLO
+        id S229642AbjBIMZv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Feb 2023 07:25:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230237AbjBIMRn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Feb 2023 07:17:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CBF612848
-        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 04:16:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675944960;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=iNTD5je9fg9x4tT0kDuBphOy/5rSQdvpzRyi0KLLL8w=;
-        b=blc8o8ZosFWFtlMCfg2xvEvhBB4jwsNFq25LM4JY6U35gFsFM/tKqKiLGcrL+EeMyQUdjP
-        so0q9iB/8r2t8AU96G/NeJPkkEsSJapTvHvxrnHhurtNXYeOzUv8ODZ18IlxWhKu7gHBLH
-        GHiFTzlf8rQD5BJ3gPk2dCnttzgokj8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-286-efhSK7TnP7SQvmOyfu6vfQ-1; Thu, 09 Feb 2023 07:15:57 -0500
-X-MC-Unique: efhSK7TnP7SQvmOyfu6vfQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 83AB685A588;
-        Thu,  9 Feb 2023 12:15:56 +0000 (UTC)
-Received: from redhat.com (unknown [10.33.36.65])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 665A61121315;
-        Thu,  9 Feb 2023 12:15:53 +0000 (UTC)
-Date:   Thu, 9 Feb 2023 12:15:51 +0000
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Cc:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org,
-        qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
-        clg@kaod.org
-Subject: Re: [PATCH v15 10/11] qapi/s390x/cpu topology: CPU_POLARITY_CHANGE
- qapi event
-Message-ID: <Y+Tj9wjvss5O7GCH@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20230201132051.126868-1-pmorel@linux.ibm.com>
- <20230201132051.126868-11-pmorel@linux.ibm.com>
- <5b26ee514ccbbfaf5670cbf0cb006d8e706fe5ae.camel@linux.ibm.com>
- <Y+TFRNoOAfZ7QTvp@redhat.com>
- <4622b3c1e565b89132be8b5a8cda61aef9c5d0f6.camel@linux.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <4622b3c1e565b89132be8b5a8cda61aef9c5d0f6.camel@linux.ibm.com>
-User-Agent: Mutt/2.2.9 (2022-11-12)
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229457AbjBIMZu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Feb 2023 07:25:50 -0500
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFDDC3AA2
+        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 04:25:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1675945549; x=1707481549;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=a58JVjX8VBd0NVglAg9VX2VLWe/QHT+KrBUb5IXqMB8=;
+  b=V6DICVClPmzMottwYhdI/W1wR65TKv4pysQzdg+SAGhnqxWFMZdVDvv4
+   OvIobEbI5vwsRj35qwLBkZh+2nMXc3JmzRTIfzKUhjNiFHCKh/RhUHmGg
+   IwJNDDuW+8nTi7LQZdM9tX5Db23jo77nDYlFld5wODW66Vtb3M1ypFknC
+   Zs3HMPOTFS04d1MZQHRZp2Lgf/9QiVqEZi4Fke4ImQZGr6q/q2rv+OHfY
+   M/wnq2ko7fLHBoDMZ/pR3106y1pCJ+ecNHpCGg3w/ypCf+ptItK+wAKFQ
+   xG0kD1akFChYnm2lvIZsYfdujCpUxwsWB5yE9fThj9pvovGgp4dqXFZ4i
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10615"; a="309739602"
+X-IronPort-AV: E=Sophos;i="5.97,283,1669104000"; 
+   d="scan'208";a="309739602"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2023 04:25:49 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10615"; a="913111282"
+X-IronPort-AV: E=Sophos;i="5.97,283,1669104000"; 
+   d="scan'208";a="913111282"
+Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
+  by fmsmga006.fm.intel.com with ESMTP; 09 Feb 2023 04:25:47 -0800
+Message-ID: <5884e0cb15f7f904728fa31bb571218aec31087c.camel@linux.intel.com>
+Subject: Re: [PATCH v4 0/9] Linear Address Masking (LAM) KVM Enabling
+From:   Robert Hoo <robert.hu@linux.intel.com>
+To:     Chao Gao <chao.gao@intel.com>
+Cc:     seanjc@google.com, pbonzini@redhat.com, yu.c.zhang@linux.intel.com,
+        yuan.yao@linux.intel.com, jingqi.liu@intel.com,
+        weijiang.yang@intel.com, isaku.yamahata@intel.com,
+        kirill.shutemov@linux.intel.com, kvm@vger.kernel.org
+Date:   Thu, 09 Feb 2023 20:25:46 +0800
+In-Reply-To: <Y+SPjkY87zzFqHLj@gao-cwp>
+References: <20230209024022.3371768-1-robert.hu@linux.intel.com>
+         <Y+SPjkY87zzFqHLj@gao-cwp>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-10.el7) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 09, 2023 at 01:12:17PM +0100, Nina Schoetterl-Glausch wrote:
-> On Thu, 2023-02-09 at 10:04 +0000, Daniel P. Berrangé wrote:
-> > On Wed, Feb 08, 2023 at 06:35:39PM +0100, Nina Schoetterl-Glausch wrote:
-> > > On Wed, 2023-02-01 at 14:20 +0100, Pierre Morel wrote:
-> > > > When the guest asks to change the polarity this change
-> > > > is forwarded to the admin using QAPI.
-> > > > The admin is supposed to take according decisions concerning
-> > > > CPU provisioning.
-> > > > 
-> > > > Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> > > > ---
-> > > >  qapi/machine-target.json | 30 ++++++++++++++++++++++++++++++
-> > > >  hw/s390x/cpu-topology.c  |  2 ++
-> > > >  2 files changed, 32 insertions(+)
-> > > > 
-> > > > diff --git a/qapi/machine-target.json b/qapi/machine-target.json
-> > > > index 58df0f5061..5883c3b020 100644
-> > > > --- a/qapi/machine-target.json
-> > > > +++ b/qapi/machine-target.json
-> > > > @@ -371,3 +371,33 @@
-> > > >    },
-> > > >    'if': { 'all': [ 'TARGET_S390X', 'CONFIG_KVM' ] }
-> > > >  }
-> > > > +
-> > > > +##
-> > > > +# @CPU_POLARITY_CHANGE:
-> > > > +#
-> > > > +# Emitted when the guest asks to change the polarity.
-> > > > +#
-> > > > +# @polarity: polarity specified by the guest
-> > > > +#
-> > > > +# The guest can tell the host (via the PTF instruction) whether the
-> > > > +# CPUs should be provisioned using horizontal or vertical polarity.
-> > > > +#
-> > > > +# On horizontal polarity the host is expected to provision all vCPUs
-> > > > +# equally.
-> > > > +# On vertical polarity the host can provision each vCPU differently.
-> > > > +# The guest will get information on the details of the provisioning
-> > > > +# the next time it uses the STSI(15) instruction.
-> > > > +#
-> > > > +# Since: 8.0
-> > > > +#
-> > > > +# Example:
-> > > > +#
-> > > > +# <- { "event": "CPU_POLARITY_CHANGE",
-> > > > +#      "data": { "polarity": 0 },
-> > > > +#      "timestamp": { "seconds": 1401385907, "microseconds": 422329 } }
-> > > > +#
-> > > > +##
-> > > > +{ 'event': 'CPU_POLARITY_CHANGE',
-> > > > +  'data': { 'polarity': 'int' },
-> > > > +   'if': { 'all': [ 'TARGET_S390X', 'CONFIG_KVM'] }
-> > > 
-> > > I wonder if you should depend on CONFIG_KVM or not. If tcg gets topology
-> > > support it will use the same event and right now it would just never be emitted.
-> > > On the other hand it's more conservative this way.
-> > > 
-> > > I also wonder if you should add 'feature' : [ 'unstable' ].
-> > > On the upside, it would mark the event as unstable, but I don't know what the
-> > > consequences are exactly.
+On Thu, 2023-02-09 at 14:15 +0800, Chao Gao wrote:
+> On Thu, Feb 09, 2023 at 10:40:13AM +0800, Robert Hoo wrote:
+> > Intercept CR4.LAM_SUP by KVM, to avoid read VMCS field every time,
+> > with
+> > expectation that guest won't toggle this bit frequently.
 > > 
-> > The intention of this flag is to allow mgmt apps to make a usage policy
-> > decision.
-> > 
-> > Libvirt's policy is that we'll never use features marked unstable.
+> > Under EPT mode, CR3 is fully under guest control, guest LAM is thus
+> > transparent to
+> > KVM. Nothing more need to do.
 > 
-> Does it enforce that, e.g via compat policies?
+> I don't think it is correct. You have to strip LAM_U57/U48 from CR3
+> when
+> walking guest page table and strip metadata from pointers when
+> emulating
+> instructions.
+> 
+Yes, has added patch 8 for emulation case. Didn't explicitly note it in
+cover letter.
+> > 
+> > For Shadow paging (EPT = off), KVM need to handle guest CR3.LAM_U48
+> > and CR3.LAM_U57
+> > toggles.
+> > 
+> > [1] ISE Chap10 https://cdrdv2.intel.com/v1/dl/getContent/671368
+> > (Section 10.6 VMX interaction)
+> > [2] Thus currently, Kernel enabling patch only enables LAM_U57. 
+> > https://lore.kernel.org/lkml/20230123220500.21077-1-kirill.shutemov@linux.intel.com/
+> >  
+> 
+> Please add a kvm-unit-test or kselftest for LAM, particularly for
+> operations (e.g., canonical check for supervisor pointers, toggle
+> CR4.LAM_SUP) which aren't covered by the test in Kirill's series.
 
-The policy is applied at time of code review, in that we'll not
-merge patches that use features marked unstable.
-
-> If so, I assume there is some way to allow use of unstable features in libvirt for development?
-> If for example you're prototyping a new mgmt feature that uses unstable commands.
-
-You can prototype usage in libvirt in a fork of course, but we
-won't take patches into the libvirt upstream repo.
-
-Alternatively in some cases the the libvirt QMP passthrough can
-be used for experiemnts (eg virsh qemu-monitor-command ) in a
-non-production envionrment.
-
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+OK, I can explore for kvm-unit-test in separate patch set.
+BTW, this patch set has passed guest running Kirill's kselftests.
 
