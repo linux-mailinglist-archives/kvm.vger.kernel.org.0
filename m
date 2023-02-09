@@ -2,130 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8DBA669146E
-	for <lists+kvm@lfdr.de>; Fri, 10 Feb 2023 00:31:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 74926691497
+	for <lists+kvm@lfdr.de>; Fri, 10 Feb 2023 00:36:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230497AbjBIXbi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Feb 2023 18:31:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38594 "EHLO
+        id S231288AbjBIXgP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Feb 2023 18:36:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230388AbjBIXbg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Feb 2023 18:31:36 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07ABD76B3;
-        Thu,  9 Feb 2023 15:31:33 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S231220AbjBIXfo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Feb 2023 18:35:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C21A66E8B8
+        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 15:34:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675985672;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=TYT45XB4DWXycv/oNPbZHzoL4jOw/uhzINL37WWviCI=;
+        b=A8Sq7J05ujDRReAAtr7qXBnbbkqKdylylUzHhXTPugvrCdBYTvZUW/CiJCmo+9SdNH/wct
+        0M7hum9sPhD8xhxfz1WoDduK1+u8XOY/UXJRtJCQCW/EnmmlvzpgFTPQ95ZGAOOKt2azGA
+        YwC3DN/MsYEpOXGPzQOQfJzxbgTxzFU=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-288-Ny2QYQhtMr--h0DAvMYLsw-1; Thu, 09 Feb 2023 18:34:29 -0500
+X-MC-Unique: Ny2QYQhtMr--h0DAvMYLsw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 78137B82361;
-        Thu,  9 Feb 2023 23:31:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E0F6C433EF;
-        Thu,  9 Feb 2023 23:31:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1675985491;
-        bh=O69LuhcZctd57x4lhJFdI4eIyFQSa4iSqPKotAdsMPs=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ufFIYrT9UvLFb9qyPXt821NOnhRi4wl83XuBhkKVoT3uRaTvaXkMYdTvXuBlRiVCH
-         lL4Vxuewop0JrgU9U1VGZZ59u8rjcYnZB007pA+WN9gR7juX7RHjo6rZSxIvz78jWc
-         bWyP1tL9I1gNbOJ8fL1pkm1qYlIZmwEKboE5b8u3CnWaQcwtN7MYEJf3DqtTXwjo0f
-         YgDAFykZxjYhC1sTpsyozbKJ40tQajhzMCx9uMoL4d/1oEFrs3y8cY86s9fCB+8Svm
-         IFTjkcK9wM14PFlw1Ssh/zSpN5C/Zc5tmp/mAoOSV2cmPkqs2u1hcVwdZ8B79sswW6
-         x7IVYN87AT3VA==
-Date:   Thu, 9 Feb 2023 23:31:24 +0000
-From:   Conor Dooley <conor@kernel.org>
-To:     Anup Patel <apatel@ventanamicro.com>
-Cc:     Conor Dooley <conor.dooley@microchip.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Stephano Cetola <stephano@riscv.org>,
-        Jeff Scheel <jeff@riscv.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>, pbonzini@redhat.com,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        ajones@ventanamicro.com, anup@brainfault.org, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/7] RISC-V: Detect AIA CSRs from ISA string
-Message-ID: <Y+WCTDgtTwLB/8re@spud>
-References: <20230128072737.2995881-3-apatel@ventanamicro.com>
- <mhng-0f9bdf58-5289-4db4-8fd7-38898824c44f@palmer-ri-x1c9>
- <CAK9=C2X8C4yswGhDwe1OzQXTELXQxp8=ayiFxh1aVMk4TxeDjw@mail.gmail.com>
- <Y+KS16ZNXrDU+xun@spud>
- <CAOnJCUKKRRCrKN17ytczYXVLTcMkFaZsg6QXKjPUuSk=PqL6JQ@mail.gmail.com>
- <Y+K3FyGrNUQJZao8@spud>
- <CAK9=C2VnkK5GNO4D1AWpiNcTE=OrSueN9NAyhR7rj9csuUi4Mg@mail.gmail.com>
- <Y+OcId2PZ0pi5T08@wendy>
- <CAK9=C2VeyJMHocZMQTZoULveAcH0kdH2vBKZYFt5kq9dMYP_Bw@mail.gmail.com>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0D77C1C05AB0;
+        Thu,  9 Feb 2023 23:34:29 +0000 (UTC)
+Received: from secure.mitica (unknown [10.39.192.29])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 11BEF440BC;
+        Thu,  9 Feb 2023 23:34:26 +0000 (UTC)
+From:   Juan Quintela <quintela@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     kvm@vger.kernel.org,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        Juan Quintela <quintela@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Subject: [PULL 00/17] Migration 20230209 patches
+Date:   Fri, 10 Feb 2023 00:34:09 +0100
+Message-Id: <20230209233426.37811-1-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="Vv2d+yOSyM4AvbL5"
-Content-Disposition: inline
-In-Reply-To: <CAK9=C2VeyJMHocZMQTZoULveAcH0kdH2vBKZYFt5kq9dMYP_Bw@mail.gmail.com>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+The following changes since commit 417296c8d8588f782018d01a317f88957e9786d6:
 
---Vv2d+yOSyM4AvbL5
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+  tests/qtest/netdev-socket: Raise connection timeout to 60 seconds (2023-02-09 11:23:53 +0000)
 
-Hey all,
+are available in the Git repository at:
 
-Just circling back to this one, since the reply from Palmer was to
-another thread with a much smaller CC list.
+  https://gitlab.com/juan.quintela/qemu.git tags/migration-20230209-pull-request
 
-On Wed, Feb 08, 2023 at 08:27:23PM +0530, Anup Patel wrote:
-> On Wed, Feb 8, 2023 at 6:27 PM Conor Dooley <conor.dooley@microchip.com> =
-wrote:
-> > On Wed, Feb 08, 2023 at 09:24:28AM +0530, Anup Patel wrote:
+for you to fetch changes up to 858191aebda251a4d1e3bc77b238096673241cdd:
 
-> > > The presence of S*aia in ISA string only implies that AIA extended
-> > > local interrupt CSRs are implemented by the underlying RISC-V
-> > > implementation.
-> >
-> > Would you mind linking to where this is documented & explaining in your
-> > commit message why it is okay operate on the basis of s*aia in the ISA
-> > string only mandates the presence of the CSRs and nothing more.
-> >
-> > I think when I was reading it last night, I saw some commentary in this
-> > vein in Section 1.6 of the rc2 spec. Although IIRC it noted changes in
-> > interrupt behaviour there too, so I'm not sure if that section is what =
-you
-> > are referring to here.
-> >
-> > Perhaps this is all just a good argument for providing more information
-> > in commit messages ;)
->=20
-> Sure, I am anyway going to send v3 after rebase so I will cite the
-> Section 1.6 of AIA spec in the commit description.
+  migration: Postpone postcopy preempt channel to be after main (2023-02-09 21:26:02 +0100)
 
-We had a nice conversation about this on during the weekly patchwork
-sync call :)
-The end result of that one was "inconclusive" and the outcome appears to
-be that we will wait until the entire spec is frozen before doing
-anything here.
-Palmer left a comment in response to another thread to that effect:
-https://lore.kernel.org/linux-riscv/mhng-474f7ecd-65b8-4cfa-8b75-e51b896cc5=
-8e@palmer-ri-x1c9/
+----------------------------------------------------------------
+Migration Pull request
 
-Cheers,
-Conor.
+Hi
 
+This are all the reviewed patches for migration:
+- AVX512 support for xbzrle (Ling Xu)
+- /dev/userfaultd support (Peter Xu)
+- Improve ordering of channels (Peter Xu)
+- multifd cleanups (Li Zhang)
+- Remove spurious files from last merge (me)
+  Rebase makes that to you
+- Fix mixup between state_pending_{exact,estimate} (me)
+- Cache RAM size during migration (me)
+- cleanup several functions (me)
 
---Vv2d+yOSyM4AvbL5
-Content-Type: application/pgp-signature; name="signature.asc"
+Please apply.
 
------BEGIN PGP SIGNATURE-----
+----------------------------------------------------------------
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCY+WCTAAKCRB4tDGHoIJi
-0q6sAP49zNucepjSQABZqre91PwzpDcltIfXd1XLoWl0qDu0CQD7BAx2at0D4LVx
-XsqZPYOLysSc280F7lsVo8sayoX3Egs=
-=wLGy
------END PGP SIGNATURE-----
+Juan Quintela (7):
+  migration: Remove spurious files
+  migration: Simplify ram_find_and_save_block()
+  migration: Make find_dirty_block() return a single parameter
+  migration: Split ram_bytes_total_common() in two functions
+  migration: Calculate ram size once
+  migration: Make ram_save_target_page() a pointer
+  migration: I messed state_pending_exact/estimate
 
---Vv2d+yOSyM4AvbL5--
+Li Zhang (2):
+  multifd: cleanup the function multifd_channel_connect
+  multifd: Remove some redundant code
+
+Peter Xu (6):
+  linux-headers: Update to v6.1
+  util/userfaultfd: Support /dev/userfaultfd
+  migration: Rework multi-channel checks on URI
+  migration: Cleanup postcopy_preempt_setup()
+  migration: Add a semaphore to count PONGs
+  migration: Postpone postcopy preempt channel to be after main
+
+ling xu (2):
+  AVX512 support for xbzrle_encode_buffer
+  Update bench-code for addressing CI problem
+
+ MAINTAINERS                                   |    1 +
+ .../x86_64-quintela-devices.mak               |    7 -
+ .../x86_64-quintela2-devices.mak              |    6 -
+ meson.build                                   |   17 +
+ include/standard-headers/drm/drm_fourcc.h     |   34 +-
+ include/standard-headers/linux/ethtool.h      |   63 +-
+ include/standard-headers/linux/fuse.h         |    6 +-
+ .../linux/input-event-codes.h                 |    1 +
+ include/standard-headers/linux/virtio_blk.h   |   19 +
+ linux-headers/asm-generic/hugetlb_encode.h    |   26 +-
+ linux-headers/asm-generic/mman-common.h       |    2 +
+ linux-headers/asm-mips/mman.h                 |    2 +
+ linux-headers/asm-riscv/kvm.h                 |    4 +
+ linux-headers/linux/kvm.h                     |    1 +
+ linux-headers/linux/psci.h                    |   14 +
+ linux-headers/linux/userfaultfd.h             |    4 +
+ linux-headers/linux/vfio.h                    |  142 ++
+ migration/migration.h                         |   15 +-
+ migration/postcopy-ram.h                      |    4 +-
+ migration/xbzrle.h                            |    4 +
+ migration/migration.c                         |  122 +-
+ migration/multifd.c                           |   70 +-
+ migration/postcopy-ram.c                      |   31 +-
+ migration/ram.c                               |  136 +-
+ migration/savevm.c                            |   56 +-
+ migration/xbzrle.c                            |  124 ++
+ tests/bench/xbzrle-bench.c                    |  473 ++++++
+ tests/unit/test-xbzrle.c                      |   42 +-
+ util/userfaultfd.c                            |   32 +
+ meson_options.txt                             |    2 +
+ migration/multifd.c.orig                      | 1274 -----------------
+ scripts/meson-buildoptions.sh                 |    3 +
+ tests/bench/meson.build                       |    4 +
+ util/trace-events                             |    1 +
+ 34 files changed, 1257 insertions(+), 1485 deletions(-)
+ delete mode 100644 configs/devices/x86_64-softmmu/x86_64-quintela-devices.mak
+ delete mode 100644 configs/devices/x86_64-softmmu/x86_64-quintela2-devices.mak
+ create mode 100644 tests/bench/xbzrle-bench.c
+ delete mode 100644 migration/multifd.c.orig
+
+-- 
+2.39.1
+
