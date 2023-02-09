@@ -2,170 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B38FB69037A
-	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 10:23:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7408769041C
+	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 10:49:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230325AbjBIJXP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Feb 2023 04:23:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53714 "EHLO
+        id S229935AbjBIJtL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Feb 2023 04:49:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230208AbjBIJWz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Feb 2023 04:22:55 -0500
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6923C611FB
-        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 01:22:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1675934533; x=1707470533;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=kt0juqwdwQSuoi6HpK6OmaLVIPiZRkaQIvFAXBDzIig=;
-  b=LKyv+9Rj8x8l/rlAM8I3L9Ag2Xcg/UNyLZSoHEgPNu6OAP05Qyl6Ah5i
-   CtF6NBybV7Bg/n3YmYSgF4IIx+HIa+KXctBXfD55X7DW6rp4VFEDlpIwO
-   4qfau+idRZJjzlpxmkBF4IAoP4wf0yihbAWmbdH6uzaITF+UMvrWYT5JJ
-   aAujB8ZqgDs+1DYPDnrVp5QFN8AwVleYWsq6oa8SXJpIu91cOqH3ffKqB
-   EQ1qOGZMIM5NVJfyZZbzbjkD7sf5zF2gm/2XJKb1Y6qrZOZyjb2WZbE33
-   tUMO1eBufeLq+5XYaYeDlVrRR6vwevo0+qCiFLkjduoFkrEUxVNINHiH5
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10615"; a="309708460"
-X-IronPort-AV: E=Sophos;i="5.97,283,1669104000"; 
-   d="scan'208";a="309708460"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2023 01:21:09 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10615"; a="699980859"
-X-IronPort-AV: E=Sophos;i="5.97,283,1669104000"; 
-   d="scan'208";a="699980859"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga001.jf.intel.com with ESMTP; 09 Feb 2023 01:21:08 -0800
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Thu, 9 Feb 2023 01:21:08 -0800
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Thu, 9 Feb 2023 01:21:08 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16 via Frontend Transport; Thu, 9 Feb 2023 01:21:08 -0800
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.105)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.16; Thu, 9 Feb 2023 01:21:07 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XNJ2SZ+U+xoq4NsDH2xwy/UQ8itk/uV35SKwVrc+U+ZRJ5KCxlo+HRRrAoM/vNQQPnn2zbXJ5rSCw0Bq3+VThXhcuLdzI+Ky6NZdLHoEfl7jqcLHk98BsB7kIfszcHzGGgj7cryplxT38SnIGZRMzdZF8HucUE+Cq9JUmBBr3W5OS869YOUWFKt8MTpWqJejagPCjSBfxOTuH7Qw9ybat+l6cK4YY8mB6LylRoC7SG0ZO9aNLoSJH5P6G/Ry0xG/mMSqZ/Wfx89c0CzxOo9N7BEovAlVOEu4jr2TWn5hmXKi2m8IyleaCoC+9ygeSQHDOZOOKW1CXB52M2tOGv37OQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AFrb/arQppWnpkgkWhgJ0pqGCVmCVO+3QM97CIdXzcA=;
- b=iJlUmNPbzh22oZviTNgkhb43ndIr/EzXwKRf27VjTDNXwKkU+Te9TZh2m1M7EekiV7c+BhZxGVubMXdRUhHqsupIA25PwLHpyNtJAppUVQKKrg133mY+5WKtoj8loHYZbcRaKl/wYseTHMc0/Ia09VeNWnRINPRzpOZ14nALnCR2aBARcwSymbCCcu8zNYObP1YpQQ8fLRFFrB46QCBbyvKwWaZe9ppk7Q4+vn6R8YTZZWJOHXT92itv1oxHYA09uy4V5jlSLyHYvQ3X8M0ggc/iLfl3oTl7Ud7FAxfibjmofYu8Ehufw0J05ZC9QKX71dOLEljUUzag5iYbZtJmhw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
- by PH0PR11MB4983.namprd11.prod.outlook.com (2603:10b6:510:40::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.19; Thu, 9 Feb
- 2023 09:21:05 +0000
-Received: from PH8PR11MB6780.namprd11.prod.outlook.com
- ([fe80::5cb1:c8ce:6f60:4e09]) by PH8PR11MB6780.namprd11.prod.outlook.com
- ([fe80::5cb1:c8ce:6f60:4e09%7]) with mapi id 15.20.6064.036; Thu, 9 Feb 2023
- 09:21:05 +0000
-Date:   Thu, 9 Feb 2023 17:21:22 +0800
-From:   Chao Gao <chao.gao@intel.com>
-To:     Robert Hoo <robert.hu@linux.intel.com>
-CC:     <seanjc@google.com>, <pbonzini@redhat.com>,
-        <yu.c.zhang@linux.intel.com>, <yuan.yao@linux.intel.com>,
-        <jingqi.liu@intel.com>, <weijiang.yang@intel.com>,
-        <isaku.yamahata@intel.com>, <kirill.shutemov@linux.intel.com>,
-        <kvm@vger.kernel.org>
-Subject: Re: [PATCH v4 1/9] KVM: x86: Intercept CR4.LAM_SUP when LAM feature
- is enabled in guest
-Message-ID: <Y+S7ErkCpUADAn1x@gao-cwp>
-References: <20230209024022.3371768-1-robert.hu@linux.intel.com>
- <20230209024022.3371768-2-robert.hu@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20230209024022.3371768-2-robert.hu@linux.intel.com>
-X-ClientProxiedBy: SG2PR04CA0177.apcprd04.prod.outlook.com
- (2603:1096:4:14::15) To PH8PR11MB6780.namprd11.prod.outlook.com
- (2603:10b6:510:1cb::11)
+        with ESMTP id S229968AbjBIJtJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Feb 2023 04:49:09 -0500
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68B16367C9
+        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 01:49:07 -0800 (PST)
+Received: by mail-wr1-x42d.google.com with SMTP id j23so1210899wra.0
+        for <kvm@vger.kernel.org>; Thu, 09 Feb 2023 01:49:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CTEOGPQnS0TIFLEvZd/nSW2p+ZjRxHWqIwAsKqfTz80=;
+        b=V0SzVGtWKLJJvy1I/BjOPA575rNIE4m6Km+ONa3qI2SCaak0FMA6FvxgHXMklDM7wO
+         pF6iG6q/zKW36VjoPOFaKba5yGdnzjSV+pwQBIm37wAnxVkbM+JekJCfSf1iVLstv1dQ
+         Y4lRPVVsF1E4AjIdZi0qAATZCol4XpBW0Rt1SRp1dx/Z0EUjt4d2Th6whIcvM2DIhdj6
+         gmtXzGOYRe0f2tAi+6cHRqwmhfOXcSUd4oiKTIj5FQpGu38Ed7qLLor7iqqBZVcQ9HF2
+         6qW4ssTi8i2ixrcBB9hCZwjd/sOWDsCbK4wkZWLm0/mVrktu6uIatpNKzY56PKJ4jABH
+         1s4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CTEOGPQnS0TIFLEvZd/nSW2p+ZjRxHWqIwAsKqfTz80=;
+        b=HHYi+G7hjGQmqzCFX/q9AFZKkVODUjunyCFySzh9sDYErwzRoolfwd6/HG2sOxH9p1
+         9nh9KbjPJ/lOiV4h53g2kdgX+rOKEJUk73IKfJiPK7OJbpANOHLC7lOLXqNKNt7jvWaZ
+         ylX0E3HPcb8pUpAFn9W9VZdOvMYUaFaAlrgqgvu+uClFmA+cboC2nAsMnpf1aAv24SsF
+         tgG+tni9IJy9V1Yh+rOGmH0EQHUSnZ8gYcdOuYNXwxd2gyZPjgYOPFJXc0aZIkjQ1dPV
+         HjM4JmhaBP14cB2LdluFkhJiDEwzTDUb0Qa8/A34ih1ccleEbadBc0w78MQ4OOeAW0lx
+         78/Q==
+X-Gm-Message-State: AO0yUKVs2TuWjDBEZdqRXkYF+XWHxsVqSuyBunsidxhp+TbwE3ruee4f
+        JsucTPra6/OsLFNWpuyu4ckh/A==
+X-Google-Smtp-Source: AK7set/zlo+mWdVn4nhTrjKjNcfLDl/mIAyWU45AYYryQiWv4XyrxL+O2BeGHVWc87DSQWF/4zhCVg==
+X-Received: by 2002:a5d:510a:0:b0:2c4:682:5639 with SMTP id s10-20020a5d510a000000b002c406825639mr4191498wrt.1.1675936146028;
+        Thu, 09 Feb 2023 01:49:06 -0800 (PST)
+Received: from ?IPV6:2a02:6b6a:b566:0:8009:2525:9580:8db2? ([2a02:6b6a:b566:0:8009:2525:9580:8db2])
+        by smtp.gmail.com with ESMTPSA id m3-20020adfe0c3000000b002c4084d3472sm809755wri.58.2023.02.09.01.49.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Feb 2023 01:49:05 -0800 (PST)
+Message-ID: <8e2f03e2-9517-aeb4-df60-b36ef3ff3a75@bytedance.com>
+Date:   Thu, 9 Feb 2023 09:49:04 +0000
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR11MB6780:EE_|PH0PR11MB4983:EE_
-X-MS-Office365-Filtering-Correlation-Id: a592090e-9305-4f3c-8bd9-08db0a7ef84f
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: b6mtdjB8VbFLQMG+fAINPI/4pm82ht3P0Kj3GLZQTGIYAjQ1r6jRFbOdImrMonPx4WHGWmcb0TfaHf/Ui8sL4BN4tKrleB48BSJ8bz04rpf4wKoF/ZfRt3oezVM5aqGfcrhTSmvOL7a+86zAeAYNBEVw1hu/MFpLrfCGeaKJKqxw5fMDL9WyG/xabetkJCZEcNFU9Cts6b5bgtmJ2uWki/WORJoNXow3ZbQre9UvO9obsa9Qiej9naIQP5JpymuYdRy/UOloxwhm4NGDForKo68+ysr2RwZh2tdip/Xc6rmzkyervY+7DA0DXBcTgGorln8gRS7F7jgynij6vyoGPfTJ+H4erd+m6Gpnh1so62TqEySc9nsu/kOlgHXdi7nTcCYYgr46mhabKT80nehMQXSZRs/YaSxmYzJnLUCwjyfX6/kmPb1E1l/BwUAZRFrcd6phxWkPOHJGqdDGLCPCn6ex9pamEEMGyaKuf3EyD+gBz0VAymv8aHDL7FJZYvmGQ/+2Xkk6lUjWsJ1VHaltoviaDaH+/ApAX40P3fDabrZR53v70WUDq3yISqeRo59AtkEb51ez3uPCz+o6hknBinaGzp2AV6nOLA2gSaEJKgFLlFWXXkiXoc/vTccf9/4qxKAdwexPO+xK1WdxISz9uZFoA33VyeK9tupaMTzdqeenuUvT2rYyM3Kl+BMFZX1Q
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB6780.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(7916004)(346002)(376002)(136003)(396003)(39860400002)(366004)(451199018)(6666004)(41300700001)(8676002)(6916009)(4326008)(66946007)(66556008)(66476007)(82960400001)(33716001)(38100700002)(86362001)(6506007)(4744005)(44832011)(2906002)(6512007)(9686003)(8936002)(5660300002)(26005)(186003)(6486002)(478600001)(316002)(67856001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?jQhYtDZbRPdM+1BwcOieWasEKHPqD6NQzWNzBBDzGCEku7cRFwZtSjgi6w52?=
- =?us-ascii?Q?Ug3iW2Iorqfr2Px9FHVuNsVjAkelMILz9WR/V0pQnTDM2keQKjt0yMN6ZJiG?=
- =?us-ascii?Q?Xpi6ldCoc6oPsi+wSku8NDoKZ/iC0M3e2xZbLjbnt9fxHSFv+u7P86Gb24Cr?=
- =?us-ascii?Q?bwRXMo8Ra1FUQQN2R1WyRx0mvCl8+zg4e6ympauM2Ah4sIToqWtMLGy/s/gH?=
- =?us-ascii?Q?f/SzdG2B3sVZA9Jp5bLKeIoNBNhkOQu9YJIFE6fT4r4Y+E9klYW11A7zWyGS?=
- =?us-ascii?Q?DJ/kOqWMqlP76QWm1eu7UWKuTfWuJmvXwx6ismZVmIhTSITNIx8KPklgzpin?=
- =?us-ascii?Q?XA5ksYIDvAPdBtELOUflg89z9ctnudnoc0fqWUdjmlLQ2xa6FdkFsxH/bOT6?=
- =?us-ascii?Q?+sHctKgrM61BMTK8rsA6AZYKYTtH2LlFtJea8GISn3fofie9rISL7AegucxC?=
- =?us-ascii?Q?B3jso7z+VmYC4o6LqPQpbT7EaCZH7qQfL3f1MAb88O2virs+ZlhkGExuWXAQ?=
- =?us-ascii?Q?g/D9ESjHRGyr0JOqCTm4oK5zC1AxXoCscsQ7A1ZIfAKEqVZJsQIzEC2VvYcC?=
- =?us-ascii?Q?j+3TCJdZenXLnr3xKdyiXfyHv4Bux2b0s+YeDtRae1yPIumzek4go79j5OoQ?=
- =?us-ascii?Q?hCriUTJXMMGm6k7HcfWHsk6Y4N/b7Kh3FVuFwFetI0olUQlvimNJP79HfOEu?=
- =?us-ascii?Q?1OFJdGC3NTBFXcobq+WqWHVkoEl0qq47ZsjXbqW/V8d1CHJIbf/MDo78PbKB?=
- =?us-ascii?Q?HAwdgI2XJcY8zeCJvl29qToUOsVYjbvixCIbGNhK8SjWSlTZ0pzu9sba3IyG?=
- =?us-ascii?Q?o24Dd8KZp11x5RTRloCFH960RpNLW1L6vX4kI+5Gq/lXZZJuYODYsYr7IzM2?=
- =?us-ascii?Q?psb5IGhiHBtyxw5few184+iZki1bUD0kwj3vTPpqtaC47NZ6HaOKjebW7V4c?=
- =?us-ascii?Q?Y3UGfLirrmgsX/tyA9nFdKue7niBOzlufzAqqXH3Tf9GcffbTSGicNWO5wkw?=
- =?us-ascii?Q?98JNclEXLVjQeh2HZbhBaAH1UcR2Hi89u9TPgRHZ6lrEviU6v7al7LwnJ8gy?=
- =?us-ascii?Q?ci/XqS1CSzbncVhDjrDUt2s8+2zTKWTy5CmwNdeRXYEnZFmCnlV27BbQNSac?=
- =?us-ascii?Q?qXkkf6GrTyW8WPOEAKWTVQV/utqfO0Z8hx/H3Oy523DQbJBDXgTcp2t4Zn9m?=
- =?us-ascii?Q?blAMhlWFtyb3O1VE2OitHISI6DnKCavIALL4uhZEkEOEmfTOzflnHHzBT328?=
- =?us-ascii?Q?tzojuZRarD7cDzEK0M9Y4/KQaTNgVG/lUEWNP761BsiYnNH8WpDe9QIZ0T9A?=
- =?us-ascii?Q?JloX0/zr2lmE7N0asx5rzmIVHUTBSOEH1fAackuIMt6w33kG6u0Rs1iatWy2?=
- =?us-ascii?Q?yXvuhpLMgwzgKWoXY0NY4Az0V+wzRVO1puibgxNSJ/+LVTGdSr04R3d7PbVQ?=
- =?us-ascii?Q?mniU8ImEeDBftoWpYcRM12qQosizje/Ulr8ZuRLcJVtl+Pgrq5GrVwjtJR1I?=
- =?us-ascii?Q?Z8cnKtYxHWFlW3Nkp2wlWtXeLFTXLkzEImt7g81t8jwATsp+MYJw4LUdZko+?=
- =?us-ascii?Q?qwtJrlrRiADa9Lg5FQ1yp7DqKd97ThNx3iz2G8sx?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a592090e-9305-4f3c-8bd9-08db0a7ef84f
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB6780.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Feb 2023 09:21:05.4613
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Rqo1aGFP1Y9HQzFWHR09yYGUD9XGxqnnUi/TH4DUg7vK54vbuzNaXtCPeFF7X8Vzbha9CcO/dyreLMltM47HxQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4983
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [External] Re: [PATCH v7 0/9] Parallel CPU bringup for x86_64
+Content-Language: en-US
+To:     paulmck@kernel.org, dwmw2@infradead.org, tglx@linutronix.de
+Cc:     kim.phillips@amd.com, arjan@linux.intel.com, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        x86@kernel.org, pbonzini@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, rcu@vger.kernel.org, mimoja@mimoja.de,
+        hewenliang4@huawei.com, thomas.lendacky@amd.com, seanjc@google.com,
+        pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
+        punit.agrawal@bytedance.com, simon.evans@bytedance.com,
+        liangma@liangbit.com
+References: <20230207230436.2690891-1-usama.arif@bytedance.com>
+ <20230209035300.GA3216394@paulmck-ThinkPad-P17-Gen-1>
+From:   Usama Arif <usama.arif@bytedance.com>
+In-Reply-To: <20230209035300.GA3216394@paulmck-ThinkPad-P17-Gen-1>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The subject doesn't match what the patch does; intercepting 
-CR4.LAM_SUP isn't done by this patch. How about:
 
-	Virtualize CR4.LAM_SUP
 
-and in the changelog, explain a bit why CR4.LAM_SUP isn't
-pass-thru'd and why no change to kvm/vmx_set_cr4() is needed.
+On 09/02/2023 03:53, Paul E. McKenney wrote:
+> On Tue, Feb 07, 2023 at 11:04:27PM +0000, Usama Arif wrote:
+>> Tested on v7, doing INIT/SIPI/SIPI in parallel brings down the time for
+>> smpboot from ~700ms to 100ms (85% improvement) on a server with 128 CPUs
+>> split across 2 NUMA nodes.
+>>
+>> The major change over v6 is keeping parallel smp support enabled in AMD.
+>> APIC ID for parallel CPU bringup is now obtained from CPUID leaf 0x0B
+>> (for x2APIC mode) otherwise CPUID leaf 0x1 (8 bits).
+>>
+>> The patch for reusing timer calibration for secondary CPUs is also removed
+>> from the series as its not part of parallel smp bringup and needs to be
+>> further thought about.
+> 
+> Running rcutorture on this got me the following NULL pointer dereference
+> on scenario TREE01:
+> 
+> ------------------------------------------------------------------------
+> 
+> [   34.662066] smpboot: CPU 0 is now offline
+> [   34.674075] rcu: NOCB: Cannot CB-offload offline CPU 25
+> [   35.038003] rcu: De-offloading 5
+> [   35.112997] rcu: Offloading 12
+> [   35.716011] smpboot: Booting Node 0 Processor 0 APIC 0x0
+> [   35.762685] BUG: kernel NULL pointer dereference, address: 0000000000000001
+> [   35.764278] #PF: supervisor instruction fetch in kernel mode
+> [   35.765530] #PF: error_code(0x0010) - not-present page
+> [   35.766700] PGD 0 P4D 0
+> [   35.767278] Oops: 0010 [#1] PREEMPT SMP PTI
+> [   35.768223] CPU: 36 PID: 0 Comm: swapper/36 Not tainted 6.2.0-rc1-00206-g18a37610b632-dirty #3563
+> [   35.770201] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
+> 
+> ------------------------------------------------------------------------
+> 
+> Given an x86 system with KVM and qemu, this can be reproduced by running
+> the following from the top-level directory in the Linux-kernel source
+> tree:
+> 
+> 	tools/testing/selftests/rcutorture/bin/kvm.sh --allcpus --configs "TREE01 TINY01" --trust-make
+> 
+> Out of 15 runs, 14 blew up just after the first attempt to bring CPU
+> 0 back online.  The 15th run blew up just after the second attempt to
+> bring CPU 0 online, the first attempt having succeeded.
+> 
+> My guess is that the CONFIG_BOOTPARAM_HOTPLUG_CPU0=y Kconfig option is
+> tickling this bug.  This Kconfig option has been added to the TREE01
+> scenario in the -rcu tree's "dev" branch, which might mean that this test
+> would pass on mainline.  But CONFIG_BOOTPARAM_HOTPLUG_CPU0=y is not new,
+> only rcutorture's testing of it.
+> 
+> Thoughts?
+> 
+> 							Thanx, Paul
 
-On Thu, Feb 09, 2023 at 10:40:14AM +0800, Robert Hoo wrote:
->Remove CR4.LAM_SUP (bit 28) from default CR4_RESERVED_BITS, while reserve
+It looks like its because of the initial_gs, initial_stack and
+early_gdt_descr not being setup properly for CPU0 hotplug, i.e. 
+init_cpu_data isnt called in cpu0 hotplug case.
 
-s/(bit 28)//
+Its easy to test, just by doing
+echo 0 > /sys/devices/system/cpu/cpu0/online;
+echo 1 > /sys/devices/system/cpu/cpu0/online;
 
->it in __cr4_reserved_bits() by feature testing.
->
->Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
->Reviewed-by: Jingqi Liu <jingqi.liu@intel.com>
+As a quick check, if we do something like below (probably there is a 
+much better place to set these..), the above hotplug commands will work.
+
+diff --git a/arch/x86/kernel/smpboot.c b/arch/x86/kernel/smpboot.c
+index 3ec5182d9698..184135c47ee5 100644
+--- a/arch/x86/kernel/smpboot.c
++++ b/arch/x86/kernel/smpboot.c
+@@ -1080,6 +1080,7 @@ wakeup_cpu_via_init_nmi(int cpu, unsigned long 
+start_ip, int apicid,
+                                           wakeup_cpu0_nmi, 0, "wake_cpu0");
+
+         if (!boot_error) {
++               initial_gs = per_cpu_offset(cpu);
+                 enable_start_cpu0 = 1;
+                 *cpu0_nmi_registered = 1;
+                 id = apic->dest_mode_logical ? cpu0_logical_apicid : 
+apicid;
+@@ -1188,10 +1189,14 @@ static int do_boot_cpu(int apicid, int cpu, 
+struct task_struct *idle,
+                 boot_error = apic->wakeup_secondary_cpu_64(apicid, 
+start_ip);
+         else if (apic->wakeup_secondary_cpu)
+                 boot_error = apic->wakeup_secondary_cpu(apicid, start_ip);
+-       else
++       else {
++               if(!cpu) {
++                       early_gdt_descr.address = (unsigned 
+long)get_cpu_gdt_rw(cpu);
++                       initial_stack  = idle->thread.sp;
++               }
+                 boot_error = wakeup_cpu_via_init_nmi(cpu, start_ip, apicid,
+                                                      cpu0_nmi_registered);
+-
++       }
+         return boot_error;
+  }
+
+
+
