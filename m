@@ -2,150 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 80470691211
-	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 21:29:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AB9F669121C
+	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 21:32:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229984AbjBIU3H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Feb 2023 15:29:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35570 "EHLO
+        id S229886AbjBIUcf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Feb 2023 15:32:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229525AbjBIU3F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Feb 2023 15:29:05 -0500
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2086.outbound.protection.outlook.com [40.107.237.86])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E8576311A;
-        Thu,  9 Feb 2023 12:29:04 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Aip7gNfKxXe4NHcU+ray6qO0thR5kazRf1Po9jWOjGtrffOfI3xLsaLHkH00wBDviato6SpXZqBkIAgfy/9Cu5B9FxRngjTJNylQqIgGWW3+m1pQ7w7Q53ThPEhfjkZ85cUBTOhKOVMWKuEdG/vNKozWYCTQrWKkEDVoxTE1iyPI3HBqC2X9rXxJwvSPR9l6iQccBWtpmkINegNnTwzruSTsZWEZeGICEYgApBvXAcZVFc8HjLHbXntWZMO57Z8WbB6Q5VsIk3ZfhBJNgss7EFvKls1vst0LXVqQz40m35hFokHCf9h9s6S1hRUzCOfLHe0wdXwx1iSTXCkSeEaneQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sonlHY1cqTCA1UaqbkzKMrVN+/PVDlZRa3iEDrCYyNg=;
- b=A+hkM80s2I/Ll/ioYFii/LuvPWDgXz4HK2qD6DtYdcGCu+u8JpVUFeSbSXAoYEi63PyGLcLju33vBx8uvhiQl8Ug7FY8IVinI54CUHIIrpXXrCGW2HGCC7J1lm1sk2A0TuD43j1y+Hs/J3j1MTUozyCLEe/gu1Fzk8q7EtGw5pk3Cl0Kal5N/7f/5uu2aR6FX9O1h4mJWZvLs/ynMAM1Sd9XBT1bYqU/gF1+lDL1AQYOv4sU5q8jWJWNxfLblubCDHpCMbTbkANGzyTlBx1O08Aa9TF4/eXC9y5xrvGMeTjmjdhX7L/4OobmOOBnytcYAwjQHffT9pVZAsp5g5utxw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.233) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sonlHY1cqTCA1UaqbkzKMrVN+/PVDlZRa3iEDrCYyNg=;
- b=gzD48ZN9y92Or1JS+Mze9ZU3FPgR+ezEBqd5wl0tX3gGe5/n0mQm9NK98ROKz4QoZZ0WCy4MbMnmJtEKYWrc1Nmi/gFjrcWrSiF/0R1VznC3GV1MCNcFPnCK5oTkXMX7vTzLe9+EzFh2gb8VYqXVRPEDKuMRUUkl9mv8h4qu5tu8zM52r/CzrKJwmo9BLgxftJ9c5g0CD2KXc0KZbykRwYv/P89r0Or4HFso65xwnGiNyJ9E4RjtmF/BTsL1sXYYOueQmuh2K8wXOXUsIhxeFydxBkpRMJgcnRlTJcd5knUFFlRiU09IabzsJRMiC36g/si2Qoy5dQ9JB4JeN+bP9w==
-Received: from MW4PR04CA0083.namprd04.prod.outlook.com (2603:10b6:303:6b::28)
- by CY5PR12MB6131.namprd12.prod.outlook.com (2603:10b6:930:25::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.17; Thu, 9 Feb
- 2023 20:29:02 +0000
-Received: from CO1PEPF00001A64.namprd05.prod.outlook.com
- (2603:10b6:303:6b:cafe::50) by MW4PR04CA0083.outlook.office365.com
- (2603:10b6:303:6b::28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.17 via Frontend
- Transport; Thu, 9 Feb 2023 20:29:02 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.233) by
- CO1PEPF00001A64.mail.protection.outlook.com (10.167.241.11) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6086.16 via Frontend Transport; Thu, 9 Feb 2023 20:29:01 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
- (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Thu, 9 Feb 2023
- 12:28:47 -0800
-Received: from drhqmail203.nvidia.com (10.126.190.182) by
- drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.36; Thu, 9 Feb 2023 12:28:47 -0800
-Received: from Asurada-Nvidia (10.127.8.9) by mail.nvidia.com (10.126.190.182)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36 via Frontend
- Transport; Thu, 9 Feb 2023 12:28:47 -0800
-Date:   Thu, 9 Feb 2023 12:28:45 -0800
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     "jgg@nvidia.com" <jgg@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>
-CC:     "joro@8bytes.org" <joro@8bytes.org>,
-        "will@kernel.org" <will@kernel.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "shuah@kernel.org" <shuah@kernel.org>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>
-Subject: Re: [PATCH v2 05/10] iommufd: Add replace support in
- iommufd_access_set_ioas()
-Message-ID: <Y+VXfQbXakNSHSLw@Asurada-Nvidia>
-References: <cover.1675802050.git.nicolinc@nvidia.com>
- <931be169ff4a1f4d4f1ed060d722c2dc17ce6667.1675802050.git.nicolinc@nvidia.com>
- <BN9PR11MB5276AE27E37866B82A6E03608CD99@BN9PR11MB5276.namprd11.prod.outlook.com>
+        with ESMTP id S229657AbjBIUce (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Feb 2023 15:32:34 -0500
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4175C643D0
+        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 12:32:05 -0800 (PST)
+Received: by mail-wm1-x32f.google.com with SMTP id c4-20020a1c3504000000b003d9e2f72093so4811443wma.1
+        for <kvm@vger.kernel.org>; Thu, 09 Feb 2023 12:32:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nB6jsWvI4KnWXooPA/ebEwHgK+FEpeXIiOzh7SZEL/A=;
+        b=unwOQ+/JOMefRgHAoXq9SmW5mvkDC93/or2ZnttHNQJgABQm4A3IDpXS0e1+f4R4xX
+         b0xddfWvU8XiZlSdi/wPe7qCM4Y+JAKHf2KenPjYQzcuIpxFK3ikAu5ws8ZwEWfW4FIb
+         y8+Yw9Mc/oEg+4iFsXjMabYFv3gIvgl2uMSU8sQ3hTwnwpJ0R05mBT3CRPYR0fFmiJuc
+         J0UPM/oO2qwIoko9LxExJvRnstRBPPOTJCNM/ltc9mBrEU4hSjTpsOJga4eJSB3xAUIy
+         U6d3OI3v+WOQPSy6lLVAx0UtFLEVzN/cbTcgrO/c2QlRCz34+CvDZW1/IG21Eeflrwmi
+         AGxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nB6jsWvI4KnWXooPA/ebEwHgK+FEpeXIiOzh7SZEL/A=;
+        b=FstpWWZUuQKKAxzzCasJN1A1+JoVZqVtuk9XIyGX/nHhuppswxpRtyEaP6Eel8WmAS
+         r10bqja265OnbUkB29QU8ivuZWT8shtaBHJIvMOX27Q5nKVm4bp7pYE4Xa+zWlRGCAiP
+         IhrVFrW1clRdeozN4uAF4lCVobzcjXnpR3mgBwZnd0j2J2L69vOul31PfAvYhWxs73/a
+         ii+FBm8auTHAZ4CQY5W/HC2xcHNeFQE1k8E5zbiYyqSyC/RJ70RQfVlqHLAETUP21OWZ
+         s5iFiAlma7h9lK82xGp8EYscY+hWOn+P6yS3WH/WkGwWMCYDr+rLiitznlNVBbHVPl2v
+         yvqg==
+X-Gm-Message-State: AO0yUKUubrhO/9k0x+ZV+dSzO6bwWsAeKwPUaHLZSBiXmFzOLAQP+/jN
+        9ncEql5ti7ph84YKj7E+40B0bQ==
+X-Google-Smtp-Source: AK7set+gR2QsBMthdpITGxMwCpqAXfgFbkuskZKUUHe4jacMK7QzidYZYkqwNqYECS4pycwtqYPbCQ==
+X-Received: by 2002:a05:600c:3b17:b0:3df:9858:c032 with SMTP id m23-20020a05600c3b1700b003df9858c032mr7481096wms.7.1675974723779;
+        Thu, 09 Feb 2023 12:32:03 -0800 (PST)
+Received: from ?IPV6:2a02:6b6a:b566:0:8009:2525:9580:8db2? ([2a02:6b6a:b566:0:8009:2525:9580:8db2])
+        by smtp.gmail.com with ESMTPSA id q14-20020a05600c46ce00b003db12112fcfsm3212547wmo.4.2023.02.09.12.32.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Feb 2023 12:32:03 -0800 (PST)
+Message-ID: <9b6bca9c-7189-a2d5-8c0a-f55c24f54b62@bytedance.com>
+Date:   Thu, 9 Feb 2023 20:32:02 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB5276AE27E37866B82A6E03608CD99@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF00001A64:EE_|CY5PR12MB6131:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3f56a5a0-ae73-4c90-0926-08db0adc47d3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: RKXJYAtXcp665dy3pvrF+dHTjYBjtPP+l/b7/4HM2G+gMMPowIknYFW9BjFu21RoeUsRMFfynCXyT8++51DGGqTHxSV9HCSx+VUI6+DaLO47Ds6owLT+qT+GHzUEieBP1JXPjdpuDOagqzdP7dSWU0f8SjZqg6kZc1zqtrZ8TILKynm0co3vZ3RxqDmq44nVZAABxhT3sf9XLtXrGaArz46LCupKjcGwL7/k03MXlShOXrhjYCCTRYEYpg1PZJ/1HcHKWgUxEn4Sw5h3hVCAc0JN5CRXRx/TrNRmmBzxD+kBe4zOBnimiTvC43Z9CzRuWZBwyGLzZGmfE+K43NXWCjYZFW8bE582bLBziYWP+M0VFnodqJkZ6iRjzy+aUCBOOOtNoIbkoCTL1D533i5iLJcEV+cozSfomtn4SEYKiOKcOMlIe9Q70KNroK+dRuPq1TidVdmnc4JMY6S0Zoz45X/6ZFitsaLkBAEUpaxKFL1C174dB9hTiE6xVfLehQEhVMb/xrTf1fUn5vCM4opeeiU5cUOx+sQwVNISM508FYtLYYJMRdOs/axhm8BQtf0g9fatseznc+UL3gdQqezlQ8izMzKgN7IPQKzt06jRO14R9LUp3MbMb61ACHHUdYvC963b7wTqEYfYu+BmXCXn/c/e5hx7HPKLGixGeOYZShPMgN9KT8fFCDUoODkeIGIQMtCFW6JJQlTB8LDMgkNimWKCle0QedxaBEP2TpcEsNU=
-X-Forefront-Antispam-Report: CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230025)(4636009)(376002)(39860400002)(136003)(396003)(346002)(451199018)(36840700001)(40470700004)(46966006)(26005)(316002)(186003)(356005)(8936002)(9686003)(2906002)(55016003)(40480700001)(83380400001)(54906003)(5660300002)(110136005)(40460700003)(7416002)(86362001)(478600001)(36860700001)(70206006)(70586007)(336012)(33716001)(4326008)(47076005)(426003)(8676002)(41300700001)(82740400003)(82310400005)(7636003)(67856001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Feb 2023 20:29:01.6215
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3f56a5a0-ae73-4c90-0926-08db0adc47d3
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1PEPF00001A64.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6131
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [External] Re: [PATCH v8 8/9] x86/mtrr: Avoid repeated save of
+ MTRRs on boot-time CPU bringup
+Content-Language: en-US
+To:     Thomas Gleixner <tglx@linutronix.de>, dwmw2@infradead.org,
+        kim.phillips@amd.com
+Cc:     arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
+        pbonzini@redhat.com, paulmck@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
+        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
+        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
+        simon.evans@bytedance.com, liangma@liangbit.com,
+        David Woodhouse <dwmw@amazon.co.uk>
+References: <20230209154156.266385-1-usama.arif@bytedance.com>
+ <20230209154156.266385-9-usama.arif@bytedance.com> <87mt5m1yiz.ffs@tglx>
+From:   Usama Arif <usama.arif@bytedance.com>
+In-Reply-To: <87mt5m1yiz.ffs@tglx>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 09, 2023 at 03:13:08AM +0000, Tian, Kevin wrote:
- 
-> > --- a/drivers/iommu/iommufd/device.c
-> > +++ b/drivers/iommu/iommufd/device.c
-> > @@ -509,11 +509,23 @@ int iommufd_access_set_ioas(struct
-> > iommufd_access *access, u32 ioas_id)
-> >               iommufd_ref_to_users(obj);
-> >       }
-> >
-> > +     /*
-> > +      * Set ioas to NULL to block any further iommufd_access_pin_pages().
-> > +      * iommufd_access_unpin_pages() can continue using access-
-> > >ioas_unpin.
-> > +      */
-> > +     access->ioas = NULL;
-> > +
-> >       if (cur_ioas) {
-> > +             if (new_ioas) {
-> > +                     mutex_unlock(&access->ioas_lock);
-> > +                     access->ops->unmap(access->data, 0, ULONG_MAX);
-> > +                     mutex_lock(&access->ioas_lock);
-> > +             }
-> 
-> why does above only apply to a valid new_ioas? this is the cleanup on
-> cur_ioas then required even when new_ioas=NULL.
-  
-Though it'd make sense to put it in the common path, our current
-detach routine doesn't call this unmap. If we do so, it'd become
-something new to the normal detach routine. Or does this mean the
-detach routine has been missing an unmap call so far?
 
-Thanks
-Nic
+
+On 09/02/2023 18:31, Thomas Gleixner wrote:
+> On Thu, Feb 09 2023 at 15:41, Usama Arif wrote:
+>>   void mtrr_save_state(void)
+>>   {
+>> +	static bool mtrr_saved;
+>>   	int first_cpu;
+>>   
+>>   	if (!mtrr_enabled())
+>>   		return;
+>>   
+>> +	if (system_state < SYSTEM_RUNNING) {
+>> +		if (!mtrr_saved) {
+>> +			mtrr_save_fixed_ranges(NULL);
+>> +			mtrr_saved = true;
+>> +		}
+>> +		return;
+>> +	}
+>> +
+>>   	first_cpu = cpumask_first(cpu_online_mask);
+>>   	smp_call_function_single(first_cpu, mtrr_save_fixed_ranges, NULL, 1);
+> 
+> So why is this relevant after the initial bringup? The BP MTRRs have
+> been saved already above, no?
+> 
+> Thanks,
+> 
+>          tglx
+
+I will let David confirm if this is correct and why he did it, but this 
+is what I thought while reviewing before posting v4:
+
+- At initial boot (system_state < SYSTEM_RUNNING), when mtrr_save_state 
+is called in do_cpu_up at roughly the same time so MTRR is going to be 
+the same, we can just save it once and then reuse for other secondary 
+cores as it wouldn't have changed for the rest of the do_cpu_up calls.
+
+- When the system is running and you offline and then online a CPU, you 
+want to make sure that hotplugged CPU gets the current MTRR (which might 
+have changed since boot?), incase the MTRR has changed after the system 
+has been booted, you save the MTRR of the first online CPU. When the 
+hotplugged CPU runs its initialisation code, its fixed-range MTRRs will 
+be updated with the newly saved fixed-range MTRRs.
+
+So mainly for hotplug, but will let David confirm.
+
+Thanks,
+Usama
+
