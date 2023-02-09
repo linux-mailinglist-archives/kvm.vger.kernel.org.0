@@ -2,339 +2,324 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B24916909A1
-	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 14:15:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CAB4D6909A6
+	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 14:15:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229657AbjBINPG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Feb 2023 08:15:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41796 "EHLO
+        id S230043AbjBINP1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Feb 2023 08:15:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229447AbjBINPE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Feb 2023 08:15:04 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FE695FE71
-        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 05:14:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675948443;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=m+OXcoCacupTD4tofJsHdhQdQk/1iyMKEWkpC01PgCY=;
-        b=cgbWlrpp39KfEuPLWCHqIOnwzCLDSlt+7NcDG7KRk1OStXeWIrEqVzXeoD4pF0K3asP1bA
-        kSyfVke9zPqOJFWj4pZfMZ5KRojYMLR66B0R+WgDO7Q5hXY0W+BuFNqr9tTJHndivrj2Wv
-        uwVuYE47gBrr28hfFwuUxvFePAD0yv4=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-595-hFmCp0FUOsmbg6iSAnpOhA-1; Thu, 09 Feb 2023 08:14:02 -0500
-X-MC-Unique: hFmCp0FUOsmbg6iSAnpOhA-1
-Received: by mail-qv1-f69.google.com with SMTP id i7-20020a056214020700b004ffce246a2bso1220631qvt.3
-        for <kvm@vger.kernel.org>; Thu, 09 Feb 2023 05:14:02 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=m+OXcoCacupTD4tofJsHdhQdQk/1iyMKEWkpC01PgCY=;
-        b=t1al53Hsd/dQOj5jHJGI62OhSa8L5QXFQRsYL8tsm8ADO7htSNzJEP296rYz9Y0HBz
-         1th0hvlqOPT5IjGC1myTKx7VO4bhB8gRAd5zc9Ii+J/DAtWK2BGFbLMJE4AROkjhyBWm
-         X0ZFZWzPfNy61qUuzR3mY1UVJZJYotZct3hVC9xigBkVimVByzpwus3pWqWKTzI6lv7+
-         J08O1/U//K3WtANTtWs151aSn8/RdrUwR+3QTtykfDaAKlE0BSnPliDUKiTd18dng5Sd
-         hFIEOnNpfZ1z0ZupCxYpmV4HGgOWWCbfHKhAnMelRyFCICRG7xCGe2eeEu6Bg0yjf+I4
-         TuyA==
-X-Gm-Message-State: AO0yUKWhAaGBj/hmD7CWBglKtaqLjOieYvtAuM0XNnDnQK7vfa7haKsq
-        oRMBzt7ah6v/3xYfppmTDsJ0JONnkhZfq4n311371Nfa4JgsrbO8Smo9Odtkfew3OxSwX0X4Juw
-        IMHRhSGKjBsD9
-X-Received: by 2002:a05:622a:15c7:b0:3b9:a6be:56f6 with SMTP id d7-20020a05622a15c700b003b9a6be56f6mr18572030qty.26.1675948441601;
-        Thu, 09 Feb 2023 05:14:01 -0800 (PST)
-X-Google-Smtp-Source: AK7set90jp6zuQheeSrju4UqtIZlbt4C3l9R5ef4fJaMbX6c85xwbOyjU5jKWWUYbgrhTmJpKLP0AQ==
-X-Received: by 2002:a05:622a:15c7:b0:3b9:a6be:56f6 with SMTP id d7-20020a05622a15c700b003b9a6be56f6mr18571990qty.26.1675948441247;
-        Thu, 09 Feb 2023 05:14:01 -0800 (PST)
-Received: from fedora (ec2-3-80-233-239.compute-1.amazonaws.com. [3.80.233.239])
-        by smtp.gmail.com with ESMTPSA id j8-20020ac85c48000000b003b9b41a32b7sm1186146qtj.81.2023.02.09.05.13.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Feb 2023 05:13:59 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Tom Rix <trix@redhat.com>, kvm@vger.kernel.org,
-        llvm@lists.linux.dev, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Subject: Re: [PATCH 2/2] KVM: VMX: Stub out enable_evmcs static key for
- CONFIG_HYPERV=n
-In-Reply-To: <20230208205430.1424667-3-seanjc@google.com>
-References: <20230208205430.1424667-1-seanjc@google.com>
- <20230208205430.1424667-3-seanjc@google.com>
-Date:   Thu, 09 Feb 2023 14:13:57 +0100
-Message-ID: <87mt5n6kx6.fsf@redhat.com>
+        with ESMTP id S230036AbjBINP0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Feb 2023 08:15:26 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70D655FB6E
+        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 05:14:58 -0800 (PST)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 319DDo0w009793;
+        Thu, 9 Feb 2023 13:14:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=FwyOYX2SShSmncmXz1UnTHi5I7coZZqMI3Ba4yi4sSo=;
+ b=CAufNiIVHnl/3uzSk0y1IjIRsPLjI93wD7XDzM4jD091Y6/p6bsnP1onwjjKCV0RVghX
+ MCfFjN2b8HpZkjBfOPDRmOn+Xp5AD5xBk7UX/NP+RDkPhYWjXnWB9bU8scVnYVnD7k0w
+ mv+5MF1SS159GX0ineVqMQ5H8OdGJA0nDZLMjzMgY8p5VDpNOVMlYTFMm/VqThCqFbUO
+ MKB2gLdvBnWaROcQd18GhyXeCJLZW93Bj1XgtNeFfFHjgcmlxxjezLhyqmqVBDjENr4K
+ e8C4w967BsUSk0Q2VYFBkCtTZYg1gOXXG6MFTRjtsHOjQg2rmvpwr32j9dKeFWrqpUOp 3g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nn1hgr0b0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Feb 2023 13:14:27 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 319DEQsk012313;
+        Thu, 9 Feb 2023 13:14:26 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nn1hgr0ak-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Feb 2023 13:14:26 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 319CXVMN023824;
+        Thu, 9 Feb 2023 13:14:24 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3nhf06x890-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Feb 2023 13:14:24 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 319DEKWq24773016
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 9 Feb 2023 13:14:20 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B36062004B;
+        Thu,  9 Feb 2023 13:14:20 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 47BF920040;
+        Thu,  9 Feb 2023 13:14:19 +0000 (GMT)
+Received: from [9.179.24.44] (unknown [9.179.24.44])
+        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Thu,  9 Feb 2023 13:14:19 +0000 (GMT)
+Message-ID: <71a18622-ad84-834c-7981-9f5b6da6dc84@linux.ibm.com>
+Date:   Thu, 9 Feb 2023 14:14:18 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH v15 08/11] qapi/s390x/cpu topology: x-set-cpu-topology
+ monitor command
+Content-Language: en-US
+To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+References: <20230201132051.126868-1-pmorel@linux.ibm.com>
+ <20230201132051.126868-9-pmorel@linux.ibm.com>
+ <5775d58faf9505e561c81baa3807f01a1e0621b4.camel@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <5775d58faf9505e561c81baa3807f01a1e0621b4.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: CYqsLdtJU5yG64TLrTjvKZUaNX3ttDp1
+X-Proofpoint-ORIG-GUID: cS0mPsPUKjeVd5_c9ZOHLrNMpFNvhoeL
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-02-09_08,2023-02-08_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
+ priorityscore=1501 adultscore=0 malwarescore=0 spamscore=0 mlxlogscore=999
+ impostorscore=0 bulkscore=0 suspectscore=0 lowpriorityscore=0
+ clxscore=1015 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302090125
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
 
-> Wrap enable_evmcs in a helper and stub it out when CONFIG_HYPERV=n in
-> order to eliminate the static branch nop placeholders.  clang-14 is clever
-> enough to elide the nop, but gcc-12 is not.  Stubbing out the key reduces
-> the size of kvm-intel.ko by ~7.5% (200KiB) when compiled with gcc-12
-> (there are a _lot_ of VMCS accesses throughout KVM).
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/vmx/hyperv.c  |  4 ++--
->  arch/x86/kvm/vmx/hyperv.h  | 10 ++++++++--
->  arch/x86/kvm/vmx/vmx.c     | 15 +++++++--------
->  arch/x86/kvm/vmx/vmx_ops.h | 22 +++++++++++-----------
->  4 files changed, 28 insertions(+), 23 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/hyperv.c b/arch/x86/kvm/vmx/hyperv.c
-> index b6748055c586..274fbd38c64e 100644
-> --- a/arch/x86/kvm/vmx/hyperv.c
-> +++ b/arch/x86/kvm/vmx/hyperv.c
-> @@ -118,8 +118,6 @@
->  
->  #define EVMCS1_SUPPORTED_VMFUNC (0)
->  
-> -DEFINE_STATIC_KEY_FALSE(enable_evmcs);
-> -
->  #define EVMCS1_OFFSET(x) offsetof(struct hv_enlightened_vmcs, x)
->  #define EVMCS1_FIELD(number, name, clean_field)[ROL16(number, 6)] = \
->  		{EVMCS1_OFFSET(name), clean_field}
-> @@ -611,6 +609,8 @@ int nested_evmcs_check_controls(struct vmcs12 *vmcs12)
->  }
->  
->  #if IS_ENABLED(CONFIG_HYPERV)
-> +DEFINE_STATIC_KEY_FALSE(enable_evmcs);
-> +
->  /*
->   * KVM on Hyper-V always uses the latest known eVMCSv1 revision, the assumption
->   * is: in case a feature has corresponding fields in eVMCS described and it was
-> diff --git a/arch/x86/kvm/vmx/hyperv.h b/arch/x86/kvm/vmx/hyperv.h
-> index 1299143d00df..a0b6d05dba5d 100644
-> --- a/arch/x86/kvm/vmx/hyperv.h
-> +++ b/arch/x86/kvm/vmx/hyperv.h
-> @@ -16,8 +16,6 @@
->  
->  struct vmcs_config;
->  
-> -DECLARE_STATIC_KEY_FALSE(enable_evmcs);
-> -
->  #define current_evmcs ((struct hv_enlightened_vmcs *)this_cpu_read(current_vmcs))
->  
->  #define KVM_EVMCS_VERSION 1
-> @@ -69,6 +67,13 @@ static inline u64 evmcs_read_any(struct hv_enlightened_vmcs *evmcs,
->  
->  #if IS_ENABLED(CONFIG_HYPERV)
->  
-> +DECLARE_STATIC_KEY_FALSE(enable_evmcs);
-> +
-> +static __always_inline bool is_evmcs_enabled(void)
-> +{
-> +	return static_branch_unlikely(&enable_evmcs);
-> +}
 
-I have a suggestion. While 'is_evmcs_enabled' name is certainly not
-worse than 'enable_evmcs', it may still be confusing as it's not clear
-which eVMCS is meant: are we running a guest using eVMCS or using eVMCS
-ourselves? So what if we rename this to a very explicit 'is_kvm_on_hyperv()'
-and hide the implementation details (i.e. 'evmcs') inside?
+On 2/8/23 19:40, Nina Schoetterl-Glausch wrote:
+> On Wed, 2023-02-01 at 14:20 +0100, Pierre Morel wrote:
+>> The modification of the CPU attributes are done through a monitor
+>> command.
+>>
+>> It allows to move the core inside the topology tree to optimise
+>> the cache usage in the case the host's hypervisor previously
+>> moved the CPU.
+>>
+>> The same command allows to modify the CPU attributes modifiers
+>> like polarization entitlement and the dedicated attribute to notify
+>> the guest if the host admin modified scheduling or dedication of a vCPU.
+>>
+>> With this knowledge the guest has the possibility to optimize the
+>> usage of the vCPUs.
+>>
+>> The command is made experimental for the moment.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   qapi/machine-target.json | 29 +++++++++++++
+>>   include/monitor/hmp.h    |  1 +
+>>   hw/s390x/cpu-topology.c  | 88 ++++++++++++++++++++++++++++++++++++++++
+>>   hmp-commands.hx          | 16 ++++++++
+>>   4 files changed, 134 insertions(+)
+>>
+>> diff --git a/qapi/machine-target.json b/qapi/machine-target.json
+>> index 2e267fa458..58df0f5061 100644
+>> --- a/qapi/machine-target.json
+>> +++ b/qapi/machine-target.json
+>> @@ -342,3 +342,32 @@
+>>                      'TARGET_S390X',
+>>                      'TARGET_MIPS',
+>>                      'TARGET_LOONGARCH64' ] } }
+>> +
+>> +##
+>> +# @x-set-cpu-topology:
+>> +#
+>> +# @core: the vCPU ID to be moved
+>> +# @socket: the destination socket where to move the vCPU
+>> +# @book: the destination book where to move the vCPU
+>> +# @drawer: the destination drawer where to move the vCPU
+> 
+> I wonder if it wouldn't be more convenient for the caller if everything is optional.
 
-> +
->  static __always_inline int get_evmcs_offset(unsigned long field,
->  					    u16 *clean_field)
->  {
-> @@ -158,6 +163,7 @@ static inline void evmcs_load(u64 phys_addr)
->  
->  void evmcs_sanitize_exec_ctrls(struct vmcs_config *vmcs_conf);
->  #else /* !IS_ENABLED(CONFIG_HYPERV) */
-> +static __always_inline bool is_evmcs_enabled(void) { return false; }
->  static __always_inline void evmcs_write64(unsigned long field, u64 value) {}
->  static __always_inline void evmcs_write32(unsigned long field, u32 value) {}
->  static __always_inline void evmcs_write16(unsigned long field, u16 value) {}
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 33614ee2cd67..9f0098c9ad64 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -595,7 +595,7 @@ static void hv_reset_evmcs(void)
->  {
->  	struct hv_vp_assist_page *vp_ap;
->  
-> -	if (!static_branch_unlikely(&enable_evmcs))
-> +	if (!is_evmcs_enabled())
->  		return;
->  
->  	/*
-> @@ -2818,8 +2818,7 @@ static int vmx_hardware_enable(void)
->  	 * This can happen if we hot-added a CPU but failed to allocate
->  	 * VP assist page for it.
->  	 */
-> -	if (static_branch_unlikely(&enable_evmcs) &&
-> -	    !hv_get_vp_assist_page(cpu))
-> +	if (is_evmcs_enabled() && !hv_get_vp_assist_page(cpu))
->  		return -EFAULT;
->  
->  	intel_pt_handle_vmx(1);
-> @@ -2871,7 +2870,7 @@ struct vmcs *alloc_vmcs_cpu(bool shadow, int cpu, gfp_t flags)
->  	memset(vmcs, 0, vmcs_config.size);
->  
->  	/* KVM supports Enlightened VMCS v1 only */
-> -	if (static_branch_unlikely(&enable_evmcs))
-> +	if (is_evmcs_enabled())
->  		vmcs->hdr.revision_id = KVM_EVMCS_VERSION;
->  	else
->  		vmcs->hdr.revision_id = vmcs_config.revision_id;
-> @@ -2966,7 +2965,7 @@ static __init int alloc_kvm_area(void)
->  		 * still be marked with revision_id reported by
->  		 * physical CPU.
->  		 */
-> -		if (static_branch_unlikely(&enable_evmcs))
-> +		if (is_evmcs_enabled())
->  			vmcs->hdr.revision_id = vmcs_config.revision_id;
->  
->  		per_cpu(vmxarea, cpu) = vmcs;
-> @@ -3936,7 +3935,7 @@ static void vmx_msr_bitmap_l01_changed(struct vcpu_vmx *vmx)
->  	 * 'Enlightened MSR Bitmap' feature L0 needs to know that MSR
->  	 * bitmap has changed.
->  	 */
-> -	if (IS_ENABLED(CONFIG_HYPERV) && static_branch_unlikely(&enable_evmcs)) {
-> +	if (is_evmcs_enabled()) {
->  		struct hv_enlightened_vmcs *evmcs = (void *)vmx->vmcs01.vmcs;
->  
->  		if (evmcs->hv_enlightenments_control.msr_bitmap)
-> @@ -7313,7 +7312,7 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
->  	vmx_vcpu_enter_exit(vcpu, __vmx_vcpu_run_flags(vmx));
->  
->  	/* All fields are clean at this point */
-> -	if (static_branch_unlikely(&enable_evmcs)) {
-> +	if (is_evmcs_enabled()) {
->  		current_evmcs->hv_clean_fields |=
->  			HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL;
->  
-> @@ -7443,7 +7442,7 @@ static int vmx_vcpu_create(struct kvm_vcpu *vcpu)
->  	 * feature only for vmcs01, KVM currently isn't equipped to realize any
->  	 * performance benefits from enabling it for vmcs02.
->  	 */
-> -	if (IS_ENABLED(CONFIG_HYPERV) && static_branch_unlikely(&enable_evmcs) &&
-> +	if (is_evmcs_enabled() &&
->  	    (ms_hyperv.nested_features & HV_X64_NESTED_MSR_BITMAP)) {
->  		struct hv_enlightened_vmcs *evmcs = (void *)vmx->vmcs01.vmcs;
->  
-> diff --git a/arch/x86/kvm/vmx/vmx_ops.h b/arch/x86/kvm/vmx/vmx_ops.h
-> index db95bde52998..6b072db47fdc 100644
-> --- a/arch/x86/kvm/vmx/vmx_ops.h
-> +++ b/arch/x86/kvm/vmx/vmx_ops.h
-> @@ -147,7 +147,7 @@ static __always_inline unsigned long __vmcs_readl(unsigned long field)
->  static __always_inline u16 vmcs_read16(unsigned long field)
->  {
->  	vmcs_check16(field);
-> -	if (static_branch_unlikely(&enable_evmcs))
-> +	if (is_evmcs_enabled())
->  		return evmcs_read16(field);
->  	return __vmcs_readl(field);
->  }
-> @@ -155,7 +155,7 @@ static __always_inline u16 vmcs_read16(unsigned long field)
->  static __always_inline u32 vmcs_read32(unsigned long field)
->  {
->  	vmcs_check32(field);
-> -	if (static_branch_unlikely(&enable_evmcs))
-> +	if (is_evmcs_enabled())
->  		return evmcs_read32(field);
->  	return __vmcs_readl(field);
->  }
-> @@ -163,7 +163,7 @@ static __always_inline u32 vmcs_read32(unsigned long field)
->  static __always_inline u64 vmcs_read64(unsigned long field)
->  {
->  	vmcs_check64(field);
-> -	if (static_branch_unlikely(&enable_evmcs))
-> +	if (is_evmcs_enabled())
->  		return evmcs_read64(field);
->  #ifdef CONFIG_X86_64
->  	return __vmcs_readl(field);
-> @@ -175,7 +175,7 @@ static __always_inline u64 vmcs_read64(unsigned long field)
->  static __always_inline unsigned long vmcs_readl(unsigned long field)
->  {
->  	vmcs_checkl(field);
-> -	if (static_branch_unlikely(&enable_evmcs))
-> +	if (is_evmcs_enabled())
->  		return evmcs_read64(field);
->  	return __vmcs_readl(field);
->  }
-> @@ -222,7 +222,7 @@ static __always_inline void __vmcs_writel(unsigned long field, unsigned long val
->  static __always_inline void vmcs_write16(unsigned long field, u16 value)
->  {
->  	vmcs_check16(field);
-> -	if (static_branch_unlikely(&enable_evmcs))
-> +	if (is_evmcs_enabled())
->  		return evmcs_write16(field, value);
->  
->  	__vmcs_writel(field, value);
-> @@ -231,7 +231,7 @@ static __always_inline void vmcs_write16(unsigned long field, u16 value)
->  static __always_inline void vmcs_write32(unsigned long field, u32 value)
->  {
->  	vmcs_check32(field);
-> -	if (static_branch_unlikely(&enable_evmcs))
-> +	if (is_evmcs_enabled())
->  		return evmcs_write32(field, value);
->  
->  	__vmcs_writel(field, value);
-> @@ -240,7 +240,7 @@ static __always_inline void vmcs_write32(unsigned long field, u32 value)
->  static __always_inline void vmcs_write64(unsigned long field, u64 value)
->  {
->  	vmcs_check64(field);
-> -	if (static_branch_unlikely(&enable_evmcs))
-> +	if (is_evmcs_enabled())
->  		return evmcs_write64(field, value);
->  
->  	__vmcs_writel(field, value);
-> @@ -252,7 +252,7 @@ static __always_inline void vmcs_write64(unsigned long field, u64 value)
->  static __always_inline void vmcs_writel(unsigned long field, unsigned long value)
->  {
->  	vmcs_checkl(field);
-> -	if (static_branch_unlikely(&enable_evmcs))
-> +	if (is_evmcs_enabled())
->  		return evmcs_write64(field, value);
->  
->  	__vmcs_writel(field, value);
-> @@ -262,7 +262,7 @@ static __always_inline void vmcs_clear_bits(unsigned long field, u32 mask)
->  {
->  	BUILD_BUG_ON_MSG(__builtin_constant_p(field) && ((field) & 0x6000) == 0x2000,
->  			 "vmcs_clear_bits does not support 64-bit fields");
-> -	if (static_branch_unlikely(&enable_evmcs))
-> +	if (is_evmcs_enabled())
->  		return evmcs_write32(field, evmcs_read32(field) & ~mask);
->  
->  	__vmcs_writel(field, __vmcs_readl(field) & ~mask);
-> @@ -272,7 +272,7 @@ static __always_inline void vmcs_set_bits(unsigned long field, u32 mask)
->  {
->  	BUILD_BUG_ON_MSG(__builtin_constant_p(field) && ((field) & 0x6000) == 0x2000,
->  			 "vmcs_set_bits does not support 64-bit fields");
-> -	if (static_branch_unlikely(&enable_evmcs))
-> +	if (is_evmcs_enabled())
->  		return evmcs_write32(field, evmcs_read32(field) | mask);
->  
->  	__vmcs_writel(field, __vmcs_readl(field) | mask);
-> @@ -289,7 +289,7 @@ static inline void vmcs_load(struct vmcs *vmcs)
->  {
->  	u64 phys_addr = __pa(vmcs);
->  
-> -	if (static_branch_unlikely(&enable_evmcs))
-> +	if (is_evmcs_enabled())
->  		return evmcs_load(phys_addr);
->  
->  	vmx_asm1(vmptrld, "m"(phys_addr), vmcs, phys_addr);
+Yes, it is a good point.
 
-With or without the change:
+> 
+>> +# @polarity: optional polarity, default is last polarity set by the guest
+>> +# @dedicated: optional, if the vCPU is dedicated to a real CPU
+>> +#
+>> +# Modifies the topology by moving the CPU inside the topology
+>> +# tree or by changing a modifier attribute of a CPU.
+>> +#
+>> +# Returns: Nothing on success, the reason on failure.
+>> +#
+>> +# Since: <next qemu stable release, eg. 1.0>
+>> +##
+>> +{ 'command': 'x-set-cpu-topology',
+>> +  'data': {
+>> +      'core': 'int',
+>> +      'socket': 'int',
+>> +      'book': 'int',
+>> +      'drawer': 'int',
+> 
+> Did you consider naming those core-id, etc.? It would be consistent with
+> query-cpus-fast/CpuInstanceProperties. Also all your variables end with _id.
+> I don't care really just wanted to point it out.
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+OK, core-id etc. looks better
+
+> 
+>> +      '*polarity': 'int',
+>> +      '*dedicated': 'bool'
+>> +  },
+>> +  'if': { 'all': [ 'TARGET_S390X', 'CONFIG_KVM' ] }
+>> +}
+> 
+> So apparently this is the old way of doing an experimental api.
+> 
+>> Names beginning with ``x-`` used to signify "experimental".  This
+>> convention has been replaced by special feature "unstable".
+> 
+>> Feature "unstable" marks a command, event, enum value, or struct
+>> member as unstable.  It is not supported elsewhere so far.  Interfaces
+>> so marked may be withdrawn or changed incompatibly in future releases.
+
+OK
+
+> 
+>> diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
+>> index 1b3bdcb446..12827479cf 100644
+>> --- a/include/monitor/hmp.h
+>> +++ b/include/monitor/hmp.h
+>> @@ -151,5 +151,6 @@ void hmp_human_readable_text_helper(Monitor *mon,
+>>                                       HumanReadableText *(*qmp_handler)(Error **));
+>>   void hmp_info_stats(Monitor *mon, const QDict *qdict);
+>>   void hmp_pcie_aer_inject_error(Monitor *mon, const QDict *qdict);
+>> +void hmp_x_set_cpu_topology(Monitor *mon, const QDict *qdict);
+>>   
+>>   #endif
+>> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+>> index c33378577b..6c50050991 100644
+>> --- a/hw/s390x/cpu-topology.c
+>> +++ b/hw/s390x/cpu-topology.c
+>> @@ -18,6 +18,10 @@
+>>   #include "target/s390x/cpu.h"
+>>   #include "hw/s390x/s390-virtio-ccw.h"
+>>   #include "hw/s390x/cpu-topology.h"
+>> +#include "qapi/qapi-commands-machine-target.h"
+>> +#include "qapi/qmp/qdict.h"
+>> +#include "monitor/hmp.h"
+>> +#include "monitor/monitor.h"
+>>   
+>>   /*
+>>    * s390_topology is used to keep the topology information.
+>> @@ -379,3 +383,87 @@ void s390_topology_set_cpu(MachineState *ms, S390CPU *cpu, Error **errp)
+>>       /* topology tree is reflected in props */
+>>       s390_update_cpu_props(ms, cpu);
+>>   }
+>> +
+>> +/*
+>> + * qmp and hmp implementations
+>> + */
+>> +
+>> +static void s390_change_topology(int64_t core_id, int64_t socket_id,
+>> +                                 int64_t book_id, int64_t drawer_id,
+>> +                                 int64_t polarity, bool dedicated,
+>> +                                 Error **errp)
+>> +{
+>> +    MachineState *ms = current_machine;
+>> +    S390CPU *cpu;
+>> +    ERRP_GUARD();
+>> +
+>> +    cpu = (S390CPU *)ms->possible_cpus->cpus[core_id].cpu;
+>> +    if (!cpu) {
+>> +        error_setg(errp, "Core-id %ld does not exist!", core_id);
+>> +        return;
+>> +    }
+>> +
+>> +    /* Verify the new topology */
+>> +    s390_topology_check(cpu, errp);
+>> +    if (*errp) {
+>> +        return;
+>> +    }
+>> +
+>> +    /* Move the CPU into its new socket */
+>> +    s390_set_core_in_socket(cpu, drawer_id, book_id, socket_id, true, errp);
+> 
+> The cpu isn't being created, so that should be false instead of true, right?
+
+Yes right, should be "false"
+
+> 
+>> +
+>> +    /* All checks done, report topology in environment */
+>> +    cpu->env.drawer_id = drawer_id;
+>> +    cpu->env.book_id = book_id;
+>> +    cpu->env.socket_id = socket_id;
+>> +    cpu->env.dedicated = dedicated;
+>> +    cpu->env.entitlement = polarity;
+>> +
+>> +    /* topology tree is reflected in props */
+>> +    s390_update_cpu_props(ms, cpu);
+>> +
+>> +    /* Advertise the topology change */
+>> +    s390_cpu_topology_set_modified();
+>> +}
+>> +
+>> +void qmp_x_set_cpu_topology(int64_t core, int64_t socket,
+>> +                         int64_t book, int64_t drawer,
+>> +                         bool has_polarity, int64_t polarity,
+>> +                         bool has_dedicated, bool dedicated,
+>> +                         Error **errp)
+>> +{
+>> +    ERRP_GUARD();
+>> +
+>> +    if (!s390_has_topology()) {
+>> +        error_setg(errp, "This machine doesn't support topology");
+>> +        return;
+>> +    }
+>> +    if (!has_polarity) {
+>> +        polarity = POLARITY_VERTICAL_MEDIUM;
+>> +    }
+>> +    if (!has_dedicated) {
+>> +        dedicated = false;
+>> +    }
+>> +    s390_change_topology(core, socket, book, drawer, polarity, dedicated, errp);
+>> +}
+>> +
+>> +void hmp_x_set_cpu_topology(Monitor *mon, const QDict *qdict)
+>> +{
+>> +    const int64_t core = qdict_get_int(qdict, "core");
+>> +    const int64_t socket = qdict_get_int(qdict, "socket");
+>> +    const int64_t book = qdict_get_int(qdict, "book");
+>> +    const int64_t drawer = qdict_get_int(qdict, "drawer");
+>> +    bool has_polarity    = qdict_haskey(qdict, "polarity");
+>> +    const int64_t polarity = qdict_get_try_int(qdict, "polarity", 0);
+>> +    bool has_dedicated    = qdict_haskey(qdict, "dedicated");
+>> +    const bool dedicated = qdict_get_try_bool(qdict, "dedicated", false);
+>> +    Error *local_err = NULL;
+>> +
+>> +    qmp_x_set_cpu_topology(core, socket, book, drawer,
+>> +                           has_polarity, polarity,
+>> +                           has_dedicated, dedicated,
+>> +                           &local_err);
+>> +    if (hmp_handle_error(mon, local_err)) {
+>> +        return;
+>> +    }
+> 
+> What is the if for? The function ends anyway.
+
+Right, I take it away.
+Thanks.
+
+Regards,
+Pierre
 
 -- 
-Vitaly
-
+Pierre Morel
+IBM Lab Boeblingen
