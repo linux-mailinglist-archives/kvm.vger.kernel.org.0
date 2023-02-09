@@ -2,166 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5EDAC690E3D
-	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 17:19:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8146D690E82
+	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 17:40:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230111AbjBIQT5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Feb 2023 11:19:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36930 "EHLO
+        id S229512AbjBIQkz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Feb 2023 11:40:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229791AbjBIQTu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Feb 2023 11:19:50 -0500
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2081.outbound.protection.outlook.com [40.107.94.81])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECBCF5CBC1;
-        Thu,  9 Feb 2023 08:19:40 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Rssut8R6XR08sLWN9OToOOXDu6xNQx5GC60bI+zFpm5HNz7XPlz/BH8zluv4v9Fuk6A4+IyP32FLBoo5kFMwOszbusMa7F7avantGRu/pjJ+nAR2mqSVo1nYHgB0VlxvsDhYxFb3IJR7gwV1lARAu9F3Xn8k2XGrqBmiQSFRLcWTEWr19Zo1MpbsNTpcxB0A2hlyzqrhf1TuKN1DOYYC0mufaOhICO9XXb5ovadQMP+VoCx4wxU1szEp93TKFpu4o4J6KQ8CRx0sk6aTyqp9l3BrmR9uqja8oTIXyVYQBs9XEaTAY4J8PL4IKA0lPaDiP05fy3RSyE/p0NhMLHg8bg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CO/ZXq5XATc6aa6+0Ckd/maHZ/f0WVz/Vql93RopThU=;
- b=KfvF8/B3SYszVEpSOJgDB60ij6jLKLVJFEUjPI5SH/5wnonwtb3GxPB8u6fl4vmIRn2tDCoBRTtCTpSilif4eDitsI27+ZelSF3kNP6M8PEHE9mb3DFCqOHArv2dt6qucFKAlIH29zb4fBU4/fi6EyyWPi/I8kgztnqGf3gMVttW+1opKb/sFljAW2KSyTGA9TwzRYoS7hJSsxdKou4Rn51HjY4q/Zm5hSBj/teQ59MCApZiOgJD109tLMKIzXn0ElW5GkUJ1zRJh8ZMK3NYPEK4AFPelcuyNegOPGCy1Fb8F1SfGJ+572RnZS7uq+PLo6yrRg52anEgfNO5xwS3TQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CO/ZXq5XATc6aa6+0Ckd/maHZ/f0WVz/Vql93RopThU=;
- b=YnAnsi8ukxFpy3x5d/Cb/iOAnx8L3Dmk8u0xFSzsWFr2eM7VoJQ9wQUBpZ1mYOwKxhTkfU/yrvDAfvpP/l6/nG1HOWSOvEGBSDw0Lg2whyE/ZSA8nGxCYBTCOcOq43dBsMUGV1UKzFgIn3JzunmV/r5wpGre74KWCwPTZa7ScDAzbFGMpXONpHrAu1V/PShisDCeJN4ExoT6lt9o1qOZm10LSZYokgnY9aMaQG8Z69A9a92FeyEYzWdLfM+x72nc/0ryGMvbpYFlehHIXDpXpq8BeW8US16F42sZ9/rqomA1qv0yBWzISIkHJy516N/wxs+aHZwPfMA38N/ljqDbdw==
-Received: from BN9PR03CA0339.namprd03.prod.outlook.com (2603:10b6:408:f6::14)
- by CH3PR12MB8281.namprd12.prod.outlook.com (2603:10b6:610:128::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.17; Thu, 9 Feb
- 2023 16:19:38 +0000
-Received: from BL02EPF000108E9.namprd05.prod.outlook.com
- (2603:10b6:408:f6:cafe::c) by BN9PR03CA0339.outlook.office365.com
- (2603:10b6:408:f6::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.19 via Frontend
- Transport; Thu, 9 Feb 2023 16:19:38 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- BL02EPF000108E9.mail.protection.outlook.com (10.167.241.202) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6086.16 via Frontend Transport; Thu, 9 Feb 2023 16:19:37 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Thu, 9 Feb 2023
- 08:19:21 -0800
-Received: from drhqmail201.nvidia.com (10.126.190.180) by
- drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.36; Thu, 9 Feb 2023 08:19:20 -0800
-Received: from Asurada-Nvidia (10.127.8.9) by mail.nvidia.com (10.126.190.180)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36 via Frontend
- Transport; Thu, 9 Feb 2023 08:19:20 -0800
-Date:   Thu, 9 Feb 2023 08:19:18 -0800
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "will@kernel.org" <will@kernel.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "shuah@kernel.org" <shuah@kernel.org>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>
-Subject: Re: [PATCH v2 10/10] vfio: Do not allow !ops->dma_unmap in
- vfio_pin/unpin_pages()
-Message-ID: <Y+UdBvoSb90cCa40@Asurada-Nvidia>
-References: <cover.1675802050.git.nicolinc@nvidia.com>
- <59e5eeac675172ab1cb07236a3eb3e166553fe71.1675802050.git.nicolinc@nvidia.com>
- <BN9PR11MB527687E27FC35CD842E4EA7B8CD99@BN9PR11MB5276.namprd11.prod.outlook.com>
- <Y+T0d9ox3KnqMDIL@nvidia.com>
+        with ESMTP id S229810AbjBIQkw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Feb 2023 11:40:52 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 727FA663C2
+        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 08:40:43 -0800 (PST)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 319GVfBl030180;
+        Thu, 9 Feb 2023 16:39:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=dbsEsCmzF9fS6ROFbhEfgY/NWOMxGQVEOSsTBmsFrnY=;
+ b=hBBSgrBAdga87uuKdI5qfuRPRIcRubLNgnGqCrCBr9DjtfNE+LBHWl1HMM+bOlK1bLUW
+ ArIfcGp5NfjGAoDcQpKQIE/b6qTxI1syOuDLHu2YWgHcEeuKjJGr1wvsrbKsfPReTcPZ
+ +wk/9AucYZmFdw8HL5iEBM7P0RDemma0f50WreaFcllOyihoqOHzg7EP6L2aeV/BypsX
+ VtZuzniVIM/PmkJBy+Vap6aVeEh6dWTKow25iWLjd+5c25+3rgN5L0Y+5mJL0Vucu2qO
+ x1OFlqNXs96LNM7bQBXzXzUm3PqgQbx/gFWK9+AA0sAhxb+bssB0zc8LjtY0HPzZK8Qt OA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nn4e2897r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Feb 2023 16:39:24 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 319GWl2S000541;
+        Thu, 9 Feb 2023 16:39:24 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nn4e2896f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Feb 2023 16:39:24 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 319CKrOo020939;
+        Thu, 9 Feb 2023 16:39:22 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3nhemfpfmx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Feb 2023 16:39:22 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 319GdII233948108
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 9 Feb 2023 16:39:18 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6AED62004B;
+        Thu,  9 Feb 2023 16:39:18 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0E2AB20043;
+        Thu,  9 Feb 2023 16:39:18 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.156.204])
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Thu,  9 Feb 2023 16:39:17 +0000 (GMT)
+Message-ID: <224677259469c69c61e120a24b7fd0754fd52956.camel@linux.ibm.com>
+Subject: Re: [PATCH v15 03/11] target/s390x/cpu topology: handle STSI(15)
+ and build the SYSIB
+From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+Date:   Thu, 09 Feb 2023 17:39:17 +0100
+In-Reply-To: <20230201132051.126868-4-pmorel@linux.ibm.com>
+References: <20230201132051.126868-1-pmorel@linux.ibm.com>
+         <20230201132051.126868-4-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.3 (3.46.3-1.fc37) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <Y+T0d9ox3KnqMDIL@nvidia.com>
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF000108E9:EE_|CH3PR12MB8281:EE_
-X-MS-Office365-Filtering-Correlation-Id: f76cfd41-2942-48af-186a-08db0ab970f9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: mmDaQRCo8hzKq/Q3D3iK2e/moQnKq4tsF+VKItaA5fP8LGZWpR5FSg3YVLvxqes6/XKjfXvVUN5kxLfUqjYKIybGQC3VCid54LtRaSk72G1eEDVH3B0xBEFhEst4W/7STJJ3VBmW7MgapHB6eOMDRV1sgqsqU/pjcsTbTHgwUKJ83c4nCTDE+ODk+AL3LTQZ8n8xVPihNfqJsHpveuuH5FheeJcri3BTYvHpYFI46HYqZ0kJbKOimWPVKH2FhFDYL4HdGEphjtfqqOtv1qABcKNyXUJkNzcl01cu6UP45AUUsOdnaTBfl1XeVY0lx5G4kTGVToxkLuPCOVcsHZuPCsNFVk2066f7r13Jgia6Po58zCcsFCFTqVuv0X6/g6pQOtBpL1XdTNZU7tfbLcCLG/STlNQcIUDoFrwPCc3woA6esIwVsoHBWtuaZ1NAjWG0Xqik6+dZT8gBGV5LI/IqtA6ht22nSKI2+oWSk4wQqOthGXhPEzv8OBAp4UW7PM3YoZUKaIriYC2P3/BynKRdQufJZbGAjLsySRPxwKYqWVGlGz9QzRhknhsqQ95xCrhFMn1mGJ9Qy8RBbfE7GWNAk28ir5Dz8LwmlSWhcB71y/2NRcwkFjiMK0WYnjXqnKNfuDOJDIpP0nkDc0knmBHJ9ZXXdlTnbCIqWiXIDF+h2YuDpP9JlzNQqAdYcBi7HWeJoV6OfivediN4m+OGUditg4yG4cJKhcoHcmsycHRngxk=
-X-Forefront-Antispam-Report: CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230025)(4636009)(396003)(136003)(346002)(39860400002)(376002)(451199018)(46966006)(36840700001)(40470700004)(4326008)(70586007)(70206006)(8676002)(336012)(36860700001)(7636003)(316002)(33716001)(6636002)(40460700003)(83380400001)(54906003)(86362001)(426003)(5660300002)(7416002)(478600001)(356005)(186003)(26005)(9686003)(2906002)(47076005)(82740400003)(41300700001)(82310400005)(8936002)(6862004)(55016003)(40480700001)(67856001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Feb 2023 16:19:37.7876
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f76cfd41-2942-48af-186a-08db0ab970f9
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BL02EPF000108E9.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8281
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: iO60dT4BFXYxll-OMTI1Bo3C8VGapX5S
+X-Proofpoint-ORIG-GUID: DWeoHxMrdO3uJ8VEOkETEvXP-XOVtlFH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-09_12,2023-02-09_03,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ lowpriorityscore=0 spamscore=0 priorityscore=1501 clxscore=1015
+ adultscore=0 bulkscore=0 mlxscore=0 malwarescore=0 suspectscore=0
+ phishscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2212070000 definitions=main-2302090157
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 09, 2023 at 09:26:15AM -0400, Jason Gunthorpe wrote:
-> On Thu, Feb 09, 2023 at 04:10:04AM +0000, Tian, Kevin wrote:
-> > > From: Nicolin Chen <nicolinc@nvidia.com>
-> > > Sent: Wednesday, February 8, 2023 5:18 AM
-> > > 
-> > > A driver that doesn't implement ops->dma_unmap shouldn't be allowed to
-> > > do
-> > > vfio_pin/unpin_pages(), though it can use vfio_dma_rw() to access an iova
-> > > range. Deny !ops->dma_unmap cases in vfio_pin/unpin_pages().
-> > > 
-> > > Suggested-by: Kevin Tian <kevin.tian@intel.com>
-> > > Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
-> > > ---
-> > >  drivers/vfio/vfio_main.c | 4 ++++
-> > >  1 file changed, 4 insertions(+)
-> > > 
-> > > diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-> > > index 8559c3dfb335..c7f3251ad6e5 100644
-> > > --- a/drivers/vfio/vfio_main.c
-> > > +++ b/drivers/vfio/vfio_main.c
-> > > @@ -1543,6 +1543,8 @@ int vfio_pin_pages(struct vfio_device *device,
-> > > dma_addr_t iova,
-> > > 
-> > >  		if (iova > ULONG_MAX)
-> > >  			return -EINVAL;
-> > > +		if (!device->ops->dma_unmap)
-> > > +			return -EINVAL;
-> > >  		/*
-> > >  		 * VFIO ignores the sub page offset, npages is from the start
-> > > of
-> > >  		 * a PAGE_SIZE chunk of IOVA. The caller is expected to
-> > > recover
-> > > @@ -1580,6 +1582,8 @@ void vfio_unpin_pages(struct vfio_device *device,
-> > > dma_addr_t iova, int npage)
-> > >  	if (device->iommufd_access) {
-> > >  		if (WARN_ON(iova > ULONG_MAX))
-> > >  			return;
-> > > +		if (!device->ops->dma_unmap)
-> > > +			return;
-> > 
-> > IMHO this restriction applies to both iommufd and legacy container.
-> 
-> Yeah that makes sense
+On Wed, 2023-02-01 at 14:20 +0100, Pierre Morel wrote:
+> On interception of STSI(15.1.x) the System Information Block
+> (SYSIB) is built from the list of pre-ordered topology entries.
+>=20
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  include/hw/s390x/cpu-topology.h |  22 +++
+>  include/hw/s390x/sclp.h         |   1 +
+>  target/s390x/cpu.h              |  72 +++++++
+>  hw/s390x/cpu-topology.c         |  10 +
+>  target/s390x/kvm/cpu_topology.c | 335 ++++++++++++++++++++++++++++++++
+>  target/s390x/kvm/kvm.c          |   5 +-
+>  target/s390x/kvm/meson.build    |   3 +-
+>  7 files changed, 446 insertions(+), 2 deletions(-)
+>  create mode 100644 target/s390x/kvm/cpu_topology.c
+>=20
+[...]
+> +
+> +/**
+> + * s390_topology_from_cpu:
+> + * @cpu: The S390CPU
+> + *
+> + * Initialize the topology id from the CPU environment.
+> + */
+> +static s390_topology_id s390_topology_from_cpu(S390CPU *cpu)
+> +{
+> +    s390_topology_id topology_id =3D {0};
+> +
+> +    topology_id.drawer =3D cpu->env.drawer_id;
+> +    topology_id.book =3D cpu->env.book_id;
+> +    topology_id.socket =3D cpu->env.socket_id;
+> +    topology_id.origin =3D cpu->env.core_id / 64;
+> +    topology_id.type =3D S390_TOPOLOGY_CPU_IFL;
+> +    topology_id.dedicated =3D cpu->env.dedicated;
+> +
+> +    if (s390_topology.polarity =3D=3D POLARITY_VERTICAL) {
+> +        /*
+> +         * Vertical polarity with dedicated CPU implies
+> +         * vertical high entitlement.
+> +         */
+> +        if (topology_id.dedicated) {
+> +            topology_id.polarity |=3D POLARITY_VERTICAL_HIGH;
+> +        } else {
+> +            topology_id.polarity |=3D cpu->env.entitlement;
+> +        }
 
-Will move them to the beginning of vfio_pin_pages/vfio_unpin_pages.
+Why |=3D instead of an assignment?
+Anyway, I think you can get rid of this in the next version.
+If you define the entitlement via qapi you can just put a little switch
+here and convert it to the hardware definition of polarization.
+(Or you just do +1, but I think the switch is easier to understand)
 
-Thanks
-Nic
+> +    }
+> +
+> +    return topology_id;
+> +}
+> +
+[...]
