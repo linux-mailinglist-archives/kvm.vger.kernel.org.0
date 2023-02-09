@@ -2,97 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2DAF26908C0
-	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 13:29:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 939C769090E
+	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 13:40:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229776AbjBIM2m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Feb 2023 07:28:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39182 "EHLO
+        id S229632AbjBIMkg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Feb 2023 07:40:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229935AbjBIM2k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Feb 2023 07:28:40 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F307786AD
-        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 04:28:39 -0800 (PST)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 319BoYXm001049;
-        Thu, 9 Feb 2023 12:28:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=u0fnO6UXmrW6o1hmKCl4YNj1jR5rtGs680h9SMIRnB8=;
- b=KLmauad+IbafwhThMjjoAKfrlOHQq0dX1T3RzWTzbOEHe1gxAL9/KbpnfTppKcLcAk0/
- VMGGNWmX5FPx6wTLmE+zBjnWC3Acm4nAx9CxZZxm17viWPzk2eVWP2MtSas+VXH/QdCP
- AfJYYmSmePRYCk8tJmQKxXKcuY0h02CW1VoLhssIR/Rn4bB0C2a5ym7I49bp4uh4xy3o
- MrpKC1zS+8rurVpoj0Dq8DqIFUtIcWK00b1tieQgf6oiIHvTAFTSHYb6ccO++8o8Ac/i
- mtkd5GnBX/UgJbwMpNoXeCyXG6HK8BP8NpKQQCMZ93oeUsdEOGeNGgzvBlFlj6v/e8xe Hg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nn0ahgweu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Feb 2023 12:28:26 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 319BsPkD013979;
-        Thu, 9 Feb 2023 12:28:25 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nn0ahgwdv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Feb 2023 12:28:25 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3192pXZo014014;
-        Thu, 9 Feb 2023 12:28:23 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3nhf06vcjx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Feb 2023 12:28:22 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 319CSJvk47776100
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 9 Feb 2023 12:28:19 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E5AE720040;
-        Thu,  9 Feb 2023 12:28:18 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 831FC2004B;
-        Thu,  9 Feb 2023 12:28:18 +0000 (GMT)
-Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.135.170])
-        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu,  9 Feb 2023 12:28:18 +0000 (GMT)
-Message-ID: <32389178edcf67ac08904906df9a12aa64f24928.camel@linux.ibm.com>
-Subject: Re: [PATCH v15 10/11] qapi/s390x/cpu topology: CPU_POLARITY_CHANGE
- qapi event
-From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To:     Markus Armbruster <armbru@redhat.com>
-Cc:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org,
-        qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
-        berrange@redhat.com, clg@kaod.org
-Date:   Thu, 09 Feb 2023 13:28:18 +0100
-In-Reply-To: <87y1p8q7v6.fsf@pond.sub.org>
-References: <20230201132051.126868-1-pmorel@linux.ibm.com>
-         <20230201132051.126868-11-pmorel@linux.ibm.com>
-         <5b26ee514ccbbfaf5670cbf0cb006d8e706fe5ae.camel@linux.ibm.com>
-         <87y1p8q7v6.fsf@pond.sub.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.3 (3.46.3-1.fc37) 
+        with ESMTP id S229612AbjBIMkf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Feb 2023 07:40:35 -0500
+Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8240E5AB06
+        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 04:40:34 -0800 (PST)
+Received: by mail-qk1-x72a.google.com with SMTP id ow4so767516qkn.1
+        for <kvm@vger.kernel.org>; Thu, 09 Feb 2023 04:40:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=wEBb6jh4OBASjgOuJ8EUtEbNgLorZ8qJTVNMTVmx2h0=;
+        b=WmdmletUgMkd+nEQSbzWjYF4CyiT9oHq6r22roJauTteFtp8lCNSchHoXImLl+zXvk
+         lALnTn6MZE/PReNC3gHR+uAsERDkX3XSOr0xZ+ChrXKEhlaj+6aHnQ2R+bE3SEjOGo+m
+         ug+uJGrq7TtkBlSwhppBySII+9ejxpGa9oI47d02QwVySGpjNx0t+Rf9ccRJhLoaw6U5
+         BeeGcI2eztxPGaAnFy8gLEV9YZ3CmvGttEguElg425dktc0nZK1EUP/Py4jaB188PCkf
+         F01An+q6IZqJ2dXUCtlezNnV7wAzY4VV+0yAPrB46iDlYaVCSQTz2ffXpwphoT4sURX3
+         yO6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wEBb6jh4OBASjgOuJ8EUtEbNgLorZ8qJTVNMTVmx2h0=;
+        b=Ni1plkEV1931irjICuH/YThDL/RfnNa631BzBxjMyeUgam8UTvceGaozskFSjGdy3K
+         Ha+pDoElKHaPkvf5mOkA1WHpfCOQcmuNPOHLGKZt9WjPcnnlTohzuWh85lV8+xr0eaJB
+         p+74xCw/rluali91pGCbpEfxC5Fl26otYEr5+KnuQ0majSyb4DvmZ7TEr085gFnZLavH
+         /qHtmiYutvdAT2rsmGvJD23u6rgYOQ9FTXBHA0EkJlycLhAA4gNzXF/H2CbXbhasRoMt
+         HZmKQK1cpJnXtTq/HSyQ/YGlKAZrqsgEiEoNUVFaC24wKkXBhmmj4EBBZJeWXCjqHhgw
+         COBg==
+X-Gm-Message-State: AO0yUKUINqBpaWY3RtHCB7LC/06hMN+Q+U7mDt5wFC+wA0XpLqzil1e9
+        8usXDduBk3k+tEwdAiTjHYPVXN28GG0ulklwuHzRZg==
+X-Google-Smtp-Source: AK7set+YEZkK5ls1iAQV9ETFtVKweQvqHdlKQDsjBS0Z1TzlkLU6wP3f5geuHyAQHtMBOI0DLsc1Y0OoZzD9z2SMxRY=
+X-Received: by 2002:a37:6390:0:b0:72b:ada6:1295 with SMTP id
+ x138-20020a376390000000b0072bada61295mr927544qkb.211.1675946433391; Thu, 09
+ Feb 2023 04:40:33 -0800 (PST)
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: LOhjIW0jyaxvC6whH550XofMazowKNVZ
-X-Proofpoint-ORIG-GUID: ZnXCxP6PjPVdfxV2Xt3TWEd8wKw4P5J7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-02-09_08,2023-02-08_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- spamscore=0 clxscore=1015 mlxscore=0 bulkscore=0 adultscore=0
- lowpriorityscore=0 mlxlogscore=999 suspectscore=0 phishscore=0
- impostorscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2212070000 definitions=main-2302090115
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
+References: <20230206165851.3106338-1-ricarkol@google.com> <20230206165851.3106338-5-ricarkol@google.com>
+ <cae4a1d9-b5c2-2929-6d88-5a3fbe719651@redhat.com>
+In-Reply-To: <cae4a1d9-b5c2-2929-6d88-5a3fbe719651@redhat.com>
+From:   Ricardo Koller <ricarkol@google.com>
+Date:   Thu, 9 Feb 2023 04:40:23 -0800
+Message-ID: <CAOHnOrxqEsbRD302Wwn9N06d6xj5NWy4p+C9DBjEm6Z4z2FvXg@mail.gmail.com>
+Subject: Re: [PATCH v2 04/12] KVM: arm64: Add kvm_pgtable_stage2_split()
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
+        yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, qperret@google.com,
+        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        eric.auger@redhat.com, reijiw@google.com, rananta@google.com,
+        bgardon@google.com, ricarkol@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -100,125 +73,206 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2023-02-08 at 20:23 +0100, Markus Armbruster wrote:
-> Nina Schoetterl-Glausch <nsg@linux.ibm.com> writes:
->=20
-> > On Wed, 2023-02-01 at 14:20 +0100, Pierre Morel wrote:
-> > > When the guest asks to change the polarity this change
-> > > is forwarded to the admin using QAPI.
-> > > The admin is supposed to take according decisions concerning
-> > > CPU provisioning.
-> > >=20
-> > > Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> > > ---
-> > >  qapi/machine-target.json | 30 ++++++++++++++++++++++++++++++
-> > >  hw/s390x/cpu-topology.c  |  2 ++
-> > >  2 files changed, 32 insertions(+)
-> > >=20
-> > > diff --git a/qapi/machine-target.json b/qapi/machine-target.json
-> > > index 58df0f5061..5883c3b020 100644
-> > > --- a/qapi/machine-target.json
-> > > +++ b/qapi/machine-target.json
-> > > @@ -371,3 +371,33 @@
-> > >    },
-> > >    'if': { 'all': [ 'TARGET_S390X', 'CONFIG_KVM' ] }
-> > >  }
-> > > +
-> > > +##
-> > > +# @CPU_POLARITY_CHANGE:
-> > > +#
-> > > +# Emitted when the guest asks to change the polarity.
-> > > +#
-> > > +# @polarity: polarity specified by the guest
-> > > +#
-> > > +# The guest can tell the host (via the PTF instruction) whether the
-> > > +# CPUs should be provisioned using horizontal or vertical polarity.
-> > > +#
-> > > +# On horizontal polarity the host is expected to provision all vCPUs
-> > > +# equally.
-> > > +# On vertical polarity the host can provision each vCPU differently.
-> > > +# The guest will get information on the details of the provisioning
-> > > +# the next time it uses the STSI(15) instruction.
-> > > +#
-> > > +# Since: 8.0
-> > > +#
-> > > +# Example:
-> > > +#
-> > > +# <- { "event": "CPU_POLARITY_CHANGE",
-> > > +#      "data": { "polarity": 0 },
-> > > +#      "timestamp": { "seconds": 1401385907, "microseconds": 422329 =
-} }
-> > > +#
-> > > +##
-> > > +{ 'event': 'CPU_POLARITY_CHANGE',
-> > > +  'data': { 'polarity': 'int' },
-> > > +  'if': { 'all': [ 'TARGET_S390X', 'CONFIG_KVM'] }
-> >=20
-> > I wonder if you should depend on CONFIG_KVM or not. If tcg gets topolog=
-y
-> > support it will use the same event and right now it would just never be=
- emitted.
-> > On the other hand it's more conservative this way.
->=20
-> TCG vs. KVM should be as transparent as we can make it.
->=20
-> If only KVM can get into the state where the event is emitted, say
-> because the state is only possible with features only KVM supports, then
-> making the event conditional on KVM makes sense.  Of course, when
-> another accelerator acquires these features, we need to emit the event
-> there as well, which will involve adjusting the condition.
+On Wed, Feb 8, 2023 at 9:58 PM Gavin Shan <gshan@redhat.com> wrote:
+>
+> Hi Ricardo,
+>
+> On 2/7/23 3:58 AM, Ricardo Koller wrote:
+> > Add a new stage2 function, kvm_pgtable_stage2_split(), for splitting a
+> > range of huge pages. This will be used for eager-splitting huge pages
+> > into PAGE_SIZE pages. The goal is to avoid having to split huge pages
+> > on write-protection faults, and instead use this function to do it
+> > ahead of time for large ranges (e.g., all guest memory in 1G chunks at
+> > a time).
+> >
+> > No functional change intended. This new function will be used in a
+> > subsequent commit.
+> >
+> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> > ---
+> >   arch/arm64/include/asm/kvm_pgtable.h |  30 ++++++++
+> >   arch/arm64/kvm/hyp/pgtable.c         | 105 +++++++++++++++++++++++++++
+> >   2 files changed, 135 insertions(+)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> > index e94c92988745..871c4eeb0184 100644
+> > --- a/arch/arm64/include/asm/kvm_pgtable.h
+> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> > @@ -658,6 +658,36 @@ bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr);
+> >    */
+> >   int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size);
+> >
+> > +/**
+> > + * kvm_pgtable_stage2_split() - Split a range of huge pages into leaf PTEs pointing
+> > + *                           to PAGE_SIZE guest pages.
+> > + * @pgt:      Page-table structure initialised by kvm_pgtable_stage2_init().
+> > + * @addr:     Intermediate physical address from which to split.
+> > + * @size:     Size of the range.
+> > + * @mc:               Cache of pre-allocated and zeroed memory from which to allocate
+> > + *            page-table pages.
+> > + * @mc_capacity: Number of pages in @mc.
+> > + *
+> > + * @addr and the end (@addr + @size) are effectively aligned down and up to
+> > + * the top level huge-page block size. This is an example using 1GB
+> > + * huge-pages and 4KB granules.
+> > + *
+> > + *                          [---input range---]
+> > + *                          :                 :
+> > + * [--1G block pte--][--1G block pte--][--1G block pte--][--1G block pte--]
+> > + *                          :                 :
+> > + *                   [--2MB--][--2MB--][--2MB--][--2MB--]
+> > + *                          :                 :
+> > + *                   [ ][ ][:][ ][ ][ ][ ][ ][:][ ][ ][ ]
+> > + *                          :                 :
+> > + *
+> > + * Return: 0 on success, negative error code on failure. Note that
+> > + * kvm_pgtable_stage2_split() is best effort: it tries to break as many
+> > + * blocks in the input range as allowed by @mc_capacity.
+> > + */
+> > +int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> > +                          void *mc, u64 mc_capacity);
+> > +
+> >   /**
+> >    * kvm_pgtable_walk() - Walk a page-table.
+> >    * @pgt:    Page-table structure initialised by kvm_pgtable_*_init().
+> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > index fed314f2b320..ae80845c8db7 100644
+> > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > @@ -1229,6 +1229,111 @@ int kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
+> >       return 0;
+> >   }
+> >
+> > +struct stage2_split_data {
+> > +     struct kvm_s2_mmu               *mmu;
+> > +     void                            *memcache;
+> > +     u64                             mc_capacity;
+> > +};
+> > +
+> > +/*
+> > + * Get the number of page-tables needed to replace a bock with a fully
+> > + * populated tree, up to the PTE level, at particular level.
+> > + */
+> > +static inline u32 stage2_block_get_nr_page_tables(u32 level)
+> > +{
+> > +     switch (level) {
+> > +     /* There are no blocks at level 0 */
+> > +     case 1: return 1 + PTRS_PER_PTE;
+> > +     case 2: return 1;
+> > +     case 3: return 0;
+> > +     default:
+> > +             WARN_ON_ONCE(1);
+> > +             return ~0;
+> > +     }
+> > +}
+> > +
+> > +static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> > +                            enum kvm_pgtable_walk_flags visit)
+> > +{
+> > +     struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+> > +     struct stage2_split_data *data = ctx->arg;
+> > +     kvm_pte_t pte = ctx->old, new, *childp;
+> > +     enum kvm_pgtable_prot prot;
+> > +     void *mc = data->memcache;
+> > +     u32 level = ctx->level;
+> > +     u64 phys, nr_pages;
+> > +     bool force_pte;
+> > +     int ret;
+> > +
+> > +     /* No huge-pages exist at the last level */
+> > +     if (level == KVM_PGTABLE_MAX_LEVELS - 1)
+> > +             return 0;
+> > +
+> > +     /* We only split valid block mappings */
+> > +     if (!kvm_pte_valid(pte) || kvm_pte_table(pte, ctx->level))
+> > +             return 0;
+> > +
+>
+> Since stage2_split_walker() has been specified as a leaf walker by KVM_PGTABLE_WALK_LEAF,
+> I don't understand how kvm_pte_table() can return true.
 
-That's the case here, KVM supports the feature, TCG doesn't, although there=
- is no
-reason it couldn't in the future.
+Good point. Will remove it. This check made sense for a previous
+version (the RFC),
+but not anymore.
 
->=20
-> > I also wonder if you should add 'feature' : [ 'unstable' ].
-> > On the upside, it would mark the event as unstable, but I don't know wh=
-at the
-> > consequences are exactly.
->=20
-> docs/devel/qapi-code-gen.rst:
->=20
->     Special features
->     ~~~~~~~~~~~~~~~~
->=20
->     Feature "deprecated" marks a command, event, enum value, or struct
->     member as deprecated.  It is not supported elsewhere so far.
->     Interfaces so marked may be withdrawn in future releases in accordanc=
-e
->     with QEMU's deprecation policy.
->=20
->     Feature "unstable" marks a command, event, enum value, or struct
->     member as unstable.  It is not supported elsewhere so far.  Interface=
-s
->     so marked may be withdrawn or changed incompatibly in future releases=
-.
+>
+> > +     nr_pages = stage2_block_get_nr_page_tables(level);
+> > +     if (data->mc_capacity >= nr_pages) {
+> > +             /* Build a tree mapped down to the PTE granularity. */
+> > +             force_pte = true;
+> > +     } else {
+> > +             /*
+> > +              * Don't force PTEs. This requires a single page of PMDs at the
+> > +              * PUD level, or a single page of PTEs at the PMD level. If we
+> > +              * are at the PUD level, the PTEs will be created recursively.
+> > +              */
+> > +             force_pte = false;
+> > +             nr_pages = 1;
+> > +     }
+> > +
+> > +     if (data->mc_capacity < nr_pages)
+> > +             return -ENOMEM;
+> > +
+> > +     phys = kvm_pte_to_phys(pte);
+> > +     prot = kvm_pgtable_stage2_pte_prot(pte);
+> > +
+> > +     ret = kvm_pgtable_stage2_create_unlinked(data->mmu->pgt, &new, phys,
+> > +                                              level, prot, mc, force_pte);
+> > +     if (ret)
+> > +             return ret;
+> > +
+> > +     if (!stage2_try_break_pte(ctx, data->mmu)) {
+> > +             childp = kvm_pte_follow(new, mm_ops);
+> > +             kvm_pgtable_stage2_free_unlinked(mm_ops, childp, level);
+> > +             mm_ops->put_page(childp);
+> > +             return -EAGAIN;
+> > +     }
+> > +
+> > +     /*
+> > +      * Note, the contents of the page table are guaranteed to be made
+> > +      * visible before the new PTE is assigned because stage2_make_pte()
+> > +      * writes the PTE using smp_store_release().
+> > +      */
+> > +     stage2_make_pte(ctx, new);
+> > +     dsb(ishst);
+> > +     data->mc_capacity -= nr_pages;
+> > +     return 0;
+> > +}
+> > +
+>
+> I think it's possible 'data->mc_capability' to be replaced by 'mc->nobjs'
+> because they're same thing. With this, we needn't to maintain a duplicate
+> 'data->mc_capability' since 'data->mc' has been existing.
 
-Yeah, I saw that, but wasn't aware of -compat, thanks.
+Ah, nice, yes. That would be simpler.
 
->=20
-> See also -compat parameters unstable-input, unstable-output, both
-> intended for "testing the future".
->=20
-> > Also I guess one can remove qemu events without breaking backwards comp=
-atibility,
-> > since they just won't be emitted? Unless I guess you specify that a eve=
-nt must
-> > occur under certain situations and the client waits on it?
->=20
-> Events are part of the interface just like command returns are.  Not
-> emitting an event in a situation where it was emitted before can easily
-> break things.  Only when the situation is no longer possible, the event
-> can be removed safely.
+Thanks!
+Ricardo
 
-@Pierre, seems it would be a good idea to mark all changes to qmp unstable,=
- not just
-set-cpu-topology, can just remove it later after all.
-
->=20
-> Questions?
->=20
-> [...]
->=20
-
+>
+> > +int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> > +                          void *mc, u64 mc_capacity)
+> > +{
+> > +     struct stage2_split_data split_data = {
+> > +             .mmu            = pgt->mmu,
+> > +             .memcache       = mc,
+> > +             .mc_capacity    = mc_capacity,
+> > +     };
+> > +
+> > +     struct kvm_pgtable_walker walker = {
+> > +             .cb     = stage2_split_walker,
+> > +             .flags  = KVM_PGTABLE_WALK_LEAF,
+> > +             .arg    = &split_data,
+> > +     };
+> > +
+> > +     return kvm_pgtable_walk(pgt, addr, size, &walker);
+> > +}
+> > +
+> >   int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+> >                             struct kvm_pgtable_mm_ops *mm_ops,
+> >                             enum kvm_pgtable_stage2_flags flags,
+> >
+>
+> Thanks,
+> Gavin
+>
