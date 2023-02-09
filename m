@@ -2,292 +2,223 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8CBE86904B6
-	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 11:25:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 00463690605
+	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 12:04:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230087AbjBIKZp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Feb 2023 05:25:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46464 "EHLO
+        id S229770AbjBILEC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Feb 2023 06:04:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230003AbjBIKZR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Feb 2023 05:25:17 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 748AE5EF80;
-        Thu,  9 Feb 2023 02:25:15 -0800 (PST)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3199AICo023579;
-        Thu, 9 Feb 2023 10:25:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=TlTzKKP6pDzT9DQGLCvV8tAQqCFP51HSn9E5f8cJ2a0=;
- b=nqJ/2lGifpvOuLuN6kXPvqXFYs0ZqmLEqZPm0RsisQx9Fa6Hf4YqtWhlaGeHyJMf3Gfm
- iI9zgXS/R7Drr3nS1YJHQTnOwTgGaz5isM2qCAZ4UbNaxHFdjHKt9JlRqz3naMiur8S2
- hvDsj4MQ1pDi+r3gm3MLV2POowCM/sAGxRwNC4YdR27C3x3WbN3CR9qt49hZ/MLjzAKV
- Nrk14dyA+zbokmrlFdXLAQEuVau8fySSu+7f+ywBCI0KdOPt1ZVpcjGSOdjaD7kRYNL5
- pa+zoHmvqXVvWrgWupVCHzeMWKOrg4Bw78NuDrrkR/m5Fl1+TPIgcKkhfU3j3B+KT8Zq pA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nmw7w2w01-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Feb 2023 10:25:14 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3199CrmV001869;
-        Thu, 9 Feb 2023 10:25:14 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nmw7w2vy6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Feb 2023 10:25:14 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 318JQabI022560;
-        Thu, 9 Feb 2023 10:25:11 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3nhemfp23p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Feb 2023 10:25:11 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 319AP8XE47186352
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 9 Feb 2023 10:25:08 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1A4D520071;
-        Thu,  9 Feb 2023 10:25:08 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E28952006A;
-        Thu,  9 Feb 2023 10:25:07 +0000 (GMT)
-Received: from li-9fd7f64c-3205-11b2-a85c-df942b00d78d.ibm.com (unknown [9.152.224.253])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu,  9 Feb 2023 10:25:07 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
-        borntraeger@linux.ibm.com, cohuck@redhat.com,
-        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        hca@linux.ibm.com
-Subject: [GIT PULL 18/18] s390/virtio: sort out physical vs virtual pointers usage
-Date:   Thu,  9 Feb 2023 11:23:00 +0100
-Message-Id: <20230209102300.12254-19-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.39.1
-In-Reply-To: <20230209102300.12254-1-frankja@linux.ibm.com>
-References: <20230209102300.12254-1-frankja@linux.ibm.com>
+        with ESMTP id S229892AbjBILDf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Feb 2023 06:03:35 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C24BB44D;
+        Thu,  9 Feb 2023 03:03:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=JMF4RZePxvBPqqWKqnl76AemIthZErhrsJr9x+WxdfE=; b=YURrDQGjtWe76jOacG0WJHyTBZ
+        K/sX5qSDaFjba3M5yNh6vHr2J5a1SBq3/be2Cn1R5uGrJu0sL49Jsm9v3Po/89HjLG2PDEqzgTlBF
+        YQIt4vzA9cUxa1/WzxrquUvIjXan/r3rRbmp7l0JxumIHb8gSRVsHtLD189cDO4HxpkbgBjvNnSQK
+        6vxV1wjehlSyjL0hPY/CclFU6wPOPCjS4+5BCAfmw7pJrq7yW4tN+AlThMYqKn5+dPx9CFzeq2vxy
+        KeGQXeBxFiwEeu7JaV9R+nPehspTS+NLqBXuWHvvBAP4zoQjkO2+xHUm8StQgUn7iCyxOFf08rAti
+        W2KSDlkA==;
+Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.infradead.org)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pQ4hh-0027t1-6U; Thu, 09 Feb 2023 11:03:02 +0000
+Message-ID: <f07b371ae2eb11f541c665b488b3d4b6bf1a81b3.camel@infradead.org>
+Subject: Re: [External] Re: [PATCH v7 0/9] Parallel CPU bringup for x86_64
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Usama Arif <usama.arif@bytedance.com>, paulmck@kernel.org,
+        tglx@linutronix.de
+Cc:     kim.phillips@amd.com, arjan@linux.intel.com, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        x86@kernel.org, pbonzini@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, rcu@vger.kernel.org, mimoja@mimoja.de,
+        hewenliang4@huawei.com, thomas.lendacky@amd.com, seanjc@google.com,
+        pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
+        punit.agrawal@bytedance.com, simon.evans@bytedance.com,
+        liangma@liangbit.com
+Date:   Thu, 09 Feb 2023 11:03:00 +0000
+In-Reply-To: <8e2f03e2-9517-aeb4-df60-b36ef3ff3a75@bytedance.com>
+References: <20230207230436.2690891-1-usama.arif@bytedance.com>
+         <20230209035300.GA3216394@paulmck-ThinkPad-P17-Gen-1>
+         <8e2f03e2-9517-aeb4-df60-b36ef3ff3a75@bytedance.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-I1tWRIsin6wDWqZIwoDh"
+User-Agent: Evolution 3.44.4-0ubuntu1 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: PmZ0qYwnmbOOOfIoNjgGWjE1WBi1QvHx
-X-Proofpoint-GUID: HtHxzpF5mBRSPZ2k2YTK0wuEYLxwhCzZ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-02-09_05,2023-02-08_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- suspectscore=0 bulkscore=0 lowpriorityscore=0 malwarescore=0
- mlxlogscore=999 phishscore=0 clxscore=1015 impostorscore=0 spamscore=0
- adultscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302090090
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Alexander Gordeev <agordeev@linux.ibm.com>
 
-This does not fix a real bug, since virtual addresses
-are currently indentical to physical ones.
+--=-I1tWRIsin6wDWqZIwoDh
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
-Signed-off-by: Alexander Gordeev <agordeev@linux.ibm.com>
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- drivers/s390/virtio/virtio_ccw.c | 46 +++++++++++++++++---------------
- 1 file changed, 24 insertions(+), 22 deletions(-)
+On Thu, 2023-02-09 at 09:49 +0000, Usama Arif wrote:
+>=20
+> Its easy to test, just by doing
+> echo 0 > /sys/devices/system/cpu/cpu0/online;
+> echo 1 > /sys/devices/system/cpu/cpu0/online;
 
-diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
-index a10dbe632ef9..954fc31b4bc7 100644
---- a/drivers/s390/virtio/virtio_ccw.c
-+++ b/drivers/s390/virtio/virtio_ccw.c
-@@ -363,7 +363,7 @@ static void virtio_ccw_drop_indicator(struct virtio_ccw_device *vcdev,
- 		thinint_area->isc = VIRTIO_AIRQ_ISC;
- 		ccw->cmd_code = CCW_CMD_SET_IND_ADAPTER;
- 		ccw->count = sizeof(*thinint_area);
--		ccw->cda = (__u32)(unsigned long) thinint_area;
-+		ccw->cda = (__u32)virt_to_phys(thinint_area);
- 	} else {
- 		/* payload is the address of the indicators */
- 		indicatorp = ccw_device_dma_zalloc(vcdev->cdev,
-@@ -373,7 +373,7 @@ static void virtio_ccw_drop_indicator(struct virtio_ccw_device *vcdev,
- 		*indicatorp = 0;
- 		ccw->cmd_code = CCW_CMD_SET_IND;
- 		ccw->count = sizeof(indicators(vcdev));
--		ccw->cda = (__u32)(unsigned long) indicatorp;
-+		ccw->cda = (__u32)virt_to_phys(indicatorp);
- 	}
- 	/* Deregister indicators from host. */
- 	*indicators(vcdev) = 0;
-@@ -417,7 +417,7 @@ static int virtio_ccw_read_vq_conf(struct virtio_ccw_device *vcdev,
- 	ccw->cmd_code = CCW_CMD_READ_VQ_CONF;
- 	ccw->flags = 0;
- 	ccw->count = sizeof(struct vq_config_block);
--	ccw->cda = (__u32)(unsigned long)(&vcdev->dma_area->config_block);
-+	ccw->cda = (__u32)virt_to_phys(&vcdev->dma_area->config_block);
- 	ret = ccw_io_helper(vcdev, ccw, VIRTIO_CCW_DOING_READ_VQ_CONF);
- 	if (ret)
- 		return ret;
-@@ -454,7 +454,7 @@ static void virtio_ccw_del_vq(struct virtqueue *vq, struct ccw1 *ccw)
- 	}
- 	ccw->cmd_code = CCW_CMD_SET_VQ;
- 	ccw->flags = 0;
--	ccw->cda = (__u32)(unsigned long)(info->info_block);
-+	ccw->cda = (__u32)virt_to_phys(info->info_block);
- 	ret = ccw_io_helper(vcdev, ccw,
- 			    VIRTIO_CCW_DOING_SET_VQ | index);
- 	/*
-@@ -556,7 +556,7 @@ static struct virtqueue *virtio_ccw_setup_vq(struct virtio_device *vdev,
- 	}
- 	ccw->cmd_code = CCW_CMD_SET_VQ;
- 	ccw->flags = 0;
--	ccw->cda = (__u32)(unsigned long)(info->info_block);
-+	ccw->cda = (__u32)virt_to_phys(info->info_block);
- 	err = ccw_io_helper(vcdev, ccw, VIRTIO_CCW_DOING_SET_VQ | i);
- 	if (err) {
- 		dev_warn(&vcdev->cdev->dev, "SET_VQ failed\n");
-@@ -590,6 +590,7 @@ static int virtio_ccw_register_adapter_ind(struct virtio_ccw_device *vcdev,
- {
- 	int ret;
- 	struct virtio_thinint_area *thinint_area = NULL;
-+	unsigned long indicator_addr;
- 	struct airq_info *info;
- 
- 	thinint_area = ccw_device_dma_zalloc(vcdev->cdev,
-@@ -599,21 +600,22 @@ static int virtio_ccw_register_adapter_ind(struct virtio_ccw_device *vcdev,
- 		goto out;
- 	}
- 	/* Try to get an indicator. */
--	thinint_area->indicator = get_airq_indicator(vqs, nvqs,
--						     &thinint_area->bit_nr,
--						     &vcdev->airq_info);
--	if (!thinint_area->indicator) {
-+	indicator_addr = get_airq_indicator(vqs, nvqs,
-+					    &thinint_area->bit_nr,
-+					    &vcdev->airq_info);
-+	if (!indicator_addr) {
- 		ret = -ENOSPC;
- 		goto out;
- 	}
-+	thinint_area->indicator = virt_to_phys((void *)indicator_addr);
- 	info = vcdev->airq_info;
- 	thinint_area->summary_indicator =
--		(unsigned long) get_summary_indicator(info);
-+		virt_to_phys(get_summary_indicator(info));
- 	thinint_area->isc = VIRTIO_AIRQ_ISC;
- 	ccw->cmd_code = CCW_CMD_SET_IND_ADAPTER;
- 	ccw->flags = CCW_FLAG_SLI;
- 	ccw->count = sizeof(*thinint_area);
--	ccw->cda = (__u32)(unsigned long)thinint_area;
-+	ccw->cda = (__u32)virt_to_phys(thinint_area);
- 	ret = ccw_io_helper(vcdev, ccw, VIRTIO_CCW_DOING_SET_IND_ADAPTER);
- 	if (ret) {
- 		if (ret == -EOPNOTSUPP) {
-@@ -686,7 +688,7 @@ static int virtio_ccw_find_vqs(struct virtio_device *vdev, unsigned nvqs,
- 		ccw->cmd_code = CCW_CMD_SET_IND;
- 		ccw->flags = 0;
- 		ccw->count = sizeof(indicators(vcdev));
--		ccw->cda = (__u32)(unsigned long) indicatorp;
-+		ccw->cda = (__u32)virt_to_phys(indicatorp);
- 		ret = ccw_io_helper(vcdev, ccw, VIRTIO_CCW_DOING_SET_IND);
- 		if (ret)
- 			goto out;
-@@ -697,7 +699,7 @@ static int virtio_ccw_find_vqs(struct virtio_device *vdev, unsigned nvqs,
- 	ccw->cmd_code = CCW_CMD_SET_CONF_IND;
- 	ccw->flags = 0;
- 	ccw->count = sizeof(indicators2(vcdev));
--	ccw->cda = (__u32)(unsigned long) indicatorp;
-+	ccw->cda = (__u32)virt_to_phys(indicatorp);
- 	ret = ccw_io_helper(vcdev, ccw, VIRTIO_CCW_DOING_SET_CONF_IND);
- 	if (ret)
- 		goto out;
-@@ -759,7 +761,7 @@ static u64 virtio_ccw_get_features(struct virtio_device *vdev)
- 	ccw->cmd_code = CCW_CMD_READ_FEAT;
- 	ccw->flags = 0;
- 	ccw->count = sizeof(*features);
--	ccw->cda = (__u32)(unsigned long)features;
-+	ccw->cda = (__u32)virt_to_phys(features);
- 	ret = ccw_io_helper(vcdev, ccw, VIRTIO_CCW_DOING_READ_FEAT);
- 	if (ret) {
- 		rc = 0;
-@@ -776,7 +778,7 @@ static u64 virtio_ccw_get_features(struct virtio_device *vdev)
- 	ccw->cmd_code = CCW_CMD_READ_FEAT;
- 	ccw->flags = 0;
- 	ccw->count = sizeof(*features);
--	ccw->cda = (__u32)(unsigned long)features;
-+	ccw->cda = (__u32)virt_to_phys(features);
- 	ret = ccw_io_helper(vcdev, ccw, VIRTIO_CCW_DOING_READ_FEAT);
- 	if (ret == 0)
- 		rc |= (u64)le32_to_cpu(features->features) << 32;
-@@ -829,7 +831,7 @@ static int virtio_ccw_finalize_features(struct virtio_device *vdev)
- 	ccw->cmd_code = CCW_CMD_WRITE_FEAT;
- 	ccw->flags = 0;
- 	ccw->count = sizeof(*features);
--	ccw->cda = (__u32)(unsigned long)features;
-+	ccw->cda = (__u32)virt_to_phys(features);
- 	ret = ccw_io_helper(vcdev, ccw, VIRTIO_CCW_DOING_WRITE_FEAT);
- 	if (ret)
- 		goto out_free;
-@@ -843,7 +845,7 @@ static int virtio_ccw_finalize_features(struct virtio_device *vdev)
- 	ccw->cmd_code = CCW_CMD_WRITE_FEAT;
- 	ccw->flags = 0;
- 	ccw->count = sizeof(*features);
--	ccw->cda = (__u32)(unsigned long)features;
-+	ccw->cda = (__u32)virt_to_phys(features);
- 	ret = ccw_io_helper(vcdev, ccw, VIRTIO_CCW_DOING_WRITE_FEAT);
- 
- out_free:
-@@ -875,7 +877,7 @@ static void virtio_ccw_get_config(struct virtio_device *vdev,
- 	ccw->cmd_code = CCW_CMD_READ_CONF;
- 	ccw->flags = 0;
- 	ccw->count = offset + len;
--	ccw->cda = (__u32)(unsigned long)config_area;
-+	ccw->cda = (__u32)virt_to_phys(config_area);
- 	ret = ccw_io_helper(vcdev, ccw, VIRTIO_CCW_DOING_READ_CONFIG);
- 	if (ret)
- 		goto out_free;
-@@ -922,7 +924,7 @@ static void virtio_ccw_set_config(struct virtio_device *vdev,
- 	ccw->cmd_code = CCW_CMD_WRITE_CONF;
- 	ccw->flags = 0;
- 	ccw->count = offset + len;
--	ccw->cda = (__u32)(unsigned long)config_area;
-+	ccw->cda = (__u32)virt_to_phys(config_area);
- 	ccw_io_helper(vcdev, ccw, VIRTIO_CCW_DOING_WRITE_CONFIG);
- 
- out_free:
-@@ -946,7 +948,7 @@ static u8 virtio_ccw_get_status(struct virtio_device *vdev)
- 	ccw->cmd_code = CCW_CMD_READ_STATUS;
- 	ccw->flags = 0;
- 	ccw->count = sizeof(vcdev->dma_area->status);
--	ccw->cda = (__u32)(unsigned long)&vcdev->dma_area->status;
-+	ccw->cda = (__u32)virt_to_phys(&vcdev->dma_area->status);
- 	ccw_io_helper(vcdev, ccw, VIRTIO_CCW_DOING_READ_STATUS);
- /*
-  * If the channel program failed (should only happen if the device
-@@ -975,7 +977,7 @@ static void virtio_ccw_set_status(struct virtio_device *vdev, u8 status)
- 	ccw->cmd_code = CCW_CMD_WRITE_STATUS;
- 	ccw->flags = 0;
- 	ccw->count = sizeof(status);
--	ccw->cda = (__u32)(unsigned long)&vcdev->dma_area->status;
-+	ccw->cda = (__u32)virt_to_phys(&vcdev->dma_area->status);
- 	/* We use ssch for setting the status which is a serializing
- 	 * instruction that guarantees the memory writes have
- 	 * completed before ssch.
-@@ -1274,7 +1276,7 @@ static int virtio_ccw_set_transport_rev(struct virtio_ccw_device *vcdev)
- 	ccw->cmd_code = CCW_CMD_SET_VIRTIO_REV;
- 	ccw->flags = 0;
- 	ccw->count = sizeof(*rev);
--	ccw->cda = (__u32)(unsigned long)rev;
-+	ccw->cda = (__u32)virt_to_phys(rev);
- 
- 	vcdev->revision = VIRTIO_CCW_REV_MAX;
- 	do {
--- 
-2.39.1
+This one also fixes it for me. If we're happy with this approach, I'll
+work it into Thomas's original patch (and hopefully eventually he'll be
+happy enough with it and the commit message that he'll give us his
+Signed-off-by for it.)
 
+
+I could probably add a Co-developed-by: tglx for that first x2apic
+patch in the series too, but then it would *also* need his SoB and I
+didn't want to be owed two, so I just pasted his suggested code and
+didn't credit him.
+
+
+diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
+index 5462464fe3ef..ea6052a97619 100644
+--- a/arch/x86/kernel/head_64.S
++++ b/arch/x86/kernel/head_64.S
+@@ -450,7 +450,16 @@ SYM_CODE_END(secondary_startup_64)
+ SYM_CODE_START(start_cpu0)
+        ANNOTATE_NOENDBR
+        UNWIND_HINT_EMPTY
+-       movq    initial_stack(%rip), %rsp
++       /* Load the per-cpu base for CPU#0 */
++       leaq    __per_cpu_offset(%rip), %rbx
++       movq    (%rbx), %rbx
++
++       /* Find the idle task stack */
++       movq    $idle_threads, %rcx
++       addq    %rbx, %rcx
++       movq    (%rcx), %rcx
++       movq    TASK_threadsp(%rcx), %rsp
++
+        jmp     .Ljump_to_C_code
+ SYM_CODE_END(start_cpu0)
+ #endif
+
+I cut and pasted some of that, I'm not entirely sure why we have three
+instructions to do the equivalent of 'movq idle_threads(%ebx), %ecx'
+and may fix that in the original as I work this in.
+
+--=-I1tWRIsin6wDWqZIwoDh
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMjA5MTEwMzAwWjAvBgkqhkiG9w0BCQQxIgQgDdsI1jU8
+1QMSqf7MK+6LvwTTpeYByy9+0KV8f/V5bOcwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAmYxSl06JWqRnr6ICNXcpmwwU98NWYd4Bx
+MzJr1R6gMhL8n0DxULO3NY+QqAEUUfr0nRy/ZmesBYODRE6y+sWgMUALGftp83SInQQFIceHqH3+
++ileWAbcVK2hkZTbHNwywRfs2Sxwz6TQKRtJkznu5hWh153cpG8ynB1Rzefc/IIXOXJoeI+aDblX
+tDljvTFEZWNKW3q9M91iUWLF5l9odELS+IF+BjONy9IwbrhOSC18P38JbdHZfo2Q4nSVyJDAFLga
+O5AweTE9ipxduUDAYvQ8gpP4G1DNgv0HLkqpkfefUzde8sJeUzTXwVGoSFDQw6PJcIL7VutXpfzz
+WJ4XBDFgkT39f3JXvOxs3WLlMCJQf4m8THErfTU+wlwsaoQ9YMxCLJUhl9rRO6ytmrJIT10q7pLy
+rXXQu2Fg9DX54PKyPNmnyOHCinql4Ts3Bh81tndXc/iEe5ViZOOOIbTRVsgG/Z4GY9ZaoNDwJ0RL
+Jpq49jHlX7QovhoItXwve02zur3BuBBCjD2qxpBvk3AU7ivVTTPUlw1jRsZuqAz034+rkYPuqfhI
+bDuVCA2KhtrpBK2qNkRngWb8BTjSdE1WLLAh1otiOn9nJFJdhFWB6uJiIEjhevj2op1hRr4j2Zr5
+oNokAiWX7vWFxP/W+lXade5inx+9iBftBczWoNdkxwAAAAAAAA==
+
+
+--=-I1tWRIsin6wDWqZIwoDh--
