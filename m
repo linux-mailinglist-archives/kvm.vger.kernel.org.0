@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 20648691044
-	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 19:25:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 91EFD69104F
+	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 19:31:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229723AbjBISZd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Feb 2023 13:25:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40900 "EHLO
+        id S229664AbjBISbV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Feb 2023 13:31:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229616AbjBISZc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Feb 2023 13:25:32 -0500
+        with ESMTP id S229576AbjBISbT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Feb 2023 13:31:19 -0500
 Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EF476031C;
-        Thu,  9 Feb 2023 10:25:31 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE7176569E;
+        Thu,  9 Feb 2023 10:31:18 -0800 (PST)
 From:   Thomas Gleixner <tglx@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1675967130;
+        s=2020; t=1675967477;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=0NaX4sqxw6MUujMtWMhi4Kyfzd9HAZvF25tWNFvR+NQ=;
-        b=a4uFotAh4zBkNeR4bTyBuQc9kV5tVaWaMBAc/9il112kLU0MYI7QbLsTUlR38AfEFeKLcE
-        8nizRUUZu6/dgDL7F1kmlQHFfgGeu06VCJLavdapJgx1aDAoAucuj78bEYQ5q/NIE46ZAX
-        NV1PHWGM3DbHFAoZnV4Amrjnb1GxH4K4PnjFzqChh5/YSHLgI++byg79BnA3ntFJ/XRnN5
-        tX9325ZAlOKhggkcMQgjGTDI7FU75ZLQ2kPLJy12HCz6WcOXqpvzVGXF+he0K8JFycrLRn
-        +HPXv7DguxauoLxol0w2dE71DIi+1zvcxpu/LEe5bJRk807sOE/sBxNDplukzA==
+        bh=W7pUh6iI4OnfGqJZq7VtDTnwn9iFkcNOiD9vzdvat8Y=;
+        b=prVdJx8mPcRJM5e4dt9vLLMnJbMJOrL1ES7/lty2iW61De45cS7zCOcIpGfmL4ByMXPQFQ
+        gqz0ASwvpfu5g0Zg1F64tbIlvJqsca1jvzkA1Xwu2ATNeiVrYKYOQFzZP9bWl1SExSVVk4
+        fP3BoeDa9is6K1ZlstkeFmDSac9ySpWYl/HkbqDcSiQhubeR5+syS6qNudRSNVPG8oEpC7
+        J4El19PaZ0nVdOVfPFZYrB0UlymwTDB5AK2M16Xttorfyv4aAKOu94JZrzPYRTjBnfEcWB
+        cs0L0Ufyg11aU/5tw2ny1Gv/mLHTk85YApDtj+mzlq33NYxuGaw8ypPKLBzvHg==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1675967130;
+        s=2020e; t=1675967477;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=0NaX4sqxw6MUujMtWMhi4Kyfzd9HAZvF25tWNFvR+NQ=;
-        b=pernKmnmJ4vi3c/QkDNqcxvo6wqgdKcDJbALgJnLBljAsmeNZOF8vDMtAxGsN1zuclVquW
-        whO9e3NeXhm2ITAw==
+        bh=W7pUh6iI4OnfGqJZq7VtDTnwn9iFkcNOiD9vzdvat8Y=;
+        b=7zA2igiHdJUrzkuc7pxNysaK5j1RhZ0AlsBOPOXgS6OQztCULl457Oexe/NtoFhlMXvdeZ
+        XXDX1Zs5yvwSGzDQ==
 To:     Usama Arif <usama.arif@bytedance.com>, dwmw2@infradead.org,
         kim.phillips@amd.com
 Cc:     arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
@@ -46,13 +46,13 @@ Cc:     arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
         simon.evans@bytedance.com, liangma@liangbit.com,
         David Woodhouse <dwmw@amazon.co.uk>,
         Usama Arif <usama.arif@bytedance.com>
-Subject: Re: [PATCH v8 6/9] x86/smpboot: Support parallel startup of
- secondary CPUs
-In-Reply-To: <20230209154156.266385-7-usama.arif@bytedance.com>
+Subject: Re: [PATCH v8 8/9] x86/mtrr: Avoid repeated save of MTRRs on
+ boot-time CPU bringup
+In-Reply-To: <20230209154156.266385-9-usama.arif@bytedance.com>
 References: <20230209154156.266385-1-usama.arif@bytedance.com>
- <20230209154156.266385-7-usama.arif@bytedance.com>
-Date:   Thu, 09 Feb 2023 19:25:29 +0100
-Message-ID: <87r0uy1ysm.ffs@tglx>
+ <20230209154156.266385-9-usama.arif@bytedance.com>
+Date:   Thu, 09 Feb 2023 19:31:16 +0100
+Message-ID: <87mt5m1yiz.ffs@tglx>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -65,20 +65,27 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Thu, Feb 09 2023 at 15:41, Usama Arif wrote:
+>  void mtrr_save_state(void)
+>  {
+> +	static bool mtrr_saved;
+>  	int first_cpu;
 >  
-> +static bool do_parallel_bringup = true;
-
-Wants to be __ro_after_init
-
-> +static int __init no_parallel_bringup(char *str)
-> +{
-> +	do_parallel_bringup = false;
+>  	if (!mtrr_enabled())
+>  		return;
+>  
+> +	if (system_state < SYSTEM_RUNNING) {
+> +		if (!mtrr_saved) {
+> +			mtrr_save_fixed_ranges(NULL);
+> +			mtrr_saved = true;
+> +		}
+> +		return;
+> +	}
 > +
-> +	return 0;
-> +}
-> +early_param("no_parallel_bringup", no_parallel_bringup);
+>  	first_cpu = cpumask_first(cpu_online_mask);
+>  	smp_call_function_single(first_cpu, mtrr_save_fixed_ranges, NULL, 1);
 
-Lacks an entry in Documentation/admin/kernel-parameters.txt
+So why is this relevant after the initial bringup? The BP MTRRs have
+been saved already above, no?
 
 Thanks,
 
