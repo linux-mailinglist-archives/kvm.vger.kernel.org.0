@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 15572691003
-	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 19:11:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D4E569100A
+	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 19:11:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229694AbjBISLG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Feb 2023 13:11:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56642 "EHLO
+        id S229579AbjBISLO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Feb 2023 13:11:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229831AbjBISLD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Feb 2023 13:11:03 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0C6E68AED
-        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 10:10:47 -0800 (PST)
+        with ESMTP id S229592AbjBISLL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Feb 2023 13:11:11 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0C7369509
+        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 10:10:56 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 27B62B8227D
-        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 18:10:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7B21C433EF;
-        Thu,  9 Feb 2023 18:10:44 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 25A8C61B6D
+        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 18:10:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8970EC433D2;
+        Thu,  9 Feb 2023 18:10:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1675966244;
-        bh=6XseaYrWthAt8FZx/5o+YR98uLeMrF9a6yo8YPl3f80=;
+        s=k20201202; t=1675966255;
+        bh=bvKB/niBnOc/ZdVNTmvtXUHucGexqrHDsffJo0FAtc0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=c3H4kdN0/fszS2dOPvPwvPxvgOzizXZp76Oq+8FEf8/T+s09wH+u8JocNHbNfj7eg
-         PcHuC/HEoo8l7MtuZVw6vhqal2FZROOe5qM6HMXYmT250qxdv3Mf28nsL4P2KAJSRN
-         q4eWlzQ83HqV00TRK7axCmR3eWjz0VjdPQAM/yxx8fGUFE2AfDEa/PzlNSR+9QrKpX
-         mMwdhn/CWaVweyeX8OsPugBDClCq9xagKDJLeSrMyXnn1uDr7hnC+0mdFAzmdYhK/s
-         rtzQ/ISQrl8gb0CnCqhd17p06UquMiD0ealcTIO40t87olxS2b0KvngQ1yBbvuUsVl
-         /hxyLGXLLzOog==
+        b=huSAXsO2Wv3N74QsMv5iyqWVl7npB8kYX6xKvrSijYrqLTHoM2vyh41TBb6/llXxS
+         NdRV871PwWkOXw4IDoLONMBH0FNcDZ7ZapC7Vc8x2zRCBXppzUGyxX2jFsr7N0oqzR
+         Dtr4B1CCgGsqj866QnugN2fmHrlb24DCd9NDMomoXrN/0nHPlgFKCVlb4ZO/uta0dr
+         x1GqtuobfMu/b4qnEMYAwMmmUHXKX9mjH3joWp5tk+D3uTrwL7BaRKpy3b916F1+6t
+         xicJ73mtz5IjRq33/KAXAfGKfdZqP4Nut4zFNSWzz82C33JDCecN+UID6qseqS2461
+         LDtAMZXRTm+EQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pQBC5-0093r7-IA;
+        id 1pQBC5-0093r7-Qe;
         Thu, 09 Feb 2023 17:58:49 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -50,9 +50,9 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 15/18] KVM: arm64: nv: Allow a sysreg to be hidden from userspace only
-Date:   Thu,  9 Feb 2023 17:58:17 +0000
-Message-Id: <20230209175820.1939006-16-maz@kernel.org>
+Subject: [PATCH 16/18] KVM: arm64: nv: Emulate EL12 register accesses from the virtual EL2
+Date:   Thu,  9 Feb 2023 17:58:18 +0000
+Message-Id: <20230209175820.1939006-17-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230209175820.1939006-1-maz@kernel.org>
 References: <20230209175820.1939006-1-maz@kernel.org>
@@ -62,8 +62,8 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, catalin.marinas@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, rmk+kernel@armlinux.org.uk, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,89 +71,83 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-So far, we never needed to distinguish between registers hidden
-from userspace and being hidden from a guest (they are always
-either visible to both, or hidden from both).
+From: Jintack Lim <jintack.lim@linaro.org>
 
-With NV, we have the ugly case of the EL02 and EL12 registers,
-which are only a view on the EL0 and EL1 registers. It makes
-absolutely no sense to expose them to userspace, since it
-already has the canonical view.
+With HCR_EL2.NV bit set, accesses to EL12 registers in the virtual EL2
+trap to EL2. Handle those traps just like we do for EL1 registers.
 
-Add a new visibility flag (REG_HIDDEN_USER) and a new helper that
-checks for it and REG_HIDDEN when checking whether to expose
-a sysreg to userspace. Subsequent patches will make use of it.
+One exception is CNTKCTL_EL12. We don't trap on CNTKCTL_EL1 for non-VHE
+virtual EL2 because we don't have to. However, accessing CNTKCTL_EL12
+will trap since it's one of the EL12 registers controlled by HCR_EL2.NV
+bit.  Therefore, add a handler for it and don't treat it as a
+non-trap-registers when preparing a shadow context.
+
+These registers, being only a view on their EL1 counterpart, are
+permanently hidden from userspace.
 
 Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+[maz: EL12_REG(), register visibility]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c |  6 +++---
- arch/arm64/kvm/sys_regs.h | 14 ++++++++++++--
- 2 files changed, 15 insertions(+), 5 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 37 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index de209059fd34..55a14c86a455 100644
+index 55a14c86a455..f5dd4f4eaaf0 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -2980,7 +2980,7 @@ int kvm_sys_reg_get_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
- 	int ret;
- 
- 	r = id_to_sys_reg_desc(vcpu, reg->id, table, num);
--	if (!r)
-+	if (!r || sysreg_hidden_user(vcpu, r))
- 		return -ENOENT;
- 
- 	if (r->get_user) {
-@@ -3024,7 +3024,7 @@ int kvm_sys_reg_set_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
- 		return -EFAULT;
- 
- 	r = id_to_sys_reg_desc(vcpu, reg->id, table, num);
--	if (!r)
-+	if (!r || sysreg_hidden_user(vcpu, r))
- 		return -ENOENT;
- 
- 	if (sysreg_user_write_ignore(vcpu, r))
-@@ -3118,7 +3118,7 @@ static int walk_one_sys_reg(const struct kvm_vcpu *vcpu,
- 	if (!(rd->reg || rd->get_user))
- 		return 0;
- 
--	if (sysreg_hidden(vcpu, rd))
-+	if (sysreg_hidden_user(vcpu, rd))
- 		return 0;
- 
- 	if (!copy_reg_to_user(rd, uind))
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index e4ebb3a379fd..6b11f2cc7146 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -85,8 +85,9 @@ struct sys_reg_desc {
- };
- 
- #define REG_HIDDEN		(1 << 0) /* hidden from userspace and guest */
--#define REG_RAZ			(1 << 1) /* RAZ from userspace and guest */
--#define REG_USER_WI		(1 << 2) /* WI from userspace only */
-+#define REG_HIDDEN_USER		(1 << 1) /* hidden from userspace only */
-+#define REG_RAZ			(1 << 2) /* RAZ from userspace and guest */
-+#define REG_USER_WI		(1 << 3) /* WI from userspace only */
- 
- static __printf(2, 3)
- inline void print_sys_reg_msg(const struct sys_reg_params *p,
-@@ -152,6 +153,15 @@ static inline bool sysreg_hidden(const struct kvm_vcpu *vcpu,
- 	return sysreg_visibility(vcpu, r) & REG_HIDDEN;
+@@ -1482,6 +1482,26 @@ static unsigned int el2_visibility(const struct kvm_vcpu *vcpu,
+ 	.val = v,				\
  }
  
-+static inline bool sysreg_hidden_user(const struct kvm_vcpu *vcpu,
-+				      const struct sys_reg_desc *r)
++/*
++ * EL{0,1}2 registers are the EL2 view on an EL0 or EL1 register when
++ * HCR_EL2.E2H==1, and only in the sysreg table for convenience of
++ * handling traps. Given that, they are always hidden from userspace.
++ */
++static unsigned int elx2_visibility(const struct kvm_vcpu *vcpu,
++				    const struct sys_reg_desc *rd)
 +{
-+	if (likely(!r->visibility))
-+		return false;
-+
-+	return r->visibility(vcpu, r) & (REG_HIDDEN | REG_HIDDEN_USER);
++	return REG_HIDDEN_USER;
 +}
 +
- static inline bool sysreg_visible_as_raz(const struct kvm_vcpu *vcpu,
- 					 const struct sys_reg_desc *r)
- {
++#define EL12_REG(name, acc, rst, v) {		\
++	SYS_DESC(SYS_##name##_EL12),		\
++	.access = acc,				\
++	.reset = rst,				\
++	.reg = name##_EL1,			\
++	.val = v,				\
++	.visibility = elx2_visibility,		\
++}
++
+ /* sys_reg_desc initialiser for known cpufeature ID registers */
+ #define ID_SANITISED(name) {			\
+ 	SYS_DESC(SYS_##name),			\
+@@ -2031,6 +2051,23 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	EL2_REG(CNTVOFF_EL2, access_rw, reset_val, 0),
+ 	EL2_REG(CNTHCTL_EL2, access_rw, reset_val, 0),
+ 
++	EL12_REG(SCTLR, access_vm_reg, reset_val, 0x00C50078),
++	EL12_REG(CPACR, access_rw, reset_val, 0),
++	EL12_REG(TTBR0, access_vm_reg, reset_unknown, 0),
++	EL12_REG(TTBR1, access_vm_reg, reset_unknown, 0),
++	EL12_REG(TCR, access_vm_reg, reset_val, 0),
++	{ SYS_DESC(SYS_SPSR_EL12), access_spsr},
++	{ SYS_DESC(SYS_ELR_EL12), access_elr},
++	EL12_REG(AFSR0, access_vm_reg, reset_unknown, 0),
++	EL12_REG(AFSR1, access_vm_reg, reset_unknown, 0),
++	EL12_REG(ESR, access_vm_reg, reset_unknown, 0),
++	EL12_REG(FAR, access_vm_reg, reset_unknown, 0),
++	EL12_REG(MAIR, access_vm_reg, reset_unknown, 0),
++	EL12_REG(AMAIR, access_vm_reg, reset_amair_el1, 0),
++	EL12_REG(VBAR, access_rw, reset_val, 0),
++	EL12_REG(CONTEXTIDR, access_vm_reg, reset_val, 0),
++	EL12_REG(CNTKCTL, access_rw, reset_val, 0),
++
+ 	EL2_REG(SP_EL2, NULL, reset_unknown, 0),
+ };
+ 
 -- 
 2.34.1
 
