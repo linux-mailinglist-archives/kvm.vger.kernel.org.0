@@ -2,137 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A741B69005A
-	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 07:30:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 97DC6690139
+	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 08:25:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229576AbjBIGaR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Feb 2023 01:30:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59250 "EHLO
+        id S229483AbjBIHZx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Feb 2023 02:25:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229498AbjBIGaQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Feb 2023 01:30:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6372B1BC7
-        for <kvm@vger.kernel.org>; Wed,  8 Feb 2023 22:29:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675924168;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QlYX3NFGK/iEEZ/mvkWFWopRA7ZdWOPwg+O9hZr+ePo=;
-        b=euLjz796L8+RYeEz0oZOHTqxsthAT/a9XDU9jmiPtjOHnrO3aWawelt5e2txSuxzj+NkVQ
-        v58MkqDffdYw1Xe/55Dw5zdrv442oonw21kozazJdyXGuAuxlJdM+9lfusQVH/fEUA/nlQ
-        Bx4Il7jEcJYnqz5iODmE/zYX99BoVpo=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-608-6wXm-My-OvWF79NSibuOKA-1; Thu, 09 Feb 2023 01:29:25 -0500
-X-MC-Unique: 6wXm-My-OvWF79NSibuOKA-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AB6243C025C2;
-        Thu,  9 Feb 2023 06:29:24 +0000 (UTC)
-Received: from [10.64.54.63] (vpn2-54-63.bne.redhat.com [10.64.54.63])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6925A492B00;
-        Thu,  9 Feb 2023 06:29:18 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v2 11/12] KVM: arm64: Split huge pages during
- KVM_CLEAR_DIRTY_LOG
-To:     Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com,
-        maz@kernel.org, oupton@google.com, yuzenghui@huawei.com,
-        dmatlack@google.com
-Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
-        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        eric.auger@redhat.com, reijiw@google.com, rananta@google.com,
-        bgardon@google.com, ricarkol@gmail.com
-References: <20230206165851.3106338-1-ricarkol@google.com>
- <20230206165851.3106338-12-ricarkol@google.com>
-From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <5be91738-093c-a416-6b04-4503d3689333@redhat.com>
-Date:   Thu, 9 Feb 2023 17:29:15 +1100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        with ESMTP id S229664AbjBIHZv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Feb 2023 02:25:51 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2397B4A1E7;
+        Wed,  8 Feb 2023 23:25:34 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id f16-20020a17090a9b1000b0023058bbd7b2so1510230pjp.0;
+        Wed, 08 Feb 2023 23:25:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rmVDDhkBD33dRebxUB6WkABikP1v8rHGLOz9oy+lzOw=;
+        b=Qqsr8VuFj/cb61lWwBfIJiwftaSsXtTbIODDj9kMRlVfS2CUTcXAcnkVENwaHeFXCc
+         eXeZ9Y66+6ildCk3obb8k3r83H0DWVz4TJzYVPAXagF7GXjgZ3GxGOCw/EF1i0/rp5IN
+         pgGJSBfHppwSSxlu/WOaFOQm7D96GzMtKBjclGwqHDQYZ8V5NNbTw5oahMvkY62J4Bcv
+         xvuULTn8M1jB7ooQLdS2tItxTCRS2SNix0Lv5msweEF06EcK/+YQoovw+ALLc950AbCO
+         dNuYMGg/puoIQ39KxeNIBvRe2lqaJj+1rlej0C5Dhe4aDgkWXgpDufZzv1pwpPPiB1NX
+         cjLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rmVDDhkBD33dRebxUB6WkABikP1v8rHGLOz9oy+lzOw=;
+        b=fHXlptSQsRUIKjFOT0E54fTp1M+fvo+LmopMDezQsQHAn6O3yItgPd6wha0MAtwNfJ
+         x/l9YYNkKXSuGmCE1RZSsBDBnXOFT7kAkZNsqbk43WbGeCRz253O+M9bb/xW1tnENivI
+         1HJOwn1i9ZX9vT8fPO2T/SKFiS5sYLBB4RkHOT9V2HW5ECBZKOgWxzpAhOKhjnLxHROL
+         epm5IGwUv518/FakgSCJEESeUhecWtzSVn3pNHy9sAToKeK4G5uO97NFvWcfYJGi0YuD
+         E6kcc7GHWGPqUmDTtJThXgq+XjZcVvAtFlErpICSAhSXRgYwqBhh8BsHE+tuaBNz1bow
+         dumQ==
+X-Gm-Message-State: AO0yUKXgkW/Sozgb++k19n79YWzZq5yPISWh2L0SC+g1QeRJGC6rpyod
+        BE1Cw23FZZKuorxonuRCDl4=
+X-Google-Smtp-Source: AK7set81TKZAFzmOrFzSNHYZptbc1qRIgjmsCDass4PkbAdTYVS+WfbfkwETMnLWvQHYBCaWiFrNHA==
+X-Received: by 2002:a17:902:f2c9:b0:19a:6098:103a with SMTP id h9-20020a170902f2c900b0019a6098103amr325179plc.23.1675927531617;
+        Wed, 08 Feb 2023 23:25:31 -0800 (PST)
+Received: from localhost ([192.55.54.55])
+        by smtp.gmail.com with ESMTPSA id n20-20020a170902d0d400b0019948184c33sm664782pln.243.2023.02.08.23.25.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Feb 2023 23:25:30 -0800 (PST)
+Date:   Wed, 8 Feb 2023 23:25:29 -0800
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        wei.w.wang@intel.com, isaku.yamahata@gmail.com
+Subject: Re: [PATCH v10 2/9] KVM: Introduce per-page memory attributes
+Message-ID: <20230209072529.GB4175971@ls.amr.corp.intel.com>
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+ <20221202061347.1070246-3-chao.p.peng@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20230206165851.3106338-12-ricarkol@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20221202061347.1070246-3-chao.p.peng@linux.intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Ricardo,
+On Fri, Dec 02, 2022 at 02:13:40PM +0800,
+Chao Peng <chao.p.peng@linux.intel.com> wrote:
 
-On 2/7/23 3:58 AM, Ricardo Koller wrote:
-> This is the arm64 counterpart of commit cb00a70bd4b7 ("KVM: x86/mmu:
-> Split huge pages mapped by the TDP MMU during KVM_CLEAR_DIRTY_LOG"),
-> which has the benefit of splitting the cost of splitting a memslot
-> across multiple ioctls.
-> 
-> Split huge pages on the range specified using KVM_CLEAR_DIRTY_LOG.
-> And do not split when enabling dirty logging if
-> KVM_DIRTY_LOG_INITIALLY_SET is set.
-> 
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> ---
->   arch/arm64/kvm/mmu.c | 15 ++++++++++++---
->   1 file changed, 12 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index f6fb2bdaab71..da2fbd04fb01 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1084,8 +1084,8 @@ static void kvm_mmu_split_memory_region(struct kvm *kvm, int slot)
->    * @mask:	The mask of pages at offset 'gfn_offset' in this memory
->    *		slot to enable dirty logging on
->    *
-> - * Writes protect selected pages to enable dirty logging for them. Caller must
-> - * acquire kvm->mmu_lock.
-> + * Splits selected pages to PAGE_SIZE and then writes protect them to enable
-> + * dirty logging for them. Caller must acquire kvm->mmu_lock.
->    */
->   void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
->   		struct kvm_memory_slot *slot,
-> @@ -1098,6 +1098,13 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
->   	lockdep_assert_held_write(&kvm->mmu_lock);
->   
->   	stage2_wp_range(&kvm->arch.mmu, start, end);
+> +static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
+> +					   struct kvm_memory_attributes *attrs)
+> +{
+> +	gfn_t start, end;
+> +	unsigned long i;
+> +	void *entry;
+> +	u64 supported_attrs = kvm_supported_mem_attributes(kvm);
 > +
-> +	/*
-> +	 * If initially-all-set mode is not set, then huge-pages were already
-> +	 * split when enabling dirty logging: no need to do it again.
-> +	 */
-> +	if (kvm_dirty_log_manual_protect_and_init_set(kvm))
-> +		kvm_mmu_split_huge_pages(kvm, start, end);
->   }
->   
->   static void kvm_send_hwpoison_signal(unsigned long address, short lsb)
-> @@ -1884,7 +1891,9 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
->   		 * this when deleting, moving, disabling dirty logging, or
->   		 * creating the memslot (a nop). Doing it for deletes makes
->   		 * sure we don't leak memory, and there's no need to keep the
-> -		 * cache around for any of the other cases.
-> +		 * cache around for any of the other cases. Keeping the cache
-> +		 * is useful for succesive KVM_CLEAR_DIRTY_LOG calls, which is
-> +		 * not handled in this function.
->   		 */
->   		kvm_mmu_free_memory_cache(&kvm->arch.mmu.split_page_cache);
->   	}
-> 
+> +	/* flags is currently not used. */
+> +	if (attrs->flags)
+> +		return -EINVAL;
+> +	if (attrs->attributes & ~supported_attrs)
+> +		return -EINVAL;
+> +	if (attrs->size == 0 || attrs->address + attrs->size < attrs->address)
+> +		return -EINVAL;
+> +	if (!PAGE_ALIGNED(attrs->address) || !PAGE_ALIGNED(attrs->size))
+> +		return -EINVAL;
+> +
+> +	start = attrs->address >> PAGE_SHIFT;
+> +	end = (attrs->address + attrs->size - 1 + PAGE_SIZE) >> PAGE_SHIFT;
+> +
+> +	entry = attrs->attributes ? xa_mk_value(attrs->attributes) : NULL;
+> +
+> +	mutex_lock(&kvm->lock);
+> +	for (i = start; i < end; i++)
+> +		if (xa_err(xa_store(&kvm->mem_attr_array, i, entry,
+> +				    GFP_KERNEL_ACCOUNT)))
+> +			break;
+> +	mutex_unlock(&kvm->lock);
+> +
+> +	attrs->address = i << PAGE_SHIFT;
+> +	attrs->size = (end - i) << PAGE_SHIFT;
+> +
+> +	return 0;
+> +}
+> +#endif /* CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES */
+> +
 
-s/succesive/successive
+If memslot isn't private, it should return error if private attribute is set.
+Something like following check is needed.
 
-Thanks,
-Gavin
++       if (attrs->flags & KVM_MEM_PRIVATE) {
++               /* non-private memory slot doesn't allow KVM_MEM_PRIVATE */
++               for (i = 0; i < kvm_arch_nr_memslot_as_ids(kvm); i++) {
++                       struct kvm_memslot_iter iter;
++                       struct kvm_memslots *slots;
++
++                       slots = __kvm_memslots(kvm, i);
++                       kvm_for_each_memslot_in_gfn_range(&iter, slots, start, end) {
++                               if (!kvm_slot_can_be_private(iter.slot)) {
++                                       mutex_unlock(&kvm->slots_lock);
++                                       return -EINVAL;
++                               }
++                       }
++               }
++       }
++
 
+
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
