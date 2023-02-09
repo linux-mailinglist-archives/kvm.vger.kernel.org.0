@@ -2,122 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ADA3E690EF8
-	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 18:14:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 425A9690F2B
+	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 18:27:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229972AbjBIROh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Feb 2023 12:14:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44336 "EHLO
+        id S229750AbjBIR1w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Feb 2023 12:27:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229557AbjBIROg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Feb 2023 12:14:36 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEAD6AD2F
-        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 09:14:35 -0800 (PST)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 319H1kZP024067;
-        Thu, 9 Feb 2023 17:14:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=lvSzpAz+N2vwasHmBwgxtzvNVnUWEG4aIwNbw07xED0=;
- b=iVuEBlOWzii20dv4km9NpZhFVdB7k2yE7FWUd+z8TmlOXgfl2D5en0zq6T6M0bjBQmAH
- PzhvD0Ljg5E1UgOlvIkyBqTjCJ+aXG/NPtEci4h+6tepHPXXVrR7hs5hYMbZthdClrNe
- eP5mxNV5RPH2PvuYR+GbR7jVcsBp1vBv+NmuYo6xX/MaTcZajYqKGnZAcx6vSPBLiKCo
- DRKU4CiQ4kQ8aTrH6thUQpA+O1LJ2HjjH0MqAOhr6m9IbRQt6L6/aFhe0x7UfmQRirc8
- wWQdTNHanjVMhuyQUbperIeGb6g+mxh3eNIh9sUdBTFyn0iiUoVVPzKeVzilmDISaU8i 2Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nn4vdgu8w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Feb 2023 17:14:30 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 319H4ehU003535;
-        Thu, 9 Feb 2023 17:14:29 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nn4vdgu82-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Feb 2023 17:14:29 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 318L1Kd5016027;
-        Thu, 9 Feb 2023 17:14:27 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3nhf06vm8a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Feb 2023 17:14:27 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 319HENl437486878
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 9 Feb 2023 17:14:23 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6CEC920049;
-        Thu,  9 Feb 2023 17:14:23 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0D47420043;
-        Thu,  9 Feb 2023 17:14:23 +0000 (GMT)
-Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.156.204])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu,  9 Feb 2023 17:14:22 +0000 (GMT)
-Message-ID: <74229e1f3cbb45a92e8b1f26cc8ad744453985a7.camel@linux.ibm.com>
-Subject: Re: [PATCH v15 00/11] s390x: CPU Topology
-From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
-        berrange@redhat.com, clg@kaod.org
-Date:   Thu, 09 Feb 2023 18:14:22 +0100
-In-Reply-To: <20230201132051.126868-1-pmorel@linux.ibm.com>
-References: <20230201132051.126868-1-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.3 (3.46.3-1.fc37) 
+        with ESMTP id S229648AbjBIR1v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Feb 2023 12:27:51 -0500
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B85601633C
+        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 09:27:48 -0800 (PST)
+Received: by mail-pl1-x631.google.com with SMTP id be8so3602304plb.7
+        for <kvm@vger.kernel.org>; Thu, 09 Feb 2023 09:27:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mt8a0Rl3erq9+Dr/Cmy9rAt9EFtIjcwoFiRBF/7IB3I=;
+        b=a/MPey0EqRCkzNnrvafc65sjTU46gsZEE0WSL2uobtUow7jWOj87hM9y/ehxQuEWTD
+         t8rPofOJgJS8UHnCDM4U6WYpw7db7UH+kL65KD5jvJF2GTjv/SBv7PjebfFENUajWSDg
+         qLyzOCUld75zaebYoQ/Buh28FtorlTX1VGfnOt1OI0CtuoAjA58KdEUkXM/V/LJg3b7a
+         PghD3IcFU/V0sOQ1XQ0mJ1fmy3ukc5LHSz+wXCxSoJtcKnS0Z9LpCMJomYbP7naVplDd
+         RqNsGz3pQVZO+qqOIjlAIqwKo93qC68udpSgHqKGRXgzzJGS1L0j7i/l4QgPWPA9q3GA
+         gVDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mt8a0Rl3erq9+Dr/Cmy9rAt9EFtIjcwoFiRBF/7IB3I=;
+        b=o6ua+MjwQSBaxnVbe/hYv3oMUAX/o3nxdePLjvtXGEzLYDk8LG268T+MYrJFru0bdd
+         qVP8TowS8Z9wwGssREast5f1fasN1AyhMGSilBLZPJyvJFPc9xb+FvMf1PP84B4fjoMH
+         9C38BatvdNSzCv2AWERKLhsC5nMFEeae+Xl6eO/ff4DqYGKDY/a4UjVkpbLJPkrLNl5m
+         F/p6mtlQw499CdZjN7UTiF/0BM4WioL7pbtQWXsUlrg0+vPUgvPgV9TKzU5EB0Li8lkv
+         Z4fxJnpPu87jCsbvOv3AgzgFaVrdsys5xlQqEK2Q/kxj4aaQgMg/LnTS3RnIj3CNhsoc
+         oFMw==
+X-Gm-Message-State: AO0yUKXb0nuTp7dJJ7sevDfhHYAE08p6pABWxkaxxRslI1dGQSN4Nk9D
+        oOep5n2+IorrtkhsR6YVCd86iA==
+X-Google-Smtp-Source: AK7set8zkXvGrkMdAb4lAjOOw5urcslii+fxgorqc2AEfu3klDwJfc5HZoAwz8XccGV7TvhCHDeDeQ==
+X-Received: by 2002:a17:902:db0e:b0:198:af50:e4e2 with SMTP id m14-20020a170902db0e00b00198af50e4e2mr177686plx.8.1675963668088;
+        Thu, 09 Feb 2023 09:27:48 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id jc12-20020a17090325cc00b001931c37da2dsm1766012plb.20.2023.02.09.09.27.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Feb 2023 09:27:47 -0800 (PST)
+Date:   Thu, 9 Feb 2023 17:27:43 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Robert Hoo <robert.hu@linux.intel.com>
+Cc:     Chao Gao <chao.gao@intel.com>, pbonzini@redhat.com,
+        yu.c.zhang@linux.intel.com, yuan.yao@linux.intel.com,
+        jingqi.liu@intel.com, weijiang.yang@intel.com,
+        isaku.yamahata@intel.com, kirill.shutemov@linux.intel.com,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v4 0/9] Linear Address Masking (LAM) KVM Enabling
+Message-ID: <Y+UtDxPqIEeZ0sYH@google.com>
+References: <20230209024022.3371768-1-robert.hu@linux.intel.com>
+ <Y+SPjkY87zzFqHLj@gao-cwp>
+ <5884e0cb15f7f904728fa31bb571218aec31087c.camel@linux.intel.com>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: mAdlDBKcYxIUM7OgnKcYkxLXUieXUbS2
-X-Proofpoint-GUID: aifQs9QIqiAsZg4xd5P5puPpuMwVUWTs
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
- definitions=2023-02-09_13,2023-02-09_03,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- adultscore=0 malwarescore=0 mlxscore=0 lowpriorityscore=0 spamscore=0
- clxscore=1015 impostorscore=0 mlxlogscore=998 bulkscore=0 phishscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302090162
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5884e0cb15f7f904728fa31bb571218aec31087c.camel@linux.intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-IMO this series looks good overall and like it's nearing the final stages.
+On Thu, Feb 09, 2023, Robert Hoo wrote:
+> On Thu, 2023-02-09 at 14:15 +0800, Chao Gao wrote:
+> > On Thu, Feb 09, 2023 at 10:40:13AM +0800, Robert Hoo wrote:
+> > Please add a kvm-unit-test or kselftest for LAM, particularly for
+> > operations (e.g., canonical check for supervisor pointers, toggle
+> > CR4.LAM_SUP) which aren't covered by the test in Kirill's series.
+> 
+> OK, I can explore for kvm-unit-test in separate patch set.
 
-You use "polarity" instead of "polarization" a lot.
-Since the PoP uses polarization I think that term would be preferred.
+Please make tests your top priority.  Without tests, I am not going to spend any
+time reviewing this series, or any other hardware enabling series[*].  I don't
+expect KVM specific tests for everything, i.e. it's ok to to rely things like
+running VMs that utilize LAM and/or running LAM selftests in the guest, but I do
+want a reasonably thorough explanation of how all the test pieces fit together to
+validate KVM's implementation.
 
-With the series as it is, one cannot set the polarization via qmp,
-only the entitlement of individual cpus. So only the VM can change
-the polarization.
-Would it be desirable to also be able to set the polarization from the outs=
-ide?
-
-Like I said in one response, it would be good to consider if we need an
-polarization_change_in_progress state that refuses requests.
-I'm guessing not, if a request is always completed before the next is handl=
-ed
-and there is no way to lose requests.
-I don't know how long it would take to change the CPU assignment and if the=
-re
-is a chance that could be overwhelmed by too many requests.
-Probably not but something worth thinking about.
-
-Might be a good idea to add a test case that performs test via qmp.
-So starts an instance with some cpu topology assignments, checks that
-qmp returns the correct topology, hot plugs a cpu and does another check,
-Changes topology attributes, etc.
-I guess this would be an avocado test.
+[*] https://lore.kernel.org/all/Y+Uq0JOEmmdI0YwA@google.com
