@@ -2,57 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6759169046C
-	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 11:07:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 55F5C69047A
+	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 11:11:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229852AbjBIKHs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Feb 2023 05:07:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37748 "EHLO
+        id S229751AbjBIKLv convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 9 Feb 2023 05:11:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229516AbjBIKHq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Feb 2023 05:07:46 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE0C75648C;
-        Thu,  9 Feb 2023 02:07:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=7ihrTUnoMI52M6sI1d2pqsQm9NOthf/7rqHgEcyNCe8=; b=sJJzP6s/vD3NpqHuAS1AfBc4+6
-        02Gmiet41+18UkI1KwWU3zwOvuH7xHl3ZhI4sgl1A3Si0A/bMrkqLOmNYAmcZiA9wcwZTHX1mme0/
-        xxA0WkhfuB2ex+kGUApYQwzGGSOF/0z+MYXbDr+GCrOSDMruBMzEjMg4ip2V2gf8SOKSyKxBmkjRq
-        tTvXv+KPUXbxvq5e5b1ZYKPobDuNjm3RaFHQlfM84z4ggdNDgsjL8M2eP1Q2fAGwzHDWP+ytJiTUT
-        EMOA56nIbETYwzuR7xYSGNqiWbGlI2oO3hhXAkEW5eUOXKU/bJnqtPONq9aFAg4t/5BKsupmjHRT/
-        8uhixrlQ==;
-Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.infradead.org)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pQ3pQ-0025im-FF; Thu, 09 Feb 2023 10:06:57 +0000
-Message-ID: <79fa4d65a0d906dd42c41324dfe065aa8ad06d6f.camel@infradead.org>
-Subject: Re: [External] Re: [PATCH v7 0/9] Parallel CPU bringup for x86_64
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Usama Arif <usama.arif@bytedance.com>, paulmck@kernel.org,
-        tglx@linutronix.de
-Cc:     kim.phillips@amd.com, arjan@linux.intel.com, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        x86@kernel.org, pbonzini@redhat.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, rcu@vger.kernel.org, mimoja@mimoja.de,
-        hewenliang4@huawei.com, thomas.lendacky@amd.com, seanjc@google.com,
-        pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
-        punit.agrawal@bytedance.com, simon.evans@bytedance.com,
-        liangma@liangbit.com
-Date:   Thu, 09 Feb 2023 10:06:55 +0000
-In-Reply-To: <8e2f03e2-9517-aeb4-df60-b36ef3ff3a75@bytedance.com>
-References: <20230207230436.2690891-1-usama.arif@bytedance.com>
-         <20230209035300.GA3216394@paulmck-ThinkPad-P17-Gen-1>
-         <8e2f03e2-9517-aeb4-df60-b36ef3ff3a75@bytedance.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-14ViVt0MfS9hGh3gKvzE"
-User-Agent: Evolution 3.44.4-0ubuntu1 
+        with ESMTP id S229723AbjBIKLt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Feb 2023 05:11:49 -0500
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1491E2690;
+        Thu,  9 Feb 2023 02:11:46 -0800 (PST)
+Received: from lhrpeml100003.china.huawei.com (unknown [172.18.147.206])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4PCCGd3Dh7z6J6Yh;
+        Thu,  9 Feb 2023 18:07:37 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
+ lhrpeml100003.china.huawei.com (7.191.160.210) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.17; Thu, 9 Feb 2023 10:11:43 +0000
+Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
+ lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.017;
+ Thu, 9 Feb 2023 10:11:42 +0000
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Yi Liu <yi.l.liu@intel.com>, "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>
+CC:     "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>
+Subject: RE: [PATCH 00/17] Add Intel VT-d nested translation
+Thread-Topic: [PATCH 00/17] Add Intel VT-d nested translation
+Thread-Index: AQHZPD95hqLckmeZEk+opw51qnHtYq7GX1jw
+Date:   Thu, 9 Feb 2023 10:11:42 +0000
+Message-ID: <0bea6077f0634587b744ec2b421205e1@huawei.com>
+References: <20230209043153.14964-1-yi.l.liu@intel.com>
+In-Reply-To: <20230209043153.14964-1-yi.l.liu@intel.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.195.245.52]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -60,157 +72,161 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-14ViVt0MfS9hGh3gKvzE
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
 
-T24gVGh1LCAyMDIzLTAyLTA5IGF0IDA5OjQ5ICswMDAwLCBVc2FtYSBBcmlmIHdyb3RlOgo+IAo+
-IC0tLSBhL2FyY2gveDg2L2tlcm5lbC9zbXBib290LmMKPiArKysgYi9hcmNoL3g4Ni9rZXJuZWwv
-c21wYm9vdC5jCj4gQEAgLTEwODAsNiArMTA4MCw3IEBAIHdha2V1cF9jcHVfdmlhX2luaXRfbm1p
-KGludCBjcHUsIHVuc2lnbmVkIGxvbmcgCj4gc3RhcnRfaXAsIGludCBhcGljaWQsCj4gwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgIHdha2V1cF9jcHUwX25taSwgMCwgIndha2VfY3B1MCIpOwo+
-IAo+IMKgwqDCoMKgwqDCoMKgwqAgaWYgKCFib290X2Vycm9yKSB7Cj4gK8KgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgaW5pdGlhbF9ncyA9IHBlcl9jcHVfb2Zmc2V0KGNwdSk7CgpUaGF0J3Mg
-Zm9yIDY0LWJpdC4KCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgZW5hYmxlX3N0
-YXJ0X2NwdTAgPSAxOwo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICpjcHUwX25t
-aV9yZWdpc3RlcmVkID0gMTsKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBpZCA9
-IGFwaWMtPmRlc3RfbW9kZV9sb2dpY2FsID8gY3B1MF9sb2dpY2FsX2FwaWNpZCA6Cj4gYXBpY2lk
-Owo+IEBAIC0xMTg4LDEwICsxMTg5LDE0IEBAIHN0YXRpYyBpbnQgZG9fYm9vdF9jcHUoaW50IGFw
-aWNpZCwgaW50IGNwdSwgCj4gc3RydWN0IHRhc2tfc3RydWN0ICppZGxlLAo+IMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgIGJvb3RfZXJyb3IgPSBhcGljLT53YWtldXBfc2Vjb25kYXJ5
-X2NwdV82NChhcGljaWQsIAo+IHN0YXJ0X2lwKTsKPiDCoMKgwqDCoMKgwqDCoMKgIGVsc2UgaWYg
-KGFwaWMtPndha2V1cF9zZWNvbmRhcnlfY3B1KQo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgIGJvb3RfZXJyb3IgPSBhcGljLT53YWtldXBfc2Vjb25kYXJ5X2NwdShhcGljaWQsIHN0
-YXJ0X2lwKTsKPiAtwqDCoMKgwqDCoMKgIGVsc2UKPiArwqDCoMKgwqDCoMKgIGVsc2Ugewo+ICvC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGlmKCFjcHUpIHsKPiArwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgZWFybHlfZ2R0X2Rlc2NyLmFkZHJlc3MgPSAo
-dW5zaWduZWQgbG9uZylnZXRfY3B1X2dkdF9ydyhjcHUpOwo+ICvCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBpbml0aWFsX3N0YWNrwqAgPSBpZGxlLT50aHJlYWQu
-c3A7Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfQoKQW5kIHRoYXQncyAzMi1iaXQu
-CgpUaGVzZSB3ZXJlIHByZXZpb3VzbHkgZG9uZSBpbiBjb21tb25fY3B1X3VwKCkgb3IgZG9fYm9v
-dF9jcHUoKSwgd2hpY2gKbWVhbnMgdGhleSB3ZXJlIGRvbmUgbm90IG9ubHkgZm9yIHRoZSB3YWtl
-dXBfY3B1X3ZpYV9pbml0X25taSgpIGNvZGUKcGF0aCwgYnV0IGFsc28gd2hlbiB3ZSBjYWxsIGFw
-aWMtPndha2V1cF9zZWNvbmRhcnlfY3B1KCkgKG9yIF82NCgpKSBmb3IKdGhlIGVzb3RlcmljIFVW
-L051bWFDb25uZWN0IG1hY2hpbmVzLgoKVGhhbmtzIGZvciBkaWFnbm9zaW5nIGl0IHNvIHF1aWNr
-bHk7IEknbGwgd29yayB1cCBhIHN1YnRseSBkaWZmZXJlbnQKZml4LgoKPiDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoCBib290X2Vycm9yID0gd2FrZXVwX2NwdV92aWFfaW5pdF9ubWko
-Y3B1LCBzdGFydF9pcCwgYXBpY2lkLAo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqAgY3B1MF9ubWlfcmVnaXN0ZXJlZCk7Cj4gLQo+ICvCoMKgwqDCoMKg
-wqAgfQo+IMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuIGJvb3RfZXJyb3I7Cj4gwqAgfQo+IAoK
+> -----Original Message-----
+> From: Yi Liu [mailto:yi.l.liu@intel.com]
+> Sent: 09 February 2023 04:32
+> To: joro@8bytes.org; alex.williamson@redhat.com; jgg@nvidia.com;
+> kevin.tian@intel.com; robin.murphy@arm.com
+> Cc: cohuck@redhat.com; eric.auger@redhat.com; nicolinc@nvidia.com;
+> kvm@vger.kernel.org; mjrosato@linux.ibm.com;
+> chao.p.peng@linux.intel.com; yi.l.liu@intel.com; yi.y.sun@linux.intel.com;
+> peterx@redhat.com; jasowang@redhat.com; Shameerali Kolothum Thodi
+> <shameerali.kolothum.thodi@huawei.com>; lulu@redhat.com;
+> suravee.suthikulpanit@amd.com; iommu@lists.linux.dev;
+> linux-kernel@vger.kernel.org; linux-kselftest@vger.kernel.org;
+> baolu.lu@linux.intel.com
+> Subject: [PATCH 00/17] Add Intel VT-d nested translation
+> 
+> Nested translation has two stage address translations to get the final
+> physical addresses. Take Intel VT-d as an example, the first stage translation
+> structure is I/O page table. As the below diagram shows, guest I/O page
+> table pointer in GPA (guest physical address) is passed to host to do the
+> first stage translation. Along with it, guest modifications to present
+> mappings in the first stage page should be followed with an iotlb invalidation
+> to sync host iotlb.
+> 
+>     .-------------.  .---------------------------.
+>     |   vIOMMU    |  | Guest I/O page table      |
+>     |             |  '---------------------------'
+>     .----------------/
+>     | PASID Entry |--- PASID cache flush --+
+>     '-------------'                        |
+>     |             |                        V
+>     |             |           I/O page table pointer in GPA
+>     '-------------'
+> Guest
+> ------| Shadow |--------------------------|--------
+>       v        v                          v
+> Host
+>     .-------------.  .------------------------.
+>     |   pIOMMU    |  |  FS for GIOVA->GPA      |
+>     |             |  '------------------------'
+>     .----------------/  |
+>     | PASID Entry |     V (Nested xlate)
+>     '----------------\.----------------------------------.
+>     |             |   | SS for GPA->HPA, unmanaged domain|
+>     |             |   '----------------------------------'
+>     '-------------'
+> Where:
+>  - FS = First stage page tables
+>  - SS = Second stage page tables
+> <Intel VT-d Nested translation>
+> 
+> Different platform vendors have different first stage translation formats,
+> so userspace should query the underlying iommu capability before setting
+> first stage translation structures to host.[1]
+> 
+> In iommufd subsystem, I/O page tables would be tracked by hw_pagetable
+> objects.
+> First stage page table is owned by userspace (guest), while second stage
+> page
+> table is owned by kernel for security. So First stage page tables are tracked
+> by user-managed hw_pagetable, second stage page tables are tracked by
+> kernel-
+> managed hw_pagetable.
+> 
+> This series first introduces new iommu op for allocating domains for
+> iommufd,
+> and op for syncing iotlb for first stage page table modifications, and then
+> add the implementation of the new ops in intel-iommu driver. After this
+> preparation, adds kernel-managed and user-managed hw_pagetable
+> allocation for
+> userspace. Last, add self-test for the new ioctls.
+> 
+> This series is based on "[PATCH 0/6] iommufd: Add iommu capability
+> reporting"[1]
+> and Nicolin's "[PATCH v2 00/10] Add IO page table replacement support"[2].
+> Complete
+> code can be found in[3]. Draft Qemu code can be found in[4].
+> 
+> Basic test done with DSA device on VT-d. Where the guest has a vIOMMU
+> built
+> with nested translation.
 
+Hi Yi Liu,
 
---=-14ViVt0MfS9hGh3gKvzE
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+Thanks for sending this out. Will go through this one. As I informed before we keep
+an internal branch based on your work and rebase few patches to get the ARM
+SMMUv3 nesting support. The recent one is based on your "iommufd-v6.2-rc4-nesting"
+branch and is here,
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMjA5MTAwNjU1WjAvBgkqhkiG9w0BCQQxIgQgQBXqescy
-GJz2Z6VFSpLOFHIB7VsSMn5Ks3COctCtjskwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBMHGc+3x2MDRcCFtExEXncbsfNP0JcmxK1
-9pPkF1pXeuV8XYEAr/kw8n+mzZYDOfR3qP2xRAbc+vf4dFgSvqHg3k9TZqdrI1+zSKp4HEQzQOuh
-O7/pDWhSePGI2I06ys3jZAWJHd7vsrRbVhhnsGQs8/BHZdhXuaGRC0m4XXdmWSyhdnVGphQDb9+N
-LH4ZM0QONck1La+m2W1dihrCNXt34ViVkeYRinM56x+CnG9k2Dn8n9wWcrYIt+HpKfL9TTAMuqXF
-5tZ59UlL/gFBZAzq5BrV8ezdMMHe5bmFmI3IRBwIYd5a3gMBoubVJfeteYhrUdQliXtqu2lX1bTq
-g+SXNMZ0Zf+27BxONbA9NEsaUDLgrWKMCtlTSi/f0TBboeYzXkKrHhNDm6CW8/oX54K0U99g9m2k
-t48JfEp6nsrU6kRZKzfm+vKYFeE3i53SvMe9coQOmg537QDzNFq1IEXpHuG8VJgNT/H2NJ0QjQwD
-RAUPWeBZWFXuaUDoMe1thapP5A3jJR0qJyvyHn09qcwZG2Gi5fPYeP1R6yVOhFaIWTNQ2UtfC8CS
-F8UTz5qnWJewBRn2VtXjlux8PHYHG/EyMH2KIkVA6OZ+3HYB75XXwalYmZpPoqe2T0tRznx9vd3P
-H/rAc6HV/scIqGlEZq2F/cVLPivnLpBYKs926C5FfwAAAAAAAA==
+https://github.com/hisilicon/kernel-dev/commits/iommufd-v6.2-rc4-nesting-arm
 
+Just wondering any chance the latest "Add SMMUv3 nesting support" series will
+be send out soon? Please let me know if you need any help with that.
 
---=-14ViVt0MfS9hGh3gKvzE--
+Thanks,
+Shameer
+> 
+> [1]
+> https://lore.kernel.org/linux-iommu/20230209041642.9346-1-yi.l.liu@intel.
+> com/
+> [2]
+> https://lore.kernel.org/linux-iommu/cover.1675802050.git.nicolinc@nvidia.c
+> om/
+> [3] https://github.com/yiliu1765/iommufd/tree/iommufd_nesting_vtd_v1
+> [4] https://github.com/yiliu1765/qemu/tree/wip/iommufd_rfcv3%2Bnesting
+> 
+> Regards,
+> 	Yi Liu
+> 
+> Lu Baolu (5):
+>   iommu: Add new iommu op to create domains owned by userspace
+>   iommu: Add nested domain support
+>   iommu/vt-d: Extend dmar_domain to support nested domain
+>   iommu/vt-d: Add helper to setup pasid nested translation
+>   iommu/vt-d: Add nested domain support
+> 
+> Nicolin Chen (6):
+>   iommufd: Add/del hwpt to IOAS at alloc/destroy()
+>   iommufd/device: Move IOAS attaching and detaching operations into
+>     helpers
+>   iommufd/selftest: Add IOMMU_TEST_OP_MOCK_DOMAIN_REPLACE test
+> op
+>   iommufd/selftest: Add coverage for IOMMU_HWPT_ALLOC ioctl
+>   iommufd/selftest: Add IOMMU_TEST_OP_MD_CHECK_IOTLB test op
+>   iommufd/selftest: Add coverage for IOMMU_HWPT_INVALIDATE ioctl
+> 
+> Yi Liu (6):
+>   iommufd/hw_pagetable: Use domain_alloc_user op for domain allocation
+>   iommufd: Split iommufd_hw_pagetable_alloc()
+>   iommufd: Add kernel-managed hw_pagetable allocation for userspace
+>   iommufd: Add infrastructure for user-managed hw_pagetable allocation
+>   iommufd: Add user-managed hw_pagetable allocation
+>   iommufd/device: Report supported stage-1 page table types
+> 
+>  drivers/iommu/intel/Makefile                  |   2 +-
+>  drivers/iommu/intel/iommu.c                   |  38 ++-
+>  drivers/iommu/intel/iommu.h                   |  50 +++-
+>  drivers/iommu/intel/nested.c                  | 143 +++++++++
+>  drivers/iommu/intel/pasid.c                   | 142 +++++++++
+>  drivers/iommu/intel/pasid.h                   |   2 +
+>  drivers/iommu/iommufd/device.c                | 117 ++++----
+>  drivers/iommu/iommufd/hw_pagetable.c          | 280
+> +++++++++++++++++-
+>  drivers/iommu/iommufd/iommufd_private.h       |  23 +-
+>  drivers/iommu/iommufd/iommufd_test.h          |  35 +++
+>  drivers/iommu/iommufd/main.c                  |  11 +
+>  drivers/iommu/iommufd/selftest.c              | 149 +++++++++-
+>  include/linux/iommu.h                         |  11 +
+>  include/uapi/linux/iommufd.h                  | 196 ++++++++++++
+>  tools/testing/selftests/iommu/iommufd.c       | 124 +++++++-
+>  tools/testing/selftests/iommu/iommufd_utils.h | 106 +++++++
+>  16 files changed, 1329 insertions(+), 100 deletions(-)
+>  create mode 100644 drivers/iommu/intel/nested.c
+> 
+> --
+> 2.34.1
+> 
+
