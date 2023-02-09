@@ -2,64 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 578EE68FF56
-	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 05:35:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 94F7D69001A
+	for <lists+kvm@lfdr.de>; Thu,  9 Feb 2023 06:59:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230341AbjBIEfj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Feb 2023 23:35:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48650 "EHLO
+        id S229483AbjBIF7G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Feb 2023 00:59:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230375AbjBIEez (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Feb 2023 23:34:55 -0500
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 337EF518F4;
-        Wed,  8 Feb 2023 20:33:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1675917185; x=1707453185;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=dlcR+UhuTmADspR4+oiL3WW4I/8TuCAOY+usI2kEQJs=;
-  b=dl4CrnpInnfB/CgOV3sCGlp5pQoFvOOqhpr8Kf8euXYo/gDGa5CoSyRk
-   RL/m1W59lTZ0PL8kInEFL42M1koA+3HvVyndT16uiuB6weaGJFYvncZdl
-   F5U7KrOMi+fksieh/4+EeCYU7F7egoK7AGQD3wsx7A0LLTua7S0Rux/mZ
-   NihIZavUf1KTfZPd6bmDJryOZWo/6RiJfrXK9i8Re1uvCNeyQ8Sir6GTV
-   5WiM1LE3xbRa/RJlhvjQ9gLs86B5VFAkLxbpw637CEhU/Sek+YNUJXPk4
-   8JEhO4TRNbqcUzpJuOEtM14B4qxbJczJi7iEhLWEgDwXczIsSk7IiFHiw
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10615"; a="331298915"
-X-IronPort-AV: E=Sophos;i="5.97,281,1669104000"; 
-   d="scan'208";a="331298915"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2023 20:32:30 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10615"; a="669447643"
-X-IronPort-AV: E=Sophos;i="5.97,281,1669104000"; 
-   d="scan'208";a="669447643"
-Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by fmsmga007.fm.intel.com with ESMTP; 08 Feb 2023 20:32:29 -0800
-From:   Yi Liu <yi.l.liu@intel.com>
-To:     joro@8bytes.org, alex.williamson@redhat.com, jgg@nvidia.com,
-        kevin.tian@intel.com, robin.murphy@arm.com
-Cc:     cohuck@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
-        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.l.liu@intel.com,
-        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        baolu.lu@linux.intel.com
-Subject: [PATCH 17/17] iommufd/selftest: Add coverage for IOMMU_HWPT_INVALIDATE ioctl
-Date:   Wed,  8 Feb 2023 20:31:53 -0800
-Message-Id: <20230209043153.14964-18-yi.l.liu@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230209043153.14964-1-yi.l.liu@intel.com>
-References: <20230209043153.14964-1-yi.l.liu@intel.com>
+        with ESMTP id S229632AbjBIF7D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Feb 2023 00:59:03 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD44338E91
+        for <kvm@vger.kernel.org>; Wed,  8 Feb 2023 21:58:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675922295;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=UOowcWM9s5inrGwJGgxBQs1aEePQqB9IDyRqhUzygKI=;
+        b=GdGr/RGrsLFxSN+4EzA7ZuRRLD5hOcXcSg3+LmYGCS5dnqu1IoNUzMdk7U0Ffo7vTDjMGb
+        nGDAJS9wbMo/rgmHv55BQxjOVKoG5Q5brM8wTL2yuzMSRzbOKkpbMuxOaaHWjsHBTP8dM/
+        7kp+QLd27CiAMzTHQdZHgY5rWRV8AmE=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-491-H2yiNuYhPfylTrHJKcZQgg-1; Thu, 09 Feb 2023 00:58:11 -0500
+X-MC-Unique: H2yiNuYhPfylTrHJKcZQgg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3D64E3C02542;
+        Thu,  9 Feb 2023 05:58:10 +0000 (UTC)
+Received: from [10.64.54.63] (vpn2-54-63.bne.redhat.com [10.64.54.63])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id BC9802026D4B;
+        Thu,  9 Feb 2023 05:58:03 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v2 04/12] KVM: arm64: Add kvm_pgtable_stage2_split()
+To:     Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com,
+        maz@kernel.org, oupton@google.com, yuzenghui@huawei.com,
+        dmatlack@google.com
+Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
+        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        eric.auger@redhat.com, reijiw@google.com, rananta@google.com,
+        bgardon@google.com, ricarkol@gmail.com
+References: <20230206165851.3106338-1-ricarkol@google.com>
+ <20230206165851.3106338-5-ricarkol@google.com>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <cae4a1d9-b5c2-2929-6d88-5a3fbe719651@redhat.com>
+Date:   Thu, 9 Feb 2023 16:58:01 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+In-Reply-To: <20230206165851.3106338-5-ricarkol@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,148 +71,193 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Nicolin Chen <nicolinc@nvidia.com>
+Hi Ricardo,
 
-This only adds limited sanity.
+On 2/7/23 3:58 AM, Ricardo Koller wrote:
+> Add a new stage2 function, kvm_pgtable_stage2_split(), for splitting a
+> range of huge pages. This will be used for eager-splitting huge pages
+> into PAGE_SIZE pages. The goal is to avoid having to split huge pages
+> on write-protection faults, and instead use this function to do it
+> ahead of time for large ranges (e.g., all guest memory in 1G chunks at
+> a time).
+> 
+> No functional change intended. This new function will be used in a
+> subsequent commit.
+> 
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> ---
+>   arch/arm64/include/asm/kvm_pgtable.h |  30 ++++++++
+>   arch/arm64/kvm/hyp/pgtable.c         | 105 +++++++++++++++++++++++++++
+>   2 files changed, 135 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index e94c92988745..871c4eeb0184 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -658,6 +658,36 @@ bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr);
+>    */
+>   int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size);
+>   
+> +/**
+> + * kvm_pgtable_stage2_split() - Split a range of huge pages into leaf PTEs pointing
+> + *				to PAGE_SIZE guest pages.
+> + * @pgt:	 Page-table structure initialised by kvm_pgtable_stage2_init().
+> + * @addr:	 Intermediate physical address from which to split.
+> + * @size:	 Size of the range.
+> + * @mc:		 Cache of pre-allocated and zeroed memory from which to allocate
+> + *		 page-table pages.
+> + * @mc_capacity: Number of pages in @mc.
+> + *
+> + * @addr and the end (@addr + @size) are effectively aligned down and up to
+> + * the top level huge-page block size. This is an example using 1GB
+> + * huge-pages and 4KB granules.
+> + *
+> + *                          [---input range---]
+> + *                          :                 :
+> + * [--1G block pte--][--1G block pte--][--1G block pte--][--1G block pte--]
+> + *                          :                 :
+> + *                   [--2MB--][--2MB--][--2MB--][--2MB--]
+> + *                          :                 :
+> + *                   [ ][ ][:][ ][ ][ ][ ][ ][:][ ][ ][ ]
+> + *                          :                 :
+> + *
+> + * Return: 0 on success, negative error code on failure. Note that
+> + * kvm_pgtable_stage2_split() is best effort: it tries to break as many
+> + * blocks in the input range as allowed by @mc_capacity.
+> + */
+> +int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> +			     void *mc, u64 mc_capacity);
+> +
+>   /**
+>    * kvm_pgtable_walk() - Walk a page-table.
+>    * @pgt:	Page-table structure initialised by kvm_pgtable_*_init().
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index fed314f2b320..ae80845c8db7 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -1229,6 +1229,111 @@ int kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
+>   	return 0;
+>   }
+>   
+> +struct stage2_split_data {
+> +	struct kvm_s2_mmu		*mmu;
+> +	void				*memcache;
+> +	u64				mc_capacity;
+> +};
+> +
+> +/*
+> + * Get the number of page-tables needed to replace a bock with a fully
+> + * populated tree, up to the PTE level, at particular level.
+> + */
+> +static inline u32 stage2_block_get_nr_page_tables(u32 level)
+> +{
+> +	switch (level) {
+> +	/* There are no blocks at level 0 */
+> +	case 1: return 1 + PTRS_PER_PTE;
+> +	case 2: return 1;
+> +	case 3: return 0;
+> +	default:
+> +		WARN_ON_ONCE(1);
+> +		return ~0;
+> +	}
+> +}
+> +
+> +static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> +			       enum kvm_pgtable_walk_flags visit)
+> +{
+> +	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+> +	struct stage2_split_data *data = ctx->arg;
+> +	kvm_pte_t pte = ctx->old, new, *childp;
+> +	enum kvm_pgtable_prot prot;
+> +	void *mc = data->memcache;
+> +	u32 level = ctx->level;
+> +	u64 phys, nr_pages;
+> +	bool force_pte;
+> +	int ret;
+> +
+> +	/* No huge-pages exist at the last level */
+> +	if (level == KVM_PGTABLE_MAX_LEVELS - 1)
+> +		return 0;
+> +
+> +	/* We only split valid block mappings */
+> +	if (!kvm_pte_valid(pte) || kvm_pte_table(pte, ctx->level))
+> +		return 0;
+> +
 
-Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
-Signed-off-by: Yi Liu <yi.l.liu@intel.com>
----
- drivers/iommu/iommufd/hw_pagetable.c          |  7 ++++++-
- drivers/iommu/iommufd/iommufd_test.h          | 10 +++++++++
- drivers/iommu/iommufd/selftest.c              | 15 +++++++++++++
- tools/testing/selftests/iommu/iommufd.c       |  8 +++++++
- tools/testing/selftests/iommu/iommufd_utils.h | 21 +++++++++++++++++++
- 5 files changed, 60 insertions(+), 1 deletion(-)
+Since stage2_split_walker() has been specified as a leaf walker by KVM_PGTABLE_WALK_LEAF,
+I don't understand how kvm_pte_table() can return true.
 
-diff --git a/drivers/iommu/iommufd/hw_pagetable.c b/drivers/iommu/iommufd/hw_pagetable.c
-index 1f1940969b2b..86864a3e170e 100644
---- a/drivers/iommu/iommufd/hw_pagetable.c
-+++ b/drivers/iommu/iommufd/hw_pagetable.c
-@@ -283,7 +283,12 @@ int iommufd_hwpt_invalidate(struct iommufd_ucmd *ucmd)
- 		goto out_put_hwpt;
- 	}
- 
--	klen = iommufd_hwpt_invalidate_info_size[cmd->data_type];
-+	if (cmd->data_type != IOMMU_PGTBL_DATA_SELFTTEST)
-+		klen = iommufd_hwpt_invalidate_info_size[cmd->data_type];
-+#ifdef CONFIG_IOMMUFD_TEST
-+	else
-+		klen = sizeof(struct iommu_hwpt_invalidate_selftest);
-+#endif
- 	if (!klen) {
- 		rc = -EINVAL;
- 		goto out_put_hwpt;
-diff --git a/drivers/iommu/iommufd/iommufd_test.h b/drivers/iommu/iommufd/iommufd_test.h
-index 5998c63a89f2..4913884a8b24 100644
---- a/drivers/iommu/iommufd/iommufd_test.h
-+++ b/drivers/iommu/iommufd/iommufd_test.h
-@@ -134,4 +134,14 @@ struct iommu_hwpt_selftest {
- 	__u64 test_config;
- };
- 
-+/**
-+ * struct iommu_hwpt_invalidate_selftest
-+ *
-+ * @flags: invalidate flags
-+ */
-+struct iommu_hwpt_invalidate_selftest {
-+#define IOMMU_TEST_INVALIDATE_ALL	(1 << 0)
-+	__u64 flags;
-+};
-+
- #endif
-diff --git a/drivers/iommu/iommufd/selftest.c b/drivers/iommu/iommufd/selftest.c
-index 21134000bc78..06b5e8829488 100644
---- a/drivers/iommu/iommufd/selftest.c
-+++ b/drivers/iommu/iommufd/selftest.c
-@@ -283,6 +283,20 @@ static phys_addr_t mock_domain_iova_to_phys(struct iommu_domain *domain,
- 	return (xa_to_value(ent) & MOCK_PFN_MASK) * MOCK_IO_PAGE_SIZE;
- }
- 
-+static void mock_domain_iotlb_sync_user(struct iommu_domain *domain,
-+					void *user_data)
-+{
-+	struct iommu_hwpt_invalidate_selftest *inv_info = user_data;
-+	struct mock_iommu_domain *mock =
-+		container_of(domain, struct mock_iommu_domain, domain);
-+
-+	if (domain->type != IOMMU_DOMAIN_NESTED || !mock->parent)
-+		return;
-+
-+	if (inv_info->flags & IOMMU_TEST_INVALIDATE_ALL)
-+		mock->iotlb = 0;
-+}
-+
- static const struct iommu_ops mock_ops = {
- 	.owner = THIS_MODULE,
- 	.pgsize_bitmap = MOCK_IO_PAGE_SIZE,
-@@ -301,6 +315,7 @@ static const struct iommu_ops mock_ops = {
- 
- static struct iommu_domain_ops domain_nested_ops = {
- 	.free = mock_domain_free,
-+	.iotlb_sync_user = mock_domain_iotlb_sync_user,
- };
- 
- static inline struct iommufd_hw_pagetable *
-diff --git a/tools/testing/selftests/iommu/iommufd.c b/tools/testing/selftests/iommu/iommufd.c
-index ddd7c898fc50..3fc7a1cd8fef 100644
---- a/tools/testing/selftests/iommu/iommufd.c
-+++ b/tools/testing/selftests/iommu/iommufd.c
-@@ -126,6 +126,7 @@ TEST_F(iommufd, cmd_length)
- 	TEST_LENGTH(iommu_vfio_ioas, IOMMU_VFIO_IOAS);
- 	TEST_LENGTH(iommu_device_info, IOMMU_DEVICE_GET_INFO);
- 	TEST_LENGTH(iommu_hwpt_alloc, IOMMU_HWPT_ALLOC);
-+	TEST_LENGTH(iommu_hwpt_invalidate, IOMMU_HWPT_INVALIDATE);
- #undef TEST_LENGTH
- }
- 
-@@ -312,6 +313,13 @@ TEST_F(iommufd_ioas, ioas_nested_hwpt)
- 		EXPECT_ERRNO(EBUSY,
- 			     _test_ioctl_destroy(self->fd, parent_hwpt_id));
- 
-+		/* hwpt_invalidate only supports a user-managed hwpt (nested) */
-+		test_err_ioctl_hwpt_invalidate(EINVAL, parent_hwpt_id);
-+		test_ioctl_hwpt_invalidate(nested_hwpt_id[0]);
-+		test_ioctl_hwpt_check_iotlb(nested_hwpt_id[0], 0);
-+		test_ioctl_hwpt_invalidate(nested_hwpt_id[1]);
-+		test_ioctl_hwpt_check_iotlb(nested_hwpt_id[1], 0);
-+
- 		/* Attach device to nested_hwpt_id[0] that then will be busy */
- 		test_cmd_mock_domain_replace(self->ioas_id, self->dev_id,
- 					     nested_hwpt_id[0]);
-diff --git a/tools/testing/selftests/iommu/iommufd_utils.h b/tools/testing/selftests/iommu/iommufd_utils.h
-index ea61b81fbc52..73ba0bacbb9a 100644
---- a/tools/testing/selftests/iommu/iommufd_utils.h
-+++ b/tools/testing/selftests/iommu/iommufd_utils.h
-@@ -244,6 +244,27 @@ static int _test_ioctl_hwpt_alloc(int fd, __u32 pt_id, __u32 dev_id,
- 		ASSERT_EQ(0, *(out_hwpt_id));                                 \
- 	})
- 
-+static int _test_ioctl_hwpt_invalidate(int fd, __u32 hwpt_id)
-+{
-+	struct iommu_hwpt_invalidate_selftest data = {
-+		.flags = IOMMU_TEST_INVALIDATE_ALL,
-+	};
-+	struct iommu_hwpt_invalidate cmd = {
-+		.size = sizeof(cmd),
-+		.hwpt_id = hwpt_id,
-+		.data_type = IOMMU_PGTBL_DATA_SELFTTEST,
-+		.data_len = sizeof(data),
-+		.data_uptr = (uint64_t)&data,
-+	};
-+
-+	return ioctl(fd, IOMMU_HWPT_INVALIDATE, &cmd);
-+}
-+
-+#define test_ioctl_hwpt_invalidate(hwpt_id)	\
-+	ASSERT_EQ(0, _test_ioctl_hwpt_invalidate(self->fd, hwpt_id))
-+#define test_err_ioctl_hwpt_invalidate(_errno, hwpt_id)	\
-+	EXPECT_ERRNO(_errno, _test_ioctl_hwpt_invalidate(self->fd, hwpt_id))
-+
- static int _test_ioctl_ioas_map(int fd, unsigned int ioas_id, void *buffer,
- 				size_t length, __u64 *iova, unsigned int flags)
- {
--- 
-2.34.1
+> +	nr_pages = stage2_block_get_nr_page_tables(level);
+> +	if (data->mc_capacity >= nr_pages) {
+> +		/* Build a tree mapped down to the PTE granularity. */
+> +		force_pte = true;
+> +	} else {
+> +		/*
+> +		 * Don't force PTEs. This requires a single page of PMDs at the
+> +		 * PUD level, or a single page of PTEs at the PMD level. If we
+> +		 * are at the PUD level, the PTEs will be created recursively.
+> +		 */
+> +		force_pte = false;
+> +		nr_pages = 1;
+> +	}
+> +
+> +	if (data->mc_capacity < nr_pages)
+> +		return -ENOMEM;
+> +
+> +	phys = kvm_pte_to_phys(pte);
+> +	prot = kvm_pgtable_stage2_pte_prot(pte);
+> +
+> +	ret = kvm_pgtable_stage2_create_unlinked(data->mmu->pgt, &new, phys,
+> +						 level, prot, mc, force_pte);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (!stage2_try_break_pte(ctx, data->mmu)) {
+> +		childp = kvm_pte_follow(new, mm_ops);
+> +		kvm_pgtable_stage2_free_unlinked(mm_ops, childp, level);
+> +		mm_ops->put_page(childp);
+> +		return -EAGAIN;
+> +	}
+> +
+> +	/*
+> +	 * Note, the contents of the page table are guaranteed to be made
+> +	 * visible before the new PTE is assigned because stage2_make_pte()
+> +	 * writes the PTE using smp_store_release().
+> +	 */
+> +	stage2_make_pte(ctx, new);
+> +	dsb(ishst);
+> +	data->mc_capacity -= nr_pages;
+> +	return 0;
+> +}
+> +
+
+I think it's possible 'data->mc_capability' to be replaced by 'mc->nobjs'
+because they're same thing. With this, we needn't to maintain a duplicate
+'data->mc_capability' since 'data->mc' has been existing.
+
+> +int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> +			     void *mc, u64 mc_capacity)
+> +{
+> +	struct stage2_split_data split_data = {
+> +		.mmu		= pgt->mmu,
+> +		.memcache	= mc,
+> +		.mc_capacity	= mc_capacity,
+> +	};
+> +
+> +	struct kvm_pgtable_walker walker = {
+> +		.cb	= stage2_split_walker,
+> +		.flags	= KVM_PGTABLE_WALK_LEAF,
+> +		.arg	= &split_data,
+> +	};
+> +
+> +	return kvm_pgtable_walk(pgt, addr, size, &walker);
+> +}
+> +
+>   int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+>   			      struct kvm_pgtable_mm_ops *mm_ops,
+>   			      enum kvm_pgtable_stage2_flags flags,
+> 
+
+Thanks,
+Gavin
 
