@@ -2,82 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BE004692A96
-	for <lists+kvm@lfdr.de>; Fri, 10 Feb 2023 23:53:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 08129692BA5
+	for <lists+kvm@lfdr.de>; Sat, 11 Feb 2023 00:52:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229550AbjBJWxX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Feb 2023 17:53:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47294 "EHLO
+        id S229873AbjBJXwI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Feb 2023 18:52:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229539AbjBJWxW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Feb 2023 17:53:22 -0500
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5643C23D88;
-        Fri, 10 Feb 2023 14:53:21 -0800 (PST)
-Received: by mail-pf1-x42a.google.com with SMTP id v3so4494541pfn.6;
-        Fri, 10 Feb 2023 14:53:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=5C7mT14sIcQvZGqVI82PDB3oIpwvIfrZYj8GQKRk2hw=;
-        b=P/Tr0QaVTqrmzTX9y2izxlfHtpFEpelXkhC8PrVRQIjIVTa77U5WVEXpobrw1wVXOt
-         ec2pULGZcCu1Q7QhlKmTHf6rsvSMr7NgLeQyrTQW3dBUJ/1d7BguZLWiBIlUibtR1yfm
-         Saq9iljFRa5en+DF9HAaDWUvOYQJzIpAdoW9S9GWKt7stpbuanfGr2xP6Xp9h1KCP+6V
-         waRMfWEy2EzM3N2uDUoOm4I4jtsWp7/YssULyHh3pMg+vhuP4liovJurTHrijef6L1f3
-         IbO/b56MVFY+bZnP2Nuu4dBpl9z7BiZl1gfPc0+aAXV6+KVD5otUeFJKwhSG8pjWX2pL
-         8hjA==
+        with ESMTP id S229551AbjBJXwH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Feb 2023 18:52:07 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67B6C26852
+        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 15:51:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676073074;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zxG2e2jd/Ft5YwmWrl0Bp+sdIxiuwt9Kd232cbEoDxs=;
+        b=fP8ygXSKd9toKX+RNShuSUKdxRME1pGdqCwLayp+DpYhmf1POP0pwWee5DBrWIA58ueABp
+        qArzQS05WnpZhtnfSAqEMC8Rgrsqfdc4LkiYVbo5Cx0Qd8roC2KrsOSOBM6q8Vb5WUmx1f
+        N+laIKD5Wx30RocUAPI7gnZVZikg0wo=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-672-181X4gGGOZmGQBhHHRjYAw-1; Fri, 10 Feb 2023 18:51:13 -0500
+X-MC-Unique: 181X4gGGOZmGQBhHHRjYAw-1
+Received: by mail-il1-f197.google.com with SMTP id z12-20020a92d6cc000000b00310d4433c8cso5228453ilp.6
+        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 15:51:13 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5C7mT14sIcQvZGqVI82PDB3oIpwvIfrZYj8GQKRk2hw=;
-        b=2is3MgbKGiOEnfXIXEV6I/JAL4e62s7KX3o6eOsKkJQRTzlXLHD9YXfcnWEdxdQZES
-         EX8NKXTD66590epMFxsaycLppG98ylr8GaBjaYXK5lf2Lv7lodccfPJZhKK2sgTCOM88
-         GS3EFvXt/pet51D1GNwX9tIKECc74adAhFRF+zvwHbOGJMP3T3DHi7hUY7InDI9mwBZb
-         huTrJ6qQcWbsmV47Aqlkl1zIOkQk1+XpOIA9CbyIY4a3D480baUh8Q4IgyYUHvGBGMz7
-         JvY8XvhQ692rzQv/+8l93OXsRCi4OUO9zZBua0s1iq/e9+mTGeMrlsGjMeQYMvsRk/LT
-         2Bfw==
-X-Gm-Message-State: AO0yUKXRww3EzOBNPdXwVTjpVhH+EE4PJdEyleo/TsjhIfJ5SfXolKEx
-        mWU+SmIftypEMIXeWX6sL7OanlpxIeDpTDY0rmc=
-X-Google-Smtp-Source: AK7set/GNEl9KMH8Zwkoa7+0XItH/dxabtmg2DZlqpwxk0lC0z5W8yfttgTmQiqIMrBuECnEJk6/1mNLzLdb19oPgIs=
-X-Received: by 2002:a62:17c3:0:b0:5a8:6aeb:e95e with SMTP id
- 186-20020a6217c3000000b005a86aebe95emr1009703pfx.33.1676069600452; Fri, 10
- Feb 2023 14:53:20 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zxG2e2jd/Ft5YwmWrl0Bp+sdIxiuwt9Kd232cbEoDxs=;
+        b=h2rq25KUVlq1z94QvqlKXZGwWF2QjDnArGyLa4kWiR7SldCXzMKVKjg4TjKMjK29yP
+         fTjj+16nWx8FehK3iOP9k8TQInnVu5CVw6jZyDwSLe2TNNt4fY6MSyWPzGYFExQBTGr8
+         bpJ+kXRlTC4xG4RCBhxhNtHo/vbbD9Ko1h+7jbdTTP98aPFimveVj/eTrUJssjPX37AT
+         8aSQoHWJguG8sxAB3pN3b1EOzT+RGmOuij3llSu2OIo12VbUAnrmtG7GLbXub2RR0YY0
+         nveGmYUZc0aDoUShh6xgHfmVBgghmLaixqg8Z/LIPehFc7Rrn2VKM50+Q1nnDIJKpZ7y
+         l7pA==
+X-Gm-Message-State: AO0yUKUdsSRQQ7fqJvUTThHg6aullXWoVSzXoyADsDw+Y+RIg+1aP9Nx
+        viLeFTCJkLyjW7IEMUejYxrNVnZ1E/jg7RaK4pKag5hC0axWbNxqZMqr87GGbRxwQ3A77EyAG2v
+        GviigY4X0R7Es
+X-Received: by 2002:a05:6e02:19cf:b0:315:2b7c:3bcd with SMTP id r15-20020a056e0219cf00b003152b7c3bcdmr227351ill.23.1676073072663;
+        Fri, 10 Feb 2023 15:51:12 -0800 (PST)
+X-Google-Smtp-Source: AK7set842Z0z6M94KbGdEcodes2zf58/JeUwSHWqWrZfu04modlNc2olG9foLCn5r2HwqlyIBAtLsA==
+X-Received: by 2002:a05:6e02:19cf:b0:315:2b7c:3bcd with SMTP id r15-20020a056e0219cf00b003152b7c3bcdmr227334ill.23.1676073072410;
+        Fri, 10 Feb 2023 15:51:12 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id t26-20020a02c49a000000b0035678e2e175sm1766330jam.50.2023.02.10.15.51.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Feb 2023 15:51:11 -0800 (PST)
+Date:   Fri, 10 Feb 2023 16:51:10 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Nicolin Chen <nicolinc@nvidia.com>
+Cc:     <jgg@nvidia.com>, <kevin.tian@intel.com>, <joro@8bytes.org>,
+        <will@kernel.org>, <robin.murphy@arm.com>, <shuah@kernel.org>,
+        <yi.l.liu@intel.com>, <linux-kernel@vger.kernel.org>,
+        <iommu@lists.linux.dev>, <kvm@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>, <baolu.lu@linux.intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>
+Subject: Re: [PATCH v2 02/10] iommu: Introduce a new
+ iommu_group_replace_domain() API
+Message-ID: <20230210165110.4e89ce55.alex.williamson@redhat.com>
+In-Reply-To: <fa81379dca611c1d9f50f9d8cd2bca0d4ec7f965.1675802050.git.nicolinc@nvidia.com>
+References: <cover.1675802050.git.nicolinc@nvidia.com>
+        <fa81379dca611c1d9f50f9d8cd2bca0d4ec7f965.1675802050.git.nicolinc@nvidia.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20230127112248.136810-1-suzuki.poulose@arm.com> <cfb0292c-e84d-0a7c-be74-ae5508779502@arm.com>
-In-Reply-To: <cfb0292c-e84d-0a7c-be74-ae5508779502@arm.com>
-From:   Itaru Kitayama <itaru.kitayama@gmail.com>
-Date:   Sat, 11 Feb 2023 07:53:09 +0900
-Message-ID: <CANW9uyvXofhGGuhGzk_0Et-w8CHT2y35WSu5+hno6Qm8K4R4ug@mail.gmail.com>
-Subject: Re: [RFC] Support for Arm CCA VMs on Linux
-To:     Ryan Roberts <ryan.roberts@arm.com>
-Cc:     Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andrew Jones <andrew.jones@linux.dev>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        James Morse <james.morse@arm.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Joey Gouly <Joey.Gouly@arm.com>, Marc Zyngier <maz@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Steven Price <steven.price@arm.com>,
-        Thomas Huth <thuth@redhat.com>, Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.cs.columbia.edu
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -85,106 +84,109 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Feb 11, 2023 at 1:56 AM Ryan Roberts <ryan.roberts@arm.com> wrote:
->
-> On 27/01/2023 11:22, Suzuki K Poulose wrote:
-> > [...]
->
-> > Running the stack
-> > ====================
-> >
-> > To run/test the stack, you would need the following components :
-> >
-> > 1) FVP Base AEM RevC model with FEAT_RME support [4]
-> > 2) TF-A firmware for EL3 [5]
-> > 3) TF-A RMM for R-EL2 [3]
-> > 4) Linux Kernel [6]
-> > 5) kvmtool [7]
-> > 6) kvm-unit-tests [8]
-> >
-> > Instructions for building the firmware components and running the model are
-> > available here [9]. Once, the host kernel is booted, a Realm can be launched by
-> > invoking the `lkvm` commad as follows:
-> >
-> >  $ lkvm run --realm                            \
-> >        --measurement-algo=["sha256", "sha512"] \
-> >        --disable-sve                           \
-> >        <normal-vm-options>
-> >
-> > Where:
-> >  * --measurement-algo (Optional) specifies the algorithm selected for creating the
-> >    initial measurements by the RMM for this Realm (defaults to sha256).
-> >  * GICv3 is mandatory for the Realms.
-> >  * SVE is not yet supported in the TF-RMM, and thus must be disabled using
-> >    --disable-sve
-> >
-> > You may also run the kvm-unit-tests inside the Realm world, using the similar
-> > options as above.
->
-> Building all of these components and configuring the FVP correctly can be quite
-> tricky, so I thought I would plug a tool we have called Shrinkwrap, which can
-> simplify all of this.
->
-> The tool accepts a yaml input configuration that describes how a set of
-> components should be built and packaged, and how the FVP should be configured
-> and booted. And by default, it uses a Docker container on its backend, which
-> contains all the required tools, including the FVP. You can optionally use
-> Podman or have it run on your native system if you prefer. It supports both
-> x86_64 and aarch64. And you can even run it in --dry-run mode to see the set of
-> shell commands that would have been executed.
->
-> It comes with two CCA configs out-of-the-box; cca-3world.yaml builds TF-A, RMM,
-> Linux (for both host and guest), kvmtool and kvm-unit-tests. cca-4world.yaml
-> adds Hafnium and some demo SPs for the secure world (although since Hafnium
-> requires x86_64 to build, cca-4world.yaml doesn't currently work on an aarch64
-> build host).
->
-> See the documentation [1] and repository [2] for more info.
->
-> Brief instructions to get you up and running:
->
->   # Install shrinkwrap. (I assume you have Docker installed):
->   sudo pip3 install pyyaml termcolor tuxmake
->   git clone https://git.gitlab.arm.com/tooling/shrinkwrap.git
->   export PATH=$PWD/shrinkwrap/shrinkwrap:$PATH
->
->   # If running Python < 3.9:
->   sudo pip3 install graphlib-backport
->
->   # Build all the CCA components:
->   shrinkwrap build cca-3world.yaml [--dry-run]
+On Tue, 7 Feb 2023 13:17:54 -0800
+Nicolin Chen <nicolinc@nvidia.com> wrote:
 
-This has been working on my Multipass instance on M1, thanks for the tool.
+> qemu has a need to replace the translations associated with a domain
+> when the guest does large-scale operations like switching between an
+> IDENTITY domain and, say, dma-iommu.c.
+> 
+> Currently, it does this by replacing all the mappings in a single
+> domain, but this is very inefficient and means that domains have to be
+> per-device rather than per-translation.
+> 
+> Provide a high-level API to allow replacements of one domain with
+> another. This is similar to a detach/attach cycle except it doesn't
+> force the group to go to the blocking domain in-between.
+> 
+> By removing this forced blocking domain the iommu driver has the
+> opportunity to implement an atomic replacement of the domains to the
+> greatest extent its hardware allows.
+> 
+> It could be possible to adderss this by simply removing the protection
+> from the iommu_attach_group(), but it is not so clear if that is safe
+> for the few users. Thus, add a new API to serve this new purpose.
+> 
+> Atomic replacement allows the qemu emulation of the viommu to be more
+> complete, as real hardware has this ability.
 
-Thanks,
-Itaru.
+I was under the impression that we could not atomically switch a
+device's domain relative to in-flight DMA.  IIRC, the discussion was
+relative to VT-d, and I vaguely recall something about the domain
+needing to be invalidated before it could be replaced.  Am I
+mis-remembering or has this since been solved?  Adding Ashok, who might
+have been involved in one of those conversations.
 
->
->   # Run the stack in the FVP:
->   shrinkwrap run cca-3world.yaml -r ROOTFS=<my_rootfs.ext4> [--dry-run]
->
-> By default, building is done at ~/.shrinkwrap/build/cca-3world and the package
-> is created at ~/.shrinkwrap/package/cca-3world (this can be changed with
-> envvars).
->
-> The 'run' command will boot TF-A, RMM and host Linux kernel in the FVP, and
-> mount the provided rootfs. You will likely want to have copied the userspace
-> pieces into the rootfs before running, so you can create realms:
->
-> - ~/.shrinkwrap/package/cca-3world/Image (kernel with RMI and RSI support)
-> - ~/.shrinkwrap/package/cca-3world/lkvm (kvmtool able to launch realms)
-> - ~/.shrinkwrap/package/cca-3world/kvm-unit-tests.tgz (built kvm-unit-tests)
->
-> Once the FVP is booted to a shell, you can do something like this to launch a
-> Linux guest in a realm:
->
->   lkvm run --realm --disable-sve -c 1 -m 256 -k Image
->
-> [1] https://shrinkwrap.docs.arm.com
-> [2] https://gitlab.arm.com/tooling/shrinkwrap
->
->
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+Or maybe atomic is the wrong word here since we expect no in-flight DMA
+during the sort of mode transitions referred to here, and we're really
+just trying to convey that we can do this via a single operation with
+reduced latency?  Thanks,
+
+Alex
+
+> All drivers are already required to support changing between active
+> UNMANAGED domains when using their attach_dev ops.
+> 
+> This API is expected to be used by IOMMUFD, so add to the iommu-priv
+> header and mark it as IOMMUFD_INTERNAL.
+> 
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
+> ---
+>  drivers/iommu/iommu-priv.h |  4 ++++
+>  drivers/iommu/iommu.c      | 28 ++++++++++++++++++++++++++++
+>  2 files changed, 32 insertions(+)
+> 
+> diff --git a/drivers/iommu/iommu-priv.h b/drivers/iommu/iommu-priv.h
+> index 9e1497027cff..b546795a7e49 100644
+> --- a/drivers/iommu/iommu-priv.h
+> +++ b/drivers/iommu/iommu-priv.h
+> @@ -15,4 +15,8 @@ static inline const struct iommu_ops *dev_iommu_ops(struct device *dev)
+>  	 */
+>  	return dev->iommu->iommu_dev->ops;
+>  }
+> +
+> +extern int iommu_group_replace_domain(struct iommu_group *group,
+> +				      struct iommu_domain *new_domain);
+> +
+>  #endif /* __LINUX_IOMMU_PRIV_H */
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index a18b7f1a4e6e..15e07d39cd8d 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -2151,6 +2151,34 @@ int iommu_attach_group(struct iommu_domain *domain, struct iommu_group *group)
+>  }
+>  EXPORT_SYMBOL_GPL(iommu_attach_group);
+>  
+> +/**
+> + * iommu_group_replace_domain - replace the domain that a group is attached to
+> + * @new_domain: new IOMMU domain to replace with
+> + * @group: IOMMU group that will be attached to the new domain
+> + *
+> + * This API allows the group to switch domains without being forced to go to
+> + * the blocking domain in-between.
+> + *
+> + * If the currently attached domain is a core domain (e.g. a default_domain),
+> + * it will act just like the iommu_attach_group().
+> + */
+> +int iommu_group_replace_domain(struct iommu_group *group,
+> +			       struct iommu_domain *new_domain)
+> +{
+> +	int ret;
+> +
+> +	if (!new_domain)
+> +		return -EINVAL;
+> +
+> +	mutex_lock(&group->mutex);
+> +	ret = __iommu_group_set_domain(group, new_domain);
+> +	if (ret)
+> +		__iommu_group_set_domain(group, group->domain);
+> +	mutex_unlock(&group->mutex);
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_NS_GPL(iommu_group_replace_domain, IOMMUFD_INTERNAL);
+> +
+>  static int iommu_group_do_set_platform_dma(struct device *dev, void *data)
+>  {
+>  	const struct iommu_ops *ops = dev_iommu_ops(dev);
+
