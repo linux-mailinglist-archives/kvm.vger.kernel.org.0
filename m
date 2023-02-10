@@ -2,126 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 241FF6920D9
-	for <lists+kvm@lfdr.de>; Fri, 10 Feb 2023 15:31:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E4A966920DC
+	for <lists+kvm@lfdr.de>; Fri, 10 Feb 2023 15:33:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232251AbjBJObe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Feb 2023 09:31:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34818 "EHLO
+        id S232166AbjBJOdS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Feb 2023 09:33:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231792AbjBJObd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Feb 2023 09:31:33 -0500
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03F6F19685
-        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 06:31:33 -0800 (PST)
-Received: by mail-pl1-x634.google.com with SMTP id d8so5425852plr.10
-        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 06:31:32 -0800 (PST)
+        with ESMTP id S231749AbjBJOdR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Feb 2023 09:33:17 -0500
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 754AE5B764
+        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 06:33:14 -0800 (PST)
+Received: by mail-pg1-x52f.google.com with SMTP id s8so3799716pgg.11
+        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 06:33:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20210112.gappssmtp.com; s=20210112; t=1676039492;
+        d=linaro.org; s=google;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=l+Fl/ea9k4MWezTUZ0x9WnUvEIS2Kl3SMNRJmE8axVU=;
-        b=PAdZ9YqKptzI8J2c/ZeiNQnUObZz0ALIlrYoAcMCDQBUNrPjvyE8gx+PowaunyE+1h
-         IhN97L6BEDaJSNNucpgO/d/wawN9iCl9qbmgq2bZsCAyL8xbf6F0wC4MxAcsDgcJdOlb
-         pgA1pHEjHqiHHcTEOGAm/PDpeXZCykdfzIczmfxQbClyhkxX/cRDCmsPUtHGSv0d/tGp
-         yz4+bKOIwb+UqxUbu+VJHBQkxyzRCXUEiz96+56zuDr35CqFkp/8t+XMB05Z3tTy33ri
-         ZF3orLqWH09NwujoYVDJDa301ZWHzDwhjAE1PimwHEKmODPOrZz3St8xG5lNv3pCVkbi
-         Ddgw==
+        bh=EoyqZuT2eCQbPBzisd4AEJrjYx9W/vK3n0wiOZhNzwM=;
+        b=J6OyvW6DQadZOtUPSG+XjxWB9VyVd+gqG78TiO9GUcBNUb7yEloVmE6YTkseT4/UJT
+         mW4fMVkIeT3P6ISy1YuX6HpqyqvtMcoBxzANucFTLomhFhGO4m0y1gVAy6ZfA75t4soV
+         cP/cmBD5rm3W8VINPO0VoyUAXLoberlBTck6EG+9dlPyy53AX9kw5hPTjrGAGcZO8fF0
+         wHFZ1319fthomq7D4esrcg+JafzRlySnfKCclXwFlr6hT+Ed+SJnqqnPv5PvA81bF2WG
+         A0Qlvd6nwqa3Mue8dAgkVU3wkK0Y2P418xY/GAIFmkrYmJczzFiFV+3Wy9X8uHzgC8uL
+         5TeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1676039492;
+        d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=l+Fl/ea9k4MWezTUZ0x9WnUvEIS2Kl3SMNRJmE8axVU=;
-        b=XauvY8jn+KC8ky0+hqTru1Hvd6Apd+t/G3FJnWlVrfMhgjj3ShYPllVpx/fZWoCYEI
-         ygzFDr4F1Q/BAl8fD/Y50M25+WDAq3SRqbMdXJ7FoISfko4qABWFogFIWO8sW9/YF7mH
-         XDdrMHQFhQ/3CxU3JOGKKSucL1MY5PHY90KEINJLB7G0GWxg1yOYi9i6o9NJIcm5S5yZ
-         CsXp58rJnK1XBOFsRxgtK4Db+jHX2wszQE21ksbWLhdudOyxoIiyWGq/jH9i4px2rcFY
-         NmIoAec6cRY/5rXxuK8OsCE4CnFr+WIhChILDeEaD1P5YoeDqK/MqMGi7fpm4QGfJLkc
-         62Zw==
-X-Gm-Message-State: AO0yUKVsoLeKaiUoKpYnXNNEhP2tlNoFsUawODr4bIooBNVfWtaf3S26
-        646TpFosfMJ6FK+UVIWd3b9FYk1pAgh9DnyphkIGmw==
-X-Google-Smtp-Source: AK7set9xWHNc5kH6eusn88GsCvBUTVNlmU8X2oBVvokr6b8aMES545MC5WwCpRyUQES38Cx/tATSpTnjI3OYuKITVy4=
-X-Received: by 2002:a17:902:ea0e:b0:196:64bf:ed7a with SMTP id
- s14-20020a170902ea0e00b0019664bfed7amr3669726plg.29.1676039492491; Fri, 10
- Feb 2023 06:31:32 -0800 (PST)
+        bh=EoyqZuT2eCQbPBzisd4AEJrjYx9W/vK3n0wiOZhNzwM=;
+        b=myB/A/Is5/Ac8qjTN4C98ZrrkVd8BOe1aQb6sD20WoqjtTCQ6tWoiO0ttvS7Unl3hx
+         jObNRfMZLhYzB3wymBwrFJionmaPJvlvILEbLgmTCMZk4GgNWExrYCYZ+2NkAcgsG+Rs
+         jc/zYJEMA0qNP0KZqcWmeRqQFw8J8CFRd/+WbalIXbmJVVzZG3qCZ47p1QiBRqd1dxJr
+         IMRQgNGM3+e/feOLb4qU2STwAjCCI3DtlB7vzLsySl5YnbdkvWw24+3BZSoTISOnm+Vr
+         pXYe8aNOLzqZopuRV5b+5Y5K6p4pc+OV5lP+UV44EoHLfLLK6r29PBBlqKAXe0wXBiLy
+         0haw==
+X-Gm-Message-State: AO0yUKXNj2wOTYzq8JrtK8yz9Wam/OzcE6GlDKWuz0zf1WZXvpoHGEZU
+        v1t/ahVmk8PRcIl89kgwzBGEFmbuoTcjB0mGGS+HVQ==
+X-Google-Smtp-Source: AK7set/FMf5yUm3tbCiiAP0QwzvkRjvitzWezf0+tWQKOdceyVyld22nLwm8RRo8cU9hraWQ+y0cWAcVHw11vKovaNc=
+X-Received: by 2002:a62:53c6:0:b0:58d:a84a:190b with SMTP id
+ h189-20020a6253c6000000b0058da84a190bmr3361718pfb.48.1676039593895; Fri, 10
+ Feb 2023 06:33:13 -0800 (PST)
 MIME-Version: 1.0
-References: <20230210135136.1115213-1-rkanwal@rivosinc.com> <CAK9=C2VzZZLqOd_4gok5QMwmwz9NKYyVmDCzmCA7spohbq_zXg@mail.gmail.com>
-In-Reply-To: <CAK9=C2VzZZLqOd_4gok5QMwmwz9NKYyVmDCzmCA7spohbq_zXg@mail.gmail.com>
-From:   Rajnesh Kanwal <rkanwal@rivosinc.com>
-Date:   Fri, 10 Feb 2023 14:31:21 +0000
-Message-ID: <CAECbVCts9EH2jBi0Mj2d+yucSSZ+ipB6ozbPkr-M2svNpRcCHA@mail.gmail.com>
-Subject: Re: [PATCH 1/1] riscv/kvm: Fix VM hang in case of timer delta being zero.
-To:     Anup Patel <apatel@ventanamicro.com>
-Cc:     anup@brainfault.org, atishp@atishpatra.org,
-        paul.walmsley@sifive.com, palmer@dabbelt.com, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org
+References: <20230209233426.37811-1-quintela@redhat.com> <CAFEAcA-qSWck=ga4XBGvGXJohtGrSPO6t6+U4KqRvJdN8hrAug@mail.gmail.com>
+ <87r0uxy528.fsf@secure.mitica>
+In-Reply-To: <87r0uxy528.fsf@secure.mitica>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Fri, 10 Feb 2023 14:33:02 +0000
+Message-ID: <CAFEAcA-SOpRiX+s14OxCJ+Lwx6kzUdroM9ufugzTVLM9Tq2gHA@mail.gmail.com>
+Subject: Re: [PULL 00/17] Migration 20230209 patches
+To:     quintela@redhat.com
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 10, 2023 at 2:07 PM Anup Patel <apatel@ventanamicro.com> wrote:
+On Fri, 10 Feb 2023 at 14:21, Juan Quintela <quintela@redhat.com> wrote:
 >
-> On Fri, Feb 10, 2023 at 7:21 PM Rajnesh Kanwal <rkanwal@rivosinc.com> wrote:
-> >
-> > In case when VCPU is blocked due to WFI, we schedule the timer
-> > from `kvm_riscv_vcpu_timer_blocking()` to keep timer interrupt
-> > ticking.
-> >
-> > But in case when delta_ns comes to be zero, we never schedule
-> > the timer and VCPU keeps sleeping indefinitely until any activity
-> > is done with VM console.
-> >
-> > This is easily reproduce-able using kvmtool.
-> > ./lkvm-static run -c1 --console virtio -p "earlycon root=/dev/vda" \
-> >          -k ./Image -d rootfs.ext4
-> >
-> > Also, just add a print in kvm_riscv_vcpu_vstimer_expired() to
-> > check the interrupt delivery and run `top` or similar auto-upating
-> > cmd from guest. Within sometime one can notice that print from
-> > timer expiry routine stops and the `top` cmd output will stop
-> > updating.
-> >
-> > This change fixes this by making sure we schedule the timer even
-> > with delta_ns being zero to bring the VCPU out of sleep immediately.
-> >
+> Peter Maydell <peter.maydell@linaro.org> wrote:
+> > Fails to build the user-mode emulators:
 >
-> Please add the Fixes tag here.
+> This is weird.
 
-Fixed in v2.
-https://lore.kernel.org/all/20230210142711.1177212-1-rkanwal@rivosinc.com/T/#t
-
-Thanks
-Rajnesh
+> > https://gitlab.com/qemu-project/qemu/-/jobs/3749435025
+> >
+> > In file included from ../authz/base.c:24:
+> > ../authz/trace.h:1:10: fatal error: trace/trace-authz.h: No such file
+> > or directory
+> > 1 | #include "trace/trace-authz.h"
 >
-> > Signed-off-by: Rajnesh Kanwal <rkanwal@rivosinc.com>
-> > ---
-> >  arch/riscv/kvm/vcpu_timer.c | 6 ++----
-> >  1 file changed, 2 insertions(+), 4 deletions(-)
+> This series only have one change for traces:
+>
+> diff --git a/util/trace-events b/util/trace-events
+> index c8f53d7d9f..16f78d8fe5 100644
+> --- a/util/trace-events
+> +++ b/util/trace-events
+> @@ -93,6 +93,7 @@ qemu_vfio_region_info(const char *desc, uint64_t region_ofs, uint64_t region_siz
+>  qemu_vfio_pci_map_bar(int index, uint64_t region_ofs, uint64_t region_size, int ofs, void *host) "map region bar#%d addr 0x%"PRIx64" size 0x%"PRIx64" ofs 0x%x host %p"
+>
+>  #userfaultfd.c
+> +uffd_detect_open_mode(int mode) "%d"
+>  uffd_query_features_nosys(int err) "errno: %i"
+>  uffd_query_features_api_failed(int err) "errno: %i"
+>  uffd_create_fd_nosys(int err) "errno: %i"
+>
+> Rest of trace mentions are for the removal of migration.multifd.c.orig
+>
+> And I don't play with authentication at all.
+>
+> This is Fedora 37.
+>
+> > https://gitlab.com/qemu-project/qemu/-/jobs/3749435094
+> > In file included from ../authz/simple.c:23:
+> > ../authz/trace.h:1:10: fatal error: trace/trace-authz.h: No such file
+> > or directory
+>
+> Problem is that this trace file is not generated, but I can think how
+> any change that I did can influence this.
+>
+> > 1 | #include "trace/trace-authz.h"
 > >
-> > diff --git a/arch/riscv/kvm/vcpu_timer.c b/arch/riscv/kvm/vcpu_timer.c
-> > index ad34519c8a13..3ac2ff6a65da 100644
-> > --- a/arch/riscv/kvm/vcpu_timer.c
-> > +++ b/arch/riscv/kvm/vcpu_timer.c
-> > @@ -147,10 +147,8 @@ static void kvm_riscv_vcpu_timer_blocking(struct kvm_vcpu *vcpu)
-> >                 return;
 > >
-> >         delta_ns = kvm_riscv_delta_cycles2ns(t->next_cycles, gt, t);
-> > -       if (delta_ns) {
-> > -               hrtimer_start(&t->hrt, ktime_set(0, delta_ns), HRTIMER_MODE_REL);
-> > -               t->next_set = true;
-> > -       }
-> > +       hrtimer_start(&t->hrt, ktime_set(0, delta_ns), HRTIMER_MODE_REL);
-> > +       t->next_set = true;
-> >  }
-> >
-> >  static void kvm_riscv_vcpu_timer_unblocking(struct kvm_vcpu *vcpu)
-> > --
-> > 2.25.1
-> >
+> > https://gitlab.com/qemu-project/qemu/-/jobs/3749434963
+> > In file included from ../authz/listfile.c:23:
+> > ../authz/trace.h:1:10: fatal error: trace/trace-authz.h: No such file
+> > or directory
+> > 1 | #include "trace/trace-authz.h"
+>
+> Looking at the ouptut of these, they are not informatives at all.
+>
+> I am going to try to compile linux-user without system, and see if that
+> brings a clue.
+
+Yes, I suspect this is a "user-mode only build" specific failure
+(you may need --disable-system --disable-tools to see it).
+
+meson.build only puts authz into trace_events_subdirs "if have_block"
+(which is to say "if have_system or have_tools"). However the
+bit of meson.build that says "subdir('authz') does not have
+the same condition on it -- it's just been put in the list without
+any condition on it. So I think that in a build-only-user-emulators
+config meson will not generate trace events for the subdirectory
+but will try to build it, which falls over.
+
+Contrast 'block', 'nbd', 'scsi', which are all guarded by
+'if have_block' for their subdir() lines, to match the guard on
+the trace_events_subdirs. OTOH 'io' is also mismatched-guards...
+
+Why this only shows up with your pullreq I have no idea.
+
+thanks
+-- PMM
