@@ -2,150 +2,302 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E4A966920DC
-	for <lists+kvm@lfdr.de>; Fri, 10 Feb 2023 15:33:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D9ED6920ED
+	for <lists+kvm@lfdr.de>; Fri, 10 Feb 2023 15:38:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232166AbjBJOdS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Feb 2023 09:33:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35592 "EHLO
+        id S232366AbjBJOih (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Feb 2023 09:38:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231749AbjBJOdR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Feb 2023 09:33:17 -0500
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 754AE5B764
-        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 06:33:14 -0800 (PST)
-Received: by mail-pg1-x52f.google.com with SMTP id s8so3799716pgg.11
-        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 06:33:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=EoyqZuT2eCQbPBzisd4AEJrjYx9W/vK3n0wiOZhNzwM=;
-        b=J6OyvW6DQadZOtUPSG+XjxWB9VyVd+gqG78TiO9GUcBNUb7yEloVmE6YTkseT4/UJT
-         mW4fMVkIeT3P6ISy1YuX6HpqyqvtMcoBxzANucFTLomhFhGO4m0y1gVAy6ZfA75t4soV
-         cP/cmBD5rm3W8VINPO0VoyUAXLoberlBTck6EG+9dlPyy53AX9kw5hPTjrGAGcZO8fF0
-         wHFZ1319fthomq7D4esrcg+JafzRlySnfKCclXwFlr6hT+Ed+SJnqqnPv5PvA81bF2WG
-         A0Qlvd6nwqa3Mue8dAgkVU3wkK0Y2P418xY/GAIFmkrYmJczzFiFV+3Wy9X8uHzgC8uL
-         5TeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=EoyqZuT2eCQbPBzisd4AEJrjYx9W/vK3n0wiOZhNzwM=;
-        b=myB/A/Is5/Ac8qjTN4C98ZrrkVd8BOe1aQb6sD20WoqjtTCQ6tWoiO0ttvS7Unl3hx
-         jObNRfMZLhYzB3wymBwrFJionmaPJvlvILEbLgmTCMZk4GgNWExrYCYZ+2NkAcgsG+Rs
-         jc/zYJEMA0qNP0KZqcWmeRqQFw8J8CFRd/+WbalIXbmJVVzZG3qCZ47p1QiBRqd1dxJr
-         IMRQgNGM3+e/feOLb4qU2STwAjCCI3DtlB7vzLsySl5YnbdkvWw24+3BZSoTISOnm+Vr
-         pXYe8aNOLzqZopuRV5b+5Y5K6p4pc+OV5lP+UV44EoHLfLLK6r29PBBlqKAXe0wXBiLy
-         0haw==
-X-Gm-Message-State: AO0yUKXNj2wOTYzq8JrtK8yz9Wam/OzcE6GlDKWuz0zf1WZXvpoHGEZU
-        v1t/ahVmk8PRcIl89kgwzBGEFmbuoTcjB0mGGS+HVQ==
-X-Google-Smtp-Source: AK7set/FMf5yUm3tbCiiAP0QwzvkRjvitzWezf0+tWQKOdceyVyld22nLwm8RRo8cU9hraWQ+y0cWAcVHw11vKovaNc=
-X-Received: by 2002:a62:53c6:0:b0:58d:a84a:190b with SMTP id
- h189-20020a6253c6000000b0058da84a190bmr3361718pfb.48.1676039593895; Fri, 10
- Feb 2023 06:33:13 -0800 (PST)
+        with ESMTP id S231733AbjBJOif (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Feb 2023 09:38:35 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E25EE6D63C;
+        Fri, 10 Feb 2023 06:38:34 -0800 (PST)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31AEbMaV012608;
+        Fri, 10 Feb 2023 14:38:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=XrT+KuNWmkkXvTa+9RSZSy+g52C8qMz0KYpCuF/oho8=;
+ b=Dcw8AZZBAcn5cpYt2NFlhoVOpAwgXq3CmjBe4foUfrHmGH91HdQ0rhqcF2Fkqz2ojkT2
+ F47LrlbFg2auNUdUSONZSZoEdQ3MW30q0+e23jUIJguuofOWhzpIBW8foQcz5fol6pjI
+ jHBuVfYR4IbFXggjGy1T+WNb9RcqhAUJD8u4/OPfuLDUg2g+dZEnxgwhntiequU3Amoa
+ ymxmHa5rNAn8E2kXlbVi8QSyPLzeZmEfd+yaKwn/US/Baxp+c18yDOYlEMODHUpV+yQK
+ VValXthyNtbhHZ6DfxOV/IuMTsbiSZEE9iqiqM+Szxh274f/tdUqk+Iwsb7mLaWc0hP9 DQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nnqunr1w1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 10 Feb 2023 14:38:34 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31AEbm7Y015005;
+        Fri, 10 Feb 2023 14:38:34 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nnqunr1tt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 10 Feb 2023 14:38:34 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31A7V3nN001926;
+        Fri, 10 Feb 2023 14:38:31 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3nhf06qm2q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 10 Feb 2023 14:38:31 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31AEcRrB39059788
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 10 Feb 2023 14:38:28 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D27DC20040;
+        Fri, 10 Feb 2023 14:38:27 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5AE742004D;
+        Fri, 10 Feb 2023 14:38:27 +0000 (GMT)
+Received: from [9.171.75.239] (unknown [9.171.75.239])
+        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 10 Feb 2023 14:38:27 +0000 (GMT)
+Message-ID: <75fecce1-f2e8-5d11-78a3-e311a23c49cb@linux.ibm.com>
+Date:   Fri, 10 Feb 2023 15:38:27 +0100
 MIME-Version: 1.0
-References: <20230209233426.37811-1-quintela@redhat.com> <CAFEAcA-qSWck=ga4XBGvGXJohtGrSPO6t6+U4KqRvJdN8hrAug@mail.gmail.com>
- <87r0uxy528.fsf@secure.mitica>
-In-Reply-To: <87r0uxy528.fsf@secure.mitica>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Fri, 10 Feb 2023 14:33:02 +0000
-Message-ID: <CAFEAcA-SOpRiX+s14OxCJ+Lwx6kzUdroM9ufugzTVLM9Tq2gHA@mail.gmail.com>
-Subject: Re: [PULL 00/17] Migration 20230209 patches
-To:     quintela@redhat.com
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [kvm-unit-tests PATCH v6 1/2] s390x: topology: Check the Perform
+ Topology Function
+Content-Language: en-US
+To:     Thomas Huth <thuth@redhat.com>, linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, kvm@vger.kernel.org, imbrenda@linux.ibm.com,
+        david@redhat.com, nrb@linux.ibm.com, nsg@linux.ibm.com
+References: <20230202092814.151081-1-pmorel@linux.ibm.com>
+ <20230202092814.151081-2-pmorel@linux.ibm.com>
+ <3a38ca69-ac0a-ce75-4add-256c5996d89c@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <3a38ca69-ac0a-ce75-4add-256c5996d89c@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: DLkT-EC_Wn7r5WthHkoxBS2OD-ia83x2
+X-Proofpoint-ORIG-GUID: evbmV-mAgzTPhLdu8opnE5lF4-F1CT92
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-10_09,2023-02-09_03,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
+ mlxlogscore=999 malwarescore=0 adultscore=0 priorityscore=1501 mlxscore=0
+ spamscore=0 impostorscore=0 lowpriorityscore=0 clxscore=1015 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
+ definitions=main-2302100120
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 10 Feb 2023 at 14:21, Juan Quintela <quintela@redhat.com> wrote:
->
-> Peter Maydell <peter.maydell@linaro.org> wrote:
-> > Fails to build the user-mode emulators:
->
-> This is weird.
 
-> > https://gitlab.com/qemu-project/qemu/-/jobs/3749435025
-> >
-> > In file included from ../authz/base.c:24:
-> > ../authz/trace.h:1:10: fatal error: trace/trace-authz.h: No such file
-> > or directory
-> > 1 | #include "trace/trace-authz.h"
->
-> This series only have one change for traces:
->
-> diff --git a/util/trace-events b/util/trace-events
-> index c8f53d7d9f..16f78d8fe5 100644
-> --- a/util/trace-events
-> +++ b/util/trace-events
-> @@ -93,6 +93,7 @@ qemu_vfio_region_info(const char *desc, uint64_t region_ofs, uint64_t region_siz
->  qemu_vfio_pci_map_bar(int index, uint64_t region_ofs, uint64_t region_size, int ofs, void *host) "map region bar#%d addr 0x%"PRIx64" size 0x%"PRIx64" ofs 0x%x host %p"
->
->  #userfaultfd.c
-> +uffd_detect_open_mode(int mode) "%d"
->  uffd_query_features_nosys(int err) "errno: %i"
->  uffd_query_features_api_failed(int err) "errno: %i"
->  uffd_create_fd_nosys(int err) "errno: %i"
->
-> Rest of trace mentions are for the removal of migration.multifd.c.orig
->
-> And I don't play with authentication at all.
->
-> This is Fedora 37.
->
-> > https://gitlab.com/qemu-project/qemu/-/jobs/3749435094
-> > In file included from ../authz/simple.c:23:
-> > ../authz/trace.h:1:10: fatal error: trace/trace-authz.h: No such file
-> > or directory
->
-> Problem is that this trace file is not generated, but I can think how
-> any change that I did can influence this.
->
-> > 1 | #include "trace/trace-authz.h"
-> >
-> >
-> > https://gitlab.com/qemu-project/qemu/-/jobs/3749434963
-> > In file included from ../authz/listfile.c:23:
-> > ../authz/trace.h:1:10: fatal error: trace/trace-authz.h: No such file
-> > or directory
-> > 1 | #include "trace/trace-authz.h"
->
-> Looking at the ouptut of these, they are not informatives at all.
->
-> I am going to try to compile linux-user without system, and see if that
-> brings a clue.
 
-Yes, I suspect this is a "user-mode only build" specific failure
-(you may need --disable-system --disable-tools to see it).
+On 2/8/23 12:06, Thomas Huth wrote:
+> On 02/02/2023 10.28, Pierre Morel wrote:
+>> We check that the PTF instruction is working correctly when
+>> the cpu topology facility is available.
+>>
+>> For KVM only, we test changing of the polarity between horizontal
+>> and vertical and that a reset set the horizontal polarity.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   s390x/Makefile      |   1 +
+>>   s390x/topology.c    | 155 ++++++++++++++++++++++++++++++++++++++++++++
+>>   s390x/unittests.cfg |   3 +
+>>   3 files changed, 159 insertions(+)
+>>   create mode 100644 s390x/topology.c
+>>
+>> diff --git a/s390x/Makefile b/s390x/Makefile
+>> index 52a9d82..b5fe8a3 100644
+>> --- a/s390x/Makefile
+>> +++ b/s390x/Makefile
+>> @@ -39,6 +39,7 @@ tests += $(TEST_DIR)/panic-loop-extint.elf
+>>   tests += $(TEST_DIR)/panic-loop-pgm.elf
+>>   tests += $(TEST_DIR)/migration-sck.elf
+>>   tests += $(TEST_DIR)/exittime.elf
+>> +tests += $(TEST_DIR)/topology.elf
+>>   pv-tests += $(TEST_DIR)/pv-diags.elf
+>> diff --git a/s390x/topology.c b/s390x/topology.c
+>> new file mode 100644
+>> index 0000000..20f7ba2
+>> --- /dev/null
+>> +++ b/s390x/topology.c
+>> @@ -0,0 +1,155 @@
+>> +/* SPDX-License-Identifier: GPL-2.0-only */
+>> +/*
+>> + * CPU Topology
+>> + *
+>> + * Copyright IBM Corp. 2022
+>> + *
+>> + * Authors:
+>> + *  Pierre Morel <pmorel@linux.ibm.com>
+>> + */
+>> +
+>> +#include <libcflat.h>
+>> +#include <asm/page.h>
+>> +#include <asm/asm-offsets.h>
+>> +#include <asm/interrupt.h>
+>> +#include <asm/facility.h>
+>> +#include <smp.h>
+>> +#include <sclp.h>
+>> +#include <s390x/hardware.h>
+>> +
+>> +#define PTF_REQ_HORIZONTAL    0
+>> +#define PTF_REQ_VERTICAL    1
+>> +#define PTF_REQ_CHECK        2
+>> +
+>> +#define PTF_ERR_NO_REASON    0
+>> +#define PTF_ERR_ALRDY_POLARIZED    1
+>> +#define PTF_ERR_IN_PROGRESS    2
+>> +
+>> +extern int diag308_load_reset(u64);
+>> +
+>> +static int ptf(unsigned long fc, unsigned long *rc)
+>> +{
+>> +    int cc;
+>> +
+>> +    asm volatile(
+>> +        "       .insn   rre,0xb9a20000,%1,0\n"
+> 
+> Why are you specifying the instruction manually? I think both, GCC and 
+> Clang should know the "ptf" mnemonic, shouldn't they?
 
-meson.build only puts authz into trace_events_subdirs "if have_block"
-(which is to say "if have_system or have_tools"). However the
-bit of meson.build that says "subdir('authz') does not have
-the same condition on it -- it's just been put in the list without
-any condition on it. So I think that in a build-only-user-emulators
-config meson will not generate trace events for the subdirectory
-but will try to build it, which falls over.
+:D right !
 
-Contrast 'block', 'nbd', 'scsi', which are all guarded by
-'if have_block' for their subdir() lines, to match the guard on
-the trace_events_subdirs. OTOH 'io' is also mismatched-guards...
+> 
+>> +        "       ipm     %0\n"
+>> +        "       srl     %0,28\n"
+>> +        : "=d" (cc), "+d" (fc)
+>> +        :
+>> +        : "cc");
+>> +
+>> +    *rc = fc >> 8;
+>> +    return cc;
+>> +}
+>> +
+>> +static void test_ptf(void)
+>> +{
+>> +    unsigned long rc;
+>> +    int cc;
+>> +
+>> +    /* PTF is a privilege instruction */
+> 
+> s/privilege/privileged/ ?
 
-Why this only shows up with your pullreq I have no idea.
+Yes, thanks
 
-thanks
--- PMM
+> 
+>> +    report_prefix_push("Privilege");
+>> +    enter_pstate();
+>> +    expect_pgm_int();
+>> +    ptf(PTF_REQ_CHECK, &rc);
+>> +    check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
+>> +    report_prefix_pop();
+>> +
+>> +    report_prefix_push("Wrong fc");
+>> +    expect_pgm_int();
+>> +    ptf(0xff, &rc);
+>> +    check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+>> +    report_prefix_pop();
+>> +
+>> +    report_prefix_push("Reserved bits");
+>> +    expect_pgm_int();
+>> +    ptf(0xffffffffffffff00UL, &rc);
+>> +    check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+>> +    report_prefix_pop();
+> 
+> This function is quite big ... I'd maybe group the above checks for 
+> error conditions into a separate function instead.
+
+OK
+
+> 
+>> +    report_prefix_push("Topology Report pending");
+>> +    /*
+>> +     * At this moment the topology may already have changed
+>> +     * since the VM has been started.
+>> +     * However, we can test if a second PTF instruction
+>> +     * reports that the topology did not change since the
+>> +     * preceding PFT instruction.
+>> +     */
+>> +    ptf(PTF_REQ_CHECK, &rc);
+>> +    cc = ptf(PTF_REQ_CHECK, &rc);
+>> +    report(cc == 0, "PTF check should clear topology report");
+>> +    report_prefix_pop();
+>> +
+>> +    report_prefix_push("Topology polarisation check");
+>> +    /*
+>> +     * We can not assume the state of the polarization for
+> 
+> s/can not/cannot/ ?
+
+OK
+
+> 
+> Also, you sometimes write polarization with "z" and sometimes with "s". 
+> I'd suggest to standardize on "z" (as in "IBM Z" ;-))
+
+OK
+
+> 
+>> +     * any Virtual Machine but KVM.
+>> +     * Let's skip the polarisation tests for other VMs.
+>> +     */
+>> +    if (!host_is_kvm()) {
+>> +        report_skip("Topology polarisation check is done for KVM only");
+>> +        goto end;
+>> +    }
+>> +
+>> +    /*
+>> +     * Set vertical polarization to verify that RESET sets
+>> +     * horizontal polarization back.
+>> +     */
+>> +    cc = ptf(PTF_REQ_VERTICAL, &rc);
+>> +    report(cc == 0, "Set vertical polarization.");
+>> +
+>> +    report(diag308_load_reset(1), "load normal reset done");
+>> +
+>> +    cc = ptf(PTF_REQ_CHECK, &rc);
+>> +    report(cc == 0, "Reset should clear topology report");
+>> +
+>> +    cc = ptf(PTF_REQ_HORIZONTAL, &rc);
+>> +    report(cc == 2 && rc == PTF_ERR_ALRDY_POLARIZED,
+>> +           "After RESET polarization is horizontal");
+>> +
+>> +    /* Flip between vertical and horizontal polarization */
+>> +    cc = ptf(PTF_REQ_VERTICAL, &rc);
+>> +    report(cc == 0, "Change to vertical polarization.");
+>> +
+>> +    cc = ptf(PTF_REQ_CHECK, &rc);
+>> +    report(cc == 1, "Polarization change should set topology report");
+>> +
+>> +    cc = ptf(PTF_REQ_HORIZONTAL, &rc);
+>> +    report(cc == 0, "Change to horizontal polarization.");
+>> +
+>> +end:
+>> +    report_prefix_pop();
+>> +}
+> 
+> Apart from the nits, the patch looks fine to me.
+> 
+>   Thomas
+> 
+
+Thanks,
+
+Regards.
+Pierre
+
+
+
+
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
