@@ -2,52 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BAC8E691A70
-	for <lists+kvm@lfdr.de>; Fri, 10 Feb 2023 09:56:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1DC7E691AAD
+	for <lists+kvm@lfdr.de>; Fri, 10 Feb 2023 10:04:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231675AbjBJI4i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Feb 2023 03:56:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55822 "EHLO
+        id S231800AbjBJJET (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Feb 2023 04:04:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231667AbjBJI4g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Feb 2023 03:56:36 -0500
+        with ESMTP id S231786AbjBJJEA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Feb 2023 04:04:00 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D47B022DD5;
-        Fri, 10 Feb 2023 00:56:34 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89B016E547;
+        Fri, 10 Feb 2023 01:02:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=JSTgJ5hV7SWofjt//iPhebk3gwe3dikCYa/+/r7DA9g=; b=TcH1SZiDVoQSCCtN8p+tfZ2305
-        O+KKBE0Yf/ssms2pfvLYnlHsKokgSIiBrOlzMGkLWrL7gAN1SFhC1md9SXCZEdTT+smgoTeHdPHCi
-        aXNz/LuGsQGYRwSnWlo1QthDxUpiKSH63TRPvfKhduZZYvPlSKboBlW9K/dzRSHU0i/1uzJXGAV7s
-        RgeKCY3repcaqByfiDHuilOf/xwDxFULmZ5xQ2ZTXgCfFWUzq5p8W7Ek6rAAyypFETwzJD1PpE548
-        IqNe2BHz+wbnw9AsJ/B8M7FJeWCWzvumg18HdkjnJIKds/a0mEflq37Rtwlm3vwbEMhoZue4X+ePA
-        NWgxSReQ==;
-Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.infradead.org)
+        bh=qPTq/LqnXV42BTUz+yTlfw4ulY4WgnJd6TzDahbZJ7k=; b=fp0c/opz8ZvY2H4ANOrIyh+vfH
+        GNeaXNOO09goEdxylVRN5vZwzljcYgO3Qm1I3sIT43S3cK8LsRrx/yfiVKp5lvQo/kFtZzKH5em2X
+        NrJ1hLrgRGFYqoJsELBCfUwTJu1Fxgxw6s4RX1zgX9pSuqrmTIBCw4HgEEaE6uJ/Z8hUDkyCIzqlH
+        9lA7fWlrbRKYd6e7a8NNd8+oaqJaJaRUvYKITTf73kbG5I3GHSJIbYBb0/6bywfkVN02qhyHXB9xj
+        KVSBDzGcrgobBR9wWCZuZx5E4HIIUTRPzqxIvRQdoTlRHi9Qo4JMlHRJn0ZD2I4L4BBT8we9vIbYU
+        jqIDqWkA==;
+Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.ant.amazon.com)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pQPC9-002xz6-SL; Fri, 10 Feb 2023 08:55:51 +0000
-Message-ID: <6fc16f3048719058bccce9d488bcb75252f49031.camel@infradead.org>
-Subject: Re: [External] Re: [PATCH v8 8/9] x86/mtrr: Avoid repeated save of
- MTRRs on boot-time CPU bringup
+        id 1pQPIF-002yAJ-W4; Fri, 10 Feb 2023 09:02:08 +0000
+Message-ID: <316d19f15ad98459df920e3bb2657f183c88d647.camel@infradead.org>
+Subject: Re: [PATCH v8 0/9] Parallel CPU bringup for x86_64
 From:   David Woodhouse <dwmw2@infradead.org>
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Usama Arif <usama.arif@bytedance.com>, kim.phillips@amd.com
-Cc:     arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
-        pbonzini@redhat.com, paulmck@kernel.org,
+To:     paulmck@kernel.org, Usama Arif <usama.arif@bytedance.com>
+Cc:     tglx@linutronix.de, kim.phillips@amd.com, arjan@linux.intel.com,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        hpa@zytor.com, x86@kernel.org, pbonzini@redhat.com,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
         thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
         fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
         simon.evans@bytedance.com, liangma@liangbit.com
-Date:   Fri, 10 Feb 2023 08:55:48 +0000
-In-Reply-To: <878rh61jqx.ffs@tglx>
+Date:   Fri, 10 Feb 2023 09:02:06 +0000
+In-Reply-To: <20230210041103.GO2948950@paulmck-ThinkPad-P17-Gen-1>
 References: <20230209154156.266385-1-usama.arif@bytedance.com>
-         <20230209154156.266385-9-usama.arif@bytedance.com> <87mt5m1yiz.ffs@tglx>
-         <9b6bca9c-7189-a2d5-8c0a-f55c24f54b62@bytedance.com> <878rh61jqx.ffs@tglx>
+         <20230210041103.GO2948950@paulmck-ThinkPad-P17-Gen-1>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-iJC8552PsSC9dk3v0Lo3"
+        boundary="=-de04AGYU3ZL51WF9vLPC"
 User-Agent: Evolution 3.44.4-0ubuntu1 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -61,83 +58,25 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-iJC8552PsSC9dk3v0Lo3
+--=-de04AGYU3ZL51WF9vLPC
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2023-02-10 at 00:50 +0100, Thomas Gleixner wrote:
-> On Thu, Feb 09 2023 at 20:32, Usama Arif wrote:
-> > On 09/02/2023 18:31, Thomas Gleixner wrote:
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0first_cpu =3D cpuma=
-sk_first(cpu_online_mask);
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0smp_call_function_s=
-ingle(first_cpu, mtrr_save_fixed_ranges, NULL, 1);
-> > >=20
-> > > So why is this relevant after the initial bringup? The BP MTRRs have
-> > > been saved already above, no?
-> > >=20
+On Thu, 2023-02-09 at 20:11 -0800, Paul E. McKenney wrote:
+> On Thu, Feb 09, 2023 at 03:41:47PM +0000, Usama Arif wrote:
+> > The major change over v7 is fixing CPU0 hotplug not working as reported=
+ by
+> > Paul E. McKenney using rcu torture tests. This is fixed by setting up t=
+he
+> > initial_gs, initial_stack and early_gdt_descr properly for this case.
 > >=20
-> > I will let David confirm if this is correct and why he did it, but this=
-=20
-> > is what I thought while reviewing before posting v4:
-> >=20
-> > - At initial boot (system_state < SYSTEM_RUNNING), when mtrr_save_state=
-=20
-> > is called in do_cpu_up at roughly the same time so MTRR is going to be=
-=20
-> > the same, we can just save it once and then reuse for other secondary=
-=20
-> > cores as it wouldn't have changed for the rest of the do_cpu_up calls.
-> >=20
-> > - When the system is running and you offline and then online a CPU, you=
-=20
-> > want to make sure that hotplugged CPU gets the current MTRR (which migh=
-t=20
-> > have changed since boot?), incase the MTRR has changed after the system=
-=20
-> > has been booted, you save the MTRR of the first online CPU. When the=
-=20
-> > hotplugged CPU runs its initialisation code, its fixed-range MTRRs will=
-=20
-> > be updated with the newly saved fixed-range MTRRs.
+> > The improvement in boot time is the same as v7.
 >=20
-> I knew that already :) But seriously:
->=20
-> If the MTRRs are changed post boot then the cached values want to be
-> updated too.
+> This one passes moderate rcutorture testing.
 
-They are, aren't they? The only way we come out of mtrr_save_state()
-without calling mtrr_save_fixed_ranges() =E2=80=94 either directly or via
-smp_call_function_single() =E2=80=94 is if they've already been saved once
-*and* system_state < SYSTEM_RUNNING.
+Thanks, Paul!
 
-I suppose we could make that clearer by moving the definition of the
-mtrr_saved flags inside the if (system_state < SYSTEM_RUNNING) block?
-
-@@ -721,11 +721,20 @@ void __init mtrr_bp_init(void)
-  */
- void mtrr_save_state(void)
- {
- 	int first_cpu;
-=20
- 	if (!mtrr_enabled())
- 		return;
-=20
-+	if (system_state < SYSTEM_RUNNING) {
-+		static bool mtrr_saved;
-+		if (!mtrr_saved) {
-+			mtrr_save_fixed_ranges(NULL);
-+			mtrr_saved =3D true;
-+		}
-+		return;
-+	}
-+
- 	first_cpu =3D cpumask_first(cpu_online_mask);
- 	smp_call_function_single(first_cpu, mtrr_save_fixed_ranges, NULL, 1);
- }
-
-
---=-iJC8552PsSC9dk3v0Lo3
+--=-de04AGYU3ZL51WF9vLPC
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -229,24 +168,24 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMjEwMDg1NTQ4WjAvBgkqhkiG9w0BCQQxIgQgnb0O9xog
-v4PzTlggA7nQ6tBzJDXSSA0NjlS3I0472yYwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMjEwMDkwMjA2WjAvBgkqhkiG9w0BCQQxIgQg+rKyLwUF
+AofhYIuN70B+3oIS00cuHA48XyMPud7lgwgwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBG2vfdXo4Jpo02fGmMq3/1BanW2SXn2cJD
-u31gmZ4NHknR06P4fFfY2uMVQbJxp+0lVz9wCiblVmmQx30c169SBWQZItakZpWmJHdpM2yidVPY
-jBeBRVbH02dWQsQmWHdBuK+0wXodNT8sOEgWM8663LDbL2bqdIlIwUhQn7Cj6fAbQOFUBrE8dmTC
-73V0TCMT1BqSvnxnUZg8aBnEpjR4Kc984kVMgbQRM4kj+sPvMThf7tmttFkVLsqBymcXjoVf/gGN
-nH/xd1CVIgzxpdxCsL+M6BtUbW07CPNgBlbnAX3Jy6sVbrEcej4oXgg1ZGhWYsoXv0gTUrGIsCBy
-t8jfN1teuUM4Skqqr/iRUdgY+xvMeRx/VdVsxH7E61gv9v1OSCky51SlxJ55Wv9z1kUtmCtm+Mzz
-s0oHeUFRIv/7KfwQ/2TKdvGgQxwiTVzFJueqJqKFD0oh+wI05IPnQaqygqg0TZD6vinLlKYum2t2
-tXqrfLzkua5GH5MydjXBEkI4mRCrDMkkmKXL9IS8Pd0fxx+3Yxa4w25JEYBBqqGCOmQtyM68CG+h
-TKYYy1SjouGtiS+a/rHbAbZIv1ba3XaAjbBqsh1oPyhaelbM23yuYqfkE12QFg9PvVZk6fEfKZ0k
-2NWQLlMhwtEP4MFKI5uugguvNhlVOdRoc9fZ+oizvwAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBUk4lej4JmmNlqpC17m1fAoarxG6KZxp0/
+UGfrOnxo/Naj99IM13TDrp+SldjO08qnd9Q0Qowxj2ce9P2cSR3jTrKvErV2ZaJrAJpCPeUysXx8
+8UNyHlrG/hKTRfIzvcHuzXDMLL4+Wi/zmKsYcFAIKsO35gFPxhx1xY83Py07QHqlab/zLO0gGP+T
+b9HTVsAQCa6MhWgCy1ZRMvcCoHSUgXbWnsyWR8iDbruhueukiXmJ2H4GXhf7H1P5UBhlPi9GSH3Z
+qxK+dMX8gty13H3hJF/PNf149Qr1iKmZWQXe9dI3LbgLBAIKoT0ilxPmddy+o0X786PNc/dv9tAM
+ilFkilpMdepIMU+NwNi2b5zruoNba2Si5COY3cTB52U7GScbJt8VDLROQJI7v1LyNrLuvRGfwvbu
+NN/8oUC/Ke4IgmwwJNCv7MeltMfX7ftJn1sRyMyNStowGyfRaf+/buZ1vJ+RbWO2oDhg14YGqQmE
+2nVtPlLz/p+rDmF4r4e2C9pZ2fq61m5DHIdU6tiGBTvRaRbkKO0el8VqHA+jr2TvLaYL6ShrNsXJ
+DyIjgyqMql68VbnZ8jLMvMr0m98ppFPrarPCEJQ4PZW9k9jAHnK7YUryk40slVofTmO8GNAkLgiP
+XSyt+3x9ARAtmVsFA3xwcZEe3eKtmRMaqTJPtPI9CQAAAAAAAA==
 
 
---=-iJC8552PsSC9dk3v0Lo3--
+--=-de04AGYU3ZL51WF9vLPC--
