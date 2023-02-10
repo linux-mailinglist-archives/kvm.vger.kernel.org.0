@@ -2,152 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 526686915B7
-	for <lists+kvm@lfdr.de>; Fri, 10 Feb 2023 01:41:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A97C6915E4
+	for <lists+kvm@lfdr.de>; Fri, 10 Feb 2023 01:50:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231334AbjBJAlN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Feb 2023 19:41:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36178 "EHLO
+        id S230266AbjBJAuc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Feb 2023 19:50:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230462AbjBJAlB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Feb 2023 19:41:01 -0500
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C1256BD12
-        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 16:40:39 -0800 (PST)
-Received: by mail-pj1-f43.google.com with SMTP id mi9so3656280pjb.4
-        for <kvm@vger.kernel.org>; Thu, 09 Feb 2023 16:40:39 -0800 (PST)
+        with ESMTP id S230055AbjBJAub (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Feb 2023 19:50:31 -0500
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B761D6A73E
+        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 16:50:26 -0800 (PST)
+Received: by mail-pl1-x62c.google.com with SMTP id z1so4853813plg.6
+        for <kvm@vger.kernel.org>; Thu, 09 Feb 2023 16:50:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=W7YPU86kRh43fh/B9xA9EKXQH40cZnkadx8AsjXbI3M=;
-        b=n02O/fL0+7AmXTmeiZ+eZ9d5ZT/GiXiS4usm8YWkyYIOPv66XejcWTG/tLJzS4ejkM
-         ovnmjNf+/V4WMPR5hJhke3vD4GplhYtvL9vEmYS6rKRFRInOWY36YmcSGRlRlXtIqk2x
-         zyyYNZ5RPe7YC1b4z/lhTrlqaQI8TZd/6fcFdDffIo1BEQ/N3P7wZXdRNFCaaVDVEmaC
-         k7EM7JL4YwRd8/j1fpMwi0Sv19KAavj/Z3Lox3YCddOW/BESEhsEfDKnGobVr1uu+fRI
-         IcumcKWqHnYFfcFoEuc9ODLNMlqMcGwYmuqo7O/bx2Pw8Bf2iZVjEA7+bSDnR5xz4m5D
-         EuCw==
+        bh=RtDJLw8vwdwAjsAtx/I+c5vwGL5haek+8I4l9FjaPbM=;
+        b=hCDE+HV/2hOt1IgVLF7MFI+Z7OlBIYifdE740L3dN+7Wk841ZR8dcb+mDJgQfuAKxm
+         ZyL89KQ0CZvLo9Vy0fPjcZ6XsGRSFTegm6RalA2ISYNQvvkPSpcgNq8MeLAZKR3LYmoA
+         xruHmL1ix31r2F6SkbKZ8eiT+t3LjufZKaVhGAYQ6NDn4QUbi2HzdrbtGUF9TfsbJmNF
+         Aym2Yv1LQHiMudQtt7RN2kLHaipSzgnnWJfk7n/p23yfY/k7kVm8eibMhrXANpIP8TLr
+         kdGvClaWoh/4p3nU2IxLZ8cUGayiqOn623qIrsOqj1JtIko7pKY+ikOOp8EffcI5p/5r
+         UbRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=W7YPU86kRh43fh/B9xA9EKXQH40cZnkadx8AsjXbI3M=;
-        b=YBRWkQTVqJGYQm89JzkTfRDyCw8SVd6QT366oZsdgg5C2UTYmmUsQKJTSdwP2sKG46
-         zWpAFl84kAMu0kiqcdQP3J7Oc+NMEEIIxEpjiu25S6hVrbnchphK/xSwC4B4g+UM7AH2
-         4TMiTe9aubKpIQRqnQD5+SBAZrnwmu09JQPtnOHVkWBEHeD1jHBM/hpqIL9CQ5zSMGR4
-         q/R1Zbw65avRpE5/gZMK+NTZxWvYAA9+C0DiYf/ZF/akKhxrLmWd0kmjsdBtwpVOYox+
-         mqZzM3sA/08aOaREu4Hs9QqwQLNyuUvNFY+xtmP34PxgkKec3opbWkR1I+Ec0yKZUacI
-         VK9w==
-X-Gm-Message-State: AO0yUKVaJz8GtGA1qDWGP/BDOMxJTnCnz0DHwPy+uC6q1TbqZksD3K03
-        rJihDt4n04rErhJku+XwqDfOkA==
-X-Google-Smtp-Source: AK7set/11E4jpVghRlgOmElBR2Eplp/YT9s1l5QVxf/giHCfieVdfEaQkx8Mgi5PszE54dGY0TW/bw==
-X-Received: by 2002:a17:902:e551:b0:19a:6cd2:a658 with SMTP id n17-20020a170902e55100b0019a6cd2a658mr34785plf.7.1675989335399;
-        Thu, 09 Feb 2023 16:35:35 -0800 (PST)
+        bh=RtDJLw8vwdwAjsAtx/I+c5vwGL5haek+8I4l9FjaPbM=;
+        b=WtY+8JNIyX8uYffGk/ocIxfDSMzyPnLPtyuDNs1+l47zEq7FQgQX1+irtPqdnn0IYf
+         QJe03OJAjfjCEn0q0rxEvHDFP/u39X1WBVdB94JME5VXNCB9TkzBB6kevaMh16zfsTqr
+         X484Dce0ZXiBCIYKGoYYZ+fjMGawqSid8iY92MK74nhtWasW45Xb5znZWGi07+udnc9D
+         b3XfNjMo/VjjCUumxXc2cZCKFrANISKgxV5hZ7BYDtG5tgreSolJnhJ0gVzmKPq24ScS
+         D9/H6a8oycs/ZfSDfcPbaK5l8tFuolDIvN5j71Mr232XLf5B0dFprq7IXNvbWSd4QIA9
+         BSYg==
+X-Gm-Message-State: AO0yUKXm9A5jIkCUdz0aPs7/zZ+NArO7YkNKSDASzpfpDK4XrtdPRBW+
+        jRAVfpPjoTy1sdWgTrOknjfWzg==
+X-Google-Smtp-Source: AK7set/kW+orNWUKnpWhKkeGtB7x+mkiP/yWiREM6SpbaG+BpIZ+uOp12qlNVThoWo/IYCSO/OUKGQ==
+X-Received: by 2002:a17:903:2792:b0:198:af4f:de08 with SMTP id jw18-20020a170903279200b00198af4fde08mr100831plb.8.1675990226095;
+        Thu, 09 Feb 2023 16:50:26 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id a11-20020a1709027e4b00b00189b2b8dbedsm2069302pln.228.2023.02.09.16.35.34
+        by smtp.gmail.com with ESMTPSA id e23-20020a63db17000000b004fb26a80875sm1891297pgg.22.2023.02.09.16.50.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Feb 2023 16:35:34 -0800 (PST)
-Date:   Fri, 10 Feb 2023 00:35:30 +0000
+        Thu, 09 Feb 2023 16:50:25 -0800 (PST)
+Date:   Fri, 10 Feb 2023 00:50:22 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Isaku Yamahata <isaku.yamahata@gmail.com>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
+To:     Lai Jiangshan <jiangshanlai@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Naoya Horiguchi <naoya.horiguchi@nec.com>,
-        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>, tabba@google.com,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        wei.w.wang@intel.com
-Subject: Re: [PATCH v10 2/9] KVM: Introduce per-page memory attributes
-Message-ID: <Y+WRUriIoan/XChx@google.com>
-References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
- <20221202061347.1070246-3-chao.p.peng@linux.intel.com>
- <20230209072529.GB4175971@ls.amr.corp.intel.com>
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH V2 1/8] kvm: x86/mmu: Use KVM_MMU_ROOT_XXX for
+ kvm_mmu_invalidate_gva()
+Message-ID: <Y+WUzgsBck4f8N4F@google.com>
+References: <20230207155735.2845-1-jiangshanlai@gmail.com>
+ <20230207155735.2845-2-jiangshanlai@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230209072529.GB4175971@ls.amr.corp.intel.com>
+In-Reply-To: <20230207155735.2845-2-jiangshanlai@gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 08, 2023, Isaku Yamahata wrote:
-> On Fri, Dec 02, 2022 at 02:13:40PM +0800,
-> Chao Peng <chao.p.peng@linux.intel.com> wrote:
-> 
-> > +static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
-> > +					   struct kvm_memory_attributes *attrs)
-> > +{
-> > +	gfn_t start, end;
-> > +	unsigned long i;
-> > +	void *entry;
-> > +	u64 supported_attrs = kvm_supported_mem_attributes(kvm);
-> > +
-> > +	/* flags is currently not used. */
-> > +	if (attrs->flags)
-> > +		return -EINVAL;
-> > +	if (attrs->attributes & ~supported_attrs)
-> > +		return -EINVAL;
-> > +	if (attrs->size == 0 || attrs->address + attrs->size < attrs->address)
-> > +		return -EINVAL;
-> > +	if (!PAGE_ALIGNED(attrs->address) || !PAGE_ALIGNED(attrs->size))
-> > +		return -EINVAL;
-> > +
-> > +	start = attrs->address >> PAGE_SHIFT;
-> > +	end = (attrs->address + attrs->size - 1 + PAGE_SIZE) >> PAGE_SHIFT;
-> > +
-> > +	entry = attrs->attributes ? xa_mk_value(attrs->attributes) : NULL;
-> > +
-> > +	mutex_lock(&kvm->lock);
-> > +	for (i = start; i < end; i++)
-> > +		if (xa_err(xa_store(&kvm->mem_attr_array, i, entry,
-> > +				    GFP_KERNEL_ACCOUNT)))
-> > +			break;
-> > +	mutex_unlock(&kvm->lock);
-> > +
-> > +	attrs->address = i << PAGE_SHIFT;
-> > +	attrs->size = (end - i) << PAGE_SHIFT;
-> > +
-> > +	return 0;
-> > +}
-> > +#endif /* CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES */
-> > +
-> 
-> If memslot isn't private, it should return error if private attribute is set.
+On Tue, Feb 07, 2023, Lai Jiangshan wrote:
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index c91ee2927dd7..958e8eb977ed 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -5707,10 +5707,12 @@ int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 err
+>  EXPORT_SYMBOL_GPL(kvm_mmu_page_fault);
+>  
+>  void kvm_mmu_invalidate_gva(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+> -			    gva_t gva, hpa_t root_hpa)
+> +			    gva_t gva, unsigned long roots)
+>  {
+>  	int i;
+>  
+> +	WARN_ON_ONCE(roots & ~KVM_MMU_ROOTS_ALL);
 
-Why?  I'd rather keep the two things separate.  If we enforce this sort of thing
-at KVM_SET_MEMORY_ATTRIBUTES, then we also have to enforce it at
-KVM_SET_USER_MEMORY_REGION.
+This does nothing since KVM_MMU_ROOTS_ALL is ~0ul.  What I wanted is below, can
+you slot that it?  Compile tested only.
+
+--
+From: Sean Christopherson <seanjc@google.com>
+Date: Thu, 9 Feb 2023 16:37:43 -0800
+Subject: [PATCH 2/8] KVM: x86/mmu: Sanity check input to kvm_mmu_free_roots()
+
+Tweak KVM_MMU_ROOTS_ALL to precisely cover all current+previous root
+flags, and add a sanity in kvm_mmu_free_roots() to verify that the set
+of roots to free doesn't stray outside KVM_MMU_ROOTS_ALL.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/include/asm/kvm_host.h | 8 ++++----
+ arch/x86/kvm/mmu/mmu.c          | 2 ++
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 4d2bc08794e4..01d34f7d009d 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -422,6 +422,10 @@ struct kvm_mmu_root_info {
+ 
+ #define KVM_MMU_NUM_PREV_ROOTS 3
+ 
++#define KVM_MMU_ROOT_CURRENT		BIT(0)
++#define KVM_MMU_ROOT_PREVIOUS(i)	BIT(1+i)
++#define KVM_MMU_ROOTS_ALL		(BIT(1 + KVM_MMU_NUM_PREV_ROOTS) - 1)
++
+ #define KVM_HAVE_MMU_RWLOCK
+ 
+ struct kvm_mmu_page;
+@@ -1978,10 +1982,6 @@ static inline int __kvm_irq_line_state(unsigned long *irq_state,
+ 	return !!(*irq_state);
+ }
+ 
+-#define KVM_MMU_ROOT_CURRENT		BIT(0)
+-#define KVM_MMU_ROOT_PREVIOUS(i)	BIT(1+i)
+-#define KVM_MMU_ROOTS_ALL		(~0UL)
+-
+ int kvm_pic_set_irq(struct kvm_pic *pic, int irq, int irq_source_id, int level);
+ void kvm_pic_clear_all(struct kvm_pic *pic, int irq_source_id);
+ 
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index c91ee2927dd7..896abf9c1126 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3513,6 +3513,8 @@ void kvm_mmu_free_roots(struct kvm *kvm, struct kvm_mmu *mmu,
+ 	LIST_HEAD(invalid_list);
+ 	bool free_active_root;
+ 
++	WARN_ON_ONCE(roots_to_free & ~KVM_MMU_ROOTS_ALL);
++
+ 	BUILD_BUG_ON(KVM_MMU_NUM_PREV_ROOTS >= BITS_PER_LONG);
+ 
+ 	/* Before acquiring the MMU lock, see if we need to do any real work. */
+-- 
+
