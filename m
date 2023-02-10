@@ -2,74 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 877F66923B3
-	for <lists+kvm@lfdr.de>; Fri, 10 Feb 2023 17:54:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 850726924BF
+	for <lists+kvm@lfdr.de>; Fri, 10 Feb 2023 18:42:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232688AbjBJQyQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Feb 2023 11:54:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34388 "EHLO
+        id S232822AbjBJRmi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Feb 2023 12:42:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232229AbjBJQyO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Feb 2023 11:54:14 -0500
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66E2A1167C
-        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 08:54:13 -0800 (PST)
-Received: by mail-pl1-x635.google.com with SMTP id m2so7081935plg.4
-        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 08:54:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=J3jP/FVeKqvhJpM+QE0UM1W//XR/6fa/Br2TVuQNjKk=;
-        b=QzUbR1U+NtQX5jDzqlzCSeeww3wnzPgAxUER8vufYdOpsiQmDVLhmP6L4T+y0mJWSm
-         hcIgG/dlZ43aPScQg+Z65NOlQWPbzQAPSwuq7YCpXtZE+OfjYjN6TJa8cRGx7xYgklZp
-         qyg6XFnyNbKrp5+IHW3YPjIZWRQo9x33eyO5dvohAq2/qrSNNkhoYfi2wnkwJOAG89/h
-         9rHtAN2X61FrWWpRlnKURk5Jeu9JjvSkgGybufNxV+ATLMVYDv1dWhM+ZEKH/rOdtHFy
-         /dm1bo9cRT0871n7mo80fgkOxrqCLvWTHLi5PtWpjJ68Z5Ew7Ajshz7MWwU/FtEVrW0A
-         0x4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J3jP/FVeKqvhJpM+QE0UM1W//XR/6fa/Br2TVuQNjKk=;
-        b=4/zGGbwch0ew5J5nN9zRysXb4FJxlZntZkQxJLbHz6SDsRGu+zJkWTo7fllUMH4DQr
-         SqviHrf7HgfsbrXOC8OohqVF6CD/EoOSbU84DmX35ylp2Ywk9QTqfDmp3iLZUwFOO6/l
-         T2VCrr0pgb0Jhct8AlrcnCf/aankDq+9vJuMHvZADrpEo/c43AI1XuI4SBHagX9fXX+V
-         C3uV+nEOkBUgBXpLnkkQFgSBTGQSbUVRuUH6XmYNWLl7VM8JL28gqUVL0xvEV9zP/Ybr
-         qmn81QwWBmbOgpWbaHjZM3JTQwmAqcMe52hGTDCq30Kqh4UdB7i4BKT4yQlMpFe5/K1W
-         qlYQ==
-X-Gm-Message-State: AO0yUKW36C4z+XjqEfVKgYioMygZDF1t2uiryM5GuiZABCKBaTKL226u
-        5xY67oFhpuIBpK1Y4iVhu+1OvA==
-X-Google-Smtp-Source: AK7set/zZM7dPuJVGyS965+Zc8wli9Ze3KU1YXdyfn2Ps53blIXYLFx/TCYI4Cay5IBct8xNlc+qYw==
-X-Received: by 2002:a17:902:f0d4:b0:198:af4f:de09 with SMTP id v20-20020a170902f0d400b00198af4fde09mr206318pla.9.1676048052704;
-        Fri, 10 Feb 2023 08:54:12 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id v8-20020a17090331c800b00199023c688esm3624777ple.26.2023.02.10.08.54.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Feb 2023 08:54:11 -0800 (PST)
-Date:   Fri, 10 Feb 2023 16:54:08 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Robert Hoo <robert.hu@linux.intel.com>
-Cc:     Chao Gao <chao.gao@intel.com>, pbonzini@redhat.com,
-        yu.c.zhang@linux.intel.com, yuan.yao@linux.intel.com,
-        jingqi.liu@intel.com, weijiang.yang@intel.com,
-        isaku.yamahata@intel.com, kirill.shutemov@linux.intel.com,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v4 3/9] KVM: x86: MMU: Commets update
-Message-ID: <Y+Z2sLTnD4UTv2m4@google.com>
-References: <20230209024022.3371768-1-robert.hu@linux.intel.com>
- <20230209024022.3371768-4-robert.hu@linux.intel.com>
- <Y+XrStGM5J/hGX6r@gao-cwp>
- <565f9b25ffbe4aef08dd8511ea66b0cb3f1d932d.camel@linux.intel.com>
+        with ESMTP id S231881AbjBJRmg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Feb 2023 12:42:36 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10B012007F;
+        Fri, 10 Feb 2023 09:42:36 -0800 (PST)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31AHgRqf000491;
+        Fri, 10 Feb 2023 17:42:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=0u5s5bu2AGAhcgXEPqbH2WvzBv8j6GzCgTayotfsUGw=;
+ b=LWZhOxB9sr6wKjpvT9583c+gjSmjCwh3znWsQUELSGIOUqLtjtn6Zwakqy/10KsHKJ7/
+ fAZuWO47VLA+9g3IEWI4c5bQLIcy3f3pvswj9mQyBJCa/sOt3EAeyNU00BCBvwHkLIGA
+ 33i6FPRdi6PEyX3ADeN0ijQXrdtcxOyeZUqbUq2o1k56f5p8G7BGJpBfUiXA7iIH+CVY
+ gkCgk9fQvqUgizzAeMhpTjaTQgwt7MUW/ufRFTkWaGTfWvPC1CpCLerzslU6OfJMo7vn
+ lqwnC60Z5q6eJIoCnPdas9hUnI9fY39lNCrGg5uqTIxOZqsQK3J3ThR4jHbUW25pQVeo yA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nntj6r04k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 10 Feb 2023 17:42:35 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31AHgZVC000775;
+        Fri, 10 Feb 2023 17:42:35 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nntj6r03q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 10 Feb 2023 17:42:35 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31A1Co5x027412;
+        Fri, 10 Feb 2023 17:42:32 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3nhf06wkqe-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 10 Feb 2023 17:42:32 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31AHgS3E25362690
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 10 Feb 2023 17:42:28 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C1C8F2004B;
+        Fri, 10 Feb 2023 17:42:28 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AF73320043;
+        Fri, 10 Feb 2023 17:42:28 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Fri, 10 Feb 2023 17:42:28 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
+        id 6E2CFE0468; Fri, 10 Feb 2023 18:42:28 +0100 (CET)
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     Halil Pasic <pasic@linux.ibm.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        Eric Farman <farman@linux.ibm.com>
+Subject: [PATCH] vfio/ccw: Remove WARN_ON during shutdown
+Date:   Fri, 10 Feb 2023 18:42:27 +0100
+Message-Id: <20230210174227.2256424-1-farman@linux.ibm.com>
+X-Mailer: git-send-email 2.37.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <565f9b25ffbe4aef08dd8511ea66b0cb3f1d932d.camel@linux.intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: j-NvG1nVPpOKaUT6kJFA2TC4VoEz9Vqn
+X-Proofpoint-GUID: -lRAolwGvcNBMBpQoNontTv6QjqLHT2Q
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-10_12,2023-02-09_03,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
+ clxscore=1011 suspectscore=0 mlxlogscore=999 spamscore=0
+ lowpriorityscore=0 phishscore=0 bulkscore=0 priorityscore=1501
+ impostorscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2212070000 definitions=main-2302100146
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,28 +95,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 10, 2023, Robert Hoo wrote:
-> On Fri, 2023-02-10 at 14:59 +0800, Chao Gao wrote:
-> > On Thu, Feb 09, 2023 at 10:40:16AM +0800, Robert Hoo wrote:
-> > > kvm_mmu_ensure_valid_pgd() is stale. Update the comments according
-> > > to
-> > > latest code.
-> > > 
-> > > No function changes.
-> > > 
-> > > P.S. Sean firstly noticed this in
-> > 
-> > Reported-by:?
-> 
-> OK. Sean agree?
-> > 
-> > Should not this be post separately? This patch has nothing to do with
-> > LAM.
-> 
-> It's too trivial to post separately, I think, just comments updates.
-> And it on the code path of LAM KVM enabling, therefore I observed and
-> update passingly; although no code change happens.
+The logic in vfio_ccw_sch_shutdown() always assumed that the input
+subchannel would point to a vfio_ccw_private struct, without checking
+that one exists. The blamed commit put in a check for this scenario,
+to prevent the possibility of a missing private.
 
-No need, I already applied a similar patch:
+The trouble is that check was put alongside a WARN_ON(), presuming
+that such a scenario would be a cause for concern. But this can be
+triggered by binding a subchannel to vfio-ccw, and rebooting the
+system before starting the mdev (via "mdevctl start" or similar)
+or after stopping it. In those cases, shutdown doesn't need to
+worry because either the private was never allocated, or it was
+cleaned up by vfio_ccw_mdev_remove().
 
-https://lore.kernel.org/all/20221128214709.224710-1-wei.liu@kernel.org
+Remove the WARN_ON() piece of this check, since there are plausible
+scenarios where private would be NULL in this path.
+
+Fixes: 9e6f07cd1eaa ("vfio/ccw: create a parent struct")
+Signed-off-by: Eric Farman <farman@linux.ibm.com>
+---
+ drivers/s390/cio/vfio_ccw_drv.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
+index 54aba7cceb33..ff538a086fc7 100644
+--- a/drivers/s390/cio/vfio_ccw_drv.c
++++ b/drivers/s390/cio/vfio_ccw_drv.c
+@@ -225,7 +225,7 @@ static void vfio_ccw_sch_shutdown(struct subchannel *sch)
+ 	struct vfio_ccw_parent *parent = dev_get_drvdata(&sch->dev);
+ 	struct vfio_ccw_private *private = dev_get_drvdata(&parent->dev);
+ 
+-	if (WARN_ON(!private))
++	if (!private)
+ 		return;
+ 
+ 	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_CLOSE);
+-- 
+2.37.2
+
