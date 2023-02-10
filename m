@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 82F3F691571
-	for <lists+kvm@lfdr.de>; Fri, 10 Feb 2023 01:32:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 06B17691576
+	for <lists+kvm@lfdr.de>; Fri, 10 Feb 2023 01:32:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230104AbjBJAcD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Feb 2023 19:32:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52202 "EHLO
+        id S230246AbjBJAcS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Feb 2023 19:32:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230116AbjBJAb7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Feb 2023 19:31:59 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5742B2597C
-        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 16:31:57 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id p202-20020a25d8d3000000b00858a2a2cc15so3488427ybg.21
-        for <kvm@vger.kernel.org>; Thu, 09 Feb 2023 16:31:57 -0800 (PST)
+        with ESMTP id S229841AbjBJAcB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Feb 2023 19:32:01 -0500
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FA57303F9
+        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 16:31:58 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id d11-20020a17090a628b00b0023118d626d5so1700403pjj.4
+        for <kvm@vger.kernel.org>; Thu, 09 Feb 2023 16:31:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=eucldSXV9a5xphj/g+7fXk4AWtyJg6Cxj5iwvnUWa+8=;
-        b=roWXO+FTDdPfR+Ekt+fGOQKYnHFb/UMtzN+5w1pAUu1FgDsAu/ybD87OWogEBv5CRZ
-         iymrfJBVfHA/n6eI4tDBLQfCNL5rYzZMCL9ouvZLjOn8TIYeNYsLiRLDM01uGgh/GqFZ
-         5lGLegMFgWy17DEJUtf2xmi/PRnFGdbcP6jdTb6M1Y84L7QKbdMFqJrhNYIpBpKxauJa
-         nfhJmjCIwCxqCNOEuKtr3cjAXFryDFPyliyeudyaf17coxLr9Xk3ZAUtaYrYfpzM0h2V
-         LKYNvpuONpKkXlrYhT/qdgTY34I6un0LWPUopi10YPpvKImcEtW50J3PHyG7+nY7alix
-         F+aQ==
+        bh=juCqi+Albnji1zaiiKR3HcTnH91vZKT8inm+htmoAik=;
+        b=gs3d0bZuGZxqvCPJzEIFBUXnJOQBkCgsQ+dAE8fItXubGO+6zcIpRcPIRaTxdkO1t1
+         0RuquvOafdUZee3vW3OEskw2pHBNQowP01ylnsVqjzEnkJlRMSQAxabRvdHb7s/lIYnU
+         FlEAaSO1WzAZTGyuafkbyXoXBfhBxOL9R+qp0Ggua8jW15QDBCroK3sziWNm6PxVS2hg
+         uXYKEUjUdhRpGEPu/7wpD3t0qU4+zwp2D03LuRqyiScvn1hLVXEh6JXrqdAlteUOI2vk
+         LVQdfIU2uZU0UruQ0vcDvSpklMtLvv/4BSwNCSYfjmfX/om5DxnVbCTtjNPPDZOvr8Wa
+         Fmzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=eucldSXV9a5xphj/g+7fXk4AWtyJg6Cxj5iwvnUWa+8=;
-        b=UZAZGT+4F4NQB+x4m/SIocFgRSRtb0QwNSxgDIjMt3AIX9u3X/GEiyGYctwweiROqU
-         2qh/avGWqWFQI5tKtABxxk3ahudtG4SupX3rs0accAUCR10c5Oxa3Uc2Bium8qPtTEti
-         lDj5oKV/m7LNvCfogULam1ND03I5U/JQ/YaDZLvWqt0t9tHHs0jdGM6jigcnc/gg4v1N
-         d7C/NASMoncMmOx0GYnIJlJyTyafPKhsgma9BB7tzh4C/wllRByj2uSrHEl1ocefrJNm
-         UJcJ2FXgCYP6eMqejOenhy8BgygLKIAUCLD7OCH3VJLElC9a9nHQEXN1lOuSsYgw1oz4
-         Xytg==
-X-Gm-Message-State: AO0yUKUYq1CLofRFfT0n7CbzMs3D+BnKjlaIuDwhmuMQgbiWKDrCBmEv
-        tSPDhmgNmYtwZxM3ylfb3Au2zToIKSg=
-X-Google-Smtp-Source: AK7set+xfl4rvD/uDp1yogYEOo3AdGu55fLzRd0Kl71cCiw5/Jp+NwyLM2DReGT+967aSjw+ARhxQt7tWUM=
+        bh=juCqi+Albnji1zaiiKR3HcTnH91vZKT8inm+htmoAik=;
+        b=uQeschFAXIRHfQD+jzLd5nec4xpgxf5egDiXMzqQDGw9bf3gQ9aQ2WmNWvw4tJREx1
+         dwRDu3GUhgcfr+99RaA4E0nYrP5Te2Qr/OhC1+M6KLVtK0B399Egfpcc05f56qx9cCrH
+         AldPrx3GedUvS6/CuGfm+/CkA3tUS3Uzr9FqV5JliyoqOJUI1PkpWYSykS2rE+2tUjJJ
+         9fNqctn8f6DEaoMqPFgmNS+VCSqyK0JEJQZAXvHgrnU/G4FthjiUIEPE+S4JpEI/cHgp
+         8ZPuEcFkN2vsbxnmR6CHzJ+8SwDiB3QreGGBzLShj8TWs52T9B3wGD2iZ16GOPikk2Fo
+         5sPw==
+X-Gm-Message-State: AO0yUKWZfqtXR9wAou5miUFpPRrxKuysWCZ1nrC6gKSPUSGA1XyIijW1
+        xdHQi8UU/jKgx2e1ViKG9Y/gyaYhEa8=
+X-Google-Smtp-Source: AK7set+yUu/rsqEsNvliQu/mdB4NbjnoXem0Bw8neo24a82OX/TbaC2E5ce3hyRXQAuuqep3vQVMfvdOMB4=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:180c:b0:8bd:9c6c:6498 with SMTP id
- cf12-20020a056902180c00b008bd9c6c6498mr53ybb.11.1675989116184; Thu, 09 Feb
- 2023 16:31:56 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:902:b191:b0:194:7c22:1885 with SMTP id
+ s17-20020a170902b19100b001947c221885mr3057336plr.26.1675989118117; Thu, 09
+ Feb 2023 16:31:58 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 10 Feb 2023 00:31:30 +0000
+Date:   Fri, 10 Feb 2023 00:31:31 +0000
 In-Reply-To: <20230210003148.2646712-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230210003148.2646712-1-seanjc@google.com>
 X-Mailer: git-send-email 2.39.1.581.gbfd45094c4-goog
-Message-ID: <20230210003148.2646712-4-seanjc@google.com>
-Subject: [PATCH v2 03/21] KVM: x86: Add macros to track first...last VMX
- feature MSRs
+Message-ID: <20230210003148.2646712-5-seanjc@google.com>
+Subject: [PATCH v2 04/21] KVM: x86: Generate set of VMX feature MSRs using
+ first/last definitions
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -64,7 +64,7 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,95 +72,108 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add macros to track the range of VMX feature MSRs that are emulated by
-KVM to reduce the maintenance cost of extending the set of emulated MSRs.
+Add VMX MSRs to the runtime list of feature MSRs by iterating over the
+range of emulated MSRs instead of manually defining each MSR in the "all"
+list.  Using the range definition reduces the cost of emulating a new VMX
+MSR, e.g. prevents forgetting to add an MSR to the list.
 
-Note, KVM doesn't necessarily emulate all known/consumed VMX MSRs, e.g.
-PROCBASED_CTLS3 is consumed by KVM to enable IPI virtualization, but is
-not emulated as KVM doesn't emulate/virtualize IPI virtualization for
-nested guests.
+Extracting the VMX MSRs from the "all" list, which is a compile-time
+constant, also shrinks the list to the point where the compiler can
+heavily optimize code that iterates over the list.
 
 No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/svm.c | 2 +-
- arch/x86/kvm/vmx/vmx.c | 8 ++++----
- arch/x86/kvm/x86.h     | 8 ++++++++
- 3 files changed, 13 insertions(+), 5 deletions(-)
+ arch/x86/kvm/x86.c | 53 +++++++++++++++++++---------------------------
+ 1 file changed, 22 insertions(+), 31 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index b43775490074..a5b9ebd6f2c5 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4107,7 +4107,7 @@ static bool svm_has_emulated_msr(struct kvm *kvm, u32 index)
- {
- 	switch (index) {
- 	case MSR_IA32_MCG_EXT_CTL:
--	case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_VMFUNC:
-+	case KVM_FIRST_EMULATED_VMX_MSR ... KVM_LAST_EMULATED_VMX_MSR:
- 		return false;
- 	case MSR_IA32_SMBASE:
- 		if (!IS_ENABLED(CONFIG_KVM_SMM))
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 47abd9101e68..ee86db130519 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1945,7 +1945,7 @@ static inline bool is_vmx_feature_control_msr_valid(struct vcpu_vmx *vmx,
- static int vmx_get_msr_feature(struct kvm_msr_entry *msr)
- {
- 	switch (msr->index) {
--	case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_VMFUNC:
-+	case KVM_FIRST_EMULATED_VMX_MSR ... KVM_LAST_EMULATED_VMX_MSR:
- 		if (!nested)
- 			return 1;
- 		return vmx_get_vmx_msr(&vmcs_config.nested, msr->index, &msr->data);
-@@ -2030,7 +2030,7 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		msr_info->data = to_vmx(vcpu)->msr_ia32_sgxlepubkeyhash
- 			[msr_info->index - MSR_IA32_SGXLEPUBKEYHASH0];
- 		break;
--	case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_VMFUNC:
-+	case KVM_FIRST_EMULATED_VMX_MSR ... KVM_LAST_EMULATED_VMX_MSR:
- 		if (!nested_vmx_allowed(vcpu))
- 			return 1;
- 		if (vmx_get_vmx_msr(&vmx->nested.msrs, msr_info->index,
-@@ -2366,7 +2366,7 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		vmx->msr_ia32_sgxlepubkeyhash
- 			[msr_index - MSR_IA32_SGXLEPUBKEYHASH0] = data;
- 		break;
--	case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_VMFUNC:
-+	case KVM_FIRST_EMULATED_VMX_MSR ... KVM_LAST_EMULATED_VMX_MSR:
- 		if (!msr_info->host_initiated)
- 			return 1; /* they are read-only */
- 		if (!nested_vmx_allowed(vcpu))
-@@ -6960,7 +6960,7 @@ static bool vmx_has_emulated_msr(struct kvm *kvm, u32 index)
- 		 * real mode.
- 		 */
- 		return enable_unrestricted_guest || emulate_invalid_guest_state;
--	case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_VMFUNC:
-+	case KVM_FIRST_EMULATED_VMX_MSR ... KVM_LAST_EMULATED_VMX_MSR:
- 		return nested;
- 	case MSR_AMD64_VIRT_SPEC_CTRL:
- 	case MSR_AMD64_TSC_RATIO:
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 754190af1791..4bc483d082ee 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -40,6 +40,14 @@ void kvm_spurious_fault(void);
- 	failed;								\
- })
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 7b91f73a837d..7b73a0b45041 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1539,36 +1539,19 @@ static u32 emulated_msrs[ARRAY_SIZE(emulated_msrs_all)];
+ static unsigned num_emulated_msrs;
  
-+/*
-+ * The first...last VMX feature MSRs that are emulated by KVM.  This may or may
-+ * not cover all known VMX MSRs, as KVM doesn't emulate an MSR until there's an
-+ * associated feature that KVM supports for nested virtualization.
-+ */
-+#define KVM_FIRST_EMULATED_VMX_MSR	MSR_IA32_VMX_BASIC
-+#define KVM_LAST_EMULATED_VMX_MSR	MSR_IA32_VMX_VMFUNC
+ /*
+- * List of msr numbers which are used to expose MSR-based features that
+- * can be used by a hypervisor to validate requested CPU features.
++ * List of MSRs that control the existence of MSR-based features, i.e. MSRs
++ * that are effectively CPUID leafs.  VMX MSRs are also included in the set of
++ * feature MSRs, but are handled separately to allow expedited lookups.
+  */
+-static const u32 msr_based_features_all[] = {
+-	MSR_IA32_VMX_BASIC,
+-	MSR_IA32_VMX_TRUE_PINBASED_CTLS,
+-	MSR_IA32_VMX_PINBASED_CTLS,
+-	MSR_IA32_VMX_TRUE_PROCBASED_CTLS,
+-	MSR_IA32_VMX_PROCBASED_CTLS,
+-	MSR_IA32_VMX_TRUE_EXIT_CTLS,
+-	MSR_IA32_VMX_EXIT_CTLS,
+-	MSR_IA32_VMX_TRUE_ENTRY_CTLS,
+-	MSR_IA32_VMX_ENTRY_CTLS,
+-	MSR_IA32_VMX_MISC,
+-	MSR_IA32_VMX_CR0_FIXED0,
+-	MSR_IA32_VMX_CR0_FIXED1,
+-	MSR_IA32_VMX_CR4_FIXED0,
+-	MSR_IA32_VMX_CR4_FIXED1,
+-	MSR_IA32_VMX_VMCS_ENUM,
+-	MSR_IA32_VMX_PROCBASED_CTLS2,
+-	MSR_IA32_VMX_EPT_VPID_CAP,
+-	MSR_IA32_VMX_VMFUNC,
+-
++static const u32 msr_based_features_all_except_vmx[] = {
+ 	MSR_AMD64_DE_CFG,
+ 	MSR_IA32_UCODE_REV,
+ 	MSR_IA32_ARCH_CAPABILITIES,
+ 	MSR_IA32_PERF_CAPABILITIES,
+ };
+ 
+-static u32 msr_based_features[ARRAY_SIZE(msr_based_features_all)];
++static u32 msr_based_features[ARRAY_SIZE(msr_based_features_all_except_vmx) +
++			      (KVM_LAST_EMULATED_VMX_MSR - KVM_FIRST_EMULATED_VMX_MSR + 1)];
+ static unsigned int num_msr_based_features;
+ 
+ /*
+@@ -6996,6 +6979,18 @@ long kvm_arch_vm_ioctl(struct file *filp,
+ 	return r;
+ }
+ 
++static void kvm_probe_feature_msr(u32 msr_index)
++{
++	struct kvm_msr_entry msr = {
++		.index = msr_index,
++	};
 +
- #define KVM_DEFAULT_PLE_GAP		128
- #define KVM_VMX_DEFAULT_PLE_WINDOW	4096
- #define KVM_DEFAULT_PLE_WINDOW_GROW	2
++	if (kvm_get_msr_feature(&msr))
++		return;
++
++	msr_based_features[num_msr_based_features++] = msr_index;
++}
++
+ static void kvm_probe_msr_to_save(u32 msr_index)
+ {
+ 	u32 dummy[2];
+@@ -7097,15 +7092,11 @@ static void kvm_init_msr_lists(void)
+ 		emulated_msrs[num_emulated_msrs++] = emulated_msrs_all[i];
+ 	}
+ 
+-	for (i = 0; i < ARRAY_SIZE(msr_based_features_all); i++) {
+-		struct kvm_msr_entry msr;
++	for (i = KVM_FIRST_EMULATED_VMX_MSR; i <= KVM_LAST_EMULATED_VMX_MSR; i++)
++		kvm_probe_feature_msr(i);
+ 
+-		msr.index = msr_based_features_all[i];
+-		if (kvm_get_msr_feature(&msr))
+-			continue;
+-
+-		msr_based_features[num_msr_based_features++] = msr_based_features_all[i];
+-	}
++	for (i = 0; i < ARRAY_SIZE(msr_based_features_all_except_vmx); i++)
++		kvm_probe_feature_msr(msr_based_features_all_except_vmx[i]);
+ }
+ 
+ static int vcpu_mmio_write(struct kvm_vcpu *vcpu, gpa_t addr, int len,
 -- 
 2.39.1.581.gbfd45094c4-goog
 
