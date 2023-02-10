@@ -2,129 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FEAD6915A4
-	for <lists+kvm@lfdr.de>; Fri, 10 Feb 2023 01:34:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 526686915B7
+	for <lists+kvm@lfdr.de>; Fri, 10 Feb 2023 01:41:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231222AbjBJAeT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Feb 2023 19:34:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53120 "EHLO
+        id S231334AbjBJAlN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Feb 2023 19:41:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231126AbjBJAde (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Feb 2023 19:33:34 -0500
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E840F70968
-        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 16:32:46 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id l1-20020a170903244100b0019a59370c75so2067571pls.7
-        for <kvm@vger.kernel.org>; Thu, 09 Feb 2023 16:32:46 -0800 (PST)
+        with ESMTP id S230462AbjBJAlB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Feb 2023 19:41:01 -0500
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C1256BD12
+        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 16:40:39 -0800 (PST)
+Received: by mail-pj1-f43.google.com with SMTP id mi9so3656280pjb.4
+        for <kvm@vger.kernel.org>; Thu, 09 Feb 2023 16:40:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=J6Gk09VCdivQ/Y/BQoeE1Efc/j/nP2LOhjM52BokYHY=;
-        b=QjfcNWfF+9MosGU5G67r8yr2rtgu0nmHJmhphY7KHFmTTQSKrVcPSVIYRFvfe0RNXf
-         5ulfvqqBYZ4AyrtK0O08jFiAWUCdJqaFantIPhan7pmEAJHv4B97orVlhsuitHwMvf/R
-         L9WiLGUq4kHCb4/AwzyJm4tArS6NfvH2di3UwYs4LqHeThgzt87PLN9gdkTivZKRwoIw
-         IvaXKhYrUWnv+KNnKkhIwYgxc6P1q8+mKPdM5UE5spmX2CcpJyh+lTMadIS4JIZLLhI/
-         ZOBkI6q0zgV3XX+lX4v8002KDf5yK3fjEfHzfM/3VEOijq46rrZ1eJvtVu9AXpyV+GRl
-         OS9A==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=W7YPU86kRh43fh/B9xA9EKXQH40cZnkadx8AsjXbI3M=;
+        b=n02O/fL0+7AmXTmeiZ+eZ9d5ZT/GiXiS4usm8YWkyYIOPv66XejcWTG/tLJzS4ejkM
+         ovnmjNf+/V4WMPR5hJhke3vD4GplhYtvL9vEmYS6rKRFRInOWY36YmcSGRlRlXtIqk2x
+         zyyYNZ5RPe7YC1b4z/lhTrlqaQI8TZd/6fcFdDffIo1BEQ/N3P7wZXdRNFCaaVDVEmaC
+         k7EM7JL4YwRd8/j1fpMwi0Sv19KAavj/Z3Lox3YCddOW/BESEhsEfDKnGobVr1uu+fRI
+         IcumcKWqHnYFfcFoEuc9ODLNMlqMcGwYmuqo7O/bx2Pw8Bf2iZVjEA7+bSDnR5xz4m5D
+         EuCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=J6Gk09VCdivQ/Y/BQoeE1Efc/j/nP2LOhjM52BokYHY=;
-        b=D8aYWt7/+53PtVfP+AvHz2XbsP5oyCNgrQvkFNjY6irJu8Lm52Q1uD8ssI0h1d68dF
-         hIFd2Irg/3oAQ4HBAV/48r7L/9iBUbyrlgPe6eDKxzvsIWOgaOpVUTaCYm2lb+BqYE4o
-         nP1u3V8smF8x3NjhD1eRR6OmN/s2rHf7WFN8dmHZVSyzdlQU3g+/ccua0FrdgxL4cJHC
-         lVTb5EXGMN/KWqgLsLj/dMvclcrZ0OAcL5+xju0yD+wjKK1V+6dFk1A26ughCS1GAUsS
-         rJCXyEHMxBwkgojK1H4+jS5n4b6AAN0HaZKrnxSbE8en5L12+QALf7ersrfueXNwhOAD
-         UdUQ==
-X-Gm-Message-State: AO0yUKUvF0oSS+t7uOuylArGLl/FUVl+K+6L1UP1TK5YPs2xjbDrJcbc
-        gdUEzqnumzFHSP/Eupw2zNuF0joMFI8=
-X-Google-Smtp-Source: AK7set8Tf+Mu4344x73YHYpL2zzFxQMThn8EfRNvY0tOHY8icvYWnk+m0wIurpkbQyNmq8saBDnIqVaXXvA=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:be48:0:b0:4fb:2c72:9168 with SMTP id
- g8-20020a63be48000000b004fb2c729168mr1791740pgo.85.1675989146248; Thu, 09 Feb
- 2023 16:32:26 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 10 Feb 2023 00:31:48 +0000
-In-Reply-To: <20230210003148.2646712-1-seanjc@google.com>
-Mime-Version: 1.0
-References: <20230210003148.2646712-1-seanjc@google.com>
-X-Mailer: git-send-email 2.39.1.581.gbfd45094c4-goog
-Message-ID: <20230210003148.2646712-22-seanjc@google.com>
-Subject: [PATCH v2 21/21] KVM: selftests: Verify LBRs are disabled if vPMU is disabled
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=W7YPU86kRh43fh/B9xA9EKXQH40cZnkadx8AsjXbI3M=;
+        b=YBRWkQTVqJGYQm89JzkTfRDyCw8SVd6QT366oZsdgg5C2UTYmmUsQKJTSdwP2sKG46
+         zWpAFl84kAMu0kiqcdQP3J7Oc+NMEEIIxEpjiu25S6hVrbnchphK/xSwC4B4g+UM7AH2
+         4TMiTe9aubKpIQRqnQD5+SBAZrnwmu09JQPtnOHVkWBEHeD1jHBM/hpqIL9CQ5zSMGR4
+         q/R1Zbw65avRpE5/gZMK+NTZxWvYAA9+C0DiYf/ZF/akKhxrLmWd0kmjsdBtwpVOYox+
+         mqZzM3sA/08aOaREu4Hs9QqwQLNyuUvNFY+xtmP34PxgkKec3opbWkR1I+Ec0yKZUacI
+         VK9w==
+X-Gm-Message-State: AO0yUKVaJz8GtGA1qDWGP/BDOMxJTnCnz0DHwPy+uC6q1TbqZksD3K03
+        rJihDt4n04rErhJku+XwqDfOkA==
+X-Google-Smtp-Source: AK7set/11E4jpVghRlgOmElBR2Eplp/YT9s1l5QVxf/giHCfieVdfEaQkx8Mgi5PszE54dGY0TW/bw==
+X-Received: by 2002:a17:902:e551:b0:19a:6cd2:a658 with SMTP id n17-20020a170902e55100b0019a6cd2a658mr34785plf.7.1675989335399;
+        Thu, 09 Feb 2023 16:35:35 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id a11-20020a1709027e4b00b00189b2b8dbedsm2069302pln.228.2023.02.09.16.35.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Feb 2023 16:35:34 -0800 (PST)
+Date:   Fri, 10 Feb 2023 00:35:30 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        Like Xu <like.xu.linux@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+To:     Isaku Yamahata <isaku.yamahata@gmail.com>
+Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        wei.w.wang@intel.com
+Subject: Re: [PATCH v10 2/9] KVM: Introduce per-page memory attributes
+Message-ID: <Y+WRUriIoan/XChx@google.com>
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+ <20221202061347.1070246-3-chao.p.peng@linux.intel.com>
+ <20230209072529.GB4175971@ls.amr.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230209072529.GB4175971@ls.amr.corp.intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
+        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Verify that disabling the guest's vPMU via CPUID also disables LBRs.
-KVM has had at least one bug where LBRs would remain enabled even though
-the intent was to disable everything PMU related.
+On Wed, Feb 08, 2023, Isaku Yamahata wrote:
+> On Fri, Dec 02, 2022 at 02:13:40PM +0800,
+> Chao Peng <chao.p.peng@linux.intel.com> wrote:
+> 
+> > +static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
+> > +					   struct kvm_memory_attributes *attrs)
+> > +{
+> > +	gfn_t start, end;
+> > +	unsigned long i;
+> > +	void *entry;
+> > +	u64 supported_attrs = kvm_supported_mem_attributes(kvm);
+> > +
+> > +	/* flags is currently not used. */
+> > +	if (attrs->flags)
+> > +		return -EINVAL;
+> > +	if (attrs->attributes & ~supported_attrs)
+> > +		return -EINVAL;
+> > +	if (attrs->size == 0 || attrs->address + attrs->size < attrs->address)
+> > +		return -EINVAL;
+> > +	if (!PAGE_ALIGNED(attrs->address) || !PAGE_ALIGNED(attrs->size))
+> > +		return -EINVAL;
+> > +
+> > +	start = attrs->address >> PAGE_SHIFT;
+> > +	end = (attrs->address + attrs->size - 1 + PAGE_SIZE) >> PAGE_SHIFT;
+> > +
+> > +	entry = attrs->attributes ? xa_mk_value(attrs->attributes) : NULL;
+> > +
+> > +	mutex_lock(&kvm->lock);
+> > +	for (i = start; i < end; i++)
+> > +		if (xa_err(xa_store(&kvm->mem_attr_array, i, entry,
+> > +				    GFP_KERNEL_ACCOUNT)))
+> > +			break;
+> > +	mutex_unlock(&kvm->lock);
+> > +
+> > +	attrs->address = i << PAGE_SHIFT;
+> > +	attrs->size = (end - i) << PAGE_SHIFT;
+> > +
+> > +	return 0;
+> > +}
+> > +#endif /* CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES */
+> > +
+> 
+> If memslot isn't private, it should return error if private attribute is set.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- .../selftests/kvm/x86_64/vmx_pmu_caps_test.c  | 29 +++++++++++++++++++
- 1 file changed, 29 insertions(+)
-
-diff --git a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
-index 29aaa0419294..3009b3e5254d 100644
---- a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
-@@ -204,6 +204,34 @@ static void test_immutable_perf_capabilities(union perf_capabilities host_cap)
- 	kvm_vm_free(vm);
- }
- 
-+/*
-+ * Test that LBR MSRs are writable when LBRs are enabled, and then verify that
-+ * disabling the vPMU via CPUID also disables LBR support.  Set bits 2:0 of
-+ * LBR_TOS as those bits are writable across all uarch implementations (arch
-+ * LBRs will need to poke a different MSR).
-+ */
-+static void test_lbr_perf_capabilities(union perf_capabilities host_cap)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	int r;
-+
-+	if (!host_cap.lbr_format)
-+		return;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, NULL);
-+
-+	vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, host_cap.capabilities);
-+	vcpu_set_msr(vcpu, MSR_LBR_TOS, 7);
-+
-+	vcpu_clear_cpuid_entry(vcpu, X86_PROPERTY_PMU_VERSION.function);
-+
-+	r = _vcpu_set_msr(vcpu, MSR_LBR_TOS, 7);
-+	TEST_ASSERT(!r, "Writing LBR_TOS should fail after disabling vPMU");
-+
-+	kvm_vm_free(vm);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	union perf_capabilities host_cap;
-@@ -222,4 +250,5 @@ int main(int argc, char *argv[])
- 	test_fungible_perf_capabilities(host_cap);
- 	test_immutable_perf_capabilities(host_cap);
- 	test_guest_wrmsr_perf_capabilities(host_cap);
-+	test_lbr_perf_capabilities(host_cap);
- }
--- 
-2.39.1.581.gbfd45094c4-goog
-
+Why?  I'd rather keep the two things separate.  If we enforce this sort of thing
+at KVM_SET_MEMORY_ATTRIBUTES, then we also have to enforce it at
+KVM_SET_USER_MEMORY_REGION.
