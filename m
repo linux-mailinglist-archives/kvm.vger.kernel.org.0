@@ -2,84 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 00670692A6A
-	for <lists+kvm@lfdr.de>; Fri, 10 Feb 2023 23:45:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BE004692A96
+	for <lists+kvm@lfdr.de>; Fri, 10 Feb 2023 23:53:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234019AbjBJWpP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Feb 2023 17:45:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39102 "EHLO
+        id S229550AbjBJWxX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Feb 2023 17:53:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233991AbjBJWpL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Feb 2023 17:45:11 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD620831CA
-        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 14:44:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676069054;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8VZLwEZ0VhiWmW6aalUpiTNY5oCQlCmFrf7N1T4iZuc=;
-        b=cgt/nRk9la+RvyddEagInq3UKLEkDd+OYfIYKq3t8udgrm3AOreQmGe2gt9b5M0Jt4iCVd
-        2opA5nGnyLw/X933I7FR9q69UV6SFvGmkfcSXed7EF3SfkhaNRCiDXwCbsm1kix5Hv9Pbg
-        sF/XB9myzbDyNTOMgWGKk9vFdLHThGY=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-153-QUczH7_iOpKCPUoqJWtXcg-1; Fri, 10 Feb 2023 17:44:13 -0500
-X-MC-Unique: QUczH7_iOpKCPUoqJWtXcg-1
-Received: by mail-io1-f71.google.com with SMTP id f4-20020a05660215c400b0073a6a9f8f45so1066862iow.11
-        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 14:44:13 -0800 (PST)
+        with ESMTP id S229539AbjBJWxW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Feb 2023 17:53:22 -0500
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5643C23D88;
+        Fri, 10 Feb 2023 14:53:21 -0800 (PST)
+Received: by mail-pf1-x42a.google.com with SMTP id v3so4494541pfn.6;
+        Fri, 10 Feb 2023 14:53:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=5C7mT14sIcQvZGqVI82PDB3oIpwvIfrZYj8GQKRk2hw=;
+        b=P/Tr0QaVTqrmzTX9y2izxlfHtpFEpelXkhC8PrVRQIjIVTa77U5WVEXpobrw1wVXOt
+         ec2pULGZcCu1Q7QhlKmTHf6rsvSMr7NgLeQyrTQW3dBUJ/1d7BguZLWiBIlUibtR1yfm
+         Saq9iljFRa5en+DF9HAaDWUvOYQJzIpAdoW9S9GWKt7stpbuanfGr2xP6Xp9h1KCP+6V
+         waRMfWEy2EzM3N2uDUoOm4I4jtsWp7/YssULyHh3pMg+vhuP4liovJurTHrijef6L1f3
+         IbO/b56MVFY+bZnP2Nuu4dBpl9z7BiZl1gfPc0+aAXV6+KVD5otUeFJKwhSG8pjWX2pL
+         8hjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8VZLwEZ0VhiWmW6aalUpiTNY5oCQlCmFrf7N1T4iZuc=;
-        b=0gmLQD3LjxxmLunGe9/h7iRmT1XtWrzDrjJrQFTUqPczNxwfwDkOvasqInuoWCFu5y
-         3FBmlerTZWzVZEPy/HkKDj+B/GGcoXxwxb2pwXAbQJtTccB+jBP56kZmRa/WSBjogTb0
-         scXi6al1nGp1BKTH89UY4C5TP3P/CFHeJdphXSH8LyMQWayWS0Qet0/6PDQiMQo38sqi
-         Kt8GNZUkSYVcH2D50d+o4JoTyrzZPu0qWEyctd0xbqGS+/NlP6Ev/TFqwg7QV6qWQ0Ob
-         FgL0DOCoVnMZZ8zj2rY7pDtFHGJ5mQkbFA4Jq9UK7SYdjD6vqTt0l1p6mo8zgPO8v7Su
-         66tw==
-X-Gm-Message-State: AO0yUKUwjEuy2F8e4YgssnPirbi/Gk4s/wDP3DQzPKR6SYMCSQhlEnpQ
-        UjWLDmCrf1+30cUy+B1A5sv0MsUNMt/xCNYOyzxGMh9SKuz3QJPrY0cuQoKMjeaPdmaSigcMCN4
-        L4NO6xXFRpgRp
-X-Received: by 2002:a05:6602:2acd:b0:722:827d:e6ac with SMTP id m13-20020a0566022acd00b00722827de6acmr17507143iov.6.1676069052818;
-        Fri, 10 Feb 2023 14:44:12 -0800 (PST)
-X-Google-Smtp-Source: AK7set/pYb5EOh/Drz42V1PJ5+VKWj6WP/ITUzBus6W3/LeQWRmoejvgCP3pyCdxFAjIjZZ39ARC1A==
-X-Received: by 2002:a05:6602:2acd:b0:722:827d:e6ac with SMTP id m13-20020a0566022acd00b00722827de6acmr17507122iov.6.1676069052584;
-        Fri, 10 Feb 2023 14:44:12 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id c11-20020a02a40b000000b003bf39936d1esm1666882jal.131.2023.02.10.14.44.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Feb 2023 14:44:11 -0800 (PST)
-Date:   Fri, 10 Feb 2023 15:44:10 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yi Liu <yi.l.liu@intel.com>
-Cc:     joro@8bytes.org, jgg@nvidia.com, kevin.tian@intel.com,
-        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
-        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
-        peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        baolu.lu@linux.intel.com
-Subject: Re: [PATCH 2/6] iommu/vt-d: Implement hw_info for iommu capability
- query
-Message-ID: <20230210154410.2b3b8296.alex.williamson@redhat.com>
-In-Reply-To: <20230209041642.9346-3-yi.l.liu@intel.com>
-References: <20230209041642.9346-1-yi.l.liu@intel.com>
-        <20230209041642.9346-3-yi.l.liu@intel.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5C7mT14sIcQvZGqVI82PDB3oIpwvIfrZYj8GQKRk2hw=;
+        b=2is3MgbKGiOEnfXIXEV6I/JAL4e62s7KX3o6eOsKkJQRTzlXLHD9YXfcnWEdxdQZES
+         EX8NKXTD66590epMFxsaycLppG98ylr8GaBjaYXK5lf2Lv7lodccfPJZhKK2sgTCOM88
+         GS3EFvXt/pet51D1GNwX9tIKECc74adAhFRF+zvwHbOGJMP3T3DHi7hUY7InDI9mwBZb
+         huTrJ6qQcWbsmV47Aqlkl1zIOkQk1+XpOIA9CbyIY4a3D480baUh8Q4IgyYUHvGBGMz7
+         JvY8XvhQ692rzQv/+8l93OXsRCi4OUO9zZBua0s1iq/e9+mTGeMrlsGjMeQYMvsRk/LT
+         2Bfw==
+X-Gm-Message-State: AO0yUKXRww3EzOBNPdXwVTjpVhH+EE4PJdEyleo/TsjhIfJ5SfXolKEx
+        mWU+SmIftypEMIXeWX6sL7OanlpxIeDpTDY0rmc=
+X-Google-Smtp-Source: AK7set/GNEl9KMH8Zwkoa7+0XItH/dxabtmg2DZlqpwxk0lC0z5W8yfttgTmQiqIMrBuECnEJk6/1mNLzLdb19oPgIs=
+X-Received: by 2002:a62:17c3:0:b0:5a8:6aeb:e95e with SMTP id
+ 186-20020a6217c3000000b005a86aebe95emr1009703pfx.33.1676069600452; Fri, 10
+ Feb 2023 14:53:20 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+References: <20230127112248.136810-1-suzuki.poulose@arm.com> <cfb0292c-e84d-0a7c-be74-ae5508779502@arm.com>
+In-Reply-To: <cfb0292c-e84d-0a7c-be74-ae5508779502@arm.com>
+From:   Itaru Kitayama <itaru.kitayama@gmail.com>
+Date:   Sat, 11 Feb 2023 07:53:09 +0900
+Message-ID: <CANW9uyvXofhGGuhGzk_0Et-w8CHT2y35WSu5+hno6Qm8K4R4ug@mail.gmail.com>
+Subject: Re: [RFC] Support for Arm CCA VMs on Linux
+To:     Ryan Roberts <ryan.roberts@arm.com>
+Cc:     Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andrew Jones <andrew.jones@linux.dev>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        James Morse <james.morse@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joey Gouly <Joey.Gouly@arm.com>, Marc Zyngier <maz@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Steven Price <steven.price@arm.com>,
+        Thomas Huth <thuth@redhat.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -87,52 +85,106 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed,  8 Feb 2023 20:16:38 -0800
-Yi Liu <yi.l.liu@intel.com> wrote:
+On Sat, Feb 11, 2023 at 1:56 AM Ryan Roberts <ryan.roberts@arm.com> wrote:
+>
+> On 27/01/2023 11:22, Suzuki K Poulose wrote:
+> > [...]
+>
+> > Running the stack
+> > ====================
+> >
+> > To run/test the stack, you would need the following components :
+> >
+> > 1) FVP Base AEM RevC model with FEAT_RME support [4]
+> > 2) TF-A firmware for EL3 [5]
+> > 3) TF-A RMM for R-EL2 [3]
+> > 4) Linux Kernel [6]
+> > 5) kvmtool [7]
+> > 6) kvm-unit-tests [8]
+> >
+> > Instructions for building the firmware components and running the model are
+> > available here [9]. Once, the host kernel is booted, a Realm can be launched by
+> > invoking the `lkvm` commad as follows:
+> >
+> >  $ lkvm run --realm                            \
+> >        --measurement-algo=["sha256", "sha512"] \
+> >        --disable-sve                           \
+> >        <normal-vm-options>
+> >
+> > Where:
+> >  * --measurement-algo (Optional) specifies the algorithm selected for creating the
+> >    initial measurements by the RMM for this Realm (defaults to sha256).
+> >  * GICv3 is mandatory for the Realms.
+> >  * SVE is not yet supported in the TF-RMM, and thus must be disabled using
+> >    --disable-sve
+> >
+> > You may also run the kvm-unit-tests inside the Realm world, using the similar
+> > options as above.
+>
+> Building all of these components and configuring the FVP correctly can be quite
+> tricky, so I thought I would plug a tool we have called Shrinkwrap, which can
+> simplify all of this.
+>
+> The tool accepts a yaml input configuration that describes how a set of
+> components should be built and packaged, and how the FVP should be configured
+> and booted. And by default, it uses a Docker container on its backend, which
+> contains all the required tools, including the FVP. You can optionally use
+> Podman or have it run on your native system if you prefer. It supports both
+> x86_64 and aarch64. And you can even run it in --dry-run mode to see the set of
+> shell commands that would have been executed.
+>
+> It comes with two CCA configs out-of-the-box; cca-3world.yaml builds TF-A, RMM,
+> Linux (for both host and guest), kvmtool and kvm-unit-tests. cca-4world.yaml
+> adds Hafnium and some demo SPs for the secure world (although since Hafnium
+> requires x86_64 to build, cca-4world.yaml doesn't currently work on an aarch64
+> build host).
+>
+> See the documentation [1] and repository [2] for more info.
+>
+> Brief instructions to get you up and running:
+>
+>   # Install shrinkwrap. (I assume you have Docker installed):
+>   sudo pip3 install pyyaml termcolor tuxmake
+>   git clone https://git.gitlab.arm.com/tooling/shrinkwrap.git
+>   export PATH=$PWD/shrinkwrap/shrinkwrap:$PATH
+>
+>   # If running Python < 3.9:
+>   sudo pip3 install graphlib-backport
+>
+>   # Build all the CCA components:
+>   shrinkwrap build cca-3world.yaml [--dry-run]
 
-> From: Lu Baolu <baolu.lu@linux.intel.com>
-> 
-> To support nested translation in the userspace, it should check the
-> underlying hardware information for the capabilities.
-> 
-> Add intel_iommu_hw_info() to report cap_reg and ecap_reg information.
-> 
-> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
-> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
-> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
-> Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
-> ---
->  drivers/iommu/intel/iommu.c  | 19 +++++++++++++++++++
->  drivers/iommu/intel/iommu.h  |  1 +
->  include/uapi/linux/iommufd.h | 21 +++++++++++++++++++++
->  3 files changed, 41 insertions(+)
-> 
-> diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
-> index 59df7e42fd53..929f600cc350 100644
-> --- a/drivers/iommu/intel/iommu.c
-> +++ b/drivers/iommu/intel/iommu.c
-> @@ -4760,8 +4760,26 @@ static void intel_iommu_remove_dev_pasid(struct device *dev, ioasid_t pasid)
->  	intel_pasid_tear_down_entry(iommu, dev, pasid, false);
->  }
->  
-> +static void *intel_iommu_hw_info(struct device *dev, u32 *length)
-> +{
-> +	struct device_domain_info *info = dev_iommu_priv_get(dev);
-> +	struct intel_iommu *iommu = info->iommu;
-> +	struct iommu_device_info_vtd *vtd;
-> +
-> +	vtd = kzalloc(sizeof(*vtd), GFP_KERNEL);
-> +	if (!vtd)
-> +		return ERR_PTR(-ENOMEM);
-> +
-> +	vtd->cap_reg = iommu->cap;
-> +	vtd->ecap_reg = iommu->ecap;
+This has been working on my Multipass instance on M1, thanks for the tool.
 
-Just a friendly reminder that these registers are already exposed to
-userspace under /sys/class/iommu/ and each device has an iommu link
-back to their iommu device there.  This series doesn't really stand on
-its own without some discussion of why that interface is not sufficient
-for this use case.  Thanks,
+Thanks,
+Itaru.
 
-Alex
-
+>
+>   # Run the stack in the FVP:
+>   shrinkwrap run cca-3world.yaml -r ROOTFS=<my_rootfs.ext4> [--dry-run]
+>
+> By default, building is done at ~/.shrinkwrap/build/cca-3world and the package
+> is created at ~/.shrinkwrap/package/cca-3world (this can be changed with
+> envvars).
+>
+> The 'run' command will boot TF-A, RMM and host Linux kernel in the FVP, and
+> mount the provided rootfs. You will likely want to have copied the userspace
+> pieces into the rootfs before running, so you can create realms:
+>
+> - ~/.shrinkwrap/package/cca-3world/Image (kernel with RMI and RSI support)
+> - ~/.shrinkwrap/package/cca-3world/lkvm (kvmtool able to launch realms)
+> - ~/.shrinkwrap/package/cca-3world/kvm-unit-tests.tgz (built kvm-unit-tests)
+>
+> Once the FVP is booted to a shell, you can do something like this to launch a
+> Linux guest in a realm:
+>
+>   lkvm run --realm --disable-sve -c 1 -m 256 -k Image
+>
+> [1] https://shrinkwrap.docs.arm.com
+> [2] https://gitlab.arm.com/tooling/shrinkwrap
+>
+>
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
