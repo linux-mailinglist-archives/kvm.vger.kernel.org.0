@@ -2,450 +2,268 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2DFB8692221
-	for <lists+kvm@lfdr.de>; Fri, 10 Feb 2023 16:27:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2010469218F
+	for <lists+kvm@lfdr.de>; Fri, 10 Feb 2023 16:06:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232609AbjBJP13 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Feb 2023 10:27:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57674 "EHLO
+        id S232577AbjBJPGM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Feb 2023 10:06:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32948 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232038AbjBJP11 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Feb 2023 10:27:27 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA734184;
-        Fri, 10 Feb 2023 07:27:25 -0800 (PST)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31AEfrOa007735;
-        Fri, 10 Feb 2023 15:04:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=7iZE0NrfDz1pDVKfzMNzS5LJx98amDA3dI9THnwu5gQ=;
- b=cpV8RlrIX9oKWr/0ozGgdZ9HMBLKuhExyp++j+UlJTHb0c2IV68llEv0BhVhi3R6RZsP
- UEC7ys7QNqsLvGTOebB6bdFX3AGWcr+5ABCE4+g5BWpScIGkxMD02zuNenEgBH061rtE
- /XyICzi941HnCH5U1xVOL9wAhOYD+IbVcbLtN1Z8QXrjQcUS0FcyeWAZeAZ3PkvHCQBR
- +xUyptmX2SnmqOagMoGR5OX9EOWBFJHvwUgkozD8R60oZ1Pt88zdLEmyRsnAs+PzqSPP
- eUMW1DL3h0DXStz8bY0UjDsflQ8l7yi8GkD7IJ5AxxcmGFUn+vqXOu8pgr2DU4ecVQCA BA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nnqwq8wre-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 10 Feb 2023 15:04:05 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31AEivmX020536;
-        Fri, 10 Feb 2023 15:03:43 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nnqwq8v62-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 10 Feb 2023 15:03:43 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31ABaQeH005648;
-        Fri, 10 Feb 2023 14:49:22 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-        by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3nhf06nf9e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 10 Feb 2023 14:49:21 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31AEnIOs42795354
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 10 Feb 2023 14:49:18 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 45D8920049;
-        Fri, 10 Feb 2023 14:49:18 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B587B20043;
-        Fri, 10 Feb 2023 14:49:17 +0000 (GMT)
-Received: from [9.171.75.239] (unknown [9.171.75.239])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 10 Feb 2023 14:49:17 +0000 (GMT)
-Message-ID: <3d48fd53-ffba-96c4-05e7-9e7fa457a42a@linux.ibm.com>
-Date:   Fri, 10 Feb 2023 15:49:17 +0100
+        with ESMTP id S232550AbjBJPGE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Feb 2023 10:06:04 -0500
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E130211F5
+        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 07:05:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1676041537; x=1707577537;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=KY4cKjzAx3QiCQKeDOzOlnqHJc6PDcM/IQcSZjG5Bac=;
+  b=kVgJMmHwKdK9E3XcI8GV+R6TewnLjQgsQVnaJMy/fzT2r5bD4IsJ/Mtr
+   TSw1O7/Yb9cBJjdsWTssu4990I0Wfh8K+r+/PpHvKcPpkQWAyOXO2x3R/
+   SW7ZuGL/0ONgIWXVuXtEAbXnYS7twCzODjIs96RXPD0Vn3e67HBn42ELe
+   /3O5GUu3WZAqn/es+ZYcK1rU3AAEvAe0DdO8M5bqyLcCiaWZTpMaBHgkM
+   R8MM2iq75C8FgyJrM3BfYJZnsHzjhzfwwLTDUoxTnc8vnopAaJEz/gqBh
+   lt/Kpe90eEU0MeKEjge9xhiNJuyMgggNgHlOD9U1f9k4dD7SWfReFNWhl
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10617"; a="330443919"
+X-IronPort-AV: E=Sophos;i="5.97,287,1669104000"; 
+   d="scan'208";a="330443919"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2023 07:04:45 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10617"; a="736769985"
+X-IronPort-AV: E=Sophos;i="5.97,287,1669104000"; 
+   d="scan'208";a="736769985"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmsmga004.fm.intel.com with ESMTP; 10 Feb 2023 07:04:44 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Fri, 10 Feb 2023 07:04:44 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16 via Frontend Transport; Fri, 10 Feb 2023 07:04:44 -0800
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.105)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.16; Fri, 10 Feb 2023 07:04:43 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ur2Owx4G1aHg7W5zHHwUkLKB10IPFUzbjygQuRrOzgUCodgs7xmrzRo0Wc0wNhI5vYorCmbxSng75UBNHDtfhUSHy1SINlEiev/rDBGOnAr0n2Sn8ybqOZHoqIY5ATYOJczqRaCZ7Wp361fYvvojpHlzjWdz56B16DsBQtfqB5TmsTJ8gMxBLIoSsOmMLZ/rYTFoDpiwnHqDiF7YgxaFDhbWgg5ySmHCLqIQfQHHN1nMRC/Bme2BCTCu0yZ8Ma27i8Rf+DtPRhCdwtrG7SCecoPAQz14hrtcZH8NkBcW3beg47w+Qn7W47ozi6aKsXlTpY2nG49TgLq66wHLrmrg3A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=IaZg+u5F1gRD4c/Rh2yPpVOPHqYqxXPXiE4FQDEQ6I0=;
+ b=EG+fTE2bPwuF9pjQtPMR1Q8BGW1svyAAx9Xl2nKNGAwxihYsC4G8OwlDv7lmKuLiyMBAAQ9yJgq1uSgH93rPOLkmt0kofLvZiCILGlsYBdlELNcI1/+cjIQqG/Cjh+i5A2WKHOZRlo2gCz9Nxuh1t/QCQG2E4A5IxKOsmx+CVFjPWtmMgqcn8PTvcgYJpcJkS3uNb1q/9h+qg4+nEUOvV9Qjy9caWUj22vReG0Fm9L8KGRIaMycJEHgdbx7bAnXGLCIA+DwbLj2KgNLwFtkzqmwIOKt2LoYhE6tXQ9Th8jfB1eyM0NZWTf6beHMC0QhZBF51Tavnh4QF6g5usVw5yg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
+ by MW5PR11MB5812.namprd11.prod.outlook.com (2603:10b6:303:193::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6064.34; Fri, 10 Feb
+ 2023 15:04:38 +0000
+Received: from PH8PR11MB6780.namprd11.prod.outlook.com
+ ([fe80::5cb1:c8ce:6f60:4e09]) by PH8PR11MB6780.namprd11.prod.outlook.com
+ ([fe80::5cb1:c8ce:6f60:4e09%8]) with mapi id 15.20.6086.021; Fri, 10 Feb 2023
+ 15:04:38 +0000
+Date:   Fri, 10 Feb 2023 23:04:54 +0800
+From:   Chao Gao <chao.gao@intel.com>
+To:     Robert Hoo <robert.hu@linux.intel.com>
+CC:     <seanjc@google.com>, <pbonzini@redhat.com>,
+        <yu.c.zhang@linux.intel.com>, <yuan.yao@linux.intel.com>,
+        <jingqi.liu@intel.com>, <weijiang.yang@intel.com>,
+        <isaku.yamahata@intel.com>, <kirill.shutemov@linux.intel.com>,
+        <kvm@vger.kernel.org>
+Subject: Re: [PATCH v4 5/9] KVM: x86: Untag LAM bits when applicable
+Message-ID: <Y+ZdFtr1fJkdCtRL@gao-cwp>
+References: <20230209024022.3371768-1-robert.hu@linux.intel.com>
+ <20230209024022.3371768-6-robert.hu@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20230209024022.3371768-6-robert.hu@linux.intel.com>
+X-ClientProxiedBy: SG2PR06CA0187.apcprd06.prod.outlook.com (2603:1096:4:1::19)
+ To PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [kvm-unit-tests PATCH v6 2/2] s390x: topology: Checking
- Configuration Topology Information
-Content-Language: en-US
-To:     Thomas Huth <thuth@redhat.com>, linux-s390@vger.kernel.org
-Cc:     frankja@linux.ibm.com, kvm@vger.kernel.org, imbrenda@linux.ibm.com,
-        david@redhat.com, nrb@linux.ibm.com, nsg@linux.ibm.com
-References: <20230202092814.151081-1-pmorel@linux.ibm.com>
- <20230202092814.151081-3-pmorel@linux.ibm.com>
- <96920589-ec3c-6e2d-4eee-a12b50b5c6ca@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <96920589-ec3c-6e2d-4eee-a12b50b5c6ca@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: BxYOLY2ArhFkRQLL_cRsR28CXdQ4Y7Xs
-X-Proofpoint-GUID: F7js13hhcCdpsxP6DZjH3PwvaGMnnYrK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
- definitions=2023-02-10_09,2023-02-09_03,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
- phishscore=0 priorityscore=1501 adultscore=0 lowpriorityscore=0
- mlxlogscore=999 bulkscore=0 impostorscore=0 spamscore=0 malwarescore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302100125
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB6780:EE_|MW5PR11MB5812:EE_
+X-MS-Office365-Filtering-Correlation-Id: b4f48ba3-3c7c-41a1-59e9-08db0b7820aa
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ybWcJljE2Iy0kbdkjludDJEVR3R1AVabGUTG1UeM4BaqUyzQd0xs26+ouaGWGLP0DiVQgQC5agI9tDMiOY52Pn1Dpq1bb09KFlffRqmAb4FW4x1V/vsC80o01+o23/h5F54/kYcRJH+iT7jK02YTyssah0ZUgtcpcC01j2DUi5CqgQf8qvst3jCkX/XIhqO9duPPcN8SI1FkG5InmGvvCzOE0kZ3/5qNykla1VpfZ57mVBPqLh4vZzonatuqHgdeSDu/Nk/WkgrLKXh3/bums+aCf6QD3BhjFvzeaYSFAqYvMnxgQX0gw9zSfvN5QEREa04tBINLswS9aHeF0aA6OXmVORUv/wJ/G45+J8j4NzkWYe+IpU9vBStjp4Mkm8f2BGJ1HzA6ls7aYInGlteqJbDf9K9dTo7UkkO30IFSYuZUof6TYr1LL2GZXR3FpmXDyMaV7wWScmjZFnR6Jy14iB61Qpoy+ttbw3GrnOyRu+U0l++A5YmQoqlViykyJUxAMOz9qVxVGWz2zHqkbC5u5S8MKMaERkxcV1irPMhdtGIIkz2QTbM4eBQPr7Vj32QxF5AIFdiV++fh9abKWfyWdRp3cT+ITP65YPQ53SBJ9U/T9EUb7D4cC8Hv+NT8sS7lb8x8CKLfnIisWJ3v7aNkRVT9AJFvTNDdlObBmFAMmIj8HLFe09Bzpvtd7/7qxLJr0ZrbyRCXwlN41C9QgVDMmJG0a06OIDy2ud9PxxE3H/s=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB6780.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(7916004)(376002)(366004)(136003)(346002)(396003)(39860400002)(451199018)(38100700002)(82960400001)(33716001)(186003)(6512007)(44832011)(26005)(6486002)(966005)(5660300002)(316002)(9686003)(41300700001)(8676002)(6916009)(66476007)(4326008)(66556008)(66946007)(83380400001)(8936002)(2906002)(86362001)(478600001)(6666004)(6506007)(67856001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?wTAM6WZoig46xiS2ZM9WQ+OWeyJV4B39u3Kb2oto8XoyXYeDbk1Loox6D7Hz?=
+ =?us-ascii?Q?SyJpcdB0+V7b7Q1DbOJn0q5qmHVs1NTzZ2izRIMwom4jLf7ovWJRCkNcYI+B?=
+ =?us-ascii?Q?4ybsbhU3ME4gOTXJaJ0B9RcTDy7PRQFJPdvCgZ3AMP1flL1B9cLZD8pzlq0y?=
+ =?us-ascii?Q?OOnPlMXO9eXhHxfJkbhegX9JFCdJTAmScAiQF2cpDSyobMPZupejgPC8OjGO?=
+ =?us-ascii?Q?5CXlsGcXmQuqR0OsjmpBDvkQa2ICHH1rrY2Akjxo+kzFjq0646NnT+2Oc85J?=
+ =?us-ascii?Q?U1h3e/HCWJ/fMQKgrd2EJS24t8ezQdK6deHD25uD+K+Y4lVzWkxJdb2v9IsA?=
+ =?us-ascii?Q?AlpTfqUAwmXadR5KehBQfLYrDSta6HUP5PmN4FgqinKveUHHzWqnYVpc0O5q?=
+ =?us-ascii?Q?FWOuFlkQ2wiI63p71c80nGJSUxp9f/tJhwbqx7t5wpFavXgZsWOLMw/VFe76?=
+ =?us-ascii?Q?+aDsywI7ERcdPj5p1CgAPkQICPZyJysjLZjHYx7Dj/tvJLVtgVp6n+d33CnY?=
+ =?us-ascii?Q?LKkvm+C3sIzw7DmE53fL3vuk1/KyYxX8VMW8nepptJUJp8SwDjQvAI2KS401?=
+ =?us-ascii?Q?urcUfJoFefCUgMCGHUEk7gR0KmQICjN9M9Is/ejRPMA6AwBpmi80R03kyrzZ?=
+ =?us-ascii?Q?hFuO9GGfeWyCL4WYx+B2HSbUGM1LjLQEUlwKeO6rT4D/acZo+p9zY0fVmsEU?=
+ =?us-ascii?Q?NBeOitL8bS+4tKQFOkTaMZKKFWBF8wfl9mzx44OVOjG42frLEZqCt3QpKSGM?=
+ =?us-ascii?Q?E7AJJ5q/ibV2Yqr7w0+YOJRG2ddOed/lZkmRJEylqvUkL64+EfK5mhIkCJAE?=
+ =?us-ascii?Q?ODzhWWE+GlYg9gAs8bU1BeVqI0oxiSJs5ymkSaqdKgOz6vP+cvEDndSForIP?=
+ =?us-ascii?Q?NpBeEkP5TPP6QVnwS+4wzlPe78Y+zQeQxp+8/rx95+uVOLV7PyG1qUaZKyt3?=
+ =?us-ascii?Q?UANSHtY+WPfQ0oNcZgMQsHlvS2DtLZNP9Qk09FKztwNoobSJfhNTlBudRpkf?=
+ =?us-ascii?Q?+Wv9/URslj6VkD6EVzYleamsmon29nBvTMP+dQtl9GrFGsuoQro3ur8CjZtu?=
+ =?us-ascii?Q?2tMA4YazWWz/CliIgWcsbxRfe2T72bFCmHKqcUA1IqgV/bCn8GSRYaEVhV77?=
+ =?us-ascii?Q?mPoHPMkcyRLk+x3bYl9Ntj97AADvNaqyN/qAbphEy4RQwwG7Ylz6y8bnXFMP?=
+ =?us-ascii?Q?Pd9GMFvJ4RClmTUG99WAHENsz6Vd7+Ile4EpxJZiOwodzAMJE/X+4H+XSz6Z?=
+ =?us-ascii?Q?vb0ydRbB34Y/SkWw2xaRNBCynYynV1af1dgGy3gJ4te0U2WJGf0ainbwMDnH?=
+ =?us-ascii?Q?X2g/z+TOUv5Sw5nUNXLTfgwsoS/WpSDiYPWf47uwLdvUgod0efZ72LLOJLEX?=
+ =?us-ascii?Q?j/pDspzyHtR2cf1kSS1Aw9Ar8L/gd8pyS2dEv9ouRTB1Xkrc/CvZ5YRF780X?=
+ =?us-ascii?Q?8EUqmyNMk8refKYhitGOr8x1kh15zmm2svYF56G46C9qRZdI7Y0Fpg+3h2vo?=
+ =?us-ascii?Q?Npkz39pRwnqBkmE+p4aNtAlTnu6dwz+/qdlcr+mH0KBVg/aNEBFpykTqaK4w?=
+ =?us-ascii?Q?b1DnmSIgucMs7chtVHKdbckE3577HCy1sN2mUv/N?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: b4f48ba3-3c7c-41a1-59e9-08db0b7820aa
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB6780.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Feb 2023 15:04:37.7229
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: yWjzR7eoyrqNIYBjDFMntX2/nue1NPMiE10HW2sXoecEHOBTb0KYgsTz8O9f7XDWnuD+3vo+sbv79cPulkUNYg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR11MB5812
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Feb 09, 2023 at 10:40:18AM +0800, Robert Hoo wrote:
+>Define kvm_untagged_addr() per LAM feature spec: Address high bits are sign
+>extended, from highest effective address bit.
 
+>Note that LAM_U48 and LA57 has some effective bits overlap. This patch
+>gives a WARN() on that case.
 
-On 2/8/23 12:53, Thomas Huth wrote:
-> On 02/02/2023 10.28, Pierre Morel wrote:
->> STSI with function code 15 is used to store the CPU configuration
->> topology.
->>
->> We retrieve the maximum nested level with SCLP and use the
->> topology tree provided by the drawers, books, sockets, cores
->> arguments.
->>
->> We check :
->> - if the topology stored is coherent between the QEMU -smp
->>    parameters and kernel parameters.
->> - the number of CPUs
->> - the maximum number of CPUs
->> - the number of containers of each levels for every STSI(15.1.x)
->>    instruction allowed by the machine.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
-> ...
->> +static inline int cpus_in_tle_mask(uint64_t val)
->> +{
->> +    int i, n;
->> +
->> +    for (i = 0, n = 0; i < 64; i++, val >>= 1)
->> +        if (val & 0x01)
->> +            n++;
->> +    return n;
+Why emit a WARN()? the behavior is undefined or something KVM cannot
+emulated?
+
+>
+>Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+>Reviewed-by: Jingqi Liu <jingqi.liu@intel.com>
+>---
+> arch/x86/kvm/vmx/vmx.c |  3 +++
+> arch/x86/kvm/x86.c     |  4 ++++
+> arch/x86/kvm/x86.h     | 32 ++++++++++++++++++++++++++++++++
+> 3 files changed, 39 insertions(+)
+>
+>diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>index 66edd091f145..e4f14d1bdd2f 100644
+>--- a/arch/x86/kvm/vmx/vmx.c
+>+++ b/arch/x86/kvm/vmx/vmx.c
+>@@ -2163,6 +2163,9 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+> 		    (!msr_info->host_initiated &&
+> 		     !guest_cpuid_has(vcpu, X86_FEATURE_MPX)))
+> 			return 1;
+>+
+>+		data = kvm_untagged_addr(data, vcpu);
+
+This is a MSR write, so LAM masking isn't performed on this write
+according to LAM spec. Am I misunderstanding something?
+
+>+
+> 		if (is_noncanonical_address(data & PAGE_MASK, vcpu) ||
+> 		    (data & MSR_IA32_BNDCFGS_RSVD))
+> 			return 1;
+>diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>index 312aea1854ae..1bdc8c0c80c0 100644
+>--- a/arch/x86/kvm/x86.c
+>+++ b/arch/x86/kvm/x86.c
+>@@ -1809,6 +1809,10 @@ static int __kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data,
+> 	case MSR_KERNEL_GS_BASE:
+> 	case MSR_CSTAR:
+> 	case MSR_LSTAR:
+>+		/*
+>+		 * The strict canonical checking still applies to MSR
+>+		 * writing even LAM is enabled.
+>+		 */
+> 		if (is_noncanonical_address(data, vcpu))
+
+LAM spec says:
+
+	Processors that support LAM continue to require the addresses written to
+	control registers or MSRs be 57-bit canonical if the processor supports
+	5-level paging or 48-bit canonical if it supports only 4-level paging
+
+My understanding is 57-bit canonical checking is performed if the processor
+__supports__ 5-level paging. Then the is_noncanonical_address() here is
+arguably wrong. Could you double-confirm and fix it?
+
+> 			return 1;
+> 		break;
+>diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+>index 8ec5cc983062..7228895d4a6f 100644
+>--- a/arch/x86/kvm/x86.h
+>+++ b/arch/x86/kvm/x86.h
+>@@ -201,6 +201,38 @@ static inline bool is_noncanonical_address(u64 la, struct kvm_vcpu *vcpu)
+> 	return !__is_canonical_address(la, vcpu_virt_addr_bits(vcpu));
+> }
 > 
-> I'd suggest to use __builtin_popcountl here instead of looping.
+>+#ifdef CONFIG_X86_64
 
-OK
+I don't get the purpose of the #ifdef. Shouldn't you check if the vcpu
+is in 64-bit long mode?
 
-> 
->> +}
->> +
->>   #endif  /* _S390X_STSI_H_ */
->> diff --git a/s390x/topology.c b/s390x/topology.c
->> index 20f7ba2..f21c653 100644
->> --- a/s390x/topology.c
->> +++ b/s390x/topology.c
->> @@ -16,6 +16,18 @@
->>   #include <smp.h>
->>   #include <sclp.h>
->>   #include <s390x/hardware.h>
->> +#include <s390x/stsi.h>
->> +
->> +static uint8_t pagebuf[PAGE_SIZE * 2] 
->> __attribute__((aligned(PAGE_SIZE * 2)));
-> 
-> Isn't the SYSIB just one page only? Why reserve two pages here?
+>+/* untag addr for guest, according to vCPU CR3 and CR4 settings */
+>+static inline u64 kvm_untagged_addr(u64 addr, struct kvm_vcpu *vcpu)
+>+{
+>+	if (addr >> 63 == 0) {
+>+		/* User pointers */
+>+		if (kvm_read_cr3(vcpu) & X86_CR3_LAM_U57)
+>+			addr = __canonical_address(addr, 57);
 
-Yes it is, I change it to a single page.
+braces are missing.
 
-> 
->> +static int max_nested_lvl;
->> +static int number_of_cpus;
->> +static int max_cpus = 1;
->> +
->> +/* Topology level as defined by architecture */
->> +static int arch_topo_lvl[CPU_TOPOLOGY_MAX_LEVEL];
->> +/* Topology nested level as reported in STSI */
->> +static int stsi_nested_lvl[CPU_TOPOLOGY_MAX_LEVEL];
->>   #define PTF_REQ_HORIZONTAL    0
->>   #define PTF_REQ_VERTICAL    1
->> @@ -122,11 +134,241 @@ end:
->>       report_prefix_pop();
->>   }
->> +/*
->> + * stsi_check_maxcpus
->> + * @info: Pointer to the stsi information
->> + *
->> + * The product of the numbers of containers per level
->> + * is the maximum number of CPU allowed by the machine.
->> + */
->> +static void stsi_check_maxcpus(struct sysinfo_15_1_x *info)
->> +{
->> +    int n, i;
->> +
->> +    report_prefix_push("maximum cpus");
->> +
->> +    for (i = 0, n = 1; i < CPU_TOPOLOGY_MAX_LEVEL; i++) {
->> +        report_info("Mag%d: %d", CPU_TOPOLOGY_MAX_LEVEL - i, 
->> info->mag[i]);
->> +        n *= info->mag[i] ? info->mag[i] : 1;
-> 
-> You could use the Elvis operator here instead.
+https://www.kernel.org/doc/html/latest/process/coding-style.html#placing-braces-and-spaces
 
-Right thanks.
+>+		else if (kvm_read_cr3(vcpu) & X86_CR3_LAM_U48) {
+>+			/*
+>+			 * If guest enabled 5-level paging and LAM_U48,
+>+			 * bit 47 should be 0, bit 48:56 contains meta data
+>+			 * although bit 47:56 are valid 5-level address
+>+			 * bits.
+>+			 * If LAM_U48 and 4-level paging, bit47 is 0.
+>+			 */
+>+			WARN_ON(addr & _BITUL(47));
+>+			addr = __canonical_address(addr, 48);
+>+		}
+>+	} else if (kvm_read_cr4(vcpu) & X86_CR4_LAM_SUP) { /* Supervisor pointers */
+>+		if (kvm_read_cr4(vcpu) & X86_CR4_LA57)
 
+use kvm_read_cr4_bits here to save potential VMCS_READs.
 
-> 
->> +    }
->> +    report(n == max_cpus, "Maximum CPUs %d expected %d", n, max_cpus);
->> +
->> +    report_prefix_pop();
->> +}
->> +
->> +/*
->> + * stsi_check_tle_coherency
->> + * @info: Pointer to the stsi information
->> + * @sel2: Topology level to check.
->> + *
->> + * We verify that we get the expected number of Topology List Entry
->> + * containers for a specific level.
->> + */
->> +static void stsi_check_tle_coherency(struct sysinfo_15_1_x *info, int 
->> sel2)
->> +{
->> +    struct topology_container *tc, *end;
->> +    struct topology_core *cpus;
->> +    int n = 0;
->> +    int i;
->> +
->> +    report_prefix_push("TLE coherency");
->> +
->> +    tc = &info->tle[0].container;
->> +    end = (struct topology_container *)((unsigned long)info + 
->> info->length);
-> 
-> s/unsigned long/uintptr_t/ please!
-
-OK, thanks
-
-> 
-> 
->> +
->> +    for (i = 0; i < CPU_TOPOLOGY_MAX_LEVEL; i++)
->> +        stsi_nested_lvl[i] = 0;
-> 
-> memset(stsi_nested_lvl, 0, sizeof(stsi_nested_lvl)) ?
-
-better, thanks
-
-> 
->> +    while (tc < end) {
->> +        if (tc->nl > 5) {
-> 
-> Use ">= CPU_TOPOLOGY_MAX_LEVEL" instead of "> 5" ?
-
-OK
-
-> 
->> +            report_abort("Unexpected TL Entry: tle->nl: %d", tc->nl);
->> +            return;
->> +        }
->> +        if (tc->nl == 0) {
->> +            cpus = (struct topology_core *)tc;
->> +            n += cpus_in_tle_mask(cpus->mask);
->> +            report_info("cpu type %02x  d: %d pp: %d", cpus->type, 
->> cpus->d, cpus->pp);
->> +            report_info("origin : %04x mask %016lx", cpus->origin, 
->> cpus->mask);
->> +        }
->> +
->> +        stsi_nested_lvl[tc->nl]++;
->> +        report_info("level %d: lvl: %d id: %d cnt: %d",
->> +                tc->nl, tc->nl, tc->id, stsi_nested_lvl[tc->nl]);
->> +
->> +        /* trick: CPU TLEs are twice the size of containers TLE */
->> +        if (tc->nl == 0)
->> +            tc++;
-> 
-> IMHO it might be cleaner to have a "uint8_t *" or "void *" to the 
-> current position in the sysinfo block, and do the pointer arithmetic on 
-> that pointer instead... well, it's likely just a matter of taste.
-
-OK
-
-> 
->> +        tc++;
->> +    }
->> +    report(n == number_of_cpus, "Number of CPUs  : %d expect %d", n, 
->> number_of_cpus);
->> +    /*
->> +     * For KVM we accept
->> +     * - only 1 type of CPU
->> +     * - only horizontal topology
->> +     * - only dedicated CPUs
->> +     * This leads to expect the number of entries of level 0 CPU
->> +     * Topology Level Entry (TLE) to be:
->> +     * 1 + (number_of_cpus - 1)  / arch_topo_lvl[0]
->> +     *
->> +     * For z/VM or LPAR this number can only be greater if different
->> +     * polarity, CPU types because there may be a nested level 0 CPU TLE
->> +     * for each of the CPU/polarity/sharing types in a level 1 
->> container TLE.
->> +     */
->> +    n =  (number_of_cpus - 1)  / arch_topo_lvl[0];
->> +    report(stsi_nested_lvl[0] >=  n + 1,
->> +           "CPU Type TLE    : %d expect %d", stsi_nested_lvl[0], n + 1);
->> +
->> +    /* For each level found in STSI */
->> +    for (i = 1; i < CPU_TOPOLOGY_MAX_LEVEL; i++) {
->> +        /*
->> +         * For non QEMU/KVM hypervisor the concatenation of the levels
->> +         * above level 1 are architecture dependent.
->> +         * Skip these checks.
->> +         */
->> +        if (!host_is_kvm() && sel2 != 2)
->> +            continue;
->> +
->> +        /* For QEMU/KVM we expect a simple calculation */
->> +        if (sel2 > i) {
->> +            report(stsi_nested_lvl[i] ==  n + 1,
->> +                   "Container TLE  %d: %d expect %d", i, 
->> stsi_nested_lvl[i], n + 1);
->> +            n /= arch_topo_lvl[i];
->> +        }
->> +    }
->> +
->> +    report_prefix_pop();
->> +}
->> +
->> +/*
->> + * check_sysinfo_15_1_x
->> + * @info: pointer to the STSI info structure
->> + * @sel2: the selector giving the topology level to check
->> + *
->> + * Check if the validity of the STSI instruction and then
->> + * calls specific checks on the information buffer.
->> + */
->> +static void check_sysinfo_15_1_x(struct sysinfo_15_1_x *info, int sel2)
->> +{
->> +    int ret;
->> +
->> +    report_prefix_pushf("mnested %d 15_1_%d", max_nested_lvl, sel2);
->> +
->> +    ret = stsi(pagebuf, 15, 1, sel2);
->> +    if (max_nested_lvl >= sel2) {
->> +        report(!ret, "Valid stsi instruction");
->> +    } else {
->> +        report(ret, "Invalid stsi instruction");
->> +        goto end;
->> +    }
->> +
->> +    stsi_check_maxcpus(info);
->> +    stsi_check_tle_coherency(info, sel2);
-> 
-> You could also move the two stsi_check_* calls into the first part of 
-> the if-statement, then you could get rid of the goto in the second part.
-
-Thanks, yes.
-
-> 
->> +end:
->> +    report_prefix_pop();
->> +}
->> +
->> +static int sclp_get_mnest(void)
->> +{
->> +    ReadInfo *sccb = (void *)_sccb;
->> +
->> +    sclp_mark_busy();
->> +    memset(_sccb, 0, PAGE_SIZE);
->> +    sccb->h.length = PAGE_SIZE;
->> +
->> +    sclp_service_call(SCLP_CMDW_READ_SCP_INFO, sccb);
->> +    assert(sccb->h.response_code == SCLP_RC_NORMAL_READ_COMPLETION);
->> +
->> +    return sccb->stsi_parm;
->> +}
->> +
->> +/*
->> + * test_stsi
->> + *
->> + * Retrieves the maximum nested topology level supported by the 
->> architecture
->> + * and the number of CPUs.
->> + * Calls the checking for the STSI instruction in sel2 reverse level 
->> order
->> + * from 6 (CPU_TOPOLOGY_MAX_LEVEL) to 2 to have the most interesting 
->> level,
->> + * the one triggering a topology-change-report-pending condition, 
->> level 2,
->> + * at the end of the report.
->> + *
->> + */
->> +static void test_stsi(void)
->> +{
->> +    int sel2;
->> +
->> +    max_nested_lvl = sclp_get_mnest();
->> +    report_info("SCLP maximum nested level : %d", max_nested_lvl);
->> +
->> +    number_of_cpus = sclp_get_cpu_num();
->> +    report_info("SCLP number of CPU: %d", number_of_cpus);
->> +
->> +    /* STSI selector 2 can takes values between 2 and 6 */
->> +    for (sel2 = 6; sel2 >= 2; sel2--)
->> +        check_sysinfo_15_1_x((struct sysinfo_15_1_x *)pagebuf, sel2);
->> +}
->> +
->> +/*
->> + * parse_topology_args
->> + * @argc: number of arguments
->> + * @argv: argument array
->> + *
->> + * This function initialize the architecture topology levels
->> + * which should be the same as the one provided by the hypervisor.
->> + *
->> + * We use the current names found in IBM/Z literature, Linux and QEMU:
->> + * cores, sockets/packages, books, drawers and nodes to facilitate the
->> + * human machine interface but store the result in a machine abstract
->> + * array of architecture topology levels.
->> + * Note that when QEMU uses socket as a name for the topology level 1
->> + * Linux uses package or physical_package.
->> + */
->> +static void parse_topology_args(int argc, char **argv)
->> +{
->> +    int i;
->> +
->> +    report_info("%d arguments", argc);
->> +    for (i = 1; i < argc; i++) {
->> +        if (!strcmp("-cores", argv[i])) {
->> +            i++;
->> +            if (i >= argc)
->> +                report_abort("-cores needs a parameter");
->> +            arch_topo_lvl[0] = atol(argv[i]);
->> +            report_info("cores: %d", arch_topo_lvl[0]);
->> +        } else if (!strcmp("-sockets", argv[i])) {
->> +            i++;
->> +            if (i >= argc)
->> +                report_abort("-sockets needs a parameter");
->> +            arch_topo_lvl[1] = atol(argv[i]);
->> +            report_info("sockets: %d", arch_topo_lvl[1]);
->> +        } else if (!strcmp("-books", argv[i])) {
->> +            i++;
->> +            if (i >= argc)
->> +                report_abort("-books needs a parameter");
->> +            arch_topo_lvl[2] = atol(argv[i]);
->> +            report_info("books: %d", arch_topo_lvl[2]);
->> +        } else if (!strcmp("-drawers", argv[i])) {
->> +            i++;
->> +            if (i >= argc)
->> +                report_abort("-drawers needs a parameter");
->> +            arch_topo_lvl[3] = atol(argv[i]);
->> +            report_info("drawers: %d", arch_topo_lvl[3]);
->> +        }
-> 
-> Maybe abort on unkown parameters, to avoid that typos go unnoticed?
-
-Yes, better.
-Thanks,
-
-Regards.
-Pierre
-
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
+>+			addr = __canonical_address(addr, 57);
+>+		else
+>+			addr = __canonical_address(addr, 48);
+>+	}
+>+
+>+	return addr;
+>+}
+>+#else
+>+#define kvm_untagged_addr(addr, vcpu)	(addr)
+>+#endif
+>+
+> static inline void vcpu_cache_mmio_info(struct kvm_vcpu *vcpu,
+> 					gva_t gva, gfn_t gfn, unsigned access)
+> {
+>-- 
+>2.31.1
+>
