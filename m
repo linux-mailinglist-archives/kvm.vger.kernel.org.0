@@ -2,122 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B587F692660
-	for <lists+kvm@lfdr.de>; Fri, 10 Feb 2023 20:30:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 29962692789
+	for <lists+kvm@lfdr.de>; Fri, 10 Feb 2023 20:59:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233110AbjBJTa3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Feb 2023 14:30:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36048 "EHLO
+        id S232919AbjBJT7q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Feb 2023 14:59:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233252AbjBJTa0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Feb 2023 14:30:26 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33DD67E022;
-        Fri, 10 Feb 2023 11:30:26 -0800 (PST)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31AJC1TT022977;
-        Fri, 10 Feb 2023 19:30:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=ruisLi78RjHoixlKjC6u1GfJ6FalANjgq/pU+XOCVTE=;
- b=ORqy8L0Nl54ulz7vyRwoH4Wtw/r2cVgVayRXOcqtt3ujgBzelvk2zZRf9+6ZRPEn67wO
- yfMq3kN9U8fCUsYNbG4vySyCw4R73Yfft9KRYV4OTja9Pxr8iBeh9YT/IzkXtVHH5/S8
- tAPlxtbd9QqBt9BTqxd+cMFe8mkv84do9N/s9YSHl1h9lkijXAGsd1MtxXSUS+ir6iN5
- hmcb7URZI5YxPw4lMZETTJE3BWSy2va/JMF0cAty7ZsIaM6lUDieO/eSfmAy/e/Evpyj
- 3IoxXx6xfj5nt9eZaSB16BVhUTIhWI9DCVkQJH6HE9HLsj9Rp0q1rfGz23q5F+u7Wt25 VA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nnuv7rcbw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 10 Feb 2023 19:30:25 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31AJM5U8025598;
-        Fri, 10 Feb 2023 19:30:25 GMT
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nnuv7rcbp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 10 Feb 2023 19:30:25 +0000
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31AIxZOL019723;
-        Fri, 10 Feb 2023 19:30:24 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([9.208.130.98])
-        by ppma01dal.us.ibm.com (PPS) with ESMTPS id 3nhf08gkjd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 10 Feb 2023 19:30:24 +0000
-Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-        by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31AJUM2l34210158
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 10 Feb 2023 19:30:22 GMT
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7E3E65805B;
-        Fri, 10 Feb 2023 19:30:22 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 170AC58059;
-        Fri, 10 Feb 2023 19:30:21 +0000 (GMT)
-Received: from [9.65.251.35] (unknown [9.65.251.35])
-        by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 10 Feb 2023 19:30:20 +0000 (GMT)
-Message-ID: <055a5964-af3f-5b6e-7eff-a87d2d0ecab9@linux.ibm.com>
-Date:   Fri, 10 Feb 2023 14:30:20 -0500
+        with ESMTP id S233400AbjBJT7p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Feb 2023 14:59:45 -0500
+Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8C0A7D3F9
+        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 11:59:35 -0800 (PST)
+Received: by mail-qk1-x72a.google.com with SMTP id ow4so2639293qkn.1
+        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 11:59:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=d+cXK0yN4PVvPYRxqzxPGR9rSHlqnym3PwTLPn4N4Qo=;
+        b=FPtXkgzKXuyODmOIzMBgoJqoSB8HG7+xWroxNgcZK10MT1vuDHcFilGYRNjVjmJF+G
+         6N3vQ3CJftv2PU+evl/ND/GQc6nQLwQ2cdlQlktnWlbcs6eaov9sjP81nyO8tC+9bOnY
+         yz35ewz2YDN7ViNCSigM4DMTNQsXO1TSxxwNL1RVGTpJxtczAvz8fS8vwMhwXNhzmUrq
+         z1Txu3KbeTtHQ7P1tsNLTuFKKqyykkgCQYAWwNFohn4Rf0an2kJpH8tDE7zoraq+LFmo
+         4H/7zwoXsXKtBSJMBSd22omEbjlLgaxkDjRv6YO97dhDjz+1PfnQR0v7xdPboMgv7kT7
+         l4cw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=d+cXK0yN4PVvPYRxqzxPGR9rSHlqnym3PwTLPn4N4Qo=;
+        b=CpLdd6khBdqUJ+WKvcmord/tf83MgKczcTycu04HJEzDdDHoCQ1MY1UpuVXOaQOiOw
+         b7OdqHNwn/iRSGbmfVXtp6Fq2diwc4MCKhssM9IolgKab7aIHx6/xVYSrzwGVcx+RSQv
+         9ltY3qh7BjGKSAYfYA/fQMirwqGyrEDUW4LPhtOpKxqAByczgGmJhzy/pAAr5hR3DYlk
+         FVolkKIxw1aUN7pcxwM4aDv0Blpim6FCgGY17trWxz9KNAAI49vUGKOM9cKDeCiRGegO
+         GLzB65vxpDZ1HJmns0egEIw4gBQIKnb42+BJmXlDvT8A2forQmFPfVuRh1EFMdONELtr
+         twBw==
+X-Gm-Message-State: AO0yUKVZeJzl0vAGeAoozyDq+WrZ0CYcq3bFpXoPjL0TKVNsulQEadQb
+        y2JQVleK6bOfz3Py7NIZtKCKkvL013BCQasfT9U6nvyJen9pissgCCQ=
+X-Google-Smtp-Source: AK7set+lUXzv8lrHvcVBMrFCyzd7pF/BI691QOOFHgkZ8TV89SfokjQ+AyFxR7q2uzAIlzMSCQ2N1kGlVuG4qC6M3c4=
+X-Received: by 2002:a37:2f85:0:b0:71b:ae71:8eed with SMTP id
+ v127-20020a372f85000000b0071bae718eedmr1348116qkh.204.1676059174528; Fri, 10
+ Feb 2023 11:59:34 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH] vfio/ccw: Remove WARN_ON during shutdown
-Content-Language: en-US
-To:     Eric Farman <farman@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org
-References: <20230210174227.2256424-1-farman@linux.ibm.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <20230210174227.2256424-1-farman@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 3ibfz0t3TTD9y3Zo2e-tPhGMxRqWNYNK
-X-Proofpoint-GUID: B48__ZxyklQEMiDRgdENIWKz0xvf8qgv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
- definitions=2023-02-10_13,2023-02-09_03,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- adultscore=0 suspectscore=0 clxscore=1015 lowpriorityscore=0 spamscore=0
- phishscore=0 impostorscore=0 priorityscore=1501 bulkscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302100160
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20221205232341.4131240-1-vannapurve@google.com>
+ <Y8dG3WDxY2OCGPby@google.com> <CAGtprH_hsLPDzFREbSehsxQRj7piVC75xPXD7OsKLUULWiS1fw@mail.gmail.com>
+In-Reply-To: <CAGtprH_hsLPDzFREbSehsxQRj7piVC75xPXD7OsKLUULWiS1fw@mail.gmail.com>
+From:   Vishal Annapurve <vannapurve@google.com>
+Date:   Fri, 10 Feb 2023 11:59:23 -0800
+Message-ID: <CAGtprH9jAkCgsNHHK7um7drsLWsUTej+djLrdzv9rzcd5VdNTg@mail.gmail.com>
+Subject: Re: [V2 PATCH 0/6] KVM: selftests: selftests for fd-based private memory
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        shuah@kernel.org, yang.zhong@intel.com, ricarkol@google.com,
+        aaronlewis@google.com, wei.w.wang@intel.com,
+        kirill.shutemov@linux.intel.com, corbet@lwn.net, hughd@google.com,
+        jlayton@kernel.org, bfields@fieldses.org,
+        akpm@linux-foundation.org, chao.p.peng@linux.intel.com,
+        yu.c.zhang@linux.intel.com, jun.nakajima@intel.com,
+        dave.hansen@intel.com, michael.roth@amd.com, qperret@google.com,
+        steven.price@arm.com, ak@linux.intel.com, david@redhat.com,
+        luto@kernel.org, vbabka@suse.cz, marcorr@google.com,
+        erdemaktas@google.com, pgonda@google.com, nikunj@amd.com,
+        diviness@google.com, maz@kernel.org, dmatlack@google.com,
+        axelrasmussen@google.com, maciej.szmigiero@oracle.com,
+        mizhang@google.com, bgardon@google.com, ackerleytng@google.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/10/23 12:42 PM, Eric Farman wrote:
-> The logic in vfio_ccw_sch_shutdown() always assumed that the input
-> subchannel would point to a vfio_ccw_private struct, without checking
-> that one exists. The blamed commit put in a check for this scenario,
-> to prevent the possibility of a missing private.
-> 
-> The trouble is that check was put alongside a WARN_ON(), presuming
-> that such a scenario would be a cause for concern. But this can be
-> triggered by binding a subchannel to vfio-ccw, and rebooting the
-> system before starting the mdev (via "mdevctl start" or similar)
-> or after stopping it. In those cases, shutdown doesn't need to
-> worry because either the private was never allocated, or it was
-> cleaned up by vfio_ccw_mdev_remove().
-> 
-> Remove the WARN_ON() piece of this check, since there are plausible
-> scenarios where private would be NULL in this path.
-> 
-> Fixes: 9e6f07cd1eaa ("vfio/ccw: create a parent struct")
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+On Tue, Jan 17, 2023 at 7:11 PM Vishal Annapurve <vannapurve@google.com> wrote:
+>
+> ...
 
-Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> > Last question, do you have a list of testcases that you consider "required" for
+> > UPM?  My off-the-cuff list of selftests I want to have before merging UPM is pretty
+> > short at this point:
+> >
+> >   - Negative testing of the memslot changes, e.g. bad alignment, bad fd,
+> >     illegal memslot updates, etc.
+> >   - Negative testing of restrictedmem, e.g. various combinations of overlapping
+> >     bindings of a single restrictedmem instance.
+> >   - Access vs. conversion stress, e.g. accessing a region in the guest while it's
+> >     concurrently converted by the host, maybe with fancy guest code to try and
+> >     detect TLB or ordering bugs?
+>
+> List of testcases that I was tracking (covered by the current
+> selftests) as required:
+> 1) Ensure private memory contents are not accessible to host userspace
+> using the HVA
+> 2) Ensure shared memory contents are visible/accessible from both host
+> userspace and the guest
+> 3) Ensure 1 and 2 holds across explicit memory conversions
+> 4) Exercise memory conversions with mixed shared/private memory pages
+> in a huge page to catch issues like [2]
+> 5) Ensure that explicit memory conversions don't affect nearby GPA ranges
+>
+> Test Cases that will be covered by TDX/SNP selftests (in addition to
+> above scenarios):
+> 6) Ensure 1 and 2 holds across implicit memory conversions
+> 7) Ensure that implicit memory conversions don't affect nearby GPA ranges
+>
+> Additional testcases possible:
+> 8) Running conversion tests for non-overlapping GPA ranges of
+> same/different memslots from multiple vcpus
+>
+> [1] - https://github.com/sean-jc/linux/commit/7e536bf3c45c623425bc84e8a96634efc3a619ed
+> [2] - https://lore.kernel.org/linux-mm/CAGtprH82H_fjtRbL0KUxOkgOk4pgbaEbAydDYfZ0qxz41JCnAQ@mail.gmail.com/
 
-The other ops in vfio_ccw_sch_driver look OK in that they quietly tolerate this scenario -- with .irq being an exception but the rationale and what we log there makes sense to me (we shouldn't get an interrupt on a disabled subchannel) plus it's only a debug log not a WARN.
+List of additional testcases that could help increase basic coverage
+(including what sean mentioned earlier):
+1) restrictedmem functionality testing
+    - read/write/mmap should not work
+    - fstat/fallocate should work as expected
+2) restrictedmem registration/modification testing with:
+    - bad alignment, bad fd, modifying properties of existing memslot
+    - Installing multiple memslots with ranges within the same
+restricted mem files
+    - deleting memslots with restricted memfd while guests are being executed
+3) Runtime restricted mem testing:
+    - Access vs conversion testing from multiple vcpus
+    - conversion and access to non-overlapping ranges from multiple vcpus
+
+Regards,
+Vishal
