@@ -2,75 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 45928691619
-	for <lists+kvm@lfdr.de>; Fri, 10 Feb 2023 02:13:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BCE42691634
+	for <lists+kvm@lfdr.de>; Fri, 10 Feb 2023 02:28:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230437AbjBJBNg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Feb 2023 20:13:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56094 "EHLO
+        id S230236AbjBJB2G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Feb 2023 20:28:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229866AbjBJBNf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Feb 2023 20:13:35 -0500
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 584B85EA1E
-        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 17:13:34 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id f15-20020a17090ac28f00b00230a32f0c9eso4047016pjt.4
-        for <kvm@vger.kernel.org>; Thu, 09 Feb 2023 17:13:34 -0800 (PST)
+        with ESMTP id S229695AbjBJB2F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Feb 2023 20:28:05 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 966D65DC0A
+        for <kvm@vger.kernel.org>; Thu,  9 Feb 2023 17:28:04 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id e10-20020a17090a630a00b0022bedd66e6dso8220866pjj.1
+        for <kvm@vger.kernel.org>; Thu, 09 Feb 2023 17:28:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=k3av9jkUvE9A6NJ/myH2LVzHPBwDhgbAq+TXm0rIoTM=;
-        b=PHZQYT5oASeECsZsHRHQMGmmlRn/fh1qFIyHRbeqb6UKHavmxO4hmYGKVNZ3HXfHCP
-         OC+jObRKncg1lbUI1c6zLMxOulEL4CDQTfhrHtjSFhe60xMZzvHSZKHiz04WTd812P6c
-         /gmzgZGkx8I5YMNuPo9O28D4S2q+ikgRILRReal9hzuIijl6Zu4RVW6sHImTFlsiNrI3
-         YVkJmEkMBeHhPbqmrRnCQuyvV8054XIVeM+4KGPkRjrFvaIx64M0S/WFnVQwX9NNiWbF
-         hMWRMMEk9Iz3eHX6+Tp6StYtSqPySt+Z95pXifmRZBUzvX8dri+GKO8RUx9Sfcd1JPKs
-         b1Mw==
+        bh=Mnobgm7/BRwA5boztD22jzgEkU3wNnOY9D1aetlEf20=;
+        b=csIO68IIOhsu6e+pdejTTT2+w48D/sWWLOeOIyNJYGX8uv7NM4VXMJmzIiRrpc2byB
+         oNF30v46MfMUr/zM1Y9pIBSYlUDIVF+op3/R/inHFDRjbUPyvEWGmS8g+4aYPNOLXmI1
+         k4gFifjP8fAfy+Pj0D/2S3/yl0kgg472XcQ7oejDQhBv7j6e61xvYtTNJxFhtCLHkUR0
+         vwFGPM0W1k1+6VAy/nE3sRCRvI1WK//Zg5F92Z7EstjU8c++zH/a/c8dOrVkEQhduubT
+         CTG0B3v3Gj7juI3iy68AbH4UWi8S6xjEzA/lWDNstS1PF9tuSuPj4tgHC/qRIAxoM46N
+         zJcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=k3av9jkUvE9A6NJ/myH2LVzHPBwDhgbAq+TXm0rIoTM=;
-        b=qbBQ2HpqkW68hm7/vVrkoQOp+sgk94HNnYO8ZTAawVmHozxnip2AcO2oTsuji11WMP
-         2Fm1tcfil1yUOeaRRqrAHZgp+orsOFts/nKe5biUwaxp9BjNOBgnM7eGtIuksxpNk89k
-         Zq0GSrtwEz4JOIjq1m9Bvc9FOfFhA1WAj0oPVHKmy4FXC7Os3DfKvc3uVyYxH1wCLx46
-         wj1drYi9CIoo/mqX12XlDxBgAwPz+rNB/nELzptbBYaeW8c7n7VCNwq5u9nGnCtP6PdN
-         Ez/qUp52E+0LeHzWE412ROtisduaoPnPvv/suyrnTqJA8zg5f7vGFGPtokQl/KHkDycj
-         SUsA==
-X-Gm-Message-State: AO0yUKV5IpXt5Pt3gCrKEmU1z8RCmWiL0e6gV3eoVTdg/GYC9FdU/xRU
-        IaBuDU6CfHT4dV2RfbQtLE0+3g==
-X-Google-Smtp-Source: AK7set9pFw3J5w5r/xV/SoTgrT6GjoR14zs1JLwGP7oCVVKObwM+RL2W/uCJ6aaf3zqmyu8HS/ZqXg==
-X-Received: by 2002:a17:902:ed89:b0:198:af50:e4e4 with SMTP id e9-20020a170902ed8900b00198af50e4e4mr102079plj.10.1675991613691;
-        Thu, 09 Feb 2023 17:13:33 -0800 (PST)
+        bh=Mnobgm7/BRwA5boztD22jzgEkU3wNnOY9D1aetlEf20=;
+        b=TANF6oi8g6OiR2j5O1Y7lRnTySYCZFEdMo2uHR8WxPXhThBX0RYLLv/+GcOmZO1vcw
+         hv4Zu7pgRDoIFEYG6NK8Uij4yR5o100liJnop7uLo/jq4zzdDnyw14LezfOmk72tqKHb
+         94+vbTFBWzhiBXW6L+Go7sCJyv93AZm6j0Mm2VAiYCqxHV1QJmhwaFozNy+7RkF2W2HC
+         TfqYoCwcu7HGzBi9Gg4Bcmsmze7yspULXcG9b2ZpNrxciROpRyEqW+MlWROolvI/xvC4
+         EutowW/V6IFcem3Ht2GyVXC/rnFfpSAl4j7CTiHeP+SV8VkzToOekqoWKk0bj9z+xYWH
+         If8A==
+X-Gm-Message-State: AO0yUKUkUgZlCOzoOq8mrP0aPQUn/Q3ifgoV8aML8IDk54LoPMwlGd5q
+        x1wjoecp/WlfEC4dxxqYkYfDopE4KzW0jbsG4q8=
+X-Google-Smtp-Source: AK7set9Obj4DfpjGpxNp3bHnBxnNHSIelzzZM7dkpr8wS73Skb7zUOHunDsTlPiKfqLt2v8la2CkZg==
+X-Received: by 2002:a17:903:264c:b0:198:af4f:de0c with SMTP id je12-20020a170903264c00b00198af4fde0cmr103011plb.12.1675992483947;
+        Thu, 09 Feb 2023 17:28:03 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id i25-20020aa78b59000000b0059428b51220sm2040561pfd.186.2023.02.09.17.13.31
+        by smtp.gmail.com with ESMTPSA id jk11-20020a170903330b00b00198da1ce519sm2143807plb.111.2023.02.09.17.28.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Feb 2023 17:13:32 -0800 (PST)
-Date:   Fri, 10 Feb 2023 01:13:27 +0000
+        Thu, 09 Feb 2023 17:28:02 -0800 (PST)
+Date:   Fri, 10 Feb 2023 01:27:59 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, Tom Rix <trix@redhat.com>,
-        kvm@vger.kernel.org, llvm@lists.linux.dev,
-        linux-kernel@vger.kernel.org,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Subject: Re: [PATCH 2/2] KVM: VMX: Stub out enable_evmcs static key for
- CONFIG_HYPERV=n
-Message-ID: <Y+WaN8wW1EOvPbXe@google.com>
-References: <20230208205430.1424667-1-seanjc@google.com>
- <20230208205430.1424667-3-seanjc@google.com>
- <87mt5n6kx6.fsf@redhat.com>
- <1433ea0c-5072-b9d9-a533-401bb58f9a80@redhat.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     David Matlack <dmatlack@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org,
+        Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH v2 2/7] KVM: arm64: Use kvm_arch_flush_remote_tlbs()
+Message-ID: <Y+Wdn+mYVYhwut5l@google.com>
+References: <20230126184025.2294823-1-dmatlack@google.com>
+ <20230126184025.2294823-3-dmatlack@google.com>
+ <86o7q4zdcp.wl-maz@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1433ea0c-5072-b9d9-a533-401bb58f9a80@redhat.com>
+In-Reply-To: <86o7q4zdcp.wl-maz@kernel.org>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,22 +89,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 09, 2023, Paolo Bonzini wrote:
-> On 2/9/23 14:13, Vitaly Kuznetsov wrote:
-> > > +static __always_inline bool is_evmcs_enabled(void)
-> > > +{
-> > > +	return static_branch_unlikely(&enable_evmcs);
-> > > +}
-> > I have a suggestion. While 'is_evmcs_enabled' name is certainly not
-> > worse than 'enable_evmcs', it may still be confusing as it's not clear
-> > which eVMCS is meant: are we running a guest using eVMCS or using eVMCS
-> > ourselves? So what if we rename this to a very explicit 'is_kvm_on_hyperv()'
-> > and hide the implementation details (i.e. 'evmcs') inside?
+On Wed, Feb 08, 2023, Marc Zyngier wrote:
+> On Thu, 26 Jan 2023 18:40:20 +0000, David Matlack <dmatlack@google.com> wrote:
+> > @@ -368,7 +367,6 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
+> >  		++kvm->stat.generic.remote_tlb_flush;
+> >  }
 > 
-> I prefer keeping eVMCS in the name,
+> For context, we currently have this:
+> 
+> 	if (!kvm_arch_flush_remote_tlb(kvm)
+> 	    || kvm_make_all_cpus_request(kvm, KVM_REQ_TLB_FLUSH))
+> 		++kvm->stat.generic.remote_tlb_flush;
+> 
+> Is there any reason why we shouldn't move the KVM_REQ_TLB_FLUSH call
+> into the arch-specific helpers? This is architecture specific, even if
+> the majority of the supported architecture cannot do broadcast
+> invalidation like arm64 does.
 
-+1, IIUC KVM can run on Hyper-V without eVMCS being enabled.
+s390 and PPC don't implement kvm_arch_flush_remote_tlb() at all, forcing them to
+implement the function just to implement what everyone except ARM does doesn't
+seem like the right trade off.
 
-> but I agree a better name could be something like kvm_uses_evmcs()?
+As usual, x86 is the real oddball.  All other architectures either use the purely
+generic KVM_REQ_TLB_FLUSH or they don't.  x86 is the only one that sometimes wants
+to fallback.  I can't see a clean way around that though, especially since MIPS
+apparently needs a notification _and_ a generic flush.
 
-kvm_is_using_evmcs()?
+Can the ARM hook be inlined?  That would eliminate the extra call and should allow
+the compiler to optimize out the conditional and the request.
