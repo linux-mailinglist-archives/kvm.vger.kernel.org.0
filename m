@@ -2,122 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1DDB269259A
-	for <lists+kvm@lfdr.de>; Fri, 10 Feb 2023 19:45:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B587F692660
+	for <lists+kvm@lfdr.de>; Fri, 10 Feb 2023 20:30:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233134AbjBJSph (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Feb 2023 13:45:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37568 "EHLO
+        id S233110AbjBJTa3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Feb 2023 14:30:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233168AbjBJSpe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Feb 2023 13:45:34 -0500
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BDBF7A7F1
-        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 10:45:33 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id v6-20020a17090ad58600b00229eec90a7fso9185511pju.0
-        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 10:45:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PLq/Mzr8440h4rqzutXNOZm+oL1xDtZlc6Z+oggEf4Q=;
-        b=Juk+l4ZEzsWfLMJ2plf3CPB8rCMIbve+DTwBR8/C48iczq96dm+UZ/2tNIRtT6Y5jI
-         pvVhTx6/sujdbCo1eiGsoO104QGCjtpshDd5ILv4w8jDb0cKLKgBJs9TuiRGSy4k9UNM
-         QuCYYuZ3inmNVY+uuFei1BdFgU6V9BR92yTxjiqipj5vRFrSALRdS4wlpOzMTHohP2Si
-         oqY/b+kgU4AopdSEv045V7HqWJWrpMQZ8mCqPUaqzrsaqAVnTE2tqoOjVFpXA1pU+YYL
-         D1dGI2Z4h8IE/nLDPfSpaPa4JqgRMf6BGllmm3i0HVYsmiJML23PiZb/7stjRr4RQirL
-         rSsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PLq/Mzr8440h4rqzutXNOZm+oL1xDtZlc6Z+oggEf4Q=;
-        b=iwRGV2BMWlIJuecjJI9Z8H89zSBqiua1Mluzl4VAKhAwOUmepPxGA6F2A2py4lK965
-         jB+xYexMA+ioalPfd05BXjR2VVRH9b3f1cxA6OBjhUNHVegbyR/qmb2B6dvEp0WAMel3
-         Hewp3R9alTeaoI/oUqvtyZsXDggHF/sXv4htCzMcVQf5g/c2lqae0ikvFsw6aDN456Qm
-         g9N3yAmlz7njRfPoU2xZBY8yHDp4WYwtIbVQ6Snp5W9QyhXiHcN/pjFAqXohvIdlT/3p
-         nrk+3OmTPdvUag9mutDSvK5TJXp5VqhAcYdgyt1NdLwe9Z8N6RAT1PCQ42EWCBVu8TJ7
-         N03g==
-X-Gm-Message-State: AO0yUKUrKFJrlh4ZvMTShDXN+6/I7R+shBFnYM5an9YbNEz9dYMwIqiH
-        sntkFtgFGdNmLbjbZ1VFNNe5mA==
-X-Google-Smtp-Source: AK7set+orDhCW8fO3sDLC9SJZSkePX9IrYiCNYicSjDmTlOeezv6IkqFzBwqLexg8wsetP+5OgV7Rw==
-X-Received: by 2002:a17:902:c1d2:b0:198:af50:e4e4 with SMTP id c18-20020a170902c1d200b00198af50e4e4mr5916plc.10.1676054732683;
-        Fri, 10 Feb 2023 10:45:32 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id jl14-20020a170903134e00b0019117164732sm3670140plb.213.2023.02.10.10.45.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Feb 2023 10:45:32 -0800 (PST)
-Date:   Fri, 10 Feb 2023 18:45:28 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Tianyu Lan <ltykernel@gmail.com>,
-        "Michael Kelley (LINUX)" <mikelley@microsoft.com>
-Subject: Re: "KVM: x86/mmu: Overhaul TDP MMU zapping and flushing" breaks SVM
- on Hyper-V
-Message-ID: <Y+aQyFJt9Tn2PJnC@google.com>
-References: <43980946-7bbf-dcef-7e40-af904c456250@linux.microsoft.com>
+        with ESMTP id S233252AbjBJTa0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Feb 2023 14:30:26 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33DD67E022;
+        Fri, 10 Feb 2023 11:30:26 -0800 (PST)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31AJC1TT022977;
+        Fri, 10 Feb 2023 19:30:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ruisLi78RjHoixlKjC6u1GfJ6FalANjgq/pU+XOCVTE=;
+ b=ORqy8L0Nl54ulz7vyRwoH4Wtw/r2cVgVayRXOcqtt3ujgBzelvk2zZRf9+6ZRPEn67wO
+ yfMq3kN9U8fCUsYNbG4vySyCw4R73Yfft9KRYV4OTja9Pxr8iBeh9YT/IzkXtVHH5/S8
+ tAPlxtbd9QqBt9BTqxd+cMFe8mkv84do9N/s9YSHl1h9lkijXAGsd1MtxXSUS+ir6iN5
+ hmcb7URZI5YxPw4lMZETTJE3BWSy2va/JMF0cAty7ZsIaM6lUDieO/eSfmAy/e/Evpyj
+ 3IoxXx6xfj5nt9eZaSB16BVhUTIhWI9DCVkQJH6HE9HLsj9Rp0q1rfGz23q5F+u7Wt25 VA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nnuv7rcbw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 10 Feb 2023 19:30:25 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31AJM5U8025598;
+        Fri, 10 Feb 2023 19:30:25 GMT
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nnuv7rcbp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 10 Feb 2023 19:30:25 +0000
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31AIxZOL019723;
+        Fri, 10 Feb 2023 19:30:24 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([9.208.130.98])
+        by ppma01dal.us.ibm.com (PPS) with ESMTPS id 3nhf08gkjd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 10 Feb 2023 19:30:24 +0000
+Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
+        by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31AJUM2l34210158
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 10 Feb 2023 19:30:22 GMT
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7E3E65805B;
+        Fri, 10 Feb 2023 19:30:22 +0000 (GMT)
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 170AC58059;
+        Fri, 10 Feb 2023 19:30:21 +0000 (GMT)
+Received: from [9.65.251.35] (unknown [9.65.251.35])
+        by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 10 Feb 2023 19:30:20 +0000 (GMT)
+Message-ID: <055a5964-af3f-5b6e-7eff-a87d2d0ecab9@linux.ibm.com>
+Date:   Fri, 10 Feb 2023 14:30:20 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <43980946-7bbf-dcef-7e40-af904c456250@linux.microsoft.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH] vfio/ccw: Remove WARN_ON during shutdown
+Content-Language: en-US
+To:     Eric Farman <farman@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     Halil Pasic <pasic@linux.ibm.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org
+References: <20230210174227.2256424-1-farman@linux.ibm.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+In-Reply-To: <20230210174227.2256424-1-farman@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 3ibfz0t3TTD9y3Zo2e-tPhGMxRqWNYNK
+X-Proofpoint-GUID: B48__ZxyklQEMiDRgdENIWKz0xvf8qgv
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-10_13,2023-02-09_03,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ adultscore=0 suspectscore=0 clxscore=1015 lowpriorityscore=0 spamscore=0
+ phishscore=0 impostorscore=0 priorityscore=1501 bulkscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302100160
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 10, 2023, Jeremi Piotrowski wrote:
-> Hi Paolo/Sean,
+On 2/10/23 12:42 PM, Eric Farman wrote:
+> The logic in vfio_ccw_sch_shutdown() always assumed that the input
+> subchannel would point to a vfio_ccw_private struct, without checking
+> that one exists. The blamed commit put in a check for this scenario,
+> to prevent the possibility of a missing private.
 > 
-> We've noticed that changes introduced in "KVM: x86/mmu: Overhaul TDP MMU zapping and flushing"
-> conflict with a nested Hyper-V enlightenment that is always enabled on AMD CPUs 
-> (HV_X64_NESTED_ENLIGHTENED_TLB). The scenario that is affected is L0 Hyper-V + L1 KVM on AMD,
+> The trouble is that check was put alongside a WARN_ON(), presuming
+> that such a scenario would be a cause for concern. But this can be
+> triggered by binding a subchannel to vfio-ccw, and rebooting the
+> system before starting the mdev (via "mdevctl start" or similar)
+> or after stopping it. In those cases, shutdown doesn't need to
+> worry because either the private was never allocated, or it was
+> cleaned up by vfio_ccw_mdev_remove().
 > 
-> L2 VMs fail to boot due to to stale data being seen on L1/L2 side, it looks
-> like the NPT is not in sync with L0. I can reproduce this on any kernel >=5.18,
-> the easiest way is by launching qemu in a loop with debug OVMF, you can observe
-> various #GP faults, assert failures, or the guest just suddenly dies. You can try it
-> for yourself in Azure by launching an Ubuntu 22.10 image on an AMD SKU with nested
-> virtualization (Da_v5).
+> Remove the WARN_ON() piece of this check, since there are plausible
+> scenarios where private would be NULL in this path.
 > 
-> In investigating I found that 3 things allow L2 guests to boot again:
-> * force tdp_mmu=N when loading kvm
-> * recompile L1 kernel to force disable HV_X64_NESTED_ENLIGHTENED_TLB
-> * revert both of these commits (found through bisecting):
-> bb95dfb9e2dfbe6b3f5eb5e8a20e0259dadbe906 "KVM: x86/mmu: Defer TLB flush to caller when freeing TDP MMU shadow pages"
-> efd995dae5eba57c5d28d6886a85298b390a4f07 "KVM: x86/mmu: Zap defunct roots via asynchronous worker"
-> 
-> I'll paste our understanding of what is happening (thanks Tianyu):
-> """
-> Hyper-V provides HVCALL_FLUSH_GUEST_PHYSICAL_ADDRESS_SPACE
-> and HVCALL_FLUSH_GUEST_PHYSICAL_ADDRESS_LIST hvcalls for l1
-> hypervisor to notify Hyper-V after L1 hypervisor changes L2 GPA <-> L1 GPA address
-> translation tables(Intel calls EPT and AMD calls NPT). This may help not to
-> mask whole address translation tables of L1 hypervisor to be write-protected in Hyper-V
-> and avoid vmexits triggered by changing address translation table in L1 hypervisor. 
-> 
-> The following commits defers to call these two hvcalls when there are changes in the L1
-> hypervisor address translation table. Hyper-V can't sync/shadow L1 address space
-> table at the first time due to the delay and this may cause mismatch between shadow page table
-> in the Hyper-V and L1 address translation table. IIRC, KVM side always uses write-protected
-> translation table to shadow and so doesn't meet such issue with the commit.
-> """
-> 
-> Let me know if either of you have any ideas on how to approach fixing this.
-> I'm not familiar enough with TDP MMU code to be able to contribute a fix directly
-> but I'm happy to help in any way I can.
+> Fixes: 9e6f07cd1eaa ("vfio/ccw: create a parent struct")
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
 
-As a hopefully quick-and-easy first step, can you try running KVM built from:
+Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
 
-  https://github.com/kvm-x86/linux/tree/mmu
-
-specifically to get the fixes for KVM's usage of range-based TLB flushes:
-
-  https://lore.kernel.org/all/cover.1665214747.git.houwenlong.hwl@antgroup.com
+The other ops in vfio_ccw_sch_driver look OK in that they quietly tolerate this scenario -- with .irq being an exception but the rationale and what we log there makes sense to me (we shouldn't get an interrupt on a disabled subchannel) plus it's only a debug log not a WARN.
