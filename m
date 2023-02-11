@@ -2,111 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8678B692BC8
-	for <lists+kvm@lfdr.de>; Sat, 11 Feb 2023 01:10:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4CB50692BDB
+	for <lists+kvm@lfdr.de>; Sat, 11 Feb 2023 01:15:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229618AbjBKAKs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Feb 2023 19:10:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39448 "EHLO
+        id S229476AbjBKAP4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Feb 2023 19:15:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229554AbjBKAKq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Feb 2023 19:10:46 -0500
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A07534F54;
-        Fri, 10 Feb 2023 16:10:44 -0800 (PST)
+        with ESMTP id S229677AbjBKAPz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Feb 2023 19:15:55 -0500
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2063.outbound.protection.outlook.com [40.107.220.63])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BBCC84500;
+        Fri, 10 Feb 2023 16:15:53 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ulp6iye6ka0T4CTCKEyih1zWV2KD5fAjJKk9uKkklwn8NYaTXlUywCgSPA8j0zMrXCL4k+wo9VNtpFCyCJlGFRC6ss/oXcSywse+TNe8VzfQnVuLHZrKgPyXIkQcepr82M9gpzoWa67tViQKH/B+UJ4GWcXv7RXxqUZmmCDgjuK3MXf63R052pP66X2X2qL/z+p/zJm5XX4OWvZNt73Q8IgA81GCLHgSEhh5KVdVoWXb385Hdpv94ALIkbkEaN/eGxNHWKtgCVNOCvldYTmHjTENs3qkxIx3jLfcwuTQ4V3CqA6jo8R4p2yO4I6ZbXG7iY+L5OVG3gSWg2ReZ6YzAg==
+ b=cKr2mXkdV2GtO2JuM5J0Fl7ULLaaJfpI4FeVR2zw7oPjpOwJRUHHfQDjyZs4vS3Mm+BBReUMHH1D/wUDjnBe671oJoZOZlpjh0F4F0RiNzO6wcQSg6c100FlJOgiJ1FCsAyPMiLumST11yDAuRAiWR9kCtMVmo9lWUyYP7Et7pkf4FSW833C2CWrgZ1yG8mmdnxeqP+dcDkXKNTPOPWiiNqqeWeDs9yxAeEBdbxg/ZsJOSiGsVzU2sxXPgwLe1GfurRNizms5nch7RQaNKyMxx+iQdHEGdzCYMcEZALFpRNodUwpPcRemPrFxfSmaNvRVtIIz9AWd/P3FMCP1qhQPw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GYffZefFR5UofCVWKPzGnDU++3z8lBP61pLximJd3as=;
- b=dcFOSIbvQnaO6N8X33947FKr3rVEyXdMtlaF9++FGWMZ3NCjkj6bgwPIZXCLmjGdwQrFitJ9akd2Yxc3XWWNtQE0zZzAxL0lqCje33MFWjFLDwE2dOBeTbJiDJM6TR0cin/e3tE3RdGeT5+vhjgdMplh13z0Esnu15m9uA8B/yUVB9Q6NxQPxZzjLZjXNYoqUV5WVRzRSO3/aNMcQY642oJXMbetNz1YffyAr7SKHOZwJHnk3iruf3LSyyzyv4Pws+1vffLA8Q+S4LANUjURkih8AOfuXpqChkA2iOAQSu7wZJrqwF90GKn/XJ1o4bi1ce1MIhPpTkS5g7nBa2JuaA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
+ bh=bROt+PZngeKtfR+cCAr+OPWc8LHp1E97cVuV/fq64S8=;
+ b=MG/0vl9mHG5gPLPfWSn6J+v128vRADRlChd8hR7GF/G2OuKX/JrG6bmcLCU8RWh92jUGqfIjQWizpPOiDl6UBFOMe5GpoaYsLXV/Wy4uvTGjeLV9sbPxtphM5Q1JL3htOgA1Zpf42zwyBJjXqoVZdK/sUVqFyje2XFj2OazAwdlwn8V+Ge++jUEuINoh1dre01PZE/FIQ8dAMs9RyJDH0ucWOhKUX1PQvo6mMJynTBWF5JmE3DjVR8fC4dkO4AlGTgfqCHk24g2e2xYSdDi5K5C2MpSkKojvTuellFPmFeYMm41aYLt/WTheLuSYRC6nJ7OyROZsdJuNxYHf4teGSA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GYffZefFR5UofCVWKPzGnDU++3z8lBP61pLximJd3as=;
- b=frEcAvcTrVIKQioJlTGXa3l8LCnyBf1m7xjz6UIJP0yeeSDN1tW4M4KSAE8/4RDt4ajOMDpCWuWGu1YamPfFCE49BQmXIzr8QNA4Su6FnFy9q7IbI16NKczde2PaTrLbfG7eRqN9OYHx38RBmejGzLqF4pWYlYJnLC6oAugL3B9sWsR9zBfaTOaTqdiumaGGW7D5jBNZQtJW2YYoGfAd3XpIiK2/u5bQBWdXpOx3kFvaki7/kcMu9zSiMNWwePXJkByVYRRni6PDbOWhtRranaDTURUhYv0GEa8ypZkO4Wc3RQhGeHrJ51gHA8XhkdjCc2XfQs8dT8vSy0V7SuVSbQ==
-Received: from BN0PR03CA0009.namprd03.prod.outlook.com (2603:10b6:408:e6::14)
- by DM4PR12MB5296.namprd12.prod.outlook.com (2603:10b6:5:39d::21) with
+ bh=bROt+PZngeKtfR+cCAr+OPWc8LHp1E97cVuV/fq64S8=;
+ b=Fyxo6ttB0X3Om6+hEKJjkCwA2cFX4MsgXd6k8QdRGUzM3pPaBRVGLwIgfbTk7IL5AGE5vcXvMACWpqxVGzoJLfLD5/rS6Dx3cgf/sYeE1PS8aLTfuoI5pinJAKnE1xRWg9Uhh+m1eCitbjH/LYH5R8d0JOXoJRzrlACozxdBWvi3/T2UCFpaNYuDJ1vdOBioMmQWgAjNi1oB8JEDmtpf3TuT/61lwWv5ZgtU17MyJBTFwH3o94HlFcKC2pguZL4CKqrO65bVsNfv5MPTz8mt2htXN7f5FzPH1Fa7FucSsbNrnh5zxM5u+DSy0xVQELFXXUh7Y2HyAegu9HDhGAsO7g==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by CY8PR12MB8298.namprd12.prod.outlook.com (2603:10b6:930:7c::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.21; Sat, 11 Feb
- 2023 00:10:41 +0000
-Received: from BL02EPF000108EB.namprd05.prod.outlook.com
- (2603:10b6:408:e6:cafe::da) by BN0PR03CA0009.outlook.office365.com
- (2603:10b6:408:e6::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.21 via Frontend
- Transport; Sat, 11 Feb 2023 00:10:41 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- BL02EPF000108EB.mail.protection.outlook.com (10.167.241.200) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6086.16 via Frontend Transport; Sat, 11 Feb 2023 00:10:40 +0000
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Fri, 10 Feb
- 2023 16:10:26 -0800
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail205.nvidia.com
- (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Fri, 10 Feb
- 2023 16:10:26 -0800
-Received: from Asurada-Nvidia (10.127.8.11) by mail.nvidia.com (10.129.68.10)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36 via Frontend
- Transport; Fri, 10 Feb 2023 16:10:25 -0800
-Date:   Fri, 10 Feb 2023 16:10:24 -0800
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     "jgg@nvidia.com" <jgg@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>
-CC:     "joro@8bytes.org" <joro@8bytes.org>,
-        "will@kernel.org" <will@kernel.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "shuah@kernel.org" <shuah@kernel.org>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>
-Subject: Re: [PATCH v2 08/10] iommufd/device: Use iommu_group_replace_domain()
-Message-ID: <Y+bc8OrWfw3Fq57n@Asurada-Nvidia>
-References: <cover.1675802050.git.nicolinc@nvidia.com>
- <4653f009c3dacae8ebf3a4865aaa944aa9c7cc7e.1675802050.git.nicolinc@nvidia.com>
- <BN9PR11MB5276C1807B710CAD3E5820D78CD99@BN9PR11MB5276.namprd11.prod.outlook.com>
- <Y+Vh479cDD7LX2x/@Asurada-Nvidia>
- <BN9PR11MB5276268D3ED0360913A05C368CDE9@BN9PR11MB5276.namprd11.prod.outlook.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.17; Sat, 11 Feb
+ 2023 00:15:51 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3cb3:2fce:5c8f:82ee]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3cb3:2fce:5c8f:82ee%4]) with mapi id 15.20.6086.019; Sat, 11 Feb 2023
+ 00:15:51 +0000
+Date:   Fri, 10 Feb 2023 20:15:49 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org, kevin.tian@intel.com,
+        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
+        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        baolu.lu@linux.intel.com
+Subject: Re: [PATCH 2/6] iommu/vt-d: Implement hw_info for iommu capability
+ query
+Message-ID: <Y+beNa5LXUvZSaEb@nvidia.com>
+References: <20230209041642.9346-1-yi.l.liu@intel.com>
+ <20230209041642.9346-3-yi.l.liu@intel.com>
+ <20230210154410.2b3b8296.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <BN9PR11MB5276268D3ED0360913A05C368CDE9@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-EOPAttributedMessage: 0
+In-Reply-To: <20230210154410.2b3b8296.alex.williamson@redhat.com>
+X-ClientProxiedBy: MN2PR08CA0026.namprd08.prod.outlook.com
+ (2603:10b6:208:239::31) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF000108EB:EE_|DM4PR12MB5296:EE_
-X-MS-Office365-Filtering-Correlation-Id: ce64b38f-a4d0-4d3f-8186-08db0bc46900
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CY8PR12MB8298:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3d9147d3-2442-4c1d-2f7c-08db0bc521d8
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: nr8VaJnMUbWEvw+Lc0dAKlT88iH5hvPhZpHmUoV5Teaf9jAsml9IdJdHAtBy3bo2brY2lKHVSzkon6rbavbALoYM7JPpj9JFaSkdqaKXWchZ7ZFdQedItb8WQsIVxRmvkTAmYZnx++FO+Eofllffioyq3Hz7PYNBY4H0PRmGItzTeYEMyM82QZLkHnFuPUO6zS9pvAyywyg13ibSN8VozSesuJxQFN82n0v8MG5rxz4UovLLxtAFCrZemj2FrMVKan/+4b0/o/WnhIusv8OVllBgu+Zv8q/Fx2qjbW7Fms6zau5MZS98YBkMDlFWdPD3dUIg/kih8d8mgLjc/0MctUs8mz8eS9UFxRSoH8HwGxA+VtTSPUFW/6MdeUrAe+vZQP57FdugM7Kcj5VNvAzfx+liV0X6r0rNeZC7SuTC+1JH76Th2T2n2Hq8Et4fo007I80AsiJMRsFsWEEFHtgmEGTn+ZKdQQwthEmHqC7fghafL+p3nl3Itu3LyucqIC0jZhkVu1Pjx4I6s75TySI1+v2+Cz4eiRnu0hIHtTfh97iI1USubQIUsmcZhpSGfYOmuUOEjsARQDzezV5fjS98CJFrYwD8b+U/4LsvwVdINDlClEQzs95wSaNMGs0VkKpgreQ0/GtwqyUuk3nm2bDiGId/YN5ofg9FM6H8/jRzy+vxpBrvvfTkBZntJuYvAnveLFPtb/uiJfu4YB2C8luHBG95nC9Tjm6E3NFxTQf5p+I=
-X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230025)(4636009)(136003)(39860400002)(376002)(346002)(396003)(451199018)(40470700004)(36840700001)(46966006)(82310400005)(8676002)(186003)(8936002)(7416002)(70586007)(70206006)(86362001)(82740400003)(33716001)(356005)(7636003)(9686003)(4326008)(426003)(47076005)(2906002)(40460700003)(336012)(54906003)(55016003)(41300700001)(5660300002)(40480700001)(478600001)(36860700001)(316002)(26005)(83380400001)(110136005)(67856001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: e1F0qcP/3MRDHv3djKeoF+l2P1iWaUVyCORX0sTdgGOioeA6K20vZiTCaGHXgyTfSCE891pMw3mwPeDPs4dw25FlBx29puD+dbUWJ3YtOox7g8lc7v55Z69zoU+bXGAQahg+DuHbghk9M68NdsEmL9FtcNENG7Hkajk3RC+LhEWR5VMzqYbfaospr/yp+DQKzGzvst976FHpuwIYgf48TvzWCRZyoRQn6tuwV/B6MYHpP8EzWGw4fqm7+PouOLrfLf2GHwwJvRm2D3/yAMkBZ75abHhuFvjWUphqNTaRRuDhzj2huKO54KeqTme4hBMp/1iOZrOKIz/bwiNVkOaNxh6dKRzAGC1+VnJ0y1eBNAABHvqbJFcvsWULQYy18oYBLJwQYMHrdHO3HhzoH0SibndSmI6HSbiH0KFOM051SjXkMw6m4RdhYAoTF3MgVSP3yQTnRcrKTDYd0Gx9dikPMdhMPt2FhYGZ4jPWkgjeHtXYdpIHMjH5BKhE12LV5sRFd7JGCXVfCG/3b3K/pFScSLJVmtCT4MWRLy6CUYM6HPX7nSn5KyvndILpVbqFOT8Mu+tLUoYmv/ghOsu01Fn3ofboiXLlsdaPG4TtJmA3I2oiZfaDV96rWvFnnkmAp4zR8mf4YHupNFFggIUuaubEEAGHD3K7UbniJRgMNL7DZgK86O7i8kyMsOLn5mUFyO5x
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(136003)(366004)(39860400002)(396003)(346002)(376002)(451199018)(26005)(2616005)(83380400001)(6512007)(6486002)(478600001)(6506007)(5660300002)(7416002)(316002)(186003)(8676002)(66946007)(66556008)(66476007)(4326008)(6916009)(38100700002)(8936002)(41300700001)(36756003)(2906002)(86362001)(67856001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?qcp1VG9ApHJ5SYBaId42tH4Ojw4j00bnhOg9GnSee7MDqA6phHcVrGjrGf1M?=
+ =?us-ascii?Q?39pYMErmy5qlDn0dD5ZTbL+8v265kGl2uVbxE3O5qRhHQaf3bVEegRsRGCfD?=
+ =?us-ascii?Q?xrJwfSmjFZH405qzeeVcEovESh3GYPAZajcyNnHXFlyW5UwBPW6uV2/MvJtT?=
+ =?us-ascii?Q?XeZ0CJfBkXOXXbKzofIObD76uEkQ2V8gn0jqR4vcc9LNUU7zYACnVDb2Dyup?=
+ =?us-ascii?Q?LI+8JcRlLkazz+7PwUbW28yh64NoQRNXMH4Io2w9ZxDRTZfng+CJ7p+6jID/?=
+ =?us-ascii?Q?4bjuW+Bk2ce19ybdkPwI41O84NRJ+f13QbngdAHm4hB2tr3t8aYwjAg+odyj?=
+ =?us-ascii?Q?GaYK/FCJvddX/hflGZBACWU/oGEJHwIn2hbnLxuk+ls+DrvVFxtnrQic4bZE?=
+ =?us-ascii?Q?5ugPQuwsBYeTNSHJCFbrLnPyh2v7M3r58ZbRzfOHWi0HvmZ0pIM3xlV8GI28?=
+ =?us-ascii?Q?i6n4XoUteWxGBBKsRecv5G8610HreNu+X11a2zLdzBFI6iB+/vpBkTAViM8d?=
+ =?us-ascii?Q?9xIQhVaNDxjd/+JE0KyQ3XrgsSaBaYa8xpl1zj/2BVaguAUElm5VTu2tY8sL?=
+ =?us-ascii?Q?IiXIy+T+FaaUzuRES8wwQXPDDUqNky+SolKQ1FE16Pn+haV+kBtWd0Djl7o0?=
+ =?us-ascii?Q?gmwjLnVezJExYCHwlTB8RattXeEH23tJOiIHk/R3F0IQxvV5FDydb+knxOAV?=
+ =?us-ascii?Q?BsNR6/3mpnQrEFer+rNV/3UvF1Q7RV9XpROGhY4nd8dnwpb1d+JE16R0B8FR?=
+ =?us-ascii?Q?8CkxYQwWlV0NkmIGPrPWFFc9t7J+X3a7Rzh6RT0Uxc+hTkQSISAT6Mzu6fvA?=
+ =?us-ascii?Q?TIdU7RCuchbJWd3imQcrEouE4XI1U/MJdFkScXvkm8Acp/gsfaqLQVNfZf4U?=
+ =?us-ascii?Q?GJkdZZc2XvwWwg6GAy703WYe680ih4FOUmJUiid0c4+F8JhlOzWaVi2JHMSu?=
+ =?us-ascii?Q?+ggnFp0fw2fqU3DZysOqm77oWd28Yu0YnMKq8W488HklEwI7zElbU+6Y/9wz?=
+ =?us-ascii?Q?C4a5+FV/rBiSNWk2epEdg+Usm5JzKQTnafM9cT5CJcSKHAG00mYkUykd7+gY?=
+ =?us-ascii?Q?WZi32xgN3QepvYWYmQHxBHtEyVJR4ERFLpW074VFVecH2HxFT2Gr0p1iQRh0?=
+ =?us-ascii?Q?PzuLwwyt7/OQFEfRNgmpwVRszqiJPvEitcMQEQfpRFJfntCvQawgZ5MhtDYk?=
+ =?us-ascii?Q?2z0RxPSOIkD44feyYdn9Wy1Yog4yywfQCoMnQlItvEXMjdBmhyl4quAyQE9I?=
+ =?us-ascii?Q?yrXf0r2eULkrpocbquB2oRbRaKyKiXbrkLVJnxMfsBz0clcDQDj+ZlzKx9Yf?=
+ =?us-ascii?Q?49o2ObackHSbx4SyWfhVwXWkgZOvR9GaOtHXukTszJIF2ehSrdVWziGBrppO?=
+ =?us-ascii?Q?t1WinebHqEqydOZBk3+krXNxg0myUs/uNqa5uKCD7w8wFyoM6K6Y6bkorDzm?=
+ =?us-ascii?Q?U+mfjudKUPlJ1yISfEMd/zXHNc4hmddbxwz2+0gqCLyfc/06kCPrjtzfJA/z?=
+ =?us-ascii?Q?c6GWS8oENmbGOZzpwpNd2C7fX6rHQrLWjNdHnS1sBF2TSWuSWOWaPVdJW2or?=
+ =?us-ascii?Q?PIT0Zf+GC2HC4pVdglVBoFdGnK6ltzaEK+11qUaW?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Feb 2023 00:10:40.4005
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3d9147d3-2442-4c1d-2f7c-08db0bc521d8
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Feb 2023 00:15:50.9679
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ce64b38f-a4d0-4d3f-8186-08db0bc46900
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BL02EPF000108EB.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5296
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mxcjekogU4ogLb6t0sLPjBia17FehX0a7/NjOVzEugE6kSdrFYD6/dO3gJ4E7pkO
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8298
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
@@ -117,233 +122,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 10, 2023 at 02:11:23AM +0000, Tian, Kevin wrote:
-
-> > > > +     if (!iommufd_hw_pagetable_has_group(hwpt, idev->group)) {
-> > > > +             if (list_empty(&hwpt->devices)) {
-> > > > +                     iopt_table_remove_domain(&hwpt->ioas->iopt,
-> > > > +                                              hwpt->domain);
-> > > > +                     list_del(&hwpt->hwpt_item);
-> > > > +             }
-> > >
-> > > I'm not sure how this can be fully shared between detach and replace.
-> > > Here some work e.g. above needs to be done before calling
-> > > iommu_group_replace_domain() while others can be done afterwards.
-> >
-> > This iopt_table_remove_domain/list_del is supposed to be done in
-> > the hwpt's destroy() actually. We couldn't move it because it'd
-> > need the new domain_alloc_user op and its implementation in ARM
-> > driver. Overall, I think it should be safe to put it behind the
-> > iommu_group_replace_domain().
-> >
+On Fri, Feb 10, 2023 at 03:44:10PM -0700, Alex Williamson wrote:
+> On Wed,  8 Feb 2023 20:16:38 -0800
+> Yi Liu <yi.l.liu@intel.com> wrote:
 > 
-> My confusion is that we have different flows between detach/attach
-> and replace.
+> > From: Lu Baolu <baolu.lu@linux.intel.com>
+> > 
+> > To support nested translation in the userspace, it should check the
+> > underlying hardware information for the capabilities.
+> > 
+> > Add intel_iommu_hw_info() to report cap_reg and ecap_reg information.
+> > 
+> > Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+> > Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> > Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
+> > Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
+> > ---
+> >  drivers/iommu/intel/iommu.c  | 19 +++++++++++++++++++
+> >  drivers/iommu/intel/iommu.h  |  1 +
+> >  include/uapi/linux/iommufd.h | 21 +++++++++++++++++++++
+> >  3 files changed, 41 insertions(+)
+> > 
+> > diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
+> > index 59df7e42fd53..929f600cc350 100644
+> > --- a/drivers/iommu/intel/iommu.c
+> > +++ b/drivers/iommu/intel/iommu.c
+> > @@ -4760,8 +4760,26 @@ static void intel_iommu_remove_dev_pasid(struct device *dev, ioasid_t pasid)
+> >  	intel_pasid_tear_down_entry(iommu, dev, pasid, false);
+> >  }
+> >  
+> > +static void *intel_iommu_hw_info(struct device *dev, u32 *length)
+> > +{
+> > +	struct device_domain_info *info = dev_iommu_priv_get(dev);
+> > +	struct intel_iommu *iommu = info->iommu;
+> > +	struct iommu_device_info_vtd *vtd;
+> > +
+> > +	vtd = kzalloc(sizeof(*vtd), GFP_KERNEL);
+> > +	if (!vtd)
+> > +		return ERR_PTR(-ENOMEM);
+> > +
+> > +	vtd->cap_reg = iommu->cap;
+> > +	vtd->ecap_reg = iommu->ecap;
 > 
-> today with separate detach+attach we have following flow:
-> 
->         Remove device from current hwpt;
->         if (last_device in hwpt) {
->                 Remove hwpt domain from current iopt;
->                 if (last_device in group)
->                         detach group from hwpt domain;
->         }
-> 
->         if (first device in group) {
->                 attach group to new hwpt domain;
->                 if (first_device in hwpt)
->                         Add hwpt domain to new iopt;
->         Add device to new hwpt;
-> 
-> but replace flow is different on the detach part:
-> 
->         if (first device in group) {
->                 replace group's domain from current hwpt to new hwpt;
->                 if (first_device in hwpt)
->                         Add hwpt domain to new iopt;
->         }
-> 
->         Remove device from old hwpt;
->         if (last_device in old hwpt)
->                 Remove hwpt domain from old iopt;
-> 
->         Add device to new hwpt;
+> Just a friendly reminder that these registers are already exposed to
+> userspace under /sys/class/iommu/ and each device has an iommu link
+> back to their iommu device there. 
 
-Oh... thinking it carefully, I see the flow does look a bit off.
-Perhaps it's better to have a similar flow for replace.
+I think in cases of mdevs w/ PASID (eg SIOV) it is not general to get
+from vfio sysfs to the sysfs path for the iommu.
 
-However, I think something would be still different due to its
-tricky nature, especially for a multi-device iommu_group.
+> This series doesn't really stand on its own without some discussion
+> of why that interface is not sufficient for this use case.
 
-An iommu_group_detach happens only when a device is the last one
-in its group to go through the routine via a DETACH ioctl, while
-an iommu_group_replace_domain() happens only when the device is
-the first one in its group to go through the routine via another
-ATTACH ioctl. However, when the first device does a replace, the
-cleanup routine of the old hwpt is a NOP, since there are still
-other devices (same group) in the old hwpt. And two implications
-here:
-1) Any other device in the same group has to forcibly switch to
-   the new domain, when the first device does a replace.
-2) The actual hwpt cleanup can only happen at the last device's
-   replace call.
+IMHO I don't really like the idea of mixing iommufd with sysfs, it
+should stand on its own.
 
-This also means that kernel has to rely on the integrity of the
-user space that it must replace all active devices in the group:
+In particular there is no generic way to go from a iommufd dev_id to
+any sysfs path, userspace would need prior unique knowledge about the
+subsystem that is being bound to iommufd first.
 
-For a three-device iommu_group,
-[scenario 1]
-	a. ATTACH dev1 to hwpt1;
-	b. ATTACH dev2 to hwpt1;
-	c. ATTACH dev3 to hwpt1;
-	d. ATTACH (REPLACE) dev1 to hwpt2;
-	   (no hwpt1 cleanup; replace dev2&3 too; do hwpt2 init)
-	e. ATTACH (REPLACE) dev2 to hwpt2; // user space must do
-	   (no hwpt1 cleanup; no dev2 replace; no hwpt2 init)
-	f. ATTACH (REPLACE) dev3 to hwpt2; // user space must do
-	   (do hwpt1 cleanup; no dev3 replace; no hwpt2 init)
+So, I think some of those explanations would be good in the commit
+message?
 
-[scenario 2]
-	a. ATTACH dev1 to hwpt1;
-	b. ATTACH dev2 to hwpt1;
-	c. ATTACH dev3 to hwpt1;
-	d. DETACH dev3 from hwpt1;
-	   (detach dev3; no hwpt1 cleanup)
-	f. ATTACH (REPLACE) dev1 to hwpt2;
-	   (no hwpt1 cleanup; replace dev2&3 too; do hwpt2 init)
-	g. ATTACH (REPLACE) dev2 to hwpt2;	// user space must do
-	   (do hwpt1 cleanup; no dev2 replace; no hwpt2 init)
-	h. (optional) ATTACH dev3 to hwpt2;	// clean ATTACH, not a REPLACE
-	   (no hwpt1 cleanup; no dev3 replace; no hwpt2 init)
+I would also add explanation about what userspace is supposed to do
+with these bits when it operates the nesting feature.
 
-[scenario 3]
-	a. ATTACH dev1 to hwpt1;
-	b. ATTACH dev2 to hwpt1;
-	c. ATTACH dev3 to hwpt1;
-	d. DETACH dev3 from hwpt1;
-	   (detach dev3; no hwpt1 cleanup)
-	e. DETACH dev2 from hwpt1;
-	   (detach dev2; no hwpt1 cleanup)
-	f. ATTACH (REPLACE) dev1 to hwpt2;
-	   (do hwpt1 cleanup; replace dev2&3 too; do hwpt2 init)
-	g. (optional) ATTACH dev2 to hwpt2;	// clean ATTACH, not a REPLACE
-	   (no hwpt1 cleanup; no dev2 replace; no hwpt2 init)
-	h. (optional) ATTACH dev3 to hwpt2;	// clean ATTACH, not a REPLACE
-	   (no hwpt1 cleanup; no dev3 replace; no hwpt2 init)
-
-Following the narratives above,
-
-[current detach+attach flow]
-	// DETACH dev1 from hwpt1;
-	Log dev1 out of the hwpt1's device list;
-	NOP; // hwpt1 has its group;
-	iopt_remove_reserved_iova(hwpt1->iopt, dev1);
-	idev1->hwpt = NULL;
-	refcount_dec();
-	// DETACH dev2 from hwpt1;
-	Log dev2 out of the hwpt1's device list;
-	if (hwpt1 does not have its group) { // last device to detach
-		if (hwpt1's device list is empty)
-			iopt_table_remove_domain/list_del(hwpt1);
-		iommu_detach_group();
-	}
-	iopt_remove_reserved_iova(hwpt1->iopt, dev2);
-	idev2->hwpt = NULL;
-	refcount_dec();
-	...
-	// ATTACH dev1 to hwpt2;
-	iopt_table_enforce_group_resv_regions(hwpt2->iopt, dev1);
-	if (hwpt2 does not have its group) { // first device to attach
-		iommu_attach_group();
-		if (hwpt2's device list is empty)
-			iopt_table_add_domain/list_add(hwpt2);
-	}
-	idev1->hwpt = hwpt2;
-	refcount_inc();
-	Log dev1 in the hwpt2's device list;
-	// ATTACH dev2 to hwpt2;
-	iopt_table_enforce_group_resv_regions(hwpt2->iopt, dev2);
-	NOP; // hwpt2 has its group;
-	idev2->hwpt = hwpt2;
-	refcount_inc();
-	Log dev2 in to the hwpt2's device list;
-
-
-[correct (?) replace flow - scenario 1 above]
-
-	// 1.d Switch (REPLACE) dev1 from hwpt1 to hwpt2;
-	partial detach (dev1) {
-		Log dev1 out of the hwpt1's device list;
-		NOP // hwpt1 has its group, and hwpt1's device list isn't empty
-		iopt_remove_reserved_iova(hwpt1->iopt, dev1);
-		refcount_dec();
-	}
-	iopt_table_enforce_group_resv_regions(hwpt2->iopt, dev1);
-	if (hwpt2 does not have its group) { // first device to replace
-		iommu_group_replace_domain();
-		if (hwpt2's device list is empty)
-			iopt_table_add_domain/list_add(hwpt2);
-	}
-	idev1->hwpt = hwpt2;
-	refcount_int();
-	Log dev1 in the hwpt2's device list;
-
-	// 1.e Switch (REPLACE) dev2 from hwpt1 to hwpt2;
-	partial detach (dev2) {
-		Log dev2 out of the hwpt1's device list;
-		NOP // hwpt1 has its group, and hwpt1's device list isn't empty
-		iopt_remove_reserved_iova(hwpt1->iopt, dev2);
-		refcount_dec();
-	}
-	iopt_table_enforce_group_resv_regions(hwpt2->iopt, dev2);
-	NOP; // hwpt2 has its group, and hwpt2's device list isn't empty
-	idev2->hwpt = hwpt2;
-	refcount_int();
-	Log dev2 in the hwpt2's device list;
-
-	// 1.f Switch (REPLACE) dev3 from hwpt1 to hwpt2;
-	partial detach (dev3) {
-		Log dev3 out of the hwpt1's device list;
-		if (hwpt1 does not have its group) { // last device to detach
-			if (hwpt1's device list is empty)
-				iopt_table_remove_domain/list_del(hwpt1);
-		}
-		iopt_remove_reserved_iova(hwpt1->iopt, dev3);
-		refcount_dec();
-	}
-	iopt_table_enforce_group_resv_regions(hwpt2->iopt, dev3);
-	NOP; // hwpt2 has its group, and hwpt2's device list isn't empty
-	idev3->hwpt = hwpt2;
-	refcount_int();
-	Log dev3 in the hwpt2's device list;
-
-And, this would also complicate the error-out routines too...
-
-> I'm yet to figure out whether we have sufficient lock protection to
-> prevent other paths from using old iopt/hwpt to find the device
-> which is already attached to a different domain.
-
-With the correct (?) flow, I think it'd be safer for one-device
-group. But it's gets tricker for the multi-device case above:
-the dev2 and dev3 are already in the new domain, but all their
-iommufd objects (idev->hwpt and iopt) are lagging. Do we need a
-lock across the three IOCTLs?
-
-One way to avoid it is to force-update idev2 and idev3 too when
-idev1 does a replace -- by iterating all same-group devices out
-of the old hwpt. This, however, feels a violation against being
-device-centric...
-
-i.e. scenario 1:
-	a. ATTACH dev1 to hwpt1;
-	b. ATTACH dev2 to hwpt1;
-	c. ATTACH dev3 to hwpt1;
-	d. ATTACH (REPLACE) dev1 to hwpt2;
-	   (do hwpt1 cleanup; replace dev2&3 and update idev2&3 too; do hwpt2 init)
-	e. ATTACH (REPLACE) dev2 to hwpt2; // user space must do, or be aware of 1.d
-	   (kernel does dummy)
-	f. ATTACH (REPLACE) dev3 to hwpt2; // user space must do, or be aware of 1.d
-	   (kernel does dummy)
-
-Thanks
-Nic
+Jason
