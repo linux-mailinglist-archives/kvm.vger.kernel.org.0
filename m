@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EE7CE692D97
-	for <lists+kvm@lfdr.de>; Sat, 11 Feb 2023 04:16:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 64895692D98
+	for <lists+kvm@lfdr.de>; Sat, 11 Feb 2023 04:17:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229631AbjBKDQw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Feb 2023 22:16:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60482 "EHLO
+        id S229634AbjBKDRA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Feb 2023 22:17:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229627AbjBKDQu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Feb 2023 22:16:50 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F09C84F51
-        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 19:16:45 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id y125-20020a25c883000000b0086349255277so6711031ybf.8
-        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 19:16:45 -0800 (PST)
+        with ESMTP id S229637AbjBKDQ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Feb 2023 22:16:58 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E251A35BC
+        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 19:16:46 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id z9-20020a25ba49000000b007d4416e3667so6807381ybj.23
+        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 19:16:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=agf94AuTrHxCSXQaehK7Zl4P+40uGWhpn6X3L2a5GPA=;
-        b=TFQ9QwV+p6zUCAWb8PQ0XUHpz7d7S20zrq4xFspgd62UPZ8ZwVLp4FZ7Ec0wXAGy5a
-         mUxV/RSLDot3wPpar3LEfqAk4isVq7lujAAUEdQ+BVhpTKJfalBLcQFf73xu3sxW8ILJ
-         OqJ6EygOpMRO/Ld2MC1q5qpUuvu2XVn00RDJtJBzH4okHXFIzloWw/Vs6rNNYaev3lry
-         Gjxc5PFysYHP1T0QhyUXufhh2mmxWaRDlJFliqoDphGxMCC8l83XTNFqlwlGLxH7xHU0
-         pMCa4lN0GmitdJIkqs0wtz9Cz/4owPsEdfJtJ2wHG3WV8DHTXA43OPrbrfXfRUEivPcA
-         z9lw==
+        bh=MCXnOb6jcGTB9kCRmfw+USzftBG5GbuvoabNuXgoEVU=;
+        b=bcxD3LvkYnFpmSe0OOL5FnK+rcgRPLQvdZMgoUbwJlzTZUXvvFht0hWOAbfD7fwzMO
+         PPIKczBG/uxBejjRAsvzVLhSrjdI/XfTYxwnP54eZLr49fS9EJoBG2Q0MH5dW24sYWqG
+         5rNeWjkrE89NWC6RTldgbiiFH+NAgkp8riAo/SLTdV1FyPQVQLJCttGqfcgxpaqUrr3A
+         zzSkEHZfzAhjy+YE86HtZC6EYQg14ZzQWfWsNvBgBFvWVMG6eabvewT9/VQlVz2wn8gw
+         AOW9WnUeK+JJvztH/lgimLiRkf8TPFLh5nIwD42T3+mLmJ5BUTDG3Y2uZhctSzK+p8u7
+         IR8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=agf94AuTrHxCSXQaehK7Zl4P+40uGWhpn6X3L2a5GPA=;
-        b=W5ywWDdXH3x58LSSBjwtA+5jz9DQG85K0c+8pj/+VAlmqdLx1RT0KyWkigZGSvKX+y
-         TR+ucsX4p0KuzDuj0AviU8YNQXl2Tls21N/+UipDqvL1e0+rMdeSquK7H1iLrzEXH+CH
-         BWFj2TNAz/gq/REpalzA48j1V3hjDpVudZztua9nQXGmmwlyGt4zWpFjN6aA4jspl0Ef
-         s4BaQMlEDPjc77x9+hXPpFJTGaUR/FC491TFT7IbpRvM44Nk8WVD1/ieTibsF8tq1nRB
-         loXGeqvqUjRzd8okfDWFjY1+4fghvPwhIcKn3VuUmCTWX/T6fNWGHnxSUPeZBI4jMgOi
-         PqEw==
-X-Gm-Message-State: AO0yUKXHhiiAyhmAVgLSdfsRCYK+S40D3ykoz/zli/MgTCoUgIdDn7aq
-        3Xi+tNfWEsACDntRHANbc6tuHaTphGk=
-X-Google-Smtp-Source: AK7set9b7sVz+BIQF/Y69bLjTeuuu6haCf6tB27Fceumt1tmwKTb6i26DmdDPHoNuYujCvhTV68xnHmJoKo=
+        bh=MCXnOb6jcGTB9kCRmfw+USzftBG5GbuvoabNuXgoEVU=;
+        b=qiB4lUVu583X5oPjP9incp4vqyorCJAMkuYrC+PRxQP2wAG+MD5AfS9x/M9qBUkw1I
+         kimnKwoNURuL9f0aAjaUufOiNpo/paoLCexJ7wCJpSieSe1mhx4DEOvrYSLc8OQQd0bG
+         BWsk4JPPfepx4VLyZIEWOMQNO1n9DpwYxhsirZ2I3vqCOn9nNblygAgiJKhd9qCcH9Wc
+         YHgNtWIZLWe7+sCKzZHezYX82GHqrgc+xdFPdKuhqMbdrFghmVAsevvTEY7DrGYujJj2
+         4iYGKU7T9ecw23SaGv994FLiqc4FCv6liROuJFqnFD+U8aw+snyrYR0ZWUFpzT6dtynZ
+         xeHg==
+X-Gm-Message-State: AO0yUKWyR/ViZ7hClZeGAHc7FQcC1HmD8dHm6w1rPIN77rrTAclCLkAQ
+        dN+VvLM2R7QCFWNUWHd5HqFObCOwCX8=
+X-Google-Smtp-Source: AK7set9ycbZcIhKY2lEr5PmnL1aLgmVOCXQ7NCzmiSMYPzzadl1xbEaheY9neKH5tD47DeO3FkS/ZiIqyJc=
 X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
- (user=reijiw job=sendgmr) by 2002:a05:6902:54a:b0:8bb:dfe8:a33b with SMTP id
- z10-20020a056902054a00b008bbdfe8a33bmr77ybs.9.1676085403814; Fri, 10 Feb 2023
- 19:16:43 -0800 (PST)
-Date:   Fri, 10 Feb 2023 19:14:58 -0800
+ (user=reijiw job=sendgmr) by 2002:a25:69c2:0:b0:8b4:7955:9223 with SMTP id
+ e185-20020a2569c2000000b008b479559223mr8ybc.8.1676085405916; Fri, 10 Feb 2023
+ 19:16:45 -0800 (PST)
+Date:   Fri, 10 Feb 2023 19:14:59 -0800
 In-Reply-To: <20230211031506.4159098-1-reijiw@google.com>
 Mime-Version: 1.0
 References: <20230211031506.4159098-1-reijiw@google.com>
 X-Mailer: git-send-email 2.39.1.581.gbfd45094c4-goog
-Message-ID: <20230211031506.4159098-7-reijiw@google.com>
-Subject: [PATCH v4 06/14] KVM: arm64: PMU: Don't define the sysreg reset() for PM{USERENR,CCFILTR}_EL0
+Message-ID: <20230211031506.4159098-8-reijiw@google.com>
+Subject: [PATCH v4 07/14] KVM: arm64: PMU: Simplify extracting PMCR_EL0.N
 From:   Reiji Watanabe <reijiw@google.com>
 To:     Marc Zyngier <maz@kernel.org>,
         Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
@@ -77,42 +77,89 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The default reset function for PMU registers (defined by PMU_SYS_REG)
-now simply clears a specified register. Use the default one for
-PMUSERENR_EL0 and PMCCFILTR_EL0, as KVM currently clears those
-registers on vCPU reset (NOTE: All non-RES0 fields of those
-registers have UNKNOWN reset values, and the same fields of
-their AArch32 registers have 0 reset values).
+Some code extracts PMCR_EL0.N using ARMV8_PMU_PMCR_N_SHIFT and
+ARMV8_PMU_PMCR_N_MASK. Define ARMV8_PMU_PMCR_N (0x1f << 11),
+and simplify those codes using FIELD_GET() and/or ARMV8_PMU_PMCR_N.
+The following patches will also use these macros to extract PMCR_EL0.N.
 
 No functional change intended.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/perf_event.h | 2 +-
+ arch/arm64/kernel/perf_event.c      | 3 +--
+ arch/arm64/kvm/pmu-emul.c           | 3 +--
+ arch/arm64/kvm/sys_regs.c           | 7 +++----
+ 4 files changed, 6 insertions(+), 9 deletions(-)
 
+diff --git a/arch/arm64/include/asm/perf_event.h b/arch/arm64/include/asm/perf_event.h
+index 3eaf462f5752..eeef8d56d9c8 100644
+--- a/arch/arm64/include/asm/perf_event.h
++++ b/arch/arm64/include/asm/perf_event.h
+@@ -219,7 +219,7 @@
+ #define ARMV8_PMU_PMCR_LC	(1 << 6) /* Overflow on 64 bit cycle counter */
+ #define ARMV8_PMU_PMCR_LP	(1 << 7) /* Long event counter enable */
+ #define	ARMV8_PMU_PMCR_N_SHIFT	11	 /* Number of counters supported */
+-#define	ARMV8_PMU_PMCR_N_MASK	0x1f
++#define	ARMV8_PMU_PMCR_N	(0x1f << ARMV8_PMU_PMCR_N_SHIFT)
+ #define	ARMV8_PMU_PMCR_MASK	0xff	 /* Mask for writable bits */
+ 
+ /*
+diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
+index a5193f2146a6..1775d89a9144 100644
+--- a/arch/arm64/kernel/perf_event.c
++++ b/arch/arm64/kernel/perf_event.c
+@@ -1158,8 +1158,7 @@ static void __armv8pmu_probe_pmu(void *info)
+ 	probe->present = true;
+ 
+ 	/* Read the nb of CNTx counters supported from PMNC */
+-	cpu_pmu->num_events = (armv8pmu_pmcr_read() >> ARMV8_PMU_PMCR_N_SHIFT)
+-		& ARMV8_PMU_PMCR_N_MASK;
++	cpu_pmu->num_events = FIELD_GET(ARMV8_PMU_PMCR_N, armv8pmu_pmcr_read());
+ 
+ 	/* Add the CPU cycles counter */
+ 	cpu_pmu->num_events += 1;
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index 701728ad78d6..9dbf532e264e 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -246,9 +246,8 @@ void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu)
+ 
+ u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
+ {
+-	u64 val = __vcpu_sys_reg(vcpu, PMCR_EL0) >> ARMV8_PMU_PMCR_N_SHIFT;
++	u64 val = FIELD_GET(ARMV8_PMU_PMCR_N, __vcpu_sys_reg(vcpu, PMCR_EL0));
+ 
+-	val &= ARMV8_PMU_PMCR_N_MASK;
+ 	if (val == 0)
+ 		return BIT(ARMV8_PMU_CYCLE_IDX);
+ 	else
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index e6e419157856..790f028a1686 100644
+index 790f028a1686..9b410a2ea20c 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1752,7 +1752,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	 * in 32bit mode. Here we choose to reset it as zero for consistency.
- 	 */
- 	{ PMU_SYS_REG(SYS_PMUSERENR_EL0), .access = access_pmuserenr,
--	  .reset = reset_val, .reg = PMUSERENR_EL0, .val = 0 },
-+	  .reg = PMUSERENR_EL0 },
- 	{ PMU_SYS_REG(SYS_PMOVSSET_EL0),
- 	  .access = access_pmovs, .reg = PMOVSSET_EL0 },
+@@ -629,7 +629,7 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ 		return;
  
-@@ -1908,7 +1908,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	 * in 32bit mode. Here we choose to reset it as zero for consistency.
- 	 */
- 	{ PMU_SYS_REG(SYS_PMCCFILTR_EL0), .access = access_pmu_evtyper,
--	  .reset = reset_val, .reg = PMCCFILTR_EL0, .val = 0 },
-+	  .reg = PMCCFILTR_EL0 },
+ 	/* Only preserve PMCR_EL0.N, and reset the rest to 0 */
+-	pmcr = read_sysreg(pmcr_el0) & (ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT);
++	pmcr = read_sysreg(pmcr_el0) & ARMV8_PMU_PMCR_N;
+ 	if (!kvm_supports_32bit_el0())
+ 		pmcr |= ARMV8_PMU_PMCR_LC;
  
- 	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
- 	{ SYS_DESC(SYS_IFSR32_EL2), NULL, reset_unknown, IFSR32_EL2 },
+@@ -736,10 +736,9 @@ static bool access_pmceid(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 
+ static bool pmu_counter_idx_valid(struct kvm_vcpu *vcpu, u64 idx)
+ {
+-	u64 pmcr, val;
++	u64 val;
+ 
+-	pmcr = __vcpu_sys_reg(vcpu, PMCR_EL0);
+-	val = (pmcr >> ARMV8_PMU_PMCR_N_SHIFT) & ARMV8_PMU_PMCR_N_MASK;
++	val = FIELD_GET(ARMV8_PMU_PMCR_N, __vcpu_sys_reg(vcpu, PMCR_EL0));
+ 	if (idx >= val && idx != ARMV8_PMU_CYCLE_IDX) {
+ 		kvm_inject_undefined(vcpu);
+ 		return false;
 -- 
 2.39.1.581.gbfd45094c4-goog
 
