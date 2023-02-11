@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 075D5692D94
-	for <lists+kvm@lfdr.de>; Sat, 11 Feb 2023 04:16:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1719E692D96
+	for <lists+kvm@lfdr.de>; Sat, 11 Feb 2023 04:16:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229624AbjBKDQq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Feb 2023 22:16:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60046 "EHLO
+        id S229632AbjBKDQv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Feb 2023 22:16:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229596AbjBKDQp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Feb 2023 22:16:45 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68B8B60E47
-        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 19:16:41 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id z9-20020a25ba49000000b007d4416e3667so6807241ybj.23
-        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 19:16:41 -0800 (PST)
+        with ESMTP id S229631AbjBKDQt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Feb 2023 22:16:49 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D1FA64651
+        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 19:16:43 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id n20-20020a25da14000000b008fa1d22bd55so2247009ybf.21
+        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 19:16:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RBT5x66aj0o+bGVgZJhYwS6XmSzkSdatLkUK3qko77M=;
-        b=ZSz6nXEHRKC94b0+dd0cJ2iN8ANusTD8u+RwkNdGXCMXNBFQhzC6Vbt9PFrPwbX48w
-         6tclEBudcfYEoIbh1fF64f8HSG8PqMV78j4ulFdqk26qpVr90D4xfdOuav5C0/N5PteN
-         GiVdCAnseLwKcGY0r0zUZ2GD/FgzgPiwjXol1mD6QnU4t6qSt+3R2V2TGVq+/lzXJKa3
-         uGWhkat/VK1TI23yfMziDsa6XpvhT5rcPoC+S3tgpq8N2MX/f5xaf87kYqSX9kyKvlbv
-         6OyXYVVw7i0q3mI5imrYK/nTYz9PYMDSBpgMTU0nrdRRZ2ji9h4ypJPlrBVlIuiW68bB
-         nhxw==
+        bh=Qt9DyyP+jmxt2SRd9Qfh6SlGcBq+sGg3jGSKwiZnJL0=;
+        b=C1bEkr31Oghws9EXM2+M78anmo1fN6vdiqVKbpzl4X7MsRntpD5o+I8PqT5MvEFooZ
+         kQr7e8aA/+8WIn8xqsm3jq9Tm8xgZrHyMSJB1LdNMgX7JcRvxW0ec+JBL3MoVg8/d1sJ
+         Z8tBsoDqXa556tZjMiWiSsqXliJDZVVvzQq4gmoLuLo7bi0OxJkM/A2ZqBuFyzf5VL1W
+         EYQFEqS3Lrl26h+oAUO0PyL4iLKeMNQyYXTc1Rs6Xy7cJJvBNmpVypwHtvbpYDxpuNzt
+         re45vhtC/opL+3MfEYkx1em6R9CUm90bIIztwg/woBPSmUrcDmmOlH0E09fXY9zPS63p
+         yRIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RBT5x66aj0o+bGVgZJhYwS6XmSzkSdatLkUK3qko77M=;
-        b=wrulNmOAhLXkXPVy2EnQXRGPwFhcgPsGAlk0ogtEV1xAX7Kz0+KcvU8BYL/lYamSLq
-         G1ZCSHV50qcDoP2NPjDgp+d1oOOL3Ctovt8oGGjmdJf9CA2LUKbGIKj7aaruIMmBsccC
-         pi0p/rVXLG6w0ls1tgHwDz26pjYO54RDpAZtCv/20E/F+cOkLezgZCTXo//IpjYzwXyy
-         8z60Zv3Yt6jQ8a4bHiD5mlxOemzvSXNb20hi0jf0EMIR/eM4Vghynx/Y1vmeHzM5J3Vc
-         eSF9rfqU+/k2ZWT+nF5af9I40LI/IBIknzUwN9em1JBrzbjjjlVdMtn8cy6NGIZftS1V
-         OFUA==
-X-Gm-Message-State: AO0yUKXoOnqbCsY2mvODLZExv/4zqT2bXkYA3eOdnYR3RgD3/bgDcP0G
-        I/As/8d2nUTMjzAQ0rrdFYaZlQkhyYQ=
-X-Google-Smtp-Source: AK7set9PagVjhSsFZquxxbL9a5MP6qEOSBD/vZTrtrlmS9TLAckHrNrA532H7ANzqpZDfdckSdHc7xqLCoQ=
+        bh=Qt9DyyP+jmxt2SRd9Qfh6SlGcBq+sGg3jGSKwiZnJL0=;
+        b=Gu+ZLLUAgbn3Fk6w7v+vmTnEfBjWiCIE/UBGHZfJtECReGnIJnWex0t/ai/Nep16ja
+         wE8/4iIxbkw10rrMBhFrNHJrM7diidDKbY+pGl85u4dYMVXPuPtFWD4I9+O5uFHdsGbM
+         F6YCF4fC8mIkNMIsdoBFy6RpynEY7sLvBOSMzFgNU9iH1vrf+Nd8/WNPH0h62jqVoXbM
+         vV1fVgTi025XVthokuzF90KQ0ZmmwFd6toNRnfgoOSU+lN6GapCvwHXc9aS6jhbbHqo+
+         /VlOP8W21xYaRRE9BBUlKPl2FeUvywCtweIiNLCELHFnfhrm8oeI/xM8ZEwfcAHY3gdo
+         POPQ==
+X-Gm-Message-State: AO0yUKVpHiv5zzrxveTY8bnOcQ+5Rn9RXqiLO9IwxlbAEN83X150GSpv
+        VNDW5hrC1AQGcOpNgLBEud2Pcv725+w=
+X-Google-Smtp-Source: AK7set+ncL9YC5JFHYhtNyMYhJcbgzv4xqHEyW0dk7wxu2vqklwEMnCfyPDaS30N5G1PI7QfeeBSP5J2yF0=
 X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
- (user=reijiw job=sendgmr) by 2002:a25:dccc:0:b0:8dc:e5aa:b60 with SMTP id
- y195-20020a25dccc000000b008dce5aa0b60mr6ybe.12.1676085400111; Fri, 10 Feb
- 2023 19:16:40 -0800 (PST)
-Date:   Fri, 10 Feb 2023 19:14:56 -0800
+ (user=reijiw job=sendgmr) by 2002:a81:9304:0:b0:52e:e6ed:30a7 with SMTP id
+ k4-20020a819304000000b0052ee6ed30a7mr158690ywg.551.1676085402308; Fri, 10 Feb
+ 2023 19:16:42 -0800 (PST)
+Date:   Fri, 10 Feb 2023 19:14:57 -0800
 In-Reply-To: <20230211031506.4159098-1-reijiw@google.com>
 Mime-Version: 1.0
 References: <20230211031506.4159098-1-reijiw@google.com>
 X-Mailer: git-send-email 2.39.1.581.gbfd45094c4-goog
-Message-ID: <20230211031506.4159098-5-reijiw@google.com>
-Subject: [PATCH v4 04/14] KVM: arm64: PMU: Don't use the PMUVer of the PMU set
- for the guest
+Message-ID: <20230211031506.4159098-6-reijiw@google.com>
+Subject: [PATCH v4 05/14] KVM: arm64: PMU: Clear PM{C,I}NTEN{SET,CLR} and
+ PMOVS{SET,CLR} on vCPU reset
 From:   Reiji Watanabe <reijiw@google.com>
 To:     Marc Zyngier <maz@kernel.org>,
         Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
@@ -78,79 +78,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM uses two potentially different PMUVer for a vCPU with PMU
-configured (kvm->arch.dfr0_pmuver.imp and kvm->arch.arm_pmu->pmuver).
-Stop using the host's PMUVer (arm_pmu->pmuver) in most cases,
-as the PMUVer for the guest (kvm->arch.dfr0_pmuver.imp) could be
-set by userspace (could be lower than the host's PMUVer).
+On vCPU reset, PMCNTEN{SET,CLR}_EL0, PMINTEN{SET,CLR}_EL1, and
+PMOVS{SET,CLR}_EL1 for a vCPU are reset by reset_pmu_reg().
+This function clears RAZ bits of those registers corresponding
+to unimplemented event counters on the vCPU, and sets bits
+corresponding to implemented event counters to a predefined
+pseudo UNKNOWN value (some bits are set to 1).
 
-The only exception to KVM using the host's PMUVer is to create an
-event filter (KVM_ARM_VCPU_PMU_V3_FILTER).  For this, KVM uses
-the value to determine the valid range of the event, and as the
-size of the event filter bitmap.  Using the host's PMUVer here will
-allow KVM to keep the compatibility with the current behavior of
-the PMU_V3_FILTER.  Also, that will allow KVM to keep the entire
-filter when PMUVer for the guest is changed, and KVM only need
-to change the actual range of use.
+The function identifies (un)implemented event counters on the
+vCPU based on the PMCR_EL0.N value on the host. Using the host
+value for this would be problematic when KVM supports letting
+userspace set PMCR_EL0.N to a value different from the host value
+(some of the RAZ bits of those registers could end up being set to 1).
+
+Fix this by clearing the registers so that it can ensure
+that all the RAZ bits are cleared even when the PMCR_EL0.N value
+for the vCPU is different from the host value. Use reset_val() to
+do this instead of fixing reset_pmu_reg(), and remove
+reset_pmu_reg(), as it is no longer used.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/kvm/pmu-emul.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 19 +------------------
+ 1 file changed, 1 insertion(+), 18 deletions(-)
 
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 49580787ee09..701728ad78d6 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -35,12 +35,8 @@ static struct kvm_pmc *kvm_vcpu_idx_to_pmc(struct kvm_vcpu *vcpu, int cnt_idx)
- 	return &vcpu->arch.pmu.pmc[cnt_idx];
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index c1ec4a68b914..e6e419157856 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -602,23 +602,6 @@ static unsigned int pmu_visibility(const struct kvm_vcpu *vcpu,
+ 	return REG_HIDDEN;
  }
  
--static u32 kvm_pmu_event_mask(struct kvm *kvm)
-+static u32 __kvm_pmu_event_mask(u8 pmuver)
+-static void reset_pmu_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+-{
+-	u64 n, mask = BIT(ARMV8_PMU_CYCLE_IDX);
+-
+-	/* No PMU available, any PMU reg may UNDEF... */
+-	if (!kvm_arm_support_pmu_v3())
+-		return;
+-
+-	n = read_sysreg(pmcr_el0) >> ARMV8_PMU_PMCR_N_SHIFT;
+-	n &= ARMV8_PMU_PMCR_N_MASK;
+-	if (n)
+-		mask |= GENMASK(n - 1, 0);
+-
+-	reset_unknown(vcpu, r);
+-	__vcpu_sys_reg(vcpu, r->reg) &= mask;
+-}
+-
+ static void reset_pmevcntr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
  {
--	unsigned int pmuver;
--
--	pmuver = kvm->arch.arm_pmu->pmuver;
--
- 	switch (pmuver) {
- 	case ID_AA64DFR0_EL1_PMUVer_IMP:
- 		return GENMASK(9, 0);
-@@ -55,6 +51,11 @@ static u32 kvm_pmu_event_mask(struct kvm *kvm)
- 	}
- }
+ 	reset_unknown(vcpu, r);
+@@ -976,7 +959,7 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	  trap_wcr, reset_wcr, 0, 0,  get_wcr, set_wcr }
  
-+static u32 kvm_pmu_event_mask(struct kvm *kvm)
-+{
-+	return __kvm_pmu_event_mask(kvm->arch.dfr0_pmuver.imp);
-+}
-+
- /**
-  * kvm_pmc_is_64bit - determine if counter is 64bit
-  * @pmc: counter context
-@@ -755,7 +756,7 @@ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
- 		 * Don't advertise STALL_SLOT, as PMMIR_EL0 is handled
- 		 * as RAZ
- 		 */
--		if (vcpu->kvm->arch.arm_pmu->pmuver >= ID_AA64DFR0_EL1_PMUVer_V3P4)
-+		if (vcpu->kvm->arch.dfr0_pmuver.imp >= ID_AA64DFR0_EL1_PMUVer_V3P4)
- 			val &= ~BIT_ULL(ARMV8_PMUV3_PERFCTR_STALL_SLOT - 32);
- 		base = 32;
- 	}
-@@ -955,7 +956,12 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- 		struct kvm_pmu_event_filter filter;
- 		int nr_events;
+ #define PMU_SYS_REG(r)						\
+-	SYS_DESC(r), .reset = reset_pmu_reg, .visibility = pmu_visibility
++	SYS_DESC(r), .reset = reset_val, .visibility = pmu_visibility
  
--		nr_events = kvm_pmu_event_mask(kvm) + 1;
-+		/*
-+		 * Allocate an event filter for the entire range supported
-+		 * by the PMU hardware so we can simply change the actual
-+		 * range of use when the PMUVer for the guest is changed.
-+		 */
-+		nr_events = __kvm_pmu_event_mask(kvm->arch.dfr0_pmuver.imp_limit) + 1;
- 
- 		uaddr = (struct kvm_pmu_event_filter __user *)(long)attr->addr;
- 
+ /* Macro to expand the PMEVCNTRn_EL0 register */
+ #define PMU_PMEVCNTR_EL0(n)						\
 -- 
 2.39.1.581.gbfd45094c4-goog
 
