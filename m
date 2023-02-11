@@ -2,54 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5744E692C98
-	for <lists+kvm@lfdr.de>; Sat, 11 Feb 2023 02:46:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F866692C99
+	for <lists+kvm@lfdr.de>; Sat, 11 Feb 2023 02:46:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229942AbjBKBqg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Feb 2023 20:46:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57504 "EHLO
+        id S229954AbjBKBqh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Feb 2023 20:46:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229866AbjBKBqd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Feb 2023 20:46:33 -0500
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E18C97E8F1
-        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 17:46:32 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-517f8be4b00so66411157b3.3
-        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 17:46:32 -0800 (PST)
+        with ESMTP id S229921AbjBKBqf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Feb 2023 20:46:35 -0500
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 628E97E8F1
+        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 17:46:34 -0800 (PST)
+Received: by mail-pf1-x449.google.com with SMTP id ds10-20020a056a004aca00b0059c8629c220so3471514pfb.23
+        for <kvm@vger.kernel.org>; Fri, 10 Feb 2023 17:46:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=hkehzV3PgH5ghzIyq+2UQQQuaUD65ZdlOHTF9Rixj6U=;
-        b=EiPQ4pAHrHy0B8yMqZ8yaO953edDmUSUzQj/xwAVtNYLDVQBdrP1aQyjZmq12LyB0o
-         EQMYlzm0Esy/1xnxItCR2hr1ZOxRpoSJMdTb2h2MUAhEoTl/EmYqpiJYK3PssnuhbMOy
-         G5CoXRTLEqmTXCJ2LCgAtHHzG2Ghij/qNtJ4lpWvIwMLHras06ZdUdHD6KCg2rTQVEEe
-         pCVgSaRmHw3iav/061EaxrWaKtG5m9LrkyIa0nQqKTZpImolErRK8plBsl2kAvk3co0y
-         uPxga+EwGqi4Vhpfuxef2EjKvWFseLoZAkZMoiVsP0WXFWWjCNGGk6Ung6GKU5H7DQvd
-         UjJg==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6MGvE068epLiCiKO1TAoNVUmSZBBRkXrwHXhAiWz0E8=;
+        b=MGK8U9JKxXLEY3zJNoNM7+6IniYornmEEv05U2sGpm2O9eFj4auGyNcX24Eo43wk5O
+         fHZiLPKVSIf3MFAZRo8T7W98SKx92zL+WmqcssJm9yZxLK51iIVdWbS5asBU401uiVds
+         05Ktad81SM43kWtp3PBg8EiF0ld/oYIFeqIdI/znw/MCZ/a8vG+K0D23LMJpovSyNHZc
+         yRP7ru9d/M1lHVBsdfT8G1bbcfrJnZjIzpNyTwgrQCwPM4oLUOBvaYjLPnpSIx+ki7qj
+         4tOoKaz7LslUVY+It/VYOrY5IHw2lpL5kjqnm8OCBNXsvcFQ5B6AUOBUQd63HPuB0YNP
+         LIdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hkehzV3PgH5ghzIyq+2UQQQuaUD65ZdlOHTF9Rixj6U=;
-        b=YgMFIu+46yLodOt3RJbvqOyKOt+8TQBo8RbmSCipGD7T9TFzaR2RnId4DI67b9c1zx
-         ZTlQt/Ulgr/1r4T04mJcrV2wnWMmlofZG+QwwX7tFzx/rsBxgaC/EcedyWimLYnMLT8b
-         4R5C5DxQUWLsdKuIY7s8SlcXsRYIRJ3OqOukUbvd4GVF+M7Kt7Jdew/em/n4OVTJxrBl
-         PYWxfaSUuoZadbFZto5MBuzwWiLrtM2y5xorF2T5/GX0hchfzsRwU/p+m5jzjimbkH47
-         i6pYPYU3avegvkKOWp3lt+JKlbd7XIIpTeUe2m9jTQ4RHZ6TQoYIJHrPzprFukbwTpS4
-         /G6A==
-X-Gm-Message-State: AO0yUKUjC1RHhX+VpGf14+plBK8eHcuoLeFz2U82zhyUXJtQVQiFmXf7
-        NPmYCyu2ifGt3O7RDNBF2PsrNe+r/MET
-X-Google-Smtp-Source: AK7set+TVmw4xTKjP8yaDn8Wq3iZ11L0Dey2bnrbR2VzWjmGIvbORcY5HqkmYFCZHbHWYP308yencXrs613h
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6MGvE068epLiCiKO1TAoNVUmSZBBRkXrwHXhAiWz0E8=;
+        b=Wj+J5VWKM5PUKpKWTrjgrsT26/dChEtp1wRkYt4kTxjGz8MHsNDNayVPEK0VTXt+7R
+         t0jkhPARdRw4beShScGi61yf38q+lK/SFgoPQbLzHlO81CU30bKGvXmlPaARrLinbO7u
+         8R6NZaKNNFwxj+Ih+PmdPShfI9R9Dk/CAgSjE4KOnolY6+sJDvPhBqTp0R4HcejjJJ+5
+         Jaiiz463/MvzA0E4llGEyoabA7w5NQ/y0bPJHKvW98Wq6u3Tt+I0DQqC5atMxXCIO1SV
+         JKc4sKPi5f4Rsuz+5EcSqx1JEP4YBCvC9vCJocIprEuZ0GJtucNX+krUnIfTpGnGqWtP
+         t/cA==
+X-Gm-Message-State: AO0yUKXiOaC63Y2zMiyhQNJ36J9xWtcMrJL7pwhjIZoqTU2ivisyqiTv
+        27ePUSSNUEO4tJyQnE34vOZZ/UtvZNo1
+X-Google-Smtp-Source: AK7set/JFBGz37t345sdNfBqXNYa7A4iPZMNWpg/ZmlKXGa/6FL7sIXl00Sw+uNwrB4SiFY6PM+UfWliQ+VL
 X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
- (user=vipinsh job=sendgmr) by 2002:a05:6902:1024:b0:8be:8c5f:9d55 with SMTP
- id x4-20020a056902102400b008be8c5f9d55mr178ybt.3.1676079992025; Fri, 10 Feb
- 2023 17:46:32 -0800 (PST)
-Date:   Fri, 10 Feb 2023 17:46:19 -0800
+ (user=vipinsh job=sendgmr) by 2002:a63:9602:0:b0:4da:85b1:e9c with SMTP id
+ c2-20020a639602000000b004da85b10e9cmr3134854pge.100.1676079993740; Fri, 10
+ Feb 2023 17:46:33 -0800 (PST)
+Date:   Fri, 10 Feb 2023 17:46:20 -0800
+In-Reply-To: <20230211014626.3659152-1-vipinsh@google.com>
 Mime-Version: 1.0
+References: <20230211014626.3659152-1-vipinsh@google.com>
 X-Mailer: git-send-email 2.39.1.581.gbfd45094c4-goog
-Message-ID: <20230211014626.3659152-1-vipinsh@google.com>
-Subject: [Patch v3 0/7] Optimize clear dirty log
+Message-ID: <20230211014626.3659152-2-vipinsh@google.com>
+Subject: [Patch v3 1/7] KVM: x86/mmu: Add a helper function to check if an
+ SPTE needs atomic write
 From:   Vipin Sharma <vipinsh@google.com>
 To:     seanjc@google.com, pbonzini@redhat.com, bgardon@google.com,
         dmatlack@google.com
@@ -66,56 +69,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Move conditions in kvm_tdp_mmu_write_spte() to check if an SPTE should
+be written atomically or not to a separate function.
 
+This new function, kvm_tdp_mmu_spte_need_atomic_write(),  will be used
+in future commits to optimize clearing bits in SPTEs.
 
-This patch series has optimized control flow of clearing dirty log and
-improved its performance by ~40% (2% more than v2).
+Signed-off-by: Vipin Sharma <vipinsh@google.com>
+Reviewed-by: David Matlack <dmatlack@google.com>
+Reviewed-by: Ben Gardon <bgardon@google.com>
+---
+ arch/x86/kvm/mmu/tdp_iter.h | 34 ++++++++++++++++++++--------------
+ 1 file changed, 20 insertions(+), 14 deletions(-)
 
-It also got rid of many variants of the handle_changed_spte family of
-functions and converged logic to one handle_changed_spte() function. It
-also remove tdp_mmu_set_spte_no_[acc_track|dirty_log] and various
-booleans for controlling them.
-
-Thanks,
-Vipin
-
-v3:
-- Tried to do better job at writing commit messages.
-- Made kvm_tdp_mmu_clear_spte_bits() similar to the kvm_tdp_mmu_write_spte().
-- clear_dirty_pt_masked() evaluates mask for the bit to be cleared outside the
-  loop and use that for all of the SPTEs instead of calculating for each SPTE.
-- Some naming changes based on the feedbacks.
-- Split out the dead code clean from the optimization code.
-
-
-v2: https://lore.kernel.org/lkml/20230203192822.106773-1-vipinsh@google.com/
-- Clear dirty log and age gfn range does not go through
-  handle_changed_spte, they handle their SPTE changes locally to improve
-  their speed.
-- Clear only specific bits atomically when updating SPTEs in clearing
-  dirty log and aging gfn range functions.
-- Removed tdp_mmu_set_spte_no_[acc_track|dirty_log] APIs.
-- Converged all handle_changed_spte related functions to one place.
-
-v1: https://lore.kernel.org/lkml/20230125213857.824959-1-vipinsh@google.com/
-
-
-Vipin Sharma (7):
-  KVM: x86/mmu: Add a helper function to check if an SPTE needs atomic
-    write
-  KVM: x86/mmu: Atomically clear SPTE dirty state in the clear-dirty-log
-    flow
-  KVM: x86/mmu: Remove "record_dirty_log" in __tdp_mmu_set_spte()
-  KVM: x86/mmu: Optimize SPTE change for aging gfn range
-  KVM: x86/mmu: Remove "record_acc_track" in __tdp_mmu_set_spte()
-  KVM: x86/mmu: Remove handle_changed_spte_dirty_log()
-  KVM: x86/mmu: Merge all handle_changed_pte* functions.
-
- arch/x86/kvm/mmu/tdp_iter.h |  48 ++++++---
- arch/x86/kvm/mmu/tdp_mmu.c  | 190 ++++++++++++------------------------
- 2 files changed, 96 insertions(+), 142 deletions(-)
-
+diff --git a/arch/x86/kvm/mmu/tdp_iter.h b/arch/x86/kvm/mmu/tdp_iter.h
+index f0af385c56e0..c11c5d00b2c1 100644
+--- a/arch/x86/kvm/mmu/tdp_iter.h
++++ b/arch/x86/kvm/mmu/tdp_iter.h
+@@ -29,23 +29,29 @@ static inline void __kvm_tdp_mmu_write_spte(tdp_ptep_t sptep, u64 new_spte)
+ 	WRITE_ONCE(*rcu_dereference(sptep), new_spte);
+ }
+ 
++/*
++ * SPTEs must be modified atomically if they are shadow-present, leaf
++ * SPTEs, and have volatile bits, i.e. has bits that can be set outside
++ * of mmu_lock.  The Writable bit can be set by KVM's fast page fault
++ * handler, and Accessed and Dirty bits can be set by the CPU.
++ *
++ * Note, non-leaf SPTEs do have Accessed bits and those bits are
++ * technically volatile, but KVM doesn't consume the Accessed bit of
++ * non-leaf SPTEs, i.e. KVM doesn't care if it clobbers the bit.  This
++ * logic needs to be reassessed if KVM were to use non-leaf Accessed
++ * bits, e.g. to skip stepping down into child SPTEs when aging SPTEs.
++ */
++static inline bool kvm_tdp_mmu_spte_need_atomic_write(u64 old_spte, int level)
++{
++	return is_shadow_present_pte(old_spte) &&
++	       is_last_spte(old_spte, level) &&
++	       spte_has_volatile_bits(old_spte);
++}
++
+ static inline u64 kvm_tdp_mmu_write_spte(tdp_ptep_t sptep, u64 old_spte,
+ 					 u64 new_spte, int level)
+ {
+-	/*
+-	 * Atomically write the SPTE if it is a shadow-present, leaf SPTE with
+-	 * volatile bits, i.e. has bits that can be set outside of mmu_lock.
+-	 * The Writable bit can be set by KVM's fast page fault handler, and
+-	 * Accessed and Dirty bits can be set by the CPU.
+-	 *
+-	 * Note, non-leaf SPTEs do have Accessed bits and those bits are
+-	 * technically volatile, but KVM doesn't consume the Accessed bit of
+-	 * non-leaf SPTEs, i.e. KVM doesn't care if it clobbers the bit.  This
+-	 * logic needs to be reassessed if KVM were to use non-leaf Accessed
+-	 * bits, e.g. to skip stepping down into child SPTEs when aging SPTEs.
+-	 */
+-	if (is_shadow_present_pte(old_spte) && is_last_spte(old_spte, level) &&
+-	    spte_has_volatile_bits(old_spte))
++	if (kvm_tdp_mmu_spte_need_atomic_write(old_spte, level))
+ 		return kvm_tdp_mmu_write_spte_atomic(sptep, new_spte);
+ 
+ 	__kvm_tdp_mmu_write_spte(sptep, new_spte);
 -- 
 2.39.1.581.gbfd45094c4-goog
 
