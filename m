@@ -2,80 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1ECF269393C
-	for <lists+kvm@lfdr.de>; Sun, 12 Feb 2023 19:02:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1018569393E
+	for <lists+kvm@lfdr.de>; Sun, 12 Feb 2023 19:06:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229671AbjBLSCg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Feb 2023 13:02:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46672 "EHLO
+        id S229522AbjBLSGM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Feb 2023 13:06:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47448 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229472AbjBLSCe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Feb 2023 13:02:34 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 691E4BDE8
-        for <kvm@vger.kernel.org>; Sun, 12 Feb 2023 10:02:33 -0800 (PST)
+        with ESMTP id S229472AbjBLSGK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Feb 2023 13:06:10 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47F0EE043;
+        Sun, 12 Feb 2023 10:06:10 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 1202BB80D3A
-        for <kvm@vger.kernel.org>; Sun, 12 Feb 2023 18:02:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC9EBC433D2;
-        Sun, 12 Feb 2023 18:02:30 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A4E6E60DBD;
+        Sun, 12 Feb 2023 18:06:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C830C433D2;
+        Sun, 12 Feb 2023 18:06:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1676224950;
-        bh=kiGqClpBn0/lm6TTVb5u7EWzWAj7r3/VwIVnED5/rdM=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=r7xmItuyrHb+Ifxbys5qNKXaoI33U+Wn7jmJTGJDFRFaPW9sc5jWHXm9u1l0YRkAi
-         T9aNijzZPfHCTrpUCyMfZ6wUk6vahW/8lN86XFsNrsIH0llMzhq3gkyK2ItT7MYNgb
-         g99tFJTXmHlqI9jagR2nLtt2qyzal9ISDXiibmeNLW1w8b8fEXPhaqWSbYOHlV71AO
-         Cq65UVVi1w8dsVXAOr723xvA6uR/5WjREQQKjY8KFw4tJSsyfW7Kuy20Vrmfb8SFZ3
-         GkxKmEBI8hTl/3nzHd0Z51P12UzL4ialLxp1fcCdjfjul9S5eSm+u3GpXEd4iC8Gfm
-         GJYGe+cOfkXnQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1pRGgG-009lrP-4T;
-        Sun, 12 Feb 2023 18:02:28 +0000
-Date:   Sun, 12 Feb 2023 18:02:26 +0000
-Message-ID: <87h6vqlq31.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Shivam Kumar <shivam.kumar1@nutanix.com>
-Cc:     Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com,
-        james.morse@arm.com, borntraeger@linux.ibm.com, david@redhat.com,
-        kvm@vger.kernel.org, Shaju Abraham <shaju.abraham@nutanix.com>,
-        Manish Mishra <manish.mishra@nutanix.com>,
-        Anurag Madnawat <anurag.madnawat@nutanix.com>
-Subject: Re: [PATCH v7 1/4] KVM: Implement dirty quota-based throttling of vcpus
-In-Reply-To: <4b81ddf6-86ad-ef34-3cec-3fcefc796b1b@nutanix.com>
-References: <20221113170507.208810-1-shivam.kumar1@nutanix.com>
-        <20221113170507.208810-2-shivam.kumar1@nutanix.com>
-        <86zgcpo00m.wl-maz@kernel.org>
-        <18b66b42-0bb4-4b32-e92c-3dce61d8e6a4@nutanix.com>
-        <86mt8iopb7.wl-maz@kernel.org>
-        <dfa49851-da9d-55f8-7dec-73a9cf985713@nutanix.com>
-        <86ilinqi3l.wl-maz@kernel.org>
-        <Y5DvJQWGwYRvlhZz@google.com>
-        <b55b79b1-9c47-960a-860b-b669ed78abc0@nutanix.com>
-        <eafbcd77-aab1-4e82-d53e-1bcc87225549@nutanix.com>
-        <874jtifpg0.wl-maz@kernel.org>
-        <77408d91-655a-6f51-5a3e-258e8ff7c358@nutanix.com>
-        <87r0w6dnor.wl-maz@kernel.org>
-        <4df8b276-595f-1ad7-4ce5-62435ea93032@nutanix.com>
-        <87h6wsdstn.wl-maz@kernel.org>
-        <8b67df9f-7d9e-23f7-f437-5aedbcfa985d@nutanix.com>
-        <200246c2-9690-dabe-279e-13bc9beb711f@nutanix.com>
-        <87k00mlsik.wl-maz@kernel.org>
-        <4b81ddf6-86ad-ef34-3cec-3fcefc796b1b@nutanix.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: shivam.kumar1@nutanix.com, seanjc@google.com, pbonzini@redhat.com, james.morse@arm.com, borntraeger@linux.ibm.com, david@redhat.com, kvm@vger.kernel.org, shaju.abraham@nutanix.com, manish.mishra@nutanix.com, anurag.madnawat@nutanix.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+        s=k20201202; t=1676225169;
+        bh=lp88wKQLqiF3Hiyw44dr0tpOeS79utafc+HLRjWlnYg=;
+        h=Date:From:To:Subject:References:In-Reply-To:From;
+        b=raJG3DXHPsmVeD91Ru+9mmbE/4O4IYRntyJ3WTHhIqt2KY2fmSrEnXz2x5bq8NLps
+         pbLRXwK3BiBMN1LQNpUmZCcOYpPg4GlwJVZGv3W1Etv/r+cmPBQvo/yc5vFInIaF9b
+         Aie6WTLql1XOemrAWDJjniRKO6aD23VkBeEQaZ5XAfmnB9/NOML93vi5Zp3aNbLeA9
+         ykexNiySadnHumXTDovz1HQUOmqPcZYSSJhMLjkIS7tqhzIw7Ea6MPcVJYWuyDJk/L
+         inx7/PxQvnaZ7X3yZ/28faDwVb99ZToMT7ZkoRcFGuHtZ6v5zzyxCZqO26gp2fMHwV
+         UQfnSLYUISkLw==
+Date:   Sun, 12 Feb 2023 18:06:03 +0000
+From:   Conor Dooley <conor@kernel.org>
+To:     Jisheng Zhang <jszhang@kernel.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Heiko Stuebner <heiko@sntech.de>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        Guenter Roeck <linux@roeck-us.net>
+Subject: Re: [PATCH v5 00/13] riscv: improve boot time isa extensions handling
+Message-ID: <Y+kqi8bQE+8hLfOF@spud>
+References: <20230128172856.3814-1-jszhang@kernel.org>
+ <20230212154333.GA3760469@roeck-us.net>
+ <Y+kM//nuDv29Z9qJ@spud>
+ <Y+kU9nDBTttZRLLq@spud>
+ <Y+kcgcncQO/2DNLo@spud>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="GmLjP+yv5qcdEtuf"
+Content-Disposition: inline
+In-Reply-To: <Y+kcgcncQO/2DNLo@spud>
 X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
@@ -85,55 +66,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 12 Feb 2023 17:54:30 +0000,
-Shivam Kumar <shivam.kumar1@nutanix.com> wrote:
-> 
-> 
-> 
-> On 12/02/23 10:39 pm, Marc Zyngier wrote:
-> > On Sat, 11 Feb 2023 06:52:02 +0000,
-> > Shivam Kumar <shivam.kumar1@nutanix.com> wrote:
-> >> 
-> >>> 
-> >>> Hi Marc,
-> >>> 
-> >>> I'm proposing this new implementation to address the concern you
-> >>> raised regarding dirty quota being a non-generic feature with the
-> >>> previous implementation. This implementation decouples dirty quota
-> >>> from dirty logging for the ARM64 arch. We shall post a similar
-> >>> implementation for x86 if this looks good. With this new
-> >>> implementation, dirty quota can be enforced independent of dirty
-> >>> logging. Dirty quota is now in bytes and
-> >> 
-> >> Hi Marc,
-> >> 
-> >> Thank you for your valuable feedback so far. Looking forward to your
-> >> feedback on this new proposition.
-> > 
-> > I'm not sure what you are expecting from me here. I've explained in
-> > great details what I wanted to see, repeatedly. This above says
-> > nothing other than "we are going to do *something* that matches your
-> > expectations".
-> > 
-> > My answer is, to quote someone else, "show me the code". Until then, I
-> > don't have much to add.
-> > 
-> > Thanks,
-> > 
-> > 	M.
-> > 
-> 
-> Hi Marc,
-> 
-> I had posted some code in the previous comment. Let me tag you there.
 
-You posted a tiny snippet that is completely out of context.
+--GmLjP+yv5qcdEtuf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I took the time to fully review your series and provide extensive
-comments. You could, similarly, take the time to post a complete
-series for people to review the new proposal.
+On Sun, Feb 12, 2023 at 05:06:09PM +0000, Conor Dooley wrote:
+> On Sun, Feb 12, 2023 at 04:33:58PM +0000, Conor Dooley wrote:
+> > On Sun, Feb 12, 2023 at 03:59:59PM +0000, Conor Dooley wrote:
+>=20
+> So as not to lead anyone up the garden path, let me correct myself:
+>=20
+> > Hmm, so this appears to be us attempting to patch in alternatives where
+> > none actually exists - seemingly F & D.
+>=20
+> And of course that's not true, riscv_has_extension_likely() now uses
+> alternatives as of:
+> bdda5d554e43 ("riscv: introduce riscv_has_extension_[un]likely()")
+>=20
+> From a quick look, it just happens that the only users are F & D.
+>=20
 
-	M.
+Samuel pointed out that this is a lockdep splat on irc.
+There's a patch on the list that removes the lockdep annotation
+entirely:
+https://patchwork.kernel.org/project/linux-riscv/patch/20230202114116.36957=
+93-1-changbin.du@huawei.com/
 
--- 
-Without deviation from the norm, progress is not possible.
+So ye, no surprises that it was config based!
+
+Palmer posted a "better" fix for that lockdep warning a while ago:
+https://lore.kernel.org/all/20220322022331.32136-1-palmer@rivosinc.com/
+
+So we'd have to duplicate/reuse that for cpufeature/errata patching.
+
+
+
+--GmLjP+yv5qcdEtuf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCY+kqiwAKCRB4tDGHoIJi
+0vcsAQDNCg9J+6Vcsh5GKfX2XL35m7Wf0yDTU5M28FIiLYqBUgEAshGaQIbqzGuw
+8lC8srYQoSDY+hH/TPM6ZvHj9k1AqQY=
+=Vm7y
+-----END PGP SIGNATURE-----
+
+--GmLjP+yv5qcdEtuf--
