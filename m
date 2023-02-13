@@ -2,167 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 468B7694015
-	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 09:55:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 534D9694028
+	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 09:58:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230160AbjBMIzp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Feb 2023 03:55:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55996 "EHLO
+        id S230144AbjBMI6N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Feb 2023 03:58:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230151AbjBMIza (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Feb 2023 03:55:30 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1924713519;
-        Mon, 13 Feb 2023 00:55:27 -0800 (PST)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31D8ROB0005608;
-        Mon, 13 Feb 2023 08:55:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : content-transfer-encoding
- : mime-version; s=pp1; bh=vc5bnivazqi4IuLKE4LfqGEDmEbxQU26YsrWUeGFmZ8=;
- b=Azihh8ljpkXhq0KW9EHGUVFiBXlGFDPiVGXM6y80/QLExQMJpNQSVvfHL53k2c6QPeM6
- u0xpfq2UiYx+c6NO/wmiFEf2tHeAGsdcvYzKjuTnQNC5efV9US2dLADdRmC/9efM/wr7
- +3KLi4JeVOHoWLXqjsfwd1MgpIR2yG/cCuZuCqF+JXSG8SYesM2nz7k0IQF1MN/iKloH
- FIFdiyYP4cqs7qOlU+1Ld5nGaG7kIhf3H8bfXgJoUfdeFRPnmB8LFg/9M7DllgUri7X/
- m25LbSu0pOMrKn7QeGxn039/1t0X4EOFkYBUI/DOOMJ2iTQcc8tEI28oIOEhSEqDPT2W gg== 
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nqhqa8jmn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Feb 2023 08:55:25 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31D1mR6r021570;
-        Mon, 13 Feb 2023 08:55:24 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3np2n6hsnf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Feb 2023 08:55:24 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31D8tKYQ41419110
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 13 Feb 2023 08:55:20 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AFCBE20043;
-        Mon, 13 Feb 2023 08:55:20 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7C9C72004B;
-        Mon, 13 Feb 2023 08:55:20 +0000 (GMT)
-Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 13 Feb 2023 08:55:20 +0000 (GMT)
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     borntraeger@linux.ibm.com, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: [PATCH v3 1/1] KVM: s390: pv: fix external interruption loop not always detected
-Date:   Mon, 13 Feb 2023 09:55:20 +0100
-Message-Id: <20230213085520.100756-2-nrb@linux.ibm.com>
-X-Mailer: git-send-email 2.39.1
-In-Reply-To: <20230213085520.100756-1-nrb@linux.ibm.com>
-References: <20230213085520.100756-1-nrb@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: SEYn8seTjyw7lwfnEocWaM2Uab3uIPnc
-X-Proofpoint-ORIG-GUID: SEYn8seTjyw7lwfnEocWaM2Uab3uIPnc
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S229711AbjBMI6M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Feb 2023 03:58:12 -0500
+Received: from mail-vk1-xa2f.google.com (mail-vk1-xa2f.google.com [IPv6:2607:f8b0:4864:20::a2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87EEF13D40
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 00:58:03 -0800 (PST)
+Received: by mail-vk1-xa2f.google.com with SMTP id v189so5894709vkf.6
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 00:58:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=JvcbLvXxozu2YBfWqtS3HpY4TsoHNMWTjV1ENQbL6no=;
+        b=e+SnJBd7R6UCjkchzm722hGlca5ssCKYt6muIwH/ewMqaRPlLJLLUtYVgHY3hkisMH
+         XqxALcsEvd/oTocKZOurAlWGJWzipVyPNet5R342X/0zb2LNbEqXPKVhRx6YeNN/AiCq
+         dfxuykZkh0m0fpwclYce3W5cp1tWxL6Cq9dA5tlMAnTMGoeStAIos1o9PbuVN5lZET4N
+         J3Od4e2efXZHpsOK0WQ/uiKU7oPCkMnT//da5f7gDTsRFwKQDOE1bZCCKS/JY6jcdias
+         NU8jcsHWh4WUAYGmqJ2mwMWMyLe1/qT43VlJH9K0G9cEH/6B7ARyk94piW82PqcdJ69v
+         8FZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JvcbLvXxozu2YBfWqtS3HpY4TsoHNMWTjV1ENQbL6no=;
+        b=egsENnBzWqoBb8FTFrIIJJVlJ+a04ML3QV+92yviIq5yVp18p8V1IajVGpB4WugSwy
+         ZLIVZY6IsxUwo06Bc0139vn4ipYYt+rUVjX2mV2ZbOZSjd+b6bQE07NQrJwxKnQjUYVX
+         2H9nrvtG7SzFvMkwtW/bUDytA8H7oT1JJRYfB5ig7d2SDEmeXTDWLKQejdRjD9PAZEbt
+         QtJAIVU28BKeQq/0E28SxfzLDneBVnSNgOEQ4qE2RWtT8wvmcQo47gJanLNobIk2yU9I
+         k+rlFXm0XjYEdbYDnHkFklvP7yUW2Iz0wsGuZMe+RtrH/fbfcimWgM9NqXBxwLON2AuP
+         lMPQ==
+X-Gm-Message-State: AO0yUKUU6/XSKiQR6KDuhCAh/4cAVOKrVfH9ZuvOmS6UwWg+AMe7NrES
+        tpJle4ZxPhf36/tlHlmwsHHwczC7n2zlYhDGhucb4w==
+X-Google-Smtp-Source: AK7set+k9jHV1zZeMhMGfI+qFlT1skoTcqVhkLvBYefS8ZKb8HrJl9hf5iOD1WTp23SCqhyFAMa7yt0/9K3YxJf5aiw=
+X-Received: by 2002:a1f:2c15:0:b0:400:f6da:4a05 with SMTP id
+ s21-20020a1f2c15000000b00400f6da4a05mr3239718vks.22.1676278682425; Mon, 13
+ Feb 2023 00:58:02 -0800 (PST)
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
- definitions=2023-02-13_04,2023-02-09_03,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- impostorscore=0 clxscore=1015 mlxscore=0 lowpriorityscore=0 phishscore=0
- spamscore=0 priorityscore=1501 mlxlogscore=999 adultscore=0 malwarescore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302130076
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <000000000000279ebd05f05cc339@google.com> <0000000000000b3f7405f48c0ad6@google.com>
+In-Reply-To: <0000000000000b3f7405f48c0ad6@google.com>
+From:   Eric Dumazet <edumazet@google.com>
+Date:   Mon, 13 Feb 2023 09:57:51 +0100
+Message-ID: <CANn89iJKYT6htHFgZLvVLkq=21CapD1YMwn2q+4Xh8B=OviVag@mail.gmail.com>
+Subject: Re: [syzbot] INFO: trying to register non-static key in __timer_delete_sync
+To:     syzbot <syzbot+1e164be619b690a43d79@syzkaller.appspotmail.com>
+Cc:     davem@davemloft.net, deshantm@xen.org, jhs@mojatatu.com,
+        jiri@resnulli.us, kuba@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        pabeni@redhat.com, pbonzini@redhat.com,
+        syzkaller-bugs@googlegroups.com, xiyou.wangcong@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-15.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SORTED_RECIPS,SPF_HELO_NONE,
+        SPF_PASS,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To determine whether the guest has caused an external interruption loop
-upon code 20 (external interrupt) intercepts, the ext_new_psw needs to
-be inspected to see whether external interrupts are enabled.
+On Mon, Feb 13, 2023 at 3:59 AM syzbot
+<syzbot+1e164be619b690a43d79@syzkaller.appspotmail.com> wrote:
+>
+> syzbot has found a reproducer for the following issue on:
+>
+> HEAD commit:    75da437a2f17 Merge branch '40GbE' of git://git.kernel.org/..
+> git tree:       net-next
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=179ffde0c80000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=6e5fc864153bbc8c
+> dashboard link: https://syzkaller.appspot.com/bug?extid=1e164be619b690a43d79
+> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12d2dfb7480000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13a81a07480000
+>
 
-Under non-PV, ext_new_psw can simply be taken from guest lowcore. Under
-PV, KVM can only access the encrypted guest lowcore and hence the
-ext_new_psw must not be taken from guest lowcore.
+Probably a dup
 
-handle_external_interrupt() incorrectly did that and hence was not able
-to reliably tell whether an external interruption loop is happening or
-not. False negatives cause spurious failures of my kvm-unit-test
-for extint loops[1] under PV.
+patch under review :
+https://patchwork.kernel.org/project/netdevbpf/patch/20230210152605.1852743-1-edumazet@google.com/
 
-Since code 20 is only caused under PV if and only if the guest's
-ext_new_psw is enabled for external interrupts, false positive detection
-of a external interruption loop can not happen.
+#syz dup: BUG: unable to handle kernel paging request in atm_tc_destroy
 
-Fix this issue by instead looking at the guest PSW in the state
-description. Since the PSW swap for external interrupt is done by the
-ultravisor before the intercept is caused, this reliably tells whether
-the guest is enabled for external interrupts in the ext_new_psw.
-
-Also update the comments to explain better what is happening.
-
-[1] https://lore.kernel.org/kvm/20220812062151.1980937-4-nrb@linux.ibm.com/
-
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
----
- arch/s390/kvm/intercept.c | 32 ++++++++++++++++++++++++--------
- 1 file changed, 24 insertions(+), 8 deletions(-)
-
-diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
-index 0ee02dae14b2..2cda8d9d7c6e 100644
---- a/arch/s390/kvm/intercept.c
-+++ b/arch/s390/kvm/intercept.c
-@@ -271,10 +271,18 @@ static int handle_prog(struct kvm_vcpu *vcpu)
-  * handle_external_interrupt - used for external interruption interceptions
-  * @vcpu: virtual cpu
-  *
-- * This interception only occurs if the CPUSTAT_EXT_INT bit was set, or if
-- * the new PSW does not have external interrupts disabled. In the first case,
-- * we've got to deliver the interrupt manually, and in the second case, we
-- * drop to userspace to handle the situation there.
-+ * This interception occurs if:
-+ * - the CPUSTAT_EXT_INT bit was already set when the external interrupt
-+ *   occurred. In this case, the interrupt needs to be injected manually to
-+ *   preserve interrupt priority.
-+ * - the external new PSW has external interrupts enabled, which will cause an
-+ *   interruption loop. We drop to userspace in this case.
-+ *
-+ * The latter case can be detected by inspecting the external mask bit in the
-+ * external new psw.
-+ *
-+ * Under PV, only the latter case can occur, since interrupt priorities are
-+ * handled in the ultravisor.
-  */
- static int handle_external_interrupt(struct kvm_vcpu *vcpu)
- {
-@@ -285,10 +293,18 @@ static int handle_external_interrupt(struct kvm_vcpu *vcpu)
- 
- 	vcpu->stat.exit_external_interrupt++;
- 
--	rc = read_guest_lc(vcpu, __LC_EXT_NEW_PSW, &newpsw, sizeof(psw_t));
--	if (rc)
--		return rc;
--	/* We can not handle clock comparator or timer interrupt with bad PSW */
-+	if (kvm_s390_pv_cpu_is_protected(vcpu)) {
-+		newpsw = vcpu->arch.sie_block->gpsw;
-+	} else {
-+		rc = read_guest_lc(vcpu, __LC_EXT_NEW_PSW, &newpsw, sizeof(psw_t));
-+		if (rc)
-+			return rc;
-+	}
-+
-+	/*
-+	 * Clock comparator or timer interrupt with external interrupt enabled
-+	 * will cause interrupt loop. Drop to userspace.
-+	 */
- 	if ((eic == EXT_IRQ_CLK_COMP || eic == EXT_IRQ_CPU_TIMER) &&
- 	    (newpsw.mask & PSW_MASK_EXT))
- 		return -EOPNOTSUPP;
--- 
-2.39.1
-
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/1ee7fdbb5171/disk-75da437a.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/74233a046cf5/vmlinux-75da437a.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/a59b1d7b14b0/bzImage-75da437a.xz
+>
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+1e164be619b690a43d79@syzkaller.appspotmail.com
+>
+> INFO: trying to register non-static key.
+> The code is fine but needs lockdep annotation, or maybe
+> you didn't initialize this object before use?
+> turning off the locking correctness validator.
+> CPU: 0 PID: 5075 Comm: syz-executor387 Not tainted 6.2.0-rc7-syzkaller-01590-g75da437a2f17 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/21/2023
+> Call Trace:
+>  <TASK>
+>  __dump_stack lib/dump_stack.c:88 [inline]
+>  dump_stack_lvl+0xd1/0x138 lib/dump_stack.c:106
+>  assign_lock_key kernel/locking/lockdep.c:981 [inline]
+>  register_lock_class+0xf1b/0x1120 kernel/locking/lockdep.c:1294
+>  __lock_acquire+0x109/0x56d0 kernel/locking/lockdep.c:4934
+>  lock_acquire kernel/locking/lockdep.c:5668 [inline]
+>  lock_acquire+0x1e3/0x630 kernel/locking/lockdep.c:5633
+>  __timer_delete_sync+0x5d/0x1c0 kernel/time/timer.c:1555
+>  del_timer_sync include/linux/timer.h:200 [inline]
+>  sfq_destroy+0x82/0x140 net/sched/sch_sfq.c:725
+>  qdisc_create+0xaca/0x1150 net/sched/sch_api.c:1329
+>  tc_modify_qdisc+0x488/0x19c0 net/sched/sch_api.c:1679
+>  rtnetlink_rcv_msg+0x43e/0xca0 net/core/rtnetlink.c:6174
+>  netlink_rcv_skb+0x165/0x440 net/netlink/af_netlink.c:2574
+>  netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
+>  netlink_unicast+0x547/0x7f0 net/netlink/af_netlink.c:1365
+>  netlink_sendmsg+0x91b/0xe10 net/netlink/af_netlink.c:1942
+>  sock_sendmsg_nosec net/socket.c:722 [inline]
+>  sock_sendmsg+0xde/0x190 net/socket.c:745
+>  ____sys_sendmsg+0x71c/0x900 net/socket.c:2501
+>  ___sys_sendmsg+0x110/0x1b0 net/socket.c:2555
+>  __sys_sendmsg+0xf7/0x1c0 net/socket.c:2584
+>  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+>  do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+>  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> RIP: 0033:0x7fcf276b9e69
+> Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007ffdba938b58 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fcf276b9e69
+> RDX: 0000000000000000 RSI: 0000000020000000 RDI: 0000000000000003
+> RBP: 00007fcf2767e010 R08: 0000000000000001 R09: 0000000000000000
+> R10: 0000000000000002 R11: 0000000000000246 R12: 00007fcf2767e0a0
+> R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+>  </TASK>
+> ------------[ cut here ]------------
+> ODEBUG: assert_init not available (active state 0) object: ffff88802ba73540 object type: timer_list hint: 0x0
+> WARNING: CPU: 0 PID: 5075 at lib/debugobjects.c:509 debug_print_object+0x194/0x2c0 lib/debugobjects.c:509
+> Modules linked in:
+> CPU: 0 PID: 5075 Comm: syz-executor387 Not tainted 6.2.0-rc7-syzkaller-01590-g75da437a2f17 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/21/2023
+> RIP: 0010:debug_print_object+0x194/0x2c0 lib/debugobjects.c:509
+> Code: df 48 89 fe 48 c1 ee 03 80 3c 16 00 0f 85 c7 00 00 00 48 8b 14 dd a0 d1 a6 8a 50 4c 89 ee 48 c7 c7 60 c5 a6 8a e8 56 68 b4 05 <0f> 0b 58 83 05 ee 4c 64 0a 01 48 83 c4 20 5b 5d 41 5c 41 5d 41 5e
+> RSP: 0018:ffffc90003b5f210 EFLAGS: 00010286
+> RAX: 0000000000000000 RBX: 0000000000000005 RCX: 0000000000000000
+> RDX: ffff888020570000 RSI: ffffffff8166195c RDI: fffff5200076be34
+> RBP: 0000000000000001 R08: 0000000000000005 R09: 0000000000000000
+> R10: 0000000080000000 R11: 203a47554245444f R12: ffffffff8a4ea980
+> R13: ffffffff8aa6cc00 R14: ffffc90003b5f2c8 R15: ffffffff816f9ff0
+> FS:  00005555573c4300(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00000000004585c0 CR3: 00000000299a3000 CR4: 00000000003506f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>  debug_object_assert_init lib/debugobjects.c:899 [inline]
+>  debug_object_assert_init+0x1f8/0x2e0 lib/debugobjects.c:870
+>  debug_timer_assert_init kernel/time/timer.c:792 [inline]
+>  debug_assert_init kernel/time/timer.c:837 [inline]
+>  __try_to_del_timer_sync+0x72/0x160 kernel/time/timer.c:1412
+>  __timer_delete_sync+0x144/0x1c0 kernel/time/timer.c:1573
+>  del_timer_sync include/linux/timer.h:200 [inline]
+>  sfq_destroy+0x82/0x140 net/sched/sch_sfq.c:725
+>  qdisc_create+0xaca/0x1150 net/sched/sch_api.c:1329
+>  tc_modify_qdisc+0x488/0x19c0 net/sched/sch_api.c:1679
+>  rtnetlink_rcv_msg+0x43e/0xca0 net/core/rtnetlink.c:6174
+>  netlink_rcv_skb+0x165/0x440 net/netlink/af_netlink.c:2574
+>  netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
+>  netlink_unicast+0x547/0x7f0 net/netlink/af_netlink.c:1365
+>  netlink_sendmsg+0x91b/0xe10 net/netlink/af_netlink.c:1942
+>  sock_sendmsg_nosec net/socket.c:722 [inline]
+>  sock_sendmsg+0xde/0x190 net/socket.c:745
+>  ____sys_sendmsg+0x71c/0x900 net/socket.c:2501
+>  ___sys_sendmsg+0x110/0x1b0 net/socket.c:2555
+>  __sys_sendmsg+0xf7/0x1c0 net/socket.c:2584
+>  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+>  do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+>  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> RIP: 0033:0x7fcf276b9e69
+> Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007ffdba938b58 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fcf276b9e69
+> RDX: 0000000000000000 RSI: 0000000020000000 RDI: 0000000000000003
+> RBP: 00007fcf2767e010 R08: 0000000000000001 R09: 0000000000000000
+> R10: 0000000000000002 R11: 0000000000000246 R12: 00007fcf2767e0a0
+> R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+>  </TASK>
+>
