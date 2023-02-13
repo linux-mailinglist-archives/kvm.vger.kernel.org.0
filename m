@@ -2,172 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 55339693CB5
-	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 03:59:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B7D18693CCB
+	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 04:09:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229911AbjBMC7r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Feb 2023 21:59:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32878 "EHLO
+        id S229751AbjBMDJu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Feb 2023 22:09:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229584AbjBMC7q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Feb 2023 21:59:46 -0500
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E1231726
-        for <kvm@vger.kernel.org>; Sun, 12 Feb 2023 18:59:45 -0800 (PST)
-Received: by mail-il1-f207.google.com with SMTP id n18-20020a056e02101200b0030f2b79c2ffso8630138ilj.20
-        for <kvm@vger.kernel.org>; Sun, 12 Feb 2023 18:59:45 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nVbpwsZ8idQJQq6UD9xpDfZ0G3KIwPvSO7fNS4TbW3Y=;
-        b=eMeNn08KMqTyY1SL8+zFOfR4fabGJoNiLy1S04km6SUmQJDoFbcGxyfveCZg7YzqKm
-         WP9mDW/vbp5A/TmXonw6tllf57l422Vz6cCgaob0yi9+M6VHLkatTjUYbY0kLR2f4qV6
-         /P/ldd1DYTrpqH++D5VGY8vqPDJWAlcYqE9EryQW0UCPSlYSQRZTilaDVhuWIvMmM8Ue
-         EjKgWyvbB0OdTZ+XFPMX5ddy7iDa318xm90DZJAMapO/qs0GU9HoRyqD2457OE5XAYPp
-         scAUn87YbahzC0QeKVbMRKPwVsNxxjNm42zbAxOamSRScC67er4sUMofkwnxNbR9vtPq
-         6RUQ==
-X-Gm-Message-State: AO0yUKULUS85v2BRwt4BgLFA/XwKf5cTGARtVzM49+rndz8xfj7jrJ6Z
-        X8vsEbXmB3m5CtgGvh6lKgtuDoA7ScxYDqBJHa2fi7lOYu/2
-X-Google-Smtp-Source: AK7set8V8SYpHfBzjrYKJ1gCBvsI/62QzM6SnvGgsus/S61l/Q77wFpgwTEecvbRLIMBTzTBNhqaZGcHhUBDaB80pgp9OFbNucE8
+        with ESMTP id S229804AbjBMDJs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Feb 2023 22:09:48 -0500
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BD31D53A;
+        Sun, 12 Feb 2023 19:09:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1676257788; x=1707793788;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Mx8hjkquFcdwVnwjv95J9hNvyTNxMHzbXHuu8sq9qEI=;
+  b=SmoTw1dyhECTZjl7kgKjJ42qcuiUYf1ySvGAYzeC2CAQnWU+ji0YLWJV
+   Xci9dC1f0HK6zXb3xNMlMmNQ6zzbFkIK1eqKpEc20i19LFVm3FklftUFL
+   jX5ZMebn+pLWIs1s660xHo4cP51zy1m5egQP5pZLqjCL2sf0a9KQJdRY+
+   6EiuCQYlIm3UXf7fQsdXFg1I0JNKwgG6UbQyJ5ZgBM5jor38gIkgjTG5t
+   A+CjZC0RSNcem1kXYrvXeBsdupaz4QyYd1YtX9ASiXVgGAUFY4/uonmBd
+   q8hjdM3aB77aQ4SGLMLaBtKp7pMNKQcZYY+paShX7CqgSg+7+xHTlVQiK
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10619"; a="329424705"
+X-IronPort-AV: E=Sophos;i="5.97,291,1669104000"; 
+   d="scan'208";a="329424705"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2023 19:09:46 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10619"; a="842621921"
+X-IronPort-AV: E=Sophos;i="5.97,291,1669104000"; 
+   d="scan'208";a="842621921"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.254.214.18]) ([10.254.214.18])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2023 19:09:41 -0800
+Message-ID: <0581875e-f0af-582e-82fb-62cf03ba39b2@linux.intel.com>
+Date:   Mon, 13 Feb 2023 11:09:39 +0800
 MIME-Version: 1.0
-X-Received: by 2002:a02:cccb:0:b0:3b1:acaf:d5b2 with SMTP id
- k11-20020a02cccb000000b003b1acafd5b2mr10741897jaq.98.1676257184659; Sun, 12
- Feb 2023 18:59:44 -0800 (PST)
-Date:   Sun, 12 Feb 2023 18:59:44 -0800
-In-Reply-To: <000000000000279ebd05f05cc339@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000000b3f7405f48c0ad6@google.com>
-Subject: Re: [syzbot] INFO: trying to register non-static key in __timer_delete_sync
-From:   syzbot <syzbot+1e164be619b690a43d79@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, deshantm@xen.org, edumazet@google.com,
-        jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, pabeni@redhat.com, pbonzini@redhat.com,
-        syzkaller-bugs@googlegroups.com, xiyou.wangcong@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,SORTED_RECIPS,
-        SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.2
+Subject: Re: [PATCH 2/6] iommu/vt-d: Implement hw_info for iommu capability
+ query
+To:     Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org,
+        alex.williamson@redhat.com, jgg@nvidia.com, kevin.tian@intel.com,
+        robin.murphy@arm.com
+Cc:     cohuck@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
+        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        baolu.lu@linux.intel.com
+References: <20230209041642.9346-1-yi.l.liu@intel.com>
+ <20230209041642.9346-3-yi.l.liu@intel.com>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20230209041642.9346-3-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-syzbot has found a reproducer for the following issue on:
 
-HEAD commit:    75da437a2f17 Merge branch '40GbE' of git://git.kernel.org/..
-git tree:       net-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=179ffde0c80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6e5fc864153bbc8c
-dashboard link: https://syzkaller.appspot.com/bug?extid=1e164be619b690a43d79
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12d2dfb7480000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13a81a07480000
+On 2/9/2023 12:16 PM, Yi Liu wrote:
+> From: Lu Baolu <baolu.lu@linux.intel.com>
+>
+> To support nested translation in the userspace, it should check the
+> underlying hardware information for the capabilities.
+>
+> Add intel_iommu_hw_info() to report cap_reg and ecap_reg information.
+>
+> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
+> Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
+> ---
+>   drivers/iommu/intel/iommu.c  | 19 +++++++++++++++++++
+>   drivers/iommu/intel/iommu.h  |  1 +
+>   include/uapi/linux/iommufd.h | 21 +++++++++++++++++++++
+>   3 files changed, 41 insertions(+)
+>
+> diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
+> index 59df7e42fd53..929f600cc350 100644
+> --- a/drivers/iommu/intel/iommu.c
+> +++ b/drivers/iommu/intel/iommu.c
+> @@ -4760,8 +4760,26 @@ static void intel_iommu_remove_dev_pasid(struct device *dev, ioasid_t pasid)
+>   	intel_pasid_tear_down_entry(iommu, dev, pasid, false);
+>   }
+>   
+> +static void *intel_iommu_hw_info(struct device *dev, u32 *length)
+> +{
+> +	struct device_domain_info *info = dev_iommu_priv_get(dev);
+> +	struct intel_iommu *iommu = info->iommu;
+> +	struct iommu_device_info_vtd *vtd;
+> +
+> +	vtd = kzalloc(sizeof(*vtd), GFP_KERNEL);
+> +	if (!vtd)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	vtd->cap_reg = iommu->cap;
+> +	vtd->ecap_reg = iommu->ecap;
+> +	*length = sizeof(*vtd);
+> +
+> +	return vtd;
+> +}
+> +
+>   const struct iommu_ops intel_iommu_ops = {
+>   	.capable		= intel_iommu_capable,
+> +	.hw_info		= intel_iommu_hw_info,
+>   	.domain_alloc		= intel_iommu_domain_alloc,
+>   	.probe_device		= intel_iommu_probe_device,
+>   	.probe_finalize		= intel_iommu_probe_finalize,
+> @@ -4774,6 +4792,7 @@ const struct iommu_ops intel_iommu_ops = {
+>   	.def_domain_type	= device_def_domain_type,
+>   	.remove_dev_pasid	= intel_iommu_remove_dev_pasid,
+>   	.pgsize_bitmap		= SZ_4K,
+> +	.driver_type		= IOMMU_DEVICE_DATA_INTEL_VTD,
+>   #ifdef CONFIG_INTEL_IOMMU_SVM
+>   	.page_response		= intel_svm_page_response,
+>   #endif
+> diff --git a/drivers/iommu/intel/iommu.h b/drivers/iommu/intel/iommu.h
+> index 06e61e474856..2e70265d4ceb 100644
+> --- a/drivers/iommu/intel/iommu.h
+> +++ b/drivers/iommu/intel/iommu.h
+> @@ -22,6 +22,7 @@
+>   #include <linux/ioasid.h>
+>   #include <linux/bitfield.h>
+>   #include <linux/xarray.h>
+> +#include <uapi/linux/iommufd.h>
+>   
+>   #include <asm/cacheflush.h>
+>   #include <asm/iommu.h>
+> diff --git a/include/uapi/linux/iommufd.h b/include/uapi/linux/iommufd.h
+> index 2309edb55028..fda75c8450ee 100644
+> --- a/include/uapi/linux/iommufd.h
+> +++ b/include/uapi/linux/iommufd.h
+> @@ -347,7 +347,28 @@ struct iommu_vfio_ioas {
+>   
+>   /**
+>    * enum iommu_device_data_type - IOMMU hardware Data types
+> + * @IOMMU_DEVICE_DATA_INTEL_VTD: Intel VT-d iommu data type
+>    */
+>   enum iommu_device_data_type {
+> +	IOMMU_DEVICE_DATA_INTEL_VTD = 1,
+> +};
+> +
+> +/**
+> + * struct iommu_device_info_vtd - Intel VT-d device info
+> + *
+> + * @flags: Must be set to 0
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/1ee7fdbb5171/disk-75da437a.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/74233a046cf5/vmlinux-75da437a.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/a59b1d7b14b0/bzImage-75da437a.xz
+Could you add more description about the usage of flags here?
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+1e164be619b690a43d79@syzkaller.appspotmail.com
 
-INFO: trying to register non-static key.
-The code is fine but needs lockdep annotation, or maybe
-you didn't initialize this object before use?
-turning off the locking correctness validator.
-CPU: 0 PID: 5075 Comm: syz-executor387 Not tainted 6.2.0-rc7-syzkaller-01590-g75da437a2f17 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/21/2023
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xd1/0x138 lib/dump_stack.c:106
- assign_lock_key kernel/locking/lockdep.c:981 [inline]
- register_lock_class+0xf1b/0x1120 kernel/locking/lockdep.c:1294
- __lock_acquire+0x109/0x56d0 kernel/locking/lockdep.c:4934
- lock_acquire kernel/locking/lockdep.c:5668 [inline]
- lock_acquire+0x1e3/0x630 kernel/locking/lockdep.c:5633
- __timer_delete_sync+0x5d/0x1c0 kernel/time/timer.c:1555
- del_timer_sync include/linux/timer.h:200 [inline]
- sfq_destroy+0x82/0x140 net/sched/sch_sfq.c:725
- qdisc_create+0xaca/0x1150 net/sched/sch_api.c:1329
- tc_modify_qdisc+0x488/0x19c0 net/sched/sch_api.c:1679
- rtnetlink_rcv_msg+0x43e/0xca0 net/core/rtnetlink.c:6174
- netlink_rcv_skb+0x165/0x440 net/netlink/af_netlink.c:2574
- netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
- netlink_unicast+0x547/0x7f0 net/netlink/af_netlink.c:1365
- netlink_sendmsg+0x91b/0xe10 net/netlink/af_netlink.c:1942
- sock_sendmsg_nosec net/socket.c:722 [inline]
- sock_sendmsg+0xde/0x190 net/socket.c:745
- ____sys_sendmsg+0x71c/0x900 net/socket.c:2501
- ___sys_sendmsg+0x110/0x1b0 net/socket.c:2555
- __sys_sendmsg+0xf7/0x1c0 net/socket.c:2584
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7fcf276b9e69
-Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffdba938b58 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fcf276b9e69
-RDX: 0000000000000000 RSI: 0000000020000000 RDI: 0000000000000003
-RBP: 00007fcf2767e010 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000002 R11: 0000000000000246 R12: 00007fcf2767e0a0
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
-------------[ cut here ]------------
-ODEBUG: assert_init not available (active state 0) object: ffff88802ba73540 object type: timer_list hint: 0x0
-WARNING: CPU: 0 PID: 5075 at lib/debugobjects.c:509 debug_print_object+0x194/0x2c0 lib/debugobjects.c:509
-Modules linked in:
-CPU: 0 PID: 5075 Comm: syz-executor387 Not tainted 6.2.0-rc7-syzkaller-01590-g75da437a2f17 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/21/2023
-RIP: 0010:debug_print_object+0x194/0x2c0 lib/debugobjects.c:509
-Code: df 48 89 fe 48 c1 ee 03 80 3c 16 00 0f 85 c7 00 00 00 48 8b 14 dd a0 d1 a6 8a 50 4c 89 ee 48 c7 c7 60 c5 a6 8a e8 56 68 b4 05 <0f> 0b 58 83 05 ee 4c 64 0a 01 48 83 c4 20 5b 5d 41 5c 41 5d 41 5e
-RSP: 0018:ffffc90003b5f210 EFLAGS: 00010286
-RAX: 0000000000000000 RBX: 0000000000000005 RCX: 0000000000000000
-RDX: ffff888020570000 RSI: ffffffff8166195c RDI: fffff5200076be34
-RBP: 0000000000000001 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000080000000 R11: 203a47554245444f R12: ffffffff8a4ea980
-R13: ffffffff8aa6cc00 R14: ffffc90003b5f2c8 R15: ffffffff816f9ff0
-FS:  00005555573c4300(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00000000004585c0 CR3: 00000000299a3000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- debug_object_assert_init lib/debugobjects.c:899 [inline]
- debug_object_assert_init+0x1f8/0x2e0 lib/debugobjects.c:870
- debug_timer_assert_init kernel/time/timer.c:792 [inline]
- debug_assert_init kernel/time/timer.c:837 [inline]
- __try_to_del_timer_sync+0x72/0x160 kernel/time/timer.c:1412
- __timer_delete_sync+0x144/0x1c0 kernel/time/timer.c:1573
- del_timer_sync include/linux/timer.h:200 [inline]
- sfq_destroy+0x82/0x140 net/sched/sch_sfq.c:725
- qdisc_create+0xaca/0x1150 net/sched/sch_api.c:1329
- tc_modify_qdisc+0x488/0x19c0 net/sched/sch_api.c:1679
- rtnetlink_rcv_msg+0x43e/0xca0 net/core/rtnetlink.c:6174
- netlink_rcv_skb+0x165/0x440 net/netlink/af_netlink.c:2574
- netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
- netlink_unicast+0x547/0x7f0 net/netlink/af_netlink.c:1365
- netlink_sendmsg+0x91b/0xe10 net/netlink/af_netlink.c:1942
- sock_sendmsg_nosec net/socket.c:722 [inline]
- sock_sendmsg+0xde/0x190 net/socket.c:745
- ____sys_sendmsg+0x71c/0x900 net/socket.c:2501
- ___sys_sendmsg+0x110/0x1b0 net/socket.c:2555
- __sys_sendmsg+0xf7/0x1c0 net/socket.c:2584
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7fcf276b9e69
-Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffdba938b58 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fcf276b9e69
-RDX: 0000000000000000 RSI: 0000000020000000 RDI: 0000000000000003
-RBP: 00007fcf2767e010 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000002 R11: 0000000000000246 R12: 00007fcf2767e0a0
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
-
+> + * @__reserved: Must be 0
+> + * @cap_reg: Value of Intel VT-d capability register defined in chapter
+> + *	     11.4.2 of Intel VT-d spec.
+> + * @ecap_reg: Value of Intel VT-d capability register defined in chapter
+> + *	     11.4.3 of Intel VT-d spec.
+> + *
+> + * Intel hardware iommu capability.
+> + */
+> +struct iommu_device_info_vtd {
+> +	__u32 flags;
+> +	__u32 __reserved;
+> +	__aligned_u64 cap_reg;
+> +	__aligned_u64 ecap_reg;
+>   };
+>   #endif
