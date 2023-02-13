@@ -2,197 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 534D9694028
-	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 09:58:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7EF2F69404F
+	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 10:03:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230144AbjBMI6N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Feb 2023 03:58:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60064 "EHLO
+        id S230142AbjBMJDS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Feb 2023 04:03:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229711AbjBMI6M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Feb 2023 03:58:12 -0500
-Received: from mail-vk1-xa2f.google.com (mail-vk1-xa2f.google.com [IPv6:2607:f8b0:4864:20::a2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87EEF13D40
-        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 00:58:03 -0800 (PST)
-Received: by mail-vk1-xa2f.google.com with SMTP id v189so5894709vkf.6
-        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 00:58:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=JvcbLvXxozu2YBfWqtS3HpY4TsoHNMWTjV1ENQbL6no=;
-        b=e+SnJBd7R6UCjkchzm722hGlca5ssCKYt6muIwH/ewMqaRPlLJLLUtYVgHY3hkisMH
-         XqxALcsEvd/oTocKZOurAlWGJWzipVyPNet5R342X/0zb2LNbEqXPKVhRx6YeNN/AiCq
-         dfxuykZkh0m0fpwclYce3W5cp1tWxL6Cq9dA5tlMAnTMGoeStAIos1o9PbuVN5lZET4N
-         J3Od4e2efXZHpsOK0WQ/uiKU7oPCkMnT//da5f7gDTsRFwKQDOE1bZCCKS/JY6jcdias
-         NU8jcsHWh4WUAYGmqJ2mwMWMyLe1/qT43VlJH9K0G9cEH/6B7ARyk94piW82PqcdJ69v
-         8FZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JvcbLvXxozu2YBfWqtS3HpY4TsoHNMWTjV1ENQbL6no=;
-        b=egsENnBzWqoBb8FTFrIIJJVlJ+a04ML3QV+92yviIq5yVp18p8V1IajVGpB4WugSwy
-         ZLIVZY6IsxUwo06Bc0139vn4ipYYt+rUVjX2mV2ZbOZSjd+b6bQE07NQrJwxKnQjUYVX
-         2H9nrvtG7SzFvMkwtW/bUDytA8H7oT1JJRYfB5ig7d2SDEmeXTDWLKQejdRjD9PAZEbt
-         QtJAIVU28BKeQq/0E28SxfzLDneBVnSNgOEQ4qE2RWtT8wvmcQo47gJanLNobIk2yU9I
-         k+rlFXm0XjYEdbYDnHkFklvP7yUW2Iz0wsGuZMe+RtrH/fbfcimWgM9NqXBxwLON2AuP
-         lMPQ==
-X-Gm-Message-State: AO0yUKUU6/XSKiQR6KDuhCAh/4cAVOKrVfH9ZuvOmS6UwWg+AMe7NrES
-        tpJle4ZxPhf36/tlHlmwsHHwczC7n2zlYhDGhucb4w==
-X-Google-Smtp-Source: AK7set+k9jHV1zZeMhMGfI+qFlT1skoTcqVhkLvBYefS8ZKb8HrJl9hf5iOD1WTp23SCqhyFAMa7yt0/9K3YxJf5aiw=
-X-Received: by 2002:a1f:2c15:0:b0:400:f6da:4a05 with SMTP id
- s21-20020a1f2c15000000b00400f6da4a05mr3239718vks.22.1676278682425; Mon, 13
- Feb 2023 00:58:02 -0800 (PST)
+        with ESMTP id S230124AbjBMJDQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Feb 2023 04:03:16 -0500
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C58E9A5C5
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 01:03:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1676278995; x=1707814995;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=QVE8zxe84HNAEzVKI67rQATE0ACd5a3oK5FW2+l1uSY=;
+  b=ndYh4MKC75bHW61BFQETNeb8giSwYPIGH7TbnxVH/xdoU0Zb48GXSlJE
+   ol1a4wLQj8kL8Kth5Gs+wC10Mi0LXx3Mpv4F/BObyMydi9XDNBx/ZHygg
+   /SGyxTOi/MoESiykkPTfz4EY4OsT9v202ZeDwaFszlDj0WF7mUDg2kkno
+   TTbe/vnDgtpj8UG1a/HllbnEcyauw5R4TqfUBVpzt3LQn5A+BcNGUQ1G+
+   5bO8VmS/kptxaAMMkYuhR66nOKGvpQgMhHTxJW0J91LihXI+uMUQDz2p7
+   ZdyRzMj9oFLPjxvofI8pJntumwSjc6kIFid4cVTKz0bxf/lStQ0TGuKS2
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10619"; a="310478450"
+X-IronPort-AV: E=Sophos;i="5.97,293,1669104000"; 
+   d="scan'208";a="310478450"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2023 01:02:26 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10619"; a="662106941"
+X-IronPort-AV: E=Sophos;i="5.97,293,1669104000"; 
+   d="scan'208";a="662106941"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.255.30.196]) ([10.255.30.196])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2023 01:02:23 -0800
+Message-ID: <f6db6ca0-8ed8-857d-5115-e22bf7d596fc@linux.intel.com>
+Date:   Mon, 13 Feb 2023 17:02:21 +0800
 MIME-Version: 1.0
-References: <000000000000279ebd05f05cc339@google.com> <0000000000000b3f7405f48c0ad6@google.com>
-In-Reply-To: <0000000000000b3f7405f48c0ad6@google.com>
-From:   Eric Dumazet <edumazet@google.com>
-Date:   Mon, 13 Feb 2023 09:57:51 +0100
-Message-ID: <CANn89iJKYT6htHFgZLvVLkq=21CapD1YMwn2q+4Xh8B=OviVag@mail.gmail.com>
-Subject: Re: [syzbot] INFO: trying to register non-static key in __timer_delete_sync
-To:     syzbot <syzbot+1e164be619b690a43d79@syzkaller.appspotmail.com>
-Cc:     davem@davemloft.net, deshantm@xen.org, jhs@mojatatu.com,
-        jiri@resnulli.us, kuba@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        pabeni@redhat.com, pbonzini@redhat.com,
-        syzkaller-bugs@googlegroups.com, xiyou.wangcong@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-15.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SORTED_RECIPS,SPF_HELO_NONE,
-        SPF_PASS,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=no
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.2
+Subject: Re: [PATCH v4 0/9] Linear Address Masking (LAM) KVM Enabling
+To:     Robert Hoo <robert.hu@linux.intel.com>, seanjc@google.com,
+        pbonzini@redhat.com, yu.c.zhang@linux.intel.com,
+        yuan.yao@linux.intel.com, jingqi.liu@intel.com,
+        weijiang.yang@intel.com, chao.gao@intel.com,
+        isaku.yamahata@intel.com
+Cc:     kirill.shutemov@linux.intel.com, kvm@vger.kernel.org
+References: <20230209024022.3371768-1-robert.hu@linux.intel.com>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20230209024022.3371768-1-robert.hu@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 13, 2023 at 3:59 AM syzbot
-<syzbot+1e164be619b690a43d79@syzkaller.appspotmail.com> wrote:
->
-> syzbot has found a reproducer for the following issue on:
->
-> HEAD commit:    75da437a2f17 Merge branch '40GbE' of git://git.kernel.org/..
-> git tree:       net-next
-> console+strace: https://syzkaller.appspot.com/x/log.txt?x=179ffde0c80000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=6e5fc864153bbc8c
-> dashboard link: https://syzkaller.appspot.com/bug?extid=1e164be619b690a43d79
-> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12d2dfb7480000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13a81a07480000
->
 
-Probably a dup
-
-patch under review :
-https://patchwork.kernel.org/project/netdevbpf/patch/20230210152605.1852743-1-edumazet@google.com/
-
-#syz dup: BUG: unable to handle kernel paging request in atm_tc_destroy
-
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/1ee7fdbb5171/disk-75da437a.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/74233a046cf5/vmlinux-75da437a.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/a59b1d7b14b0/bzImage-75da437a.xz
+On 2/9/2023 10:40 AM, Robert Hoo wrote:
+> ===Feature Introduction===
 >
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+1e164be619b690a43d79@syzkaller.appspotmail.com
+> Linear-address masking (LAM) [1], modifies the checking that is applied to
+> *64-bit* linear addresses, allowing software to use of the untranslated
+> address (upper) bits for metadata.
+> As for which upper bits of linear address can be borrowed, LAM has 2 modes:
+> LAM_48 (bits 62:48, i.e. LAM width of 15) and LAM_57 (bits 62:57, i.e. LAM
+> width of 6), controlled by these new bits: CR3[62] (LAM_U48), CR3[61]
+> (LAM_U57), and CR4[28] (LAM_SUP).
 >
-> INFO: trying to register non-static key.
-> The code is fine but needs lockdep annotation, or maybe
-> you didn't initialize this object before use?
-> turning off the locking correctness validator.
-> CPU: 0 PID: 5075 Comm: syz-executor387 Not tainted 6.2.0-rc7-syzkaller-01590-g75da437a2f17 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/21/2023
-> Call Trace:
->  <TASK>
->  __dump_stack lib/dump_stack.c:88 [inline]
->  dump_stack_lvl+0xd1/0x138 lib/dump_stack.c:106
->  assign_lock_key kernel/locking/lockdep.c:981 [inline]
->  register_lock_class+0xf1b/0x1120 kernel/locking/lockdep.c:1294
->  __lock_acquire+0x109/0x56d0 kernel/locking/lockdep.c:4934
->  lock_acquire kernel/locking/lockdep.c:5668 [inline]
->  lock_acquire+0x1e3/0x630 kernel/locking/lockdep.c:5633
->  __timer_delete_sync+0x5d/0x1c0 kernel/time/timer.c:1555
->  del_timer_sync include/linux/timer.h:200 [inline]
->  sfq_destroy+0x82/0x140 net/sched/sch_sfq.c:725
->  qdisc_create+0xaca/0x1150 net/sched/sch_api.c:1329
->  tc_modify_qdisc+0x488/0x19c0 net/sched/sch_api.c:1679
->  rtnetlink_rcv_msg+0x43e/0xca0 net/core/rtnetlink.c:6174
->  netlink_rcv_skb+0x165/0x440 net/netlink/af_netlink.c:2574
->  netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
->  netlink_unicast+0x547/0x7f0 net/netlink/af_netlink.c:1365
->  netlink_sendmsg+0x91b/0xe10 net/netlink/af_netlink.c:1942
->  sock_sendmsg_nosec net/socket.c:722 [inline]
->  sock_sendmsg+0xde/0x190 net/socket.c:745
->  ____sys_sendmsg+0x71c/0x900 net/socket.c:2501
->  ___sys_sendmsg+0x110/0x1b0 net/socket.c:2555
->  __sys_sendmsg+0xf7/0x1c0 net/socket.c:2584
->  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
->  do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
->  entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> RIP: 0033:0x7fcf276b9e69
-> Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007ffdba938b58 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fcf276b9e69
-> RDX: 0000000000000000 RSI: 0000000020000000 RDI: 0000000000000003
-> RBP: 00007fcf2767e010 R08: 0000000000000001 R09: 0000000000000000
-> R10: 0000000000000002 R11: 0000000000000246 R12: 00007fcf2767e0a0
-> R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
->  </TASK>
-> ------------[ cut here ]------------
-> ODEBUG: assert_init not available (active state 0) object: ffff88802ba73540 object type: timer_list hint: 0x0
-> WARNING: CPU: 0 PID: 5075 at lib/debugobjects.c:509 debug_print_object+0x194/0x2c0 lib/debugobjects.c:509
-> Modules linked in:
-> CPU: 0 PID: 5075 Comm: syz-executor387 Not tainted 6.2.0-rc7-syzkaller-01590-g75da437a2f17 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/21/2023
-> RIP: 0010:debug_print_object+0x194/0x2c0 lib/debugobjects.c:509
-> Code: df 48 89 fe 48 c1 ee 03 80 3c 16 00 0f 85 c7 00 00 00 48 8b 14 dd a0 d1 a6 8a 50 4c 89 ee 48 c7 c7 60 c5 a6 8a e8 56 68 b4 05 <0f> 0b 58 83 05 ee 4c 64 0a 01 48 83 c4 20 5b 5d 41 5c 41 5d 41 5e
-> RSP: 0018:ffffc90003b5f210 EFLAGS: 00010286
-> RAX: 0000000000000000 RBX: 0000000000000005 RCX: 0000000000000000
-> RDX: ffff888020570000 RSI: ffffffff8166195c RDI: fffff5200076be34
-> RBP: 0000000000000001 R08: 0000000000000005 R09: 0000000000000000
-> R10: 0000000080000000 R11: 203a47554245444f R12: ffffffff8a4ea980
-> R13: ffffffff8aa6cc00 R14: ffffc90003b5f2c8 R15: ffffffff816f9ff0
-> FS:  00005555573c4300(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00000000004585c0 CR3: 00000000299a3000 CR4: 00000000003506f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->  debug_object_assert_init lib/debugobjects.c:899 [inline]
->  debug_object_assert_init+0x1f8/0x2e0 lib/debugobjects.c:870
->  debug_timer_assert_init kernel/time/timer.c:792 [inline]
->  debug_assert_init kernel/time/timer.c:837 [inline]
->  __try_to_del_timer_sync+0x72/0x160 kernel/time/timer.c:1412
->  __timer_delete_sync+0x144/0x1c0 kernel/time/timer.c:1573
->  del_timer_sync include/linux/timer.h:200 [inline]
->  sfq_destroy+0x82/0x140 net/sched/sch_sfq.c:725
->  qdisc_create+0xaca/0x1150 net/sched/sch_api.c:1329
->  tc_modify_qdisc+0x488/0x19c0 net/sched/sch_api.c:1679
->  rtnetlink_rcv_msg+0x43e/0xca0 net/core/rtnetlink.c:6174
->  netlink_rcv_skb+0x165/0x440 net/netlink/af_netlink.c:2574
->  netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
->  netlink_unicast+0x547/0x7f0 net/netlink/af_netlink.c:1365
->  netlink_sendmsg+0x91b/0xe10 net/netlink/af_netlink.c:1942
->  sock_sendmsg_nosec net/socket.c:722 [inline]
->  sock_sendmsg+0xde/0x190 net/socket.c:745
->  ____sys_sendmsg+0x71c/0x900 net/socket.c:2501
->  ___sys_sendmsg+0x110/0x1b0 net/socket.c:2555
->  __sys_sendmsg+0xf7/0x1c0 net/socket.c:2584
->  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
->  do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
->  entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> RIP: 0033:0x7fcf276b9e69
-> Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007ffdba938b58 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fcf276b9e69
-> RDX: 0000000000000000 RSI: 0000000020000000 RDI: 0000000000000003
-> RBP: 00007fcf2767e010 R08: 0000000000000001 R09: 0000000000000000
-> R10: 0000000000000002 R11: 0000000000000246 R12: 00007fcf2767e0a0
-> R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
->  </TASK>
+> * LAM_U48 and LAM_U57 bits controls LAM for user mode address. I.e. if
+>    CR3.LAM_U57 = 1, LAM57 is applied; if CR3.LAM_U48 = 1 and CR3.LAM_U57 = 0,
+>    LAM48 is applied.
+> * LAM_SUP bit, combined with paging mode (4-level or 5-level), determines
+>    LAM status for supervisor mode address. I.e. when CR4.LAM_SUP =1, 4-level
+>    paging mode will have LAM48 for supervisor mode address while 5-level paging
+>    will have LAM57.
 >
+> Note:
+> 1. LAM applies to only data address, not to instructions.
+> 2. LAM identification of an address as user or supervisor is based solely on the
+>     value of pointer bit 63 and does not, for the purposes of LAM, depend on the CPL.
+> 3. For user mode address, it is possible that 5-level paging and LAM_U48 are both
+>     set, in this case, the effective usable linear address width is 48, i.e. bit
+>     56:47 is reserved by LAM. [2]
+
+How to understand "reserved by LAM"?
+
+According to the spec, bits 56:48 of the pointer contained metadata.
+
+
+> 4. When VM exit, the problematic address saved in VMCS field is clean, i.e.
+>     metadata cleared with canonical form.
+>
+>
+> ===LAM KVM Design===
+>
+> Intercept CR4.LAM_SUP by KVM, to avoid read VMCS field every time, with
+> expectation that guest won't toggle this bit frequently.
+>
+> Under EPT mode, CR3 is fully under guest control, guest LAM is thus transparent to
+> KVM. Nothing more need to do.
+>
+> For Shadow paging (EPT = off), KVM need to handle guest CR3.LAM_U48 and CR3.LAM_U57
+> toggles.
+>
+> [1] ISE Chap10 https://cdrdv2.intel.com/v1/dl/getContent/671368 (Section 10.6 VMX interaction)
+> [2] Thus currently, Kernel enabling patch only enables LAM_U57. https://lore.kernel.org/lkml/20230123220500.21077-1-kirill.shutemov@linux.intel.com/
+>
+> ---
+> Changelog
+> v3 --> v4:
+> Drop unrelated Patch 1 in v3 (Binbin, Sean, Xiaoyao)
+> Intercept CR4.LAM_SUP instead of pass through to guest (Sean)
+> Just filter out CR3.LAM_{U48, U57}, instead of all reserved high bits
+> (Sean, Yuan)
+> Use existing __canonical_address() helper instead write a new one (Weijiang)
+> Add LAM handling in KVM emulation (Yu, Yuan)
+> Add Jingqi's reviwed-by on Patch 7
+> Rebased to Kirill's latest code, which is 6.2-rc1 base.
+>
+> v2 --> v3:
+> As LAM Kernel patches are in tip tree now, rebase to it.
+> https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git/
+>
+> v1 --> v2:
+> 1. Fixes i386-allyesconfig build error on get_pgd(), where
+>     CR3_HIGH_RSVD_MASK isn't applicable.
+>     (Reported-by: kernel test robot <lkp@intel.com>)
+> 2. In kvm_set_cr3(), be conservative on skip tlb flush when only LAM bits
+>     toggles. (Kirill)
+>
+>
+> Robert Hoo (9):
+>    KVM: x86: Intercept CR4.LAM_SUP when LAM feature is enabled in guest
+>    KVM: x86: MMU: Clear CR3 LAM bits when allocate shadow root
+>    [Trivial] KVM: x86: MMU: Commets update
+>    KVM: x86: MMU: Integrate LAM bits when build guest CR3
+>    KVM: x86: Untag LAM bits when applicable
+>    KVM: x86: When judging setting CR3 valid or not, consider LAM bits
+>    KVM: x86: When guest set CR3, handle LAM bits semantics
+>    KVM: x86: LAM: Expose LAM CPUID to user space VMM
+>    KVM: x86: emulation: Apply LAM when emulating data access
+>
+>   arch/x86/include/asm/kvm_host.h |  3 ++-
+>   arch/x86/kvm/cpuid.c            |  2 +-
+>   arch/x86/kvm/emulate.c          |  6 +++++
+>   arch/x86/kvm/mmu.h              |  5 ++++
+>   arch/x86/kvm/mmu/mmu.c          | 11 ++++++--
+>   arch/x86/kvm/vmx/vmx.c          |  6 ++++-
+>   arch/x86/kvm/x86.c              | 38 ++++++++++++++++++++++----
+>   arch/x86/kvm/x86.h              | 47 +++++++++++++++++++++++++++++++++
+>   8 files changed, 108 insertions(+), 10 deletions(-)
+>
+> base-commit: 03334443640f226f56f71b5dfa3b1be6d4a1a1bc
+> (https://git.kernel.org/pub/scm/linux/kernel/git/kas/linux.git lam)
