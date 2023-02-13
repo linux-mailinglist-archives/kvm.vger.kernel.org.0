@@ -2,393 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 36568694EE0
-	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 19:09:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D1AE694EF8
+	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 19:12:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230270AbjBMSJ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Feb 2023 13:09:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56694 "EHLO
+        id S231191AbjBMSMi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Feb 2023 13:12:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229907AbjBMSJ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Feb 2023 13:09:28 -0500
-Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79F832715;
-        Mon, 13 Feb 2023 10:09:06 -0800 (PST)
-Received: by mail-il1-x130.google.com with SMTP id c15so3900924ils.12;
-        Mon, 13 Feb 2023 10:09:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1676311744;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7fCyiADTFkffN0YGHJqOV166FXiIeSdHDo8OhIMqjkY=;
-        b=iB2f4ocXCpV/FvA732vU9pTASYAVc7i5Pp7ET9ZmlcNG3pCoV1+X2dX6uP3seaxtsy
-         h34Ka+q2dLladO7aDKYYc/kTm8rjvypfFly7hGyodK49bKqBaHMvA1kwtWK/DjnL+3Q3
-         p++TXlk/KzI4iFUnCz+BFIvEfNSBpqWuVLrNvcaJ2sufKrA0PbEHKVKr6K2uSU2gVUTp
-         z7hwWgYfX1RMhsZJfuloHeXhAet3OnD9mVSN45EclvkorjgwpXsELDiwSCnvBvaomslJ
-         8M+L/d2Hbqu63dG8dEGSKzQa86DsUdIc2201a3C0enBVuNxBceggwTaBIEvRNXx3VjVy
-         EVIQ==
+        with ESMTP id S231145AbjBMSMg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Feb 2023 13:12:36 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6B96193D0
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 10:11:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676311873;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=btENug+HNZMgsHueHpBS/EHiJOI8qsodxlQ5SGXxzpc=;
+        b=GL6A2KK/AUCQ9IzJRqne3ntUzVXcwr4RLeu/O3rYTevx6Fk8aKUBOU09/D+NO99xyZ0Ac1
+        sgZD6eJUBvRf1LB2RsLb6LcnLgQxLaWxu+iLCob1cwMlyRVYU+OYKBVxrY9/gI60mK9+Ny
+        3NuXmDIPwq1Jr8GPLQFiAjSN9sk5wsY=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-90-x0GdombOM8-sacPomOQePA-1; Mon, 13 Feb 2023 13:11:12 -0500
+X-MC-Unique: x0GdombOM8-sacPomOQePA-1
+Received: by mail-ed1-f69.google.com with SMTP id p36-20020a056402502400b004aab6614de9so8086574eda.6
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 10:11:12 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1676311744;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7fCyiADTFkffN0YGHJqOV166FXiIeSdHDo8OhIMqjkY=;
-        b=iVtP9jxNnPmQAp7xyNpo/arnuHlEf1OVJjbsyM3cVa3Cs2tQG1DvoZdxdL+Q+S6tu/
-         sVqGJ/0xt2/P88kdo8M7IKZUeZ9emE+AD8cLMTFifOMQJbAgQ4hvyXxuexalBJoCRji+
-         sce4jLTgZfvn+OVNMbAbJiFUnMPJL7PvJ/jqxXOFI0u1GhcipFqA9wLRGawN76RCReFj
-         R6Q3KCgKCuw3sd//8h5fSSNXFyrqyhIc4SCBtoo/rfF0sb3SXDMOS/TXWtkMWwlaiNJl
-         Q484HOH1Ypr4oHPAms6w+gBMCf8ghOQwIqmYtxK56qGJbyHnXDV+gSJT32oazMlUpUoD
-         NYTg==
-X-Gm-Message-State: AO0yUKV7Pi7PyoCJ+GaFKldjJsEOFPtEeD4oerxAg6sV+XlBOWBOxo5u
-        D/V7YkuURLRBfHPQ95k0qI0=
-X-Google-Smtp-Source: AK7set8A20rRlZg2lkC+gCRHnVv3oU7t32KtOZKX/4p++cl5o7oKKY77zLgisxyfU9yajusxiGwY3g==
-X-Received: by 2002:a92:c74a:0:b0:314:11c9:955b with SMTP id y10-20020a92c74a000000b0031411c9955bmr10724389ilp.1.1676311744079;
-        Mon, 13 Feb 2023 10:09:04 -0800 (PST)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id g10-20020a92cdaa000000b0030314a7f039sm2868693ild.10.2023.02.13.10.09.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Feb 2023 10:09:03 -0800 (PST)
-Date:   Mon, 13 Feb 2023 20:08:57 +0200
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-To:     Steven Price <steven.price@arm.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Joey Gouly <joey.gouly@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev
-Subject: Re: [RFC PATCH 10/28] arm64: RME: Allocate/free RECs to match vCPUs
-Message-ID: <20230213200857.00007575@gmail.com>
-In-Reply-To: <20230127112932.38045-11-steven.price@arm.com>
-References: <20230127112248.136810-1-suzuki.poulose@arm.com>
-        <20230127112932.38045-1-steven.price@arm.com>
-        <20230127112932.38045-11-steven.price@arm.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=btENug+HNZMgsHueHpBS/EHiJOI8qsodxlQ5SGXxzpc=;
+        b=CvW8KZ3RzgmoYAPbRYpO3nhu0CrTEoqEcFPt0X0tTKzz+7GPmx2E4DRsRCFLd2PcHx
+         IZ2N/vM5PMUNOOL9FzDdb/k4wGAtshH7spe0Ol2fCgcmmmUKtRomnJ3rRwktWIz1OWGq
+         ES6UMPwk1eV+2iX/oTa3i9/yH/468p7OywW3zewi2l1O4FLyUxBPDDewXQgoWBdU/G1s
+         MekL6Of1x1og32O+UABBVyYRWARmLjnGQ+/jMA7YAYkKCK36YAIX8EGeKN2ZaTubXRcc
+         72tvQaROHprwlsVdbO+J4Iq3eMOLYstS4Fpk3s74zJlNRBy8yB/l7qJhY67tpnuXM/pP
+         NxBw==
+X-Gm-Message-State: AO0yUKWNw0EtaWQxH4owoZ+KqquzTpv2nEhOZUlBzpJuM86rRaXUSICl
+        HbFgI9X7rN5XixjZ94PGFzq2LQHPNcjpN7im7xEHSJgdvv8nug+TDsAHY0+BwBOTTeOolQMo1YV
+        Gv1FDkEPFi9pc
+X-Received: by 2002:a50:c007:0:b0:4ac:d2b3:b724 with SMTP id r7-20020a50c007000000b004acd2b3b724mr1951822edb.27.1676311871479;
+        Mon, 13 Feb 2023 10:11:11 -0800 (PST)
+X-Google-Smtp-Source: AK7set/2IiZueKNbZNJhFBMmU9KPuO2w+xCZ6ywEnPIDIDhVsdPwjrHBnwQ6oyt753mIL9L3C/68yg==
+X-Received: by 2002:a50:c007:0:b0:4ac:d2b3:b724 with SMTP id r7-20020a50c007000000b004acd2b3b724mr1951812edb.27.1676311871311;
+        Mon, 13 Feb 2023 10:11:11 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.googlemail.com with ESMTPSA id u12-20020a50950c000000b004aac44175e7sm6942278eda.12.2023.02.13.10.11.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 13 Feb 2023 10:11:10 -0800 (PST)
+Message-ID: <35ff8f48-2677-78ea-b5f3-329c75ce65c9@redhat.com>
+Date:   Mon, 13 Feb 2023 19:11:09 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Tianyu Lan <ltykernel@gmail.com>,
+        "Michael Kelley (LINUX)" <mikelley@microsoft.com>
+References: <43980946-7bbf-dcef-7e40-af904c456250@linux.microsoft.com>
+ <Y+p1j7tYT+16MX6B@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: "KVM: x86/mmu: Overhaul TDP MMU zapping and flushing" breaks SVM
+ on Hyper-V
+In-Reply-To: <Y+p1j7tYT+16MX6B@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 27 Jan 2023 11:29:14 +0000
-Steven Price <steven.price@arm.com> wrote:
-
-> The RMM maintains a data structure known as the Realm Execution Context
-> (or REC). It is similar to struct kvm_vcpu and tracks the state of the
-> virtual CPUs. KVM must delegate memory and request the structures are
-> created when vCPUs are created, and suitably tear down on destruction.
+On 2/13/23 18:38, Sean Christopherson wrote:
+> On Fri, Feb 10, 2023, Jeremi Piotrowski wrote:
+>> Hi Paolo/Sean,
+>>
+>> We've noticed that changes introduced in "KVM: x86/mmu: Overhaul TDP MMU
+>> zapping and flushing" conflict with a nested Hyper-V enlightenment that is
+>> always enabled on AMD CPUs (HV_X64_NESTED_ENLIGHTENED_TLB). The scenario that
+>> is affected is L0 Hyper-V + L1 KVM on AMD,
 > 
+> Do you see issues with Intel and HV_X64_NESTED_GUEST_MAPPING_FLUSH?  IIUC, on the
+> KVM side, that setup is equivalent to HV_X64_NESTED_ENLIGHTENED_TLB.
 
-It would be better to leave some pointers to the spec here. It really saves
-time for reviewers. 
+My reading of the spec[1] is that HV_X64_NESTED_ENLIGHTENED_TLB will 
+cause svm_flush_tlb_current to behave (in Intel parlance) as an INVVPID 
+rather than an INVEPT.  So svm_flush_tlb_current has to be changed to 
+also add a call to HvCallFlushGuestPhysicalAddressSpace.  I'm not sure 
+if that's a good idea though.
 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_emulate.h |   2 +
->  arch/arm64/include/asm/kvm_host.h    |   3 +
->  arch/arm64/include/asm/kvm_rme.h     |  10 ++
->  arch/arm64/kvm/arm.c                 |   1 +
->  arch/arm64/kvm/reset.c               |  11 ++
->  arch/arm64/kvm/rme.c                 | 144 +++++++++++++++++++++++++++
->  6 files changed, 171 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 5a2b7229e83f..285e62914ca4 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -504,6 +504,8 @@ static inline enum realm_state kvm_realm_state(struct kvm *kvm)
->  
->  static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
->  {
-> +	if (static_branch_unlikely(&kvm_rme_is_available))
-> +		return vcpu->arch.rec.mpidr != INVALID_HWID;
->  	return false;
->  }
->  
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 04347c3a8c6b..ef497b718cdb 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -505,6 +505,9 @@ struct kvm_vcpu_arch {
->  		u64 last_steal;
->  		gpa_t base;
->  	} steal;
-> +
-> +	/* Realm meta data */
-> +	struct rec rec;
+First, that's a TLB shootdown rather than just a local thing; 
+flush_tlb_current is supposed to be relatively cheap, and there would be 
+a lot of them because of the unconditional calls to 
+nested_svm_transition_tlb_flush on vmentry/vmexit.
 
-I think the name of the data structure "rec" needs a prefix, it is too common
-and might conflict with the private data structures in the other modules. Maybe
-rme_rec or realm_rec?
->  };
->  
->  /*
-> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
-> index eea5118dfa8a..4b219ebe1400 100644
-> --- a/arch/arm64/include/asm/kvm_rme.h
-> +++ b/arch/arm64/include/asm/kvm_rme.h
-> @@ -6,6 +6,7 @@
->  #ifndef __ASM_KVM_RME_H
->  #define __ASM_KVM_RME_H
->  
-> +#include <asm/rmi_smc.h>
->  #include <uapi/linux/kvm.h>
->  
->  enum realm_state {
-> @@ -29,6 +30,13 @@ struct realm {
->  	unsigned int ia_bits;
->  };
->  
-> +struct rec {
-> +	unsigned long mpidr;
-> +	void *rec_page;
-> +	struct page *aux_pages[REC_PARAMS_AUX_GRANULES];
-> +	struct rec_run *run;
-> +};
-> +
+Second, while the nCR3 matches across virtual processors for SVM, the 
+(nCR3, ASID) pair does not, so it doesn't even make much sense to do a 
+TLB shootdown.
 
-It is better to leave some comments for above members or pointers to the spec,
-that saves a lot of time for review.
+Depending on the performance results of adding the hypercall to 
+svm_flush_tlb_current, the fix could indeed be to just disable usage of 
+HV_X64_NESTED_ENLIGHTENED_TLB.
 
->  int kvm_init_rme(void);
->  u32 kvm_realm_ipa_limit(void);
->  
-> @@ -36,6 +44,8 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
->  int kvm_init_realm_vm(struct kvm *kvm);
->  void kvm_destroy_realm(struct kvm *kvm);
->  void kvm_realm_destroy_rtts(struct realm *realm, u32 ia_bits, u32 start_level);
-> +int kvm_create_rec(struct kvm_vcpu *vcpu);
-> +void kvm_destroy_rec(struct kvm_vcpu *vcpu);
->  
->  #define RME_RTT_BLOCK_LEVEL	2
->  #define RME_RTT_MAX_LEVEL	3
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index badd775547b8..52affed2f3cf 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -373,6 +373,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->  	/* Force users to call KVM_ARM_VCPU_INIT */
->  	vcpu->arch.target = -1;
->  	bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
-> +	vcpu->arch.rec.mpidr = INVALID_HWID;
->  
->  	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
->  
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index 9e71d69e051f..0c84392a4bf2 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -135,6 +135,11 @@ int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature)
->  			return -EPERM;
->  
->  		return kvm_vcpu_finalize_sve(vcpu);
-> +	case KVM_ARM_VCPU_REC:
-> +		if (!kvm_is_realm(vcpu->kvm))
-> +			return -EINVAL;
-> +
-> +		return kvm_create_rec(vcpu);
->  	}
->  
->  	return -EINVAL;
-> @@ -145,6 +150,11 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu)
->  	if (vcpu_has_sve(vcpu) && !kvm_arm_vcpu_sve_finalized(vcpu))
->  		return false;
->  
-> +	if (kvm_is_realm(vcpu->kvm) &&
-> +	    !(vcpu_is_rec(vcpu) &&
-> +	      READ_ONCE(vcpu->kvm->arch.realm.state) == REALM_STATE_ACTIVE))
-> +		return false;
+Paolo
 
-That's why it is better to introduce the realm state in the previous patches so
-that people can really get the idea of the states at this stage.
-
-> +
->  	return true;
->  }
->  
-> @@ -157,6 +167,7 @@ void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
->  	if (sve_state)
->  		kvm_unshare_hyp(sve_state, sve_state + vcpu_sve_state_size(vcpu));
->  	kfree(sve_state);
-> +	kvm_destroy_rec(vcpu);
->  }
->  
->  static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
-> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-> index f7b0e5a779f8..d79ed889ca4d 100644
-> --- a/arch/arm64/kvm/rme.c
-> +++ b/arch/arm64/kvm/rme.c
-> @@ -514,6 +514,150 @@ void kvm_destroy_realm(struct kvm *kvm)
->  	kvm_free_stage2_pgd(&kvm->arch.mmu);
->  }
->  
-> +static void free_rec_aux(struct page **aux_pages,
-> +			 unsigned int num_aux)
-> +{
-> +	unsigned int i;
-> +
-> +	for (i = 0; i < num_aux; i++) {
-> +		phys_addr_t aux_page_phys = page_to_phys(aux_pages[i]);
-> +
-> +		if (WARN_ON(rmi_granule_undelegate(aux_page_phys)))
-> +			continue;
-> +
-> +		__free_page(aux_pages[i]);
-> +	}
-> +}
-> +
-> +static int alloc_rec_aux(struct page **aux_pages,
-> +			 u64 *aux_phys_pages,
-> +			 unsigned int num_aux)
-> +{
-> +	int ret;
-> +	unsigned int i;
-> +
-> +	for (i = 0; i < num_aux; i++) {
-> +		struct page *aux_page;
-> +		phys_addr_t aux_page_phys;
-> +
-> +		aux_page = alloc_page(GFP_KERNEL);
-> +		if (!aux_page) {
-> +			ret = -ENOMEM;
-> +			goto out_err;
-> +		}
-> +		aux_page_phys = page_to_phys(aux_page);
-> +		if (rmi_granule_delegate(aux_page_phys)) {
-> +			__free_page(aux_page);
-> +			ret = -ENXIO;
-> +			goto out_err;
-> +		}
-> +		aux_pages[i] = aux_page;
-> +		aux_phys_pages[i] = aux_page_phys;
-> +	}
-> +
-> +	return 0;
-> +out_err:
-> +	free_rec_aux(aux_pages, i);
-> +	return ret;
-> +}
-> +
-> +int kvm_create_rec(struct kvm_vcpu *vcpu)
-> +{
-> +	struct user_pt_regs *vcpu_regs = vcpu_gp_regs(vcpu);
-> +	unsigned long mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
-> +	struct realm *realm = &vcpu->kvm->arch.realm;
-> +	struct rec *rec = &vcpu->arch.rec;
-> +	unsigned long rec_page_phys;
-> +	struct rec_params *params;
-> +	int r, i;
-> +
-> +	if (kvm_realm_state(vcpu->kvm) != REALM_STATE_NEW)
-> +		return -ENOENT;
-> +
-> +	/*
-> +	 * The RMM will report PSCI v1.0 to Realms and the KVM_ARM_VCPU_PSCI_0_2
-> +	 * flag covers v0.2 and onwards.
-> +	 */
-> +	if (!test_bit(KVM_ARM_VCPU_PSCI_0_2, vcpu->arch.features))
-> +		return -EINVAL;
-> +
-> +	BUILD_BUG_ON(sizeof(*params) > PAGE_SIZE);
-> +	BUILD_BUG_ON(sizeof(*rec->run) > PAGE_SIZE);
-> +
-> +	params = (struct rec_params *)get_zeroed_page(GFP_KERNEL);
-> +	rec->rec_page = (void *)__get_free_page(GFP_KERNEL);
-> +	rec->run = (void *)get_zeroed_page(GFP_KERNEL);
-> +	if (!params || !rec->rec_page || !rec->run) {
-> +		r = -ENOMEM;
-> +		goto out_free_pages;
-> +	}
-> +
-> +	for (i = 0; i < ARRAY_SIZE(params->gprs); i++)
-> +		params->gprs[i] = vcpu_regs->regs[i];
-> +
-> +	params->pc = vcpu_regs->pc;
-> +
-> +	if (vcpu->vcpu_id == 0)
-> +		params->flags |= REC_PARAMS_FLAG_RUNNABLE;
-> +
-> +	rec_page_phys = virt_to_phys(rec->rec_page);
-> +
-> +	if (rmi_granule_delegate(rec_page_phys)) {
-> +		r = -ENXIO;
-> +		goto out_free_pages;
-> +	}
-> +
-
-Wouldn't it be better to extend the alloc_rec_aux() to allocate and delegate
-pages above? so that you can same some gfps and rmi_granuale_delegates().
-
-> +	r = alloc_rec_aux(rec->aux_pages, params->aux, realm->num_aux);
-> +	if (r)
-> +		goto out_undelegate_rmm_rec;
-> +
-> +	params->num_rec_aux = realm->num_aux;
-> +	params->mpidr = mpidr;
-> +
-> +	if (rmi_rec_create(rec_page_phys,
-> +			   virt_to_phys(realm->rd),
-> +			   virt_to_phys(params))) {
-> +		r = -ENXIO;
-> +		goto out_free_rec_aux;
-> +	}
-> +
-> +	rec->mpidr = mpidr;
-> +
-> +	free_page((unsigned long)params);
-> +	return 0;
-> +
-> +out_free_rec_aux:
-> +	free_rec_aux(rec->aux_pages, realm->num_aux);
-> +out_undelegate_rmm_rec:
-> +	if (WARN_ON(rmi_granule_undelegate(rec_page_phys)))
-> +		rec->rec_page = NULL;
-> +out_free_pages:
-> +	free_page((unsigned long)rec->run);
-> +	free_page((unsigned long)rec->rec_page);
-> +	free_page((unsigned long)params);
-> +	return r;
-> +}
-> +
-> +void kvm_destroy_rec(struct kvm_vcpu *vcpu)
-> +{
-> +	struct realm *realm = &vcpu->kvm->arch.realm;
-> +	struct rec *rec = &vcpu->arch.rec;
-> +	unsigned long rec_page_phys;
-> +
-> +	if (!vcpu_is_rec(vcpu))
-> +		return;
-> +
-> +	rec_page_phys = virt_to_phys(rec->rec_page);
-> +
-> +	if (WARN_ON(rmi_rec_destroy(rec_page_phys)))
-> +		return;
-> +	if (WARN_ON(rmi_granule_undelegate(rec_page_phys)))
-> +		return;
-> +
-
-The two returns above feels off. What is the reason to skip the below page
-undelegates?
-
-> +	free_rec_aux(rec->aux_pages, realm->num_aux);
-> +	free_page((unsigned long)rec->rec_page);
-> +}
-> +
->  int kvm_init_realm_vm(struct kvm *kvm)
->  {
->  	struct realm_params *params;
+[1] 
+https://learn.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlfs/nested-virtualization
 
