@@ -2,62 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 58D23694CE9
-	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 17:31:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9840B694CEB
+	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 17:31:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230502AbjBMQbz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Feb 2023 11:31:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54880 "EHLO
+        id S230347AbjBMQb4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Feb 2023 11:31:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230486AbjBMQbt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230498AbjBMQbt (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 13 Feb 2023 11:31:49 -0500
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5379D1DBAB
-        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 08:31:42 -0800 (PST)
-Received: by mail-wm1-x334.google.com with SMTP id az4-20020a05600c600400b003dff767a1f1so9492407wmb.2
-        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 08:31:42 -0800 (PST)
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1885D1E298
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 08:31:43 -0800 (PST)
+Received: by mail-wr1-x42a.google.com with SMTP id m14so12839680wrg.13
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 08:31:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=grsecurity.net; s=grsec;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5R9IHW3Vc8hHuytFcQqc/EbsgNLSr+qUBtW2LZuwhKo=;
-        b=mOvd2eMD6QLHz2v4lsp37mHHKKF2WTr+lT6m5AFMibytX39ZrCQbcVZetFrpk3Sbte
-         n2nZyb0KnigW310tkHtMVoZFiKAs21VD9w0dDzFqZ9mVJkmYFMqbaV+g5HqlTEZ9NxBs
-         B0iOyOY0hcMJXZx9zk6sYcq2ioZMpRdHc2bQ6v4meVPLWQyAhoGoJzeChBqUvxBt7M3/
-         uSfVEdSBzXvkyd/Mvi1Qn4oLnZ6DLhzZHWOrSGz1T5lkZLvYWOnm6q4Hw98GLsmRXttH
-         tVi2OwnbYHUMlJH+S30PuIpcBbKoJaHTSdYi+uf+EDWuGHuUXQe8OQsY3l70kE6eKjO7
-         oXPA==
+        bh=qNEDXzKGcLxGE5vSCOn4Gl1824w8NdzbMa0+BJPShNE=;
+        b=b2NaKfo18h8EQ0ckZNBtyxLzCyw5M9p4fhmVsYeoz0XiLrx8boQvjYY21CLoNE1E3l
+         H2uKeunpMpjc+4/RcIpCjUOFvo5V5nIvIHtgLSh2lVO0FW8OgZi1NfbTMWhbOHibIBxs
+         5jJ1DPqKsLjmJeU6t5Ic1ZjRykllSad8RqWA+6ZU/GJDJpmmrDDnBr+JpjL/ET+8ogU+
+         1XGH9acCYd2vKMnrzWIs7LrbpER/2dfdUV24Ux6YMuwQ5jDUN6s6bF663wPubApxlPhv
+         iecR8CIbWzOtqjCLXu9oCTSgZxTZm1srzQXDdvH4enhvnQgNSAOW5E2PyoF1rWUytJkY
+         tZAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5R9IHW3Vc8hHuytFcQqc/EbsgNLSr+qUBtW2LZuwhKo=;
-        b=QhQn9itOA6zcAU9xPk8w32eQaRgzeeD+og4iwZ77Arx+aGVmPRLaGTgO2jyImgTWua
-         YZYVntUkgEsM+l93vwxOh/qUn919f6GO4Bob4Pf5tSgm6WRsMg+Eabo8K1o0pMBo1YxF
-         D71mQX496EchtLqIPZq8fA20vEn5yoHGYZIGpxtGUXOK1MqLqq+Xt/YyWZhZpsFtN57k
-         enl7Qw1jgCsgxMbv7VSa7qlU/tZga1uOq9ILGLJGWC4xbe/j+SmbSGvfvoZJLbqQhYYS
-         4uczoPrlUkDuVGZA0icUULxRl5+YGOVjFecQ3BhfyJ4DL31zv8IDuHEsX6FkCxy/EIz0
-         oTYg==
-X-Gm-Message-State: AO0yUKWbiyfURC4ixGkpBbEynWw/7/C3ChMrr8iMTH7uLgnEYI6gGqR2
-        +/E1L28yLpTU4F6v1txMnw/NfkDW6nHUW6Aa
-X-Google-Smtp-Source: AK7set//U03qp8rXuTdVuLS/9D+F7/9YZA8Byw1LnudM3CTwbMgDqUxnUsCjvN/ChQuTe21MPf+LsA==
-X-Received: by 2002:a05:600c:330a:b0:3df:de27:4191 with SMTP id q10-20020a05600c330a00b003dfde274191mr19226786wmp.16.1676305900763;
-        Mon, 13 Feb 2023 08:31:40 -0800 (PST)
+        bh=qNEDXzKGcLxGE5vSCOn4Gl1824w8NdzbMa0+BJPShNE=;
+        b=0KJoI6JzNiGrCTqmWjCwDbiNPqnQYp6YKVIiLC9noQJaA9hiyKYwth+1mCdxfcbzaU
+         +YElwycLTmAFswZaLEh6ekpVDNEDzOwmKv9iX3YdDwTLvbQWX8P2JD0iffpTKCJ/7APf
+         pORlPalW4l4xxQQ+8XKpLPnCo4rfe+Ir8aj4qUL1oW9yLLF0SBtiMOuq9exTbuWASzqw
+         rmzzrvB8tCDI/I/zmxYmUIwq/N0RvEJ87DOUSEGyb8BroMi/hC28qO6zbPc3yrcRSttz
+         GX32OjBhGReIicpwb4gHdekmfqxuX58mB1jsQDtJwu/16SF/jElR49yjLKrWTK+yptd+
+         oMUg==
+X-Gm-Message-State: AO0yUKWnXdDOqvlxGTnGgRJh2WAhaxFWQrwQ72YI0rTF1j6BgdMPFCau
+        3LEQqZTdlyVFxUnxrfRlAy0djx3+VbwPRGrwcy0=
+X-Google-Smtp-Source: AK7set/LWizz6X1on8RNDb5ylCVP38yg270tfMyvtYLfp4tz2hO9d2gTLmo4FUtabOqeuqe1yUlNrw==
+X-Received: by 2002:a05:6000:1c7:b0:2c5:585d:74c6 with SMTP id t7-20020a05600001c700b002c5585d74c6mr4064199wrx.12.1676305901519;
+        Mon, 13 Feb 2023 08:31:41 -0800 (PST)
 Received: from nuc.fritz.box (p200300f6af2efd00225e3e97da45b943.dip0.t-ipconnect.de. [2003:f6:af2e:fd00:225e:3e97:da45:b943])
         by smtp.gmail.com with ESMTPSA id s7-20020a5d5107000000b002c556a4f1casm3877993wrt.42.2023.02.13.08.31.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Feb 2023 08:31:40 -0800 (PST)
+        Mon, 13 Feb 2023 08:31:41 -0800 (PST)
 From:   Mathias Krause <minipli@grsecurity.net>
 To:     kvm@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
         Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Mathias Krause <minipli@grsecurity.net>
-Subject: [PATCH 4/5] KVM: x86: Shrink struct kvm_vcpu_arch
-Date:   Mon, 13 Feb 2023 17:33:50 +0100
-Message-Id: <20230213163351.30704-5-minipli@grsecurity.net>
+Subject: [PATCH 5/5] KVM: Shrink struct kvm_vcpu
+Date:   Mon, 13 Feb 2023 17:33:51 +0100
+Message-Id: <20230213163351.30704-6-minipli@grsecurity.net>
 X-Mailer: git-send-email 2.39.1
 In-Reply-To: <20230213163351.30704-1-minipli@grsecurity.net>
 References: <20230213163351.30704-1-minipli@grsecurity.net>
@@ -73,106 +73,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Reshuffle the members of struct kvm_vcpu_arch to make use of otherwise
-unused padding holes, allowing denser packing without disrupting their
-grouping.
+Reshuffle the members of struct kvm_vcpu to make use of otherwise unused
+padding holes, allowing denser packing without disrupting the grouping
+nor introducing wrong cacheline sharing.
 
-This allows us to shrink the object size by 48 bytes for 64 bit builds.
+The embedded mutex and spinlocks continue to not share cachelines, so no
+regressions because of lock contention leading to cacheline trashing is
+expected.
+
+This allows us to save 40 bytes for 64 bit builds.
 
 Signed-off-by: Mathias Krause <minipli@grsecurity.net>
 ---
-Instead of attempting to create an optimal shuffle by sorting members by
-their alignment constraints, I intended to keep the members grouped by
-their meaning to keep the maintainability of the code.
+ include/linux/kvm_host.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
- arch/x86/include/asm/kvm_host.h | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 040eee3e9583..5036456b05b0 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -824,18 +824,18 @@ struct kvm_vcpu_arch {
- 
- 	int halt_request; /* real mode on Intel only */
- 
-+	u32 kvm_cpuid_base;
- 	int cpuid_nent;
- 	struct kvm_cpuid_entry2 *cpuid_entries;
--	u32 kvm_cpuid_base;
- 
- 	u64 reserved_gpa_bits;
- 	int maxphyaddr;
- 
- 	/* emulate context */
- 
--	struct x86_emulate_ctxt *emulate_ctxt;
- 	bool emulate_regs_need_sync_to_vcpu;
- 	bool emulate_regs_need_sync_from_vcpu;
-+	struct x86_emulate_ctxt *emulate_ctxt;
- 	int (*complete_userspace_io)(struct kvm_vcpu *vcpu);
- 
- 	gpa_t time;
-@@ -916,17 +916,17 @@ struct kvm_vcpu_arch {
- 	unsigned long last_retry_addr;
- 
- 	struct {
--		bool halted;
- 		gfn_t gfns[ASYNC_PF_PER_VCPU];
- 		struct gfn_to_hva_cache data;
- 		u64 msr_en_val; /* MSR_KVM_ASYNC_PF_EN */
- 		u64 msr_int_val; /* MSR_KVM_ASYNC_PF_INT */
--		u16 vec;
- 		u32 id;
-+		u16 vec;
- 		bool send_user_only;
- 		u32 host_apf_flags;
- 		bool delivery_as_pf_vmexit;
- 		bool pageready_pending;
-+		bool halted;
- 	} apf;
- 
- 	/* OSVW MSRs (AMD only) */
-@@ -942,6 +942,9 @@ struct kvm_vcpu_arch {
- 
- 	u64 msr_kvm_poll_control;
- 
-+	/* set at EPT violation at this point */
-+	unsigned long exit_qualification;
-+
- 	/*
- 	 * Indicates the guest is trying to write a gfn that contains one or
- 	 * more of the PTEs used to translate the write itself, i.e. the access
-@@ -959,9 +962,6 @@ struct kvm_vcpu_arch {
- 	 */
- 	bool write_fault_to_shadow_pgtable;
- 
--	/* set at EPT violation at this point */
--	unsigned long exit_qualification;
--
- 	/* pv related host specific info */
- 	struct {
- 		bool pv_unhalted;
-@@ -979,9 +979,6 @@ struct kvm_vcpu_arch {
- 	/* Host CPU on which VM-entry was most recently attempted */
- 	int last_vmentry_cpu;
- 
--	/* AMD MSRC001_0015 Hardware Configuration */
--	u64 msr_hwcr;
--
- 	/* pv related cpuid info */
- 	struct {
- 		/*
-@@ -1006,6 +1003,9 @@ struct kvm_vcpu_arch {
- 	 */
- 	bool pdptrs_from_userspace;
- 
-+	/* AMD MSRC001_0015 Hardware Configuration */
-+	u64 msr_hwcr;
-+
- #if IS_ENABLED(CONFIG_HYPERV)
- 	hpa_t hv_root_tdp;
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 4f26b244f6d0..6e3e5a540037 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -330,8 +330,8 @@ struct kvm_vcpu {
+ 	int srcu_depth;
  #endif
+ 	int mode;
++	unsigned int guest_debug;
+ 	u64 requests;
+-	unsigned long guest_debug;
+ 
+ 	struct mutex mutex;
+ 	struct kvm_run *run;
+@@ -340,8 +340,8 @@ struct kvm_vcpu {
+ 	struct rcuwait wait;
+ #endif
+ 	struct pid __rcu *pid;
+-	int sigset_active;
+ 	sigset_t sigset;
++	int sigset_active;
+ 	unsigned int halt_poll_ns;
+ 	bool valid_wakeup;
+ 
+@@ -356,10 +356,10 @@ struct kvm_vcpu {
+ 
+ #ifdef CONFIG_KVM_ASYNC_PF
+ 	struct {
+-		u32 queued;
+ 		struct list_head queue;
+ 		struct list_head done;
+ 		spinlock_t lock;
++		u32 queued;
+ 	} async_pf;
+ #endif
+ 
 -- 
 2.39.1
 
