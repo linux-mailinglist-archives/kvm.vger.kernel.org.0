@@ -2,95 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B69B9695307
-	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 22:29:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 859B06953D9
+	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 23:26:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230339AbjBMV3F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Feb 2023 16:29:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49394 "EHLO
+        id S229468AbjBMW05 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Feb 2023 17:26:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230364AbjBMV2z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Feb 2023 16:28:55 -0500
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE03421A19
-        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 13:28:49 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-4cddba76f55so140679947b3.23
-        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 13:28:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=eXOpCy7WQU4/t43czVVLKM4cSSkIhfZyO3oxZlTPVvA=;
-        b=Dmv5QhdBYtbVdFpBp2g5PalnHfEkMeEnsfZi0JBA/N2aZdKT8NBTaOBECSTU8Vs9ka
-         TGJY6oLYVCR7Gg65i4HaVIocDIp4tRgyRA9/u5Cng5xH4umpybz3WF5eZK5hDPNy7mWW
-         gqvZ+Q9+D9LfAVJdyJ3n0D1QhC6gy569Iu6exXMCvTT6sT9uXvrIDQCZJ5y+0ZQ8KQd5
-         0ofkEPhjL0d8sDQBUX62QKISazn4PR5i8B6Dcbo88SfYhWf67oBrO0Pd1Y36b9jVAvSv
-         m5YynJG2SzutUk9UpFKc6EQT8WO5eNroeBQuIZIBLc6p7x77woupZmlLjNZZP609nb9x
-         0zPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=eXOpCy7WQU4/t43czVVLKM4cSSkIhfZyO3oxZlTPVvA=;
-        b=qaGSdJ/S2M9PEZDHi5BAlgHhrxCqjicnta1WcnDGcEH7Haj/H0FMfZU+hwM8/qIGmF
-         HdDLo5Obb+ovZnbmGpfnBPv9RZ5bOFV6G4TOBZNuraUiL93iIn9wya4nUVWPhmCFUDMB
-         DpcbK2R56FeG5M6ZbToKCqoRgyaPWTLwQXoc2OqtzEnqqUJ9liauJbNMKVhT6mls5WX5
-         /seVRAYbWu+3vY0CmG8wTgnU2AdajSKwURlHioO+mUMYIy0dtlb31svNGx+Yg0oGxypV
-         yEUzBCt8grmpExotNVIjDe25bvZLlC/pCA7c3bGM/qtXgLM8tJvULT6ZJz+vyI8ZXJOW
-         RiTg==
-X-Gm-Message-State: AO0yUKVL5YC2GH0kwmRB6be/tdY7JY3J4m34lsBJKCB989Zc6QPVjAQd
-        dB1mETmiZeL5HU1jLMBLh7klxKPCT7dQcg==
-X-Google-Smtp-Source: AK7set9nP0u+FDyoUa3wldou5a2ZkCMcGjn+muNYb1JfzxKX048ym1Sh1brJWucN/BLMBZmcWt9nCUGF796VEQ==
-X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a0d:e9c1:0:b0:514:a90f:10ea with SMTP id
- s184-20020a0de9c1000000b00514a90f10eamr2750928ywe.316.1676323729097; Mon, 13
- Feb 2023 13:28:49 -0800 (PST)
-Date:   Mon, 13 Feb 2023 13:28:44 -0800
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.39.1.581.gbfd45094c4-goog
-Message-ID: <20230213212844.3062733-1-dmatlack@google.com>
-Subject: [PATCH] KVM: x86/mmu: Make @tdp_mmu_allowed static
-From:   David Matlack <dmatlack@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        David Matlack <dmatlack@google.com>,
-        kernel test robot <lkp@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229462AbjBMW04 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Feb 2023 17:26:56 -0500
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [IPv6:2001:41d0:203:375::ae])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7AFB2101
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 14:26:54 -0800 (PST)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1676327211;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=HSzklRkVsXJz/hVV1Smo9TgADWE1visfUN0vsS5QYPM=;
+        b=Mj0TXFbTrVvFINMINi0IRxEZx6zuQM9dP26AUhQAHYasfoGVdKMDrHWEU2ch4vyel5cdqk
+        PiKPSAgmF7BXi2eEKZu3o5QPP8No1fVMH+Sejuh9jFazy+Sr2Hh4qWvlOFjxluxGy/tDY2
+        0gIyjgjB1jyMzvawFuPH+eAysVcRI1A=
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+        Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        Russell King <rmk+kernel@armlinux.org.uk>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH 00/18] KVM: arm64: Prefix patches for NV support
+Date:   Mon, 13 Feb 2023 22:26:26 +0000
+Message-Id: <167632713104.280051.11716946551616361075.b4-ty@linux.dev>
+In-Reply-To: <20230209175820.1939006-1-maz@kernel.org>
+References: <20230209175820.1939006-1-maz@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Make @tdp_mmu_allowed static since it is only ever used within
-arch/x86/kvm/mmu/mmu.c.
+On Thu, 9 Feb 2023 17:58:02 +0000, Marc Zyngier wrote:
+> As a bunch of the NV patches have had a decent amount of review, and
+> given that they do very little on their own, I've put together a
+> prefix series that gets the most mundane stuff out of the way.
+> 
+> Of course, nothing is functional, but nothing gets used either. In a
+> way, this is pretty similar to the current state of pKVM! ;-)
+> 
+> [...]
 
-Link: https://lore.kernel.org/kvm/202302072055.odjDVd5V-lkp@intel.com/
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: David Matlack <dmatlack@google.com>
----
- arch/x86/kvm/mmu/mmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Applied to kvmarm/next, thanks!
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index aeb240b339f5..adb9438be3ca 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -100,7 +100,7 @@ module_param_named(flush_on_reuse, force_flush_and_sync_on_reuse, bool, 0644);
-  */
- bool tdp_enabled = false;
- 
--bool __ro_after_init tdp_mmu_allowed;
-+static bool __ro_after_init tdp_mmu_allowed;
- 
- #ifdef CONFIG_X86_64
- bool __read_mostly tdp_mmu_enabled = true;
+[01/18] arm64: Add ARM64_HAS_NESTED_VIRT cpufeature
+        https://git.kernel.org/kvmarm/kvmarm/c/675cabc89900
+[02/18] KVM: arm64: Use the S2 MMU context to iterate over S2 table
+        https://git.kernel.org/kvmarm/kvmarm/c/8531bd63a8dc
+[03/18] KVM: arm64: nv: Introduce nested virtualization VCPU feature
+        https://git.kernel.org/kvmarm/kvmarm/c/89b0e7de3451
+[04/18] KVM: arm64: nv: Reset VCPU to EL2 registers if VCPU nested virt is set
+        https://git.kernel.org/kvmarm/kvmarm/c/2fb32357ae67
+[05/18] KVM: arm64: nv: Allow userspace to set PSR_MODE_EL2x
+        https://git.kernel.org/kvmarm/kvmarm/c/1d05d51bac78
+[06/18] KVM: arm64: nv: Add EL2 system registers to vcpu context
+        https://git.kernel.org/kvmarm/kvmarm/c/5305cc2c3400
+[07/18] KVM: arm64: nv: Add nested virt VCPU primitives for vEL2 VCPU state
+        https://git.kernel.org/kvmarm/kvmarm/c/0043b29038e2
+[08/18] KVM: arm64: nv: Handle HCR_EL2.NV system register traps
+        https://git.kernel.org/kvmarm/kvmarm/c/6ff9dc238a53
+[09/18] KVM: arm64: nv: Support virtual EL2 exceptions
+        https://git.kernel.org/kvmarm/kvmarm/c/47f3a2fc765a
+[10/18] KVM: arm64: nv: Inject HVC exceptions to the virtual EL2
+        https://git.kernel.org/kvmarm/kvmarm/c/93c33702cd2b
+[11/18] KVM: arm64: nv: Handle trapped ERET from virtual EL2
+        https://git.kernel.org/kvmarm/kvmarm/c/6898a55ce38c
+[12/18] KVM: arm64: nv: Handle PSCI call via smc from the guest
+        https://git.kernel.org/kvmarm/kvmarm/c/bd36b1a9eb5a
+[13/18] KVM: arm64: nv: Add accessors for SPSR_EL1, ELR_EL1 and VBAR_EL1 from virtual EL2
+        https://git.kernel.org/kvmarm/kvmarm/c/9da117eec924
+[14/18] KVM: arm64: nv: Emulate PSTATE.M for a guest hypervisor
+        https://git.kernel.org/kvmarm/kvmarm/c/d9552fe133f9
+[15/18] KVM: arm64: nv: Allow a sysreg to be hidden from userspace only
+        https://git.kernel.org/kvmarm/kvmarm/c/e6b367db0f91
+[16/18] KVM: arm64: nv: Emulate EL12 register accesses from the virtual EL2
+        https://git.kernel.org/kvmarm/kvmarm/c/280b748e871e
+[17/18] KVM: arm64: nv: Filter out unsupported features from ID regs
+        https://git.kernel.org/kvmarm/kvmarm/c/9f75b6d447d7
+[18/18] KVM: arm64: nv: Only toggle cache for virtual EL2 when SCTLR_EL2 changes
+        https://git.kernel.org/kvmarm/kvmarm/c/191e0e155521
 
-base-commit: f15a87c006901e02727bf8ac75b0251cdf8e0ecc
--- 
-2.39.1.581.gbfd45094c4-goog
-
+--
+Best,
+Oliver
