@@ -2,81 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 09C516950F8
-	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 20:48:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C6712695127
+	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 20:57:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231379AbjBMTsM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Feb 2023 14:48:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49406 "EHLO
+        id S231491AbjBMT5K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Feb 2023 14:57:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231374AbjBMTsL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Feb 2023 14:48:11 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C1E93AA4
-        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 11:47:25 -0800 (PST)
+        with ESMTP id S229522AbjBMT5I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Feb 2023 14:57:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 553991CAC3
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 11:56:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676317644;
+        s=mimecast20190719; t=1676318181;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=jukjE54rA/NniTDMWLMlEUTdm+2tzCyGjiSO2l2TjQQ=;
-        b=PA45mwcFJE2PmFLCfpjIweuYKqzN1cIV8stL+NTmX2HolzPDjPip9MqZNr+90SZxBEguqB
-        cwAk3QjeaiMQx5s4pFWwu4Hx6DdFnHfhjNQYrIo1v2Ui+vqIGm6pvwh+Q/+hmIHgAB4L8I
-        xgbR7nlKVPSPXZAFOrOyKMDWGTHhz9Q=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=BJSyCURZo4zjKZjqklQ7P1Wkqqa8CZURFqDl8CtDysY=;
+        b=MFPcpHsA4cpPbZWIWgPem+sgSpyCbHZ76GwRyKf436Tg7WmiGkd8+wxgaJgjTP5lFUAKdM
+        B2WdGfPwxcMYGgL96N7FvAi/aQk8ivwXAq51kevE1ry83+t+ieXdcHluDHyi/jQUsPPKQU
+        +V895WR9jkx3C9ys5TPSTVKdzI6UaXI=
+Received: from mail-vs1-f69.google.com (mail-vs1-f69.google.com
+ [209.85.217.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-594-10xvIJnBPgCiHx0w73gX7w-1; Mon, 13 Feb 2023 14:47:23 -0500
-X-MC-Unique: 10xvIJnBPgCiHx0w73gX7w-1
-Received: by mail-il1-f200.google.com with SMTP id t6-20020a056e02010600b0031417634f4bso7500995ilm.18
-        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 11:47:23 -0800 (PST)
+ us-mta-373-KRRhWMEqP5i_yjwny3irUQ-1; Mon, 13 Feb 2023 14:56:20 -0500
+X-MC-Unique: KRRhWMEqP5i_yjwny3irUQ-1
+Received: by mail-vs1-f69.google.com with SMTP id i23-20020a0561023d1700b00411ab049675so2895120vsv.12
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 11:56:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jukjE54rA/NniTDMWLMlEUTdm+2tzCyGjiSO2l2TjQQ=;
-        b=WSW2r4ITAWaCBDNvzXPd1Ft9wdoAetnqM4s9ecCBeDDDLPEIgwBgws+c7BvdMkn6nk
-         qATMNYbIqxtQi8k5+FaKd6kTXg03PGHtbSctQs0rj9qt2RmyzOWaUjH+0SttKaJaaPwD
-         On7z6QpgaFEo19CapFWYIuaaf2VFmMOwN3IskbTCYmlZwdqIElUBc4JMlhfAexcTbBFZ
-         bLSB9FG7otwSJms+CVO8xE4FQPNVwMtpONGdiKan9atw2OBW61MgEYZd+R1FABsh0jT9
-         EsVOGBsKHDUkxmI5Bu8eAjfdQ3rzlFBX3nQWKSB976aqO4RbjftMe082eK9MZ7NKLzP3
-         blsw==
-X-Gm-Message-State: AO0yUKUtDP3kQJMNcqc2tSK5mmWx817PKYVtKCICrgL3zAPe6kBnX/4R
-        vsxSvjNE2OtXeiztMu9doFjKhTuqTr9uS2Ldz0jEgdSqmyY8wiEkxAdOJyemJNRLq5LIoQgs94F
-        tVMmennoJOHFd
-X-Received: by 2002:a05:6e02:184d:b0:315:475c:5cfb with SMTP id b13-20020a056e02184d00b00315475c5cfbmr4365709ilv.2.1676317642486;
-        Mon, 13 Feb 2023 11:47:22 -0800 (PST)
-X-Google-Smtp-Source: AK7set+a3j5BS/mB6OljGhyF1TwNBaNZHDWgm8ontm8ZGuY3WL3AC4gQHk2dSPBwbafrr/9Ovuk7+A==
-X-Received: by 2002:a05:6e02:184d:b0:315:475c:5cfb with SMTP id b13-20020a056e02184d00b00315475c5cfbmr4365682ilv.2.1676317642188;
-        Mon, 13 Feb 2023 11:47:22 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id g15-20020a92dd8f000000b00313f2279f06sm4010881iln.73.2023.02.13.11.47.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Feb 2023 11:47:21 -0800 (PST)
-Date:   Mon, 13 Feb 2023 12:47:19 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yi Liu <yi.l.liu@intel.com>
-Cc:     joro@8bytes.org, jgg@nvidia.com, kevin.tian@intel.com,
-        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
-        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
-        peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org
-Subject: Re: [PATCH v3 00/15] Add vfio_device cdev for iommufd support
-Message-ID: <20230213124719.126eb828.alex.williamson@redhat.com>
-In-Reply-To: <20230213151348.56451-1-yi.l.liu@intel.com>
-References: <20230213151348.56451-1-yi.l.liu@intel.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BJSyCURZo4zjKZjqklQ7P1Wkqqa8CZURFqDl8CtDysY=;
+        b=Ou6gNrrbUiCd3qz9YVun5I3kC6bWYZjPDACzYuRl+bM5r31g4pPj5cdwjvui4O7d1Z
+         d3Wlor7/kctURS6Q5fBWhIdQtz6ftsicwlx0+Jzi86USFfsP2ADkr/wxX6p6p8MA0u+m
+         9+faVqANHbkTd35TzkaidjOZ7+QFe78A9NvLgitR19d7frTuzceGfWGfwDJBKl04MYSx
+         EOyOPNlR4bCrVWeklNb8eYXc23qvd76diHQzHvWcCAdigfQa/TSg7B8oLRVgzwh2OrzE
+         rOlJdm/PSaWDo6hC73jZ7csKVMkbApJY6loUR24iPY5ntBHyCzPN4NzNw4qtnGnlzzNB
+         cKFA==
+X-Gm-Message-State: AO0yUKX/3EbtTW2VZ1bB0fUOzVk8xMvXREA/uDafy0/AgYie90DrEMjM
+        pqAo6UbM8n+IVt/LFkz5uktq+U4KV1jCLo6AsA/DGf/9y5jnFKGZnCsKj4pT2EHUZwDPNHfXaZW
+        vUuVjZ1ORJzhDDNctlGzOBP1tb/Lq5ClhF2L0
+X-Received: by 2002:ab0:6957:0:b0:68a:67ef:4b6d with SMTP id c23-20020ab06957000000b0068a67ef4b6dmr880880uas.20.1676318179603;
+        Mon, 13 Feb 2023 11:56:19 -0800 (PST)
+X-Google-Smtp-Source: AK7set8axWCufvKXEi39RlcLeywpkZYfwLG7FADc7b/CNFdC/+kTa0YKM/S3LCGLz/Umdv220hl4bINXVESf+7aWbrY=
+X-Received: by 2002:ab0:6957:0:b0:68a:67ef:4b6d with SMTP id
+ c23-20020ab06957000000b0068a67ef4b6dmr880873uas.20.1676318179381; Mon, 13 Feb
+ 2023 11:56:19 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+References: <43980946-7bbf-dcef-7e40-af904c456250@linux.microsoft.com>
+ <Y+p1j7tYT+16MX6B@google.com> <35ff8f48-2677-78ea-b5f3-329c75ce65c9@redhat.com>
+ <Y+qLe42h9ZPRINrG@google.com>
+In-Reply-To: <Y+qLe42h9ZPRINrG@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Date:   Mon, 13 Feb 2023 20:56:08 +0100
+Message-ID: <CABgObfaZQOvt6v0yGz3MR7FBU7DcrTTGmS6M8RWCX0uy6WML1Q@mail.gmail.com>
+Subject: Re: "KVM: x86/mmu: Overhaul TDP MMU zapping and flushing" breaks SVM
+ on Hyper-V
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Tianyu Lan <ltykernel@gmail.com>,
+        "Michael Kelley (LINUX)" <mikelley@microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,62 +77,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 13 Feb 2023 07:13:33 -0800
-Yi Liu <yi.l.liu@intel.com> wrote:
+On Mon, Feb 13, 2023 at 8:12 PM Sean Christopherson <seanjc@google.com> wrote:
+> > My reading of the spec[1] is that HV_X64_NESTED_ENLIGHTENED_TLB will cause
+> > svm_flush_tlb_current to behave (in Intel parlance) as an INVVPID rather
+> > than an INVEPT.
+>
+> Oh!  Good catch!  Yeah, that'll be a problem.
+>
+> > So svm_flush_tlb_current has to be changed to also add a
+> > call to HvCallFlushGuestPhysicalAddressSpace.  I'm not sure if that's a good
+> > idea though.
+>
+> That's not strictly necessary, e.g. flushes from kvm_invalidate_pcid() and
+> kvm_post_set_cr4() don't need to effect a full flush.  I believe the virtual
+> address flush is also sufficient for avic_activate_vmcb().  Nested (from KVM's
+> perspective, i.e. running L3) can just be mutually exclusive with
+> HV_X64_NESTED_ENLIGHTENED_TLB.
+>
+> That just leaves kvm_mmu_new_pgd()'s force_flush_and_sync_on_reuse and the
+> aforementioned kvm_mmu_load().
+>
+> That said, the above cases where a virtual address flush is sufficient are
+> rare operations when using NPT, so adding a new KVM_REQ_TLB_FLUSH_ROOT or
+> whatever probably isn't worth doing.
+>
+> > First, that's a TLB shootdown rather than just a local thing;
+> > flush_tlb_current is supposed to be relatively cheap, and there would be a
+> > lot of them because of the unconditional calls to
+> > nested_svm_transition_tlb_flush on vmentry/vmexit.
+>
+> This isn't a nested scenario for KVM though.
 
-> Existing VFIO provides group-centric user APIs for userspace. Userspace
-> opens the /dev/vfio/$group_id first before getting device fd and hence
-> getting access to device. This is not the desired model for iommufd. Per
-> the conclusion of community discussion[1], iommufd provides device-centric
-> kAPIs and requires its consumer (like VFIO) to be device-centric user
-> APIs. Such user APIs are used to associate device with iommufd and also
-> the I/O address spaces managed by the iommufd.
->=20
-> This series first introduces a per device file structure to be prepared
-> for further enhancement and refactors the kvm-vfio code to be prepared
-> for accepting device file from userspace. Then refactors the vfio to be
-> able to handle iommufd binding. This refactor includes the mechanism of
-> blocking device access before iommufd bind, making vfio_device_open() be
-> exclusive between the group path and the cdev path. Eventually, adds the
-> cdev support for vfio device, and makes group infrastructure optional as
-> it is not needed when vfio device cdev is compiled.
->=20
-> This is also a prerequisite for iommu nesting for vfio device[2].
->=20
-> The complete code can be found in below branch, simple test done with the
-> legacy group path and the cdev path. Draft QEMU branch can be found at[3]
->=20
-> https://github.com/yiliu1765/iommufd/tree/vfio_device_cdev_v3
-> (config CONFIG_IOMMUFD=3Dy CONFIG_VFIO_DEVICE_CDEV=3Dy)
+Yes, but svm_flush_tlb_current() *is* also used in nested scenarios so
+it's like you said below---you would have to disable enlightened TLB
+when EFER.SVME=1 or something like that.
 
-Even using your branch[1], it seems like this has not been tested
-except with cdev support enabled:
+> > Depending on the performance results of adding the hypercall to
+> > svm_flush_tlb_current, the fix could indeed be to just disable usage of
+> > HV_X64_NESTED_ENLIGHTENED_TLB.
+>
+> Minus making nested SVM (L3) mutually exclusive, I believe this will do the trick:
+>
+> +       /* blah blah blah */
+> +       hv_flush_tlb_current(vcpu);
+> +
 
-/home/alwillia/Work/linux.git/drivers/vfio/vfio_main.c: In function =E2=80=
-=98vfio_device_add=E2=80=99:
-/home/alwillia/Work/linux.git/drivers/vfio/vfio_main.c:253:48: error: =E2=
-=80=98struct vfio_device=E2=80=99 has no member named =E2=80=98cdev=E2=80=
-=99; did you mean =E2=80=98dev=E2=80=99?
-  253 |                 ret =3D cdev_device_add(&device->cdev, &device->dev=
-ice);
-      |                                                ^~~~
-      |                                                dev
-/home/alwillia/Work/linux.git/drivers/vfio/vfio_main.c: In function =E2=80=
-=98vfio_device_del=E2=80=99:
-/home/alwillia/Work/linux.git/drivers/vfio/vfio_main.c:262:42: error: =E2=
-=80=98struct vfio_device=E2=80=99 has no member named =E2=80=98cdev=E2=80=
-=99; did you mean =E2=80=98dev=E2=80=99?
-  262 |                 cdev_device_del(&device->cdev, &device->device);
-      |                                          ^~~~
-      |                                          dev
+Yes, it's either this or disabling the feature.
 
-Additionally the VFIO_ENABLE_GROUP Kconfig option doesn't make much
-sense to me, it seems entirely redundant to VFIO_GROUP.
-
-I think it's too late for v6.3 already, but given this needs at least
-one more spin, let's set expectations of this being v6.4 material.  Thanks,
-
-Alex
-
-[1] 98491da60ae1 cover-letter: Add vfio_device cdev for iommufd support
+Paolo
 
