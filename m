@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A0CD694D01
-	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 17:35:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D5BFC694D19
+	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 17:43:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230367AbjBMQfl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Feb 2023 11:35:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59860 "EHLO
+        id S230526AbjBMQno (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Feb 2023 11:43:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229750AbjBMQfi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Feb 2023 11:35:38 -0500
-Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52909D4;
-        Mon, 13 Feb 2023 08:35:37 -0800 (PST)
-Received: by mail-io1-xd29.google.com with SMTP id j17so4637733ioa.9;
-        Mon, 13 Feb 2023 08:35:37 -0800 (PST)
+        with ESMTP id S229484AbjBMQnn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Feb 2023 11:43:43 -0500
+Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBC807EF9;
+        Mon, 13 Feb 2023 08:43:41 -0800 (PST)
+Received: by mail-io1-xd35.google.com with SMTP id j4so4654117iog.8;
+        Mon, 13 Feb 2023 08:43:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1676306136;
+        d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2rlnKFgrRUm8Uq6241EeorSyjCYr9c9HFlGFvXdOyL8=;
-        b=pwEvTbpuPD909QsbFce8wQK8GLxAqY/YRJ8l5yTI2LF1etbDxBJyppNy1pw3sccpMT
-         V/hOgCwIYM24FniVQ3CFzjUAQczUHEZS/y/O/cG6gtnPs5aSOCNiUnpISn6jHLMt3av8
-         UACyMYfr25ionq5s0vVIHsFkKSb/5mxhx/FDrQClY4po/ISPFHwrr+7VpWuXkDmRfg8E
-         Kl+bVUQ9A5mxRhQveagrtS9J5Xexml9HYe3uEVQFQUUos0sJFLWTtBUa6H4qkml0YroF
-         prnTaAGzt9AKzQcMQbv++KTD7xkPmuNIK5G/pKJIhAlOPXRSY5Rgj9YAL+D9MCyNHQ1o
-         WvPQ==
+        bh=z/cV7+uN5DOlTqY06NHqC0N/yUfZmJu1nhPWEtUUSQU=;
+        b=R9/tuAfwfNdxMtocyIKsCn3o6dgkMH//wp6vIGcTnj+dT9S+haQq5JDRlzdbSPeOlY
+         OvsKg3cu410tPtU+IXwHMEJ+mNrS0gQvP4cLfJ3Y9GPorH9X5Np0eZf7K4jhzujERVJp
+         fwPjnKcg9B7NEHR8R6ZQnCu+nM9hVuDBdRZXIs/FBLRUS7sBKBSFbiXr4bYVT8svM8yp
+         sm1JQQf8Xk0a8qyuIMQSBDSmKS6aDjzbeRlKAwLcQ/28s4Q7f2pRb/9t8/2zE5iMDKZ+
+         4lRUHxKRKQalHQgkNUCD1dtu1+EvKYsSgYcIlsX0tX2KNfSiKSCVFAwSZsp/tdbKQUdU
+         DWSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1676306136;
+        d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2rlnKFgrRUm8Uq6241EeorSyjCYr9c9HFlGFvXdOyL8=;
-        b=obya8nGwyOOvksygmpu5Zltlwf9g+swiSLyUM2u9IxU5nX8Fb5VLtZpg2nV/jAuElf
-         sXoj81xaFAbORuHZ2ViMCgoxthLUjsi4ThOn2fuLkddjlKPC16GovscBQujQ3hdSEav0
-         MnTlMp8IffgUKLAQBsr+bZTdk+VMwHlyd9Gp7Y0YgJQLQmC7b18Dzd7i4+pw9IIAeGZM
-         kal+qPJ3b/OSbwe1w1VLkHrZ5+uOQY2oLKksm7tQkNIpkEbYTCbIbL81QOUyaxMnrsDt
-         nC7JfCuEoPk5SkgHE1qH5YoIwpxbOBW3EPBCsY42ewSeSvQ+kL7B+P49Xn7hzmK7clSR
-         CpDw==
-X-Gm-Message-State: AO0yUKXWD69YYM+OuQcZU2cNcc+CnhBYs2LCFqt/EGCF7oy8DYallW6C
-        faqTxh2oBh4U6KqZEyJ3NIM=
-X-Google-Smtp-Source: AK7set8mRhRxVIVEf9OHVXJ6AT7dvTcgh2wGFkhbQuyPdTKuJ72bGM96bYuK7fsFHHVXsPTbWCfkQA==
-X-Received: by 2002:a6b:7d4c:0:b0:715:f031:a7f5 with SMTP id d12-20020a6b7d4c000000b00715f031a7f5mr16953693ioq.1.1676306136640;
-        Mon, 13 Feb 2023 08:35:36 -0800 (PST)
+        bh=z/cV7+uN5DOlTqY06NHqC0N/yUfZmJu1nhPWEtUUSQU=;
+        b=E6tl2gPlnqqUMa93b2fArZkDMFmZ7lbUytdjtoSaDifXeE1KESeEPSIPUSTC3kT0mS
+         kPBDWrlAnE2UstXvtwyz9fRnG1zflZQCzWWf4v3Roe0SuxGZ7GQ/xZl534HGlrtCYfCT
+         IOAqvmIRokCzkciSoTYFuZ87GrlRCAIhP87bifW/ZFRuUzvtVir8Z5KV6VfetcLgih3x
+         6khQSpiyNYV+Wl2e29/gwgDtcM/Kic9nUOakkSSJlZ7IScLnLOkpXF4kd1szwG3kmc+S
+         wbpMVAL/Cx4HF2w+7DbovKomdLYxflnG4bWHEfV3xkzUlkVNUBYk0B8MEgrFBbQoqvJg
+         qdlw==
+X-Gm-Message-State: AO0yUKVkjDNFw4jVmm1cSkDSHHKxCogAmu+w7Pw5QwKadXDOqQ1HQR8R
+        PEFM2HLCBg+O4tfvBauWsNc=
+X-Google-Smtp-Source: AK7set92g8u0mkrant/iz85vjRdrLOyeBFys9VLdxblB3o4cFam52zSGpnDTFrnTCoRhCqiJWPXbow==
+X-Received: by 2002:a05:6602:3429:b0:73a:6c75:5a85 with SMTP id n41-20020a056602342900b0073a6c755a85mr11375804ioz.0.1676306621158;
+        Mon, 13 Feb 2023 08:43:41 -0800 (PST)
 Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id g5-20020a02c545000000b0038a6ae38ceasm4206262jaj.26.2023.02.13.08.35.33
+        by smtp.gmail.com with ESMTPSA id h18-20020a02c732000000b00363d6918540sm4033880jao.171.2023.02.13.08.43.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Feb 2023 08:35:36 -0800 (PST)
-Date:   Mon, 13 Feb 2023 18:35:30 +0200
+        Mon, 13 Feb 2023 08:43:40 -0800 (PST)
+Date:   Mon, 13 Feb 2023 18:43:34 +0200
 From:   Zhi Wang <zhi.wang.linux@gmail.com>
 To:     Steven Price <steven.price@arm.com>
 Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
@@ -64,13 +64,12 @@ Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Christoffer Dall <christoffer.dall@arm.com>,
         Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev
-Subject: Re: [RFC PATCH 07/28] arm64: kvm: Allow passing machine type in KVM
- creation
-Message-ID: <20230213183530.00006d35@gmail.com>
-In-Reply-To: <20230127112932.38045-8-steven.price@arm.com>
+Subject: Re: [RFC PATCH 03/28] arm64: RME: Add wrappers for RMI calls
+Message-ID: <20230213184334.00007111@gmail.com>
+In-Reply-To: <20230127112932.38045-4-steven.price@arm.com>
 References: <20230127112248.136810-1-suzuki.poulose@arm.com>
         <20230127112932.38045-1-steven.price@arm.com>
-        <20230127112932.38045-8-steven.price@arm.com>
+        <20230127112932.38045-4-steven.price@arm.com>
 X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -85,111 +84,286 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 27 Jan 2023 11:29:11 +0000
+On Fri, 27 Jan 2023 11:29:07 +0000
 Steven Price <steven.price@arm.com> wrote:
 
-> Previously machine type was used purely for specifying the physical
-> address size of the guest. Reserve the higher bits to specify an ARM
-> specific machine type and declare a new type 'KVM_VM_TYPE_ARM_REALM'
-> used to create a realm guest.
+> The wrappers make the call sites easier to read and deal with the
+> boiler plate of handling the error codes from the RMM.
 > 
 > Signed-off-by: Steven Price <steven.price@arm.com>
 > ---
->  arch/arm64/kvm/arm.c     | 13 +++++++++++++
->  arch/arm64/kvm/mmu.c     |  3 ---
->  arch/arm64/kvm/reset.c   |  3 ---
->  include/uapi/linux/kvm.h | 19 +++++++++++++++----
->  4 files changed, 28 insertions(+), 10 deletions(-)
+>  arch/arm64/include/asm/rmi_cmds.h | 259 ++++++++++++++++++++++++++++++
+>  1 file changed, 259 insertions(+)
+>  create mode 100644 arch/arm64/include/asm/rmi_cmds.h
 > 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 50f54a63732a..badd775547b8 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -147,6 +147,19 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  {
->  	int ret;
->  
-> +	if (type & ~(KVM_VM_TYPE_ARM_MASK | KVM_VM_TYPE_ARM_IPA_SIZE_MASK))
-> +		return -EINVAL;
+> diff --git a/arch/arm64/include/asm/rmi_cmds.h b/arch/arm64/include/asm/rmi_cmds.h
+> new file mode 100644
+> index 000000000000..d5468ee46f35
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/rmi_cmds.h
+> @@ -0,0 +1,259 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright (C) 2023 ARM Ltd.
+> + */
 > +
-> +	switch (type & KVM_VM_TYPE_ARM_MASK) {
-> +	case KVM_VM_TYPE_ARM_NORMAL:
-> +		break;
-> +	case KVM_VM_TYPE_ARM_REALM:
-> +		kvm->arch.is_realm = true;
+> +#ifndef __ASM_RMI_CMDS_H
+> +#define __ASM_RMI_CMDS_H
+> +
+> +#include <linux/arm-smccc.h>
+> +
+> +#include <asm/rmi_smc.h>
+> +
+> +struct rtt_entry {
+> +	unsigned long walk_level;
+> +	unsigned long desc;
+> +	int state;
+> +	bool ripas;
+> +};
+> +
 
-It is better to let this call fail when !kvm_rme_is_available? It is
-strange to be able to create a VM with REALM type in a system doesn't
-support RME.
+It would be nice to have some information of the follwoing wrappers. E.g.
+meaning of the return value. They will be quite helpful in the later patch
+review.
 
-> +		break;
-> +	default:
-> +		return -EINVAL;
-> +	}
+> +static inline int rmi_data_create(unsigned long data, unsigned long rd,
+> +				  unsigned long map_addr, unsigned long src,
+> +				  unsigned long flags)
+> +{
+> +	struct arm_smccc_res res;
 > +
->  	ret = kvm_share_hyp(kvm, kvm + 1);
->  	if (ret)
->  		return ret;
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index d0f707767d05..22c00274884a 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -709,9 +709,6 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
->  	u64 mmfr0, mmfr1;
->  	u32 phys_shift;
->  
-> -	if (type & ~KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
-> -		return -EINVAL;
-> -
->  	phys_shift = KVM_VM_TYPE_ARM_IPA_SIZE(type);
->  	if (is_protected_kvm_enabled()) {
->  		phys_shift = kvm_ipa_limit;
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index c165df174737..9e71d69e051f 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -405,9 +405,6 @@ int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
->  	if (kvm_is_realm(kvm))
->  		ipa_limit = kvm_realm_ipa_limit();
->  
-> -	if (type & ~KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
-> -		return -EINVAL;
-> -
->  	phys_shift = KVM_VM_TYPE_ARM_IPA_SIZE(type);
->  	if (phys_shift) {
->  		if (phys_shift > ipa_limit ||
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index fec1909e8b73..bcfc4d58dc19 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -898,14 +898,25 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_S390_SIE_PAGE_OFFSET 1
->  
->  /*
-> - * On arm64, machine type can be used to request the physical
-> - * address size for the VM. Bits[7-0] are reserved for the guest
-> - * PA size shift (i.e, log2(PA_Size)). For backward compatibility,
-> - * value 0 implies the default IPA size, 40bits.
-> + * On arm64, machine type can be used to request both the machine type and
-> + * the physical address size for the VM.
-> + *
-> + * Bits[11-8] are reserved for the ARM specific machine type.
-> + *
-> + * Bits[7-0] are reserved for the guest PA size shift (i.e, log2(PA_Size)).
-> + * For backward compatibility, value 0 implies the default IPA size, 40bits.
->   */
-> +#define KVM_VM_TYPE_ARM_SHIFT		8
-> +#define KVM_VM_TYPE_ARM_MASK		(0xfULL << KVM_VM_TYPE_ARM_SHIFT)
-> +#define KVM_VM_TYPE_ARM(_type)		\
-> +	(((_type) << KVM_VM_TYPE_ARM_SHIFT) & KVM_VM_TYPE_ARM_MASK)
-> +#define KVM_VM_TYPE_ARM_NORMAL		KVM_VM_TYPE_ARM(0)
-> +#define KVM_VM_TYPE_ARM_REALM		KVM_VM_TYPE_ARM(1)
+> +	arm_smccc_1_1_invoke(SMC_RMI_DATA_CREATE, data, rd, map_addr, src,
+> +			     flags, &res);
 > +
->  #define KVM_VM_TYPE_ARM_IPA_SIZE_MASK	0xffULL
->  #define KVM_VM_TYPE_ARM_IPA_SIZE(x)		\
->  	((x) & KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
+> +	return res.a0;
+> +}
 > +
->  /*
->   * ioctls for /dev/kvm fds:
->   */
+> +static inline int rmi_data_create_unknown(unsigned long data,
+> +					  unsigned long rd,
+> +					  unsigned long map_addr)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_DATA_CREATE_UNKNOWN, data, rd, map_addr,
+> +			     &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_data_destroy(unsigned long rd, unsigned long map_addr)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_DATA_DESTROY, rd, map_addr, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_features(unsigned long index, unsigned long *out)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_FEATURES, index, &res);
+> +
+> +	*out = res.a1;
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_granule_delegate(unsigned long phys)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_GRANULE_DELEGATE, phys, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_granule_undelegate(unsigned long phys)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_GRANULE_UNDELEGATE, phys, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_psci_complete(unsigned long calling_rec,
+> +				    unsigned long target_rec)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_PSCI_COMPLETE, calling_rec, target_rec,
+> +			     &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_realm_activate(unsigned long rd)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_REALM_ACTIVATE, rd, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_realm_create(unsigned long rd, unsigned long params_ptr)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_REALM_CREATE, rd, params_ptr, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_realm_destroy(unsigned long rd)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_REALM_DESTROY, rd, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_rec_aux_count(unsigned long rd, unsigned long *aux_count)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_REC_AUX_COUNT, rd, &res);
+> +
+> +	*aux_count = res.a1;
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_rec_create(unsigned long rec, unsigned long rd,
+> +				 unsigned long params_ptr)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_REC_CREATE, rec, rd, params_ptr, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_rec_destroy(unsigned long rec)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_REC_DESTROY, rec, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_rec_enter(unsigned long rec, unsigned long run_ptr)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_REC_ENTER, rec, run_ptr, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_rtt_create(unsigned long rtt, unsigned long rd,
+> +				 unsigned long map_addr, unsigned long level)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_RTT_CREATE, rtt, rd, map_addr, level,
+> +			     &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_rtt_destroy(unsigned long rtt, unsigned long rd,
+> +				  unsigned long map_addr, unsigned long level)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_RTT_DESTROY, rtt, rd, map_addr, level,
+> +			     &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_rtt_fold(unsigned long rtt, unsigned long rd,
+> +			       unsigned long map_addr, unsigned long level)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_RTT_FOLD, rtt, rd, map_addr, level, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_rtt_init_ripas(unsigned long rd, unsigned long map_addr,
+> +				     unsigned long level)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_RTT_INIT_RIPAS, rd, map_addr, level, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_rtt_map_unprotected(unsigned long rd,
+> +					  unsigned long map_addr,
+> +					  unsigned long level,
+> +					  unsigned long desc)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_RTT_MAP_UNPROTECTED, rd, map_addr, level,
+> +			     desc, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_rtt_read_entry(unsigned long rd, unsigned long map_addr,
+> +				     unsigned long level, struct rtt_entry *rtt)
+> +{
+> +	struct arm_smccc_1_2_regs regs = {
+> +		SMC_RMI_RTT_READ_ENTRY,
+> +		rd, map_addr, level
+> +	};
+> +
+> +	arm_smccc_1_2_smc(&regs, &regs);
+> +
+> +	rtt->walk_level = regs.a1;
+> +	rtt->state = regs.a2 & 0xFF;
+> +	rtt->desc = regs.a3;
+> +	rtt->ripas = regs.a4 & 1;
+> +
+> +	return regs.a0;
+> +}
+> +
+> +static inline int rmi_rtt_set_ripas(unsigned long rd, unsigned long rec,
+> +				    unsigned long map_addr, unsigned long level,
+> +				    unsigned long ripas)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_RTT_SET_RIPAS, rd, rec, map_addr, level,
+> +			     ripas, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_rtt_unmap_unprotected(unsigned long rd,
+> +					    unsigned long map_addr,
+> +					    unsigned long level)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_RTT_UNMAP_UNPROTECTED, rd, map_addr,
+> +			     level, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline phys_addr_t rmi_rtt_get_phys(struct rtt_entry *rtt)
+> +{
+> +	return rtt->desc & GENMASK(47, 12);
+> +}
+> +
+> +#endif
 
