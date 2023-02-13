@@ -2,76 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D1AE694EF8
-	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 19:12:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1339B694F5B
+	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 19:28:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231191AbjBMSMi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Feb 2023 13:12:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60026 "EHLO
+        id S230326AbjBMS2f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Feb 2023 13:28:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231145AbjBMSMg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Feb 2023 13:12:36 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6B96193D0
-        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 10:11:22 -0800 (PST)
+        with ESMTP id S231389AbjBMS2Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Feb 2023 13:28:16 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39FAA206A9
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 10:26:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676311873;
+        s=mimecast20190719; t=1676312806;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=btENug+HNZMgsHueHpBS/EHiJOI8qsodxlQ5SGXxzpc=;
-        b=GL6A2KK/AUCQ9IzJRqne3ntUzVXcwr4RLeu/O3rYTevx6Fk8aKUBOU09/D+NO99xyZ0Ac1
-        sgZD6eJUBvRf1LB2RsLb6LcnLgQxLaWxu+iLCob1cwMlyRVYU+OYKBVxrY9/gI60mK9+Ny
-        3NuXmDIPwq1Jr8GPLQFiAjSN9sk5wsY=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=Dqas7IKcHMmrzpHpfZ+GZZhhDLN7yPHWj+wWiYjQmUI=;
+        b=UiH0YkJ09B1Cokvr+q0BSCfcrIgdAoF6SPZ3b1qKhjb2ehn2+C0mL3sVtOpF4jPz8DM91N
+        J0y9CoVJONmcCFMX8n50Mi00xsRAZca3buW474dxhRAU+s0Ku0n/SKSzR91heKJdwLsDBz
+        pNupMOWhX1yWXIg9DsLHG4Y7EQuEGm4=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-90-x0GdombOM8-sacPomOQePA-1; Mon, 13 Feb 2023 13:11:12 -0500
-X-MC-Unique: x0GdombOM8-sacPomOQePA-1
-Received: by mail-ed1-f69.google.com with SMTP id p36-20020a056402502400b004aab6614de9so8086574eda.6
-        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 10:11:12 -0800 (PST)
+ us-mta-231-oeGiffMdMquIGpssBV1QEw-1; Mon, 13 Feb 2023 13:26:44 -0500
+X-MC-Unique: oeGiffMdMquIGpssBV1QEw-1
+Received: by mail-ed1-f70.google.com with SMTP id eq22-20020a056402299600b004ab4da4a530so5375578edb.8
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 10:26:44 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
          :content-language:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=btENug+HNZMgsHueHpBS/EHiJOI8qsodxlQ5SGXxzpc=;
-        b=CvW8KZ3RzgmoYAPbRYpO3nhu0CrTEoqEcFPt0X0tTKzz+7GPmx2E4DRsRCFLd2PcHx
-         IZ2N/vM5PMUNOOL9FzDdb/k4wGAtshH7spe0Ol2fCgcmmmUKtRomnJ3rRwktWIz1OWGq
-         ES6UMPwk1eV+2iX/oTa3i9/yH/468p7OywW3zewi2l1O4FLyUxBPDDewXQgoWBdU/G1s
-         MekL6Of1x1og32O+UABBVyYRWARmLjnGQ+/jMA7YAYkKCK36YAIX8EGeKN2ZaTubXRcc
-         72tvQaROHprwlsVdbO+J4Iq3eMOLYstS4Fpk3s74zJlNRBy8yB/l7qJhY67tpnuXM/pP
-         NxBw==
-X-Gm-Message-State: AO0yUKWNw0EtaWQxH4owoZ+KqquzTpv2nEhOZUlBzpJuM86rRaXUSICl
-        HbFgI9X7rN5XixjZ94PGFzq2LQHPNcjpN7im7xEHSJgdvv8nug+TDsAHY0+BwBOTTeOolQMo1YV
-        Gv1FDkEPFi9pc
-X-Received: by 2002:a50:c007:0:b0:4ac:d2b3:b724 with SMTP id r7-20020a50c007000000b004acd2b3b724mr1951822edb.27.1676311871479;
-        Mon, 13 Feb 2023 10:11:11 -0800 (PST)
-X-Google-Smtp-Source: AK7set/2IiZueKNbZNJhFBMmU9KPuO2w+xCZ6ywEnPIDIDhVsdPwjrHBnwQ6oyt753mIL9L3C/68yg==
-X-Received: by 2002:a50:c007:0:b0:4ac:d2b3:b724 with SMTP id r7-20020a50c007000000b004acd2b3b724mr1951812edb.27.1676311871311;
-        Mon, 13 Feb 2023 10:11:11 -0800 (PST)
+        bh=Dqas7IKcHMmrzpHpfZ+GZZhhDLN7yPHWj+wWiYjQmUI=;
+        b=Trdx30TNBKMuEhMzYQHD94Pu6JmblBgDkd8ic6NpljNhXrx5rOqy2bqgGAXIh+QIS1
+         +di58K2qqr/uA2RdauDtznIUEV3gzblQYirOSz3cxITNyOddrN73AjkdHDanVTLs8a1C
+         tG59YALkV2SpPmnAJdO8PRbT2hSxW3jyTFpDiPG6MnYYhNDyzP5hiRP4lQAbKf4IgEg3
+         34FgQepH/VLhozcfx0HZex9kVr6BuS3bsmpCPL0VwKrWzbkxHIEZqSjrcihh/DdG6LTR
+         k17dqKzvVKovwRxAP9e8xi32IWZKWg5afN7cpJisRBe7VftnwSZDISWDcDFiPO/orNPM
+         86nQ==
+X-Gm-Message-State: AO0yUKVYAWzfTBffzydH7hb4C5vUHZyxb+FYyxCXdsLhkXDrIFvm10uP
+        owDhqidDpg5vDVNg1yF/uYnYqwSTtOAoU+XrsmJShG5+1M5N5zeDdP9AwFQqd4DRpl6iyIL7OMt
+        3jJoeJN1/hAYf
+X-Received: by 2002:a17:906:a189:b0:87b:db62:d659 with SMTP id s9-20020a170906a18900b0087bdb62d659mr26218826ejy.19.1676312803543;
+        Mon, 13 Feb 2023 10:26:43 -0800 (PST)
+X-Google-Smtp-Source: AK7set9LoCpz6wnVKg9S4xNaMygS8ScsWULBPzti431vOcsLeANKUzyaytVJAQm/dkWpkzg4ZDf8fQ==
+X-Received: by 2002:a17:906:a189:b0:87b:db62:d659 with SMTP id s9-20020a170906a18900b0087bdb62d659mr26218814ejy.19.1676312803382;
+        Mon, 13 Feb 2023 10:26:43 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id u12-20020a50950c000000b004aac44175e7sm6942278eda.12.2023.02.13.10.11.10
+        by smtp.googlemail.com with ESMTPSA id h14-20020a17090634ce00b00877e1bb54b0sm7128313ejb.53.2023.02.13.10.26.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Feb 2023 10:11:10 -0800 (PST)
-Message-ID: <35ff8f48-2677-78ea-b5f3-329c75ce65c9@redhat.com>
-Date:   Mon, 13 Feb 2023 19:11:09 +0100
+        Mon, 13 Feb 2023 10:26:42 -0800 (PST)
+Message-ID: <ad3c51a3-f46e-c559-7ad8-573564f63875@redhat.com>
+Date:   Mon, 13 Feb 2023 19:26:41 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.7.1
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+To:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>,
+        Sean Christopherson <seanjc@google.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Tianyu Lan <ltykernel@gmail.com>,
         "Michael Kelley (LINUX)" <mikelley@microsoft.com>
 References: <43980946-7bbf-dcef-7e40-af904c456250@linux.microsoft.com>
- <Y+p1j7tYT+16MX6B@google.com>
+ <Y+aQyFJt9Tn2PJnC@google.com>
+ <9a046de1-8085-3df4-94cd-39bb893c8c9a@linux.microsoft.com>
+ <88a89319-a71e-fa90-0dbb-00cf8a549380@redhat.com>
+ <21b1ee26-dfd4-923d-72da-d8ded3dd819c@linux.microsoft.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Subject: Re: "KVM: x86/mmu: Overhaul TDP MMU zapping and flushing" breaks SVM
  on Hyper-V
-In-Reply-To: <Y+p1j7tYT+16MX6B@google.com>
+In-Reply-To: <21b1ee26-dfd4-923d-72da-d8ded3dd819c@linux.microsoft.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -84,39 +87,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/13/23 18:38, Sean Christopherson wrote:
-> On Fri, Feb 10, 2023, Jeremi Piotrowski wrote:
->> Hi Paolo/Sean,
->>
->> We've noticed that changes introduced in "KVM: x86/mmu: Overhaul TDP MMU
->> zapping and flushing" conflict with a nested Hyper-V enlightenment that is
->> always enabled on AMD CPUs (HV_X64_NESTED_ENLIGHTENED_TLB). The scenario that
->> is affected is L0 Hyper-V + L1 KVM on AMD,
+On 2/13/23 19:05, Jeremi Piotrowski wrote:
+> So I looked at the ftrace (all kvm&kvmmu events + hyperv_nested_*
+> events) I see the following: With tdp_mmu=0: kvm_exit sequence of
+> kvm_mmu_prepare_zap_page hyperv_nested_flush_guest_mapping (always
+> follows every sequence of kvm_mmu_prepare_zap_page) kvm_entry
 > 
-> Do you see issues with Intel and HV_X64_NESTED_GUEST_MAPPING_FLUSH?  IIUC, on the
-> KVM side, that setup is equivalent to HV_X64_NESTED_ENLIGHTENED_TLB.
+> With tdp_mmu=1 I see: kvm_mmu_prepare_zap_page and
+> kvm_tdp_mmu_spte_changed events from a kworker context, but they are
+> not followed by hyperv_nested_flush_guest_mapping. The only
+> hyperv_nested_flush_guest_mapping events I see happen from the qemu
+> process context.
+> 
+> Also the number of flush hypercalls is significantly lower: a 7second
+> sequence through OVMF with tdp_mmu=0 produces ~270 flush hypercalls.
+> In the traces with tdp_mmu=1 I now see max 3.
+> 
+> So this might be easier to diagnose than I thought: the
+> HvCallFlushGuestPhysicalAddressSpace calls are missing now.
 
-My reading of the spec[1] is that HV_X64_NESTED_ENLIGHTENED_TLB will 
-cause svm_flush_tlb_current to behave (in Intel parlance) as an INVVPID 
-rather than an INVEPT.  So svm_flush_tlb_current has to be changed to 
-also add a call to HvCallFlushGuestPhysicalAddressSpace.  I'm not sure 
-if that's a good idea though.
+Can you check if KVM is reusing a nCR3 value?
 
-First, that's a TLB shootdown rather than just a local thing; 
-flush_tlb_current is supposed to be relatively cheap, and there would be 
-a lot of them because of the unconditional calls to 
-nested_svm_transition_tlb_flush on vmentry/vmexit.
-
-Second, while the nCR3 matches across virtual processors for SVM, the 
-(nCR3, ASID) pair does not, so it doesn't even make much sense to do a 
-TLB shootdown.
-
-Depending on the performance results of adding the hypercall to 
-svm_flush_tlb_current, the fix could indeed be to just disable usage of 
-HV_X64_NESTED_ENLIGHTENED_TLB.
+If so, perhaps you can just add 
+hyperv_flush_guest_mapping(__pa(root->spt), NULL) after 
+kvm_tdp_mmu_get_vcpu_root_hpa's call to tdp_mmu_alloc_sp()?
 
 Paolo
-
-[1] 
-https://learn.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlfs/nested-virtualization
 
