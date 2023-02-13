@@ -2,30 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 08F5069429D
-	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 11:18:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 79F8C69429E
+	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 11:18:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230271AbjBMKSf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Feb 2023 05:18:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54048 "EHLO
+        id S230403AbjBMKSm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Feb 2023 05:18:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230361AbjBMKSd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Feb 2023 05:18:33 -0500
+        with ESMTP id S230430AbjBMKSj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Feb 2023 05:18:39 -0500
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BA70F166F1
-        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 02:18:23 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D68F817160
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 02:18:24 -0800 (PST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D41481DB5;
-        Mon, 13 Feb 2023 02:19:05 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 16A2A1E2F;
+        Mon, 13 Feb 2023 02:19:07 -0800 (PST)
 Received: from godel.lab.cambridge.arm.com (godel.lab.cambridge.arm.com [10.7.66.42])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 606343F703;
-        Mon, 13 Feb 2023 02:18:22 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 769A63F703;
+        Mon, 13 Feb 2023 02:18:23 -0800 (PST)
 From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev
-Cc:     pbonzini@redhat.com, alexandru.elisei@arm.com, ricarkol@google.com
-Subject: [PATCH v4 16/30] arm64: Add support for gic initialization through ACPI
-Date:   Mon, 13 Feb 2023 10:17:45 +0000
-Message-Id: <20230213101759.2577077-17-nikos.nikoleris@arm.com>
+Cc:     pbonzini@redhat.com, alexandru.elisei@arm.com, ricarkol@google.com,
+        Andrew Jones <drjones@redhat.com>
+Subject: [PATCH v4 17/30] lib/printf: Support for precision modifier in printf
+Date:   Mon, 13 Feb 2023 10:17:46 +0000
+Message-Id: <20230213101759.2577077-18-nikos.nikoleris@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230213101759.2577077-1-nikos.nikoleris@arm.com>
 References: <20230213101759.2577077-1-nikos.nikoleris@arm.com>
@@ -40,292 +41,231 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In systems with ACPI support and when a DT is not provided, we can use
-the MADTs to figure out if it implements a GICv2 or a GICv3 and
-discover the GIC parameters. This change implements this but retains
-the default behavior; we check if a valid DT is provided, if not, we
-try to discover the cores in the system using ACPI.
+This follows the typical format of:
+
+printf("%.Ns", *str);
+
+Where N might be a decimal digit string or '*'. This feature is used
+by a future change.
+
+See also: man 3 printf
 
 Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 ---
- lib/acpi.c     |   9 +++-
- lib/acpi.h     |  46 +++++++++++++++-
- lib/arm/gic.c  | 139 ++++++++++++++++++++++++++++++++++++++++++++++++-
- lib/libcflat.h |   1 +
- 4 files changed, 191 insertions(+), 4 deletions(-)
+ lib/printf.c | 95 ++++++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 78 insertions(+), 17 deletions(-)
 
-diff --git a/lib/acpi.c b/lib/acpi.c
-index bbe33d08..760cd8b2 100644
---- a/lib/acpi.c
-+++ b/lib/acpi.c
-@@ -103,11 +103,12 @@ void *find_acpi_table_addr(u32 sig)
- 	return NULL;
- }
- 
--void acpi_table_parse_madt(enum acpi_madt_type mtype, acpi_table_handler handler)
-+int acpi_table_parse_madt(enum acpi_madt_type mtype, acpi_table_handler handler)
- {
- 	struct acpi_table_madt *madt;
- 	struct acpi_subtable_header *header;
- 	void *end;
-+	int count = 0;
- 
- 	madt = find_acpi_table_addr(MADT_SIGNATURE);
- 	assert(madt);
-@@ -116,9 +117,13 @@ void acpi_table_parse_madt(enum acpi_madt_type mtype, acpi_table_handler handler
- 	end = (void *)((ulong) madt + madt->length);
- 
- 	while ((void *)header < end) {
--		if (header->type == mtype)
-+		if (header->type == mtype) {
- 			handler(header);
-+			count++;
-+		}
- 
- 		header = (void *)(ulong) header + header->length;
- 	}
-+
-+	return count;
- }
-diff --git a/lib/acpi.h b/lib/acpi.h
-index af02fd83..a2c0f982 100644
---- a/lib/acpi.h
-+++ b/lib/acpi.h
-@@ -184,6 +184,50 @@ struct acpi_madt_generic_interrupt {
- 	u16 spe_interrupt;	/* ACPI 6.3 */
- };
- 
-+#define ACPI_MADT_ENABLED           (1)	/* 00: Processor is usable if set */
-+
-+/* 12: Generic Distributor (ACPI 5.0 + ACPI 6.0 changes) */
-+
-+struct acpi_madt_generic_distributor {
-+	struct acpi_subtable_header header;
-+	u16 reserved;		/* reserved - must be zero */
-+	u32 gic_id;
-+	u64 base_address;
-+	u32 global_irq_base;
-+	u8 version;
-+	u8 reserved2[3];	/* reserved - must be zero */
-+};
-+
-+/* Values for Version field above */
-+
-+enum acpi_madt_gic_version {
-+	ACPI_MADT_GIC_VERSION_NONE = 0,
-+	ACPI_MADT_GIC_VERSION_V1 = 1,
-+	ACPI_MADT_GIC_VERSION_V2 = 2,
-+	ACPI_MADT_GIC_VERSION_V3 = 3,
-+	ACPI_MADT_GIC_VERSION_V4 = 4,
-+	ACPI_MADT_GIC_VERSION_RESERVED = 5	/* 5 and greater are reserved */
-+};
-+
-+/* 14: Generic Redistributor (ACPI 5.1) */
-+
-+struct acpi_madt_generic_redistributor {
-+	struct acpi_subtable_header header;
-+	u16 reserved;		/* reserved - must be zero */
-+	u64 base_address;
-+	u32 length;
-+};
-+
-+/* 15: Generic Translator (ACPI 6.0) */
-+
-+struct acpi_madt_generic_translator {
-+	struct acpi_subtable_header header;
-+	u16 reserved;		/* reserved - must be zero */
-+	u32 translation_id;
-+	u64 base_address;
-+	u32 reserved2;
-+};
-+
- /* Values for MADT subtable type in struct acpi_subtable_header */
- 
- enum acpi_madt_type {
-@@ -254,6 +298,6 @@ struct acpi_table_gtdt {
- 
- void set_efi_rsdp(struct acpi_table_rsdp *rsdp);
- void *find_acpi_table_addr(u32 sig);
--void acpi_table_parse_madt(enum acpi_madt_type mtype, acpi_table_handler handler);
-+int acpi_table_parse_madt(enum acpi_madt_type mtype, acpi_table_handler handler);
- 
- #endif
-diff --git a/lib/arm/gic.c b/lib/arm/gic.c
-index 1bfcfcfb..8fc5596f 100644
---- a/lib/arm/gic.c
-+++ b/lib/arm/gic.c
-@@ -3,6 +3,7 @@
-  *
-  * This work is licensed under the terms of the GNU LGPL, version 2.
+diff --git a/lib/printf.c b/lib/printf.c
+index 383799ec..d600199b 100644
+--- a/lib/printf.c
++++ b/lib/printf.c
+@@ -6,6 +6,7 @@
   */
-+#include <acpi.h>
- #include <devicetree.h>
- #include <asm/gic.h>
- #include <asm/io.h>
-@@ -120,7 +121,7 @@ int gic_version(void)
- 	return 0;
+ 
+ #include "libcflat.h"
++#include "ctype.h"
+ 
+ #define BUFSZ 2000
+ 
+@@ -19,6 +20,7 @@ typedef struct strprops {
+ 	char pad;
+ 	int npad;
+ 	bool alternate;
++	int precision;
+ } strprops_t;
+ 
+ static void addchar(pstream_t *p, char c)
+@@ -43,7 +45,7 @@ static void print_str(pstream_t *p, const char *s, strprops_t props)
+ 		}
+ 	}
+ 
+-	while (*s)
++	while (*s && props.precision--)
+ 		addchar(p, *s++);
+ 
+ 	if (npad < 0) {
+@@ -73,12 +75,13 @@ static void print_int(pstream_t *ps, long long n, int base, strprops_t props)
+ 		n /= base;
+ 	}
+ 
++	while (p == buf || (p - buf < props.precision))
++		*p++ = '0';
++	props.precision = -1;
++
+ 	if (s)
+ 		*p++ = '-';
+ 
+-	if (p == buf)
+-		*p++ = '0';
+-
+ 	for (i = 0; i < (p - buf) / 2; ++i) {
+ 		char tmp;
+ 
+@@ -104,8 +107,13 @@ static void print_unsigned(pstream_t *ps, unsigned long long n, int base,
+ 	}
+ 
+ 	if (p == buf)
++		props.alternate = false;
++
++	while (p == buf || (p - buf < props.precision))
+ 		*p++ = '0';
+-	else if (props.alternate && base == 16) {
++	props.precision = -1;
++
++	if (props.alternate && base == 16) {
+ 		if (props.pad == '0') {
+ 			addchar(ps, '0');
+ 			addchar(ps, 'x');
+@@ -147,9 +155,56 @@ static int fmtnum(const char **fmt)
+ 	return num;
  }
  
--int gic_init(void)
-+static int gic_init_fdt(void)
++/*
++ * Adapted from drivers/firmware/efi/libstub/vsprintf.c
++ */
++static int skip_atoi(const char **s)
++{
++	int i = 0;
++
++	do {
++		i = i*10 + *((*s)++) - '0';
++	} while (isdigit(**s));
++
++	return i;
++}
++
++/*
++ * Adapted from drivers/firmware/efi/libstub/vsprintf.c
++ */
++static int get_int(const char **fmt, va_list *ap)
++{
++	if (isdigit(**fmt))
++		return skip_atoi(fmt);
++
++	if (**fmt == '*') {
++		++(*fmt);
++		/* it's the next argument */
++		return va_arg(*ap, int);
++	}
++	return 0;
++}
++
+ int vsnprintf(char *buf, int size, const char *fmt, va_list va)
  {
- 	if (gicv2_init()) {
- 		gic_common_ops = &gicv2_common_ops;
-@@ -133,6 +134,142 @@ int gic_init(void)
- 	return gic_version();
- }
+ 	pstream_t s;
++	va_list args;
++
++	/*
++	 * We want to pass our input va_list to helper functions by reference,
++	 * but there's an annoying edge case. If va_list was originally passed
++	 * to us by value, we could just pass &ap down to the helpers. This is
++	 * the case on, for example, X86_32.
++	 * However, on X86_64 (and possibly others), va_list is actually a
++	 * size-1 array containing a structure. Our function parameter ap has
++	 * decayed from T[1] to T*, and &ap has type T** rather than T(*)[1],
++	 * which is what will be expected by a function taking a va_list *
++	 * parameter.
++	 * One standard way to solve this mess is by creating a copy in a local
++	 * variable of type va_list and then passing a pointer to that local
++	 * copy instead, which is what we do here.
++	 */
++	va_copy(args, va);
  
-+#ifdef CONFIG_EFI
-+
-+#define ACPI_GICV2_DIST_MEM_SIZE	(SZ_4K)
-+#define ACPI_GIC_CPU_IF_MEM_SIZE	(SZ_8K)
-+#define ACPI_GICV3_DIST_MEM_SIZE	(SZ_64K)
-+#define ACPI_GICV3_ITS_MEM_SIZE		(SZ_128K)
-+
-+static int gic_acpi_version(struct acpi_subtable_header *header)
-+{
-+	struct acpi_madt_generic_distributor *dist = (void *)header;
-+	int version = dist->version;
-+
-+	if (version == 2)
-+		gic_common_ops = &gicv2_common_ops;
-+	else if (version == 3)
-+		gic_common_ops = &gicv3_common_ops;
-+
-+	return version;
-+}
-+
-+static int gicv2_acpi_parse_madt_cpu(struct acpi_subtable_header *header)
-+{
-+	struct acpi_madt_generic_interrupt *gicc = (void *)header;
-+	static phys_addr_t gicc_base_address;
-+
-+	if (!(gicc->flags & ACPI_MADT_ENABLED))
-+		return 0;
-+
-+	if (!gicc_base_address) {
-+		gicc_base_address = gicc->base_address;
-+		gicv2_data.cpu_base = ioremap(gicc_base_address, ACPI_GIC_CPU_IF_MEM_SIZE);
-+	}
-+	assert(gicc_base_address == gicc->base_address);
-+
-+	return 0;
-+}
-+
-+static int gicv2_acpi_parse_madt_dist(struct acpi_subtable_header *header)
-+{
-+	struct acpi_madt_generic_distributor *dist = (void *)header;
-+
-+	gicv2_data.dist_base = ioremap(dist->base_address, ACPI_GICV2_DIST_MEM_SIZE);
-+
-+	return 0;
-+}
-+
-+static int gicv3_acpi_parse_madt_gicc(struct acpi_subtable_header *header)
-+{
-+	struct acpi_madt_generic_interrupt *gicc = (void *)header;
-+	static phys_addr_t gicr_base_address;
-+
-+	if (!(gicc->flags & ACPI_MADT_ENABLED))
-+		return 0;
-+
-+	if (!gicr_base_address) {
-+		gicr_base_address = gicc->gicr_base_address;
-+		gicv3_data.redist_bases[0] = ioremap(gicr_base_address, SZ_64K * 2);
-+	}
-+	assert(gicr_base_address == gicc->gicr_base_address);
-+
-+	return 0;
-+}
-+
-+static int gicv3_acpi_parse_madt_dist(struct acpi_subtable_header *header)
-+{
-+	struct acpi_madt_generic_distributor *dist = (void *)header;
-+
-+	gicv3_data.dist_base = ioremap(dist->base_address, ACPI_GICV3_DIST_MEM_SIZE);
-+
-+	return 0;
-+}
-+
-+static int gicv3_acpi_parse_madt_redist(struct acpi_subtable_header *header)
-+{
-+	static int i;
-+	struct acpi_madt_generic_redistributor *redist = (void *)header;
-+
-+	gicv3_data.redist_bases[i++] = ioremap(redist->base_address, redist->length);
-+
-+	return 0;
-+}
-+
-+static int gicv3_acpi_parse_madt_its(struct acpi_subtable_header *header)
-+{
-+	struct acpi_madt_generic_translator *its_entry = (void *)header;
-+
-+	its_data.base = ioremap(its_entry->base_address, ACPI_GICV3_ITS_MEM_SIZE - 1);
-+
-+	return 0;
-+}
-+
-+static int gic_init_acpi(void)
-+{
-+	int count;
-+
-+	acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_DISTRIBUTOR, gic_acpi_version);
-+	if (gic_version() == 2) {
-+		acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_INTERRUPT,
-+				     gicv2_acpi_parse_madt_cpu);
-+		acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_DISTRIBUTOR,
-+				      gicv2_acpi_parse_madt_dist);
-+	} else if (gic_version() == 3) {
-+		acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_DISTRIBUTOR,
-+				      gicv3_acpi_parse_madt_dist);
-+		count = acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_REDISTRIBUTOR,
-+					      gicv3_acpi_parse_madt_redist);
-+		if (!count)
-+			acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_INTERRUPT,
-+					      gicv3_acpi_parse_madt_gicc);
-+		acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_TRANSLATOR,
-+				      gicv3_acpi_parse_madt_its);
-+#ifdef __aarch64__
-+		its_init();
-+#endif
-+	}
-+
-+	return gic_version();
-+}
-+
-+#else
-+
-+static int gic_init_acpi(void)
-+{
-+	assert_msg(false, "ACPI not available");
-+}
-+
-+#endif /* CONFIG_EFI */
-+
-+int gic_init(void)
-+{
-+	if (dt_available())
-+		return gic_init_fdt();
-+	else
-+		return gic_init_acpi();
-+}
-+
- void gic_enable_defaults(void)
- {
- 	if (!gic_common_ops) {
-diff --git a/lib/libcflat.h b/lib/libcflat.h
-index c1fd31ff..700f4352 100644
---- a/lib/libcflat.h
-+++ b/lib/libcflat.h
-@@ -161,6 +161,7 @@ extern void setup_vm(void);
- #define SZ_8K			(1 << 13)
- #define SZ_16K			(1 << 14)
- #define SZ_64K			(1 << 16)
-+#define SZ_128K			(1 << 17)
- #define SZ_1M			(1 << 20)
- #define SZ_2M			(1 << 21)
- #define SZ_1G			(1 << 30)
+ 	s.buffer = buf;
+ 	s.remain = size - 1;
+@@ -160,6 +215,7 @@ int vsnprintf(char *buf, int size, const char *fmt, va_list va)
+ 		strprops_t props;
+ 		memset(&props, 0, sizeof(props));
+ 		props.pad = ' ';
++		props.precision = -1;
+ 
+ 		if (f != '%') {
+ 			addchar(&s, f);
+@@ -172,11 +228,15 @@ morefmt:
+ 			addchar(&s, '%');
+ 			break;
+ 		case 'c':
+-			addchar(&s, va_arg(va, int));
++			addchar(&s, va_arg(args, int));
+ 			break;
+ 		case '\0':
+ 			--fmt;
+ 			break;
++		case '.':
++			props.pad = ' ';
++			props.precision = get_int(&fmt, &args);
++			goto morefmt;
+ 		case '#':
+ 			props.alternate = true;
+ 			goto morefmt;
+@@ -204,54 +264,55 @@ morefmt:
+ 		case 'd':
+ 			switch (nlong) {
+ 			case 0:
+-				print_int(&s, va_arg(va, int), 10, props);
++				print_int(&s, va_arg(args, int), 10, props);
+ 				break;
+ 			case 1:
+-				print_int(&s, va_arg(va, long), 10, props);
++				print_int(&s, va_arg(args, long), 10, props);
+ 				break;
+ 			default:
+-				print_int(&s, va_arg(va, long long), 10, props);
++				print_int(&s, va_arg(args, long long), 10, props);
+ 				break;
+ 			}
+ 			break;
+ 		case 'u':
+ 			switch (nlong) {
+ 			case 0:
+-				print_unsigned(&s, va_arg(va, unsigned), 10, props);
++				print_unsigned(&s, va_arg(args, unsigned int), 10, props);
+ 				break;
+ 			case 1:
+-				print_unsigned(&s, va_arg(va, unsigned long), 10, props);
++				print_unsigned(&s, va_arg(args, unsigned long), 10, props);
+ 				break;
+ 			default:
+-				print_unsigned(&s, va_arg(va, unsigned long long), 10, props);
++				print_unsigned(&s, va_arg(args, unsigned long long), 10, props);
+ 				break;
+ 			}
+ 			break;
+ 		case 'x':
+ 			switch (nlong) {
+ 			case 0:
+-				print_unsigned(&s, va_arg(va, unsigned), 16, props);
++				print_unsigned(&s, va_arg(args, unsigned int), 16, props);
+ 				break;
+ 			case 1:
+-				print_unsigned(&s, va_arg(va, unsigned long), 16, props);
++				print_unsigned(&s, va_arg(args, unsigned long), 16, props);
+ 				break;
+ 			default:
+-				print_unsigned(&s, va_arg(va, unsigned long long), 16, props);
++				print_unsigned(&s, va_arg(args, unsigned long long), 16, props);
+ 				break;
+ 			}
+ 			break;
+ 		case 'p':
+ 			props.alternate = true;
+-			print_unsigned(&s, (unsigned long)va_arg(va, void *), 16, props);
++			print_unsigned(&s, (unsigned long)va_arg(args, void *), 16, props);
+ 			break;
+ 		case 's':
+-			print_str(&s, va_arg(va, const char *), props);
++			print_str(&s, va_arg(args, const char *), props);
+ 			break;
+ 		default:
+ 			addchar(&s, f);
+ 			break;
+ 		}
+ 	}
++	va_end(args);
+ 	*s.buffer = 0;
+ 	return s.added;
+ }
 -- 
 2.25.1
 
