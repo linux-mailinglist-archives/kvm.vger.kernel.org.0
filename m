@@ -2,121 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DF2E96940CE
-	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 10:21:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A717B69428D
+	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 11:18:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230258AbjBMJV6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Feb 2023 04:21:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49892 "EHLO
+        id S230120AbjBMKSL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Feb 2023 05:18:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229524AbjBMJV5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Feb 2023 04:21:57 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61A24C644;
-        Mon, 13 Feb 2023 01:21:56 -0800 (PST)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31D8RQK7005640;
-        Mon, 13 Feb 2023 09:21:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=ylaedKUPVkiuwTWek6hj+l+VrUiHb8wDUwllrzXwIQw=;
- b=Cq519t7rgO3IeRsbaI1A3/J+UphfHr8yiYKjP0cjczS3WhUnro0E8D2yOWIvvyf7zGaB
- yIf91JWnkh8WNdex3qqAHgNz1SKTVQmtXXL3HxTpbhYqzejUTQQl5WVTisDx3r08jpS1
- nZctbDpagLwrzVXhrhNbliGcJ0Vef/5Rq1M1e0w9AVaoojf6hCTTxz9G+PLQjaZpT/P9
- oH5IiENCp7YKsADc5vTm6RRZ64xan88ZaMmeed6VO+IE1IBOP49erRGrLrGHa3FG5r0N
- 9/9OtXAgX0X5dwxpMSOhpNpGafsJHfuATMQnd51a2k3GSK7jAGz5kT/+Anm8gjWHYXBP zQ== 
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nqhqa97j3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Feb 2023 09:21:55 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31D8fYK6008513;
-        Mon, 13 Feb 2023 09:21:53 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3np2n69tas-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Feb 2023 09:21:53 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31D9Ln5W48628012
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 13 Feb 2023 09:21:50 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D8F3420043;
-        Mon, 13 Feb 2023 09:21:49 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 858ED20040;
-        Mon, 13 Feb 2023 09:21:49 +0000 (GMT)
-Received: from [9.171.76.240] (unknown [9.171.76.240])
-        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 13 Feb 2023 09:21:49 +0000 (GMT)
-Message-ID: <38deba59-ac91-0196-d7f0-e7846a7531b3@linux.ibm.com>
-Date:   Mon, 13 Feb 2023 10:21:49 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH v3 1/1] KVM: s390: pv: fix external interruption loop not
- always detected
-Content-Language: en-US
-To:     Nico Boehr <nrb@linux.ibm.com>, borntraeger@linux.ibm.com,
-        imbrenda@linux.ibm.com
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20230213085520.100756-1-nrb@linux.ibm.com>
- <20230213085520.100756-2-nrb@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20230213085520.100756-2-nrb@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: CIDdRPkDhr7ntLr0XG-aocxo_lSlfdXp
-X-Proofpoint-ORIG-GUID: CIDdRPkDhr7ntLr0XG-aocxo_lSlfdXp
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S230130AbjBMKSH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Feb 2023 05:18:07 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 58E8F9778
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 02:18:05 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B5F3C4B3;
+        Mon, 13 Feb 2023 02:18:47 -0800 (PST)
+Received: from godel.lab.cambridge.arm.com (godel.lab.cambridge.arm.com [10.7.66.42])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 420613F703;
+        Mon, 13 Feb 2023 02:18:04 -0800 (PST)
+From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
+To:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev
+Cc:     pbonzini@redhat.com, alexandru.elisei@arm.com, ricarkol@google.com
+Subject: [PATCH v4 00/30] EFI and ACPI support for arm64
+Date:   Mon, 13 Feb 2023 10:17:29 +0000
+Message-Id: <20230213101759.2577077-1-nikos.nikoleris@arm.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
- definitions=2023-02-13_04,2023-02-09_03,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- impostorscore=0 clxscore=1015 mlxscore=0 lowpriorityscore=0 phishscore=0
- spamscore=0 priorityscore=1501 mlxlogscore=729 adultscore=0 malwarescore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302130081
-X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-ARM-No-Footer: FoSSMail
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/13/23 09:55, Nico Boehr wrote:
-> To determine whether the guest has caused an external interruption loop
-> upon code 20 (external interrupt) intercepts, the ext_new_psw needs to
-> be inspected to see whether external interrupts are enabled.
-> 
-> Under non-PV, ext_new_psw can simply be taken from guest lowcore. Under
-> PV, KVM can only access the encrypted guest lowcore and hence the
-> ext_new_psw must not be taken from guest lowcore.
-> 
-> handle_external_interrupt() incorrectly did that and hence was not able
-> to reliably tell whether an external interruption loop is happening or
-> not. False negatives cause spurious failures of my kvm-unit-test
-> for extint loops[1] under PV.
-> 
-> Since code 20 is only caused under PV if and only if the guest's
-> ext_new_psw is enabled for external interrupts, false positive detection
-> of a external interruption loop can not happen.
-> 
-> Fix this issue by instead looking at the guest PSW in the state
-> description. Since the PSW swap for external interrupt is done by the
-> ultravisor before the intercept is caused, this reliably tells whether
-> the guest is enabled for external interrupts in the ext_new_psw.
-> 
-> Also update the comments to explain better what is happening.
-> 
-> [1] https://lore.kernel.org/kvm/20220812062151.1980937-4-nrb@linux.ibm.com/
-> 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> ---
+Hello,
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+This series adds initial support for building arm64 tests as EFI
+apps and running them under QEMU. Much like x86_64, we import external
+dependencies from gnu-efi and adapt them to work with types and other
+assumptions from kvm-unit-tests. In addition, this series adds support
+for enumerating parts of the system using ACPI.
+
+The first set of patches, moves the existing ACPI code to the common
+lib path. Then, it extends definitions and functions to allow for more
+robust discovery of ACPI tables. We add support for setting up the PSCI
+conduit, discovering the UART, timers, GIC and cpus via ACPI. The code
+retains existing behavior and gives priority to discovery through DT
+when one has been provided.
+
+In the second set of patches, we add support for getting the command
+line from the EFI shell. This is a requirement for many of the
+existing arm64 tests.
+
+In the third set of patches, we import code from gnu-efi, make minor
+changes and add an alternative setup sequence from arm64 systems that
+boot through EFI. Finally, we add support in the build system and a
+run script which is used to run an EFI app.
+
+After this set of patches one can build arm64 EFI tests:
+
+$> ./configure --enable-efi
+$> make
+
+And use the run script to run an EFI tests:
+
+$> ./arm/efi/run ./arm/selftest.efi -smp 2 -m 256 -append "setup smp=2 mem=256"
+
+Or all tests:
+
+$> ./run_tests.sh
+
+There are a few items that this series does not address but they would
+be useful to have:
+ - Support for booting the system from EL2. Currently, we assume that a
+   test starts EL1. This will be required to run EFI tests on sytems
+   that implement EL2.
+ - Support for reading environment variables and populating __envp.
+ - Support for discovering the PCI subsystem using ACPI.
+ - Get rid of other assumptions (e.g., vmalloc area) that don't hold on
+   real HW.
+ - Various fixes related to cache maintaince to better support turn the
+   MMU off.
+ - Switch to a new stack and avoid relying on the one provided by EFI.
+
+git branch: https://github.com/relokin/kvm-unit-tests/pull/new/target-efi-upstream-v4
+
+v3: https://lore.kernel.org/all/20220630100324.3153655-1-nikos.nikoleris@arm.com/
+v2: https://lore.kernel.org/kvm/20220506205605.359830-1-nikos.nikoleris@arm.com/
+
+Changes in v4:
+ - Removed patch that reworks cache maintenance when turning the MMU
+   off. This is not strictly required for EFI tests running with tcg and
+   will be addressed in a separate series by Alex.
+ - Fix compilation for arm (Alex).
+ - Convert ACPI tables to Linux style (Alex).
+
+Changes in v3:
+ - Addressed feedback from Drew, Alex and Ricardo. Many thanks for the reviews!
+ - Added support for discovering the GIC through ACPI
+ - Added a missing header file (<elf.h>)
+ - Added support for correctly parsing the outcome of tests (./run_tests)
+
+Thanks,
+
+Nikos
+
+Alexandru Elisei (3):
+  arm/Makefile.common: Compile lib/acpi.c if CONFIG_EFI=y
+  lib/acpi: Convert table names to Linux style
+  lib: arm: Print test exit status
+
+Andrew Jones (2):
+  arm/arm64: Rename etext to _etext
+  arm64: Add a new type of memory type flag MR_F_RESERVED
+
+Nikos Nikoleris (25):
+  lib: Move acpi header and implementation to lib
+  x86: Move x86_64-specific EFI CFLAGS to x86_64 Makefile
+  lib: Apply Lindent to acpi.{c,h}
+  lib: Fix style for acpi.{c,h}
+  x86: Avoid references to fields of ACPI tables
+  lib/acpi: Ensure all struct definition for ACPI tables are packed
+  lib/acpi: Add support for the XSDT table
+  lib/acpi: Extend the definition of the FADT table
+  devicetree: Check that fdt is not NULL in dt_available()
+  arm64: Add support for setting up the PSCI conduit through ACPI
+  arm64: Add support for discovering the UART through ACPI
+  arm64: Add support for timer initialization through ACPI
+  arm64: Add support for cpu initialization through ACPI
+  arm64: Add support for gic initialization through ACPI
+  lib/printf: Support for precision modifier in printf
+  lib/printf: Add support for printing wide strings
+  lib/efi: Add support for getting the cmdline
+  lib: Avoid ms_abi for calls related to EFI on arm64
+  arm64: Add a setup sequence for systems that boot through EFI
+  arm64: Copy code from GNU-EFI
+  arm64: Change GNU-EFI imported file to use defined types
+  arm64: Use code from the gnu-efi when booting with EFI
+  lib: Avoid external dependency in libelf
+  arm64: Add support for efi in Makefile
+  arm64: Add an efi/run script
+
+ Makefile                    |   4 -
+ arm/Makefile.arm            |   6 +
+ arm/Makefile.arm64          |  22 ++-
+ arm/Makefile.common         |  51 ++++--
+ arm/cstart.S                |   1 +
+ arm/cstart64.S              |   7 +
+ arm/dummy.c                 |  12 ++
+ arm/efi/crt0-efi-aarch64.S  | 141 +++++++++++++++++
+ arm/efi/elf_aarch64_efi.lds |  63 ++++++++
+ arm/efi/reloc_aarch64.c     |  93 +++++++++++
+ arm/efi/run                 |  61 ++++++++
+ arm/flat.lds                |   2 +-
+ arm/micro-bench.c           |   4 +-
+ arm/run                     |  14 +-
+ arm/timer.c                 |  10 +-
+ configure                   |  15 +-
+ lib/acpi.c                  | 129 +++++++++++++++
+ lib/acpi.h                  | 303 ++++++++++++++++++++++++++++++++++++
+ lib/argv.c                  |   2 +-
+ lib/argv.h                  |   1 +
+ lib/arm/asm/setup.h         |   9 ++
+ lib/arm/asm/timer.h         |   2 +
+ lib/arm/gic.c               | 139 ++++++++++++++++-
+ lib/arm/io.c                |  41 ++++-
+ lib/arm/mmu.c               |   4 +
+ lib/arm/psci.c              |  37 ++++-
+ lib/arm/setup.c             | 264 +++++++++++++++++++++++++------
+ lib/arm/timer.c             |  92 +++++++++++
+ lib/devicetree.c            |   2 +-
+ lib/efi.c                   | 102 ++++++++++++
+ lib/elf.h                   |  57 +++++++
+ lib/libcflat.h              |   1 +
+ lib/linux/efi.h             |  25 +++
+ lib/printf.c                | 194 +++++++++++++++++++++--
+ lib/x86/acpi.c              |  82 ----------
+ lib/x86/acpi.h              | 112 -------------
+ lib/x86/asm/setup.h         |   2 +-
+ lib/x86/setup.c             |   2 +-
+ scripts/runtime.bash        |  13 +-
+ x86/Makefile.common         |   2 +-
+ x86/Makefile.x86_64         |   4 +
+ x86/s3.c                    |  21 +--
+ x86/vmexit.c                |   4 +-
+ 43 files changed, 1831 insertions(+), 321 deletions(-)
+ create mode 100644 arm/dummy.c
+ create mode 100644 arm/efi/crt0-efi-aarch64.S
+ create mode 100644 arm/efi/elf_aarch64_efi.lds
+ create mode 100644 arm/efi/reloc_aarch64.c
+ create mode 100755 arm/efi/run
+ create mode 100644 lib/acpi.c
+ create mode 100644 lib/acpi.h
+ create mode 100644 lib/arm/timer.c
+ create mode 100644 lib/elf.h
+ delete mode 100644 lib/x86/acpi.c
+ delete mode 100644 lib/x86/acpi.h
+
+-- 
+2.25.1
 
