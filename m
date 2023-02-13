@@ -2,126 +2,234 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 75ED169450D
-	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 13:01:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 56EB46945B5
+	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 13:23:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230300AbjBMMBN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Feb 2023 07:01:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37622 "EHLO
+        id S230477AbjBMMXU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Feb 2023 07:23:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230059AbjBMMAy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Feb 2023 07:00:54 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB8361A955;
-        Mon, 13 Feb 2023 04:00:32 -0800 (PST)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31DBhid2002957;
-        Mon, 13 Feb 2023 12:00:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : from : to : cc : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=RwxiAnTqBHUPOpKdR8qJUfKKzLpebM0sFU7M8zvLwoU=;
- b=SCHhKE8RmvXEptkoQ6y7kEI4wE2MpNh2EGWhb5+p7AEI+6RMPQZwKD0R0QlTW+7KkVKT
- GMh0o63lGKaPgIs/id/fRDdH4A/JwpSd/IADKydIUbyYGsnnvflxJn7N3eQFpxCbbDBi
- +AWbhBLKU5EiU7UB1e1fxE8XTXbA5uWhXmSAu+qJKYAOCXltLPaGd0nkN+lAMrWOlfTV
- rvHAziCd5atLnN7scT0LtK+Ko1do1p87nSaXCE/UfvMYZo58B4h4PHwzbW+GvTeuY7ao
- TqT00nPJpYS5UbjYzoBw4ld/kBBgmnVclVjnqNgoXH5Pc4A67u4vhThuzexwfC33Wlr4 WQ== 
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nqmk50bqt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Feb 2023 12:00:31 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31CJ0Nas010953;
-        Mon, 13 Feb 2023 12:00:30 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3np2n6tkjj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Feb 2023 12:00:29 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31DC0QpZ35651996
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 13 Feb 2023 12:00:26 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7AF242004B;
-        Mon, 13 Feb 2023 12:00:26 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 250662006C;
-        Mon, 13 Feb 2023 12:00:26 +0000 (GMT)
-Received: from [9.171.76.240] (unknown [9.171.76.240])
-        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 13 Feb 2023 12:00:26 +0000 (GMT)
-Message-ID: <914807eb-ec75-0de1-abe4-2b928917edef@linux.ibm.com>
-Date:   Mon, 13 Feb 2023 13:00:25 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH v3 1/1] KVM: s390: pv: fix external interruption loop not
- always detected
-Content-Language: en-US
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>, borntraeger@linux.ibm.com,
-        imbrenda@linux.ibm.com
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20230213085520.100756-1-nrb@linux.ibm.com>
- <20230213085520.100756-2-nrb@linux.ibm.com>
- <38deba59-ac91-0196-d7f0-e7846a7531b3@linux.ibm.com>
-In-Reply-To: <38deba59-ac91-0196-d7f0-e7846a7531b3@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: NvacTS6GVXfm95Lsccc1BZofBYceHoeY
-X-Proofpoint-GUID: NvacTS6GVXfm95Lsccc1BZofBYceHoeY
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S230435AbjBMMXT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Feb 2023 07:23:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CB696A71
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 04:22:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676290954;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=B4q1SzzSkeGCFe9/8C3qxd/S7XbmX53zhkt3d/qbfHY=;
+        b=RbXzvmpP7Hl1iM9WiJlAD53Sfk/YiicJ8An5CM/ZPW3eA35DOqPp+uXtQLk/Y/XsIR/JLf
+        yru7JKkmnFSfB6cRIiucPoOHPgSFvmBf6R3koNco81iXKTvteNDopIGjMHw96UIO1iUUeP
+        fNYMzOojnoeeZYFH1PhIUmv647oK+nE=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-167-iyzy2GONNhySUpYQVuALWg-1; Mon, 13 Feb 2023 07:22:33 -0500
+X-MC-Unique: iyzy2GONNhySUpYQVuALWg-1
+Received: by mail-wm1-f70.google.com with SMTP id bg3-20020a05600c3c8300b003e1e7d3cf9fso2608167wmb.3
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 04:22:33 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=B4q1SzzSkeGCFe9/8C3qxd/S7XbmX53zhkt3d/qbfHY=;
+        b=uf5aqApkuV3wP+M4/Yw/kvxmcNCQluA2g6KPJLndX0nXns/2CsQyKsEY9VPLjFUViV
+         iASaU6K+e5dbf1oyBqENiHmJfYvBFFfh+PdYchWeYt9Gxmu5tZUZyPhxs3zledQK107F
+         /LgSlLDKNUqzWt3LaDtrCJfXAIWlR1RgPaABOu1O5kMa2XDDFhD88d2h2X5pbu1HtG+G
+         C+fbgwf7mzxXdbXDMvC2NQAZ31vnnLOvhedEbZb9P71okC1CSC+KrLTONiePrap5aMkG
+         gQOFqjUttMu2rRCAwrcqWdZNzsG2YRSf/AAtAiGvI2zYgD+/2GyYpCy0bb61dB8V8t0A
+         PvlA==
+X-Gm-Message-State: AO0yUKVE6mK5KbBjyFktTh1bj4rklOZ2TwY1u+LYfaQUWBkAlt3xBvee
+        g8ie4eTRdRAniAGGoiofCLw+mX4v6JvUcVkSWhN0pPgLGEPhRQ5PPOa4CJiHhKWGsCMjB/5SXrc
+        rLHe7WqCR5OY1j9hZsQ==
+X-Received: by 2002:a05:600c:70a:b0:3d2:bca5:10a2 with SMTP id i10-20020a05600c070a00b003d2bca510a2mr18060999wmn.22.1676290952125;
+        Mon, 13 Feb 2023 04:22:32 -0800 (PST)
+X-Google-Smtp-Source: AK7set/T7H3nAjnlRKhrLexMtRRHRR8M9RpmKLwTHA0bClwCZtI38bMLCp3Sa2SV3T6zx059/lY1zQ==
+X-Received: by 2002:a05:600c:70a:b0:3d2:bca5:10a2 with SMTP id i10-20020a05600c070a00b003d2bca510a2mr18060988wmn.22.1676290951881;
+        Mon, 13 Feb 2023 04:22:31 -0800 (PST)
+Received: from redhat.com ([2.52.132.212])
+        by smtp.gmail.com with ESMTPSA id y6-20020a05600c364600b003df7b40f99fsm16255933wmq.11.2023.02.13.04.22.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Feb 2023 04:22:31 -0800 (PST)
+Date:   Mon, 13 Feb 2023 07:22:27 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Nanyong Sun <sunnanyong@huawei.com>
+Cc:     joro@8bytes.org, will@kernel.org, robin.murphy@arm.com,
+        jasowang@redhat.com, iommu@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        wangrong68@huawei.com
+Subject: Re: [PATCH v2] vhost/vdpa: Add MSI translation tables to iommu for
+ software-managed MSI
+Message-ID: <20230213072118-mutt-send-email-mst@kernel.org>
+References: <20230207120843.1580403-1-sunnanyong@huawei.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
- definitions=2023-02-13_06,2023-02-13_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1015
- priorityscore=1501 suspectscore=0 lowpriorityscore=0 bulkscore=0
- spamscore=0 adultscore=0 phishscore=0 mlxscore=0 malwarescore=0
- mlxlogscore=759 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302130104
-X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230207120843.1580403-1-sunnanyong@huawei.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/13/23 10:21, Janosch Frank wrote:
-> On 2/13/23 09:55, Nico Boehr wrote:
->> To determine whether the guest has caused an external interruption loop
->> upon code 20 (external interrupt) intercepts, the ext_new_psw needs to
->> be inspected to see whether external interrupts are enabled.
->>
->> Under non-PV, ext_new_psw can simply be taken from guest lowcore. Under
->> PV, KVM can only access the encrypted guest lowcore and hence the
->> ext_new_psw must not be taken from guest lowcore.
->>
->> handle_external_interrupt() incorrectly did that and hence was not able
->> to reliably tell whether an external interruption loop is happening or
->> not. False negatives cause spurious failures of my kvm-unit-test
->> for extint loops[1] under PV.
->>
->> Since code 20 is only caused under PV if and only if the guest's
->> ext_new_psw is enabled for external interrupts, false positive detection
->> of a external interruption loop can not happen.
->>
->> Fix this issue by instead looking at the guest PSW in the state
->> description. Since the PSW swap for external interrupt is done by the
->> ultravisor before the intercept is caused, this reliably tells whether
->> the guest is enabled for external interrupts in the ext_new_psw.
->>
->> Also update the comments to explain better what is happening.
->>
->> [1] https://lore.kernel.org/kvm/20220812062151.1980937-4-nrb@linux.ibm.com/
->>
->> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
->> ---
+On Tue, Feb 07, 2023 at 08:08:43PM +0800, Nanyong Sun wrote:
+> From: Rong Wang <wangrong68@huawei.com>
 > 
-> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+> Once enable iommu domain for one device, the MSI
+> translation tables have to be there for software-managed MSI.
+> Otherwise, platform with software-managed MSI without an
+> irq bypass function, can not get a correct memory write event
+> from pcie, will not get irqs.
+> The solution is to obtain the MSI phy base address from
+> iommu reserved region, and set it to iommu MSI cookie,
+> then translation tables will be created while request irq.
 > 
+> Change log
+> ----------
+> 
+> v1->v2:
+> - add resv iotlb to avoid overlap mapping.
+> 
+> Signed-off-by: Rong Wang <wangrong68@huawei.com>
+> Signed-off-by: Nanyong Sun <sunnanyong@huawei.com>
 
-I'll add this when picking:
-Fixes: 201ae986ead7 ("KVM: s390: protvirt: Implement interrupt injection")
+
+Could I get an ACK from IOMMU maintainers on exporting this pls?
+> ---
+>  drivers/iommu/iommu.c |  1 +
+>  drivers/vhost/vdpa.c  | 59 ++++++++++++++++++++++++++++++++++++++++---
+>  2 files changed, 57 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index 5f6a85aea501..af9c064ad8b2 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -2623,6 +2623,7 @@ void iommu_get_resv_regions(struct device *dev, struct list_head *list)
+>  	if (ops->get_resv_regions)
+>  		ops->get_resv_regions(dev, list);
+>  }
+> +EXPORT_SYMBOL(iommu_get_resv_regions);
+>  
+>  /**
+>   * iommu_put_resv_regions - release resered regions
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index ec32f785dfde..a58979da8acd 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -49,6 +49,7 @@ struct vhost_vdpa {
+>  	struct completion completion;
+>  	struct vdpa_device *vdpa;
+>  	struct hlist_head as[VHOST_VDPA_IOTLB_BUCKETS];
+> +	struct vhost_iotlb resv_iotlb;
+>  	struct device dev;
+>  	struct cdev cdev;
+>  	atomic_t opened;
+> @@ -216,6 +217,8 @@ static int vhost_vdpa_reset(struct vhost_vdpa *v)
+>  
+>  	v->in_batch = 0;
+>  
+> +	vhost_iotlb_reset(&v->resv_iotlb);
+> +
+>  	return vdpa_reset(vdpa);
+>  }
+>  
+> @@ -1013,6 +1016,10 @@ static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
+>  	    msg->iova + msg->size - 1 > v->range.last)
+>  		return -EINVAL;
+>  
+> +	if (vhost_iotlb_itree_first(&v->resv_iotlb, msg->iova,
+> +					msg->iova + msg->size - 1))
+> +		return -EINVAL;
+> +
+>  	if (vhost_iotlb_itree_first(iotlb, msg->iova,
+>  				    msg->iova + msg->size - 1))
+>  		return -EEXIST;
+> @@ -1103,6 +1110,45 @@ static ssize_t vhost_vdpa_chr_write_iter(struct kiocb *iocb,
+>  	return vhost_chr_write_iter(dev, from);
+>  }
+>  
+> +static int vhost_vdpa_resv_iommu_region(struct iommu_domain *domain, struct device *dma_dev,
+> +	struct vhost_iotlb *resv_iotlb)
+> +{
+> +	struct list_head dev_resv_regions;
+> +	phys_addr_t resv_msi_base = 0;
+> +	struct iommu_resv_region *region;
+> +	int ret = 0;
+> +	bool with_sw_msi = false;
+> +	bool with_hw_msi = false;
+> +
+> +	INIT_LIST_HEAD(&dev_resv_regions);
+> +	iommu_get_resv_regions(dma_dev, &dev_resv_regions);
+> +
+> +	list_for_each_entry(region, &dev_resv_regions, list) {
+> +		ret = vhost_iotlb_add_range_ctx(resv_iotlb, region->start,
+> +				region->start + region->length - 1,
+> +				0, 0, NULL);
+> +		if (ret) {
+> +			vhost_iotlb_reset(resv_iotlb);
+> +			break;
+> +		}
+> +
+> +		if (region->type == IOMMU_RESV_MSI)
+> +			with_hw_msi = true;
+> +
+> +		if (region->type == IOMMU_RESV_SW_MSI) {
+> +			resv_msi_base = region->start;
+> +			with_sw_msi = true;
+> +		}
+> +	}
+> +
+> +	if (!ret && !with_hw_msi && with_sw_msi)
+> +		ret = iommu_get_msi_cookie(domain, resv_msi_base);
+> +
+> +	iommu_put_resv_regions(dma_dev, &dev_resv_regions);
+> +
+> +	return ret;
+> +}
+> +
+>  static int vhost_vdpa_alloc_domain(struct vhost_vdpa *v)
+>  {
+>  	struct vdpa_device *vdpa = v->vdpa;
+> @@ -1128,11 +1174,16 @@ static int vhost_vdpa_alloc_domain(struct vhost_vdpa *v)
+>  
+>  	ret = iommu_attach_device(v->domain, dma_dev);
+>  	if (ret)
+> -		goto err_attach;
+> +		goto err_alloc_domain;
+>  
+> -	return 0;
+> +	ret = vhost_vdpa_resv_iommu_region(v->domain, dma_dev, &v->resv_iotlb);
+> +	if (ret)
+> +		goto err_attach_device;
+>  
+> -err_attach:
+> +	return 0;
+> +err_attach_device:
+> +	iommu_detach_device(v->domain, dma_dev);
+> +err_alloc_domain:
+>  	iommu_domain_free(v->domain);
+>  	return ret;
+>  }
+> @@ -1385,6 +1436,8 @@ static int vhost_vdpa_probe(struct vdpa_device *vdpa)
+>  		goto err;
+>  	}
+>  
+> +	vhost_iotlb_init(&v->resv_iotlb, 0, 0);
+> +
+>  	r = dev_set_name(&v->dev, "vhost-vdpa-%u", minor);
+>  	if (r)
+>  		goto err;
+
+Jason any feedback on vdpa change here?
+
+> -- 
+> 2.25.1
+
