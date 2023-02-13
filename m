@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 33519694EAF
-	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 19:03:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E01A0694EB0
+	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 19:03:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231213AbjBMSDR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Feb 2023 13:03:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46744 "EHLO
+        id S231252AbjBMSDT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Feb 2023 13:03:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231128AbjBMSCz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Feb 2023 13:02:55 -0500
-Received: from mail-io1-xd4a.google.com (mail-io1-xd4a.google.com [IPv6:2607:f8b0:4864:20::d4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0255166D0
-        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 10:02:47 -0800 (PST)
-Received: by mail-io1-xd4a.google.com with SMTP id e16-20020a6b5010000000b00719041c51ebso8831216iob.12
-        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 10:02:47 -0800 (PST)
+        with ESMTP id S231145AbjBMSC7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Feb 2023 13:02:59 -0500
+Received: from mail-il1-x149.google.com (mail-il1-x149.google.com [IPv6:2607:f8b0:4864:20::149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F4C71A8
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 10:02:48 -0800 (PST)
+Received: by mail-il1-x149.google.com with SMTP id i23-20020a056e021d1700b003111192e89aso9797190ila.10
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 10:02:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/4pVme0YnvFkbmhGf1BNKoMvu6OdpqpHsZJlFNEmDZU=;
-        b=IUlIvqk99wOkDyN8QxvxQiqVaFMxbqcgA9uNoQQZndNpq1vnhI1bsorC5l7knDzNI1
-         CNDo0y4gWYWsjH8HGIUC2KbuMfUKXfm7ePcqNQpy+Qs4qo8ajWDUsOujEIEHzjn327wK
-         sZ1ayR5mmnOmUCp4kpQavgmctGK3PWKE8lV3wz7hGdhQau+QWqpp26566SvWZ7ItdtGp
-         m6IcH36QOlGywNrGdqHCpVGddGG8i6Xw2nKmdn1sn1BnyRI/jVLOCzIkw/xbo4NTXMGy
-         /IjMPtH0X6J6GrDvjXmIAlRLaq0mI7ZT34see0s7lbyDyBucG6Lo7pboRUp5GpzbE3TB
-         P77g==
+        bh=NBYdz/0TDvO7IvfPjxUDSlCbo4CB4F+r8/XPr+qUWDQ=;
+        b=q/9pkLp04O+q0/h8HqWtbW0b4VJCwyM93nDv77GqvjJ6CZ4Czxpm5H8d/lDlpTXsCj
+         Lxw6nGE3jZxgA/Lo2HUBZdf5EE0qjSxvUgHGZW6o0+9e+HkhvQpiHgZdToFd+AbKHIFB
+         A5CHSl5TSlCOZjqQlpxD5e5wkvR8X/0b6YcT5jL/nTql/+HqHR7svK3rwtTT1Y+ZTR7R
+         GJ/moeEEW6KXP6NWUNqTjcT4/YBd1FC1rP0DUY32WTXTIIVoTMVTv09vwSp4CKIUlMXE
+         jaIuuptu376OmVIHLWwwSlFCwuNah5pfd60Cn7DxqT17NURWdErBO2ZYOWNiy3gYm9fN
+         UGog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/4pVme0YnvFkbmhGf1BNKoMvu6OdpqpHsZJlFNEmDZU=;
-        b=Y0AyRn0rAz0rGxtayjg2nB4IiObeNs2pMt2mQfImickds0864P031+RtGgJObyiDSb
-         M3GmCGr6n/YDyPbz7CGZQXTeJZBY1LPu6OBXeKgee+VeICJKGDfA4XsE3dT4W/knfD4w
-         XeqHtxS5KUvoagb9Lc0ljl+/XXemgTDyvI1FjA0P3Ez6x6ObrveWK/LYDLdGa0FkGIAn
-         v6QYwHZwv8R4tu8Ae+CrhnKW0HaKvYy3MIdDTdioSLAmQ4Ddpg2NsoZM+l8K5d1pAJwp
-         QtAV1l+kzKSgnag2Om0XI7/9f6U7yjyMnVQ7Dp0/YUr13op4PDwRokXhNOdom3631enU
-         +wZQ==
-X-Gm-Message-State: AO0yUKX6wjGBbjYPHy9X5WwlXbYFdyOQBMpBryxhpXsn1t3fM3deXW9y
-        5ArgP4Vpz2+rw/9gTYfjOhLdQ5mBWcUh
-X-Google-Smtp-Source: AK7set/zRoXeDH2o2OgI5SNOkKe9Bljn/xqjOVO+iFT8+upLAFbhCUFo5GurkgO+YcVUEBjj4XoXzR5ZKsrW
+        bh=NBYdz/0TDvO7IvfPjxUDSlCbo4CB4F+r8/XPr+qUWDQ=;
+        b=cBnJoqr99kC/gtWG0Eb/govvF4RO8Pto33hxLYVoGhcrd1OWGj7SA8SxtUhiRatJ3P
+         p+cvVFP1bfjMxnaRbqxJMsl9lHms8SJpIXKQmVvy+bHmZMuXJvBEEmvcwDpFcPsBhpVD
+         EmXsogRCUu5+uYHxRdr/o4DhH+aJhhZWmlJVJm3INYGM5cd50eBmKC9zq7dsDqPPMbGt
+         wVJ/i1LX7WZltbVnqHBqibC655BO86MFF6EtowaWPIekv/Pnufr6y7oz44D20ffA5+VB
+         3rQ5wRge9fPTNbl2DDVsgTWmS63A7/HMC4DMz/SyE1cHepEUB28lpwD8j72gbCBulytT
+         ULRA==
+X-Gm-Message-State: AO0yUKWMwtI5kLfA24inlpxqGoiOkNGX4IpOlvWuqYpMs0vLdnoQcJDy
+        P+dhub7OPhQTIYf25ItkPJUFZlIhjgUD
+X-Google-Smtp-Source: AK7set/5XtGkWzBFYSheugf2dkdONWpj2qzeqEPgWjWfAnOy0vxdZ74FjxG8HtTLpC55TP3sfOr6vpeLRU29
 X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:22b5])
- (user=rananta job=sendgmr) by 2002:a92:9409:0:b0:310:9fc1:a92b with SMTP id
- c9-20020a929409000000b003109fc1a92bmr2739337ili.0.1676311367115; Mon, 13 Feb
- 2023 10:02:47 -0800 (PST)
-Date:   Mon, 13 Feb 2023 18:02:28 +0000
+ (user=rananta job=sendgmr) by 2002:a92:9407:0:b0:313:f870:58fb with SMTP id
+ c7-20020a929407000000b00313f87058fbmr2508047ili.2.1676311368215; Mon, 13 Feb
+ 2023 10:02:48 -0800 (PST)
+Date:   Mon, 13 Feb 2023 18:02:29 +0000
 In-Reply-To: <20230213180234.2885032-1-rananta@google.com>
 Mime-Version: 1.0
 References: <20230213180234.2885032-1-rananta@google.com>
 X-Mailer: git-send-email 2.39.1.581.gbfd45094c4-goog
-Message-ID: <20230213180234.2885032-8-rananta@google.com>
-Subject: [PATCH 07/13] selftests: KVM: aarch64: Add KVM EVTYPE filter PMU test
+Message-ID: <20230213180234.2885032-9-rananta@google.com>
+Subject: [PATCH 08/13] selftests: KVM: aarch64: Add vCPU migration test for PMU
 From:   Raghavendra Rao Ananta <rananta@google.com>
 To:     Oliver Upton <oupton@google.com>,
         Reiji Watanabe <reijiw@google.com>,
@@ -76,145 +76,252 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM doest't allow the guests to modify the filter types
-such counting events in nonsecure/secure-EL2, EL3, and
-so on. Validate the same by force-configuring the bits
-in PMXEVTYPER_EL0, PMEVTYPERn_EL0, and PMCCFILTR_EL0
-registers.
-
-The test extends further by trying to create an event
-for counting only in EL2 and validates if the counter
-is not progressing.
+Implement a stress test for KVM by frequently force-migrating the
+vCPU to random pCPUs in the system. This would validate the
+save/restore functionality of KVM and starting/stopping of
+PMU counters as necessary.
 
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 ---
- .../testing/selftests/kvm/aarch64/vpmu_test.c | 85 +++++++++++++++++++
- 1 file changed, 85 insertions(+)
+ .../testing/selftests/kvm/aarch64/vpmu_test.c | 195 +++++++++++++++++-
+ 1 file changed, 193 insertions(+), 2 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_test.c b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
-index 3dfb770b538e9..5c166df245589 100644
+index 5c166df245589..0c9d801f4e602 100644
 --- a/tools/testing/selftests/kvm/aarch64/vpmu_test.c
 +++ b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
-@@ -15,6 +15,10 @@
-  * of allowing or denying the events. The guest validates it by
-  * checking if it's able to count only the events that are allowed.
+@@ -19,9 +19,15 @@
+  * higher exception levels (EL2, EL3). Verify this functionality by
+  * configuring and trying to count the events for EL2 in the guest.
   *
-+ * 3. KVM doesn't allow the guest to count the events attributed with
-+ * higher exception levels (EL2, EL3). Verify this functionality by
-+ * configuring and trying to count the events for EL2 in the guest.
++ * 4. Since the PMU registers are per-cpu, stress KVM by frequently
++ * migrating the guest vCPU to random pCPUs in the system, and check
++ * if the vPMU is still behaving as expected.
 + *
   * Copyright (c) 2022 Google LLC.
   *
   */
-@@ -23,6 +27,7 @@
++#define _GNU_SOURCE
++
+ #include <kvm_util.h>
+ #include <processor.h>
  #include <test_util.h>
- #include <vgic.h>
- #include <asm/perf_event.h>
-+#include <linux/arm-smccc.h>
+@@ -30,6 +36,11 @@
+ #include <linux/arm-smccc.h>
  #include <linux/bitfield.h>
  #include <linux/bitmap.h>
++#include <stdlib.h>
++#include <pthread.h>
++#include <sys/sysinfo.h>
++
++#include "delay.h"
  
-@@ -259,6 +264,7 @@ struct vpmu_vm {
- enum test_stage {
+ /* The max number of the PMU event counters (excluding the cycle counter) */
+ #define ARMV8_PMU_MAX_GENERAL_COUNTERS	(ARMV8_PMU_MAX_COUNTERS - 1)
+@@ -37,6 +48,8 @@
+ /* The max number of event numbers that's supported */
+ #define ARMV8_PMU_MAX_EVENTS		64
+ 
++#define msecs_to_usecs(msec)		((msec) * 1000LL)
++
+ /*
+  * The macros and functions below for reading/writing PMEV{CNTR,TYPER}<n>_EL0
+  * were basically copied from arch/arm64/kernel/perf_event.c.
+@@ -265,6 +278,7 @@ enum test_stage {
  	TEST_STAGE_COUNTER_ACCESS = 1,
  	TEST_STAGE_KVM_EVENT_FILTER,
-+	TEST_STAGE_KVM_EVTYPE_FILTER,
+ 	TEST_STAGE_KVM_EVTYPE_FILTER,
++	TEST_STAGE_VCPU_MIGRATION,
  };
  
  struct guest_data {
-@@ -678,6 +684,70 @@ static void guest_event_filter_test(unsigned long *pmu_filter)
+@@ -275,6 +289,19 @@ struct guest_data {
+ 
+ static struct guest_data guest_data;
+ 
++#define VCPU_MIGRATIONS_TEST_ITERS_DEF		1000
++#define VCPU_MIGRATIONS_TEST_MIGRATION_FREQ_MS	2
++
++struct test_args {
++	int vcpu_migration_test_iter;
++	int vcpu_migration_test_migrate_freq_ms;
++};
++
++static struct test_args test_args = {
++	.vcpu_migration_test_iter = VCPU_MIGRATIONS_TEST_ITERS_DEF,
++	.vcpu_migration_test_migrate_freq_ms = VCPU_MIGRATIONS_TEST_MIGRATION_FREQ_MS,
++};
++
+ static void guest_sync_handler(struct ex_regs *regs)
+ {
+ 	uint64_t esr, ec;
+@@ -352,7 +379,6 @@ static bool pmu_event_is_supported(uint64_t event)
+ 		GUEST_ASSERT_3(!(_tval & mask), _tval, mask, set_expected);\
+ }
+ 
+-
+ /*
+  * Extra instructions inserted by the compiler would be difficult to compensate
+  * for, so hand assemble everything between, and including, the PMCR accesses
+@@ -459,6 +485,13 @@ static void test_event_count(uint64_t event, int pmc_idx, bool expect_count)
  	}
  }
  
-+static void guest_evtype_filter_test(void)
++static void test_basic_pmu_functionality(void)
 +{
-+	int i;
-+	struct pmc_accessor *acc;
-+	uint64_t typer, cnt;
-+	struct arm_smccc_res res;
++	/* Test events on generic and cycle counters */
++	test_instructions_count(0, true);
++	test_cycles_count(true);
++}
 +
-+	pmu_enable();
-+
+ /*
+  * Check if @mask bits in {PMCNTEN,PMINTEN,PMOVS}{SET,CLR} registers
+  * are set or cleared as specified in @set_expected.
+@@ -748,6 +781,16 @@ static void guest_evtype_filter_test(void)
+ 	GUEST_ASSERT_2(cnt == 0, cnt, typer);
+ }
+ 
++static void guest_vcpu_migration_test(void)
++{
 +	/*
-+	 * KVM blocks the guests from creating events for counting in Secure/Non-Secure Hyp (EL2),
-+	 * Monitor (EL3), and Multithreading configuration. It applies the mask
-+	 * ARMV8_PMU_EVTYPE_MASK against guest accesses to PMXEVTYPER_EL0, PMEVTYPERn_EL0,
-+	 * and PMCCFILTR_EL0 registers to prevent this. Check if KVM honors this using all possible
-+	 * ways to configure the EVTYPER.
++	 * While the userspace continuously migrates this vCPU to random pCPUs,
++	 * run basic PMU functionalities and verify the results.
 +	 */
-+	for (i = 0; i < ARRAY_SIZE(pmc_accessors); i++) {
-+		acc = &pmc_accessors[i];
-+
-+		/* Set all filter bits (31-24), readback, and check against the mask */
-+		acc->write_typer(0, 0xff000000);
-+		typer = acc->read_typer(0);
-+
-+		GUEST_ASSERT_2((typer | ARMV8_PMU_EVTYPE_EVENT) == ARMV8_PMU_EVTYPE_MASK,
-+				typer | ARMV8_PMU_EVTYPE_EVENT, ARMV8_PMU_EVTYPE_MASK);
-+
-+		/*
-+		 * Regardless of ARMV8_PMU_EVTYPE_MASK, KVM sets perf attr.exclude_hv
-+		 * to not count NS-EL2 events. Verify this functionality by configuring
-+		 * a NS-EL2 event, for which the couunt shouldn't increment.
-+		 */
-+		typer = ARMV8_PMUV3_PERFCTR_INST_RETIRED;
-+		typer |= ARMV8_PMU_INCLUDE_EL2 | ARMV8_PMU_EXCLUDE_EL1 | ARMV8_PMU_EXCLUDE_EL0;
-+		acc->write_typer(0, typer);
-+		acc->write_cntr(0, 0);
-+		enable_counter(0);
-+
-+		/* Issue a hypercall to enter EL2 and return */
-+		memset(&res, 0, sizeof(res));
-+		smccc_hvc(ARM_SMCCC_VERSION_FUNC_ID, 0, 0, 0, 0, 0, 0, 0, &res);
-+
-+		cnt = acc->read_cntr(0);
-+		GUEST_ASSERT_3(cnt == 0, cnt, typer, i);
-+	}
-+
-+	/* Check the same sequence for the Cycle counter */
-+	write_pmccfiltr(0xff000000);
-+	typer = read_pmccfiltr();
-+	GUEST_ASSERT_2((typer | ARMV8_PMU_EVTYPE_EVENT) == ARMV8_PMU_EVTYPE_MASK,
-+				typer | ARMV8_PMU_EVTYPE_EVENT, ARMV8_PMU_EVTYPE_MASK);
-+
-+	typer = ARMV8_PMU_INCLUDE_EL2 | ARMV8_PMU_EXCLUDE_EL1 | ARMV8_PMU_EXCLUDE_EL0;
-+	write_pmccfiltr(typer);
-+	reset_cycle_counter();
-+	enable_cycle_counter();
-+
-+	/* Issue a hypercall to enter EL2 and return */
-+	memset(&res, 0, sizeof(res));
-+	smccc_hvc(ARM_SMCCC_VERSION_FUNC_ID, 0, 0, 0, 0, 0, 0, 0, &res);
-+
-+	cnt = read_cycle_counter();
-+	GUEST_ASSERT_2(cnt == 0, cnt, typer);
++	while (test_args.vcpu_migration_test_iter--)
++		test_basic_pmu_functionality();
 +}
 +
  static void guest_code(void)
  {
  	switch (guest_data.test_stage) {
-@@ -687,6 +757,9 @@ static void guest_code(void)
- 	case TEST_STAGE_KVM_EVENT_FILTER:
- 		guest_event_filter_test(guest_data.pmu_filter);
+@@ -760,6 +803,9 @@ static void guest_code(void)
+ 	case TEST_STAGE_KVM_EVTYPE_FILTER:
+ 		guest_evtype_filter_test();
  		break;
-+	case TEST_STAGE_KVM_EVTYPE_FILTER:
-+		guest_evtype_filter_test();
++	case TEST_STAGE_VCPU_MIGRATION:
++		guest_vcpu_migration_test();
 +		break;
  	default:
  		GUEST_ASSERT_1(0, guest_data.test_stage);
  	}
-@@ -1014,10 +1087,22 @@ static void run_kvm_event_filter_test(void)
- 	run_kvm_event_filter_error_tests();
+@@ -837,6 +883,7 @@ create_vpmu_vm(void *guest_code, struct kvm_pmu_event_filter *pmu_event_filters)
+ 
+ 	vpmu_vm->vm = vm = vm_create(1);
+ 	vm_init_descriptor_tables(vm);
++
+ 	/* Catch exceptions for easier debugging */
+ 	for (ec = 0; ec < ESR_EC_NUM; ec++) {
+ 		vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT, ec,
+@@ -881,6 +928,8 @@ static void run_vcpu(struct kvm_vcpu *vcpu)
+ 	struct ucall uc;
+ 
+ 	sync_global_to_guest(vcpu->vm, guest_data);
++	sync_global_to_guest(vcpu->vm, test_args);
++
+ 	vcpu_run(vcpu);
+ 	switch (get_ucall(vcpu, &uc)) {
+ 	case UCALL_ABORT:
+@@ -1098,11 +1147,112 @@ static void run_kvm_evtype_filter_test(void)
+ 	destroy_vpmu_vm(vpmu_vm);
  }
  
-+static void run_kvm_evtype_filter_test(void)
-+{
++struct vcpu_migrate_data {
 +	struct vpmu_vm *vpmu_vm;
++	pthread_t *pt_vcpu;
++	bool vcpu_done;
++};
 +
-+	guest_data.test_stage = TEST_STAGE_KVM_EVTYPE_FILTER;
++static void *run_vcpus_migrate_test_func(void *arg)
++{
++	struct vcpu_migrate_data *migrate_data = arg;
++	struct vpmu_vm *vpmu_vm = migrate_data->vpmu_vm;
 +
-+	vpmu_vm = create_vpmu_vm(guest_code, NULL);
 +	run_vcpu(vpmu_vm->vcpu);
++	migrate_data->vcpu_done = true;
++
++	return NULL;
++}
++
++static uint32_t get_pcpu(void)
++{
++	uint32_t pcpu;
++	unsigned int nproc_conf;
++	cpu_set_t online_cpuset;
++
++	nproc_conf = get_nprocs_conf();
++	sched_getaffinity(0, sizeof(cpu_set_t), &online_cpuset);
++
++	/* Randomly find an available pCPU to place the vCPU on */
++	do {
++		pcpu = rand() % nproc_conf;
++	} while (!CPU_ISSET(pcpu, &online_cpuset));
++
++	return pcpu;
++}
++
++static int migrate_vcpu(struct vcpu_migrate_data *migrate_data)
++{
++	int ret;
++	cpu_set_t cpuset;
++	uint32_t new_pcpu = get_pcpu();
++
++	CPU_ZERO(&cpuset);
++	CPU_SET(new_pcpu, &cpuset);
++
++	pr_debug("Migrating vCPU to pCPU: %u\n", new_pcpu);
++
++	ret = pthread_setaffinity_np(*migrate_data->pt_vcpu, sizeof(cpuset), &cpuset);
++
++	/* Allow the error where the vCPU thread is already finished */
++	TEST_ASSERT(ret == 0 || ret == ESRCH,
++		    "Failed to migrate the vCPU to pCPU: %u; ret: %d\n", new_pcpu, ret);
++
++	return ret;
++}
++
++static void *vcpus_migrate_func(void *arg)
++{
++	struct vcpu_migrate_data *migrate_data = arg;
++
++	while (!migrate_data->vcpu_done) {
++		usleep(msecs_to_usecs(test_args.vcpu_migration_test_migrate_freq_ms));
++		migrate_vcpu(migrate_data);
++	}
++
++	return NULL;
++}
++
++static void run_vcpu_migration_test(uint64_t pmcr_n)
++{
++	int ret;
++	struct vpmu_vm *vpmu_vm;
++	pthread_t pt_vcpu, pt_sched;
++	struct vcpu_migrate_data migrate_data = {
++		.pt_vcpu = &pt_vcpu,
++		.vcpu_done = false,
++	};
++
++	__TEST_REQUIRE(get_nprocs() >= 2, "At least two pCPUs needed for vCPU migration test");
++
++	guest_data.test_stage = TEST_STAGE_VCPU_MIGRATION;
++	guest_data.expected_pmcr_n = pmcr_n;
++
++	migrate_data.vpmu_vm = vpmu_vm = create_vpmu_vm(guest_code, NULL);
++
++	/* Initialize random number generation for migrating vCPUs to random pCPUs */
++	srand(time(NULL));
++
++	/* Spawn a vCPU thread */
++	ret = pthread_create(&pt_vcpu, NULL, run_vcpus_migrate_test_func, &migrate_data);
++	TEST_ASSERT(!ret, "Failed to create the vCPU thread");
++
++	/* Spawn a scheduler thread to force-migrate vCPUs to various pCPUs */
++	ret = pthread_create(&pt_sched, NULL, vcpus_migrate_func, &migrate_data);
++	TEST_ASSERT(!ret, "Failed to create the scheduler thread for migrating the vCPUs");
++
++	pthread_join(pt_sched, NULL);
++	pthread_join(pt_vcpu, NULL);
++
 +	destroy_vpmu_vm(vpmu_vm);
 +}
 +
@@ -222,10 +329,66 @@ index 3dfb770b538e9..5c166df245589 100644
  {
  	run_counter_access_tests(pmcr_n);
  	run_kvm_event_filter_test();
-+	run_kvm_evtype_filter_test();
+ 	run_kvm_evtype_filter_test();
++	run_vcpu_migration_test(pmcr_n);
  }
  
  /*
+@@ -1121,12 +1271,53 @@ static uint64_t get_pmcr_n_limit(void)
+ 	return FIELD_GET(ARMV8_PMU_PMCR_N, pmcr);
+ }
+ 
+-int main(void)
++static void print_help(char *name)
++{
++	pr_info("Usage: %s [-h] [-i vcpu_migration_test_iterations] [-m vcpu_migration_freq_ms]\n",
++		name);
++	pr_info("\t-i: Number of iterations of vCPU migrations test (default: %u)\n",
++		VCPU_MIGRATIONS_TEST_ITERS_DEF);
++	pr_info("\t-m: Frequency (in ms) of vCPUs to migrate to different pCPU. (default: %u)\n",
++		VCPU_MIGRATIONS_TEST_MIGRATION_FREQ_MS);
++	pr_info("\t-h: print this help screen\n");
++}
++
++static bool parse_args(int argc, char *argv[])
++{
++	int opt;
++
++	while ((opt = getopt(argc, argv, "hi:m:")) != -1) {
++		switch (opt) {
++		case 'i':
++			test_args.vcpu_migration_test_iter =
++				atoi_positive("Nr vCPU migration iterations", optarg);
++			break;
++		case 'm':
++			test_args.vcpu_migration_test_migrate_freq_ms =
++				atoi_positive("vCPU migration frequency", optarg);
++			break;
++		case 'h':
++		default:
++			goto err;
++		}
++	}
++
++	return true;
++
++err:
++	print_help(argv[0]);
++	return false;
++}
++
++int main(int argc, char *argv[])
+ {
+ 	uint64_t pmcr_n;
+ 
+ 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PMU_V3));
+ 
++	if (!parse_args(argc, argv))
++		exit(KSFT_SKIP);
++
+ 	pmcr_n = get_pmcr_n_limit();
+ 	run_tests(pmcr_n);
+ 
 -- 
 2.39.1.581.gbfd45094c4-goog
 
