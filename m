@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EE0DB694299
-	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 11:18:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 33A4C69429A
+	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 11:18:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230336AbjBMKS3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Feb 2023 05:18:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53386 "EHLO
+        id S230334AbjBMKSa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Feb 2023 05:18:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230354AbjBMKSW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Feb 2023 05:18:22 -0500
+        with ESMTP id S230318AbjBMKS0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Feb 2023 05:18:26 -0500
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E8232166FD
-        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 02:18:18 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6CF6714E90
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 02:18:20 -0800 (PST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2B01D1D31;
-        Mon, 13 Feb 2023 02:19:01 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5BC581D34;
+        Mon, 13 Feb 2023 02:19:02 -0800 (PST)
 Received: from godel.lab.cambridge.arm.com (godel.lab.cambridge.arm.com [10.7.66.42])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 90EBB3F703;
-        Mon, 13 Feb 2023 02:18:17 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C1B013F703;
+        Mon, 13 Feb 2023 02:18:18 -0800 (PST)
 From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev
 Cc:     pbonzini@redhat.com, alexandru.elisei@arm.com, ricarkol@google.com,
         Andrew Jones <drjones@redhat.com>
-Subject: [PATCH v4 12/30] arm64: Add support for setting up the PSCI conduit through ACPI
-Date:   Mon, 13 Feb 2023 10:17:41 +0000
-Message-Id: <20230213101759.2577077-13-nikos.nikoleris@arm.com>
+Subject: [PATCH v4 13/30] arm64: Add support for discovering the UART through ACPI
+Date:   Mon, 13 Feb 2023 10:17:42 +0000
+Message-Id: <20230213101759.2577077-14-nikos.nikoleris@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230213101759.2577077-1-nikos.nikoleris@arm.com>
 References: <20230213101759.2577077-1-nikos.nikoleris@arm.com>
@@ -42,103 +42,120 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 In systems with ACPI support and when a DT is not provided, we can use
-the FADT to discover whether PSCI calls need to use smc or hvc
-calls. This change implements this but retains the default behavior;
-we check if a valid DT is provided, if not, we try to setup the PSCI
-conduit using ACPI.
+the SPCR to discover the serial port address range. This change
+implements this but retains the default behavior; we check if a valid
+DT is provided, if not, we try to discover the UART using ACPI.
 
 Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 Reviewed-by: Andrew Jones <drjones@redhat.com>
 Reviewed-by: Ricardo Koller <ricarkol@google.com>
 ---
- arm/Makefile.arm64 |  4 ++++
- lib/acpi.h         |  5 +++++
- lib/arm/psci.c     | 37 ++++++++++++++++++++++++++++++++++++-
- 3 files changed, 45 insertions(+), 1 deletion(-)
+ lib/acpi.h   | 25 +++++++++++++++++++++++++
+ lib/arm/io.c | 34 +++++++++++++++++++++++++++++-----
+ 2 files changed, 54 insertions(+), 5 deletions(-)
 
-diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-index 42e18e77..6dff6cad 100644
---- a/arm/Makefile.arm64
-+++ b/arm/Makefile.arm64
-@@ -25,6 +25,10 @@ cflatobjs += lib/arm64/processor.o
- cflatobjs += lib/arm64/spinlock.o
- cflatobjs += lib/arm64/gic-v3-its.o lib/arm64/gic-v3-its-cmd.o
- 
-+ifeq ($(CONFIG_EFI),y)
-+cflatobjs += lib/acpi.o
-+endif
-+
- OBJDIRS += lib/arm64
- 
- # arm64 specific tests
 diff --git a/lib/acpi.h b/lib/acpi.h
-index 38b6d5c9..5ba6e29d 100644
+index 5ba6e29d..02ca8958 100644
 --- a/lib/acpi.h
 +++ b/lib/acpi.h
-@@ -129,6 +129,11 @@ struct acpi_table_fadt {
- 	u64 hypervisor_id;	/* Hypervisor Vendor ID (ACPI 6.0) */
+@@ -17,6 +17,7 @@
+ #define XSDT_SIGNATURE ACPI_SIGNATURE('X','S','D','T')
+ #define FACP_SIGNATURE ACPI_SIGNATURE('F','A','C','P')
+ #define FACS_SIGNATURE ACPI_SIGNATURE('F','A','C','S')
++#define SPCR_SIGNATURE ACPI_SIGNATURE('S','P','C','R')
+ 
+ #define ACPI_SIGNATURE_8BYTE(c1, c2, c3, c4, c5, c6, c7, c8) \
+ 	(((uint64_t)(ACPI_SIGNATURE(c1, c2, c3, c4))) |	     \
+@@ -145,6 +146,30 @@ struct acpi_table_facs_rev1 {
+ 	u8 reserved3[40];	/* Reserved - must be zero */
  };
  
-+/* Masks for FADT ARM Boot Architecture Flags (arm_boot_flags) ACPI 5.1 */
++struct spcr_descriptor {
++	ACPI_TABLE_HEADER_DEF	/* ACPI common table header */
++	u8 interface_type;	/* 0=full 16550, 1=subset of 16550 */
++	u8 reserved[3];
++	struct acpi_generic_address serial_port;
++	u8 interrupt_type;
++	u8 pc_interrupt;
++	u32 interrupt;
++	u8 baud_rate;
++	u8 parity;
++	u8 stop_bits;
++	u8 flow_control;
++	u8 terminal_type;
++	u8 reserved1;
++	u16 pci_device_id;
++	u16 pci_vendor_id;
++	u8 pci_bus;
++	u8 pci_device;
++	u8 pci_function;
++	u32 pci_flags;
++	u8 pci_segment;
++	u32 reserved2;
++};
 +
-+#define ACPI_FADT_PSCI_COMPLIANT    (1)	/* 00: [V5+] PSCI 0.2+ is implemented */
-+#define ACPI_FADT_PSCI_USE_HVC      (1<<1)	/* 01: [V5+] HVC must be used instead of SMC as the PSCI conduit */
-+
- struct acpi_table_facs_rev1 {
- 	u32 signature;		/* ACPI Signature */
- 	u32 length;		/* Length of structure, in bytes */
-diff --git a/lib/arm/psci.c b/lib/arm/psci.c
-index 9c031a12..bddb0787 100644
---- a/lib/arm/psci.c
-+++ b/lib/arm/psci.c
-@@ -56,7 +56,7 @@ void psci_system_off(void)
- 	printf("CPU%d unable to do system off (error = %d)\n", smp_processor_id(), err);
- }
+ #pragma pack(0)
  
--void psci_set_conduit(void)
-+static void psci_set_conduit_fdt(void)
+ void set_efi_rsdp(struct acpi_table_rsdp *rsdp);
+diff --git a/lib/arm/io.c b/lib/arm/io.c
+index 343e1082..19f93490 100644
+--- a/lib/arm/io.c
++++ b/lib/arm/io.c
+@@ -29,7 +29,7 @@ static struct spinlock uart_lock;
+ #define UART_EARLY_BASE (u8 *)(unsigned long)CONFIG_UART_EARLY_BASE
+ static volatile u8 *uart0_base = UART_EARLY_BASE;
+ 
+-static void uart0_init(void)
++static void uart0_init_fdt(void)
  {
- 	const void *fdt = dt_fdt();
- 	const struct fdt_property *method;
-@@ -75,3 +75,38 @@ void psci_set_conduit(void)
- 	else
- 		assert_msg(false, "Unknown PSCI conduit: %s", method->data);
- }
+ 	/*
+ 	 * kvm-unit-tests uses the uart only for output. Both uart models have
+@@ -65,17 +65,41 @@ static void uart0_init(void)
+ 	}
+ 
+ 	uart0_base = ioremap(base.addr, base.size);
++}
 +
 +#ifdef CONFIG_EFI
 +
 +#include <acpi.h>
 +
-+static void psci_set_conduit_acpi(void)
++static void uart0_init_acpi(void)
 +{
-+	struct acpi_table_fadt *fadt = find_acpi_table_addr(FACP_SIGNATURE);
++	struct spcr_descriptor *spcr = find_acpi_table_addr(SPCR_SIGNATURE);
 +
-+	assert_msg(fadt, "Unable to find ACPI FADT");
-+	assert_msg(fadt->arm_boot_flags & ACPI_FADT_PSCI_COMPLIANT,
-+		   "PSCI is not supported in this platform");
-+
-+	if (fadt->arm_boot_flags & ACPI_FADT_PSCI_USE_HVC)
-+		psci_invoke = psci_invoke_hvc;
-+	else
-+		psci_invoke = psci_invoke_smc;
++	assert_msg(spcr, "Unable to find ACPI SPCR");
++	uart0_base = ioremap(spcr->serial_port.address, spcr->serial_port.bit_width);
 +}
-+
 +#else
 +
-+static void psci_set_conduit_acpi(void)
++static void uart0_init_acpi(void)
 +{
 +	assert_msg(false, "ACPI not available");
 +}
 +
 +#endif
 +
-+void psci_set_conduit(void)
++void io_init(void)
 +{
 +	if (dt_available())
-+		psci_set_conduit_fdt();
++		uart0_init_fdt();
 +	else
-+		psci_set_conduit_acpi();
-+}
++		uart0_init_acpi();
+ 
+ 	if (uart0_base != UART_EARLY_BASE) {
+ 		printf("WARNING: early print support may not work. "
+ 		       "Found uart at %p, but early base is %p.\n",
+ 			uart0_base, UART_EARLY_BASE);
+ 	}
+-}
+ 
+-void io_init(void)
+-{
+-	uart0_init();
+ 	chr_testdev_init();
+ }
+ 
 -- 
 2.25.1
 
