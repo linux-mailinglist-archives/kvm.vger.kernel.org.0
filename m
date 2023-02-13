@@ -2,163 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 015B16954D8
-	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 00:39:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F2666954E8
+	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 00:43:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230200AbjBMXjU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Feb 2023 18:39:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47488 "EHLO
+        id S231131AbjBMXnq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Feb 2023 18:43:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229670AbjBMXjS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Feb 2023 18:39:18 -0500
-Received: from mail-oa1-x2d.google.com (mail-oa1-x2d.google.com [IPv6:2001:4860:4864:20::2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7A10C649
-        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 15:39:17 -0800 (PST)
-Received: by mail-oa1-x2d.google.com with SMTP id 586e51a60fabf-16cc1e43244so12838676fac.12
-        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 15:39:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ktaBt39wS4f2yCu02LIXZMFtDIQascfY8Gt2E5XTzjg=;
-        b=X0tOw9s28CYugHz6ZHC9SJauJDYvMA4hKuFlOfrD5E0WFz1QQC2umxD9SSn20R/YZa
-         nI4/TX/PUZel0L4U89dwKXDRmpLK0rrSB5G2rAg6gdr5o4FV9F/r6b0w0ESdxyd0lC/B
-         xEODVPYz/H4EEtSD8H7IqpRtT2STmyzzIZGGxcqEF/25kGTs1ulQHCLKx+EPCigBf8Hp
-         mID5u4fZ6Tv4eoa3Y3XhOk1Rcn49d2TT09s6Gms7crhHjQ/phjtgxd0BbXxU4hvp8aFQ
-         IqNSWZ/uvqK/73waagT7uWflBvIn7Fc6tfhjsCPMtfYAzT3kzyYuTXqdrz0M7fSY+X7X
-         W5xA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ktaBt39wS4f2yCu02LIXZMFtDIQascfY8Gt2E5XTzjg=;
-        b=kCjCa2QYw5q68zZXAHfOYotyiqV4ZJg68co2GMB8mAoGjwql58UZy1DsAgGO4wWPRY
-         VSo4Jq1crDLXusY0AseeGwpx0G7ngQ0Kkqc1GlMr2xkbmEUP8cQv2VQgoRTLlol1XT8H
-         fDm0mfzmnhFBlJDPiiTTGbJ5uCvYeT7vNVCBpRGXrkn+ESHcFLLH87yZYmKCIWgoUvXJ
-         hA9g82s7rHE2aYdrnm52256fuU6/4JbruUz4HE24cEdYjX600OW6Thf0drPXauu38paM
-         rM2MelKbSEKS1Y0uGDXTdPIBNya/ZqzNXgCpVSODspfv+y2zRZ4QDCz9EFCqUmwys9gG
-         R6NA==
-X-Gm-Message-State: AO0yUKUbcxPG2lqK1Le7fGtQbGMfHDI4iWmI4wdl2/z3xcZfdrnWAqH7
-        VDU+MHqytSeTmhJsHolZglHx+eZVelk2Kt9z1fua+w==
-X-Google-Smtp-Source: AK7set9CsYCQgd2WdRuRBl7l0PTQ1UaPtTpAsr9EVzTsDTVe8XSr1K5UxB+YK03KvheKFGMDO+PFXKMELqjmns6Vyww=
-X-Received: by 2002:a05:6871:d81:b0:16d:e8ac:8424 with SMTP id
- vi1-20020a0568710d8100b0016de8ac8424mr1202074oab.179.1676331556807; Mon, 13
- Feb 2023 15:39:16 -0800 (PST)
+        with ESMTP id S229570AbjBMXno (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Feb 2023 18:43:44 -0500
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2068.outbound.protection.outlook.com [40.107.244.68])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 664C412049;
+        Mon, 13 Feb 2023 15:43:43 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fsyA9qfwqNRO5aIu8zoFYP0LzbDwTr7NLeCUNsvaXGqQH/nE528wMYQGiScDgDcfYeN9LiPDNV+GsP+cvmkmvn5thVNMx3aXwAC+xzX4KE/YzDlqoW+bB2zxbuk6RmPEPTQ+RzsT4syPizdmFsPgc4Nn563uELPAsbHdAYdxqHNxdk+vxzllJC9qEpLrL0hGPIjzSOh11pjozGADNWKW1BqitykA7hMqiPO/3y5miarVbLtvQuTzx0TVcp4Q/HWvCnxUoL+Qxzu5Xpn+hRi9to9vYtnRxzZfIeoN37i9iSfW5nhfIHnd1ev3ZXy4V5enWTuaVZf+SZY2ZTc9lTapkw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ge/DQO5aFqrJrH06n6mZWvL04n+zcXkOJT1C79YQEf0=;
+ b=F98fnT4b7ThQFqsDWj4uJJC3hqLCuJ1tlIQKK/HyCCxF0QNnCx2DUFwbWO85hevCEJfGpwaZQqBPbmyKeVsnuIdbcsKyUandeFkKy2ujLONVXqB3vrOxjjt37i35yT+brKQSN3DuG/dsiaYWpUi1PgmQvJPnvrD2COlYH0b1wMyXfphnKoi7Cc3I5C1G1rt+r0Pv4hxBtfrWnNTe+xyUX6VIOqt7WLChSdBRVjme0bhh1ORtR8FFD+MNi7rgp1yrcIvVTqc3XUEJWLdSz+4w5RNUTOAtbzGHMob32vG7UqtACwCIYPJP64ENUoXI1f5WnKA+EzBX7YGY/iS9gvdpUA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ge/DQO5aFqrJrH06n6mZWvL04n+zcXkOJT1C79YQEf0=;
+ b=UUe+pDWRPU2dQ65DuaXbaDiYYr213RGANsEiHm5IH236S/gXHx3oGj5z9I3bAExDeP/wcBzlSd9UbQ1EvHVaeXBVZh9i/oxZeosv37UAWXH8xKbMuOS/dQ5MVTiKwHP7PR2n50Q7Yn/65AnmgKFNKKUqdnbeHmnkvapMFMWam9z09RjngWw2ZWURgwFneqDK6VK8CJNSVQ5JOkYBjII0B4Ap8KVcB+NOtPvSRHy6aAGN0KkdpT/CJTo3aRi483LmOOgJIXQniur01ws+2sKwBCd8Rhd4aawIYm3QE5r8ZfL56LuMMMQ6CSvrgyulM1TayDYI+v3LR3JCGgCWMcqVmA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by PH7PR12MB6000.namprd12.prod.outlook.com (2603:10b6:510:1dc::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.22; Mon, 13 Feb
+ 2023 23:43:40 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3cb3:2fce:5c8f:82ee]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3cb3:2fce:5c8f:82ee%6]) with mapi id 15.20.6086.023; Mon, 13 Feb 2023
+ 23:43:40 +0000
+Date:   Mon, 13 Feb 2023 19:43:38 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+Cc:     joro@8bytes.org, alex.williamson@redhat.com, kevin.tian@intel.com,
+        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
+        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org
+Subject: Re: [PATCH v3 03/15] vfio: Accept vfio device file in the driver
+ facing kAPI
+Message-ID: <Y+rLKvCMivND0izd@nvidia.com>
+References: <20230213151348.56451-1-yi.l.liu@intel.com>
+ <20230213151348.56451-4-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230213151348.56451-4-yi.l.liu@intel.com>
+X-ClientProxiedBy: MN2PR10CA0024.namprd10.prod.outlook.com
+ (2603:10b6:208:120::37) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-References: <20230213180234.2885032-1-rananta@google.com>
-In-Reply-To: <20230213180234.2885032-1-rananta@google.com>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Mon, 13 Feb 2023 15:39:04 -0800
-Message-ID: <CAJHc60wHFHYCotv87n0rCuDLaF4k8idNpMf-J9ERRebLH=uBLQ@mail.gmail.com>
-Subject: Re: [PATCH 00/13] Extend the vPMU selftest
-To:     Oliver Upton <oupton@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Ricardo Koller <ricarkol@google.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH7PR12MB6000:EE_
+X-MS-Office365-Filtering-Correlation-Id: b615cd5f-132e-4bc1-3243-08db0e1c2297
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 410Sw2fQ8BBfBIYuIWI8O13HUgzDEH5e9AcNQdCJYwUO5ZdQXUlwXGAn0NobrgQJ2WHNPsOy5gvW2FAZRNl91drWg/8vei4JT16s8u9vkLwOd98DZCB3gHwx4pge8QxjKSpZeVlnRw09eLIW3PK8mPzPaisfPufo9OK81pXyhGdq5z7OvsrLAZJMQKohElsEXmcv9IgvKP3tjwiVwyTqFZHaFQ1w/8FH/48m1smY0hn+cCbxOd8WSTKaaZv3ZwdejEdRmavWpLX6ReiYSMudXslvNNrmyNwcM4xwg/RiYmzgFff5XtVBCXQm6xlHZWl3JqQT9TVNKX1Dgdz5sITXjk9Ng2+YamA4Y8IMMkIAexXlfIDJB0LEm0ZHpJr/Qc3uARLmct5GhB24CZ8mwYR8SzAJt6d5iVvB3GEWW5eVDvPpYg9lAcHa91t4s0ECPhgmMTj0uq1wa00UV/IWVpXZhZ3M1//RPMtHfHlGx0ghf1HcXosqK41mPbLYXmrbCkr4qBPDPN7igq+WrsHUdkyJmSrvbRW2OAgsDGt0v3ugcvYm09O6KTOonFuNwuxPwajMLLpXd326jO9CTTXQ0xp5lanHIxlbH5PmZ4VNyeri/ZgjXIAXf0xBWnjZOswhsJRr8HV1aaWP5vlTBBrx5UnaKDJh6ytio2R/LZtVFs3ntBuyBBloY5dTMnuMXmiD+j3T
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(396003)(366004)(376002)(346002)(136003)(39860400002)(451199018)(38100700002)(2616005)(26005)(6512007)(186003)(316002)(86362001)(8936002)(66946007)(2906002)(4326008)(6916009)(66476007)(36756003)(4744005)(8676002)(41300700001)(6486002)(5660300002)(478600001)(6506007)(7416002)(66556008)(67856001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?AF6DVTzdPK3FEhfxdogVfiHylwZF26iPxzA0T1iYyTXZD5c/h7eJSUgDbUUz?=
+ =?us-ascii?Q?wHcTyX8t4qTEXUI1zjsfX1BR35crBvz6qBaCUL3bTVyCEURowah/RVQGadmS?=
+ =?us-ascii?Q?HP0/RRDZ881145Or6REYdLChUwdN4e2AcNGh/fcr7bS6i6FPj+TH5+KMy2hV?=
+ =?us-ascii?Q?3FMI9IZFnk3sy3it2rPJal2BN1elQ8emcd6ZXFgPpUK3kyfRTn3InJBckqiD?=
+ =?us-ascii?Q?AvjEpTAWflYDcrn6GM3YY4s9PS4vq1/pZwCFd+EAFj7dRmtftMZAhO5bG6Zn?=
+ =?us-ascii?Q?pAvU2XIxqXWBATCqVzeorFtkuMa/NvSBgV8EJR+hes0vjsiUwZ/KSyOMSm05?=
+ =?us-ascii?Q?GNgDvY3yzjbJcia5to2KxPhVB4HbwjHOmy1EHSDWZJloOOBOjgbBrZ8IAYYh?=
+ =?us-ascii?Q?bY4P++8eyQcKQwewIqw6VIh4aISbTf3ukkrErcNwHKZ1Dku4wDkka92MV6uc?=
+ =?us-ascii?Q?lXpxe+xBNjvvJdzgQKRui9Zl+XXtIopFQQNqg+yEB2uzrsxwXde68vW3qsEP?=
+ =?us-ascii?Q?ua2p2IDxQvblyS02kme1sMfk/ratMH6NoeVjRrxsLK3fxFBeJiK5s2oBYVkv?=
+ =?us-ascii?Q?cbwBi5PxH+ZHe/VOM+SiKsgQ/uzB432m82uEyH+gYt/cUa8NuKVWPwZxVm/W?=
+ =?us-ascii?Q?Z50a37n3NicX9bP9hqQ6M4OPlFbApytIZJZRM6eqOIGGEdwdECpudyeUKUt6?=
+ =?us-ascii?Q?XgUw0w56PN65ECkDW86UmYng/qfZEcsyfDi07POGI30w5oh3FE3HXbWnazw8?=
+ =?us-ascii?Q?WtRCN3eDPCHd0T6If2h9qoIRpYscI9fB56mQTo4AFpXvaIg3KgMbXap82h3Z?=
+ =?us-ascii?Q?RLWBRPhUdUK6Z/uk2F/pmWg+yHvaBP7zsUoWVg7vbqcGur+wnX7Bb6NXyx+y?=
+ =?us-ascii?Q?lBk4aDNil9T9pUdjIXKuuZo/0ZZTtv0V6BvbqNYmIxnKVCxP0iePalq+lyX+?=
+ =?us-ascii?Q?8sbxWhhPLEdltWw/veVaxY0PSuLbGGPILCXaon/4W42NGRK4ovlAhzzqKIBf?=
+ =?us-ascii?Q?a7/ilkLVYRmCPFl+SANtQdW8zI24aqdAl9EsN4uWYIg/LxzpJVPiQ3xoXTFM?=
+ =?us-ascii?Q?cxidg5hUlY9eOYu1NdRMBEMbtR9mY9nGcMZ++GIvJIYJbte/npZDk3iz7vRz?=
+ =?us-ascii?Q?jsOn/2eiskSGmp+Gm/2yzSBfREYo9I06I15ZDXIj8JBkU3wgacVrDhHqqVSP?=
+ =?us-ascii?Q?qzdmFatd8PLV58B2xK+68y8DF67HR2XcZJ6X0d7j1KHttOlIEXg/GQ25dA+H?=
+ =?us-ascii?Q?gbIvlToC5RlcALmf76aH/XHNrF2kGD17R9Zcx+ZwacVBQfy6uTrDTO8ge+LL?=
+ =?us-ascii?Q?gO3IQ1wPm72C1kdglJHQuzTqIhVB+nLCnCdLm+qNNEy4SuTthOfPs+e9mZun?=
+ =?us-ascii?Q?yxARtkQGoHkk4goM43mOlnJaqPb6/Or8zEXNAnloH5GGNo9NeF1/ND4ugcGs?=
+ =?us-ascii?Q?Q2BUGPaNZMbMxYZpLzyB/9FPMZbJJQZo/ppYhxN9pyUevGSVYAHInDcWtwvc?=
+ =?us-ascii?Q?u4fJcfkLtujbUV86utqV63c0Et5UaHsr1Quzvusgu3hgbsqK4e6cxTm9TYWd?=
+ =?us-ascii?Q?jiCNGPtN7OKMp+7+kzgX6fRtZhjtjw47Fp4lA79Q?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b615cd5f-132e-4bc1-3243-08db0e1c2297
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Feb 2023 23:43:40.6826
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +ForOPDIKwCvlhUgqgQDl1eSoCs88j6t2KmqiZVa20aOlXrPIQSVsGfj8WFyudNA
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6000
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 13, 2023 at 10:02 AM Raghavendra Rao Ananta
-<rananta@google.com> wrote:
->
-> Hello,
->
-> This vPMU KVM selftest series is an extension to the selftests
-> introduced by Reiji Watanabe in his series aims to limit the number
-> of PMCs on vCPU from userspace [1].
->
-> The idea behind this series is to expand the test coverage to include
-> the tests that validates actions from userspace, such as allowing or
-> denying certain events via KVM_ARM_VCPU_PMU_V3_FILTER attribute, KVM's
-> guarding of the PMU attributes to count EL2/EL3 events, and formal KVM
-> behavior that enables PMU emulation. The last part validates the guest
-> expectations of the vPMU by setting up a stress test that force-migrates
-> multiple vCPUs frequently across random pCPUs in the system, thus
-> ensuring KVM's management of vCPU PMU contexts correctly.
->
-> Patch-1 renames the test file to be more generic.
->
-> Patch-2 refactors the existing tests for plugging-in the upcoming tests
-> easily.
->
-> Patch-3 and 4 add helper macros and functions respectively to interact
-> with the cycle counter.
->
-> Patch-5 extends create_vpmu_vm() to accept an array of event filters
-> as an argument that are to be applied to the VM.
->
-> Patch-6 tests the KVM_ARM_VCPU_PMU_V3_FILTER attribute by scripting
-> various combinations of events that are to be allowed or denied to
-> the guest and verifying guest's behavior.
->
-> Patch-7 adds test to validate KVM's handling of guest requests to count
-> events in EL2/EL3.
->
-> Patch-8 introduces the vCPU migration stress testing by validating cycle
-> counter and general purpose counter's behavior across vCPU migrations.
->
-> Patch-9, 10, and 11 expands the tests in patch-8 to validate
-> overflow/IRQ functionality, chained events, and occupancy of all the PMU
-> counters, respectively.
->
-> Patch-12 extends create_vpmu_vm() to create multiple vCPUs for the VM.
->
-> Patch-13 expands the stress tests for multiple vCPUs.
->
-> The series has been tested on hardwares with PMUv8p1 and PMUvp5.
->
-Sorry for the typo (thanks Reiji for pointing it out!). It should be
-"PMUv3p1 and
-PMUv3p5". And the testing was done on v6.2-rc6 + [1].
+On Mon, Feb 13, 2023 at 07:13:36AM -0800, Yi Liu wrote:
+> +static struct vfio_device *vfio_device_from_file(struct file *file)
+> +{
+> +	struct vfio_device_file *df = file->private_data;
+> +
+> +	if (file->f_op != &vfio_device_fops)
+> +		return NULL;
+> +	return df->device;
+> +}
+> +
+>  /**
+>   * vfio_file_is_valid - True if the file is usable with VFIO APIS
+>   * @file: VFIO group file or VFIO device file
+>   */
+>  bool vfio_file_is_valid(struct file *file)
+>  {
+> -	return vfio_group_from_file(file);
+> +	return vfio_group_from_file(file) ||
+> +	       vfio_device_from_file(file);
+>  }
+>  EXPORT_SYMBOL_GPL(vfio_file_is_valid);
 
-Thank you.
-Raghavendra
-> Thank you.
-> Raghavendra
->
-> [1]: https://lore.kernel.org/all/20230203040242.1792453-1-reijiw@google.com/
->
->
-> Raghavendra Rao Ananta (13):
->   selftests: KVM: aarch64: Rename vpmu_counter_access.c to vpmu_test.c
->   selftests: KVM: aarch64: Refactor the vPMU counter access tests
->   tools: arm64: perf_event: Define Cycle counter enable/overflow bits
->   selftests: KVM: aarch64: Add PMU cycle counter helpers
->   selftests: KVM: aarch64: Consider PMU event filters for VM creation
->   selftests: KVM: aarch64: Add KVM PMU event filter test
->   selftests: KVM: aarch64: Add KVM EVTYPE filter PMU test
->   selftests: KVM: aarch64: Add vCPU migration test for PMU
->   selftests: KVM: aarch64: Test PMU overflow/IRQ functionality
->   selftests: KVM: aarch64: Test chained events for PMU
->   selftests: KVM: aarch64: Add PMU test to chain all the counters
->   selftests: KVM: aarch64: Add multi-vCPU support for vPMU VM creation
->   selftests: KVM: aarch64: Extend the vCPU migration test to multi-vCPUs
->
->  tools/arch/arm64/include/asm/perf_event.h     |    7 +
->  tools/testing/selftests/kvm/Makefile          |    2 +-
->  .../kvm/aarch64/vpmu_counter_access.c         |  642 -------
->  .../testing/selftests/kvm/aarch64/vpmu_test.c | 1710 +++++++++++++++++
->  4 files changed, 1718 insertions(+), 643 deletions(-)
->  delete mode 100644 tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
->  create mode 100644 tools/testing/selftests/kvm/aarch64/vpmu_test.c
->
-> --
-> 2.39.1.581.gbfd45094c4-goog
->
+This can only succeed on a device cdev that has been fully opened.
+
+Jason
