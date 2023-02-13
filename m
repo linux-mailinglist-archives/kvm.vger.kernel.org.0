@@ -2,30 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BE4DC69428F
-	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 11:18:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B3190694290
+	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 11:18:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230217AbjBMKSQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Feb 2023 05:18:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53022 "EHLO
+        id S230290AbjBMKSR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Feb 2023 05:18:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230223AbjBMKSI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Feb 2023 05:18:08 -0500
+        with ESMTP id S230102AbjBMKSJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Feb 2023 05:18:09 -0500
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 92D8DE387
-        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 02:18:07 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 99136EB6D
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 02:18:08 -0800 (PST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E24A8176A;
-        Mon, 13 Feb 2023 02:18:49 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 04392176C;
+        Mon, 13 Feb 2023 02:18:51 -0800 (PST)
 Received: from godel.lab.cambridge.arm.com (godel.lab.cambridge.arm.com [10.7.66.42])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6E70E3F703;
-        Mon, 13 Feb 2023 02:18:06 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8494E3F703;
+        Mon, 13 Feb 2023 02:18:07 -0800 (PST)
 From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev
-Cc:     pbonzini@redhat.com, alexandru.elisei@arm.com, ricarkol@google.com
-Subject: [PATCH v4 02/30] x86: Move x86_64-specific EFI CFLAGS to x86_64 Makefile
-Date:   Mon, 13 Feb 2023 10:17:31 +0000
-Message-Id: <20230213101759.2577077-3-nikos.nikoleris@arm.com>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>, pbonzini@redhat.com,
+        ricarkol@google.com
+Subject: [PATCH v4 03/30] arm/Makefile.common: Compile lib/acpi.c if CONFIG_EFI=y
+Date:   Mon, 13 Feb 2023 10:17:32 +0000
+Message-Id: <20230213101759.2577077-4-nikos.nikoleris@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230213101759.2577077-1-nikos.nikoleris@arm.com>
 References: <20230213101759.2577077-1-nikos.nikoleris@arm.com>
@@ -40,50 +41,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Compiler flag -macculate-outgoing-args is only needed by the x86_64
-ABI. Move it to the relevant Makefile.
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+
+For arm/arm64, ACPI is available only when UEFI is present. Compile
+acpi.c if CONFIG_EFI is set to 'y'. For now, only x86 can configure the
+tests with --enable-efi, but that will soon change.
 
 Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-Reviewed-by: Ricardo Koller <ricarkol@google.com>
 ---
- Makefile            | 4 ----
- x86/Makefile.x86_64 | 4 ++++
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ arm/Makefile.common | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/Makefile b/Makefile
-index 6ed5deac..307bc291 100644
---- a/Makefile
-+++ b/Makefile
-@@ -40,14 +40,10 @@ OBJDIRS += $(LIBFDT_objdir)
+diff --git a/arm/Makefile.common b/arm/Makefile.common
+index 1bbec64f..3a726c20 100644
+--- a/arm/Makefile.common
++++ b/arm/Makefile.common
+@@ -54,6 +54,10 @@ cflatobjs += lib/arm/smp.o
+ cflatobjs += lib/arm/delay.o
+ cflatobjs += lib/arm/gic.o lib/arm/gic-v2.o lib/arm/gic-v3.o
  
- # EFI App
- ifeq ($(CONFIG_EFI),y)
--EFI_ARCH = x86_64
- EFI_CFLAGS := -DCONFIG_EFI
- # The following CFLAGS and LDFLAGS come from:
- #   - GNU-EFI/Makefile.defaults
- #   - GNU-EFI/apps/Makefile
--# Function calls must include the number of arguments passed to the functions
--# More details: https://wiki.osdev.org/GNU-EFI
--EFI_CFLAGS += -maccumulate-outgoing-args
- # GCC defines wchar to be 32 bits, but EFI expects 16 bits
- EFI_CFLAGS += -fshort-wchar
- # EFI applications use PIC as they are loaded to dynamic addresses, not a fixed
-diff --git a/x86/Makefile.x86_64 b/x86/Makefile.x86_64
-index f483dead..2771a6fa 100644
---- a/x86/Makefile.x86_64
-+++ b/x86/Makefile.x86_64
-@@ -2,6 +2,10 @@ cstart.o = $(TEST_DIR)/cstart64.o
- bits = 64
- ldarch = elf64-x86-64
- ifeq ($(CONFIG_EFI),y)
-+# Function calls must include the number of arguments passed to the functions
-+# More details: https://wiki.osdev.org/GNU-EFI
-+CFLAGS += -maccumulate-outgoing-args
++ifeq ($(CONFIG_EFI),y)
++cflatobjs += lib/acpi.o
++endif
 +
- exe = efi
- bin = so
- FORMAT = efi-app-x86_64
+ OBJDIRS += lib/arm
+ 
+ libeabi = lib/arm/libeabi.a
 -- 
 2.25.1
 
