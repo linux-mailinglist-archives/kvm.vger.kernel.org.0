@@ -2,86 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A39D695508
-	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 00:52:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1306E695510
+	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 00:53:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231256AbjBMXwP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Feb 2023 18:52:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58486 "EHLO
+        id S231290AbjBMXxw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Feb 2023 18:53:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229956AbjBMXwO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Feb 2023 18:52:14 -0500
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1645E1632D;
-        Mon, 13 Feb 2023 15:52:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1676332333; x=1707868333;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=4fzPXXlr+NKT3FMdKI22Byml/iVzpZd9hBiHmFnYHyY=;
-  b=Wq1Q3WTeYGlJNoqg9vqUC/WzlY3c8z2l/d2DTQY9SV3NCtH4cJX7xz/1
-   7gTwJmAjptj7O5HMQEffc6NPAYJvJIbV98yoyzuULI8BQ6Urri9Q7ZLD+
-   rrRYt46xI/cF5acyk1U0hVJjwKQT3O1pzvV8FJYL54CKWwEnBHCpsLWy3
-   dM2oX//M5c3/IAhZAteEaMmfoJ1M8qYtoPYIVIiYqLQmxYgZMqzzuM9yy
-   Whd2v35tHGjDHI0P75O1HDPGU7nv2bSyBXCpIfsK2B/CHBF+yW0WNtCum
-   Pel3v/ck+j848rOqrA6BDuEuzxveN/79Y4XvOLR0okZnxTobElmqMz3UW
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10620"; a="417248470"
-X-IronPort-AV: E=Sophos;i="5.97,294,1669104000"; 
-   d="scan'208";a="417248470"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2023 15:52:12 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10620"; a="792905130"
-X-IronPort-AV: E=Sophos;i="5.97,294,1669104000"; 
-   d="scan'208";a="792905130"
-Received: from mlswanso-mobl.amr.corp.intel.com (HELO [10.251.26.232]) ([10.251.26.232])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2023 15:52:11 -0800
-Message-ID: <5803a3f2-72c8-fb1e-9ba3-e52747c990d3@intel.com>
-Date:   Mon, 13 Feb 2023 15:52:11 -0800
+        with ESMTP id S229489AbjBMXxv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Feb 2023 18:53:51 -0500
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCCB01A5;
+        Mon, 13 Feb 2023 15:53:46 -0800 (PST)
+Received: by mail-pl1-x62d.google.com with SMTP id e17so6429579plg.12;
+        Mon, 13 Feb 2023 15:53:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oN12p0IDxvmorHBGQ7GzjlWOyGaJlkT0wNKpNtRNPE8=;
+        b=C91FV0IHIHySQTRkb86+GocwXDr8WlYgQiYnUNZd1Ke1PWzwc0Ui3swRKoM/EMugmd
+         mtDyIYfBfzKVpqk3ZurWfE4C06NJuP7sWx9xClULK72fPaRyTgD475XUP5w0R0lmJSxg
+         fqPMDhOQ1CLyvdP8vm+bEyoR42WnbkStnrKpQAmZxWuxcmJUuRvcyRi1Rk+aqkGEy+qK
+         F0pLZENP3TbitJijIx7cS7NuofTEJwgwDOkN5GYMW48d2+LHtiHhs30rOQ3tZSv01O8e
+         FB7gFZ7JbhxL0Pno8NSgZttpMsmCG6pRRBkbmMYW6rJKC8Z6IMP2dpIC+LDTcFZNOFFC
+         kxfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oN12p0IDxvmorHBGQ7GzjlWOyGaJlkT0wNKpNtRNPE8=;
+        b=xqNZuHMNxgT99rZWQQNnw8wpOg3qzosHQmhZyYVbFtaloz/QbEWRZQyZOt/2ErBMOz
+         8t3kfPaDYJUdJ37k7GsB3xZs8f+eDrNHSM8Gv/YCTpK3WTMNZgncvKZ6rDm7W0q/IejL
+         BOSbGmo0Fh5DE4zAy+4eX5xdxrH6AYACL6+xRsXSXaiimR4EP5zS0j6c/K6Iwg2ChBLg
+         qrri3JdwhGCVRqc12fFVIguPSnyle0fENkqkDSu9yG5tUunx9JE0RGiw1rdWHUizYJHA
+         LtdG0Itct4B8WC97y5w/d7X55xveuFUsCk3o173VB3Nw33n/RL+++mGn+XNuw55gFOm6
+         YcCQ==
+X-Gm-Message-State: AO0yUKVAPg73vouIYrCh0i7evYzmSJbBHtaXlCzgo8wRh07CMSl3SbM2
+        /P1rocIvc9ugnjVxXzMxRIU=
+X-Google-Smtp-Source: AK7set/amp4VFmNZkQNRNmMa3hykvI7jc+MqhCv8WD2YyR0i7BGfBFGLnLeucu0LFmUtyzTRowTMiQ==
+X-Received: by 2002:a05:6a20:12c7:b0:c3:161a:b954 with SMTP id v7-20020a056a2012c700b000c3161ab954mr391641pzg.44.1676332425999;
+        Mon, 13 Feb 2023 15:53:45 -0800 (PST)
+Received: from localhost ([192.55.54.55])
+        by smtp.gmail.com with ESMTPSA id z20-20020aa791d4000000b0058e08796e98sm8406145pfa.196.2023.02.13.15.53.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Feb 2023 15:53:45 -0800 (PST)
+Date:   Mon, 13 Feb 2023 15:53:43 -0800
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        wei.w.wang@intel.com
+Subject: Re: [PATCH v10 2/9] KVM: Introduce per-page memory attributes
+Message-ID: <20230213235343.GC4175971@ls.amr.corp.intel.com>
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+ <20221202061347.1070246-3-chao.p.peng@linux.intel.com>
+ <20230209072529.GB4175971@ls.amr.corp.intel.com>
+ <Y+WRUriIoan/XChx@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH v9 07/18] x86/virt/tdx: Do TDX module per-cpu
- initialization
-Content-Language: en-US
-To:     "Huang, Kai" <kai.huang@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Cc:     "Luck, Tony" <tony.luck@intel.com>,
-        "david@redhat.com" <david@redhat.com>,
-        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
-        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "Chatre, Reinette" <reinette.chatre@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "imammedo@redhat.com" <imammedo@redhat.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "Huang, Ying" <ying.huang@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>
-References: <cover.1676286526.git.kai.huang@intel.com>
- <557c526a1190903d11d67c4e2c76e01f67f6eb15.1676286526.git.kai.huang@intel.com>
- <2d9172c5-e1e7-bf94-c52b-0e9bc5b5b319@intel.com>
- <BL1PR11MB5978F562548EA22BFFD13970F7DD9@BL1PR11MB5978.namprd11.prod.outlook.com>
- <2d7141b1-1d76-4e67-60d2-471a524c372e@intel.com>
- <8e9238bbcccedfa00e2dbec87e1d77d370911846.camel@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <8e9238bbcccedfa00e2dbec87e1d77d370911846.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Y+WRUriIoan/XChx@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -89,17 +104,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/13/23 15:43, Huang, Kai wrote:
-> ( My main concern is "Run after the KVM handler" seems a little bit hacky to me.
-> Logically, it's more reasonable to have the TDX callback _before_ KVM's but not
-> _after_.  If any user (KVM) has done tdx_enable() successfully, the TDX code
-> should give the user a "TDX-runnable" cpu before user (KVM)'s own callback is
-> involved. Anyway as mentioned above, I'll do above as you suggested.)
+On Fri, Feb 10, 2023 at 12:35:30AM +0000,
+Sean Christopherson <seanjc@google.com> wrote:
 
-I was assuming that the KVM callback is what does VMXON for a given
-logical CPU.  If that were the case, you'd need to do the TDX stuff
-*AFTER* VMXON.
+> On Wed, Feb 08, 2023, Isaku Yamahata wrote:
+> > On Fri, Dec 02, 2022 at 02:13:40PM +0800,
+> > Chao Peng <chao.p.peng@linux.intel.com> wrote:
+> > 
+> > > +static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
+> > > +					   struct kvm_memory_attributes *attrs)
+> > > +{
+> > > +	gfn_t start, end;
+> > > +	unsigned long i;
+> > > +	void *entry;
+> > > +	u64 supported_attrs = kvm_supported_mem_attributes(kvm);
+> > > +
+> > > +	/* flags is currently not used. */
+> > > +	if (attrs->flags)
+> > > +		return -EINVAL;
+> > > +	if (attrs->attributes & ~supported_attrs)
+> > > +		return -EINVAL;
+> > > +	if (attrs->size == 0 || attrs->address + attrs->size < attrs->address)
+> > > +		return -EINVAL;
+> > > +	if (!PAGE_ALIGNED(attrs->address) || !PAGE_ALIGNED(attrs->size))
+> > > +		return -EINVAL;
+> > > +
+> > > +	start = attrs->address >> PAGE_SHIFT;
+> > > +	end = (attrs->address + attrs->size - 1 + PAGE_SIZE) >> PAGE_SHIFT;
+> > > +
+> > > +	entry = attrs->attributes ? xa_mk_value(attrs->attributes) : NULL;
+> > > +
+> > > +	mutex_lock(&kvm->lock);
+> > > +	for (i = start; i < end; i++)
+> > > +		if (xa_err(xa_store(&kvm->mem_attr_array, i, entry,
+> > > +				    GFP_KERNEL_ACCOUNT)))
+> > > +			break;
+> > > +	mutex_unlock(&kvm->lock);
+> > > +
+> > > +	attrs->address = i << PAGE_SHIFT;
+> > > +	attrs->size = (end - i) << PAGE_SHIFT;
+> > > +
+> > > +	return 0;
+> > > +}
+> > > +#endif /* CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES */
+> > > +
+> > 
+> > If memslot isn't private, it should return error if private attribute is set.
+> 
+> Why?  I'd rather keep the two things separate.  If we enforce this sort of thing
+> at KVM_SET_MEMORY_ATTRIBUTES, then we also have to enforce it at
+> KVM_SET_USER_MEMORY_REGION.
 
-Am I wrong?
-
-
+For device assignment via shared GPA, non-private memory slot needs to be
+allowed.
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
