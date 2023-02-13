@@ -2,96 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 03430694EEE
-	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 19:12:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 56774694EE2
+	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 19:09:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229876AbjBMSL6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Feb 2023 13:11:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60040 "EHLO
+        id S230450AbjBMSJj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Feb 2023 13:09:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230462AbjBMSL5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Feb 2023 13:11:57 -0500
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7992B117;
-        Mon, 13 Feb 2023 10:11:24 -0800 (PST)
-Received: from [192.168.2.1] (77-166-152-30.fixed.kpn.net [77.166.152.30])
-        by linux.microsoft.com (Postfix) with ESMTPSA id 30F6C20CEAA2;
-        Mon, 13 Feb 2023 10:05:14 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 30F6C20CEAA2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1676311515;
-        bh=g2sXOJcYBH6Oc9c82Iqdn7FrnECej31LP7qAuLdPq0U=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=M/y65pxMQl6pH/X1UpUIfm/f4tfy/NhCYdUowNlj4klFeMpJBuoWi6DGayg37dYwY
-         lIMyQknaQEbXLw4bzcgTTWH2ch2Brrxw75C+4TRpLOU9YW0kgHZ3annZ7ycdmmWAkb
-         RZFOalWttZUaFRe9yQNf9N6DcufABnvCDogvE8Ww=
-Message-ID: <21b1ee26-dfd4-923d-72da-d8ded3dd819c@linux.microsoft.com>
-Date:   Mon, 13 Feb 2023 19:05:12 +0100
+        with ESMTP id S230497AbjBMSJg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Feb 2023 13:09:36 -0500
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83B053C2D;
+        Mon, 13 Feb 2023 10:09:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1676311758; x=1707847758;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=G5AV2pkXDQoTS6YCv9ce9+5JFgN9La2hpC0dnMFOo9o=;
+  b=gT+wtp6M6kV/Yyf3QTkDS8xJBxZ57EXxp4E9GdpIBnQxUqqlgPQSnyY6
+   kff2ADZbPOJHUKJgsnzyqYhyAnzKKJy7dqcLdfCN9QK66s8CQynDBWJOY
+   w/qJDi4iFuItQqdXlu7OU5DY0TRqnMzl5IlfFKLLsVUkj8b/1aRcg/kdQ
+   8xVSf2Yf2QG4vGVw/fHl8UlaP5ib2/HB9xW1QAt8pF+DKZ0B+cBuwFhpi
+   l3xKuWXKwLuMQ+7EcCa9hPLdFFOAY2RSqLQIrtr8jQhYjFIM3OM9BfMTf
+   h6tFn5iKeZ3YCSe+1oVXuiZ2m/OHXmflazjvWtH1/MOLCGaQ1UQ0NCNnJ
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10620"; a="395567986"
+X-IronPort-AV: E=Sophos;i="5.97,294,1669104000"; 
+   d="scan'208";a="395567986"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2023 10:07:32 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10620"; a="842854085"
+X-IronPort-AV: E=Sophos;i="5.97,294,1669104000"; 
+   d="scan'208";a="842854085"
+Received: from mlswanso-mobl.amr.corp.intel.com (HELO [10.251.26.232]) ([10.251.26.232])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2023 10:07:30 -0800
+Message-ID: <2d9172c5-e1e7-bf94-c52b-0e9bc5b5b319@intel.com>
+Date:   Mon, 13 Feb 2023 10:07:30 -0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.2
-Subject: Re: "KVM: x86/mmu: Overhaul TDP MMU zapping and flushing" breaks SVM
- on Hyper-V
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH v9 07/18] x86/virt/tdx: Do TDX module per-cpu
+ initialization
 Content-Language: en-US
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Tianyu Lan <ltykernel@gmail.com>,
-        "Michael Kelley (LINUX)" <mikelley@microsoft.com>
-References: <43980946-7bbf-dcef-7e40-af904c456250@linux.microsoft.com>
- <Y+aQyFJt9Tn2PJnC@google.com>
- <9a046de1-8085-3df4-94cd-39bb893c8c9a@linux.microsoft.com>
- <88a89319-a71e-fa90-0dbb-00cf8a549380@redhat.com>
-From:   Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-In-Reply-To: <88a89319-a71e-fa90-0dbb-00cf8a549380@redhat.com>
+To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     linux-mm@kvack.org, peterz@infradead.org, tglx@linutronix.de,
+        seanjc@google.com, pbonzini@redhat.com, dan.j.williams@intel.com,
+        rafael.j.wysocki@intel.com, kirill.shutemov@linux.intel.com,
+        ying.huang@intel.com, reinette.chatre@intel.com,
+        len.brown@intel.com, tony.luck@intel.com, ak@linux.intel.com,
+        isaku.yamahata@intel.com, chao.gao@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, david@redhat.com,
+        bagasdotme@gmail.com, sagis@google.com, imammedo@redhat.com
+References: <cover.1676286526.git.kai.huang@intel.com>
+ <557c526a1190903d11d67c4e2c76e01f67f6eb15.1676286526.git.kai.huang@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <557c526a1190903d11d67c4e2c76e01f67f6eb15.1676286526.git.kai.huang@intel.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-20.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 2/13/23 03:59, Kai Huang wrote:
+> @@ -247,8 +395,17 @@ int tdx_enable(void)
+>  		ret = __tdx_enable();
+>  		break;
+>  	case TDX_MODULE_INITIALIZED:
+> -		/* Already initialized, great, tell the caller. */
+> -		ret = 0;
+> +		/*
+> +		 * The previous call of __tdx_enable() may only have
+> +		 * initialized part of present cpus during module
+> +		 * initialization, and new cpus may have become online
+> +		 * since then.
+> +		 *
+> +		 * To make sure all online cpus are TDX-runnable, always
+> +		 * do per-cpu initialization for all online cpus here
+> +		 * even the module has been initialized.
+> +		 */
+> +		ret = __tdx_enable_online_cpus();
 
+I'm missing something here.  CPUs get initialized through either:
 
-On 13/02/2023 13:50, Paolo Bonzini wrote:
-> 
-> On 2/13/23 13:44, Jeremi Piotrowski wrote:
->> Just built a kernel from that tree, and it displays the same behavior. The problem
->> is not that the addresses are wrong, but that the flushes are issued at the wrong
->> time now. At least for what "enlightened NPT TLB flush" requires.
-> 
-> It is not clear to me why HvCallFluyshGuestPhysicalAddressSpace or HvCallFlushGuestPhysicalAddressList would have stricter requirements than a "regular" TLB shootdown using INVEPT.
-> 
-> Can you clarify what you mean by wrong time, preferrably with some kind of sequence of events?
-> 
-> That is, something like
-> 
-> CPU 0    Modify EPT from ... to ...
-> CPU 0    call_rcu() to free page table
-> CPU 1    ... which is invalid because ...
-> CPU 0    HvCallFlushGuestPhysicalAddressSpace
-> 
-> Paolo
+ 1. __tdx_enable(), for the CPUs around at the time
+ 2. tdx_cpu_online(), for hotplugged CPUs after __tdx_enable()
 
-So I looked at the ftrace (all kvm&kvmmu events + hyperv_nested_* events) I see the following:
-With tdp_mmu=0:
-kvm_exit
-sequence of kvm_mmu_prepare_zap_page
-hyperv_nested_flush_guest_mapping (always follows every sequence of kvm_mmu_prepare_zap_page)
-kvm_entry
-
-With tdp_mmu=1 I see:
-kvm_mmu_prepare_zap_page and kvm_tdp_mmu_spte_changed events from a kworker context, but
-they are not followed by hyperv_nested_flush_guest_mapping. The only hyperv_nested_flush_guest_mapping
-events I see happen from the qemu process context.
-
-Also the number of flush hypercalls is significantly lower: a 7second sequence through OVMF with
-tdp_mmu=0 produces ~270 flush hypercalls. In the traces with tdp_mmu=1 I now see max 3.
-
-So this might be easier to diagnose than I thought: the HvCallFlushGuestPhysicalAddressSpace calls
-are missing now.
+But, this is a third class.  CPUs that came online after #1, but which
+got missed by #2.  How can that happen?
