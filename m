@@ -2,30 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D6256942A2
-	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 11:19:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EF8776942AB
+	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 11:19:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230521AbjBMKS6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Feb 2023 05:18:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54516 "EHLO
+        id S231192AbjBMKT0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Feb 2023 05:19:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229841AbjBMKSy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Feb 2023 05:18:54 -0500
+        with ESMTP id S231183AbjBMKTS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Feb 2023 05:19:18 -0500
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 75A1F126D8
-        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 02:18:31 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 98A98E3B4
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 02:19:03 -0800 (PST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ED1971EA6;
-        Mon, 13 Feb 2023 02:19:13 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0F4A41EDB;
+        Mon, 13 Feb 2023 02:19:15 -0800 (PST)
 Received: from godel.lab.cambridge.arm.com (godel.lab.cambridge.arm.com [10.7.66.42])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 797363F703;
-        Mon, 13 Feb 2023 02:18:30 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8FB8C3F703;
+        Mon, 13 Feb 2023 02:18:31 -0800 (PST)
 From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev
 Cc:     pbonzini@redhat.com, alexandru.elisei@arm.com, ricarkol@google.com
-Subject: [PATCH v4 23/30] arm64: Add a setup sequence for systems that boot through EFI
-Date:   Mon, 13 Feb 2023 10:17:52 +0000
-Message-Id: <20230213101759.2577077-24-nikos.nikoleris@arm.com>
+Subject: [PATCH v4 24/30] arm64: Copy code from GNU-EFI
+Date:   Mon, 13 Feb 2023 10:17:53 +0000
+Message-Id: <20230213101759.2577077-25-nikos.nikoleris@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230213101759.2577077-1-nikos.nikoleris@arm.com>
 References: <20230213101759.2577077-1-nikos.nikoleris@arm.com>
@@ -40,278 +40,330 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This change implements an alternative setup sequence for the system
-when we are booting through EFI. The memory map is discovered through
-EFI boot services and devices through ACPI.
+This change adds unmodified dependencies that we need from GNU-EFI in
+order to build arm64 EFI apps.
 
-This change is based on a change initially proposed by
-Andrew Jones <drjones@redhat.com>
+GNU-EFI sources from  https://git.code.sf.net/p/gnu-efi/code v3.0.14
 
 Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+Reviewed-by: Ricardo Koller <ricarkol@google.com>
 ---
- arm/cstart.S        |   1 +
- arm/cstart64.S      |   1 +
- lib/arm/asm/setup.h |   8 ++
- lib/arm/setup.c     | 181 +++++++++++++++++++++++++++++++++++++++++++-
- lib/linux/efi.h     |   1 +
- 5 files changed, 190 insertions(+), 2 deletions(-)
+ arm/efi/crt0-efi-aarch64.S  | 130 ++++++++++++++++++++++++++++++++++++
+ arm/efi/elf_aarch64_efi.lds |  63 +++++++++++++++++
+ arm/efi/reloc_aarch64.c     |  97 +++++++++++++++++++++++++++
+ 3 files changed, 290 insertions(+)
+ create mode 100644 arm/efi/crt0-efi-aarch64.S
+ create mode 100644 arm/efi/elf_aarch64_efi.lds
+ create mode 100644 arm/efi/reloc_aarch64.c
 
-diff --git a/arm/cstart.S b/arm/cstart.S
-index 7036e67f..3dd71ed9 100644
---- a/arm/cstart.S
-+++ b/arm/cstart.S
-@@ -242,6 +242,7 @@ asm_mmu_disable:
-  *
-  * Input r0 is the stack top, which is the exception stacks base
-  */
-+.globl exceptions_init
- exceptions_init:
- 	mrc	p15, 0, r2, c1, c0, 0	@ read SCTLR
- 	bic	r2, #CR_V		@ SCTLR.V := 0
-diff --git a/arm/cstart64.S b/arm/cstart64.S
-index e4ab7d06..223c1092 100644
---- a/arm/cstart64.S
-+++ b/arm/cstart64.S
-@@ -265,6 +265,7 @@ asm_mmu_disable:
-  * Vectors
-  */
- 
-+.globl exceptions_init
- exceptions_init:
- 	adrp	x4, vector_table
- 	add	x4, x4, :lo12:vector_table
-diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
-index 64cd379b..06069116 100644
---- a/lib/arm/asm/setup.h
-+++ b/lib/arm/asm/setup.h
-@@ -38,4 +38,12 @@ extern unsigned int mem_region_get_flags(phys_addr_t paddr);
- 
- void setup(const void *fdt, phys_addr_t freemem_start);
- 
-+#ifdef CONFIG_EFI
+diff --git a/arm/efi/crt0-efi-aarch64.S b/arm/efi/crt0-efi-aarch64.S
+new file mode 100644
+index 00000000..d50e78dd
+--- /dev/null
++++ b/arm/efi/crt0-efi-aarch64.S
+@@ -0,0 +1,130 @@
++/*
++ * crt0-efi-aarch64.S - PE/COFF header for AArch64 EFI applications
++ *
++ * Copright (C) 2014 Linaro Ltd. <ard.biesheuvel@linaro.org>
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice and this list of conditions, without modification.
++ * 2. The name of the author may not be used to endorse or promote products
++ *    derived from this software without specific prior written permission.
++ *
++ * Alternatively, this software may be distributed under the terms of the
++ * GNU General Public License as published by the Free Software Foundation;
++ * either version 2 of the License, or (at your option) any later version.
++ */
 +
-+#include <efi.h>
-+
-+efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo);
-+
-+#endif
-+
- #endif /* _ASMARM_SETUP_H_ */
-diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-index 03a4098e..cab19b1e 100644
---- a/lib/arm/setup.c
-+++ b/lib/arm/setup.c
-@@ -33,7 +33,7 @@
- #define NR_EXTRA_MEM_REGIONS	16
- #define NR_INITIAL_MEM_REGIONS	(MAX_DT_MEM_REGIONS + NR_EXTRA_MEM_REGIONS)
- 
--extern unsigned long _etext;
-+extern unsigned long _text, _etext, _data, _edata;
- 
- char *initrd;
- u32 initrd_size;
-@@ -43,7 +43,10 @@ int nr_cpus;
- 
- static struct mem_region __initial_mem_regions[NR_INITIAL_MEM_REGIONS + 1];
- struct mem_region *mem_regions = __initial_mem_regions;
--phys_addr_t __phys_offset, __phys_end;
-+phys_addr_t __phys_offset = (phys_addr_t)-1, __phys_end = 0;
-+
-+extern void exceptions_init(void);
-+extern void asm_mmu_disable(void);
- 
- int mpidr_to_cpu(uint64_t mpidr)
- {
-@@ -289,3 +292,177 @@ void setup(const void *fdt, phys_addr_t freemem_start)
- 	if (!(auxinfo.flags & AUXINFO_MMU_OFF))
- 		setup_vm();
- }
-+
-+#ifdef CONFIG_EFI
-+
-+#include <efi.h>
-+
-+static efi_status_t setup_rsdp(efi_bootinfo_t *efi_bootinfo)
-+{
-+	efi_status_t status;
-+	struct acpi_table_rsdp *rsdp;
++	.section	.text.head
 +
 +	/*
-+	 * RSDP resides in an EFI_ACPI_RECLAIM_MEMORY region, which is not used
-+	 * by kvm-unit-tests arm64 memory allocator. So it is not necessary to
-+	 * copy the data structure to another memory region to prevent
-+	 * unintentional overwrite.
++	 * Magic "MZ" signature for PE/COFF
 +	 */
-+	status = efi_get_system_config_table(ACPI_20_TABLE_GUID, (void **)&rsdp);
-+	if (status != EFI_SUCCESS)
-+		return status;
++	.globl	ImageBase
++ImageBase:
++	.ascii	"MZ"
++	.skip	58				// 'MZ' + pad + offset == 64
++	.long	pe_header - ImageBase		// Offset to the PE header.
++pe_header:
++	.ascii	"PE"
++	.short 	0
++coff_header:
++	.short	0xaa64				// AArch64
++	.short	2				// nr_sections
++	.long	0 				// TimeDateStamp
++	.long	0				// PointerToSymbolTable
++	.long	0				// NumberOfSymbols
++	.short	section_table - optional_header	// SizeOfOptionalHeader
++	.short	0x206				// Characteristics.
++						// IMAGE_FILE_DEBUG_STRIPPED |
++						// IMAGE_FILE_EXECUTABLE_IMAGE |
++						// IMAGE_FILE_LINE_NUMS_STRIPPED
++optional_header:
++	.short	0x20b				// PE32+ format
++	.byte	0x02				// MajorLinkerVersion
++	.byte	0x14				// MinorLinkerVersion
++	.long	_data - _start			// SizeOfCode
++	.long	_data_size			// SizeOfInitializedData
++	.long	0				// SizeOfUninitializedData
++	.long	_start - ImageBase		// AddressOfEntryPoint
++	.long	_start - ImageBase		// BaseOfCode
 +
-+	set_efi_rsdp(rsdp);
++extra_header_fields:
++	.quad	0				// ImageBase
++	.long	0x1000				// SectionAlignment
++	.long	0x200				// FileAlignment
++	.short	0				// MajorOperatingSystemVersion
++	.short	0				// MinorOperatingSystemVersion
++	.short	0				// MajorImageVersion
++	.short	0				// MinorImageVersion
++	.short	0				// MajorSubsystemVersion
++	.short	0				// MinorSubsystemVersion
++	.long	0				// Win32VersionValue
 +
-+	return EFI_SUCCESS;
-+}
++	.long	_edata - ImageBase		// SizeOfImage
 +
-+static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
++	// Everything before the kernel image is considered part of the header
++	.long	_start - ImageBase		// SizeOfHeaders
++	.long	0				// CheckSum
++	.short	EFI_SUBSYSTEM			// Subsystem
++	.short	0				// DllCharacteristics
++	.quad	0				// SizeOfStackReserve
++	.quad	0				// SizeOfStackCommit
++	.quad	0				// SizeOfHeapReserve
++	.quad	0				// SizeOfHeapCommit
++	.long	0				// LoaderFlags
++	.long	0x6				// NumberOfRvaAndSizes
++
++	.quad	0				// ExportTable
++	.quad	0				// ImportTable
++	.quad	0				// ResourceTable
++	.quad	0				// ExceptionTable
++	.quad	0				// CertificationTable
++	.quad	0				// BaseRelocationTable
++
++	// Section table
++section_table:
++	.ascii	".text\0\0\0"
++	.long	_data - _start		// VirtualSize
++	.long	_start - ImageBase	// VirtualAddress
++	.long	_data - _start		// SizeOfRawData
++	.long	_start - ImageBase	// PointerToRawData
++
++	.long	0		// PointerToRelocations (0 for executables)
++	.long	0		// PointerToLineNumbers (0 for executables)
++	.short	0		// NumberOfRelocations  (0 for executables)
++	.short	0		// NumberOfLineNumbers  (0 for executables)
++	.long	0x60000020	// Characteristics (section flags)
++
++	.ascii	".data\0\0\0"
++	.long	_data_size		// VirtualSize
++	.long	_data - ImageBase	// VirtualAddress
++	.long	_data_size		// SizeOfRawData
++	.long	_data - ImageBase	// PointerToRawData
++
++	.long	0		// PointerToRelocations (0 for executables)
++	.long	0		// PointerToLineNumbers (0 for executables)
++	.short	0		// NumberOfRelocations  (0 for executables)
++	.short	0		// NumberOfLineNumbers  (0 for executables)
++	.long	0xc0000040	// Characteristics (section flags)
++
++	.align		12
++_start:
++	stp		x29, x30, [sp, #-32]!
++	mov		x29, sp
++
++	stp		x0, x1, [sp, #16]
++	mov		x2, x0
++	mov		x3, x1
++	adr		x0, ImageBase
++	adrp		x1, _DYNAMIC
++	add		x1, x1, #:lo12:_DYNAMIC
++	bl		_relocate
++	cbnz		x0, 0f
++
++	ldp		x0, x1, [sp, #16]
++	bl		efi_main
++
++0:	ldp		x29, x30, [sp], #32
++	ret
+diff --git a/arm/efi/elf_aarch64_efi.lds b/arm/efi/elf_aarch64_efi.lds
+new file mode 100644
+index 00000000..836d9825
+--- /dev/null
++++ b/arm/efi/elf_aarch64_efi.lds
+@@ -0,0 +1,63 @@
++OUTPUT_FORMAT("elf64-littleaarch64", "elf64-littleaarch64", "elf64-littleaarch64")
++OUTPUT_ARCH(aarch64)
++ENTRY(_start)
++SECTIONS
 +{
++  .text 0x0 : {
++    _text = .;
++    *(.text.head)
++    *(.text)
++    *(.text.*)
++    *(.gnu.linkonce.t.*)
++    *(.srodata)
++    *(.rodata*)
++    . = ALIGN(16);
++  }
++  _etext = .;
++  _text_size = . - _text;
++  .dynamic  : { *(.dynamic) }
++  .data : ALIGN(4096)
++  {
++   _data = .;
++   *(.sdata)
++   *(.data)
++   *(.data1)
++   *(.data.*)
++   *(.got.plt)
++   *(.got)
++
++   /* the EFI loader doesn't seem to like a .bss section, so we stick
++      it all into .data: */
++   . = ALIGN(16);
++   _bss = .;
++   *(.sbss)
++   *(.scommon)
++   *(.dynbss)
++   *(.bss)
++   *(COMMON)
++   . = ALIGN(16);
++   _bss_end = .;
++  }
++
++  .rela.dyn : { *(.rela.dyn) }
++  .rela.plt : { *(.rela.plt) }
++  .rela.got : { *(.rela.got) }
++  .rela.data : { *(.rela.data) *(.rela.data*) }
++  . = ALIGN(512);
++  _edata = .;
++  _data_size = . - _data;
++
++  . = ALIGN(4096);
++  .dynsym   : { *(.dynsym) }
++  . = ALIGN(4096);
++  .dynstr   : { *(.dynstr) }
++  . = ALIGN(4096);
++  .note.gnu.build-id : { *(.note.gnu.build-id) }
++  /DISCARD/ :
++  {
++    *(.rel.reloc)
++    *(.eh_frame)
++    *(.note.GNU-stack)
++  }
++  .comment 0 : { *(.comment) }
++}
+diff --git a/arm/efi/reloc_aarch64.c b/arm/efi/reloc_aarch64.c
+new file mode 100644
+index 00000000..08672796
+--- /dev/null
++++ b/arm/efi/reloc_aarch64.c
+@@ -0,0 +1,97 @@
++/* reloc_aarch64.c - position independent x86 ELF shared object relocator
++   Copyright (C) 2014 Linaro Ltd. <ard.biesheuvel@linaro.org>
++   Copyright (C) 1999 Hewlett-Packard Co.
++	Contributed by David Mosberger <davidm@hpl.hp.com>.
++
++    All rights reserved.
++
++    Redistribution and use in source and binary forms, with or without
++    modification, are permitted provided that the following conditions
++    are met:
++
++    * Redistributions of source code must retain the above copyright
++      notice, this list of conditions and the following disclaimer.
++    * Redistributions in binary form must reproduce the above
++      copyright notice, this list of conditions and the following
++      disclaimer in the documentation and/or other materials
++      provided with the distribution.
++    * Neither the name of Hewlett-Packard Co. nor the names of its
++      contributors may be used to endorse or promote products derived
++      from this software without specific prior written permission.
++
++    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
++    CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
++    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
++    MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
++    DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
++    BE LIABLE FOR ANYDIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
++    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
++    PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
++    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
++    TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
++    THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++    SUCH DAMAGE.
++*/
++
++#include <efi.h>
++#include <efilib.h>
++
++#include <elf.h>
++
++EFI_STATUS _relocate (long ldbase, Elf64_Dyn *dyn,
++		      EFI_HANDLE image EFI_UNUSED,
++		      EFI_SYSTEM_TABLE *systab EFI_UNUSED)
++{
++	long relsz = 0, relent = 0;
++	Elf64_Rela *rel = 0;
++	unsigned long *addr;
 +	int i;
-+	unsigned long free_mem_pages = 0;
-+	unsigned long free_mem_start = 0;
-+	struct efi_boot_memmap *map = &(efi_bootinfo->mem_map);
-+	efi_memory_desc_t *buffer = *map->map;
-+	efi_memory_desc_t *d = NULL;
-+	phys_addr_t base, top;
-+	struct mem_region *r;
-+	uintptr_t text = (uintptr_t)&_text, etext = __ALIGN((uintptr_t)&_etext, 4096);
-+	uintptr_t data = (uintptr_t)&_data, edata = __ALIGN((uintptr_t)&_edata, 4096);
 +
-+	/*
-+	 * Record the largest free EFI_CONVENTIONAL_MEMORY region
-+	 * which will be used to set up the memory allocator, so that
-+	 * the memory allocator can work in the largest free
-+	 * continuous memory region.
-+	 */
-+	for (i = 0, r = &mem_regions[0]; i < *(map->map_size); i += *(map->desc_size), ++r) {
-+		d = (efi_memory_desc_t *)(&((u8 *)buffer)[i]);
++	for (i = 0; dyn[i].d_tag != DT_NULL; ++i) {
++		switch (dyn[i].d_tag) {
++			case DT_RELA:
++				rel = (Elf64_Rela*)
++					((unsigned long)dyn[i].d_un.d_ptr
++					 + ldbase);
++				break;
 +
-+		r->start = d->phys_addr;
-+		r->end = d->phys_addr + d->num_pages * EFI_PAGE_SIZE;
++			case DT_RELASZ:
++				relsz = dyn[i].d_un.d_val;
++				break;
 +
-+		switch (d->type) {
-+		case EFI_RESERVED_TYPE:
-+		case EFI_LOADER_DATA:
-+		case EFI_BOOT_SERVICES_CODE:
-+		case EFI_BOOT_SERVICES_DATA:
-+		case EFI_RUNTIME_SERVICES_CODE:
-+		case EFI_RUNTIME_SERVICES_DATA:
-+		case EFI_UNUSABLE_MEMORY:
-+		case EFI_ACPI_RECLAIM_MEMORY:
-+		case EFI_ACPI_MEMORY_NVS:
-+		case EFI_PAL_CODE:
-+			r->flags = MR_F_RESERVED;
-+			break;
-+		case EFI_MEMORY_MAPPED_IO:
-+		case EFI_MEMORY_MAPPED_IO_PORT_SPACE:
-+			r->flags = MR_F_IO;
-+			break;
-+		case EFI_LOADER_CODE:
-+			if (r->start <= text && r->end > text) {
-+				/* This is the unit test region. Flag the code separately. */
-+				phys_addr_t tmp = r->end;
++			case DT_RELAENT:
++				relent = dyn[i].d_un.d_val;
++				break;
 +
-+				assert(etext <= data);
-+				assert(edata <= r->end);
-+				r->flags = MR_F_CODE;
-+				r->end = data;
-+				++r;
-+				r->start = data;
-+				r->end = tmp;
-+			} else {
-+				r->flags = MR_F_RESERVED;
-+			}
-+			break;
-+		case EFI_CONVENTIONAL_MEMORY:
-+			if (free_mem_pages < d->num_pages) {
-+				free_mem_pages = d->num_pages;
-+				free_mem_start = d->phys_addr;
-+			}
-+			break;
-+		}
-+
-+		if (!(r->flags & MR_F_IO)) {
-+			if (r->start < __phys_offset)
-+				__phys_offset = r->start;
-+			if (r->end > __phys_end)
-+				__phys_end = r->end;
++			default:
++				break;
 +		}
 +	}
-+	__phys_end &= PHYS_MASK;
-+	asm_mmu_disable();
 +
-+	if (free_mem_pages == 0)
-+		return EFI_OUT_OF_RESOURCES;
++	if (!rel && relent == 0)
++		return EFI_SUCCESS;
 +
-+	assert(sizeof(long) == 8 || free_mem_start < (3ul << 30));
++	if (!rel || relent == 0)
++		return EFI_LOAD_ERROR;
 +
-+	phys_alloc_init(free_mem_start, free_mem_pages << EFI_PAGE_SHIFT);
-+	phys_alloc_set_minimum_alignment(SMP_CACHE_BYTES);
++	while (relsz > 0) {
++		/* apply the relocs */
++		switch (ELF64_R_TYPE (rel->r_info)) {
++			case R_AARCH64_NONE:
++				break;
 +
-+	phys_alloc_get_unused(&base, &top);
-+	base = PAGE_ALIGN(base);
-+	top = top & PAGE_MASK;
-+	assert(sizeof(long) == 8 || !(base >> 32));
-+	if (sizeof(long) != 8 && (top >> 32) != 0)
-+		top = ((uint64_t)1 << 32);
-+	page_alloc_init_area(0, base >> PAGE_SHIFT, top >> PAGE_SHIFT);
-+	page_alloc_ops_enable();
++			case R_AARCH64_RELATIVE:
++				addr = (unsigned long *)
++					(ldbase + rel->r_offset);
++				*addr = ldbase + rel->r_addend;
++				break;
 +
++			default:
++				break;
++		}
++		rel = (Elf64_Rela*) ((char *) rel + relent);
++		relsz -= relent;
++	}
 +	return EFI_SUCCESS;
 +}
-+
-+efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
-+{
-+	efi_status_t status;
-+
-+	struct thread_info *ti = current_thread_info();
-+
-+	memset(ti, 0, sizeof(*ti));
-+
-+	exceptions_init();
-+
-+	status = efi_mem_init(efi_bootinfo);
-+	if (status != EFI_SUCCESS) {
-+		printf("Failed to initialize memory: ");
-+		switch (status) {
-+		case EFI_OUT_OF_RESOURCES:
-+			printf("No free memory region\n");
-+			break;
-+		default:
-+			printf("Unknown error\n");
-+			break;
-+		}
-+		return status;
-+	}
-+
-+	status = setup_rsdp(efi_bootinfo);
-+	if (status != EFI_SUCCESS) {
-+		printf("Cannot find RSDP in EFI system table\n");
-+		return status;
-+	}
-+
-+	psci_set_conduit();
-+	cpu_init();
-+	/* cpu_init must be called before thread_info_init */
-+	thread_info_init(current_thread_info(), 0);
-+	/* mem_init must be called before io_init */
-+	io_init();
-+
-+	timer_save_state();
-+	if (initrd) {
-+		/* environ is currently the only file in the initrd */
-+		char *env = malloc(initrd_size);
-+
-+		memcpy(env, initrd, initrd_size);
-+		setup_env(env, initrd_size);
-+	}
-+
-+	if (!(auxinfo.flags & AUXINFO_MMU_OFF))
-+		setup_vm();
-+
-+	return EFI_SUCCESS;
-+}
-+
-+#endif
-diff --git a/lib/linux/efi.h b/lib/linux/efi.h
-index 53748dd4..89f9a9e0 100644
---- a/lib/linux/efi.h
-+++ b/lib/linux/efi.h
-@@ -63,6 +63,7 @@ typedef guid_t efi_guid_t;
- 	(c) & 0xff, ((c) >> 8) & 0xff, d } }
- 
- #define ACPI_TABLE_GUID EFI_GUID(0xeb9d2d30, 0x2d88, 0x11d3, 0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d)
-+#define ACPI_20_TABLE_GUID EFI_GUID(0x8868e871, 0xe4f1, 0x11d3,  0xbc, 0x22, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81)
- 
- #define LOADED_IMAGE_PROTOCOL_GUID EFI_GUID(0x5b1b31a1, 0x9562, 0x11d2,  0x8e, 0x3f, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b)
- 
 -- 
 2.25.1
 
