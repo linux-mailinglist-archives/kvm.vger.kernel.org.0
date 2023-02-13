@@ -2,143 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B4966948A7
-	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 15:51:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 87D47694AAC
+	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 16:14:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230433AbjBMOvq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Feb 2023 09:51:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45352 "EHLO
+        id S230285AbjBMPOn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Feb 2023 10:14:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230428AbjBMOvn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Feb 2023 09:51:43 -0500
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2057.outbound.protection.outlook.com [40.107.92.57])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BD421BAF3;
-        Mon, 13 Feb 2023 06:51:24 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aY87mxhN5sPbDg9SIqiejg3HYTIEHNJLG7Ebj1kFzKSVJt4ott/iOJBszwSTjrxzeVA3Vaw5LZx379Luvry1Wbrnx0Ckg0/4wq+XvIeGN1TZppRI1rgEHRWdpm4w8QjEjTFSDW5GC3jqOCyBF5jmkYwoi4AjcNapfdfPuo4tVWHJJi4VEY+JI5QklQPEqh9rrOCdsmdVrfzq55J88d711hA+LNQMS+a4BVDyNbqe/WcUpzn/xC2MH4Fz6qN8OjdQ5v3j97zGg3lVdR3IfFj2d80uSr0RrJdEMH0n8cGhNH04xVMXktQituk3idm71flEJWLyR/wwIumfCf8KoLM7uw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qZnDbqOju59BLOWg38WoCQ7Qvcie5Ro3mMyhaCs5DH4=;
- b=Y01n0xjWMHsm4iGN+rZt1s9ea8w1r1ljBZJcy1bwltUkBmV/h73EQshSGSMQ6xjlw101eciZ8rdD0F/z+qJlMhIByGHRZKiAHynXxOmcSGbfzrGgs0mVTsqMkyBPS8jKUQtOuFe4G/nOENaMaVhWu3G0u5+/nT24sW454lbHda3EOUEPkRPkq6w6mYIO4okeOAHCZ7OMHloKAkHqhyMGfqaFhgmLI0oEfGCp+pQdbV+TFlZooU8z6pQtEIWCQ706o0C3SSgNAku7Tl34GfIeYiNIYHawPMcbODMWSL/+SapuZG7fX3PUPfrdDMw+kUgTZekm2Fg2/GvJMLtLDn2kOg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qZnDbqOju59BLOWg38WoCQ7Qvcie5Ro3mMyhaCs5DH4=;
- b=VfM3nT8UpUBpICe+BPItc8JJ67F/Ji0zbxXvpAuoV8xcsQwLYFojh3sm8eHM9lwtFXsBSosHu+QLSuF+WL2LC/Yp5hyUEGn+a/0GZhYWewX50wSmwLC/iGH5/7iQpypgQ8rizmt7Nbc3F0GnjekMVBLF66VdwW8ptewsC8qsQ7S+JbFJrQTfUFry/nSu+7zFE3mowZvs7f6GOmI7o7nGPFul5lXfgsHzM73IDtA5SyK1VrnXMbv2dg638NOMOk7H2u25LTdNhUCc7Um1Tb80zAeAiA90zH1pRkclmX+3DOWO6r3GqqfDbHFRvxOFvJ6DbKvekc2ej3h1hebRPfqzTA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by MN0PR12MB6128.namprd12.prod.outlook.com (2603:10b6:208:3c4::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.23; Mon, 13 Feb
- 2023 14:51:22 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3cb3:2fce:5c8f:82ee]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3cb3:2fce:5c8f:82ee%6]) with mapi id 15.20.6086.023; Mon, 13 Feb 2023
- 14:51:22 +0000
-Date:   Mon, 13 Feb 2023 10:51:20 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Yi Liu <yi.l.liu@intel.com>
-Cc:     joro@8bytes.org, alex.williamson@redhat.com, kevin.tian@intel.com,
-        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
-        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
-        peterx@redhat.com, jasowang@redhat.com,
+        with ESMTP id S229728AbjBMPOl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Feb 2023 10:14:41 -0500
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17A15FF06;
+        Mon, 13 Feb 2023 07:14:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1676301252; x=1707837252;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=NuL3WKfeg4daNOlumqOVMpxB8O0V9YixwTzc+OOAYBY=;
+  b=G5T/9mvfe2eDDe70GJk92krY+sdsSbpwa+JUdtkQ8Y/J9OZu/By2exy1
+   ILqdbamVGyo3uo/oSdayK1gdpMnJ0NcI6sXiN2M6cOiOdMbg3AOmocVUj
+   +xelxtjZ5KVoOVJKCf90ww2+jRUwdYQ5bsD+01tDPnX+SbQBa46vRp8HV
+   FI5eRGRozHJE8YRGve48fBqaYPSIgfd6wJTGUsglsu/kgMLF8qVVYrn9p
+   MAltaDcZj98y6j5UbAJi4YJ9rKt8RoDAFCDHSlRvEJUfqtGVVvAZM5R3H
+   vufBqih0a20Hq9ZB8ns4Lt0zrf5S+dc1QtxSwC7aRfMica9CGLcNOeaI0
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10620"; a="318931515"
+X-IronPort-AV: E=Sophos;i="5.97,294,1669104000"; 
+   d="scan'208";a="318931515"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2023 07:13:50 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10620"; a="701289649"
+X-IronPort-AV: E=Sophos;i="5.97,294,1669104000"; 
+   d="scan'208";a="701289649"
+Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
+  by orsmga001.jf.intel.com with ESMTP; 13 Feb 2023 07:13:50 -0800
+From:   Yi Liu <yi.l.liu@intel.com>
+To:     joro@8bytes.org, alex.williamson@redhat.com, jgg@nvidia.com,
+        kevin.tian@intel.com, robin.murphy@arm.com
+Cc:     cohuck@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
+        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.l.liu@intel.com,
+        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
         shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        baolu.lu@linux.intel.com
-Subject: Re: [PATCH 2/6] iommu/vt-d: Implement hw_info for iommu capability
- query
-Message-ID: <Y+pOaPOaparSpkGj@nvidia.com>
-References: <20230209041642.9346-1-yi.l.liu@intel.com>
- <20230209041642.9346-3-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230209041642.9346-3-yi.l.liu@intel.com>
-X-ClientProxiedBy: BL0PR02CA0060.namprd02.prod.outlook.com
- (2603:10b6:207:3d::37) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org
+Subject: [PATCH v3 00/15] Add vfio_device cdev for iommufd support
+Date:   Mon, 13 Feb 2023 07:13:33 -0800
+Message-Id: <20230213151348.56451-1-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|MN0PR12MB6128:EE_
-X-MS-Office365-Filtering-Correlation-Id: 83c801de-9e57-4842-dccb-08db0dd1c5d3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 2Teo3cVmgPfFlCaDdknwnS/6R55xX8Jd7ch62n32kRhWPQiNjT3AcdXGE8SReJbL6EkitM6M/FQtq65QzG7yJqZ7x2/2LyGo+vqcbtjQTDN+gZPSprVRHL4NBn9mjQF+MzOO4BwhxBKKhTimVI7VMvSk6Rug6j3ZYX/kww1OyLBaG2OpGg/9bbsP1M+vfbp5fIFbdnGtAxoM9FLQkSE1JWdbJRzYQUdXgv+paawrHaWr19SGusiTC7U6oZEDW66xht+ZhumY/Mdr1apZN1Ionfe+4rG5Kste6OORqRIQPnMV5vYzg+uTTm4R1XBapBAdEynNmqHS9k8mIgImh7qHDsA80xS8/aIoZggsZjkHIcj5sFB1WQUynoWKEtjyPEjs+qjtpURMfBHFs6/niG3GdnU7m1CKOwCMFrI6tazhvdltn6ibUL+S7e4xvdipk9ytBgtW55/7JGStnK94S8OKGkRJWgxwMbUB85BoCLAFQn8x+81fLDlHQnNNbn1WoLfbmIpD1ungdVt3M4stAC53zHQ50AtewIiZiFutKspCMBHtW551BbANw/7gS/+Sf0QDjNt/9R55RPbsmeoyHkrAGwI26LXuoQTlgJ32kk0i3lT916UusWFLr/0VadTLHh0nxDDD8fztKoYbpToa7JztJXUiKvsKYbm5U19HViqW9aarfvk+0Ldo1VGY+VImxcrf
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(136003)(39860400002)(396003)(346002)(366004)(376002)(451199018)(2906002)(86362001)(38100700002)(478600001)(4744005)(36756003)(7416002)(6512007)(5660300002)(6486002)(26005)(186003)(6506007)(8936002)(2616005)(41300700001)(8676002)(66556008)(66476007)(6916009)(4326008)(66946007)(316002)(67856001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Z2PgLYiVYJjtPihNx1W4qh0hvtK+21nY8in38mYJatHNEE1buCcruiuEC0zu?=
- =?us-ascii?Q?VNi1JgykVpywKd7WQEupSBE+jYYmwBh6BaiJLz5VQ6Lu1nGGBNgBZ+tjiezG?=
- =?us-ascii?Q?XOGqJW+gBITi4mwi2UOh08H0Rl3UdyfCPb8RrTO8eEWO9UTX/2C/DMTWblzc?=
- =?us-ascii?Q?L8bNwQ25SvxEwfkN09DNa9FIuAD2VdH//Krs1WuBmPepVRw6NImbO8vtk1QN?=
- =?us-ascii?Q?ORHOa0DyJO+Z5TFY8+3Q/7GZCJ3cXQvmYBJE4fnoF4JAK2nRSVbQse7UwI77?=
- =?us-ascii?Q?rFpvdNCGkhEqlROA525fS9J6Cmqy6Wwug4hV49Tyh73wNBnr+qoikAWNb3Hi?=
- =?us-ascii?Q?weW/ZlCiVX0owX5AgEJ6nwDB/Mth67qnyq9HYO4R17N9cCMaxkcd9Y6ZvosP?=
- =?us-ascii?Q?V5swTip3GdcTk7ZigZwuX9006aE2itYCNfP/rJlbe6K4sykGjQwIX/YbVo++?=
- =?us-ascii?Q?l0ky+dRRyfuA8w/LfTZaaacZkBygkG2l9rhxb7BhT+vkM3Ji7PIb1KMdTk1n?=
- =?us-ascii?Q?TrGfc7B0zB9R+H9+WnV3LMxhTuTBjw5KaVHuSTU+4noZUBKB2g5ryHAjIm5N?=
- =?us-ascii?Q?karqFoGhtLDSju6und7lncPTdWGygqGjX4P5BvOBK3vNMIWoN8PkSLPPCZO2?=
- =?us-ascii?Q?RdOMdnkXqYFMw8Y6kzafZIioOl779vnus4itIpgiTCdER5ILbjtzi8ZIkvOX?=
- =?us-ascii?Q?BzFlFSSIS6Q0YbVZ+xb8bPRLzNsQ6LudYEda3gMMhjIJP/napr1V41588wZC?=
- =?us-ascii?Q?O2A0L23YKz0MSTnk/lkrcILJZQ29tQsmnxLsFml+C1Zgjjn6JZfjsufze7qA?=
- =?us-ascii?Q?xxbOKl56OKvtYH6yB0cP1hGNtzoTLivmlLELh9i2pYdU7uXfsAjdI9SyTh2Y?=
- =?us-ascii?Q?9y2yIKUexA17gU6T6EAx/Eyt24W+N0dCUri1S8/752D2jGpJN9lE3gr7UeF7?=
- =?us-ascii?Q?i0bZ398VHcTYXDvUD6lUf60Sbs8JHG/n7VIowNBpVm0LtUbzcMiQwsxRoIMC?=
- =?us-ascii?Q?wdjDyuuE+bf7GZlungIPu3mB35dINfgaIgiTuNmwllh0OPVlfRMGckA1tSni?=
- =?us-ascii?Q?GQpld7ulNQ9lH4YWkUicWJrhmAG/XdnTqCN7fIHgKMGcOiV5mQDNI81v2YWm?=
- =?us-ascii?Q?rUgiDI+4iHiE5F90sLP05QKC6X60t/2l8TMYDxYxFSSd3EMzwLoyGVqfZ66h?=
- =?us-ascii?Q?Gc5voV7+qXX0p3QDkhtqvCyGsKXtkodl05t7M7rlvjArEVJ9nAomgjYwxMS8?=
- =?us-ascii?Q?0UneEprJqY35CIJlkP8B52eYDvPw8HM0sATIkafI70v6faHux/y4eAHnYZhj?=
- =?us-ascii?Q?4nByyuhslKN32s7/o9WzdeVPfJAXnb/mzxjU4oCcrMAFaL1rNqbvKvXmhecH?=
- =?us-ascii?Q?acVDK/DIkBlRhDcQ3tMsxNxMGwF/dslXlxhuY1YI4RZgY16pcb15cejpqJRc?=
- =?us-ascii?Q?ZnPxYL/Ezt23YYJROd+8AT8HzmSFxZb3aQaDGcgPQVSkW0P3a7tF0KOvPkVw?=
- =?us-ascii?Q?+qYNRurz8YTIfu4gLcFu94ZeuLkb/rmRTijSVwB0EjebLGzCORDKTDjyTYD3?=
- =?us-ascii?Q?mgukiT5oiHJQiPHL4QkPTY/wvBYreJZxnnuQp3wW?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 83c801de-9e57-4842-dccb-08db0dd1c5d3
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Feb 2023 14:51:22.3891
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: pxQZWwj6ig+/NdQpXkWvXEqAQZbr0W65m5ZVFRYgpbNQzneklOjkHzBSvFDhhMc9
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6128
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 08, 2023 at 08:16:38PM -0800, Yi Liu wrote:
-> From: Lu Baolu <baolu.lu@linux.intel.com>
-> 
-> To support nested translation in the userspace, it should check the
-> underlying hardware information for the capabilities.
-> 
-> Add intel_iommu_hw_info() to report cap_reg and ecap_reg information.
-> 
-> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
-> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
-> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
-> Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
-> ---
->  drivers/iommu/intel/iommu.c  | 19 +++++++++++++++++++
->  drivers/iommu/intel/iommu.h  |  1 +
->  include/uapi/linux/iommufd.h | 21 +++++++++++++++++++++
->  3 files changed, 41 insertions(+)
+Existing VFIO provides group-centric user APIs for userspace. Userspace
+opens the /dev/vfio/$group_id first before getting device fd and hence
+getting access to device. This is not the desired model for iommufd. Per
+the conclusion of community discussion[1], iommufd provides device-centric
+kAPIs and requires its consumer (like VFIO) to be device-centric user
+APIs. Such user APIs are used to associate device with iommufd and also
+the I/O address spaces managed by the iommufd.
 
-This should come after the next patch in the series
+This series first introduces a per device file structure to be prepared
+for further enhancement and refactors the kvm-vfio code to be prepared
+for accepting device file from userspace. Then refactors the vfio to be
+able to handle iommufd binding. This refactor includes the mechanism of
+blocking device access before iommufd bind, making vfio_device_open() be
+exclusive between the group path and the cdev path. Eventually, adds the
+cdev support for vfio device, and makes group infrastructure optional as
+it is not needed when vfio device cdev is compiled.
 
-Jason
+This is also a prerequisite for iommu nesting for vfio device[2].
+
+The complete code can be found in below branch, simple test done with the
+legacy group path and the cdev path. Draft QEMU branch can be found at[3]
+
+https://github.com/yiliu1765/iommufd/tree/vfio_device_cdev_v3
+(config CONFIG_IOMMUFD=y CONFIG_VFIO_DEVICE_CDEV=y)
+
+base-commit: 06a24ad
+
+[1] https://lore.kernel.org/kvm/BN9PR11MB5433B1E4AE5B0480369F97178C189@BN9PR11MB5433.namprd11.prod.outlook.com/
+[2] https://lore.kernel.org/linux-iommu/20230209043153.14964-1-yi.l.liu@intel.com/
+[3] https://github.com/yiliu1765/qemu/tree/iommufd_rfcv3 (it is based on Eric's
+    QEMU iommufd rfcv3 (https://lore.kernel.org/kvm/20230131205305.2726330-1-eric.auger@redhat.com/)
+    plus two commits to align with vfio_device_cdev v3)
+
+Change log:
+
+v3:
+ - Add r-b from Kevin on patch 03, 06, 07, 08.
+ - Refine the group and cdev path exclusion. Remove vfio_device:single_open;
+   add vfio_group::cdev_device_open_cnt to achieve exlucsion between group
+   path and cdev path (Kevin, Jason)
+ - Fix a bug in the error handling path (Yan Zhao)
+ - Address misc remarks from Kevin
+
+v2: https://lore.kernel.org/kvm/20230206090532.95598-1-yi.l.liu@intel.com/
+ - Add r-b from Kevin and Eric on patch 01 02 04.
+ - "Split kvm/vfio: Provide struct kvm_device_ops::release() insted of ::destroy()"
+   from this series and got applied. (Alex, Kevin, Jason, Mathhew)
+ - Add kvm_ref_lock to protect vfio_device_file->kvm instead of reusing
+   dev_set->lock as dead-lock is observed with vfio-ap which would try to
+   acquire kvm_lock. This is opposite lock order with kvm_device_release()
+   which holds kvm_lock first and then hold dev_set->lock. (Kevin)
+ - Use a separate ioctl for detaching IOAS. (Alex)
+ - Rename vfio_device_file::single_open to be is_cdev_device (Kevin, Alex)
+ - Move the vfio device cdev code into device_cdev.c and add a VFIO_DEVICE_CDEV
+   kconfig for it. (Kevin, Jason)
+
+v1: https://lore.kernel.org/kvm/20230117134942.101112-1-yi.l.liu@intel.com/
+ - Fix the circular refcount between kvm struct and device file reference. (JasonG)
+ - Address comments from KevinT
+ - Remained the ioctl for detach, needs to Alex's taste
+   (https://lore.kernel.org/kvm/BN9PR11MB5276BE9F4B0613EE859317028CFF9@BN9PR11MB5276.namprd11.prod.outlook.com/)
+
+rfc: https://lore.kernel.org/kvm/20221219084718.9342-1-yi.l.liu@intel.com/
+
+Thanks,
+	Yi Liu
+
+Yi Liu (15):
+  vfio: Allocate per device file structure
+  vfio: Refine vfio file kAPIs
+  vfio: Accept vfio device file in the driver facing kAPI
+  kvm/vfio: Rename kvm_vfio_group to prepare for accepting vfio device
+    fd
+  kvm/vfio: Accept vfio device file from userspace
+  vfio: Pass struct vfio_device_file * to vfio_device_open/close()
+  vfio: Block device access via device fd until device is opened
+  vfio: Add infrastructure for bind_iommufd from userspace
+  vfio-iommufd: Add detach_ioas support for physical VFIO devices
+  vfio-iommufd: Add detach_ioas for emulated VFIO devices
+  vfio: Add cdev_device_open_cnt to vfio_group
+  vfio: Make vfio_device_open() single open for device cdev path
+  vfio: Add cdev for vfio_device
+  vfio: Add ioctls for device cdev using iommufd
+  vfio: Compile group optionally
+
+ Documentation/driver-api/vfio.rst             |   8 +-
+ Documentation/virt/kvm/devices/vfio.rst       |  45 ++-
+ drivers/gpu/drm/i915/gvt/kvmgt.c              |   1 +
+ drivers/s390/cio/vfio_ccw_ops.c               |   1 +
+ drivers/s390/crypto/vfio_ap_ops.c             |   1 +
+ drivers/vfio/Kconfig                          |  29 ++
+ drivers/vfio/Makefile                         |   3 +-
+ drivers/vfio/device_cdev.c                    | 264 ++++++++++++++++
+ drivers/vfio/fsl-mc/vfio_fsl_mc.c             |   1 +
+ drivers/vfio/group.c                          | 149 +++++----
+ drivers/vfio/iommufd.c                        |  59 +++-
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    |   2 +
+ drivers/vfio/pci/mlx5/main.c                  |   1 +
+ drivers/vfio/pci/vfio_pci.c                   |   1 +
+ drivers/vfio/pci/vfio_pci_core.c              |   4 +-
+ drivers/vfio/platform/vfio_amba.c             |   1 +
+ drivers/vfio/platform/vfio_platform.c         |   1 +
+ drivers/vfio/vfio.h                           | 168 +++++++++-
+ drivers/vfio/vfio_main.c                      | 295 ++++++++++++++++--
+ include/linux/iommufd.h                       |   6 +
+ include/linux/vfio.h                          |  28 +-
+ include/uapi/linux/kvm.h                      |  16 +-
+ include/uapi/linux/vfio.h                     |  86 +++++
+ virt/kvm/vfio.c                               | 141 ++++-----
+ 24 files changed, 1106 insertions(+), 205 deletions(-)
+ create mode 100644 drivers/vfio/device_cdev.c
+
+-- 
+2.34.1
+
