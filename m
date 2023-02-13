@@ -2,126 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BDDB693FB6
-	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 09:35:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A13ED693FBE
+	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 09:37:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230026AbjBMIfB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Feb 2023 03:35:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44330 "EHLO
+        id S230050AbjBMIhA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Feb 2023 03:37:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230028AbjBMIeu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Feb 2023 03:34:50 -0500
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38AFDA25D;
-        Mon, 13 Feb 2023 00:34:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1676277289; x=1707813289;
-  h=message-id:date:mime-version:cc:subject:to:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=cwbWY0MYycEcAmZ1WT+ohW6HXdmMTj+4gVFJ3q+KyUo=;
-  b=kTY8dzc1UBlCNRZJEF4uYVXS8DWsZwzOlmiBHYPSwnqn8hX4WZKtDioW
-   9je0n1wYk7QBk+1RZ6P3xd6zM7MUYUbtcHOcekXHv/Fi8aU0rGP9TwkvL
-   NZIK1vNpqnRFpNBsvSCt4hIX5JpZmDZgVjiQFRp+cLuHLQd8wa5lvJjF8
-   zOcCEn1SmpwaBsPwSMMBPd7CMvz9amPG0K/PWGEJczl7iFw+RD96wz2QR
-   +cpsX+zfLU6wzBTyu8dRlRjvs2bp/WqshcDH3AHw5nyuWLclQTFgUOvHi
-   H2jg8E3pSVXWm7EXzUQD40SECAD4HWqPv3XhY7cI/hDjR8oVvECRBH6Wy
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10619"; a="329468498"
-X-IronPort-AV: E=Sophos;i="5.97,293,1669104000"; 
-   d="scan'208";a="329468498"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2023 00:34:48 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10619"; a="701185884"
-X-IronPort-AV: E=Sophos;i="5.97,293,1669104000"; 
-   d="scan'208";a="701185884"
-Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.249.169.207]) ([10.249.169.207])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2023 00:34:34 -0800
-Message-ID: <ff0b2a68-8aeb-426b-0fb4-010c5e7b20b8@linux.intel.com>
-Date:   Mon, 13 Feb 2023 16:34:32 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.2
-Cc:     baolu.lu@linux.intel.com, Nicolin Chen <nicolinc@nvidia.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "will@kernel.org" <will@kernel.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "shuah@kernel.org" <shuah@kernel.org>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>
-Subject: Re: [PATCH v2 02/10] iommu: Introduce a new
- iommu_group_replace_domain() API
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-References: <cover.1675802050.git.nicolinc@nvidia.com>
- <fa81379dca611c1d9f50f9d8cd2bca0d4ec7f965.1675802050.git.nicolinc@nvidia.com>
- <20230210165110.4e89ce55.alex.williamson@redhat.com>
- <Y+bk+GSCPKOJfr1f@nvidia.com>
- <BL1PR11MB527176BE1F6DFA3D2942664D8CDD9@BL1PR11MB5271.namprd11.prod.outlook.com>
+        with ESMTP id S229663AbjBMIg7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Feb 2023 03:36:59 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66C0EB457;
+        Mon, 13 Feb 2023 00:36:58 -0800 (PST)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31D8Lvhv004546;
+        Mon, 13 Feb 2023 08:36:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=z+uYQk09qIe/OPjT/0i5zBxN8duBX/EdvHszA378x7I=;
+ b=X8519aZs3o6cYpkHBU/SCClsmtHAEFpBAOLa11D9BAkL5nxVtvxmyKArqT9BHba5j8CA
+ YKcamMH1qRV2T+9da/RD8KO6UItvYX63r7zHSGRaABl04ESKrQ+9ep9PuJVrU2EL5kVm
+ XmMKEdN1GZ6/c+qiBxwovf1O2D8Atp8KRPsp4Yf+TgpKpVxOR2PCXEBG6JY52AjINWs+
+ mMxFbMI5Gkpw8GOcDp7dJD8PkSq3p8vnirNqjGDLyE/CVmKe4cN7f/l2hWode1n49nu9
+ uHIOZUQPXf80C/q7WwK7pxE7wVFf7ye9IWSNdMMTyiFKnFeG0r/SLp3ZwAECr/ei1Xgw yw== 
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nqhmnr8tu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 13 Feb 2023 08:36:57 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31C60WMM008616;
+        Mon, 13 Feb 2023 08:36:55 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3np2n69s4x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 13 Feb 2023 08:36:55 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31D8apZB40960306
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 13 Feb 2023 08:36:51 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4D51F2005A;
+        Mon, 13 Feb 2023 08:36:51 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EE1142004B;
+        Mon, 13 Feb 2023 08:36:50 +0000 (GMT)
+Received: from [9.171.76.240] (unknown [9.171.76.240])
+        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Mon, 13 Feb 2023 08:36:50 +0000 (GMT)
+Message-ID: <8754aab3-1b4a-d48e-cf30-081fe720583c@linux.ibm.com>
+Date:   Mon, 13 Feb 2023 09:36:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [v2] KVM: s390: pv: fix external interruption loop not always
+ detected
+To:     Nico Boehr <nrb@linux.ibm.com>, borntraeger@linux.ibm.com,
+        imbrenda@linux.ibm.com
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+References: <20221005122050.60625-1-nrb@linux.ibm.com>
+ <167627590762.7662.2548443744874886411@t14-nrb.local>
 Content-Language: en-US
-From:   Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <BL1PR11MB527176BE1F6DFA3D2942664D8CDD9@BL1PR11MB5271.namprd11.prod.outlook.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <167627590762.7662.2548443744874886411@t14-nrb.local>
 Content-Type: text/plain; charset=UTF-8; format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 4MgRNAPzMpjLMRBsboDvmarre-3eTSUn
+X-Proofpoint-ORIG-GUID: 4MgRNAPzMpjLMRBsboDvmarre-3eTSUn
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-13_04,2023-02-09_03,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ spamscore=0 adultscore=0 mlxlogscore=924 malwarescore=0 clxscore=1015
+ impostorscore=0 phishscore=0 priorityscore=1501 bulkscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302130076
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023/2/13 10:24, Tian, Kevin wrote:
->> From: Jason Gunthorpe<jgg@nvidia.com>
->> Sent: Saturday, February 11, 2023 8:45 AM
+On 2/13/23 09:11, Nico Boehr wrote:
+> Quoting Nico Boehr (2022-10-05 14:20:50)
+>> To determine whether the guest has caused an external interruption loop
+>> upon code 20 (external interrupt) intercepts, the ext_new_psw needs to
+>> be inspected to see whether external interrupts are enabled.
 >>
->> On Fri, Feb 10, 2023 at 04:51:10PM -0700, Alex Williamson wrote:
->>> On Tue, 7 Feb 2023 13:17:54 -0800
->>> Nicolin Chen<nicolinc@nvidia.com>  wrote:
->>>
->>>> qemu has a need to replace the translations associated with a domain
->>>> when the guest does large-scale operations like switching between an
->>>> IDENTITY domain and, say, dma-iommu.c.
->>>>
->>>> Currently, it does this by replacing all the mappings in a single
->>>> domain, but this is very inefficient and means that domains have to be
->>>> per-device rather than per-translation.
->>>>
->>>> Provide a high-level API to allow replacements of one domain with
->>>> another. This is similar to a detach/attach cycle except it doesn't
->>>> force the group to go to the blocking domain in-between.
->>>>
->>>> By removing this forced blocking domain the iommu driver has the
->>>> opportunity to implement an atomic replacement of the domains to the
->>>> greatest extent its hardware allows.
->>>>
->>>> It could be possible to adderss this by simply removing the protection
->>>> from the iommu_attach_group(), but it is not so clear if that is safe
->>>> for the few users. Thus, add a new API to serve this new purpose.
->>>>
->>>> Atomic replacement allows the qemu emulation of the viommu to be
->> more
->>>> complete, as real hardware has this ability.
->>> I was under the impression that we could not atomically switch a
->>> device's domain relative to in-flight DMA.
-> it's possible as long as the mappings for in-flight DMA don't change
-> in the transition.
+>> Under non-PV, ext_new_psw can simply be taken from guest lowcore. Under
+>> PV, KVM can only access the encrypted guest lowcore and hence the
+>> ext_new_psw must not be taken from guest lowcore.
+>>
+>> handle_external_interrupt() incorrectly did that and hence was not able
+>> to reliably tell whether an external interruption loop is happening or
+>> not. False negatives cause spurious failures of my kvm-unit-test
+>> for extint loops[1] under PV.
+>>
+>> Since code 20 is only caused under PV if and only if the guest's
+>> ext_new_psw is enabled for external interrupts, false positive detection
+>> of a external interruption loop can not happen.
+>>
+>> Fix this issue by instead looking at the guest PSW in the state
+>> description. Since the PSW swap for external interrupt is done by the
+>> ultravisor before the intercept is caused, this reliably tells whether
+>> the guest is enabled for external interrupts in the ext_new_psw.
+>>
+>> Also update the comments to explain better what is happening.
+>>
+>> [1] https://lore.kernel.org/kvm/20220812062151.1980937-4-nrb@linux.ibm.com/
 > 
+> Polite Ping.
 
-It also requires the mappings in old and new domains are identical. In
-another word, any IOVA should be translated to a same result no matter
-through the old domain, the new domain, or hardware caches.
-
-A similar replacement has been implemented in the code. For example,
-the Intel IOMMU driver dynamically transforms a large range (2M or 1G)
-mapping from discrete 4k pages to a super pages to improve the paging
-cache efficiency.
-
-Best regards,
-baolu
+There are 2 checkpatch warnings, would you mind fixing them up so I 
+don't need to fiddle with this when picking?
