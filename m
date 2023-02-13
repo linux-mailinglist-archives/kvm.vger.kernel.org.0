@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 10689693C37
-	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 03:30:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 39432693C41
+	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 03:30:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229734AbjBMCaN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Feb 2023 21:30:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44712 "EHLO
+        id S229789AbjBMCa4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Feb 2023 21:30:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229692AbjBMCaL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Feb 2023 21:30:11 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87AD6E041
-        for <kvm@vger.kernel.org>; Sun, 12 Feb 2023 18:29:25 -0800 (PST)
+        with ESMTP id S229692AbjBMCax (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Feb 2023 21:30:53 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CFC2E052
+        for <kvm@vger.kernel.org>; Sun, 12 Feb 2023 18:29:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676255364;
+        s=mimecast20190719; t=1676255366;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=0OmubI2NEZicuPkXPyraesqovkN5V1ARkv7LLLCRMM0=;
-        b=iaI6NwhKz3cBiIlvvbo2vk8i3OR10+xhTuGWPIRnHuBmKHmTCXjoc7RLYTK3onplBYItYE
-        bQ9ss+/+wnWqzCge8bB9JElwPiGEl1VSoaRnEt39NxwIdBGlYSWVcQWAceUIMISvszbYZc
-        iS06+mBW6iKh3mdu4+nQ1WIv3dMokGo=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=OVgMt+TdJwmeIvY3Hw47YNm8dYS4wVaPDdNlXTwlDwQ=;
+        b=I5ChttIW9lsmBz+O8QeBx3y1TmkUn4fOdA4dXyN+Krh0WWhF6kVMuhMGL1GPuR7O+cSWJ/
+        n2ItEU1pnrkc1jq9Zg2JfJczmahXgIo10omwvagoaaeGEihGrKSs+5xSsJHQGsemtBLT2X
+        R2PnND/5L/tpizmHdJQ4+A+w7GXP9ec=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-370-O6N_qcC5NTeJGTdXqesnqw-1; Sun, 12 Feb 2023 21:29:22 -0500
-X-MC-Unique: O6N_qcC5NTeJGTdXqesnqw-1
-Received: by mail-wm1-f69.google.com with SMTP id l31-20020a05600c1d1f00b003deab30bb8bso5427376wms.2
-        for <kvm@vger.kernel.org>; Sun, 12 Feb 2023 18:29:22 -0800 (PST)
+ us-mta-147-1qw9YlXOPIa6dYZ8GovoyA-1; Sun, 12 Feb 2023 21:29:24 -0500
+X-MC-Unique: 1qw9YlXOPIa6dYZ8GovoyA-1
+Received: by mail-wm1-f70.google.com with SMTP id x10-20020a05600c21ca00b003dc5584b516so8362343wmj.7
+        for <kvm@vger.kernel.org>; Sun, 12 Feb 2023 18:29:24 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0OmubI2NEZicuPkXPyraesqovkN5V1ARkv7LLLCRMM0=;
-        b=eJ9Xx6cTTpUF39kzfmyvRYT1G5NFBb0mvuq/zRmZqgGl4NvOAr0Yja9zWuHeI48O8R
-         xHaxPVajKgWiRhNtYMsF4JpOuUOU5xEwCuy1Y1O7qnsd0VW0w0mtzRFBZaSUS3IWHRlm
-         VRGhHKxjaUtfNbAlYfQcmMgMghcw0mTK5VpG6q4VRQOK8hOEBLYNb+8EGmRf1ti8rzG8
-         naWFgncMTmyCBuJDPeh6Se9rn2+TE9XV6Q2cmbVoP5pDl21YkuXkzgne+0LWP24YE9Og
-         TuQtAy5JQNJSr52b/gNiIoPLyVrg7Gqs3A79qG5ZP6aQMy7Tj7V4qzMDDmlQD/huqVLK
-         AN5A==
-X-Gm-Message-State: AO0yUKXsPBd2ZHr6OPuQi8/zUiGPlKw+19m6PA7f3o5GTHmIEdRnG5C2
-        s/LX64ubTBdFmstJ+pSnC9yc1r28DKjpwpi7zdSNVbGqCYiEcF+8z4dtlVsaRwzwyLUUjoWbp1I
-        w3klgMA5/E4ys
-X-Received: by 2002:a05:6000:1045:b0:2c5:598c:14b0 with SMTP id c5-20020a056000104500b002c5598c14b0mr721869wrx.20.1676255361577;
-        Sun, 12 Feb 2023 18:29:21 -0800 (PST)
-X-Google-Smtp-Source: AK7set9mEuAJuUUFAaKDkoF4K/Bpi3uxYbwIt8gZFY4JpKNCbwFLbmvekq3ibmA7XAgTGLiovhsauA==
-X-Received: by 2002:a05:6000:1045:b0:2c5:598c:14b0 with SMTP id c5-20020a056000104500b002c5598c14b0mr721855wrx.20.1676255361324;
-        Sun, 12 Feb 2023 18:29:21 -0800 (PST)
+        bh=OVgMt+TdJwmeIvY3Hw47YNm8dYS4wVaPDdNlXTwlDwQ=;
+        b=rBcKEed28zrELFp15vdvuyor3zuCkrhLCpsOHdvEs0iBxRXSDb+luKeisnRkc36cgY
+         m0NKwVrVz4w6v6mIGMEad3cqIk/o4g04aWQaVrXJ5XZeCLv8mvl/AD2GsecxXejawRPR
+         7pQAiZG23x29qqjZvngrxq//ff52rxyPW8Y4WrXYtKW+ykjg5lQem25U0uYyzDconGqR
+         3QsEGiMmanCuWtDE7c9szvBZrlV1Z3SkGlzgbSldPPEe40Hqah6kGt+sPrgoQx44ZHEG
+         edSQZuhWAEiJ7bbvYKWNNqqJhNkhkuyCJDn417eJBII8PZtmO9tEsOiaQtMgDSdY48wB
+         ADXw==
+X-Gm-Message-State: AO0yUKXpddPz14qiIRzi/UuYRawhPSoXYeM8FPWcvKajNHc2X/Qz2gu0
+        7ITvoWgJvDHGCchO8lcG6zl7TagmeNKPdFBYXn31WI9rF6e//X/e8uwT9Q9V7klz//4a39YsqMf
+        6rg6ILWw1PK5B
+X-Received: by 2002:a5d:595f:0:b0:2c5:585d:74c5 with SMTP id e31-20020a5d595f000000b002c5585d74c5mr1617018wri.22.1676255363516;
+        Sun, 12 Feb 2023 18:29:23 -0800 (PST)
+X-Google-Smtp-Source: AK7set+1AvjRljtPucQVqwFkeTx727Y5hrIJrWAWmfJIZuoPIp9WAfMkp3jkVQMcApV1qaza2muSpA==
+X-Received: by 2002:a5d:595f:0:b0:2c5:585d:74c5 with SMTP id e31-20020a5d595f000000b002c5585d74c5mr1617009wri.22.1676255363296;
+        Sun, 12 Feb 2023 18:29:23 -0800 (PST)
 Received: from redhat.com ([46.136.252.173])
-        by smtp.gmail.com with ESMTPSA id m3-20020adfe0c3000000b002c4084d3472sm9273865wri.58.2023.02.12.18.29.20
+        by smtp.gmail.com with ESMTPSA id t9-20020adfeb89000000b002be0b1e556esm9231047wrn.59.2023.02.12.18.29.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 Feb 2023 18:29:20 -0800 (PST)
+        Sun, 12 Feb 2023 18:29:22 -0800 (PST)
 From:   Xxx Xx <quintela@redhat.com>
 X-Google-Original-From: Xxx Xx <xxx.xx@gmail.com>
 To:     qemu-devel@nongnu.org
@@ -66,11 +66,10 @@ Cc:     =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
         "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
         kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
-        Peter Xu <peterx@redhat.com>
-Subject: [PULL 05/22] util/userfaultfd: Support /dev/userfaultfd
-Date:   Mon, 13 Feb 2023 03:28:54 +0100
-Message-Id: <20230213022911.68490-6-xxx.xx@gmail.com>
+        =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Subject: [PULL 06/22] migration: Simplify ram_find_and_save_block()
+Date:   Mon, 13 Feb 2023 03:28:55 +0100
+Message-Id: <20230213022911.68490-7-xxx.xx@gmail.com>
 X-Mailer: git-send-email 2.39.1
 In-Reply-To: <20230213022911.68490-1-xxx.xx@gmail.com>
 References: <20230213022911.68490-1-xxx.xx@gmail.com>
@@ -86,84 +85,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Peter Xu <peterx@redhat.com>
+From: Juan Quintela <quintela@redhat.com>
 
-Teach QEMU to use /dev/userfaultfd when it existed and fallback to the
-system call if either it's not there or doesn't have enough permission.
+We will need later that find_dirty_block() return errors, so
+simplify the loop.
 
-Firstly, as long as the app has permission to access /dev/userfaultfd, it
-always have the ability to trap kernel faults which QEMU mostly wants.
-Meanwhile, in some context (e.g. containers) the userfaultfd syscall can be
-forbidden, so it can be the major way to use postcopy in a restricted
-environment with strict seccomp setup.
-
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- util/userfaultfd.c | 32 ++++++++++++++++++++++++++++++++
- util/trace-events  |  1 +
- 2 files changed, 33 insertions(+)
+ migration/ram.c | 20 +++++++++-----------
+ 1 file changed, 9 insertions(+), 11 deletions(-)
 
-diff --git a/util/userfaultfd.c b/util/userfaultfd.c
-index 4953b3137d..fdff4867e8 100644
---- a/util/userfaultfd.c
-+++ b/util/userfaultfd.c
-@@ -18,10 +18,42 @@
- #include <poll.h>
- #include <sys/syscall.h>
- #include <sys/ioctl.h>
-+#include <fcntl.h>
-+
-+typedef enum {
-+    UFFD_UNINITIALIZED = 0,
-+    UFFD_USE_DEV_PATH,
-+    UFFD_USE_SYSCALL,
-+} uffd_open_mode;
- 
- int uffd_open(int flags)
+diff --git a/migration/ram.c b/migration/ram.c
+index b966e148c2..dd809fec1f 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -2542,7 +2542,6 @@ static int ram_find_and_save_block(RAMState *rs)
  {
- #if defined(__NR_userfaultfd)
-+    static uffd_open_mode open_mode;
-+    static int uffd_dev;
-+
-+    /* Detect how to generate uffd desc when run the 1st time */
-+    if (open_mode == UFFD_UNINITIALIZED) {
-+        /*
-+         * Make /dev/userfaultfd the default approach because it has better
-+         * permission controls, meanwhile allows kernel faults without any
-+         * privilege requirement (e.g. SYS_CAP_PTRACE).
-+         */
-+        uffd_dev = open("/dev/userfaultfd", O_RDWR | O_CLOEXEC);
-+        if (uffd_dev >= 0) {
-+            open_mode = UFFD_USE_DEV_PATH;
-+        } else {
-+            /* Fallback to the system call */
-+            open_mode = UFFD_USE_SYSCALL;
-+        }
-+        trace_uffd_detect_open_mode(open_mode);
-+    }
-+
-+    if (open_mode == UFFD_USE_DEV_PATH) {
-+        assert(uffd_dev >= 0);
-+        return ioctl(uffd_dev, USERFAULTFD_IOC_NEW, flags);
-+    }
-+
-     return syscall(__NR_userfaultfd, flags);
- #else
-     return -EINVAL;
-diff --git a/util/trace-events b/util/trace-events
-index c8f53d7d9f..16f78d8fe5 100644
---- a/util/trace-events
-+++ b/util/trace-events
-@@ -93,6 +93,7 @@ qemu_vfio_region_info(const char *desc, uint64_t region_ofs, uint64_t region_siz
- qemu_vfio_pci_map_bar(int index, uint64_t region_ofs, uint64_t region_size, int ofs, void *host) "map region bar#%d addr 0x%"PRIx64" size 0x%"PRIx64" ofs 0x%x host %p"
+     PageSearchStatus *pss = &rs->pss[RAM_CHANNEL_PRECOPY];
+     int pages = 0;
+-    bool again, found;
  
- #userfaultfd.c
-+uffd_detect_open_mode(int mode) "%d"
- uffd_query_features_nosys(int err) "errno: %i"
- uffd_query_features_api_failed(int err) "errno: %i"
- uffd_create_fd_nosys(int err) "errno: %i"
+     /* No dirty page as there is zero RAM */
+     if (!ram_bytes_total()) {
+@@ -2564,18 +2563,17 @@ static int ram_find_and_save_block(RAMState *rs)
+     pss_init(pss, rs->last_seen_block, rs->last_page);
+ 
+     do {
+-        again = true;
+-        found = get_queued_page(rs, pss);
+-
+-        if (!found) {
++        if (!get_queued_page(rs, pss)) {
+             /* priority queue empty, so just search for something dirty */
+-            found = find_dirty_block(rs, pss, &again);
++            bool again = true;
++            if (!find_dirty_block(rs, pss, &again)) {
++                if (!again) {
++                    break;
++                }
++            }
+         }
+-
+-        if (found) {
+-            pages = ram_save_host_page(rs, pss);
+-        }
+-    } while (!pages && again);
++        pages = ram_save_host_page(rs, pss);
++    } while (!pages);
+ 
+     rs->last_seen_block = pss->block;
+     rs->last_page = pss->page;
 -- 
 2.39.1
 
