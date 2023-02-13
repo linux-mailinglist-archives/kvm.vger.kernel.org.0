@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DC94E694ABA
-	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 16:15:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B3DE4694AC2
+	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 16:15:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230288AbjBMPPE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Feb 2023 10:15:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53600 "EHLO
+        id S231614AbjBMPPT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Feb 2023 10:15:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231540AbjBMPOy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Feb 2023 10:14:54 -0500
+        with ESMTP id S231536AbjBMPPA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Feb 2023 10:15:00 -0500
 Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AD6AFF06;
-        Mon, 13 Feb 2023 07:14:42 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A64FE1E9D6;
+        Mon, 13 Feb 2023 07:14:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1676301282; x=1707837282;
+  t=1676301292; x=1707837292;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=WnTzzJXtARLwUtXkY81KogBO5Kf2HLrYLOAYVb4LkVE=;
-  b=FY73DcT3MRXQgEAsjJPlXxhAKDKda+y4zazUl7HrfM718TbtOS3cqsee
-   MK9o8M8Ce7Yf328PJMin49mltQj8V65QFNI1kOWXLCppTfwYzHSs7xPoI
-   l1Nu760qYSlSnpg4Gz5P6eO3DYU2xe49epp97EWAPjFwn7rJdbVqPoKSL
-   D/SDDMFl7Ewk8Qsh7n8CWYFxuZKcfYhYrYQ7pjsTFRegfoCqeciRWHExB
-   cuu1arDLdSbdo70Wjpf8Zh+po3Snl65HLC2WrsSkLov+WAFw3bxzYl2Ab
-   mRQWF0X2Ctp/HiayqP6mvmNp06W6ngPKXSfbzxet2LmumFzcndPgK+3sL
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10620"; a="318931581"
+  bh=U2rECZ0JItdMdjmbYNwZ0avc4uKZTi4VlXq+oNTswaY=;
+  b=awBiijAac11/wRikvWL7Y+b4qdyKd+LCWgVaVeykMHc3UeW7ZWKenB2N
+   IXJb9+OIQG87lDsORbz2VW6DlZm0xksdaM5A9oVePWQ3lyNXj8Ox4QLfi
+   HPrj+XyfbKtP7faeN8bTp0LTMWw6hEXInCOIkkxsSdAKY5WkuZKDqV/Tu
+   7C24Pbwi3zdCTsxJ/vXLIwlF4Ph5CZvkwyoglfqFwAqJPzsVKbXXImiMr
+   KhBEVDVzWQNL24kC1UWBmfxu8z4wKZaU+61s4t4lJ99enDBJro80N+/wP
+   A3WsH0s2jQQdpOSSetn1bnw8NUUMtadwv5FoCVPBS3feBLts3V/gDw46H
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10620"; a="318931591"
 X-IronPort-AV: E=Sophos;i="5.97,294,1669104000"; 
-   d="scan'208";a="318931581"
+   d="scan'208";a="318931591"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2023 07:13:56 -0800
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2023 07:13:57 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10620"; a="701289669"
+X-IronPort-AV: E=McAfee;i="6500,9779,10620"; a="701289672"
 X-IronPort-AV: E=Sophos;i="5.97,294,1669104000"; 
-   d="scan'208";a="701289669"
+   d="scan'208";a="701289672"
 Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
   by orsmga001.jf.intel.com with ESMTP; 13 Feb 2023 07:13:56 -0800
 From:   Yi Liu <yi.l.liu@intel.com>
@@ -48,9 +48,9 @@ Cc:     cohuck@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
         shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
         suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
         intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org
-Subject: [PATCH v3 06/15] vfio: Pass struct vfio_device_file * to vfio_device_open/close()
-Date:   Mon, 13 Feb 2023 07:13:39 -0800
-Message-Id: <20230213151348.56451-7-yi.l.liu@intel.com>
+Subject: [PATCH v3 07/15] vfio: Block device access via device fd until device is opened
+Date:   Mon, 13 Feb 2023 07:13:40 -0800
+Message-Id: <20230213151348.56451-8-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230213151348.56451-1-yi.l.liu@intel.com>
 References: <20230213151348.56451-1-yi.l.liu@intel.com>
@@ -66,187 +66,122 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This avoids passing too much parameters in multiple functions.
+Allow the vfio_device file to be in a state where the device FD is
+opened but the device cannot be used by userspace (i.e. its .open_device()
+hasn't been called). This inbetween state is not used when the device
+FD is spawned from the group FD, however when we create the device FD
+directly by opening a cdev it will be opened in the blocked state.
 
+The reason for the inbetween state is that userspace only gets a FD but
+doesn't gain access permission until binding the FD to an iommufd. So in
+the blocked state, only the bind operation is allowed. Completing bind
+will allow user to further access the device.
+
+This is implemented by adding a flag in struct vfio_device_file to mark
+the blocked state and using a simple smp_load_acquire() to obtain the
+flag value and serialize all the device setup with the thread accessing
+this device.
+
+Following this lockless scheme, it can safely handle the device FD
+unbound->bound but it cannot handle bound->unbound. To allow this we'd
+need to add a lock on all the vfio ioctls which seems costly. So once
+device FD is bound, it remains bound until the FD is closed.
+
+Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
 Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 Reviewed-by: Kevin Tian <kevin.tian@intel.com>
 ---
- drivers/vfio/group.c     | 19 +++++++++++++------
- drivers/vfio/vfio.h      |  8 ++++----
- drivers/vfio/vfio_main.c | 25 +++++++++++++++----------
- 3 files changed, 32 insertions(+), 20 deletions(-)
+ drivers/vfio/vfio.h      |  1 +
+ drivers/vfio/vfio_main.c | 34 +++++++++++++++++++++++++++++++++-
+ 2 files changed, 34 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
-index cc0eded19a9f..2abf55c69281 100644
---- a/drivers/vfio/group.c
-+++ b/drivers/vfio/group.c
-@@ -166,8 +166,9 @@ static void vfio_device_group_get_kvm_safe(struct vfio_device *device)
- 	spin_unlock(&device->group->kvm_ref_lock);
- }
- 
--static int vfio_device_group_open(struct vfio_device *device)
-+static int vfio_device_group_open(struct vfio_device_file *df)
- {
-+	struct vfio_device *device = df->device;
- 	int ret;
- 
- 	mutex_lock(&device->group->group_lock);
-@@ -187,7 +188,11 @@ static int vfio_device_group_open(struct vfio_device *device)
- 	if (device->open_count == 0)
- 		vfio_device_group_get_kvm_safe(device);
- 
--	ret = vfio_device_open(device, device->group->iommufd);
-+	df->iommufd = device->group->iommufd;
-+
-+	ret = vfio_device_open(df);
-+	if (ret)
-+		df->iommufd = NULL;
- 
- 	if (device->open_count == 0)
- 		vfio_device_put_kvm(device);
-@@ -199,12 +204,14 @@ static int vfio_device_group_open(struct vfio_device *device)
- 	return ret;
- }
- 
--void vfio_device_group_close(struct vfio_device *device)
-+void vfio_device_group_close(struct vfio_device_file *df)
- {
-+	struct vfio_device *device = df->device;
-+
- 	mutex_lock(&device->group->group_lock);
- 	mutex_lock(&device->dev_set->lock);
- 
--	vfio_device_close(device, device->group->iommufd);
-+	vfio_device_close(df);
- 
- 	if (device->open_count == 0)
- 		vfio_device_put_kvm(device);
-@@ -225,7 +232,7 @@ static struct file *vfio_device_open_file(struct vfio_device *device)
- 		goto err_out;
- 	}
- 
--	ret = vfio_device_group_open(device);
-+	ret = vfio_device_group_open(df);
- 	if (ret)
- 		goto err_free;
- 
-@@ -257,7 +264,7 @@ static struct file *vfio_device_open_file(struct vfio_device *device)
- 	return filep;
- 
- err_close_device:
--	vfio_device_group_close(device);
-+	vfio_device_group_close(df);
- err_free:
- 	kfree(df);
- err_out:
 diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
-index cee979a1b90f..11e56fe079a1 100644
+index 11e56fe079a1..d56cdb114024 100644
 --- a/drivers/vfio/vfio.h
 +++ b/drivers/vfio/vfio.h
-@@ -20,13 +20,13 @@ struct vfio_device_file {
+@@ -18,6 +18,7 @@ struct vfio_container;
+ 
+ struct vfio_device_file {
  	struct vfio_device *device;
++	bool access_granted;
  	spinlock_t kvm_ref_lock; /* protect kvm field */
  	struct kvm *kvm;
-+	struct iommufd_ctx *iommufd; /* protected by struct vfio_device_set::lock */
- };
- 
- void vfio_device_put_registration(struct vfio_device *device);
- bool vfio_device_try_get_registration(struct vfio_device *device);
--int vfio_device_open(struct vfio_device *device, struct iommufd_ctx *iommufd);
--void vfio_device_close(struct vfio_device *device,
--		       struct iommufd_ctx *iommufd);
-+int vfio_device_open(struct vfio_device_file *df);
-+void vfio_device_close(struct vfio_device_file *df);
- struct vfio_device_file *
- vfio_allocate_device_file(struct vfio_device *device);
- 
-@@ -91,7 +91,7 @@ void vfio_device_group_register(struct vfio_device *device);
- void vfio_device_group_unregister(struct vfio_device *device);
- int vfio_device_group_use_iommu(struct vfio_device *device);
- void vfio_device_group_unuse_iommu(struct vfio_device *device);
--void vfio_device_group_close(struct vfio_device *device);
-+void vfio_device_group_close(struct vfio_device_file *df);
- struct vfio_group *vfio_group_from_file(struct file *file);
- bool vfio_group_enforced_coherent(struct vfio_group *group);
- void vfio_group_set_kvm(struct vfio_group *group, struct kvm *kvm);
+ 	struct iommufd_ctx *iommufd; /* protected by struct vfio_device_set::lock */
 diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-index c529f609fecc..c517252aba19 100644
+index c517252aba19..2267057240bd 100644
 --- a/drivers/vfio/vfio_main.c
 +++ b/drivers/vfio/vfio_main.c
-@@ -411,9 +411,10 @@ vfio_allocate_device_file(struct vfio_device *device)
- 	return df;
- }
- 
--static int vfio_device_first_open(struct vfio_device *device,
--				  struct iommufd_ctx *iommufd)
-+static int vfio_device_first_open(struct vfio_device_file *df)
- {
-+	struct vfio_device *device = df->device;
-+	struct iommufd_ctx *iommufd = df->iommufd;
- 	int ret;
- 
- 	lockdep_assert_held(&device->dev_set->lock);
-@@ -445,9 +446,11 @@ static int vfio_device_first_open(struct vfio_device *device,
- 	return ret;
- }
- 
--static void vfio_device_last_close(struct vfio_device *device,
--				   struct iommufd_ctx *iommufd)
-+static void vfio_device_last_close(struct vfio_device_file *df)
- {
-+	struct vfio_device *device = df->device;
-+	struct iommufd_ctx *iommufd = df->iommufd;
-+
- 	lockdep_assert_held(&device->dev_set->lock);
- 
- 	if (device->ops->close_device)
-@@ -459,15 +462,16 @@ static void vfio_device_last_close(struct vfio_device *device,
- 	module_put(device->dev->driver->owner);
- }
- 
--int vfio_device_open(struct vfio_device *device, struct iommufd_ctx *iommufd)
-+int vfio_device_open(struct vfio_device_file *df)
- {
-+	struct vfio_device *device = df->device;
- 	int ret = 0;
- 
- 	lockdep_assert_held(&device->dev_set->lock);
- 
- 	device->open_count++;
- 	if (device->open_count == 1) {
--		ret = vfio_device_first_open(device, iommufd);
-+		ret = vfio_device_first_open(df);
- 		if (ret)
+@@ -476,7 +476,15 @@ int vfio_device_open(struct vfio_device_file *df)
  			device->open_count--;
  	}
-@@ -475,14 +479,15 @@ int vfio_device_open(struct vfio_device *device, struct iommufd_ctx *iommufd)
- 	return ret;
- }
  
--void vfio_device_close(struct vfio_device *device,
--		       struct iommufd_ctx *iommufd)
-+void vfio_device_close(struct vfio_device_file *df)
- {
-+	struct vfio_device *device = df->device;
+-	return ret;
++	if (ret)
++		return ret;
 +
- 	lockdep_assert_held(&device->dev_set->lock);
- 
- 	vfio_assert_device_open(device);
- 	if (device->open_count == 1)
--		vfio_device_last_close(device, iommufd);
-+		vfio_device_last_close(df);
- 	device->open_count--;
++	/*
++	 * Paired with smp_load_acquire() in vfio_device_fops::ioctl/
++	 * read/write/mmap
++	 */
++	smp_store_release(&df->access_granted, true);
++	return 0;
  }
  
-@@ -527,7 +532,7 @@ static int vfio_device_fops_release(struct inode *inode, struct file *filep)
+ void vfio_device_close(struct vfio_device_file *df)
+@@ -1104,8 +1112,14 @@ static long vfio_device_fops_unl_ioctl(struct file *filep,
+ {
  	struct vfio_device_file *df = filep->private_data;
  	struct vfio_device *device = df->device;
++	bool access;
+ 	int ret;
  
--	vfio_device_group_close(device);
-+	vfio_device_group_close(df);
++	/* Paired with smp_store_release() in vfio_device_open() */
++	access = smp_load_acquire(&df->access_granted);
++	if (!access)
++		return -EINVAL;
++
+ 	ret = vfio_device_pm_runtime_get(device);
+ 	if (ret)
+ 		return ret;
+@@ -1132,6 +1146,12 @@ static ssize_t vfio_device_fops_read(struct file *filep, char __user *buf,
+ {
+ 	struct vfio_device_file *df = filep->private_data;
+ 	struct vfio_device *device = df->device;
++	bool access;
++
++	/* Paired with smp_store_release() in vfio_device_open() */
++	access = smp_load_acquire(&df->access_granted);
++	if (!access)
++		return -EINVAL;
  
- 	vfio_device_put_registration(device);
+ 	if (unlikely(!device->ops->read))
+ 		return -EINVAL;
+@@ -1145,6 +1165,12 @@ static ssize_t vfio_device_fops_write(struct file *filep,
+ {
+ 	struct vfio_device_file *df = filep->private_data;
+ 	struct vfio_device *device = df->device;
++	bool access;
++
++	/* Paired with smp_store_release() in vfio_device_open() */
++	access = smp_load_acquire(&df->access_granted);
++	if (!access)
++		return -EINVAL;
  
+ 	if (unlikely(!device->ops->write))
+ 		return -EINVAL;
+@@ -1156,6 +1182,12 @@ static int vfio_device_fops_mmap(struct file *filep, struct vm_area_struct *vma)
+ {
+ 	struct vfio_device_file *df = filep->private_data;
+ 	struct vfio_device *device = df->device;
++	bool access;
++
++	/* Paired with smp_store_release() in vfio_device_open() */
++	access = smp_load_acquire(&df->access_granted);
++	if (!access)
++		return -EINVAL;
+ 
+ 	if (unlikely(!device->ops->mmap))
+ 		return -EINVAL;
 -- 
 2.34.1
 
