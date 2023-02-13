@@ -2,129 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E6746946F3
-	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 14:26:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C61726947CF
+	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 15:17:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229822AbjBMN0V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Feb 2023 08:26:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60892 "EHLO
+        id S230053AbjBMORd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Feb 2023 09:17:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230133AbjBMNZ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Feb 2023 08:25:56 -0500
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FCAA1ADC8
-        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 05:25:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1676294755; x=1707830755;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=GJtQLCFFcNY7WdH1m4b75Yc62eRv0h0pOqP1DOMmL+4=;
-  b=QmK4/11A4n7crsNxrAdXHDFbSUSQSZU4EpQpEpkMU5RsPCI5ayo9GBui
-   G0QZ9YOayJqnfqNofbXy/rmgMFp5Ne1pfx5ZzX15Yz7aeEQnCVRRAnbUn
-   OQIl7Z0thGfgVXmw95kFWHkL+HqoF38pbb8BEgX7DC3ZG1cF8v0iRrJfg
-   3ui81dKF7Paix/EOF89IAyDqdfysmjGV0umSSPt6JNiYDxTDTRRV5R5R/
-   eP3t+aIMrJjtbA8Tdn2te1p0Ambvn4rjlaeHD0w5R06I5ElpHZ7zguleu
-   7RuW53ylzaCQ8dSyWEzzY6sfaG9pgBema5gBjxAgd7z+pQQ278e/UiT7a
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10620"; a="417111986"
-X-IronPort-AV: E=Sophos;i="5.97,294,1669104000"; 
-   d="scan'208";a="417111986"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2023 05:25:54 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10620"; a="699174148"
-X-IronPort-AV: E=Sophos;i="5.97,294,1669104000"; 
-   d="scan'208";a="699174148"
-Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
-  by orsmga008.jf.intel.com with ESMTP; 13 Feb 2023 05:25:51 -0800
-Message-ID: <cd11d9bd2ab1560f0adce5da32190739f7550b06.camel@linux.intel.com>
-Subject: Re: [PATCH v4 6/9] KVM: x86: When KVM judges CR3 valid or not,
- consider LAM bits
-From:   Robert Hoo <robert.hu@linux.intel.com>
-To:     Chao Gao <chao.gao@intel.com>
-Cc:     seanjc@google.com, pbonzini@redhat.com, yu.c.zhang@linux.intel.com,
-        yuan.yao@linux.intel.com, jingqi.liu@intel.com,
-        weijiang.yang@intel.com, isaku.yamahata@intel.com,
-        kirill.shutemov@linux.intel.com, kvm@vger.kernel.org
-Date:   Mon, 13 Feb 2023 21:25:50 +0800
-In-Reply-To: <Y+mZ/ja1bt5L9jfl@gao-cwp>
-References: <20230209024022.3371768-1-robert.hu@linux.intel.com>
-         <20230209024022.3371768-7-robert.hu@linux.intel.com>
-         <Y+mZ/ja1bt5L9jfl@gao-cwp>
+        with ESMTP id S230013AbjBMORa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Feb 2023 09:17:30 -0500
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B771015545
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 06:17:29 -0800 (PST)
+Received: by mail-pj1-x1035.google.com with SMTP id d2so12036531pjd.5
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 06:17:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=9KxabtV8Gxta25OgC2D6SS7uLMr9UtHR7eB3HWJjlbE=;
+        b=aFq96rao8X/Yiroe/6r3zOWASKc1b6mWcASe6E/G8+ZKRiJjRasU7jzeO2kxtadwri
+         MQ2xiGTymNBE5J8wfTmtH4LTR5IP2Y7TjAU8VodzM3wUdN8e/195ItwqfS65zLQ/ugr3
+         9I4rgW7es36VL412GAJ/ylWx8k0kc1rK3Eb/M5YNAtTQf9Mwq2X7FNRPttMQNKyJTeOO
+         RQY91eGF5UDwbeXrDU5vn8yzc5qtwgrnNvYcuSZg8fqCUyOg8EuJgNtXh26Q4rXapuWw
+         XBpcX2gF6XE+LqmoWVZIGa9ZNZnPgjbuTdi9e6ePylWXn1gHleputKOIq+ebObF0g785
+         +L8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9KxabtV8Gxta25OgC2D6SS7uLMr9UtHR7eB3HWJjlbE=;
+        b=DZnB8ZRnhLDqwFteL1OWM4fT8OjYLiAOyBm4KitK0IQsuogh6YqXkTjghDAGavMqYv
+         26F6kVzy8sHzfbV1jolRkyIVCtNQ6DWJmvXN8yrwRrFYZmJJrvL7uIJ9HbZpzel+9r7F
+         C9/V9Ugwmp0oPq3LS5oUsI3+Kx7sej71bAhO1wBvnvgwKJL7oZ/jchg+FbOdcyscZ45i
+         zXFC9AnRUbnMNOi1CVtrswtZR1aUtjFvSvq14UMFgofkY165E7wboV9gcY8rE5qfvkBl
+         5edVnNeP7VuJhToRiabQGnFuEr0RPCHOG/toGZEqW7RgKlwbpubDa0tCYuedOKqQnkSu
+         8hmw==
+X-Gm-Message-State: AO0yUKWW8ZwwABGOXWo6gWWtbN70tDX4jqVvu936wQ2Eq2JGB86Hbof7
+        qfsy84urUsaZjoiUYIrPlwnIb0gHQyJfgJSBYvyhBw==
+X-Google-Smtp-Source: AK7set84uOX6lkHYj1JRMvvFpgKFSNkez2K6MuhdS/elvMz+u7N6gQ+j7ymKR+7pQe0UwcN+SOHzY6nqvx7muQnFe2c=
+X-Received: by 2002:a17:902:8d8e:b0:19a:8a3c:c6ea with SMTP id
+ v14-20020a1709028d8e00b0019a8a3cc6eamr1439721plo.33.1676297849288; Mon, 13
+ Feb 2023 06:17:29 -0800 (PST)
+MIME-Version: 1.0
+References: <20230213025150.71537-1-quintela@redhat.com>
+In-Reply-To: <20230213025150.71537-1-quintela@redhat.com>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Mon, 13 Feb 2023 14:17:18 +0000
+Message-ID: <CAFEAcA9+CdnP_ZTO+WtCqCjm8FSPsRSU82R0mUzZz7Ya3H0Paw@mail.gmail.com>
+Subject: Re: [PULL 00/22] Migration 20230213 patches
+To:     Juan Quintela <quintela@redhat.com>
+Cc:     qemu-devel@nongnu.org,
+        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+        =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
+        Li Xiaohui <xiaohli@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-10.el7) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2023-02-13 at 10:01 +0800, Chao Gao wrote:
-> On Thu, Feb 09, 2023 at 10:40:19AM +0800, Robert Hoo wrote:
-> > Before apply to kvm_vcpu_is_illegal_gpa(), clear LAM bits if it's
-> > valid.
-> 
-> I prefer to squash this patch into patch 2 because it is also related
-> to
-> CR3 LAM bits handling.
-> 
-Though all surround CR3, I would prefer split into pieces, so that
-easier for review and accept. I can change their order to group
-together. Is is all right for you?
-> > 
-> > 
-> > +static bool kvm_is_valid_cr3(struct kvm_vcpu *vcpu, unsigned long
-> > cr3)
-> 
-> Since this function takes a "vcpu" argument, probably
-> kvm_vcpu_is_valid_cr3() is slightly better.
+On Mon, 13 Feb 2023 at 02:52, Juan Quintela <quintela@redhat.com> wrote:
+>
+> The following changes since commit 3b33ae48ec28e1e0d1bc28a85c7423724bcb1a2c:
+>
+>   Merge tag 'block-pull-request' of https://gitlab.com/stefanha/qemu into staging (2023-02-09 15:29:14 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://gitlab.com/juan.quintela/qemu.git tags/migration-20230213-pull-request
+>
+> for you to fetch changes up to 7b548761e5d084f2fc0fc4badebab227b51a8a84:
+>
+>   ram: Document migration ram flags (2023-02-13 03:45:47 +0100)
+>
+> ----------------------------------------------------------------
+> Migration Pull request (take3)
+>
+> Hi
+>
+> In this PULL request:
+> - Added to leonardo fixes:
+> Fixes: b5eea99ec2 ("migration: Add yank feature")
+> Reported-by: Li Xiaohui <xiaohli@redhat.com>
+>
+> Please apply.
 
-OK, to align with kvm_vcpu_is_legal_gpa().
-> 
-> > +{
-> > +	if (guest_cpuid_has(vcpu, X86_FEATURE_LAM))
-> 
-> check if the vcpu is in the 64 bit long mode?
 
-Emm, looks necessary. 
-	(guest_cpuid_has(vcpu, X86_FEATURE_LAM) && is_long_mode(vcpu))
-Let me ponder more, e.g. when guest has LAM feature but not in long
-mode...
-> 
-> > +		cr3 &= ~(X86_CR3_LAM_U48 | X86_CR3_LAM_U57);
-> > +
-> > +	return kvm_vcpu_is_legal_gpa(vcpu, cr3);
-> > +}
-> > +
-> > int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
-> > {
-> > 	bool skip_tlb_flush = false;
-> > @@ -1254,7 +1262,7 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu,
-> > unsigned long cr3)
-> > 	 * stuff CR3, e.g. for RSM emulation, and there is no guarantee
-> > that
-> > 	 * the current vCPU mode is accurate.
-> > 	 */
-> > -	if (kvm_vcpu_is_illegal_gpa(vcpu, cr3))
-> > +	if (!kvm_is_valid_cr3(vcpu, cr3))
-> 
-> There are other call sites of kvm_vcpu_is_illegal_gpa() to validate
-> cr3.
-> Do you need to modify them?
+Applied, thanks.
 
-I don't think so. Others are for gpa validation, no need to change.
-Here is for CR3.
-> 
-> > 		return 1;
-> > 
-> > 	if (is_pae_paging(vcpu) && !load_pdptrs(vcpu, cr3))
-> > -- 
-> > 2.31.1
-> > 
+Please update the changelog at https://wiki.qemu.org/ChangeLog/8.0
+for any user-visible changes.
 
+-- PMM
