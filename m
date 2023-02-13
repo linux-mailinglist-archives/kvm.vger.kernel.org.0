@@ -2,31 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EE238694298
-	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 11:18:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 580FA694297
+	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 11:18:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230325AbjBMKS1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Feb 2023 05:18:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53212 "EHLO
+        id S230321AbjBMKS0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Feb 2023 05:18:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230334AbjBMKSS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S229713AbjBMKSS (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 13 Feb 2023 05:18:18 -0500
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7DC841204D
-        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 02:18:16 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9954A13D4C
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 02:18:17 -0800 (PST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D81C81D14;
-        Mon, 13 Feb 2023 02:18:58 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EE9291D15;
+        Mon, 13 Feb 2023 02:18:59 -0800 (PST)
 Received: from godel.lab.cambridge.arm.com (godel.lab.cambridge.arm.com [10.7.66.42])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 49D6F3F703;
-        Mon, 13 Feb 2023 02:18:15 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7A8EE3F703;
+        Mon, 13 Feb 2023 02:18:16 -0800 (PST)
 From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev
-Cc:     pbonzini@redhat.com, alexandru.elisei@arm.com, ricarkol@google.com,
-        Andrew Jones <drjones@redhat.com>
-Subject: [PATCH v4 10/30] lib/acpi: Extend the definition of the FADT table
-Date:   Mon, 13 Feb 2023 10:17:39 +0000
-Message-Id: <20230213101759.2577077-11-nikos.nikoleris@arm.com>
+Cc:     pbonzini@redhat.com, alexandru.elisei@arm.com, ricarkol@google.com
+Subject: [PATCH v4 11/30] devicetree: Check that fdt is not NULL in dt_available()
+Date:   Mon, 13 Feb 2023 10:17:40 +0000
+Message-Id: <20230213101759.2577077-12-nikos.nikoleris@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230213101759.2577077-1-nikos.nikoleris@arm.com>
 References: <20230213101759.2577077-1-nikos.nikoleris@arm.com>
@@ -41,111 +40,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This change add more fields in the APCI table FADT to allow for the
-discovery of the PSCI conduit in arm64 systems. The definition for
-FADT is similar to the one in include/acpi/actbl.h in Linux.
+Up until now, for platforms that support DT, kvm-unit-tests would
+unconditionally use DT to configure the system and the code made the
+assumption that the fdt will always be a valid pointer.
+
+On Arm systems that support both ACPI and DT, kvm-unit-tests plans to
+follow the same convension as the Linux kernel: attempt to configure the
+system using the DT first, then fallback to ACPI.
+
+As a result, the fdt pointer can be NULL. Check for that in dt_available().
 
 Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-Reviewed-by: Ricardo Koller <ricarkol@google.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+[ Alex E: Minor changes to the commit message ]
 ---
- lib/acpi.c   |  2 +-
- lib/acpi.h   | 33 +++++++++++++++++++++++++++++----
- x86/s3.c     |  2 +-
- x86/vmexit.c |  2 +-
- 4 files changed, 32 insertions(+), 7 deletions(-)
+ lib/devicetree.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/lib/acpi.c b/lib/acpi.c
-index d35f09a6..a197f3dd 100644
---- a/lib/acpi.c
-+++ b/lib/acpi.c
-@@ -45,7 +45,7 @@ void *find_acpi_table_addr(u32 sig)
+diff --git a/lib/devicetree.c b/lib/devicetree.c
+index 78c1f6fb..3ff9d164 100644
+--- a/lib/devicetree.c
++++ b/lib/devicetree.c
+@@ -16,7 +16,7 @@ const void *dt_fdt(void)
  
- 	/* FACS is special... */
- 	if (sig == FACS_SIGNATURE) {
--		struct acpi_table_fadt_rev1 *fadt;
-+		struct acpi_table_fadt *fadt;
- 
- 		fadt = find_acpi_table_addr(FACP_SIGNATURE);
- 		if (!fadt)
-diff --git a/lib/acpi.h b/lib/acpi.h
-index 621ad08a..38b6d5c9 100644
---- a/lib/acpi.h
-+++ b/lib/acpi.h
-@@ -62,7 +62,15 @@ struct acpi_table_xsdt {
- 	u64 table_offset_entry[];
- };
- 
--struct acpi_table_fadt_rev1 {
-+struct acpi_generic_address {
-+	u8 space_id;		/* Address space where struct or register exists */
-+	u8 bit_width;		/* Size in bits of given register */
-+	u8 bit_offset;		/* Bit offset within the register */
-+	u8 access_width;	/* Minimum Access size (ACPI 3.0) */
-+	u64 address;		/* 64-bit address of struct or register */
-+};
-+
-+struct acpi_table_fadt {
- 	ACPI_TABLE_HEADER_DEF	/* ACPI common table header */
- 	u32 firmware_ctrl;	/* Physical address of FACS */
- 	u32 dsdt;		/* Physical address of DSDT */
-@@ -99,9 +107,26 @@ struct acpi_table_fadt_rev1 {
- 	u8 day_alrm;		/* Index to day-of-month alarm in RTC CMOS RAM */
- 	u8 mon_alrm;		/* Index to month-of-year alarm in RTC CMOS RAM */
- 	u8 century;		/* Index to century in RTC CMOS RAM */
--	u8 reserved4;		/* Reserved */
--	u8 reserved4a;		/* Reserved */
--	u8 reserved4b;		/* Reserved */
-+	u16 boot_flags;		/* IA-PC Boot Architecture Flags (see below for individual flags) */
-+	u8 reserved;		/* Reserved, must be zero */
-+	u32 flags;		/* Miscellaneous flag bits (see below for individual flags) */
-+	struct acpi_generic_address reset_register;	/* 64-bit address of the Reset register */
-+	u8 reset_value;		/* Value to write to the reset_register port to reset the system */
-+	u16 arm_boot_flags;	/* ARM-Specific Boot Flags (see below for individual flags) (ACPI 5.1) */
-+	u8 minor_revision;	/* FADT Minor Revision (ACPI 5.1) */
-+	u64 Xfacs;		/* 64-bit physical address of FACS */
-+	u64 Xdsdt;		/* 64-bit physical address of DSDT */
-+	struct acpi_generic_address xpm1a_event_block;	/* 64-bit Extended Power Mgt 1a Event Reg Blk address */
-+	struct acpi_generic_address xpm1b_event_block;	/* 64-bit Extended Power Mgt 1b Event Reg Blk address */
-+	struct acpi_generic_address xpm1a_control_block;	/* 64-bit Extended Power Mgt 1a Control Reg Blk address */
-+	struct acpi_generic_address xpm1b_control_block;	/* 64-bit Extended Power Mgt 1b Control Reg Blk address */
-+	struct acpi_generic_address xpm2_control_block;	/* 64-bit Extended Power Mgt 2 Control Reg Blk address */
-+	struct acpi_generic_address xpm_timer_block;	/* 64-bit Extended Power Mgt Timer Ctrl Reg Blk address */
-+	struct acpi_generic_address xgpe0_block;	/* 64-bit Extended General Purpose Event 0 Reg Blk address */
-+	struct acpi_generic_address xgpe1_block;	/* 64-bit Extended General Purpose Event 1 Reg Blk address */
-+	struct acpi_generic_address sleep_control;	/* 64-bit Sleep Control register (ACPI 5.0) */
-+	struct acpi_generic_address sleep_status;	/* 64-bit Sleep Status register (ACPI 5.0) */
-+	u64 hypervisor_id;	/* Hypervisor Vendor ID (ACPI 6.0) */
- };
- 
- struct acpi_table_facs_rev1 {
-diff --git a/x86/s3.c b/x86/s3.c
-index 910c57fb..6f2d6d10 100644
---- a/x86/s3.c
-+++ b/x86/s3.c
-@@ -30,8 +30,8 @@ extern char resume_start, resume_end;
- 
- int main(int argc, char **argv)
+ bool dt_available(void)
  {
--	struct acpi_table_fadt_rev1 *fadt = find_acpi_table_addr(FACP_SIGNATURE);
- 	struct acpi_table_facs_rev1 *facs = find_acpi_table_addr(FACS_SIGNATURE);
-+	struct acpi_table_fadt *fadt = find_acpi_table_addr(FACP_SIGNATURE);
- 	char *addr, *resume_vec = (void*)0x1000;
+-	return fdt_check_header(fdt) == 0;
++	return fdt && fdt_check_header(fdt) == 0;
+ }
  
- 	assert(facs);
-diff --git a/x86/vmexit.c b/x86/vmexit.c
-index 6987aca0..3920f441 100644
---- a/x86/vmexit.c
-+++ b/x86/vmexit.c
-@@ -206,7 +206,7 @@ int pm_tmr_blk;
- static void inl_pmtimer(void)
- {
-     if (!pm_tmr_blk) {
--	struct acpi_table_fadt_rev1 *fadt;
-+	struct acpi_table_fadt *fadt;
- 
- 	fadt = find_acpi_table_addr(FACP_SIGNATURE);
- 	pm_tmr_blk = fadt->pm_tmr_blk;
+ int dt_get_nr_cells(int fdtnode, u32 *nr_address_cells, u32 *nr_size_cells)
 -- 
 2.25.1
 
