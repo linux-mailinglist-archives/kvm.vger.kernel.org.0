@@ -2,115 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1339B694F5B
-	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 19:28:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9935A69501A
+	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 19:59:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230326AbjBMS2f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Feb 2023 13:28:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47218 "EHLO
+        id S230324AbjBMS7K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Feb 2023 13:59:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231389AbjBMS2Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Feb 2023 13:28:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39FAA206A9
-        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 10:26:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676312806;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Dqas7IKcHMmrzpHpfZ+GZZhhDLN7yPHWj+wWiYjQmUI=;
-        b=UiH0YkJ09B1Cokvr+q0BSCfcrIgdAoF6SPZ3b1qKhjb2ehn2+C0mL3sVtOpF4jPz8DM91N
-        J0y9CoVJONmcCFMX8n50Mi00xsRAZca3buW474dxhRAU+s0Ku0n/SKSzR91heKJdwLsDBz
-        pNupMOWhX1yWXIg9DsLHG4Y7EQuEGm4=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-231-oeGiffMdMquIGpssBV1QEw-1; Mon, 13 Feb 2023 13:26:44 -0500
-X-MC-Unique: oeGiffMdMquIGpssBV1QEw-1
-Received: by mail-ed1-f70.google.com with SMTP id eq22-20020a056402299600b004ab4da4a530so5375578edb.8
-        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 10:26:44 -0800 (PST)
+        with ESMTP id S229868AbjBMS7J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Feb 2023 13:59:09 -0500
+Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BB971CAFA
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 10:58:42 -0800 (PST)
+Received: by mail-yb1-xb34.google.com with SMTP id g2so15529190ybk.8
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 10:58:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=sC5Aqs8Zx9KnYE6mc2FVfCuvY0HxXOcL8kz2uAMityk=;
+        b=V46MGcuWl3FG8fgqKMwn7kH1WW09dtFEK1b5alAAvvIeT2dDpmVrGV3IcA7E+xaaUq
+         4+FspjDYoTnE7NZmL6aEZRGu/RRjEjNrr7Gmv7AffjgRJgJ+22YWQ8z7n4nGvq8Gj5fl
+         wn8TGX17LY6POKXC1aZ1GEuH057SP08eUZaOt/+mIIqej4M7ScfATlPi/N5iyw+KWt98
+         dKo7vF6SVbpaxyqnDbnCgATD3DbL0kmwWee5i/JQNg7Birti9h9z47af4VH31h5vKn23
+         W1x6mfF3mUu4gnAqQNdg2gstCLiLDwduhOMSPfYeddvqsXzrsqdKKRjodCRnG2t0KKBv
+         SpBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dqas7IKcHMmrzpHpfZ+GZZhhDLN7yPHWj+wWiYjQmUI=;
-        b=Trdx30TNBKMuEhMzYQHD94Pu6JmblBgDkd8ic6NpljNhXrx5rOqy2bqgGAXIh+QIS1
-         +di58K2qqr/uA2RdauDtznIUEV3gzblQYirOSz3cxITNyOddrN73AjkdHDanVTLs8a1C
-         tG59YALkV2SpPmnAJdO8PRbT2hSxW3jyTFpDiPG6MnYYhNDyzP5hiRP4lQAbKf4IgEg3
-         34FgQepH/VLhozcfx0HZex9kVr6BuS3bsmpCPL0VwKrWzbkxHIEZqSjrcihh/DdG6LTR
-         k17dqKzvVKovwRxAP9e8xi32IWZKWg5afN7cpJisRBe7VftnwSZDISWDcDFiPO/orNPM
-         86nQ==
-X-Gm-Message-State: AO0yUKVYAWzfTBffzydH7hb4C5vUHZyxb+FYyxCXdsLhkXDrIFvm10uP
-        owDhqidDpg5vDVNg1yF/uYnYqwSTtOAoU+XrsmJShG5+1M5N5zeDdP9AwFQqd4DRpl6iyIL7OMt
-        3jJoeJN1/hAYf
-X-Received: by 2002:a17:906:a189:b0:87b:db62:d659 with SMTP id s9-20020a170906a18900b0087bdb62d659mr26218826ejy.19.1676312803543;
-        Mon, 13 Feb 2023 10:26:43 -0800 (PST)
-X-Google-Smtp-Source: AK7set9LoCpz6wnVKg9S4xNaMygS8ScsWULBPzti431vOcsLeANKUzyaytVJAQm/dkWpkzg4ZDf8fQ==
-X-Received: by 2002:a17:906:a189:b0:87b:db62:d659 with SMTP id s9-20020a170906a18900b0087bdb62d659mr26218814ejy.19.1676312803382;
-        Mon, 13 Feb 2023 10:26:43 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id h14-20020a17090634ce00b00877e1bb54b0sm7128313ejb.53.2023.02.13.10.26.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Feb 2023 10:26:42 -0800 (PST)
-Message-ID: <ad3c51a3-f46e-c559-7ad8-573564f63875@redhat.com>
-Date:   Mon, 13 Feb 2023 19:26:41 +0100
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sC5Aqs8Zx9KnYE6mc2FVfCuvY0HxXOcL8kz2uAMityk=;
+        b=hFR6ogGeeC63j9zl+Xy1cf2mtJwFEqqt3nODRipXPLjHA4Kced6mIdh00sQRiCrdtZ
+         qyUeOhKG+MmRfV8f/i4ja0f+2M7aduu5+O/HnHSAYP2s0aTo6bfy3cFCUnSJhSOPKEtR
+         kW8vgrLWuHy+XBdJGI4wx2NDbMbqjeVPs3TiSzEvPsiPxo/BvGvO8F2EJxv+H1/LsFt6
+         +kR1ET10oNvyJJAhzzen88f8/6omfhOLYlT9JsTRPTHLS1Rq15b2xECDU3zvA/CV6iGG
+         VaMqA789gXnd5GutJPn0PHDxEvxtuI6XdmxXYuOe3jEOj5O8th8Z0jrZyda3F9Rjb4IA
+         jCgA==
+X-Gm-Message-State: AO0yUKWqysS29AtRYyMq0hwv5pI2hxWCGamy3kPNIs4JL2jYfYOt1gix
+        1RkJodzwFU7yxLRzQslV0+pegeOdX6/3s4878xYGRg==
+X-Google-Smtp-Source: AK7set92u7HjWSwWlNONIaamzQpCYwD4/vrcW9EncCbfcJza6KzxR1ziVRIWxtymCs+H2aP/nh+hhePZnAwN8YIHdco=
+X-Received: by 2002:a25:1f89:0:b0:80b:5398:3aeb with SMTP id
+ f131-20020a251f89000000b0080b53983aebmr2658539ybf.300.1676314713084; Mon, 13
+ Feb 2023 10:58:33 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Content-Language: en-US
-To:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Tianyu Lan <ltykernel@gmail.com>,
-        "Michael Kelley (LINUX)" <mikelley@microsoft.com>
-References: <43980946-7bbf-dcef-7e40-af904c456250@linux.microsoft.com>
- <Y+aQyFJt9Tn2PJnC@google.com>
- <9a046de1-8085-3df4-94cd-39bb893c8c9a@linux.microsoft.com>
- <88a89319-a71e-fa90-0dbb-00cf8a549380@redhat.com>
- <21b1ee26-dfd4-923d-72da-d8ded3dd819c@linux.microsoft.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: "KVM: x86/mmu: Overhaul TDP MMU zapping and flushing" breaks SVM
- on Hyper-V
-In-Reply-To: <21b1ee26-dfd4-923d-72da-d8ded3dd819c@linux.microsoft.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20230110185823.1856951-1-mizhang@google.com> <20230110185823.1856951-2-mizhang@google.com>
+ <Y+L3HlFDRy+UiUSU@google.com>
+In-Reply-To: <Y+L3HlFDRy+UiUSU@google.com>
+From:   Mingwei Zhang <mizhang@google.com>
+Date:   Mon, 13 Feb 2023 10:57:56 -0800
+Message-ID: <CAL715WL9V8d-jvxkSALKQsMTgwDoyG-zE0g2tKd7FxihUhVGTA@mail.gmail.com>
+Subject: Re: [PATCH 1/4] KVM: selftests: x86: Fix an error in comment of amx_test
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        Venkatesh Srinivas <venkateshs@google.com>,
+        Aaron Lewis <aaronlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/13/23 19:05, Jeremi Piotrowski wrote:
-> So I looked at the ftrace (all kvm&kvmmu events + hyperv_nested_*
-> events) I see the following: With tdp_mmu=0: kvm_exit sequence of
-> kvm_mmu_prepare_zap_page hyperv_nested_flush_guest_mapping (always
-> follows every sequence of kvm_mmu_prepare_zap_page) kvm_entry
-> 
-> With tdp_mmu=1 I see: kvm_mmu_prepare_zap_page and
-> kvm_tdp_mmu_spte_changed events from a kworker context, but they are
-> not followed by hyperv_nested_flush_guest_mapping. The only
-> hyperv_nested_flush_guest_mapping events I see happen from the qemu
-> process context.
-> 
-> Also the number of flush hypercalls is significantly lower: a 7second
-> sequence through OVMF with tdp_mmu=0 produces ~270 flush hypercalls.
-> In the traces with tdp_mmu=1 I now see max 3.
-> 
-> So this might be easier to diagnose than I thought: the
-> HvCallFlushGuestPhysicalAddressSpace calls are missing now.
+On Tue, Feb 7, 2023 at 5:13 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Tue, Jan 10, 2023, Mingwei Zhang wrote:
+> > After the execution of __tilerelease(), AMX component will be in INIT
+> > state. Therefore, execution of xsavec saving the AMX state into memory will
+>
+> s/xsavec/XSAVEC
+>
+> > cause the XSTATE_BV[18] cleared in xheader. However, the XCOMP_BV[18] will
+> > remain set. Fix the error in comment.
+> >
+> > Cc: Jim Mattson <jmattson@google.com>
+> > Cc: Venkatesh Srinivas <venkateshs@google.com>
+> > Cc: Aaron Lewis <aaronlewis@google.com>
+> >
+>
+> No need for a blank line.
 
-Can you check if KVM is reusing a nCR3 value?
+ack.
+>
+> > Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> > ---
+> >  tools/testing/selftests/kvm/x86_64/amx_test.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/x86_64/amx_test.c b/tools/testing/selftests/kvm/x86_64/amx_test.c
+> > index bd72c6eb3b67..16533949a189 100644
+> > --- a/tools/testing/selftests/kvm/x86_64/amx_test.c
+> > +++ b/tools/testing/selftests/kvm/x86_64/amx_test.c
+> > @@ -204,7 +204,7 @@ static void __attribute__((__flatten__)) guest_code(struct tile_config *amx_cfg,
+> >       GUEST_SYNC(4);
+> >       __tilerelease();
+> >       GUEST_SYNC(5);
+> > -     /* bit 18 not in the XCOMP_BV after xsavec() */
+> > +     /* bit 18 not in the XSTATE_BV after xsavec() */
+>
+> I would rather overhaul the entire comment, e.g.
+>
+>         /* Verify XTILEDATA is not set in XSTATE_BV after XSAVEC */
+>
+> I had to look at the definition of XFEATURE_XTILEDATA to verify that yes, indeed,
+> bit 18 is XTILEDATA.
+>
+> As for xsavec() vs. XSAVE, IIUC the clearing of XCOMP_BV[18] is a side effect of
+> XSAVEC the instruction, not something extra done by xsavec() the function.
 
-If so, perhaps you can just add 
-hyperv_flush_guest_mapping(__pa(root->spt), NULL) after 
-kvm_tdp_mmu_get_vcpu_root_hpa's call to tdp_mmu_alloc_sp()?
-
-Paolo
-
+I see, that's why you asked me to use capital words.
+>
+> >       set_xstatebv(xsave_data, XFEATURE_MASK_XTILEDATA);
+> >       __xsavec(xsave_data, XFEATURE_MASK_XTILEDATA);
+> >       GUEST_ASSERT((get_xstatebv(xsave_data) & XFEATURE_MASK_XTILEDATA) == 0);
+> > --
+> > 2.39.0.314.g84b9a713c41-goog
+> >
