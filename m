@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B64C3693C59
-	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 03:31:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 98619693C5B
+	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 03:31:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229954AbjBMCby (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Feb 2023 21:31:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44798 "EHLO
+        id S229948AbjBMCb6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Feb 2023 21:31:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229932AbjBMCbj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Feb 2023 21:31:39 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5764910243
-        for <kvm@vger.kernel.org>; Sun, 12 Feb 2023 18:29:53 -0800 (PST)
+        with ESMTP id S229943AbjBMCbo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Feb 2023 21:31:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AC941024F
+        for <kvm@vger.kernel.org>; Sun, 12 Feb 2023 18:29:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676255392;
+        s=mimecast20190719; t=1676255393;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1yhUeN6PMDjGLlmfRv43ztKFKB+CFUSApjprBMF/DVs=;
-        b=cFRWuHbvypJNcwea3nEaFnSgPt6xDLxntEKtqETqyj4gmGrjmhYymaEzFMJd3H70tnWlsC
-        qRAeHUKDbYVUNBbdmYQCdfy/4f7ZJOn+hoNVL/W6Ljonn8xdjsfmK94a8hnDfc+9eM11k9
-        gCmmNrKia6BFPL3rsaPioIEL83+TZhc=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=Wri2CO6/ED+3PLHQRO4xHrfVHwULI1GD8MLKUb731II=;
+        b=JlqRnJB3XovB5xEvly2yFr4QbLRF8FOiiS3RgT21oruNsztTlq2SsE1ar1J2tlcX9dna1o
+        qBHagMAhVvDkNi8/r1bco4+uuz38AA1vruu+ugvkjYAas1/r9qQEIgzxzfc6tr7tqyoCxw
+        uF+JGUZ9jr7Cve9L1tJM/ZpNmOW9j/0=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-593-dah-WIUPM1-7Cd8WMOkMEg-1; Sun, 12 Feb 2023 21:29:50 -0500
-X-MC-Unique: dah-WIUPM1-7Cd8WMOkMEg-1
-Received: by mail-wm1-f70.google.com with SMTP id l38-20020a05600c1d2600b003ddff4b9a40so6033404wms.9
-        for <kvm@vger.kernel.org>; Sun, 12 Feb 2023 18:29:50 -0800 (PST)
+ us-mta-592-uGqaHkl3N_SPbLHw2-g7KA-1; Sun, 12 Feb 2023 21:29:52 -0500
+X-MC-Unique: uGqaHkl3N_SPbLHw2-g7KA-1
+Received: by mail-wm1-f69.google.com with SMTP id l38-20020a05600c1d2600b003ddff4b9a40so6033441wms.9
+        for <kvm@vger.kernel.org>; Sun, 12 Feb 2023 18:29:51 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=1yhUeN6PMDjGLlmfRv43ztKFKB+CFUSApjprBMF/DVs=;
-        b=qSXRiic6vBXMKct8j32t7MxTLYbdy2mOR3P0iRLGq2BwMmRI5v+2EY8oB7l5Lf8Th7
-         ktgC/MbGyST0tObtlaCiaHy809UW8L8HhQDc7SO3mIsNQjSbSB9KsK+wS30wYfl4yBvC
-         Vczdp2bTHT7h/xhhvIoo50pReNY18sS4juv+vbx8/sttIQ4ZMR4k6+KQKoR6IYPRlG54
-         rHPG7ScfQiMZitiulNwER0OyX6/DIfx48rfScCLWrawsM8uKJPAulfthpQ/t/yyTEI01
-         5Fph7KSR40jU0WrxYoL92DopZMDej6Fvo2Kb89utiRag3w5B/KGzNt734t8sr51VKu6+
-         YFaA==
-X-Gm-Message-State: AO0yUKW53BdA/teTTSvR01dHJTC81ZwP1HWV3fq89/1pFuu2NAPOcEPM
-        pB0B7yFLd3huRcjRHL3Bl8jQ+mwmVmfLjbsbAqe5uklKiWxBlVijBDtZnBq1igptHsrR08pvSGX
-        Im7c7Q34AIAiZ
-X-Received: by 2002:a05:600c:1694:b0:3de:27c3:ef13 with SMTP id k20-20020a05600c169400b003de27c3ef13mr17673794wmn.9.1676255389379;
-        Sun, 12 Feb 2023 18:29:49 -0800 (PST)
-X-Google-Smtp-Source: AK7set8MM5ZCkie7NV7W++wxJDBegmWHyipkHejCobgGbh9/xnuobYvLzGnVHhdOuw7GmHpn5yPvNA==
-X-Received: by 2002:a05:600c:1694:b0:3de:27c3:ef13 with SMTP id k20-20020a05600c169400b003de27c3ef13mr17673782wmn.9.1676255389180;
-        Sun, 12 Feb 2023 18:29:49 -0800 (PST)
+        bh=Wri2CO6/ED+3PLHQRO4xHrfVHwULI1GD8MLKUb731II=;
+        b=mO1h69b72Jg5dd2gODn3RcFH9rihFohPJ8jCrYnqCrkTzPFSp54ApyOBG1QnufAZuu
+         i8tUmKjhcnTW9akp8njhK9/SgYTIwZcJ+Ugds4a90I1jZaxZpquM8vHjb19FHPvZ7fJY
+         qH/ntZ/q+5h7M/k20TQq0Jy+mlT3DZAw19LGUDmwJVM3a14KBIvpUCMF25rWXXyJ4qg7
+         m/fcwqJLSJsnQdh1zOhDxWdK62OD9wacSkO2qCuwMDzix/uwkai3jUg4JeleChYTX/1r
+         a507Kb2vMRWft8y0f0JcTHx1qC2YWuEsLl4Eo8qA/N15NHFk5Ii/kPHx/esbz+Z4Zhjd
+         AJEg==
+X-Gm-Message-State: AO0yUKV3kl9pAvKo1zV+Ws/v4hGx9085A5l2pzR5lYCKQ1TRuFjH2pRy
+        hbaGyH2n2l77fl2EaKDBwcVhZy46EUZACOLnu/dNfyOUWov7d0tN3bFjsa50dSrxxcHyLWv2jDB
+        XJy5OlDYRSCvE
+X-Received: by 2002:a5d:6845:0:b0:2c3:e0a0:94f with SMTP id o5-20020a5d6845000000b002c3e0a0094fmr18388365wrw.37.1676255391017;
+        Sun, 12 Feb 2023 18:29:51 -0800 (PST)
+X-Google-Smtp-Source: AK7set9w/r02MOuyNF6ZqzSL2cS4DS8i6O5G9fomfHgKEJeNVNkj+CcjrykNGeyX93lI34+24dt6Yg==
+X-Received: by 2002:a5d:6845:0:b0:2c3:e0a0:94f with SMTP id o5-20020a5d6845000000b002c3e0a0094fmr18388350wrw.37.1676255390787;
+        Sun, 12 Feb 2023 18:29:50 -0800 (PST)
 Received: from redhat.com ([46.136.252.173])
-        by smtp.gmail.com with ESMTPSA id j40-20020a05600c1c2800b003dc4480df80sm17346274wms.34.2023.02.12.18.29.47
+        by smtp.gmail.com with ESMTPSA id t9-20020adfeb89000000b002be0b1e556esm9231583wrn.59.2023.02.12.18.29.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 Feb 2023 18:29:48 -0800 (PST)
+        Sun, 12 Feb 2023 18:29:50 -0800 (PST)
 From:   Xxx Xx <quintela@redhat.com>
 X-Google-Original-From: Xxx Xx <xxx.xx@gmail.com>
 To:     qemu-devel@nongnu.org
@@ -67,11 +67,10 @@ Cc:     =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
         kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
-        Leonardo Bras <leobras@redhat.com>,
-        Peter Xu <peterx@redhat.com>
-Subject: [PULL 21/22] migration/multifd: Move load_cleanup inside incoming_state_destroy
-Date:   Mon, 13 Feb 2023 03:29:10 +0100
-Message-Id: <20230213022911.68490-22-xxx.xx@gmail.com>
+        Eric Blake <eblake@redhat.com>
+Subject: [PULL 22/22] ram: Document migration ram flags
+Date:   Mon, 13 Feb 2023 03:29:11 +0100
+Message-Id: <20230213022911.68490-23-xxx.xx@gmail.com>
 X-Mailer: git-send-email 2.39.1
 In-Reply-To: <20230213022911.68490-1-xxx.xx@gmail.com>
 References: <20230213022911.68490-1-xxx.xx@gmail.com>
@@ -87,98 +86,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Leonardo Bras <leobras@redhat.com>
+From: Juan Quintela <quintela@redhat.com>
 
-Currently running migration_incoming_state_destroy() without first running
-multifd_load_cleanup() will cause a yank error:
+0x80 is RAM_SAVE_FLAG_HOOK, it is in qemu-file now.
+Bigger usable flag is 0x200, noticing that.
+We can reuse RAM_SAVe_FLAG_FULL.
 
-qemu-system-x86_64: ../util/yank.c:107: yank_unregister_instance:
-Assertion `QLIST_EMPTY(&entry->yankfns)' failed.
-(core dumped)
-
-The above error happens in the target host, when multifd is being used
-for precopy, and then postcopy is triggered and the migration finishes.
-This will crash the VM in the target host.
-
-To avoid that, move multifd_load_cleanup() inside
-migration_incoming_state_destroy(), so that the load cleanup becomes part
-of the incoming state destroying process.
-
-Running multifd_load_cleanup() twice can become an issue, though, but the
-only scenario it could be ran twice is on process_incoming_migration_bh().
-So removing this extra call is necessary.
-
-On the other hand, this multifd_load_cleanup() call happens way before the
-migration_incoming_state_destroy() and having this happening before
-dirty_bitmap_mig_before_vm_start() and vm_start() may be a need.
-
-So introduce a new function multifd_load_shutdown() that will mainly stop
-all multifd threads and close their QIOChannels. Then use this function
-instead of multifd_load_cleanup() to make sure nothing else is received
-before dirty_bitmap_mig_before_vm_start().
-
-Signed-off-by: Leonardo Bras <leobras@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/multifd.h   | 1 +
- migration/migration.c | 4 +++-
- migration/multifd.c   | 7 +++++++
- 3 files changed, 11 insertions(+), 1 deletion(-)
+ migration/ram.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/migration/multifd.h b/migration/multifd.h
-index 9a7e1a8826..7cfc265148 100644
---- a/migration/multifd.h
-+++ b/migration/multifd.h
-@@ -17,6 +17,7 @@ int multifd_save_setup(Error **errp);
- void multifd_save_cleanup(void);
- int multifd_load_setup(Error **errp);
- void multifd_load_cleanup(void);
-+void multifd_load_shutdown(void);
- bool multifd_recv_all_channels_created(void);
- void multifd_recv_new_channel(QIOChannel *ioc, Error **errp);
- void multifd_recv_sync_main(void);
-diff --git a/migration/migration.c b/migration/migration.c
-index 5bf332fdd2..90fca70cb7 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -315,6 +315,8 @@ void migration_incoming_state_destroy(void)
- {
-     struct MigrationIncomingState *mis = migration_incoming_get_current();
+diff --git a/migration/ram.c b/migration/ram.c
+index 18ac68b181..521912385d 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -67,21 +67,25 @@
+ /***********************************************************/
+ /* ram save/restore */
  
-+    multifd_load_cleanup();
-+
-     if (mis->to_src_file) {
-         /* Tell source that we are done */
-         migrate_send_rp_shut(mis, qemu_file_get_error(mis->from_src_file) != 0);
-@@ -559,7 +561,7 @@ static void process_incoming_migration_bh(void *opaque)
-      */
-     qemu_announce_self(&mis->announce_timer, migrate_announce_params());
+-/* RAM_SAVE_FLAG_ZERO used to be named RAM_SAVE_FLAG_COMPRESS, it
+- * worked for pages that where filled with the same char.  We switched
++/*
++ * RAM_SAVE_FLAG_ZERO used to be named RAM_SAVE_FLAG_COMPRESS, it
++ * worked for pages that were filled with the same char.  We switched
+  * it to only search for the zero value.  And to avoid confusion with
+- * RAM_SSAVE_FLAG_COMPRESS_PAGE just rename it.
++ * RAM_SAVE_FLAG_COMPRESS_PAGE just rename it.
+  */
+-
+-#define RAM_SAVE_FLAG_FULL     0x01 /* Obsolete, not used anymore */
++/*
++ * RAM_SAVE_FLAG_FULL was obsoleted in 2009, it can be reused now
++ */
++#define RAM_SAVE_FLAG_FULL     0x01
+ #define RAM_SAVE_FLAG_ZERO     0x02
+ #define RAM_SAVE_FLAG_MEM_SIZE 0x04
+ #define RAM_SAVE_FLAG_PAGE     0x08
+ #define RAM_SAVE_FLAG_EOS      0x10
+ #define RAM_SAVE_FLAG_CONTINUE 0x20
+ #define RAM_SAVE_FLAG_XBZRLE   0x40
+-/* 0x80 is reserved in migration.h start with 0x100 next */
++/* 0x80 is reserved in qemu-file.h for RAM_SAVE_FLAG_HOOK */
+ #define RAM_SAVE_FLAG_COMPRESS_PAGE    0x100
++/* We can't use any flag that is bigger than 0x200 */
  
--    multifd_load_cleanup();
-+    multifd_load_shutdown();
- 
-     dirty_bitmap_mig_before_vm_start();
- 
-diff --git a/migration/multifd.c b/migration/multifd.c
-index 840d5814e4..5e85c3ea9b 100644
---- a/migration/multifd.c
-+++ b/migration/multifd.c
-@@ -1013,6 +1013,13 @@ static void multifd_recv_terminate_threads(Error *err)
-     }
- }
- 
-+void multifd_load_shutdown(void)
-+{
-+    if (migrate_use_multifd()) {
-+        multifd_recv_terminate_threads(NULL);
-+    }
-+}
-+
- void multifd_load_cleanup(void)
- {
-     int i;
+ int (*xbzrle_encode_buffer_func)(uint8_t *, uint8_t *, int,
+      uint8_t *, int) = xbzrle_encode_buffer;
 -- 
 2.39.1
 
