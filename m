@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 83DC2694B9A
-	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 16:49:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 92757694BD3
+	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 16:56:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230021AbjBMPtF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Feb 2023 10:49:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36312 "EHLO
+        id S231297AbjBMP4H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Feb 2023 10:56:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230095AbjBMPs6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Feb 2023 10:48:58 -0500
-Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B1901A949;
-        Mon, 13 Feb 2023 07:48:57 -0800 (PST)
-Received: by mail-il1-x129.google.com with SMTP id v6so395841ilc.10;
-        Mon, 13 Feb 2023 07:48:57 -0800 (PST)
+        with ESMTP id S231296AbjBMP4A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Feb 2023 10:56:00 -0500
+Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85A7E1F480;
+        Mon, 13 Feb 2023 07:55:48 -0800 (PST)
+Received: by mail-il1-x12e.google.com with SMTP id t7so3688689ilq.2;
+        Mon, 13 Feb 2023 07:55:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1676303336;
+        d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Waw3704gOD/az5PcxO/EsghNrg3YZs8kXzHhQwOTEJs=;
-        b=L5JDfZTnchppM3i6PqdvZLVMUS05vfV6UthgxdbPQcP2L3fl48I39lLW0iJEfZkUwu
-         Yhd91zOLTLdUPCObSKvyqf5a2esNEHrrVH5jUviY7UGp55DzP3Vx7wko/pfxNuYcL3JF
-         sF8+crevet79/M2ZQwBGnzvAFtVje9FYHqRMM+xHXqQvuEu98OE2ZO4xhiKk+MmrRCD4
-         eVEJzyuV41/UWwvhPLRxYNpdL4NzIj6Gj7Dz9nd1v930bHIHEIklMpwWCYVp/uDEvLdG
-         +wlnMESx22SdV5y5lTx5s1QP1SP9eErTeKre0IHAFHoD5KHfSJPrpPMQupn3q3xCuQ/g
-         2ixQ==
+        bh=0+TZfyO96MuT6z1hpaU/81N8W1L7K7DdH8/8YCsn0po=;
+        b=cPyl1tdDXZ5qYnw44R9BEJT8bydv2rE67zAHJcwa0Gjm/AAQihVKqXkGJ+WEMdvVBm
+         t+rjMBR4VcGYJ4VNQekZJVijsjkK+EdlwPmNQ35ZAomo4G+JeTrSon1F1vGs57gMckwb
+         55uQpCHmoXMv8KV6rL+sEQPZyKrS5dJ6dSds4J5egseJG/5bISNybr2JDBtAhzaH54Yj
+         bsjPIXzqjQhDhGoO7QQ0SJT2ldbC0IXcF+j3lK6tIAA2RjdZz6pi6A4JtZd/OkhmSVEh
+         S/fhCBKaqLuV0PcxTqxjfhu6JOogve1E/8rdtlcfUAIUs7IDdjwMXaUcgHrdm9fbBb5a
+         BWpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1676303336;
+        d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Waw3704gOD/az5PcxO/EsghNrg3YZs8kXzHhQwOTEJs=;
-        b=nYkmqNZtpBi3GsprX4tUwIl20i784eFlAxK7xhvyueCVOi0w7OwNm+QtLk3GtiE7js
-         3k1un3hAstZAaYWM7C4XsBaP45o3Hbwb+xZxhAvJcfLB/87vZWP+Y8O3+DgAfvvzhAwi
-         Vk//+Prh3PX2dTtC7j0whsxPm4hkuPZYqq2XDxNBnteUMEpiN/YRt6NwQ6K2iWXYAXuZ
-         kQNs/Xi1Bpc8rbzcJ2hFmwc5Z9pD3+VSGXMFMUWfZf8xdStFHTCqEFuE9qhj1jG7p7DG
-         B8uCuybM9oIsrrFs2YhE5OdbJkghIhb9klug8j0SgdG3e2yJr04PMqC0b9fbFj7SZdgw
-         LM0Q==
-X-Gm-Message-State: AO0yUKXaJPct51/lHiXWBYx5RVyj9VlHaa+7fM2y/83mpCYW6A5JKF/P
-        jKdqGS9He+J5VSV1rOU1f5I=
-X-Google-Smtp-Source: AK7set+FwZ+W7PnwPjiG2Mo2t7jCLHwiWgiv5IrmVFUv0YbtS1W/pjLs5Z/wAor1s/0TtYblSNqN9g==
-X-Received: by 2002:a05:6e02:ee3:b0:315:363e:b140 with SMTP id j3-20020a056e020ee300b00315363eb140mr4769616ilk.1.1676303336441;
-        Mon, 13 Feb 2023 07:48:56 -0800 (PST)
+        bh=0+TZfyO96MuT6z1hpaU/81N8W1L7K7DdH8/8YCsn0po=;
+        b=IOCQvK7JtfsbaUQmjQIJNVK2OC0IXjzHKOnQ1mCTyV0yrawr/OKmrIe0zHiMW/qoKc
+         pSyCkKyV5nJOgQTsspwqLWZnzO0PjtsbgzziJbEEKZzmy4X3vJ7US04qHzCJ/uPTaWgm
+         i/G7W8Qq8zE6hCHEsD+DdQ96qKbK2POxAb6vhSS39D2H8TvRtq0jUaTWA0/aZ3GlGgmu
+         TDfQipp8vRblWqkFxUcqEf2OTTRLEqGUkynzJh1FgURFZm1szrr34u26fUT8ZkfDYCUr
+         ep0EW+UFaK7xJUxxCRZt84fiBK9YPBLx8DopvJNpsb6mtnDHePs6cdI8RG3BSgl3cRY8
+         BVEw==
+X-Gm-Message-State: AO0yUKWrPeIkuuYtmjiT51d/kc9y+iw2PYoSo5heMXQxlD11JtqHLMgv
+        bYVn55o886Aiu09se0P/iKU=
+X-Google-Smtp-Source: AK7set+GP57b23l4H7mZbkBUG5+1tmsloUkZbk2K4Lht+GiGt0jBGf9WhoYhh29+cRjOHLVgOKAXEw==
+X-Received: by 2002:a92:6801:0:b0:315:5436:a632 with SMTP id d1-20020a926801000000b003155436a632mr635911ilc.2.1676303747888;
+        Mon, 13 Feb 2023 07:55:47 -0800 (PST)
 Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id h26-20020a02c73a000000b00389d02a032dsm4041122jao.172.2023.02.13.07.48.53
+        by smtp.gmail.com with ESMTPSA id r13-20020a92d44d000000b0031550a3dc7esm399373ilm.32.2023.02.13.07.55.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Feb 2023 07:48:56 -0800 (PST)
-Date:   Mon, 13 Feb 2023 17:48:46 +0200
+        Mon, 13 Feb 2023 07:55:47 -0800 (PST)
+Date:   Mon, 13 Feb 2023 17:55:41 +0200
 From:   Zhi Wang <zhi.wang.linux@gmail.com>
 To:     Steven Price <steven.price@arm.com>
 Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
@@ -65,7 +65,7 @@ Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
         Christoffer Dall <christoffer.dall@arm.com>,
         Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev
 Subject: Re: [RFC PATCH 04/28] arm64: RME: Check for RME support at KVM init
-Message-ID: <20230213174846.00003fad@gmail.com>
+Message-ID: <20230213175541.00007cc9@gmail.com>
 In-Reply-To: <20230127112932.38045-5-steven.price@arm.com>
 References: <20230127112248.136810-1-suzuki.poulose@arm.com>
         <20230127112932.38045-1-steven.price@arm.com>
@@ -150,12 +150,6 @@ Steven Price <steven.price@arm.com> wrote:
 >  	struct kvm_protected_vm pkvm;
 > +
 > +	bool is_realm;
-               ^
-It would be better to put more comments which really helps on the review.
-
-I was looking for the user of this memeber to see when it is set. It seems
-it is not in this patch. It would have been nice to have a quick answer from the
-comments.
 > +	struct realm realm;
 >  };
 >  
@@ -181,6 +175,10 @@ comments.
 > +	REALM_STATE_DYING
 > +};
 > +
+
+By the way, it is better to add more comments to introduce about the states
+here.
+
 > +struct realm {
 > +	enum realm_state state;
 > +};
