@@ -2,109 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 859B06953D9
-	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 23:26:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C44F6953DD
+	for <lists+kvm@lfdr.de>; Mon, 13 Feb 2023 23:28:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229468AbjBMW05 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Feb 2023 17:26:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37902 "EHLO
+        id S229879AbjBMW2t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Feb 2023 17:28:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229462AbjBMW04 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Feb 2023 17:26:56 -0500
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [IPv6:2001:41d0:203:375::ae])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7AFB2101
-        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 14:26:54 -0800 (PST)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1676327211;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=HSzklRkVsXJz/hVV1Smo9TgADWE1visfUN0vsS5QYPM=;
-        b=Mj0TXFbTrVvFINMINi0IRxEZx6zuQM9dP26AUhQAHYasfoGVdKMDrHWEU2ch4vyel5cdqk
-        PiKPSAgmF7BXi2eEKZu3o5QPP8No1fVMH+Sejuh9jFazy+Sr2Hh4qWvlOFjxluxGy/tDY2
-        0gIyjgjB1jyMzvawFuPH+eAysVcRI1A=
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-        Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
-        Russell King <rmk+kernel@armlinux.org.uk>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH 00/18] KVM: arm64: Prefix patches for NV support
-Date:   Mon, 13 Feb 2023 22:26:26 +0000
-Message-Id: <167632713104.280051.11716946551616361075.b4-ty@linux.dev>
-In-Reply-To: <20230209175820.1939006-1-maz@kernel.org>
-References: <20230209175820.1939006-1-maz@kernel.org>
+        with ESMTP id S229740AbjBMW2r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Feb 2023 17:28:47 -0500
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3ED01CF56;
+        Mon, 13 Feb 2023 14:28:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1676327326; x=1707863326;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=314vpw90/2DwHi9JOkrC++51z0wYP6vtdKNmpuIX6Gc=;
+  b=kjMnN3OFudXhRQ3rX7o+dcIcXgPzUdJMTuKwPgCohU2HC++l+5eMJmJi
+   LJljc3gfxLYe7xA5iyz7tIzjo/JTvJJNykWyCWmNtNk1OQ45ym0j/7Czx
+   NPF75T9+ZsXTU6MfQ1w9vC6D8vvikT4oS8yuLEeytd4Y0FecvB+ohHJ3I
+   x5MyrwN+/oc12ExwzB4P9I1MsNflqLlP+D+uYeUNNgVuGSyxV/zb625qm
+   lc5+IBzM37hrQowNZmVtCzlV6ZdMrjeboCuhWrPH9q4iPFZZpHMh89h8n
+   PrYv/77mwpacNFwC8JcmMCspn56abr4CUY0n4oR2LznQ3VBS0nL34EfF+
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10620"; a="358421214"
+X-IronPort-AV: E=Sophos;i="5.97,294,1669104000"; 
+   d="scan'208";a="358421214"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2023 14:28:46 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10620"; a="737674268"
+X-IronPort-AV: E=Sophos;i="5.97,294,1669104000"; 
+   d="scan'208";a="737674268"
+Received: from mlswanso-mobl.amr.corp.intel.com (HELO [10.251.26.232]) ([10.251.26.232])
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2023 14:28:44 -0800
+Message-ID: <2d7141b1-1d76-4e67-60d2-471a524c372e@intel.com>
+Date:   Mon, 13 Feb 2023 14:28:43 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH v9 07/18] x86/virt/tdx: Do TDX module per-cpu
+ initialization
+Content-Language: en-US
+To:     "Huang, Kai" <kai.huang@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc:     "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>
+References: <cover.1676286526.git.kai.huang@intel.com>
+ <557c526a1190903d11d67c4e2c76e01f67f6eb15.1676286526.git.kai.huang@intel.com>
+ <2d9172c5-e1e7-bf94-c52b-0e9bc5b5b319@intel.com>
+ <BL1PR11MB5978F562548EA22BFFD13970F7DD9@BL1PR11MB5978.namprd11.prod.outlook.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <BL1PR11MB5978F562548EA22BFFD13970F7DD9@BL1PR11MB5978.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 9 Feb 2023 17:58:02 +0000, Marc Zyngier wrote:
-> As a bunch of the NV patches have had a decent amount of review, and
-> given that they do very little on their own, I've put together a
-> prefix series that gets the most mundane stuff out of the way.
+On 2/13/23 13:13, Huang, Kai wrote:
+> Perhaps I didn't explain clearly in the comment.  Below is the updated one:
 > 
-> Of course, nothing is functional, but nothing gets used either. In a
-> way, this is pretty similar to the current state of pKVM! ;-)
-> 
-> [...]
+>                 /*
+>                  * The previous call of __tdx_enable() may only have
+>                  * initialized part of present cpus during module
+>                  * initialization, and new cpus may have become online
+>                  * since then w/o doing per-cpu initialization.
+>                  *
+>                  * For example, a new CPU can become online when KVM is
+>                  * unloaded, in which case tdx_cpu_enable() is not called since
+>                  * KVM's CPU online callback has been removed.
+>                  *
+>                  * To make sure all online cpus are TDX-runnable, always
+>                  * do per-cpu initialization for all online cpus here
+>                  * even the module has been initialized.
+>                  */
 
-Applied to kvmarm/next, thanks!
+This is voodoo.
 
-[01/18] arm64: Add ARM64_HAS_NESTED_VIRT cpufeature
-        https://git.kernel.org/kvmarm/kvmarm/c/675cabc89900
-[02/18] KVM: arm64: Use the S2 MMU context to iterate over S2 table
-        https://git.kernel.org/kvmarm/kvmarm/c/8531bd63a8dc
-[03/18] KVM: arm64: nv: Introduce nested virtualization VCPU feature
-        https://git.kernel.org/kvmarm/kvmarm/c/89b0e7de3451
-[04/18] KVM: arm64: nv: Reset VCPU to EL2 registers if VCPU nested virt is set
-        https://git.kernel.org/kvmarm/kvmarm/c/2fb32357ae67
-[05/18] KVM: arm64: nv: Allow userspace to set PSR_MODE_EL2x
-        https://git.kernel.org/kvmarm/kvmarm/c/1d05d51bac78
-[06/18] KVM: arm64: nv: Add EL2 system registers to vcpu context
-        https://git.kernel.org/kvmarm/kvmarm/c/5305cc2c3400
-[07/18] KVM: arm64: nv: Add nested virt VCPU primitives for vEL2 VCPU state
-        https://git.kernel.org/kvmarm/kvmarm/c/0043b29038e2
-[08/18] KVM: arm64: nv: Handle HCR_EL2.NV system register traps
-        https://git.kernel.org/kvmarm/kvmarm/c/6ff9dc238a53
-[09/18] KVM: arm64: nv: Support virtual EL2 exceptions
-        https://git.kernel.org/kvmarm/kvmarm/c/47f3a2fc765a
-[10/18] KVM: arm64: nv: Inject HVC exceptions to the virtual EL2
-        https://git.kernel.org/kvmarm/kvmarm/c/93c33702cd2b
-[11/18] KVM: arm64: nv: Handle trapped ERET from virtual EL2
-        https://git.kernel.org/kvmarm/kvmarm/c/6898a55ce38c
-[12/18] KVM: arm64: nv: Handle PSCI call via smc from the guest
-        https://git.kernel.org/kvmarm/kvmarm/c/bd36b1a9eb5a
-[13/18] KVM: arm64: nv: Add accessors for SPSR_EL1, ELR_EL1 and VBAR_EL1 from virtual EL2
-        https://git.kernel.org/kvmarm/kvmarm/c/9da117eec924
-[14/18] KVM: arm64: nv: Emulate PSTATE.M for a guest hypervisor
-        https://git.kernel.org/kvmarm/kvmarm/c/d9552fe133f9
-[15/18] KVM: arm64: nv: Allow a sysreg to be hidden from userspace only
-        https://git.kernel.org/kvmarm/kvmarm/c/e6b367db0f91
-[16/18] KVM: arm64: nv: Emulate EL12 register accesses from the virtual EL2
-        https://git.kernel.org/kvmarm/kvmarm/c/280b748e871e
-[17/18] KVM: arm64: nv: Filter out unsupported features from ID regs
-        https://git.kernel.org/kvmarm/kvmarm/c/9f75b6d447d7
-[18/18] KVM: arm64: nv: Only toggle cache for virtual EL2 when SCTLR_EL2 changes
-        https://git.kernel.org/kvmarm/kvmarm/c/191e0e155521
+I want a TDX-specific hotplug CPU handler.  Period.  Please make that
+happen.  Put that code in this patch.  That handler should:
 
---
-Best,
-Oliver
+	1. Run after the KVM handler (if present)
+	2. See if VMX is on
+	3. If VMX is on:
+	 3a. Run smp_func_module_lp_init(), else
+	 3b. Mark the CPU as needing smp_func_module_lp_init()
+
+Then, in the 'case TDX_MODULE_INITIALIZED:', you call a function to
+iterate over the cpumask that was generated in 3b.
+
+That makes the handoff *EXPLICIT*.  You know exactly which CPUs need
+what done to them.  A CPU hotplug either explicitly involves doing the
+work to make TDX work on the CPU, or explicitly defers the work to a
+specific later time in a specific later piece of code.
