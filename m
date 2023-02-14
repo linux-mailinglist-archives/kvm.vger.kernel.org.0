@@ -2,173 +2,242 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D0E4469599C
-	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 08:06:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A316E695A5C
+	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 08:12:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231819AbjBNHGN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Feb 2023 02:06:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48048 "EHLO
+        id S231977AbjBNHM1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Feb 2023 02:12:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231815AbjBNHF7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Feb 2023 02:05:59 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 745401E1F4
-        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 23:05:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676358303;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=K4q3ZOUtLgcz08YCMzP/3RHQNhlZSfQVVlPbPjliwbo=;
-        b=HlY+CFKOTx7wS9sOVXr4LNqI1cugqo3RPjMRss8xhTguSJFjmEiO8DAsUjR+BrS1zAsS++
-        +IRv189Xewe7B14cBbNs95GgjT6HetKEdCn4nXuzm0EbWg09gF6HR0jb9arCUY/O40jZne
-        YQVaaPvlIM1uQA3LSe0qq+IA6CfuwVM=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-262-gG0aRr7KMEqxF2X-E1pN6g-1; Tue, 14 Feb 2023 02:05:01 -0500
-X-MC-Unique: gG0aRr7KMEqxF2X-E1pN6g-1
-Received: by mail-wm1-f70.google.com with SMTP id bi10-20020a05600c3d8a00b003dd1b5d2a36so204816wmb.1
-        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 23:05:01 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=K4q3ZOUtLgcz08YCMzP/3RHQNhlZSfQVVlPbPjliwbo=;
-        b=QMh8KCY/Vr77ka0OYj6LqhHwInCAZpvchXPF+FK8q45BaLsOztRDJvVR8o5QLFLFOG
-         FW1o1aVekrBLsH9YX3j3iZlOO8/Nh4bHJPOJ8R3uv1R8iRpirIEi7VUl3ZgvhvFeCb1B
-         ZV90kp8dlj9ZlJQVg8wYkW4fjmGGGxmeB9T09AisdNKap3Yo2kmAF9orbfXEDAddAm7k
-         FmFthNWw/RobZ2GEgOOy6BGrxe+ZtTdmZpxUGka7Q1qmTdyvc3z7EL+/U/UhOo9X7HC3
-         pwjofBa1Xm0/9A4bvRUF7hmi9GnHZErSfmrzGe1OsuM3vdj7ikUTkSGI2syB/yPbp1/r
-         wlnw==
-X-Gm-Message-State: AO0yUKUepGr7VWnT9K28wR382aqYMwMVpAoL+EpmubZhClcnPJFG315w
-        X5eaPni4EItbRDRy9FbULOHkGC3ACtUefe/2dpa2r80fi6x1EDP09ZCG0IMXBy3imoufWxHYE6E
-        ZCCaKMjVpJKlbfjgQlESXy/DNDnWA
-X-Received: by 2002:a5d:6687:0:b0:2c5:4c7d:b32e with SMTP id l7-20020a5d6687000000b002c54c7db32emr28274wru.111.1676358300811;
-        Mon, 13 Feb 2023 23:05:00 -0800 (PST)
-X-Google-Smtp-Source: AK7set9NwwUZJZcSgMe5GePtOrKP0+CEYzCYjvgzm6gRH8DV0a5JQH/LCJZ/vHtMrACTUdKsHqwFs3ysk8rsxU98qBo=
-X-Received: by 2002:a5d:6687:0:b0:2c5:4c7d:b32e with SMTP id
- l7-20020a5d6687000000b002c54c7db32emr28268wru.111.1676358300510; Mon, 13 Feb
- 2023 23:05:00 -0800 (PST)
+        with ESMTP id S231894AbjBNHMH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Feb 2023 02:12:07 -0500
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FB6622DDE;
+        Mon, 13 Feb 2023 23:08:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1676358525; x=1707894525;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=7mxrqjucLiuCXh3jkBMuGLi7BeMczW6z9ZSnKt52TSc=;
+  b=EhMyNz8ugA8EgruVcE7JAIGXHDuwwlGgcVV0TQNgww+Ny2bGkhtkEZi2
+   ZF+RMwqPLd2MAyTaWf67Tj8r6GQtZMj9n3+GhgitkP3I7l3QBGJlWA6Sq
+   ZcQtm6QGLWlcmC1RTYn43cz68qS10SSZ9W+rA9243GnTzAKBxKBIqj2xz
+   HO+d/IUZ6Pt7K2m405NFHLXXztNIQ5xbIX+RKNfrM9yvN7a7Jth81WHnV
+   FOoOeUy8nuH3fDP3wfB8y4VL7QqhmmWfpeRFHGObgquJxCxMG4qllWW/A
+   I8cmovKRDUdoWcxAeZPxCWDpTsZeFuiLeqg3tN4qBnHxB0YTwsTzxxyPU
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10620"; a="393499245"
+X-IronPort-AV: E=Sophos;i="5.97,296,1669104000"; 
+   d="scan'208";a="393499245"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2023 23:08:02 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10620"; a="618939126"
+X-IronPort-AV: E=Sophos;i="5.97,296,1669104000"; 
+   d="scan'208";a="618939126"
+Received: from lkp-server01.sh.intel.com (HELO 4455601a8d94) ([10.239.97.150])
+  by orsmga003.jf.intel.com with ESMTP; 13 Feb 2023 23:07:59 -0800
+Received: from kbuild by 4455601a8d94 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pRpPy-0008I9-1S;
+        Tue, 14 Feb 2023 07:07:58 +0000
+Date:   Tue, 14 Feb 2023 15:07:23 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Tianrui Zhao <zhaotianrui@loongson.cn>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     oe-kbuild-all@lists.linux.dev, Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>
+Subject: Re: [PATCH v1 22/24] LoongArch: KVM: Implement vcpu world switch
+Message-ID: <202302141408.1hBkpMAf-lkp@intel.com>
+References: <20230214025648.1898508-23-zhaotianrui@loongson.cn>
 MIME-Version: 1.0
-References: <20230214061743.114257-1-lulu@redhat.com> <CACGkMEtFbxRqJZiho+kxZqziTXLFm5ySfubdAKJf-+eE-wprvw@mail.gmail.com>
-In-Reply-To: <CACGkMEtFbxRqJZiho+kxZqziTXLFm5ySfubdAKJf-+eE-wprvw@mail.gmail.com>
-From:   Cindy Lu <lulu@redhat.com>
-Date:   Tue, 14 Feb 2023 15:04:21 +0800
-Message-ID: <CACLfguWLhO3r91CSfORN3ZStezdfEOBHxCRNp_qxcuyo7JyFYQ@mail.gmail.com>
-Subject: Re: [PATCH] vp_vdpa: fix the crash in hot unplug with vp_vdpa
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     mst@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230214025648.1898508-23-zhaotianrui@loongson.cn>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 14 Feb 2023 at 14:24, Jason Wang <jasowang@redhat.com> wrote:
->
-> On Tue, Feb 14, 2023 at 2:17 PM Cindy Lu <lulu@redhat.com> wrote:
-> >
-> > While unplugging the vp_vdpa device, the kernel will crash
-> > The root cause is the function vp_modern_get_status() called following the
-> > vp_modern_remove().
->
-> This needs some tweaking, maybe it's better to say
-> vdpa_mgmtdev_unregister() will access modern devices which will cause
-> a use after free.
->
-> >So need to change the sequence in vp_vdpa_remove
-> >
-> > [  195.016001] Call Trace:
->
-> Let's paste the full log with the reason for the calltrace (e.g
-> general protection fault or whatever else).
->
-sure, will post a new version
-Thanks
-Cindy
-> > [  195.016233]  <TASK>
-> > [  195.016434]  vp_modern_get_status+0x12/0x20
-> > [  195.016823]  vp_vdpa_reset+0x1b/0x50 [vp_vdpa]
-> > [  195.017238]  virtio_vdpa_reset+0x3c/0x48 [virtio_vdpa]
-> > [  195.017709]  remove_vq_common+0x1f/0x3a0 [virtio_net]
-> > [  195.018178]  virtnet_remove+0x5d/0x70 [virtio_net]
-> > [  195.018618]  virtio_dev_remove+0x3d/0x90
-> > [  195.018986]  device_release_driver_internal+0x1aa/0x230
-> > [  195.019466]  bus_remove_device+0xd8/0x150
-> > [  195.019841]  device_del+0x18b/0x3f0
-> > [  195.020167]  ? kernfs_find_ns+0x35/0xd0
-> > [  195.020526]  device_unregister+0x13/0x60
-> > [  195.020894]  unregister_virtio_device+0x11/0x20
-> > [  195.021311]  device_release_driver_internal+0x1aa/0x230
-> > [  195.021790]  bus_remove_device+0xd8/0x150
-> > [  195.022162]  device_del+0x18b/0x3f0
-> > [  195.022487]  device_unregister+0x13/0x60
-> > [  195.022852]  ? vdpa_dev_remove+0x30/0x30 [vdpa]
-> > [  195.023270]  vp_vdpa_dev_del+0x12/0x20 [vp_vdpa]
-> > [  195.023694]  vdpa_match_remove+0x2b/0x40 [vdpa]
-> > [  195.024115]  bus_for_each_dev+0x78/0xc0
-> > [  195.024471]  vdpa_mgmtdev_unregister+0x65/0x80 [vdpa]
-> > [  195.024937]  vp_vdpa_remove+0x23/0x40 [vp_vdpa]
-> > [  195.025353]  pci_device_remove+0x36/0xa0
-> > [  195.025719]  device_release_driver_internal+0x1aa/0x230
-> > [  195.026201]  pci_stop_bus_device+0x6c/0x90
-> > [  195.026580]  pci_stop_and_remove_bus_device+0xe/0x20
-> > [  195.027039]  disable_slot+0x49/0x90
-> > [  195.027366]  acpiphp_disable_and_eject_slot+0x15/0x90
-> > [  195.027832]  hotplug_event+0xea/0x210
-> > [  195.028171]  ? hotplug_event+0x210/0x210
-> > [  195.028535]  acpiphp_hotplug_notify+0x22/0x80
-> > [  195.028942]  ? hotplug_event+0x210/0x210
-> > [  195.029303]  acpi_device_hotplug+0x8a/0x1d0
-> > [  195.029690]  acpi_hotplug_work_fn+0x1a/0x30
-> > [  195.030077]  process_one_work+0x1e8/0x3c0
-> > [  195.030451]  worker_thread+0x50/0x3b0
-> > [  195.030791]  ? rescuer_thread+0x3a0/0x3a0
-> > [  195.031165]  kthread+0xd9/0x100
-> > [  195.031459]  ? kthread_complete_and_exit+0x20/0x20
-> > [  195.031899]  ret_from_fork+0x22/0x30
-> > [  195.032233]  </TASK>
-> >
-> > Fixes: ffbda8e9df10 ("vdpa/vp_vdpa : add vdpa tool support in vp_vdpa")
-> > Tested-by: Lei Yang <leiyang@redhat.com>
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Cindy Lu <lulu@redhat.com>
->
-> Other than above,
->
-> Acked-by: Jason Wang <jasowang@redhat.com>
->
-> Thanks
->
-> > ---
-> >  drivers/vdpa/virtio_pci/vp_vdpa.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/vdpa/virtio_pci/vp_vdpa.c b/drivers/vdpa/virtio_pci/vp_vdpa.c
-> > index 8fe267ca3e76..281287fae89f 100644
-> > --- a/drivers/vdpa/virtio_pci/vp_vdpa.c
-> > +++ b/drivers/vdpa/virtio_pci/vp_vdpa.c
-> > @@ -645,8 +645,8 @@ static void vp_vdpa_remove(struct pci_dev *pdev)
-> >         struct virtio_pci_modern_device *mdev = NULL;
-> >
-> >         mdev = vp_vdpa_mgtdev->mdev;
-> > -       vp_modern_remove(mdev);
-> >         vdpa_mgmtdev_unregister(&vp_vdpa_mgtdev->mgtdev);
-> > +       vp_modern_remove(mdev);
-> >         kfree(vp_vdpa_mgtdev->mgtdev.id_table);
-> >         kfree(mdev);
-> >         kfree(vp_vdpa_mgtdev);
-> > --
-> > 2.34.3
-> >
->
+Hi Tianrui,
 
+Thank you for the patch! Perhaps something to improve:
+
+[auto build test WARNING on kvm/queue]
+[also build test WARNING on linus/master v6.2-rc8]
+[cannot apply to kvm/linux-next next-20230214]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Tianrui-Zhao/LoongArch-KVM-Implement-kvm-module-related-interface/20230214-110506
+base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+patch link:    https://lore.kernel.org/r/20230214025648.1898508-23-zhaotianrui%40loongson.cn
+patch subject: [PATCH v1 22/24] LoongArch: KVM: Implement vcpu world switch
+config: loongarch-allyesconfig (https://download.01.org/0day-ci/archive/20230214/202302141408.1hBkpMAf-lkp@intel.com/config)
+compiler: loongarch64-linux-gcc (GCC) 12.1.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/1adfa2faabc606d0813446b2d2111e04aa3d2828
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Tianrui-Zhao/LoongArch-KVM-Implement-kvm-module-related-interface/20230214-110506
+        git checkout 1adfa2faabc606d0813446b2d2111e04aa3d2828
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=loongarch olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=loongarch prepare
+
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202302141408.1hBkpMAf-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   arch/loongarch/kernel/asm-offsets.c:17:6: warning: no previous prototype for 'output_ptreg_defines' [-Wmissing-prototypes]
+      17 | void output_ptreg_defines(void)
+         |      ^~~~~~~~~~~~~~~~~~~~
+   arch/loongarch/kernel/asm-offsets.c:64:6: warning: no previous prototype for 'output_task_defines' [-Wmissing-prototypes]
+      64 | void output_task_defines(void)
+         |      ^~~~~~~~~~~~~~~~~~~
+   arch/loongarch/kernel/asm-offsets.c:79:6: warning: no previous prototype for 'output_thread_info_defines' [-Wmissing-prototypes]
+      79 | void output_thread_info_defines(void)
+         |      ^~~~~~~~~~~~~~~~~~~~~~~~~~
+   arch/loongarch/kernel/asm-offsets.c:95:6: warning: no previous prototype for 'output_thread_defines' [-Wmissing-prototypes]
+      95 | void output_thread_defines(void)
+         |      ^~~~~~~~~~~~~~~~~~~~~
+   arch/loongarch/kernel/asm-offsets.c:138:6: warning: no previous prototype for 'output_thread_fpu_defines' [-Wmissing-prototypes]
+     138 | void output_thread_fpu_defines(void)
+         |      ^~~~~~~~~~~~~~~~~~~~~~~~~
+   arch/loongarch/kernel/asm-offsets.c:178:6: warning: no previous prototype for 'output_mm_defines' [-Wmissing-prototypes]
+     178 | void output_mm_defines(void)
+         |      ^~~~~~~~~~~~~~~~~
+   arch/loongarch/kernel/asm-offsets.c:210:6: warning: no previous prototype for 'output_sc_defines' [-Wmissing-prototypes]
+     210 | void output_sc_defines(void)
+         |      ^~~~~~~~~~~~~~~~~
+   arch/loongarch/kernel/asm-offsets.c:218:6: warning: no previous prototype for 'output_signal_defines' [-Wmissing-prototypes]
+     218 | void output_signal_defines(void)
+         |      ^~~~~~~~~~~~~~~~~~~~~
+   arch/loongarch/kernel/asm-offsets.c:256:6: warning: no previous prototype for 'output_smpboot_defines' [-Wmissing-prototypes]
+     256 | void output_smpboot_defines(void)
+         |      ^~~~~~~~~~~~~~~~~~~~~~
+   arch/loongarch/kernel/asm-offsets.c:266:6: warning: no previous prototype for 'output_pbe_defines' [-Wmissing-prototypes]
+     266 | void output_pbe_defines(void)
+         |      ^~~~~~~~~~~~~~~~~~
+>> arch/loongarch/kernel/asm-offsets.c:277:6: warning: no previous prototype for 'output_kvm_defines' [-Wmissing-prototypes]
+     277 | void output_kvm_defines(void)
+         |      ^~~~~~~~~~~~~~~~~~
+--
+   arch/loongarch/kernel/asm-offsets.c:17:6: warning: no previous prototype for 'output_ptreg_defines' [-Wmissing-prototypes]
+      17 | void output_ptreg_defines(void)
+         |      ^~~~~~~~~~~~~~~~~~~~
+   arch/loongarch/kernel/asm-offsets.c:64:6: warning: no previous prototype for 'output_task_defines' [-Wmissing-prototypes]
+      64 | void output_task_defines(void)
+         |      ^~~~~~~~~~~~~~~~~~~
+   arch/loongarch/kernel/asm-offsets.c:79:6: warning: no previous prototype for 'output_thread_info_defines' [-Wmissing-prototypes]
+      79 | void output_thread_info_defines(void)
+         |      ^~~~~~~~~~~~~~~~~~~~~~~~~~
+   arch/loongarch/kernel/asm-offsets.c:95:6: warning: no previous prototype for 'output_thread_defines' [-Wmissing-prototypes]
+      95 | void output_thread_defines(void)
+         |      ^~~~~~~~~~~~~~~~~~~~~
+   arch/loongarch/kernel/asm-offsets.c:138:6: warning: no previous prototype for 'output_thread_fpu_defines' [-Wmissing-prototypes]
+     138 | void output_thread_fpu_defines(void)
+         |      ^~~~~~~~~~~~~~~~~~~~~~~~~
+   arch/loongarch/kernel/asm-offsets.c:178:6: warning: no previous prototype for 'output_mm_defines' [-Wmissing-prototypes]
+     178 | void output_mm_defines(void)
+         |      ^~~~~~~~~~~~~~~~~
+   arch/loongarch/kernel/asm-offsets.c:210:6: warning: no previous prototype for 'output_sc_defines' [-Wmissing-prototypes]
+     210 | void output_sc_defines(void)
+         |      ^~~~~~~~~~~~~~~~~
+   arch/loongarch/kernel/asm-offsets.c:218:6: warning: no previous prototype for 'output_signal_defines' [-Wmissing-prototypes]
+     218 | void output_signal_defines(void)
+         |      ^~~~~~~~~~~~~~~~~~~~~
+   arch/loongarch/kernel/asm-offsets.c:256:6: warning: no previous prototype for 'output_smpboot_defines' [-Wmissing-prototypes]
+     256 | void output_smpboot_defines(void)
+         |      ^~~~~~~~~~~~~~~~~~~~~~
+   arch/loongarch/kernel/asm-offsets.c:266:6: warning: no previous prototype for 'output_pbe_defines' [-Wmissing-prototypes]
+     266 | void output_pbe_defines(void)
+         |      ^~~~~~~~~~~~~~~~~~
+>> arch/loongarch/kernel/asm-offsets.c:277:6: warning: no previous prototype for 'output_kvm_defines' [-Wmissing-prototypes]
+     277 | void output_kvm_defines(void)
+         |      ^~~~~~~~~~~~~~~~~~
+   <stdin>:569:2: warning: #warning syscall fstat not implemented [-Wcpp]
+
+
+vim +/output_kvm_defines +277 arch/loongarch/kernel/asm-offsets.c
+
+   217	
+ > 218	void output_signal_defines(void)
+   219	{
+   220		COMMENT("Linux signal numbers.");
+   221		DEFINE(_SIGHUP, SIGHUP);
+   222		DEFINE(_SIGINT, SIGINT);
+   223		DEFINE(_SIGQUIT, SIGQUIT);
+   224		DEFINE(_SIGILL, SIGILL);
+   225		DEFINE(_SIGTRAP, SIGTRAP);
+   226		DEFINE(_SIGIOT, SIGIOT);
+   227		DEFINE(_SIGABRT, SIGABRT);
+   228		DEFINE(_SIGFPE, SIGFPE);
+   229		DEFINE(_SIGKILL, SIGKILL);
+   230		DEFINE(_SIGBUS, SIGBUS);
+   231		DEFINE(_SIGSEGV, SIGSEGV);
+   232		DEFINE(_SIGSYS, SIGSYS);
+   233		DEFINE(_SIGPIPE, SIGPIPE);
+   234		DEFINE(_SIGALRM, SIGALRM);
+   235		DEFINE(_SIGTERM, SIGTERM);
+   236		DEFINE(_SIGUSR1, SIGUSR1);
+   237		DEFINE(_SIGUSR2, SIGUSR2);
+   238		DEFINE(_SIGCHLD, SIGCHLD);
+   239		DEFINE(_SIGPWR, SIGPWR);
+   240		DEFINE(_SIGWINCH, SIGWINCH);
+   241		DEFINE(_SIGURG, SIGURG);
+   242		DEFINE(_SIGIO, SIGIO);
+   243		DEFINE(_SIGSTOP, SIGSTOP);
+   244		DEFINE(_SIGTSTP, SIGTSTP);
+   245		DEFINE(_SIGCONT, SIGCONT);
+   246		DEFINE(_SIGTTIN, SIGTTIN);
+   247		DEFINE(_SIGTTOU, SIGTTOU);
+   248		DEFINE(_SIGVTALRM, SIGVTALRM);
+   249		DEFINE(_SIGPROF, SIGPROF);
+   250		DEFINE(_SIGXCPU, SIGXCPU);
+   251		DEFINE(_SIGXFSZ, SIGXFSZ);
+   252		BLANK();
+   253	}
+   254	
+   255	#ifdef CONFIG_SMP
+   256	void output_smpboot_defines(void)
+   257	{
+   258		COMMENT("Linux smp cpu boot offsets.");
+   259		OFFSET(CPU_BOOT_STACK, secondary_data, stack);
+   260		OFFSET(CPU_BOOT_TINFO, secondary_data, thread_info);
+   261		BLANK();
+   262	}
+   263	#endif
+   264	
+   265	#ifdef CONFIG_HIBERNATION
+   266	void output_pbe_defines(void)
+   267	{
+   268		COMMENT(" Linux struct pbe offsets. ");
+   269		OFFSET(PBE_ADDRESS, pbe, address);
+   270		OFFSET(PBE_ORIG_ADDRESS, pbe, orig_address);
+   271		OFFSET(PBE_NEXT, pbe, next);
+   272		DEFINE(PBE_SIZE, sizeof(struct pbe));
+   273		BLANK();
+   274	}
+   275	#endif
+   276	
+ > 277	void output_kvm_defines(void)
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
