@@ -2,101 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D91E6960CC
-	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 11:33:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D526369616B
+	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 11:50:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232298AbjBNKdP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Feb 2023 05:33:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38048 "EHLO
+        id S232670AbjBNKuI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Feb 2023 05:50:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229722AbjBNKdN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Feb 2023 05:33:13 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9AC2222F7
-        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 02:33:12 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 8555BB81D06
-        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 10:33:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C455EC433D2;
-        Tue, 14 Feb 2023 10:33:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1676370790;
-        bh=MwFoiJ2S+3dDe4m1UN4luipBIDQtovWAF23GHeW9zo4=;
-        h=From:To:Cc:Subject:Date:From;
-        b=bVhyv3mt5i1Kqusel3h+qUe2rqePvjqvVDMGFCXwD8KrviBnp4/fYSJitDtF8FOFS
-         R+Co3Xj0/SYdF+o/EiMj6xCqFDh5ENo1VMNHG05pLQjflnhCL0KKhjFHLQMKjfVfdm
-         ka4KAmHdGxuaIwnXtpx97SS9iOqmQxj0orSj94Vg=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     kvm@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, stable <stable@kernel.org>,
-        Xingyuan Mo <hdthky0@gmail.com>
-Subject: [PATCH] kvm: initialize all of the kvm_debugregs structure before sending it to userspace
-Date:   Tue, 14 Feb 2023 11:33:04 +0100
-Message-Id: <20230214103304.3689213-1-gregkh@linuxfoundation.org>
-X-Mailer: git-send-email 2.39.1
+        with ESMTP id S232776AbjBNKtt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Feb 2023 05:49:49 -0500
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F211A138;
+        Tue, 14 Feb 2023 02:49:07 -0800 (PST)
+Received: by mail-pj1-x102a.google.com with SMTP id bx22so14695254pjb.3;
+        Tue, 14 Feb 2023 02:49:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pUdKercMwIzfCNwi4nXhcJunGaPC6aQ18aVtD0+Afx0=;
+        b=pTg9tmmAA/bvDbEYMKfFp3A2ZngmUpK5yL1c2kHC3TXKGt+yCXE4TgPE0vdJj5P+Fq
+         yO9EWMTUPB1jBmQvC3tGxAG56Uyvrgu3rCkJXN3QjG96QD+RQZiuU4+yWsG0XOLoVlyo
+         aZiruIrTPs1PmpHF8eowCdumteLWtPYBVaDbIAeLaDOoEha5e8aIB8uJvZaS0Fo5DSV+
+         KlZK84PnQakzSH26kjgNQmQ5+2MktIugXiy6mZ+o+yRQkLc20rAnURN+MAsTvy48aUUA
+         ARlh5Qh0ykOj9BGgs/u8BHtm1RV4RbvZMsjNsECnusEtRfm3voUZptSRi63AVXYmWa4h
+         hehQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pUdKercMwIzfCNwi4nXhcJunGaPC6aQ18aVtD0+Afx0=;
+        b=P041H4J72PYzXGyY26Tq4TI2d2ppEzo0IeuB6dL5uPC8Sx4VQjjyaPSlvZRlxK+aUi
+         q7fpdIgBeMlpcVyPFvUvDZLLhN/dlZgPA3fuMOE0eiU9qTeEkXu72J0T7ipO3N1G8uWx
+         IaWPNX1oFP1fJTZDWtSOEGjO66yRxd99DLnNt4KmIOQlG9tBwxmzZaktcFA1VoWIyrb3
+         VwfNUHhrsJ/wjl1VcI97JG9yRIaVDcTYcAy8nzuq0FSty2pPxkvLSgIBKwWETDIOQ/8Q
+         9O120quqDgzcg1T8qOwluJJJg5qDFhSawtpRqfFuDwZkVS8jIobYbT1Q4eEcHOO0ygSn
+         sPYw==
+X-Gm-Message-State: AO0yUKVa2Ioq5Wd41uZflYWVwfBGzhuGo07O0cDvvvc+0deSlHU+TeEk
+        cc7dbc8GPoapMMQcixgo6yw=
+X-Google-Smtp-Source: AK7set9TMA7b72PJHBf9qda1QRhsBpPP15denuLukpwCcgHpNmh8Rw69/ujtyFkT9ktxiFaCDRedlw==
+X-Received: by 2002:a05:6a20:728b:b0:c6:5d8b:494b with SMTP id o11-20020a056a20728b00b000c65d8b494bmr2121410pzk.33.1676371734266;
+        Tue, 14 Feb 2023 02:48:54 -0800 (PST)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id s18-20020a170902a51200b00199136ded1dsm9942101plq.112.2023.02.14.02.48.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Feb 2023 02:48:53 -0800 (PST)
+Message-ID: <5771a4cb-4df7-e9a0-9e7e-9a116a40a411@gmail.com>
+Date:   Tue, 14 Feb 2023 18:48:46 +0800
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1590; i=gregkh@linuxfoundation.org; h=from:subject; bh=MwFoiJ2S+3dDe4m1UN4luipBIDQtovWAF23GHeW9zo4=; b=owGbwMvMwCRo6H6F97bub03G02pJDMmvk+N8t9+8e//+W1mP8rMKE+Sniy16PuvLd+3IRWv+LrTr fbNjTUcsC4MgE4OsmCLLl208R/dXHFL0MrQ9DTOHlQlkCAMXpwBMxFmBYX6sj9l/KzkmxqaXllOE3e zzbZa69jLML5892euST0ftZ8Xqes2K6bsfnVbeCAA=
-X-Developer-Key: i=gregkh@linuxfoundation.org; a=openpgp; fpr=F4B60CC5BF78C2214A313DCB3147D40DDB2DFB29
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.7.2
+Subject: Re: [PATCH v2 03/21] KVM: x86: Add macros to track first...last VMX
+ feature MSRs
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <20230210003148.2646712-1-seanjc@google.com>
+ <20230210003148.2646712-4-seanjc@google.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <20230210003148.2646712-4-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When calling the KVM_GET_DEBUGREGS ioctl, on some configurations, there
-might be some unitialized portions of the kvm_debugregs structure that
-could be copied to userspace.  Prevent this as is done in the other kvm
-ioctls, by setting the whole structure to 0 before copying anything into
-it.
+On 10/2/2023 8:31 am, Sean Christopherson wrote:
+> +/*
+> + * The first...last VMX feature MSRs that are emulated by KVM.  This may or may
+> + * not cover all known VMX MSRs, as KVM doesn't emulate an MSR until there's an
+> + * associated feature that KVM supports for nested virtualization.
+> + */
+> +#define KVM_FIRST_EMULATED_VMX_MSR	MSR_IA32_VMX_BASIC
+> +#define KVM_LAST_EMULATED_VMX_MSR	MSR_IA32_VMX_VMFUNC
 
-Bonus is that this reduces the lines of code as the explicit flag
-setting and reserved space zeroing out can be removed.
-
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>
-Cc: <x86@kernel.org>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: stable <stable@kernel.org>
-Reported-by: Xingyuan Mo <hdthky0@gmail.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- arch/x86/kvm/x86.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index da4bbd043a7b..50a95c8082fa 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -5254,12 +5254,11 @@ static void kvm_vcpu_ioctl_x86_get_debugregs(struct kvm_vcpu *vcpu,
- {
- 	unsigned long val;
- 
-+	memset(dbgregs, 0, sizeof(*dbgregs));
- 	memcpy(dbgregs->db, vcpu->arch.db, sizeof(vcpu->arch.db));
- 	kvm_get_dr(vcpu, 6, &val);
- 	dbgregs->dr6 = val;
- 	dbgregs->dr7 = vcpu->arch.dr7;
--	dbgregs->flags = 0;
--	memset(&dbgregs->reserved, 0, sizeof(dbgregs->reserved));
- }
- 
- static int kvm_vcpu_ioctl_x86_set_debugregs(struct kvm_vcpu *vcpu,
--- 
-2.39.1
-
+Off-topic, we now have "#define MSR_IA32_VMX_PROCBASED_CTLS3 0x00000492",
+any further changes needed here if L2 guest needs IPI virtualization or why not ?
