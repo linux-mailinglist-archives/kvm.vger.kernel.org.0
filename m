@@ -2,53 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E212696ACB
-	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 18:07:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B5538696AE5
+	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 18:11:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232051AbjBNRHU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Feb 2023 12:07:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60794 "EHLO
+        id S232995AbjBNRLC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Feb 2023 12:11:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229799AbjBNRHP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Feb 2023 12:07:15 -0500
+        with ESMTP id S232455AbjBNRKy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Feb 2023 12:10:54 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23CDF15564
-        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 09:06:23 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77C9EAD31
+        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 09:10:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676394382;
+        s=mimecast20190719; t=1676394603;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4xhjIgOLD34GhGSF0bJgUI1/ZkWKw+rh+EHdWU9oeAM=;
-        b=b61S7YELBOJ4WV27Ch3fVOWwE7vuOL9jaAx+R9gmI8YNknuiINM6MoaR+NE6O47GAyCX+P
-        D03uTuYXoPGZiy42wMHJ4wcOmjQuFSO1q+zUwSg/x400faOMBYJ/4M2288W9ZNaTWMLmdP
-        2zM+4BBNHrOEIigD4/vg0/wO/YXe+pM=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+         content-transfer-encoding:content-transfer-encoding;
+        bh=/J+VcbC4xHv/uYq04eqrKXQbIzqZA9C+bgYVEdOPlvE=;
+        b=i30INa7ub/Ykw5IlCFb5xkv0pkyx6GBZ3xHHhor+GR98J3+nhdBPvhoEnNAV3RWZjjNqGa
+        Bv6uiLjFMsooU3f1UmgiwTuarDO2ypBKgam/V/N71FMZ3TcypkFUyrCcD9FDmniFRRS9Ea
+        tEr4F/YJiVT9B33qSCrgJov3UuJehrM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-495-1WEFv077OQqXn6aeKRzQyw-1; Tue, 14 Feb 2023 12:06:17 -0500
-X-MC-Unique: 1WEFv077OQqXn6aeKRzQyw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+ us-mta-627-0FWwYbNIN7i_b6-hV3EeDA-1; Tue, 14 Feb 2023 12:09:59 -0500
+X-MC-Unique: 0FWwYbNIN7i_b6-hV3EeDA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B132F3C16E94;
-        Tue, 14 Feb 2023 17:06:16 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 31D5B857F4E;
+        Tue, 14 Feb 2023 17:09:57 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9535DC15BA0;
-        Tue, 14 Feb 2023 17:06:16 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 107501121318;
+        Tue, 14 Feb 2023 17:09:57 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     thomas.lendacky@amd.com
-Subject: [PATCH 3/3] Documentation/hw-vuln: Add documentation for Cross-Thread Return Predictions
-Date:   Tue, 14 Feb 2023 12:06:15 -0500
-Message-Id: <20230214170615.1297202-4-pbonzini@redhat.com>
-In-Reply-To: <20230214170615.1297202-1-pbonzini@redhat.com>
-References: <20230214170615.1297202-1-pbonzini@redhat.com>
+Cc:     stable@vger.kernel.org, thomas.lendacky@amd.com
+Subject: [PATCH for-5.15 0/3] Cross-Thread Return Address Predictions vulnerability
+Date:   Tue, 14 Feb 2023 12:09:53 -0500
+Message-Id: <20230214170956.1297309-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
@@ -59,126 +56,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Tom Lendacky <thomas.lendacky@amd.com>
+Certain AMD processors are vulnerable to a cross-thread return address
+predictions bug. When running in SMT mode and one of the sibling threads
+transitions out of C0 state, the other thread gets access to twice as many
+entries in the RSB, but unfortunately the predictions of the now-halted
+logical processor are not purged.  Therefore, the executing processor
+could speculatively execute from locations that the now-halted processor
+had trained the RSB on.
 
-Add the admin guide for the Cross-Thread Return Predictions vulnerability.
+The Spectre v2 mitigations cover the Linux kernel, as it fills the RSB
+when context switching to the idle thread. However, KVM allows a VMM to
+prevent exiting guest mode when transitioning out of C0 using the
+KVM_CAP_X86_DISABLE_EXITS capability can be used by a VMM to change this
+behavior. To mitigate the cross-thread return address predictions bug,
+a VMM must not be allowed to override the default behavior to intercept
+C0 transitions.
 
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-Message-Id: <60f9c0b4396956ce70499ae180cb548720b25c7e.1675956146.git.thomas.lendacky@amd.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
+These patches introduce a KVM module parameter that, if set, will prevent
+the user from disabling the HLT, MWAIT and CSTATE exits.
+
+The patches apply to the 5.15 stable tree, and Greg has already received
+them through a git bundle.  The difference is only in context, but it is
+too much for "git cherry-pick" so here they are.
+
+Thanks,
+
+Paolo
+
+Tom Lendacky (3):
+  x86/speculation: Identify processors vulnerable to SMT RSB predictions
+  KVM: x86: Mitigate the cross-thread return address predictions bug
+  Documentation/hw-vuln: Add documentation for Cross-Thread Return
+    Predictions
+
  .../admin-guide/hw-vuln/cross-thread-rsb.rst  | 92 +++++++++++++++++++
  Documentation/admin-guide/hw-vuln/index.rst   |  1 +
- 2 files changed, 93 insertions(+)
+ arch/x86/include/asm/cpufeatures.h            |  1 +
+ arch/x86/kernel/cpu/common.c                  |  9 +-
+ arch/x86/kvm/x86.c                            | 43 ++++++---
+ 5 files changed, 133 insertions(+), 13 deletions(-)
  create mode 100644 Documentation/admin-guide/hw-vuln/cross-thread-rsb.rst
 
-diff --git a/Documentation/admin-guide/hw-vuln/cross-thread-rsb.rst b/Documentation/admin-guide/hw-vuln/cross-thread-rsb.rst
-new file mode 100644
-index 000000000000..ec6e9f5bcf9e
---- /dev/null
-+++ b/Documentation/admin-guide/hw-vuln/cross-thread-rsb.rst
-@@ -0,0 +1,92 @@
-+
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+Cross-Thread Return Address Predictions
-+=======================================
-+
-+Certain AMD and Hygon processors are subject to a cross-thread return address
-+predictions vulnerability. When running in SMT mode and one sibling thread
-+transitions out of C0 state, the other sibling thread could use return target
-+predictions from the sibling thread that transitioned out of C0.
-+
-+The Spectre v2 mitigations protect the Linux kernel, as it fills the return
-+address prediction entries with safe targets when context switching to the idle
-+thread. However, KVM does allow a VMM to prevent exiting guest mode when
-+transitioning out of C0. This could result in a guest-controlled return target
-+being consumed by the sibling thread.
-+
-+Affected processors
-+-------------------
-+
-+The following CPUs are vulnerable:
-+
-+    - AMD Family 17h processors
-+    - Hygon Family 18h processors
-+
-+Related CVEs
-+------------
-+
-+The following CVE entry is related to this issue:
-+
-+   ==============  =======================================
-+   CVE-2022-27672  Cross-Thread Return Address Predictions
-+   ==============  =======================================
-+
-+Problem
-+-------
-+
-+Affected SMT-capable processors support 1T and 2T modes of execution when SMT
-+is enabled. In 2T mode, both threads in a core are executing code. For the
-+processor core to enter 1T mode, it is required that one of the threads
-+requests to transition out of the C0 state. This can be communicated with the
-+HLT instruction or with an MWAIT instruction that requests non-C0.
-+When the thread re-enters the C0 state, the processor transitions back
-+to 2T mode, assuming the other thread is also still in C0 state.
-+
-+In affected processors, the return address predictor (RAP) is partitioned
-+depending on the SMT mode. For instance, in 2T mode each thread uses a private
-+16-entry RAP, but in 1T mode, the active thread uses a 32-entry RAP. Upon
-+transition between 1T/2T mode, the RAP contents are not modified but the RAP
-+pointers (which control the next return target to use for predictions) may
-+change. This behavior may result in return targets from one SMT thread being
-+used by RET predictions in the sibling thread following a 1T/2T switch. In
-+particular, a RET instruction executed immediately after a transition to 1T may
-+use a return target from the thread that just became idle. In theory, this
-+could lead to information disclosure if the return targets used do not come
-+from trustworthy code.
-+
-+Attack scenarios
-+----------------
-+
-+An attack can be mounted on affected processors by performing a series of CALL
-+instructions with targeted return locations and then transitioning out of C0
-+state.
-+
-+Mitigation mechanism
-+--------------------
-+
-+Before entering idle state, the kernel context switches to the idle thread. The
-+context switch fills the RAP entries (referred to as the RSB in Linux) with safe
-+targets by performing a sequence of CALL instructions.
-+
-+Prevent a guest VM from directly putting the processor into an idle state by
-+intercepting HLT and MWAIT instructions.
-+
-+Both mitigations are required to fully address this issue.
-+
-+Mitigation control on the kernel command line
-+---------------------------------------------
-+
-+Use existing Spectre v2 mitigations that will fill the RSB on context switch.
-+
-+Mitigation control for KVM - module parameter
-+---------------------------------------------
-+
-+By default, the KVM hypervisor mitigates this issue by intercepting guest
-+attempts to transition out of C0. A VMM can use the KVM_CAP_X86_DISABLE_EXITS
-+capability to override those interceptions, but since this is not common, the
-+mitigation that covers this path is not enabled by default.
-+
-+The mitigation for the KVM_CAP_X86_DISABLE_EXITS capability can be turned on
-+using the boolean module parameter mitigate_smt_rsb, e.g.:
-+        kvm.mitigate_smt_rsb=1
-diff --git a/Documentation/admin-guide/hw-vuln/index.rst b/Documentation/admin-guide/hw-vuln/index.rst
-index 4df436e7c417..e0614760a99e 100644
---- a/Documentation/admin-guide/hw-vuln/index.rst
-+++ b/Documentation/admin-guide/hw-vuln/index.rst
-@@ -18,3 +18,4 @@ are configurable at compile, boot or run time.
-    core-scheduling.rst
-    l1d_flush.rst
-    processor_mmio_stale_data.rst
-+   cross-thread-rsb.rst
 -- 
 2.39.1
 
