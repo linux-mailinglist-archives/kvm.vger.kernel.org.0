@@ -2,176 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 059EA695C2E
-	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 09:07:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BD2E695C54
+	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 09:10:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231667AbjBNIHr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Feb 2023 03:07:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42132 "EHLO
+        id S231760AbjBNIKZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Feb 2023 03:10:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231901AbjBNIH0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Feb 2023 03:07:26 -0500
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E7FD72A1;
-        Tue, 14 Feb 2023 00:07:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1676362041; x=1707898041;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=upMQRhHeGPaYDTlCBcylaekLEwfW/Ni5muYw4TzKxvo=;
-  b=YMMQcgwuWOU/0W89hMvQtjl3zb3eB9uk7RrokpwgoGT7jz0vP8EyoUNa
-   kLKYnjV2FFs8tU2hV+/RMJV2xZcAV6xVP+Ug1QPeqBjP8ay1qUezshU7c
-   Uo4UcTTKjuF1kTlf8T6vpC9POtVviOQP7hBqOyRzanytiHNc9McH1xPoI
-   eRIGx8WIxBLeTCWx9DkiZJJzRgiujvUZHRGVje+zO+IWGI9KDvHi8tf9B
-   rOsEbk+88pKcOW2PASX1gG64v8bLEYU49i/q+9yiaFyHt2tv5c+TH6RiN
-   lAtAeVq6SDOJCmmNGYnm/iGVXXp5Kj4Ha9x/F4gVjvg6Zhuzhk5u4/XD9
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10620"; a="328815470"
-X-IronPort-AV: E=Sophos;i="5.97,296,1669104000"; 
-   d="scan'208";a="328815470"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2023 00:06:52 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10620"; a="671145801"
-X-IronPort-AV: E=Sophos;i="5.97,296,1669104000"; 
-   d="scan'208";a="671145801"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmsmga007.fm.intel.com with ESMTP; 14 Feb 2023 00:06:50 -0800
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Tue, 14 Feb 2023 00:06:50 -0800
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16 via Frontend Transport; Tue, 14 Feb 2023 00:06:50 -0800
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.104)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.16; Tue, 14 Feb 2023 00:06:48 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=O/GSX1kJNOy09Fz7cDmKno6sw5CeMfOGO2uP9P1AHH0BLmG1RKqht0FEx1vuZ7A8YD/E619Gw62Y+rJQyB1yOZTXhSS/WxXDBr83acLd0u3khLmj4OLMOGaj4jKRE9g3WP9dAcm2TuvuToPCK0T17NMQI/13G7TAo4T77GqWbzUUWRKriLe3J1q9gfILx2lNXV6p8bvQHWK2nsT4J76PFkJGcCAdqlH0DRNbUkhcRiT+7piAG1Im4FcFNlBRrc/WhT9vx6cpFFxjPY/IVQ4iDFE3lB2DmzhinloUz4CwO8hjtbpdyb/ByDDo4AjnTL6iwT9VsNdaMdkjQ8kGebfPww==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=upMQRhHeGPaYDTlCBcylaekLEwfW/Ni5muYw4TzKxvo=;
- b=jWco2hf4/dK7uYRCe9J6e/9wRROB3hUEv90KBqruomaDEo27MjcejEbYP8sVmo1CFzuzMJ18P/5UcffQGQjKNABaSAb29D9QuVCxaTdgQgV35mSZHIqKktQTUZds331QV3yFDu5MvCb6+BoXBG3IH+aEHufgc0L2wIOwtBP7IIID1iTO/uGUnBeh8wknyPm2bX2iJRE53PzTcpL4JjIoNIFNbGEbBYGPrrN98C3h1WKI2D/dU3mhQUDaYHqVK9u0bbvxxmlZiDGjxSFfemLTm7Y5DzI0UZgUq4dweRX1Vp+OeX9q/8Rna1ZCrbSceP3Syer6qMpTNJD3KNGwivng9A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by DS0PR11MB7577.namprd11.prod.outlook.com (2603:10b6:8:142::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.24; Tue, 14 Feb
- 2023 08:06:46 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::6a8d:b95:e1b5:d79d]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::6a8d:b95:e1b5:d79d%9]) with mapi id 15.20.6086.026; Tue, 14 Feb 2023
- 08:06:46 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>
-CC:     "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>
-Subject: RE: [PATCH v3 10/15] vfio-iommufd: Add detach_ioas for emulated VFIO
- devices
-Thread-Topic: [PATCH v3 10/15] vfio-iommufd: Add detach_ioas for emulated VFIO
- devices
-Thread-Index: AQHZP73UitONeFV1XEyoFPFfvN9lSK7OFvzA
-Date:   Tue, 14 Feb 2023 08:06:46 +0000
-Message-ID: <BN9PR11MB52762E04CD46EEFCFBEB53E98CA29@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20230213151348.56451-1-yi.l.liu@intel.com>
- <20230213151348.56451-11-yi.l.liu@intel.com>
-In-Reply-To: <20230213151348.56451-11-yi.l.liu@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|DS0PR11MB7577:EE_
-x-ms-office365-filtering-correlation-id: 0d237a47-2f5d-4edc-602c-08db0e626af3
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: pvpznMkgRbxa2CjZH+SEZMiDIJx1URvWchf0I21cLXd+eLQ7EGQtlP/27ySOYVVmHlnV6V3+C1P88pLp3ja1U7snQxd8ZMUvxbrTsQkISzuRDrjSflF7vxhbFt8dH4UKbBZnA+krFaMcqt98MV2paiIW9AxOrQTAqFn3oXiCCRPY0mJvq5YrCPBeXDxj53t+b9zbKllSMnxnCRqIHm3vbqbqGsZ0s/tpA2ev8mp5AfLUj4r8HNGtM47NU+4TvbPwnNtjW7Mznf9yZrCjQh1BUtPZH/99X8pZSodmkC87Di7S73IPM+HYCudUdNrkttgVTmqa+T+cbwTSiD/Y5JMirGeLT9jh12y6RKE/NBRvn8jdGgYTJVylxS3yKaK7RBLJAPGWs+yjUoFtaOtG6ZI9NgctD3CBiK5cD7YcLtklAGfq5zZyOUk75OP/z3dP8ZygLU9wIghJuIWvGZuAWajH541iE+5z15m4avuXSPrZKyrZFn2cITNXvIAxNa5U8eVsKb+xU12HSMYSs/ixL6dAg98ch97R+7n2NDhY+s/frEGhSmp6JBraG+yhuWK3MkfryEJmdtektVtcZkvBQXRl4LcVPpNxHfsDQQdt2Nksp35x4yMYBARQ1265C39eNSTkQc4fQY4nCdDNXzbpF4/akq2hqQML+sls6PBPYTEl5AC1lN9/D/OL5qWESXRLgPEVBYjzca5zRbb97FIyLnJSsg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(376002)(396003)(39860400002)(366004)(136003)(346002)(451199018)(71200400001)(7696005)(2906002)(33656002)(55016003)(558084003)(38070700005)(82960400001)(86362001)(38100700002)(122000001)(478600001)(9686003)(186003)(26005)(6506007)(8936002)(41300700001)(52536014)(110136005)(54906003)(66556008)(66476007)(76116006)(4326008)(8676002)(66946007)(64756008)(66446008)(316002)(7416002)(5660300002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?dezcme6XATHD5tBtv4NORflnETzD97E3ZjBssgqcsL2pOEppqvPN2yViNYTb?=
- =?us-ascii?Q?FmeMf+cvK9aAEA22yQ68JApDw/Pc3avdMg1FoHFU6E8f7Ldr8KdZxHca2qkw?=
- =?us-ascii?Q?ShRgTFqrMBniMLxUCDqWm903TaONOE/yoOlRHYBWdsJCiyM/HtYfAggeKR9j?=
- =?us-ascii?Q?Sm63v55K22hbUBA8d/pc1nqDoY3Hn4i1NdMuj31ymT1yjI9i7lQwS5MBGCe+?=
- =?us-ascii?Q?moKDWFeoVCLzLZabUeVtELjhoVLpuHZ6tbjgJPryHFE3wdzgATE7a3knfocn?=
- =?us-ascii?Q?4KaLAJpnSegOyRg07J+zACJ6bM/nHu9gcJX+P5H8CMDBBfLRHX/59dzRMpGR?=
- =?us-ascii?Q?0LTa70uCP4aChrX9P/jd+o31z4aMPEN+vobrPFTViJ0kfiqCYDlBCwdsKv9p?=
- =?us-ascii?Q?WQojM+AsU5k6fEYgjD5MK+DmNcHzav8o2B7w0h25Qtod7Th8TC0zkYICyAPM?=
- =?us-ascii?Q?J+a29CFJetuIYTTt7eYmH2Wz3qkCw4404WD9upr10btHMSg9xTjBLkpf5ABB?=
- =?us-ascii?Q?7xyfY30xfGf0K69bYP44eun8anwdf4eKUn3eAYhHRq8TtQsFbNFrp0lZkFKK?=
- =?us-ascii?Q?GWlxuFTwUS+pPq9kYr0kBK9FlNIzvYRUw5ErBTWrC70fF9yYAIpzc1aiCr8t?=
- =?us-ascii?Q?78Las/I0A2MUeYunH+VgynfaeKcRIqZ6aLEmQEVHE9VKynNToAXs66mUw7RG?=
- =?us-ascii?Q?Em5JlHmjCeE5JV4wkTwfSpb/mn54DHpVncsBQTixFpIRuYhrpxcKKG/upAeI?=
- =?us-ascii?Q?0aJlpuFN1BRDlfFEzAXSnYjnP5S2uXVxw6VORNfXIipg9NVxTrFA4NGQjBaT?=
- =?us-ascii?Q?b9UjIT0h97Fpxsj5xh8S9kX5KJorcWZMLxEiLwNEk8Yk5OPIuuhmafeab3NA?=
- =?us-ascii?Q?SnqsS2cWGi8RUZr+nhrAxF4VPx5LPd/N7ul14EbayrZvnVZdNQ8yUiKR1bgY?=
- =?us-ascii?Q?EGGJNBSl2zlFy7pyOZlsJAfBSlDYEw+rSDK139hULYQeCPez6tWSZxjloMsA?=
- =?us-ascii?Q?QRbRMsLgtqCOP3KcMqMFKQm2VvwQC1NEulLgKZE48Zvy0tZMW7SFcqKo70uF?=
- =?us-ascii?Q?XIyQMAoOaWpfn170z+/euJeaBP/Dto4W+tCq/ezLICzuWcVsG9ka/BI0UGw/?=
- =?us-ascii?Q?If9iMzggchJTPCT1Qt6qw5jJeMRCzogBEG5o1YFXZe5IZmyrFGD01EFudg4M?=
- =?us-ascii?Q?Jxdw0QmsWKvtzuvFaxwNgDflpVJZWMuvj9htTaltYz94/LOhMuwOzOfKi6rV?=
- =?us-ascii?Q?v2r/q0WvyJ0IMUgn7NRBYB2C74idozfL5LoKvCOHa4sCrFc7daMAk6BSxHfH?=
- =?us-ascii?Q?b4biCLkDaSdtdXHSQ+fdW8eKqVTR7zHA3pSD938SMHQx0uk/iPkaqZIASLjn?=
- =?us-ascii?Q?IBpN5mzJm4IsyT68kpsz7BU0cCkwh/ur3RsPxYUI9jigbWeUUuJ3wle9E/Rp?=
- =?us-ascii?Q?7fQ9NylHmOu9Hinmo9adNMBh19TNXQMz6rmHSir8yAAGJi0UJMwdU7uFsXL7?=
- =?us-ascii?Q?IaP/lxHXkEVVsEfE6t75uEd3o3V4xrNq5hEOFrzs52VQYROjMEjCgz+xE4HL?=
- =?us-ascii?Q?QUwlRixUrEmzJhbU7q48IWFgr7Ocbq1mZyFIT0Uv?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S229589AbjBNIKY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Feb 2023 03:10:24 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFF592111
+        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 00:09:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676362172;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=rB5ID/2Qs9ceDcs0KHL5dcmrag9/xwe+5cqfsigTfHY=;
+        b=DBhTe7wfYdMVJn9tUQKlRKIUBLuCsylgd+1PVVebwSKctRqHuKwe10v0/Sg9wOb/0p7xvU
+        Itg5IyXapNGomx68/ifPVfW797zFaVTxOfdbmnmIpqHd8ycdH9iu1KUk3626t71c8pYRZI
+        oXzTz3STTv2/3WtIwrntIxLMIuy0Hlc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-657-cI3ZZsQEOxmLpapnfXyNlg-1; Tue, 14 Feb 2023 03:09:31 -0500
+X-MC-Unique: cI3ZZsQEOxmLpapnfXyNlg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B7D92857A99;
+        Tue, 14 Feb 2023 08:09:30 +0000 (UTC)
+Received: from server.redhat.com (ovpn-13-103.pek2.redhat.com [10.72.13.103])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6EDA240C10FA;
+        Tue, 14 Feb 2023 08:09:27 +0000 (UTC)
+From:   Cindy Lu <lulu@redhat.com>
+To:     lulu@redhat.com, jasowang@redhat.com, mst@redhat.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Cc:     stable@vger.kernel.org
+Subject: [PATCH v2] vp_vdpa: fix the crash in hot unplug with vp_vdpa
+Date:   Tue, 14 Feb 2023 16:09:24 +0800
+Message-Id: <20230214080924.131462-1-lulu@redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0d237a47-2f5d-4edc-602c-08db0e626af3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Feb 2023 08:06:46.6663
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: f5I8bC9koX9h2Z7XTSX6XKSrBwm72+Gae2Wz9OPnw4elfWL3f3bYSLx6Lmb3blZpihgYa1dUIx/A0hWkzGyOyA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7577
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Liu, Yi L <yi.l.liu@intel.com>
-> Sent: Monday, February 13, 2023 11:14 PM
->=20
-> this prepares for adding DETACH ioctl for emulated VFIO devices.
->=20
-> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+While unplugging the vp_vdpa device, it triggers a kernel panic
+The root cause is: vdpa_mgmtdev_unregister() will accesses modern
+devices which will cause a use after free.
+So need to change the sequence in vp_vdpa_remove
 
-Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+[  195.003359] BUG: unable to handle page fault for address: ff4e8beb80199014
+[  195.004012] #PF: supervisor read access in kernel mode
+[  195.004486] #PF: error_code(0x0000) - not-present page
+[  195.004960] PGD 100000067 P4D 1001b6067 PUD 1001b7067 PMD 1001b8067 PTE 0
+[  195.005578] Oops: 0000 1 PREEMPT SMP PTI
+[  195.005968] CPU: 13 PID: 164 Comm: kworker/u56:10 Kdump: loaded Not tainted 5.14.0-252.el9.x86_64 #1
+[  195.006792] Hardware name: Red Hat KVM/RHEL, BIOS edk2-20221207gitfff6d81270b5-2.el9 unknown
+[  195.007556] Workqueue: kacpi_hotplug acpi_hotplug_work_fn
+[  195.008059] RIP: 0010:ioread8+0x31/0x80
+[  195.008418] Code: 77 28 48 81 ff 00 00 01 00 76 0b 89 fa ec 0f b6 c0 c3 cc cc cc cc 8b 15 ad 72 93 01 b8 ff 00 00 00 85 d2 75 0f c3 cc cc cc cc <8a> 07 0f b6 c0 c3 cc cc cc cc 83 ea 01 48 83 ec 08 48 89 fe 48 c7
+[  195.010104] RSP: 0018:ff4e8beb8067bab8 EFLAGS: 00010292
+[  195.010584] RAX: ffffffffc05834a0 RBX: ffffffffc05843c0 RCX: ff4e8beb8067bae0
+[  195.011233] RDX: ff1bcbd580f88000 RSI: 0000000000000246 RDI: ff4e8beb80199014
+[  195.011881] RBP: ff1bcbd587e39000 R08: ffffffff916fa2d0 R09: ff4e8beb8067ba68
+[  195.012527] R10: 000000000000001c R11: 0000000000000000 R12: ff1bcbd5a3de9120
+[  195.013179] R13: ffffffffc062d000 R14: 0000000000000080 R15: ff1bcbe402bc7805
+[  195.013826] FS:  0000000000000000(0000) GS:ff1bcbe402740000(0000) knlGS:0000000000000000
+[  195.014564] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  195.015093] CR2: ff4e8beb80199014 CR3: 0000000107dea002 CR4: 0000000000771ee0
+[  195.015741] PKRU: 55555554
+[  195.016001] Call Trace:
+[  195.016233]  <TASK>
+[  195.016434]  vp_modern_get_status+0x12/0x20
+[  195.016823]  vp_vdpa_reset+0x1b/0x50 [vp_vdpa]
+[  195.017238]  virtio_vdpa_reset+0x3c/0x48 [virtio_vdpa]
+[  195.017709]  remove_vq_common+0x1f/0x3a0 [virtio_net]
+[  195.018178]  virtnet_remove+0x5d/0x70 [virtio_net]
+[  195.018618]  virtio_dev_remove+0x3d/0x90
+[  195.018986]  device_release_driver_internal+0x1aa/0x230
+[  195.019466]  bus_remove_device+0xd8/0x150
+[  195.019841]  device_del+0x18b/0x3f0
+[  195.020167]  ? kernfs_find_ns+0x35/0xd0
+[  195.020526]  device_unregister+0x13/0x60
+[  195.020894]  unregister_virtio_device+0x11/0x20
+[  195.021311]  device_release_driver_internal+0x1aa/0x230
+[  195.021790]  bus_remove_device+0xd8/0x150
+[  195.022162]  device_del+0x18b/0x3f0
+[  195.022487]  device_unregister+0x13/0x60
+[  195.022852]  ? vdpa_dev_remove+0x30/0x30 [vdpa]
+[  195.023270]  vp_vdpa_dev_del+0x12/0x20 [vp_vdpa]
+[  195.023694]  vdpa_match_remove+0x2b/0x40 [vdpa]
+[  195.024115]  bus_for_each_dev+0x78/0xc0
+[  195.024471]  vdpa_mgmtdev_unregister+0x65/0x80 [vdpa]
+[  195.024937]  vp_vdpa_remove+0x23/0x40 [vp_vdpa]
+[  195.025353]  pci_device_remove+0x36/0xa0
+[  195.025719]  device_release_driver_internal+0x1aa/0x230
+[  195.026201]  pci_stop_bus_device+0x6c/0x90
+[  195.026580]  pci_stop_and_remove_bus_device+0xe/0x20
+[  195.027039]  disable_slot+0x49/0x90
+[  195.027366]  acpiphp_disable_and_eject_slot+0x15/0x90
+[  195.027832]  hotplug_event+0xea/0x210
+[  195.028171]  ? hotplug_event+0x210/0x210
+[  195.028535]  acpiphp_hotplug_notify+0x22/0x80
+[  195.028942]  ? hotplug_event+0x210/0x210
+[  195.029303]  acpi_device_hotplug+0x8a/0x1d0
+[  195.029690]  acpi_hotplug_work_fn+0x1a/0x30
+[  195.030077]  process_one_work+0x1e8/0x3c0
+[  195.030451]  worker_thread+0x50/0x3b0
+[  195.030791]  ? rescuer_thread+0x3a0/0x3a0
+[  195.031165]  kthread+0xd9/0x100
+[  195.031459]  ? kthread_complete_and_exit+0x20/0x20
+[  195.031899]  ret_from_fork+0x22/0x30
+[  195.032233]  </TASK>
+
+Fixes: ffbda8e9df10 ("vdpa/vp_vdpa : add vdpa tool support in vp_vdpa")
+Tested-by: Lei Yang <leiyang@redhat.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Cindy Lu <lulu@redhat.com>
+---
+ drivers/vdpa/virtio_pci/vp_vdpa.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/vdpa/virtio_pci/vp_vdpa.c b/drivers/vdpa/virtio_pci/vp_vdpa.c
+index 8fe267ca3e76..281287fae89f 100644
+--- a/drivers/vdpa/virtio_pci/vp_vdpa.c
++++ b/drivers/vdpa/virtio_pci/vp_vdpa.c
+@@ -645,8 +645,8 @@ static void vp_vdpa_remove(struct pci_dev *pdev)
+ 	struct virtio_pci_modern_device *mdev = NULL;
+ 
+ 	mdev = vp_vdpa_mgtdev->mdev;
+-	vp_modern_remove(mdev);
+ 	vdpa_mgmtdev_unregister(&vp_vdpa_mgtdev->mgtdev);
++	vp_modern_remove(mdev);
+ 	kfree(vp_vdpa_mgtdev->mgtdev.id_table);
+ 	kfree(mdev);
+ 	kfree(vp_vdpa_mgtdev);
+-- 
+2.34.3
+
