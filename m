@@ -2,225 +2,249 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 07494696194
-	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 11:59:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C80B69620A
+	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 12:10:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232604AbjBNK7i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Feb 2023 05:59:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39050 "EHLO
+        id S232269AbjBNLKY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Feb 2023 06:10:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232462AbjBNK7h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Feb 2023 05:59:37 -0500
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2054.outbound.protection.outlook.com [40.107.92.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B33239ED8;
-        Tue, 14 Feb 2023 02:59:34 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=f2f8eHEulqUV+vFf3sm6oi+TRRH1T6auyACizgn42SPVr/BGBSBbUT0aPS1ZuAKEdNWB5kgOfJAKAQpPvJe0KYzqUDF8CJ70XmaYsLZ+/CZ4fYqkEyvHpppLeoCcD4FZtS+lrfrIteBsIdmytIHye/R1s54P5DXvRMlPHLbodNYRNCpSk1rEDXBggwLRSIFcKk1BCVej8hIFJpHSU6/MQj6HxVQAAQU35k2jNnQ0GrHUUWqL8x5NxiinS5o2pLRI6bF7fZBfj4QdjSdV15kMKCkg48O/SjTwdSdG2ljCnAAizzmk4ApLGvFlnipmUzUrPowBgpFw87NRaIaXyjdTtA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3fPX2A7kQWYVtVadkmJB4zZhLhPOkPyChPFaoQxNZ0A=;
- b=VxVskvcK3VxuqUT/BIoMbeQq+ZDX9RXIykKNFMShhUelEOnKO2aN4xUFVAcUsu9E+gedFdwjZAWtJDgQ2d+Bl5WjW/B4PYsIy0lcxj0GbB3YEJjI+ce7cCaS5Oz5YGPLrpl7kJibaBFC8iIXCLlgcVoORzRhcYeez57FiFelBuPcFcxPnca5hCygi0q1BlcxQCwZVn+WZh1ijbJeo/qVZoXe/dpk5wPugVHXoVqooFNfUjAfxorbXHuRVUZqxjA0rSLlVzk0tYP4k88NKjdb0VJ3cqIHY6DUfxpExSMrodrf3gg67pmwks4iC5M+jNK1BaCO31UmuairXKh+gtcfqg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3fPX2A7kQWYVtVadkmJB4zZhLhPOkPyChPFaoQxNZ0A=;
- b=kBctSnpb245sMr5C/VxU9wVbMIhMWl7egQswn6FaNyC6y5YK3jyEBC10FkMGPRASAsRC8heipY3/5f2OLppPK5dvmJLehC0JTNQejK66svhIpJrrrDEgKT1JZYhOE3n5pn6wZSjrcfo8+w+Z9JAaQsVKDD9wMd0Wet+FN95rn30P+KmgyC5efqxwaXij6qcDiQJvZe8GwYR/d3voVP8VW64IYsXCwV1tileH7mnU/bhidvxxCFIESGV1gejrm8HBwmTHKNJ8cwmCQ1XI9lTg3gc9JkJzP3+Dyva8kb5nuCAd5tPlBYbn+WVIKhtAe+M10CxRx3/2ejuFew7W6DYs4A==
-Received: from DM6PR02CA0166.namprd02.prod.outlook.com (2603:10b6:5:332::33)
- by DM4PR12MB6184.namprd12.prod.outlook.com (2603:10b6:8:a6::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6086.24; Tue, 14 Feb 2023 10:59:32 +0000
-Received: from DS1PEPF0000E639.namprd02.prod.outlook.com
- (2603:10b6:5:332:cafe::25) by DM6PR02CA0166.outlook.office365.com
- (2603:10b6:5:332::33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.26 via Frontend
- Transport; Tue, 14 Feb 2023 10:59:32 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- DS1PEPF0000E639.mail.protection.outlook.com (10.167.17.71) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6111.8 via Frontend Transport; Tue, 14 Feb 2023 10:59:32 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Tue, 14 Feb
- 2023 02:59:32 -0800
-Received: from drhqmail201.nvidia.com (10.126.190.180) by
- drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.36; Tue, 14 Feb 2023 02:59:32 -0800
-Received: from Asurada-Nvidia (10.127.8.12) by mail.nvidia.com
- (10.126.190.180) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36 via Frontend
- Transport; Tue, 14 Feb 2023 02:59:31 -0800
-Date:   Tue, 14 Feb 2023 02:59:30 -0800
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-CC:     "jgg@nvidia.com" <jgg@nvidia.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "will@kernel.org" <will@kernel.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "shuah@kernel.org" <shuah@kernel.org>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>
-Subject: Re: [PATCH v2 08/10] iommufd/device: Use iommu_group_replace_domain()
-Message-ID: <Y+tpkpNYil3duTIP@Asurada-Nvidia>
-References: <cover.1675802050.git.nicolinc@nvidia.com>
- <4653f009c3dacae8ebf3a4865aaa944aa9c7cc7e.1675802050.git.nicolinc@nvidia.com>
- <BN9PR11MB5276C1807B710CAD3E5820D78CD99@BN9PR11MB5276.namprd11.prod.outlook.com>
- <Y+Vh479cDD7LX2x/@Asurada-Nvidia>
- <BN9PR11MB5276268D3ED0360913A05C368CDE9@BN9PR11MB5276.namprd11.prod.outlook.com>
+        with ESMTP id S233038AbjBNLKC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Feb 2023 06:10:02 -0500
+Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F37AA29152;
+        Tue, 14 Feb 2023 03:09:07 -0800 (PST)
+Received: by mail-il1-x129.google.com with SMTP id v6so1190130ilc.10;
+        Tue, 14 Feb 2023 03:09:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1676372921;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WGrMblQl+955iRmU6iG0PllpzKpANHBobzyPai6DG8o=;
+        b=haMj9w5pbQvjO8Vlxzzte9DDC9GpDeShCKTJCoYtJ+OokvKNKypbsKmjuLLjkhb7GI
+         oIcRY7jcdmwxXmnzN0+MzQ1sH2pURRuvnzP0zUwHvEt6ufqJPXFcegmf/2npxbq7T4fL
+         q7NXQrzUyADaD+NJOq6JnpbzNYUF+2dwEaR2NnjfZuZPWNy7Z8IcLPqCq9WGD7CrnUJF
+         eFzmTsbJV041Tx7tpuF2fszVznTzMudAHQgg6MpAS6p90O2Y8gX+GaSyzjMtIGwV29j4
+         6zorARjocSUqTcHRQUIbwxBcNNaN+sikxD1FshMm21y+yLOZoDiMJw5uk1keBQqNsUoR
+         pQdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1676372921;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WGrMblQl+955iRmU6iG0PllpzKpANHBobzyPai6DG8o=;
+        b=474FM3AChaVFeJko0eQllI6+w42JEaOJeJTqslNzkMZU4ulHf0/qNHsqMJ9S3xLDPg
+         COQT+hXRq7aR2bAJZhkH8Eybo7X3Q7bIbcty8Bw4iuQiLyhfGU0mJXEDAbNvzwTZ29u/
+         13Jr9wNmlqCy07EoyLoXPcvmmokS/mNptmeFsYqw34vV4MPjjkjdQ6herumB+DBcyMqt
+         Ytbkps5HWAFYKYyt8dENo77MO5Vld1KbQteGkDQRfFtHKYnYYwIg0x1D20JDDbIyDF7F
+         GqFqEesOgMdNqBz0PA1HFFvhK2TuJrStIciDDxYIC4dF9ZBg2DCHNA1jeWKnupk4j7lo
+         rDoA==
+X-Gm-Message-State: AO0yUKU5j2Et1ZoI5pbWTSUdTUMMMKY99gmOEtgBlPJa81d2KHqohe50
+        rc/nQ6nU+LwHKju1J8De0CF8DSL0rvencYF0
+X-Google-Smtp-Source: AK7set8lreR90YGHkocJi+2Z7DJYf93rMLfY4KYkUTtHYUZ05AvDz1aQ58QpjMZXIjBdXjHwL0P1/w==
+X-Received: by 2002:a92:c007:0:b0:314:115d:afa2 with SMTP id q7-20020a92c007000000b00314115dafa2mr1468604ild.0.1676372921586;
+        Tue, 14 Feb 2023 03:08:41 -0800 (PST)
+Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
+        by smtp.gmail.com with ESMTPSA id x9-20020a02ac89000000b003a484df1652sm4463423jan.55.2023.02.14.03.08.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Feb 2023 03:08:41 -0800 (PST)
+Date:   Tue, 14 Feb 2023 13:08:36 +0200
+From:   Zhi Wang <zhi.wang.linux@gmail.com>
+To:     Mathias Krause <minipli@grsecurity.net>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v3 4/6] KVM: x86: Make use of kvm_read_cr*_bits() when
+ testing bits
+Message-ID: <20230214130836.00005d2a@gmail.com>
+In-Reply-To: <4b4f845e-b92e-778c-db69-4d6fa9d64811@grsecurity.net>
+References: <20230201194604.11135-1-minipli@grsecurity.net>
+        <20230201194604.11135-5-minipli@grsecurity.net>
+        <20230207150535.00004453@gmail.com>
+        <4b4f845e-b92e-778c-db69-4d6fa9d64811@grsecurity.net>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB5276268D3ED0360913A05C368CDE9@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF0000E639:EE_|DM4PR12MB6184:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8b77e759-e524-47c0-6274-08db0e7a8d9c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0QBCsZeABtFR+8fHv0RA5nvdgyE8hmyobE+ujpDxM7Qh1+bl2qdpK4RnP9/GvcpZaPeGnxOAwX/3STUFdQ2ENdMtk0IFmEQvyc6VaVxhf24grb2p4RZxCMZSWzJgRBXc2/wTlcLHi2Eex3CvHbjwGvTNoMT7vzxAuBjL6nwYo4iP4dh9wF3OWQa3OVa0mOGy6eOwLbjdcXDqn0J6xqdE8tey7dUyT39eJLui3B85vk4iaaq5pOulurdXoCDaW4MoXPJ4fKay4qDyR6A3JmohO6rR88DGFI5K+eGvsLVvUQ9SblzhDG3KZGAyBEv61EWTsEpnjXEyc3MDhyW3inkdJMcALDZRF1VgsI/ITzSYM+7eJSM9sm3k0T/QaYmmNu92y5cMWjBYII9FBUnmd6NqVU8xggF4xs7dr08ECiTUhfpUSnUokbofkjD7itvM/U/exQZeYBggBkJkxMX4JRczxxnS/VIHlOynF0hNFewAbVicPhnWpZjc+Yk1ceSwzsG/Mhl8DChckJPDcYvYK62pYNShS0GRwOI4s7VXnS+TZIpf+DhWoYd6cyUkirJKetp6C5kFbFRCzB+/SVKW+5mC740AVbcDuWM3g7Rno+casvZ3q6cHDa21BUFvQuDROC8zEAQMsgNyFZ69nokZOwer52VW9w9pty7S//yYqjFbmAKpqnBtQ5+XlXVE9DjDvXxg62bU5bjB/NakZOkDFo0xv7qkwjItLYlKB86Of1wLsBI=
-X-Forefront-Antispam-Report: CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230025)(4636009)(376002)(39860400002)(136003)(346002)(396003)(451199018)(40470700004)(46966006)(36840700001)(8936002)(36860700001)(4326008)(41300700001)(6916009)(5660300002)(33716001)(70586007)(70206006)(8676002)(40460700003)(7416002)(86362001)(40480700001)(478600001)(356005)(55016003)(426003)(47076005)(7636003)(2906002)(336012)(82740400003)(316002)(82310400005)(54906003)(83380400001)(9686003)(26005)(186003)(67856001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Feb 2023 10:59:32.6129
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8b77e759-e524-47c0-6274-08db0e7a8d9c
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF0000E639.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6184
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 10, 2023 at 02:11:23AM +0000, Tian, Kevin wrote:
+On Wed, 8 Feb 2023 10:11:30 +0100
+Mathias Krause <minipli@grsecurity.net> wrote:
 
-> My confusion is that we have different flows between detach/attach
-> and replace.
+> On 07.02.23 14:05, Zhi Wang wrote:
+> > On Wed,  1 Feb 2023 20:46:02 +0100
+> > Mathias Krause <minipli@grsecurity.net> wrote:
+> >   
+> >> Make use of the kvm_read_cr{0,4}_bits() helper functions when we only
+> >> want to know the state of certain bits instead of the whole register.
+> >>
+> >> This not only makes the intend cleaner, it also avoids a VMREAD in case  
+>                            ~~~~~~
+> Oh, this should have been "intent". Will fix in v4, if there's a need for.
 > 
-> today with separate detach+attach we have following flow:
+> >> the tested bits aren't guest owned.  
+> >                     ^
+> > The patch comment is a little confusing. Not sure if I misunderstood here:  
 > 
->         Remove device from current hwpt;
->         if (last_device in hwpt) {
->                 Remove hwpt domain from current iopt;
->                 if (last_device in group)
->                         detach group from hwpt domain;
->         }
+> Sorry, lets try to clarify.
 > 
->         if (first device in group) {
->                 attach group to new hwpt domain;
->                 if (first_device in hwpt)
->                         Add hwpt domain to new iopt;
->         Add device to new hwpt;
+> > Check the code of kvm_read_cr0_bits
+> > 
+> > static inline ulong kvm_read_cr0_bits(struct kvm_vcpu *vcpu, ulong mask)
+> > {
+> >         ulong tmask = mask & KVM_POSSIBLE_CR0_GUEST_BITS;
+> >         if ((tmask & vcpu->arch.cr0_guest_owned_bits) &&
+> >             !kvm_register_is_available(vcpu, VCPU_EXREG_CR0))
+> >                 static_call(kvm_x86_cache_reg)(vcpu, VCPU_EXREG_CR0);
+> >         return vcpu->arch.cr0 & mask;
+> > }
+> > 
+> > I suppose the conditions that can avoids a VMREAD is to avoid the vmread in
+> > static_call(kvm_x86_cache_reg):  
 > 
-> but replace flow is different on the detach part:
+> Correct, that's what this patch is trying to do: It tries to avoid the
+> static_call(kvm_x86_cache_reg)(...) by making the compiler aware of the
+> actually used bits in 'mask'. If those don't intersect with the guest
+> owned bits, the first part of the condition wont be true and we simply
+> can make use of 'vcpu->arch.cr0'.
 > 
->         if (first device in group) {
->                 replace group's domain from current hwpt to new hwpt;
->                 if (first_device in hwpt)
->                         Add hwpt domain to new iopt;
->         }
+> Maybe it gets clearer when looking at kvm_read_cr0() too which is just this:
 > 
->         Remove device from old hwpt;
->         if (last_device in old hwpt)
->                 Remove hwpt domain from old iopt;
+> static inline ulong kvm_read_cr0(struct kvm_vcpu *vcpu)
+> {
+>     return kvm_read_cr0_bits(vcpu, ~0UL);
+> }
 > 
->         Add device to new hwpt;
+> So the 'mask' passed to kvm_read_cr0_bits() will always include all
+> (possible) guest owned bits (KVM_POSSIBLE_CR0_GUEST_BITS & ~0UL ==
+> KVM_POSSIBLE_CR0_GUEST_BITS) and the compiler cannot do the optimization
+> mentioned above.
 > 
-> I'm yet to figure out whether we have sufficient lock protection to
-> prevent other paths from using old iopt/hwpt to find the device
-> which is already attached to a different domain.
+> If we, however, use kvm_read_cr0_bits(..., MASK) directly instead of
+> using kvm_read_cr0() & MASK, it can, like for all bits not in
+> KVM_POSSIBLE_CR0_GUEST_BITS & vcpu->arch.cr0_guest_owned_bits.
+> 
+> > Conditions are not triggering vmread:
+> > 
+> > 1) The test bits are guest_owned_bits and cache register is available.
+> > 2) The test bits are *not* guest_owned bits.  
+> 
+> For case 1 the patch would make only a minor difference, by concluding
+> earlier that it can simply make use of vcpu->arch.cr0. But it's case 2
+> I'm after.
+>
 
-With Jason's new series, the detach() routine is lighter now.
-
-I wonder if it'd be safer now to do the detach() call after
-iommu_group_replace_domain()?
-
-Thanks
-Nic
-
-@@ -196,10 +198,41 @@ static bool iommufd_hw_pagetable_has_group(struct iommufd_hw_pagetable *hwpt,
- 	return false;
- }
+Thanks for the explanation. Now I got it. 
  
-+/**
-+ * __iommufd_device_detach - Detach a device from idev->hwpt
-+ * @idev: device to detach
-+ * @detach_group: flag to call iommu_detach_group
-+ *
-+ * This is a cleanup helper shared by the replace and detach routines. Comparing
-+ * to a detach routine, a replace call does not need the iommu_detach_group().
-+ */
-+static void __iommufd_device_detach(struct iommufd_device *idev,
-+				     bool detach_group)
-+{
-+	struct iommufd_hw_pagetable *hwpt = idev->hwpt;
-+
-+	mutex_lock(&hwpt->devices_lock);
-+	list_del(&idev->devices_item);
-+	if (detach_group && !iommufd_hw_pagetable_has_group(hwpt, idev->group))
-+		iommu_detach_group(hwpt->domain, idev->group);
-+	iopt_remove_reserved_iova(&hwpt->ioas->iopt, idev->dev);
-+	mutex_unlock(&hwpt->devices_lock);
-+
-+	if (hwpt->auto_domain)
-+		iommufd_object_destroy_user(idev->ictx, &hwpt->obj);
-+	else
-+		refcount_dec(&hwpt->obj.users);
-+
-+	idev->hwpt = NULL;
-+
-+	refcount_dec(&idev->obj.users);
-+}
-+
- /* On success this consumes a hwpt reference from the caller */
- static int iommufd_device_do_attach(struct iommufd_device *idev,
- 				    struct iommufd_hw_pagetable *hwpt)
- {
-+	struct iommufd_hw_pagetable *cur_hwpt = idev->hwpt;
- 	phys_addr_t sw_msi_start = PHYS_ADDR_MAX;
- 	int rc;
- 
-@@ -237,7 +270,7 @@ static int iommufd_device_do_attach(struct iommufd_device *idev,
- 	 * the group once for the first device that is in the group.
- 	 */
- 	if (!iommufd_hw_pagetable_has_group(hwpt, idev->group)) {
--		rc = iommu_attach_group(hwpt->domain, idev->group);
-+		rc = iommu_group_replace_domain(idev->group, hwpt->domain);
- 		if (rc)
- 			goto out_iova;
- 
-@@ -249,6 +282,10 @@ static int iommufd_device_do_attach(struct iommufd_device *idev,
- 		}
- 	}
- 
-+	/* Detach from the cur_hwpt without iommu_detach_group() */
-+	if (cur_hwpt)
-+		__iommufd_device_detach(idev, false);
-+
- 	idev->hwpt = hwpt;
- 	/* The HWPT reference from the caller is moved to this list */
- 	list_add(&idev->devices_item, &hwpt->devices);
+> If you look up KVM_POSSIBLE_CR0_GUEST_BITS, which is the upper bound for
+> guest owned CR0 bits, you'll find before patch 6:
+> 
+> #define KVM_POSSIBLE_CR0_GUEST_BITS X86_CR0_TS
+> 
+> and after patch 6:
+> 
+> #define KVM_LAZY_CR0_GUEST_BITS     X86_CR0_WP
+> #define KVM_POSSIBLE_CR0_GUEST_BITS (X86_CR0_TS|KVM_LAZY_CR0_GUEST_BITS)
+> 
+> So the upper bound would be 'X86_CR0_TS|X86_CR0_WP'. Every bit outside
+> that set can directly be read from the 'vcpu' cached register value and
+> that's (mostly) the case for the users this patch is changing, see below.
+> 
+> > I agree that this makes the intend cleaner, but not sure the later statement
+> > is true in the patch comment. If the test bits are not guest owned, it will
+> > not reach static_call(kvm_x86_cache_reg).  
+> 
+> Correct, but that's no different from what I'm saying. My description
+> just set 'static_call(kvm_x86_cache_reg)' mentally equivalent to VMREAD,
+> which abstracts the static_call quite well, IMHO. But maybe I should
+> clarify that 'tested bits' means the bits used by the changed call side?
+> Though, I think that's rather obvious from the change itself. I can
+> factor in the caching aspect, though.
+> 
+> Maybe something like this?:
+> 
+>     This not only makes the intent cleaner, it also avoids a potential
+>     VMREAD in case the tested bits aren't guest owned.
+> 
+> I've added "potential" but left the remainder as is.
+> 
+> >>
+> >> Signed-off-by: Mathias Krause <minipli@grsecurity.net>
+> >> ---
+> >>  arch/x86/kvm/pmu.c     | 4 ++--
+> >>  arch/x86/kvm/vmx/vmx.c | 4 ++--
+> >>  2 files changed, 4 insertions(+), 4 deletions(-)
+> >>
+> >> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> >> index d939d3b84e6f..d9922277df67 100644
+> >> --- a/arch/x86/kvm/pmu.c
+> >> +++ b/arch/x86/kvm/pmu.c
+> >> @@ -439,9 +439,9 @@ int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned idx, u64 *data)
+> >>  	if (!pmc)
+> >>  		return 1;
+> >>  
+> >> -	if (!(kvm_read_cr4(vcpu) & X86_CR4_PCE) &&
+> >> +	if (!(kvm_read_cr4_bits(vcpu, X86_CR4_PCE)) &&  
+> 
+> X86_CR4_PCE & KVM_POSSIBLE_CR4_GUEST_BITS == X86_CR4_PCE, therefore can
+> only be optimized if X86_CR4_PCE would be dropped from
+> 'vcpu->arch.cr4_guest_owned_bits' as well. But AFAICS we don't do that.
+> So here you're right that this only clears up the intent, not the actual
+> behavior at runtime.
+> 
+> >>  	    (static_call(kvm_x86_get_cpl)(vcpu) != 0) &&
+> >> -	    (kvm_read_cr0(vcpu) & X86_CR0_PE))
+> >> +	    (kvm_read_cr0_bits(vcpu, X86_CR0_PE)))  
+> 
+> X86_CR0_PE & KVM_POSSIBLE_CR0_GUEST_BITS == 0, therefore this can be
+> optimized.
+> 
+> >>  		return 1;
+> >>  
+> >>  	*data = pmc_read_counter(pmc) & mask;
+> >> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> >> index c8198c8a9b55..d3b49e0b6c32 100644
+> >> --- a/arch/x86/kvm/vmx/vmx.c
+> >> +++ b/arch/x86/kvm/vmx/vmx.c
+> >> @@ -5487,7 +5487,7 @@ static int handle_cr(struct kvm_vcpu *vcpu)
+> >>  		break;
+> >>  	case 3: /* lmsw */
+> >>  		val = (exit_qualification >> LMSW_SOURCE_DATA_SHIFT) & 0x0f;
+> >> -		trace_kvm_cr_write(0, (kvm_read_cr0(vcpu) & ~0xful) | val);
+> >> +		trace_kvm_cr_write(0, (kvm_read_cr0_bits(vcpu, ~0xful) | val));  
+> 
+> ~0xful & KVM_POSSIBLE_CR0_GUEST_BITS is 0 prior to patch 6 and
+> X86_CR0_WP afterwards, therefore this might be optimized, depending on
+> the runtime setting of 'enable_lazy_cr0', possibly capping the guest
+> owned CR0 bits to exclude X86_CR0_WP again.
+> 
+> >>  		kvm_lmsw(vcpu, val);
+> >>  
+> >>  		return kvm_skip_emulated_instruction(vcpu);
+> >> @@ -7547,7 +7547,7 @@ static u8 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
+> >>  	if (!kvm_arch_has_noncoherent_dma(vcpu->kvm))
+> >>  		return (MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;
+> >>  
+> >> -	if (kvm_read_cr0(vcpu) & X86_CR0_CD) {
+> >> +	if (kvm_read_cr0_bits(vcpu, X86_CR0_CD)) {  
+> 
+> X86_CR0_CD & KVM_POSSIBLE_CR0_GUEST_BITS == 0, therefore this can be
+> optimized as well.
+> 
+> >>  		if (kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_CD_NW_CLEARED))
+> >>  			cache = MTRR_TYPE_WRBACK;
+> >>  		else  
+> >   
+> 
+> Thanks,
+> Mathias
+
