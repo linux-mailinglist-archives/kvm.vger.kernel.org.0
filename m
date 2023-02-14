@@ -2,156 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A323C69583B
-	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 06:09:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B6EE2695881
+	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 06:28:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231664AbjBNFJf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Feb 2023 00:09:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39990 "EHLO
+        id S229928AbjBNF2n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Feb 2023 00:28:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231608AbjBNFJE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Feb 2023 00:09:04 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E48C17CF2;
-        Mon, 13 Feb 2023 21:08:38 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id v6-20020a17090ad58600b00229eec90a7fso844885pju.0;
-        Mon, 13 Feb 2023 21:08:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OWR1aZtd/m+anAz1/vi6a0lTWZtpyayUx/qgggC5GfI=;
-        b=h6voPmac2HA7L2HzbWXyJ2mC5+yfbtzh8gZ9uTGuseZ4Wb82Sfwcbcp7WgAtJ7h7gZ
-         4I81Yc6tRI7mblmX14vVWxjPLJuM9C+eW/izHFrB2ZSQLcEgRCyl0KvXxiVSo1+qbqEM
-         iSLzKVddLvCOZDMECdfCAlAGzVPX5a43cEc8+9B7pWyzsZcT0RRTj/FMYpbq60Ouwxau
-         svC+liS/RYwKjncA2j+SxjNmuoyPm18GF+vzNVaYoCgkWolW0L4XtVtjtj99w7BdmeUC
-         Vd5ztPt9CcC3phiNopSEYYIMqOi471MMCJ5aCxw3qRYUOkN/Xnl+HU6WxuslupA6vY9u
-         zxdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OWR1aZtd/m+anAz1/vi6a0lTWZtpyayUx/qgggC5GfI=;
-        b=YTDNgmHOv5WZzJdHwVUFhnA/O81tFgLYiOhXuUYfejfx47sKlEOhP1AUDbbRjZzieJ
-         Uqz/dDGiSglu5D8JaCTT8q2ZK89wTDW6dtDPzhlLnMy0OjfS01uz0CsRtBa3tAPjDD4w
-         11FA9zMAmZ+ZeBLvomKeJfSs0bm40k/Cke+aUIdx9X7NnWAP5FXnj3ihEUjB3d+ymrGV
-         a91/ESxC77LVDvvUBuKt8xp3XeFS9WJgPWRCAxzlLu9XRNfERBzpa0nJrJX7OgLEbm+k
-         dYZY2Cn8McqQWEtLvA7eKYoK++Zeo9r4M7CiOYNewTWBj49NK08Ctq+SOcjhsY5O49Rg
-         9hng==
-X-Gm-Message-State: AO0yUKWMmyQ80RK0vmpNtxIfeHfOEz6fV4DpaAozAoWV3JP4x8umGC+W
-        C2NZjueLrnfAAvfMsP8NwIY=
-X-Google-Smtp-Source: AK7set++yByUL/EzVM8pxUT6V98JwU8tyKWO4OJq3ZuQOQfjULPGQwSCuaVK6hiI/IrU1Y8aW9m9hg==
-X-Received: by 2002:a05:6a20:12d6:b0:bf:14cc:51d8 with SMTP id v22-20020a056a2012d600b000bf14cc51d8mr1181154pzg.26.1676351317268;
-        Mon, 13 Feb 2023 21:08:37 -0800 (PST)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id j22-20020aa79296000000b005a79f5d9f53sm8738919pfa.165.2023.02.13.21.08.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Feb 2023 21:08:37 -0800 (PST)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Sandipan Das <sandipan.das@amd.com>
-Subject: [PATCH v4 12/12] KVM: x86/cpuid: Add AMD CPUID ExtPerfMonAndDbg leaf 0x80000022
-Date:   Tue, 14 Feb 2023 13:07:57 +0800
-Message-Id: <20230214050757.9623-13-likexu@tencent.com>
-X-Mailer: git-send-email 2.39.1
-In-Reply-To: <20230214050757.9623-1-likexu@tencent.com>
-References: <20230214050757.9623-1-likexu@tencent.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229570AbjBNF2k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Feb 2023 00:28:40 -0500
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F73493CF
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 21:28:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1676352519; x=1707888519;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=YpPec0kUGjsmXPwX/LnRnRLj88sBMIU4pIASbXJrUNs=;
+  b=Wfd6rlaPbVK1byoMm4Lu4Mt6MAy3TQA9jK/fSMUXWAadC2dl55EGrt7C
+   yD/fd/1zLTLkcNxeTvD7TS9BAUZiV4nCg1P9VDq2W+6V4AKFXOPilvJhU
+   FoL2AEIo66Psel60EJZQBDCf9pj0YmLF+Vnb4IWbof65tSLx+aMKudnq3
+   GovqBR0GPgRo/g31GfaI/WgM+kcmx2Ad6uZmJWfKXPCwAQO0kKtSK/gev
+   mQkD7N1/tYs9O1G98i3dqGYsu9T8eZXzbUpdEpMi6Brrb92zM62yDbNgp
+   2gn1EwNJnoTsyFHk8cLaYEC5aGVjlMTYt0CvxlPJZUxlvlopOW+pK2Rwm
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10620"; a="314723445"
+X-IronPort-AV: E=Sophos;i="5.97,294,1669104000"; 
+   d="scan'208";a="314723445"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2023 21:28:37 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10620"; a="792988027"
+X-IronPort-AV: E=Sophos;i="5.97,294,1669104000"; 
+   d="scan'208";a="792988027"
+Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
+  by orsmga004.jf.intel.com with ESMTP; 13 Feb 2023 21:28:34 -0800
+Message-ID: <8ece08328b0ab07303140b9b731e252cfdb38b1f.camel@linux.intel.com>
+Subject: Re: [PATCH v4 7/9] KVM: x86: When guest set CR3, handle LAM bits
+ semantics
+From:   Robert Hoo <robert.hu@linux.intel.com>
+To:     Chao Gao <chao.gao@intel.com>
+Cc:     seanjc@google.com, pbonzini@redhat.com, yu.c.zhang@linux.intel.com,
+        yuan.yao@linux.intel.com, jingqi.liu@intel.com,
+        weijiang.yang@intel.com, isaku.yamahata@intel.com,
+        kirill.shutemov@linux.intel.com, kvm@vger.kernel.org
+Date:   Tue, 14 Feb 2023 13:28:33 +0800
+In-Reply-To: <Y+mvG8S3W5lXoZNJ@gao-cwp>
+References: <20230209024022.3371768-1-robert.hu@linux.intel.com>
+         <20230209024022.3371768-8-robert.hu@linux.intel.com>
+         <Y+mvG8S3W5lXoZNJ@gao-cwp>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-10.el7) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+On Mon, 2023-02-13 at 11:31 +0800, Chao Gao wrote:
+> On Thu, Feb 09, 2023 at 10:40:20AM +0800, Robert Hoo wrote:
+> > When only changes LAM bits, ask next vcpu run to load mmu pgd, so
+> > that it
+> > will build new CR3 with LAM bits updates.
+> > When changes on CR3's effective address bits, no matter LAM bits
+> > changes or not,
+> > go through normal pgd update process.
+> 
+> Please squash this into patch 2.
+> 
+Though all surround CR3, I would prefer split into pieces, so that
+easier for review and accept. I can change their order to group
+together. Is it all right for you?
+> > 
+> > -	bool pcid_enabled = kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE);
+> > +	bool pcid_enabled = !!kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE);
+> 
+> This change isn't related. Please drop it or post it separately.
+> 
+Yu commented this also on last version. I thought it's too trivial to
+be separated.
+Now that both of you suggest this. Let me split it in a separated patch
+in this set. Is this all right?
+I do think separating it in another patch set alone, is too trivial.
+> > 
+> > 	if (pcid_enabled) {
+> > 		skip_tlb_flush = cr3 & X86_CR3_PCID_NOFLUSH;
+> > @@ -1257,6 +1257,10 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu,
+> > unsigned long cr3)
+> > 	if (cr3 == kvm_read_cr3(vcpu) && !is_pae_paging(vcpu))
+> > 		goto handle_tlb_flush;
+> > 
+> > +	if (!guest_cpuid_has(vcpu, X86_FEATURE_LAM) &&
+> > +	    (cr3 & (X86_CR3_LAM_U48 | X86_CR3_LAM_U57)))
+> > +		return	1;
+> 
+> can you move this check to kvm_vcpu_is_valid_cr3(), i.e., return
+> false in
+> that function if any LAM bit is toggled while LAM isn't exposed to
+> the guest?
+> 
+OK
+> > +
+> > 	/*
+> > 	 * Do not condition the GPA check on long mode, this helper is
+> > used to
+> > 	 * stuff CR3, e.g. for RSM emulation, and there is no guarantee
+> > that
+> > @@ -1268,8 +1272,20 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu,
+> > unsigned long cr3)
+> > 	if (is_pae_paging(vcpu) && !load_pdptrs(vcpu, cr3))
+> > 		return 1;
+> > 
+> > -	if (cr3 != kvm_read_cr3(vcpu))
+> > -		kvm_mmu_new_pgd(vcpu, cr3);
+> > +	old_cr3 = kvm_read_cr3(vcpu);
+> > +	if (cr3 != old_cr3) {
+> > +		if ((cr3 ^ old_cr3) & CR3_ADDR_MASK) {
+> 
+This means those effective addr bits changes, then no matter LAM bits
+toggled or not, it needs new pgd.
 
-CPUID leaf 0x80000022 i.e. ExtPerfMonAndDbg advertises some new
-performance monitoring features for AMD processors.
+> Does this check against CR3_ADDR_MASK necessarily mean LAM bits are
+> toggled, i.e., CR3_ADDR_MASK == ~(X86_CR3_LAM_U48 | X86_CR3_LAM_U57)?
+> 
+> Why not check if LAM bits are changed? This way the patch only
+> changes
+> cases related to LAM, keeping other cases intact.
 
-Bit 0 of EAX indicates support for Performance Monitoring Version 2
-(PerfMonV2) features. If found to be set during PMU initialization,
-the EBX bits of the same CPUID function can be used to determine
-the number of available PMCs for different PMU types.
+Yes, I can better to add check in "else" that LAM bits changes.
+But in fact above kvm_is_valid_cr3() has guaranteed no other high order
+bits changed.
+Emm, now you might ask to melt LAM bits into vcpu-
+>arch.reserved_gpa_bits? ;)
+> 
+> > +			kvm_mmu_new_pgd(vcpu, cr3 & ~(X86_CR3_LAM_U48 |
+> > +					X86_CR3_LAM_U57));
+> 
+> Do you need to touch kvm_mmu_new_pgd() in nested_vmx_load_cr3()?
 
-Expose the relevant bits via KVM_GET_SUPPORTED_CPUID so that
-guests can make use of the PerfMonV2 features.
+Didn't scope nested LAM case in this patch set.
 
-Co-developed-by: Sandipan Das <sandipan.das@amd.com>
-Signed-off-by: Sandipan Das <sandipan.das@amd.com>
-Signed-off-by: Like Xu <likexu@tencent.com>
----
- arch/x86/kvm/cpuid.c   | 24 +++++++++++++++++++++++-
- arch/x86/kvm/svm/svm.c |  6 ++++++
- 2 files changed, 29 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index b0bb5f9f5307..274cae531d7f 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -1124,7 +1124,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 		entry->edx = 0;
- 		break;
- 	case 0x80000000:
--		entry->eax = min(entry->eax, 0x80000021);
-+		entry->eax = min(entry->eax, 0x80000022);
- 		/*
- 		 * Serializing LFENCE is reported in a multitude of ways, and
- 		 * NullSegClearsBase is not reported in CPUID on Zen2; help
-@@ -1247,6 +1247,28 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 		if (!static_cpu_has_bug(X86_BUG_NULL_SEG))
- 			entry->eax |= BIT(6);
- 		break;
-+	/* AMD Extended Performance Monitoring and Debug */
-+	case 0x80000022: {
-+		union cpuid_0x80000022_ebx ebx;
-+
-+		entry->ecx = entry->edx = 0;
-+		if (!enable_pmu || !kvm_cpu_cap_has(X86_FEATURE_PERFMON_V2)) {
-+			entry->eax = entry->ebx;
-+			break;
-+		}
-+
-+		cpuid_entry_override(entry, CPUID_8000_0022_EAX);
-+
-+		if (kvm_cpu_cap_has(X86_FEATURE_PERFMON_V2))
-+			ebx.split.num_core_pmc = kvm_pmu_cap.num_counters_gp;
-+		else if (kvm_cpu_cap_has(X86_FEATURE_PERFCTR_CORE))
-+			ebx.split.num_core_pmc = AMD64_NUM_COUNTERS_CORE;
-+		else
-+			ebx.split.num_core_pmc = AMD64_NUM_COUNTERS;
-+
-+		entry->ebx = ebx.full;
-+		break;
-+	}
- 	/*Add support for Centaur's CPUID instruction*/
- 	case 0xC0000000:
- 		/*Just support up to 0xC0000004 now*/
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index f4a4691b4f4e..2472fa8746c2 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4916,6 +4916,12 @@ static __init void svm_set_cpu_caps(void)
- 		} else {
- 			/* AMD PMU PERFCTR_CORE CPUID */
- 			kvm_cpu_cap_check_and_set(X86_FEATURE_PERFCTR_CORE);
-+			/*
-+			 * KVM only supports AMD PerfMon V2, even if it supports V3+.
-+			 * For PerfMon V3+, it's unsafe to expect V2 bit is set or cleared.
-+			 */
-+			if (kvm_pmu_cap.version > 1)
-+				kvm_cpu_cap_set(X86_FEATURE_PERFMON_V2);
- 		}
- 	}
- 
--- 
-2.39.1
 
