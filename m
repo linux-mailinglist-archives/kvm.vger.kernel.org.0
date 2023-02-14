@@ -2,91 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A3D2C6963A0
-	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 13:36:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5667C69641C
+	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 14:00:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232335AbjBNMgw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Feb 2023 07:36:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54712 "EHLO
+        id S232512AbjBNNA5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Feb 2023 08:00:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229686AbjBNMgu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Feb 2023 07:36:50 -0500
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4652F44AD
-        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 04:36:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1676378209; x=1707914209;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=+JtY4yNkj2iEyf9H3Df0IPvRsvNzzLv6a2WpGrXQAUY=;
-  b=JyXcNAJIwc4wzndNozvmqzlELBjDpqEdbgn2n5V5jR5xR1q3bM70LaeA
-   ljshsGxPeXSdAhf4zbI1+q4kwZd2f6PpIMLY7jQHAlSCMr9JQ1HrSZZ7o
-   DIMmFX2sp4n7TebpH8qh9of6pYhpEbK061dGJJYK70yazpteLSEOaN45D
-   /8r51ffLd24G40ou4pB2GQR88R4BPd6mzMUhtUASAANjr+fb7w+10EgxC
-   JwVcWhhYljeEKRNIxjX7VaLKDyTQS4JkqnRnWbOpYtiBgxW26HS4bHkFf
-   pcnLSsAfqu/8yX5U4S+r6hFW4OqHPFl7gUKqbn2XGhNp2lgkpMogIlshR
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10620"; a="395765079"
-X-IronPort-AV: E=Sophos;i="5.97,296,1669104000"; 
-   d="scan'208";a="395765079"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2023 04:36:48 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10620"; a="732881877"
-X-IronPort-AV: E=Sophos;i="5.97,296,1669104000"; 
-   d="scan'208";a="732881877"
-Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
-  by fmsmga008.fm.intel.com with ESMTP; 14 Feb 2023 04:36:44 -0800
-Message-ID: <b5fa93147fa4e890560184ff0a8f404706ff2e28.camel@linux.intel.com>
-Subject: Re: [PATCH v4 1/9] KVM: x86: Intercept CR4.LAM_SUP when LAM feature
- is enabled in guest
-From:   Robert Hoo <robert.hu@linux.intel.com>
-To:     Binbin Wu <binbin.wu@linux.intel.com>, seanjc@google.com,
-        pbonzini@redhat.com, yu.c.zhang@linux.intel.com,
-        yuan.yao@linux.intel.com, jingqi.liu@intel.com,
-        weijiang.yang@intel.com, chao.gao@intel.com,
-        isaku.yamahata@intel.com
-Cc:     kirill.shutemov@linux.intel.com, kvm@vger.kernel.org
-Date:   Tue, 14 Feb 2023 20:36:43 +0800
-In-Reply-To: <d1d819b00a6dda7a58b25f7b0692ad53473497d8.camel@linux.intel.com>
-References: <20230209024022.3371768-1-robert.hu@linux.intel.com>
-         <20230209024022.3371768-2-robert.hu@linux.intel.com>
-         <814481b6-c316-22bd-2193-6aa700db47b5@linux.intel.com>
-         <90d0f1ffec67e015e3f0f1ce9d8d719634469a82.camel@linux.intel.com>
-         <1e8df25a-4c25-6738-dd92-a58c28282eb0@linux.intel.com>
-         <d1d819b00a6dda7a58b25f7b0692ad53473497d8.camel@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-10.el7) 
-Mime-Version: 1.0
+        with ESMTP id S231716AbjBNNAz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Feb 2023 08:00:55 -0500
+Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9AF93273A;
+        Tue, 14 Feb 2023 05:00:52 -0800 (PST)
+Received: from loongson.cn (unknown [10.20.42.120])
+        by gateway (Coremail) with SMTP id _____8BxONkDhutjEogAAA--.1314S3;
+        Tue, 14 Feb 2023 21:00:51 +0800 (CST)
+Received: from [10.20.42.120] (unknown [10.20.42.120])
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8Bxyr0ChutjydoyAA--.29297S3;
+        Tue, 14 Feb 2023 21:00:51 +0800 (CST)
+Subject: Re: [PATCH v1 01/24] LoongArch: KVM: Implement kvm module related
+ interface
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+References: <20230214025648.1898508-1-zhaotianrui@loongson.cn>
+ <20230214025648.1898508-2-zhaotianrui@loongson.cn>
+ <Y+ssT+W27GxDRAAZ@kroah.com>
+ <6fd2ca5a-7243-0627-79e9-8c8bd840adc2@loongson.cn>
+ <Y+tbMwXjA0hkiUJA@kroah.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>, loongarch@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>
+From:   Tianrui Zhao <zhaotianrui@loongson.cn>
+Message-ID: <a44fc722-e3e2-7f8a-0454-f27a8a10d52b@loongson.cn>
+Date:   Tue, 14 Feb 2023 21:00:50 +0800
+User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:45.0) Gecko/20100101
+ Thunderbird/45.4.0
+MIME-Version: 1.0
+In-Reply-To: <Y+tbMwXjA0hkiUJA@kroah.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-CM-TRANSID: AQAAf8Bxyr0ChutjydoyAA--.29297S3
+X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
+X-Coremail-Antispam: 1Uk129KBjvdXoW7JFy8XFWUAFyfJF17CryDZFb_yoWfuFc_Cr
+        17Jr4Du3y5GF45Ka1DGFs0kFWxG3W5Ga4Iqrs8Kry3urnrXF48Ca1kG34kZFW3Kw4xKr4I
+        9wn5tFW8XwsFqjkaLaAFLSUrUUUU0b8apTn2vfkv8UJUUUU8wcxFpf9Il3svdxBIdaVrn0
+        xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUO
+        e7kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3w
+        AFIxvE14AKwVWUXVWUAwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK
+        6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j6F4UM28EF7
+        xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVWxJr0_GcWln4kS
+        14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx
+        1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r126r1DMcIj6I8E87Iv
+        67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07
+        AlzVAYIcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE
+        7xkEbVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I
+        0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAI
+        cVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcV
+        CF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4UJVWxJr1lIxAIcVC2z280
+        aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x07jFApnUUUUU=
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2023-02-14 at 20:24 +0800, Robert Hoo wrote:
-> On Tue, 2023-02-14 at 17:00 +0800, Binbin Wu wrote:
-> > According to the code of set_cr4_guest_host_mask,
-> > vcpu->arch.cr4_guest_owned_bits is a subset of
-> > KVM_POSSIBLE_CR4_GUEST_BITS,
-> > and X86_CR4_LAM_SUP is not included in KVM_POSSIBLE_CR4_GUEST_BITS.
-> > No matter change CR4_RESERVED_BITS or not, X86_CR4_LAM_SUP will
-> > always be set in CR4_GUEST_HOST_MASK.
 
-yes, bits set to 1 in a guest/host mask means it's owned by the host.
-> > 
-> > 
-> 
-> set_cr4_guest_host_mask():
-> 	vcpu->arch.cr4_guest_owned_bits = KVM_POSSIBLE_CR4_GUEST_BITS &
-> 			~vcpu->arch.cr4_guest_rsvd_bits;
-> 
-> kvm_vcpu_after_set_cpuid():
-> 	vcpu->arch.cr4_guest_rsvd_bits =
-> 	    __cr4_reserved_bits(guest_cpuid_has, vcpu);
+
+在 2023年02月14日 17:58, Greg Kroah-Hartman 写道:
+> On Tue, Feb 14, 2023 at 05:00:56PM +0800, Tianrui Zhao wrote:
+>>>> +#define KVM_GET_CSRS		_IOWR(KVMIO, 0xc5, struct kvm_csrs)
+>>>> +#define KVM_SET_CSRS		_IOW(KVMIO,  0xc6, struct kvm_csrs)
+>>> Why does this arch need new ioctls?
+>> We want to use this ioctl to access multiple csrs at one time. If without
+>> this, we only access one csr.
+> What is wrong with accessing only one csr at a time?  Isn't this what
+> other architectures do?
+
+Generally, using KVM_GET_ONE_GET ioctl to get one reg, but we want a
+more convenient interface to get serial regs at one time, so we add this
+ioctl.
+And in x86 platform, using KVM_GET_MSRS to access multiple registers. and
+our functions reference this.
+
+Thanks,
+Tianrui Zhao
+
+>
+>> There is another function, can we use the KVM_GET/SET_MSRS to access our
+>> csrs?
+> I do not know, that's up to the KVM developers to answer.
+>
+> thanks,
+>
+> greg k-h
 
