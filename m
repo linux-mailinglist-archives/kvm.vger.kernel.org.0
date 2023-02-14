@@ -2,152 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BD2E695C54
-	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 09:10:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C5C8695CBB
+	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 09:18:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231760AbjBNIKZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Feb 2023 03:10:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45288 "EHLO
+        id S231857AbjBNISv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Feb 2023 03:18:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229589AbjBNIKY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Feb 2023 03:10:24 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFF592111
-        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 00:09:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676362172;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=rB5ID/2Qs9ceDcs0KHL5dcmrag9/xwe+5cqfsigTfHY=;
-        b=DBhTe7wfYdMVJn9tUQKlRKIUBLuCsylgd+1PVVebwSKctRqHuKwe10v0/Sg9wOb/0p7xvU
-        Itg5IyXapNGomx68/ifPVfW797zFaVTxOfdbmnmIpqHd8ycdH9iu1KUk3626t71c8pYRZI
-        oXzTz3STTv2/3WtIwrntIxLMIuy0Hlc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-657-cI3ZZsQEOxmLpapnfXyNlg-1; Tue, 14 Feb 2023 03:09:31 -0500
-X-MC-Unique: cI3ZZsQEOxmLpapnfXyNlg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B7D92857A99;
-        Tue, 14 Feb 2023 08:09:30 +0000 (UTC)
-Received: from server.redhat.com (ovpn-13-103.pek2.redhat.com [10.72.13.103])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6EDA240C10FA;
-        Tue, 14 Feb 2023 08:09:27 +0000 (UTC)
-From:   Cindy Lu <lulu@redhat.com>
-To:     lulu@redhat.com, jasowang@redhat.com, mst@redhat.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Cc:     stable@vger.kernel.org
-Subject: [PATCH v2] vp_vdpa: fix the crash in hot unplug with vp_vdpa
-Date:   Tue, 14 Feb 2023 16:09:24 +0800
-Message-Id: <20230214080924.131462-1-lulu@redhat.com>
+        with ESMTP id S230044AbjBNISt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Feb 2023 03:18:49 -0500
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1A03206B4;
+        Tue, 14 Feb 2023 00:18:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1676362728; x=1707898728;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=XfC2T6YoM+Eb7pr+eZ1WMNiTPKjbkEfMoQtkIip4xHw=;
+  b=DAHoION4gwCepVnUBHXNCwGeg/lEQ4vnnPNygvGaau1XQ5cq3a8fYpeY
+   CxXLoKO+at63OCNVLn+rsMvG0bfHT2Ruw8Xha8yJwHtRL0B50lIoOsiYi
+   lEH8hjmKwnmR3HqBlQFznes7LelJ2mRj/BOhZWr/J3WJyVidwNjQOQR6o
+   P4hCp9u00FBBeHoE21IFIaWByKZ6lotdgQuYFYHLR10+h0sdFWW357h/c
+   vAqtGfI80Jj9vtjFR0Vw+i2DPP8E3dgJJ+Ly3bPgdZUbMOgu/G+DEvhkh
+   LzlGVhhdGHJ3W/zrCR/TNk0I7rUdkVbZuLKhZf4HJvQcJbGpvjj4oYXH6
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10620"; a="358519114"
+X-IronPort-AV: E=Sophos;i="5.97,296,1669104000"; 
+   d="scan'208";a="358519114"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2023 00:18:48 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10620"; a="732801626"
+X-IronPort-AV: E=Sophos;i="5.97,296,1669104000"; 
+   d="scan'208";a="732801626"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmsmga008.fm.intel.com with ESMTP; 14 Feb 2023 00:18:47 -0800
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Tue, 14 Feb 2023 00:18:46 -0800
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Tue, 14 Feb 2023 00:18:46 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16 via Frontend Transport; Tue, 14 Feb 2023 00:18:46 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.174)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.16; Tue, 14 Feb 2023 00:18:46 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MhXDQPV8QnDppL46p+opybxvRtQ+SNXtXHMrQFw7JRwd//mXol50LQ9r/HOiZGtZUUDsu9ah5L0mJR21wHHldOv227YOusbA1gKBUJ3MMSet6ieQxWeWP/YGNvEhvzE5x/pWiD/o69IQtyydERzh2pirCnaUob2zvGRqvqqTW92275vc+DxiDZyuT/IkEUQUqHqdO4eWHDf1piq0EiARsDIJh09qLEniJ8d+z46DX6TimBjit86tfkkaD7aZcZ5EdOk6CzDw60XqjpJoMMd2LJLIgB4bqdTyAj1g5FlNWg2FqJC0oMOExHeR3krbQVQZlCOJltOr8rU7aMwFI9dpfQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hNgtBE5KeZEJr/cV/FUlBHSU9xIrTZRjEniUT2839cw=;
+ b=MNzmxJljEny3ZRU0ut66Uri4R9VNod3cCBXS26HDaPzyS9EN/FnP54uZ5WAMWpx2d27pS6efQ0YcZmRXxgBlqOcX05zNJBxkqIRuDQRZ/ZA1NCN2C8B8i+zo8+5zyXySBx6tWei7rWQjPT8QW22/SoPyAd1UQeyC67bTIcZmkqcBGsAIK+qBbFA/DMJC98HXg42IcPvXsqkEI91LsUevJ8l16lzOEdTsx2hzu5RFDcChsBEuo+tMHv277DP5kRj3+ycxqdyTFvd1F54lnoXI4x7rrQ+2yExW03XUiGV0XDARGnytM2Djh0hSnhUrB9yKqogqhE6wlgPcAFHmBu4NAg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by SN7PR11MB7509.namprd11.prod.outlook.com (2603:10b6:806:346::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.24; Tue, 14 Feb
+ 2023 08:18:43 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::6a8d:b95:e1b5:d79d]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::6a8d:b95:e1b5:d79d%9]) with mapi id 15.20.6086.026; Tue, 14 Feb 2023
+ 08:18:43 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>
+CC:     "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>
+Subject: RE: [PATCH v3 11/15] vfio: Add cdev_device_open_cnt to vfio_group
+Thread-Topic: [PATCH v3 11/15] vfio: Add cdev_device_open_cnt to vfio_group
+Thread-Index: AQHZP73SnNj5I1R/vkyXA91XWppiPa7OGjGQ
+Date:   Tue, 14 Feb 2023 08:18:43 +0000
+Message-ID: <BN9PR11MB5276C7C8EF1A47CC5B8955038CA29@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20230213151348.56451-1-yi.l.liu@intel.com>
+ <20230213151348.56451-12-yi.l.liu@intel.com>
+In-Reply-To: <20230213151348.56451-12-yi.l.liu@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|SN7PR11MB7509:EE_
+x-ms-office365-filtering-correlation-id: 78266ae7-0614-43ae-38c0-08db0e641625
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: v4uJw/gPPBKN2Ln6SIgvXbQte7DvFv8t0xPX1nUxf3FLucPXxagSkzh5BJ5MHNrk1R9RZyNJQ+y0xhlYaM+FNW37/PIprYZMLsz+L3BDh/8ojjzZWG+KyDuesFk/rPpl5rSt6tY30aTPJlPribVxAZ1W0c7zvef7LbdDf1bMWE8VXa7kVdtdoZkzOZlnzgA0Bh9oI1ndUUHd0pQ3qxN2zjEbSeMszzjodFY8et/UoVlm3cC9umhxcmPPNB9fiZrbMiKQ2HOL+TSZreiTB5fM0i/INDIixDg5gIO4i9LTUKbY8snwdX7up5cncGsWmY4ALbjvQIH+P60EtrhO4sB89iNdapZ71Slpo9GUKEewmhQCOS9Q3rYHvQ3u66S7VMrCb5vQ1Nj/zbE+yrUVIKl+2luGw8M8x+MX7odfduy5lnydvaj89zqQ+YkcdG0kw1TmOhJfIq6nHuhfsLFCTeagR9LCf23Is65BsIyUB7pHnZdsuhB/vgBHAhlYbf+jqxUKLw97UganqAtMqMdUgI+QVfQKsYTR1Z9lrCfwYtbR9vRpQ6m6FtLjLr6Dij1nsnKJDO4GNItzyjgr9XjSX7Ac+exXQMurQ8dw6ALcrZmxJ/1or++Pkf/gkzZyylBtDyorGm4A15lUPpAnz1IzT6pe9/EKSdZJl/ARwgRG2zqfI3MDOvQWuBv+P0JhTlJXLcwAgQoM2w4jhk+dVXfdAGd59A==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(136003)(376002)(346002)(396003)(39860400002)(366004)(451199018)(41300700001)(71200400001)(33656002)(66556008)(66476007)(76116006)(64756008)(66946007)(4326008)(8676002)(122000001)(66446008)(52536014)(55016003)(26005)(6506007)(186003)(9686003)(38070700005)(2906002)(5660300002)(8936002)(7416002)(82960400001)(7696005)(54906003)(316002)(83380400001)(38100700002)(110136005)(86362001)(478600001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Sz1APFM1nLl+Q518SnKxJ+2EDIHlXPlB+DzZs2fUwRcW0IP0B6NHv6trYlXZ?=
+ =?us-ascii?Q?JZmrRQpB8FqVLX1fEX258OmNtJKJMD5Tn1yF3G8MU+TUN8V5q7L+GHbutVvW?=
+ =?us-ascii?Q?yFb/yqxeJv5TmUom3nVxBS9O8QdVse0Yl9t1G+84qWOGv9Ik0/Tw+t64nuPE?=
+ =?us-ascii?Q?KS5fNb+bgcbKJLzkKY6oKFaBMMfwwBCBP3UDPPniOKy6MIIqlTlHYZBmiZNp?=
+ =?us-ascii?Q?Y7IDAoVarfVQIYM+8Opai/z2BW5+56MTGuUqqziRu8wGQ3hm6xlCmtgwhuLz?=
+ =?us-ascii?Q?HV+2hZLrZbk7F8OUNeHpJTTIdd3+IWzqXMzb0l8VshHV2VmOV4dh+ISTe2yM?=
+ =?us-ascii?Q?c5HEObrKfJp10J95dAHZGVVqsNSM6wvoJ7AwPlom6+IZjCYuiLp80we3AiSS?=
+ =?us-ascii?Q?J4vXZSAgH4yeybD7UHNFmkSdsI+76GknDmDlog8LE4XZl572FB3uKcx3StGd?=
+ =?us-ascii?Q?S5CLNVgRWIBWfL/uRp8uSt8y+EDbdV6HXa7fKHkMPsDHafCTZcV+afW6JWT1?=
+ =?us-ascii?Q?shT9jSp0n/Iz2A7clpgGNqnyFM8rk2f1i3ACnFl4lvFtGq2XFSp9FwMi8JVJ?=
+ =?us-ascii?Q?mvtyAKUyZECli0dDDSbJDJaTSYUXjMrI7sn3TfDjMFsDbmcA71P8yRdMDaIw?=
+ =?us-ascii?Q?XKlvSi/eKFYhZ77oJ0F/Wijrlqi9tbHqHvYDZXhcbOZslkbL7RZUtYjdme0J?=
+ =?us-ascii?Q?PXO7XPf59CT6Qnt0B3+10Es23CiFsZHsF+AttdKh4aPTaxrYi5JtLm4d7iED?=
+ =?us-ascii?Q?k8fARSBb+4n5eIiWolpAx7TXHqoKx0Ugc7Nzb+8wUS9ZGXfwfAc8FHa0Ddxw?=
+ =?us-ascii?Q?m0FslbEg57LAR69Uxhka8gso/VD840CJoAhzUxJ3US3Xh9/dI26yBXbCb/iz?=
+ =?us-ascii?Q?vxaACo5D2l2siefnFeea9KGq7PBealPtmAeMN+xMKaks6ZKgq6y35jrg+Xpu?=
+ =?us-ascii?Q?xYPqCblQNmsq/TIRvHS7ehkR3J+01G4fCDPddxYusSoFW/w6LHSbxUvQ1ybX?=
+ =?us-ascii?Q?JBQd+IxKCGDoDHwiu4KQTBAOXSmVwaYrqrsle6g8eSkYxjNaIaEXNp+tyyyl?=
+ =?us-ascii?Q?aUr5gfmpJH7nSBFNuJsZbob/+3kH1paLkXPuAACJthUB+rfUSpIUZ54N+1ad?=
+ =?us-ascii?Q?RDy3CFpp/BhiXiqYR6gMEPEhWk6R6SB1yhkeMRYtH5cmLP61DvE0FcRftk+a?=
+ =?us-ascii?Q?9dbQuvj07Qy5i38qG7qRCwSkwv90Io1wIXoNa61o3qCg9rvl5cM5Xd9ibqB5?=
+ =?us-ascii?Q?M72GdUVTu9gNRxZwsPKKZ5TC3ruG0D1FZv671qexWPtqJXuYilHMUk5Y5KPJ?=
+ =?us-ascii?Q?2GHtUQ4uPev5zgWLCI1JsScUyMfC9HzmGu5Lj6RrOVuCIU3W2I2IPxTMv5NB?=
+ =?us-ascii?Q?wEhWKQMxtjApvsM2F13YqUftSNxSWTqzlN0NU5H1mVHecw0uyZAKkgfbbVGI?=
+ =?us-ascii?Q?JmRaOjICTrPznQDxr8FBwXqHnGod0ZFckF3jHMQ/QfDOAafK8b9PAW7a5BOM?=
+ =?us-ascii?Q?2hwCGyuswHFgvDCekiw27f20GwCem+tmAIwNIrX2hGpu2E2QiCbKNFLmk3ZQ?=
+ =?us-ascii?Q?P5k7bO8smUEsFNMBh0Dudt0Dbl8w/5DVJD3W9ef2?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 78266ae7-0614-43ae-38c0-08db0e641625
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Feb 2023 08:18:43.3645
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Bv3e8AyNlzl4Jc1l40lSIkAEY7/Pf2JrIeaEkvfaG283eEqIeOakwe3NqmlLumZbtnYPZrLJlcqokdKsVfZZGQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB7509
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-While unplugging the vp_vdpa device, it triggers a kernel panic
-The root cause is: vdpa_mgmtdev_unregister() will accesses modern
-devices which will cause a use after free.
-So need to change the sequence in vp_vdpa_remove
+> From: Liu, Yi L <yi.l.liu@intel.com>
+> Sent: Monday, February 13, 2023 11:14 PM
+>=20
+> for counting the devices that are opened via the cdev path. This count
+> is increased and decreased by the cdev path. The group path checks it
+> to achieve exclusion with the cdev path. With this, only one path (group
+> path or cdev path) will claim DMA ownership. This avoids scenarios in
+> which devices within the same group may be opened via different paths.
 
-[  195.003359] BUG: unable to handle page fault for address: ff4e8beb80199014
-[  195.004012] #PF: supervisor read access in kernel mode
-[  195.004486] #PF: error_code(0x0000) - not-present page
-[  195.004960] PGD 100000067 P4D 1001b6067 PUD 1001b7067 PMD 1001b8067 PTE 0
-[  195.005578] Oops: 0000 1 PREEMPT SMP PTI
-[  195.005968] CPU: 13 PID: 164 Comm: kworker/u56:10 Kdump: loaded Not tainted 5.14.0-252.el9.x86_64 #1
-[  195.006792] Hardware name: Red Hat KVM/RHEL, BIOS edk2-20221207gitfff6d81270b5-2.el9 unknown
-[  195.007556] Workqueue: kacpi_hotplug acpi_hotplug_work_fn
-[  195.008059] RIP: 0010:ioread8+0x31/0x80
-[  195.008418] Code: 77 28 48 81 ff 00 00 01 00 76 0b 89 fa ec 0f b6 c0 c3 cc cc cc cc 8b 15 ad 72 93 01 b8 ff 00 00 00 85 d2 75 0f c3 cc cc cc cc <8a> 07 0f b6 c0 c3 cc cc cc cc 83 ea 01 48 83 ec 08 48 89 fe 48 c7
-[  195.010104] RSP: 0018:ff4e8beb8067bab8 EFLAGS: 00010292
-[  195.010584] RAX: ffffffffc05834a0 RBX: ffffffffc05843c0 RCX: ff4e8beb8067bae0
-[  195.011233] RDX: ff1bcbd580f88000 RSI: 0000000000000246 RDI: ff4e8beb80199014
-[  195.011881] RBP: ff1bcbd587e39000 R08: ffffffff916fa2d0 R09: ff4e8beb8067ba68
-[  195.012527] R10: 000000000000001c R11: 0000000000000000 R12: ff1bcbd5a3de9120
-[  195.013179] R13: ffffffffc062d000 R14: 0000000000000080 R15: ff1bcbe402bc7805
-[  195.013826] FS:  0000000000000000(0000) GS:ff1bcbe402740000(0000) knlGS:0000000000000000
-[  195.014564] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  195.015093] CR2: ff4e8beb80199014 CR3: 0000000107dea002 CR4: 0000000000771ee0
-[  195.015741] PKRU: 55555554
-[  195.016001] Call Trace:
-[  195.016233]  <TASK>
-[  195.016434]  vp_modern_get_status+0x12/0x20
-[  195.016823]  vp_vdpa_reset+0x1b/0x50 [vp_vdpa]
-[  195.017238]  virtio_vdpa_reset+0x3c/0x48 [virtio_vdpa]
-[  195.017709]  remove_vq_common+0x1f/0x3a0 [virtio_net]
-[  195.018178]  virtnet_remove+0x5d/0x70 [virtio_net]
-[  195.018618]  virtio_dev_remove+0x3d/0x90
-[  195.018986]  device_release_driver_internal+0x1aa/0x230
-[  195.019466]  bus_remove_device+0xd8/0x150
-[  195.019841]  device_del+0x18b/0x3f0
-[  195.020167]  ? kernfs_find_ns+0x35/0xd0
-[  195.020526]  device_unregister+0x13/0x60
-[  195.020894]  unregister_virtio_device+0x11/0x20
-[  195.021311]  device_release_driver_internal+0x1aa/0x230
-[  195.021790]  bus_remove_device+0xd8/0x150
-[  195.022162]  device_del+0x18b/0x3f0
-[  195.022487]  device_unregister+0x13/0x60
-[  195.022852]  ? vdpa_dev_remove+0x30/0x30 [vdpa]
-[  195.023270]  vp_vdpa_dev_del+0x12/0x20 [vp_vdpa]
-[  195.023694]  vdpa_match_remove+0x2b/0x40 [vdpa]
-[  195.024115]  bus_for_each_dev+0x78/0xc0
-[  195.024471]  vdpa_mgmtdev_unregister+0x65/0x80 [vdpa]
-[  195.024937]  vp_vdpa_remove+0x23/0x40 [vp_vdpa]
-[  195.025353]  pci_device_remove+0x36/0xa0
-[  195.025719]  device_release_driver_internal+0x1aa/0x230
-[  195.026201]  pci_stop_bus_device+0x6c/0x90
-[  195.026580]  pci_stop_and_remove_bus_device+0xe/0x20
-[  195.027039]  disable_slot+0x49/0x90
-[  195.027366]  acpiphp_disable_and_eject_slot+0x15/0x90
-[  195.027832]  hotplug_event+0xea/0x210
-[  195.028171]  ? hotplug_event+0x210/0x210
-[  195.028535]  acpiphp_hotplug_notify+0x22/0x80
-[  195.028942]  ? hotplug_event+0x210/0x210
-[  195.029303]  acpi_device_hotplug+0x8a/0x1d0
-[  195.029690]  acpi_hotplug_work_fn+0x1a/0x30
-[  195.030077]  process_one_work+0x1e8/0x3c0
-[  195.030451]  worker_thread+0x50/0x3b0
-[  195.030791]  ? rescuer_thread+0x3a0/0x3a0
-[  195.031165]  kthread+0xd9/0x100
-[  195.031459]  ? kthread_complete_and_exit+0x20/0x20
-[  195.031899]  ret_from_fork+0x22/0x30
-[  195.032233]  </TASK>
+please move vfio_device_claim/release_group() from patch 14 into
+this patch to make the exclusiveness part complete.
 
-Fixes: ffbda8e9df10 ("vdpa/vp_vdpa : add vdpa tool support in vp_vdpa")
-Tested-by: Lei Yang <leiyang@redhat.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Cindy Lu <lulu@redhat.com>
----
- drivers/vdpa/virtio_pci/vp_vdpa.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/vdpa/virtio_pci/vp_vdpa.c b/drivers/vdpa/virtio_pci/vp_vdpa.c
-index 8fe267ca3e76..281287fae89f 100644
---- a/drivers/vdpa/virtio_pci/vp_vdpa.c
-+++ b/drivers/vdpa/virtio_pci/vp_vdpa.c
-@@ -645,8 +645,8 @@ static void vp_vdpa_remove(struct pci_dev *pdev)
- 	struct virtio_pci_modern_device *mdev = NULL;
- 
- 	mdev = vp_vdpa_mgtdev->mdev;
--	vp_modern_remove(mdev);
- 	vdpa_mgmtdev_unregister(&vp_vdpa_mgtdev->mgtdev);
-+	vp_modern_remove(mdev);
- 	kfree(vp_vdpa_mgtdev->mgtdev.id_table);
- 	kfree(mdev);
- 	kfree(vp_vdpa_mgtdev);
--- 
-2.34.3
+>=20
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+>  drivers/vfio/group.c | 5 +++++
+>  drivers/vfio/vfio.h  | 1 +
+>  2 files changed, 6 insertions(+)
+>=20
+> diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
+> index 9f3f6f0e4942..f3f5f4589cdd 100644
+> --- a/drivers/vfio/group.c
+> +++ b/drivers/vfio/group.c
+> @@ -403,6 +403,11 @@ static int vfio_group_fops_open(struct inode *inode,
+> struct file *filep)
+>  		goto out_unlock;
+>  	}
+>=20
+> +	if (group->cdev_device_open_cnt) {
+> +		ret =3D -EBUSY;
+> +		goto out_unlock;
+> +	}
+> +
+>  	/*
+>  	 * Do we need multiple instances of the group open?  Seems not.
+>  	 */
+> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+> index 6f063e31d08a..7a77fb12bd2c 100644
+> --- a/drivers/vfio/vfio.h
+> +++ b/drivers/vfio/vfio.h
+> @@ -84,6 +84,7 @@ struct vfio_group {
+>  	struct blocking_notifier_head	notifier;
+>  	struct iommufd_ctx		*iommufd;
+>  	spinlock_t			kvm_ref_lock;
+> +	unsigned int			cdev_device_open_cnt;
+>  };
+>=20
+>  int vfio_device_set_group(struct vfio_device *device,
+> --
+> 2.34.1
 
