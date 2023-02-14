@@ -2,90 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 06577696D51
-	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 19:51:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 20465696E55
+	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 21:18:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232449AbjBNSvp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Feb 2023 13:51:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45306 "EHLO
+        id S231894AbjBNUSV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Feb 2023 15:18:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231515AbjBNSvo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Feb 2023 13:51:44 -0500
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E4874213
-        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 10:51:43 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-517f8be4b00so168353567b3.3
-        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 10:51:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CBABwlFNTWMj+OjkJm26ysoCCOBdecl6mEpKIPGdoU0=;
-        b=dJ82eLB/kuIvWdVkC/59SzpMuWdofWypOJfKy8sZBOyhrEZA+PC0dJ9W3iEddR3aMc
-         Lqd3Py6GYkRG/iI63g90bJs3wLGPib4ROQc5/t19/kWUZ48XCVSXUJAWn8xC0SZYh8M0
-         zGClqScCLvwyoxW0XwL2UE6DghdhJfdPxJ+iiXcYl9v2ubWyPnQD1DvIvGqLv9g12NKZ
-         muTvwj5ixhqxrBP7IyqorCFppNQ/iqfP/pYjsVdBj+A3R+PBKL6MGm3gWV+FVPSmhpyL
-         pI5bizntZQpmJEpoP20IraPbBOBL9+OZbFf6BF2az54lI1G1lCqXkOfxlbaoi2j8nNtC
-         UmJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CBABwlFNTWMj+OjkJm26ysoCCOBdecl6mEpKIPGdoU0=;
-        b=0crimj2jbrvJU4eSx4F44t1tdMZRPfsl1HrfntJ+nTwPZ9FCT27277bKu9jl9z9Yca
-         +49y9uBMHCIlo2MKT2oF0Zspbg7vou/6IK3XT3nK1d/lkHWN3TiSJVVwGgfUBHUJaVjQ
-         Yj5M4xbauI8v3rssx/eB+Ojr4OLcRVxdoEpFizNSOczxQIBQykA84nVssP5xJxnd8lCF
-         OiUj75DynIhT95dYFF8veUeUNRGarviRXTIoEhTAxAscig/X1ohX5lD3QjKDZD9HiZzQ
-         iuV4rX5dGKJFJLHqb6BJSC6qFieZ9g1toUwmB32fDGmiwxhR+oBrjy4PV6G1y+KQRAhU
-         tj8w==
-X-Gm-Message-State: AO0yUKWmPFx9tVuOf6ItED68iNbsFCvu1+wki63E/G5W2DqImo54BKuf
-        4YJnYWHWjrP+ySUS8EJpBrscKRaxpYM=
-X-Google-Smtp-Source: AK7set/SNZbRFHqvZ7ACMxDYON677YCI5I8pZlgQQujkfw+QOIWB6rggnifY3rIXZOpKoomJfrYdkIGlxWU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:6804:0:b0:527:1a01:964c with SMTP id
- d4-20020a816804000000b005271a01964cmr411317ywc.480.1676400702514; Tue, 14 Feb
- 2023 10:51:42 -0800 (PST)
-Date:   Tue, 14 Feb 2023 10:51:40 -0800
-In-Reply-To: <5771a4cb-4df7-e9a0-9e7e-9a116a40a411@gmail.com>
-Mime-Version: 1.0
-References: <20230210003148.2646712-1-seanjc@google.com> <20230210003148.2646712-4-seanjc@google.com>
- <5771a4cb-4df7-e9a0-9e7e-9a116a40a411@gmail.com>
-Message-ID: <Y+vYPDY82Z/7VBal@google.com>
-Subject: Re: [PATCH v2 03/21] KVM: x86: Add macros to track first...last VMX
- feature MSRs
-From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229848AbjBNUSU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Feb 2023 15:18:20 -0500
+Received: from out-125.mta0.migadu.com (out-125.mta0.migadu.com [91.218.175.125])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89BEA1DB8C
+        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 12:18:19 -0800 (PST)
+Date:   Tue, 14 Feb 2023 21:18:16 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1676405897;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=yuaj1zHJFoMRoJdDoO0Dzp8Y3jToLAkJ82554SZ8ZIU=;
+        b=k+3PkFmNUb/WlOGQkV+evZKnMssx18jo7IkQO+fxrPjU+xDmFDPA7JWw1WQ+po7wXixkQt
+        hBEy63+/7sbhUDkzm1uEaLoAtDizanAU425UCRaSQkqDzHQWbK9p3quzoLcegDzNtWYSDm
+        SEOMHzIMfB0GtfYBLrxjABItmm+F7TY=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Andrew Jones <andrew.jones@linux.dev>
+To:     Colton Lewis <coltonlewis@google.com>
+Cc:     thuth@redhat.com, pbonzini@redhat.com, nrb@linux.ibm.com,
+        imbrenda@linux.ibm.com, marcorr@google.com,
+        alexandru.elisei@arm.com, oliver.upton@linux.dev,
+        kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [kvm-unit-tests PATCH v5] arm: Replace MAX_SMP probe loop in
+ favor of reading directly
+Message-ID: <20230214201816.rhky4rn7kmvfuh75@orel>
+References: <20230207233256.3791424-1-coltonlewis@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230207233256.3791424-1-coltonlewis@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 14, 2023, Like Xu wrote:
-> On 10/2/2023 8:31 am, Sean Christopherson wrote:
-> > +/*
-> > + * The first...last VMX feature MSRs that are emulated by KVM.  This may or may
-> > + * not cover all known VMX MSRs, as KVM doesn't emulate an MSR until there's an
-> > + * associated feature that KVM supports for nested virtualization.
-> > + */
-> > +#define KVM_FIRST_EMULATED_VMX_MSR	MSR_IA32_VMX_BASIC
-> > +#define KVM_LAST_EMULATED_VMX_MSR	MSR_IA32_VMX_VMFUNC
+On Tue, Feb 07, 2023 at 11:32:56PM +0000, Colton Lewis wrote:
+> Replace the MAX_SMP probe loop in favor of reading a number directly
+> from the QEMU error message. This is equally safe as the existing code
+> because the error message has had the same format as long as it has
+> existed, since QEMU v2.10. The final number before the end of the
+> error message line indicates the max QEMU supports.
 > 
-> Off-topic, we now have "#define MSR_IA32_VMX_PROCBASED_CTLS3 0x00000492",
-> any further changes needed here if L2 guest needs IPI virtualization or why not ?
+> This loop logic is broken for machines with a number of CPUs that
+> isn't a power of two. This problem was noticed for gicv2 tests on
+> machines with a non-power-of-two number of CPUs greater than 8 because
+> tests were running with MAX_SMP less than 8. As a hypothetical example,
+> a machine with 12 CPUs will test with MAX_SMP=6 because 12 >> 1 ==
+> 6. This can, in rare circumstances, lead to different test results
+> depending only on the number of CPUs the machine has.
+> 
+> A previous comment explains the loop should only apply to kernels
+> <=v4.3 on arm and suggests deletion when it becomes tiresome to
+> maintain. However, it is always theoretically possible to test on a
+> machine that has more CPUs than QEMU supports, so it makes sense to
+> leave some check in place.
+> 
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> ---
+>  scripts/runtime.bash | 17 ++++++++---------
+>  1 file changed, 8 insertions(+), 9 deletions(-)
+> 
+> v5: Remove the last awk reference and guard the probing code with a
+> check that ARCH = arm or arm64.
+> 
+> v4: https://lore.kernel.org/kvm/20230201172110.1970980-1-coltonlewis@google.com/
+> 
+> v3: https://lore.kernel.org/kvm/20230130195700.729498-1-coltonlewis@google.com/
+> 
+> v2: https://lore.kernel.org/kvm/20230111215422.2153645-1-coltonlewis@google.com/
+> 
+> v1: https://lore.kernel.org/kvm/20221219185250.631503-1-coltonlewis@google.com/
+> 
+> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+> index f8794e9a..fb64e855 100644
+> --- a/scripts/runtime.bash
+> +++ b/scripts/runtime.bash
+> @@ -188,12 +188,11 @@ function run()
+>  # Probe for MAX_SMP, in case it's less than the number of host cpus.
+>  #
+>  # This probing currently only works for ARM, as x86 bails on another
+> -# error first. Also, this probing isn't necessary for any ARM hosts
+> -# running kernels later than v4.3, i.e. those including ef748917b52
+> -# "arm/arm64: KVM: Remove 'config KVM_ARM_MAX_VCPUS'". So, at some
+> -# point when maintaining the while loop gets too tiresome, we can
+> -# just remove it...
+> -while $RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
+> -		|& grep -qi 'exceeds max CPUs'; do
+> -	MAX_SMP=$((MAX_SMP >> 1))
+> -done
+> +# error first, so this check is only run for ARM and ARM64. The
+> +# parameter expansion takes the last number from the QEMU error
+> +# message, which gives the allowable MAX_SMP.
+> +if [ "${ARCH%64}" = arm ] && smp=$($RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
+> +      |& grep 'exceeds max CPUs'); then
+> +	smp=${smp##*(}
+> +	MAX_SMP=${smp:0:-1}
+> +fi
+> --
+> 2.39.1.519.gcb327c4b5f-goog
 
-If KVM exposes IPI virtualization, or any other feature that depends on tertiary
-controls, to L1, then yes this will need to be extended.  But that will naturally
-happen as part of any such enabling, otherwise userspace won't be able to do
-anything with L1's tertiary controls.
-
-As for supporting IPI virtualization for nested VMs, that's definitely future work.
-I haven't though about it too much, but I assume it's a similar story to AVIC where
-KVM would need to shadow L1's PID table.
+Applied, thanks
