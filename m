@@ -2,94 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A84A695AB0
-	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 08:33:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BC16695B65
+	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 08:56:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230259AbjBNHda (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Feb 2023 02:33:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41836 "EHLO
+        id S231598AbjBNH4g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Feb 2023 02:56:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229704AbjBNHd2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Feb 2023 02:33:28 -0500
-Received: from out-5.mta1.migadu.com (out-5.mta1.migadu.com [IPv6:2001:41d0:203:375::5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E9D812F18
-        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 23:33:27 -0800 (PST)
-Date:   Tue, 14 Feb 2023 07:33:19 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1676360005;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ad/et/OIgS8gRdWL64gbaVO61dCrO/Lf6mmXhJYxJZc=;
-        b=AGqkcIYhjtK3mjDdkr5sFTpnh+YoGyX8qgFC/ozYJ3DKUulZL0zLptH+Gz9uAnStY8sMmg
-        y6jWC3WIYleMGpT9ut/RuRARrCmQBXQT2+ER34QBj23OP7GCB1FX/XVb6J9/WKtqJH7rNM
-        tLB/XVn88PF/r9WzWftRIbFc72pPIn8=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Gavin Shan <gshan@redhat.com>
-Cc:     Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com,
-        maz@kernel.org, oupton@google.com, yuzenghui@huawei.com,
-        dmatlack@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        qperret@google.com, catalin.marinas@arm.com,
-        andrew.jones@linux.dev, seanjc@google.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        eric.auger@redhat.com, reijiw@google.com, rananta@google.com,
-        bgardon@google.com, ricarkol@gmail.com
-Subject: Re: [PATCH v2 00/12] Implement Eager Page Splitting for ARM.
-Message-ID: <Y+s5PwV1l60jXal1@linux.dev>
-References: <20230206165851.3106338-1-ricarkol@google.com>
- <1a3afa6d-3478-31dd-6f34-52075875c2fa@redhat.com>
+        with ESMTP id S231501AbjBNH4b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Feb 2023 02:56:31 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A22A21A17
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 23:56:10 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id oa11-20020a17090b1bcb00b002341a2656e5so3167847pjb.1
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 23:56:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=atishpatra.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=qelBQClw7mXq80SVJvQ3JIsOiducFvvsAUEKszfdTWI=;
+        b=Zjsnk3G1m3c2j2vBbWEw29s+tBSpeyW8l+mBJUemvwZ3ZIl3mAlMHMiMg5UmykQdgU
+         QXQRxZ/gY57Pg7TekPEUcPMnvtA3Y338kmwhxKOKiNC7KsEZ9lgXJYWfRaMX+wIRFCe5
+         xmv5uzQgyI0T25jmd4sjvlc52XI/mhrlH7U9Q=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qelBQClw7mXq80SVJvQ3JIsOiducFvvsAUEKszfdTWI=;
+        b=s5zDJHP2XwBKu3qcid2Uji9zFEd6OoNA/9e2BAdg0MvniMzyU9KY09D8hYs/e2u6ff
+         92oHSg3U2whqkX29QY6IjTK91AO8k7jkCVCT56Vi0/o2AC4Si9Dr3v+z0pLSZkmmdEtk
+         inw+O+rqg/gLmLXpDp2dnZNVxKBAel+SsXh0bqyz1bJo+OdS6Im1iwXg11i1pcYWYnf8
+         DoKqmYKlebDvrDClUS6HQXu3Z/R32mSlVjfIcjQJYzN3fDZNlwanYaK02XB49nMvzwNI
+         2IoFYGCB5B3pIOkFVjhE5xnr5HRThxCZyveFt44QqH7I2jlIT6Rnb8lXWJ0Ij4AY1MNs
+         Sd9g==
+X-Gm-Message-State: AO0yUKVrYEgcTiHM44pyYpdEabzI1TuJPmojqHY06/9DkD9g/RH7l/nF
+        mI+bpL+lkPEVB8d1qYswhDPJ2qjPchU6xV63xMv9zsPDnWaK
+X-Google-Smtp-Source: AK7set83Sbzb8jCkDb4xrCrdqGGfaYuMy9wt+/YQodEHLIM55YAQJY9anSobjjDFMQ5cSu0tBC593mHUT8KAO6pp7Bk=
+X-Received: by 2002:a17:90a:3b08:b0:230:88c4:a922 with SMTP id
+ d8-20020a17090a3b0800b0023088c4a922mr193163pjc.103.1676361369599; Mon, 13 Feb
+ 2023 23:56:09 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1a3afa6d-3478-31dd-6f34-52075875c2fa@redhat.com>
-X-Migadu-Flow: FLOW_OUT
+References: <20230210142711.1177212-1-rkanwal@rivosinc.com>
+In-Reply-To: <20230210142711.1177212-1-rkanwal@rivosinc.com>
+From:   Atish Patra <atishp@atishpatra.org>
+Date:   Mon, 13 Feb 2023 23:55:58 -0800
+Message-ID: <CAOnJCU+i63tk8kthtqWB09av7GQJcCrgYipqMJv+XPeLtOF90g@mail.gmail.com>
+Subject: Re: [PATCH v2 1/1] riscv/kvm: Fix VM hang in case of timer delta
+ being zero.
+To:     Rajnesh Kanwal <rkanwal@rivosinc.com>
+Cc:     anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Gavin,
+On Fri, Feb 10, 2023 at 6:27 AM Rajnesh Kanwal <rkanwal@rivosinc.com> wrote:
+>
+> In case when VCPU is blocked due to WFI, we schedule the timer
+> from `kvm_riscv_vcpu_timer_blocking()` to keep timer interrupt
+> ticking.
+>
+> But in case when delta_ns comes to be zero, we never schedule
+> the timer and VCPU keeps sleeping indefinitely until any activity
+> is done with VM console.
+>
+> This is easily reproduce-able using kvmtool.
+> ./lkvm-static run -c1 --console virtio -p "earlycon root=/dev/vda" \
+>          -k ./Image -d rootfs.ext4
+>
+> Also, just add a print in kvm_riscv_vcpu_vstimer_expired() to
+> check the interrupt delivery and run `top` or similar auto-upating
+> cmd from guest. Within sometime one can notice that print from
+> timer expiry routine stops and the `top` cmd output will stop
+> updating.
+>
+> This change fixes this by making sure we schedule the timer even
+> with delta_ns being zero to bring the VCPU out of sleep immediately.
+>
+> Fixes: 8f5cb44b1bae ("RISC-V: KVM: Support sstc extension")
+> Signed-off-by: Rajnesh Kanwal <rkanwal@rivosinc.com>
+> ---
+> v2: Added Fixes tag in commit message.
+>
+> v1: https://lore.kernel.org/all/20230210135136.1115213-1-rkanwal@rivosinc.com/
+>
+>  arch/riscv/kvm/vcpu_timer.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+>
+> diff --git a/arch/riscv/kvm/vcpu_timer.c b/arch/riscv/kvm/vcpu_timer.c
+> index ad34519c8a13..3ac2ff6a65da 100644
+> --- a/arch/riscv/kvm/vcpu_timer.c
+> +++ b/arch/riscv/kvm/vcpu_timer.c
+> @@ -147,10 +147,8 @@ static void kvm_riscv_vcpu_timer_blocking(struct kvm_vcpu *vcpu)
+>                 return;
+>
+>         delta_ns = kvm_riscv_delta_cycles2ns(t->next_cycles, gt, t);
+> -       if (delta_ns) {
+> -               hrtimer_start(&t->hrt, ktime_set(0, delta_ns), HRTIMER_MODE_REL);
+> -               t->next_set = true;
+> -       }
+> +       hrtimer_start(&t->hrt, ktime_set(0, delta_ns), HRTIMER_MODE_REL);
+> +       t->next_set = true;
+>  }
+>
+>  static void kvm_riscv_vcpu_timer_unblocking(struct kvm_vcpu *vcpu)
+> --
+> 2.25.1
+>
 
-On Tue, Feb 14, 2023 at 04:57:59PM +1100, Gavin Shan wrote:
-> On 2/7/23 3:58 AM, Ricardo Koller wrote:
 
-<snip>
-
-> > Eager Page Splitting fixes the above two issues by eagerly splitting
-> > huge-pages when enabling dirty logging. The goal is to avoid doing it
-> > while faulting on write-protected pages.
-
-</snip>
-
-> I'm not sure why we can't eagerly split the PMD mapping into 512 PTE
-> mapping in the page fault handler?
-
-The entire goal of the series is to avoid page splitting at all on the
-stage-2 abort path. Ideally we want to minimize the time taken to handle
-a fault so we can get back to running the guest. The requirement to
-perform a break-before-make operation to change the mapping granularity
-can, as Ricardo points out, be a bottleneck on contemporary implementations.
-
-There is a clear uplift with the proposed implementation already, and I
-would expect that margin to widen if/when we add support for lockless
-(i.e. RCU-protected) permission relaxation.
-
-> In the implementation, the newly introduced API
-> kvm_pgtable_stage2_split() calls to kvm_pgtable_stage2_create_unlinked()
-> and then stage2_map_walker(), which is part of kvm_pgtable_stage2_map(),
-> to create the unlinked page tables.
-
-This is deliberate code reuse. Page table construction in the fault path
-is largely similar to that of eager split besides the fact that one is
-working on 'live' page tables whereas the other is not. As such I gave
-the suggestion to Ricardo to reuse what we have today for the sake of
-eager splitting.
-
+Reviewed-by: Atish Patra <atishp@rivosinc.com>
 -- 
-Thanks,
-Oliver
+Regards,
+Atish
