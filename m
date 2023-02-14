@@ -2,111 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 73CF5696C5A
-	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 19:07:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C1F68696C62
+	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 19:07:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232363AbjBNSHI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Feb 2023 13:07:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37572 "EHLO
+        id S232098AbjBNSHu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Feb 2023 13:07:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233274AbjBNSHF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Feb 2023 13:07:05 -0500
-Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF1822ED7A;
-        Tue, 14 Feb 2023 10:07:02 -0800 (PST)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailout.nyi.internal (Postfix) with ESMTP id 79EA05C0154;
-        Tue, 14 Feb 2023 13:07:00 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute5.internal (MEProxy); Tue, 14 Feb 2023 13:07:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
-        :cc:content-type:date:date:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to; s=fm1; t=1676398020; x=1676484420; bh=2vEumOitJz
-        p7mZeo1LyjVeDNF3glQyrVaaSOFva2+jo=; b=bFVpBUrR4iEbsG5houHxYRNTCu
-        jmCOo7eZjnUgh8m0vrHwfxjK33uxIeie8FWg8pWmd8iMhrtU3czvG6rVxCJrQA3N
-        +LZC9PeqjlGbTC0uF0yyD+jdxOWpC5gZKL10JJ5GzTAxT6xd3uo9qFem89/vK5aR
-        hcf+v8BtfInn+DMtlHbTwfPilPF0/pkpLX7/2+HOyV9mM3rbfZct95jx2f+hPHWo
-        SYe+mcDa3fm8MYLeDkpXtZx91iK6bdgV7PpCGJkLPJwTmWJ+bh10IxPZsBm8Uhob
-        f/j6rDm3W59kkFXu2GckxPNnA3mzWNRHAKoAB+1mQ92KTW5+SA2e5D124/AQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm1; t=1676398020; x=1676484420; bh=2vEumOitJzp7mZeo1LyjVeDNF3gl
-        QyrVaaSOFva2+jo=; b=iac1zJ7mZan6Y03ZbbcPHZh0C15vYgllxFOYxRFGKPvN
-        6lLcAl1uOxsJLBjcM4AcqGkG0m/0ERFve11tyS8tbUMXQZazUt9SYPZaUFlaUDZ9
-        1y1PMUtQ7sjNpI9n/RBEyT0yLM24w00aRwmsSqQC2UWtAKQB0m/neuD3ZAxBoyI3
-        v4kwQiF8f/Yf2JtAJtzH2nBtG+anV2OAGjGEI4ayhWghhcDCBNWXZ+kPVTzEInO5
-        dk8xJQB6NYlAkxqXPzIc41RM5nDHfzVBnuw7tLBc0gw+/UwCBYgGKt4Lv5FY1bHI
-        RKtWxjvIWk8mcflPpVesDmL6SmgKsY9z9t1ndWKI8g==
-X-ME-Sender: <xms:xM3rY4tQhTZs5gbxt56m7DBJb-zJi35Uev-MtpoktAsh6vLTGumkkA>
-    <xme:xM3rY1dJOg85g7VjSgPQqTSd_coZCcMwasHSp24fe8Q2yulZ-vldG2mW7hvkXX184
-    t6fAOaMGKoVTw>
-X-ME-Received: <xmr:xM3rYzy8Sd_lO1mlEfJ07L0vYpG80MQSFWcUD_ECVu0b9cS_xrLV-kCL1Za1Hl-YY3qkNFbNuf4uMPQ0KhDi56XovHL8UrSYSgTdfA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrudeifedguddttdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefirhgv
-    ghcumffjuceoghhrvghgsehkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpeehge
-    dvvedvleejuefgtdduudfhkeeltdeihfevjeekjeeuhfdtueefhffgheekteenucevlhhu
-    shhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehgrhgvgheskhhroh
-    grhhdrtghomh
-X-ME-Proxy: <xmx:xM3rY7N5tiVbS4pdhfOTudq-jnlRa5UiCWh5YzeSaham3bpxDLhDiQ>
-    <xmx:xM3rY49nUKeu5uT6_tBpUUccHZ8Lm_2UHKvf2lDPDjdKv7E--VHDsg>
-    <xmx:xM3rYzUuAXV-7nZA62dnGpNWZ5uk4qEpNAy_apzSQZNm2fqP3wOVtg>
-    <xmx:xM3rY8QrEEjqEC9r_4_3puj3emhNA-zgfx0YROy7hgmgR-wW5sAI7w>
-Feedback-ID: i787e41f1:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 14 Feb 2023 13:06:59 -0500 (EST)
-Date:   Tue, 14 Feb 2023 19:06:51 +0100
-From:   Greg KH <greg@kroah.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        stable@vger.kernel.org, thomas.lendacky@amd.com
-Subject: Re: [PATCH for-5.15 0/3] Cross-Thread Return Address Predictions
- vulnerability
-Message-ID: <Y+vNu+vaxPFN8Sy7@kroah.com>
-References: <20230214170956.1297309-1-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230214170956.1297309-1-pbonzini@redhat.com>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S233277AbjBNSHr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Feb 2023 13:07:47 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77AEB2FCE5
+        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 10:07:30 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id v63-20020a254842000000b008f257b16d71so12838578yba.15
+        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 10:07:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wX05IVkHj3QBCA1mIon81shk3MJEJQ/4hz193u4oHCc=;
+        b=Dt+QCXEL/j2OVlYZG+8qwoo88m8d8gSqPp1DJoQ+IGJpPuoZGZ7SYYDdYB8+yJ3eDl
+         jeP6IZHDHerpXSU/A3lwaLOqhRFKoFsgEci4P2KArqSNVmooBA2C7+kM9EYWXXJTyLae
+         Xg1dZ+EziJ8yGcFploTgi9FMPrPslHsMYXReHQVo9CBAaIj0P6zc7wVMCM6iWLSQwSfv
+         rIpX9OdI9ocknhGSMghX+77PCRzZY4cpQYWxW05GrdrgU5xkG+PmVmF6RvgPoyIDvsRh
+         kG8ONtGxcufDvuzLkSW/HaWjLqmZO3eUfiS87W6x7qkvY49eByyFST1j571DlgUotIiS
+         /nZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wX05IVkHj3QBCA1mIon81shk3MJEJQ/4hz193u4oHCc=;
+        b=QZIyY2B60r342EYTJgc2kS58BNcKql6e2Ndgybe0JTJnOjMj1L3UmMZhIcGPq8ZCG5
+         DpNd4f4G9n118UCwZ6qsMFyIZmnxDgpDGKcncfuf1xWDN/1aZrVTtxqSrKj/s2DhW8Qh
+         OwQ377zoL6mrPnnps+C8vTBfg6eCib77Vcy23J5WFFuRI0SETHS4zUwmTahsVzoc9+B0
+         b0CryOqvuPdC3ZkyE801xSLFisYJszeA7vWUEHnFVq8+L7VfNkqkhThop8d9rThdTla1
+         GEaIM/L00WNu+5hg+HGEg45y4KuffUVslvBG4vd3xtwRJfyhXVmQWCn+chDQZW1JNaGo
+         71SQ==
+X-Gm-Message-State: AO0yUKVzLiL+WuZfl0WfPgdo7TyGs/CfObiFtgvtDUMGeHH04okqlkoq
+        tGbKZtZfbpBkgr7AU4J9thEKRWIbQA8=
+X-Google-Smtp-Source: AK7set+EI7pNBbm5Gukj5zYQbLZVnpf4V0D4zMPyPaLWe/aBZALXoW94wxCwwjPKImE/Ubi3qEmpRmHjMf0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:dd0a:0:b0:52a:9490:4f66 with SMTP id
+ e10-20020a81dd0a000000b0052a94904f66mr350779ywn.56.1676398049608; Tue, 14 Feb
+ 2023 10:07:29 -0800 (PST)
+Date:   Tue, 14 Feb 2023 10:07:28 -0800
+In-Reply-To: <20230213235343.GC4175971@ls.amr.corp.intel.com>
+Mime-Version: 1.0
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+ <20221202061347.1070246-3-chao.p.peng@linux.intel.com> <20230209072529.GB4175971@ls.amr.corp.intel.com>
+ <Y+WRUriIoan/XChx@google.com> <20230213235343.GC4175971@ls.amr.corp.intel.com>
+Message-ID: <Y+vN4L3N6f3fFlgA@google.com>
+Subject: Re: [PATCH v10 2/9] KVM: Introduce per-page memory attributes
+From:   Sean Christopherson <seanjc@google.com>
+To:     Isaku Yamahata <isaku.yamahata@gmail.com>
+Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        wei.w.wang@intel.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 14, 2023 at 12:09:53PM -0500, Paolo Bonzini wrote:
-> Certain AMD processors are vulnerable to a cross-thread return address
-> predictions bug. When running in SMT mode and one of the sibling threads
-> transitions out of C0 state, the other thread gets access to twice as many
-> entries in the RSB, but unfortunately the predictions of the now-halted
-> logical processor are not purged.  Therefore, the executing processor
-> could speculatively execute from locations that the now-halted processor
-> had trained the RSB on.
+On Mon, Feb 13, 2023, Isaku Yamahata wrote:
+> On Fri, Feb 10, 2023 at 12:35:30AM +0000,
+> Sean Christopherson <seanjc@google.com> wrote:
 > 
-> The Spectre v2 mitigations cover the Linux kernel, as it fills the RSB
-> when context switching to the idle thread. However, KVM allows a VMM to
-> prevent exiting guest mode when transitioning out of C0 using the
-> KVM_CAP_X86_DISABLE_EXITS capability can be used by a VMM to change this
-> behavior. To mitigate the cross-thread return address predictions bug,
-> a VMM must not be allowed to override the default behavior to intercept
-> C0 transitions.
+> > On Wed, Feb 08, 2023, Isaku Yamahata wrote:
+> > > On Fri, Dec 02, 2022 at 02:13:40PM +0800,
+> > > Chao Peng <chao.p.peng@linux.intel.com> wrote:
+> > > 
+> > > > +static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
+> > > > +					   struct kvm_memory_attributes *attrs)
+> > > > +{
+> > > > +	gfn_t start, end;
+> > > > +	unsigned long i;
+> > > > +	void *entry;
+> > > > +	u64 supported_attrs = kvm_supported_mem_attributes(kvm);
+> > > > +
+> > > > +	/* flags is currently not used. */
+> > > > +	if (attrs->flags)
+> > > > +		return -EINVAL;
+> > > > +	if (attrs->attributes & ~supported_attrs)
+> > > > +		return -EINVAL;
+> > > > +	if (attrs->size == 0 || attrs->address + attrs->size < attrs->address)
+> > > > +		return -EINVAL;
+> > > > +	if (!PAGE_ALIGNED(attrs->address) || !PAGE_ALIGNED(attrs->size))
+> > > > +		return -EINVAL;
+> > > > +
+> > > > +	start = attrs->address >> PAGE_SHIFT;
+> > > > +	end = (attrs->address + attrs->size - 1 + PAGE_SIZE) >> PAGE_SHIFT;
+> > > > +
+> > > > +	entry = attrs->attributes ? xa_mk_value(attrs->attributes) : NULL;
+> > > > +
+> > > > +	mutex_lock(&kvm->lock);
+> > > > +	for (i = start; i < end; i++)
+> > > > +		if (xa_err(xa_store(&kvm->mem_attr_array, i, entry,
+> > > > +				    GFP_KERNEL_ACCOUNT)))
+> > > > +			break;
+> > > > +	mutex_unlock(&kvm->lock);
+> > > > +
+> > > > +	attrs->address = i << PAGE_SHIFT;
+> > > > +	attrs->size = (end - i) << PAGE_SHIFT;
+> > > > +
+> > > > +	return 0;
+> > > > +}
+> > > > +#endif /* CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES */
+> > > > +
+> > > 
+> > > If memslot isn't private, it should return error if private attribute is set.
+> > 
+> > Why?  I'd rather keep the two things separate.  If we enforce this sort of thing
+> > at KVM_SET_MEMORY_ATTRIBUTES, then we also have to enforce it at
+> > KVM_SET_USER_MEMORY_REGION.
 > 
-> These patches introduce a KVM module parameter that, if set, will prevent
-> the user from disabling the HLT, MWAIT and CSTATE exits.
-> 
-> The patches apply to the 5.15 stable tree, and Greg has already received
-> them through a git bundle.  The difference is only in context, but it is
-> too much for "git cherry-pick" so here they are.
+> For device assignment via shared GPA, non-private memory slot needs to be
+> allowed.
 
-Thanks for these, all now queued up.
-
-greg k-h
+That doesn't say anything about why setting attributes needs to poke into the
+memslot.  The page fault path already kicks out to userspace if there's a
+discrepancy between the attributes and the memslot, why is that insufficient?
