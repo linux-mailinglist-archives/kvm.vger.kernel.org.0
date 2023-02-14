@@ -2,73 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C80B69620A
-	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 12:10:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D333769628D
+	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 12:39:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232269AbjBNLKY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Feb 2023 06:10:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51716 "EHLO
+        id S231909AbjBNLjW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Feb 2023 06:39:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233038AbjBNLKC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Feb 2023 06:10:02 -0500
-Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F37AA29152;
-        Tue, 14 Feb 2023 03:09:07 -0800 (PST)
-Received: by mail-il1-x129.google.com with SMTP id v6so1190130ilc.10;
-        Tue, 14 Feb 2023 03:09:07 -0800 (PST)
+        with ESMTP id S229727AbjBNLjV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Feb 2023 06:39:21 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA0D0233C8;
+        Tue, 14 Feb 2023 03:39:15 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id w20-20020a17090a8a1400b00233d7314c1cso7413174pjn.5;
+        Tue, 14 Feb 2023 03:39:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1676372921;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WGrMblQl+955iRmU6iG0PllpzKpANHBobzyPai6DG8o=;
-        b=haMj9w5pbQvjO8Vlxzzte9DDC9GpDeShCKTJCoYtJ+OokvKNKypbsKmjuLLjkhb7GI
-         oIcRY7jcdmwxXmnzN0+MzQ1sH2pURRuvnzP0zUwHvEt6ufqJPXFcegmf/2npxbq7T4fL
-         q7NXQrzUyADaD+NJOq6JnpbzNYUF+2dwEaR2NnjfZuZPWNy7Z8IcLPqCq9WGD7CrnUJF
-         eFzmTsbJV041Tx7tpuF2fszVznTzMudAHQgg6MpAS6p90O2Y8gX+GaSyzjMtIGwV29j4
-         6zorARjocSUqTcHRQUIbwxBcNNaN+sikxD1FshMm21y+yLOZoDiMJw5uk1keBQqNsUoR
-         pQdQ==
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/Y57F08pUra92blWcIk+PqGFgFXQ01NHbnCF22kLkSc=;
+        b=R9RRplBng8KHI9xyWdPmB2r7QLviyH7cRO3oyxS8roXx7HrOwCo8jS0wCmIXhWCDKj
+         mQaD6JoyrdqPF+ROb3FQ+EdRABjucoD7VucMW+XLWz0B6106BD1mV3PFH+MA0FhASEkC
+         ojrfiDZUT55ms9YSAMy701AvkOQCm2nD9YOZ+L9wKgA33ulamD8DATFV6mwR7XMd+VpK
+         ppZDa+IKYMCECKuHR8pA1pocJKrvnuhNH/ver/NryWXmqHDloUR0bHR+pNkkoO9HlEi4
+         ib0JmMUlDpfC7sQfG3LLsHSPFgAfl/vCEu5q++dMrKG4f2LxDsO/7ObU/5XVkQVSK6kr
+         6MUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1676372921;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WGrMblQl+955iRmU6iG0PllpzKpANHBobzyPai6DG8o=;
-        b=474FM3AChaVFeJko0eQllI6+w42JEaOJeJTqslNzkMZU4ulHf0/qNHsqMJ9S3xLDPg
-         COQT+hXRq7aR2bAJZhkH8Eybo7X3Q7bIbcty8Bw4iuQiLyhfGU0mJXEDAbNvzwTZ29u/
-         13Jr9wNmlqCy07EoyLoXPcvmmokS/mNptmeFsYqw34vV4MPjjkjdQ6herumB+DBcyMqt
-         Ytbkps5HWAFYKYyt8dENo77MO5Vld1KbQteGkDQRfFtHKYnYYwIg0x1D20JDDbIyDF7F
-         GqFqEesOgMdNqBz0PA1HFFvhK2TuJrStIciDDxYIC4dF9ZBg2DCHNA1jeWKnupk4j7lo
-         rDoA==
-X-Gm-Message-State: AO0yUKU5j2Et1ZoI5pbWTSUdTUMMMKY99gmOEtgBlPJa81d2KHqohe50
-        rc/nQ6nU+LwHKju1J8De0CF8DSL0rvencYF0
-X-Google-Smtp-Source: AK7set8lreR90YGHkocJi+2Z7DJYf93rMLfY4KYkUTtHYUZ05AvDz1aQ58QpjMZXIjBdXjHwL0P1/w==
-X-Received: by 2002:a92:c007:0:b0:314:115d:afa2 with SMTP id q7-20020a92c007000000b00314115dafa2mr1468604ild.0.1676372921586;
-        Tue, 14 Feb 2023 03:08:41 -0800 (PST)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id x9-20020a02ac89000000b003a484df1652sm4463423jan.55.2023.02.14.03.08.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Feb 2023 03:08:41 -0800 (PST)
-Date:   Tue, 14 Feb 2023 13:08:36 +0200
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-To:     Mathias Krause <minipli@grsecurity.net>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v3 4/6] KVM: x86: Make use of kvm_read_cr*_bits() when
- testing bits
-Message-ID: <20230214130836.00005d2a@gmail.com>
-In-Reply-To: <4b4f845e-b92e-778c-db69-4d6fa9d64811@grsecurity.net>
-References: <20230201194604.11135-1-minipli@grsecurity.net>
-        <20230201194604.11135-5-minipli@grsecurity.net>
-        <20230207150535.00004453@gmail.com>
-        <4b4f845e-b92e-778c-db69-4d6fa9d64811@grsecurity.net>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/Y57F08pUra92blWcIk+PqGFgFXQ01NHbnCF22kLkSc=;
+        b=YPjO9q2K8XQHzEdX8iJLJ3cZgWGRwuXtw3v4TLZNQnQV+6pBQOVkkE9oRs0ftF193b
+         61/Bd/eJht1/TvOB98qU8nLy9HCplwKy2rUIqa8KGasylRaaztETiE1jbOhBEHuUDytG
+         7dP6MuuoTSjDxmO9fAVUr0uOFpTsm7wB9eHQYlMCZ/1g5jMnJ7ZF4Av4VuQZ9XkfenC1
+         uOX7nW6HuvFnRAyluxiJ36EdfsKpV5Sh9TQhLDFq/kV4oizksoVXRs3DUrT4b5dZOQby
+         F32BjCzT/uEDF+y3gPheIeA/ddREL2NGItrTydUA5aQRa63fjipcQZDzrE628AawtG1X
+         8mXA==
+X-Gm-Message-State: AO0yUKVAtHXZIA8D6U1qoKrJO5EgnIDTT+UEnmCtS9kyUdoeBfn6BOv/
+        3uQMUQnRtULgM6ErH0aBi/ROOEebVigXU7F9z7Q=
+X-Google-Smtp-Source: AK7set/QyO0+U3as6lA7xWgRlSxgkKZjw7IDHpaF3AS0Sn1LZun9am32Kc6+S4OZQNg3zWyOOCdtWg==
+X-Received: by 2002:a05:6a20:b91b:b0:bf:58d1:ce99 with SMTP id fe27-20020a056a20b91b00b000bf58d1ce99mr14877930pzb.24.1676374755150;
+        Tue, 14 Feb 2023 03:39:15 -0800 (PST)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id t1-20020a63b701000000b004fb5704f19bsm7381770pgf.31.2023.02.14.03.39.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Feb 2023 03:39:14 -0800 (PST)
+Message-ID: <4f0d03de-4372-2472-ef59-e80bb3aa7703@gmail.com>
+Date:   Tue, 14 Feb 2023 19:39:07 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.7.2
+Subject: Re: [PATCH v2 05/21] KVM: x86: Disallow writes to immutable feature
+ MSRs after KVM_RUN
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20230210003148.2646712-1-seanjc@google.com>
+ <20230210003148.2646712-6-seanjc@google.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <20230210003148.2646712-6-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -77,174 +76,94 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 8 Feb 2023 10:11:30 +0100
-Mathias Krause <minipli@grsecurity.net> wrote:
+On 10/2/2023 8:31 am, Sean Christopherson wrote:
+> Disallow writes to feature MSRs after KVM_RUN to prevent userspace from
+> changing the vCPU model after running the vCPU.  Similar to guest CPUID,
+> KVM uses feature MSRs to configure intercepts, determine what operations
+> are/aren't allowed, etc.  Changing the capabilities while the vCPU is
+> active will at best yield unpredictable guest behavior, and at worst
+> could be dangerous to KVM.
+> 
+> Allow writing the current value, e.g. so that userspace can blindly set
+> all MSRs when emulating RESET, and unconditionally allow writes to
+> MSR_IA32_UCODE_REV so that userspace can emulate patch loads.
+> 
+> Special case the VMX MSRs to keep the generic list small, i.e. so that
+> KVM can do a linear walk of the generic list without incurring meaningful
+> overhead.
+> 
+> Cc: Like Xu <like.xu.linux@gmail.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/x86/kvm/x86.c | 36 ++++++++++++++++++++++++++++++++++++
+>   1 file changed, 36 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 7b73a0b45041..186cb6a81643 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1554,6 +1554,25 @@ static u32 msr_based_features[ARRAY_SIZE(msr_based_features_all_except_vmx) +
+>   			      (KVM_LAST_EMULATED_VMX_MSR - KVM_FIRST_EMULATED_VMX_MSR + 1)];
+>   static unsigned int num_msr_based_features;
+>   
+> +/*
+> + * All feature MSRs except uCode revID, which tracks the currently loaded uCode
+> + * patch, are immutable once the vCPU model is defined.
+> + */
+> +static bool kvm_is_immutable_feature_msr(u32 msr)
+> +{
+> +	int i;
+> +
+> +	if (msr >= KVM_FIRST_EMULATED_VMX_MSR && msr <= KVM_LAST_EMULATED_VMX_MSR)
+> +		return true;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(msr_based_features_all_except_vmx); i++) {
+> +		if (msr == msr_based_features_all_except_vmx[i])
+> +			return msr != MSR_IA32_UCODE_REV;
+> +	}
+> +
+> +	return false;
+> +}
+> +
+>   /*
+>    * Some IA32_ARCH_CAPABILITIES bits have dependencies on MSRs that KVM
+>    * does not yet virtualize. These include:
+> @@ -2168,6 +2187,23 @@ static int do_get_msr(struct kvm_vcpu *vcpu, unsigned index, u64 *data)
+>   
+>   static int do_set_msr(struct kvm_vcpu *vcpu, unsigned index, u64 *data)
+>   {
+> +	u64 val;
+> +
+> +	/*
+> +	 * Disallow writes to immutable feature MSRs after KVM_RUN.  KVM does
+> +	 * not support modifying the guest vCPU model on the fly, e.g. changing
+> +	 * the nVMX capabilities while L2 is running is nonsensical.  Ignore
+> +	 * writes of the same value, e.g. to allow userspace to blindly stuff
+> +	 * all MSRs when emulating RESET.
+> +	 */
+> +	if (vcpu->arch.last_vmentry_cpu != -1 &&
 
-> On 07.02.23 14:05, Zhi Wang wrote:
-> > On Wed,  1 Feb 2023 20:46:02 +0100
-> > Mathias Krause <minipli@grsecurity.net> wrote:
-> >   
-> >> Make use of the kvm_read_cr{0,4}_bits() helper functions when we only
-> >> want to know the state of certain bits instead of the whole register.
-> >>
-> >> This not only makes the intend cleaner, it also avoids a VMREAD in case  
->                            ~~~~~~
-> Oh, this should have been "intent". Will fix in v4, if there's a need for.
-> 
-> >> the tested bits aren't guest owned.  
-> >                     ^
-> > The patch comment is a little confusing. Not sure if I misunderstood here:  
-> 
-> Sorry, lets try to clarify.
-> 
-> > Check the code of kvm_read_cr0_bits
-> > 
-> > static inline ulong kvm_read_cr0_bits(struct kvm_vcpu *vcpu, ulong mask)
-> > {
-> >         ulong tmask = mask & KVM_POSSIBLE_CR0_GUEST_BITS;
-> >         if ((tmask & vcpu->arch.cr0_guest_owned_bits) &&
-> >             !kvm_register_is_available(vcpu, VCPU_EXREG_CR0))
-> >                 static_call(kvm_x86_cache_reg)(vcpu, VCPU_EXREG_CR0);
-> >         return vcpu->arch.cr0 & mask;
-> > }
-> > 
-> > I suppose the conditions that can avoids a VMREAD is to avoid the vmread in
-> > static_call(kvm_x86_cache_reg):  
-> 
-> Correct, that's what this patch is trying to do: It tries to avoid the
-> static_call(kvm_x86_cache_reg)(...) by making the compiler aware of the
-> actually used bits in 'mask'. If those don't intersect with the guest
-> owned bits, the first part of the condition wont be true and we simply
-> can make use of 'vcpu->arch.cr0'.
-> 
-> Maybe it gets clearer when looking at kvm_read_cr0() too which is just this:
-> 
-> static inline ulong kvm_read_cr0(struct kvm_vcpu *vcpu)
-> {
->     return kvm_read_cr0_bits(vcpu, ~0UL);
-> }
-> 
-> So the 'mask' passed to kvm_read_cr0_bits() will always include all
-> (possible) guest owned bits (KVM_POSSIBLE_CR0_GUEST_BITS & ~0UL ==
-> KVM_POSSIBLE_CR0_GUEST_BITS) and the compiler cannot do the optimization
-> mentioned above.
-> 
-> If we, however, use kvm_read_cr0_bits(..., MASK) directly instead of
-> using kvm_read_cr0() & MASK, it can, like for all bits not in
-> KVM_POSSIBLE_CR0_GUEST_BITS & vcpu->arch.cr0_guest_owned_bits.
-> 
-> > Conditions are not triggering vmread:
-> > 
-> > 1) The test bits are guest_owned_bits and cache register is available.
-> > 2) The test bits are *not* guest_owned bits.  
-> 
-> For case 1 the patch would make only a minor difference, by concluding
-> earlier that it can simply make use of vcpu->arch.cr0. But it's case 2
-> I'm after.
->
+Three concerns on my mind (to help you think more if any):
+- why not using kvm->created_vcpus;
 
-Thanks for the explanation. Now I got it. 
- 
-> If you look up KVM_POSSIBLE_CR0_GUEST_BITS, which is the upper bound for
-> guest owned CR0 bits, you'll find before patch 6:
-> 
-> #define KVM_POSSIBLE_CR0_GUEST_BITS X86_CR0_TS
-> 
-> and after patch 6:
-> 
-> #define KVM_LAZY_CR0_GUEST_BITS     X86_CR0_WP
-> #define KVM_POSSIBLE_CR0_GUEST_BITS (X86_CR0_TS|KVM_LAZY_CR0_GUEST_BITS)
-> 
-> So the upper bound would be 'X86_CR0_TS|X86_CR0_WP'. Every bit outside
-> that set can directly be read from the 'vcpu' cached register value and
-> that's (mostly) the case for the users this patch is changing, see below.
-> 
-> > I agree that this makes the intend cleaner, but not sure the later statement
-> > is true in the patch comment. If the test bits are not guest owned, it will
-> > not reach static_call(kvm_x86_cache_reg).  
-> 
-> Correct, but that's no different from what I'm saying. My description
-> just set 'static_call(kvm_x86_cache_reg)' mentally equivalent to VMREAD,
-> which abstracts the static_call quite well, IMHO. But maybe I should
-> clarify that 'tested bits' means the bits used by the changed call side?
-> Though, I think that's rather obvious from the change itself. I can
-> factor in the caching aspect, though.
-> 
-> Maybe something like this?:
-> 
->     This not only makes the intent cleaner, it also avoids a potential
->     VMREAD in case the tested bits aren't guest owned.
-> 
-> I've added "potential" but left the remainder as is.
-> 
-> >>
-> >> Signed-off-by: Mathias Krause <minipli@grsecurity.net>
-> >> ---
-> >>  arch/x86/kvm/pmu.c     | 4 ++--
-> >>  arch/x86/kvm/vmx/vmx.c | 4 ++--
-> >>  2 files changed, 4 insertions(+), 4 deletions(-)
-> >>
-> >> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> >> index d939d3b84e6f..d9922277df67 100644
-> >> --- a/arch/x86/kvm/pmu.c
-> >> +++ b/arch/x86/kvm/pmu.c
-> >> @@ -439,9 +439,9 @@ int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned idx, u64 *data)
-> >>  	if (!pmc)
-> >>  		return 1;
-> >>  
-> >> -	if (!(kvm_read_cr4(vcpu) & X86_CR4_PCE) &&
-> >> +	if (!(kvm_read_cr4_bits(vcpu, X86_CR4_PCE)) &&  
-> 
-> X86_CR4_PCE & KVM_POSSIBLE_CR4_GUEST_BITS == X86_CR4_PCE, therefore can
-> only be optimized if X86_CR4_PCE would be dropped from
-> 'vcpu->arch.cr4_guest_owned_bits' as well. But AFAICS we don't do that.
-> So here you're right that this only clears up the intent, not the actual
-> behavior at runtime.
-> 
-> >>  	    (static_call(kvm_x86_get_cpl)(vcpu) != 0) &&
-> >> -	    (kvm_read_cr0(vcpu) & X86_CR0_PE))
-> >> +	    (kvm_read_cr0_bits(vcpu, X86_CR0_PE)))  
-> 
-> X86_CR0_PE & KVM_POSSIBLE_CR0_GUEST_BITS == 0, therefore this can be
-> optimized.
-> 
-> >>  		return 1;
-> >>  
-> >>  	*data = pmc_read_counter(pmc) & mask;
-> >> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> >> index c8198c8a9b55..d3b49e0b6c32 100644
-> >> --- a/arch/x86/kvm/vmx/vmx.c
-> >> +++ b/arch/x86/kvm/vmx/vmx.c
-> >> @@ -5487,7 +5487,7 @@ static int handle_cr(struct kvm_vcpu *vcpu)
-> >>  		break;
-> >>  	case 3: /* lmsw */
-> >>  		val = (exit_qualification >> LMSW_SOURCE_DATA_SHIFT) & 0x0f;
-> >> -		trace_kvm_cr_write(0, (kvm_read_cr0(vcpu) & ~0xful) | val);
-> >> +		trace_kvm_cr_write(0, (kvm_read_cr0_bits(vcpu, ~0xful) | val));  
-> 
-> ~0xful & KVM_POSSIBLE_CR0_GUEST_BITS is 0 prior to patch 6 and
-> X86_CR0_WP afterwards, therefore this might be optimized, depending on
-> the runtime setting of 'enable_lazy_cr0', possibly capping the guest
-> owned CR0 bits to exclude X86_CR0_WP again.
-> 
-> >>  		kvm_lmsw(vcpu, val);
-> >>  
-> >>  		return kvm_skip_emulated_instruction(vcpu);
-> >> @@ -7547,7 +7547,7 @@ static u8 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
-> >>  	if (!kvm_arch_has_noncoherent_dma(vcpu->kvm))
-> >>  		return (MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;
-> >>  
-> >> -	if (kvm_read_cr0(vcpu) & X86_CR0_CD) {
-> >> +	if (kvm_read_cr0_bits(vcpu, X86_CR0_CD)) {  
-> 
-> X86_CR0_CD & KVM_POSSIBLE_CR0_GUEST_BITS == 0, therefore this can be
-> optimized as well.
-> 
-> >>  		if (kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_CD_NW_CLEARED))
-> >>  			cache = MTRR_TYPE_WRBACK;
-> >>  		else  
-> >   
-> 
-> Thanks,
-> Mathias
+- how about different vcpu models of the same guest have different feature_msr 
+values;
+(although they are not altered after the first run, cases (selftests) may be 
+needed to
+show that it is dangerous for KVM);
 
+- the relative time to set "vcpu->arch.last_vmentry_cpu = vcpu->cpu" is still 
+too late,
+since part of the guest code (an attack window) has already been executed on first
+run of kvm_x86_vcpu_run() which may run for a long time;
+
+> +	    kvm_is_immutable_feature_msr(index)) {
+> +		if (do_get_msr(vcpu, index, &val) || *data != val)
+> +			return -EINVAL;
+> +
+> +		return 0;
+> +	}
+> +
+>   	return kvm_set_msr_ignored_check(vcpu, index, *data, true);
+>   }
+>   
