@@ -2,140 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B5FC69595C
-	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 07:43:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B3F9C695968
+	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 07:47:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231326AbjBNGna (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Feb 2023 01:43:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37598 "EHLO
+        id S231696AbjBNGrX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Feb 2023 01:47:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229648AbjBNGn2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Feb 2023 01:43:28 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66470EB79
-        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 22:43:27 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id BF167CE1F26
-        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 06:43:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C861C433EF;
-        Tue, 14 Feb 2023 06:43:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1676357003;
-        bh=lq4W396FO+Q3Y2AX/3T1BrpLEZNbnz8ryv/Vmo361xs=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=VFCrbqIcsVnE5fUmOjjPNWrBldBZeePy7P0Yz2LYjVZLjKBVTrDsCZh1/XFBLHg4p
-         1Ql4Wq/1+ylkQvHEV8goFJdarOX0C5r35G6keDIyrMlrMAc/L1IAs67fxxL9f48tMn
-         FhkWOJa5RTDP9ctWVydEKvnWaGujrrLUGyO0NlpMd0Iig5Wlvt1TftfCkO9l/vPfvP
-         AWyBvPlM1EbpIj2xVDK4hRIyp1FP7ZSp/fOQY7Y4mXWcAvqQUqRFoEcFT7O15RfuGW
-         J4sKbRe1zbx+jgHj4n7HKpJ+Ibsb7lZL3CbPWBEbRLpg0h01IwKSg7aX8qY7ZqvdVi
-         PxKV6c9orGOYQ==
-From:   =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-To:     Vineet Gupta <vineetg@rivosinc.com>,
-        Andy Chiu <andy.chiu@sifive.com>,
-        linux-riscv@lists.infradead.org, palmer@dabbelt.com,
-        anup@brainfault.org, atishp@atishpatra.org,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
-Cc:     greentime.hu@sifive.com, guoren@linux.alibaba.com,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Heiko Stuebner <heiko.stuebner@vrull.eu>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        Jisheng Zhang <jszhang@kernel.org>,
-        Vincent Chen <vincent.chen@sifive.com>,
-        Guo Ren <guoren@kernel.org>,
-        Li Zhengyu <lizhengyu3@huawei.com>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH -next v13 10/19] riscv: Allocate user's vector context
- in the first-use trap
-In-Reply-To: <82551518-7b7e-8ac9-7325-5d99d3be0406@rivosinc.com>
-References: <20230125142056.18356-1-andy.chiu@sifive.com>
- <20230125142056.18356-11-andy.chiu@sifive.com>
- <875ycdy22c.fsf@all.your.base.are.belong.to.us>
- <82551518-7b7e-8ac9-7325-5d99d3be0406@rivosinc.com>
-Date:   Tue, 14 Feb 2023 07:43:21 +0100
-Message-ID: <87sff8ags6.fsf@all.your.base.are.belong.to.us>
+        with ESMTP id S231699AbjBNGrV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Feb 2023 01:47:21 -0500
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DED163C33
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 22:47:18 -0800 (PST)
+Received: by mail-pl1-x634.google.com with SMTP id m2so16068111plg.4
+        for <kvm@vger.kernel.org>; Mon, 13 Feb 2023 22:47:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BI6Cf8UpvZjP6jplrWT8lnHQTrEvrPak/IxCZ3TqnxA=;
+        b=JBXtmP0oKWhKbXVy9SFG5QnLv5p156Nl5d9tM4socGM8bCeNPWjivlRdjGxPPH/90M
+         jZshXbibrDLszEZ6uPyh9DgntgQlNNnc1PRuSE2ISl8DqYfn0neJwjb96MrGUhk6iTEr
+         /wvqQyVWi9gn64brLINnJkPYqgcV4BqEsNnLf10EFKmwaHhDDASk4kXwqBe3YzbPGk8a
+         7t61tBXFYQ7oTeAb8uHmrrskKIwLepgTD0S7p9i1X2+f4krYCvJkUahoHPEOvS/7Rtc5
+         LnKcJsmqkuelUGP4MoxT/wBhkTm+Kb7jrxqE5kPF5NZ2Dc0Gz0nMAXIhlH/VmULJYKpE
+         NTow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BI6Cf8UpvZjP6jplrWT8lnHQTrEvrPak/IxCZ3TqnxA=;
+        b=g+rxdq5Ek9KbF/HrjPdGHfT0mfeEQwbNQBLL3f8RBwRBsNa0BmfLmKjSrTneTZ31Mv
+         Uj6UCKHqQEQRnkcgQE4zkXYUV8JcrZ3MCbZd2Mvfx102vR2GZeQQHJEC+TqKGGJTrwE3
+         Jtr/ynmC7gr0qwyF2C2Tu3U9MTrGkPCFhOq80nQ5zKBIjbPIHTccemJyiiTo6b14C+wF
+         I6A7QKQycGV9Z3vBpsVTeNIlW8i9YiYMOWd5U+atJhVjEeNcybxogQ2jig6Wb7Os/nWh
+         8eelKqSRNODLNEUfFPZ7mfoM2lrT9GBXgmwZL+Y0vBTBQDR4lZbPkULPhziTHHFgOeVp
+         sFZw==
+X-Gm-Message-State: AO0yUKUMVoIKwEMxOqNfabpta53bMoG1g6ZXSFG8vWGGY0FjDBE2jRGq
+        cwYX7B+LVaILvNVP9TsiIU0=
+X-Google-Smtp-Source: AK7set+QOcf1iskQqBVQ9vpwo4Tjb1XLAo85wuATxLCZ7v3GpKW4S+Lww3IHdjXjGBrRYzp3Y3ZSTQ==
+X-Received: by 2002:a17:903:249:b0:198:a715:d26d with SMTP id j9-20020a170903024900b00198a715d26dmr1780681plh.8.1676357238357;
+        Mon, 13 Feb 2023 22:47:18 -0800 (PST)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id w6-20020a1709029a8600b0019324fbec59sm6624552plp.41.2023.02.13.22.47.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 13 Feb 2023 22:47:18 -0800 (PST)
+Message-ID: <c5da9a9c-b411-5a44-4255-eb49399cf4c0@gmail.com>
+Date:   Tue, 14 Feb 2023 14:47:05 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.7.2
+Subject: Re: [kvm-unit-tests PATCH 0/2] x86/pmu: Add TSX testcase and fix
+ force_emulation_prefix
+Content-Language: en-US
+From:   Like Xu <like.xu.linux@gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Andrew Jones <andrew.jones@linux.dev>
+Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
+References: <20221226075412.61167-1-likexu@tencent.com>
+In-Reply-To: <20221226075412.61167-1-likexu@tencent.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Vineet Gupta <vineetg@rivosinc.com> writes:
+CC more KUT maintainers, could anyone pick up these two minor x86 tests ?
 
-> On 2/7/23 06:36, Bj=C3=B6rn T=C3=B6pel wrote:
->>> +bool rvv_first_use_handler(struct pt_regs *regs)
->>> +{
->>> +	__user u32 *epc =3D (u32 *)regs->epc;
->>> +	u32 tval =3D (u32)regs->badaddr;
->>> +
->>> +	/* If V has been enabled then it is not the first-use trap */
->>> +	if (vstate_query(regs))
->>> +		return false;
->>> +	/* Get the instruction */
->>> +	if (!tval) {
->>> +		if (__get_user(tval, epc))
->>> +			return false;
->>> +	}
->>> +	/* Filter out non-V instructions */
->>> +	if (!insn_is_vector(tval))
->>> +		return false;
->>> +	/* Sanity check. datap should be null by the time of the first-use tr=
-ap */
->>> +	WARN_ON(current->thread.vstate.datap);
->>> +	/*
->>> +	 * Now we sure that this is a V instruction. And it executes in the
->>> +	 * context where VS has been off. So, try to allocate the user's V
->>> +	 * context and resume execution.
->>> +	 */
->>> +	if (rvv_thread_zalloc()) {
->>> +		force_sig(SIGKILL);
->>> +		return true;
->>> +	}
->> Should the altstack size be taken into consideration, like x86 does in
->> validate_sigaltstack() (see __xstate_request_perm()).
->
-> For a preexisting alternate stack ?
-
-Yes.
-
-> Otherwise there is no=20
-> "configuration" like x86 to cross-check against and V fault implies=20
-> large'ish signal stack.
-> See below as well.
->
->> Related; Would it make sense to implement sigaltstack_size_valid() for
->> riscv, analogous to x86?
->
-> Indeed we need to do that for the case where alt stack is being setup,=20
-> *after* V fault-on-first use.
-> But how to handle an existing alt stack which might not be big enough to=
-=20
-> handle V state ?
-
-What I'm getting at is a stricter check at the time of fault
-(SIGILL/enable V) handling. If the *existing* altstack is not big
-enough, kill the process -- similar to the rvv_thread_zalloc() handling
-above.
-
-So, two changes:
-
-1. Disallow V-enablement if the existing altstack does not fit a V-sized
-   frame.
-2. Sanitize altstack changes when V is enabled.
-
-Other than the altstack handling, I think the series is a good state! It
-would great if we could see a v14 land in -next...
-
-
-Bj=C3=B6rn
+On 26/12/2022 3:54 pm, Like Xu wrote:
+> We have adopted a test-driven development approach for vPMU's features,
+> and these two fixes below cover the paths for at least two corner use cases.
+> 
+> Like Xu (2):
+>    x86/pmu: Add Intel Guest Transactional (commited) cycles testcase
+>    x86/pmu: Wrap the written counter value with gp_counter_width
+> 
+>   x86/pmu.c | 47 ++++++++++++++++++++++++++++++++++++++++++++---
+>   1 file changed, 44 insertions(+), 3 deletions(-)
+> 
