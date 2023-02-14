@@ -2,97 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D3F22696C3E
-	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 19:03:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 73CF5696C5A
+	for <lists+kvm@lfdr.de>; Tue, 14 Feb 2023 19:07:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233006AbjBNSDp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Feb 2023 13:03:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33540 "EHLO
+        id S232363AbjBNSHI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Feb 2023 13:07:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230119AbjBNSDo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Feb 2023 13:03:44 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 262C52B2A1
-        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 10:03:43 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id q127-20020a25d985000000b009362f0368aeso4126198ybg.3
-        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 10:03:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bk+f22HFGRshmH5QUuAzOacVnCT3IjpFp9tZOTami+M=;
-        b=KhoXltQMOeY6BXTwpnEI/BBCXoJIYvnSDqakl4l/z3CbwiGzalhKuAc/02otpKL4JC
-         K0kuue3aUE/0BhhMc3C7jCS1JlAr7kfon3VZ0dtaXswbfoyhpnxpLSr7YXAty1Fd0pud
-         Q2mirdmaYcsKAYvVMWldQFG7pKdPJdPwrv596HOZ8tzaAq/V8hpDjH6aYCQul8js8UZl
-         WRJDJcGROSamVxkFbUZ86UUU0RfaKAv4fRKyGWRb39UlHemGFn0xoETSXxU++pkpIcVK
-         FknRO5NGjlzdIEwFNqnshxsZvNDWm05e2u8YcUS7TLXieSjrx4S3ychpOHYPaytPkd52
-         0wKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bk+f22HFGRshmH5QUuAzOacVnCT3IjpFp9tZOTami+M=;
-        b=Yy8NJb7tGY4gOWijPqddyYU19S/wN0QiYOIA2ThQoD6yDVIUKte1dYa9sAwNUsor+M
-         lLD52JGflDDX4FNUUxFscSiBtcea+iMynkSrR5a2rCf8YoDilJg7f5Lax5ksSG+jRkw1
-         hWlRDDDapgXBMJO/Lkc6d2RP8kc9Q5rUELZTT2o/y337UkYiUaQiJwT+tAt2gbwSPdTK
-         IM9axP65/shD48tYqiGUwriXd2DfIO6940AQgUu0q7pvxGXxSVdoASfE6J1NTwJISAet
-         A8XzwocHeSFM16OGB/ZBvzp/zSWNGUZHp0IstRpTOsa9TgBKq5OE6mXHc8RgdnR7tbDu
-         eBqQ==
-X-Gm-Message-State: AO0yUKUoErn1tp/it1HKt95D6zOnnzY7uaVSHBMoCZqbqPEAwvTYzZ2z
-        noQcyY/D0UhtjKuFypC8g6ZbMAT6xDI=
-X-Google-Smtp-Source: AK7set8yymJUlXsVxH9MgrKTIr6rjkN/DxWkSEg/qj8Xf3PjvLJi7wEBzJReR2v1e/8/DqS8BZM2w+0LGQI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a5b:34d:0:b0:7c8:ba83:62de with SMTP id
- q13-20020a5b034d000000b007c8ba8362demr397281ybp.114.1676397822387; Tue, 14
- Feb 2023 10:03:42 -0800 (PST)
-Date:   Tue, 14 Feb 2023 10:03:40 -0800
-In-Reply-To: <20230214084920.59787-3-likexu@tencent.com>
-Mime-Version: 1.0
-References: <20230214084920.59787-1-likexu@tencent.com> <20230214084920.59787-3-likexu@tencent.com>
-Message-ID: <Y+vM/KBFNGd+SX9l@google.com>
-Subject: Re: [PATCH 2/2] KVM: selftests: Report enable_pmu module value when
- test is skipped
-From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S233274AbjBNSHF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Feb 2023 13:07:05 -0500
+Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF1822ED7A;
+        Tue, 14 Feb 2023 10:07:02 -0800 (PST)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+        by mailout.nyi.internal (Postfix) with ESMTP id 79EA05C0154;
+        Tue, 14 Feb 2023 13:07:00 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute5.internal (MEProxy); Tue, 14 Feb 2023 13:07:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
+        :cc:content-type:date:date:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to; s=fm1; t=1676398020; x=1676484420; bh=2vEumOitJz
+        p7mZeo1LyjVeDNF3glQyrVaaSOFva2+jo=; b=bFVpBUrR4iEbsG5houHxYRNTCu
+        jmCOo7eZjnUgh8m0vrHwfxjK33uxIeie8FWg8pWmd8iMhrtU3czvG6rVxCJrQA3N
+        +LZC9PeqjlGbTC0uF0yyD+jdxOWpC5gZKL10JJ5GzTAxT6xd3uo9qFem89/vK5aR
+        hcf+v8BtfInn+DMtlHbTwfPilPF0/pkpLX7/2+HOyV9mM3rbfZct95jx2f+hPHWo
+        SYe+mcDa3fm8MYLeDkpXtZx91iK6bdgV7PpCGJkLPJwTmWJ+bh10IxPZsBm8Uhob
+        f/j6rDm3W59kkFXu2GckxPNnA3mzWNRHAKoAB+1mQ92KTW5+SA2e5D124/AQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
+        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:sender:subject:subject:to:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm1; t=1676398020; x=1676484420; bh=2vEumOitJzp7mZeo1LyjVeDNF3gl
+        QyrVaaSOFva2+jo=; b=iac1zJ7mZan6Y03ZbbcPHZh0C15vYgllxFOYxRFGKPvN
+        6lLcAl1uOxsJLBjcM4AcqGkG0m/0ERFve11tyS8tbUMXQZazUt9SYPZaUFlaUDZ9
+        1y1PMUtQ7sjNpI9n/RBEyT0yLM24w00aRwmsSqQC2UWtAKQB0m/neuD3ZAxBoyI3
+        v4kwQiF8f/Yf2JtAJtzH2nBtG+anV2OAGjGEI4ayhWghhcDCBNWXZ+kPVTzEInO5
+        dk8xJQB6NYlAkxqXPzIc41RM5nDHfzVBnuw7tLBc0gw+/UwCBYgGKt4Lv5FY1bHI
+        RKtWxjvIWk8mcflPpVesDmL6SmgKsY9z9t1ndWKI8g==
+X-ME-Sender: <xms:xM3rY4tQhTZs5gbxt56m7DBJb-zJi35Uev-MtpoktAsh6vLTGumkkA>
+    <xme:xM3rY1dJOg85g7VjSgPQqTSd_coZCcMwasHSp24fe8Q2yulZ-vldG2mW7hvkXX184
+    t6fAOaMGKoVTw>
+X-ME-Received: <xmr:xM3rYzy8Sd_lO1mlEfJ07L0vYpG80MQSFWcUD_ECVu0b9cS_xrLV-kCL1Za1Hl-YY3qkNFbNuf4uMPQ0KhDi56XovHL8UrSYSgTdfA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrudeifedguddttdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefirhgv
+    ghcumffjuceoghhrvghgsehkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpeehge
+    dvvedvleejuefgtdduudfhkeeltdeihfevjeekjeeuhfdtueefhffgheekteenucevlhhu
+    shhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehgrhgvgheskhhroh
+    grhhdrtghomh
+X-ME-Proxy: <xmx:xM3rY7N5tiVbS4pdhfOTudq-jnlRa5UiCWh5YzeSaham3bpxDLhDiQ>
+    <xmx:xM3rY49nUKeu5uT6_tBpUUccHZ8Lm_2UHKvf2lDPDjdKv7E--VHDsg>
+    <xmx:xM3rYzUuAXV-7nZA62dnGpNWZ5uk4qEpNAy_apzSQZNm2fqP3wOVtg>
+    <xmx:xM3rY8QrEEjqEC9r_4_3puj3emhNA-zgfx0YROy7hgmgR-wW5sAI7w>
+Feedback-ID: i787e41f1:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 14 Feb 2023 13:06:59 -0500 (EST)
+Date:   Tue, 14 Feb 2023 19:06:51 +0100
+From:   Greg KH <greg@kroah.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        stable@vger.kernel.org, thomas.lendacky@amd.com
+Subject: Re: [PATCH for-5.15 0/3] Cross-Thread Return Address Predictions
+ vulnerability
+Message-ID: <Y+vNu+vaxPFN8Sy7@kroah.com>
+References: <20230214170956.1297309-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230214170956.1297309-1-pbonzini@redhat.com>
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 14, 2023, Like Xu wrote:
-> From: Like Xu <likexu@tencent.com>
+On Tue, Feb 14, 2023 at 12:09:53PM -0500, Paolo Bonzini wrote:
+> Certain AMD processors are vulnerable to a cross-thread return address
+> predictions bug. When running in SMT mode and one of the sibling threads
+> transitions out of C0 state, the other thread gets access to twice as many
+> entries in the RSB, but unfortunately the predictions of the now-halted
+> logical processor are not purged.  Therefore, the executing processor
+> could speculatively execute from locations that the now-halted processor
+> had trained the RSB on.
 > 
-> Running x86_64/pmu_event_filter_test with enable_pmu globally disabled
-> will report the following skipping prompt:
-> 	1..0 # SKIP - Requirement not met: use_intel_pmu() || use_amd_pmu()
-> this can be confusing, so add a check on enable_pmu.
+> The Spectre v2 mitigations cover the Linux kernel, as it fills the RSB
+> when context switching to the idle thread. However, KVM allows a VMM to
+> prevent exiting guest mode when transitioning out of C0 using the
+> KVM_CAP_X86_DISABLE_EXITS capability can be used by a VMM to change this
+> behavior. To mitigate the cross-thread return address predictions bug,
+> a VMM must not be allowed to override the default behavior to intercept
+> C0 transitions.
 > 
-> Signed-off-by: Like Xu <likexu@tencent.com>
-> ---
->  tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c | 1 +
->  1 file changed, 1 insertion(+)
+> These patches introduce a KVM module parameter that, if set, will prevent
+> the user from disabling the HLT, MWAIT and CSTATE exits.
 > 
-> diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-> index bad7ef8c5b92..070bc8a60a7f 100644
-> --- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-> @@ -771,6 +771,7 @@ int main(int argc, char *argv[])
->  	TEST_REQUIRE(kvm_has_cap(KVM_CAP_PMU_EVENT_FILTER));
->  	TEST_REQUIRE(kvm_has_cap(KVM_CAP_PMU_EVENT_MASKED_EVENTS));
->  
-> +	TEST_REQUIRE(get_kvm_param_bool("enable_pmu"));
+> The patches apply to the 5.15 stable tree, and Greg has already received
+> them through a git bundle.  The difference is only in context, but it is
+> too much for "git cherry-pick" so here they are.
 
-I think it makes sense to put this at the very top, just in case more requirements
-that depend on enable_pmu get added in the future.  I can do that when applying.
+Thanks for these, all now queued up.
 
-I'll plan on grabbing this for 6.4.
-
-Thanks!
+greg k-h
