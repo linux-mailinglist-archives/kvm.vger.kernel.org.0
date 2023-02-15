@@ -2,70 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 273D7698240
-	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 18:36:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E6D80698246
+	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 18:36:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230110AbjBORf7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Feb 2023 12:35:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41312 "EHLO
+        id S230113AbjBORgt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Feb 2023 12:36:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230106AbjBORf5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Feb 2023 12:35:57 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 181B65FF3
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 09:35:11 -0800 (PST)
+        with ESMTP id S229741AbjBORgs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Feb 2023 12:36:48 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FD3C44A3
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 09:36:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676482510;
+        s=mimecast20190719; t=1676482559;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=5tf+V8DJIKLh2c8kinjZQV06pVM49sC8W88QF7Olf/c=;
-        b=BF7B6K+hx8dYWK3r7oYHHns1wx8+su1arPEjqH1MOjdJfkrFdXjX7oGpncfv1NI+ScaOv1
-        pUqc3PYCEN9HrwEto3AOuOmR0njehJIaIveXboA9JAFG6JmI7kSVWm1No7vRJ55yKx1dhD
-        Hcgbg+xiXqCT7lo7UHsgDsAc924MQfM=
-Received: from mail-vk1-f197.google.com (mail-vk1-f197.google.com
- [209.85.221.197]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=WO+XysgspF8DqSG5kDwuRcRoRdFcJUc3Wr5oeGuvwGQ=;
+        b=eIVqVXxuW1BxirBFY3CXKtgcapnKVKch2dczsLffQMN4JZWC6xT1vqdQMmNdvWoDqXZ6Qv
+        yb5UF316gU47Ew+bZggM1HGqmMG6hLc44Yx6/I/ikgJTPocGqBv12gRLk6brIPFpqWAtfi
+        KdXXrA6RXKsXJkhKUL3askwszgKRtRM=
+Received: from mail-ua1-f69.google.com (mail-ua1-f69.google.com
+ [209.85.222.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-620-gPgAHCgxM1WKVeB-3lnN7Q-1; Wed, 15 Feb 2023 12:35:07 -0500
-X-MC-Unique: gPgAHCgxM1WKVeB-3lnN7Q-1
-Received: by mail-vk1-f197.google.com with SMTP id i20-20020a056122209400b0040163d749ecso4243477vkd.11
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 09:35:07 -0800 (PST)
+ us-mta-529-xT_pIljfN3mtvhq66HGRtA-1; Wed, 15 Feb 2023 12:35:57 -0500
+X-MC-Unique: xT_pIljfN3mtvhq66HGRtA-1
+Received: by mail-ua1-f69.google.com with SMTP id f6-20020ab03d06000000b0068a65937391so4098105uax.6
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 09:35:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=5tf+V8DJIKLh2c8kinjZQV06pVM49sC8W88QF7Olf/c=;
-        b=0/G1kWQ6zY25Q+RALSal9EYp9P077FM1hmLDQh4mtmynkMjH3v/R1xICZ4a20o9TLe
-         /pWZ+3Awsc0YWwAGiG8h2p1Ew8VS2K+TwxOaate5FoYMkCxDZoIzsTv0Tck71mU4xuxV
-         Mm1+Wct3cOFueh8vA9kq407/RufRNWmTVGg7RqHkBJMFLqW8vYQuBFDME7Cr4TlC2HwP
-         e5vCmvRDm26ZjPiCit87ohjL42VenLQOJqPhCdnIULaG3NEpqMZ0waanREg6QFKvnCBD
-         8i1/llfWUHDx6gBY7Y2cuSPc2BTnkS/zrCkOrN4M83JCe/xtWOk+oCdx01WI0IN1G5cb
-         tSfw==
-X-Gm-Message-State: AO0yUKWFmS8pfmorT7iJDX9g4WSuNrq3tNHOYWJBFr30gJ115VvEgH8U
-        X9am1rlbhE+WOy9WAVFo0+DzE4H4NcGfD5bNI1fCz69Czkm0tM9OMQy2Le71xNUReX+GtCsMDKP
-        wJAm/Kz9JGyaXONfYvM0n6wsZKG6P
-X-Received: by 2002:a05:6102:5c17:b0:412:c97:4ac8 with SMTP id ds23-20020a0561025c1700b004120c974ac8mr501650vsb.53.1676482506628;
-        Wed, 15 Feb 2023 09:35:06 -0800 (PST)
-X-Google-Smtp-Source: AK7set+AYx/JnyU2pU6bd3Lzl+4J3wYF3yJk48DOVfDOD8nXYixJemGpjfVpYcAQrXAoAoxcjoDZwnuK40Ze7IoLFgs=
+        bh=WO+XysgspF8DqSG5kDwuRcRoRdFcJUc3Wr5oeGuvwGQ=;
+        b=QfG5iebUYRMz+KGhqWr1AV+MCpOLZ3NWeN7KMr7AqG7K3dB+B3pcUw1GClq8n+b8lR
+         uZBDEy8tsCQnTEBBIyvK2e5dBE6AYLtUKGW27PLTh/QMvlBP5nZFOOxCZIQfr9wtZYra
+         Kr5xtL0ZM8iMoV+og+e4olD3Zf2n+Bfxw8MBYDNtfn6nFdwOY+tQTnBRYczDm+MJbwct
+         AbK6ZX6zOi5dskfmiOQrEdk7Ww9DQgE06GgJU0n08FY34CtbjKo7H+LxL+touz2zFDii
+         DoeOStSRu9UfOAMZ7xDG8vKgGjbO+HaUfSIwcXayvROPcZniEvHyaDkHw43wA/kMOb6p
+         D7LA==
+X-Gm-Message-State: AO0yUKXQ4RDxfNKSK3EMO7L/XdeY9dA4yxe4CCgZTaJbfjdVBEvQ0Psz
+        W90QI7OtfdlOd0QhMB8Vo5LEl2LU7iujtKE5yaVFtftgTlWBcsRA23xxezXKJZxkfqv06UNc3l+
+        9k4gRDIV+mdCcP5M++Ayr4JgKVlj5
+X-Received: by 2002:a05:6102:5c17:b0:412:c97:4ac8 with SMTP id ds23-20020a0561025c1700b004120c974ac8mr502129vsb.53.1676482556701;
+        Wed, 15 Feb 2023 09:35:56 -0800 (PST)
+X-Google-Smtp-Source: AK7set8L0sjCkHm2xvfBfZvyQXKAczVR+gQk4t1ZdDhxtXnBjH9xoR9zAR7+Oh0qJAyco9BvrbRFrWse2QE/MMpxhPA=
 X-Received: by 2002:a05:6102:5c17:b0:412:c97:4ac8 with SMTP id
- ds23-20020a0561025c1700b004120c974ac8mr501643vsb.53.1676482506333; Wed, 15
- Feb 2023 09:35:06 -0800 (PST)
+ ds23-20020a0561025c1700b004120c974ac8mr502125vsb.53.1676482556440; Wed, 15
+ Feb 2023 09:35:56 -0800 (PST)
 MIME-Version: 1.0
-References: <CAAhSdy25NgCY23u=icRgcZpEZzNgJkyEN92KEVL8D-SvUwTBXg@mail.gmail.com>
-In-Reply-To: <CAAhSdy25NgCY23u=icRgcZpEZzNgJkyEN92KEVL8D-SvUwTBXg@mail.gmail.com>
+References: <20230209102300.12254-1-frankja@linux.ibm.com>
+In-Reply-To: <20230209102300.12254-1-frankja@linux.ibm.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Date:   Wed, 15 Feb 2023 18:34:55 +0100
-Message-ID: <CABgObfbkCP7gciYaBQ38Qqkryx_k=RcV_Egvv_UE28EO1CnOew@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/riscv changes for 6.3
-To:     anup@brainfault.org
-Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        KVM General <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>
+Date:   Wed, 15 Feb 2023 18:35:45 +0100
+Message-ID: <CABgObfbj2GGHxHefb9jdXar3YKMYJxBjJBwzTXhntUQE-xjBNA@mail.gmail.com>
+Subject: Re: [GIT PULL 00/18] KVM: s390x: KVM s390x changes for 6.3
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, david@redhat.com, borntraeger@linux.ibm.com,
+        cohuck@redhat.com, linux-s390@vger.kernel.org,
+        imbrenda@linux.ibm.com, hca@linux.ibm.com
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -77,102 +73,78 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 7, 2023 at 6:36 PM Anup Patel <anup@brainfault.org> wrote:
+On Thu, Feb 9, 2023 at 11:25 AM Janosch Frank <frankja@linux.ibm.com> wrote:
 >
 > Hi Paolo,
 >
-> We have the following KVM RISC-V changes for 6.3:
-> 1) Fix wrong usage of PGDIR_SIZE to check page sizes
-> 2) Fix privilege mode setting in kvm_riscv_vcpu_trap_redirect()
-> 3) Redirect illegal instruction traps to guest
-> 4) SBI PMU support for guest
+> the following changes are ready for pulling for 6.3:
+> * Two more V!=R patches
+> * The last part of the cmpxchg patches
+> * A few fixes
 >
-> Please pull.
->
-> I will send another PR for 6.3 containing AIA CSR
-> virtualization after Palmer has sent his first PR for 6.3
-> so that I can resolve conflicts with arch/riscv changes.
-> I hope you are okay with this ??
+> This pull includes the s390 cmpxchg_user_key feature branch which is
+> the base for the KVM cmpxchg patches by Janis.
 
-Yes, it's fine to have it separate.
-
-But please send it now, solving the conflicts is either my task or Linus's.
+Pulled, thanks,
 
 Paolo
 
-
-> Regards,
-> Anup
+> Cheers,
+> Janosch
 >
-> The following changes since commit 4ec5183ec48656cec489c49f989c508b68b518e3:
+> The following changes since commit a2ce98d69fabc7d3758063366fe830f682610cf7:
 >
->   Linux 6.2-rc7 (2023-02-05 13:13:28 -0800)
+>   Merge remote-tracking branch 'l390-korg/cmpxchg_user_key' into kvm-next (2023-02-07 18:04:23 +0100)
 >
 > are available in the Git repository at:
 >
->   https://github.com/kvm-riscv/linux.git tags/kvm-riscv-6.3-1
+>   https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git tags/kvm-s390-next-6.3-1
 >
-> for you to fetch changes up to c39cea6f38eefe356d64d0bc1e1f2267e282cdd3:
+> for you to fetch changes up to 5fc5b94a273655128159186c87662105db8afeb5:
 >
->   RISC-V: KVM: Increment firmware pmu events (2023-02-07 20:36:08 +0530)
->
-> ----------------------------------------------------------------
-> KVM/riscv changes for 6.3
->
-> - Fix wrong usage of PGDIR_SIZE to check page sizes
-> - Fix privilege mode setting in kvm_riscv_vcpu_trap_redirect()
-> - Redirect illegal instruction traps to guest
-> - SBI PMU support for guest
+>   s390/virtio: sort out physical vs virtual pointers usage (2023-02-08 09:59:46 +0100)
 >
 > ----------------------------------------------------------------
-> Alexandre Ghiti (1):
->       KVM: RISC-V: Fix wrong usage of PGDIR_SIZE to check page sizes
 >
-> Andy Chiu (1):
->       RISC-V: KVM: Redirect illegal instruction traps to guest
+> Alexander Gordeev (1):
+>   s390/virtio: sort out physical vs virtual pointers usage
 >
-> Anup Patel (1):
->       RISC-V: KVM: Fix privilege mode setting in kvm_riscv_vcpu_trap_redirect()
+> Janis Schoetterl-Glausch (14):
+>   KVM: s390: selftest: memop: Pass mop_desc via pointer
+>   KVM: s390: selftest: memop: Replace macros by functions
+>   KVM: s390: selftest: memop: Move testlist into main
+>   KVM: s390: selftest: memop: Add bad address test
+>   KVM: s390: selftest: memop: Fix typo
+>   KVM: s390: selftest: memop: Fix wrong address being used in test
+>   KVM: s390: selftest: memop: Fix integer literal
+>   KVM: s390: Move common code of mem_op functions into function
+>   KVM: s390: Dispatch to implementing function at top level of vm mem_op
+>   KVM: s390: Refactor absolute vm mem_op function
+>   KVM: s390: Refactor vcpu mem_op function
+>   KVM: s390: Extend MEM_OP ioctl by storage key checked cmpxchg
+>   Documentation: KVM: s390: Describe KVM_S390_MEMOP_F_CMPXCHG
+>   KVM: s390: selftest: memop: Add cmpxchg tests
 >
-> Atish Patra (14):
->       perf: RISC-V: Define helper functions expose hpm counter width and count
->       perf: RISC-V: Improve privilege mode filtering for perf
->       RISC-V: Improve SBI PMU extension related definitions
->       RISC-V: KVM: Define a probe function for SBI extension data structures
->       RISC-V: KVM: Return correct code for hsm stop function
->       RISC-V: KVM: Modify SBI extension handler to return SBI error code
->       RISC-V: KVM: Add skeleton support for perf
->       RISC-V: KVM: Add SBI PMU extension support
->       RISC-V: KVM: Make PMU functionality depend on Sscofpmf
->       RISC-V: KVM: Disable all hpmcounter access for VS/VU mode
->       RISC-V: KVM: Implement trap & emulate for hpmcounters
->       RISC-V: KVM: Implement perf support without sampling
->       RISC-V: KVM: Support firmware events
->       RISC-V: KVM: Increment firmware pmu events
+> Nico Boehr (2):
+>   KVM: s390: disable migration mode when dirty tracking is disabled
+>   KVM: s390: GISA: sort out physical vs virtual pointers usage
 >
->  arch/riscv/include/asm/kvm_host.h     |   4 +
->  arch/riscv/include/asm/kvm_vcpu_pmu.h | 107 ++++++
->  arch/riscv/include/asm/kvm_vcpu_sbi.h |  13 +-
->  arch/riscv/include/asm/sbi.h          |   7 +-
->  arch/riscv/kvm/Makefile               |   1 +
->  arch/riscv/kvm/main.c                 |   3 +-
->  arch/riscv/kvm/mmu.c                  |   8 +-
->  arch/riscv/kvm/tlb.c                  |   4 +
->  arch/riscv/kvm/vcpu.c                 |   7 +
->  arch/riscv/kvm/vcpu_exit.c            |   9 +
->  arch/riscv/kvm/vcpu_insn.c            |   4 +-
->  arch/riscv/kvm/vcpu_pmu.c             | 633 ++++++++++++++++++++++++++++++++++
->  arch/riscv/kvm/vcpu_sbi.c             |  72 ++--
->  arch/riscv/kvm/vcpu_sbi_base.c        |  27 +-
->  arch/riscv/kvm/vcpu_sbi_hsm.c         |  28 +-
->  arch/riscv/kvm/vcpu_sbi_pmu.c         |  86 +++++
->  arch/riscv/kvm/vcpu_sbi_replace.c     |  50 +--
->  arch/riscv/kvm/vcpu_sbi_v01.c         |  17 +-
->  drivers/perf/riscv_pmu_sbi.c          |  64 +++-
->  include/linux/perf/riscv_pmu.h        |   5 +
->  20 files changed, 1035 insertions(+), 114 deletions(-)
->  create mode 100644 arch/riscv/include/asm/kvm_vcpu_pmu.h
->  create mode 100644 arch/riscv/kvm/vcpu_pmu.c
->  create mode 100644 arch/riscv/kvm/vcpu_sbi_pmu.c
+> Nina Schoetterl-Glausch (1):
+>   KVM: selftests: Compile s390 tests with -march=z10
+>
+>  Documentation/virt/kvm/api.rst            |  46 +-
+>  Documentation/virt/kvm/devices/vm.rst     |   4 +
+>  arch/s390/kvm/gaccess.c                   | 109 ++++
+>  arch/s390/kvm/gaccess.h                   |   3 +
+>  arch/s390/kvm/interrupt.c                 |  11 +-
+>  arch/s390/kvm/kvm-s390.c                  | 268 +++++----
+>  drivers/s390/virtio/virtio_ccw.c          |  46 +-
+>  include/uapi/linux/kvm.h                  |   8 +
+>  tools/testing/selftests/kvm/Makefile      |   3 +
+>  tools/testing/selftests/kvm/s390x/memop.c | 676 +++++++++++++++++-----
+>  10 files changed, 889 insertions(+), 285 deletions(-)
+>
+> --
+> 2.39.1
 >
 
