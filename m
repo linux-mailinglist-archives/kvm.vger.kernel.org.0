@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B2C26982EE
-	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 19:06:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 69A26698321
+	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 19:20:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229968AbjBOSGN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Feb 2023 13:06:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35312 "EHLO
+        id S230162AbjBOSUF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Feb 2023 13:20:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229538AbjBOSGL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Feb 2023 13:06:11 -0500
-Received: from mail-vs1-xe31.google.com (mail-vs1-xe31.google.com [IPv6:2607:f8b0:4864:20::e31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1DB134F70
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 10:06:07 -0800 (PST)
-Received: by mail-vs1-xe31.google.com with SMTP id d66so20707063vsd.9
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 10:06:07 -0800 (PST)
+        with ESMTP id S229520AbjBOSUD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Feb 2023 13:20:03 -0500
+Received: from mail-vs1-xe33.google.com (mail-vs1-xe33.google.com [IPv6:2607:f8b0:4864:20::e33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 570723CE3A
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 10:19:52 -0800 (PST)
+Received: by mail-vs1-xe33.google.com with SMTP id u20so4854546vsp.5
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 10:19:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=14Wsnq1C5/e/lr4OHIbzbe/RW8U5P8QTch1ADuqyPNc=;
-        b=hqydrB0uk3xrYuEWrr9bC2c28vBvdOrWuT4o2GQyjyKHHMRGVquMplEKn0VEa7IG3z
-         zDPbKd6PNbA8+cMSjjZJ+XY/jm106WMeZVNzEP1rVcs4pGglU3JTT/NTzterzjXgwbZu
-         e7pvbkYFHd0k6CT2PbycxRlNPY7/TcAODYosIg6cF3OaA/8PLnDtJDpAcnhD5aQTIzsg
-         Qg3fsJ45d4GMQ1hKwksNnZ0KFwhmWHRQRRTuQn8W+RBtH6mHF9lgMKRiXGn2KEx/GMlQ
-         QmiDcJyYqdxCQ4+RbsIxNsGKLpnkix1GXBZkVFemnFQD1RDwOo8POfG5Uq1MtnEB3X4K
-         WNSg==
+        bh=QexbYYGKRhTPyK9qoiEanQk7KDl1Is1wY2YZxvsIfXU=;
+        b=mFyJ6OIO7yB2VWEaz6UL+z3Wa25WYnVJXGNQsTHc25aO4V3+I0c4AQL8EKqyjDJaT7
+         tRsOG1YLaPBo9FbRNLA2ZIW4yRCfpflBCwkTUkgH6FRhAbatENYkWsNfteYLgjavbnae
+         ypZnRQOlbfRgDVf6UQwZg2/CC2POTWtowXhAG2YICyXavov5RCdNwlIQiAx2WwFwpWpv
+         JbkV5MnJgbEOCrVagRukB3iIf/OWuiJZjmWjDemoKUwQ7mcmwarwHJDC+vVDq+52s6pP
+         pj3o598LibgN/JG5sh+s8Ry+zUPN/LEA7AJGKwC8pAFw8F67pXql5s5uF9EdHT3HEXK/
+         2r9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=14Wsnq1C5/e/lr4OHIbzbe/RW8U5P8QTch1ADuqyPNc=;
-        b=EQ1mhcIxUSo3DQfurfOBzxcyVOmk2KXCOk0uM1QdJPrTdTvjYQ38dpjLM+GN4NS6R2
-         a77UXKAdz5asDBzYL8ikRfjxWJh6WOZCWTlnIuFpraQWd1gKr7+onG4NUi9iy1WzT2Zy
-         qkvwlgIXslbeQqPUwK2yw5GrTVAw0D2KcOr5KcsNlqH6upVxq9rU38af0ULiKHqIV+R8
-         OJvAsiFyoLGf/Kkk6LUozXpQSmqZX3MwAP9I+FR5KFpl4OYb+wqobnMdQ1aJyb+7p3je
-         2m8kol6NEoOFwwsoFP6WtK62b3ykdmL1agXd41V2/0LqoKHuwlJQKbw+zOJCoh99pFN8
-         hrZw==
-X-Gm-Message-State: AO0yUKU/B71G7f02f8SJ+PFuy1uV5WQHR20ZxvER1XHoOWIF172jsZJs
-        iH8NCSlsKCAO8yFSHA1UMBM/ZlFaAPGEjyJ4vE9LEQ==
-X-Google-Smtp-Source: AK7set/KlyJWZTFcc9c+ciNsp30/44ed0OYWwISa16TuXvviGl/4f1NDwiurFeZZA96nyqwnVTbAz2TX63KihceiHCU=
+        bh=QexbYYGKRhTPyK9qoiEanQk7KDl1Is1wY2YZxvsIfXU=;
+        b=yWcocrhX2gyIJZG4KXj0hclLbOqvIAP/dBe9pzjsV5Xn/BetXu9gvfGikU8/lUV5wH
+         gOcVGORhu71WAj4J821ofpEuu20zboAEVeKeeGWz7UBKZ1+Apv6/cyvCPcjnpEr0Hlif
+         XZG3AWJ9UepVYIMA4F7+2YpYM+2aaH6No9aQZzDxy9N+IOEBGciT9vZCLC4o7yVWtW8e
+         lRNwTPPeQuJ/CXpuoiXKGiO3KoAgcEqrLovXbgVqEdTSPYHlPFwhvX1fOqWlaEmMJyaP
+         tfwbdr0kihwOx7ngU/V8/7Dp8L8WitDS+c4FEiuKXrYu2KX82r2Rsz0NCwjzcVRXd1jk
+         b4CA==
+X-Gm-Message-State: AO0yUKUTh76pKLZP2RZOCEzRqAYhCRWbHxF62TxA1RF6H51pk2JazNvi
+        kIOSU2bcW+hdoobs3CdJ57hcWFXzpr6uYviD0KtaPQ==
+X-Google-Smtp-Source: AK7set8ObJP7iGMvIUA6ruyvO8dY6AGJgXSEHO2ybg33E1OElXwnHQnJ+uNh4aYLeegXyK4SEQSkBTFZmZzJxetes74=
 X-Received: by 2002:a05:6102:3b01:b0:412:6a3:2267 with SMTP id
- x1-20020a0561023b0100b0041206a32267mr719527vsu.5.1676484366683; Wed, 15 Feb
- 2023 10:06:06 -0800 (PST)
+ x1-20020a0561023b0100b0041206a32267mr730394vsu.5.1676485191228; Wed, 15 Feb
+ 2023 10:19:51 -0800 (PST)
 MIME-Version: 1.0
-References: <20230215011614.725983-1-amoorthy@google.com> <20230215011614.725983-2-amoorthy@google.com>
- <Y+yJU2pE4IyuIwOQ@linux.dev> <Y+0L/x2YgiEgm9bt@google.com>
-In-Reply-To: <Y+0L/x2YgiEgm9bt@google.com>
+References: <20230215011614.725983-1-amoorthy@google.com> <20230215011614.725983-5-amoorthy@google.com>
+ <Y+yfhELf/TbsosO9@linux.dev> <Y+0QRsZ4yWyUdpnc@google.com>
+In-Reply-To: <Y+0QRsZ4yWyUdpnc@google.com>
 From:   Anish Moorthy <amoorthy@google.com>
-Date:   Wed, 15 Feb 2023 10:05:55 -0800
-Message-ID: <CAF7b7mpSOqzrxqXgpSjD17SufaV-2ZnLL5+eR29jJL_j=1aFvA@mail.gmail.com>
-Subject: Re: [PATCH 1/8] selftests/kvm: Fix bug in how demand_paging_test
- calculates paging rate
+Date:   Wed, 15 Feb 2023 10:19:40 -0800
+Message-ID: <CAF7b7mprKmdoQ=aedfDkN85vi01fskAL_s_ROgkysWuTmSt9FQ@mail.gmail.com>
+Subject: Re: [PATCH 4/8] kvm: Allow hva_pfn_fast to resolve read-only faults.
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Oliver Upton <oliver.upton@linux.dev>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -77,35 +76,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 15, 2023 at 8:44 AM Sean Christopherson <seanjc@google.com> wrote:
+On Wed, Feb 15, 2023 at 1:02 AM Oliver Upton <oliver.upton@linux.dev> wrote:
 >
-> On Wed, Feb 15, 2023, Oliver Upton wrote:
-> > Hi Anish,
-> >
-> > On Wed, Feb 15, 2023 at 01:16:07AM +0000, Anish Moorthy wrote:
-> > > Currently we're dividing tv_nsec by 1E8, not 1E9.
-> > >
-> > > Reported-by: James Houghton <jthoughton@google.com>
-> > > Signed-off-by: Anish Moorthy <amoorthy@google.com>
-> > > ---
-> > >  tools/testing/selftests/kvm/demand_paging_test.c | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > >
-> > > diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
-> > > index b0e1fc4de9e29..6809184ce2390 100644
-> > > --- a/tools/testing/selftests/kvm/demand_paging_test.c
-> > > +++ b/tools/testing/selftests/kvm/demand_paging_test.c
-> > > @@ -194,7 +194,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
-> > >             ts_diff.tv_sec, ts_diff.tv_nsec);
-> > >     pr_info("Overall demand paging rate: %f pgs/sec\n",
-> > >             memstress_args.vcpu_args[0].pages * nr_vcpus /
-> > > -           ((double)ts_diff.tv_sec + (double)ts_diff.tv_nsec / 100000000.0));
-> > > +           ((double)ts_diff.tv_sec + (double)ts_diff.tv_nsec / 1E9));
-> >
-> > Use NSEC_PER_SEC instead so the conversion taking place is immediately
-> > obvious.
+> You could have a smaller diff (and arrive at something more readable)
+> using a local for the gup flags:
 >
-> And please post this separately, it's a fix that's independent of the rest of the
-> series and can/should be applied sooner than later.
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 9c60384b5ae0..57f92ff3728a 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2494,6 +2494,7 @@ static inline int check_user_page_hwpoison(unsigned long addr)
+>  static bool hva_to_pfn_fast(unsigned long addr, bool write_fault,
+>                             bool *writable, kvm_pfn_t *pfn)
+>  {
+> +       unsigned int gup_flags;
+>         struct page *page[1];
+>
+>         /*
+> @@ -2501,10 +2502,9 @@ static bool hva_to_pfn_fast(unsigned long addr, bool write_fault,
+>          * or the caller allows to map a writable pfn for a read fault
+>          * request.
+>          */
+> -       if (!(write_fault || writable))
+> -               return false;
+> +       gup_flags = (write_fault || writable) ? FOLL_WRITE : 0;
+>
+> -       if (get_user_page_fast_only(addr, FOLL_WRITE, page)) {
+> +       if (get_user_page_fast_only(addr, gup_flags, page)) {
+>                 *pfn = page_to_pfn(page[0]);
+>
+>                 if (writable)
 
-Will do, and thanks for the pointer to NSEC_PER_SEC Oliver.
+Good idea, will do.
+
+On Wed, Feb 15, 2023 at 9:03 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> State what the patch does, avoid pronouns, and especially don't have "This commmit"
+> or "This patch" anywhere.  From Documentation/process/submitting-patches.rst:
+>
+>   Describe your changes in imperative mood, e.g. "make xyzzy do frotz"
+>   instead of "[This patch] makes xyzzy do frotz" or "[I] changed xyzzy
+>   to do frotz", as if you are giving orders to the codebase to change
+>   its behaviour.
+>
+> Heh, this whole series just screams "google3". :-)
+>
+> Anish, please read through
+>
+>   Documentation/process/coding-style.rst
+>
+> and
+>
+>   Documentation/process/submitting-patches.rst
+>
+> particularaly the "Describe your changes" and "Style-check your changes" your
+> changes sections.  Bonus points if you work through the mostly redundant process/
+> documentation, e.g. these have supplementary info.
+>
+>   Documentation/process/4.Coding.rst
+>   Documentation/process/5.Posting.rst
+
+Thanks for the resources Sean- I'll go through the series and rework the commit
+messages/documentation appropriately.
