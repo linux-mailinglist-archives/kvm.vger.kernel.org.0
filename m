@@ -2,126 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 176C6698340
-	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 19:24:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 658A46983BE
+	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 19:46:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230153AbjBOSY6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Feb 2023 13:24:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46522 "EHLO
+        id S229842AbjBOSqJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Feb 2023 13:46:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229520AbjBOSY5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Feb 2023 13:24:57 -0500
-Received: from out-219.mta1.migadu.com (out-219.mta1.migadu.com [95.215.58.219])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 336FB7A91
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 10:24:55 -0800 (PST)
-Date:   Wed, 15 Feb 2023 18:24:48 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1676485493;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=TuerVw8H+lvd5C5aDhOZnh6mY1rE1c8GuVXscwWRNfA=;
-        b=euTSnP6NAC5Gk3GepcKoHDyUgDpziIxealLy4hUFuEHKwFfoTzUegmgqTN0r+UwVroDxFS
-        ms9SZBmU6xRhbTNTSgmhipH5I1B+shFp6+OgGdARcomxYzf7QYzxUd1kmvR8k1rpCGdU7D
-        h6ETxk/L/lhPapEHcYNfr8kjE+wBuzo=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Anish Moorthy <amoorthy@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        James Houghton <jthoughton@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Axel Rasmussen <axelrasmussen@google.com>, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev
-Subject: Re: [PATCH 7/8] kvm/arm64: Implement KVM_CAP_MEM_FAULT_NOWAIT for
- arm64
-Message-ID: <Y+0jcC/Em/cnYe9t@linux.dev>
-References: <20230215011614.725983-1-amoorthy@google.com>
- <20230215011614.725983-8-amoorthy@google.com>
+        with ESMTP id S229759AbjBOSqH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Feb 2023 13:46:07 -0500
+Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79AFE3CE39;
+        Wed, 15 Feb 2023 10:45:29 -0800 (PST)
+Received: from MUA
+        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <mail@maciej.szmigiero.name>)
+        id 1pSMlf-000305-3p; Wed, 15 Feb 2023 19:44:35 +0100
+Message-ID: <f3c1ea27-ba90-171b-a336-8da86ec98900@maciej.szmigiero.name>
+Date:   Wed, 15 Feb 2023 19:44:28 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230215011614.725983-8-amoorthy@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+To:     Ackerley Tng <ackerleytng@google.com>
+Cc:     erdemaktas@google.com, linux-kselftest@vger.kernel.org,
+        pbonzini@redhat.com, isaku.yamahata@intel.com, sagis@google.com,
+        afranji@google.com, runanwang@google.com, shuah@kernel.org,
+        drjones@redhat.com, maz@kernel.org, bgardon@google.com,
+        jmattson@google.com, dmatlack@google.com, peterx@redhat.com,
+        oupton@google.com, ricarkol@google.com, yang.zhong@intel.com,
+        wei.w.wang@intel.com, xiaoyao.li@intel.com, pgonda@google.com,
+        marcorr@google.com, eesposit@redhat.com, borntraeger@de.ibm.com,
+        eric.auger@redhat.com, wangyanan55@huawei.com,
+        aaronlewis@google.com, vkuznets@redhat.com, pshier@google.com,
+        axelrasmussen@google.com, zhenzhong.duan@intel.com,
+        like.xu@linux.intel.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
+References: <diqzlekzkazq.fsf@ackerleytng-cloudtop.c.googlers.com>
+Content-Language: en-US, pl-PL
+From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Subject: Re: [RFC PATCH v3 08/31] KVM: selftests: Require GCC to realign
+ stacks on function entry
+In-Reply-To: <diqzlekzkazq.fsf@ackerleytng-cloudtop.c.googlers.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 15, 2023 at 01:16:13AM +0000, Anish Moorthy wrote:
-> Just do atomic gfn_to_pfn_memslot when the cap is enabled. Since we
-> don't have to deal with async page faults, the implementation is even
-> simpler than on x86
-
-All of Sean's suggestions about writing a change description apply here
-too.
-
-> Signed-off-by: Anish Moorthy <amoorthy@google.com>
-> Acked-by: James Houghton <jthoughton@google.com>
-> ---
->  arch/arm64/kvm/arm.c |  1 +
->  arch/arm64/kvm/mmu.c | 14 ++++++++++++--
->  2 files changed, 13 insertions(+), 2 deletions(-)
+On 15.02.2023 01:50, Ackerley Tng wrote:
 > 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 698787ed87e92..31bec7866c346 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -220,6 +220,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_VCPU_ATTRIBUTES:
->  	case KVM_CAP_PTP_KVM:
->  	case KVM_CAP_ARM_SYSTEM_SUSPEND:
-> +	case KVM_CAP_MEM_FAULT_NOWAIT:
->  		r = 1;
->  		break;
->  	case KVM_CAP_SET_GUEST_DEBUG2:
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 01352f5838a00..964af7cd5f1c8 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1206,6 +1206,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	unsigned long vma_pagesize, fault_granule;
->  	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
->  	struct kvm_pgtable *pgt;
-> +	bool mem_fault_nowait;
->  
->  	fault_granule = 1UL << ARM64_HW_PGTABLE_LEVEL_SHIFT(fault_level);
->  	write_fault = kvm_is_write_fault(vcpu);
-> @@ -1301,8 +1302,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	 */
->  	smp_rmb();
->  
-> -	pfn = __gfn_to_pfn_memslot(memslot, gfn, false, false, NULL,
-> -				   write_fault, &writable, NULL);
-> +	mem_fault_nowait = memory_faults_enabled(vcpu->kvm);
-> +	pfn = __gfn_to_pfn_memslot(
-> +		memslot, gfn, mem_fault_nowait, false, NULL,
-> +		write_fault, &writable, NULL);
-> +
-> +	if (mem_fault_nowait && pfn == KVM_PFN_ERR_FAULT) {
-> +		vcpu->run->exit_reason = KVM_EXIT_MEMORY_FAULT;
-> +		vcpu->run->memory_fault.gpa = gfn << PAGE_SHIFT;
-> +		vcpu->run->memory_fault.size = vma_pagesize;
-> +		return -EFAULT;
+>> On Mon, Jan 23, 2023, Erdem Aktas wrote:
+>> > On Mon, Jan 23, 2023 at 10:53 AM Sean Christopherson <seanjc@google.com> wrote:
+>> > >
+>> > > On Mon, Jan 23, 2023, Maciej S. Szmigiero wrote:
+>> > > > On 23.01.2023 19:30, Erdem Aktas wrote:
+>> > > > > On Fri, Jan 20, 2023 at 4:28 PM Sean Christopherson <seanjc@google.com> wrote:
+>> > > > > >
+>> > > > > > On Sat, Jan 21, 2023, Ackerley Tng wrote:
+>> > > > > > > Some SSE instructions assume a 16-byte aligned stack, and GCC compiles
+>> > > > > > > assuming the stack is aligned:
+>> > > > > > > https://gcc.gnu.org/bugzilla/show_bug.cgi?id=40838. This combination
+>> > > > > > > results in a #GP in guests.
+>> > > > > > >
+>> > > > > > > Adding this compiler flag will generate an alternate prologue and
+>> > > > > > > epilogue to realign the runtime stack, which makes selftest code
+>> > > > > > > slower and bigger, but this is okay since we do not need selftest code
+>> > > > > > > to be extremely performant.
+>> > > > > >
+>> > > > > > Huh, I had completely forgotten that this is why SSE is problematic.  I ran into
+>> > > > > > this with the base UPM selftests and just disabled SSE.  /facepalm.
+>> > > > > >
+>> > > > > > We should figure out exactly what is causing a misaligned stack.  As you've noted,
+>> > > > > > the x86-64 ABI requires a 16-byte aligned RSP.  Unless I'm misreading vm_arch_vcpu_add(),
+>> > > > > > the starting stack should be page aligned, which means something is causing the
+>> > > > > > stack to become unaligned at runtime.  I'd rather hunt down that something than
+>> > > > > > paper over it by having the compiler force realignment.
+>> > > > >
+>> > > > > Is not it due to the 32bit execution part of the guest code at boot
+>> > > > > time. Any push/pop of 32bit registers might make it a 16-byte
+>> > > > > unaligned stack.
+>> > > >
+>> > > > 32-bit stack needs to be 16-byte aligned, too (at function call boundaries) -
+>> > > > see [1] chapter 2.2.2 "The Stack Frame"
+>> > >
+>> > > And this showing up in the non-TDX selftests rules that out as the sole problem;
+>> > > the selftests stuff 64-bit mode, i.e. don't have 32-bit boot code.
+>> >
+>> > Thanks Maciej and Sean for the clarification. I was suspecting the
+>> > hand-coded assembly part that we have for TDX tests but  it being
+>> > happening in the non-TDX selftests disproves it.
+> 
+>> Not necessarily, it could be both.  Goofs in the handcoded assembly and PEBKAC
+>> on my end :-)
+> 
+> I figured it out!
+> 
+> GCC assumes that the stack is 16-byte aligned **before** the call
+> instruction. Since call pushes rip to the stack, GCC will compile code
+> assuming that on entrance to the function, the stack is -8 from a
+> 16-byte aligned address.
+> 
+> Since for TDs we do a ljmp to guest code, providing a function's
+> address, the stack was not modified by a call instruction pushing rip to
+> the stack, so the stack is 16-byte aligned when the guest code starts
+> running, instead of 16-byte aligned -8 that GCC expects.
+> 
+> For VMs, we set rip to a function pointer, and the VM starts running
+> with a 16-byte algined stack too.
+> 
+> To fix this, I propose that in vm_arch_vcpu_add(), we align the
+> allocated stack address and then subtract 8 from that:
+> 
 
-We really don't want to get out to userspace with EFAULT. Instead, we
-should get out to userspace with 0 as the return code to indicate a
-'normal' / expected exit.
+Note that if this code is ever used to launch a vCPU with 32-bit entry
+point it will need to subtract 4 bytes instead of 8 bytes.
 
-That will require a bit of redefinition on user_mem_abort()'s return
-values:
+I think it would be worthwhile to at least place a comment mentioning
+this near the stack aligning expression so nobody misses this fact.
 
- - < 0, return to userspace with an error
- - 0, return to userspace for a 'normal' exit
- - 1, resume the guest
-
--- 
 Thanks,
-Oliver
+Maciej
+
