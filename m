@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3876F697354
-	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 02:17:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C0EE69735B
+	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 02:17:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233340AbjBOBRJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Feb 2023 20:17:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36844 "EHLO
+        id S233396AbjBOBRM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Feb 2023 20:17:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233310AbjBOBRG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S233336AbjBOBRG (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 14 Feb 2023 20:17:06 -0500
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B616E211A
-        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 17:16:40 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-4cddba76f55so182662767b3.23
-        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 17:16:40 -0800 (PST)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 100DF31E04
+        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 17:16:41 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-52ec7c792b1so155742087b3.5
+        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 17:16:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OVCdKhDDZw/gGjfaku0Q25g+1PJYV5T4NjwoSTMXyIM=;
-        b=YS0IVuodOriuD6adGk6yJIyRbkJGKtwXHdpw1eiZyMtO/0jtjpiry/ha4aiE86Lbqu
-         tYnZLXKu6LhNvMjZT6lc9zM4Dvu0tgNeemkcwqfITKacVnU/TqlwJnFPIjN3vzZRziBa
-         QnPI+nQBR2XFtlewR0E9N5vIIjyfymSMXo8yQysEDk9SagSu0T3U5xbW5mZrSaY8oVXF
-         jic/nk4POmV7OjagmW5oCyoyOjWlUPb+nft0Bjir5SvqCbjlxTCxp71+UId36Xf77oHE
-         CvNSWJqfmhGoClwY4Vh3M5sTu7kHvX4L1Ejtu5cj9z1Zy/uRjnc1c9UT9xHtBlijvc/c
-         qjdw==
+        bh=fA0hO878IlXBSB4jC4+MvDA1z8jaFfYMhwWYQLmDel4=;
+        b=bbl37QLKdxpOtLvT/k5zY+PC40bb+EIVGf2KQRCmQQcOBqrWCjj8cTHg9P1O53Wse2
+         bugHioYaQtfHeLhjbFzDZE9Z4Fa/USJV4eXHrmrbY5/e7BEvJb6m5NimTEqAIoDNLGv8
+         RtOK7ixEhdqBb/gNQRm1H7gBYrwBT6XIeMtAkg1qQqDWfkUKBzzu7SCyuYvIyksxF++X
+         Nv7ghiPS6n8LZMTLXV3/bKHv/dxdos2e85WQnmo99BXYi+hjKs9IfwCYFDy7uGwwFOBQ
+         v7/8wpH3p8RqxOLwBlALPfxSgRTzU9g1o9w1ljpVMqh6W+sHUEAGkNRAw/4vHz2gGRq/
+         O75w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OVCdKhDDZw/gGjfaku0Q25g+1PJYV5T4NjwoSTMXyIM=;
-        b=W8ajxLLwekr8rLT8rqbeTj/Jeovs9pnXolMl+xtZWmsWIV9lYwv8IoQlNzT8NwkXXv
-         /4F6SD93+67tfFpBtF2ZphVqxqZXgbqd2Qux0Wt3P/b5apscayFLnen2s3SAzDmJhc8T
-         t4oMaTIKftu9t/j+NfYOoDibqTvbx9LkHFQzVdYgGKVlQzz6Iom0ZH7Lw0cJ6YdJ1PPK
-         D2JUyYaivrqgJDerDeieygVhhLtx/nFSfMe0cr3w4Cv2BdVU0YdIG4hNhtr1WFhVit8K
-         huZBReT+cPGW7XEAT3v4w8Muf62EcaJBxMZSXGHEBhEvkO0RgmURQMCBKLundhCKKRdB
-         GTGQ==
-X-Gm-Message-State: AO0yUKWJmwbxZqY0c2dBU5zeTVmvjW/Mo4c4MOkyYOa554KOVu+mxceJ
-        C/PP6ShIK/njnWDxcR7VKiqiQxYFA4TpVQ==
-X-Google-Smtp-Source: AK7set/0P5HkCsHCdqNkX6Phqm5KuQtLcG9ryS3GI3DTfruqUOURyBW0cYukAJvfbIrniqxUkkuylJt1BjwNYQ==
+        bh=fA0hO878IlXBSB4jC4+MvDA1z8jaFfYMhwWYQLmDel4=;
+        b=Z4O0e1QBUyVInSfmbKs4cHKr7qklo/dvWgQaCF8CBle6bI0vuJN5t5YZH7ICnwSEva
+         bbcWnKywPwma7yqitJt+NDmVbmZzWdc7mNLPRP/zscHsR9Y1bs4aIDlljgN5Iq2bX96q
+         dcp1Lisbmv2ZpDuyzIKYSQX82XLuiaVVtTTJUagbkIZj8N4Jq950XTkcBq+gPVdvYbhw
+         mTzVTQem3PVH0mTb4cTIkDkoHbkUO4zvhDtTOnYxCKEjC6hc/3J/uWF4OU6aJswQ5Sap
+         KNzJFDvHvLslKmCbQmjOK9b94STII2asJksP++BedsyC/fZDIAE3x6qaeKBXPEldEbHO
+         38gQ==
+X-Gm-Message-State: AO0yUKWTPKA7vqFiqdNxcd2NL0bW+yWaofLoqdsRJT41bk5gNeCbKZGn
+        iWO8rZUYVB1RgO5mtHt33Uw1vd84WGfelA==
+X-Google-Smtp-Source: AK7set+HWJ0kZC5aOyt79tOmvB1HvKpMOid+UEBdsClpbT07t1SvqZT3R0AdeIWlivmxNpxwaLmCHdoiMduUIg==
 X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
- (user=amoorthy job=sendgmr) by 2002:a5b:10e:0:b0:94a:ebba:cba6 with SMTP id
- 14-20020a5b010e000000b0094aebbacba6mr2ybx.9.1676423796690; Tue, 14 Feb 2023
- 17:16:36 -0800 (PST)
-Date:   Wed, 15 Feb 2023 01:16:12 +0000
+ (user=amoorthy job=sendgmr) by 2002:a25:9f90:0:b0:85d:3cec:46d7 with SMTP id
+ u16-20020a259f90000000b0085d3cec46d7mr48855ybq.283.1676423798015; Tue, 14 Feb
+ 2023 17:16:38 -0800 (PST)
+Date:   Wed, 15 Feb 2023 01:16:13 +0000
 In-Reply-To: <20230215011614.725983-1-amoorthy@google.com>
 Mime-Version: 1.0
 References: <20230215011614.725983-1-amoorthy@google.com>
 X-Mailer: git-send-email 2.39.1.581.gbfd45094c4-goog
-Message-ID: <20230215011614.725983-7-amoorthy@google.com>
-Subject: [PATCH 6/8] kvm/x86: Add mem fault exit on EPT violations
+Message-ID: <20230215011614.725983-8-amoorthy@google.com>
+Subject: [PATCH 7/8] kvm/arm64: Implement KVM_CAP_MEM_FAULT_NOWAIT for arm64
 From:   Anish Moorthy <amoorthy@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>
 Cc:     Oliver Upton <oliver.upton@linux.dev>,
@@ -75,70 +75,61 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-With the relevant kvm cap enabled, EPT violations will exit to userspace
-w/ reason KVM_EXIT_MEMORY_FAULT instead of resolving the fault via slow
-get_user_pages.
+Just do atomic gfn_to_pfn_memslot when the cap is enabled. Since we
+don't have to deal with async page faults, the implementation is even
+simpler than on x86
 
 Signed-off-by: Anish Moorthy <amoorthy@google.com>
-Suggested-by: James Houghton <jthoughton@google.com>
+Acked-by: James Houghton <jthoughton@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 23 ++++++++++++++++++++---
- arch/x86/kvm/x86.c     |  1 +
- 2 files changed, 21 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/arm.c |  1 +
+ arch/arm64/kvm/mmu.c | 14 ++++++++++++--
+ 2 files changed, 13 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index aeb240b339f54..28af8d60adee6 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4201,6 +4201,7 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- {
- 	struct kvm_memory_slot *slot = fault->slot;
- 	bool async;
-+	bool mem_fault_nowait;
- 
- 	/*
- 	 * Retry the page fault if the gfn hit a memslot that is being deleted
-@@ -4230,9 +4231,25 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 	}
- 
- 	async = false;
--	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, false, &async,
--					  fault->write, &fault->map_writable,
--					  &fault->hva);
-+	mem_fault_nowait = memory_faults_enabled(vcpu->kvm);
-+
-+	fault->pfn = __gfn_to_pfn_memslot(
-+		slot, fault->gfn,
-+		mem_fault_nowait,
-+		false,
-+		mem_fault_nowait ? NULL : &async,
-+		fault->write, &fault->map_writable,
-+		&fault->hva);
-+
-+	if (mem_fault_nowait) {
-+		if (fault->pfn == KVM_PFN_ERR_FAULT) {
-+			vcpu->run->exit_reason = KVM_EXIT_MEMORY_FAULT;
-+			vcpu->run->memory_fault.gpa = fault->gfn << PAGE_SHIFT;
-+			vcpu->run->memory_fault.size = PAGE_SIZE;
-+		}
-+		return RET_PF_CONTINUE;
-+	}
-+
- 	if (!async)
- 		return RET_PF_CONTINUE; /* *pfn has correct page already */
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 508074e47bc0e..fe39ab2af5db4 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4427,6 +4427,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_VAPIC:
- 	case KVM_CAP_ENABLE_CAP:
- 	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 698787ed87e92..31bec7866c346 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -220,6 +220,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_VCPU_ATTRIBUTES:
+ 	case KVM_CAP_PTP_KVM:
+ 	case KVM_CAP_ARM_SYSTEM_SUSPEND:
 +	case KVM_CAP_MEM_FAULT_NOWAIT:
  		r = 1;
  		break;
- 	case KVM_CAP_EXIT_HYPERCALL:
+ 	case KVM_CAP_SET_GUEST_DEBUG2:
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 01352f5838a00..964af7cd5f1c8 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1206,6 +1206,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	unsigned long vma_pagesize, fault_granule;
+ 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
+ 	struct kvm_pgtable *pgt;
++	bool mem_fault_nowait;
+ 
+ 	fault_granule = 1UL << ARM64_HW_PGTABLE_LEVEL_SHIFT(fault_level);
+ 	write_fault = kvm_is_write_fault(vcpu);
+@@ -1301,8 +1302,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	 */
+ 	smp_rmb();
+ 
+-	pfn = __gfn_to_pfn_memslot(memslot, gfn, false, false, NULL,
+-				   write_fault, &writable, NULL);
++	mem_fault_nowait = memory_faults_enabled(vcpu->kvm);
++	pfn = __gfn_to_pfn_memslot(
++		memslot, gfn, mem_fault_nowait, false, NULL,
++		write_fault, &writable, NULL);
++
++	if (mem_fault_nowait && pfn == KVM_PFN_ERR_FAULT) {
++		vcpu->run->exit_reason = KVM_EXIT_MEMORY_FAULT;
++		vcpu->run->memory_fault.gpa = gfn << PAGE_SHIFT;
++		vcpu->run->memory_fault.size = vma_pagesize;
++		return -EFAULT;
++	}
+ 	if (pfn == KVM_PFN_ERR_HWPOISON) {
+ 		kvm_send_hwpoison_signal(hva, vma_shift);
+ 		return 0;
 -- 
 2.39.1.581.gbfd45094c4-goog
 
