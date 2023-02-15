@@ -2,61 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 69A26698321
-	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 19:20:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 176C6698340
+	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 19:24:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230162AbjBOSUF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Feb 2023 13:20:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42394 "EHLO
+        id S230153AbjBOSY6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Feb 2023 13:24:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229520AbjBOSUD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Feb 2023 13:20:03 -0500
-Received: from mail-vs1-xe33.google.com (mail-vs1-xe33.google.com [IPv6:2607:f8b0:4864:20::e33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 570723CE3A
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 10:19:52 -0800 (PST)
-Received: by mail-vs1-xe33.google.com with SMTP id u20so4854546vsp.5
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 10:19:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=QexbYYGKRhTPyK9qoiEanQk7KDl1Is1wY2YZxvsIfXU=;
-        b=mFyJ6OIO7yB2VWEaz6UL+z3Wa25WYnVJXGNQsTHc25aO4V3+I0c4AQL8EKqyjDJaT7
-         tRsOG1YLaPBo9FbRNLA2ZIW4yRCfpflBCwkTUkgH6FRhAbatENYkWsNfteYLgjavbnae
-         ypZnRQOlbfRgDVf6UQwZg2/CC2POTWtowXhAG2YICyXavov5RCdNwlIQiAx2WwFwpWpv
-         JbkV5MnJgbEOCrVagRukB3iIf/OWuiJZjmWjDemoKUwQ7mcmwarwHJDC+vVDq+52s6pP
-         pj3o598LibgN/JG5sh+s8Ry+zUPN/LEA7AJGKwC8pAFw8F67pXql5s5uF9EdHT3HEXK/
-         2r9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QexbYYGKRhTPyK9qoiEanQk7KDl1Is1wY2YZxvsIfXU=;
-        b=yWcocrhX2gyIJZG4KXj0hclLbOqvIAP/dBe9pzjsV5Xn/BetXu9gvfGikU8/lUV5wH
-         gOcVGORhu71WAj4J821ofpEuu20zboAEVeKeeGWz7UBKZ1+Apv6/cyvCPcjnpEr0Hlif
-         XZG3AWJ9UepVYIMA4F7+2YpYM+2aaH6No9aQZzDxy9N+IOEBGciT9vZCLC4o7yVWtW8e
-         lRNwTPPeQuJ/CXpuoiXKGiO3KoAgcEqrLovXbgVqEdTSPYHlPFwhvX1fOqWlaEmMJyaP
-         tfwbdr0kihwOx7ngU/V8/7Dp8L8WitDS+c4FEiuKXrYu2KX82r2Rsz0NCwjzcVRXd1jk
-         b4CA==
-X-Gm-Message-State: AO0yUKUTh76pKLZP2RZOCEzRqAYhCRWbHxF62TxA1RF6H51pk2JazNvi
-        kIOSU2bcW+hdoobs3CdJ57hcWFXzpr6uYviD0KtaPQ==
-X-Google-Smtp-Source: AK7set8ObJP7iGMvIUA6ruyvO8dY6AGJgXSEHO2ybg33E1OElXwnHQnJ+uNh4aYLeegXyK4SEQSkBTFZmZzJxetes74=
-X-Received: by 2002:a05:6102:3b01:b0:412:6a3:2267 with SMTP id
- x1-20020a0561023b0100b0041206a32267mr730394vsu.5.1676485191228; Wed, 15 Feb
- 2023 10:19:51 -0800 (PST)
-MIME-Version: 1.0
-References: <20230215011614.725983-1-amoorthy@google.com> <20230215011614.725983-5-amoorthy@google.com>
- <Y+yfhELf/TbsosO9@linux.dev> <Y+0QRsZ4yWyUdpnc@google.com>
-In-Reply-To: <Y+0QRsZ4yWyUdpnc@google.com>
-From:   Anish Moorthy <amoorthy@google.com>
-Date:   Wed, 15 Feb 2023 10:19:40 -0800
-Message-ID: <CAF7b7mprKmdoQ=aedfDkN85vi01fskAL_s_ROgkysWuTmSt9FQ@mail.gmail.com>
-Subject: Re: [PATCH 4/8] kvm: Allow hva_pfn_fast to resolve read-only faults.
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
+        with ESMTP id S229520AbjBOSY5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Feb 2023 13:24:57 -0500
+Received: from out-219.mta1.migadu.com (out-219.mta1.migadu.com [95.215.58.219])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 336FB7A91
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 10:24:55 -0800 (PST)
+Date:   Wed, 15 Feb 2023 18:24:48 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1676485493;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=TuerVw8H+lvd5C5aDhOZnh6mY1rE1c8GuVXscwWRNfA=;
+        b=euTSnP6NAC5Gk3GepcKoHDyUgDpziIxealLy4hUFuEHKwFfoTzUegmgqTN0r+UwVroDxFS
+        ms9SZBmU6xRhbTNTSgmhipH5I1B+shFp6+OgGdARcomxYzf7QYzxUd1kmvR8k1rpCGdU7D
+        h6ETxk/L/lhPapEHcYNfr8kjE+wBuzo=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Anish Moorthy <amoorthy@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
         James Houghton <jthoughton@google.com>,
         Ben Gardon <bgardon@google.com>,
         David Matlack <dmatlack@google.com>,
@@ -64,77 +36,92 @@ Cc:     Oliver Upton <oliver.upton@linux.dev>,
         Chao Peng <chao.p.peng@linux.intel.com>,
         Axel Rasmussen <axelrasmussen@google.com>, kvm@vger.kernel.org,
         kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Subject: Re: [PATCH 7/8] kvm/arm64: Implement KVM_CAP_MEM_FAULT_NOWAIT for
+ arm64
+Message-ID: <Y+0jcC/Em/cnYe9t@linux.dev>
+References: <20230215011614.725983-1-amoorthy@google.com>
+ <20230215011614.725983-8-amoorthy@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230215011614.725983-8-amoorthy@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 15, 2023 at 1:02 AM Oliver Upton <oliver.upton@linux.dev> wrote:
->
-> You could have a smaller diff (and arrive at something more readable)
-> using a local for the gup flags:
->
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 9c60384b5ae0..57f92ff3728a 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2494,6 +2494,7 @@ static inline int check_user_page_hwpoison(unsigned long addr)
->  static bool hva_to_pfn_fast(unsigned long addr, bool write_fault,
->                             bool *writable, kvm_pfn_t *pfn)
->  {
-> +       unsigned int gup_flags;
->         struct page *page[1];
->
->         /*
-> @@ -2501,10 +2502,9 @@ static bool hva_to_pfn_fast(unsigned long addr, bool write_fault,
->          * or the caller allows to map a writable pfn for a read fault
->          * request.
->          */
-> -       if (!(write_fault || writable))
-> -               return false;
-> +       gup_flags = (write_fault || writable) ? FOLL_WRITE : 0;
->
-> -       if (get_user_page_fast_only(addr, FOLL_WRITE, page)) {
-> +       if (get_user_page_fast_only(addr, gup_flags, page)) {
->                 *pfn = page_to_pfn(page[0]);
->
->                 if (writable)
+On Wed, Feb 15, 2023 at 01:16:13AM +0000, Anish Moorthy wrote:
+> Just do atomic gfn_to_pfn_memslot when the cap is enabled. Since we
+> don't have to deal with async page faults, the implementation is even
+> simpler than on x86
 
-Good idea, will do.
+All of Sean's suggestions about writing a change description apply here
+too.
 
-On Wed, Feb 15, 2023 at 9:03 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> State what the patch does, avoid pronouns, and especially don't have "This commmit"
-> or "This patch" anywhere.  From Documentation/process/submitting-patches.rst:
->
->   Describe your changes in imperative mood, e.g. "make xyzzy do frotz"
->   instead of "[This patch] makes xyzzy do frotz" or "[I] changed xyzzy
->   to do frotz", as if you are giving orders to the codebase to change
->   its behaviour.
->
-> Heh, this whole series just screams "google3". :-)
->
-> Anish, please read through
->
->   Documentation/process/coding-style.rst
->
-> and
->
->   Documentation/process/submitting-patches.rst
->
-> particularaly the "Describe your changes" and "Style-check your changes" your
-> changes sections.  Bonus points if you work through the mostly redundant process/
-> documentation, e.g. these have supplementary info.
->
->   Documentation/process/4.Coding.rst
->   Documentation/process/5.Posting.rst
+> Signed-off-by: Anish Moorthy <amoorthy@google.com>
+> Acked-by: James Houghton <jthoughton@google.com>
+> ---
+>  arch/arm64/kvm/arm.c |  1 +
+>  arch/arm64/kvm/mmu.c | 14 ++++++++++++--
+>  2 files changed, 13 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 698787ed87e92..31bec7866c346 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -220,6 +220,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_VCPU_ATTRIBUTES:
+>  	case KVM_CAP_PTP_KVM:
+>  	case KVM_CAP_ARM_SYSTEM_SUSPEND:
+> +	case KVM_CAP_MEM_FAULT_NOWAIT:
+>  		r = 1;
+>  		break;
+>  	case KVM_CAP_SET_GUEST_DEBUG2:
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 01352f5838a00..964af7cd5f1c8 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1206,6 +1206,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	unsigned long vma_pagesize, fault_granule;
+>  	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
+>  	struct kvm_pgtable *pgt;
+> +	bool mem_fault_nowait;
+>  
+>  	fault_granule = 1UL << ARM64_HW_PGTABLE_LEVEL_SHIFT(fault_level);
+>  	write_fault = kvm_is_write_fault(vcpu);
+> @@ -1301,8 +1302,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	 */
+>  	smp_rmb();
+>  
+> -	pfn = __gfn_to_pfn_memslot(memslot, gfn, false, false, NULL,
+> -				   write_fault, &writable, NULL);
+> +	mem_fault_nowait = memory_faults_enabled(vcpu->kvm);
+> +	pfn = __gfn_to_pfn_memslot(
+> +		memslot, gfn, mem_fault_nowait, false, NULL,
+> +		write_fault, &writable, NULL);
+> +
+> +	if (mem_fault_nowait && pfn == KVM_PFN_ERR_FAULT) {
+> +		vcpu->run->exit_reason = KVM_EXIT_MEMORY_FAULT;
+> +		vcpu->run->memory_fault.gpa = gfn << PAGE_SHIFT;
+> +		vcpu->run->memory_fault.size = vma_pagesize;
+> +		return -EFAULT;
 
-Thanks for the resources Sean- I'll go through the series and rework the commit
-messages/documentation appropriately.
+We really don't want to get out to userspace with EFAULT. Instead, we
+should get out to userspace with 0 as the return code to indicate a
+'normal' / expected exit.
+
+That will require a bit of redefinition on user_mem_abort()'s return
+values:
+
+ - < 0, return to userspace with an error
+ - 0, return to userspace for a 'normal' exit
+ - 1, resume the guest
+
+-- 
+Thanks,
+Oliver
