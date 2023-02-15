@@ -2,89 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A6A86981C3
-	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 18:19:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C2D146981CE
+	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 18:20:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229702AbjBORTE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Feb 2023 12:19:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55072 "EHLO
+        id S229756AbjBORUb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Feb 2023 12:20:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229446AbjBORTC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Feb 2023 12:19:02 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC077298F1;
-        Wed, 15 Feb 2023 09:19:01 -0800 (PST)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31FH7aiA029037;
-        Wed, 15 Feb 2023 17:19:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=sx+DnNM/PAs0L9A2sEqUdMbZ9Sg8LZN5YzGYqXCGT98=;
- b=CuRb5e2WnKHC8PJ0Db1w8sN1doFWmVBpFqT9bPWk8+B+RvehfUVRbMSpkfrHkfkCAlTI
- rOXL39qZxmuXF1wKoFWVXHw0BeRVAtd5iFi8zUlpnFw/CQ9Zc+/n9H+zw1JaEEazh30O
- yhhbJxKMF/mZjhR9wg0oJIhdf+CKYE9McTa1z1eoSe7+th5yyje8Zn/uISXN+XNhN2OQ
- B/qZUO5bxacDggpev51/DwWOVIU9TRgGEMktQwjdqv1/i5/GtGPE1RMo8i/Xx8otFGRf
- UTtHY3KiVqWIZtAQ8AJbdeV33/kDkQ+49fme4iEDD6C9lJiRo3buPQtfNsHm9oHEfChi rQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ns0grfyre-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Feb 2023 17:19:01 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31FG08QJ023217;
-        Wed, 15 Feb 2023 17:19:00 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ns0grfyqa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Feb 2023 17:19:00 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31FBOgYT032710;
-        Wed, 15 Feb 2023 17:18:58 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3np29fnnv1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Feb 2023 17:18:58 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31FHItpF36307268
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 15 Feb 2023 17:18:55 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F27A320040;
-        Wed, 15 Feb 2023 17:18:54 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C7A1920043;
-        Wed, 15 Feb 2023 17:18:54 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 15 Feb 2023 17:18:54 +0000 (GMT)
-From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v1 2/2] s390x/spec_ex: Add test of EXECUTE with odd target address
-Date:   Wed, 15 Feb 2023 18:18:52 +0100
-Message-Id: <20230215171852.1935156-3-nsg@linux.ibm.com>
-X-Mailer: git-send-email 2.37.2
-In-Reply-To: <20230215171852.1935156-1-nsg@linux.ibm.com>
-References: <20230215171852.1935156-1-nsg@linux.ibm.com>
+        with ESMTP id S229446AbjBORUa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Feb 2023 12:20:30 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34C7838EB6
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 09:19:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676481581;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=f8VA1c6iZtz7FGtZvF7i96siVIEbaGum/570KUL8JYQ=;
+        b=DgqKb6sQ/OkfUHUbW6PDkw/fcroPt9jQ/01J4/A13wYJHbi1b3fkTaQA4nS0LVqHGcWGJj
+        2dL0Fa8iApYwYS85DaR+EjThNAHMFbrP/a/nPB8+SU7+drv7eBY/zqlrXITQZTycMc7Evn
+        s3TD3EHUoT3RwcE3/PjGC/2JAgtLRo4=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-629-fdLu4Yk-MT-KDiApsHTfJQ-1; Wed, 15 Feb 2023 12:19:39 -0500
+X-MC-Unique: fdLu4Yk-MT-KDiApsHTfJQ-1
+Received: by mail-io1-f72.google.com with SMTP id t185-20020a6bc3c2000000b00733ef3dabe3so12451653iof.14
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 09:19:39 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=f8VA1c6iZtz7FGtZvF7i96siVIEbaGum/570KUL8JYQ=;
+        b=PmDazGHnE3JHTScHv8SJgkrXicfXEekTfKPFIanP5njUPgWF/Gt35FjriIFxycadfv
+         AEF4eGT6HPF6yWfds47ba8zkMZegQBK0tMVkSMZeza4bbhnykI2LQEUAHJLRZQVG+2nj
+         x2u619hkHFtbKGtOVaLwULub0wbsf6Jfw5ruudgYNf1EiI66zpGLhxd/FRHErHyeDt4o
+         3hAYN55uyDUf0TwnZiOrBKKmjYmK0/6ENuGzIrCGffBE4e7kmT19I24tF3uB7HF5YR5q
+         10Odmk8+r6eUsfbJufdSi7PrFkmnr1fGVA7usXRScxBxGObJLDoMVMqe+GGE6fWn2IVH
+         CKag==
+X-Gm-Message-State: AO0yUKUMpLlEH1Qyt01qj6GDqeUFx8Dc7lJFrZE5Jk75vaQXxg8Y/nd7
+        v1p0vnHBLiGhZsFuUztYss9Fo/8jYZite8v/3uOKIvx80O7JzFyMTCHASrm5pvmR+bLo6A+6iDI
+        R+kAWoBjtiTDd
+X-Received: by 2002:a92:c264:0:b0:314:5aa:94ba with SMTP id h4-20020a92c264000000b0031405aa94bamr3025123ild.9.1676481578291;
+        Wed, 15 Feb 2023 09:19:38 -0800 (PST)
+X-Google-Smtp-Source: AK7set8JFQMg3wd2K4N1A/L6AEEoJSZuErtZEgPbOjbAIunGxdN2sZ5/fVleX+GPj5DIkwZFSCFuTg==
+X-Received: by 2002:a92:c264:0:b0:314:5aa:94ba with SMTP id h4-20020a92c264000000b0031405aa94bamr3025097ild.9.1676481577996;
+        Wed, 15 Feb 2023 09:19:37 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id q6-20020a02c8c6000000b00374fa5b600csm5932699jao.0.2023.02.15.09.19.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Feb 2023 09:19:37 -0800 (PST)
+Date:   Wed, 15 Feb 2023 10:19:35 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v3 03/15] vfio: Accept vfio device file in the driver
+ facing kAPI
+Message-ID: <20230215101935.6416b39c.alex.williamson@redhat.com>
+In-Reply-To: <Y+0QjaIWr84eVzsp@nvidia.com>
+References: <20230213151348.56451-1-yi.l.liu@intel.com>
+        <20230213151348.56451-4-yi.l.liu@intel.com>
+        <Y+rLKvCMivND0izd@nvidia.com>
+        <DS0PR11MB7529B43C7D357D8A0C2438C7C3A29@DS0PR11MB7529.namprd11.prod.outlook.com>
+        <Y+zSRklKkL3rc2FB@nvidia.com>
+        <DS0PR11MB75299F5D92AAC33FD8690694C3A39@DS0PR11MB7529.namprd11.prod.outlook.com>
+        <Y+zwSn63eA7HrefO@nvidia.com>
+        <20230215083234.194d07a9.alex.williamson@redhat.com>
+        <Y+0QjaIWr84eVzsp@nvidia.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 9KxGM0itLBhzsj6nJb2RimnXQhWU9k2b
-X-Proofpoint-ORIG-GUID: AUuWf_dftBWTSMaDLUwaJ98lll3MUga8
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
- definitions=2023-02-15_07,2023-02-15_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 bulkscore=0
- priorityscore=1501 adultscore=0 mlxlogscore=999 malwarescore=0
- suspectscore=0 clxscore=1011 lowpriorityscore=0 impostorscore=0 mlxscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302150154
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -92,59 +107,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The EXECUTE instruction executes the instruction at the given target
-address. This address must be halfword aligned, otherwise a
-specification exception occurs.
-Add a test for this.
+On Wed, 15 Feb 2023 13:04:13 -0400
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
----
- s390x/spec_ex.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+> On Wed, Feb 15, 2023 at 08:32:34AM -0700, Alex Williamson wrote:
+> 
+> > We've discussed this with Paolo before and I believe the bar of proof
+> > is not very high.  I suspect it's not a problem that the device itself
+> > is not yet accessible, so long as the user can prove they have the
+> > ability to access the device, such as access to a restricted file.  In
+> > most cases this isn't going to turn on wbinvd anyway since DMA will be
+> > coherent.  Thanks,  
+> 
+> Isn't that a second problem, we don't know if the device is coherent
+> until it is bound?
 
-diff --git a/s390x/spec_ex.c b/s390x/spec_ex.c
-index b6764677..0cd3174f 100644
---- a/s390x/spec_ex.c
-+++ b/s390x/spec_ex.c
-@@ -200,6 +200,30 @@ static int short_psw_bit_12_is_0(void)
- 	return 0;
- }
- 
-+static int odd_ex_target(void)
-+{
-+	uint64_t target_addr_pre;
-+	int to = 0, from = 0x0dd;
-+
-+	asm volatile ( ".pushsection .rodata\n"
-+		"odd_ex_target_pre_insn:\n"
-+		"	.balign 2\n"
-+		"	. = . + 1\n"
-+		"	lr	%[to],%[from]\n"
-+		"	.popsection\n"
-+
-+		"	larl	%[target_addr_pre],odd_ex_target_pre_insn\n"
-+		"	ex	0,1(%[target_addr_pre])\n"
-+		: [target_addr_pre] "=&a" (target_addr_pre),
-+		  [to] "+d" (to)
-+		: [from] "d" (from)
-+	);
-+
-+	assert((target_addr_pre + 1) & 1);
-+	report(to != from, "did not perform ex with odd target");
-+	return 0;
-+}
-+
- static int bad_alignment(void)
- {
- 	uint32_t words[5] __attribute__((aligned(16)));
-@@ -241,6 +265,7 @@ static const struct spec_ex_trigger spec_ex_triggers[] = {
- 	{ "psw_bit_12_is_1", &psw_bit_12_is_1, false, &fixup_invalid_psw },
- 	{ "short_psw_bit_12_is_0", &short_psw_bit_12_is_0, false, &fixup_invalid_psw },
- 	{ "psw_odd_address", &psw_odd_address, false, &fixup_invalid_psw },
-+	{ "odd_ex_target", &odd_ex_target, true, NULL },
- 	{ "bad_alignment", &bad_alignment, true, NULL },
- 	{ "not_even", &not_even, true, NULL },
- 	{ NULL, NULL, false, NULL },
--- 
-2.36.1
+I think this is already accounted for in the conversion to device level
+IOMMU ops, ie. device_iommu_capable() follows the
+dev->iommu->iommu_dev->ops, where for example intel_iommu_capable() is
+only looking at the capabilities of the IOMMU managing the device.  We
+did some hand waving simplifications that was sufficient at some point,
+IIRC.  Thanks,
+
+Alex
 
