@@ -2,92 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 89D846987F0
-	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 23:34:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 85A0D6987F4
+	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 23:34:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229840AbjBOWeD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Feb 2023 17:34:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36814 "EHLO
+        id S229946AbjBOWeP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Feb 2023 17:34:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229781AbjBOWeA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Feb 2023 17:34:00 -0500
-Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDCC33252D
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 14:33:58 -0800 (PST)
-Received: by mail-il1-x130.google.com with SMTP id h5so168575ilq.6
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 14:33:58 -0800 (PST)
+        with ESMTP id S229771AbjBOWeC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Feb 2023 17:34:02 -0500
+Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29D7A392AA
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 14:34:01 -0800 (PST)
+Received: by mail-io1-xd2c.google.com with SMTP id z5so19725iow.1
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 14:34:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=onPboIVuwFQM+u11FAIAIUF6FsX292G7WEiPOTqQPg8=;
-        b=N/nnLNCloXEfghvTNAXw+I6rZ21KJHDzNBWYN1//+agMoDmkc4p2uF5tGKWwVYGWnv
-         wEqyDErcLL+IQCmktHXDkEEa9CFd3WXlYLeAnXmWRus0ztYASmQctA99YmsCYrsFabbC
-         ViuxzH6SA3drPTIGVbzUJEMGqhtF+LCznfCg8=
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mnWb0/c3SYq7VOjFth5MeHXAYmHB31VnBFWZUTQPvpw=;
+        b=kC+gHfVdbRJlKuA2eO3yNTVt7DH6c/TA0/kfK1ldKXFTz8jF7IfNK0GsqoCDlFaey+
+         Ot5LcebAIg2SwBu3bz6JxTwqg50CJu1GANhWz5aFxR+pABZYHwDTNFIl1ylVCSJBriro
+         ftvYlS/DyAxzJSjMvhjrfJadtr3Xe/GVoDQlg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=onPboIVuwFQM+u11FAIAIUF6FsX292G7WEiPOTqQPg8=;
-        b=jJ1FkXOz6RkOSxgrYMe1uNAQT5Nzp8MGjdmDCTZhsNxNzG0esV++hr2FXOgSnGV/B4
-         ty5MQu+Y9w7ww3N8k2Yi6G2L7Gzl62nLVy9rFitwyvi6rcFusiyUW+627TPvGFu+iv6V
-         PDnXbzXm+TrtbqOrLr8ih1RRS3q6YoPma4sqFxDg9gvmyfFFSeAtavdIlz8R/tK8ufgQ
-         O5if9Fh43nZzO0UJbwEFEnDIzsobRuBbOn3Ak6f/TVmvrR3AFlcWF93Cb0K8ScN9hu7+
-         iY/RV9hgsiRu9l2G+O8cKxVJ1t6JiKFbS5sC3fXkMojCkEoxcMYCf5V0EUG1oKrv2V9S
-         kwjQ==
-X-Gm-Message-State: AO0yUKWTy77Q+h6p8UVcOHOIxJ7tllc6BTVpMJHPazNI6Obv6yDDkM6h
-        hy2M0IhmMbE8Fn65wweTfjABSg==
-X-Google-Smtp-Source: AK7set9iJvaog96LALhe884wzN0xuXErl0FzajFZhkV85AuS0ZFd+QdHTbYidcus7alXRIzwIWNnJw==
-X-Received: by 2002:a05:6e02:1d17:b0:315:4f67:7055 with SMTP id i23-20020a056e021d1700b003154f677055mr4026600ila.1.1676500438087;
-        Wed, 15 Feb 2023 14:33:58 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mnWb0/c3SYq7VOjFth5MeHXAYmHB31VnBFWZUTQPvpw=;
+        b=drHIJeMMclzwH5VYKR+gRSjJ4zG/6OKhJKEfkoliROs5MD+uQsqAjMwbIFQsgCFegh
+         OOfxTmciNcLw8RKRa60NP3IKFXivrzDo5v1J9u6tcSImPjZFn9621viWK2WJ6PlitKsk
+         cdvU+TphRr4BMaHwLNC1GprocOLPRUQ2PCp0fzYTylmmupIwTOkykqcd7CRhmHdEfQbU
+         gpPvGgcI3eWBraSsijdR/HDGOoNusBEx5Yv0iGMwETjBQpYJJQsLtumCZ26ILTE2aKk7
+         Z2W5bOPD+SLxS0vUyVKOTZwe/STfuKaen1kbLAZJMnjtT+NhPT9mbN3VX0tIF2mRx16A
+         fgqA==
+X-Gm-Message-State: AO0yUKVU1SCmGMIWCAgF5eFAdj0NgsPl/PHzCJBPJPS1tyohFXNFnYjz
+        5Zh8O0b1J8eNxB8Tge6tcdUD1w==
+X-Google-Smtp-Source: AK7set+LWFNoW1FRruwyMQqPtFjjrfVj8AiheRpZcLSgqEnBWe2webNydnur3ykK3IxtsLkMcuwgOQ==
+X-Received: by 2002:a6b:7118:0:b0:734:2621:58e2 with SMTP id q24-20020a6b7118000000b00734262158e2mr3155532iog.20.1676500440593;
+        Wed, 15 Feb 2023 14:34:00 -0800 (PST)
 Received: from ravnica.bld.corp.google.com ([2620:15c:183:200:6299:179b:a6e4:be59])
-        by smtp.gmail.com with ESMTPSA id b15-20020a92c14f000000b003141eddd283sm1131489ilh.22.2023.02.15.14.33.57
+        by smtp.gmail.com with ESMTPSA id b15-20020a92c14f000000b003141eddd283sm1131489ilh.22.2023.02.15.14.34.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Feb 2023 14:33:57 -0800 (PST)
+        Wed, 15 Feb 2023 14:34:00 -0800 (PST)
 From:   Ross Zwisler <zwisler@chromium.org>
 X-Google-Original-From: Ross Zwisler <zwisler@google.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     Ross Zwisler <zwisler@google.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "Tobin C. Harding" <me@tobin.cc>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jason Wang <jasowang@redhat.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Tycho Andersen <tycho@tycho.pizza>, kvm@vger.kernel.org,
-        linux-hardening@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-mm@kvack.org, virtualization@lists.linux-foundation.org,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
         linux-trace-kernel@vger.kernel.org,
         Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH v2 0/6] use canonical ftrace path whenever possible
-Date:   Wed, 15 Feb 2023 15:33:44 -0700
-Message-Id: <20230215223350.2658616-1-zwisler@google.com>
+Subject: [PATCH v2 4/6] tools/kvm_stat: use canonical ftrace path
+Date:   Wed, 15 Feb 2023 15:33:48 -0700
+Message-Id: <20230215223350.2658616-5-zwisler@google.com>
 X-Mailer: git-send-email 2.39.1.637.g21b0678d19-goog
+In-Reply-To: <20230215223350.2658616-1-zwisler@google.com>
+References: <20230215223350.2658616-1-zwisler@google.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Changes in v2:
- * Dropped patches which were pulled into maintainer trees.
- * Split BPF patches out into another series targeting bpf-next.
- * trace-agent now falls back to debugfs if tracefs isn't present.
- * Added Acked-by from mst@redhat.com to series.
- * Added a typo fixup for the virtio-trace README.
-
-Steven, assuming there are no objections, would you feel comfortable
-taking this series through your tree?
-
----
 The canonical location for the tracefs filesystem is at /sys/kernel/tracing.
 
 But, from Documentation/trace/ftrace.rst:
@@ -99,43 +81,27 @@ But, from Documentation/trace/ftrace.rst:
 
   /sys/kernel/debug/tracing
 
-There are many places where this older debugfs path is still used in
-code comments, selftests, examples and tools, so let's update them to
-avoid confusion.
+A comment in kvm_stat still refers to this older debugfs path, so let's
+update it to avoid confusion.
 
-I've broken up the series as best I could by maintainer or directory,
-and I've only sent people the patches that I think they care about to
-avoid spamming everyone.
+Signed-off-by: Ross Zwisler <zwisler@google.com>
+---
+ tools/kvm/kvm_stat/kvm_stat | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Ross Zwisler (6):
-  tracing: always use canonical ftrace path
-  selftests: use canonical ftrace path
-  leaking_addresses: also skip canonical ftrace path
-  tools/kvm_stat: use canonical ftrace path
-  tools/virtio: use canonical ftrace path
-  tools/virtio: fix typo in README instructions
-
- include/linux/kernel.h                        |  2 +-
- include/linux/tracepoint.h                    |  4 ++--
- kernel/trace/Kconfig                          | 20 +++++++++----------
- kernel/trace/kprobe_event_gen_test.c          |  2 +-
- kernel/trace/ring_buffer.c                    |  2 +-
- kernel/trace/synth_event_gen_test.c           |  2 +-
- kernel/trace/trace.c                          |  2 +-
- samples/user_events/example.c                 |  4 ++--
- scripts/leaking_addresses.pl                  |  1 +
- scripts/tracing/draw_functrace.py             |  6 +++---
- tools/kvm/kvm_stat/kvm_stat                   |  2 +-
- tools/lib/api/fs/tracing_path.c               |  4 ++--
- .../testing/selftests/user_events/dyn_test.c  |  2 +-
- .../selftests/user_events/ftrace_test.c       | 10 +++++-----
- .../testing/selftests/user_events/perf_test.c |  8 ++++----
- tools/testing/selftests/vm/protection_keys.c  |  4 ++--
- tools/tracing/latency/latency-collector.c     |  2 +-
- tools/virtio/virtio-trace/README              |  4 ++--
- tools/virtio/virtio-trace/trace-agent.c       | 12 +++++++----
- 19 files changed, 49 insertions(+), 44 deletions(-)
-
+diff --git a/tools/kvm/kvm_stat/kvm_stat b/tools/kvm/kvm_stat/kvm_stat
+index 6f28180ffeea..15bf00e79e3f 100755
+--- a/tools/kvm/kvm_stat/kvm_stat
++++ b/tools/kvm/kvm_stat/kvm_stat
+@@ -627,7 +627,7 @@ class TracepointProvider(Provider):
+         name)'.
+ 
+         All available events have directories under
+-        /sys/kernel/debug/tracing/events/ which export information
++        /sys/kernel/tracing/events/ which export information
+         about the specific event. Therefore, listing the dirs gives us
+         a list of all available events.
+ 
 -- 
 2.39.1.637.g21b0678d19-goog
 
