@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 448E5698265
-	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 18:41:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DFC12698266
+	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 18:41:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230106AbjBORlF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Feb 2023 12:41:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44910 "EHLO
+        id S229896AbjBORlH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Feb 2023 12:41:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230116AbjBORlD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Feb 2023 12:41:03 -0500
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCA2E39B90
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 09:41:00 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-4c11ae6ab25so225122207b3.8
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 09:41:00 -0800 (PST)
+        with ESMTP id S229728AbjBORlF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Feb 2023 12:41:05 -0500
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 980023A87D
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 09:41:02 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-52eb75aeecdso219994857b3.13
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 09:41:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2aQfWdKPXuFG6NSbYocOUPq5yC9G6Tl83wDoUvzVHnI=;
-        b=Ua5IO7vGngB3DNTztZZETtTDciYiE4ZSiNpD2944my3OwRFQUckvrgPt2B78tyOqXi
-         F5kKqBAoj6U1HKy1VTJEhvlYGW3FWgCNy4cvKT9FHRcMvJ8MHnHbjozdlzOln7nl9oyg
-         JRgPMkCocBqDVJTgdXR/qsVvybn4hlHa1C7dOwtMVjOGWyj9O6BBdiYwnsaSH4EMjiEV
-         jllLlMJozi4joV+FdfhpVn2jSts0h8cnkwTnWayt7Lsoj3eUqLy1i0CczBm48omZvZoK
-         z7ebDlIWrmJBod1cOC40C4r+VfkG6cyJNX8DgPgLiy4QiEKKoE0Oc9WE/2rBp1QnS8hz
-         Zr4g==
+        bh=F7pmS0etoscsJWB31SNQ0h7rXLmwCbZI5n0ahNK1Zxc=;
+        b=BkglgUo7hgFH0voA/pzzH9dAyhjXKOyLokdbDXnZmmat37ke58uDWgCy8VW/Wy/cqy
+         t5SY2VP4f5nQPltPGAlXM4o+C9zUoX1UhOZgOqaERs/Q0guYOZXHIoeTF8XGmYXj5KBh
+         U6HPOEubmicYwXVNYIznD+IE7BBCfQA0Nl7IERklHdSwdTdOWs1B/TkQZbt6RYCy3IuT
+         nO/SQvThH02fcyD16UxXoMDjq6Y22JXC3ju9/MXG6+9jKwplhwaOYpTWOB4E5AZv1Ru9
+         fFF7uKdlPzEdvaXp67uB3P1YvgacBYjJUK2aTjAgO8NOzQLvoGnDtc4I6eaQ7yf7FDqG
+         qnlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2aQfWdKPXuFG6NSbYocOUPq5yC9G6Tl83wDoUvzVHnI=;
-        b=UATIG4rMByvcbn2zsuq4vMyA5byIhQdEH/MK+q42fGGnaHHJk2pMIC92YTAajsED1L
-         IOx+mYvdJefTW9eCiyz/FCzeV5SNJTCNgxPp2t1z/qgyxTlQ+9Dgiq4k7lldjMbR7sI4
-         hG8QGwSa5qvWaI8yllRRCdtZjbKdIbEVa2geIZWQKw34rWUJBgGooxQvqLdS++/6+sQw
-         HToljgQGIXXbScJpWWNRhuTQPF3I0mYdTxdDah85DWYdBGWf4swCxLZ/L3KBnKXbF5eK
-         GgMNp/oucIvyN7agehNTU42acyH2dKrokSEO8goFXBuMo8nuKsX3NU3369jajenURpNg
-         vLiA==
-X-Gm-Message-State: AO0yUKUv0YlXA0fwiu1fVA6T2RSu2B1vgF9bXHOr/uASrmFJRy1OyXoN
-        MweLJlEeEKM4KiZWvwvOTJPIBO0hHs4hsA==
-X-Google-Smtp-Source: AK7set9UpWTD9Hf0MbU51HmGeZZNYgY6nfTTY6vNSaQoP2nvyZ6+CLZ7Rwm9HKLf3iyzgtqf832vzhg6ZxuPMg==
+        bh=F7pmS0etoscsJWB31SNQ0h7rXLmwCbZI5n0ahNK1Zxc=;
+        b=0w9jFfbFA5oAI3gVQvV1qowGPvZFf4817nO+Pjr/NRPk9uO7MCYxNyydOnmuzUqI06
+         0SPagZA90Bm9a4qXFb9ztO2CvpMBg42wDJ8sQPwu5CMl9/7UzwLccYLc8S/cOS2SGqtv
+         apba8OLjcpy5dDVbSxTj3PYWYKBLGv8T0LsdPp1Wmg7bGAPYC4kZOWV9kdWsnuHqG04X
+         OaUZrVETThzqf4vY4pp/NX/XXIVkfyYc6NM5XhgUdGPVTa8MuRoXjStBSL1XgGFvyKVp
+         a54ZjPfCgMQrzOVJRaTjPewVQkLMwpHYSqqeC5USzKK1oYcgHx2/SLHrJaOR/Xoy1MZ0
+         hqdg==
+X-Gm-Message-State: AO0yUKUPkVjrSR5BrhIQP/cjwGFmRjJ4MoVENpmOZdCnZlzQJecuZL5r
+        esY/a0SrHZC/V7lwFqP4IEKE+5jh16ZonA==
+X-Google-Smtp-Source: AK7set+Jy7z2qk9y2xPyd0hgX9cF2Rs6bN8+J369ziuNiWMAFJ8XPlPOKXYBYze5fVC1+rVVIeLv/76M+F4NKg==
 X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a25:dfcf:0:b0:886:23d6:1b4f with SMTP id
- w198-20020a25dfcf000000b0088623d61b4fmr347924ybg.115.1676482860031; Wed, 15
- Feb 2023 09:41:00 -0800 (PST)
-Date:   Wed, 15 Feb 2023 17:40:40 +0000
+ (user=ricarkol job=sendgmr) by 2002:a25:7903:0:b0:855:d2c4:2119 with SMTP id
+ u3-20020a257903000000b00855d2c42119mr366476ybc.107.1676482861684; Wed, 15 Feb
+ 2023 09:41:01 -0800 (PST)
+Date:   Wed, 15 Feb 2023 17:40:41 +0000
 In-Reply-To: <20230215174046.2201432-1-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20230215174046.2201432-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.39.1.637.g21b0678d19-goog
-Message-ID: <20230215174046.2201432-7-ricarkol@google.com>
-Subject: [PATCH v3 06/12] KVM: arm64: Add kvm_uninit_stage2_mmu()
+Message-ID: <20230215174046.2201432-8-ricarkol@google.com>
+Subject: [PATCH v3 07/12] KVM: arm64: Export kvm_are_all_memslots_empty()
 From:   Ricardo Koller <ricarkol@google.com>
 To:     pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
         yuzenghui@huawei.com, dmatlack@google.com
@@ -72,55 +72,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add kvm_uninit_stage2_mmu() and move kvm_free_stage2_pgd() into it. A
-future commit will add some more things to do inside of
-kvm_uninit_stage2_mmu().
+Export kvm_are_all_memslots_empty(). This will be used by a future
+commit when checking before setting a capability.
 
 No functional change intended.
 
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- arch/arm64/include/asm/kvm_mmu.h | 1 +
- arch/arm64/kvm/mmu.c             | 7 ++++++-
- 2 files changed, 7 insertions(+), 1 deletion(-)
+ include/linux/kvm_host.h | 2 ++
+ virt/kvm/kvm_main.c      | 2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index e4a7e6369499..058f3ae5bc26 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -167,6 +167,7 @@ void free_hyp_pgds(void);
- 
- void stage2_unmap_vm(struct kvm *kvm);
- int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long type);
-+void kvm_uninit_stage2_mmu(struct kvm *kvm);
- void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
- int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- 			  phys_addr_t pa, unsigned long size, bool writable);
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index d2c5e6992459..812633a75e74 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -766,6 +766,11 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
- 	return err;
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 4f26b244f6d0..8c5530e03a78 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -991,6 +991,8 @@ static inline bool kvm_memslots_empty(struct kvm_memslots *slots)
+ 	return RB_EMPTY_ROOT(&slots->gfn_tree);
  }
  
-+void kvm_uninit_stage2_mmu(struct kvm *kvm)
-+{
-+	kvm_free_stage2_pgd(&kvm->arch.mmu);
-+}
++bool kvm_are_all_memslots_empty(struct kvm *kvm);
 +
- static void stage2_unmap_memslot(struct kvm *kvm,
- 				 struct kvm_memory_slot *memslot)
- {
-@@ -1855,7 +1860,7 @@ void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen)
- 
- void kvm_arch_flush_shadow_all(struct kvm *kvm)
- {
--	kvm_free_stage2_pgd(&kvm->arch.mmu);
-+	kvm_uninit_stage2_mmu(kvm);
+ #define kvm_for_each_memslot(memslot, bkt, slots)			      \
+ 	hash_for_each(slots->id_hash, bkt, memslot, id_node[slots->node_idx]) \
+ 		if (WARN_ON_ONCE(!memslot->npages)) {			      \
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 9c60384b5ae0..3940d2467e1b 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4604,7 +4604,7 @@ int __attribute__((weak)) kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 	return -EINVAL;
  }
  
- void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+-static bool kvm_are_all_memslots_empty(struct kvm *kvm)
++bool kvm_are_all_memslots_empty(struct kvm *kvm)
+ {
+ 	int i;
+ 
 -- 
 2.39.1.637.g21b0678d19-goog
 
