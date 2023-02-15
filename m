@@ -2,70 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CD4C9697333
-	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 02:08:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E2E8069733E
+	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 02:10:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233343AbjBOBIo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Feb 2023 20:08:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53980 "EHLO
+        id S232909AbjBOBKY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Feb 2023 20:10:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233034AbjBOBIN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Feb 2023 20:08:13 -0500
-Received: from mail-il1-x14a.google.com (mail-il1-x14a.google.com [IPv6:2607:f8b0:4864:20::14a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60EF431E23
-        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 17:07:40 -0800 (PST)
-Received: by mail-il1-x14a.google.com with SMTP id r16-20020a92ce90000000b0031539a8e730so5383426ilo.13
-        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 17:07:40 -0800 (PST)
+        with ESMTP id S232732AbjBOBKX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Feb 2023 20:10:23 -0500
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80FD983F3
+        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 17:09:53 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id g12-20020a170902868c00b00199148d00f2so9961840plo.17
+        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 17:09:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=E305a934JyKR6d0LbQnwDb1KLXy1uRhITDhO1feUNVQ=;
-        b=I9xImCmVWCFNHbTSunyTqAaQSap8s5DCNhGLVbV7DgL0T5/D1hdtBQJhSlNOe0jyPF
-         voYUROttsE9l9SnEr6HvowKBOJbe3Owouy9OMVDxedlEyBXWr5K1mib2fl7gRhdLO48L
-         fnbPgDfuU6IyeV5gmtkDjhnSwbDWrRJiY/rOnl9/nyjQn/kkRiKJ7TrYIVTF4wF6Riqy
-         H4EGjONPbs2vlw0XIQt4v1m1JZuOeQ5uTUSmzUK+wKvS/rdrVoM46iwXIui3VhOGipia
-         XgImDP9+Y9tLkAorIZjdPiohqFBlpPbzSEPNJfNVZHgYBDc7MHB0TWhNYdEakb6KtRlu
-         ToZg==
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=/D3tWjq5EbXGfsR6lDylgRsLrovR+yglXMNG93mrjXQ=;
+        b=GfjOADNQleJBV6SLlcbfQMeHdXt/RX9hIFiY3rYg69NIxEhdF2js3Tng8z6G7Xp/nT
+         9eyspcQYid7406j1CMK96UheLbXpkRX/m6onKKOtGG95jKtmz7hM2n2MaqNTzaAspn9r
+         V5iWLcfAS1oIiXazMw+pmmpzl9P8Oo7eo+w9FrbilEhQEwKLZ3uO72QLHYuEYgxA8YxE
+         3NsqVjXqVctGAUX95wnh/xDHicr94iF/5pccDnkx4WREbeVO5xMFCHIJrxtRTlersOm+
+         1gdm2RTUzbaA67UnEegDfwt3UlSYDQQSHUdXUQTBbhlLnniZRGezqPyTGsuZtJcpiwbO
+         TyNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=E305a934JyKR6d0LbQnwDb1KLXy1uRhITDhO1feUNVQ=;
-        b=XqlDAQAe7mTDvLyemRJgWdKzJUkCubzyW5Itzca6+1SUr41GVzDuButv1mW1cjmi7K
-         M0p4wlfISuE2Eayhk9EG7bjduNXOMcOdugc+W7L77bZtPZyCEHTu4RLshlCGSB/HqNWn
-         DcqD4CZAVI8N3UZ595qKaH7RtK7ZTxjq15LKdDSCD44VvbY6aF04ihh3hDesgsRd96nB
-         AZlhkmLJMaXz3g45zDBwHeinpXWKuge3YPrIOMMSDRQyjtgOOyGVK01K4i1bwhvk5BmX
-         seeE0WqxHlHK/tW7SywwM3MLtnkhF/R1cOZwt704uzQ9INdUcGpCTXZyAfIqPhxxkKWG
-         hZoA==
-X-Gm-Message-State: AO0yUKUepGivkB0/oPwggagEWsbwDppBlChVVvN8QtVntZzVwNgmbCfW
-        PzsqEQNwtfZTdxJNxSKIFDnZjobI2qtV
-X-Google-Smtp-Source: AK7set+b4ssQzb8aMv+uSf2RmCPqXoTCRttRjQLG+i9Fm0UeKWjHu4LVoeyGHXP+DptEEnYx2/E5xZzWwpO6
-X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:22b5])
- (user=rananta job=sendgmr) by 2002:a6b:fb01:0:b0:71c:479d:741a with SMTP id
- h1-20020a6bfb01000000b0071c479d741amr332606iog.38.1676423258679; Tue, 14 Feb
- 2023 17:07:38 -0800 (PST)
-Date:   Wed, 15 Feb 2023 01:07:15 +0000
-In-Reply-To: <20230215010717.3612794-1-rananta@google.com>
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/D3tWjq5EbXGfsR6lDylgRsLrovR+yglXMNG93mrjXQ=;
+        b=hOnjYRk4KkkTyu/D+UCQji+4uRq5ddqyxHutoz0IlJOgiPMe3/OO7IQKKOvKV+uLAF
+         tQqPC4Zb+qXmJ7DCoe6dPUJTB75fyaRK7Wh+rC1Z7qSuIE+03vTB8gUi22seRjQF22Y6
+         8TW+cSGPMlUe94S6WolLcla+uZqV6vOLafPQvLwG5Tys6FRrNhW57VpgRk/ANfDVkKT1
+         eL6TJGyDcfYUIHc6L4zsoarptuPQOlcX/AxpAgb2RXT6LaWYbq89e0p3/+nrPvGeJPgK
+         jIlWVRyzxfz98YoSpkTurs3HpyKs8H1sDiYSjaxhEIgfAsiA/uJjg5ZLcmru35+XmzOd
+         Vjeg==
+X-Gm-Message-State: AO0yUKX2lD8guLzisLgrXwVDSh8BM26BOQjx7Jao2QlVvnwyIA//M+N7
+        ElrtHdHhMw0u2IPF+Oo4bG77okjEcSY=
+X-Google-Smtp-Source: AK7set/Svo1zA8o8HHs/0xjBmiTppRburnATrTqlyJn0pc8ICSysKVsZXnH+Lv4OQlYwKRHnbQHLOtgzeyg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:5d03:0:b0:4da:a1d0:3f3f with SMTP id
+ r3-20020a635d03000000b004daa1d03f3fmr60827pgb.5.1676423315470; Tue, 14 Feb
+ 2023 17:08:35 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Tue, 14 Feb 2023 17:07:15 -0800
+In-Reply-To: <20230215010718.415413-1-seanjc@google.com>
 Mime-Version: 1.0
-References: <20230215010717.3612794-1-rananta@google.com>
+References: <20230215010718.415413-1-seanjc@google.com>
 X-Mailer: git-send-email 2.39.1.581.gbfd45094c4-goog
-Message-ID: <20230215010717.3612794-15-rananta@google.com>
-Subject: [REPOST PATCH 14/16] selftests: KVM: aarch64: Add PMU test to chain
- all the counters
-From:   Raghavendra Rao Ananta <rananta@google.com>
-To:     Oliver Upton <oupton@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Ricardo Koller <ricarkol@google.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Message-ID: <20230215010718.415413-5-seanjc@google.com>
+Subject: [GIT PULL] KVM: x86: PMU changes for 6.3
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -77,94 +68,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Extend the vCPU migration test to occupy all the vPMU counters,
-by configuring chained events on alternate counter-ids and chaining
-them with its corresponding predecessor counter, and verify against
-the extended behavior.
+KVM x86/pmu changes for 6.3.  The most noteworthy patches are two fixes that
+_aren't_ in this pull request.  The arch LBRs fix came late in the cycle and
+doesn't seem super urgent, not sure if it needs to go into 6.3.  Disabling vPMU
+support on hybrid CPUs is much more urgent, but I want your input before
+proceeding.
 
-Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
----
- .../testing/selftests/kvm/aarch64/vpmu_test.c | 60 +++++++++++++++++++
- 1 file changed, 60 insertions(+)
+  https://lore.kernel.org/all/20230128001427.2548858-1-seanjc@google.com
+  https://lore.kernel.org/all/20230208204230.1360502-1-seanjc@google.com
 
-diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_test.c b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
-index de725f4339ad5..fd00acb9391c8 100644
---- a/tools/testing/selftests/kvm/aarch64/vpmu_test.c
-+++ b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
-@@ -710,6 +710,63 @@ static void test_chained_count(int pmc_idx)
- 	pmu_irq_exit(chained_pmc_idx);
- }
- 
-+static void test_chain_all_counters(void)
-+{
-+	int i;
-+	uint64_t cnt, pmcr_n = get_pmcr_n();
-+	struct pmc_accessor *acc = &pmc_accessors[0];
-+
-+	/*
-+	 * Test the occupancy of all the event counters, by chaining the
-+	 * alternate counters. The test assumes that the host hasn't
-+	 * occupied any counters. Hence, if the test fails, it could be
-+	 * because all the counters weren't available to the guest or
-+	 * there's actually a bug in KVM.
-+	 */
-+
-+	/*
-+	 * Configure even numbered counters to count cpu-cycles, and chain
-+	 * each of them with its odd numbered counter.
-+	 */
-+	for (i = 0; i < pmcr_n; i++) {
-+		if (i % 2) {
-+			acc->write_typer(i, ARMV8_PMUV3_PERFCTR_CHAIN);
-+			acc->write_cntr(i, 1);
-+		} else {
-+			pmu_irq_init(i);
-+			acc->write_cntr(i, PRE_OVERFLOW_32);
-+			acc->write_typer(i, ARMV8_PMUV3_PERFCTR_CPU_CYCLES);
-+		}
-+		enable_counter(i);
-+	}
-+
-+	/* Introduce some cycles */
-+	execute_precise_instrs(500, ARMV8_PMU_PMCR_E);
-+
-+	/*
-+	 * An overflow interrupt should've arrived for all the even numbered
-+	 * counters but none for the odd numbered ones. The odd numbered ones
-+	 * should've incremented exactly by 1.
-+	 */
-+	for (i = 0; i < pmcr_n; i++) {
-+		if (i % 2) {
-+			GUEST_ASSERT_1(!pmu_irq_received(i), i);
-+
-+			cnt = acc->read_cntr(i);
-+			GUEST_ASSERT_2(cnt == 2, i, cnt);
-+		} else {
-+			GUEST_ASSERT_1(pmu_irq_received(i), i);
-+		}
-+	}
-+
-+	/* Cleanup the states */
-+	for (i = 0; i < pmcr_n; i++) {
-+		if (i % 2 == 0)
-+			pmu_irq_exit(i);
-+		disable_counter(i);
-+	}
-+}
-+
- static void test_event_count(uint64_t event, int pmc_idx, bool expect_count)
- {
- 	switch (event) {
-@@ -739,6 +796,9 @@ static void test_basic_pmu_functionality(void)
- 
- 	/* Test chained events */
- 	test_chained_count(0);
-+
-+	/* Test running chained events on all the implemented counters */
-+	test_chain_all_counters();
- }
- 
- /*
--- 
-2.39.1.581.gbfd45094c4-goog
+The following changes since commit 7cb79f433e75b05d1635aefaa851cfcd1cb7dc4f:
 
+  KVM: PPC: Fix refactoring goof in kvmppc_e500mc_init() (2023-01-24 13:00:32 -0500)
+
+are available in the Git repository at:
+
+  https://github.com/kvm-x86/linux.git tags/kvm-x86-pmu-6.3
+
+for you to fetch changes up to 13738a3647368f7f600b30d241779bcd2a3ebbfd:
+
+  perf/x86/intel: Expose EPT-friendly PEBS for SPR and future models (2023-02-01 16:42:36 -0800)
+
+----------------------------------------------------------------
+KVM x86 PMU changes for 6.3:
+
+ - Add support for created masked events for the PMU filter to allow
+   userspace to heavily restrict what events the guest can use without
+   needing to create an absurd number of events
+
+ - Clean up KVM's handling of "PMU MSRs to save", especially when vPMU
+   support is disabled
+
+ - Add PEBS support for Intel SPR
+
+----------------------------------------------------------------
+Aaron Lewis (7):
+      KVM: x86/pmu: Correct the mask used in a pmu event filter lookup
+      KVM: x86/pmu: Remove impossible events from the pmu event filter
+      KVM: x86/pmu: prepare the pmu event filter for masked events
+      KVM: x86/pmu: Introduce masked events to the pmu event filter
+      KVM: selftests: Add flags when creating a pmu event filter
+      KVM: selftests: Add testing for KVM_SET_PMU_EVENT_FILTER
+      KVM: selftests: Test masked events in PMU filter
+
+Like Xu (4):
+      KVM: x86/pmu: Drop event_type and rename "struct kvm_event_hw_type_mapping"
+      KVM: x86/pmu: Don't tell userspace to save MSRs for non-existent fixed PMCs
+      KVM: x86/pmu: Add PRIR++ and PDist support for SPR and later models
+      perf/x86/intel: Expose EPT-friendly PEBS for SPR and future models
+
+Sean Christopherson (5):
+      KVM: x86/pmu: Cap kvm_pmu_cap.num_counters_gp at KVM's internal max
+      KVM: x86/pmu: Gate all "unimplemented MSR" prints on report_ignored_msrs
+      KVM: x86/pmu: Use separate array for defining "PMU MSRs to save"
+      KVM: x86/pmu: Don't tell userspace to save PMU MSRs if PMU is disabled
+      KVM: x86/pmu: Provide "error" semantics for unsupported-but-known PMU MSRs
+
+ Documentation/virt/kvm/api.rst                     |  80 ++++-
+ arch/x86/events/intel/core.c                       |   1 +
+ arch/x86/events/intel/ds.c                         |   4 +-
+ arch/x86/include/asm/kvm_host.h                    |  15 +-
+ arch/x86/include/uapi/asm/kvm.h                    |  29 ++
+ arch/x86/kvm/hyperv.c                              |  10 +-
+ arch/x86/kvm/pmu.c                                 | 286 +++++++++++++---
+ arch/x86/kvm/pmu.h                                 |  13 +-
+ arch/x86/kvm/svm/pmu.c                             |   2 +
+ arch/x86/kvm/svm/svm.c                             |   5 +-
+ arch/x86/kvm/vmx/pmu_intel.c                       |  23 +-
+ arch/x86/kvm/vmx/vmx.c                             |   4 +-
+ arch/x86/kvm/x86.c                                 | 230 +++++++------
+ arch/x86/kvm/x86.h                                 |  12 +
+ include/uapi/linux/kvm.h                           |   1 +
+ .../selftests/kvm/x86_64/pmu_event_filter_test.c   | 381 ++++++++++++++++++++-
+ 16 files changed, 897 insertions(+), 199 deletions(-)
