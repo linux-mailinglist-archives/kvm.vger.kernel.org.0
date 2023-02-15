@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BDE0697F51
-	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 16:17:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E983A697F6A
+	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 16:21:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229576AbjBOPRT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Feb 2023 10:17:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44606 "EHLO
+        id S229914AbjBOPVB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Feb 2023 10:21:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47826 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229501AbjBOPRR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Feb 2023 10:17:17 -0500
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5053F32E6C
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 07:17:16 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-52ec7c792b1so192777027b3.5
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 07:17:16 -0800 (PST)
+        with ESMTP id S229862AbjBOPU7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Feb 2023 10:20:59 -0500
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3EF272A4
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 07:20:58 -0800 (PST)
+Received: by mail-pf1-x449.google.com with SMTP id y28-20020a056a001c9c00b005a8c5cd5ae9so4290723pfw.22
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 07:20:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2GWRPMHVeiqOMag7N+CGtJxwUoAtSFjI5MbWgOrFpZ4=;
-        b=DIrTC42RWTBZubBn6CRUk0pf27X1NwqhaA22qAP2/rgKTxdcSt1wwkryixrq+QvVX8
-         J9Kze6KJWc5+tMHtDBrt0dHDrXo2/1LJfFhnvyrt66vvh5Ud4P/8pGkRrmTRXMKAlDG/
-         ASbJT6YcLbaEDYmEMRndtPvde4CmCTNXG2xURWyPYxFIm6O0OTNoUAo0TdcgOZucgGp5
-         u/PqWm46+1rlUL+9xLB6EcMyl3ac+YTOevbptNwmqYvRxW1UVxDbuYvG8PsWYjVEyYOL
-         QKEq26CXCFyCSdF55Cnh/L6Gt/cJ0CHmaSTdi2ei00wOXdu6TvHsud2xl+0D757m1CSf
-         boOA==
+        bh=iDukbJdwBzqD8cf3Dpo6Rb4XouWez9+Bscdl5lNP9jE=;
+        b=ohreeci2tmJfITEyOGUGkEKnrkaY1n0D9pgJXvMVz+Ilu2jbR8TAIlYP/R/MvfTqoH
+         Ke/LOWMGGHyEfy+IW2VArB3dtXeA4bi3uXACt8DqX1GWgBjY+uXq5j5yj1GtHhhUon4b
+         6k18Uc8Loq/buM60b3SNXw401AaLdyv5aAhnpmy4R+cLSAi2cm9QXcqTswhCwnEg8YQG
+         9hf5/D9JLV2TnBdAngWJEHUy6UDXLlG1/PY2bkNIJX0C9zaXP8G/CAvBsP/BnpKmOqA3
+         VzbsnDa/AjdZIzeJ+zy4K6WPPAnhrS2rSjwkFtkxW+40qSsoq39UkbPolqF4/jU93dil
+         JuQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2GWRPMHVeiqOMag7N+CGtJxwUoAtSFjI5MbWgOrFpZ4=;
-        b=hLfXksXChFJlaSnlFAbtwOqTZczAGo3Jowd1RfhkZtdVu0S3Ku1LpMdwZTp6U4wO46
-         2og9Uy58it5boRBAXGpbwlj32I9+R2hQDPsduagrYMeASN/APThCVqRoh5sEkn6XM9LD
-         zARPr/cuUkbjhizt2CZdQ2h5HgWP361SznKRIPCblVNUQ2T/Jg2BCoJ/ZfnxG45NqDz4
-         u7a25DDqPtG7u74MJQqWt9hiks/qEj1BrmI4ACoM8rZt3ic0f2UMQlN+BQQlp7JZ662/
-         C7EmuU2bL4ZpN0yidNyHGoM/0J0ffqBCckxEGsi6TDVo+FPZgA7P4Ufspk0ve3XQO282
-         VuPw==
-X-Gm-Message-State: AO0yUKUX/LMXQB0QJwmfv/pV8VEV7/xoIu297f0i9tg2qsdO8SuBNpCW
-        Pkv0l4YSIEkRr1X8rpkIvI2QVFLbq8o=
-X-Google-Smtp-Source: AK7set/MdswQiu5fOFAT1hMuarY6sAib5CavrAMi8b+P3/gfIyilWUpkViGeL2SlHgAfgXq1HFAjTeoAIDk=
+        bh=iDukbJdwBzqD8cf3Dpo6Rb4XouWez9+Bscdl5lNP9jE=;
+        b=G/3UhE3vJbiydJtHZ8cFpwXW0exe+WMxeGsQpByME84QUPKZEIxG9eXQuvB2jn4XmY
+         U1tigrgW4kvx0FQCniKEmW2TzcF9I/VtLGNeDdoeZR6WoPlgYvHUHTT2DJ7ZD7XJ0tJS
+         M+CcbcI3fNVjmVhH9s+wYBDlziAY6WqxPcDUjM1kbpOpmYj7D6q/uGgWg52SRmuK8p3+
+         NCKv4ArpKx0aZtXYq4+UiceJ3RfEmp8Uot4sDnqqKsVyB6bcLCvStnlXYWUKD0GVEJdI
+         48aDbbqrHECfa7OA7pMNk0zGUGjwkeWrhGDf9WcwKijBGMt/BGHeFZDHO9/BrPRlmuop
+         72jA==
+X-Gm-Message-State: AO0yUKWUqW+ZmksbPvd1RBqV80tjlz1vfePuSqV15pm+GTGMHe+s0KTa
+        r0Sui/jJKGezlFDuJMnBehJXy9aSH+w=
+X-Google-Smtp-Source: AK7set8S5SerR9f1nJdNDbGDT5znXEYryuJhEM9i7uc4EXq3U3S7jiJB/xHpbyswaGjzRWNCEa1V9zD4V/I=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:4314:0:b0:52f:1c23:ee6 with SMTP id
- q20-20020a814314000000b0052f1c230ee6mr4ywa.2.1676474235192; Wed, 15 Feb 2023
- 07:17:15 -0800 (PST)
-Date:   Wed, 15 Feb 2023 07:17:13 -0800
-In-Reply-To: <73545081-0d82-fce6-43f0-c50aee9416cb@gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a63:338f:0:b0:4fb:9b70:2bfe with SMTP id
+ z137-20020a63338f000000b004fb9b702bfemr461308pgz.2.1676474458212; Wed, 15 Feb
+ 2023 07:20:58 -0800 (PST)
+Date:   Wed, 15 Feb 2023 07:20:56 -0800
+In-Reply-To: <54d64f0e-871f-3004-d8a6-55c60affede0@gmail.com>
 Mime-Version: 1.0
-References: <20230210003148.2646712-1-seanjc@google.com> <20230210003148.2646712-8-seanjc@google.com>
- <73545081-0d82-fce6-43f0-c50aee9416cb@gmail.com>
-Message-ID: <Y+z2+5HPTRAa7+5i@google.com>
-Subject: Re: [PATCH v2 07/21] KVM: x86/pmu: Zero out LBR capabilities during
- PMU refresh
+References: <20230210003148.2646712-1-seanjc@google.com> <20230210003148.2646712-7-seanjc@google.com>
+ <54d64f0e-871f-3004-d8a6-55c60affede0@gmail.com>
+Message-ID: <Y+z4WF03dD/ytPl9@google.com>
+Subject: Re: [PATCH v2 06/21] KVM: x86/pmu: WARN and bug the VM if PMU is
+ refreshed after vCPU has run
 From:   Sean Christopherson <seanjc@google.com>
 To:     Like Xu <like.xu.linux@gmail.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -60,7 +60,7 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,12 +70,27 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Feb 15, 2023, Like Xu wrote:
 > On 10/2/2023 8:31 am, Sean Christopherson wrote:
-> > Note, this is a very theoretical bug, there is no known use case where a
-> > VMM would deliberately enable the vPMU via KVM_SET_CPUID2, and then later
-> > disable the vPMU.
+> > Now that KVM disallows changing feature MSRs, i.e. PERF_CAPABILITIES,
+> > after running a vCPU, WARN and bug the VM if the PMU is refreshed after
+> > the vCPU has run.
+> > 
+> > Note, KVM has disallowed CPUID updates after running a vCPU since commit
+> > feb627e8d6f6 ("KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN"), i.e.
+> > PERF_CAPABILITIES was the only remaining way to trigger a PMU refresh
+> > after KVM_RUN.
 > 
-> That's why we're getting more and more comfortable with selftests
-> and fuzz testing on KVM interfaces. So is there a test for this ?
+> A malicious user space could have saved the vcpu state and then deleted
+> and recreated a new vcpu w/ previous state so that it would have a chance
+> to re-set the features msr.
 
-Yep, last patch in the series, "KVM: selftests: Verify LBRs are disabled if vPMU
-is disabled".
+I don't follow.  vcpu->arch.perf_capabilities and kvm_vcpu_has_run() are per-vCPU,
+creating another vCPU will not let userspace trigger this WARN.
+
+> The key to this issue may be focused on the KVM_CREATE_VM interface.
+> 
+> How about the contract that when the first vcpu is created and "after
+> KVM_RUN of any vcpu", the values of all feature msrs for all vcpus on
+> the same guest cannot be changed, even if the (likely) first ever ran
+> vcpu is deleted ?
+
+I don't think that's necessary, as above the "freeze" happens per-vCPU.
