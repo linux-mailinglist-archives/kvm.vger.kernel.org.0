@@ -2,58 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F4EC697338
-	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 02:08:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5AF7669732B
+	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 02:08:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232763AbjBOBIt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Feb 2023 20:08:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53676 "EHLO
+        id S233251AbjBOBIO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Feb 2023 20:08:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233082AbjBOBIV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Feb 2023 20:08:21 -0500
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 670D63251D
-        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 17:07:46 -0800 (PST)
-Received: by mail-pf1-x44a.google.com with SMTP id c11-20020a62e80b000000b005a8ba9365c1so3927484pfi.18
-        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 17:07:46 -0800 (PST)
+        with ESMTP id S232803AbjBOBHz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Feb 2023 20:07:55 -0500
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33B5B30EB9
+        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 17:07:33 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-52ec8c88d75so153438287b3.12
+        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 17:07:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GgKzaPi/QrcJiYM9eoiWYZTMezdJYvR+LPCiPmmJFjY=;
-        b=h7nSXllSzOJ60G4tQHhNw0yP7P7IYk0V3nZluZTd1aMfkkFB5AixmW6tMQT57xcK5X
-         3N+teDIr2zebKOfi+rXEmLZDY+2Jn+/fgVbt87wmgO4Zell5U4fJXChAH0FUfjQcnxkZ
-         99uNFbR404ukjvLLgCaP/YvpdxSZmd9BWx+qQMSZLfT+drLA+sqU2P4YpiAr0oTZsmQ/
-         dr1EryYc7/p+6ImTUZVERkCPEzSjufT+1PbPc99/YoduBfja3S6h7MvDinPhlOcXwiU3
-         RF7gPL6ORXAH9NgRoMjLAEqKeUBQJGTN6Vb3p33ypqUalMNTD44ZDBcvaV7XIqlo1agb
-         ppAw==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/4pVme0YnvFkbmhGf1BNKoMvu6OdpqpHsZJlFNEmDZU=;
+        b=ObqpJ3X4Zzzxcthx2JxQal7z6qTNzX0aROAeY+JqG1bSWZY5Eiu6wXNgAa1sJK4lp6
+         BtjQCAheEnQDtcSI9+r2CfvzWHwsKFkiiiOElApjEDSk7ja4AX/Tsg3GePdBGX1TpxhH
+         8RcFt91LUTW5UZzn+gaVrvMsveq0lmd1LdeCVKxyrLkdmSEzd3anP2KIw9YGNSiNsZoB
+         7CYeHJCpj3CA+3IK5usRsXbXrlgz/CnR49SXSfnOLPv0T5fzBqfrgRgQAdvnG7lMoLdy
+         mvpc8qoiQomiDHpToX8qlVk45/hmvVZDfWJoUtHP1t3KaeOl+8VXiq9tKR5z2CUzzTX8
+         91gA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GgKzaPi/QrcJiYM9eoiWYZTMezdJYvR+LPCiPmmJFjY=;
-        b=PhDjtUAW1bs+gAwUlpqsvG6cBa8WJRdOJfjYG44cqlC9KtIOqgQfpTMKciG3AcEXw/
-         /nV/VFZAiWVjmbs+e30ya71Td081bD4CCr/rd25lW+Qom3dJuKpIWAVkQa27jPD/6HX9
-         0ex8ag2sxCa1rKyPUzxsFhLsaPKXol/UhuU/yKMH+n0qPh+hV60tC0s+fmO4F/vKSoGl
-         DUXuuxl+9LeAxhjOStM6VCv+x6bt9GcJeJU014kM3ttq6mSjtXN/XNl6r01fFDW2Pfaw
-         GFgGmyllqzUBALL9gW2Po4bBgu/iDgIvMv3mMA+Ql4dbWoPhHb7+oNEpBgmnOwrwfHz8
-         o0GA==
-X-Gm-Message-State: AO0yUKVortx2tyDhMnOoxRn9Ar5Z0qXu+nX40HNLh+449Ts7BjCBx/4Y
-        cxCj3N3BTetY5vEg+iPBuEArFyjUutE=
-X-Google-Smtp-Source: AK7set9MjL0Jda/vguFC5G3SyIToXJN/WaABgPL+TzCCiyajUFbJq7+m/hR2kmh5tMx8b86IAzn4xqMAjqE=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:3d06:0:b0:4fb:58bf:d25f with SMTP id
- k6-20020a633d06000000b004fb58bfd25fmr52360pga.7.1676423265751; Tue, 14 Feb
- 2023 17:07:45 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 14 Feb 2023 17:07:11 -0800
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/4pVme0YnvFkbmhGf1BNKoMvu6OdpqpHsZJlFNEmDZU=;
+        b=7/CzTcc1LyhHp5imu0ciiGZWwLXs9aksDSduf/xO+dsAidsOEy8hxuHCVx2qYBgsjG
+         ihTSsXCV7RIVotOT5ujFb5LLj2z9SjWyHP7O6RnoKdmmnBXoM/nKFAzVD2ZVNizQNZb0
+         wiyBaw4zgCVKp0C2Gu8T/mFhibXxBeHRQYVu0K/D6LE3MbANL7LF2ikmDo7w9XV65RH/
+         BbFEXlZQA/P+Kv4izU2zLj3sqZ1/Vd+2rOVigpHgTnVMpJ7/ixKA1Ga43jG3eHspJgDF
+         OkDyPrmiv4CmkQuX+Ellr+sFvAFP+X6hopkXk38seQNbNDEjoKdTMgysYpx4GGGadm1T
+         VOGA==
+X-Gm-Message-State: AO0yUKXWQQboAskPN+qAei6sLXfoV4kQ68Yq/CX+3Jf4dCyEBP5B0VSE
+        w5zqfP1pOCo64AUm/QqF+d1tLDTYW1r+
+X-Google-Smtp-Source: AK7set/yth4yrA5ctQs+Ets8c+gX8SkJ+jqv3vTU0OJChXY9EOPoTKuziDGTG20vcC7yRb46VfVl/mtRqm08
+X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:22b5])
+ (user=rananta job=sendgmr) by 2002:a05:6902:4e6:b0:910:5688:3360 with SMTP id
+ w6-20020a05690204e600b0091056883360mr58485ybs.375.1676423253392; Tue, 14 Feb
+ 2023 17:07:33 -0800 (PST)
+Date:   Wed, 15 Feb 2023 01:07:11 +0000
+In-Reply-To: <20230215010717.3612794-1-rananta@google.com>
 Mime-Version: 1.0
+References: <20230215010717.3612794-1-rananta@google.com>
 X-Mailer: git-send-email 2.39.1.581.gbfd45094c4-goog
-Message-ID: <20230215010718.415413-1-seanjc@google.com>
-Subject: [GIT PULL] KVM: x86: APIC changes for 6.3
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org
+Message-ID: <20230215010717.3612794-11-rananta@google.com>
+Subject: [REPOST PATCH 10/16] selftests: KVM: aarch64: Add KVM EVTYPE filter
+ PMU test
+From:   Raghavendra Rao Ananta <rananta@google.com>
+To:     Oliver Upton <oupton@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Ricardo Koller <ricarkol@google.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -65,55 +77,156 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM x86 APIC related changes for 6.3.  Emanuele's fix for userspace forcing an
-x2APIC => xAPIC transition is the most interesting change, the rest is minor
-fixes and cleanups.
+KVM doest't allow the guests to modify the filter types
+such counting events in nonsecure/secure-EL2, EL3, and
+so on. Validate the same by force-configuring the bits
+in PMXEVTYPER_EL0, PMEVTYPERn_EL0, and PMCCFILTR_EL0
+registers.
 
-The following changes since commit 7cb79f433e75b05d1635aefaa851cfcd1cb7dc4f:
+The test extends further by trying to create an event
+for counting only in EL2 and validates if the counter
+is not progressing.
 
-  KVM: PPC: Fix refactoring goof in kvmppc_e500mc_init() (2023-01-24 13:00:32 -0500)
+Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+---
+ .../testing/selftests/kvm/aarch64/vpmu_test.c | 85 +++++++++++++++++++
+ 1 file changed, 85 insertions(+)
 
-are available in the Git repository at:
+diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_test.c b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
+index 3dfb770b538e9..5c166df245589 100644
+--- a/tools/testing/selftests/kvm/aarch64/vpmu_test.c
++++ b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
+@@ -15,6 +15,10 @@
+  * of allowing or denying the events. The guest validates it by
+  * checking if it's able to count only the events that are allowed.
+  *
++ * 3. KVM doesn't allow the guest to count the events attributed with
++ * higher exception levels (EL2, EL3). Verify this functionality by
++ * configuring and trying to count the events for EL2 in the guest.
++ *
+  * Copyright (c) 2022 Google LLC.
+  *
+  */
+@@ -23,6 +27,7 @@
+ #include <test_util.h>
+ #include <vgic.h>
+ #include <asm/perf_event.h>
++#include <linux/arm-smccc.h>
+ #include <linux/bitfield.h>
+ #include <linux/bitmap.h>
+ 
+@@ -259,6 +264,7 @@ struct vpmu_vm {
+ enum test_stage {
+ 	TEST_STAGE_COUNTER_ACCESS = 1,
+ 	TEST_STAGE_KVM_EVENT_FILTER,
++	TEST_STAGE_KVM_EVTYPE_FILTER,
+ };
+ 
+ struct guest_data {
+@@ -678,6 +684,70 @@ static void guest_event_filter_test(unsigned long *pmu_filter)
+ 	}
+ }
+ 
++static void guest_evtype_filter_test(void)
++{
++	int i;
++	struct pmc_accessor *acc;
++	uint64_t typer, cnt;
++	struct arm_smccc_res res;
++
++	pmu_enable();
++
++	/*
++	 * KVM blocks the guests from creating events for counting in Secure/Non-Secure Hyp (EL2),
++	 * Monitor (EL3), and Multithreading configuration. It applies the mask
++	 * ARMV8_PMU_EVTYPE_MASK against guest accesses to PMXEVTYPER_EL0, PMEVTYPERn_EL0,
++	 * and PMCCFILTR_EL0 registers to prevent this. Check if KVM honors this using all possible
++	 * ways to configure the EVTYPER.
++	 */
++	for (i = 0; i < ARRAY_SIZE(pmc_accessors); i++) {
++		acc = &pmc_accessors[i];
++
++		/* Set all filter bits (31-24), readback, and check against the mask */
++		acc->write_typer(0, 0xff000000);
++		typer = acc->read_typer(0);
++
++		GUEST_ASSERT_2((typer | ARMV8_PMU_EVTYPE_EVENT) == ARMV8_PMU_EVTYPE_MASK,
++				typer | ARMV8_PMU_EVTYPE_EVENT, ARMV8_PMU_EVTYPE_MASK);
++
++		/*
++		 * Regardless of ARMV8_PMU_EVTYPE_MASK, KVM sets perf attr.exclude_hv
++		 * to not count NS-EL2 events. Verify this functionality by configuring
++		 * a NS-EL2 event, for which the couunt shouldn't increment.
++		 */
++		typer = ARMV8_PMUV3_PERFCTR_INST_RETIRED;
++		typer |= ARMV8_PMU_INCLUDE_EL2 | ARMV8_PMU_EXCLUDE_EL1 | ARMV8_PMU_EXCLUDE_EL0;
++		acc->write_typer(0, typer);
++		acc->write_cntr(0, 0);
++		enable_counter(0);
++
++		/* Issue a hypercall to enter EL2 and return */
++		memset(&res, 0, sizeof(res));
++		smccc_hvc(ARM_SMCCC_VERSION_FUNC_ID, 0, 0, 0, 0, 0, 0, 0, &res);
++
++		cnt = acc->read_cntr(0);
++		GUEST_ASSERT_3(cnt == 0, cnt, typer, i);
++	}
++
++	/* Check the same sequence for the Cycle counter */
++	write_pmccfiltr(0xff000000);
++	typer = read_pmccfiltr();
++	GUEST_ASSERT_2((typer | ARMV8_PMU_EVTYPE_EVENT) == ARMV8_PMU_EVTYPE_MASK,
++				typer | ARMV8_PMU_EVTYPE_EVENT, ARMV8_PMU_EVTYPE_MASK);
++
++	typer = ARMV8_PMU_INCLUDE_EL2 | ARMV8_PMU_EXCLUDE_EL1 | ARMV8_PMU_EXCLUDE_EL0;
++	write_pmccfiltr(typer);
++	reset_cycle_counter();
++	enable_cycle_counter();
++
++	/* Issue a hypercall to enter EL2 and return */
++	memset(&res, 0, sizeof(res));
++	smccc_hvc(ARM_SMCCC_VERSION_FUNC_ID, 0, 0, 0, 0, 0, 0, 0, &res);
++
++	cnt = read_cycle_counter();
++	GUEST_ASSERT_2(cnt == 0, cnt, typer);
++}
++
+ static void guest_code(void)
+ {
+ 	switch (guest_data.test_stage) {
+@@ -687,6 +757,9 @@ static void guest_code(void)
+ 	case TEST_STAGE_KVM_EVENT_FILTER:
+ 		guest_event_filter_test(guest_data.pmu_filter);
+ 		break;
++	case TEST_STAGE_KVM_EVTYPE_FILTER:
++		guest_evtype_filter_test();
++		break;
+ 	default:
+ 		GUEST_ASSERT_1(0, guest_data.test_stage);
+ 	}
+@@ -1014,10 +1087,22 @@ static void run_kvm_event_filter_test(void)
+ 	run_kvm_event_filter_error_tests();
+ }
+ 
++static void run_kvm_evtype_filter_test(void)
++{
++	struct vpmu_vm *vpmu_vm;
++
++	guest_data.test_stage = TEST_STAGE_KVM_EVTYPE_FILTER;
++
++	vpmu_vm = create_vpmu_vm(guest_code, NULL);
++	run_vcpu(vpmu_vm->vcpu);
++	destroy_vpmu_vm(vpmu_vm);
++}
++
+ static void run_tests(uint64_t pmcr_n)
+ {
+ 	run_counter_access_tests(pmcr_n);
+ 	run_kvm_event_filter_test();
++	run_kvm_evtype_filter_test();
+ }
+ 
+ /*
+-- 
+2.39.1.581.gbfd45094c4-goog
 
-  https://github.com/kvm-x86/linux.git tags/kvm-x86-apic-6.3
-
-for you to fetch changes up to eb98192576315d3f4c6c990d589ab398e7091782:
-
-  KVM: selftests: Verify APIC_ID is set when forcing x2APIC=>xAPIC transition (2023-02-01 16:22:54 -0800)
-
-----------------------------------------------------------------
-KVM x86 APIC changes for 6.3:
-
- - Remove a superfluous variables from apic_get_tmcct()
-
- - Fix various edge cases in x2APIC MSR emulation
-
- - Mark APIC timer as expired if its in one-shot mode and the count
-   underflows while the vCPU task was being migrated
-
- - Reset xAPIC when userspace forces "impossible" x2APIC => xAPIC transition
-
-----------------------------------------------------------------
-Emanuele Giuseppe Esposito (2):
-      KVM: x86: Reinitialize xAPIC ID when userspace forces x2APIC => xAPIC
-      KVM: selftests: Verify APIC_ID is set when forcing x2APIC=>xAPIC transition
-
-Li RongQing (1):
-      KVM: x86: fire timer when it is migrated and expired, and in oneshot mode
-
-Sean Christopherson (6):
-      KVM: x86: Inject #GP if WRMSR sets reserved bits in APIC Self-IPI
-      KVM: x86: Inject #GP on x2APIC WRMSR that sets reserved bits 63:32
-      KVM: x86: Mark x2APIC DFR reg as non-existent for x2APIC
-      KVM: x86: Split out logic to generate "readable" APIC regs mask to helper
-      KVM: VMX: Always intercept accesses to unsupported "extended" x2APIC regs
-      KVM: VMX: Intercept reads to invalid and write-only x2APIC registers
-
-zhang songyi (1):
-      KVM: x86: remove redundant ret variable
-
- arch/x86/kvm/lapic.c                               | 77 +++++++++++++---------
- arch/x86/kvm/lapic.h                               |  2 +
- arch/x86/kvm/vmx/vmx.c                             | 40 +++++------
- .../selftests/kvm/x86_64/xapic_state_test.c        | 55 ++++++++++++++++
- 4 files changed, 125 insertions(+), 49 deletions(-)
