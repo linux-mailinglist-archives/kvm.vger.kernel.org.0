@@ -2,116 +2,233 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 361D8697A5B
-	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 12:00:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B4B6697A76
+	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 12:13:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233285AbjBOLAS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Feb 2023 06:00:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45350 "EHLO
+        id S231276AbjBOLNQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Feb 2023 06:13:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230335AbjBOLAR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Feb 2023 06:00:17 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 501ED2D178
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 02:59:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676458755;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Z1vm4rRSwi9q0BCc8utZUgURv9fQkg9JJyOqtW+jBlQ=;
-        b=Nbk14g1UyFJ3w/MLjXmBTRz8YS1s6+HvopAZJUvYQV9UGVIOdxEEoYuU1gRaVAatjrO3Dh
-        78MAkh6VbZdNBDDMnvvlT59PgUDbZYzwj/cNLMFZ1WWEN0NVWVjE01HQZjyOSdbF+SGWD0
-        US5v82V5WMK5TqsYO83arg9kRC864DA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-208-DGET8La2Nii-4pQFBs3PVA-1; Wed, 15 Feb 2023 05:59:12 -0500
-X-MC-Unique: DGET8La2Nii-4pQFBs3PVA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 635AA85CCE4;
-        Wed, 15 Feb 2023 10:59:11 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.233])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id F3CFB2166B30;
-        Wed, 15 Feb 2023 10:59:10 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Eric Auger <eauger@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>
-Cc:     qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Juan Quintela <quintela@redhat.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v5 3/3] qtests/arm: add some mte tests
-In-Reply-To: <a7904d6e-c8e5-055b-34f7-8ea2956ec65f@redhat.com>
-Organization: Red Hat GmbH
-References: <20230203134433.31513-1-cohuck@redhat.com>
- <20230203134433.31513-4-cohuck@redhat.com>
- <a7904d6e-c8e5-055b-34f7-8ea2956ec65f@redhat.com>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date:   Wed, 15 Feb 2023 11:59:09 +0100
-Message-ID: <874jrndwjm.fsf@redhat.com>
+        with ESMTP id S230195AbjBOLNO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Feb 2023 06:13:14 -0500
+Received: from mail-vs1-xe2a.google.com (mail-vs1-xe2a.google.com [IPv6:2607:f8b0:4864:20::e2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C58E22A24
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 03:13:13 -0800 (PST)
+Received: by mail-vs1-xe2a.google.com with SMTP id j5so10496039vsc.8
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 03:13:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1676459592;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=D9lP4MvG5k1EpDumXLwfDIbMIO5VvOfCG8n4ZwEIYRA=;
+        b=LrC6OAsRg8g1C233qVSu2aTQsjJukMSr9kJugX5eEv5xTztxZNBGMYdnJtZL4A3I20
+         FoLBUysjf9I+puYCWrbSuqo18hn0vqoPJL/cUrror+NRaNEDJyZ3FV73Mb3RKJ5gxrUm
+         doCRxywsnNkhtbu6FZMJIpFRgYhTSkEwnzvw8bRm76R+noLjOzx1LDCmPmiRSHG2fvso
+         ELFjfxQfq8GOCff+Anilfx36Xa62SovbSw6qbo8+Grwykib0TwZ2Cc5QFZJb/qgNfGhE
+         GfmbPEfktti6g6oROelZgHi/02PwL6GGew43sdomc4f8fWfJDqXSSIFCj1u96PRDbLcp
+         idQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1676459592;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=D9lP4MvG5k1EpDumXLwfDIbMIO5VvOfCG8n4ZwEIYRA=;
+        b=Hs24llL1eT9Cp479qDQclWMlRbIvthjDJ2vZf3VNow5Q9yiwM7BAknGbAPLQ8o0vZI
+         yVhlHXOwAJIaUHz8OzizbkLcSmtzTktiIPKNAeCmGJXy9Vtt2Y/0anUVqJiNa8kNVZoI
+         6N6/r5gNfdn2ZMXCSJJl5YVWWLn0Pm997ULknKZV/Wn3x1RQgtm0rqcHJw6ibNAvBfXH
+         CRxLNZ3KUy0cDiJII6tAQ0Hfj2oNFe1cTSqk5miMpFmTkSni1u4uIMtvH8YDCUEQj+O8
+         zGX0DCjTdtCnKtYSvxJ0dEMjeVppaCP5EGN9kVwQ9OKu4LYUhiY1IWgkFDbAXMJzalQE
+         Vf6w==
+X-Gm-Message-State: AO0yUKXVh26md6G1nyBa8Z+uu59ZrZJpgGZPohSlu/Xzgof5+miNW6L7
+        +Y6qe6l2kDjPpqPc5LuMl3CCI3ouHDq4sHDRck9+HQ==
+X-Google-Smtp-Source: AK7set+3UZH4rvUHU7q81fVFwnGAXPrl5eO9z6mdY/NTSmUYUwUrPc1QZupIIazj9JL9bT4f4FTNcpxlotuAc3guJtA=
+X-Received: by 2002:a67:6081:0:b0:3ee:65e3:af84 with SMTP id
+ u123-20020a676081000000b003ee65e3af84mr325407vsb.77.1676459592133; Wed, 15
+ Feb 2023 03:13:12 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20230209223811.4993-1-mario.limonciello@amd.com> <20230209223811.4993-3-mario.limonciello@amd.com>
+In-Reply-To: <20230209223811.4993-3-mario.limonciello@amd.com>
+From:   Sumit Garg <sumit.garg@linaro.org>
+Date:   Wed, 15 Feb 2023 16:43:01 +0530
+Message-ID: <CAFA6WYMJosUrE0BzQe6xFOaofZZWGiRBPBqoGk4Cvhm5s30VEQ@mail.gmail.com>
+Subject: Re: [PATCH 2/6] crypto: ccp: Add a header for multiple drivers to use `__psp_pa`
+To:     Mario Limonciello <mario.limonciello@amd.com>
+Cc:     =?UTF-8?B?SmFuIETEhWJyb8Wb?= <jsd@semihalf.com>,
+        Grzegorz Bernacki <gjb@semihalf.com>,
+        Thomas Rijo-john <Rijo-john.Thomas@amd.com>,
+        Lendacky Thomas <Thomas.Lendacky@amd.com>,
+        herbert@gondor.apana.org.au,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        John Allen <john.allen@amd.com>,
+        Jarkko Nikula <jarkko.nikula@linux.intel.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Mika Westerberg <mika.westerberg@linux.intel.com>,
+        linux-i2c@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        kvm@vger.kernel.org, op-tee@lists.trustedfirmware.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 06 2023, Eric Auger <eauger@redhat.com> wrote:
-
-> Hi,
+On Fri, 10 Feb 2023 at 04:08, Mario Limonciello
+<mario.limonciello@amd.com> wrote:
 >
-> On 2/3/23 14:44, Cornelia Huck wrote:
->> @@ -517,6 +583,13 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
->>          assert_set_feature(qts, "host", "pmu", false);
->>          assert_set_feature(qts, "host", "pmu", true);
->>  
->> +        /*
->> +         * Unfortunately, there's no easy way to test whether this instance
->> +         * of KVM supports MTE. So we can only assert that the feature
->> +         * is present, but not whether it can be toggled.
->> +         */
->> +        assert_has_feature(qts, "host", "mte");
-> I know you replied in v4 but I am still confused:
-> What does
->       (QEMU) query-cpu-model-expansion type=full model={"name":"host"}
-> return on a MTE capable host and and on a non MTE capable host?
-
-FWIW, it's "auto" in both cases, but the main problem is actually
-something else...
-
+> The TEE subdriver for CCP, the amdtee driver and the i2c-designware-amdpsp
+> drivers all include `psp-sev.h` even though they don't use SEV
+> functionality.
 >
-> If I remember correctly qmp_query_cpu_model_expansion loops over the
-> advertised features and try to set them explicitly so if the host does
-> not support it this should fail and the result should be different from
-> the case where the host supports it (even if it is off by default)
+> Move the definition of `__psp_pa` into a common header to be included
+> by all of these drivers.
 >
-> Does assert_has_feature_enabled() returns false?
+> Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
+> ---
+>  arch/x86/kvm/svm/sev.c                     |  1 +
+>  drivers/crypto/ccp/sev-dev.c               |  1 +
+>  drivers/crypto/ccp/tee-dev.c               |  2 +-
+>  drivers/i2c/busses/i2c-designware-amdpsp.c |  2 +-
 
-I poked around a bit with qmp on a system (well, model) with MTE where
-starting a guest with MTE works just fine. I used the minimal setup
-described in docs/devel/writing-monitor-commands.rst, and trying to do a
-cpu model expansion with mte=on fails because the KVM ioctl fails with
--EINVAL (as we haven't set up proper memory mappings). The qtest setup
-doesn't do any proper setup either AFAICS, so enabling MTE won't work
-even if KVM and the host support it. (Trying to enable MTE on a host
-that doesn't support it would also report an error, but a different one,
-as KVM would not support the MTE cap at all.) We don't really know
-beforehand what to expect ("auto" is not yet expanded, see above), so
-I'm not sure how to test this in a meaningful way, even if we did set up
-memory mappings (which seems like overkill for a feature test.)
+>  drivers/tee/amdtee/call.c                  |  2 +-
+>  drivers/tee/amdtee/shm_pool.c              |  2 +-
 
-The comment describing this could be improved, though :)
+For TEE subsystem bits:
 
+Acked-by: Sumit Garg <sumit.garg@linaro.org>
+
+-Sumit
+
+>  include/linux/psp-sev.h                    |  8 --------
+>  include/linux/psp.h                        | 14 ++++++++++++++
+>  8 files changed, 20 insertions(+), 12 deletions(-)
+>  create mode 100644 include/linux/psp.h
+>
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 86d6897f48068..ee8e9053f4468 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -11,6 +11,7 @@
+>  #include <linux/kvm_host.h>
+>  #include <linux/kernel.h>
+>  #include <linux/highmem.h>
+> +#include <linux/psp.h>
+>  #include <linux/psp-sev.h>
+>  #include <linux/pagemap.h>
+>  #include <linux/swap.h>
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index e2f25926eb514..28945ca7c8563 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -24,6 +24,7 @@
+>  #include <linux/cpufeature.h>
+>  #include <linux/fs.h>
+>  #include <linux/fs_struct.h>
+> +#include <linux/psp.h>
+>
+>  #include <asm/smp.h>
+>  #include <asm/cacheflush.h>
+> diff --git a/drivers/crypto/ccp/tee-dev.c b/drivers/crypto/ccp/tee-dev.c
+> index 5c9d47f3be375..f24fc953718a0 100644
+> --- a/drivers/crypto/ccp/tee-dev.c
+> +++ b/drivers/crypto/ccp/tee-dev.c
+> @@ -13,7 +13,7 @@
+>  #include <linux/delay.h>
+>  #include <linux/slab.h>
+>  #include <linux/gfp.h>
+> -#include <linux/psp-sev.h>
+> +#include <linux/psp.h>
+>  #include <linux/psp-tee.h>
+>
+>  #include "psp-dev.h"
+> diff --git a/drivers/i2c/busses/i2c-designware-amdpsp.c b/drivers/i2c/busses/i2c-designware-amdpsp.c
+> index 8f36167bce624..80f28a1bbbef6 100644
+> --- a/drivers/i2c/busses/i2c-designware-amdpsp.c
+> +++ b/drivers/i2c/busses/i2c-designware-amdpsp.c
+> @@ -4,7 +4,7 @@
+>  #include <linux/bits.h>
+>  #include <linux/i2c.h>
+>  #include <linux/io-64-nonatomic-lo-hi.h>
+> -#include <linux/psp-sev.h>
+> +#include <linux/psp.h>
+>  #include <linux/types.h>
+>  #include <linux/workqueue.h>
+>
+> diff --git a/drivers/tee/amdtee/call.c b/drivers/tee/amdtee/call.c
+> index cec6e70f0ac92..e8cd9aaa34675 100644
+> --- a/drivers/tee/amdtee/call.c
+> +++ b/drivers/tee/amdtee/call.c
+> @@ -8,7 +8,7 @@
+>  #include <linux/tee_drv.h>
+>  #include <linux/psp-tee.h>
+>  #include <linux/slab.h>
+> -#include <linux/psp-sev.h>
+> +#include <linux/psp.h>
+>  #include "amdtee_if.h"
+>  #include "amdtee_private.h"
+>
+> diff --git a/drivers/tee/amdtee/shm_pool.c b/drivers/tee/amdtee/shm_pool.c
+> index f87f96a291c99..f0303126f199d 100644
+> --- a/drivers/tee/amdtee/shm_pool.c
+> +++ b/drivers/tee/amdtee/shm_pool.c
+> @@ -5,7 +5,7 @@
+>
+>  #include <linux/slab.h>
+>  #include <linux/tee_drv.h>
+> -#include <linux/psp-sev.h>
+> +#include <linux/psp.h>
+>  #include "amdtee_private.h"
+>
+>  static int pool_op_alloc(struct tee_shm_pool *pool, struct tee_shm *shm,
+> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+> index 1595088c428b4..7fd17e82bab43 100644
+> --- a/include/linux/psp-sev.h
+> +++ b/include/linux/psp-sev.h
+> @@ -14,14 +14,6 @@
+>
+>  #include <uapi/linux/psp-sev.h>
+>
+> -#ifdef CONFIG_X86
+> -#include <linux/mem_encrypt.h>
+> -
+> -#define __psp_pa(x)    __sme_pa(x)
+> -#else
+> -#define __psp_pa(x)    __pa(x)
+> -#endif
+> -
+>  #define SEV_FW_BLOB_MAX_SIZE   0x4000  /* 16KB */
+>
+>  /**
+> diff --git a/include/linux/psp.h b/include/linux/psp.h
+> new file mode 100644
+> index 0000000000000..202162487ec3b
+> --- /dev/null
+> +++ b/include/linux/psp.h
+> @@ -0,0 +1,14 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +
+> +#ifndef __PSP_H
+> +#define __PSP_H
+> +
+> +#ifdef CONFIG_X86
+> +#include <linux/mem_encrypt.h>
+> +
+> +#define __psp_pa(x)    __sme_pa(x)
+> +#else
+> +#define __psp_pa(x)    __pa(x)
+> +#endif
+> +
+> +#endif /* __PSP_H */
+> --
+> 2.34.1
+>
