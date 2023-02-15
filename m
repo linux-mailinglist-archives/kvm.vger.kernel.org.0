@@ -2,76 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7FA4F6972B5
-	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 01:36:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 31FD56972DA
+	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 01:50:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232271AbjBOAg3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Feb 2023 19:36:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35612 "EHLO
+        id S229726AbjBOAuk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Feb 2023 19:50:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229460AbjBOAg2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Feb 2023 19:36:28 -0500
-X-Greylist: delayed 558 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 14 Feb 2023 16:36:27 PST
-Received: from raptorengineering.com (mail.raptorengineering.com [23.155.224.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E4C1977C
-        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 16:36:27 -0800 (PST)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.rptsys.com (Postfix) with ESMTP id E454A37E180AFF;
-        Tue, 14 Feb 2023 18:27:07 -0600 (CST)
-Received: from mail.rptsys.com ([127.0.0.1])
-        by localhost (vali.starlink.edu [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id mxSS9AhdlaO9; Tue, 14 Feb 2023 18:27:05 -0600 (CST)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.rptsys.com (Postfix) with ESMTP id 2586637E180AF1;
-        Tue, 14 Feb 2023 18:27:05 -0600 (CST)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.rptsys.com 2586637E180AF1
+        with ESMTP id S229460AbjBOAuh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Feb 2023 19:50:37 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 441002BEC5
+        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 16:50:36 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id oo13-20020a17090b1c8d00b0022936a63a22so238798pjb.8
+        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 16:50:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=raptorengineering.com; s=B8E824E6-0BE2-11E6-931D-288C65937AAD;
-        t=1676420825; bh=k+Zla+TXGT+u0A7tdHZXItJb2pEmHhwdwagw90wi1D4=;
-        h=Date:From:To:Message-ID:MIME-Version;
-        b=OyiReIBHBRqEu3Q9dt+hYtOGKVCGMQ9ln719/xjqjRm/2qaICeqBMgDGz6Sjabln8
-         QCpeNljG3kau1Cuxk0Mll6bRX8fd/IJdUwLNfIqibC1OP5YlA0K7flHOJ+jZ4gRvbF
-         QPZaQBGqYZz1M96qGrLoffu0T0EhuJ8Q8Q2SYw2s=
-X-Virus-Scanned: amavisd-new at rptsys.com
-Received: from mail.rptsys.com ([127.0.0.1])
-        by localhost (vali.starlink.edu [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id oiirFsNpqpBI; Tue, 14 Feb 2023 18:27:04 -0600 (CST)
-Received: from vali.starlink.edu (localhost [127.0.0.1])
-        by mail.rptsys.com (Postfix) with ESMTP id CFA8837E180AEE;
-        Tue, 14 Feb 2023 18:27:04 -0600 (CST)
-Date:   Tue, 14 Feb 2023 18:27:03 -0600 (CST)
-From:   Timothy Pearson <tpearson@raptorengineering.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org,
-        kevin tian <kevin.tian@intel.com>,
-        robin murphy <robin.murphy@arm.com>, cohuck@redhat.com,
-        eric auger <eric.auger@redhat.com>, nicolinc@nvidia.com,
-        kvm <kvm@vger.kernel.org>, mjrosato@linux.ibm.com,
-        chao p peng <chao.p.peng@linux.intel.com>,
-        yi y sun <yi.y.sun@linux.intel.com>, peterx@redhat.com,
-        jasowang@redhat.com,
-        shameerali kolothum thodi 
-        <shameerali.kolothum.thodi@huawei.com>, lulu@redhat.com,
-        suravee suthikulpanit <suravee.suthikulpanit@amd.com>,
-        intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>
-Message-ID: <595229255.11912427.1676420823058.JavaMail.zimbra@raptorengineeringinc.com>
-In-Reply-To: <Y+wkqnCAe42Ogcof@nvidia.com>
-References: <20230213151348.56451-1-yi.l.liu@intel.com> <20230213151348.56451-6-yi.l.liu@intel.com> <20230214152627.3a399523.alex.williamson@redhat.com> <Y+wYX34sPvPQmGSr@nvidia.com> <20230214164235.64e2dccb.alex.williamson@redhat.com> <Y+wkqnCAe42Ogcof@nvidia.com>
-Subject: Re: [PATCH v3 05/15] kvm/vfio: Accept vfio device file from
- userspace
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Mailer: Zimbra 8.5.0_GA_3042 (ZimbraWebClient - GC110 (Linux)/8.5.0_GA_3042)
-Thread-Topic: kvm/vfio: Accept vfio device file from userspace
-Thread-Index: AsnTMrxzRGkgYuS3YUElHBx57ph+Og==
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=jAtu+jAzoPXgZmgX0Gm/pPUfllI1EZc5ORAFaSSbbuE=;
+        b=L/+DzgtP0mxJhAdZ5Z/aVaM/bV88j5aAGhM00slMCuZIfD+STsib8GLR0j1uVV3RGR
+         dtA3VBBk5jqr92WFuvac+vtWgHA9axC9yGsdotN1s2zvptok+vXYQTN9VdjbJUigRS3O
+         2jZY5F7cgm/oyxFyh78x1KjMGS84KKZlOUGs6YwT05zphD47TUJZoNMNMn1v+XLRjeSK
+         rSh8mZTOHGk2MfbxNhVhiYQK3lh4+2xmCp2uAw2N1A6T0rO/ZsTPr+kcEit0Z/bi8vDo
+         Q2uYusX/6wxTlJTAAVRHOiWXIGmZtT5M0QHuzbFHJE61DGFFaGulvIopfgOxvaWpLaaP
+         39lQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jAtu+jAzoPXgZmgX0Gm/pPUfllI1EZc5ORAFaSSbbuE=;
+        b=8RkazSC+6lwludKXol36mNMrxJ1fdLFU7dhTF1dxXn0FHynQ0BhOIi5QeBxMDLtt/N
+         rVx3zr3OLKS+rHgUSG8dMdP2d7zWKiYVJTyWvnvd2lMK8hIdiC0dC0rWvhQVPz46MinE
+         q+Jyv09ewfMJRLIrhOr4ah357pFEISaruUtV/fbCmuvzyJ1Os0zwEZ3rX/6nQemysSTt
+         zuc/FxWYurlRNwWLNjxAQlBCX77d/AZxuMSHwzdyaXI2tbm5t2ji+bSzM3bJSABXZ9r5
+         YqBV5GFjFbqBIQKExGhTFxMnulrLYtp2/apH+3GjyFrFL1ZmRuQGUCyaLlfxTMUI2lF4
+         bP6A==
+X-Gm-Message-State: AO0yUKXLyyVV1+Fn/0AZiRXfpYl1W78UUvWhy3g3/gd0QhF8yc/6HCvg
+        83abhdjWx9SROMTxaaP64NJwthb6HpcyoTpJxw==
+X-Google-Smtp-Source: AK7set/B9k2Ck9cwqCz3QkOM260/f27rO5NkJ+CBnzWZ5I7LICMI8IV8Q/zzgS1M+gU0YZA5XK2frvm7yadOvdfolw==
+X-Received: from ackerleytng-cloudtop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1f5f])
+ (user=ackerleytng job=sendgmr) by 2002:a17:90a:d908:b0:233:a844:1e9e with
+ SMTP id c8-20020a17090ad90800b00233a8441e9emr272542pjv.60.1676422235601; Tue,
+ 14 Feb 2023 16:50:35 -0800 (PST)
+Date:   Wed, 15 Feb 2023 00:50:33 +0000
+In-Reply-To: <Y88ylDFfMQNcUEw7@google.com> (message from Sean Christopherson
+ on Tue, 24 Jan 2023 01:21:24 +0000)
+Mime-Version: 1.0
+Message-ID: <diqzlekzkazq.fsf@ackerleytng-cloudtop.c.googlers.com>
+Subject: Re: [RFC PATCH v3 08/31] KVM: selftests: Require GCC to realign
+ stacks on function entry
+From:   Ackerley Tng <ackerleytng@google.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     erdemaktas@google.com, mail@maciej.szmigiero.name,
+        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
+        isaku.yamahata@intel.com, sagis@google.com, afranji@google.com,
+        runanwang@google.com, shuah@kernel.org, drjones@redhat.com,
+        maz@kernel.org, bgardon@google.com, jmattson@google.com,
+        dmatlack@google.com, peterx@redhat.com, oupton@google.com,
+        ricarkol@google.com, yang.zhong@intel.com, wei.w.wang@intel.com,
+        xiaoyao.li@intel.com, pgonda@google.com, marcorr@google.com,
+        eesposit@redhat.com, borntraeger@de.ibm.com, eric.auger@redhat.com,
+        wangyanan55@huawei.com, aaronlewis@google.com, vkuznets@redhat.com,
+        pshier@google.com, axelrasmussen@google.com,
+        zhenzhong.duan@intel.com, like.xu@linux.intel.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -79,56 +79,97 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+> On Mon, Jan 23, 2023, Erdem Aktas wrote:
+> > On Mon, Jan 23, 2023 at 10:53 AM Sean Christopherson  
+> <seanjc@google.com> wrote:
+> > >
+> > > On Mon, Jan 23, 2023, Maciej S. Szmigiero wrote:
+> > > > On 23.01.2023 19:30, Erdem Aktas wrote:
+> > > > > On Fri, Jan 20, 2023 at 4:28 PM Sean Christopherson  
+> <seanjc@google.com> wrote:
+> > > > > >
+> > > > > > On Sat, Jan 21, 2023, Ackerley Tng wrote:
+> > > > > > > Some SSE instructions assume a 16-byte aligned stack, and GCC  
+> compiles
+> > > > > > > assuming the stack is aligned:
+> > > > > > > https://gcc.gnu.org/bugzilla/show_bug.cgi?id=40838. This  
+> combination
+> > > > > > > results in a #GP in guests.
+> > > > > > >
+> > > > > > > Adding this compiler flag will generate an alternate prologue  
+> and
+> > > > > > > epilogue to realign the runtime stack, which makes selftest  
+> code
+> > > > > > > slower and bigger, but this is okay since we do not need  
+> selftest code
+> > > > > > > to be extremely performant.
+> > > > > >
+> > > > > > Huh, I had completely forgotten that this is why SSE is  
+> problematic.  I ran into
+> > > > > > this with the base UPM selftests and just disabled SSE.   
+> /facepalm.
+> > > > > >
+> > > > > > We should figure out exactly what is causing a misaligned  
+> stack.  As you've noted,
+> > > > > > the x86-64 ABI requires a 16-byte aligned RSP.  Unless I'm  
+> misreading vm_arch_vcpu_add(),
+> > > > > > the starting stack should be page aligned, which means  
+> something is causing the
+> > > > > > stack to become unaligned at runtime.  I'd rather hunt down  
+> that something than
+> > > > > > paper over it by having the compiler force realignment.
+> > > > >
+> > > > > Is not it due to the 32bit execution part of the guest code at  
+> boot
+> > > > > time. Any push/pop of 32bit registers might make it a 16-byte
+> > > > > unaligned stack.
+> > > >
+> > > > 32-bit stack needs to be 16-byte aligned, too (at function call  
+> boundaries) -
+> > > > see [1] chapter 2.2.2 "The Stack Frame"
+> > >
+> > > And this showing up in the non-TDX selftests rules that out as the  
+> sole problem;
+> > > the selftests stuff 64-bit mode, i.e. don't have 32-bit boot code.
+> >
+> > Thanks Maciej and Sean for the clarification. I was suspecting the
+> > hand-coded assembly part that we have for TDX tests but  it being
+> > happening in the non-TDX selftests disproves it.
 
------ Original Message -----
-> From: "Jason Gunthorpe" <jgg@nvidia.com>
-> To: "Alex Williamson" <alex.williamson@redhat.com>
-> Cc: "Yi Liu" <yi.l.liu@intel.com>, joro@8bytes.org, "kevin tian" <kevin.tian@intel.com>, "robin murphy"
-> <robin.murphy@arm.com>, cohuck@redhat.com, "eric auger" <eric.auger@redhat.com>, nicolinc@nvidia.com, "kvm"
-> <kvm@vger.kernel.org>, mjrosato@linux.ibm.com, "chao p peng" <chao.p.peng@linux.intel.com>, "yi y sun"
-> <yi.y.sun@linux.intel.com>, peterx@redhat.com, jasowang@redhat.com, "shameerali kolothum thodi"
-> <shameerali.kolothum.thodi@huawei.com>, lulu@redhat.com, "suravee suthikulpanit" <suravee.suthikulpanit@amd.com>,
-> intel-gvt-dev@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, "linux-s390" <linux-s390@vger.kernel.org>,
-> "Timothy Pearson" <tpearson@raptorengineering.com>, "Michael Ellerman" <mpe@ellerman.id.au>
-> Sent: Tuesday, February 14, 2023 6:17:46 PM
-> Subject: Re: [PATCH v3 05/15] kvm/vfio: Accept vfio device file from userspace
+> Not necessarily, it could be both.  Goofs in the handcoded assembly and  
+> PEBKAC
+> on my end :-)
 
-> On Tue, Feb 14, 2023 at 04:42:35PM -0700, Alex Williamson wrote:
-> 
->> A device file opened through a group could be passed through this
->> interface though, right?
-> 
-> Yes, I think so
-> 
->> Do we just chalk that up to user error?  Maybe the SPAPR extension
->> at least needs to be documented as relying on registering groups
->> rather than devices.
-> 
-> The way these APIs work is you have to pass the same FD to all of
-> them. The SPAPR stuff is no different, if you used a cdev with
-> KVM_DEV_VFIO_GROUP_ADD then you have to use the same cdev fd with the
-> SPAPR group_fd. Yi just didn't rename it.
-> 
-> It is weird, but logically self consistent, I think.
-> 
->> > I'm still thinking about proposing to just delete all this SPAPR
->> > stuff. Power still hasn't had the patches applied to make it work
->> > again so it seems to all be dead.
->> 
->> There's been some off-list discussion about at least fixing SPAPR
->> support, but yes, it either needs to get some love or we ought to think
->> about its future.  Thanks,
-> 
-> The patches exist, they just need to be applied AFAIK. If the people
-> responsible can't care enough about this to even do that then I find
-> it hard to care at all about the state of SPAPR.
-> 
-> Jason
+I figured it out!
 
-I've been discussing the state of the patches offline, apologies for the delay in checking in here.
+GCC assumes that the stack is 16-byte aligned **before** the call
+instruction. Since call pushes rip to the stack, GCC will compile code
+assuming that on entrance to the function, the stack is -8 from a
+16-byte aligned address.
 
-I'll be taking over SPAPR support going forward, as we need it for our product line.  My current thoughts are to rebase / fix and test the patches that were already generated, to at least get support reenabled, then we can coordinate on further changes needed to maintain the support going forward.
+Since for TDs we do a ljmp to guest code, providing a function's
+address, the stack was not modified by a call instruction pushing rip to
+the stack, so the stack is 16-byte aligned when the guest code starts
+running, instead of 16-byte aligned -8 that GCC expects.
 
-I should have a rebased patchset ready later this week.
+For VMs, we set rip to a function pointer, and the VM starts running
+with a 16-byte algined stack too.
 
-Thank you!
+To fix this, I propose that in vm_arch_vcpu_add(), we align the
+allocated stack address and then subtract 8 from that:
+
+@@ -573,10 +573,13 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm,  
+uint32_t vcpu_id,
+         vcpu_init_cpuid(vcpu, kvm_get_supported_cpuid());
+         vcpu_setup(vm, vcpu);
+
++       stack_vaddr += (DEFAULT_STACK_PGS * getpagesize());
++       stack_vaddr = ALIGN_DOWN(stack_vaddr, 16) - 8;
++
+         /* Setup guest general purpose registers */
+         vcpu_regs_get(vcpu, &regs);
+         regs.rflags = regs.rflags | 0x2;
+-       regs.rsp = stack_vaddr + (DEFAULT_STACK_PGS * getpagesize());
++       regs.rsp = stack_vaddr;
+         regs.rip = (unsigned long) guest_code;
+         vcpu_regs_set(vcpu, &regs);
