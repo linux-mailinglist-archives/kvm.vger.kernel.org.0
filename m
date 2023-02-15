@@ -2,64 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 79BA86987AC
-	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 23:11:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BCBA6987B1
+	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 23:16:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229623AbjBOWLX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Feb 2023 17:11:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51810 "EHLO
+        id S229705AbjBOWQN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Feb 2023 17:16:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229487AbjBOWLW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Feb 2023 17:11:22 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12CD142DFF
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 14:11:21 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id 79-20020a250b52000000b009419f64f6afso35270ybl.2
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 14:11:21 -0800 (PST)
+        with ESMTP id S229576AbjBOWQM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Feb 2023 17:16:12 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C369B43913
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 14:16:10 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id k9-20020a25bec9000000b00944353b6a81so24241ybm.7
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 14:16:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oudIwnEPPAGRBRrCfLq7ua1hvqy4La4rrkSnZmTBp/0=;
-        b=JCTFc/XD5KHvKUrSaQKv4dzmCop87QijxyX9tGllF1EmLMsNtkfsSpbL5bEwPHeUOm
-         1W0AucJ3Vw4PiLgErIrY1vjRWlX/0/WOdGveetOzf+XsPm2dGek2Tz4tBfrube1okBem
-         bIX9j6lejcv6kRaVIGGPvTTHNkOe4SprqNdhqJ7m1XWhtPsvLRSrRm4wgqd0fwKJoRhR
-         /0j0sj0irfUMMJjuNvDzHuNkFSV+dylfdM7/JX0PUoW8zt1C0k46H7YBiVbLE0ynLqG8
-         NfNOHPZDkR80w/hvTm8S7cH5LMrlgeasn+fA+3ym8uu4AJit4sKoKk5x6czlO6oG4EnE
-         Ihpw==
+        bh=XrCcxlLanE1hw5a0xpT0A8Dl5UAfprFd59vy3LFZr7U=;
+        b=dufJ2caSE7pFyPwErBK72yheI6BZZubW5yttXJiCleUurjqI1LdcOFnLRJEucAOC8N
+         kiPpkUsSj7pevYLtxNzxDUqK27tZ49f22RF6mmoNtfWPnMIdz+GPO96fG+B9OQX2R6Qw
+         9JdPj3S9/VwZF8Md99zWuwkHulC+8rStLL9J1k9A62mJ/JuvnCStL4NTJwoU+R4WVIyS
+         nEP7SiGCDp1bz9MiOEEiYfvBY3t+xv5prj49IFk7yePPMChOrT0xmNOcwZtX8QEqlHYR
+         VVssn+QEDpqM5cUS+0tHavgKKf16cTPNZECAS/bhuarkPkUefaExERGxFJReGRXBL0ki
+         377A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oudIwnEPPAGRBRrCfLq7ua1hvqy4La4rrkSnZmTBp/0=;
-        b=6JCTsuUqTv70rFhZqUh1UmxL+FcZyO+Kcu9ViPU+33p070FXkVzdVRRVUmKadwlNjj
-         qedcvSCdv/1jrZJMTwXNbHZ1qsLEUefhIgmUBwW8X8itcSbL2GM9uAvNQX2Q9ShoSwdf
-         bCDZcaWlm6Gq0QFXlJyj+OQxxY1A++Nmsa/h/U72TmNz4tTdutnwtTMSx0CKNL0od7Cu
-         veyY0ZqBK/NJ7LOUoWpKpN3IJItGQqgiXd5N06oFkmwPvJvOhDPfPJtjiTyQVFfWBVG3
-         eoxOx4HChWxqe9XPba/zcFldcJ4zYE70wjnNte1qaQBilD77zHffSI+rPaEC7DGUey+E
-         XNbw==
-X-Gm-Message-State: AO0yUKWsV7pTX4A0PYnc4eXjf0wdTI+6EMOAi25a28LQV+6ASjLCDbr3
-        1Rr2PtisiKzVxP8fcDOY916p6Gam3zM=
-X-Google-Smtp-Source: AK7set9syMGwwbPlXmBc/5glGE+EpC18KxAdh4RUvLmWB8+O0XSG5n+IUtEl9uk0lbMxdt5l4FX6JvCAe2A=
+        bh=XrCcxlLanE1hw5a0xpT0A8Dl5UAfprFd59vy3LFZr7U=;
+        b=ZWZZPR4jytVA5hk63QO7uE5t7XAldkn6yzNcfHY8oWrvBDEbn6A8cjQ+CbjByujJmn
+         A9QdAYu0Tj2LqQb5HSnWch8Q7W75p1sHRkGjFtDWts9C9IZXCxDnM/5eZkMWYOVozuKn
+         Iq1OHy9qi1orxL10nBZ0seRbs0UraYHZOqHAA9Ks8khHJm5eUbmIBmMoOyucWq9gbUrU
+         +03CZuTG9C6xmgoDMRz74tsw6gXFnVsRYA0G5XJBmDQnbCekAKvIP3AY783W8KOoVhm8
+         syTL90lW56iy7rgWM8h8L1XzOOWPa+M06gl9tezBVu9O/YWHu01h85qgTVOSTYqzwtfe
+         OY0g==
+X-Gm-Message-State: AO0yUKV+dAMjL1CRrzndTM7hc7wSwG1943TtcwRdIm1wgXUTn7KAhO+L
+        Xh2u+rHqc8eN1N2bKcl5E+1ZWljxrnY=
+X-Google-Smtp-Source: AK7set9RveR7cZTWuYyYEu3ndpHZHwVU9G84NUcj4gM2LYDO3EY5laHoBKVkf7tYCQur1RoShx22rpfXEpI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:205:b0:8e9:abfc:1a38 with SMTP id
- j5-20020a056902020500b008e9abfc1a38mr12ybs.10.1676499079682; Wed, 15 Feb 2023
- 14:11:19 -0800 (PST)
-Date:   Wed, 15 Feb 2023 14:11:17 -0800
-In-Reply-To: <c3b6efc8-4f47-449f-d3f0-1f16ae756bee@amd.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1024:b0:8fc:686c:cf87 with SMTP id
+ x4-20020a056902102400b008fc686ccf87mr0ybt.4.1676499369677; Wed, 15 Feb 2023
+ 14:16:09 -0800 (PST)
+Date:   Wed, 15 Feb 2023 14:16:07 -0800
+In-Reply-To: <20d189fc-8d20-8083-b448-460cc0420151@linux.microsoft.com>
 Mime-Version: 1.0
-References: <20230207002156.521736-1-seanjc@google.com> <c3b6efc8-4f47-449f-d3f0-1f16ae756bee@amd.com>
-Message-ID: <Y+1YL7jaNEUUYfGq@google.com>
-Subject: Re: [PATCH v2 0/3] KVM: SVM: Fix GATag bug for >256 vCPUs
+References: <43980946-7bbf-dcef-7e40-af904c456250@linux.microsoft.com>
+ <Y+p1j7tYT+16MX6B@google.com> <35ff8f48-2677-78ea-b5f3-329c75ce65c9@redhat.com>
+ <Y+qLe42h9ZPRINrG@google.com> <CABgObfaZQOvt6v0yGz3MR7FBU7DcrTTGmS6M8RWCX0uy6WML1Q@mail.gmail.com>
+ <20d189fc-8d20-8083-b448-460cc0420151@linux.microsoft.com>
+Message-ID: <Y+1ZpxAkome9s1Ve@google.com>
+Subject: Re: "KVM: x86/mmu: Overhaul TDP MMU zapping and flushing" breaks SVM
+ on Hyper-V
 From:   Sean Christopherson <seanjc@google.com>
-To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+To:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
+        linux-kernel@vger.kernel.org, Tianyu Lan <ltykernel@gmail.com>,
+        "Michael Kelley (LINUX)" <mikelley@microsoft.com>
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,39 +71,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 16, 2023, Suthikulpanit, Suravee wrote:
+On Tue, Feb 14, 2023, Jeremi Piotrowski wrote:
+> On 13/02/2023 20:56, Paolo Bonzini wrote:
+> > On Mon, Feb 13, 2023 at 8:12 PM Sean Christopherson <seanjc@google.com> wrote:
+> >>> Depending on the performance results of adding the hypercall to
+> >>> svm_flush_tlb_current, the fix could indeed be to just disable usage of
+> >>> HV_X64_NESTED_ENLIGHTENED_TLB.
+> >>
+> >> Minus making nested SVM (L3) mutually exclusive, I believe this will do the trick:
+> >>
+> >> +       /* blah blah blah */
+> >> +       hv_flush_tlb_current(vcpu);
+> >> +
+> > 
+> > Yes, it's either this or disabling the feature.
+> > 
+> > Paolo
 > 
+> Combining the two sub-threads: both of the suggestions:
 > 
-> On 2/7/2023 7:21 AM, Sean Christopherson wrote:
-> > Fix a bug in KVM's use of the GATag where it unintentionally drops a bit
-> > from vCPU IDs greater than 255 and as a result wakes the wrong vCPU.
-> > 
-> > Suravee and/or Alejandro, can you give this proper testing?  It's compile
-> > tested only at this point.  I'll do basic testing before officially
-> > applying, but AFAIK I don't have access to x2AVIC hardware, nor do I have
-> > a ready-to-go configuration to properly exercise this code.
-> > 
-> > Thanks!
-> > 
-> > Sean Christopherson (2):
-> >    KVM: SVM: Fix a benign off-by-one bug in AVIC physical table mask
-> >    KVM: SVM: WARN if GATag generation drops VM or vCPU ID information
-> > 
-> > Suravee Suthikulpanit (1):
-> >    KVM: SVM: Modify AVIC GATag to support max number of 512 vCPUs
-> > 
-> >   arch/x86/include/asm/svm.h | 12 +++++++-----
-> >   arch/x86/kvm/svm/avic.c    | 37 ++++++++++++++++++++++++++++---------
-> >   2 files changed, 35 insertions(+), 14 deletions(-)
-> > 
-> > 
-> > base-commit: 32e69f232db4ca11f26e5961daeff93906ce232f
+> a) adding a hyperv_flush_guest_mapping(__pa(root->spt) after kvm_tdp_mmu_get_vcpu_root_hpa's call to tdp_mmu_alloc_sp()
+> b) adding a hyperv_flush_guest_mapping(vcpu->arch.mmu->root.hpa) to svm_flush_tlb_current()
 > 
-> For the series:
+> appear to work in my test case (L2 vm startup until panic due to missing rootfs).
 > 
-> Tested-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+> But in both these cases (and also when I completely disable HV_X64_NESTED_ENLIGHTENED_TLB)
+> the runtime of an iteration of the test is noticeably longer compared to tdp_mmu=0.
 
-Thanks much!
+Hmm, what is test doing?
 
-Paolo, do you want to grab this directly, or should I throw this in next for a
-few days and send a separate pull request?  Or do something else entirely?
+> So in terms of performance the ranking is (fastest to slowest):
+> 1. tdp_mmu=0 + enlightened TLB
+> 2. tdp_mmu=0 + no enlightened TLB
+> 3. tdp_mmu=1 (enlightened TLB makes minimal difference)
