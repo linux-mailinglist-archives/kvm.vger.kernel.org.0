@@ -2,199 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 24E4A69827A
-	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 18:43:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A54169827C
+	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 18:44:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229799AbjBORn2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Feb 2023 12:43:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47602 "EHLO
+        id S229814AbjBORn7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Feb 2023 12:43:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229462AbjBORn1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Feb 2023 12:43:27 -0500
-Received: from mail-qv1-xf2b.google.com (mail-qv1-xf2b.google.com [IPv6:2607:f8b0:4864:20::f2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 256F53C29A
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 09:43:26 -0800 (PST)
-Received: by mail-qv1-xf2b.google.com with SMTP id j9so13529069qvt.0
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 09:43:26 -0800 (PST)
+        with ESMTP id S229502AbjBORn6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Feb 2023 12:43:58 -0500
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 558C53C298
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 09:43:57 -0800 (PST)
+Received: by mail-wr1-x434.google.com with SMTP id m14so19950207wrg.13
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 09:43:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1676483005;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=tiueSxPH/5XMq2okwELIwCkEeHw1Uv6uhMkuP28yRjI=;
-        b=BrgSNZyXjhQJUqM/WJn/VeUjmhWHjH5OMxDQX7Dbd87++G6ZzReos0q5DO9hqPkLlp
-         tI3mcWHBOZmUUiA6VJjJ+6xMDFYpfRclZRynpvXbq9QwZwchd5mIoZRwQxHP/TRuaFwS
-         XtWBMKaMTXsTeU3Zdg6axqVtfZVM++48yywYYR/VJZqg+ykeh78PA4peuFBCXtrDjHbD
-         ueUJYflyn5j7vEqm002Cm27n7CXFu9GaqiGXbhTozJFnPI/9PCMUNNTt/GSjeo3GSKuC
-         e/7SHv3qzhsZPKrvgS8cGGz0dAi98kgQkqXJvN05R83NgMyc1ewZC6E2wfD1qjTJ+G1q
-         nQvw==
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1qgw8+Wwe6UbEIQRuVneXNaCb/C9jGyBn8UJr2mvMpE=;
+        b=OUQYxjBOzhi4iZJef7RmHx3pYvwnmJUQ9l254ANvT2XMvaNRjgh549I0BaL2o47oQM
+         jEHSngvage9JIW3vJigdLEUyqataQvj3iecmCSgaj+oITeCWfqBIO9G9ZNyzuYyx8TCo
+         LT4l2JYUwrNY/oSrO6U82VGZeA3zn0fjqvRUMHjQJElb6QqLyqzAwnXZpwn2qQ+XpmDl
+         xejTlxSPs7dSIl9n+MgYiiUzOleavDjjTIrgaj12JaHZJ1CQ5mZ28SRb2MDfil4ksVnW
+         JEr9Vj2QmEWvtSVaD0hxOjWlT54LqcvP9dpDm3ln7tRP9hItK4p9WnozsISPz3ACuEXP
+         1QSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1676483005;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=tiueSxPH/5XMq2okwELIwCkEeHw1Uv6uhMkuP28yRjI=;
-        b=JcVkySfOSZMsqOO3uGXAzKJKMbhi14ppn+WPfpE6fQGjhlHqxabpFJpsS+yN8hrkqd
-         MYcMnXe552d0ENiXb4Pkcfsovn71JCLFt8q3WixHudYXxDKxKzqsCYS4BzgZxH9WkdW+
-         xCV8bIxXwpzzULmrSGXQp7WmJUAtEEb7oI3l64zxIEHZmIUPmdZDDydbYG3sX5KsdKwp
-         TaDFelcr8iphLUbY8syhHm9ZrhzQ01RnCvp0s8p0wFF1Rsc46oqsbLr7M45R1W2xragJ
-         LixsjYA9yuGML0AYVPjSWSBu+hsRuYaw2lzQwMnVkaIDY0O/1z2NK6PBr6koYbkBy6GL
-         YHHA==
-X-Gm-Message-State: AO0yUKWXRGEbdkoka1TVpNrcOo/hqQMzgM+f/CavBT9Ibj7R2cA1qwl0
-        tD+hjI25CuuhtMFqY+x9veThxy/BewPlZEkENi/j1g==
-X-Google-Smtp-Source: AK7set+a5es9bxSHn3aiGfI4t3jgQHTlrPEsm/w+jNk+g8yEwbDTQChK8aA/CQgUD+G6tn4oiY4kWhI8V4PEqBbOi/U=
-X-Received: by 2002:a0c:e086:0:b0:56e:a207:142d with SMTP id
- l6-20020a0ce086000000b0056ea207142dmr220072qvk.6.1676483005133; Wed, 15 Feb
- 2023 09:43:25 -0800 (PST)
+        bh=1qgw8+Wwe6UbEIQRuVneXNaCb/C9jGyBn8UJr2mvMpE=;
+        b=Otpuw2xTrGp4blsKU8nsTZnzZTEKadQawko2ubPgLqyljqwX7QmwP/CCT/qXcksvTM
+         ihABbKaCvbdZwZI3K7stoPmMw0laUVzglIwbYTUMLcrNFSfBYIP/lD2J+423fQpx9FF/
+         ecTz2IM7QeXfQcE9hUZkPnixkpGyzAyr7+f/a7cZYV/qgc1V0Zg11ascHeDkpXad+OC1
+         GafT+0HXXyWVpUc+3FTEhScV04VKzCu6vI0mFWfAL8w42ZbUgOaR5354DecovE//zsnj
+         gWf9y1ZF0abnW/Il0zFFzVJK1rcuAfddRW6cVFZn7kR5BnbXL2vw4ieu7CVpUOS0cCsb
+         +woA==
+X-Gm-Message-State: AO0yUKWMlFjTvY6qhnoXasEaWXodwGmK+PlBeegjCmqEEI6vT5jNIYk1
+        Y013CUVIUfbuwfBJtjPFmkiyhg==
+X-Google-Smtp-Source: AK7set+gN7zPm/eZBuNOrogb8C7yyYd5GMjKJw0HuEPzZaP/Jq4izkNObYCrrwIqDlZz0ODyc4yUKQ==
+X-Received: by 2002:adf:fdc3:0:b0:2c5:4480:b590 with SMTP id i3-20020adffdc3000000b002c54480b590mr2456780wrs.54.1676483035789;
+        Wed, 15 Feb 2023 09:43:55 -0800 (PST)
+Received: from localhost.localdomain ([81.0.6.76])
+        by smtp.gmail.com with ESMTPSA id g9-20020a5d5409000000b002c558228b6dsm8674648wrv.12.2023.02.15.09.43.54
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Wed, 15 Feb 2023 09:43:55 -0800 (PST)
+From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+To:     qemu-devel@nongnu.org
+Cc:     Marcelo Tosatti <mtosatti@redhat.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
+        Eduardo Habkost <eduardo@habkost.net>, qemu-ppc@nongnu.org,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+Subject: [PATCH 0/5] hw/timer/i8254: Un-inline and simplify IRQs
+Date:   Wed, 15 Feb 2023 18:43:48 +0100
+Message-Id: <20230215174353.37097-1-philmd@linaro.org>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
-References: <20230206165851.3106338-1-ricarkol@google.com> <20230206165851.3106338-5-ricarkol@google.com>
- <cae4a1d9-b5c2-2929-6d88-5a3fbe719651@redhat.com> <CAOHnOrxqEsbRD302Wwn9N06d6xj5NWy4p+C9DBjEm6Z4z2FvXg@mail.gmail.com>
- <CAOHnOrwprM8v3xXCA5sEVD1cHVQRS6vsPvdXiC1NocrzyQcoYw@mail.gmail.com> <e8513463-75cc-ca11-2fe8-1ba1b32411d8@redhat.com>
-In-Reply-To: <e8513463-75cc-ca11-2fe8-1ba1b32411d8@redhat.com>
-From:   Ricardo Koller <ricarkol@google.com>
-Date:   Wed, 15 Feb 2023 09:43:14 -0800
-Message-ID: <CAOHnOryXUxZdeocg3YA8Qhu3xpXPFZVkQ0ZbO=YrcvDR1SYXow@mail.gmail.com>
-Subject: Re: [PATCH v2 04/12] KVM: arm64: Add kvm_pgtable_stage2_split()
-To:     Gavin Shan <gshan@redhat.com>
-Cc:     pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
-        yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, qperret@google.com,
-        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        eric.auger@redhat.com, reijiw@google.com, rananta@google.com,
-        bgardon@google.com, ricarkol@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 9, 2023 at 2:48 PM Gavin Shan <gshan@redhat.com> wrote:
->
-> On 2/10/23 3:17 AM, Ricardo Koller wrote:
-> > "(> > > +     if (data->mc_capacity < nr_pages)
-> >>>> +             return -ENOMEM;
-> >>>> +
-> >>>> +     phys = kvm_pte_to_phys(pte);
-> >>>> +     prot = kvm_pgtable_stage2_pte_prot(pte);
-> >>>> +
-> >>>> +     ret = kvm_pgtable_stage2_create_unlinked(data->mmu->pgt, &new, phys,
-> >>>> +                                              level, prot, mc, force_pte);
-> >>>> +     if (ret)
-> >>>> +             return ret;
-> >>>> +
-> >>>> +     if (!stage2_try_break_pte(ctx, data->mmu)) {
-> >>>> +             childp = kvm_pte_follow(new, mm_ops);
-> >>>> +             kvm_pgtable_stage2_free_unlinked(mm_ops, childp, level);
-> >>>> +             mm_ops->put_page(childp);
-> >>>> +             return -EAGAIN;
-> >>>> +     }
-> >>>> +
-> >>>> +     /*
-> >>>> +      * Note, the contents of the page table are guaranteed to be made
-> >>>> +      * visible before the new PTE is assigned because stage2_make_pte()
-> >>>> +      * writes the PTE using smp_store_release().
-> >>>> +      */
-> >>>> +     stage2_make_pte(ctx, new);
-> >>>> +     dsb(ishst);
-> >>>> +     data->mc_capacity -= nr_pages;
-> >>>> +     return 0;
-> >>>> +}
-> >>>> +
-> >>>
-> >>> I think it's possible 'data->mc_capability' to be replaced by 'mc->nobjs'
-> >>> because they're same thing. With this, we needn't to maintain a duplicate
-> >>> 'data->mc_capability' since 'data->mc' has been existing.
-> >>
-> >> Ah, nice, yes. That would be simpler.
-> >>
-> >
-> > Actually, there's a complication. The memcache details are hidden
-> > inside of pgtable.c,
-> > so different types of memcaches (for vhe and nvhe) can be used for allocations.
-> > Specifically, the memcache objects are passed as an opaque pointer ("void *")
-> > and can be used with "struct hyp_pool" and "struct kvm_mmu_memory_cache".
-> >
-> > So, here are all the options that I can think of:
-> >
-> >          1. stage2_split_walker() is just used on the VHE case with the
-> >          "struct kvm_mmu_memory_cache" memcache, so we could just use it
-> >          instead of a "void *":
-> >
-> >                  kvm_pgtable_stage2_split(..., struct kvm_mmu_memory_cache *mc);
-> >
-> >          However, it could be used for the NVHE case as well, plus
-> >          this would go against the overall design of pgtable.c which tries
-> >          to use opaque objects for most things.
-> >
-> >          2. add a "get_nobjs()" method to both memcaches. This is tricky
-> >          because "struct hyp_pool" doesn't directly track its capacity. I
-> >          would rather not mess with it.
-> >
-> >          3. This whole accounting of available pages in the memcache is
-> >          needed because of the way I implemented stage2_split_walker() and
-> >          the memcache interface.  stage2_split_walker() tries to allocate
-> >          as many pages for the new table as allowed by the capacity of the
-> >          memcache. The issue with blindingly trying until the allocation
-> >          fails is that kvm_mmu_memory_cache_alloc() WARNs and tries to
-> >          allocate using GFP_ATOMIC when !nobjs. We don't want to do that,
-> >          so we could extend kvm_pgtable_mm_ops.zalloc_page() with a
-> >          NO_GFP_ATOMIC_ON_EMPTY (or similar). This flag would have to be
-> >          ignored on the hyp side.
-> >
-> >          4. what this patch is currently doing: tracking the capacity by
-> >          hand.
-> >
-> > I prefer options 4 and 3. WDYT?
-> >
->
-> Yeah, stage2_split_walker() is currently only used by VHE and it calls to
-> stage2_map_walker() to create the unlinked page table, which is shared by
-> VHE and nVHE. I think option 3 would be better than 4 because we generally
-> just want to fetch the pre-allocated page table, instead of allocating a
-> new page table with GFP_ATOMIC. However, I'm also fine with option 4. I
+i8254_pit_init() uses a odd pattern of "use this IRQ output
+line if non-NULL, otherwise use the ISA IRQ #number as output".
 
-Going with option 4 then for version 3.
+Rework as simply "Use this IRQ output".
 
-> think this can be improved in the future if you agree.
+Un-inline/rename/document functions.
 
-Definitely!
+Based-on: <20230215161641.32663-1-philmd@linaro.org>
+          "hw/ide: Untangle ISA/PCI abuses of ide_init_ioport" v2
+https://lore.kernel.org/qemu-devel/20230215161641.32663-1-philmd@linaro.org/
 
-Thanks,
-Ricardo
+Philippe Mathieu-Daudé (5):
+  hw/timer/hpet: Include missing 'hw/qdev-properties.h' header
+  hw/timer/i8254: Factor i8254_pit_create() out and document
+  hw/i386/pc: Un-inline i8254_pit_init()
+  hw/timer/i8254: Really inline i8254_pit_init()
+  hw/i386/kvm: Factor i8254_pit_create_try_kvm() out
 
->
-> >>
-> >>>
-> >>>> +int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> >>>> +                          void *mc, u64 mc_capacity)
-> >>>> +{
-> >>>> +     struct stage2_split_data split_data = {
-> >>>> +             .mmu            = pgt->mmu,
-> >>>> +             .memcache       = mc,
-> >>>> +             .mc_capacity    = mc_capacity,
-> >>>> +     };
-> >>>> +
-> >>>> +     struct kvm_pgtable_walker walker = {
-> >>>> +             .cb     = stage2_split_walker,
-> >>>> +             .flags  = KVM_PGTABLE_WALK_LEAF,
-> >>>> +             .arg    = &split_data,
-> >>>> +     };
-> >>>> +
-> >>>> +     return kvm_pgtable_walk(pgt, addr, size, &walker);
-> >>>> +}
-> >>>> +
-> >>>>    int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
-> >>>>                              struct kvm_pgtable_mm_ops *mm_ops,
-> >>>>                              enum kvm_pgtable_stage2_flags flags,
-> >>>>
-> >>>
->
-> Thanks,
-> Gavin
->
+ hw/i386/kvm/i8254.c        | 18 ++++++++++++++
+ hw/i386/microvm.c          |  6 +----
+ hw/i386/pc.c               | 15 +++++-------
+ hw/isa/i82378.c            |  2 +-
+ hw/isa/piix4.c             |  4 ++--
+ hw/isa/vt82c686.c          |  2 +-
+ hw/mips/jazz.c             |  2 +-
+ hw/timer/hpet.c            |  1 +
+ hw/timer/i8254.c           | 16 +++++++++++++
+ include/hw/timer/i8254.h   | 48 +++++++++++++-------------------------
+ target/i386/kvm/kvm-stub.c |  6 +++++
+ 11 files changed, 69 insertions(+), 51 deletions(-)
+
+-- 
+2.38.1
+
