@@ -2,65 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E983A697F6A
-	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 16:21:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DE395697F8D
+	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 16:33:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229914AbjBOPVB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Feb 2023 10:21:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47826 "EHLO
+        id S230130AbjBOPdq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Feb 2023 10:33:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229862AbjBOPU7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Feb 2023 10:20:59 -0500
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3EF272A4
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 07:20:58 -0800 (PST)
-Received: by mail-pf1-x449.google.com with SMTP id y28-20020a056a001c9c00b005a8c5cd5ae9so4290723pfw.22
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 07:20:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iDukbJdwBzqD8cf3Dpo6Rb4XouWez9+Bscdl5lNP9jE=;
-        b=ohreeci2tmJfITEyOGUGkEKnrkaY1n0D9pgJXvMVz+Ilu2jbR8TAIlYP/R/MvfTqoH
-         Ke/LOWMGGHyEfy+IW2VArB3dtXeA4bi3uXACt8DqX1GWgBjY+uXq5j5yj1GtHhhUon4b
-         6k18Uc8Loq/buM60b3SNXw401AaLdyv5aAhnpmy4R+cLSAi2cm9QXcqTswhCwnEg8YQG
-         9hf5/D9JLV2TnBdAngWJEHUy6UDXLlG1/PY2bkNIJX0C9zaXP8G/CAvBsP/BnpKmOqA3
-         VzbsnDa/AjdZIzeJ+zy4K6WPPAnhrS2rSjwkFtkxW+40qSsoq39UkbPolqF4/jU93dil
-         JuQg==
+        with ESMTP id S229914AbjBOPdo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Feb 2023 10:33:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B6BF7DAB
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 07:32:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676475173;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Dh5NdUXXqt2OwKe+bgzJIjOdCZFOJ5LseD3HaKSZilk=;
+        b=hM4mgD73hXukCkN2eX8LSAJ6h2cw4Hkyspw1tqK2HW/T7iIiRIiebwvgupzpSYD/X4KNTb
+        1EX2PXcwecYGUqOtP26WsJAB1EUWMT1mS3TJ6NGdDddZQL9RWq6/wZMoIKl57kZMMmnptL
+        4PV7yXIXrEjrjdzKeW1SUAcOekNnASI=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-377-F1NQg2HeNBWm5WZgLSCetg-1; Wed, 15 Feb 2023 10:32:49 -0500
+X-MC-Unique: F1NQg2HeNBWm5WZgLSCetg-1
+Received: by mail-il1-f197.google.com with SMTP id k13-20020a92c24d000000b003127853ef5dso13376688ilo.5
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 07:32:38 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iDukbJdwBzqD8cf3Dpo6Rb4XouWez9+Bscdl5lNP9jE=;
-        b=G/3UhE3vJbiydJtHZ8cFpwXW0exe+WMxeGsQpByME84QUPKZEIxG9eXQuvB2jn4XmY
-         U1tigrgW4kvx0FQCniKEmW2TzcF9I/VtLGNeDdoeZR6WoPlgYvHUHTT2DJ7ZD7XJ0tJS
-         M+CcbcI3fNVjmVhH9s+wYBDlziAY6WqxPcDUjM1kbpOpmYj7D6q/uGgWg52SRmuK8p3+
-         NCKv4ArpKx0aZtXYq4+UiceJ3RfEmp8Uot4sDnqqKsVyB6bcLCvStnlXYWUKD0GVEJdI
-         48aDbbqrHECfa7OA7pMNk0zGUGjwkeWrhGDf9WcwKijBGMt/BGHeFZDHO9/BrPRlmuop
-         72jA==
-X-Gm-Message-State: AO0yUKWUqW+ZmksbPvd1RBqV80tjlz1vfePuSqV15pm+GTGMHe+s0KTa
-        r0Sui/jJKGezlFDuJMnBehJXy9aSH+w=
-X-Google-Smtp-Source: AK7set8S5SerR9f1nJdNDbGDT5znXEYryuJhEM9i7uc4EXq3U3S7jiJB/xHpbyswaGjzRWNCEa1V9zD4V/I=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:338f:0:b0:4fb:9b70:2bfe with SMTP id
- z137-20020a63338f000000b004fb9b702bfemr461308pgz.2.1676474458212; Wed, 15 Feb
- 2023 07:20:58 -0800 (PST)
-Date:   Wed, 15 Feb 2023 07:20:56 -0800
-In-Reply-To: <54d64f0e-871f-3004-d8a6-55c60affede0@gmail.com>
-Mime-Version: 1.0
-References: <20230210003148.2646712-1-seanjc@google.com> <20230210003148.2646712-7-seanjc@google.com>
- <54d64f0e-871f-3004-d8a6-55c60affede0@gmail.com>
-Message-ID: <Y+z4WF03dD/ytPl9@google.com>
-Subject: Re: [PATCH v2 06/21] KVM: x86/pmu: WARN and bug the VM if PMU is
- refreshed after vCPU has run
-From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Dh5NdUXXqt2OwKe+bgzJIjOdCZFOJ5LseD3HaKSZilk=;
+        b=vDkK8kJ9v6u4LJ6Vqeh9NyQzWFKxowNtEHCmJ5XkEb7jpaJfY0jlxQ8haKOMWZVm8N
+         VioQUVYfSvDdDXq73DAnMBzEcqKaPR0+TmsT3e4PWcZNyQTxcKkAy15tSmn/52gbQBWT
+         XMpFbtqklrdgSNbAFgVaFECgGnvkIbrL2R9Zm8F7Uk9fVxIYw3zEeqNkNtbJLOum/l/g
+         5AmcbkTq9VjOKGwaX8xXyV1noeQBXupTrE62u2JTj7VgiJSTe6ToqOHc1JGWb4XdpjeS
+         I6KdCtV96Ga07blQzVPPD10GeXn0EV2Jn1y3RY3iv9uJSGJkZJ332M4eBAMaqYer9MlN
+         Jbhg==
+X-Gm-Message-State: AO0yUKUCxvJNyFVN12qUsg8pOoWTnuHoWgw0+KqWLKcI/lvGaOe/RlaK
+        ZoZ9uOd1ZsukdtIDeh06WUt0Iz74a7wkkoPnSiEZTjh926hm3gLqlRI9Cj814KcGw3W6Tn73EiZ
+        7f8/JRoOG045I
+X-Received: by 2002:a05:6e02:180a:b0:315:3036:4da with SMTP id a10-20020a056e02180a00b00315303604damr2903331ilv.30.1676475157557;
+        Wed, 15 Feb 2023 07:32:37 -0800 (PST)
+X-Google-Smtp-Source: AK7set9dYhmZ8agTRUin0PWV3DETcyMYPO5GFEHe0t1hXDUe9MWRtba6M7F5v8HJtVUnNqr1Vxo/uA==
+X-Received: by 2002:a05:6e02:180a:b0:315:3036:4da with SMTP id a10-20020a056e02180a00b00315303604damr2903310ilv.30.1676475157275;
+        Wed, 15 Feb 2023 07:32:37 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id u6-20020a02aa86000000b0038a822f87c3sm5723739jai.159.2023.02.15.07.32.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Feb 2023 07:32:36 -0800 (PST)
+Date:   Wed, 15 Feb 2023 08:32:34 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+Subject: Re: [PATCH v3 03/15] vfio: Accept vfio device file in the driver
+ facing kAPI
+Message-ID: <20230215083234.194d07a9.alex.williamson@redhat.com>
+In-Reply-To: <Y+zwSn63eA7HrefO@nvidia.com>
+References: <20230213151348.56451-1-yi.l.liu@intel.com>
+        <20230213151348.56451-4-yi.l.liu@intel.com>
+        <Y+rLKvCMivND0izd@nvidia.com>
+        <DS0PR11MB7529B43C7D357D8A0C2438C7C3A29@DS0PR11MB7529.namprd11.prod.outlook.com>
+        <Y+zSRklKkL3rc2FB@nvidia.com>
+        <DS0PR11MB75299F5D92AAC33FD8690694C3A39@DS0PR11MB7529.namprd11.prod.outlook.com>
+        <Y+zwSn63eA7HrefO@nvidia.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,29 +105,77 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 15, 2023, Like Xu wrote:
-> On 10/2/2023 8:31 am, Sean Christopherson wrote:
-> > Now that KVM disallows changing feature MSRs, i.e. PERF_CAPABILITIES,
-> > after running a vCPU, WARN and bug the VM if the PMU is refreshed after
-> > the vCPU has run.
+[Cc +Paolo]
+
+On Wed, 15 Feb 2023 10:46:34 -0400
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> On Wed, Feb 15, 2023 at 02:43:20PM +0000, Liu, Yi L wrote:
+> > > From: Jason Gunthorpe <jgg@nvidia.com>
+> > > Sent: Wednesday, February 15, 2023 8:39 PM
+> > > 
+> > > On Tue, Feb 14, 2023 at 02:02:37AM +0000, Liu, Yi L wrote:  
+> > > > > From: Jason Gunthorpe <jgg@nvidia.com>
+> > > > > Sent: Tuesday, February 14, 2023 7:44 AM
+> > > > >
+> > > > > On Mon, Feb 13, 2023 at 07:13:36AM -0800, Yi Liu wrote:  
+> > > > > > +static struct vfio_device *vfio_device_from_file(struct file *file)
+> > > > > > +{
+> > > > > > +	struct vfio_device_file *df = file->private_data;
+> > > > > > +
+> > > > > > +	if (file->f_op != &vfio_device_fops)
+> > > > > > +		return NULL;
+> > > > > > +	return df->device;
+> > > > > > +}
+> > > > > > +
+> > > > > >  /**
+> > > > > >   * vfio_file_is_valid - True if the file is usable with VFIO APIS
+> > > > > >   * @file: VFIO group file or VFIO device file
+> > > > > >   */
+> > > > > >  bool vfio_file_is_valid(struct file *file)
+> > > > > >  {
+> > > > > > -	return vfio_group_from_file(file);
+> > > > > > +	return vfio_group_from_file(file) ||
+> > > > > > +	       vfio_device_from_file(file);
+> > > > > >  }
+> > > > > >  EXPORT_SYMBOL_GPL(vfio_file_is_valid);  
+> > > > >
+> > > > > This can only succeed on a device cdev that has been fully opened.  
+> > > >
+> > > > Actually, we cannot. This is used in the kvm-vfio code to see if the
+> > > > user-provided fd is vfio fds in the SET_KVM path. And we don't
+> > > > have the device cdev fully opened until BIND_IOMMUFD. But we do
+> > > > need to invoke SET_KVM before issuing BIND_IOMMUFD as the device
+> > > > open needs kvm pointer. So if we cannot apply fully opened limit to this
+> > > > interface. Maybe an updated function comment is needed.  
+> > > 
+> > > This also seems sketchy, KVM is using the VFIO fd as a "proof" to
+> > > enable the wbinvd stuff. A half opened cdev should not be used as that
+> > > proof.  
 > > 
-> > Note, KVM has disallowed CPUID updates after running a vCPU since commit
-> > feb627e8d6f6 ("KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN"), i.e.
-> > PERF_CAPABILITIES was the only remaining way to trigger a PMU refresh
-> > after KVM_RUN.
+> > From this angle, the group path seems has the same concern. Device is not
+> > opened until VFIO_GROUP_GET_DEVICE_FD.   
 > 
-> A malicious user space could have saved the vcpu state and then deleted
-> and recreated a new vcpu w/ previous state so that it would have a chance
-> to re-set the features msr.
-
-I don't follow.  vcpu->arch.perf_capabilities and kvm_vcpu_has_run() are per-vCPU,
-creating another vCPU will not let userspace trigger this WARN.
-
-> The key to this issue may be focused on the KVM_CREATE_VM interface.
+> Well, classically the device was DMA ownership claimed at least.
 > 
-> How about the contract that when the first vcpu is created and "after
-> KVM_RUN of any vcpu", the values of all feature msrs for all vcpus on
-> the same guest cannot be changed, even if the (likely) first ever ran
-> vcpu is deleted ?
+> > But group path has one advantage, which make it ok. Group can only be
+> > opened by one application. So once it is opened, the devices within the
+> > group are somehow obtained by the application until group fd close.  
+> 
+> It depends on what do we want the KVM proof to actually mean.
+> 
+> Is simply having permissions on the cdev node sufficient proof for
+> wbinvd?
+> 
+> I admit I poorly understand the threat model for this in kvm beyond
+> that kvm doesn't want everyone to use wbinvd.
 
-I don't think that's necessary, as above the "freeze" happens per-vCPU.
+We've discussed this with Paolo before and I believe the bar of proof
+is not very high.  I suspect it's not a problem that the device itself
+is not yet accessible, so long as the user can prove they have the
+ability to access the device, such as access to a restricted file.  In
+most cases this isn't going to turn on wbinvd anyway since DMA will be
+coherent.  Thanks,
+
+Alex
+
