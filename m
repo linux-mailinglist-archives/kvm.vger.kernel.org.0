@@ -2,71 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 424286980CE
-	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 17:25:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EA90669811F
+	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 17:44:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229477AbjBOQZS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Feb 2023 11:25:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35182 "EHLO
+        id S229651AbjBOQow (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Feb 2023 11:44:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229678AbjBOQZR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Feb 2023 11:25:17 -0500
-Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 501B539CC3
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 08:25:14 -0800 (PST)
-Received: by mail-qt1-x836.google.com with SMTP id m12so22364270qth.4
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 08:25:14 -0800 (PST)
+        with ESMTP id S229772AbjBOQou (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Feb 2023 11:44:50 -0500
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8185020D13
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 08:44:49 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id u6-20020a170903124600b00188cd4769bcso10954316plh.0
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 08:44:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=AFepK2rkB6ezD70sOO4MhlZcyxN8oS1icDWJsj/PPKQ=;
-        b=Qhoq6nyimphHqRE5WzVN8RgkyLd4oDJPLhqmOaXFoUid4CPWPTXVbx5yfIcS/DOpDi
-         Q66ZjIRewef/dTRmmUZgomkm9Zy1xH+8qmHVBQ8bgeRyLulUUHGdB6RbVOZ7mtVrdILk
-         4N7yn9eJ/7b0IwZHWlL0nh9QjVDOJuijesSDZ/8rzE+ihdxXQwVLvCiFCgFTclMcaG5x
-         RbqeniZ0qbfppXUI3yQWv6m5/JOGgE9m0961DBmvFhyq59PuPQ63p9Olt1BIvoED6GOo
-         aaRL6rERcJQWqI+1IFfJ5Asu6m84awWlRbc3hzZ7WSly5iAsVvZGHX4C5K5mP8sGf5ZL
-         GamQ==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=t8DMcJvXOt1uVMYd5lzHsJnF9jrZA0JOd1Wq9dyU57Y=;
+        b=WoRu9NpYfvK6J7R6Hjg/lqXmtWSjFmIjHU2Co8CI2GzDjhbDr+vBMUWmeO1JI0psis
+         L86WT9EvkHym4MiCd+N49yB7UaWK4XEkKss6gjM2GjoxmzxLW6DofNQ0BScuDnGDWTkL
+         m203gZvFo7D0YemQZg96lVgyrB2rwF3q9QkcSVLcbUGCR7yexx/c0+bAQDYQFYroDKUU
+         MZWQByGYoptU9v021DZtiGN1+sbig7mL/ZWIvMCkJMUKZDFvyBBLtyUvouKFwwym4Ib+
+         5iJqFRO9/VLw8UKxjgH46tUGdUKGWgry3LhdlTKTaIHzy71rmAqj20l0dfvkyECUsZby
+         hvKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AFepK2rkB6ezD70sOO4MhlZcyxN8oS1icDWJsj/PPKQ=;
-        b=BTuis2EcF0k9eSNAbjTA5+3dG/aKXRzgrPAnEP0tIg2Nqqayqju0gPzbm7bM7OKV3K
-         QwR6Rn4gk2mtplMmOUFDzJaWlxpsQaQuwONN+zBGj5/VkWeldkii/MLkXRnhKJF5zh5f
-         S5ST/6hoRxfQnUImnLNpmWmPJLz9ldkAv0pOzeZDo5Gq/2Nme0w+W6mO92kN99+l7Wd8
-         Pm3xbrF+lPsls0e1GuweRZu7pVjNu5+Y76VhYxR9v4c5GDcW3NiyGFFFkyBPevqbkgUi
-         6ZoHJfSbgUGS+34FJTzve80Nu1JMawH74ylMZMqGZY/iiwMksqsLl6x6Udcl4OXPXGoL
-         4IEg==
-X-Gm-Message-State: AO0yUKXUe/xpkaA/0ZQXN13tZlbX6o5oSJsa/U0YzQ2XYLXjSeGQpxxn
-        PrHG82c+mPYwPT4RKhXkBba+JjYfcsdF0bMUqN7HQTMfDwSrXiemJTM=
-X-Google-Smtp-Source: AK7set9ikM4pL943zsnOf8yKyyR11BmkOt0tLqoP8fuVV3p3LRQ9jdICX6UpZLZ8msIH4DpPAMZoNgO+hZsONxK16LM=
-X-Received: by 2002:ac8:58cb:0:b0:3ba:240b:99ad with SMTP id
- u11-20020ac858cb000000b003ba240b99admr355236qta.65.1676478313326; Wed, 15 Feb
- 2023 08:25:13 -0800 (PST)
-MIME-Version: 1.0
-References: <20230206165851.3106338-1-ricarkol@google.com> <20230206165851.3106338-10-ricarkol@google.com>
- <9201764f-baa1-250a-39ac-0305bce789a3@redhat.com> <CAOHnOrzGXU29JK+8aRq0SnMe6Ske04YWffJhPU6iUXjGyyoQtA@mail.gmail.com>
-In-Reply-To: <CAOHnOrzGXU29JK+8aRq0SnMe6Ske04YWffJhPU6iUXjGyyoQtA@mail.gmail.com>
-From:   Ricardo Koller <ricarkol@google.com>
-Date:   Wed, 15 Feb 2023 08:25:02 -0800
-Message-ID: <CAOHnOrwZGyzARsOqfgNGk9cH4rUoi-FyKXbbKa-fu=MzA+yO1g@mail.gmail.com>
-Subject: Re: [PATCH v2 09/12] KVM: arm64: Split huge pages when dirty logging
- is enabled
-To:     Gavin Shan <gshan@redhat.com>
-Cc:     pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
-        yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, qperret@google.com,
-        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        eric.auger@redhat.com, reijiw@google.com, rananta@google.com,
-        bgardon@google.com, ricarkol@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=t8DMcJvXOt1uVMYd5lzHsJnF9jrZA0JOd1Wq9dyU57Y=;
+        b=SorN9zJFumN+nH2G1OIrqr4B8NThxF29c9OfQJvQ8GM/oguZS9RAaYlPK6K8e5913P
+         dR6Bko3cmiwJS8SskXx3ySA+f7DyBf6sZrkudHfnviL4jhfGtjbY9FO1Omj/x9l78/zu
+         BDmaF1nw8vnw9PloR/5+ZTnB7QWqu3jcRecfv4uEtcnnenllNm2yC5z+ki8aiYx8feHq
+         0ixrWf8rHpA3rXjgjw0toQVfo/TZeUDLvRcaYwN6kSC0+ROjP8StYgBHdP80QLrcPmrr
+         3pgbHnTCECIXXK6r86Pukxqn5KYGVVLden2LieTkKeDc6X1Y/4RgcmBc9kMiPsUb+fP3
+         V6Kg==
+X-Gm-Message-State: AO0yUKXk6WDyao7N1WarQ1mtkEXwRr2Z6wDD4iLJxVzjHsobBcS+oVua
+        PEbqTPUOut5NMeAwfbyeM0LRaCzjXk4=
+X-Google-Smtp-Source: AK7set9mz6oE4Te7rt9n1BbiU/9ZQWLHMawumtBwjGTY9V0SWl+h2f3S7YMuaoevJRHcJm0SIwnMhfdvhvA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:bf0b:0:b0:4ce:ca8b:432b with SMTP id
+ v11-20020a63bf0b000000b004ceca8b432bmr244899pgf.10.1676479488932; Wed, 15 Feb
+ 2023 08:44:48 -0800 (PST)
+Date:   Wed, 15 Feb 2023 08:44:47 -0800
+In-Reply-To: <Y+yJU2pE4IyuIwOQ@linux.dev>
+Mime-Version: 1.0
+References: <20230215011614.725983-1-amoorthy@google.com> <20230215011614.725983-2-amoorthy@google.com>
+ <Y+yJU2pE4IyuIwOQ@linux.dev>
+Message-ID: <Y+0L/x2YgiEgm9bt@google.com>
+Subject: Re: [PATCH 1/8] selftests/kvm: Fix bug in how demand_paging_test
+ calculates paging rate
+From:   Sean Christopherson <seanjc@google.com>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Anish Moorthy <amoorthy@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Houghton <jthoughton@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Axel Rasmussen <axelrasmussen@google.com>, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,40 +76,33 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > > +
-> > > +             next = __stage2_range_addr_end(addr, end, chunk_size);
-> > > +             ret = kvm_pgtable_stage2_split(pgt, addr, next - addr,
-> > > +                                            cache, cache_capacity);
-> > > +             if (ret)
-> > > +                     break;
-> > > +     } while (addr = next, addr != end);
-> > > +
-> > > +     return ret;
-> > > +}
-> > > +
-> > >   #define stage2_apply_range_resched(kvm, addr, end, fn)                      \
-> > >       stage2_apply_range(kvm, addr, end, fn, true)
-> > >
-> >
-> > I'm wandering if stage2_apply_range() can be reused to avoid invent another similar
-> > function. the gap are the granularity and conditions to reschedule.
->
-> Will try and see what it looks like and report back.
->
+On Wed, Feb 15, 2023, Oliver Upton wrote:
+> Hi Anish,
+> 
+> On Wed, Feb 15, 2023 at 01:16:07AM +0000, Anish Moorthy wrote:
+> > Currently we're dividing tv_nsec by 1E8, not 1E9.
+> > 
+> > Reported-by: James Houghton <jthoughton@google.com>
+> > Signed-off-by: Anish Moorthy <amoorthy@google.com>
+> > ---
+> >  tools/testing/selftests/kvm/demand_paging_test.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
+> > index b0e1fc4de9e29..6809184ce2390 100644
+> > --- a/tools/testing/selftests/kvm/demand_paging_test.c
+> > +++ b/tools/testing/selftests/kvm/demand_paging_test.c
+> > @@ -194,7 +194,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+> >  		ts_diff.tv_sec, ts_diff.tv_nsec);
+> >  	pr_info("Overall demand paging rate: %f pgs/sec\n",
+> >  		memstress_args.vcpu_args[0].pages * nr_vcpus /
+> > -		((double)ts_diff.tv_sec + (double)ts_diff.tv_nsec / 100000000.0));
+> > +		((double)ts_diff.tv_sec + (double)ts_diff.tv_nsec / 1E9));
+> 
+> Use NSEC_PER_SEC instead so the conversion taking place is immediately
+> obvious.
 
-Tried and don't like the result very much:
+And please post this separately, it's a fix that's independent of the rest of the
+series and can/should be applied sooner than later.
 
-static int _stage2_apply_range(struct kvm *kvm, phys_addr_t addr,
-phys_addr_t end,
-                               int (*fn)(struct kvm_pgtable *, u64,
-u64),
-                               bool fn_ignore_failures, bool
-fn_drop_mmu_lock,
-                               struct kvm_mmu_memory_cache *cache, int
-cache_capacity,
-                               bool resched)
-
-The generic function would require too many arguments to work for all cases.
-
-Thanks,
-Ricardo
+Thanks!
