@@ -2,154 +2,700 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8690C69818E
-	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 18:04:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0DFA469819B
+	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 18:06:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229977AbjBOREU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Feb 2023 12:04:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45118 "EHLO
+        id S229959AbjBORGj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Feb 2023 12:06:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229870AbjBORET (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Feb 2023 12:04:19 -0500
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2077.outbound.protection.outlook.com [40.107.220.77])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0943755B9;
-        Wed, 15 Feb 2023 09:04:18 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Zgvng1vxj33TKM60TaHv7RnlMa45A89IWRFby5WtaZMAqXtdUlOEC6T+9qQoNTzinQPIkBHEFdrR6qXwloorr4tufcIoDUc+JYe+X0TgwiTxeLeatqg76cJahfjHnAOB/tv6z2QMxmRhkUTLZ73X4FnCYtyiBPlF3Me1lJa0O5Wo8tivEUbgZoALslOR/Ps5ENWZw3LmVDkQlTwooHL3C2AhwrxpH9u4CBQ5MvvWgTO+zWsIKLcFY6OuyRmjZQb0UZM/W3c+9ezkwSh9o3tJQl7AVRgmWFL8dSd5KlfyOf68F87s89TjnP9P8GHnG6pB+1ACsDBZL4IgnODynG1krQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5b9lQc9EouqL4IqUUfWN5MzWeOUr3e0j22SqXiH55cY=;
- b=YogoX099U4CMndvyQ93jL6sP/vRNSDIcyMNK6ktKdbdZUvf52Td7wHvyTCQt13QY+Bd9b0iexu4QXa7oMiS4nYh5yoQ3ubGo3lQMazLQRaiphjGxskI+uGPGqGmvLjxRzDJG0luWDid7ghojowuUeFSIEeOIDMbWGiqyvjiBIxPZB6IQmXox6a+zQLR3Wa2sa58KdM/FpF0eIWZ/S3eaMiSm7xCr8zfTqw3ScDMSmhamEGl24gFDnuMjJYsSiSzNCf54fVPEEfgJywtJJjzvNfodhLqvAC3JYuqy8wQ2tXgEf/X8G9C2LKAzhFsWemVznI/gEQSOEWylbQET0bE2dw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5b9lQc9EouqL4IqUUfWN5MzWeOUr3e0j22SqXiH55cY=;
- b=CytssQD/1VDWN+HgL17GS8k5FR5jp9urJoXiRbDdbOOxj1XLffR7JgS4gSngp9lNDBeq6ImOA/rdWzoDdaJJIH+Ih6DRnkOeJJLm19HQpnqdCeCQJ06Fwkq//fhQYCXCcGm1P+OqJ/RpPBn9slACO+XOo7YkqSZB80vkCuoDs/luwQWa9vTNZP5kxZiz6ZHGBOxvjQmYZCktybXevSj9EzYQbTL0RKYUucuwsA8WAwNU+aW3+OxXGhwMtBdCRL9W1YdkxJYXy0ym+aVHajfPDqSKnDdoCEThszkBbMv2h/jjD6YvufdenkXzil+EtskkQBVb/y2HE3Hqyf2DfTDwXw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SN7PR12MB6981.namprd12.prod.outlook.com (2603:10b6:806:263::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.26; Wed, 15 Feb
- 2023 17:04:15 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3cb3:2fce:5c8f:82ee]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3cb3:2fce:5c8f:82ee%4]) with mapi id 15.20.6086.024; Wed, 15 Feb 2023
- 17:04:15 +0000
-Date:   Wed, 15 Feb 2023 13:04:13 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v3 03/15] vfio: Accept vfio device file in the driver
- facing kAPI
-Message-ID: <Y+0QjaIWr84eVzsp@nvidia.com>
-References: <20230213151348.56451-1-yi.l.liu@intel.com>
- <20230213151348.56451-4-yi.l.liu@intel.com>
- <Y+rLKvCMivND0izd@nvidia.com>
- <DS0PR11MB7529B43C7D357D8A0C2438C7C3A29@DS0PR11MB7529.namprd11.prod.outlook.com>
- <Y+zSRklKkL3rc2FB@nvidia.com>
- <DS0PR11MB75299F5D92AAC33FD8690694C3A39@DS0PR11MB7529.namprd11.prod.outlook.com>
- <Y+zwSn63eA7HrefO@nvidia.com>
- <20230215083234.194d07a9.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230215083234.194d07a9.alex.williamson@redhat.com>
-X-ClientProxiedBy: BL1PR13CA0201.namprd13.prod.outlook.com
- (2603:10b6:208:2be::26) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S229949AbjBORGi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Feb 2023 12:06:38 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E02A211EB3;
+        Wed, 15 Feb 2023 09:06:35 -0800 (PST)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31FGqW4A027688;
+        Wed, 15 Feb 2023 17:06:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=gurvaWfCx++nflDtA5UxsLe9y+K2uLQNdregC07tNIQ=;
+ b=BSDhCPytnSN9xLOJ6Vr8SAb6JyPMWb4UP7qYoiVDqfBsJlONTzJ9/taaMonTpkAiD+lH
+ eg9WDum8RZWH3Svxc/lzPm7Er1rB689wrRHeNGRuFeOqNJ/5Gdtf8fbPDMvdrPe32YuR
+ aVF+MTYohalFtnwVlPjIuQLUa5dwXO3Yc9+02Hm4+MjKk1IbJDHcHapCcIR9BQSTgpdb
+ Cw0C0D+05ukLqKOcTVud80e8G82oukOSi4EF+o46eBhYeq0gPf2f7moEvNLBFbwtVJe5
+ 3CxrGWwlFTcNer1dE+r3C3Ke5Ua/1oS4rFTbuFg7HXyjLrpN2S2T1j0ugBScTLsUNDlw 2A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ns3a3ge0x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 15 Feb 2023 17:06:35 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31FGqokI031344;
+        Wed, 15 Feb 2023 17:06:34 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ns3a3gdyx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 15 Feb 2023 17:06:34 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31F2nXqh007609;
+        Wed, 15 Feb 2023 17:06:32 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma04fra.de.ibm.com (PPS) with ESMTPS id 3np2n6c5q9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 15 Feb 2023 17:06:31 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31FH6Swp47841720
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 15 Feb 2023 17:06:28 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0829C20040;
+        Wed, 15 Feb 2023 17:06:28 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B584520043;
+        Wed, 15 Feb 2023 17:06:27 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.56])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Wed, 15 Feb 2023 17:06:27 +0000 (GMT)
+Date:   Wed, 15 Feb 2023 18:06:25 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com
+Subject: Re: [kvm-unit-tests PATCH 2/3] s390x: pv: Test sie entry intercepts
+ and validities
+Message-ID: <20230215180625.53b260a9@p-imbrenda>
+In-Reply-To: <20230201084833.39846-3-frankja@linux.ibm.com>
+References: <20230201084833.39846-1-frankja@linux.ibm.com>
+        <20230201084833.39846-3-frankja@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SN7PR12MB6981:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4c9ce9ad-ba00-4297-7a85-08db0f76aaff
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: W+BCwFHAcD2Z5Y9zn3EuNH0EgbkHVoS2dX2Nm392nMVh+LxwDaPDiYAQVp9l868Wgi8vWC5bXoy237oLJ81Zl3p1+fcX1boSKyT6SNfMMd945SLg+AalPZJ6NFXGToDMD1cGXMMI3dJr/Knok8Csm+etkZ+D+wSw+XW4A+Pi0KOGQ+D5B4oGWg93/AObd+uPOnYHBQKaXL/KW0/BwYxzkVWnaIw5FweqahfpMo4MAHKx0nLJrB6vFugWWTEGnX1uq1RSJX+MhrIR/v6HaUHF2wS2aqevoYDytoV7CEcjUYHbTbiaUQP5FaInm1jXpGCDTat2GizHB7ifGS3WF2syjj6msJ7cvDshcdf7z6sFmwmqONyCW/rq03HeI9oR6Q4u3Il+kDt0HZzyILRiSnM+vjerbpp4hnQ2dKpEI3hYtaXuwWwTj/vaA+FzwwEWvQU8wOx+VqW/g5gTeAWzs3wOCIzb+xv2/ylHvlzezoNHPqCxqSJizkuxnveqpr9gUEXybGmtLDR4m7yXI0UNIxJFeCde03+HgCqAmrP0n2P+SXg3gzYR+MXoJxaxSUFLvXICQp1h/0pWgToxuBsH4hhLz0CwVtkYqJzrthnyxEzqImNUVWRGHuCo/QNaLZChxWlUyPM/M0Ypg2/BV0Db1xOuno0vxFijAbSAmv/yjI1oUSix8dYF5WniFnXMmHsvs9ag
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(396003)(346002)(136003)(376002)(366004)(39860400002)(451199018)(54906003)(316002)(8936002)(7416002)(4744005)(5660300002)(41300700001)(38100700002)(2906002)(36756003)(83380400001)(66946007)(66556008)(8676002)(6916009)(4326008)(66476007)(6506007)(2616005)(6486002)(478600001)(86362001)(186003)(26005)(6512007)(67856001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?XYG9I4OPG21tBeuSZ0wk0UGQyIr7ucIEtUJXe8Vkj0ujuVYuGew3Rl4uCVtp?=
- =?us-ascii?Q?4BmPR0w3b0tpfsWOptXIG5G3uc/15nn3P69+ysrRw5bY7g05okh5Slg8Q1w7?=
- =?us-ascii?Q?hsqXr2yUCtTwR2JPPFYwSXOTnuHhBfF22nEBBskjQg5ZcLxIiuhqk52DK4cS?=
- =?us-ascii?Q?QzZFzjEyzfFtGMuFdTDaWNlgoOdVgXYWdMLheBT82iBRxYn7kE5HhW17+j7+?=
- =?us-ascii?Q?U/kQk/vvD3g+c88xlPlZyW+dW0Yv7rKUceEHLEcBpyL2R12FefdgBwwSxvU2?=
- =?us-ascii?Q?CQdOTMyWYTvOVVRjFVzXTIQhhnP31ixko8VeRRQzFDkWmnyqtzJReREB/2iH?=
- =?us-ascii?Q?B0VV1Mzdpi7IYSQcZzExc3hGO1wfBek5L1eq24jP2y0a0wSiPxT6t0qzDdnV?=
- =?us-ascii?Q?iFFEB2s65fWWOUfgqBh/LkZD7oLc1zjGyrUbmP7qeYQvweMvsUTsRUP8iz1F?=
- =?us-ascii?Q?uMHJkw0uNDVYL0Vntz2xZfSlbGuzkIcROEgPwzydiY82xzG60B56rGe/KGIM?=
- =?us-ascii?Q?zU9Fta534JyMP3n3rRvfaAq5EgHZNVujj4QccSMze/3fS8Y1nQDLqAF/pQUN?=
- =?us-ascii?Q?bDoK4FiuFIWyKLiBnEfQbZOXnmFFDdNzMOX17mrY76fWj0qtlnDUrrqj+EEW?=
- =?us-ascii?Q?DStYReX2QIps+2t75++pr1pa1wdKY1cryQpBzBuzpZ1yIgGrpY8QR7mM8Nh/?=
- =?us-ascii?Q?z3epTU9Vwvu2VWWbMcw5pcWzqJcdQUEZz9hWhH3QMxC1QBI46rC2YXkWOqs8?=
- =?us-ascii?Q?6KzRtZyzqavnpqJOqCj7rtLHcdgaJ2lI9fanw6/H65MOw2SOIwLu9BVs8UeL?=
- =?us-ascii?Q?GZ35cgRj3SqKVVTw8SxtBfX5xA4IdnQkYBcW4Uy1L6tTi5bGx348R6OG4YLE?=
- =?us-ascii?Q?bgmomxmW+a+P05gqSN4u0+dRAoz24TUeAb+EMVnfpmiJ7gryllX1rAMSyWvi?=
- =?us-ascii?Q?sJYX9lD3yqjUu2f3Dr30YnkDYYnVKdpJBww62BiacsyHe9Ga26VC3EiZSJlY?=
- =?us-ascii?Q?hUbPZNxKNXC7/6LpfwFXMGNkhrmd9Z+5v+fgQCYpXc9ztEZOuwvqBXc3u2bd?=
- =?us-ascii?Q?Ub1RveqiZ/wW/ekJ6VbRHSYO6KAUxxLa0PZ3KZYNIR4VPSj0G0P8WJXIEgMs?=
- =?us-ascii?Q?EgTkopps31g2FhHHK64Z4XWtD0qSyrwH6chRTYGA35l8ZEVgglYDhi1D6T6K?=
- =?us-ascii?Q?lPqiSEIApuwm0Qj2YR+ujKUGq0z1a7ie948pUbZqscHCaGiqkXJeJN5k3RNo?=
- =?us-ascii?Q?cWTqxhoOEaX/el7ueLMWZRLf/gfPvn0/JmFGi12FYTmTXZ+xN05zZAQhHTo5?=
- =?us-ascii?Q?8HbTwlWEA5odJqFFM/ZUVTVscXJCgCXwIS39bLRfjGiQPjlxZBlD0p0vOs+O?=
- =?us-ascii?Q?ALpb3qujgym8vyI1wo8PScCt2hrnDs2yTQAvHklhdSmbQWAOs54u9K1f4aLX?=
- =?us-ascii?Q?DK7Aic0ytshin6xt4MEN5PjcmVsaeK6T7d7d+EPaSBdWmUssxK1EEbgAS8nn?=
- =?us-ascii?Q?aII7ZnFGGAywtaY306KxDAcUya6oks+GYKodstv7BEW4e+pd6TeWBCWYgat2?=
- =?us-ascii?Q?87yNIPoSqKm0+BOrgjizB2WUwzS+CrWavvSAnVBZ?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4c9ce9ad-ba00-4297-7a85-08db0f76aaff
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Feb 2023 17:04:15.4671
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VY5Zwzhk+ftUkElkKZvCOo3lA7yGI0T14LFknrO2giNtiGfQ+d4UU209fj9t13QI
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6981
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: y55AFA-ElEl6Nhs7FbhYbwTIhlZUDMSI
+X-Proofpoint-GUID: jebf2xMUSnf79NpIsp1YNT60Vxy5t6hX
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-15_07,2023-02-15_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 bulkscore=0
+ clxscore=1011 spamscore=0 adultscore=0 mlxscore=0 lowpriorityscore=0
+ suspectscore=0 impostorscore=0 priorityscore=1501 malwarescore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302150154
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 15, 2023 at 08:32:34AM -0700, Alex Williamson wrote:
+On Wed,  1 Feb 2023 08:48:32 +0000
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-> We've discussed this with Paolo before and I believe the bar of proof
-> is not very high.  I suspect it's not a problem that the device itself
-> is not yet accessible, so long as the user can prove they have the
-> ability to access the device, such as access to a restricted file.  In
-> most cases this isn't going to turn on wbinvd anyway since DMA will be
-> coherent.  Thanks,
+> The lowcore is an important part of any s390 cpu so we need to make
+> sure it's always available when we virtualize one. For non-PV guests
+> that would mean ensuring that the lowcore page is read and writable by
+> the guest.
+> 
+> For PV guests we additionally need to make sure that the page is owned
+> by the guest as it is only allowed to access them if that's the
+> case. The code 112 SIE intercept tells us if the lowcore pages aren't
+> secure anymore.
+> 
+> Let's check if that intercept is reported by SIE if we export the
+> lowcore pages. Additionally check if that's also the case if the guest
+> shares the lowcore which will make it readable to the host but
+> ownership of the page should not change.
+> 
+> Also we check for validities in these conditions:
+>      * Manipulated cpu timer
+>      * Double SIE for same vcpu
+>      * Re-use of VCPU handle from another secure configuration
+>      * ASCE re-use
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 
-Isn't that a second problem, we don't know if the device is coherent
-until it is bound?
+looks good, see some questions below
 
-Jason
+> ---
+>  s390x/Makefile                                |   5 +
+>  s390x/pv-icptcode.c                           | 366 ++++++++++++++++++
+>  s390x/snippets/asm/snippet-loop.S             |  12 +
+>  s390x/snippets/asm/snippet-pv-icpt-112.S      |  77 ++++
+>  s390x/snippets/asm/snippet-pv-icpt-loop.S     |  15 +
+>  .../snippets/asm/snippet-pv-icpt-vir-timing.S |  22 ++
+>  6 files changed, 497 insertions(+)
+>  create mode 100644 s390x/pv-icptcode.c
+>  create mode 100644 s390x/snippets/asm/snippet-loop.S
+>  create mode 100644 s390x/snippets/asm/snippet-pv-icpt-112.S
+>  create mode 100644 s390x/snippets/asm/snippet-pv-icpt-loop.S
+>  create mode 100644 s390x/snippets/asm/snippet-pv-icpt-vir-timing.S
+> 
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index 97a61611..858f5af4 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -41,6 +41,7 @@ tests += $(TEST_DIR)/migration-sck.elf
+>  tests += $(TEST_DIR)/exittime.elf
+>  
+>  pv-tests += $(TEST_DIR)/pv-diags.elf
+> +pv-tests += $(TEST_DIR)/pv-icptcode.elf
+>  
+>  ifneq ($(HOST_KEY_DOCUMENT),)
+>  ifneq ($(GEN_SE_HEADER),)
+> @@ -119,6 +120,10 @@ $(TEST_DIR)/spec_ex-sie.elf: snippets = $(SNIPPET_DIR)/c/spec_ex.gbin
+>  $(TEST_DIR)/pv-diags.elf: pv-snippets += $(SNIPPET_DIR)/asm/snippet-pv-diag-yield.gbin
+>  $(TEST_DIR)/pv-diags.elf: pv-snippets += $(SNIPPET_DIR)/asm/snippet-pv-diag-288.gbin
+>  $(TEST_DIR)/pv-diags.elf: pv-snippets += $(SNIPPET_DIR)/asm/snippet-pv-diag-500.gbin
+> +$(TEST_DIR)/pv-icptcode.elf: pv-snippets += $(SNIPPET_DIR)/asm/snippet-pv-icpt-112.gbin
+> +$(TEST_DIR)/pv-icptcode.elf: pv-snippets += $(SNIPPET_DIR)/asm/snippet-pv-icpt-loop.gbin
+> +$(TEST_DIR)/pv-icptcode.elf: pv-snippets += $(SNIPPET_DIR)/asm/snippet-loop.gbin
+> +$(TEST_DIR)/pv-icptcode.elf: pv-snippets += $(SNIPPET_DIR)/asm/snippet-pv-icpt-vir-timing.gbin
+>  
+>  ifneq ($(GEN_SE_HEADER),)
+>  snippets += $(pv-snippets)
+> diff --git a/s390x/pv-icptcode.c b/s390x/pv-icptcode.c
+> new file mode 100644
+> index 00000000..1a2a4123
+> --- /dev/null
+> +++ b/s390x/pv-icptcode.c
+> @@ -0,0 +1,366 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * PV virtualization interception tests for intercepts that are not
+> + * caused by an instruction.
+> + *
+> + * Copyright (c) 2023 IBM Corp
+> + *
+> + * Authors:
+> + *  Janosch Frank <frankja@linux.ibm.com>
+> + */
+> +#include <libcflat.h>
+> +#include <sie.h>
+> +#include <smp.h>
+> +#include <sclp.h>
+> +#include <snippet.h>
+> +#include <asm/facility.h>
+> +#include <asm/barrier.h>
+> +#include <asm/sigp.h>
+> +#include <asm/uv.h>
+> +
+> +static struct vm vm, vm2;
+> +
+> +static void test_validity_timing(void)
+> +{
+> +	extern const char SNIPPET_NAME_START(asm, snippet_pv_icpt_vir_timing)[];
+> +	extern const char SNIPPET_NAME_END(asm, snippet_pv_icpt_vir_timing)[];
+> +	extern const char SNIPPET_HDR_START(asm, snippet_pv_icpt_vir_timing)[];
+> +	extern const char SNIPPET_HDR_END(asm, snippet_pv_icpt_vir_timing)[];
+> +	int size_hdr = SNIPPET_HDR_LEN(asm, snippet_pv_icpt_vir_timing);
+> +	int size_gbin = SNIPPET_LEN(asm, snippet_pv_icpt_vir_timing);
+> +
+> +	report_prefix_push("manipulated cpu time");
+> +	snippet_pv_init(&vm, SNIPPET_NAME_START(asm, snippet_pv_icpt_vir_timing),
+> +			SNIPPET_HDR_START(asm, snippet_pv_icpt_vir_timing),
+> +			size_gbin, size_hdr, SNIPPET_UNPACK_OFF);
+> +
+> +	sie(&vm);
+> +	report(vm.sblk->icptcode == ICPT_PV_NOTIFY && vm.sblk->ipa == 0x8302 &&
+> +	       vm.sblk->ipb == 0x50000000 && vm.save_area.guest.grs[5] == 0x44,
+> +	       "stp done");
+> +	vm.sblk->cputm -= 0x280de80000 / 2;
+
+so you are subtracting half of the value?
+
+why not vm.sblk->cputm /= 2?
+or just set a fixed (very low) magic value?
+
+what should happen if the cpu timer is higher instead of lower?
+
+> +
+> +	sie_expect_validity(&vm);
+> +	sie(&vm);
+> +	report(uv_validity_check(&vm), "validity");
+> +	uv_destroy_guest(&vm);
+> +	report_prefix_pop();
+> +}
+> +
+> +static void run_loop(void)
+> +{
+> +	sie(&vm);
+> +	sigp_retry(stap(), SIGP_STOP, 0, NULL);
+> +}
+> +
+> +static void test_validity_already_running(void)
+> +{
+> +	extern const char SNIPPET_NAME_START(asm, snippet_loop)[];
+> +	extern const char SNIPPET_NAME_END(asm, snippet_loop)[];
+> +	extern const char SNIPPET_HDR_START(asm, snippet_loop)[];
+> +	extern const char SNIPPET_HDR_END(asm, snippet_loop)[];
+> +	int size_hdr = SNIPPET_HDR_LEN(asm, snippet_loop);
+> +	int size_gbin = SNIPPET_LEN(asm, snippet_loop);
+> +	struct psw psw = {
+> +		.mask = PSW_MASK_64,
+> +		.addr = (uint64_t)run_loop,
+> +	};
+> +
+> +	report_prefix_push("already running");
+> +	if (smp_query_num_cpus() < 3) {
+> +		report_skip("need at least 3 cpus for this test");
+> +		goto out;
+> +	}
+> +
+> +	snippet_pv_init(&vm, SNIPPET_NAME_START(asm, snippet_loop),
+> +			SNIPPET_HDR_START(asm, snippet_loop),
+> +			size_gbin, size_hdr, SNIPPET_UNPACK_OFF);
+> +
+> +	sie_expect_validity(&vm);
+> +	smp_cpu_setup(1, psw);
+> +	smp_cpu_setup(2, psw);
+> +	while (vm.sblk->icptcode != ICPT_VALIDITY) { mb(); }
+
+maybe put the mb(); in a separate line
+
+> +	/* Yes I know this is not reliable as one cpu might overwrite it */
+
+the wording in this comment could be improved
+
+> +	report(uv_validity_check(&vm), "validity");
+> +	smp_cpu_stop(1);
+> +	smp_cpu_stop(2);
+> +	uv_destroy_guest(&vm);
+> +
+> +out:
+> +	report_prefix_pop();
+> +}
+> +
+> +/* Tests if a vcpu handle from another configuration results in a validity intercept. */
+> +static void test_validity_handle_not_in_config(void)
+> +{
+> +	extern const char SNIPPET_NAME_START(asm, snippet_pv_icpt_loop)[];
+> +	extern const char SNIPPET_NAME_END(asm, snippet_pv_icpt_loop)[];
+> +	extern const char SNIPPET_HDR_START(asm, snippet_pv_icpt_loop)[];
+> +	extern const char SNIPPET_HDR_END(asm, snippet_pv_icpt_loop)[];
+> +	int size_hdr = SNIPPET_HDR_LEN(asm, snippet_pv_icpt_loop);
+> +	int size_gbin = SNIPPET_LEN(asm, snippet_pv_icpt_loop);
+> +
+> +	report_prefix_push("handle not in config");
+> +	/* Setup our primary vm */
+> +	snippet_pv_init(&vm, SNIPPET_NAME_START(asm, snippet_pv_icpt_loop),
+> +			SNIPPET_HDR_START(asm, snippet_pv_icpt_loop),
+> +			size_gbin, size_hdr, SNIPPET_UNPACK_OFF);
+> +
+> +	/* Setup secondary vm */
+> +	snippet_setup_guest(&vm2, true);
+> +	snippet_pv_init(&vm2, SNIPPET_NAME_START(asm, snippet_pv_icpt_loop),
+> +			SNIPPET_HDR_START(asm, snippet_pv_icpt_loop),
+> +			size_gbin, size_hdr, SNIPPET_UNPACK_OFF);
+> +
+> +	vm.sblk->pv_handle_cpu = vm2.sblk->pv_handle_cpu;
+> +	sie_expect_validity(&vm);
+> +	sie(&vm);
+> +	report(uv_validity_check(&vm), "validity");
+> +
+> +	/* Restore cpu handle and destroy the second vm */
+> +	vm.sblk->pv_handle_cpu = vm.uv.vcpu_handle;
+> +	uv_destroy_guest(&vm2);
+> +	sie_guest_destroy(&vm2);
+> +
+> +	uv_destroy_guest(&vm);
+> +	report_prefix_pop();
+> +}
+> +
+> +/* Tests if a wrong vm or vcpu handle results in a validity intercept. */
+> +static void test_validity_seid(void)
+> +{
+> +	extern const char SNIPPET_NAME_START(asm, snippet_pv_icpt_loop)[];
+> +	extern const char SNIPPET_NAME_END(asm, snippet_pv_icpt_loop)[];
+> +	extern const char SNIPPET_HDR_START(asm, snippet_pv_icpt_loop)[];
+> +	extern const char SNIPPET_HDR_END(asm, snippet_pv_icpt_loop)[];
+> +	int size_hdr = SNIPPET_HDR_LEN(asm, snippet_pv_icpt_loop);
+> +	int size_gbin = SNIPPET_LEN(asm, snippet_pv_icpt_loop);
+> +	int fails = 0;
+> +	int i;
+> +
+> +	report_prefix_push("handles");
+> +	snippet_pv_init(&vm, SNIPPET_NAME_START(asm, snippet_pv_icpt_loop),
+> +			SNIPPET_HDR_START(asm, snippet_pv_icpt_loop),
+> +			size_gbin, size_hdr, SNIPPET_UNPACK_OFF);
+> +
+> +	for (i = 0; i < 64; i++) {
+> +		vm.sblk->pv_handle_config ^= 1UL << i;
+> +		sie_expect_validity(&vm);
+> +		sie(&vm);
+> +		if (!uv_validity_check(&vm)) {
+> +			report_fail("SIE accepted wrong VM SEID, changed bit %d",
+> +				    63 - i);
+> +			fails++;
+> +		}
+> +		vm.sblk->pv_handle_config ^= 1UL << i;
+> +	}
+> +	report(!fails, "No wrong vm handle accepted");
+> +
+> +	fails = 0;
+> +	for (i = 0; i < 64; i++) {
+> +		vm.sblk->pv_handle_cpu ^= 1UL << i;
+> +		sie_expect_validity(&vm);
+> +		sie(&vm);
+> +		if (!uv_validity_check(&vm)) {
+> +			report_fail("SIE accepted wrong CPU SEID, changed bit %d",
+> +				    63 - i);
+> +			fails++;
+> +		}
+> +		vm.sblk->pv_handle_cpu ^= 1UL << i;
+> +	}
+> +	report(!fails, "No wrong cpu handle accepted");
+> +
+> +	uv_destroy_guest(&vm);
+> +	report_prefix_pop();
+> +}
+> +
+> +/*
+> + * Tests if we get a validity intercept if the CR1 asce at SIE entry
+> + * is not the same as the one given at the UV creation of the VM.
+> + */
+> +static void test_validity_asce(void)
+> +{
+> +	extern const char SNIPPET_NAME_START(asm, snippet_pv_icpt_112)[];
+> +	extern const char SNIPPET_NAME_END(asm, snippet_pv_icpt_112)[];
+> +	extern const char SNIPPET_HDR_START(asm, snippet_pv_icpt_112)[];
+> +	extern const char SNIPPET_HDR_END(asm, snippet_pv_icpt_112)[];
+> +	int size_hdr = SNIPPET_HDR_LEN(asm, snippet_pv_icpt_112);
+> +	int size_gbin = SNIPPET_LEN(asm, snippet_pv_icpt_112);
+> +	uint64_t asce_old, asce_new;
+> +	void *pgd_new, *pgd_old;
+> +
+> +	report_prefix_push("asce");
+> +	snippet_pv_init(&vm, SNIPPET_NAME_START(asm, snippet_pv_icpt_112),
+> +			SNIPPET_HDR_START(asm, snippet_pv_icpt_112),
+> +			size_gbin, size_hdr, SNIPPET_UNPACK_OFF);
+> +
+> +	asce_old = vm.save_area.guest.asce;
+> +	pgd_new = memalign_pages_flags(PAGE_SIZE, PAGE_SIZE * 4, 0);
+> +	pgd_old = (void *)(asce_old & PAGE_MASK);
+> +
+> +	/* Copy the contents of the top most table */
+> +	memcpy(pgd_new, pgd_old, PAGE_SIZE * 4);
+> +
+> +	/* Create the replacement ASCE */
+> +	asce_new = __pa(pgd_new) | ASCE_DT_REGION1 | REGION_TABLE_LENGTH | ASCE_P;
+> +	vm.save_area.guest.asce = asce_new;
+> +
+> +	sie_expect_validity(&vm);
+> +	sie(&vm);
+> +	report(uv_validity_check(&vm), "wrong CR1 validity");
+> +
+> +	/* Restore the old ASCE */
+> +	vm.save_area.guest.asce = asce_old;
+> +
+> +	/* Try if we can still do an entry with the correct asce */
+> +	sie(&vm);
+> +	report(vm.sblk->icptcode == ICPT_PV_NOTIFY && vm.sblk->ipa == 0x8302 &&
+> +	       vm.sblk->ipb == 0x50000000 && vm.save_area.guest.grs[5] == 0x44,
+> +	       "re-entry with valid CR1");
+> +	uv_destroy_guest(&vm);
+> +	free_pages(pgd_new);
+> +	report_prefix_pop();
+> +}
+> +
+> +static void test_icpt_112(void)
+> +{
+> +	extern const char SNIPPET_NAME_START(asm, snippet_pv_icpt_112)[];
+> +	extern const char SNIPPET_NAME_END(asm, snippet_pv_icpt_112)[];
+> +	extern const char SNIPPET_HDR_START(asm, snippet_pv_icpt_112)[];
+> +	extern const char SNIPPET_HDR_END(asm, snippet_pv_icpt_112)[];
+> +	int size_hdr = SNIPPET_HDR_LEN(asm, snippet_pv_icpt_112);
+> +	int size_gbin = SNIPPET_LEN(asm, snippet_pv_icpt_112);
+> +
+> +	u64 lc_off = 0;
+> +
+> +	report_prefix_push("prefix");
+> +
+> +	snippet_pv_init(&vm, SNIPPET_NAME_START(asm, snippet_pv_icpt_112),
+> +			SNIPPET_HDR_START(asm, snippet_pv_icpt_112),
+> +			size_gbin, size_hdr, SNIPPET_UNPACK_OFF);
+> +
+> +	report_prefix_push("0x0");
+> +	sie(&vm);
+> +
+> +	/* Guest indicates that it has been setup via the diag 0x44 */
+> +	report(vm.sblk->icptcode == ICPT_PV_NOTIFY && vm.sblk->ipa == 0x8302 &&
+> +	       vm.sblk->ipb == 0x50000000 && vm.save_area.guest.grs[5] == 0x44,
+> +	       "guest set up");
+> +
+> +	/*
+> +	 * Let's export the standard prefix 0x0 and check for the 112
+> +	 * intercept.
+> +	 */
+> +	uv_export(vm.sblk->mso + lc_off);
+> +	sie(&vm);
+> +	report(vm.sblk->icptcode == ICPT_PV_PREF, "Intercept 112 for page 0");
+> +	uv_import(vm.uv.vm_handle, vm.sblk->mso + lc_off);
+> +
+> +	uv_export(vm.sblk->mso + lc_off + PAGE_SIZE);
+> +	report(vm.sblk->icptcode == ICPT_PV_PREF, "Intercept 112 for page 1");
+> +
+> +	uv_import(vm.uv.vm_handle, vm.sblk->mso + lc_off + PAGE_SIZE);
+> +
+> +	/*
+> +	 * Guest will share the lowcore and we need to check if that
+> +	 * makes a difference (which it should not).
+> +	 */
+> +	report_prefix_push("shared");
+> +	sie(&vm);
+> +	/* Guest indicates that it has been setup via the diag 0x44 */
+> +	report(vm.sblk->icptcode == ICPT_PV_NOTIFY && vm.sblk->ipa == 0x8302 &&
+> +	       vm.sblk->ipb == 0x50000000 && vm.save_area.guest.grs[5] == 0x44,
+> +	       "guest shared the first lowcore page");
+> +
+> +	/*
+> +	 * Let's export the standard prefix 0x0 and check for the 112
+> +	 * intercept.
+> +	 */
+> +	uv_export(vm.sblk->mso + lc_off);
+> +	sie(&vm);
+> +	report(vm.sblk->icptcode == ICPT_PV_PREF, "Intercept 112");
+> +	uv_import(vm.uv.vm_handle, vm.sblk->mso + lc_off);
+> +	report_prefix_pop();
+> +
+> +	report_prefix_pop();
+> +
+> +
+> +	report_prefix_push("0x8000");
+> +	/*
+> +	 * Import the new prefix pages so we don't get a PGM 0x3E on
+> +	 * the guest's spx instruction.
+> +	 */
+> +	lc_off = 0x8000;
+> +	uv_import(vm.uv.vm_handle, vm.sblk->mso + lc_off);
+> +	uv_import(vm.uv.vm_handle, vm.sblk->mso + lc_off + PAGE_SIZE);
+> +	sie(&vm);
+> +
+> +	/* SPX generates a PV instruction notification */
+> +	report(vm.sblk->icptcode == ICPT_PV_NOTIFY && vm.sblk->ipa == 0xb210,
+> +	       "Received a PV instruction notification intercept for spx");
+> +	report(*(u32 *)vm.sblk->sidad == 0x8000, "New prefix is 0x8000");
+> +
+> +	/* Let's export the prefix at 0x8000 and check for the 112 intercept */
+> +	uv_export(vm.sblk->mso + lc_off);
+> +	sie(&vm);
+> +	report(vm.sblk->icptcode == ICPT_PV_PREF, "Intercept 112 for page 0");
+> +	uv_import(vm.uv.vm_handle, vm.sblk->mso + lc_off);
+> +
+> +	uv_export(vm.sblk->mso + lc_off + PAGE_SIZE);
+> +	report(vm.sblk->icptcode == ICPT_PV_PREF, "Intercept 112 for page 1");
+> +
+> +	uv_import(vm.uv.vm_handle, vm.sblk->mso + lc_off + PAGE_SIZE);
+> +
+> +	report_prefix_push("shared");
+> +	sie(&vm);
+> +	/* Guest indicates that it has shared the new lowcore */
+> +	report(vm.sblk->icptcode == ICPT_PV_NOTIFY && vm.sblk->ipa == 0x8302 &&
+> +	       vm.sblk->ipb == 0x50000000 && vm.save_area.guest.grs[5] == 0x44,
+> +	       "intercept values");
+> +
+> +	uv_export(vm.sblk->mso + lc_off);
+> +	uv_export(vm.sblk->mso + lc_off + PAGE_SIZE);
+
+why are you not testing both pages individually here, like you did
+above?
+
+> +	sie(&vm);
+> +	report(vm.sblk->icptcode == ICPT_PV_PREF, "Intercept 112");
+> +	uv_import(vm.uv.vm_handle, vm.sblk->mso + lc_off);
+> +	uv_import(vm.uv.vm_handle, vm.sblk->mso + lc_off + PAGE_SIZE);
+> +
+> +	/* Try a re-entry */
+> +	sie(&vm);
+> +	report(vm.sblk->icptcode == ICPT_PV_NOTIFY && vm.sblk->ipa == 0x8302 &&
+> +	       vm.sblk->ipb == 0x50000000 && vm.save_area.guest.grs[5] == 0x9c &&
+> +	       vm.save_area.guest.grs[0] == 42,
+> +	       "re-entry successful");
+> +	report_prefix_pop();
+> +
+> +	report_prefix_pop();
+> +
+> +	report_prefix_pop();
+> +	uv_destroy_guest(&vm);
+> +}
+> +
+> +int main(void)
+> +{
+> +	report_prefix_push("pv-icpts");
+> +	if (!test_facility(158)) {
+> +		report_skip("UV Call facility unavailable");
+> +		goto done;
+> +	}
+> +	if (!sclp_facilities.has_sief2) {
+> +		report_skip("SIEF2 facility unavailable");
+> +		goto done;
+> +	}
+> +
+> +	snippet_setup_guest(&vm, true);
+> +	test_icpt_112();
+> +	test_validity_asce();
+> +	test_validity_seid();
+> +	test_validity_handle_not_in_config();
+> +	test_validity_already_running();
+> +	test_validity_timing();
+> +	sie_guest_destroy(&vm);
+> +
+> +done:
+> +	report_prefix_pop();
+> +	return report_summary();
+> +}
+> diff --git a/s390x/snippets/asm/snippet-loop.S b/s390x/snippets/asm/snippet-loop.S
+> new file mode 100644
+> index 00000000..ee7cd863
+> --- /dev/null
+> +++ b/s390x/snippets/asm/snippet-loop.S
+> @@ -0,0 +1,12 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Infinite loop snippet with no exit
+> + *
+> + * Copyright (c) 2023 IBM Corp
+> + *
+> + * Authors:
+> + *  Janosch Frank <frankja@linux.ibm.com>
+> + */
+> +.section .text
+> +retry:
+> +j 	retry
+> diff --git a/s390x/snippets/asm/snippet-pv-icpt-112.S b/s390x/snippets/asm/snippet-pv-icpt-112.S
+> new file mode 100644
+> index 00000000..aef82dbb
+> --- /dev/null
+> +++ b/s390x/snippets/asm/snippet-pv-icpt-112.S
+> @@ -0,0 +1,77 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Intercept 112 PV snippet
+> + *
+> + * We setup and share a prefix at 0x0 and 0x8000 which the hypervisor
+> + * test will try to export and then execute a SIE entry which
+> + * should result in a 112 SIE intercept.
+> + *
+> + * Copyright (c) 2023 IBM Corp
+> + *
+> + * Authors:
+> + *  Janosch Frank <frankja@linux.ibm.com>
+> + */
+> +#include <asm/asm-offsets.h>
+> +
+> +.section .text
+> +xgr	%r0, %r0
+> +xgr	%r1, %r1
+> +
+> +# Let's tell the hypervisor we're ready to start
+> +diag	0,0,0x44
+> +
+> +/*
+> + * Hypervisor will export the lowcore and try a SIE entry which should
+> + * result in a 112. It will then import the lowcore again and we
+> + * should continue with the code below.
+> + */
+> +
+> +# Share the lowcore
+> +larl	%r1, share
+> +.insn rrf,0xB9A40000,0,1,0,0
+> +xgr	%r1, %r1
+> +
+> +# Let's tell the hypervisor we're ready to start shared testing
+> +diag	0,0,0x44
+> +/* Host: icpt:  PV instruction diag 0x44 */
+> +/* Host: icpt:  112 */
+> +
+> +# Copy the invalid PGM new PSW to the new lowcore
+> +larl	%r1, prfx
+> +l	%r2, 0(%r1)
+> +mvc     GEN_LC_PGM_NEW_PSW(16, %r2), GEN_LC_PGM_NEW_PSW(%r0)
+> +
+> +# Change the prefix to 0x8000 and re-try
+> +xgr	%r1, %r1
+> +xgr	%r2, %r2
+> +larl	%r2, prfx
+> +spx	0(%r2)
+> +/* Host: icpt:  PV instruction notification SPX*/
+> +/* Host: icpt:  112 */
+> +
+> +# Share the new lowcore
+> +larl	%r3, share_addr
+> +stg	%r2, 0(%r3)
+> +larl	%r2, share
+> +.insn rrf,0xB9A40000,0,2,0,0
+> +
+> +# Let's tell the hypervisor we're ready to start shared testing
+> +diag	0,0,0x44
+> +/* Host: icpt:  PV instruction diag 0x44 */
+> +/* Host: icpt:  112 */
+> +
+> +# Test re-entry
+> +lghi	%r1, 42
+> +diag	1,0,0x9c
+> +/* Host: icpt:  PV instruction diag 0x9c */
+> +
+> +.align 8
+> +share:
+> +	.quad 0x0030100000000000
+> +	.quad 0x0, 0x0, 0x0
+> +share_addr:
+> +	.quad 0x0
+> +	.quad 0x0
+> +.align 4
+> +prfx:
+> +	.long 0x00008000
+> diff --git a/s390x/snippets/asm/snippet-pv-icpt-loop.S b/s390x/snippets/asm/snippet-pv-icpt-loop.S
+> new file mode 100644
+> index 00000000..2aa59c01
+> --- /dev/null
+> +++ b/s390x/snippets/asm/snippet-pv-icpt-loop.S
+> @@ -0,0 +1,15 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Infinite loop snippet which can be used to test manipulated SIE
+> + * control block intercepts. E.g. when manipulating the PV handles.
+> + *
+> + * Copyright (c) 2023 IBM Corp
+> + *
+> + * Authors:
+> + *  Janosch Frank <frankja@linux.ibm.com>
+> + */
+> +.section .text
+> +xgr	%r0, %r0
+> +retry:
+> +diag	0,0,0x44
+> +j 	retry
+> diff --git a/s390x/snippets/asm/snippet-pv-icpt-vir-timing.S b/s390x/snippets/asm/snippet-pv-icpt-vir-timing.S
+> new file mode 100644
+> index 00000000..a0f9fe21
+> --- /dev/null
+> +++ b/s390x/snippets/asm/snippet-pv-icpt-vir-timing.S
+> @@ -0,0 +1,22 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Sets a cpu timer which the host can manipulate to check if it will
+> + *receive a validity
+> + *
+> + * Copyright (c) 2023 IBM Corp
+> + *
+> + * Authors:
+> + *  Janosch Frank <frankja@linux.ibm.com>
+> + */
+> +.section .text
+> +larl	%r1, time_val
+> +spt	0(%r1)
+> +diag    0,0,0x44
+> +xgr	%r1, %r1
+> +lghi	%r1, 42
+> +diag	1,0,0x9c
+> +
+> +
+> +.align 8
+> +time_val:
+> +	.quad 0x280de80000
+
