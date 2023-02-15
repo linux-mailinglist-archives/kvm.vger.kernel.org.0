@@ -2,159 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 63032698189
-	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 18:03:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8690C69818E
+	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 18:04:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229976AbjBORDU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Feb 2023 12:03:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44526 "EHLO
+        id S229977AbjBOREU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Feb 2023 12:04:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229959AbjBORDT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Feb 2023 12:03:19 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 452FA2CFD0
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 09:03:04 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id i14-20020a17090aee8e00b00233f1a535e0so1351489pjz.0
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 09:03:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rXpHrm412Se84icLxlhp0c6gn6FcOiMTmYzMu9XFzE0=;
-        b=aLJK/RN+Unz5AmXXe1jY38G4rjdZYbR+ulpZxlfYoinsVuT0AVhwUWxXtbsDj+cxdi
-         o/xO1bFJomGKwqEdz2sz5QYTN8lW3dhyO/q0maVszkrPBtu9rJ2rfyW4uv1VIkOD7umC
-         CR3YEAR8APgGj00V5yp/WQbwIpTihgXmTNa6SOOPf6hlfOikYJu/R38zHTK/27VSgPaf
-         FfblQYJBNauILeThbiUEl6MpF57hSexikv3tHqsVOC3XjHRTwp+rphmcFQ6hh/GFzqIJ
-         847rlbVckcQrssaXB7GwVsA8r2Ud6PaIUWUPJLPxXVfxrK9vAup92Yn4Rg1nkwG16Jof
-         Bgyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rXpHrm412Se84icLxlhp0c6gn6FcOiMTmYzMu9XFzE0=;
-        b=24YqzZEWGZS4CIhKiSfKHTEgRNvCbzxGAC05RMwRERaNWcCIqsvsjZvQbYT/3DqorH
-         RYtDEnqcrT+C/8DffYusL3x/PDa0Gi2d2E+/BEIfnKzS0dh+rOgbqtRWwFTBT/KQRlL3
-         pOMK9sIBsm+UL0pgxNCTfhv73lxpZYwanbdHqM9PvugnW8Ro+J9ilAjpTnEJeCHIJByo
-         t/WdEaMcl0kAag8HyI5Utshue0rMFJHgp54E/aw/XHWWwsTAtxk1j1KkNy/muCu8le9f
-         twIwYSy3iszL49xSR9Y8ZS2onO+h0BaVBpr9YImaQ1sa8s3F0tbW7MhBInGguc9J3Jf+
-         wVpg==
-X-Gm-Message-State: AO0yUKW5I54TP9JvrWy8phiLo785xdbs6zB63ejx6tSiTvYUT9HEVBYC
-        Bovd+i57JRAAdpQDk4xvXCFpNtWDwDc=
-X-Google-Smtp-Source: AK7set/RArgkpEYAvlgEF0UvF1fVSH+rZwKn4nEsJtUurS58zRCLANNB+sRdpIYCCh6+5smbam+TI/Xym8o=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:af59:0:b0:4fb:ee04:732a with SMTP id
- s25-20020a63af59000000b004fbee04732amr466823pgo.2.1676480583747; Wed, 15 Feb
- 2023 09:03:03 -0800 (PST)
-Date:   Wed, 15 Feb 2023 09:03:02 -0800
-In-Reply-To: <Y+yfhELf/TbsosO9@linux.dev>
-Mime-Version: 1.0
-References: <20230215011614.725983-1-amoorthy@google.com> <20230215011614.725983-5-amoorthy@google.com>
- <Y+yfhELf/TbsosO9@linux.dev>
-Message-ID: <Y+0QRsZ4yWyUdpnc@google.com>
-Subject: Re: [PATCH 4/8] kvm: Allow hva_pfn_fast to resolve read-only faults.
-From:   Sean Christopherson <seanjc@google.com>
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Anish Moorthy <amoorthy@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Houghton <jthoughton@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Axel Rasmussen <axelrasmussen@google.com>, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229870AbjBORET (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Feb 2023 12:04:19 -0500
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2077.outbound.protection.outlook.com [40.107.220.77])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0943755B9;
+        Wed, 15 Feb 2023 09:04:18 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Zgvng1vxj33TKM60TaHv7RnlMa45A89IWRFby5WtaZMAqXtdUlOEC6T+9qQoNTzinQPIkBHEFdrR6qXwloorr4tufcIoDUc+JYe+X0TgwiTxeLeatqg76cJahfjHnAOB/tv6z2QMxmRhkUTLZ73X4FnCYtyiBPlF3Me1lJa0O5Wo8tivEUbgZoALslOR/Ps5ENWZw3LmVDkQlTwooHL3C2AhwrxpH9u4CBQ5MvvWgTO+zWsIKLcFY6OuyRmjZQb0UZM/W3c+9ezkwSh9o3tJQl7AVRgmWFL8dSd5KlfyOf68F87s89TjnP9P8GHnG6pB+1ACsDBZL4IgnODynG1krQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5b9lQc9EouqL4IqUUfWN5MzWeOUr3e0j22SqXiH55cY=;
+ b=YogoX099U4CMndvyQ93jL6sP/vRNSDIcyMNK6ktKdbdZUvf52Td7wHvyTCQt13QY+Bd9b0iexu4QXa7oMiS4nYh5yoQ3ubGo3lQMazLQRaiphjGxskI+uGPGqGmvLjxRzDJG0luWDid7ghojowuUeFSIEeOIDMbWGiqyvjiBIxPZB6IQmXox6a+zQLR3Wa2sa58KdM/FpF0eIWZ/S3eaMiSm7xCr8zfTqw3ScDMSmhamEGl24gFDnuMjJYsSiSzNCf54fVPEEfgJywtJJjzvNfodhLqvAC3JYuqy8wQ2tXgEf/X8G9C2LKAzhFsWemVznI/gEQSOEWylbQET0bE2dw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5b9lQc9EouqL4IqUUfWN5MzWeOUr3e0j22SqXiH55cY=;
+ b=CytssQD/1VDWN+HgL17GS8k5FR5jp9urJoXiRbDdbOOxj1XLffR7JgS4gSngp9lNDBeq6ImOA/rdWzoDdaJJIH+Ih6DRnkOeJJLm19HQpnqdCeCQJ06Fwkq//fhQYCXCcGm1P+OqJ/RpPBn9slACO+XOo7YkqSZB80vkCuoDs/luwQWa9vTNZP5kxZiz6ZHGBOxvjQmYZCktybXevSj9EzYQbTL0RKYUucuwsA8WAwNU+aW3+OxXGhwMtBdCRL9W1YdkxJYXy0ym+aVHajfPDqSKnDdoCEThszkBbMv2h/jjD6YvufdenkXzil+EtskkQBVb/y2HE3Hqyf2DfTDwXw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by SN7PR12MB6981.namprd12.prod.outlook.com (2603:10b6:806:263::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.26; Wed, 15 Feb
+ 2023 17:04:15 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3cb3:2fce:5c8f:82ee]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3cb3:2fce:5c8f:82ee%4]) with mapi id 15.20.6086.024; Wed, 15 Feb 2023
+ 17:04:15 +0000
+Date:   Wed, 15 Feb 2023 13:04:13 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v3 03/15] vfio: Accept vfio device file in the driver
+ facing kAPI
+Message-ID: <Y+0QjaIWr84eVzsp@nvidia.com>
+References: <20230213151348.56451-1-yi.l.liu@intel.com>
+ <20230213151348.56451-4-yi.l.liu@intel.com>
+ <Y+rLKvCMivND0izd@nvidia.com>
+ <DS0PR11MB7529B43C7D357D8A0C2438C7C3A29@DS0PR11MB7529.namprd11.prod.outlook.com>
+ <Y+zSRklKkL3rc2FB@nvidia.com>
+ <DS0PR11MB75299F5D92AAC33FD8690694C3A39@DS0PR11MB7529.namprd11.prod.outlook.com>
+ <Y+zwSn63eA7HrefO@nvidia.com>
+ <20230215083234.194d07a9.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230215083234.194d07a9.alex.williamson@redhat.com>
+X-ClientProxiedBy: BL1PR13CA0201.namprd13.prod.outlook.com
+ (2603:10b6:208:2be::26) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SN7PR12MB6981:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4c9ce9ad-ba00-4297-7a85-08db0f76aaff
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: W+BCwFHAcD2Z5Y9zn3EuNH0EgbkHVoS2dX2Nm392nMVh+LxwDaPDiYAQVp9l868Wgi8vWC5bXoy237oLJ81Zl3p1+fcX1boSKyT6SNfMMd945SLg+AalPZJ6NFXGToDMD1cGXMMI3dJr/Knok8Csm+etkZ+D+wSw+XW4A+Pi0KOGQ+D5B4oGWg93/AObd+uPOnYHBQKaXL/KW0/BwYxzkVWnaIw5FweqahfpMo4MAHKx0nLJrB6vFugWWTEGnX1uq1RSJX+MhrIR/v6HaUHF2wS2aqevoYDytoV7CEcjUYHbTbiaUQP5FaInm1jXpGCDTat2GizHB7ifGS3WF2syjj6msJ7cvDshcdf7z6sFmwmqONyCW/rq03HeI9oR6Q4u3Il+kDt0HZzyILRiSnM+vjerbpp4hnQ2dKpEI3hYtaXuwWwTj/vaA+FzwwEWvQU8wOx+VqW/g5gTeAWzs3wOCIzb+xv2/ylHvlzezoNHPqCxqSJizkuxnveqpr9gUEXybGmtLDR4m7yXI0UNIxJFeCde03+HgCqAmrP0n2P+SXg3gzYR+MXoJxaxSUFLvXICQp1h/0pWgToxuBsH4hhLz0CwVtkYqJzrthnyxEzqImNUVWRGHuCo/QNaLZChxWlUyPM/M0Ypg2/BV0Db1xOuno0vxFijAbSAmv/yjI1oUSix8dYF5WniFnXMmHsvs9ag
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(396003)(346002)(136003)(376002)(366004)(39860400002)(451199018)(54906003)(316002)(8936002)(7416002)(4744005)(5660300002)(41300700001)(38100700002)(2906002)(36756003)(83380400001)(66946007)(66556008)(8676002)(6916009)(4326008)(66476007)(6506007)(2616005)(6486002)(478600001)(86362001)(186003)(26005)(6512007)(67856001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?XYG9I4OPG21tBeuSZ0wk0UGQyIr7ucIEtUJXe8Vkj0ujuVYuGew3Rl4uCVtp?=
+ =?us-ascii?Q?4BmPR0w3b0tpfsWOptXIG5G3uc/15nn3P69+ysrRw5bY7g05okh5Slg8Q1w7?=
+ =?us-ascii?Q?hsqXr2yUCtTwR2JPPFYwSXOTnuHhBfF22nEBBskjQg5ZcLxIiuhqk52DK4cS?=
+ =?us-ascii?Q?QzZFzjEyzfFtGMuFdTDaWNlgoOdVgXYWdMLheBT82iBRxYn7kE5HhW17+j7+?=
+ =?us-ascii?Q?U/kQk/vvD3g+c88xlPlZyW+dW0Yv7rKUceEHLEcBpyL2R12FefdgBwwSxvU2?=
+ =?us-ascii?Q?CQdOTMyWYTvOVVRjFVzXTIQhhnP31ixko8VeRRQzFDkWmnyqtzJReREB/2iH?=
+ =?us-ascii?Q?B0VV1Mzdpi7IYSQcZzExc3hGO1wfBek5L1eq24jP2y0a0wSiPxT6t0qzDdnV?=
+ =?us-ascii?Q?iFFEB2s65fWWOUfgqBh/LkZD7oLc1zjGyrUbmP7qeYQvweMvsUTsRUP8iz1F?=
+ =?us-ascii?Q?uMHJkw0uNDVYL0Vntz2xZfSlbGuzkIcROEgPwzydiY82xzG60B56rGe/KGIM?=
+ =?us-ascii?Q?zU9Fta534JyMP3n3rRvfaAq5EgHZNVujj4QccSMze/3fS8Y1nQDLqAF/pQUN?=
+ =?us-ascii?Q?bDoK4FiuFIWyKLiBnEfQbZOXnmFFDdNzMOX17mrY76fWj0qtlnDUrrqj+EEW?=
+ =?us-ascii?Q?DStYReX2QIps+2t75++pr1pa1wdKY1cryQpBzBuzpZ1yIgGrpY8QR7mM8Nh/?=
+ =?us-ascii?Q?z3epTU9Vwvu2VWWbMcw5pcWzqJcdQUEZz9hWhH3QMxC1QBI46rC2YXkWOqs8?=
+ =?us-ascii?Q?6KzRtZyzqavnpqJOqCj7rtLHcdgaJ2lI9fanw6/H65MOw2SOIwLu9BVs8UeL?=
+ =?us-ascii?Q?GZ35cgRj3SqKVVTw8SxtBfX5xA4IdnQkYBcW4Uy1L6tTi5bGx348R6OG4YLE?=
+ =?us-ascii?Q?bgmomxmW+a+P05gqSN4u0+dRAoz24TUeAb+EMVnfpmiJ7gryllX1rAMSyWvi?=
+ =?us-ascii?Q?sJYX9lD3yqjUu2f3Dr30YnkDYYnVKdpJBww62BiacsyHe9Ga26VC3EiZSJlY?=
+ =?us-ascii?Q?hUbPZNxKNXC7/6LpfwFXMGNkhrmd9Z+5v+fgQCYpXc9ztEZOuwvqBXc3u2bd?=
+ =?us-ascii?Q?Ub1RveqiZ/wW/ekJ6VbRHSYO6KAUxxLa0PZ3KZYNIR4VPSj0G0P8WJXIEgMs?=
+ =?us-ascii?Q?EgTkopps31g2FhHHK64Z4XWtD0qSyrwH6chRTYGA35l8ZEVgglYDhi1D6T6K?=
+ =?us-ascii?Q?lPqiSEIApuwm0Qj2YR+ujKUGq0z1a7ie948pUbZqscHCaGiqkXJeJN5k3RNo?=
+ =?us-ascii?Q?cWTqxhoOEaX/el7ueLMWZRLf/gfPvn0/JmFGi12FYTmTXZ+xN05zZAQhHTo5?=
+ =?us-ascii?Q?8HbTwlWEA5odJqFFM/ZUVTVscXJCgCXwIS39bLRfjGiQPjlxZBlD0p0vOs+O?=
+ =?us-ascii?Q?ALpb3qujgym8vyI1wo8PScCt2hrnDs2yTQAvHklhdSmbQWAOs54u9K1f4aLX?=
+ =?us-ascii?Q?DK7Aic0ytshin6xt4MEN5PjcmVsaeK6T7d7d+EPaSBdWmUssxK1EEbgAS8nn?=
+ =?us-ascii?Q?aII7ZnFGGAywtaY306KxDAcUya6oks+GYKodstv7BEW4e+pd6TeWBCWYgat2?=
+ =?us-ascii?Q?87yNIPoSqKm0+BOrgjizB2WUwzS+CrWavvSAnVBZ?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4c9ce9ad-ba00-4297-7a85-08db0f76aaff
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Feb 2023 17:04:15.4671
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: VY5Zwzhk+ftUkElkKZvCOo3lA7yGI0T14LFknrO2giNtiGfQ+d4UU209fj9t13QI
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6981
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 15, 2023, Oliver Upton wrote:
-> On Wed, Feb 15, 2023 at 01:16:10AM +0000, Anish Moorthy wrote:
-> > The upcoming mem_fault_nowait commits will make it so that, when the
-> > relevant cap is enabled, hva_to_pfn will return after calling
-> > hva_to_pfn_fast without ever attempting to pin memory via
-> > hva_to_pfn_slow.
-> > 
-> > hva_to_pfn_fast currently just fails for read-only faults. However,
-> > there doesn't seem to be a reason that we can't just try pinning the
-> > page without FOLL_WRITE instead of immediately falling back to slow-GUP.
-> > This commit implements that behavior.
+On Wed, Feb 15, 2023 at 08:32:34AM -0700, Alex Williamson wrote:
 
-State what the patch does, avoid pronouns, and especially don't have "This commmit"
-or "This patch" anywhere.  From Documentation/process/submitting-patches.rst:
+> We've discussed this with Paolo before and I believe the bar of proof
+> is not very high.  I suspect it's not a problem that the device itself
+> is not yet accessible, so long as the user can prove they have the
+> ability to access the device, such as access to a restricted file.  In
+> most cases this isn't going to turn on wbinvd anyway since DMA will be
+> coherent.  Thanks,
 
-  Describe your changes in imperative mood, e.g. "make xyzzy do frotz"
-  instead of "[This patch] makes xyzzy do frotz" or "[I] changed xyzzy
-  to do frotz", as if you are giving orders to the codebase to change
-  its behaviour.
+Isn't that a second problem, we don't know if the device is coherent
+until it is bound?
 
-> > Suggested-by: James Houghton <jthoughton@google.com>
-> > Signed-off-by: Anish Moorthy <amoorthy@google.com>
-> > ---
-> >  virt/kvm/kvm_main.c | 22 ++++++++++++----------
-> >  1 file changed, 12 insertions(+), 10 deletions(-)
-> > 
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index d255964ec331e..dae5f48151032 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -2479,7 +2479,7 @@ static inline int check_user_page_hwpoison(unsigned long addr)
-> >  }
-> >  
-> >  /*
-> > - * The fast path to get the writable pfn which will be stored in @pfn,
-> > + * The fast path to get the pfn which will be stored in @pfn,
-> >   * true indicates success, otherwise false is returned.  It's also the
-> >   * only part that runs if we can in atomic context.
-> >   */
-> > @@ -2487,16 +2487,18 @@ static bool hva_to_pfn_fast(unsigned long addr, bool write_fault,
-> >  			    bool *writable, kvm_pfn_t *pfn)
-> >  {
-> >  	struct page *page[1];
-> > +	bool found_by_fast_gup =
-> > +		get_user_page_fast_only(
-> > +			addr,
-> > +			/*
-> > +			 * Fast pin a writable pfn only if it is a write fault request
-> > +			 * or the caller allows to map a writable pfn for a read fault
-> > +			 * request.
-> > +			 */
-> > +			(write_fault || writable) ? FOLL_WRITE : 0,
-> > +			page);
-> >  
-> > -	/*
-> > -	 * Fast pin a writable pfn only if it is a write fault request
-> > -	 * or the caller allows to map a writable pfn for a read fault
-> > -	 * request.
-> > -	 */
-> > -	if (!(write_fault || writable))
-> > -		return false;
-> > -
-> > -	if (get_user_page_fast_only(addr, FOLL_WRITE, page)) {
-> > +	if (found_by_fast_gup) {
-> 
-> You could have a smaller diff (and arrive at something more readable)
-
-Heh, this whole series just screams "google3". :-)
-
-Anish, please read through 
-
-  Documentation/process/coding-style.rst
-
-and 
-
-  Documentation/process/submitting-patches.rst
-
-particularaly the "Describe your changes" and "Style-check your changes" your
-changes sections.  Bonus points if you work through the mostly redundant process/
-documentation, e.g. these have supplementary info.
-
-  Documentation/process/4.Coding.rst
-  Documentation/process/5.Posting.rst
+Jason
