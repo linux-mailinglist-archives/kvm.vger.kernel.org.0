@@ -2,98 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 27BE8697D24
-	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 14:25:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B64F7697D44
+	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 14:28:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233825AbjBONZf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Feb 2023 08:25:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39442 "EHLO
+        id S230266AbjBON2J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Feb 2023 08:28:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230396AbjBONZd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Feb 2023 08:25:33 -0500
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ED87274BF;
-        Wed, 15 Feb 2023 05:25:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=o8nHcYwdgi5dYAVXOPCLhYnFf1f1EfIQ8SqfEDzFWkw=; b=AN6OHde5imKffEHRQZGWI+RwRR
-        6jBGeGjqpJRGHRGwxDVfcgNpyqZKP1iCZVhPVwowJcyendmftvAi1fi7mlDy0Gu4ShxswIpI6wMyh
-        WEuAccn5HT6TPEoeVoItrOWro323eZEeHWbwWmXbQO6mvk/3gW70yXwufNDPpns3VnshexH70DVm7
-        iEbqhVhtS476shYMSaanJgV8crimum8tHuXZeCkSAlHLwUgmh1d+enALIGldFaLFfjVmF/Tgf1mCu
-        zMikJHfb/jH/6z11YeU7gBSFd6TPmzOziIhx5fULKoOzjzvyaFaDqb5Cy9Nu0DCjvO5NbPeInnyhP
-        zxrxyYZg==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1pSHlo-009wmA-1H;
-        Wed, 15 Feb 2023 13:25:07 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 6509E3001D6;
-        Wed, 15 Feb 2023 14:25:05 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 490822CEE165F; Wed, 15 Feb 2023 14:25:05 +0100 (CET)
-Date:   Wed, 15 Feb 2023 14:25:05 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     "Huang, Kai" <kai.huang@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
-        "david@redhat.com" <david@redhat.com>,
-        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
-        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        "Chatre, Reinette" <reinette.chatre@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "tj@kernel.org" <tj@kernel.org>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "imammedo@redhat.com" <imammedo@redhat.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "Huang, Ying" <ying.huang@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>
-Subject: Re: [PATCH v9 07/18] x86/virt/tdx: Do TDX module per-cpu
- initialization
-Message-ID: <Y+zdMZjApMWJ97GP@hirez.programming.kicks-ass.net>
-References: <cover.1676286526.git.kai.huang@intel.com>
- <557c526a1190903d11d67c4e2c76e01f67f6eb15.1676286526.git.kai.huang@intel.com>
- <86a8fe2f-566a-d0b9-7a22-9b41c91796f8@intel.com>
- <BL1PR11MB59789A024CFA9E9DE715C2F1F7DD9@BL1PR11MB5978.namprd11.prod.outlook.com>
- <af6034c3-98a3-239b-2c79-ff878f5d9673@intel.com>
- <43fec733ea5331c6de4592dbf44a62e0c61eecb1.camel@intel.com>
- <Y+uWu9hLMZ35JHlY@hirez.programming.kicks-ass.net>
- <0795f69fd0ff8ccdd40cc7a3d6cc32da47e6d929.camel@intel.com>
- <Y+yi4B+P9K2FXNqt@hirez.programming.kicks-ass.net>
- <24bd9d546d07b57387ecd990746061ae35ce5fa5.camel@intel.com>
+        with ESMTP id S229886AbjBON2I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Feb 2023 08:28:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D7EE3251C
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 05:27:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676467631;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
+        b=UpVS7wXgts0vzUV8hlfIjiHqgeQsUGybzWxmd2uilJbKiHLn4vngYXwsAzgjbhWP9Lm3Sp
+        ph+dCQxWx+0ylMNt9uIKS57HCDmtaj5wDmLkSksq6QVBYUyAWJYmAt9xNQ3VxctbFp6bpF
+        Z9Fa1//6vBdvU/wbwMLtaauvLE1Q0Ug=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-634-bSnxo5JIPNyjZVUu63p6Vg-1; Wed, 15 Feb 2023 08:27:05 -0500
+X-MC-Unique: bSnxo5JIPNyjZVUu63p6Vg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7F5EC3C0F22E;
+        Wed, 15 Feb 2023 13:27:04 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1914B18EC1;
+        Wed, 15 Feb 2023 13:27:04 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Jianfeng Gao <jianfeng.gao@intel.com>,
+        Andrew Cooper <Andrew.Cooper3@citrix.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Andi Kleen <ak@linux.intel.com>
+Subject: Re: [PATCH v2 0/2] perf/x86: KVM: Disable vPMU on hybrid CPUs
+Date:   Wed, 15 Feb 2023 08:27:02 -0500
+Message-Id: <20230215132702.1339553-1-pbonzini@redhat.com>
+In-Reply-To: <20230208204230.1360502-1-seanjc@google.com>
+References: 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <24bd9d546d07b57387ecd990746061ae35ce5fa5.camel@intel.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 15, 2023 at 09:46:10AM +0000, Huang, Kai wrote:
-> Yes agreed.  Your code below looks indeed better.  Thanks!
-> 
-> Would you mind send me a patch so I can include to this series, or would you
-> mind get it merged to tip/x86/tdx (or other branch I am not sure) so I can
-> rebase?
+Queued, thanks.
 
-Just take the patch, add your comments and test it.. enjoy! :-)
+Paolo
+
+
