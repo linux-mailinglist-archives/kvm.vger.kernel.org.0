@@ -2,106 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 85A0D6987F4
-	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 23:34:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CF88E6987FB
+	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 23:36:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229946AbjBOWeP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Feb 2023 17:34:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36912 "EHLO
+        id S229800AbjBOWgo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Feb 2023 17:36:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229771AbjBOWeC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Feb 2023 17:34:02 -0500
-Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29D7A392AA
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 14:34:01 -0800 (PST)
-Received: by mail-io1-xd2c.google.com with SMTP id z5so19725iow.1
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 14:34:01 -0800 (PST)
+        with ESMTP id S229596AbjBOWgl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Feb 2023 17:36:41 -0500
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC3C830295
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 14:36:35 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-4bdeb1bbeafso297817b3.4
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 14:36:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mnWb0/c3SYq7VOjFth5MeHXAYmHB31VnBFWZUTQPvpw=;
-        b=kC+gHfVdbRJlKuA2eO3yNTVt7DH6c/TA0/kfK1ldKXFTz8jF7IfNK0GsqoCDlFaey+
-         Ot5LcebAIg2SwBu3bz6JxTwqg50CJu1GANhWz5aFxR+pABZYHwDTNFIl1ylVCSJBriro
-         ftvYlS/DyAxzJSjMvhjrfJadtr3Xe/GVoDQlg=
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MIQXENS2+4sMRi90b513aA2Q153GZQ5k/QlHWLrBT2A=;
+        b=ZYNMMFGaenxLALBL2wkoeLLWcRxUq1y7auD4MvNvGfv7MW/Zzc/6OHVvmxXZRo37Ts
+         8/VwxU1tz7UOrJDGnVVvI9umeMJ8Mrwf4dkYFiLWNbBJJn2StxZrQIbSnrz91gyzZYYX
+         uOyl7AUZuu1wbDe2EHq/mdEBIDBLp/2mfczeovyZsREMzhd2TkaxmVpMygdx0JcoRJuC
+         xD++nMj3f6cIhIUyh2bjcr+O3TbIvzS7aLGXeMYY0WcmhH3cm/voZhTh1tK+Rqc9MD0U
+         1EA4n4R9MpBLmY7RjZvdOFeVHRRjPNO/C+va5TZ5TJdYdKgR6y0xE6zSfNfGgM8S0/se
+         +AFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mnWb0/c3SYq7VOjFth5MeHXAYmHB31VnBFWZUTQPvpw=;
-        b=drHIJeMMclzwH5VYKR+gRSjJ4zG/6OKhJKEfkoliROs5MD+uQsqAjMwbIFQsgCFegh
-         OOfxTmciNcLw8RKRa60NP3IKFXivrzDo5v1J9u6tcSImPjZFn9621viWK2WJ6PlitKsk
-         cdvU+TphRr4BMaHwLNC1GprocOLPRUQ2PCp0fzYTylmmupIwTOkykqcd7CRhmHdEfQbU
-         gpPvGgcI3eWBraSsijdR/HDGOoNusBEx5Yv0iGMwETjBQpYJJQsLtumCZ26ILTE2aKk7
-         Z2W5bOPD+SLxS0vUyVKOTZwe/STfuKaen1kbLAZJMnjtT+NhPT9mbN3VX0tIF2mRx16A
-         fgqA==
-X-Gm-Message-State: AO0yUKVU1SCmGMIWCAgF5eFAdj0NgsPl/PHzCJBPJPS1tyohFXNFnYjz
-        5Zh8O0b1J8eNxB8Tge6tcdUD1w==
-X-Google-Smtp-Source: AK7set+LWFNoW1FRruwyMQqPtFjjrfVj8AiheRpZcLSgqEnBWe2webNydnur3ykK3IxtsLkMcuwgOQ==
-X-Received: by 2002:a6b:7118:0:b0:734:2621:58e2 with SMTP id q24-20020a6b7118000000b00734262158e2mr3155532iog.20.1676500440593;
-        Wed, 15 Feb 2023 14:34:00 -0800 (PST)
-Received: from ravnica.bld.corp.google.com ([2620:15c:183:200:6299:179b:a6e4:be59])
-        by smtp.gmail.com with ESMTPSA id b15-20020a92c14f000000b003141eddd283sm1131489ilh.22.2023.02.15.14.34.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Feb 2023 14:34:00 -0800 (PST)
-From:   Ross Zwisler <zwisler@chromium.org>
-X-Google-Original-From: Ross Zwisler <zwisler@google.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Ross Zwisler <zwisler@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-trace-kernel@vger.kernel.org,
-        Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH v2 4/6] tools/kvm_stat: use canonical ftrace path
-Date:   Wed, 15 Feb 2023 15:33:48 -0700
-Message-Id: <20230215223350.2658616-5-zwisler@google.com>
-X-Mailer: git-send-email 2.39.1.637.g21b0678d19-goog
-In-Reply-To: <20230215223350.2658616-1-zwisler@google.com>
-References: <20230215223350.2658616-1-zwisler@google.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MIQXENS2+4sMRi90b513aA2Q153GZQ5k/QlHWLrBT2A=;
+        b=7r5fPWc1NtTnNr1Q91nDJ2uFXHm2SEHMkNwzQsUgyg33R9Hoyui/PmieJtMHEiiqIZ
+         OZKKd9qKhm19puPyz4u4Jhkippo2hMAZ0GIaflFLUhLoqtGMbgIxqF+TY+BKrIttYpq1
+         EhjCz9klVanbvJDrwfEeRfGJDAoGsRe6px4iW5u2JDC35zMUa+4JQa5QahY1nm2EtZTS
+         ghTb0YzX76CQkxAAwFdsMsrCkH41npjF7MUBneYAyoUIbh7jz3TJ4Yqg9mVoxWxuEmGJ
+         b588/g+kwhs+ndhjTyYqerrfYTwtdf9Y3nI+k39UgCCcpjekp0KL71bL8GYulwjavQy+
+         watQ==
+X-Gm-Message-State: AO0yUKWpE+ckm5monELhbTmwdddxyjHDljC4/xDKvqMoMm2Q9b4SAZV2
+        2qZ71bizFxDfAlzavyV7bZHR2/hR6vg=
+X-Google-Smtp-Source: AK7set9tYoNoI6QJwihu1gK/MM6fk7qfD/5z/sIGddBwvpoJr9Je1x7HajVcrjAMbO/AaomTOeaybmdzZf4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a0d:dc41:0:b0:52e:cebf:a440 with SMTP id
+ f62-20020a0ddc41000000b0052ecebfa440mr444390ywe.242.1676500595047; Wed, 15
+ Feb 2023 14:36:35 -0800 (PST)
+Date:   Wed, 15 Feb 2023 14:36:33 -0800
+In-Reply-To: <4f0d03de-4372-2472-ef59-e80bb3aa7703@gmail.com>
+Mime-Version: 1.0
+References: <20230210003148.2646712-1-seanjc@google.com> <20230210003148.2646712-6-seanjc@google.com>
+ <4f0d03de-4372-2472-ef59-e80bb3aa7703@gmail.com>
+Message-ID: <Y+1ecVEQhgEGIqMy@google.com>
+Subject: Re: [PATCH v2 05/21] KVM: x86: Disallow writes to immutable feature
+ MSRs after KVM_RUN
+From:   Sean Christopherson <seanjc@google.com>
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The canonical location for the tracefs filesystem is at /sys/kernel/tracing.
+On Tue, Feb 14, 2023, Like Xu wrote:
+> On 10/2/2023 8:31 am, Sean Christopherson wrote:
+> > @@ -2168,6 +2187,23 @@ static int do_get_msr(struct kvm_vcpu *vcpu, unsigned index, u64 *data)
+> >   static int do_set_msr(struct kvm_vcpu *vcpu, unsigned index, u64 *data)
+> >   {
+> > +	u64 val;
+> > +
+> > +	/*
+> > +	 * Disallow writes to immutable feature MSRs after KVM_RUN.  KVM does
+> > +	 * not support modifying the guest vCPU model on the fly, e.g. changing
+> > +	 * the nVMX capabilities while L2 is running is nonsensical.  Ignore
+> > +	 * writes of the same value, e.g. to allow userspace to blindly stuff
+> > +	 * all MSRs when emulating RESET.
+> > +	 */
+> > +	if (vcpu->arch.last_vmentry_cpu != -1 &&
+> 
+> Three concerns on my mind (to help you think more if any):
+> - why not using kvm->created_vcpus;
 
-But, from Documentation/trace/ftrace.rst:
+Because this is a vCPU scoped ioctl().
 
-  Before 4.1, all ftrace tracing control files were within the debugfs
-  file system, which is typically located at /sys/kernel/debug/tracing.
-  For backward compatibility, when mounting the debugfs file system,
-  the tracefs file system will be automatically mounted at:
+> - how about different vcpu models of the same guest have different
+> feature_msr values;
 
-  /sys/kernel/debug/tracing
+KVM shouldn't care.  If KVM does care, then that's a completely orthogonal bug
+that needs to be fixed separately.
 
-A comment in kvm_stat still refers to this older debugfs path, so let's
-update it to avoid confusion.
+> (although they are not altered after the first run, cases (selftests) may be
+> needed to
+> show that it is dangerous for KVM);
+> 
+> - the relative time to set "vcpu->arch.last_vmentry_cpu = vcpu->cpu" is
+> still too late,
+> since part of the guest code (an attack window) has already been executed on first
+> run of kvm_x86_vcpu_run() which may run for a long time;
 
-Signed-off-by: Ross Zwisler <zwisler@google.com>
----
- tools/kvm/kvm_stat/kvm_stat | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tools/kvm/kvm_stat/kvm_stat b/tools/kvm/kvm_stat/kvm_stat
-index 6f28180ffeea..15bf00e79e3f 100755
---- a/tools/kvm/kvm_stat/kvm_stat
-+++ b/tools/kvm/kvm_stat/kvm_stat
-@@ -627,7 +627,7 @@ class TracepointProvider(Provider):
-         name)'.
- 
-         All available events have directories under
--        /sys/kernel/debug/tracing/events/ which export information
-+        /sys/kernel/tracing/events/ which export information
-         about the specific event. Therefore, listing the dirs gives us
-         a list of all available events.
- 
--- 
-2.39.1.637.g21b0678d19-goog
-
+Again, this is a vCPU scoped ioctl.  The task doing KVM_RUN holds vcpu->mutex so
+there is no race.
