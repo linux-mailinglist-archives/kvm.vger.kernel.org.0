@@ -1,215 +1,177 @@
 Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 777DD6973BE
-	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 02:41:38 +0100 (CET)
+Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
+	by mail.lfdr.de (Postfix) with ESMTP id 7824F6973DB
+	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 02:46:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231714AbjBOBi5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Feb 2023 20:38:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59760 "EHLO
+        id S233675AbjBOBqo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Feb 2023 20:46:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229460AbjBOBiz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Feb 2023 20:38:55 -0500
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C913586BC;
-        Tue, 14 Feb 2023 17:38:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1676425134; x=1707961134;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Sd/Vj/T4DLU2vZ1ZQn3DOLZ12ozp1nlWE4s5KJEh+O4=;
-  b=JjPuMU1JM3MQbj2BP35kLnCOIZLgXzDsp6IuY7Uyl0bNcrBXifIigoTq
-   aVwDM8zssC7yXYGI8/hjbFQYuJ77tVH9aCkyUz6psQd+h6hcuol/6+Ytn
-   tIAHK2otNBFUxSctZ6sCuOXaaAqIC3Ti8YkWmH7LlnBXiqGzxiePPhEYe
-   gtqn5TPxNzp6NkHaMWF1VplOSjJ+S39c08Vt7sjq5IRap7Z0oArFOMonx
-   XTpGV7xW+W4UOJKQbqtW0l+9XAHaVAUGewq13Emf725Wkj/+h/1oIiIj0
-   kZh4cozhubk6Cj4yT4MF5uC6amqLV33hXZIMyvrk8Mn/Vxhs3mLiSoFiw
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10621"; a="393721567"
-X-IronPort-AV: E=Sophos;i="5.97,298,1669104000"; 
-   d="scan'208";a="393721567"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2023 17:38:54 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10621"; a="738107429"
-X-IronPort-AV: E=Sophos;i="5.97,298,1669104000"; 
-   d="scan'208";a="738107429"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmsmga004.fm.intel.com with ESMTP; 14 Feb 2023 17:38:40 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Tue, 14 Feb 2023 17:38:40 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Tue, 14 Feb 2023 17:38:39 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16 via Frontend Transport; Tue, 14 Feb 2023 17:38:39 -0800
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.103)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.16; Tue, 14 Feb 2023 17:38:39 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TB8V2Nuk2o3R+WIWkKtWGqmK0e5eexgHfKrKK7noQ4283BBv0z/ckiHYh2bseflQU15BqriSukkFnVcFMvgmuxMG96J+taU24HxGnz+f+oaDmEsPkLxPKb3nyIU2QnhAp3V2OkV22/6NZOTBtCnDEWJ+mNxgBzBwr41RYEvMvWdaq421gQOwqt1+wmU5UkHaIphGi6A8n1uYYYQCP1tw0SBJmWEsnIiaH2/zGr68ALlbjm/cYO+WdnmSR/SaElXK8NcvMbICJrto7DPyxYfLulJUt+L6Rc0HA6Z0SoscfjK9DmnyFLacrfulBoYWXhng9R/1vSpMTpLAq3PD3f0iow==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=F8+0PhKS08jRxk7/iFXL2eP6QdwCr8lFE3ZS8DG9+jY=;
- b=j/fnrspvwFA9JI8vDR2Xeb0TmVeX2WJNKmg3PeHzcAlfGRx8B2wIcAaUFywK43S0jbzXzivgAc+awTb0jZXmKInD25ZeF5Zp/t0eykVPm/yZmRxap1oWjDaZSR30rXPhfCheB8UHD9GFkUlMV9ui1OZZWoX2dsAeDwwX7fKVuLCmTQ9nGWCk0I1gjDg2nGecngzyNQBIaSBVwqEaBYk0xsCsnHYL7Fg7mJWpxE8ClLkB7J76OE+pa2oEvqnIy/shiIny6k8p3YA/6CjNNbxB9d76y4FG1iHgq7eEi7F7eduvjLqPUzQbybLZ/DM5Id0Y+OW/nx+R2z9pg93lWAZEAA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by DS0PR11MB7459.namprd11.prod.outlook.com (2603:10b6:8:144::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.24; Wed, 15 Feb
- 2023 01:38:33 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::6a8d:b95:e1b5:d79d]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::6a8d:b95:e1b5:d79d%9]) with mapi id 15.20.6086.026; Wed, 15 Feb 2023
- 01:38:32 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Nicolin Chen <nicolinc@nvidia.com>
-CC:     "jgg@nvidia.com" <jgg@nvidia.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "will@kernel.org" <will@kernel.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "shuah@kernel.org" <shuah@kernel.org>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>
-Subject: RE: [PATCH v2 08/10] iommufd/device: Use iommu_group_replace_domain()
-Thread-Topic: [PATCH v2 08/10] iommufd/device: Use
- iommu_group_replace_domain()
-Thread-Index: AQHZOzoV+UAbwLQwnEuO17sJd5b+0K7F+NzggAEnS4CAAE2/cIAG4ngAgAD1Q2A=
-Date:   Wed, 15 Feb 2023 01:38:32 +0000
-Message-ID: <BN9PR11MB5276A2CCAB714977F07AD0758CA39@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <cover.1675802050.git.nicolinc@nvidia.com>
- <4653f009c3dacae8ebf3a4865aaa944aa9c7cc7e.1675802050.git.nicolinc@nvidia.com>
- <BN9PR11MB5276C1807B710CAD3E5820D78CD99@BN9PR11MB5276.namprd11.prod.outlook.com>
- <Y+Vh479cDD7LX2x/@Asurada-Nvidia>
- <BN9PR11MB5276268D3ED0360913A05C368CDE9@BN9PR11MB5276.namprd11.prod.outlook.com>
- <Y+tpkpNYil3duTIP@Asurada-Nvidia>
-In-Reply-To: <Y+tpkpNYil3duTIP@Asurada-Nvidia>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|DS0PR11MB7459:EE_
-x-ms-office365-filtering-correlation-id: f5603b8e-8689-4c80-a1f8-08db0ef55922
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 5GWYkLfRKXpYMXTUPi6AP+j+01wwPmlE0LcA1eZGy+8PXAz1Iz8lMcklo3WkYPL/gNI/LHvYKU+uRo++6W0hBy8H5AmOJQP9HQpQozXvIsp9uKVyR/plHPCX4h0kPcHFPE9OYjLsN5CtLd0yBKYdN1BUwycCvXW7Wfu34eq1Pt3x0jal60Nc82z5Tjwse5MBAjUQCEVUbDtMMbTTyQEaGEDkD/GIjbTCHyZlE8tcLNx3HR4Fnf8Rmrp4+Nxbw2BB9o3A6tygtyDJj9dSsCvVL4CFbkuJEHSY39EJNF9By7czHn+O4q2+5foiIP0vlNGR4QkvD+40bii76Vec+3AWFCl6rJ0Sooq3ss0CODqGJxgZUGB0glUAVHOXquYudrbW/5pK725AKkFh4A4+xhqlPFZbkrg9Y8Ho1JDDkdvMnXfYm+48prHJSNfUynDPv2ky66uvMOQWcvDU+2SxKoYyEbtE1SuWo84XPxMkWZkOSRX54n6psNkXe0Ca6iW4LRujibA/XXLfghMObuDn2ObbE5w+f8cHudbWzvpo+4AhSiPpLSTySxp4mKkMbfAwCXGSDRHPVjJT7f+yUJEHnUJBeIKSBIpgzAUnM4bU1DPMszLURcQ11MOJXeJyfKklTS87Ae+T/9ZB63g7C3se9tYiAi9/bysGQX/eNkL8tqogIMDfXiPC+NRhKDDkANYNL1WHmze9tviIFsDCZQOt5EjcDA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(136003)(346002)(396003)(366004)(376002)(39860400002)(451199018)(6916009)(52536014)(5660300002)(4326008)(41300700001)(33656002)(8936002)(6506007)(122000001)(316002)(9686003)(2906002)(186003)(26005)(83380400001)(54906003)(7696005)(8676002)(86362001)(76116006)(66556008)(7416002)(64756008)(66476007)(478600001)(38100700002)(82960400001)(66946007)(66446008)(38070700005)(55016003)(71200400001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?wzqBmPJEp4rtxthM6EJoa8GIq/AsEVYbvtVzPoGDpLUPAiUXN/fgEMpKu0GG?=
- =?us-ascii?Q?GNGBFxl3/x5kdtQ1aFx4QlNJaEOMT4c4ARXzO9+If3xnMi6eyQ/tWMmOVb/a?=
- =?us-ascii?Q?NEOgsqyH8IThpEAjuI4Uk3sNHc42XvW0ECG5llL/TCaMVtbdueLv3GCU15Ma?=
- =?us-ascii?Q?7V4GrgNRrovW6yNrVFyC/YIuWGAk4r/WaBW+F56hjP9bpaWJf4ZZkjobqrM8?=
- =?us-ascii?Q?qIJsXXyErBEamUG3ZnBbfEupG0qE+oJJ2N+8wyzF1wSeIEPUTAav6FDRZBxE?=
- =?us-ascii?Q?ADXJFaEsbjnWp9GDh/UjafOGfvXx+1FoqkOSAiK/JC7fU7Wp75jBPwehxg0M?=
- =?us-ascii?Q?puvdXrC3FczmHFbK1cKWh3MuD9ynaMFfqT2IxHpecmJuOWSkO2Gd7XF+vi+9?=
- =?us-ascii?Q?N4MX8pWLiJjECRiUOj02GiXHZ4K3j4QpDDuM0GbZIll8/RFMMAlkoH8R4qmQ?=
- =?us-ascii?Q?X4O2fjak4YRvYi9X07BPw8oZPRnSefndkk1wA+cspaweTrMLtoiXy4ffHdPp?=
- =?us-ascii?Q?CQEjJFRlkzBTLboyNCOrC3LMft0bqe0z1MxhK4LeNmqVing9YKw/XpidscSC?=
- =?us-ascii?Q?FarC6Z7U3dH1akv5kgnbrGZt91IyGELA97BO04+2Oyy/fA1KdgGrPh96Xveh?=
- =?us-ascii?Q?2kHcws0E8FDOUYDtQPCBKqUTo7dseeFWqZsLPKSCt/6ONZZn83jTlzMq6ZtO?=
- =?us-ascii?Q?T30J0ZNUo9nz6L+pMgyHmySIMwZu0vAfyvUPvJ3P5nCkgNfO4cFMyV2a7ka+?=
- =?us-ascii?Q?tSM1lWgDEV7WNz6LWNytZyIIZf/lwPeBocB3CyuxaQE5pxOTKwW4qAAecFEe?=
- =?us-ascii?Q?ydzp5eXesrw1M9ybihpfvTZjKoX4hLfNTWgD7k7wYMjPxvbMGvhqn5K2D/9g?=
- =?us-ascii?Q?5I0BX7zCVI9f59OGOZm29CNbJ6mDbSFgb3bcYsTmef3TKTVAkpab1hMfsNgG?=
- =?us-ascii?Q?pAxzYkTrEiumxDdVsmVxTEZhJzx+EryR1ScmjLGc4tXqGkD/6rQW3maND9vo?=
- =?us-ascii?Q?qAcsE3ykxFze2ydSfv5jWXg/fXKAmGRs2xKaaMyAuKPz4jcxBCzrnhMhjSJh?=
- =?us-ascii?Q?7yyE0n3CAJZnKpgzSP2BRp3bYzSo0WB19TUtWk7dXFbeTMS2RZEtzkJmqr6o?=
- =?us-ascii?Q?ia/FiiN5u0t3HoS1/lTBPa/rCDNiUHXojbomnlkVqc9l5dh+ap5BgAqJlEY3?=
- =?us-ascii?Q?t/MQbDyDXuL2/GJFYyGga5tLTnOPfsWpNa66+jY7IbBvaAGJ/YmEnFlHz1o8?=
- =?us-ascii?Q?EpsVQY2BPORqMgfunx0Kp1md9OQOadpqsd92gIXHPGjlHC61jzL47gdh6lwt?=
- =?us-ascii?Q?ln01z5kg557kQlNGa/A4PePmT6VpJyhiawDyTS+L5ql71mRl/+P5BpWMUfLz?=
- =?us-ascii?Q?ukqgJtboOOUQ6eD4NdeTs8HUGjrk+LEyUZM9rdcF+olTzTKbab8mdEhSJxWY?=
- =?us-ascii?Q?/MA5XCEfmhy+yjzbzcE9rrdVpuaZanWq5cKhtB0HhYFY8eSx7KGBGpdOOvUe?=
- =?us-ascii?Q?FlUxPC5rrFZ7mar/XFJVtsXGG82wUiBOye8xSF+EGBXXmc/xLs3VODkMHomM?=
- =?us-ascii?Q?iYFTdVXDBWMVUPDSgr0hQFadrA7V39qZfhVz+Ntn?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S233245AbjBOBqn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Feb 2023 20:46:43 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3406B3402B
+        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 17:45:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676425553;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=z13SvjuRAK6JAGO7hupMx4g/hf9s2/2VYJAPPBUkXPo=;
+        b=Hm/WBpcMx7jzMPP/tKv/dYuGzzWzg2KpxavtT7kRBNiUPplAieDvntbe3+cq4asV79ZmpG
+        BLVSpR8Jb/CuwW94MX2UxgIpibGe2kMN0y+AHdz2d54puacSGSqfWMuJvHssKp4IB/u6CW
+        UIkHebYpbqSOhKIPvK5ANCKPl0DUC7I=
+Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com
+ [209.85.161.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-253-eRFAUsgtPD-j405OghSzbA-1; Tue, 14 Feb 2023 20:45:52 -0500
+X-MC-Unique: eRFAUsgtPD-j405OghSzbA-1
+Received: by mail-oo1-f72.google.com with SMTP id n65-20020a4a5344000000b005174a86ea9cso6132997oob.23
+        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 17:45:52 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=z13SvjuRAK6JAGO7hupMx4g/hf9s2/2VYJAPPBUkXPo=;
+        b=jD3NWSix5QW+a0lCVFEUcsQg8T1K/22X0VFaqHbGwY0zTieATFUdBTd6Nlww9iv5tp
+         0Mocwki8VAfeVKzugq8dXz296yjZ+qnouYB/9dvUOH5fHd+f+/tO9o6nvyplQGXHuJ6Z
+         2I/ja37S4zDdahvRedRmrFbDjKiaIdIiWrwskrNQEnE/0/zgVt77KVc/KnnMY7fR4rJ0
+         xRKT44qxBmf+/m5KJ4u1zzgM+5FYx00pNNSGCfPSk3dR++EBcmfWuEUAdth7P8CK2rDk
+         ujcxZZqRhbKqWjzRfobpPVivJCf/z8rQse+ZGY9OfnXguOIBdQW1Euy7+eXZi8qFOrHe
+         zrlw==
+X-Gm-Message-State: AO0yUKW2BhL0BZlb+U7xkP09mR00sPatYzh/kXHmGCUDunuZvqvCfVUd
+        CcS5dKFjoZvCjgDOjAnUb/RST9Fw4KlrzLj7qce0o4zyDXz83aXNTwl6LvUYs5/PY1POjPhO+t4
+        fW3vSRWMAnqdMK/mUYEODbQSbcRAl
+X-Received: by 2002:aca:1119:0:b0:37d:5d77:e444 with SMTP id 25-20020aca1119000000b0037d5d77e444mr92596oir.35.1676425551283;
+        Tue, 14 Feb 2023 17:45:51 -0800 (PST)
+X-Google-Smtp-Source: AK7set9w9gHRXxHk27xEdyGR83Dq4iLC9uil3PZBspRy+TTttuI3bvOJBj1uNqJQezz8luZu/g266O3VxQFOX8woKo8=
+X-Received: by 2002:aca:1119:0:b0:37d:5d77:e444 with SMTP id
+ 25-20020aca1119000000b0037d5d77e444mr92589oir.35.1676425551023; Tue, 14 Feb
+ 2023 17:45:51 -0800 (PST)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f5603b8e-8689-4c80-a1f8-08db0ef55922
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Feb 2023 01:38:32.7650
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: j8X39JTtghaq8D4nutp4+6E6pFIwv4aLQUICJAxUJvUHXmwkFSlRDECWxvsLFCGckSRbyW4WubpkyqIv/Bn7Rw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7459
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20230214080924.131462-1-lulu@redhat.com>
+In-Reply-To: <20230214080924.131462-1-lulu@redhat.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Wed, 15 Feb 2023 09:45:40 +0800
+Message-ID: <CACGkMEuidAhBhAD7SsNJ9g6_yH2HKfTC6jr7GvBDu8t=ZQVPpA@mail.gmail.com>
+Subject: Re: [PATCH v2] vp_vdpa: fix the crash in hot unplug with vp_vdpa
+To:     Cindy Lu <lulu@redhat.com>
+Cc:     mst@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Nicolin Chen <nicolinc@nvidia.com>
-> Sent: Tuesday, February 14, 2023 7:00 PM
->=20
-> On Fri, Feb 10, 2023 at 02:11:23AM +0000, Tian, Kevin wrote:
->=20
-> > My confusion is that we have different flows between detach/attach
-> > and replace.
-> >
-> > today with separate detach+attach we have following flow:
-> >
-> >         Remove device from current hwpt;
-> >         if (last_device in hwpt) {
-> >                 Remove hwpt domain from current iopt;
-> >                 if (last_device in group)
-> >                         detach group from hwpt domain;
-> >         }
-> >
-> >         if (first device in group) {
-> >                 attach group to new hwpt domain;
-> >                 if (first_device in hwpt)
-> >                         Add hwpt domain to new iopt;
-> >         Add device to new hwpt;
-> >
-> > but replace flow is different on the detach part:
-> >
-> >         if (first device in group) {
-> >                 replace group's domain from current hwpt to new hwpt;
-> >                 if (first_device in hwpt)
-> >                         Add hwpt domain to new iopt;
-> >         }
-> >
-> >         Remove device from old hwpt;
-> >         if (last_device in old hwpt)
-> >                 Remove hwpt domain from old iopt;
-> >
-> >         Add device to new hwpt;
-> >
-> > I'm yet to figure out whether we have sufficient lock protection to
-> > prevent other paths from using old iopt/hwpt to find the device
-> > which is already attached to a different domain.
->=20
-> With Jason's new series, the detach() routine is lighter now.
->=20
-> I wonder if it'd be safer now to do the detach() call after
-> iommu_group_replace_domain()?
->=20
+On Tue, Feb 14, 2023 at 4:09 PM Cindy Lu <lulu@redhat.com> wrote:
+>
+> While unplugging the vp_vdpa device, it triggers a kernel panic
+> The root cause is: vdpa_mgmtdev_unregister() will accesses modern
+> devices which will cause a use after free.
+> So need to change the sequence in vp_vdpa_remove
+>
+> [  195.003359] BUG: unable to handle page fault for address: ff4e8beb80199014
+> [  195.004012] #PF: supervisor read access in kernel mode
+> [  195.004486] #PF: error_code(0x0000) - not-present page
+> [  195.004960] PGD 100000067 P4D 1001b6067 PUD 1001b7067 PMD 1001b8067 PTE 0
+> [  195.005578] Oops: 0000 1 PREEMPT SMP PTI
+> [  195.005968] CPU: 13 PID: 164 Comm: kworker/u56:10 Kdump: loaded Not tainted 5.14.0-252.el9.x86_64 #1
+> [  195.006792] Hardware name: Red Hat KVM/RHEL, BIOS edk2-20221207gitfff6d81270b5-2.el9 unknown
+> [  195.007556] Workqueue: kacpi_hotplug acpi_hotplug_work_fn
+> [  195.008059] RIP: 0010:ioread8+0x31/0x80
+> [  195.008418] Code: 77 28 48 81 ff 00 00 01 00 76 0b 89 fa ec 0f b6 c0 c3 cc cc cc cc 8b 15 ad 72 93 01 b8 ff 00 00 00 85 d2 75 0f c3 cc cc cc cc <8a> 07 0f b6 c0 c3 cc cc cc cc 83 ea 01 48 83 ec 08 48 89 fe 48 c7
+> [  195.010104] RSP: 0018:ff4e8beb8067bab8 EFLAGS: 00010292
+> [  195.010584] RAX: ffffffffc05834a0 RBX: ffffffffc05843c0 RCX: ff4e8beb8067bae0
+> [  195.011233] RDX: ff1bcbd580f88000 RSI: 0000000000000246 RDI: ff4e8beb80199014
+> [  195.011881] RBP: ff1bcbd587e39000 R08: ffffffff916fa2d0 R09: ff4e8beb8067ba68
+> [  195.012527] R10: 000000000000001c R11: 0000000000000000 R12: ff1bcbd5a3de9120
+> [  195.013179] R13: ffffffffc062d000 R14: 0000000000000080 R15: ff1bcbe402bc7805
+> [  195.013826] FS:  0000000000000000(0000) GS:ff1bcbe402740000(0000) knlGS:0000000000000000
+> [  195.014564] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [  195.015093] CR2: ff4e8beb80199014 CR3: 0000000107dea002 CR4: 0000000000771ee0
+> [  195.015741] PKRU: 55555554
+> [  195.016001] Call Trace:
+> [  195.016233]  <TASK>
+> [  195.016434]  vp_modern_get_status+0x12/0x20
+> [  195.016823]  vp_vdpa_reset+0x1b/0x50 [vp_vdpa]
+> [  195.017238]  virtio_vdpa_reset+0x3c/0x48 [virtio_vdpa]
+> [  195.017709]  remove_vq_common+0x1f/0x3a0 [virtio_net]
+> [  195.018178]  virtnet_remove+0x5d/0x70 [virtio_net]
+> [  195.018618]  virtio_dev_remove+0x3d/0x90
+> [  195.018986]  device_release_driver_internal+0x1aa/0x230
+> [  195.019466]  bus_remove_device+0xd8/0x150
+> [  195.019841]  device_del+0x18b/0x3f0
+> [  195.020167]  ? kernfs_find_ns+0x35/0xd0
+> [  195.020526]  device_unregister+0x13/0x60
+> [  195.020894]  unregister_virtio_device+0x11/0x20
+> [  195.021311]  device_release_driver_internal+0x1aa/0x230
+> [  195.021790]  bus_remove_device+0xd8/0x150
+> [  195.022162]  device_del+0x18b/0x3f0
+> [  195.022487]  device_unregister+0x13/0x60
+> [  195.022852]  ? vdpa_dev_remove+0x30/0x30 [vdpa]
+> [  195.023270]  vp_vdpa_dev_del+0x12/0x20 [vp_vdpa]
+> [  195.023694]  vdpa_match_remove+0x2b/0x40 [vdpa]
+> [  195.024115]  bus_for_each_dev+0x78/0xc0
+> [  195.024471]  vdpa_mgmtdev_unregister+0x65/0x80 [vdpa]
+> [  195.024937]  vp_vdpa_remove+0x23/0x40 [vp_vdpa]
+> [  195.025353]  pci_device_remove+0x36/0xa0
+> [  195.025719]  device_release_driver_internal+0x1aa/0x230
+> [  195.026201]  pci_stop_bus_device+0x6c/0x90
+> [  195.026580]  pci_stop_and_remove_bus_device+0xe/0x20
+> [  195.027039]  disable_slot+0x49/0x90
+> [  195.027366]  acpiphp_disable_and_eject_slot+0x15/0x90
+> [  195.027832]  hotplug_event+0xea/0x210
+> [  195.028171]  ? hotplug_event+0x210/0x210
+> [  195.028535]  acpiphp_hotplug_notify+0x22/0x80
+> [  195.028942]  ? hotplug_event+0x210/0x210
+> [  195.029303]  acpi_device_hotplug+0x8a/0x1d0
+> [  195.029690]  acpi_hotplug_work_fn+0x1a/0x30
+> [  195.030077]  process_one_work+0x1e8/0x3c0
+> [  195.030451]  worker_thread+0x50/0x3b0
+> [  195.030791]  ? rescuer_thread+0x3a0/0x3a0
+> [  195.031165]  kthread+0xd9/0x100
+> [  195.031459]  ? kthread_complete_and_exit+0x20/0x20
+> [  195.031899]  ret_from_fork+0x22/0x30
+> [  195.032233]  </TASK>
+>
+> Fixes: ffbda8e9df10 ("vdpa/vp_vdpa : add vdpa tool support in vp_vdpa")
+> Tested-by: Lei Yang <leiyang@redhat.com>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Cindy Lu <lulu@redhat.com>
 
-yes, looks so.
+Acked-by: Jason Wang <jasowang@redhat.com>
+
+Thanks
+
+> ---
+>  drivers/vdpa/virtio_pci/vp_vdpa.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/vdpa/virtio_pci/vp_vdpa.c b/drivers/vdpa/virtio_pci/vp_vdpa.c
+> index 8fe267ca3e76..281287fae89f 100644
+> --- a/drivers/vdpa/virtio_pci/vp_vdpa.c
+> +++ b/drivers/vdpa/virtio_pci/vp_vdpa.c
+> @@ -645,8 +645,8 @@ static void vp_vdpa_remove(struct pci_dev *pdev)
+>         struct virtio_pci_modern_device *mdev = NULL;
+>
+>         mdev = vp_vdpa_mgtdev->mdev;
+> -       vp_modern_remove(mdev);
+>         vdpa_mgmtdev_unregister(&vp_vdpa_mgtdev->mgtdev);
+> +       vp_modern_remove(mdev);
+>         kfree(vp_vdpa_mgtdev->mgtdev.id_table);
+>         kfree(mdev);
+>         kfree(vp_vdpa_mgtdev);
+> --
+> 2.34.3
+>
+
