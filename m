@@ -2,61 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B7CC669733D
-	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 02:10:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CD4C9697333
+	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 02:08:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233025AbjBOBKX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Feb 2023 20:10:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56348 "EHLO
+        id S233343AbjBOBIo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Feb 2023 20:08:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232909AbjBOBKX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Feb 2023 20:10:23 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 679BA32E5A
-        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 17:09:52 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id l20-20020a17090ac59400b00233dc329a18so276847pjt.2
-        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 17:09:52 -0800 (PST)
+        with ESMTP id S233034AbjBOBIN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Feb 2023 20:08:13 -0500
+Received: from mail-il1-x14a.google.com (mail-il1-x14a.google.com [IPv6:2607:f8b0:4864:20::14a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60EF431E23
+        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 17:07:40 -0800 (PST)
+Received: by mail-il1-x14a.google.com with SMTP id r16-20020a92ce90000000b0031539a8e730so5383426ilo.13
+        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 17:07:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=wBnLaCuaQHue5r3LlxOvH+/hIU83D2TBPNlncWYFxkk=;
-        b=h5CKOSYxj8FHzA4Jq/zKj1V84UYqGxOv54HdMWQ218xlsrDNSSgKvHBxYUi8jXQuSS
-         w2nvXa6YxMUNLOi2VliP2k7HvE2YvUW5nysT31rxT3/Zfyjq2JVdwn/XWb1ucZevTtKw
-         evO0t9hr0X8iDBim/NxETPwRDMi1dc6+wRRUumME/9Adq357FRVcwtBf2qYiq2SzxrWl
-         3srBf0VPy+oIxhXsD8mO7vpuphAmS6UnmxRV/I6kOgjcMHbhBCwqzMS67LId045524xo
-         FC6dpk481aX7TSB7ShT/0vdB3N3IMmy7ivXgjmhboaz/zK+Ab+ysQPBoTnr+Q/M5iV+C
-         MO9g==
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=E305a934JyKR6d0LbQnwDb1KLXy1uRhITDhO1feUNVQ=;
+        b=I9xImCmVWCFNHbTSunyTqAaQSap8s5DCNhGLVbV7DgL0T5/D1hdtBQJhSlNOe0jyPF
+         voYUROttsE9l9SnEr6HvowKBOJbe3Owouy9OMVDxedlEyBXWr5K1mib2fl7gRhdLO48L
+         fnbPgDfuU6IyeV5gmtkDjhnSwbDWrRJiY/rOnl9/nyjQn/kkRiKJ7TrYIVTF4wF6Riqy
+         H4EGjONPbs2vlw0XIQt4v1m1JZuOeQ5uTUSmzUK+wKvS/rdrVoM46iwXIui3VhOGipia
+         XgImDP9+Y9tLkAorIZjdPiohqFBlpPbzSEPNJfNVZHgYBDc7MHB0TWhNYdEakb6KtRlu
+         ToZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wBnLaCuaQHue5r3LlxOvH+/hIU83D2TBPNlncWYFxkk=;
-        b=OykZUJUYgBo9HvNncFB3LYZtzows0ADSusSZBwlQRkESnt74KgQm8PNbHJzXbLRIJ1
-         7A7J0ApNDojy0bcWvgWaLte1+Gj4ca/bMoX075mWYBLnY3f1TiWxG5gKKW9L2GdSZ0Wd
-         9FtGc3UELs1w9mfMakXHzy1P2SDKAdNVHRuoDB1/3vFIhqj3/TcP6q+EJKx3uFfXLOX8
-         wuB3TRhGVqhrylnW+9Su+S/xZFNr2EaDsiIeHgk4iE00r29LaUYTur0gj4hupsVyYWKK
-         BZQorEDxp8a2h7QxsLRMGd45a6/OZ1qFoz55eL+TlpCFTc/VwM58+2qb5fYAwS6Uy908
-         VT/w==
-X-Gm-Message-State: AO0yUKV8wRf/nIZWpVc7VrKPMvhqujUxay02FK3nhCqqSPwNDKzX81gl
-        IiTbEaZLc0Lt0M7WZqh72x9pSmkYYfQ=
-X-Google-Smtp-Source: AK7set8THymUnG7147NM6k17ye6v2R5uAUPVC611uPuYPQf6QVtD7lhnMShzANadwVNAeLo9qJKPcbqoOI0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:d94e:0:b0:4fb:3896:a7d4 with SMTP id
- e14-20020a63d94e000000b004fb3896a7d4mr58640pgj.7.1676423313835; Tue, 14 Feb
- 2023 17:08:33 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 14 Feb 2023 17:07:14 -0800
-In-Reply-To: <20230215010718.415413-1-seanjc@google.com>
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=E305a934JyKR6d0LbQnwDb1KLXy1uRhITDhO1feUNVQ=;
+        b=XqlDAQAe7mTDvLyemRJgWdKzJUkCubzyW5Itzca6+1SUr41GVzDuButv1mW1cjmi7K
+         M0p4wlfISuE2Eayhk9EG7bjduNXOMcOdugc+W7L77bZtPZyCEHTu4RLshlCGSB/HqNWn
+         DcqD4CZAVI8N3UZ595qKaH7RtK7ZTxjq15LKdDSCD44VvbY6aF04ihh3hDesgsRd96nB
+         AZlhkmLJMaXz3g45zDBwHeinpXWKuge3YPrIOMMSDRQyjtgOOyGVK01K4i1bwhvk5BmX
+         seeE0WqxHlHK/tW7SywwM3MLtnkhF/R1cOZwt704uzQ9INdUcGpCTXZyAfIqPhxxkKWG
+         hZoA==
+X-Gm-Message-State: AO0yUKUepGivkB0/oPwggagEWsbwDppBlChVVvN8QtVntZzVwNgmbCfW
+        PzsqEQNwtfZTdxJNxSKIFDnZjobI2qtV
+X-Google-Smtp-Source: AK7set+b4ssQzb8aMv+uSf2RmCPqXoTCRttRjQLG+i9Fm0UeKWjHu4LVoeyGHXP+DptEEnYx2/E5xZzWwpO6
+X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:22b5])
+ (user=rananta job=sendgmr) by 2002:a6b:fb01:0:b0:71c:479d:741a with SMTP id
+ h1-20020a6bfb01000000b0071c479d741amr332606iog.38.1676423258679; Tue, 14 Feb
+ 2023 17:07:38 -0800 (PST)
+Date:   Wed, 15 Feb 2023 01:07:15 +0000
+In-Reply-To: <20230215010717.3612794-1-rananta@google.com>
 Mime-Version: 1.0
-References: <20230215010718.415413-1-seanjc@google.com>
+References: <20230215010717.3612794-1-rananta@google.com>
 X-Mailer: git-send-email 2.39.1.581.gbfd45094c4-goog
-Message-ID: <20230215010718.415413-4-seanjc@google.com>
-Subject: [GIT PULL] KVM: x86: MMU changes for 6.3
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org
+Message-ID: <20230215010717.3612794-15-rananta@google.com>
+Subject: [REPOST PATCH 14/16] selftests: KVM: aarch64: Add PMU test to chain
+ all the counters
+From:   Raghavendra Rao Ananta <rananta@google.com>
+To:     Oliver Upton <oupton@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Ricardo Koller <ricarkol@google.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -68,54 +77,94 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM x86/mmu changes for 6.3.  Not much this time around, Hou's fixes for range-
-based TLB flushing are by far the most interesting.  Not that it likely affects
-anything, but I'm expecting 6.4 to have quite a bit more MMU stuff.
+Extend the vCPU migration test to occupy all the vPMU counters,
+by configuring chained events on alternate counter-ids and chaining
+them with its corresponding predecessor counter, and verify against
+the extended behavior.
 
-The following changes since commit 7cb79f433e75b05d1635aefaa851cfcd1cb7dc4f:
+Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+---
+ .../testing/selftests/kvm/aarch64/vpmu_test.c | 60 +++++++++++++++++++
+ 1 file changed, 60 insertions(+)
 
-  KVM: PPC: Fix refactoring goof in kvmppc_e500mc_init() (2023-01-24 13:00:32 -0500)
+diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_test.c b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
+index de725f4339ad5..fd00acb9391c8 100644
+--- a/tools/testing/selftests/kvm/aarch64/vpmu_test.c
++++ b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
+@@ -710,6 +710,63 @@ static void test_chained_count(int pmc_idx)
+ 	pmu_irq_exit(chained_pmc_idx);
+ }
+ 
++static void test_chain_all_counters(void)
++{
++	int i;
++	uint64_t cnt, pmcr_n = get_pmcr_n();
++	struct pmc_accessor *acc = &pmc_accessors[0];
++
++	/*
++	 * Test the occupancy of all the event counters, by chaining the
++	 * alternate counters. The test assumes that the host hasn't
++	 * occupied any counters. Hence, if the test fails, it could be
++	 * because all the counters weren't available to the guest or
++	 * there's actually a bug in KVM.
++	 */
++
++	/*
++	 * Configure even numbered counters to count cpu-cycles, and chain
++	 * each of them with its odd numbered counter.
++	 */
++	for (i = 0; i < pmcr_n; i++) {
++		if (i % 2) {
++			acc->write_typer(i, ARMV8_PMUV3_PERFCTR_CHAIN);
++			acc->write_cntr(i, 1);
++		} else {
++			pmu_irq_init(i);
++			acc->write_cntr(i, PRE_OVERFLOW_32);
++			acc->write_typer(i, ARMV8_PMUV3_PERFCTR_CPU_CYCLES);
++		}
++		enable_counter(i);
++	}
++
++	/* Introduce some cycles */
++	execute_precise_instrs(500, ARMV8_PMU_PMCR_E);
++
++	/*
++	 * An overflow interrupt should've arrived for all the even numbered
++	 * counters but none for the odd numbered ones. The odd numbered ones
++	 * should've incremented exactly by 1.
++	 */
++	for (i = 0; i < pmcr_n; i++) {
++		if (i % 2) {
++			GUEST_ASSERT_1(!pmu_irq_received(i), i);
++
++			cnt = acc->read_cntr(i);
++			GUEST_ASSERT_2(cnt == 2, i, cnt);
++		} else {
++			GUEST_ASSERT_1(pmu_irq_received(i), i);
++		}
++	}
++
++	/* Cleanup the states */
++	for (i = 0; i < pmcr_n; i++) {
++		if (i % 2 == 0)
++			pmu_irq_exit(i);
++		disable_counter(i);
++	}
++}
++
+ static void test_event_count(uint64_t event, int pmc_idx, bool expect_count)
+ {
+ 	switch (event) {
+@@ -739,6 +796,9 @@ static void test_basic_pmu_functionality(void)
+ 
+ 	/* Test chained events */
+ 	test_chained_count(0);
++
++	/* Test running chained events on all the implemented counters */
++	test_chain_all_counters();
+ }
+ 
+ /*
+-- 
+2.39.1.581.gbfd45094c4-goog
 
-are available in the Git repository at:
-
-  https://github.com/kvm-x86/linux.git tags/kvm-x86-mmu-6.3
-
-for you to fetch changes up to 11b36fe7d4500c8ef73677c087f302fd713101c2:
-
-  KVM: x86/mmu: Use kstrtobool() instead of strtobool() (2023-01-24 10:05:49 -0800)
-
-----------------------------------------------------------------
-KVM x86 MMU changes for 6.3:
-
- - Fix and cleanup the range-based TLB flushing code, used when KVM is
-   running on Hyper-V
-
- - A few one-off cleanups
-
-----------------------------------------------------------------
-Christophe JAILLET (1):
-      KVM: x86/mmu: Use kstrtobool() instead of strtobool()
-
-Hou Wenlong (6):
-      KVM: x86/mmu: Move round_gfn_for_level() helper into mmu_internal.h
-      KVM: x86/mmu: Fix wrong gfn range of tlb flushing in kvm_set_pte_rmapp()
-      KVM: x86/mmu: Reduce gfn range of tlb flushing in tdp_mmu_map_handle_target_level()
-      KVM: x86/mmu: Fix wrong start gfn of tlb flushing with range
-      KVM: x86/mmu: Fix wrong gfn range of tlb flushing in validate_direct_spte()
-      KVM: x86/mmu: Cleanup range-based flushing for given page
-
-Lai Jiangshan (2):
-      kvm: x86/mmu: Rename SPTE_TDP_AD_ENABLED_MASK to SPTE_TDP_AD_ENABLED
-      kvm: x86/mmu: Don't clear write flooding for direct SP
-
-Wei Liu (1):
-      KVM: x86/mmu: fix an incorrect comment in kvm_mmu_new_pgd()
-
- arch/x86/kvm/mmu/mmu.c          | 45 +++++++++++++++++++++++++----------------
- arch/x86/kvm/mmu/mmu_internal.h | 14 +++++++++++++
- arch/x86/kvm/mmu/paging_tmpl.h  | 13 +++++-------
- arch/x86/kvm/mmu/spte.c         |  6 +++---
- arch/x86/kvm/mmu/spte.h         | 16 +++++++--------
- arch/x86/kvm/mmu/tdp_iter.c     | 11 +++-------
- arch/x86/kvm/mmu/tdp_mmu.c      |  6 ++----
- 7 files changed, 63 insertions(+), 48 deletions(-)
