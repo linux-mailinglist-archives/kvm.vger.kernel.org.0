@@ -2,61 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 152B369733C
-	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 02:10:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F412697331
+	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 02:08:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232978AbjBOBKV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Feb 2023 20:10:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56324 "EHLO
+        id S233324AbjBOBI2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Feb 2023 20:08:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232830AbjBOBKR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Feb 2023 20:10:17 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADBEC32E4C
-        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 17:09:49 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id l18-20020a17090add9200b00230f60889d6so7236484pjv.3
-        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 17:09:49 -0800 (PST)
+        with ESMTP id S232951AbjBOBIA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Feb 2023 20:08:00 -0500
+Received: from mail-io1-xd4a.google.com (mail-io1-xd4a.google.com [IPv6:2607:f8b0:4864:20::d4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7439732539
+        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 17:07:37 -0800 (PST)
+Received: by mail-io1-xd4a.google.com with SMTP id t185-20020a6bc3c2000000b00733ef3dabe3so11299664iof.14
+        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 17:07:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=03cgvFPbNe6ByH9lxxxwUZiJnOgauDq0XtWJ16612IY=;
-        b=Y4Ns2yXU/Y3lRHxaf5/ChQCqmGY80GsFChbWemb2iDqSQX5BNtQdidHVvWioMgOMr1
-         QpXz/wqCPLUUSAAXmiBtHOI3ytlnxOaaebtdQEe8M01pamoBvcU+nFjo2yvCfnQjsV3Q
-         PHQmA4vCwZ34u1+dZv+tfN0f1jOG6aR2kyybkNuESg5JC92/oy8Z5JPoufdyvHyyeLk2
-         hEBD8VdmV68LiO+PCau6sDEc2TRFwdpu0fk0XLrjD5dEM3N/XmYsy7I8jz2Jj7mIWZQs
-         3LTUS77F0RdPnwgXwKEbOA8BS20vWLbSuptIoFI+EWaIt//atn2OLxzor+GeIDMPzQim
-         b/hg==
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=BS2eIj6/WnJybsbailZVj7vXOCSqKu90WeWXBSqAGkA=;
+        b=AjTSergnfy8C/785t8axK+Vvs1zbfaktJqaWCHRu2YXjH4xSRl/eM7AVQrl/R1X4W0
+         Uw3DsRxwBYSZbHBn3a50IqNX0UB5SJmO6sHffJg1P0Bxnwv6AxD/+TbMWp78pL3GW6dO
+         xz3WajyDhVJiyiUgqwXXdBGiiF60PBusNvd4DX+lO6ijTpygrm8HYu94OC3zngjlrJEd
+         pfXf0uTNxmyDGyxCL4rdXRjIMORzQ2ycxh0iTW8lWA7rfbrU+o+bM1Ox+D0XaSAstClp
+         /hxqsgBELyFZCuUJtJjhEnjO1QAi2UGnfSppIUljZnIZqQGIyx5NuAb5aZxrE3E8Eg7F
+         1UMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=03cgvFPbNe6ByH9lxxxwUZiJnOgauDq0XtWJ16612IY=;
-        b=KsfDeQ7BStg1pMry2SIQys1NdBjBokAXLS1su9Er4pxgCzEyW2iAdR0R13QcYp6gYd
-         bQQc8BD84cHgbZN9X+oXFhb9VVFAJ+eJ+ESjg/W3uPWaZpNlUcC4kEk2lZMbVzsE8610
-         9d0cnuHJ8t8G7y8F276y7RELoavJXL/l+3hverW4bxIenAAJgkQUSEzxTi9fGGkmjSAQ
-         JtjK7vKUDyxfxaNDv4ZBkakEWR0jZ4YTyjYfAg9OunXHpGuYOSnxwWEpxd7lk/mad6Yz
-         PMUha6e1pr200DUZcuru/YUXvFpLb0m06XjgGkc1w1gPAPudMa/cvQyOmJIaKK6w3B4N
-         8UoQ==
-X-Gm-Message-State: AO0yUKXrkD6SQ+BT9F+LuFaOjSouwtkAGPMHJS8Oy3gffcb0BQPh9AW/
-        6spf8fp/yMC05I3/LElQeqL8PQVhot4=
-X-Google-Smtp-Source: AK7set/dFXuS4OKP5Jhrmgn9iWQBsZg8tuoPs/ACl5tisbkxkQp1bPDAQSy/w3we1Na6WQVOIex1AlSKVR0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a62:5b86:0:b0:5a8:d169:581e with SMTP id
- p128-20020a625b86000000b005a8d169581emr16698pfb.49.1676423312040; Tue, 14 Feb
- 2023 17:08:32 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 14 Feb 2023 17:07:13 -0800
-In-Reply-To: <20230215010718.415413-1-seanjc@google.com>
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BS2eIj6/WnJybsbailZVj7vXOCSqKu90WeWXBSqAGkA=;
+        b=RUMgUVInkse13HDSTAMGttrXP5/WEX/ou9pTsJZWZGFUxy2f4kZk5utWUOppsvchDn
+         8H4RfQpcsQOILk6NBxPD4T93vdGHfvgXH+lCy2IS5PAG6EX1fSqL691AGgUZ8xeHdi7S
+         t8zePBeQeBy0RZba3aUOWNHo2h7dduNY5ugPsZIo4d1i4f83S+1/23BzkVCSvxE9Vduj
+         HR+JA31G5CLCP1A9nzgw+BRcn8jfNXtiHssQlLmtrJzUsEET2rN1OVL6C0KVT7Ma3fi0
+         zcFpYSs7ayd+B8V+BudRo9y/t8k8L4OJAUI1n4Ugxe9kOBIOTAkuOycUZDoNqwB5sgj/
+         4hpw==
+X-Gm-Message-State: AO0yUKX+nzZ/dWPZXg2InxvfVx7BQYha+1fdSW+IITOCZa8W/DProUey
+        HiFzPD3J0WXn08UZYVe7+oE9vK8aldKY
+X-Google-Smtp-Source: AK7set/7gzYfd4tGsCtPonDEuhVJyQ8zfTN9MXyCGP1j08RK6Rci4b2doJcZes78PxFC87kC1dW/HOjrZgFW
+X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:22b5])
+ (user=rananta job=sendgmr) by 2002:a05:6602:334a:b0:73d:fd95:8e1c with SMTP
+ id c10-20020a056602334a00b0073dfd958e1cmr304543ioz.41.1676423256592; Tue, 14
+ Feb 2023 17:07:36 -0800 (PST)
+Date:   Wed, 15 Feb 2023 01:07:13 +0000
+In-Reply-To: <20230215010717.3612794-1-rananta@google.com>
 Mime-Version: 1.0
-References: <20230215010718.415413-1-seanjc@google.com>
+References: <20230215010717.3612794-1-rananta@google.com>
 X-Mailer: git-send-email 2.39.1.581.gbfd45094c4-goog
-Message-ID: <20230215010718.415413-3-seanjc@google.com>
-Subject: [GIT PULL] KVM: x86: Misc changes for 6.3
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org
+Message-ID: <20230215010717.3612794-13-rananta@google.com>
+Subject: [REPOST PATCH 12/16] selftests: KVM: aarch64: Test PMU overflow/IRQ functionality
+From:   Raghavendra Rao Ananta <rananta@google.com>
+To:     Oliver Upton <oupton@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Ricardo Koller <ricarkol@google.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -68,106 +76,371 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Misc KVM x86 changes for 6.3.
+Extend the vCPU migration test to also validate the vPMU's
+functionality when set up for overflow conditions.
 
-Note, the cpufeatures.h change will conflict with changes in the tip tree, but
-the resolution should be straightforward.
+Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+---
+ .../testing/selftests/kvm/aarch64/vpmu_test.c | 223 ++++++++++++++++--
+ 1 file changed, 198 insertions(+), 25 deletions(-)
 
-The following changes since commit 7cb79f433e75b05d1635aefaa851cfcd1cb7dc4f:
+diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_test.c b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
+index 0c9d801f4e602..066dc17fa3906 100644
+--- a/tools/testing/selftests/kvm/aarch64/vpmu_test.c
++++ b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
+@@ -21,7 +21,9 @@
+  *
+  * 4. Since the PMU registers are per-cpu, stress KVM by frequently
+  * migrating the guest vCPU to random pCPUs in the system, and check
+- * if the vPMU is still behaving as expected.
++ * if the vPMU is still behaving as expected. The sub-tests include
++ * testing basic functionalities such as basic counters behavior,
++ * overflow, and overflow interrupts.
+  *
+  * Copyright (c) 2022 Google LLC.
+  *
+@@ -41,13 +43,27 @@
+ #include <sys/sysinfo.h>
+ 
+ #include "delay.h"
++#include "gic.h"
++#include "spinlock.h"
+ 
+ /* The max number of the PMU event counters (excluding the cycle counter) */
+ #define ARMV8_PMU_MAX_GENERAL_COUNTERS	(ARMV8_PMU_MAX_COUNTERS - 1)
+ 
++/* The cycle counter bit position that's common among the PMU registers */
++#define ARMV8_PMU_CYCLE_COUNTER_IDX	31
++
+ /* The max number of event numbers that's supported */
+ #define ARMV8_PMU_MAX_EVENTS		64
+ 
++#define PMU_IRQ				23
++
++#define COUNT_TO_OVERFLOW	0xFULL
++#define PRE_OVERFLOW_32		(GENMASK(31, 0) - COUNT_TO_OVERFLOW + 1)
++#define PRE_OVERFLOW_64		(GENMASK(63, 0) - COUNT_TO_OVERFLOW + 1)
++
++#define GICD_BASE_GPA	0x8000000ULL
++#define GICR_BASE_GPA	0x80A0000ULL
++
+ #define msecs_to_usecs(msec)		((msec) * 1000LL)
+ 
+ /*
+@@ -162,6 +178,17 @@ static inline void write_sel_evtyper(int sel, unsigned long val)
+ 	isb();
+ }
+ 
++static inline void write_pmovsclr(unsigned long val)
++{
++	write_sysreg(val, pmovsclr_el0);
++	isb();
++}
++
++static unsigned long read_pmovsclr(void)
++{
++	return read_sysreg(pmovsclr_el0);
++}
++
+ static inline void enable_counter(int idx)
+ {
+ 	uint64_t v = read_sysreg(pmcntenset_el0);
+@@ -178,11 +205,33 @@ static inline void disable_counter(int idx)
+ 	isb();
+ }
+ 
++static inline void enable_irq(int idx)
++{
++	uint64_t v = read_sysreg(pmcntenset_el0);
++
++	write_sysreg(BIT(idx) | v, pmintenset_el1);
++	isb();
++}
++
++static inline void disable_irq(int idx)
++{
++	uint64_t v = read_sysreg(pmcntenset_el0);
++
++	write_sysreg(BIT(idx) | v, pmintenclr_el1);
++	isb();
++}
++
+ static inline uint64_t read_cycle_counter(void)
+ {
+ 	return read_sysreg(pmccntr_el0);
+ }
+ 
++static inline void write_cycle_counter(uint64_t v)
++{
++	write_sysreg(v, pmccntr_el0);
++	isb();
++}
++
+ static inline void reset_cycle_counter(void)
+ {
+ 	uint64_t v = read_sysreg(pmcr_el0);
+@@ -289,6 +338,15 @@ struct guest_data {
+ 
+ static struct guest_data guest_data;
+ 
++/* Data to communicate among guest threads */
++struct guest_irq_data {
++	uint32_t pmc_idx_bmap;
++	uint32_t irq_received_bmap;
++	struct spinlock lock;
++};
++
++static struct guest_irq_data guest_irq_data;
++
+ #define VCPU_MIGRATIONS_TEST_ITERS_DEF		1000
+ #define VCPU_MIGRATIONS_TEST_MIGRATION_FREQ_MS	2
+ 
+@@ -322,6 +380,79 @@ static void guest_sync_handler(struct ex_regs *regs)
+ 	expected_ec = INVALID_EC;
+ }
+ 
++static void guest_validate_irq(int pmc_idx, uint32_t pmovsclr, uint32_t pmc_idx_bmap)
++{
++	/*
++	 * Fail if there's an interrupt from unexpected PMCs.
++	 * All the expected events' IRQs may not arrive at the same time.
++	 * Hence, check if the interrupt is valid only if it's expected.
++	 */
++	if (pmovsclr & BIT(pmc_idx)) {
++		GUEST_ASSERT_3(pmc_idx_bmap & BIT(pmc_idx), pmc_idx, pmovsclr, pmc_idx_bmap);
++		write_pmovsclr(BIT(pmc_idx));
++	}
++}
++
++static void guest_irq_handler(struct ex_regs *regs)
++{
++	uint32_t pmc_idx_bmap;
++	uint64_t i, pmcr_n = get_pmcr_n();
++	uint32_t pmovsclr = read_pmovsclr();
++	unsigned int intid = gic_get_and_ack_irq();
++
++	/* No other IRQ apart from the PMU IRQ is expected */
++	GUEST_ASSERT_1(intid == PMU_IRQ, intid);
++
++	spin_lock(&guest_irq_data.lock);
++	pmc_idx_bmap = READ_ONCE(guest_irq_data.pmc_idx_bmap);
++
++	for (i = 0; i < pmcr_n; i++)
++		guest_validate_irq(i, pmovsclr, pmc_idx_bmap);
++	guest_validate_irq(ARMV8_PMU_CYCLE_COUNTER_IDX, pmovsclr, pmc_idx_bmap);
++
++	/* Mark IRQ as recived for the corresponding PMCs */
++	WRITE_ONCE(guest_irq_data.irq_received_bmap, pmovsclr);
++	spin_unlock(&guest_irq_data.lock);
++
++	gic_set_eoi(intid);
++}
++
++static int pmu_irq_received(int pmc_idx)
++{
++	bool irq_received;
++
++	spin_lock(&guest_irq_data.lock);
++	irq_received = READ_ONCE(guest_irq_data.irq_received_bmap) & BIT(pmc_idx);
++	WRITE_ONCE(guest_irq_data.irq_received_bmap, guest_irq_data.pmc_idx_bmap & ~BIT(pmc_idx));
++	spin_unlock(&guest_irq_data.lock);
++
++	return irq_received;
++}
++
++static void pmu_irq_init(int pmc_idx)
++{
++	write_pmovsclr(BIT(pmc_idx));
++
++	spin_lock(&guest_irq_data.lock);
++	WRITE_ONCE(guest_irq_data.irq_received_bmap, guest_irq_data.pmc_idx_bmap & ~BIT(pmc_idx));
++	WRITE_ONCE(guest_irq_data.pmc_idx_bmap, guest_irq_data.pmc_idx_bmap | BIT(pmc_idx));
++	spin_unlock(&guest_irq_data.lock);
++
++	enable_irq(pmc_idx);
++}
++
++static void pmu_irq_exit(int pmc_idx)
++{
++	write_pmovsclr(BIT(pmc_idx));
++
++	spin_lock(&guest_irq_data.lock);
++	WRITE_ONCE(guest_irq_data.irq_received_bmap, guest_irq_data.pmc_idx_bmap & ~BIT(pmc_idx));
++	WRITE_ONCE(guest_irq_data.pmc_idx_bmap, guest_irq_data.pmc_idx_bmap & ~BIT(pmc_idx));
++	spin_unlock(&guest_irq_data.lock);
++
++	disable_irq(pmc_idx);
++}
++
+ /*
+  * Run the given operation that should trigger an exception with the
+  * given exception class. The exception handler (guest_sync_handler)
+@@ -420,12 +551,20 @@ static void execute_precise_instrs(int num, uint32_t pmcr)
+ 	precise_instrs_loop(loop, pmcr);
+ }
+ 
+-static void test_instructions_count(int pmc_idx, bool expect_count)
++static void test_instructions_count(int pmc_idx, bool expect_count, bool test_overflow)
+ {
+ 	int i;
+ 	struct pmc_accessor *acc;
+-	uint64_t cnt;
+-	int instrs_count = 100;
++	uint64_t cntr_val = 0;
++	int instrs_count = 500;
++
++	if (test_overflow) {
++		/* Overflow scenarios can only be tested when a count is expected */
++		GUEST_ASSERT_1(expect_count, pmc_idx);
++
++		cntr_val = PRE_OVERFLOW_32;
++		pmu_irq_init(pmc_idx);
++	}
+ 
+ 	enable_counter(pmc_idx);
+ 
+@@ -433,41 +572,68 @@ static void test_instructions_count(int pmc_idx, bool expect_count)
+ 	for (i = 0; i < ARRAY_SIZE(pmc_accessors); i++) {
+ 		acc = &pmc_accessors[i];
+ 
+-		pmu_disable_reset();
+-
++		acc->write_cntr(pmc_idx, cntr_val);
+ 		acc->write_typer(pmc_idx, ARMV8_PMUV3_PERFCTR_INST_RETIRED);
+ 
+-		/* Enable the PMU and execute precisely number of instructions as a workload */
+-		execute_precise_instrs(instrs_count, read_sysreg(pmcr_el0) | ARMV8_PMU_PMCR_E);
++		/*
++		 * Enable the PMU and execute a precise number of instructions as a workload.
++		 * Since execute_precise_instrs() disables the PMU at the end, 'instrs_count'
++		 * should have enough instructions to raise an IRQ.
++		 */
++		execute_precise_instrs(instrs_count, ARMV8_PMU_PMCR_E);
+ 
+-		/* If a count is expected, the counter should be increased by 'instrs_count' */
+-		cnt = acc->read_cntr(pmc_idx);
+-		GUEST_ASSERT_4(expect_count == (cnt == instrs_count),
+-				i, expect_count, cnt, instrs_count);
++		/*
++		 * If an overflow is expected, only check for the overflag flag.
++		 * As overflow interrupt is enabled, the interrupt would add additional
++		 * instructions and mess up the precise instruction count. Hence, measure
++		 * the instructions count only when the test is not set up for an overflow.
++		 */
++		if (test_overflow) {
++			GUEST_ASSERT_2(pmu_irq_received(pmc_idx), pmc_idx, i);
++		} else {
++			uint64_t cnt = acc->read_cntr(pmc_idx);
++
++			GUEST_ASSERT_4(expect_count == (cnt == instrs_count),
++					pmc_idx, i, cnt, expect_count);
++		}
+ 	}
+ 
+-	disable_counter(pmc_idx);
++	if (test_overflow)
++		pmu_irq_exit(pmc_idx);
+ }
+ 
+-static void test_cycles_count(bool expect_count)
++static void test_cycles_count(bool expect_count, bool test_overflow)
+ {
+ 	uint64_t cnt;
+ 
+-	pmu_enable();
+-	reset_cycle_counter();
++	if (test_overflow) {
++		/* Overflow scenarios can only be tested when a count is expected */
++		GUEST_ASSERT(expect_count);
++
++		write_cycle_counter(PRE_OVERFLOW_64);
++		pmu_irq_init(ARMV8_PMU_CYCLE_COUNTER_IDX);
++	} else {
++		reset_cycle_counter();
++	}
+ 
+ 	/* Count cycles in EL0 and EL1 */
+ 	write_pmccfiltr(0);
+ 	enable_cycle_counter();
+ 
++	/* Enable the PMU and execute precisely number of instructions as a workload */
++	execute_precise_instrs(500, read_sysreg(pmcr_el0) | ARMV8_PMU_PMCR_E);
+ 	cnt = read_cycle_counter();
+ 
+ 	/*
+ 	 * If a count is expected by the test, the cycle counter should be increased by
+-	 * at least 1, as there is at least one instruction between enabling the
++	 * at least 1, as there are a number of instructions between enabling the
+ 	 * counter and reading the counter.
+ 	 */
+ 	GUEST_ASSERT_2(expect_count == (cnt > 0), cnt, expect_count);
++	if (test_overflow) {
++		GUEST_ASSERT_2(pmu_irq_received(ARMV8_PMU_CYCLE_COUNTER_IDX), cnt, expect_count);
++		pmu_irq_exit(ARMV8_PMU_CYCLE_COUNTER_IDX);
++	}
+ 
+ 	disable_cycle_counter();
+ 	pmu_disable_reset();
+@@ -477,19 +643,28 @@ static void test_event_count(uint64_t event, int pmc_idx, bool expect_count)
+ {
+ 	switch (event) {
+ 	case ARMV8_PMUV3_PERFCTR_INST_RETIRED:
+-		test_instructions_count(pmc_idx, expect_count);
++		test_instructions_count(pmc_idx, expect_count, false);
+ 		break;
+ 	case ARMV8_PMUV3_PERFCTR_CPU_CYCLES:
+-		test_cycles_count(expect_count);
++		test_cycles_count(expect_count, false);
+ 		break;
+ 	}
+ }
+ 
+ static void test_basic_pmu_functionality(void)
+ {
++	local_irq_disable();
++	gic_init(GIC_V3, 1, (void *)GICD_BASE_GPA, (void *)GICR_BASE_GPA);
++	gic_irq_enable(PMU_IRQ);
++	local_irq_enable();
++
+ 	/* Test events on generic and cycle counters */
+-	test_instructions_count(0, true);
+-	test_cycles_count(true);
++	test_instructions_count(0, true, false);
++	test_cycles_count(true, false);
++
++	/* Test overflow with interrupts on generic and cycle counters */
++	test_instructions_count(0, true, true);
++	test_cycles_count(true, true);
+ }
+ 
+ /*
+@@ -813,9 +988,6 @@ static void guest_code(void)
+ 	GUEST_DONE();
+ }
+ 
+-#define GICD_BASE_GPA	0x8000000ULL
+-#define GICR_BASE_GPA	0x80A0000ULL
+-
+ static unsigned long *
+ set_event_filters(struct kvm_vcpu *vcpu, struct kvm_pmu_event_filter *pmu_event_filters)
+ {
+@@ -866,7 +1038,7 @@ create_vpmu_vm(void *guest_code, struct kvm_pmu_event_filter *pmu_event_filters)
+ 	struct kvm_vcpu *vcpu;
+ 	struct kvm_vcpu_init init;
+ 	uint8_t pmuver, ec;
+-	uint64_t dfr0, irq = 23;
++	uint64_t dfr0, irq = PMU_IRQ;
+ 	struct vpmu_vm *vpmu_vm;
+ 	struct kvm_device_attr irq_attr = {
+ 		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
+@@ -883,6 +1055,7 @@ create_vpmu_vm(void *guest_code, struct kvm_pmu_event_filter *pmu_event_filters)
+ 
+ 	vpmu_vm->vm = vm = vm_create(1);
+ 	vm_init_descriptor_tables(vm);
++	vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT, guest_irq_handler);
+ 
+ 	/* Catch exceptions for easier debugging */
+ 	for (ec = 0; ec < ESR_EC_NUM; ec++) {
+-- 
+2.39.1.581.gbfd45094c4-goog
 
-  KVM: PPC: Fix refactoring goof in kvmppc_e500mc_init() (2023-01-24 13:00:32 -0500)
-
-are available in the Git repository at:
-
-  https://github.com/kvm-x86/linux.git tags/kvm-x86-misc-6.3
-
-for you to fetch changes up to e73ba25fdc241c06ab48a1f708a30305d6036e66:
-
-  KVM: x86: Simplify msr_io() (2023-02-03 15:55:17 -0800)
-
-----------------------------------------------------------------
-KVM x86 changes for 6.3:
-
- - Advertise support for Intel's fancy new fast REP string features
-
- - Fix a double-shootdown issue in the emergency reboot code
-
- - Ensure GIF=1 and disable SVM during an emergency reboot, i.e. give SVM
-   similar treatment to VMX
-
- - Update Xen's TSC info CPUID sub-leaves as appropriate
-
- - Add support for Hyper-V's extended hypercalls, where "support" at this
-   point is just forwarding the hypercalls to userspace
-
- - Clean up the kvm->lock vs. kvm->srcu sequences when updating the PMU and
-   MSR filters
-
- - One-off fixes and cleanups
-
-----------------------------------------------------------------
-David Matlack (1):
-      KVM: x86: Replace cpu_dirty_logging_count with nr_memslots_dirty_logging
-
-Jim Mattson (2):
-      x86/cpufeatures: Add macros for Intel's new fast rep string features
-      KVM: x86: Advertise fast REP string features inherent to the CPU
-
-Kees Cook (1):
-      KVM: x86: Replace 0-length arrays with flexible arrays
-
-Michal Luczaj (8):
-      KVM: x86/emulator: Fix segment load privilege level validation
-      KVM: x86/emulator: Fix comment in __load_segment_descriptor()
-      KVM: x86: Optimize kvm->lock and SRCU interaction (KVM_SET_PMU_EVENT_FILTER)
-      KVM: x86: Optimize kvm->lock and SRCU interaction (KVM_X86_SET_MSR_FILTER)
-      KVM: x86: Simplify msr_filter update
-      KVM: x86: Explicitly state lockdep condition of msr_filter update
-      KVM: x86: Remove unnecessary initialization in kvm_vm_ioctl_set_msr_filter()
-      KVM: x86: Simplify msr_io()
-
-Paul Durrant (2):
-      KVM: x86/cpuid: generalize kvm_update_kvm_cpuid_base() and also capture limit
-      KVM: x86/xen: update Xen CPUID Leaf 4 (tsc info) sub-leaves, if present
-
-Sean Christopherson (4):
-      x86/crash: Disable virt in core NMI crash handler to avoid double shootdown
-      x86/virt: Force GIF=1 prior to disabling SVM (for reboot flows)
-      x86/reboot: Disable virtualization in an emergency if SVM is supported
-      x86/reboot: Disable SVM, not just VMX, when stopping CPUs
-
-Vipin Sharma (5):
-      KVM: x86: hyper-v: Use common code for hypercall userspace exit
-      KVM: x86: hyper-v: Add extended hypercall support in Hyper-v
-      KVM: selftests: Test Hyper-V extended hypercall enablement
-      KVM: selftests: Replace hardcoded Linux OS id with HYPERV_LINUX_OS_ID
-      KVM: selftests: Test Hyper-V extended hypercall exit to userspace
-
-ye xingchen (1):
-      KVM: x86: Replace IS_ERR() with IS_ERR_VALUE()
-
- arch/x86/include/asm/cpufeatures.h                 |  3 +
- arch/x86/include/asm/kvm_host.h                    |  9 +-
- arch/x86/include/asm/reboot.h                      |  2 +
- arch/x86/include/asm/virtext.h                     | 16 +++-
- arch/x86/include/asm/xen/hypervisor.h              |  4 +-
- arch/x86/include/uapi/asm/kvm.h                    |  5 +-
- arch/x86/kernel/crash.c                            | 17 +---
- arch/x86/kernel/reboot.c                           | 88 ++++++++++++++------
- arch/x86/kernel/smp.c                              |  6 +-
- arch/x86/kvm/cpuid.c                               | 31 ++++---
- arch/x86/kvm/emulate.c                             |  6 +-
- arch/x86/kvm/hyperv.c                              | 55 ++++++++----
- arch/x86/kvm/pmu.c                                 |  3 +-
- arch/x86/kvm/vmx/vmx.c                             |  9 +-
- arch/x86/kvm/x86.c                                 | 34 +++-----
- arch/x86/kvm/xen.c                                 | 26 ++++++
- arch/x86/kvm/xen.h                                 |  7 ++
- tools/testing/selftests/kvm/Makefile               |  1 +
- .../testing/selftests/kvm/include/x86_64/hyperv.h  |  5 ++
- tools/testing/selftests/kvm/lib/kvm_util.c         |  1 +
- tools/testing/selftests/kvm/x86_64/hyperv_clock.c  |  2 +-
- .../kvm/x86_64/hyperv_extended_hypercalls.c        | 97 ++++++++++++++++++++++
- .../testing/selftests/kvm/x86_64/hyperv_features.c |  9 ++
- 23 files changed, 327 insertions(+), 109 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
