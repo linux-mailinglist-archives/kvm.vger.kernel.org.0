@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D8235698263
-	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 18:41:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 448E5698265
+	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 18:41:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230119AbjBORlC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Feb 2023 12:41:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44802 "EHLO
+        id S230106AbjBORlF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Feb 2023 12:41:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230018AbjBORlA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Feb 2023 12:41:00 -0500
+        with ESMTP id S230116AbjBORlD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Feb 2023 12:41:03 -0500
 Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 476A939BB5
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 09:40:59 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-52ecbe73389so192006807b3.0
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 09:40:59 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCA2E39B90
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 09:41:00 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-4c11ae6ab25so225122207b3.8
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 09:41:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=M+kDNgoMDtvFvURb+a81Y7HPZ850UMfDMsGSfIPtSEw=;
-        b=hJ9vl3m71GYNnf3TgzGMxykAT00VnMYT5gHKuaJsMZ8KbemR75oOEt0WuweEox0XJp
-         /aJ7TjIvNwG30kMr6RFAkVMCb22BBtNlhiURvCwfQcgyJrtqiX1FCOzDnboyu6XQnph6
-         mgIhCyOWuWDj9+GP7S29WXup+oyRW1Msf6nxH+plJxuqMn5xSTqAhN26TGWUJIqDCna+
-         MHBlMhYMLcmS41tdUEOzpEME9EuPXSZadpttlRV0/2wt3WYEej+vhlDjRFph7ZDTgGUO
-         v3UNs4Npavu675RBlyPO46U16Fq+Ic7Kda2TL/OBNyufLZjx7N4VrYNttbbE3zE6yaGJ
-         aOKg==
+        bh=2aQfWdKPXuFG6NSbYocOUPq5yC9G6Tl83wDoUvzVHnI=;
+        b=Ua5IO7vGngB3DNTztZZETtTDciYiE4ZSiNpD2944my3OwRFQUckvrgPt2B78tyOqXi
+         F5kKqBAoj6U1HKy1VTJEhvlYGW3FWgCNy4cvKT9FHRcMvJ8MHnHbjozdlzOln7nl9oyg
+         JRgPMkCocBqDVJTgdXR/qsVvybn4hlHa1C7dOwtMVjOGWyj9O6BBdiYwnsaSH4EMjiEV
+         jllLlMJozi4joV+FdfhpVn2jSts0h8cnkwTnWayt7Lsoj3eUqLy1i0CczBm48omZvZoK
+         z7ebDlIWrmJBod1cOC40C4r+VfkG6cyJNX8DgPgLiy4QiEKKoE0Oc9WE/2rBp1QnS8hz
+         Zr4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=M+kDNgoMDtvFvURb+a81Y7HPZ850UMfDMsGSfIPtSEw=;
-        b=KIcEM74Y2+RumbU4/7HaHjHqDP0+fpIw31yM7jDSkdpuODhHD5V2+0mK3mYCJIvpUh
-         y58qskTocfyX8zNAKEZY5esWgDJWYBuzGVSRT/XI0MFFU4lF36OCSLO1fNGtYl6MgDTm
-         0Tat66b4vvzPd7B38LF7JDcMU2S7h/ZEVL+QJbIU4/4sIikJyD8TIH3Ur6F4NSHmr87w
-         N9ucMn37MBTYKBYRGBPfUW6EYMuTkxvHZN7WiHI1MrDrZBC/A94MMA14zYpplsMBdERm
-         4GHZgrvIaO7kWO0AYxepbpexrhllAoJdKyeGWmRLoJJzvWcMQ1VlYx5YP+GdWcItcNl1
-         I57Q==
-X-Gm-Message-State: AO0yUKV6RP5I5++fxmklRPXnUQbfgS8NiDlfR7fxPceRyJshQE9tJsGo
-        BgOEZoB9UQFObVyEIw9ZfSW2xvNdpCqRpw==
-X-Google-Smtp-Source: AK7set8UK9Lwh5Z8Md4clrULGO4vd49cXttUTNvL3kcNkt7nFP4UQCaVRVWZIq+TySiyPYPI+8vfBLFgSpLT/w==
+        bh=2aQfWdKPXuFG6NSbYocOUPq5yC9G6Tl83wDoUvzVHnI=;
+        b=UATIG4rMByvcbn2zsuq4vMyA5byIhQdEH/MK+q42fGGnaHHJk2pMIC92YTAajsED1L
+         IOx+mYvdJefTW9eCiyz/FCzeV5SNJTCNgxPp2t1z/qgyxTlQ+9Dgiq4k7lldjMbR7sI4
+         hG8QGwSa5qvWaI8yllRRCdtZjbKdIbEVa2geIZWQKw34rWUJBgGooxQvqLdS++/6+sQw
+         HToljgQGIXXbScJpWWNRhuTQPF3I0mYdTxdDah85DWYdBGWf4swCxLZ/L3KBnKXbF5eK
+         GgMNp/oucIvyN7agehNTU42acyH2dKrokSEO8goFXBuMo8nuKsX3NU3369jajenURpNg
+         vLiA==
+X-Gm-Message-State: AO0yUKUv0YlXA0fwiu1fVA6T2RSu2B1vgF9bXHOr/uASrmFJRy1OyXoN
+        MweLJlEeEKM4KiZWvwvOTJPIBO0hHs4hsA==
+X-Google-Smtp-Source: AK7set9UpWTD9Hf0MbU51HmGeZZNYgY6nfTTY6vNSaQoP2nvyZ6+CLZ7Rwm9HKLf3iyzgtqf832vzhg6ZxuPMg==
 X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a5b:8c:0:b0:80b:a1c7:e81a with SMTP id
- b12-20020a5b008c000000b0080ba1c7e81amr347590ybp.253.1676482858484; Wed, 15
- Feb 2023 09:40:58 -0800 (PST)
-Date:   Wed, 15 Feb 2023 17:40:39 +0000
+ (user=ricarkol job=sendgmr) by 2002:a25:dfcf:0:b0:886:23d6:1b4f with SMTP id
+ w198-20020a25dfcf000000b0088623d61b4fmr347924ybg.115.1676482860031; Wed, 15
+ Feb 2023 09:41:00 -0800 (PST)
+Date:   Wed, 15 Feb 2023 17:40:40 +0000
 In-Reply-To: <20230215174046.2201432-1-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20230215174046.2201432-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.39.1.637.g21b0678d19-goog
-Message-ID: <20230215174046.2201432-6-ricarkol@google.com>
-Subject: [PATCH v3 05/12] KVM: arm64: Refactor kvm_arch_commit_memory_region()
+Message-ID: <20230215174046.2201432-7-ricarkol@google.com>
+Subject: [PATCH v3 06/12] KVM: arm64: Add kvm_uninit_stage2_mmu()
 From:   Ricardo Koller <ricarkol@google.com>
 To:     pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
         yuzenghui@huawei.com, dmatlack@google.com
@@ -72,53 +72,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Refactor kvm_arch_commit_memory_region() as a preparation for a future
-commit to look cleaner and more understandable. Also, it looks more
-like its x86 counterpart (in kvm_mmu_slot_apply_flags()).
+Add kvm_uninit_stage2_mmu() and move kvm_free_stage2_pgd() into it. A
+future commit will add some more things to do inside of
+kvm_uninit_stage2_mmu().
 
 No functional change intended.
 
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- arch/arm64/kvm/mmu.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ arch/arm64/include/asm/kvm_mmu.h | 1 +
+ arch/arm64/kvm/mmu.c             | 7 ++++++-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index e4a7e6369499..058f3ae5bc26 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -167,6 +167,7 @@ void free_hyp_pgds(void);
+ 
+ void stage2_unmap_vm(struct kvm *kvm);
+ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long type);
++void kvm_uninit_stage2_mmu(struct kvm *kvm);
+ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
+ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ 			  phys_addr_t pa, unsigned long size, bool writable);
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 9bd3c2cfb476..d2c5e6992459 100644
+index d2c5e6992459..812633a75e74 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1761,20 +1761,27 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
- 				   const struct kvm_memory_slot *new,
- 				   enum kvm_mr_change change)
- {
-+	bool log_dirty_pages = new && new->flags & KVM_MEM_LOG_DIRTY_PAGES;
-+
- 	/*
- 	 * At this point memslot has been committed and there is an
- 	 * allocated dirty_bitmap[], dirty pages will be tracked while the
- 	 * memory slot is write protected.
- 	 */
--	if (change != KVM_MR_DELETE && new->flags & KVM_MEM_LOG_DIRTY_PAGES) {
-+	if (log_dirty_pages) {
-+
-+		if (change == KVM_MR_DELETE)
-+			return;
-+
- 		/*
- 		 * If we're with initial-all-set, we don't need to write
- 		 * protect any pages because they're all reported as dirty.
- 		 * Huge pages and normal pages will be write protect gradually.
- 		 */
--		if (!kvm_dirty_log_manual_protect_and_init_set(kvm)) {
--			kvm_mmu_wp_memory_region(kvm, new->id);
--		}
-+		if (kvm_dirty_log_manual_protect_and_init_set(kvm))
-+			return;
-+
-+		kvm_mmu_wp_memory_region(kvm, new->id);
- 	}
+@@ -766,6 +766,11 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+ 	return err;
  }
  
++void kvm_uninit_stage2_mmu(struct kvm *kvm)
++{
++	kvm_free_stage2_pgd(&kvm->arch.mmu);
++}
++
+ static void stage2_unmap_memslot(struct kvm *kvm,
+ 				 struct kvm_memory_slot *memslot)
+ {
+@@ -1855,7 +1860,7 @@ void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen)
+ 
+ void kvm_arch_flush_shadow_all(struct kvm *kvm)
+ {
+-	kvm_free_stage2_pgd(&kvm->arch.mmu);
++	kvm_uninit_stage2_mmu(kvm);
+ }
+ 
+ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
 -- 
 2.39.1.637.g21b0678d19-goog
 
