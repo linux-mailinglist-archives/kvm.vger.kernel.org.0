@@ -2,84 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 93144697B08
-	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 12:46:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B4FC9697B1D
+	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 12:49:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233708AbjBOLqn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Feb 2023 06:46:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44612 "EHLO
+        id S233795AbjBOLtf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Feb 2023 06:49:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233682AbjBOLql (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Feb 2023 06:46:41 -0500
+        with ESMTP id S233217AbjBOLta (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Feb 2023 06:49:30 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A62533A9B
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 03:45:55 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B578D274B1
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 03:48:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676461554;
+        s=mimecast20190719; t=1676461720;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Gx6lloEADLK78/decfvNuOIH7Z76rhDLA1nc7SYA9k8=;
-        b=i+4w98R29+6POkF+evXYpaVViOdJ/idasPb1lXdESa5/riW24m5E2lZOcM98vHperxPjSI
-        XHIlnDvZfGqiVkoQaEYshpT3rT0CQZFsI1MaHhl8g9rn89WTxDZlCm7m96aWEgwWNDtMnG
-        bCKwioCy0G9r4QMXZPILnAa2kHqp0Ug=
+        bh=Z/H0rotavd9oyHOO+0LmtN00go4zSs58DTjk4UZUpfA=;
+        b=JMiRyUzlOeZYfNxvEFqCk0ZJYi85e9R8Rzsrpxy3w9nDFAuVAoxFVz1oqGdb+pQStSjV9m
+        YZY5HwR7mFl5eMSiWEey0beWCvp8Sh6nMRHTH/aqUDAXiC46wHQt6F6EHMiAcsW1QAvC9Q
+        RJDtTn3VBXtCEzMf8NHR7EsDB88i6CU=
 Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
  [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-325-vhrLaGT5MVyjkVVwXu8j_g-1; Wed, 15 Feb 2023 06:45:53 -0500
-X-MC-Unique: vhrLaGT5MVyjkVVwXu8j_g-1
-Received: by mail-wm1-f72.google.com with SMTP id b19-20020a05600c4e1300b003e10d3e1c23so1096278wmq.1
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 03:45:53 -0800 (PST)
+ us-mta-61-Inx9TtF_NFe3b0fwaNHv1Q-1; Wed, 15 Feb 2023 06:48:27 -0500
+X-MC-Unique: Inx9TtF_NFe3b0fwaNHv1Q-1
+Received: by mail-wm1-f72.google.com with SMTP id n7-20020a05600c3b8700b003dc55dcb298so999576wms.8
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 03:48:26 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Gx6lloEADLK78/decfvNuOIH7Z76rhDLA1nc7SYA9k8=;
-        b=AwDHswpAaKvkjznPdXiaCLfwU+CWQrykL9HlqqMl3cPlYvJpctHwz005puFj5FQDh8
-         gfy8Y+sAez3nodhBAb48c0ME4J07mfTVySm3BeJt21pueP6FAkRoAoUDqtvvhPDrqNmn
-         vMbL/3l3jsBWfZy/SrG7HsjBWxCerDSmmAPNsnp1B7ZBJ4Y8qqZ/lGq1YxdVZtHQ7bkR
-         AbRkttIo+ckfxv6/T4Zxm/g/LOnQNRDS55Pq9iSUi7eaO97EvxfqAxEllsjAWe+rQoXR
-         TZ8X08PHryMTmIz0guhH+a1Y3xR6AVgKTFrpBH/A83QwPl5VOZqqouCN+8Sww5tz/9+P
-         8cow==
-X-Gm-Message-State: AO0yUKUQu1wKeXKYpllEZVhHtdahBtrd+byi6k7jB073l7xQVc7fpyCA
-        U3+nnfxl1V5AvNk2/zLu1mTPqB0VzhcCk9SdusmT2WPLbM0vcjmTDm0/qRx/I4CyPyU/K+jlLYc
-        OFpZU86JrCvtn
-X-Received: by 2002:a05:600c:2b46:b0:3df:f85a:472f with SMTP id e6-20020a05600c2b4600b003dff85a472fmr1810826wmf.13.1676461552403;
-        Wed, 15 Feb 2023 03:45:52 -0800 (PST)
-X-Google-Smtp-Source: AK7set8nZozTolWM0zXwr30WCnlRjDTIljGjpf4il41K3/g5Ih7zAXVQocFbwFd0cPMbnJUphz/2fw==
-X-Received: by 2002:a05:600c:2b46:b0:3df:f85a:472f with SMTP id e6-20020a05600c2b4600b003dff85a472fmr1810808wmf.13.1676461552152;
-        Wed, 15 Feb 2023 03:45:52 -0800 (PST)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Z/H0rotavd9oyHOO+0LmtN00go4zSs58DTjk4UZUpfA=;
+        b=54s2X8IaewsRdQPNPJ90+D4lt89QtFJgCXjfD0Qj3RTn9/3l8ji61oE6VSQAAv3WuQ
+         XsIXEF/B6kTPMNI7NtcgZuwQwLnT+QpveQfnhl25hgZXQT20Ij88V+cFg4dguR82NsHq
+         bOihUYcxgj+t17eip2MdUhkTHAv/Bamqr/rcJWFPQbYcXgBYuh9xElO34EyePtlItQ5O
+         nFKlojExEt/4Vi+ENpAP+Ueq5DTnetyRsjj15+bXmpFsbsLM2kV3dKI3YD3h/YrHiKq1
+         j9mr/lhhL7sFd/2OL2YGHFzouExDWCBcDssrfM1uym9SgvOQktbWC/D8sz4Feb6+B6sm
+         zYPQ==
+X-Gm-Message-State: AO0yUKXJVsIGaIlPiKe5+yRxgzP/F48VNNiJA6tFROCOTLsfck/jXsmH
+        9h4ddehswStwob4i+7Hwwzb3k9tM3/HRQddRX9//smo++Z2ejgcC73wdM7coONmUsOUkTVIwJAF
+        xu8OyH1chgKwH
+X-Received: by 2002:a05:600c:318f:b0:3e1:f8af:8772 with SMTP id s15-20020a05600c318f00b003e1f8af8772mr2325065wmp.9.1676461706062;
+        Wed, 15 Feb 2023 03:48:26 -0800 (PST)
+X-Google-Smtp-Source: AK7set8OYAXBJzFVluU8HCwAVQMa/cFq9Nf1S2p+oFvhdxz8zS5w1AxVlAWS//WkraJpLlX5F/zY9Q==
+X-Received: by 2002:a05:600c:318f:b0:3e1:f8af:8772 with SMTP id s15-20020a05600c318f00b003e1f8af8772mr2325057wmp.9.1676461705784;
+        Wed, 15 Feb 2023 03:48:25 -0800 (PST)
 Received: from redhat.com ([2.52.5.34])
-        by smtp.gmail.com with ESMTPSA id w8-20020a05600c474800b003de2fc8214esm1967316wmo.20.2023.02.15.03.45.50
+        by smtp.gmail.com with ESMTPSA id c3-20020a1c3503000000b003dc522dd25esm1920544wma.30.2023.02.15.03.48.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Feb 2023 03:45:51 -0800 (PST)
-Date:   Wed, 15 Feb 2023 06:45:48 -0500
+        Wed, 15 Feb 2023 03:48:25 -0800 (PST)
+Date:   Wed, 15 Feb 2023 06:48:21 -0500
 From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)" 
-        <longpeng2@huawei.com>
-Cc:     Jason Wang <jasowang@redhat.com>, arei.gonglei@huawei.com,
-        yechuan@huawei.com, huangzhichao@huawei.com,
-        virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] vhost-vdpa: cleanup memory maps when closing vdpa fds
-Message-ID: <20230215064454-mutt-send-email-mst@kernel.org>
-References: <20230131145310.2069-1-longpeng2@huawei.com>
- <db99245c-606a-2f24-52fe-836a6972437f@redhat.com>
- <35b94992-0c6b-a190-1fce-5dda9c8dcf4b@huawei.com>
- <CACGkMEt0Rgkcmt9k4dWsp-qqtPvrM40mtgmSERc0A7Ve1wzKHw@mail.gmail.com>
- <ad0ab6b8-1e1e-f686-eb5c-78cc63869c54@huawei.com>
- <CACGkMEsOWmVGA1RYTNZybmzkz53g5cYEkJeMK_9uuQu-ezZcqg@mail.gmail.com>
- <af95c38d-fdca-aef0-55ae-bbb0baee6029@huawei.com>
+To:     Nanyong Sun <sunnanyong@huawei.com>
+Cc:     joro@8bytes.org, will@kernel.org, robin.murphy@arm.com,
+        jasowang@redhat.com, iommu@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        wangrong68@huawei.com
+Subject: Re: [PATCH v2] vhost/vdpa: Add MSI translation tables to iommu for
+ software-managed MSI
+Message-ID: <20230215064759-mutt-send-email-mst@kernel.org>
+References: <20230207120843.1580403-1-sunnanyong@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <af95c38d-fdca-aef0-55ae-bbb0baee6029@huawei.com>
+In-Reply-To: <20230207120843.1580403-1-sunnanyong@huawei.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -87,166 +80,152 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 15, 2023 at 01:15:55PM +0800, Longpeng (Mike, Cloud Infrastructure Service Product Dept.) wrote:
+On Tue, Feb 07, 2023 at 08:08:43PM +0800, Nanyong Sun wrote:
+> From: Rong Wang <wangrong68@huawei.com>
 > 
+> Once enable iommu domain for one device, the MSI
+> translation tables have to be there for software-managed MSI.
+> Otherwise, platform with software-managed MSI without an
+> irq bypass function, can not get a correct memory write event
+> from pcie, will not get irqs.
+> The solution is to obtain the MSI phy base address from
+> iommu reserved region, and set it to iommu MSI cookie,
+> then translation tables will be created while request irq.
 > 
-> 在 2023/2/15 10:56, Jason Wang 写道:
-> > On Wed, Feb 15, 2023 at 10:49 AM Longpeng (Mike, Cloud Infrastructure
-> > Service Product Dept.) <longpeng2@huawei.com> wrote:
-> > > 
-> > > 
-> > > 
-> > > 在 2023/2/15 10:00, Jason Wang 写道:
-> > > > On Tue, Feb 14, 2023 at 2:28 PM Longpeng (Mike, Cloud Infrastructure
-> > > > Service Product Dept.) <longpeng2@huawei.com> wrote:
-> > > > > 
-> > > > > 
-> > > > > 
-> > > > > 在 2023/2/14 14:16, Jason Wang 写道:
-> > > > > > 
-> > > > > > 在 2023/1/31 22:53, Longpeng(Mike) 写道:
-> > > > > > > From: Longpeng <longpeng2@huawei.com>
-> > > > > > > 
-> > > > > > > We must cleanup all memory maps when closing the vdpa fds, otherwise
-> > > > > > > some critical resources (e.g. memory, iommu map) will leaked if the
-> > > > > > > userspace exits unexpectedly (e.g. kill -9).
-> > > > > > 
-> > > > > > 
-> > > > > > Sounds like a bug of the kernel, should we fix there?
-> > > > > > 
-> > > > > 
-> > > > > For example, the iommu map is setup when QEMU calls VHOST_IOTLB_UPDATE
-> > > > > ioctl and it'll be freed if QEMU calls VHOST_IOTLB_INVALIDATE ioctl.
-> > > > > 
-> > > > > So maybe we release these resources in vdpa framework in kernel is a
-> > > > > suitable choice?
-> > > > 
-> > > > I think I need understand what does "resources" mean here:
-> > > > 
-> > > > For iommu mapping, it should be freed by vhost_vdpa_free_domain() in
-> > > > vhost_vdpa_release()?
-> > > > 
-> > > 
-> > > Please consider the following lifecycle of the vdpa device:
-> > > 
-> > > 1. vhost_vdpa_open
-> > >       vhost_vdpa_alloc_domain
-> > > 
-> > > 2. vhost_vdpa_pa_map
-> > >       pin_user_pages
-> > >       vhost_vdpa_map
-> > >         iommu_map
-> > > 
-> > > 3. kill QEMU
-> > > 
-> > > 4. vhost_vdpa_release
-> > >       vhost_vdpa_free_domain
-> > > 
-> > > In this case, we have no opportunity to invoke unpin_user_pages or
-> > > iommu_unmap to free the memory.
-> > 
-> > We do:
-> > 
-> > vhost_vdpa_cleanup()
-> >      vhost_vdpa_remove_as()
-> >          vhost_vdpa_iotlb_unmap()
-> >              vhost_vdpa_pa_unmap()
-> >                  unpin_user_pages()
-> >                  vhost_vdpa_general_unmap()
-> >                      iommu_unmap()
-> > ?
-> > 
-> Oh, my codebase is linux-6.2-rc2 and the commit c070c1912a8 (vhost-vdpa: fix
-> an iotlb memory leak) already fixed this bug in linux-6.2-rc3.
+> Change log
+> ----------
 > 
-> > Btw, it looks like we should call vhost_vdpa_free_domain() *after*
-> > vhost_vdpa_cleanup() otherwise it's a UAF?
-> > 
-> I think so, the v->domain is set to NULL in vhost_vdpa_free_domain(), it
-> seems would trigger null-pointer access in my case.
+> v1->v2:
+> - add resv iotlb to avoid overlap mapping.
 
+put changelog after --- pls
 
-OK I'll drop this patch for now then?
-
-> > Thanks
-> > 
-> > > 
-> > > > static int vhost_vdpa_release(struct inode *inode, struct file *filep)
-> > > > {
-> > > >           struct vhost_vdpa *v = filep->private_data;
-> > > >           struct vhost_dev *d = &v->vdev;
-> > > > 
-> > > >           mutex_lock(&d->mutex);
-> > > >           filep->private_data = NULL;
-> > > >           vhost_vdpa_clean_irq(v);
-> > > >           vhost_vdpa_reset(v);
-> > > >           vhost_dev_stop(&v->vdev);
-> > > >           vhost_vdpa_free_domain(v);
-> > > >           vhost_vdpa_config_put(v);
-> > > >           vhost_vdpa_cleanup(v);
-> > > >           mutex_unlock(&d->mutex);
-> > > > 
-> > > >           atomic_dec(&v->opened);
-> > > >           complete(&v->completion);
-> > > > 
-> > > >           return 0;
-> > > > }
-> > > > 
-> > > > > 
-> > > > > By the way, Jason, can you reproduce the problem in your machine?
-> > > > > 
-> > > > 
-> > > > Haven't got time in doing this but it should be the responsibility of
-> > > > the author to validate this anyhow.
-> > > > 
-> > > > Thanks
-> > > > 
-> > > > > > Thanks
-> > > > > > 
-> > > > > > 
-> > > > > > > 
-> > > > > > > Signed-off-by: Longpeng <longpeng2@huawei.com>
-> > > > > > > ---
-> > > > > > >     drivers/vhost/vdpa.c | 13 +++++++++++++
-> > > > > > >     1 file changed, 13 insertions(+)
-> > > > > > > 
-> > > > > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> > > > > > > index a527eeeac637..37477cffa5aa 100644
-> > > > > > > --- a/drivers/vhost/vdpa.c
-> > > > > > > +++ b/drivers/vhost/vdpa.c
-> > > > > > > @@ -823,6 +823,18 @@ static void vhost_vdpa_unmap(struct vhost_vdpa *v,
-> > > > > > >             vhost_vdpa_remove_as(v, asid);
-> > > > > > >     }
-> > > > > > > +static void vhost_vdpa_clean_map(struct vhost_vdpa *v)
-> > > > > > > +{
-> > > > > > > +    struct vhost_vdpa_as *as;
-> > > > > > > +    u32 asid;
-> > > > > > > +
-> > > > > > > +    for (asid = 0; asid < v->vdpa->nas; asid++) {
-> > > > > > > +        as = asid_to_as(v, asid);
-> > > > > > > +        if (as)
-> > > > > > > +            vhost_vdpa_unmap(v, &as->iotlb, 0ULL, 0ULL - 1);
-> > > > > > > +    }
-> > > > > > > +}
-> > > > > > > +
-> > > > > > >     static int vhost_vdpa_va_map(struct vhost_vdpa *v,
-> > > > > > >                      struct vhost_iotlb *iotlb,
-> > > > > > >                      u64 iova, u64 size, u64 uaddr, u32 perm)
-> > > > > > > @@ -1247,6 +1259,7 @@ static int vhost_vdpa_release(struct inode
-> > > > > > > *inode, struct file *filep)
-> > > > > > >         vhost_vdpa_clean_irq(v);
-> > > > > > >         vhost_vdpa_reset(v);
-> > > > > > >         vhost_dev_stop(&v->vdev);
-> > > > > > > +    vhost_vdpa_clean_map(v);
-> > > > > > >         vhost_vdpa_free_domain(v);
-> > > > > > >         vhost_vdpa_config_put(v);
-> > > > > > >         vhost_vdpa_cleanup(v);
-> > > > > > 
-> > > > > > .
-> > > > > 
-> > > > 
-> > > > .
-> > > 
-> > 
-> > .
+> Signed-off-by: Rong Wang <wangrong68@huawei.com>
+> Signed-off-by: Nanyong Sun <sunnanyong@huawei.com>
+> ---
+>  drivers/iommu/iommu.c |  1 +
+>  drivers/vhost/vdpa.c  | 59 ++++++++++++++++++++++++++++++++++++++++---
+>  2 files changed, 57 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index 5f6a85aea501..af9c064ad8b2 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -2623,6 +2623,7 @@ void iommu_get_resv_regions(struct device *dev, struct list_head *list)
+>  	if (ops->get_resv_regions)
+>  		ops->get_resv_regions(dev, list);
+>  }
+> +EXPORT_SYMBOL(iommu_get_resv_regions);
+>  
+>  /**
+>   * iommu_put_resv_regions - release resered regions
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index ec32f785dfde..a58979da8acd 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -49,6 +49,7 @@ struct vhost_vdpa {
+>  	struct completion completion;
+>  	struct vdpa_device *vdpa;
+>  	struct hlist_head as[VHOST_VDPA_IOTLB_BUCKETS];
+> +	struct vhost_iotlb resv_iotlb;
+>  	struct device dev;
+>  	struct cdev cdev;
+>  	atomic_t opened;
+> @@ -216,6 +217,8 @@ static int vhost_vdpa_reset(struct vhost_vdpa *v)
+>  
+>  	v->in_batch = 0;
+>  
+> +	vhost_iotlb_reset(&v->resv_iotlb);
+> +
+>  	return vdpa_reset(vdpa);
+>  }
+>  
+> @@ -1013,6 +1016,10 @@ static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
+>  	    msg->iova + msg->size - 1 > v->range.last)
+>  		return -EINVAL;
+>  
+> +	if (vhost_iotlb_itree_first(&v->resv_iotlb, msg->iova,
+> +					msg->iova + msg->size - 1))
+> +		return -EINVAL;
+> +
+>  	if (vhost_iotlb_itree_first(iotlb, msg->iova,
+>  				    msg->iova + msg->size - 1))
+>  		return -EEXIST;
+> @@ -1103,6 +1110,45 @@ static ssize_t vhost_vdpa_chr_write_iter(struct kiocb *iocb,
+>  	return vhost_chr_write_iter(dev, from);
+>  }
+>  
+> +static int vhost_vdpa_resv_iommu_region(struct iommu_domain *domain, struct device *dma_dev,
+> +	struct vhost_iotlb *resv_iotlb)
+> +{
+> +	struct list_head dev_resv_regions;
+> +	phys_addr_t resv_msi_base = 0;
+> +	struct iommu_resv_region *region;
+> +	int ret = 0;
+> +	bool with_sw_msi = false;
+> +	bool with_hw_msi = false;
+> +
+> +	INIT_LIST_HEAD(&dev_resv_regions);
+> +	iommu_get_resv_regions(dma_dev, &dev_resv_regions);
+> +
+> +	list_for_each_entry(region, &dev_resv_regions, list) {
+> +		ret = vhost_iotlb_add_range_ctx(resv_iotlb, region->start,
+> +				region->start + region->length - 1,
+> +				0, 0, NULL);
+> +		if (ret) {
+> +			vhost_iotlb_reset(resv_iotlb);
+> +			break;
+> +		}
+> +
+> +		if (region->type == IOMMU_RESV_MSI)
+> +			with_hw_msi = true;
+> +
+> +		if (region->type == IOMMU_RESV_SW_MSI) {
+> +			resv_msi_base = region->start;
+> +			with_sw_msi = true;
+> +		}
+> +	}
+> +
+> +	if (!ret && !with_hw_msi && with_sw_msi)
+> +		ret = iommu_get_msi_cookie(domain, resv_msi_base);
+> +
+> +	iommu_put_resv_regions(dma_dev, &dev_resv_regions);
+> +
+> +	return ret;
+> +}
+> +
+>  static int vhost_vdpa_alloc_domain(struct vhost_vdpa *v)
+>  {
+>  	struct vdpa_device *vdpa = v->vdpa;
+> @@ -1128,11 +1174,16 @@ static int vhost_vdpa_alloc_domain(struct vhost_vdpa *v)
+>  
+>  	ret = iommu_attach_device(v->domain, dma_dev);
+>  	if (ret)
+> -		goto err_attach;
+> +		goto err_alloc_domain;
+>  
+> -	return 0;
+> +	ret = vhost_vdpa_resv_iommu_region(v->domain, dma_dev, &v->resv_iotlb);
+> +	if (ret)
+> +		goto err_attach_device;
+>  
+> -err_attach:
+> +	return 0;
+> +err_attach_device:
+> +	iommu_detach_device(v->domain, dma_dev);
+> +err_alloc_domain:
+>  	iommu_domain_free(v->domain);
+>  	return ret;
+>  }
+> @@ -1385,6 +1436,8 @@ static int vhost_vdpa_probe(struct vdpa_device *vdpa)
+>  		goto err;
+>  	}
+>  
+> +	vhost_iotlb_init(&v->resv_iotlb, 0, 0);
+> +
+>  	r = dev_set_name(&v->dev, "vhost-vdpa-%u", minor);
+>  	if (r)
+>  		goto err;
+> -- 
+> 2.25.1
 
