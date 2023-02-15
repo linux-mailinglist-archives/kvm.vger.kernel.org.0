@@ -2,198 +2,230 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B4AD16988E3
-	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 00:48:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 542EF6988EB
+	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 00:51:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229520AbjBOXsY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Feb 2023 18:48:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46532 "EHLO
+        id S229701AbjBOXvY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Feb 2023 18:51:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229501AbjBOXsX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Feb 2023 18:48:23 -0500
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2056.outbound.protection.outlook.com [40.107.223.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C9762E820
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 15:48:22 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=l4KdipDalWzJubUyegC5Tmn51lzwD3KINtW3HleXe5BP4tk6JrYU90UnH1TxCvqCXtCfHZ3Fh0Tj7T4jao/Z2mNarRn9/R1oqvcr2XsOMqEfC1RdSCdbwYkkjGJfzewJhjH3oMY5CYjqjHW5DiXfRH3GwlKO1o55zg5gnp87oVJFiuw15BDSg0FJhOZsQNgXQhHi0xGNlL0K3ZeA9SAyNQkxUC24FDXXVdHy36IpPYszdLY5yDs68vkXHgqPJVxdwrGb5vn/0oskSqPLOcXsonp8jZrG3Tqvdsnw3Rg99OHK5sfw4qgJFhw9MXR/c1GIf6SD6b7SWPDxzI9057/0GQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+Y4RMMfsESY1z/Qz3DjPBFtmd+/AmOumVCpxQtbQ9tk=;
- b=ejC82l/m9lkA0AosAZWO2VcsS0ZhmzVRolyICj9XOxFsUn4p8+dc0nGzLISFaM2WYWUOljfemUPyphl0fGgRqf5NUHaCF8QmdxQxnqgE0KP9iVANUhucYCmL7t6YJ9NVBsoKa07bldUF1W2BiXT414xcM0u33Wv+SI25OUGuD41U6a6FTs7AuPdIXcWNHrv1BXBhkE9el4FIvpu1f53TPdA+3SOn4QvEs+Lomqg0DGccql8tI2OzFbWMtBOjxrM5rI+iWsmgb+VAVcMjH6lqBkFQMYYMz/HC2Ri/AAPNhTcIffMdNw51exu4Yl46AF8+6Y1eJYxKQeAaGCK3tsY/nw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+Y4RMMfsESY1z/Qz3DjPBFtmd+/AmOumVCpxQtbQ9tk=;
- b=jX4CTcWOqcF4XeXTJDDPpRIumN3B73F8O/74sPU2RfWAMVJDJES1938vaW43PX/2FvnGVdLUYPqPz+pv6ik15ChIINBgaGZPSQoVQkA3Q8K51/E0oUR58xH0Xyps8QFtICqL7u0+I5lqqGr5mXfXDN3lNfeoDqlYPujnm0U8W7HsGTsIAYvEAAwQx34Fp2oUcInJmbDhxXtTxA/ccTbtSVR6IKaHKnFraV1uk6uADVhfwSrcbbZzIGBJbseCxaKZvCdON+/a7Tw/pgLwxu893zs1cGG8EHRSs09ERsThWcTobyc1M4T4xI3TnVDljXVA84KpCUVIw/76nnkbJ+24rw==
-Received: from BN9PR03CA0098.namprd03.prod.outlook.com (2603:10b6:408:fd::13)
- by SA1PR12MB6918.namprd12.prod.outlook.com (2603:10b6:806:24d::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.26; Wed, 15 Feb
- 2023 23:48:20 +0000
-Received: from BN8NAM11FT024.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:fd:cafe::c0) by BN9PR03CA0098.outlook.office365.com
- (2603:10b6:408:fd::13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.26 via Frontend
- Transport; Wed, 15 Feb 2023 23:48:20 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- BN8NAM11FT024.mail.protection.outlook.com (10.13.177.38) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6111.12 via Frontend Transport; Wed, 15 Feb 2023 23:48:19 +0000
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Wed, 15 Feb
- 2023 15:48:10 -0800
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail202.nvidia.com
- (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Wed, 15 Feb
- 2023 15:48:10 -0800
-Received: from Asurada-Nvidia (10.127.8.12) by mail.nvidia.com (10.129.68.7)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36 via Frontend
- Transport; Wed, 15 Feb 2023 15:48:08 -0800
-Date:   Wed, 15 Feb 2023 15:48:06 -0800
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     Eric Auger <eric.auger@redhat.com>
-CC:     <eric.auger.pro@gmail.com>, <yi.l.liu@intel.com>,
-        <yi.y.sun@intel.com>, <alex.williamson@redhat.com>,
-        <clg@redhat.com>, <qemu-devel@nongnu.org>,
-        <david@gibson.dropbear.id.au>, <thuth@redhat.com>,
-        <farman@linux.ibm.com>, <mjrosato@linux.ibm.com>,
-        <akrowiak@linux.ibm.com>, <pasic@linux.ibm.com>,
-        <jjherne@linux.ibm.com>, <jasowang@redhat.com>,
-        <kvm@vger.kernel.org>, <jgg@nvidia.com>, <kevin.tian@intel.com>,
-        <chao.p.peng@intel.com>, <peterx@redhat.com>,
-        <shameerali.kolothum.thodi@huawei.com>, <zhangfei.gao@linaro.org>,
-        <berrange@redhat.com>, <apopple@nvidia.com>,
-        <suravee.suthikulpanit@amd.com>
-Subject: Re: [RFC v3 14/18] backends/iommufd: Introduce the iommufd object
-Message-ID: <Y+1vNgoGJJw40+9C@Asurada-Nvidia>
-References: <20230131205305.2726330-1-eric.auger@redhat.com>
- <20230131205305.2726330-15-eric.auger@redhat.com>
+        with ESMTP id S229584AbjBOXvX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Feb 2023 18:51:23 -0500
+Received: from out-48.mta1.migadu.com (out-48.mta1.migadu.com [IPv6:2001:41d0:203:375::30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA5E32E80D
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 15:51:21 -0800 (PST)
+Date:   Wed, 15 Feb 2023 23:51:12 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1676505079;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=2T/MmpXDESGNpNT2+p7+XdqARITDPtj7T7/D4LsWwd4=;
+        b=Kbxs9FZX5BVyUgNOxSeOw3uJj8lLHFS6sdIVrSDi1lkpKyZn9k1R//9CnZHs1t+I+1d2Vm
+        QQgD2yvdWrV9NSFsF7xIN4t+CBzuBg4qFb+PTF5AEftNbxMfyByelUCjlYodRA8VJKg3Ri
+        +zaJYXQTk4jKWZmPOvAjAdpaHeLYOBw=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
+        yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, qperret@google.com,
+        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
+        rananta@google.com, bgardon@google.com, ricarkol@gmail.com
+Subject: Re: [PATCH v3 02/12] KVM: arm64: Rename free_unlinked to free_removed
+Message-ID: <Y+1v8Nctig7sYWas@linux.dev>
+References: <20230215174046.2201432-1-ricarkol@google.com>
+ <20230215174046.2201432-3-ricarkol@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20230131205305.2726330-15-eric.auger@redhat.com>
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN8NAM11FT024:EE_|SA1PR12MB6918:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7a117678-221c-41a4-0cf8-08db0faf1e08
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 7vTprzX53ANReBB0e7gLcvHrHNkCym4MMjugSF2rXLT6DnAlKcLUzStMLVgR+e8O9/AR8qa7y2VngmMzPp/sACaFsCB7wjL1wliIOEA2q20unZVygIFzoep4Xm2hX9kGiwgb7k2T/zHBeSMsI4eEjPK5+iKJ7FohycgoT6AvLIY8J2W6IqRp2+4/+Nv3j/OYTYmEQ9lYzaTk4QCsBowlkpj79nw+emJDTIKFvnI7ZJNoa813td5ZxU33N023C6tnrXGTRMFPq48xB1gAuThZ850pTcEZ5LzUdXwDKMzXrc78BAXpFcbb6LZBu/DSuIgrYvCH7qt2VE/pFImjRhlU1Nl0gYwYPhTgIN1JBzIc8nVnUy5NsgdIonz3CFhffMZkVj6CClIazYz6uPSuMtEgxvZAsCiafp7eb2a/MeKY8UdRJRAQm8XoQh8QnkDKJS1BHSniw12vS4ZomhacFsM7VMxbif0yNQHBZYCRjDS2Npw8J7f0Zpq6diOTNgdUPH03xpJWB47qdcv5P9AH8RzA6nWuaVLuxD+ptA+/VXVT7wvSt9tbzjKsy9drWtsrE6veedpQU50+wZfy6mykgeVIYWlRUPe+8xkBJ10XcUBSooS8o0CKdzw6RhDd5FWfYEEnAj/WFn5o7itTNVGMhjHFi4imZbQPLIu8U0lgJLr/+YHhpRafsmj7a1vezqDGf5H45afDmov8GT1T22K0QZpV7Q==
-X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230025)(4636009)(376002)(396003)(39860400002)(346002)(136003)(451199018)(40470700004)(36840700001)(46966006)(33716001)(336012)(82310400005)(2906002)(478600001)(9686003)(186003)(4326008)(41300700001)(83380400001)(26005)(6916009)(356005)(426003)(86362001)(40480700001)(55016003)(36860700001)(316002)(47076005)(40460700003)(8676002)(8936002)(5660300002)(7416002)(70586007)(7636003)(82740400003)(70206006)(54906003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Feb 2023 23:48:19.8563
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7a117678-221c-41a4-0cf8-08db0faf1e08
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT024.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6918
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <20230215174046.2201432-3-ricarkol@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
+On Wed, Feb 15, 2023 at 05:40:36PM +0000, Ricardo Koller wrote:
+> Make it clearer that the "free_removed" functions refer to tables that
+> have never been part of the paging structure: they are "unlinked".
 
-On Tue, Jan 31, 2023 at 09:53:01PM +0100, Eric Auger wrote:
+the page table passed to ->free_removed_table() was definitely part of a
+paging structure before. Maybe:
 
-> diff --git a/include/sysemu/iommufd.h b/include/sysemu/iommufd.h
-> new file mode 100644
-> index 0000000000..06a866d1bd
-> --- /dev/null
-> +++ b/include/sysemu/iommufd.h
-> @@ -0,0 +1,47 @@
-> +#ifndef SYSEMU_IOMMUFD_H
-> +#define SYSEMU_IOMMUFD_H
-> +
-> +#include "qom/object.h"
-> +#include "qemu/thread.h"
-> +#include "exec/hwaddr.h"
-> +#include "exec/ram_addr.h"
+  A subsequent change to KVM will add support for building page tables
+  that are not part of an active paging structure. The existing
+  'removed_table' terminology is quite clunky when applied in this
+  context.
 
-After rebasing nesting patches on top of this, I see a build error:
+  Normalize on referring to tables outside of an active paging structure
+  as 'unlinked'. No functional change intended.
 
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-[47/876] Compiling C object libcommon.fa.p/hw_arm_smmu-common.c.o
-FAILED: libcommon.fa.p/hw_arm_smmu-common.c.o=20
-cc -Ilibcommon.fa.p -I../src/3rdparty/qemu/dtc/libfdt -I/usr/include/pixman=
--1 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/glib-2.0 -I/=
-usr/lib/aarch64-linux-gnu/glib-2.0/include -I/usr/include/gio-unix-2.0 -fdi=
-agnostics-color=3Dauto -Wall -Winvalid-pch -std=3Dgnu11 -O2 -g -isystem /sr=
-c/3rdparty/qemu/linux-headers -isystem linux-headers -iquote . -iquote /src=
-/3rdparty/qemu -iquote /src/3rdparty/qemu/include -iquote /src/3rdparty/qem=
-u/tcg/aarch64 -pthread -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3D2 -D_GNU_SOURC=
-E -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SOURCE -fno-strict-aliasing -fno-co=
-mmon -fwrapv -Wundef -Wwrite-strings -Wmissing-prototypes -Wstrict-prototyp=
-es -Wredundant-decls -Wold-style-declaration -Wold-style-definition -Wtype-=
-limits -Wformat-security -Wformat-y2k -Winit-self -Wignored-qualifiers -Wem=
-pty-body -Wnested-externs -Wendif-labels -Wexpansion-to-defined -Wimplicit-=
-fallthrough=3D2 -Wmissing-format-attribute -Wno-missing-include-dirs -Wno-s=
-hift-negative-value -Wno-psabi -fstack-protector-strong -fPIE -MD -MQ libco=
-mmon.fa.p/hw_arm_smmu-common.c.o -MF libcommon.fa.p/hw_arm_smmu-common.c.o.=
-d -o libcommon.fa.p/hw_arm_smmu-common.c.o -c ../src/3rdparty/qemu/hw/arm/s=
-mmu-common.c
-In file included from /src/3rdparty/qemu/include/sysemu/iommufd.h:7,
-                 from ../src/3rdparty/qemu/hw/arm/smmu-common.c:29:
-/src/3rdparty/qemu/include/exec/ram_addr.h:23:10: fatal error: cpu.h: No su=
-ch file or directory
-   23 | #include "cpu.h"
-      |          ^~~~~~~
-compilation terminated.
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> No functional change intended.
+> 
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
 
-I guess it's resulted from the module inter-dependency. Though our
-nesting patches aren't finalized yet, the possibility of including
-iommufd.h is still there. Meanwhile, the ram_addr.h here is added
-for "ram_addr_t" type, I think. So, could we include "cpu-common.h"
-instead, where the "ram_addr_t" type is actually defined?
+besides the changelog nit:
 
-The build error is gone after this replacement:
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-diff --git a/include/sysemu/iommufd.h b/include/sysemu/iommufd.h
-index 45540de63986..86d370c221b3 100644
---- a/include/sysemu/iommufd.h
-+++ b/include/sysemu/iommufd.h
-@@ -4,7 +4,7 @@
- #include "qom/object.h"
- #include "qemu/thread.h"
- #include "exec/hwaddr.h"
--#include "exec/ram_addr.h"
-+#include "exec/cpu-common.h"
- #include <linux/iommufd.h>
-=20
- #define TYPE_IOMMUFD_BACKEND "iommufd"
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 
-Thanks
-Nic
+--
+Thanks,
+Oliver
+
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h  |  8 ++++----
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c |  6 +++---
+>  arch/arm64/kvm/hyp/pgtable.c          |  6 +++---
+>  arch/arm64/kvm/mmu.c                  | 10 +++++-----
+>  4 files changed, 15 insertions(+), 15 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index 3339192a97a9..7c45082e6c23 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -99,7 +99,7 @@ static inline bool kvm_level_supports_block_mapping(u32 level)
+>   *				allocation is physically contiguous.
+>   * @free_pages_exact:		Free an exact number of memory pages previously
+>   *				allocated by zalloc_pages_exact.
+> - * @free_removed_table:		Free a removed paging structure by unlinking and
+> + * @free_unlinked_table:	Free an unlinked paging structure by unlinking and
+>   *				dropping references.
+>   * @get_page:			Increment the refcount on a page.
+>   * @put_page:			Decrement the refcount on a page. When the
+> @@ -119,7 +119,7 @@ struct kvm_pgtable_mm_ops {
+>  	void*		(*zalloc_page)(void *arg);
+>  	void*		(*zalloc_pages_exact)(size_t size);
+>  	void		(*free_pages_exact)(void *addr, size_t size);
+> -	void		(*free_removed_table)(void *addr, u32 level);
+> +	void		(*free_unlinked_table)(void *addr, u32 level);
+>  	void		(*get_page)(void *addr);
+>  	void		(*put_page)(void *addr);
+>  	int		(*page_count)(void *addr);
+> @@ -450,7 +450,7 @@ int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+>  void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
+>  
+>  /**
+> - * kvm_pgtable_stage2_free_removed() - Free a removed stage-2 paging structure.
+> + * kvm_pgtable_stage2_free_unlinked() - Free un unlinked stage-2 paging structure.
+>   * @mm_ops:	Memory management callbacks.
+>   * @pgtable:	Unlinked stage-2 paging structure to be freed.
+>   * @level:	Level of the stage-2 paging structure to be freed.
+> @@ -458,7 +458,7 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
+>   * The page-table is assumed to be unreachable by any hardware walkers prior to
+>   * freeing and therefore no TLB invalidation is performed.
+>   */
+> -void kvm_pgtable_stage2_free_removed(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level);
+> +void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level);
+>  
+>  /**
+>   * kvm_pgtable_stage2_map() - Install a mapping in a guest stage-2 page-table.
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index 552653fa18be..b030170d803b 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -91,9 +91,9 @@ static void host_s2_put_page(void *addr)
+>  	hyp_put_page(&host_s2_pool, addr);
+>  }
+>  
+> -static void host_s2_free_removed_table(void *addr, u32 level)
+> +static void host_s2_free_unlinked_table(void *addr, u32 level)
+>  {
+> -	kvm_pgtable_stage2_free_removed(&host_mmu.mm_ops, addr, level);
+> +	kvm_pgtable_stage2_free_unlinked(&host_mmu.mm_ops, addr, level);
+>  }
+>  
+>  static int prepare_s2_pool(void *pgt_pool_base)
+> @@ -110,7 +110,7 @@ static int prepare_s2_pool(void *pgt_pool_base)
+>  	host_mmu.mm_ops = (struct kvm_pgtable_mm_ops) {
+>  		.zalloc_pages_exact = host_s2_zalloc_pages_exact,
+>  		.zalloc_page = host_s2_zalloc_page,
+> -		.free_removed_table = host_s2_free_removed_table,
+> +		.free_unlinked_table = host_s2_free_unlinked_table,
+>  		.phys_to_virt = hyp_phys_to_virt,
+>  		.virt_to_phys = hyp_virt_to_phys,
+>  		.page_count = hyp_page_count,
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index e093e222daf3..0a5ef9288371 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -841,7 +841,7 @@ static int stage2_map_walk_table_pre(const struct kvm_pgtable_visit_ctx *ctx,
+>  	if (ret)
+>  		return ret;
+>  
+> -	mm_ops->free_removed_table(childp, ctx->level);
+> +	mm_ops->free_unlinked_table(childp, ctx->level);
+>  	return 0;
+>  }
+>  
+> @@ -886,7 +886,7 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+>   * The TABLE_PRE callback runs for table entries on the way down, looking
+>   * for table entries which we could conceivably replace with a block entry
+>   * for this mapping. If it finds one it replaces the entry and calls
+> - * kvm_pgtable_mm_ops::free_removed_table() to tear down the detached table.
+> + * kvm_pgtable_mm_ops::free_unlinked_table() to tear down the detached table.
+>   *
+>   * Otherwise, the LEAF callback performs the mapping at the existing leaves
+>   * instead.
+> @@ -1250,7 +1250,7 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
+>  	pgt->pgd = NULL;
+>  }
+>  
+> -void kvm_pgtable_stage2_free_removed(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level)
+> +void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level)
+>  {
+>  	kvm_pteref_t ptep = (kvm_pteref_t)pgtable;
+>  	struct kvm_pgtable_walker walker = {
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index a3ee3b605c9b..9bd3c2cfb476 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -130,21 +130,21 @@ static void kvm_s2_free_pages_exact(void *virt, size_t size)
+>  
+>  static struct kvm_pgtable_mm_ops kvm_s2_mm_ops;
+>  
+> -static void stage2_free_removed_table_rcu_cb(struct rcu_head *head)
+> +static void stage2_free_unlinked_table_rcu_cb(struct rcu_head *head)
+>  {
+>  	struct page *page = container_of(head, struct page, rcu_head);
+>  	void *pgtable = page_to_virt(page);
+>  	u32 level = page_private(page);
+>  
+> -	kvm_pgtable_stage2_free_removed(&kvm_s2_mm_ops, pgtable, level);
+> +	kvm_pgtable_stage2_free_unlinked(&kvm_s2_mm_ops, pgtable, level);
+>  }
+>  
+> -static void stage2_free_removed_table(void *addr, u32 level)
+> +static void stage2_free_unlinked_table(void *addr, u32 level)
+>  {
+>  	struct page *page = virt_to_page(addr);
+>  
+>  	set_page_private(page, (unsigned long)level);
+> -	call_rcu(&page->rcu_head, stage2_free_removed_table_rcu_cb);
+> +	call_rcu(&page->rcu_head, stage2_free_unlinked_table_rcu_cb);
+>  }
+>  
+>  static void kvm_host_get_page(void *addr)
+> @@ -681,7 +681,7 @@ static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
+>  	.zalloc_page		= stage2_memcache_zalloc_page,
+>  	.zalloc_pages_exact	= kvm_s2_zalloc_pages_exact,
+>  	.free_pages_exact	= kvm_s2_free_pages_exact,
+> -	.free_removed_table	= stage2_free_removed_table,
+> +	.free_unlinked_table	= stage2_free_unlinked_table,
+>  	.get_page		= kvm_host_get_page,
+>  	.put_page		= kvm_s2_put_page,
+>  	.page_count		= kvm_host_page_count,
+> -- 
+> 2.39.1.637.g21b0678d19-goog
+> 
+> 
+
+-- 
+Thanks,
+Oliver
