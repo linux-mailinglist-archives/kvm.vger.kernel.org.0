@@ -2,75 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 31FD56972DA
-	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 01:50:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 081A5697317
+	for <lists+kvm@lfdr.de>; Wed, 15 Feb 2023 02:07:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229726AbjBOAuk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Feb 2023 19:50:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41366 "EHLO
+        id S232598AbjBOBHX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Feb 2023 20:07:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229460AbjBOAuh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Feb 2023 19:50:37 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 441002BEC5
-        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 16:50:36 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id oo13-20020a17090b1c8d00b0022936a63a22so238798pjb.8
-        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 16:50:36 -0800 (PST)
+        with ESMTP id S229650AbjBOBHV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Feb 2023 20:07:21 -0500
+Received: from mail-il1-x14a.google.com (mail-il1-x14a.google.com [IPv6:2607:f8b0:4864:20::14a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D37682596A
+        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 17:07:20 -0800 (PST)
+Received: by mail-il1-x14a.google.com with SMTP id g1-20020a92cda1000000b0030c45d93884so12553153ild.16
+        for <kvm@vger.kernel.org>; Tue, 14 Feb 2023 17:07:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=jAtu+jAzoPXgZmgX0Gm/pPUfllI1EZc5ORAFaSSbbuE=;
-        b=L/+DzgtP0mxJhAdZ5Z/aVaM/bV88j5aAGhM00slMCuZIfD+STsib8GLR0j1uVV3RGR
-         dtA3VBBk5jqr92WFuvac+vtWgHA9axC9yGsdotN1s2zvptok+vXYQTN9VdjbJUigRS3O
-         2jZY5F7cgm/oyxFyh78x1KjMGS84KKZlOUGs6YwT05zphD47TUJZoNMNMn1v+XLRjeSK
-         rSh8mZTOHGk2MfbxNhVhiYQK3lh4+2xmCp2uAw2N1A6T0rO/ZsTPr+kcEit0Z/bi8vDo
-         Q2uYusX/6wxTlJTAAVRHOiWXIGmZtT5M0QHuzbFHJE61DGFFaGulvIopfgOxvaWpLaaP
-         39lQ==
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=IyNPeLOdyUSRCloXmM+8l8tMrO7/92CcJQeGkdKd/vw=;
+        b=a3RFuz2JUP+kYHqqv6Gl99pOIwgDCa05eLIbj2NAByamb9c87BYsdvwxSsltqlpuTj
+         G5bChEn3dvtuU/Zn/BWCKyZk07px3NCmu8Z7Eyewl9O+etu7BOXo/pGAhhwDWb+RofUf
+         UY6O8BrPc0LpoYEbfvBh3vYBSpVnCO+zJ/76Ecmegs8MzRSqk+w1yE103NepU7HN1/6e
+         VwSD+ZVgh1SJWgb7GFmq2TZjZaYbfX9ne88fw/xhK+Lh0frKX3CYWN6CjCp7QgJ66mhA
+         8ld3bdlRiq0Mh27BOLutcQQ4BHuJ1jQWhO3HqmaP7p3TrxwMal8Rk0LRiM2xuK3+aI3A
+         fsrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jAtu+jAzoPXgZmgX0Gm/pPUfllI1EZc5ORAFaSSbbuE=;
-        b=8RkazSC+6lwludKXol36mNMrxJ1fdLFU7dhTF1dxXn0FHynQ0BhOIi5QeBxMDLtt/N
-         rVx3zr3OLKS+rHgUSG8dMdP2d7zWKiYVJTyWvnvd2lMK8hIdiC0dC0rWvhQVPz46MinE
-         q+Jyv09ewfMJRLIrhOr4ah357pFEISaruUtV/fbCmuvzyJ1Os0zwEZ3rX/6nQemysSTt
-         zuc/FxWYurlRNwWLNjxAQlBCX77d/AZxuMSHwzdyaXI2tbm5t2ji+bSzM3bJSABXZ9r5
-         YqBV5GFjFbqBIQKExGhTFxMnulrLYtp2/apH+3GjyFrFL1ZmRuQGUCyaLlfxTMUI2lF4
-         bP6A==
-X-Gm-Message-State: AO0yUKXLyyVV1+Fn/0AZiRXfpYl1W78UUvWhy3g3/gd0QhF8yc/6HCvg
-        83abhdjWx9SROMTxaaP64NJwthb6HpcyoTpJxw==
-X-Google-Smtp-Source: AK7set/B9k2Ck9cwqCz3QkOM260/f27rO5NkJ+CBnzWZ5I7LICMI8IV8Q/zzgS1M+gU0YZA5XK2frvm7yadOvdfolw==
-X-Received: from ackerleytng-cloudtop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1f5f])
- (user=ackerleytng job=sendgmr) by 2002:a17:90a:d908:b0:233:a844:1e9e with
- SMTP id c8-20020a17090ad90800b00233a8441e9emr272542pjv.60.1676422235601; Tue,
- 14 Feb 2023 16:50:35 -0800 (PST)
-Date:   Wed, 15 Feb 2023 00:50:33 +0000
-In-Reply-To: <Y88ylDFfMQNcUEw7@google.com> (message from Sean Christopherson
- on Tue, 24 Jan 2023 01:21:24 +0000)
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IyNPeLOdyUSRCloXmM+8l8tMrO7/92CcJQeGkdKd/vw=;
+        b=TIKiNd1l32b8Drqn7PEZsVvlABtafeyK8RX8UOWrcijxutz0JRyYYG8Y4PEN/fyVA0
+         VPVkuxd/C3VuPwNS+EUVyzDS7vDfuySFsQ0ApBqp55ICPQVJm0cDi1me4Qgm0JTnZWxV
+         9A7xW1jC1x4noF+uFo4bagHmpkia0m+h4KC7bWrI485ZgTKk+DK+AcR1+3BwXt7ofqCF
+         6XIoqiAh6prIe5HIpojr9C/SV1fCoDPbWyRRQUpvLvAlP0ru3laVl+WgWRBJAVd2LYwh
+         6ZiImV/R9CFMYb9aDdYUt7zR26F4sD85v9KhH80p52jXe3gYAj6bMnjNxV8QjP2acXA0
+         r0jg==
+X-Gm-Message-State: AO0yUKX68SIzKiuLA/jah2+I7nw5IxVMNbW9epwcWLX9b6b/df8XOGae
+        teeYNxqfnLIcUZALab9AsXYx4kKhFVA2
+X-Google-Smtp-Source: AK7set/hhwzs3tBETMRfIHWDYFlERciNM8DL4xWOpJy9YppTznI6bpJLKBiVPnqbNBCyVEoxYd0Fj8xSX5cn
+X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:22b5])
+ (user=rananta job=sendgmr) by 2002:a6b:4015:0:b0:6df:2c9f:f8fc with SMTP id
+ k21-20020a6b4015000000b006df2c9ff8fcmr306048ioa.4.1676423240257; Tue, 14 Feb
+ 2023 17:07:20 -0800 (PST)
+Date:   Wed, 15 Feb 2023 01:07:01 +0000
 Mime-Version: 1.0
-Message-ID: <diqzlekzkazq.fsf@ackerleytng-cloudtop.c.googlers.com>
-Subject: Re: [RFC PATCH v3 08/31] KVM: selftests: Require GCC to realign
- stacks on function entry
-From:   Ackerley Tng <ackerleytng@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     erdemaktas@google.com, mail@maciej.szmigiero.name,
-        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
-        isaku.yamahata@intel.com, sagis@google.com, afranji@google.com,
-        runanwang@google.com, shuah@kernel.org, drjones@redhat.com,
-        maz@kernel.org, bgardon@google.com, jmattson@google.com,
-        dmatlack@google.com, peterx@redhat.com, oupton@google.com,
-        ricarkol@google.com, yang.zhong@intel.com, wei.w.wang@intel.com,
-        xiaoyao.li@intel.com, pgonda@google.com, marcorr@google.com,
-        eesposit@redhat.com, borntraeger@de.ibm.com, eric.auger@redhat.com,
-        wangyanan55@huawei.com, aaronlewis@google.com, vkuznets@redhat.com,
-        pshier@google.com, axelrasmussen@google.com,
-        zhenzhong.duan@intel.com, like.xu@linux.intel.com,
+X-Mailer: git-send-email 2.39.1.581.gbfd45094c4-goog
+Message-ID: <20230215010717.3612794-1-rananta@google.com>
+Subject: [REPOST PATCH 00/16] Add support for vPMU selftests
+From:   Raghavendra Rao Ananta <rananta@google.com>
+To:     Oliver Upton <oupton@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Ricardo Koller <ricarkol@google.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,98 +74,93 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hello,
 
-> On Mon, Jan 23, 2023, Erdem Aktas wrote:
-> > On Mon, Jan 23, 2023 at 10:53 AM Sean Christopherson  
-> <seanjc@google.com> wrote:
-> > >
-> > > On Mon, Jan 23, 2023, Maciej S. Szmigiero wrote:
-> > > > On 23.01.2023 19:30, Erdem Aktas wrote:
-> > > > > On Fri, Jan 20, 2023 at 4:28 PM Sean Christopherson  
-> <seanjc@google.com> wrote:
-> > > > > >
-> > > > > > On Sat, Jan 21, 2023, Ackerley Tng wrote:
-> > > > > > > Some SSE instructions assume a 16-byte aligned stack, and GCC  
-> compiles
-> > > > > > > assuming the stack is aligned:
-> > > > > > > https://gcc.gnu.org/bugzilla/show_bug.cgi?id=40838. This  
-> combination
-> > > > > > > results in a #GP in guests.
-> > > > > > >
-> > > > > > > Adding this compiler flag will generate an alternate prologue  
-> and
-> > > > > > > epilogue to realign the runtime stack, which makes selftest  
-> code
-> > > > > > > slower and bigger, but this is okay since we do not need  
-> selftest code
-> > > > > > > to be extremely performant.
-> > > > > >
-> > > > > > Huh, I had completely forgotten that this is why SSE is  
-> problematic.  I ran into
-> > > > > > this with the base UPM selftests and just disabled SSE.   
-> /facepalm.
-> > > > > >
-> > > > > > We should figure out exactly what is causing a misaligned  
-> stack.  As you've noted,
-> > > > > > the x86-64 ABI requires a 16-byte aligned RSP.  Unless I'm  
-> misreading vm_arch_vcpu_add(),
-> > > > > > the starting stack should be page aligned, which means  
-> something is causing the
-> > > > > > stack to become unaligned at runtime.  I'd rather hunt down  
-> that something than
-> > > > > > paper over it by having the compiler force realignment.
-> > > > >
-> > > > > Is not it due to the 32bit execution part of the guest code at  
-> boot
-> > > > > time. Any push/pop of 32bit registers might make it a 16-byte
-> > > > > unaligned stack.
-> > > >
-> > > > 32-bit stack needs to be 16-byte aligned, too (at function call  
-> boundaries) -
-> > > > see [1] chapter 2.2.2 "The Stack Frame"
-> > >
-> > > And this showing up in the non-TDX selftests rules that out as the  
-> sole problem;
-> > > the selftests stuff 64-bit mode, i.e. don't have 32-bit boot code.
-> >
-> > Thanks Maciej and Sean for the clarification. I was suspecting the
-> > hand-coded assembly part that we have for TDX tests but  it being
-> > happening in the non-TDX selftests disproves it.
+The series aims to add vPMU selftests to improve the test coverage
+for KVM's PMU emulation. It includes the tests that validates actions
+from userspace, such as verifying the guest read/write accesses to the
+PMu registers while limiting the number for PMCs, and allowing or denying
+certain events via KVM_ARM_VCPU_PMU_V3_FILTER attribute. It also includes
+tests for KVM's guarding of the PMU attributes to count EL2/EL3 events,
+and formal KVM behavior that enables PMU emulation. The last part validates
+the guest expectations of the vPMU by setting up a stress test that
+force-migrates multiple vCPUs frequently across random pCPUs in the system,
+thus ensuring KVM's management of vCPU PMU contexts correctly.
 
-> Not necessarily, it could be both.  Goofs in the handcoded assembly and  
-> PEBKAC
-> on my end :-)
+As suggested by Oliver in my original post of the series [1] (and with
+Reiji's permission), I'm re-posting the series to include the
+selftest patches from Reiji's series that aims to limit the number
+of PMCs for the guest [2].
 
-I figured it out!
+Patches 1-4 are unmodified patches 11-14 from Reiji's series [2],
+which introduces the vPMU selftests that adds a test to validate
+the read/write functionalities for the guest accesses to the
+implemented and unimplemented counters.
 
-GCC assumes that the stack is 16-byte aligned **before** the call
-instruction. Since call pushes rip to the stack, GCC will compile code
-assuming that on entrance to the function, the stack is -8 from a
-16-byte aligned address.
+Patch-5 refactors the existing tests for plugging-in the upcoming tests
+easily and rename the test file to a more generic name.
 
-Since for TDs we do a ljmp to guest code, providing a function's
-address, the stack was not modified by a call instruction pushing rip to
-the stack, so the stack is 16-byte aligned when the guest code starts
-running, instead of 16-byte aligned -8 that GCC expects.
+Patch-6 and 7 add helper macros and functions respectively to interact
+with the cycle counter.
 
-For VMs, we set rip to a function pointer, and the VM starts running
-with a 16-byte algined stack too.
+Patch-8 extends create_vpmu_vm() to accept an array of event filters
+as an argument that are to be applied to the VM.
 
-To fix this, I propose that in vm_arch_vcpu_add(), we align the
-allocated stack address and then subtract 8 from that:
+Patch-9 tests the KVM_ARM_VCPU_PMU_V3_FILTER attribute by scripting
+various combinations of events that are to be allowed or denied to
+the guest and verifying guest's behavior.
 
-@@ -573,10 +573,13 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm,  
-uint32_t vcpu_id,
-         vcpu_init_cpuid(vcpu, kvm_get_supported_cpuid());
-         vcpu_setup(vm, vcpu);
+Patch-10 adds test to validate KVM's handling of guest requests to count
+events in EL2/EL3.
 
-+       stack_vaddr += (DEFAULT_STACK_PGS * getpagesize());
-+       stack_vaddr = ALIGN_DOWN(stack_vaddr, 16) - 8;
-+
-         /* Setup guest general purpose registers */
-         vcpu_regs_get(vcpu, &regs);
-         regs.rflags = regs.rflags | 0x2;
--       regs.rsp = stack_vaddr + (DEFAULT_STACK_PGS * getpagesize());
-+       regs.rsp = stack_vaddr;
-         regs.rip = (unsigned long) guest_code;
-         vcpu_regs_set(vcpu, &regs);
+Patch-11 introduces the vCPU migration stress testing by validating cycle
+counter and general purpose counter's behavior across vCPU migrations.
+
+Patch-12, 13, and 14 expands the tests in patch-8 to validate
+overflow/IRQ functionality, chained events, and occupancy of all the PMU
+counters, respectively.
+
+Patch-15 extends create_vpmu_vm() to create multiple vCPUs for the VM.
+
+Patch-16 expands the stress tests for multiple vCPUs.
+
+The series has been tested on hardwares with PMUv3p1 and PMUv3p5 on
+top of v6.2-rc7 plus Reiji's series [2].
+
+Thank you.
+Raghavendra
+
+[1]: https://lore.kernel.org/all/20230213180234.2885032-1-rananta@google.com/
+[2]: https://lore.kernel.org/all/20230211031506.4159098-1-reijiw@google.com/
+
+Raghavendra Rao Ananta (12):
+  selftests: KVM: aarch64: Refactor the vPMU counter access tests
+  tools: arm64: perf_event: Define Cycle counter enable/overflow bits
+  selftests: KVM: aarch64: Add PMU cycle counter helpers
+  selftests: KVM: aarch64: Consider PMU event filters for VM creation
+  selftests: KVM: aarch64: Add KVM PMU event filter test
+  selftests: KVM: aarch64: Add KVM EVTYPE filter PMU test
+  selftests: KVM: aarch64: Add vCPU migration test for PMU
+  selftests: KVM: aarch64: Test PMU overflow/IRQ functionality
+  selftests: KVM: aarch64: Test chained events for PMU
+  selftests: KVM: aarch64: Add PMU test to chain all the counters
+  selftests: KVM: aarch64: Add multi-vCPU support for vPMU VM creation
+  selftests: KVM: aarch64: Extend the vCPU migration test to multi-vCPUs
+
+Reiji Watanabe (4):
+  tools: arm64: Import perf_event.h
+  KVM: selftests: aarch64: Introduce vpmu_counter_access test
+  KVM: selftests: aarch64: vPMU register test for implemented counters
+  KVM: selftests: aarch64: vPMU register test for unimplemented counters
+
+ tools/arch/arm64/include/asm/perf_event.h     |  265 +++
+ tools/testing/selftests/kvm/Makefile          |    1 +
+ .../testing/selftests/kvm/aarch64/vpmu_test.c | 1710 +++++++++++++++++
+ .../selftests/kvm/include/aarch64/processor.h |    1 +
+ 4 files changed, 1977 insertions(+)
+ create mode 100644 tools/arch/arm64/include/asm/perf_event.h
+ create mode 100644 tools/testing/selftests/kvm/aarch64/vpmu_test.c
+
+-- 
+2.39.1.581.gbfd45094c4-goog
+
