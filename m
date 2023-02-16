@@ -2,68 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 20B54699C68
-	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 19:37:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E6BE8699C7B
+	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 19:40:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229512AbjBPShT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Feb 2023 13:37:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42914 "EHLO
+        id S229523AbjBPSkm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Feb 2023 13:40:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229612AbjBPShS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Feb 2023 13:37:18 -0500
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D09531A488
-        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 10:37:11 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-4cddba76f55so29836687b3.23
-        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 10:37:11 -0800 (PST)
+        with ESMTP id S229483AbjBPSkl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Feb 2023 13:40:41 -0500
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD8043773A
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 10:40:38 -0800 (PST)
+Received: by mail-lj1-x234.google.com with SMTP id s8so2959536ljp.2
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 10:40:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ksbzkRXE/JS/W0+wuWEP51+Px76UP+MTJknwcR2OxYA=;
-        b=HOou0cn+O+Cn+zaA5Js8kqXP0pHL+tzhW3BZfhadB1+IT2Wvi5cFGLnJPjwNJyV1XL
-         WGWiYPo0N7wgo7LG2uC+rtNrDw8a14+tquWecN4k3h+upfsRsTiSc6gTcYAORRfI8odw
-         cuO0B0Pl7fCGoBbSEO/pgFbjXmzkfWho0RDT+6OBcAzXByCrPrEVfKp/K6dxNHEP5pyd
-         4RvyNFYy8R8U+HMnKCYItQ2JmGqrEwHz/xWPan696rLLoM1xO21Nct2BzGqFBebF4jQi
-         nQX7RxHLxSVTnNS17BR2yowmVhlbN4tDCvgxfaakrq8fXxytIKya0ZWNJlBEwT0z9Squ
-         H39g==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=RnMIt9bnD7wu1F07oZKc3PilekU/6n+6FHRDumzc86Y=;
+        b=Gc7PdyPlyXxguZiljzwytZvv24ednOVuDLzY6afquonF+u7ybs/MKVXMHiLjEdvLNl
+         rdrqBaNqeCXfi+hUzhXqHyY0Mx9ZVQbMcJ4Y+yKDdqe5B3AJwjeEFt8SdV1c5jO9J8TS
+         wn47Sv3woYnowMkEqYUPhhs+iaVxC8so3WnYHBpK+casd/rA6zLqRZ0PA0s3EEMMQ6Wn
+         sDkB62VXNZQYBycJgOXGguCBQFs5eelaXn6s+1eO12ULsJfLE8uzOVcgAgnq67pWW6CJ
+         gzyaqGHyDcfPgn4jwlTJHv3Q822gtaovw/1s1YzEGz5TAw8+4LexRHBgeIZbTEN7lJBK
+         ftYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ksbzkRXE/JS/W0+wuWEP51+Px76UP+MTJknwcR2OxYA=;
-        b=Z5Rsxa8ugz1wtKGhIVm81NJ9KKY5YBmAcz8ZFQg9c6hrh4h6KE9dZp5XAIKzuQHG06
-         /lE1MSapar5G+BbDwInMBwCpcjlpmdqI08C2aIDXikC/Czw5Ous0vUvj6LIAsur/Xa6O
-         eWS84/gDHnKL7vPhbLp9eJoaLlBhD5bwvJYMGganhB0Z/zOgxZNOci8OfgTBoAS2jic1
-         tPTpln/WCiAUDDHh4L4Tzi59oJvF+7a/h0zMYjUFgLMqFaYDzGaDwWuEkD2k1q4Pjawj
-         gDPL6jwR0wlU5tAmsJXgLOrpDjfgeAou2N6fUDTAhXTZZ7/tDUICNY18zD6od8eGHthM
-         yG8Q==
-X-Gm-Message-State: AO0yUKUjHmWvBZ0LzSVhKUx1OQFJXcdCDsa09Qm1hLf4YbZbk+0nAthC
-        oRPwyboiBQSsVDyro2W8KEmMsx2Bnls=
-X-Google-Smtp-Source: AK7set9FC37TETZLek6ManiQtw89cTALH4cPfGew4iMbQvxpHiSKs9rZtjcJmcWpnx/5yFRsj23JzcEeuxQ=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:9e0a:0:b0:8a0:96fa:f8f1 with SMTP id
- m10-20020a259e0a000000b008a096faf8f1mr1015418ybq.535.1676572631114; Thu, 16
- Feb 2023 10:37:11 -0800 (PST)
-Date:   Thu, 16 Feb 2023 10:37:09 -0800
-In-Reply-To: <BYAPR12MB3014D1E557077CB76DEA019DA0A09@BYAPR12MB3014.namprd12.prod.outlook.com>
-Mime-Version: 1.0
-References: <c0bf0011-a697-da29-c2d2-8c16e9df21cf@outlook.com>
- <BYAPR12MB301441A16CE6CFFE17147888A0A09@BYAPR12MB3014.namprd12.prod.outlook.com>
- <Y+52DQQT+N/4gWDb@google.com> <BYAPR12MB3014D1E557077CB76DEA019DA0A09@BYAPR12MB3014.namprd12.prod.outlook.com>
-Message-ID: <Y+531ch/dAfdJbYV@google.com>
-Subject: Re: Fwd: Windows 11 guest crashing supposedly in smm after some time
- of use
-From:   Sean Christopherson <seanjc@google.com>
-To:     "=?utf-8?Q?Micha=C5=82?= Zegan" <webczat@outlook.com>
-Cc:     kvm@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RnMIt9bnD7wu1F07oZKc3PilekU/6n+6FHRDumzc86Y=;
+        b=LvIb+6uJi00tqCYOod4HzKxXfXsTK6NBEUfx7RrnQEasisTMVt2d72liSHmRyRUYba
+         h7mcql1rwPx7FZS6WMoVmZTCeeWoFyDxC8sHZ5tsDWpb12Yw+24JE4jhLZWj9Or6eW5+
+         ExfKUnXY1txDS0q8WBu5XY72N/P43kqRBOj0mZoFQnpJ4EtGzrgnzD6u8AT5yX+RPYCG
+         OfUTf9Bd02is9B6nQA4eoGeQCwS0IM7gg5lCCfjsdj0oDSYzULZqzWzOmtN/vpq55Zvd
+         f98NkcSum8dku5s2+ReZpHPg7egFNLnSoGOx8ftoMVzuIZ0fT8IG93F+nJI/Atn3zLtu
+         +npQ==
+X-Gm-Message-State: AO0yUKVE8xjdu5akTodeVHbpFNVgGeM7j5AfVr0ZZGgKWM/1BD05PCTp
+        SclUVOZN6t/qI95YUsIF7xhS17jQ0IIGDmXzpm6bwA==
+X-Google-Smtp-Source: AK7set8d1ow8EwFVcWsYe3UhF/Y/BVKZ+jmgNE4AHtQsnrzbBExG0wMqBkQiRH5Oea6ywGOdHY+k64dCkT9M35dUXVg=
+X-Received: by 2002:a05:651c:1719:b0:293:4e6d:f4f7 with SMTP id
+ be25-20020a05651c171900b002934e6df4f7mr1937041ljb.3.1676572836926; Thu, 16
+ Feb 2023 10:40:36 -0800 (PST)
+MIME-Version: 1.0
+References: <CAAhR5DE4rYey42thw_4toKx0tEn5ZY3mRq8AJT=YQqemqvt7pw@mail.gmail.com>
+ <CAMkAt6pTNZ2_+0RNZcPFHhG-9o2q0ew0Wgd=m_T6KfLSYJyB4g@mail.gmail.com> <Y+5zaeJxKr6hzp4w@google.com>
+In-Reply-To: <Y+5zaeJxKr6hzp4w@google.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Thu, 16 Feb 2023 11:40:24 -0700
+Message-ID: <CAMkAt6rq855c2691cqvPh6A7vj0qXWtgDNniL_s8ZqLmcsTJFw@mail.gmail.com>
+Subject: Re: Issue with "KVM: SEV: Add support for SEV intra host migration"
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Sagi Shahar <sagis@google.com>, kvm@vger.kernel.org,
+        Erdem Aktas <erdemaktas@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ryan Afranji <afranji@google.com>,
+        Michael Sterritt <sterritt@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,71 +71,102 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+Maxim
+On Thu, Feb 16, 2023 at 11:18 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Thu, Feb 16, 2023, Peter Gonda wrote:
+> > On Mon, Feb 13, 2023 at 1:07 PM Sagi Shahar <sagis@google.com> wrote:
+> > >
+> > > TL;DR
+> > > Marking an SEV VM as dead after intra-host migration prevents cleanly tearing
+> > > down said VM.
+> > >
+> > > We are testing our POC code for TDX copyless migration and notice some
+> > > issues. We are currently using a similar scheme to the one used for
+> > > SEV where the VM is marked as dead after the migration is completed
+> > > which prevents any other IOCTLs from being triggered on the VM.
+> > >
+> > > From what we are seeing, there are at least 2 IOCTLs that VMM is
+> > > issuing on the source VM after the migration is completed. The first
+> > > one is KVM_IOEVENTFD for unwiring an eventfd used for the NVMe admin
+> > > queue during the NVMe device unplug sequence. The second IOCTL is
+> > > KVM_SET_USER_MEMORY_REGION for removing the memslots during VM
+> > > destruction. Failing any of these IOCTLs will cause the migration to
+> > > fail.
+>
+> Does the VMM _need_ to cleanly teardown the source VM?  If so, why?
+>
+> > > I can see 3 options:
+> > >
+> > > 1) If we want to keep the vm_dead logic as is, this means changing to
+> > > VMM code in some pretty hacky way. We will need to distinguish between
+> > > regular VM shutdown to VM shutdown after migration. We will also need
+> > > to make absolutely sure that we don't leave any dangling data in the
+> > > kernel by skipping some of the cleanup stages.
+> > >
+> > > 2) If we want to remove the vm_dead logic we can simply not mark the
+> > > vm as dead after migration. It looks like it will just work but might
+> > > create special cases where IOCTLs can be called on a TD which isn't
+> > > valid anymore. From what I can tell, some of these code paths are
+> > > already  protected by a check if hkid is assigned so it might not be a
+> > > big issue. Not sure how this will work for SEV but I'm guessing
+> > > there's a similar mechanism there as well.
+> > >
+> > > 3) We can also go half way and only block certain memory encryption
+> > > related IOCTLs if the VM got migrated. This will likely require more
+> > > changes when we try to push this ustream since it will require adding
+> > > a new field for vm_mem_enc_dead (or something similar) in addition to
+> > > the current vm_bugged and vm_dead.
+> > >
+> > > Personally, I don't want to go with option (1) since it sounds quite
+> > > risky to make these kind of changes without fully understanding all
+> > > the possible side effects.
+> > >
+> > > I prefer either option (2) or (3) but I don't know which one will be
+> > > more acceptable by the community.
+> >
+> > I agree option 2 or 3 seem preferable. Option two sounds good to me, I
+> > am not sure why we needed to disable all IOCLTs on the source VM after
+> > the migration. I was just taking feedback on the review.
+>
+> I don't like #2.  For all intents and purposes, the source VM _is_ dead, or at
+> least zombified.  It _was_ an SEV guest, but after migration it's no longer an
+> SEV guest, e.g. doesn't have a dedicated ASID, etc.  But the CPUID state and a
+> pile of register state won't be coherent, especially on SEV-ES where KVM doesn't
+> have visibility into guest state.
+>
+> > We have the ASID similar to the HKID in SEV. I don't think the code
+> > paths are already protected like you mention TDX is but that seems
+> > like a simple enough fix. Or maybe it's better to introduce a new
+> > VM_MOVED like VM_BUGGED and VM_DEAD which allows most IOCTLs but just
+> > disables running vCPUs.
+>
+> I kinda like the idea of a VM_MOVED flag, but I'm a bit leary of it from a
+> a maintenance and ABI perspective.  Definining and documenting what ioctls()
+> are/aren't allowed would get rather messy.  The beauty of VM_DEAD is that it's
+> all or nothing.
+>
+> > What about option 4. Remove the VM_DEAD on migration and do nothing
+> > else.
+>
+> I'm strongly against doing nothing.  It _might_ be safe from KVM's perspective,
+> but I would really prefer not to have to constantly think about whether or not a
+> given change is safe in the context of a zombified SEV guest.
 
-On Thu, Feb 16, 2023, Micha=C5=82 Zegan wrote:
-> What these issues were? I don't have a quick ability to test kernel 6.2, =
-but
-> fedora will receive it, so I will definitely get a chance. Can you give m=
-e
-> any pointers so that I can see whether it could be related?
+What if it was the responsibility of sev_vm_move_enc_context_from()
+(and I assume tdx_vm_move_enc_context_from) to put the VM and its
+vCPUs into a safe state with regard to KVM. That state can be
+completely broken for running the VM though as it would need to be for
+SEV-ES and TDX.
 
-I don't know the details, we (Google) don't rely on emulating SMM to suppor=
-t secure
-boot.
 
-Maxim, do you have any pointers for determining whether or not the KVM SMM =
-issues
-might be related?
-
-> W dniu 16.02.2023 o=C2=A019:29, Sean Christopherson pisze:
-> > On Thu, Feb 16, 2023, Micha=C5=82 Zegan wrote:
-> > > Resending to kvm mailing list, in case someone here might help... Als=
-o will
-> > > try again with newer ovmf, but assume it happens.
-> > > I have windows11 installed on a vm. This vm generally works properly,=
- but
-> > > then might crash unexpectedly at any point, this includes situation l=
-ike
-> > > logging onto the system and leaving it intact for like an hour or les=
-s. This
-> > > can be reproduced by waiting long enough but there is no single known=
- action
-> > > causing it.
-> > >=20
-> > > What could be the problem?
-> > >=20
-> > >=20
-> > > Configuration and error details:
-> > >=20
-> > > My host is a msi vector gp76 laptop with intel core i7 12700h, 32gb o=
-f
-> > > memory, host os is fedora linux 37 with custom compiled linux kernel =
-(fedora
-> > > patches). Current kernel version is 6.1.10 but when I installed the v=
-m it
-> > > was 6.0 or less, don't quite remember exactly, and this bug was prese=
-nt. Not
-> > > sure if bios is up to date, but microcode is, if that matters.
-> > ...
-> >=20
-> > > Guest is windows 11 pro 64 bit.
-> > >=20
-> > > What crashes is qemu itself, not that the guest is bsod'ing.
-> > Can you try a 6.2 or later kernel?  E.g. Linus' HEAD, linux-next, kvm/q=
-ueue, etc.
-> > KVM had a pile of SMM fixes[*] merged for 6.2 specifically aimed at fix=
-ing issues
-> > with secure boot of Windows 11 guest.  They aren't likely to be backpor=
-ted to LTS
-> > kernels as they aren't easily consumable (though I'm guessing software =
-vendors
-> > will end up backporting to their supported kernels).
-> >=20
-> > [*] https://na01.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2F=
-lore.kernel.org%2Fall%2F20221025124741.228045-1-mlevitsk%40redhat.com&data=
-=3D05%7C01%7C%7Ced887369e7a446c55aa208db104bc18f%7C84df9e7fe9f640afb435aaaa=
-aaaaaaaa%7C1%7C0%7C638121689771499220%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wL=
-jAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=
-=3DoTa%2BDEScxiIn%2Fqd3KRUtqiegCv2J8p6RpZ%2Flnm%2F1f1I%3D&reserved=3D0
->=20
+>
+> > Userspace can easily make errors which cause the VM to be unusable. Does this
+> > error path really need support from KVM?
+>
+> As above, I'm concerned with KVM's safety, not the guest's.
+>
+> Depending on why the source VM needs to be cleaned up, one thought would be add
+> a dedicated ioctl(), e.g. KVM_DISMANTLE_VM, and make that the _only_ ioctl() that's
+> allowed to operate on a dead VM.  The ioctl() would be defined as a best-effort
+> mechanism to teardown/free internal state, e.g. destroy KVM_PIO_BUS, KVM_MMIO_BUS,
+> and memslots, zap all SPTEs, etc...
