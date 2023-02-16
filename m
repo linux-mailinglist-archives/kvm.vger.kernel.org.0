@@ -2,86 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 97FF3699670
-	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 14:57:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4EF6A699672
+	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 14:57:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229793AbjBPN4d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Feb 2023 08:56:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35348 "EHLO
+        id S229485AbjBPN5g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Feb 2023 08:57:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230038AbjBPN4U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Feb 2023 08:56:20 -0500
+        with ESMTP id S229999AbjBPN5d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Feb 2023 08:57:33 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C2A33BD9D
-        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 05:55:37 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62F7C3B21B
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 05:56:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676555736;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        s=mimecast20190719; t=1676555807;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=hii/hEJ9PZyd5sM9pg8DiE74V3lS3n6PlgGZ2jOvQQA=;
-        b=hqHZ2K7N1FEyU91dO0tSTZrKz+YpIas6Zmlfz7ppDkaHrDrygBo6UDLy87TDkuCFYSrVzu
-        YBeihVyE622TS1K1w70j8le1hS/hai53YeLlacQnbIJpqq2ZD6PMe/J1AB8aNzb3fUbwQf
-        zZxDi7bYAD2jH6wvgn97u9tzi1+L1Qg=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=yAY9A4DgDYTs34l5F4SNL1vgPiLPs32KphqeD6tWbMs=;
+        b=MMbSjKz8quNSwiwF5dIk7yZRucOpvGi3o/+m7kt22fZBv0HskAj0m2e0H3WNENrSYkrRED
+        lEUaRiDnC8yuqohTh1gmFat/XArOJ0lDSphk0Kp20iIQmq32Vx10G+FHZk2VpeghGSJaM/
+        B9dKJu5DNlVbO4E0X1v50Thj+G8khc0=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-631-Xiio-F3ePaq0FvN3n_NSwQ-1; Thu, 16 Feb 2023 08:55:35 -0500
-X-MC-Unique: Xiio-F3ePaq0FvN3n_NSwQ-1
-Received: by mail-qk1-f197.google.com with SMTP id bp30-20020a05620a459e00b00738e1fe2470so1204577qkb.23
-        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 05:55:35 -0800 (PST)
+ us-mta-187-T-sz2bDEPnOQnDTM60nalA-1; Thu, 16 Feb 2023 08:56:46 -0500
+X-MC-Unique: T-sz2bDEPnOQnDTM60nalA-1
+Received: by mail-wm1-f70.google.com with SMTP id j20-20020a05600c1c1400b003dc5dd44c0cso855530wms.8
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 05:56:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hii/hEJ9PZyd5sM9pg8DiE74V3lS3n6PlgGZ2jOvQQA=;
-        b=bzAoC+h/5z7qeTb3dPiyVtlw439lFHln256ZB6Cp7XAtPv+hEa6LKRFdF2kn8khdRO
-         kygfqG7QZ0Ee4lRtjfyYJqHBsaB5iMqNf0xVO3z8ICC9dpTHyRfDlbUlEQMjwXofhksZ
-         MX5fXtXhGrqex3U1Ch6OfUVQjIIsYlViMnmM4mp8/gtWaLw8lcMl52kQhM6d+ne6h2oK
-         3/dikKAJXmRV6oc5hriDwhJdIs2wTpfGKbqfMXJyKvqw1eeOpOXDqqpedXnVsa1MT2pg
-         n1APltFeB7VvMos7A5TXrJ0RF+upD1SQusXhRgsRPhDer3xAEH8IOpqJO1uHwLynHx9o
-         Z88g==
-X-Gm-Message-State: AO0yUKXSdLGCXdDoPz/WcaNeWL2PwsmQHRIGHtInQzhZPxyvs1IS3P+4
-        R4KgJblMLCauEEX5DqX9WklQ1BeLfMp6TIyI2iG0w2j+VIhZSCFFNvhIWJyzP1fDO9zGXe/1HqH
-        7r6ss3+4Wa3mY
-X-Received: by 2002:ac8:5bd5:0:b0:3bb:8f10:6029 with SMTP id b21-20020ac85bd5000000b003bb8f106029mr10792543qtb.50.1676555734666;
-        Thu, 16 Feb 2023 05:55:34 -0800 (PST)
-X-Google-Smtp-Source: AK7set+JnPrAuwzQGhfHNhTBc/+z66FBbT4aDZCX6sfMD4/mj4mAXZ+i5dm9S21S3kppDEVaj0vlBQ==
-X-Received: by 2002:ac8:5bd5:0:b0:3bb:8f10:6029 with SMTP id b21-20020ac85bd5000000b003bb8f106029mr10792507qtb.50.1676555734312;
-        Thu, 16 Feb 2023 05:55:34 -0800 (PST)
-Received: from sgarzare-redhat (host-82-57-51-167.retail.telecomitalia.it. [82.57.51.167])
-        by smtp.gmail.com with ESMTPSA id r188-20020a37a8c5000000b00729a26e836esm1206352qke.84.2023.02.16.05.55.31
+        h=content-transfer-encoding:mime-version:message-id:date:reply-to
+         :user-agent:references:in-reply-to:subject:cc:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yAY9A4DgDYTs34l5F4SNL1vgPiLPs32KphqeD6tWbMs=;
+        b=XMZkr7MK9iITN8jIYj354H7+L+ha7cX9p7linT8iQA400KQZLje4qntmiV1pwzmhJE
+         NkIDPg7cUtfzvIXSSB9bO5NSlZt/ZEExyWq/fQ6yBYxjLpwl9UGY4EW04LX8qamPajW9
+         hWmzs8uyTE6zlLzStB9u3fNlZ3XHkd1SBqBJ/bFfmunidyYdDJO2U038A00r9ICmlOh0
+         Tu7d8tEkQG/twnrDiu7udEg7QobcLCnF/zUHhGMVwfc0nwW02Ib1OPBTPpfELjJFFWD5
+         Nsi9LJmn/sy9YAR+qMBhm76MAXe8sVqYh9Rd+scCYKtLnDSv7aWnCqX5uq0hP5FmpTeU
+         +iqw==
+X-Gm-Message-State: AO0yUKUQT6JNZPJYDsmVSiJonvevmc3AoXJX1K0+UCFxCD1sXGvZN2Hm
+        hs74t0sbWL+jTct6apUNBqUTFr0xnBh+OfZ9Si+5OlpIQcmWQjxQAXkJunfJA5bHdDsGrg0VMAv
+        PAkg/LZ1cwXM7
+X-Received: by 2002:adf:d1c1:0:b0:2c3:be89:7c2a with SMTP id b1-20020adfd1c1000000b002c3be897c2amr2008358wrd.13.1676555804825;
+        Thu, 16 Feb 2023 05:56:44 -0800 (PST)
+X-Google-Smtp-Source: AK7set/UHB8LhBNMXatokxc3iGpvsyF0+wMJFk3Dy2w1kDt1q6H6J++YHovfDvwaPmRyJa35CX0Pug==
+X-Received: by 2002:adf:d1c1:0:b0:2c3:be89:7c2a with SMTP id b1-20020adfd1c1000000b002c3be897c2amr2008337wrd.13.1676555804517;
+        Thu, 16 Feb 2023 05:56:44 -0800 (PST)
+Received: from redhat.com ([46.136.252.173])
+        by smtp.gmail.com with ESMTPSA id a8-20020a5d5088000000b002c567881dbcsm1579374wrt.48.2023.02.16.05.56.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Feb 2023 05:55:33 -0800 (PST)
-Date:   Thu, 16 Feb 2023 14:55:28 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Krasnov Arseniy <oxffffaa@gmail.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        kernel <kernel@sberdevices.ru>
-Subject: Re: [RFC PATCH v1 02/12] vsock: read from socket's error queue
-Message-ID: <20230216135528.ge4otfhfv22p3htc@sgarzare-redhat>
-References: <0e7c6fc4-b4a6-a27b-36e9-359597bba2b5@sberdevices.ru>
- <7b2f00ce-296c-3f59-9861-468c6340300e@sberdevices.ru>
+        Thu, 16 Feb 2023 05:56:44 -0800 (PST)
+From:   Juan Quintela <quintela@redhat.com>
+To:     Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Mark Burton <mburton@qti.qualcomm.com>,
+        Bill Mills <bill.mills@linaro.org>,
+        Marco Liebel <mliebel@qti.qualcomm.com>,
+        Alexandre Iooss <erdnaxe@crans.org>,
+        Mahmoud Mandour <ma.mandourr@gmail.com>,
+        Emilio Cota <cota@braap.org>, kvm-devel <kvm@vger.kernel.org>,
+        "Wei W. Wang" <wei.w.wang@intel.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: Re: Future of icount discussion for next KVM call?
+In-Reply-To: <CAHDbmO3QSbpKLWKt9uj+2Yo_fT-dC-E4M1Nb=iWHqMSBw35-3w@mail.gmail.com>
+        ("Alex =?utf-8?Q?Benn=C3=A9e=22's?= message of "Thu, 16 Feb 2023 10:23:58
+ +0000")
+References: <87bklt9alc.fsf@linaro.org>
+        <CAHDbmO3QSbpKLWKt9uj+2Yo_fT-dC-E4M1Nb=iWHqMSBw35-3w@mail.gmail.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+Reply-To: quintela@redhat.com
+Date:   Thu, 16 Feb 2023 14:56:43 +0100
+Message-ID: <875yc1k92c.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <7b2f00ce-296c-3f59-9861-468c6340300e@sberdevices.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -89,90 +93,24 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 06, 2023 at 06:54:51AM +0000, Arseniy Krasnov wrote:
->This adds handling of MSG_ERRQUEUE input flag for receive call, thus
->skb from socket's error queue is read.
+Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+> (replying all because qemu-devel rejected my email again)
 
-A general tip, add a little more description in the commit messages,
-especially to explain why these changes are necessary.
-Otherwise, even review becomes difficult because one has to look at all
-the patches to understand what the previous ones are for.
-I know it's boring, but it's very useful for those who review and even
-then if we have to bisect ;-)
+Just to see what we are having now:
 
-Thanks,
-Stefano
+- single qemu binary moved to next slot (moved to next week?)
+  Phillipe proposal
+- TDX migration: we have the slides, but no code
+  So I guess we can move it to the following slot, when we have a chance
+  to look at the code, Wei?
+- Markus asked to have only one topic per call
+  (and it is reasonable)
+- the future of icount cames with documentation to read before the call.
 
->
->Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->---
-> include/linux/socket.h   |  1 +
-> net/vmw_vsock/af_vsock.c | 26 ++++++++++++++++++++++++++
-> 2 files changed, 27 insertions(+)
->
->diff --git a/include/linux/socket.h b/include/linux/socket.h
->index 13c3a237b9c9..19a6f39fa014 100644
->--- a/include/linux/socket.h
->+++ b/include/linux/socket.h
->@@ -379,6 +379,7 @@ struct ucred {
-> #define SOL_MPTCP	284
-> #define SOL_MCTP	285
-> #define SOL_SMC		286
->+#define SOL_VSOCK	287
->
-> /* IPX options */
-> #define IPX_TYPE	1
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index b5e51ef4a74c..f752b30b71d6 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -110,6 +110,7 @@
-> #include <linux/workqueue.h>
-> #include <net/sock.h>
-> #include <net/af_vsock.h>
->+#include <linux/errqueue.h>
->
-> static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr);
-> static void vsock_sk_destruct(struct sock *sk);
->@@ -2086,6 +2087,27 @@ static int __vsock_seqpacket_recvmsg(struct sock *sk, struct msghdr *msg,
-> 	return err;
-> }
->
->+static int vsock_err_recvmsg(struct sock *sk, struct msghdr *msg)
->+{
->+	struct sock_extended_err *ee;
->+	struct sk_buff *skb;
->+	int err;
->+
->+	lock_sock(sk);
->+	skb = sock_dequeue_err_skb(sk);
->+	release_sock(sk);
->+
->+	if (!skb)
->+		return -EAGAIN;
->+
->+	ee = &SKB_EXT_ERR(skb)->ee;
->+	err = put_cmsg(msg, SOL_VSOCK, 0, sizeof(*ee), ee);
->+	msg->msg_flags |= MSG_ERRQUEUE;
->+	consume_skb(skb);
->+
->+	return err;
->+}
->+
-> static int
-> vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
-> 			  int flags)
->@@ -2096,6 +2118,10 @@ vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
-> 	int err;
->
-> 	sk = sock->sk;
->+
->+	if (unlikely(flags & MSG_ERRQUEUE))
->+		return vsock_err_recvmsg(sk, msg);
->+
-> 	vsk = vsock_sk(sk);
-> 	err = 0;
->
->-- 
->2.25.1
+So I think we can do the icount call this week, and discuss here on list
+if we move to a weekly call on the same slot.
+
+What do you think?
+
+Later, Juan.
 
