@@ -2,185 +2,285 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A760698E32
-	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 08:59:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 90FC9698EF5
+	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 09:48:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229696AbjBPH7W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Feb 2023 02:59:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60638 "EHLO
+        id S229838AbjBPIsQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Feb 2023 03:48:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229495AbjBPH7V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Feb 2023 02:59:21 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B311EC7B
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 23:58:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676534314;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=eQOjVsFCow0A7sQ5eVwn9Fx+XiRjrGdejeIN4EGNxn4=;
-        b=f1KqFO/aOVibGE7YWpV6nAwq/Jd0XgumxUOhG2JdohQsii3gzii2Ati4IMKHYSDnGEhZt9
-        rW4Kc3v0NtDo4/MH26FgtytkSwhjRhPUonm+k6m3FfzGgZrRQ3JQD6cSAcGc94SY/5Vxp4
-        GhcCaK+7EUbiNlXEjl/XOVflBTxqSMA=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-84--KcPXUwzP-iVHj1HwxsfjA-1; Thu, 16 Feb 2023 02:58:33 -0500
-X-MC-Unique: -KcPXUwzP-iVHj1HwxsfjA-1
-Received: by mail-qk1-f197.google.com with SMTP id g6-20020ae9e106000000b00720f9e6e3e2so734176qkm.13
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 23:58:32 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=eQOjVsFCow0A7sQ5eVwn9Fx+XiRjrGdejeIN4EGNxn4=;
-        b=MfFRSsPZY4b3aGCSq5c2J+ZaKrGwg3OqAbdc2U3j+vmLSnp3jkml0KBQvRHrSbBV/L
-         XNXUMtyS7n+BEYZie12JfS98gq3S1YqeTsaKkqemfCNh6xP3QqBKFaYGqcyASLpemBf+
-         g248Pvhca7OlzhdFtRVdZeWNssGrxelUrLP94H8p5ajUbpfd45PiXlI72b6jR76CRNxA
-         tlcWxr7a6mF4EkQr/NvZEL7bkGcCB9kwzant16Sr+wnvxdJN+k7iQrPX26WJpEgcGdz6
-         jyuxPgckVW21s0575g0lVP7izg3xgNFK4f5AQhj738Fo9pjBfJKE1qdww6jhR8/boO+2
-         9HYA==
-X-Gm-Message-State: AO0yUKUC4pGmzUboeeNZl+uUu3G4PjWkS/3RuOG9UhP/xIxau3ZTXj8i
-        a3h0p98QFRm80ak4X5N+g0DzpAwFNLseaMNEVs8xAs/BmCdWd9yE1/JoEaiwt1DaJT0pJ1zXFMO
-        S+9/60fjGIX8F
-X-Received: by 2002:ac8:7d06:0:b0:3b8:6c10:f52 with SMTP id g6-20020ac87d06000000b003b86c100f52mr9108817qtb.46.1676534312521;
-        Wed, 15 Feb 2023 23:58:32 -0800 (PST)
-X-Google-Smtp-Source: AK7set8cSqYROssY81qYk1tIYDpeDpcutDsT3ukmfNWC6FjE0fX7JbR/tBo3b/veb7UgJW0FBStazQ==
-X-Received: by 2002:ac8:7d06:0:b0:3b8:6c10:f52 with SMTP id g6-20020ac87d06000000b003b86c100f52mr9108798qtb.46.1676534312229;
-        Wed, 15 Feb 2023 23:58:32 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id s64-20020a372c43000000b00719165e9e72sm689993qkh.91.2023.02.15.23.58.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Feb 2023 23:58:31 -0800 (PST)
-Message-ID: <240d4842-5f71-bf51-6a7c-845c70ce0abd@redhat.com>
-Date:   Thu, 16 Feb 2023 08:58:20 +0100
+        with ESMTP id S229505AbjBPIsP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Feb 2023 03:48:15 -0500
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8CB538E86;
+        Thu, 16 Feb 2023 00:48:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1676537294; x=1708073294;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=5djWH0WSuY+3FU/poQKqEXOPP6rLmgylUgHL+WSICYk=;
+  b=TnQ1LekKZl0qO/EfklRhJthcJ3plK0YUdeWMHjjGyOqSkODjSlpUULCd
+   tkADF2FTzDN9eOQDIEvj5NUOBn8h4im8yoUwjERQwxJDolIG+qUvJjgEk
+   dPeiNjsZHQ9sD+UPuNu8FhFtayAK5asI2EvU0Kx3adiO8m8hOfuSGTvw3
+   vdelSNTqwcoU7Cg0NcTEiCo2a9vE/NOPnYiUprfzr6VP24Y6ntnSPECoY
+   hys1HLEXsw5HhkZ12su+Zpds/+hrkw330KonRnbH8p6OXRbRK3za3av7l
+   Iwmc0YIdo/xb5UFPttse7SM/5NLiMKIPZB+c86nu2hSnVyy3BA+2MJARY
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10622"; a="394086968"
+X-IronPort-AV: E=Sophos;i="5.97,302,1669104000"; 
+   d="scan'208";a="394086968"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2023 00:48:14 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10622"; a="758854711"
+X-IronPort-AV: E=Sophos;i="5.97,302,1669104000"; 
+   d="scan'208";a="758854711"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by FMSMGA003.fm.intel.com with ESMTP; 16 Feb 2023 00:48:13 -0800
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Thu, 16 Feb 2023 00:48:13 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Thu, 16 Feb 2023 00:48:12 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16 via Frontend Transport; Thu, 16 Feb 2023 00:48:12 -0800
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.177)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.16; Thu, 16 Feb 2023 00:48:12 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lR85EwXtecKKGlJUKAv9y+NvCri6KbO87TwzCaXquwABnTBUPFWoOPAkl3GAVr8ccBjBZY5Tjc5920GM6y2TkxQfD42kTcyDkWMtUZ6lkNq3niM1ToGl4hYolf9fJrJNVuUXme63WJRzjQ0TVJCRenMjRz272bjWFxdyUa4qOWTelsW/yNABcS/0eBdwo9i3kL1OgvQO+NXR9p2lxFmj1Pr97fmSDJxDwpHw8l2MD7kM45PUX+nH7NQ9F11m4p9vgVBA7xoZso6GYZssRckcJ5pQIPpyrpFrACnebxYlrFs7ygzPAm6EL0T6Zs8Hz5kYdracF0y4lSt8ZA/eZ1BvtQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CN1RFxjnQRLPr9wPofHioazHdbV5BL8JLjhKJqXLijY=;
+ b=SdQwz2NVpPT7sQtEsrz7jG3YQpgbCTTDxa6+LgyR1w8pLwiX9/aD0NbC8y1vT/AgWLW1ub5xwIgUQ3CtAjndBELNdGsu/suqOQG3FMwOxnEaYMPWuk2VgSJacH2leMDhwiGjVLnqOrSvmunj2kVxephj8JB6m08B1x2ClLRZ4WcKI4yUfs9JZ5xiKMFe3sH7DR/t/hUnE4ziGiyPFqctc3JOxU+RKebe5AFNFBZv2s9MzVPm66MkdZN6x1KVChYJobtyw7/L3TDn/+y/g6aX6Wkqe9uO4/TGLEvCHa1c2sQ3Fe7bC9Lo6Vk712jLmAAooSrxfUm9o16aTcmSL6+z7A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ IA0PR11MB7933.namprd11.prod.outlook.com (2603:10b6:208:407::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.26; Thu, 16 Feb
+ 2023 08:48:10 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::82d2:d341:4138:17ef]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::82d2:d341:4138:17ef%7]) with mapi id 15.20.6086.026; Thu, 16 Feb 2023
+ 08:48:10 +0000
+Date:   Thu, 16 Feb 2023 16:24:25 +0800
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+CC:     <joro@8bytes.org>, <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+        <kevin.tian@intel.com>, <robin.murphy@arm.com>,
+        <linux-s390@vger.kernel.org>, <yi.y.sun@linux.intel.com>,
+        <kvm@vger.kernel.org>, <mjrosato@linux.ibm.com>,
+        <jasowang@redhat.com>, <cohuck@redhat.com>, <peterx@redhat.com>,
+        <eric.auger@redhat.com>, <nicolinc@nvidia.com>,
+        <shameerali.kolothum.thodi@huawei.com>,
+        <suravee.suthikulpanit@amd.com>, <chao.p.peng@linux.intel.com>,
+        <lulu@redhat.com>, <intel-gvt-dev@lists.freedesktop.org>,
+        <intel-gfx@lists.freedesktop.org>
+Subject: Re: [PATCH v3 14/15] vfio: Add ioctls for device cdev using iommufd
+Message-ID: <Y+3oObuMG/v3+x0N@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20230213151348.56451-1-yi.l.liu@intel.com>
+ <20230213151348.56451-15-yi.l.liu@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20230213151348.56451-15-yi.l.liu@intel.com>
+X-ClientProxiedBy: SGBP274CA0012.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b0::24)
+ To DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Reply-To: eric.auger@redhat.com
-Subject: Re: [RFC v3 14/18] backends/iommufd: Introduce the iommufd object
-Content-Language: en-US
-To:     Nicolin Chen <nicolinc@nvidia.com>
-Cc:     eric.auger.pro@gmail.com, yi.l.liu@intel.com, yi.y.sun@intel.com,
-        alex.williamson@redhat.com, clg@redhat.com, qemu-devel@nongnu.org,
-        david@gibson.dropbear.id.au, thuth@redhat.com,
-        farman@linux.ibm.com, mjrosato@linux.ibm.com,
-        akrowiak@linux.ibm.com, pasic@linux.ibm.com, jjherne@linux.ibm.com,
-        jasowang@redhat.com, kvm@vger.kernel.org, jgg@nvidia.com,
-        kevin.tian@intel.com, chao.p.peng@intel.com, peterx@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, zhangfei.gao@linaro.org,
-        berrange@redhat.com, apopple@nvidia.com,
-        suravee.suthikulpanit@amd.com
-References: <20230131205305.2726330-1-eric.auger@redhat.com>
- <20230131205305.2726330-15-eric.auger@redhat.com>
- <Y+1vNgoGJJw40+9C@Asurada-Nvidia>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <Y+1vNgoGJJw40+9C@Asurada-Nvidia>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|IA0PR11MB7933:EE_
+X-MS-Office365-Filtering-Correlation-Id: 92da7912-89dd-4506-4c21-08db0ffa882e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: XVeql+u0pTjCqaO8TB4WNRJubVrEz4v1P7Z0vumcovHOSAwY2oK15ZytwvMAwbdhtps0x6I3/e3w1Xw4e3W76e06r3hhYn58eLpcusvcUGXLyCXeb/hgbRLdvlI7WPwMpfMk5Bh2OWI1Pb/wK9b+5VCLIKVPKOER64Fwhk7JBzaXFsUJhWrHi+IK9Cdqv3pvDw5LsexCiIzJDG6mHms58I4oh61wKXgylQxKURohzIDojA3pABYWHn6Js68Uf9883jSTEeLdkasVcsS3jbagDu6l3grV/pZMtIxJzR5rH37D2BWpUD6RZTDkpzKKgp7I/KdoooPeJx9x4d8QKM75Niy1PZToDIPLb3luks1Z69WPbvaFc5dLLb71dt3OMtOATU6ZBHu9UQL1/ge07/QGz00SJByRvsUGGlCo8qMyDEou7KItF8GN9REQ3riTzjunnTfrl2isExzlgKe6kTPgZD67Bb0fs726SuJK/GVh9l5O4TDBDcCFJPgBuRDtnGA6TgKBI06SjphEP1tlO2xuBfTtQb2Re42dpDOUQhpfapWQNWnVLdWiyxi+0bPZQL/sRFxoVOVHuMCxyWUrsptuXcPn6S+aWFWGd+wanai0JwJyZzOTWTLVRlgWZU8aBTmjcJVE39Dmq8VD3gs6SAhjiQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(366004)(39860400002)(346002)(396003)(376002)(136003)(451199018)(6666004)(6486002)(186003)(6512007)(478600001)(26005)(6506007)(86362001)(82960400001)(38100700002)(83380400001)(8676002)(41300700001)(8936002)(6862004)(5660300002)(7416002)(6636002)(66946007)(316002)(66556008)(66476007)(4326008)(2906002)(3450700001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?gq52KCWte0hEm6xDFy2Saf4J9qbGPeTMJp/QINPiMzmeRq8CoUJPtXB3pjkw?=
+ =?us-ascii?Q?ja8BmkvP1Lh0ZAi9eEAymazGStAhn4AKpRpfixeoHAw/SBs8L6ijtGJ5QZSc?=
+ =?us-ascii?Q?j4xlG6WLn0WU6ify1P+q0TGY+LtYQKagdz9uBInfdRF6bgJZtNh0Ctmu+Hwi?=
+ =?us-ascii?Q?3cgcvszVLQ6l1XUie7MEarg3b+SetYFkuNIWrpDUNgUoLyyo1wp1JajTd5So?=
+ =?us-ascii?Q?kUtyNpnlMbg5utHEy+1anYLUecs78ejNMS1l+trzDBFlVEs95kyQvnE/Bm79?=
+ =?us-ascii?Q?dyn1VFeqiHAxUKxzA21VUOlv1Dbdo+aNtiqs+qY6FBoCMgIiSjMnv9OoD+dg?=
+ =?us-ascii?Q?FhVdC56JEH9zTgwJj4pMJFrstK8ZjWKA5IO7ASIyehc/vYVfOidCWEr0CW4e?=
+ =?us-ascii?Q?FSH8lrE6wqTtS63/Cok3e3AA/Lwi/6Lbppiz2xrTV7+Xq45cXpgg9EkzBmfA?=
+ =?us-ascii?Q?23vQHkzKvpAZBANQZensLIF4LOk/Q0BFpQuVcdS37Zusue4XpKuCm0wtLi1k?=
+ =?us-ascii?Q?rvNJITZQspusU9t7Y2jaVoNa9X8mj2bJXO+QB3UkcbhyBYkMjWg1OnoIvL+u?=
+ =?us-ascii?Q?O/CJhSJMhbH8UNR1HWSYpohbP1OiQrKvQBltH6eyv28+XIgmtrgSXkkFFbk7?=
+ =?us-ascii?Q?UdnSBuQOv+ARWNI2jK5aPSGSOq15qAPNbQjAF96KSmMImJRh5b7Mx0rT5cYo?=
+ =?us-ascii?Q?8lQX8vbvRqTkoRn3wLc3ETzbz3u88oydZf1B4iJtGZ8+V1kw0tSr/cVkBTfY?=
+ =?us-ascii?Q?KudypfEptUdoWk4xO4I2+MSwFeH3p5vun4U8L6jo2U+vuyUkM71mdqrI6FHp?=
+ =?us-ascii?Q?an/TnCEz5O4rrB/Lj3cesDiPAQrg9jOGeT5IWuTk/DmpqASBbbV73ZllXRnB?=
+ =?us-ascii?Q?qXXlMjHNfVYD1USvqirxyPZGY+l6nVeOvovsc80gVnlbrOxXdn6oa4MlDL0d?=
+ =?us-ascii?Q?v8CTyl0p5qBF7ZQCG2Xp0iHH1HTYSVEK8/4p9vO0IrPi3iKa4xaRbHNyypd0?=
+ =?us-ascii?Q?kqCXUawHD5ewfapKu8qCX76XTWnGafBHSrklxTExuuAB8tI+MopsB58mGEff?=
+ =?us-ascii?Q?qKXboe2+8M/++M0Jr9yLA/e8vCpFoSK8O6E94xIaA5E0qAJMUYJPnJZU3yih?=
+ =?us-ascii?Q?xTVLdvH/fOMpqTcQ1fRFDpowTMMfpVZou5qzzdpTLgE1HMKMjD7xfgc4gNQR?=
+ =?us-ascii?Q?udT/Sic04V57SrhK9Yu+oNo1MqFpXJQXwACZ8SDyl/t42T0DvQJ4rTyoahQm?=
+ =?us-ascii?Q?k34+uZuZ8qtMVDv881jWfyRSC1Q6jOcdmP5Idm2yLjAbvHt7T9r4dgpOOfEo?=
+ =?us-ascii?Q?O8gydcgcgjUYG40PdkCm6dwB88uMNELcrDD7smXNPzRNFbGQDyLZumq0Xf6T?=
+ =?us-ascii?Q?yjVhgyDO18OJ7gTEv3wvKR/e6c/0TwR0o0J31UTPTj0N0gHmBplq4kEZw9Ih?=
+ =?us-ascii?Q?g7QPNIjwjFXhyAfWvHXlaqGrsG1fGQ34CtkoZfuM/NpuNgE/kDDp1k5NPcr6?=
+ =?us-ascii?Q?O+2/0TfVVoG0YZF+FPeIpCQ3LR20EB0gdHSY1akFgHus0sj3iwOmjBI7VmdH?=
+ =?us-ascii?Q?M2xNCYNur30XJ+vRMhk8aNHpB+UkT8k8r6gtrybkJFTmNb127uYL/xGe1Zjf?=
+ =?us-ascii?Q?Pw=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 92da7912-89dd-4506-4c21-08db0ffa882e
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Feb 2023 08:48:10.6689
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: OeeH2bcMUvEjMBW+OyNK2Enh0aTtAI0R0eYI4qhL8virFlIsxWgK1m3HEIRTwQN7yU+4CxO7gqpiOfiS56eCAA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7933
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Nicolin,
+On Mon, Feb 13, 2023 at 07:13:47AM -0800, Yi Liu wrote:
+...
 
-On 2/16/23 00:48, Nicolin Chen wrote:
-> Hi Eric,
->
-> On Tue, Jan 31, 2023 at 09:53:01PM +0100, Eric Auger wrote:
->
->> diff --git a/include/sysemu/iommufd.h b/include/sysemu/iommufd.h
->> new file mode 100644
->> index 0000000000..06a866d1bd
->> --- /dev/null
->> +++ b/include/sysemu/iommufd.h
->> @@ -0,0 +1,47 @@
->> +#ifndef SYSEMU_IOMMUFD_H
->> +#define SYSEMU_IOMMUFD_H
->> +
->> +#include "qom/object.h"
->> +#include "qemu/thread.h"
->> +#include "exec/hwaddr.h"
->> +#include "exec/ram_addr.h"
-> After rebasing nesting patches on top of this, I see a build error:
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> [47/876] Compiling C object libcommon.fa.p/hw_arm_smmu-common.c.o
-> FAILED: libcommon.fa.p/hw_arm_smmu-common.c.o=20
-> cc -Ilibcommon.fa.p -I../src/3rdparty/qemu/dtc/libfdt -I/usr/include/pi=
-xman-1 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/glib-2=
-=2E0 -I/usr/lib/aarch64-linux-gnu/glib-2.0/include -I/usr/include/gio-uni=
-x-2.0 -fdiagnostics-color=3Dauto -Wall -Winvalid-pch -std=3Dgnu11 -O2 -g =
--isystem /src/3rdparty/qemu/linux-headers -isystem linux-headers -iquote =
-=2E -iquote /src/3rdparty/qemu -iquote /src/3rdparty/qemu/include -iquote=
- /src/3rdparty/qemu/tcg/aarch64 -pthread -U_FORTIFY_SOURCE -D_FORTIFY_SOU=
-RCE=3D2 -D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SOURCE -fno-s=
-trict-aliasing -fno-common -fwrapv -Wundef -Wwrite-strings -Wmissing-prot=
-otypes -Wstrict-prototypes -Wredundant-decls -Wold-style-declaration -Wol=
-d-style-definition -Wtype-limits -Wformat-security -Wformat-y2k -Winit-se=
-lf -Wignored-qualifiers -Wempty-body -Wnested-externs -Wendif-labels -Wex=
-pansion-to-defined -Wimplicit-fallthrough=3D2 -Wmissing-format-attribute =
--Wno-missing-include-dirs -Wno-shift-negative-value -Wno-psabi -fstack-pr=
-otector-strong -fPIE -MD -MQ libcommon.fa.p/hw_arm_smmu-common.c.o -MF li=
-bcommon.fa.p/hw_arm_smmu-common.c.o.d -o libcommon.fa.p/hw_arm_smmu-commo=
-n.c.o -c ../src/3rdparty/qemu/hw/arm/smmu-common.c
-> In file included from /src/3rdparty/qemu/include/sysemu/iommufd.h:7,
->                  from ../src/3rdparty/qemu/hw/arm/smmu-common.c:29:
-> /src/3rdparty/qemu/include/exec/ram_addr.h:23:10: fatal error: cpu.h: N=
-o such file or directory
->    23 | #include "cpu.h"
->       |          ^~~~~~~
-> compilation terminated.
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
-> I guess it's resulted from the module inter-dependency. Though our
-> nesting patches aren't finalized yet, the possibility of including
-> iommufd.h is still there. Meanwhile, the ram_addr.h here is added
-> for "ram_addr_t" type, I think. So, could we include "cpu-common.h"
-> instead, where the "ram_addr_t" type is actually defined?
+> +long vfio_device_ioctl_bind_iommufd(struct vfio_device_file *df,
+> +				    unsigned long arg)
+> +{
+> +	struct vfio_device *device = df->device;
+> +	struct vfio_device_bind_iommufd bind;
+> +	struct iommufd_ctx *iommufd = NULL;
+> +	struct fd f;
+> +	unsigned long minsz;
+> +	int ret;
+> +
+> +	minsz = offsetofend(struct vfio_device_bind_iommufd, out_devid);
+> +
+> +	if (copy_from_user(&bind, (void __user *)arg, minsz))
+> +		return -EFAULT;
+> +
+> +	if (bind.argsz < minsz || bind.flags)
+> +		return -EINVAL;
+> +
+> +	if (!device->ops->bind_iommufd)
+> +		return -ENODEV;
+> +
+> +	ret = vfio_device_claim_group(device);
+> +	if (ret)
+> +		return ret;
+> +
+> +	mutex_lock(&device->dev_set->lock);
+> +	/*
+> +	 * If already been bound to an iommufd, or already set noiommu
+> +	 * then fail it.
+> +	 */
+> +	if (df->iommufd || df->noiommu) {
+> +		ret = -EINVAL;
+> +		goto out_unlock;
+> +	}
+> +
+> +	/* iommufd < 0 means noiommu mode */
+> +	if (bind.iommufd < 0) {
+> +		if (!capable(CAP_SYS_RAWIO)) {
+> +			ret = -EPERM;
+> +			goto out_unlock;
+> +		}
+> +		df->noiommu = true;
+> +	} else {
+> +		f = fdget(bind.iommufd);
+Here, the iommufd file count + 1,
 
-Sure. We will fix that on the next iteration
+> +		if (!f.file) {
+> +			ret = -EBADF;
+> +			goto out_unlock;
+> +		}
+> +		iommufd = iommufd_ctx_from_file(f.file);
+iommufd file count + 1, again
 
-Eric
+> +		if (IS_ERR(iommufd)) {
+> +			ret = PTR_ERR(iommufd);
+> +			goto out_put_file;
+> +		}
+> +	}
+> +
+> +	/*
+> +	 * Before the device open, get the KVM pointer currently
+> +	 * associated with the device file (if there is) and obtain a
+> +	 * reference. This reference is held until device closed. Save
+> +	 * the pointer in the device for use by drivers.
+> +	 */
+> +	vfio_device_get_kvm_safe(df);
+> +
+> +	df->iommufd = iommufd;
+> +	ret = vfio_device_open(df, &bind.out_devid, NULL);
+iommufd file count + 1 in iommufd_device_bind for first open.
 
->
-> The build error is gone after this replacement:
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> diff --git a/include/sysemu/iommufd.h b/include/sysemu/iommufd.h
-> index 45540de63986..86d370c221b3 100644
-> --- a/include/sysemu/iommufd.h
-> +++ b/include/sysemu/iommufd.h
-> @@ -4,7 +4,7 @@
->  #include "qom/object.h"
->  #include "qemu/thread.h"
->  #include "exec/hwaddr.h"
-> -#include "exec/ram_addr.h"
-> +#include "exec/cpu-common.h"
->  #include <linux/iommufd.h>
-> =20
->  #define TYPE_IOMMUFD_BACKEND "iommufd"
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
-> Thanks
-> Nic
->
+> +	if (ret)
+> +		goto out_put_kvm;
+> +
+> +	ret = copy_to_user((void __user *)arg +
+> +			   offsetofend(struct vfio_device_bind_iommufd, iommufd),
+> +			   &bind.out_devid,
+> +			   sizeof(bind.out_devid)) ? -EFAULT : 0;
+> +	if (ret)
+> +		goto out_close_device;
+> +
+> +	if (iommufd)
+> +		fdput(f);
+But, only one file count is put.
 
+Need a paring iommufd_ctx_put() after a successful iommufd_ctx_from_file()
+above to avoid iommufd_fops_release() never being called.
+
+e.g.
+
+@@ -1222,11 +1226,13 @@ static long vfio_device_ioctl_bind_iommufd(struct vfio_device_file *df,
+                        ret = -EBADF;
+                        goto out_unlock;
+                }
+                iommufd = iommufd_ctx_from_file(f.file);
+                if (IS_ERR(iommufd)) {
+                        ret = PTR_ERR(iommufd);
+                        goto out_put_file;
+                }
++               iommufd_ctx_put(iommufd);
+        }
+
+        /* df->kvm is supposed to be set in vfio_device_file_set_kvm() */
+
+> +	else if (df->noiommu)
+> +		dev_warn(device->dev, "vfio-noiommu device used by user "
+> +			 "(%s:%d)\n", current->comm, task_pid_nr(current));
+> +	mutex_unlock(&device->dev_set->lock);
+> +	return 0;
+> +
+> +out_close_device:
+> +	vfio_device_close(df);
+> +out_put_kvm:
+> +	df->iommufd = NULL;
+> +	df->noiommu = false;
+> +	vfio_device_put_kvm(device);
+> +out_put_file:
+> +	if (iommufd)
+> +		fdput(f);
+> +out_unlock:
+> +	mutex_unlock(&device->dev_set->lock);
+> +	vfio_device_release_group(device);
+> +	return ret;
+> +}
+> +
