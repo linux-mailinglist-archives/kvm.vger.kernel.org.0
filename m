@@ -2,143 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 80DD1699099
-	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 11:00:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CC966990BC
+	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 11:10:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229528AbjBPKAn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Feb 2023 05:00:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40922 "EHLO
+        id S229799AbjBPKKw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Feb 2023 05:10:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229489AbjBPKAm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Feb 2023 05:00:42 -0500
-Received: from mail.8bytes.org (mail.8bytes.org [85.214.250.239])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0641E10EF
-        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 02:00:40 -0800 (PST)
-Received: from 8bytes.org (p200300c27714bc0086ad4f9d2505dd0d.dip0.t-ipconnect.de [IPv6:2003:c2:7714:bc00:86ad:4f9d:2505:dd0d])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.8bytes.org (Postfix) with ESMTPSA id 367F92245E3;
-        Thu, 16 Feb 2023 11:00:39 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=8bytes.org;
-        s=default; t=1676541639;
-        bh=ECcHlosMEjmFtUse35OeJBXoREt01AQegbavKKJmYS8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=7tqbSHOFvdUWadBzElpKWejdm3y7QuuYC0OCMN1XpJlHQshWHiWFM7sBb/K3uZbS9
-         AKNmtypEv58gLLvd9Kj45tA4sxMf8RpnXTJkO3YxUbclLEkY+hA+mJ/s8omAM59nnB
-         iNGrxHOOXxI7BW2BjBhU4zj5SH/QW9FMX4AAWDjxI/pNc/zNrLVpF9axIdRDfdPOsn
-         mo53OyR5zhjsh/MTPMWovRdZ5EmYlUplSTfw8pmcKCwpU8s+NHdtVCKYP4MK/JyGQ9
-         Cj+l/tGlweZeJxg4Gsv3H08ZlW50ZXePC97odYXX7H8QPI1Fpx4wz0stsxgTOHV27z
-         HPhgG5oIEgNEQ==
-Date:   Thu, 16 Feb 2023 11:00:38 +0100
-From:   Joerg Roedel <joro@8bytes.org>
-To:     Joao Martins <joao.m.martins@oracle.com>
-Cc:     iommu@lists.linux.dev, Vasant Hegde <vasant.hegde@amd.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v1] iommu/amd: Don't block updates to GATag if guest mode
- is already on
-Message-ID: <Y+3+xtof4tC8koSj@8bytes.org>
-References: <20230208131938.39898-1-joao.m.martins@oracle.com>
+        with ESMTP id S229717AbjBPKKv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Feb 2023 05:10:51 -0500
+Received: from new3-smtp.messagingengine.com (new3-smtp.messagingengine.com [66.111.4.229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 207E63D914
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 02:10:50 -0800 (PST)
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+        by mailnew.nyi.internal (Postfix) with ESMTP id EF2C4581F74;
+        Thu, 16 Feb 2023 05:01:54 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute3.internal (MEProxy); Thu, 16 Feb 2023 05:01:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
+         h=cc:cc:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm2; t=1676541714; x=1676548914; bh=mU
+        wZ0jLBJxHz2jqLQpzE2WZti2villst4pazhry1LDk=; b=asp+w4tFm/0L+ogLMm
+        Aah1xvH4AC5j6a6LcApo6uCb3V6IY8r2ikkDaJR2FB7shHkGsgS8TyPVHysvz1wl
+        w7G3DJVe3kyuaXTizspLXlv3dJBwdw64oluQvhEnmtO4wfuyeISDBd6koC5smlpl
+        c93B3qTaOlQ4qQH+023WPx+j/T99sQC2oSsiiLdLbmjIl2Ea27cka8xxchVgLeve
+        2iThLMVvWxeyJ8/+TtsHp414ynVa9p8Ek5ApwrgL7rZwSTPWcV36dqF+GqYO8/Dy
+        1WBs+dM4cIQcKpj/xukVy46UYiPY04WL8AW6VZXgpBrsVwNylSig3yXUWWzBeko4
+        D/Rg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
+        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:sender:subject:subject:to:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm1; t=1676541714; x=1676548914; bh=mUwZ0jLBJxHz2jqLQpzE2WZti2vi
+        llst4pazhry1LDk=; b=tjURGj5OYhitZIFJH3pTuYCsW7QnYHGo+Bne0z8nqsMe
+        1vE03qoSKLsFpwrfX45Li0aYqbWQm4stNaS+vt48/4lKLIjocyVldJiCveFBfosz
+        z1zO21pN4R/OzCph8SEKEFFabqMyT2/AI11YU8k8hPU4nDeuJnfB8orvpWtkHJyT
+        9mZGqb+AKEOq7igi7qO71E1BN9IKsiUYj0+uGfblt1DBv9l3HV4NB/LxejoHDK8a
+        Re5iX+uoxlS4q0MeYcJEFDpzZxspfZMJAZuyRJEeItqZ6bNa39wmmelk/84cmodq
+        jRXd7aIoo1nGJiyBaZUIp7vf0F5yoSOrbVFLya1HVg==
+X-ME-Sender: <xms:Ef_tYzaWl82N0I06rUgcVq24rgB0UPCcY_uZCX5iMdPrN79_UTiyYQ>
+    <xme:Ef_tYyaVPVBOKK0gm-z_DyI7flgQuvDSu3EG7BaDzT2yhKmqV-mpAiN3ChBJhHpN3
+    36E8wlywbwfeB-_lBk>
+X-ME-Received: <xmr:Ef_tY1_9oOigwbr3GGpJODva1Y__qcK34XggsAHHIDjA9f4TX0aN_mQBvPjK5NI0x87C_g>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrudeijedguddtucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdttddttddtvdenucfhrhhomhepfdfmihhr
+    ihhllhcutedrucfuhhhuthgvmhhovhdfuceokhhirhhilhhlsehshhhuthgvmhhovhdrnh
+    grmhgvqeenucggtffrrghtthgvrhhnpefhieeghfdtfeehtdeftdehgfehuddtvdeuheet
+    tddtheejueekjeegueeivdektdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
+    epmhgrihhlfhhrohhmpehkihhrihhllhesshhhuhhtvghmohhvrdhnrghmvg
+X-ME-Proxy: <xmx:Ef_tY5qnpuptUFz_7q9O0jrLxFFrdoyPKTcdPLw4Oe4i1P9ucNbHbQ>
+    <xmx:Ef_tY-p8xe27YBBU1UELy8V2QuAQ-IGOmMnZ8rbJaTvFU0viy-Jabg>
+    <xmx:Ef_tY_QH7z8xTeiVhI_VGSg6zgQX4ss2bNezQMrty9LRd49QHytaLA>
+    <xmx:Ev_tY7OboPatSl1njimvH7MDK1iQT2H5wcb75YSbti-YfrG81Ou-SA>
+Feedback-ID: ie3994620:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 16 Feb 2023 05:01:52 -0500 (EST)
+Received: by box.shutemov.name (Postfix, from userid 1000)
+        id 93F7210CCE1; Thu, 16 Feb 2023 13:01:50 +0300 (+03)
+Date:   Thu, 16 Feb 2023 13:01:50 +0300
+From:   "Kirill A. Shutemov" <kirill@shutemov.name>
+To:     Ackerley Tng <ackerleytng@google.com>
+Cc:     kvm@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, qemu-devel@nongnu.org,
+        chao.p.peng@linux.intel.com, aarcange@redhat.com,
+        ak@linux.intel.com, akpm@linux-foundation.org, arnd@arndb.de,
+        bfields@fieldses.org, bp@alien8.de, corbet@lwn.net,
+        dave.hansen@intel.com, david@redhat.com, ddutile@redhat.com,
+        dhildenb@redhat.com, hpa@zytor.com, hughd@google.com,
+        jlayton@kernel.org, jmattson@google.com, joro@8bytes.org,
+        jun.nakajima@intel.com, kirill.shutemov@linux.intel.com,
+        linmiaohe@huawei.com, luto@kernel.org, mail@maciej.szmigiero.name,
+        mhocko@suse.com, michael.roth@amd.com, mingo@redhat.com,
+        naoya.horiguchi@nec.com, pbonzini@redhat.com, qperret@google.com,
+        rppt@kernel.org, seanjc@google.com, shuah@kernel.org,
+        steven.price@arm.com, tabba@google.com, tglx@linutronix.de,
+        vannapurve@google.com, vbabka@suse.cz, vkuznets@redhat.com,
+        wanpengli@tencent.com, wei.w.wang@intel.com, x86@kernel.org,
+        yu.c.zhang@linux.intel.com
+Subject: Re: [RFC PATCH 1/2] mm: restrictedmem: Allow userspace to specify
+ mount_path for memfd_restricted
+Message-ID: <20230216100150.yv2ehwrdcfzbdhcq@box.shutemov.name>
+References: <cover.1676507663.git.ackerleytng@google.com>
+ <176081a4817e492965a864a8bc8bacb7d2c05078.1676507663.git.ackerleytng@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230208131938.39898-1-joao.m.martins@oracle.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <176081a4817e492965a864a8bc8bacb7d2c05078.1676507663.git.ackerleytng@google.com>
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Missing Signed-off-by.
-
-Also adding Vasant from AMD for review.
-
-On Wed, Feb 08, 2023 at 01:19:38PM +0000, Joao Martins wrote:
-> On KVM GSI routing table updates, specially those where they have vIOMMUs
-> with interrupt remapping enabled (e.g. to boot >255vcpus guests without
-> relying on KVM_FEATURE_MSI_EXT_DEST_ID), a VMM may update the backing VF
-> MSIs with new VCPU affinities.
+On Thu, Feb 16, 2023 at 12:41:16AM +0000, Ackerley Tng wrote:
+> By default, the backing shmem file for a restrictedmem fd is created
+> on shmem's kernel space mount.
 > 
-> On AMD this translates to calls to amd_ir_set_vcpu_affinity() and
-> eventually to amd_iommu_{de}activate_guest_mode() with a new GATag
-> outlining the VM ID and (new) VCPU ID. On vCPU blocking and unblocking
-> paths it disables AVIC, and rely on GALog to convey the wakeups to any
-> sleeping vCPUs. KVM will store a list of GA-mode IR entries to each
-> running/blocked vCPU. So any vCPU Affinity update to a VF interrupt happen
-> via KVM, and it will change already-configured-guest-mode IRTEs with a new
-> GATag.
+> With this patch, an optional tmpfs mount can be specified, which will
+> be used as the mountpoint for backing the shmem file associated with a
+> restrictedmem fd.
 > 
-> The issue is that amd_iommu_activate_guest_mode() will essentially only
-> change IRTE fields on transitions from non-guest-mode to guest-mode and
-> otherwise returns *with no changes to IRTE* on already configured
-> guest-mode interrupts. To the guest this means that the VF interrupts
-> remain affined to the first vCPU these were first configured, and guest
-> will be unable to either VF interrupts and receive messages like this from
-> spurious interrupts (e.g. from waking the wrong vCPU in GALog):
+> This change is modeled after how sys_open() can create an unnamed
+> temporary file in a given directory with O_TMPFILE.
 > 
-> [  167.759472] __common_interrupt: 3.34 No irq handler for vector
-> [  230.680927] mlx5_core 0000:00:02.0: mlx5_cmd_eq_recover:247:(pid
-> 3122): Recovered 1 EQEs on cmd_eq
-> [  230.681799] mlx5_core 0000:00:02.0:
-> wait_func_handle_exec_timeout:1113:(pid 3122): cmd[0]: CREATE_CQ(0x400)
-> recovered after timeout
-> [  230.683266] __common_interrupt: 3.34 No irq handler for vector
+> This will help restrictedmem fds inherit the properties of the
+> provided tmpfs mounts, for example, hugepage allocation hints, NUMA
+> binding hints, etc.
 > 
-> Given that amd_ir_set_vcpu_affinity() uses amd_iommu_activate_guest_mode()
-> underneath it essentially means that VCPU affinity changes of IRTEs are
-> nops if it was called once for the IRTE already (on VMENTER). Fix it by
-> dropping the check for guest-mode at amd_iommu_activate_guest_mode().  Same
-> thing is applicable to amd_iommu_deactivate_guest_mode() although, even if
-> the IRTE doesn't change underlying DestID on the host, the VFIO IRQ handler
-> will still be able to poke at the right guest-vCPU.
-> 
-> Fixes: b9c6ff94e43a ("iommu/amd: Re-factor guest virtual APIC (de-)activation code")
-> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
 > ---
-> Some notes in other related flaws as I looked at this:
+>  include/linux/syscalls.h           |  2 +-
+>  include/uapi/linux/restrictedmem.h |  8 ++++
+>  mm/restrictedmem.c                 | 63 +++++++++++++++++++++++++++---
+>  3 files changed, 66 insertions(+), 7 deletions(-)
+>  create mode 100644 include/uapi/linux/restrictedmem.h
 > 
-> 1) amd_iommu_deactivate_guest_mode() suffers from the same issue as this patch,
-> but it should only matter for the case where you rely on irqbalance-like
-> daemons balancing VFIO IRQs in the hypervisor. Though, it doesn't translate
-> into guest failures, more like performance "misdirection". Happy to fix it, if
-> folks also deem it as a problem.
-> 
-> 2) This patch doesn't attempt at changing semantics around what
-> amd_iommu_activate_guest_mode() has been doing for a long time [since v5.4]
-> (i.e. clear the whole IRTE and then changes its fields). As such when
-> updating the IRTEs the interrupts get isRunning and DestId cleared, thus
-> we rely on the GALog to inject IRQs into vCPUs /until/ the vCPUs block
-> and unblock again (which is when they update the IOMMU affinity), or the
-> AVIC gets momentarily disabled. I have patches that improve this part as a
-> follow-up, but I thought that this patch had value on its own onto fixing
-> what has been broken since v5.4 ... and that it could be easily carried
-> to stable trees.
-> 
-> ---
->  drivers/iommu/amd/iommu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/iommu/amd/iommu.c b/drivers/iommu/amd/iommu.c
-> index cbeaab55c0db..afe1f35a4dd9 100644
-> --- a/drivers/iommu/amd/iommu.c
-> +++ b/drivers/iommu/amd/iommu.c
-> @@ -3476,7 +3476,7 @@ int amd_iommu_activate_guest_mode(void *data)
->  	u64 valid;
+> diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
+> index f9e9e0c820c5..4b8efe9a8680 100644
+> --- a/include/linux/syscalls.h
+> +++ b/include/linux/syscalls.h
+> @@ -1056,7 +1056,7 @@ asmlinkage long sys_memfd_secret(unsigned int flags);
+>  asmlinkage long sys_set_mempolicy_home_node(unsigned long start, unsigned long len,
+>  					    unsigned long home_node,
+>  					    unsigned long flags);
+> -asmlinkage long sys_memfd_restricted(unsigned int flags);
+> +asmlinkage long sys_memfd_restricted(unsigned int flags, const char __user *mount_path);
 >  
->  	if (!AMD_IOMMU_GUEST_IR_VAPIC(amd_iommu_guest_ir) ||
-> -	    !entry || entry->lo.fields_vapic.guest_mode)
-> +	    !entry)
->  		return 0;
->  
->  	valid = entry->lo.fields_vapic.valid;
-> -- 
-> 2.17.2
-> 
+>  /*
+>   * Architecture-specific system calls
+
+I'm not sure what the right practice now: do we provide string that
+contains mount path or fd that represents the filesystem (returned from
+fsmount(2) or open_tree(2)).
+
+fd seems more flexible: it allows to specify unbind mounts.
+
+-- 
+  Kiryl Shutsemau / Kirill A. Shutemov
