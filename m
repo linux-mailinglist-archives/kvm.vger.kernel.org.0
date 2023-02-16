@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 729C2699AE3
-	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 18:13:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E7726699AE8
+	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 18:13:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229837AbjBPRNK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Feb 2023 12:13:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34072 "EHLO
+        id S229553AbjBPRNR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Feb 2023 12:13:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230057AbjBPRNH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Feb 2023 12:13:07 -0500
+        with ESMTP id S230064AbjBPRNK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Feb 2023 12:13:10 -0500
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54E6B4E5C9
-        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 09:13:02 -0800 (PST)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31GFsF4A006559
-        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 17:13:02 GMT
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 826294E5D2
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 09:13:03 -0800 (PST)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31GGfieo025176
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 17:13:03 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : content-transfer-encoding
- : mime-version; s=pp1; bh=0VBSSY0G101+awYFx0IKgYPGzk8Au8tWPNol83K79AA=;
- b=SGjUHEZceFjHmRyHCQSpiOJpHD32ReLW/nkQZvgkwPHYQG0cxaH8PKH/eb5Oix3MVhKM
- 3/O7hpRsNRXzXVnecrPPBHlaUpNH+eRa3L9lAJsjw11zl/XgnKZs1C2/2J/V9au7W/a9
- g5fqXEi8VfYC9hgVTb3MFL08sEwAFFGpDp9aQlvRxCTs8SmLdxJbbRsiQZtIa9yv/E0v
- NbAnsOnHvy18xHEtrb4tYT1Ngd97oDekYI2cKS9YuUJcKkTGHESvsoDzf5AxuAxVy6y6
- tapRJFFaDWdZvkihsSPDURLGLI9wmQ0sLVgCNztnO7xNaI/rneegxw7cEdtK8Ayqbv8D VA== 
+ : mime-version; s=pp1; bh=Ej0Jfz7BUe3iF+jeMfhb6h0eJuJ9WIwT8Nd7of0qhG4=;
+ b=DsUBAcMUKM3mpPMr+XEaNBHDW8HfeFxRNTnsu7HuYMS8bfal31V1QtUo+KPrJzh3802B
+ u8kEftZT2k5LwcU7p7AjuKghveAoolIKn0C5KwbqVtfCiKW2vOcOownfEnCcHm9pckx2
+ ymJhGE4OuKmznrhLB72xVuflZiLn6ttPQKlNqU5lMTfp67+o7rXuiBhxCIeFsQvibAL8
+ U3X5s/DVHaxBScR2y/d7HbEHYJpvv5spEGH87SOhnrbkjyOro+xCRK/0BLRpc7t1Qlb+
+ RT9F7Hq5gV/e99vfC0hFkHgFQea2TlewPA9pl3nBGfNw2+EwUMBJRceDIg9dfPKrYjxd NQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nsqhcj0b3-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nsr7tgsde-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 17:13:01 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31GH5rnU029334
-        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 17:13:01 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nsqhcj0a1-1
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 17:13:02 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31GHB4Fm014252
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 17:13:02 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nsr7tgscf-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 16 Feb 2023 17:13:01 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31GH8pxG026199;
-        Thu, 16 Feb 2023 17:12:58 GMT
+        Thu, 16 Feb 2023 17:13:02 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31G12mxx007609;
+        Thu, 16 Feb 2023 17:13:00 GMT
 Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma06fra.de.ibm.com (PPS) with ESMTPS id 3np29fd52a-1
+        by ppma04fra.de.ibm.com (PPS) with ESMTPS id 3np2n6d58b-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 16 Feb 2023 17:12:58 +0000
+        Thu, 16 Feb 2023 17:12:59 +0000
 Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31GHCunT47186426
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31GHCu3N47186430
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Thu, 16 Feb 2023 17:12:56 GMT
 Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 55A1D2004B;
+        by IMSVA (Postfix) with ESMTP id 85C052004B;
         Thu, 16 Feb 2023 17:12:56 +0000 (GMT)
 Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2DF112004F;
+        by IMSVA (Postfix) with ESMTP id 5DD492005A;
         Thu, 16 Feb 2023 17:12:56 +0000 (GMT)
 Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.56])
         by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
@@ -59,26 +59,26 @@ Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.56])
 From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
 To:     pbonzini@redhat.com, thuth@redhat.com
 Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com
-Subject: [kvm-unit-tests GIT PULL 02/10] s390x: use the new PSW and PSW_WITH_CUR_MASK macros
-Date:   Thu, 16 Feb 2023 18:12:47 +0100
-Message-Id: <20230216171255.48799-3-imbrenda@linux.ibm.com>
+Subject: [kvm-unit-tests GIT PULL 03/10] s390x: add parallel skey migration test
+Date:   Thu, 16 Feb 2023 18:12:48 +0100
+Message-Id: <20230216171255.48799-4-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.39.1
 In-Reply-To: <20230216171255.48799-1-imbrenda@linux.ibm.com>
 References: <20230216171255.48799-1-imbrenda@linux.ibm.com>
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 3ABlb468iMiDmgP5Z1C_Mt9IMkcUQYrN
-X-Proofpoint-ORIG-GUID: _eduWW3ZvfWbjlrsnmS4ykq3SPbGXL0V
+X-Proofpoint-ORIG-GUID: lJIujtQbb2H3jVfqHlIeyGuhWqkFVKsb
+X-Proofpoint-GUID: CN5bsoY6q5fUcqmyIZvO7X9ZRUsix-I1
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
  definitions=2023-02-16_13,2023-02-16_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- malwarescore=0 impostorscore=0 adultscore=0 clxscore=1015 suspectscore=0
- bulkscore=0 priorityscore=1501 mlxlogscore=981 mlxscore=0 spamscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302160144
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ impostorscore=0 mlxscore=0 spamscore=0 priorityscore=1501 phishscore=0
+ adultscore=0 clxscore=1015 bulkscore=0 malwarescore=0 lowpriorityscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302160148
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
@@ -88,363 +88,327 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use the new macros in the existing code. No functional changes intended.
+From: Nico Boehr <nrb@linux.ibm.com>
 
-Reviewed-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-Link: https://lore.kernel.org/r/20221130154038.70492-3-imbrenda@linux.ibm.com
+Right now, we have a test which sets storage keys, then migrates the VM
+and - after migration finished - verifies the skeys are still there.
+
+Add a new version of the test which changes storage keys while the
+migration is in progress. This is achieved by adding a command line
+argument to the existing migration-skey test.
+
+Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+Reviewed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Link: https://lore.kernel.org/r/20221220083030.30153-2-nrb@linux.ibm.com
+Message-Id: <20221220083030.30153-2-nrb@linux.ibm.com>
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Message-Id: <20221130154038.70492-3-imbrenda@linux.ibm.com>
 ---
- s390x/adtl-status.c | 24 ++++----------------
- s390x/firq.c        |  5 +----
- s390x/migration.c   |  6 +----
- s390x/skrf.c        |  7 +-----
- s390x/smp.c         | 53 ++++++++++-----------------------------------
- s390x/uv-host.c     |  5 +----
- 6 files changed, 19 insertions(+), 81 deletions(-)
+ s390x/migration-skey.c | 218 +++++++++++++++++++++++++++++++++++++----
+ s390x/unittests.cfg    |  15 ++-
+ 2 files changed, 210 insertions(+), 23 deletions(-)
 
-diff --git a/s390x/adtl-status.c b/s390x/adtl-status.c
-index 9fb76319..2db650a1 100644
---- a/s390x/adtl-status.c
-+++ b/s390x/adtl-status.c
-@@ -205,16 +205,11 @@ static void restart_write_vector(void)
+diff --git a/s390x/migration-skey.c b/s390x/migration-skey.c
+index a91eb6b5..8d6d8ecf 100644
+--- a/s390x/migration-skey.c
++++ b/s390x/migration-skey.c
+@@ -2,6 +2,12 @@
+ /*
+  * Storage Key migration tests
+  *
++ * There are two variants of this test:
++ * - sequential: set storage keys on some pages, migrates the VM and then
++ *   verifies that the storage keys are still as we expect.
++ * - parallel: start migration and set and check storage keys on some
++ *   pages while migration is in process.
++ *
+  * Copyright IBM Corp. 2022
+  *
+  * Authors:
+@@ -13,16 +19,45 @@
+ #include <asm/facility.h>
+ #include <asm/page.h>
+ #include <asm/mem.h>
+-#include <asm/interrupt.h>
++#include <asm/barrier.h>
+ #include <hardware.h>
++#include <smp.h>
++
++struct verify_result {
++	bool verify_failed;
++	union skey expected_key;
++	union skey actual_key;
++	unsigned long page_mismatch_idx;
++	unsigned long page_mismatch_addr;
++};
  
- static void cpu_write_magic_to_vector_regs(uint16_t cpu_idx)
+ #define NUM_PAGES 128
+-static uint8_t pagebuf[NUM_PAGES][PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
++static uint8_t pagebuf[NUM_PAGES * PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
++
++static struct verify_result result;
++
++static unsigned int thread_iters;
++static bool thread_should_exit;
++static bool thread_exited;
++
++static enum {
++	TEST_INVALID,
++	TEST_SEQUENTIAL,
++	TEST_PARALLEL
++} arg_test_to_run;
+ 
+-static void test_migration(void)
++/*
++ * Set storage key test pattern on pagebuf with a seed for the storage keys.
++ *
++ * Each page's storage key is generated by taking the page's index in pagebuf,
++ * XOR-ing that with the given seed and then multipling the result with two.
++ *
++ * Only the lower seven bits of the seed are considered.
++ */
++static void set_test_pattern(unsigned char seed)
  {
--	struct psw new_psw;
--
- 	smp_cpu_stop(cpu_idx);
+-	union skey expected_key, actual_key;
+-	int i, key_to_set, key_mismatches = 0;
++	unsigned char key_to_set;
++	unsigned long i;
  
--	new_psw.mask = extract_psw_mask();
--	new_psw.addr = (unsigned long)restart_write_vector;
--
- 	set_flag(0);
- 
--	smp_cpu_start(cpu_idx, new_psw);
-+	smp_cpu_start(cpu_idx, PSW_WITH_CUR_MASK(restart_write_vector));
- 
- 	wait_for_flag();
- }
-@@ -241,7 +236,6 @@ static int adtl_status_check_unmodified_fields_for_lc(unsigned long lc)
- static void __store_adtl_status_vector_lc(unsigned long lc)
- {
- 	uint32_t status = -1;
--	struct psw psw;
- 	int cc;
- 
- 	report_prefix_pushf("LC %lu", lc);
-@@ -274,9 +268,7 @@ static void __store_adtl_status_vector_lc(unsigned long lc)
- 	 * Destroy and re-initalize the CPU to fix that.
- 	 */
- 	smp_cpu_destroy(1);
--	psw.mask = extract_psw_mask();
--	psw.addr = (unsigned long)test_func;
--	smp_cpu_setup(1, psw);
-+	smp_cpu_setup(1, PSW_WITH_CUR_MASK(test_func));
- 
- out:
- 	report_prefix_pop();
-@@ -325,16 +317,11 @@ static void restart_write_gs_regs(void)
- 
- static void cpu_write_to_gs_regs(uint16_t cpu_idx)
- {
--	struct psw new_psw;
--
- 	smp_cpu_stop(cpu_idx);
- 
--	new_psw.mask = extract_psw_mask();
--	new_psw.addr = (unsigned long)restart_write_gs_regs;
--
- 	set_flag(0);
- 
--	smp_cpu_start(cpu_idx, new_psw);
-+	smp_cpu_start(cpu_idx, PSW_WITH_CUR_MASK(restart_write_gs_regs));
- 
- 	wait_for_flag();
- }
-@@ -382,7 +369,6 @@ out:
- 
- int main(void)
- {
--	struct psw psw;
- 	report_prefix_push("adtl_status");
- 
- 	if (smp_query_num_cpus() == 1) {
-@@ -391,9 +377,7 @@ int main(void)
+ 	for (i = 0; i < NUM_PAGES; i++) {
+ 		/*
+@@ -32,15 +67,34 @@ static void test_migration(void)
+ 		 * protection as well as reference and change indication for
+ 		 * some keys.
+ 		 */
+-		key_to_set = i * 2;
+-		set_storage_key(pagebuf[i], key_to_set, 1);
++		key_to_set = (i ^ seed) * 2;
++		set_storage_key(pagebuf + i * PAGE_SIZE, key_to_set, 1);
  	}
++}
  
- 	/* Setting up the cpu to give it a stack and lowcore */
--	psw.mask = extract_psw_mask();
--	psw.addr = (unsigned long)test_func;
--	smp_cpu_setup(1, psw);
-+	smp_cpu_setup(1, PSW_WITH_CUR_MASK(test_func));
- 	smp_cpu_stop(1);
+-	migrate_once();
++/*
++ * Verify storage keys on pagebuf.
++ * Storage keys must have been set by set_test_pattern on pagebuf before.
++ * set_test_pattern must have been called with the same seed value.
++ *
++ * If storage keys match the expected result, will return a verify_result
++ * with verify_failed false. All other fields are then invalid.
++ * If there is a mismatch, returned struct will have verify_failed true and will
++ * be filled with the details on the first mismatch encountered.
++ */
++static struct verify_result verify_test_pattern(unsigned char seed)
++{
++	union skey expected_key, actual_key;
++	struct verify_result result = {
++		.verify_failed = true
++	};
++	uint8_t *cur_page;
++	unsigned long i;
  
- 	test_store_adtl_status_unavail();
-diff --git a/s390x/firq.c b/s390x/firq.c
-index b4b3542e..0d65d87f 100644
---- a/s390x/firq.c
-+++ b/s390x/firq.c
-@@ -33,7 +33,6 @@ static void wait_for_sclp_int(void)
-  */
- static void test_wait_state_delivery(void)
- {
--	struct psw psw;
- 	SCCBHeader *h;
- 	int ret;
+ 	for (i = 0; i < NUM_PAGES; i++) {
+-		actual_key.val = get_storage_key(pagebuf[i]);
+-		expected_key.val = i * 2;
++		cur_page = pagebuf + i * PAGE_SIZE;
++		actual_key.val = get_storage_key(cur_page);
++		expected_key.val = (i ^ seed) * 2;
  
-@@ -55,9 +54,7 @@ static void test_wait_state_delivery(void)
- 	sclp_mark_busy();
+ 		/*
+ 		 * The PoP neither gives a guarantee that the reference bit is
+@@ -51,27 +105,153 @@ static void test_migration(void)
+ 		actual_key.str.rf = 0;
+ 		expected_key.str.rf = 0;
  
- 	/* Start CPU #1 and let it wait for the interrupt. */
--	psw.mask = extract_psw_mask();
--	psw.addr = (unsigned long)wait_for_sclp_int;
--	ret = smp_cpu_setup(1, psw);
-+	ret = smp_cpu_setup(1, PSW_WITH_CUR_MASK(wait_for_sclp_int));
- 	/* This must not fail because we have at least 3 CPUs */
- 	assert(!ret);
- 
-diff --git a/s390x/migration.c b/s390x/migration.c
-index fe6ea836..269e272d 100644
---- a/s390x/migration.c
-+++ b/s390x/migration.c
-@@ -159,8 +159,6 @@ static void test_func(void)
- 
- int main(void)
- {
--	struct psw psw;
--
- 	/* don't say migrate here otherwise we will migrate right away */
- 	report_prefix_push("migration");
- 
-@@ -170,9 +168,7 @@ int main(void)
- 	}
- 
- 	/* Second CPU does the actual tests */
--	psw.mask = extract_psw_mask();
--	psw.addr = (unsigned long)test_func;
--	smp_cpu_setup(1, psw);
-+	smp_cpu_setup(1, PSW_WITH_CUR_MASK(test_func));
- 
- 	/* wait for thread setup */
- 	while(!flag_thread_complete)
-diff --git a/s390x/skrf.c b/s390x/skrf.c
-index 4cb563c3..e72a2b19 100644
---- a/s390x/skrf.c
-+++ b/s390x/skrf.c
-@@ -151,11 +151,6 @@ static void ecall_setup(void)
- 
- static void test_exception_ext_new(void)
- {
--	struct psw psw = {
--		.mask = extract_psw_mask(),
--		.addr = (unsigned long)ecall_setup
--	};
--
- 	report_prefix_push("exception external new");
- 	if (smp_query_num_cpus() < 2) {
- 		report_skip("Need second cpu for exception external new test.");
-@@ -163,7 +158,7 @@ static void test_exception_ext_new(void)
- 		return;
- 	}
- 
--	smp_cpu_setup(1, psw);
-+	smp_cpu_setup(1, PSW_WITH_CUR_MASK(ecall_setup));
- 	wait_for_flag();
- 	set_flag(0);
- 
-diff --git a/s390x/smp.c b/s390x/smp.c
-index 91f3e3bc..2b03bf0c 100644
---- a/s390x/smp.c
-+++ b/s390x/smp.c
-@@ -101,12 +101,8 @@ static void test_func(void)
- 
- static void test_start(void)
- {
--	struct psw psw;
--	psw.mask = extract_psw_mask();
--	psw.addr = (unsigned long)test_func;
--
- 	set_flag(0);
--	smp_cpu_start(1, psw);
-+	smp_cpu_start(1, PSW_WITH_CUR_MASK(test_func));
- 	wait_for_flag();
- 	report_pass("start");
- }
-@@ -120,8 +116,7 @@ static void test_restart(void)
- 	report_prefix_push("restart");
- 	report_prefix_push("stopped");
- 
--	lc->restart_new_psw.mask = extract_psw_mask();
--	lc->restart_new_psw.addr = (unsigned long)test_func;
-+	lc->restart_new_psw = PSW_WITH_CUR_MASK(test_func);
- 
- 	/* Make sure cpu is stopped */
- 	smp_cpu_stop(1);
-@@ -256,7 +251,6 @@ static void test_set_prefix(void)
- 	struct lowcore *new_lc = alloc_pages_flags(1, AREA_DMA31);
- 	struct cpu *cpu1 = smp_cpu_from_idx(1);
- 	uint32_t status = 0;
--	struct psw new_psw;
- 	int cc;
- 
- 	report_prefix_push("set prefix");
-@@ -268,9 +262,7 @@ static void test_set_prefix(void)
- 
- 	report_prefix_push("running");
- 	set_flag(0);
--	new_psw.addr = (unsigned long)stpx_and_set_flag;
--	new_psw.mask = extract_psw_mask();
--	smp_cpu_start(1, new_psw);
-+	smp_cpu_start(1, PSW_WITH_CUR_MASK(stpx_and_set_flag));
- 	wait_for_flag();
- 	cpu1_prefix = 0xFFFFFFFF;
- 
-@@ -326,7 +318,6 @@ static void call_received(void)
- static void test_calls(void)
- {
- 	int i;
--	struct psw psw;
- 
- 	for (i = 0; i < ARRAY_SIZE(cases_sigp_call); i++) {
- 		current_sigp_call_case = &cases_sigp_call[i];
-@@ -339,9 +330,7 @@ static void test_calls(void)
+-		/* don't log anything when key matches to avoid spamming the log */
+ 		if (actual_key.val != expected_key.val) {
+-			key_mismatches++;
+-			report_fail("page %d expected_key=0x%x actual_key=0x%x", i, expected_key.val, actual_key.val);
++			result.expected_key.val = expected_key.val;
++			result.actual_key.val = actual_key.val;
++			result.page_mismatch_idx = i;
++			result.page_mismatch_addr = (unsigned long)cur_page;
++			return result;
  		}
- 
- 		set_flag(0);
--		psw.mask = extract_psw_mask();
--		psw.addr = (unsigned long)call_received;
--		smp_cpu_start(1, psw);
-+		smp_cpu_start(1, PSW_WITH_CUR_MASK(call_received));
- 
- 		/* Wait until the receiver has finished setup */
- 		wait_for_flag();
-@@ -389,7 +378,6 @@ static void call_in_wait_cleanup(void)
- static void test_calls_in_wait(void)
- {
- 	int i;
--	struct psw psw;
- 
- 	report_prefix_push("psw wait");
- 	for (i = 0; i < ARRAY_SIZE(cases_sigp_call); i++) {
-@@ -404,9 +392,7 @@ static void test_calls_in_wait(void)
- 
- 		/* Let the secondary CPU setup the external mask and the external interrupt cleanup function */
- 		set_flag(0);
--		psw.mask = extract_psw_mask();
--		psw.addr = (unsigned long)call_in_wait_setup;
--		smp_cpu_start(1, psw);
-+		smp_cpu_start(1, PSW_WITH_CUR_MASK(call_in_wait_setup));
- 
- 		/* Wait until the receiver has finished setup */
- 		wait_for_flag();
-@@ -422,9 +408,7 @@ static void test_calls_in_wait(void)
- 		 * wait until the CPU becomes operating (done by smp_cpu_start).
- 		 */
- 		smp_cpu_stop(1);
--		psw.mask = extract_psw_mask() | PSW_MASK_EXT | PSW_MASK_WAIT;
--		psw.addr = (unsigned long)call_in_wait_received;
--		smp_cpu_start(1, psw);
-+		smp_cpu_start(1, PSW(extract_psw_mask() | PSW_MASK_EXT | PSW_MASK_WAIT, call_in_wait_received));
- 
- 		smp_sigp(1, current_sigp_call_case->call, 0, NULL);
- 
-@@ -439,9 +423,7 @@ static void test_calls_in_wait(void)
- 		 * to catch an interrupt that is presented twice since we would
- 		 * disable the external call on the first interrupt.
- 		 */
--		psw.mask = extract_psw_mask();
--		psw.addr = (unsigned long)call_in_wait_cleanup;
--		smp_cpu_start(1, psw);
-+		smp_cpu_start(1, PSW_WITH_CUR_MASK(call_in_wait_cleanup));
- 
- 		/* Wait until the cleanup has been completed */
- 		wait_for_flag();
-@@ -478,15 +460,11 @@ static void test_func_initial(void)
- static void test_reset_initial(void)
- {
- 	struct cpu_status *status = alloc_pages_flags(0, AREA_DMA31);
--	struct psw psw;
- 	int i;
- 
--	psw.mask = extract_psw_mask();
--	psw.addr = (unsigned long)test_func_initial;
--
- 	report_prefix_push("reset initial");
- 	set_flag(0);
--	smp_cpu_start(1, psw);
-+	smp_cpu_start(1, PSW_WITH_CUR_MASK(test_func_initial));
- 	wait_for_flag();
- 
- 	smp_sigp(1, SIGP_INITIAL_CPU_RESET, 0, NULL);
-@@ -525,22 +503,16 @@ static void test_local_ints(void)
- 
- static void test_reset(void)
- {
--	struct psw psw;
--
--	psw.mask = extract_psw_mask();
--	psw.addr = (unsigned long)test_func;
--
- 	report_prefix_push("cpu reset");
- 	smp_sigp(1, SIGP_EMERGENCY_SIGNAL, 0, NULL);
- 	smp_sigp(1, SIGP_EXTERNAL_CALL, 0, NULL);
--	smp_cpu_start(1, psw);
-+	smp_cpu_start(1, PSW_WITH_CUR_MASK(test_func));
- 
- 	smp_sigp(1, SIGP_CPU_RESET, 0, NULL);
- 	report(smp_cpu_stopped(1), "cpu stopped");
- 
- 	set_flag(0);
--	psw.addr = (unsigned long)test_local_ints;
--	smp_cpu_start(1, psw);
-+	smp_cpu_start(1, PSW_WITH_CUR_MASK(test_local_ints));
- 	wait_for_flag();
- 	report_pass("local interrupts cleared");
- 	report_prefix_pop();
-@@ -548,7 +520,6 @@ static void test_reset(void)
- 
- int main(void)
- {
--	struct psw psw;
- 	report_prefix_push("smp");
- 
- 	if (smp_query_num_cpus() == 1) {
-@@ -557,9 +528,7 @@ int main(void)
  	}
  
- 	/* Setting up the cpu to give it a stack and lowcore */
--	psw.mask = extract_psw_mask();
--	psw.addr = (unsigned long)test_func;
--	smp_cpu_setup(1, psw);
-+	smp_cpu_setup(1, PSW_WITH_CUR_MASK(test_func));
- 	smp_cpu_stop(1);
+-	report(!key_mismatches, "skeys after migration match");
++	result.verify_failed = false;
++	return result;
++}
++
++static void report_verify_result(const struct verify_result * result)
++{
++	if (result->verify_failed)
++		report_fail("page skey mismatch: first page idx = %lu, addr = 0x%lx, "
++			    "expected_key = 0x%02x, actual_key = 0x%02x",
++			    result->page_mismatch_idx, result->page_mismatch_addr,
++			    result->expected_key.val, result->actual_key.val);
++	else
++		report_pass("skeys match");
++}
++
++static void test_skey_migration_sequential(void)
++{
++	report_prefix_push("sequential");
++
++	set_test_pattern(0);
++
++	migrate_once();
++
++	result = verify_test_pattern(0);
++	report_verify_result(&result);
++
++	report_prefix_pop();
++}
++
++static void set_skeys_thread(void)
++{
++	while (!READ_ONCE(thread_should_exit)) {
++		set_test_pattern(thread_iters);
++
++		result = verify_test_pattern(thread_iters);
++
++		/*
++		 * Always increment even if the verify fails. This ensures primary CPU knows where
++		 * we left off and can do an additional verify round after migration finished.
++		 */
++		thread_iters++;
++
++		if (result.verify_failed)
++			break;
++	}
++
++	WRITE_ONCE(thread_exited, 1);
++}
++
++static void test_skey_migration_parallel(void)
++{
++	report_prefix_push("parallel");
++
++	if (smp_query_num_cpus() == 1) {
++		report_skip("need at least 2 cpus for this test");
++		goto error;
++	}
++
++	smp_cpu_setup(1, PSW_WITH_CUR_MASK(set_skeys_thread));
++
++	migrate_once();
++
++	WRITE_ONCE(thread_should_exit, 1);
++
++	while (!READ_ONCE(thread_exited))
++		;
++
++	/* Ensure we read result and thread_iters below from memory after thread exited */
++	mb();
++	report_info("thread completed %u iterations", thread_iters);
++
++	report_prefix_push("during migration");
++	report_verify_result(&result);
++	report_prefix_pop();
++
++	/*
++	 * Verification of skeys occurs on the thread. We don't know if we
++	 * were still migrating during the verification.
++	 * To be sure, make another verification round after the migration
++	 * finished to catch skeys which might not have been migrated
++	 * correctly.
++	 */
++	report_prefix_push("after migration");
++	assert(thread_iters > 0);
++	result = verify_test_pattern(thread_iters - 1);
++	report_verify_result(&result);
++	report_prefix_pop();
++
++error:
++	report_prefix_pop();
++}
++
++static void print_usage(void)
++{
++	report_info("Usage: migration-skey [--parallel|--sequential]");
++}
++
++static void parse_args(int argc, char **argv)
++{
++	if (argc < 2) {
++		/* default to sequential since it only needs one cpu */
++		arg_test_to_run = TEST_SEQUENTIAL;
++		return;
++	}
++
++	if (!strcmp("--parallel", argv[1]))
++		arg_test_to_run = TEST_PARALLEL;
++	else if (!strcmp("--sequential", argv[1]))
++		arg_test_to_run = TEST_SEQUENTIAL;
++	else
++		arg_test_to_run = TEST_INVALID;
+ }
  
- 	test_start();
-diff --git a/s390x/uv-host.c b/s390x/uv-host.c
-index 9f09f80e..33e6eec6 100644
---- a/s390x/uv-host.c
-+++ b/s390x/uv-host.c
-@@ -501,7 +501,6 @@ static void test_init(void)
+-int main(void)
++int main(int argc, char **argv)
  {
- 	int rc;
- 	uint64_t mem;
--	struct psw psw;
+ 	report_prefix_push("migration-skey");
  
- 	/* Donated storage needs to be over 2GB */
- 	mem = (uint64_t)memalign_pages_flags(SZ_1M, uvcb_qui.uv_base_stor_len, AREA_NORMAL);
-@@ -547,9 +546,7 @@ static void test_init(void)
- 	       "storage below 2GB");
- 	uvcb_init.stor_origin = mem;
+-	if (test_facility(169))
++	if (test_facility(169)) {
+ 		report_skip("storage key removal facility is active");
+-	else
+-		test_migration();
++		goto error;
++	}
  
--	psw.mask = extract_psw_mask();
--	psw.addr = (unsigned long)cpu_loop;
--	smp_cpu_setup(1, psw);
-+	smp_cpu_setup(1, PSW_WITH_CUR_MASK(cpu_loop));
- 	rc = uv_call(0, (uint64_t)&uvcb_init);
- 	report(rc == 1 && uvcb_init.header.rc == 0x102,
- 	       "too many running cpus");
+-	migrate_once();
++	parse_args(argc, argv);
++
++	switch (arg_test_to_run) {
++	case TEST_SEQUENTIAL:
++		test_skey_migration_sequential();
++		break;
++	case TEST_PARALLEL:
++		test_skey_migration_parallel();
++		break;
++	default:
++		print_usage();
++		break;
++	}
+ 
++error:
++	migrate_once();
+ 	report_prefix_pop();
+ 	return report_summary();
+ }
+diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+index 3caf81ed..d97eb5e9 100644
+--- a/s390x/unittests.cfg
++++ b/s390x/unittests.cfg
+@@ -185,10 +185,6 @@ smp = 2
+ file = migration-cmm.elf
+ groups = migration
+ 
+-[migration-skey]
+-file = migration-skey.elf
+-groups = migration
+-
+ [panic-loop-extint]
+ file = panic-loop-extint.elf
+ groups = panic
+@@ -208,3 +204,14 @@ groups = migration
+ [exittime]
+ file = exittime.elf
+ smp = 2
++
++[migration-skey-sequential]
++file = migration-skey.elf
++groups = migration
++extra_params = -append '--sequential'
++
++[migration-skey-parallel]
++file = migration-skey.elf
++smp = 2
++groups = migration
++extra_params = -append '--parallel'
 -- 
 2.39.1
 
