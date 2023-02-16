@@ -2,70 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 22CF5699FE0
-	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 23:50:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D83869A027
+	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 23:56:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229534AbjBPWur (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Feb 2023 17:50:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48056 "EHLO
+        id S229803AbjBPW4v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Feb 2023 17:56:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229448AbjBPWuq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Feb 2023 17:50:46 -0500
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B3C932CDE
-        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 14:50:44 -0800 (PST)
-Received: by mail-lf1-x129.google.com with SMTP id bp15so4625919lfb.13
-        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 14:50:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ClwnzccO8BUmmOp/VxOG0pbBm89yQbz/BP7ZVIUzFp0=;
-        b=lTDHazNCt6CpvoWDFLaTNphbBZzT7kt1EubGrgRAvV3c145eYBBy5f5+CtT3pQ4EEw
-         vq+DzxuqBCnY5UksycggzU5GJHZeuLU5IAxGmNBR6217pQas78tP+CrhDfMRE2vTRbZY
-         x2uj2Xr2/rM4KCxCV5QeHTMyUgAk5EL2IrMd9k39U07Dr2a/OZ3bKfQVHqipOfZrFeRI
-         RJPVNhKvC8V8aj9IFWyr+ppBaTAl8wYPH9tamMJbkTkopjTplqlSzb0xI18EjtwpIvmi
-         OanxYg1+kfSqY8Q5OJ3ILiQvzqovMQYuBrPtY6+iinR11dgsTsxUiFCd1VsXhahGTsyA
-         p00g==
+        with ESMTP id S229525AbjBPW4k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Feb 2023 17:56:40 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A9C838E96
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 14:55:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676588152;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=WsJAQPdgfmyRCdBIfmljb6PSA+KVi0kNYA3whbtDzGE=;
+        b=DHRiAYSjcsDDcxs8PoOioXboGPqApCxe10kW+xOpIZvMy4uR5zwDVDlSYD8DRskieVrfCL
+        cbswfVfdgP2WHEobYyQtbo6CpuGPVq6p3ima6AM9RgroyIz9lArqCE1LpD9P2OExe28e2f
+        EycCJ0HKFBZogPJeSPkh1ASWzbTtBxg=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-557-1Ro_eLD4Oay3qxqukJWRew-1; Thu, 16 Feb 2023 17:55:50 -0500
+X-MC-Unique: 1Ro_eLD4Oay3qxqukJWRew-1
+Received: by mail-qv1-f72.google.com with SMTP id r10-20020a0562140c8a00b0056ed45f262dso1958761qvr.11
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 14:55:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ClwnzccO8BUmmOp/VxOG0pbBm89yQbz/BP7ZVIUzFp0=;
-        b=J2h9R9MvVT2HSCpawdQ6hUK7G6fZ/IjtAByNZHD+PD7SGaWXaVU15Nbk8ipjspdmx4
-         s9FXzG6TA2ylYrF62xpR6Xi/zTIFFLWUFGkMBLDAhFSrUPXzYAxZERSP0JYRxBZL7jQL
-         Fj0AorDp2d7s2DEfNggLaizYa8/zSta+fUH2YbXXQgGel3Ug2O/+wc2+j3utVssw0afd
-         QUCeprCogYK59QiRlwfdWdlqwi6+JMxDOmgOhHTnRC4yJei81ZTaY2blzubHR2XmkGqb
-         T99PugMDkLPWVjxxjeMre/6Qix7pgW2s/nLZHQomgyU84Uz+0ytcQm7ec4PTFfOiA+gM
-         aUPQ==
-X-Gm-Message-State: AO0yUKVNbUoR3BmLRjtMNDoprMYQDSUV6Plr4BjDcZgQQ3GtRJ9XK5oy
-        8U2+UErbzYGXwvwEKo11v6xr+J+/7zmB8FZmrrQkIQ==
-X-Google-Smtp-Source: AK7set+XwTphH4d36OqZHqgckvXgUFJc0W3zjAIyA4f6EK3O2FPS2MJJ3q+nMfhSXUB+1Vn3wOShwlqp/ZSFNKFp9fY=
-X-Received: by 2002:a19:c215:0:b0:4d8:1c0e:bfc7 with SMTP id
- l21-20020a19c215000000b004d81c0ebfc7mr2140062lfc.13.1676587842656; Thu, 16
- Feb 2023 14:50:42 -0800 (PST)
-MIME-Version: 1.0
-References: <CAAhR5DE4rYey42thw_4toKx0tEn5ZY3mRq8AJT=YQqemqvt7pw@mail.gmail.com>
- <CAMkAt6pTNZ2_+0RNZcPFHhG-9o2q0ew0Wgd=m_T6KfLSYJyB4g@mail.gmail.com>
- <Y+5zaeJxKr6hzp4w@google.com> <c34b8753-d70b-3d0f-f3b1-c89264642291@redhat.com>
- <Y+59PX7V9qEzpuJh@google.com> <CAAhR5DEhqv_FsdGbeOQ9vvKEcVCOnkDBxCJRs_XC2zN_8fKB5Q@mail.gmail.com>
-In-Reply-To: <CAAhR5DEhqv_FsdGbeOQ9vvKEcVCOnkDBxCJRs_XC2zN_8fKB5Q@mail.gmail.com>
-From:   Sagi Shahar <sagis@google.com>
-Date:   Thu, 16 Feb 2023 14:50:31 -0800
-Message-ID: <CAAhR5DG5Q=0Yadj9mhw7K-dAzzcSN8T3oM68BhWCUZfT19f4Xg@mail.gmail.com>
-Subject: Re: Issue with "KVM: SEV: Add support for SEV intra host migration"
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WsJAQPdgfmyRCdBIfmljb6PSA+KVi0kNYA3whbtDzGE=;
+        b=T2a7BqjcyfxzfQRtkS374evYF/EHGur5vN5yTPomVo+E9t/dR/TwMGGd42oZiSlSv5
+         xkNyyZ3U4qqZvSNAmlSkc4x52vljijDzOiymsksGgbPWXYRFieO0hvTfqVjpcbR0tmqA
+         kJNhBlmkcFM4fKE5kLyH2YxyQeDRyCoPR4REk8Yv1H3lOqx9qOL0uS+Wewh7DXQCbinA
+         a3Apt3xtNSGsW+WGty75dHj3NmuKjJnvMltsJVgaIXo3KunRR9LAJdq/loCOpGD/Aobj
+         VAfKNVM00kyL0bNz2pAw6/uuCyuoZjsgFa+mCodTO7/JheZUlR4MPwghlMTfM4J1s0+d
+         crpQ==
+X-Gm-Message-State: AO0yUKUylF/PbYXgqNSLN5Z1EduN4RI1HO9zM7Ykg/lpvruuVor/Pirc
+        Vwp7T+d2OxACNzHso/gKlCm5W/N/664J9W5dVCXnHZ8StpH8qLk9HsuaSCIznVcHaiQFv36U+Dc
+        g3u3xUWQE23Re
+X-Received: by 2002:a05:622a:1052:b0:3b5:87db:f979 with SMTP id f18-20020a05622a105200b003b587dbf979mr14520331qte.5.1676588150334;
+        Thu, 16 Feb 2023 14:55:50 -0800 (PST)
+X-Google-Smtp-Source: AK7set+WU3Uxar4FQEfigjScvOSNMorobMDegsajbzAUL2/ymdc3m3y2cKgUDCySPQH/BrPQuXkBAg==
+X-Received: by 2002:a05:622a:1052:b0:3b5:87db:f979 with SMTP id f18-20020a05622a105200b003b587dbf979mr14520310qte.5.1676588150092;
+        Thu, 16 Feb 2023 14:55:50 -0800 (PST)
+Received: from x1n (bras-base-aurron9127w-grc-56-70-30-145-63.dsl.bell.ca. [70.30.145.63])
+        by smtp.gmail.com with ESMTPSA id 2-20020ac82082000000b003b2d890752dsm1301870qtd.88.2023.02.16.14.55.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Feb 2023 14:55:49 -0800 (PST)
+Date:   Thu, 16 Feb 2023 17:55:48 -0500
+From:   Peter Xu <peterx@redhat.com>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Gonda <pgonda@google.com>, kvm@vger.kernel.org,
-        Erdem Aktas <erdemaktas@google.com>,
-        Ryan Afranji <afranji@google.com>,
-        Michael Sterritt <sterritt@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Cc:     Anish Moorthy <amoorthy@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        James Houghton <jthoughton@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Axel Rasmussen <axelrasmussen@google.com>, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev
+Subject: Re: [PATCH 6/8] kvm/x86: Add mem fault exit on EPT violations
+Message-ID: <Y+60dIGWIXEuHpwW@x1n>
+References: <20230215011614.725983-1-amoorthy@google.com>
+ <20230215011614.725983-7-amoorthy@google.com>
+ <Y+0VK6vZpMqAQ2Dc@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Y+0VK6vZpMqAQ2Dc@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,43 +87,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 16, 2023 at 2:47 PM Sagi Shahar <sagis@google.com> wrote:
->
-> On Thu, Feb 16, 2023 at 11:00 AM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > On Thu, Feb 16, 2023, Paolo Bonzini wrote:
-> > > On 2/16/23 19:18, Sean Christopherson wrote:
-> > > > Depending on why the source VM needs to be cleaned up, one thought would be add
-> > > > a dedicated ioctl(), e.g. KVM_DISMANTLE_VM, and make that the _only_ ioctl() that's
-> > > > allowed to operate on a dead VM.  The ioctl() would be defined as a best-effort
-> > > > mechanism to teardown/free internal state, e.g. destroy KVM_PIO_BUS, KVM_MMIO_BUS,
-> > > > and memslots, zap all SPTEs, etc...
-> > >
-> > > If we have to write the code we might as well do it directly at context-move
-> > > time, couldn't we?  I like the idea of minimizing the memory cost of the
-> > > zombie VM.
-> >
-> > I thought about that too, but I assume the teardown latency would be non-trivial,
-> > especially if KVM aggressively purges state.  The VMM can't resume the VM until
-> > it knows the migration has completed, so immediately doing the cleanup would impact
-> > the VM's blackout time.
-> >
-> > My other thought was to automatically do the cleanup, but to do so asynchronously.
-> > I actually don't know why I discarded that idea.  I think I got distracted and
-> > forgot to circle back.  That might be something we could do for any and all
-> > bugged/dead VMs.
->
-> As my second experiment where I always return success on ioctls after
-> the vm is marked dead, my guess is that VMM doesn't HAVE to clean the
-> state using the ioctls.
-> Our VMM currently cleans everything automatically during the shutdown
-> process of the vm. Changing this behavior might be a bit tricky if if
-> it's safer than allowing cleanup ioctls in KVM we can see if we can
-> change that behavior.
->
-> I like Paul's suggestion on ignoring ioctl errors if the vm got
+Hi, Sean,
 
-Sorry Paolo, not Paul.
+On Wed, Feb 15, 2023 at 09:23:55AM -0800, Sean Christopherson wrote:
+> > @@ -4230,9 +4231,25 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+> >  	}
+> >  
+> >  	async = false;
+> > -	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, false, &async,
+> > -					  fault->write, &fault->map_writable,
+> > -					  &fault->hva);
+> > +	mem_fault_nowait = memory_faults_enabled(vcpu->kvm);
+> > +
+> > +	fault->pfn = __gfn_to_pfn_memslot(
+> > +		slot, fault->gfn,
+> > +		mem_fault_nowait,
+> 
+> Hrm, as prep work for this series, I think we should first clean up the pile o'
+> bools.  This came up before when the "interruptible" flag was added[*].  We punted
+> then, but I think it's time to bite the bullet, especially since "nowait" and
+> "async" need to be mutually exclusive.
+> 
+> [*] https://lore.kernel.org/all/YrR9i3yHzh5ftOxB@google.com
 
-> migrated in VMM. This might be enough for us to clean up the source VM
-> state enough that we can safely release it.
+IIUC at that time we didn't reach a consensus on how to rework it, and the
+suggestion was using a bool and separate the cleanup (while the flag
+cleanup got NACKed..), which makes sense to me.
+
+Personally I like your other patch a lot:
+
+https://lore.kernel.org/all/YrTNGVpT8Cw2yrnr@google.com/
+
+The question is, after we merge the bools into a flag, do we still need a
+struct* anyway?  If we can reach a consensus, I'll be happy to continue
+working on the cleanup (by picking up your patch first).  Or if Anish would
+like to take it over in any form that'll be also perfect.
+
+Thanks,
+
+-- 
+Peter Xu
+
