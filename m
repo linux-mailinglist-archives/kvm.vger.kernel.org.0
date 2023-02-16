@@ -2,276 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2DAAF699A3F
-	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 17:39:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 12E8C699ADF
+	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 18:13:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229928AbjBPQje (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Feb 2023 11:39:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38358 "EHLO
+        id S229955AbjBPRNG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Feb 2023 12:13:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229745AbjBPQjc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Feb 2023 11:39:32 -0500
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5361E3B872;
-        Thu, 16 Feb 2023 08:39:31 -0800 (PST)
-Received: by mail-lf1-x129.google.com with SMTP id bp15so3446801lfb.13;
-        Thu, 16 Feb 2023 08:39:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1676565569;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Hl8TkXjDUuINBql4o4AzCQpBWalus571qjEm8zEtAl8=;
-        b=Q+1mB6OD6oZI8cLbrQkfpwDvFsR/TXzS4KWXgdCDmFL5U3qypgZyAd/G5VYXsfvupZ
-         Y3wPtzlskIrA3Y/QuR0xdosznwk5tzV1uD00VxHKxh5cA48S3yFVViCCHzYgVdp/F0yY
-         ELtwAgIzYCe0zyIkWbCDC9zmyRHMqmMHXMLe5uo6KjHaApEnvmwx+PJQLFdsDd52Unyb
-         dRH4E60DEFsuMmh/Emw7URM+GUVTJfvkBR9shpuppu+qQVkkv/u8fZ14fgMCNTywvfR4
-         cbPv8qHIU6VOwkzTSgOrMF5QdnUOqiOWmm12wfh+VbCPbJq5wqbSQWElQIowj007MKJE
-         2PtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1676565569;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Hl8TkXjDUuINBql4o4AzCQpBWalus571qjEm8zEtAl8=;
-        b=BBPbazG7yuHAg4IDjlymZy1IlUEYMwRxyBhnzVHtxacD9cZrMMOKnSE40ITqvhirSB
-         iZCV21l07NGe802ruY+MlVzfJNDANsc2QhC4lQPFVPk/yN8SoZ7+gbOjEYayYc23CrSp
-         6EJ88hJtoNkT5ESYeTLgmI/PF2Me0JJQRunvYaP8MPY9fhP4LOkB84sGxFk/BMCecD9H
-         czJSG0DyeGARjPkNNrxmo0+uor/OMC9cdaakCB3c3cu5s+6S92gURr12/IfSzyGFcUdg
-         P5ysHibkJb6bjIDQkyB3gKyjACjk7dX1n7BWU1Zq5Nw8z2Cb18qytUhuAl9CPD1HSa1+
-         46lQ==
-X-Gm-Message-State: AO0yUKVxdWnh2+YoeWkmUgsGEVlDzrIyChEqm9Tf6ZJ1IVVP2yEwT+Yb
-        VtM5N+bAJokQ8IfDwpY1sXNr+IMunQs=
-X-Google-Smtp-Source: AK7set+0/k1CnD9VK7tSUUfut8czHczIQQPqzWVgN3d77QcaVE1QwuT0kyEzV0eH9r3nCD0D16WKdQ==
-X-Received: by 2002:ac2:43b9:0:b0:4db:3847:12ed with SMTP id t25-20020ac243b9000000b004db384712edmr1547125lfl.6.1676565569541;
-        Thu, 16 Feb 2023 08:39:29 -0800 (PST)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id x16-20020ac259d0000000b004d0b1327b75sm353279lfn.61.2023.02.16.08.39.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Feb 2023 08:39:29 -0800 (PST)
-Date:   Thu, 16 Feb 2023 18:39:26 +0200
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-To:     isaku.yamahata@intel.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v11 044/113] KVM: x86/tdp_mmu: Make
- handle_changed_spte() return value
-Message-ID: <20230216183926.00003f48@gmail.com>
-In-Reply-To: <7cbce6eff935d9d64fa4638f5f6085ac1b8de9bb.1673539699.git.isaku.yamahata@intel.com>
-References: <cover.1673539699.git.isaku.yamahata@intel.com>
-        <7cbce6eff935d9d64fa4638f5f6085ac1b8de9bb.1673539699.git.isaku.yamahata@intel.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        with ESMTP id S229461AbjBPRNE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Feb 2023 12:13:04 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 768AD4E5C6
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 09:13:01 -0800 (PST)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31GF8e5w030547
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 17:13:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=9hglFhuIUExouHqxi4pxF7UYkOu4Y91Pznqyj05de3o=;
+ b=tdjQbf/CsEFyusdQSx95d2GFiYFMln5ZYCUksqxng+mFEV2SEmXqEhqFwTgvZhwR0hKr
+ T2ZwGsDSogQd0u3dTPnn8rUO3MuIFkSeq3uCMveA9rnZgdvSGcqAYa9YTjUyEXIUXNdC
+ QWHDiZG3LMpHb3YTFKEUOZo4DX0sy+9sYvrdyyvEMjw7UoXZF5YTYe9cBN2G9Az6GYJo
+ fw8nLzP+BuSKmUHq/LpOgcZEH7aYEvcRFV17UqeyTbgz2MqlVc4JNIW0moRyu0G4DBQ2
+ D83wie4G6lZysBM5Pq4iHG3BRSHbQQ07i79s+hF29MXQsOlgq4pH4RMaps37f9ZP42k7 uQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nspv2k5es-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 17:13:00 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31GGHSOg000780
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 17:13:00 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nspv2k5e1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 16 Feb 2023 17:12:59 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31G4w7o1011623;
+        Thu, 16 Feb 2023 17:12:58 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3np2n6xyn5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 16 Feb 2023 17:12:58 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31GHCuvA47186420
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 16 Feb 2023 17:12:56 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E81622004F;
+        Thu, 16 Feb 2023 17:12:55 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C68142004B;
+        Thu, 16 Feb 2023 17:12:55 +0000 (GMT)
+Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.56])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Thu, 16 Feb 2023 17:12:55 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     pbonzini@redhat.com, thuth@redhat.com
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com
+Subject: [kvm-unit-tests GIT PULL 00/10] s390x: storage key migration tests, snippets and linker cleanups
+Date:   Thu, 16 Feb 2023 18:12:45 +0100
+Message-Id: <20230216171255.48799-1-imbrenda@linux.ibm.com>
+X-Mailer: git-send-email 2.39.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: U2F8c8NOAeBJNy1GA7nvpGbFhiIknhK2
+X-Proofpoint-ORIG-GUID: YKOOKReeV3Ib1vhAsbNIxS-FlkRPnrYv
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-16_13,2023-02-16_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 impostorscore=0 phishscore=0 mlxscore=0 lowpriorityscore=0
+ suspectscore=0 mlxlogscore=972 malwarescore=0 adultscore=0 spamscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302160144
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 12 Jan 2023 08:31:52 -0800
-isaku.yamahata@intel.com wrote:
+Hi Paolo and/or Thomas,
 
-Some typos below:
 
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
-> 
-> TDX operation can fail with TDX_OPERAND_BUSY when multiple vcpu try to
-                                                             vcpus
-> operation on same TDX resource like Secure EPT.  It doesn't spin and returns
-  operate
+please merge the following changes:
 
-> busy error to VMM so that VMM has to take action, e.g. retry or whatever.
-> 
-> Because TDP MMU uses read spin lock for scalability, spinlock around seam
-> call busts TDP MMU effort.  The other option is to let SEAMCALL fail and
-> page fault handler should retry.  Make handle_changed_spte() and its caller
-> return values so that kvm page fault handler can return on such cases. This
-> patch makes it return only zero.
-> 
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 72 +++++++++++++++++++++++++-------------
->  1 file changed, 47 insertions(+), 25 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 7ab498b80214..4fb07f91e5d6 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -349,9 +349,9 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
->  	return __pa(root->spt);
->  }
->  
-> -static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
-> -				u64 old_spte, u64 new_spte, int level,
-> -				bool shared);
-> +static int __must_check handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
-> +					    u64 old_spte, u64 new_spte, int level,
-> +					    bool shared);
->  
->  static void handle_changed_spte_acc_track(u64 old_spte, u64 new_spte, int level)
->  {
-> @@ -445,6 +445,7 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
->  	struct kvm_mmu_page *sp = sptep_to_sp(rcu_dereference(pt));
->  	int level = sp->role.level;
->  	gfn_t base_gfn = sp->gfn;
-> +	int ret;
->  	int i;
->  
->  	trace_kvm_mmu_prepare_zap_page(sp);
-> @@ -516,8 +517,14 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
->  			old_spte = kvm_tdp_mmu_write_spte(sptep, old_spte,
->  							  REMOVED_SPTE, level);
->  		}
-> -		handle_changed_spte(kvm, kvm_mmu_page_as_id(sp), gfn,
-> -				    old_spte, REMOVED_SPTE, level, shared);
-> +		ret = handle_changed_spte(kvm, kvm_mmu_page_as_id(sp), gfn,
-> +					  old_spte, REMOVED_SPTE, level, shared);
-> +		/*
-> +		 * We are removing page tables.  Because in TDX case we don't
-> +		 * zap private page tables except tearing down VM.  It means
-> +		 * no race condition.
-> +		 */
-> +		WARN_ON_ONCE(ret);
->  	}
->  
->  	call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
-> @@ -538,9 +545,9 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
->   * Handle bookkeeping that might result from the modification of a SPTE.
->   * This function must be called for all TDP SPTE modifications.
->   */
-> -static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
-> -				  u64 old_spte, u64 new_spte, int level,
-> -				  bool shared)
-> +static int __must_check __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
-> +					      u64 old_spte, u64 new_spte, int level,
-> +					      bool shared)
->  {
->  	bool was_present = is_shadow_present_pte(old_spte);
->  	bool is_present = is_shadow_present_pte(new_spte);
-> @@ -576,7 +583,7 @@ static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
->  	}
->  
->  	if (old_spte == new_spte)
-> -		return;
-> +		return 0;
->  
->  	trace_kvm_tdp_mmu_spte_changed(as_id, gfn, level, old_spte, new_spte);
->  
-> @@ -605,7 +612,7 @@ static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
->  			       "a temporary removed SPTE.\n"
->  			       "as_id: %d gfn: %llx old_spte: %llx new_spte: %llx level: %d",
->  			       as_id, gfn, old_spte, new_spte, level);
-> -		return;
-> +		return 0;
->  	}
->  
->  	if (is_leaf != was_leaf)
-> @@ -624,17 +631,25 @@ static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
->  	if (was_present && !was_leaf &&
->  	    (is_leaf || !is_present || WARN_ON_ONCE(pfn_changed)))
->  		handle_removed_pt(kvm, spte_to_child_pt(old_spte, level), shared);
-> +
-> +	return 0;
->  }
->  
-> -static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
-> -				u64 old_spte, u64 new_spte, int level,
-> -				bool shared)
-> +static int __must_check handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
-> +					    u64 old_spte, u64 new_spte, int level,
-> +					    bool shared)
->  {
-> -	__handle_changed_spte(kvm, as_id, gfn, old_spte, new_spte, level,
-> -			      shared);
-> +	int ret;
-> +
-> +	ret = __handle_changed_spte(kvm, as_id, gfn, old_spte, new_spte, level,
-> +				    shared);
-> +	if (ret)
-> +		return ret;
-> +
->  	handle_changed_spte_acc_track(old_spte, new_spte, level);
->  	handle_changed_spte_dirty_log(kvm, as_id, gfn, old_spte,
->  				      new_spte, level);
-> +	return 0;
->  }
->  
->  /*
-> @@ -653,12 +668,14 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
->   * * -EBUSY - If the SPTE cannot be set. In this case this function will have
->   *            no side-effects other than setting iter->old_spte to the last
->   *            known value of the spte.
-> + * * -EAGAIN - Same to -EBUSY. But the source is from callbacks for private spt
->   */
-> -static inline int tdp_mmu_set_spte_atomic(struct kvm *kvm,
-> -					  struct tdp_iter *iter,
-> -					  u64 new_spte)
-> +static inline int __must_check tdp_mmu_set_spte_atomic(struct kvm *kvm,
-> +						       struct tdp_iter *iter,
-> +						       u64 new_spte)
->  {
->  	u64 *sptep = rcu_dereference(iter->sptep);
-> +	int ret;
->  
->  	/*
->  	 * The caller is responsible for ensuring the old SPTE is not a REMOVED
-> @@ -677,15 +694,16 @@ static inline int tdp_mmu_set_spte_atomic(struct kvm *kvm,
->  	if (!try_cmpxchg64(sptep, &iter->old_spte, new_spte))
->  		return -EBUSY;
->  
-> -	__handle_changed_spte(kvm, iter->as_id, iter->gfn, iter->old_spte,
-> -			      new_spte, iter->level, true);
-> -	handle_changed_spte_acc_track(iter->old_spte, new_spte, iter->level);
-> +	ret = __handle_changed_spte(kvm, iter->as_id, iter->gfn, iter->old_spte,
-> +				    new_spte, iter->level, true);
-> +	if (!ret)
-> +		handle_changed_spte_acc_track(iter->old_spte, new_spte, iter->level);
->  
-> -	return 0;
-> +	return ret;
->  }
->  
+* storage key concurrent migration test
+* new utility macros for PSWs
+* linker and snippets cleanups
+* fix backtrace when exceptions happen during VM execution
 
-----
+MERGE: https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/merge_requests/40
 
-> -static inline int tdp_mmu_zap_spte_atomic(struct kvm *kvm,
-> -					  struct tdp_iter *iter)
-> +static inline int __must_check tdp_mmu_zap_spte_atomic(struct kvm *kvm,
-> +						       struct tdp_iter *iter)
->  {
->  	int ret;
->  
-----
+PIPELINE: https://gitlab.com/imbrenda/kvm-unit-tests/-/pipelines/780085043
 
-The above part doesn't belong to this patch.
+PULL: https://gitlab.com/imbrenda/kvm-unit-tests.git s390x-next-2023-02
 
-> @@ -750,6 +768,8 @@ static u64 __tdp_mmu_set_spte(struct kvm *kvm, int as_id, tdp_ptep_t sptep,
->  			      u64 old_spte, u64 new_spte, gfn_t gfn, int level,
->  			      bool record_acc_track, bool record_dirty_log)
->  {
-> +	int ret;
-> +
->  	lockdep_assert_held_write(&kvm->mmu_lock);
->  
->  	/*
-> @@ -763,7 +783,9 @@ static u64 __tdp_mmu_set_spte(struct kvm *kvm, int as_id, tdp_ptep_t sptep,
->  
->  	old_spte = kvm_tdp_mmu_write_spte(sptep, old_spte, new_spte, level);
->  
-> -	__handle_changed_spte(kvm, as_id, gfn, old_spte, new_spte, level, false);
-> +	ret = __handle_changed_spte(kvm, as_id, gfn, old_spte, new_spte, level, false);
-> +	/* Because write spin lock is held, no race.  It should success. */
-> +	WARN_ON_ONCE(ret);
->  
->  	if (record_acc_track)
->  		handle_changed_spte_acc_track(old_spte, new_spte, level);
+
+Claudio Imbrenda (2):
+  lib: s390x: add PSW and PSW_WITH_CUR_MASK macros
+  s390x: use the new PSW and PSW_WITH_CUR_MASK macros
+
+Janosch Frank (7):
+  s390x: Cleanup flat.lds
+  s390x: snippets: c: Cleanup flat.lds
+  s390x: Add a linker script to assembly snippets
+  s390x: snippets: Fix SET_PSW_NEW_ADDR macro
+  lib: s390x: sie: Set guest memory pointer
+  s390x: Clear first stack frame and end backtrace early
+  lib: s390x: Handle debug prints for SIE exceptions correctly
+
+Nico Boehr (1):
+  s390x: add parallel skey migration test
+
+ s390x/Makefile              |   5 +-
+ lib/s390x/asm/arch_def.h    |   4 +
+ lib/s390x/sie.h             |   2 +
+ lib/s390x/snippet.h         |   3 +-
+ lib/s390x/interrupt.c       |  46 +++++++-
+ lib/s390x/sie.c             |   1 +
+ lib/s390x/stack.c           |   2 +
+ s390x/flat.lds              |  19 +---
+ s390x/snippets/asm/flat.lds |  41 +++++++
+ s390x/snippets/c/flat.lds   |  28 ++---
+ s390x/cpu.S                 |   6 +-
+ s390x/cstart64.S            |   2 +
+ s390x/snippets/asm/macros.S |   2 +-
+ s390x/adtl-status.c         |  24 +---
+ s390x/firq.c                |   5 +-
+ s390x/migration-skey.c      | 218 ++++++++++++++++++++++++++++++++----
+ s390x/migration.c           |   6 +-
+ s390x/mvpg-sie.c            |   2 +-
+ s390x/pv-diags.c            |   6 +-
+ s390x/skrf.c                |   7 +-
+ s390x/smp.c                 |  53 ++-------
+ s390x/uv-host.c             |   5 +-
+ s390x/unittests.cfg         |  15 ++-
+ 23 files changed, 348 insertions(+), 154 deletions(-)
+ create mode 100644 s390x/snippets/asm/flat.lds
+
+-- 
+2.39.1
 
