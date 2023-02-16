@@ -2,109 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B707699BE4
-	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 19:07:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 90D22699BFA
+	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 19:14:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229516AbjBPSHU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Feb 2023 13:07:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46456 "EHLO
+        id S229667AbjBPSO5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Feb 2023 13:14:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229558AbjBPSHT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Feb 2023 13:07:19 -0500
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12olkn2048.outbound.protection.outlook.com [40.92.23.48])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F40E4505D1
-        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 10:06:48 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jWZ4s90CAovWoy1GV09tJ2/86C9QLiZ5sCC1mnU/vNlDBJNIew5G3sQ51Yphbv14DNKxrSGSt/Ua5OR6V8fSYV55a9OUm/LDyXuIkLD8w+MpM8uStSEbq6WqnPLXqn8j8MZBJLRI1RisAOw4OzVO6m6dzTod/+FxU9nMgGsGzSnZY6PH5EgRYyOMG0dp7VqFc/HIgi52J5Oku1lxmdNIT9ln3vzVGGPNgc1tuhl4XPUHO7TSEF2N6r98VvMaOZ+CBvBIibZQNf6TJuY880PJsVLC0wmrpVeYa1+VmL0G/opqcNbgn4U2vjymZfnJKSOAq4OFJhgE5IHN3aM9c13kKg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QVXfZ6n+H1H2kk2OrBC9dbgWprlhZ319Yj6PIi5hEm8=;
- b=TQBydniXVIWDz0tuHTjQZ9zgCjjy+I03rnLGR0hvNc0mpn+mOMWhsGVJo53CodhGwj9kkEUpn9tPaIpP9ZNLv1wX5/JzRqt/WwmBpHLModxuf924dhaJKnxBBC65NHntUbgkoZ5JQMAESdY0g7v5YvvA34oGuMwzEh1Fb+PUCTAM3dpJOsBMgTX7J7Rw676pdE0csEIBy7fwiZayOswGxFQA7Tqcw7NnPNaYZIxYfx0YiTWEpppGPFdlpWRh677k/+X0kLLv2e99gouv+NjejCZYRsUB5cW31s9BpjY0KV6EqLFaOHf6ij4T2qq4IYNkFO/sYBo8CpGyryrQKeV2lA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QVXfZ6n+H1H2kk2OrBC9dbgWprlhZ319Yj6PIi5hEm8=;
- b=H25jeDXxoORHicGP1VgFabSuJkjpx97owzXOLJesy9e6BbebHmKD7uwXo1lXu9wzQAlbo0qKzJfaFRgN0QzEGLCvq6VEW5njqJkTa5d9pjRrnxgE+uZL7UiLGBNAuqV4FmdYk7HFie7YvXPswidIkBbyZiZ8hDuvbsdw9dmMAioZBR9vcfT4CKsD3lrQeck1I1DW2qJbbPhgef9ZRDiYpoGY0jCJ9bGdhKQYXYZXKA/MNvSIN0i9yZL+gt/GgzWlfoWc9F9jsuNmn2ShkkqUo8tqQtBd0W+KnbwVsxgD0GWJBX62rltfPB1eXhQ2pYwhU3TGY3TxZrHI8bQhyHvHIg==
-Received: from BYAPR12MB3014.namprd12.prod.outlook.com (2603:10b6:a03:d8::11)
- by MN6PR12MB8589.namprd12.prod.outlook.com (2603:10b6:208:47d::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.22; Thu, 16 Feb
- 2023 18:06:47 +0000
-Received: from BYAPR12MB3014.namprd12.prod.outlook.com
- ([fe80::a666:b29d:dedf:c853]) by BYAPR12MB3014.namprd12.prod.outlook.com
- ([fe80::a666:b29d:dedf:c853%7]) with mapi id 15.20.6111.013; Thu, 16 Feb 2023
- 18:06:47 +0000
-Message-ID: <BYAPR12MB301441A16CE6CFFE17147888A0A09@BYAPR12MB3014.namprd12.prod.outlook.com>
-Date:   Thu, 16 Feb 2023 19:06:41 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.2
-From:   =?UTF-8?Q?Micha=c5=82_Zegan?= <webczat@outlook.com>
-Subject: Fwd: Windows 11 guest crashing supposedly in smm after some time of
- use
-To:     kvm@vger.kernel.org
-References: <c0bf0011-a697-da29-c2d2-8c16e9df21cf@outlook.com>
-Content-Language: en-US
-In-Reply-To: <c0bf0011-a697-da29-c2d2-8c16e9df21cf@outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TMN:  [3TMemEwSHzBIuaHqIV2imWo+zJsj61k3]
-X-ClientProxiedBy: BE1P281CA0124.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:7a::10) To BYAPR12MB3014.namprd12.prod.outlook.com
- (2603:10b6:a03:d8::11)
-X-Microsoft-Original-Message-ID: <a561568d-9e76-08ce-2c7f-2626d5ea1e76@outlook.com>
+        with ESMTP id S229448AbjBPSOz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Feb 2023 13:14:55 -0500
+Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C30B530C6
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 10:14:53 -0800 (PST)
+Received: by mail-qk1-x72b.google.com with SMTP id ow4so1142651qkn.1
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 10:14:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=3r4RDI5/ND95D3FHxdSWmhErNcQIg7xBHStY1H5A3qI=;
+        b=PkGFoumz4SnpwQ9+GSogVdbWJa5o6EivrdKnfSyuk8a/f26g6y79N3g7WvWfbhdLxU
+         u29Vk2vEylYCPZDe0jZtL7FZZOM16+RUng88NX+XpwVgMk0+vzgioTgUfqrylVbNvSa1
+         HhDQsiVktAgMDyM/eXrX1A814Me3tQ/8RKd4A6hvsrhDO63IfGPwFOoAsZ+H7lwDgwP2
+         L8YgS+m6CyKXRlfkzEkyYmz+hZIaBAyeSsrpLLAx7Gcu4EmIcZJIjhDWLD+6PUf+N4lJ
+         63a6aELYwD0+NJWSo9/CVFfU1AXNUIOxv3vL4KddB8utJaVdKYqTVdESeP8dv5M8OFBy
+         TdwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3r4RDI5/ND95D3FHxdSWmhErNcQIg7xBHStY1H5A3qI=;
+        b=5qv42E632bmI/dKwe5TcuPmdYlJxT0jFfU+QoP/1fZ3EXumbu7A7w3MPH5GVskDuo4
+         dB6Xg++B0br6FymQFW23njDtkhAVKP/d3EgUDI63j4wqmJStSSuixLrYOhOVXjAGE9qE
+         ABf6CBZGdSungDpwfD8+fOnBWmRRX2jftw6AOOux3StWVGPGApZIJSF2/NP1hNTkPy7U
+         rLoTsEW37zVe0Znb4+IRFL5Vw4OAV1zSgk9RntMh/YjOy4gsRUSELywO08OuRypb97uC
+         GabpnctRhVdtU1GAYcXQ7qBEFncHvZThHd6P70pSLiBSfgOxVh7SZE2yOkP9c400pPua
+         bZzA==
+X-Gm-Message-State: AO0yUKUAUXrkHaL32ps+powJx6oT+f5bi+bVU5AROWhTOC1vUkgHcQNm
+        N8oEF9O/BnbVrHBNP443C7+Ex1cwAraRkcMTVl9OfQ==
+X-Google-Smtp-Source: AK7set+eJOrr95yLq/jzBEi0O1hYYKrmXkVkBeJACrnwd3R1mPd45ws8fND3WIrOB9gNmbpc0CdvWP8hYP3+kUJIWPg=
+X-Received: by 2002:a05:620a:1eb:b0:73b:79fb:ffb8 with SMTP id
+ x11-20020a05620a01eb00b0073b79fbffb8mr399194qkn.11.1676571292328; Thu, 16 Feb
+ 2023 10:14:52 -0800 (PST)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR12MB3014:EE_|MN6PR12MB8589:EE_
-X-MS-Office365-Filtering-Correlation-Id: c9e0d24d-db4b-4d24-e049-08db10489143
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: W6H4n29yRvA4zwEPQVIMP1E4D1OtYVOY1UHAcoq2OczszSJ7JEtFbRK4I1BGd+W2taqCgIlNU8ip/rTYGykCtdIgmb6juaMDKsQw1ZA+wQGa2UYZn/bUFX1BzWOp4WcNBoiXNYqJ1NYiU5nR0UPRYQOEeOxpCz3KVZn81bbwdqTPc7qmkf0IhE895ybaBuiuqMLzBGL7caOVqxOhpDGC2b5ZL/1jPrCqWR5q6cly6HVd2rbyxyNaWJyg089cvkWMnoaZn+3cOQDqz1YjcfGcEBEjsXzdwF2xZhkBVwJymMu9Zyut2x50dQvixJF3ZdYdjGC5v3UVvQwq14x/qsDTPzbz2Siq1SjcdEuhng/UcLvVk+QopgVbOC60YS4mRvpknV/QPRqA4XOUJ/npCL30EIorJwruGfvnZCQcAG8PiMBMXAAOe/yBww8qmHbG+gfbFSMJ5Vyyu10Bsb1tYbLzorvBfKEY4o07po76wTVSKx0ufynQoue1mR2/qH6BLlCfVKTeXYUYcSqJQKbVOWvz+NfcObkxjbJ3BBhdIJEskIhBGdJFp2ZBzetNFO+fcleaVoouOOWu8D8LDyELHX8cmw==
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QStxRW80WnhlYkFoTDQ0dlgxK0hHa1N3VDd3aG5PNlhBTFVtMjBlZTZUS2la?=
- =?utf-8?B?c1FDRXRkQ09RZC9BdzkrL3J0aklFQlU1T2M3cXloREJZYUd5UnZ3WkE3aGVD?=
- =?utf-8?B?Wk9XTnFrZ0VRdkhJQnJ5eENNa2RXRjNuUmdaTXJkdXlnNXFvb1h0ekhFRE0v?=
- =?utf-8?B?ZmZRMk1IaTg0UjVXRmtPL0ZXVmlKSktUSW9KbkZmdmNuRnorRGJvanNVamFR?=
- =?utf-8?B?cUhRbUVtSnR1ODlzK2p4WjI0Mzg2MTdSNnVCUGg2U1JBaTBMaDlSYTgvUDVj?=
- =?utf-8?B?emo1d1JBczdIY2dmUStTRkdWem94aWRKVEpxbE1hTEFiYjBIcDRyekNPTytZ?=
- =?utf-8?B?bmg0UXJJSURKbWJWa3Z3eENpOHdIT0hXeldPaXdTbWtVRDFDbm05dWZ1M2py?=
- =?utf-8?B?TGZyQ01vYWxKYnZ3N2xPejdvVWI3ZDNDZ1U2OVdWYmlXRVQ0a1BRdE1SWThU?=
- =?utf-8?B?eDdFL3BCSlpGY0tzVEFRVFFOenZLUjhRMnRGd243Wi9VY2dtcm02U0s5aU52?=
- =?utf-8?B?T0o5a0tZTDlYMkU4bCtFTk5yemQ3V1FtWHViSjVjK2FVOXViM0J4Y3ZZYVI3?=
- =?utf-8?B?YUpCTE1CR0VZQTdBSDErVG4rZVhYclRJQ3FUdURiVWVWbVhTWGY3UVlXVVNY?=
- =?utf-8?B?K3NBYkNlUFR1QTMrNW83bzFSeGxwVEdkTlF0MTI2ZzZCS01lV2VIM1Zzc085?=
- =?utf-8?B?Tmd3VUJIZi9iZERBVVZJRlk3SmJRY1hWQTdQd2xwTlF1eVpxSnlLOEhuRzUw?=
- =?utf-8?B?MDRVc3ZodFJ1VUg0T0NHSW5wS3ppUnpVcU81akxyS2w2WnJPOUo3ekJVV0lw?=
- =?utf-8?B?alJiQ0VUTDdIZnZHM1pDMU5hbWg4VWtOUUJ1aWZEemNRbXVWK0xMZmxhYnVH?=
- =?utf-8?B?bERPV1k0UzNQaWhIbnJrdjFrcnY5QWhndUUzM2R4ZnF3ckdVeE5hTEtNSVAx?=
- =?utf-8?B?bHZ0cjlKVTNiK1VKT3pvNUY0UGhDdE9ERXR3YjNGOSs2SHo2QlZUYTlSSHU3?=
- =?utf-8?B?V2dJQ2VhUGVyQS9QUkdDZDVmZ25QN1JILytCZDVJQmYyS011K2ZzSVovOVh6?=
- =?utf-8?B?dkRCR2tkTDFCMkh2UUlHeDJLNThudFkvS3N0Myt0VWtVSTVBeElCai93V05k?=
- =?utf-8?B?blpWcTVScGxaVnVPc2poaURveHQ0cmVLSmw0Y2RraDJ4Vm9kUmFLcDhidHI3?=
- =?utf-8?B?TGlBVjU5THlYenQzVGFOT2JiU3pGS3dIbG9QRnlUTnBXR3JyQVBOUjVDQW5t?=
- =?utf-8?B?NE1oNUYvRjF3aHRHdFJpUGhhTlhkNTRJL2hvUUtFZlRUQ2s3enZiT25ER0h5?=
- =?utf-8?B?KzgzbEE1djBQUjh1V1JTSXZHY0gvZXIrS2svbko1bUp2VEY3RTZuRDEzZVRh?=
- =?utf-8?B?V2NkSDdSRjZraENYeURwMEk0c2ZnYy9pUURGTXJTWGs5QXY3QU9nelFYbTEx?=
- =?utf-8?B?OFN2dXpzaDJ4aGtRZi85WEM2cWJWZ2psSTlYVkJMUGJ6NEFjYXE0TGt3Ui9Q?=
- =?utf-8?B?Vi9CVENxZTdGYVVPOUtEZURyR0k1NnVjQnpoTXRwWC85dVJldDBBcjRlcEpv?=
- =?utf-8?B?cDRYNEc0RzJ0ZmIyQWF5QW9YUmlxWVlLc2cxZ1gxam9jRkZ4UTRIbFJraTFT?=
- =?utf-8?B?M3lQNGhwa3JVMDhzU0hScGZ4QUp0MlZNWlpaSTlKMEhMM0RIMklOZ3BHZVJS?=
- =?utf-8?B?YlZ1eDhTSzEzSTAwK2RTKzhmMXROUEhCQkVVemhYWUUybFdhV0lsQmdBPT0=?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c9e0d24d-db4b-4d24-e049-08db10489143
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB3014.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Feb 2023 18:06:47.1078
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR12MB8589
-X-Spam-Status: No, score=0.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_MUA_MOZILLA,
-        FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_PASS,SPF_PASS autolearn=no
+References: <20230215174046.2201432-1-ricarkol@google.com> <20230215174046.2201432-5-ricarkol@google.com>
+ <Y+16gsTbsZyUBMAt@linux.dev> <CAOHnOrzoBp7zh=yjjtgto-m1p1P1sWQ5gJRTzChemGk93J+T4g@mail.gmail.com>
+In-Reply-To: <CAOHnOrzoBp7zh=yjjtgto-m1p1P1sWQ5gJRTzChemGk93J+T4g@mail.gmail.com>
+From:   Ricardo Koller <ricarkol@google.com>
+Date:   Thu, 16 Feb 2023 10:14:41 -0800
+Message-ID: <CAOHnOry-RG=nyvbWkSV5pCh--9pp=DtcXXNL=bguAW3o+XV0Pw@mail.gmail.com>
+Subject: Re: [PATCH v3 04/12] KVM: arm64: Add kvm_pgtable_stage2_split()
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
+        yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, qperret@google.com,
+        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
+        rananta@google.com, bgardon@google.com, ricarkol@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -112,59 +73,137 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Resending to kvm mailing list, in case someone here might help... Also 
-will try again with newer ovmf, but assume it happens.
+On Thu, Feb 16, 2023 at 10:07 AM Ricardo Koller <ricarkol@google.com> wrote:
+>
+> On Wed, Feb 15, 2023 at 4:36 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+> >
+> > On Wed, Feb 15, 2023 at 05:40:38PM +0000, Ricardo Koller wrote:
+> >
+> > [...]
+> >
+> > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > > index fed314f2b320..e2fb78398b3d 100644
+> > > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > > @@ -1229,6 +1229,111 @@ int kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
+> > >       return 0;
+> > >  }
+> > >
+> > > +struct stage2_split_data {
+> > > +     struct kvm_s2_mmu               *mmu;
+> > > +     void                            *memcache;
+> > > +     u64                             mc_capacity;
+> > > +};
+> > > +
+> > > +/*
+> > > + * Get the number of page-tables needed to replace a bock with a fully
+> > > + * populated tree, up to the PTE level, at particular level.
+> > > + */
+> > > +static inline u32 stage2_block_get_nr_page_tables(u32 level)
+> > > +{
+> > > +     switch (level) {
+> > > +     /* There are no blocks at level 0 */
+> > > +     case 1: return 1 + PTRS_PER_PTE;
+> > > +     case 2: return 1;
+> > > +     case 3: return 0;
+> > > +     default:
+> > > +             WARN_ON_ONCE(1);
+> > > +             return ~0;
+> > > +     }
+> > > +}
+> >
+> > This doesn't take into account our varying degrees of hugepage support
+> > across page sizes. Perhaps:
+> >
+> >   static inline int stage2_block_get_nr_page_tables(u32 level)
+> >   {
+> >           if (WARN_ON_ONCE(level < KVM_PGTABLE_MIN_BLOCK_LEVEL ||
+> >                            level >= KVM_PGTABLE_MAX_LEVELS))
+> >                   return -EINVAL;
+> >
+> >           switch (level) {
+> >           case 1:
+> >                 return PTRS_PER_PTE + 1;
+> >           case 2:
+> >                 return 1;
+> >           case 3:
+> >                 return 0;
+> >           }
+> >   }
+> >
+> > paired with an explicit error check and early return on the caller side.
+>
+> Sounds good, will add this to the next version.
+>
+> >
+> > > +static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> > > +                            enum kvm_pgtable_walk_flags visit)
+> > > +{
+> > > +     struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+> > > +     struct stage2_split_data *data = ctx->arg;
+> > > +     kvm_pte_t pte = ctx->old, new, *childp;
+> > > +     enum kvm_pgtable_prot prot;
+> > > +     void *mc = data->memcache;
+> > > +     u32 level = ctx->level;
+> > > +     u64 phys, nr_pages;
+> > > +     bool force_pte;
+> > > +     int ret;
+> > > +
+> > > +     /* No huge-pages exist at the last level */
+> > > +     if (level == KVM_PGTABLE_MAX_LEVELS - 1)
+> > > +             return 0;
+> > > +
+> > > +     /* We only split valid block mappings */
+> > > +     if (!kvm_pte_valid(pte))
+> > > +             return 0;
+> > > +
+> > > +     nr_pages = stage2_block_get_nr_page_tables(level);
+> > > +     if (data->mc_capacity >= nr_pages) {
+> > > +             /* Build a tree mapped down to the PTE granularity. */
+> > > +             force_pte = true;
+> > > +     } else {
+> > > +             /*
+> > > +              * Don't force PTEs. This requires a single page of PMDs at the
+> > > +              * PUD level, or a single page of PTEs at the PMD level. If we
+> > > +              * are at the PUD level, the PTEs will be created recursively.
+> > > +              */
+> > > +             force_pte = false;
+> > > +             nr_pages = 1;
+> > > +     }
+> >
+> > Do we know if the 'else' branch here is even desirable? I.e. has
+> > recursive shattering been tested with PUD hugepages (HugeTLB 1G) and
+> > shown to improve guest performance while dirty tracking?
+>
+> Yes, I think it's desirable. Here are some numbers on a neoverse n1 using
+> dirty_log_perf_test (152 vcpus, 1G each, 4K pages):
+>
+> CHUNK_SIZE=1G
+> Enabling dirty logging time: 2.468014046s
+> Iteration 1 dirty memory time: 4.275447900s
+>
+> CHUNK_SIZE=2M
+> Enabling dirty logging time: 2.692124099s
+> Iteration 1 dirty memory time: 4.284682220s
+>
+> Enabling dirty logging increases as expected when using a smaller CHUNK_SIZE,
+> but not by too much (~9%). It's a fair tradeoff for users not willing
+> to allocate large
+> caches.
+>
+> >
+> > The observations we've made on existing systems were that the successive
+> > break-before-make operations led to a measurable slowdown in guest
+> > pre-copy performance. Recursively building the page tables should
+> > actually result in *more* break-before-makes than if we just let the vCPU
+> > fault path lazily shatter hugepages.
+> >
+> > --
+> > Thanks,
+> > Oliver
 
+There is a terribly offensive image that was attached to the previous
+email. I would like to apologize for
+attaching it. I don't know how that happened.
 
-
---- Treść przekazanej wiadomości ---
-Temat: 	Windows 11 guest crashing supposedly in smm after some time of use
-Data: 	Fri, 10 Feb 2023 15:48:56 +0100
-Nadawca: 	Michał Zegan <webczat@outlook.com>
-Adresat: 	qemu-devel@nongnu.org
-
-
-
-Hello.
-
-I have windows11 installed on a vm. This vm generally works properly, 
-but then might crash unexpectedly at any point, this includes situation 
-like logging onto the system and leaving it intact for like an hour or 
-less. This can be reproduced by waiting long enough but there is no 
-single known action causing it.
-
-What could be the problem?
-
-
-Configuration and error details:
-
-My host is a msi vector gp76 laptop with intel core i7 12700h, 32gb of 
-memory, host os is fedora linux 37 with custom compiled linux kernel 
-(fedora patches). Current kernel version is 6.1.10 but when I installed 
-the vm it was 6.0 or less, don't quite remember exactly, and this bug 
-was present. Not sure if bios is up to date, but microcode is, if that 
-matters.
-
-Hardware virtualization enabled, nested virtualization enabled in module 
-params for kvm_intel.
-
-For vm using libvirt, qemu 7.0.0. Virtual machine is q35, smm enabled, 
-processor model set to host, firmware is uefi with secureboot and 
-preenrolled keys, tpm is enabled. Most/all hyperv enlightenments are 
-enabled.
-
-Using virtio for what I can including virtio-scsi, virtio-input, 
-virtio-net, virtio-balloon, etc... installed windows drivers for all of 
-these things.
-
-Guest is windows 11 pro 64 bit.
-
-What crashes is qemu itself, not that the guest is bsod'ing.
-
-Below is the link containing libvirt qemu log, containing the full qemu 
-command line and also the crash messages. Note virtualization is 
-disabled in vm even though nested virtualization enabled on host, and 
-hyperv not installed on windows, so it's likely not the cause.
-
-https://gist.github.com/webczat/1f224e7ecdc17c5c26316e0121f4ed43
-
+Ricardo
