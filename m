@@ -2,92 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E14CA699CC0
-	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 20:00:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 435B8699D08
+	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 20:35:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230097AbjBPTAf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Feb 2023 14:00:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57640 "EHLO
+        id S229744AbjBPTer (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Feb 2023 14:34:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229948AbjBPTAc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Feb 2023 14:00:32 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5BC8528AD
-        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 11:00:15 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id a9-20020a25af09000000b0083fa6f15c2fso2851403ybh.16
-        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 11:00:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OVUZP7Oz3CFc4JyohlORGNb1nw+7ac5bsRAnU7jTVQc=;
-        b=fd1vpUIOY4Ej0D1KIhOBDgWuEqrsLE2sKeEYigwQHzeJA9qh8b7gszfl8HV3+uDUKq
-         t/W/DMpaIXhpNdnwCN6zP04Y5zHC66xtuO73mSTdXxRpHG1NCoDkByqLRj8yW/+AdWCe
-         3PrBk8KCSVQFqoW5JoytLTAzmZ0cU/0ff5zabP4gZjQGfB4Jm8JDs35dDEO8X8a+cmTl
-         hfA5N3vDsyrubwTUPGt+u926hSZ6Uw6CWNufyqpiU4s0Dtx65reJ0Edg2hI4A8zM65kE
-         OEOUmgH5HqTuLeNLrVE41hmtDv1SzsmPiVEWyedmdXXypJMn4OG2yb7a6PVie9NlKhv6
-         Hk9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OVUZP7Oz3CFc4JyohlORGNb1nw+7ac5bsRAnU7jTVQc=;
-        b=424ep50LcXyEwH/B1FutMQzSrX/XPxw1OumBQVGh10hKjDTbDgH0aaZUyAOS9VFg81
-         pBkwgmz1JohaQFgWXTzZphz5B7fgrnutgLrRsidy3oSP1DAwH/hbZRCK6f4oVkr+x6Wz
-         r2r8UhC3MOldpjQ9+BXTbcHDYIOrVVXJ8mOPpbhHD+HE4ZLJG1Q6ANleRg0pbwgrDsu/
-         zOfYGL2WDG2hx8RBlow04FObhNB3M2xxn+pJDqelE5fqUooeWtF+dkSZR7j89aGxN0lG
-         EN6mq5ZDr0l2CHNgBSV4mSU5upnRfKuY910nOfcjsFTCDO9E6XGgusKroRwxrT1GPdg5
-         bqMw==
-X-Gm-Message-State: AO0yUKWtZMnCBj1FVBR3QKa4a6xiZbmDSIF4mZ6X6BLut4GF+DkF/i+F
-        dv/piw7RTxTr0yiggnehVM/YUn5qu9w=
-X-Google-Smtp-Source: AK7set+jlDbQwiCgCNHnVqazKactcZBXLvvVCaSsCv1D4UHy4+Eegb6+4wWhUhIZAInclQsN/BK/y1cQzEI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:b403:0:b0:527:65b4:48e9 with SMTP id
- h3-20020a81b403000000b0052765b448e9mr916676ywi.59.1676574015117; Thu, 16 Feb
- 2023 11:00:15 -0800 (PST)
-Date:   Thu, 16 Feb 2023 11:00:13 -0800
-In-Reply-To: <c34b8753-d70b-3d0f-f3b1-c89264642291@redhat.com>
-Mime-Version: 1.0
-References: <CAAhR5DE4rYey42thw_4toKx0tEn5ZY3mRq8AJT=YQqemqvt7pw@mail.gmail.com>
- <CAMkAt6pTNZ2_+0RNZcPFHhG-9o2q0ew0Wgd=m_T6KfLSYJyB4g@mail.gmail.com>
- <Y+5zaeJxKr6hzp4w@google.com> <c34b8753-d70b-3d0f-f3b1-c89264642291@redhat.com>
-Message-ID: <Y+59PX7V9qEzpuJh@google.com>
-Subject: Re: Issue with "KVM: SEV: Add support for SEV intra host migration"
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Peter Gonda <pgonda@google.com>, Sagi Shahar <sagis@google.com>,
-        kvm@vger.kernel.org, Erdem Aktas <erdemaktas@google.com>,
-        Ryan Afranji <afranji@google.com>,
-        Michael Sterritt <sterritt@google.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229726AbjBPTeo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Feb 2023 14:34:44 -0500
+Received: from out-35.mta0.migadu.com (out-35.mta0.migadu.com [91.218.175.35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B4054D602
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 11:34:42 -0800 (PST)
+Date:   Thu, 16 Feb 2023 19:34:36 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1676576080;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=dpoDOnj3G+hYh7/UvLCSR56PrbvzC1VRhpcp77nLQtM=;
+        b=qcBUhf3s0IDejLnw5OxOJoxCVcLGMETOrzm15p4ytyE91tA4Yrsu33AmUC9uO6e5jGR4hh
+        nYMdHx9P2wq31uctirgIy23HSqhMw/nCKOVP/lO1g2NCWqNb6DnZAIHql1mhrHUabXP/Tw
+        JLjP+ZKnRR0hGOwBiWkQIGTDGPxhq8Y=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Tianrui Zhao <zhaotianrui@loongson.cn>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>, loongarch@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>
+Subject: Re: [PATCH v1 01/24] LoongArch: KVM: Implement kvm module related
+ interface
+Message-ID: <Y+6FTC1vBeZoZx8V@linux.dev>
+References: <20230214025648.1898508-1-zhaotianrui@loongson.cn>
+ <20230214025648.1898508-2-zhaotianrui@loongson.cn>
+ <Y+ssT+W27GxDRAAZ@kroah.com>
+ <6fd2ca5a-7243-0627-79e9-8c8bd840adc2@loongson.cn>
+ <Y+tbMwXjA0hkiUJA@kroah.com>
+ <a44fc722-e3e2-7f8a-0454-f27a8a10d52b@loongson.cn>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <a44fc722-e3e2-7f8a-0454-f27a8a10d52b@loongson.cn>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 16, 2023, Paolo Bonzini wrote:
-> On 2/16/23 19:18, Sean Christopherson wrote:
-> > Depending on why the source VM needs to be cleaned up, one thought would be add
-> > a dedicated ioctl(), e.g. KVM_DISMANTLE_VM, and make that the _only_ ioctl() that's
-> > allowed to operate on a dead VM.  The ioctl() would be defined as a best-effort
-> > mechanism to teardown/free internal state, e.g. destroy KVM_PIO_BUS, KVM_MMIO_BUS,
-> > and memslots, zap all SPTEs, etc...
+On Tue, Feb 14, 2023 at 09:00:50PM +0800, Tianrui Zhao wrote:
+> 在 2023年02月14日 17:58, Greg Kroah-Hartman 写道:
+> > On Tue, Feb 14, 2023 at 05:00:56PM +0800, Tianrui Zhao wrote:
+> > > > > +#define KVM_GET_CSRS		_IOWR(KVMIO, 0xc5, struct kvm_csrs)
+> > > > > +#define KVM_SET_CSRS		_IOW(KVMIO,  0xc6, struct kvm_csrs)
+> > > > Why does this arch need new ioctls?
+> > > We want to use this ioctl to access multiple csrs at one time. If without
+> > > this, we only access one csr.
+> > What is wrong with accessing only one csr at a time?  Isn't this what
+> > other architectures do?
 > 
-> If we have to write the code we might as well do it directly at context-move
-> time, couldn't we?  I like the idea of minimizing the memory cost of the
-> zombie VM.
+> Generally, using KVM_GET_ONE_GET ioctl to get one reg, but we want a
+> more convenient interface to get serial regs at one time, so we add this
+> ioctl.
 
-I thought about that too, but I assume the teardown latency would be non-trivial,
-especially if KVM aggressively purges state.  The VMM can't resume the VM until
-it knows the migration has completed, so immediately doing the cleanup would impact
-the VM's blackout time.
+Have you found register accesses through the KVM_{GET,SET}_ONE_REG
+ioctls to actually be a bounding issue? I'd be surprised if that were
+actually the case.
 
-My other thought was to automatically do the cleanup, but to do so asynchronously.
-I actually don't know why I discarded that idea.  I think I got distracted and
-forgot to circle back.  That might be something we could do for any and all
-bugged/dead VMs.
+An architecture-neutral implementation was entertained a few years ago
+[*], but even then it saved an inconsequential amount of time relative
+to the rest of VM serialization (at least for arm64). The one thing that
+series got right was to share the plumbing across all architectures that
+use the ONE_REG interface (i.e. everyone but x86).
+
+If you have data that supports the thesis that a batched ioctl is
+useful then please do share. But in any case this should not use an ioctl
+tied down to a single architecture.
+
+[*] https://lore.kernel.org/kvm/20201120125616.14436-1-darkhan@amazon.com/
+
+-- 
+Thanks,
+Oliver
