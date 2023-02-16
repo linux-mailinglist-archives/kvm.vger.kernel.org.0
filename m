@@ -2,180 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DBC846990B4
-	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 11:08:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 286996990C7
+	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 11:12:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229628AbjBPKIx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Feb 2023 05:08:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46826 "EHLO
+        id S229717AbjBPKMN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Feb 2023 05:12:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229495AbjBPKIw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Feb 2023 05:08:52 -0500
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79D693D0A4
-        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 02:08:50 -0800 (PST)
-Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31G8FhSD022159;
-        Thu, 16 Feb 2023 10:08:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2022-7-12;
- bh=4uDu7wlcpPIcABXug/QQK9C6elGrS/l++AMeL5WhPMY=;
- b=BJH1XmAHX5WomjUNrB6ww7cH9+RlfWGIvGf7rte3+KyLuTGSpP3cqKHoGyUdxDVDR1IM
- b73JTNSQ+FMUTEpCCJZC91Focl9fLN1M2gtcEk2DChNSN+BSg4JQJpKmCp6Ei5wKfoNq
- nCz8GIaDZRaCX3nry+nTMN4PrtTG/mRLss2yDJ2oqBPYSUJuw7yFwAx3T016vtPxx3qp
- qeqrWYlW1/sXNavpCDSVvQXNr2b4wu/e8dZkFnVzRdpCDv6eZMUsjAYzLIkaafG3hLo0
- ofJ0jna/IQ+X1bMxpC/S8eSzLyzchmAujymsTsf4lW51R63Kbod5U+rjEeGUqzejLWjc 3Q== 
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3np1xbarps-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 16 Feb 2023 10:08:21 +0000
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 31G8Vri0013576;
-        Thu, 16 Feb 2023 10:08:21 GMT
-Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2175.outbound.protection.outlook.com [104.47.56.175])
-        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3np1f848cu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 16 Feb 2023 10:08:20 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Q9Peuu/8yrfWEW3K+4ujbdzTw19Sqwalk07YCCszuCxXzkYtbeibyXU6elAp8IIaCqhJQhs70Z0BuYTZGE+oj9c1tK+QydScDs2zSjepEJv5cjsnafVcXhhzN4V1jxdYllYOsJiCt8KCfSoTCpjHOKWa/B1o2Zi8L0VLfJ102LOhB3+MjKBzQ3REb0VD2o8eHeVBPPil15guCMWvXPLuB6VsadRZ8U4pc7pyChc0gB8ZJ0L+/FIu1gRFlNCv8xm0CUz2wk78aLlEDW3YCGGF2ixbAeXcMcYF8sdsF5tyL9NLjENHfw6dSsp6qo9ZzgziY4a+NJH0opF7LtG07+mnCw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4uDu7wlcpPIcABXug/QQK9C6elGrS/l++AMeL5WhPMY=;
- b=QgjOLiN1xVzzG37yBPBVOf26PvK5M0qZz767khHmrKwHvdBSxSV7aNau2NWYxrkZp14l+OrNT+BcKr1hQtMJdXhSiwwPzf5xeYzRjQV4B4v1eRkqkvUQjOkEsPF8wQ2P0OLkwYLiXMvQHzL1MNSOIz4ahAJ1kGPSwf0cz86Ii0b02mJf7OpCHXoC7DVxbABBXLwSjXWU7DLbfbCW/Hy33bCcuZcKNPM/80u/p878M1aXefaHnZwTLWRC1kLsQQ3HO6zPqxceqDHObmFUibPZUbnz9SwPbxn17BrAaPUSg2yzvInNgX0jMX150KMTKI2sQ+AR+30I7WmBffwN2DerUg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4uDu7wlcpPIcABXug/QQK9C6elGrS/l++AMeL5WhPMY=;
- b=GFYOC6dyjFOn7Y1Tb3oM1LW/ER3EfPfbILfowFl86x9r9Amw/y8LFhDPERnUabI/3h8iewQ1OGzamkPRtht6cwE6V5V9RKql+PfpSl2JTsqDVS3WZmC44TYQnPqlHlcgmGXxBDUEyhrwSdjc9RSKtofXcQb7zz58i95nxq4Wy8s=
-Received: from BLAPR10MB4835.namprd10.prod.outlook.com (2603:10b6:208:331::11)
- by DS0PR10MB6948.namprd10.prod.outlook.com (2603:10b6:8:144::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.10; Thu, 16 Feb
- 2023 10:08:18 +0000
-Received: from BLAPR10MB4835.namprd10.prod.outlook.com
- ([fe80::9b30:898b:e552:8823]) by BLAPR10MB4835.namprd10.prod.outlook.com
- ([fe80::9b30:898b:e552:8823%3]) with mapi id 15.20.6111.012; Thu, 16 Feb 2023
- 10:08:18 +0000
-Message-ID: <6f5da7c9-cec0-3034-ca58-41115c565df5@oracle.com>
-Date:   Thu, 16 Feb 2023 10:08:11 +0000
-Subject: Re: [PATCH v1] iommu/amd: Don't block updates to GATag if guest mode
- is already on
-Content-Language: en-US
-To:     Joerg Roedel <joro@8bytes.org>, Vasant Hegde <vasant.hegde@amd.com>
-Cc:     iommu@lists.linux.dev,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
-        kvm@vger.kernel.org
-References: <20230208131938.39898-1-joao.m.martins@oracle.com>
- <Y+3+xtof4tC8koSj@8bytes.org>
-From:   Joao Martins <joao.m.martins@oracle.com>
-In-Reply-To: <Y+3+xtof4tC8koSj@8bytes.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM0PR07CA0014.eurprd07.prod.outlook.com
- (2603:10a6:208:ac::27) To BLAPR10MB4835.namprd10.prod.outlook.com
- (2603:10b6:208:331::11)
+        with ESMTP id S229800AbjBPKMM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Feb 2023 05:12:12 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6E913D914
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 02:11:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676542282;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=MlqifzjMfxJIWbw1nrDZ6WeasGdb1HC8zG0+g5goMUk=;
+        b=CzZK2U0aT5jmYt3mpc8zT7vi9Sm5xsomQGroF1yQR2T3k6QHGSNizNzFk7qgNyRxwLKUv1
+        JlIyTM7nFdWEb37uaLBDIz0+Au9ddTtXfFPBBH+ayO5JDhBLnrY0UJZfNCuAEwWeQnt93k
+        +QZBrFvnN+OH49lcH1N6LyXmmyOSNjk=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-502-W3m60V7EM4Ck3AqXgKcPYw-1; Thu, 16 Feb 2023 05:11:21 -0500
+X-MC-Unique: W3m60V7EM4Ck3AqXgKcPYw-1
+Received: by mail-qv1-f72.google.com with SMTP id v10-20020a0cf90a000000b0056f060452adso2637qvn.6
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 02:11:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MlqifzjMfxJIWbw1nrDZ6WeasGdb1HC8zG0+g5goMUk=;
+        b=vH9N74N/xDu56ZJ/MDiD5vE+KyTMth0JvzuHe5vPBqBKhdFJX8jqk7jHj51qScjd00
+         tuY6hwuB7/k0R2spkPJKlJAEoK7FimP5k4xU7Z1cO+mKDmEZ8EKXRcZhtyrc57Dk9/Fi
+         4ZLucS6Z4JnViumkhS2IagaHZBRPIx/7w9hM1SS30w9JxfgiDj6PxGLNfzMDFMIAS7zB
+         jHYKf8PKbGZVeTsCZb8kvaHqfInQzu6l0SpmhWX6ZbOPf5m+XmmauUohzsXz+Yckxxcw
+         i6WW4gpycFwdHaCL+6x4cW2yvAw2Jq0zwejWpCMFiSayw0uCzuPW367vyinnVLEepf9f
+         EmQA==
+X-Gm-Message-State: AO0yUKV/ldGKdmCCM2+LZ19Kc7mFUXe/w81bT3E5VFPRTsCsC/tGk/tt
+        +UYZBMiYvfO7Jyu3EY+V+TPE4F2FGELSxIkyn8OeTiEWDK9kAEt4B64HrXwQHCx8JnJXX4e3DY3
+        3ghez7EUf2/qS
+X-Received: by 2002:ac8:59cf:0:b0:3b9:b4f9:d362 with SMTP id f15-20020ac859cf000000b003b9b4f9d362mr9479622qtf.43.1676542280587;
+        Thu, 16 Feb 2023 02:11:20 -0800 (PST)
+X-Google-Smtp-Source: AK7set8ztvyfBPqk3mJ47/D60iBhyJpF0A25lsrNHn848W+IBgCojCWxVuQYrqMC0x0yKwLUBRjuLg==
+X-Received: by 2002:ac8:59cf:0:b0:3b9:b4f9:d362 with SMTP id f15-20020ac859cf000000b003b9b4f9d362mr9479597qtf.43.1676542280258;
+        Thu, 16 Feb 2023 02:11:20 -0800 (PST)
+Received: from sgarzare-redhat (host-82-57-51-167.retail.telecomitalia.it. [82.57.51.167])
+        by smtp.gmail.com with ESMTPSA id c192-20020ae9edc9000000b007059c5929b8sm914681qkg.21.2023.02.16.02.11.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Feb 2023 02:11:19 -0800 (PST)
+Date:   Thu, 16 Feb 2023 11:11:10 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Bobby Eshleman <bobby.eshleman@bytedance.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Mykola Lysenko <mykolal@fb.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Martin KaFai Lau <martin.lau@linux.dev>,
+        Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        KP Singh <kpsingh@kernel.org>,
+        Stanislav Fomichev <sdf@google.com>,
+        Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Bobby Eshleman <bobbyeshleman@gmail.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        jakub@cloudflare.com, hdanton@sina.com, cong.wang@bytedance.com
+Subject: Re: [PATCH RFC net-next v2 1/3] vsock: support sockmap
+Message-ID: <20230216101110.fnwci5u5cwbkg2u5@sgarzare-redhat>
+References: <20230118-support-vsock-sockmap-connectible-v2-0-58ffafde0965@bytedance.com>
+ <20230118-support-vsock-sockmap-connectible-v2-1-58ffafde0965@bytedance.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BLAPR10MB4835:EE_|DS0PR10MB6948:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7fcbe897-67d0-4bd6-d901-08db1005b9e2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8oq/nA/WaFC0paM8igrmobT8hxVaGHl3/3jcL7dbnocGcMbD4JFuaGdmXMBXGql90WInnvHnPOPiq/Lbm9eztcH+lcbyNTMlY5dNiiI+MxqM5TCJSId3K7q/FwdRLPnKdgw6P3jkaL12y2Bq4z7r2U/DDxvD4A7rc3Qm1E6OrTUonzMuhu7m0t1DljLmlsxYQO9P6ehJciwgvcY43vCneUitWOv+EY7QeeLLmMyZa+y8yEXwmtcnpUiY09fuu2VAkRuZoB8mSQe3whFR0Un0YZPXE8XTjyFOmWCippYK73KfQIxI56b0xR3tvVOvxce15nuQtwRJBExEPv4Wv6UudzxFhf+a4OzJoE7pXeIBSmFubAMpcatFGdxYNsSENWccXKmTo2LKy/5ojSvutZCXGAfYdvn6/dsvvohz3CWjb1SOxZjTXza9ufwOb4T6RzAYgQOjOqeA5Im0KaMOCDjlhsP8FyW1CPxfU8FF2P98KQ1yYBIikJ2XJ9cbE2wbayML3S+HpO4HJTt8ZrLZymGdn2JgCSASz0BfGCf6wObAJWh/O54fXecNyF7Ij1PWlZ1egkeTmk9L2BHyrgzJFBPN2FFdMyB9ghqSbhndYEdt1RSJi6pEgNDBqhvXFIVJzTIgQW+KdLLjee/waAEdlpEViG5Mo+ZNqaXkKuDC7mLWTk5cbasxZICZrZXz199VxuCmhzYHlDEnBT7V3nNxQmk73Q==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BLAPR10MB4835.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(376002)(366004)(346002)(39860400002)(136003)(396003)(451199018)(2616005)(8936002)(83380400001)(41300700001)(6666004)(6512007)(6506007)(38100700002)(36756003)(53546011)(5660300002)(2906002)(15650500001)(316002)(54906003)(86362001)(6486002)(31686004)(186003)(31696002)(110136005)(478600001)(66556008)(66476007)(66946007)(8676002)(4326008)(26005)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SVRncVMvdUJ4ZHUralN5UmxKTHAydCtlV1BST01iY3M5NkpUR2QwOFhqZmtY?=
- =?utf-8?B?L0pJdW04VHd4Z256SDdVditjWVMyZ0FqMnk0d2VaNGduejg0WnYxQTJlOHNO?=
- =?utf-8?B?VzhiRnRFeVpJSkFuaFVVOUNuTjRpb2xqeXdsVE9EVnc5cXVlVWMzSUpOUHpX?=
- =?utf-8?B?RGhSWklEY01rSERENDh6NDZGaFRtL2V6SWFGZVJ6VDMwWDNxKzQ3dmpEK2Ro?=
- =?utf-8?B?R0JzSXh1VWVmaTBtSm9BL05WQlpZTXVXZGxJSm9EQjhEdzk5b2pJeDk2RkxU?=
- =?utf-8?B?Q3ovNlgrMjhNVzMydklEWCt3MTFzcUFiSjRHVmcveE5TeHF0ZWdhYW5lQmxt?=
- =?utf-8?B?K1c4aUdEMC9iUXl2cUhPOWNLN0pvTDBaSkxQaXQ2QTM5b3FxdVVKSllOd0Vs?=
- =?utf-8?B?U0FVcDB4STQ2VWJTWFh6WGF0TzgydURSc2xKeG1hN1pGdDYxM1NJOHZjNkJD?=
- =?utf-8?B?NG1QZ0s2N2taa2hodDNKNmVET2Y5WURsczRUSUpGbkNpcEtwV3VQR3lYdXR5?=
- =?utf-8?B?Z3ZrcWgrTjlnL0dnWW85dEFUQkZDWTR2bWVQK1k2c1M5SUV6eVJlWXBmQ0py?=
- =?utf-8?B?cHBIZEovYi9ZcEM1eU5meDhZeklNbnZ1ajExZ0o2NmtsL3NVSzBsQmtJMVQy?=
- =?utf-8?B?d1lCM0g2Qk9vTnhsbTd1L3ZvV2sxcDc4RnI5M2xGS3FwSkdhc2g2QU5CUWtw?=
- =?utf-8?B?U0E0VmhiUzIvTEJ6RjFob0ZYVHo5cHdkeVJmc1p1TjgwdERQQTFLcDcvYm80?=
- =?utf-8?B?WmltUFhpTk1kQXFwWE8rRGlPLzZVNHFMbERmZnMwVXBuSkFJNFhpNktac0FU?=
- =?utf-8?B?QWRaMVhIRkxIL09MdVlHOG1WWnhZMnA2aXg5Y0ZKKzV0aXRjQ0ZocGJCR3JX?=
- =?utf-8?B?NGVBS2J5cmFRaTVGYU05RGpjSUpGZ0NFVC9kVGRtT2cyWmNhdml4Wm00NXJp?=
- =?utf-8?B?WVd3d0hpY2RRSUZ4ZjkxVHh1N0NEVFIyK0xDdG13azdRSzF4cjBlZ3QyZTJp?=
- =?utf-8?B?SkdLNy9wWEMyeDJpblg0NVJQTVVpLzZQZGJOUS9NVnNMNnBUS2dSejdEaklK?=
- =?utf-8?B?Vy9FMTBmQzEyL0EzSFlSZGZCMWNwdjMyeU5oSjBWSkRzeGdsUU1RQ24yMG9t?=
- =?utf-8?B?OHFSUEJTT2d5djlteERYcWpvazYyRVVKdnZ0MmQ3MDVXTlhyMU5HQlRZeU9h?=
- =?utf-8?B?eTdXK1ZpWTgrNHRmK3pDbUgwR1dEQUk5enRvS2tvd3M3WVEyNHFabEpTSVk2?=
- =?utf-8?B?a2xXS2IxS2lyNy9abWxadlhLTXR2VDRMdEtka2NTYkRpZFZic0c4Vmo5SHV5?=
- =?utf-8?B?dEE0ZVBaMDRLNHlLMThubVdSOWo4aEFHMFhUdWZtSUNsK2NFVTArQ2cwUy91?=
- =?utf-8?B?ckhVVVRHd3k3MmN3WEdKYmUreko4TzV1cmVqZ2w3eUhrZlVCeGQvc3pwbUI3?=
- =?utf-8?B?MHR6ZW1SaXpqcE1rbUxnWkNZdllkN3NwVjJMMWIyTjVHb2l4SUFwNldqME5a?=
- =?utf-8?B?QXB2NldwTVhGYm1taUpDSm9KaVFXQWMzM0lFTCsxWkhXcTBmNWhvQjlvam5F?=
- =?utf-8?B?TVBpZ3hHbHE3VG9jdlZkamFNUnpybE9mZmFzb05KQkppOHV1OHVmZWQ3R2E3?=
- =?utf-8?B?Z2F4d09iTkV0dDdOUWlqNTg5Nkk0ZmdPK0FKWWR5MGgzVXhnS3R1Z09keFAv?=
- =?utf-8?B?ZTM5dEZrUkhKbTRNMFloaVNTM1lENktOVGxWSTdvdm14MXR0MVVZSjVWandO?=
- =?utf-8?B?S1BhS3dBYVBqZy9LdGlpajlXdVgyeStUK0pYVTNwb0laOUxuMTYzaDJKK3A0?=
- =?utf-8?B?RVgwMmxnNkNwYXB5TitBSG01ZDIyWDcxMXhlMHFsRFgwWmUwcFRUSitXcWIz?=
- =?utf-8?B?Z3oveVVjSENKUWxWbHpEbHZEdlNQdmxJWmtCZjBZV2NKMks0czBFRHNVVVFZ?=
- =?utf-8?B?UXN1NEwxV1FtcCtYSkVZUDYvSXFPYzMzVm1hSnFVSkFtR01hZk91eWpuTnNK?=
- =?utf-8?B?TG5yZzBSaDk0K1RlbGlham9yVUhkclRwV3pCZEhYcTRSQURRekRaT1h6RGdZ?=
- =?utf-8?B?eEd2MzBLbWJ5a3A4OHBwR2tONG51V0NjcDRPOTlKUjBpN2tSdFZxOHNqREcv?=
- =?utf-8?B?R0czeE5KVTAzcko2MGpla3pVdEVDSEthb3YrbzVkZlJueEVIcC9oMkZTZmVS?=
- =?utf-8?B?WHc9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?utf-8?B?bGM5bC9BSTUvbVVVMTJ6L2hDM0UrUzhGd2ZRV0VLRkZLM0FBR1J2NGlqeFRO?=
- =?utf-8?B?dTdTQTlWTUFvWDhlQmpBa3JYdHJZZW5xUkxVRTJkbDVzUU1iM00zc0s3Q28y?=
- =?utf-8?B?YkdJNmd2ZTJJVmFlZHd4VW1UZUxIZFU1Y2RtVlRDRU03dzJ1YzhPUDhsQXNK?=
- =?utf-8?B?U1hMSElzRzFHcGo2MjZ1Ulk3WkRvaTd2cUExTDA2MkRJNVBROHlPalRSOGV6?=
- =?utf-8?B?Qk9MbUpVMkRMcmRVS0JVU0Z3TWUrUmo3VFlFVkhQWThLYjNoaUlxN0NiL2pY?=
- =?utf-8?B?bytwWlNGeDJ4RUU1OEtPcmpqTXFFeFBXRlVaaG1IU1Z2REVEaUlhdWxmL0xX?=
- =?utf-8?B?dUplaG9hNklndmtYRDlROTZtekpLLytFUFRjWGZpdUpwbDZzbkFyT1dxcCtT?=
- =?utf-8?B?Sm0xRlh0ak4yUkFpVXNFbnAzaG0wbXJKSmZ1clY5dEh3UHhwR2tvVmhaU2VW?=
- =?utf-8?B?Wk94bDkyaXNUckN3VllIM3RPS05XVUtDbmdOR2h2UVVNZzkxQW5DV2RKMU8r?=
- =?utf-8?B?OXB6Nm1Fd0M0a2xsZWlHdzU1b2xPZnlQVUxCOW9PTGxQKy9lQklEMDVkem1F?=
- =?utf-8?B?eXdhbUtsa084eCsvWHhxK1c0djhWUWJvTDRtZHhnc0htS3pWTi9vZTdPeUJP?=
- =?utf-8?B?aEVjZnJMc0xYNHR3Sm8zUUVPNGMwTzZRSnYrczdTMkRzTGNBWTc4dkF2ZzZV?=
- =?utf-8?B?V244Z0YrWk5HWVBvQzk3bzJ5TFEyem5iZzl4STNZZFRxRW5DU0xyaVNlc24x?=
- =?utf-8?B?SnZMRVFkdVdDaWx2MjhZQXEyaTU2eGgwdlBSaUUwMVp6THFGYTRLbVBZTTZW?=
- =?utf-8?B?REF4OWs1UVFtamZDQUMwRFlVdm5aTG5NYnF5dTg0TE9SV3BpSW9YL1QrbEF4?=
- =?utf-8?B?aGJqc05yV3N4Yi81cEw2M3pEVG4wZjIxQ2xxY2pwZ2I3ais1c0w1cVZRRXpi?=
- =?utf-8?B?MkVqTDVVd2J3QzVDdWJEc3JlSHpYZzJYYlhhYmVwR21mWkQyaUJMYm00NGZt?=
- =?utf-8?B?UkpqRDRKdXJCRUhDVytIVFNTOXVWUFFyMlVmbkVYbnNBMVVqSC9PVGIrUzM2?=
- =?utf-8?B?b1NISkpTU3NCbUZyNVlSWEF6b1JxclB3TGJXSjd0ZllZWkZuSkZmdE5PRUxB?=
- =?utf-8?B?OUsvQ0svaU9Bb1pLL204cVB5ZU1kTExlWVdjSkFMNlJubnN3WkVOK2x2V2gw?=
- =?utf-8?B?c29NMFZ4Nm85am8xekVGT2x3SEFmN3FMTDJYcDI2T05tTjJSeVZtenRUclNQ?=
- =?utf-8?Q?wTy+Zmg17QSsL1w?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7fcbe897-67d0-4bd6-d901-08db1005b9e2
-X-MS-Exchange-CrossTenant-AuthSource: BLAPR10MB4835.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Feb 2023 10:08:18.4933
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1htp3OyI33DaFJHwCTbwffZkjLBCV3/b6VUG5natCRuefS1WrWGTRnoscQVzGpp2mS+Assg2c1ih/Wp7HYviVvJPJVotuIEgWyuT1xKQL7Y=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR10MB6948
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
- definitions=2023-02-16_07,2023-02-16_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 suspectscore=0
- phishscore=0 spamscore=0 bulkscore=0 mlxlogscore=999 malwarescore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302160086
-X-Proofpoint-ORIG-GUID: x-TBGjkeWtC-p4_f9bMQ1rE7vOHseC7U
-X-Proofpoint-GUID: x-TBGjkeWtC-p4_f9bMQ1rE7vOHseC7U
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20230118-support-vsock-sockmap-connectible-v2-1-58ffafde0965@bytedance.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -183,96 +98,563 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/02/2023 10:00, Joerg Roedel wrote:
-> Missing Signed-off-by.
-> 
+On Mon, Jan 30, 2023 at 08:35:12PM -0800, Bobby Eshleman wrote:
+>This patch adds sockmap support for vsock sockets. It is intended to be
+>usable by all transports, but only the virtio transport is implemented.
+>
+>Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+>---
+> drivers/vhost/vsock.c                   |   1 +
+> include/linux/virtio_vsock.h            |   1 +
+> include/net/af_vsock.h                  |  17 ++++
+> net/vmw_vsock/Makefile                  |   1 +
+> net/vmw_vsock/af_vsock.c                |  55 ++++++++--
+> net/vmw_vsock/virtio_transport.c        |   2 +
+> net/vmw_vsock/virtio_transport_common.c |  24 +++++
+> net/vmw_vsock/vsock_bpf.c               | 175 ++++++++++++++++++++++++++++++++
+> net/vmw_vsock/vsock_loopback.c          |   2 +
+> 9 files changed, 272 insertions(+), 6 deletions(-)
+>
+>diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>index 1f3b89c885cc..3c6dc036b904 100644
+>--- a/drivers/vhost/vsock.c
+>+++ b/drivers/vhost/vsock.c
+>@@ -439,6 +439,7 @@ static struct virtio_transport vhost_transport = {
+> 		.notify_send_post_enqueue = virtio_transport_notify_send_post_enqueue,
+> 		.notify_buffer_size       = virtio_transport_notify_buffer_size,
+>
+>+		.read_skb = virtio_transport_read_skb,
+> 	},
+>
+> 	.send_pkt = vhost_transport_send_pkt,
+>diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>index 3f9c16611306..c58453699ee9 100644
+>--- a/include/linux/virtio_vsock.h
+>+++ b/include/linux/virtio_vsock.h
+>@@ -245,4 +245,5 @@ u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 wanted);
+> void virtio_transport_put_credit(struct virtio_vsock_sock *vvs, u32 credit);
+> void virtio_transport_deliver_tap_pkt(struct sk_buff *skb);
+> int virtio_transport_purge_skbs(void *vsk, struct sk_buff_head *list);
+>+int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t read_actor);
+> #endif /* _LINUX_VIRTIO_VSOCK_H */
+>diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+>index 568a87c5e0d0..a73f5fbd296a 100644
+>--- a/include/net/af_vsock.h
+>+++ b/include/net/af_vsock.h
+>@@ -75,6 +75,7 @@ struct vsock_sock {
+> 	void *trans;
+> };
+>
+>+s64 vsock_connectible_has_data(struct vsock_sock *vsk);
+> s64 vsock_stream_has_data(struct vsock_sock *vsk);
+> s64 vsock_stream_has_space(struct vsock_sock *vsk);
+> struct sock *vsock_create_connected(struct sock *parent);
+>@@ -173,6 +174,9 @@ struct vsock_transport {
+>
+> 	/* Addressing. */
+> 	u32 (*get_local_cid)(void);
+>+
+>+	/* Read a single skb */
+>+	int (*read_skb)(struct vsock_sock *, skb_read_actor_t);
+> };
+>
+> /**** CORE ****/
+>@@ -225,5 +229,18 @@ int vsock_init_tap(void);
+> int vsock_add_tap(struct vsock_tap *vt);
+> int vsock_remove_tap(struct vsock_tap *vt);
+> void vsock_deliver_tap(struct sk_buff *build_skb(void *opaque), void *opaque);
+>+int vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+>+			      int flags);
+>+int vsock_dgram_recvmsg(struct socket *sock, struct msghdr *msg,
+>+			       size_t len, int flags);
 
-Not really missing it. It's actually there, right after the 'Fixes' tag.
+checkpatch complains: "CHECK: Alignment should match open parenthesis"
 
-> Also adding Vasant from AMD for review.
-> 
+>+
+>+#ifdef CONFIG_BPF_SYSCALL
+>+extern struct proto vsock_proto;
+>+int vsock_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool restore);
+>+void __init vsock_bpf_build_proto(void);
+>+#else
+>+static inline void __init vsock_bpf_build_proto(void)
+>+{}
+>+#endif
+>
+> #endif /* __AF_VSOCK_H__ */
+>diff --git a/net/vmw_vsock/Makefile b/net/vmw_vsock/Makefile
+>index 6a943ec95c4a..5da74c4a9f1d 100644
+>--- a/net/vmw_vsock/Makefile
+>+++ b/net/vmw_vsock/Makefile
+>@@ -8,6 +8,7 @@ obj-$(CONFIG_HYPERV_VSOCKETS) += hv_sock.o
+> obj-$(CONFIG_VSOCKETS_LOOPBACK) += vsock_loopback.o
+>
+> vsock-y += af_vsock.o af_vsock_tap.o vsock_addr.o
+>+vsock-$(CONFIG_BPF_SYSCALL) += vsock_bpf.o
+>
+> vsock_diag-y += diag.o
+>
+>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>index 19aea7cba26e..f2cc04fb8b13 100644
+>--- a/net/vmw_vsock/af_vsock.c
+>+++ b/net/vmw_vsock/af_vsock.c
+>@@ -116,10 +116,13 @@ static void vsock_sk_destruct(struct sock *sk);
+> static int vsock_queue_rcv_skb(struct sock *sk, struct sk_buff *skb);
+>
+> /* Protocol family. */
+>-static struct proto vsock_proto = {
+>+struct proto vsock_proto = {
+> 	.name = "AF_VSOCK",
+> 	.owner = THIS_MODULE,
+> 	.obj_size = sizeof(struct vsock_sock),
+>+#ifdef CONFIG_BPF_SYSCALL
+>+	.psock_update_sk_prot = vsock_bpf_update_proto,
+>+#endif
+> };
+>
+> /* The default peer timeout indicates how long we will wait for a peer response
+>@@ -865,7 +868,7 @@ s64 vsock_stream_has_data(struct vsock_sock *vsk)
+> }
+> EXPORT_SYMBOL_GPL(vsock_stream_has_data);
+>
+>-static s64 vsock_connectible_has_data(struct vsock_sock *vsk)
+>+s64 vsock_connectible_has_data(struct vsock_sock *vsk)
+> {
+> 	struct sock *sk = sk_vsock(vsk);
+>
+>@@ -874,6 +877,7 @@ static s64 vsock_connectible_has_data(struct vsock_sock *vsk)
+> 	else
+> 		return vsock_stream_has_data(vsk);
+> }
+>+EXPORT_SYMBOL_GPL(vsock_connectible_has_data);
+>
+> s64 vsock_stream_has_space(struct vsock_sock *vsk)
+> {
+>@@ -1131,6 +1135,13 @@ static __poll_t vsock_poll(struct file *file, struct socket *sock,
+> 	return mask;
+> }
+>
+>+static int vsock_read_skb(struct sock *sk, skb_read_actor_t read_actor)
+>+{
+>+	struct vsock_sock *vsk = vsock_sk(sk);
+>+
+>+	return vsk->transport->read_skb(vsk, read_actor);
+>+}
+>+
+> static int vsock_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
+> 			       size_t len)
+> {
+>@@ -1241,19 +1252,34 @@ static int vsock_dgram_connect(struct socket *sock,
+>
+> 	memcpy(&vsk->remote_addr, remote_addr, sizeof(vsk->remote_addr));
+> 	sock->state = SS_CONNECTED;
+>+	sk->sk_state = TCP_ESTABLISHED;
+>
+> out:
+> 	release_sock(sk);
+> 	return err;
+> }
+>
+>-static int vsock_dgram_recvmsg(struct socket *sock, struct msghdr *msg,
+>-			       size_t len, int flags)
+>+int vsock_dgram_recvmsg(struct socket *sock, struct msghdr *msg,
+>+			size_t len, int flags)
+> {
+>-	struct vsock_sock *vsk = vsock_sk(sock->sk);
+>+#ifdef CONFIG_BPF_SYSCALL
+>+	const struct proto *prot;
+>+#endif
+>+	struct vsock_sock *vsk;
+>+	struct sock *sk;
+>+
+>+	sk = sock->sk;
+>+	vsk = vsock_sk(sk);
+>+
+>+#ifdef CONFIG_BPF_SYSCALL
+>+	prot = READ_ONCE(sk->sk_prot);
+>+	if (prot != &vsock_proto)
+>+		return prot->recvmsg(sk, msg, len, flags, NULL);
+>+#endif
+>
+> 	return vsk->transport->dgram_dequeue(vsk, msg, len, flags);
+> }
+>+EXPORT_SYMBOL_GPL(vsock_dgram_recvmsg);
+>
+> static const struct proto_ops vsock_dgram_ops = {
+> 	.family = PF_VSOCK,
+>@@ -1272,6 +1298,7 @@ static const struct proto_ops vsock_dgram_ops = {
+> 	.recvmsg = vsock_dgram_recvmsg,
+> 	.mmap = sock_no_mmap,
+> 	.sendpage = sock_no_sendpage,
+>+	.read_skb = vsock_read_skb,
+> };
+>
+> static int vsock_transport_cancel_pkt(struct vsock_sock *vsk)
+>@@ -2086,13 +2113,16 @@ static int __vsock_seqpacket_recvmsg(struct sock *sk, struct msghdr *msg,
+> 	return err;
+> }
+>
+>-static int
+>+int
+> vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+> 			  int flags)
+> {
+> 	struct sock *sk;
+> 	struct vsock_sock *vsk;
+> 	const struct vsock_transport *transport;
+>+#ifdef CONFIG_BPF_SYSCALL
+>+	const struct proto *prot;
+>+#endif
+> 	int err;
+>
+> 	sk = sock->sk;
+>@@ -2139,6 +2169,14 @@ vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+> 		goto out;
+> 	}
+>
+>+#ifdef CONFIG_BPF_SYSCALL
+>+	prot = READ_ONCE(sk->sk_prot);
+>+	if (prot != &vsock_proto) {
+>+		release_sock(sk);
+>+		return prot->recvmsg(sk, msg, len, flags, NULL);
+>+	}
+>+#endif
+>+
+> 	if (sk->sk_type == SOCK_STREAM)
+> 		err = __vsock_stream_recvmsg(sk, msg, len, flags);
+> 	else
+>@@ -2148,6 +2186,7 @@ vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+> 	release_sock(sk);
+> 	return err;
+> }
+>+EXPORT_SYMBOL_GPL(vsock_connectible_recvmsg);
+>
+> static int vsock_set_rcvlowat(struct sock *sk, int val)
+> {
+>@@ -2188,6 +2227,7 @@ static const struct proto_ops vsock_stream_ops = {
+> 	.mmap = sock_no_mmap,
+> 	.sendpage = sock_no_sendpage,
+> 	.set_rcvlowat = vsock_set_rcvlowat,
+>+	.read_skb = vsock_read_skb,
+> };
+>
+> static const struct proto_ops vsock_seqpacket_ops = {
+>@@ -2209,6 +2249,7 @@ static const struct proto_ops vsock_seqpacket_ops = {
+> 	.recvmsg = vsock_connectible_recvmsg,
+> 	.mmap = sock_no_mmap,
+> 	.sendpage = sock_no_sendpage,
+>+	.read_skb = vsock_read_skb,
+> };
+>
+> static int vsock_create(struct net *net, struct socket *sock,
+>@@ -2348,6 +2389,8 @@ static int __init vsock_init(void)
+> 		goto err_unregister_proto;
+> 	}
+>
+>+	vsock_bpf_build_proto();
+>+
+> 	return 0;
+>
+> err_unregister_proto:
+>diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>index 28b5a8e8e094..e95df847176b 100644
+>--- a/net/vmw_vsock/virtio_transport.c
+>+++ b/net/vmw_vsock/virtio_transport.c
+>@@ -457,6 +457,8 @@ static struct virtio_transport virtio_transport = {
+> 		.notify_send_pre_enqueue  = virtio_transport_notify_send_pre_enqueue,
+> 		.notify_send_post_enqueue = virtio_transport_notify_send_post_enqueue,
+> 		.notify_buffer_size       = virtio_transport_notify_buffer_size,
+>+
+>+		.read_skb = virtio_transport_read_skb,
+> 	},
+>
+> 	.send_pkt = virtio_transport_send_pkt,
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index a1581c77cf84..82bdaf61ee02 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -1388,6 +1388,30 @@ int virtio_transport_purge_skbs(void *vsk, struct sk_buff_head *queue)
+> }
+> EXPORT_SYMBOL_GPL(virtio_transport_purge_skbs);
+>
+>+int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t recv_actor)
+>+{
+>+	struct virtio_vsock_sock *vvs = vsk->trans;
+>+	struct sock *sk = sk_vsock(vsk);
+>+	struct sk_buff *skb;
+>+	int off = 0;
+>+	int copied;
+>+	int err;
+>+
+>+	spin_lock_bh(&vvs->rx_lock);
+>+	/* Use __skb_recv_datagram() for race-free handling of the receive. It
+>+	 * works for types other than dgrams. */
 
-FWIW, I think I have a better version that handles better the bullet (2) further
-below. But I'm still testing it.
+Checkpatch:
+   WARNING: Block comments use a trailing */ on a separate line
 
-> On Wed, Feb 08, 2023 at 01:19:38PM +0000, Joao Martins wrote:
->> On KVM GSI routing table updates, specially those where they have vIOMMUs
->> with interrupt remapping enabled (e.g. to boot >255vcpus guests without
->> relying on KVM_FEATURE_MSI_EXT_DEST_ID), a VMM may update the backing VF
->> MSIs with new VCPU affinities.
->>
->> On AMD this translates to calls to amd_ir_set_vcpu_affinity() and
->> eventually to amd_iommu_{de}activate_guest_mode() with a new GATag
->> outlining the VM ID and (new) VCPU ID. On vCPU blocking and unblocking
->> paths it disables AVIC, and rely on GALog to convey the wakeups to any
->> sleeping vCPUs. KVM will store a list of GA-mode IR entries to each
->> running/blocked vCPU. So any vCPU Affinity update to a VF interrupt happen
->> via KVM, and it will change already-configured-guest-mode IRTEs with a new
->> GATag.
->>
->> The issue is that amd_iommu_activate_guest_mode() will essentially only
->> change IRTE fields on transitions from non-guest-mode to guest-mode and
->> otherwise returns *with no changes to IRTE* on already configured
->> guest-mode interrupts. To the guest this means that the VF interrupts
->> remain affined to the first vCPU these were first configured, and guest
->> will be unable to either VF interrupts and receive messages like this from
->> spurious interrupts (e.g. from waking the wrong vCPU in GALog):
->>
->> [  167.759472] __common_interrupt: 3.34 No irq handler for vector
->> [  230.680927] mlx5_core 0000:00:02.0: mlx5_cmd_eq_recover:247:(pid
->> 3122): Recovered 1 EQEs on cmd_eq
->> [  230.681799] mlx5_core 0000:00:02.0:
->> wait_func_handle_exec_timeout:1113:(pid 3122): cmd[0]: CREATE_CQ(0x400)
->> recovered after timeout
->> [  230.683266] __common_interrupt: 3.34 No irq handler for vector
->>
->> Given that amd_ir_set_vcpu_affinity() uses amd_iommu_activate_guest_mode()
->> underneath it essentially means that VCPU affinity changes of IRTEs are
->> nops if it was called once for the IRTE already (on VMENTER). Fix it by
->> dropping the check for guest-mode at amd_iommu_activate_guest_mode().  Same
->> thing is applicable to amd_iommu_deactivate_guest_mode() although, even if
->> the IRTE doesn't change underlying DestID on the host, the VFIO IRQ handler
->> will still be able to poke at the right guest-vCPU.
->>
->> Fixes: b9c6ff94e43a ("iommu/amd: Re-factor guest virtual APIC (de-)activation code")
->> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
->> ---
->> Some notes in other related flaws as I looked at this:
->>
->> 1) amd_iommu_deactivate_guest_mode() suffers from the same issue as this patch,
->> but it should only matter for the case where you rely on irqbalance-like
->> daemons balancing VFIO IRQs in the hypervisor. Though, it doesn't translate
->> into guest failures, more like performance "misdirection". Happy to fix it, if
->> folks also deem it as a problem.
->>
->> 2) This patch doesn't attempt at changing semantics around what
->> amd_iommu_activate_guest_mode() has been doing for a long time [since v5.4]
->> (i.e. clear the whole IRTE and then changes its fields). As such when
->> updating the IRTEs the interrupts get isRunning and DestId cleared, thus
->> we rely on the GALog to inject IRQs into vCPUs /until/ the vCPUs block
->> and unblock again (which is when they update the IOMMU affinity), or the
->> AVIC gets momentarily disabled. I have patches that improve this part as a
->> follow-up, but I thought that this patch had value on its own onto fixing
->> what has been broken since v5.4 ... and that it could be easily carried
->> to stable trees.
->>
->> ---
->>  drivers/iommu/amd/iommu.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/drivers/iommu/amd/iommu.c b/drivers/iommu/amd/iommu.c
->> index cbeaab55c0db..afe1f35a4dd9 100644
->> --- a/drivers/iommu/amd/iommu.c
->> +++ b/drivers/iommu/amd/iommu.c
->> @@ -3476,7 +3476,7 @@ int amd_iommu_activate_guest_mode(void *data)
->>  	u64 valid;
->>  
->>  	if (!AMD_IOMMU_GUEST_IR_VAPIC(amd_iommu_guest_ir) ||
->> -	    !entry || entry->lo.fields_vapic.guest_mode)
->> +	    !entry)
->>  		return 0;
->>  
->>  	valid = entry->lo.fields_vapic.valid;
->> -- 
->> 2.17.2
->>
+Since we also use this convention in the other comments in this file,
+I would follow it.
+
+>+	skb = __skb_recv_datagram(sk, &vvs->rx_queue, MSG_DONTWAIT, &off, &err);
+>+	spin_unlock_bh(&vvs->rx_lock);
+>+
+>+	if (!skb)
+>+		return err;
+>+
+>+	copied = recv_actor(sk, skb);
+>+	kfree_skb(skb);
+>+	return copied;
+>+}
+>+EXPORT_SYMBOL_GPL(virtio_transport_read_skb);
+>+
+> MODULE_LICENSE("GPL v2");
+> MODULE_AUTHOR("Asias He");
+> MODULE_DESCRIPTION("common code for virtio vsock");
+>diff --git a/net/vmw_vsock/vsock_bpf.c b/net/vmw_vsock/vsock_bpf.c
+>new file mode 100644
+>index 000000000000..ee92a1f42031
+>--- /dev/null
+>+++ b/net/vmw_vsock/vsock_bpf.c
+>@@ -0,0 +1,175 @@
+>+// SPDX-License-Identifier: GPL-2.0
+>+/* Copyright (c) 2022 Bobby Eshleman <bobby.eshleman@bytedance.com>
+>+ *
+>+ * Based off of net/unix/unix_bpf.c
+>+ */
+>+
+>+#include <linux/bpf.h>
+>+#include <linux/module.h>
+>+#include <linux/skmsg.h>
+>+#include <linux/socket.h>
+>+#include <linux/wait.h>
+>+#include <net/af_vsock.h>
+>+#include <net/sock.h>
+>+
+>+#define vsock_sk_has_data(__sk, __psock)				\
+>+		({	!skb_queue_empty(&__sk->sk_receive_queue) ||	\
+>+			!skb_queue_empty(&__psock->ingress_skb) ||	\
+>+			!list_empty(&__psock->ingress_msg);		\
+>+		})
+
+Some suggestions from checkpatch that I would fix:
+
+CHECK: Macro argument '__sk' may be better as '(__sk)' to avoid precedence issues
+CHECK: Macro argument '__psock' may be better as '(__psock)' to avoid precedence issues
+
+>+
+>+static struct proto *vsock_prot_saved __read_mostly;
+>+static DEFINE_SPINLOCK(vsock_prot_lock);
+>+static struct proto vsock_bpf_prot;
+>+
+>+static bool vsock_has_data(struct sock *sk, struct sk_psock *psock)
+>+{
+>+	struct vsock_sock *vsk = vsock_sk(sk);
+>+	s64 ret;
+>+
+>+	ret = vsock_connectible_has_data(vsk);
+>+	if (ret > 0)
+>+		return true;
+>+
+>+	return vsock_sk_has_data(sk, psock);
+>+}
+>+
+>+static int vsock_msg_wait_data(struct sock *sk, struct sk_psock *psock, long timeo)
+
+IIUC now this function returns 0 when there isn't data and 1 when there
+is data, maybe better to change the return type to bool.
+
+>+{
+>+	int ret = 0;
+>+
+>+	DEFINE_WAIT_FUNC(wait, woken_wake_function);
+>+
+>+	if (sk->sk_shutdown & RCV_SHUTDOWN)
+>+		return 1;
+>+
+>+	if (!timeo)
+>+		return ret;
+>+
+>+	add_wait_queue(sk_sleep(sk), &wait);
+>+	sk_set_bit(SOCKWQ_ASYNC_WAITDATA, sk);
+>+	ret = vsock_has_data(sk, psock);
+>+	if (!ret) {
+>+		wait_woken(&wait, TASK_INTERRUPTIBLE, timeo);
+>+		ret = vsock_has_data(sk, psock);
+>+	}
+>+	sk_clear_bit(SOCKWQ_ASYNC_WAITDATA, sk);
+>+	remove_wait_queue(sk_sleep(sk), &wait);
+>+	return ret;
+>+}
+>+
+>+static int __vsock_recvmsg(struct sock *sk, struct msghdr *msg, size_t len, int flags)
+>+{
+>+	struct socket *sock = sk->sk_socket;
+>+	int err;
+>+
+>+	if (sk->sk_type == SOCK_STREAM || sk->sk_type == SOCK_SEQPACKET)
+>+		err = vsock_connectible_recvmsg(sock, msg, len, flags);
+>+	else if (sk->sk_type == SOCK_DGRAM)
+>+		err = vsock_dgram_recvmsg(sock, msg, len, flags);
+>+	else
+>+		err = -EPROTOTYPE;
+>+
+>+	return err;
+>+}
+>+
+>+static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
+>+			     size_t len, int flags, int *addr_len)
+>+{
+>+	struct sk_psock *psock;
+>+	int copied;
+>+
+>+	psock = sk_psock_get(sk);
+>+	lock_sock(sk);
+>+	if (unlikely(!psock)) {
+>+		release_sock(sk);
+
+I'm not sure we need the lock to check psock, so can we move this
+block before the lock_sock?
+
+>+		return __vsock_recvmsg(sk, msg, len, flags);
+>+	}
+>+
+>+	if (vsock_has_data(sk, psock) && sk_psock_queue_empty(psock)) {
+>+		release_sock(sk);
+>+		sk_psock_put(sk, psock);
+>+		return __vsock_recvmsg(sk, msg, len, flags);
+>+	}
+>+
+>+msg_bytes_ready:
+
+I saw that this code is also in unix_bpf.c and tcp_bpf.c, so I guess
+it's acceptable, but I would have avoided using a label to go back.
+I prefer a to use goto only for centralized exiting of functions.
+
+One possible refactoring (not tested):
+
+         copied = sk_msg_recvmsg(sk, psock, msg, len, flags);
+         while (!copied) {
+                 long timeo = sock_rcvtimeo(sk, flags & MSG_DONTWAIT);
+
+                 if (!vsock_msg_wait_data(sk, psock, timeo)) {
+                         copied = -EAGAIN;
+                         break;
+                 }
+
+                 if (sk_psock_queue_empty(psock)) {
+                         release_sock(sk);
+                         sk_psock_put(sk, psock);
+                         return __vsock_recvmsg(sk, msg, len, flags);
+                 }
+
+                 copied = sk_msg_recvmsg(sk, psock, msg, len, flags);
+         }
+         ...
+
+I'm not sure why we need to call release_sock() and sk_psock_put()
+before __vsock_recvmsg(). If it is not needed we can simplify more the
+previous code.
+
+The rest LGTM.
+
+Thanks,
+Stefano
+
+>+	copied = sk_msg_recvmsg(sk, psock, msg, len, flags);
+>+	if (!copied) {
+>+		long timeo;
+>+		int data;
+>+
+>+		timeo = sock_rcvtimeo(sk, flags & MSG_DONTWAIT);
+>+		data = vsock_msg_wait_data(sk, psock, timeo);
+>+		if (data) {
+>+			if (!sk_psock_queue_empty(psock))
+>+				goto msg_bytes_ready;
+>+			release_sock(sk);
+>+			sk_psock_put(sk, psock);
+>+			return __vsock_recvmsg(sk, msg, len, flags);
+>+		}
+>+		copied = -EAGAIN;
+>+	}
+>+	release_sock(sk);
+>+	sk_psock_put(sk, psock);
+>+
+>+	return copied;
+>+}
+>+
+>+/* Copy of original proto with updated sock_map methods */
+>+static struct proto vsock_bpf_prot = {
+>+	.close = sock_map_close,
+>+	.recvmsg = vsock_bpf_recvmsg,
+>+	.sock_is_readable = sk_msg_is_readable,
+>+	.unhash = sock_map_unhash,
+>+};
+>+
+>+static void vsock_bpf_rebuild_protos(struct proto *prot, const struct proto *base)
+>+{
+>+	*prot        = *base;
+>+	prot->close  = sock_map_close;
+>+	prot->recvmsg = vsock_bpf_recvmsg;
+>+	prot->sock_is_readable = sk_msg_is_readable;
+>+}
+>+
+>+static void vsock_bpf_check_needs_rebuild(struct proto *ops)
+>+{
+>+	/* Paired with the smp_store_release() below. */
+>+	if (unlikely(ops != smp_load_acquire(&vsock_prot_saved))) {
+>+		spin_lock_bh(&vsock_prot_lock);
+>+		if (likely(ops != vsock_prot_saved)) {
+>+			vsock_bpf_rebuild_protos(&vsock_bpf_prot, ops);
+>+			/* Make sure proto function pointers are updated before publishing the
+>+			 * pointer to the struct.
+>+			 */
+>+			smp_store_release(&vsock_prot_saved, ops);
+>+		}
+>+		spin_unlock_bh(&vsock_prot_lock);
+>+	}
+>+}
+>+
+>+int vsock_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool restore)
+>+{
+>+	struct vsock_sock *vsk;
+>+
+>+	if (restore) {
+>+		sk->sk_write_space = psock->saved_write_space;
+>+		sock_replace_proto(sk, psock->sk_proto);
+>+		return 0;
+>+	}
+>+
+>+	vsk = vsock_sk(sk);
+>+	if (!vsk->transport)
+>+		return -ENODEV;
+>+
+>+	if (!vsk->transport->read_skb)
+>+		return -EOPNOTSUPP;
+>+
+>+	vsock_bpf_check_needs_rebuild(psock->sk_proto);
+>+	sock_replace_proto(sk, &vsock_bpf_prot);
+>+	return 0;
+>+}
+>+
+>+void __init vsock_bpf_build_proto(void)
+>+{
+>+	vsock_bpf_rebuild_protos(&vsock_bpf_prot, &vsock_proto);
+>+}
+>diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
+>index 671e03240fc5..40753b661c13 100644
+>--- a/net/vmw_vsock/vsock_loopback.c
+>+++ b/net/vmw_vsock/vsock_loopback.c
+>@@ -94,6 +94,8 @@ static struct virtio_transport loopback_transport = {
+> 		.notify_send_pre_enqueue  = virtio_transport_notify_send_pre_enqueue,
+> 		.notify_send_post_enqueue = virtio_transport_notify_send_post_enqueue,
+> 		.notify_buffer_size       = virtio_transport_notify_buffer_size,
+>+
+>+		.read_skb = virtio_transport_read_skb,
+> 	},
+>
+> 	.send_pkt = vsock_loopback_send_pkt,
+>
+>-- 
+>2.35.1
+>
+
