@@ -2,61 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 091B4699D7E
-	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 21:17:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 67EEF699D93
+	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 21:23:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229722AbjBPURg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Feb 2023 15:17:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37318 "EHLO
+        id S229547AbjBPUW7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Feb 2023 15:22:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229614AbjBPURf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Feb 2023 15:17:35 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C00EC4C6D7
-        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 12:17:33 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id o10-20020a17090ac08a00b00233d3ac7451so1412550pjs.0
-        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 12:17:33 -0800 (PST)
+        with ESMTP id S229490AbjBPUW5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Feb 2023 15:22:57 -0500
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D43CA241E8
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 12:22:56 -0800 (PST)
+Received: by mail-pg1-x549.google.com with SMTP id q6-20020a656246000000b004fc1c14c9daso827321pgv.23
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 12:22:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KXO/sMRgR+rq5C1H+AUe//FrAstwKoUzse8qRjeYsDo=;
-        b=O3WTDmw/BRLbWcBl8LO2fDR2TTcVCdniBNPeV0Pjm/DNIsqp1Ubldvl1CHSAcG844Z
-         VkoJltbIUu0i2w0/D0qe1OhtcAzBBFICU+cG9foUg2uIIFC+bK19LXb5n8tF4utHDy4d
-         vI1lfaz0VP9rjTbhb7DjRcDo35BFgs+P4h/N9HUmzenHgyKx2lZvlzBfeWVdOHSfAZht
-         KjY7pbTrxmcHW1anbnWnWzFYOAyyLd+ukyfr4VaNLC/NQ5pNFMTmFcHXIR28gp96veef
-         d7j4HcomCvttWFZkVj9bzpAeAjIGZ47QClo/uppIFmzyolMvvbeE2rIE/VqLfJYFhle0
-         +vrQ==
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vCcncjl9vBVTEjELfag9S1oLRHyPwIXh9OBkmmp9fyQ=;
+        b=NTpw1IWK3yxfTwGuflws4m5YpI8z8UgmraB7YS1w/S3ByOhCFacaKx7rycLIedDkCn
+         jJUHfxI3ogukVrFzv/nYaeBLtbKVDtyHlsfZmhX1EjbJZut+AbB4u1qMweHYauWd3FiB
+         jptZBQsHE5XmbvRFBawO9ymKexULzaGA4+zGWMmM5XiMuqMu08n3kCGlociec9zueD5e
+         n0YMjDPMCINMWK/CU3c9sxnop9ActkMTr8nIypll3yp9JGWRwdYNCq/CnmGL41wLnkwn
+         uCQivV48xRDy0XYjNZwOOrzU3QYfg+iHNfMGK8xR6iu/h2bmUy0twRglIkpI3AgKfu8O
+         06mA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KXO/sMRgR+rq5C1H+AUe//FrAstwKoUzse8qRjeYsDo=;
-        b=kFxLrsrdnM32/gaUDofCppPY6uYO5DRmXA+irQp36wJUJ3XziESAqOS3KPd4EC5mnk
-         CEXE6Sa7gJfXW8P1nVrtC9CzP/Y9PIZtA4cj//QTugrujerZlm6zahKlzFUKHG013jTj
-         yg3yuTCoWPk0OE8/kGTtdoWQPxqHLIysaI9EC9cU197Zp+4BRGhZcNyPJ8L+RCLtCm4y
-         tMwuRAXIls/HSC0wDZ5dVB9sj1WpaoYy21djdx0uV/JfpqZO+POp0kITIuFAfCrYudHb
-         3hXrWjAYOSJ0rponkKLaS0SYGP/mpx0DgYMaL2Z5zD49WVhxwy0toxG0PMuPYimN7Bdy
-         zwtA==
-X-Gm-Message-State: AO0yUKVDzTzMdogp3UUXdpYQ1GWfW9K1fsOlHb85cAdlBe1BmmCEk0pB
-        Vx05wY/XXpsVx/k6ZvwboKb8KWhAKL0=
-X-Google-Smtp-Source: AK7set9JYQxhi6D0RAerpBPuJY8iPyiR9ud11f6qQKuR+s/1APo6XGe8uNPIMBjngYTQvPJSScYuaugcc2Q=
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vCcncjl9vBVTEjELfag9S1oLRHyPwIXh9OBkmmp9fyQ=;
+        b=yB/1zwqFHLhLLxvtD1djxqVCS0xXiVFD+MFmx2AXVeGub0MNDZSx9ZQ+ihSsERzPsr
+         pqYzDHSuyBCBEC+xZ6ethC+UVZnICbGgx61kdfmW/2HkiJOGS0MdQ0xZemlWqy08PdHU
+         kYOaTbFnm8hERGGDivCZasshP8rSO8BW908sHfWzoj5a/Epge3SLl93kz4yhnnC8uP/J
+         IFnzyYNNd83EYlcPqDNy06KWnufZVsl+QsVeKeW0X1e+RInXjpuwWhMa7yFgYRG5y1gq
+         moaQQNYu072ik0cNdm2X8aVG/ZhgY1LsDfBAatEUZH69yVJH8NNT9eCpWObFvMBR7ARy
+         O25g==
+X-Gm-Message-State: AO0yUKUI40T7IoHybMN8vwwi7M8BVcnXm/LcIIa6+S77FdooyfZocRos
+        l82PgaP7qH2flGPMW/ERtHHSSCDr+VQ=
+X-Google-Smtp-Source: AK7set/C3eyoe44sPAK5448q8AkTUZPYBdSEOdPc/EdG3pQncPT5DGKzeV84EYJMZ2sfGXKPDmrwVbH11QQ=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:aa7:96ca:0:b0:5a8:da1f:8672 with SMTP id
- h10-20020aa796ca000000b005a8da1f8672mr1120288pfq.18.1676578653224; Thu, 16
- Feb 2023 12:17:33 -0800 (PST)
-Date:   Thu, 16 Feb 2023 12:17:31 -0800
-In-Reply-To: <Y+6OVtw1kEO99Gah@linux.dev>
+ (user=seanjc job=sendgmr) by 2002:a63:755d:0:b0:4fc:8b10:870 with SMTP id
+ f29-20020a63755d000000b004fc8b100870mr35550pgn.5.1676578976283; Thu, 16 Feb
+ 2023 12:22:56 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Thu, 16 Feb 2023 12:22:54 -0800
 Mime-Version: 1.0
-References: <20230216200218.1028943-1-amoorthy@google.com> <Y+6OVtw1kEO99Gah@linux.dev>
-Message-ID: <Y+6PWxGL5w+pwbhe@google.com>
-Subject: Re: [PATCH] selftests/kvm: Fix bug in how demand_paging_test
- calculates paging rate
+X-Mailer: git-send-email 2.39.2.637.g21b0678d19-goog
+Message-ID: <20230216202254.671772-1-seanjc@google.com>
+Subject: [PATCH] KVM: x86: Assert that the emulator doesn't load CS with
+ garbage in !RM
 From:   Sean Christopherson <seanjc@google.com>
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Anish Moorthy <amoorthy@google.com>, pbonzini@redhat.com,
-        kvm@vger.kernel.org, jthoughton@google.com
-Content-Type: text/plain; charset="us-ascii"
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Hou Wenlong <houwenlong.hwl@antgroup.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
@@ -67,28 +68,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 16, 2023, Oliver Upton wrote:
-> The shortlog doesn't give any hint as to what the bug actually is.
-> Maybe:
-> 
->   KVM: selftests: Fix nsec to sec conversion in demand_paging_test
+Yell loudly if KVM attempts to load CS outside of Real Mode without an
+accompanying control transfer type, i.e. on X86_TRANSFER_NONE.  KVM uses
+X86_TRANSFER_NONE when emulating IRET and exceptions/interrupts for Real
+Mode, but IRET emulation for Protected Mode is non-existent.  WARN instead
+of trying to pass in a less-wrong type, e.g. X86_TRANSFER_RET, as
+emulating IRET goes even beyond emulating FAR RET (which KVM also doesn't
+fully support).
 
-+1
+Reported-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/emulate.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-> On Thu, Feb 16, 2023 at 08:02:18PM +0000, Anish Moorthy wrote:
-> > The current denominator is 1E8, not 1E9 as it should be.
-> 
->   demand_paging_test uses 1E8 as the denominator to convert nanoseconds
->   to seconds, which is wrong. Use NSEC_PER_SEC instead to fix the issue
->   and make the conversion obvious.
-> 
-> > Reported-by: James Houghton <jthoughton@google.com>
-> > Signed-off-by: Anish Moorthy <amoorthy@google.com>
-> 
-> Bikeshedding aside:
-> 
-> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index baf97c56aefa..07e5f473f6fe 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -1640,6 +1640,14 @@ static int __load_segment_descriptor(struct x86_emulate_ctxt *ctxt,
+ 			goto exception;
+ 		break;
+ 	case VCPU_SREG_CS:
++		/*
++		 * KVM uses "none" when loading CS as part of emulating Real
++		 * Mode exceptions and IRET (handled above).  In all other
++		 * cases, loading CS without a control transfer is a KVM bug.
++		 */
++		if (WARN_ON_ONCE(transfer == X86_TRANSFER_NONE))
++			goto exception;
++
+ 		if (!(seg_desc.type & 8))
+ 			goto exception;
+ 
 
-With Oliver's shortlog (I'm indifferent on the changelog),
+base-commit: 62ef199250cd46fb66fe98267137b7f64e0b41b4
+-- 
+2.39.2.637.g21b0678d19-goog
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
