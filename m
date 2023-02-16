@@ -2,207 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 016476993F0
-	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 13:11:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DFAEF6993F4
+	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 13:12:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229887AbjBPMLO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Feb 2023 07:11:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53308 "EHLO
+        id S229788AbjBPMMS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Feb 2023 07:12:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229739AbjBPMLL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Feb 2023 07:11:11 -0500
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD27D55E77;
-        Thu, 16 Feb 2023 04:11:09 -0800 (PST)
-Received: from kwepemm600003.china.huawei.com (unknown [172.30.72.55])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4PHYgQ1hddzrS1D;
-        Thu, 16 Feb 2023 20:10:42 +0800 (CST)
-Received: from [10.174.179.79] (10.174.179.79) by
- kwepemm600003.china.huawei.com (7.193.23.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.17; Thu, 16 Feb 2023 20:11:07 +0800
-Subject: Re: [PATCH v2] vhost/vdpa: Add MSI translation tables to iommu for
- software-managed MSI
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-CC:     <joro@8bytes.org>, <will@kernel.org>, <robin.murphy@arm.com>,
-        <jasowang@redhat.com>, <iommu@lists.linux.dev>,
-        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <wangrong68@huawei.com>
-References: <20230207120843.1580403-1-sunnanyong@huawei.com>
- <20230215064759-mutt-send-email-mst@kernel.org>
-From:   Nanyong Sun <sunnanyong@huawei.com>
-Message-ID: <18aa2ad4-df34-de2d-4bda-8a49c191df18@huawei.com>
-Date:   Thu, 16 Feb 2023 20:11:06 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        with ESMTP id S229524AbjBPMMQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Feb 2023 07:12:16 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AEF455E51;
+        Thu, 16 Feb 2023 04:12:15 -0800 (PST)
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31GC0WCK019227;
+        Thu, 16 Feb 2023 12:12:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=RlxpYpt5CuMMWJervzBjpenh7aoLwDWKIaU6JluD+vM=;
+ b=P7wkUsyws9h4fTgkcbv6DEOU/19B+uJ73g6vSA9TyBRWw0f7JzkXwDjxsr5pZ79bBh4Z
+ Pbc1inN45+GmFeGTQdWwQBRi5mlW8kyLxFH5eYzrHaW7jE8pwMTa6uZHAPgrvw1mk6WX
+ dGTM1/2TGBfiAKdYu3f3UhEJpVIa+jF2Kcn38uQdaOwB/s6CXP5XTaLqnVU2C60DHt23
+ tS9Sv0XuNdsu4nACzUJ17uHJsV7bDnigHI3pQIo3ggXTZmustdp/tlNZCeKPAtVuLJwG
+ d4g1BS4/LCcujq5h3x6VjkCLYiQZMo3BQI2ouvDITiXa7gAmsNFHLSSmhpn0rL4ZlS0p /Q== 
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nsgts57rv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 16 Feb 2023 12:12:14 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31G12mho007609;
+        Thu, 16 Feb 2023 12:12:12 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma04fra.de.ibm.com (PPS) with ESMTPS id 3np2n6cwnt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 16 Feb 2023 12:12:12 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31GCC9FD23003752
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 16 Feb 2023 12:12:09 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 07E2220043;
+        Thu, 16 Feb 2023 12:12:09 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A8C9720040;
+        Thu, 16 Feb 2023 12:12:08 +0000 (GMT)
+Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Thu, 16 Feb 2023 12:12:08 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     borntraeger@linux.ibm.com, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com, agordeev@linux.ibm.com
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: [PATCH v2 0/1] s390: nmi: fix virtual-physical address confusion
+Date:   Thu, 16 Feb 2023 13:12:07 +0100
+Message-Id: <20230216121208.4390-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.39.1
 MIME-Version: 1.0
-In-Reply-To: <20230215064759-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.179.79]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600003.china.huawei.com (7.193.23.202)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 3IcV6KMEr2kTsSVsSqZPLcRzt59EISuM
+X-Proofpoint-ORIG-GUID: 3IcV6KMEr2kTsSVsSqZPLcRzt59EISuM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-16_09,2023-02-16_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ priorityscore=1501 impostorscore=0 lowpriorityscore=0 adultscore=0
+ suspectscore=0 mlxlogscore=999 spamscore=0 phishscore=0 malwarescore=0
+ mlxscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302160103
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+v2:
+---
+* remove unneeded cast (thanks Alexander)
 
-On 2023/2/15 19:48, Michael S. Tsirkin wrote:
-> On Tue, Feb 07, 2023 at 08:08:43PM +0800, Nanyong Sun wrote:
->> From: Rong Wang <wangrong68@huawei.com>
->>
->> Once enable iommu domain for one device, the MSI
->> translation tables have to be there for software-managed MSI.
->> Otherwise, platform with software-managed MSI without an
->> irq bypass function, can not get a correct memory write event
->> from pcie, will not get irqs.
->> The solution is to obtain the MSI phy base address from
->> iommu reserved region, and set it to iommu MSI cookie,
->> then translation tables will be created while request irq.
->>
->> Change log
->> ----------
->>
->> v1->v2:
->> - add resv iotlb to avoid overlap mapping.
-> put changelog after --- pls
+When a machine check is received while in SIE, it is reinjected into the
+guest in some cases. The respective code needs to access the sie_block,
+which is taken from the backed up R14.
 
-Ok, will do that in version3
+Since reinjection only occurs while we are in SIE (i.e. between the
+labels sie_entry and sie_leave in entry.S and thus if CIF_MCCK_GUEST is
+set), the backed up R14 will always contain a physical address in
+s390_backup_mcck_info.
 
->
->> Signed-off-by: Rong Wang <wangrong68@huawei.com>
->> Signed-off-by: Nanyong Sun <sunnanyong@huawei.com>
->> ---
->>   drivers/iommu/iommu.c |  1 +
->>   drivers/vhost/vdpa.c  | 59 ++++++++++++++++++++++++++++++++++++++++---
->>   2 files changed, 57 insertions(+), 3 deletions(-)
->>
->> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
->> index 5f6a85aea501..af9c064ad8b2 100644
->> --- a/drivers/iommu/iommu.c
->> +++ b/drivers/iommu/iommu.c
->> @@ -2623,6 +2623,7 @@ void iommu_get_resv_regions(struct device *dev, struct list_head *list)
->>   	if (ops->get_resv_regions)
->>   		ops->get_resv_regions(dev, list);
->>   }
->> +EXPORT_SYMBOL(iommu_get_resv_regions);
->>   
->>   /**
->>    * iommu_put_resv_regions - release resered regions
->> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
->> index ec32f785dfde..a58979da8acd 100644
->> --- a/drivers/vhost/vdpa.c
->> +++ b/drivers/vhost/vdpa.c
->> @@ -49,6 +49,7 @@ struct vhost_vdpa {
->>   	struct completion completion;
->>   	struct vdpa_device *vdpa;
->>   	struct hlist_head as[VHOST_VDPA_IOTLB_BUCKETS];
->> +	struct vhost_iotlb resv_iotlb;
->>   	struct device dev;
->>   	struct cdev cdev;
->>   	atomic_t opened;
->> @@ -216,6 +217,8 @@ static int vhost_vdpa_reset(struct vhost_vdpa *v)
->>   
->>   	v->in_batch = 0;
->>   
->> +	vhost_iotlb_reset(&v->resv_iotlb);
->> +
->>   	return vdpa_reset(vdpa);
->>   }
->>   
->> @@ -1013,6 +1016,10 @@ static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
->>   	    msg->iova + msg->size - 1 > v->range.last)
->>   		return -EINVAL;
->>   
->> +	if (vhost_iotlb_itree_first(&v->resv_iotlb, msg->iova,
->> +					msg->iova + msg->size - 1))
->> +		return -EINVAL;
->> +
->>   	if (vhost_iotlb_itree_first(iotlb, msg->iova,
->>   				    msg->iova + msg->size - 1))
->>   		return -EEXIST;
->> @@ -1103,6 +1110,45 @@ static ssize_t vhost_vdpa_chr_write_iter(struct kiocb *iocb,
->>   	return vhost_chr_write_iter(dev, from);
->>   }
->>   
->> +static int vhost_vdpa_resv_iommu_region(struct iommu_domain *domain, struct device *dma_dev,
->> +	struct vhost_iotlb *resv_iotlb)
->> +{
->> +	struct list_head dev_resv_regions;
->> +	phys_addr_t resv_msi_base = 0;
->> +	struct iommu_resv_region *region;
->> +	int ret = 0;
->> +	bool with_sw_msi = false;
->> +	bool with_hw_msi = false;
->> +
->> +	INIT_LIST_HEAD(&dev_resv_regions);
->> +	iommu_get_resv_regions(dma_dev, &dev_resv_regions);
->> +
->> +	list_for_each_entry(region, &dev_resv_regions, list) {
->> +		ret = vhost_iotlb_add_range_ctx(resv_iotlb, region->start,
->> +				region->start + region->length - 1,
->> +				0, 0, NULL);
->> +		if (ret) {
->> +			vhost_iotlb_reset(resv_iotlb);
->> +			break;
->> +		}
->> +
->> +		if (region->type == IOMMU_RESV_MSI)
->> +			with_hw_msi = true;
->> +
->> +		if (region->type == IOMMU_RESV_SW_MSI) {
->> +			resv_msi_base = region->start;
->> +			with_sw_msi = true;
->> +		}
->> +	}
->> +
->> +	if (!ret && !with_hw_msi && with_sw_msi)
->> +		ret = iommu_get_msi_cookie(domain, resv_msi_base);
->> +
->> +	iommu_put_resv_regions(dma_dev, &dev_resv_regions);
->> +
->> +	return ret;
->> +}
->> +
->>   static int vhost_vdpa_alloc_domain(struct vhost_vdpa *v)
->>   {
->>   	struct vdpa_device *vdpa = v->vdpa;
->> @@ -1128,11 +1174,16 @@ static int vhost_vdpa_alloc_domain(struct vhost_vdpa *v)
->>   
->>   	ret = iommu_attach_device(v->domain, dma_dev);
->>   	if (ret)
->> -		goto err_attach;
->> +		goto err_alloc_domain;
->>   
->> -	return 0;
->> +	ret = vhost_vdpa_resv_iommu_region(v->domain, dma_dev, &v->resv_iotlb);
->> +	if (ret)
->> +		goto err_attach_device;
->>   
->> -err_attach:
->> +	return 0;
->> +err_attach_device:
->> +	iommu_detach_device(v->domain, dma_dev);
->> +err_alloc_domain:
->>   	iommu_domain_free(v->domain);
->>   	return ret;
->>   }
->> @@ -1385,6 +1436,8 @@ static int vhost_vdpa_probe(struct vdpa_device *vdpa)
->>   		goto err;
->>   	}
->>   
->> +	vhost_iotlb_init(&v->resv_iotlb, 0, 0);
->> +
->>   	r = dev_set_name(&v->dev, "vhost-vdpa-%u", minor);
->>   	if (r)
->>   		goto err;
->> -- 
->> 2.25.1
-> .
+This currently works, because virtual and physical addresses are
+the same.
+
+Add phys_to_virt() to resolve the virtual-physical confusion.
+
+Nico Boehr (1):
+  s390: nmi: fix virtual-physical address confusion
+
+ arch/s390/kernel/nmi.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+-- 
+2.39.1
+
