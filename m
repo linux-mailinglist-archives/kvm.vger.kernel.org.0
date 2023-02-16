@@ -2,249 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6CED7698B73
-	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 05:44:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 23A28698B95
+	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 06:14:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229556AbjBPEoI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Feb 2023 23:44:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34204 "EHLO
+        id S229532AbjBPFOV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Feb 2023 00:14:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229478AbjBPEn7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Feb 2023 23:43:59 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C54E32E0C6
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 20:43:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676522592;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3DDHO8i0zvrnMlu2LxipZBzY2ZSSiL5SyYkVWHiaTdo=;
-        b=F/Hs1aBhY3zU/XiwbYixyW5b4HuuyyNmYe+WjgC/Jba9HnIfOGoaf/8ihBrBoA2JBR8PjQ
-        VV4eQe+YYkospSH8sFDLocse8CU45e1PPTD675Ii+OePRt8Cjje5VDuWC1nfHSe2ytJG3t
-        m+koXiGWrML1eFOnxBXsghn55V7ePGI=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-241-RdvdFzasPpet-d3QH8hohQ-1; Wed, 15 Feb 2023 23:43:08 -0500
-X-MC-Unique: RdvdFzasPpet-d3QH8hohQ-1
-Received: by mail-pj1-f70.google.com with SMTP id mp1-20020a17090b190100b00233cc25fc7bso359177pjb.4
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 20:43:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3DDHO8i0zvrnMlu2LxipZBzY2ZSSiL5SyYkVWHiaTdo=;
-        b=HHitAjyA82w5EhFMZxvQtLnHnbnF5fWBYPUcqLybUS7CiAtqpQCCSt/zZThZt0LvTs
-         ZewyyKZrYZLeXGexVMqT28IIrRp1wjvWyk1N9dgJ3FzxtM38MmlEKVcsXGuJiG/Dogbb
-         NLLtMAACl/JkbfkQts+sChzMS+oqfEGP2CuyTl8UKB5mW4zsPp/kv8iCL7yJKhYsWc5R
-         XLjbQKKH9194rGB8WvOdsJclng3N1+pQwzMfrzKmyZbHaqLgoG8ufqgHSwx8PPM91Fv9
-         roygbsyQ+mEm7UXHaREPOlfnwT64s/DOcXskQg9aAWHtptt8jtK2Br/dCbbx/3gbFWGJ
-         Tkgw==
-X-Gm-Message-State: AO0yUKWG7fTxBj/n5mwIMdUjg8ND7QONGw6lQ77Z4YltLYI5wQE2UtfV
-        rVGgMqPYTgQRywNCiT++ur78KSL/GbNicUR6yNhezjFXi8J/XpBU3z+Q3Hf+67HA3qT4frTiSKP
-        NmG0VPE+NQXRu
-X-Received: by 2002:a17:90b:4c04:b0:234:bf0:86bc with SMTP id na4-20020a17090b4c0400b002340bf086bcmr5369921pjb.31.1676522587176;
-        Wed, 15 Feb 2023 20:43:07 -0800 (PST)
-X-Google-Smtp-Source: AK7set/qQ5O/TZ0PJALyrxA2Lethp9rxzMGA6y2yAhomtgRtTLlXGq4nNUzsUdYKVT2TS5pjlJl+Xw==
-X-Received: by 2002:a17:90b:4c04:b0:234:bf0:86bc with SMTP id na4-20020a17090b4c0400b002340bf086bcmr5369907pjb.31.1676522586789;
-        Wed, 15 Feb 2023 20:43:06 -0800 (PST)
-Received: from [10.72.12.253] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id l2-20020a17090aec0200b00233b5d6b4b5sm2306741pjy.16.2023.02.15.20.43.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Feb 2023 20:43:06 -0800 (PST)
-Message-ID: <3bb88db8-1283-f16d-d16a-5d3fb958b584@redhat.com>
-Date:   Thu, 16 Feb 2023 12:43:00 +0800
+        with ESMTP id S229454AbjBPFOT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Feb 2023 00:14:19 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD2EB3E095;
+        Wed, 15 Feb 2023 21:14:18 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5F28361E79;
+        Thu, 16 Feb 2023 05:14:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57DFEC433EF;
+        Thu, 16 Feb 2023 05:14:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1676524457;
+        bh=5bN2qNXzQ4ZA0g4le+lak/ncOAC6JWfVkeV3mS7J638=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=S6DhiGdHj1JDcPoZ1SfQW0UbLyKedojDvkeLmMsMmBwPwm5Yt9ALPyAEdUcNs/Kri
+         y0wdQjtRgesQPv1yH4KbX2jBYemiOzTpuPf+dczvYxTVGZ2quVV8mTHQhPE8aLG4e7
+         DXI8KPzfDbQEhul6FRH1xmCTTBptlv18inIYrE3lZPKsxHrObglGNVUJjYWLJw+yRh
+         qLoEV/M0+FXsR2Yyl4A/8ONxeFBM4nRHoCK+SPySEBCED0DLIe2fRJWz1w55/Uvg/l
+         XxPsCan76eLvTZglTKRcCOa4i7hQJI9KrgiS2Iu63uqvrH8MGX/DwoTfVEw+ty44Xp
+         JVI04vumpZNTw==
+Date:   Thu, 16 Feb 2023 07:13:53 +0200
+From:   Mike Rapoport <rppt@kernel.org>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        wei.w.wang@intel.com
+Subject: Re: [PATCH v10 0/9] KVM: mm: fd-based approach for supporting KVM
+Message-ID: <Y+27kRxJoXlMcbtH@kernel.org>
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.6.1
-Subject: Re: [PATCH v2] vhost/vdpa: Add MSI translation tables to iommu for
- software-managed MSI
-Content-Language: en-US
-To:     Nanyong Sun <sunnanyong@huawei.com>, joro@8bytes.org,
-        will@kernel.org, robin.murphy@arm.com, mst@redhat.com
-Cc:     iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, wangrong68@huawei.com
-References: <20230207120843.1580403-1-sunnanyong@huawei.com>
-From:   Jason Wang <jasowang@redhat.com>
-In-Reply-To: <20230207120843.1580403-1-sunnanyong@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi,
 
-在 2023/2/7 20:08, Nanyong Sun 写道:
-> From: Rong Wang <wangrong68@huawei.com>
->
-> Once enable iommu domain for one device, the MSI
-> translation tables have to be there for software-managed MSI.
-> Otherwise, platform with software-managed MSI without an
-> irq bypass function, can not get a correct memory write event
-> from pcie, will not get irqs.
-> The solution is to obtain the MSI phy base address from
-> iommu reserved region, and set it to iommu MSI cookie,
-> then translation tables will be created while request irq.
->
-> Change log
-> ----------
->
-> v1->v2:
-> - add resv iotlb to avoid overlap mapping.
->
-> Signed-off-by: Rong Wang <wangrong68@huawei.com>
-> Signed-off-by: Nanyong Sun <sunnanyong@huawei.com>
-> ---
->   drivers/iommu/iommu.c |  1 +
->   drivers/vhost/vdpa.c  | 59 ++++++++++++++++++++++++++++++++++++++++---
->   2 files changed, 57 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> index 5f6a85aea501..af9c064ad8b2 100644
-> --- a/drivers/iommu/iommu.c
-> +++ b/drivers/iommu/iommu.c
-> @@ -2623,6 +2623,7 @@ void iommu_get_resv_regions(struct device *dev, struct list_head *list)
->   	if (ops->get_resv_regions)
->   		ops->get_resv_regions(dev, list);
->   }
-> +EXPORT_SYMBOL(iommu_get_resv_regions);
->   
->   /**
->    * iommu_put_resv_regions - release resered regions
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index ec32f785dfde..a58979da8acd 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -49,6 +49,7 @@ struct vhost_vdpa {
->   	struct completion completion;
->   	struct vdpa_device *vdpa;
->   	struct hlist_head as[VHOST_VDPA_IOTLB_BUCKETS];
-> +	struct vhost_iotlb resv_iotlb;
+On Fri, Dec 02, 2022 at 02:13:38PM +0800, Chao Peng wrote:
+> This patch series implements KVM guest private memory for confidential
+> computing scenarios like Intel TDX[1]. If a TDX host accesses
+> TDX-protected guest memory, machine check can happen which can further
+> crash the running host system, this is terrible for multi-tenant
+> configurations. The host accesses include those from KVM userspace like
+> QEMU. This series addresses KVM userspace induced crash by introducing
+> new mm and KVM interfaces so KVM userspace can still manage guest memory
+> via a fd-based approach, but it can never access the guest memory
+> content.
 
+Sorry for jumping late.
 
-Nit: it might be better to rename this as resv_regions.
+Unless I'm missing something, hibernation will also cause an machine check
+when there is TDX-protected memory in the system. When the hibernation
+creates memory snapshot it essentially walks all physical pages and saves
+their contents, so for TDX memory this will trigger machine check, right?
+ 
+>  Documentation/virt/kvm/api.rst         | 125 ++++++-
+>  arch/x86/entry/syscalls/syscall_32.tbl |   1 +
+>  arch/x86/entry/syscalls/syscall_64.tbl |   1 +
+>  arch/x86/include/asm/kvm_host.h        |   9 +
+>  arch/x86/kvm/Kconfig                   |   3 +
+>  arch/x86/kvm/mmu/mmu.c                 | 205 ++++++++++-
+>  arch/x86/kvm/mmu/mmu_internal.h        |  14 +-
+>  arch/x86/kvm/mmu/mmutrace.h            |   1 +
+>  arch/x86/kvm/mmu/tdp_mmu.c             |   2 +-
+>  arch/x86/kvm/x86.c                     |  17 +-
+>  include/linux/kvm_host.h               | 103 +++++-
+>  include/linux/restrictedmem.h          |  71 ++++
+>  include/linux/syscalls.h               |   1 +
+>  include/uapi/asm-generic/unistd.h      |   5 +-
+>  include/uapi/linux/kvm.h               |  53 +++
+>  include/uapi/linux/magic.h             |   1 +
+>  kernel/sys_ni.c                        |   3 +
+>  mm/Kconfig                             |   4 +
+>  mm/Makefile                            |   1 +
+>  mm/memory-failure.c                    |   3 +
+>  mm/restrictedmem.c                     | 318 +++++++++++++++++
+>  virt/kvm/Kconfig                       |   6 +
+>  virt/kvm/kvm_main.c                    | 469 +++++++++++++++++++++----
+>  23 files changed, 1323 insertions(+), 93 deletions(-)
+>  create mode 100644 include/linux/restrictedmem.h
+>  create mode 100644 mm/restrictedmem.c
 
-
->   	struct device dev;
->   	struct cdev cdev;
->   	atomic_t opened;
-> @@ -216,6 +217,8 @@ static int vhost_vdpa_reset(struct vhost_vdpa *v)
->   
->   	v->in_batch = 0;
->   
-> +	vhost_iotlb_reset(&v->resv_iotlb);
-> +
->   	return vdpa_reset(vdpa);
->   }
->   
-> @@ -1013,6 +1016,10 @@ static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
->   	    msg->iova + msg->size - 1 > v->range.last)
->   		return -EINVAL;
->   
-> +	if (vhost_iotlb_itree_first(&v->resv_iotlb, msg->iova,
-> +					msg->iova + msg->size - 1))
-> +		return -EINVAL;
-> +
->   	if (vhost_iotlb_itree_first(iotlb, msg->iova,
->   				    msg->iova + msg->size - 1))
->   		return -EEXIST;
-> @@ -1103,6 +1110,45 @@ static ssize_t vhost_vdpa_chr_write_iter(struct kiocb *iocb,
->   	return vhost_chr_write_iter(dev, from);
->   }
->   
-> +static int vhost_vdpa_resv_iommu_region(struct iommu_domain *domain, struct device *dma_dev,
-> +	struct vhost_iotlb *resv_iotlb)
-> +{
-> +	struct list_head dev_resv_regions;
-> +	phys_addr_t resv_msi_base = 0;
-> +	struct iommu_resv_region *region;
-> +	int ret = 0;
-> +	bool with_sw_msi = false;
-> +	bool with_hw_msi = false;
-> +
-> +	INIT_LIST_HEAD(&dev_resv_regions);
-> +	iommu_get_resv_regions(dma_dev, &dev_resv_regions);
-> +
-> +	list_for_each_entry(region, &dev_resv_regions, list) {
-> +		ret = vhost_iotlb_add_range_ctx(resv_iotlb, region->start,
-> +				region->start + region->length - 1,
-> +				0, 0, NULL);
-> +		if (ret) {
-> +			vhost_iotlb_reset(resv_iotlb);
-> +			break;
-> +		}
-> +
-> +		if (region->type == IOMMU_RESV_MSI)
-> +			with_hw_msi = true;
-> +
-> +		if (region->type == IOMMU_RESV_SW_MSI) {
-> +			resv_msi_base = region->start;
-> +			with_sw_msi = true;
-> +		}
-> +	}
-> +
-> +	if (!ret && !with_hw_msi && with_sw_msi)
-> +		ret = iommu_get_msi_cookie(domain, resv_msi_base);
-> +
-> +	iommu_put_resv_regions(dma_dev, &dev_resv_regions);
-> +
-> +	return ret;
-> +}
-
-
-As discussed in v1, I still prefer to factor out the common logic and 
-move them to iommu.c. It helps to simplify the future bug fixing and 
-enhancement.
-
-
-> +
->   static int vhost_vdpa_alloc_domain(struct vhost_vdpa *v)
->   {
->   	struct vdpa_device *vdpa = v->vdpa;
-> @@ -1128,11 +1174,16 @@ static int vhost_vdpa_alloc_domain(struct vhost_vdpa *v)
->   
->   	ret = iommu_attach_device(v->domain, dma_dev);
->   	if (ret)
-> -		goto err_attach;
-> +		goto err_alloc_domain;
->   
-> -	return 0;
-> +	ret = vhost_vdpa_resv_iommu_region(v->domain, dma_dev, &v->resv_iotlb);
-> +	if (ret)
-> +		goto err_attach_device;
->   
-> -err_attach:
-> +	return 0;
-> +err_attach_device:
-> +	iommu_detach_device(v->domain, dma_dev);
-> +err_alloc_domain:
->   	iommu_domain_free(v->domain);
->   	return ret;
->   }
-> @@ -1385,6 +1436,8 @@ static int vhost_vdpa_probe(struct vdpa_device *vdpa)
->   		goto err;
->   	}
->   
-> +	vhost_iotlb_init(&v->resv_iotlb, 0, 0);
-> +
->   	r = dev_set_name(&v->dev, "vhost-vdpa-%u", minor);
->   	if (r)
->   		goto err;
-
-
-We need clean resv_iotlb during release().
-
-Other looks good.
-
-Thanks
-
+-- 
+Sincerely yours,
+Mike.
