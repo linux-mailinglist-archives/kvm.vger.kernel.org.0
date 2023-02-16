@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 36F8E69988B
-	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 16:17:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 542426998E4
+	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 16:30:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229973AbjBPPRQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Feb 2023 10:17:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49438 "EHLO
+        id S230072AbjBPPak (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Feb 2023 10:30:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229508AbjBPPRO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Feb 2023 10:17:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 708C34D60F
-        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 07:16:31 -0800 (PST)
+        with ESMTP id S229765AbjBPPaj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Feb 2023 10:30:39 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57366C15B
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 07:29:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676560590;
+        s=mimecast20190719; t=1676561394;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=TfM1ZlXzKUkDCUxuJyuXPYY/56tUGy5zNcAq6nqBMRg=;
-        b=QnScjDBvB40UBs1QN9dlqrJ/okqyFI7B9Qcx2U55jirKwg08IoJtAhpBuRjbP+Itk2uG6c
-        26TnsJXoSuYCStyIsE5zVmQMv2upT3tKY4bob3FNum7eZL/E0QNFOUGsQHT3tZTGU9u1+q
-        RuHeIzDCEgaDaXPXDrUgIoXE5bw73iM=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=O+OnUaBkHzkHXcVUDxA2W+iWYjA7NHTym1Lcryt4gOY=;
+        b=BlBArEi1fqRBDPqUTWr0uQTLiUx2aowq8Q2/GYc6gpSKhpQ5uNTP7+UY7xrmP47oWgUh1F
+        LxUVMcKIRLS/pG1mqoxtjBeEt/NjgxhhWSJo9fo2WPuXtYHxp+deFdVv2uy3Z5uS0P3gUe
+        mOLt5QSWrLY9m1G6udAi2HnSLL/pXrI=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-6-thIHxH1ENp2mJDVkpb9olw-1; Thu, 16 Feb 2023 10:16:28 -0500
-X-MC-Unique: thIHxH1ENp2mJDVkpb9olw-1
-Received: by mail-qv1-f69.google.com with SMTP id pv24-20020ad45498000000b0056ea549d728so1236280qvb.10
-        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 07:16:28 -0800 (PST)
+ us-mta-175-uGRBLjmaNMCR0FpeEzClog-1; Thu, 16 Feb 2023 10:29:52 -0500
+X-MC-Unique: uGRBLjmaNMCR0FpeEzClog-1
+Received: by mail-qt1-f199.google.com with SMTP id c16-20020ac85190000000b003b841d1118aso1383045qtn.17
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 07:29:52 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TfM1ZlXzKUkDCUxuJyuXPYY/56tUGy5zNcAq6nqBMRg=;
-        b=Pw7/wZmiTLzlXMM38tt29qMDko7VKfoneqs3Pv7xvQ2cJE4BFr27oyErJuuVMYKMJT
-         4AxqeoPFWhJvedX0R0vmyehP++boBXGrU50EegMhTqE0qlVl/KXuWeftF1TL3IIX/cEC
-         EbeodAc59XXv7mzK32FOgbH20F6t5hydrT7H10CStpOu9qT92SpmLRf7NVTdh7rdo6cp
-         UNKkJw+08VcBHjvFvnyfIVPJRZvz/hijbYR3H/GQ+JLKV8lKn71o7Y9oAR56uWdRMZ0b
-         XB81PIe+nDLJYQ4/ogGGSsTPjIS+6ec3tCdqc5Jor8C160Cw8Q+a1ZRw6ufC+vTXZ4mj
-         CG/A==
-X-Gm-Message-State: AO0yUKU+k4zd8MjxieSAxraf1P5mnPrwSEWhVfnizKJbro8AJRLLJ2zR
-        +CnO4OvWlV0Red8EmZGzU/Y3DD2GLFXYcNpe4ymPMgJ0IUHYsQy+hgbI3S2DX1qf9AKPzjeQUtN
-        bvDRqocojSekc
-X-Received: by 2002:a05:622a:1648:b0:3bc:f954:323b with SMTP id y8-20020a05622a164800b003bcf954323bmr8607787qtj.29.1676560588094;
-        Thu, 16 Feb 2023 07:16:28 -0800 (PST)
-X-Google-Smtp-Source: AK7set/dluYNqaywOvNSwlQKJZgy3rhaatZv5j5C/MDcRhW5QcV5jfGsrL1X9gJrCHlPcHul8bH8Ow==
-X-Received: by 2002:a05:622a:1648:b0:3bc:f954:323b with SMTP id y8-20020a05622a164800b003bcf954323bmr8607754qtj.29.1676560587786;
-        Thu, 16 Feb 2023 07:16:27 -0800 (PST)
+        bh=O+OnUaBkHzkHXcVUDxA2W+iWYjA7NHTym1Lcryt4gOY=;
+        b=wnWUukLdX3OFHYAbQ1SNdkQZZp4bRfgWdv6tKAC2+CITTmSlhrgpPuJw/zQLvGbTYk
+         0BlzSkBTZSf8DRW+QZK0BjPF0W65yH3wTdEakJYzpnAigXBNAdfyMoQOz5lk4Sof02gT
+         tSRtV6tGmV6KOUWJQkylgccEheUvr5PZwFQ0YHXpatEkE4o8tPfj91Cfb0VFuPxV6NJe
+         Z4KRu8SVnoC17BP+Dj77SaAJxegGUASQMTgq3fBWu+IqpxIR8lyi+GiSlIPF5Z0+7NBo
+         ITq+8MEghSFg4sA1W/I7lt2qzz4kJEFgjEecpI5PiOZ6lbdmvs5dUwAayTMm2S/ossUp
+         YIEQ==
+X-Gm-Message-State: AO0yUKWpvS3G3cXk9nEg/BO2TwpLvUqcPmKs69SZ3n78Cug0OvDWdZPP
+        hXoe5+2EHaZVpjXYP/2I3fZRuTdf95p8uxTzPbpMUrBeqsgSExgLPJOFT9VWqbxKyjdn1BeiMKV
+        4d54PGsLMHo5c
+X-Received: by 2002:a05:6214:20aa:b0:56e:adc7:da2c with SMTP id 10-20020a05621420aa00b0056eadc7da2cmr11354175qvd.45.1676561392255;
+        Thu, 16 Feb 2023 07:29:52 -0800 (PST)
+X-Google-Smtp-Source: AK7set8jujUmYvQoNbsqIW6FTw3ePLT8M+JBb9cOjPHIvg9BVyvokaD0baxtMbtkCTkLtlm/CuRZaA==
+X-Received: by 2002:a05:6214:20aa:b0:56e:adc7:da2c with SMTP id 10-20020a05621420aa00b0056eadc7da2cmr11354147qvd.45.1676561391923;
+        Thu, 16 Feb 2023 07:29:51 -0800 (PST)
 Received: from sgarzare-redhat (host-82-57-51-167.retail.telecomitalia.it. [82.57.51.167])
-        by smtp.gmail.com with ESMTPSA id a13-20020ac8720d000000b003b860983973sm1371958qtp.60.2023.02.16.07.16.25
+        by smtp.gmail.com with ESMTPSA id b64-20020a37b243000000b0072ad54e36b2sm1349762qkf.93.2023.02.16.07.29.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Feb 2023 07:16:27 -0800 (PST)
-Date:   Thu, 16 Feb 2023 16:16:22 +0100
+        Thu, 16 Feb 2023 07:29:51 -0800 (PST)
+Date:   Thu, 16 Feb 2023 16:29:45 +0100
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
@@ -71,17 +71,18 @@ Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
         <virtualization@lists.linux-foundation.org>,
         "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
         kernel <kernel@sberdevices.ru>
-Subject: Re: [RFC PATCH v1 07/12] vsock/virtio: MGS_ZEROCOPY flag support
-Message-ID: <20230216151622.xu5jhha3wvc3us2b@sgarzare-redhat>
+Subject: Re: [RFC PATCH v1 12/12] test/vsock: MSG_ZEROCOPY support for
+ vsock_perf
+Message-ID: <20230216152945.qdh6vrq66pl2bfxe@sgarzare-redhat>
 References: <0e7c6fc4-b4a6-a27b-36e9-359597bba2b5@sberdevices.ru>
- <716333a1-d6d1-3dde-d04a-365d4a361bfe@sberdevices.ru>
+ <03570f48-f56a-2af4-9579-15a685127aeb@sberdevices.ru>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <716333a1-d6d1-3dde-d04a-365d4a361bfe@sberdevices.ru>
+In-Reply-To: <03570f48-f56a-2af4-9579-15a685127aeb@sberdevices.ru>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -89,314 +90,257 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 06, 2023 at 07:00:35AM +0000, Arseniy Krasnov wrote:
->This adds main logic of MSG_ZEROCOPY flag processing for packet
->creation. When this flag is set and user's iov iterator fits for
->zerocopy transmission, call 'get_user_pages()' and add returned
->pages to the newly created skb.
+On Mon, Feb 06, 2023 at 07:06:32AM +0000, Arseniy Krasnov wrote:
+>To use this option pass '--zc' parameter:
+
+--zerocopy or --zero-copy maybe better follow what we did with the other 
+parameters :-)
+
+>
+>./vsock_perf --zc --sender <cid> --port <port> --bytes <bytes to send>
+>
+>With this option MSG_ZEROCOPY flag will be passed to the 'send()' call.
 >
 >Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 >---
-> net/vmw_vsock/virtio_transport_common.c | 212 ++++++++++++++++++++++--
-> 1 file changed, 195 insertions(+), 17 deletions(-)
+> tools/testing/vsock/vsock_perf.c | 127 +++++++++++++++++++++++++++++--
+> 1 file changed, 120 insertions(+), 7 deletions(-)
 >
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index 05ce97b967ad..69e37f8a68a6 100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -37,6 +37,169 @@ virtio_transport_get_ops(struct vsock_sock *vsk)
-> 	return container_of(t, struct virtio_transport, transport);
+>diff --git a/tools/testing/vsock/vsock_perf.c b/tools/testing/vsock/vsock_perf.c
+>index a72520338f84..1d435be9b48e 100644
+>--- a/tools/testing/vsock/vsock_perf.c
+>+++ b/tools/testing/vsock/vsock_perf.c
+>@@ -18,6 +18,8 @@
+> #include <poll.h>
+> #include <sys/socket.h>
+> #include <linux/vm_sockets.h>
+>+#include <sys/mman.h>
+>+#include <linux/errqueue.h>
+>
+> #define DEFAULT_BUF_SIZE_BYTES	(128 * 1024)
+> #define DEFAULT_TO_SEND_BYTES	(64 * 1024)
+>@@ -28,9 +30,14 @@
+> #define BYTES_PER_GB		(1024 * 1024 * 1024ULL)
+> #define NSEC_PER_SEC		(1000000000ULL)
+>
+>+#ifndef SOL_VSOCK
+>+#define SOL_VSOCK 287
+>+#endif
+
+I thought we use the current kernel headers when we compile the tests,
+do we need to fix something in the makefile?
+
+>+
+> static unsigned int port = DEFAULT_PORT;
+> static unsigned long buf_size_bytes = DEFAULT_BUF_SIZE_BYTES;
+> static unsigned long vsock_buf_bytes = DEFAULT_VSOCK_BUF_BYTES;
+>+static bool zerocopy;
+>
+> static void error(const char *s)
+> {
+>@@ -247,15 +254,74 @@ static void run_receiver(unsigned long rcvlowat_bytes)
+> 	close(fd);
 > }
 >
-
-I'd use bool if we don't need to return an error value in the following
-new functions.
-
->+static int virtio_transport_can_zcopy(struct iov_iter *iov_iter,
->+				      size_t free_space)
+>+static void recv_completion(int fd)
 >+{
->+	size_t pages;
->+	int i;
+>+	struct sock_extended_err *serr;
+>+	char cmsg_data[128];
+>+	struct cmsghdr *cm;
+>+	struct msghdr msg;
+>+	int ret;
 >+
->+	if (!iter_is_iovec(iov_iter))
->+		return -1;
+>+	msg.msg_control = cmsg_data;
+>+	msg.msg_controllen = sizeof(cmsg_data);
 >+
->+	if (iov_iter->iov_offset)
->+		return -1;
+>+	ret = recvmsg(fd, &msg, MSG_ERRQUEUE);
+>+	if (ret == -1)
+>+		return;
 >+
->+	/* We can't send whole iov. */
->+	if (free_space < iov_iter->count)
->+		return -1;
->+
->+	for (pages = 0, i = 0; i < iov_iter->nr_segs; i++) {
->+		const struct iovec *iovec;
->+		int pages_in_elem;
->+
->+		iovec = &iov_iter->iov[i];
->+
->+		/* Base must be page aligned. */
->+		if (offset_in_page(iovec->iov_base))
->+			return -1;
->+
->+		/* Only last element could have not page aligned size.  */
->+		if (i != (iov_iter->nr_segs - 1)) {
->+			if (offset_in_page(iovec->iov_len))
->+				return -1;
->+
->+			pages_in_elem = iovec->iov_len >> PAGE_SHIFT;
->+		} else {
->+			pages_in_elem = round_up(iovec->iov_len, PAGE_SIZE);
->+			pages_in_elem >>= PAGE_SHIFT;
->+		}
->+
->+		/* In case of user's pages - one page is one frag. */
->+		if (pages + pages_in_elem > MAX_SKB_FRAGS)
->+			return -1;
->+
->+		pages += pages_in_elem;
+>+	cm = CMSG_FIRSTHDR(&msg);
+>+	if (!cm) {
+>+		fprintf(stderr, "cmsg: no cmsg\n");
+>+		return;
 >+	}
 >+
->+	return 0;
->+}
->+
->+static int virtio_transport_init_zcopy_skb(struct vsock_sock *vsk,
->+					   struct sk_buff *skb,
->+					   struct iov_iter *iter,
->+					   bool zerocopy)
->+{
->+	struct ubuf_info_msgzc *uarg_zc;
->+	struct ubuf_info *uarg;
->+
->+	uarg = msg_zerocopy_realloc(sk_vsock(vsk),
->+				    iov_length(iter->iov, iter->nr_segs),
->+				    NULL);
->+
->+	if (!uarg)
->+		return -1;
->+
->+	uarg_zc = uarg_to_msgzc(uarg);
->+	uarg_zc->zerocopy = zerocopy ? 1 : 0;
->+
->+	skb_zcopy_init(skb, uarg);
->+
->+	return 0;
->+}
->+
->+static int virtio_transport_fill_nonlinear_skb(struct sk_buff *skb,
->+					       struct vsock_sock *vsk,
->+					       struct virtio_vsock_pkt_info *info)
->+{
->+	struct iov_iter *iter;
->+	int frag_idx;
->+	int seg_idx;
->+
->+	iter = &info->msg->msg_iter;
->+	frag_idx = 0;
->+	VIRTIO_VSOCK_SKB_CB(skb)->curr_frag = 0;
->+	VIRTIO_VSOCK_SKB_CB(skb)->frag_off = 0;
->+
->+	/* At this moment:
->+	 * 1) 'iov_offset' is zero.
->+	 * 2) Every 'iov_base' and 'iov_len' are also page aligned
->+	 *    (except length of the last element).
->+	 * 3) Number of pages in this iov <= MAX_SKB_FRAGS.
->+	 * 4) Length of the data fits in current credit space.
->+	 */
->+	for (seg_idx = 0; seg_idx < iter->nr_segs; seg_idx++) {
->+		struct page *user_pages[MAX_SKB_FRAGS];
->+		const struct iovec *iovec;
->+		size_t last_frag_len;
->+		size_t pages_in_seg;
->+		int page_idx;
->+
->+		iovec = &iter->iov[seg_idx];
->+		pages_in_seg = iovec->iov_len >> PAGE_SHIFT;
->+
->+		if (iovec->iov_len % PAGE_SIZE) {
->+			last_frag_len = iovec->iov_len % PAGE_SIZE;
->+			pages_in_seg++;
->+		} else {
->+			last_frag_len = PAGE_SIZE;
->+		}
->+
->+		if (get_user_pages((unsigned long)iovec->iov_base,
->+				   pages_in_seg, FOLL_GET, user_pages,
->+				   NULL) != pages_in_seg)
->+			return -1;
-
-Reading the get_user_pages() documentation, this should pin the user
-pages, so we should be fine if we then expose them in the virtqueue.
-
-But reading Documentation/core-api/pin_user_pages.rst it seems that
-drivers should use "pin_user_pages*() for DMA-pinned pages", so I'm not
-sure what we should do.
-
-Additional advice would be great!
-
-Anyway, when we are done using the pages, we should call put_page() or
-unpin_user_page() depending on how we pin them.
-
->+
->+		for (page_idx = 0; page_idx < pages_in_seg; page_idx++) {
->+			int frag_len = PAGE_SIZE;
->+
->+			if (page_idx == (pages_in_seg - 1))
->+				frag_len = last_frag_len;
->+
->+			skb_fill_page_desc(skb, frag_idx++,
->+					   user_pages[page_idx], 0,
->+					   frag_len);
->+			skb_len_add(skb, frag_len);
->+		}
+>+	if (cm->cmsg_level != SOL_VSOCK) {
+>+		fprintf(stderr, "cmsg: unexpected 'cmsg_level'\n");
+>+		return;
 >+	}
 >+
->+	return virtio_transport_init_zcopy_skb(vsk, skb, iter, true);
->+}
->+
->+static int virtio_transport_copy_payload(struct sk_buff *skb,
->+					 struct vsock_sock *vsk,
->+					 struct virtio_vsock_pkt_info *info,
->+					 size_t len)
->+{
->+	void *payload;
->+	int err;
->+
->+	payload = skb_put(skb, len);
->+	err = memcpy_from_msg(payload, info->msg, len);
->+	if (err)
->+		return -1;
->+
->+	if (msg_data_left(info->msg))
->+		return 0;
->+
->+	if (info->type == VIRTIO_VSOCK_TYPE_SEQPACKET) {
->+		struct virtio_vsock_hdr *hdr;
->+
->+		hdr = virtio_vsock_hdr(skb);
->+
->+		hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
->+
->+		if (info->msg->msg_flags & MSG_EOR)
->+			hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
+>+	if (cm->cmsg_type) {
+>+		fprintf(stderr, "cmsg: unexpected 'cmsg_type'\n");
+>+		return;
 >+	}
 >+
-
-A comment here explaining why this is necessary would be helpful.
-
->+	if (info->flags & MSG_ZEROCOPY)
->+		return virtio_transport_init_zcopy_skb(vsk, skb,
->+						       &info->msg->msg_iter,
->+						       false);
+>+	serr = (void *)CMSG_DATA(cm);
+>+	if (serr->ee_origin != SO_EE_ORIGIN_ZEROCOPY) {
+>+		fprintf(stderr, "serr: wrong origin\n");
+>+		return;
+>+	}
 >+
->+	return 0;
+>+	if (serr->ee_errno) {
+>+		fprintf(stderr, "serr: wrong error code\n");
+>+		return;
+>+	}
+>+
+>+	if (zerocopy && (serr->ee_code & SO_EE_CODE_ZEROCOPY_COPIED))
+>+		fprintf(stderr, "warning: copy instead of zerocopy\n");
 >+}
 >+
-> /* Returns a new packet on success, otherwise returns NULL.
->  *
->  * If NULL is returned, errp is set to a negative errno.
->@@ -47,15 +210,31 @@ virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
-> 			   u32 src_cid,
-> 			   u32 src_port,
-> 			   u32 dst_cid,
->-			   u32 dst_port)
->+			   u32 dst_port,
->+			   struct vsock_sock *vsk)
+>+static void enable_so_zerocopy(int fd)
+>+{
+>+	int val = 1;
+>+
+>+	if (setsockopt(fd, SOL_SOCKET, SO_ZEROCOPY, &val, sizeof(val)))
+>+		error("setsockopt(SO_ZEROCOPY)");
+>+}
+>+
+> static void run_sender(int peer_cid, unsigned long to_send_bytes)
 > {
->-	const size_t skb_len = VIRTIO_VSOCK_SKB_HEADROOM + len;
->+	const size_t skb_len = VIRTIO_VSOCK_SKB_HEADROOM;
-> 	struct virtio_vsock_hdr *hdr;
-> 	struct sk_buff *skb;
->-	void *payload;
->-	int err;
->+	bool use_zcopy = false;
+> 	time_t tx_begin_ns;
+> 	time_t tx_total_ns;
+> 	size_t total_send;
+>+	time_t time_in_send;
+> 	void *data;
+> 	int fd;
+>
+>-	printf("Run as sender\n");
+>+	if (zerocopy)
+>+		printf("Run as sender MSG_ZEROCOPY\n");
+>+	else
+>+		printf("Run as sender\n");
 >+
->+	if (info->msg) {
->+		/* If SOCK_ZEROCOPY is not enabled, ignore MSG_ZEROCOPY
->+		 * flag later and continue in classic way(e.g. without
->+		 * completion).
->+		 */
->+		if (!sock_flag(sk_vsock(vsk), SOCK_ZEROCOPY)) {
-
-`vsk` can be null, should we check it?
-Otherwise, what about passing only a flag?
-So the caller will check it.
-
->+			info->flags &= ~MSG_ZEROCOPY;
->+		} else {
->+			if ((info->flags & MSG_ZEROCOPY) &&
->+			    !virtio_transport_can_zcopy(&info->msg->msg_iter, len)) {
-
-This part is not very clear, I think virtio_transport_can_zcopy()
-should return `true` if "can_zcopy".
-
->+				use_zcopy = true;
->+			}
+> 	printf("Connect to %i:%u\n", peer_cid, port);
+> 	printf("Send %lu bytes\n", to_send_bytes);
+> 	printf("TX buffer %lu bytes\n", buf_size_bytes);
+>@@ -265,25 +331,58 @@ static void run_sender(int peer_cid, unsigned long to_send_bytes)
+> 	if (fd < 0)
+> 		exit(EXIT_FAILURE);
+>
+>-	data = malloc(buf_size_bytes);
+>+	if (zerocopy) {
+>+		enable_so_zerocopy(fd);
+>
+>-	if (!data) {
+>-		fprintf(stderr, "'malloc()' failed\n");
+>-		exit(EXIT_FAILURE);
+>+		data = mmap(NULL, buf_size_bytes, PROT_READ | PROT_WRITE,
+>+			    MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+>+		if (data == MAP_FAILED) {
+>+			perror("mmap");
+>+			exit(EXIT_FAILURE);
 >+		}
->+	}
->
->-	skb = virtio_vsock_alloc_skb(skb_len, GFP_KERNEL);
->+	/* For MSG_ZEROCOPY length will be added later. */
->+	skb = virtio_vsock_alloc_skb(skb_len + (use_zcopy ? 0 : len), GFP_KERNEL);
+>+	} else {
+>+		data = malloc(buf_size_bytes);
+>+
+>+		if (!data) {
+>+			fprintf(stderr, "'malloc()' failed\n");
+>+			exit(EXIT_FAILURE);
+>+		}
+> 	}
 
-I think is better to adsjut `skb_len` in the previous block, when we set
-`use_zcopy = true`, we can do `skb_len -= len` (with the comment);
+Eventually to simplify the code I think we can use the mmaped buffer in
+both cases.
 
-> 	if (!skb)
-> 		return NULL;
 >
->@@ -70,18 +249,15 @@ virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
-> 	hdr->len	= cpu_to_le32(len);
+> 	memset(data, 0, buf_size_bytes);
+> 	total_send = 0;
+>+	time_in_send = 0;
+> 	tx_begin_ns = current_nsec();
 >
-> 	if (info->msg && len > 0) {
->-		payload = skb_put(skb, len);
->-		err = memcpy_from_msg(payload, info->msg, len);
->-		if (err)
->-			goto out;
->+		int err;
+> 	while (total_send < to_send_bytes) {
+> 		ssize_t sent;
+>+		size_t rest_bytes;
+>+		time_t before;
+>+
+>+		rest_bytes = to_send_bytes - total_send;
 >
->-		if (msg_data_left(info->msg) == 0 &&
->-		    info->type == VIRTIO_VSOCK_TYPE_SEQPACKET) {
->-			hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
->+		if (use_zcopy)
->+			err = virtio_transport_fill_nonlinear_skb(skb, vsk, info);
->+		else
->+			err = virtio_transport_copy_payload(skb, vsk, info, len);
+>-		sent = write(fd, data, buf_size_bytes);
+>+		before = current_nsec();
+>+		sent = send(fd, data, (rest_bytes > buf_size_bytes) ?
+>+			    buf_size_bytes : rest_bytes,
+>+			    zerocopy ? MSG_ZEROCOPY : 0);
+>+		time_in_send += (current_nsec() - before);
 >
->-			if (info->msg->msg_flags & MSG_EOR)
->-				hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
->-		}
->+		if (err)
->+			goto out;
+> 		if (sent <= 0)
+> 			error("write");
+>
+>+		if (zerocopy) {
+>+			struct pollfd fds = { 0 };
+>+
+>+			fds.fd = fd;
+
+Which event are we waiting for here?
+
+>+
+>+			if (poll(&fds, 1, -1) < 0) {
+>+				perror("poll");
+>+				exit(EXIT_FAILURE);
+>+			}
+
+We need this because we use only one buffer, but if we use more than
+one, we could take full advantage of zerocopy, right?
+
+Otherwise, I don't think it's a fair comparison with non-zerocopy.
+
+Thanks,
+Stefano
+
+>+
+>+			recv_completion(fd);
+>+		}
+>+
+> 		total_send += sent;
 > 	}
 >
-> 	if (info->reply)
->@@ -266,7 +442,8 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+>@@ -294,9 +393,14 @@ static void run_sender(int peer_cid, unsigned long to_send_bytes)
+> 	       get_gbps(total_send * 8, tx_total_ns));
+> 	printf("total time in 'write()': %f sec\n",
+> 	       (float)tx_total_ns / NSEC_PER_SEC);
+>+	printf("time in send %f\n", (float)time_in_send / NSEC_PER_SEC);
 >
-> 	skb = virtio_transport_alloc_skb(info, pkt_len,
-> 					 src_cid, src_port,
->-					 dst_cid, dst_port);
->+					 dst_cid, dst_port,
->+					 vsk);
-> 	if (!skb) {
-> 		virtio_transport_put_credit(vvs, pkt_len);
-> 		return -ENOMEM;
->@@ -842,6 +1019,7 @@ virtio_transport_stream_enqueue(struct vsock_sock *vsk,
-> 		.msg = msg,
-> 		.pkt_len = len,
-> 		.vsk = vsk,
->+		.flags = msg->msg_flags,
-> 	};
+> 	close(fd);
+>-	free(data);
+>+
+>+	if (zerocopy)
+>+		munmap(data, buf_size_bytes);
+>+	else
+>+		free(data);
+> }
 >
-> 	return virtio_transport_send_pkt_info(vsk, &info);
->@@ -894,7 +1072,7 @@ static int virtio_transport_reset_no_sock(const struct virtio_transport *t,
-> 					   le64_to_cpu(hdr->dst_cid),
-> 					   le32_to_cpu(hdr->dst_port),
-> 					   le64_to_cpu(hdr->src_cid),
->-					   le32_to_cpu(hdr->src_port));
->+					   le32_to_cpu(hdr->src_port), NULL);
-> 	if (!reply)
-> 		return -ENOMEM;
+> static const char optstring[] = "";
+>@@ -336,6 +440,11 @@ static const struct option longopts[] = {
+> 		.has_arg = required_argument,
+> 		.val = 'R',
+> 	},
+>+	{
+>+		.name = "zc",
+>+		.has_arg = no_argument,
+>+		.val = 'Z',
+>+	},
+> 	{},
+> };
 >
+>@@ -351,6 +460,7 @@ static void usage(void)
+> 	       "  --help			This message\n"
+> 	       "  --sender   <cid>		Sender mode (receiver default)\n"
+> 	       "                                <cid> of the receiver to connect to\n"
+>+	       "  --zc				Enable zerocopy\n"
+> 	       "  --port     <port>		Port (default %d)\n"
+> 	       "  --bytes    <bytes>KMG		Bytes to send (default %d)\n"
+> 	       "  --buf-size <bytes>KMG		Data buffer size (default %d). In sender mode\n"
+>@@ -413,6 +523,9 @@ int main(int argc, char **argv)
+> 		case 'H': /* Help. */
+> 			usage();
+> 			break;
+>+		case 'Z': /* Zerocopy. */
+>+			zerocopy = true;
+>+			break;
+> 		default:
+> 			usage();
+> 		}
 >-- 
 >2.25.1
+>
 
