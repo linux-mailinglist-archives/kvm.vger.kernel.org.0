@@ -2,157 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 681C8698954
-	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 01:36:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8590069895B
+	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 01:41:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229525AbjBPAgi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Feb 2023 19:36:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38326 "EHLO
+        id S229605AbjBPAle (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Feb 2023 19:41:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229462AbjBPAgh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Feb 2023 19:36:37 -0500
-Received: from out-246.mta0.migadu.com (out-246.mta0.migadu.com [91.218.175.246])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C879242DCF
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 16:36:35 -0800 (PST)
-Date:   Thu, 16 Feb 2023 00:36:18 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1676507794;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=jUWghOA0XMQm7ZnAAYelpbgLNnK2ho6Hsw1M8ipcYbM=;
-        b=tpHgqc1NbfynRGVXEBegZGlS4EH/rrYKUj17F6cPjtFbCGvZsSQK4op38ZarbDWQ97rYnL
-        Ow76UigCBqT3IqOJrVdVsxbgPSRSWzQXs8CJJD7GaO9dAXjFLXL9JV6OJT3bf0JxRPPE5s
-        nFlZ5XPc67wfqLRGDNSWH/pyUT+NpZg=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
-        yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, qperret@google.com,
-        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
-        rananta@google.com, bgardon@google.com, ricarkol@gmail.com
-Subject: Re: [PATCH v3 04/12] KVM: arm64: Add kvm_pgtable_stage2_split()
-Message-ID: <Y+16gsTbsZyUBMAt@linux.dev>
-References: <20230215174046.2201432-1-ricarkol@google.com>
- <20230215174046.2201432-5-ricarkol@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230215174046.2201432-5-ricarkol@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229551AbjBPAlc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Feb 2023 19:41:32 -0500
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D54F442DF2
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 16:41:30 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id n2-20020a170902d2c200b0019a8c8a13dfso200059plc.16
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 16:41:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KyDL7aG5vadqxs1ZDVMtNmlMp6h+pTwRitO0Vsd+xXA=;
+        b=UlyGz18Rq6eKdsAzT90nvKAGzObDlWojIa+4RUu1raCFtQqRUYcy3SspX0jxdJ9rb0
+         Nw7weHMdrBLZ31wvo1gRWxGi06bUObPJDZmDnyE3qo/jMx6/HDaZTvkl6TQazEiCG569
+         utifp/LkZIaUBLsxN8fp/8hujvgldojhDyaXNaI8MeFAbY3JeVjvD0NkW2/MUJ28e42V
+         ZMWfGCIgfQWx7Q2YfH7HNWCie5aE+GUgO/fc5leiKryY6MB/sRZht4uh4VjIQkc1sgzj
+         o5tcKSvOUm3vBr0kx5kdnMHT1xneMoUIuFwr5LQO2CkBOhtS2iifTcqrX4jc6sGsYjIC
+         IkyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KyDL7aG5vadqxs1ZDVMtNmlMp6h+pTwRitO0Vsd+xXA=;
+        b=GNl2dfKXI2zUq7QDvuLCE0jdi+j6HhZJPcNhuf7TPY7pqkNwxp2Is5x8M3arMIBF7b
+         BLskP4cd0X9Akxfxd8xF88a/dmCbrry7/U9LXmK1Ft4zQvNKgqqMMrbnFACnXsReAS1L
+         RZwKliAaH8aUFQBgzCirLXg0Magd0q23wRTAsVPc75Bh1QW9hg4Oa3S75balVr1LZis3
+         8Wglews5J3VOlvbpzg/9QQ8NQtkA2qjQNVTcisJuqKdyrZfVYlXOBHIKYkbX6j1UOSTH
+         e3MQ8FsClrUYuKH5WX4xO4kfoDane9bOwpz/xVgeUrRpAhsjBUcd5Y9pUNx6aIQcb35+
+         GGhQ==
+X-Gm-Message-State: AO0yUKVYZSICWW1fcWiNvJFeZEgPO7AoRib9YIWxIXPFiCfO/KGvYtfV
+        7XTQAv27++QGhLv5HuZ/5PLXYXJxwvwmU/hr6ZNAKx0/2STWjp8mrVnSLI9FeZvbHsrdfmX1U4W
+        3OoRktWrY5V/cA9bpeevie+fiGwgq7DEcrMH15ETVQtXK8fhH8kTx+ZX8VgDj9w020K1uC+k=
+X-Google-Smtp-Source: AK7set9ULYqZvTPKnXy7w+XwzeOZWCcMQ4uqZfm4qVlxGYvM8N3GKtC4fbQQyb++BnxdRdIQAt0St6aX14Ha/b9zJw==
+X-Received: from ackerleytng-cloudtop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1f5f])
+ (user=ackerleytng job=sendgmr) by 2002:a63:7a1c:0:b0:4fb:ab27:fa7 with SMTP
+ id v28-20020a637a1c000000b004fbab270fa7mr637750pgc.0.1676508089776; Wed, 15
+ Feb 2023 16:41:29 -0800 (PST)
+Date:   Thu, 16 Feb 2023 00:41:15 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.1.637.g21b0678d19-goog
+Message-ID: <cover.1676507663.git.ackerleytng@google.com>
+Subject: [RFC PATCH 0/2] Providing mount for memfd_restricted() syscall
+From:   Ackerley Tng <ackerleytng@google.com>
+To:     kvm@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, qemu-devel@nongnu.org
+Cc:     chao.p.peng@linux.intel.com, aarcange@redhat.com,
+        ak@linux.intel.com, akpm@linux-foundation.org, arnd@arndb.de,
+        bfields@fieldses.org, bp@alien8.de, corbet@lwn.net,
+        dave.hansen@intel.com, david@redhat.com, ddutile@redhat.com,
+        dhildenb@redhat.com, hpa@zytor.com, hughd@google.com,
+        jlayton@kernel.org, jmattson@google.com, joro@8bytes.org,
+        jun.nakajima@intel.com, kirill.shutemov@linux.intel.com,
+        linmiaohe@huawei.com, luto@kernel.org, mail@maciej.szmigiero.name,
+        mhocko@suse.com, michael.roth@amd.com, mingo@redhat.com,
+        naoya.horiguchi@nec.com, pbonzini@redhat.com, qperret@google.com,
+        rppt@kernel.org, seanjc@google.com, shuah@kernel.org,
+        steven.price@arm.com, tabba@google.com, tglx@linutronix.de,
+        vannapurve@google.com, vbabka@suse.cz, vkuznets@redhat.com,
+        wanpengli@tencent.com, wei.w.wang@intel.com, x86@kernel.org,
+        yu.c.zhang@linux.intel.com, Ackerley Tng <ackerleytng@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 15, 2023 at 05:40:38PM +0000, Ricardo Koller wrote:
+Hello,
 
-[...]
+This patchset builds upon the memfd_restricted() system call that has
+been discussed in the =E2=80=98KVM: mm: fd-based approach for supporting KV=
+M=E2=80=99
+patch series, at
+https://lore.kernel.org/lkml/20221202061347.1070246-1-chao.p.peng@linux.int=
+el.com/T/#m7e944d7892afdd1d62a03a287bd488c56e377b0c
 
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index fed314f2b320..e2fb78398b3d 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -1229,6 +1229,111 @@ int kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
->  	return 0;
->  }
->  
-> +struct stage2_split_data {
-> +	struct kvm_s2_mmu		*mmu;
-> +	void				*memcache;
-> +	u64				mc_capacity;
-> +};
-> +
-> +/*
-> + * Get the number of page-tables needed to replace a bock with a fully
-> + * populated tree, up to the PTE level, at particular level.
-> + */
-> +static inline u32 stage2_block_get_nr_page_tables(u32 level)
-> +{
-> +	switch (level) {
-> +	/* There are no blocks at level 0 */
-> +	case 1: return 1 + PTRS_PER_PTE;
-> +	case 2: return 1;
-> +	case 3: return 0;
-> +	default:
-> +		WARN_ON_ONCE(1);
-> +		return ~0;
-> +	}
-> +}
+The tree can be found at:
+https://github.com/googleprodkernel/linux-cc/tree/restrictedmem-provide-mou=
+nt-path
 
-This doesn't take into account our varying degrees of hugepage support
-across page sizes. Perhaps:
+In this patchset, a modification to the memfd_restricted() syscall is
+proposed, which allows userspace to provide a mount, on which the file
+will be created and returned from the memfd_restricted().
 
-  static inline int stage2_block_get_nr_page_tables(u32 level)
-  {
-          if (WARN_ON_ONCE(level < KVM_PGTABLE_MIN_BLOCK_LEVEL ||
-	                   level >= KVM_PGTABLE_MAX_LEVELS))
-	          return -EINVAL;
+Allowing userspace to provide a mount allows userspace to control
+various memory binding policies via tmpfs mount options, such as
+Transparent HugePage memory allocation policy through
+=E2=80=98huge=3Dalways/never=E2=80=99 and NUMA memory allocation policy thr=
+ough
+=E2=80=98mpol=3Dlocal/bind:*=E2=80=99.
 
-          switch (level) {
-	  case 1:
-	  	return PTRS_PER_PTE + 1;
-	  case 2:
-	  	return 1;
-	  case 3:
-	  	return 0;
-	  }
-  }
+Dependencies:
++ Sean=E2=80=99s iteration of the =E2=80=98KVM: mm: fd-based approach for s=
+upporting
+  KVM=E2=80=99 patch series at
+  https://github.com/sean-jc/linux/tree/x86/upm_base_support
++ Proposed fixes for these issues mentioned on the mailing list:
+    + https://lore.kernel.org/lkml/diqzzga0fv96.fsf@ackerleytng-cloudtop-sg=
+.c.googlers.com/
 
-paired with an explicit error check and early return on the caller side.
+Future work/TODOs:
++ man page for the memfd_restricted() syscall
++ Support for per file Transparent HugePage allocation hints
++ Support for per file NUMA binding hints
 
-> +static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
-> +			       enum kvm_pgtable_walk_flags visit)
-> +{
-> +	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
-> +	struct stage2_split_data *data = ctx->arg;
-> +	kvm_pte_t pte = ctx->old, new, *childp;
-> +	enum kvm_pgtable_prot prot;
-> +	void *mc = data->memcache;
-> +	u32 level = ctx->level;
-> +	u64 phys, nr_pages;
-> +	bool force_pte;
-> +	int ret;
-> +
-> +	/* No huge-pages exist at the last level */
-> +	if (level == KVM_PGTABLE_MAX_LEVELS - 1)
-> +		return 0;
-> +
-> +	/* We only split valid block mappings */
-> +	if (!kvm_pte_valid(pte))
-> +		return 0;
-> +
-> +	nr_pages = stage2_block_get_nr_page_tables(level);
-> +	if (data->mc_capacity >= nr_pages) {
-> +		/* Build a tree mapped down to the PTE granularity. */
-> +		force_pte = true;
-> +	} else {
-> +		/*
-> +		 * Don't force PTEs. This requires a single page of PMDs at the
-> +		 * PUD level, or a single page of PTEs at the PMD level. If we
-> +		 * are at the PUD level, the PTEs will be created recursively.
-> +		 */
-> +		force_pte = false;
-> +		nr_pages = 1;
-> +	}
+Ackerley Tng (2):
+  mm: restrictedmem: Allow userspace to specify mount_path for
+    memfd_restricted
+  selftests: restrictedmem: Check hugepage-ness of shmem file backing
+    restrictedmem fd
 
-Do we know if the 'else' branch here is even desirable? I.e. has
-recursive shattering been tested with PUD hugepages (HugeTLB 1G) and
-shown to improve guest performance while dirty tracking?
+ include/linux/syscalls.h                      |   2 +-
+ include/uapi/linux/restrictedmem.h            |   8 +
+ mm/restrictedmem.c                            |  63 +++-
+ tools/testing/selftests/Makefile              |   1 +
+ .../selftests/restrictedmem/.gitignore        |   3 +
+ .../testing/selftests/restrictedmem/Makefile  |  14 +
+ .../testing/selftests/restrictedmem/common.c  |   9 +
+ .../testing/selftests/restrictedmem/common.h  |   8 +
+ .../restrictedmem_hugepage_test.c             | 344 ++++++++++++++++++
+ 9 files changed, 445 insertions(+), 7 deletions(-)
+ create mode 100644 include/uapi/linux/restrictedmem.h
+ create mode 100644 tools/testing/selftests/restrictedmem/.gitignore
+ create mode 100644 tools/testing/selftests/restrictedmem/Makefile
+ create mode 100644 tools/testing/selftests/restrictedmem/common.c
+ create mode 100644 tools/testing/selftests/restrictedmem/common.h
+ create mode 100644 tools/testing/selftests/restrictedmem/restrictedmem_hug=
+epage_test.c
 
-The observations we've made on existing systems were that the successive
-break-before-make operations led to a measurable slowdown in guest
-pre-copy performance. Recursively building the page tables should
-actually result in *more* break-before-makes than if we just let the vCPU
-fault path lazily shatter hugepages.
-
--- 
-Thanks,
-Oliver
+--
+2.39.1.637.g21b0678d19-goog
