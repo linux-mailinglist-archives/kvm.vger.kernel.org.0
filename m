@@ -2,334 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2534A6990EC
-	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 11:17:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E8846990E8
+	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 11:17:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229896AbjBPKRe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Feb 2023 05:17:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52962 "EHLO
+        id S229670AbjBPKRT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Feb 2023 05:17:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229723AbjBPKR3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Feb 2023 05:17:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AF6E4DE1C
-        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 02:16:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676542598;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=k/s3z/K3lmbyo3jKgGFl7HdCfZ2nwsRj+PuGxWblknM=;
-        b=Rx/q3UKxNLJgaQRdm6Cayvi97R17v6ELgcO0q9Ut7Avn2OmAiDXJ0OOWdpmiCzVXBc5p+m
-        hd4S/4Y057eBtLvT8cs+dPZ870KlYQyT0xoMJjg6okhYF6u69H0XHm1QxUKSm36pzey7eB
-        9dF/RZCzSAmtmjIhB0lRqkvaBDWk0cM=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-518-IaiOIXt9OCGunwiwPXXWmQ-1; Thu, 16 Feb 2023 05:16:37 -0500
-X-MC-Unique: IaiOIXt9OCGunwiwPXXWmQ-1
-Received: by mail-qk1-f200.google.com with SMTP id x12-20020a05620a258c00b007051ae500a2so880897qko.15
-        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 02:16:37 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=k/s3z/K3lmbyo3jKgGFl7HdCfZ2nwsRj+PuGxWblknM=;
-        b=8HvoTsibeRHyQn9sOgMkRZSLRiQ2pJA/YsU8j1QzX4YHgcYvuozPoxfElBCImt9FzD
-         +F/t3Aim5MVPGOXzrsn146Su1BBulEH25Ur99b4ru5dzx619U51SpocqUznRw88EJSTl
-         YRvMMDgfmL6zC/cbRGueW28FsWDY1aeSkTP7Ij8ETsNPoifnwiVL6rXieNCNBKcM8nMR
-         BvLBLMBv88IDPq0fFhJ+n/0dkqNylbOYWruzHQnmutndFsP/E+5g4hDb8+ltSZVKq2MD
-         iMg+qcF0KdjPvEv5KF86FuZsjZWDZeE+eptDWSdZORGuHn0Y4DTelJwI+tebOLSjMxkd
-         lFdQ==
-X-Gm-Message-State: AO0yUKW6qeJ0FX4o1H8dFbIJt9vwLHEsW8FgUYrcS0/ykHuubervvNez
-        tThKSrOYKJu6fkqDOKKPrkcZf2L7NHG7QLcw5C9bl6tU/J1i8NKlTa9Kpv2i4UzTiG0b9EDsnFs
-        Lnwtze/nPfYM1
-X-Received: by 2002:a05:6214:c2f:b0:56e:bfda:a14f with SMTP id a15-20020a0562140c2f00b0056ebfdaa14fmr9539625qvd.9.1676542597082;
-        Thu, 16 Feb 2023 02:16:37 -0800 (PST)
-X-Google-Smtp-Source: AK7set/7erKu7JlmNSZNtANo2ENIubiFUB6Q9MQmhbJPU7u43h3bSc2LEqwIScpXL3Ip7O3tVadXLA==
-X-Received: by 2002:a05:6214:c2f:b0:56e:bfda:a14f with SMTP id a15-20020a0562140c2f00b0056ebfdaa14fmr9539586qvd.9.1676542596758;
-        Thu, 16 Feb 2023 02:16:36 -0800 (PST)
-Received: from sgarzare-redhat (host-82-57-51-167.retail.telecomitalia.it. [82.57.51.167])
-        by smtp.gmail.com with ESMTPSA id q4-20020a378e04000000b006ce580c2663sm911676qkd.35.2023.02.16.02.16.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Feb 2023 02:16:36 -0800 (PST)
-Date:   Thu, 16 Feb 2023 11:16:28 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Bobby Eshleman <bobby.eshleman@bytedance.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        Mykola Lysenko <mykolal@fb.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        KP Singh <kpsingh@kernel.org>,
-        Stanislav Fomichev <sdf@google.com>,
-        Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Bobby Eshleman <bobbyeshleman@gmail.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        jakub@cloudflare.com, hdanton@sina.com, cong.wang@bytedance.com
-Subject: Re: [PATCH RFC net-next v2 3/3] selftests/bpf: Add a test case for
- vsock sockmap
-Message-ID: <20230216101628.7z672auaimoauvi7@sgarzare-redhat>
-References: <20230118-support-vsock-sockmap-connectible-v2-0-58ffafde0965@bytedance.com>
- <20230118-support-vsock-sockmap-connectible-v2-3-58ffafde0965@bytedance.com>
+        with ESMTP id S229507AbjBPKRS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Feb 2023 05:17:18 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49B35AD3A;
+        Thu, 16 Feb 2023 02:17:16 -0800 (PST)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31G8fr9P001459;
+        Thu, 16 Feb 2023 10:17:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=IJ/vOFfQDWnEAnUcTGF5mAtBpqxO3VI4XxcI9PPPiAw=;
+ b=GKqwvUxAe1VLPSICktCvMczw71A52n17OKuBCIKekLJt0D6bjD6V3jxOJWhGbEDot+cU
+ lMCH7KrftvJBN77MuEFq7w9Q2c01W4IMBU7e/ijFOVI2MtyAlLxgsWwARkIeskmXmJQh
+ 96zI9qadpIDCnTY/I8UTqts1ZiB/e1aOIehtob6Xt1KgYHkGcBLa42ghWkJz7qFZbbwe
+ urlrJ7fpv8kzXr+4zWjtE4mtmL852CmKSzw6IXdp/LMSCIjIeCFDPrO3c/EREeqcd8sf
+ EZyNN+kZ8Pi5+aOoTcQqWCeEGDU+SolhXHvtOKYrMlE+DQAzHHSJBWWhzxG6BhFWJ9b0 Tg== 
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nsfvwv25w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 16 Feb 2023 10:17:15 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31G0sBUG008148;
+        Thu, 16 Feb 2023 10:17:13 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3np2n6cs8k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 16 Feb 2023 10:17:13 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31GAH9r448693754
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 16 Feb 2023 10:17:09 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BF7742005A;
+        Thu, 16 Feb 2023 10:17:09 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 721F92004F;
+        Thu, 16 Feb 2023 10:17:09 +0000 (GMT)
+Received: from [9.171.31.47] (unknown [9.171.31.47])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Thu, 16 Feb 2023 10:17:09 +0000 (GMT)
+Message-ID: <fd06a430-8cc3-e754-8efc-ef1c2d61d6a5@linux.ibm.com>
+Date:   Thu, 16 Feb 2023 11:17:09 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20230118-support-vsock-sockmap-connectible-v2-3-58ffafde0965@bytedance.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.2
+Subject: Re: [PATCH v1 1/1] s390: nmi: fix virtual-physical address confusion
+To:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        Nico Boehr <nrb@linux.ibm.com>
+Cc:     borntraeger@linux.ibm.com, imbrenda@linux.ibm.com,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org
+References: <20230215160252.14672-1-nrb@linux.ibm.com>
+ <20230215160252.14672-2-nrb@linux.ibm.com>
+ <Y+3KYSnJsznJEX4v@li-4a3a4a4c-28e5-11b2-a85c-a8d192c6f089.ibm.com>
+ <Y+35mHYZJlKT+e+s@li-4a3a4a4c-28e5-11b2-a85c-a8d192c6f089.ibm.com>
+Content-Language: en-US
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <Y+35mHYZJlKT+e+s@li-4a3a4a4c-28e5-11b2-a85c-a8d192c6f089.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 0X8enNwaE6CArA7Y7ASGDGecu7smMEHa
+X-Proofpoint-ORIG-GUID: 0X8enNwaE6CArA7Y7ASGDGecu7smMEHa
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-16_07,2023-02-16_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
+ lowpriorityscore=0 impostorscore=0 bulkscore=0 clxscore=1015
+ mlxlogscore=745 mlxscore=0 adultscore=0 phishscore=0 suspectscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302160085
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 30, 2023 at 08:35:14PM -0800, Bobby Eshleman wrote:
->Add a test case testing the redirection from connectible AF_VSOCK
->sockets to connectible AF_UNIX sockets.
->
->Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
->---
-> .../selftests/bpf/prog_tests/sockmap_listen.c      | 163 +++++++++++++++++++++
-> 1 file changed, 163 insertions(+)
+On 2/16/23 10:38, Alexander Gordeev wrote:
+> On Thu, Feb 16, 2023 at 07:17:07AM +0100, Alexander Gordeev wrote:
+>> Casting to (struct kvm_s390_sie_block *) is not superfluous,
+> 
+> s/not//
 
-For the vsock part:
-
-Acked-by: Stefano Garzarella <sgarzare@redhat.com>
-
->
->diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c b/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
->index 2cf0c7a3fe23..8b5a2e09c9ed 100644
->--- a/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
->+++ b/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
->@@ -18,6 +18,7 @@
-> #include <string.h>
-> #include <sys/select.h>
-> #include <unistd.h>
->+#include <linux/vm_sockets.h>
->
-> #include <bpf/bpf.h>
-> #include <bpf/libbpf.h>
->@@ -249,6 +250,16 @@ static void init_addr_loopback6(struct sockaddr_storage *ss, socklen_t *len)
-> 	*len = sizeof(*addr6);
-> }
->
->+static void init_addr_loopback_vsock(struct sockaddr_storage *ss, socklen_t *len)
->+{
->+	struct sockaddr_vm *addr = memset(ss, 0, sizeof(*ss));
->+
->+	addr->svm_family = AF_VSOCK;
->+	addr->svm_port = VMADDR_PORT_ANY;
->+	addr->svm_cid = VMADDR_CID_LOCAL;
->+	*len = sizeof(*addr);
->+}
->+
-> static void init_addr_loopback(int family, struct sockaddr_storage *ss,
-> 			       socklen_t *len)
-> {
->@@ -259,6 +270,9 @@ static void init_addr_loopback(int family, struct sockaddr_storage *ss,
-> 	case AF_INET6:
-> 		init_addr_loopback6(ss, len);
-> 		return;
->+	case AF_VSOCK:
->+		init_addr_loopback_vsock(ss, len);
->+		return;
-> 	default:
-> 		FAIL("unsupported address family %d", family);
-> 	}
->@@ -1434,6 +1448,8 @@ static const char *family_str(sa_family_t family)
-> 		return "IPv6";
-> 	case AF_UNIX:
-> 		return "Unix";
->+	case AF_VSOCK:
->+		return "VSOCK";
-> 	default:
-> 		return "unknown";
-> 	}
->@@ -1644,6 +1660,151 @@ static void test_unix_redir(struct test_sockmap_listen *skel, struct bpf_map *ma
-> 	unix_skb_redir_to_connected(skel, map, sotype);
-> }
->
->+/* Returns two connected loopback vsock sockets */
->+static int vsock_socketpair_connectible(int sotype, int *v0, int *v1)
->+{
->+	struct sockaddr_storage addr;
->+	socklen_t len = sizeof(addr);
->+	int s, p, c;
->+
->+	s = socket_loopback(AF_VSOCK, sotype);
->+	if (s < 0)
->+		return -1;
->+
->+	c = xsocket(AF_VSOCK, sotype | SOCK_NONBLOCK, 0);
->+	if (c == -1)
->+		goto close_srv;
->+
->+	if (getsockname(s, sockaddr(&addr), &len) < 0)
->+		goto close_cli;
->+
->+	if (connect(c, sockaddr(&addr), len) < 0 && errno != EINPROGRESS) {
->+		FAIL_ERRNO("connect");
->+		goto close_cli;
->+	}
->+
->+	len = sizeof(addr);
->+	p = accept_timeout(s, sockaddr(&addr), &len, IO_TIMEOUT_SEC);
->+	if (p < 0)
->+		goto close_cli;
->+
->+	*v0 = p;
->+	*v1 = c;
->+
->+	return 0;
->+
->+close_cli:
->+	close(c);
->+close_srv:
->+	close(s);
->+
->+	return -1;
->+}
->+
->+static void vsock_unix_redir_connectible(int sock_mapfd, int verd_mapfd,
->+					 enum redir_mode mode, int sotype)
->+{
->+	const char *log_prefix = redir_mode_str(mode);
->+	char a = 'a', b = 'b';
->+	int u0, u1, v0, v1;
->+	int sfd[2];
->+	unsigned int pass;
->+	int err, n;
->+	u32 key;
->+
->+	zero_verdict_count(verd_mapfd);
->+
->+	if (socketpair(AF_UNIX, SOCK_STREAM | SOCK_NONBLOCK, 0, sfd))
->+		return;
->+
->+	u0 = sfd[0];
->+	u1 = sfd[1];
->+
->+	err = vsock_socketpair_connectible(sotype, &v0, &v1);
->+	if (err) {
->+		FAIL("vsock_socketpair_connectible() failed");
->+		goto close_uds;
->+	}
->+
->+	err = add_to_sockmap(sock_mapfd, u0, v0);
->+	if (err) {
->+		FAIL("add_to_sockmap failed");
->+		goto close_vsock;
->+	}
->+
->+	n = write(v1, &a, sizeof(a));
->+	if (n < 0)
->+		FAIL_ERRNO("%s: write", log_prefix);
->+	if (n == 0)
->+		FAIL("%s: incomplete write", log_prefix);
->+	if (n < 1)
->+		goto out;
->+
->+	n = recv(mode == REDIR_INGRESS ? u0 : u1, &b, sizeof(b), MSG_DONTWAIT);
->+	if (n < 0)
->+		FAIL("%s: recv() err, errno=%d", log_prefix, errno);
->+	if (n == 0)
->+		FAIL("%s: incomplete recv", log_prefix);
->+	if (b != a)
->+		FAIL("%s: vsock socket map failed, %c != %c", log_prefix, a, b);
->+
->+	key = SK_PASS;
->+	err = xbpf_map_lookup_elem(verd_mapfd, &key, &pass);
->+	if (err)
->+		goto out;
->+	if (pass != 1)
->+		FAIL("%s: want pass count 1, have %d", log_prefix, pass);
->+out:
->+	key = 0;
->+	bpf_map_delete_elem(sock_mapfd, &key);
->+	key = 1;
->+	bpf_map_delete_elem(sock_mapfd, &key);
->+
->+close_vsock:
->+	close(v0);
->+	close(v1);
->+
->+close_uds:
->+	close(u0);
->+	close(u1);
->+}
->+
->+static void vsock_unix_skb_redir_connectible(struct test_sockmap_listen *skel,
->+					     struct bpf_map *inner_map,
->+					     int sotype)
->+{
->+	int verdict = bpf_program__fd(skel->progs.prog_skb_verdict);
->+	int verdict_map = bpf_map__fd(skel->maps.verdict_map);
->+	int sock_map = bpf_map__fd(inner_map);
->+	int err;
->+
->+	err = xbpf_prog_attach(verdict, sock_map, BPF_SK_SKB_VERDICT, 0);
->+	if (err)
->+		return;
->+
->+	skel->bss->test_ingress = false;
->+	vsock_unix_redir_connectible(sock_map, verdict_map, REDIR_EGRESS, sotype);
->+	skel->bss->test_ingress = true;
->+	vsock_unix_redir_connectible(sock_map, verdict_map, REDIR_INGRESS, sotype);
->+
->+	xbpf_prog_detach2(verdict, sock_map, BPF_SK_SKB_VERDICT);
->+}
->+
->+static void test_vsock_redir(struct test_sockmap_listen *skel, struct bpf_map *map)
->+{
->+	const char *family_name, *map_name;
->+	char s[MAX_TEST_NAME];
->+
->+	family_name = family_str(AF_VSOCK);
->+	map_name = map_type_str(map);
->+	snprintf(s, sizeof(s), "%s %s %s", map_name, family_name, __func__);
->+	if (!test__start_subtest(s))
->+		return;
->+
->+	vsock_unix_skb_redir_connectible(skel, map, SOCK_STREAM);
->+	vsock_unix_skb_redir_connectible(skel, map, SOCK_SEQPACKET);
->+}
->+
-> static void test_reuseport(struct test_sockmap_listen *skel,
-> 			   struct bpf_map *map, int family, int sotype)
-> {
->@@ -2015,12 +2176,14 @@ void serial_test_sockmap_listen(void)
-> 	run_tests(skel, skel->maps.sock_map, AF_INET6);
-> 	test_unix_redir(skel, skel->maps.sock_map, SOCK_DGRAM);
-> 	test_unix_redir(skel, skel->maps.sock_map, SOCK_STREAM);
->+	test_vsock_redir(skel, skel->maps.sock_map);
->
-> 	skel->bss->test_sockmap = false;
-> 	run_tests(skel, skel->maps.sock_hash, AF_INET);
-> 	run_tests(skel, skel->maps.sock_hash, AF_INET6);
-> 	test_unix_redir(skel, skel->maps.sock_hash, SOCK_DGRAM);
-> 	test_unix_redir(skel, skel->maps.sock_hash, SOCK_STREAM);
->+	test_vsock_redir(skel, skel->maps.sock_hash);
->
-> 	test_sockmap_listen__destroy(skel);
-> }
->
->-- 
->2.35.1
->
-
+Do you want to pick this up or should it go through the kvm tree?
