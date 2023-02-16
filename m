@@ -2,214 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A48DF698925
-	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 01:13:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1EECA69892A
+	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 01:22:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229574AbjBPAN3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Feb 2023 19:13:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58582 "EHLO
+        id S229596AbjBPAWV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Feb 2023 19:22:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229460AbjBPAN2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Feb 2023 19:13:28 -0500
-Received: from out-210.mta0.migadu.com (out-210.mta0.migadu.com [IPv6:2001:41d0:1004:224b::d2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A2C54390A
-        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 16:13:26 -0800 (PST)
-Date:   Thu, 16 Feb 2023 00:13:18 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1676506404;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=tsgik+TkLTT38ETaf6PMozlp7a9H3CC1m2Yq9zLY5NE=;
-        b=mVqJFtv48sjG0eIb+Z5HJxl+L1nSGmiQRTq7wcm8Cqt0FYDUcmFmvk479FcYaFRY1uua51
-        vNZJeOBEatShDipD19E/MROmWKv/qPbDNc9Bp7J0iOuCzETtIgJByYThJTJyL4OmhFEp6j
-        1z6H9D2E1DHi1JIcJ7jDMwalTzJ9cuk=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
-        yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, qperret@google.com,
-        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
-        rananta@google.com, bgardon@google.com, ricarkol@gmail.com
-Subject: Re: [PATCH v3 03/12] KVM: arm64: Add helper for creating unlinked
- stage2 subtrees
-Message-ID: <Y+11HkcHMwUrEkPz@linux.dev>
-References: <20230215174046.2201432-1-ricarkol@google.com>
- <20230215174046.2201432-4-ricarkol@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230215174046.2201432-4-ricarkol@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229460AbjBPAWT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Feb 2023 19:22:19 -0500
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5AD4298DF
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 16:22:17 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-53317a0238dso2126107b3.17
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 16:22:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=OO/XTincpCiOXImHy7SwOjlBWMW8XPG1CnOI7CA/ZcY=;
+        b=LnBstyJy4LT3mEIvdskbIgeDS+rclo6poLMV+Nv5ZzkibiXvVIGYgkx+eOYc5BJHvL
+         0zETyvNfNI/evJrwJjztLvCpN2ptg7Fb4ErZw3wTbRnLzZmYj7aGlhQrL7iJI0yGogOP
+         rfyh44a+Gh2NWZVrepHI5BJIpv/+R24uMLgypUhJXK8IzqTxcYLcadWw38FdHhM2ZR8t
+         O4QkPfZroFOoYjKZqdQ7aQQHblRW81SOmO6DpONJjDgKmi+9IrJrKWbRF7I6XkGDYUmo
+         2gyVpBEA5dHppBpAM2NvB3AMfRXKL0UlijifmMlLRS7DVO4EL6O+XkniDfrgCR2HNKPO
+         2Vwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OO/XTincpCiOXImHy7SwOjlBWMW8XPG1CnOI7CA/ZcY=;
+        b=hwc4tdwSVgKCrDKpjHBa36APoJVUdP/uWKQSU8ptVz7M1QtnNU7WxV12/QF626i/3k
+         VgLdCgdY7OEZ/GM2VQqU9OQsvVQiLifMUQLI8ITHW/j2xIC0NRhSInH/kuOB2uR9hbFJ
+         Ks51vuGPkD6j/FOlEnSvTGYnVthpcZD6q0a/xGgFY20aZlYg1ZNDR28UyjNbmDvWqFyI
+         DA4LwtC8j8DrCqUNLNu509x5rjRqzZQIep66lU1iNPXqsydzzfYNEPp48OGs6WnT6Few
+         QKs0CWg54qJYDP2cdTzz5iwRje0BF8c3rV0Ms8hyOvZVtb8XLHznox4XAxfyzy6M5WSV
+         k4+w==
+X-Gm-Message-State: AO0yUKXyCDIr0lp4wMbK0ghO022hP1LGdqz1MF6IWfidq6wkYhUuHLPj
+        DdfJ390jo/bESWLfBm8rO8AaABeGIgI=
+X-Google-Smtp-Source: AK7set8TtgAp+JveubF1EyRpmR0tyRaCPAWGn+TbxCeFDcJCSfFyMY0Gdzt5kzn4yrgBcM4KmuI5pUnnlgk=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a5b:bcd:0:b0:8ac:a1b7:6fa3 with SMTP id
+ c13-20020a5b0bcd000000b008aca1b76fa3mr458932ybr.278.1676506937147; Wed, 15
+ Feb 2023 16:22:17 -0800 (PST)
+Date:   Wed, 15 Feb 2023 16:22:15 -0800
+In-Reply-To: <Y+1f/En6rvqoe6st@google.com>
+Mime-Version: 1.0
+References: <20221129193717.513824-1-mlevitsk@redhat.com> <20221129193717.513824-8-mlevitsk@redhat.com>
+ <Y9mWFlGdzoa8ZDW7@google.com> <a59505b3-5405-0409-bbf1-34466932c2c1@amd.com>
+ <Y+PIdJZtCsGH2Sw3@google.com> <2b5994e2-15ba-dd57-285c-fb33827a5275@amd.com> <Y+1f/En6rvqoe6st@google.com>
+Message-ID: <Y+13N/Ky19VK0rzq@google.com>
+Subject: Re: [PATCH v2 07/11] KVM: x86: add a delayed hardware NMI injection interface
+From:   Sean Christopherson <seanjc@google.com>
+To:     Santosh Shukla <santosh.shukla@amd.com>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+        Sandipan Das <sandipan.das@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+        Jiaxi Chen <jiaxi.chen@linux.intel.com>,
+        Babu Moger <babu.moger@amd.com>, linux-kernel@vger.kernel.org,
+        Jing Liu <jing2.liu@intel.com>,
+        Wyes Karny <wyes.karny@amd.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 15, 2023 at 05:40:37PM +0000, Ricardo Koller wrote:
-> Add a stage2 helper, kvm_pgtable_stage2_create_unlinked(), for creating
-> unlinked tables (the opposite of kvm_pgtable_stage2_free_unlinked()).
+On Wed, Feb 15, 2023, Sean Christopherson wrote:
+> On Tue, Feb 14, 2023, Santosh Shukla wrote:
+> > "
+> > V_NMI_MASK: Indicates whether virtual NMIs are masked. The processor will set V_NMI_MASK
+> > once it takes the virtual NMI. V_NMI_MASK is cleared when the guest successfully completes an
+> > IRET instruction or #VMEXIT occurs while delivering the virtual NMI
+> > "
+> >
+> > In my initial implementation I had changed V_NMI_MASK for the SMM scenario [1],
+> > This is also not required as HW will save the V_NMI/V_NMI_MASK on 
+> > SMM entry and restore them on RSM.
+> > 
+> > That said the svm_{get,set}_nmi_mask will look something like:
 
-You don't need to mention the free_unlinked() side of things, IMO.
+...
 
-> Creating an unlinked table is useful for splitting block PTEs into
-> subtrees of 4K PTEs.  For example, a 1G block PTE can be split into 4K
-> PTEs by first creating a fully populated tree, and then use it to
-> replace the 1G PTE in a single step.  This will be used in a
-> subsequent commit for eager huge-page splitting (a dirty-logging
-> optimization).
-
-This is all very PAGE_SIZE=4K centric :) Could you instead describe the
-operation in terms of the Linux page table hierarchy?
-
-i.e. '... useful for splitting hugepages into PTE-level mappings'
-
-> No functional change intended. This new function will be used in a
-> subsequent commit.
+> >  static void svm_set_nmi_mask(struct kvm_vcpu *vcpu, bool masked)
+> >  {
+> >         struct vcpu_svm *svm = to_svm(vcpu);
+> > 
+> > +       if (is_vnmi_enabled(svm))
+> > +               return;
+> > +
+> >         if (masked) {
+> >                 svm->nmi_masked = true;
+> >                 svm_set_iret_intercept(svm);
+> > 
+> > is there any inputs on above approach?
 > 
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> ---
->  arch/arm64/include/asm/kvm_pgtable.h | 29 +++++++++++++++++
->  arch/arm64/kvm/hyp/pgtable.c         | 47 ++++++++++++++++++++++++++++
->  2 files changed, 76 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 7c45082e6c23..2ea397ad3e63 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -460,6 +460,35 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
->   */
->  void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level);
->  
-> +/**
-> + * kvm_pgtable_stage2_create_unlinked() - Create an unlinked stage-2 paging structure.
-> + * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
-> + * @new:	Unlinked stage-2 paging structure to be created.
-> + * @phys:	Physical address of the memory to map.
-> + * @level:	Level of the stage-2 paging structure to be created.
+> What happens if software clears the "NMIs are blocked" flag?  If KVM can't clear
+> the flag, then we've got problems.  E.g. if KVM emulates IRET or SMI+RSM.  And I
+> I believe there are use cases that use KVM to snapshot and reload vCPU state,
+> e.g. record+replay?, in which case KVM_SET_VCPU_EVENTS needs to be able to adjust
+> NMI blocking too.
 
-I believe this is the starting level of the page table to be created,
-right? Might be worth calling that out explicitly as level could also be
-interpreted as mapping level.
-
-> + * @prot:	Permissions and attributes for the mapping.
-> + * @mc:		Cache of pre-allocated and zeroed memory from which to allocate
-> + *		page-table pages.
-> + * @force_pte:  Force mappings to PAGE_SIZE granularity.
-> + *
-> + * Create an unlinked page-table tree under @new. If @force_pte is
-> + * true or @level is the PMD level, then the tree is mapped up to the
-> + * PAGE_SIZE leaf PTE; the tree is mapped up one level otherwise. This
-> + * new page-table tree is not reachable (i.e., it is removed) from the
-
-'i.e. it is unlinked'
-
-> + * root pgd and it's therefore unreachableby the hardware page-table
-> + * walker. No TLB invalidation or CMOs are performed.
-> + *
-> + * If device attributes are not explicitly requested in @prot, then the
-> + * mapping will be normal, cacheable.
-> + *
-> + * Return: 0 only if a fully populated tree was created (all memory
-> + * under @level is mapped), negative error code on failure.
-> + */
-> +int kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
-> +				       kvm_pte_t *new, u64 phys, u32 level,
-> +				       enum kvm_pgtable_prot prot, void *mc,
-> +				       bool force_pte);
-> +
->  /**
->   * kvm_pgtable_stage2_map() - Install a mapping in a guest stage-2 page-table.
->   * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 0a5ef9288371..fed314f2b320 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -1181,6 +1181,53 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
->  	return kvm_pgtable_walk(pgt, addr, size, &walker);
->  }
->  
-> +int kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
-> +				      kvm_pte_t *new, u64 phys, u32 level,
-> +				      enum kvm_pgtable_prot prot, void *mc,
-> +				      bool force_pte)
-> +{
-> +	struct stage2_map_data map_data = {
-> +		.phys		= phys,
-> +		.mmu		= pgt->mmu,
-> +		.memcache	= mc,
-> +		.force_pte	= force_pte,
-> +	};
-> +	struct kvm_pgtable_walker walker = {
-> +		.cb		= stage2_map_walker,
-> +		.flags		= KVM_PGTABLE_WALK_LEAF |
-> +				  KVM_PGTABLE_WALK_SKIP_BBM |
-> +				  KVM_PGTABLE_WALK_SKIP_CMO,
-> +		.arg		= &map_data,
-> +	};
-> +	/* .addr (the IPA) is irrelevant for a removed table */
-> +	struct kvm_pgtable_walk_data data = {
-> +		.walker	= &walker,
-> +		.addr	= 0,
-> +		.end	= kvm_granule_size(level),
-> +	};
-> +	struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
-> +	kvm_pte_t *pgtable;
-> +	int ret;
-> +
-> +	ret = stage2_set_prot_attr(pgt, prot, &map_data.attr);
-> +	if (ret)
-> +		return ret;
-> +
-> +	pgtable = mm_ops->zalloc_page(mc);
-> +	if (!pgtable)
-> +		return -ENOMEM;
-> +
-> +	ret = __kvm_pgtable_walk(&data, mm_ops, (kvm_pteref_t)pgtable,
-> +				 level + 1);
-> +	if (ret) {
-> +		kvm_pgtable_stage2_free_unlinked(mm_ops, pgtable, level);
-> +		mm_ops->put_page(pgtable);
-> +		return ret;
-> +	}
-> +
-> +	*new = kvm_init_table_pte(pgtable, mm_ops);
-> +	return 0;
-
-Hmm. I don't think you really need the 'out' pointer here. Either the
-function fails and it returns a negative error, or it succeeds and
-returns a pointer.
-
-  kvm_pte_t *kvm_pgtable_stage2_create_unlinked(...)
-  {
-          int ret;
-
-	  [...]
-
-	  ret = __kvm_pgtable_walk(...);
-	  if (ret) {
-	          kvm_pgtable_stage2_free_unlinked(...);
-		  mm_ops->put_page(pgtable);
-		  return ERR_PTR(ret);
-	  }
-
-
-          return pgtable;
-  }
-
-  [...]
-
-  pgtable = kvm_pgtable_stage2_create_unlinked(...);
-  if (IS_ERR(pgtable))
-  	return PTR_ERR(pgtable);
-
--- 
-Thanks,
-Oliver
+Actually, what am I thinking.  Any type of state save/restore will need to stuff
+NMI blocking.  E.g. live migration of a VM that is handling an NMI (V_NMI_MASK=1)
+_and_ has a pending NMI (V_NMI=1) absolutely needs to set V_NMI_MASK=1 on the dest,
+otherwise the pending NMI will get serviced when the guest expects NMIs to be blocked.
