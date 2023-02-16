@@ -2,204 +2,249 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 310D8698B6D
-	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 05:40:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CED7698B73
+	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 05:44:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229517AbjBPEkY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Feb 2023 23:40:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32842 "EHLO
+        id S229556AbjBPEoI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Feb 2023 23:44:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229462AbjBPEkX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Feb 2023 23:40:23 -0500
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2100.outbound.protection.outlook.com [40.107.93.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E35628222;
-        Wed, 15 Feb 2023 20:40:21 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DSOcOiUTrMsNpF6nStSF6h+F5d5uMqKYeNK0+H3xYG6ucZBlLDyus48pxJJhNfNARsvHIkxB4NBpeW8+vcFgPrKw5bsWgG0fGNmX/NIDfkNvahG0Mq23sHE8DwlGPBjH6BM+BMD0t9bYast/oCGRrrnF7kS7C0BeAfjvnRS7gavcHmYVYIHSyejfn7pgSw5UHJ9f5pp3uMDeaWIqq7s1r+SAU5k6RLL6ch96HndiBlScgfSoT7xRQQrlMz4hdegLxhpvJY6dN2+4HwfyKfU9W3v8Zgwnlfo6s9+CTn6ZazD9t8lzYh0iGGYdZybvhxiEh7ySwG4l1DuCVCCAso2ZdA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UcKBmIL/BZUT3aPoeTK7G7VQkRe+PAHXWxz283a5MN0=;
- b=CqdH8LBEUDKe6GkI90uPWvfkKACZr5GtCjWMfN9yqTbaCz7+OwsYCp/TVwmHjLzH5ZQ9u/C48UnRB1bwl4fXc42iZP01eo+yZqZELWvnxRESp1QAjVDGNyFnjSVNakhXHOmUyZesfwSFsFBi0wexcm7Rh1TNyt1ppRroimMq5GYaQRZuxA5eShPBbO3RBAO6QU5AMZa5lzQNLmkXxrudKlfz0z/yvSvV2UEOdCtXMtHDxiLp7+4vrsEmQmn05GzH5fuLPuTRO7s4mjgTnYm1tOHyE8uIOvKCRo6Yv8PVY1WKM4gqIsNLqo4QxAKc2AZFQujwu1tGK4pPFRhBacQzwA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UcKBmIL/BZUT3aPoeTK7G7VQkRe+PAHXWxz283a5MN0=;
- b=DBlIPz2YSLxc+sXz4scX2iFUNI5KmQRvf1ChEL3VS3AS+VtQCEN38b886OK2Ox/B7K5/yE1+xQfFTWn0fDuqxBHPgVmZYia7HUNwdMBNZTNr4TytiTkUq2AGXP/IhOzHBLr8c8DAuhP8FQEmAXp3H8RQoTeCa1othgWUgqZMEgI=
-Received: from SA1PR21MB1335.namprd21.prod.outlook.com (2603:10b6:806:1f2::11)
- by SA1PR21MB2051.namprd21.prod.outlook.com (2603:10b6:806:1b6::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.6; Thu, 16 Feb
- 2023 04:40:15 +0000
-Received: from SA1PR21MB1335.namprd21.prod.outlook.com
- ([fe80::3747:daf4:7cc9:5ba2]) by SA1PR21MB1335.namprd21.prod.outlook.com
- ([fe80::3747:daf4:7cc9:5ba2%3]) with mapi id 15.20.6134.006; Thu, 16 Feb 2023
- 04:40:15 +0000
-From:   Dexuan Cui <decui@microsoft.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "sandipan.das@amd.com" <sandipan.das@amd.com>,
-        "Gupta, Pankaj" <pankaj.gupta@amd.com>,
-        "ray.huang@amd.com" <ray.huang@amd.com>,
-        "brijesh.singh@amd.com" <brijesh.singh@amd.com>,
-        "michael.roth@amd.com" <michael.roth@amd.com>,
-        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>
-CC:     Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Does earlyprintk=ttyS0 work for an AMD SNP guest on KVM?
-Thread-Topic: Does earlyprintk=ttyS0 work for an AMD SNP guest on KVM?
-Thread-Index: AdlBv/2siHbGoHczQeyMVKtAUkBIZw==
-Date:   Thu, 16 Feb 2023 04:40:14 +0000
-Message-ID: <SA1PR21MB13359DBABC5625368E369A42BFA09@SA1PR21MB1335.namprd21.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=58befa47-fe37-44a6-b515-533a56ad9479;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2023-02-16T04:07:30Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA1PR21MB1335:EE_|SA1PR21MB2051:EE_
-x-ms-office365-filtering-correlation-id: 7ca0acdf-57c4-4040-c026-08db0fd7e575
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: lP9AfSp6MJ7I/JfZ34euVeQt4Rz0rNUh04D7+bMMTwh7GvScYx35FE/Py571whsJNAXgU00XPnNKEpo3+AEG9n+pxX2VRarb9fTE+ilANnjXs7H2PlvkwLm21Q8SEE2w/veIIuU0wWPH2CGL1YVsfE9+luNFFZclJv8VXy3vApkjMuC2vHNuwdULSJ86BfG8dQbdZAO4Agi/tFGiNF8yaroIuBbz0vKjpYeHfZLJUEfEOMyrXA1Qyvc2wxhB4BevJ8Z0nu/gdo4V6gdCuGBPSFSFg4BhmL1nxjJ0IJD5s+SPkND+USijqQ1d0YU+nJ4UQ9f2CbEY8nH+NeRpWw+t850BPDvGcW57Dye9daGGM8rBJGN85dMODqwf35ycITdklMCO6/AccufDhrfGE+OdyhhuNIWI1i/WHZiL3Bhce9zw1ki0sE8iGc+LHB0pJG9DWi2yqIXOEyN3fDgemNPExhdVD9QytIam/K+FapD+OAw41/kJoMEP7seZvQnq3qTieTgVMdT1iMVg0hlCwukwyeiYTIwyjYfXf4t5wBqE/LysdF+74Rhm6jIzKYyXy5Fxsx2vatzWEStsspqWI3cPHi/2t7qi5SwN3xWK8D8QgVbVXqdXvPilXzU9Zi8QfO7ZUlJQ55iWhm84JDACpF0xZGyk5E/uVF5/+tt5Obq8OCxIbVnWZlGmEAaKoEpsvlG+PVXBT4dzOVm4+w8Q4rN8B0XnNgjTAPCX62mlwjOVJGiGDGY9ZhMq9QuVf8eZXkmqY9AV9k7PXDrIijMty8f8cQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR21MB1335.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(39860400002)(136003)(396003)(346002)(376002)(366004)(451199018)(110136005)(5660300002)(8936002)(82950400001)(122000001)(82960400001)(54906003)(38100700002)(83380400001)(26005)(71200400001)(7696005)(478600001)(186003)(9686003)(4326008)(8676002)(2906002)(33656002)(66476007)(64756008)(921005)(41300700001)(7416002)(66446008)(66946007)(66556008)(38070700005)(52536014)(10290500003)(86362001)(316002)(55016003)(76116006)(6506007)(8990500004);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?14r7H2cAi9Ye9syIdOc7i/gLQdFmT+EjnwW5s2g9snN2UNOFwKSLRiCjzOo7?=
- =?us-ascii?Q?UEYbXXFbE9XASXV5FjEqzDUwamDz/F+UH6R6FsL70NX9lfSca80VVFjX4wy+?=
- =?us-ascii?Q?Cu8NvP5r/LNhjzvUyukbf943r6X3sb1jhL2TWQj+S6W4+00/EfRmeYtSRkL+?=
- =?us-ascii?Q?tnO54tdCqSLIUf/CtTRRGd3BCHmHtv/q3G3u5dDbECbprpTlUF9lcJoTAeDa?=
- =?us-ascii?Q?sblqlpZ0HgICmnuDTZ2Vg8RpHBCoHjzZdA1wDWJU2vHFGCi+p/KGEuoda5R8?=
- =?us-ascii?Q?35PUGWK9PpFzuoEHtldxwwruZlSIXzX1gR84pZjzKVeqb51N6ZpryCb74WTE?=
- =?us-ascii?Q?1G5/DoLJDG19Rh/HA7I4Oxi1Cj+SpOaNzB87jzoZGfXpS2soJ8KItiY2ytP0?=
- =?us-ascii?Q?YdaOYYtQE+MnPNRCnwRxmvv9VgTfn9ddfkQj0ghsQ7lcUJGsftjv2ybCkErX?=
- =?us-ascii?Q?EOTdhYr6uCq7xu2J3Z1MuCkpF63S/AEpp0f9VPOLVUqFXBfn/o6VRhCkDa0F?=
- =?us-ascii?Q?BE+meETLPJIYQwm843+JGP1TjOSfiu45DkmEuRJMX5PrYIvsn8lNtK0pbCtn?=
- =?us-ascii?Q?Jm1f7zLAXIEESqeUdhPb63XUt6/ym7cMzWx9JnIaERIFgjxhZcq6+lITV5Zs?=
- =?us-ascii?Q?IcyZhmTP3X/zFwYMVlGS6CT4dy79vRLsASzAMhSt7g1CHInUXnVm1BV7b2Qa?=
- =?us-ascii?Q?LtGYBPRguDfpzvcNyygChSwDxU2RB2eBo2Ar8skCdKNQPJf6iuT3Ubh9+mWO?=
- =?us-ascii?Q?sfBJD6wS/QgiMUKnswcJ+16FDoGUv2Z/Ui8K2P+VQQDkybqe9fJrBrJunL0K?=
- =?us-ascii?Q?y2zjG4RYP0PwsOVPB9dOO9LA0CZKQh3bq7prSI0c9VS9b2oJXeHa1E7y0wJq?=
- =?us-ascii?Q?PC0LF3Qlp7aObYENl5ww1SBB++8Sc9Enpr29p9g7KeG7swixOsL9rxMSII+j?=
- =?us-ascii?Q?Lnvgdoz4rsLWRFvHTX1LzeS3R97ZGfGmDgAjeGdmkw16TloXnJibT4BX2qJd?=
- =?us-ascii?Q?a2MCfZ6NUCYkmFEk9/l5j03DU2PuOjDvZpUTzt4dddIL9WcZx0yTh2vOuEMt?=
- =?us-ascii?Q?EVLTZBDhq1nbvekzv+nM+gu/nQ0SF4dULSyLrB9mbkJ/n2fL8ySL1YbHhMO1?=
- =?us-ascii?Q?soRrKGmHjfPFXF0jLrvHqelCi6pWGKC/OIqrXDBrawM8p8o48qVi76M0+l13?=
- =?us-ascii?Q?2/fWQOP0X+5mTCgzjFwXjufW96z0bZrGXuMfVlWtL1Db6lOa5oIhtdaz4SXf?=
- =?us-ascii?Q?D8bBujsveFRZa+iDlq2/z59FpJTWnjBctYuPf//3TsUmqGBcv4qabPIkzcgf?=
- =?us-ascii?Q?XSwX+X0RcSu5ORtihUFUYZXobNhurGGjrMLHJHVvk2bDY6SNrhmTSShiJMt0?=
- =?us-ascii?Q?VO9090aC69dLnCkPqOtyHCdaWj8rrxHUTNyrJqsiCqlrgVFfkOdVU1+BMIkb?=
- =?us-ascii?Q?bycvQ+9PGGPq8Q3NXXij8utB1R0Kt8ZgURjuamBHJlLIl3qtuDW2p85VJwPi?=
- =?us-ascii?Q?dFyBVfhfN1W2UYp5s3rYALxfa2OPnKu8Z4mLOf+7+51v1FXGT0mrXkYuhIX1?=
- =?us-ascii?Q?W8ETpbQFJbU5EUvCREzut58yNQOSYLdxuOgKrc9t?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S229478AbjBPEn7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Feb 2023 23:43:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C54E32E0C6
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 20:43:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676522592;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3DDHO8i0zvrnMlu2LxipZBzY2ZSSiL5SyYkVWHiaTdo=;
+        b=F/Hs1aBhY3zU/XiwbYixyW5b4HuuyyNmYe+WjgC/Jba9HnIfOGoaf/8ihBrBoA2JBR8PjQ
+        VV4eQe+YYkospSH8sFDLocse8CU45e1PPTD675Ii+OePRt8Cjje5VDuWC1nfHSe2ytJG3t
+        m+koXiGWrML1eFOnxBXsghn55V7ePGI=
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
+ [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-241-RdvdFzasPpet-d3QH8hohQ-1; Wed, 15 Feb 2023 23:43:08 -0500
+X-MC-Unique: RdvdFzasPpet-d3QH8hohQ-1
+Received: by mail-pj1-f70.google.com with SMTP id mp1-20020a17090b190100b00233cc25fc7bso359177pjb.4
+        for <kvm@vger.kernel.org>; Wed, 15 Feb 2023 20:43:08 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3DDHO8i0zvrnMlu2LxipZBzY2ZSSiL5SyYkVWHiaTdo=;
+        b=HHitAjyA82w5EhFMZxvQtLnHnbnF5fWBYPUcqLybUS7CiAtqpQCCSt/zZThZt0LvTs
+         ZewyyKZrYZLeXGexVMqT28IIrRp1wjvWyk1N9dgJ3FzxtM38MmlEKVcsXGuJiG/Dogbb
+         NLLtMAACl/JkbfkQts+sChzMS+oqfEGP2CuyTl8UKB5mW4zsPp/kv8iCL7yJKhYsWc5R
+         XLjbQKKH9194rGB8WvOdsJclng3N1+pQwzMfrzKmyZbHaqLgoG8ufqgHSwx8PPM91Fv9
+         roygbsyQ+mEm7UXHaREPOlfnwT64s/DOcXskQg9aAWHtptt8jtK2Br/dCbbx/3gbFWGJ
+         Tkgw==
+X-Gm-Message-State: AO0yUKWG7fTxBj/n5mwIMdUjg8ND7QONGw6lQ77Z4YltLYI5wQE2UtfV
+        rVGgMqPYTgQRywNCiT++ur78KSL/GbNicUR6yNhezjFXi8J/XpBU3z+Q3Hf+67HA3qT4frTiSKP
+        NmG0VPE+NQXRu
+X-Received: by 2002:a17:90b:4c04:b0:234:bf0:86bc with SMTP id na4-20020a17090b4c0400b002340bf086bcmr5369921pjb.31.1676522587176;
+        Wed, 15 Feb 2023 20:43:07 -0800 (PST)
+X-Google-Smtp-Source: AK7set/qQ5O/TZ0PJALyrxA2Lethp9rxzMGA6y2yAhomtgRtTLlXGq4nNUzsUdYKVT2TS5pjlJl+Xw==
+X-Received: by 2002:a17:90b:4c04:b0:234:bf0:86bc with SMTP id na4-20020a17090b4c0400b002340bf086bcmr5369907pjb.31.1676522586789;
+        Wed, 15 Feb 2023 20:43:06 -0800 (PST)
+Received: from [10.72.12.253] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id l2-20020a17090aec0200b00233b5d6b4b5sm2306741pjy.16.2023.02.15.20.43.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 15 Feb 2023 20:43:06 -0800 (PST)
+Message-ID: <3bb88db8-1283-f16d-d16a-5d3fb958b584@redhat.com>
+Date:   Thu, 16 Feb 2023 12:43:00 +0800
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR21MB1335.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7ca0acdf-57c4-4040-c026-08db0fd7e575
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Feb 2023 04:40:14.4673
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Rr3VVJNAJ/1RJf+fDHmyBlhvpPmFaRg+yuibVu+90wXd+2V5oFRXABQNpfv8+ZwAf2M3SfAZL4q5BTXC2QsGgA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR21MB2051
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.6.1
+Subject: Re: [PATCH v2] vhost/vdpa: Add MSI translation tables to iommu for
+ software-managed MSI
+Content-Language: en-US
+To:     Nanyong Sun <sunnanyong@huawei.com>, joro@8bytes.org,
+        will@kernel.org, robin.murphy@arm.com, mst@redhat.com
+Cc:     iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, wangrong68@huawei.com
+References: <20230207120843.1580403-1-sunnanyong@huawei.com>
+From:   Jason Wang <jasowang@redhat.com>
+In-Reply-To: <20230207120843.1580403-1-sunnanyong@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi all,
-With the earlyprintk=3DttyS0 kernel parameter, a C-bit mode Linux SNP guest
-on Hyper-V always decides to crash via sev_es_terminate() in
-do_boot_stage2_vc(), because early_setup_ghcb() fails:
 
-early_setup_ghcb() ->
-  set_page_decrypted() ->
-    set_clr_page_flags() ->
-      split_large_pmd() ->
-        alloc_pgt_page() fails to allocate memory.
+在 2023/2/7 20:08, Nanyong Sun 写道:
+> From: Rong Wang <wangrong68@huawei.com>
+>
+> Once enable iommu domain for one device, the MSI
+> translation tables have to be there for software-managed MSI.
+> Otherwise, platform with software-managed MSI without an
+> irq bypass function, can not get a correct memory write event
+> from pcie, will not get irqs.
+> The solution is to obtain the MSI phy base address from
+> iommu reserved region, and set it to iommu MSI cookie,
+> then translation tables will be created while request irq.
+>
+> Change log
+> ----------
+>
+> v1->v2:
+> - add resv iotlb to avoid overlap mapping.
+>
+> Signed-off-by: Rong Wang <wangrong68@huawei.com>
+> Signed-off-by: Nanyong Sun <sunnanyong@huawei.com>
+> ---
+>   drivers/iommu/iommu.c |  1 +
+>   drivers/vhost/vdpa.c  | 59 ++++++++++++++++++++++++++++++++++++++++---
+>   2 files changed, 57 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index 5f6a85aea501..af9c064ad8b2 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -2623,6 +2623,7 @@ void iommu_get_resv_regions(struct device *dev, struct list_head *list)
+>   	if (ops->get_resv_regions)
+>   		ops->get_resv_regions(dev, list);
+>   }
+> +EXPORT_SYMBOL(iommu_get_resv_regions);
+>   
+>   /**
+>    * iommu_put_resv_regions - release resered regions
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index ec32f785dfde..a58979da8acd 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -49,6 +49,7 @@ struct vhost_vdpa {
+>   	struct completion completion;
+>   	struct vdpa_device *vdpa;
+>   	struct hlist_head as[VHOST_VDPA_IOTLB_BUCKETS];
+> +	struct vhost_iotlb resv_iotlb;
 
-static void *alloc_pgt_page(void *context)
-{
-...
-        /* Validate there is space available for a new page. */
-        if (pages->pgt_buf_offset >=3D pages->pgt_buf_size) {
-  ...
-              return NULL;
-        }
-...
-}
 
-alloc_pgt_page() fails to allocate memory because both
-pages->pgt_buf_offset and pages->pgt_buf_size are zero.
+Nit: it might be better to rename this as resv_regions.
 
 
-pgt_data.pgt_buf_size is zero because of this line in
-initialize_identity_maps()
-     pgt_data.pgt_buf_size =3D BOOT_PGT_SIZE - BOOT_INIT_PGT_SIZE;
+>   	struct device dev;
+>   	struct cdev cdev;
+>   	atomic_t opened;
+> @@ -216,6 +217,8 @@ static int vhost_vdpa_reset(struct vhost_vdpa *v)
+>   
+>   	v->in_batch = 0;
+>   
+> +	vhost_iotlb_reset(&v->resv_iotlb);
+> +
+>   	return vdpa_reset(vdpa);
+>   }
+>   
+> @@ -1013,6 +1016,10 @@ static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
+>   	    msg->iova + msg->size - 1 > v->range.last)
+>   		return -EINVAL;
+>   
+> +	if (vhost_iotlb_itree_first(&v->resv_iotlb, msg->iova,
+> +					msg->iova + msg->size - 1))
+> +		return -EINVAL;
+> +
+>   	if (vhost_iotlb_itree_first(iotlb, msg->iova,
+>   				    msg->iova + msg->size - 1))
+>   		return -EEXIST;
+> @@ -1103,6 +1110,45 @@ static ssize_t vhost_vdpa_chr_write_iter(struct kiocb *iocb,
+>   	return vhost_chr_write_iter(dev, from);
+>   }
+>   
+> +static int vhost_vdpa_resv_iommu_region(struct iommu_domain *domain, struct device *dma_dev,
+> +	struct vhost_iotlb *resv_iotlb)
+> +{
+> +	struct list_head dev_resv_regions;
+> +	phys_addr_t resv_msi_base = 0;
+> +	struct iommu_resv_region *region;
+> +	int ret = 0;
+> +	bool with_sw_msi = false;
+> +	bool with_hw_msi = false;
+> +
+> +	INIT_LIST_HEAD(&dev_resv_regions);
+> +	iommu_get_resv_regions(dma_dev, &dev_resv_regions);
+> +
+> +	list_for_each_entry(region, &dev_resv_regions, list) {
+> +		ret = vhost_iotlb_add_range_ctx(resv_iotlb, region->start,
+> +				region->start + region->length - 1,
+> +				0, 0, NULL);
+> +		if (ret) {
+> +			vhost_iotlb_reset(resv_iotlb);
+> +			break;
+> +		}
+> +
+> +		if (region->type == IOMMU_RESV_MSI)
+> +			with_hw_msi = true;
+> +
+> +		if (region->type == IOMMU_RESV_SW_MSI) {
+> +			resv_msi_base = region->start;
+> +			with_sw_msi = true;
+> +		}
+> +	}
+> +
+> +	if (!ret && !with_hw_msi && with_sw_msi)
+> +		ret = iommu_get_msi_cookie(domain, resv_msi_base);
+> +
+> +	iommu_put_resv_regions(dma_dev, &dev_resv_regions);
+> +
+> +	return ret;
+> +}
 
-void initialize_identity_maps(void *rmode)
-{
-...
-        top_level_pgt =3D read_cr3_pa();
-        if (p4d_offset((pgd_t *)top_level_pgt, 0) =3D=3D (p4d_t *)_pgtable)=
- {
-                pgt_data.pgt_buf =3D _pgtable + BOOT_INIT_PGT_SIZE;
-                pgt_data.pgt_buf_size =3D BOOT_PGT_SIZE - BOOT_INIT_PGT_SIZ=
-E;
-                memset(pgt_data.pgt_buf, 0, pgt_data.pgt_buf_size);
-        } else {
-                pgt_data.pgt_buf =3D _pgtable;
-                pgt_data.pgt_buf_size =3D BOOT_PGT_SIZE;
-                memset(pgt_data.pgt_buf, 0, pgt_data.pgt_buf_size);
-                top_level_pgt =3D (unsigned long)alloc_pgt_page(&pgt_data);
-        }
 
-In arch/x86/include/asm/boot.h, BOOT_PGT_SIZE equals
-BOOT_INIT_PGT_SIZE if CONFIG_RANDOMIZE_BASE is not defined=20
-(which is my case):
-=20
-# define BOOT_INIT_PGT_SIZE     (6*4096)
+As discussed in v1, I still prefer to factor out the common logic and 
+move them to iommu.c. It helps to simplify the future bug fixing and 
+enhancement.
 
-# ifdef CONFIG_RANDOMIZE_BASE
-...
-#  ifdef CONFIG_X86_VERBOSE_BOOTUP
-#   define BOOT_PGT_SIZE        (19*4096)
-#  else /* !CONFIG_X86_VERBOSE_BOOTUP */
-#   define BOOT_PGT_SIZE        (17*4096)
-#  endif
-# else /* !CONFIG_RANDOMIZE_BASE */
-#  define BOOT_PGT_SIZE         BOOT_INIT_PGT_SIZE
-# endif
 
-I think this means: if CONFIG_RANDOMIZE_BASE is not defined,
-earlyprintk=3DttyS0 also doesn't work for an SNP guest on KVM?=20
-Sorry I don't have a KVM environment at hand to test it.
+> +
+>   static int vhost_vdpa_alloc_domain(struct vhost_vdpa *v)
+>   {
+>   	struct vdpa_device *vdpa = v->vdpa;
+> @@ -1128,11 +1174,16 @@ static int vhost_vdpa_alloc_domain(struct vhost_vdpa *v)
+>   
+>   	ret = iommu_attach_device(v->domain, dma_dev);
+>   	if (ret)
+> -		goto err_attach;
+> +		goto err_alloc_domain;
+>   
+> -	return 0;
+> +	ret = vhost_vdpa_resv_iommu_region(v->domain, dma_dev, &v->resv_iotlb);
+> +	if (ret)
+> +		goto err_attach_device;
+>   
+> -err_attach:
+> +	return 0;
+> +err_attach_device:
+> +	iommu_detach_device(v->domain, dma_dev);
+> +err_alloc_domain:
+>   	iommu_domain_free(v->domain);
+>   	return ret;
+>   }
+> @@ -1385,6 +1436,8 @@ static int vhost_vdpa_probe(struct vdpa_device *vdpa)
+>   		goto err;
+>   	}
+>   
+> +	vhost_iotlb_init(&v->resv_iotlb, 0, 0);
+> +
+>   	r = dev_set_name(&v->dev, "vhost-vdpa-%u", minor);
+>   	if (r)
+>   		goto err;
 
-If I define CONFIG_RANDOMIZE_BASE, my C-bit mode SNP guest crashes
-even ealier -- it looks like CONFIG_RANDOMIZE_BASE is incompatible
-with my guest on Hyper-V due to some reason I don't know.
 
-Do you always use CONFIG_RANDOMIZE_BASE for a SNP guest on KVM
-and does earlyprintk=3DttyS0 work for you?
+We need clean resv_iotlb during release().
 
-Can you please share your thoughts? Thanks!
+Other looks good.
 
-Thanks,
--- Dexuan
+Thanks
+
