@@ -2,123 +2,256 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C044A6995FF
-	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 14:41:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1055D6995FD
+	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 14:41:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230203AbjBPNlf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Feb 2023 08:41:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49724 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229653AbjBPNld (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S230176AbjBPNld (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Thu, 16 Feb 2023 08:41:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDB084A1FF
-        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 05:40:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676554846;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=y98TLzC7T3MjlRAfco0hk5x9PJvmulya2RupI5c7FMk=;
-        b=eu6sf+9ulluL7PPyS9xUmzmMaQiKjWuigF0RfzhMm3p/FX+xAEay1UcDdiDgt6RFjJOMGe
-        ONRpS5jm9gIxj6lHCtE9DRRzA3e/si3X4ZLMMJtC8+qciM4T1aGL0MRGT5H/xQWoxgzNtG
-        R3I+NSCGdETpOvH3OyigIZloVfh9DZo=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-652-jVFnyuhYOOGyqx29KtEXNw-1; Thu, 16 Feb 2023 08:40:44 -0500
-X-MC-Unique: jVFnyuhYOOGyqx29KtEXNw-1
-Received: by mail-qk1-f200.google.com with SMTP id g6-20020ae9e106000000b00720f9e6e3e2so1203215qkm.13
-        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 05:40:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y98TLzC7T3MjlRAfco0hk5x9PJvmulya2RupI5c7FMk=;
-        b=cLtMTSE7tbcf3bcBkUBNIvtKgaU6HnqYKn8YG3uy0rhHidOzT1jnTpiGTMGxSDfEAP
-         qMVlj92kIQn9lqAjvF92TK2eiOWOx+jld4oSr9fhz62Dyb86QdiQvkpCULadi34ENHXQ
-         I5yc0Zbp8/eKq3HlZFELO2CtSCqc8QsOS7gY29G7uyVg+MO76mtILRLK5D5jwRLycWye
-         UXS1jb0VNRX1ojjC7S+f3ePEvI5Lxk3ukhbaknxdUm7jFoVbJ67X+d1XuYzPxObSzo3v
-         qHbHvJ+KfbFc8/6hSLrIwG/5AqFNNY3OIAjIwZTaFGX+wrNAVOUk4lqxqCJb+jgGX/qZ
-         wKsg==
-X-Gm-Message-State: AO0yUKVX3485IrVcnv6wpIq3blZIj6Y5QAcCKlUtZkrAD8PeazHL8tEZ
-        J07pPBuf8LaKZIPMcogIfzbgBbZR7bD//os5sWOReXca6iHQQutAYTQ7yxeoVO7U6jPCje825Pg
-        ZeDANccWwey+Q
-X-Received: by 2002:ac8:5c8a:0:b0:3b6:36a0:adbe with SMTP id r10-20020ac85c8a000000b003b636a0adbemr9858797qta.6.1676554844467;
-        Thu, 16 Feb 2023 05:40:44 -0800 (PST)
-X-Google-Smtp-Source: AK7set+u2XfrViYGYBUOAnQ+C6klosItAnWhnmgPEyZDck8HDSLvs4kyoFZDdTEvpoeeeF5P7hlYrA==
-X-Received: by 2002:ac8:5c8a:0:b0:3b6:36a0:adbe with SMTP id r10-20020ac85c8a000000b003b636a0adbemr9858769qta.6.1676554844177;
-        Thu, 16 Feb 2023 05:40:44 -0800 (PST)
-Received: from sgarzare-redhat (host-82-57-51-167.retail.telecomitalia.it. [82.57.51.167])
-        by smtp.gmail.com with ESMTPSA id z143-20020a376595000000b0073ba211e765sm228285qkb.19.2023.02.16.05.40.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Feb 2023 05:40:43 -0800 (PST)
-Date:   Thu, 16 Feb 2023 14:40:39 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Krasnov Arseniy <oxffffaa@gmail.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        kernel <kernel@sberdevices.ru>
-Subject: Re: [RFC PATCH v1 01/12] vsock: check error queue to set EPOLLERR
-Message-ID: <20230216134039.rgnb2hnzgme2ve76@sgarzare-redhat>
-References: <0e7c6fc4-b4a6-a27b-36e9-359597bba2b5@sberdevices.ru>
- <17a276d3-1112-3431-2a33-c17f3da67470@sberdevices.ru>
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50126 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229673AbjBPNlb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Feb 2023 08:41:31 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AF3846D6D;
+        Thu, 16 Feb 2023 05:41:30 -0800 (PST)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31GCi6TG010500;
+        Thu, 16 Feb 2023 13:41:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=4GW9HGTcCea+TxaGteRpkHZ0UVUKrvCVO/dKrvjpaFk=;
+ b=sZAyuuCyfW664a5V1OxANXuiJU7KVJ9PVK35vgBt6A2zYQp5XhfKlJrP0Cnj7JUiB1Me
+ wevnkDMh3+1c1GTZKVLKa3meSkwL0YMMgM60DaQyr7r8wWkHPDs4u+tlCBEARaZp8cN6
+ lKoyilRS1le79AHUAvmQmSK3ANi6RHl82CT1PvBhq4+C/LoiZOFoPY9TJpAclIE53Qrx
+ 0RvOsmgNEKVw8GODiNlVQvwCQDDjlvLYZRzgtyA0QZkAHJFBUleDyNpZ9vMBBFzK3wx4
+ FnjVJMRlXxWtn+XYUaujihBeg2mf5/nT4dJ9yEOFpy/b/hb5Je2zzia9+AHRAzE0vv0/ sA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nsmrd1dxe-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 16 Feb 2023 13:41:29 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31GDBr0K008790;
+        Thu, 16 Feb 2023 13:41:28 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nsmrd1dwa-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 16 Feb 2023 13:41:28 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31FMktdQ028428;
+        Thu, 16 Feb 2023 13:41:27 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3np2n6mycp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 16 Feb 2023 13:41:26 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31GDfMEW47448338
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 16 Feb 2023 13:41:23 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D733F20043;
+        Thu, 16 Feb 2023 13:41:22 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 459EE20040;
+        Thu, 16 Feb 2023 13:41:22 +0000 (GMT)
+Received: from [9.171.30.51] (unknown [9.171.30.51])
+        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Thu, 16 Feb 2023 13:41:22 +0000 (GMT)
+Message-ID: <d32a4080-3c74-27f0-2ef7-78755da98022@linux.ibm.com>
+Date:   Thu, 16 Feb 2023 14:41:22 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <17a276d3-1112-3431-2a33-c17f3da67470@sberdevices.ru>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.2
+Subject: Re: [PATCH v3 1/1] KVM: s390: vsie: clarifications on setting the
+ APCB
+To:     Pierre Morel <pmorel@linux.ibm.com>, david@redhat.com
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, borntraeger@de.ibm.com,
+        cohuck@redhat.com, thuth@redhat.com, imbrenda@linux.ibm.com,
+        hca@linux.ibm.com, gor@linux.ibm.com, svens@linux.ibm.com
+References: <20230214122841.13066-1-pmorel@linux.ibm.com>
+ <20230214122841.13066-2-pmorel@linux.ibm.com>
+Content-Language: en-US
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20230214122841.13066-2-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: bSWWLV9L_XbwnFL-Niq7IURztR_TMqGI
+X-Proofpoint-GUID: g1ymuem39vjcjT2YxTKVN2lwGVDeUa2l
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-16_10,2023-02-16_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
+ clxscore=1015 impostorscore=0 adultscore=0 malwarescore=0
+ priorityscore=1501 bulkscore=0 mlxscore=0 spamscore=0 mlxlogscore=999
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302160116
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 06, 2023 at 06:53:22AM +0000, Arseniy Krasnov wrote:
->If socket's error queue is not empty, EPOLLERR must be set.
+On 2/14/23 13:28, Pierre Morel wrote:
+> The APCB is part of the CRYCB.
+> The calculation of the APCB origin can be done by adding
+> the APCB offset to the CRYCB origin.
+> 
+> Current code makes confusing transformations, converting
+> the CRYCB origin to a pointer to calculate the APCB origin.
+> 
+> Let's make things simpler and keep the CRYCB origin to make
+> these calculations.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-Could this patch go regardless of this series?
+LGTM:
+Acked-by: Janosch Frank <frankja@linux.ibm.com>
 
-Can you explain (even in the commit message) what happens without this
-patch?
-
-Thanks,
-Stefano
-
->
->Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->---
-> net/vmw_vsock/af_vsock.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
->
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index 19aea7cba26e..b5e51ef4a74c 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -1026,7 +1026,7 @@ static __poll_t vsock_poll(struct file *file, struct socket *sock,
-> 	poll_wait(file, sk_sleep(sk), wait);
-> 	mask = 0;
->
->-	if (sk->sk_err)
->+	if (sk->sk_err || !skb_queue_empty_lockless(&sk->sk_error_queue))
-> 		/* Signify that there has been an error on this socket. */
-> 		mask |= EPOLLERR;
->
->-- 
->2.25.1
+> ---
+>   arch/s390/kvm/vsie.c | 50 +++++++++++++++++++++++++-------------------
+>   1 file changed, 29 insertions(+), 21 deletions(-)
+> 
+> diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
+> index b6a0219e470a..8d6b765abf29 100644
+> --- a/arch/s390/kvm/vsie.c
+> +++ b/arch/s390/kvm/vsie.c
+> @@ -138,11 +138,15 @@ static int prepare_cpuflags(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
+>   }
+>   /* Copy to APCB FORMAT1 from APCB FORMAT0 */
+>   static int setup_apcb10(struct kvm_vcpu *vcpu, struct kvm_s390_apcb1 *apcb_s,
+> -			unsigned long apcb_o, struct kvm_s390_apcb1 *apcb_h)
+> +			unsigned long crycb_gpa, struct kvm_s390_apcb1 *apcb_h)
+>   {
+>   	struct kvm_s390_apcb0 tmp;
+> +	unsigned long apcb_gpa;
+>   
+> -	if (read_guest_real(vcpu, apcb_o, &tmp, sizeof(struct kvm_s390_apcb0)))
+> +	apcb_gpa = crycb_gpa + offsetof(struct kvm_s390_crypto_cb, apcb0);
+> +
+> +	if (read_guest_real(vcpu, apcb_gpa, &tmp,
+> +			    sizeof(struct kvm_s390_apcb0)))
+>   		return -EFAULT;
+>   
+>   	apcb_s->apm[0] = apcb_h->apm[0] & tmp.apm[0];
+> @@ -157,15 +161,19 @@ static int setup_apcb10(struct kvm_vcpu *vcpu, struct kvm_s390_apcb1 *apcb_s,
+>    * setup_apcb00 - Copy to APCB FORMAT0 from APCB FORMAT0
+>    * @vcpu: pointer to the virtual CPU
+>    * @apcb_s: pointer to start of apcb in the shadow crycb
+> - * @apcb_o: pointer to start of original apcb in the guest2
+> + * @crycb_gpa: guest physical address to start of original guest crycb
+>    * @apcb_h: pointer to start of apcb in the guest1
+>    *
+>    * Returns 0 and -EFAULT on error reading guest apcb
+>    */
+>   static int setup_apcb00(struct kvm_vcpu *vcpu, unsigned long *apcb_s,
+> -			unsigned long apcb_o, unsigned long *apcb_h)
+> +			unsigned long crycb_gpa, unsigned long *apcb_h)
+>   {
+> -	if (read_guest_real(vcpu, apcb_o, apcb_s,
+> +	unsigned long apcb_gpa;
+> +
+> +	apcb_gpa = crycb_gpa + offsetof(struct kvm_s390_crypto_cb, apcb0);
+> +
+> +	if (read_guest_real(vcpu, apcb_gpa, apcb_s,
+>   			    sizeof(struct kvm_s390_apcb0)))
+>   		return -EFAULT;
+>   
+> @@ -178,16 +186,20 @@ static int setup_apcb00(struct kvm_vcpu *vcpu, unsigned long *apcb_s,
+>    * setup_apcb11 - Copy the FORMAT1 APCB from the guest to the shadow CRYCB
+>    * @vcpu: pointer to the virtual CPU
+>    * @apcb_s: pointer to start of apcb in the shadow crycb
+> - * @apcb_o: pointer to start of original guest apcb
+> + * @crycb_gpa: guest physical address to start of original guest crycb
+>    * @apcb_h: pointer to start of apcb in the host
+>    *
+>    * Returns 0 and -EFAULT on error reading guest apcb
+>    */
+>   static int setup_apcb11(struct kvm_vcpu *vcpu, unsigned long *apcb_s,
+> -			unsigned long apcb_o,
+> +			unsigned long crycb_gpa,
+>   			unsigned long *apcb_h)
+>   {
+> -	if (read_guest_real(vcpu, apcb_o, apcb_s,
+> +	unsigned long apcb_gpa;
+> +
+> +	apcb_gpa = crycb_gpa + offsetof(struct kvm_s390_crypto_cb, apcb1);
+> +
+> +	if (read_guest_real(vcpu, apcb_gpa, apcb_s,
+>   			    sizeof(struct kvm_s390_apcb1)))
+>   		return -EFAULT;
+>   
+> @@ -200,7 +212,7 @@ static int setup_apcb11(struct kvm_vcpu *vcpu, unsigned long *apcb_s,
+>    * setup_apcb - Create a shadow copy of the apcb.
+>    * @vcpu: pointer to the virtual CPU
+>    * @crycb_s: pointer to shadow crycb
+> - * @crycb_o: pointer to original guest crycb
+> + * @crycb_gpa: guest physical address of original guest crycb
+>    * @crycb_h: pointer to the host crycb
+>    * @fmt_o: format of the original guest crycb.
+>    * @fmt_h: format of the host crycb.
+> @@ -211,50 +223,46 @@ static int setup_apcb11(struct kvm_vcpu *vcpu, unsigned long *apcb_s,
+>    * Return 0 or an error number if the guest and host crycb are incompatible.
+>    */
+>   static int setup_apcb(struct kvm_vcpu *vcpu, struct kvm_s390_crypto_cb *crycb_s,
+> -	       const u32 crycb_o,
+> +	       const u32 crycb_gpa,
+>   	       struct kvm_s390_crypto_cb *crycb_h,
+>   	       int fmt_o, int fmt_h)
+>   {
+> -	struct kvm_s390_crypto_cb *crycb;
+> -
+> -	crycb = (struct kvm_s390_crypto_cb *) (unsigned long)crycb_o;
+> -
+>   	switch (fmt_o) {
+>   	case CRYCB_FORMAT2:
+> -		if ((crycb_o & PAGE_MASK) != ((crycb_o + 256) & PAGE_MASK))
+> +		if ((crycb_gpa & PAGE_MASK) != ((crycb_gpa + 256) & PAGE_MASK))
+>   			return -EACCES;
+>   		if (fmt_h != CRYCB_FORMAT2)
+>   			return -EINVAL;
+>   		return setup_apcb11(vcpu, (unsigned long *)&crycb_s->apcb1,
+> -				    (unsigned long) &crycb->apcb1,
+> +				    crycb_gpa,
+>   				    (unsigned long *)&crycb_h->apcb1);
+>   	case CRYCB_FORMAT1:
+>   		switch (fmt_h) {
+>   		case CRYCB_FORMAT2:
+>   			return setup_apcb10(vcpu, &crycb_s->apcb1,
+> -					    (unsigned long) &crycb->apcb0,
+> +					    crycb_gpa,
+>   					    &crycb_h->apcb1);
+>   		case CRYCB_FORMAT1:
+>   			return setup_apcb00(vcpu,
+>   					    (unsigned long *) &crycb_s->apcb0,
+> -					    (unsigned long) &crycb->apcb0,
+> +					    crycb_gpa,
+>   					    (unsigned long *) &crycb_h->apcb0);
+>   		}
+>   		break;
+>   	case CRYCB_FORMAT0:
+> -		if ((crycb_o & PAGE_MASK) != ((crycb_o + 32) & PAGE_MASK))
+> +		if ((crycb_gpa & PAGE_MASK) != ((crycb_gpa + 32) & PAGE_MASK))
+>   			return -EACCES;
+>   
+>   		switch (fmt_h) {
+>   		case CRYCB_FORMAT2:
+>   			return setup_apcb10(vcpu, &crycb_s->apcb1,
+> -					    (unsigned long) &crycb->apcb0,
+> +					    crycb_gpa,
+>   					    &crycb_h->apcb1);
+>   		case CRYCB_FORMAT1:
+>   		case CRYCB_FORMAT0:
+>   			return setup_apcb00(vcpu,
+>   					    (unsigned long *) &crycb_s->apcb0,
+> -					    (unsigned long) &crycb->apcb0,
+> +					    crycb_gpa,
+>   					    (unsigned long *) &crycb_h->apcb0);
+>   		}
+>   	}
 
