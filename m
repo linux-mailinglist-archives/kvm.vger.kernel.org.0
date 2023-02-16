@@ -2,65 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E368A699C96
-	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 19:45:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EF4D2699CAE
+	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 19:54:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229839AbjBPSpC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Feb 2023 13:45:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49620 "EHLO
+        id S229999AbjBPSyG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Feb 2023 13:54:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229785AbjBPSpB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Feb 2023 13:45:01 -0500
-Received: from mail-qv1-xf36.google.com (mail-qv1-xf36.google.com [IPv6:2607:f8b0:4864:20::f36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E78650AE9
-        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 10:44:59 -0800 (PST)
-Received: by mail-qv1-xf36.google.com with SMTP id mg2so1940026qvb.9
-        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 10:44:59 -0800 (PST)
+        with ESMTP id S229920AbjBPSyD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Feb 2023 13:54:03 -0500
+Received: from mail-vs1-xe29.google.com (mail-vs1-xe29.google.com [IPv6:2607:f8b0:4864:20::e29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D38B34AFCF
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 10:54:00 -0800 (PST)
+Received: by mail-vs1-xe29.google.com with SMTP id p14so3002222vsn.0
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 10:54:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1676573098;
+        d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=jst1eroHBjIYT5ftKqNRgPwYlOrEbGcZ49gDFgkRgkY=;
-        b=K+KYc6g+JVFfRY8F2QnmXioxJ8sgXR/PchYG4K2wxmSE1Fn31IRzLDIv2BLKC5dt9f
-         lLuEZoc4/dJabibmcfFuWFomkef479qmB4fjw+GsqyyfejcYy4C0KA36mRLFgPkWg3mR
-         YACzg1hQFPBR2Ux8oCr0jv5yylXvtJm+4/X9fFgK4P3DgD77qFkkwq+a/EBq1stA3791
-         B0yfcGVnvgJtItQgIOxCjdvqf815pE7AGjeIuLJNp2gJgva7bK845aKsKRboFUW1S18B
-         Q35VS7QnXSv4EVCEoFsfvtiMTqRFi+o+6rbqGz+llAAlyptHzmv26c9gbGdzfemjL0LY
-         CjvQ==
+        bh=JyRRKEGZ8zSR9Nqcb3MNGJNAmA81Hl5SP7GHLNm+Cm0=;
+        b=bNCnbI+VXeIdOVQVm0sp1rmobHHtRTc9+2ERfzZi+u+Y/2FGqLRckgeiuLg8Ex3nLm
+         0cUpC0qdwJjBHVo2Vi5ljBKsPHbc0Jn2ODIe1C1s8JYQvuF8kCa8m9CIolH5KGRZZYKP
+         mOsC6CqHniQu+2TX0Bc5ZM+88NEakTpoG52aE3DbF0o8TWeNAeKOEXEFawDmNF+UDbsD
+         Zv7+kC30Ig39liFHBwG9JNTIrekrPThxd0HrTxB6mzZE8VFVCpt/bbR/UZcgXRo2ZZOH
+         a9j/pYumOiZMehj5gcnSH87ePomE82U/r+swRnENXuA5ixacoPmMm6fgHWUrsiZcbxop
+         50XA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1676573098;
+        d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=jst1eroHBjIYT5ftKqNRgPwYlOrEbGcZ49gDFgkRgkY=;
-        b=4MbmBRz2Yr25VvDJYpMz2bp5g7f9k2/8bDMfaYOjSo4XIi9iqK3AQPZm9+8an016pQ
-         VVZY33YaPjBuL231jx2/I8Xk/1kV5XNKbyLTbkqvKNiI3+9+Uj7M6p7roblJVo+oByJH
-         8Jv0fQXWoTuD2vmwzUIlNZErmdRg2J0iy1yoydEd7HcxIcPf1Rqv6PU/MC9yOoTQ1O3s
-         kexAOV/p5CANLzoVzhE0G9NbHgAsocGw6Pw1c3jup4Zk9cI5YCrKdDhPOwzhy3vJi1UW
-         JIYifocU1LLcKE7qx4r7/jio2HdKl2D1eoWlaKrkbbwEn7biF7NI5Z69Y3lQXoLGHxEo
-         0Ntg==
-X-Gm-Message-State: AO0yUKXtJ70DjECDrynfaYhz7GaBf/w7m26nmeidtTPISueZXsFv0/x0
-        71wOWUyDVrxG1iMjMQyT9LEHJskSl3gq/Wtq+6d2JQ==
-X-Google-Smtp-Source: AK7set//YvqlaNZ1YOPWbH8oPCJeBDls16I0T5zMqjTeT54rnIlGu3EhPAE7hLQrViU9pUYY4hCO5wjpN6yfN/rAcqA=
-X-Received: by 2002:a0c:e086:0:b0:56e:a207:142d with SMTP id
- l6-20020a0ce086000000b0056ea207142dmr584064qvk.6.1676573098061; Thu, 16 Feb
- 2023 10:44:58 -0800 (PST)
+        bh=JyRRKEGZ8zSR9Nqcb3MNGJNAmA81Hl5SP7GHLNm+Cm0=;
+        b=vf7ChHVLPhbW1Ame39SCeSSOyKXlmZwAadzImU3acV6slyJ22+tfNIqZ8QyEklOThL
+         HZaZxSv8j76wYyHKBC7KkP7a+LEwL0yM9Baf3PYhHRz1SG4YJT0+01OIzuZW+w/T/Qd2
+         WDTdXy+7Lljn6hIiUsRXYLs26C9bpuingNLfskmewpnSdowBKYa3XMJCenrHONqrwyhE
+         H9BEpcz/jj44sPwPa/NBOAJKKACuoRj0NEkdfCTr44K7i1uqI5WpPuB8f5HjlvDD/OK/
+         EC7hxSriTI4jdU5bAGqoKOx/HxCw4zV1fkOyV8eIFBa9bDmVHLjGbsATB1q8D0WSUE6f
+         FdhQ==
+X-Gm-Message-State: AO0yUKUdMvi/cKkbA5t6SveM2Bn+Q+XxiqJVMbGESHoPB2Z6PS6QqrkI
+        iay+hHFVTts7dxIGFJcIRjv6dxsvR3M/W4I4i+Gd5w==
+X-Google-Smtp-Source: AK7set9dE37K0pvg3/0VA9YLcO6pH4noIv9bFNiaq7QbeTkkjSQXEmjErAL00CLE7/xnjYN1EglE9y72davbrfU8Qj8=
+X-Received: by 2002:a05:6102:3b01:b0:412:6a3:2267 with SMTP id
+ x1-20020a0561023b0100b0041206a32267mr1548682vsu.5.1676573639812; Thu, 16 Feb
+ 2023 10:53:59 -0800 (PST)
 MIME-Version: 1.0
-References: <20230215174046.2201432-1-ricarkol@google.com> <20230215174046.2201432-3-ricarkol@google.com>
- <85bbfda3-405d-9bd5-d5fa-f2e14c3acad7@redhat.com>
-In-Reply-To: <85bbfda3-405d-9bd5-d5fa-f2e14c3acad7@redhat.com>
-From:   Ricardo Koller <ricarkol@google.com>
-Date:   Thu, 16 Feb 2023 10:44:47 -0800
-Message-ID: <CAOHnOrw06=823f6tszN2YyRnrBCchwXmqvneqY=tH2D-DSca4g@mail.gmail.com>
-Subject: Re: [PATCH v3 02/12] KVM: arm64: Rename free_unlinked to free_removed
-To:     Shaoqin Huang <shahuang@redhat.com>
-Cc:     pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
-        yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, qperret@google.com,
-        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
-        rananta@google.com, bgardon@google.com, ricarkol@gmail.com
+References: <20230215011614.725983-1-amoorthy@google.com> <20230215011614.725983-6-amoorthy@google.com>
+ <87mt5fz5g6.wl-maz@kernel.org>
+In-Reply-To: <87mt5fz5g6.wl-maz@kernel.org>
+From:   Anish Moorthy <amoorthy@google.com>
+Date:   Thu, 16 Feb 2023 10:53:47 -0800
+Message-ID: <CAF7b7mr3iDBYWvX+ZPA1JeZgezX-BDo8VArwnjuzHUeWJmO32Q@mail.gmail.com>
+Subject: Re: [PATCH 5/8] kvm: Add cap/kvm_run field for memory fault exits
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Sean Christopherson <seanjc@google.com>,
+        James Houghton <jthoughton@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Axel Rasmussen <axelrasmussen@google.com>, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, peterx@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
@@ -73,167 +76,261 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 15, 2023 at 7:13 PM Shaoqin Huang <shahuang@redhat.com> wrote:
+On Wed, Feb 15, 2023 at 12:59 AM Oliver Upton <oliver.upton@linux.dev> wrote:
 >
-> Hi Ricardo,
->
-> On 2/16/23 01:40, Ricardo Koller wrote:
-> > Make it clearer that the "free_removed" functions refer to tables that
-> > have never been part of the paging structure: they are "unlinked".
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > ---
-> >   arch/arm64/include/asm/kvm_pgtable.h  |  8 ++++----
-> >   arch/arm64/kvm/hyp/nvhe/mem_protect.c |  6 +++---
-> >   arch/arm64/kvm/hyp/pgtable.c          |  6 +++---
-> >   arch/arm64/kvm/mmu.c                  | 10 +++++-----
-> >   4 files changed, 15 insertions(+), 15 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> > index 3339192a97a9..7c45082e6c23 100644
-> > --- a/arch/arm64/include/asm/kvm_pgtable.h
-> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> > @@ -99,7 +99,7 @@ static inline bool kvm_level_supports_block_mapping(u32 level)
-> >    *                          allocation is physically contiguous.
-> >    * @free_pages_exact:               Free an exact number of memory pages previously
-> >    *                          allocated by zalloc_pages_exact.
-> > - * @free_removed_table:              Free a removed paging structure by unlinking and
-> > + * @free_unlinked_table:     Free an unlinked paging structure by unlinking and
-> >    *                          dropping references.
-> >    * @get_page:                       Increment the refcount on a page.
-> >    * @put_page:                       Decrement the refcount on a page. When the
-> > @@ -119,7 +119,7 @@ struct kvm_pgtable_mm_ops {
-> >       void*           (*zalloc_page)(void *arg);
-> >       void*           (*zalloc_pages_exact)(size_t size);
-> >       void            (*free_pages_exact)(void *addr, size_t size);
-> > -     void            (*free_removed_table)(void *addr, u32 level);
-> > +     void            (*free_unlinked_table)(void *addr, u32 level);
-> >       void            (*get_page)(void *addr);
-> >       void            (*put_page)(void *addr);
-> >       int             (*page_count)(void *addr);
-> > @@ -450,7 +450,7 @@ int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
-> >   void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
-> >
-> >   /**
-> > - * kvm_pgtable_stage2_free_removed() - Free a removed stage-2 paging structure.
-> > + * kvm_pgtable_stage2_free_unlinked() - Free un unlinked stage-2 paging structure.
->
-> Free an unlinked stage-2
+> Why not use KVM_ENABLE_CAP instead for this? Its a preexisting UAPI for
+> toggling KVM behaviors.
 
-ACK, will fix on v4.
+Oh I wrote it this way because, even with the "args" field in "struct
+kvm_enable_cap" to express the enable/disable intent, it felt weird to allow
+disabling the feature through KVM_ENABLE_CAP. But it seems like that's the
+convention, so I'll make the change.
 
+> >  5. The kvm_run structure
+> >  ========================
+> >
+> > @@ -6544,6 +6556,21 @@ array field represents return values. The userspace should update the return
+> >  values of SBI call before resuming the VCPU. For more details on RISC-V SBI
+> >  spec refer, https://github.com/riscv/riscv-sbi-doc.
+> > +
+> > +             /* KVM_EXIT_MEMORY_FAULT */
+> > +             struct {
+> > +                     __u64 gpa;
+> > +                     __u64 size;
+> > +             } memory_fault;
+> > +
 >
-> >    * @mm_ops: Memory management callbacks.
-> >    * @pgtable:        Unlinked stage-2 paging structure to be freed.
-> >    * @level:  Level of the stage-2 paging structure to be freed.
-> > @@ -458,7 +458,7 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
-> >    * The page-table is assumed to be unreachable by any hardware walkers prior to
-> >    * freeing and therefore no TLB invalidation is performed.
-> >    */
-> > -void kvm_pgtable_stage2_free_removed(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level);
-> > +void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level);
-> >
-> >   /**
-> >    * kvm_pgtable_stage2_map() - Install a mapping in a guest stage-2 page-table.
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > index 552653fa18be..b030170d803b 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > @@ -91,9 +91,9 @@ static void host_s2_put_page(void *addr)
-> >       hyp_put_page(&host_s2_pool, addr);
-> >   }
-> >
-> > -static void host_s2_free_removed_table(void *addr, u32 level)
-> > +static void host_s2_free_unlinked_table(void *addr, u32 level)
-> >   {
-> > -     kvm_pgtable_stage2_free_removed(&host_mmu.mm_ops, addr, level);
-> > +     kvm_pgtable_stage2_free_unlinked(&host_mmu.mm_ops, addr, level);
-> >   }
-> >
-> >   static int prepare_s2_pool(void *pgt_pool_base)
-> > @@ -110,7 +110,7 @@ static int prepare_s2_pool(void *pgt_pool_base)
-> >       host_mmu.mm_ops = (struct kvm_pgtable_mm_ops) {
-> >               .zalloc_pages_exact = host_s2_zalloc_pages_exact,
-> >               .zalloc_page = host_s2_zalloc_page,
-> > -             .free_removed_table = host_s2_free_removed_table,
-> > +             .free_unlinked_table = host_s2_free_unlinked_table,
-> >               .phys_to_virt = hyp_phys_to_virt,
-> >               .virt_to_phys = hyp_virt_to_phys,
-> >               .page_count = hyp_page_count,
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index e093e222daf3..0a5ef9288371 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -841,7 +841,7 @@ static int stage2_map_walk_table_pre(const struct kvm_pgtable_visit_ctx *ctx,
-> >       if (ret)
-> >               return ret;
-> >
-> > -     mm_ops->free_removed_table(childp, ctx->level);
-> > +     mm_ops->free_unlinked_table(childp, ctx->level);
-> >       return 0;
-> >   }
-> >
-> > @@ -886,7 +886,7 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
-> >    * The TABLE_PRE callback runs for table entries on the way down, looking
-> >    * for table entries which we could conceivably replace with a block entry
-> >    * for this mapping. If it finds one it replaces the entry and calls
-> > - * kvm_pgtable_mm_ops::free_removed_table() to tear down the detached table.
-> > + * kvm_pgtable_mm_ops::free_unlinked_table() to tear down the detached table.
-> >    *
-> >    * Otherwise, the LEAF callback performs the mapping at the existing leaves
-> >    * instead.
-> > @@ -1250,7 +1250,7 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
-> >       pgt->pgd = NULL;
-> >   }
-> >
-> > -void kvm_pgtable_stage2_free_removed(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level)
-> > +void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level)
-> >   {
-> >       kvm_pteref_t ptep = (kvm_pteref_t)pgtable;
-> >       struct kvm_pgtable_walker walker = {
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index a3ee3b605c9b..9bd3c2cfb476 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -130,21 +130,21 @@ static void kvm_s2_free_pages_exact(void *virt, size_t size)
-> >
-> >   static struct kvm_pgtable_mm_ops kvm_s2_mm_ops;
-> >
-> > -static void stage2_free_removed_table_rcu_cb(struct rcu_head *head)
-> > +static void stage2_free_unlinked_table_rcu_cb(struct rcu_head *head)
-> >   {
-> >       struct page *page = container_of(head, struct page, rcu_head);
-> >       void *pgtable = page_to_virt(page);
-> >       u32 level = page_private(page);
-> >
-> > -     kvm_pgtable_stage2_free_removed(&kvm_s2_mm_ops, pgtable, level);
-> > +     kvm_pgtable_stage2_free_unlinked(&kvm_s2_mm_ops, pgtable, level);
-> >   }
-> >
-> > -static void stage2_free_removed_table(void *addr, u32 level)
-> > +static void stage2_free_unlinked_table(void *addr, u32 level)
-> >   {
-> >       struct page *page = virt_to_page(addr);
-> >
-> >       set_page_private(page, (unsigned long)level);
-> > -     call_rcu(&page->rcu_head, stage2_free_removed_table_rcu_cb);
-> > +     call_rcu(&page->rcu_head, stage2_free_unlinked_table_rcu_cb);
-> >   }
-> >
-> >   static void kvm_host_get_page(void *addr)
-> > @@ -681,7 +681,7 @@ static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
-> >       .zalloc_page            = stage2_memcache_zalloc_page,
-> >       .zalloc_pages_exact     = kvm_s2_zalloc_pages_exact,
-> >       .free_pages_exact       = kvm_s2_free_pages_exact,
-> > -     .free_removed_table     = stage2_free_removed_table,
-> > +     .free_unlinked_table    = stage2_free_unlinked_table,
-> >       .get_page               = kvm_host_get_page,
-> >       .put_page               = kvm_s2_put_page,
-> >       .page_count             = kvm_host_page_count,
+> How is userspace expected to differentiate the gup_fast() failed exit
+> from the guest-private memory exit? I don't think flags are a good idea
+> for this, as it comes with the illusion that both events can happen on a
+> single exit. In reality, these are mutually exclusive.
 >
-> --
-> Regards,
-> Shaoqin
+> A fault type/code would be better here, with the option to add flags at
+> a later date that could be used to further describe the exit (if
+> needed).
+
+Agreed. Something like this, then?
+
++    struct {
++        __u32 fault_code;
++        __u64 reserved;
++        __u64 gpa;
++        __u64 size;
++    } memory_fault;
+
+The "reserved" field is meant to be the placeholder for a future "flags" field.
+Let me know if there's a better/more conventional way to achieve this.
+
+On Wed, Feb 15, 2023 at 9:07 AM Sean Christopherson <seanjc@google.com> wrote:
 >
+> On Wed, Feb 15, 2023, Marc Zyngier wrote:
+> > On Wed, 15 Feb 2023 01:16:11 +0000, Anish Moorthy <amoorthy@google.com> wrote:
+> > >  8. Other capabilities.
+> > >  ======================
+> > >
+> > > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > > index 109b18e2789c4..9352e7f8480fb 100644
+> > > --- a/include/linux/kvm_host.h
+> > > +++ b/include/linux/kvm_host.h
+> > > @@ -801,6 +801,9 @@ struct kvm {
+> > >     bool vm_bugged;
+> > >     bool vm_dead;
+> > >
+> > > +   rwlock_t mem_fault_nowait_lock;
+> > > +   bool mem_fault_nowait;
+> >
+> > A full-fat rwlock to protect a single bool? What benefits do you
+> > expect from a rwlock? Why is it preferable to an atomic access, or a
+> > simple bitop?
+>
+> There's no need to have any kind off dedicated atomicity.  The only readers are
+> in vCPU context, just disallow KVM_CAP_MEM_FAULT_NOWAIT after vCPUs are created.
+
+I think we do need atomicity here. When KVM_CAP_MEM_FAULT_NOWAIT is enabled
+async page faults are essentially disabled: so userspace will likely want to
+disable the cap at some point (such as the end of live migration post-copy).
+Since we want to support this without having to pause vCPUs, there's an
+atomicity requirement.
+
+Marc, I used an rwlock simply because it seemed like the easiest correct thing
+to do. I had a hunch that I'd be asked to change this to an atomic, so I can go
+ahead and do that barring any other suggestions.
+
+On Wed, Feb 15, 2023 at 12:41 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> > +:Returns: 0 on success, or -1 if KVM_CAP_MEM_FAULT_NOWAIT is not present.
+>
+> Please pick a meaningful error code instead of -1. And if you intended
+> this as -EPERM, please explain the rationale (-EINVAL would seem more
+> appropriate).
+
+As I mention earlier, I'll be switching to toggling the capability via
+KVM_ENABLE_CAP so this KVM_SET_MEM_FAULT_NOWAIT ioctl is going to go away. I
+will make sure to set an appropriate error code if the user passes nonsensical
+"args" to KVM_ENABLE_CAP though, whatever that ends up meaning.
+
+> > +
+> > +Enables (state=true) or disables (state=false) waitless memory faults. For more
+> > +information, see the documentation of KVM_CAP_MEM_FAULT_NOWAIT.
+> > +
+> >  5. The kvm_run structure
+> >  ========================
+> >
+> > @@ -6544,6 +6556,21 @@ array field represents return values. The userspace should update the return
+> >  values of SBI call before resuming the VCPU. For more details on RISC-V SBI
+> >  spec refer, https://github.com/riscv/riscv-sbi-doc.
+> >
+> > +::
+> > +
+> > +             /* KVM_EXIT_MEMORY_FAULT */
+> > +             struct {
+> > +                     __u64 gpa;
+> > +                     __u64 size;
+> > +             } memory_fault;
+> > +
+> > +If exit reason is KVM_EXIT_MEMORY_FAULT then it indicates that the VCPU has
+> > +encountered a memory error which is not handled by KVM kernel module and
+> > +which userspace may choose to handle.
+>
+> No, the vcpu hasn't "encountered a memory error". The hypervisor has
+> taken a page fault, which is very different. And it isn't that KVM
+> couldn't handle it (or we wouldn't have a hypervisor at all). From
+> what I understand of this series (possibly very little), userspace has
+> to *ask* for these, and they are delivered in specific circumstances.
+> Which are?
+
+Thanks for the correction: "encountered a memory error" was incorrect phrasing.
+What is your opinion on the following, hopefully more accurate, documentation?
+
+"An exit reason of KVM_EXIT_MEMORY_FAULT indicates that the vCPU encountered a
+memory fault for which the userspace page tables did not contain a present
+mapping. This exit is only generated when KVM_CAP_MEM_FAULT_NOWAIT is enabled:
+otherwise KVM will attempt to resolve the fault without exiting to userspace,
+returning -1 with errno=EFAULT when it cannot."
+
+It might also help to note that the vCPUs exit in exactly the same cases where
+userspace would get a page fault when trying to access the memory through the
+VMA/mapping provided to the memslot. Please let me know if you feel that this
+information should be included in the documentation, or if you see anything else
+I've gotten wrong.
+
+As for handling these faults: userspace should consider its own knowledge of the
+guest and determine how best to resolve each fault. For instance if userspace
+hasn't UFFDIO_COPY/CONTINUEd a faulting page yet, then it must do so to
+establish the mapping. If it already did, then the next step would be to fault
+in the page via MADV_POPULATE_READ|WRITE.
+
+A naive userspace could just always MADV_POPULATE_READ|WRITE in response to
+these faults: that would basically yield KVM's behavior *without* the capability
+enabled, just with extra steps, worse performance, and no chance for async page
+faults.
+
+A final note: this is just how the fault applies in the context of
+userfaultfd-based post-copy live migration. Other uses might come up in the
+future, in which case userspace would want to take some other sort of action.
+
+> > +'gpa' and 'size' indicate the memory range the error occurs at. Userspace
+> > +may handle the error and return to KVM to retry the previous memory access.
+>
+> What are these *exactly*? In what unit?
+
+Sorry, I'll add some descriptive comments here. "gpa" is the guest physical
+address of the faulting page (rounded down to be aligned with "size"), and
+"size" is just the size in bytes of the faulting page.
+
+> ... What guarantees that the
+> process eventually converges? How is userspace supposed to handle the
+> fault (which is *not* an error)? Don't you need to communicate other
+> information, such as the type of fault (read, write, permission or
+> translation fault...)?
+
+Ok, two parts to the response here.
+
+1. As Oliver touches on earlier, we'll probably want to use this same field for
+   different classes of memory fault in the future (such as the ones which Chao
+   is introducing in [1]): so it does make sense to add "code" and "flags"
+   fields which can be used to communicate more information to the user (and
+   which can just be set to MEM_FAULT_NOWAIT/0 in this series).
+
+2. As to why a code/flags of MEM_FAULT_NOWAIT/0 should be enough information to
+   convey to the user here: the assumption behind this series is that
+   MADV_POPULATE_READ|WRITE will always be enough to ensure that the vCPU can
+   run again. This goes back to the earlier claim about vCPUs exiting in the
+   exact same cases as when userspace would get a page fault trying to access
+   the same memory. MADV_POPULATE_READ|WRITE is intended to resolve exactly
+   these cases, so userspace shouldn't need anything more.
+
+Again, a VMM enabling the new exit to make post-copy faster must determine what
+action to take depending on whether it has UFFDIO_COPY|CONTINUEd the faulting
+page (at least for now, perhaps there will be more uses in the future): we can
+keep discussing if this seems fragile. Just keeping things limited to
+userfaultfd, having KVM communicate to userspace which action is required could
+get difficult. For UFFDIO_CONTINUE we'd have to check if the VMA had
+VM_UFFD_MINOR, and for UFFDIO_COPY we'd have to at least check the page cache.
+
+> >
+> > +7.34 KVM_CAP_MEM_FAULT_NOWAIT
+> > +-----------------------------
+> > +
+> > +:Architectures: x86, arm64
+> > +:Target: VM
+> > +:Parameters: None
+> > +:Returns: 0 on success, or -EINVAL if capability is not supported.
+> > +
+> > +The presence of this capability indicates that userspace can enable/disable
+> > +waitless memory faults through the KVM_SET_MEM_FAULT_NOWAIT ioctl.
+> > +
+> > +When waitless memory faults are enabled, fast get_user_pages failures when
+> > +handling EPT/Shadow Page Table violations will cause a vCPU exit
+> > +(KVM_EXIT_MEMORY_FAULT) instead of a fallback to slow get_user_pages.
+>
+> Do you really expect a random VMM hacker to understand what GUP is?
+> Also, the x86 verbiage makes zero sense to me. Please write this in a
+> way that is useful for userspace people, because they are the ones
+> consuming this documentation. I really can't imagine anyone being able
+> to write something useful based on this.
+
+My bad: obviously I shouldn't be exposing the kernel's implementation details
+here. As for what the documentation should actually say, I'm thinking I can
+adapt the revised description of the KVM exit from earlier ("An exit reason of
+KVM_EXIT_MEMORY_FAULT indicates..."). Again, please let me know if you see
+anything which should be changed there.
+
+> > +             /* KVM_EXIT_MEMORY_FAULT */
+> > +             struct {
+> > +                     __u64 flags;
+> > +                     __u64 gpa;
+> > +                     __u64 size;
+> > +             } memory_fault;
+>
+> Sigh... This doesn't even match the documentation.
+
+Ack! Ack.
+
+> > -/* Available with  KVM_CAP_S390_VCPU_RESETS */
+> > +/* Available with KVM_CAP_S390_VCPU_RESETS */
+>
+> Unrelated change?
+
+Yes, I'll drop it from the next revision.
+
+> > +             r = -EFAULT;
+> > +             if (copy_from_user(&state, argp, sizeof(state)))
+>
+> A copy_from_user for... a bool? Why don't you directly treat argp as
+> the boolean itself? Of even better, make it a more interesting
+> quantity so that the API can evolve in the future. As it stands, it is
+> not extensible, which means it is already dead, if Linux APIs are
+> anything to go by.
+
+I'll keep that in mind for the future, but this is now moot since I'll be
+removing KVM_SET_MEM_FAULT_NOWAIT.
+
+> On a related subject: is there a set of patches for any of the main
+> VMMs making any use of this?
+
+No. For what it's worth, the demand_paging_selftest demonstrates the basics of
+what userspace can do with the new exit. Would it be helpful to see how QEMU
+could use it as well?
+
+[1] https://lore.kernel.org/all/CA+EHjTyzZ2n8kQxH_Qx72aRq1k+dETJXTsoOM3tggPZAZkYbCA@mail.gmail.com/
