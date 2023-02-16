@@ -2,123 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 605DD698CBB
-	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 07:17:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A101F698D18
+	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 07:34:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229824AbjBPGRQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Feb 2023 01:17:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60788 "EHLO
+        id S229632AbjBPGe4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Feb 2023 01:34:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229596AbjBPGRP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Feb 2023 01:17:15 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E02E3770D;
-        Wed, 15 Feb 2023 22:17:14 -0800 (PST)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31G4TYbk016020;
-        Thu, 16 Feb 2023 06:17:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=dwYvXklkQPC6Q+eIG8bMSC+KKu07S+NZwABvL1rqCUI=;
- b=MffWi8qpNCFIyvBUTfnoGGYxr82brVe3h68QvpfRrhUnjpXWaBvDVvzu4Uq2fU7J3oLV
- oAnf6Z/r3XDGyX9jhJ1BqwjkID9O8dpthh+bUNtCbICKhJEK4osOVKYJScHfEqeHxubp
- iGqEMg+Eespm6xKXuc7lLSGN8VvZ5vCFxIc41rLHdSPCSPJP5MN8ZX9qBqQ5bjSIol/K
- rLdbr+z8HOcM53WuvWgyQzcxSnCzP1CVANRtLqMt8x8fVfN1ln/MlqzrspWUT19CIqbl
- 7h6zSislRyjWMvih5qfc+tSjAZ5P6naznrABqtfeL7AotL8XDhjlU+EUf4qqhG7K8YBQ ig== 
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nsdgsa244-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 16 Feb 2023 06:17:13 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31G5k3ne031329;
-        Thu, 16 Feb 2023 06:17:11 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3np29fp8v3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 16 Feb 2023 06:17:11 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31G6H7qq44171632
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 16 Feb 2023 06:17:07 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CDC1C2004D;
-        Thu, 16 Feb 2023 06:17:07 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 59A3120040;
-        Thu, 16 Feb 2023 06:17:07 +0000 (GMT)
-Received: from li-4a3a4a4c-28e5-11b2-a85c-a8d192c6f089.ibm.com (unknown [9.171.28.250])
-        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-        Thu, 16 Feb 2023 06:17:07 +0000 (GMT)
-Date:   Thu, 16 Feb 2023 07:17:05 +0100
-From:   Alexander Gordeev <agordeev@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     borntraeger@linux.ibm.com, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [PATCH v1 1/1] s390: nmi: fix virtual-physical address confusion
-Message-ID: <Y+3KYSnJsznJEX4v@li-4a3a4a4c-28e5-11b2-a85c-a8d192c6f089.ibm.com>
-References: <20230215160252.14672-1-nrb@linux.ibm.com>
- <20230215160252.14672-2-nrb@linux.ibm.com>
+        with ESMTP id S229485AbjBPGez (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Feb 2023 01:34:55 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8DBA43443;
+        Wed, 15 Feb 2023 22:34:34 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6753B61DEE;
+        Thu, 16 Feb 2023 06:34:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B344C433D2;
+        Thu, 16 Feb 2023 06:34:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1676529264;
+        bh=TaJX0rn163ChcOickz0gpBby+9FDsJsRnGlfNP2/n08=;
+        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+        b=CTRLfWbK9nXPSg32reC9xxHlkN2P2F9h2C4janWP1+afFUG2TXxtEwttiE63dTkrc
+         FDAWQnqysZt4nwUe0N+5L8IXRbKcIVIax6cRorCDA3BAp4o+XPYAWmzM2tMK4PPouF
+         tD++An5l193VmfJY/BPOEKMH+tAg5pwC4qPD0VXu/0tqpAGRbmv0k3MiDhIDfquThb
+         d5bqFNsC4GPlyIeVZLETJxuKr0tOpBTcUCOvHc5GWC7YHwL7d5nlZkKdhsu/uUW2Lc
+         Y0MRfr8uDWMY21D3e0TSltimT3W0+I0QTDVvXXqk4TQ8h7WR1pXvSCcHZ7zXAwkKd5
+         NL2RMXKzosWjg==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+        id 0BD465C164C; Wed, 15 Feb 2023 22:34:22 -0800 (PST)
+Date:   Wed, 15 Feb 2023 22:34:22 -0800
+From:   "Paul E. McKenney" <paulmck@kernel.org>
+To:     Usama Arif <usama.arif@bytedance.com>
+Cc:     dwmw2@infradead.org, tglx@linutronix.de, kim.phillips@amd.com,
+        arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
+        pbonzini@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, rcu@vger.kernel.org, mimoja@mimoja.de,
+        hewenliang4@huawei.com, thomas.lendacky@amd.com, seanjc@google.com,
+        pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
+        punit.agrawal@bytedance.com, simon.evans@bytedance.com,
+        liangma@liangbit.com
+Subject: Re: [PATCH v9 0/8] Parallel CPU bringup for x86_64
+Message-ID: <20230216063422.GQ2948950@paulmck-ThinkPad-P17-Gen-1>
+Reply-To: paulmck@kernel.org
+References: <20230215145425.420125-1-usama.arif@bytedance.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230215160252.14672-2-nrb@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: KzHwTlKRbVxEUMabM7UXhfEIDReZekPY
-X-Proofpoint-ORIG-GUID: KzHwTlKRbVxEUMabM7UXhfEIDReZekPY
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
- definitions=2023-02-16_04,2023-02-15_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- impostorscore=0 suspectscore=0 mlxlogscore=944 clxscore=1011
- malwarescore=0 adultscore=0 phishscore=0 spamscore=0 lowpriorityscore=0
- mlxscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302160050
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20230215145425.420125-1-usama.arif@bytedance.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 15, 2023 at 05:02:52PM +0100, Nico Boehr wrote:
-> When a machine check is received while in SIE, it is reinjected into the
-> guest in some cases. The respective code needs to access the sie_block,
-> which is taken from the backed up R14.
+On Wed, Feb 15, 2023 at 02:54:17PM +0000, Usama Arif wrote:
+> The main change over v8 is dropping the patch to avoid repeated saves of MTRR
+> at boot time. It didn't make a difference to smpboot time and is independent
+> of parallel CPU bringup, so if needed can be explored in a separate patchset.
 > 
-> Since reinjection only occurs while we are in SIE (i.e. between the
-> labels sie_entry and sie_leave in entry.S and thus if CIF_MCCK_GUEST is
-> set), the backed up R14 will always contain a physical address in
-> s390_backup_mcck_info.
-> 
-> This currently works, because virtual and physical addresses are
-> the same.
-> 
-> Add phys_to_virt() to resolve the virtual-physical confusion.
-> 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> ---
->  arch/s390/kernel/nmi.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/s390/kernel/nmi.c b/arch/s390/kernel/nmi.c
-> index 5dbf274719a9..322160328866 100644
-> --- a/arch/s390/kernel/nmi.c
-> +++ b/arch/s390/kernel/nmi.c
-> @@ -347,7 +347,7 @@ static void notrace s390_backup_mcck_info(struct pt_regs *regs)
->  
->  	/* r14 contains the sie block, which was set in sie64a */
->  	struct kvm_s390_sie_block *sie_block =
-> -			(struct kvm_s390_sie_block *) regs->gprs[14];
-> +			(struct kvm_s390_sie_block *)phys_to_virt(regs->gprs[14]);
+> The patches have also been rebased to v6.2-rc8 and retested and the
+> improvement in boot time is the same as v8.
 
-Casting to (struct kvm_s390_sie_block *) is not superfluous,
-since phys_to_virt() returns (void *).
+This version passes moderate torture testing.
 
->  
->  	if (sie_block == NULL)
->  		/* Something's seriously wrong, stop system. */
+Tested-by: Paul E. McKenney <paulmck@kernel.org>
 
-Reviewed-by: Alexander Gordeev <agordeev@linux.ibm.com>
+> Thanks,
+> Usama
+> 
+> Changes across versions:
+> v2: Cut it back to just INIT/SIPI/SIPI in parallel for now, nothing more
+> v3: Clean up x2apic patch, add MTRR optimisation, lock topology update
+>     in preparation for more parallelisation.
+> v4: Fixes to the real mode parallelisation patch spotted by SeanC, to
+>     avoid scribbling on initial_gs in common_cpu_up(), and to allow all
+>     24 bits of the physical X2APIC ID to be used. That patch still needs
+>     a Signed-off-by from its original author, who once claimed not to
+>     remember writing it at all. But now we've fixed it, hopefully he'll
+>     admit it now :)
+> v5: rebase to v6.1 and remeasure performance, disable parallel bringup
+>     for AMD CPUs.
+> v6: rebase to v6.2-rc6, disabled parallel boot on amd as a cpu bug and
+>     reused timer calibration for secondary CPUs.
+> v7: [David Woodhouse] iterate over all possible CPUs to find any existing
+>     cluster mask in alloc_clustermask. (patch 1/9)
+>     Keep parallel AMD support enabled in AMD, using APIC ID in CPUID leaf
+>     0x0B (for x2APIC mode) or CPUID leaf 0x01 where 8 bits are sufficient.
+>     Included sanity checks for APIC id from 0x0B. (patch 6/9)
+>     Removed patch for reusing timer calibration for secondary CPUs.
+>     commit message and code improvements.
+> v8: Fix CPU0 hotplug by setting up the initial_gs, initial_stack and
+>     early_gdt_descr.
+>     Drop trampoline lock and bail if APIC ID not found in find_cpunr.
+>     Code comments improved and debug prints added.
+> v9: Drop patch to avoid repeated saves of MTRR at boot time.
+>     rebased and retested at v6.2-rc8.
+>     added kernel doc for no_parallel_bringup and made do_parallel_bringup
+>     __ro_after_init.
+> 
+> David Woodhouse (8):
+>   x86/apic/x2apic: Allow CPU cluster_mask to be populated in parallel
+>   cpu/hotplug: Move idle_thread_get() to <linux/smpboot.h>
+>   cpu/hotplug: Add dynamic parallel bringup states before
+>     CPUHP_BRINGUP_CPU
+>   x86/smpboot: Reference count on smpboot_setup_warm_reset_vector()
+>   x86/smpboot: Split up native_cpu_up into separate phases and document
+>     them
+>   x86/smpboot: Support parallel startup of secondary CPUs
+>   x86/smpboot: Send INIT/SIPI/SIPI to secondary CPUs in parallel
+>   x86/smpboot: Serialize topology updates for secondary bringup
+> 
+>  .../admin-guide/kernel-parameters.txt         |   3 +
+>  arch/x86/include/asm/realmode.h               |   3 +
+>  arch/x86/include/asm/smp.h                    |  14 +-
+>  arch/x86/include/asm/topology.h               |   2 -
+>  arch/x86/kernel/acpi/sleep.c                  |   1 +
+>  arch/x86/kernel/apic/apic.c                   |   2 +-
+>  arch/x86/kernel/apic/x2apic_cluster.c         | 130 ++++---
+>  arch/x86/kernel/cpu/common.c                  |   6 +-
+>  arch/x86/kernel/head_64.S                     |  99 ++++-
+>  arch/x86/kernel/smpboot.c                     | 350 +++++++++++++-----
+>  arch/x86/realmode/init.c                      |   3 +
+>  arch/x86/realmode/rm/trampoline_64.S          |  14 +
+>  arch/x86/xen/smp_pv.c                         |   4 +-
+>  include/linux/cpuhotplug.h                    |   2 +
+>  include/linux/smpboot.h                       |   7 +
+>  kernel/cpu.c                                  |  31 +-
+>  kernel/smpboot.c                              |   2 +-
+>  kernel/smpboot.h                              |   2 -
+>  18 files changed, 515 insertions(+), 160 deletions(-)
+> 
+> -- 
+> 2.25.1
+> 
