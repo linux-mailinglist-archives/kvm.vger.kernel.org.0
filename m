@@ -2,94 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 435B8699D08
-	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 20:35:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CF88699D4A
+	for <lists+kvm@lfdr.de>; Thu, 16 Feb 2023 21:02:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229744AbjBPTer (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Feb 2023 14:34:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44916 "EHLO
+        id S229520AbjBPUCY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Feb 2023 15:02:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229726AbjBPTeo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Feb 2023 14:34:44 -0500
-Received: from out-35.mta0.migadu.com (out-35.mta0.migadu.com [91.218.175.35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B4054D602
-        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 11:34:42 -0800 (PST)
-Date:   Thu, 16 Feb 2023 19:34:36 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1676576080;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dpoDOnj3G+hYh7/UvLCSR56PrbvzC1VRhpcp77nLQtM=;
-        b=qcBUhf3s0IDejLnw5OxOJoxCVcLGMETOrzm15p4ytyE91tA4Yrsu33AmUC9uO6e5jGR4hh
-        nYMdHx9P2wq31uctirgIy23HSqhMw/nCKOVP/lO1g2NCWqNb6DnZAIHql1mhrHUabXP/Tw
-        JLjP+ZKnRR0hGOwBiWkQIGTDGPxhq8Y=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Tianrui Zhao <zhaotianrui@loongson.cn>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        WANG Xuerui <kernel@xen0n.name>, loongarch@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>
-Subject: Re: [PATCH v1 01/24] LoongArch: KVM: Implement kvm module related
- interface
-Message-ID: <Y+6FTC1vBeZoZx8V@linux.dev>
-References: <20230214025648.1898508-1-zhaotianrui@loongson.cn>
- <20230214025648.1898508-2-zhaotianrui@loongson.cn>
- <Y+ssT+W27GxDRAAZ@kroah.com>
- <6fd2ca5a-7243-0627-79e9-8c8bd840adc2@loongson.cn>
- <Y+tbMwXjA0hkiUJA@kroah.com>
- <a44fc722-e3e2-7f8a-0454-f27a8a10d52b@loongson.cn>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <a44fc722-e3e2-7f8a-0454-f27a8a10d52b@loongson.cn>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S229489AbjBPUCX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Feb 2023 15:02:23 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57ED03B220
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 12:02:22 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id k15-20020a5b0a0f000000b007eba3f8e3baso3028675ybq.4
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 12:02:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=jIgrYbrw1OcjMvUr5NxPosJwiRZMEmOTls06KUUbRQc=;
+        b=meju69KoHaINzwjCZgxS6UiKeUm/8jnihSc7WaSW125QfTMeJ27kk1aoGzHLv25Q48
+         7kp/eSATATPovAxTPIScxxnvogQa31Xh0kRWeOFq2sF4wvFKuBCQNgSRgDTmfx0g7PF1
+         oNvh6T41Bx/CEFFWmwaqOnivail/UjErz4RqdboLixkQEkkQrrj30gcYhi7siBDaOp/x
+         LBcYJZU+jkZ7M2rNDhV/2fY7qg4e8lH//lt159a9nwonQG3EnhFdZqRLnX64p41Ec349
+         MAync0eh9hSIxzcw8LhKP6VtOH4mJEHmH1aqAOH6qGMbDXd29P+VcSp20D6UyrpvBZLl
+         SMHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jIgrYbrw1OcjMvUr5NxPosJwiRZMEmOTls06KUUbRQc=;
+        b=UBtN3AsP/25eifN1Ad6NSSAVgG/DpK4Tymmx7B888722rNQRPLJC/DQXtFabSzwWBG
+         DhUa9qj7Gnnm/MoUi27ici523vf92mBej5V8mw+qKrobLHQ2SFKglnbC+wSRYoGPZtAn
+         lRvxxCUluIcog5HjHk2f4CXCVPq1ipIvwa28PJDrAduazWxgfakbkIPKXIc/bH6RAkQz
+         /XSAbmIuk8oFJkXbBB+3qbDN6UinTRvt5KXf/PKUsFDJuzAIkbghoeP/xjshLz5PcBCq
+         532rqMT6WnvFIn1uBqBe9kDo88lZqTGLD/wRa2o+PdsTuKiekokaocykSyEhwEaK6TLx
+         2Caw==
+X-Gm-Message-State: AO0yUKXhtEVjaWr7YowIqyOIrH1PZEoyDSiXylU6ZxZ4FQxJ45Ekja0x
+        veOx5uuXGwQZCMfWcjX68pj/oljyrScTig==
+X-Google-Smtp-Source: AK7set8e9rjh3QXcjR+A+/r5XfAnPRP4H1GfKvV7t1A+6nzeeoB6jgwNXpkF9+KZ8OCCYAgoaZO4IKH6MBMSlg==
+X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
+ (user=amoorthy job=sendgmr) by 2002:a05:6902:308:b0:855:fd13:bc3c with SMTP
+ id b8-20020a056902030800b00855fd13bc3cmr16ybs.11.1676577741072; Thu, 16 Feb
+ 2023 12:02:21 -0800 (PST)
+Date:   Thu, 16 Feb 2023 20:02:18 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.2.637.g21b0678d19-goog
+Message-ID: <20230216200218.1028943-1-amoorthy@google.com>
+Subject: [PATCH] selftests/kvm: Fix bug in how demand_paging_test calculates
+ paging rate
+From:   Anish Moorthy <amoorthy@google.com>
+To:     pbonzini@redhat.com, kvm@vger.kernel.org
+Cc:     jthoughton@google.com, seanjc@google.com, oliver.upton@linux.dev,
+        Anish Moorthy <amoorthy@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 14, 2023 at 09:00:50PM +0800, Tianrui Zhao wrote:
-> 在 2023年02月14日 17:58, Greg Kroah-Hartman 写道:
-> > On Tue, Feb 14, 2023 at 05:00:56PM +0800, Tianrui Zhao wrote:
-> > > > > +#define KVM_GET_CSRS		_IOWR(KVMIO, 0xc5, struct kvm_csrs)
-> > > > > +#define KVM_SET_CSRS		_IOW(KVMIO,  0xc6, struct kvm_csrs)
-> > > > Why does this arch need new ioctls?
-> > > We want to use this ioctl to access multiple csrs at one time. If without
-> > > this, we only access one csr.
-> > What is wrong with accessing only one csr at a time?  Isn't this what
-> > other architectures do?
-> 
-> Generally, using KVM_GET_ONE_GET ioctl to get one reg, but we want a
-> more convenient interface to get serial regs at one time, so we add this
-> ioctl.
+The current denominator is 1E8, not 1E9 as it should be.
 
-Have you found register accesses through the KVM_{GET,SET}_ONE_REG
-ioctls to actually be a bounding issue? I'd be surprised if that were
-actually the case.
+Reported-by: James Houghton <jthoughton@google.com>
+Signed-off-by: Anish Moorthy <amoorthy@google.com>
+---
+ tools/testing/selftests/kvm/demand_paging_test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-An architecture-neutral implementation was entertained a few years ago
-[*], but even then it saved an inconsequential amount of time relative
-to the rest of VM serialization (at least for arm64). The one thing that
-series got right was to share the plumbing across all architectures that
-use the ONE_REG interface (i.e. everyone but x86).
-
-If you have data that supports the thesis that a batched ioctl is
-useful then please do share. But in any case this should not use an ioctl
-tied down to a single architecture.
-
-[*] https://lore.kernel.org/kvm/20201120125616.14436-1-darkhan@amazon.com/
-
+diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
+index b0e1fc4de9e29..2439c4043fed6 100644
+--- a/tools/testing/selftests/kvm/demand_paging_test.c
++++ b/tools/testing/selftests/kvm/demand_paging_test.c
+@@ -194,7 +194,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 		ts_diff.tv_sec, ts_diff.tv_nsec);
+ 	pr_info("Overall demand paging rate: %f pgs/sec\n",
+ 		memstress_args.vcpu_args[0].pages * nr_vcpus /
+-		((double)ts_diff.tv_sec + (double)ts_diff.tv_nsec / 100000000.0));
++		((double)ts_diff.tv_sec + (double)ts_diff.tv_nsec / NSEC_PER_SEC));
+ 
+ 	memstress_destroy_vm(vm);
+ 
 -- 
-Thanks,
-Oliver
+2.39.2.637.g21b0678d19-goog
+
