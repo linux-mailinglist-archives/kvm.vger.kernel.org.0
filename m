@@ -2,57 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9229369A4D3
-	for <lists+kvm@lfdr.de>; Fri, 17 Feb 2023 05:22:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A82E269A4DA
+	for <lists+kvm@lfdr.de>; Fri, 17 Feb 2023 05:24:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229576AbjBQEWH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Feb 2023 23:22:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45338 "EHLO
+        id S229597AbjBQEYw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Feb 2023 23:24:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229515AbjBQEWG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Feb 2023 23:22:06 -0500
-Received: from mail-vs1-xe30.google.com (mail-vs1-xe30.google.com [IPv6:2607:f8b0:4864:20::e30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 543A73A0BD
-        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 20:22:05 -0800 (PST)
-Received: by mail-vs1-xe30.google.com with SMTP id k4so4336255vsc.4
-        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 20:22:05 -0800 (PST)
+        with ESMTP id S229555AbjBQEYr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Feb 2023 23:24:47 -0500
+Received: from mail-vs1-xe2c.google.com (mail-vs1-xe2c.google.com [IPv6:2607:f8b0:4864:20::e2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB42A42BFA
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 20:24:46 -0800 (PST)
+Received: by mail-vs1-xe2c.google.com with SMTP id g8so4343509vso.3
+        for <kvm@vger.kernel.org>; Thu, 16 Feb 2023 20:24:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=DmQBbpAu6B0uYYhxH30aHdK9UMmXNgVHX14jvNOggZk=;
-        b=tJA35Ofvs7OhFLQM4OAO9pyzBvthd1pHbKdaGQcRJ3YavWvQaShc7aTkBnKhHNN/qf
-         71V0DM19hvtEjOHUzjLR2745KsM8dlyMKcd01CcQ+FwFzC7/bE1MPLr0cth7zPVN5t84
-         xXJakn3yMkVRExor1tx6+hTzGcDc9X7aMCvaIxvranghfxdnSmz++u5JcY376v30Pvve
-         cbEsgeTf3k8MLOzEzpPng3PoJj+Ma95D9fTXhjgzq7h+2JupaecZZY1EoqYZmXBd2Gl2
-         pokR2z1r2mqfRnRHTWASeUWMVLlt4NHNRc3gZ0KfBJzISW6RhMZlmTLJmVp6kSJ54cKK
-         2BCQ==
+        bh=PJu4vps/ydzm+bD68RapcHOeOMmzQwBmAiW7NmBj0zU=;
+        b=N9QazQscN5/bMrTwGxOfAtM8xQD0zg2C7V00UxsuXtYfAz5LVfV9yZkceaMx30llQS
+         MbtMbGZSrDyQ8f+5wFmT5KPHG7yoVHYuRGjV/K+K1/YBzfts3DWsIWEL2wK13NHsBONL
+         3WSw5YTZ0a5gR+5SW3CY0ht9ZWgZiEHmWxeYTUfbfTwp27jM0ayQIQmuMeH32n16zCMS
+         LlHALD1+pwPBgt3KwWvli37N4+ulQIAdwqaKEMOyIYnaNF0PxJI5iNKryPEMJ1JxgseD
+         cL+jVcKxymHBK7RZixjBM3EahjNXB2uD4wOmYf/cmuvuGiqT2+UiebhqO4obZD3C2vfh
+         jyHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=DmQBbpAu6B0uYYhxH30aHdK9UMmXNgVHX14jvNOggZk=;
-        b=x/O+VGGYZdsJ4cqxE+GAlTXvkOx8o2RmmZfF6rGfT9EVKXI6z9rKPw/A5yraviKsJU
-         EsCewWz9IqnCb1BxomaBbtiSQEGC58ldmCe+IB1hdWCQ4vw0iQD3FMr7E/6EKSbGzT+7
-         3kr9FQLtzRiozm8YaefHEz/FdtntYVe09gUP5icn87w5mCZxnCQcYwwqi5cIlVHHAEU6
-         azNfKqT3GfapHi59EYnABbrIrtavHnrvN6NxPfPSf5iVyvlNngwIFLUvcaRv4H1CnED6
-         gyX1vVd5eGkDrka3rPVbyJtk+VB86VJRdmxALqzlbhOPXoHXzKN4ZwCzU/0Ig1xElm3r
-         WDOw==
-X-Gm-Message-State: AO0yUKVEYQ5nR23OyQTVIDk74wbdd2dU4uCMoQmOhdL7irLfLiQTs52n
-        cloiVghI64qCW/QaghwLiYlOvGN/YRkWH9LJ5OnShw==
-X-Google-Smtp-Source: AK7set8pOdWfIt69LFD7Klja37MX4Y0B4AgeZGxYGFzE3TmHzaA3GYFi17QwE/R0IT0jJksQbazWrQ2EJ3TyMlpGcMk=
+        bh=PJu4vps/ydzm+bD68RapcHOeOMmzQwBmAiW7NmBj0zU=;
+        b=krRIPWotF7p3dnXBhf/EhiEGhgWqSoWp0l9yE9inz5a9DABnPm2jWorBCNcguh7InA
+         nKc7eml4n/nvYF1skoSiWFrKrkpxsKpKsEIhyyuNiu7Zhe6FXUvUaRoxyt1yxT94pzab
+         S6MoeIJJ1xbHMlJTp5tOHftYZ8mqo0maYT+1PWCzBLLyqrIpZCtUbDD+oAG/vj9269CX
+         lVPPYpaJMXf/A7dPLf84uwPMydO3Ze0qNDIy8E2p2sZkh3wr4RNPJC6+5tHzQ+eaOB8p
+         oQOn9wR4yJF2ToLpo2eQEPGWhiZV+Bz20KxHA7U8be4AtJ/9g7Tr2IxAbNRNTvH+0mCl
+         XKJw==
+X-Gm-Message-State: AO0yUKUjtLaZQqYxhB158Wc8xMU31wfElG9iKc/cQf9e9P63GUpPoLMc
+        Pbruuf1FjfjB19ZKAh+Wz91zcYG97y1YalSTm18eNg==
+X-Google-Smtp-Source: AK7set+Yem2rWelUagYff1NdlU4Jg460e39X+mAJEfXHa9zcbTd/sITo7f0UTvcIS0NfZcWWeb2tTMWiIhTxmfPdL/A=
 X-Received: by 2002:a67:cf47:0:b0:411:c1a0:c787 with SMTP id
- f7-20020a67cf47000000b00411c1a0c787mr1602974vsm.26.1676607724287; Thu, 16 Feb
- 2023 20:22:04 -0800 (PST)
+ f7-20020a67cf47000000b00411c1a0c787mr1603908vsm.26.1676607885989; Thu, 16 Feb
+ 2023 20:24:45 -0800 (PST)
 MIME-Version: 1.0
-References: <20230217041230.2417228-1-yuzhao@google.com> <20230217041230.2417228-4-yuzhao@google.com>
-In-Reply-To: <20230217041230.2417228-4-yuzhao@google.com>
+References: <20230217041230.2417228-1-yuzhao@google.com> <20230217041230.2417228-5-yuzhao@google.com>
+In-Reply-To: <20230217041230.2417228-5-yuzhao@google.com>
 From:   Yu Zhao <yuzhao@google.com>
-Date:   Thu, 16 Feb 2023 21:21:28 -0700
-Message-ID: <CAOUHufYSx-edDVCZSauOzwOJG6Av0++0TFT4ko8qWq7vLi_mjw@mail.gmail.com>
-Subject: Re: [PATCH mm-unstable v1 3/5] kvm/arm64: add kvm_arch_test_clear_young()
-To:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>
+Date:   Thu, 16 Feb 2023 21:24:09 -0700
+Message-ID: <CAOUHufbjbaBtNQX-uSOUQEDoH9nAE0nC7L+ssoPF3WHpQuiwuw@mail.gmail.com>
+Subject: Re: [PATCH mm-unstable v1 4/5] kvm/powerpc: add kvm_arch_test_clear_young()
+To:     Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>
 Cc:     Jonathan Corbet <corbet@lwn.net>,
         Michael Larabel <michael@michaellarabel.com>,
         kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -75,8 +77,7 @@ X-Mailing-List: kvm@vger.kernel.org
 On Thu, Feb 16, 2023 at 9:12 PM Yu Zhao <yuzhao@google.com> wrote:
 >
 > This patch adds kvm_arch_test_clear_young() for the vast majority of
-> VMs that are not pKVM and run on hardware that sets the accessed bit
-> in KVM page tables.
+> VMs that are not nested and run on hardware with Radix MMU enabled.
 >
 > It relies on two techniques, RCU and cmpxchg, to safely test and clear
 > the accessed bit without taking the MMU lock. The former protects KVM
@@ -86,16 +87,17 @@ On Thu, Feb 16, 2023 at 9:12 PM Yu Zhao <yuzhao@google.com> wrote:
 >
 > Signed-off-by: Yu Zhao <yuzhao@google.com>
 > ---
->  arch/arm64/include/asm/kvm_host.h       |  7 +++
->  arch/arm64/include/asm/kvm_pgtable.h    |  8 +++
->  arch/arm64/include/asm/stage2_pgtable.h | 43 ++++++++++++++
->  arch/arm64/kvm/arm.c                    |  1 +
->  arch/arm64/kvm/hyp/pgtable.c            | 51 ++--------------
->  arch/arm64/kvm/mmu.c                    | 77 ++++++++++++++++++++++++-
->  6 files changed, 141 insertions(+), 46 deletions(-)
+>  arch/powerpc/include/asm/kvm_host.h    | 18 ++++++
+>  arch/powerpc/include/asm/kvm_ppc.h     | 14 +----
+>  arch/powerpc/kvm/book3s.c              |  7 +++
+>  arch/powerpc/kvm/book3s.h              |  2 +
+>  arch/powerpc/kvm/book3s_64_mmu_radix.c | 78 +++++++++++++++++++++++++-
+>  arch/powerpc/kvm/book3s_hv.c           | 10 ++--
+>  6 files changed, 110 insertions(+), 19 deletions(-)
 
-Adding Marc and Will.
+Adding Michael, Nicholas and Christophe.
 
-Can you please add other interested parties that I've missed?
+I'm not sure who I should add for this patch. Can you please add any
+interested parties that I've missed?
 
-Thanks.
+Thank you.
