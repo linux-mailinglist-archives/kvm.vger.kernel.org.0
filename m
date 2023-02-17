@@ -2,65 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C4CDE69B52A
-	for <lists+kvm@lfdr.de>; Fri, 17 Feb 2023 23:00:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E622869B532
+	for <lists+kvm@lfdr.de>; Fri, 17 Feb 2023 23:01:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229838AbjBQWAV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Feb 2023 17:00:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33986 "EHLO
+        id S229482AbjBQWBq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Feb 2023 17:01:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34950 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229795AbjBQWAU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Feb 2023 17:00:20 -0500
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8195F64B17
-        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 14:00:19 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5366333bdb5so12519007b3.19
-        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 14:00:19 -0800 (PST)
+        with ESMTP id S229677AbjBQWBp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Feb 2023 17:01:45 -0500
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07D1159732
+        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 14:01:41 -0800 (PST)
+Received: by mail-wr1-x432.google.com with SMTP id m3so156874wri.5
+        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 14:01:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ax1DcGoLiLxZwgQzmuNdmNdXr6vzAEjDqxAb7c6JEUk=;
-        b=IMPJ+mcHcIXW/UTi2L5jv9YTQUPSXf986Vqjn1IQ5yFma7mqU050Jll0vTJnGuHcXO
-         xhoDOYHUBW9ws706UrHkfzDGrctbXqNBMAVmlhTm4ZKA4HKvf98v+rQ+p21fSDanhi+j
-         hCoLMeD1sIF0GTIQo/Iqo6sAzSVuqwimdmSRnd7kLngHl1mfJb7mdVytCFr3Dj8lGGiA
-         zILSGb2kznAoXrApI7uAPAxDmhVkD30WxQYkMoWH95bwFZgfaPjYli1wHtree2nUX7fi
-         Qv9R684Vu0XSoKKah+65CdIS7Ly6XA4bDiuuQBhxrSQYIbmEJzLbpjPiQ+mTh8Lbw8eO
-         JvkA==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=S+RWIU7oYjEmeKhN1BRM+dPgJ9kaVMQBvH0lTKx4gCo=;
+        b=P7KlUd8vpj+WjFNp4aWlFlmB/DX+kLVPD3QP7QX7aLNUWsHdPIdNFpbudIqZ+cvY3W
+         HE0ybe5TzouaO117yLXbatR1gY8rf1h/o+Bbbu3X5MDM0ZuWico3g9t9+bxjoOmydgzx
+         /ZSgmlxE3ZAvzI1Fz/TVDDEHgO5h2G13bQcwPcyDdQd9nb86jlNZWruMtK/sN29vC8EN
+         qKYcgdkk5hp4jtKsLRINg8vRhzyDDSkhTbmlmWZWtBZVzH3kKZEN3c8jPfDaXOCTZ1+/
+         m7EmHx5R0xdNkHUBsI3nYaZWB6exavhe51sDW3KSusJYEPjUMh4WO7GAZe3VRKgtC57A
+         DXXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ax1DcGoLiLxZwgQzmuNdmNdXr6vzAEjDqxAb7c6JEUk=;
-        b=ue4Pw+oyIPowAEDzg14gCi28j0myVZ22b2v6z+8i3/QntWrKt1JbGMaL5nLg5TcKNc
-         iAY59K36i4H55+UNj8IzkJgDNtjshmKJRpHdINriRsTLHautvVUk6eH1ASggPFqiNuaB
-         WDvroIOtZa+dcq05ltXP1Vekai6vuHxoDUPL36FXo2cXpx64PMPVKW5x2gBUielbDiEg
-         U7i3PLCRS3dDTFSzFy/RIQWm0ZcjxETtah9P9r3bp8hnHRWc2x3nXSqN5Tw7lDa8CZvB
-         kY3avnu9LaMGaP659mwrWDCoEc0cEfm0x88lGV4/PMVsJrDGvRO9escP0cO5b/OMf7lB
-         I65A==
-X-Gm-Message-State: AO0yUKU82rVvnrQ0uSZykFHlCO2qanS2YyxDAwO13hB/nDBcuB8UfuvR
-        q8awUDZsCHXxIibkE/BCXa9/AbSIZi93pA0P4ANp5xaqLqkoWqL0qXvFexWRdu797EOfDDpoMMj
-        6ZSJbl5qwbSaCiAUbLuCAaT8ByG78Mvqb1NLAH9JNe/53qV84LQ/LHbB3/fa5vBwers5R
-X-Google-Smtp-Source: AK7set9eNWsRwlNHBEftQgg1CO9RzIf8fdO4PIbsnjoMB7dMzLV0R7geKgvzRBU5TecHmT3ttnS1/E2alM2rSE3y
-X-Received: from aaronlewis-2.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:519c])
- (user=aaronlewis job=sendgmr) by 2002:a0d:e8c2:0:b0:52e:c5e0:6564 with SMTP
- id r185-20020a0de8c2000000b0052ec5e06564mr1119623ywe.280.1676671218760; Fri,
- 17 Feb 2023 14:00:18 -0800 (PST)
-Date:   Fri, 17 Feb 2023 21:59:59 +0000
-In-Reply-To: <20230217215959.1569092-1-aaronlewis@google.com>
-Mime-Version: 1.0
-References: <20230217215959.1569092-1-aaronlewis@google.com>
-X-Mailer: git-send-email 2.39.2.637.g21b0678d19-goog
-Message-ID: <20230217215959.1569092-6-aaronlewis@google.com>
-Subject: [PATCH 5/5] KVM: selftests: Check that XTILEDATA supports XFD
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=S+RWIU7oYjEmeKhN1BRM+dPgJ9kaVMQBvH0lTKx4gCo=;
+        b=xxkpebw2ocFSWd9mN6nr++B726uK9J+c/4R6v+D/XhMxiQH/bbWSUjaPsuNH+bvSLZ
+         MhQ2D00YBIWGP7+so/cJvwkbYb+QWC3gefoCqZnbg6AsSgF0YVnQ/mwVNUMl3KLVHdVr
+         sn4+w0IpoasdcVEw4bjs/o7kKmXmsevU49aUCYzA0KPEaM3zh5qnfIpi3EvruV8HXubW
+         OGD/pTlWJq1zzZDIIiZJhBGe7E8pBRiizRxKmPk7iBC02fYBgUhG/oCp8D0IrLXoauc5
+         WManBmgvMGSdREEm6mbaLnHdv2ZzIe5i1LSHkroUEsAHD67OFbV0AC4D2GPZugq/taM/
+         RlRg==
+X-Gm-Message-State: AO0yUKXyxtHxMZe/Gxq/j67cwJ0fFutIaEFR20oKBs6JIMq30qZs9v5f
+        35KjrP/hrk+H9/GlXeafTpdoIV7CYlyPHprJ7ilzbA==
+X-Google-Smtp-Source: AK7set8Y5jxAp9swg/itPrwFcKyXyojx4iwM90gLmILXSZ0Xoyfrwexebu9w/TfSPp/vznOWaghs7HSgvJ2FQTvEhzU=
+X-Received: by 2002:a5d:640e:0:b0:2c4:dbc:8e34 with SMTP id
+ z14-20020a5d640e000000b002c40dbc8e34mr229772wru.123.1676671299303; Fri, 17
+ Feb 2023 14:01:39 -0800 (PST)
+MIME-Version: 1.0
+References: <20230214184606.510551-1-mizhang@google.com> <20230214184606.510551-4-mizhang@google.com>
+In-Reply-To: <20230214184606.510551-4-mizhang@google.com>
 From:   Aaron Lewis <aaronlewis@google.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
-        Aaron Lewis <aaronlewis@google.com>
+Date:   Fri, 17 Feb 2023 22:01:27 +0000
+Message-ID: <CAAAPnDFG+9x5A24cDs8344k9W6zddpJ7cKBFOXmzaLhMhvmR=g@mail.gmail.com>
+Subject: Re: [PATCH v2 3/7] KVM: selftests: x86: Add check of CR0.TS in the
+ #NM handler in amx_test
+To:     Mingwei Zhang <mizhang@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jim Mattson <jmattson@google.com>,
+        Venkatesh Srinivas <venkateshs@google.com>,
+        "Chang S. Bae" <chang.seok.bae@intel.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,39 +72,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In amx_test, add the requirement that the guest allows the xfeature,
-XTILEDATA, to be set in XFD.  The test relies on it.
+On Tue, Feb 14, 2023 at 6:46 PM Mingwei Zhang <mizhang@google.com> wrote:
+>
+> Add check of CR0.TS[bit 3] before the check of IA32_XFD_ERR in the #NM
+> handler in amx_test. This is because XFD may not be the only reason of
+> the IA32_XFD MSR and the bitmap corresponding to the state components
+> required by the faulting instruction." (Intel SDM vol 1. Section 13.14)
+>
+> Add the missing check of CR0.TS.
+>
+> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> ---
+>  tools/testing/selftests/kvm/x86_64/amx_test.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/tools/testing/selftests/kvm/x86_64/amx_test.c b/tools/testing/selftests/kvm/x86_64/amx_test.c
+> index aac727ff7cf8..847752998660 100644
+> --- a/tools/testing/selftests/kvm/x86_64/amx_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/amx_test.c
+> @@ -215,6 +215,7 @@ void guest_nm_handler(struct ex_regs *regs)
+>  {
+>         /* Check if #NM is triggered by XFEATURE_MASK_XTILEDATA */
+>         GUEST_SYNC(7);
+> +       GUEST_ASSERT((get_cr0() & X86_CR0_TS) == 0);
 
-Signed-off-by: Aaron Lewis <aaronlewis@google.com>
----
- tools/testing/selftests/kvm/include/x86_64/processor.h | 1 +
- tools/testing/selftests/kvm/x86_64/amx_test.c          | 1 +
- 2 files changed, 2 insertions(+)
+Can't we infer that the #NM is the result of an XFD error due to the fact
+that IA32_XFD_ERR is set?  Is this check needed?
+SDM vol 1, 13.14, EXTENDED FEATURE DISABLE (XFD)
+ - Device-not-available exceptions that are not due to XFD - those
+   resulting from setting CR0.TS to 1 - do not modify the IA32_XFD_ERR
+   MSR.
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 8211b9de6e7b9..647cc6b9839d5 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -125,6 +125,7 @@ struct kvm_x86_cpu_feature {
- #define	X86_FEATURE_XTILEDATA		KVM_X86_CPU_FEATURE(0xD, 0, EAX, 18)
- #define	X86_FEATURE_XSAVES		KVM_X86_CPU_FEATURE(0xD, 1, EAX, 3)
- #define	X86_FEATURE_XFD			KVM_X86_CPU_FEATURE(0xD, 1, EAX, 4)
-+#define X86_FEATURE_XTILEDATA_XFD	KVM_X86_CPU_FEATURE(0xD, 18, ECX, 2)
- 
- /*
-  * Extended Leafs, a.k.a. AMD defined
-diff --git a/tools/testing/selftests/kvm/x86_64/amx_test.c b/tools/testing/selftests/kvm/x86_64/amx_test.c
-index ab66a51228fff..d1a029f132d94 100644
---- a/tools/testing/selftests/kvm/x86_64/amx_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/amx_test.c
-@@ -254,6 +254,7 @@ int main(int argc, char *argv[])
- 	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_AMX_TILE));
- 	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_XTILECFG));
- 	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_XTILEDATA));
-+	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_XTILEDATA_XFD));
- 
- 	/* Create VM */
- 	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
--- 
-2.39.2.637.g21b0678d19-goog
-
+>         GUEST_ASSERT(rdmsr(MSR_IA32_XFD_ERR) == XFEATURE_MASK_XTILEDATA);
+>         GUEST_SYNC(8);
+>         GUEST_ASSERT(rdmsr(MSR_IA32_XFD_ERR) == XFEATURE_MASK_XTILEDATA);
+> --
+> 2.39.1.581.gbfd45094c4-goog
+>
