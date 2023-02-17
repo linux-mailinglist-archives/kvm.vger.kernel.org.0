@@ -2,263 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 82C7C69B140
-	for <lists+kvm@lfdr.de>; Fri, 17 Feb 2023 17:42:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 87DEC69B16A
+	for <lists+kvm@lfdr.de>; Fri, 17 Feb 2023 17:53:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230250AbjBQQmx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Feb 2023 11:42:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55376 "EHLO
+        id S229919AbjBQQxS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Feb 2023 11:53:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229958AbjBQQmt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Feb 2023 11:42:49 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C73472916;
-        Fri, 17 Feb 2023 08:42:42 -0800 (PST)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31HG9ReH015677;
-        Fri, 17 Feb 2023 16:42:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=RXsfqh9OKheMYhHDnfbRzosWPgga/aEbqUy2oi+eRmE=;
- b=RcWa+XEj9DhYUFReDEF9Q+Swlu9iB1NjzbOOAKJs/MOFrc1JLR89YpPV+skdbQXbi8qg
- Kl896ycpDcrAggtKkOu6KnQKZRRCqMZhktnnUz+rWgTmNFPDlunaWIFyrBiJwpq9OWA0
- gkJSKDzJQsQldFaqP2cLFxVSkGZWYb7ZiL+PiF1cxnKz+EsxbY+Czxa78Rs/KKHejUOw
- RTub6ge5rOzzCjplJ+X6nVMXCB3GX45wC6CdK0iSD4Au/LU1F18qNlpHKIcpMaTI5C8s
- oK7katHM6JMiLyXNAGx0fwS904x9jOPapqn82IcIP2Vlh/+CAMclitGncwySKhxnS/Qe Gw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ntbesk5fm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Feb 2023 16:42:41 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31HGVdUc011274;
-        Fri, 17 Feb 2023 16:42:40 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ntbesk5eu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Feb 2023 16:42:40 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31HBR58P031329;
-        Fri, 17 Feb 2023 16:42:38 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3np29fra3r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Feb 2023 16:42:38 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31HGgZPP18874892
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 17 Feb 2023 16:42:35 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 233C220043;
-        Fri, 17 Feb 2023 16:42:35 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A4A2920049;
-        Fri, 17 Feb 2023 16:42:34 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.171.12.31])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with SMTP;
-        Fri, 17 Feb 2023 16:42:34 +0000 (GMT)
-Date:   Fri, 17 Feb 2023 17:42:19 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH 3/3] s390x: pv: Add IPL reset tests
-Message-ID: <20230217174219.71163eb5@p-imbrenda>
-In-Reply-To: <20230201084833.39846-4-frankja@linux.ibm.com>
-References: <20230201084833.39846-1-frankja@linux.ibm.com>
-        <20230201084833.39846-4-frankja@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        with ESMTP id S229689AbjBQQxR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Feb 2023 11:53:17 -0500
+Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2156B38E8D
+        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 08:53:16 -0800 (PST)
+Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-53657970423so17784877b3.3
+        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 08:53:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=z/hRZYR3fVpHyYpO+oH5zoICQrmOs+J1H6tsMPelw4A=;
+        b=lhjA8MbStWGfo26CglkUGgucX3s1xSLnittXgq74TCMNsEAUEHoGmHDakQZiT+Zeb+
+         cxYZX4Z4DSyC8QxG2FKstkLr6zxMTgZE2qCx+hKnPu93Mdrk9QVrPAlIUMaGmjsOobPT
+         xeMQlcciVkT8v7vNAomlNUQ9xwNWZoz+3q0cljl0yrMWslvurXST8P03gZD/9cs5tn3/
+         W//CMRqz136aMbLKctrEdYn0YH7FnC5Aa/BS9NEWvlxqDBx5y5PuHQ/M0MCMpXWkR94Q
+         ndELdimx/4EW/dmspjd2rXUu/8J3O9Bm3uwQHCEGBB6JuIzFb2cTkIDI2vgl1xY6sZCm
+         8JKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=z/hRZYR3fVpHyYpO+oH5zoICQrmOs+J1H6tsMPelw4A=;
+        b=Ydokgc/Q7OfqqWMutLevxe6qc6cG+29ZNnaaacW4SObNs+7uuIslRILA66x6/cGkFQ
+         HEDPh3FVJusCDZWZQAnF6U9WsUQXpWJO95yiuStFEd603808ByQJSpktAPgvxQ+igu+N
+         1nRm2F4C8JJmclKTyDBKPrprgeZtZnrGOY0L409SdslCjUoCB6RvCkAjrATalsNQWvna
+         q9Kp13Ys95bA0pyYaXdv7NrDPa9DOnWwwD8Mt5DGnJ5BMntsHddo6hWy4aHkWmV/HPv/
+         f8iqf2f7G6/RfES2v+HrhaDvmT3Uml15v3cJm06vdAVx1JVXfYHq3TkVi5/Q2OFMOobn
+         vZxg==
+X-Gm-Message-State: AO0yUKU1Bm4tuBYCuJEMutGr1+JlFV2L9rtfHDPwyjhxFQjGuefDAsue
+        S/dUXHUSnKhgvQ7KQ3YUmTq+1NLdyTHV6HXo75Y=
+X-Google-Smtp-Source: AK7set8nB6PKjkOu4hIviFl1ja2lfs+XKEzHTQQnjzxsICmvHJvlSkKhj56yCtciQKCE6lBz5tmGVYmYAJqIxlwq1d4=
+X-Received: by 2002:a81:fd12:0:b0:4f0:64a3:725a with SMTP id
+ g18-20020a81fd12000000b004f064a3725amr1275366ywn.229.1676652795340; Fri, 17
+ Feb 2023 08:53:15 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: k00zO66PM2WvS4IXeJFi-DRZiyFXBqhY
-X-Proofpoint-ORIG-GUID: KEQhLq8p6GSnLBhfZ-tB5UlUOv0ZBAZ-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
- definitions=2023-02-17_11,2023-02-17_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- clxscore=1015 mlxscore=0 bulkscore=0 malwarescore=0 suspectscore=0
- adultscore=0 mlxlogscore=999 impostorscore=0 spamscore=0 phishscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302170148
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <CAJSP0QUuuZLC0DJNEfZ7amyd3XnRhRNr1k+1OgLfDeF77X1ZDQ@mail.gmail.com>
+ <20230217162334.b33myqqfzz33634b@sgarzare-redhat>
+In-Reply-To: <20230217162334.b33myqqfzz33634b@sgarzare-redhat>
+From:   Stefan Hajnoczi <stefanha@gmail.com>
+Date:   Fri, 17 Feb 2023 11:53:03 -0500
+Message-ID: <CAJSP0QXDD5uyY5Neccf4WmGyuXwHuefwbToBdZDwegV2XHMnHA@mail.gmail.com>
+Subject: Re: Call for GSoC and Outreachy project ideas for summer 2023
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
+        Rust-VMM Mailing List <rust-vmm@lists.opendev.org>,
+        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+        Thomas Huth <thuth@redhat.com>, John Snow <jsnow@redhat.com>,
+        =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+        "Florescu, Andreea" <fandree@amazon.com>,
+        Damien <damien.lemoal@opensource.wdc.com>,
+        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
+        Hanna Reitz <hreitz@redhat.com>,
+        Alberto Faria <afaria@redhat.com>,
+        Daniel Henrique Barboza <danielhb413@gmail.com>,
+        =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+        Bernhard Beschow <shentey@gmail.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, gmaglione@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed,  1 Feb 2023 08:48:33 +0000
-Janosch Frank <frankja@linux.ibm.com> wrote:
+On Fri, 17 Feb 2023 at 11:23, Stefano Garzarella <sgarzare@redhat.com> wrote:
+>
+> Hi Stefan,
+>
+> On Fri, Jan 27, 2023 at 10:17:40AM -0500, Stefan Hajnoczi wrote:
+> >Dear QEMU, KVM, and rust-vmm communities,
+> >QEMU will apply for Google Summer of Code 2023
+> >(https://summerofcode.withgoogle.com/) and has been accepted into
+> >Outreachy May 2023 (https://www.outreachy.org/). You can now
+> >submit internship project ideas for QEMU, KVM, and rust-vmm!
+> >
+> >Please reply to this email by February 6th with your project ideas.
+>
+> sorry for being late, if there is still time I would like to propose the
+> following project.
+>
+> Please, let me know if I should add it to the wiki page.
 
-> The diag308 requires extensive cooperation between the hypervisor and
-> the Ultravisor so the Ultravisor can make sure all necessary reset
-> steps have been done.
-> 
-> Let's check if we get the correct validity errors.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
+Hi Stefano,
+I have added it to the wiki page:
+https://wiki.qemu.org/Internships/ProjectIdeas/VsockSiblingCommunication
 
-[...]
+I noticed that the project idea describes in words but never gives
+concrete details about what sibling VM communication is and how it
+should work. For someone who has never heard of AF_VSOCK or know how
+addressing works, I think it would help to have more detail: does the
+vhost-user-vsock program need new command-line arguments that define
+sibling VMs, does a { .svm_cid = 2, .svm_port = 1234 } address usually
+talk to a guest but the TO_HOST flag changes the meaning and you wish
+to exploit that, etc? I'm not suggesting making the description much
+longer, but instead tweaking it with more concrete details/keywords so
+someone can research the idea and understand what the tasks will be.
 
-> +
-> +	/*
-> +	 * We need to perform several UV calls to emulate the subcode
-> +	 * 1. Failing to do that should result in a validity
-> +	 *
-> +	 * - Mark all cpus as stopped
-> +	 * - Reset the cpus, calling one gets an initial reset
-> +	 * - Load the reset PSW
-> +	 * - Unshare all
-> +	 * - Load the reset PSW
-
-you forgot to mention prepare the reset, and the list does not reflect
-the order things are done in the code
-
-> +	 */
-> +	sie_expect_validity(&vm);
-> +	sie(&vm);
-> +	report((sie_get_validity(&vm) & 0xff00) == 0x2000, "validity no UVCs");
-> +
-> +	/* Mark the CPU as stopped so we can unshare and reset */
-> +	cc = uv_set_cpu_state(vm.sblk->pv_handle_cpu, PV_CPU_STATE_STP);
-> +	report(!cc, "Set cpu stopped");
-> +
-> +	sie_expect_validity(&vm);
-> +	sie(&vm);
-> +	report((sie_get_validity(&vm) & 0xff00) == 0x2000, "validity stopped");
-> +
-> +	/* Unshare all memory */
-> +	cc = uv_cmd_nodata(vm.sblk->pv_handle_config,
-> +			   UVC_CMD_SET_UNSHARED_ALL, &rc, &rrc);
-> +	report(cc == 0 && rc == 1, "Unshare all");
-> +
-> +	sie_expect_validity(&vm);
-> +	sie(&vm);
-> +	report((sie_get_validity(&vm) & 0xff00) == 0x2000,
-> +	       "validity stopped, unshared");
-> +
-> +	/* Prepare the CPU reset */
-> +	cc = uv_cmd_nodata(vm.sblk->pv_handle_config,
-> +			   UVC_CMD_PREPARE_RESET, &rc, &rrc);
-> +	report(cc == 0 && rc == 1, "Prepare reset call");
-> +
-> +	sie_expect_validity(&vm);
-> +	sie(&vm);
-> +	report((sie_get_validity(&vm) & 0xff00) == 0x2000,
-> +	       "validity stopped, unshared, prepare");
-> +
-> +	/* Do the reset */
-> +	cc = uv_cmd_nodata(vm.sblk->pv_handle_cpu,
-> +			   UVC_CMD_CPU_RESET_INITIAL, &rc, &rrc);
-> +	report(cc == 0 && rc == 1, "Clear reset cpu");
-> +
-> +	sie_expect_validity(&vm);
-> +	sie(&vm);
-> +	report((sie_get_validity(&vm) & 0xff00) == 0x2000,
-> +	       "validity stopped, unshared, prepare, reset");
-> +
-> +	/* Load the PSW from 0x0 */
-> +	cc = uv_set_cpu_state(vm.sblk->pv_handle_cpu, PV_CPU_STATE_OPR_LOAD);
-> +	report(!cc, "Set cpu load");
-> +
-> +	/*
-> +	 * Check if we executed the iaddr of the reset PSW, we should
-> +	 * see a diagnose 0x9c PV instruction notification.
-> +	 */
-> +	sie(&vm);
-> +	report(vm.sblk->icptcode == ICPT_PV_NOTIFY && vm.sblk->ipa == 0x8302 &&
-> +	       vm.sblk->ipb == 0x50000000 && vm.save_area.guest.grs[5] == 0x9c &&
-> +	       vm.save_area.guest.grs[0] == 42,
-> +	       "intercept values after diag 0x308");
-> +
-> +
-> +	uv_destroy_guest(&vm);
-> +	report_prefix_pop();
-> +}
-> +
-
-[...]
-
-> diff --git a/s390x/snippets/asm/snippet-pv-diag-308.S b/s390x/snippets/asm/snippet-pv-diag-308.S
-> new file mode 100644
-> index 00000000..58c96173
-> --- /dev/null
-> +++ b/s390x/snippets/asm/snippet-pv-diag-308.S
-> @@ -0,0 +1,67 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Diagnose 0x308 snippet used for PV IPL and reset testing
-> + *
-> + * Copyright (c) 2023 IBM Corp
-> + *
-> + * Authors:
-> + *  Janosch Frank <frankja@linux.ibm.com>
-> + */
-> +#include <asm/asm-offsets.h>
-> +.section .text
-> +
-> +/* Sets a reset PSW with the given PSW address */
-> +.macro SET_RESET_PSW_ADDR label
-> +lgrl	%r5, reset_psw
-> +larl	%r6, \label
-> +ogr	%r5, %r6
-> +stg	%r5, 0
-> +.endm
-> +
-> +/* Does a diagnose 308 with the given subcode */
-> +.macro DIAG308 subcode
-> +xgr	%r3, %r3
-> +lghi	%r3, \subcode
-> +diag	1, 3, 0x308
-> +.endm
-> +
-> +sam64
-> +
-> +/* Execute the diag500 which will set the subcode we execute in gr2 */
-> +diag	0, 0, 0x500
-> +
-> +/*
-> + * A valid PGM new PSW can be a real problem since we never fall out
-> + * of SIE and therefore effectively loop forever. 0 is a valid PSW
-> + * therefore we re-use the reset_psw as this has the short PSW
-> + * bit set which is invalid for a long PSW like the exception new
-> + * PSWs.
-> + *
-> + * For subcode 0/1 there are no PGMs to consider.
-> + */
-> +lgrl   %r5, reset_psw
-> +stg    %r5, GEN_LC_PGM_NEW_PSW
-> +
-> +/* Clean registers that are used */
-> +xgr	%r0, %r0
-> +xgr	%r1, %r1
-> +xgr	%r3, %r3
-> +xgr	%r4, %r4
-> +xgr	%r5, %r5
-> +xgr	%r6, %r6
-> +
-> +/* Subcode 0 - Modified Clear */
-
-what about subcode 1?
-
-> +SET_RESET_PSW_ADDR done
-> +diag	%r0, %r2, 0x308
-> +
-> +/* Should never be executed because of the reset PSW */
-> +diag	0, 0, 0x44
-> +
-> +done:
-> +lghi	%r1, 42
-> +diag	%r1, 0, 0x9c
-> +
-> +
-> +	.align	8
-> +reset_psw:
-> +	.quad	0x0008000180000000
-
+Stefan
