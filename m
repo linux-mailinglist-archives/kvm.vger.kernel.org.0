@@ -2,182 +2,245 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C92369B013
-	for <lists+kvm@lfdr.de>; Fri, 17 Feb 2023 17:00:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E7A6F69B034
+	for <lists+kvm@lfdr.de>; Fri, 17 Feb 2023 17:07:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230418AbjBQQA2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Feb 2023 11:00:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57622 "EHLO
+        id S230197AbjBQQH5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Feb 2023 11:07:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230033AbjBQQAW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Feb 2023 11:00:22 -0500
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2049.outbound.protection.outlook.com [40.107.102.49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2F2C71189;
-        Fri, 17 Feb 2023 08:00:18 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PCvcHx0h/iqcQ3nWYJ76UQQ2dZHMEqw7ctlnyPgtlXh+shsvrSa68jFFlawRrIcL9YYjKylzqjhY+2WOM1aaD4j5/wN+PGN3XFuEBVx6oNEhXuCShsFITKrCNd+QhJVhw01ZpVSXtxQ1OYZqvjqxn8Tp5+cNqiBiLasOSdxxyXcZw16pLe2YmjQtFmol38ibdYy0zSLjcd6q+AGb6IzmXwgju6CAX5zjzF0dLZpcSbz4oVilih7vuXzSn1A+O1tam+UEhG+RdpZqyV6gJyHHvETZ8i685HWwQbgm4F18t1PizAseg+DZ6KgoyfKxAKd3sJwhPmdDtlN+OyVwdaWerw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wDTH35pF5Qz4pOdYyNxXJArA5ARXeZ/iigdjwrnHL/w=;
- b=buS1r4PZwoHXPMbcMkqmLtcEyxGXLh2NpjJyl2NGnrt1MTB4yDwNQHGLm0KiYRdukB2iBmZbXyIAPlr0vLYHyUFypcpssx1eHNkcrt8AhHCi/e4+726dr1qZcHPChu+B+j4jPdhAk17EZCH5VubVW9Sc9MAkUHdGDB3lKoXAoZglDqiXOfuCSeTZ9F50HJ7ubJxfmwFr1iNmtdAvp1N5yLmrzkFi1pWqiMO/gklXnfSB1BiyV01yqMCkeV++vYSEzdTeRARZs1yFNy7pl+4LoEpzACIiB2Sn5M1w7xvk/topduIaT4i5sqGShaXml1vkFgTuRB+bU1f1OmlXiXWgKg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wDTH35pF5Qz4pOdYyNxXJArA5ARXeZ/iigdjwrnHL/w=;
- b=OPshPD70BT+yXDji9StoexjbxZzjLHyU4xL7ysHXlUdJvwdNILq5Yvr9ZKgSZcbaPBOyLOaLhsjY6AqBVdo/xoJRB6QmYdeFnUWBgp2B9xqz9MntsuU7twTk9IHKBwrdeaUCcJ2kaZGrNPfAxb2pbvt5nns+y7tzCHKVZhYwiWVH9XfcWNCdsWI5+RtAIcxGnWFBrvcIL1QP3ImEjUGn3M7UuDH4bXQZXJD2irDvnpWR6h5HAdlQmMoEgXpkqBwk7SkFiU0m/XYzYjljh2Azobkg5AyZNMJwT4HhVCA50o5Ni8mF43rVQkKmkvkvaBUz5PJtAblUhhqlli+Cmhui1w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by CY8PR12MB7492.namprd12.prod.outlook.com (2603:10b6:930:93::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.15; Fri, 17 Feb
- 2023 16:00:14 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3cb3:2fce:5c8f:82ee]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3cb3:2fce:5c8f:82ee%4]) with mapi id 15.20.6111.013; Fri, 17 Feb 2023
- 16:00:14 +0000
-Date:   Fri, 17 Feb 2023 12:00:12 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        Timothy Pearson <tpearson@raptorengineering.com>,
-        Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH v3 05/15] kvm/vfio: Accept vfio device file from userspace
-Message-ID: <Y++kjA8eZHeD5JwT@nvidia.com>
-References: <20230213151348.56451-1-yi.l.liu@intel.com>
- <20230213151348.56451-6-yi.l.liu@intel.com>
- <20230214152627.3a399523.alex.williamson@redhat.com>
- <Y+wYX34sPvPQmGSr@nvidia.com>
- <20230214164235.64e2dccb.alex.williamson@redhat.com>
- <Y+wkqnCAe42Ogcof@nvidia.com>
- <DS0PR11MB752967E3A3A8B8693A523D54C3A19@DS0PR11MB7529.namprd11.prod.outlook.com>
- <DS0PR11MB7529ECA0D4D0E1FB8B4B1A0DC3A19@DS0PR11MB7529.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DS0PR11MB7529ECA0D4D0E1FB8B4B1A0DC3A19@DS0PR11MB7529.namprd11.prod.outlook.com>
-X-ClientProxiedBy: BLAP220CA0012.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:208:32c::17) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S229676AbjBQQHz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Feb 2023 11:07:55 -0500
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4771410DF
+        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 08:07:48 -0800 (PST)
+Received: by mail-ed1-x52f.google.com with SMTP id l11so6589906edb.11
+        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 08:07:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=grsecurity.net; s=grsec;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gvz/PlOxVkjn4hsOF5UMdaOD4Obyi55/9qlltRO+pHM=;
+        b=Si70hAjsWNOhnugjYEa79ZVyUzplEm9+PndtaS0hoclHL9UnzN0JhxTieUi3fQaHHM
+         2FmSh78EiCwUht5Jml77VjH3BO3UmquoeDHd+X4Ggy5ZopD73jbJFZ4V2bGrbSig1lZs
+         lN9gHY2SNW8BtSUHxMoHGRXJI/XgJRU2tI4AiUW2LEU2JObnMN2RGfWWV/WulYJmV00d
+         UJrwYzhlU8I7x0vsGpjtp5P30bDdKTEwhuGsXRRe6OND0a1DDxUe7s/wfrkO6EujawNj
+         UZGa2yQSm9ovwmQ5BLtasTOzl1Gp75nj6ZVXzPxoclSXR9Sac35QhSqVTg0zePL7OBdL
+         X2tA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gvz/PlOxVkjn4hsOF5UMdaOD4Obyi55/9qlltRO+pHM=;
+        b=miNIl6TMouk3bGGwUY029J25w9D76FHhSpwUdCaypmBhWILTRpA+nklXNkkdGGtqOn
+         zVQ5FlBvnV6qB0CFBW2FLDM2UG4u0yxkru0vkjf0xK8yDrzB5WtN8UuFWNy8INE6akKb
+         J7q+h4nrHbCi2RPpmTCWuwzljVqZWEOODwPu7F3boo5kH5SDNCLjqi0N8gkUdefJycHx
+         XW/ngLngOW8FIT4G8aqNHKrbb7PFgIO2nqeuERSmv6ulShSdCEveIH2Xp/nJ/L2yzrWO
+         57pkSB3/mvwNsZORXxjd786QaDVAAGUXC0xymDExtiLA2955Sy+nbCSAz4wrbA0QtErP
+         dOOg==
+X-Gm-Message-State: AO0yUKWGGZrwZ04eK5OfffP9L97RkjJS6cEd1aJqW325eqHrtZlQefeS
+        YnFQDhFbB8OM30+9VU06HSZh/A==
+X-Google-Smtp-Source: AK7set/JpCwktCs1oTQtJNycSpMSWyMeVI9aRczPjYx1j7tV8jmh58ba2/S6pXuwLlXnHwq5oBZtzQ==
+X-Received: by 2002:a17:907:c00b:b0:8af:3739:bdd7 with SMTP id ss11-20020a170907c00b00b008af3739bdd7mr5910406ejc.27.1676650066682;
+        Fri, 17 Feb 2023 08:07:46 -0800 (PST)
+Received: from ?IPV6:2003:f6:af46:5a00:93e3:335:818b:a454? (p200300f6af465a0093e30335818ba454.dip0.t-ipconnect.de. [2003:f6:af46:5a00:93e3:335:818b:a454])
+        by smtp.gmail.com with ESMTPSA id gh15-20020a170906e08f00b008720c458bd4sm2281730ejb.3.2023.02.17.08.07.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 17 Feb 2023 08:07:46 -0800 (PST)
+Message-ID: <2c2f77a3-1d77-0d88-991a-60dcdc370ea8@grsecurity.net>
+Date:   Fri, 17 Feb 2023 17:07:45 +0100
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CY8PR12MB7492:EE_
-X-MS-Office365-Filtering-Correlation-Id: bf766da2-f0be-492d-4d9a-08db11000e5b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: w+mpsw3fWCcRH/7fQUTftTPjKItBJGcrDshfe8FnvEpkLYG81VGJLo9B/NybIHpLKrk3sHqc7qEii+toZ4Ot67C8R5VLzNHmmzObf4zMWtEmyIUgaCJo1qADXhyihpkqg9BzmbKTYCJoVXkgxMSzwvoBqcBJPDnSKURoGm2Ar2ATTwDABXGxLY6VU33BD90ur6QdKIW79TrsJLKopUz4oAAWZqZ/vdABJmyAFvLVzEyEYRnFwsNENG99qco2BRLQaL8pIUNO5SwekkIGPAjP2P+jM5cRHGee5QCd7Q6UQb8G51tA6Xkce88LvNzi61D+5hTNm1ra4Dh1LRhBmKBUC6AXP3h+/fXEaBeGVnSLTftuMi/VYbhBL/jP6Z4u7Z6tAQbTl//js9Q+FQEv0coW27ZIlAy/eUga2aFys+ze3ek8GCNxexB1gWgRVxN1S+ioHm/01yPjCnVbux00h7Zc66B4PLWpVNo+6jzp0g6SNMKs1B8k6O29YTOMHsXsApOvzIYm8lPwjMG0Ol5aXRbNin8oNWgeJgHLHHFddQcrNOhozLpVMrd7KUBXkTuu5JgDMVlLnXehW2yvlj+L7TUw1fpBCCDsjhkeKZ0YYEACM72qrbZqWxlPSi+6Omo8AkHhVQMB3mNzdm22C9FsV5HaVA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(366004)(346002)(376002)(396003)(39860400002)(136003)(451199018)(36756003)(6506007)(6512007)(6486002)(2616005)(26005)(186003)(8676002)(8936002)(41300700001)(316002)(66476007)(66556008)(66946007)(4326008)(6916009)(478600001)(2906002)(54906003)(38100700002)(7416002)(5660300002)(86362001)(83380400001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?h9m59Bmz24IZsvC9PQ46UgmB7eVAH9ZdsNNIrxEqwstLCFDwXEnO5caxtGns?=
- =?us-ascii?Q?xFYoMfRRQK8xmksLlZt1kHTNXKkqvg14HJCvFZsXD2bLHGF6wJK7rSbGVEbq?=
- =?us-ascii?Q?cWNSMhH6bVq92XMjVuqCjSe7m7z4iVi83ISmYpqeX/BRUV1hzidLg3WH+Lvj?=
- =?us-ascii?Q?6myJiFKDSmKXKK91UEadSS9jijIzYaMrBkpep2pUE8l/ZUhhKYggyVPwhohx?=
- =?us-ascii?Q?XkGpXeegaJMKokexJp+VYSG2D4yeNRZvGwE3fPg2j6vk3cPjVbZxLskqps0l?=
- =?us-ascii?Q?CCjUWCXOkhI9TscOTOr/3IP0Xp5MCWLV8M2RbxSF+XjicHKr5LVN9jQCRc32?=
- =?us-ascii?Q?9XtJb8hROLTcoZj4I0HtlfON+k6Ijpu++piDqMcnizTI63IcTX4YMaR7yGMD?=
- =?us-ascii?Q?cCnJsuql7KNWuiqNbQ3EBzDDSe3xFKB6dV3GW7sI+p+zjNP9SY0IF2c0jTZV?=
- =?us-ascii?Q?Tm532CANF32g9GwSr2VtjgvJjhb6bd7dSWdbftdgMC91vdEdl0cxlyArgvDT?=
- =?us-ascii?Q?8gJ8j6l4DySr4o+JVmYtyh1tNCAoCz9VFXPTDPgcY0zjtWIjCL2GIM6OkE9M?=
- =?us-ascii?Q?Hz4gM8iUgsaDBLDSgEH34xxpb5PJR8uFa/koKJ2c6PmMvB+x+IGJkhsvDzRF?=
- =?us-ascii?Q?MaAwXHqB2PRfU8xHFu/HJmoym6cLly9R7D9ahtIbJ3KPH7rI32QGJ714z7wR?=
- =?us-ascii?Q?PotcaYnU/bPeuKVtkyiJuieefA8E3h1IQxNnoeibY0w/GFLYCS1vHkSgq8xN?=
- =?us-ascii?Q?7drUu8QKyZLt9GqoqZr/bDUhtoPlxZvyCT2S9Kj7m5RzaR2sZ8988e8SOj6a?=
- =?us-ascii?Q?Zsj6dAJPqJ+04P/Lh2RK0emZTBRR7kQTc81xVnSIi2Axf+QTMos3WPlSKPoM?=
- =?us-ascii?Q?2YuinixSuP+rKYgcpugEE3zcs17KHXmMNhvFDJiohX7sCauO9dKKBR0bQVhM?=
- =?us-ascii?Q?5yLRHxI4nLYLXEoldJUIcTxM+3pt2muWbKv3NZiWx7OJyCc9bqjn/8R6v/av?=
- =?us-ascii?Q?8q4zV9QTqcrWhBQ2B2CUcX+IowiYVti2FA/FiKh7M+hoimMdV+bfJQ+KVu2e?=
- =?us-ascii?Q?PJu2h6zo1Gk0WRqNuZDG9lhuDHvkCDx8D1L5XX9s1WuxV1ykdmuQpS+rHDWZ?=
- =?us-ascii?Q?sRgLRV8yK+KpR+4gnsH+1W3HIHVPNbZ/UPXrVuuWsk0ZkGDfCQim0CwaQPBW?=
- =?us-ascii?Q?cCMXAnbJrSLN5zkoyHKO9V6yJHCjgCFUZyVD1nt6zEJ7XsjmSvtzJYMh/xJ5?=
- =?us-ascii?Q?Kk2n8kNqf58yfUOXzf/GAm8YlWCUxdw0QGvwvXn4ms3mmdYt2h31Ego1Nmn5?=
- =?us-ascii?Q?O3T8ZTjV3qLgsGMILqhyrEhvghRQ8pUP+/MFDjafHwhtDmRl6YsAZIAmAKrK?=
- =?us-ascii?Q?pHbaRKaDUdmAOa0z21N9wX8Xk7XoFGUZUQ2Yy837IwlVWW1sGz1W6P4cyUKE?=
- =?us-ascii?Q?CyA2NMAq3hcYsEAmScbU2MIhYbu7LIuVBCa4TKnN5c5jhbvjd7UPIt9T1Z6C?=
- =?us-ascii?Q?yypaQNrOHgAy8YFNZ4YNSoFO8Z7He1x95RShmLXq5HRLevRE9DCwzyc73fz1?=
- =?us-ascii?Q?rpcplpCw0+FGam+kX+xnMfqMkDB9R76dWBYwxQIN?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bf766da2-f0be-492d-4d9a-08db11000e5b
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Feb 2023 16:00:14.3637
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3hR3hKHSM/jtPJrcE58xabxqXxdeIAL1RD5SVp9Fmuj47TxhvPcoJOxIAg29Ce5N
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7492
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH 0/5] KVM: Put struct kvm_vcpu on a diet
+Content-Language: en-US, de-DE
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <20230213163351.30704-1-minipli@grsecurity.net>
+ <Y+pt5MGR+EjLH4qQ@google.com>
+ <13deaeb6-dfb2-224c-0aa3-5546ad426f63@grsecurity.net>
+ <Y+5okhlB4rkXjKWS@google.com>
+From:   Mathias Krause <minipli@grsecurity.net>
+In-Reply-To: <Y+5okhlB4rkXjKWS@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 17, 2023 at 05:48:57AM +0000, Liu, Yi L wrote:
-> > From: Liu, Yi L <yi.l.liu@intel.com>
-> > Sent: Friday, February 17, 2023 1:34 PM
-> > 
-> > > From: Jason Gunthorpe <jgg@nvidia.com>
-> > > Sent: Wednesday, February 15, 2023 8:18 AM
-> > >
-> > > On Tue, Feb 14, 2023 at 04:42:35PM -0700, Alex Williamson wrote:
-> > >
-> > > > A device file opened through a group could be passed through this
-> > > > interface though, right?
-> > >
-> > > Yes, I think so
-> > >
-> > > > Do we just chalk that up to user error?  Maybe the SPAPR extension
-> > > > at least needs to be documented as relying on registering groups
-> > > > rather than devices.
-> > >
-> > > The way these APIs work is you have to pass the same FD to all of
-> > > them. The SPAPR stuff is no different, if you used a cdev with
-> > > KVM_DEV_VFIO_GROUP_ADD then you have to use the same cdev fd
-> > with
-> > > the
-> > > SPAPR group_fd. Yi just didn't rename it.
-> > 
-> > This is because SPAPR cannot accept cdev fd yet. It explicitly requires
-> > group fd and get iommu_group during the handling.
+On 16.02.23 18:32, Sean Christopherson wrote:
+> On Tue, Feb 14, 2023, Mathias Krause wrote:
+>> On 13.02.23 18:05, Sean Christopherson wrote:
+>> However, I still remain confident that this makes sense from a uarch point of
+>> view. Touching less cache lines should be a win -- even if I'm unable to
+>> measure it. By preserving more cachelines during a VMEXIT, guests should be
+>> able to resume their work faster (assuming they still need these cachelines).
 > 
-> Sorry I misunderstood it. I think this can be renamed to be fds if
-> no objection. Maybe as below, so that old userspace that uses
-> group_fds can still compile. I doubt if a new flag is needed to
-> identify the provided fds are group or device fds. I guess no since
-> the pci hot reset code does not really care about it. It cares more
-> the fd is held by the application.
+> Yes, but I'm skeptical that compacting struct kvm_vcpu will actually result in
+> fewer cache lines being touched, at least not in a persistent, maintainable way.
+> While every VM-Exit accesses a lot of state, it's most definitely still a small
+> percentage of kvm_vcpu.  And for the VM-Exits that really benefit from optimized
+> handling, a.k.a. the fastpath exits, that percentage is even lower.
 
-I wouldn't change it, even though it does work like this
+Yeah, that's probably true.
 
-spapr requires the group fd because it doesn't work with
-iommufd. No sense in confusing things.
+> On x86, kvm_vcpu is actually comprised of three "major" structs: kvm_vcpu,
+> kvm_vcpu_arch, and vcpu_{vmx,svm}.  The majority of fields accessed on every VM-Exit
+> are in the vendor part, vcpu_{vmx,svm}, but there are still high-touch fields in
+> the common structures, e.g. registers in kvm_vcpu_arch and things like requests
+> in kvm_vcpu.
+> 
+> Naively compating any of the three (well, four) structures might result in fewer
+> cache lines being touched, but mostly by coincidence.  E.g. because compacting
+> part of kvm_vcpu_arch happened to better align vcpu_vmx, not because of the
+> compaction itself.
 
-Jason
+Fortunately, kvm_vcpu is embedded as first member in vcpu_{vmx,svm}, so
+all three share a common "header." Optimizations done for kvm_vcpu will
+therefore benefit the vendor specific structures too. However, you're
+right that this will implicitly change the layout for the remainder of
+vcpu_{vmx,svm} and might even have a negative impact regarding cacheline
+usage. But, as my changes chop off exactly 128 bytes from kvm_vcpu,
+that's not the case here. But I can see that this is "coincidence" and
+fragile in the long run.
+
+> If we really wanted to optimize cache line usage, our best bet would be to identify
+> the fields that are accessed in the fastpath run loop and then pack those fields
+> into as few cache lines as possible.  And to do that in a maintainable way, we'd
+> probably need something like ASI[*] to allow us to detect changes that result in
+> the fastpath handling accessing fields that aren't in the cache-optimized region.
+> 
+
+> I'm not necessarily opposed to such aggressive optimization, but the ROI is likely
+> very, very low.  For optimized workloads, there simply aren't very many VM-Exits,
+> e.g. the majority of exits on a modern CPU are due to timer ticks.  And even those
+> will hopefully be eliminiated in the not-too-distant future, e.g. by having hardware
+> virtualize the TSC deadline timer, and by moving to a vCPU scheduling scheme that
+> allows for a tickless host.
+
+Well, for guests running grsecurity kernels, there's also the CR0.WP
+toggling triggering VMEXITs, which happens a lot! -- at least until
+something along the lines of [1] gets merged *hint ;)*
+
+[1]
+https://lore.kernel.org/all/20230201194604.11135-1-minipli@grsecurity.net/
+
+>  
+> https://lore.kernel.org/all/20220223052223.1202152-1-junaids@google.com
+
+Heh, that RFC is from February last year and it looks like it stalled at
+that point. But I guess you only meant patch 44 anyway, that splits up
+kvm_vcpu_arch:
+https://lore.kernel.org/all/20220223052223.1202152-45-junaids@google.com/.
+It does that for other purposes, though, which might conflict with the
+performance aspect I'm mostly after here. Anyways, I got your point. If
+we care about cacheline footprint, we should do a more radical change
+and group hot members together instead of simply shrinking the structs
+involved.
+
+>>> And as you observed, imperfect struct layouts are highly unlikely to have a
+>>> measurable impact on performance.  The types of operations that are involved in
+>>> a world switch are just too costly for the layout to matter much.  I do like to
+>>> shave cycles in the VM-Enter/VM-Exit paths, but only when a change is inarguably
+>>> more performant, doesn't require ongoing mainteance, and/or also improves the code
+>>> quality.
+>>
+>> Any pointers to measure the "more performant" aspect?
+> 
+> TL;DR: not really.
+> 
+> What I've done in the past is run a very tight loop in the guest, and then measure
+> latency from the host by hacking KVM.  Measuring from the guest works, e.g. we have
+> a variety of selftests that do exactly that, but when trying to shave cycles in
+> the VM-Exit path, it doesn't take many host IRQs arriving at the "wrong" time to
+> skew the measurement.  My quick-and-dirty solution has always been to just hack
+> KVM to measure latency with IRQs disabled, but a more maintainable approach would
+> be to add smarts somewhere to sanitize the results, e.g. to throw away outliers
+> where the guest likely got interrupted.
+> 
+> I believe we've talked about adding a selftest to measure fastpath latency, e.g.
+> by writing MSR_IA32_TSC_DEADLINE in a tight loop.
+> 
+> However, that's not going to be useful in this case since you are interested in
+> measuring the impact of reducing the host's L1D footprint.  If the guest isn't
+> cache-constrainted, reducing the host's cache footprint isn't going to impact
+> performance since there's no contention.
+
+Yeah, it's hard to find a test case measuring the gains. I looked into
+running Linux userland workloads initially, but saw no real impact, as
+the sdtdev was already too high. But, as you pointed out, a
+micro-benchmark is of no use either, so it's all hand-waving only. :D
+
+> Running a micro benchmark in the guest that aims to measure cache performance might
+> work, but presumably those are all userspace tests, i.e. you'd end up measuring
+> the impact of the guest kernel too.  And they wouldn't consistently trigger VM-Exits,
+> so it would be difficult to prove the validity of the results.
+
+Jepp. It's all just gut feeling, unfortunately.
+
+> I suppose you could write a dedicated selftest or port a micro benchmark to run
+> as a selftest (or KVM-unit-test)?
+> 
+>>  I tried to make use of the vmx_vmcs_shadow_test in kvm-unit-tests, as it's
+>>  already counting cycles, but the numbers are too unstable, even if I pin the
+>>  test to a given CPU, disable turbo mode, SMT, use the performance cpu
+>>  governor, etc.
+> 
+> Heh, you might have picked quite possibly the worst way to measure VM-Exit
+> performance :-)
+> 
+> The guest code in that test that's measuring latency runs at L2.  For VMREADs
+> and VMWRITEs that are "passed-through" all the way to L2, no VM-Exit will occur
+> (the access will be handled purely in ucode).  And for accesses that do cause a
+> VM-Exit, I'm pretty sure they all result in a nested VM-Exit, which is a _very_
+> heavy path (~10k cycles).  Even if the exit is handled by KVM (in L0), it's still
+> a relatively slow, heavy path.
+
+I see. I'll have a look at the selftests and see if I can repurpose one
+of them. But, as you noted, a microbenchmark might not be what I'm
+after. It's more about identifying the usage patterns for hot VMEXIT
+paths and optimize these.
+
+>>> I am in favor in cleaning up kvm_mmu_memory_cache as there's no reason to carry
+>>> a sub-optimal layouy and the change is arguably warranted even without the change
+>>> in size.  Ditto for kvm_pmu, logically I think it makes sense to have the version
+>>> at the very top.
+>>
+>> Yeah, was exactly thinking the same when modifying kvm_pmu.
+>>
+>>> But I dislike using bitfields instead of bools in kvm_queued_exception, and shuffling
+>>> fields in kvm_vcpu, kvm_vcpu_arch, vcpu_vmx, vcpu_svm, etc. unless there's a truly
+>>> egregious field(s) just isn't worth the cost in the long term.
+>>
+>> Heh, just found this gem in vcpu_vmx:
+>>
+>> struct vcpu_vmx {
+>>   [...]
+>>   union vmx_exit_reason      exit_reason;
+>>
+>>   /* XXX 44 bytes hole, try to pack */
+>>
+>>   /* --- cacheline 123 boundary (7872 bytes) --- */
+>>   struct pi_desc             pi_desc __attribute__((__aligned__(64)));
+>>   [...]
+>>
+>> So there are, in fact, some bigger holes left.
+> 
+> Ya.  Again, I'm definitely ok cleaning up the truly heinous warts and/or doing
+> a targeted, deliberate refactor of structures.  What I don't want to do is
+> shuffle fields around purely to save a few bytes here and there.
+
+Got it. I'll back out the reshuffling ones and only keep the ones for
+kvm_pmu and kvm_mmu_memory_cache, as these are more like straight cleanups.
+
+Thanks,
+Mathias
