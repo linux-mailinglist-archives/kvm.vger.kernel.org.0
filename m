@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 87DEC69B16A
-	for <lists+kvm@lfdr.de>; Fri, 17 Feb 2023 17:53:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 076F769B17A
+	for <lists+kvm@lfdr.de>; Fri, 17 Feb 2023 17:56:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229919AbjBQQxS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Feb 2023 11:53:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38798 "EHLO
+        id S230121AbjBQQ4w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Feb 2023 11:56:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229689AbjBQQxR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Feb 2023 11:53:17 -0500
-Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2156B38E8D
-        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 08:53:16 -0800 (PST)
-Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-53657970423so17784877b3.3
-        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 08:53:16 -0800 (PST)
+        with ESMTP id S230058AbjBQQ4v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Feb 2023 11:56:51 -0500
+Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A08463A868
+        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 08:56:46 -0800 (PST)
+Received: by mail-yb1-xb31.google.com with SMTP id 63so1327734ybq.6
+        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 08:56:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=z/hRZYR3fVpHyYpO+oH5zoICQrmOs+J1H6tsMPelw4A=;
-        b=lhjA8MbStWGfo26CglkUGgucX3s1xSLnittXgq74TCMNsEAUEHoGmHDakQZiT+Zeb+
-         cxYZX4Z4DSyC8QxG2FKstkLr6zxMTgZE2qCx+hKnPu93Mdrk9QVrPAlIUMaGmjsOobPT
-         xeMQlcciVkT8v7vNAomlNUQ9xwNWZoz+3q0cljl0yrMWslvurXST8P03gZD/9cs5tn3/
-         W//CMRqz136aMbLKctrEdYn0YH7FnC5Aa/BS9NEWvlxqDBx5y5PuHQ/M0MCMpXWkR94Q
-         ndELdimx/4EW/dmspjd2rXUu/8J3O9Bm3uwQHCEGBB6JuIzFb2cTkIDI2vgl1xY6sZCm
-         8JKw==
+        bh=J4RHINuYWc62wuiZUYoVA1vr2xMboB0oFkSwWLbZ724=;
+        b=RilVJ/HKpoW7n5UWDOfmrCHM8smsB9ocQ/p3kdiPDCSdDzuOlCJEft4fkow+1dxspC
+         GC8C4lRh3cOpNfXNe6d4qZZp98hQu6zKVw3dmJp4Xx6Oc7yZJk+tJpIREqR6DX5P8AZV
+         YFpHe/T1skf1BjQ0qqt6rq3LcasxdRFSrcW98DOzWrr81YY80DpinOc4vjfb5LmHjF6h
+         uXsCTd3/tK9RtuGq35Z0leESq2HGjaeosMdNT8xA3RsTGFDOB4LWBhp1LeylZDK+bBus
+         OFQQJptLk7+igo7m3ejC12+xx66bsaz0a5wCgpuZa1i5gHIPenso0tLc+viophHTM4rZ
+         Qb1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=z/hRZYR3fVpHyYpO+oH5zoICQrmOs+J1H6tsMPelw4A=;
-        b=Ydokgc/Q7OfqqWMutLevxe6qc6cG+29ZNnaaacW4SObNs+7uuIslRILA66x6/cGkFQ
-         HEDPh3FVJusCDZWZQAnF6U9WsUQXpWJO95yiuStFEd603808ByQJSpktAPgvxQ+igu+N
-         1nRm2F4C8JJmclKTyDBKPrprgeZtZnrGOY0L409SdslCjUoCB6RvCkAjrATalsNQWvna
-         q9Kp13Ys95bA0pyYaXdv7NrDPa9DOnWwwD8Mt5DGnJ5BMntsHddo6hWy4aHkWmV/HPv/
-         f8iqf2f7G6/RfES2v+HrhaDvmT3Uml15v3cJm06vdAVx1JVXfYHq3TkVi5/Q2OFMOobn
-         vZxg==
-X-Gm-Message-State: AO0yUKU1Bm4tuBYCuJEMutGr1+JlFV2L9rtfHDPwyjhxFQjGuefDAsue
-        S/dUXHUSnKhgvQ7KQ3YUmTq+1NLdyTHV6HXo75Y=
-X-Google-Smtp-Source: AK7set8nB6PKjkOu4hIviFl1ja2lfs+XKEzHTQQnjzxsICmvHJvlSkKhj56yCtciQKCE6lBz5tmGVYmYAJqIxlwq1d4=
-X-Received: by 2002:a81:fd12:0:b0:4f0:64a3:725a with SMTP id
- g18-20020a81fd12000000b004f064a3725amr1275366ywn.229.1676652795340; Fri, 17
- Feb 2023 08:53:15 -0800 (PST)
+        bh=J4RHINuYWc62wuiZUYoVA1vr2xMboB0oFkSwWLbZ724=;
+        b=pyhTpMKmmRBUtuoh/f3ZBopRrLCESyn5Cz26vIYIyUSVC1252zfNHnNJHuKWbzTgTU
+         IhQ38PY56yCEyymlwl9cLDFN78ADUGMihvFSosthbUhQ/WChfiab5w1M+sSY0MPfUBDw
+         PyVqmV8Lhs9o7yjkHbGgxJd9omLGRGhd36yjhg47ypMpFjiKrYsHXQWNJ2sQQPYsA1TG
+         e0cYRKsumti9/2bZ/tDnMkoBMIj4IWATSjmpRuA5uH2nPFSzX1makGhJ3KcjGLfRpc+u
+         tXSw3fm/Kdi+EQ9cjDgsvPgCJsn3FHcf4X5s5igUlzMjjuUqvNckrZSHQTM+tYZ0EOaU
+         CpmA==
+X-Gm-Message-State: AO0yUKWfy3sWhFfLrKTJWmnhuB6Nj9OWWJmKctBAGry+gVVMgsMxyOZG
+        hfzkwYlV8qXIURVXNr0LdaMzrHvDO1Ht0WJpKBk=
+X-Google-Smtp-Source: AK7set9I98nAtJXAqf2cGgeSocah47oxAOCKp17Pa8rpZh8CKcwj6w7QL2PwPvnpDaxatA7kg/Dbt82bbdNpUSZSncI=
+X-Received: by 2002:a5b:1c1:0:b0:95d:85ed:4594 with SMTP id
+ f1-20020a5b01c1000000b0095d85ed4594mr704527ybp.513.1676653005832; Fri, 17 Feb
+ 2023 08:56:45 -0800 (PST)
 MIME-Version: 1.0
 References: <CAJSP0QUuuZLC0DJNEfZ7amyd3XnRhRNr1k+1OgLfDeF77X1ZDQ@mail.gmail.com>
- <20230217162334.b33myqqfzz33634b@sgarzare-redhat>
-In-Reply-To: <20230217162334.b33myqqfzz33634b@sgarzare-redhat>
+ <CAJh=p+4_XkR-MN4ByiOHmu_8-RSMDS69zKd_AXYX-47Kzp7Ciw@mail.gmail.com>
+In-Reply-To: <CAJh=p+4_XkR-MN4ByiOHmu_8-RSMDS69zKd_AXYX-47Kzp7Ciw@mail.gmail.com>
 From:   Stefan Hajnoczi <stefanha@gmail.com>
-Date:   Fri, 17 Feb 2023 11:53:03 -0500
-Message-ID: <CAJSP0QXDD5uyY5Neccf4WmGyuXwHuefwbToBdZDwegV2XHMnHA@mail.gmail.com>
+Date:   Fri, 17 Feb 2023 11:56:34 -0500
+Message-ID: <CAJSP0QUrXeySuD4xi-sbuAeniuKJQLHfg9+Xu-Xpn=-SZdKsxQ@mail.gmail.com>
 Subject: Re: Call for GSoC and Outreachy project ideas for summer 2023
-To:     Stefano Garzarella <sgarzare@redhat.com>
+To:     German Maglione <gmaglione@redhat.com>
 Cc:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
         Rust-VMM Mailing List <rust-vmm@lists.opendev.org>,
         =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
@@ -62,6 +62,7 @@ Cc:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
         Gerd Hoffmann <kraxel@redhat.com>,
         =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
         Thomas Huth <thuth@redhat.com>, John Snow <jsnow@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
         =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
         "Florescu, Andreea" <fandree@amazon.com>,
         Damien <damien.lemoal@opensource.wdc.com>,
@@ -72,7 +73,7 @@ Cc:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
         =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
         Bernhard Beschow <shentey@gmail.com>,
         Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, gmaglione@redhat.com
+        Vitaly Kuznetsov <vkuznets@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
@@ -84,37 +85,99 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 17 Feb 2023 at 11:23, Stefano Garzarella <sgarzare@redhat.com> wrote:
+On Fri, 17 Feb 2023 at 11:43, German Maglione <gmaglione@redhat.com> wrote:
 >
 > Hi Stefan,
 >
-> On Fri, Jan 27, 2023 at 10:17:40AM -0500, Stefan Hajnoczi wrote:
-> >Dear QEMU, KVM, and rust-vmm communities,
-> >QEMU will apply for Google Summer of Code 2023
-> >(https://summerofcode.withgoogle.com/) and has been accepted into
-> >Outreachy May 2023 (https://www.outreachy.org/). You can now
-> >submit internship project ideas for QEMU, KVM, and rust-vmm!
-> >
-> >Please reply to this email by February 6th with your project ideas.
->
-> sorry for being late, if there is still time I would like to propose the
-> following project.
->
-> Please, let me know if I should add it to the wiki page.
+> Sorry for being so late, if it is still possible I would like to propose the
+> following project:
 
-Hi Stefano,
-I have added it to the wiki page:
-https://wiki.qemu.org/Internships/ProjectIdeas/VsockSiblingCommunication
-
-I noticed that the project idea describes in words but never gives
-concrete details about what sibling VM communication is and how it
-should work. For someone who has never heard of AF_VSOCK or know how
-addressing works, I think it would help to have more detail: does the
-vhost-user-vsock program need new command-line arguments that define
-sibling VMs, does a { .svm_cid = 2, .svm_port = 1234 } address usually
-talk to a guest but the TO_HOST flag changes the meaning and you wish
-to exploit that, etc? I'm not suggesting making the description much
-longer, but instead tweaking it with more concrete details/keywords so
-someone can research the idea and understand what the tasks will be.
+Added, thanks!
+https://wiki.qemu.org/Internships/ProjectIdeas/VirtiofsdSandboxingTool
 
 Stefan
+
+>
+> === A sandboxing tool for virtiofsd ===
+>
+> ''Summary:''' Create a tool that runs virtiofsd in a sandboxed environment
+>
+> Virtiofs is a shared file system that lets virtual machines access a directory
+> tree on the host. Unlike existing approaches, it is designed to
+> offer local file system semantics and performance.
+>
+> Currently, virtiofsd integrates the sandboxing code and the server code in a
+> single binary. The goal is to extract that code and create an external tool that
+> creates a sandbox environment and runs virtiofsd in it. In addition, that tool
+> should be extended to be able to run virtiofsd in a restricted environment with
+> Landlock.
+>
+> This will allow greater flexibility when integrating virtiofsd into a VMM or
+> running it inside a container.
+>
+> Goals:
+> * Understand how to setup a restricted environment using chroot, namespaces, and
+>   Landlock
+> * Refactor virtiofsd to extract the sandbox code to its own crate
+> * Create an external sandboxing tool for virtiofsd
+>
+> '''Links:'''
+> * https://virtio-fs.gitlab.io/
+> * https://gitlab.com/virtio-fs/virtiofsd
+> * https://landlock.io/
+>
+> '''Details:'''
+> * Project size: 175 hours
+> * Skill level: intermediate (knowledge of Rust and C)
+> * Language: Rust
+> * Mentor: German Maglione <gmaglione@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
+> * Suggested by: German Maglione <gmaglione@redhat.com>
+>
+>
+> On Fri, Jan 27, 2023 at 4:18 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>>
+>> Dear QEMU, KVM, and rust-vmm communities,
+>> QEMU will apply for Google Summer of Code 2023
+>> (https://summerofcode.withgoogle.com/) and has been accepted into
+>> Outreachy May 2023 (https://www.outreachy.org/). You can now
+>> submit internship project ideas for QEMU, KVM, and rust-vmm!
+>>
+>> Please reply to this email by February 6th with your project ideas.
+>>
+>> If you have experience contributing to QEMU, KVM, or rust-vmm you can
+>> be a mentor. Mentors support interns as they work on their project. It's a
+>> great way to give back and you get to work with people who are just
+>> starting out in open source.
+>>
+>> Good project ideas are suitable for remote work by a competent
+>> programmer who is not yet familiar with the codebase. In
+>> addition, they are:
+>> - Well-defined - the scope is clear
+>> - Self-contained - there are few dependencies
+>> - Uncontroversial - they are acceptable to the community
+>> - Incremental - they produce deliverables along the way
+>>
+>> Feel free to post ideas even if you are unable to mentor the project.
+>> It doesn't hurt to share the idea!
+>>
+>> I will review project ideas and keep you up-to-date on QEMU's
+>> acceptance into GSoC.
+>>
+>> Internship program details:
+>> - Paid, remote work open source internships
+>> - GSoC projects are 175 or 350 hours, Outreachy projects are 30
+>> hrs/week for 12 weeks
+>> - Mentored by volunteers from QEMU, KVM, and rust-vmm
+>> - Mentors typically spend at least 5 hours per week during the coding period
+>>
+>> For more background on QEMU internships, check out this video:
+>> https://www.youtube.com/watch?v=xNVCX7YMUL8
+>>
+>> Please let me know if you have any questions!
+>>
+>> Stefan
+>>
+>
+>
+> --
+> German
