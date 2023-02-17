@@ -2,58 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A05E69B63A
+	by mail.lfdr.de (Postfix) with ESMTP id 75DF269B63B
 	for <lists+kvm@lfdr.de>; Sat, 18 Feb 2023 00:10:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229927AbjBQXKj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Feb 2023 18:10:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56258 "EHLO
+        id S229913AbjBQXKl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Feb 2023 18:10:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229885AbjBQXKb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Feb 2023 18:10:31 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1738B595A0
-        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 15:10:29 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id w6-20020a25c706000000b0098592b9ff86so2552521ybe.9
-        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 15:10:29 -0800 (PST)
+        with ESMTP id S229892AbjBQXKc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Feb 2023 18:10:32 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 105E56855E
+        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 15:10:30 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id o8-20020a17090a0a0800b0023699c4353eso353010pjo.6
+        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 15:10:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=KioFTda0zEdQSBw0TQsNW7u7HebdEbC7ULL51zMSfbE=;
-        b=MCT5iiV4rc2yE80RyBM9o4KOTMsZUh2bAIbwptEF0tPQ9AAIaLqeXfPV1v20xeQdBJ
-         ngvY5MNXm07+nxgNuRVOw426oKdsi4ub/BMFNHHzgpk+EOmpzHjGpfwdwZBvTVIsXJ1Z
-         ixYtudyqlOIGwVMjR24PG6YIbvmFhc89VzwHoRedtJxRbKHjBrbkpRxTQeXTDHZ53RLv
-         v75nUo1kDzVi4ZVoxG0a8eb1dmu/6aE1NqaDLwhmqbHynV8Y12e7IUCx+nsNis1FHY/k
-         nW0CsLs/BM7+/PNt0iB7yoNFIxk5lLvX8E9NBgK01X2cqZqg5s3MH84roh/Ua50ptKae
-         XOmA==
+        bh=Jv7eFJCQHJdShrZad4wg6qbhczS1BO2S26DrILrvWfg=;
+        b=PFHXa5FBY+a98Z9yhWweF+SxDQQJFEMs/DEpJGFZxDfSIxf44H5vOl3VOmkB5k/UXL
+         U3qRSMbobqQF16A/BVrXRskJUiV2o0dTn/LKHqc9U2JijMlZ4cxm9EioE+Ge1KjSeugJ
+         ILLisMTKa/AFV865ZWzsbS1JSwkmuPn6yF7z18WK9tugVUsjbEiBPGQNPv3f5dQabJPH
+         /nHNy9lxyEQQezs5pqgLJcaAPGgIepldgdv4CCVkTaRmLij2029pBnXCp7ZCf2MZjXZo
+         OawdxxDdwOLXn91PoeKTV+UXRw0EChPxEAp31Vk9jO5/uqniV2CbcKYWBO31lsjoM89w
+         lebQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=KioFTda0zEdQSBw0TQsNW7u7HebdEbC7ULL51zMSfbE=;
-        b=zdzN4gvA67gdZqT9GE4xOGDSDEhhKLz9RSVVOVgPXJdLyk8DTBj4fMBeERe2t1r8kx
-         xZPv9WtENY7CACkv6XHzckjbKVZLdBKeBCPijkbzL0ZPLZlyASqwX/dzW1pmB6aX/zhq
-         3hT17HW2z3FRN1fTK1q2BJr+tZuSTNETJnePg9epH82x8EvSFqbDNisY6SGMJ6m/v/yV
-         xhxkI8VHd6Qo0vMu7wpdXBbGpXDK4zXVNo5nXtxyvuX8nNhhiN5kZwfV4dWxhya6d5sZ
-         hdlR29few7bBmpgKFykOc7uZaK9b/QdlLjIUKa9rE+HYkY9iSg4l4wUKiRKNKYVYvaCI
-         r/CA==
-X-Gm-Message-State: AO0yUKU8BwYeZg2Y8iqTSM1gXTZM+aXHNizLn+xZfZweMcIbL1kzUtS2
-        uB/H7ZqrSOhQOC8v8828aAzjHt3fZFQ=
-X-Google-Smtp-Source: AK7set9Dwo/hviHwIJnFBxeHVrNQ2bUODo/qyA0pDmZ2dx1zM98CMehXtRboa/88TVYh1yvoZFtBjxAmVxw=
+        bh=Jv7eFJCQHJdShrZad4wg6qbhczS1BO2S26DrILrvWfg=;
+        b=DgPsqX/H2pGBEOITcUk2V79ICfX562CRXe0G1XwKsQaFNOqm/gzp9gbUVqBh9pZiDP
+         z0LtxA+YKAO0T5SSU3mfWXFUyerc0iw4YlkB2Z+YUmnWeleLSjrOhMrMSSppyAMB/JKd
+         pWoL704OjnH1aDp1DQafaUF/JRDLswU8FCScaaBIxSnAn+MO5gwdORIkEcmc2zuuUgOx
+         164RfibR0PF1pcuHqGKQgi6BqruDLX/kTP+ih6nrwzX0WSmp4sT/kBZHJ4QCwyXPoMVV
+         1gjHLv3UF1GbAq3Tx1twduzasbX6CvWA8iqxKtTImOk6opwpdHr9Gj8WkFZTfEzwfy35
+         ahfg==
+X-Gm-Message-State: AO0yUKVYn4aR6WUS1lsANXgNYv4K1ujkKuwu8IAUwkuYJQVm2uzQHnSO
+        bKn8aM1qoXcW/cxx6zCVVJa4WhM6sm4=
+X-Google-Smtp-Source: AK7set/aRqzoIGn2r6hKGdQL2yk7USvE3Z3o494g7U9jz+D7bYJ70gxPWaaOqXWw6886u2sgHjajnJplNP4=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:9205:0:b0:8ef:90e1:b2f8 with SMTP id
- b5-20020a259205000000b008ef90e1b2f8mr206400ybo.2.1676675428316; Fri, 17 Feb
- 2023 15:10:28 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:902:ab0e:b0:19b:c29:3932 with SMTP id
+ ik14-20020a170902ab0e00b0019b0c293932mr427871plb.3.1676675430051; Fri, 17 Feb
+ 2023 15:10:30 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 17 Feb 2023 15:10:11 -0800
+Date:   Fri, 17 Feb 2023 15:10:12 -0800
 In-Reply-To: <20230217231022.816138-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230217231022.816138-1-seanjc@google.com>
 X-Mailer: git-send-email 2.39.2.637.g21b0678d19-goog
-Message-ID: <20230217231022.816138-2-seanjc@google.com>
-Subject: [PATCH 01/12] KVM: x86: Add a framework for enabling KVM-governed x86 features
+Message-ID: <20230217231022.816138-3-seanjc@google.com>
+Subject: [PATCH 02/12] KVM: x86/mmu: Use KVM-governed feature framework to
+ track "GBPAGES enabled"
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -62,7 +63,7 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,134 +71,102 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introduce yet another X86_FEATURE flag framework to manage and cache KVM
-governed features (for lack of a better term).  "Governed" in this case
-means that KVM has some level of involvement and/or vested interest in
-whether or not an X86_FEATURE can be used by the guest.  The intent of the
-framework is twofold: to simplify caching of guest CPUID flags that KVM
-needs to frequently query, and to add clarity to such caching, e.g. it
-isn't immediately obvious that SVM's bundle of flags for "optional nested]
-SVM features" track whether or not a flag is exposed to L1.
+Use the governed feature framework to track whether or not the guest can
+use 1GiB pages, and drop the one-off helper that wraps the surprisingly
+non-trivial logic surrounding 1GiB page usage in the guest.
+
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/kvm_host.h  | 11 +++++++
- arch/x86/kvm/cpuid.c             |  2 ++
- arch/x86/kvm/cpuid.h             | 51 ++++++++++++++++++++++++++++++++
- arch/x86/kvm/governed_features.h |  9 ++++++
- 4 files changed, 73 insertions(+)
- create mode 100644 arch/x86/kvm/governed_features.h
+ arch/x86/kvm/cpuid.c             | 16 ++++++++++++++++
+ arch/x86/kvm/governed_features.h |  2 ++
+ arch/x86/kvm/mmu/mmu.c           | 20 +++-----------------
+ 3 files changed, 21 insertions(+), 17 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 792a6037047a..cd660de02f7b 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -835,6 +835,17 @@ struct kvm_vcpu_arch {
- 	struct kvm_cpuid_entry2 *cpuid_entries;
- 	struct kvm_hypervisor_cpuid kvm_cpuid;
- 
-+	/*
-+	 * Track whether or not the guest is allowed to use features that are
-+	 * governed by KVM, where "governed" means KVM needs to manage state
-+	 * and/or explicitly enable the feature in hardware.  Typically, but
-+	 * not always, governed features can be used by the guest if and only
-+	 * if both KVM and userspace want to expose the feature to the guest.
-+	 */
-+	struct {
-+		u32 enabled;
-+	} governed_features;
-+
- 	u64 reserved_gpa_bits;
- 	int maxphyaddr;
- 
 diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 8f8edeaf8177..013fdc27fc8f 100644
+index 013fdc27fc8f..3b604499c35c 100644
 --- a/arch/x86/kvm/cpuid.c
 +++ b/arch/x86/kvm/cpuid.c
-@@ -335,6 +335,8 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 	struct kvm_lapic *apic = vcpu->arch.apic;
- 	struct kvm_cpuid_entry2 *best;
+@@ -337,6 +337,22 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
  
-+	vcpu->arch.governed_features.enabled = 0;
+ 	vcpu->arch.governed_features.enabled = 0;
+ 
++	/*
++	 * If TDP is enabled, let the guest use GBPAGES if they're supported in
++	 * hardware.  The hardware page walker doesn't let KVM disable GBPAGES,
++	 * i.e. won't treat them as reserved, and KVM doesn't redo the GVA->GPA
++	 * walk for performance and complexity reasons.  Not to mention KVM
++	 * _can't_ solve the problem because GVA->GPA walks aren't visible to
++	 * KVM once a TDP translation is installed.  Mimic hardware behavior so
++	 * that KVM's is at least consistent, i.e. doesn't randomly inject #PF.
++	 * If TDP is disabled, honor guest CPUID as KVM has full visibility and
++	 * can install smaller shadow pages if the host lacks 1GiB support.
++	 */
++	if (!tdp_enabled)
++		kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_GBPAGES);
++	else if (boot_cpu_has(X86_FEATURE_GBPAGES))
++		kvm_governed_feature_set(vcpu, X86_FEATURE_GBPAGES);
 +
  	best = kvm_find_cpuid_entry(vcpu, 1);
  	if (best && apic) {
  		if (cpuid_entry_has(best, X86_FEATURE_TSC_DEADLINE_TIMER))
-diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-index b1658c0de847..f61a2106ba90 100644
---- a/arch/x86/kvm/cpuid.h
-+++ b/arch/x86/kvm/cpuid.h
-@@ -232,4 +232,55 @@ static __always_inline bool guest_pv_has(struct kvm_vcpu *vcpu,
- 	return vcpu->arch.pv_cpuid.features & (1u << kvm_feature);
+diff --git a/arch/x86/kvm/governed_features.h b/arch/x86/kvm/governed_features.h
+index 40ce8e6608cd..b29c15d5e038 100644
+--- a/arch/x86/kvm/governed_features.h
++++ b/arch/x86/kvm/governed_features.h
+@@ -5,5 +5,7 @@ BUILD_BUG()
+ 
+ #define KVM_GOVERNED_X86_FEATURE(x) KVM_GOVERNED_FEATURE(X86_FEATURE_##x)
+ 
++KVM_GOVERNED_X86_FEATURE(GBPAGES)
++
+ #undef KVM_GOVERNED_X86_FEATURE
+ #undef KVM_GOVERNED_FEATURE
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index c91ee2927dd7..36e4561554ca 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4728,28 +4728,13 @@ __reset_rsvds_bits_mask(struct rsvd_bits_validate *rsvd_check,
+ 	}
  }
  
-+enum kvm_governed_features {
-+#define KVM_GOVERNED_FEATURE(x) KVM_GOVERNED_##x,
-+#include "governed_features.h"
-+	KVM_NR_GOVERNED_FEATURES
-+};
-+
-+static __always_inline int kvm_governed_feature_index(unsigned int x86_feature)
-+{
-+	switch (x86_feature) {
-+#define KVM_GOVERNED_FEATURE(x) case x: return KVM_GOVERNED_##x;
-+#include "governed_features.h"
-+	default:
-+		return -1;
-+	}
-+}
-+
-+static __always_inline int kvm_is_governed_feature(unsigned int x86_feature)
-+{
-+	return kvm_governed_feature_index(x86_feature) >= 0;
-+}
-+
-+static __always_inline u32 kvm_governed_feature_bit(unsigned int x86_feature)
-+{
-+	int index = kvm_governed_feature_index(x86_feature);
-+
-+	BUILD_BUG_ON(index < 0);
-+	return BIT(index);
-+}
-+
-+static __always_inline void kvm_governed_feature_set(struct kvm_vcpu *vcpu,
-+						     unsigned int x86_feature)
-+{
-+	BUILD_BUG_ON(KVM_NR_GOVERNED_FEATURES >
-+		     sizeof(vcpu->arch.governed_features.enabled) * BITS_PER_BYTE);
-+
-+	vcpu->arch.governed_features.enabled |= kvm_governed_feature_bit(x86_feature);
-+}
-+
-+static __always_inline void kvm_governed_feature_check_and_set(struct kvm_vcpu *vcpu,
-+							       unsigned int x86_feature)
-+{
-+	if (guest_cpuid_has(vcpu, x86_feature))
-+		kvm_governed_feature_set(vcpu, x86_feature);
-+}
-+
-+static __always_inline bool guest_can_use(struct kvm_vcpu *vcpu,
-+					  unsigned int x86_feature)
-+{
-+	return vcpu->arch.governed_features.enabled & kvm_governed_feature_bit(x86_feature);
-+}
-+
- #endif
-diff --git a/arch/x86/kvm/governed_features.h b/arch/x86/kvm/governed_features.h
-new file mode 100644
-index 000000000000..40ce8e6608cd
---- /dev/null
-+++ b/arch/x86/kvm/governed_features.h
-@@ -0,0 +1,9 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#if !defined(KVM_GOVERNED_FEATURE) || defined(KVM_GOVERNED_X86_FEATURE)
-+BUILD_BUG()
-+#endif
-+
-+#define KVM_GOVERNED_X86_FEATURE(x) KVM_GOVERNED_FEATURE(X86_FEATURE_##x)
-+
-+#undef KVM_GOVERNED_X86_FEATURE
-+#undef KVM_GOVERNED_FEATURE
+-static bool guest_can_use_gbpages(struct kvm_vcpu *vcpu)
+-{
+-	/*
+-	 * If TDP is enabled, let the guest use GBPAGES if they're supported in
+-	 * hardware.  The hardware page walker doesn't let KVM disable GBPAGES,
+-	 * i.e. won't treat them as reserved, and KVM doesn't redo the GVA->GPA
+-	 * walk for performance and complexity reasons.  Not to mention KVM
+-	 * _can't_ solve the problem because GVA->GPA walks aren't visible to
+-	 * KVM once a TDP translation is installed.  Mimic hardware behavior so
+-	 * that KVM's is at least consistent, i.e. doesn't randomly inject #PF.
+-	 */
+-	return tdp_enabled ? boot_cpu_has(X86_FEATURE_GBPAGES) :
+-			     guest_cpuid_has(vcpu, X86_FEATURE_GBPAGES);
+-}
+-
+ static void reset_guest_rsvds_bits_mask(struct kvm_vcpu *vcpu,
+ 					struct kvm_mmu *context)
+ {
+ 	__reset_rsvds_bits_mask(&context->guest_rsvd_check,
+ 				vcpu->arch.reserved_gpa_bits,
+ 				context->cpu_role.base.level, is_efer_nx(context),
+-				guest_can_use_gbpages(vcpu),
++				guest_can_use(vcpu, X86_FEATURE_GBPAGES),
+ 				is_cr4_pse(context),
+ 				guest_cpuid_is_amd_or_hygon(vcpu));
+ }
+@@ -4826,7 +4811,8 @@ static void reset_shadow_zero_bits_mask(struct kvm_vcpu *vcpu,
+ 	__reset_rsvds_bits_mask(shadow_zero_check, reserved_hpa_bits(),
+ 				context->root_role.level,
+ 				context->root_role.efer_nx,
+-				guest_can_use_gbpages(vcpu), is_pse, is_amd);
++				guest_can_use(vcpu, X86_FEATURE_GBPAGES),
++				is_pse, is_amd);
+ 
+ 	if (!shadow_me_mask)
+ 		return;
 -- 
 2.39.2.637.g21b0678d19-goog
 
