@@ -2,273 +2,246 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F28469A6CC
-	for <lists+kvm@lfdr.de>; Fri, 17 Feb 2023 09:22:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 82C2C69A6E4
+	for <lists+kvm@lfdr.de>; Fri, 17 Feb 2023 09:27:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229833AbjBQIWP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Feb 2023 03:22:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54168 "EHLO
+        id S229781AbjBQI1z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Feb 2023 03:27:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229461AbjBQIWN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Feb 2023 03:22:13 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BAD65EC91;
-        Fri, 17 Feb 2023 00:21:54 -0800 (PST)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31H6DY4S034574;
-        Fri, 17 Feb 2023 08:21:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=PhOPvRxSccZ0JizLljIoOYKn+EmB6A64ecGWeyQyOSE=;
- b=f8/C20xUFz/RSsyd394W/4lGKk+FNLCkWEkC00EjNamkYYf9rj8iZVapKTEuqicyZw9d
- 5xSvzBof3ig89Cndz/2KumSTufaFB44ek7LSUcaHlY2xzFamYV0Z2olvSll/r1qXF9Js
- /x+NwA0LKbioye2B0WwDiURa22qwaDnv7dF27EVgcCUrgP+D8/e2ozQED/ku9hvxo4kz
- n3/I7LTp8su+oxWgdPxh6A7zPR7chT3kNVyi1C5Dj6PuZfBFd5swtxuXII5bmEweu0cV
- dw8XtGcsJfm4PrnX4J1zL0w/FqFtakXGzDyQ/unkrBJkMU/hZ8xguYG+ez+rTxEKpByZ 6A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nt44daffd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Feb 2023 08:21:53 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31H7oid0005198;
-        Fri, 17 Feb 2023 08:21:52 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nt44dafet-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Feb 2023 08:21:52 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31GFRmko002747;
-        Fri, 17 Feb 2023 08:21:50 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3np2n6dpcs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Feb 2023 08:21:50 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31H8LlHp44761502
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 17 Feb 2023 08:21:47 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EE95220043;
-        Fri, 17 Feb 2023 08:21:46 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1C68B20040;
-        Fri, 17 Feb 2023 08:21:46 +0000 (GMT)
-Received: from [9.179.29.70] (unknown [9.179.29.70])
-        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 17 Feb 2023 08:21:46 +0000 (GMT)
-Message-ID: <4b54bb98-593d-4ef0-8479-6e0446ee902a@linux.ibm.com>
-Date:   Fri, 17 Feb 2023 09:21:45 +0100
+        with ESMTP id S229522AbjBQI1y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Feb 2023 03:27:54 -0500
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B6E25FD8;
+        Fri, 17 Feb 2023 00:27:51 -0800 (PST)
+Received: by mail-lj1-x233.google.com with SMTP id r12so405662ljg.4;
+        Fri, 17 Feb 2023 00:27:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QAoMJKlMJ+XFbSX67OuVv50PwIJOWkP1+4AQHzhPSBI=;
+        b=k0dek0QEJcdjG5iRaaOlqBTL+r2HXB/4pVxjTCu9cbunK/oZ0rvaSr4IOQcEJPjMZu
+         YzC80oegiQZH7KiywkxXnqXGAWvY6/cByeGn7r6iTe3a4r2P4/zLydmnHEjp99q1f+qw
+         pWgX3Pnzm4VpffdSOI8hG5Kb9Q6mfMElGsMkCBqwpUcbEJ4zfFaq2JUkO8YseP9+3x9+
+         WHCo/P09LrRBaKiRG1A7iGvhWOak94yRYJCSzvpQE4rZYZcuHw6QjvFykXHjQ/07GxG4
+         LFD246YzUD6SIGN0/f6/CDvU4SLciJYuleJ4SjD8x7yHS7lM4qiEPchc2V5ZadzcGit0
+         gcRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QAoMJKlMJ+XFbSX67OuVv50PwIJOWkP1+4AQHzhPSBI=;
+        b=4ulgmKWx+1QdDwGazFgEUxQSV13frt2VwLlN2VtMm5ESU4C4c1ki9r7edM+oJzKQVu
+         2Zz5lKMZhpaxZ9+llmfgXJYOlUmqHd9nh1sx7cq5Y8es77HT7OAy/JTChJGd6g8/qA5a
+         QfKnG7pTKsv8uE319vis2s1Hsz8eD++tBwowB6hGAoB8rMrC/qoLD7MqkdcsK+8eHf0G
+         vyfL+P0fbluo4EdPoKdQYXt10frIAKa94MD7IcRerKJCGxx/aBhi7lTvUewhi6gQgJ8z
+         Yf5zJ39aJfTb472vbJ0qqarjNKfk9xeqVf3K/Eg/NfMFn4yESR+Y4irx/O0Tu+IPzMCS
+         1guA==
+X-Gm-Message-State: AO0yUKV9yrw6LdJ3jNGCoeRxj7O8sEV1KzgZQJL7PSXfv4949KEwWPn7
+        30I9YyCkYxE6zLA4kETc1SroPBHauys=
+X-Google-Smtp-Source: AK7set8D9uBbw+3iBbBQ1xyqHMFFSTvgKsBKUsJ9d7KylbJFqPupp8qm2cdGiGQnKxIGZF3xFFOpaw==
+X-Received: by 2002:a2e:bea8:0:b0:294:710a:fe6c with SMTP id a40-20020a2ebea8000000b00294710afe6cmr659798ljr.0.1676622469585;
+        Fri, 17 Feb 2023 00:27:49 -0800 (PST)
+Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
+        by smtp.gmail.com with ESMTPSA id j20-20020a2e8014000000b002934ba451b1sm505580ljg.131.2023.02.17.00.27.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Feb 2023 00:27:49 -0800 (PST)
+Date:   Fri, 17 Feb 2023 10:27:47 +0200
+From:   Zhi Wang <zhi.wang.linux@gmail.com>
+To:     isaku.yamahata@intel.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH v11 050/113] KVM: x86/tdp_mmu: Ignore unsupported mmu
+ operation on private GFNs
+Message-ID: <20230217102747.00001d7f@gmail.com>
+In-Reply-To: <7a0fb2a0dddc87fb8d34d5af8fc73b288dbcc63c.1673539699.git.isaku.yamahata@intel.com>
+References: <cover.1673539699.git.isaku.yamahata@intel.com>
+        <7a0fb2a0dddc87fb8d34d5af8fc73b288dbcc63c.1673539699.git.isaku.yamahata@intel.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.2
-Subject: Re: [PATCH v3 1/1] KVM: s390: vsie: clarifications on setting the
- APCB
-Content-Language: en-US
-To:     Janosch Frank <frankja@linux.ibm.com>, david@redhat.com
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, borntraeger@de.ibm.com,
-        cohuck@redhat.com, thuth@redhat.com, imbrenda@linux.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com, svens@linux.ibm.com
-References: <20230214122841.13066-1-pmorel@linux.ibm.com>
- <20230214122841.13066-2-pmorel@linux.ibm.com>
- <d32a4080-3c74-27f0-2ef7-78755da98022@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <d32a4080-3c74-27f0-2ef7-78755da98022@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 1pIoEP0DGBrcz1S7HYMID0Pv2VGeQDNA
-X-Proofpoint-GUID: KxVel-WhCNhAttbkqfI1E-8mtE0Ad1mI
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
- definitions=2023-02-17_04,2023-02-16_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
- suspectscore=0 bulkscore=0 clxscore=1015 adultscore=0 mlxscore=0
- priorityscore=1501 phishscore=0 lowpriorityscore=0 malwarescore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302170073
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, 12 Jan 2023 08:31:58 -0800
+isaku.yamahata@intel.com wrote:
 
-
-On 2/16/23 14:41, Janosch Frank wrote:
-> On 2/14/23 13:28, Pierre Morel wrote:
->> The APCB is part of the CRYCB.
->> The calculation of the APCB origin can be done by adding
->> the APCB offset to the CRYCB origin.
->>
->> Current code makes confusing transformations, converting
->> the CRYCB origin to a pointer to calculate the APCB origin.
->>
->> Let's make things simpler and keep the CRYCB origin to make
->> these calculations.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 > 
-> LGTM:
-> Acked-by: Janosch Frank <frankja@linux.ibm.com>
-
-Thanks,
-Pierre
-
+> Some KVM MMU operations (dirty page logging, page migration, aging page)
+> aren't supported for private GFNs (yet) with the first generation of TDX.
+> Silently return on unsupported TDX KVM MMU operations.
 > 
->> ---
->>   arch/s390/kvm/vsie.c | 50 +++++++++++++++++++++++++-------------------
->>   1 file changed, 29 insertions(+), 21 deletions(-)
->>
->> diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
->> index b6a0219e470a..8d6b765abf29 100644
->> --- a/arch/s390/kvm/vsie.c
->> +++ b/arch/s390/kvm/vsie.c
->> @@ -138,11 +138,15 @@ static int prepare_cpuflags(struct kvm_vcpu 
->> *vcpu, struct vsie_page *vsie_page)
->>   }
->>   /* Copy to APCB FORMAT1 from APCB FORMAT0 */
->>   static int setup_apcb10(struct kvm_vcpu *vcpu, struct kvm_s390_apcb1 
->> *apcb_s,
->> -            unsigned long apcb_o, struct kvm_s390_apcb1 *apcb_h)
->> +            unsigned long crycb_gpa, struct kvm_s390_apcb1 *apcb_h)
->>   {
->>       struct kvm_s390_apcb0 tmp;
->> +    unsigned long apcb_gpa;
->> -    if (read_guest_real(vcpu, apcb_o, &tmp, sizeof(struct 
->> kvm_s390_apcb0)))
->> +    apcb_gpa = crycb_gpa + offsetof(struct kvm_s390_crypto_cb, apcb0);
->> +
->> +    if (read_guest_real(vcpu, apcb_gpa, &tmp,
->> +                sizeof(struct kvm_s390_apcb0)))
->>           return -EFAULT;
->>       apcb_s->apm[0] = apcb_h->apm[0] & tmp.apm[0];
->> @@ -157,15 +161,19 @@ static int setup_apcb10(struct kvm_vcpu *vcpu, 
->> struct kvm_s390_apcb1 *apcb_s,
->>    * setup_apcb00 - Copy to APCB FORMAT0 from APCB FORMAT0
->>    * @vcpu: pointer to the virtual CPU
->>    * @apcb_s: pointer to start of apcb in the shadow crycb
->> - * @apcb_o: pointer to start of original apcb in the guest2
->> + * @crycb_gpa: guest physical address to start of original guest crycb
->>    * @apcb_h: pointer to start of apcb in the guest1
->>    *
->>    * Returns 0 and -EFAULT on error reading guest apcb
->>    */
->>   static int setup_apcb00(struct kvm_vcpu *vcpu, unsigned long *apcb_s,
->> -            unsigned long apcb_o, unsigned long *apcb_h)
->> +            unsigned long crycb_gpa, unsigned long *apcb_h)
->>   {
->> -    if (read_guest_real(vcpu, apcb_o, apcb_s,
->> +    unsigned long apcb_gpa;
->> +
->> +    apcb_gpa = crycb_gpa + offsetof(struct kvm_s390_crypto_cb, apcb0);
->> +
->> +    if (read_guest_real(vcpu, apcb_gpa, apcb_s,
->>                   sizeof(struct kvm_s390_apcb0)))
->>           return -EFAULT;
->> @@ -178,16 +186,20 @@ static int setup_apcb00(struct kvm_vcpu *vcpu, 
->> unsigned long *apcb_s,
->>    * setup_apcb11 - Copy the FORMAT1 APCB from the guest to the shadow 
->> CRYCB
->>    * @vcpu: pointer to the virtual CPU
->>    * @apcb_s: pointer to start of apcb in the shadow crycb
->> - * @apcb_o: pointer to start of original guest apcb
->> + * @crycb_gpa: guest physical address to start of original guest crycb
->>    * @apcb_h: pointer to start of apcb in the host
->>    *
->>    * Returns 0 and -EFAULT on error reading guest apcb
->>    */
->>   static int setup_apcb11(struct kvm_vcpu *vcpu, unsigned long *apcb_s,
->> -            unsigned long apcb_o,
->> +            unsigned long crycb_gpa,
->>               unsigned long *apcb_h)
->>   {
->> -    if (read_guest_real(vcpu, apcb_o, apcb_s,
->> +    unsigned long apcb_gpa;
->> +
->> +    apcb_gpa = crycb_gpa + offsetof(struct kvm_s390_crypto_cb, apcb1);
->> +
->> +    if (read_guest_real(vcpu, apcb_gpa, apcb_s,
->>                   sizeof(struct kvm_s390_apcb1)))
->>           return -EFAULT;
->> @@ -200,7 +212,7 @@ static int setup_apcb11(struct kvm_vcpu *vcpu, 
->> unsigned long *apcb_s,
->>    * setup_apcb - Create a shadow copy of the apcb.
->>    * @vcpu: pointer to the virtual CPU
->>    * @crycb_s: pointer to shadow crycb
->> - * @crycb_o: pointer to original guest crycb
->> + * @crycb_gpa: guest physical address of original guest crycb
->>    * @crycb_h: pointer to the host crycb
->>    * @fmt_o: format of the original guest crycb.
->>    * @fmt_h: format of the host crycb.
->> @@ -211,50 +223,46 @@ static int setup_apcb11(struct kvm_vcpu *vcpu, 
->> unsigned long *apcb_s,
->>    * Return 0 or an error number if the guest and host crycb are 
->> incompatible.
->>    */
->>   static int setup_apcb(struct kvm_vcpu *vcpu, struct 
->> kvm_s390_crypto_cb *crycb_s,
->> -           const u32 crycb_o,
->> +           const u32 crycb_gpa,
->>              struct kvm_s390_crypto_cb *crycb_h,
->>              int fmt_o, int fmt_h)
->>   {
->> -    struct kvm_s390_crypto_cb *crycb;
->> -
->> -    crycb = (struct kvm_s390_crypto_cb *) (unsigned long)crycb_o;
->> -
->>       switch (fmt_o) {
->>       case CRYCB_FORMAT2:
->> -        if ((crycb_o & PAGE_MASK) != ((crycb_o + 256) & PAGE_MASK))
->> +        if ((crycb_gpa & PAGE_MASK) != ((crycb_gpa + 256) & PAGE_MASK))
->>               return -EACCES;
->>           if (fmt_h != CRYCB_FORMAT2)
->>               return -EINVAL;
->>           return setup_apcb11(vcpu, (unsigned long *)&crycb_s->apcb1,
->> -                    (unsigned long) &crycb->apcb1,
->> +                    crycb_gpa,
->>                       (unsigned long *)&crycb_h->apcb1);
->>       case CRYCB_FORMAT1:
->>           switch (fmt_h) {
->>           case CRYCB_FORMAT2:
->>               return setup_apcb10(vcpu, &crycb_s->apcb1,
->> -                        (unsigned long) &crycb->apcb0,
->> +                        crycb_gpa,
->>                           &crycb_h->apcb1);
->>           case CRYCB_FORMAT1:
->>               return setup_apcb00(vcpu,
->>                           (unsigned long *) &crycb_s->apcb0,
->> -                        (unsigned long) &crycb->apcb0,
->> +                        crycb_gpa,
->>                           (unsigned long *) &crycb_h->apcb0);
->>           }
->>           break;
->>       case CRYCB_FORMAT0:
->> -        if ((crycb_o & PAGE_MASK) != ((crycb_o + 32) & PAGE_MASK))
->> +        if ((crycb_gpa & PAGE_MASK) != ((crycb_gpa + 32) & PAGE_MASK))
->>               return -EACCES;
->>           switch (fmt_h) {
->>           case CRYCB_FORMAT2:
->>               return setup_apcb10(vcpu, &crycb_s->apcb1,
->> -                        (unsigned long) &crycb->apcb0,
->> +                        crycb_gpa,
->>                           &crycb_h->apcb1);
->>           case CRYCB_FORMAT1:
->>           case CRYCB_FORMAT0:
->>               return setup_apcb00(vcpu,
->>                           (unsigned long *) &crycb_s->apcb0,
->> -                        (unsigned long) &crycb->apcb0,
->> +                        crycb_gpa,
->>                           (unsigned long *) &crycb_h->apcb0);
->>           }
->>       }
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c     |  3 +++
+>  arch/x86/kvm/mmu/tdp_mmu.c | 50 ++++++++++++++++++++++++++++++++++----
+>  arch/x86/kvm/x86.c         |  3 +++
+>  3 files changed, 51 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 484e615196aa..ad0482a101a3 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -6635,6 +6635,9 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
+>  	for_each_rmap_spte(rmap_head, &iter, sptep) {
+>  		sp = sptep_to_sp(sptep);
+>  
+> +		/* Private page dirty logging is not supported yet. */
+> +		KVM_BUG_ON(is_private_sptep(sptep), kvm);
+> +
+>  		/*
+>  		 * We cannot do huge page mapping for indirect shadow pages,
+>  		 * which are found on the last rmap (level = 1) when not using
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 5ce0328c71df..69e202bd1897 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -1478,7 +1478,8 @@ typedef bool (*tdp_handler_t)(struct kvm *kvm, struct tdp_iter *iter,
+>  
+>  static __always_inline bool kvm_tdp_mmu_handle_gfn(struct kvm *kvm,
+>  						   struct kvm_gfn_range *range,
+> -						   tdp_handler_t handler)
+> +						   tdp_handler_t handler,
+> +						   bool only_shared)
+
+What's the purpose of having only_shared while all the callers will set it as
+true?
+
+>  {
+>  	struct kvm_mmu_page *root;
+>  	struct tdp_iter iter;
+> @@ -1489,9 +1490,23 @@ static __always_inline bool kvm_tdp_mmu_handle_gfn(struct kvm *kvm,
+>  	 * into this helper allow blocking; it'd be dead, wasteful code.
+>  	 */
+>  	for_each_tdp_mmu_root(kvm, root, range->slot->as_id) {
+> +		gfn_t start;
+> +		gfn_t end;
+> +
+> +		if (only_shared && is_private_sp(root))
+> +			continue;
+> +
+>  		rcu_read_lock();
+>  
+> -		tdp_root_for_each_leaf_pte(iter, root, range->start, range->end)
+> +		/*
+> +		 * For TDX shared mapping, set GFN shared bit to the range,
+> +		 * so the handler() doesn't need to set it, to avoid duplicated
+> +		 * code in multiple handler()s.
+> +		 */
+> +		start = kvm_gfn_for_root(kvm, root, range->start);
+> +		end = kvm_gfn_for_root(kvm, root, range->end);
+> +
+
+The coco implementation tends to treat the SHARED bit / C bit as a page_prot,
+an attribute, not a part of the GFN. From that prospective, the caller needs to
+be aware if it is operating on the private memory or shared memory, so does
+the handler. The page table walker should know the SHARED bit as a attribute.
+
+I don't think it is a good idea to have two different understandings, which
+will cause conversion and confusion.
+
+> +		tdp_root_for_each_leaf_pte(iter, root, start, end)
+>  			ret |= handler(kvm, &iter, range);
+>  
+>  		rcu_read_unlock();
+> @@ -1535,7 +1550,12 @@ static bool age_gfn_range(struct kvm *kvm, struct tdp_iter *iter,
+>  
+>  bool kvm_tdp_mmu_age_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+>  {
+> -	return kvm_tdp_mmu_handle_gfn(kvm, range, age_gfn_range);
+> +	/*
+> +	 * First TDX generation doesn't support clearing A bit for private
+> +	 * mapping, since there's no secure EPT API to support it.  However
+> +	 * it's a legitimate request for TDX guest.
+> +	 */
+> +	return kvm_tdp_mmu_handle_gfn(kvm, range, age_gfn_range, true);
+>  }
+>  
+>  static bool test_age_gfn(struct kvm *kvm, struct tdp_iter *iter,
+> @@ -1546,7 +1566,8 @@ static bool test_age_gfn(struct kvm *kvm, struct tdp_iter *iter,
+>  
+>  bool kvm_tdp_mmu_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+>  {
+> -	return kvm_tdp_mmu_handle_gfn(kvm, range, test_age_gfn);
+> +	/* The first TDX generation doesn't support A bit. */
+> +	return kvm_tdp_mmu_handle_gfn(kvm, range, test_age_gfn, true);
+>  }
+>  
+>  static bool set_spte_gfn(struct kvm *kvm, struct tdp_iter *iter,
+> @@ -1591,8 +1612,11 @@ bool kvm_tdp_mmu_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+>  	 * No need to handle the remote TLB flush under RCU protection, the
+>  	 * target SPTE _must_ be a leaf SPTE, i.e. cannot result in freeing a
+>  	 * shadow page.  See the WARN on pfn_changed in __handle_changed_spte().
+> +	 *
+> +	 * .change_pte() callback should not happen for private page, because
+> +	 * for now TDX private pages are pinned during VM's life time.
+>  	 */
+> -	return kvm_tdp_mmu_handle_gfn(kvm, range, set_spte_gfn);
+> +	return kvm_tdp_mmu_handle_gfn(kvm, range, set_spte_gfn, true);
+>  }
+>
+If the mmu notifier callbacks will never operate on a private page, having a
+WARN_ON() is better than silently letting it fade away.  
+
+>  /*
+> @@ -1974,6 +1998,13 @@ void kvm_tdp_mmu_clear_dirty_pt_masked(struct kvm *kvm,
+>  	struct kvm_mmu_page *root;
+>  
+>  	lockdep_assert_held_write(&kvm->mmu_lock);
+> +	/*
+> +	 * First TDX generation doesn't support clearing dirty bit,
+> +	 * since there's no secure EPT API to support it.  For now silently
+> +	 * ignore KVM_CLEAR_DIRTY_LOG.
+> +	 */
+> +	if (!kvm_arch_dirty_log_supported(kvm))
+> +		return;
+>  	for_each_tdp_mmu_root(kvm, root, slot->as_id)
+>  		clear_dirty_pt_masked(kvm, root, gfn, mask, wrprot);
+>  }
+> @@ -2093,6 +2124,15 @@ bool kvm_tdp_mmu_write_protect_gfn(struct kvm *kvm,
+>  	bool spte_set = false;
+>  
+>  	lockdep_assert_held_write(&kvm->mmu_lock);
+> +
+> +	/*
+> +	 * First TDX generation doesn't support write protecting private
+> +	 * mappings, silently ignore the request.  KVM_GET_DIRTY_LOG etc
+> +	 * can reach here, no warning.
+> +	 */
+> +	if (!kvm_arch_dirty_log_supported(kvm))
+> +		return false;
+> +
+>  	for_each_tdp_mmu_root(kvm, root, slot->as_id)
+>  		spte_set |= write_protect_gfn(kvm, root, gfn, min_level);
 > 
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 5b4d5f8128a5..c4579e696d39 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12526,6 +12526,9 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
+>  	u32 new_flags = new ? new->flags : 0;
+>  	bool log_dirty_pages = new_flags & KVM_MEM_LOG_DIRTY_PAGES;
+>  
+> +	if (!kvm_arch_dirty_log_supported(kvm) && log_dirty_pages)
+> +		return;
+> +
+>  	/*
+>  	 * Update CPU dirty logging if dirty logging is being toggled.  This
+>  	 * applies to all operations.
+
