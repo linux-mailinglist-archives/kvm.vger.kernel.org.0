@@ -2,199 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F20569A67B
-	for <lists+kvm@lfdr.de>; Fri, 17 Feb 2023 09:03:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1974F69A6C8
+	for <lists+kvm@lfdr.de>; Fri, 17 Feb 2023 09:21:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229738AbjBQIDD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Feb 2023 03:03:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38952 "EHLO
+        id S229805AbjBQIV0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Feb 2023 03:21:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229496AbjBQIDB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Feb 2023 03:03:01 -0500
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6516A5EC83;
-        Fri, 17 Feb 2023 00:02:34 -0800 (PST)
-Received: by mail-pg1-x52f.google.com with SMTP id f7so150274pgu.2;
-        Fri, 17 Feb 2023 00:02:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=5phApT5KIAC+uU4xT31TKIBplRF0IkqRKlCgfLJol30=;
-        b=Xby5Ak4MGCvbfJQDH9RgIBpJ7ud8v/bYNBMmTNvPlgRfw4ceXutUEndOOBZ6FvKmne
-         /m4Mmf5w0gBLFFk1FBOs2ho4xYFfIaI1zMG8mqRPXG3uj6K7N/ZPwX28SYTy3ekopzbs
-         hq0/55FgbSOALCjOmBUQw7u+1wMO8jXxfkehHfXHOsMB1NiAaPEkidC282DKS+9Q6sw0
-         nXXwPcC7+YfDcYOplELpS7swqFr9W3r/o+Ct4Zte+dC4tcH6eRuY8CYnFevaCMBJ7I+z
-         R4hPz97jW56z52zUlMAneBAmi49J72is2YmRZS/xSDbXP/FryfwHQg88N3TsX8Io9roQ
-         sD0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5phApT5KIAC+uU4xT31TKIBplRF0IkqRKlCgfLJol30=;
-        b=CT5Ud91oKMe3eXzNo+aEn0j7Ek0axLqclgyiA47LNkbzMkM51q5lGBWRCdTF5+TQb6
-         RcbmYmm+P5B4xR5BSSU/YSFz8mu6+JFoJubMRar0lLzwsVbpelhNqbMIOC0zBe7c6Z8N
-         /Juvy5nm+KiNQ34MAmUzWOap6i9FfPWnOlH4TEcwRz/+wmutEEBDJAeIjRE9/+7woKMV
-         Bi6xMcdeKO/SibwI9071RwdrDoRtkiYOwHyXjjBudy6ysKz1LCd0nUByvPPodxs4NjL8
-         Bce/VYBn5vDJAwqA3spUfnjO5P+fiMnWIteweSqX8vP6aVMuZ1DEwzbXhFAkGvn9Ancq
-         /UHw==
-X-Gm-Message-State: AO0yUKXRnnszMWDdWrbF/8vsY6TDfFLH0czFrcjJw0Jhfgw3hdrSDR6t
-        3+XJjky0gvn8P2jb+fRKNPUyLd1Te6ldhhU4yzM=
-X-Google-Smtp-Source: AK7set9c2bqfEa/WvsjgUSoNZf3yG4q6yN5HhL1cKAlR3naz5zYCmz1a+lbbOE7KDjDQKA7s66o9VdJMNMaoYdA/jQE=
-X-Received: by 2002:a63:3ec8:0:b0:4fb:8fb6:37e3 with SMTP id
- l191-20020a633ec8000000b004fb8fb637e3mr48435pga.6.1676620953779; Fri, 17 Feb
- 2023 00:02:33 -0800 (PST)
+        with ESMTP id S229598AbjBQIVY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Feb 2023 03:21:24 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 825045CF24;
+        Fri, 17 Feb 2023 00:21:23 -0800 (PST)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31H6Y4g1019928;
+        Fri, 17 Feb 2023 08:21:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=8Y/uQ0C2Vq37cI9U+XphcblnLu2cI2NzDDwTAJTHmok=;
+ b=kN0qAPwvbTZy6rfyKTPtuVxiXl13UuYId26oxxrDMWblDGEFskNeyrhv0LdcBliL4Z1G
+ MCNsZYpIjY5D+u5ftN4ktBtVp/7nUlKNtuNJfxzQyWAZVrV2NaGN3h/f+vXzWYcQBXwi
+ u+b/SoisJBbY28E6EZXi3z3im0pl8maxrY5W8WrcY7ssP82F991j0loSJw6NMP0opyBC
+ Mp4u0yjtAey8EYIdKO+kCjmfnJdMlK7KuNej7gst0eOOG4LHfDLRjstGEMaC7hBHVDKL
+ T/aDQiI76xt6xpzP6i6BnD+rM1CXMjC/8LUZiMqx5/arlSrJSooXsUvTPcuFd82J8NEo Tg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nsv6evy7e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Feb 2023 08:21:22 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31H6XRot013268;
+        Fri, 17 Feb 2023 08:21:22 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nsv6evy6f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Feb 2023 08:21:22 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31GJW3lZ030392;
+        Fri, 17 Feb 2023 08:21:20 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3np2n6dq7d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Feb 2023 08:21:20 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31H8LG6F50921732
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 17 Feb 2023 08:21:16 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9A8E620043;
+        Fri, 17 Feb 2023 08:21:16 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D01DE20040;
+        Fri, 17 Feb 2023 08:21:15 +0000 (GMT)
+Received: from [9.179.29.70] (unknown [9.179.29.70])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 17 Feb 2023 08:21:15 +0000 (GMT)
+Message-ID: <faf9b6aa-a72b-3c61-c720-6b972792f720@linux.ibm.com>
+Date:   Fri, 17 Feb 2023 09:21:15 +0100
 MIME-Version: 1.0
-References: <20230127112248.136810-1-suzuki.poulose@arm.com>
- <cfb0292c-e84d-0a7c-be74-ae5508779502@arm.com> <CANW9uyvXofhGGuhGzk_0Et-w8CHT2y35WSu5+hno6Qm8K4R4ug@mail.gmail.com>
-In-Reply-To: <CANW9uyvXofhGGuhGzk_0Et-w8CHT2y35WSu5+hno6Qm8K4R4ug@mail.gmail.com>
-From:   Itaru Kitayama <itaru.kitayama@gmail.com>
-Date:   Fri, 17 Feb 2023 17:02:22 +0900
-Message-ID: <CANW9uyuY2Ca9dxYQTtFLFupd-A088NTtmhdE=ST6o6Qn1_XM_A@mail.gmail.com>
-Subject: Re: [RFC] Support for Arm CCA VMs on Linux
-To:     Ryan Roberts <ryan.roberts@arm.com>
-Cc:     Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andrew Jones <andrew.jones@linux.dev>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        James Morse <james.morse@arm.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Joey Gouly <Joey.Gouly@arm.com>, Marc Zyngier <maz@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Steven Price <steven.price@arm.com>,
-        Thomas Huth <thuth@redhat.com>, Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.cs.columbia.edu
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.2
+Subject: Re: [PATCH v3 1/1] KVM: s390: vsie: clarifications on setting the
+ APCB
+Content-Language: en-US
+To:     David Hildenbrand <david@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, borntraeger@de.ibm.com,
+        frankja@linux.ibm.com, cohuck@redhat.com, thuth@redhat.com,
+        imbrenda@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        svens@linux.ibm.com
+References: <20230214122841.13066-1-pmorel@linux.ibm.com>
+ <20230214122841.13066-2-pmorel@linux.ibm.com>
+ <2e1d3f81-9cc0-bf96-abde-a270a58701a1@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <2e1d3f81-9cc0-bf96-abde-a270a58701a1@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: MzZSutRHOZgqZyxSEDKn0RKjdJHvEb4p
+X-Proofpoint-ORIG-GUID: nQ1UDkYSjspkejkbQQt95x-2A_n2CDMM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-17_04,2023-02-16_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
+ priorityscore=1501 malwarescore=0 impostorscore=0 adultscore=0
+ lowpriorityscore=0 mlxlogscore=804 clxscore=1015 mlxscore=0 spamscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302170073
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Feb 11, 2023 at 7:53 AM Itaru Kitayama <itaru.kitayama@gmail.com> wrote:
->
-> On Sat, Feb 11, 2023 at 1:56 AM Ryan Roberts <ryan.roberts@arm.com> wrote:
-> >
-> > On 27/01/2023 11:22, Suzuki K Poulose wrote:
-> > > [...]
-> >
-> > > Running the stack
-> > > ====================
-> > >
-> > > To run/test the stack, you would need the following components :
-> > >
-> > > 1) FVP Base AEM RevC model with FEAT_RME support [4]
-> > > 2) TF-A firmware for EL3 [5]
-> > > 3) TF-A RMM for R-EL2 [3]
-> > > 4) Linux Kernel [6]
-> > > 5) kvmtool [7]
-> > > 6) kvm-unit-tests [8]
-> > >
-> > > Instructions for building the firmware components and running the model are
-> > > available here [9]. Once, the host kernel is booted, a Realm can be launched by
-> > > invoking the `lkvm` commad as follows:
-> > >
-> > >  $ lkvm run --realm                            \
-> > >        --measurement-algo=["sha256", "sha512"] \
-> > >        --disable-sve                           \
-> > >        <normal-vm-options>
-> > >
-> > > Where:
-> > >  * --measurement-algo (Optional) specifies the algorithm selected for creating the
-> > >    initial measurements by the RMM for this Realm (defaults to sha256).
-> > >  * GICv3 is mandatory for the Realms.
-> > >  * SVE is not yet supported in the TF-RMM, and thus must be disabled using
-> > >    --disable-sve
-> > >
-> > > You may also run the kvm-unit-tests inside the Realm world, using the similar
-> > > options as above.
-> >
-> > Building all of these components and configuring the FVP correctly can be quite
-> > tricky, so I thought I would plug a tool we have called Shrinkwrap, which can
-> > simplify all of this.
-> >
-> > The tool accepts a yaml input configuration that describes how a set of
-> > components should be built and packaged, and how the FVP should be configured
-> > and booted. And by default, it uses a Docker container on its backend, which
-> > contains all the required tools, including the FVP. You can optionally use
-> > Podman or have it run on your native system if you prefer. It supports both
-> > x86_64 and aarch64. And you can even run it in --dry-run mode to see the set of
-> > shell commands that would have been executed.
-> >
-> > It comes with two CCA configs out-of-the-box; cca-3world.yaml builds TF-A, RMM,
-> > Linux (for both host and guest), kvmtool and kvm-unit-tests. cca-4world.yaml
-> > adds Hafnium and some demo SPs for the secure world (although since Hafnium
-> > requires x86_64 to build, cca-4world.yaml doesn't currently work on an aarch64
-> > build host).
-> >
-> > See the documentation [1] and repository [2] for more info.
-> >
-> > Brief instructions to get you up and running:
-> >
-> >   # Install shrinkwrap. (I assume you have Docker installed):
-> >   sudo pip3 install pyyaml termcolor tuxmake
-> >   git clone https://git.gitlab.arm.com/tooling/shrinkwrap.git
-> >   export PATH=$PWD/shrinkwrap/shrinkwrap:$PATH
-> >
-> >   # If running Python < 3.9:
-> >   sudo pip3 install graphlib-backport
-> >
-> >   # Build all the CCA components:
-> >   shrinkwrap build cca-3world.yaml [--dry-run]
->
-> This has been working on my Multipass instance on M1, thanks for the tool.
->
-> Thanks,
-> Itaru.
 
-It took a while though I've just booted an Ubuntu 22.10 disk image
-with the cca-3world.yaml config on M1.
+
+On 2/16/23 14:04, David Hildenbrand wrote:
+> On 14.02.23 13:28, Pierre Morel wrote:
+>> The APCB is part of the CRYCB.
+>> The calculation of the APCB origin can be done by adding
+>> the APCB offset to the CRYCB origin.
+>>
+>> Current code makes confusing transformations, converting
+>> the CRYCB origin to a pointer to calculate the APCB origin.
+>>
+>> Let's make things simpler and keep the CRYCB origin to make
+>> these calculations.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+>> ---
+> 
+> Much better
+> 
+> Acked-by: David Hildenbrand <david@redhat.com>
+> 
 
 Thanks,
-Itaru.
+Pierre
 
->
-> >
-> >   # Run the stack in the FVP:
-> >   shrinkwrap run cca-3world.yaml -r ROOTFS=<my_rootfs.ext4> [--dry-run]
-> >
-> > By default, building is done at ~/.shrinkwrap/build/cca-3world and the package
-> > is created at ~/.shrinkwrap/package/cca-3world (this can be changed with
-> > envvars).
-> >
-> > The 'run' command will boot TF-A, RMM and host Linux kernel in the FVP, and
-> > mount the provided rootfs. You will likely want to have copied the userspace
-> > pieces into the rootfs before running, so you can create realms:
-> >
-> > - ~/.shrinkwrap/package/cca-3world/Image (kernel with RMI and RSI support)
-> > - ~/.shrinkwrap/package/cca-3world/lkvm (kvmtool able to launch realms)
-> > - ~/.shrinkwrap/package/cca-3world/kvm-unit-tests.tgz (built kvm-unit-tests)
-> >
-> > Once the FVP is booted to a shell, you can do something like this to launch a
-> > Linux guest in a realm:
-> >
-> >   lkvm run --realm --disable-sve -c 1 -m 256 -k Image
-> >
-> > [1] https://shrinkwrap.docs.arm.com
-> > [2] https://gitlab.arm.com/tooling/shrinkwrap
-> >
-> >
-> > _______________________________________________
-> > linux-arm-kernel mailing list
-> > linux-arm-kernel@lists.infradead.org
-> > http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+-- 
+Pierre Morel
+IBM Lab Boeblingen
