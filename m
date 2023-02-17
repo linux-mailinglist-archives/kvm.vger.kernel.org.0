@@ -2,112 +2,294 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D51769A8EC
-	for <lists+kvm@lfdr.de>; Fri, 17 Feb 2023 11:13:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6475369A8F7
+	for <lists+kvm@lfdr.de>; Fri, 17 Feb 2023 11:17:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229534AbjBQKN0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Feb 2023 05:13:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34564 "EHLO
+        id S229460AbjBQKRf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Feb 2023 05:17:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229573AbjBQKNY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Feb 2023 05:13:24 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F6B362FF4
-        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 02:12:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676628757;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=7Y7MkPKxQ4b4S+E2uuEcl4fSWKwkp7IBI4B2vVLi24A=;
-        b=ClxYJ0hn4Jr7aQog7ltNWg76fmRK3NOEJcdlPIUCrT/eKgm/RZhIgVxlnDvJ6LPyBg8ntL
-        ksIYg6CX1U9lbF5oc5QZMsjJ9PfeDRQkVpWQTY+LVaHOxx0b1S910LUrvuYiopCwUSLPRp
-        W2bpWxpRBZiHp8Snb9sY+6Cz35DhpcQ=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-633-eNfdYF_pPTKpqHbOa_11Jw-1; Fri, 17 Feb 2023 05:12:36 -0500
-X-MC-Unique: eNfdYF_pPTKpqHbOa_11Jw-1
-Received: by mail-wm1-f72.google.com with SMTP id l36-20020a05600c1d2400b003dfe4bae099so417981wms.0
-        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 02:12:36 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7Y7MkPKxQ4b4S+E2uuEcl4fSWKwkp7IBI4B2vVLi24A=;
-        b=QNSJzi55J8BGyGRfMDnnE+diMn55rjbGlkPqxfJql/ckZ1x3cd+aWgeGrvCL9sX1a9
-         WRmk78YMvMVi7WjxPA/Qqu/OeCtM2tkssIiUwywXPwoxBQnN0QtPSykqJRjf7KzqRNCe
-         ACUk6bXtXHqdqnBmfY7hUFJvG1Ih+yUglZbOh8Kvns3J5C9o3VRaOBHgZayVjUJwDs41
-         9Us1exCz66rF4ZqyAqQdJCull4wuZbrsT9wp46c+pPaqZbP99fTy5PDXNZcCNDgmAI5H
-         9IItD675gcjajk2xJyinvQOokM/52jZAb6luWvCMVpgZeZCgE3/aU7z6dADxlyIECdJZ
-         8UUA==
-X-Gm-Message-State: AO0yUKUOKX5fcVxd/2sFZpN/GN+vhmg2hpC1f8YotTDGS2m4uE3qujB0
-        DeGPjQy6s7q+Va7ya/U4xKO1gJhw6mvsZ3wSb34MhsMRqnXf8IJ0BEsenKmBp7icHk40wL4Ss9o
-        BYi2UECIFzFcf
-X-Received: by 2002:adf:f40b:0:b0:2c5:5ff8:93e5 with SMTP id g11-20020adff40b000000b002c55ff893e5mr6717181wro.44.1676628755108;
-        Fri, 17 Feb 2023 02:12:35 -0800 (PST)
-X-Google-Smtp-Source: AK7set9h4wA736ZeMYva3jBcgfzObA1Ee5DxMQNCqSjLJtJ9uB6fqQFZuR5r1/3OYbU7YpGJ6GX0bQ==
-X-Received: by 2002:adf:f40b:0:b0:2c5:5ff8:93e5 with SMTP id g11-20020adff40b000000b002c55ff893e5mr6717163wro.44.1676628754834;
-        Fri, 17 Feb 2023 02:12:34 -0800 (PST)
-Received: from redhat.com ([2.52.5.34])
-        by smtp.gmail.com with ESMTPSA id i3-20020a05600011c300b002c4061a687bsm3720864wrx.31.2023.02.17.02.12.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Feb 2023 02:12:34 -0800 (PST)
-Date:   Fri, 17 Feb 2023 05:12:29 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Nanyong Sun <sunnanyong@huawei.com>, joro@8bytes.org,
-        will@kernel.org, robin.murphy@arm.com, jasowang@redhat.com,
-        iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, wangrong68@huawei.com
-Subject: Re: [PATCH v2] vhost/vdpa: Add MSI translation tables to iommu for
- software-managed MSI
-Message-ID: <20230217051158-mutt-send-email-mst@kernel.org>
-References: <20230207120843.1580403-1-sunnanyong@huawei.com>
- <Y+7G+tiBCjKYnxcZ@nvidia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y+7G+tiBCjKYnxcZ@nvidia.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229582AbjBQKRd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Feb 2023 05:17:33 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 084AD35AB
+        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 02:17:31 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 946AC61824
+        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 10:17:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7DC2C433D2;
+        Fri, 17 Feb 2023 10:17:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1676629050;
+        bh=231h88vTgQFVNlkKNYjvAnxwk+hDV93H0+b/QLMgduA=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=S1ZBNs6Car3/MQXjpkGCX0zkz3QQQEt5jWeeiAtlQFYP6R+jLW28mIEXdL1VMMRW9
+         gxhT8jgaGWnv1Rl3huMYSyTdIJqe3Iavfrc46R6x/E+8LnoUzmQfz5yAKY73Db4uFa
+         xpe9HJfiWBUbg4asvG8HWLqWxu2RUZaAlbSEV73mvgcx/2CwHd+IVQ4cTofEDPh1Ei
+         eF54CcJZXkMXZ+UCCh6PFwR96v5wnhTaqlmo6nOLTVA7DKiWt2v42Ee4suj2VLTNwM
+         o4O7Jveq9DPxYzuHbMWZENvjyBqvtw0rm6O+fIkWp5Ppr7rFuH+B+913HZ22ks5/Zp
+         swsizVRf+3e4g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pSxnz-00B9sO-Fl;
+        Fri, 17 Feb 2023 10:17:27 +0000
+Date:   Fri, 17 Feb 2023 10:17:27 +0000
+Message-ID: <86k00gy4so.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Simon Veith <sveith@amazon.de>, dwmw2@infradead.org
+Subject: Re: [PATCH 08/16] KVM: arm64: timers: Allow userspace to set the counter offsets
+In-Reply-To: <Y+6pqz3pCwu7izZL@linux.dev>
+References: <20230216142123.2638675-1-maz@kernel.org>
+        <20230216142123.2638675-9-maz@kernel.org>
+        <Y+6pqz3pCwu7izZL@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de, dwmw2@infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 16, 2023 at 08:14:50PM -0400, Jason Gunthorpe wrote:
-> On Tue, Feb 07, 2023 at 08:08:43PM +0800, Nanyong Sun wrote:
-> > From: Rong Wang <wangrong68@huawei.com>
+Hi Oliver,
+
+On Thu, 16 Feb 2023 22:09:47 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> Hi Marc,
+> 
+> On Thu, Feb 16, 2023 at 02:21:15PM +0000, Marc Zyngier wrote:
+> > And this is the moment you have all been waiting for: setting the
+> > counter offsets from userspace.
 > > 
-> > Once enable iommu domain for one device, the MSI
-> > translation tables have to be there for software-managed MSI.
-> > Otherwise, platform with software-managed MSI without an
-> > irq bypass function, can not get a correct memory write event
-> > from pcie, will not get irqs.
-> > The solution is to obtain the MSI phy base address from
-> > iommu reserved region, and set it to iommu MSI cookie,
-> > then translation tables will be created while request irq.
+> > We expose a brand new capability that reports the ability to set
+> > the offsets for both the virtual and physical sides, independently.
+> > 
+> > In keeping with the architecture, the offsets are expressed as
+> > a delta that is substracted from the physical counter value.
+> > 
+> > Once this new API is used, there is no going back, and the counters
+> > cannot be written to to set the offsets implicitly (the writes
+> > are instead ignored).
 > 
-> Probably not what anyone wants to hear, but I would prefer we not add
-> more uses of this stuff. It looks like we have to get rid of
-> iommu_get_msi_cookie() :\
-> 
-> I'd like it if vdpa could move to iommufd not keep copying stuff from
-> it..
+> Is there any particular reason to use an explicit ioctl as opposed to
+> the KVM_{GET,SET}_DEVICE_ATTR ioctls? Dunno where you stand on it, but I
+> quite like that interface for simple state management. We also avoid
+> eating up more UAPI bits in the global namespace.
 
-Absolutely but when is that happening?
+The problem with that is that it requires yet another KVM device for
+this, and I'm lazy. It also makes it a bit harder for the VMM to buy
+into this (need to track another FD, for example).
 
-> Also the iommu_group_has_isolated_msi() check is missing on the vdpa
-> path, and it is missing the iommu ownership mechanism.
-> 
-> Also which in-tree VDPA driver that uses the iommu runs on ARM? Please
-> don't propose core changes for unmerged drivers. :(
-> 
-> Jason
+> You could also split up the two offsets as individual attributes, but I
+> really couldn't care less. Its userspace's problem after all!
 
+The current approach also allows you to deal with the two offsets
+individually (you can update one or both as you see fit).
+
+> 
+> And on that note, any VMM patches to match this implementation? kvmtool
+> would suffice, just want something that runs a real VM and pokes these
+> ioctls.
+
+I did hack kvmtool for that, but that's very uninteresting, as it
+doesn't do any save/restore. I want to have a go at QEMU in my copious
+spare time, stay tuned.
+
+> 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h |  4 +++
+> >  arch/arm64/include/uapi/asm/kvm.h | 15 ++++++++++
+> >  arch/arm64/kvm/arch_timer.c       | 46 +++++++++++++++++++++++++++----
+> >  arch/arm64/kvm/arm.c              |  8 ++++++
+> >  include/uapi/linux/kvm.h          |  3 ++
+> >  5 files changed, 71 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 3adac0c5e175..8514a37cf8d5 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -221,6 +221,8 @@ struct kvm_arch {
+> >  #define KVM_ARCH_FLAG_EL1_32BIT				4
+> >  	/* PSCI SYSTEM_SUSPEND enabled for the guest */
+> >  #define KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED		5
+> > +	/* VM counter offsets */
+> > +#define KVM_ARCH_FLAG_COUNTER_OFFSETS			6
+> 
+> nit: I'm not too bothered by the test_bit(...) mouthful when its used
+> sparingly but it may be nice to have a helper if it is repeated enough
+> times.
+
+3 times. I'll slap a helper in, can't hurt.
+
+> 
+> >  	unsigned long flags;
+> >  
+> > @@ -1010,6 +1012,8 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+> >  
+> >  long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+> >  				struct kvm_arm_copy_mte_tags *copy_tags);
+> > +int kvm_vm_ioctl_set_counter_offsets(struct kvm *kvm,
+> > +				     struct kvm_arm_counter_offsets *offsets);
+> >  
+> >  /* Guest/host FPSIMD coordination helpers */
+> >  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
+> > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> > index f8129c624b07..2d7557a160bd 100644
+> > --- a/arch/arm64/include/uapi/asm/kvm.h
+> > +++ b/arch/arm64/include/uapi/asm/kvm.h
+> > @@ -198,6 +198,21 @@ struct kvm_arm_copy_mte_tags {
+> >  	__u64 reserved[2];
+> >  };
+> >  
+> > +/*
+> > + * Counter/Timer offset structure. Describe the virtual/physical offsets.
+> > + * To be used with KVM_ARM_SET_CNT_OFFSETS.
+> > + */
+> > +struct kvm_arm_counter_offsets {
+> > +	__u64 virtual_offset;
+> > +	__u64 physical_offset;
+> > +
+> > +#define KVM_COUNTER_SET_VOFFSET_FLAG	(1UL << 0)
+> > +#define KVM_COUNTER_SET_POFFSET_FLAG	(1UL << 1)
+> > +
+> > +	__u64 flags;
+> > +	__u64 reserved;
+> > +};
+> > +
+> >  #define KVM_ARM_TAGS_TO_GUEST		0
+> >  #define KVM_ARM_TAGS_FROM_GUEST		1
+> >  
+> > diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> > index 444ea6dca218..b04544b702f9 100644
+> > --- a/arch/arm64/kvm/arch_timer.c
+> > +++ b/arch/arm64/kvm/arch_timer.c
+> > @@ -852,9 +852,11 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+> >  	ptimer->vcpu = vcpu;
+> >  	ptimer->offset.vm_offset = &vcpu->kvm->arch.offsets.poffset;
+> >  
+> > -	/* Synchronize cntvoff across all vtimers of a VM. */
+> > -	timer_set_offset(vtimer, kvm_phys_timer_read());
+> > -	timer_set_offset(ptimer, 0);
+> > +	/* Synchronize offsets across timers of a VM if not already provided */
+> > +	if (!test_bit(KVM_ARCH_FLAG_COUNTER_OFFSETS, &vcpu->kvm->arch.flags)) {
+> > +		timer_set_offset(vtimer, kvm_phys_timer_read());
+> > +		timer_set_offset(ptimer, 0);
+> > +	}
+> >  
+> >  	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
+> >  	timer->bg_timer.function = kvm_bg_timer_expire;
+> > @@ -898,8 +900,11 @@ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
+> >  		kvm_arm_timer_write(vcpu, timer, TIMER_REG_CTL, value);
+> >  		break;
+> >  	case KVM_REG_ARM_TIMER_CNT:
+> > -		timer = vcpu_vtimer(vcpu);
+> > -		timer_set_offset(timer, kvm_phys_timer_read() - value);
+> > +		if (!test_bit(KVM_ARCH_FLAG_COUNTER_OFFSETS,
+> > +			      &vcpu->kvm->arch.flags)) {
+> > +			timer = vcpu_vtimer(vcpu);
+> > +			timer_set_offset(timer, kvm_phys_timer_read() - value);
+> > +		}
+> 
+> If we've already got userspace to buy in to the new UAPI, should we
+> return an error instead of silently failing? Might be good to catch
+> misbehavior in the act, even if it is benign as this patch is
+> written.
+
+I don't necessarily see it as a misbehaviour. I'm trying to make it
+cheap for people to integrate this into their flow, and no two VMM do
+that the same way (plus, I only have QEMU as an example -- I'm sure
+Amazon, Google, and whoever do that in very different ways).
+
+It is also pretty annoying, as the VMM now has to filter the registers
+it restores. This is extra work. Instead, the VMM knows that having
+used the new API, the registers become WI.
+
+> 
+> >  		break;
+> >  	case KVM_REG_ARM_TIMER_CVAL:
+> >  		timer = vcpu_vtimer(vcpu);
+> > @@ -909,6 +914,13 @@ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
+> >  		timer = vcpu_ptimer(vcpu);
+> >  		kvm_arm_timer_write(vcpu, timer, TIMER_REG_CTL, value);
+> >  		break;
+> > +	case KVM_REG_ARM_PTIMER_CNT:
+> > +		if (!test_bit(KVM_ARCH_FLAG_COUNTER_OFFSETS,
+> > +			      &vcpu->kvm->arch.flags)) {
+> > +			timer = vcpu_ptimer(vcpu);
+> > +			timer_set_offset(timer, kvm_phys_timer_read() - value);
+> > +		}
+> > +		break;
+> >  	case KVM_REG_ARM_PTIMER_CVAL:
+> >  		timer = vcpu_ptimer(vcpu);
+> >  		kvm_arm_timer_write(vcpu, timer, TIMER_REG_CVAL, value);
+> > @@ -1446,3 +1458,27 @@ int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+> >  
+> >  	return -ENXIO;
+> >  }
+> > +
+> > +int kvm_vm_ioctl_set_counter_offsets(struct kvm *kvm,
+> > +				     struct kvm_arm_counter_offsets *offsets)
+> > +{
+> > +	if (offsets->reserved ||
+> > +	    (offsets->flags & ~(KVM_COUNTER_SET_VOFFSET_FLAG |
+> > +				KVM_COUNTER_SET_POFFSET_FLAG)))
+> > +		return -EINVAL;
+> > +
+> > +	if (!lock_all_vcpus(kvm))
+> > +		return -EBUSY;
+> 
+> Is there any reason why we can't just order this ioctl before vCPU
+> creation altogether, or is there a need to do this at runtime? We're
+> about to tolerate multiple writers to the offset value, and I think the
+> only thing we need to guarantee is that the below flag is set before
+> vCPU ioctls have a chance to run.
+
+Again, we don't know for sure whether the final offset is available
+before vcpu creation time. My idea for QEMU would be to perform the
+offset adjustment as late as possible, right before executing the VM,
+after having restored the vcpus with whatever value they had.
+
+> Actually, the one benefit of enforcing a strict ordering is that you can
+> hide the old register indices completely from KVM_GET_REG_LIST to
+> provide further discouragement to userspace.
+
+But if you do that, how do you know what offset to program on the
+target? You need the VM's view of time. You could compute it from the
+physical counter and the offset locally, but you now need to transfer
+it across. That's a change in the wire protocol, which is far more
+than I'm prepared to bite.
+
+> Otherwise, if you choose to keep it this way then the requirement to
+> have no vCPU ioctls in flight needs to be explicitly documented as that
+> is a bit of a tricky interface.
+
+Ah, good point. Completely missed that.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
