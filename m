@@ -2,73 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AE0D369B32F
-	for <lists+kvm@lfdr.de>; Fri, 17 Feb 2023 20:33:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D106569B326
+	for <lists+kvm@lfdr.de>; Fri, 17 Feb 2023 20:31:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229698AbjBQTd1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Feb 2023 14:33:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53866 "EHLO
+        id S229845AbjBQTb2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Feb 2023 14:31:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229561AbjBQTd0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Feb 2023 14:33:26 -0500
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A65C9305C1
-        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 11:33:07 -0800 (PST)
-Received: by mail-wm1-x32e.google.com with SMTP id t6-20020a7bc3c6000000b003dc57ea0dfeso1697583wmj.0
-        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 11:33:07 -0800 (PST)
+        with ESMTP id S229849AbjBQTbY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Feb 2023 14:31:24 -0500
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A8EC52895
+        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 11:31:20 -0800 (PST)
+Received: by mail-wm1-x32f.google.com with SMTP id m21-20020a05600c3b1500b003e1f5f2a29cso1734721wms.4
+        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 11:31:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=grsecurity.net; s=grsec;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7P7MflaWpXYQfD6IKZsdwP5oFsSsaEC7e6p8ArHuhRk=;
-        b=MM77SFJNQaAr50RLNAkmsYdV5rbkafzGlHGV2lcEqC0AqS0bXw9RkZ/nCL0fYxO3ey
-         9wGLn0WjtY122/lgQWQiwtemieT1gYCb6/Jjt7a9N6uyq/mJql3a3HtRyvXcsLg3eeRE
-         ykvzZka1uteNMG6pk4GwFJC+8GAVawxAuz5tDYdKQf5DlOgMhpMRnyHAVcCYYaEF27Oq
-         nzXOPnK+DrqUL9nU+MpCC/7O1JafhQnAf1LHbDg5VCh1VFU+gCtnob3nZD4nJQt0DJBI
-         isbw2C/c9v6mgLpEwMJltxEw0y7KqhVH0XOlMSYKMAMje7thabQ/NKtPzJ5mIhdD2A+4
-         OMUA==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=36c2t3bxTYAXxN1sWnIe/NpwPxNe7BvAQ4RverxEpho=;
+        b=BujsuhQlQ/vmzD35Tq0BOi+ArpHBIxvhv5hgzCk/NIAlsM1Tb90KM7c67qp/QmSLPJ
+         0AxwBCHqXUfs3ggEhatYLFrjglhO0sU36azEhu/3OMIijcx3xL574kFCGFLxxU6XpM1I
+         Q/jIxdJOwo0doZfssMOcGp2rb/c0z0xcQmtnp7o1tnNoXqZj6VloYMGP31Q/FuGp4A/l
+         7ul7X/Ocgot+UDJMM9+vCVfEiLEszCiw9ryRu7qhDNP/mpQYidjdkKHHwfaWDh4obey5
+         M/rD4+al+n06rkDrOMAJA6EV6c8IQP+WR5Awy3LYyOIaJ8ddlKmWQePE1g+2qzCtOVMb
+         XxBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7P7MflaWpXYQfD6IKZsdwP5oFsSsaEC7e6p8ArHuhRk=;
-        b=MUNQC+/yLZTDz8lTlyLZ/Fl2H6aJl/XmQ9YmTv1TEJFwj0cYde7TiRSlpjEXpAMNc4
-         QMHUV0tdypH5U4YGYryRBVQUYdfogxsQVu5MIdTTDsQ6gJiVjno45B+3tNTnCVXbbYzF
-         vKqj55fCat/UMy9J5hPFrY1hJOTljGyqjZHsv8L3KwoDBspeizd2blyB9C7laPELIcYA
-         FvkqlEQMJaIa4mza40ddeLNSrSjqZO3/4OZBL+p0xVfQWQz9c9s7022ySSwkXOtYFqXR
-         fQx7Sn4v98LwEfETk1Od5waIUsEpMJT1GgiyZg/aaC+uvX6CxDZUdMh1Db66Iy6Jyu7j
-         bO9w==
-X-Gm-Message-State: AO0yUKWWp+XwOnKqxMyVSwwIysWJLikHjJzQ36GdYHc/TYIS0zfQ9JZx
-        14bjwcKJI4YHJvHs3mwcmWaiLQ==
-X-Google-Smtp-Source: AK7set+1BE3TKM3KTrihpM0VlLi49tlM7qrFm/+jUkKOALb8aIBmBnr3dura/EZeRe90kEScbQsqlA==
-X-Received: by 2002:a05:600c:601b:b0:3dc:545f:e9ce with SMTP id az27-20020a05600c601b00b003dc545fe9cemr1296991wmb.24.1676662386249;
-        Fri, 17 Feb 2023 11:33:06 -0800 (PST)
-Received: from ?IPV6:2003:f6:af46:5a00:93e3:335:818b:a454? (p200300f6af465a0093e30335818ba454.dip0.t-ipconnect.de. [2003:f6:af46:5a00:93e3:335:818b:a454])
-        by smtp.gmail.com with ESMTPSA id q12-20020a7bce8c000000b003daf672a616sm6015667wmj.22.2023.02.17.11.33.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Feb 2023 11:33:06 -0800 (PST)
-Message-ID: <b80bdc6d-a9f9-249e-77fd-bc5c553126df@grsecurity.net>
-Date:   Fri, 17 Feb 2023 20:33:05 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH] KVM: Reorder fields in 'struct kvm_mmu_memory_cache'
-Content-Language: en-US, de-DE
-To:     Sean Christopherson <seanjc@google.com>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org, kvm@vger.kernel.org
-References: <f9423a6ee10d91bd6bad32beefd1b96cad4d28f1.1676620879.git.christophe.jaillet@wanadoo.fr>
- <Y++uHlQz7OEOzojb@google.com>
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=36c2t3bxTYAXxN1sWnIe/NpwPxNe7BvAQ4RverxEpho=;
+        b=Lq98IzszRBCeFVTiUGYjWnm4M3ONmyvcE3pxsPp+AJQmaDKTUWqYZG0Kxr6/IQfNfc
+         jVeRrWyiqMp7SeCmVSO4KwXz251/BJfZxRcStQPYWmR+ce3PHPwcsWokPrX7+6UoSdP3
+         XRCwcNeMhl/uoxhhkFMJTEe9LlyQIvinI0hh5xzbvX/yRxjRl+sypfumW+CgKCqBBEt/
+         un4e+GQn1IT9rAD8BhsbRnjndUNv2n3o7VN/D2BBwwKhW8DrpChlq8z7Pl+1hH+Cygyw
+         OUnlT3bE2IYI+dpJcmGO2e+m/0ZCZM8N9e9wCuiMb6GHyGsL3l2ZiQM2rWrDFAi+W6QT
+         uGoQ==
+X-Gm-Message-State: AO0yUKUdLPuI7Qf+xtfHJlQAm87kVdG+X7TmKkyZ/5D2obrh2nSYem9X
+        WANp13jPJg9JcRGXDrRtYDguvWveI8tDmDkD
+X-Google-Smtp-Source: AK7set+Do8Oea3EiNpOBU6NsvYLWCkCaUZhItfU6Qy+K5HebfbKb0emwIEFSkUdueCyYckis503Obw==
+X-Received: by 2002:a05:600c:998:b0:3e2:20c7:6544 with SMTP id w24-20020a05600c099800b003e220c76544mr2530540wmp.19.1676662278862;
+        Fri, 17 Feb 2023 11:31:18 -0800 (PST)
+Received: from nuc.fritz.box (p200300f6af465a00bfa0a0965e5e0d85.dip0.t-ipconnect.de. [2003:f6:af46:5a00:bfa0:a096:5e5e:d85])
+        by smtp.gmail.com with ESMTPSA id u9-20020a05600c4d0900b003e1f2e43a1csm5393618wmp.48.2023.02.17.11.31.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Feb 2023 11:31:18 -0800 (PST)
 From:   Mathias Krause <minipli@grsecurity.net>
-In-Reply-To: <Y++uHlQz7OEOzojb@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+To:     kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Mathias Krause <minipli@grsecurity.net>
+Subject: [PATCH v2 0/2] KVM: Minor structure layout changes
+Date:   Fri, 17 Feb 2023 20:33:34 +0100
+Message-Id: <20230217193336.15278-1-minipli@grsecurity.net>
+X-Mailer: git-send-email 2.39.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,19 +70,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17.02.23 17:41, Sean Christopherson wrote:
-> On Fri, Feb 17, 2023, Christophe JAILLET wrote:
->> Group some variables based on their sizes to reduce hole and avoid padding.
->> On x86_64, this shrinks the size from 40 to 32 bytes.
-> 
-> Heh, a hair too late[*].  Unless I'm mistaken, Mathias will be sending a new
-> version in the not-too-distant future.
+v1: https://lore.kernel.org/kvm/20230213163351.30704-1-minipli@grsecurity.net/
 
-Jepp, patches should appear here anytime soon:
+This used to be a more exhaustive patch set shrinking kvm_vcpu's size.
+But we concluded that this would be too fragile to maintain and would
+require a more radical layout change to group often used members
+together instead of chopping off individual padding bytes.
 
-https://lore.kernel.org/kvm/20230217193336.15278-1-minipli@grsecurity.net
+The remaining two patches are nonetheless useful, as they either make
+the structure layout a more natural fit (as for kvm_pmu, putting the
+version atop) or removing pointless padding (kvm_mmu_memory_cache).
 
-> 
-> Thanks!
-> 
-> [*] https://lore.kernel.org/all/Y+puefrgtqf430fs@google.com
+Please apply!
+
+Thanks,
+
+Mathias Krause (2):
+  KVM: x86: Shrink struct kvm_pmu
+  KVM: Shrink struct kvm_mmu_memory_cache
+
+ arch/x86/include/asm/kvm_host.h | 2 +-
+ include/linux/kvm_types.h       | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+-- 
+2.39.1
+
