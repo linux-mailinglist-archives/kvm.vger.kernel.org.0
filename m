@@ -2,156 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 651A669A9B6
-	for <lists+kvm@lfdr.de>; Fri, 17 Feb 2023 12:06:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C979569A8E8
+	for <lists+kvm@lfdr.de>; Fri, 17 Feb 2023 11:12:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229952AbjBQLG0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Feb 2023 06:06:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44516 "EHLO
+        id S229820AbjBQKMf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Feb 2023 05:12:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229982AbjBQLGG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Feb 2023 06:06:06 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2301B642E6;
-        Fri, 17 Feb 2023 03:05:42 -0800 (PST)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31H91FX7015429;
-        Fri, 17 Feb 2023 11:05:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=sJAEhRnP/TQyp4v3xC/EVoSyF0IX9maDjAZarRdthCE=;
- b=tjJvyp9NfKgAtqZTwGD1mVDepp0A1X6fUMFzquJuCURtf0ME41gRkXH9IKXc5XkhtRl7
- HBmIDdx07M7+R9nfcGTSmDIeepWiK/cEWKSnTE7S36IfGzxXR3zgG+xdng3zsynD4l/W
- 1kISUL3XS0sfa7SonktqrMIWmcMsESVVGCad8LQXQZN5hox5bNIbIaRP3j10M0vKjLcY
- AwZ6bSSOXOD+pr93x+ZnMUr6sxobUUjIz7TUWgd78TPXMiX6lTsH+NpDhfvdgIeilRdA
- nGOJtSTYHv1o63nhEsq8apZCaekLlPlyT1LeYslnfKXFGM8xkKvrQL5c9D7kEUGYpOk+ LA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nt15wsn6t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Feb 2023 11:05:29 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31H94tTb023546;
-        Fri, 17 Feb 2023 11:05:29 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nt15wsn6d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Feb 2023 11:05:29 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31GJIxbk017665;
-        Fri, 17 Feb 2023 11:05:27 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3np2n6qwc8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Feb 2023 11:05:27 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31HB5Oa636176156
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 17 Feb 2023 11:05:24 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2C6892004D;
-        Fri, 17 Feb 2023 11:05:24 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AE5EE20040;
-        Fri, 17 Feb 2023 11:05:23 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.171.12.31])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with SMTP;
-        Fri, 17 Feb 2023 11:05:23 +0000 (GMT)
-Date:   Fri, 17 Feb 2023 11:01:31 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v1 2/2] s390x/spec_ex: Add test of
- EXECUTE with odd target address
-Message-ID: <20230217110131.4bf670e8@p-imbrenda>
-In-Reply-To: <20230215171852.1935156-3-nsg@linux.ibm.com>
-References: <20230215171852.1935156-1-nsg@linux.ibm.com>
-        <20230215171852.1935156-3-nsg@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        with ESMTP id S229750AbjBQKMc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Feb 2023 05:12:32 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFB66604E5
+        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 02:11:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676628706;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=dvpK31b66LZjOlbG0RKceUyJP6Xe2y/6MQclDivAbW8=;
+        b=a162mr4qXZaVlzcIKbKIwdArdg9ZR32w3iHdjSPwfZDn5WRO2s4I3ANQEQHfncjmTX6rSR
+        I1WJviZxOYssxqU1zGAE91d0rdPxwnQm6FKap1pUM/cCaNV+3xVK5A/JbDXae5HrRA4Li7
+        Kg4lcWA77wlBotkB9hXxBpWQnV+lvI0=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-79-GJlo0kLbPlucM8EZIYy_JA-1; Fri, 17 Feb 2023 05:11:44 -0500
+X-MC-Unique: GJlo0kLbPlucM8EZIYy_JA-1
+Received: by mail-wr1-f70.google.com with SMTP id b13-20020adfde0d000000b002c559840c76so14380wrm.3
+        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 02:11:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dvpK31b66LZjOlbG0RKceUyJP6Xe2y/6MQclDivAbW8=;
+        b=6Tum0EgSoi+M6AvVWUOl36bLPx3uGyZwAqRvpp3AxzJFxdAhlzRjCJsCRarddm35k2
+         M06IyuX42fY4k8OaOz4P5ayZ3oHmJKa/FY/7KXqzn8u2RUQBVjDNscikwPtcMXbrM/34
+         1/ONAWVQQcp3/MiFZg1Sa1XrDl3y5eOnSkUxyfZkvu8CIR86B1tslKAIIOJGExamTUcl
+         M6U7y9Y4fDdXtYeMvPjx0ztvXt0F8TOdhBXkBA84K41LCT/RU/W+LhaDOv2R8yfgw5kq
+         h5+f5/iFmx1XL25BDkopGUXp57xixFPYlhYAlfHFh0UYH7GS9nBwAWkGveYAM1Bd7StJ
+         obfA==
+X-Gm-Message-State: AO0yUKWAql5ieakxcg1EUAP2aflYW+IQFL+oK52yP92L+o5F/oZIYsOR
+        R93hfj8sTuXZTUn+xgloijl2Nh1dPhjX8yHhjiR0jSA8LeVCstlwuajNZgYpzbzDYivVD05gROW
+        VsqENxVynVtWW
+X-Received: by 2002:a05:600c:4d21:b0:3d9:f769:2115 with SMTP id u33-20020a05600c4d2100b003d9f7692115mr188607wmp.26.1676628703386;
+        Fri, 17 Feb 2023 02:11:43 -0800 (PST)
+X-Google-Smtp-Source: AK7set+Kcg4izxtCX4bYTTRixMiAEVt9Z6ixnz/KbWXmJ3fdzzSg3LAlSGK6fov0vMkMCzQhoGEOjA==
+X-Received: by 2002:a05:600c:4d21:b0:3d9:f769:2115 with SMTP id u33-20020a05600c4d2100b003d9f7692115mr188590wmp.26.1676628703126;
+        Fri, 17 Feb 2023 02:11:43 -0800 (PST)
+Received: from redhat.com ([2.52.5.34])
+        by smtp.gmail.com with ESMTPSA id az5-20020a05600c600500b003e20a6fd604sm4644634wmb.4.2023.02.17.02.11.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Feb 2023 02:11:42 -0800 (PST)
+Date:   Fri, 17 Feb 2023 05:11:38 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Nanyong Sun <sunnanyong@huawei.com>, joro@8bytes.org,
+        will@kernel.org, robin.murphy@arm.com, iommu@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        wangrong68@huawei.com
+Subject: Re: [PATCH v2] vhost/vdpa: Add MSI translation tables to iommu for
+ software-managed MSI
+Message-ID: <20230217051038-mutt-send-email-mst@kernel.org>
+References: <20230207120843.1580403-1-sunnanyong@huawei.com>
+ <Y+7G+tiBCjKYnxcZ@nvidia.com>
+ <CACGkMEtehykvqNUnfCi0VmHR1xpmhj4sSWdYW1-0oATY=0YhXw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: FViK7t7c4uPJQOar4hEG9UXjfj_VgEms
-X-Proofpoint-GUID: UxzFtg3B2WUD-y7GN4bVa9-cC_ilI7sR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
- definitions=2023-02-17_06,2023-02-17_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- clxscore=1015 suspectscore=0 malwarescore=0 adultscore=0 bulkscore=0
- lowpriorityscore=0 phishscore=0 mlxscore=0 mlxlogscore=999 spamscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302170101
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACGkMEtehykvqNUnfCi0VmHR1xpmhj4sSWdYW1-0oATY=0YhXw@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 15 Feb 2023 18:18:52 +0100
-Nina Schoetterl-Glausch <nsg@linux.ibm.com> wrote:
-
-> The EXECUTE instruction executes the instruction at the given target
-> address. This address must be halfword aligned, otherwise a
-> specification exception occurs.
-> Add a test for this.
+On Fri, Feb 17, 2023 at 01:35:59PM +0800, Jason Wang wrote:
+> On Fri, Feb 17, 2023 at 8:15 AM Jason Gunthorpe <jgg@nvidia.com> wrote:
+> >
+> > On Tue, Feb 07, 2023 at 08:08:43PM +0800, Nanyong Sun wrote:
+> > > From: Rong Wang <wangrong68@huawei.com>
+> > >
+> > > Once enable iommu domain for one device, the MSI
+> > > translation tables have to be there for software-managed MSI.
+> > > Otherwise, platform with software-managed MSI without an
+> > > irq bypass function, can not get a correct memory write event
+> > > from pcie, will not get irqs.
+> > > The solution is to obtain the MSI phy base address from
+> > > iommu reserved region, and set it to iommu MSI cookie,
+> > > then translation tables will be created while request irq.
+> >
+> > Probably not what anyone wants to hear, but I would prefer we not add
+> > more uses of this stuff. It looks like we have to get rid of
+> > iommu_get_msi_cookie() :\
+> >
+> > I'd like it if vdpa could move to iommufd not keep copying stuff from
+> > it..
 > 
-> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+> Yes, but we probably need a patch for -stable.
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Hmm do we? this looks like it's enabling new platforms is not a bugfix...
 
-> ---
->  s390x/spec_ex.c | 25 +++++++++++++++++++++++++
->  1 file changed, 25 insertions(+)
+> >
+> > Also the iommu_group_has_isolated_msi() check is missing on the vdpa
+> > path, and it is missing the iommu ownership mechanism.
 > 
-> diff --git a/s390x/spec_ex.c b/s390x/spec_ex.c
-> index b6764677..0cd3174f 100644
-> --- a/s390x/spec_ex.c
-> +++ b/s390x/spec_ex.c
-> @@ -200,6 +200,30 @@ static int short_psw_bit_12_is_0(void)
->  	return 0;
->  }
->  
-> +static int odd_ex_target(void)
-> +{
-> +	uint64_t target_addr_pre;
-> +	int to = 0, from = 0x0dd;
-> +
-> +	asm volatile ( ".pushsection .rodata\n"
-> +		"odd_ex_target_pre_insn:\n"
-> +		"	.balign 2\n"
-> +		"	. = . + 1\n"
-> +		"	lr	%[to],%[from]\n"
-> +		"	.popsection\n"
-> +
-> +		"	larl	%[target_addr_pre],odd_ex_target_pre_insn\n"
-> +		"	ex	0,1(%[target_addr_pre])\n"
-> +		: [target_addr_pre] "=&a" (target_addr_pre),
-> +		  [to] "+d" (to)
-> +		: [from] "d" (from)
-> +	);
-> +
-> +	assert((target_addr_pre + 1) & 1);
-> +	report(to != from, "did not perform ex with odd target");
-> +	return 0;
-> +}
-> +
->  static int bad_alignment(void)
->  {
->  	uint32_t words[5] __attribute__((aligned(16)));
-> @@ -241,6 +265,7 @@ static const struct spec_ex_trigger spec_ex_triggers[] = {
->  	{ "psw_bit_12_is_1", &psw_bit_12_is_1, false, &fixup_invalid_psw },
->  	{ "short_psw_bit_12_is_0", &short_psw_bit_12_is_0, false, &fixup_invalid_psw },
->  	{ "psw_odd_address", &psw_odd_address, false, &fixup_invalid_psw },
-> +	{ "odd_ex_target", &odd_ex_target, true, NULL },
->  	{ "bad_alignment", &bad_alignment, true, NULL },
->  	{ "not_even", &not_even, true, NULL },
->  	{ NULL, NULL, false, NULL },
+> Ok.
+> 
+> >
+> > Also which in-tree VDPA driver that uses the iommu runs on ARM? Please
+> 
+> ifcvf and vp_vpda are two drivers that use platform IOMMU.
+> 
+> Thanks
+> 
+> > don't propose core changes for unmerged drivers. :(
+> >
+> > Jason
+> >
 
