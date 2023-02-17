@@ -2,129 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B80AB69B335
-	for <lists+kvm@lfdr.de>; Fri, 17 Feb 2023 20:37:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DD9069B3FB
+	for <lists+kvm@lfdr.de>; Fri, 17 Feb 2023 21:33:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229809AbjBQThb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Feb 2023 14:37:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55638 "EHLO
+        id S229839AbjBQUdQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Feb 2023 15:33:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229540AbjBQTh3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Feb 2023 14:37:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6B6512859
-        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 11:36:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676662605;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=GYExQvIsCt0o1ZEFa6ZanJqmfuLccRgbfCWm1JARXDs=;
-        b=bLewOnvpQ50EHJgi76CZjl854Nmv0DZ82ISRBu2CN6O0nOWAdYM0HgPfvmOPRgrPMgEnkS
-        i33zMMVI+z68oxaSxeBVPwBnAttmJWEqRA84L9K69iYRnCxJ7qxjTHA6kglFLUFZQXFLN+
-        br28fjRfXfpz1pqpqdWga6Dr8EIGL70=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-587-z31mCJ7UMx6ATTsnmTII0g-1; Fri, 17 Feb 2023 14:36:44 -0500
-X-MC-Unique: z31mCJ7UMx6ATTsnmTII0g-1
-Received: by mail-wm1-f72.google.com with SMTP id y11-20020a1c4b0b000000b003dc5341afbaso1129229wma.7
-        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 11:36:44 -0800 (PST)
+        with ESMTP id S229823AbjBQUdO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Feb 2023 15:33:14 -0500
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43AA71F924
+        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 12:33:06 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id q70-20020a17090a1b4c00b0022936a63a22so1172768pjq.8
+        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 12:33:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3cWU4YaTlf2UhXKjrN1L30IZIkoSCB1BD9HAZEO2O34=;
+        b=VcXUa7EhmYLBs+ePYWZMQV8OZnL82Z8DyQSl1EWdMegEl00omMjSrq3F3DMgREAO59
+         L/TwjBy0nLdJOS+9odlymeLdBRPVTfbGN81vaPsaec9pcZ4Mkc7mccaYquBfebY944fx
+         fBL2+s7yBre/tS0+9j7Q57aSC8jsf5LCh6lYvyQi/pgUE79gvMQzMRkQPLM5riLYHHVz
+         O+zzo1oeaV5JJ6qVsChJtCoG3HuHScxCauqSUL0njHozd0Q3Pj5RM7X5QYNr+gl3mswh
+         VCiOtQMVtDmKUQ4c7wPtOiAabIyIBNQplPYJdYkLEyFVRJ1F/mCJHhaoybW/lhvyeZWb
+         jjtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GYExQvIsCt0o1ZEFa6ZanJqmfuLccRgbfCWm1JARXDs=;
-        b=zloYynA+awdGd4ti/u1Lii2TGpPjGRv16B9gcA0C1e96/PHN6VgqTW6yh8rchmC0fv
-         wm9USi2e3W5sHwbpXpOsYYcennmtLO6guQ8orPUeJZd+mdxR9qHT3XGau74sbiY5C6XI
-         8psuo0JQNbaZjB0rTBJu7x3/NI4yE6kYbNCtJZmgYx94UXwhISfs+gvD4o43V4TSxpwT
-         Zx0qwkiRHMI3sQmC5jWsIWYW67aHfLM4wlTnwVxUEDvZfjZwDdjSXhz2fgd2OQUOoJgP
-         8/c5nXfHyutqKQAkaWWcywYP2ZWm796W8uLhAIXwBSNsszEZFs1+N9PJ+li9qXQ761xS
-         +gnw==
-X-Gm-Message-State: AO0yUKVpfFVH8g434bUUsb5xqobrOj8EC6Dmatf8vatHX2QYErItWYFC
-        0wVfyGF/kX7zzt/CXOtdW6FfaIK/KKkaRlsZpaCoH8Gny74g2HghBFVjAMvswrLiufv/O3xUgHF
-        D/j1T1af4+RyKgD+HaUGX
-X-Received: by 2002:a05:600c:3481:b0:3df:eda1:439c with SMTP id a1-20020a05600c348100b003dfeda1439cmr6053875wmq.11.1676662603429;
-        Fri, 17 Feb 2023 11:36:43 -0800 (PST)
-X-Google-Smtp-Source: AK7set/V4gZYOcfO6sSKYUl4AVbZ5LonUXino43CN37EpI7D/k8Yl39Woa9L0raq23pt4GsJlNtF0g==
-X-Received: by 2002:a05:600c:3481:b0:3df:eda1:439c with SMTP id a1-20020a05600c348100b003dfeda1439cmr6053861wmq.11.1676662603164;
-        Fri, 17 Feb 2023 11:36:43 -0800 (PST)
-Received: from [192.168.8.104] (tmo-110-21.customers.d1-online.com. [80.187.110.21])
-        by smtp.gmail.com with ESMTPSA id az17-20020a05600c601100b003dd1bd0b915sm2825694wmb.22.2023.02.17.11.36.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Feb 2023 11:36:42 -0800 (PST)
-Message-ID: <06d04f32-8403-4d7f-76a1-11a7fac3078e@redhat.com>
-Date:   Fri, 17 Feb 2023 20:36:41 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Content-Language: en-US
-To:     Maxim Levitsky <mlevitsk@redhat.com>,
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=3cWU4YaTlf2UhXKjrN1L30IZIkoSCB1BD9HAZEO2O34=;
+        b=1f+tCHOURMMEXfMcJ/jYl9T2Yo97QAB+KmrAnriL1tEN2MjJjcChT1BuIiQpbN/HFS
+         6pvgCRH+ZC1c5oHO3OzErbUcvzfDUTqUolwzwiXjyBm3I87HBn48X739CjLMaSvkXaUZ
+         EDP5uvBcwU2MP30vjtzGtcYTlHzuVDDvZRuLK0690mM9nd8D2DHeRj33zIe0vNR+/r1V
+         gNtLxPKBqKeBGk6zx8yLCVK+7vqp+1FVpebBC8EB8yB5BukMQOt8oHjyV4uGkF1fkM1/
+         SGYdHttaTzCJZ2UMVX1hmUyzUcEKYC09JQu7UYlcd1JsB2QtDAQ8N69GC/Lpnjk6gLro
+         +Xzg==
+X-Gm-Message-State: AO0yUKXzcGPzLb89AhM+66VJKb0aAYykl/9TmB4UjEoM4iIGLevT4roy
+        8eGNZrC6+CcyFlD8ULV8UVFdyLuM54k=
+X-Google-Smtp-Source: AK7set+B4C+zq8huZ3NcArYooa+U3Mp9foscElC4vL4yxwAcZdjr86jqIYUaycd8VpRKPDtnwMJC0jD/5hg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a62:878e:0:b0:596:78f:1532 with SMTP id
+ i136-20020a62878e000000b00596078f1532mr352202pfe.2.1676665985704; Fri, 17 Feb
+ 2023 12:33:05 -0800 (PST)
+Date:   Fri, 17 Feb 2023 12:33:04 -0800
+In-Reply-To: <CAF7b7mqeXcHdFHewX3enn-vxf6y7CUWjXjB3TXithZ_PnzVLQQ@mail.gmail.com>
+Mime-Version: 1.0
+References: <20230215011614.725983-1-amoorthy@google.com> <20230215011614.725983-6-amoorthy@google.com>
+ <87mt5fz5g6.wl-maz@kernel.org> <CAF7b7mr3iDBYWvX+ZPA1JeZgezX-BDo8VArwnjuzHUeWJmO32Q@mail.gmail.com>
+ <Y+6iX6a22+GEuH1b@google.com> <CAF7b7mqeXcHdFHewX3enn-vxf6y7CUWjXjB3TXithZ_PnzVLQQ@mail.gmail.com>
+Message-ID: <Y+/kgMxQPOswAz/2@google.com>
+Subject: Re: [PATCH 5/8] kvm: Add cap/kvm_run field for memory fault exits
+From:   Sean Christopherson <seanjc@google.com>
+To:     Anish Moorthy <amoorthy@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        Marc Zyngier <maz@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        "Daniel P. Berrange" <berrange@redhat.com>
-References: <20220926165112.603078-1-pbonzini@redhat.com>
- <YzMt24/14n1BVdnI@google.com>
- <ed74c9a9d6a0d2fd2ad8bd98214ad36e97c243a0.camel@redhat.com>
- <15291c3f-d55c-a206-9261-253a1a33dce1@redhat.com>
- <YzRycXDnWgMDgbD7@google.com>
- <ad97d0671774a873175c71c6435763a33569f669.camel@redhat.com>
- <YzSKhUEg3L1eMKOR@google.com>
- <08dab49f-9ca4-4978-4482-1815cf168e74@redhat.com>
- <b8fa9561295bb6af2b7fcaa8125c6a3b89b305c7.camel@redhat.com>
-From:   Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH] KVM: x86: disable on 32-bit unless CONFIG_BROKEN
-In-Reply-To: <b8fa9561295bb6af2b7fcaa8125c6a3b89b305c7.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        James Houghton <jthoughton@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Axel Rasmussen <axelrasmussen@google.com>, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, peterx@redhat.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29/09/2022 15.52, Maxim Levitsky wrote:
-> On Thu, 2022-09-29 at 15:26 +0200, Paolo Bonzini wrote:
->> On 9/28/22 19:55, Sean Christopherson wrote:
->>>> As far as my opinion goes I do volunteer to test this code more often,
->>>> and I do not want to see the 32 bit KVM support be removed*yet*.
->>>
->>> Yeah, I 100% agree that it shouldn't be removed until we have equivalent test
->>> coverage.  But I do think it should an "off-by-default" sort of thing.  Maybe
->>> BROKEN is the wrong dependency though?  E.g. would EXPERT be a better option?
->>
->> Yeah, maybe EXPERT is better but I'm not sure of the equivalent test
->> coverage.  32-bit VMX/SVM kvm-unit-tests are surely a good idea, but
->> what's wrong with booting an older guest?
-> 
->>From my point of view, using the same kernel source for host and the guest
-> is easier because you know that both kernels behave the same.
-> 
-> About EXPERT, IMHO these days most distros already dropped 32 bit suport thus anyway
-> one needs to compile a recent 32 bit kernel manually - thus IMHO whoever
-> these days compiles a 32 bit kernel, knows what they are doing.
-> 
-> I personally would wait few more releases when there is a pressing reason to remove
-> this support.
+On Fri, Feb 17, 2023, Anish Moorthy wrote:
+> On Thu, Feb 16, 2023 at 10:53=E2=80=AFAM Anish Moorthy <amoorthy@google.c=
+om> wrote:
+> >
+> > On Wed, Feb 15, 2023 at 12:59 AM Oliver Upton <oliver.upton@linux.dev> =
+wrote:
+> > >
+> > > How is userspace expected to differentiate the gup_fast() failed exit
+> > > from the guest-private memory exit?
 
-FWIW, from the QEMU perspective, it would be very helpful to remove 32-bit 
-KVM support from the kernel. The QEMU project currently struggles badly with 
-keeping everything tested in the CI in a reasonable amount of time. The 
-32-bit KVM kernel support is the only reason to keep the qemu-system-i386 
-binary around - everything else can be covered with the qemu-system-x86_64 
-binary that is a superset of the -i386 variant (except for the KVM part as 
-far as I know).
-Sure, we could also drop qemu-system-i386 from the CI without dropping the 
-32-bit KVM code in the kernel, but I guess things will rather bitrot there 
-even faster in that case, so I'd appreciate if the kernel could drop the 
-32-bit in the near future, too.
+Sorry, missed this comment first time around.  I don't see any reason why u=
+serspace
+needs to uniquely identify the gup_fast() case.  Similar to page faults fro=
+m
+hardware, KVM should describe the access in sufficient detail so that users=
+pace
+can resolve the issue, whatever that may be, but KVM should make any assump=
+tions
+about _why_ the failure occurred. =20
 
-  Thomas
+gup_fast() failing in itself isn't interesting.  The _intended_ behavior is=
+ that
+KVM will exit if and only if the guest accesses a valid page that hasn't ye=
+t been
+transfered from the source, but the _actual_ behavior is that KVM will exit=
+ if
+the page isn't faulted in for _any_ reason.  Even tagging the access NOWAIT=
+ is
+speculative to some degree, as that suggests the access may have succeeded =
+if
+KVM "waited", which may or may not be true.
 
+E.g. see the virtiofs trunctionation use case that planted the original see=
+d for
+this approach: https://lore.kernel.org/kvm/20201005161620.GC11938@linux.int=
+el.com.
+
+> > > I don't think flags are a good idea for this, as it comes with the
+> > > illusion that both events can happen on a single exit. In reality, th=
+ese
+> > > are mutually exclusive.
+
+They aren't mutually exclusive.  Obviously KVM will only detect one other t=
+he
+other, but it's entirely possible that a guest could be accessing the "wron=
+g"
+flavor of a page _and_ for that flavor to not be faulted in.  A smart users=
+pace
+should see that (a) it needs to change the memory attributes and (b) that i=
+t
+needs to demand the to-be-installed page from the source.
+
+> > > A fault type/code would be better here, with the option to add flags =
+at
+> > > a later date that could be used to further describe the exit (if
+> > > needed).
+> >
+> > Agreed.
+
+Not agreed :-)
+
+> > +    struct {
+> > +        __u32 fault_code;
+> > +        __u64 reserved;
+> > +        __u64 gpa;
+> > +        __u64 size;
+> > +    } memory_fault;
+> >
+> > The "reserved" field is meant to be the placeholder for a future "flags=
+" field.
+> > Let me know if there's a better/more conventional way to achieve this.
+>=20
+> On Thu, Feb 16, 2023 at 10:53=E2=80=AFAM Anish Moorthy <amoorthy@google.c=
+om> wrote:
+> >
+> > 1. As Oliver touches on earlier, we'll probably want to use this same f=
+ield for
+> >    different classes of memory fault in the future (such as the ones wh=
+ich Chao
+> >    is introducing in [1]): so it does make sense to add "code" and "fla=
+gs"
+> >    fields which can be used to communicate more information to the user=
+ (and
+> >    which can just be set to MEM_FAULT_NOWAIT/0 in this series).
+>=20
+> Let me walk back my responses here: I took a closer look at Chao's series=
+, and
+> it doesn't seem that I should be trying to share KVM_EXIT_MEMORY_FAULT wi=
+th it
+> in the first place. As far as I can understand (not that much, to be clea=
+r :)
+> we're signaling unrelated things, so it makes more sense to use different=
+ exits
+> (ie, rename mine to KVM_EXIT_MEMORY_FAULT_NOWAIT). That would prevent any
+> potential confusion about mutual exclusivity.
+
+Hard "no" on a separate exit reason unless someone comes up with a very com=
+pelling
+argument.
+
+Chao's UPM series is not yet merged, i.e. is not set in stone.  If the prop=
+osed
+functionality in Chao's series is lacking and/or will conflict with this UF=
+FD,
+then we can and should address those issues _before_ it gets merged.
