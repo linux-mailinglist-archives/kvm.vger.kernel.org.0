@@ -2,153 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B8D669B00A
-	for <lists+kvm@lfdr.de>; Fri, 17 Feb 2023 16:59:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5FAF069B00C
+	for <lists+kvm@lfdr.de>; Fri, 17 Feb 2023 17:00:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229488AbjBQP7g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Feb 2023 10:59:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56766 "EHLO
+        id S230018AbjBQQAQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Feb 2023 11:00:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229595AbjBQP7e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Feb 2023 10:59:34 -0500
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16C823B85A;
-        Fri, 17 Feb 2023 07:59:20 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MVotyfSIdQ60TiFXev0lk4+WevmvD/UYYFthtUFb/UHMszItg5hmiJSUruQ9FC3vTZWe2YXqqBYNRY5z5vpUrykFFtjNjeqzF4otLGmp1JD34EIWROdFadV0DXyIfTfRI0HmpEXKWbM4ZfwKyTPVQW+1mTZx8C6jmNk0s2oSNKXB5cCZqju1objnL+JfN5yZUjUmdYQ0otzukrbMLhInbIz9Gxyvdky6x849fwou+rXB7ZivgyWT2ww4zpFhgaBen7tz0uXTHxM+hLrUx9A9JiiRZT2dRiltCNVPmxwh6UAUqZwY2tjX4Ea6iO7cYCCUSpEmJYd1qp7tMYJqwiuQYA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Wm40sVRxgeAxtQkYolrQ9vXt0qcpEmLh5p2KbTEghSQ=;
- b=FXrmVWkJWbUlY86U/MTNKMuNbZpfaDBBOPJLJHLQZIHmxzgCnXXF1MAcao9e+ZHskssknQHLuZxV6fApN4wlKdArZoNw8eJI1ZTQcMILtlitliD34jmxwMr6xc6xHXich6jKKER0wswpYvsc4VAdqWSZ59Usqv43WteKTR7iJvrfeQdC7QdJWMuBe/RdfSOSExfxwrNoxOl2Yi6IDLJxoEsoNKuIMxVWGO/Hp5wZmOewFSBVedFHrgVYfljfO9AHxuXCiTO/eDuBxNMxuWTx7e1rptgCIO2UrdyMZkthn+CM7CHb1CMP7ONTEefLOzhIOshqs5m9gnwZJe8ufDgKHQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Wm40sVRxgeAxtQkYolrQ9vXt0qcpEmLh5p2KbTEghSQ=;
- b=CPBkBqXzvzalFN3sGdycbculBtc9sELINX+3tQXRMAIJjQKDRvWY0AzyIEneMQ+7kchSfcb/QFoswpmieJV3i0gJ44CxAcUlfqV2mq9UyqBFxp606DQAaTcl+kEcZd6woXsvdM6G6Du1fKRDQavZWT6AbNmgYgOy/1dVmrCEr4Qxp26mmGQplyV/csVkSaCC6aXvp7lWjlN2YnPD7tChLvZNYL6EYra26dXidjcJoQCdJyqW9J1Hj7Z7XPzClytJ+XTshmPUxHu84dwvjL/hw12gNO1tBtBUWD/ldDH1QbMchNfhKuSoAx1L7huu31IgKqOpH5+lWTyE+NREyug/FA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by PH8PR12MB6914.namprd12.prod.outlook.com (2603:10b6:510:1cb::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.15; Fri, 17 Feb
- 2023 15:59:17 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3cb3:2fce:5c8f:82ee]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3cb3:2fce:5c8f:82ee%4]) with mapi id 15.20.6111.013; Fri, 17 Feb 2023
- 15:59:17 +0000
-Date:   Fri, 17 Feb 2023 11:59:16 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>
-Subject: Re: [PATCH v3 03/15] vfio: Accept vfio device file in the driver
- facing kAPI
-Message-ID: <Y++kVGvMDfOrNf5b@nvidia.com>
-References: <20230213151348.56451-1-yi.l.liu@intel.com>
- <20230213151348.56451-4-yi.l.liu@intel.com>
- <Y+rLKvCMivND0izd@nvidia.com>
- <DS0PR11MB7529B43C7D357D8A0C2438C7C3A29@DS0PR11MB7529.namprd11.prod.outlook.com>
- <DS0PR11MB7529028251B2DFF28A3CCD00C3A29@DS0PR11MB7529.namprd11.prod.outlook.com>
- <DS0PR11MB75293D6F394CA6F255D05159C3A19@DS0PR11MB7529.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DS0PR11MB75293D6F394CA6F255D05159C3A19@DS0PR11MB7529.namprd11.prod.outlook.com>
-X-ClientProxiedBy: MN2PR19CA0064.namprd19.prod.outlook.com
- (2603:10b6:208:19b::41) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH8PR12MB6914:EE_
-X-MS-Office365-Filtering-Correlation-Id: fa2ca6d0-afa2-4d07-ad9c-08db10ffec86
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ttS4IF/kjC1A34Mp0GgtXziGeEGfzf8MWXdQDfkzh6lbdzWttJK8uUFKaVDVK8mdHkdjLetk8oy3PIySOgHGkpXs8aNIeoAW1B8FF1lSgGE/P/6CY/uNCuftBT1UOojjzbTzCQfNEhRWZbuSsqUHpbASMxX8gZZFJWgvpb9EJn8NORRDBgGWRwIK0s6L9xshdMPOOeH1Rtjvx5lGi8Kdrqc62dTe9x3PJUyg/9jvKPCZDwgT8TKtmjvjOzNbsqxjJiyJOGTkcjWSDb+DTRuZ+xLwwBOdIplnBDWeIz5jliaFJLGjMX/0Me0QASSJZJNF5wWcWy0/zr+06wno8jb0hqQ/dQ8rhMkWKaBrP8MFUo1eDGuzIyqp8s0OUZUQsFuM1CgxolAnrBwYdW2ob0bGQHS+3pGBpeyUBHWKMYqgl0AfgOdvymPzG63OWnYLuuvVgNzkWy9HYrzVB1Ek2kT0XPrs7ou7nhXxUdZzvHJGGurwaI64x0WY68RRDlyPNERcl/iyWqYKQjIeg+K97qFosiS7ZXbflRubyaM5q+MiBNBClORMPAtYFlWott7mZPFfXLsjPu3RkQKbNVawxw3pTcab4O20Lpt+jN17YFI0zG+W+tbSQbqdE8nOmcDewN6bOgSpaeoPGu6hezedOxtoSQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(396003)(39860400002)(366004)(376002)(136003)(346002)(451199018)(38100700002)(36756003)(4744005)(7416002)(5660300002)(66946007)(6916009)(8676002)(2906002)(66556008)(66476007)(8936002)(4326008)(2616005)(186003)(26005)(6512007)(83380400001)(316002)(54906003)(6506007)(6486002)(478600001)(86362001)(41300700001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?qsTVf6+nYRGf0hzx7VI2E8C+ZUElYIf5JmIVhGPJ1c/mLgNJLMCkejmFdEOm?=
- =?us-ascii?Q?qF6W655qaq+U3aHk3pvY0iOH2nUaqP3cK3FiyyirOfvGOsvS55zUD7GUbq5/?=
- =?us-ascii?Q?tjqeNmAk0Qjuuz3g6IvninoH2Y695GNW454SjxXE0jlHpbddVlvpxFnQuoaJ?=
- =?us-ascii?Q?SMnvS2Xdpp9P6enkUmyG+IWl5VSAlT9dIYbEX78fYHo7EThN852iTIhGuwCC?=
- =?us-ascii?Q?4jU0PkjVNfbvgfRrmWTdYVviOyltVrE+DETi4D2wwIwckDIj8iwIKepJxYz+?=
- =?us-ascii?Q?bMqCFupfbFgHZz7N888fyMvha8WvpdVxIErAG2EEAwvkLAOXxg9NCA/258E3?=
- =?us-ascii?Q?hlF0ZYxQtstLknOdXEwAS+Dac/+AtxKlRdwmPn4TdBcOLa2x5/UGuoII7CYy?=
- =?us-ascii?Q?ydc0KZkPuXfuglL3SmGN5ULhNn+TSC6cgrWvOP5m6RaAnz+E1LIK7ZVgJisU?=
- =?us-ascii?Q?kEND32HNm9Z9oqNwAhuYb/eadk+O/bx++vS35AFYdAqAnEkbU1X9jvbDOU1o?=
- =?us-ascii?Q?J42zYjvnkodPMQEos7AVLHO0l5Sf3Rsku22kBJiOTNccJz07dFyGGcLYyBL5?=
- =?us-ascii?Q?20SDyN5Y2AQuzZy40hdxF0/yy/dyOkRWGgl7plBY7l9qb/gar3t9p4+CMfk4?=
- =?us-ascii?Q?FuvlokEG52qN5+MYaxYPsirKbRlHVGIyrvagvYairh/8nDyqpFdwP9fb6YFp?=
- =?us-ascii?Q?6c3kwXk/UME9XDwLY8nS7ToviiR/GZ6HQk/0mO811estQlaGen02p7zTWORk?=
- =?us-ascii?Q?Di+v725yMUukkMpdltUaFVAkTgmPPU0cMut8B/zT12j7rGnbQkXh5vO1iTic?=
- =?us-ascii?Q?nvPl10lubch+BmuniImUyDOSEGwiENrClFCEEWEFu2RSZVtGAWwlcQvK87W5?=
- =?us-ascii?Q?YLPHln8XY6Uzlq+5PPw6v2LJNCXJrRTD+ILf1RH5KGAgz8nH4fpItpkjcRUj?=
- =?us-ascii?Q?ucCeTnwV0LmyLgv24mgyPNS75QXCFP1wJM8xi+BJ6EUxEWNbSZ42ETLkao+r?=
- =?us-ascii?Q?mqGEWHsdu5DotAQkZBooM/5/jCg137kQTiePgLTymiMMPqtmAbFfQjZWqFT8?=
- =?us-ascii?Q?p3rEAEuZ07OCL6WptGHcqkMiPATl8NfHOHZWmBEk4Oh2HfGV9z36z6dksXUt?=
- =?us-ascii?Q?uvEa+1Tn6p7yrOBouO1jBqGfB4lvJACpA74vrAqFrfD2XtiLivip/2aOcsQG?=
- =?us-ascii?Q?C4tLhqMCBBL8JAy5PrRPXFA3wpJVageR9L6cjEMqBe4yXN5EucPSIl8pBivQ?=
- =?us-ascii?Q?aL/ingezSBl/e7UISm6QJU3pe9Nq3macyMmyJDHlaG26S0+tTIxqmf+0TMLt?=
- =?us-ascii?Q?gyJFUIBWIGC4B7FZOS7QlVt0gmY8fbN2T8bw7bKoIHGbK6r2Gx2gvcdgodWf?=
- =?us-ascii?Q?4bSG1ZhlxKGeYJjzV70O3h7jxaXwjMRYpZXZTJaw6fULJQTEXStPEDabVDFJ?=
- =?us-ascii?Q?3yhAoKbWEydqCGZyHAXNgEcBISQJ3DAmCY9uggBoECAT7yvhCh9p693bYDfY?=
- =?us-ascii?Q?TH5OpfxnApYVYWNlSNXRzzACeqzJnpymugD4J8V2jbwHc5yRQxRDqJFikBUW?=
- =?us-ascii?Q?cNPxtra3A/+6r38PTjQQFtXGlN4WGQ8fLQ2OlUXA?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fa2ca6d0-afa2-4d07-ad9c-08db10ffec86
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Feb 2023 15:59:17.5573
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dqrMb5ef8A+r/dljKzOoN3+K4yz0vITjdOPc9Z0mDEETpkep4yZT08jkQoQFRcd6
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6914
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+        with ESMTP id S229684AbjBQQAN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Feb 2023 11:00:13 -0500
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA5ED68AEC
+        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 08:00:10 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id cl6-20020a056a0032c600b0058d9b9fecb6so654539pfb.1
+        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 08:00:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+ASrBAOfhB8V2b1UWnVkBSljvQtym3PPwSnuFL8RngU=;
+        b=sUkblHuJ9dulsxh4CZcm+FIp/qRpAAcmRtfvp6ULnSXppIvCitchjm1OUit+QXJRWj
+         fwJ7Xd7LeD3Frj7FzM+U/mMAyXTZ8R5RK0CcMGNMR8PLROcI0/4xgADL5vqH5U+/VYgG
+         dkLQqFX5fKeKJhpV5Gz8z+39KNbu/jjFTFfYD8mmFsM5kC/nK+Gp9BDhC26xn+icV0pC
+         bHQSk7Mqvc6fB6p4dz8MrdQupt1NEggpWvfcZBir6hbXow/Kay6VqXDNaQVda+8NmyZ/
+         DJpPCojT4dj2fTwoDxf+msJ00C5RYvwVAx1bbgonDLlmp6LfYVABRQ30VMxJGXDgaHEA
+         nfVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+ASrBAOfhB8V2b1UWnVkBSljvQtym3PPwSnuFL8RngU=;
+        b=mRaOekJLWcdyBG440QVWmdBOV8LuU9sGwLRsMcV+jTrSNzWJRMc0dzQjXBRgF2PYdm
+         6LrumJX9XNoGRDxdE6HAZq8NnCQyPUEX5fafXn6N/9zFbV/DQ5t/gegcQ0K9nQZJEwtj
+         3MLNhbYL/X++Q6UBDrtiKpep5ODRdbVS4AwGS8KrxrBE2m27zfb2pNx9ygNN7HW3EYHA
+         VR5LBdNfTgwHq7apX6xZyRuBgZfQrNZki8O7Izwiqngg+AhOw0m5cXzFPLwJGemAOfgG
+         3oW6kGabFaUSJIjQfuCFyw9Kpie7/HBmL4eN4QDT01bV8N+oinEnEwx2P1+958/LLNq/
+         7CLg==
+X-Gm-Message-State: AO0yUKWCJpuXrZz8IrZYAdTV80ah2Ch92xe5ALL277QMoDa2XKPeKfDv
+        5Pi4IHIYTTXY4swcLjWlGyRjnop2KrY=
+X-Google-Smtp-Source: AK7set/TQ5moWaaNQcL8V8kGjN9B7zl+2zJIJ8kumCX3x4I/RGgInnGSIHRIAYNv9fJ3WTWtfSDyzLo0yfI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a02:43:b0:4fd:72f3:5859 with SMTP id
+ az3-20020a056a02004300b004fd72f35859mr296462pgb.2.1676649609963; Fri, 17 Feb
+ 2023 08:00:09 -0800 (PST)
+Date:   Fri, 17 Feb 2023 08:00:08 -0800
+In-Reply-To: <Y+9EUeUIS/ZUe2vw@linux.dev>
+Mime-Version: 1.0
+References: <20230217041230.2417228-1-yuzhao@google.com> <20230217041230.2417228-4-yuzhao@google.com>
+ <Y+9EUeUIS/ZUe2vw@linux.dev>
+Message-ID: <Y++kiJwUIh55jkvl@google.com>
+Subject: Re: [PATCH mm-unstable v1 3/5] kvm/arm64: add kvm_arch_test_clear_young()
+From:   Sean Christopherson <seanjc@google.com>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Yu Zhao <yuzhao@google.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Michael Larabel <michael@michaellarabel.com>,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, x86@kernel.org,
+        linux-mm@google.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 17, 2023 at 10:55:08AM +0000, Liu, Yi L wrote:
+On Fri, Feb 17, 2023, Oliver Upton wrote:
+> Hi Yu,
+> 
+> scripts/get_maintainers.pl is your friend for getting the right set of
+> emails for a series :) Don't know about others, but generally I would
+> prefer to be Cc'ed on an entire series (to gather context) than just an
+> individual patch.
 
-> One more thinking on this. For a single device, my above reply is true.
-> The device should have been fully-opened when its GET_PCI_HOT_RESET_INFO
-> and HOT_RESET path have been unblocked. However, when there are
-> multiple devices that have been affected by the hotreset. User may only
-> have one device that is fully opened while others are not yet. In such case,
-> existing vfio_file_is_valid() is not enough. Shall we have another API for
-> this purpose? E.g. if it's cdev fd, then the new API return true only when
-> the device is fully opened. Any suggestion here?
++1
 
-I think what I heard is you need two APIs, one for pci and one for KVM
-and the PCI one requires binding to succeed.
+> 
+> On Thu, Feb 16, 2023 at 09:12:28PM -0700, Yu Zhao wrote:
+> > This patch adds kvm_arch_test_clear_young() for the vast majority of
+> > VMs that are not pKVM and run on hardware that sets the accessed bit
+> > in KVM page tables.
 
-Jason
+At least for the x86 changes, please read Documentation/process/maintainer-tip.rst
+and rewrite the changelogs.
+
+> > It relies on two techniques, RCU and cmpxchg, to safely test and clear
+> > the accessed bit without taking the MMU lock. The former protects KVM
+> > page tables from being freed while the latter clears the accessed bit
+> > atomically against both the hardware and other software page table
+> > walkers.
+> > 
+> > Signed-off-by: Yu Zhao <yuzhao@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h       |  7 +++
+> >  arch/arm64/include/asm/kvm_pgtable.h    |  8 +++
+> >  arch/arm64/include/asm/stage2_pgtable.h | 43 ++++++++++++++
+> >  arch/arm64/kvm/arm.c                    |  1 +
+> >  arch/arm64/kvm/hyp/pgtable.c            | 51 ++--------------
+> >  arch/arm64/kvm/mmu.c                    | 77 ++++++++++++++++++++++++-
+> >  6 files changed, 141 insertions(+), 46 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 35a159d131b5..572bcd321586 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -1031,4 +1031,11 @@ static inline void kvm_hyp_reserve(void) { }
+> >  void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
+> >  bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu);
+> >  
+> > +/* see the comments on the generic kvm_arch_has_test_clear_young() */
+
+Please eliminate all of these "see the comments on blah", in every case they do
+nothing more than redirect the reader to something they're likely already aware of.
+
+> > +#define kvm_arch_has_test_clear_young kvm_arch_has_test_clear_young
+> > +static inline bool kvm_arch_has_test_clear_young(void)
+> > +{
+> > +	return IS_ENABLED(CONFIG_KVM) && cpu_has_hw_af() && !is_protected_kvm_enabled();
+> > +}
+
+...
+
+> Also, I'm at a loss for why we'd need to test if CONFIG_KVM is enabled.
+> My expectation is that we should provide an implementation that returns
+> false if !CONFIG_KVM, avoiding the need to repeat that bit in every
+> single implementation of the function.
+
+mm/vmscan.c uses kvm_arch_has_test_clear_young().  I have opinions on that, but
+I'll hold off on expressing them until there's actual justification presented
+somewhere.
+
+Yu, this series and each patch needs a big pile of "why".  I get that the goal
+is to optimize memory oversubscribe, but there needs to be justification for
+why this is KVM only, why nested VMs and !A/D hardware are out of scope, why yet
+another mmu_notifier hook is being added, etc.
