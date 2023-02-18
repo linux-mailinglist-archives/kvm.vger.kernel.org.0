@@ -2,519 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E2FE69B797
-	for <lists+kvm@lfdr.de>; Sat, 18 Feb 2023 02:52:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 04BBA69B7D1
+	for <lists+kvm@lfdr.de>; Sat, 18 Feb 2023 03:55:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229703AbjBRBwU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Feb 2023 20:52:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49992 "EHLO
+        id S229706AbjBRCz2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Feb 2023 21:55:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229622AbjBRBwS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Feb 2023 20:52:18 -0500
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D384F6B32B
-        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 17:52:15 -0800 (PST)
-Received: by mail-pl1-x632.google.com with SMTP id f4so3396228plg.12
-        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 17:52:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=UBEVWw3WXBvHOFF4d4tbMsnCzo67ikzGKOhyeJOY0vw=;
-        b=AGYMDXki50BnYdxWFJqUj8aFwKzW3tt8O53BGm7aJjyqvKpeexlakluHu8a9roTkD+
-         z3tg2uLw4wHgHWH4yDT1zyrEfep5Sbyh7nExU3tz/WFuN7cOi0PRUIHcSj6eZkaMyzbk
-         XaldLxzqF11qJIKHMJXo3h/BtrLshcz0NxecwbVJtqbYGag7KgPQ3M3gv80llDwCA8ex
-         h6al/THttcrlCtwLGUevnLXZ4ReEfJnJ6x8k2rmckHj1/Fh7n2Ze2GK7z0v36r3h1w7p
-         M+fQLvbY5wrnnMuBPqcN6AHJaGMBz05dFpw1p7qbhbpIhaT1ByXgDpwohe8ZVd/Sik+F
-         23sA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UBEVWw3WXBvHOFF4d4tbMsnCzo67ikzGKOhyeJOY0vw=;
-        b=O4vcfylR7p9/doLaYm+LnF2m0oAERCo2ahs6vpv960i/KOTCRUkkaHp8oP2j4/5Y9v
-         VzeONbjxlhnwpVXD/C+w/3MM54W2mET3l7tdK2SEu+5jIe65Jq6629UaG5bpFsI1//Th
-         BJNk3XQb0pHDZKbGCmfkLG/GYFaDDH7rTKw3fP4bjPk/zJP+lrzyJ+b+EWOqanAEmSiS
-         ZvYAofex/STKlbV0oVxB29AHDgf6p5stl7efCTmZmB7PEg//yZwjTr0/WP8YpSXSTUr/
-         etZQRiCAy20bvGsCqcKvaefKPfrfUXR4vU4ZZzxkBs3TyyHSUJSqYGnc2BcnDhOGJFN4
-         GkVg==
-X-Gm-Message-State: AO0yUKXdp48qdBGY8EaS4Zx31FpxG9a9elXw7/o4ZmGWDh6aX/SrA/Vx
-        qLbW9ezAEPEevvl9JWM9GurJFQ==
-X-Google-Smtp-Source: AK7set/lFrYVXfNN6eT036RKZP2IsxmZqCoh9IL8ovtthwdJR03sFFmG2iO/IDkBuATLpaKCqq3xIA==
-X-Received: by 2002:a17:902:d489:b0:196:40b1:3319 with SMTP id c9-20020a170902d48900b0019640b13319mr2237677plg.5.1676685134885;
-        Fri, 17 Feb 2023 17:52:14 -0800 (PST)
-Received: from google.com (77.62.105.34.bc.googleusercontent.com. [34.105.62.77])
-        by smtp.gmail.com with ESMTPSA id jg3-20020a17090326c300b0019908d2c85dsm3722789plb.52.2023.02.17.17.52.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Feb 2023 17:52:14 -0800 (PST)
-Date:   Sat, 18 Feb 2023 01:52:10 +0000
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sagi Shahar <sagis@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Peter Shier <pshier@google.com>,
-        Anish Ghulati <aghulati@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        James Houghton <jthoughton@google.com>,
-        Anish Moorthy <amoorthy@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Axel Rasmussen <axelrasmussen@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Ashish Kalra <ashish.kalra@amd.com>,
-        Babu Moger <babu.moger@amd.com>, Chao Gao <chao.gao@intel.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Chenyi Qiang <chenyi.qiang@intel.com>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Guang Zeng <guang.zeng@intel.com>,
-        Hou Wenlong <houwenlong.hwl@antgroup.com>,
-        Jiaxi Chen <jiaxi.chen@linux.intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Jing Liu <jing2.liu@intel.com>,
-        Junaid Shahid <junaids@google.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Leonardo Bras <leobras@redhat.com>,
-        Like Xu <like.xu.linux@gmail.com>,
-        Li RongQing <lirongqing@baidu.com>,
-        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Michal Luczaj <mhal@rbox.co>,
-        Nikunj A Dadhania <nikunj@amd.com>,
-        Paul Durrant <pdurrant@amazon.com>,
-        Peng Hao <flyingpenghao@gmail.com>,
-        Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>,
-        Robert Hoo <robert.hu@linux.intel.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Wei Wang <wei.w.wang@intel.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Zhenzhong Duan <zhenzhong.duan@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] Documentation/process: Add a maintainer handbook for
- KVM x86
-Message-ID: <Y/AvSjsgLBWECLq2@google.com>
-References: <20230217225449.811957-1-seanjc@google.com>
- <20230217225449.811957-3-seanjc@google.com>
+        with ESMTP id S229510AbjBRCz0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Feb 2023 21:55:26 -0500
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30ABC6ABC6;
+        Fri, 17 Feb 2023 18:55:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1676688925; x=1708224925;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=KJFii5RIdiXuklZPei54cB/wcgtGBgIelPLVoC2CnwQ=;
+  b=aYd//tbw6wjZWsZ3u2WJqGGmSzvykqtGTxLj5Nc+SYXEwciYeK2O1mJt
+   Ws7RIWey2zD/awyt2JlvuMfueO56vs3RRPPvlpufZSoK10/2Gt0d9wHTa
+   Z+XuomlNRUmpnSGV9CpWf6P/ldIgm6JS82y/MOpjM/lKIPyU753Grmq5I
+   PQsUn7UBfB3r/T7pB9J70bB5GToir6Xzw3DJDil06Iyni47TOzBZr9XjR
+   GzeKbG1uW1Q5v7zEPnp3sJDG7iFqeIczNJp2YNdJSTKR4FjGjF1EI74NL
+   SMNc58ngFy1iRBQ12D3JObIAffe2KSoUu6jNv0oDZeRZ6nXw2iueb0rTf
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10624"; a="333496006"
+X-IronPort-AV: E=Sophos;i="5.97,306,1669104000"; 
+   d="scan'208";a="333496006"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2023 18:55:23 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10624"; a="672795322"
+X-IronPort-AV: E=Sophos;i="5.97,306,1669104000"; 
+   d="scan'208";a="672795322"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmsmga007.fm.intel.com with ESMTP; 17 Feb 2023 18:54:31 -0800
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Fri, 17 Feb 2023 18:54:31 -0800
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Fri, 17 Feb 2023 18:54:30 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16 via Frontend Transport; Fri, 17 Feb 2023 18:54:30 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.107)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.16; Fri, 17 Feb 2023 18:54:30 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=O+kxr2RGjk3fKVu9E/ChNCBNo31a4ix2gIE0IpWbnmQuTGXSd4gjnZRBGNdWVjQAXhtIgAFuZpfa53XhCa/texiyEKmXDVTdaskYtZshV+UwxS4wjFLD0+I5DVpnlBa0t8fGt4fYfCzIckIZ2hqZjAJbt6uZBqmhrLa0RT58Z41cxiDLqdz+eXVvkN3UNM2XWUmBz8uS6iEtKmWsrQRvE8knfL+ls/3/JGg4EZJgW7vUvO/M0LC4WSMjs9WJFk5XI+WHfUjtMolyVz4A7GCa0Gz+04EDG1IHu1+IrznebYFsdjb8MkGtoJL+SXb8KFzpAyW1IsxqXaCmIBLUUvlnIg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=KJFii5RIdiXuklZPei54cB/wcgtGBgIelPLVoC2CnwQ=;
+ b=OUgqwm60DKHe0EkCidP9nwP5jVdmk7cVLkRzLQW4DBYhDNcC3Nu8Chmdq/6OvT2EGc7G62i3/TGqTW1AnY7sJgfiIcFR1yy4ZvpdliUXI3ox23SL1+hyLc1RC+hXSaaYDj8sT6b6kklCCZrtKjGSqiaQvusIekhrhyCfIcBvkW637RNz+W+BEDRtLizMGBgTuGQZozjXSGt6WNqlTTIiM9owVQ22IRK8ZTgxGmBg4KLczdzCoS8dRrt5BZ55C8+9kHzPXlEG1lZY6OKpjN4LR+g39FWrufCWpHnSbKT8HVSOivyQnGoD77a7VlEEhO+6BUDawZoeFggFIkKF7p7QPw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by PH0PR11MB4840.namprd11.prod.outlook.com (2603:10b6:510:43::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.17; Sat, 18 Feb
+ 2023 02:54:29 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::e1fa:abbe:2009:b0a3]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::e1fa:abbe:2009:b0a3%4]) with mapi id 15.20.6111.013; Sat, 18 Feb 2023
+ 02:54:28 +0000
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>
+Subject: RE: [PATCH v3 03/15] vfio: Accept vfio device file in the driver
+ facing kAPI
+Thread-Topic: [PATCH v3 03/15] vfio: Accept vfio device file in the driver
+ facing kAPI
+Thread-Index: AQHZP73OQ1XOEaarRU+iobEkUB6WaK7NioEAgAAlR2CAAFaKgIAE9K9QgABXFQCAALaFcA==
+Date:   Sat, 18 Feb 2023 02:54:28 +0000
+Message-ID: <DS0PR11MB75299F7B2D34AD8A0633B54DC3A69@DS0PR11MB7529.namprd11.prod.outlook.com>
+References: <20230213151348.56451-1-yi.l.liu@intel.com>
+ <20230213151348.56451-4-yi.l.liu@intel.com> <Y+rLKvCMivND0izd@nvidia.com>
+ <DS0PR11MB7529B43C7D357D8A0C2438C7C3A29@DS0PR11MB7529.namprd11.prod.outlook.com>
+ <DS0PR11MB7529028251B2DFF28A3CCD00C3A29@DS0PR11MB7529.namprd11.prod.outlook.com>
+ <DS0PR11MB75293D6F394CA6F255D05159C3A19@DS0PR11MB7529.namprd11.prod.outlook.com>
+ <Y++kVGvMDfOrNf5b@nvidia.com>
+In-Reply-To: <Y++kVGvMDfOrNf5b@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS0PR11MB7529:EE_|PH0PR11MB4840:EE_
+x-ms-office365-filtering-correlation-id: a124ecbe-14a2-4661-7978-08db115b73ec
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: whpoh+IktRSN+WJx8HZNAygtLoUdGrnh0hhBm+JVRecHq7hA4w5cS+I+brYhCOwMof7jPbPf+/1gTQs3axXiIQFI7Uu9rCGEulEb3o2SfwanWRDclpiAx580a3IBNOI3cz7ubJprujhfnXZ3DvplDejec4Rmrd9a3Hmdx1e8OupTYSrn6GI0A6nk+NDDhwcYTFSQ1//p72lCMD+RA0j88TOZNWkF6pDMsdqEQ1CTRZbJr2eidsmNLkRKSnpgcUgKEbkrdZQsMmUO1KozBY9nKhB5irmiR95IIZgvPp7MbX7uBLxAZC+25I3cuI1ArsRMdcHlaMHAFiih7xVm8zL/mkyqabwrKvwRcjCE9/9VDvNSD3pRWP33AiEUqR3KCM7K0yoPnGfTueObvoGQm1eLKGBsiYNbU7z8qsBvZEjTY8tgHcSiDt2VcOVeyLBGaSmC8pLGgrxQcBNI1hBO3Ker7B4dcs59n+r7MFSkIfYK+ZOUua2iUeHRsTwIUpPCBZoD6bClwATSCdWraUCuZcqEzadx74AFCB7JpJ0FqmZpFgjCYFjo00GG9BjiNOgZxvPV0jY5NasSlf8zW/2XKzSVt7oBmrUDe9vAzeV2iIMEInDBGELODmC5QGGF/ZG6mvehs2Rig5Vgg2nQt+zKW+a2qXSbMFA+iJi+2LnIjEyksDCpa6sOT1/6jLz4yE2GUzFlQMeP/xJryBCpRT/Yniz2jg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(366004)(136003)(376002)(396003)(39860400002)(346002)(451199018)(9686003)(41300700001)(66446008)(64756008)(66556008)(8676002)(76116006)(316002)(66946007)(66476007)(4326008)(8936002)(5660300002)(7416002)(6916009)(83380400001)(52536014)(26005)(54906003)(478600001)(186003)(71200400001)(7696005)(4744005)(6506007)(33656002)(55016003)(38070700005)(82960400001)(86362001)(2906002)(122000001)(38100700002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?0BhPv+Kvme76aQ3kcw8+LKXZ7blqg4TZM9Q4nW1ogDMQv8Dititosa1mYB5E?=
+ =?us-ascii?Q?jT8RmieWgHC1mpjQfoYUmAN9tsdnt+47H3zY077vpoTdayQ5Q+BWvtZMwGqb?=
+ =?us-ascii?Q?/90n40GJH9zLh+u40TeblJpDA/vObojkR1HlZ5NjwRGpv3a6hfyBidaWDQgg?=
+ =?us-ascii?Q?iUEMKADpW23Vj+yWGrygC4+WoBdPsojKZhDXLUXnv9IXsD8vqjMH17vexT2B?=
+ =?us-ascii?Q?U+tCbLC48RLcICe7rOHNypCd5z06T3ipZaAGN8oFqwnWFH94oWp6iiGY67bl?=
+ =?us-ascii?Q?dyF0yRCWaxhvetZ4GDlt8Ro2EwHKQIyMbm9oH0JkwL+Sz7Yu3hBcCpI0bcNR?=
+ =?us-ascii?Q?/WIaG3msI4qwjS0v+fBdnH07tEwMYwvLya0dtTQWNrchrzJXBhDLZ0YhGl0J?=
+ =?us-ascii?Q?V2WhT+8+Jae3OAPF1dirrA7zpXO6efv/5ERb48Ty5RE141xMYpae7MfsiWN5?=
+ =?us-ascii?Q?H9DbiPHpcQrK/goCqUyTXUXDEjutFLG7QGWom2GnSsuwJG1c3iQZhW7T9w/e?=
+ =?us-ascii?Q?QZdmg9z4tKjgdFRsRw+JHAozazdvl4ZFfMPW1aqVYPlJN7iZHahIcS/HLF4B?=
+ =?us-ascii?Q?K4T4ZmTdR5ENSiiu99uCXa9pNiFZCfG7Sx8XL08zqiH5YQOCTH4OqzWsOeQA?=
+ =?us-ascii?Q?YQ3MX1WodEu68+NqsWAEeC/9JrxCFpMiKBZjJjXYBzj7QweoC7EhntFllT2P?=
+ =?us-ascii?Q?bC7xw+38Abpv9nF+3lz/obQfPlJO07tt2c2W7vKQ57d59++l/lYeoo6v5Wou?=
+ =?us-ascii?Q?6OwHePT2ACxAYGu5C7a0FjBJFt25NQ6RprS7ovIHMWnUk85OEpXdgOJB0uZP?=
+ =?us-ascii?Q?dbDJ79mLPa/nNzW+nDlJMTzjVruEV9aQS/8EtsEr2JJxMU6KX5kyVPNIXdfX?=
+ =?us-ascii?Q?lde8aunPzF61fe6YqKFSdVwXZG2wXzO4SNne+zWc0OCQdcUa23ohLTxjb1Cq?=
+ =?us-ascii?Q?psLi0WJc7cnFjRx7ZTQJ1Ht2q0n0gL3SgdDYoyfXQpEIegqMalLHWGCpiu2l?=
+ =?us-ascii?Q?0akfMIZmN/2gOH9bhJnWpPQ/lGoElxdrol6QM78WFDlhAA9IVl3dD1Hxakre?=
+ =?us-ascii?Q?PDXFqfu7f3g5ge3v2jb5sAHawnBVk1QrdvuqGB5aHoXQzWcbQGq7PK8BWppo?=
+ =?us-ascii?Q?hwj1QpP2zN5NbxmpU01hqwHlh+7iIIZCCQtivEFIs2DS6OsnCzvoKLy/cYuM?=
+ =?us-ascii?Q?W8O1RzirbR3WL43ZPmx+yo+UXYjvzE51l7E6s8dJWvcq8qSvGWb/4+6+6t/r?=
+ =?us-ascii?Q?THsxYb6K8Sub7S9vTtH+azCWCWNHIcESnB3JRmnS0mKS1RCH+5io1eImTe4D?=
+ =?us-ascii?Q?4uNmuyW5+FXTVS3mzhuZESVpaD8cV5fmg3QS/FGOLVyrlXWpQ68l3kXOKjI9?=
+ =?us-ascii?Q?1hf8myCEGmM1PKD9xeu3suBCgHpv1tp1RQIcQCVO4Nk7UQYvk7kUY/OxXCH2?=
+ =?us-ascii?Q?VzZ7thFm5Rrs6YpQG0NzSr2QtH4KTaA1R+WBEqBrAKrubZYBHGuvd2CR/Kzp?=
+ =?us-ascii?Q?o9jkkg54rVxH9d5KShW5Xxj7F6wXznCJhJZQCsGzj+x+G5r9wnW4qn2wDH5+?=
+ =?us-ascii?Q?THYgK6dkSG/qxqL2IyVJfSJ9A9GW5MLbBPESfMnm?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230217225449.811957-3-seanjc@google.com>
-X-Spam-Status: No, score=-14.9 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,GUARANTEED_100_PERCENT,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=no autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a124ecbe-14a2-4661-7978-08db115b73ec
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Feb 2023 02:54:28.7005
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: th5KZi/ZfP1dl14z0TeEnYPCcl0xAsjFb/lbphK8/CqgEMdHGViAmhmIbvqw0BwELKWyGqTVzAUrN2mM42Y6PQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4840
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 17, 2023, Sean Christopherson wrote:
-> Add a KVM x86 doc to the subsystem/maintainer handbook section to explain
-> how KVM x86 (currently) operates as a sub-subsystem, and to soapbox on
-> the rules and expectations for contributing to KVM x86.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  .../process/maintainer-handbooks.rst          |   1 +
->  Documentation/process/maintainer-kvm-x86.rst  | 347 ++++++++++++++++++
->  MAINTAINERS                                   |   1 +
->  3 files changed, 349 insertions(+)
->  create mode 100644 Documentation/process/maintainer-kvm-x86.rst
-> 
-> diff --git a/Documentation/process/maintainer-handbooks.rst b/Documentation/process/maintainer-handbooks.rst
-> index d783060b4cc6..d12cbbe2b7df 100644
-> --- a/Documentation/process/maintainer-handbooks.rst
-> +++ b/Documentation/process/maintainer-handbooks.rst
-> @@ -17,3 +17,4 @@ Contents:
->  
->     maintainer-tip
->     maintainer-netdev
-> +   maintainer-kvm-x86
-> diff --git a/Documentation/process/maintainer-kvm-x86.rst b/Documentation/process/maintainer-kvm-x86.rst
-> new file mode 100644
-> index 000000000000..ac81a42a32a3
-> --- /dev/null
-> +++ b/Documentation/process/maintainer-kvm-x86.rst
-> @@ -0,0 +1,347 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +KVM x86
-> +=======
-> +
-> +TL;DR
-> +-----
-> +Testing is mandatory.  Be consistent with established styles and patterns.
-> +
-> +Trees
-> +-----
-> +KVM x86 is currently in a transition period from being part of the main KVM
-> +tree, to being "just another KVM arch".  As such, KVM x86 is split across the
-> +main KVM tree, ``git.kernel.org/pub/scm/virt/kvm/kvm.git``, and a KVM x86
-> +specific tree, ``github.com/kvm-x86/linux.git``.
-> +
-> +Generally speaking, fixes for the current cycle are applied directly to the
-> +main KVM tree, while all development for the next cycle is routed through the
-> +KVM x86 tree.
-> +
-> +Note, this transition period is expected to last quite some time, i.e. will be
-> +the status quo for the foreseeable future.
-> +
-> +Branches
-> +~~~~~~~~
-> +The KVM x86 tree is organized into multiple topic branches.  The purpose of
-> +using finer-grained topic branches is to make it easier to keep tabs on an area
-> +of development, and to limit the collateral damage of human errors and/or buggy
-> +commits, e.g. dropping the HEAD commit of a topic branch has no impact on other
-> +in-flight commits' SHA1 hashes, and having to reject a pull request due to bugs
-> +delays only that topic branch.
-> +
-> +All topic branches, except for ``next`` and ``fixes``, are rolled into ``next``
-> +via a cthulu merge on an as-needed basis, i.e. when a topic branch is updated.
-> +As a result, force pushes to ``next`` are common.
-> +
-> +Lifecycle
-> +~~~~~~~~~
-> +Pull requests for the next release cycle are sent to the main KVM tree, one
-> +for each KVM x86 topic branch.  If all goes well, the topic branches are rolled
-> +into the main KVM pull request sent during Linus' merge window.  Pull requests
-> +for KVM x86 branches are typically made the week before Linus' opening of the
-> +merge window, e.g. the week following rc7 for "normal" releases.
-> +
-> +The KVM x86 tree doesn't have its own official merge window, but there's a soft
-> +close around rc5 for new features, and a soft close around rc6 for fixes.
-> +
-> +Timeline
-> +~~~~~~~~
-> +Submissions are typically reviewed and applied in FIFO order, with some wiggle
-> +room for the size of a series, patches that are "cache hot", etc.  Fixes,
-> +especially for the current release and or stable trees, get to jump the queue.
-> +Patches that will be taken through a non-KVM tree (most often through the tip
-> +tree) and/or have other acks/reviews also jump the queue to some extent.
-> +
-> +Note, the vast majority of review is done between rc1 and rc6, give or take.
-> +The period between rc6 and the next rc1 is used to catch up on other tasks,
-> +i.e. radio silence during this period isn't unusual.
-> +
-> +Pings to get a status update are welcome, but keep in mind the timing of the
-> +current release cycle and have realistic expectations.  If you are pinging for
-> +acceptance, i.e. not just for feedback or an update, please do everything you
-> +can, within reason, to ensure that your patches are ready to be merged!  Pings
-> +on series that break the build or fail tests lead to unhappy maintainers!
-> +
-> +Development
-> +-----------
-> +
-> +Base Tree/Branch
-> +~~~~~~~~~~~~~~~~
-> +Fixes that target mainline, i.e. the current release, should be based on
-> +``git://git.kernel.org/pub/scm/virt/kvm/kvm.git master``.
-> +
-> +Everything else should be based on a kvm-x86 topic branch.  If there is no
-> +obvious fit, use ``misc``.  Unless a patch/series depends on and/or conflicts
-> +with multiple topic branches, do not use ``next`` as a base.  Because ``next``
-> +is force-pushed on a regular basis, depending on when others fetch ``next``,
-> +they may or may not have the relevant objects in their local git tree.
-> +
-> +Coding Style
-> +~~~~~~~~~~~~
-> +When it comes to style, naming, patterns, etc., consistency is the number one
-> +priority in KVM x86.  If all else fails, match what already exists.
-> +
-> +With a few caveats listed below, follow the tip tree maintainers' preferred
-> +:ref:`maintainer-tip-coding-style`, as patches/series often touch both KVM and
-> +non-KVM x86 files, i.e. draw the attention of KVM *and* tip tree maintainers.
-> +
-> +Using reverse fir tree for variable declarations isn't strictly required,
-> +though it is still preferred.
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Friday, February 17, 2023 11:59 PM
+>=20
+> On Fri, Feb 17, 2023 at 10:55:08AM +0000, Liu, Yi L wrote:
+>=20
+> > One more thinking on this. For a single device, my above reply is true.
+> > The device should have been fully-opened when its
+> GET_PCI_HOT_RESET_INFO
+> > and HOT_RESET path have been unblocked. However, when there are
+> > multiple devices that have been affected by the hotreset. User may only
+> > have one device that is fully opened while others are not yet. In such =
+case,
+> > existing vfio_file_is_valid() is not enough. Shall we have another API =
+for
+> > this purpose? E.g. if it's cdev fd, then the new API return true only w=
+hen
+> > the device is fully opened. Any suggestion here?
+>=20
+> I think what I heard is you need two APIs, one for pci and one for KVM
+> and the PCI one requires binding to succeed.
 
-What is the 'reverse fir tree'? Maybe, "Reverse Christmas Tree" is
-better to understand.
-> +
-> +Except for a handful of special snowflakes, do not use kernel-doc comments for
-> +functions.  The vast majority of "public" KVM functions aren't truly public as
-> +they are intended only for KVM-internal consumption (there are plans to
-> +privatize KVM's headers and exports to enforce this).
-> +
-> +Comments
-> +~~~~~~~~
-> +Write comments using imperative mood and avoid pronouns.  Use comments to
-> +provide a high level overview of the code, and/or to explain why the code does
-> +what it does.  Do not reiterate what the code literally does; let the code
-> +speak for itself.  If the code itself is inscrutable, comments will not help.
-> +
-> +SDM and APM References
-> +~~~~~~~~~~~~~~~~~~~~~~
-> +Much of KVM's code base is directly tied to architectural behavior defined in
-> +Intel's Software Development Manual (SDM) and AMD's Architecture Programmer’s
-> +Manual (APM).  Use of "Intel's SDM" and "AMD's APM", or even just "SDM" or
-> +"APM", without additional context is a-ok.
-> +
-> +Do not reference specific sections, tables, figures, etc. by number, especially
-> +not in comments.  Instead, copy-paste the relevant snippet (if warranted), and
-> +reference sections/tables/figures by name.  The layouts of the SDM and APM are
-> +constantly changing, and so the numbers/labels aren't stable/consistent.
-> +
-> +Generally speaking, do not copy-paste SDM or APM snippets into comments.  With
-> +few exceptions, KVM *must* honor architectural behavior, therefore it's implied
-> +that KVM behavior is emulating SDM and/or APM behavior.
-> +
-> +Shortlog
-> +~~~~~~~~
-> +The preferred prefix format is ``KVM: <topic>:``, where ``<topic>`` is one of::
-> +
-> +  - x86
-> +  - x86/mmu
-> +  - x86/pmu
-> +  - x86/xen
-> +  - selftests
-> +  - SVM
-> +  - nSVM
-> +  - VMX
-> +  - nVMX
-> +
-> +**DO NOT use x86/kvm!**  ``x86/kvm`` is used exclusively for Linux-as-a-KVM-guest
-> +changes, i.e. for arch/x86/kernel/kvm.c.
-> +
-> +Note, these don't align with the topics branches (the topic branches care much
-> +more about code conflicts).
-> +
-> +All names are case sensitive!  ``KVM: x86:`` is good, ``kvm: vmx:`` is not.
-> +
-> +Capitalize the first word of the condensed patch description, but omit ending
-> +punctionation.  E.g.::
-> +
-> +    KVM: x86: Fix a null pointer dererence in function_xyz()
-> +
-> +not::
-> +
-> +    kvm: x86: fix a null pointer dererence in function_xyz.
-> +
-> +If a patch touches multiple topics, traverse up the conceptual tree to find the
-> +first common parent (which is often simply ``x86``).  When in doubt,
-> +``git log path/to/file`` should provide a reasonable hint.
-> +
-> +New topics do occasionally pop up, but please start an on-list discussion if
-> +you want to propose introducing a new topic, i.e. don't go rogue.
-> +
-> +Do not use file names or complete file paths as the subject/shortlog prefix.
-> +
-> +Changelog
-> +~~~~~~~~~
-> +Write changelogs using imperative mood and avoid pronouns.  Lead with a short
-> +blurb on what is changing, and then follow up with the context and background.
-> +Note!  This order directly conflicts with the tip tree's preferred approach!
-> +
-> +Beyond personal preference, there are less subjective reasons for stating what
-> +a patch does before diving into details.  First and foremost, what code is
-> +actually being changed is the most important information, and so that info
-> +should be easy to find.  Changelogs that bury the "what's actually changing" in
-> +a one-liner after 3+ paragraphs of background make it very hard to find that
-> +information.
-> +
-> +For initial review, one could argue the "what's broken" is more important, but
-> +for skimming logs and git archaeology, the gory details matter less and less.
-> +E.g. when doing a series of "git blame", the details of each change along the
-> +way are useless, the details only matter for the culprit.  Providing the "what
-> +changed" makes it easy to quickly determine whether or not a commit might be of
-> +interest.
-> +
-> +Another benefit of stating "what's changing" first is that it's almost always
-> +possible to state "what's changing" in a single sentence.  Conversely, all but
-> +the most simple bugs require multiple sentences or paragraphs to fully describe
-> +the problem.  If both the "what's changing" and "what's the bug" are super
-> +short then the order doesn't matter.  But if one is shorter (almost always the
-> +"what's changing), then covering the shorter one first is advantageous because
-> +it's less of an inconvenience for readers/reviewers that have a strict ordering
-> +preference.  E.g. having to skip one sentence to get to the context is less
-> +painful than having to skip three paragraphs to get to "what's changing".
-> +
-> +Fixes
-> +~~~~~
-> +If a change fixes a KVM/kernel bug, add a Fixes: tag even if the change doesn't
-> +need to be backported to stable kernels, and even if the change fixes a bug in
-> +an older release.
-> +
-> +Conversely, if a fix does need to be backported, explicitly tag the patch with
-> +"Cc: stable@vger.kernel" (though the email itself doesn't need to Cc: stable);
-> +KVM x86 opts out of backporting Fixes: by default.  Some auto-selected patches
-> +do get backported, but require explicit maintainer approval (search MANUALSEL).
-> +
-> +Function References
-> +~~~~~~~~~~~~~~~~~~~
-> +When a function is mentioned in a comment, changelog, or shortlog (or anywhere
-> +for that matter), use the format ``function_name()``.  The parentheses provide
-> +context and disambiguate the reference.
-> +
-> +Testing
-> +-------
-> +At a bare minimum, *all* patches in a series must build cleanly for KVM_INTEL=m
-> +KVM_AMD=m, and KVM_WERROR=y.  Building every possible combination of Kconfigs
-> +isn't feasible, but the more the merrier.  KVM_SMM, KVM_XEN, PROVE_LOCKING, and
-> +X86_64 are particularly interesting knobs to turn.
-> +
-> +Running KVM selftests and KVM-unit-tests is also mandatory (and stating the
-> +obvious, the tests need to pass).  When possible and relevant, testing on both
-> +Intel and AMD is strongly preferred.  Booting an actual VM is encouraged, but
-> +not mandatory.
-> +
-> +For changes that touch KVM's shadow paging code, running with TDP (EPT/NPT)
-> +disabled is mandatory.  For changes that affect common KVM MMU code, running
-> +with TDP disabled is strongly encouraged.  For all other changes, if the code
-> +being modified depends on and/or interacts with a module param, testing with
-> +the relevant settings is mandatory.
-> +
-> +Note, KVM selftests and KVM-unit-tests do have known failures.  If you suspect
-> +a failure is not due to your changes, verify that the *exact same* failure
-> +occurs with and without your changes.
-> +
-> +If you can't fully test a change, e.g. due to lack of hardware, clearly state
-> +what level of testing you were able to do, e.g. in the cover letter.
-> +
-> +New Features
-> +~~~~~~~~~~~~
-> +With one exception, new features *must* come with test coverage.  KVM specific
-> +tests aren't strictly required, e.g. if coverage is provided by running a
-> +sufficiently enabled guest VM, or by running a related kernel selftest in a VM,
-> +but dedicated KVM tests are preferred in all cases.  Negative testcases in
-> +particular are mandatory for enabling of new hardware features as error and
-> +exception flows are rarely exercised simply by running a VM.
-> +
-> +The only exception to this rule is if KVM is simply advertising support for a
-> +feature via KVM_SET_SUPPORTED_CPUID, i.e. for instructions/features that KVM
-> +can't prevent a guest from using and for which there is no true enabling.
-> +
-> +Note, "new features" does not just mean "new hardware features"!  New features
-> +that can't be well validated using existing KVM selftests and/or KVM-unit-tests
-> +must come with tests.
-> +
-> +Posting new feature development without tests to get early feedback is more
-> +than welcome, but such submissions should be tagged RFC, and the cover letter
-> +should clearly state what type of feedback is requested/expected.  Do not abuse
-> +the RFC process; RFCs will typically not receive in-depth review.
-> +
-> +Bug Fixes
-> +~~~~~~~~~
-> +Except for "obvious" found-by-inspection bugs, fixes must be accompanied by a
-> +reproducer for the bug being fixed.  In many cases the reproducer is implicit,
-> +e.g. for build errors and test failures, but it should still be clear to
-> +readers what is broken and how to verify the fix.  Some leeway is given for
-> +bugs that are found via non-public workloads/tests, but providing regression
-> +tests for such bugs is strongly preferred.
-> +
-> +In general, regression tests are preferred for any bug that is not trivial to
-> +hit.  E.g. even if the bug was originally found by a fuzzer such as syzkaller,
-> +a targeted regression test may be warranted if the bug requires hitting a
-> +one-in-a-million type race condition.
-> +
-> +Note, KVM bugs are rarely urgent *and* non-trivial to reproduce.  Ask yourself
-> +if a bug is really truly the end of the world before posting a fix without a
-> +reproducer.
-> +
-> +Posting
-> +-------
-> +
-> +Links
-> +~~~~~
-> +Do not explicitly reference bug reports, prior versions of a patch/series, etc.
-> +via ``In-Reply-To:`` headers.  Using ``In-Reply-To:`` becomes an unholy mess
-> +for large series and/or when the version count gets high, and ``In-Reply-To:``
-> +is useless for anyone that doesn't have the original message, e.g. if someone
-> +wasn't Cc'd on the bug report or if the list of recipients changes between
-> +versions.
-> +
-> +To link to a bug report, previous version, or anything of interest, use lore
-> +links.  For referencing previous version(s), generally speaking do not include
-> +a Link: in the changelog as there is no need to record the history in git, i.e.
-> +put the link in the cover letter or in the section git ignores.  Do provide a
-> +formal Link: for bug reports and/or discussions that led to the patch.  The
-> +context of why a change was made is highly valuable for future readers.
-> +
-> +Git Base
-> +~~~~~~~~
-> +If you are using git version 2.9.0 or later (Googlers, this is all of you!),
-> +use ``git format-patch`` with the ``--base`` flag to automatically include the
-> +base tree information in the generated patches.
-> +
-> +Note, ``--base=auto`` works as expected if and only if a branch's upstream is
-> +set to the base topic branch, e.g. it will do the wrong thing if your upstream
-> +is set to your personal repository for backup purposes.  An alternative "auto"
-> +solution is to derive the names of your development branches based on their
-> +KVM x86 topic, and feed that into ``--base``.  E.g. ``x86/pmu/my_branch_name``,
-> +and then write a small wrapper to extract ``pmu`` from the current branch name
-> +to yield ``--base=x/pmu``, where ``x`` is whatever name your repository uses to
-> +track the KVM x86 remote.
-> +
-> +Co-Posting Tests
-> +~~~~~~~~~~~~~~~~
-> +KVM selftests that are associated with KVM changes, e.g. regression tests for
-> +bug fixes, should be posted along with the KVM changes as a single series.
-> +
-> +KVM-unit-tests should *always* be posted separately.  Tools, e.g. b4 am, don't
-> +know that KVM-unit-tests is a separate repository and get confused when patches
-> +in a series apply on different trees.  To tie KVM-unit-tests patches back to
-> +KVM patches, first post the KVM changes and then provide a lore Link: to the
-> +KVM patch/series in the KVM-unit-tests patch(es).
-> +
-> +Notifications
-> +-------------
-> +When a patch/series is officially accepted, a notification email will be sent
-> +in reply to the original posting (cover letter for multi-patch series).  The
-> +notification will include the tree and topic branch, along with the SHA1s of
-> +the commits of applied patches.
-> +
-> +If a subset of patches is applied, this will be clearly stated in the
-> +notification.  Unless stated otherwise, it's implied that any patches in the
-> +series that were not accepted need more work and should be submitted in a new
-> +version.
-> +
-> +If for some reason a patch is dropped after officially being accepted, a reply
-> +will be sent to the notification email explaining why the patch was dropped, as
-> +well as the next steps.
-> +
-> +SHA1 Stability
-> +~~~~~~~~~~~~~~
-> +SHA1s are not 100% guaranteed to be stable until they land in Linus' tree!  A
-> +SHA1 is *usually* stable once a notification has been sent, but things happen.
-> +In most cases, an update to the notification email be provided if an applied
-> +patch's SHA1 changes.  However, in some scenarios, e.g. if all KVM x86 branches
-> +need to be rebased, individual notifications will not be given.
-> +
-> +Vulnerabilities
-> +---------------
-> +Bugs that can be exploited by the guest to attack the host (kernel or
-> +userspace), or that can be exploited by a nested VM to *its* host (L2 attacking
-> +L1), are of particular interest to KVM.  Please follow the protocol for
-> +:ref:`securitybugs` if you suspect a bug can lead to an escape, data leak, etc.
-> +
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 6a47510d1592..13e67a8b4827 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -11436,6 +11436,7 @@ M:	Sean Christopherson <seanjc@google.com>
->  M:	Paolo Bonzini <pbonzini@redhat.com>
->  L:	kvm@vger.kernel.org
->  S:	Supported
-> +P:	Documentation/process/maintainer-kvm-x86.rst
->  T:	git git://git.kernel.org/pub/scm/virt/kvm/kvm.git
->  F:	arch/x86/include/asm/kvm*
->  F:	arch/x86/include/asm/svm.h
-> -- 
-> 2.39.2.637.g21b0678d19-goog
-> 
+Yes.
+
+One is vfio_file_is_valid() - for KVM
+Another one is vfio_file_device_opened() - for PCI.
+
+Regards,
+Yi Liu
