@@ -2,56 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 331F669B7F0
-	for <lists+kvm@lfdr.de>; Sat, 18 Feb 2023 04:23:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EA0F869B7F2
+	for <lists+kvm@lfdr.de>; Sat, 18 Feb 2023 04:28:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229751AbjBRDXu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Feb 2023 22:23:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34310 "EHLO
+        id S229533AbjBRD2W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Feb 2023 22:28:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229708AbjBRDXt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Feb 2023 22:23:49 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CE1F1422D
-        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 19:23:37 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id y33-20020a25ad21000000b00953ffdfbe1aso2522226ybi.23
-        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 19:23:36 -0800 (PST)
+        with ESMTP id S229481AbjBRD2V (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Feb 2023 22:28:21 -0500
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35E64305CA
+        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 19:28:20 -0800 (PST)
+Received: by mail-pl1-x62c.google.com with SMTP id o9so38587plk.12
+        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 19:28:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FEDRhyMFCECWJJMCXfuOIikv5npXJq0fQihBBev/TIA=;
-        b=TsL/rEFHgzF8PB3fl/52k7sY+V2wtYkQo2G2NtQUkj8mG/mR9M+X0ARF+JByYpTdf4
-         rHdC2lPdoW/iHfrfnJNxzkRdZIdWxB6961+rR6gt1FTOrfRJpYyf98KtklSvEkZ50EIz
-         ph9DAW1DudYqTZWpbcdhs6HC2O6GaqY8PVyYAaURCKqLEcTGYo5kpLhBeKKj/7Qsj23I
-         gva/Kvmt2p08y3rhs63O7QRd2QRBHM+UxE+EuxQ467soHSxuN8WFfemk7TepF2XHWVcS
-         EEuwmz+/YmtTMbmz4w6ddwctx3k/7DWxI/Jxa00WvgYBdkQhQMW7qcUorb7WbfY30iVz
-         Q/rw==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rfCMHgIz5kiDxJwrkO/9/DfGjzMle5yHTdkfBDkL2xk=;
+        b=KPMxqKoZhW06fnf/R4mUih0Wq+NPd/lIsqRYf5c1GKQbe8WA0NyxhpsJYqjMg6kf3t
+         0GyNTIHhZdNBbRJ6P4LH14zg5tvZxFW/DiK//hWG0MKUgdYWMdl8tqvy15fg8zpjlEa+
+         ILMxFXGT6tgUv9GCX+A9QB3Jaql1hrwpGWAcGwBLJDJmNUzuIkdh3Fl4k245WIQcZLLp
+         94Jt3g16WFtNa+5vC1j4NGtPLiXJmRvXVF5br9o6Di/oCkGOo3EzMu8dQlQ5THTMxrQF
+         RnvK5zVLNHzRd5LLzYdLSBC3bJiYlrdXbW6MkE00e0F3kay3V0kb4eSp9phL83eys+59
+         Actw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FEDRhyMFCECWJJMCXfuOIikv5npXJq0fQihBBev/TIA=;
-        b=HxEuru/sYgkAAn7/UMaDjwt0MYyD67/MBS1RKdnMqc/7t1KTSEZcfGeKPqVqD6nm+G
-         XN27xi8krzmRX9W9TU4JZOVgMQd9MQwjZXaED7jDrXH3rSJ9h/fLIX5knKjeB+Fqsrpf
-         hwJvl/FpVDLQDvkDs9cUpHTU0tWgUy610DbkloCDifHLGLtAVOd9FixCHqRiZQPfnvo7
-         mjoyMZ67hsNN8v1CW6aR7TSHwz1BZPM3RqtzFds5wPygGZhxDOcA8p6JuDGXjssCNA6C
-         hOaLrBMFBmA8xcj5iLpy7HeWMESN5eaUiupi8dfQuTaWK/H6XMW36aUcPs74WgwY8v5D
-         o4Qw==
-X-Gm-Message-State: AO0yUKUHtw/GsaoPmAN/GqBcqKrXXT/3ln5gYg9UOJHTMjOHJu5kadd/
-        iAl1RzKeCGhmxYbtzxsVKvf65MVKhFEndw==
-X-Google-Smtp-Source: AK7set+8ZqBbGv/5+KpNRrBzr4O7c0V0Q3qngND/S2IUittkfFuLPIrXR022lFKFcWFdml6nj4vqj2wsIvmbTw==
-X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a81:b660:0:b0:534:515:e472 with SMTP id
- h32-20020a81b660000000b005340515e472mr69437ywk.4.1676690616159; Fri, 17 Feb
- 2023 19:23:36 -0800 (PST)
-Date:   Sat, 18 Feb 2023 03:23:14 +0000
-In-Reply-To: <20230218032314.635829-1-ricarkol@google.com>
-Mime-Version: 1.0
-References: <20230218032314.635829-1-ricarkol@google.com>
-X-Mailer: git-send-email 2.39.2.637.g21b0678d19-goog
-Message-ID: <20230218032314.635829-13-ricarkol@google.com>
-Subject: [PATCH v4 12/12] KVM: arm64: Use local TLBI on permission relaxation
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rfCMHgIz5kiDxJwrkO/9/DfGjzMle5yHTdkfBDkL2xk=;
+        b=1PltH0Z5gfE3sL/gzWCZsXjxKEZrzixx3pj7eUbzPrm25Al3RSE+NUo6a0Kv7zUGDO
+         7dyuFmi4jCXBdbG4yVPTTUItMWOaZ7PwuQlUtv8kYdebaTk9nK4IQWOeT3Uh9/z5q+F6
+         iGF1paEXJFTFDITltzKL2ikQGAl6iEY+GP1Zli5qNO50OCv9W7exEam2K5LWs1hHL7sO
+         WmiLwY7oxBtis7DEMsEuZEbtRoD0r/hY/UNvLWmW/shvZoKJXkJsHHsZvOe3Olsd8chW
+         otVLl2C0aiTTwB76CXXe1ZESzo25aXChgFLGhIs7d/pMLEbd5ukHG67Ntg21cP7pgkSw
+         aj5w==
+X-Gm-Message-State: AO0yUKVprq1qwqYjVlv/70S16xshcQ5JBtxaOJiGgCWOi0BswvGKhlQZ
+        3ivkyQ8YAStkOFaxApVunuw7ZzhZLwaevDM8xa8osA==
+X-Google-Smtp-Source: AK7set8DENOPudv/9pNYoQdUkuHucMW3IYcRqd/evB9ZUjF/5gLd4X20Of1eJm/DGnBQbbQpiX0oAg==
+X-Received: by 2002:a17:902:e74d:b0:198:af50:e4e2 with SMTP id p13-20020a170902e74d00b00198af50e4e2mr112298plf.8.1676690899332;
+        Fri, 17 Feb 2023 19:28:19 -0800 (PST)
+Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
+        by smtp.gmail.com with ESMTPSA id x7-20020a170902a38700b0019926c7757asm3748296pla.289.2023.02.17.19.28.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Feb 2023 19:28:18 -0800 (PST)
+Date:   Fri, 17 Feb 2023 19:28:15 -0800
 From:   Ricardo Koller <ricarkol@google.com>
 To:     pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
         yuzenghui@huawei.com, dmatlack@google.com
@@ -59,12 +56,19 @@ Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
         catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
         alexandru.elisei@arm.com, suzuki.poulose@arm.com,
         eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
-        rananta@google.com, bgardon@google.com, ricarkol@gmail.com,
-        Ricardo Koller <ricarkol@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        rananta@google.com, bgardon@google.com, ricarkol@gmail.com
+Subject: Re: [PATCH v4 04/12] KVM: arm64: Add kvm_pgtable_stage2_split()
+Message-ID: <Y/BFz5uC+iL2+q2o@google.com>
+References: <20230218032314.635829-1-ricarkol@google.com>
+ <20230218032314.635829-5-ricarkol@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230218032314.635829-5-ricarkol@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,201 +76,201 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Marc Zyngier <maz@kernel.org>
+On Sat, Feb 18, 2023 at 03:23:06AM +0000, Ricardo Koller wrote:
+> Add a new stage2 function, kvm_pgtable_stage2_split(), for splitting a
+> range of huge pages. This will be used for eager-splitting huge pages
+> into PAGE_SIZE pages. The goal is to avoid having to split huge pages
+> on write-protection faults, and instead use this function to do it
+> ahead of time for large ranges (e.g., all guest memory in 1G chunks at
+> a time).
+> 
+> No functional change intended. This new function will be used in a
+> subsequent commit.
+> 
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h |  30 +++++++
+>  arch/arm64/kvm/hyp/pgtable.c         | 113 +++++++++++++++++++++++++++
+>  2 files changed, 143 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index b8cde914cca9..6908109ac11e 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -657,6 +657,36 @@ bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr);
+>   */
+>  int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size);
+>  
+> +/**
+> + * kvm_pgtable_stage2_split() - Split a range of huge pages into leaf PTEs pointing
+> + *				to PAGE_SIZE guest pages.
+> + * @pgt:	 Page-table structure initialised by kvm_pgtable_stage2_init().
+> + * @addr:	 Intermediate physical address from which to split.
+> + * @size:	 Size of the range.
+> + * @mc:		 Cache of pre-allocated and zeroed memory from which to allocate
+> + *		 page-table pages.
+> + * @mc_capacity: Number of pages in @mc.
+> + *
+> + * @addr and the end (@addr + @size) are effectively aligned down and up to
+> + * the top level huge-page block size. This is an example using 1GB
+> + * huge-pages and 4KB granules.
+> + *
+> + *                          [---input range---]
+> + *                          :                 :
+> + * [--1G block pte--][--1G block pte--][--1G block pte--][--1G block pte--]
+> + *                          :                 :
+> + *                   [--2MB--][--2MB--][--2MB--][--2MB--]
+> + *                          :                 :
+> + *                   [ ][ ][:][ ][ ][ ][ ][ ][:][ ][ ][ ]
+> + *                          :                 :
+> + *
+> + * Return: 0 on success, negative error code on failure. Note that
+> + * kvm_pgtable_stage2_split() is best effort: it tries to break as many
+> + * blocks in the input range as allowed by @mc_capacity.
+> + */
+> +int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> +			     void *mc, u64 mc_capacity);
+> +
+>  /**
+>   * kvm_pgtable_walk() - Walk a page-table.
+>   * @pgt:	Page-table structure initialised by kvm_pgtable_*_init().
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 80f2965ab0fe..9f1c8fdd9330 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -1228,6 +1228,119 @@ kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
+>  	return pgtable;
+>  }
+>  
+> +struct stage2_split_data {
+> +	struct kvm_s2_mmu		*mmu;
+> +	void				*memcache;
+> +	u64				mc_capacity;
+> +};
+> +
+> +/*
+> + * Get the number of page-tables needed to replace a block with a
+> + * fully populated tree, up to the PTE level, at particular level.
+> + */
+> +static inline int stage2_block_get_nr_page_tables(u32 level)
+> +{
+> +	if (WARN_ON_ONCE(level < KVM_PGTABLE_MIN_BLOCK_LEVEL ||
+> +			 level >= KVM_PGTABLE_MAX_LEVELS))
+> +		return -EINVAL;
+> +
+> +	switch (level) {
+> +	case 1:
+> +		return PTRS_PER_PTE + 1;
+> +	case 2:
+> +		return 1;
+> +	case 3:
+> +		return 0;
+> +	default:
+> +		return -EINVAL;
+> +	};
+> +}
 
-Broadcasted TLB invalidations (TLBI) are usually less performant than their
-local variant. In particular, we observed some implementations that take
-millliseconds to complete parallel broadcasted TLBIs.
+Shaoqin,
 
-It's safe to use local, non-shareable, TLBIs when relaxing permissions on a
-PTE in the KVM case for a couple of reasons. First, according to the ARM
-Arm (DDI 0487H.a D5-4913), permission relaxation does not need
-break-before-make.  Second, KVM does not set the VTTBR_EL2.CnP bit, so each
-PE has its own TLB entry for the same page. KVM could tolerate that when
-doing permission relaxation (i.e., not having changes broadcasted to all
-PEs).
+"Is the level 3 check really needed?"
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Ricardo Koller <ricarkol@google.com>
----
- arch/arm64/include/asm/kvm_asm.h   |  4 +++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 10 ++++++
- arch/arm64/kvm/hyp/nvhe/tlb.c      | 54 ++++++++++++++++++++++++++++++
- arch/arm64/kvm/hyp/pgtable.c       |  2 +-
- arch/arm64/kvm/hyp/vhe/tlb.c       | 32 ++++++++++++++++++
- 5 files changed, 101 insertions(+), 1 deletion(-)
+Regarding your question about the need for "case 3". You are right,
+it's not actually needed in this particular case (when called from
+stage2_split_walker()). However, it would be nice to reuse this
+function and so it should cover all functions.
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 43c3bc0f9544..bb17b2ead4c7 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -68,6 +68,7 @@ enum __kvm_host_smccc_func {
- 	__KVM_HOST_SMCCC_FUNC___kvm_vcpu_run,
- 	__KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context,
- 	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa,
-+	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa_nsh,
- 	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid,
- 	__KVM_HOST_SMCCC_FUNC___kvm_flush_cpu_context,
- 	__KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff,
-@@ -225,6 +226,9 @@ extern void __kvm_flush_vm_context(void);
- extern void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu);
- extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa,
- 				     int level);
-+extern void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
-+					 phys_addr_t ipa,
-+					 int level);
- extern void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu);
- 
- extern void __kvm_timer_set_cntvoff(u64 cntvoff);
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 728e01d4536b..c6bf1e49ca93 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -125,6 +125,15 @@ static void handle___kvm_tlb_flush_vmid_ipa(struct kvm_cpu_context *host_ctxt)
- 	__kvm_tlb_flush_vmid_ipa(kern_hyp_va(mmu), ipa, level);
- }
- 
-+static void handle___kvm_tlb_flush_vmid_ipa_nsh(struct kvm_cpu_context *host_ctxt)
-+{
-+	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
-+	DECLARE_REG(phys_addr_t, ipa, host_ctxt, 2);
-+	DECLARE_REG(int, level, host_ctxt, 3);
-+
-+	__kvm_tlb_flush_vmid_ipa_nsh(kern_hyp_va(mmu), ipa, level);
-+}
-+
- static void handle___kvm_tlb_flush_vmid(struct kvm_cpu_context *host_ctxt)
- {
- 	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
-@@ -315,6 +324,7 @@ static const hcall_t host_hcall[] = {
- 	HANDLE_FUNC(__kvm_vcpu_run),
- 	HANDLE_FUNC(__kvm_flush_vm_context),
- 	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa),
-+	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa_nsh),
- 	HANDLE_FUNC(__kvm_tlb_flush_vmid),
- 	HANDLE_FUNC(__kvm_flush_cpu_context),
- 	HANDLE_FUNC(__kvm_timer_set_cntvoff),
-diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
-index d296d617f589..ef2b70587f93 100644
---- a/arch/arm64/kvm/hyp/nvhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-@@ -109,6 +109,60 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
- 	__tlb_switch_to_host(&cxt);
- }
- 
-+void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
-+				  phys_addr_t ipa, int level)
-+{
-+	struct tlb_inv_context cxt;
-+
-+	dsb(nshst);
-+
-+	/* Switch to requested VMID */
-+	__tlb_switch_to_guest(mmu, &cxt);
-+
-+	/*
-+	 * We could do so much better if we had the VA as well.
-+	 * Instead, we invalidate Stage-2 for this IPA, and the
-+	 * whole of Stage-1. Weep...
-+	 */
-+	ipa >>= 12;
-+	__tlbi_level(ipas2e1, ipa, level);
-+
-+	/*
-+	 * We have to ensure completion of the invalidation at Stage-2,
-+	 * since a table walk on another CPU could refill a TLB with a
-+	 * complete (S1 + S2) walk based on the old Stage-2 mapping if
-+	 * the Stage-1 invalidation happened first.
-+	 */
-+	dsb(nsh);
-+	__tlbi(vmalle1);
-+	dsb(nsh);
-+	isb();
-+
-+	/*
-+	 * If the host is running at EL1 and we have a VPIPT I-cache,
-+	 * then we must perform I-cache maintenance at EL2 in order for
-+	 * it to have an effect on the guest. Since the guest cannot hit
-+	 * I-cache lines allocated with a different VMID, we don't need
-+	 * to worry about junk out of guest reset (we nuke the I-cache on
-+	 * VMID rollover), but we do need to be careful when remapping
-+	 * executable pages for the same guest. This can happen when KSM
-+	 * takes a CoW fault on an executable page, copies the page into
-+	 * a page that was previously mapped in the guest and then needs
-+	 * to invalidate the guest view of the I-cache for that page
-+	 * from EL1. To solve this, we invalidate the entire I-cache when
-+	 * unmapping a page from a guest if we have a VPIPT I-cache but
-+	 * the host is running at EL1. As above, we could do better if
-+	 * we had the VA.
-+	 *
-+	 * The moral of this story is: if you have a VPIPT I-cache, then
-+	 * you should be running with VHE enabled.
-+	 */
-+	if (icache_is_vpipt())
-+		icache_inval_all_pou();
-+
-+	__tlb_switch_to_host(&cxt);
-+}
-+
- void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
- {
- 	struct tlb_inv_context cxt;
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 9f1c8fdd9330..399e62a8c453 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -1148,7 +1148,7 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
- 	ret = stage2_update_leaf_attrs(pgt, addr, 1, set, clr, NULL, &level,
- 				       KVM_PGTABLE_WALK_SHARED);
- 	if (!ret)
--		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, pgt->mmu, addr, level);
-+		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa_nsh, pgt->mmu, addr, level);
- 	return ret;
- }
- 
-diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-index 24cef9b87f9e..e69da550cdc5 100644
---- a/arch/arm64/kvm/hyp/vhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/vhe/tlb.c
-@@ -111,6 +111,38 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
- 	__tlb_switch_to_host(&cxt);
- }
- 
-+void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
-+				  phys_addr_t ipa, int level)
-+{
-+	struct tlb_inv_context cxt;
-+
-+	dsb(nshst);
-+
-+	/* Switch to requested VMID */
-+	__tlb_switch_to_guest(mmu, &cxt);
-+
-+	/*
-+	 * We could do so much better if we had the VA as well.
-+	 * Instead, we invalidate Stage-2 for this IPA, and the
-+	 * whole of Stage-1. Weep...
-+	 */
-+	ipa >>= 12;
-+	__tlbi_level(ipas2e1, ipa, level);
-+
-+	/*
-+	 * We have to ensure completion of the invalidation at Stage-2,
-+	 * since a table walk on another CPU could refill a TLB with a
-+	 * complete (S1 + S2) walk based on the old Stage-2 mapping if
-+	 * the Stage-1 invalidation happened first.
-+	 */
-+	dsb(nsh);
-+	__tlbi(vmalle1);
-+	dsb(nsh);
-+	isb();
-+
-+	__tlb_switch_to_host(&cxt);
-+}
-+
- void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
- {
- 	struct tlb_inv_context cxt;
--- 
-2.39.2.637.g21b0678d19-goog
+Thanks,
+Ricardo
 
+> +
+> +static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> +			       enum kvm_pgtable_walk_flags visit)
+> +{
+> +	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+> +	struct stage2_split_data *data = ctx->arg;
+> +	kvm_pte_t pte = ctx->old, new, *childp;
+> +	enum kvm_pgtable_prot prot;
+> +	void *mc = data->memcache;
+> +	u32 level = ctx->level;
+> +	bool force_pte;
+> +	int nr_pages;
+> +	u64 phys;
+> +
+> +	/* No huge-pages exist at the last level */
+> +	if (level == KVM_PGTABLE_MAX_LEVELS - 1)
+> +		return 0;
+> +
+> +	/* We only split valid block mappings */
+> +	if (!kvm_pte_valid(pte))
+> +		return 0;
+> +
+> +	nr_pages = stage2_block_get_nr_page_tables(level);
+> +	if (nr_pages < 0)
+> +		return nr_pages;
+> +
+> +	if (data->mc_capacity >= nr_pages) {
+> +		/* Build a tree mapped down to the PTE granularity. */
+> +		force_pte = true;
+> +	} else {
+> +		/*
+> +		 * Don't force PTEs. This requires a single page of PMDs at the
+> +		 * PUD level, or a single page of PTEs at the PMD level. If we
+> +		 * are at the PUD level, the PTEs will be created recursively.
+> +		 */
+> +		force_pte = false;
+> +		nr_pages = 1;
+> +	}
+> +
+> +	if (data->mc_capacity < nr_pages)
+> +		return -ENOMEM;
+> +
+> +	phys = kvm_pte_to_phys(pte);
+> +	prot = kvm_pgtable_stage2_pte_prot(pte);
+> +
+> +	childp = kvm_pgtable_stage2_create_unlinked(data->mmu->pgt, phys,
+> +						    level, prot, mc, force_pte);
+> +	if (IS_ERR(childp))
+> +		return PTR_ERR(childp);
+> +
+> +	if (!stage2_try_break_pte(ctx, data->mmu)) {
+> +		kvm_pgtable_stage2_free_unlinked(mm_ops, childp, level);
+> +		mm_ops->put_page(childp);
+> +		return -EAGAIN;
+> +	}
+> +
+> +	/*
+> +	 * Note, the contents of the page table are guaranteed to be made
+> +	 * visible before the new PTE is assigned because stage2_make_pte()
+> +	 * writes the PTE using smp_store_release().
+> +	 */
+> +	new = kvm_init_table_pte(childp, mm_ops);
+> +	stage2_make_pte(ctx, new);
+> +	dsb(ishst);
+> +	data->mc_capacity -= nr_pages;
+> +	return 0;
+> +}
+> +
+> +int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> +			     void *mc, u64 mc_capacity)
+> +{
+> +	struct stage2_split_data split_data = {
+> +		.mmu		= pgt->mmu,
+> +		.memcache	= mc,
+> +		.mc_capacity	= mc_capacity,
+> +	};
+> +
+> +	struct kvm_pgtable_walker walker = {
+> +		.cb	= stage2_split_walker,
+> +		.flags	= KVM_PGTABLE_WALK_LEAF,
+> +		.arg	= &split_data,
+> +	};
+> +
+> +	return kvm_pgtable_walk(pgt, addr, size, &walker);
+> +}
+> +
+>  int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+>  			      struct kvm_pgtable_mm_ops *mm_ops,
+>  			      enum kvm_pgtable_stage2_flags flags,
+> -- 
+> 2.39.2.637.g21b0678d19-goog
+> 
