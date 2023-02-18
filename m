@@ -2,135 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EF36E69B7CC
-	for <lists+kvm@lfdr.de>; Sat, 18 Feb 2023 03:54:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5212C69B7E4
+	for <lists+kvm@lfdr.de>; Sat, 18 Feb 2023 04:23:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229637AbjBRCys (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Feb 2023 21:54:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49286 "EHLO
+        id S229650AbjBRDXU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Feb 2023 22:23:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229489AbjBRCyq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Feb 2023 21:54:46 -0500
-Received: from BN6PR00CU002-vft-obe.outbound.protection.outlook.com (mail-eastus2azon11021024.outbound.protection.outlook.com [52.101.57.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2236969297;
-        Fri, 17 Feb 2023 18:54:45 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BCkHATfcVLYKJoFwuqFKaNFr3cff7SWSV1JXGQI2rbP8F4jmdRJMr/Nl4seX/qb4e7YbI3iMpNV564ke7/hut8JK2pWve2+P1XXx6fUCKr/zb5Mad2u0QNvf6uwz5FnUBvyt9/gRFInlmDT8Hup74bkgNb2PuSpiPP0AaBTRk50cZrdc1AgaC6DAMkt3FzUx0cpjanEkoW8O1bPV+tBUZnryx3NEkkYo5faq25H7wXtLaICDohtotmt+OXprO0n5zArV7Hnw68mmgDRcQp3FClQstD7GwHSaBaPgVXT+PfqBpo7VE5iiPySZlK3H0GlFw3+9Qo8qdHjxo5muQnO7+g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qQpVpCuOQmpustvFDFM9G9GgAuR3/AU4nhx8R45MGoY=;
- b=bz/WZ019PgYBxBIIAu0RpAeO8N+FLelz2pFf3dVaydQgmSMkax6YQ06I2MliQ81xf4sO1Vcb9YUXstnZIZ5QS3onLS6X5R8bksNY8SugxfikFFlwUGlj5W/aaF4/eIAN+kNgTk45CagEIXogK1QVwxJgZDtQyYZCnyD5L+n+TCjmWeYMETtcQ0uSqNBnchwz8H7Ov9ewjNtkq2kv6zJktwPwpd00DGw2v53K4ktKw00XA/1GJMBoZZSV+2C2VSdAUIqwb7KYCtuCIh21Cb+QpV76I370GG5gklv7EByWyzSnQ++I7odypbzFGFZFm7IXnzF4ISDV00WTb4Vt+qMJZA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qQpVpCuOQmpustvFDFM9G9GgAuR3/AU4nhx8R45MGoY=;
- b=F85z6Dixtj3TBJukGL48u4v2JNQR3Lsq2o/PwPsH7oHH+THQt3RnQ5RqYr5LsXzsqJvX1HmxblrG26okp/RX1xpJwx4SLcFxQmVauPN80xGWIPYNhdan6isLNFUPbANPzpr1UmUfrnU7+dC2dmbZzf85xZMdQ5eXUygxNQlcgJE=
-Received: from SA1PR21MB1335.namprd21.prod.outlook.com (2603:10b6:806:1f2::11)
- by LV2PR21MB3303.namprd21.prod.outlook.com (2603:10b6:408:14f::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.6; Sat, 18 Feb
- 2023 02:54:38 +0000
-Received: from SA1PR21MB1335.namprd21.prod.outlook.com
- ([fe80::3747:daf4:7cc9:5ba2]) by SA1PR21MB1335.namprd21.prod.outlook.com
- ([fe80::3747:daf4:7cc9:5ba2%3]) with mapi id 15.20.6134.013; Sat, 18 Feb 2023
- 02:54:37 +0000
-From:   Dexuan Cui <decui@microsoft.com>
-To:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-CC:     Tom Lendacky <thomas.lendacky@amd.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "sandipan.das@amd.com" <sandipan.das@amd.com>,
-        "Gupta, Pankaj" <pankaj.gupta@amd.com>,
-        "ray.huang@amd.com" <ray.huang@amd.com>,
-        "brijesh.singh@amd.com" <brijesh.singh@amd.com>,
-        "michael.roth@amd.com" <michael.roth@amd.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: Does earlyprintk=ttyS0 work for an AMD SNP guest on KVM?
-Thread-Topic: Does earlyprintk=ttyS0 work for an AMD SNP guest on KVM?
-Thread-Index: AdlBv/2siHbGoHczQeyMVKtAUkBIZwAJxYmAABIBUjAAJ9tUgAAcDwZg
-Date:   Sat, 18 Feb 2023 02:54:37 +0000
-Message-ID: <SA1PR21MB13352DCAA7371B90CB8A637CBFA69@SA1PR21MB1335.namprd21.prod.outlook.com>
-References: <SA1PR21MB13359DBABC5625368E369A42BFA09@SA1PR21MB1335.namprd21.prod.outlook.com>
- <20230216091431.GA10166@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <SA1PR21MB13358707043E2901958819AEBFA09@SA1PR21MB1335.namprd21.prod.outlook.com>
- <e06d90cc-544b-5280-f8cd-b25684214b4a@linux.microsoft.com>
-In-Reply-To: <e06d90cc-544b-5280-f8cd-b25684214b4a@linux.microsoft.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=8c4a6c41-b57a-4645-8ee7-c521905b2604;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2023-02-18T02:14:41Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA1PR21MB1335:EE_|LV2PR21MB3303:EE_
-x-ms-office365-filtering-correlation-id: 6d6fb674-0db6-486c-def6-08db115b7949
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: vwr7PAYRj+MHeM8FN+jfGyQoGJHcyYWnvbBsOK2iCwYOnf0IGTjUpx5apNPHxSLmmebzenJfFrutxxjCYwJWF6U74Oh5ucWheXBH4UciMRvD42kxXG4ofIXh98BDH9w2XWbYnYMdg6EV5bY7sIVnCmV9uvg2Mvy7qVg0uSurfjTelSM8G3dVyJbvo9GeyRAqJkBdv/0i9rBjEkhohS1nW9uhAIrc2utbTC/HFDDKR3UVHPWYMfcoo0WBsjQDx7rO+EfyoVFxL9s6r8dYSONsca25aHS204P2zk9OzoGDbgObsYW3SZAbZa4vlVXUa6N3EXMPaEi3AZ/8VSLqctlaTLkLw05mi6bru1KhwIgsn7W8POJGuwp2IBSg0hXRL/ueNO5BvmTopm+a0EYG7bKstPg4aoHx/2p0jnEL00yCfnzjtnz38htneD9/zmjeXZqm1JRIHGFIIYtr6T9Q+NtUT6dwbXIxKGAxhVEQM1ZfvrkPwaXNu/htM7oGO6m/eGEpv55dHeHWae0rEFcuE00lGvV8Lz+ERdDzORgGTcbQQPc+e8hi9L7TnRePH9DxWw0I3Qkdl/PwyGVcWNL+O/K8YpuL54fOKoyINbtw7jTVE6O+CvT2bhy91pm1/oNnqQMvjtO3zYzV/y+Lo+3MncSZdL88/oCVBehRP2UG9b6dh/fGrQ70zSqhjm4WcXXAOz9vGxqImYTU7UZo9IeXSx0lfS3MQJOpxYXTNUa0tv3bleTXcbZtY1/83rFxAp/bQYPW
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR21MB1335.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(396003)(136003)(346002)(376002)(39860400002)(366004)(451199018)(26005)(9686003)(186003)(478600001)(7696005)(4326008)(66556008)(66476007)(66446008)(64756008)(8676002)(71200400001)(10290500003)(54906003)(53546011)(6506007)(76116006)(66946007)(316002)(52536014)(7416002)(82950400001)(82960400001)(5660300002)(41300700001)(8936002)(2906002)(6862004)(122000001)(38100700002)(8990500004)(38070700005)(86362001)(33656002)(55016003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?WHc3SDZKaENnVi9SZGE0RStFMHo5VEh2emJubHJPK3JlSWFBYVBYK09XdnRn?=
- =?utf-8?B?clU4Nkc1dDduRWkzajcrbU9xeVNlVEIzZ3lhYVVjbUQ1a3JkdGxjZTB5ZG9S?=
- =?utf-8?B?eTg2RWNGVk9xbnIyVU9aUlhoVTJUQ2Yvb1dYV1JTdmRWSnZIY2RZZnMwYUxu?=
- =?utf-8?B?SHpjSDFVNVA1NHBlSVJnT2ZhN1BXUW1nd2gyenpZQmd6RmhWN0FILzU4OWRx?=
- =?utf-8?B?eXJqbTVtNUlkdCtHd3BzRnRlcEs5OXJpcjNFOTJjZ3Jpd0VlRXhpNDdqbEti?=
- =?utf-8?B?cTNrdmt1eUJCZXNHajA4TXBXbER3RnhKeVQ0NXk0VExHNTdpeXRtRHFuOVNj?=
- =?utf-8?B?K3NHcGxHWUp6d3VIQXNRcGtPRGZ0V096emRDdVozSW5IOVdlOXpnd2RqYWJB?=
- =?utf-8?B?Y05UaVJzczFGWTNOdTltY1BEZWpVTDMyeXVQcllTT2s5dlArRHJEV2xXemN4?=
- =?utf-8?B?Qm91OXltekMvTWcwNjJlRHdnaFNwcFNWQXFtNXI5eTR6cWlhUkVkTHBteDN2?=
- =?utf-8?B?VnFVWVFRdVlXUHM5SjNjNTNuemo4cnhIc29DWHJqcGJRcENuTU9NWituM0ht?=
- =?utf-8?B?anYvK1BuNTI3NUJ4emVYcnRmNndudGlzTEt2UEZ3bzlJdGQ2Sk92ZzE4WmJY?=
- =?utf-8?B?VWp5eDNJeU43NmN1OVQzWFRYRmREZnRoSjB0V1kvRS9zNm1HQTZ0RFJ2aS9w?=
- =?utf-8?B?TjlUTkFRS0ZqQ3FTcEdJQjRKNytCdnRpQmRUMzU1ZUJqZHA1WVhJT0k0bjRM?=
- =?utf-8?B?VnJtdThZR0M5WmtpR21hN2QxWG5YVWpuUVFOY29HRXkvODltRjdqNk92aVVm?=
- =?utf-8?B?VmlnS2dTZENqTkkreWs3ZzF4bzR1SlpldU9SSlZBTEF6ZEVWWThyUWlnTlJI?=
- =?utf-8?B?TDNscWE5bS85Vi9TRUJVQW1XaWpxN3I1K1V0SHNNeGNGbmszQlpsSmdQYldF?=
- =?utf-8?B?VUNHcmdhNXgrNGNiQUpyN0NKeG5JN1h2a0Y3OElIbFk1RHNBTUVIL29mVk1Z?=
- =?utf-8?B?TTBaMVdXU2Rsd3ZVdHZ6OHRWSWRiRDBKQU51KzFvNWJiYlpWMlZaYmlZU1ZS?=
- =?utf-8?B?SXpDbU51TU9OZjdyb1kzYzB6UDZodlBmdDN1d091ajg1azU3aDdhYW1SakRr?=
- =?utf-8?B?M1M1UWhBWndSMDl2RThhVmJYSWRzS2lZa2lIZlFsMitsUzFHUmc3OXJsc0Rq?=
- =?utf-8?B?dU1jWFZHRkxrTWxqTjN4eEJoSXJNQnpnMHZud2xpRDR2M2R3YVM5VkxVSnpw?=
- =?utf-8?B?b20rZXppK1gxaTgvMWZFdDkyOWo1V2VSKzhiNmRMVTFCTDFuTUZuaUl6YTFm?=
- =?utf-8?B?QVBPY2ltcXp6T2c3Q2pBa3d5NGtjcDZ0cXNweHpRaVFPRGR4QkdVanRseS9H?=
- =?utf-8?B?R0pBdmVDNkFGamFPNWQ5T1BsRElmeWIwV3VDVitOU2MwWXE5Ui95aXRybWs4?=
- =?utf-8?B?ZERtSmJhVU55T1BreGJOMXZlSmZvU1JFaUhZTWl1MlVMRWp5eDVGZWM0cFZ1?=
- =?utf-8?B?SEhrREMwYW9yRzdqOTV1QUp2a0NsaXZWTjBEcGZNUDJLNDBudko5akZHbWhy?=
- =?utf-8?B?bHpzMnNvU3c0N1NCbFRNZE8xWFhqb1pKWlpzaHEyQTdla2hiSXVYUm80MXVa?=
- =?utf-8?B?MkVUTHJIeXF2akZlaHova1VFSkpUQkxPZFRiL2o0S29JRDlBME9aMTRYeEJK?=
- =?utf-8?B?ZGN5MzRmbHQvUU4rUTdvK0xzOENWNXJYQUNTNDFLT0h1cFdmbUtYTDVvRUVM?=
- =?utf-8?B?MjNyMXFGelNFeCs3OW1EczhIek9xcGQ1b0xBK2Z5OXF2OXd4WG9RWXdodk5h?=
- =?utf-8?B?Ui96UTJnc0ZVaFM5cTFkcm9jTGllL1RVbDFnNmJhVVpxbWtXQzU2RzZnM1h4?=
- =?utf-8?B?T05ySWczdDd3VnFtN05YQm80NnB2RHMzT3d1dEJIcHY5UTRJOU5tVE15OXI3?=
- =?utf-8?B?eXo0YjdTNk93a0tvS3N0ME9lUUdnZnptU2xiMjd3R1pTc1JBSGYzc1lzWkVv?=
- =?utf-8?B?Uk9ZdjZhZlQwUmtLaHZaSDd6WWRZSmlVcVFVQkpxc1Nickdzd1l2aVBkdkEr?=
- =?utf-8?B?RWV3STQ0c3RVS2wrQjNGTWtPTVFzQTJpVlJKcEEvcmdUdmhLeGRva0I0Qytu?=
- =?utf-8?Q?Ns92dyJQQgPDKnZ1YYBxWhnW8?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR21MB1335.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6d6fb674-0db6-486c-def6-08db115b7949
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Feb 2023 02:54:37.7169
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Iey+ZKVKQZoStsThfEpmg65+yUWAku8hlEYEcSP52QjRUuQ/jdjHwNLKVQl7J0X6f+6un/RFzPM66osHtkvnWA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR21MB3303
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_PASS,SPF_NONE autolearn=no
+        with ESMTP id S229506AbjBRDXT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Feb 2023 22:23:19 -0500
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DD1D40E1
+        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 19:23:17 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-53655de27a1so31652507b3.14
+        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 19:23:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=6ZCewEQd5vkrfkBY2DqxPlegfMd8h8RpUWFewGb6TNE=;
+        b=OBOyWFM3UWZshRFcdEI8eXdPQ7ySSC7HX1+ng0wa520fiO2Ck958GcKHv2qlHnShDg
+         8rUfqT4WxStsnN9ZMYno1keUPh5imI8ccZXm0LPPEPetdeFsjcVm78GsG4PoUIdn4po3
+         /PWnVfUt3Qpou+PePKrTnRbDZxkYyMLnAPpuZno7ApJmEtxt9URTowjmLF0PfMUah/B+
+         EsZTJhjSQnnaAdXCMFtuMgE4vlgGM1veSPaoaAOVOk+WJGDmxzx6sLlZ+7sJ9qocjRgi
+         7lT0D1+UPM4x4C37+KuUKfWGtJlMilnvjJeRv9KsPwUAfg+45z26HqKIjln42V6NLE9z
+         6tWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6ZCewEQd5vkrfkBY2DqxPlegfMd8h8RpUWFewGb6TNE=;
+        b=QnE0wL+nSXis4tcDBtcyvdoNStsYx5PLETf9aIwjQa3fWpjTxUhzu3EagFoB8VBq+f
+         itsWLqvQyzMKDqZXhNhY0CkFfcxemeu+Ua3kexgn9SoGvWX8ckcNQ5I6p9b4JCHhLZw6
+         Qcnv4nfCvOwwmqk1od+j6bY31jODnXbPpaRbcIKVASJPACGvwRYDIqxOoSXNcOQO2nqv
+         1oeGk9lTY5QrXs7A3HWBILRCYjyQCcE54mlsRKKecegNiXZsaQanmJZsnuTIhOTSh7vw
+         xH9i7DGUdmKsJ3lsxz2FYeSK9WPKBCNqJlq/wzXl4+mE7xzfOvbsCu904bJg9rCaM0hX
+         +sAQ==
+X-Gm-Message-State: AO0yUKWXAa3wVGPGFhUWlBB0hX7c2G6Bi9heDHF88DvsIn7W3Y8x0sY5
+        afdpC4PLc19mKT6alSBWk70LP9595rbi3Q==
+X-Google-Smtp-Source: AK7set8Tzb4cDOmF3DwYg8AHLy80Sr/Fr7dsKCFTsx7gFJABRL91kzR0pbdmZRBHPfoWgK5vzeDY5jc+UKBvTA==
+X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
+ (user=ricarkol job=sendgmr) by 2002:a81:8606:0:b0:52e:e6ed:308e with SMTP id
+ w6-20020a818606000000b0052ee6ed308emr1258183ywf.526.1676690596794; Fri, 17
+ Feb 2023 19:23:16 -0800 (PST)
+Date:   Sat, 18 Feb 2023 03:23:02 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.2.637.g21b0678d19-goog
+Message-ID: <20230218032314.635829-1-ricarkol@google.com>
+Subject: [PATCH v4 00/12] Implement Eager Page Splitting for ARM
+From:   Ricardo Koller <ricarkol@google.com>
+To:     pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
+        yuzenghui@huawei.com, dmatlack@google.com
+Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
+        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
+        rananta@google.com, bgardon@google.com, ricarkol@gmail.com,
+        Ricardo Koller <ricarkol@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -138,25 +70,201 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBGcm9tOiBKZXJlbWkgUGlvdHJvd3NraSA8anBpb3Ryb3dza2lAbGludXgubWljcm9zb2Z0LmNv
-bT4NCj4gU2VudDogRnJpZGF5LCBGZWJydWFyeSAxNywgMjAyMyA0OjUxIEFNDQo+IFRvOiBEZXh1
-YW4gQ3VpIDxkZWN1aUBtaWNyb3NvZnQuY29tPg0KPiA+IFsuLi5dDQo+ID4gVGhlIGNvbW1lbnQg
-YmVmb3JlIHRoZSBmaXJzdCBicmFuY2ggc2F5czoNCj4gPiAgIE9uIDQtbGV2ZWwgcGFnaW5nLCBw
-NGRfb2Zmc2V0KHRvcF9sZXZlbF9wZ3QsIDApIGlzIGVxdWFsIHRvICd0b3BfbGV2ZWxfcGd0Jy4N
-Cj4gPg0KPiA+IElJVUMgdGhpcyBtZWFucyAndG9wX2xldmVsX3BndCcgaXMgZXF1YWwgdG8gJ19w
-Z3RhYmxlJz8gaS5lLiB3aXRob3V0DQo+ID4gQ09ORklHX1JBTkRPTUlaRV9CQVNFLCBwZ3RfZGF0
-YS5wZ3RfYnVmX3NpemUgc2hvdWxkIGJlIDAuDQo+ID4NCj4gPiBOb3Qgc3VyZSB3aHkgaXQncyBu
-b3QgZ2V0dGluZyBpbnRvIHRoZSBmaXJzdCBicmFuY2ggZm9yIHlvdS4NCj4gDQo+IFNvcnJ5LCBJ
-IGdvdCB0d28gdGhpbmdzIGNvbmZ1c2VkIGhlcmUuIFRoZSByZWxldmFudCBwYXJ0IG9mIHRoZSBj
-b21tZW50IGlzIHRoaXM6DQo+ICJJZiB3ZSBjYW1lIGhlcmUgdmlhIHN0YXJ0dXBfMzIoKSwgY3Iz
-IHdpbGwgYmUgX3BndGFibGUgYWxyZWFkeSIuDQo+IA0KPiBCb290aW5nIGEgKG5vbi1TTlApIGd1
-ZXN0IHZpYSBCSU9TIEkgZW5kIHVwIGluIHRoZSBmaXJzdCBicmFuY2guIFVwc3RyZWFtIFNOUA0K
-PiBzdXBwb3J0IHJlcXVpcmVzIE9WTUYgKFVFRkkpIHNvIHdlJ2xsIGFsd2F5cyByZWFjaCB0aGUg
-a2VybmVsIGluIDY0LWJpdCBtb2RlDQo+IChzdGFydHVwXzY0PyksIGFuZCBlbmQgdXAgaW4gdGhl
-IHNlY29uZCBicmFuY2guDQo+IA0KPiBKZXJlbWkNCg0KSGVyZSBJJ20gcnVubmluZyBhIEMtYml0
-IG1vZGUgU05QIGd1ZXN0IG9uIEh5cGVyLVYgdmlhICJkaXJlY3QtYm9vdCIgKGkuZS4gDQpJIHJ1
-biBTZXQtVk1GaXJtd2FyZSB0byB0ZWxsIEh5cGVyLVYgdG8gYm9vdCB0aGUga2VybmVsIGRpcmVj
-dGx5IHdpdGhvdXQNClVFRkkpLiBMb29rcyBsaWtlIGFyY2gveDg2L2Jvb3QvY29tcHJlc3NlZC9o
-ZWFkXzY0LlM6IHN0YXJ0dXBfMzIgcnVucw0KZmlyc3QgYW5kIGNhbGxzIHN0YXJ0dXBfNjQgbGF0
-ZXIgKD8pIFRoaXMgbWlnaHQgZXhwbGFpbiB3aHkgSSdtIGdldHRpbmcgaW50bw0KdGhlIGZpcnN0
-IGJyYW5jaCwgd2hpY2ggSSBob3BlIGNvdWxkIGJlIGZpeGVkIGJ5IHNvbWVvbmUuLi4NCg==
+Eager Page Splitting improves the performance of dirty-logging (used
+in live migrations) when guest memory is backed by huge-pages.  It's
+an optimization used in Google Cloud since 2016 on x86, and for the
+last couple of months on ARM.
+
+Background and motivation
+=========================
+Dirty logging is typically used for live-migration iterative copying.
+KVM implements dirty-logging at the PAGE_SIZE granularity (will refer
+to 4K pages from now on).  It does it by faulting on write-protected
+4K pages.  Therefore, enabling dirty-logging on a huge-page requires
+breaking it into 4K pages in the first place.  KVM does this breaking
+on fault, and because it's in the critical path it only maps the 4K
+page that faulted; every other 4K page is left unmapped.  This is not
+great for performance on ARM for a couple of reasons:
+
+- Splitting on fault can halt vcpus for milliseconds in some
+  implementations. Splitting a block PTE requires using a broadcasted
+  TLB invalidation (TLBI) for every huge-page (due to the
+  break-before-make requirement). Note that x86 doesn't need this. We
+  observed some implementations that take millliseconds to complete
+  broadcasted TLBIs when done in parallel from multiple vcpus.  And
+  that's exactly what happens when doing it on fault: multiple vcpus
+  fault at the same time triggering TLBIs in parallel.
+
+- Read intensive guest workloads end up paying for dirty-logging.
+  Only mapping the faulting 4K page means that all the other pages
+  that were part of the huge-page will now be unmapped. The effect is
+  that any access, including reads, now has to fault.
+
+Eager Page Splitting (on ARM)
+=============================
+Eager Page Splitting fixes the above two issues by eagerly splitting
+huge-pages when enabling dirty logging. The goal is to avoid doing it
+while faulting on write-protected pages. This is what the TDP MMU does
+for x86 [0], except that x86 does it for different reasons: to avoid
+grabbing the MMU lock on fault. Note that taking care of
+write-protection faults still requires grabbing the MMU lock on ARM,
+but not on x86 (with the fast_page_fault path).
+
+An additional benefit of eagerly splitting huge-pages is that it can
+be done in a controlled way (e.g., via an IOCTL). This series provides
+two knobs for doing it, just like its x86 counterpart: when enabling
+dirty logging, and when using the KVM_CLEAR_DIRTY_LOG ioctl. The
+benefit of doing it on KVM_CLEAR_DIRTY_LOG is that this ioctl takes
+ranges, and not complete memslots like when enabling dirty logging.
+This means that the cost of splitting (mainly broadcasted TLBIs) can
+be throttled: split a range, wait for a bit, split another range, etc.
+The benefits of this approach were presented by Oliver Upton at KVM
+Forum 2022 [1].
+
+Implementation
+==============
+Patches 3-4 add a pgtable utility function for splitting huge block
+PTEs: kvm_pgtable_stage2_split(). Patches 5-9 add support for eagerly
+splitting huge-pages when enabling dirty-logging and when using the
+KVM_CLEAR_DIRTY_LOG ioctl. Note that this is just like what x86 does,
+and the code is actually based on it.  And finally, patch 9:
+
+	KVM: arm64: Use local TLBI on permission relaxation
+
+adds support for using local TLBIs instead of broadcasts when doing
+permission relaxation. This last patch is key to achieving good
+performance during dirty-logging, as eagerly breaking huge-pages
+replaces mapping new pages with permission relaxation. Got this patch
+(indirectly) from Marc Z.  and took the liberty of adding a commit
+message.
+
+Note: this applies on top of 6.2-rc6.
+
+Performance evaluation
+======================
+The performance benefits were tested using the dirty_log_perf_test
+selftest with 2M huge-pages.
+
+The first test uses a write-only sequential workload where the stride
+is 2M instead of 4K [2]. The idea with this experiment is to emulate a
+random access pattern writing a different huge-page at every access.
+Observe that the benefit increases with the number of vcpus: up to
+5.76x for 152 vcpus. This table shows the guest dirtying time when
+using the CLEAR ioctl (and KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2):
+
+/dirty_log_perf_test_sparse -s anonymous_hugetlb_2mb -b 1G -v $i -i 3 -m 2
+
+	+-------+----------+------------------+
+	| vCPUs | 6.2-rc3  | 6.2-rc3 + series |
+	|       |    (ms)  |             (ms) |
+	+-------+----------+------------------+
+	|    1  |    2.63  |          1.66    |
+	|    2  |    2.95  |          1.70    |
+	|    4  |    3.21  |          1.71    |
+	|    8  |    4.97  |          1.78    |
+	|   16  |    9.51  |          1.82    |
+	|   32  |   20.15  |          3.03    |
+	|   64  |   40.09  |          5.80    |
+	|  128  |   80.08  |         12.24    |
+	|  152  |  109.81  |         15.14    |
+	+-------+----------+------------------+
+
+This secondv test measures the benefit of eager page splitting on read
+intensive workloads (1 write for every 10 reads). As in the other
+test, the benefit increases with the number of vcpus, up to 8.82x for
+152 vcpus. This table shows the guest dirtying time when using the
+CLEAR ioctl (and KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2):
+
+./dirty_log_perf_test -s anonymous_hugetlb_2mb -b 1G -v $i -i 3 -m 2 -w 10
+
+	+-------+----------+------------------+
+	| vCPUs | 6.2-rc3  | 6.2-rc3 + series |
+	|       |   (sec)  |            (sec) |
+	+-------+----------+------------------+
+	|    1  |    0.65  |          0.07    |
+	|    2  |    0.70  |          0.08    |
+	|    4  |    0.71  |          0.08    |
+	|    8  |    0.72  |          0.08    |
+	|   16  |    0.76  |          0.08    |
+	|   32  |    1.61  |          0.14    |
+	|   64  |    3.46  |          0.30    |
+	|  128  |    5.49  |          0.64    |
+	|  152  |    6.44  |          0.63    |
+	+-------+----------+------------------+
+
+Changes from v3:
+https://lore.kernel.org/kvmarm/20230215174046.2201432-1-ricarkol@google.com/
+- KVM_PGTABLE_WALK_SKIP_CMO to use BIT(5). (Shaoqin)
+- Rewritten commit message for "Rename free_unlinked to free_removed"
+  using Oliver's suggestion. (Oliver)
+- "un" -> "an" typo. (Shaoqin)
+- kvm_pgtable_stage2_create_unlinked() to return a "kvm_pte_t *". (Oliver)
+- refactored stage2_block_get_nr_page_tables(). (Oliver)
+- /s/bock/block. (Shaoqin)
+
+Changes from v2:
+https://lore.kernel.org/kvmarm/20230206165851.3106338-1-ricarkol@google.com/
+- removed redundant kvm_pte_table() check from split walker function. (Gavin)
+- fix compilation of patch 8 by moving some definitions from path 9. (Gavin)
+- add comment for kvm_mmu_split_nr_page_tables(). (Gavin)
+
+Changes from v1:
+https://lore.kernel.org/kvmarm/20230113035000.480021-1-ricarkol@google.com/
+- added a capability to set the eager splitting chunk size. This
+  indirectly sets the number of pages in the cache. It also allows for
+  opting out of this feature. (Oliver, Marc)
+- changed kvm_pgtable_stage2_split() to split 1g huge-pages
+  using either 513 or 1 at a time (with a cache of 1). (Oliver, Marc)
+- added force_pte arg to kvm_pgtable_stage2_create_removed().
+- renamed free_removed to free_unlinked. (Ben and Oliver)
+- added KVM_PGTABLE_WALK ctx->flags for skipping BBM and CMO, instead
+  of KVM_PGTABLE_WALK_REMOVED. (Oliver)
+
+Changes from the RFC:
+https://lore.kernel.org/kvmarm/20221112081714.2169495-1-ricarkol@google.com/
+- dropped the changes to split on POST visits. No visible perf
+  benefit.
+- changed the kvm_pgtable_stage2_free_removed() implementation to
+  reuse the stage2 mapper.
+- dropped the FEAT_BBM changes and optimization. Will send this on a
+  different series.
+
+Thanks,
+Ricardo
+
+Marc Zyngier (1):
+  KVM: arm64: Use local TLBI on permission relaxation
+
+Ricardo Koller (11):
+  KVM: arm64: Add KVM_PGTABLE_WALK ctx->flags for skipping BBM and CMO
+  KVM: arm64: Rename free_unlinked to free_removed
+  KVM: arm64: Add helper for creating unlinked stage2 subtrees
+  KVM: arm64: Add kvm_pgtable_stage2_split()
+  KVM: arm64: Refactor kvm_arch_commit_memory_region()
+  KVM: arm64: Add kvm_uninit_stage2_mmu()
+  KVM: arm64: Export kvm_are_all_memslots_empty()
+  KVM: arm64: Add KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+  KVM: arm64: Split huge pages when dirty logging is enabled
+  KVM: arm64: Open-code kvm_mmu_write_protect_pt_masked()
+  KVM: arm64: Split huge pages during KVM_CLEAR_DIRTY_LOG
+
+ Documentation/virt/kvm/api.rst        |  26 ++++
+ arch/arm64/include/asm/kvm_asm.h      |   4 +
+ arch/arm64/include/asm/kvm_host.h     |  19 +++
+ arch/arm64/include/asm/kvm_mmu.h      |   1 +
+ arch/arm64/include/asm/kvm_pgtable.h  |  84 ++++++++++-
+ arch/arm64/kvm/arm.c                  |  22 +++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c    |  10 ++
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c |   6 +-
+ arch/arm64/kvm/hyp/nvhe/tlb.c         |  54 +++++++
+ arch/arm64/kvm/hyp/pgtable.c          | 194 ++++++++++++++++++++++++--
+ arch/arm64/kvm/hyp/vhe/tlb.c          |  32 +++++
+ arch/arm64/kvm/mmu.c                  | 188 +++++++++++++++++++++----
+ include/linux/kvm_host.h              |   2 +
+ include/uapi/linux/kvm.h              |   1 +
+ virt/kvm/kvm_main.c                   |   2 +-
+ 15 files changed, 591 insertions(+), 54 deletions(-)
+
+-- 
+2.39.2.637.g21b0678d19-goog
+
