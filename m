@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1000369B7E7
-	for <lists+kvm@lfdr.de>; Sat, 18 Feb 2023 04:23:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 343FB69B7E8
+	for <lists+kvm@lfdr.de>; Sat, 18 Feb 2023 04:23:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229679AbjBRDXZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Feb 2023 22:23:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33240 "EHLO
+        id S229724AbjBRDX2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Feb 2023 22:23:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229506AbjBRDXX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Feb 2023 22:23:23 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A77F21A951
-        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 19:23:22 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id b15-20020a252e4f000000b008ee1c76c25dso2407024ybn.11
-        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 19:23:22 -0800 (PST)
+        with ESMTP id S229687AbjBRDXZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Feb 2023 22:23:25 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35EA61422D
+        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 19:23:24 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id o14-20020a25810e000000b0095d2ada3d26so2133497ybk.5
+        for <kvm@vger.kernel.org>; Fri, 17 Feb 2023 19:23:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IPKuIrgtmaUvnSQsSTqJdSngfJOw0G5AsmYHjfQDA+w=;
-        b=Df1ZtaZZDKkMQcinUaB82zEycAOToO5IWYefHKGUwkjpNvaM1eFEGTH2JKXaM97RQt
-         sx1LAS0HYD0+iSqWZcKnhakihEd2vR85fH8b49cYd0v+AA9ePg1fKRrR0gpqHBVux4PU
-         VkvWLwg+lL6aTRSvNvchziRnyznLen1sTUgeyF1d+m/BgCbUGc5YcNc4+c0ajIH4O7AT
-         MHr8N9LGGxyxeUIQRRZH46vZzLEyQ4UknI8YAMpZIZfh3ULGNzMcUtJ9JYqS0eQcqm6W
-         9UB5p+qLsKYq7yvsplYerlWZjYcdw4Jt1oO2R/4z6Mog8AVlsFoE/pTbqsqySH1rwXMK
-         YWPA==
+        bh=sWl8r2vGcb6fsDM+UiT1aLTOtpAnLts9h5IrkrEYugA=;
+        b=Kltg1Qd9h6AL9AG4oBeoxQOUxL3J93hRT0ksFS8TFi6GLUvjhAFfQGq0+N7V+8WCSA
+         JOpkgEt2B5PaAPuMND3GpXYtuUAUO2NZUbBIZFZ0lJ1Ie4Cld/XG2Pj8t5mIgh6mCr3V
+         CBubLCCONIwwzGdlZX3T+sitdQF8j8Jwdp7QBe4mkhAEruK3CQhc+64EtgovaLxVK9kx
+         z6gapwP+KjR3Bo+jkj8wDTs9UDNaJ74Ny279ufBfDMNDqUbRuU2WDtItroIJPM6XpZfU
+         q6ojQHoXiiq7YcrqA2un1ibuBTYsvluXHoP4RzK5wzDCS1Qz6WK/aVyyBvMZFMcl1uBI
+         vZpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IPKuIrgtmaUvnSQsSTqJdSngfJOw0G5AsmYHjfQDA+w=;
-        b=ABKkVEaxoSCZcsFYPd9V3zbBqcBpmC+2l/9O0hfeT7iU3+G8HpmTsvYUd2ezpmKH8m
-         TQNgBmREeYLTGBURDhnJlKArZE8pY+uMstB/FKaHcCAw8z4IDlT59hMHMbiee3I3JjEg
-         /TMQucP3f0E/1ZkTDrQdWi1iL8odpNCcZZ+YhkfhZiRW92nWVtVlZ0wIA9oY0MqWIU3+
-         5WOz3C9eUUvbHfjtqh/pAHoUfFhNMBFIUxkktnbMbGhPz5jyito5dW5weNiOof/3B6vy
-         3p+T6EXjMtbsD2o+gEpqyf0P5MHmQhwGYnjXBj+D3WSLSyi+w9WD87k7NIr0h6TOpTIc
-         MhJg==
-X-Gm-Message-State: AO0yUKVOeon+I8s59B5A1dthtFy+jEQaO1J6Y5wwv0UecdmwF8GqY3b0
-        j/Z2Ip2Ljd9TYk51z1gtytwUUeAKNuOZRQ==
-X-Google-Smtp-Source: AK7set+LpHmmkgDl+/xDHOC/PKsWo6xoTJCTFIX3caU3Y29wflPl4vB0beoWr8mP2hw10HMmU41BpbJMuaJfwA==
+        bh=sWl8r2vGcb6fsDM+UiT1aLTOtpAnLts9h5IrkrEYugA=;
+        b=oWbZGmWaeBshtscn7NsjamgvlmDzCV/ewLKk1BJ64i64doeeMOeACmS4j0H6pcYi9r
+         HRumLaCmOLF8dcYQXdtoo81uzeWjY8NGxurvXuQtdkIghVoHRBAcalA03iuY0H54l2Ip
+         JfQY6WEacn5CoVVdpCdUDtkviZvbY+SOrJKPlqr6MXyHygv6kidF0nnljrSUwKGHE3uE
+         VZpJsOQr9yHMfZCN+N0ACtj/u6woXqZOWu9PaK7XFSMg6gz1x/51vM4poSZbT+Bwywrj
+         C7s5UeQ5c8uCQdMdTAchR/Zx+T1edEE6WYBBcHwAaZCpsY/TADFTDTKDDQbjgQH4Y79H
+         8sbw==
+X-Gm-Message-State: AO0yUKWnvw3RnEI25UK9SiG6ccklKk8IGTfaqaBj7L43fHanJd69osrb
+        UcESlQDTRPtUqYiq00ZDnDMAPZlE3DeWsg==
+X-Google-Smtp-Source: AK7set+b3N/Tt0sdPcR8K3f0xGAIaPQ87xNO0k/s0lLwPfYU1eTcY3bTamWct8qMgH8g6KiEtD25b1QgPkuB/Q==
 X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a81:7b02:0:b0:52e:d589:c893 with SMTP id
- w2-20020a817b02000000b0052ed589c893mr1411708ywc.457.1676690601872; Fri, 17
- Feb 2023 19:23:21 -0800 (PST)
-Date:   Sat, 18 Feb 2023 03:23:05 +0000
+ (user=ricarkol job=sendgmr) by 2002:a05:6902:10e:b0:95d:6b4f:a73a with SMTP
+ id o14-20020a056902010e00b0095d6b4fa73amr28018ybh.8.1676690603463; Fri, 17
+ Feb 2023 19:23:23 -0800 (PST)
+Date:   Sat, 18 Feb 2023 03:23:06 +0000
 In-Reply-To: <20230218032314.635829-1-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20230218032314.635829-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.39.2.637.g21b0678d19-goog
-Message-ID: <20230218032314.635829-4-ricarkol@google.com>
-Subject: [PATCH v4 03/12] KVM: arm64: Add helper for creating unlinked stage2 subtrees
+Message-ID: <20230218032314.635829-5-ricarkol@google.com>
+Subject: [PATCH v4 04/12] KVM: arm64: Add kvm_pgtable_stage2_split()
 From:   Ricardo Koller <ricarkol@google.com>
 To:     pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
         yuzenghui@huawei.com, dmatlack@google.com
@@ -72,120 +72,187 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a stage2 helper, kvm_pgtable_stage2_create_unlinked(), for
-creating unlinked tables (which is the opposite of
-kvm_pgtable_stage2_free_unlinked()).  Creating an unlinked table is
-useful for splitting PMD and PUD blocks into subtrees of PAGE_SIZE
-PTEs.  For example, a PUD can be split into PAGE_SIZE PTEs by first
-creating a fully populated tree, and then use it to replace the PUD in
-a single step.  This will be used in a subsequent commit for eager
-huge-page splitting (a dirty-logging optimization).
+Add a new stage2 function, kvm_pgtable_stage2_split(), for splitting a
+range of huge pages. This will be used for eager-splitting huge pages
+into PAGE_SIZE pages. The goal is to avoid having to split huge pages
+on write-protection faults, and instead use this function to do it
+ahead of time for large ranges (e.g., all guest memory in 1G chunks at
+a time).
 
 No functional change intended. This new function will be used in a
 subsequent commit.
 
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- arch/arm64/include/asm/kvm_pgtable.h | 28 +++++++++++++++++
- arch/arm64/kvm/hyp/pgtable.c         | 46 ++++++++++++++++++++++++++++
- 2 files changed, 74 insertions(+)
+ arch/arm64/include/asm/kvm_pgtable.h |  30 +++++++
+ arch/arm64/kvm/hyp/pgtable.c         | 113 +++++++++++++++++++++++++++
+ 2 files changed, 143 insertions(+)
 
 diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index dcd3aafd3e6c..b8cde914cca9 100644
+index b8cde914cca9..6908109ac11e 100644
 --- a/arch/arm64/include/asm/kvm_pgtable.h
 +++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -460,6 +460,34 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
+@@ -657,6 +657,36 @@ bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr);
   */
- void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level);
+ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size);
  
 +/**
-+ * kvm_pgtable_stage2_create_unlinked() - Create an unlinked stage-2 paging structure.
-+ * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
-+ * @phys:	Physical address of the memory to map.
-+ * @level:	Starting level of the stage-2 paging structure to be created.
-+ * @prot:	Permissions and attributes for the mapping.
-+ * @mc:		Cache of pre-allocated and zeroed memory from which to allocate
-+ *		page-table pages.
-+ * @force_pte:  Force mappings to PAGE_SIZE granularity.
++ * kvm_pgtable_stage2_split() - Split a range of huge pages into leaf PTEs pointing
++ *				to PAGE_SIZE guest pages.
++ * @pgt:	 Page-table structure initialised by kvm_pgtable_stage2_init().
++ * @addr:	 Intermediate physical address from which to split.
++ * @size:	 Size of the range.
++ * @mc:		 Cache of pre-allocated and zeroed memory from which to allocate
++ *		 page-table pages.
++ * @mc_capacity: Number of pages in @mc.
 + *
-+ * Create an unlinked page-table tree under @new. If @force_pte is
-+ * true or @level is 2 (the PMD level), then the tree is mapped up to
-+ * the PAGE_SIZE leaf PTE; the tree is mapped up one level otherwise.
-+ * This new page-table tree is not reachable (i.e., it is unlinked)
-+ * from the root pgd and it's therefore unreachableby the hardware
-+ * page-table walker. No TLB invalidation or CMOs are performed.
++ * @addr and the end (@addr + @size) are effectively aligned down and up to
++ * the top level huge-page block size. This is an example using 1GB
++ * huge-pages and 4KB granules.
 + *
-+ * If device attributes are not explicitly requested in @prot, then the
-+ * mapping will be normal, cacheable.
++ *                          [---input range---]
++ *                          :                 :
++ * [--1G block pte--][--1G block pte--][--1G block pte--][--1G block pte--]
++ *                          :                 :
++ *                   [--2MB--][--2MB--][--2MB--][--2MB--]
++ *                          :                 :
++ *                   [ ][ ][:][ ][ ][ ][ ][ ][:][ ][ ][ ]
++ *                          :                 :
 + *
-+ * Return: The fully populated (unlinked) stage-2 paging structure, or
-+ * an ERR_PTR(error) on failure.
++ * Return: 0 on success, negative error code on failure. Note that
++ * kvm_pgtable_stage2_split() is best effort: it tries to break as many
++ * blocks in the input range as allowed by @mc_capacity.
 + */
-+kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
-+					      u64 phys, u32 level,
-+					      enum kvm_pgtable_prot prot,
-+					      void *mc, bool force_pte);
++int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
++			     void *mc, u64 mc_capacity);
 +
  /**
-  * kvm_pgtable_stage2_map() - Install a mapping in a guest stage-2 page-table.
-  * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
+  * kvm_pgtable_walk() - Walk a page-table.
+  * @pgt:	Page-table structure initialised by kvm_pgtable_*_init().
 diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 0a5ef9288371..80f2965ab0fe 100644
+index 80f2965ab0fe..9f1c8fdd9330 100644
 --- a/arch/arm64/kvm/hyp/pgtable.c
 +++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -1181,6 +1181,52 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
- 	return kvm_pgtable_walk(pgt, addr, size, &walker);
+@@ -1228,6 +1228,119 @@ kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
+ 	return pgtable;
  }
  
-+kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
-+					      u64 phys, u32 level,
-+					      enum kvm_pgtable_prot prot,
-+					      void *mc, bool force_pte)
++struct stage2_split_data {
++	struct kvm_s2_mmu		*mmu;
++	void				*memcache;
++	u64				mc_capacity;
++};
++
++/*
++ * Get the number of page-tables needed to replace a block with a
++ * fully populated tree, up to the PTE level, at particular level.
++ */
++static inline int stage2_block_get_nr_page_tables(u32 level)
 +{
-+	struct stage2_map_data map_data = {
-+		.phys		= phys,
-+		.mmu		= pgt->mmu,
-+		.memcache	= mc,
-+		.force_pte	= force_pte,
-+	};
-+	struct kvm_pgtable_walker walker = {
-+		.cb		= stage2_map_walker,
-+		.flags		= KVM_PGTABLE_WALK_LEAF |
-+				  KVM_PGTABLE_WALK_SKIP_BBM |
-+				  KVM_PGTABLE_WALK_SKIP_CMO,
-+		.arg		= &map_data,
-+	};
-+	/* .addr (the IPA) is irrelevant for a removed table */
-+	struct kvm_pgtable_walk_data data = {
-+		.walker	= &walker,
-+		.addr	= 0,
-+		.end	= kvm_granule_size(level),
-+	};
-+	struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
-+	kvm_pte_t *pgtable;
-+	int ret;
++	if (WARN_ON_ONCE(level < KVM_PGTABLE_MIN_BLOCK_LEVEL ||
++			 level >= KVM_PGTABLE_MAX_LEVELS))
++		return -EINVAL;
 +
-+	ret = stage2_set_prot_attr(pgt, prot, &map_data.attr);
-+	if (ret)
-+		return ERR_PTR(ret);
++	switch (level) {
++	case 1:
++		return PTRS_PER_PTE + 1;
++	case 2:
++		return 1;
++	case 3:
++		return 0;
++	default:
++		return -EINVAL;
++	};
++}
 +
-+	pgtable = mm_ops->zalloc_page(mc);
-+	if (!pgtable)
-+		return ERR_PTR(-ENOMEM);
++static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
++			       enum kvm_pgtable_walk_flags visit)
++{
++	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
++	struct stage2_split_data *data = ctx->arg;
++	kvm_pte_t pte = ctx->old, new, *childp;
++	enum kvm_pgtable_prot prot;
++	void *mc = data->memcache;
++	u32 level = ctx->level;
++	bool force_pte;
++	int nr_pages;
++	u64 phys;
 +
-+	ret = __kvm_pgtable_walk(&data, mm_ops, (kvm_pteref_t)pgtable,
-+				 level + 1);
-+	if (ret) {
-+		kvm_pgtable_stage2_free_unlinked(mm_ops, pgtable, level);
-+		mm_ops->put_page(pgtable);
-+		return ERR_PTR(ret);
++	/* No huge-pages exist at the last level */
++	if (level == KVM_PGTABLE_MAX_LEVELS - 1)
++		return 0;
++
++	/* We only split valid block mappings */
++	if (!kvm_pte_valid(pte))
++		return 0;
++
++	nr_pages = stage2_block_get_nr_page_tables(level);
++	if (nr_pages < 0)
++		return nr_pages;
++
++	if (data->mc_capacity >= nr_pages) {
++		/* Build a tree mapped down to the PTE granularity. */
++		force_pte = true;
++	} else {
++		/*
++		 * Don't force PTEs. This requires a single page of PMDs at the
++		 * PUD level, or a single page of PTEs at the PMD level. If we
++		 * are at the PUD level, the PTEs will be created recursively.
++		 */
++		force_pte = false;
++		nr_pages = 1;
 +	}
 +
-+	return pgtable;
++	if (data->mc_capacity < nr_pages)
++		return -ENOMEM;
++
++	phys = kvm_pte_to_phys(pte);
++	prot = kvm_pgtable_stage2_pte_prot(pte);
++
++	childp = kvm_pgtable_stage2_create_unlinked(data->mmu->pgt, phys,
++						    level, prot, mc, force_pte);
++	if (IS_ERR(childp))
++		return PTR_ERR(childp);
++
++	if (!stage2_try_break_pte(ctx, data->mmu)) {
++		kvm_pgtable_stage2_free_unlinked(mm_ops, childp, level);
++		mm_ops->put_page(childp);
++		return -EAGAIN;
++	}
++
++	/*
++	 * Note, the contents of the page table are guaranteed to be made
++	 * visible before the new PTE is assigned because stage2_make_pte()
++	 * writes the PTE using smp_store_release().
++	 */
++	new = kvm_init_table_pte(childp, mm_ops);
++	stage2_make_pte(ctx, new);
++	dsb(ishst);
++	data->mc_capacity -= nr_pages;
++	return 0;
 +}
- 
++
++int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
++			     void *mc, u64 mc_capacity)
++{
++	struct stage2_split_data split_data = {
++		.mmu		= pgt->mmu,
++		.memcache	= mc,
++		.mc_capacity	= mc_capacity,
++	};
++
++	struct kvm_pgtable_walker walker = {
++		.cb	= stage2_split_walker,
++		.flags	= KVM_PGTABLE_WALK_LEAF,
++		.arg	= &split_data,
++	};
++
++	return kvm_pgtable_walk(pgt, addr, size, &walker);
++}
++
  int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
  			      struct kvm_pgtable_mm_ops *mm_ops,
+ 			      enum kvm_pgtable_stage2_flags flags,
 -- 
 2.39.2.637.g21b0678d19-goog
 
