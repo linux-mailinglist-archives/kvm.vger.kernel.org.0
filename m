@@ -2,120 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D910D69C1AE
-	for <lists+kvm@lfdr.de>; Sun, 19 Feb 2023 18:25:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0FA4169C1C1
+	for <lists+kvm@lfdr.de>; Sun, 19 Feb 2023 18:57:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231200AbjBSRZS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 19 Feb 2023 12:25:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51534 "EHLO
+        id S231214AbjBSR5P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 19 Feb 2023 12:57:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231196AbjBSRZR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 19 Feb 2023 12:25:17 -0500
-X-Greylist: delayed 32510 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 19 Feb 2023 09:25:13 PST
-Received: from mailgate64.posindonesia.co.id (mailgate64.posindonesia.co.id [103.146.135.223])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 721F412F38
-        for <kvm@vger.kernel.org>; Sun, 19 Feb 2023 09:25:13 -0800 (PST)
-Received: from mailgate64.posindonesia.co.id (localhost [127.0.0.1])
-        by mailgate64.posindonesia.co.id (Proxmox) with ESMTP id B06AE3A4E99
-        for <kvm@vger.kernel.org>; Sun, 19 Feb 2023 23:47:04 +0700 (WIB)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        posindonesia.co.id; h=cc:content-description
-        :content-transfer-encoding:content-type:content-type:date:from
-        :from:message-id:mime-version:reply-to:reply-to:subject:subject
-        :to:to; s=posindonesia-mailgate64; bh=649KiAmEK3EsGtBHbs/5MjwXT8
-        2WL00ODocS4Zkoqks=; b=WASVhP7gbCjxb5pcMJI61VLCZZe5GxDz64y/Ngcq6C
-        cFRFVA+50jpdNferPovPikmJdgxHJQUXuhqSlotHynLho+/SjWlZPEySaGjUVKyl
-        Xg4mnaxxk943SGkWpoQfdsKPAvPSGj6Kshb4uWTq6Zxd3v+UEBeJa1jIOAOPbQLM
-        bykoMqPdBLXG/WlMCebYZVOpzTzwdALhD2A/1xwHNf/IZtAfMuHwKjFXfJ8m8ksK
-        JkIERvdEDTG6g00ORyCVZT6QhQUaIdDf8QYZsIolhS4JYhd+Kk31MgnGrsBG6tRH
-        JL/VeD5kFnZCV+O/1/fRVF/dDq7VhAmULSLTNbialo1w==
-Received: from zmmtacloud.posindonesia.co.id (unknown [10.28.8.12])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mailgate64.posindonesia.co.id (Proxmox) with ESMTPS id 98C0E3A4CE6
-        for <kvm@vger.kernel.org>; Sun, 19 Feb 2023 23:46:40 +0700 (WIB)
-Received: from localhost (localhost [127.0.0.1])
-        by zmmtacloud.posindonesia.co.id (Postfix) with ESMTP id 344D31B6706
-        for <kvm@vger.kernel.org>; Sun, 19 Feb 2023 22:21:25 +0700 (WIB)
-Received: from zmmtacloud.posindonesia.co.id ([127.0.0.1])
-        by localhost (zmmtacloud.posindonesia.co.id [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id 17ZKbZfOA-4f for <kvm@vger.kernel.org>;
-        Sun, 19 Feb 2023 22:21:25 +0700 (WIB)
-Received: from localhost (localhost [127.0.0.1])
-        by zmmtacloud.posindonesia.co.id (Postfix) with ESMTP id 65B411B870D
-        for <kvm@vger.kernel.org>; Sun, 19 Feb 2023 22:20:39 +0700 (WIB)
-DKIM-Filter: OpenDKIM Filter v2.10.3 zmmtacloud.posindonesia.co.id 65B411B870D
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=posindonesia.co.id;
-        s=E6824E3C-11D5-11EC-B3CA-F7EF1304C619; t=1676820039;
-        bh=649KiAmEK3EsGtBHbs/5MjwXT82WL00ODocS4Zkoqks=;
-        h=MIME-Version:To:From:Date:Message-Id;
-        b=fLKt3y+iaWcXWmaDLUaTL7nWugVzhiazFDEwofxksd5Pp9rI374dpVo1IFuWu6vcu
-         /HHw+Hv5+6GLwtwfghK/nhfL63PYnfWyi+59TYjIZzqfjK02Yyk69hOgB+6luMhdxg
-         Z+GyESFm02H6hssaEtVBq7xJhXyJ4UJk1uQLuyCmtxIUAL8ukLk7yo+nxwPeNXDKIo
-         Al05IPoXVJHISuybh70hoZWSbT3FMJESnp2LWVz0necqV9H7CNYCnsa4UOg/rMY1Ii
-         sZKAzKJSf1p1ZaSM7r/ln1s93dR5Jvdhp2VVP7LQUduGQur3eKpT8p039I8dKfqjG/
-         VZ/sB1RhQDdhw==
-X-Virus-Scanned: amavisd-new at 
-Received: from zmmtacloud.posindonesia.co.id ([127.0.0.1])
-        by localhost (zmmtacloud.posindonesia.co.id [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 62EsFQ9sYoS8 for <kvm@vger.kernel.org>;
-        Sun, 19 Feb 2023 22:20:39 +0700 (WIB)
-Received: from DESKTOP-IM7P72B.lan (unknown [102.132.157.225])
-        by zmmtacloud.posindonesia.co.id (Postfix) with ESMTPSA id B44111B7964
-        for <kvm@vger.kernel.org>; Sun, 19 Feb 2023 22:19:44 +0700 (WIB)
-Content-Type: text/plain; charset="iso-8859-1"
+        with ESMTP id S231205AbjBSR5O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 19 Feb 2023 12:57:14 -0500
+Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C236D1025B
+        for <kvm@vger.kernel.org>; Sun, 19 Feb 2023 09:57:12 -0800 (PST)
+Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-5369b3f3f76so12351687b3.0
+        for <kvm@vger.kernel.org>; Sun, 19 Feb 2023 09:57:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=sscneNe11LR3WffkFyUD3z+Ja4W5fhnimf00dL+tzak=;
+        b=WftmOx8+im1S7FRJ5eHmM1GLa3IimgiHInS2RR0fhJV5qHCEX0LMJ8YmJdAiHU3R84
+         BVEJRRQz+YleupKdWZtxqzXlgvzgIfBHE91bxS8w40mxAIE9PC5fWc7r1mdAm4a3jciH
+         TLOxb2i5aBOVkmSoeb6erf2TA7JsQEqVdV2d7LcMLLTUqGCia5bfvE6ZO/nc6d9OTrmV
+         OzPT9Rwim/drYpF5ygMCVZ9UGYlDTv/I2Hn+6/wciZcgvBdcvpqpsCkMvRAogUD9jbwY
+         TRVdNkOVX4ohiTVperjU+YwvJanbdE2Qc4EzE20VsKhljdjs+hnVqOnMQ45Bnpf0x4xN
+         waBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sscneNe11LR3WffkFyUD3z+Ja4W5fhnimf00dL+tzak=;
+        b=5jma2/3gQkhOK3BN/iH32vKMdh6GxnrQfJR3bLfDvBpQcmN7IigF9ztZ99MXOEGmt1
+         AiN0wDQ5Ylr+vE/SStXjWb7IRoT+ZQj3r9MN7R6HESNCWQ3MBYqp/LlNkqu5vz2zSScK
+         MJ1OQs1+MkCeH8ZevTGXK0srkXj73prmJUAP7wIElOEc/7/eL3gC7sybjFKy3VotFM/C
+         OC00wkpgjiYn9ujBP6PeT8myUr5GS2aYP+PeL4jIO/dnlh8dSepKxrA4bvwNm0cLFnty
+         zP/hBIbBPGD53HgR3JdNTz5qH7raKuNsy2em9Q0qqI5xmOlCE/itGYDqpz0IU3Znapri
+         M24A==
+X-Gm-Message-State: AO0yUKVGna0xW+TDpG1PNUaHPRzzlvM2km/HckH3ThHd/CR0qRIQ5u1y
+        4ANw9sv7KMJsYiJjyhXexQRBl/n7xEBPt8Pss6oLvw==
+X-Google-Smtp-Source: AK7set+65qfecMTYI0Ahz8F1uyux6Ma918+90Z7sXd1YIA5huooyLk5OpQDe0rfdJlYabaYOSaW9Udk1FdvuioaoOvc=
+X-Received: by 2002:a81:7302:0:b0:527:9fc2:66a3 with SMTP id
+ o2-20020a817302000000b005279fc266a3mr11464ywc.83.1676829431453; Sun, 19 Feb
+ 2023 09:57:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Description: Mail message body
-Subject: Is kvm@vger.kernel.org valid??
-To:     kvm@vger.kernel.org
-From:   "Hansjorg-Wyss" <900493628@posindonesia.co.id>
-Date:   Sun, 19 Feb 2023 17:19:40 +0200
-Reply-To: info.wfsrvs@gmail.com
-X-Antivirus: Avast (VPS 230219-2, 2/19/2023), Outbound message
-X-Antivirus-Status: Clean
-Message-Id: <20230219151945.B44111B7964@zmmtacloud.posindonesia.co.id>
-X-Spam-Status: Yes, score=6.9 required=5.0 tests=BAYES_99,BAYES_999,
+References: <20230214184606.510551-1-mizhang@google.com> <20230214184606.510551-2-mizhang@google.com>
+ <Y/He1Sro3hb7Hn0h@gao-cwp>
+In-Reply-To: <Y/He1Sro3hb7Hn0h@gao-cwp>
+From:   Mingwei Zhang <mizhang@google.com>
+Date:   Sun, 19 Feb 2023 09:56:35 -0800
+Message-ID: <CAL715WJx1bjm21JnGzbsre+OQQnsKZ+rXQDqNAp9NwixZ_zEow@mail.gmail.com>
+Subject: Re: [PATCH v2 1/7] KVM: selftests: x86: Add a working xstate data structure
+To:     Chao Gao <chao.gao@intel.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jim Mattson <jmattson@google.com>,
+        Venkatesh Srinivas <venkateshs@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        "Chang S. Bae" <chang.seok.bae@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        FREEMAIL_FORGED_REPLYTO,LOTS_OF_MONEY,MONEY_FREEMAIL_REPTO,
-        RCVD_IN_BL_SPAMCOP_NET,SPF_HELO_NONE,SPF_PASS autolearn=no
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
-X-Spam-Report: *  1.3 RCVD_IN_BL_SPAMCOP_NET RBL: Received via a relay in
-        *      bl.spamcop.net
-        *      [Blocked - see <https://www.spamcop.net/bl.shtml?103.146.135.223>]
-        *  0.2 BAYES_999 BODY: Bayes spam probability is 99.9 to 100%
-        *      [score: 1.0000]
-        *  3.5 BAYES_99 BODY: Bayes spam probability is 99 to 100%
-        *      [score: 1.0000]
-        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
-        * -0.0 SPF_PASS SPF: sender matches SPF record
-        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
-        *      envelope-from domain
-        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
-        *       valid
-        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
-        *      author's domain
-        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
-        *  0.0 LOTS_OF_MONEY Huge... sums of money
-        *  2.1 FREEMAIL_FORGED_REPLYTO Freemail in Reply-To, but not From
-        *  0.0 MONEY_FREEMAIL_REPTO Lots of money from someone using free
-        *      email?
-X-Spam-Level: ******
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
-You have a Donation of $1,5 Mil from Wyss-Foundation. Reply for more inform=
-ation.
+On Sun, Feb 19, 2023 at 12:33 AM Chao Gao <chao.gao@intel.com> wrote:
+>
+> On Tue, Feb 14, 2023 at 06:46:00PM +0000, Mingwei Zhang wrote:
+> >-      /* xsave data for guest_code */
+> >-      xsavedata = vm_vaddr_alloc_pages(vm, 3);
+> >-      memset(addr_gva2hva(vm, xsavedata), 0, 3 * getpagesize());
+> >-      vcpu_args_set(vcpu, 3, amx_cfg, tiledata, xsavedata);
+> >+      /* XSAVE state for guest_code */
+> >+      xstate = vm_vaddr_alloc_pages(vm, DIV_ROUND_UP(XSAVE_SIZE, PAGE_SIZE));
+> >+      memset(addr_gva2hva(vm, xstate), 0, DIV_ROUND_UP(XSAVE_SIZE, PAGE_SIZE));
+>
+>                                             ^ this should be the size in bytes instead of in pages. Right?
 
-Thank You
-Hanjorg Wyss
-
--- 
-This email has been checked for viruses by Avast antivirus software.
-www.avast.com
-
+Right, thanks for catching that. I will fix it in the next version.
