@@ -2,211 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D49BF69C569
-	for <lists+kvm@lfdr.de>; Mon, 20 Feb 2023 07:46:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E8EA69C58E
+	for <lists+kvm@lfdr.de>; Mon, 20 Feb 2023 07:58:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229497AbjBTGqg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Feb 2023 01:46:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58104 "EHLO
+        id S230363AbjBTG5s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Feb 2023 01:57:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230095AbjBTGqb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Feb 2023 01:46:31 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21E89B75A
-        for <kvm@vger.kernel.org>; Sun, 19 Feb 2023 22:45:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676875544;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3rptlYlRt3R46ibwBszuK5OyDEDc2S9dWOf1spnPeJ4=;
-        b=Jl5OirFBHIPVZad5Ai8NmK4GikH/ohRfN2lNku8SvLklSiEy8My2hQ74gi6jCNPVDzT9ti
-        k64d71ofSFMoKb7UN7E1lmH9SSftQQ+6K6U8O7yEGXiVN2kwjgfdcwVF8goO0sDATP+mGx
-        q44sOYvBMIgIRJwll2fIyeVIb+uUMY4=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-662-z5R9Hx29NM2umUHBwDGunw-1; Mon, 20 Feb 2023 01:45:42 -0500
-X-MC-Unique: z5R9Hx29NM2umUHBwDGunw-1
-Received: by mail-pj1-f72.google.com with SMTP id ci5-20020a17090afc8500b0020a71040b4cso617509pjb.6
-        for <kvm@vger.kernel.org>; Sun, 19 Feb 2023 22:45:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1676875542;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3rptlYlRt3R46ibwBszuK5OyDEDc2S9dWOf1spnPeJ4=;
-        b=Wsq0kvRZ2bv9DoB2YgzGQ+vAD65rReEyhSX49pxTJaUgWcPqnP4s8kIizRCqckedmO
-         9GvBLpTZYMGFpZAuSYCo+ox/vBi/IPwmH1PfVg2SjlrcSC3EAtcvzkaGus2buDRj3yVG
-         9sj3S1DLn5c2PPV+vCWCR8IGw+3DQojjUKScPrp00w+SoOF46TIPe826nJ+71oE5IteX
-         Aubop2Mh1WxXP+lWMoiWPOskV7qOHiE661nPjzjA/l3BFPQ3TAY8U2Ij0BaYU28FyMXl
-         nKjldvNX5emo7LbFarBsqN5pkTkpOgbCVjgAoEWQeP+pczTUqstmVhADEEsFrb76tgQ7
-         /C3w==
-X-Gm-Message-State: AO0yUKUdjfms1IPQRTLmIc6eLQpBNxSWuJYP28vd7n6oy5Dyxip61WRN
-        34vbMAWlQs2ifySxcgefjf4AcnJ1pO6pOuTXI4qdSqY1DkTRgjF2UNwvBVDw9nUB979idmaE55c
-        1PHmHgOily6QZ
-X-Received: by 2002:a17:902:bb0f:b0:197:8e8e:f15 with SMTP id im15-20020a170902bb0f00b001978e8e0f15mr480944plb.6.1676875541898;
-        Sun, 19 Feb 2023 22:45:41 -0800 (PST)
-X-Google-Smtp-Source: AK7set8ivq49gW1MGNhCLMX0zbkdZG0Yei44YoBtfL9Kdb7k2K0HdlK8UXHL/QZ4BNcPDW1JtM8QpQ==
-X-Received: by 2002:a17:902:bb0f:b0:197:8e8e:f15 with SMTP id im15-20020a170902bb0f00b001978e8e0f15mr480924plb.6.1676875541621;
-        Sun, 19 Feb 2023 22:45:41 -0800 (PST)
-Received: from [10.66.61.39] ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id a17-20020a170902ee9100b0019a95764e68sm1515989pld.294.2023.02.19.22.45.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 19 Feb 2023 22:45:40 -0800 (PST)
-Message-ID: <be032357-1af2-f910-276f-ed492b287784@redhat.com>
-Date:   Mon, 20 Feb 2023 14:45:33 +0800
+        with ESMTP id S230238AbjBTG5n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Feb 2023 01:57:43 -0500
+Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4E36F1042F;
+        Sun, 19 Feb 2023 22:57:39 -0800 (PST)
+Received: from loongson.cn (unknown [10.2.5.185])
+        by gateway (Coremail) with SMTP id _____8BxMMzhGfNjJLQCAA--.65S3;
+        Mon, 20 Feb 2023 14:57:37 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.5.185])
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8Ax+73fGfNjFvk2AA--.34690S2;
+        Mon, 20 Feb 2023 14:57:35 +0800 (CST)
+From:   Tianrui Zhao <zhaotianrui@loongson.cn>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn
+Subject: [PATCH v2 00/29] Add KVM LoongArch support
+Date:   Mon, 20 Feb 2023 14:57:06 +0800
+Message-Id: <20230220065735.1282809-1-zhaotianrui@loongson.cn>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH v4 03/12] KVM: arm64: Add helper for creating unlinked
- stage2 subtrees
-Content-Language: en-US
-To:     Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com,
-        maz@kernel.org, oupton@google.com, yuzenghui@huawei.com,
-        dmatlack@google.com
-Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
-        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
-        rananta@google.com, bgardon@google.com, ricarkol@gmail.com
-References: <20230218032314.635829-1-ricarkol@google.com>
- <20230218032314.635829-4-ricarkol@google.com>
-From:   Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20230218032314.635829-4-ricarkol@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: AQAAf8Ax+73fGfNjFvk2AA--.34690S2
+X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
+X-Coremail-Antispam: 1Uk129KBjvJXoWxKFWkZFWrGr4kGry7Jr1DKFg_yoWxur43pF
+        W3urn8Gr4DGrsaq39Yq3s8Z3s8ZF1xGryaq3Wa9Fy8CrW2qry8Z34kKr9FvFy3AaykJr10
+        qr1rKw1ag3WUJaDanT9S1TB71UUUUjJqnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
+        qI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUIcSsGvfJTRUUU
+        bckFc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4
+        AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF
+        7I0E14v26F4j6r4UJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6x
+        kF7I0E14v26F4UJVW0owAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAq
+        jxCEc2xF0cIa020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E74AGY7Cv6c
+        x26rWlOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxkF7I0En4kS14v26r12
+        6r1DMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY20_WwCFx2IqxVCFs4IE7xkEbV
+        WUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E7480
+        Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7
+        IYx2IY67AKxVW5JVW7JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k2
+        6cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxV
+        AFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0zR9iSdUUUUU=
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Ricardo,
+This series adds KVM LoongArch support. Loongson 3A5000 supports hardware
+assisted virtualization. With cpu virtualization, there are separate
+hw-supported user mode and kernel mode in guest mode. With memory
+virtualization, there are two-level hw mmu table for guest mode and host
+mode. Also there is separate hw cpu timer with consant frequency in
+guest mode, so that vm can migrate between hosts with different freq.
+Currently, we are able to boot LoongArch Linux Guests.
 
-On 2/18/23 11:23, Ricardo Koller wrote:
-> Add a stage2 helper, kvm_pgtable_stage2_create_unlinked(), for
-> creating unlinked tables (which is the opposite of
-> kvm_pgtable_stage2_free_unlinked()).  Creating an unlinked table is
-> useful for splitting PMD and PUD blocks into subtrees of PAGE_SIZE
-> PTEs.  For example, a PUD can be split into PAGE_SIZE PTEs by first
-> creating a fully populated tree, and then use it to replace the PUD in
-> a single step.  This will be used in a subsequent commit for eager
-> huge-page splitting (a dirty-logging optimization).
-> 
-> No functional change intended. This new function will be used in a
-> subsequent commit.
-> 
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> ---
->   arch/arm64/include/asm/kvm_pgtable.h | 28 +++++++++++++++++
->   arch/arm64/kvm/hyp/pgtable.c         | 46 ++++++++++++++++++++++++++++
->   2 files changed, 74 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index dcd3aafd3e6c..b8cde914cca9 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -460,6 +460,34 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
->    */
->   void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level);
->   
-> +/**
-> + * kvm_pgtable_stage2_create_unlinked() - Create an unlinked stage-2 paging structure.
-> + * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
-> + * @phys:	Physical address of the memory to map.
-> + * @level:	Starting level of the stage-2 paging structure to be created.
-> + * @prot:	Permissions and attributes for the mapping.
-> + * @mc:		Cache of pre-allocated and zeroed memory from which to allocate
-> + *		page-table pages.
-> + * @force_pte:  Force mappings to PAGE_SIZE granularity.
-> + *
-> + * Create an unlinked page-table tree under @new. If @force_pte is
-> + * true or @level is 2 (the PMD level), then the tree is mapped up to
-> + * the PAGE_SIZE leaf PTE; the tree is mapped up one level otherwise.
-> + * This new page-table tree is not reachable (i.e., it is unlinked)
-> + * from the root pgd and it's therefore unreachableby the hardware
-> + * page-table walker. No TLB invalidation or CMOs are performed.
-> + *
-> + * If device attributes are not explicitly requested in @prot, then the
-> + * mapping will be normal, cacheable.
-> + *
-> + * Return: The fully populated (unlinked) stage-2 paging structure, or
-> + * an ERR_PTR(error) on failure.
-> + */
-> +kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
-> +					      u64 phys, u32 level,
-> +					      enum kvm_pgtable_prot prot,
-> +					      void *mc, bool force_pte);
-> +
->   /**
->    * kvm_pgtable_stage2_map() - Install a mapping in a guest stage-2 page-table.
->    * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 0a5ef9288371..80f2965ab0fe 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -1181,6 +1181,52 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
->   	return kvm_pgtable_walk(pgt, addr, size, &walker);
->   }
->   
-> +kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
-> +					      u64 phys, u32 level,
-> +					      enum kvm_pgtable_prot prot,
-> +					      void *mc, bool force_pte)
-> +{
-> +	struct stage2_map_data map_data = {
-> +		.phys		= phys,
-> +		.mmu		= pgt->mmu,
-> +		.memcache	= mc,
-> +		.force_pte	= force_pte,
-> +	};
-> +	struct kvm_pgtable_walker walker = {
-> +		.cb		= stage2_map_walker,
-> +		.flags		= KVM_PGTABLE_WALK_LEAF |
-> +				  KVM_PGTABLE_WALK_SKIP_BBM |
-> +				  KVM_PGTABLE_WALK_SKIP_CMO,
-> +		.arg		= &map_data,
-> +	};
-> +	/* .addr (the IPA) is irrelevant for a removed table */
-for an unlinked table.
-> +	struct kvm_pgtable_walk_data data = {
-> +		.walker	= &walker,
-> +		.addr	= 0,
-> +		.end	= kvm_granule_size(level),
-> +	};
-> +	struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
-> +	kvm_pte_t *pgtable;
-> +	int ret;
-> +
-> +	ret = stage2_set_prot_attr(pgt, prot, &map_data.attr);
-> +	if (ret)
-> +		return ERR_PTR(ret);
-> +
-> +	pgtable = mm_ops->zalloc_page(mc);
-> +	if (!pgtable)
-> +		return ERR_PTR(-ENOMEM);
-> +
-> +	ret = __kvm_pgtable_walk(&data, mm_ops, (kvm_pteref_t)pgtable,
-> +				 level + 1);
-> +	if (ret) {
-> +		kvm_pgtable_stage2_free_unlinked(mm_ops, pgtable, level);
-> +		mm_ops->put_page(pgtable);
-> +		return ERR_PTR(ret);
-> +	}
-> +
-> +	return pgtable;
-> +}
->   
->   int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
->   			      struct kvm_pgtable_mm_ops *mm_ops,
+Few key aspects of KVM LoongArch added by this series are:
+1. Enable kvm hardware function when kvm module is loaded.
+2. Implement VM and vcpu related ioctl interface such as vcpu create,
+   vcpu run etc. GET_ONE_REG/SET_ONE_REG ioctl commands are use to
+   get general registers one by one.
+3. Hardware access about MMU, timer and csr are emulated in kernel.
+4. Hardwares such as mmio and iocsr device are emulated in user space
+   such as APIC, IPI, pci devices etc.
+
+The running environment of LoongArch virt machine:
+1. Cross tools to build kernel and uefi:
+   $ wget https://github.com/loongson/build-tools/releases/download/2022.09.06/loongarch64-clfs-6.3-cross-tools-gcc-glibc.tar.xz
+   tar -vxf loongarch64-clfs-6.3-cross-tools-gcc-glibc.tar.xz  -C /opt
+   export PATH=/opt/cross-tools/bin:$PATH
+   export LD_LIBRARY_PATH=/opt/cross-tools/lib:$LD_LIBRARY_PATH
+   export LD_LIBRARY_PATH=/opt/cross-tools/loongarch64-unknown-linux-gnu/lib/:$LD_LIBRARY_PATH
+2. This series is based on the linux source code:
+   https://github.com/loongson/linux-loongarch-kvm
+   Build command:
+   git checkout kvm-loongarch
+   make ARCH=loongarch CROSS_COMPILE=loongarch64-unknown-linux-gnu- loongson3_defconfig
+   make ARCH=loongarch CROSS_COMPILE=loongarch64-unknown-linux-gnu-
+3. QEMU hypervisor with LoongArch supported:
+   https://github.com/loongson/qemu
+   Build command:
+   git checkout kvm-loongarch
+   ./configure --target-list="loongarch64-softmmu"  --enable-kvm
+   make
+4. Uefi bios of LoongArch virt machine:
+   Reference: https://github.com/tianocore/edk2-platforms/tree/master/Platform/Loongson/LoongArchQemuPkg#readme
+5. you can also access the binary files we have already build:
+   https://github.com/yangxiaojuan-loongson/qemu-binary
+
+The command to boot loongarch virt machine:
+   $ qemu-system-loongarch64 -machine virt -m 4G -cpu la464 \
+   -smp 1 -bios QEMU_EFI.fd -kernel vmlinuz.efi -initrd ramdisk \
+   -serial stdio   -monitor telnet:localhost:4495,server,nowait \
+   -append "root=/dev/ram rdinit=/sbin/init console=ttyS0,115200" \
+   --nographic
+
+Changes since v1:
+1. Seprate the original patch-01 and patch-03 into small patches, and the
+patches mainly contain kvm module init, module exit, vcpu create, vcpu run,
+etc.
+2. Remove the original KVM_{GET,SET}_CSRS ioctl in the kvm uapi header,
+and we use the common KVM_{GET,SET}_ONE_REG to access register.
+3. Use BIT(x) to replace the "1 << n_bits" statement.
+                                                                                  
+Tianrui Zhao (29):
+  LoongArch: KVM: Add kvm related header files
+  LoongArch: KVM: Implement kvm module related interface
+  LoongArch: KVM: Implement kvm hardware enable, disable interface
+  LoongArch: KVM: Implement VM related functions
+  LoongArch: KVM: Add vcpu related header files
+  LoongArch: KVM: Implement vcpu create and destroy interface
+  LoongArch: KVM: Implement vcpu run interface
+  LoongArch: KVM: Implement vcpu handle exit interface
+  LoongArch: KVM: Implement vcpu get, vcpu set registers
+  LoongArch: KVM: Implement vcpu ENABLE_CAP, CHECK_EXTENSION ioctl
+    interface
+  LoongArch: KVM: Implement fpu related operations for vcpu
+  LoongArch: KVM: Implement vcpu interrupt operations
+  LoongArch: KVM: Implement misc vcpu related interfaces
+  LoongArch: KVM: Implement vcpu load and vcpu put operations
+  LoongArch: KVM: Implement vcpu status description
+  LoongArch: KVM: Implement update VM id function
+  LoongArch: KVM: Implement virtual machine tlb operations
+  LoongArch: KVM: Implement vcpu timer operations
+  LoongArch: KVM: Implement kvm mmu operations
+  LoongArch: KVM: Implement handle csr excption
+  LoongArch: KVM: Implement handle iocsr exception
+  LoongArch: KVM: Implement handle idle exception
+  LoongArch: KVM: Implement handle gspr exception
+  LoongArch: KVM: Implement handle mmio exception
+  LoongArch: KVM: Implement handle fpu exception
+  LoongArch: KVM: Implement kvm exception vector
+  LoongArch: KVM: Implement vcpu world switch
+  LoongArch: KVM: Implement probe virtualization when loongarch cpu init
+  LoongArch: KVM: Enable kvm config and add the makefile
+
+ arch/loongarch/Kbuild                      |    1 +
+ arch/loongarch/Kconfig                     |    2 +
+ arch/loongarch/configs/loongson3_defconfig |    2 +
+ arch/loongarch/include/asm/cpu-features.h  |   22 +
+ arch/loongarch/include/asm/cpu-info.h      |   13 +
+ arch/loongarch/include/asm/inst.h          |   16 +
+ arch/loongarch/include/asm/kvm_csr.h       |   89 ++
+ arch/loongarch/include/asm/kvm_host.h      |  257 +++++
+ arch/loongarch/include/asm/kvm_types.h     |   11 +
+ arch/loongarch/include/asm/kvm_vcpu.h      |  112 ++
+ arch/loongarch/include/asm/loongarch.h     |  195 +++-
+ arch/loongarch/include/uapi/asm/kvm.h      |  107 ++
+ arch/loongarch/kernel/asm-offsets.c        |   32 +
+ arch/loongarch/kernel/cpu-probe.c          |   53 +
+ arch/loongarch/kvm/Kconfig                 |   38 +
+ arch/loongarch/kvm/Makefile                |   21 +
+ arch/loongarch/kvm/exit.c                  |  702 ++++++++++++
+ arch/loongarch/kvm/interrupt.c             |  126 +++
+ arch/loongarch/kvm/main.c                  |  152 +++
+ arch/loongarch/kvm/mmu.c                   |  821 ++++++++++++++
+ arch/loongarch/kvm/switch.S                |  327 ++++++
+ arch/loongarch/kvm/timer.c                 |  266 +++++
+ arch/loongarch/kvm/tlb.c                   |   31 +
+ arch/loongarch/kvm/trace.h                 |  137 +++
+ arch/loongarch/kvm/vcpu.c                  | 1118 ++++++++++++++++++++
+ arch/loongarch/kvm/vm.c                    |   85 ++
+ arch/loongarch/kvm/vmid.c                  |   64 ++
+ include/uapi/linux/kvm.h                   |   12 +
+ 28 files changed, 4806 insertions(+), 6 deletions(-)
+ create mode 100644 arch/loongarch/include/asm/kvm_csr.h
+ create mode 100644 arch/loongarch/include/asm/kvm_host.h
+ create mode 100644 arch/loongarch/include/asm/kvm_types.h
+ create mode 100644 arch/loongarch/include/asm/kvm_vcpu.h
+ create mode 100644 arch/loongarch/include/uapi/asm/kvm.h
+ create mode 100644 arch/loongarch/kvm/Kconfig
+ create mode 100644 arch/loongarch/kvm/Makefile
+ create mode 100644 arch/loongarch/kvm/exit.c
+ create mode 100644 arch/loongarch/kvm/interrupt.c
+ create mode 100644 arch/loongarch/kvm/main.c
+ create mode 100644 arch/loongarch/kvm/mmu.c
+ create mode 100644 arch/loongarch/kvm/switch.S
+ create mode 100644 arch/loongarch/kvm/timer.c
+ create mode 100644 arch/loongarch/kvm/tlb.c
+ create mode 100644 arch/loongarch/kvm/trace.h
+ create mode 100644 arch/loongarch/kvm/vcpu.c
+ create mode 100644 arch/loongarch/kvm/vm.c
+ create mode 100644 arch/loongarch/kvm/vmid.c
 
 -- 
-Regards,
-Shaoqin
+2.31.1
 
