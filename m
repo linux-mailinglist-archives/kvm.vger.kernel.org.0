@@ -2,76 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1323369C1C4
-	for <lists+kvm@lfdr.de>; Sun, 19 Feb 2023 18:58:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7224B69C430
+	for <lists+kvm@lfdr.de>; Mon, 20 Feb 2023 03:37:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230274AbjBSR6s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 19 Feb 2023 12:58:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33408 "EHLO
+        id S229436AbjBTChc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 19 Feb 2023 21:37:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230322AbjBSR6q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 19 Feb 2023 12:58:46 -0500
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A329F113E3
-        for <kvm@vger.kernel.org>; Sun, 19 Feb 2023 09:58:44 -0800 (PST)
-Received: by mail-pl1-x632.google.com with SMTP id ky4so132464plb.3
-        for <kvm@vger.kernel.org>; Sun, 19 Feb 2023 09:58:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=b2rY0fDePvZ3ge2mp7FGjGIShiKV6CSswgiMPgCf5uY=;
-        b=Q2fsYk+/ips79nToDdZaIQ5r56O5hTmDZv3zAog+oerEoHeUZzBmJzPUcIy20tmDC5
-         1SEo9LyX8X/p9GYsrp+XhAIWeiqCtJtxDlkn+JIWn7Y92zjaDN1paBCzaKUrAfnATJls
-         3Halcrnd18gcRkC4O+CvdstDiXB0kt8jZ3SYmlu+pMiydGNMCu3LHtkfPO4DcT/AHBzt
-         M/oBDwuDxujTAFg5pjGOc6eBBsGC5WexDg/5p8fnWhZ+JCuPUWYWfYuihESbRZLhvai5
-         ZJgxRRCgKbyeBlDVTen8QBA9NjPdkxXzbNUm2Mtkh03xemzQuS+gk80AD2dVZ2rOc8VF
-         +WAQ==
+        with ESMTP id S229619AbjBTCh2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 19 Feb 2023 21:37:28 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED9F79778
+        for <kvm@vger.kernel.org>; Sun, 19 Feb 2023 18:36:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676860600;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=+QRTKe9fslXsmMjbWLGC+1jCq193n05lX0twVp21S3I=;
+        b=hsGpX6976hdhAd1NgH70VDZh0rG01tRZWoHcrTr3H/+aWtrTKiD15S/nkUTGEVJ3N6+cvo
+        oqbg77tBv5eMvPLwey23tOajo+slchKYyv6Dm1KxJkIAiSfjMcQ65hw0h+iKPGfXg24KXO
+        Nph51+kvI6djeAp4kWlnHXexl91LPfs=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-625-yjgikanNPv666xweneotRA-1; Sun, 19 Feb 2023 21:36:39 -0500
+X-MC-Unique: yjgikanNPv666xweneotRA-1
+Received: by mail-ot1-f71.google.com with SMTP id g27-20020a056830309b00b0068d17bf4c93so840730ots.7
+        for <kvm@vger.kernel.org>; Sun, 19 Feb 2023 18:36:39 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=b2rY0fDePvZ3ge2mp7FGjGIShiKV6CSswgiMPgCf5uY=;
-        b=GynBfWFBR9F/IvqzLxB85xjk/noMlxmyi7EoV2tRkxerCtAEuH8J4/tmtJwGelSSfd
-         CJuc9ysUlWbu77VksQxn9QqGDLONAsamKjKw/i9PH5m6tvoRzhOFeea8nIUvSf0ZRJ69
-         zdXGWNTSR7qzPQmC6B6dLIuFXJBgbuHy6lM2/rARcDSAdtPGNDc+UMFfalL4XsEAxfYo
-         hvU0uz0TJgBxUDjOVRKRzq0D+1hPVpEqdCArq9usrowewbJvhxB6uN8+TGIRo7oD+/XY
-         PaePAQRv6ATvfDwetJzj1r89H5OTMcc1awW8od5kaqXZWk3o4tJGXYbSmEatV/lY+nuD
-         FEsg==
-X-Gm-Message-State: AO0yUKWICJgE0R/1NDMfHzf8uTXpeoE8DxjA9CctMRoMWmZ9bzMjmYyE
-        DAngytAKD9E25AIlWH7uHh3YrQ==
-X-Google-Smtp-Source: AK7set+GY3ybl/QsgojsDaqcMFssxRzRsKYU44N6hTtKw+of4RSi58cpzxDTb55Udub1Sz3I5DYV/Q==
-X-Received: by 2002:a17:902:d2cb:b0:19a:ad90:4223 with SMTP id n11-20020a170902d2cb00b0019aad904223mr660008plc.48.1676829523868;
-        Sun, 19 Feb 2023 09:58:43 -0800 (PST)
-Received: from google.com (77.62.105.34.bc.googleusercontent.com. [34.105.62.77])
-        by smtp.gmail.com with ESMTPSA id e8-20020a170902744800b0019a8468cbe7sm18392plt.224.2023.02.19.09.58.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Feb 2023 09:58:43 -0800 (PST)
-Date:   Sun, 19 Feb 2023 17:58:40 +0000
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Chao Gao <chao.gao@intel.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jim Mattson <jmattson@google.com>,
-        Venkatesh Srinivas <venkateshs@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        "Chang S. Bae" <chang.seok.bae@intel.com>
-Subject: Re: [PATCH v2 2/7] KVM: selftests: x86: Fix an error in comment of
- amx_test
-Message-ID: <Y/JjUEiIizj98hZb@google.com>
-References: <20230214184606.510551-1-mizhang@google.com>
- <20230214184606.510551-3-mizhang@google.com>
- <Y/Hh31GLftx3eZJY@gao-cwp>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+QRTKe9fslXsmMjbWLGC+1jCq193n05lX0twVp21S3I=;
+        b=wJFQppPgt2JG8YilA+e3R3mfVDIrce/rOakIXYpDeEkIsayWG4YavEJfE7uvVLpmLq
+         9JCeK6vU2TEbRLHXgI3vx7o4bytOrKgYaEu6sst4kMASANbHUWS8oJUF9EDwz7DsBrAg
+         9knD6fnoPcjMKi/d8m/URdcwQkKhCP92CYPaoFF/ySlpViDhyn+FDxnh0gZss5edNkM8
+         RVwwt/YWB+u5P8z2ycn0sG1mipRFVQRZGJ0rmfrkiBn7rXYJPmBHeet5VYFkOJ8nuSYa
+         bZZNJSOhz2pqEWAhuhAeQNsxx3KYBE34X85hqfEWMIFQ3KY0PCTwpSDT3zwQHYfEJTpw
+         gcXQ==
+X-Gm-Message-State: AO0yUKXJBmDsGYhXQtxkQ3b9Gq7vpB/X3vtuF+dNaVsI9SLkHZ1jaMFT
+        1JicEZhrUfRFx6D/fNYW2VgPHU8o1EL4Ybo8yka7nNRKmAAjSFk/aLLH2bRYouGAZGKxGLut4ou
+        3poNOnJMovDyEkqwkEJTynGiOeYBhUce0W7yO
+X-Received: by 2002:a05:6870:610c:b0:171:d1a1:c5cb with SMTP id s12-20020a056870610c00b00171d1a1c5cbmr212601oae.217.1676860598327;
+        Sun, 19 Feb 2023 18:36:38 -0800 (PST)
+X-Google-Smtp-Source: AK7set+o/PIyYCf/r6enEsMKw/BDh3XyDsV2IO5FKzRCPBc/l0Kkzql2S6nZ1RAhn3rjmZd7RJyHVxQxAPtJc0uZzgY=
+X-Received: by 2002:a05:6870:610c:b0:171:d1a1:c5cb with SMTP id
+ s12-20020a056870610c00b00171d1a1c5cbmr212592oae.217.1676860598109; Sun, 19
+ Feb 2023 18:36:38 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y/Hh31GLftx3eZJY@gao-cwp>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+References: <20230207120843.1580403-1-sunnanyong@huawei.com>
+ <Y+7G+tiBCjKYnxcZ@nvidia.com> <CACGkMEtehykvqNUnfCi0VmHR1xpmhj4sSWdYW1-0oATY=0YhXw@mail.gmail.com>
+ <20230217051038-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20230217051038-mutt-send-email-mst@kernel.org>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Mon, 20 Feb 2023 10:36:27 +0800
+Message-ID: <CACGkMEuDG1NUs0=ry1=Mphfd+TrqAvVS0yeu9hcni2VrPkB8tQ@mail.gmail.com>
+Subject: Re: [PATCH v2] vhost/vdpa: Add MSI translation tables to iommu for
+ software-managed MSI
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Nanyong Sun <sunnanyong@huawei.com>, joro@8bytes.org,
+        will@kernel.org, robin.murphy@arm.com, iommu@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        wangrong68@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,47 +79,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Feb 19, 2023, Chao Gao wrote:
-> On Tue, Feb 14, 2023 at 06:46:01PM +0000, Mingwei Zhang wrote:
-> >After the execution of __tilerelease(), AMX component will be in INIT
-> >state. Therefore, execution of XSAVEC saving the AMX state into memory will
-> >cause the xstate_bv[18] cleared in xheader. However, the xcomp_bv[18] will
-> >remain set. Fix the error in comment. Also, update xsavec() to XSAVEC
-> >because xcomp_bv[18] is set due to the instruction, not the function.
-> >Finally, use XTILEDATA instead 'bit 18' in comments.
+On Fri, Feb 17, 2023 at 6:11 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Fri, Feb 17, 2023 at 01:35:59PM +0800, Jason Wang wrote:
+> > On Fri, Feb 17, 2023 at 8:15 AM Jason Gunthorpe <jgg@nvidia.com> wrote:
+> > >
+> > > On Tue, Feb 07, 2023 at 08:08:43PM +0800, Nanyong Sun wrote:
+> > > > From: Rong Wang <wangrong68@huawei.com>
+> > > >
+> > > > Once enable iommu domain for one device, the MSI
+> > > > translation tables have to be there for software-managed MSI.
+> > > > Otherwise, platform with software-managed MSI without an
+> > > > irq bypass function, can not get a correct memory write event
+> > > > from pcie, will not get irqs.
+> > > > The solution is to obtain the MSI phy base address from
+> > > > iommu reserved region, and set it to iommu MSI cookie,
+> > > > then translation tables will be created while request irq.
+> > >
+> > > Probably not what anyone wants to hear, but I would prefer we not add
+> > > more uses of this stuff. It looks like we have to get rid of
+> > > iommu_get_msi_cookie() :\
+> > >
+> > > I'd like it if vdpa could move to iommufd not keep copying stuff from
+> > > it..
 > >
-> >Cc: Jim Mattson <jmattson@google.com>
-> >Cc: Venkatesh Srinivas <venkateshs@google.com>
-> >Cc: Aaron Lewis <aaronlewis@google.com>
-> >Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> >---
-> > tools/testing/selftests/kvm/x86_64/amx_test.c | 5 ++++-
-> > 1 file changed, 4 insertions(+), 1 deletion(-)
-> >
-> >diff --git a/tools/testing/selftests/kvm/x86_64/amx_test.c b/tools/testing/selftests/kvm/x86_64/amx_test.c
-> >index d506821a5a26..aac727ff7cf8 100644
-> >--- a/tools/testing/selftests/kvm/x86_64/amx_test.c
-> >+++ b/tools/testing/selftests/kvm/x86_64/amx_test.c
-> >@@ -190,7 +190,10 @@ static void __attribute__((__flatten__)) guest_code(struct tile_config *amx_cfg,
-> > 	GUEST_SYNC(4);
-> > 	__tilerelease();
-> > 	GUEST_SYNC(5);
-> >-	/* bit 18 not in the XCOMP_BV after xsavec() */
-> >+	/*
-> >+	 * After XSAVEC, XTILEDATA is cleared in the xstate_bv but is set in
-> >+	 * the xcomp_bv.
-> >+	 */
-> > 	xstate->header.xstate_bv = XFEATURE_MASK_XTILEDATA;
-> > 	__xsavec(xstate, XFEATURE_MASK_XTILEDATA);
-> > 	GUEST_ASSERT(!(xstate->header.xstate_bv & XFEATURE_MASK_XTILEDATA));
-> 
-> maybe it would be better to add another GUEST_ASSERT() to enforce that
-> XTILEDATA is set in the xcomp_bv.
+> > Yes, but we probably need a patch for -stable.
+>
+> Hmm do we? this looks like it's enabling new platforms is not a bugfix...
 
-yeah. The check has been added in the 6th patch of the series, but I
-think it is hard to see. I will reorder the change next to this one in
-the next version.
-> 
-> >-- 
-> >2.39.1.581.gbfd45094c4-goog
+I think we haven't limited vDPA to any specific arch in the past?
+
+Thanks
+
+>
+> > >
+> > > Also the iommu_group_has_isolated_msi() check is missing on the vdpa
+> > > path, and it is missing the iommu ownership mechanism.
 > >
+> > Ok.
+> >
+> > >
+> > > Also which in-tree VDPA driver that uses the iommu runs on ARM? Please
+> >
+> > ifcvf and vp_vpda are two drivers that use platform IOMMU.
+> >
+> > Thanks
+> >
+> > > don't propose core changes for unmerged drivers. :(
+> > >
+> > > Jason
+> > >
+>
+
