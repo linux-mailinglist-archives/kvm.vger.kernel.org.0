@@ -2,66 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 12CF569C563
-	for <lists+kvm@lfdr.de>; Mon, 20 Feb 2023 07:37:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D49BF69C569
+	for <lists+kvm@lfdr.de>; Mon, 20 Feb 2023 07:46:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230267AbjBTGh2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Feb 2023 01:37:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54902 "EHLO
+        id S229497AbjBTGqg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Feb 2023 01:46:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229662AbjBTGh0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Feb 2023 01:37:26 -0500
+        with ESMTP id S230095AbjBTGqb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Feb 2023 01:46:31 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 279E8D503
-        for <kvm@vger.kernel.org>; Sun, 19 Feb 2023 22:36:39 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21E89B75A
+        for <kvm@vger.kernel.org>; Sun, 19 Feb 2023 22:45:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676874998;
+        s=mimecast20190719; t=1676875544;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=8GjODHe6S++XQylWhBaNjHr8qSr1b8DgtaT4TgXobEI=;
-        b=NCpYnSuZvXZ/owjP4tk2UUgYoLl+ohRNABP9Xx6cpBJDDjCrP1COgcSkwORrarO3/leJXn
-        3VjGeF6tr8pBJIX04n6fcv/CYrkozxLBJmRzuVyW6vbfsOCT4xFD/OEe0+Q1EDrjLPlnDh
-        jARFdEc+WPF4u3ch0xqGwQqB/TEyPFM=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=3rptlYlRt3R46ibwBszuK5OyDEDc2S9dWOf1spnPeJ4=;
+        b=Jl5OirFBHIPVZad5Ai8NmK4GikH/ohRfN2lNku8SvLklSiEy8My2hQ74gi6jCNPVDzT9ti
+        k64d71ofSFMoKb7UN7E1lmH9SSftQQ+6K6U8O7yEGXiVN2kwjgfdcwVF8goO0sDATP+mGx
+        q44sOYvBMIgIRJwll2fIyeVIb+uUMY4=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-134-YtClLH8-OFmudezZf-ynYw-1; Mon, 20 Feb 2023 01:36:36 -0500
-X-MC-Unique: YtClLH8-OFmudezZf-ynYw-1
-Received: by mail-pj1-f70.google.com with SMTP id gt9-20020a17090af2c900b0023465ea4b65so683880pjb.3
-        for <kvm@vger.kernel.org>; Sun, 19 Feb 2023 22:36:36 -0800 (PST)
+ us-mta-662-z5R9Hx29NM2umUHBwDGunw-1; Mon, 20 Feb 2023 01:45:42 -0500
+X-MC-Unique: z5R9Hx29NM2umUHBwDGunw-1
+Received: by mail-pj1-f72.google.com with SMTP id ci5-20020a17090afc8500b0020a71040b4cso617509pjb.6
+        for <kvm@vger.kernel.org>; Sun, 19 Feb 2023 22:45:42 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1676874995;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20210112; t=1676875542;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8GjODHe6S++XQylWhBaNjHr8qSr1b8DgtaT4TgXobEI=;
-        b=EWH5z2oYBEN/K4lJvQQ+8Xu/IDR4LazE74vyvQpaBjlObOkztl79y8DgFxb/JHiXBp
-         eXIOmG5DhBgjRsPayPmM53CSZhNxRc61433br3OgwwxpG0o3QepGfv4wST5Q+SLIhXAF
-         ivkeK9WML5Hx37UXjx+dfm4zZPxT6ka4tMZ1yNzxKWOpcn7ud5JkeEq8R9yVD6DpnroR
-         KyN5fEDoxxF1c861m/n+AnFNmLU+ti2BrWC89Zmamv/1WsB9JvCluEJsWVnNfCAgoNv5
-         D6Uk/Z8Pj8qayEaCfD25776dIQGwUJ2BpvjdrEjelTxoedU29w8Rpu0f3t738hDfT0JL
-         ue/Q==
-X-Gm-Message-State: AO0yUKXMA7Nhy/zijemG8x/6cO77jjVTg/pOPpR327AkE2I6oHrV+gS+
-        +2NI3PSuLL4aXWA1AeOXKvwOqtLHdNg3booBDJ9epndyEOprnDiELUft9FQ0CQtsGTlMXEVD04o
-        z23VS0hSJtT6O
-X-Received: by 2002:a62:e713:0:b0:5a9:cebd:7b79 with SMTP id s19-20020a62e713000000b005a9cebd7b79mr874869pfh.0.1676874995596;
-        Sun, 19 Feb 2023 22:36:35 -0800 (PST)
-X-Google-Smtp-Source: AK7set8E02nUXFpUZT0DxvGjWE7nTzqX9K4BGP1W4oErCb+WGEbDoiKUSDEreN1T1nYqO+eYiw6y2Q==
-X-Received: by 2002:a62:e713:0:b0:5a9:cebd:7b79 with SMTP id s19-20020a62e713000000b005a9cebd7b79mr874843pfh.0.1676874995304;
-        Sun, 19 Feb 2023 22:36:35 -0800 (PST)
+        bh=3rptlYlRt3R46ibwBszuK5OyDEDc2S9dWOf1spnPeJ4=;
+        b=Wsq0kvRZ2bv9DoB2YgzGQ+vAD65rReEyhSX49pxTJaUgWcPqnP4s8kIizRCqckedmO
+         9GvBLpTZYMGFpZAuSYCo+ox/vBi/IPwmH1PfVg2SjlrcSC3EAtcvzkaGus2buDRj3yVG
+         9sj3S1DLn5c2PPV+vCWCR8IGw+3DQojjUKScPrp00w+SoOF46TIPe826nJ+71oE5IteX
+         Aubop2Mh1WxXP+lWMoiWPOskV7qOHiE661nPjzjA/l3BFPQ3TAY8U2Ij0BaYU28FyMXl
+         nKjldvNX5emo7LbFarBsqN5pkTkpOgbCVjgAoEWQeP+pczTUqstmVhADEEsFrb76tgQ7
+         /C3w==
+X-Gm-Message-State: AO0yUKUdjfms1IPQRTLmIc6eLQpBNxSWuJYP28vd7n6oy5Dyxip61WRN
+        34vbMAWlQs2ifySxcgefjf4AcnJ1pO6pOuTXI4qdSqY1DkTRgjF2UNwvBVDw9nUB979idmaE55c
+        1PHmHgOily6QZ
+X-Received: by 2002:a17:902:bb0f:b0:197:8e8e:f15 with SMTP id im15-20020a170902bb0f00b001978e8e0f15mr480944plb.6.1676875541898;
+        Sun, 19 Feb 2023 22:45:41 -0800 (PST)
+X-Google-Smtp-Source: AK7set8ivq49gW1MGNhCLMX0zbkdZG0Yei44YoBtfL9Kdb7k2K0HdlK8UXHL/QZ4BNcPDW1JtM8QpQ==
+X-Received: by 2002:a17:902:bb0f:b0:197:8e8e:f15 with SMTP id im15-20020a170902bb0f00b001978e8e0f15mr480924plb.6.1676875541621;
+        Sun, 19 Feb 2023 22:45:41 -0800 (PST)
 Received: from [10.66.61.39] ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id bm2-20020a056a00320200b005821c109cebsm1384665pfb.199.2023.02.19.22.36.29
+        by smtp.gmail.com with ESMTPSA id a17-20020a170902ee9100b0019a95764e68sm1515989pld.294.2023.02.19.22.45.35
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 19 Feb 2023 22:36:34 -0800 (PST)
-Message-ID: <e62b4495-3e99-d3da-8fc3-e40246ccb498@redhat.com>
-Date:   Mon, 20 Feb 2023 14:35:46 +0800
+        Sun, 19 Feb 2023 22:45:40 -0800 (PST)
+Message-ID: <be032357-1af2-f910-276f-ed492b287784@redhat.com>
+Date:   Mon, 20 Feb 2023 14:45:33 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.7.1
 Subject: Re: [PATCH v4 03/12] KVM: arm64: Add helper for creating unlinked
  stage2 subtrees
+Content-Language: en-US
 To:     Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com,
         maz@kernel.org, oupton@google.com, yuzenghui@huawei.com,
         dmatlack@google.com
@@ -72,7 +73,6 @@ Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
         rananta@google.com, bgardon@google.com, ricarkol@gmail.com
 References: <20230218032314.635829-1-ricarkol@google.com>
  <20230218032314.635829-4-ricarkol@google.com>
-Content-Language: en-US
 From:   Shaoqin Huang <shahuang@redhat.com>
 In-Reply-To: <20230218032314.635829-4-ricarkol@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
@@ -127,10 +127,6 @@ On 2/18/23 11:23, Ricardo Koller wrote:
 > + * @force_pte:  Force mappings to PAGE_SIZE granularity.
 > + *
 > + * Create an unlinked page-table tree under @new. If @force_pte is
-The @new parameter has been deleted, you should update the comments too.
-
-Thanks,
-Shaoqin
 > + * true or @level is 2 (the PMD level), then the tree is mapped up to
 > + * the PAGE_SIZE leaf PTE; the tree is mapped up one level otherwise.
 > + * This new page-table tree is not reachable (i.e., it is unlinked)
@@ -178,6 +174,7 @@ Shaoqin
 > +		.arg		= &map_data,
 > +	};
 > +	/* .addr (the IPA) is irrelevant for a removed table */
+for an unlinked table.
 > +	struct kvm_pgtable_walk_data data = {
 > +		.walker	= &walker,
 > +		.addr	= 0,
