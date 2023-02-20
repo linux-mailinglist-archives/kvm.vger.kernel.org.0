@@ -2,72 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7224B69C430
-	for <lists+kvm@lfdr.de>; Mon, 20 Feb 2023 03:37:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1660069C433
+	for <lists+kvm@lfdr.de>; Mon, 20 Feb 2023 03:38:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229436AbjBTChc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 19 Feb 2023 21:37:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39404 "EHLO
+        id S229759AbjBTCiV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 19 Feb 2023 21:38:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229619AbjBTCh2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 19 Feb 2023 21:37:28 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED9F79778
-        for <kvm@vger.kernel.org>; Sun, 19 Feb 2023 18:36:41 -0800 (PST)
+        with ESMTP id S229576AbjBTCiU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 19 Feb 2023 21:38:20 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AC609778
+        for <kvm@vger.kernel.org>; Sun, 19 Feb 2023 18:37:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676860600;
+        s=mimecast20190719; t=1676860651;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=+QRTKe9fslXsmMjbWLGC+1jCq193n05lX0twVp21S3I=;
-        b=hsGpX6976hdhAd1NgH70VDZh0rG01tRZWoHcrTr3H/+aWtrTKiD15S/nkUTGEVJ3N6+cvo
-        oqbg77tBv5eMvPLwey23tOajo+slchKYyv6Dm1KxJkIAiSfjMcQ65hw0h+iKPGfXg24KXO
-        Nph51+kvI6djeAp4kWlnHXexl91LPfs=
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
- [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=Z4mF9eRLWUighxaWu/WlNqJCc0pM0J+zyyIk2SE2gxU=;
+        b=fPygkbLALlk+6ukzBEvSJLsPhuqYnNPH0N7bl7BG0m0F3E6y+Pfob4gWdaTJz9lCvJobxG
+        fLG5thQGVgd5lqzmTEaK+4VJqNjDNVV5AqTmIVNbM6TxWm8X8UXf6x9VIgJMcbcNqKkxoW
+        PWh5hg2L2e56X4rdY32ZSAVN2Bs/ppo=
+Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
+ [209.85.167.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-625-yjgikanNPv666xweneotRA-1; Sun, 19 Feb 2023 21:36:39 -0500
-X-MC-Unique: yjgikanNPv666xweneotRA-1
-Received: by mail-ot1-f71.google.com with SMTP id g27-20020a056830309b00b0068d17bf4c93so840730ots.7
-        for <kvm@vger.kernel.org>; Sun, 19 Feb 2023 18:36:39 -0800 (PST)
+ us-mta-312-Em3cAYTVMtm5vCCSpthCyA-1; Sun, 19 Feb 2023 21:37:30 -0500
+X-MC-Unique: Em3cAYTVMtm5vCCSpthCyA-1
+Received: by mail-oi1-f197.google.com with SMTP id bf30-20020a056808191e00b00363be5d9f42so304022oib.15
+        for <kvm@vger.kernel.org>; Sun, 19 Feb 2023 18:37:30 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=+QRTKe9fslXsmMjbWLGC+1jCq193n05lX0twVp21S3I=;
-        b=wJFQppPgt2JG8YilA+e3R3mfVDIrce/rOakIXYpDeEkIsayWG4YavEJfE7uvVLpmLq
-         9JCeK6vU2TEbRLHXgI3vx7o4bytOrKgYaEu6sst4kMASANbHUWS8oJUF9EDwz7DsBrAg
-         9knD6fnoPcjMKi/d8m/URdcwQkKhCP92CYPaoFF/ySlpViDhyn+FDxnh0gZss5edNkM8
-         RVwwt/YWB+u5P8z2ycn0sG1mipRFVQRZGJ0rmfrkiBn7rXYJPmBHeet5VYFkOJ8nuSYa
-         bZZNJSOhz2pqEWAhuhAeQNsxx3KYBE34X85hqfEWMIFQ3KY0PCTwpSDT3zwQHYfEJTpw
-         gcXQ==
-X-Gm-Message-State: AO0yUKXJBmDsGYhXQtxkQ3b9Gq7vpB/X3vtuF+dNaVsI9SLkHZ1jaMFT
-        1JicEZhrUfRFx6D/fNYW2VgPHU8o1EL4Ybo8yka7nNRKmAAjSFk/aLLH2bRYouGAZGKxGLut4ou
-        3poNOnJMovDyEkqwkEJTynGiOeYBhUce0W7yO
-X-Received: by 2002:a05:6870:610c:b0:171:d1a1:c5cb with SMTP id s12-20020a056870610c00b00171d1a1c5cbmr212601oae.217.1676860598327;
-        Sun, 19 Feb 2023 18:36:38 -0800 (PST)
-X-Google-Smtp-Source: AK7set+o/PIyYCf/r6enEsMKw/BDh3XyDsV2IO5FKzRCPBc/l0Kkzql2S6nZ1RAhn3rjmZd7RJyHVxQxAPtJc0uZzgY=
-X-Received: by 2002:a05:6870:610c:b0:171:d1a1:c5cb with SMTP id
- s12-20020a056870610c00b00171d1a1c5cbmr212592oae.217.1676860598109; Sun, 19
- Feb 2023 18:36:38 -0800 (PST)
+        bh=Z4mF9eRLWUighxaWu/WlNqJCc0pM0J+zyyIk2SE2gxU=;
+        b=ofVxXNu0xvKEzs9jb1Y301hYccgHh1iEryGFiSqKF2PBps34EJpA053Of6a1eZzFQ+
+         1LtxYlTfFPCpfSeeD+UK3dNMS8d+pOBG2ds8v/Gp7aLnX36Eq+VkTfq+PW3NwPatmmxy
+         QXxZgX9OpurRRm8B3znEWpnZwxJAUctkVp29Umuj9vf1GutyWROx2vSaajnszTG/fMpf
+         g0lfoja8PKHMbAC21M21wF6MFxFvqLOvfHp3k3uVA6KN6n+hIOwpR5nbxudqJMQ6wU+P
+         KEqIsWmsmWfY//quOGBB558LYDQrpEITcDb2MYlRcsieq0bqy0PNwY8jhrXPWKUn5eAv
+         3CHw==
+X-Gm-Message-State: AO0yUKWqLlY8/I+v/NfCOqtBfI4onF2OWoCU0q3OrGlspJo0ofwaDBTo
+        nL8ShrPoTWmCJEj1OOGaCtmNCgj0W3OjfUeoZ8DoxliNo9StHK26PyOj2nSTYD4yNa5jAWstPiB
+        0GTGYVxXknpZhjqSVYnkYp0Slo2bE
+X-Received: by 2002:a05:6870:e309:b0:16a:cfba:d187 with SMTP id z9-20020a056870e30900b0016acfbad187mr57943oad.2.1676860649432;
+        Sun, 19 Feb 2023 18:37:29 -0800 (PST)
+X-Google-Smtp-Source: AK7set8SJitLQ9LUE3u1syC+o7Uv38TErayt/RAfp5Ui0lrmlYgjeBjytjXtpn+4L/G0i6tLLMj766NjBhCbz614fY0=
+X-Received: by 2002:a05:6870:e309:b0:16a:cfba:d187 with SMTP id
+ z9-20020a056870e30900b0016acfbad187mr57932oad.2.1676860649055; Sun, 19 Feb
+ 2023 18:37:29 -0800 (PST)
 MIME-Version: 1.0
 References: <20230207120843.1580403-1-sunnanyong@huawei.com>
- <Y+7G+tiBCjKYnxcZ@nvidia.com> <CACGkMEtehykvqNUnfCi0VmHR1xpmhj4sSWdYW1-0oATY=0YhXw@mail.gmail.com>
- <20230217051038-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20230217051038-mutt-send-email-mst@kernel.org>
+ <Y+7G+tiBCjKYnxcZ@nvidia.com> <20230217051158-mutt-send-email-mst@kernel.org> <Y+92c9us3HVjO2Zq@nvidia.com>
+In-Reply-To: <Y+92c9us3HVjO2Zq@nvidia.com>
 From:   Jason Wang <jasowang@redhat.com>
-Date:   Mon, 20 Feb 2023 10:36:27 +0800
-Message-ID: <CACGkMEuDG1NUs0=ry1=Mphfd+TrqAvVS0yeu9hcni2VrPkB8tQ@mail.gmail.com>
+Date:   Mon, 20 Feb 2023 10:37:18 +0800
+Message-ID: <CACGkMEsVBhxtpUFs7TrQzAecO8kK_NR+b1EvD2H7MjJ+2aEKJw@mail.gmail.com>
 Subject: Re: [PATCH v2] vhost/vdpa: Add MSI translation tables to iommu for
  software-managed MSI
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
         Nanyong Sun <sunnanyong@huawei.com>, joro@8bytes.org,
         will@kernel.org, robin.murphy@arm.com, iommu@lists.linux.dev,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        wangrong68@huawei.com
+        wangrong68@huawei.com, Cindy Lu <lulu@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -79,11 +78,10 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 17, 2023 at 6:11 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+On Fri, Feb 17, 2023 at 8:43 PM Jason Gunthorpe <jgg@nvidia.com> wrote:
 >
-> On Fri, Feb 17, 2023 at 01:35:59PM +0800, Jason Wang wrote:
-> > On Fri, Feb 17, 2023 at 8:15 AM Jason Gunthorpe <jgg@nvidia.com> wrote:
-> > >
+> On Fri, Feb 17, 2023 at 05:12:29AM -0500, Michael S. Tsirkin wrote:
+> > On Thu, Feb 16, 2023 at 08:14:50PM -0400, Jason Gunthorpe wrote:
 > > > On Tue, Feb 07, 2023 at 08:08:43PM +0800, Nanyong Sun wrote:
 > > > > From: Rong Wang <wangrong68@huawei.com>
 > > > >
@@ -103,31 +101,22 @@ On Fri, Feb 17, 2023 at 6:11 PM Michael S. Tsirkin <mst@redhat.com> wrote:
 > > > I'd like it if vdpa could move to iommufd not keep copying stuff from
 > > > it..
 > >
-> > Yes, but we probably need a patch for -stable.
+> > Absolutely but when is that happening?
 >
-> Hmm do we? this looks like it's enabling new platforms is not a bugfix...
+> Don't know, I think it has to come from the VDPA maintainers, Nicolin
+> made some drafts but wasn't able to get it beyond that.
 
-I think we haven't limited vDPA to any specific arch in the past?
+Cindy (cced) will carry on the work.
 
 Thanks
 
 >
-> > >
-> > > Also the iommu_group_has_isolated_msi() check is missing on the vdpa
-> > > path, and it is missing the iommu ownership mechanism.
-> >
-> > Ok.
-> >
-> > >
-> > > Also which in-tree VDPA driver that uses the iommu runs on ARM? Please
-> >
-> > ifcvf and vp_vpda are two drivers that use platform IOMMU.
-> >
-> > Thanks
-> >
-> > > don't propose core changes for unmerged drivers. :(
-> > >
-> > > Jason
-> > >
+> Please have people who need more iommu platform enablement to pick it
+> up instead of merging hacks like this..
+>
+> We are very close to having nested translation on ARM so anyone who is
+> serious about VDPA on ARM is going to need iommufd anyhow.
+>
+> Jason
 >
 
