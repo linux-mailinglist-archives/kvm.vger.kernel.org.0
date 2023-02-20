@@ -2,212 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6389169D501
-	for <lists+kvm@lfdr.de>; Mon, 20 Feb 2023 21:32:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 05A1969D509
+	for <lists+kvm@lfdr.de>; Mon, 20 Feb 2023 21:34:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232732AbjBTUcC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Feb 2023 15:32:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54972 "EHLO
+        id S232766AbjBTUe0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Feb 2023 15:34:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229885AbjBTUcB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Feb 2023 15:32:01 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F10BA270A;
-        Mon, 20 Feb 2023 12:31:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=VTUTOKS/Iip/C7nA83wIyGAQbjddIMsHseDsumqVjQY=; b=MG7NVP+Sah1Sd4Q1lorpSahAcj
-        ZhwfSXJEKcuYnVCsAvQSEn99AG82hFCqZyNzFmsS66EM5bwAhvIQpGe6rFg6b/zEuNrD5rt3doVNy
-        /1qHeDM0KZfLuzA/K9DXiNYe792ZzzRXM+QUYByzVs13+FGKWE/GTqHAEb+xhwd5CLbcwbOgakSl/
-        N+m33NZYXc+q8KJmj6AV/7WUjqNi18pFXbwB5vIwsr+nEerBk4uPqozE1tI7dvA10g/nkTomGLqPe
-        owKLHV4sjubNs9tjaaRMgmDVGW0XvDmnHnrrqksA/JEmLFzghoWuW6bKEBQcowEhFyJCG3Ca+BsXL
-        feKGP1oA==;
-Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.ant.amazon.com)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pUCog-00C08A-F4; Mon, 20 Feb 2023 20:31:19 +0000
-Message-ID: <2a67f6cf18dd2c1879fad9fd8a28242918d3e5d2.camel@infradead.org>
-Subject: Re: [PATCH v9 0/8] Parallel CPU bringup for x86_64
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Oleksandr Natalenko <oleksandr@natalenko.name>, tglx@linutronix.de,
-        kim.phillips@amd.com, Usama Arif <usama.arif@bytedance.com>
-Cc:     arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
-        pbonzini@redhat.com, paulmck@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
-        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
-        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
-        simon.evans@bytedance.com, liangma@liangbit.com
-Date:   Mon, 20 Feb 2023 20:31:16 +0000
-In-Reply-To: <2668869.mvXUDI8C0e@natalenko.name>
-References: <20230215145425.420125-1-usama.arif@bytedance.com>
-         <2668799.mvXUDI8C0e@natalenko.name>
-         <ed8d662351cfe5793f8cc7e7e8c514d05d16c501.camel@infradead.org>
-         <2668869.mvXUDI8C0e@natalenko.name>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-+zum+WtzMV2/rH0rNAE5"
-User-Agent: Evolution 3.44.4-0ubuntu1 
+        with ESMTP id S229468AbjBTUeY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Feb 2023 15:34:24 -0500
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2045.outbound.protection.outlook.com [40.107.220.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1E7C193FB;
+        Mon, 20 Feb 2023 12:34:23 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=F93Li0DgAqbCxqdP+rZpunYdYTDRgRj6c9In86/FX8hFBrBFXNNvSgpQtYiBhIycCIxtQcNjWGJNnh5LzCvrtAS6vlbbS5serBdMC167f2nEBYn57kAccO5Z9GWEaEBn1b//BvfTDHkvPU77YRD/uuF4JjH7IGZ32/A7bZAytOv+DbqoAbRlcJFJ3VrYI+L1GOs9DLJzMLcL3zucuynDx9W27K9kbhlx6tgAobNkseSGM0WKAPgfCbPOc5DFUCMjVuPuCrRrY4VgFaaa80mGPkxtCMcdV8qCew1fgufMOfX3rB0KIhgp/dd6Eb8hHyZaDK9i3Iul0gSPlKR0YkU4/Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=A0GngpEAj0k1OWgyk0D03qOWG2sQkyN2bOfyqNVfyHI=;
+ b=kmA+BfDSRMHp997ibtwX/9pPKR0sStZVbyogjWxy35S3GAJ2jkB+tWRP8MQN2973mcroVzR+JxziTBgkBB9Uh6t+rvWhKuieeW5V1+OTPUP21f+WmkXxiClcUttr0Z1IQkbVmeDRtNhUJyL6GJEY4FpXOihAbQ2LJUffBSe+c+dyWeb4GpP8q2eZivN6tryzsQD7PikbL5WRR/4lT8Apj5f4v7d9neP13iOFQEk/OMVe18vFY7BDVTQ3aBwaRo/wxXDik8TJEYmEfhJee5mVXwNQ8Jew/Ahb6mHoy9GP7uCaDjBRENMF4KLJM8e7w3iJNZru5+JO3n+WL8XR2Jad2Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=A0GngpEAj0k1OWgyk0D03qOWG2sQkyN2bOfyqNVfyHI=;
+ b=iA1Zm3T0iL4pmL1di7tZAx/lpkS+H8ndcwxMAbqcc5AepZKD1BKGpcGk5Iw3oa9UdtHhvSgbjpe+/6m+Nl99P6e6oel24FNeGmNMYOmHmqL1Q/bgT7H7JULeg6HkSGVDsdTuhx8jplp8CgO1srmLIGjO89+7VbLWa2BhL3173mo=
+Received: from DM6PR03CA0042.namprd03.prod.outlook.com (2603:10b6:5:100::19)
+ by DS0PR12MB7560.namprd12.prod.outlook.com (2603:10b6:8:133::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.19; Mon, 20 Feb
+ 2023 20:34:21 +0000
+Received: from DM6NAM11FT037.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:100:cafe::9c) by DM6PR03CA0042.outlook.office365.com
+ (2603:10b6:5:100::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.20 via Frontend
+ Transport; Mon, 20 Feb 2023 20:34:21 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DM6NAM11FT037.mail.protection.outlook.com (10.13.172.122) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6111.19 via Frontend Transport; Mon, 20 Feb 2023 20:34:21 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 20 Feb
+ 2023 14:34:20 -0600
+Date:   Mon, 20 Feb 2023 14:31:27 -0600
+From:   Michael Roth <michael.roth@amd.com>
+To:     Hugh Dickins <hughd@google.com>
+CC:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
+        <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
+        <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
+        <thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
+        <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
+        <jmattson@google.com>, <luto@kernel.org>,
+        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
+        <pgonda@google.com>, <peterz@infradead.org>,
+        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
+        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
+        <tony.luck@intel.com>, <marcorr@google.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
+        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>
+Subject: Re: [PATCH RFC v8 18/56] x86/fault: fix handle_split_page_fault() to
+ work with memfd backed pages
+Message-ID: <20230220203127.o4mf2bcrlwgsmf7z@amd.com>
+References: <20230220183847.59159-1-michael.roth@amd.com>
+ <20230220183847.59159-19-michael.roth@amd.com>
+ <29e9ed33-52eb-fbb4-5358-76939df747a9@google.com>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <29e9ed33-52eb-fbb4-5358-76939df747a9@google.com>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT037:EE_|DS0PR12MB7560:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5053471c-e46e-4a48-8340-08db1381d8ed
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: zeC4GVYzt7Zj+W6CjjgyDsTGI0vI0/NJ9J75aEqW5ZqhANrQ9NYlOZBCMVH8BIIHMztU+H+ydBRpMD72nKpHr1PXUZX80eDJJCs46yjYqIsY/IPmpbuQlIgnpnuV9vbDGRtx+XIH2th8IHoJjam2wKhe3KUCSa7yFDNYNrgwgV67EPPw3TzwP7dgPnMou/5p6Q9X8zCfi2cdVH+UfO89eEtdIar8Wq6QQmR/SPiQKiRXvaEc0hG6qxmlUM5yHULkhV46C37KjMUHyy7MKZ7KQ9IgpzC0Bv0aqdUC8IUneM1GUsi1wOMdJ0wIcm7WHW2lKgFOfj6kDyXxviazu2yk31qFiDO7LTX0Ijdf27Qrbu4gY61U0NodMUM+Z8G/YySJ/FaF9TzfVwLbRwK/feTPyeiUOJrHm1BLK2p8G6EG8mrn31UI7CAdCKDr88043ZyeGQ5ZcDbeiKdqthssaENc/ignNrWkjmsUb5w7ec2XTWdM+r/d7G7hOtqPf3X6imkqxtSM5nZJurFla5eiRS7F/c3jGTIs2nWviU2srUhALwZCGRzOXhxKb0eJfmso9Slb8VSuPByUb/PWt2nd0dC4EDT9uom0runwV3HfP0F9baazMw3HAAQlyuUcCOZMHC0iP06iu3Yn1JTgpOpKaN3Xfz4cFEfzeqqiBOuuaOzzCwZe7VkHyYmtQtcXjBKcbHOtBgBOGtHovKT+WZ38yF4digVrn8oaxkmiM7tVaZpzw38=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(396003)(376002)(346002)(39860400002)(136003)(451199018)(36840700001)(40470700004)(46966006)(6916009)(83380400001)(40460700003)(36756003)(86362001)(5660300002)(36860700001)(7406005)(7416002)(2906002)(81166007)(8936002)(356005)(40480700001)(47076005)(82310400005)(426003)(336012)(70206006)(966005)(1076003)(8676002)(82740400003)(478600001)(70586007)(44832011)(186003)(54906003)(26005)(41300700001)(2616005)(4326008)(16526019)(316002)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2023 20:34:21.3585
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5053471c-e46e-4a48-8340-08db1381d8ed
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT037.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7560
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Feb 20, 2023 at 11:57:59AM -0800, Hugh Dickins wrote:
+> On Mon, 20 Feb 2023, Michael Roth wrote:
+> 
+> > From: Hugh Dickins <hughd@google.com>
+> 
+> No.
+> 
+> > 
+> > When the address is backed by a memfd, the code to split the page does
+> > nothing more than remove the PMD from the page tables. So immediately
+> > install a PTE to ensure that any other pages in that 2MB region are
+> > brought back as in 4K pages.
+> > 
+> > Signed-off-by: Hugh Dickins <hughd@google.com>
+> 
+> No.  Suggested-by would be okay.
+> 
+> > Cc: Hugh Dickins <hughd@google.com>
+> 
+> Thanks.  I'm really sorry to be such a jobsworth,
+> and have nothing more constructive to say than I did before in
+> https://lore.kernel.org/linux-mm/7f2228c4-1586-2934-7b92-1a9d23b6046@google.com/
+> (please re-read), but adding a Signed-off-by where none was given is wrong;
+> and I'm not ever going to comprehend enough of the context to give it.
 
---=-+zum+WtzMV2/rH0rNAE5
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Hi Hugh,
 
-On Mon, 2023-02-20 at 17:40 +0100, Oleksandr Natalenko wrote:
-> Hello.
->=20
-> Thank you for your reply.
->=20
-> On pond=C4=9Bl=C3=AD 20. =C3=BAnora 2023 17:20:13 CET David Woodhouse wro=
-te:
-> > On Mon, 2023-02-20 at 17:08 +0100, Oleksandr Natalenko wrote:
-> > >=20
-> > > I've applied this to the v6.2 kernel, and suspend/resume broke on
-> > > my
-> > > Ryzen 5950X desktop. The machine suspends just fine, but on
-> > > resume
-> > > the screen stays blank, and there's no visible disk I/O.
-> > >=20
-> > > Reverting the series brings suspend/resume back to working state.
-> >=20
-> > Hm, thanks. What if you add 'no_parallel_bringup' on the command
-> > line?
->=20
-> If the `no_parallel_bringup` param is added, the suspend/resume
-> works.
+Sorry for the mix-up, I'd intended to remove this patch before submitting. I'll
+make sure to remove it from future postings.
 
-Thanks for the testing. Can I ask you to do one further test: apply the
-series only as far as patch 6/8 'x86/smpboot: Support parallel startup
-of secondary CPUs'.
+> 
+> Best of luck for the series,
 
-That will do the new startup asm sequence where each CPU finds its own
-per-cpu data so it *could* work in parallel, but doesn't actually do
-the bringup in parallel yet.
+Thank you!
 
-Does your box have a proper serial port?=20
+-Mike
 
---=-+zum+WtzMV2/rH0rNAE5
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMjIwMjAzMTE2WjAvBgkqhkiG9w0BCQQxIgQgF9OhjiUv
-4y5YR92n5Y+dm8aZX+9NYA9QKKC2UnvF7xswgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCjjLh+GqBrqitcKL4cIdL7BazHYM67Hukx
-6QhbVLlRS1r22pwJ2H6eBLr5x7qbHWXZfpRtQz1RA33ezwpH5461FqOfN4o5nOYICDjB/08z5CnQ
-zc7UHy/SMe1ZuQS+dLnB49IUhh9bnF2yI+AhsZGrCoWZcG4ThUmKrRfEqnkctU3TicBHynW4GV5a
-HpGjfsqJ/J9iq4YRnOS/oSoT+636AMQk3tliIOlp5GCJf0TcaTM+EIJ6p/6mV+9jraOxA8geS1I2
-bNbm+q8GqywP0cRxsh7QxGDixHXL/l8J2+ySKCd+oMex/uWakc4X7JurgoInaka9/9AYqgSON3kE
-rLpvspwEeQEX3CsByR/VBoRO+QQByHeINAwmikE9NAUYNg9eT9kRxWmQ0VmbySV5pmJM8DpmtB7m
-Icwo/YTfkMxtivZN8JUla9LOjr+G27xYuY+kHodSJYKxsZw/pJHFXj40+vPebQc54kH+q8TQ8y6/
-5KJOxad1aaQw+kV+sSyUFh6bN+AELxXpcTD8TOwwOZcwhwLjh3phyn7gd+SCeBxPo7sOHZRsvB8V
-ts5+fzcilcWzLgvk5IEy7mdqJ7FkOjBY2Y6X6dW517ag9QkGsg/CfDWgj2Teg66Mcw4r8i1pQd3S
-jbct5hIkYmP3Kc7wvQD1EZnTDudy6EB/XRS7+BRhrgAAAAAAAA==
-
-
---=-+zum+WtzMV2/rH0rNAE5--
+> Hugh
+> 
+> > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> > Signed-off-by: Michael Roth <michael.roth@amd.com>
+> > ---
+> >  mm/memory.c | 5 +++++
+> >  1 file changed, 5 insertions(+)
+> > 
+> > diff --git a/mm/memory.c b/mm/memory.c
+> > index e68da7e403c6..33c9020ba1f8 100644
+> > --- a/mm/memory.c
+> > +++ b/mm/memory.c
+> > @@ -4999,6 +4999,11 @@ static vm_fault_t handle_pte_fault(struct vm_fault *vmf)
+> >  static int handle_split_page_fault(struct vm_fault *vmf)
+> >  {
+> >  	__split_huge_pmd(vmf->vma, vmf->pmd, vmf->address, false, NULL);
+> > +	/*
+> > +	 * Install a PTE immediately to ensure that any other pages in
+> > +	 * this 2MB region are brought back in as 4K pages.
+> > +	 */
+> > +	__pte_alloc(vmf->vma->vm_mm, vmf->pmd);
+> >  	return 0;
+> >  }
+> >  
+> > -- 
+> > 2.25.1
