@@ -2,189 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6EBC469D140
-	for <lists+kvm@lfdr.de>; Mon, 20 Feb 2023 17:21:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 20EB569D192
+	for <lists+kvm@lfdr.de>; Mon, 20 Feb 2023 17:42:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231848AbjBTQVJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Feb 2023 11:21:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35806 "EHLO
+        id S232336AbjBTQmW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Feb 2023 11:42:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230062AbjBTQVI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Feb 2023 11:21:08 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DA4FFF2E;
-        Mon, 20 Feb 2023 08:21:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=2N0mjLDF4RCECwYgGB5UhLjBmELGQo92MP9bsWA0jW8=; b=IJiQh8zbhURvfw5gNdxP0jXVtg
-        XVT17YXclc19YBiQzx+rgbPoO1RZEZjffd2icsJiYuXOvEtAFL/hg8k+bWgccs99fr0IJ+ZuEupgh
-        NA0SBMY1GresjopCd2LuNCGwHfXOvAlYIxHjaPl2kTYBATBF5f0CPOT5ryv+jfU+Okv5pptVl+GG2
-        tcHpZ9bK4JuwuSI4/sYPj2BAf0sYJeO6NMlqb+EFGUnd5+uBEjQt9dvZznQ7b0wZtaZoNqgUvmy+u
-        sxqQdYZ5pv/lxtu2eYSZJkWxcz1T0yF6Nr/9ihFo0e9vhlGc7Kh7sINCt1S3eSOHv1DTo5egQ1vEm
-        4LDkWeHw==;
-Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.ant.amazon.com)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pU8tj-00Br48-CV; Mon, 20 Feb 2023 16:20:15 +0000
-Message-ID: <ed8d662351cfe5793f8cc7e7e8c514d05d16c501.camel@infradead.org>
-Subject: Re: [PATCH v9 0/8] Parallel CPU bringup for x86_64
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Oleksandr Natalenko <oleksandr@natalenko.name>, tglx@linutronix.de,
-        kim.phillips@amd.com, Usama Arif <usama.arif@bytedance.com>
-Cc:     arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
-        pbonzini@redhat.com, paulmck@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
-        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
-        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
-        simon.evans@bytedance.com, liangma@liangbit.com
-Date:   Mon, 20 Feb 2023 16:20:13 +0000
-In-Reply-To: <2668799.mvXUDI8C0e@natalenko.name>
-References: <20230215145425.420125-1-usama.arif@bytedance.com>
-         <2668799.mvXUDI8C0e@natalenko.name>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-uE9XCa0ZzGivZ6OioyoI"
-User-Agent: Evolution 3.44.4-0ubuntu1 
+        with ESMTP id S232339AbjBTQmT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Feb 2023 11:42:19 -0500
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2055.outbound.protection.outlook.com [40.107.93.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0DC41E5EC;
+        Mon, 20 Feb 2023 08:41:39 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=O5L7DJf4LmtelcC9wBjZcNgb6+ELX7sAhrS3RViOZPq7ukAQkZHDHLuhnso/3TetGMUP0tzuyGdNjxUXhEKZt5KGyKSc1OW179SkGTQC1E2m36Ifs2TFx8hct5QD8HOBpZmUCcr0u+W5C2nTgeaz6Djq01KGTE7SnWGGeaBH1dvUe7jfpyi+3f6/cMLcAHi3MoI90C/GTR3nWK4klRGWDbt0+sUfulyxamJVEMzqCm+DVQeENv0BLAUYUAhgq1yFYmGIe7B+dluN7ybZNEvCbWrKGORbMcqEmH+ka5Lk9Lx7p4cwtLleUQ7iHCa873oa09VyOwUKvzhGTi73BaLckQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=MYG2F/Kz+L66kuyTglO+w54eANn764HnkaGxzcD/lIo=;
+ b=ja+wRfDFx66hQVuYY4e0ZVuKvF9bXwOHuCJGXkcrs4OG5CweokyzdeeBjvTKaYM6EIEFhb7EncSkB/evZs0Hm1HcuNjRKb+TNgn0AVY+iLEc5/oiJMuho0hvkBd8QpLeZuz4fzOUTQJuIJOGTGX04Sk5QjZj+EcOiexmLJPTKjf5Dd1wyEpAkep4BMjFT0HYhSqlwKGpn4zAqaBYbvDR4qWaUSCKvU+tKoo0oDHlI3OmvyxoIc05PRvQdSaEYjhE7vJ3FZkkqsQGTlLjGdWWaM/59+lD+sh4n86b9x+sKydefJKLNwJBtTy4Pqvqit6mmowuttZwxrnak49ncsfnvA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MYG2F/Kz+L66kuyTglO+w54eANn764HnkaGxzcD/lIo=;
+ b=b+hRllSZL33xnPNb455ex0qZG3NS8LcxVtfkdSzJu8WEVabrhLx4tm1ZSWrsKmHcYB6ltIrv8KdA4zdOzFiedtVH4jNTuZIyNh1mL/Qct/aSrGdjEUt+SkqzZc0zMk0Zuyg/Bph/+VMbv3ll6EEwi+mnLMAdbOWszLzPKTwBDpQ=
+Received: from BN9PR03CA0085.namprd03.prod.outlook.com (2603:10b6:408:fc::30)
+ by IA1PR12MB6233.namprd12.prod.outlook.com (2603:10b6:208:3e7::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.19; Mon, 20 Feb
+ 2023 16:41:36 +0000
+Received: from BN8NAM11FT082.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:fc:cafe::3e) by BN9PR03CA0085.outlook.office365.com
+ (2603:10b6:408:fc::30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.19 via Frontend
+ Transport; Mon, 20 Feb 2023 16:41:36 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN8NAM11FT082.mail.protection.outlook.com (10.13.176.94) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6111.20 via Frontend Transport; Mon, 20 Feb 2023 16:41:36 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 20 Feb
+ 2023 10:41:35 -0600
+Date:   Mon, 20 Feb 2023 10:22:10 -0600
+From:   Michael Roth <michael.roth@amd.com>
+To:     Sean Christopherson <seanjc@google.com>
+CC:     Borislav Petkov <bp@alien8.de>, <kvm@vger.kernel.org>,
+        <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+        <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <tglx@linutronix.de>,
+        <mingo@redhat.com>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
+        <hpa@zytor.com>, <ardb@kernel.org>, <pbonzini@redhat.com>,
+        <vkuznets@redhat.com>, <wanpengli@tencent.com>,
+        <jmattson@google.com>, <luto@kernel.org>,
+        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
+        <pgonda@google.com>, <peterz@infradead.org>,
+        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <vbabka@suse.cz>,
+        <kirill@shutemov.name>, <ak@linux.intel.com>,
+        <tony.luck@intel.com>, <marcorr@google.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
+        <ashish.kalra@amd.com>, <harald@profian.com>
+Subject: Re: [PATCH RFC v7 04/64] KVM: x86: Add 'fault_is_private' x86 op
+Message-ID: <20230220162210.42rjdgbdwbjiextz@amd.com>
+References: <20221214194056.161492-1-michael.roth@amd.com>
+ <20221214194056.161492-5-michael.roth@amd.com>
+ <Y628y6hQK38+IAev@zn.tnic>
+ <20230105024256.ptujtjgzcdmpakoa@amd.com>
+ <Y8Fr/F1RV0B8CHq5@zn.tnic>
+ <Y8F9a2pmh13aIQZL@google.com>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <Y8F9a2pmh13aIQZL@google.com>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT082:EE_|IA1PR12MB6233:EE_
+X-MS-Office365-Filtering-Correlation-Id: b6c2e143-74b1-423a-2241-08db1361556b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: cP6+xIqw9Siwm1AsQbGq3lUcyP+SuryfSqfArKD40Dzj2bvBy2ZCoKtQKi+zao/5bZErIalPmMMpkPRKVO3QnbFAQI6pXPmnVHRtnnJEIiuUeUW/QFTifxvF5s7Xt9VULWiDxJwSL+UwIVG7cu2GrKvFGPttm3Cqhzl6R5NOFBw7Z8CVPhMdt+IdSRBrhoEXizRYsXBP8m9XXDMfJwa3glbqBF/4veEwFv5YAmi0f+nT7cp5Ls5xsrFStI7WpqLpCtz+GrBGCA+rXjwlVSsdf2S4QidMIA/xgza4Hhzbi+883+tK5lwhE/JF5sVbCRiPrEnxv0QAY9Np0cE3Hp37XNU8EuSCU2Bg3WgPZ2rDyi2Ss8IV8dQWvVpkww/grOlHIorV4b7r4EcU2wxVZuK9tsNIvNE4t2RQPVnrniZG8H2HbwiReDt4FnkijeVBa/YHZey4edIiE4oiYRECf+zhxcnB9Uosi+/+REpy3ERkR5ycAL6KKIbK9MOtUl/yRnaV+IqMEBKyR3FNoCdwUFYGBYRX3N5fUa/K12cechZBA+DtwWUQb1gBKvpAjJsWvFTGAxSUJfeYcq5n9xs9n1xoqnA4JNPww9u2LvRH9DgnhHJKTCSQ+GWBRym5Bhvy5AF/x/PzVA44J2iIXkQQ9MupVFIAvuEIsNIsUTz+4Tj+F2Nr7iyEqz1jANyQhoYwKq4iiM3F/utOaFOOiZCEod4ujQOXekpczbxcHn3erXcXibA=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(376002)(346002)(136003)(396003)(39860400002)(451199018)(46966006)(40470700004)(36840700001)(66899018)(8676002)(70206006)(70586007)(6916009)(4326008)(316002)(7406005)(54906003)(7416002)(44832011)(8936002)(5660300002)(41300700001)(40460700003)(36756003)(86362001)(356005)(478600001)(16526019)(6666004)(26005)(186003)(1076003)(2616005)(336012)(47076005)(426003)(2906002)(82310400005)(40480700001)(81166007)(36860700001)(82740400003)(83380400001)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2023 16:41:36.7959
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: b6c2e143-74b1-423a-2241-08db1361556b
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT082.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6233
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Jan 13, 2023 at 03:48:59PM +0000, Sean Christopherson wrote:
+> On Fri, Jan 13, 2023, Borislav Petkov wrote:
+> > On Wed, Jan 04, 2023 at 08:42:56PM -0600, Michael Roth wrote:
+> > > Obviously I need to add some proper documentation for this, but a 1
+> > > return basically means 'private_fault' pass-by-ref arg has been set
+> > > with the appropriate value, whereas 0 means "there's no platform-specific
+> > > handling for this, so if you have some generic way to determine this
+> > > then use that instead".
+> > 
+> > Still binary, tho, and can be bool, right?
+> > 
+> > I.e., you can just as well do:
+> > 
+> >         if (static_call(kvm_x86_fault_is_private)(kvm, gpa, err, &private_fault))
+> >                 goto out;
+> > 
+> > at the call site.
+> 
+> Ya.  Don't spend too much time trying to make this look super pretty though, there
+> are subtle bugs inherited from the base UPM series that need to be sorted out and
+> will impact this code.  E.g. invoking kvm_mem_is_private() outside of the protection
+> of mmu_invalidate_seq means changes to the attributes may not be reflected in the
+> page tables.
+> 
+> I'm also hoping we can avoid a callback entirely, though that may prove to be
+> more pain than gain.  I'm poking at the UPM and testing series right now, will
+> circle back to this and TDX in a few weeks to see if there's a sane way to communicate
+> shared vs. private without having to resort to a callback, and without having
+> races between page faults, KVM_SET_MEMORY_ATTRIBUTES, and KVM_SET_USER_MEMORY_REGION2.
 
---=-uE9XCa0ZzGivZ6OioyoI
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Can circle back on this, but for v8 at least I've kept the callback, but
+simplified SVM implementation of it so that it's only needed for SNP. For
+protected-SEV it will fall through to the same generic handling used by UPM
+self-tests.
 
-On Mon, 2023-02-20 at 17:08 +0100, Oleksandr Natalenko wrote:
->=20
-> I've applied this to the v6.2 kernel, and suspend/resume broke on my
-> Ryzen 5950X desktop. The machine suspends just fine, but on resume
-> the screen stays blank, and there's no visible disk I/O.
->=20
-> Reverting the series brings suspend/resume back to working state.
+It seems like it's safe to have a callback of that sort here for TDX/SNP (or
+whatever we end up replacing the callback with), since the #NPF flags
+themselves won't change based on attribute updates, and the subsequent
+comparison to kvm_mem_is_private() will happen after mmu_invalidate_seq
+is logged.
 
-Hm, thanks. What if you add 'no_parallel_bringup' on the command line?
+But for protected-SEV and UPM selftests the initial kvm_mem_is_private()
+can become stale vs. the one in __kvm_faultin_pfn(), but it seems like ATM
+it would only lead to a spurious KVM_EXIT_MEMORY_FAULT, which SEV at least
+should treat at an implicit page-state change and be able to recover from.
+But yah, not ideal, and maybe for self-tests that makes it difficult to tell
+if things are working as expected or not.
 
-Is that using X2APIC? If so, what about 'nox2apic' on the command line?
+Maybe we should just skip setting fault->is_private here in the
+non-TDX/non-SNP cases, and just have some other indicator so it's
+initialized/ignored in kvm_mem_is_private() later. I think some iterations
+of UPM did it this way prior to 'is_private' becoming const.
 
---=-uE9XCa0ZzGivZ6OioyoI
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+> 
+> > > This is mainly to handle CONFIG_HAVE_KVM_PRIVATE_MEM_TESTING, which
+> > > just parrots whatever kvm_mem_is_private() returns to support running
+> > > KVM selftests without needed hardware/platform support. If we don't
+> > > take care to skip this check where the above fault_is_private() hook
+> > > returns 1, then it ends up breaking SNP in cases where the kernel has
+> > > been compiled with CONFIG_HAVE_KVM_PRIVATE_MEM_TESTING, since SNP
+> > > relies on the page fault flags to make this determination, not
+> > > kvm_mem_is_private(), which normally only tracks the memory attributes
+> > > set by userspace via KVM_SET_MEMORY_ATTRIBUTES ioctl.
+> > 
+> > Some of that explanation belongs into the commit message, which is a bit
+> > lacking...
+> 
+> I'll circle back to this too when I give this series (and TDX) a proper look,
+> there's got too be a better way to handle this.
+> 
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMjIwMTYyMDEzWjAvBgkqhkiG9w0BCQQxIgQgzO2hyBf3
-8I3JhhhO0aSjLtdzxl5dm1xOE/AjQ9tw0KUwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAG7egpu9AyoAp+wQ38DrTUPQ55pBOZqELo
-ipMBsZDVvgbOeORtrDMl2uHixNrDQRkaNffhWZhCYEiFLzYnlond8swIRos+rKNdkbemuiKnvIUp
-A9uduFNCn2ypPYMPl/qe9XEphfy7uM3619NZsoW4h2SkSvOgxegLvxtFjwNram/UcneuTck7jGW8
-PHcM8jO3sUxdf8Mb+YU8GRIGjXIOv0lEk3fBBV6HsNCBq76ag3u99DsWhG/B+kIQBtLoAFCt+SvB
-xYrSnUUdewgSCOLmsa1u0ZB+shXgMrz2ylhNzq+jI4KktLJhLmc360agpAfeNHpOSfRyyhyru4o+
-GSy2B3AQy8iTNEJf6Ro9WdZx4LPTg3aG6m7Z2CJWOi+FdRCEkpG4uQygdlxLzQWY9lMpAVdg0vGr
-UpTIyBJcwsLwnI9teTdkmaqyEuGFyvEogEUnuMT537uzXve8GI5X9ziGFpLHVvj+Knov3JyUhyBA
-u7bj1B4mSxfRwJ3SnAlgLOXwyhqxN/EVMwUbUxvLAkALK88jtj/6owZl3UFFNz5b2GazWmH3+F2F
-80aV/3kwOW5dPnACtAIkxcSErcmoWrcTmPhC4tqpXhYuzm3XhJe6iZrT2QSBA+QJFLCWn8ods51k
-+RyDBNR3Sbz6XMPw0b2k69cAC+VgMNEzfWL0vwcFGgAAAAAAAA==
+It seems like for SNP/TDX we just need to register the shared/encrypted
+bits with KVM MMU and let it handle checking the #NPF flags, but can
+iterate on that for the next spin when we have a better idea what it
+should look like.
 
-
---=-uE9XCa0ZzGivZ6OioyoI--
+-Mike
