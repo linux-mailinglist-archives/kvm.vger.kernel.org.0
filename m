@@ -2,75 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 628C969C8D1
-	for <lists+kvm@lfdr.de>; Mon, 20 Feb 2023 11:41:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 178D569C90A
+	for <lists+kvm@lfdr.de>; Mon, 20 Feb 2023 11:52:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231620AbjBTKl2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Feb 2023 05:41:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33292 "EHLO
+        id S231316AbjBTKwF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Feb 2023 05:52:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230291AbjBTKl0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Feb 2023 05:41:26 -0500
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B53EE397
-        for <kvm@vger.kernel.org>; Mon, 20 Feb 2023 02:40:59 -0800 (PST)
-Received: by mail-ed1-x52e.google.com with SMTP id g1so2570694edz.7
-        for <kvm@vger.kernel.org>; Mon, 20 Feb 2023 02:40:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G+eAFzJgAQpcC9VEGPniXtKBPMuCgVjnMF20YBpaeWM=;
-        b=efrQDZi3JcWpS907l2e1Ycsl45yQ7twvtI7todBCKfucVcvSDri1C8WCVout0o6nIt
-         ifQilTJbMNoo5oJ6GYdPfQCuG6ThCgeaPzg88Y9PUZ5ss4Wqfmtfu0n1+CD1wmlPrfGQ
-         MZbtc/9vFdcsx3xhU0Isjk7uOjcjCT8Rm+Qyth9W0g4JpzpUpP5XpbQgGz7BzHOZLKDM
-         nedHWfK2MiQ4k1V0p8vMhOTsugNLyymJVQpFMacD3X/hLFJ/ue5KdBkii18XT4N41849
-         7pxH43OLbURWHGZvV6ATNWGrc/dxM/wwqcxxdy137TVXcYgmDbirZ0wjVaazvXTpoK5r
-         BZ7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=G+eAFzJgAQpcC9VEGPniXtKBPMuCgVjnMF20YBpaeWM=;
-        b=rEEvYIdpMif3TDI2m4bU5eIVXQvxdmvNZUArC1NCvPzu0z+OXLdaP0U89l5XbRLL2o
-         Q9nzC3tk418DqB7dedB6I5e4H0aNClTKIC0x5TOIMgawdp8ShZQjNDxBnPl8bPH/+JC6
-         TJmqljCwUZzj2Uc48g2UdN/zMF+o9mT5MTWaQy9r/YgMpYaV1lrUBiB0zczGEdIFptP8
-         8WeiIC1phSe0ennZlODIZ8FFouvk5HYHqekZrDlZ4CSjcifqNbJSUGS02ofAMVMA8TXN
-         xOEtPGr6AdnqMmP/TUVA8Df4QvMFtsg5mphIgXIURX0ps9W6sQRYuB/xmB2ymwo2j4FX
-         qwmQ==
-X-Gm-Message-State: AO0yUKXzXTDHB8/lNAvvjqh9qD9Oo95bgLEwgeBLFUD0fAf34OY40Z43
-        ZmNr/wT5scGZLamOnyLTnGg30A==
-X-Google-Smtp-Source: AK7set9YSsK3XlQtgqXayCh5Z251nsX/bKXrhXTztxDePk9N8sFp5lY9SNzDgjrMB6pM/zACr8c4Yw==
-X-Received: by 2002:a17:907:a0d5:b0:8b8:c06e:52d8 with SMTP id hw21-20020a170907a0d500b008b8c06e52d8mr12288750ejc.36.1676889658006;
-        Mon, 20 Feb 2023 02:40:58 -0800 (PST)
-Received: from bell.fritz.box (p200300f6af17b800ede54e0189be431e.dip0.t-ipconnect.de. [2003:f6:af17:b800:ede5:4e01:89be:431e])
-        by smtp.gmail.com with ESMTPSA id u21-20020a17090657d500b007c11e5ac250sm5626050ejr.91.2023.02.20.02.40.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Feb 2023 02:40:57 -0800 (PST)
-From:   Mathias Krause <minipli@grsecurity.net>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        kvm@vger.kernel.org
-Cc:     Mathias Krause <minipli@grsecurity.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, stable <stable@kernel.org>,
-        Xingyuan Mo <hdthky0@gmail.com>
-Subject: Re: [PATCH] kvm: initialize all of the kvm_debugregs structure before sending it to userspace
-Date:   Mon, 20 Feb 2023 11:40:50 +0100
-Message-Id: <20230220104050.419438-1-minipli@grsecurity.net>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230214103304.3689213-1-gregkh@linuxfoundation.org>
-References: <20230214103304.3689213-1-gregkh@linuxfoundation.org>
+        with ESMTP id S229728AbjBTKwA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Feb 2023 05:52:00 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 395E6125A7;
+        Mon, 20 Feb 2023 02:51:58 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C879915BF;
+        Mon, 20 Feb 2023 02:52:40 -0800 (PST)
+Received: from [10.57.75.211] (unknown [10.57.75.211])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4EDEA3F703;
+        Mon, 20 Feb 2023 02:51:53 -0800 (PST)
+Message-ID: <09cc1a81-d4a2-7db2-2add-d56121bbd7d7@arm.com>
+Date:   Mon, 20 Feb 2023 10:51:51 +0000
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.7.2
+Subject: Re: [RFC] Support for Arm CCA VMs on Linux
+Content-Language: en-US
+To:     Itaru Kitayama <itaru.kitayama@gmail.com>
+Cc:     Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andrew Jones <andrew.jones@linux.dev>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        James Morse <james.morse@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joey Gouly <Joey.Gouly@arm.com>, Marc Zyngier <maz@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Steven Price <steven.price@arm.com>,
+        Thomas Huth <thuth@redhat.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.cs.columbia.edu
+References: <20230127112248.136810-1-suzuki.poulose@arm.com>
+ <cfb0292c-e84d-0a7c-be74-ae5508779502@arm.com>
+ <CANW9uyvXofhGGuhGzk_0Et-w8CHT2y35WSu5+hno6Qm8K4R4ug@mail.gmail.com>
+ <CANW9uyuY2Ca9dxYQTtFLFupd-A088NTtmhdE=ST6o6Qn1_XM_A@mail.gmail.com>
+From:   Ryan Roberts <ryan.roberts@arm.com>
+In-Reply-To: <CANW9uyuY2Ca9dxYQTtFLFupd-A088NTtmhdE=ST6o6Qn1_XM_A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,132 +66,121 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14.02.23 11:33, Greg Kroah-Hartman wrote:
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index da4bbd043a7b..50a95c8082fa 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -5254,12 +5254,11 @@ static void kvm_vcpu_ioctl_x86_get_debugregs(struct kvm_vcpu *vcpu,
->  {
->  	unsigned long val;
->  
-> +	memset(dbgregs, 0, sizeof(*dbgregs));
->  	memcpy(dbgregs->db, vcpu->arch.db, sizeof(vcpu->arch.db));
->  	kvm_get_dr(vcpu, 6, &val);
->  	dbgregs->dr6 = val;
->  	dbgregs->dr7 = vcpu->arch.dr7;
-> -	dbgregs->flags = 0;
-> -	memset(&dbgregs->reserved, 0, sizeof(dbgregs->reserved));
->  }
->  
->  static int kvm_vcpu_ioctl_x86_set_debugregs(struct kvm_vcpu *vcpu,
+On 17/02/2023 08:02, Itaru Kitayama wrote:
+> On Sat, Feb 11, 2023 at 7:53 AM Itaru Kitayama <itaru.kitayama@gmail.com> wrote:
+>>
+>> On Sat, Feb 11, 2023 at 1:56 AM Ryan Roberts <ryan.roberts@arm.com> wrote:
+>>>
+>>> On 27/01/2023 11:22, Suzuki K Poulose wrote:
+>>>> [...]
+>>>
+>>>> Running the stack
+>>>> ====================
+>>>>
+>>>> To run/test the stack, you would need the following components :
+>>>>
+>>>> 1) FVP Base AEM RevC model with FEAT_RME support [4]
+>>>> 2) TF-A firmware for EL3 [5]
+>>>> 3) TF-A RMM for R-EL2 [3]
+>>>> 4) Linux Kernel [6]
+>>>> 5) kvmtool [7]
+>>>> 6) kvm-unit-tests [8]
+>>>>
+>>>> Instructions for building the firmware components and running the model are
+>>>> available here [9]. Once, the host kernel is booted, a Realm can be launched by
+>>>> invoking the `lkvm` commad as follows:
+>>>>
+>>>>  $ lkvm run --realm                            \
+>>>>        --measurement-algo=["sha256", "sha512"] \
+>>>>        --disable-sve                           \
+>>>>        <normal-vm-options>
+>>>>
+>>>> Where:
+>>>>  * --measurement-algo (Optional) specifies the algorithm selected for creating the
+>>>>    initial measurements by the RMM for this Realm (defaults to sha256).
+>>>>  * GICv3 is mandatory for the Realms.
+>>>>  * SVE is not yet supported in the TF-RMM, and thus must be disabled using
+>>>>    --disable-sve
+>>>>
+>>>> You may also run the kvm-unit-tests inside the Realm world, using the similar
+>>>> options as above.
+>>>
+>>> Building all of these components and configuring the FVP correctly can be quite
+>>> tricky, so I thought I would plug a tool we have called Shrinkwrap, which can
+>>> simplify all of this.
+>>>
+>>> The tool accepts a yaml input configuration that describes how a set of
+>>> components should be built and packaged, and how the FVP should be configured
+>>> and booted. And by default, it uses a Docker container on its backend, which
+>>> contains all the required tools, including the FVP. You can optionally use
+>>> Podman or have it run on your native system if you prefer. It supports both
+>>> x86_64 and aarch64. And you can even run it in --dry-run mode to see the set of
+>>> shell commands that would have been executed.
+>>>
+>>> It comes with two CCA configs out-of-the-box; cca-3world.yaml builds TF-A, RMM,
+>>> Linux (for both host and guest), kvmtool and kvm-unit-tests. cca-4world.yaml
+>>> adds Hafnium and some demo SPs for the secure world (although since Hafnium
+>>> requires x86_64 to build, cca-4world.yaml doesn't currently work on an aarch64
+>>> build host).
+>>>
+>>> See the documentation [1] and repository [2] for more info.
+>>>
+>>> Brief instructions to get you up and running:
+>>>
+>>>   # Install shrinkwrap. (I assume you have Docker installed):
+>>>   sudo pip3 install pyyaml termcolor tuxmake
+>>>   git clone https://git.gitlab.arm.com/tooling/shrinkwrap.git
+>>>   export PATH=$PWD/shrinkwrap/shrinkwrap:$PATH
+>>>
+>>>   # If running Python < 3.9:
+>>>   sudo pip3 install graphlib-backport
+>>>
+>>>   # Build all the CCA components:
+>>>   shrinkwrap build cca-3world.yaml [--dry-run]
+>>
+>> This has been working on my Multipass instance on M1, thanks for the tool.
+>>
+>> Thanks,
+>> Itaru.
+> 
+> It took a while though I've just booted an Ubuntu 22.10 disk image
+> with the cca-3world.yaml config on M1.
 
-While this change handles the info leak for 32 bit kernels just fine, it
-completely ignores that the ABI is broken for such kernels. The bug
-(existing since the introduction of the API) effectively makes using
-DR1..3 impossible. The memcpy() will only copy half of dbgregs->db and
-effectively only allows setting DR0 to its intended value. The remaining
-registers get shuffled around (lower half of db[1] will end up in DR2,
-not DR1) or completely ignored (db[2..3] which should end up in DR3 and
-DR4). Now, this broken ABI might be considdered "API," so I gave it a
-look...
+That's good to hear - If you have any feedback (or patches ;-)) for Shrinkwrap
+that would improve the experience, do let me know!
 
-A Debian code search gave only three real users of these ioctl()s:
-- VirtualBox ([1], lines 1735 ff.),
-- QEMU ([2], in kvm_put_debugregs(): lines 4491 ff. and
-  kvm_get_debugregs(): lines 4515 ff.) and
-- Linux's KVM selftests ([3], lines 722 ff., used in vcpu_load_state()
-  and vcpu_save_state()).
-
-Linux's selftest uses the API only to read and bounce back the state --
-doesn't do any sanity checks on it.
-
-VirtualBox and QEMU, OTOH, assume that the array is properly filled,
-i.e. indices 0..3 map to DR0..3. This means, these users are currently
-(and *always* have been) broken when trying to set DR1..3. Time to get
-them fixed before x86-32 vanishes into irrelevance.
-
-[1] https://www.virtualbox.org/browser/vbox/trunk/src/VBox/VMM/VMMR3/NEMR3Native-linux.cpp?rev=98193#L1735
-[2] https://gitlab.com/qemu-project/qemu/-/blob/v7.2.0/target/i386/kvm/kvm.c#L4480-4522
-[3] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/tools/testing/selftests/kvm/include/x86_64/processor.h?h=v6.2#n722
-
-An ABI-breaking^Wfixing change like below might be worth to apply on top
-to get that long standing bug fixed:
-
--- >8 --
-Subject: [PATCH] KVM: x86: Fix broken debugregs ABI for 32 bit kernels
-
-The ioctl()s to get and set KVM's debug registers are broken for 32 bit
-kernels as they'd only copy half of the user register state because of
-the UAPI and in-kernel type mismatch (__u64 vs. unsigned long; 8 vs. 4
-bytes).
-
-This makes it impossible for userland to set anything but DR0 without
-resorting to bit folding tricks.
-
-Switch to a loop for copying debug registers that'll implicitly do the
-type conversion for us, if needed.
-
-This ABI breaking change actually fixes known users [1,2] that have been
-broken since the API's introduction in commit a1efbe77c1fd ("KVM: x86:
-Add support for saving&restoring debug registers").
-
-Also take 'dr6' from the arch part directly, as we do for 'dr7'. There's
-no need to take the clunky route via kvm_get_dr().
-
-[1] https://www.virtualbox.org/browser/vbox/trunk/src/VBox/VMM/VMMR3/NEMR3Native-linux.cpp?rev=98193#L1735
-[2] https://gitlab.com/qemu-project/qemu/-/blob/v7.2.0/target/i386/kvm/kvm.c#L4480-4522
-
-Fixes: a1efbe77c1fd ("KVM: x86: Add support for saving&restoring debug registers")
-Cc: stable <stable@kernel.org>	# needs 2c10b61421a2
-Signed-off-by: Mathias Krause <minipli@grsecurity.net>
----
- arch/x86/kvm/x86.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index a2c299d47e69..db3967de7958 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -5261,18 +5261,23 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
- static void kvm_vcpu_ioctl_x86_get_debugregs(struct kvm_vcpu *vcpu,
- 					     struct kvm_debugregs *dbgregs)
- {
--	unsigned long val;
-+	unsigned int i;
- 
- 	memset(dbgregs, 0, sizeof(*dbgregs));
--	memcpy(dbgregs->db, vcpu->arch.db, sizeof(vcpu->arch.db));
--	kvm_get_dr(vcpu, 6, &val);
--	dbgregs->dr6 = val;
-+
-+	BUILD_BUG_ON(ARRAY_SIZE(vcpu->arch.db) != ARRAY_SIZE(dbgregs->db));
-+	for (i = 0; i < ARRAY_SIZE(vcpu->arch.db); i++)
-+		dbgregs->db[i] = vcpu->arch.db[i];
-+
-+	dbgregs->dr6 = vcpu->arch.dr6;
- 	dbgregs->dr7 = vcpu->arch.dr7;
- }
- 
- static int kvm_vcpu_ioctl_x86_set_debugregs(struct kvm_vcpu *vcpu,
- 					    struct kvm_debugregs *dbgregs)
- {
-+	unsigned int i;
-+
- 	if (dbgregs->flags)
- 		return -EINVAL;
- 
-@@ -5281,7 +5286,9 @@ static int kvm_vcpu_ioctl_x86_set_debugregs(struct kvm_vcpu *vcpu,
- 	if (!kvm_dr7_valid(dbgregs->dr7))
- 		return -EINVAL;
- 
--	memcpy(vcpu->arch.db, dbgregs->db, sizeof(vcpu->arch.db));
-+	for (i = 0; i < ARRAY_SIZE(vcpu->arch.db); i++)
-+		vcpu->arch.db[i] = dbgregs->db[i];
-+
- 	kvm_update_dr0123(vcpu);
- 	vcpu->arch.dr6 = dbgregs->dr6;
- 	vcpu->arch.dr7 = dbgregs->dr7;
--- 
-2.30.2
+> 
+> Thanks,
+> Itaru.
+> 
+>>
+>>>
+>>>   # Run the stack in the FVP:
+>>>   shrinkwrap run cca-3world.yaml -r ROOTFS=<my_rootfs.ext4> [--dry-run]
+>>>
+>>> By default, building is done at ~/.shrinkwrap/build/cca-3world and the package
+>>> is created at ~/.shrinkwrap/package/cca-3world (this can be changed with
+>>> envvars).
+>>>
+>>> The 'run' command will boot TF-A, RMM and host Linux kernel in the FVP, and
+>>> mount the provided rootfs. You will likely want to have copied the userspace
+>>> pieces into the rootfs before running, so you can create realms:
+>>>
+>>> - ~/.shrinkwrap/package/cca-3world/Image (kernel with RMI and RSI support)
+>>> - ~/.shrinkwrap/package/cca-3world/lkvm (kvmtool able to launch realms)
+>>> - ~/.shrinkwrap/package/cca-3world/kvm-unit-tests.tgz (built kvm-unit-tests)
+>>>
+>>> Once the FVP is booted to a shell, you can do something like this to launch a
+>>> Linux guest in a realm:
+>>>
+>>>   lkvm run --realm --disable-sve -c 1 -m 256 -k Image
+>>>
+>>> [1] https://shrinkwrap.docs.arm.com
+>>> [2] https://gitlab.arm.com/tooling/shrinkwrap
+>>>
+>>>
+>>> _______________________________________________
+>>> linux-arm-kernel mailing list
+>>> linux-arm-kernel@lists.infradead.org
+>>> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
 
