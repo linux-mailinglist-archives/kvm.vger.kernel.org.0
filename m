@@ -2,42 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2EFCA69D3B3
-	for <lists+kvm@lfdr.de>; Mon, 20 Feb 2023 20:02:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A93869D3C8
+	for <lists+kvm@lfdr.de>; Mon, 20 Feb 2023 20:05:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233024AbjBTTCn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Feb 2023 14:02:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51188 "EHLO
+        id S233082AbjBTTFt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Feb 2023 14:05:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56700 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232968AbjBTTCl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Feb 2023 14:02:41 -0500
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2062f.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e83::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 702E92200A;
-        Mon, 20 Feb 2023 11:02:11 -0800 (PST)
+        with ESMTP id S233068AbjBTTFs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Feb 2023 14:05:48 -0500
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2051.outbound.protection.outlook.com [40.107.243.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56D9E21976;
+        Mon, 20 Feb 2023 11:05:20 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CO4iwPjKE80tPuL9lmKCM5mmLO6HYbno7n/ituOTvT2gVHkQANMd8w46IryWQS5luuzAGm/Hr4zoRbDWCRXt/zCGDgrAVI0DT7UPYvjqlThakXsJrBNuwEeuyBHh/RY8mu6/QItTj1cqrAcvdVFMRBAryGfb4hQhnTz8JBw+SazuXS7N0H0H3F2jQ9qyNY6Hne1hMvjVtHxiQ1MAyOTQxEjGwQb+k2O+BntlpxLysa9WSngkJHn6B+CFB/3EswOVrlK+73To80VgIaZezWkqKbs0itded8AMav9+nkSjkIQT97VZIf23CfK05d6QGYQ2zkzs9ovdwFK10ydUhKaT8A==
+ b=W2aenU3s6cZD5hVCPjgOAoPTP2W6rpwaGeyZr83O6oQmUVFM4kuTcJt6HKSjhWX19hO2dOBfdpmMSgPqyTn1t9RLJfARFZkvE0tUH0IgceK6WT8/8FSNFBTDM4zf/0vSqxfTZPxzRjBT2vD7VbgpMhddkYyojjzbKs/v02IDznlB/U0zvsHWvdjuIsg18WXdDlMuFE+a87dYKnwvSGToljI8gdvNPXYaaE35T/eOdMlxsh+DioN0OvoR3H0l0wspm8veTfneXVA+L5N0Yldz8MLjTNkAfdA/i7IJ9kna610n9upu7pSsuTebYMNf7X+Dzev8Zi7jYu8lLZ3X8EaNdw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CwZqp+t05+zsG1Vq05f7ztxd34mOR92w8AyhJ0DMD40=;
- b=SWuwQchQyY5W0H+mg/T1qnHk7tpH9CEr1CWsrTVIjFRTDrzrqpPf4YS7IDdT08qPP2z0cC7NW5woF8PLcfbLx1UE06mgFpX+euWGnFXvY4d+szj/7qB6x1EpXjtcjvEPUA7t6s4TCJ3TbHF/aVoaEoV9P/mByCd22Tz1Hht2xnrmLqH6NI2zRSCNjlvRVMRZL5Va7npz+rLrlyJL2YxoHM1uEviLs1YdQDMTSUCTGZbKElbiTtVBSxpci29BtzQCpUbSq79ZUkOUdT1EaIcmGwg4SiKwhcgqFynF+S2b06fPSOLZHOP5tK1cHub8nxSkyHxPJASmzkqO/pEwqVVKxw==
+ bh=AnmyPryN/heSuGOFY8VRmqMvbLRbxeGy7ersAZFqHrs=;
+ b=cyK72mdA3W40+GoElJkksYkV12Nto+lYHLiMJ/ICUDyoEJ3KVjyZg/NuIXRcNbHoaUuYSxNC3+mBGGy8D1gC7glvcPb765MhP4FyhqAlJR9daQ37SRiCFf2iRrkO8gwuhtWypydJZDHimaFDeTwAG4VwAXG7w0oc8Z7C7A0TpA9T03/AvGIxpmqHqA5J5k92Zbtm16uGEtIMccecPPbKsWjD/jUUeK5mQqbGtxfC/jC5u0HdBGdjrfF79MVf5SlE0w1UwbiSA4qaOrUZEUS74Vr1o0hEaP3dmKtR8Xq979/6OjULjQ+j1q15EstqVgmHLviXERNvZeGS7hN8615DUg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CwZqp+t05+zsG1Vq05f7ztxd34mOR92w8AyhJ0DMD40=;
- b=GZfHlX5EvrGWt1vMCFpgEiJjJxf6LZYxW+1F/tvbbPgKtUOQIsqNCwieNfv1UUboCovFFuSyxW3KpExpm3OAYW8lY7hYjX77rWncS14YvaOQTEA+e0+aKP1+nC33Q8JwsdNXbOz+AWGYLTg21ZgILH/VZtP/p5khO9Bvbzs/+jY=
-Received: from BL0PR01CA0022.prod.exchangelabs.com (2603:10b6:208:71::35) by
- DM4PR12MB5939.namprd12.prod.outlook.com (2603:10b6:8:6a::19) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6111.19; Mon, 20 Feb 2023 18:58:16 +0000
+ bh=AnmyPryN/heSuGOFY8VRmqMvbLRbxeGy7ersAZFqHrs=;
+ b=3CBYj510JB/Xi9kZ6Rl3hpwED5tzOJQUeTWTpyiRgMGVC9uF5d1tQ9FoovDjnYQG9HiisJNLUy1rFsklT2loKSWjAYNcQOh7pWeh/EL6jWbxpvvI70zyxICUQbEl4tuv6/k+MZrf4Rr5YyL+RTa9h2Udlzd/jh8F5zwGLo6Br4Q=
+Received: from BL0PR01CA0014.prod.exchangelabs.com (2603:10b6:208:71::27) by
+ SJ2PR12MB8112.namprd12.prod.outlook.com (2603:10b6:a03:4f8::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.19; Mon, 20 Feb
+ 2023 18:59:44 +0000
 Received: from BL02EPF000108EA.namprd05.prod.outlook.com
- (2603:10b6:208:71:cafe::18) by BL0PR01CA0022.outlook.office365.com
- (2603:10b6:208:71::35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.19 via Frontend
- Transport; Mon, 20 Feb 2023 18:58:16 +0000
+ (2603:10b6:208:71:cafe::65) by BL0PR01CA0014.outlook.office365.com
+ (2603:10b6:208:71::27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.20 via Frontend
+ Transport; Mon, 20 Feb 2023 18:59:44 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -47,11 +48,11 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  BL02EPF000108EA.mail.protection.outlook.com (10.167.241.203) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6134.14 via Frontend Transport; Mon, 20 Feb 2023 18:58:16 +0000
+ 15.20.6134.14 via Frontend Transport; Mon, 20 Feb 2023 18:59:40 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 20 Feb
- 2023 12:58:13 -0600
+ 2023 12:59:37 -0600
 From:   Michael Roth <michael.roth@amd.com>
 To:     <kvm@vger.kernel.org>
 CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -68,10 +69,11 @@ CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
         <tony.luck@intel.com>, <marcorr@google.com>,
         <sathyanarayanan.kuppuswamy@linux.intel.com>,
         <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
-        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>
-Subject: [PATCH RFC v8 48/56] KVM: SVM: Add SNP-specific handling for memory attribute updates
-Date:   Mon, 20 Feb 2023 12:38:39 -0600
-Message-ID: <20230220183847.59159-49-michael.roth@amd.com>
+        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: [PATCH RFC v8 51/56] KVM: SVM: Add module parameter to enable the SEV-SNP
+Date:   Mon, 20 Feb 2023 12:38:42 -0600
+Message-ID: <20230220183847.59159-52-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230220183847.59159-1-michael.roth@amd.com>
 References: <20230220183847.59159-1-michael.roth@amd.com>
@@ -83,208 +85,82 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF000108EA:EE_|DM4PR12MB5939:EE_
-X-MS-Office365-Filtering-Correlation-Id: bcc55256-0910-4096-d0fb-08db13746cac
+X-MS-TrafficTypeDiagnostic: BL02EPF000108EA:EE_|SJ2PR12MB8112:EE_
+X-MS-Office365-Filtering-Correlation-Id: 52d75de6-2d76-454e-aea0-08db1374a0ee
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: WBp7NsOjtQRr9r2fumEpdAu2TR9WF4vodunw4ENlL2ILID28X/WPfusVJ37xj3+ktwvUzJe5DP/655UmLFKdVJSlIcWsF16TjWtHGKUVEkWny043koH9hJDr6d0IdnvPe0SHoLbHw4BfNhEyAhSgp39ArmsrNKKfD6EEPMupYkpHZOv7PXCPua6PHZYAu/5T3MtK8b4sqNvMofHg0d/S11Vu8TEbKeLOkihXXz0I86wF71DNWbzYjh1LVijQlGR9cjPZKw1niDGRoDqIEGY+W8lVrROW7SRwz3oOjTDF1WScGjY11i59xfHPitSLgYnfJDjN3o6M1x2cN0JeXjPreqD5A12aOkPavg/TeU9WiLMiQR0DD2PABDKd58TAs1DvOiRoEZa1e9n7G3mTkFOq/XWkZPTMgSdDmbpegjK7SOqlhCnPonTAa488rub51NY1FkoI0S4NCSiNfYTNRUXmtqIMj/3ug1zctR5kHplSAU0wutWTqn6idstZHMIr3z+fZemKhN1J4f5KQinbfdCFwGAnbAljLEUcfW9nDj7RDN3lu6gmOUorYjBCz8ZRPOUs6Y7dKXhCSFUDxSOjl+Nwnflcih3DkM0EUDHMvix+Ai787rblJAxG0ukUCicsCJPEG79NCnEg2G2Veo3dJk3q8zD5r/ryyoLLO4RVG4IK6JpR0B9SmXXXk6NJFT9X2OGDVqbTk3om9EbIWDS/AZVgRRN9p251yCKuK34HB/ZXlNg=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(346002)(136003)(376002)(39860400002)(396003)(451199018)(40470700004)(46966006)(36840700001)(40460700003)(83380400001)(316002)(70586007)(70206006)(54906003)(2616005)(8676002)(8936002)(6666004)(4326008)(6916009)(1076003)(41300700001)(426003)(16526019)(186003)(47076005)(26005)(478600001)(336012)(356005)(40480700001)(36756003)(82310400005)(86362001)(15650500001)(82740400003)(7406005)(44832011)(7416002)(5660300002)(36860700001)(2906002)(81166007)(66899018)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: sTe4xAMoq5qs8YNKgQysFoV6mcA4pIKYsNbhB2cFfiIcPw1x9RKRny+Z0hBatdIf5FTLLRcg5W3wDysgVBdYh1lfTi7F6Fs1nIN+tNkGEI7oppP90DgN0+cbjwYXpGkHSyL2IuypupiJIqHW/vn4uTd26PcIBsW1dW/BIeuj47sIAeDxq7r07GE39CrjJY5dE4KA6u6gSpX3EISmF4BJj1OlZIzsOH+J7dEAKgy0Rz2QpDHH8BLdg1EkuWLVuQ5YkyYqzo0TH8tjs7Hq1/STP0quYMEHxvXJMe4eGnympgGX4dsIbHhDzgR0PtjQAhYsBwRKzqmEj+tqYYF8OrxmXgVM4Fav1RC5OGt1CvMVveBnmonxPe7lo3p9idQx/jjiuDONs9bFaoEEI9SB1hDsXG1u0eCT3sqz32timjJHqipHfV2AH1w5sUaxhmBut+pCCtWe+Sb7JnSRSKg8NxD6qhjL3lRuT5CVA+/bRTPJn6JKzXK6ZpU//6c4rMCnaOZ/dPRmhojKEBc89kR01n8Wa4OD3vFk7PAYmkIyTqiGzfeJBbxg40YN7aasn8Kt1rMk/rAvpv0ta39uKFqPKcBmCVAoJTMbbJbo0mnyvKq6cV1JsdQ/L1X8r/GuzwRZHSsWESr13zeqafFB42q2Pnn2cjiDsCg12Rew/TRfpSqA3D9/3Ta4Cl7EMw5FbbmtXTnw3QhjPKqJH7tiEBJPmNXrqOeain0aINXfviAd7s6VDFo=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(39860400002)(136003)(396003)(376002)(346002)(451199018)(36840700001)(40470700004)(46966006)(40460700003)(41300700001)(83380400001)(54906003)(70586007)(316002)(2616005)(6916009)(4326008)(8936002)(6666004)(1076003)(8676002)(70206006)(426003)(47076005)(26005)(336012)(186003)(16526019)(478600001)(36756003)(40480700001)(2906002)(82310400005)(82740400003)(356005)(7406005)(44832011)(5660300002)(36860700001)(7416002)(81166007)(86362001)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2023 18:58:16.0331
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2023 18:59:40.8781
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: bcc55256-0910-4096-d0fb-08db13746cac
+X-MS-Exchange-CrossTenant-Network-Message-Id: 52d75de6-2d76-454e-aea0-08db1374a0ee
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource: BL02EPF000108EA.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5939
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8112
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,SPF_HELO_PASS,
-        SPF_NONE,T_FILL_THIS_FORM_SHORT autolearn=no autolearn_force=no
-        version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This will handle RMP table updates and direct map changes needed for
-page state conversions requested by userspace.
+From: Brijesh Singh <brijesh.singh@amd.com>
 
+Add a module parameter than can be used to enable or disable the SEV-SNP
+feature. Now that KVM contains the support for the SNP set the GHCB
+hypervisor feature flag to indicate that SNP is supported.
+
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- arch/x86/kvm/svm/sev.c | 126 +++++++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/svm/svm.c |   1 +
- arch/x86/kvm/svm/svm.h |   2 +
- 3 files changed, 129 insertions(+)
+ arch/x86/kvm/svm/sev.c | 7 ++++---
+ arch/x86/kvm/svm/svm.h | 2 +-
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index b2f1a12685ed..73d614c538da 100644
+index bedec90d034f..70d5650d8d95 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -3381,6 +3381,31 @@ static int snp_rmptable_psmash(struct kvm *kvm, kvm_pfn_t pfn)
- 	return psmash(pfn);
- }
+@@ -55,14 +55,15 @@ module_param_named(sev, sev_enabled, bool, 0444);
+ /* enable/disable SEV-ES support */
+ static bool sev_es_enabled = true;
+ module_param_named(sev_es, sev_es_enabled, bool, 0444);
++
++/* enable/disable SEV-SNP support */
++static bool sev_snp_enabled = true;
++module_param_named(sev_snp, sev_snp_enabled, bool, 0444);
+ #else
+ #define sev_enabled false
+ #define sev_es_enabled false
+ #endif /* CONFIG_KVM_AMD_SEV */
  
-+static int snp_make_page_shared(struct kvm *kvm, gpa_t gpa, kvm_pfn_t pfn, int level)
-+{
-+	int rc, rmp_level;
-+
-+	rc = snp_lookup_rmpentry(pfn, &rmp_level);
-+	if (rc < 0)
-+		return -EINVAL;
-+
-+	/* If page is not assigned then do nothing */
-+	if (!rc)
-+		return 0;
-+
-+	/*
-+	 * Is the page part of an existing 2MB RMP entry ? Split the 2MB into
-+	 * multiple of 4K-page before making the memory shared.
-+	 */
-+	if (level == PG_LEVEL_4K && rmp_level == PG_LEVEL_2M) {
-+		rc = snp_rmptable_psmash(kvm, pfn);
-+		if (rc)
-+			return rc;
-+	}
-+
-+	return rmp_make_shared(pfn, level);
-+}
-+
- /*
-  * TODO: need to get the value set by userspace in vcpu->run->vmgexit.ghcb_msr
-  * and process that here accordingly.
-@@ -4373,3 +4398,104 @@ void handle_rmp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code)
- 	kvm_zap_gfn_range(kvm, gfn, gfn + PTRS_PER_PMD);
- 	put_page(pfn_to_page(pfn));
- }
-+
-+static inline u8 order_to_level(int order)
-+{
-+	BUILD_BUG_ON(KVM_MAX_HUGEPAGE_LEVEL > PG_LEVEL_1G);
-+
-+	if (order >= KVM_HPAGE_GFN_SHIFT(PG_LEVEL_1G))
-+		return PG_LEVEL_1G;
-+
-+	if (order >= KVM_HPAGE_GFN_SHIFT(PG_LEVEL_2M))
-+		return PG_LEVEL_2M;
-+
-+	return PG_LEVEL_4K;
-+}
-+
-+int sev_update_mem_attr(struct kvm_memory_slot *slot, unsigned int attr,
-+			gfn_t start, gfn_t end)
-+{
-+	struct kvm_sev_info *sev = &to_kvm_svm(slot->kvm)->sev_info;
-+	enum psc_op op = (attr & KVM_MEMORY_ATTRIBUTE_PRIVATE) ? SNP_PAGE_STATE_PRIVATE
-+							       : SNP_PAGE_STATE_SHARED;
-+	gfn_t gfn = start;
-+
-+	pr_debug("%s: GFN 0x%llx - 0x%llx, op: %d\n", __func__, start, end, op);
-+
-+	if (!sev_snp_guest(slot->kvm))
-+		return 0;
-+
-+	if (!kvm_slot_can_be_private(slot)) {
-+		pr_err_ratelimited("%s: memslot for gfn: 0x%llx is not private.\n",
-+				   __func__, gfn);
-+		return -EPERM;
-+	}
-+
-+	while (gfn < end) {
-+		kvm_pfn_t pfn;
-+		int level = PG_LEVEL_4K; /* TODO: take actual order into account */
-+		gpa_t gpa = gfn_to_gpa(gfn);
-+		int npages = 1;
-+		int order;
-+		int rc;
-+
-+		/*
-+		 * No work to do if there was never a page allocated from private
-+		 * memory. If there was a page that was deallocated previously,
-+		 * the invalidation notifier should have restored the page to
-+		 * shared.
-+		 */
-+		rc = kvm_restrictedmem_get_pfn(slot, gfn, &pfn, &order);
-+		if (rc) {
-+			pr_warn_ratelimited("%s: failed to retrieve gfn 0x%llx from private FD\n",
-+					    __func__, gfn);
-+			gfn++;
-+			continue;
-+		}
-+
-+		/*
-+		 * TODO: The RMP entry's hugepage bit is ignored for
-+		 * shared/unassigned pages. Either handle looping through each
-+		 * sub-page as part of snp_make_page_shared(), or remove the
-+		 * level argument.
-+		 */
-+		if (op == SNP_PAGE_STATE_PRIVATE && order &&
-+		    IS_ALIGNED(gfn, 1 << order) && (gfn + (1 << order)) <= end) {
-+			level = order_to_level(order);
-+			npages = 1 << order;
-+		}
-+
-+		/*
-+		 * Grab the PFN from private memslot and update the RMP entry.
-+		 * It may be worthwhile to go ahead and map it into the TDP at
-+		 * this point if the guest is doing lazy acceptance, but for
-+		 * up-front bulk shared->private conversions it's not likely
-+		 * the guest will try to access the PFN any time soon, so for
-+		 * now just take the let KVM MMU handle faulting it on the next
-+		 * access.
-+		 */
-+		switch (op) {
-+		case SNP_PAGE_STATE_SHARED:
-+			rc = snp_make_page_shared(slot->kvm, gpa, pfn, level);
-+			break;
-+		case SNP_PAGE_STATE_PRIVATE:
-+			rc = rmp_make_private(pfn, gpa, level, sev->asid, false);
-+			break;
-+		default:
-+			rc = PSC_INVALID_ENTRY;
-+			break;
-+		}
-+
-+		put_page(pfn_to_page(pfn));
-+
-+		if (rc) {
-+			pr_err_ratelimited("%s: failed op %d gpa %llx pfn %llx level %d rc %d\n",
-+					   __func__, op, gpa, pfn, level, rc);
-+			return -EINVAL;
-+		}
-+
-+		gfn += npages;
-+	}
-+
-+	return 0;
-+}
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 539926b07ee5..e2edc4700e55 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4860,6 +4860,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.alloc_apic_backing_page = svm_alloc_apic_backing_page,
- 
- 	.adjust_mapping_level = sev_adjust_mapping_level,
-+	.update_mem_attr = sev_update_mem_attr,
- };
- 
- /*
+-/* enable/disable SEV-SNP support */
+-static bool sev_snp_enabled;
+-
+ #define AP_RESET_HOLD_NONE		0
+ #define AP_RESET_HOLD_NAE_EVENT		1
+ #define AP_RESET_HOLD_MSR_PROTO		2
 diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 37bd7b728d52..50a2bcaf3fd7 100644
+index 857b674e68f0..221b38d3c845 100644
 --- a/arch/x86/kvm/svm/svm.h
 +++ b/arch/x86/kvm/svm/svm.h
-@@ -725,6 +725,8 @@ struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu);
- void sev_adjust_mapping_level(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int *level);
- void handle_rmp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code);
- void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu);
-+int sev_update_mem_attr(struct kvm_memory_slot *slot, unsigned int attr,
-+			gfn_t start, gfn_t end);
+@@ -694,7 +694,7 @@ void avic_refresh_virtual_apic_mode(struct kvm_vcpu *vcpu);
+ #define GHCB_VERSION_MAX	2ULL
+ #define GHCB_VERSION_MIN	1ULL
  
- /* vmenter.S */
+-#define GHCB_HV_FT_SUPPORTED	0
++#define GHCB_HV_FT_SUPPORTED	(GHCB_HV_FT_SNP | GHCB_HV_FT_SNP_AP_CREATION)
+ 
+ extern unsigned int max_sev_asid;
  
 -- 
 2.25.1
