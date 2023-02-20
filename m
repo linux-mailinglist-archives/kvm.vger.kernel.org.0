@@ -2,99 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D51B69D25E
-	for <lists+kvm@lfdr.de>; Mon, 20 Feb 2023 18:50:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C5E3769D266
+	for <lists+kvm@lfdr.de>; Mon, 20 Feb 2023 18:54:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232303AbjBTRuv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Feb 2023 12:50:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45402 "EHLO
+        id S231950AbjBTRyN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Feb 2023 12:54:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231496AbjBTRuu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Feb 2023 12:50:50 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD9892128B;
-        Mon, 20 Feb 2023 09:50:21 -0800 (PST)
-Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 0B28A1EC04DA;
-        Mon, 20 Feb 2023 18:50:10 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1676915410;
+        with ESMTP id S230265AbjBTRyM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Feb 2023 12:54:12 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C1D62D76
+        for <kvm@vger.kernel.org>; Mon, 20 Feb 2023 09:53:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676915606;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=bwxrmMj2mOhFOpUwjeGU/UbbKBMLtBWO125onjebAs8=;
-        b=FoUfwnLMKo9IrSqAIx2RAzvNDd5eyrw8LvSXPxUE5AtEjEvDoUz+Ph+r6XA3M4OnRXT2Vc
-        7X41bpF9uMgZUtI+rf8WMPC75kqv+dLhNZbzPKL8j+SmdveIJ7IGVQdYFnjzvyMBY4V/Fe
-        GZb2+MVxxdDfLbQVYOzAi6Ota/RbFJU=
-Date:   Mon, 20 Feb 2023 18:50:09 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
-        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
-        ashish.kalra@amd.com, harald@profian.com,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Jarkko Sakkinen <jarkko@profian.com>
-Subject: Re: [PATCH RFC v7 13/64] x86/cpufeatures: Add SEV-SNP CPU feature
-Message-ID: <Y/Oy0cvhXIm5kLTh@zn.tnic>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-14-michael.roth@amd.com>
- <Y9qx5NbZIRdpHy5J@zn.tnic>
- <20230220162647.czmii5swwsz2wdhy@amd.com>
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=A6m99hVi2S7tt6YKMO1cVTA7Dd38UPq4FNBkdwIRSkw=;
+        b=bAyGcO5aIqx7VdN7DoJIqj9+gh1lJiFpT3Wd7qVJuwJQvENN+/kOXvq7XyjQsbxjgej7XS
+        /m85oeTDtRJPix8YqXnIud4x6dlNAZbjFzYyFJWxnjhnHSAEj144LP614OF20GEonxVA/X
+        kcZubLZTolVmaJAKdUnzVSX6N3L2fqk=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-551-sJF8F-NhNpeiklFgYhCwkA-1; Mon, 20 Feb 2023 12:53:23 -0500
+X-MC-Unique: sJF8F-NhNpeiklFgYhCwkA-1
+Received: by mail-ed1-f71.google.com with SMTP id h13-20020a0564020e8d00b004a26ef05c34so2107615eda.16
+        for <kvm@vger.kernel.org>; Mon, 20 Feb 2023 09:53:23 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=A6m99hVi2S7tt6YKMO1cVTA7Dd38UPq4FNBkdwIRSkw=;
+        b=5TVSeNu9O+DBP3BnqoI2tfkwxQyavfocyLqQofDnGWTPHS0QjgarCVFceqfcZOz6s6
+         965O9+sqd2CsZ0zOWY+wd5NZTfEKZsVwQsu1KqzoOhTLgOvv+VBNN2c9YojDxRnLf/Hj
+         cfZI7Lth5KFeb3CThDJqGSNGzwEoM9gc005rBquNgvtX4Jdojv1i5X1xr0Bc5D+vhwiZ
+         Whm/BTZoN/pps5K3auYnUv42xdD4MYFGvezhgeSWF4GMu3cYeECV9YkSLrwyk9HFf2NY
+         RieIv4KbRN/bB8sBF/76cGCYXE9gXzYRp1YYE31mlctmHhpG3zOjmUeLlwzVGejm1px6
+         NvWg==
+X-Gm-Message-State: AO0yUKVOM2QX97OZIyU++5O2aB3uJ3aGf6UNxVbvcSmmmr6Flhw8ftts
+        EHOo2nTlKCHPsxUzLLkcNlBPBsnt+LHJLyV5usYnuQj2yDSvY9n59usvJ9IA6UgRfJ7+PIp3XmF
+        KfJnvHeclOI9N
+X-Received: by 2002:a17:906:5587:b0:8ae:707:e129 with SMTP id y7-20020a170906558700b008ae0707e129mr11613416ejp.19.1676915602744;
+        Mon, 20 Feb 2023 09:53:22 -0800 (PST)
+X-Google-Smtp-Source: AK7set8YUMllxoIfXoPvpKgnxtQVrwTWJX8iE/yV2ZHIe2nb+KwqL6pfZmuCO53IKmK9nVaiNrgo/w==
+X-Received: by 2002:a17:906:5587:b0:8ae:707:e129 with SMTP id y7-20020a170906558700b008ae0707e129mr11613400ejp.19.1676915602476;
+        Mon, 20 Feb 2023 09:53:22 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:4783:a68:c1ee:15c5? ([2001:b07:6468:f312:4783:a68:c1ee:15c5])
+        by smtp.googlemail.com with ESMTPSA id sa14-20020a170906edae00b008b176df2899sm5514793ejb.160.2023.02.20.09.53.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Feb 2023 09:53:21 -0800 (PST)
+Message-ID: <cbd95763-ec38-63f7-89bf-c8b01aa7df77@redhat.com>
+Date:   Mon, 20 Feb 2023 18:53:20 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230220162647.czmii5swwsz2wdhy@amd.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH v2 06/29] LoongArch: KVM: Implement vcpu create and
+ destroy interface
+Content-Language: en-US
+To:     Tianrui Zhao <zhaotianrui@loongson.cn>
+Cc:     Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn
+References: <20230220065735.1282809-1-zhaotianrui@loongson.cn>
+ <20230220065735.1282809-7-zhaotianrui@loongson.cn>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20230220065735.1282809-7-zhaotianrui@loongson.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 20, 2023 at 10:26:47AM -0600, Michael Roth wrote:
-> On Wed, Feb 01, 2023 at 07:39:32PM +0100, Borislav Petkov wrote:
-> > On Wed, Dec 14, 2022 at 01:40:05PM -0600, Michael Roth wrote:
-> > > From: Brijesh Singh <brijesh.singh@amd.com>
-> > > 
-> > > Add CPU feature detection for Secure Encrypted Virtualization with
-> > > Secure Nested Paging. This feature adds a strong memory integrity
-> > > protection to help prevent malicious hypervisor-based attacks like
-> > > data replay, memory re-mapping, and more.
-> > > 
-> > > Link: https://lore.kernel.org/all/YrGINaPc3cojG6%2F3@zn.tnic/
-> > 
-> > That points to some review feedback I've given - dunno if it is
-> > relevant.
-> > 
-> > > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> > > Signed-off-by: Jarkko Sakkinen <jarkko@profian.com>
-> > 
-> > I read this as Jarkko has handled this patch too. Is that the case?
-> 
-> Yes we shared some patches via an internal tree at some stages.
+On 2/20/23 07:57, Tianrui Zhao wrote:
+> +	vcpu->arch.guest_eentry = (unsigned long)kvm_context->kvm_eentry;
+> +	vcpu->arch.vcpu_run = kvm_context->kvm_enter_guest;
+> +	vcpu->arch.handle_exit = _kvm_handle_exit;
 
-In the sense that, he took Brijesh's patch, then he did something with
-it(?) and then Ashish took it from him and then you took it from Ashish?
+Here as well, whatever is constant must not be stored in struct 
+kvm_arch_vcpu.
 
-This is how I'm reading this SOB chain at least...
+Paolo
 
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
