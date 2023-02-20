@@ -2,525 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AF52B69C840
-	for <lists+kvm@lfdr.de>; Mon, 20 Feb 2023 11:07:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 628C969C8D1
+	for <lists+kvm@lfdr.de>; Mon, 20 Feb 2023 11:41:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230201AbjBTKHQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Feb 2023 05:07:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39500 "EHLO
+        id S231620AbjBTKl2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Feb 2023 05:41:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229688AbjBTKHP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Feb 2023 05:07:15 -0500
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B0562D6D;
-        Mon, 20 Feb 2023 02:07:12 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id cp9so1953302pjb.0;
-        Mon, 20 Feb 2023 02:07:12 -0800 (PST)
+        with ESMTP id S230291AbjBTKl0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Feb 2023 05:41:26 -0500
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B53EE397
+        for <kvm@vger.kernel.org>; Mon, 20 Feb 2023 02:40:59 -0800 (PST)
+Received: by mail-ed1-x52e.google.com with SMTP id g1so2570694edz.7
+        for <kvm@vger.kernel.org>; Mon, 20 Feb 2023 02:40:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Tb1ZLQiRSypOT9eH0qivSowONbEePXc36TNfGqtbPIQ=;
-        b=ngOGSAdOifEhLNmGn4mncBZY2b41Up+5ACuroX/KQg+yltY/3DxiMrqHb0rgzxb4li
-         mSDZhVo8K/yIgRg26HC1KjJ1awJ7AydjNB8GWfv3Vapu/3t1yF4VHt9wlgLkoCFd0Ati
-         u52YnndceaqpXfaQnAvJmp3TcmIzQdTAaKj5zj3gCTJWHnki65UFO9IbXj4XAYLjh+Bd
-         V2QH5aFQo5kHx4u2BdxVKJsbaJa+my/lpBOpDPNBrJ8Qh1JaNZoPff3gmOjICtns8mDJ
-         R783NrC6LyUeGU0tiPpCNXmMNgWuGvwwlNmGrgO8uM9Ky44Nxa29AwuMdNpur6VXtnmQ
-         jUmw==
+        d=grsecurity.net; s=grsec;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=G+eAFzJgAQpcC9VEGPniXtKBPMuCgVjnMF20YBpaeWM=;
+        b=efrQDZi3JcWpS907l2e1Ycsl45yQ7twvtI7todBCKfucVcvSDri1C8WCVout0o6nIt
+         ifQilTJbMNoo5oJ6GYdPfQCuG6ThCgeaPzg88Y9PUZ5ss4Wqfmtfu0n1+CD1wmlPrfGQ
+         MZbtc/9vFdcsx3xhU0Isjk7uOjcjCT8Rm+Qyth9W0g4JpzpUpP5XpbQgGz7BzHOZLKDM
+         nedHWfK2MiQ4k1V0p8vMhOTsugNLyymJVQpFMacD3X/hLFJ/ue5KdBkii18XT4N41849
+         7pxH43OLbURWHGZvV6ATNWGrc/dxM/wwqcxxdy137TVXcYgmDbirZ0wjVaazvXTpoK5r
+         BZ7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Tb1ZLQiRSypOT9eH0qivSowONbEePXc36TNfGqtbPIQ=;
-        b=gzHtv7ZZ1U+YoGrqfC9GCmYJ4BFNkFdC69mddrxTjoH0hoIONCceLuBAt2H4HkiItL
-         zs58lEX41WSF6duFFSZAhHBsbs9HKtqFS94KRZNnk0y5xNkenGBknVFlvRwtr1f1++j/
-         1bBdiq8d3j1WnvwhQnTyVYEqEXWVmSim4clAbsboIfqGYbyB65tDNY3yBOp93n0vX8QR
-         s7Hd4yLtQpKjzezBozS60CMgQ9qAhgy6k/LoREDlxhyHI311q2qsYgXuLh+oFbpesjs6
-         JY83Tb89pwVwUDdXk0V0WwbGAO8gUA6wjDgcm/OfWadMbxqo/wZlqg0C6VG/pt4tLe+a
-         /niw==
-X-Gm-Message-State: AO0yUKUoFyqNK9OkMDZGSN7XwOpXBYNgByVj6jxdSjiwd9f802BdgNJ/
-        W/e5kFEFaOssncXhHpXQGg5hdsArUGeVtBRs
-X-Google-Smtp-Source: AK7set99AvgBS+EqtI4hvUZPbCzPIqGpaLyJOuvi71fiFW1T2kbF4HWwdQm7WLAXxGNrUaXcnwQi6Q==
-X-Received: by 2002:a05:6a20:7da9:b0:bc:bf86:660 with SMTP id v41-20020a056a207da900b000bcbf860660mr11523778pzj.45.1676887631317;
-        Mon, 20 Feb 2023 02:07:11 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id u64-20020a638543000000b004fba03ee681sm858070pgd.13.2023.02.20.02.07.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Feb 2023 02:07:10 -0800 (PST)
-Message-ID: <460b341c-4720-bfb2-d1ef-1e42acf81974@gmail.com>
-Date:   Mon, 20 Feb 2023 18:07:00 +0800
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=G+eAFzJgAQpcC9VEGPniXtKBPMuCgVjnMF20YBpaeWM=;
+        b=rEEvYIdpMif3TDI2m4bU5eIVXQvxdmvNZUArC1NCvPzu0z+OXLdaP0U89l5XbRLL2o
+         Q9nzC3tk418DqB7dedB6I5e4H0aNClTKIC0x5TOIMgawdp8ShZQjNDxBnPl8bPH/+JC6
+         TJmqljCwUZzj2Uc48g2UdN/zMF+o9mT5MTWaQy9r/YgMpYaV1lrUBiB0zczGEdIFptP8
+         8WeiIC1phSe0ennZlODIZ8FFouvk5HYHqekZrDlZ4CSjcifqNbJSUGS02ofAMVMA8TXN
+         xOEtPGr6AdnqMmP/TUVA8Df4QvMFtsg5mphIgXIURX0ps9W6sQRYuB/xmB2ymwo2j4FX
+         qwmQ==
+X-Gm-Message-State: AO0yUKXzXTDHB8/lNAvvjqh9qD9Oo95bgLEwgeBLFUD0fAf34OY40Z43
+        ZmNr/wT5scGZLamOnyLTnGg30A==
+X-Google-Smtp-Source: AK7set9YSsK3XlQtgqXayCh5Z251nsX/bKXrhXTztxDePk9N8sFp5lY9SNzDgjrMB6pM/zACr8c4Yw==
+X-Received: by 2002:a17:907:a0d5:b0:8b8:c06e:52d8 with SMTP id hw21-20020a170907a0d500b008b8c06e52d8mr12288750ejc.36.1676889658006;
+        Mon, 20 Feb 2023 02:40:58 -0800 (PST)
+Received: from bell.fritz.box (p200300f6af17b800ede54e0189be431e.dip0.t-ipconnect.de. [2003:f6:af17:b800:ede5:4e01:89be:431e])
+        by smtp.gmail.com with ESMTPSA id u21-20020a17090657d500b007c11e5ac250sm5626050ejr.91.2023.02.20.02.40.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Feb 2023 02:40:57 -0800 (PST)
+From:   Mathias Krause <minipli@grsecurity.net>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        kvm@vger.kernel.org
+Cc:     Mathias Krause <minipli@grsecurity.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, stable <stable@kernel.org>,
+        Xingyuan Mo <hdthky0@gmail.com>
+Subject: Re: [PATCH] kvm: initialize all of the kvm_debugregs structure before sending it to userspace
+Date:   Mon, 20 Feb 2023 11:40:50 +0100
+Message-Id: <20230220104050.419438-1-minipli@grsecurity.net>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20230214103304.3689213-1-gregkh@linuxfoundation.org>
+References: <20230214103304.3689213-1-gregkh@linuxfoundation.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.8.0
-Subject: Re: [PATCH 2/2] Documentation/process: Add a maintainer handbook for
- KVM x86
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20230217225449.811957-1-seanjc@google.com>
- <20230217225449.811957-3-seanjc@google.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <20230217225449.811957-3-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=0.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        GUARANTEED_100_PERCENT,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/2/2023 6:54 am, Sean Christopherson wrote:
-> Add a KVM x86 doc to the subsystem/maintainer handbook section to explain
-> how KVM x86 (currently) operates as a sub-subsystem, and to soapbox on
-> the rules and expectations for contributing to KVM x86.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   .../process/maintainer-handbooks.rst          |   1 +
->   Documentation/process/maintainer-kvm-x86.rst  | 347 ++++++++++++++++++
->   MAINTAINERS                                   |   1 +
->   3 files changed, 349 insertions(+)
->   create mode 100644 Documentation/process/maintainer-kvm-x86.rst
-> 
-> diff --git a/Documentation/process/maintainer-handbooks.rst b/Documentation/process/maintainer-handbooks.rst
-> index d783060b4cc6..d12cbbe2b7df 100644
-> --- a/Documentation/process/maintainer-handbooks.rst
-> +++ b/Documentation/process/maintainer-handbooks.rst
-> @@ -17,3 +17,4 @@ Contents:
->   
->      maintainer-tip
->      maintainer-netdev
-> +   maintainer-kvm-x86
-> diff --git a/Documentation/process/maintainer-kvm-x86.rst b/Documentation/process/maintainer-kvm-x86.rst
-> new file mode 100644
-> index 000000000000..ac81a42a32a3
-> --- /dev/null
-> +++ b/Documentation/process/maintainer-kvm-x86.rst
-> @@ -0,0 +1,347 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +KVM x86
+On 14.02.23 11:33, Greg Kroah-Hartman wrote:
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index da4bbd043a7b..50a95c8082fa 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -5254,12 +5254,11 @@ static void kvm_vcpu_ioctl_x86_get_debugregs(struct kvm_vcpu *vcpu,
+>  {
+>  	unsigned long val;
+>  
+> +	memset(dbgregs, 0, sizeof(*dbgregs));
+>  	memcpy(dbgregs->db, vcpu->arch.db, sizeof(vcpu->arch.db));
+>  	kvm_get_dr(vcpu, 6, &val);
+>  	dbgregs->dr6 = val;
+>  	dbgregs->dr7 = vcpu->arch.dr7;
+> -	dbgregs->flags = 0;
+> -	memset(&dbgregs->reserved, 0, sizeof(dbgregs->reserved));
+>  }
+>  
+>  static int kvm_vcpu_ioctl_x86_set_debugregs(struct kvm_vcpu *vcpu,
 
-KERNEL VIRTUAL MACHINE FOR X86 (KVM/x86)
+While this change handles the info leak for 32 bit kernels just fine, it
+completely ignores that the ABI is broken for such kernels. The bug
+(existing since the introduction of the API) effectively makes using
+DR1..3 impossible. The memcpy() will only copy half of dbgregs->db and
+effectively only allows setting DR0 to its intended value. The remaining
+registers get shuffled around (lower half of db[1] will end up in DR2,
+not DR1) or completely ignored (db[2..3] which should end up in DR3 and
+DR4). Now, this broken ABI might be considdered "API," so I gave it a
+look...
 
-> +=======
-> +
-> +TL;DR
-> +-----
-> +Testing is mandatory.  Be consistent with established styles and patterns.
-> +
-> +Trees
-> +-----
-> +KVM x86 is currently in a transition period from being part of the main KVM
-> +tree, to being "just another KVM arch".  As such, KVM x86 is split across the
-> +main KVM tree, ``git.kernel.org/pub/scm/virt/kvm/kvm.git``, and a KVM x86
-> +specific tree, ``github.com/kvm-x86/linux.git``.
-> +
-> +Generally speaking, fixes for the current cycle are applied directly to the
-> +main KVM tree, while all development for the next cycle is routed through the
-> +KVM x86 tree.
-> +
-> +Note, this transition period is expected to last quite some time, i.e. will be
-> +the status quo for the foreseeable future.
-> +
-> +Branches
-> +~~~~~~~~
-> +The KVM x86 tree is organized into multiple topic branches.  The purpose of
-> +using finer-grained topic branches is to make it easier to keep tabs on an area
-> +of development, and to limit the collateral damage of human errors and/or buggy
-> +commits, e.g. dropping the HEAD commit of a topic branch has no impact on other
-> +in-flight commits' SHA1 hashes, and having to reject a pull request due to bugs
-> +delays only that topic branch.
-> +
-> +All topic branches, except for ``next`` and ``fixes``, are rolled into ``next``
-> +via a cthulu merge on an as-needed basis, i.e. when a topic branch is updated.
+A Debian code search gave only three real users of these ioctl()s:
+- VirtualBox ([1], lines 1735 ff.),
+- QEMU ([2], in kvm_put_debugregs(): lines 4491 ff. and
+  kvm_get_debugregs(): lines 4515 ff.) and
+- Linux's KVM selftests ([3], lines 722 ff., used in vcpu_load_state()
+  and vcpu_save_state()).
 
-s/cthulu/Cthulhu
+Linux's selftest uses the API only to read and bounce back the state --
+doesn't do any sanity checks on it.
 
-> +As a result, force pushes to ``next`` are common.
-> +
-> +Lifecycle
-> +~~~~~~~~~
-> +Pull requests for the next release cycle are sent to the main KVM tree, one
-> +for each KVM x86 topic branch.  If all goes well, the topic branches are rolled
-> +into the main KVM pull request sent during Linus' merge window.  Pull requests
-> +for KVM x86 branches are typically made the week before Linus' opening of the
-> +merge window, e.g. the week following rc7 for "normal" releases.
-> +
-> +The KVM x86 tree doesn't have its own official merge window, but there's a soft
-> +close around rc5 for new features, and a soft close around rc6 for fixes.
+VirtualBox and QEMU, OTOH, assume that the array is properly filled,
+i.e. indices 0..3 map to DR0..3. This means, these users are currently
+(and *always* have been) broken when trying to set DR1..3. Time to get
+them fixed before x86-32 vanishes into irrelevance.
 
-Any urgent AND critical fixes are exempt. No?
+[1] https://www.virtualbox.org/browser/vbox/trunk/src/VBox/VMM/VMMR3/NEMR3Native-linux.cpp?rev=98193#L1735
+[2] https://gitlab.com/qemu-project/qemu/-/blob/v7.2.0/target/i386/kvm/kvm.c#L4480-4522
+[3] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/tools/testing/selftests/kvm/include/x86_64/processor.h?h=v6.2#n722
 
-> +
-> +Timeline
-> +~~~~~~~~
-> +Submissions are typically reviewed and applied in FIFO order, with some wiggle
-> +room for the size of a series, patches that are "cache hot", etc.  Fixes,
-> +especially for the current release and or stable trees, get to jump the queue.
-> +Patches that will be taken through a non-KVM tree (most often through the tip
-> +tree) and/or have other acks/reviews also jump the queue to some extent.
-> +
-> +Note, the vast majority of review is done between rc1 and rc6, give or take.
-> +The period between rc6 and the next rc1 is used to catch up on other tasks,
-> +i.e. radio silence during this period isn't unusual.
-> +
-> +Pings to get a status update are welcome, but keep in mind the timing of the
-> +current release cycle and have realistic expectations.  If you are pinging for
-> +acceptance, i.e. not just for feedback or an update, please do everything you
-> +can, within reason, to ensure that your patches are ready to be merged!  Pings
-> +on series that break the build or fail tests lead to unhappy maintainers!
-> +
-> +Development
-> +-----------
-> +
-> +Base Tree/Branch
-> +~~~~~~~~~~~~~~~~
-> +Fixes that target mainline, i.e. the current release, should be based on
-> +``git://git.kernel.org/pub/scm/virt/kvm/kvm.git master``.
-> +
-> +Everything else should be based on a kvm-x86 topic branch.  If there is no
-> +obvious fit, use ``misc``.  Unless a patch/series depends on and/or conflicts
-> +with multiple topic branches, do not use ``next`` as a base.  Because ``next``
-> +is force-pushed on a regular basis, depending on when others fetch ``next``,
-> +they may or may not have the relevant objects in their local git tree.
-> +
-> +Coding Style
-> +~~~~~~~~~~~~
-> +When it comes to style, naming, patterns, etc., consistency is the number one
-> +priority in KVM x86.  If all else fails, match what already exists.
+An ABI-breaking^Wfixing change like below might be worth to apply on top
+to get that long standing bug fixed:
 
-priority in KVM x86 (including selftests).
+-- >8 --
+Subject: [PATCH] KVM: x86: Fix broken debugregs ABI for 32 bit kernels
 
-> +
-> +With a few caveats listed below, follow the tip tree maintainers' preferred
-> +:ref:`maintainer-tip-coding-style`, as patches/series often touch both KVM and
-> +non-KVM x86 files, i.e. draw the attention of KVM *and* tip tree maintainers.
-> +
-> +Using reverse fir tree for variable declarations isn't strictly required,
-> +though it is still preferred.
-> +
-> +Except for a handful of special snowflakes, do not use kernel-doc comments for
-> +functions.  The vast majority of "public" KVM functions aren't truly public as
-> +they are intended only for KVM-internal consumption (there are plans to
-> +privatize KVM's headers and exports to enforce this).
-> +
-> +Comments
-> +~~~~~~~~
-> +Write comments using imperative mood and avoid pronouns.  Use comments to
-> +provide a high level overview of the code, and/or to explain why the code does
-> +what it does.  Do not reiterate what the code literally does; let the code
-> +speak for itself.  If the code itself is inscrutable, comments will not help.
-> +
-> +SDM and APM References
-> +~~~~~~~~~~~~~~~~~~~~~~
-> +Much of KVM's code base is directly tied to architectural behavior defined in
-> +Intel's Software Development Manual (SDM) and AMD's Architecture Programmer’s
-> +Manual (APM).  Use of "Intel's SDM" and "AMD's APM", or even just "SDM" or
-> +"APM", without additional context is a-ok.
+The ioctl()s to get and set KVM's debug registers are broken for 32 bit
+kernels as they'd only copy half of the user register state because of
+the UAPI and in-kernel type mismatch (__u64 vs. unsigned long; 8 vs. 4
+bytes).
 
-ISE: Intel® Architecture Instruction Set Extensions and Future Features
-PPR: Processor Programming Reference (PPR) for specific AMD Model
+This makes it impossible for userland to set anything but DR0 without
+resorting to bit folding tricks.
 
-> +
-> +Do not reference specific sections, tables, figures, etc. by number, especially
-> +not in comments.  Instead, copy-paste the relevant snippet (if warranted), and
-> +reference sections/tables/figures by name.  The layouts of the SDM and APM are
-> +constantly changing, and so the numbers/labels aren't stable/consistent.
-> +
-> +Generally speaking, do not copy-paste SDM or APM snippets into comments.  With
-> +few exceptions, KVM *must* honor architectural behavior, therefore it's implied
-> +that KVM behavior is emulating SDM and/or APM behavior.
+Switch to a loop for copying debug registers that'll implicitly do the
+type conversion for us, if needed.
 
-All undefined behaviors (if any) need to be clarified.
+This ABI breaking change actually fixes known users [1,2] that have been
+broken since the API's introduction in commit a1efbe77c1fd ("KVM: x86:
+Add support for saving&restoring debug registers").
 
-> +
-> +Shortlog
-> +~~~~~~~~
-> +The preferred prefix format is ``KVM: <topic>:``, where ``<topic>`` is one of::
-> +
-> +  - x86
-> +  - x86/mmu
-> +  - x86/pmu
-> +  - x86/xen
+Also take 'dr6' from the arch part directly, as we do for 'dr7'. There's
+no need to take the clunky route via kvm_get_dr().
 
-Any conflict w/ "KVM X86 Xen (KVM/Xen)" ? Then "KVM X86 HYPER-V (KVM/hyper-v)" ?
+[1] https://www.virtualbox.org/browser/vbox/trunk/src/VBox/VMM/VMMR3/NEMR3Native-linux.cpp?rev=98193#L1735
+[2] https://gitlab.com/qemu-project/qemu/-/blob/v7.2.0/target/i386/kvm/kvm.c#L4480-4522
 
-> +  - selftests > +  - SVM
-> +  - nSVM
-> +  - VMX
-> +  - nVMX
+Fixes: a1efbe77c1fd ("KVM: x86: Add support for saving&restoring debug registers")
+Cc: stable <stable@kernel.org>	# needs 2c10b61421a2
+Signed-off-by: Mathias Krause <minipli@grsecurity.net>
+---
+ arch/x86/kvm/x86.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
-emulator ? lapic ?
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a2c299d47e69..db3967de7958 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -5261,18 +5261,23 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
+ static void kvm_vcpu_ioctl_x86_get_debugregs(struct kvm_vcpu *vcpu,
+ 					     struct kvm_debugregs *dbgregs)
+ {
+-	unsigned long val;
++	unsigned int i;
+ 
+ 	memset(dbgregs, 0, sizeof(*dbgregs));
+-	memcpy(dbgregs->db, vcpu->arch.db, sizeof(vcpu->arch.db));
+-	kvm_get_dr(vcpu, 6, &val);
+-	dbgregs->dr6 = val;
++
++	BUILD_BUG_ON(ARRAY_SIZE(vcpu->arch.db) != ARRAY_SIZE(dbgregs->db));
++	for (i = 0; i < ARRAY_SIZE(vcpu->arch.db); i++)
++		dbgregs->db[i] = vcpu->arch.db[i];
++
++	dbgregs->dr6 = vcpu->arch.dr6;
+ 	dbgregs->dr7 = vcpu->arch.dr7;
+ }
+ 
+ static int kvm_vcpu_ioctl_x86_set_debugregs(struct kvm_vcpu *vcpu,
+ 					    struct kvm_debugregs *dbgregs)
+ {
++	unsigned int i;
++
+ 	if (dbgregs->flags)
+ 		return -EINVAL;
+ 
+@@ -5281,7 +5286,9 @@ static int kvm_vcpu_ioctl_x86_set_debugregs(struct kvm_vcpu *vcpu,
+ 	if (!kvm_dr7_valid(dbgregs->dr7))
+ 		return -EINVAL;
+ 
+-	memcpy(vcpu->arch.db, dbgregs->db, sizeof(vcpu->arch.db));
++	for (i = 0; i < ARRAY_SIZE(vcpu->arch.db); i++)
++		vcpu->arch.db[i] = dbgregs->db[i];
++
+ 	kvm_update_dr0123(vcpu);
+ 	vcpu->arch.dr6 = dbgregs->dr6;
+ 	vcpu->arch.dr7 = dbgregs->dr7;
+-- 
+2.30.2
 
-> +
-> +**DO NOT use x86/kvm!**  ``x86/kvm`` is used exclusively for Linux-as-a-KVM-guest
-> +changes, i.e. for arch/x86/kernel/kvm.c.
-> +
-> +Note, these don't align with the topics branches (the topic branches care much
-> +more about code conflicts).
-> +
-> +All names are case sensitive!  ``KVM: x86:`` is good, ``kvm: vmx:`` is not.
-> +
-> +Capitalize the first word of the condensed patch description, but omit ending
-> +punctionation.  E.g.::
-
-s/punctionation/punctuation
-
-> +
-> +    KVM: x86: Fix a null pointer dererence in function_xyz()
-
-s/dererence/dereference
-
-> +
-> +not::
-> +
-> +    kvm: x86: fix a null pointer dererence in function_xyz.
-> +
-> +If a patch touches multiple topics, traverse up the conceptual tree to find the
-> +first common parent (which is often simply ``x86``).  When in doubt,
-> +``git log path/to/file`` should provide a reasonable hint.
-> +
-> +New topics do occasionally pop up, but please start an on-list discussion if
-> +you want to propose introducing a new topic, i.e. don't go rogue.
-> +
-> +Do not use file names or complete file paths as the subject/shortlog prefix.
-> +
-> +Changelog
-> +~~~~~~~~~
-> +Write changelogs using imperative mood and avoid pronouns.  Lead with a short
-> +blurb on what is changing, and then follow up with the context and background.
-> +Note!  This order directly conflicts with the tip tree's preferred approach!
-
-Emm, could this be considered/clarified as an incentive option ?
-
-> +
-> +Beyond personal preference, there are less subjective reasons for stating what
-> +a patch does before diving into details.  First and foremost, what code is
-> +actually being changed is the most important information, and so that info
-> +should be easy to find.  Changelogs that bury the "what's actually changing" in
-> +a one-liner after 3+ paragraphs of background make it very hard to find that
-> +information.
-> +
-> +For initial review, one could argue the "what's broken" is more important, but
-> +for skimming logs and git archaeology, the gory details matter less and less.
-> +E.g. when doing a series of "git blame", the details of each change along the
-> +way are useless, the details only matter for the culprit.  Providing the "what
-> +changed" makes it easy to quickly determine whether or not a commit might be of
-> +interest.
-> +
-> +Another benefit of stating "what's changing" first is that it's almost always
-> +possible to state "what's changing" in a single sentence.  Conversely, all but
-> +the most simple bugs require multiple sentences or paragraphs to fully describe
-> +the problem.  If both the "what's changing" and "what's the bug" are super
-> +short then the order doesn't matter.  But if one is shorter (almost always the
-> +"what's changing), then covering the shorter one first is advantageous because
-> +it's less of an inconvenience for readers/reviewers that have a strict ordering
-> +preference.  E.g. having to skip one sentence to get to the context is less
-> +painful than having to skip three paragraphs to get to "what's changing".
-
-I'm sure more than one kernel friends will be concerned about this requirement,
-especially those who like to read novels in our git logs.
-
-> +
-> +Fixes
-> +~~~~~
-> +If a change fixes a KVM/kernel bug, add a Fixes: tag even if the change doesn't
-> +need to be backported to stable kernels, and even if the change fixes a bug in
-> +an older release.
-> +
-> +Conversely, if a fix does need to be backported, explicitly tag the patch with
-> +"Cc: stable@vger.kernel" (though the email itself doesn't need to Cc: stable);
-> +KVM x86 opts out of backporting Fixes: by default.  Some auto-selected patches
-> +do get backported, but require explicit maintainer approval (search MANUALSEL).
-> +
-> +Function References
-> +~~~~~~~~~~~~~~~~~~~
-> +When a function is mentioned in a comment, changelog, or shortlog (or anywhere
-> +for that matter), use the format ``function_name()``.  The parentheses provide
-> +context and disambiguate the reference.
-> +
-> +Testing
-> +-------
-> +At a bare minimum, *all* patches in a series must build cleanly for KVM_INTEL=m
-> +KVM_AMD=m, and KVM_WERROR=y.  Building every possible combination of Kconfigs
-> +isn't feasible, but the more the merrier.  KVM_SMM, KVM_XEN, PROVE_LOCKING, and
-> +X86_64 are particularly interesting knobs to turn.
-> +
-> +Running KVM selftests and KVM-unit-tests is also mandatory (and stating the
-> +obvious, the tests need to pass).  When possible and relevant, testing on both
-> +Intel and AMD is strongly preferred.  Booting an actual VM is encouraged, but
-> +not mandatory.
-
-Testing L2 guest available features inside L1 is also encouraged.
-
-> +
-> +For changes that touch KVM's shadow paging code, running with TDP (EPT/NPT)
-> +disabled is mandatory.  For changes that affect common KVM MMU code, running
-> +with TDP disabled is strongly encouraged.  For all other changes, if the code
-> +being modified depends on and/or interacts with a module param, testing with
-> +the relevant settings is mandatory.
-> +
-> +Note, KVM selftests and KVM-unit-tests do have known failures.  If you suspect
-> +a failure is not due to your changes, verify that the *exact same* failure
-> +occurs with and without your changes.
-> +
-> +If you can't fully test a change, e.g. due to lack of hardware, clearly state
-> +what level of testing you were able to do, e.g. in the cover letter.
-
-Add an RFT (request for test) tag.
-
-> +
-> +New Features
-> +~~~~~~~~~~~~
-> +With one exception, new features *must* come with test coverage.  KVM specific
-> +tests aren't strictly required, e.g. if coverage is provided by running a
-> +sufficiently enabled guest VM, or by running a related kernel selftest in a VM,
-> +but dedicated KVM tests are preferred in all cases.  Negative testcases in
-> +particular are mandatory for enabling of new hardware features as error and
-> +exception flows are rarely exercised simply by running a VM.
-> +
-> +The only exception to this rule is if KVM is simply advertising support for a
-> +feature via KVM_SET_SUPPORTED_CPUID, i.e. for instructions/features that KVM
-> +can't prevent a guest from using and for which there is no true enabling.
-> +
-> +Note, "new features" does not just mean "new hardware features"!  New features
-> +that can't be well validated using existing KVM selftests and/or KVM-unit-tests
-> +must come with tests.
-
-must come with tests to ensure good code coverage.
-
-> +
-> +Posting new feature development without tests to get early feedback is more
-> +than welcome, but such submissions should be tagged RFC, and the cover letter
-> +should clearly state what type of feedback is requested/expected.  Do not abuse
-> +the RFC process; RFCs will typically not receive in-depth review.
-> +
-> +Bug Fixes
-> +~~~~~~~~~
-> +Except for "obvious" found-by-inspection bugs, fixes must be accompanied by a
-> +reproducer for the bug being fixed.  In many cases the reproducer is implicit,
-> +e.g. for build errors and test failures, but it should still be clear to
-> +readers what is broken and how to verify the fix.  Some leeway is given for
-> +bugs that are found via non-public workloads/tests, but providing regression
-> +tests for such bugs is strongly preferred.
-
-tests or detailed reproduction sequence for such bugs is strongly preferred.
-
-> +
-> +In general, regression tests are preferred for any bug that is not trivial to
-> +hit.  E.g. even if the bug was originally found by a fuzzer such as syzkaller,
-> +a targeted regression test may be warranted if the bug requires hitting a
-> +one-in-a-million type race condition.
-> +
-> +Note, KVM bugs are rarely urgent *and* non-trivial to reproduce.  Ask yourself
-> +if a bug is really truly the end of the world before posting a fix without a
-> +reproducer.
-> +
-> +Posting
-> +-------
-> +
-> +Links
-> +~~~~~
-> +Do not explicitly reference bug reports, prior versions of a patch/series, etc.
-> +via ``In-Reply-To:`` headers.  Using ``In-Reply-To:`` becomes an unholy mess
-> +for large series and/or when the version count gets high, and ``In-Reply-To:``
-> +is useless for anyone that doesn't have the original message, e.g. if someone
-> +wasn't Cc'd on the bug report or if the list of recipients changes between
-> +versions.
-> +
-> +To link to a bug report, previous version, or anything of interest, use lore
-> +links.  For referencing previous version(s), generally speaking do not include
-> +a Link: in the changelog as there is no need to record the history in git, i.e.
-> +put the link in the cover letter or in the section git ignores.  Do provide a
-> +formal Link: for bug reports and/or discussions that led to the patch.  The
-> +context of why a change was made is highly valuable for future readers.
-> +
-> +Git Base
-> +~~~~~~~~
-> +If you are using git version 2.9.0 or later (Googlers, this is all of you!),
-
-Please do not mention specific developers or groups in this type of document.
-
-> +use ``git format-patch`` with the ``--base`` flag to automatically include the
-> +base tree information in the generated patches.
-> +
-> +Note, ``--base=auto`` works as expected if and only if a branch's upstream is
-> +set to the base topic branch, e.g. it will do the wrong thing if your upstream
-> +is set to your personal repository for backup purposes.  An alternative "auto"
-> +solution is to derive the names of your development branches based on their
-> +KVM x86 topic, and feed that into ``--base``.  E.g. ``x86/pmu/my_branch_name``,
-> +and then write a small wrapper to extract ``pmu`` from the current branch name
-> +to yield ``--base=x/pmu``, where ``x`` is whatever name your repository uses to
-> +track the KVM x86 remote.
-> +
-> +Co-Posting Tests
-> +~~~~~~~~~~~~~~~~
-> +KVM selftests that are associated with KVM changes, e.g. regression tests for
-> +bug fixes, should be posted along with the KVM changes as a single series.
-
-Keeping git-bisect is mandatory.
-
-> +
-> +KVM-unit-tests should *always* be posted separately.  Tools, e.g. b4 am, don't
-> +know that KVM-unit-tests is a separate repository and get confused when patches
-> +in a series apply on different trees.  To tie KVM-unit-tests patches back to
-> +KVM patches, first post the KVM changes and then provide a lore Link: to the
-> +KVM patch/series in the KVM-unit-tests patch(es).
-> +
-> +Notifications
-> +-------------
-> +When a patch/series is officially accepted, a notification email will be sent
-> +in reply to the original posting (cover letter for multi-patch series).  The
-> +notification will include the tree and topic branch, along with the SHA1s of
-> +the commits of applied patches.
-> +
-> +If a subset of patches is applied, this will be clearly stated in the
-> +notification.  Unless stated otherwise, it's implied that any patches in the
-> +series that were not accepted need more work and should be submitted in a new
-> +version.
-
-in a new version or a separate topic thread.
-
-> +
-> +If for some reason a patch is dropped after officially being accepted, a reply
-> +will be sent to the notification email explaining why the patch was dropped, as
-> +well as the next steps.
-> +
-> +SHA1 Stability
-> +~~~~~~~~~~~~~~
-> +SHA1s are not 100% guaranteed to be stable until they land in Linus' tree!  A
-> +SHA1 is *usually* stable once a notification has been sent, but things happen.
-> +In most cases, an update to the notification email be provided if an applied
-> +patch's SHA1 changes.  However, in some scenarios, e.g. if all KVM x86 branches
-> +need to be rebased, individual notifications will not be given.
-> +
-> +Vulnerabilities
-> +---------------
-> +Bugs that can be exploited by the guest to attack the host (kernel or
-> +userspace), or that can be exploited by a nested VM to *its* host (L2 attacking
-> +L1), are of particular interest to KVM.  Please follow the protocol for
-
-L1, even L0 host),
-
-> +:ref:`securitybugs` if you suspect a bug can lead to an escape, data leak, etc.
-> +
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 6a47510d1592..13e67a8b4827 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -11436,6 +11436,7 @@ M:	Sean Christopherson <seanjc@google.com>
->   M:	Paolo Bonzini <pbonzini@redhat.com>
->   L:	kvm@vger.kernel.org
->   S:	Supported
-> +P:	Documentation/process/maintainer-kvm-x86.rst
->   T:	git git://git.kernel.org/pub/scm/virt/kvm/kvm.git
->   F:	arch/x86/include/asm/kvm*
->   F:	arch/x86/include/asm/svm.h
