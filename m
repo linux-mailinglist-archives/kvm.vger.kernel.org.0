@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 73BCB69C5B5
-	for <lists+kvm@lfdr.de>; Mon, 20 Feb 2023 07:58:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 016A869C5D5
+	for <lists+kvm@lfdr.de>; Mon, 20 Feb 2023 08:12:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231149AbjBTG6h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Feb 2023 01:58:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35650 "EHLO
+        id S231282AbjBTHLo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Feb 2023 02:11:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230421AbjBTG5x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Feb 2023 01:57:53 -0500
+        with ESMTP id S231243AbjBTHLm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Feb 2023 02:11:42 -0500
 Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C1CC82712;
-        Sun, 19 Feb 2023 22:57:50 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A402A659B;
+        Sun, 19 Feb 2023 23:11:31 -0800 (PST)
 Received: from loongson.cn (unknown [10.2.5.185])
-        by gateway (Coremail) with SMTP id _____8DxEwztGfNjRrUCAA--.65S3;
-        Mon, 20 Feb 2023 14:57:49 +0800 (CST)
+        by gateway (Coremail) with SMTP id _____8DxEwzjGfNjUrQCAA--.45S3;
+        Mon, 20 Feb 2023 14:57:39 +0800 (CST)
 Received: from localhost.localdomain (unknown [10.2.5.185])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8Ax+73fGfNjFvk2AA--.34690S31;
-        Mon, 20 Feb 2023 14:57:47 +0800 (CST)
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8Ax+73fGfNjFvk2AA--.34690S10;
+        Mon, 20 Feb 2023 14:57:38 +0800 (CST)
 From:   Tianrui Zhao <zhaotianrui@loongson.cn>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Huacai Chen <chenhuacai@kernel.org>,
@@ -30,32 +30,32 @@ Cc:     Huacai Chen <chenhuacai@kernel.org>,
         Mark Brown <broonie@kernel.org>,
         Alex Deucher <alexander.deucher@amd.com>,
         Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn
-Subject: [PATCH v2 29/29] LoongArch: KVM: Enable kvm config and add the makefile
-Date:   Mon, 20 Feb 2023 14:57:35 +0800
-Message-Id: <20230220065735.1282809-30-zhaotianrui@loongson.cn>
+Subject: [PATCH v2 08/29] LoongArch: KVM: Implement vcpu handle exit interface
+Date:   Mon, 20 Feb 2023 14:57:14 +0800
+Message-Id: <20230220065735.1282809-9-zhaotianrui@loongson.cn>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20230220065735.1282809-1-zhaotianrui@loongson.cn>
 References: <20230220065735.1282809-1-zhaotianrui@loongson.cn>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8Ax+73fGfNjFvk2AA--.34690S31
+X-CM-TRANSID: AQAAf8Ax+73fGfNjFvk2AA--.34690S10
 X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBjvJXoWxXFW3Ww4DWry3Cr48KFy7GFg_yoW5KF1DpF
-        s7Ar1kGr4xWFn3JrZ3t34kWrs8CFn7Kr47u3Waya48Cry7Z34kur1ktr9rXFyUA393JrW0
-        gr1rGa1agayUJw7anT9S1TB71UUUUjJqnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
+X-Coremail-Antispam: 1Uk129KBjvJXoWxGw47Zr4UXFWDGFWrWw43Awb_yoW5Ww47pa
+        y8CryY9w48G34xAanayr1qqr4YvrZ3Kr1xZrZrW3yayrsrtas8Jr4kKrZxtFy8W34FvF1f
+        ZF1rt3Z0kr4qyw7anT9S1TB71UUUUjJqnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
         qI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUIcSsGvfJTRUUU
-        b4AFc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4
+        b4xFc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4
         AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF
-        7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6x
-        kF7I0E14v26F4UJVW0owAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAq
-        jxCEc2xF0cIa020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E74AGY7Cv6c
-        x26rWlOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxkF7I0En4kS14v26r12
-        6r1DMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY20_WwCFx2IqxVCFs4IE7xkEbV
-        WUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E7480
-        Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7
-        IYx2IY67AKxVWDJVCq3wCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJwCI42IY6xAI
-        w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr1j6F4UJwCI42IY6I8E87Iv6x
-        kF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7xRiTKZJUUUUU==
+        7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aV
+        CY1x0267AKxVWxJr0_GcWln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l
+        57IF6xkI12xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6x8ErcxFaV
+        Av8VWrMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCY1x0262kKe7AKxVWU
+        AVWUtwCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6cx26rWl4I8I3I0E4IkC6x0Yz7
+        v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
+        jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
+        x0cI8IcVAFwI0_tr0E3s1lIxAIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY6xAI
+        w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Cr0_Gr1UMIIF0xvEx4A2jsIEc7
+        CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0zR9iSdUUUUU=
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
         SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -64,133 +64,111 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Enable loongarch kvm config and add the makefile to support build kvm
-module.
+Implement vcpu handle exit interface, getting the exit code by ESTAT
+register and using kvm exception vector to handle it.
 
 Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
 ---
- arch/loongarch/Kbuild                      |  1 +
- arch/loongarch/Kconfig                     |  2 ++
- arch/loongarch/configs/loongson3_defconfig |  2 ++
- arch/loongarch/kvm/Kconfig                 | 38 ++++++++++++++++++++++
- arch/loongarch/kvm/Makefile                | 21 ++++++++++++
- 5 files changed, 64 insertions(+)
- create mode 100644 arch/loongarch/kvm/Kconfig
- create mode 100644 arch/loongarch/kvm/Makefile
+ arch/loongarch/kvm/vcpu.c | 86 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 86 insertions(+)
 
-diff --git a/arch/loongarch/Kbuild b/arch/loongarch/Kbuild
-index b01f5cdb2..40be8a169 100644
---- a/arch/loongarch/Kbuild
-+++ b/arch/loongarch/Kbuild
-@@ -2,6 +2,7 @@ obj-y += kernel/
- obj-y += mm/
- obj-y += net/
- obj-y += vdso/
-+obj-y += kvm/
+diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+index 571ac8b9d..e08a4faa0 100644
+--- a/arch/loongarch/kvm/vcpu.c
++++ b/arch/loongarch/kvm/vcpu.c
+@@ -38,6 +38,92 @@ static int _kvm_check_requests(struct kvm_vcpu *vcpu, int cpu)
+ 	return ret;
+ }
  
- # for cleaning
- subdir- += boot
-diff --git a/arch/loongarch/Kconfig b/arch/loongarch/Kconfig
-index 9cc8b84f7..424ad9392 100644
---- a/arch/loongarch/Kconfig
-+++ b/arch/loongarch/Kconfig
-@@ -142,6 +142,7 @@ config LOONGARCH
- 	select USE_PERCPU_NUMA_NODE_ID
- 	select USER_STACKTRACE_SUPPORT
- 	select ZONE_DMA32
-+	select HAVE_KVM
- 
- config 32BIT
- 	bool
-@@ -541,3 +542,4 @@ source "drivers/acpi/Kconfig"
- endmenu
- 
- source "drivers/firmware/Kconfig"
-+source "arch/loongarch/kvm/Kconfig"
-diff --git a/arch/loongarch/configs/loongson3_defconfig b/arch/loongarch/configs/loongson3_defconfig
-index eb84cae64..9a6e31b43 100644
---- a/arch/loongarch/configs/loongson3_defconfig
-+++ b/arch/loongarch/configs/loongson3_defconfig
-@@ -62,6 +62,8 @@ CONFIG_EFI_ZBOOT=y
- CONFIG_EFI_GENERIC_STUB_INITRD_CMDLINE_LOADER=y
- CONFIG_EFI_CAPSULE_LOADER=m
- CONFIG_EFI_TEST=m
-+CONFIG_VIRTUALIZATION=y
-+CONFIG_KVM=m
- CONFIG_MODULES=y
- CONFIG_MODULE_FORCE_LOAD=y
- CONFIG_MODULE_UNLOAD=y
-diff --git a/arch/loongarch/kvm/Kconfig b/arch/loongarch/kvm/Kconfig
-new file mode 100644
-index 000000000..8a999b4c0
---- /dev/null
-+++ b/arch/loongarch/kvm/Kconfig
-@@ -0,0 +1,38 @@
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# KVM configuration
-+#
++/*
++ * Return value is in the form (errcode<<2 | RESUME_FLAG_HOST | RESUME_FLAG_NV)
++ */
++static int _kvm_handle_exit(struct kvm_run *run, struct kvm_vcpu *vcpu)
++{
++	unsigned long exst = vcpu->arch.host_estat;
++	u32 intr = exst & 0x1fff; /* ignore NMI */
++	u32 exccode = (exst & CSR_ESTAT_EXC) >> CSR_ESTAT_EXC_SHIFT;
++	u32 __user *opc = (u32 __user *) vcpu->arch.pc;
++	int ret = RESUME_GUEST, cpu;
 +
-+source "virt/kvm/Kconfig"
++	vcpu->mode = OUTSIDE_GUEST_MODE;
 +
-+menuconfig VIRTUALIZATION
-+	bool "Virtualization"
-+	help
-+	  Say Y here to get to see options for using your Linux host to run
-+	  other operating systems inside virtual machines (guests).
-+	  This option alone does not add any kernel code.
++	/* Set a default exit reason */
++	run->exit_reason = KVM_EXIT_UNKNOWN;
++	run->ready_for_interrupt_injection = 1;
 +
-+	  If you say N, all options in this submenu will be skipped and
-+	  disabled.
++	/*
++	 * Set the appropriate status bits based on host CPU features,
++	 * before we hit the scheduler
++	 */
 +
-+if VIRTUALIZATION
++	local_irq_enable();
 +
-+config KVM
-+	tristate "Kernel-based Virtual Machine (KVM) support"
-+	depends on HAVE_KVM
-+	select MMU_NOTIFIER
-+	select ANON_INODES
-+	select PREEMPT_NOTIFIERS
-+	select KVM_MMIO
-+	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
-+	select HAVE_KVM_VCPU_ASYNC_IOCTL
-+	select HAVE_KVM_EVENTFD
-+	select SRCU
-+	help
-+	  Support hosting virtualized guest machines using hardware
-+	  virtualization extensions. You will need a fairly processor
-+	  equipped with virtualization extensions.
++	kvm_debug("%s: exst: %lx, PC: %p, kvm_run: %p, kvm_vcpu: %p\n",
++			__func__, exst, opc, run, vcpu);
++	trace_kvm_exit(vcpu, exccode);
++	if (exccode) {
++		ret = _kvm_handle_fault(vcpu, exccode);
++	} else {
++		WARN(!intr, "suspicious vm exiting");
++		++vcpu->stat.int_exits;
 +
-+	  If unsure, say N.
++		if (need_resched())
++			cond_resched();
 +
-+endif # VIRTUALIZATION
-diff --git a/arch/loongarch/kvm/Makefile b/arch/loongarch/kvm/Makefile
-new file mode 100644
-index 000000000..42e9dcc18
---- /dev/null
-+++ b/arch/loongarch/kvm/Makefile
-@@ -0,0 +1,21 @@
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Makefile for LOONGARCH KVM support
-+#
++		ret = RESUME_GUEST;
++	}
 +
-+ccflags-y += -I $(srctree)/$(src)
++	cond_resched();
 +
-+include $(srctree)/virt/kvm/Makefile.kvm
++	local_irq_disable();
 +
-+obj-$(CONFIG_KVM) += kvm.o
++	if (ret == RESUME_GUEST)
++		kvm_acquire_timer(vcpu);
 +
-+kvm-y += main.o
-+kvm-y += vm.o
-+kvm-y += vmid.o
-+kvm-y += tlb.o
-+kvm-y += mmu.o
-+kvm-y += vcpu.o
-+kvm-y += exit.o
-+kvm-y += interrupt.o
-+kvm-y += timer.o
-+kvm-y += switch.o
++	if (!(ret & RESUME_HOST)) {
++		_kvm_deliver_intr(vcpu);
++		/* Only check for signals if not already exiting to userspace */
++		if (signal_pending(current)) {
++			run->exit_reason = KVM_EXIT_INTR;
++			ret = (-EINTR << 2) | RESUME_HOST;
++			++vcpu->stat.signal_exits;
++			trace_kvm_exit(vcpu, KVM_TRACE_EXIT_SIGNAL);
++		}
++	}
++
++	if (ret == RESUME_GUEST) {
++		trace_kvm_reenter(vcpu);
++
++		/*
++		 * Make sure the read of VCPU requests in vcpu_reenter()
++		 * callback is not reordered ahead of the write to vcpu->mode,
++		 * or we could miss a TLB flush request while the requester sees
++		 * the VCPU as outside of guest mode and not needing an IPI.
++		 */
++		smp_store_mb(vcpu->mode, IN_GUEST_MODE);
++
++		cpu = smp_processor_id();
++		_kvm_check_requests(vcpu, cpu);
++		_kvm_check_vmid(vcpu, cpu);
++		vcpu->arch.host_eentry = csr_read64(LOONGARCH_CSR_EENTRY);
++
++		/*
++		 * If FPU are enabled (i.e. the guest's FPU context
++		 * is live), restore FCSR0.
++		 */
++		if (_kvm_guest_has_fpu(&vcpu->arch) &&
++			read_csr_euen() & (CSR_EUEN_FPEN)) {
++			kvm_restore_fcsr(&vcpu->arch.fpu);
++		}
++	}
++
++	return ret;
++}
++
+ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ {
+ 	int i;
 -- 
 2.31.1
 
