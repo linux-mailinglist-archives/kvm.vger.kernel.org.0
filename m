@@ -2,291 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E83669D180
-	for <lists+kvm@lfdr.de>; Mon, 20 Feb 2023 17:41:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6EBC469D140
+	for <lists+kvm@lfdr.de>; Mon, 20 Feb 2023 17:21:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232358AbjBTQlk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Feb 2023 11:41:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51982 "EHLO
+        id S231848AbjBTQVJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Feb 2023 11:21:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232370AbjBTQl3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Feb 2023 11:41:29 -0500
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2086.outbound.protection.outlook.com [40.107.94.86])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9676206AB;
-        Mon, 20 Feb 2023 08:41:18 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=D6USKytXKZLfOSxuOyBGl4SlkJOOpDtJ+15DBLKVxCpWrFD4KrXwKzQMnIa6xNbo/GDBKgYxPcuEDXGEoqNny0Tid6lqW4wdywF3wpVFDB5ciHqWqEiapFMmtKtauLHv3WO7Q/uyxdpiSOVHzgLm4Fovv9PcyZQ+STaUef0LMsGv4P0xfECjVdbmd7jlv/gBUX/4VDsqmoqv3GgfpegZ3R1HkduXx04Pow57fR6KidmYlGcKNSz6chvmxiutgMNR9Sx6YP1oNHzAkf5ApuggQNe2ptKnFGuZ+mH6mjXzRqreL/brG7vMsuvRcaRm6Q//sMqrIsKrlf3YQYP7kKrHLA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CXcfaW3dWUbugSefHUtpb/s4DncZt1qaRcxfgd64UDA=;
- b=eoZU274HplIlRrdVUMXupVP6PPU6BPo7EyTx6PV7JLP3v571AJY1JQoaaoxDN3PygwhCbI4a2GwFs4h2uSPR7toTGtR7i66eLVb6hnDLM6dqu/ajRqXnH4FBIT201n4w0FZABdaNK27wDuP2QxH+sordFiu8S9nv0huTKlbQWhcco8IPMKZs9VNP6PDzA9d42sORx21DgBfS8FlXMLF9V4ozHh60ZC5jN783gl8yPUxle2bhRfbCyCiiz5wXWhqvKM7IEl36nX4O3or4qcVxDIyURvLOvWaNYKLYc9y75tovmMRFWZKn9g9KGhbU/rTlbpqkCGMVKGh0IyzBmTv+3g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CXcfaW3dWUbugSefHUtpb/s4DncZt1qaRcxfgd64UDA=;
- b=3yNZeBhBLEqNN2wRpF3uZjuHkWKeejd0339LHvc6919JBrUXCsQWsgAhmH08P77m295+2qesaIr6MwLFESzER8UQIn6uN9YgMcOIhCArR4OSqG2XW5YfCm2QfYy+UezFsSSvpIs5xGwJu8xbfsTTN1/93rNP9KPBtx+ndNOS54E=
-Received: from BN9PR03CA0070.namprd03.prod.outlook.com (2603:10b6:408:fc::15)
- by MW4PR12MB7438.namprd12.prod.outlook.com (2603:10b6:303:219::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.20; Mon, 20 Feb
- 2023 16:41:16 +0000
-Received: from BN8NAM11FT082.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:fc:cafe::da) by BN9PR03CA0070.outlook.office365.com
- (2603:10b6:408:fc::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.20 via Frontend
- Transport; Mon, 20 Feb 2023 16:41:15 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN8NAM11FT082.mail.protection.outlook.com (10.13.176.94) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6111.20 via Frontend Transport; Mon, 20 Feb 2023 16:41:15 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 20 Feb
- 2023 10:41:14 -0600
-Date:   Mon, 20 Feb 2023 10:18:42 -0600
-From:   Michael Roth <michael.roth@amd.com>
-To:     Jarkko Sakkinen <jarkko@kernel.org>
-CC:     Borislav Petkov <bp@alien8.de>, <kvm@vger.kernel.org>,
-        <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-        <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <tglx@linutronix.de>,
-        <mingo@redhat.com>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
-        <hpa@zytor.com>, <ardb@kernel.org>, <pbonzini@redhat.com>,
-        <seanjc@google.com>, <vkuznets@redhat.com>,
-        <wanpengli@tencent.com>, <jmattson@google.com>, <luto@kernel.org>,
-        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
-        <pgonda@google.com>, <peterz@infradead.org>,
-        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <vbabka@suse.cz>,
-        <kirill@shutemov.name>, <ak@linux.intel.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        <alpergun@google.com>, <dgilbert@redhat.com>,
-        <ashish.kalra@amd.com>, <harald@profian.com>,
-        Nikunj A Dadhania <nikunj@amd.com>,
-        <chao.p.peng@linux.intel.com>
-Subject: Re: [PATCH RFC v7 03/64] KVM: SVM: Advertise private memory support
- to KVM
-Message-ID: <20230220161842.ou73dqulryed3k75@amd.com>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-4-michael.roth@amd.com>
- <Y6Xd0ruz3kMij/5F@zn.tnic>
- <20230105021419.rs23nfq44rv64tsd@amd.com>
- <Y8sFnsk2GvnUCVFI@kernel.org>
+        with ESMTP id S230062AbjBTQVI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Feb 2023 11:21:08 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DA4FFF2E;
+        Mon, 20 Feb 2023 08:21:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=2N0mjLDF4RCECwYgGB5UhLjBmELGQo92MP9bsWA0jW8=; b=IJiQh8zbhURvfw5gNdxP0jXVtg
+        XVT17YXclc19YBiQzx+rgbPoO1RZEZjffd2icsJiYuXOvEtAFL/hg8k+bWgccs99fr0IJ+ZuEupgh
+        NA0SBMY1GresjopCd2LuNCGwHfXOvAlYIxHjaPl2kTYBATBF5f0CPOT5ryv+jfU+Okv5pptVl+GG2
+        tcHpZ9bK4JuwuSI4/sYPj2BAf0sYJeO6NMlqb+EFGUnd5+uBEjQt9dvZznQ7b0wZtaZoNqgUvmy+u
+        sxqQdYZ5pv/lxtu2eYSZJkWxcz1T0yF6Nr/9ihFo0e9vhlGc7Kh7sINCt1S3eSOHv1DTo5egQ1vEm
+        4LDkWeHw==;
+Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.ant.amazon.com)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pU8tj-00Br48-CV; Mon, 20 Feb 2023 16:20:15 +0000
+Message-ID: <ed8d662351cfe5793f8cc7e7e8c514d05d16c501.camel@infradead.org>
+Subject: Re: [PATCH v9 0/8] Parallel CPU bringup for x86_64
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Oleksandr Natalenko <oleksandr@natalenko.name>, tglx@linutronix.de,
+        kim.phillips@amd.com, Usama Arif <usama.arif@bytedance.com>
+Cc:     arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
+        pbonzini@redhat.com, paulmck@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
+        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
+        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
+        simon.evans@bytedance.com, liangma@liangbit.com
+Date:   Mon, 20 Feb 2023 16:20:13 +0000
+In-Reply-To: <2668799.mvXUDI8C0e@natalenko.name>
+References: <20230215145425.420125-1-usama.arif@bytedance.com>
+         <2668799.mvXUDI8C0e@natalenko.name>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-uE9XCa0ZzGivZ6OioyoI"
+User-Agent: Evolution 3.44.4-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <Y8sFnsk2GvnUCVFI@kernel.org>
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN8NAM11FT082:EE_|MW4PR12MB7438:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7be97b1f-4a5b-41c9-739e-08db1361486d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: S3AtAncVSVRoe8/daDhhirQecZhqEvjg99rERb4jH6F7V/Qx+0HN5IduQaj4WTs6UhW7Xyfp3eMXlELE7EPqduV95lGqX9NOrrjK+V8tQ5WvCLrVOhTXyZOcX68QKrg9BQw79cPSbcpp6C+x6TQydfTWUanKpcL1Gq6sLm0sRgo/hWyvW7qZQMp986spLG1BzvXeqHvEq2qwhOAVRhnxMpzQN8/CiEeNszFTSBiv1BriXrUBkh07WWulVMiBwX6r4yzHeevA7kFZ1rBJepm8ztc5KrqYXMpWhveZKUm5d1HQ8YWtxNtM7u4QGpEa0eEil0NHa7IWidowFyfw+GDEGDmqctG1KzNs9FUlAnRQWunVWyW1ulmpg5zpDY7VY4izeJlbcS7Xd2KX1CZkTOlAsog2hEmk+mCsM/KMmRHIkZcKWClk/Yd4ScnG1U+PFE/QFqItbk2+EEt6awn98PAwkbLh26hBFUpuF5W8oMsLVimqTZBmOQIQusG4rx2w3IJVyiX4q7lxl3TYob6PmkMQP9FWRxNwc+wZNYdFMP+0kWxrLkjed9soracPcl+l6yZpA5VoCBPTk5tvzYIkZjfOJRFY3lsp2R0vjbrGCwsEYJ2sUVc8SEix6u2GjCX7vq8VPjbYtcn/WMfRy4VgoHSlUTRR4Vo7He4DHM9DXWzl4MGmGzcWn6oyqIFbA7kTs3TEEauWwamhoegUt27kj3spuSH42ev9uKfybdbIswfIBTU=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(376002)(39860400002)(346002)(396003)(136003)(451199018)(36840700001)(46966006)(40470700004)(8936002)(2616005)(7406005)(7416002)(36860700001)(5660300002)(336012)(6916009)(4326008)(82310400005)(8676002)(70206006)(86362001)(70586007)(36756003)(83380400001)(54906003)(45080400002)(426003)(40480700001)(47076005)(316002)(478600001)(966005)(40460700003)(41300700001)(26005)(186003)(16526019)(82740400003)(356005)(2906002)(81166007)(1076003)(66899018)(6666004)(44832011)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2023 16:41:15.0320
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7be97b1f-4a5b-41c9-739e-08db1361486d
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT082.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7438
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 20, 2023 at 09:20:30PM +0000, Jarkko Sakkinen wrote:
-> On Wed, Jan 04, 2023 at 08:14:19PM -0600, Michael Roth wrote:
-> > On Fri, Dec 23, 2022 at 05:56:50PM +0100, Borislav Petkov wrote:
-> > > On Wed, Dec 14, 2022 at 01:39:55PM -0600, Michael Roth wrote:
-> > > > +       bool (*private_mem_enabled)(struct kvm *kvm);
-> > > 
-> > > This looks like a function returning boolean to me. IOW, you can
-> > > simplify this to:
-> > 
-> > The semantics and existing uses of KVM_X86_OP_OPTIONAL_RET0() gave me the
-> > impression it needed to return an integer value, since by default if a
-> > platform doesn't implement the op it would "return 0", and so could
-> > still be called unconditionally.
-> > 
-> > Maybe that's not actually enforced, by it seems awkward to try to use a
-> > bool return instead. At least for KVM_X86_OP_OPTIONAL_RET0().
-> > 
-> > However, we could just use KVM_X86_OP() to declare it so we can cleanly
-> > use a function that returns bool, and then we just need to do:
-> > 
-> >   bool kvm_arch_has_private_mem(struct kvm *kvm)
-> >   {
-> >           if (kvm_x86_ops.private_mem_enabled)
-> >                   return static_call(kvm_x86_private_mem_enabled)(kvm);
-> 
-> I guess this is missing:
-> 
->         return false;
-> 
-> >   }
-> >     
-> > instead of relying on default return value. So I'll take that approach
-> > and adopt your other suggested changes.
-> > 
-> > ...
-> > 
-> > On a separate topic though, at a high level, this hook is basically a way
-> > for platform-specific code to tell generic KVM code that private memslots
-> > are supported by overriding the kvm_arch_has_private_mem() weak
-> > reference. In this case the AMD platform is using using kvm->arch.upm_mode
-> > flag to convey that, which is in turn set by the
-> > KVM_CAP_UNMAPPED_PRIVATE_MEMORY introduced in this series.
-> > 
-> > But if, as I suggested in response to your PATCH 2 comments, we drop
-> > KVM_CAP_UNAMMPED_PRIVATE_MEMORY in favor of
-> > KVM_SET_SUPPORTED_MEMORY_ATTRIBUTES ioctl to enable "UPM mode" in SEV/SNP
-> > code, then we need to rethink things a bit, since KVM_SET_MEMORY_ATTRIBUTES
-> > in-part relies on kvm_arch_has_private_mem() to determine what flags are
-> > supported, whereas SEV/SNP code would be using what was set by
-> > KVM_SET_MEMORY_ATTRIBUTES to determine the return value in
-> > kvm_arch_has_private_mem().
-> 
-> Does this mean that internal calls to  kvm_vm_set_region_attr() will
-> cease to exist, and it will rely for user space to use the ioctl
-> properly instead?
 
-Patches 1-3 are no longer needed and have been dropped for v8, instead
-"UPM mode" is set via KVM_VM_CREATE vm_type arg, and SEV/SNP can simply
-call kvm_arch_has_private_mem() to query whether userspace has enabled
-UPM mode or not.
+--=-uE9XCa0ZzGivZ6OioyoI
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-But even still, we call kvm_vm_set_region_attr() in
-sev_launch_update_data() and snp_launch_update() after copying initial
-payload into private memory.
+On Mon, 2023-02-20 at 17:08 +0100, Oleksandr Natalenko wrote:
+>=20
+> I've applied this to the v6.2 kernel, and suspend/resume broke on my
+> Ryzen 5950X desktop. The machine suspends just fine, but on resume
+> the screen stays blank, and there's no visible disk I/O.
+>=20
+> Reverting the series brings suspend/resume back to working state.
 
-I don't think there's much worth in having userspace have to do it via
-KVM_SET_MEMORY_ATTRIBUTES afterward. It could be done that way I suppose,
-but generally RMP update from shared->private happens as part of
-KVM_SET_MEMORY_ATTRIBUTES, whereas in this case it would necessarily
-happen *after* the RMP updates, since SNP_LAUNCH_UPDATE expects the pages
-to be marked private beforehand.
+Hm, thanks. What if you add 'no_parallel_bringup' on the command line?
 
-Just seems like more corner cases to deal with and more boilerplate code
-for userspace, which already needed to operate under the assumption that
-pages will be private after SNP_LAUNCH_UPDATE, so seems to make sense to
-just have the memory attributes also updated accordingly.
+Is that using X2APIC? If so, what about 'nox2apic' on the command line?
 
--Mike
-> 
-> > So, for AMD, the return value of kvm_arch_has_private_mem() needs to rely
-> > on something else. Maybe the logic can just be:
-> > 
-> >   bool svm_private_mem_enabled(struct kvm *kvm)
-> >   {
-> >     return sev_enabled(kvm) || sev_snp_enabled(kvm)
-> >   }
-> > 
-> > (at least in the context of this patchset where UPM support is added for
-> > both SEV and SNP).
-> > 
-> > So I'll plan to make that change as well.
-> > 
-> > -Mike
-> > 
-> > > 
-> > > diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> > > index 82ba4a564e58..4449aeff0dff 100644
-> > > --- a/arch/x86/include/asm/kvm-x86-ops.h
-> > > +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> > > @@ -129,6 +129,7 @@ KVM_X86_OP(msr_filter_changed)
-> > >  KVM_X86_OP(complete_emulated_msr)
-> > >  KVM_X86_OP(vcpu_deliver_sipi_vector)
-> > >  KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
-> > > +KVM_X86_OP_OPTIONAL_RET0(private_mem_enabled);
-> > >  
-> > >  #undef KVM_X86_OP
-> > >  #undef KVM_X86_OP_OPTIONAL
-> > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > > index 1da0474edb2d..1b4b89ddeb55 100644
-> > > --- a/arch/x86/include/asm/kvm_host.h
-> > > +++ b/arch/x86/include/asm/kvm_host.h
-> > > @@ -1574,6 +1574,7 @@ struct kvm_x86_ops {
-> > >  
-> > >  	void (*load_mmu_pgd)(struct kvm_vcpu *vcpu, hpa_t root_hpa,
-> > >  			     int root_level);
-> > > +	bool (*private_mem_enabled)(struct kvm *kvm);
-> > >  
-> > >  	bool (*has_wbinvd_exit)(void);
-> > >  
-> > > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > > index ce362e88a567..73b780fa4653 100644
-> > > --- a/arch/x86/kvm/svm/svm.c
-> > > +++ b/arch/x86/kvm/svm/svm.c
-> > > @@ -4680,6 +4680,14 @@ static int svm_vm_init(struct kvm *kvm)
-> > >  	return 0;
-> > >  }
-> > >  
-> > > +static bool svm_private_mem_enabled(struct kvm *kvm)
-> > > +{
-> > > +	if (sev_guest(kvm))
-> > > +		return kvm->arch.upm_mode;
-> > > +
-> > > +	return IS_ENABLED(CONFIG_HAVE_KVM_PRIVATE_MEM_TESTING);
-> > > +}
-> > > +
-> > >  static struct kvm_x86_ops svm_x86_ops __initdata = {
-> > >  	.name = "kvm_amd",
-> > >  
-> > > @@ -4760,6 +4768,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
-> > >  
-> > >  	.vcpu_after_set_cpuid = svm_vcpu_after_set_cpuid,
-> > >  
-> > > +	.private_mem_enabled = svm_private_mem_enabled,
-> > > +
-> > >  	.has_wbinvd_exit = svm_has_wbinvd_exit,
-> > >  
-> > >  	.get_l2_tsc_offset = svm_get_l2_tsc_offset,
-> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > > index 823646d601db..9a1ca59d36a4 100644
-> > > --- a/arch/x86/kvm/x86.c
-> > > +++ b/arch/x86/kvm/x86.c
-> > > @@ -12556,6 +12556,11 @@ void __user * __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa,
-> > >  }
-> > >  EXPORT_SYMBOL_GPL(__x86_set_memory_region);
-> > >  
-> > > +bool kvm_arch_has_private_mem(struct kvm *kvm)
-> > > +{
-> > > +	return static_call(kvm_x86_private_mem_enabled)(kvm);
-> > > +}
-> > > +
-> > >  void kvm_arch_pre_destroy_vm(struct kvm *kvm)
-> > >  {
-> > >  	kvm_mmu_pre_destroy_vm(kvm);
-> > > 
-> > > -- 
-> > > Regards/Gruss,
-> > >     Boris.
-> > > 
-> > > https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fpeople.kernel.org%2Ftglx%2Fnotes-about-netiquette&data=05%7C01%7Cmichael.roth%40amd.com%7C319e89ce555a46eace4d08dae506b51a%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C638074114318137471%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=aG11K7va1BhemwlKCKKdcIXEwXGUzImYL%2BZ9%2FQ7XToI%3D&reserved=0
-> 
-> BR, Jarkko
+--=-uE9XCa0ZzGivZ6OioyoI
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMjIwMTYyMDEzWjAvBgkqhkiG9w0BCQQxIgQgzO2hyBf3
+8I3JhhhO0aSjLtdzxl5dm1xOE/AjQ9tw0KUwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAG7egpu9AyoAp+wQ38DrTUPQ55pBOZqELo
+ipMBsZDVvgbOeORtrDMl2uHixNrDQRkaNffhWZhCYEiFLzYnlond8swIRos+rKNdkbemuiKnvIUp
+A9uduFNCn2ypPYMPl/qe9XEphfy7uM3619NZsoW4h2SkSvOgxegLvxtFjwNram/UcneuTck7jGW8
+PHcM8jO3sUxdf8Mb+YU8GRIGjXIOv0lEk3fBBV6HsNCBq76ag3u99DsWhG/B+kIQBtLoAFCt+SvB
+xYrSnUUdewgSCOLmsa1u0ZB+shXgMrz2ylhNzq+jI4KktLJhLmc360agpAfeNHpOSfRyyhyru4o+
+GSy2B3AQy8iTNEJf6Ro9WdZx4LPTg3aG6m7Z2CJWOi+FdRCEkpG4uQygdlxLzQWY9lMpAVdg0vGr
+UpTIyBJcwsLwnI9teTdkmaqyEuGFyvEogEUnuMT537uzXve8GI5X9ziGFpLHVvj+Knov3JyUhyBA
+u7bj1B4mSxfRwJ3SnAlgLOXwyhqxN/EVMwUbUxvLAkALK88jtj/6owZl3UFFNz5b2GazWmH3+F2F
+80aV/3kwOW5dPnACtAIkxcSErcmoWrcTmPhC4tqpXhYuzm3XhJe6iZrT2QSBA+QJFLCWn8ods51k
++RyDBNR3Sbz6XMPw0b2k69cAC+VgMNEzfWL0vwcFGgAAAAAAAA==
+
+
+--=-uE9XCa0ZzGivZ6OioyoI--
