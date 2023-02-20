@@ -2,157 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C56F869D27B
-	for <lists+kvm@lfdr.de>; Mon, 20 Feb 2023 19:01:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A16669D2B6
+	for <lists+kvm@lfdr.de>; Mon, 20 Feb 2023 19:23:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232493AbjBTSBr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Feb 2023 13:01:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53776 "EHLO
+        id S231448AbjBTSXJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Feb 2023 13:23:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232500AbjBTSBn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Feb 2023 13:01:43 -0500
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2059.outbound.protection.outlook.com [40.107.243.59])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30659211F3;
-        Mon, 20 Feb 2023 10:01:37 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Cq6nYlCindlYBnW2USj5A+zE1/hb9mZwELE73UAQ+BBUJAchjwl6E/SVs04tjfThdk9nLHjZY1PWWCnuag7GIDns501/YvAPsOjO1RRwGwnAsYEttVfaPkFxe9e42RN/iV4HaIq+tHNj97q9WMXWWgbSiOCcLCjj8Ae0psw1EyNmP4MiZ/gPNY/SFg2DBJ5XhEMAZEwPFv7EUr8/TAnRR7NapzNO+Mn0nqzXGi78V78maHWae1exmYosZ62rpGzlR2mAciCFxmH8YQae9naaQHECBVHB4vigHS8pMtCVeUlW6uSkxueWS8mIp1SHO9lL9R5sQPsyAO18XClnPKJZsw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6jIXoXIh/rCS4FT7VmzFZqmscBIzGRTFQqENB1R9pdE=;
- b=f/qoM+mRcBWW4Qwc2U6za+1fG2fyXl51H89F04tJDpRT+lFP+Qqm6VThw5by5O0ayR2WN308fyME3zOU6xLTC3cH2aodD8iaTcro+CKJrGl2f4yGhXG1/OJOaBkeSK84xgYZhD/8s90GZRn8goG3qDuLeMUvfb3/JU9x963uHTqUjQ6hpgPKfX+SZCFcmzTVNXSXEPP6uzy7WFA9Xf/c2k2QglHMgg2SqUfQ0CTq75CAktLsJYI6lwcFmwz/7OYEFpSa4QTJimhEoMeJlavyJS3MNRFZdiuBjTVsk1bfNMqimf/Q5ZcmkIUuJIYCdKu9RF4Z282IIwPaw4m5YiApBQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=alien8.de smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6jIXoXIh/rCS4FT7VmzFZqmscBIzGRTFQqENB1R9pdE=;
- b=5hs8N2Y3uB2Vy/PWeYHLLj74UXFh+pyTJy3FbaYipqFX07nFXTsEGbzgQSS4u9d9JI/9HHB0WE0nb9YUHUhdSpZ/x4JY074zdcOjRBSJJtwC/2pZcTjApF4LIh7YbGPV2LhsTdnB7LWMjWUQAlkRxChs0B26sKEB1yZ4E72PU24=
-Received: from DM6PR14CA0065.namprd14.prod.outlook.com (2603:10b6:5:18f::42)
- by DM4PR12MB6400.namprd12.prod.outlook.com (2603:10b6:8:b9::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6111.20; Mon, 20 Feb 2023 18:01:35 +0000
-Received: from DS1PEPF0000E648.namprd02.prod.outlook.com
- (2603:10b6:5:18f:cafe::77) by DM6PR14CA0065.outlook.office365.com
- (2603:10b6:5:18f::42) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.19 via Frontend
- Transport; Mon, 20 Feb 2023 18:01:35 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS1PEPF0000E648.mail.protection.outlook.com (10.167.18.38) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6134.14 via Frontend Transport; Mon, 20 Feb 2023 18:01:34 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 20 Feb
- 2023 12:01:34 -0600
-Date:   Mon, 20 Feb 2023 12:00:38 -0600
-From:   Michael Roth <michael.roth@amd.com>
-To:     Borislav Petkov <bp@alien8.de>
-CC:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
-        <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
-        <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
-        <thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
-        <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
-        <wanpengli@tencent.com>, <jmattson@google.com>, <luto@kernel.org>,
-        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
-        <pgonda@google.com>, <peterz@infradead.org>,
-        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <vbabka@suse.cz>,
-        <kirill@shutemov.name>, <ak@linux.intel.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
-        <ashish.kalra@amd.com>, <harald@profian.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Jarkko Sakkinen <jarkko@profian.com>
-Subject: Re: [PATCH RFC v7 13/64] x86/cpufeatures: Add SEV-SNP CPU feature
-Message-ID: <20230220180038.bkypwkjkzsb4xc4b@amd.com>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-14-michael.roth@amd.com>
- <Y9qx5NbZIRdpHy5J@zn.tnic>
- <20230220162647.czmii5swwsz2wdhy@amd.com>
- <Y/Oy0cvhXIm5kLTh@zn.tnic>
+        with ESMTP id S231521AbjBTSXI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Feb 2023 13:23:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEB6A1C7FF
+        for <kvm@vger.kernel.org>; Mon, 20 Feb 2023 10:22:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676917336;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=/gpJAHMzCGZDzd5ahHH1dkmWAXlvJ43+tMHBJHsRtPc=;
+        b=RDuH9IUusqNQ3Hk8GUAYnian4eMOFc54Y1nuTBg72+k2SNdWYeLzhNCTCnvQLwkEtH5G2o
+        NEU/Adj9QC4brq0FrOCeOswUDx3VJaQYpIxTAxsq3TRkZ0oTNuDEKe/dSpIgyRIuU8G0lA
+        cegm5myXqWBiRzLD6gytBSq69l175jo=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-651-zct_bfO3OD6msCsx_19Y-g-1; Mon, 20 Feb 2023 13:22:14 -0500
+X-MC-Unique: zct_bfO3OD6msCsx_19Y-g-1
+Received: by mail-ed1-f69.google.com with SMTP id ck7-20020a0564021c0700b004a25d8d7593so2032477edb.0
+        for <kvm@vger.kernel.org>; Mon, 20 Feb 2023 10:22:14 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/gpJAHMzCGZDzd5ahHH1dkmWAXlvJ43+tMHBJHsRtPc=;
+        b=eMBQ5ZNuiwr6IyTUu7NMJFKi7ylOO1sKnEtRcZBB4JGQrWrdpxOOfUSc8+lGFWKvYh
+         zrV0wJirjuG4RRGIBy5n0BjfT60ldcx9W3nSwc7SB5Hzm8ZR/ECigxZwnm/Sh95Gy273
+         ZZYpSiR27h0nBPXraPW2Hx9825qh1MvKklRv0OoHB7sEonLPYuibCTgXlPfVOrl6eNhh
+         bKjT+BHDjSazXozUUkTlwzOdT7VPBVVXaj3b6ROiI0CHReZpaxfAJHkAU5dBd+U+kJQy
+         2BvTSzhTKKDrb+K4B2Wpkepbrn+ePHUiWpmesQe3W8OgccjHJXcsYBxYgx4AdM/7oGVe
+         SmyQ==
+X-Gm-Message-State: AO0yUKWM0U12FbRBVkMDMUyExUqiIkTPj2aLc1pQqK5J0nLojeRwkpjL
+        AxUSGd/ZLQFHxzFhghRERybaUQ2f38mAiTZZA+AzH8yFkQ4ViqrZ2Q7s2cbNdz8yEeHr58b67gn
+        8cKDoe4A768st
+X-Received: by 2002:aa7:cace:0:b0:4ad:7abe:f41a with SMTP id l14-20020aa7cace000000b004ad7abef41amr1229477edt.25.1676917333722;
+        Mon, 20 Feb 2023 10:22:13 -0800 (PST)
+X-Google-Smtp-Source: AK7set+4CVGpOiWcW9kTs3XQyKjwDB5XGYxKs1Buak8GTZGSmZIwhKKOoqXKiHsWLcJdCkgfgPMdUA==
+X-Received: by 2002:aa7:cace:0:b0:4ad:7abe:f41a with SMTP id l14-20020aa7cace000000b004ad7abef41amr1229456edt.25.1676917333441;
+        Mon, 20 Feb 2023 10:22:13 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:4783:a68:c1ee:15c5? ([2001:b07:6468:f312:4783:a68:c1ee:15c5])
+        by smtp.googlemail.com with ESMTPSA id y36-20020a50bb27000000b004ac54d4da22sm6572247ede.71.2023.02.20.10.22.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Feb 2023 10:22:12 -0800 (PST)
+Message-ID: <2b047b75-7397-0cce-e7af-ebba67ae2561@redhat.com>
+Date:   Mon, 20 Feb 2023 19:22:11 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <Y/Oy0cvhXIm5kLTh@zn.tnic>
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF0000E648:EE_|DM4PR12MB6400:EE_
-X-MS-Office365-Filtering-Correlation-Id: 42965bd7-2543-4da6-e6d1-08db136c8160
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Sb1jROt16KjoHkqlrb0EltNjHHIiSmxTsEAgT+GKsRr7sMTTmjRjDVNrJu8nhNlh6lFUnMdzCGKgoptZpVmftZp0N+ZUUfJbJU30rl0Rk06HABIQLd7o9wHDJ4u9/AIC9HQD5h59Meo+2QEdl4TUMZxdCBUf+mIAPH02+yx5jz8XhXRoIXo6HSwQloeS0PgiolhvrhQ4lOPFUp7RcGEpeRAFlGJ410UJjHLiWEzkJT1DfSdJHxoUlNf+aL8k0puVYNPWOmKJiQ8YC518g/Ua6XwzI3dEQ3/2J/cZzgDrW6K2+gmfaYPM4owxl25DJmiVSakvilaxULJyiwd6AV4buOGmFqND4Hh2VCoNzb9eKB0mjAQt+1A+/3SiWZqKJBJBQkPYkMqIkmDX/lfLEKIcvv+HbRR/OCzTMTVsv6rjz0QRUSZGSRRExtA6PWDc6eY4xDMEZ7X3uasNt3Q7pJKdSnjLJfmZgJ8+342muzdsKGOVdkL8Y4vrgaGPwrAKPeJQdhBYSSt8ar4H9DGK7yUBl6p48lvLOMXx66128evMzerrb94wT9hJLSyeqEIofGM77T8DnuspJrz9OXL+IIN46wYC9/NN3vzo6RPYXfCQWkg1DPBcdqN0dszuxhGtlWhffZSaTjvQopb1FLUD7oaoAbSyBgjZuImdyj/71Tg3EGUg4GqKjPlYXsZSCt8pkkcg0yu3XftKq9SZu9uKhNQnnCpS4sNko4iMab/s/BLLsw0=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(376002)(346002)(396003)(39860400002)(136003)(451199018)(36840700001)(40470700004)(46966006)(26005)(186003)(16526019)(5660300002)(2906002)(81166007)(8936002)(40460700003)(2616005)(36860700001)(82740400003)(7406005)(7416002)(44832011)(356005)(1076003)(41300700001)(70586007)(70206006)(8676002)(4326008)(966005)(6916009)(86362001)(316002)(83380400001)(478600001)(82310400005)(54906003)(40480700001)(47076005)(336012)(426003)(36756003)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2023 18:01:34.9970
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 42965bd7-2543-4da6-e6d1-08db136c8160
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF0000E648.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6400
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Content-Language: en-US
+To:     Tianrui Zhao <zhaotianrui@loongson.cn>
+Cc:     Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn
+References: <20230220065735.1282809-1-zhaotianrui@loongson.cn>
+ <20230220065735.1282809-2-zhaotianrui@loongson.cn>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 01/29] LoongArch: KVM: Add kvm related header files
+In-Reply-To: <20230220065735.1282809-2-zhaotianrui@loongson.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 20, 2023 at 06:50:09PM +0100, Borislav Petkov wrote:
-> On Mon, Feb 20, 2023 at 10:26:47AM -0600, Michael Roth wrote:
-> > On Wed, Feb 01, 2023 at 07:39:32PM +0100, Borislav Petkov wrote:
-> > > On Wed, Dec 14, 2022 at 01:40:05PM -0600, Michael Roth wrote:
-> > > > From: Brijesh Singh <brijesh.singh@amd.com>
-> > > > 
-> > > > Add CPU feature detection for Secure Encrypted Virtualization with
-> > > > Secure Nested Paging. This feature adds a strong memory integrity
-> > > > protection to help prevent malicious hypervisor-based attacks like
-> > > > data replay, memory re-mapping, and more.
-> > > > 
-> > > > Link: https://lore.kernel.org/all/YrGINaPc3cojG6%2F3@zn.tnic/
-> > > 
-> > > That points to some review feedback I've given - dunno if it is
-> > > relevant.
-> > > 
-> > > > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> > > > Signed-off-by: Jarkko Sakkinen <jarkko@profian.com>
-> > > 
-> > > I read this as Jarkko has handled this patch too. Is that the case?
-> > 
-> > Yes we shared some patches via an internal tree at some stages.
-> 
-> In the sense that, he took Brijesh's patch, then he did something with
-> it(?) and then Ashish took it from him and then you took it from Ashish?
+On 2/20/23 07:57, Tianrui Zhao wrote:
+> +
+> +/* Resume Flags */
+> +#define RESUME_FLAG_DR		(1<<0)	/* Reload guest nonvolatile state? */
+> +#define RESUME_FLAG_HOST	(1<<1)	/* Resume host? */
+> +
+> +#define RESUME_GUEST		0
+> +#define RESUME_GUEST_DR		RESUME_FLAG_DR
+> +#define RESUME_HOST		RESUME_FLAG_HOST
+> +
 
-Yes, I think he rebased Ashish's tree on a newer tree and added his SoB on
-patches that required any conflict resolutions or changes on his end, so
-we kept those intact since then.
+Most of this code is dead, I'll give more instructions in a reply to 
+patch 8.
 
--Mike
+> +	unsigned long guest_eentry;
+> +	unsigned long host_eentry;
+> +	int (*vcpu_run)(struct kvm_run *run, struct kvm_vcpu *vcpu);
+> +	int (*handle_exit)(struct kvm_run *run, struct kvm_vcpu *vcpu);
+> +
+> +	/* Host registers preserved across guest mode execution */
+> +	unsigned long host_stack;
+> +	unsigned long host_gp;
+> +	unsigned long host_pgd;
+> +	unsigned long host_pgdhi;
+> +	unsigned long host_entryhi;
+> +
+> +	/* Host CSR registers used when handling exits from guest */
+> +	unsigned long badv;
+> +	unsigned long host_estat;
+> +	unsigned long badi;
+> +	unsigned long host_ecfg;
+> +	unsigned long host_percpu;
+> +
+> +	/* GPRS */
+> +	unsigned long gprs[32];
+> +	unsigned long pc;
+> +
+> +	/* FPU State */
+> +	struct loongarch_fpu fpu FPU_ALIGN;
+> +	/* Which auxiliary state is loaded (KVM_LOONGARCH_AUX_*) */
+> +	unsigned int aux_inuse;
+> +
+> +	/* CSR State */
+> +	struct loongarch_csrs *csr;
+> +
+> +	/* GPR used as IO source/target */
+> +	u32 io_gpr;
+> +
+> +	struct hrtimer swtimer;
+> +	/* Count timer control KVM register */
+> +	u32 count_ctl;
+> +
+> +	/* Bitmask of exceptions that are pending */
+> +	unsigned long irq_pending;
+> +	/* Bitmask of pending exceptions to be cleared */
+> +	unsigned long irq_clear;
+> +
+> +	/* Cache some mmu pages needed inside spinlock regions */
+> +	struct kvm_mmu_memory_cache mmu_page_cache;
+> +
+> +	/* vcpu's vpid is different on each host cpu in an smp system */
+> +	u64 vpid[NR_CPUS];
 
-> 
-> This is how I'm reading this SOB chain at least...
-> 
-> -- 
-> Regards/Gruss,
->     Boris.
-> 
-> https://people.kernel.org/tglx/notes-about-netiquette
+In _kvm_check_vmid(), you already have
+
++	if (migrated || (ver != old)) {
++		_kvm_update_vpid(vcpu, cpu);
++		trace_kvm_vpid_change(vcpu, vcpu->arch.vpid[cpu]);
++	}
+
+so a vpid will never be recycled if a vCPU migrates from physical CPU A 
+to B and back to A.
+
+So please keep the current VPID in the per-cpu struct vmcs, and you can 
+just copy it from there in _kvm_check_vmid().
+
+> +	/* Period of stable timer tick in ns */
+> +	u64 timer_period;
+> +	/* Frequency of stable timer in Hz */
+> +	u64 timer_mhz;
+> +	/* Stable bias from the raw time */
+> +	u64 timer_bias;
+> +	/* Dynamic nanosecond bias (multiple of timer_period) to avoid overflow */
+> +	s64 timer_dyn_bias;
+> +	/* Save ktime */
+> +	ktime_t stable_ktime_saved;
+> +
+> +	u64 core_ext_ioisr[4];
+> +
+> +	/* Last CPU the VCPU state was loaded on */
+> +	int last_sched_cpu;
+> +	/* Last CPU the VCPU actually executed guest code on */
+> +	int last_exec_cpu;
+> +
+> +	u8 fpu_enabled;
+
+This field is always true, please remove it.
+
+> +	struct kvm_guest_debug_arch guest_debug;
+
+This struct is empty, please remove it.
+
+Paolo
+
