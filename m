@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A617069D303
-	for <lists+kvm@lfdr.de>; Mon, 20 Feb 2023 19:46:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CB1B69D30C
+	for <lists+kvm@lfdr.de>; Mon, 20 Feb 2023 19:46:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232072AbjBTSqC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Feb 2023 13:46:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54994 "EHLO
+        id S232590AbjBTSqq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Feb 2023 13:46:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231719AbjBTSp7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Feb 2023 13:45:59 -0500
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2054.outbound.protection.outlook.com [40.107.92.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76E6A212AC;
-        Mon, 20 Feb 2023 10:45:41 -0800 (PST)
+        with ESMTP id S231708AbjBTSqp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Feb 2023 13:46:45 -0500
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on20601.outbound.protection.outlook.com [IPv6:2a01:111:f400:7eae::601])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36410212B2;
+        Mon, 20 Feb 2023 10:46:12 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=M1L6SGKpp9ocXlZdXp0N3Us/tZIlA6KIrYrwWnF92htZIqOJZF4vtspXPSMe1EauxRmKP1BW0SUVDmZ0+WPd55iH4u7yiibHzTK1blVPioMqON0OdL6LXMVRwpuc4ATknu/tEg1Z+IRKzRtjboq3UzuX+hG4YQ8o44gb4uiPTkptzy4zSkvBz+gmOIbtw+gi6r50Xaf6N50CTruN30O5JHLHGstsfsA8dwpqVqdXLS4rbQDdobMPN0N0HCL+7m5kw18JeBPijm3rgcWyYlwt2iMMXXXYMv9d+jxrgBBoiS8jmTUrNET8xU4/XAae2YmTJ29KaFWPywVNjhc6y5saAw==
+ b=Ib+QpV4dtiCPvitAowhXJoqt6AuFnZRb9Cc94pbBK9x7hTGF6yECS/qxVCdatV/8+GtnzkFdjiWXZWjZnZmYzg8WNfRVP/6w3MybTuufT2oAKTW1LNj7lgTtpILW61meN9CnpScb/O8ZjgbiaxQgiJZqvmv01eZ4Oleq4kCfpw1TeQ1oDZAUVhtlTSNsB+U3G4UwvGOlvTmtXaRmkjiaFh2aC3zrdsFJr8Wkq0lDA8hE7Z6KrP5GblzNOQOvOE0l5WkYZwbs7QFpG+loeQghwe9R4+VRe+nN4tefxps/AbEcKj0OdxIFJHgiGH4AKnJ3GoHK/jHLZTYZlwqdirbjkg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YbUe5MPV5IcipfQc+HmmLC3mcPpmVfsdPBM6AWSlV6s=;
- b=IRSDhQPsurvL+0oEmU1QqbLhgeyOe4GmR25ISNi4U/HrFYxBOwhepntf8MBTzKiHDjL4L+eBHcJlaefI578i+8Np4Lmq4re6I6v9HbevQEz6crOY6/2eM9S18SCsOmuQV3O/ootKrCV8qoG81cOUL0mZoKcPImkuLa3FN/8d3ZHGHh2fQypEnPDtaqkALf4KDiRbcZvAGVvYmKWvKBaOGCDdbT6fmE8Zxy5bqHoZYLNs8hZMGeXKgQWg30zzpEEzGtkDor+GU8sWBgpTsbSFP1x8v/qVcE0ZW+BlbY/eIZl9pZMG3EtAr2OOVVFXDUcSZ5O0vIWtfEhagyN+cbPV0Q==
+ bh=LaE99ZyE9fPNXP1+sCNkKPB9OJSZnnK2iy4k/8TUgSg=;
+ b=I6Xjea3pj2aKHKhdSkxjR6gikxurOur4IP+GjkVtmHO8SLiA8rmGq0TrBsNCS58TGEcnnJc9lAa8vSBi1jRJaUq5KycgJhaUNPOf3XfCoAlc5irq1GOhCprk++gei0UlpssKFSZyoQjfbAr9DpzqVfqmFkJlQW5fkwldFmhbWTyf0Ll6Kt3hTG+U9mccWcTsAYa7PpAMBg0C4UYhF0/rlavHlajIlZa3x/s3PsRceZEs79/ILZyyXQcraixFu6SYBjDcbubq1Vf4E3MEomVpftTSPIfQimk1i/XbvPq1nNRVWTZQpjicCP+grlaHkLkaKQZWWnrP489o8m2L9Df1xg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YbUe5MPV5IcipfQc+HmmLC3mcPpmVfsdPBM6AWSlV6s=;
- b=iTRJU2R8wg/ieKSHtq75FVVJyby9r3WrsNP2qRqVGZdCQ0ReWqFvt0KTdUUYA43EuQp5JdqTnHSRZsaxQE6MPW0TED4mfR1AgirJgPVodz4W/JLJuguMs7AawD9g/VodkUWU4inkI4v1cW88to9uDZMKYdd1TanGWKfyE0KoxVU=
-Received: from CY8PR19CA0002.namprd19.prod.outlook.com (2603:10b6:930:44::11)
- by IA0PR12MB8277.namprd12.prod.outlook.com (2603:10b6:208:3de::22) with
+ bh=LaE99ZyE9fPNXP1+sCNkKPB9OJSZnnK2iy4k/8TUgSg=;
+ b=5ScSu2nP8vwx48ps6wK9Q7/C+pleM5XY3oVqWseQHPXeeNBGgZ0Ai+qhFcAuWAn+0iuU0ONOadc7mj1JQq+U77QpbHWjaFCDcZFdJGOhfbRFPHXp5coXavZYRtFRnSnOs8UVELiuQRwGJD8nyhJTePhtlu2vZwk/XI5L3f2eDIc=
+Received: from CY8PR22CA0016.namprd22.prod.outlook.com (2603:10b6:930:45::27)
+ by SJ0PR12MB7068.namprd12.prod.outlook.com (2603:10b6:a03:4ae::7) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.20; Mon, 20 Feb
- 2023 18:45:39 +0000
-Received: from CY4PEPF0000C96A.namprd02.prod.outlook.com
- (2603:10b6:930:44:cafe::43) by CY8PR19CA0002.outlook.office365.com
- (2603:10b6:930:44::11) with Microsoft SMTP Server (version=TLS1_2,
+ 2023 18:45:59 +0000
+Received: from CY4PEPF0000C968.namprd02.prod.outlook.com
+ (2603:10b6:930:45:cafe::3a) by CY8PR22CA0016.outlook.office365.com
+ (2603:10b6:930:45::27) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.20 via Frontend
- Transport; Mon, 20 Feb 2023 18:45:38 +0000
+ Transport; Mon, 20 Feb 2023 18:45:59 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -46,13 +46,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CY4PEPF0000C96A.mail.protection.outlook.com (10.167.241.74) with Microsoft
+ CY4PEPF0000C968.mail.protection.outlook.com (10.167.241.72) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6134.14 via Frontend Transport; Mon, 20 Feb 2023 18:45:38 +0000
+ 15.20.6134.14 via Frontend Transport; Mon, 20 Feb 2023 18:45:59 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 20 Feb
- 2023 12:45:37 -0600
+ 2023 12:45:58 -0600
 From:   Michael Roth <michael.roth@amd.com>
 To:     <kvm@vger.kernel.org>
 CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -71,9 +71,9 @@ CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
         <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
         <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH RFC v8 15/56] x86/sev: Invalidate pages from the direct map when adding them to the RMP table
-Date:   Mon, 20 Feb 2023 12:38:06 -0600
-Message-ID: <20230220183847.59159-16-michael.roth@amd.com>
+Subject: [PATCH RFC v8 16/56] x86/traps: Define RMP violation #PF error code
+Date:   Mon, 20 Feb 2023 12:38:07 -0600
+Message-ID: <20230220183847.59159-17-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230220183847.59159-1-michael.roth@amd.com>
 References: <20230220183847.59159-1-michael.roth@amd.com>
@@ -85,27 +85,26 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000C96A:EE_|IA0PR12MB8277:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4fb6eb3b-8dec-40c1-12d5-08db1372a920
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000C968:EE_|SJ0PR12MB7068:EE_
+X-MS-Office365-Filtering-Correlation-Id: 33661cb8-979b-4837-8754-08db1372b597
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: jvQ48W5gzOiaKIfldMU6eOipFaHDQEN93lXnmKlUHh2g+hjw59RYzpTOl6yfxSpM658lv8Ak+1WPE1wxnjpLbn28GPc7vS5XhlrbbGWs7N2R13OXOVmMIpCSSE/myAqZHlLpRMYLDUFPumysJQN8JwMfyoyyE7yFd7OxdrOsQ0WZUz+jz2KFluvVSib8PyCmd8JdBmxK0VrOmQGCtF2xcxg++jcWuEKLOuZgNTCvqEvORV9HFc0ocAjmUjFn0I9ydZhW59kUf+khoIyv2+wWuo95cBcxSO6QVb1zveo/1jjWBLbIVfMCSPgJ8IZcH4WKzqZmYU8chcKbbcwbWG6DrpA+XDvUTxqR8VFjBILp14HveGQCa9JmcGJLkbY/NY7APZJzJphNZKTbqtixelV4MXK+EPb43mdnMuQCtWfPX5F0aqTx72hb0FxMmeVbNGwgy63bsPhabZIfMay0GJaeTzNLEjlpZ7LvHCGOR8HAqeYzZhrozdvbQ870MzEOLlO3eGP/yxbk/Ewxffw8ltg4BEInhXQkDtO+43nvNTmzkiz3STsMveutICFcfQ93gztjx7T6A0ImgeOLkHItdCKFx8sDMTtbSD+Y/ueg/leOBSsb5sEmoRswfsOyMwTMP5lxa20Z5j/+lV67QNzN//iJK9dh2uwg9eBAz20oD1lfptk5niZhE7+sxv9MffqDRwcYrzjic32iBdN7/qV0RCmRtzw97WUxUVvHfeFEatL2PqY=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(396003)(136003)(346002)(376002)(39860400002)(451199018)(40470700004)(46966006)(36840700001)(70206006)(40480700001)(40460700003)(6666004)(8936002)(83380400001)(7416002)(7406005)(5660300002)(41300700001)(47076005)(44832011)(426003)(86362001)(16526019)(26005)(186003)(1076003)(8676002)(2906002)(70586007)(6916009)(316002)(4326008)(336012)(54906003)(478600001)(2616005)(356005)(36860700001)(36756003)(82310400005)(81166007)(82740400003)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: FAAeYIHurIps2K/JbO09YdHrBe1AjJsKNqb7GYwz2aBSj7eW6BanckDmdj6Cys2OwC7BKay+bs1YmbEM2zxGgq2yMEAEaOGnSbsUEDuv3mEwI252KjeRpRpVD+VayI3RHaEa1IpNJ5KMnN35J1yQeZuqln9KzGKGSEdIoJhVoLbqrS87itrEiGZA+/rj8Vu3Kqo6ngIQoc3Y7C7CWOU+Kxtt9Aq+4TU+vyqbtQboA/RvexFOnNJwktWT9fRvK5T76FQCnIWoKPvy1gsWZpcDFN8Q1FkQms7c+Kj6/Ij4idDw90JJC6YkatRVI7EznC1L1lac++F/Qc30pEdmuTfkxb8aReuI9cvqqSEeyner+ieaHMG4yIzpz144ZdgRSOVzB6CVLr3Sv7QkuyO7kOf/LiSEfb3JsBNFif3mSbtNM61UQz5Sd53vCcugP4SyQaggJNHYDuNADFwFQ6pEpehRCrPYzdnhswBw8CKmUKRfbNZG1n5q58G/cQJxPoDwXSmFLHPnw/XEz1QAnKuoh3DxUuzffgysoWnQ/LAtZdOPmvT6xHskWptFOw9Cv9UcylqKFR69CIpOgXM3y99z3QGq5q7vzGTe3/YB85Ze4OW3a5Vmtc2QUlhVbNxyAsMnDEEwgXl54MduP0w4tfOqshOk/cPQfBl2aSKsZ6mm2HlYJ5WuoWGuvyCfHo8K7xJP136skBVFXPwO95u1d1/KbXUj3ZBx1QKa7vIZnS8m2Zv2TlE=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(396003)(136003)(376002)(39860400002)(346002)(451199018)(36840700001)(40470700004)(46966006)(82740400003)(81166007)(82310400005)(36756003)(356005)(36860700001)(16526019)(40460700003)(40480700001)(6666004)(26005)(186003)(70586007)(1076003)(70206006)(4326008)(336012)(2616005)(478600001)(54906003)(316002)(2906002)(8676002)(6916009)(83380400001)(5660300002)(7406005)(8936002)(44832011)(86362001)(7416002)(41300700001)(426003)(47076005)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2023 18:45:38.6770
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2023 18:45:59.5769
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4fb6eb3b-8dec-40c1-12d5-08db1372a920
+X-MS-Exchange-CrossTenant-Network-Message-Id: 33661cb8-979b-4837-8754-08db1372b597
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000C96A.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000C968.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8277
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB7068
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,SPF_HELO_PASS,
+        SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -114,108 +113,69 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Brijesh Singh <brijesh.singh@amd.com>
 
-The integrity guarantee of SEV-SNP is enforced through the RMP table.
-The RMP is used with standard x86 and IOMMU page tables to enforce
-memory restrictions and page access rights. The RMP check is enforced as
-soon as SEV-SNP is enabled globally in the system. When hardware
-encounters an RMP-check failure, it raises a page-fault exception.
+Bit 31 in the page fault-error bit will be set when processor encounters
+an RMP violation.
 
-The rmp_make_private() and rmp_make_shared() helpers are used to add
-or remove the pages from the RMP table. Improve the rmp_make_private()
-to invalidate state so that pages cannot be used in the direct-map after
-they are added the RMP table, and restored to their default valid
-permission after the pages are removed from the RMP table.
+While at it, use the BIT_ULL() macro.
 
-Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
-Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+Signed-off by: Ashish Kalra <ashish.kalra@amd.com>
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- arch/x86/kernel/sev.c | 57 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 57 insertions(+)
+ arch/x86/include/asm/trap_pf.h | 18 +++++++++++-------
+ arch/x86/mm/fault.c            |  1 +
+ 2 files changed, 12 insertions(+), 7 deletions(-)
 
-diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-index a49f30c10dc1..3e5ff5934e83 100644
---- a/arch/x86/kernel/sev.c
-+++ b/arch/x86/kernel/sev.c
-@@ -2595,6 +2595,37 @@ int psmash(u64 pfn)
- }
- EXPORT_SYMBOL_GPL(psmash);
+diff --git a/arch/x86/include/asm/trap_pf.h b/arch/x86/include/asm/trap_pf.h
+index 10b1de500ab1..295be06f8db7 100644
+--- a/arch/x86/include/asm/trap_pf.h
++++ b/arch/x86/include/asm/trap_pf.h
+@@ -2,6 +2,8 @@
+ #ifndef _ASM_X86_TRAP_PF_H
+ #define _ASM_X86_TRAP_PF_H
  
-+static int restore_direct_map(u64 pfn, int npages)
-+{
-+	int i, ret = 0;
++#include <linux/bits.h>  /* BIT() macro */
 +
-+	for (i = 0; i < npages; i++) {
-+		ret = set_direct_map_default_noflush(pfn_to_page(pfn + i));
-+		if (ret)
-+			goto cleanup;
-+	}
-+
-+cleanup:
-+	WARN(ret > 0, "Failed to restore direct map for pfn 0x%llx\n", pfn + i);
-+	return ret;
-+}
-+
-+static int invalidate_direct_map(u64 pfn, int npages)
-+{
-+	int i, ret = 0;
-+
-+	for (i = 0; i < npages; i++) {
-+		ret = set_direct_map_invalid_noflush(pfn_to_page(pfn + i));
-+		if (ret)
-+			goto cleanup;
-+	}
-+
-+cleanup:
-+	WARN(ret > 0, "Failed to invalidate direct map for pfn 0x%llx\n", pfn + i);
-+	restore_direct_map(pfn, i);
-+	return ret;
-+}
-+
- static int rmpupdate(u64 pfn, struct rmp_state *val)
- {
- 	int max_attempts = 4 * num_present_cpus();
-@@ -2605,6 +2636,21 @@ static int rmpupdate(u64 pfn, struct rmp_state *val)
- 	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
- 		return -ENXIO;
+ /*
+  * Page fault error code bits:
+  *
+@@ -12,15 +14,17 @@
+  *   bit 4 ==				1: fault was an instruction fetch
+  *   bit 5 ==				1: protection keys block access
+  *   bit 15 ==				1: SGX MMU page-fault
++ *   bit 31 ==				1: fault was due to RMP violation
+  */
+ enum x86_pf_error_code {
+-	X86_PF_PROT	=		1 << 0,
+-	X86_PF_WRITE	=		1 << 1,
+-	X86_PF_USER	=		1 << 2,
+-	X86_PF_RSVD	=		1 << 3,
+-	X86_PF_INSTR	=		1 << 4,
+-	X86_PF_PK	=		1 << 5,
+-	X86_PF_SGX	=		1 << 15,
++	X86_PF_PROT	=		BIT(0),
++	X86_PF_WRITE	=		BIT(1),
++	X86_PF_USER	=		BIT(2),
++	X86_PF_RSVD	=		BIT(3),
++	X86_PF_INSTR	=		BIT(4),
++	X86_PF_PK	=		BIT(5),
++	X86_PF_SGX	=		BIT(15),
++	X86_PF_RMP	=		BIT(31),
+ };
  
-+	level = RMP_TO_X86_PG_LEVEL(val->pagesize);
-+	npages = page_level_size(level) / PAGE_SIZE;
-+
-+	/*
-+	 * If page is getting assigned in the RMP table then unmap it from the
-+	 * direct map.
-+	 */
-+	if (val->assigned) {
-+		if (invalidate_direct_map(pfn, npages)) {
-+			pr_err("Failed to unmap %d pages at pfn 0x%llx from the direct_map\n",
-+			       npages, pfn);
-+			return -EFAULT;
-+		}
-+	}
-+
- 	do {
- 		/* Binutils version 2.36 supports the RMPUPDATE mnemonic. */
- 		asm volatile(".byte 0xF2, 0x0F, 0x01, 0xFE"
-@@ -2630,6 +2676,17 @@ static int rmpupdate(u64 pfn, struct rmp_state *val)
- 			 attempts, val->asid, ret, pfn, npages);
- 	}
+ #endif /* _ASM_X86_TRAP_PF_H */
+diff --git a/arch/x86/mm/fault.c b/arch/x86/mm/fault.c
+index 7b0d4ab894c8..f8193b99e9c8 100644
+--- a/arch/x86/mm/fault.c
++++ b/arch/x86/mm/fault.c
+@@ -567,6 +567,7 @@ show_fault_oops(struct pt_regs *regs, unsigned long error_code, unsigned long ad
+ 		 !(error_code & X86_PF_PROT) ? "not-present page" :
+ 		 (error_code & X86_PF_RSVD)  ? "reserved bit violation" :
+ 		 (error_code & X86_PF_PK)    ? "protection keys violation" :
++		 (error_code & X86_PF_RMP)   ? "RMP violation" :
+ 					       "permissions violation");
  
-+	/*
-+	 * Restore the direct map after the page is removed from the RMP table.
-+	 */
-+	if (!val->assigned) {
-+		if (restore_direct_map(pfn, npages)) {
-+			pr_err("Failed to map %d pages at pfn 0x%llx into the direct_map\n",
-+			       npages, pfn);
-+			return -EFAULT;
-+		}
-+	}
-+
- 	return 0;
- }
- 
+ 	if (!(error_code & X86_PF_USER) && user_mode(regs)) {
 -- 
 2.25.1
 
