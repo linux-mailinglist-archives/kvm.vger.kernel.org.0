@@ -2,224 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A06469DAFD
-	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 08:13:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A3CC69DB0C
+	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 08:17:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233516AbjBUHN3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Feb 2023 02:13:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47378 "EHLO
+        id S233550AbjBUHRn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Feb 2023 02:17:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233502AbjBUHN1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Feb 2023 02:13:27 -0500
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD99E72B9
-        for <kvm@vger.kernel.org>; Mon, 20 Feb 2023 23:13:13 -0800 (PST)
-Received: by mail-wm1-x329.google.com with SMTP id bg28so2497367wmb.0
-        for <kvm@vger.kernel.org>; Mon, 20 Feb 2023 23:13:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vrull.eu; s=google;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PKUefFK9SiP/kDBGD+FrqYGyTRY+XtYHTqFfXzLRCic=;
-        b=Wn/WwmyzxpAuhNVifq3JYfnKu8T/n2i/txGrpukajWWRJwYuCjQT2rjWs04z7XGtUx
-         V5hazoONpR83YdFjd4oPC7KhWET8tvlpNJyz0kdw4Vd50KxRh0f3WNePwGB+tUdsZ4W/
-         oLhrGc4DhkqoT93Hp5b3zyWPTYhOYyiPmLjDRLi6RTjwBM6JsPPTIrXaG2HP2Ot5yCmC
-         h9HjtQBpH4iXY8GdIzaPeJ5olenWTLIoCktzV8KXLKw1yx/kOtjBght0vm2QuGDXNGwW
-         7HrkSDSPEw22C2medMeG4ERmJkjkWpprGX1CSci82dWL/FM35rI8vH9Hj3F+Y4THzQYK
-         N3Sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PKUefFK9SiP/kDBGD+FrqYGyTRY+XtYHTqFfXzLRCic=;
-        b=d4wDCEVTAMOJQrKcgM/aE0syiQGSgAF4d10meIwaHUWeRfVi4asj7YtKJLdMVljX6M
-         qMgvaxLmzYi9kMTzWzZ6bR6HactrAIQDWVw/ZrmSHjPF6jBkSkQiGfTuMhMqiBrC5ptf
-         dLSx78elVlqo7wpgYDOyAJcRLxqHqOwB7qW4IHocf86K5Rzh0vxcH9z0RYMMCA7ZoxUf
-         4qWdxNhOrMj8ZbutduKW2GKRsl81XBUV5JUbEx4vwtYXIYYShqrARDjJw0x5lqAhRBoZ
-         1M51IlRXwMYdRpTddu1IoW0ahzXjiRk+Ov8yB9q/QB44MVcHWal/R4/2l23i/nYM6mER
-         KJ0g==
-X-Gm-Message-State: AO0yUKVZ75Abf1YjeCs+/iROASuN1rXMLe37ctL7yKAHgbQbGLOpIqJT
-        KuzUm/K4qCgfPspeVl+lOme4sEla9eHmN94rX1DzTolEXCcOqg==
-X-Google-Smtp-Source: AK7set+H1FIoSX3EEh1yGR9n51hoiM91i0p+8wSWyTcgIW4iRjlyf1gAZ3YDv3sxlv0ULcTUiG4yHijCYkpJw3gnib8=
-X-Received: by 2002:a05:600c:600a:b0:3e4:2f8d:ae35 with SMTP id
- az10-20020a05600c600a00b003e42f8dae35mr386805wmb.185.1676963592042; Mon, 20
- Feb 2023 23:13:12 -0800 (PST)
+        with ESMTP id S233504AbjBUHRl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Feb 2023 02:17:41 -0500
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0F5B4204;
+        Mon, 20 Feb 2023 23:17:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
+        :MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
+        Sender:Reply-To:Content-ID:Content-Description;
+        bh=aUtZhwcFtwgw9BzG8RXhGgVJcrrtGKcENm6Kyn1StVI=; b=BUIB8VBBffBrLar9x9XbJKN0se
+        dNCOehBXCghSV5mkOMzNjyOTAyWZ4TK8SfHAyWRa8DjjdYmSy0NvNSwxBWVzwzsqcQfPnkiZdeed7
+        QgCD/xNPgY/Z0LvhHpcueiA5fkpGtPiOTpuuC7+Hc3EEduow7wQuRGmm+68ZpnXdfVLcpTfkS66SP
+        1rFdCKiHYJLelpvhbIt1nc369V/Gcuk1nsWjq89sjo48sJKLzmq/mWiGQkST0dughHau0dSywvhdY
+        Jep0jstP67FeeBkUKAXCXKCvmbiRiwIskJzeKquVIPIGMrxglic8Ya3JzPDZDwrIwfw0CQIV8B5Nw
+        dmISnuFw==;
+Received: from [2001:8b0:10b:5:f109:264d:11ca:a009] (helo=[IPv6:::1])
+        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1pUMtN-00C4V4-2U;
+        Tue, 21 Feb 2023 07:16:50 +0000
+Date:   Tue, 21 Feb 2023 07:16:48 +0000
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Kim Phillips <kim.phillips@amd.com>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>
+CC:     tglx@linutronix.de, Usama Arif <usama.arif@bytedance.com>,
+        arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
+        pbonzini@redhat.com, paulmck@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
+        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
+        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
+        simon.evans@bytedance.com, liangma@liangbit.com,
+        Piotr Gorski <lucjan.lucjanov@gmail.com>,
+        "Limonciello, Mario" <Mario.Limonciello@amd.com>
+Subject: Re: [PATCH v9 0/8] Parallel CPU bringup for x86_64
+User-Agent: K-9 Mail for Android
+In-Reply-To: <6a25f9a6-c4c4-ddb4-a3c7-c151bd7f2a89@amd.com>
+References: <20230215145425.420125-1-usama.arif@bytedance.com> <2668799.mvXUDI8C0e@natalenko.name> <ed8d662351cfe5793f8cc7e7e8c514d05d16c501.camel@infradead.org> <2668869.mvXUDI8C0e@natalenko.name> <2a67f6cf18dd2c1879fad9fd8a28242918d3e5d2.camel@infradead.org> <982e1d6140705414e8fd60b990bd259a@natalenko.name> <715CBABF-4017-4784-8F30-5386F1524830@infradead.org> <67dbc69f-b712-8971-f1c9-5d07f506a19c@amd.com> <42dc683e2846ae8fc1e09715aaf7884660e1a386.camel@infradead.org> <6a25f9a6-c4c4-ddb4-a3c7-c151bd7f2a89@amd.com>
+Message-ID: <DDB94D59-714C-4747-B67F-6C7424D068A1@infradead.org>
 MIME-Version: 1.0
-References: <20230128072737.2995881-3-apatel@ventanamicro.com>
- <mhng-0f9bdf58-5289-4db4-8fd7-38898824c44f@palmer-ri-x1c9> <CAEg0e7hrQFu+cdZy+3QO1ML9FNTPBehZwOOBnr1F-5ABYDnkGg@mail.gmail.com>
-In-Reply-To: <CAEg0e7hrQFu+cdZy+3QO1ML9FNTPBehZwOOBnr1F-5ABYDnkGg@mail.gmail.com>
-From:   =?UTF-8?Q?Christoph_M=C3=BCllner?= <christoph.muellner@vrull.eu>
-Date:   Tue, 21 Feb 2023 08:12:58 +0100
-Message-ID: <CAEg0e7hRjMSgYZbPTQztbQ3bGZf-r8wAfCK5ZnDXOcx27HcTCA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/7] RISC-V: Detect AIA CSRs from ISA string
-To:     Palmer Dabbelt <palmer@dabbelt.com>
-Cc:     apatel@ventanamicro.com, pbonzini@redhat.com,
-        atishp@atishpatra.org, Paul Walmsley <paul.walmsley@sifive.com>,
-        ajones@ventanamicro.com, anup@brainfault.org, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi all,
 
-The RISC-V Architectural Review Committee has discussed the concerns
-regarding the non-ratified chapters in the AIA specification.
 
-Here is the relevant quote from the meeting minutes:
-"""
-Although the Advanced Interrupt Architecture (AIA) has already passed
-Architecture Review (with a minor edit still pending), the committee
-has some suggestions about its final steps to ratification, to avoid
-the AIA document having a mixture of ratified and non-ratified content:
+On 21 February 2023 04:20:41 GMT, Kim Phillips <kim=2Ephillips@amd=2Ecom> =
+wrote:
+>On 2/20/23 5:30 PM, David Woodhouse wrote:
+>> On Mon, 2023-02-20 at 17:23 -0600, Kim Phillips wrote:
+>>> On 2/20/23 3:39 PM, David Woodhouse wrote:
+>>>> On 20 February 2023 21:23:38 GMT, Oleksandr Natalenko <oleksandr@nata=
+lenko=2Ename> wrote:
+>>>>> On 20=2E02=2E2023 21:31, David Woodhouse wrote:
+>>>>>> On Mon, 2023-02-20 at 17:40 +0100, Oleksandr Natalenko wrote:
+>>>>>>> On pond=C4=9Bl=C3=AD 20=2E =C3=BAnora 2023 17:20:13 CET David Wood=
+house wrote:
+>>>>>>>> On Mon, 2023-02-20 at 17:08 +0100, Oleksandr Natalenko wrote:
+>>>>>>>>>=20
+>>>>>>>>> I've applied this to the v6=2E2 kernel, and suspend/resume broke=
+ on
+>>>>>>>>> my
+>>>>>>>>> Ryzen 5950X desktop=2E The machine suspends just fine, but on
+>>>>>>>>> resume
+>>>>>>>>> the screen stays blank, and there's no visible disk I/O=2E
+>>>>>>>>>=20
+>>>>>>>>> Reverting the series brings suspend/resume back to working state=
+=2E
+>>>>>>>>=20
+>>>>>>>> Hm, thanks=2E What if you add 'no_parallel_bringup' on the comman=
+d
+>>>>>>>> line?
+>>>>>>>=20
+>>>>>>> If the `no_parallel_bringup` param is added, the suspend/resume
+>>>>>>> works=2E
+>>>>>>=20
+>>>>>> Thanks for the testing=2E Can I ask you to do one further test: app=
+ly the
+>>>>>> series only as far as patch 6/8 'x86/smpboot: Support parallel star=
+tup
+>>>>>> of secondary CPUs'=2E
+>>>>>>=20
+>>>>>> That will do the new startup asm sequence where each CPU finds its =
+own
+>>>>>> per-cpu data so it *could* work in parallel, but doesn't actually d=
+o
+>>>>>> the bringup in parallel yet=2E
+>>>>>=20
+>>>>> With patches 1 to 6 (including) applied and no extra cmdline
+>>>>> params added the resume doesn't work=2E
+>>>>=20
+>>>> Hm=2E Kim, is there some weirdness with the way AMD CPUs get their
+>>>> APIC ID in CPUID 0x1? Especially after resume?
+>>>=20
+>>> Not to my knowledge=2E=C2=A0 Mario?
+>
+>I tested v9-up-to-6/8 on a Ryzen 3000 that passed your between-v6 & v7
+>tree commits (ce7e2d1e046a for the parallel-6=2E2-rc6-part1 tag
+>and 17bbd12ee03 for parallel-6=2E2-rc6), and it, too, fails to resume
+>v9-up-to-6/8 after suspend=2E
+>
+>> Oleksandr, please could you show the output of 'cpuid' after a
+>> successful resume?  I'm particularly looking for this part=2E=2E=2E
+>>=20
+>>=20
+>> $ sudo cpuid | grep -A1 1/ebx
+>>     miscellaneous (1/ebx):
+>>        process local APIC physical ID =3D 0x0 (0)
+>> --
+>>     miscellaneous (1/ebx):
+>>        process local APIC physical ID =3D 0x2 (2)
+>> =2E=2E=2E
+>
+>The Ryzens have a different pattern it seems:
+>
+>$ sudo cpuid | grep -A1 \(1/ebx
+>   miscellaneous (1/ebx):
+>      process local APIC physical ID =3D 0x0 (0)
+>--
+>   miscellaneous (1/ebx):
+>      process local APIC physical ID =3D 0x1 (1)
+>--
+>   miscellaneous (1/ebx):
+>      process local APIC physical ID =3D 0x2 (2)
+>--
+>   miscellaneous (1/ebx):
+>      process local APIC physical ID =3D 0x3 (3)
+>--
+>   miscellaneous (1/ebx):
+>      process local APIC physical ID =3D 0x4 (4)
+>--
+>   miscellaneous (1/ebx):
+>      process local APIC physical ID =3D 0x5 (5)
+>--
+>   miscellaneous (1/ebx):
+>      process local APIC physical ID =3D 0x6 (6)
+>--
+>   miscellaneous (1/ebx):
+>      process local APIC physical ID =3D 0x7 (7)
+>
+>
+>I tested the v7 series on Ryzen, it also fails, so
+>Ryzen users were last known good with those two
+>aforementioned commits on your tree:
+>
+>git://git=2Einfradead=2Eorg/users/dwmw2/linux=2Egit
 
-- The AIA document's remaining draft chapter on the Duo-PLIC, which is
-  not currently on a path to ratification, can be removed to a separate
-  document.
-
-- Ratification of the full AIA (without Duo-PLIC) can be postponed to
-  coincide with ratification of the IOMMU specification, given that
-  the latter is now expected in a reasonable time, and the AIA's last
-  chapter concerning IOMMUs is already scheduled to go through public
-  review and be ratified only together with the IOMMU specification.
-"""
-
-The full meeting minutes can be found here:
-  https://lists.riscv.org/g/tech-chairs/message/1381
-
-BR
-Christoph
-
-On Wed, Feb 15, 2023 at 4:41 PM Christoph M=C3=BCllner
-<christoph.muellner@vrull.eu> wrote:
->
-> On Fri, Feb 3, 2023 at 1:25 AM Palmer Dabbelt <palmer@dabbelt.com> wrote:
-> >
-> > On Fri, 27 Jan 2023 23:27:32 PST (-0800), apatel@ventanamicro.com wrote=
-:
-> > > We have two extension names for AIA ISA support: Smaia (M-mode AIA CS=
-Rs)
-> > > and Ssaia (S-mode AIA CSRs).
-> >
-> > This has pretty much the same problem that we had with the other
-> > AIA-related ISA string patches, where there's that ambiguity with the
-> > non-ratified chapters.  IIRC when this came up in GCC the rough idea wa=
-s
-> > to try and document that we're going to interpret the standard ISA
-> > strings that way, but now that we're doing custom ISA extensions it
-> > seems saner to just define on here that removes the ambiguity.
->
->
-> To avoid the impression that I did not work on that, here is the v2
-> from November,
-> that attempts to document this:
->   https://gcc.gnu.org/pipermail/gcc-patches/2022-November/607326.html
->
-> My proposed text was:
-> +Note, that AIA support (@samp{Smaia} and @samp{Ssaia}) is based on an AI=
-A
-> +specification, which is frozen but contains draft chapters ("Duo-PLIC" a=
-nd
-> +"IOMMU Support").
->
-> Btw, I did not get any feedback on that patch.
->
-> I also tried to address this on spec level (the PR has been linked) and r=
-aised
-> that to tech-aia (the conversation has been linked).
->
-> Another thing that I want to highlight, since it was discussed a lot rece=
-ntly
-> (e.g. just a few minutes ago in tech-chairs).
-> There is a chance of a last-minute spec change of AIA:
->   https://github.com/riscv/riscv-aia/pull/37
->
-> BR
-> Christoph
->
->
->
-> >
-> >
-> > I just sent
-> > <https://lore.kernel.org/r/20230203001201.14770-1-palmer@rivosinc.com/>
-> > which documents that.
-> >
-> > > We extend the ISA string parsing to detect Smaia and Ssaia extensions=
-.
-> > >
-> > > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> > > Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-> > > ---
-> > >  arch/riscv/include/asm/hwcap.h | 2 ++
-> > >  arch/riscv/kernel/cpu.c        | 2 ++
-> > >  arch/riscv/kernel/cpufeature.c | 2 ++
-> > >  3 files changed, 6 insertions(+)
-> > >
-> > > diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/=
-hwcap.h
-> > > index 86328e3acb02..341ef30a3718 100644
-> > > --- a/arch/riscv/include/asm/hwcap.h
-> > > +++ b/arch/riscv/include/asm/hwcap.h
-> > > @@ -59,6 +59,8 @@ enum riscv_isa_ext_id {
-> > >       RISCV_ISA_EXT_ZIHINTPAUSE,
-> > >       RISCV_ISA_EXT_SSTC,
-> > >       RISCV_ISA_EXT_SVINVAL,
-> > > +     RISCV_ISA_EXT_SMAIA,
-> > > +     RISCV_ISA_EXT_SSAIA,
-> > >       RISCV_ISA_EXT_ID_MAX
-> > >  };
-> > >  static_assert(RISCV_ISA_EXT_ID_MAX <=3D RISCV_ISA_EXT_MAX);
-> > > diff --git a/arch/riscv/kernel/cpu.c b/arch/riscv/kernel/cpu.c
-> > > index 1b9a5a66e55a..a215ec929160 100644
-> > > --- a/arch/riscv/kernel/cpu.c
-> > > +++ b/arch/riscv/kernel/cpu.c
-> > > @@ -162,6 +162,8 @@ arch_initcall(riscv_cpuinfo_init);
-> > >   *    extensions by an underscore.
-> > >   */
-> > >  static struct riscv_isa_ext_data isa_ext_arr[] =3D {
-> > > +     __RISCV_ISA_EXT_DATA(smaia, RISCV_ISA_EXT_SMAIA),
-> > > +     __RISCV_ISA_EXT_DATA(ssaia, RISCV_ISA_EXT_SSAIA),
-> >
-> > This will conflict with that ISA string refactoring I just merged.  It
-> > should be a pretty mechanical merge conflict, but if you want we can do
-> > a shared tag with the first few patches and I can handle the merge
-> > conflict locally.
-> >
-> > >       __RISCV_ISA_EXT_DATA(sscofpmf, RISCV_ISA_EXT_SSCOFPMF),
-> > >       __RISCV_ISA_EXT_DATA(sstc, RISCV_ISA_EXT_SSTC),
-> > >       __RISCV_ISA_EXT_DATA(svinval, RISCV_ISA_EXT_SVINVAL),
-> > > diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufe=
-ature.c
-> > > index 93e45560af30..3c5b51f519d5 100644
-> > > --- a/arch/riscv/kernel/cpufeature.c
-> > > +++ b/arch/riscv/kernel/cpufeature.c
-> > > @@ -228,6 +228,8 @@ void __init riscv_fill_hwcap(void)
-> > >                               SET_ISA_EXT_MAP("zihintpause", RISCV_IS=
-A_EXT_ZIHINTPAUSE);
-> > >                               SET_ISA_EXT_MAP("sstc", RISCV_ISA_EXT_S=
-STC);
-> > >                               SET_ISA_EXT_MAP("svinval", RISCV_ISA_EX=
-T_SVINVAL);
-> > > +                             SET_ISA_EXT_MAP("smaia", RISCV_ISA_EXT_=
-SMAIA);
-> > > +                             SET_ISA_EXT_MAP("ssaia", RISCV_ISA_EXT_=
-SSAIA);
-> > >                       }
-> > >  #undef SET_ISA_EXT_MAP
-> > >               }
-> >
-> > _______________________________________________
-> > linux-riscv mailing list
-> > linux-riscv@lists.infradead.org
-> > http://lists.infradead.org/mailman/listinfo/linux-riscv
+That was when it was only using (and validating) CPUID 0xB and never trust=
+ing CPUID 0x1, right?
