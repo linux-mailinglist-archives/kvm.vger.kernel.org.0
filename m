@@ -2,104 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D346769DD2F
-	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 10:50:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D86069DDBC
+	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 11:18:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234034AbjBUJuA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Feb 2023 04:50:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57586 "EHLO
+        id S233353AbjBUKSt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Feb 2023 05:18:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233466AbjBUJt6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Feb 2023 04:49:58 -0500
-Received: from vulcan.natalenko.name (vulcan.natalenko.name [104.207.131.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 000C835BB;
-        Tue, 21 Feb 2023 01:49:55 -0800 (PST)
-Received: from mail.natalenko.name (vulcan.natalenko.name [IPv6:2001:19f0:6c00:8846:5400:ff:fe0c:dfa0])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by vulcan.natalenko.name (Postfix) with ESMTPSA id 1C163123AEFF;
-        Tue, 21 Feb 2023 10:49:52 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=natalenko.name;
-        s=dkim-20170712; t=1676972992;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=g05pMn2cSNkPdmjZQ3btHmTyaRTRoUr1UNVWrEKBUCw=;
-        b=aSVH9Y+PGJYxz+iY5mNyHHSCp8GrUTri/HfzPcu4njSrXEZ0utXpQ/Z/ZnJ6fZCWXh7t6D
-        XMNhy3VHRmon6Uu3NW2j22Vm682tmjTVCBBWbCo5Fg2i2Uu44QvyYYANo6GXCDRTT6Bfce
-        YXa9H1TMDmFV0se16FSPXmrL9IZY+qs=
+        with ESMTP id S232640AbjBUKSo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Feb 2023 05:18:44 -0500
+Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 829F4469C;
+        Tue, 21 Feb 2023 02:18:42 -0800 (PST)
+Received: from loongson.cn (unknown [10.20.42.170])
+        by gateway (Coremail) with SMTP id _____8BxedmBmvRj_x0DAA--.922S3;
+        Tue, 21 Feb 2023 18:18:41 +0800 (CST)
+Received: from [10.20.42.170] (unknown [10.20.42.170])
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8Cx2r2AmvRj56s3AA--.36327S3;
+        Tue, 21 Feb 2023 18:18:40 +0800 (CST)
+Message-ID: <2875aa3f-0dc4-4e48-17ad-42c703e12063@loongson.cn>
+Date:   Tue, 21 Feb 2023 18:18:40 +0800
 MIME-Version: 1.0
-Date:   Tue, 21 Feb 2023 10:49:51 +0100
-From:   Oleksandr Natalenko <oleksandr@natalenko.name>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Kim Phillips <kim.phillips@amd.com>, tglx@linutronix.de,
-        Usama Arif <usama.arif@bytedance.com>, arjan@linux.intel.com,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        hpa@zytor.com, x86@kernel.org, pbonzini@redhat.com,
-        paulmck@kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, rcu@vger.kernel.org, mimoja@mimoja.de,
-        hewenliang4@huawei.com, thomas.lendacky@amd.com, seanjc@google.com,
-        pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
-        punit.agrawal@bytedance.com, simon.evans@bytedance.com,
-        liangma@liangbit.com,
-        "Limonciello, Mario" <Mario.Limonciello@amd.com>,
-        Piotr Gorski <piotrgorski@cachyos.org>
-Subject: Re: [PATCH v9 0/8] Parallel CPU bringup for x86_64
-In-Reply-To: <85ceb3f92abf3c013924de2f025517372bed19c0.camel@infradead.org>
-References: <20230215145425.420125-1-usama.arif@bytedance.com>
- <2668799.mvXUDI8C0e@natalenko.name>
- <ed8d662351cfe5793f8cc7e7e8c514d05d16c501.camel@infradead.org>
- <2668869.mvXUDI8C0e@natalenko.name>
- <2a67f6cf18dd2c1879fad9fd8a28242918d3e5d2.camel@infradead.org>
- <982e1d6140705414e8fd60b990bd259a@natalenko.name>
- <715CBABF-4017-4784-8F30-5386F1524830@infradead.org>
- <67dbc69f-b712-8971-f1c9-5d07f506a19c@amd.com>
- <42dc683e2846ae8fc1e09715aaf7884660e1a386.camel@infradead.org>
- <37c18c3aeea2e558633b6da6886111d0@natalenko.name>
- <5A3B7074-0C6D-472B-803B-D76541828C1F@infradead.org>
- <3d8ed6e157df10c5175c636de0e21849@natalenko.name>
- <5c557f9b6f55dc2a612ee89142971298e6ae12d8.camel@infradead.org>
- <ee0d0d971a3095d6a1e96ad4f1ba32d2@natalenko.name>
- <5b8f9c89f7015fa80c966c6c7f6fa259db6744f8.camel@infradead.org>
- <ce731b5a4a53680b4840467977b33d9a@natalenko.name>
- <85ceb3f92abf3c013924de2f025517372bed19c0.camel@infradead.org>
-Message-ID: <3e5944de08ef0d23584d19bad7bae66c@natalenko.name>
-X-Sender: oleksandr@natalenko.name
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH v2 02/29] LoongArch: KVM: Implement kvm module related
+ interface
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Tianrui Zhao <zhaotianrui@loongson.cn>
+Cc:     Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Oliver Upton <oliver.upton@linux.dev>
+References: <20230220065735.1282809-1-zhaotianrui@loongson.cn>
+ <20230220065735.1282809-3-zhaotianrui@loongson.cn>
+ <bf4111f9-f722-1847-4f1d-964c5356f392@redhat.com>
+ <0fa9c062-d3fc-61e5-4d54-6bc29f7c64cf@loongson.cn>
+ <3f16a8e1-21d9-808e-aa1a-4f1d6f6f291b@redhat.com>
+Content-Language: en-US
+From:   maobibo <maobibo@loongson.cn>
+In-Reply-To: <3f16a8e1-21d9-808e-aa1a-4f1d6f6f291b@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: AQAAf8Cx2r2AmvRj56s3AA--.36327S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBjvJXoW7Zw1Uur15CF17Cw1UKw4fGrg_yoW8CrWfpa
+        ySyrW7Gr1vkr9Yka1kXw1v934IkFZYka15Jry7JFZYyws0grZIya40kry7AF98Cr4rXr1U
+        Zws0yaykCwn8Z37anT9S1TB71UUUUjDqnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
+        qI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUIcSsGvfJTRUUU
+        bqxYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s
+        1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xv
+        wVC0I7IYx2IY67AKxVWUCVW8JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4
+        x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v26F4UJVW0owAa
+        w2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa020Ex4CE44
+        I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_Jw1lYx0Ex4A2
+        jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62
+        AI1cAE67vIY487MxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCa
+        FVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2
+        IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI
+        42IY6xIIjxv20xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42
+        IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280
+        aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8uc_3UUUUU==
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21.02.2023 10:06, David Woodhouse wrote:
-> Why does arch/x86/kernel/acpi/sleep.c::x86_acpi_suspend_lowlevel() set
+
+
+在 2023/2/21 16:14, Paolo Bonzini 写道:
+> On 2/21/23 07:59, maobibo wrote:
+>>> Also, why does the world switch code need a copy?
+>> There will be problem in world switch code if there is page fault reenter,
+>> since pgd register is shared between root kernel and kvm hypervisor.
+>> World switch entry need be unmapped area, cannot be tlb mapped area.
 > 
->     initial_gs = per_cpu_offset(smp_processor_id()) ?
+> So if I understand correctly the processor is in direct address translation mode until the "csrwr t0, LOONGARCH_CSR_CRMD" instruction. Where does it leave paged mode?
+The processor still in paged mode during world switch context. For example
+when vm exits from guest mode to root mode, it executes world switch code
+from kvm_vector_entry, PC register points to HVA address, however vmid from
+LOONGARCH_CSR_GTLBC is not clear to root mode. If there is page fault
+exception, hardware treats it exception from GPA-->HPA rather than that
+from HVA --> HPA, since vmid info in CSR_GTLBC is not zero.
+
+In page mode, there are two kinds of address: unmapped address and 
+tlb mapped address. For unmapped address there is only cachable/uncachable
+attribution, but not RWX attr; and there is no tlb handling for it.
+For simplicity,  unmapped address can be treated as window filtered address.
+
+It will be fully root mode only after this piece of code is executed
+during world switch context; vmid is zero and PC points to HVA.
+        ori     t0, zero, CSR_GSTAT_PVM
+        csrxchg zero, t0, LOONGARCH_CSR_GSTAT
+        /* Clear GTLBC.TGID field */
+        csrrd   t0, LOONGARCH_CSR_GTLBC
+        bstrins.w       t0, zero, CSR_GTLBC_TGID_SHIFT_END, CSR_GTLBC_TGID_SHIFT
+        csrwr   t0, LOONGARCH_CSR_GTLBC
+
 > 
-> Would it not be CPU#0 that comes back up, and should it not get
-> per_cpu_offset(0) ?
+> Can you please also add comments to kvm_vector_entry explaining the processor state after a VZ exception entry (interrupts, paging, ...)?
+Yeap, we will add more comments about these critical exception entry.
 
-Wanna me try `initial_gs = per_cpu_offset(0);` too?
-
-> Or maybe we should just set up smpboot_control for the CPU to find its
-> own stuff, *even* on waking. Since the structures are already set up,
-> it isn't like a clean boot.
+Regards
+Bibo, Mao
 > 
-> If you let it boot in parallel mode, what if you just *remove* the line
-> that sets smpboot_control=0 ?
+> Paolo
 
-If the `smpboot_control = 0;` line in 
-arch/x86/kernel/acpi/sleep.c::x86_acpi_suspend_lowlevel() is commented 
-out, and the system is booted in parallel mode, then suspend/resume 
-works.
-
--- 
-   Oleksandr Natalenko (post-factum)
