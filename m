@@ -2,94 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A0A869DB2D
-	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 08:27:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BC7AC69DB4C
+	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 08:36:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233621AbjBUH1Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Feb 2023 02:27:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57848 "EHLO
+        id S233664AbjBUHg6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Feb 2023 02:36:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232946AbjBUH1X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Feb 2023 02:27:23 -0500
-Received: from vulcan.natalenko.name (vulcan.natalenko.name [104.207.131.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9D07244BC;
-        Mon, 20 Feb 2023 23:27:16 -0800 (PST)
-Received: from mail.natalenko.name (vulcan.natalenko.name [IPv6:2001:19f0:6c00:8846:5400:ff:fe0c:dfa0])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by vulcan.natalenko.name (Postfix) with ESMTPSA id 71BE4123AAF7;
-        Tue, 21 Feb 2023 08:27:13 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=natalenko.name;
-        s=dkim-20170712; t=1676964433;
+        with ESMTP id S232246AbjBUHgz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Feb 2023 02:36:55 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCEB2233E5
+        for <kvm@vger.kernel.org>; Mon, 20 Feb 2023 23:36:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676964966;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=UktBiYkkeez87hMqM48Li63kPXU3FfbLk8UmzQ2RKWw=;
-        b=QZC4Pw9o8MidWlTN/5L02j+LoMK6F2ufXZBjCK4usO7euEBOakN9aSoXgJap+ITrXS+acc
-        rKXItmNG7yzx3G4PdBlbSCKQZpp9pjxSJOLXeyxUbu6xwHtgoNVIhJiqHouMgFXRfE2TkY
-        EZyNZ8kvJVi7N//V3luu7IT/3pqfezc=
+        bh=GJUhBSU80naNAyt7KCYwVauVvdFPDJ7F9xsF0ak04fU=;
+        b=N6Kj33Z7NDZJBtV3iqTifNVNWNVhj+oIoC/iSL7PK82kbTjSqIoasISRwZg6pmT3dgJkKA
+        vDfEIqb4a+m/IUd8xngHAaWBWl9qaNtNPJT6O+36hqT5DFdreJ4NmCgetF74K1SyklZQ/r
+        jzQaXtIKUETsUmjlMIyeYdC65C8in3Q=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-189-Kjib8UxzMyqomAoR5pqc4Q-1; Tue, 21 Feb 2023 02:36:04 -0500
+X-MC-Unique: Kjib8UxzMyqomAoR5pqc4Q-1
+Received: by mail-ed1-f69.google.com with SMTP id dm14-20020a05640222ce00b0046790cd9082so5089112edb.21
+        for <kvm@vger.kernel.org>; Mon, 20 Feb 2023 23:36:04 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GJUhBSU80naNAyt7KCYwVauVvdFPDJ7F9xsF0ak04fU=;
+        b=wpxyBWcIeHqT2A8gXWBHfrZLSVZJnyAJNBaIEEsBlXkzxcnSQmyEeoSweMMvfIC07Z
+         aU6fmvfPClwMXa+lQ8Hq/wN2aoR7k0p6JIjKyjpcPkPZiV9S1/ejtxjeI5VMhf0uq+5X
+         b3IcYOd3SYi/YNWdrQYi+l9NipHzO8NMg+VNwVtBG5grFt3gsA0RFYZJSaxdk0xa/Qra
+         HhgoYEACT119xMFIaGWRZXklU7k1tMeoC8V4JS0Ob0Vk28X9mNeFnTTDIqIeoK6nF5sP
+         78eVwzhi/GgvgwQj+4XEPo3ndDKSNDo5NjGMc3M/wrDy5OWgXhFQK0PweXsC7nNjWkBc
+         OtEg==
+X-Gm-Message-State: AO0yUKVjdMn57DFn/2LwnRxZiBTijvf7PzCA0ScIJEo7BhFTSAk5YSX2
+        aTlLHieTHmwPcSIsnMgykYR3kd5a3HWeg7Ql07/m1vugtMOZZ9eDu06e3fugFU1hgPwmlZ/bruW
+        BJY/hGyPxvXp2
+X-Received: by 2002:a17:906:eca1:b0:87d:eff1:acc8 with SMTP id qh1-20020a170906eca100b0087deff1acc8mr11390847ejb.48.1676964963253;
+        Mon, 20 Feb 2023 23:36:03 -0800 (PST)
+X-Google-Smtp-Source: AK7set9J1/92GkILe5uy/U98ad25HyMRx/vMAcuPeun433EDTbMLSpuGQJ2VGiRFrZCp9HdNZZQeUw==
+X-Received: by 2002:a17:906:eca1:b0:87d:eff1:acc8 with SMTP id qh1-20020a170906eca100b0087deff1acc8mr11390829ejb.48.1676964962981;
+        Mon, 20 Feb 2023 23:36:02 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.googlemail.com with ESMTPSA id z10-20020a170906714a00b008ba365e7e59sm4555423ejj.121.2023.02.20.23.36.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Feb 2023 23:36:02 -0800 (PST)
+Message-ID: <87268dce-1b5d-0556-7e65-2a75a7893cd1@redhat.com>
+Date:   Tue, 21 Feb 2023 08:35:58 +0100
 MIME-Version: 1.0
-Date:   Tue, 21 Feb 2023 08:27:13 +0100
-From:   Oleksandr Natalenko <oleksandr@natalenko.name>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Kim Phillips <kim.phillips@amd.com>, tglx@linutronix.de,
-        Usama Arif <usama.arif@bytedance.com>, arjan@linux.intel.com,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        hpa@zytor.com, x86@kernel.org, pbonzini@redhat.com,
-        paulmck@kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, rcu@vger.kernel.org, mimoja@mimoja.de,
-        hewenliang4@huawei.com, thomas.lendacky@amd.com, seanjc@google.com,
-        pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
-        punit.agrawal@bytedance.com, simon.evans@bytedance.com,
-        liangma@liangbit.com, Piotr Gorski <lucjan.lucjanov@gmail.com>,
-        "Limonciello, Mario" <Mario.Limonciello@amd.com>
-Subject: Re: [PATCH v9 0/8] Parallel CPU bringup for x86_64
-In-Reply-To: <42dc683e2846ae8fc1e09715aaf7884660e1a386.camel@infradead.org>
-References: <20230215145425.420125-1-usama.arif@bytedance.com>
- <2668799.mvXUDI8C0e@natalenko.name>
- <ed8d662351cfe5793f8cc7e7e8c514d05d16c501.camel@infradead.org>
- <2668869.mvXUDI8C0e@natalenko.name>
- <2a67f6cf18dd2c1879fad9fd8a28242918d3e5d2.camel@infradead.org>
- <982e1d6140705414e8fd60b990bd259a@natalenko.name>
- <715CBABF-4017-4784-8F30-5386F1524830@infradead.org>
- <67dbc69f-b712-8971-f1c9-5d07f506a19c@amd.com>
- <42dc683e2846ae8fc1e09715aaf7884660e1a386.camel@infradead.org>
-Message-ID: <37c18c3aeea2e558633b6da6886111d0@natalenko.name>
-X-Sender: oleksandr@natalenko.name
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH v2 05/29] LoongArch: KVM: Add vcpu related header files
+Content-Language: en-US
+To:     Xi Ruoyao <xry111@xry111.site>, maobibo <maobibo@loongson.cn>,
+        Tianrui Zhao <zhaotianrui@loongson.cn>
+Cc:     Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Oliver Upton <oliver.upton@linux.dev>
+References: <20230220065735.1282809-1-zhaotianrui@loongson.cn>
+ <20230220065735.1282809-6-zhaotianrui@loongson.cn>
+ <497693ca2cbc443c1d9f796c3aace6c9987bec72.camel@xry111.site>
+ <7d6125dd-29e8-14d8-b1d7-d8c14d7bec80@loongson.cn>
+ <4cd00b5cdc78da6357d2d326e607b169faee34a8.camel@xry111.site>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <4cd00b5cdc78da6357d2d326e607b169faee34a8.camel@xry111.site>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21.02.2023 00:30, David Woodhouse wrote:
-> Oleksandr, please could you show the output of 'cpuid' after a
-> successful resume?  I'm particularly looking for this part...
+On 2/21/23 08:12, Xi Ruoyao wrote:
+>> We are preparing to submit these instruction support for binutils,
+>> however it is still necessary. Supposing that it is supported in future
+>> gcc version, we can not drop existing gcc 12/13 supporting to compiling
+>> kernel with LoongArch architecture.
+> You can drop the support for KVM with less capable Binutils versions,
+> like:
 > 
+> config AS_HAS_LVZ
+>      def_bool $(as-instr some_gcsr_insn \$r0, \$gcsr0)
 > 
-> $ sudo cpuid | grep -A1 1/ebx
->    miscellaneous (1/ebx):
->       process local APIC physical ID = 0x0 (0)
-> --
->    miscellaneous (1/ebx):
->       process local APIC physical ID = 0x2 (2)
-> ...
+> config KVM
+>      depends on AS_HAS_LVZ
+> 
 
-For me this command doesn't produce any output. Also, no output from the 
-command Kim used in response to you. With no `grep` it just dumps a 
-table of raw hex data.
+There are precedents in Linux for using .word when necessary.  There's 
+no reason to prevent using KVM on old Binutils versions.
 
-It's `msr-tools` 1.3-4 from Arch. Should I run this command on a patched 
-kernel booted with `no_parallel_bringup`, or on unpatched kernel (if 
-that makes any difference)?
+Paolo
 
--- 
-   Oleksandr Natalenko (post-factum)
