@@ -2,275 +2,285 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B814469D717
-	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 00:31:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E21C69D7A1
+	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 01:41:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232672AbjBTXbE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Feb 2023 18:31:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46250 "EHLO
+        id S232754AbjBUAlq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Feb 2023 19:41:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232643AbjBTXbC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Feb 2023 18:31:02 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 816681B33A;
-        Mon, 20 Feb 2023 15:31:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=+ZA16k5Dc1qU5cg8+reVANg8qxynZvvmKekBVEPqk2I=; b=qgJrt/kSx+nUaWGoxU3zPDbuti
-        1DDD3fvUdXt4wMZ+SDoFe0TspTOVWV5cloIoeXSzXaIvXMyBcNvFycHRAbjP2tpp9ijs7vRWz3eou
-        dgCia2DQTJBjI94tQEh+YYuVkm+ebVXwOZaljfmiOVRFQgcQuedX61A4fuqEBfcYTwINjw4RvhgN0
-        fXB4glG8Mq1oPEZPRjriW5nDR8cEvXuKPc7SQqYMwHcTL3Jsdz4mcg3XaDj7j2z9jRkLx9e/zLb9U
-        80+pT+VY/w1JfH+5jA0E7cdHMqUWyauqgpbAZE6klAcWj57PnGqKizFoGH4PSxPr3PshSM10E5cuR
-        rzKLylPw==;
-Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.ant.amazon.com)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pUFbu-00C6iK-Rh; Mon, 20 Feb 2023 23:30:19 +0000
-Message-ID: <42dc683e2846ae8fc1e09715aaf7884660e1a386.camel@infradead.org>
-Subject: Re: [PATCH v9 0/8] Parallel CPU bringup for x86_64
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Kim Phillips <kim.phillips@amd.com>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>
-Cc:     tglx@linutronix.de, Usama Arif <usama.arif@bytedance.com>,
-        arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
-        pbonzini@redhat.com, paulmck@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
-        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
-        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
-        simon.evans@bytedance.com, liangma@liangbit.com,
-        Piotr Gorski <lucjan.lucjanov@gmail.com>,
-        "Limonciello, Mario" <Mario.Limonciello@amd.com>
-Date:   Mon, 20 Feb 2023 23:30:17 +0000
-In-Reply-To: <67dbc69f-b712-8971-f1c9-5d07f506a19c@amd.com>
-References: <20230215145425.420125-1-usama.arif@bytedance.com>
-         <2668799.mvXUDI8C0e@natalenko.name>
-         <ed8d662351cfe5793f8cc7e7e8c514d05d16c501.camel@infradead.org>
-         <2668869.mvXUDI8C0e@natalenko.name>
-         <2a67f6cf18dd2c1879fad9fd8a28242918d3e5d2.camel@infradead.org>
-         <982e1d6140705414e8fd60b990bd259a@natalenko.name>
-         <715CBABF-4017-4784-8F30-5386F1524830@infradead.org>
-         <67dbc69f-b712-8971-f1c9-5d07f506a19c@amd.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-WglCeHjc8V868uws2y0V"
-User-Agent: Evolution 3.44.4-0ubuntu1 
+        with ESMTP id S232718AbjBUAlo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Feb 2023 19:41:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75AA022A31
+        for <kvm@vger.kernel.org>; Mon, 20 Feb 2023 16:40:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676940054;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=ivV8MRUKs7ozW1pF8hDCdVy4BvYTao2KBGKgdqnNtEA=;
+        b=h6+wBFE09OcVrhGDjkalL/uPK4zvXGMkwKAsXZGExKkScLCLV3uU28w02bzKuNfBAWjPHk
+        z5qCiJr1KeGYIog34TmaIZXSGTIO3PwXyiucGCMcpUcPWShOw5bFJCh0D8mRxmcGafjcya
+        NAgDc4TD8hJGQDX5phkFP3PTCI2dBYs=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-37-9Y0KwjaXPUmLXhvKe81aNQ-1; Mon, 20 Feb 2023 19:40:53 -0500
+X-MC-Unique: 9Y0KwjaXPUmLXhvKe81aNQ-1
+Received: by mail-wm1-f72.google.com with SMTP id l16-20020a05600c1d1000b003e77552705cso179269wms.7
+        for <kvm@vger.kernel.org>; Mon, 20 Feb 2023 16:40:53 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:content-disposition:mime-version
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ivV8MRUKs7ozW1pF8hDCdVy4BvYTao2KBGKgdqnNtEA=;
+        b=HeMPawIu4sUhK78ymkbUdZDIV8yF9G6252C50xChpgFu/a3JoRC2E3HLebXAXXGjWv
+         VWuKA/+7ItMH9O4WHUGl3tDJxVLKmuksPfu0gCmGO9A3ynG9ohIVH/QiydI78D3aYXEj
+         Gg5gmdRF5BBrtltjeWRT9GO7NkiGv/BA00E0Nn7qmboFNhPw6jw4VPd0nmH71466B2KE
+         4B9HcoJ2d1O0teLwLw89g3x0r4LyiRnTXVPA97tHP+xE1YZXOp5cafCFpLYEFo5Ixf6b
+         Mc20mbylY9VHEHZfXjEg3qwLQ8nNT663hjJl9CbuE/G94uZUnBbnFgBuBKYRkmKqr5Q1
+         ZVTg==
+X-Gm-Message-State: AO0yUKXysGZ/TkeAHobPnlewSXFZjx4tJej1OicZXoKw82eCmBAZwF+f
+        MYduVguDzVC2nNBfCqyfqrS0xDX/odmeYeyiaILbEujjNC9VOtGUKkcH8/D3HoE9PJNLmMHpdm+
+        MlxOQ3xF3Mq/B
+X-Received: by 2002:a5d:444d:0:b0:2c5:4c32:92cb with SMTP id x13-20020a5d444d000000b002c54c3292cbmr1010425wrr.54.1676940052192;
+        Mon, 20 Feb 2023 16:40:52 -0800 (PST)
+X-Google-Smtp-Source: AK7set8KGWfYITRF31i2K/JLQVmFylv6hAV7//rGLBlWRfuXHGq2sQ0V6QTBt+n4dJHEoKpWOPQgHg==
+X-Received: by 2002:a5d:444d:0:b0:2c5:4c32:92cb with SMTP id x13-20020a5d444d000000b002c54c3292cbmr1010403wrr.54.1676940051865;
+        Mon, 20 Feb 2023 16:40:51 -0800 (PST)
+Received: from redhat.com ([2.52.36.56])
+        by smtp.gmail.com with ESMTPSA id r13-20020adfdc8d000000b002c557f82e27sm1062943wrj.99.2023.02.20.16.40.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Feb 2023 16:40:51 -0800 (PST)
+Date:   Mon, 20 Feb 2023 19:40:45 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        almasrymina@google.com, alvaro.karsz@solid-run.com,
+        anders.roxell@linaro.org, bagasdotme@gmail.com,
+        bhelgaas@google.com, colin.i.king@gmail.com,
+        dmitry.fomichev@wdc.com, elic@nvidia.com, eperezma@redhat.com,
+        hch@lst.de, jasowang@redhat.com, kangjie.xu@linux.alibaba.com,
+        leiyang@redhat.com, liming.wu@jaguarmicro.com,
+        lingshan.zhu@intel.com, liubo03@inspur.com, lkft@linaro.org,
+        mie@igel.co.jp, mst@redhat.com, m.szyprowski@samsung.com,
+        ricardo.canuelo@collabora.com, sammler@google.com,
+        sebastien.boeuf@intel.com, sfr@canb.auug.org.au,
+        si-wei.liu@oracle.com, stable@vger.kernel.org, stefanha@gmail.com,
+        suwan.kim027@gmail.com, xuanzhuo@linux.alibaba.com,
+        yangyingliang@huawei.com, zyytlz.wz@163.com
+Subject: [GIT PULL] virtio,vhost,vdpa: features, fixes
+Message-ID: <20230220194045-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-Mutt-Fcc: =sent
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+The following changes since commit ceaa837f96adb69c0df0397937cd74991d5d821a:
 
---=-WglCeHjc8V868uws2y0V
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+  Linux 6.2-rc8 (2023-02-12 14:10:17 -0800)
 
-On Mon, 2023-02-20 at 17:23 -0600, Kim Phillips wrote:
-> On 2/20/23 3:39 PM, David Woodhouse wrote:
-> > On 20 February 2023 21:23:38 GMT, Oleksandr Natalenko <oleksandr@natale=
-nko.name> wrote:
-> > > Hello.
-> > >=20
-> > > On 20.02.2023 21:31, David Woodhouse wrote:
-> > > > On Mon, 2023-02-20 at 17:40 +0100, Oleksandr Natalenko wrote:
-> > > > > On pond=C4=9Bl=C3=AD 20. =C3=BAnora 2023 17:20:13 CET David Woodh=
-ouse wrote:
-> > > > > > On Mon, 2023-02-20 at 17:08 +0100, Oleksandr Natalenko wrote:
-> > > > > > >=20
-> > > > > > > I've applied this to the v6.2 kernel, and suspend/resume brok=
-e on
-> > > > > > > my
-> > > > > > > Ryzen 5950X desktop. The machine suspends just fine, but on
-> > > > > > > resume
-> > > > > > > the screen stays blank, and there's no visible disk I/O.
-> > > > > > >=20
-> > > > > > > Reverting the series brings suspend/resume back to working st=
-ate.
-> > > > > >=20
-> > > > > > Hm, thanks. What if you add 'no_parallel_bringup' on the comman=
-d
-> > > > > > line?
-> > > > >=20
-> > > > > If the `no_parallel_bringup` param is added, the suspend/resume
-> > > > > works.
-> > > >=20
-> > > > Thanks for the testing. Can I ask you to do one further test: apply=
- the
-> > > > series only as far as patch 6/8 'x86/smpboot: Support parallel star=
-tup
-> > > > of secondary CPUs'.
-> > > >=20
-> > > > That will do the new startup asm sequence where each CPU finds its =
-own
-> > > > per-cpu data so it *could* work in parallel, but doesn't actually d=
-o
-> > > > the bringup in parallel yet.
-> > >=20
-> > > With patches 1 to 6 (including) applied and no extra cmdline
-> > > params added the resume doesn't work.
-> >=20
-> > Hm. Kim, is there some weirdness with the way AMD CPUs get their
-> > APIC ID in CPUID 0x1? Especially after resume?
->=20
-> Not to my knowledge.=C2=A0 Mario?
+are available in the Git repository at:
 
-Oleksandr, please could you show the output of 'cpuid' after a
-successful resume?  I'm particularly looking for this part...
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
+for you to fetch changes up to deeacf35c922da579637f5db625af20baafc66ed:
 
-$ sudo cpuid | grep -A1 1/ebx
-   miscellaneous (1/ebx):
-      process local APIC physical ID =3D 0x0 (0)
---
-   miscellaneous (1/ebx):
-      process local APIC physical ID =3D 0x2 (2)
-...
+  vdpa/mlx5: support device features provisioning (2023-02-20 19:27:00 -0500)
 
+Note: dropped a patch close to the bottom of the stack at the last
+minute so the commits differ but all of these have been in next already.
+The dropped patch just added a new query ioctl so not interacting with
+anything else in the pull.
 
-> > Perhaps we turn it off for any AMD CPU that doesn't have X2APIC and CPU=
-ID 0xB?
->=20
-> Perhaps.
->=20
-> > > > Does your box have a proper serial port?
-> > >=20
-> > > No, sorry. I know it'd help with getting logs, and I do have a serial=
--to-USB cable that I use for another machine, but in this one the port is n=
-ot routed to outside. I think I can put a header there as the motherboard d=
-oes have pins, but I'd have to buy one first. In theory, I can do that, but=
- that won't happen within the next few weeks.
-> > >=20
-> > > P.S. Piotr Gorski (in Cc) also reported this: "My friend from CachyOS=
- can confirm bugs with smpboot patches. AMD FX 6300 only shows 1 core when =
-using smp boot patchset". Probably, he can reply to this thread and provide=
- more details.
-> > >=20
->=20
-> I ran mem/disk versions of 'sudo rtcwake --mode mem -s 60'
-> on my Rome server, and multiple suspend/resumes succeeded, and
-> with all CPUs, but then the NETDEV WATCHDOG fired - not sure
-> if it's related:
+----------------------------------------------------------------
+virtio,vhost,vdpa: features, fixes
 
-I suspect not.
+device feature provisioning in ifcvf, mlx5
+new SolidNET driver
+support for zoned block device in virtio blk
+numa support in virtio pmem
+VIRTIO_F_RING_RESET support in vhost-net
+more debugfs entries in mlx5
+resume support in vdpa
+completion batching in virtio blk
+cleanup of dma api use in vdpa
+now simulating more features in vdpa-sim
+documentation, features, fixes all over the place
 
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
---=-WglCeHjc8V868uws2y0V
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+----------------------------------------------------------------
+Alvaro Karsz (4):
+      PCI: Add SolidRun vendor ID
+      PCI: Avoid FLR for SolidRun SNET DPU rev 1
+      virtio: vdpa: new SolidNET DPU driver.
+      vhost-vdpa: print warning when vhost_vdpa_alloc_domain fails
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMjIwMjMzMDE3WjAvBgkqhkiG9w0BCQQxIgQgdC+zmPxN
-7ZiHNKkBDG375vkLy4eU2ect+O+ResbLkaswgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBohVMIeKmNDcdS1D0Jvb6rZnwaQ66XNcWc
-GyTYueMTO2guRxXb+F9xN3Ge1SIDxdU7PoyUirQETek2/3QZiArq8azms1hHoFKmyHAg5SqJlOOm
-Uamg1Tw5lClxrbbe+KEJ9y61EzpEOF3M7kC4O8TQs8+lI0LZIQLwq6uSdw4JQ2QPcmoKw30o4v25
-jYoBQUDufAvKcHOA5Gm4YE+oR5IrmxMLaEtLsKgUUAvDDw5mcTxRauMpHSSsXBvL19KCZwObhYKk
-/qBvdKAp+j8DqSPuhjR0Ny84llcJ7e/WL7pd4z2s98tu08kE8Dt/9cW5ox2xiiiWvYlw+lJI4FJ5
-pBi1Q9B6KGE5/fEtOjo7dW3ABg40b0KLBdRuCJyP5Y1l1B6NgeDkF/q+YcfGLUAxfxln8DV7PqkM
-amkQioo2iGQWpl1H4dPYdkxASDRctDsG0wMk08H8zEIaGjiEapV3sKUYKfiUdOow+6/NJsjP77eN
-Jf7k6SABFDoQ7VwDAvCEt4gqaN4W6hjZ2V9IFuvEBqq+NPrw692NSzAtPZXp+6tyLCyQkxkazWBR
-EIEjAh2UpC79eJY4LGPAQ3u0nZfhmIkgjMnX9aQzLE4kxGbVPzDseGFaq6VBYZdICd00YUjHWJgG
-Sn4tXodZaA0HiDza3P6v1LxFylLjapwvjLj+ZUnTawAAAAAAAA==
+Bagas Sanjaya (3):
+      docs: driver-api: virtio: parenthesize external reference targets
+      docs: driver-api: virtio: slightly reword virtqueues allocation paragraph
+      docs: driver-api: virtio: commentize spec version checking
 
+Bo Liu (1):
+      vhost-scsi: convert sysfs snprintf and sprintf to sysfs_emit
 
---=-WglCeHjc8V868uws2y0V--
+Colin Ian King (1):
+      vdpa: Fix a couple of spelling mistakes in some messages
+
+Dmitry Fomichev (1):
+      virtio-blk: add support for zoned block devices
+
+Eli Cohen (6):
+      vdpa/mlx5: Move some definitions to a new header file
+      vdpa/mlx5: Add debugfs subtree
+      vdpa/mlx5: Add RX counters to debugfs
+      vdpa/mlx5: Directly assign memory key
+      vdpa/mlx5: Don't clear mr struct on destroy MR
+      vdpa/mlx5: Initialize CVQ iotlb spinlock
+
+Eugenio Pérez (2):
+      vdpa_sim: not reset state in vdpasim_queue_ready
+      vdpa_sim_net: Offer VIRTIO_NET_F_STATUS
+
+Jason Wang (11):
+      vdpa_sim: use weak barriers
+      vdpa_sim: switch to use __vdpa_alloc_device()
+      vdpasim: customize allocation size
+      vdpa_sim: support vendor statistics
+      vdpa_sim_net: vendor satistics
+      vdpa_sim: get rid of DMA ops
+      virtio_ring: per virtqueue dma device
+      vdpa: introduce get_vq_dma_device()
+      virtio-vdpa: support per vq dma device
+      vdpa: set dma mask for vDPA device
+      vdpa: mlx5: support per virtqueue dma device
+
+Kangjie Xu (1):
+      vhost-net: support VIRTIO_F_RING_RESET
+
+Liming Wu (2):
+      vhost-test: remove meaningless debug info
+      vhost: remove unused paramete
+
+Michael S. Tsirkin (3):
+      virtio_blk: temporary variable type tweak
+      virtio_blk: zone append in header type tweak
+      virtio_blk: mark all zone fields LE
+
+Michael Sammler (1):
+      virtio_pmem: populate numa information
+
+Ricardo Cañuelo (1):
+      docs: driver-api: virtio: virtio on Linux
+
+Sebastien Boeuf (4):
+      vdpa: Add resume operation
+      vhost-vdpa: Introduce RESUME backend feature bit
+      vhost-vdpa: uAPI to resume the device
+      vdpa_sim: Implement resume vdpa op
+
+Shunsuke Mie (2):
+      vringh: fix a typo in comments for vringh_kiov
+      tools/virtio: enable to build with retpoline
+
+Si-Wei Liu (6):
+      vdpa: fix improper error message when adding vdpa dev
+      vdpa: conditionally read STATUS in config space
+      vdpa: validate provisioned device features against specified attribute
+      vdpa: validate device feature provisioning against supported class
+      vdpa/mlx5: make MTU/STATUS presence conditional on feature bits
+      vdpa/mlx5: support device features provisioning
+
+Suwan Kim (2):
+      virtio-blk: set req->state to MQ_RQ_COMPLETE after polling I/O is finished
+      virtio-blk: support completion batching for the IRQ path
+
+Zheng Wang (1):
+      scsi: virtio_scsi: fix handling of kmalloc failure
+
+Zhu Lingshan (12):
+      vDPA/ifcvf: decouple hw features manipulators from the adapter
+      vDPA/ifcvf: decouple config space ops from the adapter
+      vDPA/ifcvf: alloc the mgmt_dev before the adapter
+      vDPA/ifcvf: decouple vq IRQ releasers from the adapter
+      vDPA/ifcvf: decouple config IRQ releaser from the adapter
+      vDPA/ifcvf: decouple vq irq requester from the adapter
+      vDPA/ifcvf: decouple config/dev IRQ requester and vectors allocator from the adapter
+      vDPA/ifcvf: ifcvf_request_irq works on ifcvf_hw
+      vDPA/ifcvf: manage ifcvf_hw in the mgmt_dev
+      vDPA/ifcvf: allocate the adapter in dev_add()
+      vDPA/ifcvf: retire ifcvf_private_to_vf
+      vDPA/ifcvf: implement features provisioning
+
+ Documentation/driver-api/index.rst                 |    1 +
+ Documentation/driver-api/virtio/index.rst          |   11 +
+ Documentation/driver-api/virtio/virtio.rst         |  145 +++
+ .../driver-api/virtio/writing_virtio_drivers.rst   |  197 ++++
+ MAINTAINERS                                        |    5 +
+ drivers/block/virtio_blk.c                         |  468 ++++++++-
+ drivers/nvdimm/virtio_pmem.c                       |   11 +-
+ drivers/pci/quirks.c                               |    8 +
+ drivers/scsi/virtio_scsi.c                         |   14 +-
+ drivers/vdpa/Kconfig                               |   30 +
+ drivers/vdpa/Makefile                              |    1 +
+ drivers/vdpa/ifcvf/ifcvf_base.c                    |   32 +-
+ drivers/vdpa/ifcvf/ifcvf_base.h                    |   10 +-
+ drivers/vdpa/ifcvf/ifcvf_main.c                    |  162 ++-
+ drivers/vdpa/mlx5/Makefile                         |    2 +-
+ drivers/vdpa/mlx5/core/mr.c                        |    1 -
+ drivers/vdpa/mlx5/core/resources.c                 |    3 +-
+ drivers/vdpa/mlx5/net/debug.c                      |  152 +++
+ drivers/vdpa/mlx5/net/mlx5_vnet.c                  |  261 +++--
+ drivers/vdpa/mlx5/net/mlx5_vnet.h                  |   94 ++
+ drivers/vdpa/solidrun/Makefile                     |    6 +
+ drivers/vdpa/solidrun/snet_hwmon.c                 |  188 ++++
+ drivers/vdpa/solidrun/snet_main.c                  | 1111 ++++++++++++++++++++
+ drivers/vdpa/solidrun/snet_vdpa.h                  |  194 ++++
+ drivers/vdpa/vdpa.c                                |  110 +-
+ drivers/vdpa/vdpa_sim/vdpa_sim.c                   |  233 ++--
+ drivers/vdpa/vdpa_sim/vdpa_sim.h                   |    7 +-
+ drivers/vdpa/vdpa_sim/vdpa_sim_blk.c               |    1 +
+ drivers/vdpa/vdpa_sim/vdpa_sim_net.c               |  219 +++-
+ drivers/vhost/net.c                                |    5 +-
+ drivers/vhost/scsi.c                               |    6 +-
+ drivers/vhost/test.c                               |    3 -
+ drivers/vhost/vdpa.c                               |   39 +-
+ drivers/vhost/vhost.c                              |    2 +-
+ drivers/vhost/vhost.h                              |    2 +-
+ drivers/vhost/vsock.c                              |    2 +-
+ drivers/virtio/virtio_ring.c                       |  133 ++-
+ drivers/virtio/virtio_vdpa.c                       |   13 +-
+ include/linux/pci_ids.h                            |    2 +
+ include/linux/vdpa.h                               |   12 +-
+ include/linux/virtio_config.h                      |    8 +-
+ include/linux/virtio_ring.h                        |   16 +
+ include/linux/vringh.h                             |    2 +-
+ include/uapi/linux/vhost.h                         |    8 +
+ include/uapi/linux/vhost_types.h                   |    2 +
+ include/uapi/linux/virtio_blk.h                    |  105 ++
+ tools/virtio/Makefile                              |    2 +-
+ 47 files changed, 3536 insertions(+), 503 deletions(-)
+ create mode 100644 Documentation/driver-api/virtio/index.rst
+ create mode 100644 Documentation/driver-api/virtio/virtio.rst
+ create mode 100644 Documentation/driver-api/virtio/writing_virtio_drivers.rst
+ create mode 100644 drivers/vdpa/mlx5/net/debug.c
+ create mode 100644 drivers/vdpa/mlx5/net/mlx5_vnet.h
+ create mode 100644 drivers/vdpa/solidrun/Makefile
+ create mode 100644 drivers/vdpa/solidrun/snet_hwmon.c
+ create mode 100644 drivers/vdpa/solidrun/snet_main.c
+ create mode 100644 drivers/vdpa/solidrun/snet_vdpa.h
+
