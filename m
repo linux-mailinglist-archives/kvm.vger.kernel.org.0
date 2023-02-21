@@ -2,309 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D05F69E654
-	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 18:51:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F1C069E6BF
+	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 19:03:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234743AbjBURvA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Feb 2023 12:51:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37552 "EHLO
+        id S230258AbjBUSDs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Feb 2023 13:03:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234762AbjBURu6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Feb 2023 12:50:58 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD4DF2ED6B;
-        Tue, 21 Feb 2023 09:50:49 -0800 (PST)
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31LHmNqR027825;
-        Tue, 21 Feb 2023 17:50:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=QVSQkG2IvU8uhJISu5edOcszlsa8QDX0sl9Smaxy4uQ=;
- b=J+1TWYCVvsK5703S6FgojLzXqd7QHAN5SAwW6+7c+Kil0T6XQyhM4BtEyiEk1OvRZSn3
- s9+gORbnBIhOzvKdB+ar43kP58ztceVRmA+qnYhM6RTyRC5nifH94Bgyo4NcJ59m7Pcs
- L+wZ17Nx9NdWwYA6lgTqZxfYNrfPiXyOB8aXbfpYTueLGF5568FNHyHW01vJaBfQlLUw
- wkTO95ujXI6VoQAgOO+R8UGkOdShaBnBejBlgyl5QJP7uCcbksrpfaDsVgrLT0HoCPn/
- JVw73xPuXgs/7Ql6qPlItwkWVD4okn2P0MV0XIOZTfpeq1GoVbbduHFUTeY9xwhmC88H kQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nw29f0m16-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 21 Feb 2023 17:50:48 +0000
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31LHomUs006236;
-        Tue, 21 Feb 2023 17:50:48 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nw29f0m0j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 21 Feb 2023 17:50:48 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31L8QCe9016582;
-        Tue, 21 Feb 2023 17:50:45 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3ntpa6cb0v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 21 Feb 2023 17:50:45 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31LHogxa37814612
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 21 Feb 2023 17:50:42 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 120112004D;
-        Tue, 21 Feb 2023 17:50:42 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DD6E820040;
-        Tue, 21 Feb 2023 17:50:41 +0000 (GMT)
-Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.152.224.238])
-        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 21 Feb 2023 17:50:41 +0000 (GMT)
-Message-ID: <0a9740faae7f375248c60ff5b0753cadc9ed0348.camel@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v2 1/3] s390x/spec_ex: Use PSW macro
-From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Date:   Tue, 21 Feb 2023 18:50:41 +0100
-In-Reply-To: <20230221174822.1378667-2-nsg@linux.ibm.com>
-References: <20230221174822.1378667-1-nsg@linux.ibm.com>
-         <20230221174822.1378667-2-nsg@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.3 (3.46.3-1.fc37) 
+        with ESMTP id S229626AbjBUSDq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Feb 2023 13:03:46 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B6623AA9
+        for <kvm@vger.kernel.org>; Tue, 21 Feb 2023 10:03:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1677002585;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=X5G7yNJYR/7nFmDPXDuo4nvzidlzmsTdXIb/lCyVhoE=;
+        b=iG5hunCAay3hdfWOTuRk+/0Jaw6exa+uf0esvVqRjeZWXvVh84QWu5VUiADKaTCy3Os0p4
+        04M6u1l1Q9NDefrv2QS6BQ/B10Exe0Po2eNcw7L9nQBhrF2jXRg0qrOraRpCKn0VzoebLz
+        MtCRPvuBJSHXF53C10X/2T2CBQSYgmQ=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-414-xmjfTELSOnGFldFq3taqjA-1; Tue, 21 Feb 2023 13:03:04 -0500
+X-MC-Unique: xmjfTELSOnGFldFq3taqjA-1
+Received: by mail-il1-f197.google.com with SMTP id y14-20020a92c74e000000b003157134a9fbso2148760ilp.2
+        for <kvm@vger.kernel.org>; Tue, 21 Feb 2023 10:03:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=X5G7yNJYR/7nFmDPXDuo4nvzidlzmsTdXIb/lCyVhoE=;
+        b=eyHDL+melnOBN1rK70ipKk0mbGLnv3QUHHxWMZOI/jZiDNC0TCkEYCPkbMsC+20uZk
+         UCQ8T+V1LS98xPSAuku+7RqFI0y2NBL9h5lLmup2t1fI4LKYwU28ysfU9jTqbHfact1P
+         iEwYfCBZhxCzWkZYFZDlIva+UKpFUZf0iJy7tNja1PtXh3UYpqwhiN9pd6/1EB3fusdS
+         RdkaedGxACeG7EnxUgbWbeDt7Dr9+ZEU5Z5SCj9cqrtrk6J6FAKwdqQ4cMdtqoohMHvX
+         Agq4Xp+ln9hc6yYLwLIWaDp1EhmU05XlfrDd92XsdROAmQV5YnnIhRCOiSh+N/6DiGJh
+         du8Q==
+X-Gm-Message-State: AO0yUKV7FYP7WZtb9Thd4UIyLofSkPUkmqpHt0FwzPjXupkBYJpuQMnO
+        fAGhGgaIhD98JKcMEZLhVVwo2V4i1m6reR7KxfiFzYo2W26MLn2jiU1p3fUEuRYk40B8WtdGecI
+        23BdUCJZXDPwA
+X-Received: by 2002:a05:6e02:221d:b0:315:69ef:345d with SMTP id j29-20020a056e02221d00b0031569ef345dmr2844793ilf.16.1677002583287;
+        Tue, 21 Feb 2023 10:03:03 -0800 (PST)
+X-Google-Smtp-Source: AK7set/hLeVsKTqTWrORz6QWWSp1fT0Ez9wF5+sgA3ye/y/dTmsm7MwxUyeQMsrKgy04bowZYojXSg==
+X-Received: by 2002:a05:6e02:221d:b0:315:69ef:345d with SMTP id j29-20020a056e02221d00b0031569ef345dmr2844771ilf.16.1677002582978;
+        Tue, 21 Feb 2023 10:03:02 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id a25-20020a029999000000b0038a6ae38ceasm356488jal.26.2023.02.21.10.03.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Feb 2023 10:03:02 -0800 (PST)
+Date:   Tue, 21 Feb 2023 11:03:00 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     "jgg@nvidia.com" <jgg@nvidia.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>
+Subject: Re: [PATCH] docs: kvm: vfio: Require call KVM_DEV_VFIO_GROUP_ADD
+ before VFIO_GROUP_GET_DEVICE_FD
+Message-ID: <20230221110300.0a36a3f6.alex.williamson@redhat.com>
+In-Reply-To: <DS0PR11MB7529D25552603AAE0A557034C3A59@DS0PR11MB7529.namprd11.prod.outlook.com>
+References: <20230221034114.135386-1-yi.l.liu@intel.com>
+        <20230220213916.212e03a4.alex.williamson@redhat.com>
+        <DS0PR11MB7529D25552603AAE0A557034C3A59@DS0PR11MB7529.namprd11.prod.outlook.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: xWX5mDz9a4J54Pk86xeTntPXQktTXhN2
-X-Proofpoint-ORIG-GUID: _cagxmTg-RIJ6fg14VviXuopzQ61ea-o
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
- definitions=2023-02-21_10,2023-02-20_02,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
- suspectscore=0 spamscore=0 clxscore=1015 adultscore=0 mlxlogscore=999
- impostorscore=0 priorityscore=1501 malwarescore=0 bulkscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302210148
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Messed up the recipients on the cover letter...
+On Tue, 21 Feb 2023 05:07:36 +0000
+"Liu, Yi L" <yi.l.liu@intel.com> wrote:
 
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Tuesday, February 21, 2023 12:39 PM
+> > 
+> > On Mon, 20 Feb 2023 19:41:14 -0800
+> > Yi Liu <yi.l.liu@intel.com> wrote:
+> >   
+> > > as some vfio_device's open_device op requires kvm pointer and kvm  
+> > pointer  
+> > > set is part of GROUP_ADD.
+> > >
+> > > Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> > > ---
+> > >  Documentation/virt/kvm/devices/vfio.rst | 5 +++++
+> > >  1 file changed, 5 insertions(+)
+> > >
+> > > diff --git a/Documentation/virt/kvm/devices/vfio.rst  
+> > b/Documentation/virt/kvm/devices/vfio.rst  
+> > > index 2d20dc561069..5722e283f1b5 100644
+> > > --- a/Documentation/virt/kvm/devices/vfio.rst
+> > > +++ b/Documentation/virt/kvm/devices/vfio.rst
+> > > @@ -39,3 +39,8 @@ KVM_DEV_VFIO_GROUP attributes:
+> > >  	- @groupfd is a file descriptor for a VFIO group;
+> > >  	- @tablefd is a file descriptor for a TCE table allocated via
+> > >  	  KVM_CREATE_SPAPR_TCE.
+> > > +
+> > > +::
+> > > +
+> > > +The GROUP_ADD operation above should be invoked before  
+> > vfio_device's  
+> > > +open_device op which is called in the ioctl  
+> > VFIO_GROUP_GET_DEVICE_FD.
+> > 
+> > Why only include the reasoning in the commit log and not the docs?  
+> 
+> Oops, sure. How about below?
+> 
+> KVM_DEV_VFIO_GROUP_ADD has a duty to set the kvm pointer to VFIO as some
+> vfio_devices require kvm pointer to open_device. Like gvt-g, vfio-ap and etc.
+> Meanwhile, open_device is part of VFIO_GROUP_GET_DEVICE_FD. Hence user should
+> invoke KVM_DEV_VFIO_GROUP_ADD before VFIO_GROUP_GET_DEVICE_FD.
 
-Instructions on s390 must be halfword aligned.
-Add two tests for that.
-These currently fail when using TCG.
+How about:
 
-v1 -> v2:
- * rebase
- * use PSW macros
- * simplify odd psw test (thanks Claudio)
- * rename some identifiers
- * pick up R-b (thanks Claudio)
+The GROUP_ADD operation above should be invoked prior to accessing the
+device file descriptor via VFIO_GROUP_GET_DEVICE_FD in order to support
+drivers which require a kvm pointer to be set in their .open_device()
+callback.
 
-Nina Schoetterl-Glausch (3):
-  s390x/spec_ex: Use PSW macro
-  s390x/spec_ex: Add test introducing odd address into PSW
-  s390x/spec_ex: Add test of EXECUTE with odd target address
-
- s390x/spec_ex.c | 85 +++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 76 insertions(+), 9 deletions(-)
-
-Range-diff against v1:
--:  -------- > 1:  d82f4fb6 s390x/spec_ex: Use PSW macro
-1:  62f61c07 ! 2:  e537797f s390x/spec_ex: Add test introducing odd address=
- into PSW
-    @@ Commit message
-         Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-    =20
-      ## s390x/spec_ex.c ##
-    -@@ s390x/spec_ex.c: static void fixup_invalid_psw(struct stack_frame_i=
-nt *stack)
-    - /*
-    -  * Load possibly invalid psw, but setup fixup_psw before,
-    -  * so that fixup_invalid_psw() can bring us back onto the right track=
-.
-    -+ * The provided argument is loaded into register 1.
-    -  * Also acts as compiler barrier, -> none required in expect/check_in=
-valid_psw
-    -  */
-    --static void load_psw(struct psw psw)
-    -+static void load_psw_with_arg(struct psw psw, uint64_t arg)
-    - {
-    - 	uint64_t scratch;
-    -=20
-    -@@ s390x/spec_ex.c: static void load_psw(struct psw psw)
-    - 	fixup_psw.mask =3D extract_psw_mask();
-    - 	asm volatile ( "larl	%[scratch],0f\n"
-    - 		"	stg	%[scratch],%[fixup_addr]\n"
-    -+		"	lgr	%%r1,%[arg]\n"
-    - 		"	lpswe	%[psw]\n"
-    - 		"0:	nop\n"
-    - 		: [scratch] "=3D&d" (scratch),
-    - 		  [fixup_addr] "=3D&T" (fixup_psw.addr)
-    --		: [psw] "Q" (psw)
-    --		: "cc", "memory"
-    -+		: [psw] "Q" (psw),
-    -+		  [arg] "d" (arg)
-    -+		: "cc", "memory", "%r1"
-    - 	);
-    - }
-    -=20
-    -+static void load_psw(struct psw psw)
-    -+{
-    -+	load_psw_with_arg(psw, 0);
-    -+}
-    -+
-    - static void load_short_psw(struct short_psw psw)
-    - {
-    - 	uint64_t scratch;
-     @@ s390x/spec_ex.c: static void expect_invalid_psw(struct psw psw)
-      	invalid_psw_expected =3D true;
-      }
-     =20
-     +static void clear_invalid_psw(void)
-     +{
-    -+	expected_psw =3D (struct psw){0};
-    ++	expected_psw =3D PSW(0, 0);
-     +	invalid_psw_expected =3D false;
-     +}
-     +
-    @@ s390x/spec_ex.c: static void expect_invalid_psw(struct psw psw)
-      {
-      	/* Since the fixup sets this to false we check for false here. */
-      	if (!invalid_psw_expected) {
-    ++		/*
-    ++		 * Early exception recognition: pgm_int_id =3D=3D 0.
-    ++		 * Late exception recognition: psw address has been
-    ++		 *	incremented by pgm_int_id (unpredictable value)
-    ++		 */
-      		if (expected_psw.mask =3D=3D invalid_psw.mask &&
-     -		    expected_psw.addr =3D=3D invalid_psw.addr)
-     +		    expected_psw.addr =3D=3D invalid_psw.addr - lowcore.pgm_int_id)
-    @@ s390x/spec_ex.c: static int psw_bit_12_is_1(void)
-      	return check_invalid_psw();
-      }
-     =20
-    ++extern char misaligned_code[];
-    ++asm (  ".balign	2\n"
-    ++"	. =3D . + 1\n"
-    ++"misaligned_code:\n"
-    ++"	larl	%r0,0\n"
-    ++"	bcr	0xf,%r1\n"
-    ++);
-    ++
-     +static int psw_odd_address(void)
-     +{
-    -+	struct psw odd =3D {
-    -+		.mask =3D extract_psw_mask(),
-    -+	};
-    -+	uint64_t regs[16];
-    -+	int r;
-    ++	struct psw odd =3D PSW_WITH_CUR_MASK((uint64_t)&misaligned_code);
-    ++	uint64_t executed_addr;
-     +
-    -+	/*
-    -+	 * This asm is reentered at an odd address, which should cause a spe=
-cification
-    -+	 * exception before the first unaligned instruction is executed.
-    -+	 * In this case, the interrupt handler fixes the address and the tes=
-t succeeds.
-    -+	 * If, however, unaligned instructions *are* executed, they are jump=
-ed to
-    -+	 * from somewhere, with unknown registers, so save and restore those=
- before.
-    -+	 */
-    -+	asm volatile ( "stmg	%%r0,%%r15,%[regs]\n"
-    -+		//can only offset by even number when using larl -> increment by on=
-e
-    -+		"	larl	%[r],0f\n"
-    -+		"	aghi	%[r],1\n"
-    -+		"	stg	%[r],%[addr]\n"
-    -+		"	xr	%[r],%[r]\n"
-    -+		"	brc	0xf,1f\n"
-    -+		"0:	. =3D . + 1\n"
-    -+		"	lmg	%%r0,%%r15,0(%%r1)\n"
-    -+		//address of the instruction itself, should be odd, store for asser=
-t
-    -+		"	larl	%[r],0\n"
-    -+		"	stg	%[r],%[addr]\n"
-    -+		"	larl	%[r],0f\n"
-    -+		"	aghi	%[r],1\n"
-    -+		"	bcr	0xf,%[r]\n"
-    -+		"0:	. =3D . + 1\n"
-    -+		"1:\n"
-    -+	: [addr] "=3DT" (odd.addr),
-    -+	  [regs] "=3DQ" (regs),
-    -+	  [r] "=3Dd" (r)
-    -+	: : "cc", "memory"
-    ++	expect_invalid_psw(odd);
-    ++	fixup_psw.mask =3D extract_psw_mask();
-    ++	asm volatile ( "xr	%%r0,%%r0\n"
-    ++		"	larl	%%r1,0f\n"
-    ++		"	stg	%%r1,%[fixup_addr]\n"
-    ++		"	lpswe	%[odd_psw]\n"
-    ++		"0:	lr	%[executed_addr],%%r0\n"
-    ++	: [fixup_addr] "=3D&T" (fixup_psw.addr),
-    ++	  [executed_addr] "=3Dd" (executed_addr)
-    ++	: [odd_psw] "Q" (odd)
-    ++	: "cc", "%r0", "%r1"
-     +	);
-     +
-    -+	if (!r) {
-    -+		expect_invalid_psw(odd);
-    -+		load_psw_with_arg(odd, (uint64_t)&regs);
-    ++	if (!executed_addr) {
-     +		return check_invalid_psw();
-     +	} else {
-    -+		assert(odd.addr & 1);
-    ++		assert(executed_addr =3D=3D odd.addr);
-     +		clear_invalid_psw();
-    -+		report_fail("executed unaligned instructions");
-    ++		report_fail("did not execute unaligned instructions");
-     +		return 1;
-     +	}
-     +}
-2:  30075863 ! 3:  dc552880 s390x/spec_ex: Add test of EXECUTE with odd tar=
-get address
-    @@ s390x/spec_ex.c: static int short_psw_bit_12_is_0(void)
-     =20
-     +static int odd_ex_target(void)
-     +{
-    -+	uint64_t target_addr_pre;
-    ++	uint64_t pre_target_addr;
-     +	int to =3D 0, from =3D 0x0dd;
-     +
-     +	asm volatile ( ".pushsection .rodata\n"
-    -+		"odd_ex_target_pre_insn:\n"
-    -+		"	.balign 2\n"
-    ++		"pre_odd_ex_target:\n"
-    ++		"	.balign	2\n"
-     +		"	. =3D . + 1\n"
-     +		"	lr	%[to],%[from]\n"
-     +		"	.popsection\n"
-     +
-    -+		"	larl	%[target_addr_pre],odd_ex_target_pre_insn\n"
-    -+		"	ex	0,1(%[target_addr_pre])\n"
-    -+		: [target_addr_pre] "=3D&a" (target_addr_pre),
-    ++		"	larl	%[pre_target_addr],pre_odd_ex_target\n"
-    ++		"	ex	0,1(%[pre_target_addr])\n"
-    ++		: [pre_target_addr] "=3D&a" (pre_target_addr),
-     +		  [to] "+d" (to)
-     +		: [from] "d" (from)
-     +	);
-     +
-    -+	assert((target_addr_pre + 1) & 1);
-    ++	assert((pre_target_addr + 1) & 1);
-     +	report(to !=3D from, "did not perform ex with odd target");
-     +	return 0;
-     +}
-
-base-commit: e3c5c3ef2524c58023073c0fadde2e8ae3c04ec6
---=20
-2.36.1
+Thanks,
+Alex
 
