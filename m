@@ -2,117 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 573CC69E274
-	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 15:37:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 778B569E2C8
+	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 15:56:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234479AbjBUOhE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Feb 2023 09:37:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57644 "EHLO
+        id S233907AbjBUO4l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Feb 2023 09:56:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234496AbjBUOhC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Feb 2023 09:37:02 -0500
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A97AB2A6C6
-        for <kvm@vger.kernel.org>; Tue, 21 Feb 2023 06:36:47 -0800 (PST)
+        with ESMTP id S233919AbjBUO4j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Feb 2023 09:56:39 -0500
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC6B22A143;
+        Tue, 21 Feb 2023 06:56:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1676990207; x=1708526207;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=56/amPO7umkfCno8KWBQ2OJYcCSCPe2SCOmLV8mpFWE=;
-  b=MfuNQ+G1QVOOBW+anoIB6yw4tRGhOTcMU00XCS+BrzUtorGv2eBF+kIB
-   ScUb71XyaLaSUvwWBTNcdm6wJbJL9trXkoqaK9okihPofIl07KRlKkJzP
-   679KXU8/MLsDg8eRa6+iaHG2t3WfjJLSv9LpECMWM4yIBxH297g+e5UOW
-   iAed2WFtaKThItOxKE8M5bPEHwulejUcmOaNGp3tpdkDPi9LvXsfhN3pi
-   tnbLqMh4LhfoX2KwJZyoUL5gAZA3SsIsXdQGx+RFOSMAOGLcwITqn8Fnr
-   WxYM+ghdK8inOFccY4XmWdMQMdtNF2fXWKCMS3b9HsR7e4Y8bIGUYdCkc
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10627"; a="316366325"
+  t=1676991397; x=1708527397;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=VE7TJfrm4RZ6eDfArZktuMj3vWfcIklvlSsBd6+oiXY=;
+  b=g6MfmMNvmil6qhPlX9QVLQZ+22eI5xKbogpSrOmRrLHsjIFIIPscsx3e
+   Bg0U9aWRUAnRCkjeJHo2bVULY0tG8lp2SJBVRSdnxtiz+T+IWhVWtn6qI
+   uEDelhDwEvZqa0kFx4MQyCiLilm4kzE/hGPioyxNWhPbG/HezzByDNO82
+   GhmSAz8wbQINXMQMC3wGk1OFP6a6sukhRRFI/I9v1s1RIJlBXeVCqrAqz
+   RPj8LlIM2Ub9/A+59DfeWZVgVg8eu7ATa0NZxqErbvaYrbhb0K+FV1IlO
+   ZwoKK3rZQD1F3ttr4I7pGXUuJSd+7jprZDDjScTNgrRJ5Cb4VDzf6gZ2s
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10627"; a="418870401"
 X-IronPort-AV: E=Sophos;i="5.97,315,1669104000"; 
-   d="scan'208";a="316366325"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2023 06:36:27 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10627"; a="845697060"
+   d="scan'208";a="418870401"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2023 06:56:16 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10627"; a="704058316"
 X-IronPort-AV: E=Sophos;i="5.97,315,1669104000"; 
-   d="scan'208";a="845697060"
-Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
-  by orsmga005.jf.intel.com with ESMTP; 21 Feb 2023 06:36:24 -0800
-Message-ID: <c4057e5a1648714832f0a29ab6a4a28d991e27c0.camel@linux.intel.com>
-Subject: Re: [PATCH v4 9/9] KVM: x86: LAM: Expose LAM CPUID to user space VMM
-From:   Robert Hoo <robert.hu@linux.intel.com>
-To:     Binbin Wu <binbin.wu@linux.intel.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>
-Cc:     seanjc@google.com, pbonzini@redhat.com, yuan.yao@linux.intel.com,
-        jingqi.liu@intel.com, weijiang.yang@intel.com, chao.gao@intel.com,
-        isaku.yamahata@intel.com, kirill.shutemov@linux.intel.com,
-        kvm@vger.kernel.org
-Date:   Tue, 21 Feb 2023 22:36:24 +0800
-In-Reply-To: <ccf06c0d-8ca9-9693-c580-d832e162fbfa@linux.intel.com>
-References: <20230209024022.3371768-1-robert.hu@linux.intel.com>
-         <20230209024022.3371768-10-robert.hu@linux.intel.com>
-         <2c7c4d73-810e-6c9c-0480-46d68dedadc8@linux.intel.com>
-         <587054f9715283ef4414af64dd69cda1f7597380.camel@linux.intel.com>
-         <fc84dd84-67c5-5565-b989-7e6bb9116c6e@linux.intel.com>
-         <20230221111328.jaosfrcw2da7jx76@linux.intel.com>
-         <ccf06c0d-8ca9-9693-c580-d832e162fbfa@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-10.el7) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+   d="scan'208";a="704058316"
+Received: from yichaohu-mobl.ccr.corp.intel.com (HELO localhost) ([10.254.208.83])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2023 06:56:13 -0800
+Date:   Tue, 21 Feb 2023 22:56:10 +0800
+From:   Yu Zhang <yu.c.zhang@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 05/12] KVM: x86: Use KVM-governed feature framework to
+ track "XSAVES enabled"
+Message-ID: <20230221145610.ytlj5nkqsscc2yxo@linux.intel.com>
+References: <20230217231022.816138-1-seanjc@google.com>
+ <20230217231022.816138-6-seanjc@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230217231022.816138-6-seanjc@google.com>
+User-Agent: NeoMutt/20171215
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2023-02-21 at 21:18 +0800, Binbin Wu wrote:
-> On 2/21/2023 7:13 PM, Yu Zhang wrote:
-> > > The special handling for LA57 is from the patch "kvm: x86: Return
-> > > LA57
-> > > feature based on hardware capability".
-> > > https://lore.kernel.org/lkml/1548950983-18458-1-git-send-email-yu.c.zhang@linux.intel.com/
-> > > 
-> > > The reason is host kernel may disable 5-level paging using
-> > > cmdline parameter
-> > > 'no5lvl', and it will clear the feature bit for LA57 in
-> > > boot_cpu_data.
-> > > boot_cpu_data is queried in kvm_set_cpu_caps to derive kvm cpu
-> > > cap masks.
-> > > 
-> > > " VMs can still benefit from extended linear address width, e.g.
-> > > to enhance
-> > > features like ASLR" even when host  doesn't use 5-level paging.
-> > > So, the patch sets LA57 based on hardware capability.
-> > > 
-> > > I was just wondering  whether LAM could be the similar case that
-> > > the host
-> > > disabled the feature somehow (e.g via clearcpuid), and the guest
-> > > still want
-> > > to use it.
-> > 
-> > Paging modes in root & non-root are orthogonal, so should LAM.
+On Fri, Feb 17, 2023 at 03:10:15PM -0800, Sean Christopherson wrote:
+> Use the governed feature framework to track if XSAVES is "enabled", i.e.
+> if XSAVES can be used by the guest.  Add a comment in the SVM code to
+> explain the very unintuitive logic of deliberately NOT checking if XSAVES
+> is enumerated in the guest CPUID model.
 > 
-> Agree.
-> 
-Understand
+> No functional change intended.
 
-In 
-https://lore.kernel.org/lkml/1548950983-18458-1-git-send-email-yu.c.zhang@linux.intel.com/
-, it mentioned
-"As discussed earlier, VMs can still benefit from extended linear
-address width, e.g. to enhance features like ASLR. So we would like to
-fix this..."
+xsaves_enabled in struct kvm_vcpu_arch is no longer used. But instead of
+just deleting it, maybe we could move 'bool load_eoi_exitmap_pending' to
+its place, so 7 bytes can be saved for each struct kvm_vcpu_arch:
 
-Apparently something was "discussed earlier", some request was made for
-that (perhaps related to ASLR).
-Read through kvm_set_cpu_caps(), such kind of handling, i.e. bypass
-host/KVM and expose the feature as long as HW supports it, is exception
-case.
-Therefore, though LAM could be done like LA57, I hesitate to make LAM
-exception case to break existing framework, unless analogous
-discussion/request for it occurs.
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index cd660de02f7b..0eef5469c165 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -740,7 +740,6 @@ struct kvm_vcpu_arch {
+        u64 efer;
+        u64 apic_base;
+        struct kvm_lapic *apic;    /* kernel irqchip context */
+-       bool load_eoi_exitmap_pending;
+        DECLARE_BITMAP(ioapic_handled_vectors, 256);
+        unsigned long apic_attention;
+        int32_t apic_arb_prio;
+@@ -750,7 +749,7 @@ struct kvm_vcpu_arch {
+        u64 smi_count;
+        bool at_instruction_boundary;
+        bool tpr_access_reporting;
+-       bool xsaves_enabled;
++       bool load_eoi_exitmap_pending;
+        bool xfd_no_write_intercept;
+        u64 ia32_xss;
+        u64 microcode_version;
 
+B.R.
+Yu
