@@ -2,133 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 301B469DE25
-	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 11:47:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8BBE769DE36
+	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 11:51:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233504AbjBUKrh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Feb 2023 05:47:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47518 "EHLO
+        id S233874AbjBUKvw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Feb 2023 05:51:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231546AbjBUKrg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Feb 2023 05:47:36 -0500
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A93BF22795
-        for <kvm@vger.kernel.org>; Tue, 21 Feb 2023 02:47:33 -0800 (PST)
-Received: by mail-wm1-x32e.google.com with SMTP id l2-20020a05600c1d0200b003e1f6dff952so3143396wms.1
-        for <kvm@vger.kernel.org>; Tue, 21 Feb 2023 02:47:33 -0800 (PST)
+        with ESMTP id S233222AbjBUKvu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Feb 2023 05:51:50 -0500
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E2F421A25
+        for <kvm@vger.kernel.org>; Tue, 21 Feb 2023 02:51:16 -0800 (PST)
+Received: by mail-wr1-x430.google.com with SMTP id c5so4612455wrr.5
+        for <kvm@vger.kernel.org>; Tue, 21 Feb 2023 02:51:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jXmuQG1dfEVhegQET1ciyFk70lK4dL+yJdCWUFAYYoo=;
-        b=zWqs3LwmNFHMn0sPIi+SBZ/YwimWwNG+h6h4ZtkRkt7tf6qZKJ7zPHZM1HmSapsMS9
-         pBId8l1NBh6mUwaB+d1plb2miRGyGRBTn90I4QL0MYgABXQNC0ghvZps/2O9O0PbmH2W
-         tDFOyn6ygdjXyaIP7T7WwSMVU3uhQhNrnELQSoFIIJ4FTmhyhDPNtTVO1i7MX/mr527n
-         lPiNEQSVLMJSbv//nOh1kPGzQbV/VSIgUOjcUikQl62/YKC07LrNE8iFnMPqw0cArkN8
-         UATNxX6lqTbeoTEiiwpaDkwvtEXOuS6K+UVcr7qJ147OPQgB776AJCxTxvXAKC6O8hqP
-         Q65Q==
+        d=jrtc27.com; s=gmail.jrtc27.user;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9w7XobGmqoHAIzgD6LtsFXauMIPw7dVC/9cFUkEqxAg=;
+        b=AXBF51TxVmSaVNE/WJ8amku2KSqvbxFUmsYKA0gXCvXJqgyKiBQs9uEXObAlXXO/7f
+         /l+eZ4zLmdc1I4b9hsiZ/twLu7qAVcd8EfZA4oho/t2X1ZdAzrR7SiGiYVu2aFezzqJm
+         +df4yR61596wmZ5fi9d9AocUK64Oe7O14BjlKLmzHvbUcGvMVAzvQ6/XVHgpna5C2jOL
+         umPOhgxAOtOgrzSyfHnsPud0NAy8QPEfUyToiLcecoc667tm7GRghydN6Y98YF7nzUNv
+         3lmdApV/CvnwmL6AZZl/38AEFazpjx8ROWgcWSGfrA+FeK/lQUEq5lYzMmSfW0kByN7z
+         Ic3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jXmuQG1dfEVhegQET1ciyFk70lK4dL+yJdCWUFAYYoo=;
-        b=OuSR4VG5h/uonBjEwIcOK4gBRp8DWSD7QkkCT5rl+z6woHS+umICt3aoQGiITxnQdU
-         yk19CzGJoj2H3XGeCMo53iPtx+4Dxlu3DKG9KIch0hYbobJnVN4NDHdz11YUbOq1BEki
-         UsSZgOwhkwEm+H7nr9TbNZlBFvPsqMLp2t4APpNUsgAYai2KRvzfSqVEB2gQTjhue0c0
-         CuaSm0CvFPutDll09uBneHvDxiNHMrkG1rgSdmr40eth4T79w0IywtixupiygJ2EY+uI
-         0LBXSl1kkLW4Mn8AUp+gs8VLGW7pDh5/67MOuraS9RQyhYZ4Jii+IDYis7ejAhZFMaHb
-         JT1g==
-X-Gm-Message-State: AO0yUKWDeUIn4CksmbClnFYbZ/HJ8L27hGudNwUOanJqUhxfVgWDvlD1
-        f/yHXKclFCLU4s/WCS3GqFVmkg==
-X-Google-Smtp-Source: AK7set+7mvOb5btarvLZ2cXo2greZPvSxLs876lUjAVTVgLdO9MppHKbeNLt044pvoGfSDZFxp1WYw==
-X-Received: by 2002:a05:600c:198e:b0:3df:9858:c037 with SMTP id t14-20020a05600c198e00b003df9858c037mr3131536wmq.12.1676976452180;
-        Tue, 21 Feb 2023 02:47:32 -0800 (PST)
-Received: from ?IPV6:2a02:6b6a:b566:0:8498:f303:14d8:47b5? ([2a02:6b6a:b566:0:8498:f303:14d8:47b5])
-        by smtp.gmail.com with ESMTPSA id n3-20020a1c7203000000b003dc522dd25esm4608714wmc.30.2023.02.21.02.47.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Feb 2023 02:47:31 -0800 (PST)
-Message-ID: <d91f96eb-86a1-c794-761d-a96e39076b13@bytedance.com>
-Date:   Tue, 21 Feb 2023 10:47:31 +0000
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [External] Re: [PATCH v9 0/8] Parallel CPU bringup for x86_64
-Content-Language: en-US
-To:     David Woodhouse <dwmw2@infradead.org>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>
-Cc:     Kim Phillips <kim.phillips@amd.com>, tglx@linutronix.de,
-        arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
-        pbonzini@redhat.com, paulmck@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
-        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
-        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
-        simon.evans@bytedance.com, liangma@liangbit.com,
-        "Limonciello, Mario" <Mario.Limonciello@amd.com>,
-        Piotr Gorski <piotrgorski@cachyos.org>
-References: <20230215145425.420125-1-usama.arif@bytedance.com>
- <ed8d662351cfe5793f8cc7e7e8c514d05d16c501.camel@infradead.org>
- <2668869.mvXUDI8C0e@natalenko.name>
- <2a67f6cf18dd2c1879fad9fd8a28242918d3e5d2.camel@infradead.org>
- <982e1d6140705414e8fd60b990bd259a@natalenko.name>
- <715CBABF-4017-4784-8F30-5386F1524830@infradead.org>
- <67dbc69f-b712-8971-f1c9-5d07f506a19c@amd.com>
- <42dc683e2846ae8fc1e09715aaf7884660e1a386.camel@infradead.org>
- <37c18c3aeea2e558633b6da6886111d0@natalenko.name>
- <5A3B7074-0C6D-472B-803B-D76541828C1F@infradead.org>
- <3d8ed6e157df10c5175c636de0e21849@natalenko.name>
- <5c557f9b6f55dc2a612ee89142971298e6ae12d8.camel@infradead.org>
- <ee0d0d971a3095d6a1e96ad4f1ba32d2@natalenko.name>
- <5b8f9c89f7015fa80c966c6c7f6fa259db6744f8.camel@infradead.org>
- <ce731b5a4a53680b4840467977b33d9a@natalenko.name>
- <85ceb3f92abf3c013924de2f025517372bed19c0.camel@infradead.org>
- <3e5944de08ef0d23584d19bad7bae66c@natalenko.name>
- <26E5DC9C-0F19-4E4F-9076-04506A197374@infradead.org>
-From:   Usama Arif <usama.arif@bytedance.com>
-In-Reply-To: <26E5DC9C-0F19-4E4F-9076-04506A197374@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9w7XobGmqoHAIzgD6LtsFXauMIPw7dVC/9cFUkEqxAg=;
+        b=eOlTf0rdLrSzDZdNMXD45C62+wCRD+enfsvu9TT34C/bOM/I8EE9b6NKVpWeveovGE
+         A3HgVzgRG9DeRQh0Ox2l7gsdoU2/uPaDLUx3XgivRlEqEW/SiM3rB9DBwokUt34IxdKX
+         YeUbQLpfzB8YgVlDSDQbIhsmdPUGu90SdCYtZqVMsXeXZgxx1i4Z8l4VRpD6a8jnNg7U
+         885jTiywJM+qio1w8zpX87LNzUAxk5QIux/HDwBlbnzP89xkjJLYgZsVMbD3HcoxPwk3
+         04/XK4+FOWDBhZoKkiS9BfnkphczS4bgBb6R+suZ6YqTOYUVOPYi5sJLOpz2QFFjW3xL
+         f9aQ==
+X-Gm-Message-State: AO0yUKWXwdSoD9zm6RBP6Y3L3/biK+wtVVGE1rNqV+9yKd6L1FTfEI87
+        5TTsPTHrQDsX6ik5XB4kz+p8Fg==
+X-Google-Smtp-Source: AK7set8U0nwW6pymToKnj0QWWxsDXX4OES4HSyFf1ItR+ya7bj1YlMfmMfNBNYEKfrx1VuPwLLXTgg==
+X-Received: by 2002:a5d:65c6:0:b0:2c5:7c7a:78f7 with SMTP id e6-20020a5d65c6000000b002c57c7a78f7mr2849679wrw.45.1676976674381;
+        Tue, 21 Feb 2023 02:51:14 -0800 (PST)
+Received: from smtpclient.apple (global-5-143.n-2.net.cam.ac.uk. [131.111.5.143])
+        by smtp.gmail.com with ESMTPSA id d1-20020a5d4f81000000b002c5526234d2sm3656584wru.8.2023.02.21.02.51.13
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 21 Feb 2023 02:51:13 -0800 (PST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.120.41.1.1\))
+Subject: Re: [PATCH v2 2/7] RISC-V: Detect AIA CSRs from ISA string
+From:   Jessica Clarke <jrtc27@jrtc27.com>
+In-Reply-To: <Y/Sfpb2c/LS0LCiA@wendy>
+Date:   Tue, 21 Feb 2023 10:51:13 +0000
+Cc:     =?utf-8?Q?Christoph_M=C3=BCllner?= <christoph.muellner@vrull.eu>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Anup Patel <apatel@ventanamicro.com>, pbonzini@redhat.com,
+        Atish Patra <atishp@atishpatra.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <F80EBB4C-29C4-472D-B213-EFD220EF9B1F@jrtc27.com>
+References: <20230128072737.2995881-3-apatel@ventanamicro.com>
+ <mhng-0f9bdf58-5289-4db4-8fd7-38898824c44f@palmer-ri-x1c9>
+ <CAEg0e7hrQFu+cdZy+3QO1ML9FNTPBehZwOOBnr1F-5ABYDnkGg@mail.gmail.com>
+ <CAEg0e7hRjMSgYZbPTQztbQ3bGZf-r8wAfCK5ZnDXOcx27HcTCA@mail.gmail.com>
+ <Y/Sfpb2c/LS0LCiA@wendy>
+To:     Conor Dooley <conor.dooley@microchip.com>
+X-Mailer: Apple Mail (2.3696.120.41.1.1)
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 21 Feb 2023, at 10:40, Conor Dooley <conor.dooley@microchip.com> =
+wrote:
+>=20
+> Hey Christoph,
+>=20
+> On Tue, Feb 21, 2023 at 08:12:58AM +0100, Christoph M=C3=BCllner =
+wrote:
+>> Hi all,
+>>=20
+>> The RISC-V Architectural Review Committee has discussed the concerns
+>> regarding the non-ratified chapters in the AIA specification.
+>=20
+> Thanks for the update!
+>=20
+>> Here is the relevant quote from the meeting minutes:
+>> """
+>> Although the Advanced Interrupt Architecture (AIA) has already passed
+>> Architecture Review (with a minor edit still pending), the committee
+>> has some suggestions about its final steps to ratification, to avoid
+>> the AIA document having a mixture of ratified and non-ratified =
+content:
+>=20
+>> - The AIA document's remaining draft chapter on the Duo-PLIC, which =
+is
+>>  not currently on a path to ratification, can be removed to a =
+separate
+>>  document.
+>=20
+> That sounds promising...
+>=20
+>> - Ratification of the full AIA (without Duo-PLIC) can be postponed to
+>>  coincide with ratification of the IOMMU specification, given that
+>>  the latter is now expected in a reasonable time, and the AIA's last
+>>  chapter concerning IOMMUs is already scheduled to go through public
+>>  review and be ratified only together with the IOMMU specification.
+>> """
+>=20
+> ...and so does this. AIA stuff's acceptability only depending on the
+> IOMMU spec's freeze (and thus Chapter 9's) seems like a vast =
+improvement
+> on the status quo to me!
+>=20
+>> The full meeting minutes can be found here:
+>>  https://lists.riscv.org/g/tech-chairs/message/1381
+>=20
+> This link is non functional unfortunately :/
 
+tech-chairs is private, for (co-)chairs only... not sure why it went
+there rather than tech-privileged.
 
-On 21/02/2023 10:27, David Woodhouse wrote:
-> 
-> 
-> On 21 February 2023 09:49:51 GMT, Oleksandr Natalenko <oleksandr@natalenko.name> wrote:
->> On 21.02.2023 10:06, David Woodhouse wrote:
->>> Why does arch/x86/kernel/acpi/sleep.c::x86_acpi_suspend_lowlevel() set
->>>
->>>      initial_gs = per_cpu_offset(smp_processor_id()) ?
->>>
->>> Would it not be CPU#0 that comes back up, and should it not get
->>> per_cpu_offset(0) ?
->>
->> Wanna me try `initial_gs = per_cpu_offset(0);` too?
-> 
+Jess
 
-I think it might be smp_processor_id() and not 0 incase CPU0 was offline 
-at the point the system was suspended?
+> Cheers,
+> Conor.
+>=20
+> _______________________________________________
+> linux-riscv mailing list
+> linux-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-riscv
 
-> Hm, yes please. There's another one to make zero on the next line up, I think?
-> 
->>> Or maybe we should just set up smpboot_control for the CPU to find its
->>> own stuff, *even* on waking. Since the structures are already set up,
->>> it isn't like a clean boot.
->>>
->>> If you let it boot in parallel mode, what if you just *remove* the line
->>> that sets smpboot_control=0 ?
->>
->> If the `smpboot_control = 0;` line in arch/x86/kernel/acpi/sleep.c::x86_acpi_suspend_lowlevel() is commented out, and the system is booted in parallel mode, then suspend/resume works.
-> 
-> Well that's entertaining. Now, can we come up with any theory which doesn't leave us wondering why it ever worked in the first place...?
