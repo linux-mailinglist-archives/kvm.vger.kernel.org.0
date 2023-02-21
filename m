@@ -2,124 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 221E569D93C
-	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 04:22:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E28169D967
+	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 04:42:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233290AbjBUDWJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Feb 2023 22:22:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54428 "EHLO
+        id S231346AbjBUDml (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Feb 2023 22:42:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232873AbjBUDWI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Feb 2023 22:22:08 -0500
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B483C23D90;
-        Mon, 20 Feb 2023 19:22:07 -0800 (PST)
+        with ESMTP id S233139AbjBUDmj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Feb 2023 22:42:39 -0500
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 587F524120
+        for <kvm@vger.kernel.org>; Mon, 20 Feb 2023 19:41:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1676949727; x=1708485727;
+  t=1676950915; x=1708486915;
   h=from:to:cc:subject:date:message-id:mime-version:
    content-transfer-encoding;
-  bh=nCueLugKj6AS1tNo11nKqAVGoXrrBxgB0PinJrUQ9SE=;
-  b=d6ZCXofXA8xGVPsO5PNdyezs9v/B+jfugLaeHaKc1lNd29uoNcWaEXpO
-   pOcLgSlKApT4h94x+T2DsKNafNDfn95u7G7tA9v2wbYDUgotIHtHcdbmZ
-   tzIFGSw4fc0HfZYXfCTNYBYgZAi89KgfDoskHCmmnjRXU6aj9XRAJLdo8
-   qN72+WYt8DrsdWxlvcEx8Lp+OIecJwpiHF0S3a2izCjdVPUqkFwexNb9I
-   LNZoFMX3UI/Lw3DXCxga0lvcxfFLSuxlC7G1/+PQPc9i+vSSfRUpUsQGp
-   +C9dyBB8mOE0WhQDmdLmpSs8ARROz5mxUyz/EJPbozEgpRTmNPX+rKrT7
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10627"; a="395012922"
+  bh=zoPReBuZ2NuXmJ6670cNJoY4GmEDXo+vXbP2NcKUldM=;
+  b=i8JDPURpTWKdnlnXE/ZPH3ASvVKj4CBJ2ANPZBdQhQXdj0VvaFl8IoW4
+   A/zGTEF3It+CTcK/uTFPuOT37MbMAmMzjzmh/39MRqS4RfjUujBaVN4GO
+   9gQsjIQKdZYyeyiJYad1LcnyZ7jM/nm/da8azjTegAwMd2JMW7ZhVFhZh
+   HRU44RK4P+h+9nPIrk16gOtXJftI0DQnxmewOGI7dACSGPFniz2bM1f8n
+   cJlxdzEyy/JPxBlvR/uP9IFj84kUwLFcNtXLQPa+ZPXn6BWW+VrJq+bwr
+   3TPf5hDAPk7jIae3jkuOE9lESW7l1xMH6Ee3SGv7n1r5Gq5XxcKRPFrYH
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10627"; a="331198273"
 X-IronPort-AV: E=Sophos;i="5.97,314,1669104000"; 
-   d="scan'208";a="395012922"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2023 19:22:07 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10627"; a="780841410"
+   d="scan'208";a="331198273"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2023 19:41:16 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10627"; a="814339834"
 X-IronPort-AV: E=Sophos;i="5.97,314,1669104000"; 
-   d="scan'208";a="780841410"
-Received: from binbinwu-mobl.ccr.corp.intel.com ([10.238.10.94])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2023 19:22:05 -0800
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com,
-        Binbin Wu <binbin.wu@linux.intel.com>
-Subject: [PATCH] KVM: x86: Remove duplicated calls of reverse_cpuid_check()
-Date:   Tue, 21 Feb 2023 11:21:56 +0800
-Message-Id: <20230221032156.791-1-binbin.wu@linux.intel.com>
-X-Mailer: git-send-email 2.25.1
+   d="scan'208";a="814339834"
+Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
+  by fmsmga001.fm.intel.com with ESMTP; 20 Feb 2023 19:41:16 -0800
+From:   Yi Liu <yi.l.liu@intel.com>
+To:     alex.williamson@redhat.com, jgg@nvidia.com, kevin.tian@intel.com
+Cc:     cohuck@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
+        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.l.liu@intel.com,
+        yi.y.sun@linux.intel.com, pbonzini@redhat.com
+Subject: [PATCH] docs: kvm: vfio: Require call KVM_DEV_VFIO_GROUP_ADD before VFIO_GROUP_GET_DEVICE_FD
+Date:   Mon, 20 Feb 2023 19:41:14 -0800
+Message-Id: <20230221034114.135386-1-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove duplicated calls of reverse_cpuid_check() in __kvm_cpu_cap_mask()
-and kvm_cpu_cap_{clear, set, get}().
+as some vfio_device's open_device op requires kvm pointer and kvm pointer
+set is part of GROUP_ADD.
 
-reverse_cpuid_check() is directly called by:
- - feature_bit() / __feature_bit()
- - x86_feature_cpuid()
- - kvm_cpu_cap_{clear, set, get}()
- - __kvm_cpu_cap_mask()
-Also __kvm_cpu_cap_mask() calls x86_feature_cpuid(),
-and kvm_cpu_cap_{clear, set, get}() calls __feature_bit().
-It makes the direct call of reverse_cpuid_check() duplicated.
-
-For functions call reverse_cpuid_check() twice indirectly (e.g. cpuid_entry_get()
-calls both __feature_bit() and x86_feature_cpuid()), keep them as they are.
-
-Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
+Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 ---
- arch/x86/kvm/cpuid.c | 2 --
- arch/x86/kvm/cpuid.h | 3 ---
- 2 files changed, 5 deletions(-)
+ Documentation/virt/kvm/devices/vfio.rst | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 8f8edeaf8177..f4089d7a7c4c 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -545,8 +545,6 @@ static __always_inline void __kvm_cpu_cap_mask(unsigned int leaf)
- 	const struct cpuid_reg cpuid = x86_feature_cpuid(leaf * 32);
- 	struct kvm_cpuid_entry2 entry;
- 
--	reverse_cpuid_check(leaf);
--
- 	cpuid_count(cpuid.function, cpuid.index,
- 		    &entry.eax, &entry.ebx, &entry.ecx, &entry.edx);
- 
-diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-index b1658c0de847..d781372a01e8 100644
---- a/arch/x86/kvm/cpuid.h
-+++ b/arch/x86/kvm/cpuid.h
-@@ -192,7 +192,6 @@ static __always_inline void kvm_cpu_cap_clear(unsigned int x86_feature)
- {
- 	unsigned int x86_leaf = __feature_leaf(x86_feature);
- 
--	reverse_cpuid_check(x86_leaf);
- 	kvm_cpu_caps[x86_leaf] &= ~__feature_bit(x86_feature);
- }
- 
-@@ -200,7 +199,6 @@ static __always_inline void kvm_cpu_cap_set(unsigned int x86_feature)
- {
- 	unsigned int x86_leaf = __feature_leaf(x86_feature);
- 
--	reverse_cpuid_check(x86_leaf);
- 	kvm_cpu_caps[x86_leaf] |= __feature_bit(x86_feature);
- }
- 
-@@ -208,7 +206,6 @@ static __always_inline u32 kvm_cpu_cap_get(unsigned int x86_feature)
- {
- 	unsigned int x86_leaf = __feature_leaf(x86_feature);
- 
--	reverse_cpuid_check(x86_leaf);
- 	return kvm_cpu_caps[x86_leaf] & __feature_bit(x86_feature);
- }
- 
-
-base-commit: e73ba25fdc241c06ab48a1f708a30305d6036e66
+diff --git a/Documentation/virt/kvm/devices/vfio.rst b/Documentation/virt/kvm/devices/vfio.rst
+index 2d20dc561069..5722e283f1b5 100644
+--- a/Documentation/virt/kvm/devices/vfio.rst
++++ b/Documentation/virt/kvm/devices/vfio.rst
+@@ -39,3 +39,8 @@ KVM_DEV_VFIO_GROUP attributes:
+ 	- @groupfd is a file descriptor for a VFIO group;
+ 	- @tablefd is a file descriptor for a TCE table allocated via
+ 	  KVM_CREATE_SPAPR_TCE.
++
++::
++
++The GROUP_ADD operation above should be invoked before vfio_device's
++open_device op which is called in the ioctl VFIO_GROUP_GET_DEVICE_FD.
 -- 
-2.25.1
+2.34.1
 
