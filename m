@@ -2,105 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9312169DDFD
-	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 11:37:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B223869DE06
+	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 11:41:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233792AbjBUKhi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Feb 2023 05:37:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37884 "EHLO
+        id S233417AbjBUKlP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Feb 2023 05:41:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233754AbjBUKhh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Feb 2023 05:37:37 -0500
-Received: from mailbox.box.xen0n.name (mail.xen0n.name [115.28.160.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D769F25E11;
-        Tue, 21 Feb 2023 02:37:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xen0n.name; s=mail;
-        t=1676975848; bh=kttlikzHwisAM0E2qY/d8RHeLStCZm5KlaC55tFr4CU=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=A4g5I85hUYVQJ4SHKWhlfMQrRbyItlwUavJVuBjGob+k8vmVXjA7H6nNXFrV49req
-         7zjwdT3tnAEserZ62WFgSVtsO+wfG2cz7p7Hla51+t7h0OBdtuXiOR1EtR41O6m/oS
-         4iGCHu89NLXDtXQBWSc3x/5mAupivdX9iD64G4XI=
-Received: from [100.100.57.122] (unknown [58.34.185.106])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mailbox.box.xen0n.name (Postfix) with ESMTPSA id A5054600BD;
-        Tue, 21 Feb 2023 18:37:27 +0800 (CST)
-Message-ID: <35d54051-3876-4fb7-d1c8-d1c605420962@xen0n.name>
-Date:   Tue, 21 Feb 2023 18:37:27 +0800
+        with ESMTP id S233453AbjBUKlM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Feb 2023 05:41:12 -0500
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95E8125BAE;
+        Tue, 21 Feb 2023 02:41:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1676976067; x=1708512067;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=B7QA/vyewvRH8xz6i211QhpHsRW7Qheq3VCrsuFZ1m8=;
+  b=uiMaSKst6U46U7h3dCWb+DcQ9GosLplG1FiTJQgHrBE9TTXcQsL1Oo2H
+   L4n7GLRa8bx7IFuQDDFh1cW9c+wx5oY9nfbgQ3QOQEJperptGPfvrYh3e
+   Zyb+bSieD8Zo8a1kjod3kR4aNacU02+D1WDXdCUGmlCf4w7eVE2lKQIpt
+   uFMrr153uDFOy6z7uyQWIE3STQAjXIdoksXrxgzJp9wtgTjzYPJGlHoW7
+   ay70vDHnlshmA2wXckd0g8FajlTL3JNToB8UcrswaO770vDkirMsBossk
+   03pHmyJaXNl5W51EZokTRfQU29FQlce8iMcZb5TROzEoVD4XVxa7ZXufr
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.97,315,1669100400"; 
+   d="asc'?scan'208";a="201567546"
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 21 Feb 2023 03:41:06 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Tue, 21 Feb 2023 03:41:05 -0700
+Received: from wendy (10.10.115.15) by chn-vm-ex03.mchp-main.com
+ (10.10.85.151) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.16 via Frontend
+ Transport; Tue, 21 Feb 2023 03:41:04 -0700
+Date:   Tue, 21 Feb 2023 10:40:37 +0000
+From:   Conor Dooley <conor.dooley@microchip.com>
+To:     Christoph =?iso-8859-1?Q?M=FCllner?= <christoph.muellner@vrull.eu>
+CC:     Palmer Dabbelt <palmer@dabbelt.com>, <apatel@ventanamicro.com>,
+        <pbonzini@redhat.com>, <atishp@atishpatra.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        <ajones@ventanamicro.com>, <anup@brainfault.org>,
+        <kvm@vger.kernel.org>, <kvm-riscv@lists.infradead.org>,
+        <linux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 2/7] RISC-V: Detect AIA CSRs from ISA string
+Message-ID: <Y/Sfpb2c/LS0LCiA@wendy>
+References: <20230128072737.2995881-3-apatel@ventanamicro.com>
+ <mhng-0f9bdf58-5289-4db4-8fd7-38898824c44f@palmer-ri-x1c9>
+ <CAEg0e7hrQFu+cdZy+3QO1ML9FNTPBehZwOOBnr1F-5ABYDnkGg@mail.gmail.com>
+ <CAEg0e7hRjMSgYZbPTQztbQ3bGZf-r8wAfCK5ZnDXOcx27HcTCA@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.8.0
-Subject: Re: [PATCH v2 02/29] LoongArch: KVM: Implement kvm module related
- interface
-To:     maobibo <maobibo@loongson.cn>, Paolo Bonzini <pbonzini@redhat.com>,
-        Tianrui Zhao <zhaotianrui@loongson.cn>
-Cc:     Huacai Chen <chenhuacai@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>
-References: <20230220065735.1282809-1-zhaotianrui@loongson.cn>
- <20230220065735.1282809-3-zhaotianrui@loongson.cn>
- <bf4111f9-f722-1847-4f1d-964c5356f392@redhat.com>
- <0fa9c062-d3fc-61e5-4d54-6bc29f7c64cf@loongson.cn>
- <3f16a8e1-21d9-808e-aa1a-4f1d6f6f291b@redhat.com>
- <2875aa3f-0dc4-4e48-17ad-42c703e12063@loongson.cn>
-Content-Language: en-US
-From:   WANG Xuerui <kernel@xen0n.name>
-In-Reply-To: <2875aa3f-0dc4-4e48-17ad-42c703e12063@loongson.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="6iuVe0fRaCPwebfO"
+Content-Disposition: inline
+In-Reply-To: <CAEg0e7hRjMSgYZbPTQztbQ3bGZf-r8wAfCK5ZnDXOcx27HcTCA@mail.gmail.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023/2/21 18:18, maobibo wrote:
-> 
-> 
-> 在 2023/2/21 16:14, Paolo Bonzini 写道:
->> On 2/21/23 07:59, maobibo wrote:
->>>> Also, why does the world switch code need a copy?
->>> There will be problem in world switch code if there is page fault reenter,
->>> since pgd register is shared between root kernel and kvm hypervisor.
->>> World switch entry need be unmapped area, cannot be tlb mapped area.
->>
->> So if I understand correctly the processor is in direct address translation mode until the "csrwr t0, LOONGARCH_CSR_CRMD" instruction. Where does it leave paged mode?
-> The processor still in paged mode during world switch context. For example
-> when vm exits from guest mode to root mode, it executes world switch code
-> from kvm_vector_entry, PC register points to HVA address, however vmid from
-> LOONGARCH_CSR_GTLBC is not clear to root mode. If there is page fault
-> exception, hardware treats it exception from GPA-->HPA rather than that
-> from HVA --> HPA, since vmid info in CSR_GTLBC is not zero.
-> 
-> In page mode, there are two kinds of address: unmapped address and
-> tlb mapped address. For unmapped address there is only cachable/uncachable
-> attribution, but not RWX attr; and there is no tlb handling for it.
-> For simplicity,  unmapped address can be treated as window filtered address.
-> 
-> It will be fully root mode only after this piece of code is executed
-> during world switch context; vmid is zero and PC points to HVA.
->          ori     t0, zero, CSR_GSTAT_PVM
->          csrxchg zero, t0, LOONGARCH_CSR_GSTAT
->          /* Clear GTLBC.TGID field */
->          csrrd   t0, LOONGARCH_CSR_GTLBC
->          bstrins.w       t0, zero, CSR_GTLBC_TGID_SHIFT_END, CSR_GTLBC_TGID_SHIFT
->          csrwr   t0, LOONGARCH_CSR_GTLBC
+--6iuVe0fRaCPwebfO
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-AFAIK all of these is probably coming from Volume 3 of LoongArch ISA 
-Manual, which is unfortunately not publicly available at the moment. For 
-sake of meaningful reviews, when can we expect to get our hands on the 
-manuals?
+Hey Christoph,
 
--- 
-WANG "xen0n" Xuerui
+On Tue, Feb 21, 2023 at 08:12:58AM +0100, Christoph M=FCllner wrote:
+> Hi all,
+>=20
+> The RISC-V Architectural Review Committee has discussed the concerns
+> regarding the non-ratified chapters in the AIA specification.
 
-Linux/LoongArch mailing list: https://lore.kernel.org/loongarch/
+Thanks for the update!
 
+> Here is the relevant quote from the meeting minutes:
+> """
+> Although the Advanced Interrupt Architecture (AIA) has already passed
+> Architecture Review (with a minor edit still pending), the committee
+> has some suggestions about its final steps to ratification, to avoid
+> the AIA document having a mixture of ratified and non-ratified content:
+
+> - The AIA document's remaining draft chapter on the Duo-PLIC, which is
+>   not currently on a path to ratification, can be removed to a separate
+>   document.
+
+That sounds promising...
+
+> - Ratification of the full AIA (without Duo-PLIC) can be postponed to
+>   coincide with ratification of the IOMMU specification, given that
+>   the latter is now expected in a reasonable time, and the AIA's last
+>   chapter concerning IOMMUs is already scheduled to go through public
+>   review and be ratified only together with the IOMMU specification.
+> """
+
+=2E..and so does this. AIA stuff's acceptability only depending on the
+IOMMU spec's freeze (and thus Chapter 9's) seems like a vast improvement
+on the status quo to me!
+
+> The full meeting minutes can be found here:
+>   https://lists.riscv.org/g/tech-chairs/message/1381
+
+This link is non functional unfortunately :/
+
+Cheers,
+Conor.
+
+
+--6iuVe0fRaCPwebfO
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCY/SfpQAKCRB4tDGHoIJi
+0glVAP48ulWH0wluVY0nRbCm5mnXv2qbJhdboksLyQ9PBMmj4AEA/g4b4WQyFK4F
+pOnOdQtJiSbRjyBmsB6lQ/f+ZjOGRAE=
+=+DAU
+-----END PGP SIGNATURE-----
+
+--6iuVe0fRaCPwebfO--
