@@ -2,315 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CB1BC69E9DA
-	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 23:06:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 467A569E9F7
+	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 23:18:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230208AbjBUWGU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Feb 2023 17:06:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35976 "EHLO
+        id S229940AbjBUWSC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Feb 2023 17:18:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44948 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229702AbjBUWGS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Feb 2023 17:06:18 -0500
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1148C303CE;
-        Tue, 21 Feb 2023 14:06:17 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=knC41Lnox3TQ3rvEz5djao8wftoPA1Vsy65Xr6db97m6LxSi1vOVQ0aTUoUj2IBeXniKivrHnyL2eqkT/Vek6BEBNCiDd0F9Q9n6N/GkNWDZOnHft3odp3Lpd/5InaDzgGkdGBVmq7F+0na2vnbD9O+ln+CROsErDQh6HZRoQ20+JcrQTT+nPn+BIcJNyk+1oJjpaNliCKet3khOZSOosbTuHNATrEXjJ4TgAb/WpEi387ey8QDtCBSPu1lOXTzs2SYZlVfQ+gefdvwGf8VQ6McYRAea8CElVe59ewJFCFcZ2FU7NcJNqf13iW6b/2Yf9tZhmW3YHrnTLAvJmUkBcw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qZyHiit4p3IDqeFtLvP3SjkUsiHaYD5sdx271a5WCco=;
- b=agm6ZEqX+mV1yYBppQ3PVQnOA36Rj1yCyeYTiVeFIE/14mFQSe5bwhiGM0Zia0vOJJ6zqN+X75QAdZLKmLvPBCUtgxxSQnqjGi7aSrBNZX5EL/N9wMnFE3KQ11Mq9rZZi7TRxi1VogZpnfnbZn0dW+5eog03d18eKoQWaV2ryk4gXdZEggRcYRwzeHbA7ANKloVM/6M9c44JTYJHXpqVvOdVz/geR9Z5tupoeEVuIVp7MsrelV0YJe1VOYYT6NrtsX4E4nfYKQ17XqLRVDocFTeI48GuLfQlWQtq4RjcRb1D3bgllZ+2sB/8YczF3+maQ/E8LWyp77Yw8msEi1l/Yw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qZyHiit4p3IDqeFtLvP3SjkUsiHaYD5sdx271a5WCco=;
- b=XXfMafhWSBU4eUegj9/4G2OTNMGUiNRQLy+06JHUQ0Rfj4lii93X/Z+nogJq8N5D1iqD15isXFkeHlt6XFyViruK3P8arqg0/ZaZLWk7NQeY57n9UHhHYejUDuxDE2cDPW99gpGYrHupfEaUHd+pVxPBClv2CU0usM5QqUmtQtE=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by SJ0PR12MB7082.namprd12.prod.outlook.com (2603:10b6:a03:4ae::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.21; Tue, 21 Feb
- 2023 22:06:14 +0000
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::dc5d:6248:1c13:4a3]) by SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::dc5d:6248:1c13:4a3%7]) with mapi id 15.20.6111.019; Tue, 21 Feb 2023
- 22:06:13 +0000
-Message-ID: <40bf3fed-460e-b578-6795-08e564f412db@amd.com>
-Date:   Tue, 21 Feb 2023 16:06:06 -0600
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.1
-Subject: Re: [PATCH RFC v8 24/56] crypto: ccp: Handle the legacy TMR
- allocation when SNP is enabled
-Content-Language: en-US
-To:     Zhi Wang <zhi.wang.linux@gmail.com>
-Cc:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
-        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, nikunj.dadhania@amd.com,
-        Brijesh Singh <brijesh.singh@amd.com>
-References: <20230220183847.59159-1-michael.roth@amd.com>
- <20230220183847.59159-25-michael.roth@amd.com>
- <20230221112823.000063e4@gmail.com>
- <f70a2398-bd78-24aa-b0ae-9171465d50ff@amd.com>
- <20230221231514.00004b27@gmail.com>
-From:   "Kalra, Ashish" <ashish.kalra@amd.com>
-In-Reply-To: <20230221231514.00004b27@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH0P221CA0018.NAMP221.PROD.OUTLOOK.COM
- (2603:10b6:610:11c::19) To SN6PR12MB2767.namprd12.prod.outlook.com
- (2603:10b6:805:75::23)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|SJ0PR12MB7082:EE_
-X-MS-Office365-Filtering-Correlation-Id: 30c7769e-8caa-446d-69e8-08db1457d8db
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 7se0XbO54SgNdD0Zo+ENJz3yAsNeDlSW1nNCphuG6dHxlqlH1yR3Bib81gQE2YK1Hjy3a69UMU4mgV/0Ap8ZsARUG0gmWcW+56QgYhuQ6Y5s2IiPbZGKoiI9neQzpAiDe3LnqcxDlrO+V31PkVINjvqLKmE5/aiDFIVYWuzXIeJSKRImTgaRCUoMND1za0bntkORW/UWkEni3dioGDaiexRL4ZUhg7E4vkaosWac6rel9Asou2aRdETKsVJfvTQ/Mso/ZQ+nW00fIBwBJUHB8VRMK/POfsKF2iz9NtESC/62F0Him1eDmQiCYXNC6Gx0N9OS4nQRoT9KMnn8mBGf97QzGUK1LisgLHfmiVO5tFSn38+a5dTL+mDuRgwX/5jHbTx+fJovkvuzaxQxXH8/PWnccqVhwQ8Ps1zHT+qwCWEMUZIy0+9u73Pbci76YPdiVpB+JY6RMfGQFNt0I+rqX7sllRRjBvUt04whpuGS/fjZonYEOlPvyEEHqJMj04lNfOay2KtgqSnMPb75NYiVCvLUV7grz44fEY9CeFtqUegh/5bf4yU3YH6tr4VE9hRRAeQHlifw0PKdPkABp5wkaHXJMhlYQo0aueFtBAHoAXEa7q9HM7XGFRDtNbSw4o6XTn+alEAMOfDk7YYznYWn6LEuHnuMXLgATe8kMuQxqv8cL1YKXOTMfM9BhK2lBX0M6r3o8qr1xruW5jsq8kq8nx/NukHBGClX+Y0VGN9QIH4=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(396003)(39860400002)(366004)(346002)(136003)(376002)(451199018)(31686004)(83380400001)(54906003)(316002)(36756003)(38100700002)(66946007)(8676002)(66556008)(66476007)(2616005)(53546011)(41300700001)(186003)(6512007)(26005)(6666004)(6486002)(6506007)(478600001)(7416002)(5660300002)(7406005)(4326008)(31696002)(6916009)(2906002)(86362001)(8936002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RjNMZXk3QnR2Unp2VHR4TjR5eWkzUG1kaXBqYnFGaG8yNHRMZW9EbkEzSFdz?=
- =?utf-8?B?ME02UjdHYzVDbHJNN2JUSUxsZytaZDFXalpJcWVsT3VSS3JtbjU2c1BSVTBi?=
- =?utf-8?B?czZpODA1bTVuQWhINXhueWNsaWYzOHdCbW1SZlcrY0oxYnZPRkJWdkgxaVlZ?=
- =?utf-8?B?RnZBVlFlU2dCYUgxbzRnaXVkL09VUG9GWHcyZGNYbVlibnFvbUJWZjRxYVU3?=
- =?utf-8?B?Mm9jQ1d1cTRKZ3dIL1paQXA0cmdpV254N0NLRjZtQ2lVQmNrOTlFMUdXaFhn?=
- =?utf-8?B?UVBqMmVPU3BIT1lReXV0ZnJGWm41dndOdUhaemFsVzg5Wnc4NUdsRnkwZmNy?=
- =?utf-8?B?R3IxcnZFYjNHbzRWRG5VVjE2Q0dKbjdzY3cwT2RYVnNOOUxhWDJyUnplQXV5?=
- =?utf-8?B?aEswKzhPNjlzSnoxODN1b1I2MnFncHpmczhHTUFsZ2kyMG1jMXBJM21xdDhu?=
- =?utf-8?B?K3ZiU0NxWjdOa0xtL1Z1Uk5aT3ZjSDhYREtFa2Ywa1VHMk1aTFlmNTkvYXlD?=
- =?utf-8?B?eFdFdCtGYjRvUE11QXpmdE82U0VOS0FOa29FZVJZYTJFZXRuZjlZKy9tckpX?=
- =?utf-8?B?b2FOYWtGTkg1alVvRVNva3FFOUcyTTJobUZYRWpRNUZNaDdmd1YxVTVGeWMy?=
- =?utf-8?B?a1ZjNS9jdDc1TVNQaERvem4vdUZRYnQwZ0xiV0xhMkpyY2pjQW9xREFOU3py?=
- =?utf-8?B?RkdJWnV1QkdqVVVHNlk5YWN3ejNyZWxYR3pBWXloSDAyVXdBUWxmQWx5K2tn?=
- =?utf-8?B?R2xiaGZYY2Nod0luZUhtbWRpWW1iSTFNbWZrM2NpZDFwRXAycDNtdmFuREI1?=
- =?utf-8?B?cGd1U1h5dHQ5eDIwbHloVjF6NmNiNEJlcjFkSFJld3R1QW42K2ZxMHNaOC96?=
- =?utf-8?B?bTNyOWp5eWNEa09zbU9QNnN3aW80SUY2ZHQ0YThkS0lHMTllTSswZGJKR0hm?=
- =?utf-8?B?OXYwYmlFZ0FOMko2K2RCT3lNUkRDZnN1VkNSRWNCYXlibDJwTGliOTFpL0xi?=
- =?utf-8?B?SFI3MjhYc3V3Z1ZvN3dWcDdYRVMzVmxqYXBvZU9aQTJGT3ZJZXQ2cGRCZ0lP?=
- =?utf-8?B?b3BzdzJSNytMbVNnMDdkc3R1NjAzRXpJNUZkNDE0eGYvNGh6cnZnV0pSakFa?=
- =?utf-8?B?dEF5RThpVzdmU2FGREVsOU1jWVNBSVNIVUphaG1DMk1QVVZIbzk4WURMZ2Fq?=
- =?utf-8?B?OWoyZTJQVXVWL0ZNbDJ1Q3JzYUZUaHpXUGRJd21PUEI0YkI5MVRHN0xMWHQ1?=
- =?utf-8?B?L09jeW01MThQMDg4OWtrRm1WN1JidjJNcFh4WXBoVEtRVW1VMGYzWVhUMEYx?=
- =?utf-8?B?LzVFN0c3UlNoeUtvUkVXbmMxMmpWdkI5RXpXa0d4RExlSnVFT1ZrZTFxeHFn?=
- =?utf-8?B?U3RkbVB2c01OYXM3ZlgwYW5mM1pVNGdwM0FieERuZWlSeXRjTldyTUp5b3Fh?=
- =?utf-8?B?ZUw2WTBpSW51Ynp4U2JWdVBSYjVBY1Flb2k5WEYrYW1kSVNHUUpYY1dLRFZG?=
- =?utf-8?B?cm4wOVQ2bmJNTkNVbzBFR2VuK2EvbVBFK01la2FjeHBTVU42eFMzdXFjTUVm?=
- =?utf-8?B?bDhDVVlvRW1ZeW1ycVhEdmYyK01Gd2JTbEZTWEY5Z25ZaU43cEtPaE1mZ3Jz?=
- =?utf-8?B?YWIxcSsyVVhLSzdNOWVpMWRVVko2TEJPbjJPNEMyb3dPeUNiMlVUbERMUC9K?=
- =?utf-8?B?cFVyVktLSm5DSGpkWFVYZ0VnajlYMzVTZENTKzcrNGlYOHVreUxsNjRyanRq?=
- =?utf-8?B?SWRUcEJlQW5ROW9ZWWNXcFVFTmtnNXF4QnBTaVRNY3BORGJ6eG9ZdmQ3VTZj?=
- =?utf-8?B?aDhIcERNRU1BeEYwdkxIbSsyUEpXVmtmZmhaRElqM1IvZnFpc1p3V081YUJT?=
- =?utf-8?B?OU9YZG9qRVl4VmdWQjJTQTBpaUo4eE1OTzJOQm1uWGlSMlltL3BHYk53ZmRF?=
- =?utf-8?B?SnBqUit4U2I5d2wzdVgrNENZa2FVVTY5UE5aMkx1VzIyUk9YLzdxYklZKzVE?=
- =?utf-8?B?eHdGcExwYU5NTHhHd3BBU00waTFLYWVqV2Nlci9QZDVuSEliWVEwTG9Nc1hi?=
- =?utf-8?B?aHJpNUJTTXRXeHIzbjZLU29NaUROV2IwUk9XR1JXZDFjY2xPVWY5MzNyZ2dK?=
- =?utf-8?Q?Quete3FZ2SzNrBPim16DuRJcx?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 30c7769e-8caa-446d-69e8-08db1457d8db
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Feb 2023 22:06:13.8212
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: svIQz+e22JmVKzEp6aVwbQklLvq5Q1883OOz2OjwC4fQRfqz5l07O6xVoj4ynVIL2qf5yFluLVAfe7QdcGvJcg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB7082
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+        with ESMTP id S229818AbjBUWR7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Feb 2023 17:17:59 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66DCB86A9
+        for <kvm@vger.kernel.org>; Tue, 21 Feb 2023 14:17:58 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id DB850611E3
+        for <kvm@vger.kernel.org>; Tue, 21 Feb 2023 22:17:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5370FC433D2;
+        Tue, 21 Feb 2023 22:17:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1677017877;
+        bh=7NgmTSoX6xFkJQjEiuCD2VFCagZVsbvuwdkjicAmDTg=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=cpxz3ikQozuEH9OqfOioetwbh5VQrJZXzjR2jjYEUgyQiINbhXX7OFi7l0W0Qv18T
+         tCA9PAjHmCS7eDvPBhR/Uc3OKiVEtLOOwIwkUAIlmpFD3hsEUZkZVNVy+RnhRlZHjC
+         UXk5PZmL2XQwCs5awMjufUke4p6cb/NiiAnsLegV1aLjhqJdcQlqcrU/f4hT616XIY
+         a0y/VIRpg4Fx/AmqmRspyls1+A6dCiNwTcP5hc2EdL1SWXutuPoN1o+kSB+pWbdUuF
+         IHA1+fQk8VtojpoVRmdTLWPN3CFIJvCqjU94UXH1G2+cMklGCIM2D1mvSH0B907K/H
+         1qpVJW/y4dS2A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pUaxP-00CByA-1D;
+        Tue, 21 Feb 2023 22:17:55 +0000
+Date:   Tue, 21 Feb 2023 22:17:54 +0000
+Message-ID: <87lekqzmr1.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     "Veith, Simon" <sveith@amazon.de>
+Cc:     "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+        "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+        "james.morse@arm.com" <james.morse@arm.com>,
+        "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+        "ricarkol@google.com" <ricarkol@google.com>
+Subject: Re: [PATCH 00/16] KVM: arm64: Rework timer offsetting for fun and profit
+In-Reply-To: <5404a3554c3a1efd1e8e098072a4cf03d1b01152.camel@amazon.de>
+References: <20230216142123.2638675-1-maz@kernel.org>
+        <5404a3554c3a1efd1e8e098072a4cf03d1b01152.camel@amazon.de>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sveith@amazon.de, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, dwmw2@infradead.org, yuzenghui@huawei.com, suzuki.poulose@arm.com, james.morse@arm.com, oliver.upton@linux.dev, ricarkol@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/21/2023 3:15 PM, Zhi Wang wrote:
-> On Tue, 21 Feb 2023 09:31:01 -0600
-> "Kalra, Ashish" <ashish.kalra@amd.com> wrote:
-> 
->>>> +static int snp_reclaim_pages(unsigned long paddr, unsigned int npages, bool locked)
->>>> +{
->>>> +	/* Cbit maybe set in the paddr */
->>>
->>> This is confusing.
->>>
->>> I suppose C-bit is treated as a attribute of PTE in the kernel not part of the
->>> PA. It means only a PTE might carry a C-bit.
->>>
->>
->> snp_reclaim_pages() is also called for reclaiming guest memory, in which
->> case the (guest) paddr will have the C-bit set. Hence this C-bit
->> handling is done within snp_reclaim_pages() so that the callers don't
->> need to handle it explicitly.
-> 
-> Thanks for the explanation.
-> 
-> Do you mean it will be used like that in the later patch? Sorry if it is in the
-> later patch as I was making progress slowly. It is quite a big patch set.
->
+Hi Simon,
 
-Yes, these are callers in later patches, like the following code path in 
-patch 25:
+On Tue, 21 Feb 2023 16:28:36 +0000,
+"Veith, Simon" <sveith@amazon.de> wrote:
+>=20
+> Hello Marc,
+>=20
+> On Thu, 2023-02-16 at 14:21 +0000, Marc Zyngier wrote:
+> > This series aims at satisfying multiple goals:
+> >=20
+> > - allow a VMM to atomically restore a timer offset for a whole VM
+> > =C2=A0 instead of updating the offset each time a vcpu get its counter
+> > =C2=A0 written
+> >=20
+> > - allow a VMM to save/restore the physical timer context, something
+> > =C2=A0 that we cannot do at the moment due to the lack of offsetting
+> >=20
+> > - provide a framework that is suitable for NV support, where we get
+> > =C2=A0 both global and per timer, per vcpu offsetting
+>=20
+> Thank you so much for following up on my (admittedly very basic) patch
+> with your own proposal!
 
-static int unmap_firmware_writeable(u64 *paddr, u32 len, bool guest, 
-struct snp_host_map *map)
-{
-         unsigned int npages = PAGE_ALIGN(len) >> PAGE_SHIFT;
-	...
-         /* If paddr points to a guest memory then restore the page 
-state to hypervisor. */
-         if (guest) {
-                 if (snp_reclaim_pages(*paddr, npages, true))
-                         return -EFAULT;
+No worries. There is nothing like "nerd sniping"... ;-)
 
-                 goto done;
-         }
+> > This has been moderately tested with nVHE, VHE and NV. I do not have
+> > access to CNTPOFF-aware HW, so the jury is still out on that one
+>=20
+> Same here about CNTPOFF -- I gave it a quick spin on Graviton2 and
+> Graviton3, and neither chip claims the ARM64_HAS_ECV_CNTPOFF capability
+> from your patch.
 
-       	...
-	...
+Nah, G2/G3 are old stuff (v8.2 and v8.3+ respectively). You need at
+least a v8.6 system, something that is made of the best Unobtainium
+money can buy. M2 has ECV, but without CNTPOFF, which is just silly.
 
-Or, the following as part of patch 52:
+> I am working on testing your series with our userspace and will report
+> back.
 
-int snp_guest_dbg_decrypt_page(u64 gctx_pfn, u64 src_pfn, u64 dst_pfn, 
-int *error)
-{
-	...
-         data.gctx_paddr = sme_me_mask | (gctx_pfn << PAGE_SHIFT);
-         data.src_addr = sme_me_mask | (src_pfn << PAGE_SHIFT);
-         data.dst_addr = sme_me_mask | (dst_pfn << PAGE_SHIFT);
-
-         /* The destination page must be in the firmware state. */
-         if (rmp_mark_pages_firmware(data.dst_addr, 1, false))
-                 return -EIO;
-
-         ret = sev_do_cmd(SEV_CMD_SNP_DBG_DECRYPT, &data, error);
-
-         /* Restore the page state */
-         if (snp_reclaim_pages(data.dst_addr, 1, false))
-	...
-	...
+Thanks a lot, that'd be super helpful. Please don't get too attached
+to the userspace interface though, as it is likely to change (Oliver
+has an interesting suggestion to simplify it, but I need to convince
+myself that it doesn't break migration of the physical timer).
 
 Thanks,
-Ashish
 
-> At least, I don't see that kind of usage in the current patch. Feel free to
-> correct me if I am wrong.
-> 
-> The call chains:
-> 
-> __snp_free_firmware_page()
->      snp_reclaim_pages();
-> 
-> As __snp_free_firmware_page() takes struct page*, all the follwing coversion
-> from it would not carry C-bit.
-> 
-> __snp_alloc_firmware_pages()
->    rmp_mark_pages_firmware()
->      snp_reclaim_pages()
-> 
-> As __snp_alloc_firmware_page() allocates page with struct page*, the same
-> conclusion as above.
-> 
->>
->>
->>> The paddr is from __pa(page_address()). It is not extracted from a PTE. Thus, the
->>> return from them should never have a C-bit.
->>>
->>> BTW: Wouldn't it be better to have pfn as input param instead of paddr?
->>>
->>> The caller has struct page, calling snp_reclaim_pages(page_to_pfn(page), xxxxx)
->>> would be much clearer than the current conversion:
->>> page_address() (struct page is converted to VA), __pa() (VA is converted to PA)
->>> in the caller and then PA is converted to pfn here.
->>>
->>>> +	unsigned long pfn = __sme_clr(paddr) >> PAGE_SHIFT;
->>>> +	int ret, err, i, n = 0;
->>>> +
->>>
->>> should be unsigned int i, n; as the input param npage is unsigned int.
->>>
->>>> +	if (!pfn_valid(pfn)) {
->>>> +		pr_err("%s: Invalid PFN %lx\n", __func__, pfn);
->>>> +		return 0;
->>>> +	}
->>>> +
->>>> +	for (i = 0; i < npages; i++, pfn++, n++) {
->>>> +		paddr = pfn << PAGE_SHIFT;
->>>> +
->>>> +		if (locked)
->>>> +			ret = __sev_do_cmd_locked(SEV_CMD_SNP_PAGE_RECLAIM, &paddr, &err);
->>>> +		else
->>>> +			ret = sev_do_cmd(SEV_CMD_SNP_PAGE_RECLAIM, &paddr, &err);
->>>> +
->>>> +		if (ret)
->>>> +			goto cleanup;
->>>> +
->>>> +		ret = rmp_make_shared(pfn, PG_LEVEL_4K);
->>>> +		if (ret)
->>>> +			goto cleanup;
->>>> +	}
->>>> +
->>>> +	return 0;
->>>> +
->>>> +cleanup:
->>>> +	/*
->>>> +	 * If failed to reclaim the page then page is no longer safe to
->>>> +	 * be release back to the system, leak it.
->>>> +	 */
->>>> +	snp_mark_pages_offline(pfn, npages - n);
->>>> +	return ret;
->>>> +}
->>>> +
->>>> +static int rmp_mark_pages_firmware(unsigned long paddr, unsigned int npages, bool locked)
->>>
->>> The same comment as above. Better take pfn or page instead of paddr with
->>> redundant conversions.
->>>
->>
->> Again, the paddr can point to guest memory so it can have C-bit set.
->>
->> Thanks,
->> Ashish
->>
->>>> +{
->>>> +	/* Cbit maybe set in the paddr */
->>>> +	unsigned long pfn = __sme_clr(paddr) >> PAGE_SHIFT;
->>>> +	int rc, n = 0, i;
->>>> +
->>>> +	for (i = 0; i < npages; i++, n++, pfn++) {
->>>> +		rc = rmp_make_private(pfn, 0, PG_LEVEL_4K, 0, true);
->>>> +		if (rc)
->>>> +			goto cleanup;
->>>> +	}
->>>> +
->>>> +	return 0;
->>>> +
->>>> +cleanup:
->>>> +	/*
->>>> +	 * Try unrolling the firmware state changes by
->>>> +	 * reclaiming the pages which were already changed to the
->>>> +	 * firmware state.
->>>> +	 */
->>>> +	snp_reclaim_pages(paddr, n, locked);
->>>> +
->>>> +	return rc;
->>>> +}
->>>> +
-> 
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
