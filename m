@@ -2,384 +2,247 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0506D69DCED
-	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 10:28:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CE7269DD03
+	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 10:38:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233331AbjBUJ2b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Feb 2023 04:28:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41322 "EHLO
+        id S232790AbjBUJiF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Feb 2023 04:38:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233215AbjBUJ23 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Feb 2023 04:28:29 -0500
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8CE8B443;
-        Tue, 21 Feb 2023 01:28:27 -0800 (PST)
-Received: by mail-lj1-x236.google.com with SMTP id y44so3760293ljq.7;
-        Tue, 21 Feb 2023 01:28:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7cMvEWx93T+DKuH/EfNzVMzxjU3ZfkiKTGej0rtS7XU=;
-        b=h/MKpwswKXFMPyFd7oBDdGwT1y9EKS9WAjFXU+U9BdYQN554vMrvq7yaIJ2bISdl5q
-         68rK/XqSK0ZTzubookOAKlQiRkh/Qb+Y8NhBvjuVdNePw8caYBX8chcYUBHO+Txivp94
-         styxcRkySeYlHXAer1Fcb1AVJGRFD8XAwBVbdMhmVttT+M1PksmkX6OnEr+7/MJxcciD
-         sdGiFEPtgOoRpI9UQnVRKTdt7WL8TCV/H0zeJTdw3HvdESLUNxvHPOInJrwl6qHi9tcH
-         Ks92c0JaxDH8N94zNzsfA/+AuA3X+OhIFaa51UecB9hENAWk21HAG3e29iK6ok7jWNio
-         Fi+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7cMvEWx93T+DKuH/EfNzVMzxjU3ZfkiKTGej0rtS7XU=;
-        b=7xW7yq8zHv0lAC78SI0VDzfbXrZNO+AaJi4vhiewGaTRwasK9fVmj9pKkFgUH1e5Ka
-         ONWEZM5I6aQmzAMj3af1mCOYZhZGQ6vQCTDRH4fFAAvvmOOn3jauomDsNFU0Gq3ijfbL
-         izIhmeDFGtim28Q0QIoXf25uWlUpqIz0hqQPEGpa716coCCTCyEkHzj7IAhXJyHoCfer
-         ZMNs0toS7lNoIYb0ogR0BFD0wxbpuds89d0BZJcldxGyMRKFZUymBl4nWQbBHbpZTDJD
-         ReraNKJhM1vRtmsSXsYU/LYCS5zWPow6DA0mwfY60/jQJUawKPMexKbbuJPTHHlbDrmT
-         MDGg==
-X-Gm-Message-State: AO0yUKVfLVTVluJ/9WXIH01Nn4TbS8bPLkRLgWlzgUSDgPSj2DVetw5o
-        jI9gv0A4hNDsnLokq0g30ZA=
-X-Google-Smtp-Source: AK7set84dqJj7wcs9uzj2n8kT//QPqBDPmWF+AwkpmwrrrE3ZAh41j4XgidURaSXeFVF8sErCcmqqw==
-X-Received: by 2002:a05:651c:897:b0:295:90b2:da6b with SMTP id d23-20020a05651c089700b0029590b2da6bmr206314ljq.0.1676971705705;
-        Tue, 21 Feb 2023 01:28:25 -0800 (PST)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id o16-20020a2e9b50000000b002958bb2deacsm123022ljj.46.2023.02.21.01.28.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Feb 2023 01:28:25 -0800 (PST)
-Date:   Tue, 21 Feb 2023 11:28:23 +0200
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
-        <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
-        <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
-        <thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
-        <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
-        <jmattson@google.com>, <luto@kernel.org>,
-        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
-        <pgonda@google.com>, <peterz@infradead.org>,
-        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
-        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
-        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH RFC v8 24/56] crypto: ccp: Handle the legacy TMR
- allocation when SNP is enabled
-Message-ID: <20230221112823.000063e4@gmail.com>
-In-Reply-To: <20230220183847.59159-25-michael.roth@amd.com>
-References: <20230220183847.59159-1-michael.roth@amd.com>
-        <20230220183847.59159-25-michael.roth@amd.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        with ESMTP id S233557AbjBUJiD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Feb 2023 04:38:03 -0500
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 196ABB2
+        for <kvm@vger.kernel.org>; Tue, 21 Feb 2023 01:38:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1676972281; x=1708508281;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=S5nv0v9G/k4ilpQdx/DhnLESITrRRa+u3xWUBZfHO/E=;
+  b=W39jAywUbi2sVeKzCDHMiiNqqb/9LHO5uf15ba8OOnHUkdQ9FKE1OC1D
+   8RLBrbREtGJP/tSJpLLUmPtlAM6L4SF+bM2lQWtkZ+ctl363JN4bFxO4b
+   NurX5nv+YLdYl/jnzTSM91bd8U9B36+K6CY3DCDSGbwNT4L7A3oVp7qVZ
+   5DkZEit1JeqLPaB+iS9Alp8v1YE7LQ3W9Ba+8g7/ILjnKflj8N+4WoI9Q
+   /EqhqjLFveCNbmQuGpFkQ4HkTUGhx5lWPJMqUBasRUeSKnmj5nwE9U+CY
+   gvOmGhYOXyYh30kI9HHjKtAt7z1kYccMyuaWwf3kMqf/GpNohYFLEyTvC
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10627"; a="397275143"
+X-IronPort-AV: E=Sophos;i="5.97,315,1669104000"; 
+   d="scan'208";a="397275143"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2023 01:37:35 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10627"; a="814442293"
+X-IronPort-AV: E=Sophos;i="5.97,315,1669104000"; 
+   d="scan'208";a="814442293"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.254.214.78]) ([10.254.214.78])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2023 01:37:33 -0800
+Message-ID: <bc8d47d8-2474-7b5d-8a01-958cd4ac626a@intel.com>
+Date:   Tue, 21 Feb 2023 17:37:28 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.8.0
+Subject: Re: [PATCH v3 6/8] target/i386/intel-pt: Enable host pass through of
+ Intel PT
+Content-Language: en-US
+To:     "Wang, Lei" <lei4.wang@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <20221208062513.2589476-1-xiaoyao.li@intel.com>
+ <20221208062513.2589476-7-xiaoyao.li@intel.com>
+ <219476ab-c8e6-95a8-ee0b-348421362ced@intel.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <219476ab-c8e6-95a8-ee0b-348421362ced@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 20 Feb 2023 12:38:15 -0600
-Michael Roth <michael.roth@amd.com> wrote:
-
-> From: Brijesh Singh <brijesh.singh@amd.com>
+On 2/21/2023 1:14 PM, Wang, Lei wrote:
 > 
-> The behavior and requirement for the SEV-legacy command is altered when
-> the SNP firmware is in the INIT state. See SEV-SNP firmware specification
-> for more details.
+> On 12/8/2022 2:25 PM, Xiaoyao Li wrote:
+>> commit e37a5c7fa459 ("i386: Add Intel Processor Trace feature support")
+>> added the support of Intel PT by making CPUID[14] of PT as fixed feature
+>> set (from ICX) for any CPU model on any host. This truly breaks the PT
+>> exposure on Intel SPR platform because SPR has less supported bitmap of
+>> CPUID(0x14,1):EBX[15:0] than ICX.
+>>
+>> To fix the problem, enable pass through of host's PT capabilities for
+>> the cases "-cpu host/max" that it won't use default fixed PT feature set
+>> of ICX but expand automatically based on get_supported_cpuid reported by
+>> host. Meanwhile, it needs to ensure named CPU model still has the fixed
+>> PT feature set to not break the live migration case of
+>> "-cpu named_cpu_model,+intel-pt"
+>>
+>> Introduces env->use_default_intel_pt flag.
+>>   - True means it's old CPU model that uses fixed PT feature set of ICX.
+>>   - False means the named CPU model has its own PT feature set.
+>>
+>> Besides, to keep the same behavior for old CPU models that validate PT
+>> feature set against default fixed PT feature set of ICX in addition to
+>> validate from host's capabilities (via get_supported_cpuid) in
+>> x86_cpu_filter_features().
+>>
+>> In the future, new named CPU model, e.g., Sapphire Rapids, can define
+>> its own PT feature set by setting @has_specific_intel_pt_feature_set to
+>> true and defines it's own FEAT_14_0_EBX, FEAT_14_0_ECX, FEAT_14_1_EAX
+>> and FEAT_14_1_EBX.
+>>
+>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>> ---
+>>   target/i386/cpu.c | 71 ++++++++++++++++++++++++++---------------------
+>>   target/i386/cpu.h |  1 +
+>>   2 files changed, 40 insertions(+), 32 deletions(-)
+>>
+>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+>> index e302cbbebfc5..24f3c7b06698 100644
+>> --- a/target/i386/cpu.c
+>> +++ b/target/i386/cpu.c
+>> @@ -5194,6 +5194,21 @@ static void x86_cpu_load_model(X86CPU *cpu, X86CPUModel *model)
+>>           env->features[w] = def->features[w];
+>>       }
+>>   
+>> +    /*
+>> +     * All (old) named CPU models have the same default values for INTEL_PT_*
+>> +     *
+>> +     * Assign the default value here since we don't want to manually copy/paste
+>> +     * it to all entries in builtin_x86_defs.
+>> +     */
+>> +    if (!env->features[FEAT_14_0_EBX] && !env->features[FEAT_14_0_ECX] &&
+>> +        !env->features[FEAT_14_1_EAX] && !env->features[FEAT_14_1_EBX]) {
+>> +        env->use_default_intel_pt = true;
+>> +        env->features[FEAT_14_0_EBX] = INTEL_PT_DEFAULT_0_EBX;
+>> +        env->features[FEAT_14_0_ECX] = INTEL_PT_DEFAULT_0_ECX;
+>> +        env->features[FEAT_14_1_EAX] = INTEL_PT_DEFAULT_1_EAX;
+>> +        env->features[FEAT_14_1_EBX] = INTEL_PT_DEFAULT_1_EBX;
+>> +    }
+>> +
+>>       /* legacy-cache defaults to 'off' if CPU model provides cache info */
+>>       cpu->legacy_cache = !def->cache_info;
+>>   
+>> @@ -5716,14 +5731,11 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>>   
+>>           if (count == 0) {
+>>               *eax = INTEL_PT_MAX_SUBLEAF;
+>> -            *ebx = INTEL_PT_DEFAULT_0_EBX;
+>> -            *ecx = INTEL_PT_DEFAULT_0_ECX;
+>> -            if (env->features[FEAT_14_0_ECX] & CPUID_14_0_ECX_LIP) {
+>> -                *ecx |= CPUID_14_0_ECX_LIP;
+>> -            }
+>> +            *ebx = env->features[FEAT_14_0_EBX];
+>> +            *ecx = env->features[FEAT_14_0_ECX];
+>>           } else if (count == 1) {
+>> -            *eax = INTEL_PT_DEFAULT_1_EAX;
+>> -            *ebx = INTEL_PT_DEFAULT_1_EBX;
+>> +            *eax = env->features[FEAT_14_1_EAX];
+>> +            *ebx = env->features[FEAT_14_1_EBX];
+>>           }
+>>           break;
+>>       }
+>> @@ -6425,6 +6437,7 @@ static void x86_cpu_filter_features(X86CPU *cpu, bool verbose)
+>>       CPUX86State *env = &cpu->env;
+>>       FeatureWord w;
+>>       const char *prefix = NULL;
+>> +    uint64_t host_feat;
+>>   
+>>       if (verbose) {
+>>           prefix = accel_uses_host_cpuid()
+>> @@ -6433,8 +6446,7 @@ static void x86_cpu_filter_features(X86CPU *cpu, bool verbose)
+>>       }
+>>   
+>>       for (w = 0; w < FEATURE_WORDS; w++) {
+>> -        uint64_t host_feat =
+>> -            x86_cpu_get_supported_feature_word(w, false);
+>> +        host_feat = x86_cpu_get_supported_feature_word(w, false);
+>>           uint64_t requested_features = env->features[w];
+>>           uint64_t unavailable_features;
+>>   
+>> @@ -6458,31 +6470,26 @@ static void x86_cpu_filter_features(X86CPU *cpu, bool verbose)
+>>           mark_unavailable_features(cpu, w, unavailable_features, prefix);
+>>       }
+>>   
+>> -    if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) &&
+>> -        kvm_enabled()) {
+>> -        KVMState *s = CPU(cpu)->kvm_state;
+>> -        uint32_t eax_0 = kvm_arch_get_supported_cpuid(s, 0x14, 0, R_EAX);
+>> -        uint32_t ebx_0 = kvm_arch_get_supported_cpuid(s, 0x14, 0, R_EBX);
+>> -        uint32_t ecx_0 = kvm_arch_get_supported_cpuid(s, 0x14, 0, R_ECX);
+>> -        uint32_t eax_1 = kvm_arch_get_supported_cpuid(s, 0x14, 1, R_EAX);
+>> -        uint32_t ebx_1 = kvm_arch_get_supported_cpuid(s, 0x14, 1, R_EBX);
+>> -
+>> -        if (!eax_0 ||
+>> -           ((ebx_0 & INTEL_PT_DEFAULT_0_EBX) != INTEL_PT_DEFAULT_0_EBX) ||
+>> -           ((ecx_0 & INTEL_PT_DEFAULT_0_ECX) != INTEL_PT_DEFAULT_0_ECX) ||
+>> -           ((eax_1 & INTEL_PT_DEFAULT_MTC_BITMAP) != INTEL_PT_DEFAULT_MTC_BITMAP) ||
+>> -           ((eax_1 & INTEL_PT_ADDR_RANGES_NUM_MASK) <
+>> -                                      INTEL_PT_DEFAULT_ADDR_RANGES_NUM) ||
+>> -           ((ebx_1 & INTEL_PT_DEFAULT_1_EBX) != INTEL_PT_DEFAULT_1_EBX) ||
+>> -           ((ecx_0 & CPUID_14_0_ECX_LIP) !=
+>> -                (env->features[FEAT_14_0_ECX] & CPUID_14_0_ECX_LIP))) {
+>> -            /*
+>> -             * Processor Trace capabilities aren't configurable, so if the
+>> -             * host can't emulate the capabilities we report on
+>> -             * cpu_x86_cpuid(), intel-pt can't be enabled on the current host.
+>> -             */
+>> +    if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) {
+>> +        /*
+>> +         * env->use_default_intel_pt is true means the CPU model doesn't have
+>> +         * INTEL_PT_* specified. In this case, we need to check it has the
+>> +         * value of default INTEL_PT to not break live migration
+>> +         */
+>> +        if (env->use_default_intel_pt &&
+>> +            ((env->features[FEAT_14_0_EBX] != INTEL_PT_DEFAULT_0_EBX) ||
 > 
-> Allocate the Trusted Memory Region (TMR) as a 2mb sized/aligned region
-> when SNP is enabled to satisfy new requirements for the SNP. Continue
-> allocating a 1mb region for !SNP configuration.
-> 
-> While at it, provide API that can be used by others to allocate a page
-> that can be used by the firmware. The immediate user for this API will
-> be the KVM driver. The KVM driver to need to allocate a firmware context
-> page during the guest creation. The context page need to be updated
-> by the firmware. See the SEV-SNP specification for further details.
-> 
-> Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->  drivers/crypto/ccp/sev-dev.c | 148 +++++++++++++++++++++++++++++++++--
->  include/linux/psp-sev.h      |   9 +++
->  2 files changed, 149 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index eca4e59b0f44..4c12e98a1219 100644
-> --- a/drivers/crypto/ccp/sev-dev.c
-> +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -94,6 +94,13 @@ static void *sev_init_ex_buffer;
->   */
->  struct sev_data_range_list *snp_range_list;
->  
-> +/* When SEV-SNP is enabled the TMR needs to be 2MB aligned and 2MB size. */
-> +#define SEV_SNP_ES_TMR_SIZE	(2 * 1024 * 1024)
+> When will the env->use_default_intel_pt be true and env->features[FEAT_14_0_EBX]
+> != INTEL_PT_DEFAULT_0_EBX? It seems they will always be equal if
+> env->use_default_intel_pt is true according to your code above.
 
-It would be better to re-use the kernel size definition macros. E.g. SZ_2MB.
+When +/-feature are used to configure them.
 
-> +
-> +static size_t sev_es_tmr_size = SEV_ES_TMR_SIZE;
-> +
-> +static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret);
-> +
->  static inline bool sev_version_greater_or_equal(u8 maj, u8 min)
->  {
->  	struct sev_device *sev = psp_master->sev_data;
-> @@ -216,11 +223,134 @@ void snp_mark_pages_offline(unsigned long pfn, unsigned int npages)
->  }
->  EXPORT_SYMBOL_GPL(snp_mark_pages_offline);
->  
-> +static int snp_reclaim_pages(unsigned long paddr, unsigned int npages, bool locked)
-> +{
-> +	/* Cbit maybe set in the paddr */
+However, after thinking I realize this can be dropped. The original 
+purpose of this handling is to validate what KVM reports satisfying what 
+QEMU configures. Now the validation is performed in
+x86_cpu_filter_features()
 
-This is confusing.
+The purpose for not breaking live migration, targets specifically for 
+the case where migrating from the old QEMU (without this patch) to new 
+QEMU. However, old qemu has no ability to +/- feature bit of leaf 0x14. 
+Thus no need to keep this code. I will remove them in next version.
 
-I suppose C-bit is treated as a attribute of PTE in the kernel not part of the
-PA. It means only a PTE might carry a C-bit. 
 
-The paddr is from __pa(page_address()). It is not extracted from a PTE. Thus, the
-return from them should never have a C-bit.
-
-BTW: Wouldn't it be better to have pfn as input param instead of paddr?
-
-The caller has struct page, calling snp_reclaim_pages(page_to_pfn(page), xxxxx)
-would be much clearer than the current conversion:
-page_address() (struct page is converted to VA), __pa() (VA is converted to PA)
-in the caller and then PA is converted to pfn here.
-
-> +	unsigned long pfn = __sme_clr(paddr) >> PAGE_SHIFT;
-> +	int ret, err, i, n = 0;
-> +
-
-should be unsigned int i, n; as the input param npage is unsigned int.
-
-> +	if (!pfn_valid(pfn)) {
-> +		pr_err("%s: Invalid PFN %lx\n", __func__, pfn);
-> +		return 0;
-> +	}
-> +
-> +	for (i = 0; i < npages; i++, pfn++, n++) {
-> +		paddr = pfn << PAGE_SHIFT;
-> +
-> +		if (locked)
-> +			ret = __sev_do_cmd_locked(SEV_CMD_SNP_PAGE_RECLAIM, &paddr, &err);
-> +		else
-> +			ret = sev_do_cmd(SEV_CMD_SNP_PAGE_RECLAIM, &paddr, &err);
-> +
-> +		if (ret)
-> +			goto cleanup;
-> +
-> +		ret = rmp_make_shared(pfn, PG_LEVEL_4K);
-> +		if (ret)
-> +			goto cleanup;
-> +	}
-> +
-> +	return 0;
-> +
-> +cleanup:
-> +	/*
-> +	 * If failed to reclaim the page then page is no longer safe to
-> +	 * be release back to the system, leak it.
-> +	 */
-> +	snp_mark_pages_offline(pfn, npages - n);
-> +	return ret;
-> +}
-> +
-> +static int rmp_mark_pages_firmware(unsigned long paddr, unsigned int npages, bool locked)
-
-The same comment as above. Better take pfn or page instead of paddr with
-redundant conversions.
-
-> +{
-> +	/* Cbit maybe set in the paddr */
-> +	unsigned long pfn = __sme_clr(paddr) >> PAGE_SHIFT;
-> +	int rc, n = 0, i;
-> +
-> +	for (i = 0; i < npages; i++, n++, pfn++) {
-> +		rc = rmp_make_private(pfn, 0, PG_LEVEL_4K, 0, true);
-> +		if (rc)
-> +			goto cleanup;
-> +	}
-> +
-> +	return 0;
-> +
-> +cleanup:
-> +	/*
-> +	 * Try unrolling the firmware state changes by
-> +	 * reclaiming the pages which were already changed to the
-> +	 * firmware state.
-> +	 */
-> +	snp_reclaim_pages(paddr, n, locked);
-> +
-> +	return rc;
-> +}
-> +
-> +static struct page *__snp_alloc_firmware_pages(gfp_t gfp_mask, int order, bool locked)
-> +{
-> +	unsigned long npages = 1ul << order, paddr;
-> +	struct sev_device *sev;
-> +	struct page *page;
-> +
-> +	if (!psp_master || !psp_master->sev_data)
-> +		return NULL;
-> +
-> +	page = alloc_pages(gfp_mask, order);
-> +	if (!page)
-> +		return NULL;
-> +
-> +	/* If SEV-SNP is initialized then add the page in RMP table. */
-> +	sev = psp_master->sev_data;
-> +	if (!sev->snp_initialized)
-> +		return page;
-> +
-> +	paddr = __pa((unsigned long)page_address(page));
-> +	if (rmp_mark_pages_firmware(paddr, npages, locked))
-> +		return NULL;
-> +
-> +	return page;
-> +}
-> +
-> +void *snp_alloc_firmware_page(gfp_t gfp_mask)
-> +{
-> +	struct page *page;
-> +
-> +	page = __snp_alloc_firmware_pages(gfp_mask, 0, false);
-> +
-> +	return page ? page_address(page) : NULL;
-> +}
-> +EXPORT_SYMBOL_GPL(snp_alloc_firmware_page);
-> +
-> +static void __snp_free_firmware_pages(struct page *page, int order, bool locked)
-> +{
-> +	struct sev_device *sev = psp_master->sev_data;
-> +	unsigned long paddr, npages = 1ul << order;
-> +
-> +	if (!page)
-> +		return;
-> +
-> +	paddr = __pa((unsigned long)page_address(page));
-> +	if (sev->snp_initialized &&
-> +	    snp_reclaim_pages(paddr, npages, locked))
-> +		return;
-> +
-> +	__free_pages(page, order);
-> +}
-> +
-> +void snp_free_firmware_page(void *addr)
-> +{
-> +	if (!addr)
-> +		return;
-> +
-> +	__snp_free_firmware_pages(virt_to_page(addr), 0, false);
-> +}
-> +EXPORT_SYMBOL_GPL(snp_free_firmware_page);
-> +
->  static void *sev_fw_alloc(unsigned long len)
->  {
->  	struct page *page;
->  
-> -	page = alloc_pages(GFP_KERNEL, get_order(len));
-> +	page = __snp_alloc_firmware_pages(GFP_KERNEL, get_order(len), false);
->  	if (!page)
->  		return NULL;
->  
-> @@ -468,7 +598,7 @@ static int __sev_init_locked(int *error)
->  		data.tmr_address = __pa(sev_es_tmr);
->  
->  		data.flags |= SEV_INIT_FLAGS_SEV_ES;
-> -		data.tmr_len = SEV_ES_TMR_SIZE;
-> +		data.tmr_len = sev_es_tmr_size;
->  	}
->  
->  	return __sev_do_cmd_locked(SEV_CMD_INIT, &data, error);
-> @@ -491,7 +621,7 @@ static int __sev_init_ex_locked(int *error)
->  		data.tmr_address = __pa(sev_es_tmr);
->  
->  		data.flags |= SEV_INIT_FLAGS_SEV_ES;
-> -		data.tmr_len = SEV_ES_TMR_SIZE;
-> +		data.tmr_len = sev_es_tmr_size;
->  	}
->  
->  	return __sev_do_cmd_locked(SEV_CMD_INIT_EX, &data, error);
-> @@ -982,6 +1112,8 @@ static int __sev_snp_init_locked(int *error)
->  	sev->snp_initialized = true;
->  	dev_dbg(sev->dev, "SEV-SNP firmware initialized\n");
->  
-> +	sev_es_tmr_size = SEV_SNP_ES_TMR_SIZE;
-> +
->  	return rc;
->  }
->  
-> @@ -1499,8 +1631,9 @@ static void sev_firmware_shutdown(struct sev_device *sev)
->  		/* The TMR area was encrypted, flush it from the cache */
->  		wbinvd_on_all_cpus();
->  
-> -		free_pages((unsigned long)sev_es_tmr,
-> -			   get_order(SEV_ES_TMR_SIZE));
-> +		__snp_free_firmware_pages(virt_to_page(sev_es_tmr),
-> +					  get_order(sev_es_tmr_size),
-> +					  false);
->  		sev_es_tmr = NULL;
->  	}
->  
-> @@ -1511,8 +1644,7 @@ static void sev_firmware_shutdown(struct sev_device *sev)
->  	}
->  
->  	if (snp_range_list) {
-> -		free_pages((unsigned long)snp_range_list,
-> -			   get_order(PAGE_SIZE));
-> +		snp_free_firmware_page(snp_range_list);
->  		snp_range_list = NULL;
->  	}
->  
-> @@ -1593,7 +1725,7 @@ void sev_pci_init(void)
->  	}
->  
->  	/* Obtain the TMR memory area for SEV-ES use */
-> -	sev_es_tmr = sev_fw_alloc(SEV_ES_TMR_SIZE);
-> +	sev_es_tmr = sev_fw_alloc(sev_es_tmr_size);
->  	if (!sev_es_tmr)
->  		dev_warn(sev->dev,
->  			 "SEV: TMR allocation failed, SEV-ES support unavailable\n");
-> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-> index 8edf5c548fbf..d19744807471 100644
-> --- a/include/linux/psp-sev.h
-> +++ b/include/linux/psp-sev.h
-> @@ -922,6 +922,8 @@ int sev_guest_decommission(struct sev_data_decommission *data, int *error);
->  int sev_do_cmd(int cmd, void *data, int *psp_ret);
->  
->  void *psp_copy_user_blob(u64 uaddr, u32 len);
-> +void *snp_alloc_firmware_page(gfp_t mask);
-> +void snp_free_firmware_page(void *addr);
->  
->  /**
->   * sev_mark_pages_offline - insert non-reclaimed firmware/guest pages
-> @@ -959,6 +961,13 @@ static inline void *psp_copy_user_blob(u64 __user uaddr, u32 len) { return ERR_P
->  
->  void snp_mark_pages_offline(unsigned long pfn, unsigned int npages) {}
->  
-> +static inline void *snp_alloc_firmware_page(gfp_t mask)
-> +{
-> +	return NULL;
-> +}
-> +
-> +static inline void snp_free_firmware_page(void *addr) { }
-> +
->  #endif	/* CONFIG_CRYPTO_DEV_SP_PSP */
->  
->  #endif	/* __PSP_SEV_H__ */
+>> +             ((env->features[FEAT_14_0_ECX] & ~CPUID_14_0_ECX_LIP) !=
+>> +              INTEL_PT_DEFAULT_0_ECX) ||
+>> +             (env->features[FEAT_14_1_EAX] != INTEL_PT_DEFAULT_1_EAX) ||
+>> +             (env->features[FEAT_14_1_EBX] != INTEL_PT_DEFAULT_1_EBX))) {
+>>               mark_unavailable_features(cpu, FEAT_7_0_EBX, CPUID_7_0_EBX_INTEL_PT, prefix);
+>>           }
+>> +
+>> +        host_feat = x86_cpu_get_supported_feature_word(FEAT_14_0_ECX, false);
+>> +        if ((env->features[FEAT_14_0_ECX] ^ host_feat) & CPUID_14_0_ECX_LIP) {
+>> +            warn_report("Cannot configure different Intel PT IP payload format than hardware");
+>> +            mark_unavailable_features(cpu, FEAT_7_0_EBX, CPUID_7_0_EBX_INTEL_PT, NULL);
+>> +        }
+>>       }
+>>   }
+>>   
+>> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+>> index 93fb5a87b40e..91a3971c1c29 100644
+>> --- a/target/i386/cpu.h
+>> +++ b/target/i386/cpu.h
+>> @@ -1784,6 +1784,7 @@ typedef struct CPUArchState {
+>>       uint32_t cpuid_vendor2;
+>>       uint32_t cpuid_vendor3;
+>>       uint32_t cpuid_version;
+>> +    bool use_default_intel_pt;
+>>       FeatureWordArray features;
+>>       /* Features that were explicitly enabled/disabled */
+>>       FeatureWordArray user_features;
 
