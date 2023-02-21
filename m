@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4101F69E4DF
-	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 17:38:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7045669E4E5
+	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 17:38:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234847AbjBUQiW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Feb 2023 11:38:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36702 "EHLO
+        id S234953AbjBUQiZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Feb 2023 11:38:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234840AbjBUQiA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Feb 2023 11:38:00 -0500
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74C762D15A
-        for <kvm@vger.kernel.org>; Tue, 21 Feb 2023 08:37:38 -0800 (PST)
-Received: by mail-pf1-x449.google.com with SMTP id x30-20020a056a00189e00b005a8e8833e93so2250485pfh.12
-        for <kvm@vger.kernel.org>; Tue, 21 Feb 2023 08:37:38 -0800 (PST)
+        with ESMTP id S234795AbjBUQiE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Feb 2023 11:38:04 -0500
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 568952D155
+        for <kvm@vger.kernel.org>; Tue, 21 Feb 2023 08:37:40 -0800 (PST)
+Received: by mail-pg1-x549.google.com with SMTP id 6-20020a631046000000b00502afcf62easo1469334pgq.8
+        for <kvm@vger.kernel.org>; Tue, 21 Feb 2023 08:37:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=iGUJ74hklZ9IC2JyxMgKiaxBDpYa7dvkgnZvEvOVY64=;
-        b=rLLClLSLRO2Tp90/r7PQXQ0zXhJU4bH3YbgREwBPeec4T+BSaGhme3PS6pRryZIl2I
-         3Vx6/7T14jB9wybO+c1oOfMR7bCqjQQ/VnYnqMjA6woidQlCuLjLIdfMuBQdNW48M941
-         Ri2FghSa86fAhOxHk5FbQr06jmgvgYyjPOrcT1UStStg1SBpOofv9Yg9vgeVv+T0o5XV
-         u1OEO1L0WyfNDRkM9ADA7YHu99CylDNoC72jQ2FPD4hpuo8q+nPo7sttGxOYOMxUEcy9
-         3sXqIBJywR+kvP6c1+AAe5h7SsBxplT6ztBAGAMYaw4kKN6FKiGbS9msYuRp8SiysKQo
-         dDrA==
+        bh=V/DDoXnf2opyFk/JIknDREbRoogTSxKXRqdxFHEiFI8=;
+        b=azZPMaZPqkrP+aRIze5KyWBJigIWuhR7vtvT2AIX7QbIONV/SEZfaTC3RTMNBJ/gmU
+         WYfczP8dXkhdM244WOARnjbjac48VMe8eRTwD7rTm6azex04IDUSY5aK7pYJUH5Q9fSQ
+         cAuHVy840VC+14rudyO4RSecU0L00tAeBdKtH7NcPLH8GxDkvp1xvPKlLwmrkMt57oNf
+         sBPRwczKUdtLW4cbVPp72zxUCHV+SKGOro4n/9T6lq8U5i6fhwmfhXtLw29/sNy2c/G6
+         ful7j4FyU0Ce4ymO3+jQVgWQIIwUy0pocwJ+mztGJ2ZXd0XKM3AY0LmeezohXhHHMwUK
+         vnaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=iGUJ74hklZ9IC2JyxMgKiaxBDpYa7dvkgnZvEvOVY64=;
-        b=zHww3xzAbO8cLVilm5YCPd87IvjZAakpsAU2hZo6sxII9vOOqwzU2O1WkkL2DcDvks
-         M6qkC7cpfoQ3Jw0SgDmGdVqif6fJGstTjR5uQXzNniHwG/RekYqzKpJy1p384a1fIBBu
-         lTw2v06cPgC9FJe5Xq5hkbCaYDZen+2FipDqwOHWdLoqZVQ1RklQBkOY+BHrIwYzvKbW
-         Sn9MkxiZJHB+sYnLK/XErcbhEwPkcjZGkLnT59hdq0jpXDcrQ+3FgPT2BFFEmCDcI4jU
-         9R1LyUnDrDtsRUHoyFwdCYT39p7Fwl3z5KkjL+AMmGHsRzLFJ3QGR36hJF6T9ToScgOE
-         p/sg==
-X-Gm-Message-State: AO0yUKWJglYeb5j9f/a3lkJf61ZqWN6eFpMoR/u8ZXI/vhEDRtZdtIEK
-        7yx9zxgC6Jer/ozLFH2qM/fy5wKoA4np
-X-Google-Smtp-Source: AK7set+m1UL4EQdVkgxFOWJtVr69/x8dmtIcB6yIkcdQ2Uw9+EflID8jEffCwLg3f81uwnaUjq48GPyiEo04
+        bh=V/DDoXnf2opyFk/JIknDREbRoogTSxKXRqdxFHEiFI8=;
+        b=rdDWzkl7eFu1xB/gND1TWYIzQMtxfK0ochWPR1LVcu76YDDNjI82ZyG6yDdis7NXz/
+         fmAMerIN8kmVQS/gTeMVuoPzBA4/S1xNOMMFvokKFv6psuIxevDiMv7shBfp7fl4zE+V
+         ByiRaCJjIwCUzHzjcSDyWAm+opM68mfjxQKrlhqX9iFnZK8nMso8nawv3cC5FZ5M6GVJ
+         Y4kMx4lVeuXBEEpwDjDM0z+Fs5q3ywM7jTMO7oid4fwGfbHC/+M2336gjpKLqFW4UijJ
+         Cj92+wKCwgSSfiCLivflHPS6Kzoc7JTkdhRbyyanlik6rq41BVQdeZL9TK3FkMPTMbma
+         BciA==
+X-Gm-Message-State: AO0yUKUly1LH1opfdXkOc9tC8mgWO+5joLBFmFmcHHLQ49/0V5nfFsHB
+        gV3nVg5kydviOQ+g7vM7K/+/1e5k1tNW
+X-Google-Smtp-Source: AK7set+uCt7SuZB25GG76skCLbvVlwbw3NDGyd+ph4vafj6zCKa42RtEONl+cA12mbmKCbURNFSBFoNJic7t
 X-Received: from mizhang-super.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1071])
- (user=mizhang job=sendgmr) by 2002:a17:903:2651:b0:19b:8cbb:30fe with SMTP id
- je17-20020a170903265100b0019b8cbb30femr708263plb.13.1676997457301; Tue, 21
- Feb 2023 08:37:37 -0800 (PST)
+ (user=mizhang job=sendgmr) by 2002:a63:77c1:0:b0:4fc:27da:54a5 with SMTP id
+ s184-20020a6377c1000000b004fc27da54a5mr681202pgc.1.1676997459042; Tue, 21 Feb
+ 2023 08:37:39 -0800 (PST)
 Reply-To: Mingwei Zhang <mizhang@google.com>
-Date:   Tue, 21 Feb 2023 16:36:53 +0000
+Date:   Tue, 21 Feb 2023 16:36:54 +0000
 In-Reply-To: <20230221163655.920289-1-mizhang@google.com>
 Mime-Version: 1.0
 References: <20230221163655.920289-1-mizhang@google.com>
 X-Mailer: git-send-email 2.39.2.637.g21b0678d19-goog
-Message-ID: <20230221163655.920289-12-mizhang@google.com>
-Subject: [PATCH v3 11/13] KVM: selftests: x86: Remove redundant check that
- XSAVE is supported
+Message-ID: <20230221163655.920289-13-mizhang@google.com>
+Subject: [PATCH v3 12/13] KVM: selftests: x86: Check that the palette table
+ exists before using it
 From:   Mingwei Zhang <mizhang@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -80,52 +80,52 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Aaron Lewis <aaronlewis@google.com>
 
-In amx_test, userspace requires that XSAVE is supported before running
-the test, then the guest checks that it is supported after enabling
-AMX.  Remove the redundant check in the guest that XSAVE is supported.
-
-Opportunistically, move the check that OSXSAVE is set to immediately
-after the guest sets it, rather than in a separate helper.
+Check that the palette table exists before using it. The maximum number of
+AMX palette tables is enumerated by CPUID.1DH:EAX. Assert that the palette
+used in amx_test, CPUID.1DH.1H, does not exceed that maximum.
 
 Signed-off-by: Aaron Lewis <aaronlewis@google.com>
 Signed-off-by: Mingwei Zhang <mizhang@google.com>
 ---
- tools/testing/selftests/kvm/x86_64/amx_test.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+ tools/testing/selftests/kvm/include/x86_64/processor.h | 1 +
+ tools/testing/selftests/kvm/x86_64/amx_test.c          | 5 +++++
+ 2 files changed, 6 insertions(+)
 
+diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+index 5cfd7ef40d78..a6a86c41ed75 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/processor.h
++++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+@@ -223,6 +223,7 @@ struct kvm_x86_cpu_property {
+ #define X86_PROPERTY_XSTATE_MAX_SIZE		KVM_X86_CPU_PROPERTY(0xd,  0, ECX,  0, 31)
+ #define X86_PROPERTY_XSTATE_TILE_SIZE		KVM_X86_CPU_PROPERTY(0xd, 18, EAX,  0, 31)
+ #define X86_PROPERTY_XSTATE_TILE_OFFSET		KVM_X86_CPU_PROPERTY(0xd, 18, EBX,  0, 31)
++#define X86_PROPERTY_AMX_MAX_PALETTE_TABLES	KVM_X86_CPU_PROPERTY(0x1d, 0, EAX,  0, 31)
+ #define X86_PROPERTY_AMX_TOTAL_TILE_BYTES	KVM_X86_CPU_PROPERTY(0x1d, 1, EAX,  0, 15)
+ #define X86_PROPERTY_AMX_BYTES_PER_TILE		KVM_X86_CPU_PROPERTY(0x1d, 1, EAX, 16, 31)
+ #define X86_PROPERTY_AMX_BYTES_PER_ROW		KVM_X86_CPU_PROPERTY(0x1d, 1, EBX, 0,  15)
 diff --git a/tools/testing/selftests/kvm/x86_64/amx_test.c b/tools/testing/selftests/kvm/x86_64/amx_test.c
-index 1a1565126255..deacd21cf744 100644
+index deacd21cf744..2fd6a8a928d9 100644
 --- a/tools/testing/selftests/kvm/x86_64/amx_test.c
 +++ b/tools/testing/selftests/kvm/x86_64/amx_test.c
-@@ -109,12 +109,6 @@ static inline void __xsavec(struct xstate *xstate, uint64_t rfbm)
- 		     : "memory");
- }
+@@ -30,6 +30,7 @@
+ #define XSAVE_SIZE			((NUM_TILES * TILE_SIZE) + PAGE_SIZE)
  
--static inline void check_cpuid_xsave(void)
--{
--	GUEST_ASSERT(this_cpu_has(X86_FEATURE_XSAVE));
--	GUEST_ASSERT(this_cpu_has(X86_FEATURE_OSXSAVE));
--}
--
- static void check_xtile_info(void)
- {
- 	GUEST_ASSERT(this_cpu_has_p(X86_PROPERTY_XSTATE_MAX_SIZE_XCR0));
-@@ -157,6 +151,7 @@ static void init_regs(void)
- 	cr4 = get_cr4();
- 	cr4 |= X86_CR4_OSXSAVE;
- 	set_cr4(cr4);
-+	GUEST_ASSERT(this_cpu_has(X86_FEATURE_OSXSAVE));
+ /* Tile configuration associated: */
++#define PALETTE_TABLE_INDEX		1
+ #define MAX_TILES			16
+ #define RESERVED_BYTES			14
  
- 	xcr0 = __xgetbv(0);
- 	xcr0 |= XFEATURE_MASK_XTILE;
-@@ -169,7 +164,6 @@ static void __attribute__((__flatten__)) guest_code(struct tile_config *amx_cfg,
- 						    struct xstate *xstate)
- {
- 	init_regs();
--	check_cpuid_xsave();
- 	check_xtile_info();
- 	GUEST_SYNC(1);
+@@ -120,6 +121,10 @@ static void check_xtile_info(void)
+ 	GUEST_ASSERT(xtile.xsave_size == 8192);
+ 	GUEST_ASSERT(sizeof(struct tile_data) >= xtile.xsave_size);
  
++	GUEST_ASSERT(this_cpu_has_p(X86_PROPERTY_AMX_MAX_PALETTE_TABLES));
++	GUEST_ASSERT(this_cpu_property(X86_PROPERTY_AMX_MAX_PALETTE_TABLES) >=
++		     PALETTE_TABLE_INDEX);
++
+ 	GUEST_ASSERT(this_cpu_has_p(X86_PROPERTY_AMX_NR_TILE_REGS));
+ 	xtile.max_names = this_cpu_property(X86_PROPERTY_AMX_NR_TILE_REGS);
+ 	GUEST_ASSERT(xtile.max_names == 8);
 -- 
 2.39.2.637.g21b0678d19-goog
 
