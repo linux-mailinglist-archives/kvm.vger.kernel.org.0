@@ -2,149 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D90A269DBD9
-	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 09:25:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CB23D69DBE3
+	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 09:26:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233409AbjBUIZP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Feb 2023 03:25:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40948 "EHLO
+        id S233668AbjBUI0t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Feb 2023 03:26:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232115AbjBUIZO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Feb 2023 03:25:14 -0500
-Received: from vulcan.natalenko.name (vulcan.natalenko.name [IPv6:2001:19f0:6c00:8846:5400:ff:fe0c:dfa0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3356D20059;
-        Tue, 21 Feb 2023 00:25:13 -0800 (PST)
-Received: from mail.natalenko.name (vulcan.natalenko.name [IPv6:2001:19f0:6c00:8846:5400:ff:fe0c:dfa0])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by vulcan.natalenko.name (Postfix) with ESMTPSA id 9F46E123AC91;
-        Tue, 21 Feb 2023 09:25:08 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=natalenko.name;
-        s=dkim-20170712; t=1676967908;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=RlDwttwnbhqYBrOWhJDWVTjB+F85C40HjekkKQ5uE7s=;
-        b=nSmMILXUq9FQJPXkCEz31jy6cxHVR1YFkZ8DuL2k928cguoQYftMmkn7J63/KU+cmKI4Zw
-        dzARuBiFv2pKO6zVJSVegBG4PzFG0jxVDBWP9ssV0YmH3lHfW+Hl+dm6Wi1boquFKR0vB8
-        rrmq66EqbZC+MB9FVOCwnuK+qOUTfBY=
+        with ESMTP id S233669AbjBUI0n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Feb 2023 03:26:43 -0500
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A55ED234CA
+        for <kvm@vger.kernel.org>; Tue, 21 Feb 2023 00:26:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1676967989; x=1708503989;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=+5WHf6C2sT658tDHPh+X+uovNTfiwHJEASlJLSgry2U=;
+  b=WEaOEsQkFECyKS7AlyB4JbQgGqpjEqg2oI3ARJhmLyVbQbisPmZtRc6p
+   OkEvRqbS0/nMvFmVAJZPy6ezYR4Pn7VwdW0L/pB++a69j6Gshi7idRLzK
+   OzX2wrjTvpdjFxIA7Vq29m8NmLLnxBL+0GHMAdKHOLR2YuOx4hXsy2TX6
+   Z6B2naF4NevKHkCbSpg9gVai8c46XJmNnQkdF4K3EDUxOuzIuh1EPqOdA
+   jrIdraLoZ4vk0meBcH1IDR+SI4ugF8aCmKt44oh0XD4UpE2/BHM6Knm1q
+   Zj+rLSJ0hHB4675lb7Iq0nKqYfn6T5YlHyYpBRVAqlkhaOuh7u5AjTiFG
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10627"; a="418800924"
+X-IronPort-AV: E=Sophos;i="5.97,315,1669104000"; 
+   d="scan'208";a="418800924"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2023 00:26:29 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10627"; a="673596385"
+X-IronPort-AV: E=Sophos;i="5.97,315,1669104000"; 
+   d="scan'208";a="673596385"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.10.94]) ([10.238.10.94])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2023 00:26:26 -0800
+Message-ID: <fc84dd84-67c5-5565-b989-7e6bb9116c6e@linux.intel.com>
+Date:   Tue, 21 Feb 2023 16:26:25 +0800
 MIME-Version: 1.0
-Date:   Tue, 21 Feb 2023 09:25:08 +0100
-From:   Oleksandr Natalenko <oleksandr@natalenko.name>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Kim Phillips <kim.phillips@amd.com>, tglx@linutronix.de,
-        Usama Arif <usama.arif@bytedance.com>, arjan@linux.intel.com,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        hpa@zytor.com, x86@kernel.org, pbonzini@redhat.com,
-        paulmck@kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, rcu@vger.kernel.org, mimoja@mimoja.de,
-        hewenliang4@huawei.com, thomas.lendacky@amd.com, seanjc@google.com,
-        pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
-        punit.agrawal@bytedance.com, simon.evans@bytedance.com,
-        liangma@liangbit.com,
-        "Limonciello, Mario" <Mario.Limonciello@amd.com>,
-        Piotr Gorski <piotrgorski@cachyos.org>
-Subject: Re: [PATCH v9 0/8] Parallel CPU bringup for x86_64
-In-Reply-To: <5c557f9b6f55dc2a612ee89142971298e6ae12d8.camel@infradead.org>
-References: <20230215145425.420125-1-usama.arif@bytedance.com>
- <2668799.mvXUDI8C0e@natalenko.name>
- <ed8d662351cfe5793f8cc7e7e8c514d05d16c501.camel@infradead.org>
- <2668869.mvXUDI8C0e@natalenko.name>
- <2a67f6cf18dd2c1879fad9fd8a28242918d3e5d2.camel@infradead.org>
- <982e1d6140705414e8fd60b990bd259a@natalenko.name>
- <715CBABF-4017-4784-8F30-5386F1524830@infradead.org>
- <67dbc69f-b712-8971-f1c9-5d07f506a19c@amd.com>
- <42dc683e2846ae8fc1e09715aaf7884660e1a386.camel@infradead.org>
- <37c18c3aeea2e558633b6da6886111d0@natalenko.name>
- <5A3B7074-0C6D-472B-803B-D76541828C1F@infradead.org>
- <3d8ed6e157df10c5175c636de0e21849@natalenko.name>
- <5c557f9b6f55dc2a612ee89142971298e6ae12d8.camel@infradead.org>
-Message-ID: <ee0d0d971a3095d6a1e96ad4f1ba32d2@natalenko.name>
-X-Sender: oleksandr@natalenko.name
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.2
+Subject: Re: [PATCH v4 9/9] KVM: x86: LAM: Expose LAM CPUID to user space VMM
+To:     Robert Hoo <robert.hu@linux.intel.com>, seanjc@google.com,
+        pbonzini@redhat.com, yu.c.zhang@linux.intel.com,
+        yuan.yao@linux.intel.com, jingqi.liu@intel.com,
+        weijiang.yang@intel.com, chao.gao@intel.com,
+        isaku.yamahata@intel.com
+Cc:     kirill.shutemov@linux.intel.com, kvm@vger.kernel.org
+References: <20230209024022.3371768-1-robert.hu@linux.intel.com>
+ <20230209024022.3371768-10-robert.hu@linux.intel.com>
+ <2c7c4d73-810e-6c9c-0480-46d68dedadc8@linux.intel.com>
+ <587054f9715283ef4414af64dd69cda1f7597380.camel@linux.intel.com>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <587054f9715283ef4414af64dd69cda1f7597380.camel@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21.02.2023 09:17, David Woodhouse wrote:
-> On Tue, 2023-02-21 at 09:05 +0100, Oleksandr Natalenko wrote:
->> 
->> Please see here: http://ix.io/4oLm
-> 
-> Was that just for one CPU? Can we have them all please?
-> 
-> The interesting part is the line starting 00000001. We're looking at
-> the top 8 bits of EBX:
-> 
-> Leaf     Subleaf    EAX            EBX            ECX            EDX
-> 00000000 00000000:  00000010 ....  68747541 Auth  444d4163 cAMD  
-> 69746e65 enti
-> 00000001 00000000:  00a20f12 ....  00200800 .. .  7ef8320b .2.~  
-> 178bfbff ....
->                                    ↑↑
-> 
-> So the first CPU is CPU0. Could have told you that... what about the 
-> others? :)
 
-Right, sorry. Here it is: http://ix.io/4oLq
+On 2/21/2023 3:26 PM, Robert Hoo wrote:
+> On Tue, 2023-02-21 at 13:47 +0800, Binbin Wu wrote:
+>> On 2/9/2023 10:40 AM, Robert Hoo wrote:
+>>> LAM feature is enumerated by (EAX=07H, ECX=01H):EAX.LAM[bit26].
+>>>
+>>> Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+>>> Reviewed-by: Jingqi Liu <jingqi.liu@intel.com>
+>>> ---
+>>>    arch/x86/kvm/cpuid.c | 2 +-
+>>>    1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+>>> index b14653b61470..79f45cbe587e 100644
+>>> --- a/arch/x86/kvm/cpuid.c
+>>> +++ b/arch/x86/kvm/cpuid.c
+>>> @@ -664,7 +664,7 @@ void kvm_set_cpu_caps(void)
+>>>    
+>>>    	kvm_cpu_cap_mask(CPUID_7_1_EAX,
+>>>    		F(AVX_VNNI) | F(AVX512_BF16) | F(CMPCCXADD) |
+>>> F(AMX_FP16) |
+>>> -		F(AVX_IFMA)
+>>> +		F(AVX_IFMA) | F(LAM)
+>> Do we allow to expose the LAM capability to guest when host kernel
+>> disabled LAM feature (e.g. via clearcpuid)?
+> No
+>> May be it should be handled similarly as LA57.
+>>
+> You mean expose LAM to guest based on HW capability rather than host
+> status?
+> Why is LA57 exposure like this? unlike most features.
 
-> If anyone can reproduce this with a serial port, can you try this?
-> 
-> From 98ad11d0fb88f081f49f7b1496420dbfbeff8833 Mon Sep 17 00:00:00 2001
-> From: David Woodhouse <dwmw@amazon.co.uk>
-> Date: Sat, 4 Feb 2023 15:20:24 +0000
-> Subject: [PATCH] parallel debug
-> 
-> ---
->  arch/x86/kernel/head_64.S | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
-> 
-> diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
-> index 0e4e53d231db..da7f4d2d9951 100644
-> --- a/arch/x86/kernel/head_64.S
-> +++ b/arch/x86/kernel/head_64.S
-> @@ -281,6 +281,15 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify, 
-> SYM_L_GLOBAL)
-> 
->  .Lsetup_AP:
->  	/* EDX contains the APIC ID of the current CPU */
-> +#if 1
-> +	/* Test hack: Print APIC ID and then CPU# when we find it. */
-> +	mov	%edx, %ecx
-> +	mov	%edx, %eax
-> +	addb	$'A', %al
-> +	mov	$0x3f8, %dx
-> +	outb    %al, %dx
-> +	mov	%ecx, %edx
-> +#endif
->  	xorq	%rcx, %rcx
->  	leaq	cpuid_to_apicid(%rip), %rbx
-> 
-> @@ -302,6 +311,14 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify, 
-> SYM_L_GLOBAL)
-> 
->  .Linit_cpu_data:
->  	/* Get the per cpu offset for the given CPU# which is in ECX */
-> +#if 1
-> +	mov	%rcx, %rax
-> +	shr	$3, %rax
-> +	addb	$'a', %al
-> +
-> +	mov	$0x3f8, %dx
-> +	outb    %al, %dx
-> +#endif
->  	leaq	__per_cpu_offset(%rip), %rbx
->  	movq	(%rbx,%rcx,8), %rbx
->  	/* Save it for GS BASE setup */
+The special handling for LA57 is from the patch "kvm: x86: Return LA57 
+feature based on hardware capability".
+https://lore.kernel.org/lkml/1548950983-18458-1-git-send-email-yu.c.zhang@linux.intel.com/
 
--- 
-   Oleksandr Natalenko (post-factum)
+The reason is host kernel may disable 5-level paging using cmdline 
+parameter 'no5lvl', and it will clear the feature bit for LA57 in 
+boot_cpu_data.
+boot_cpu_data is queried in kvm_set_cpu_caps to derive kvm cpu cap masks.
+
+" VMs can still benefit from extended linear address width, e.g. to 
+enhance features like ASLR" even when host  doesn't use 5-level paging.
+So, the patch sets LA57 based on hardware capability.
+
+I was just wondering  whether LAM could be the similar case that the 
+host disabled the feature somehow (e.g via clearcpuid), and the guest 
+still want to use it.
+
+
+
+>
+> Without explicit rationality, I would tend to follow most conventions.
+>
+>
