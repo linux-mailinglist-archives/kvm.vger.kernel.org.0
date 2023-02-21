@@ -2,108 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ADD6B69DE62
-	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 12:04:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AC39F69DE69
+	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 12:06:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233744AbjBULEF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Feb 2023 06:04:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60074 "EHLO
+        id S233453AbjBULGd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Feb 2023 06:06:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233678AbjBULEC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Feb 2023 06:04:02 -0500
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4633822010
-        for <kvm@vger.kernel.org>; Tue, 21 Feb 2023 03:03:59 -0800 (PST)
-Received: by mail-wr1-x42f.google.com with SMTP id c5so4655612wrr.5
-        for <kvm@vger.kernel.org>; Tue, 21 Feb 2023 03:03:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vrull.eu; s=google;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8nuii1O1uXqWSPb5QmokeXfWS5vvCDyLzlvaBL4q0jA=;
-        b=ngKsUA1fri3dXJyo2WTKtv8pm59KVoqPZ2+wgww4/qt+B18+838Nmg8/c4vLBr8Hb1
-         RrX1cr3XacBMEm9yDpKinYwiGx29E1SG3yprab9xqBXSQ0XdjH111hptHlJfYXd4cSJM
-         A66sA7XajwTLYsjkIH0ol67ql3xA/ewCbNi4Jt/kRnQ7q4nziMVFfRCk4QojMaH9BUod
-         BnH6pjZropMvQdyfC2WLB4qreyNQGpzkQsxsB/54Rqxl/zV3+vISHw4F3/zjfP1n+W9s
-         9MIvCr5vXXQSFyvV5Vxc7tJlMX9oFfYicNUjTpP8RKs+atZKPBXTbjx7KdGMOLiNAUo/
-         YiCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8nuii1O1uXqWSPb5QmokeXfWS5vvCDyLzlvaBL4q0jA=;
-        b=SH3azDOYAxvDMGht2JPg+T9LUVVns739DcmmZNOigdL7XyYply/S9mISerGHEqVOAc
-         5EXPh6MzOKYoXXahqbET600zEKchYwMnOs8uJEPtDHt8dDgRlLmCCVYQ+SeLb0mF54yz
-         TeroMDOzPhrMNkMSjE1mWN4gyY0Aykm87Zi5236iHktgSUqTCbq61D9YAZqB2nfzUsnt
-         XUzdIxHWZrOg0ME9xZraKPFRI/ZynvVxSBaFHgigrrZ9h1f/9nIhu/COr7ZUt8TNZhry
-         JLIlcfKGwZq4NHG3Q3HOjxBVyU5CxBVfEd3TqtJDfX43pJ9YFEJVm4Ctp7ms9DSMb+Q1
-         wQ1g==
-X-Gm-Message-State: AO0yUKU+9czSZIdrQuRfnraGr4Xk2u3oNonsaW7cNlif8Nat/mrT4PZ7
-        Fl3U7cDUpMmB/pHSMo38s0dVVy3TU4tJH5/MCD+QDA==
-X-Google-Smtp-Source: AK7set/p0Op55W1O5D/4Ls2gp3wEI6ZwX06UJ6h/kCzp2F6pBHxE8g/N5Its7aG571Qjz7hLDLVIdY1hi3fybLfcBSU=
-X-Received: by 2002:a5d:45c2:0:b0:2c5:5b2f:8c80 with SMTP id
- b2-20020a5d45c2000000b002c55b2f8c80mr350550wrs.318.1676977437766; Tue, 21 Feb
- 2023 03:03:57 -0800 (PST)
-MIME-Version: 1.0
-References: <20230128072737.2995881-3-apatel@ventanamicro.com>
- <mhng-0f9bdf58-5289-4db4-8fd7-38898824c44f@palmer-ri-x1c9>
- <CAEg0e7hrQFu+cdZy+3QO1ML9FNTPBehZwOOBnr1F-5ABYDnkGg@mail.gmail.com>
- <CAEg0e7hRjMSgYZbPTQztbQ3bGZf-r8wAfCK5ZnDXOcx27HcTCA@mail.gmail.com>
- <Y/Sfpb2c/LS0LCiA@wendy> <F80EBB4C-29C4-472D-B213-EFD220EF9B1F@jrtc27.com> <Y/SkES28TNBz02wM@wendy>
-In-Reply-To: <Y/SkES28TNBz02wM@wendy>
-From:   =?UTF-8?Q?Christoph_M=C3=BCllner?= <christoph.muellner@vrull.eu>
-Date:   Tue, 21 Feb 2023 12:03:45 +0100
-Message-ID: <CAEg0e7i3=Zg5pxG4HCEfFkzpot5-u6yHoTSFKPBuCGU+djZ5uw@mail.gmail.com>
-Subject: Re: [PATCH v2 2/7] RISC-V: Detect AIA CSRs from ISA string
-To:     Conor Dooley <conor.dooley@microchip.com>
-Cc:     Jessica Clarke <jrtc27@jrtc27.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Anup Patel <apatel@ventanamicro.com>, pbonzini@redhat.com,
-        Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org,
-        linux-riscv <linux-riscv@lists.infradead.org>,
+        with ESMTP id S229732AbjBULGa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Feb 2023 06:06:30 -0500
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D71D22DC1;
+        Tue, 21 Feb 2023 03:06:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1676977589; x=1708513589;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=2CjPQ/miNwaYKFFDt9yQwTps+fh10MwgTpKNxPViTwE=;
+  b=ac+1NntqHQ8yjBatGK70H/cuYXYqF9aoqRgt2ZFwW4wYsNm00aTVwvua
+   57Vr4s7KWpl4QNnQCnVdiyeYDmRBXfT510AMhXk6lxiN0SY7kmZoMLelb
+   Sw2Apu2gWnWsr/u//YFPhAnYOIVGaER7Jp6q/pkxeS+EMpvIZA/DDw2OR
+   HneDGVfQSM/2Ab5xPGWKeYctu6OeywgP8B3+RvT/7nZUQszQlI+ULleMV
+   ZE90pfTTVI6tn+fiA26lqpkiiKEBSO7rVEp+dS3h5nwChSLDaTebXsLyE
+   TJ6gS5MglZr0APrrBUG4iWyJIO/GHyrut1OqNylpE761yNo71MJN1oC8k
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10627"; a="331270069"
+X-IronPort-AV: E=Sophos;i="5.97,315,1669104000"; 
+   d="scan'208";a="331270069"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2023 03:06:28 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10627"; a="703993147"
+X-IronPort-AV: E=Sophos;i="5.97,315,1669104000"; 
+   d="scan'208";a="703993147"
+Received: from yichaohu-mobl.ccr.corp.intel.com (HELO localhost) ([10.254.208.83])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2023 03:06:10 -0800
+Date:   Tue, 21 Feb 2023 19:06:07 +0800
+From:   Yu Zhang <yu.c.zhang@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sagi Shahar <sagis@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Peter Shier <pshier@google.com>,
+        Anish Ghulati <aghulati@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        James Houghton <jthoughton@google.com>,
+        Anish Moorthy <amoorthy@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Axel Rasmussen <axelrasmussen@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Ashish Kalra <ashish.kalra@amd.com>,
+        Babu Moger <babu.moger@amd.com>, Chao Gao <chao.gao@intel.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Chenyi Qiang <chenyi.qiang@intel.com>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Guang Zeng <guang.zeng@intel.com>,
+        Hou Wenlong <houwenlong.hwl@antgroup.com>,
+        Jiaxi Chen <jiaxi.chen@linux.intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        Jing Liu <jing2.liu@intel.com>,
+        Junaid Shahid <junaids@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Leonardo Bras <leobras@redhat.com>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Li RongQing <lirongqing@baidu.com>,
+        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Michal Luczaj <mhal@rbox.co>,
+        Mingwei Zhang <mizhang@google.com>,
+        Nikunj A Dadhania <nikunj@amd.com>,
+        Paul Durrant <pdurrant@amazon.com>,
+        Peng Hao <flyingpenghao@gmail.com>,
+        Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>,
+        Robert Hoo <robert.hu@linux.intel.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Wei Wang <wei.w.wang@intel.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        Zhenzhong Duan <zhenzhong.duan@intel.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Subject: Re: [PATCH 2/2] Documentation/process: Add a maintainer handbook for
+ KVM x86
+Message-ID: <20230221110607.6wvrgpqip3njrkwu@linux.intel.com>
+References: <20230217225449.811957-1-seanjc@google.com>
+ <20230217225449.811957-3-seanjc@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230217225449.811957-3-seanjc@google.com>
+User-Agent: NeoMutt/20171215
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 21, 2023 at 12:00 PM Conor Dooley
-<conor.dooley@microchip.com> wrote:
->
-> On Tue, Feb 21, 2023 at 10:51:13AM +0000, Jessica Clarke wrote:
-> > On 21 Feb 2023, at 10:40, Conor Dooley <conor.dooley@microchip.com> wro=
-te:
-> > > On Tue, Feb 21, 2023 at 08:12:58AM +0100, Christoph M=C3=BCllner wrot=
-e:
-> > >> The full meeting minutes can be found here:
-> > >>  https://lists.riscv.org/g/tech-chairs/message/1381
-> > >
-> > > This link is non functional unfortunately :/
-> >
-> > tech-chairs is private, for (co-)chairs only... not sure why it went
-> > there rather than tech-privileged.
->
-> Yah, that's what I was getting at.. This is a conversation on a public
-> ML, so it'd be annoying enough for some readers if it was gated around
-> RVI membership, but gating on membership of the inner circle makes it
-> kinda useless!
+Thank you so much, Sean, for such a detailed guidance!
 
-The mail was forwarded there as well (and to tech-unprivileged):
-  https://lists.riscv.org/g/tech-privileged/message/1294
-  https://lists.riscv.org/g/tech-unprivileged/message/430
+Some questions below:
 
-BR
-Christoph
+On Fri, Feb 17, 2023 at 02:54:49PM -0800, Sean Christopherson wrote:
+> Add a KVM x86 doc to the subsystem/maintainer handbook section to explain
+> how KVM x86 (currently) operates as a sub-subsystem, and to soapbox on
+> the rules and expectations for contributing to KVM x86.
+
+It's a fantastic doc! Also, many good requirements can be common in KVM, not
+just KVM x86(e.g. the comment, changelog format, the testing requirement
+etc.). Could we be greedier to ask our KVM maintainers for a generic handbook
+of KVM, and maybe different sections for specific arches, which describe their
+specific requirements(the base trees and branches, the maintaining processes
+etc.)? :)
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  .../process/maintainer-handbooks.rst          |   1 +
+>  Documentation/process/maintainer-kvm-x86.rst  | 347 ++++++++++++++++++
+>  MAINTAINERS                                   |   1 +
+>  3 files changed, 349 insertions(+)
+>  create mode 100644 Documentation/process/maintainer-kvm-x86.rst
+> 
+> diff --git a/Documentation/process/maintainer-handbooks.rst b/Documentation/process/maintainer-handbooks.rst
+> index d783060b4cc6..d12cbbe2b7df 100644
+> --- a/Documentation/process/maintainer-handbooks.rst
+> +++ b/Documentation/process/maintainer-handbooks.rst
+> @@ -17,3 +17,4 @@ Contents:
+>  
+>     maintainer-tip
+>     maintainer-netdev
+> +   maintainer-kvm-x86
+> diff --git a/Documentation/process/maintainer-kvm-x86.rst b/Documentation/process/maintainer-kvm-x86.rst
+> new file mode 100644
+> index 000000000000..ac81a42a32a3
+> --- /dev/null
+> +++ b/Documentation/process/maintainer-kvm-x86.rst
+> @@ -0,0 +1,347 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+> +KVM x86
+> +=======
+> +
+> +TL;DR
+> +-----
+> +Testing is mandatory.  Be consistent with established styles and patterns.
+> +
+> +Trees
+> +-----
+> +KVM x86 is currently in a transition period from being part of the main KVM
+> +tree, to being "just another KVM arch".  As such, KVM x86 is split across the
+> +main KVM tree, ``git.kernel.org/pub/scm/virt/kvm/kvm.git``, and a KVM x86
+> +specific tree, ``github.com/kvm-x86/linux.git``.
+
+Does other arch also have a specific tree? If a patch series touches multiple
+archs(though the chance could be very low), I guess that patch set should still
+be based on the main KVM tree? The master branch or the next branch?
+
+...
+> +Co-Posting Tests
+> +~~~~~~~~~~~~~~~~
+> +KVM selftests that are associated with KVM changes, e.g. regression tests for
+> +bug fixes, should be posted along with the KVM changes as a single series.
+> +
+> +KVM-unit-tests should *always* be posted separately.  Tools, e.g. b4 am, don't
+> +know that KVM-unit-tests is a separate repository and get confused when patches
+> +in a series apply on different trees.  To tie KVM-unit-tests patches back to
+> +KVM patches, first post the KVM changes and then provide a lore Link: to the
+> +KVM patch/series in the KVM-unit-tests patch(es).
+
+I wonder, for KVM bugzilla to report a bug, or for our QAs to perform regular
+tests using KVM selftests/KVM-unit-tests, which tree/branch is more reasonable
+to be based on?
+
+E.g., I saw some bugzilla issues earlier, reporting failures of some unit tests,
+did some investigation, yet to find those failures were just because the corresponding
+KVM patches had not been merged yet. 
+
+Maybe we also should take care of the timings of the merging of KVM patches and
+the test patches? Two examples(I'm sure there're more :)): 
+1> https://bugzilla.kernel.org/show_bug.cgi?id=216812
+2> https://bugzilla.kernel.org/show_bug.cgi?id=216725
+
+
+B.R.
+Yu
