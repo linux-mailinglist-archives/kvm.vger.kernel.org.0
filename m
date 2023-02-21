@@ -2,73 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 97A9869E4A9
-	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 17:29:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 85EED69E4BD
+	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 17:37:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233721AbjBUQ3c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Feb 2023 11:29:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55966 "EHLO
+        id S234653AbjBUQhT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Feb 2023 11:37:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233564AbjBUQ3b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Feb 2023 11:29:31 -0500
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D758F11661
-        for <kvm@vger.kernel.org>; Tue, 21 Feb 2023 08:28:42 -0800 (PST)
+        with ESMTP id S233565AbjBUQhS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Feb 2023 11:37:18 -0500
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AE27279AA
+        for <kvm@vger.kernel.org>; Tue, 21 Feb 2023 08:37:17 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id la3-20020a170902fa0300b0019ca5ddecedso65934plb.1
+        for <kvm@vger.kernel.org>; Tue, 21 Feb 2023 08:37:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1676996923; x=1708532923;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-id:mime-version:content-transfer-encoding:subject;
-  bh=An3ZyYPjzm/F1tOVGPO3OL+S+08Pygd7okUCpWph0KM=;
-  b=ktRvifHjlkmSz8i+EE5q5eCylYudUaQJcEQ/RIIGgKky/S18+I94TtXA
-   t/OFMagvbVVmPiqAvyhRh3VNbVMlbK9lRcda89/+V1v9ktqI3ZEuR53Ft
-   XSt/yvSaEcXajUvnrvULvGxDSpmDUzO5Yj6buy8dbtU9NpbUqJttz+jLB
-   w=;
-X-IronPort-AV: E=Sophos;i="5.97,315,1669075200"; 
-   d="scan'208";a="299455621"
-Subject: Re: [PATCH 00/16] KVM: arm64: Rework timer offsetting for fun and profit
-Thread-Topic: [PATCH 00/16] KVM: arm64: Rework timer offsetting for fun and profit
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-44b6fc51.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2023 16:28:40 +0000
-Received: from EX19D018EUC004.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-pdx-2a-m6i4x-44b6fc51.us-west-2.amazon.com (Postfix) with ESMTPS id 914E4A293A;
-        Tue, 21 Feb 2023 16:28:37 +0000 (UTC)
-Received: from EX19D018EUC003.ant.amazon.com (10.252.51.231) by
- EX19D018EUC004.ant.amazon.com (10.252.51.172) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.24; Tue, 21 Feb 2023 16:28:36 +0000
-Received: from EX19D018EUC003.ant.amazon.com ([fe80::8a6b:2af5:3f32:8cfe]) by
- EX19D018EUC003.ant.amazon.com ([fe80::8a6b:2af5:3f32:8cfe%3]) with mapi id
- 15.02.1118.024; Tue, 21 Feb 2023 16:28:36 +0000
-From:   "Veith, Simon" <sveith@amazon.de>
-To:     "maz@kernel.org" <maz@kernel.org>,
-        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>
-CC:     "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-        "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-        "james.morse@arm.com" <james.morse@arm.com>,
-        "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-        "ricarkol@google.com" <ricarkol@google.com>
-Thread-Index: AQHZQhIhiotZ8QeTIUeBSHOWoG2ULa7ZnmqA
-Date:   Tue, 21 Feb 2023 16:28:36 +0000
-Message-ID: <5404a3554c3a1efd1e8e098072a4cf03d1b01152.camel@amazon.de>
-References: <20230216142123.2638675-1-maz@kernel.org>
-In-Reply-To: <20230216142123.2638675-1-maz@kernel.org>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.1.212.17]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B285DF88BE57D8478127CC5E2935E5BB@amazon.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=r9GngjfEiO2YdAiq4afzZtr0guJMgojljVZUby60vN8=;
+        b=mAn0vFk+ChTStIeaeuUZlb6J63gdV5C2oabXyKkoizXVxjcJvry0jEzZjeab3B0reB
+         rW1OyjgkgRMEodBTmTl732oY1idaSQYNoLoVzQQYe6gcq70V8wBgWRyji6Sd5miDXnk5
+         En3GD/SM7Xjx3FIFrJhfqNqbfE08LqNJMsPbMroF5pQjsicLJ6faGW9cKZGnirEyDpxk
+         wxj/DLJbeuvdIuELOOzZn0dBx+2c/hyPjWHBEhGu2UYVWf9AhcU8waBl7NqyI6+rEu+4
+         AtmXPiN7wX+zF16ZMyP224jrc6LEyWegXd4Z5DBIPfoNQKuUceTZNAfdmMhZc3pKPY4D
+         rWvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=r9GngjfEiO2YdAiq4afzZtr0guJMgojljVZUby60vN8=;
+        b=LB/YI4z9y/5Ztjw5LWa2Ic6GUMi80hHgojJhKXrUfW/4EYSSt5jskwPVC7norQ9/oP
+         eW4zIQqEj07erD06EiyCZ7mtrWKbV+jLQ6A43/jc3JLUd7u5h7jotvusl5SDHjGgkJqy
+         6NoGT++XttMhTB6W5QdqdRHbntL6cryWpkytIcGq8k+qf3eC77yyUMwJmvqnRgRIdGvV
+         2idEMAe/vKMVZHSDW2pji+9rWdLBwjSzUEVwcIReIzoerE/ELDuRpgQTTWUu09f/P+td
+         +sqpfahWmTs5dVQv2RjoR88472kXnf7n6Z5wuwQU+RzDljoM7Y/4ZLlIoS5g6aTMf3Nn
+         y5Qw==
+X-Gm-Message-State: AO0yUKVtKyQ7kswlJ7rR2+I+CmHpwDWZ3432iC0YUuN+JWt6IjchjYoR
+        BT6ak/90LGpJr+HeOks8qD9Lvy3DUBMx
+X-Google-Smtp-Source: AK7set/hGerFqBnOr69r9p+6s6eCl18x7fitzOEmn/UB+O2DhpTWhstOcDjrXbZVn2yXX5JhsI/CY8KvvM47
+X-Received: from mizhang-super.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1071])
+ (user=mizhang job=sendgmr) by 2002:a17:903:551:b0:19a:81a0:4f7 with SMTP id
+ jo17-20020a170903055100b0019a81a004f7mr742552plb.35.1676997436891; Tue, 21
+ Feb 2023 08:37:16 -0800 (PST)
+Reply-To: Mingwei Zhang <mizhang@google.com>
+Date:   Tue, 21 Feb 2023 16:36:42 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.2.637.g21b0678d19-goog
+Message-ID: <20230221163655.920289-1-mizhang@google.com>
+Subject: [PATCH v3 00/13]  Overhauling amx_test
+From:   Mingwei Zhang <mizhang@google.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Cc:     "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Mingwei Zhang <mizhang@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Venkatesh Srinivas <venkateshs@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        "Chang S. Bae" <chang.seok.bae@intel.com>,
+        Chao Gao <chao.gao@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,27 +74,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SGVsbG8gTWFyYywNCg0KT24gVGh1LCAyMDIzLTAyLTE2IGF0IDE0OjIxICswMDAwLCBNYXJjIFp5
-bmdpZXIgd3JvdGU6DQo+IFRoaXMgc2VyaWVzIGFpbXMgYXQgc2F0aXNmeWluZyBtdWx0aXBsZSBn
-b2FsczoNCj4gDQo+IC0gYWxsb3cgYSBWTU0gdG8gYXRvbWljYWxseSByZXN0b3JlIGEgdGltZXIg
-b2Zmc2V0IGZvciBhIHdob2xlIFZNDQo+IMKgIGluc3RlYWQgb2YgdXBkYXRpbmcgdGhlIG9mZnNl
-dCBlYWNoIHRpbWUgYSB2Y3B1IGdldCBpdHMgY291bnRlcg0KPiDCoCB3cml0dGVuDQo+IA0KPiAt
-IGFsbG93IGEgVk1NIHRvIHNhdmUvcmVzdG9yZSB0aGUgcGh5c2ljYWwgdGltZXIgY29udGV4dCwg
-c29tZXRoaW5nDQo+IMKgIHRoYXQgd2UgY2Fubm90IGRvIGF0IHRoZSBtb21lbnQgZHVlIHRvIHRo
-ZSBsYWNrIG9mIG9mZnNldHRpbmcNCj4gDQo+IC0gcHJvdmlkZSBhIGZyYW1ld29yayB0aGF0IGlz
-IHN1aXRhYmxlIGZvciBOViBzdXBwb3J0LCB3aGVyZSB3ZSBnZXQNCj4gwqAgYm90aCBnbG9iYWwg
-YW5kIHBlciB0aW1lciwgcGVyIHZjcHUgb2Zmc2V0dGluZw0KDQpUaGFuayB5b3Ugc28gbXVjaCBm
-b3IgZm9sbG93aW5nIHVwIG9uIG15IChhZG1pdHRlZGx5IHZlcnkgYmFzaWMpIHBhdGNoDQp3aXRo
-IHlvdXIgb3duIHByb3Bvc2FsIQ0KDQo+IFRoaXMgaGFzIGJlZW4gbW9kZXJhdGVseSB0ZXN0ZWQg
-d2l0aCBuVkhFLCBWSEUgYW5kIE5WLiBJIGRvIG5vdCBoYXZlDQo+IGFjY2VzcyB0byBDTlRQT0ZG
-LWF3YXJlIEhXLCBzbyB0aGUganVyeSBpcyBzdGlsbCBvdXQgb24gdGhhdCBvbmUNCg0KU2FtZSBo
-ZXJlIGFib3V0IENOVFBPRkYgLS0gSSBnYXZlIGl0IGEgcXVpY2sgc3BpbiBvbiBHcmF2aXRvbjIg
-YW5kDQpHcmF2aXRvbjMsIGFuZCBuZWl0aGVyIGNoaXAgY2xhaW1zIHRoZSBBUk02NF9IQVNfRUNW
-X0NOVFBPRkYgY2FwYWJpbGl0eQ0KZnJvbSB5b3VyIHBhdGNoLg0KDQpJIGFtIHdvcmtpbmcgb24g
-dGVzdGluZyB5b3VyIHNlcmllcyB3aXRoIG91ciB1c2Vyc3BhY2UgYW5kIHdpbGwgcmVwb3J0DQpi
-YWNrLg0KDQpUaGFua3MNClNpbW9uDQoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIEdlcm1h
-bnkgR21iSApLcmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhydW5nOiBD
-aHJpc3RpYW4gU2NobGFlZ2VyLCBKb25hdGhhbiBXZWlzcwpFaW5nZXRyYWdlbiBhbSBBbXRzZ2Vy
-aWNodCBDaGFybG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5MTczIEIKU2l0ejogQmVybGluClVzdC1J
-RDogREUgMjg5IDIzNyA4NzkKCgo=
+In this version, I have integrated Aaron's changes to the amx_test. In
+addition, we also integrated one fix patch for a kernel warning due to
+xsave address issue.
+
+Patch 1:
+Fix a host FPU kernel warning due to missing XTILEDATA in xinit.
+
+Patch 2-8:
+Overhaul amx_test. These patches were basically from v2.
+
+Patch 9-13:
+Overhaul amx_test from Aaron. I modified the changelog a little bit.
+
+
+v2 -> v3:
+ - integrate Aaron's 5 commits with minor changes on commit message.
+ - Add one fix patch for a kernel warning.
+
+v2:
+https://lore.kernel.org/all/20230214184606.510551-1-mizhang@google.com/
+
+
+Aaron Lewis (5):
+  KVM: selftests: x86: Assert that XTILE is XSAVE-enabled
+  KVM: selftests: x86: Assert that both XTILE{CFG,DATA} are
+    XSAVE-enabled
+  KVM: selftests: x86: Remove redundant check that XSAVE is supported
+  KVM: selftests: x86: Check that the palette table exists before using
+    it
+  KVM: selftests: x86: Check that XTILEDATA supports XFD
+
+Mingwei Zhang (8):
+  x86/fpu/xstate: Avoid getting xstate address of init_fpstate if
+    fpstate contains the component
+  KVM: selftests: x86: Add a working xstate data structure
+  KVM: selftests: x86: Fix an error in comment of amx_test
+  KVM: selftests: x86: Add check of CR0.TS in the #NM handler in
+    amx_test
+  KVM: selftests: x86: Add the XFD check to IA32_XFD in #NM handler
+  KVM: selftests: x86: Fix the checks to XFD_ERR using and operation
+  KVM: selftests: x86: Enable checking on xcomp_bv in amx_test
+  KVM: selftests: x86: Repeat the checking of xheader when
+    IA32_XFD[XTILEDATA] is set in amx_test
+
+ arch/x86/kernel/fpu/xstate.c                  | 10 ++-
+ .../selftests/kvm/include/x86_64/processor.h  | 14 ++++
+ tools/testing/selftests/kvm/x86_64/amx_test.c | 80 +++++++++----------
+ 3 files changed, 59 insertions(+), 45 deletions(-)
+
+-- 
+2.39.2.637.g21b0678d19-goog
 
