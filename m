@@ -2,102 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C955269DD29
-	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 10:48:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D346769DD2F
+	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 10:50:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234023AbjBUJsv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Feb 2023 04:48:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56588 "EHLO
+        id S234034AbjBUJuA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Feb 2023 04:50:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57586 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234019AbjBUJst (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Feb 2023 04:48:49 -0500
-Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 800C2233C5;
-        Tue, 21 Feb 2023 01:48:46 -0800 (PST)
-Received: from loongson.cn (unknown [10.20.42.120])
-        by gateway (Coremail) with SMTP id _____8AxIMx8k_RjNBwDAA--.834S3;
-        Tue, 21 Feb 2023 17:48:44 +0800 (CST)
-Received: from [10.20.42.120] (unknown [10.20.42.120])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8Dx6r14k_RjH6g3AA--.36064S3;
-        Tue, 21 Feb 2023 17:48:40 +0800 (CST)
-Subject: Re: [PATCH v2 22/29] LoongArch: KVM: Implement handle idle exception
-To:     Paolo Bonzini <pbonzini@redhat.com>
-References: <20230220065735.1282809-1-zhaotianrui@loongson.cn>
- <20230220065735.1282809-23-zhaotianrui@loongson.cn>
- <06d61407-00b9-812c-e5b3-de585c47ae6b@redhat.com>
-Cc:     Huacai Chen <chenhuacai@kernel.org>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn
-From:   Tianrui Zhao <zhaotianrui@loongson.cn>
-Message-ID: <5d7fe795-66b9-7a07-b754-77327886c6c6@loongson.cn>
-Date:   Tue, 21 Feb 2023 17:48:40 +0800
-User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:45.0) Gecko/20100101
- Thunderbird/45.4.0
+        with ESMTP id S233466AbjBUJt6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Feb 2023 04:49:58 -0500
+Received: from vulcan.natalenko.name (vulcan.natalenko.name [104.207.131.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 000C835BB;
+        Tue, 21 Feb 2023 01:49:55 -0800 (PST)
+Received: from mail.natalenko.name (vulcan.natalenko.name [IPv6:2001:19f0:6c00:8846:5400:ff:fe0c:dfa0])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by vulcan.natalenko.name (Postfix) with ESMTPSA id 1C163123AEFF;
+        Tue, 21 Feb 2023 10:49:52 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=natalenko.name;
+        s=dkim-20170712; t=1676972992;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=g05pMn2cSNkPdmjZQ3btHmTyaRTRoUr1UNVWrEKBUCw=;
+        b=aSVH9Y+PGJYxz+iY5mNyHHSCp8GrUTri/HfzPcu4njSrXEZ0utXpQ/Z/ZnJ6fZCWXh7t6D
+        XMNhy3VHRmon6Uu3NW2j22Vm682tmjTVCBBWbCo5Fg2i2Uu44QvyYYANo6GXCDRTT6Bfce
+        YXa9H1TMDmFV0se16FSPXmrL9IZY+qs=
 MIME-Version: 1.0
-In-Reply-To: <06d61407-00b9-812c-e5b3-de585c47ae6b@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8Dx6r14k_RjH6g3AA--.36064S3
-X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBjvdXoWrZrWDJw1ruFyxWr4DCryxAFb_yoWxurg_Ww
-        s3X3Z2kw4UWFsrt3W3CwnIgF43Ga1vqF98urWj9FyUWFnFqFWUWanFg397u397twsxZFZI
-        9r18A342kr17XjkaLaAFLSUrUUUUeb8apTn2vfkv8UJUUUU8wcxFpf9Il3svdxBIdaVrn0
-        xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUO
-        07kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3w
-        AFIxvE14AKwVWUXVWUAwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK
-        6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j6F4UM28EF7
-        xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Cr1j6rxdM2kK
-        e7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zVCFFI
-        0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUAVWUtwAv7VC2z280
-        aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2
-        xFo4CEbIxvr21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC
-        6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s
-        026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF
-        0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0x
-        vE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv
-        6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU4SoGDUUUU
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Date:   Tue, 21 Feb 2023 10:49:51 +0100
+From:   Oleksandr Natalenko <oleksandr@natalenko.name>
+To:     David Woodhouse <dwmw2@infradead.org>
+Cc:     Kim Phillips <kim.phillips@amd.com>, tglx@linutronix.de,
+        Usama Arif <usama.arif@bytedance.com>, arjan@linux.intel.com,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        hpa@zytor.com, x86@kernel.org, pbonzini@redhat.com,
+        paulmck@kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, rcu@vger.kernel.org, mimoja@mimoja.de,
+        hewenliang4@huawei.com, thomas.lendacky@amd.com, seanjc@google.com,
+        pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
+        punit.agrawal@bytedance.com, simon.evans@bytedance.com,
+        liangma@liangbit.com,
+        "Limonciello, Mario" <Mario.Limonciello@amd.com>,
+        Piotr Gorski <piotrgorski@cachyos.org>
+Subject: Re: [PATCH v9 0/8] Parallel CPU bringup for x86_64
+In-Reply-To: <85ceb3f92abf3c013924de2f025517372bed19c0.camel@infradead.org>
+References: <20230215145425.420125-1-usama.arif@bytedance.com>
+ <2668799.mvXUDI8C0e@natalenko.name>
+ <ed8d662351cfe5793f8cc7e7e8c514d05d16c501.camel@infradead.org>
+ <2668869.mvXUDI8C0e@natalenko.name>
+ <2a67f6cf18dd2c1879fad9fd8a28242918d3e5d2.camel@infradead.org>
+ <982e1d6140705414e8fd60b990bd259a@natalenko.name>
+ <715CBABF-4017-4784-8F30-5386F1524830@infradead.org>
+ <67dbc69f-b712-8971-f1c9-5d07f506a19c@amd.com>
+ <42dc683e2846ae8fc1e09715aaf7884660e1a386.camel@infradead.org>
+ <37c18c3aeea2e558633b6da6886111d0@natalenko.name>
+ <5A3B7074-0C6D-472B-803B-D76541828C1F@infradead.org>
+ <3d8ed6e157df10c5175c636de0e21849@natalenko.name>
+ <5c557f9b6f55dc2a612ee89142971298e6ae12d8.camel@infradead.org>
+ <ee0d0d971a3095d6a1e96ad4f1ba32d2@natalenko.name>
+ <5b8f9c89f7015fa80c966c6c7f6fa259db6744f8.camel@infradead.org>
+ <ce731b5a4a53680b4840467977b33d9a@natalenko.name>
+ <85ceb3f92abf3c013924de2f025517372bed19c0.camel@infradead.org>
+Message-ID: <3e5944de08ef0d23584d19bad7bae66c@natalenko.name>
+X-Sender: oleksandr@natalenko.name
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 21.02.2023 10:06, David Woodhouse wrote:
+> Why does arch/x86/kernel/acpi/sleep.c::x86_acpi_suspend_lowlevel() set
+> 
+>     initial_gs = per_cpu_offset(smp_processor_id()) ?
+> 
+> Would it not be CPU#0 that comes back up, and should it not get
+> per_cpu_offset(0) ?
 
+Wanna me try `initial_gs = per_cpu_offset(0);` too?
 
-在 2023年02月21日 02:40, Paolo Bonzini 写道:
-> On 2/20/23 07:57, Tianrui Zhao wrote:
->> +int _kvm_emu_idle(struct kvm_vcpu *vcpu)
->> +{
->> +    ++vcpu->stat.idle_exits;
->> +    trace_kvm_exit(vcpu, KVM_TRACE_EXIT_IDLE);
->
-> Please add a separate tracepoint, don't overload trace_kvm_exit().
->
-> Likewise for _kvm_trap_handle_gspr().
->
-> I think _kvm_trap_handle_gspr() should have a tracepoint whose 
-> parameter is inst.word.
+> Or maybe we should just set up smpboot_control for the CPU to find its
+> own stuff, *even* on waking. Since the structures are already set up,
+> it isn't like a clean boot.
+> 
+> If you let it boot in parallel mode, what if you just *remove* the line
+> that sets smpboot_control=0 ?
 
-Thanks, I will add the tracepoint for _kvm_emu_idle and 
-_kvm_trap_handle_gspr.
+If the `smpboot_control = 0;` line in 
+arch/x86/kernel/acpi/sleep.c::x86_acpi_suspend_lowlevel() is commented 
+out, and the system is booted in parallel mode, then suspend/resume 
+works.
 
-Thanks
-Tianrui Zhao
-
->
-> Paolo
->
->> +    if (!vcpu->arch.irq_pending) {
->> +        kvm_save_timer(vcpu);
->> +        kvm_vcpu_block(vcpu);
->> +    }
->> +
->> +    return EMULATE_DONE;
-
+-- 
+   Oleksandr Natalenko (post-factum)
