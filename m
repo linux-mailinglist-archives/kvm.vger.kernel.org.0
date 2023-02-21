@@ -2,216 +2,236 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6524269D9D7
-	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 04:50:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D13869DA12
+	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 05:21:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233616AbjBUDul (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Feb 2023 22:50:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48786 "EHLO
+        id S233027AbjBUEUw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Feb 2023 23:20:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232556AbjBUDui (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Feb 2023 22:50:38 -0500
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC68D4C1E;
-        Mon, 20 Feb 2023 19:50:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1676951418; x=1708487418;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=+3Nq/K38kHZsQSxS12tarLBGvaa5fz9uJFcv3nNQVBg=;
-  b=BQcCYCTT98oXri0y5bZSBHLSbUGrrRMWwm03nWL16poULsxssBtZltaU
-   iNZhgL3oNYkCYK2AgkY5vueYDWU81Qxwvypk2YIPcUfE6Etspv/DMi9u5
-   6lFaG+G2z0Ar2WcN42gz0nUH2d2p4AHKXDy9zPeA+HwiqBBMPdXW4K8W8
-   sJ1RkVIaZoxnYwFZYDfnnVT0A19iqKRFpVN3BL3PhcKLImT4SlVMrw8v+
-   XH9ONP4FjKs9GbME/2xkfbaDUc5VTAyrBJFpKgH619sjJSmZaPbkO3tlw
-   oRuL8JOfrEB7zIDopOaXoZQZNFsVZUsz1K9Vzzu/W+1VfpekT3gZb2rci
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10627"; a="397218547"
-X-IronPort-AV: E=Sophos;i="5.97,314,1669104000"; 
-   d="scan'208";a="397218547"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2023 19:48:29 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10627"; a="664822227"
-X-IronPort-AV: E=Sophos;i="5.97,314,1669104000"; 
-   d="scan'208";a="664822227"
-Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by orsmga007.jf.intel.com with ESMTP; 20 Feb 2023 19:48:29 -0800
-From:   Yi Liu <yi.l.liu@intel.com>
-To:     alex.williamson@redhat.com, jgg@nvidia.com, kevin.tian@intel.com
-Cc:     joro@8bytes.org, cohuck@redhat.com, eric.auger@redhat.com,
-        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.l.liu@intel.com,
-        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
-        yan.y.zhao@intel.com, xudong.hao@intel.com, terrence.xu@intel.com
-Subject: [PATCH v4 19/19] docs: vfio: Add vfio device cdev description
-Date:   Mon, 20 Feb 2023 19:48:12 -0800
-Message-Id: <20230221034812.138051-20-yi.l.liu@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230221034812.138051-1-yi.l.liu@intel.com>
-References: <20230221034812.138051-1-yi.l.liu@intel.com>
-MIME-Version: 1.0
+        with ESMTP id S232411AbjBUEUt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Feb 2023 23:20:49 -0500
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2045.outbound.protection.outlook.com [40.107.243.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D89B241D7;
+        Mon, 20 Feb 2023 20:20:48 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AZD+GC0LtaeFCQhGdvg9nFzYn3XNxPqfyFYHOdEVx0iu2jVN0Ssbnw1OQJ2GE1S2LIhgTe+SBzueJb737WLdRMtJEFIyn9f0gdpcGhTz++YbSAnkT7Rx6rBQg+jlIeLU1i2RFEjoz4s60NR6EzFq0ldQVNtnL12gXkkABDbe1l4mEbyVKGaRDUxCwztPXG0JzzECGoloXLwhU4PLmgFxXAEHvJuMHHxggb92PQE0n6lM+3VaRDpHrUFWlAxbIwlaf4OLOh8lwvZYhtfr7bOGZ4vsATfSLB0LZHS/2Ga4KRiJGYVMUhVLqO2VzgAWU0yLyvbnw/JNW08FC/+vaPjXmQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8Nr+tvdxjp4fylNXgqQT7u2GeQRkc3cCkA4Ms4RuSqQ=;
+ b=HyQw/LpNmK5oIvT7AQ/XnFHBFhfExzskMmKbOORHkL+EZGjrpdxkAIXEd/XPDUfwGfBaP07tmWtV3R/JTUTSYiDian4PoWYPO8xCxzthAjHLf9iCJ0+K8OODOx9Cr8XBq7R/T4Z5Gn4vwi9rRBW/yPQxUqQ6NoWrVhv4PPToageHKkqwYgI1Y51C74mEdqfiY6Ew8WI1HXMfbPxz+hccfnZXQYLMBOgAowLm/8v5TrMuNMP2WvD3fLN1QGKk42AW31CV+r1wkQVLXO7nnG+XEKl6tnw9Oj+tUYoYyqab2pgQK+6vm1scwSyESGAr+/Hs1oNW/fOolyWtkR8Bnk6wOg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8Nr+tvdxjp4fylNXgqQT7u2GeQRkc3cCkA4Ms4RuSqQ=;
+ b=nHsfURU6UY7KQnBbHICvVZN+IPcs/klh+pVv0u3gFRUCWp/9s/KVdEcO9xTeGk0RNHOiSMAKhEg6MCQ07FV3pjEvfRhJ8SMRcH3IVTHOvlgPzVCg2pcDkStQlik+qwdHwAYzXDcY9O9rPBsq4OfQyYDWLU3awPaDD9lOMXrzt8U=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS7PR12MB6263.namprd12.prod.outlook.com (2603:10b6:8:95::17) by
+ CH0PR12MB5091.namprd12.prod.outlook.com (2603:10b6:610:be::10) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6111.20; Tue, 21 Feb 2023 04:20:46 +0000
+Received: from DS7PR12MB6263.namprd12.prod.outlook.com
+ ([fe80::e144:1523:4928:b4]) by DS7PR12MB6263.namprd12.prod.outlook.com
+ ([fe80::e144:1523:4928:b4%5]) with mapi id 15.20.6111.021; Tue, 21 Feb 2023
+ 04:20:45 +0000
+Message-ID: <6a25f9a6-c4c4-ddb4-a3c7-c151bd7f2a89@amd.com>
+Date:   Mon, 20 Feb 2023 22:20:41 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH v9 0/8] Parallel CPU bringup for x86_64
+To:     David Woodhouse <dwmw2@infradead.org>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>
+Cc:     tglx@linutronix.de, Usama Arif <usama.arif@bytedance.com>,
+        arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
+        pbonzini@redhat.com, paulmck@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
+        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
+        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
+        simon.evans@bytedance.com, liangma@liangbit.com,
+        Piotr Gorski <lucjan.lucjanov@gmail.com>,
+        "Limonciello, Mario" <Mario.Limonciello@amd.com>
+References: <20230215145425.420125-1-usama.arif@bytedance.com>
+ <2668799.mvXUDI8C0e@natalenko.name>
+ <ed8d662351cfe5793f8cc7e7e8c514d05d16c501.camel@infradead.org>
+ <2668869.mvXUDI8C0e@natalenko.name>
+ <2a67f6cf18dd2c1879fad9fd8a28242918d3e5d2.camel@infradead.org>
+ <982e1d6140705414e8fd60b990bd259a@natalenko.name>
+ <715CBABF-4017-4784-8F30-5386F1524830@infradead.org>
+ <67dbc69f-b712-8971-f1c9-5d07f506a19c@amd.com>
+ <42dc683e2846ae8fc1e09715aaf7884660e1a386.camel@infradead.org>
+Content-Language: en-US
+From:   Kim Phillips <kim.phillips@amd.com>
+Organization: AMD
+In-Reply-To: <42dc683e2846ae8fc1e09715aaf7884660e1a386.camel@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-ClientProxiedBy: SN7PR04CA0020.namprd04.prod.outlook.com
+ (2603:10b6:806:f2::25) To DS7PR12MB6263.namprd12.prod.outlook.com
+ (2603:10b6:8:95::17)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6263:EE_|CH0PR12MB5091:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3d96cf98-783f-4ed2-fa31-08db13c3009c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: /pvggjZ1KDKs5lCbhJLCuhkIQyMcvY8YwDPgRpcjcHkwESl1XyBTQ9ytBfg7YV0nQ0VxoSt/UKy2qzV42+M2SYqCR7MUaAVYA1JewNXLMxTenDRFdbPDEW8W97AnA1NiVgFxEwowcwtHq7YQov/BkvUKBKxTJIgdpFHl3th4TM6wCM8JmB+NAjGOn+e3w7BI4IOeuO+zJ7JnD2zrNAXmbE3HITjU03UR5tMuRJ8YT6JUxgKDmSR8mX3MG6SFGWmh40b5vMsAVTpby9FssgLqPg6EHTjYCNm17oohGKG8Cc4WiW7I//tKZjCzB5mKgjLepYhCMAC0qbFzm2IYSeLIkuaegPpsEh+eKWvMN6NDiyVjA/qnhfq4VXnR6e7Ub88UjI6xZWrD7R/isoVqBjt+VfFz8POSLBLzwbR/RhEEQC5pvL/WRJqf7UfkY92I8suvAesToLLzYewbgH7H5RfqaEzrW0kpS9BTlI6fCROIdcCxFbBj+A/NxeBRSCrIRwyX1t3E3TI6gAdtVG5GCweTFDzgfpjDmMzwbd8hJ44AQZS1ernTspjne1bmLTJgRzULBzmauVDaZRh5QnYXtgnz2rooqUJiavWKApM6WjeA5R0vM8n8mkyL+PeNm8ofZnBT02JaBAW36WbCvyYz8c/H512w3k8GSoytPqPf2eu0ck2KlAN6kyhzrl/tnI5ytnsEyEGhAdhFgSRx3DGiu7VarYQ14+8ZQ/YzxGYrS3xKxZ0=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6263.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(136003)(366004)(396003)(346002)(39860400002)(376002)(451199018)(38100700002)(44832011)(31696002)(86362001)(5660300002)(7416002)(2906002)(36916002)(31686004)(478600001)(6486002)(6512007)(53546011)(66574015)(186003)(36756003)(6666004)(66556008)(54906003)(316002)(110136005)(6506007)(2616005)(4326008)(41300700001)(66946007)(66476007)(83380400001)(8936002)(8676002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aGR2SS9JK2kvUVQ5WDhPRk5GZTVvelRxODJQcEIwL0JIZ3ZoL1UwOEdxR3R4?=
+ =?utf-8?B?QlIycDU0eXRKSHBlZHR0UE0vRS9ud0tTMHpFK25XZFhnS2lvbkxnNzZxQlo3?=
+ =?utf-8?B?c29FVXRnUkdoM2FFdHdvWkVvYWo2Qk5GTHR3WFpuNnEzdXBHOHBjSkN2UE9m?=
+ =?utf-8?B?MjZ4NW1ZK2c4WFRlMzZ3T0xZTGxKUHNwVTAvVU9kUjFEenhWNXdBQWE3NVl0?=
+ =?utf-8?B?OVNzUlRZMFBTeTAwZGQySyt3YjBEMUhmWTdaTEpDbFR0d0JpblFKQmloS0Yr?=
+ =?utf-8?B?eDNHVmpjamVPMEN4c2ljMkRWbUJQZ2hJeWRMOXZQQkpYY0JiQ3Z3Z0RQTWlY?=
+ =?utf-8?B?aGdxd0VJTWZwdTFwbE5iRzlwNGZzcE1iNytQMnViT2R4MHlZaHpWdGVvQ0Rh?=
+ =?utf-8?B?MWxyQWNyeUVZTlM4K25xeEJDempKSUg1WUZ0a0NidDdJMDNaKzczYittblJ0?=
+ =?utf-8?B?bkZVUnhtU2ZPM05SS3YrV0haQTF1S0N4S0dKWDBIajBoSDFURDNCTnowWFF0?=
+ =?utf-8?B?OFlvTEZrTVcrSmNpODZ2ZFFDZXRIMmhuaTI1ZHlQSXFydXhsb3JkM3R3ZWhj?=
+ =?utf-8?B?UDBkanhjSnNSRjV6aDYyZ29GOE1CYjdEb0FpbHFrZ3MwWEZrR01mUGgyNzB6?=
+ =?utf-8?B?MlhkS1c3TXcrTmp1QUFGdVYzRnUyNk4wbXNyaVNRTUo5dDVFNFVObmxGTTNE?=
+ =?utf-8?B?Y3pqN3g3ZE5UNTVJamdHM2pNRFNMZVZsL21nWHVrZlg5VGVYOTd5eHUrU3Ro?=
+ =?utf-8?B?cE5RSUJiRFpQTFB1b2ptdENETmhtbGg4WXdrdVlhd2xJem40cFUxQk9Jclpa?=
+ =?utf-8?B?NUxFM1JJN1d3Qkdkelg1eHhxVDA4SCtZQVdyYTVVaUp5ek51RVR6Z3E2b0pt?=
+ =?utf-8?B?S3cxZkNMZnhGNlZzTFA1VzhpNmRsTUg2UXRwN3BZdk5LRWJ6bXVKcHhUMkFW?=
+ =?utf-8?B?OWxLTjVsTjduN2lmK3RETElRQUVtT1ZQY1RaWDlHTUJUcVRBVHNmN255UzFW?=
+ =?utf-8?B?UklYem4vMXcrYXd1T094VStSQUUzbjdoRldqdEtvTTdLc3NLYzZZdG1YMmh0?=
+ =?utf-8?B?NDNYaDB2WWw1QXVnRTJpb3pVOGYyWWYyNENHVXU1czZFNGtYNlI5U0s2KzJ4?=
+ =?utf-8?B?T1ZPY21LRVhqWEQrSWczTUtaUDd4WDBBWnFKaTJRdEIrTXdUN3FlSk1TNTZR?=
+ =?utf-8?B?STFjdStWRVhhdERDUWtja3ZoRCs1b2V4WHNNajZEMGtVbWpHazgyNVdUcXNz?=
+ =?utf-8?B?dE55bWRYOWczWlRSZUMwWnBId1lXT2ZMSFBFdng1NnNyeGZ1aUlmQ0dWSkZr?=
+ =?utf-8?B?K0t4SlRhbTd6WDZSMzVxbUlhVFNrR1k1bno3ems4MkdPYnp2R044OVNzUG4w?=
+ =?utf-8?B?Y01ZdFVZc2VlZlk3eTlSa3V0SDZydDZqdkpyMmVKVXdlcGhXZ3hnVzJFTHJW?=
+ =?utf-8?B?Q240SDZTdVFOeEFMRmlxYS9mZDJZWkV5Ylg5aFNHbFJSVkdGZXZGbmxXK1kv?=
+ =?utf-8?B?R0hiMUhMR25OdEphdXRDZEczYzJqNUI3Lzg0bFZxQWpMYmV1a0NybE8xNnpn?=
+ =?utf-8?B?eGQrNWpGMmE0NnQ2QUxQZHg2ajlhQnVqM1VkSXRtaXZEZXJDR01lWmNXbjhI?=
+ =?utf-8?B?WWVsZTRBZU9OQ2dwTE5SY2JTcEFFb1FFeDFqYk9XaGdEQVVGejVCVjJqYk5K?=
+ =?utf-8?B?aHBnM0hKWTVEVFU5N0ZhNEZLdTZZWk9aaUR3Q2VYT0JWeHNweG5ncHNNVTRr?=
+ =?utf-8?B?WDNZdk5nUHc2Umw1aHZ4VjlGNG12YWFyN2VZK0U2STlGbjFMZUtGT0VPazZI?=
+ =?utf-8?B?aENIN1I3ajZTK202d294aXFnT1BsZnIzZWdrYzBFa1EzWlBzdnNYMzR2MUlJ?=
+ =?utf-8?B?QStYVktqaWJ1ZzRpVzArVEdmR2ZOU3VST3o5a2ZOOUl5N1NRYXRDSmRvY1E1?=
+ =?utf-8?B?TnkxS0dIc1FleXY0akY5MnlXWEhRcm1TbXo1VnRuUTZSUzBnbEJMVjg1SGVj?=
+ =?utf-8?B?MGhCcTU4R0xBSkRQZW1oQ3ovdjRmZWhhSnI5WjNibUF1SGpCYTBMcVRSL1Fy?=
+ =?utf-8?B?Q2c1QmpUVEhvdTlseDN5aXM2c0NtNlQ0S0ZBd2c4Y0JJVjRiV2tUQ1RXa2Rj?=
+ =?utf-8?B?bVpOcWZ4OHRJTkQ3TTBDMDlYNHFzNEF2VDY1eGNrWll4VEVOL3VBRXVLQmZ1?=
+ =?utf-8?Q?9JE0YT9hh/H6RVuQy1z3RglisMnStsP77zTZUIYkdsbC?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3d96cf98-783f-4ed2-fa31-08db13c3009c
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6263.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Feb 2023 04:20:45.6175
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: a5ur0gJBJNiW9C20TAePq+DSbDtJ/dvIXf3c3/aRJivxciB/2Ny+ds4QdPswVPdjge17Ua3QRZELw5lj16/tYg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5091
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This gives hints for userspace applications on device cdev usage.
+On 2/20/23 5:30 PM, David Woodhouse wrote:
+> On Mon, 2023-02-20 at 17:23 -0600, Kim Phillips wrote:
+>> On 2/20/23 3:39 PM, David Woodhouse wrote:
+>>> On 20 February 2023 21:23:38 GMT, Oleksandr Natalenko <oleksandr@natalenko.name> wrote:
+>>>> On 20.02.2023 21:31, David Woodhouse wrote:
+>>>>> On Mon, 2023-02-20 at 17:40 +0100, Oleksandr Natalenko wrote:
+>>>>>> On pondělí 20. února 2023 17:20:13 CET David Woodhouse wrote:
+>>>>>>> On Mon, 2023-02-20 at 17:08 +0100, Oleksandr Natalenko wrote:
+>>>>>>>>
+>>>>>>>> I've applied this to the v6.2 kernel, and suspend/resume broke on
+>>>>>>>> my
+>>>>>>>> Ryzen 5950X desktop. The machine suspends just fine, but on
+>>>>>>>> resume
+>>>>>>>> the screen stays blank, and there's no visible disk I/O.
+>>>>>>>>
+>>>>>>>> Reverting the series brings suspend/resume back to working state.
+>>>>>>>
+>>>>>>> Hm, thanks. What if you add 'no_parallel_bringup' on the command
+>>>>>>> line?
+>>>>>>
+>>>>>> If the `no_parallel_bringup` param is added, the suspend/resume
+>>>>>> works.
+>>>>>
+>>>>> Thanks for the testing. Can I ask you to do one further test: apply the
+>>>>> series only as far as patch 6/8 'x86/smpboot: Support parallel startup
+>>>>> of secondary CPUs'.
+>>>>>
+>>>>> That will do the new startup asm sequence where each CPU finds its own
+>>>>> per-cpu data so it *could* work in parallel, but doesn't actually do
+>>>>> the bringup in parallel yet.
+>>>>
+>>>> With patches 1 to 6 (including) applied and no extra cmdline
+>>>> params added the resume doesn't work.
+>>>
+>>> Hm. Kim, is there some weirdness with the way AMD CPUs get their
+>>> APIC ID in CPUID 0x1? Especially after resume?
+>>
+>> Not to my knowledge.  Mario?
 
-Signed-off-by: Yi Liu <yi.l.liu@intel.com>
----
- Documentation/driver-api/vfio.rst | 125 ++++++++++++++++++++++++++++++
- 1 file changed, 125 insertions(+)
+I tested v9-up-to-6/8 on a Ryzen 3000 that passed your between-v6 & v7
+tree commits (ce7e2d1e046a for the parallel-6.2-rc6-part1 tag
+and 17bbd12ee03 for parallel-6.2-rc6), and it, too, fails to resume
+v9-up-to-6/8 after suspend.
 
-diff --git a/Documentation/driver-api/vfio.rst b/Documentation/driver-api/vfio.rst
-index 44527420f20d..5d290ceb2bbf 100644
---- a/Documentation/driver-api/vfio.rst
-+++ b/Documentation/driver-api/vfio.rst
-@@ -239,6 +239,123 @@ group and can access them as follows::
- 	/* Gratuitous device reset and go... */
- 	ioctl(device, VFIO_DEVICE_RESET);
- 
-+IOMMUFD and vfio_iommu_type1
-+----------------------------
-+
-+IOMMUFD is the new user API to manage I/O page tables from userspace.
-+It intends to be the portal of delivering advanced userspace DMA
-+features (nested translation [5], PASID [6], etc.) and backward
-+compatible with the vfio_iommu_type1 driver. Eventually vfio_iommu_type1
-+will be deprecated.
-+
-+With the backward compatibility, no change is required for legacy VFIO
-+drivers or applications to connect a VFIO device to IOMMUFD.
-+
-+	When CONFIG_IOMMUFD_VFIO_CONTAINER=n, VFIO container still provides
-+	/dev/vfio/vfio which connects to vfio_iommu_type1. To disable VFIO
-+	container and vfio_iommu_type1, the administrator could symbol link
-+	/dev/vfio/vfio to /dev/iommu to enable VFIO container emulation
-+	in IOMMUFD.
-+
-+	When CONFIG_IOMMUFD_VFIO_CONTAINER=y, IOMMUFD directly provides
-+	/dev/vfio/vfio while the VFIO container and vfio_iommu_type1 are
-+	explicitly disabled.
-+
-+VFIO Device cdev
-+----------------
-+
-+Traditionally user acquires a device fd via VFIO_GROUP_GET_DEVICE_FD
-+in a VFIO group.
-+
-+With CONFIG_VFIO_DEVICE_CDEV=y the user can now acquire a device fd
-+by directly opening a character device /dev/vfio/devices/vfioX where
-+"X" is the number allocated uniquely by VFIO for registered devices.
-+
-+The cdev only works with IOMMUFD. Both VFIO drivers and applications
-+must adapt to the new cdev security model which requires using
-+VFIO_DEVICE_BIND_IOMMUFD to claim DMA ownership before starting to
-+actually use the device. Once bind succeeds then a VFIO device can
-+be fully accessed by the user.
-+
-+VFIO device cdev doesn't rely on VFIO group/container/iommu drivers.
-+Hence those modules can be fully compiled out in an environment
-+where no legacy VFIO application exists.
-+
-+So far SPAPR does not support IOMMUFD yet. So it cannot support device
-+cdev either.
-+
-+Device cdev Example
-+-------------------
-+
-+Assume user wants to access PCI device 0000:6a:01.0::
-+
-+	$ ls /sys/bus/pci/devices/0000:6a:01.0/vfio-dev/
-+	vfio0
-+
-+This device is therefore represented as vfio0. The user can verify
-+its existence::
-+
-+	$ ls -l /dev/vfio/devices/vfio0
-+	crw------- 1 root root 511, 0 Feb 16 01:22 /dev/vfio/devices/vfio0
-+	$ cat /sys/bus/pci/devices/0000:6a:01.0/vfio-dev/vfio0/dev
-+	511:0
-+	$ ls -l /dev/char/511\:0
-+	lrwxrwxrwx 1 root root 21 Feb 16 01:22 /dev/char/511:0 -> ../vfio/devices/vfio0
-+
-+Then provide the user with access to the device if unprivileged
-+operation is desired::
-+
-+	$ chown user:user /dev/vfio/devices/vfio0
-+
-+Finally the user could get cdev fd by::
-+
-+	cdev_fd = open("/dev/vfio/devices/vfio0", O_RDWR);
-+
-+An opened cdev_fd doesn't give the user any permission of accessing
-+the device except binding the cdev_fd to an iommufd. After that point
-+then the device is fully accessible including attaching it to an
-+IOMMUFD IOAS/HWPT to enable userspace DMA::
-+
-+	struct vfio_device_bind_iommufd bind = {
-+		.argsz = sizeof(bind),
-+		.flags = 0,
-+	};
-+	struct iommu_ioas_alloc alloc_data  = {
-+		.size = sizeof(alloc_data),
-+		.flags = 0,
-+	};
-+	struct vfio_device_attach_iommufd_pt attach_data = {
-+		.argsz = sizeof(attach_data),
-+		.flags = 0,
-+	};
-+	struct iommu_ioas_map map = {
-+		.size = sizeof(map),
-+		.flags = IOMMU_IOAS_MAP_READABLE |
-+			 IOMMU_IOAS_MAP_WRITEABLE |
-+			 IOMMU_IOAS_MAP_FIXED_IOVA,
-+		.__reserved = 0,
-+	};
-+
-+	iommufd = open("/dev/iommu", O_RDWR);
-+
-+	bind.iommufd = iommufd;
-+	ioctl(cdev_fd, VFIO_DEVICE_BIND_IOMMUFD, &bind);
-+
-+	ioctl(iommufd, IOMMU_IOAS_ALLOC, &alloc_data);
-+	attach_data.pt_id = alloc_data.out_ioas_id;
-+	ioctl(cdev_fd, VFIO_DEVICE_ATTACH_IOMMUFD_PT, &attach_data);
-+
-+	/* Allocate some space and setup a DMA mapping */
-+	map.user_va = (int64_t)mmap(0, 1024 * 1024, PROT_READ | PROT_WRITE,
-+				    MAP_PRIVATE | MAP_ANONYMOUS, 0, 0);
-+	map.iova = 0; /* 1MB starting at 0x0 from device view */
-+	map.length = 1024 * 1024;
-+	map.ioas_id = alloc_data.out_ioas_id;;
-+
-+	ioctl(iommufd, IOMMU_IOAS_MAP, &map);
-+
-+	/* Other device operations as stated in "VFIO Usage Example" */
-+
- VFIO User API
- -------------------------------------------------------------------------------
- 
-@@ -566,3 +683,11 @@ This implementation has some specifics:
- 				\-0d.1
- 
- 	00:1e.0 PCI bridge: Intel Corporation 82801 PCI Bridge (rev 90)
-+
-+.. [5] Nested translation is an IOMMU feature which supports two stage
-+   address translations. This improves the address translation efficiency
-+   in IOMMU virtualization.
-+
-+.. [6] PASID stands for Process Address Space ID, introduced by PCI
-+   Express. It is a prerequisite for Shared Virtual Addressing (SVA)
-+   and Scalable I/O Virtualization (Scalable IOV).
--- 
-2.34.1
+> Oleksandr, please could you show the output of 'cpuid' after a
+> successful resume?  I'm particularly looking for this part...
+> 
+> 
+> $ sudo cpuid | grep -A1 1/ebx
+>     miscellaneous (1/ebx):
+>        process local APIC physical ID = 0x0 (0)
+> --
+>     miscellaneous (1/ebx):
+>        process local APIC physical ID = 0x2 (2)
+> ...
 
+The Ryzens have a different pattern it seems:
+
+$ sudo cpuid | grep -A1 \(1/ebx
+    miscellaneous (1/ebx):
+       process local APIC physical ID = 0x0 (0)
+--
+    miscellaneous (1/ebx):
+       process local APIC physical ID = 0x1 (1)
+--
+    miscellaneous (1/ebx):
+       process local APIC physical ID = 0x2 (2)
+--
+    miscellaneous (1/ebx):
+       process local APIC physical ID = 0x3 (3)
+--
+    miscellaneous (1/ebx):
+       process local APIC physical ID = 0x4 (4)
+--
+    miscellaneous (1/ebx):
+       process local APIC physical ID = 0x5 (5)
+--
+    miscellaneous (1/ebx):
+       process local APIC physical ID = 0x6 (6)
+--
+    miscellaneous (1/ebx):
+       process local APIC physical ID = 0x7 (7)
+
+
+I tested the v7 series on Ryzen, it also fails, so
+Ryzen users were last known good with those two
+aforementioned commits on your tree:
+
+git://git.infradead.org/users/dwmw2/linux.git
+
+Thanks,
+
+Kim
