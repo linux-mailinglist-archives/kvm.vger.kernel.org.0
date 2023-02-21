@@ -2,92 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B4A369DC54
-	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 09:44:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 33E2D69DC58
+	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 09:45:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233641AbjBUIoX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Feb 2023 03:44:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34622 "EHLO
+        id S233628AbjBUIpD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Feb 2023 03:45:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233560AbjBUIoV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Feb 2023 03:44:21 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62846E5;
-        Tue, 21 Feb 2023 00:44:20 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id x34so519027pjj.0;
-        Tue, 21 Feb 2023 00:44:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=iAdVpmaUtP1sMiKhdmhcYrJ4v5VDK3Of4Da2QjdRn/Q=;
-        b=Axa5vyTi9T3TZzw9+JqrNW3qQhqWqtKfNCffJfbjHIyhbcSPOZkXTMWHfVvnWZUC0J
-         JOjXFBVgQhLmqT3vRwFsU3odpuVFnR868Mhnw1VPL6cNPk8ZAj80BHy30hrZMK7Ur6A4
-         29LM1BWubPuS2nd7ll3oX0FtTqJEW0n9xSe2A4w/SlpRV1A9jJ4ZZtGmmEqCncj/lAa7
-         9uAty/F/vQDgIEQwfv6Thpis7Q70NkbYxAVaKl9dqSYVKOsCG3pAV/lwQV+9CZg1sxuW
-         OkbQxr5Ht3fE2KRnYLWSbSLHp4z1Heo4Z99+3WTX1txFCG0BMBN2gOUF/h/0nGioazht
-         oFKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iAdVpmaUtP1sMiKhdmhcYrJ4v5VDK3Of4Da2QjdRn/Q=;
-        b=0cs+oQNBJIoAtdn/o6bK1nKo9JdQk1tm6K55PXxJ/a/HAduRxarZCakSrv4xydfa/e
-         JDfCAKWpRScZiue8yzGpOhcynqDeZdIiQQyo/7f32U2068pt63D7d3qCoQpY56z9sMii
-         RuU7s9kJemi9mTBxRp1zfKZ9/itRsGZNfZ9xw8BsQlMo9G4UAKW3gXOaLB/eh8zuUpqt
-         Mvt9Gvv+jIDtnFFM9vxw4SxWnLmgYmAngCeQ22BNRdeTqxjgGUloH6MXtXMfJmcqIgzl
-         OCzTyCptHaAqcU4RXZRov7XcFK2WF8ddmVGTEh8JRyWuePHR2I7ty3C1Bcs5KnrZ3fQk
-         Ob7w==
-X-Gm-Message-State: AO0yUKVsyt+ePYXuhgkxJ2ULhce5urnA+FaNL0jwW4ayKXN3r+vp1vrj
-        mhIP1l3nNDU3L3ETtzeSefo=
-X-Google-Smtp-Source: AK7set95lmiuGKXHxsdQZVMTkvrgvbizW4Z6wpHIxl4NR3tCfQ3bzPRMG7GqShrz2JAV4Ib9oUukpg==
-X-Received: by 2002:a17:90b:4a03:b0:236:6dea:87b4 with SMTP id kk3-20020a17090b4a0300b002366dea87b4mr4580538pjb.39.1676969059844;
-        Tue, 21 Feb 2023 00:44:19 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id t21-20020a17090b019500b002311ae14a01sm2669907pjs.11.2023.02.21.00.44.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Feb 2023 00:44:19 -0800 (PST)
-Message-ID: <3e0f74af-772b-547b-18a9-7ac5c325dd35@gmail.com>
-Date:   Tue, 21 Feb 2023 16:44:10 +0800
+        with ESMTP id S233847AbjBUIpB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Feb 2023 03:45:01 -0500
+Received: from vulcan.natalenko.name (vulcan.natalenko.name [104.207.131.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFF78234E1;
+        Tue, 21 Feb 2023 00:44:58 -0800 (PST)
+Received: from mail.natalenko.name (vulcan.natalenko.name [IPv6:2001:19f0:6c00:8846:5400:ff:fe0c:dfa0])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by vulcan.natalenko.name (Postfix) with ESMTPSA id 15F41123AD1B;
+        Tue, 21 Feb 2023 09:44:54 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=natalenko.name;
+        s=dkim-20170712; t=1676969094;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=FIC5lZ3as9dPKws7ocPjtZcSjnJaB0fJKP8YCUvjRyo=;
+        b=BclCujBF1iHRmI1ZsL+BoarWPqxvHzzvE71lqQyOszq4YLBmPuL+67RqACIfbxlQxUO+sS
+        MBVFNZ2OsboKr7oTCpxZWrx7WiWZGpOn/YNmqJa7cF6Ic4U80F2GBJrpdNsF3FHR4d1icp
+        Ul09+sWKh8vOxFyb6mcCBKXB6oHsMTI=
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.8.0
-Subject: Re: [PATCH v4 02/12] KVM: VMX: Refactor intel_pmu_set_msr() to align
- with other set_msr() helpers
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20230214050757.9623-1-likexu@tencent.com>
- <20230214050757.9623-3-likexu@tencent.com> <Y+6cfen/CpO3/dLO@google.com>
-Content-Language: en-US
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <Y+6cfen/CpO3/dLO@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Date:   Tue, 21 Feb 2023 09:44:53 +0100
+From:   Oleksandr Natalenko <oleksandr@natalenko.name>
+To:     David Woodhouse <dwmw2@infradead.org>
+Cc:     Kim Phillips <kim.phillips@amd.com>, tglx@linutronix.de,
+        Usama Arif <usama.arif@bytedance.com>, arjan@linux.intel.com,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        hpa@zytor.com, x86@kernel.org, pbonzini@redhat.com,
+        paulmck@kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, rcu@vger.kernel.org, mimoja@mimoja.de,
+        hewenliang4@huawei.com, thomas.lendacky@amd.com, seanjc@google.com,
+        pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
+        punit.agrawal@bytedance.com, simon.evans@bytedance.com,
+        liangma@liangbit.com,
+        "Limonciello, Mario" <Mario.Limonciello@amd.com>,
+        Piotr Gorski <piotrgorski@cachyos.org>
+Subject: Re: [PATCH v9 0/8] Parallel CPU bringup for x86_64
+In-Reply-To: <5b8f9c89f7015fa80c966c6c7f6fa259db6744f8.camel@infradead.org>
+References: <20230215145425.420125-1-usama.arif@bytedance.com>
+ <2668799.mvXUDI8C0e@natalenko.name>
+ <ed8d662351cfe5793f8cc7e7e8c514d05d16c501.camel@infradead.org>
+ <2668869.mvXUDI8C0e@natalenko.name>
+ <2a67f6cf18dd2c1879fad9fd8a28242918d3e5d2.camel@infradead.org>
+ <982e1d6140705414e8fd60b990bd259a@natalenko.name>
+ <715CBABF-4017-4784-8F30-5386F1524830@infradead.org>
+ <67dbc69f-b712-8971-f1c9-5d07f506a19c@amd.com>
+ <42dc683e2846ae8fc1e09715aaf7884660e1a386.camel@infradead.org>
+ <37c18c3aeea2e558633b6da6886111d0@natalenko.name>
+ <5A3B7074-0C6D-472B-803B-D76541828C1F@infradead.org>
+ <3d8ed6e157df10c5175c636de0e21849@natalenko.name>
+ <5c557f9b6f55dc2a612ee89142971298e6ae12d8.camel@infradead.org>
+ <ee0d0d971a3095d6a1e96ad4f1ba32d2@natalenko.name>
+ <5b8f9c89f7015fa80c966c6c7f6fa259db6744f8.camel@infradead.org>
+Message-ID: <ce731b5a4a53680b4840467977b33d9a@natalenko.name>
+X-Sender: oleksandr@natalenko.name
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/2/2023 5:13 am, Sean Christopherson wrote:
-> Gah, I forgot to post a patch that gives intel_pmu_get_msr() the same treatment.
-> I'll replace this patch with the combined version below when applying, or will
-> post it separately if a v5 is needed.
-
-It's fine for me to apply this new patch first and then apply the remaining
-patches with only a tiny rebase effort (tests still remains healthy). More, if
-you have more comments on any other patches that need changing after
-the radio silence, please roar at me on this version.
-
+On 21.02.2023 09:35, David Woodhouse wrote:
+> On Tue, 2023-02-21 at 09:25 +0100, Oleksandr Natalenko wrote:
+>> 
+>> 
+>> Right, sorry. Here it is: http://ix.io/4oLq
 > 
-> From: Sean Christopherson<seanjc@google.com>
-> Date: Thu, 26 Jan 2023 17:08:03 -0800
-> Subject: [PATCH] KVM: VMX: Refactor intel_pmu_{g,}set_msr() to align with
->   other helpers
+> $ echo `grep ^00000001 4oLq  | cut -c36-37`
+> 00 02 04 06 08 0a 0c 0e 10 12 14 16 18 1a 1c 1e 01 03 05 07 09 0b 0d 0f
+> 11 13 15 17 19 1b 1d 1f
+> 
+> Well they look sane enough. All even APIC IDs and then all the odd ones
+> is a topology that isn't massively surprising.
+> 
+> Does it match what you get *before* suspend/resume?
+
+Yes, the output is completely the same after a fresh boot and after a 
+suspend/resume cycle.
+
+> Obviously we could stick our fingers in our ears and go "la la la" and
+> just disable it for non-X2APIC, for AMD without X2APIC, or perhaps
+> disable it on *resume* but still use it at boot. But I'd really like to
+> understand what's going on and not do voodoo. Thanks for helping!
+
+-- 
+   Oleksandr Natalenko (post-factum)
