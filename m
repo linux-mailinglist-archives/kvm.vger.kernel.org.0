@@ -2,122 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CB23D69DBE3
-	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 09:26:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0937169DBEB
+	for <lists+kvm@lfdr.de>; Tue, 21 Feb 2023 09:29:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233668AbjBUI0t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Feb 2023 03:26:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42898 "EHLO
+        id S233687AbjBUI35 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Feb 2023 03:29:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233669AbjBUI0n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Feb 2023 03:26:43 -0500
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A55ED234CA
-        for <kvm@vger.kernel.org>; Tue, 21 Feb 2023 00:26:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1676967989; x=1708503989;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=+5WHf6C2sT658tDHPh+X+uovNTfiwHJEASlJLSgry2U=;
-  b=WEaOEsQkFECyKS7AlyB4JbQgGqpjEqg2oI3ARJhmLyVbQbisPmZtRc6p
-   OkEvRqbS0/nMvFmVAJZPy6ezYR4Pn7VwdW0L/pB++a69j6Gshi7idRLzK
-   OzX2wrjTvpdjFxIA7Vq29m8NmLLnxBL+0GHMAdKHOLR2YuOx4hXsy2TX6
-   Z6B2naF4NevKHkCbSpg9gVai8c46XJmNnQkdF4K3EDUxOuzIuh1EPqOdA
-   jrIdraLoZ4vk0meBcH1IDR+SI4ugF8aCmKt44oh0XD4UpE2/BHM6Knm1q
-   Zj+rLSJ0hHB4675lb7Iq0nKqYfn6T5YlHyYpBRVAqlkhaOuh7u5AjTiFG
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10627"; a="418800924"
-X-IronPort-AV: E=Sophos;i="5.97,315,1669104000"; 
-   d="scan'208";a="418800924"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2023 00:26:29 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10627"; a="673596385"
-X-IronPort-AV: E=Sophos;i="5.97,315,1669104000"; 
-   d="scan'208";a="673596385"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.10.94]) ([10.238.10.94])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2023 00:26:26 -0800
-Message-ID: <fc84dd84-67c5-5565-b989-7e6bb9116c6e@linux.intel.com>
-Date:   Tue, 21 Feb 2023 16:26:25 +0800
+        with ESMTP id S233669AbjBUI3x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Feb 2023 03:29:53 -0500
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CFBE233D1;
+        Tue, 21 Feb 2023 00:29:52 -0800 (PST)
+Received: by mail-pl1-x629.google.com with SMTP id e5so5231232plg.8;
+        Tue, 21 Feb 2023 00:29:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZkejIJ/ewx23N/WQCdpAyX4kI9mx9e+IZS2vzWc4m3U=;
+        b=f3u/AZPdaqSHj0bjil/r9jJ2SsdMj6FISC2s3Ppl84M1SZZtuMPsv+V/I++9Tcclas
+         ytcyXb6f2BTNouvI8uTex4Dg1uHfunnPYizf/7nR2OdHpr9PdhV16yCtCve2sLJY/LaB
+         aDkRwjJOsdVvbL2OKF3O9Q7V++IEmZhagYs7wpaAbBarEq5ET7Vbv9Y89Af9fSbVpSSN
+         BtW6aLRbA8NoTg6RVZH21+TAZJCd/+3aQ4W0Xyrm+y2+DNsNc/Q+k61AoFrmSp/Zf6il
+         LaOhBxx/a7eZGNB+hL8eQ0dG6+7pOEk2zJ80dn/uvXkATBxr9ud3CWIuELjYofyw2qQz
+         HCTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZkejIJ/ewx23N/WQCdpAyX4kI9mx9e+IZS2vzWc4m3U=;
+        b=QisnUUvRSzoQpZuZGqi2FEsTRBDnGqlX/Tc58659LpB5DaDWWY4KGe1L12JL4MvdAN
+         IMTwe25kemufNOSHjc6q0grgxuPPEY0/7YozyZpy4I+Kedxpu4Q6CMetJ5Ir8SEUXNNF
+         CG0WF4hTNq6BUAwazCG2KSOLZKxgvag8kamjhuFF83OrHinGApW7hK1RTbFpZBGB0hu8
+         rnwaLWz0tJ9k+c0wMbMXRehQx/bOn7SHcHryglnqdMVNc5m1wfabF1w/Of4/L3xz+Hr4
+         4kgGpnV8Y3tdy/abygDwe0LNDo5e4OdRNlyEPOKRRvgI3T3cKoAv7AXN8wmwepq03LT8
+         VaXA==
+X-Gm-Message-State: AO0yUKXQCSLMlxQP/WH83QI4JWDoDw2SAk9FJXQv/hUadqMadkjGBs+J
+        9Wu0HSoFQWJnLNchRHPrxOE=
+X-Google-Smtp-Source: AK7set8wrJpFrU5r+5p3/X5A33DTb3ReLnXOpz4cxOIPPAW9QcP3jgErFXYUQuWGI4U6NFtnhDGYBA==
+X-Received: by 2002:a17:902:d505:b0:19a:debb:58f7 with SMTP id b5-20020a170902d50500b0019adebb58f7mr3762503plg.13.1676968191912;
+        Tue, 21 Feb 2023 00:29:51 -0800 (PST)
+Received: from localhost.localdomain ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id t9-20020a170902a5c900b00196896d6d04sm2988686plq.258.2023.02.21.00.29.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Feb 2023 00:29:51 -0800 (PST)
+From:   Like Xu <like.xu.linux@gmail.com>
+X-Google-Original-From: Like Xu <likexu@tencent.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH kvm-unit-tests] x86/pmu: Check counter is working properly before AMD pmu init
+Date:   Tue, 21 Feb 2023 16:29:25 +0800
+Message-Id: <20230221082925.16014-1-likexu@tencent.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.2
-Subject: Re: [PATCH v4 9/9] KVM: x86: LAM: Expose LAM CPUID to user space VMM
-To:     Robert Hoo <robert.hu@linux.intel.com>, seanjc@google.com,
-        pbonzini@redhat.com, yu.c.zhang@linux.intel.com,
-        yuan.yao@linux.intel.com, jingqi.liu@intel.com,
-        weijiang.yang@intel.com, chao.gao@intel.com,
-        isaku.yamahata@intel.com
-Cc:     kirill.shutemov@linux.intel.com, kvm@vger.kernel.org
-References: <20230209024022.3371768-1-robert.hu@linux.intel.com>
- <20230209024022.3371768-10-robert.hu@linux.intel.com>
- <2c7c4d73-810e-6c9c-0480-46d68dedadc8@linux.intel.com>
- <587054f9715283ef4414af64dd69cda1f7597380.camel@linux.intel.com>
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <587054f9715283ef4414af64dd69cda1f7597380.camel@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Like Xu <likexu@tencent.com>
 
-On 2/21/2023 3:26 PM, Robert Hoo wrote:
-> On Tue, 2023-02-21 at 13:47 +0800, Binbin Wu wrote:
->> On 2/9/2023 10:40 AM, Robert Hoo wrote:
->>> LAM feature is enumerated by (EAX=07H, ECX=01H):EAX.LAM[bit26].
->>>
->>> Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
->>> Reviewed-by: Jingqi Liu <jingqi.liu@intel.com>
->>> ---
->>>    arch/x86/kvm/cpuid.c | 2 +-
->>>    1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
->>> index b14653b61470..79f45cbe587e 100644
->>> --- a/arch/x86/kvm/cpuid.c
->>> +++ b/arch/x86/kvm/cpuid.c
->>> @@ -664,7 +664,7 @@ void kvm_set_cpu_caps(void)
->>>    
->>>    	kvm_cpu_cap_mask(CPUID_7_1_EAX,
->>>    		F(AVX_VNNI) | F(AVX512_BF16) | F(CMPCCXADD) |
->>> F(AMX_FP16) |
->>> -		F(AVX_IFMA)
->>> +		F(AVX_IFMA) | F(LAM)
->> Do we allow to expose the LAM capability to guest when host kernel
->> disabled LAM feature (e.g. via clearcpuid)?
-> No
->> May be it should be handled similarly as LA57.
->>
-> You mean expose LAM to guest based on HW capability rather than host
-> status?
-> Why is LA57 exposure like this? unlike most features.
+Avoid misleading pmu initialisation when vPMU is globally disabled
+by performing a read/write consistency test on one of AMD's counters.
+Without this check, pmu test will fail rather than be skipped.
 
-The special handling for LA57 is from the patch "kvm: x86: Return LA57 
-feature based on hardware capability".
-https://lore.kernel.org/lkml/1548950983-18458-1-git-send-email-yu.c.zhang@linux.intel.com/
+Given some historical reasons, the expectation that AMD counter write
+values lead to #GP when vPMU is globally disabled is not in line with
+the architectural specification (even when not disabled, writing to AMD
+reserved bits will likely not result in #GP, but more of a filtered write),
+and like many mature guests, KUT can test the consistency of read and
+write values against a counter MSR that must be supported to determine
+if the PMU is available and continue testing.
 
-The reason is host kernel may disable 5-level paging using cmdline 
-parameter 'no5lvl', and it will clear the feature bit for LA57 in 
-boot_cpu_data.
-boot_cpu_data is queried in kvm_set_cpu_caps to derive kvm cpu cap masks.
+Signed-off-by: Like Xu <likexu@tencent.com>
+---
+Nit:
+- A generic "durable" MSRs check could be applied later if need;
+- Two more tests: 20221226075412.61167-1-likexu@tencent.com;
 
-" VMs can still benefit from extended linear address width, e.g. to 
-enhance features like ASLR" even when host  doesn't use 5-level paging.
-So, the patch sets LA57 based on hardware capability.
+ lib/x86/pmu.c | 16 +++++++++++++++-
+ x86/pmu.c     |  3 +++
+ 2 files changed, 18 insertions(+), 1 deletion(-)
 
-I was just wondering  whether LAM could be the similar case that the 
-host disabled the feature somehow (e.g via clearcpuid), and the guest 
-still want to use it.
+diff --git a/lib/x86/pmu.c b/lib/x86/pmu.c
+index 0f2afd6..1e23a17 100644
+--- a/lib/x86/pmu.c
++++ b/lib/x86/pmu.c
+@@ -2,6 +2,20 @@
+ 
+ struct pmu_caps pmu;
+ 
++/*
++ * All AMD CPUs that support vPMU have MSR_K7_PERFCTRx, but the
++ * values written to it are discarded when vPMU is globally disabled.
++ */
++static inline bool amd_k7_counter_is_durable(void)
++{
++    u64 after, before = (1ull << PMC_DEFAULT_WIDTH) - 1;
++
++    wrmsr_safe(MSR_K7_PERFCTR0, before);
++    rdmsr_safe(MSR_K7_PERFCTR0, &after);
++
++    return before == after;
++}
++
+ void pmu_init(void)
+ {
+ 	pmu.is_intel = is_intel();
+@@ -38,7 +52,7 @@ void pmu_init(void)
+ 			pmu.msr_global_ctl = MSR_CORE_PERF_GLOBAL_CTRL;
+ 			pmu.msr_global_status_clr = MSR_CORE_PERF_GLOBAL_OVF_CTRL;
+ 		}
+-	} else {
++	} else if (amd_k7_counter_is_durable()){
+ 		if (this_cpu_has(X86_FEATURE_PERFCTR_CORE)) {
+ 			/* Performance Monitoring Version 2 Supported */
+ 			if (this_cpu_has(X86_FEATURE_AMD_PMU_V2)) {
+diff --git a/x86/pmu.c b/x86/pmu.c
+index 72c2c9c..1f041e6 100644
+--- a/x86/pmu.c
++++ b/x86/pmu.c
+@@ -684,6 +684,9 @@ int main(int ac, char **av)
+ 		gp_events_size = sizeof(intel_gp_events)/sizeof(intel_gp_events[0]);
+ 		report_prefix_push("Intel");
+ 		set_ref_cycle_expectations();
++	} else if (!pmu.nr_gp_counters) {
++		report_skip("No AMD PMU is detected!");
++		return report_summary();
+ 	} else {
+ 		gp_events_size = sizeof(amd_gp_events)/sizeof(amd_gp_events[0]);
+ 		gp_events = (struct pmu_event *)amd_gp_events;
 
+base-commit: e3c5c3ef2524c58023073c0fadde2e8ae3c04ec6
+-- 
+2.39.2
 
-
->
-> Without explicit rationality, I would tend to follow most conventions.
->
->
