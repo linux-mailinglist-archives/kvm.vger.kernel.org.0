@@ -2,206 +2,329 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B231169EF97
-	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 08:50:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7839869EFFA
+	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 09:17:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230403AbjBVHut (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Feb 2023 02:50:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39344 "EHLO
+        id S231303AbjBVIRD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Feb 2023 03:17:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230402AbjBVHup (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Feb 2023 02:50:45 -0500
-Received: from out-28.mta0.migadu.com (out-28.mta0.migadu.com [91.218.175.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C54F635251
-        for <kvm@vger.kernel.org>; Tue, 21 Feb 2023 23:50:43 -0800 (PST)
-Date:   Wed, 22 Feb 2023 07:50:36 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1677052241;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=J/fk+MeIWW89zx2K/F0d+4r3Hj9qGcFVA+uUnWcayb8=;
-        b=Wle8bqCgQ3OEjfcD5GDmQ3TfLmXPO/267A1N8oPQBT1IUVpadyyDKWbjj82KXcljKIBZdR
-        pK9ruEGxhY4ct0ktCYUR0sXCe9pHCZTY9bibovpUNOTb3teHXuOHmSaMRtiyCxEC8NApSG
-        vc+RR8gnKzV3sxRY8B2KzfhmjNcFFSE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Colton Lewis <coltonlewis@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Andrew Jones <andrew.jones@linux.dev>,
-        Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: selftests: Provide generic way to read system
- counter
-Message-ID: <Y/XJTGydjLCGKqRz@linux.dev>
-References: <20230221232740.387978-1-coltonlewis@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+        with ESMTP id S229612AbjBVIRB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Feb 2023 03:17:01 -0500
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55B3A36FE5;
+        Wed, 22 Feb 2023 00:16:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1677053817; x=1708589817;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=EP1Hl21xMxh1psOWpQJTih63QMR8M5mx+sJIiwqONT8=;
+  b=JMnrbnXnZjmaGIVjLJSxooI26KNbeGI6/u4CjFdVvBfHfR4zrdOET98X
+   HjdvtrfQTjDoCIIqy2w40HJZtjz+h3z/xq5V88R7pskbYhrVNyS7cp6q0
+   LFIksh+59Cs1O4ROcVGnbSZc0KeZHKmgF8hPExdAVYUzSqYBj0CGZnlLK
+   gyuTu6ZRitCtnuF/ATJzZeV6SvseYMRly6tIapgKs/aaHCY2VO1Ms5npG
+   ira2qo+c7NDV1Xdgdlmy9+OirINg0A7tToEEsFTifm1/fyaRcGjEluiAX
+   dR3zNqRPdK/cz+AF6rXTgkHWEgcdwUhs/HuZwPGHvCnv1mLUXFySIC5l+
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10628"; a="419094378"
+X-IronPort-AV: E=Sophos;i="5.97,318,1669104000"; 
+   d="scan'208";a="419094378"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Feb 2023 00:16:56 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10628"; a="665268328"
+X-IronPort-AV: E=Sophos;i="5.97,318,1669104000"; 
+   d="scan'208";a="665268328"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orsmga007.jf.intel.com with ESMTP; 22 Feb 2023 00:16:56 -0800
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Wed, 22 Feb 2023 00:16:55 -0800
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Wed, 22 Feb 2023 00:16:55 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16 via Frontend Transport; Wed, 22 Feb 2023 00:16:55 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.174)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.16; Wed, 22 Feb 2023 00:16:55 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YZ62IovNTQySa5W79t3mq6upIOTtASuOLh0fnpBLvFgPcin9T4QO2UZDNFSQFyu6eSXKgbgBf0c1y4bi7whVVKcopUvH3lD7vaCjVnfQQR7FCSMXACW8rlWwhVuz0jwAXaDz6klWT/Jn5pja7LYD0ApejOrs9yTiuH0hD+sG0sZ3Vzc5Ip9ZVUuDujCnFEmUMBq3VIL0Kms9wvrFJypott0eWaXibS6KTFAUfOb1fbMWo/JqPbnXhnpgNFuPy610k+GDuFNW3qCGOdegdYOmtiPOG/bm4JXeoA73RtSqLhljv33GkHSCfxiBeSBhpCSUrkwJgVynP3I4cDMdpInyng==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zFQwy71kkv/QvF/7/81ItRMImd7RDoC/wjR/OFqTbnY=;
+ b=cmF9llpPVN05yCrPGR3pOujJcXpDwhBcjxfflxTIZoydV+fho+JRILe75FvLpvx3LsFdVMsbBP1Ii2bHf8bErtbt5XCNngulEKMM9KqrpCBdpoH12NNRkYi0bE1BssrRyzEQ3AqKj+duSTnKAVdYf6xuyfkha20ctGukJPkJtcPtooNSLUdSRtfofEk0Ub9rslhINzesplvDUQsPQcKXNblQMzW5M9deWvettKJxZXXzjc06QCeUhFLMEBG15oCqasvKgRaFmI5VTrXMwHXhqPXDm17H+HRmBi/pSVhpvIVr0JeAA7UHBwzTfS1DMhY1pqB9ajDTfCmKmAAbaMq/9w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ DS7PR11MB6038.namprd11.prod.outlook.com (2603:10b6:8:75::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6111.19; Wed, 22 Feb 2023 08:16:54 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::82d2:d341:4138:17ef]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::82d2:d341:4138:17ef%6]) with mapi id 15.20.6111.019; Wed, 22 Feb 2023
+ 08:16:54 +0000
+Date:   Wed, 22 Feb 2023 15:53:09 +0800
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+CC:     <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+        <kevin.tian@intel.com>, <joro@8bytes.org>, <cohuck@redhat.com>,
+        <eric.auger@redhat.com>, <nicolinc@nvidia.com>,
+        <kvm@vger.kernel.org>, <mjrosato@linux.ibm.com>,
+        <chao.p.peng@linux.intel.com>, <yi.y.sun@linux.intel.com>,
+        <peterx@redhat.com>, <jasowang@redhat.com>,
+        <shameerali.kolothum.thodi@huawei.com>, <lulu@redhat.com>,
+        <suravee.suthikulpanit@amd.com>,
+        <intel-gvt-dev@lists.freedesktop.org>,
+        <intel-gfx@lists.freedesktop.org>, <linux-s390@vger.kernel.org>,
+        <xudong.hao@intel.com>, <terrence.xu@intel.com>
+Subject: Re: [PATCH v4 16/19] vfio: Add VFIO_DEVICE_BIND_IOMMUFD
+Message-ID: <Y/XJ5RsH+uivVUlH@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20230221034812.138051-1-yi.l.liu@intel.com>
+ <20230221034812.138051-17-yi.l.liu@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20230221232740.387978-1-coltonlewis@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230221034812.138051-17-yi.l.liu@intel.com>
+X-ClientProxiedBy: SG2P153CA0013.APCP153.PROD.OUTLOOK.COM (2603:1096::23) To
+ DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|DS7PR11MB6038:EE_
+X-MS-Office365-Filtering-Correlation-Id: 08224c01-5003-4a1f-e593-08db14ad27f6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 6QMKMZGft8SlgTk622SNPKXFzQWsLNBRp3BeprAx3PHMwCkQ4f5OXS6F8scfDktNjjGWbFCUam0kZpgdrl/BT+UTATpbqQUmQr6EWwahwBHqX6/Tn04Pmu8Tp2VIQtZqhav6rTZR3+NTeN8Eom+KHDMXVAWGAeDb7rEVRQYQi2M2z44ybJCxkWGg/xuYLLF6mDrFbXJscimxF9KY3jhrDmYX2c5xy3/fzoGG7gTXWgjM2KiuYk9Z9wqwhygrRwskteYPvse4YJM4aaza1THYB0wdJLhM0X9+hm4KytytVPmtEmBwz91IrHYGMoheXpoHtbzZUceQxquMOGr+hE0w3VYE46QWhOV/2iv1xwCeJz8ZkdC6awMm+R9snbg2oXtwAnd6Rapl5nNcwRYyFMd+L6LaCtE5dgTWrWkUX4nvOU9T06NY9jgEg8bRwG7SONCtQToRz9BLAbgbsvN9SsYufW8x/PtKDQwykzflIIBoIJLbK86zkOpwISt2JVXYMcbZR3Q8bibhKq1X2BymQMZA7RF0xQ56agszjx5SPnn8/NGznefTkqAqOGdFu8S67m1GrEN2e5d6qQjp8goi0PaLbYQe2JCsP6cPCEMrYc7lPXlZH4gKPr3+LISbx+FrQ+Z8yqyPIshf+S6zG7LSj6YXEA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(346002)(396003)(136003)(376002)(39860400002)(366004)(451199018)(66476007)(8676002)(66556008)(4326008)(6486002)(66946007)(7416002)(54906003)(316002)(6636002)(8936002)(41300700001)(86362001)(478600001)(6666004)(6506007)(38100700002)(186003)(6512007)(26005)(2906002)(3450700001)(5660300002)(82960400001)(6862004)(83380400001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?uzcu1eUj4VdzGDRTKf5FqW08xJIz8ZSpV9EPQEe4tLjDZETKXyufiddb8Tck?=
+ =?us-ascii?Q?AMOoidtnDsZIVvg/TEv/hjYHyoPHzN2DrdpJdtHcyOhuzmB8xXFL1iObQvuS?=
+ =?us-ascii?Q?+cCdD0SjqJqECpE4tkQy3U0Qly9IKrZ0Pff5Df9s1nwaZ1dgnDh3bw1GEmJ2?=
+ =?us-ascii?Q?B+nkXUSRslApOTV4R9b7EQ9UbrnmYDki7IrglP0UTl8eUWI0Xo7j7QtAdfpy?=
+ =?us-ascii?Q?/3nixjf6JhfIHdmQb3CdLd5Atux88v/Lnms6gcirA6fv+JbFwpb4hHloEd0L?=
+ =?us-ascii?Q?ft2OHSqT+IJAwILU0tCzA4NVDcrhRy6ktnQX7AiCAMMG6uRAz8HFkqdTN4hU?=
+ =?us-ascii?Q?MRl+yLUOXcs23lHay9S+HjdY6CeWxhuIVdJ6diOVXyZCUxpelrXSuIrUB6sG?=
+ =?us-ascii?Q?h8Bk9lpCvyaWCYc6xmhkE9muruXa2Ekx3lrwaTd/MeVkvJAhrBknTuIid3u1?=
+ =?us-ascii?Q?Iy3yr9nsMDCY0LCUiTvUkwLtis8gxJiwLznCrO7/M4z3zDZJhWxI83KWGJ29?=
+ =?us-ascii?Q?2fFjvkXW3r85fqUxodsdSKwohs0+7pdOLAAHOixS9Bsd91D6BHoFke5fc49M?=
+ =?us-ascii?Q?YuP/BxdPMa06u1LGnR5//xzgCxtNDCppzLJ5mso67ZnQ7+IxchMSWA/2v5Br?=
+ =?us-ascii?Q?X9Rrg4Jb47UDoiN2uOIUhKHMF8Q33ZqMSABiLoThBYTLWdEJjMwE2u22dB7q?=
+ =?us-ascii?Q?+H+nNwAEM+ErzinBi+TjtmEcJIdQCeS6Q5cjGX5uCpCm4Xy9KxJMjDLp/ods?=
+ =?us-ascii?Q?hucNdpqjaWHdMis9GyrW3Vt+4SZb7WLD9bs5HGbiEz5OS9kbaaElr7ctJIJr?=
+ =?us-ascii?Q?VjgwQVjBVkTFM87gcBdY70fOO3pHY4GAzTUtXqL6fWnevkk2kAINq38/vHHH?=
+ =?us-ascii?Q?ZlUU9ea4IPNQjGh9HYMSiI4g3o52zZnINjRPn3Usa/QdaAf3WLX0MZrTJi8r?=
+ =?us-ascii?Q?vTqGNYJnRLuyeyjBEQ0cujEh3b3nk2bRQHOpjSEMdsDsdhK4AgjAT38fN5bp?=
+ =?us-ascii?Q?k6d0l5oJp6JVStuVkWCi+lKGlqnUKb1RH3yX3pRD9khFHmzytwg+D/DJyY/L?=
+ =?us-ascii?Q?Ro/HNjbenSHAsVxYaaIJ01CdToPu+5cI8AE9STRMFj9dAYz7n+geVaDc3S+I?=
+ =?us-ascii?Q?lx2MTCqJwn/CBwqeZbHoW41WibMPtu8yub4mLA8OFEFjQCIxe7NqLgGFm0CJ?=
+ =?us-ascii?Q?jWXGqeKIhemr/0ObcsLX99/ZwxpYH2Qgs2sQ04/bCVo6/92tEvC/As8U4/9e?=
+ =?us-ascii?Q?6QwgzmYvVbD+rTK8VyHaOgTjCuMp2tZHnHyUXUsyQ/SuR8JNRVQr/n0/3bK9?=
+ =?us-ascii?Q?AbxyVPbZXbrzWroj5h/asXg1nuQXT/Mj+yEQtbcsmUYBHtRkA/KoQRtOs8uc?=
+ =?us-ascii?Q?aianDHMwJPeB0EOuLoVsv1hws06fxcvCAkuRSh1+SUeDgbhWSBD9LCmLBPuw?=
+ =?us-ascii?Q?C3lw4Vfr8z3eE+CRqvI8/7H3Xkj4+AoFQmiKE7XoCfIgyprphosdtrbG3Sew?=
+ =?us-ascii?Q?vzvWBSiEavjIQOVDog17XlsORpJ5Sp/xz4k606JCPoriMm+9XvNCq1EtLGgo?=
+ =?us-ascii?Q?Ea5NBeDUNbwBmaeZqMP/emOG3bG8IeiCvCQNr+YfQpsC24CyU+0anU1dUllT?=
+ =?us-ascii?Q?8w=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 08224c01-5003-4a1f-e593-08db14ad27f6
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Feb 2023 08:16:53.7790
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: iCubrQm3IKRe2x09QQ81sETmwPf7g6W0985wCpUWI5GQRy6xlpgyNPLpKLGZM1AlkIuGzL9XnMZcp2hrSj8hAA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB6038
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Colton,
-
-On Tue, Feb 21, 2023 at 11:27:40PM +0000, Colton Lewis wrote:
-> Provide a generic function to read the system counter from the guest
-> for timing purposes. An increasingly common and important way to
-> measure guest performance is to measure the amount of time different
-> actions take in the guest. Provide also a mathematical conversion from
-> cycles to nanoseconds and a macro for timing individual statements.
+On Mon, Feb 20, 2023 at 07:48:09PM -0800, Yi Liu wrote:
+> This adds ioctl for userspace to bind device cdev fd to iommufd.
 > 
-> Substitute the previous custom implementation of a similar function in
-> system_counter_offset_test with this new implementation.
+>     VFIO_DEVICE_BIND_IOMMUFD: bind device to an iommufd, hence gain DMA
+> 			      control provided by the iommufd. open_device
+> 			      op is called after bind_iommufd op.
+> 			      VFIO no iommu mode is indicated by passing
+> 			      a negative iommufd value.
 > 
-> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 > ---
+>  drivers/vfio/device_cdev.c | 137 +++++++++++++++++++++++++++++++++++++
+>  drivers/vfio/vfio.h        |  17 ++++-
+>  drivers/vfio/vfio_main.c   |  30 ++++++--
+>  include/linux/iommufd.h    |   6 ++
+>  include/uapi/linux/vfio.h  |  34 +++++++++
+>  5 files changed, 219 insertions(+), 5 deletions(-)
 > 
-> These functions were originally part of my patch to introduce latency
-> measurements into dirty_log_perf_test. [1] Sean Christopherson
-> suggested lifting these functions into their own patch in generic code
-> so they can be used by any test. [2] Ricardo Koller suggested the
-> addition of the MEASURE macro to more easily time individual
-> statements. [3]
-> 
-> [1] https://lore.kernel.org/kvm/20221115173258.2530923-1-coltonlewis@google.com/
-> [2] https://lore.kernel.org/kvm/Y8gfOP5CMXK60AtH@google.com/
-> [3] https://lore.kernel.org/kvm/Y8cIdxp5k8HivVAe@google.com/
-
-This patch doesn't make a great deal of sense outside of [1]. Can you
-send this as part of your larger series next time around?
-
->  .../testing/selftests/kvm/include/test_util.h |  3 ++
->  tools/testing/selftests/kvm/lib/test_util.c   | 37 +++++++++++++++++++
->  .../kvm/system_counter_offset_test.c          | 10 +----
->  3 files changed, 42 insertions(+), 8 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
-> index 80d6416f3012..290653b99035 100644
-> --- a/tools/testing/selftests/kvm/include/test_util.h
-> +++ b/tools/testing/selftests/kvm/include/test_util.h
-> @@ -84,6 +84,9 @@ struct guest_random_state {
->  struct guest_random_state new_guest_random_state(uint32_t seed);
->  uint32_t guest_random_u32(struct guest_random_state *state);
-> 
-> +uint64_t guest_cycles_read(void);
-> +double guest_cycles_to_ns(double cycles);
->
->  enum vm_mem_backing_src_type {
->  	VM_MEM_SRC_ANONYMOUS,
->  	VM_MEM_SRC_ANONYMOUS_THP,
-> diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
-> index 5c22fa4c2825..6d88132a0131 100644
-> --- a/tools/testing/selftests/kvm/lib/test_util.c
-> +++ b/tools/testing/selftests/kvm/lib/test_util.c
-> @@ -15,6 +15,11 @@
->  #include <linux/mman.h>
->  #include "linux/kernel.h"
-> 
-> +#if defined(__aarch64__)
-> +#include "aarch64/arch_timer.h"
-> +#elif defined(__x86_64__)
-> +#include "x86_64/processor.h"
-> +#endif
-
-I believe we place 'include/$(ARCH)/' on the include path, so the
-'x86_64' can be dropped.
-
->  #include "test_util.h"
-> 
->  /*
-> @@ -34,6 +39,38 @@ uint32_t guest_random_u32(struct guest_random_state *state)
->  	return state->seed;
->  }
-> 
-> +uint64_t guest_cycles_read(void)
-
-Do we need the 'guest_' prefix in here? At least for x86 and arm64 the
-same instructions can be used in host userspace and guest kernel for
-accessing the counter.
-
-> +{
-> +#if defined(__aarch64__)
-> +	return timer_get_cntct(VIRTUAL);
-> +#elif defined(__x86_64__)
-> +	return rdtsc();
-> +#else
-> +#warn __func__ " is not implemented for this architecture, will return 0"
-> +	return 0;
-> +#endif
-> +}
-
-I think it would be cleaner if each architecture just provided its own
-implementation of this function instead of ifdeffery here.
-
-If an arch doesn't implement the requisite helper then it will become
-painfully obvious at compile time.
-
-> +double guest_cycles_to_ns(double cycles)
-> +{
-> +#if defined(__aarch64__)
-> +	return cycles * (1e9 / timer_get_cntfrq());
-> +#elif defined(__x86_64__)
-> +	return cycles * (1e9 / (KVM_GET_TSC_KHZ * 1000));
-
-The x86 implementation is wrong. KVM_GET_TSC_KHZ is the ioctl needed
-to get at the guest's TSC frequency (from the perpsective of host
-userspace).
-
-So at the very least this needs to do an ioctl on the VM fd to work out
-the frequency. This is expected to be called in host userspace, right?
-
-> +#else
-> +#warn __func__ " is not implemented for this architecture, will return 0"
-> +	return 0.0;
-> +#endif
-> +}
-> +
-> +#define MEASURE_CYCLES(x)			\
-> +	({					\
-> +		uint64_t start;			\
-> +		start = guest_cycles_read();	\
-> +		x;				\
-> +		guest_cycles_read() - start;	\
-> +	})
-> +
->  /*
->   * Parses "[0-9]+[kmgt]?".
+> diff --git a/drivers/vfio/device_cdev.c b/drivers/vfio/device_cdev.c
+> index 9e2c1ecaaf4f..be62f0a5687e 100644
+> --- a/drivers/vfio/device_cdev.c
+> +++ b/drivers/vfio/device_cdev.c
+> @@ -3,6 +3,7 @@
+>   * Copyright (c) 2023 Intel Corporation.
 >   */
-> diff --git a/tools/testing/selftests/kvm/system_counter_offset_test.c b/tools/testing/selftests/kvm/system_counter_offset_test.c
-> index 7f5b330b6a1b..39b1249c7404 100644
-> --- a/tools/testing/selftests/kvm/system_counter_offset_test.c
-> +++ b/tools/testing/selftests/kvm/system_counter_offset_test.c
-> @@ -39,14 +39,9 @@ static void setup_system_counter(struct kvm_vcpu *vcpu, struct test_case *test)
->  			     &test->tsc_offset);
+>  #include <linux/vfio.h>
+> +#include <linux/iommufd.h>
+>  
+>  #include "vfio.h"
+>  
+> @@ -45,6 +46,142 @@ int vfio_device_fops_cdev_open(struct inode *inode, struct file *filep)
+>  	return ret;
 >  }
-> 
-> -static uint64_t guest_read_system_counter(struct test_case *test)
-> -{
-> -	return rdtsc();
-> -}
-> -
->  static uint64_t host_read_guest_system_counter(struct test_case *test)
->  {
-> -	return rdtsc() + test->tsc_offset;
-> +	return guest_cycles_read() + test->tsc_offset;
+>  
+> +static void vfio_device_get_kvm_safe(struct vfio_device_file *df)
+> +{
+> +	spin_lock(&df->kvm_ref_lock);
+> +	if (!df->kvm)
+> +		goto unlock;
+> +
+> +	_vfio_device_get_kvm_safe(df->device, df->kvm);
+> +
+> +unlock:
+> +	spin_unlock(&df->kvm_ref_lock);
+> +}
+> +
+> +void vfio_device_cdev_close(struct vfio_device_file *df)
+> +{
+> +	struct vfio_device *device = df->device;
+> +
+> +	mutex_lock(&device->dev_set->lock);
+> +	if (!smp_load_acquire(&df->access_granted)) {
+> +		mutex_unlock(&device->dev_set->lock);
+> +		return;
+> +	}
+> +	vfio_device_close(df);
+> +	vfio_device_put_kvm(device);
+> +	if (df->iommufd)
+> +		iommufd_ctx_put(df->iommufd);
+> +	mutex_unlock(&device->dev_set->lock);
+> +	vfio_device_unblock_group(device);
+> +}
+> +
+> +long vfio_device_ioctl_bind_iommufd(struct vfio_device_file *df,
+> +				    unsigned long arg)
+> +{
+> +	struct vfio_device *device = df->device;
+> +	struct vfio_device_bind_iommufd bind;
+> +	struct iommufd_ctx *iommufd = NULL;
+> +	struct fd f;
+> +	unsigned long minsz;
+> +	int ret;
+> +
+> +	minsz = offsetofend(struct vfio_device_bind_iommufd, out_devid);
+> +
+> +	if (copy_from_user(&bind, (void __user *)arg, minsz))
+> +		return -EFAULT;
+> +
+> +	if (bind.argsz < minsz || bind.flags)
+> +		return -EINVAL;
+> +
+> +	if (!device->ops->bind_iommufd)
+> +		return -ENODEV;
+> +
+> +	ret = vfio_device_block_group(device);
+> +	if (ret)
+> +		return ret;
+> +
+> +	mutex_lock(&device->dev_set->lock);
+> +	/*
+> +	 * If already been bound to an iommufd, or already set noiommu
+> +	 * then fail it.
+> +	 */
+> +	if (df->iommufd || df->noiommu) {
+> +		ret = -EINVAL;
+> +		goto out_unlock;
+> +	}
+> +
+> +	/* iommufd < 0 means noiommu mode */
+> +	if (bind.iommufd < 0) {
+> +		if (!capable(CAP_SYS_RAWIO)) {
+> +			ret = -EPERM;
+> +			goto out_unlock;
+> +		}
+> +		df->noiommu = true;
+> +	} else {
+> +		f = fdget(bind.iommufd);
+> +		if (!f.file) {
+> +			ret = -EBADF;
+> +			goto out_unlock;
+> +		}
+> +		iommufd = iommufd_ctx_from_file(f.file);
+> +		if (IS_ERR(iommufd)) {
+> +			ret = PTR_ERR(iommufd);
+> +			goto out_put_file;
+> +		}
+> +	}
+> +
+> +	/*
+> +	 * Before the device open, get the KVM pointer currently
+> +	 * associated with the device file (if there is) and obtain a
+> +	 * reference. This reference is held until device closed. Save
+> +	 * the pointer in the device for use by drivers.
+> +	 */
+> +	vfio_device_get_kvm_safe(df);
+> +
+> +	df->iommufd = iommufd;
+> +	ret = vfio_device_open(df, &bind.out_devid, NULL);
+> +	if (ret)
+> +		goto out_put_kvm;
+> +
+> +	ret = copy_to_user((void __user *)arg +
+> +			   offsetofend(struct vfio_device_bind_iommufd, iommufd),
+> +			   &bind.out_devid,
+> +			   sizeof(bind.out_devid)) ? -EFAULT : 0;
+> +	if (ret)
+> +		goto out_close_device;
+> +
+> +	if (iommufd)
+> +		fdput(f);
+> +	else if (df->noiommu)
+> +		dev_warn(device->dev, "vfio-noiommu device used by user "
+> +			 "(%s:%d)\n", current->comm, task_pid_nr(current));
+> +
+> +	/*
+> +	 * Paired with smp_load_acquire() in vfio_device_fops::ioctl/
+> +	 * read/write/mmap
+> +	 */
+> +	smp_store_release(&df->access_granted, true);
+> +	mutex_unlock(&device->dev_set->lock);
+> +
+> +	return 0;
+> +
+> +out_close_device:
+> +	vfio_device_close(df);
+> +out_put_kvm:
+> +	df->iommufd = NULL;
+> +	df->noiommu = false;
+> +	vfio_device_put_kvm(device);
+> +out_put_file:
+> +	if (iommufd) {
+> +		iommufd_ctx_put(iommufd);
+> +		fdput(f);
+even if iommufd is NULL, still need to fdput(f) if f.file is true, right?
 
-The 'guest_' part is rather confusing here. What this function is really
-trying to do is read the counter from host userspace and apply an offset
-to construct the expected value for the test.
-
-It all compiles down to the same thing, but as written is seemingly
-wrong.
-
--- 
-Thanks,
-Oliver
+> +	}
+> +out_unlock:
+> +	mutex_unlock(&device->dev_set->lock);
+> +	vfio_device_unblock_group(device);
+> +	return ret;
+> +}
+> +
