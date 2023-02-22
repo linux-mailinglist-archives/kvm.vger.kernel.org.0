@@ -2,65 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D131D69FC1F
-	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 20:28:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 00D1D69FC3D
+	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 20:32:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232728AbjBVT2V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Feb 2023 14:28:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33362 "EHLO
+        id S232107AbjBVTb7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Feb 2023 14:31:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232714AbjBVT2T (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Feb 2023 14:28:19 -0500
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0B41199FD
-        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 11:28:18 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-536af109f9aso93370757b3.13
-        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 11:28:18 -0800 (PST)
+        with ESMTP id S230434AbjBVTb5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Feb 2023 14:31:57 -0500
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF52A42BFF
+        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 11:31:20 -0800 (PST)
+Received: by mail-pf1-x42d.google.com with SMTP id fd25so4314566pfb.1
+        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 11:31:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1ncgyXSBsgJeq7wrxsMy4LqhbZKIDHoclZTNSNLUENI=;
-        b=lPp3P/+jAqBvgQohTYmTDD0TAQQX8vElx+SGA/Fdjpqpgp7X4ZXAkUUWiwp2DNFT3X
-         GqB559DmNdRCk/fizAD3aSPNa9ZdtOrDO1fqiBLbp5FhmgOyzBznOvh2//7F0L0rrTaf
-         ADY3pMXCuIPU6Bwv4GP4ZGhYHCN2PdfHnbWI+dFzcbAtLVrYHjEk7bIS1U9sAoQeEfL5
-         LK3y/wuYUVlFNRWsnGRbZ0Iq76k0HJ1OG/na75dFBnYikMRq9f1ZA2bHba4++hOCEHqG
-         YxBRwMkxGfkslTEmPOBEhz35wceGoIQttwp0eQlUQDiFj/LwDawGyXUf6BmRdbj6apn4
-         A54g==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4sXW4q9EpLmN3ULY3ncrUN7CkV+kTTsNZ6c+/DibckI=;
+        b=mH5jupgb0dU5Lzc0M29Umy6r1ACP4DRwXeP/4yF6Jq0tfVd7j5v6LPSNPjdt8inr4K
+         BWEZb7gFLlx5Yp+9K2BVzU4wE/Qt7c2SY+Cx4XCVT+xnDNatFQzOnpHQGSYr/+wfgmfy
+         za0f7NF+CJq6YlgZn1cv9AFAaS4udNZuVMWBzRRFGsW1WElfHlfrNIckQhNSUkT+5KwU
+         L3dG3OAciVgQ3JYh7l86OMCfd7FIz9F0uG1ZX+1ICtaxIAxr61ZVEcdnRaMPZOtDDuE4
+         sQZChY0qPhsz73Bkeo6OcHye3RKXRD46nbIdYh9eLOasKqCgZ7YK9JgfEGZMnzDMMEC/
+         eFtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1ncgyXSBsgJeq7wrxsMy4LqhbZKIDHoclZTNSNLUENI=;
-        b=hIr8v3S3duk81L/uG29WtTSA3/Nk+hR6L4/u7yAa5fZHXhetc1Fx5qC0JeLongpgou
-         J7WNyiq1duUT7nO6MA7N2hQw44TOht5FwZWXlCl7Ret8GoZ0oxlcpqT+DwLJthLjieR6
-         vOqKA3OazlCii+YSkpQ4XVmfjqvayZ1KT+Zpl9nzN4ff99IYotbiRxyjbjMUeoMSTWPB
-         w/pJuNDKpzAKD61jtHOrbVNwYtEq5rJHjWwPc4wBkwUGMMSPKpcsAeEYV1xbKGJO8w4N
-         1nqBTBcSRQXDZAm0+VZ9AaS1ZisDMTmZxzJP5WCW5aEFfBCqnG/awOIajsXVLH/5DPEX
-         TJbg==
-X-Gm-Message-State: AO0yUKWtlECoPRXymzsAGG+LlQCexi7Rda4SQ/POTvDPLP361PgYMK+K
-        Q3m0VtWUmHWtupssajMueHTwlGCaFZY=
-X-Google-Smtp-Source: AK7set/migc9eZDF9Jt8DO4SyvFLBdhry2B2rzLsJS06zwAZEaYvIiX2Jf9s9qcrBQhnsS38/zTdxuNH4GA=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a0d:df82:0:b0:527:ac6f:625b with SMTP id
- i124-20020a0ddf82000000b00527ac6f625bmr1330959ywe.431.1677094097863; Wed, 22
- Feb 2023 11:28:17 -0800 (PST)
-Date:   Wed, 22 Feb 2023 11:28:16 -0800
-In-Reply-To: <20230222082002.97570-1-likexu@tencent.com>
-Mime-Version: 1.0
-References: <20230222082002.97570-1-likexu@tencent.com>
-Message-ID: <Y/Zs0M48SnI1WMCr@google.com>
-Subject: Re: [PATCH] KVM: x86/pmu: Apply event filter mechanism to emulated instructions
-From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Jinrong Liang <cloudliang@tencent.com>,
-        Aaron Lewis <aaronlewis@google.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4sXW4q9EpLmN3ULY3ncrUN7CkV+kTTsNZ6c+/DibckI=;
+        b=y3HWIgIZIkGMjWT+Qe1yI5cqDdBagzN6qMPSP7ScRZ9XRqeg8iddCMsjFoEu2JOjoB
+         qi1etQ9i2zSgwIruu92qTm6x3Wpr8h6nVSwZqkLWUWFO8j6lVCbMiMf4VRMubpJVF+NE
+         MiTKvUaakcTgLf7P8DzAPIuw10ZelTKaWYQk1ib1vQxK77Gyw8hQstzu2pazIOHMnIp3
+         5v1t0qnmgb4443JqiU3TsNqqI1de+WoqdqA3QHJEmVEZlTUrQ5iQHiAQh1vSccyWnEKN
+         fBAUIXb66XKB1nT+mlx/gMcgR/EC7qOgjacVijXq3ee4KWhbtJ2PRKzCHtWZ9fMEiTKB
+         CBew==
+X-Gm-Message-State: AO0yUKWg+raorNym9zdKeRCpGX9mESSPwjxOKL/02PEP03O64dOzp8Rp
+        F5/BlYnhpFcbls8CllMbFlQPMw==
+X-Google-Smtp-Source: AK7set84Ifyb7uDh1Kjx1qh6DhbE56VdeAITxITb2KO5Zwc5hRJuXbHRLoo+ei4a1YqmXOUpsubibA==
+X-Received: by 2002:a62:cf45:0:b0:5a8:ecb1:bf1 with SMTP id b66-20020a62cf45000000b005a8ecb10bf1mr6774200pfg.19.1677094279038;
+        Wed, 22 Feb 2023 11:31:19 -0800 (PST)
+Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
+        by smtp.gmail.com with ESMTPSA id x53-20020a056a000bf500b005a8c92f7c27sm5321528pfu.212.2023.02.22.11.31.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Feb 2023 11:31:17 -0800 (PST)
+Date:   Wed, 22 Feb 2023 11:31:12 -0800
+From:   David Matlack <dmatlack@google.com>
+To:     Vipin Sharma <vipinsh@google.com>
+Cc:     seanjc@google.com, pbonzini@redhat.com, bgardon@google.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [Patch v3 5/7] KVM: x86/mmu: Remove "record_acc_track" in
+ __tdp_mmu_set_spte()
+Message-ID: <Y/ZtgBA7lEdEVnnf@google.com>
+References: <20230211014626.3659152-1-vipinsh@google.com>
+ <20230211014626.3659152-6-vipinsh@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230211014626.3659152-6-vipinsh@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,16 +73,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 22, 2023, Like Xu wrote:
-> From: Like Xu <likexu@tencent.com>
+On Fri, Feb 10, 2023 at 05:46:24PM -0800, Vipin Sharma wrote:
+> Remove bool parameter "record_acc_track" from __tdp_mmu_set_spte() and
+> refactor the code. This variable is always set to true by its caller.
 > 
-> The check_pmu_event_filter() prevents the perf_event from being created
-> and stops the associated counters from increasing, the same check should
-> also be applied to counter increases caused by emulated instructions.
-> Otherwise this filter mechanism cannot be considered to be in effect.
+> Remove single and double underscore prefix from tdp_mmu_set_spte()
+
+uber-nit: I find it helpful to use phrasing like "Opportunistically do
+X" for opportunistic cleanups that are separate from the primary change.
+Otherwise the commit message reads as if 2 totally independent changes
+are being made.
+
+> related APIs:
+> 1. Change __tdp_mmu_set_spte() to tdp_mmu_set_spte()
+> 2. Change _tdp_mmu_set_spte() to tdp_mmu_iter_set_spte()
 > 
-> Reported-by: Jinrong Liang <cloudliang@tencent.com>
+> Signed-off-by: Vipin Sharma <vipinsh@google.com>
+> ---
 
-Already posted by Aaron[*], but I don't think there's been a follow-up.  Aaron?
-
-[*] https://lore.kernel.org/all/20221209194957.2774423-2-aaronlewis@google.com
+Reviewed-by: David Matlack <dmatlack@google.com>
