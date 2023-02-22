@@ -2,157 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BCC8169F911
-	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 17:34:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5969969F923
+	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 17:39:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232209AbjBVQen (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Feb 2023 11:34:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52912 "EHLO
+        id S232118AbjBVQjH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Feb 2023 11:39:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229907AbjBVQel (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Feb 2023 11:34:41 -0500
-Received: from out-7.mta1.migadu.com (out-7.mta1.migadu.com [95.215.58.7])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA00D36FC9
-        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 08:34:38 -0800 (PST)
-Date:   Wed, 22 Feb 2023 16:34:32 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1677083676;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=g115dikiBaIdK9L3xrHdLRa1z/3GXDeuHTXVn7mG2MI=;
-        b=Z2yeX4z0Wwlw2wMfAQtY1lun7xWbSQuUO207B4RZ8QuN66rySmpU3bDF1OdGJnqqNZ+y08
-        FON6+jQz7nnTz8R2UEr9rqD/ZxzRSxgqfVomxPjmRADh5q0zZKXrDmlaJefO0bV8s0NuZD
-        pu2Cri+wT5Mt7TS3vNYnYgdj6e7W8cY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Simon Veith <sveith@amazon.de>, dwmw2@infradead.org
-Subject: Re: [PATCH 08/16] KVM: arm64: timers: Allow userspace to set the
- counter offsets
-Message-ID: <Y/ZEGHkw5Jft19RP@linux.dev>
-References: <20230216142123.2638675-1-maz@kernel.org>
- <20230216142123.2638675-9-maz@kernel.org>
- <Y+6pqz3pCwu7izZL@linux.dev>
- <86k00gy4so.wl-maz@kernel.org>
- <Y+/7mO1sxH4jThmu@linux.dev>
- <86bkllyku2.wl-maz@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86bkllyku2.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231765AbjBVQjE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Feb 2023 11:39:04 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 732E42A6FF
+        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 08:39:03 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id qb12-20020a17090b280c00b002310ecae757so4139589pjb.1
+        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 08:39:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kXgaJI/j9VqE32P3+P9vI0Zcemav11hNqQd2XHiyolg=;
+        b=jRJGnK4E2fY4GvsbcKBwGR7YXRVirER4oHtjA5fJF3UGZ9q6FZyFyIPiIHaFN2MHfT
+         6zjzuKOn2BOdPV0Ur4SqicZgIZ+ea7STJrTUIH8CB3FmYaVoEZUZa8Ead/Zg44msUt3R
+         Kg6cESWjAcu7ZUjHj9Ua/meVz9donOfSRbDqPWoZp2rHmOfmiTAmovV+STTertImDidB
+         G9zxBCv2SDYFkQlRHHFG8FiaSo+6c85J8FWSKnHhR3yh+yOjvCfLz6J25qWcQsqT06uj
+         bbqP8vYCehEkiVS2Fzk8Wl1oWs3WJPOIbgt7WuzNtIG6BYx+nfBFdLDG3Ec32nqEtYCP
+         vFaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kXgaJI/j9VqE32P3+P9vI0Zcemav11hNqQd2XHiyolg=;
+        b=fXUy2++BYn7bYOG5g3omssVTvhMUJlJWHk86XShmugJSH9J80XbyZJG3NRNoWsaYK2
+         UenkjVg91x0RZ8RQTk5SfOqFBWP9ZwQAd0wq34PDC3S0oYIEOYPysnaRb0LuPgGDOyLz
+         SrJqxoa63arBb8v3cn3TqkTbTjyWMHiuKkfRb/PwL33EQtT0E+a2P4kGa7r20Y8kKq0n
+         C6Q1IynqQwUOLeRyQcTS6pdITz6Ox95Bby4Y05Qex9vQeNVoZkWA2rVxGWCStn/7vexM
+         90YILdq4L3I3rX+Kp1ySbvagnp5LkD0ORDsSl9uRguLxX6XRXPRiXq4GSpSy+X5QBbhg
+         Zq6g==
+X-Gm-Message-State: AO0yUKVTXfRfmlamtm5aX3qGJCwzJbQPhwPusCxu3fi+f/tj9yylY40K
+        zW3e7EIpt3rUW4X+yblG2ZKVEQhMBXw=
+X-Google-Smtp-Source: AK7set/e12i1snm1HK5N9SmoYRSKeJsIAJ000V9OqW6XjpY/L6IYgApozXDHfy8kanx3CGdwtgGVtdF/zvo=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:3750:0:b0:4fb:be1a:2074 with SMTP id
+ g16-20020a633750000000b004fbbe1a2074mr1159464pgn.12.1677083942861; Wed, 22
+ Feb 2023 08:39:02 -0800 (PST)
+Date:   Wed, 22 Feb 2023 08:39:01 -0800
+In-Reply-To: <20230222064931.ppz6berhfr4edewf@linux.intel.com>
+Mime-Version: 1.0
+References: <20230217231022.816138-1-seanjc@google.com> <20230217231022.816138-9-seanjc@google.com>
+ <20230221152349.ulcjtbnvziair7ff@linux.intel.com> <20230221153306.qubx7tfmasnvodeu@linux.intel.com>
+ <Y/VYN3n/lHePiDxM@google.com> <20230222064931.ppz6berhfr4edewf@linux.intel.com>
+Message-ID: <Y/ZFJfspU6L2RmQS@google.com>
+Subject: Re: [PATCH 08/12] KVM: nSVM: Use KVM-governed feature framework to
+ track "vVM{SAVE,LOAD} enabled"
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yu Zhang <yu.c.zhang@linux.intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 22, 2023 at 11:56:53AM +0000, Marc Zyngier wrote:
++Maxim
 
-[...]
-
-> > AFAICT, this UAPI exposes abstractions for (2) and (3) to userspace, but
-> > userspace cannot directly get at (1).
-> 
-> Of course it can! CNTVCT_EL0 is accessible from userspace, and is
-> guaranteed to have an offset of 0 on a host.
-
-Derp, yes :)
-
+On Wed, Feb 22, 2023, Yu Zhang wrote:
+> On Tue, Feb 21, 2023 at 03:48:07PM -0800, Sean Christopherson wrote:
+> > On Tue, Feb 21, 2023, Yu Zhang wrote:
+> > > > Sorry, why guest_cpuid_is_intel(vcpu)? Is it becasue that a AMD host with virtual
+> > > > VMSAVE/VMLOAD capability will always expose this feature for all AMD guests? 
+> > > 
+> > > Oh, sorry. I missed the guest_cpuid_has() in kvm_governed_feature_check_and_set().
+> > > So please just ignore my 2nd question.
+> > > 
+> > > As to the check of guest_cpuid_is_intel(), is it necessary?
 > > 
-> > Chewing on this a bit more, I don't think userspace has any business
-> > messing with virtual and physical time independently, especially when
-> > nested virtualization comes into play.
-> 
-> Well, NV already ignores the virtual offset completely (see how the
-> virtual timer gets its offset reassigned at reset time).
-
-I'll need to have a look at that, but if we need to ignore user input on
-the shiny new interface for NV then I really do wonder if it is the
-right fit.
-
-> I previously toyed with this idea, and I really like it. However, the
-> problem with this is that it breaks the current behaviour of having
-> two different values for CNTVCT and CNTPCT in the guest, and CNTPCT
-> representing the counter value on the host.
-> 
-> Such a VM cannot be migrated *today*, but not everybody cares about
-> migration. My "dual offset" approach allows the current behaviour to
-> persist, and such a VM to be migrated. The luser even gets the choice
-> of preserving counter continuity in the guest or to stay without a
-> physical offset and reflect the host's counter.
-> 
-> Is it a good behaviour? Of course not. Does anyone depend on it? I
-> have no idea, but odds are that someone does. Can we break their toys?
-> The jury is still out.
-
-Well, I think the new interface presents an opportunity to change the
-rules around counter migration, and the illusion of two distinct offsets
-for physical / virtual counters will need to be broken soon enough for
-NV. Do we need to bend over backwards for a theoretical use case with
-the new UAPI? If anyone depends on the existing behavior then they can
-continue to use the old UAPI to partially migrate the guest counters.
-
-My previous suggestion of tying the physical and virtual counters
-together at VM creation would definitely break such a use case, though,
-so we'd be at the point of requiring explicit opt-in from userspace.
-
+> > Yes?  The comment in init_vmcb_after_set_cpuid() says:
 > > 
-> > That frees up the meaning of the counter offsets as being purely a
-> > virtual EL2 thing. These registers would reset to 0, and non-NV guests
-> > could never change their value.
+> > 		/*
+> > 		 * We must intercept SYSENTER_EIP and SYSENTER_ESP
+> > 		 * accesses because the processor only stores 32 bits.
+> > 		 * For the same reason we cannot use virtual VMLOAD/VMSAVE.
+> > 		 */
 > > 
-> > Under the hood KVM would program the true offset registers as:
+> > but I'm struggling to connect the dots to SYSENTER.  I suspect the comment is
+> > misleading and has nothing to do 32-bit vs. 64-bit (or I'm reading it wrong) and
+> > should be something like:
 > > 
-> > 	CNT{P,V}OFF_EL2 = 'virtual CNT{P,V}OFF_EL2' + system_offset
+> > 	/*
+> > 	 * Disable virtual VMLOAD/VMSAVE and intercept VMLOAD/VMSAVE if the
+> > 	 * guest CPU is Intel in order to inject #UD.
+> > 	 */
 > > 
-> > With this we would effectively configure CNTPCT = CNTVCT = 0 at the
-> > point of VM creation. Only crappy thing is it requires full physical
-> > counter/timer emulation for non-ECV systems, but the guest shouldn't be
-> > using the physical counter in the first place.
+> > In other words, a non-SVM guest shouldn't be allowed to execute VMLOAD/VMSAVE.
 > 
-> And I think that's the point where we differ. I can completely imagine
-> some in-VM code using the physical counter to export some timestamping
-> to the host (for tracing purposes, amongst other things).
+> Yes. Such interpretation makes sense. And vmload/vmsave shall be intercepted
+> if guest CPU is Intel and #UD shall be injected. I guess this is done indirectly
+> by judging the EFER_SVME not set in EFER in nested_svm_check_permissions()?
 
-So in this case the guest and userspace would already be in cahoots, so
-userspace could choose to not use UAPI. Hell, if userspace did
-absolutely nothing then it all continues to work.
+Nope, my interpretation is wrong.  vmload_vmsave_interception() clears the upper
+bits of SYSENTER_{EIP,ESP}
 
-> > Yes, this sucks for guests running on hosts w/ NV but not ECV. If anyone
-> > can tell me how an L0 hypervisor is supposed to do NV without ECV, I'm
-> > all ears.
-> 
-> You absolutely can run with NV2 without ECV. You just get a bad
-> quality of emulation for the EL0 timers. But that's about it.a
+	if (vmload) {
+		svm_copy_vmloadsave_state(svm->vmcb, vmcb12);
+		svm->sysenter_eip_hi = 0;
+		svm->sysenter_esp_hi = 0;
+	} else {
+		svm_copy_vmloadsave_state(vmcb12, svm->vmcb);
+	}
 
-'do NV well', I should've said :)
+From commit adc2a23734ac ("KVM: nSVM: improve SYSENTER emulation on AMD"):
+    
+    3. Disable vmload/vmsave virtualization if vendor=GenuineIntel.
+       (It is somewhat insane to set vendor=GenuineIntel and still enable
+       SVM for the guest but well whatever).
+       Then zero the high 32 bit parts when kvm intercepts and emulates vmload.
 
-> > Does any of what I've written make remote sense or have I gone entirely
-> > off the rails with my ASCII art? :)
-> 
-> Your ASCII art is beautiful, only a tad too wide! ;-) What you suggest
-> makes a lot of sense, but it leaves existing behaviours in the lurch.
-> Can we pretend they don't exist? You tell me!
+Presumably AMD hardware loads only the lower 32 bits, which would leave garbage
+in the upper bits and even leak state from L1 to L2 (again ignoring the fact that
+exposing SVM to an Intel vCPU is bonkers).
 
-Oh, we're definitely on the hook for any existing misuse of observable
-KVM behavior. I just think if we're at the point of adding new UAPI we
-may as well lay down some new rules with userspace to avoid surprises.
+I'll opportunistically massage the comment to make it more explicit about why
+VMLOAD needs to be intercepted.
+ 
+That said, clearing the bits for this seems wrong.  That would corrupt the MSRs
+for 64-bit Intel guests.  The "target" of the fix was 32-bit L2s, i.e. I doubt
+anything would notice.
 
-OTOH, ignoring the virtual offset for NV is another way out of the mess,
-but it just bothers me we're about to ignore input on a brand new
-UAPI...
+    This patch fixes nested migration of 32 bit nested guests, that was
+    broken because incorrect cached values of SYSENTER msrs were stored in
+    the migration stream if L1 changed these msrs with
+    vmload prior to L2 entry.
 
--- 
-Thanks,
-Oliver
+Maxim, would anything actually break if KVM let L1 load 64-bit values for the
+SYSENTER MSRs?
+
+> And as to X86_FEATURE_V_VMSAVE_VMLOAD, should the guest_cpuid_has() return true
+> at all for a Intel guest?
+
+Yes, because guest CPUID is userspace controlled.  Except for emulating architectural
+side effects, e.g. size of XSAVE area, KVM doesn't sanitize guest CPUID.
