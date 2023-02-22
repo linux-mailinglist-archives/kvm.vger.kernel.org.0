@@ -2,282 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BD37069FD25
-	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 21:43:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A27569FD7F
+	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 22:08:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232786AbjBVUnE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Feb 2023 15:43:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50262 "EHLO
+        id S232851AbjBVVIP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Feb 2023 16:08:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232774AbjBVUnD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Feb 2023 15:43:03 -0500
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 528D67A9C;
-        Wed, 22 Feb 2023 12:42:57 -0800 (PST)
-Received: by mail-lf1-x130.google.com with SMTP id bp25so11840252lfb.0;
-        Wed, 22 Feb 2023 12:42:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1677098576;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3pLghbOMnh1AF6uxDquwPbjxAIvGIgrI59/gCPI5GL8=;
-        b=LoYZQSVZum4vtB0QbV6sETXieLV8c6vvsXwrHI1vh+AGuUKZMBsz8L7mM6LfJKELKI
-         QfvgfhQg+sZ/gniTDFx3ZAy9/xXY55xBIwFP9lZhRlKUk17axgFRUh5vGc8iR+XCl/cx
-         jqyyglRPUmn8fEwbDuoZApjPmcKsSiGfD7uz8HQShxJ3mXr1pDKtTKyRlT6NUz6kIiKm
-         Rxn5eWJkMDTN7uV4ofHLWtRNGeDVouEKAZuSMJvw94LX3zOwxeJHH2B0U8532rh8gNFl
-         CFCAjb80p3am8S6nfeiqM3ZtA5Mnc47up8bpowWhniLnBjT1i6Zkq6FDLT/qd9SBCY/2
-         Hh8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677098576;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3pLghbOMnh1AF6uxDquwPbjxAIvGIgrI59/gCPI5GL8=;
-        b=FYfOBrAk8+ZV5jOGWQ6YIMK3mn+nAC5ruGWy3zOVbtbSoxsp9a0784qK/+hrkY2PNE
-         ssMkV9YUL0PO3XL5vnRPN5+D4OdWqOdeG2NKtvg4UVeFThhZFwXihPNSfZ8pZPADyHAS
-         Al6D4fv32zg28RLEOcx23s4LMDQd6kg5Esqx8VA44qVOyjF5OBMt9PQlTcmxPSLq7uxz
-         YFvCozmv7e35S56rCgzQT5mrXfBTE4tMaZqu188W+/kVhdf0tGWwqFTE/murbBOCNnOx
-         CbMfON2hGiSqhcYuBazDRd+3MCrSEKcIFApbthR8ojpA67IX7yUKgheQVoOXNhXpIIQR
-         QWHQ==
-X-Gm-Message-State: AO0yUKXY/YK3Thk8Y34HOgfniRZ3Ta/hjjdHgtwFUdYsoUi6QW36I/x3
-        LVcRGZUzEfg5OizLQkNubf0=
-X-Google-Smtp-Source: AK7set8rAA9AhpMbKSjj7YzXz1bfeSjIQsdkFqAlsea9eIRT6FzIZoaOkh8a/2uc/4oVhXEb/Qh2bw==
-X-Received: by 2002:a05:6512:7b:b0:4dd:a025:d87 with SMTP id i27-20020a056512007b00b004dda0250d87mr426608lfo.0.1677098576019;
-        Wed, 22 Feb 2023 12:42:56 -0800 (PST)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id a28-20020ac2521c000000b004d34238ca44sm1135378lfl.214.2023.02.22.12.42.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Feb 2023 12:42:55 -0800 (PST)
-Date:   Wed, 22 Feb 2023 22:42:53 +0200
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
-        <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
-        <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
-        <thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
-        <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
-        <jmattson@google.com>, <luto@kernel.org>,
-        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
-        <pgonda@google.com>, <peterz@infradead.org>,
-        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
-        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
-        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH RFC v8 31/56] KVM: SVM: Make AVIC backing, VMSA and VMCB
- memory allocation SNP safe
-Message-ID: <20230222224253.00002740@gmail.com>
-In-Reply-To: <20230220183847.59159-32-michael.roth@amd.com>
-References: <20230220183847.59159-1-michael.roth@amd.com>
-        <20230220183847.59159-32-michael.roth@amd.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        with ESMTP id S232867AbjBVVII (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Feb 2023 16:08:08 -0500
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2060.outbound.protection.outlook.com [40.107.220.60])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95F2546150;
+        Wed, 22 Feb 2023 13:07:43 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IEws8k0OXV/S37b5ei7BAGE81kVR60XH+GR1Y1PLsVy8dZbto3/iP3rL754A5jJb/9tPJcitwYUBUB4phq6QI1zhkMWw6jrsg5WehYKJY9ft2qUHzZv0yhOda4zMyTfQRrwBqRh4gD0A6HfCYeQLHB6BOCB707RfUYIEK6INF1QVvT4lYVcVX27T4tOJicZwriAu4XWO14QKKyKK61qEmxCWA3z0boD14J2KDv0enEKXIBrk2lN1He1NfNGSBctu/BLrbWOXsM+cLYFrFz7UyjuW4JtDDWVLZlh1pGKffPJonJEIc/Koa0QjeQqPfDeeXuM3JbNyP+Gaj+OIOys6mg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dQRZ6Nl22+3XdCRB5n88HRIDKaDRFW5MHEYwCdnJJHU=;
+ b=AVe1MGo/bHX1NtBLWGdcezcqxjy+7CK1ToaV9jw0Pc28XpwhHFjE7/R3su2SEYZpU26IL0lZdi03MgGY2Lu5et52ZGIrlz3C3UMaZVrdj3pjwb1hfNe80QIJ3TF+0JWe+jsS17W/M2lFudlGy9JUGDPod7AoiMfKkmMrBbWiO3MHmLt7lc59OtW7k9wzzxURWcTv7EkbC5aUlzwZtxOwIuqMXXz8ZDR/NFGpRl6VK19d37oHKvHqqotniq2v1PIIkEi15sl/NSzBDNLNo1CbC1vLsaf2auXIdKhpOM9Jr6Psp6MURsZRcJB6G1t/3g8k7xoJFQhB9G8KevNylSSVeg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dQRZ6Nl22+3XdCRB5n88HRIDKaDRFW5MHEYwCdnJJHU=;
+ b=GrWz1mbgHbOcFVXd5nt4e3WFuos7oWEI8Zifo0A7DYRVzs3MpIO81Rbsr/o+yrxgk3YDcEIn8BJJkX1084p4DM5MpkvjdEnd/ycFe05nFo07xunoUGQbcvMlUYVw3wGpQWmRXVCHD9Iwlb/yZL97P53C61ps4GfIZjdF3A+tUii4TLeHss/swjl14+neKIRyRdtf+H0cftYhc1R9RKIpG4ww1nTSdIDsjELL+woqdnHvAxBb7XUKqPMn8wz5WqVFohMrJT6VoFlcNCmL6MqLEMmL0u3vdcLTTYTRkB7JSyxKHn8LnrwFFXIjJJGoT/QwPeZGCBfAdKH8RULrlebrbg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by DS7PR12MB6213.namprd12.prod.outlook.com (2603:10b6:8:97::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.19; Wed, 22 Feb
+ 2023 21:07:21 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3cb3:2fce:5c8f:82ee]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3cb3:2fce:5c8f:82ee%4]) with mapi id 15.20.6111.021; Wed, 22 Feb 2023
+ 21:07:21 +0000
+Date:   Wed, 22 Feb 2023 17:07:20 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+Cc:     joro@8bytes.org, alex.williamson@redhat.com, kevin.tian@intel.com,
+        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
+        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        baolu.lu@linux.intel.com
+Subject: Re: [PATCH 0/6] iommufd: Add iommu capability reporting
+Message-ID: <Y/aECHpCo4LJ1Rw2@nvidia.com>
+References: <20230209041642.9346-1-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230209041642.9346-1-yi.l.liu@intel.com>
+X-ClientProxiedBy: MN2PR01CA0010.prod.exchangelabs.com (2603:10b6:208:10c::23)
+ To LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DS7PR12MB6213:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5a33f696-4aed-45f9-5ac3-08db1518c9e7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: RfMB3HoQIHqWkk5iqyBTcOfNwp91L24gsps2ZLe5wN/X5QZ5v+Mqp2XCdzqvkKtOsp+JCGD+gFDCoh5Obla6IFvnBoZLVqIYoUldFZQl0Q99zWZzZ30YhgiSK0F8f4Q6GbmyjBBtaXy9uJRbmH5e7/t05NKeohcltNUCg3NevskgRGBd73MBmftA8kpQ12XLrlY4Enjfv6kH8DaK1jTMKCNWNhlQxnmSjfCRFMWLZ6Py5adKtXq2smfh2ltiVE90GZhF0rWMnTYy7lKRmSdSxobEtiP6gHvWNi0HwzK8SaQd1v4jg5aOZQ7y9c97ItSsnevdtHuHuVVTpCjUB0/GFuTQToObEZ2An5G7++lhu3cpYJH+TdsLG/mxcsntAqADRlw3T5EhuhI8TNTj0tMaICwKDFnRCaLBb4dEL+c/lJAWrB/0cv3UdXbnt3pFnX3oNiDCzsiGklXWW4vLz40UdF4dLyK2+yU3mmJwFoQLUAvgOjS/faM7HfxTKWB/gRgpWrKRh4Pq9V2nC8T6eHu0+ggMuCujXBWW9XTZbuuziML5RFiNLLB3V4W0yMFOg/nEdY7Oy52R0PiAaJ6yrizzihvF3+whfgibibu3nv7dTB1VRMn5nP9NjVNh/xBD+oTH9mXIGRjcmPza9B1QsiXXSRzcV76KRLwdcwJN6SrRnskz+JmgK0AmcxJuxfxAighjux3FwQnIsIPweiiqzJJRNvkDCyFDtnrC5fkcwxEB2lA=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(346002)(366004)(396003)(136003)(376002)(39860400002)(451199018)(38100700002)(2906002)(2616005)(83380400001)(36756003)(186003)(6506007)(6512007)(41300700001)(5660300002)(316002)(26005)(966005)(4326008)(6916009)(8676002)(66946007)(6486002)(66476007)(66556008)(86362001)(478600001)(7416002)(8936002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?9z3qYQyJZrsGPV/Mm+iOAqscA+4JAa02np99J3Zc/lW7gGNJeN5TXHiQEsCh?=
+ =?us-ascii?Q?hXi/5XGZCUWCG1lRyQ+hmp2HVkkfrPwGEViosfsK+qP0BCg9l58AsSYU69lr?=
+ =?us-ascii?Q?4fhL2BhaYGV434asPpoL91U/cD2QUbfx+cGDAkbIWoV1jadjyfGCecCEs/9k?=
+ =?us-ascii?Q?4FZZ49OfCrwK9/HX3OdcdV8DyUWMdfmR0FN/T+euy202BL2XDNQbMwEaD0w/?=
+ =?us-ascii?Q?9pFZwvKID4Rnn3mH+QsonwCAZH2ys5g9pm9DIcd51MRC1o7fRZQF+MNGhQe5?=
+ =?us-ascii?Q?MOcETgdoMB2N16ezgAAlroJcU1PLmJglsY2lOrPOMUqeLJ/oZwAPxnFBEfYU?=
+ =?us-ascii?Q?kxATM+CvbTEDxhb6IqxqWIqm3j90cDAYiz7R0wmppCZqOVlSNlSHnRrZUnNy?=
+ =?us-ascii?Q?oOGXms9CIb4CXzqhWxNTt3H9isWs6ynUrN+a7yyL3B8NHhDBuZOaAIJeUrNu?=
+ =?us-ascii?Q?k+hLBtm3af6O2lkxz6fGlArSlXKzz1GWTjb/XLaEuTCCQp+wrhDSHwUoWpjY?=
+ =?us-ascii?Q?2AB9oUhFm9yNbcKVNvXHkoEQjEAQN4xfRms+PkfvzPDcFQWjFk/DECjbNXKQ?=
+ =?us-ascii?Q?ktIaLsPdeCKx1mnQtGicLhC0TnXRu60WjmXDQmN6yHSbJ6VKHNO/Xq4uKxig?=
+ =?us-ascii?Q?sjqq+zDtCj+vjGGyqKoJKX3CeeBPbNNkL1UKj/2lJfcF4YVDCoRjzHvhyAvE?=
+ =?us-ascii?Q?WG9ZLjnCnlru9R0YGzxH/kIEuUDuZ1Gr1v14Bp+MmQFP6X2uepL10C9PyrRI?=
+ =?us-ascii?Q?206HSb15n27YgAS8tCGyKV3qMpki4DHm9ZgrX9v+sn3eC3rByVsBcbkMgD02?=
+ =?us-ascii?Q?gZmVkKn9QfNcGL06DhBLz0Foz2C6kjWeA87ofqtRTNaGTDclgRfVwaLvRz2C?=
+ =?us-ascii?Q?eU1akJvyqj3KEJJALLGu8r1qF1N+XwfzoAk5RRv78nx/iIKnPv0kZJRw32W7?=
+ =?us-ascii?Q?cCGwMHCcPsAK1KlNxy0hTQDKkzJcmoMGPZJIdTY9Bk08atOtvbc2phlNH0EI?=
+ =?us-ascii?Q?s4qTnKUmVKOYnrRDic+YTkqCVFwh8wqtmFUGgE5niUb+JvSJL7vczZ7DikPl?=
+ =?us-ascii?Q?LEHM/X328Q2yrIzBeAZLwP/3yfkBfsT/xn9r4OXVx/kiqv28uJkmz0jMNAxl?=
+ =?us-ascii?Q?lBWYTMULqUnZ7pY3nWAy+NtKbtkmBiIdCwtFf3ooZVBAJ/k45EWJr9DL4vsM?=
+ =?us-ascii?Q?isREGogY5o4zeOWrKjVea56+r2RD2QOJplWDLo+eC/PNq0pGqqrZyfXJ8Cbg?=
+ =?us-ascii?Q?GBFotNwZWZ16d1fKkLe3ZaxJ8lD2oVO3IeiMep9GkKwoyVjylLLAcrxci5y7?=
+ =?us-ascii?Q?jO3yhsW5yT9azq/PYv2OYJGoSAmNxKz+8b6NIhNFHcytCxVUP6D49RUhrFS9?=
+ =?us-ascii?Q?2h0pRF9r6t6Ler2BSBeX0PcK7q+Pq9xsnZJK30XikPkuHzovCkgKJONT84jq?=
+ =?us-ascii?Q?d8+NLjS7DkgqCtH4MX4ZPOaIiXJ8xtPZsKIvUsLe9YmsmqFW5N4mhK5XTLcS?=
+ =?us-ascii?Q?9bnwKY3Z0FnlS5+6mH92YOQKzm4QctjQSHYrcvtHF9GhPLin+gTPTIZMkDeq?=
+ =?us-ascii?Q?bng5HVOdcwyuWzW2bp06QvDHPcTn+XZDZ6A9iSoi?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5a33f696-4aed-45f9-5ac3-08db1518c9e7
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Feb 2023 21:07:21.6337
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6L1aL4UDdMaUSvtAc/IXpqeoBxoXI/CUxFCriodd6SKW8sjYR4yhpatblU8vIIC2
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6213
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 20 Feb 2023 12:38:22 -0600
-Michael Roth <michael.roth@amd.com> wrote:
-
-> From: Brijesh Singh <brijesh.singh@amd.com>
+On Wed, Feb 08, 2023 at 08:16:36PM -0800, Yi Liu wrote:
+> iommufd gives userspace the capabilty to manipulating iommu subsytem.
+> e.g. DMA map/unmap etc. In the near future, it will also support iommu
+> nested translation. Different platform vendors have different implementation
+> for the nested translation. So before set up nested translation, userspace
+> needs to know the hardware iommu capabilities. For example, Intel platform
+> supports guest I/O page table to be the first stage translation structure.
 > 
-> Implement a workaround for an SNP erratum where the CPU will incorrectly
-> signal an RMP violation #PF if a hugepage (2mb or 1gb) collides with the
-> RMP entry of a VMCB, VMSA or AVIC backing page.
+> This series reports the iommu capability for a given iommufd_device which
+> has been bound to iommufd. It is a preparation work for nested translation
+> support[1]. In this series, Intel VT-d capability reporting is added. Other
+> vendors may add their own reporting based on this series.
 > 
-> When SEV-SNP is globally enabled, the CPU marks the VMCB, VMSA, and AVIC
-> backing   pages as "in-use" in the RMP after a successful VMRUN.  This
+> [1] https://github.com/yiliu1765/iommufd/tree/iommufd_nesting_vtd_v1
 
-Is this "in-use" bit part of an RMP entry? If yes, better list its name 
-in APM.
+Let's have the comments addressed and this rebased on top of
+ https://github.com/jgunthorpe/linux/commits/iommufd_hwpt
 
-> is done for _all_ VMs, not just SNP-Active VMs.
-_All_ VMs? Do you mean SEV VMs and SEVSNP VMs? I guess legacy VM is not
-affected, right?
->
-> If the hypervisor accesses an in-use page through a writable
-> translation, the CPU will throw an RMP violation #PF. On early SNP
-> hardware, if an in-use page is 2mb aligned and software accesses any
-> part of the associated 2mb region with a hupage, the CPU will
-                                            ^hugepage
-> incorrectly treat the entire 2mb region as in-use and signal a spurious
-> RMP violation #PF.
-> 
-> The recommended is to not use the hugepage for the VMCB, VMSA or
-> AVIC backing page. Add a generic allocator that will ensure that the
-> page returns is not hugepage (2mb or 1gb) and is safe to be used when
-> SEV-SNP is enabled.
-> 
-> Co-developed-by: Marc Orr <marcorr@google.com>
-> Signed-off-by: Marc Orr <marcorr@google.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->  arch/x86/include/asm/kvm-x86-ops.h |  1 +
->  arch/x86/include/asm/kvm_host.h    |  2 ++
->  arch/x86/kvm/lapic.c               |  5 ++++-
->  arch/x86/kvm/svm/sev.c             | 33 ++++++++++++++++++++++++++++++
->  arch/x86/kvm/svm/svm.c             | 15 ++++++++++++--
->  arch/x86/kvm/svm/svm.h             |  1 +
->  6 files changed, 54 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> index 6a885f024a00..e116405cbb5f 100644
-> --- a/arch/x86/include/asm/kvm-x86-ops.h
-> +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> @@ -131,6 +131,7 @@ KVM_X86_OP(msr_filter_changed)
->  KVM_X86_OP(complete_emulated_msr)
->  KVM_X86_OP(vcpu_deliver_sipi_vector)
->  KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
-> +KVM_X86_OP_OPTIONAL(alloc_apic_backing_page)
->  KVM_X86_OP_OPTIONAL_RET0(fault_is_private);
->  KVM_X86_OP_OPTIONAL_RET0(update_mem_attr)
->  KVM_X86_OP_OPTIONAL(invalidate_restricted_mem)
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 37c92412035f..a9363a6f779d 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1729,6 +1729,8 @@ struct kvm_x86_ops {
->  	 * Returns vCPU specific APICv inhibit reasons
->  	 */
->  	unsigned long (*vcpu_get_apicv_inhibit_reasons)(struct kvm_vcpu *vcpu);
-> +
-> +	void *(*alloc_apic_backing_page)(struct kvm_vcpu *vcpu);
->  };
->  
->  struct kvm_x86_nested_ops {
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 80f92cbc4029..72e46d5b4201 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -2740,7 +2740,10 @@ int kvm_create_lapic(struct kvm_vcpu *vcpu, int timer_advance_ns)
->  
->  	vcpu->arch.apic = apic;
->  
-> -	apic->regs = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
-> +	if (kvm_x86_ops.alloc_apic_backing_page)
-> +		apic->regs = static_call(kvm_x86_alloc_apic_backing_page)(vcpu);
-> +	else
-> +		apic->regs = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
->  	if (!apic->regs) {
->  		printk(KERN_ERR "malloc apic regs error for vcpu %x\n",
->  		       vcpu->vcpu_id);
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index c1f0d4898ce3..9e9efb42a766 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -3241,3 +3241,36 @@ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
->  		break;
->  	}
->  }
-> +
-> +struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu)
-> +{
-> +	unsigned long pfn;
-> +	struct page *p;
-> +
-> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-> +		return alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-> +
-> +	/*
-> +	 * Allocate an SNP safe page to workaround the SNP erratum where
-> +	 * the CPU will incorrectly signal an RMP violation  #PF if a
-> +	 * hugepage (2mb or 1gb) collides with the RMP entry of VMCB, VMSA
-> +	 * or AVIC backing page. The recommeded workaround is to not use the
-> +	 * hugepage.
-> +	 *
-> +	 * Allocate one extra page, use a page which is not 2mb aligned
-> +	 * and free the other.
-> +	 */
-> +	p = alloc_pages(GFP_KERNEL_ACCOUNT | __GFP_ZERO, 1);
-> +	if (!p)
-> +		return NULL;
-> +
-> +	split_page(p, 1);
-> +
-> +	pfn = page_to_pfn(p);
-> +	if (IS_ALIGNED(pfn, PTRS_PER_PMD))
-> +		__free_page(p++);
-> +	else
-> +		__free_page(p + 1);
-> +
-> +	return p;
-> +}
+Which should address eg the selftest issue
 
-The duplicate allocation routine in snp_alloc_vmsa_page() in sev.c can
-be replaced with snp_safe_alloc_page().
+I want to start chipping away at bits of the nesting patch pile and
+this part looks close
 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 213593dbd7a1..1061aaf66f0a 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -1372,7 +1372,7 @@ static int svm_vcpu_create(struct kvm_vcpu *vcpu)
->  	svm = to_svm(vcpu);
->  
->  	err = -ENOMEM;
-> -	vmcb01_page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-> +	vmcb01_page = snp_safe_alloc_page(vcpu);
->  	if (!vmcb01_page)
->  		goto out;
->  
-> @@ -1381,7 +1381,7 @@ static int svm_vcpu_create(struct kvm_vcpu *vcpu)
->  		 * SEV-ES guests require a separate VMSA page used to contain
->  		 * the encrypted register state of the guest.
->  		 */
-> -		vmsa_page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-> +		vmsa_page = snp_safe_alloc_page(vcpu);
->  		if (!vmsa_page)
->  			goto error_free_vmcb_page;
->  
-> @@ -4696,6 +4696,16 @@ static int svm_vm_init(struct kvm *kvm)
->  	return 0;
->  }
->  
-> +static void *svm_alloc_apic_backing_page(struct kvm_vcpu *vcpu)
-> +{
-> +	struct page *page = snp_safe_alloc_page(vcpu);
-> +
-> +	if (!page)
-> +		return NULL;
-> +
-> +	return page_address(page);
-> +}
-> +
->  static struct kvm_x86_ops svm_x86_ops __initdata = {
->  	.name = KBUILD_MODNAME,
->  
-> @@ -4824,6 +4834,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
->  
->  	.vcpu_deliver_sipi_vector = svm_vcpu_deliver_sipi_vector,
->  	.vcpu_get_apicv_inhibit_reasons = avic_vcpu_get_apicv_inhibit_reasons,
-> +	.alloc_apic_backing_page = svm_alloc_apic_backing_page,
->  };
->  
->  /*
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index c249c360fe36..5efcf036ccad 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -692,6 +692,7 @@ void sev_es_vcpu_reset(struct vcpu_svm *svm);
->  void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
->  void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa);
->  void sev_es_unmap_ghcb(struct vcpu_svm *svm);
-> +struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu);
->  
->  /* vmenter.S */
->  
-
+Thanks,
+Jason
