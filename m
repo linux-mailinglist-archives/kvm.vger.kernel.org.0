@@ -2,44 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3EACF69F247
-	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 10:56:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5627069F226
+	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 10:49:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231292AbjBVJ4D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Feb 2023 04:56:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57032 "EHLO
+        id S232286AbjBVJtX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Feb 2023 04:49:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230086AbjBVJzq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Feb 2023 04:55:46 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6835759E9;
-        Wed, 22 Feb 2023 01:54:26 -0800 (PST)
+        with ESMTP id S232305AbjBVJsj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Feb 2023 04:48:39 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C00FA234DC;
+        Wed, 22 Feb 2023 01:46:53 -0800 (PST)
 From:   Thomas Gleixner <tglx@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1677058288;
+        s=2020; t=1677059186;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pDlMfmqhMdFX7PRz+dvs1mIXbK5q+u+WakKLZ5Y6UeM=;
-        b=MmTYkqREjEEVkGUJzQG0PK3n3AgJ/yU1gF+RJ0cEUZgk95syy3ZK1X59ygzmbsgETDzhXH
-        ev/b4jQ3MlmenDMU/FmI9nyKDj+1XeZfvKb6gJh8HYMo03pCq8Oez2rGCAKViHzMCpKlAC
-        IX5ySirflmqyzY6uBaZ11IgvIECuZy98GDFaSklh9kmC9A2kxwznYm6ZrBMZKxQSrfZ2xG
-        e+B3dclHUZHK0ONRdJjC3xcfJcxhUed+nmEts77bw6J9cHdqrCArOPRPuiBZj/kUm6NHfo
-        hxfOYP7Dqg4SuX+8LqZx0HxDE0vCBviVwdRY+fz2UvF5kw21P5qV3yAgcO/OSg==
+        bh=lX7t4eNJpUd+FIylBrybVCZctPOCrlFQiVjFX2fFY+o=;
+        b=u+ppGWmucKqpOWHmZ+NLpxavWBcEqSJst3Yn6S3sCmOef2TnWaNJXO/sZGTROz3ApcDQLo
+        SJhAzjVFrg/C+IThgMV5rsDTFFRb70Ly8Yh07b93P3/mP4nAzeYAUekMtwQSO+NO2NVC/I
+        P8RLqBXRlSRsKgSqvrEbcCe6Xng5yHfRPAqOhZR2XFoAaqJeQhA8voAmYWifS6KcNyUPkP
+        7cNNaRNMq3BToTBbBJs22begklQfppjwu7QUkErAWGBCilo4kmjBPVdvJYBYTiwYAXVppp
+        NAAIzUVPWPVRV1qADuKB2C0fv0B492k2UwQ0LbdJBQ0XMW73LTKmnEuBZtqg9Q==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1677058288;
+        s=2020e; t=1677059186;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pDlMfmqhMdFX7PRz+dvs1mIXbK5q+u+WakKLZ5Y6UeM=;
-        b=kv7wrax4zru04yHnluN7jr8QGbNi+jU3yAL/uYV/E2z1GByScJiBknV8pkpN4XZqM6lOaS
-        28AW0waTgzK8uLAg==
+        bh=lX7t4eNJpUd+FIylBrybVCZctPOCrlFQiVjFX2fFY+o=;
+        b=jjPZw4ffdEwKY0XAY8DQfZ+9766w086OXQYFuDwgITe7wnvW5Af7B82bqySUquV/ekSq6g
+        7mb5Dv1MA25iXXBQ==
 To:     David Woodhouse <dwmw2@infradead.org>,
+        Usama Arif <usama.arif@bytedance.com>,
         Oleksandr Natalenko <oleksandr@natalenko.name>
-Cc:     Kim Phillips <kim.phillips@amd.com>,
-        Usama Arif <usama.arif@bytedance.com>, arjan@linux.intel.com,
+Cc:     Kim Phillips <kim.phillips@amd.com>, arjan@linux.intel.com,
         mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
         hpa@zytor.com, x86@kernel.org, pbonzini@redhat.com,
         paulmck@kernel.org, linux-kernel@vger.kernel.org,
@@ -50,12 +48,9 @@ Cc:     Kim Phillips <kim.phillips@amd.com>,
         liangma@liangbit.com,
         "Limonciello, Mario" <Mario.Limonciello@amd.com>,
         Piotr Gorski <piotrgorski@cachyos.org>
-Subject: Re: [PATCH v9 0/8] Parallel CPU bringup for x86_64
-In-Reply-To: <aac036a17b1bcbabe8ee5a7c69fb2dfbc546d06e.camel@infradead.org>
+Subject: Re: [External] Re: [PATCH v9 0/8] Parallel CPU bringup for x86_64
+In-Reply-To: <e7036423216287e86eab4daf9dd1acdaecdd2b49.camel@infradead.org>
 References: <20230215145425.420125-1-usama.arif@bytedance.com>
- <982e1d6140705414e8fd60b990bd259a@natalenko.name>
- <715CBABF-4017-4784-8F30-5386F1524830@infradead.org>
- <67dbc69f-b712-8971-f1c9-5d07f506a19c@amd.com>
  <42dc683e2846ae8fc1e09715aaf7884660e1a386.camel@infradead.org>
  <37c18c3aeea2e558633b6da6886111d0@natalenko.name>
  <5A3B7074-0C6D-472B-803B-D76541828C1F@infradead.org>
@@ -73,11 +68,12 @@ References: <20230215145425.420125-1-usama.arif@bytedance.com>
  <e2e6616f691f1822035be245ec847f7c86a26367.camel@infradead.org>
  <87356yofw3.ffs@tglx>
  <aac036a17b1bcbabe8ee5a7c69fb2dfbc546d06e.camel@infradead.org>
-Date:   Wed, 22 Feb 2023 10:31:27 +0100
-Message-ID: <87fsaym4gg.ffs@tglx>
+ <11cc090b-82aa-f2f5-0f08-b8e63e662947@bytedance.com>
+ <e7036423216287e86eab4daf9dd1acdaecdd2b49.camel@infradead.org>
+Date:   Wed, 22 Feb 2023 10:46:25 +0100
+Message-ID: <87cz62m3ri.ffs@tglx>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
         SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
@@ -87,30 +83,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 21 2023 at 23:18, David Woodhouse wrote:
-> On Tue, 2023-02-21 at 22:41 +0100, Thomas Gleixner wrote:
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (IS_ENABLED(CONFIG_64BIT) =
-&& IS_ENABLED(CONFIG_SMP))
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0smpboot_control =3D saved_smpboot_ctrl;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return 0;
->> =C2=A0}
->> =C2=A0
+On Wed, Feb 22 2023 at 08:19, David Woodhouse wrote:
+> But the BSP/CPU0 is different. It hasn't actually been taken offline,
+> and its idle thread context is still in cpu_startup_entry(CPUHP_ONLINE)
+> which got called from rest_init().
 >
-> But wait, why is this giving it a dedicated temp_stack anyway? Why
-> can't it use that CPU's idle thread stack like we usually do? I already
-> made idle_thread_get() accessible from here. So we could do this...
+> In testing I probably got away with it because we're only using the
+> *top* of the stack, don't use anything of the red zone, and thus don't
+> actually bother the true idle thread which is never going to return.
 
-Because this very CPU is still online and from the kernels POV is does
-not go offline. It goes into the firmware blackhole and comes back
-magically through the startup code.
+:)
 
-That means this very CPUs indle thread stack is in use and the resume
-path will scribble over it. Maybe you won't notice because it only
-clobbers top of stack which is never used again because the idle thread
-does not return. But correct is something different.
+> But I don't think it's correct; we really ought to have that temp_stack
+> unless we're going to refactor the wakeup_64 code to *become* the idle
+> thread just as startup_secondary() does, and *schedule* to the context
+> that was saved in the suspend code.
+
+And thereby messing up the scheduler state...
 
 Thanks,
 
         tglx
+
