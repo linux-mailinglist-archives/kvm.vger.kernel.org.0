@@ -2,144 +2,267 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A27569FD7F
-	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 22:08:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C3AB769FDAE
+	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 22:25:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232851AbjBVVIP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Feb 2023 16:08:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42614 "EHLO
+        id S232631AbjBVVZZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Feb 2023 16:25:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232867AbjBVVII (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Feb 2023 16:08:08 -0500
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2060.outbound.protection.outlook.com [40.107.220.60])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95F2546150;
-        Wed, 22 Feb 2023 13:07:43 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IEws8k0OXV/S37b5ei7BAGE81kVR60XH+GR1Y1PLsVy8dZbto3/iP3rL754A5jJb/9tPJcitwYUBUB4phq6QI1zhkMWw6jrsg5WehYKJY9ft2qUHzZv0yhOda4zMyTfQRrwBqRh4gD0A6HfCYeQLHB6BOCB707RfUYIEK6INF1QVvT4lYVcVX27T4tOJicZwriAu4XWO14QKKyKK61qEmxCWA3z0boD14J2KDv0enEKXIBrk2lN1He1NfNGSBctu/BLrbWOXsM+cLYFrFz7UyjuW4JtDDWVLZlh1pGKffPJonJEIc/Koa0QjeQqPfDeeXuM3JbNyP+Gaj+OIOys6mg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dQRZ6Nl22+3XdCRB5n88HRIDKaDRFW5MHEYwCdnJJHU=;
- b=AVe1MGo/bHX1NtBLWGdcezcqxjy+7CK1ToaV9jw0Pc28XpwhHFjE7/R3su2SEYZpU26IL0lZdi03MgGY2Lu5et52ZGIrlz3C3UMaZVrdj3pjwb1hfNe80QIJ3TF+0JWe+jsS17W/M2lFudlGy9JUGDPod7AoiMfKkmMrBbWiO3MHmLt7lc59OtW7k9wzzxURWcTv7EkbC5aUlzwZtxOwIuqMXXz8ZDR/NFGpRl6VK19d37oHKvHqqotniq2v1PIIkEi15sl/NSzBDNLNo1CbC1vLsaf2auXIdKhpOM9Jr6Psp6MURsZRcJB6G1t/3g8k7xoJFQhB9G8KevNylSSVeg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dQRZ6Nl22+3XdCRB5n88HRIDKaDRFW5MHEYwCdnJJHU=;
- b=GrWz1mbgHbOcFVXd5nt4e3WFuos7oWEI8Zifo0A7DYRVzs3MpIO81Rbsr/o+yrxgk3YDcEIn8BJJkX1084p4DM5MpkvjdEnd/ycFe05nFo07xunoUGQbcvMlUYVw3wGpQWmRXVCHD9Iwlb/yZL97P53C61ps4GfIZjdF3A+tUii4TLeHss/swjl14+neKIRyRdtf+H0cftYhc1R9RKIpG4ww1nTSdIDsjELL+woqdnHvAxBb7XUKqPMn8wz5WqVFohMrJT6VoFlcNCmL6MqLEMmL0u3vdcLTTYTRkB7JSyxKHn8LnrwFFXIjJJGoT/QwPeZGCBfAdKH8RULrlebrbg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DS7PR12MB6213.namprd12.prod.outlook.com (2603:10b6:8:97::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.19; Wed, 22 Feb
- 2023 21:07:21 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3cb3:2fce:5c8f:82ee]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3cb3:2fce:5c8f:82ee%4]) with mapi id 15.20.6111.021; Wed, 22 Feb 2023
- 21:07:21 +0000
-Date:   Wed, 22 Feb 2023 17:07:20 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Yi Liu <yi.l.liu@intel.com>
-Cc:     joro@8bytes.org, alex.williamson@redhat.com, kevin.tian@intel.com,
-        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
-        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
-        peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        baolu.lu@linux.intel.com
-Subject: Re: [PATCH 0/6] iommufd: Add iommu capability reporting
-Message-ID: <Y/aECHpCo4LJ1Rw2@nvidia.com>
-References: <20230209041642.9346-1-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230209041642.9346-1-yi.l.liu@intel.com>
-X-ClientProxiedBy: MN2PR01CA0010.prod.exchangelabs.com (2603:10b6:208:10c::23)
- To LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DS7PR12MB6213:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5a33f696-4aed-45f9-5ac3-08db1518c9e7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: RfMB3HoQIHqWkk5iqyBTcOfNwp91L24gsps2ZLe5wN/X5QZ5v+Mqp2XCdzqvkKtOsp+JCGD+gFDCoh5Obla6IFvnBoZLVqIYoUldFZQl0Q99zWZzZ30YhgiSK0F8f4Q6GbmyjBBtaXy9uJRbmH5e7/t05NKeohcltNUCg3NevskgRGBd73MBmftA8kpQ12XLrlY4Enjfv6kH8DaK1jTMKCNWNhlQxnmSjfCRFMWLZ6Py5adKtXq2smfh2ltiVE90GZhF0rWMnTYy7lKRmSdSxobEtiP6gHvWNi0HwzK8SaQd1v4jg5aOZQ7y9c97ItSsnevdtHuHuVVTpCjUB0/GFuTQToObEZ2An5G7++lhu3cpYJH+TdsLG/mxcsntAqADRlw3T5EhuhI8TNTj0tMaICwKDFnRCaLBb4dEL+c/lJAWrB/0cv3UdXbnt3pFnX3oNiDCzsiGklXWW4vLz40UdF4dLyK2+yU3mmJwFoQLUAvgOjS/faM7HfxTKWB/gRgpWrKRh4Pq9V2nC8T6eHu0+ggMuCujXBWW9XTZbuuziML5RFiNLLB3V4W0yMFOg/nEdY7Oy52R0PiAaJ6yrizzihvF3+whfgibibu3nv7dTB1VRMn5nP9NjVNh/xBD+oTH9mXIGRjcmPza9B1QsiXXSRzcV76KRLwdcwJN6SrRnskz+JmgK0AmcxJuxfxAighjux3FwQnIsIPweiiqzJJRNvkDCyFDtnrC5fkcwxEB2lA=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(346002)(366004)(396003)(136003)(376002)(39860400002)(451199018)(38100700002)(2906002)(2616005)(83380400001)(36756003)(186003)(6506007)(6512007)(41300700001)(5660300002)(316002)(26005)(966005)(4326008)(6916009)(8676002)(66946007)(6486002)(66476007)(66556008)(86362001)(478600001)(7416002)(8936002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?9z3qYQyJZrsGPV/Mm+iOAqscA+4JAa02np99J3Zc/lW7gGNJeN5TXHiQEsCh?=
- =?us-ascii?Q?hXi/5XGZCUWCG1lRyQ+hmp2HVkkfrPwGEViosfsK+qP0BCg9l58AsSYU69lr?=
- =?us-ascii?Q?4fhL2BhaYGV434asPpoL91U/cD2QUbfx+cGDAkbIWoV1jadjyfGCecCEs/9k?=
- =?us-ascii?Q?4FZZ49OfCrwK9/HX3OdcdV8DyUWMdfmR0FN/T+euy202BL2XDNQbMwEaD0w/?=
- =?us-ascii?Q?9pFZwvKID4Rnn3mH+QsonwCAZH2ys5g9pm9DIcd51MRC1o7fRZQF+MNGhQe5?=
- =?us-ascii?Q?MOcETgdoMB2N16ezgAAlroJcU1PLmJglsY2lOrPOMUqeLJ/oZwAPxnFBEfYU?=
- =?us-ascii?Q?kxATM+CvbTEDxhb6IqxqWIqm3j90cDAYiz7R0wmppCZqOVlSNlSHnRrZUnNy?=
- =?us-ascii?Q?oOGXms9CIb4CXzqhWxNTt3H9isWs6ynUrN+a7yyL3B8NHhDBuZOaAIJeUrNu?=
- =?us-ascii?Q?k+hLBtm3af6O2lkxz6fGlArSlXKzz1GWTjb/XLaEuTCCQp+wrhDSHwUoWpjY?=
- =?us-ascii?Q?2AB9oUhFm9yNbcKVNvXHkoEQjEAQN4xfRms+PkfvzPDcFQWjFk/DECjbNXKQ?=
- =?us-ascii?Q?ktIaLsPdeCKx1mnQtGicLhC0TnXRu60WjmXDQmN6yHSbJ6VKHNO/Xq4uKxig?=
- =?us-ascii?Q?sjqq+zDtCj+vjGGyqKoJKX3CeeBPbNNkL1UKj/2lJfcF4YVDCoRjzHvhyAvE?=
- =?us-ascii?Q?WG9ZLjnCnlru9R0YGzxH/kIEuUDuZ1Gr1v14Bp+MmQFP6X2uepL10C9PyrRI?=
- =?us-ascii?Q?206HSb15n27YgAS8tCGyKV3qMpki4DHm9ZgrX9v+sn3eC3rByVsBcbkMgD02?=
- =?us-ascii?Q?gZmVkKn9QfNcGL06DhBLz0Foz2C6kjWeA87ofqtRTNaGTDclgRfVwaLvRz2C?=
- =?us-ascii?Q?eU1akJvyqj3KEJJALLGu8r1qF1N+XwfzoAk5RRv78nx/iIKnPv0kZJRw32W7?=
- =?us-ascii?Q?cCGwMHCcPsAK1KlNxy0hTQDKkzJcmoMGPZJIdTY9Bk08atOtvbc2phlNH0EI?=
- =?us-ascii?Q?s4qTnKUmVKOYnrRDic+YTkqCVFwh8wqtmFUGgE5niUb+JvSJL7vczZ7DikPl?=
- =?us-ascii?Q?LEHM/X328Q2yrIzBeAZLwP/3yfkBfsT/xn9r4OXVx/kiqv28uJkmz0jMNAxl?=
- =?us-ascii?Q?lBWYTMULqUnZ7pY3nWAy+NtKbtkmBiIdCwtFf3ooZVBAJ/k45EWJr9DL4vsM?=
- =?us-ascii?Q?isREGogY5o4zeOWrKjVea56+r2RD2QOJplWDLo+eC/PNq0pGqqrZyfXJ8Cbg?=
- =?us-ascii?Q?GBFotNwZWZ16d1fKkLe3ZaxJ8lD2oVO3IeiMep9GkKwoyVjylLLAcrxci5y7?=
- =?us-ascii?Q?jO3yhsW5yT9azq/PYv2OYJGoSAmNxKz+8b6NIhNFHcytCxVUP6D49RUhrFS9?=
- =?us-ascii?Q?2h0pRF9r6t6Ler2BSBeX0PcK7q+Pq9xsnZJK30XikPkuHzovCkgKJONT84jq?=
- =?us-ascii?Q?d8+NLjS7DkgqCtH4MX4ZPOaIiXJ8xtPZsKIvUsLe9YmsmqFW5N4mhK5XTLcS?=
- =?us-ascii?Q?9bnwKY3Z0FnlS5+6mH92YOQKzm4QctjQSHYrcvtHF9GhPLin+gTPTIZMkDeq?=
- =?us-ascii?Q?bng5HVOdcwyuWzW2bp06QvDHPcTn+XZDZ6A9iSoi?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5a33f696-4aed-45f9-5ac3-08db1518c9e7
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Feb 2023 21:07:21.6337
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6L1aL4UDdMaUSvtAc/IXpqeoBxoXI/CUxFCriodd6SKW8sjYR4yhpatblU8vIIC2
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6213
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+        with ESMTP id S232553AbjBVVZY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Feb 2023 16:25:24 -0500
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42AF143912
+        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 13:25:22 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5376fa4106eso46757037b3.7
+        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 13:25:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VCAEO323b86BbB7XtvnH+rG3EP2w0C3Dqq7NI+H9LE0=;
+        b=rzW4oiBSJ63i/anFjhOay2GibzgaSIcPlhs4icaZXWt5tih/osT60UF5e1mwSVULhr
+         JA10nXn/Y6ES/XMfobF3rXA0+xT8tqci00AYfMRUEKHVUxG6JbSqI9dpiBOiOKsrLbee
+         bYfLIVa2BYR+spMxhwdoUyja2LlL+Mut0U/wnb3uo6zTUNO+QbmpWgddUexwhQjv1HXV
+         zoLD7Nt5c/165lbrdfRGyO8N0FXIlW/zx8x2Ec3Omk9D8TqW3ZfghlgsWa2lUSnTeGOM
+         9sxnd67n4MCSx7otekA5PPlVXRqMI+iWtlHIKZrBzcfZ3JxTRhsjCjR6AQ6bjByIMLKG
+         /Vnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=VCAEO323b86BbB7XtvnH+rG3EP2w0C3Dqq7NI+H9LE0=;
+        b=icNaL8iGXMCOJLXdrg8JBVONIxmE82DsbSKzcUeOBJJffFyfJIlcH2QfDemDGfWrPi
+         bi/BuL8eYO/qNwqnlpI5VFhODOHXLV4F7Sr+31iH9bQAaXl7lcFy1RTR8qCcW9DmCLcd
+         lz3jkBCAEiK80LC10syG2YcUBlbsbppJY6J/0qjNSIcdz7jAPSxHg/BJRGBgXGpCp611
+         1C1KjNJR+MqSpyVZogg4rp7hIQl+CPk6eW2yf+WrtNP3mt7GrogsD/raONK7BpkbdVjp
+         tev3VgIGjWyjBAjPFqy1euO+/pYLOzYhBLK7nKABJbC0ox5MavHjGHDtiauyz9jvyyNa
+         Cggw==
+X-Gm-Message-State: AO0yUKV8fKpQiIF9b+smtpKdXv+GTxV3597yluJBzObLzMhd8ZTJI+7V
+        dTvrGgha3PBs8LbRDFZyQKb/+yhJdKQ=
+X-Google-Smtp-Source: AK7set9wDZXbRc6wLa992mDcUcum92VMWfB8kgedycpfygyX7MXQMXDLL4D76H3UAiAg1sC8Z7wuyTwxayc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1028:b0:a27:3ecd:6 with SMTP id
+ x8-20020a056902102800b00a273ecd0006mr438895ybt.1.1677101121372; Wed, 22 Feb
+ 2023 13:25:21 -0800 (PST)
+Date:   Wed, 22 Feb 2023 13:25:19 -0800
+In-Reply-To: <2dfae61c-6ac7-7686-ebd1-6ad4448b2bf8@maciej.szmigiero.name>
+Mime-Version: 1.0
+References: <20230217225449.811957-1-seanjc@google.com> <20230217225449.811957-3-seanjc@google.com>
+ <2dfae61c-6ac7-7686-ebd1-6ad4448b2bf8@maciej.szmigiero.name>
+Message-ID: <Y/aIP4aCxTVOU/ZC@google.com>
+Subject: Re: [PATCH 2/2] Documentation/process: Add a maintainer handbook for
+ KVM x86
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sagi Shahar <sagis@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Peter Shier <pshier@google.com>,
+        Anish Ghulati <aghulati@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        James Houghton <jthoughton@google.com>,
+        Anish Moorthy <amoorthy@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Axel Rasmussen <axelrasmussen@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Ashish Kalra <ashish.kalra@amd.com>,
+        Babu Moger <babu.moger@amd.com>, Chao Gao <chao.gao@intel.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Chenyi Qiang <chenyi.qiang@intel.com>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Guang Zeng <guang.zeng@intel.com>,
+        Hou Wenlong <houwenlong.hwl@antgroup.com>,
+        Jiaxi Chen <jiaxi.chen@linux.intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        Jing Liu <jing2.liu@intel.com>,
+        Junaid Shahid <junaids@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Leonardo Bras <leobras@redhat.com>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Li RongQing <lirongqing@baidu.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Michal Luczaj <mhal@rbox.co>,
+        Mingwei Zhang <mizhang@google.com>,
+        Nikunj A Dadhania <nikunj@amd.com>,
+        Paul Durrant <pdurrant@amazon.com>,
+        Peng Hao <flyingpenghao@gmail.com>,
+        Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>,
+        Robert Hoo <robert.hu@linux.intel.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Wei Wang <wei.w.wang@intel.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Zhenzhong Duan <zhenzhong.duan@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 08, 2023 at 08:16:36PM -0800, Yi Liu wrote:
-> iommufd gives userspace the capabilty to manipulating iommu subsytem.
-> e.g. DMA map/unmap etc. In the near future, it will also support iommu
-> nested translation. Different platform vendors have different implementation
-> for the nested translation. So before set up nested translation, userspace
-> needs to know the hardware iommu capabilities. For example, Intel platform
-> supports guest I/O page table to be the first stage translation structure.
-> 
-> This series reports the iommu capability for a given iommufd_device which
-> has been bound to iommufd. It is a preparation work for nested translation
-> support[1]. In this series, Intel VT-d capability reporting is added. Other
-> vendors may add their own reporting based on this series.
-> 
-> [1] https://github.com/yiliu1765/iommufd/tree/iommufd_nesting_vtd_v1
+On Wed, Feb 22, 2023, Maciej S. Szmigiero wrote:
+> On 17.02.2023 23:54, Sean Christopherson wrote:
+> > +SDM and APM References
+> > +~~~~~~~~~~~~~~~~~~~~~~
+> > +Much of KVM's code base is directly tied to architectural behavior def=
+ined in
+> > +Intel's Software Development Manual (SDM) and AMD's Architecture Progr=
+ammer=E2=80=99s
+> > +Manual (APM).  Use of "Intel's SDM" and "AMD's APM", or even just "SDM=
+" or
+> > +"APM", without additional context is a-ok.
+> > +
+> > +Do not reference specific sections, tables, figures, etc. by number, e=
+specially
+> > +not in comments.  Instead, copy-paste the relevant snippet (if warrant=
+ed), and
+> > +reference sections/tables/figures by name.
+>=20
+> This says do "copy-paste the relevant snippet"...
+>=20
+> > The layouts of the SDM and APM are
+> > +constantly changing, and so the numbers/labels aren't stable/consisten=
+t.
+> > +
+> > +Generally speaking, do not copy-paste SDM or APM snippets into
+> > comments.
+>=20
+> ...but this seems to say "don't do that".
 
-Let's have the comments addressed and this rebased on top of
- https://github.com/jgunthorpe/linux/commits/iommufd_hwpt
+Yeah, that didn't come out right.
 
-Which should address eg the selftest issue
+> More specific guidance would probably help here.
 
-I want to start chipping away at bits of the nesting patch pile and
-this part looks close
+Is this better?
 
-Thanks,
-Jason
+  Do not reference specific sections, tables, figures, etc. by number, espe=
+cially
+  not in comments.  Instead, if necessary (see below), copy-paste the relev=
+ant
+  snippet and reference sections/tables/figures by name.  The layouts of th=
+e SDM
+  and APM are constantly changing, and so the numbers/labels aren't stable.
+ =20
+  Generally speaking, do not explicitly reference or copy-paste from the SD=
+M or
+  APM in comments.  With few exceptions, KVM *must* honor architectural beh=
+avior,
+  therefore it's implied that KVM behavior is emulating SDM and/or APM beha=
+vior.
+  Note, referencing the SDM/APM in changelogs to justify the change and pro=
+vide
+  context is perfectly ok and encouraged.
+
+> > +If a patch touches multiple topics, traverse up the conceptual tree to=
+ find the
+> > +first common parent (which is often simply ``x86``).  When in doubt,
+> > +``git log path/to/file`` should provide a reasonable hint.
+> > +
+> > +New topics do occasionally pop up, but please start an on-list discuss=
+ion if
+> > +you want to propose introducing a new topic, i.e. don't go rogue.
+> > +
+> > +Do not use file names or complete file paths as the subject/shortlog p=
+refix.
+>=20
+> Do we strictly obey the "75 characters max" rule for the subject/shortlog
+> or do we prefer to be more flexible here if it results in a more
+> descriptive patch subject?
+
+I prefer to be a little flexible, I'll expand this section to clarify that.
+
+> (...)
+> > +Testing
+> > +-------
+> > +At a bare minimum, *all* patches in a series must build cleanly for KV=
+M_INTEL=3Dm
+> > +KVM_AMD=3Dm, and KVM_WERROR=3Dy.  Building every possible combination =
+of Kconfigs
+> > +isn't feasible, but the more the merrier.  KVM_SMM, KVM_XEN, PROVE_LOC=
+KING, and
+> > +X86_64 are particularly interesting knobs to turn.
+> > +
+> > +Running KVM selftests and KVM-unit-tests is also mandatory (and statin=
+g the
+> > +obvious, the tests need to pass).
+>=20
+> I would add an exception here from mandatory testing for changes that
+> obviously have negligible probability of affecting runtime behavior.
+>=20
+> For example: patches that modify just code comments or documentation.
+
+Agreed, will add.
+
+Regarding documentation, I think I'll also add a requirement of 'make htmld=
+ocs'
+without warnings for non-trivial docs changes.  It's all too easy to write =
+buggy
+ReST "code" that looks correct as raw text, e.g. the whole double-colon thi=
+ng.
+
+> > When possible and relevant, testing on both
+> > +Intel and AMD is strongly preferred.  Booting an actual VM is encourag=
+ed, but
+> > +not mandatory.
+> > +
+> > +For changes that touch KVM's shadow paging code, running with TDP (EPT=
+/NPT)
+> > +disabled is mandatory.  For changes that affect common KVM MMU code, r=
+unning
+> > +with TDP disabled is strongly encouraged.  For all other changes, if t=
+he code
+> > +being modified depends on and/or interacts with a module param, testin=
+g with
+> > +the relevant settings is mandatory.
+> > +
+> > +Note, KVM selftests and KVM-unit-tests do have known failures.  If you=
+ suspect
+> > +a failure is not due to your changes, verify that the *exact same* fai=
+lure
+> > +occurs with and without your changes.
+> > +
+> > +If you can't fully test a change, e.g. due to lack of hardware, clearl=
+y state
+> > +what level of testing you were able to do, e.g. in the cover letter.
+> > +
+> (...)
+>=20
+> Thanks for preparing such a detailed handbook Sean.
+>=20
+> However, having so many rules might seem intimidating for newcomers, and
+> deter them from contributing out of fear that they'll be screamed at for
+> accidentally breaking some obscure rule.
+>=20
+> That's especially true for unpaid volunteers that might become
+> professional kernel developers one day if their learning curve isn't
+> made too steep.
+>=20
+> Maybe have a paragraph or two that, despite all these rules, KVM x86
+> strives to be a welcome community, encouraging newcomers and understandin=
+g
+> their beginner mistakes (or so)?
+
+I like that idea a lot, I'll add a section at the very top.
+
+Thanks much!
