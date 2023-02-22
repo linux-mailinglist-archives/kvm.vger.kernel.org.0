@@ -2,67 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 95B3769FA67
-	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 18:49:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B4FF69FA9C
+	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 18:59:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231545AbjBVRt0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Feb 2023 12:49:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59720 "EHLO
+        id S231878AbjBVR7h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Feb 2023 12:59:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231386AbjBVRtY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Feb 2023 12:49:24 -0500
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6DE62A6C0
-        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 09:49:23 -0800 (PST)
-Received: by mail-pl1-x649.google.com with SMTP id w7-20020a170902e88700b0019ca50c7fa3so1862730plg.23
-        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 09:49:23 -0800 (PST)
+        with ESMTP id S229513AbjBVR7g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Feb 2023 12:59:36 -0500
+Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BB8338B6D
+        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 09:59:35 -0800 (PST)
+Received: by mail-il1-x129.google.com with SMTP id b12so1021785ils.8
+        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 09:59:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DpJmow91+P1uUm2vvVjtoiUyGX/MQ97j5Cxp747w7F8=;
-        b=VKSwYh0V4btWDXxmM43GcLyr7Af4gVYu3fZurjR8EXlupFOnv0fKkTU66i4bEECm6R
-         A0tibHPcSiAESewarQLiPoCrJTPYCP+epOpVwObr3QR8y8hhqcszctW+A73tfvxCEFpg
-         Ar/FvSLTvY7wQQTYWKdLqHNQgLCmYkFxAcnBIcsBn3Tt4iZu9A/yy1tkn4BHe+QbN3q9
-         O0a3EstEXV3o+M5RPK75iU+LnigcL/qHYAIVg0LLlAhJltt3BfwJ3CyDq0G+RB2JQNs5
-         SNy+2VJkDWI3Td9xPaPj14/TjO5eJs5YFsuYTJkCprptcXGMY9nE32TFQOkZ7eRk0USl
-         v2ww==
+        d=linuxfoundation.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Uy5pdeYgUpFGIEf7X91ctTBBE3MBoLcU1hE7QgayOKU=;
+        b=RARg57s3eSm29ZIVgj49+EpDoogrHha3wyIOOsXgwx1gtb8nIF/m4M72NPEzw+ceiX
+         kxCMjZeDw+GXM7z/Z3n8Zr6ODdpLnXZFAZ5mL3MNsP5AHqf4+iHIpBMXsI6oUoBeTanE
+         A/jh+0/xQylOECZ1iI1/zx2okhpmI8Sfpad2s=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DpJmow91+P1uUm2vvVjtoiUyGX/MQ97j5Cxp747w7F8=;
-        b=c24oh6rTIuSGkB5xROlZ3rUfeICiTWpdhxrI3FxIk3xA3R/funi4MCdaqrIM+psbK3
-         CYssWFOV2nfJmtE3NworMqDO3P0IQB7OucCApYVk2wikXfka91eAsQkEvbULY/CX+BqK
-         h5xxk0d6K2g/xVXa7rKDZ3BMQ0rVLfTJb5HApFf20SY9J43M8T85PRHuHHrOqnv2JJs1
-         J51ahxUfcz95M4K0TwbsKUOaBDP7o69mnmUvPEUb4ize/iVhXrCS824tjKUDuO3jGV3l
-         FCTW1TwNGzhkJl07wA3e0H2W/kk5hB5vRQC71OJSeH74wJB+wqyahYgcizgh8kgq+YlK
-         eupg==
-X-Gm-Message-State: AO0yUKXD3IlPg3GmLg7EdPiuRxVfzrCq1bkXDWEEmbzpVX9vonBdZJj7
-        7657sXRGV6MpxiqJbKRoYtpk0YVnavU=
-X-Google-Smtp-Source: AK7set9SJT9/oi1RQ9D03sKQtFd7cr9S+1ilJYcb20T1cWv6eUgUEEaiweNDpdbctk9pyNvcC+1btaTxeOI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a65:6aa5:0:b0:4fc:8b10:873 with SMTP id
- x5-20020a656aa5000000b004fc8b100873mr1138892pgu.6.1677088163270; Wed, 22 Feb
- 2023 09:49:23 -0800 (PST)
-Date:   Wed, 22 Feb 2023 09:49:21 -0800
-In-Reply-To: <20230220203529.136013-1-coltonlewis@google.com>
-Mime-Version: 1.0
-References: <20230220203529.136013-1-coltonlewis@google.com>
-Message-ID: <Y/ZVoSR0sYyceEAr@google.com>
-Subject: Re: [PATCH] KVM: selftests: Depend on kernel headers when making selftests
-From:   Sean Christopherson <seanjc@google.com>
-To:     Colton Lewis <coltonlewis@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Uy5pdeYgUpFGIEf7X91ctTBBE3MBoLcU1hE7QgayOKU=;
+        b=NTFIacJV4lTRzh/zPhoEVzE+kbQvh/KU41xSvq6uFjIiksVaTV6b6R+UpYKht/EPuy
+         uKM7msdSgMyqKDb6p4ctb1Ji+rtXY+4RIMCLKcEfFp8aV7xm2HdlUPGTOOQyUk97TlWi
+         2P5arnYhS+Iru8IqFFVkkQ/CDB6eXWbPYXPvaojwMlUEJcEpkRxegunQsTcBxsuIXxFx
+         aCjHM17YbJ0Gc5lojr9hqyl6Q+hFxN/nj4Q6ozs2zyAiLrZXg0s4AnAKc7bgdwERZhHf
+         yb+xpBY6sPsw7bOzR/SlPfqkoi2hwMjStvGOf32S/EORHHqDoF8BSPb824/xuCP7aPma
+         yJ8g==
+X-Gm-Message-State: AO0yUKUEi0YEmQXk/F5Wq7joy/iI77IeUELj6s12vIFxek/8ercF6j66
+        nPvM3hTq1jpZgRxaw5QwErTZBw==
+X-Google-Smtp-Source: AK7set8zfC7rQBLLvFFyGlkHMBrELQeG6gTKOLCBwBe7x3GJv28x5iQWiVhuEGEhS2R9udJ+U6CaYQ==
+X-Received: by 2002:a05:6e02:1605:b0:315:2b2a:f458 with SMTP id t5-20020a056e02160500b003152b2af458mr5506062ilu.3.1677088774574;
+        Wed, 22 Feb 2023 09:59:34 -0800 (PST)
+Received: from [192.168.1.128] ([38.15.45.1])
+        by smtp.gmail.com with ESMTPSA id p10-20020a92d48a000000b0030c27c9eea4sm2139981ilg.33.2023.02.22.09.59.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 22 Feb 2023 09:59:33 -0800 (PST)
+Message-ID: <30d80f40-247e-f5b6-3693-e8cd9c119d8e@linuxfoundation.org>
+Date:   Wed, 22 Feb 2023 10:59:32 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH] KVM: selftests: Depend on kernel headers when making
+ selftests
+Content-Language: en-US
+To:     Colton Lewis <coltonlewis@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
         Marc Zyngier <maz@kernel.org>,
         David Matlack <dmatlack@google.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        Ben Gardon <bgardon@google.com>
+Cc:     kvm@vger.kernel.org, Shuah Khan <skhan@linuxfoundation.org>
+References: <20230220203529.136013-1-coltonlewis@google.com>
+From:   Shuah Khan <skhan@linuxfoundation.org>
+In-Reply-To: <20230220203529.136013-1-coltonlewis@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,70 +79,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 20, 2023, Colton Lewis wrote:
+On 2/20/23 13:35, Colton Lewis wrote:
 > Add a makefile dependency for the kernel headers when building KVM
 > selftests. As the selftests do depend on the kernel headers, needing
 > to do things such as build selftests for a different architecture
 > requires rebuilding the headers. That is an extra annoying manual step
 > that should be handled by make.
+> 
 
-I 100% agree that this is super annoying, but auto-installation of header was
-deliberately removed[1][2] (this isn't the first time this type of change has been
-proposed[3]) to play nice with an out-of-tree build directory.
+It does if you use the kselftest-* targets from the main Makefile:
 
-Argh, digging a bit deeper, KVM selftests' makefile is all kinds of funky.  It
-defines its own header path, LINUX_HDR_PATH, but then also grabs KHDR_INCLUDE
-since commit 0cc5963b4cc3 ("selftests: kvm: Add the uapi headers include variable").
-That's flawed because KVM selftests will pick up the in-tree headers first, i.e.
-out-of-tree builds effectively rely on the in-tree headers not being built.  I'll
-send the below as a formal patch.
+# Kernel selftest
 
-As for auto-installing headers, for those of us that build directly from the KVM
-selftests directory, the best option I've come up with is to add an alias+script
-for building selftests and have that do the header installation.
+PHONY += kselftest
+kselftest: headers
+         $(Q)$(MAKE) -C $(srctree)/tools/testing/selftests run_tests
 
----
- tools/testing/selftests/kvm/Makefile | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+kselftest-%: headers FORCE
+         $(Q)$(MAKE) -C $(srctree)/tools/testing/selftests $*
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 844417601618..01ea083a2cd9 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -186,8 +186,6 @@ LIBKVM += $(LIBKVM_$(ARCH_DIR))
- # which causes the environment variable to override the makefile).
- include ../lib.mk
- 
--INSTALL_HDR_PATH = $(top_srcdir)/usr
--LINUX_HDR_PATH = $(INSTALL_HDR_PATH)/include/
- LINUX_TOOL_INCLUDE = $(top_srcdir)/tools/include
- ifeq ($(ARCH),x86_64)
- LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/x86/include
-@@ -198,9 +196,8 @@ CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
- 	-Wno-gnu-variable-sized-type-not-at-end \
- 	-fno-builtin-memcmp -fno-builtin-memcpy -fno-builtin-memset \
- 	-fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
--	-I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
--	-I$(<D) -Iinclude/$(ARCH_DIR) -I ../rseq -I.. $(EXTRA_CFLAGS) \
--	$(KHDR_INCLUDES)
-+	-I$(LINUX_TOOL_ARCH_INCLUDE) -Iinclude -I$(<D) -Iinclude/$(ARCH_DIR) \
-+	-I ../rseq -I.. $(EXTRA_CFLAGS) $(KHDR_INCLUDES)
- 
- no-pie-option := $(call try-run, echo 'int main(void) { return 0; }' | \
-         $(CC) -Werror $(CFLAGS) -no-pie -x c - -o "$$TMP", -no-pie)
-@@ -238,7 +235,7 @@ x := $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
- $(TEST_GEN_PROGS): $(LIBKVM_OBJS)
- $(TEST_GEN_PROGS_EXTENDED): $(LIBKVM_OBJS)
- 
--cscope: include_paths = $(LINUX_TOOL_INCLUDE) $(LINUX_HDR_PATH) include lib ..
-+cscope: include_paths = $(LINUX_TOOL_INCLUDE) $(top_srcdir)/usr/include include lib ..
- cscope:
- 	$(RM) cscope.*
- 	(find $(include_paths) -name '*.h' \
+You can use the following commands to just build what you want to build:
+make kselftest-all TARGETS=kvm
 
-base-commit: c57c5ac42480250deb22b306ec6bcbdf0e6b5857
--- 
+I would like to see the above used to make kselftest easier to maintain
+and easier to add features.
 
-[1] https://lore.kernel.org/lkml/cover.1657296695.git.guillaume.tucker@collabora.com
-[2] https://lore.kernel.org/all/b39b9e0b-45f3-1818-39fe-58921182d957@linuxfoundation.org
-[3] https://lore.kernel.org/all/20221219095540.52208-1-likexu@tencent.com
+If you choose to build from the test directory - then you do have
+to manually run headers_install.
+
+
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> ---
+> 
+> This change has been sitting in my local git repo as a stach for a
+> long time to make it easier to build selftests for multiple
+> architectures and I just realized I never sent it upstream. I don't
+> know if this is the best way to accomplish the goal, but it was the
+> only obvious one I found.
+> 
+>   tools/testing/selftests/kvm/Makefile | 6 +++++-
+>   1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index 1750f91dd936..857c6f78e4da 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -221,12 +221,16 @@ LIBKVM_OBJS = $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ) $(LIBKVM_STRING_OBJ)
+>   EXTRA_CLEAN += $(LIBKVM_OBJS) cscope.*
+> 
+>   x := $(shell mkdir -p $(sort $(dir $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ))))
+> -$(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c
+> +$(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c headers
+>   	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
+> 
+>   $(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S
+>   	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
+> 
+> +PHONY += headers
+> +headers:
+> +	$(MAKE) -C $(top_srcdir) headers
+> +
+
+This will install headers under the repo and doesn't work with out
+of tree builds.
+
+thanks,
+-- Shuah
