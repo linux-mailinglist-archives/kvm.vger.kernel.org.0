@@ -2,73 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5EB7A69FA27
-	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 18:28:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 95B3769FA67
+	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 18:49:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231580AbjBVR2Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Feb 2023 12:28:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43634 "EHLO
+        id S231545AbjBVRt0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Feb 2023 12:49:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230129AbjBVR2X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Feb 2023 12:28:23 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5FE03E0BF
-        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 09:27:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677086846;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=A3hjthbpnOytnzdDsquz7EOnh3xJTlIr5J5MzFX7ZsE=;
-        b=MigS1rIMQ9hWikuWwiP0tnZGNRAYHEQW0fb78zuyUp+KoUdDnFITMHg2dl4AQNka2XN2l2
-        8QamZ43/HMATPrB569vV1JOhfH13mFbp9lUmKDwONqJ27VO3D6KwdEa4FKZLgA6kNNIRr+
-        cOVKmsIzuY8n6GM5jt5w8y4cQdg8vkI=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-671-rbpMasb2ODC9x0h9cmNZwQ-1; Wed, 22 Feb 2023 12:27:22 -0500
-X-MC-Unique: rbpMasb2ODC9x0h9cmNZwQ-1
-Received: by mail-qv1-f72.google.com with SMTP id pv11-20020ad4548b000000b0056e96f4fd64so3923965qvb.15
-        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 09:27:18 -0800 (PST)
+        with ESMTP id S231386AbjBVRtY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Feb 2023 12:49:24 -0500
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6DE62A6C0
+        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 09:49:23 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id w7-20020a170902e88700b0019ca50c7fa3so1862730plg.23
+        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 09:49:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=DpJmow91+P1uUm2vvVjtoiUyGX/MQ97j5Cxp747w7F8=;
+        b=VKSwYh0V4btWDXxmM43GcLyr7Af4gVYu3fZurjR8EXlupFOnv0fKkTU66i4bEECm6R
+         A0tibHPcSiAESewarQLiPoCrJTPYCP+epOpVwObr3QR8y8hhqcszctW+A73tfvxCEFpg
+         Ar/FvSLTvY7wQQTYWKdLqHNQgLCmYkFxAcnBIcsBn3Tt4iZu9A/yy1tkn4BHe+QbN3q9
+         O0a3EstEXV3o+M5RPK75iU+LnigcL/qHYAIVg0LLlAhJltt3BfwJ3CyDq0G+RB2JQNs5
+         SNy+2VJkDWI3Td9xPaPj14/TjO5eJs5YFsuYTJkCprptcXGMY9nE32TFQOkZ7eRk0USl
+         v2ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=A3hjthbpnOytnzdDsquz7EOnh3xJTlIr5J5MzFX7ZsE=;
-        b=cbb3+898oOi85lUJR3EO/KhebOiwpTyQ/BiqkgZJwGs32RpLxUzwC96dGi3D1g+5H9
-         HVGUFm5ikCDNtWs6pq81a3nGe0kfbRVWidrFy6PLfLgLWoUG/+7DxYsrcG3t+KhYghkz
-         kOnfk+36SY93VTXW85wYMyDdaVw6SMjN/9esp+cNO1mHG4pnAVZQVS5f+yp92Fb1cPj2
-         caOehPgp65jDR3o82w6LP3rc2+hJgmxaKubYNDHun6dHgU2/Ardlqu3WUrLXWFXS1zjQ
-         gnNjKPEQfVdVHGPUKgRTUgXDmuXourGufzltYSoQWaT4jUuKjL+oc0lDmCskjoaIKPKQ
-         miXA==
-X-Gm-Message-State: AO0yUKU4c0EAYJTE1dF8CR0a4wfRTfoD1PCy5dN1dF4GFL0xnf26HP7m
-        svCMKDVKW04Rip323bUP2ClzdhswkCc/HrE5PsVC6bgfPgnldAbLV6jIAUunvyHuByS9KQWgf81
-        CVVg2X4pcNSAA75onBEpksFh+E4sjNPFE3I6aOTGalXfDs4VxJkT8sNVbAPsKyFWPrOi7hQ==
-X-Received: by 2002:ac8:7d89:0:b0:3b8:682d:cebf with SMTP id c9-20020ac87d89000000b003b8682dcebfmr14866175qtd.66.1677086838441;
-        Wed, 22 Feb 2023 09:27:18 -0800 (PST)
-X-Google-Smtp-Source: AK7set+d4d5FJqnfbvKfxeC1bGLDNd4C8QlotcmipZ4m9xE+sgAZLxryVvT5ew8R/ylau0iFM30W6w==
-X-Received: by 2002:ac8:7d89:0:b0:3b8:682d:cebf with SMTP id c9-20020ac87d89000000b003b8682dcebfmr14866141qtd.66.1677086838114;
-        Wed, 22 Feb 2023 09:27:18 -0800 (PST)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id n123-20020a37bd81000000b006ee8874f5fasm2096783qkf.53.2023.02.22.09.27.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Feb 2023 09:27:17 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org
-Cc:     Vineeth Pillai <viremana@linux.microsoft.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: SVM: hyper-v: placate modpost section mismatch
- error
-In-Reply-To: <20230222162511.7964-1-rdunlap@infradead.org>
-References: <20230222162511.7964-1-rdunlap@infradead.org>
-Date:   Wed, 22 Feb 2023 18:27:14 +0100
-Message-ID: <87h6vd4nm5.fsf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DpJmow91+P1uUm2vvVjtoiUyGX/MQ97j5Cxp747w7F8=;
+        b=c24oh6rTIuSGkB5xROlZ3rUfeICiTWpdhxrI3FxIk3xA3R/funi4MCdaqrIM+psbK3
+         CYssWFOV2nfJmtE3NworMqDO3P0IQB7OucCApYVk2wikXfka91eAsQkEvbULY/CX+BqK
+         h5xxk0d6K2g/xVXa7rKDZ3BMQ0rVLfTJb5HApFf20SY9J43M8T85PRHuHHrOqnv2JJs1
+         J51ahxUfcz95M4K0TwbsKUOaBDP7o69mnmUvPEUb4ize/iVhXrCS824tjKUDuO3jGV3l
+         FCTW1TwNGzhkJl07wA3e0H2W/kk5hB5vRQC71OJSeH74wJB+wqyahYgcizgh8kgq+YlK
+         eupg==
+X-Gm-Message-State: AO0yUKXD3IlPg3GmLg7EdPiuRxVfzrCq1bkXDWEEmbzpVX9vonBdZJj7
+        7657sXRGV6MpxiqJbKRoYtpk0YVnavU=
+X-Google-Smtp-Source: AK7set9SJT9/oi1RQ9D03sKQtFd7cr9S+1ilJYcb20T1cWv6eUgUEEaiweNDpdbctk9pyNvcC+1btaTxeOI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a65:6aa5:0:b0:4fc:8b10:873 with SMTP id
+ x5-20020a656aa5000000b004fc8b100873mr1138892pgu.6.1677088163270; Wed, 22 Feb
+ 2023 09:49:23 -0800 (PST)
+Date:   Wed, 22 Feb 2023 09:49:21 -0800
+In-Reply-To: <20230220203529.136013-1-coltonlewis@google.com>
+Mime-Version: 1.0
+References: <20230220203529.136013-1-coltonlewis@google.com>
+Message-ID: <Y/ZVoSR0sYyceEAr@google.com>
+Subject: Re: [PATCH] KVM: selftests: Depend on kernel headers when making selftests
+From:   Sean Christopherson <seanjc@google.com>
+To:     Colton Lewis <coltonlewis@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,61 +70,70 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Randy Dunlap <rdunlap@infradead.org> writes:
+On Mon, Feb 20, 2023, Colton Lewis wrote:
+> Add a makefile dependency for the kernel headers when building KVM
+> selftests. As the selftests do depend on the kernel headers, needing
+> to do things such as build selftests for a different architecture
+> requires rebuilding the headers. That is an extra annoying manual step
+> that should be handled by make.
 
-> modpost reports section mismatch errors/warnings:
-> WARNING: modpost: vmlinux.o: section mismatch in reference: svm_hv_hardware_setup (section: .text) -> (unknown) (section: .init.data)
-> WARNING: modpost: vmlinux.o: section mismatch in reference: svm_hv_hardware_setup (section: .text) -> (unknown) (section: .init.data)
-> WARNING: modpost: vmlinux.o: section mismatch in reference: svm_hv_hardware_setup (section: .text) -> (unknown) (section: .init.data)
->
-> Marking svm_hv_hardware_setup() as __init fixes the warnings.
->
-> I don't know why this should be needed -- it seems like a compiler
-> problem to me since the calling function is marked as __init.
->
-> This "(unknown) (section: .init.data)" all refer to svm_x86_ops.
->
-> Fixes: 1e0c7d40758b ("KVM: SVM: hyper-v: Remote TLB flush for SVM")
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> Cc: Vineeth Pillai <viremana@linux.microsoft.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: kvm@vger.kernel.org
-> ---
-> v2: also make the empty stub function be __init (Vitaly)
+I 100% agree that this is super annoying, but auto-installation of header was
+deliberately removed[1][2] (this isn't the first time this type of change has been
+proposed[3]) to play nice with an out-of-tree build directory.
 
-Thanks!
+Argh, digging a bit deeper, KVM selftests' makefile is all kinds of funky.  It
+defines its own header path, LINUX_HDR_PATH, but then also grabs KHDR_INCLUDE
+since commit 0cc5963b4cc3 ("selftests: kvm: Add the uapi headers include variable").
+That's flawed because KVM selftests will pick up the in-tree headers first, i.e.
+out-of-tree builds effectively rely on the in-tree headers not being built.  I'll
+send the below as a formal patch.
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+As for auto-installing headers, for those of us that build directly from the KVM
+selftests directory, the best option I've come up with is to add an alias+script
+for building selftests and have that do the header installation.
 
->
->  arch/x86/kvm/svm/svm_onhyperv.h |    4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff -- a/arch/x86/kvm/svm/svm_onhyperv.h b/arch/x86/kvm/svm/svm_onhyperv.h
-> --- a/arch/x86/kvm/svm/svm_onhyperv.h
-> +++ b/arch/x86/kvm/svm/svm_onhyperv.h
-> @@ -30,7 +30,7 @@ static inline void svm_hv_init_vmcb(stru
->  		hve->hv_enlightenments_control.msr_bitmap = 1;
->  }
->  
-> -static inline void svm_hv_hardware_setup(void)
-> +static inline __init void svm_hv_hardware_setup(void)
->  {
->  	if (npt_enabled &&
->  	    ms_hyperv.nested_features & HV_X64_NESTED_ENLIGHTENED_TLB) {
-> @@ -84,7 +84,7 @@ static inline void svm_hv_init_vmcb(stru
->  {
->  }
->  
-> -static inline void svm_hv_hardware_setup(void)
-> +static inline __init void svm_hv_hardware_setup(void)
->  {
->  }
->  
->
+---
+ tools/testing/selftests/kvm/Makefile | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 844417601618..01ea083a2cd9 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -186,8 +186,6 @@ LIBKVM += $(LIBKVM_$(ARCH_DIR))
+ # which causes the environment variable to override the makefile).
+ include ../lib.mk
+ 
+-INSTALL_HDR_PATH = $(top_srcdir)/usr
+-LINUX_HDR_PATH = $(INSTALL_HDR_PATH)/include/
+ LINUX_TOOL_INCLUDE = $(top_srcdir)/tools/include
+ ifeq ($(ARCH),x86_64)
+ LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/x86/include
+@@ -198,9 +196,8 @@ CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
+ 	-Wno-gnu-variable-sized-type-not-at-end \
+ 	-fno-builtin-memcmp -fno-builtin-memcpy -fno-builtin-memset \
+ 	-fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
+-	-I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
+-	-I$(<D) -Iinclude/$(ARCH_DIR) -I ../rseq -I.. $(EXTRA_CFLAGS) \
+-	$(KHDR_INCLUDES)
++	-I$(LINUX_TOOL_ARCH_INCLUDE) -Iinclude -I$(<D) -Iinclude/$(ARCH_DIR) \
++	-I ../rseq -I.. $(EXTRA_CFLAGS) $(KHDR_INCLUDES)
+ 
+ no-pie-option := $(call try-run, echo 'int main(void) { return 0; }' | \
+         $(CC) -Werror $(CFLAGS) -no-pie -x c - -o "$$TMP", -no-pie)
+@@ -238,7 +235,7 @@ x := $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
+ $(TEST_GEN_PROGS): $(LIBKVM_OBJS)
+ $(TEST_GEN_PROGS_EXTENDED): $(LIBKVM_OBJS)
+ 
+-cscope: include_paths = $(LINUX_TOOL_INCLUDE) $(LINUX_HDR_PATH) include lib ..
++cscope: include_paths = $(LINUX_TOOL_INCLUDE) $(top_srcdir)/usr/include include lib ..
+ cscope:
+ 	$(RM) cscope.*
+ 	(find $(include_paths) -name '*.h' \
+
+base-commit: c57c5ac42480250deb22b306ec6bcbdf0e6b5857
 -- 
-Vitaly
 
+[1] https://lore.kernel.org/lkml/cover.1657296695.git.guillaume.tucker@collabora.com
+[2] https://lore.kernel.org/all/b39b9e0b-45f3-1818-39fe-58921182d957@linuxfoundation.org
+[3] https://lore.kernel.org/all/20221219095540.52208-1-likexu@tencent.com
