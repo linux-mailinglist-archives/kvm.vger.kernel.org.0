@@ -2,226 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 52ADF69F23F
-	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 10:53:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EA11369F276
+	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 11:06:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231464AbjBVJxl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Feb 2023 04:53:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56742 "EHLO
+        id S231995AbjBVKGy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Feb 2023 05:06:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231658AbjBVJxT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Feb 2023 04:53:19 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 516D93B861;
-        Wed, 22 Feb 2023 01:51:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=81DnHrUMwR8m+1B0upNexy/cx3qg2FPSWVCASyPnLTU=; b=R/5kQrl77SogDMz6L70H+4GSow
-        sRklqKLgNvvJkrIdcgns0Ge87rnA3YZ913/RdPdedpLt0tI76bF5KiHWhRxYIGftcpYTL/kHBDK5e
-        cfrqIt5SyllRSKhF7gjcpxxsHNbITwIPpFNkyppAnU66FIBm1Z6Ozs4Qb784Rk+KxmVMkSmxtlX2p
-        WCMbAK9zDZ1kgD5TPqN1r+HIr78Nxvh4Chl4ZNbKZ/1W944fbOpzUf+4BGQBAjQ/HAQPRgegilnUb
-        lgBpO7z4TnhKYybA0XOnOMxH7Cje2hL89h73yxlbPr5MJujoN5kk+5gT5MPDV7NVtBlxGc47zhQrq
-        Bq42hxWg==;
-Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.ant.amazon.com)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pUlmE-00DMbp-B5; Wed, 22 Feb 2023 09:51:07 +0000
-Message-ID: <fc845767a39a8b0fa692a2380eeb3a75c8b09774.camel@infradead.org>
-Subject: Re: [External] Re: [PATCH v9 0/8] Parallel CPU bringup for x86_64
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Usama Arif <usama.arif@bytedance.com>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>
-Cc:     Kim Phillips <kim.phillips@amd.com>, arjan@linux.intel.com,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        hpa@zytor.com, x86@kernel.org, pbonzini@redhat.com,
-        paulmck@kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, rcu@vger.kernel.org, mimoja@mimoja.de,
-        hewenliang4@huawei.com, thomas.lendacky@amd.com, seanjc@google.com,
-        pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
-        punit.agrawal@bytedance.com, simon.evans@bytedance.com,
-        liangma@liangbit.com,
-        "Limonciello, Mario" <Mario.Limonciello@amd.com>,
-        Piotr Gorski <piotrgorski@cachyos.org>
-Date:   Wed, 22 Feb 2023 09:51:04 +0000
-In-Reply-To: <87cz62m3ri.ffs@tglx>
-References: <20230215145425.420125-1-usama.arif@bytedance.com>
-         <42dc683e2846ae8fc1e09715aaf7884660e1a386.camel@infradead.org>
-         <37c18c3aeea2e558633b6da6886111d0@natalenko.name>
-         <5A3B7074-0C6D-472B-803B-D76541828C1F@infradead.org>
-         <3d8ed6e157df10c5175c636de0e21849@natalenko.name>
-         <5c557f9b6f55dc2a612ee89142971298e6ae12d8.camel@infradead.org>
-         <ee0d0d971a3095d6a1e96ad4f1ba32d2@natalenko.name>
-         <5b8f9c89f7015fa80c966c6c7f6fa259db6744f8.camel@infradead.org>
-         <ce731b5a4a53680b4840467977b33d9a@natalenko.name>
-         <85ceb3f92abf3c013924de2f025517372bed19c0.camel@infradead.org>
-         <3e5944de08ef0d23584d19bad7bae66c@natalenko.name>
-         <26E5DC9C-0F19-4E4F-9076-04506A197374@infradead.org>
-         <f71275dc809cfb32df513023786c3faa@natalenko.name>
-         <10CA27BB-ADC6-4421-86D2-A83BD7FA12E0@infradead.org>
-         <9153284c37a79d303aa79dbf07c10329@natalenko.name>
-         <e2e6616f691f1822035be245ec847f7c86a26367.camel@infradead.org>
-         <87356yofw3.ffs@tglx>
-         <aac036a17b1bcbabe8ee5a7c69fb2dfbc546d06e.camel@infradead.org>
-         <11cc090b-82aa-f2f5-0f08-b8e63e662947@bytedance.com>
-         <e7036423216287e86eab4daf9dd1acdaecdd2b49.camel@infradead.org>
-         <87cz62m3ri.ffs@tglx>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-Qid2suNkBaW1opW+cXoy"
-User-Agent: Evolution 3.44.4-0ubuntu1 
+        with ESMTP id S231499AbjBVKGx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Feb 2023 05:06:53 -0500
+Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3C6B26CE5;
+        Wed, 22 Feb 2023 02:06:50 -0800 (PST)
+Received: from pps.filterd (m0250812.ppops.net [127.0.0.1])
+        by mx0a-0064b401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31M8s2IP007030;
+        Wed, 22 Feb 2023 10:06:46 GMT
+Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2168.outbound.protection.outlook.com [104.47.59.168])
+        by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 3ntpem3m8s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 22 Feb 2023 10:06:46 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JV1+qC1MiDDr29wHrn1Otl+VLEST/qYM+GTVPyIVmwIawA24+zzwQhmUc58rFPSxn2u1nBhUcBXqoCVzTrZgO/ZUMCiNixkZ+MWhhPeRjaLBKhhhFDZHSZDxPmYN0u+XZLj14wAqcok9lZ8oP31KzL+PAYRoSrJRPvu2RgromKj2yzVZVH4OLG9JBYMmvD0jXSLFs7fq186//rrDGO9EJr1JOOPuIdDj26JInxBhLc2kVnbor8JmqvZZYBEiD2mWbWNe38MnNRXB6nbXd4ldJZxEXz0AOrskY+m+MGhZveLNLcasc1bKfjZrYtQ7TlkzG27f198QQLVYdNMaxx20Hg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5ZSNXVktUKAikwPv/svQ5Hluaa1S8AS66oqYtb63ppc=;
+ b=GEjYZ6Fh9S4OT3bezU8xVgZuiob7CS414Qw0mFV1TUZgyRZeph0xQVBS+BZoFSAwjxjp5vC50b+Db8eYreCqizUoI6X6iM6ctX93yRdGzbJViHWNIvOnb0PPSsEvWxuboDHK5/+P3kder5xH0PdiwiH3FF8N+2pjhu9XfpQH9/a3J6xaMA22yRqyZoPN0KDHrHYMLGPJR+Lktn8QOzYXH987N/XRtoW3UFJU+XT3bz5vJNC2RiraevL8+2pTMo78ubgfk3Oi5Q/n30HSMy/HN1jSnNFLFhAWEZ2Fx31sCnEUx5UPYxPg38uKjZxNiGvG/v+iWOQKvweMdpU7RAC34Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=windriver.com; dmarc=pass action=none
+ header.from=eng.windriver.com; dkim=pass header.d=eng.windriver.com; arc=none
+Received: from DM4PR11MB5327.namprd11.prod.outlook.com (2603:10b6:5:392::22)
+ by IA1PR11MB7944.namprd11.prod.outlook.com (2603:10b6:208:3d8::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.21; Wed, 22 Feb
+ 2023 10:06:43 +0000
+Received: from DM4PR11MB5327.namprd11.prod.outlook.com
+ ([fe80::31f8:d3d4:2c0b:cec4]) by DM4PR11MB5327.namprd11.prod.outlook.com
+ ([fe80::31f8:d3d4:2c0b:cec4%9]) with mapi id 15.20.6111.021; Wed, 22 Feb 2023
+ 10:06:43 +0000
+From:   Ovidiu Panait <ovidiu.panait@eng.windriver.com>
+To:     stable@vger.kernel.org
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Ovidiu Panait <ovidiu.panait@eng.windriver.com>
+Subject: [PATCH 6.1/5.15/5.10/5.4 1/1] KVM: VMX: Execute IBPB on emulated VM-exit when guest has IBRS
+Date:   Wed, 22 Feb 2023 12:06:25 +0200
+Message-Id: <20230222100625.1409958-1-ovidiu.panait@eng.windriver.com>
+X-Mailer: git-send-email 2.39.1
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-ClientProxiedBy: VI1PR07CA0135.eurprd07.prod.outlook.com
+ (2603:10a6:802:16::22) To DM4PR11MB5327.namprd11.prod.outlook.com
+ (2603:10b6:5:392::22)
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB5327:EE_|IA1PR11MB7944:EE_
+X-MS-Office365-Filtering-Correlation-Id: e88baef9-bd78-4465-a078-08db14bc7f75
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: oBhzYAv7JAzDRH9EBK9Do6oIQB9yRQTFp++70Eesw4MkCv+jblEpvrWHxL5fQLJPFty1a+7ohl/0wT9Hanw8RtLrikbQmdghS+qqFkQfVElHwnX0XvpmQloE1AAG+ls1Cb7XdYFTWgUFsGnbfnbkypTT7Tsd9bzFHJbzlzah5yUO20ody/8lfHw7fUSLJiptSbuBDuFi440KrQycLFrjh8JtXDux/NJ7nfxGaUCc5Hec9oHFG7MkofhAM060N/H97/m4I33KAj1R1w+byJCCSMveLNSxJJ6nyxJOanm7/ZEgSSiYSMwbTrNsIZvns/zsqD4MkVd27qNyEf2FIBxMUGbd3MAmpMcmeRvVH7bG1qTZU8UQ3OkWkW7lGZZSMfLU0N2z6olZ3vqeRH34eMj14+M8dQ0khuUGsIm9UTEazZBtuR6x2RXesM+BKBTsmTOGOhjb5vTM6zuRXKPohlElBZ2eaIi4Pz5ybY5bVDQ2uyR1BlqOpmP24VVcfayNx2jbhLQO0fFXZR734f6ykUddjKTTNCXOsHdMhE+bI4oRy1Ff7mvFGz9h+t0V2Ex5/P0oSqsf0RlctDRQAGTkSHpGcSPS+kUI1o7n/cS1MiZ3wqIQ3c61X4I3gK3gSzE4Br4sd6937mxkqpkKTMR0jCY2kB22jdCrlzFZ1Mdzcy5t+MvfjbrmauU4NjQBrLSyWT0/
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5327.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(366004)(39850400004)(396003)(136003)(376002)(346002)(451199018)(83170400001)(2616005)(54906003)(6512007)(316002)(6666004)(4326008)(966005)(186003)(107886003)(6506007)(6486002)(1076003)(38350700002)(44832011)(52116002)(41300700001)(38100700002)(66946007)(66556008)(66476007)(8676002)(5660300002)(6916009)(2906002)(8936002)(26005)(478600001)(83380400001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?iEAphLNYr3fwo4tpYWHpoNV+pG7Lw36366w0q5FixyhZAXDRB4G+e/0NR6HR?=
+ =?us-ascii?Q?B9veinKrOOnJ5rWGNDmkOfirO/LRJjzb4u5Z0KqsXUtkplTjKGeTOH4/oybP?=
+ =?us-ascii?Q?17BSV8k4ahTfjfc+Jn4Gtzf/Af6vSZHNcFc+K9mJ3FmG/ExnHxFRqnkcLJsH?=
+ =?us-ascii?Q?L7VmikqfAWfuj2fkutagllur8RKfPyBmKyp3PyqRAPB0Nui/EAwJi2zBaEDY?=
+ =?us-ascii?Q?hPDyfQ6q6+1JVM+INAEEaWHj1Rp62R2lzET1neseo4bVPNmSSA82f8EQe9MB?=
+ =?us-ascii?Q?Hd6iKqq7hw8W7oMqD6H64bX5TIZIifn38mxwo89rA4HJo9D5SLma+F6Gy9wP?=
+ =?us-ascii?Q?Wx2YvVVOoeiIduktLPFNRA3PO+oj35qwDW9HEcH0DHBrtSI5+AhMmnR1dvRN?=
+ =?us-ascii?Q?GmfkQU201919T/KBSj/XcoPHGqIJ2lEjZdTiPkr7FOdp/clUZVN3Rly1I7TX?=
+ =?us-ascii?Q?LU6KTwhKuk+lfh15yoxFiRpoIKcRc9/cAjTYBBTsLTtZC4wa2lVmSj/NdqiV?=
+ =?us-ascii?Q?iBXp1XAjslL4m9YeWZ+33OLyqlh8KERMpbYtKTSC6qT0ICdB+BqmfCaN6zpA?=
+ =?us-ascii?Q?8x7dmjlRa2s20wzNdjOZuSexPx7eu+1R5H6enfeHOC0Y6d69+CKBtWnheF/C?=
+ =?us-ascii?Q?bbotMCZnhUeBuyi+DOSogKiCvVT3ijjFUzfB3D395lx9SyYLwhUNiD0h4nWW?=
+ =?us-ascii?Q?e/4japlne+fISZHBRxQNyKtYVzT9liEaGYXB+VCzaVQURAqT1vlhQB6nz2Ry?=
+ =?us-ascii?Q?GMjQAQ1nTqoHTQO/xkUHR5NdYx/cgRvAUilIKhLHDkCxHY1qXvy10XAMnW2k?=
+ =?us-ascii?Q?SCYWqxgj0Gjszdp8kI09QCdKLL+jeGRxdjoGK0DKGVEYfL4TLOEiLyq/WIi/?=
+ =?us-ascii?Q?JlCohG1yBMorlONY1imFChhEW5fZkx7tPc88mdX04s0J6AYNHiHE0Ov2zmYk?=
+ =?us-ascii?Q?4FBsY6ywWEhffMzHXeSBLfLwKMSel93lfsDvLiYX5uKrBFzuN8cs2DKMnxB1?=
+ =?us-ascii?Q?YtVeZGvlrKHioe3RtYAug8cAnEa9Xxt4OrRHr3PWsRjzVj7DiE8WJlsUgV5P?=
+ =?us-ascii?Q?h/4AGJUUylyh02PEi4Kv9M8rtDzuX9TEYQkfjU3t55obgXVpYyRxk+PcdvoD?=
+ =?us-ascii?Q?G0ynSZGRV/f3MEc2ZnpqCgiPcGdqBncRCHbEOJuM3rF0Nvt9jxjUrIw4DscV?=
+ =?us-ascii?Q?OEfaqW6QjkBBPkpRubwG7Vf8PhyfdbYoW2y3NOKu39rMfywguGscOPLz4GIH?=
+ =?us-ascii?Q?LG98+WmSWBqlc5DAZbdApPeetdpOFP/IkbVAFW9h6jQNjnAZrozgf8LuGgUM?=
+ =?us-ascii?Q?6NuLnvvWfPhLFCrd9WncpVvAzUiPNz/VHs/jjLIvMwXgZaXFjKy8+YdRlur0?=
+ =?us-ascii?Q?1XPCnq5lIWakJl41evgfgDSkOdyG+Yr5hoRZY1Nv1sClfBIQs1Zc8QLlP4g3?=
+ =?us-ascii?Q?hRO4raxvNDUR2zaNbdmyI8rFl74z03cRAj/OZTAsK+FoGuWRay6DSo/Srl6r?=
+ =?us-ascii?Q?KRjD2e4w2mkhRJ4SBfffSGhxPBp2st7pAxYD4T4KndsLtQpjdB89BQon2oad?=
+ =?us-ascii?Q?XEmt6bcDPqFDJwfz1AzsUqAmyd+GZFswU0vu03/Sgnen5JOiWijQrq830ONI?=
+ =?us-ascii?Q?TA=3D=3D?=
+X-OriginatorOrg: eng.windriver.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e88baef9-bd78-4465-a078-08db14bc7f75
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB5327.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Feb 2023 10:06:42.9753
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 8ddb2873-a1ad-4a18-ae4e-4644631433be
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BDGKQABpk/VUZZx+G+VZ+pNTxd0ygfZb4Kk3Jf0KNQ/O1/im1VWiEBJc30+QerMorGrTiqGnV/V6Dp7WrIQ/Jyrs1hfcpxih4cPhYA6FMdM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7944
+X-Proofpoint-ORIG-GUID: 6H2DIP71EFR5wa1nkiWNqxZ0ny6Fcx83
+X-Proofpoint-GUID: 6H2DIP71EFR5wa1nkiWNqxZ0ny6Fcx83
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-22_05,2023-02-20_02,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 mlxscore=0
+ lowpriorityscore=0 priorityscore=1501 suspectscore=0 mlxlogscore=643
+ bulkscore=0 spamscore=0 malwarescore=0 impostorscore=0 adultscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302220087
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Jim Mattson <jmattson@google.com>
 
---=-Qid2suNkBaW1opW+cXoy
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+commit 2e7eab81425ad6c875f2ed47c0ce01e78afc38a5 upstream.
 
-On Wed, 2023-02-22 at 10:46 +0100, Thomas Gleixner wrote:
-> On Wed, Feb 22 2023 at 08:19, David Woodhouse wrote:
-> > But the BSP/CPU0 is different. It hasn't actually been taken offline,
-> > and its idle thread context is still in cpu_startup_entry(CPUHP_ONLINE)
-> > which got called from rest_init().
-> >=20
-> > In testing I probably got away with it because we're only using the
-> > *top* of the stack, don't use anything of the red zone, and thus don't
-> > actually bother the true idle thread which is never going to return.
->=20
-> :)
->=20
-> > But I don't think it's correct; we really ought to have that temp_stack
-> > unless we're going to refactor the wakeup_64 code to *become* the idle
-> > thread just as startup_secondary() does, and *schedule* to the context
-> > that was saved in the suspend code.
->=20
-> And thereby messing up the scheduler state...
+According to Intel's document on Indirect Branch Restricted
+Speculation, "Enabling IBRS does not prevent software from controlling
+the predicted targets of indirect branches of unrelated software
+executed later at the same predictor mode (for example, between two
+different user applications, or two different virtual machines). Such
+isolation can be ensured through use of the Indirect Branch Predictor
+Barrier (IBPB) command." This applies to both basic and enhanced IBRS.
 
-Indeed. Which is probably fixable but also probably more of a wart in
-the scheduler code, than it's worth for the negligible cleanup in the
-suspend code.
+Since L1 and L2 VMs share hardware predictor modes (guest-user and
+guest-kernel), hardware IBRS is not sufficient to virtualize
+IBRS. (The way that basic IBRS is implemented on pre-eIBRS parts,
+hardware IBRS is actually sufficient in practice, even though it isn't
+sufficient architecturally.)
 
-Hence "not today". Which is code for "not ever". But don't tell my
-children that.
+For virtual CPUs that support IBRS, add an indirect branch prediction
+barrier on emulated VM-exit, to ensure that the predicted targets of
+indirect branches executed in L1 cannot be controlled by software that
+was executed in L2.
 
---=-Qid2suNkBaW1opW+cXoy
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+Since we typically don't intercept guest writes to IA32_SPEC_CTRL,
+perform the IBPB at emulated VM-exit regardless of the current
+IA32_SPEC_CTRL.IBRS value, even though the IBPB could technically be
+deferred until L1 sets IA32_SPEC_CTRL.IBRS, if IA32_SPEC_CTRL.IBRS is
+clear at emulated VM-exit.
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMjIyMDk1MTA0WjAvBgkqhkiG9w0BCQQxIgQgF7HXnD2p
-xQqMGdqUf5QY8JJ/88iGoUchEjeiHuHoZrwwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgALBISJO4BMwuj1LV9dUONdQtSley0V9fiJ
-FW9gHNVhbMokN/NK5f3OEBw1QzlnyomlQ6y0wieVvleWg8rwAuDT1MQtRFKAuUCEuyl/wgrtJOMc
-dpdXVvBKL/2tr2l6FQUIKHOl5GVIua8KZrNAPmPAGfdhid8uGhLh3f4D5O3nJmn9i7voth+7n6oo
-5nb7a4mQC+UNs63OHV3p9fOM3+1lG5UbidSWHDJV2TQ49YTNJbCCm61xe4ldBz80Hh2VVL01Jr/B
-6y+cTN4Por0w6YiPMVvirn5laXtT3RidA6vOZsle0xl2jg2hZLO9NqxQxhFCtQupgapbJ+GYZZ9o
-L6nochm8qehVEYEP8MrtYk5F7sozytZRk8kg41S97FTO74qINmwudncZbuOHmPNF5Xt8vWFXEI1o
-wIZML921r0g517ldqi7IzxQK4P1ohzsGFMD3sqHmTCmymynJ3IQC3e/NZhBh9AoP5PxAfXbFXSOh
-QxbMS2rZW1xV2KELbMlzm8EXJTOZePOJW5fUGp3votpCAB4icsS4gct1XTGEscHKGrq+PSFIqr+A
-CKH7WOZX+g4sz1h4jvwgtJIov1YmSOTx0FuSZR8wJqye+4rGE5SxwIUSB2fqqKlnRGTOXj+bz/24
-NtTNaCa/eHetagKSMAmhLicjeXPMQrkTSin+lkIxBwAAAAAAAA==
+This is CVE-2022-2196.
 
+Fixes: 5c911beff20a ("KVM: nVMX: Skip IBPB when switching between vmcs01 and vmcs02")
+Cc: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Jim Mattson <jmattson@google.com>
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+Link: https://lore.kernel.org/r/20221019213620.1953281-3-jmattson@google.com
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Ovidiu Panait <ovidiu.panait@eng.windriver.com>
+---
+ arch/x86/kvm/vmx/nested.c | 11 +++++++++++
+ arch/x86/kvm/vmx/vmx.c    |  6 ++++--
+ 2 files changed, 15 insertions(+), 2 deletions(-)
 
---=-Qid2suNkBaW1opW+cXoy--
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index cdebeceedbd0..f3c136548af6 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -4617,6 +4617,17 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
+ 
+ 	vmx_switch_vmcs(vcpu, &vmx->vmcs01);
+ 
++	/*
++	 * If IBRS is advertised to the vCPU, KVM must flush the indirect
++	 * branch predictors when transitioning from L2 to L1, as L1 expects
++	 * hardware (KVM in this case) to provide separate predictor modes.
++	 * Bare metal isolates VMX root (host) from VMX non-root (guest), but
++	 * doesn't isolate different VMCSs, i.e. in this case, doesn't provide
++	 * separate modes for L2 vs L1.
++	 */
++	if (guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL))
++		indirect_branch_prediction_barrier();
++
+ 	/* Update any VMCS fields that might have changed while L2 ran */
+ 	vmcs_write32(VM_EXIT_MSR_LOAD_COUNT, vmx->msr_autoload.host.nr);
+ 	vmcs_write32(VM_ENTRY_MSR_LOAD_COUNT, vmx->msr_autoload.guest.nr);
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 0718658268fe..c849173b60c2 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -1332,8 +1332,10 @@ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu,
+ 
+ 		/*
+ 		 * No indirect branch prediction barrier needed when switching
+-		 * the active VMCS within a guest, e.g. on nested VM-Enter.
+-		 * The L1 VMM can protect itself with retpolines, IBPB or IBRS.
++		 * the active VMCS within a vCPU, unless IBRS is advertised to
++		 * the vCPU.  To minimize the number of IBPBs executed, KVM
++		 * performs IBPB on nested VM-Exit (a single nested transition
++		 * may switch the active VMCS multiple times).
+ 		 */
+ 		if (!buddy || WARN_ON_ONCE(buddy->vmcs != prev))
+ 			indirect_branch_prediction_barrier();
+-- 
+2.39.1
+
