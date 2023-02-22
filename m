@@ -2,221 +2,263 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 21A5469F39C
-	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 12:47:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CBEB669F3CB
+	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 12:57:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231618AbjBVLrz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Feb 2023 06:47:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36336 "EHLO
+        id S231311AbjBVL5J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Feb 2023 06:57:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231667AbjBVLrw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Feb 2023 06:47:52 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4669046B3;
-        Wed, 22 Feb 2023 03:47:51 -0800 (PST)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31MBKbX2014545;
-        Wed, 22 Feb 2023 11:47:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=dNzx9hCcFyizYPZylMpU9zX9/4dCBiRnCvClANQidg0=;
- b=NxI3GUyyXOtsBXKPBYy4SfdB1/+LNMUWnsWrhLqQ7jNVCnxcHwIrLz4QD3UTdcDa8f4J
- tv780ZpnGaDQ1FFJFyv2o3L67oicYPWPF3I02Titi0pC9f5frdDXGFT2/FttHIbqKqdr
- Z83+3NzKQU+bKhZCLSDiQq39BcZ1FUTjn5h/Y/7ezJu1sNc+7uI7L7NAXNS/IGM0gy+/
- +X3BHK/6h4w17Ru/exxMFDKtpBUvAYPQW9ORuHzmnUY2wm9kunlWG7rqDPf+Px51VFD6
- YlUvhy0H1rNz6evM5R3bHabgly6Beg2BvTVbRGn/lDkSrhcyuEm/FfCiZHHIdjXsRdHG iQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nwj3g0khd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 22 Feb 2023 11:47:50 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31MBPLGr030380;
-        Wed, 22 Feb 2023 11:47:50 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nwj3g0kgh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 22 Feb 2023 11:47:50 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31M9vSHP001735;
-        Wed, 22 Feb 2023 11:47:48 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3ntpa6418n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 22 Feb 2023 11:47:47 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31MBliiE22741458
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 22 Feb 2023 11:47:44 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 448972004F;
-        Wed, 22 Feb 2023 11:47:44 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EE4D02004B;
-        Wed, 22 Feb 2023 11:47:43 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 22 Feb 2023 11:47:43 +0000 (GMT)
-From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v1] s390x: Add tests for execute-type instructions
-Date:   Wed, 22 Feb 2023 12:47:42 +0100
-Message-Id: <20230222114742.1208584-1-nsg@linux.ibm.com>
-X-Mailer: git-send-email 2.37.2
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: pX1ewMghN8Ka7BRZI7V-nK7sSred1X56
-X-Proofpoint-ORIG-GUID: 9Wt9Hzw4tZDiixMRH07O7P1_lSjJgoVf
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
- definitions=2023-02-22_05,2023-02-22_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 clxscore=1015
- suspectscore=0 phishscore=0 adultscore=0 priorityscore=1501 bulkscore=0
- malwarescore=0 mlxscore=0 spamscore=0 impostorscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
- definitions=main-2302220102
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S231571AbjBVL5F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Feb 2023 06:57:05 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4317C37F35
+        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 03:56:59 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id DE22CB812A9
+        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 11:56:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B1C3C433EF;
+        Wed, 22 Feb 2023 11:56:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1677067016;
+        bh=jLhFNoK0Y5+ittwsfZoTrvJY64aV4q/mQd2Mfyo5cWs=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Phr6wDe22I6wGZqNW4H3yybxdi9lWF+Su3XqYnRWG0orPNeRJPzwM11DQqw9eO7wZ
+         RYuBh2rlUnUFxgFghzfnCtAmhzpTvD/HgYmcSVgQ8Rtbk5WpfnLzuMym0uYExumyRQ
+         FvPteRpxgj0jXUm36Ih6gaOIv/WAD3ehwrEdQNXrcIxoi3WuwVLjn4y4wKUiRMVj19
+         o1ohR+tjs+6asyESiWr9AykaS+jNYG29yWk7Ut08EC/PY37lMTbtwEn044+R3JsrIv
+         R+2dA/wNXIj0g7LIxaz/bxvs/Nf6Iy6za60cH4/UEHEHwIHYTX6OUxBSGKmv+RC8jE
+         v7rOjkkakpVEA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pUnjy-00CLMa-31;
+        Wed, 22 Feb 2023 11:56:54 +0000
+Date:   Wed, 22 Feb 2023 11:56:53 +0000
+Message-ID: <86bkllyku2.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Simon Veith <sveith@amazon.de>, dwmw2@infradead.org
+Subject: Re: [PATCH 08/16] KVM: arm64: timers: Allow userspace to set the counter offsets
+In-Reply-To: <Y+/7mO1sxH4jThmu@linux.dev>
+References: <20230216142123.2638675-1-maz@kernel.org>
+        <20230216142123.2638675-9-maz@kernel.org>
+        <Y+6pqz3pCwu7izZL@linux.dev>
+        <86k00gy4so.wl-maz@kernel.org>
+        <Y+/7mO1sxH4jThmu@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de, dwmw2@infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Test the instruction address used by targets of an execute instruction.
-When the target instruction calculates a relative address, the result is
-relative to the target instruction, not the execute instruction.
+On Fri, 17 Feb 2023 22:11:36 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> On Fri, Feb 17, 2023 at 10:17:27AM +0000, Marc Zyngier wrote:
+> > Hi Oliver,
+> > 
+> > On Thu, 16 Feb 2023 22:09:47 +0000,
+> > Oliver Upton <oliver.upton@linux.dev> wrote:
+> > > 
+> > > Hi Marc,
+> > > 
+> > > On Thu, Feb 16, 2023 at 02:21:15PM +0000, Marc Zyngier wrote:
+> > > > And this is the moment you have all been waiting for: setting the
+> > > > counter offsets from userspace.
+> > > > 
+> > > > We expose a brand new capability that reports the ability to set
+> > > > the offsets for both the virtual and physical sides, independently.
+> > > > 
+> > > > In keeping with the architecture, the offsets are expressed as
+> > > > a delta that is substracted from the physical counter value.
+> > > > 
+> > > > Once this new API is used, there is no going back, and the counters
+> > > > cannot be written to to set the offsets implicitly (the writes
+> > > > are instead ignored).
+> > > 
+> > > Is there any particular reason to use an explicit ioctl as opposed to
+> > > the KVM_{GET,SET}_DEVICE_ATTR ioctls? Dunno where you stand on it, but I
+> > > quite like that interface for simple state management. We also avoid
+> > > eating up more UAPI bits in the global namespace.
+> > 
+> > The problem with that is that it requires yet another KVM device for
+> > this, and I'm lazy. It also makes it a bit harder for the VMM to buy
+> > into this (need to track another FD, for example).
+> 
+> You can also accept the device ioctls on the actual VM FD, quite like
+> we do for the vCPU right now. And hey, I've got a patch that gets you
+> most of the way there!
+> 
+> https://lore.kernel.org/kvmarm/20230211013759.3556016-3-oliver.upton@linux.dev/
 
-Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
----
+Huh... I don't know yet if I love it or hate it.At the end of the day,
+this is just another ioctl, so I don't care either way.
 
+> > > Is there any reason why we can't just order this ioctl before vCPU
+> > > creation altogether, or is there a need to do this at runtime? We're
+> > > about to tolerate multiple writers to the offset value, and I think the
+> > > only thing we need to guarantee is that the below flag is set before
+> > > vCPU ioctls have a chance to run.
+> > 
+> > Again, we don't know for sure whether the final offset is available
+> > before vcpu creation time. My idea for QEMU would be to perform the
+> > offset adjustment as late as possible, right before executing the VM,
+> > after having restored the vcpus with whatever value they had.
+> 
+> So how does userspace work out an offset based on available information?
+> The part that hasn't clicked for me yet is where userspace gets the
+> current value of the true physical counter to calculate an offset.
 
-TCG does the address calculation relative to the execute instruction.
+What's wrong with CNTVCT_EL0?
 
+> We could make it ABI that the guest's physical counter matches that of
+> the host by default. Of course, that has been the case since the
+> beginning of time but it is now directly user-visible.
+> 
+> The only part I don't like about that is that we aren't fully creating
+> an abstraction around host and guest system time. So here's my current
+> mental model of how we represent the generic timer to userspace:
+> 
+> 				+-----------------------+
+> 				|	   		|
+> 				| Host System Counter	|
+> 				|	   (1) 		|
+> 				+-----------------------+
+> 				    	   |
+> 			       +-----------+-----------+
+> 			       |		       |
+>        +-----------------+  +-----+		    +-----+  +--------------------+
+>        | (2) CNTPOFF_EL2 |--| sub |		    | sub |--| (3) CNTVOFF_EL2    |
+>        +-----------------+  +-----+	     	    +-----+  +--------------------+
+> 			       |           	       |
+> 			       |		       |
+> 		     +-----------------+	 +----------------+
+> 		     | (5) CNTPCT_EL0  |         | (4) CNTVCT_EL0 |
+> 		     +-----------------+	 +----------------+
+> 
+> AFAICT, this UAPI exposes abstractions for (2) and (3) to userspace, but
+> userspace cannot directly get at (1).
 
- s390x/Makefile |  1 +
- s390x/ex.c     | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 93 insertions(+)
- create mode 100644 s390x/ex.c
+Of course it can! CNTVCT_EL0 is accessible from userspace, and is
+guaranteed to have an offset of 0 on a host.
 
-diff --git a/s390x/Makefile b/s390x/Makefile
-index 97a61611..6cf8018b 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -39,6 +39,7 @@ tests += $(TEST_DIR)/panic-loop-extint.elf
- tests += $(TEST_DIR)/panic-loop-pgm.elf
- tests += $(TEST_DIR)/migration-sck.elf
- tests += $(TEST_DIR)/exittime.elf
-+tests += $(TEST_DIR)/ex.elf
- 
- pv-tests += $(TEST_DIR)/pv-diags.elf
- 
-diff --git a/s390x/ex.c b/s390x/ex.c
-new file mode 100644
-index 00000000..1bf4d8cd
---- /dev/null
-+++ b/s390x/ex.c
-@@ -0,0 +1,92 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright IBM Corp. 2023
-+ *
-+ * Test EXECUTE (RELATIVE LONG).
-+ */
-+
-+#include <libcflat.h>
-+
-+static void test_basr(void)
-+{
-+	uint64_t ret_addr, after_ex;
-+
-+	report_prefix_push("BASR");
-+	asm volatile ( ".pushsection .rodata\n"
-+		"0:	basr	%[ret_addr],0\n"
-+		"	.popsection\n"
-+
-+		"	larl	%[after_ex],1f\n"
-+		"	exrl	0,0b\n"
-+		"1:\n"
-+		: [ret_addr] "=d" (ret_addr),
-+		  [after_ex] "=d" (after_ex)
-+	);
-+
-+	report(ret_addr == after_ex, "return address after EX");
-+	report_prefix_pop();
-+}
-+
-+/*
-+ * According to PoP (Branch-Address Generation), the address is relative to
-+ * BRAS when it is the target of an execute-type instruction.
-+ */
-+static void test_bras(void)
-+{
-+	uint64_t after_target, ret_addr, after_ex, branch_addr;
-+
-+	report_prefix_push("BRAS");
-+	asm volatile ( ".pushsection .text.ex_bras, \"x\"\n"
-+		"0:	bras	%[ret_addr],1f\n"
-+		"	nopr	%%r7\n"
-+		"1:	larl	%[branch_addr],0\n"
-+		"	j	4f\n"
-+		"	.popsection\n"
-+
-+		"	larl	%[after_target],1b\n"
-+		"	larl	%[after_ex],3f\n"
-+		"2:	exrl	0,0b\n"
-+		"3:	larl	%[branch_addr],0\n"
-+		"4:\n"
-+
-+		"	.if (1b - 0b) != (3b - 2b)\n"
-+		"	.error	\"right and wrong target must have same offset\"\n"
-+		"	.endif\n"
-+		: [after_target] "=d" (after_target),
-+		  [ret_addr] "=d" (ret_addr),
-+		  [after_ex] "=d" (after_ex),
-+		  [branch_addr] "=d" (branch_addr)
-+	);
-+
-+	report(after_target == branch_addr, "address calculated relative to BRAS");
-+	report(ret_addr == after_ex, "return address after EX");
-+	report_prefix_pop();
-+}
-+
-+static void test_larl(void)
-+{
-+	uint64_t target, addr;
-+
-+	report_prefix_push("LARL");
-+	asm volatile ( ".pushsection .rodata\n"
-+		"0:	larl	%[addr],0\n"
-+		"	.popsection\n"
-+
-+		"	larl	%[target],0b\n"
-+		"	exrl	0,0b\n"
-+		: [target] "=d" (target),
-+		  [addr] "=d" (addr)
-+	);
-+
-+	report(target == addr, "address calculated relative to LARL");
-+	report_prefix_pop();
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	test_basr();
-+	test_bras();
-+	test_larl();
-+
-+	return report_summary();
-+}
+> 
+> Chewing on this a bit more, I don't think userspace has any business
+> messing with virtual and physical time independently, especially when
+> nested virtualization comes into play.
 
-base-commit: e3c5c3ef2524c58023073c0fadde2e8ae3c04ec6
+Well, NV already ignores the virtual offset completely (see how the
+virtual timer gets its offset reassigned at reset time).
+
+> 
+> I think the illusion to userspace needs to be built around the notion of
+> a system counter:
+> 
+>                                 +-----------------------+
+>                                 |                       |
+>                                 | Host System Counter   |
+>                                 |          (1)          |
+>                                 +-----------------------+
+> 					   |
+> 					   |
+> 					+-----+   +-------------------+
+> 					| sub |---| (6) system_offset |
+> 					+-----+   +-------------------+
+> 					   |
+> 					   |
+>                                 +-----------------------+
+>                                 |                       |
+>                                 | Guest System Counter  |
+>                                 |          (7)          |
+>                                 +-----------------------+
+>                                            |
+>                                +-----------+-----------+
+>                                |                       |
+>        +-----------------+  +-----+                 +-----+  +--------------------+
+>        | (2) CNTPOFF_EL2 |--| sub |                 | sub |--| (3) CNTVOFF_EL2    |
+>        +-----------------+  +-----+                 +-----+  +--------------------+
+>                                |                       |
+>                                |                       |
+>                      +-----------------+         +----------------+
+>                      | (5) CNTPCT_EL0  |         | (4) CNTVCT_EL0 |
+>                      +-----------------+         +----------------+
+> 
+> And from a UAPI perspective, we would either expose (1) and (6) to let
+> userspace calculate an offset or simply allow (7) to be directly
+> read/written.
+
+I previously toyed with this idea, and I really like it. However, the
+problem with this is that it breaks the current behaviour of having
+two different values for CNTVCT and CNTPCT in the guest, and CNTPCT
+representing the counter value on the host.
+
+Such a VM cannot be migrated *today*, but not everybody cares about
+migration. My "dual offset" approach allows the current behaviour to
+persist, and such a VM to be migrated. The luser even gets the choice
+of preserving counter continuity in the guest or to stay without a
+physical offset and reflect the host's counter.
+
+Is it a good behaviour? Of course not. Does anyone depend on it? I
+have no idea, but odds are that someone does. Can we break their toys?
+The jury is still out.
+
+> 
+> That frees up the meaning of the counter offsets as being purely a
+> virtual EL2 thing. These registers would reset to 0, and non-NV guests
+> could never change their value.
+> 
+> Under the hood KVM would program the true offset registers as:
+> 
+> 	CNT{P,V}OFF_EL2 = 'virtual CNT{P,V}OFF_EL2' + system_offset
+> 
+> With this we would effectively configure CNTPCT = CNTVCT = 0 at the
+> point of VM creation. Only crappy thing is it requires full physical
+> counter/timer emulation for non-ECV systems, but the guest shouldn't be
+> using the physical counter in the first place.
+
+And I think that's the point where we differ. I can completely imagine
+some in-VM code using the physical counter to export some timestamping
+to the host (for tracing purposes, amongst other things).
+
+> Yes, this sucks for guests running on hosts w/ NV but not ECV. If anyone
+> can tell me how an L0 hypervisor is supposed to do NV without ECV, I'm
+> all ears.
+
+You absolutely can run with NV2 without ECV. You just get a bad
+quality of emulation for the EL0 timers. But that's about it.
+
+> Does any of what I've written make remote sense or have I gone entirely
+> off the rails with my ASCII art? :)
+
+Your ASCII art is beautiful, only a tad too wide! ;-) What you suggest
+makes a lot of sense, but it leaves existing behaviours in the lurch.
+Can we pretend they don't exist? You tell me!
+
+Thanks,
+
+	M.
+
 -- 
-2.36.1
-
+Without deviation from the norm, progress is not possible.
