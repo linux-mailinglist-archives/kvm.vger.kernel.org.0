@@ -2,99 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E5A569FB0A
-	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 19:33:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 440EB69FB14
+	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 19:39:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232097AbjBVSds (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Feb 2023 13:33:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38154 "EHLO
+        id S232417AbjBVSje (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Feb 2023 13:39:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229907AbjBVSdr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Feb 2023 13:33:47 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11549211D6
-        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 10:32:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677090779;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=RxTLlKY+9ULrzzMXgSndrIJ/8bCAMpyPVZCvM+mLSnU=;
-        b=JhKngjvI1EXfB3GO/WT8NhjNE3eBQBWHKqjJ5/obUeYrfsljNMy0SvMU6xCdUYoVNIryqf
-        8/HHd8GlRihXyhP1nR0M1PkDger2vGpU6XG4cdkTmWPPUHfPJevUHmgsqWHOPYQYmsmnrA
-        JEQ5ZhsmNYrAtyK4dZsp8CErafGjP1Y=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-645--wpzUTfGOP-0tHqRNzcKKg-1; Wed, 22 Feb 2023 13:32:57 -0500
-X-MC-Unique: -wpzUTfGOP-0tHqRNzcKKg-1
-Received: by mail-ed1-f71.google.com with SMTP id c1-20020a0564021f8100b004acbe232c03so11669858edc.9
-        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 10:32:56 -0800 (PST)
+        with ESMTP id S229907AbjBVSjc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Feb 2023 13:39:32 -0500
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E52422D14D
+        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 10:39:31 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id q5-20020a170902788500b0019b0c60afa8so5135608pll.12
+        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 10:39:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1RX0usnmg54lDWkRfTdJaybq9v0ennM6mLW3m9XCSVk=;
+        b=dHlkLbxj7oVZhPWN9VK1XIGSE8j9w1WDljtOSlDVt0y057HlUP4h9F4yHngWwJPkEj
+         PQqTGNrD2PFs6kuiihbTD8ypAtiBfXtIYUC8xgr6U18lwjwCnEvxUMlfAePYGGGLI9A8
+         1Q9WU0wrrMXDWaDWm2Hvg5VrtzNmd4yZuFidDo8W4BXxwr3hGy/Av0/Nh/wxUMMfwNrx
+         zGImFPOF0jQxK93E4SD0QlQXEHMaVl7i5PS0X06BUBNKLKtRsQTmMYdfNwP78VdeVDTH
+         bMW0RQCBXgGFEA+L+of+7fo6IYkvZOtkkKi77r8ichXwD9vOQneqon/YxKD/jreYm6Da
+         D5XQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RxTLlKY+9ULrzzMXgSndrIJ/8bCAMpyPVZCvM+mLSnU=;
-        b=BSCxbOMHaork2V3fiiaikxzRe6/NwVRLBogBLdr7xaDP5x58GuvnvKAUM8MLFFemMM
-         ZqFrPD0ASjaslTBQcDh184zscFXjJPS62du0tNpTDT6u2NqdQVi4KINzvpi92LsmImW7
-         HmZJFrIhPib8V9ITxRFp23l8Jlqn4bp1jxlvpZsUtesdVA6WFR0pfbrouCz3RK6cykKK
-         bF0HhNi1r0AnjUGuDxSTyFBEn04T4OD/Xw5SjAkpgmBuYYYNb4x6uOOMRLhRF+bRIZKq
-         rKdy8WeD6OgS7gcyZHQmoocK+zQtATnOElJMIiEg6/lpLZ9pWfFxT5Q40BVGoNxuLY1o
-         e8iQ==
-X-Gm-Message-State: AO0yUKX93Q+1jQO3rf3LAPXKarpxgcpDAQsB91IDW+H9PPuiSU7k/YPN
-        Q94+SUoKhB8QL+5pnhU1kuO3V9JdkvThYQwDbqmrkESeFxnlJKJK5YlVUyma8aWfXtTiGCiQyP5
-        aXoxRa308UDRS
-X-Received: by 2002:a17:906:6d11:b0:86f:763c:2695 with SMTP id m17-20020a1709066d1100b0086f763c2695mr19160431ejr.17.1677090775569;
-        Wed, 22 Feb 2023 10:32:55 -0800 (PST)
-X-Google-Smtp-Source: AK7set/PslfAFfrcvFRi8NUH0wtaoIfKKC3ofUUlS9iItCKHzhNsqOJxd9xPZha2wUF1fM+RNDjeaQ==
-X-Received: by 2002:a17:906:6d11:b0:86f:763c:2695 with SMTP id m17-20020a1709066d1100b0086f763c2695mr19160411ejr.17.1677090775238;
-        Wed, 22 Feb 2023 10:32:55 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id n27-20020a17090673db00b008d173604d72sm4487933ejl.174.2023.02.22.10.32.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Feb 2023 10:32:54 -0800 (PST)
-Message-ID: <27364a82-fa60-1454-e25d-15239905baf3@redhat.com>
-Date:   Wed, 22 Feb 2023 19:32:53 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH v2] KVM: SVM: hyper-v: placate modpost section mismatch
- error
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Randy Dunlap <rdunlap@infradead.org>
-Cc:     linux-kernel@vger.kernel.org,
-        Vineeth Pillai <viremana@linux.microsoft.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-References: <20230222162511.7964-1-rdunlap@infradead.org>
- <Y/ZG8u6/aUtpsVDa@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <Y/ZG8u6/aUtpsVDa@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1RX0usnmg54lDWkRfTdJaybq9v0ennM6mLW3m9XCSVk=;
+        b=cL9MnnWqueOxPBVQmPskZvJABEX3h+jaA2Bw6yvtkPCT/C6AGWjNu//tVRQSYz09sI
+         ztnZ/TpGemxL6/QXpLymVYd+LTTYc4OW5RGTN+jXCcPNnhSqKhAxdkEQhqizab4xw+4s
+         c8MpgGU8qFQvfzbsqU4IhCTyzlq+owOnYiqhrL2lnBdXbIMrKtcFY6vyK3UtZcsqLMmf
+         IlQ/bDRuyMdK3w0/CMs4gXiFp85IS7+hYPLcryTelfRapzJWV/5ptIL2ibBBoScUNC84
+         IQZQVLXr4D7W8ZPiA3vnBZ5JFVGogyjDg2A92i6PNPwYUAcvM3guah7kE3R8tffZYR0D
+         2+Pw==
+X-Gm-Message-State: AO0yUKWnLT15RKZ9a+90Y2qIq1ZGigVc1ra/HpHokLShvwSnrAsi8avu
+        X07IC20HHjfoa1LYrOee0aVndhd+iyQ=
+X-Google-Smtp-Source: AK7set+5dRB8iLmwnKzhs7QvBP57/KrG+2y4uCZ7f6ytg7iZfRgE8z0UbaB0ZlzERRTIoeNciM4bw5J7PfU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:3e4f:0:b0:4fc:a80e:e6ec with SMTP id
+ l76-20020a633e4f000000b004fca80ee6ecmr1209989pga.5.1677091171417; Wed, 22 Feb
+ 2023 10:39:31 -0800 (PST)
+Date:   Wed, 22 Feb 2023 10:39:30 -0800
+In-Reply-To: <20230220084500.938739-1-jun.miao@intel.com>
+Mime-Version: 1.0
+References: <20230220084500.938739-1-jun.miao@intel.com>
+Message-ID: <Y/ZhYiN+oYbx6z5n@google.com>
+Subject: Re: [PATCH] KVM: Align the function name of kvm_swap_active_memslots()
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jun Miao <jun.miao@intel.com>
+Cc:     pbonzini@redhat.com, corbet@lwn.net, maciej.szmigiero@oracle.com,
+        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/22/23 17:46, Sean Christopherson wrote:
->    Tag svm_hv_hardware_setup() with __init to fix a modpost warning as the
->    non-stub implementation accesses __initdata (svm_x86_ops), i.e. would
->    generate a use-after-free if svm_hv_hardware_setup() were actually invoked
->    post-init.  The helper is only called from svm_hardware_setup(), which is
->    also __init, i.e. other than the modpost warning, lack of __init is benign.
+Nit, "Align" is a confusing because it's often used to refer to indentation.  Maybe?
 
-Done.  It's caused by the compiler deciding not to inline the function, 
-probably.
+   KVM: Fix comments that refer to the non-existent install_new_memslots()
 
-Also Cc'ed stable.
+On Mon, Feb 20, 2023, Jun Miao wrote:
+> The function of install_new_memslots() is replaced by kvm_swap_active_memslots().
+> In order to avoid confusion, align the name in the comments which always be ignored.
+> 
+> Fixes: a54d806688fe "KVM: Keep memslots in tree-based structures instead of array-based ones")
+> Signed-off-by: Jun Miao <jun.miao@intel.com>
+> ---
+>  Documentation/virt/kvm/locking.rst | 2 +-
+>  include/linux/kvm_host.h           | 4 ++--
+>  virt/kvm/kvm_main.c                | 4 ++--
+>  3 files changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/locking.rst b/Documentation/virt/kvm/locking.rst
+> index 14c4e9fa501d..ac0e549a3ae7 100644
+> --- a/Documentation/virt/kvm/locking.rst
+> +++ b/Documentation/virt/kvm/locking.rst
+> @@ -21,7 +21,7 @@ The acquisition orders for mutexes are as follows:
+>  - kvm->mn_active_invalidate_count ensures that pairs of
+>    invalidate_range_start() and invalidate_range_end() callbacks
+>    use the same memslots array.  kvm->slots_lock and kvm->slots_arch_lock
+> -  are taken on the waiting side in install_new_memslots, so MMU notifiers
+> +  are taken on the waiting side in kvm_swap_active_memslots, so MMU notifiers
 
-Paolo
+Can you send a v2 and opportunistically add () to the blurbs that don't have it?
+I.e. so these are all "kvm_swap_active_memslots()"?
 
+Thanks!
