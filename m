@@ -2,90 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C8D8969F089
-	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 09:41:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B61B269F122
+	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 10:18:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231332AbjBVIlX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Feb 2023 03:41:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59832 "EHLO
+        id S231648AbjBVJSd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Feb 2023 04:18:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230246AbjBVIlV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Feb 2023 03:41:21 -0500
-Received: from mail.loanfly.pl (mail.loanfly.pl [141.94.250.68])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A259F367F2
-        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 00:41:13 -0800 (PST)
-Received: by mail.loanfly.pl (Postfix, from userid 1002)
-        id F2E5EA5983; Wed, 22 Feb 2023 08:40:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=loanfly.pl; s=mail;
-        t=1677055265; bh=flSgn4+IJB03yMaHNopPnR0v50wun3P5Hd/CkHJx2Bc=;
-        h=Date:From:To:Subject:From;
-        b=tWR0mWU5OK2YOeQgxG9M5T3VOZ4dJOZNXAd4EwAoX9txOSFwxm6hYtDCiKhxIMtIQ
-         hqVIOruvbNOEgaAj4+ASHLWULg/W6UbnjFciHtrsDfPR5KCtnwpadTNkSSmno7y868
-         sLUYR+LfD1Uz3osz93wWt6/sK1RKecaVIUbDvY2PGPze2U195tX4L7ZBXRwZliTRxN
-         ObLzPOwxqFW2e2LiIbiicrZ2qRml/bBLfzMqDXcMB3dxhaUIb8hQn03qjruQdLdR2C
-         2eHhVvigemo/zbeb0EavapmgP4x0Kthq9E2h0qbI73vtKGtkM2NgvKZJsZBrm3tLVk
-         5sD4bZ58AhFDw==
-Received: by mail.loanfly.pl for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 08:40:25 GMT
-Message-ID: <20230222074501-0.1.8j.r4an.0.r5uh7l1gju@loanfly.pl>
-Date:   Wed, 22 Feb 2023 08:40:25 GMT
-From:   "Damian Cichocki" <damian.cichocki@loanfly.pl>
-To:     <kvm@vger.kernel.org>
-Subject: Prezentacja
-X-Mailer: mail.loanfly.pl
-MIME-Version: 1.0
+        with ESMTP id S230135AbjBVJSc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Feb 2023 04:18:32 -0500
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AA3227D48;
+        Wed, 22 Feb 2023 01:18:31 -0800 (PST)
+Received: by mail-ed1-x534.google.com with SMTP id h16so27749954edz.10;
+        Wed, 22 Feb 2023 01:18:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=bDXcsUPRL4UT1twN0Ir2xjoXiwcVYl6Jo6QwftXXn0Q=;
+        b=jD2O3mypAIhVO2lUG6fBf60jp6G71KHISNKTa/WE8crJIqS+ZJtRettQw6AA8TAtKn
+         rUdvi+hW2rroToXBaiyT0ngE9qAWNxUAhU0ndO1ko+PsSd1aBpBxyEtGz+QlK7WqDITM
+         hQhPaIIq3PU3y16VhfUoTnf+GbbktUKGXRyvmMYBeUVdZuxE+5RJEuwx3oS6p8DWPUyj
+         Re0vjwlQ36twccACor2l4HR3GnC4Lnlk9Wzn9MVNtoN0eB1B9e03/Ayq1fLiETUEA5ft
+         7PlChqRIDpQQAzr3+U7uLgVCAlUjf5Q/35CHX9yVeIuRd84YSa9k7Aqnowg+kLD/VX/f
+         zMGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bDXcsUPRL4UT1twN0Ir2xjoXiwcVYl6Jo6QwftXXn0Q=;
+        b=Ygnp5CANDPih1wIcsVCKIRpLp3Fu6naNEzKwE5Hfo9IbE8XAIWWgSAkOmvVEzcdBPF
+         EDu5SCnKT5OqgDWmgchtxZ3mtZdMywrIf+46atAU9gzLDKoN8fHHzypyV10VJzpKGlOv
+         oRAIDd6OivayxfxdXmdsFMlLs017Z4Sub2KYuygAnSj14LTxlbLR2HjPT0V3OZ1wYYch
+         pVXYm49/ly2XQqfd2N6rSEFZllNzxIiF/nqg3G5UD6Xxe8gbv2YyFFDPna388tq4DYt1
+         Xs0YQfSJ19fnK2KrqiDw68IPWfH9ZILDgy3vQr73bZfsk5mXrR/Dd5k6z2ktA0Tnvu7L
+         YoSA==
+X-Gm-Message-State: AO0yUKUqvE2n1JJofhjjFJZHrrR+JXS/QymiKikOHu4owpFtaor+Wl7Y
+        E6I6wNXMBusXPBOJ/o6jyIs=
+X-Google-Smtp-Source: AK7set/h7Vr1dqG5wxIxvwcQ1QGoNKpvOIrdzM9OBVTBU38biCpAWbjmbsEkZhdaexjNQtmY94+4mQ==
+X-Received: by 2002:aa7:de13:0:b0:4ae:eb0f:4258 with SMTP id h19-20020aa7de13000000b004aeeb0f4258mr7980618edv.30.1677057509656;
+        Wed, 22 Feb 2023 01:18:29 -0800 (PST)
+Received: from sakura.myxoz.lan (81-230-97-204-no2390.tbcn.telia.com. [81.230.97.204])
+        by smtp.gmail.com with ESMTPSA id l1-20020a50c101000000b004ad79733ac4sm3134404edf.40.2023.02.22.01.18.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Feb 2023 01:18:29 -0800 (PST)
+Message-ID: <a4ad3fd15d41feda354ed50feaaccbe73e945d16.camel@gmail.com>
+Subject: Re: [PATCH] vfio: Fix NULL pointer dereference caused by
+ uninitialized group->iommufd
+From:   Miko Larsson <mikoxyzzz@gmail.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>, alex.williamson@redhat.com,
+        jgg@nvidia.com, kevin.tian@intel.com
+Cc:     yi.l.liu@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Date:   Wed, 22 Feb 2023 10:18:28 +0100
+In-Reply-To: <20230222074938.13681-1-yan.y.zhao@intel.com>
+References: <20230222074938.13681-1-yan.y.zhao@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: Yes, score=5.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_BL_SPAMCOP_NET,
-        RCVD_IN_SBL_CSS,SPF_HELO_NONE,SPF_PASS,URIBL_CSS_A,URIBL_DBL_SPAM
-        autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Report: *  2.5 URIBL_DBL_SPAM Contains a spam URL listed in the Spamhaus DBL
-        *      blocklist
-        *      [URIs: loanfly.pl]
-        *  3.3 RCVD_IN_SBL_CSS RBL: Received via a relay in Spamhaus SBL-CSS
-        *      [141.94.250.68 listed in zen.spamhaus.org]
-        *  1.3 RCVD_IN_BL_SPAMCOP_NET RBL: Received via a relay in
-        *      bl.spamcop.net
-        *      [Blocked - see <https://www.spamcop.net/bl.shtml?141.94.250.68>]
-        *  0.1 URIBL_CSS_A Contains URL's A record listed in the Spamhaus CSS
-        *      blocklist
-        *      [URIs: loanfly.pl]
-        * -1.9 BAYES_00 BODY: Bayes spam probability is 0 to 1%
-        *      [score: 0.0000]
-        * -0.0 SPF_PASS SPF: sender matches SPF record
-        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
-        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
-        *      envelope-from domain
-        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
-        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
-        *       valid
-        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
-        *      author's domain
-X-Spam-Level: *****
+User-Agent: Evolution 3.46.3 (3.46.3-1.module_f37+15877+cf3308f9) 
+MIME-Version: 1.0
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dzie=C5=84 dobry!
+On Wed, 2023-02-22 at 15:49 +0800, Yan Zhao wrote:
+> group->iommufd is not initialized for the iommufd_ctx_put()
+>=20
+> [20018.331541] BUG: kernel NULL pointer dereference, address:
+> 0000000000000000
+> [20018.377508] RIP: 0010:iommufd_ctx_put+0x5/0x10 [iommufd]
+> ...
+> [20018.476483] Call Trace:
+> [20018.479214]=C2=A0 <TASK>
+> [20018.481555]=C2=A0 vfio_group_fops_unl_ioctl+0x506/0x690 [vfio]
+> [20018.487586]=C2=A0 __x64_sys_ioctl+0x6a/0xb0
+> [20018.491773]=C2=A0 ? trace_hardirqs_on+0xc5/0xe0
+> [20018.496347]=C2=A0 do_syscall_64+0x67/0x90
+> [20018.500340]=C2=A0 entry_SYSCALL_64_after_hwframe+0x4b/0xb5
+>=20
+> Fixes: 9eefba8002c2 ("vfio: Move vfio group specific code into
+> group.c")
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> ---
+> =C2=A0drivers/vfio/group.c | 2 +-
+> =C2=A01 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
+> index 57ebe5e1a7e6..8649f85f3be4 100644
+> --- a/drivers/vfio/group.c
+> +++ b/drivers/vfio/group.c
+> @@ -137,7 +137,7 @@ static int vfio_group_ioctl_set_container(struct
+> vfio_group *group,
+> =C2=A0
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0ret =3D iommufd_vfio_compat_ioas_id(iommufd, &ioas_=
+id);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0if (ret) {
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0iommufd_c=
+tx_put(group->iommufd);
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0iommufd_c=
+tx_put(iommufd);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0got=
+o out_unlock;
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0}
+> =C2=A0
 
-Czy m=C3=B3g=C5=82bym przedstawi=C4=87 rozwi=C4=85zanie, kt=C3=B3re umo=C5=
-=BCliwia monitoring ka=C5=BCdego auta w czasie rzeczywistym w tym jego po=
-zycj=C4=99, zu=C5=BCycie paliwa i przebieg?
-
-Dodatkowo nasze narz=C4=99dzie minimalizuje koszty utrzymania samochod=C3=
-=B3w, skraca czas przejazd=C3=B3w, a tak=C5=BCe tworzenie planu tras czy =
-dostaw.
-
-Z naszej wiedzy i do=C5=9Bwiadczenia korzysta ju=C5=BC ponad 49 tys. Klie=
-nt=C3=B3w. Monitorujemy 809 000 pojazd=C3=B3w na ca=C5=82ym =C5=9Bwiecie,=
- co jest nasz=C4=85 najlepsz=C4=85 wizyt=C3=B3wk=C4=85.
-
-Bardzo prosz=C4=99 o e-maila zwrotnego, je=C5=9Bli mogliby=C5=9Bmy wsp=C3=
-=B3lnie om=C3=B3wi=C4=87 potencja=C5=82 wykorzystania takiego rozwi=C4=85=
-zania w Pa=C5=84stwa firmie.
-
-
-Pozdrawiam,
-Damian Cichocki
+Might want to Cc this to the stable mailing list.
+--=20
+~miko
