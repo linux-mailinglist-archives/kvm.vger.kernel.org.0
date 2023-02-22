@@ -2,120 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E7B6669FAA1
-	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 19:00:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E5A569FB0A
+	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 19:33:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232091AbjBVSAd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Feb 2023 13:00:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38844 "EHLO
+        id S232097AbjBVSds (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Feb 2023 13:33:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232085AbjBVSAc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Feb 2023 13:00:32 -0500
+        with ESMTP id S229907AbjBVSdr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Feb 2023 13:33:47 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF12B38EA7
-        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 09:59:48 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11549211D6
+        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 10:32:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677088788;
+        s=mimecast20190719; t=1677090779;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=IWyApdiQGDHbUGKS9+Y31lH4Jek/qAyUXTgCGlvrld4=;
-        b=imCFr0XcQxdnsbwFKFgNNSMGUZY7lEMBymrdsRNL7OLI8f3Dcine9Ugg5S+x91nQjT45lM
-        NwEZv4vw0fiIHx2EMHxnzhgSmG1+ZWueOetdXxPO7hZsWrdaRASqDWIkZhOhM7p0tpkk2x
-        NhbaxLs2MsSYIFUga8EdLaSjqwCBovc=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=RxTLlKY+9ULrzzMXgSndrIJ/8bCAMpyPVZCvM+mLSnU=;
+        b=JhKngjvI1EXfB3GO/WT8NhjNE3eBQBWHKqjJ5/obUeYrfsljNMy0SvMU6xCdUYoVNIryqf
+        8/HHd8GlRihXyhP1nR0M1PkDger2vGpU6XG4cdkTmWPPUHfPJevUHmgsqWHOPYQYmsmnrA
+        JEQ5ZhsmNYrAtyK4dZsp8CErafGjP1Y=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-645-v0gZzuhZOeqfuw7tcmpiGA-1; Wed, 22 Feb 2023 12:59:46 -0500
-X-MC-Unique: v0gZzuhZOeqfuw7tcmpiGA-1
-Received: by mail-il1-f199.google.com with SMTP id z5-20020a92bf05000000b00313f4759a73so4299706ilh.9
-        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 09:59:45 -0800 (PST)
+ us-mta-645--wpzUTfGOP-0tHqRNzcKKg-1; Wed, 22 Feb 2023 13:32:57 -0500
+X-MC-Unique: -wpzUTfGOP-0tHqRNzcKKg-1
+Received: by mail-ed1-f71.google.com with SMTP id c1-20020a0564021f8100b004acbe232c03so11669858edc.9
+        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 10:32:56 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IWyApdiQGDHbUGKS9+Y31lH4Jek/qAyUXTgCGlvrld4=;
-        b=XkvSCVeFhmu0WLkmU9MMI74ebwtXMdd2MbVLK4XfbMCnr1bUt9hU9fOccbPQmls9b3
-         6e0DWUeIgxZEurMeJa0onNgCSJcGIxqpjw9bZCF52r2B11ih5TOEFAdQDltDJg3X4A7o
-         4u9gKod0vm8v5R7fqAK/vwkrhT4LtSd7R4iflLE607APLNkijydE7w406ksm1FdXkutE
-         OrSZ0vgYi1UWqDeQ/eycL3Gs6HTrTE73OV0Gt7lPs8zV6KxrXumyK6680nOSRu5gucN+
-         Mqfp2yrkfx9/TUTo1GtLNdC4oCk64OBzhUUDvFxe45KfmkHk65EMkL+QafS7D4iVfF28
-         lPvA==
-X-Gm-Message-State: AO0yUKWmKZ5H4yhiuyX7soJL8ynllhg+nurL8bG3DWCJHFZzHVfi5vvv
-        lvAYTzG8iNcXXc9wf1bsK3L4ZySSVyaXLyVvrQWfBE7DSDTMdaRpLp8aI8baqL9PxUbDPei0u7d
-        zeACMM18yz6Km
-X-Received: by 2002:a05:6e02:1d99:b0:315:7004:3e69 with SMTP id h25-20020a056e021d9900b0031570043e69mr7546079ila.13.1677088785210;
-        Wed, 22 Feb 2023 09:59:45 -0800 (PST)
-X-Google-Smtp-Source: AK7set9r6tRu/CNtnXOiqXnQw+dpxBgVCCJ4i5wUmXP6rZKqJ2tGI7YJQa71XArwlBX37VPRQgaYlQ==
-X-Received: by 2002:a05:6e02:1d99:b0:315:7004:3e69 with SMTP id h25-20020a056e021d9900b0031570043e69mr7546058ila.13.1677088784970;
-        Wed, 22 Feb 2023 09:59:44 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id m5-20020a924b05000000b00316ecc80a61sm622829ilg.11.2023.02.22.09.59.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Feb 2023 09:59:44 -0800 (PST)
-Date:   Wed, 22 Feb 2023 10:59:42 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     jgg@nvidia.com, kevin.tian@intel.com, yi.l.liu@intel.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vfio: Fix NULL pointer dereference caused by
- uninitialized group->iommufd
-Message-ID: <20230222105942.27ead3de.alex.williamson@redhat.com>
-In-Reply-To: <20230222074938.13681-1-yan.y.zhao@intel.com>
-References: <20230222074938.13681-1-yan.y.zhao@intel.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RxTLlKY+9ULrzzMXgSndrIJ/8bCAMpyPVZCvM+mLSnU=;
+        b=BSCxbOMHaork2V3fiiaikxzRe6/NwVRLBogBLdr7xaDP5x58GuvnvKAUM8MLFFemMM
+         ZqFrPD0ASjaslTBQcDh184zscFXjJPS62du0tNpTDT6u2NqdQVi4KINzvpi92LsmImW7
+         HmZJFrIhPib8V9ITxRFp23l8Jlqn4bp1jxlvpZsUtesdVA6WFR0pfbrouCz3RK6cykKK
+         bF0HhNi1r0AnjUGuDxSTyFBEn04T4OD/Xw5SjAkpgmBuYYYNb4x6uOOMRLhRF+bRIZKq
+         rKdy8WeD6OgS7gcyZHQmoocK+zQtATnOElJMIiEg6/lpLZ9pWfFxT5Q40BVGoNxuLY1o
+         e8iQ==
+X-Gm-Message-State: AO0yUKX93Q+1jQO3rf3LAPXKarpxgcpDAQsB91IDW+H9PPuiSU7k/YPN
+        Q94+SUoKhB8QL+5pnhU1kuO3V9JdkvThYQwDbqmrkESeFxnlJKJK5YlVUyma8aWfXtTiGCiQyP5
+        aXoxRa308UDRS
+X-Received: by 2002:a17:906:6d11:b0:86f:763c:2695 with SMTP id m17-20020a1709066d1100b0086f763c2695mr19160431ejr.17.1677090775569;
+        Wed, 22 Feb 2023 10:32:55 -0800 (PST)
+X-Google-Smtp-Source: AK7set/PslfAFfrcvFRi8NUH0wtaoIfKKC3ofUUlS9iItCKHzhNsqOJxd9xPZha2wUF1fM+RNDjeaQ==
+X-Received: by 2002:a17:906:6d11:b0:86f:763c:2695 with SMTP id m17-20020a1709066d1100b0086f763c2695mr19160411ejr.17.1677090775238;
+        Wed, 22 Feb 2023 10:32:55 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id n27-20020a17090673db00b008d173604d72sm4487933ejl.174.2023.02.22.10.32.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 22 Feb 2023 10:32:54 -0800 (PST)
+Message-ID: <27364a82-fa60-1454-e25d-15239905baf3@redhat.com>
+Date:   Wed, 22 Feb 2023 19:32:53 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH v2] KVM: SVM: hyper-v: placate modpost section mismatch
+ error
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Randy Dunlap <rdunlap@infradead.org>
+Cc:     linux-kernel@vger.kernel.org,
+        Vineeth Pillai <viremana@linux.microsoft.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
+References: <20230222162511.7964-1-rdunlap@infradead.org>
+ <Y/ZG8u6/aUtpsVDa@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <Y/ZG8u6/aUtpsVDa@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 22 Feb 2023 15:49:38 +0800
-Yan Zhao <yan.y.zhao@intel.com> wrote:
+On 2/22/23 17:46, Sean Christopherson wrote:
+>    Tag svm_hv_hardware_setup() with __init to fix a modpost warning as the
+>    non-stub implementation accesses __initdata (svm_x86_ops), i.e. would
+>    generate a use-after-free if svm_hv_hardware_setup() were actually invoked
+>    post-init.  The helper is only called from svm_hardware_setup(), which is
+>    also __init, i.e. other than the modpost warning, lack of __init is benign.
 
-> group->iommufd is not initialized for the iommufd_ctx_put()
-> 
-> [20018.331541] BUG: kernel NULL pointer dereference, address: 0000000000000000
-> [20018.377508] RIP: 0010:iommufd_ctx_put+0x5/0x10 [iommufd]
-> ...
-> [20018.476483] Call Trace:
-> [20018.479214]  <TASK>
-> [20018.481555]  vfio_group_fops_unl_ioctl+0x506/0x690 [vfio]
-> [20018.487586]  __x64_sys_ioctl+0x6a/0xb0
-> [20018.491773]  ? trace_hardirqs_on+0xc5/0xe0
-> [20018.496347]  do_syscall_64+0x67/0x90
-> [20018.500340]  entry_SYSCALL_64_after_hwframe+0x4b/0xb5
-> 
-> Fixes: 9eefba8002c2 ("vfio: Move vfio group specific code into group.c")
-> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> ---
->  drivers/vfio/group.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
-> index 57ebe5e1a7e6..8649f85f3be4 100644
-> --- a/drivers/vfio/group.c
-> +++ b/drivers/vfio/group.c
-> @@ -137,7 +137,7 @@ static int vfio_group_ioctl_set_container(struct vfio_group *group,
->  
->  		ret = iommufd_vfio_compat_ioas_id(iommufd, &ioas_id);
->  		if (ret) {
-> -			iommufd_ctx_put(group->iommufd);
-> +			iommufd_ctx_put(iommufd);
->  			goto out_unlock;
->  		}
->  
+Done.  It's caused by the compiler deciding not to inline the function, 
+probably.
 
-Applied to vfio next branch for v6.3 and added a stable cc.  Thanks,
+Also Cc'ed stable.
 
-Alex
+Paolo
 
