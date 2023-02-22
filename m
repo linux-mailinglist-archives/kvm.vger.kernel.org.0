@@ -2,88 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F9F869F937
-	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 17:43:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 613A369F946
+	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 17:46:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232171AbjBVQnG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Feb 2023 11:43:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33050 "EHLO
+        id S232318AbjBVQqu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Feb 2023 11:46:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230246AbjBVQnF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Feb 2023 11:43:05 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF133977E;
-        Wed, 22 Feb 2023 08:43:03 -0800 (PST)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31MFgY6Q000752;
-        Wed, 22 Feb 2023 16:43:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=Pr5N/dHKvbOGWfAeujYiCiMrJ1PQFec6SELfe9xkMnI=;
- b=tT0tXq9E9ClnV8ZHC8RumPGyhCSJy/eRc2I24uHyB8wbkqmEwLE/f79TgiSl1PyuyfzY
- vrUH3ZfB7851IDtfCM2T/LerAScaukjLbcjjSoA3YIQ3A8sM5/W1wG8k2KErkNONzc/X
- 6KpnROs1gb5c2CFmL6htT3lehnuHRVTN5jXuO8ErbM057uGz7jy7xFMHgwsA1ERYAvC/
- Tb+yPXsGPI2WOlvSww+9S9ht++2bskjKUrRMTrueuUEgRdpBJp4eezXAY+1GpwFBAflQ
- 8pDDE+6kidfaugI0IzrdG9zXSPbhQCJ5t7e+Fhv5C0JxUgxt3CWjM734LsxtRE6f82qR MA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nwnwysm0m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 22 Feb 2023 16:43:03 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31MGelYO015248;
-        Wed, 22 Feb 2023 16:43:02 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nwnwyskyy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 22 Feb 2023 16:43:02 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31MFv1EK007338;
-        Wed, 22 Feb 2023 16:43:00 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3ntpa6dm2r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 22 Feb 2023 16:43:00 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31MGguTd27853306
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 22 Feb 2023 16:42:56 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AC10B20043;
-        Wed, 22 Feb 2023 16:42:56 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C8B2720040;
-        Wed, 22 Feb 2023 16:42:55 +0000 (GMT)
-Received: from li-4a3a4a4c-28e5-11b2-a85c-a8d192c6f089.ibm.com (unknown [9.171.70.162])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-        Wed, 22 Feb 2023 16:42:55 +0000 (GMT)
-Date:   Wed, 22 Feb 2023 17:42:53 +0100
-From:   Alexander Gordeev <agordeev@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     borntraeger@linux.ibm.com, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com, mjrosato@linux.ibm.com,
-        farman@linux.ibm.com, david@redhat.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [PATCH v1 1/1] KVM: s390: pci: fix virtual-physical confusion on
- module unload/load
-Message-ID: <Y/ZGDfCAdLtArVL/@li-4a3a4a4c-28e5-11b2-a85c-a8d192c6f089.ibm.com>
-References: <20230222155503.43399-1-nrb@linux.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230222155503.43399-1-nrb@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: uUodFcLzrGtyOpo24bZEFOeNwRGWrczc
-X-Proofpoint-GUID: 5TZR_gowIUWzMD3wBtGFhBqUJTPLxCSV
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
- definitions=2023-02-22_06,2023-02-22_02,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 mlxscore=0
- adultscore=0 phishscore=0 lowpriorityscore=0 bulkscore=0 impostorscore=0
- priorityscore=1501 spamscore=0 clxscore=1015 mlxlogscore=999
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302220145
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        with ESMTP id S232300AbjBVQqs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Feb 2023 11:46:48 -0500
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F7A03CE12
+        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 08:46:44 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id cx12-20020a17090afd8c00b002366e47e91bso3770458pjb.7
+        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 08:46:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+QiiW3N8MUbaTaxsJfApLiTX1buSoqhASLC/z4dapy4=;
+        b=GobH1TaO+hYYJacM6Zcvpe66sOC21cqykazSq1J2VfB2XNkfb8K4cNmC52EfF6Z37B
+         X/l+vH0NKlIokAokN2fXuTFzzWhDTEKr7tMXYW3pa7hSQOmKfbAhJNUbcB2jjoTwXzp6
+         0xLALS7YWBhjLRhxGN4q//qHxIsoxv4DfkbQc6QMnX6XvoK5g6T6DBxuZsOV8PFm2iPc
+         72xnsXo1pe9eLjdfopbVKdv14jkZ/WOabj8F6bRV4Csjv/BYNrLVkA1roRJyk5zG84+N
+         ni3li+3bYraWKXhBBMTFlSagZ5sGcL5sbjpijXsSNxvXzWJ3TUKJ4RmM6O0s/QOPiI1q
+         lFTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+QiiW3N8MUbaTaxsJfApLiTX1buSoqhASLC/z4dapy4=;
+        b=Tu0FDc3tJbQttRRxLRRZudmVTM2QSizJ4AaHBNo+zytm5jcvlKcejSHuLtIRbzl/4Q
+         IaB8E/SjCr/rsSOsz7TzLsGSyFH7Zw58NaS9uklL6ZqEUXje5RIbQn/pSJajZpUdyRfA
+         BudhsBPEVaiT83l2qcWkiDwTP+N87FM5HLxw0wRvlGNoB9/C2iYODGJEC0yeCmQdSCyq
+         PJ8YE+sTALuT1vfV2wEgTFk2QS4dUkidaQLvg8XM4VPA41324nWtoasxUfTZUY4pgiyC
+         sFuF0zX0iG2TEOcaOKesK6249SOpDbnN4w0l0eN+lI/t4/UUJS0EycCA45Tza2B8s1p8
+         7S4A==
+X-Gm-Message-State: AO0yUKUQWKVBV+QnbMP2tMvtlmE0g4Ibwawn+a3mUzDG0G5rZ/0MLNLS
+        lSga6P48CAOyYfWedJy6UfUXcCDBVbQ=
+X-Google-Smtp-Source: AK7set9R2NDRkVHaXW1B/ByU6rTiQWFnudxLqy4CssEn+ehoejPBUN4E1Wtt4AllhbB1WTLfsFep+7k793Q=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:7556:0:b0:4fb:9902:fc4a with SMTP id
+ f22-20020a637556000000b004fb9902fc4amr1146164pgn.10.1677084403857; Wed, 22
+ Feb 2023 08:46:43 -0800 (PST)
+Date:   Wed, 22 Feb 2023 08:46:42 -0800
+In-Reply-To: <20230222162511.7964-1-rdunlap@infradead.org>
+Mime-Version: 1.0
+References: <20230222162511.7964-1-rdunlap@infradead.org>
+Message-ID: <Y/ZG8u6/aUtpsVDa@google.com>
+Subject: Re: [PATCH v2] KVM: SVM: hyper-v: placate modpost section mismatch error
+From:   Sean Christopherson <seanjc@google.com>
+To:     Randy Dunlap <rdunlap@infradead.org>
+Cc:     linux-kernel@vger.kernel.org,
+        Vineeth Pillai <viremana@linux.microsoft.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -91,24 +68,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 22, 2023 at 04:55:02PM +0100, Nico Boehr wrote:
-> @@ -112,7 +112,7 @@ static int zpci_reset_aipb(u8 nisc)
->  		return -EINVAL;
->  
->  	aift->sbv = zpci_aif_sbv;
-> -	aift->gait = (struct zpci_gaite *)zpci_aipb->aipb.gait;
-> +	aift->gait = phys_to_virt(zpci_aipb->aipb.gait);
->  
->  	return 0;
+On Wed, Feb 22, 2023, Randy Dunlap wrote:
+> modpost reports section mismatch errors/warnings:
+> WARNING: modpost: vmlinux.o: section mismatch in reference: svm_hv_hardware_setup (section: .text) -> (unknown) (section: .init.data)
+> WARNING: modpost: vmlinux.o: section mismatch in reference: svm_hv_hardware_setup (section: .text) -> (unknown) (section: .init.data)
+> WARNING: modpost: vmlinux.o: section mismatch in reference: svm_hv_hardware_setup (section: .text) -> (unknown) (section: .init.data)
+> 
+> Marking svm_hv_hardware_setup() as __init fixes the warnings.
+> 
+> I don't know why this should be needed -- it seems like a compiler
+> problem to me since the calling function is marked as __init.
+
+It's not a compiler issue.  __initdata is freed after init and so must not be
+accessed by __init-less functions.
+
+This as a changelog?
+
+  Tag svm_hv_hardware_setup() with __init to fix a modpost warning as the
+  non-stub implementation accesses __initdata (svm_x86_ops), i.e. would
+  generate a use-after-free if svm_hv_hardware_setup() were actually invoked
+  post-init.  The helper is only called from svm_hardware_setup(), which is
+  also __init, i.e. other than the modpost warning, lack of __init is benign.
+
+With that (in case Paolo grabs this directly):
+
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+  
+> This "(unknown) (section: .init.data)" all refer to svm_x86_ops.
+> 
+> Fixes: 1e0c7d40758b ("KVM: SVM: hyper-v: Remote TLB flush for SVM")
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Cc: Vineeth Pillai <viremana@linux.microsoft.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: kvm@vger.kernel.org
+> ---
+> v2: also make the empty stub function be __init (Vitaly)
+> 
+>  arch/x86/kvm/svm/svm_onhyperv.h |    4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff -- a/arch/x86/kvm/svm/svm_onhyperv.h b/arch/x86/kvm/svm/svm_onhyperv.h
+> --- a/arch/x86/kvm/svm/svm_onhyperv.h
+> +++ b/arch/x86/kvm/svm/svm_onhyperv.h
+> @@ -30,7 +30,7 @@ static inline void svm_hv_init_vmcb(stru
+>  		hve->hv_enlightenments_control.msr_bitmap = 1;
 >  }
-
-With this change aift->gait would never be NULL. Does it work with line 125?
-
-120 int kvm_s390_pci_aen_init(u8 nisc)
-121 {
-122         int rc = 0;
-123 
-124         /* If already enabled for AEN, bail out now */
-125         if (aift->gait || aift->sbv)
-126                 return -EPERM;
-
+>  
+> -static inline void svm_hv_hardware_setup(void)
+> +static inline __init void svm_hv_hardware_setup(void)
+>  {
+>  	if (npt_enabled &&
+>  	    ms_hyperv.nested_features & HV_X64_NESTED_ENLIGHTENED_TLB) {
+> @@ -84,7 +84,7 @@ static inline void svm_hv_init_vmcb(stru
+>  {
+>  }
+>  
+> -static inline void svm_hv_hardware_setup(void)
+> +static inline __init void svm_hv_hardware_setup(void)
+>  {
+>  }
+>  
+> 
