@@ -2,135 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EC5CD69F933
-	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 17:42:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F9F869F937
+	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 17:43:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232418AbjBVQmT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Feb 2023 11:42:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60166 "EHLO
+        id S232171AbjBVQnG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Feb 2023 11:43:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231334AbjBVQmS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Feb 2023 11:42:18 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 647BD2A9A7;
-        Wed, 22 Feb 2023 08:42:17 -0800 (PST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1677084135;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=K7HcjWyWuj/5j6nspFZSk3Xpdt8/emavbnK49+tWbK4=;
-        b=H1gebXPpy/MopGrAL1OMlgPweAjr1Qjz7TqTirYai1HvD7SU8eDoJgJNfRoxLYHxJrrci6
-        sb/fv0iruua+FUX60ZRP/HffjFM+LSffZJdQQPSLGqfmAVdNF2+AmmdvAf112m6dp+KPoD
-        Qpz2zmfSfUrRqK3LQ79oISf3b4RB3eOGMNHQ3xt8xsw0zvx6Zpz0Cv8c7pYiWbxnTFrMpE
-        Nmj8iYIGI+5IUUZn1pEsEv1GlC+I2rm+rgUMZTYeRJ3QPnH4gijNMQPGweq/yR1hpCwNZ0
-        WPxNThxspuX5nu5WKpZqJkCibH9qQbNPGgQnv6TGV2z/gNNyNrpxYyYXI47P8g==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1677084135;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=K7HcjWyWuj/5j6nspFZSk3Xpdt8/emavbnK49+tWbK4=;
-        b=U8xpsIMCJkiVO85tc+OPLbgsQbGm9zdO8p+7WfyMi0S1c8TgcO0n5hmjojQAIwBEekaX6Z
-        9RJ9kYBR8fnf+1Dg==
-To:     David Woodhouse <dwmw2@infradead.org>,
-        Usama Arif <usama.arif@bytedance.com>, kim.phillips@amd.com
-Cc:     arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
-        pbonzini@redhat.com, paulmck@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
-        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
-        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
-        simon.evans@bytedance.com, liangma@liangbit.com
-Subject: Re: [PATCH v9 0/8] Parallel CPU bringup for x86_64
-In-Reply-To: <62ee53770b4010f065346b7f2a1200013836be97.camel@infradead.org>
-References: <20230215145425.420125-1-usama.arif@bytedance.com>
- <62ee53770b4010f065346b7f2a1200013836be97.camel@infradead.org>
-Date:   Wed, 22 Feb 2023 17:42:14 +0100
-Message-ID: <87a615mz2x.ffs@tglx>
+        with ESMTP id S230246AbjBVQnF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Feb 2023 11:43:05 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF133977E;
+        Wed, 22 Feb 2023 08:43:03 -0800 (PST)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31MFgY6Q000752;
+        Wed, 22 Feb 2023 16:43:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=Pr5N/dHKvbOGWfAeujYiCiMrJ1PQFec6SELfe9xkMnI=;
+ b=tT0tXq9E9ClnV8ZHC8RumPGyhCSJy/eRc2I24uHyB8wbkqmEwLE/f79TgiSl1PyuyfzY
+ vrUH3ZfB7851IDtfCM2T/LerAScaukjLbcjjSoA3YIQ3A8sM5/W1wG8k2KErkNONzc/X
+ 6KpnROs1gb5c2CFmL6htT3lehnuHRVTN5jXuO8ErbM057uGz7jy7xFMHgwsA1ERYAvC/
+ Tb+yPXsGPI2WOlvSww+9S9ht++2bskjKUrRMTrueuUEgRdpBJp4eezXAY+1GpwFBAflQ
+ 8pDDE+6kidfaugI0IzrdG9zXSPbhQCJ5t7e+Fhv5C0JxUgxt3CWjM734LsxtRE6f82qR MA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nwnwysm0m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 22 Feb 2023 16:43:03 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31MGelYO015248;
+        Wed, 22 Feb 2023 16:43:02 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nwnwyskyy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 22 Feb 2023 16:43:02 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31MFv1EK007338;
+        Wed, 22 Feb 2023 16:43:00 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3ntpa6dm2r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 22 Feb 2023 16:43:00 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31MGguTd27853306
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 22 Feb 2023 16:42:56 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AC10B20043;
+        Wed, 22 Feb 2023 16:42:56 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C8B2720040;
+        Wed, 22 Feb 2023 16:42:55 +0000 (GMT)
+Received: from li-4a3a4a4c-28e5-11b2-a85c-a8d192c6f089.ibm.com (unknown [9.171.70.162])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Wed, 22 Feb 2023 16:42:55 +0000 (GMT)
+Date:   Wed, 22 Feb 2023 17:42:53 +0100
+From:   Alexander Gordeev <agordeev@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     borntraeger@linux.ibm.com, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com, mjrosato@linux.ibm.com,
+        farman@linux.ibm.com, david@redhat.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [PATCH v1 1/1] KVM: s390: pci: fix virtual-physical confusion on
+ module unload/load
+Message-ID: <Y/ZGDfCAdLtArVL/@li-4a3a4a4c-28e5-11b2-a85c-a8d192c6f089.ibm.com>
+References: <20230222155503.43399-1-nrb@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230222155503.43399-1-nrb@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: uUodFcLzrGtyOpo24bZEFOeNwRGWrczc
+X-Proofpoint-GUID: 5TZR_gowIUWzMD3wBtGFhBqUJTPLxCSV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-22_06,2023-02-22_02,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 mlxscore=0
+ adultscore=0 phishscore=0 lowpriorityscore=0 bulkscore=0 impostorscore=0
+ priorityscore=1501 spamscore=0 clxscore=1015 mlxlogscore=999
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302220145
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-David!
+On Wed, Feb 22, 2023 at 04:55:02PM +0100, Nico Boehr wrote:
+> @@ -112,7 +112,7 @@ static int zpci_reset_aipb(u8 nisc)
+>  		return -EINVAL;
+>  
+>  	aift->sbv = zpci_aif_sbv;
+> -	aift->gait = (struct zpci_gaite *)zpci_aipb->aipb.gait;
+> +	aift->gait = phys_to_virt(zpci_aipb->aipb.gait);
+>  
+>  	return 0;
+>  }
 
-On Wed, Feb 22 2023 at 10:11, David Woodhouse wrote:
-> On Wed, 2023-02-15 at 14:54 +0000, Usama Arif wrote:
-> So the next thing that might be worth looking at is allowing the APs
-> all to be running their hotplug thread simultaneously, bringing
-> themselves from CPUHP_BRINGUP_CPU to CPUHP_AP_ONLINE. This series eats
-> the initial INIT/SIPI/SIPI latency, but if there's any significant time
-> in the AP hotplug thread, that could be worth parallelising.
+With this change aift->gait would never be NULL. Does it work with line 125?
 
-On a 112 CPU machine (64 cores, HT enabled) the bringup takes
+120 int kvm_s390_pci_aen_init(u8 nisc)
+121 {
+122         int rc = 0;
+123 
+124         /* If already enabled for AEN, bail out now */
+125         if (aift->gait || aift->sbv)
+126                 return -EPERM;
 
-Setup and SIPIs sent: 	 49 ms
-Bringup each CPU:	516 ms
-
-That's about 500 ms faster than a non-parallel bringup!
-
-Now looking at the 516 ms, which is ~4.7 ms/CPU. The vast majority of the
-time is spent on the APs in
-
-     cpu_init() -> ucode_cpu_init()
-
-for the primary threads of each core. The secondary threads are quickly
-(1us) out of ucode_cpu_init() because the primary thread already loaded
-it.
-
-A microcode load on that machine takes ~7.5 ms per primary thread on
-average which sums up to 7.5 * 55 = 412.5 ms
-
-The threaded bringup after CPU_AP_ONLINE takes about 100us per CPU.
-
-identify_secondary_cpu() is one of the longer functions which takes
-~125us / CPU summing up to 13ms
-
-The TSC sync check for the first CPU on the second socket consumes
-20ms. That's only once per socket, intra socket is using MSR_TSC_ADJUST,
-which is more or less free.
-
-So the 516 ms are wasted here:
-
-   total                                516 ms
-   ucode_cpu_init()                     412 ms
-   identify_secondary_cpu()              13 ms
-   2ndsocket_tsc_sync			 20 ms
-   threaded bringup                      12 ms
-   rest 		                 59 ms
-
-So the rest is about 530us per CPU, which is just the sum of many small
-functions, lock contentions...
-
-Getting rid of the micro code overhead is possible. There is no reason
-to serialize that between the cores. But it needs serialization vs. HT
-siblings, which requires to move identify_secondary_cpu() and its caller
-smp_store_cpu_info() ahead of the synchronization point and then have
-serialization between the siblings. That's going to be a major surgery
-and inspection effort to ensure that there are no hidden assumptions
-about global hotplug serialization. 
-
-So that would cut the total cost down to ~100ms plus the
-preparatory/SIPI stage of 60ms which sums up to about 160ms and about
-1.5ms per CPU total.
-
-Further optimization starts to be questionable IMO. It's surely possible
-somehow, but then you really have to go and inspect each and every
-function in those code pathes, add local locking, etc. Not to talk about
-the required mess in the core code to support that.
-
-The low hanging fruit which brings most is the identification/topology
-muck and the microcode loading. That needs to be addressed first anyway.
-
-Thanks,
-
-        tglx
