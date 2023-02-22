@@ -2,489 +2,436 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 858BD69EC98
-	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 02:55:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9443069ECB4
+	for <lists+kvm@lfdr.de>; Wed, 22 Feb 2023 03:08:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230112AbjBVBzP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Feb 2023 20:55:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33918 "EHLO
+        id S230251AbjBVCID (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Feb 2023 21:08:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229818AbjBVBzO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Feb 2023 20:55:14 -0500
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E88822822F
-        for <kvm@vger.kernel.org>; Tue, 21 Feb 2023 17:55:11 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-536a4eba107so71013167b3.19
-        for <kvm@vger.kernel.org>; Tue, 21 Feb 2023 17:55:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oH3wzgYYq/74BwrcfiZL5bA9g0o+Ffd7CJOhixtujEY=;
-        b=KD0d27RcUKUIRPIlAofkm1rJ/RBs2KPWmGH2VR034IRUD+NvdjhbM/RYGwuzwd8aaC
-         jByCraewDxz2QZEENcIppv9jJciGnb+vdFXnF35QVJ/O3nGHdbeVBZe37PcRp2iX+WE1
-         gThQhIoYoRgWWB0hjdC/Fz1kUlkFyrcVXgBL1AZPVG52qnGZoM+JB5zyqHwzjGMhjVii
-         Ij2xOEFpvowPbT9uwYsdcX73hBCw915wjjPLYYSUU6OcoMP6hJQNdoRJugaTp1FiQ2Dp
-         gFvL+GWRQr/57ApovfGO6mua/Fc5DNGlnhz+OUHc3J8gtUp/MDoHcco6AWDKjRaQOKFU
-         51eg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=oH3wzgYYq/74BwrcfiZL5bA9g0o+Ffd7CJOhixtujEY=;
-        b=IeSFjIDyEnyQHZ4zJBQ1CF+4S5PANTriycvqRQHOSStS64PLqTLNUctvCL7sKnxT04
-         xANjoth6wPNeC8cGSxM2Wz55dwgcgkBfkt92ZM7us43eKwoRUAMnlM5se0wbsk2dBezz
-         KiLCJND4mST1EIdif9qx/zURqXrjPdamuQ4BJudIoBnRYK9RWHXbMbaE96cY5gD2+qq5
-         yELqI65dDCLom/ju68OXcwZ+lbDJHHctdeE7ME/BOkAj8xQfk8C3iftwai4UEgOfFhVs
-         CQb1SLOO380/4Xj0DMS2AawpNdhAQIjq5c860L784yGYzCAAbM7TPy+yeM3YPyVorqa1
-         62UQ==
-X-Gm-Message-State: AO0yUKWtEB+IOY6IB6YTcR15tF6h9Lz/gI7nZxQx8RAPJGx2TX4Qpcn9
-        feil/aID/8qWeY6MXHPNRAUW9FGqsCk=
-X-Google-Smtp-Source: AK7set/RE3d3HUCYKXQYj1/S4gC27BgatAEGR/mQlpeo99cXGbkEic36ZeqGSQDIpc8WgFlKodW9oPQ7ze8=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:10ca:b0:9ed:13e9:fe68 with SMTP id
- w10-20020a05690210ca00b009ed13e9fe68mr702832ybu.3.1677030911201; Tue, 21 Feb
- 2023 17:55:11 -0800 (PST)
-Date:   Tue, 21 Feb 2023 17:55:09 -0800
-In-Reply-To: <460b341c-4720-bfb2-d1ef-1e42acf81974@gmail.com>
-Mime-Version: 1.0
-References: <20230217225449.811957-1-seanjc@google.com> <20230217225449.811957-3-seanjc@google.com>
- <460b341c-4720-bfb2-d1ef-1e42acf81974@gmail.com>
-Message-ID: <Y/V1/Z15Ax3Igydb@google.com>
-Subject: Re: [PATCH 2/2] Documentation/process: Add a maintainer handbook for
- KVM x86
-From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
+        with ESMTP id S229514AbjBVCIB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Feb 2023 21:08:01 -0500
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2068.outbound.protection.outlook.com [40.107.92.68])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75F441F91C;
+        Tue, 21 Feb 2023 18:07:59 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QoOTc3KMxQVlENV7zaJBhWAIX1AMOslRoI5MYE9pqqnIx1CCAFConY5yBYFvATRmuRq3eyqwx/WDIq01QA/Po2b3O74oP9aU916t7UNaGEsMkSbFPKiGbN0hk0FKz2xE+jrmvlQXDaD0MMyyE0sHFNK2HjmDU7opdi2deBV/L798yR/rLkMO+JT1z3Z5fq6r1er0Kd04ghVFoh991s4vXzhxD9kClB1XbZF09gR4ThdwIyR1l/X1pPnWt2qKEb7CIgebFldfMk4rqHOa3aA5PNtYRtp61r8ZLD9KIUbchM3dlgjEyVDpsuaMdnIxIjgiDed1pv4p6jO3LHcGzCetnw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Clk3EGFeCSxahOgqqj7xKu60s0z/724EYJ1PzNyyo6k=;
+ b=JCDZx/5J9YDwznepQej6IqrQpsecXyV7yYHovTgMkKGDQJYVC11GoFuYAUqWnO6LvSUHoa6O4S2HnSiMXn9vqogruGFIqrZGQbhQNcikVmHDusyMEChV75zOjkTaY+ZgHy41eboVw3fZDTWabSk36rEKUn/H8YTQLoZd2/mjMTA4hhANJplCGC/ldXNPKl5OrL4Xa5nk0qoC1EgdwzopDfGBkWFSlTwCkWwW19He1gST/L1vL098okWDSO+BMcuerteex6VJhXTWYiHk8EqaE7usVPsiNffblnmkhHMXNYf5gow4523iDBBsg3bD0viOhwJt1hOukvleCdrmu9m5wg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Clk3EGFeCSxahOgqqj7xKu60s0z/724EYJ1PzNyyo6k=;
+ b=3wnhSjUMNSadGPR74g6ZdxdsgU6nF8xROCMHHgKnSCtJgiBsal8f9WHPVpkPq4+d6aeotKU6h5BKx7Ex55Ca31CVVdoU9/G4M5IlGRirNuXOZplL01bzIO12L+Yv5R7C43/9oZ61DK9kFnBsc8MJ1Ngne828aSef9dn1qcxVACM=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB2843.namprd12.prod.outlook.com (2603:10b6:5:48::24) by
+ IA1PR12MB6185.namprd12.prod.outlook.com (2603:10b6:208:3e7::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.21; Wed, 22 Feb
+ 2023 02:07:56 +0000
+Received: from DM6PR12MB2843.namprd12.prod.outlook.com
+ ([fe80::1185:1d60:8b6e:89d3]) by DM6PR12MB2843.namprd12.prod.outlook.com
+ ([fe80::1185:1d60:8b6e:89d3%7]) with mapi id 15.20.6111.019; Wed, 22 Feb 2023
+ 02:07:55 +0000
+Message-ID: <7555a235-76be-abf5-075a-80dbe6f1ea8e@amd.com>
+Date:   Wed, 22 Feb 2023 13:07:31 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH v10 1/9] mm: Introduce memfd_restricted system call to
+ create restricted user memory
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        wei.w.wang@intel.com
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+ <20221202061347.1070246-2-chao.p.peng@linux.intel.com>
+ <Y8HTITl1+Oe0H7Gd@google.com>
+From:   Alexey Kardashevskiy <aik@amd.com>
+In-Reply-To: <Y8HTITl1+Oe0H7Gd@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SG2PR02CA0096.apcprd02.prod.outlook.com
+ (2603:1096:4:90::36) To DM6PR12MB2843.namprd12.prod.outlook.com
+ (2603:10b6:5:48::24)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB2843:EE_|IA1PR12MB6185:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3f037670-97b4-4398-8da3-08db14799c4c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: UrSehtznjxMV3EX4kernI+nJLu8ybw2rRF7wXQ36HLb7+t7Mt4potHIVpgdZroWm4JUFVYoW2Dxdv4RoTogO3DXd7jxZxAuUrci/6P1P/caP2fy/mWk95guK3wWmpa8iq6tkdi+H6av/CoWw3NPQ32gy70Q89v2B1FW7ciWfwKOwvBwmfclf49L4cLgBpTqLf1+KuqMvOoGYLs1yzJrkWGbwDZnlMX/oXQtAgew6gnXUhfmB4HiPXeJMvDkK5mO6FWlRZbmKD4/AU+Kb8c7A1rWVfqhurb0dQTuaqq8whndcZj/SD1hCNpMqilGhWVGdZYygveD5R7plSUyBdaWfmBjwGO7PXBNaFRTy8q5grUn1GEuJEjeNG6wU6prqDQPoxegK2sN7Fu6AEukQoGtnCXghWGCks91ha/p5ypLhYiPI9ehabUESZG6era7o+oMH76+N+4eiOXXR0Wq+cINcJstqj8s6ucUUTfFf+H4JnY7lM82VRTBll9dUZIJ7A0rUhjY8gTfdbC9mlo2dameExppzxyYtZNbCR458Vf0sFF2R3OIHLzP2rEeCVXCTCIfqjnNy+ZWAXutjfJg9j3cq57Ssb+4xIiPF9ALzM4AJ2rihJBZcoEJIJXKi+PTclJmCG2MotIdllIfZJyI39YkP/JtBkeG6ySpSAthFIc675982lNrBqRRUkSpVLOoPrMZpE3FU122Edzkt05zIXSnV4h/C1a1gaygtUOlRxutxMr4=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2843.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(376002)(366004)(346002)(39860400002)(136003)(396003)(451199018)(316002)(54906003)(110136005)(66476007)(66946007)(478600001)(66556008)(8676002)(4326008)(6486002)(36756003)(5660300002)(41300700001)(2906002)(8936002)(7416002)(7406005)(38100700002)(31696002)(31686004)(2616005)(186003)(6506007)(26005)(53546011)(6512007)(6666004)(83380400001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Mjc2dFl4aFFFL3o0VHNBcXlOYVRXWXdpc0JYTlkzdER0OUJIWVZ6K3pmQzZn?=
+ =?utf-8?B?NHlJRWdCS3RzazlqOEVQVks5WUt3ak92cEIwQWxxVDlLc3E2UmllWVovQzBE?=
+ =?utf-8?B?eFd0aVRMZjNDSXlwekY3d3FkZ2NEMUQ0TjRYZmFtU0NBcDJWTW1XTVBKREw1?=
+ =?utf-8?B?by94TGxXbDR0VmNuTFppenQrdkZnSXBuZkxNWDU0ZWptMCtneVBGWGR0TS9z?=
+ =?utf-8?B?NXZtbCtrcUFQR3I5Umk3em5SeUFoZVlOcjVHR2REaUlNSE5tVis5V0pUM2lu?=
+ =?utf-8?B?cUNhVDZYSTE5M3pmZW5rNDRBWk1yUzRsYXhMWEw4TWpvVlZOeVI0NS9GWktw?=
+ =?utf-8?B?QkE1VHRnRlJWYUpYT2x1MVFKYlBwYythMmR6Zi81UEF1MFZHMHcwVU03T2JJ?=
+ =?utf-8?B?VXZkVXdEVkdWbUppY0hUc0VRNDNWWTZPOHBpSHFrTkJBMjdKSFRqaXRkb3hZ?=
+ =?utf-8?B?T2VGWVI1WTNVVUo4Z2pVVkRscnhRWkoyV2ZyMmxRejhKYW5HNjdrQTlMeGY1?=
+ =?utf-8?B?SnluemNaUFYyTmkzbEVFdDVYT0kzZW1WZHp5d3A2SW5qM3A2M1NEWlEyRDk3?=
+ =?utf-8?B?eDFtRnRIWFQxQ2ladVp0clhYTzVwSHZtNUE4NHUwZXBBNnRyc0VRc0NOR3hQ?=
+ =?utf-8?B?dHo2MW1hbWtSbGpkbVpMT25CVnpwbUY1amZMcDVnTXhvVHJTMkxjTXpWcWdw?=
+ =?utf-8?B?aGtBTWtISkZrUnAvWWZJK0l1MDVFSmRoc09ZSkRhZDN4eVl4QXBCNkRGaXFX?=
+ =?utf-8?B?MHJlWlJSeGpySlVKbTU5KzZiTlNHcVNrckNLYlZ4NUdCaHlONXdUMnIxRjFz?=
+ =?utf-8?B?UVRUdy9vS00vWTNVeW1TOHdzVzFkMzhoN05ESU14TnBQY2NJR3NBZTIzbndG?=
+ =?utf-8?B?WnhFZmNMclp5VWJydGp3RVRsR0w1V3hzWjRZSlF0RGRzaTRVOUZGa2FlZEM4?=
+ =?utf-8?B?SDlGM1B4M0ZsZkQvSE9tcldpNWkzR3dDUUgzbGNtd1BwWWw0a2xzUkRGZnkx?=
+ =?utf-8?B?dW15YlFqWjVBZ0hWSFlDbjl4bjdiOTQzVnlkWHE0MzVBMGRqQkJjbk5kdUo4?=
+ =?utf-8?B?RjM1cnpXQXlOc0NDSnQrN1JHTFpDOXpuZ2grd3dJVVVYaFJLRTllZ1h5VWtj?=
+ =?utf-8?B?SFVNZTdFWGxpZXBuY2sybDlveTljSkFvUGg0NlNxUHJIMFRjOTdJWEJ2TlBI?=
+ =?utf-8?B?eGtvSk9xVmtFZlRtQ0MvQSthYVd6WlBxaXZkZmNwSnhZb1IveVhCRWhsRjV0?=
+ =?utf-8?B?aFBxZzE4SVNiMk9STllmT2JtNlZMOFM3ZnRZV0h0RVhlZjNoYkkxbGdVaVFh?=
+ =?utf-8?B?cG9jc0dMNHVtQ0IrZlk0ZkJLY2tFU2NkN2pJTGwweXh1N2d6TDRHZ21iVHlT?=
+ =?utf-8?B?TEVQdmNDSU9CbjZaM1p5ZXE4djMyZHduRUZHcG83MXRHN3l6Kzdhd0h1SG1j?=
+ =?utf-8?B?YkUrZVdkdDdUcHNWQUZzZUFWSUJ4dElwSjlkZVlac2Y4RXViUWU0clhpemVD?=
+ =?utf-8?B?eVJTNmM4QlNnaGhMSkdTQUJvWHIzS0oyYyttU0lhVHRZVUtRSnh0aW5xcFlm?=
+ =?utf-8?B?ejFRVFRhQjlUVmJFVG9NZWovRjBwOVBUYkJvRHVDamc5QWFFT3JGVmV0T2Ey?=
+ =?utf-8?B?VUk1S01TSHNxakN1MHRSRXNTS21BTDlvaXA4ZVpvYTJtbytjbHZGRHJmeVBw?=
+ =?utf-8?B?MkZISFJ1em5SdlQyOTJoRGdKbWo4VU9NcldkeThJaFZKVHZJNDZYaUFpelh1?=
+ =?utf-8?B?azhicFRpQWZwQzMzOWFkeU1MWlJabEZlVCtlRlkrTVVlWnZDUlMxa1JTMTBS?=
+ =?utf-8?B?ekZ2QkUwN3BhcnQvK05zM2o2ZVMwSy9vQkVZcmd1MjRUWGhsMFFMVmdkNEI5?=
+ =?utf-8?B?ZEJjY3daSUZ0cmwzSGdCMk5UeHVKRklsMmF0QndHT0xaVzY1VDR0d0gwWkdr?=
+ =?utf-8?B?NkhWS3QrTGtCVm5hL0dpUmtONHlXcXduMHJrQ3pZWUFPU2F5WFZmWFRNa2Jo?=
+ =?utf-8?B?Y294UWo0N204TnlyeFlub1pNdXhpcTRodFJiTFZiNTR0L3RqSzJPOXFPZlRK?=
+ =?utf-8?B?WEcrWEsvMndjejdhU1JJeXJ5YitzTHJvMEhmNGpadEJUc3NBM21KT0RPWko4?=
+ =?utf-8?Q?npsisC8AQ6GrIiKG1ivloq/3P?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3f037670-97b4-4398-8da3-08db14799c4c
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2843.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Feb 2023 02:07:55.1574
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1eUreHXlDCSV7a9COB9CFi+JvFQvruBp8r44/r1nFazBybH2GKAejEfhXBpu/8LefcfpWjgraxeepiM3/IV9Lg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6185
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 20, 2023, Like Xu wrote:
-> On 18/2/2023 6:54 am, Sean Christopherson wrote:
-> > Add a KVM x86 doc to the subsystem/maintainer handbook section to expla=
-in
-> > how KVM x86 (currently) operates as a sub-subsystem, and to soapbox on
-> > the rules and expectations for contributing to KVM x86.
-> >=20
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >   .../process/maintainer-handbooks.rst          |   1 +
-> >   Documentation/process/maintainer-kvm-x86.rst  | 347 +++++++++++++++++=
-+
-> >   MAINTAINERS                                   |   1 +
-> >   3 files changed, 349 insertions(+)
-> >   create mode 100644 Documentation/process/maintainer-kvm-x86.rst
-> >=20
-> > diff --git a/Documentation/process/maintainer-handbooks.rst b/Documenta=
-tion/process/maintainer-handbooks.rst
-> > index d783060b4cc6..d12cbbe2b7df 100644
-> > --- a/Documentation/process/maintainer-handbooks.rst
-> > +++ b/Documentation/process/maintainer-handbooks.rst
-> > @@ -17,3 +17,4 @@ Contents:
-> >      maintainer-tip
-> >      maintainer-netdev
-> > +   maintainer-kvm-x86
-> > diff --git a/Documentation/process/maintainer-kvm-x86.rst b/Documentati=
-on/process/maintainer-kvm-x86.rst
-> > new file mode 100644
-> > index 000000000000..ac81a42a32a3
-> > --- /dev/null
-> > +++ b/Documentation/process/maintainer-kvm-x86.rst
-> > @@ -0,0 +1,347 @@
-> > +.. SPDX-License-Identifier: GPL-2.0
-> > +
-> > +KVM x86
->=20
-> KERNEL VIRTUAL MACHINE FOR X86 (KVM/x86)
+On 14/1/23 08:54, Sean Christopherson wrote:
+> On Fri, Dec 02, 2022, Chao Peng wrote:
+>> The system call is currently wired up for x86 arch.
+> 
+> Building on other architectures (except for arm64 for some reason) yields:
+> 
+>    CALL    /.../scripts/checksyscalls.sh
+>    <stdin>:1565:2: warning: #warning syscall memfd_restricted not implemented [-Wcpp]
+> 
+> Do we care?  It's the only such warning, which makes me think we either need to
+> wire this up for all architectures, or explicitly document that it's unsupported.
+> 
+>> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+>> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+>> ---
+> 
+> ...
+> 
+>> diff --git a/include/linux/restrictedmem.h b/include/linux/restrictedmem.h
+>> new file mode 100644
+>> index 000000000000..c2700c5daa43
+>> --- /dev/null
+>> +++ b/include/linux/restrictedmem.h
+>> @@ -0,0 +1,71 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+>> +#ifndef _LINUX_RESTRICTEDMEM_H
+> 
+> Missing
+> 
+>   #define _LINUX_RESTRICTEDMEM_H
+> 
+> which causes fireworks if restrictedmem.h is included more than once.
+> 
+>> +#include <linux/file.h>
+>> +#include <linux/magic.h>
+>> +#include <linux/pfn_t.h>
+> 
+> ...
+> 
+>> +static inline int restrictedmem_get_page(struct file *file, pgoff_t offset,
+>> +					 struct page **pagep, int *order)
+>> +{
+>> +	return -1;
+> 
+> This should be a proper -errno, though in the current incarnation of things it's
+> a moot point because no stub is needed.  KVM can (and should) easily provide its
+> own stub for this one.
+> 
+>> +}
+>> +
+>> +static inline bool file_is_restrictedmem(struct file *file)
+>> +{
+>> +	return false;
+>> +}
+>> +
+>> +static inline void restrictedmem_error_page(struct page *page,
+>> +					    struct address_space *mapping)
+>> +{
+>> +}
+>> +
+>> +#endif /* CONFIG_RESTRICTEDMEM */
+>> +
+>> +#endif /* _LINUX_RESTRICTEDMEM_H */
+> 
+> ...
+> 
+>> diff --git a/mm/restrictedmem.c b/mm/restrictedmem.c
+>> new file mode 100644
+>> index 000000000000..56953c204e5c
+>> --- /dev/null
+>> +++ b/mm/restrictedmem.c
+>> @@ -0,0 +1,318 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +#include "linux/sbitmap.h"
+>> +#include <linux/pagemap.h>
+>> +#include <linux/pseudo_fs.h>
+>> +#include <linux/shmem_fs.h>
+>> +#include <linux/syscalls.h>
+>> +#include <uapi/linux/falloc.h>
+>> +#include <uapi/linux/magic.h>
+>> +#include <linux/restrictedmem.h>
+>> +
+>> +struct restrictedmem_data {
+> 
+> Any objection to simply calling this "restrictedmem"?  And then using either "rm"
+> or "rmem" for local variable names?  I kept reading "data" as the underyling data
+> being written to the page, as opposed to the metadata describing the restrictedmem
+> instance.
+> 
+>> +	struct mutex lock;
+>> +	struct file *memfd;
+>> +	struct list_head notifiers;
+>> +};
+>> +
+>> +static void restrictedmem_invalidate_start(struct restrictedmem_data *data,
+>> +					   pgoff_t start, pgoff_t end)
+>> +{
+>> +	struct restrictedmem_notifier *notifier;
+>> +
+>> +	mutex_lock(&data->lock);
+> 
+> This can be a r/w semaphore instead of a mutex, that way punching holes at multiple
+> points in the file can at least run the notifiers in parallel.  The actual allocation
+> by shmem will still be serialized, but I think it's worth the simple optimization
+> since zapping and flushing in KVM may be somewhat slow.
+> 
+>> +	list_for_each_entry(notifier, &data->notifiers, list) {
+>> +		notifier->ops->invalidate_start(notifier, start, end);
+> 
+> Two major design issues that we overlooked long ago:
+> 
+>    1. Blindly invoking notifiers will not scale.  E.g. if userspace configures a
+>       VM with a large number of convertible memslots that are all backed by a
+>       single large restrictedmem instance, then converting a single page will
+>       result in a linear walk through all memslots.  I don't expect anyone to
+>       actually do something silly like that, but I also never expected there to be
+>       a legitimate usecase for thousands of memslots.
+> 
+>    2. This approach fails to provide the ability for KVM to ensure a guest has
+>       exclusive access to a page.  As discussed in the past, the kernel can rely
+>       on hardware (and maybe ARM's pKVM implementation?) for those guarantees, but
+>       only for SNP and TDX VMs.  For VMs where userspace is trusted to some extent,
+>       e.g. SEV, there is value in ensuring a 1:1 association.
+> 
+>       And probably more importantly, relying on hardware for SNP and TDX yields a
+>       poor ABI and complicates KVM's internals.  If the kernel doesn't guarantee a
+>       page is exclusive to a guest, i.e. if userspace can hand out the same page
+>       from a restrictedmem instance to multiple VMs, then failure will occur only
+>       when KVM tries to assign the page to the second VM.  That will happen deep
+>       in KVM, which means KVM needs to gracefully handle such errors, and it means
+>       that KVM's ABI effectively allows plumbing garbage into its memslots.
+> 
+> Rather than use a simple list of notifiers, this appears to be yet another
+> opportunity to use an xarray.  Supporting sharing of restrictedmem will be
+> non-trivial, but IMO we should punt that to the future since it's still unclear
+> exactly how sharing will work.
+> 
+> An xarray will solve #1 by notifying only the consumers (memslots) that are bound
+> to the affected range.
+> 
+> And for #2, it's relatively straightforward (knock wood) to detect existing
+> entries, i.e. if the user wants exclusive access to memory, then the bind operation
+> can be reject if there's an existing entry.
+> 
+> VERY lightly tested code snippet at the bottom (will provide link to fully worked
+> code in cover letter).
+> 
+> 
+>> +static long restrictedmem_punch_hole(struct restrictedmem_data *data, int mode,
+>> +				     loff_t offset, loff_t len)
+>> +{
+>> +	int ret;
+>> +	pgoff_t start, end;
+>> +	struct file *memfd = data->memfd;
+>> +
+>> +	if (!PAGE_ALIGNED(offset) || !PAGE_ALIGNED(len))
+>> +		return -EINVAL;
+>> +
+>> +	start = offset >> PAGE_SHIFT;
+>> +	end = (offset + len) >> PAGE_SHIFT;
+>> +
+>> +	restrictedmem_invalidate_start(data, start, end);
+>> +	ret = memfd->f_op->fallocate(memfd, mode, offset, len);
+>> +	restrictedmem_invalidate_end(data, start, end);
+> 
+> The lock needs to be end for the entire duration of the hole punch, i.e. needs to
+> be taken before invalidate_start() and released after invalidate_end().  If a user
+> (un)binds/(un)registers after invalidate_state(), it will see an unpaired notification,
+> e.g. could leave KVM with incorrect notifier counts.
+> 
+>> +
+>> +	return ret;
+>> +}
+> 
+> What I ended up with for an xarray-based implementation.  I'm very flexible on
+> names and whatnot, these are just what made sense to me.
+> 
+> static long restrictedmem_punch_hole(struct restrictedmem *rm, int mode,
+> 				     loff_t offset, loff_t len)
+> {
+> 	struct restrictedmem_notifier *notifier;
+> 	struct file *memfd = rm->memfd;
+> 	unsigned long index;
+> 	pgoff_t start, end;
+> 	int ret;
+> 
+> 	if (!PAGE_ALIGNED(offset) || !PAGE_ALIGNED(len))
+> 		return -EINVAL;
+> 
+> 	start = offset >> PAGE_SHIFT;
+> 	end = (offset + len) >> PAGE_SHIFT;
+> 
+> 	/*
+> 	 * Bindings must stable across invalidation to ensure the start+end
+> 	 * are balanced.
+> 	 */
+> 	down_read(&rm->lock);
+> 
+> 	xa_for_each_range(&rm->bindings, index, notifier, start, end)
+> 		notifier->ops->invalidate_start(notifier, start, end);
+> 
+> 	ret = memfd->f_op->fallocate(memfd, mode, offset, len);
+> 
+> 	xa_for_each_range(&rm->bindings, index, notifier, start, end)
+> 		notifier->ops->invalidate_end(notifier, start, end);
+> 
+> 	up_read(&rm->lock);
+> 
+> 	return ret;
+> }
+> 
+> int restrictedmem_bind(struct file *file, pgoff_t start, pgoff_t end,
+> 		       struct restrictedmem_notifier *notifier, bool exclusive)
+> {
+> 	struct restrictedmem *rm = file->f_mapping->private_data;
+> 	int ret = -EINVAL;
+> 
+> 	down_write(&rm->lock);
+> 
+> 	/* Non-exclusive mappings are not yet implemented. */
+> 	if (!exclusive)
+> 		goto out_unlock;
+> 
+> 	if (!xa_empty(&rm->bindings)) {
+> 		if (exclusive != rm->exclusive)
+> 			goto out_unlock;
+> 
+> 		if (exclusive && xa_find(&rm->bindings, &start, end, XA_PRESENT))
+> 			goto out_unlock;
+> 	}
+> 
+> 	xa_store_range(&rm->bindings, start, end, notifier, GFP_KERNEL);
 
-My preference is "KVM x86", but I don't have a super strong opinion.  I def=
-initely
-don't think it's necessary to strictly match the MAINTAINERS file.
 
-> > +Lifecycle
-> > +~~~~~~~~~
-> > +Pull requests for the next release cycle are sent to the main KVM tree=
-, one
-> > +for each KVM x86 topic branch.  If all goes well, the topic branches a=
-re rolled
-> > +into the main KVM pull request sent during Linus' merge window.  Pull =
-requests
-> > +for KVM x86 branches are typically made the week before Linus' opening=
- of the
-> > +merge window, e.g. the week following rc7 for "normal" releases.
-> > +
-> > +The KVM x86 tree doesn't have its own official merge window, but there=
-'s a soft
-> > +close around rc5 for new features, and a soft close around rc6 for fix=
-es.
->=20
-> Any urgent AND critical fixes are exempt. No?
+|| ld: mm/restrictedmem.o: in function `restrictedmem_bind':
+mm/restrictedmem.c|295| undefined reference to `xa_store_range'
 
-More or less.  The majority of urgent and critical fixes should target the =
-current
-release, and the "soft" qualifier on "soft close" covers the rest.  Ah, but=
- this
-section doesn't say anything about fixes that target mainline.  I'll add a =
-paragraph
-to explicitly talk about fixes.
 
-> > +SDM and APM References
-> > +~~~~~~~~~~~~~~~~~~~~~~
-> > +Much of KVM's code base is directly tied to architectural behavior def=
-ined in
-> > +Intel's Software Development Manual (SDM) and AMD's Architecture Progr=
-ammer=E2=80=99s
-> > +Manual (APM).  Use of "Intel's SDM" and "AMD's APM", or even just "SDM=
-" or
-> > +"APM", without additional context is a-ok.
->=20
-> ISE: Intel=C2=AE Architecture Instruction Set Extensions and Future Featu=
-res
-> PPR: Processor Programming Reference (PPR) for specific AMD Model
+This is missing:
+===
+diff --git a/mm/Kconfig b/mm/Kconfig
+index f952d0172080..03aca542c0da 100644
+--- a/mm/Kconfig
++++ b/mm/Kconfig
+@@ -1087,6 +1087,7 @@ config SECRETMEM
+  config RESTRICTEDMEM
+         bool
+         depends on TMPFS
++       select XARRAY_MULTI
+===
 
-Hmm, I think we should explicitly spell those out in changelogs.  ISE relea=
-ses
-should _never_ be referenced in code, and I would prefer=20
+Thanks,
 
-> > +
-> > +Do not reference specific sections, tables, figures, etc. by number, e=
-specially
-> > +not in comments.  Instead, copy-paste the relevant snippet (if warrant=
-ed), and
-> > +reference sections/tables/figures by name.  The layouts of the SDM and=
- APM are
-> > +constantly changing, and so the numbers/labels aren't stable/consisten=
-t.
-> > +
-> > +Generally speaking, do not copy-paste SDM or APM snippets into comment=
-s.  With
-> > +few exceptions, KVM *must* honor architectural behavior, therefore it'=
-s implied
-> > +that KVM behavior is emulating SDM and/or APM behavior.
->=20
-> All undefined behaviors (if any) need to be clarified.
->=20
-> > +
-> > +Shortlog
-> > +~~~~~~~~
-> > +The preferred prefix format is ``KVM: <topic>:``, where ``<topic>`` is=
- one of::
-> > +
-> > +  - x86
-> > +  - x86/mmu
-> > +  - x86/pmu
-> > +  - x86/xen
->=20
-> Any conflict w/ "KVM X86 Xen (KVM/Xen)" ? Then "KVM X86 HYPER-V (KVM/hype=
-r-v)" ?
 
-I didn't follow this question.  Are you asking if we should have "KVM: x86/=
-hyperv:"?
-If so, my answer is "probably not".  The Hyper-V code isn't as isolated as =
-the Xen
-code and much of it is vendor specific, e.g. I would rather Hyper-V changes=
- that
-primarily touch vmx.c be tagged "KVM: VMX" as it's possible, however unlike=
-ly, that
-non-Hyper-V users could be affected.=20
-=20
-> > +  - selftests > +  - SVM
-> > +  - nSVM
-> > +  - VMX
-> > +  - nVMX
->=20
-> emulator ? lapic ?
 
-I don't want to introduce "emulator" as I don't think there will be a high =
-enough
-volume of patches to benefit from the extra qualifier, the emulator isn't a=
-s isolated
-as we like to think it is, and because KVM does a lot of emulation outside =
-of the
-emulator.  E.g. enter_smm() doesn't flow through emulate.c, but emulator_le=
-ave_smm()
-_only_ gets invoked via the emulator.
+> 	rm->exclusive = exclusive;
+> 	ret = 0;
+> out_unlock:
+> 	up_write(&rm->lock);
+> 	return ret;
+> }
+> EXPORT_SYMBOL_GPL(restrictedmem_bind);
+> 
+> void restrictedmem_unbind(struct file *file, pgoff_t start, pgoff_t end,
+> 			  struct restrictedmem_notifier *notifier)
+> {
+> 	struct restrictedmem *rm = file->f_mapping->private_data;
+> 
+> 	down_write(&rm->lock);
+> 	xa_store_range(&rm->bindings, start, end, NULL, GFP_KERNEL);
+> 	synchronize_rcu();
+> 	up_write(&rm->lock);
+> }
+> EXPORT_SYMBOL_GPL(restrictedmem_unbind);
 
-Similar to Hyper-V, I'm hesitant to introduce x86/apic as many "APIC" chang=
-es are
-actually in vendor specific code, e.g. much of APICv, AVIC, IPI virtualizat=
-ion, etc.
-I'm definitely not opposed to using x86/apic for local and and maybe even I=
-/O APIC
-changes though.
+-- 
+Alexey
 
-> > +**DO NOT use x86/kvm!**  ``x86/kvm`` is used exclusively for Linux-as-=
-a-KVM-guest
-> > +changes, i.e. for arch/x86/kernel/kvm.c.
-> > +
-> > +Note, these don't align with the topics branches (the topic branches c=
-are much
-> > +more about code conflicts).
-> > +
-> > +All names are case sensitive!  ``KVM: x86:`` is good, ``kvm: vmx:`` is=
- not.
-> > +
-> > +Capitalize the first word of the condensed patch description, but omit=
- ending
-> > +punctionation.  E.g.::
->=20
-> s/punctionation/punctuation
->=20
-> > +
-> > +    KVM: x86: Fix a null pointer dererence in function_xyz()
->=20
-> s/dererence/dereference
-
-Heh, at least I'm consistent.
-
-> > +    kvm: x86: fix a null pointer dererence in function_xyz.
-> > +
-> > +If a patch touches multiple topics, traverse up the conceptual tree to=
- find the
-> > +first common parent (which is often simply ``x86``).  When in doubt,
-> > +``git log path/to/file`` should provide a reasonable hint.
-> > +
-> > +New topics do occasionally pop up, but please start an on-list discuss=
-ion if
-> > +you want to propose introducing a new topic, i.e. don't go rogue.
-> > +
-> > +Do not use file names or complete file paths as the subject/shortlog p=
-refix.
-> > +
-> > +Changelog
-> > +~~~~~~~~~
-> > +Write changelogs using imperative mood and avoid pronouns.  Lead with =
-a short
-> > +blurb on what is changing, and then follow up with the context and bac=
-kground.
-> > +Note!  This order directly conflicts with the tip tree's preferred app=
-roach!
->=20
-> Emm, could this be considered/clarified as an incentive option ?
-
-Can you elaborate?  I don't understand what you're asking.
-
-> > +Testing
-> > +-------
-> > +At a bare minimum, *all* patches in a series must build cleanly for KV=
-M_INTEL=3Dm
-> > +KVM_AMD=3Dm, and KVM_WERROR=3Dy.  Building every possible combination =
-of Kconfigs
-> > +isn't feasible, but the more the merrier.  KVM_SMM, KVM_XEN, PROVE_LOC=
-KING, and
-> > +X86_64 are particularly interesting knobs to turn.
-> > +
-> > +Running KVM selftests and KVM-unit-tests is also mandatory (and statin=
-g the
-> > +obvious, the tests need to pass).  When possible and relevant, testing=
- on both
-> > +Intel and AMD is strongly preferred.  Booting an actual VM is encourag=
-ed, but
-> > +not mandatory.
->=20
-> Testing L2 guest available features inside L1 is also encouraged.
-
-Hmm.  Sort of.  In a perfect world where everyone has unlimited time, then =
-testing
-a inside a nested VM would be encouraged.  But practically speaking, doing =
-basic
-testing of a feature in a nested VM doesn't buy all that much meaningful co=
-verage,
-and can even give a false sense of security.
-
-The things we tend to get wrong are the edge cases, error handling, etc., a=
-nd those
-are unlikely to be excercised by basic testing, i.e. really need dedicated =
-tests.
-And if we have dedicated tests, then nested is covered by "Running selftest=
-s and KUT
-are mandatory".
-
-At least for official documentation, I think I would prefer not to explicit=
-ly
-encourage people to use their time booting and testing in nested VMs.
-
-> > +For changes that touch KVM's shadow paging code, running with TDP (EPT=
-/NPT)
-> > +disabled is mandatory.  For changes that affect common KVM MMU code, r=
-unning
-> > +with TDP disabled is strongly encouraged.  For all other changes, if t=
-he code
-> > +being modified depends on and/or interacts with a module param, testin=
-g with
-> > +the relevant settings is mandatory.
-> > +
-> > +Note, KVM selftests and KVM-unit-tests do have known failures.  If you=
- suspect
-> > +a failure is not due to your changes, verify that the *exact same* fai=
-lure
-> > +occurs with and without your changes.
-> > +
-> > +If you can't fully test a change, e.g. due to lack of hardware, clearl=
-y state
-> > +what level of testing you were able to do, e.g. in the cover letter.
->=20
-> Add an RFT (request for test) tag.
-
-I'm not necessarily opposed to the idea of "RFT", but until it's a ubiquito=
-us
-and/or formally documented tag I would prefer to avoid using RFT KVM x86.
-
-For the overwhelming majority of changes where "I couldn't test this" is le=
-gitimate
-_and_ the series/patch isn't tagged RFC, I have access to the necessary har=
-dware.
-For the few cases where I don't have hardware, I don't mind hunting down so=
-meone
-who does.  I.e. blasting "RFT to everyone isn't necessary.
-
-In other words, I think we'll spend more time explaining and trying to unde=
-rstand
-the use of RFT than we would benefit from using it to identify when a serie=
-s needs
-extra testing.
-
-> > +New Features
-> > +~~~~~~~~~~~~
-> > +With one exception, new features *must* come with test coverage.  KVM =
-specific
-> > +tests aren't strictly required, e.g. if coverage is provided by runnin=
-g a
-> > +sufficiently enabled guest VM, or by running a related kernel selftest=
- in a VM,
-> > +but dedicated KVM tests are preferred in all cases.  Negative testcase=
-s in
-> > +particular are mandatory for enabling of new hardware features as erro=
-r and
-> > +exception flows are rarely exercised simply by running a VM.
-> > +
-> > +The only exception to this rule is if KVM is simply advertising suppor=
-t for a
-> > +feature via KVM_SET_SUPPORTED_CPUID, i.e. for instructions/features th=
-at KVM
-> > +can't prevent a guest from using and for which there is no true enabli=
-ng.
-> > +
-> > +Note, "new features" does not just mean "new hardware features"!  New =
-features
-> > +that can't be well validated using existing KVM selftests and/or KVM-u=
-nit-tests
-> > +must come with tests.
->=20
-> must come with tests to ensure good code coverage.
-
-I _really_ don't want to add that qualifier.  Code coverage is but one aspe=
-ct of
-testing, and it's not even #1 priority, e.g. exercising code that violates =
-architectural
-behavior means nothing if the test doesn't detect the error.  I.e. the purp=
-ose of
-tests isn't _just_ to ensure good code coverage.
-
-> > +Posting new feature development without tests to get early feedback is=
- more
-> > +than welcome, but such submissions should be tagged RFC, and the cover=
- letter
-> > +should clearly state what type of feedback is requested/expected.  Do =
-not abuse
-> > +the RFC process; RFCs will typically not receive in-depth review.
-> > +
-> > +Bug Fixes
-> > +~~~~~~~~~
-> > +Except for "obvious" found-by-inspection bugs, fixes must be accompani=
-ed by a
-> > +reproducer for the bug being fixed.  In many cases the reproducer is i=
-mplicit,
-> > +e.g. for build errors and test failures, but it should still be clear =
-to
-> > +readers what is broken and how to verify the fix.  Some leeway is give=
-n for
-> > +bugs that are found via non-public workloads/tests, but providing regr=
-ession
-> > +tests for such bugs is strongly preferred.
->=20
-> tests or detailed reproduction sequence for such bugs is strongly preferr=
-ed.
-
-No, just tests.  This is specifically talking about non-public workloads.  =
-If a
-detailed reproduction sequence _doesn't_ involve writing code, i.e. a test,=
- then
-the fix should simply provider the reproducer.
-
-If you're talking about the sequence of events in KVM that result in the bu=
-g,
-then that info belongs in the changelog and is largely covered by the tip t=
-ree
-handbook.
-
-> > +Git Base
-> > +~~~~~~~~
-> > +If you are using git version 2.9.0 or later (Googlers, this is all of =
-you!),
->=20
-> Please do not mention specific developers or groups in this type of docum=
-ent.
-
-Honest question, why not?
-
-Calling out a specific developer is one thing, but I don't see the harm in =
-adding
-what essentially amounts to an extra requirement for Google employees.
-
-> > +use ``git format-patch`` with the ``--base`` flag to automatically inc=
-lude the
-> > +base tree information in the generated patches.
-> > +
-> > +Note, ``--base=3Dauto`` works as expected if and only if a branch's up=
-stream is
-> > +set to the base topic branch, e.g. it will do the wrong thing if your =
-upstream
-> > +is set to your personal repository for backup purposes.  An alternativ=
-e "auto"
-> > +solution is to derive the names of your development branches based on =
-their
-> > +KVM x86 topic, and feed that into ``--base``.  E.g. ``x86/pmu/my_branc=
-h_name``,
-> > +and then write a small wrapper to extract ``pmu`` from the current bra=
-nch name
-> > +to yield ``--base=3Dx/pmu``, where ``x`` is whatever name your reposit=
-ory uses to
-> > +track the KVM x86 remote.
-> > +
-> > +Co-Posting Tests
-> > +~~~~~~~~~~~~~~~~
-> > +KVM selftests that are associated with KVM changes, e.g. regression te=
-sts for
-> > +bug fixes, should be posted along with the KVM changes as a single ser=
-ies.
->=20
-> Keeping git-bisect is mandatory.
-
-Ah, yeah, I'll explicitly call out the order between tests and KVM.
-
-> > +Vulnerabilities
-> > +---------------
-> > +Bugs that can be exploited by the guest to attack the host (kernel or
-> > +userspace), or that can be exploited by a nested VM to *its* host (L2 =
-attacking
-> > +L1), are of particular interest to KVM.  Please follow the protocol fo=
-r
->=20
-> L1, even L0 host),
-
-No, because at that point it's just the guest attacking the host.  This sni=
-ppet
-is purely translating "nested VM to *its* host* into familiar terminology.
