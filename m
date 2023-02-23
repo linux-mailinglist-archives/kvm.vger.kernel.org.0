@@ -2,399 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B07EE6A021A
-	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 05:44:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F1176A0242
+	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 06:07:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233232AbjBWEoe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Feb 2023 23:44:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52384 "EHLO
+        id S232925AbjBWFHn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Feb 2023 00:07:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233212AbjBWEoc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Feb 2023 23:44:32 -0500
-Received: from mail-vs1-xe36.google.com (mail-vs1-xe36.google.com [IPv6:2607:f8b0:4864:20::e36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABFA834326
-        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 20:44:28 -0800 (PST)
-Received: by mail-vs1-xe36.google.com with SMTP id f13so9101585vsg.6
-        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 20:44:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sKMjr7Rxqbv+CnGa/A6QjHWJcmQnXCdCgOjEl0O2AyY=;
-        b=KldsSOrZ+whK6GS8ItSI8GbaPaoingpbkITCbC8iP5Na/f3qE/94VIvTGsXwpStTyv
-         ddVVxE76Gx+CXC/H2DcqfgLyyTBpBHBW5mzkGI2ZnS6m0IzP/tDpXvfGxtyfGFilFaKj
-         OTTPcr8H+2ptLKE6RF/rfsTjbPNX+q6CK6ONaeEAXLmImm1NN78/Lbrtaa6+3h5ipNHO
-         sHF4B3yOY/jqYcmshXwQeMtLBPsbrZ/cL1JBO+1pEwI8mNxyoNXQ0K5rkZDljelRyozy
-         U7mIOiWqy2V7XOTkoLzOhwaDPQvmoQfBh3wSTsduMBudpdNMgB9FZIgyrubGZL7RBld3
-         WCOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sKMjr7Rxqbv+CnGa/A6QjHWJcmQnXCdCgOjEl0O2AyY=;
-        b=IRUEwzKp/85Uvrs32tXcKg+TccRK1EIajNXIy52+KPN4PajbeXjXfcipQoCvm3oro+
-         FyS42zatf2B8ntcC6KuuAHhATpxYq2i2+t+/4wNaNkomiuQlTKJrhW8HCIkz+RO3wbi/
-         QiQbK1M2fGU+FLiKvo0wEmj5bjRzhDwOTiDXicrO2qHalxOMaekb0e0VG1MO+aAyuNYO
-         JsQv+vUNJPDI5gJiF/nnpTmb9E89jMIj8fEZ1C9O42hG39LqzDyqfNmFXJnuX1urHySI
-         wlAjzTqM0UrbEjo/zvyDbUn6WsQrZoFAaT12/fhzNKSPjnq6N8VwuL5ZUwh8t2dA3LvL
-         vzlQ==
-X-Gm-Message-State: AO0yUKUMtRF/k4wkI1mlvoeIy+v8Xd1pAm806vvlkc0skC4+wbPwRFkF
-        4+YMQpwtpAuVVJJKqy5CmUjhOUug0o3W8PNE9+6K5w==
-X-Google-Smtp-Source: AK7set/jYL42RVs45A2l6N3tK6qvlX8e/whXZCANHirepJNMIs4VP2TB3H12vFITACk4sHqNPjUBk2Ol9OD0H+8R24k=
-X-Received: by 2002:a05:6102:108f:b0:41e:d8b5:ee40 with SMTP id
- s15-20020a056102108f00b0041ed8b5ee40mr545448vsr.26.1677127467563; Wed, 22 Feb
- 2023 20:44:27 -0800 (PST)
-MIME-Version: 1.0
-References: <20230217041230.2417228-1-yuzhao@google.com> <20230217041230.2417228-4-yuzhao@google.com>
- <Y+9EUeUIS/ZUe2vw@linux.dev>
-In-Reply-To: <Y+9EUeUIS/ZUe2vw@linux.dev>
-From:   Yu Zhao <yuzhao@google.com>
-Date:   Wed, 22 Feb 2023 21:43:51 -0700
-Message-ID: <CAOUHufa9UEPVZTKUfm2UAOAkQ+abSwhupdX_7_=vZAQSqs8yng@mail.gmail.com>
-Subject: Re: [PATCH mm-unstable v1 3/5] kvm/arm64: add kvm_arch_test_clear_young()
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Michael Larabel <michael@michaellarabel.com>,
-        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, x86@kernel.org,
-        linux-mm@google.com
-Content-Type: text/plain; charset="UTF-8"
+        with ESMTP id S229379AbjBWFHl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Feb 2023 00:07:41 -0500
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 220513527D;
+        Wed, 22 Feb 2023 21:07:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1677128859; x=1708664859;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=n6ml1LhldVZgTB+XyVBdvDmDcqP56+iBpXUIV6oJ/rA=;
+  b=n2uiTzghJYwYVAq0lBR5k6Tfx0VH+dlysA4W3mnDdCsKjtD1NqkI7Cdj
+   m5sDsnSIyOg/Lhmrd2WDGSfQ5NqiQ7TPeP71bWHTp1f2TSnMIYsyV6Kkz
+   ta0p3D9DdpOZVt8nH7WMhmQPxwPpFmQJxKg/R4IbSF3pxLO4S23tDd24a
+   6VMfpnHeNLtxRE7ssEI2InkqnRLQVUrRwqIUzot0NKVxfpkdNjFH3kGiJ
+   Z+CDnC52lJ5Yg9fgbPga0AxUe06hNajbFxhIHSZDqUgk8u+Ugb8bdFOBx
+   Bi2U+KEWVmIiyo4IDejSHR5Z2QgDyCalRAjvdf1+a0oMghBy+Idpjc3RO
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10629"; a="321262449"
+X-IronPort-AV: E=Sophos;i="5.97,320,1669104000"; 
+   d="scan'208";a="321262449"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Feb 2023 21:07:12 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10629"; a="622190951"
+X-IronPort-AV: E=Sophos;i="5.97,320,1669104000"; 
+   d="scan'208";a="622190951"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orsmga003.jf.intel.com with ESMTP; 22 Feb 2023 21:07:11 -0800
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Wed, 22 Feb 2023 21:07:10 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16 via Frontend Transport; Wed, 22 Feb 2023 21:07:10 -0800
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.173)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.16; Wed, 22 Feb 2023 21:07:10 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YfCL7oC8+yqSWAFiBsm2N9JoBA+t2ZODOvOPHAuGq8oVBxC2bnu6dUxDynJG2RERo/MpnLvxT0XYlyDsJxBIa39QvNPsNo1TyB+bl9ZpZJ468zu4vID3v8CZR4AMfvJ60ZjE4YE9urCsVkAOorlu9JwCO8D7Ih1PK5E58HMA5MDzjbPypqEQUgOcs4OtHAlm585C4RIF1zLRqsU4D34+2GXrlM++yrrLmg68/cikM6qrLGoHn+gk/V8jYVOB62cJ4hOsSXBFDI8VVCAj0nn+8vh0ubIOG0lUvuLAxf6Yv1DyU1XhNKtmuSpvpxqRbwbxmjEoyfWtw1gW02rQUM11vQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Npf5NEIZp2XPL1OSVHTe1UkLc9kV7e6q+gzX/9llioQ=;
+ b=BoywBs2Apw5YX5R8tsWFVsGXv/i69J6aL7KDkCoSeMmV5gFqNeYae/LlLRyHXLGraM4NzT7pIXYo+MsmBibsI5qJiiW4rc0OTubUaOU+/14GaOcVdHhQjS91QmILdzE2ALF8Gn9IBsOfmwOuBsUmJWuTBGwS/QFEsy4chmEGbEqMkdd5BfQYVOwvlhv0Zx+Eq9J9HQluJUDYKBE/23aZ8SNZh9XCqW4+uuO9eW//vBCM+dp3vN3PjZWCTtcYrb1IwZEUKKZ5IKgK93bGl/j3Y2CNoxFB+6TKxcqUy6wNbOeqMqpr6vPH2y9qbS68qcNGKJgIPqnRSFBXxlwBDoQYFg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM6PR11MB4739.namprd11.prod.outlook.com (2603:10b6:5:2a0::22)
+ by DS0PR11MB8206.namprd11.prod.outlook.com (2603:10b6:8:166::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.18; Thu, 23 Feb
+ 2023 05:07:02 +0000
+Received: from DM6PR11MB4739.namprd11.prod.outlook.com
+ ([fe80::c442:e5e2:35c4:7339]) by DM6PR11MB4739.namprd11.prod.outlook.com
+ ([fe80::c442:e5e2:35c4:7339%7]) with mapi id 15.20.6134.019; Thu, 23 Feb 2023
+ 05:07:02 +0000
+From:   "Miao, Jun" <jun.miao@intel.com>
+To:     "Christopherson,, Sean" <seanjc@google.com>
+CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "Szmigiero, Maciej" <maciej.szmigiero@oracle.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH] KVM: Align the function name of
+ kvm_swap_active_memslots()
+Thread-Topic: [PATCH] KVM: Align the function name of
+ kvm_swap_active_memslots()
+Thread-Index: AQHZRQfG/5qoLPdSx0uaQHuTSRKFXa7bT+8AgACuWUA=
+Date:   Thu, 23 Feb 2023 05:07:01 +0000
+Message-ID: <DM6PR11MB4739574A5EBA94A487D725319AAB9@DM6PR11MB4739.namprd11.prod.outlook.com>
+References: <20230220084500.938739-1-jun.miao@intel.com>
+ <Y/ZhYiN+oYbx6z5n@google.com>
+In-Reply-To: <Y/ZhYiN+oYbx6z5n@google.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR11MB4739:EE_|DS0PR11MB8206:EE_
+x-ms-office365-filtering-correlation-id: d75362a0-deaf-4029-4292-08db155bcc68
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Uk0FfHgsEBelryApHVhOCQZ/0MhcNgvmZn49kKL1W4u7qwQORFzYdYAVoC3TLp9GhaX0CbLaW2bRfV/Ekp6OQhVSxvVBzb8ZByJiG1BR2EZt3H5VY9j7e2UYhsLWntZ7MdWpjfqFVHoslHO2nAbSDw8Sp1P33WwRqr3Ulf9jIS3DZZkU8xdpjksSjzfeWewPa3d0Mz0YYla+K5AIUE0vknyCcCIb9jCds3Y1mYJ1oZ4ImRSJQYLw0p1EHwclna41nAoeQEp3rEwfNVZhn7pnsvSahT3fLQdfR/9uX+RKUylQPkLbMDo5tOUzQpM1tMdyoNY9d0qNA1nBby8WM1m47f2fyfta4KNlH7XRYmCDppgDlXi2vXr5aBNwYuZ8U1nVl9pR16gcBRHGRYJ+lZWH7aMBZIV81ktxip7rT0FaLizrLT1C8LTRJ96MEFU7B2QfZ/ZxoBITxWQbVH87TaoF78og3C2htiasVkjH+GyIBjGgNylwHbjGm/QtRBUN1/BZut8RTAt3AFPGs6H17/q7VHzQTLiHmLDFxpBpHdiy4RgqGj9twc3gN3JGwuvWBQw3HXKK8yKI7s2qmJXsl9cZJLuPYcvmsHw/D7A8i4KyBh1O8L47FWUCfAv5IP8vyuJoL+425V/C3uZHPn6U2D6qBeIymHRINrZwaFTuExa62UPl5MboqieCxV2a4GqXh0RXPVhB7tOm7gbjeia+OvJUtQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB4739.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(136003)(39860400002)(366004)(396003)(376002)(346002)(451199018)(316002)(478600001)(66446008)(66556008)(66476007)(71200400001)(66946007)(64756008)(8936002)(54906003)(8676002)(52536014)(76116006)(4326008)(7696005)(6916009)(5660300002)(41300700001)(38100700002)(122000001)(2906002)(38070700005)(26005)(186003)(9686003)(83380400001)(33656002)(6506007)(86362001)(55016003)(82960400001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?87Z5B6lDTG6cJ2+6VhNLGAd8q/ZzBVn+1UxJ/TQmMQDzX2HsHFXhWKG3OXB6?=
+ =?us-ascii?Q?v9alj0WSi5wn1+KAwC7q77XbWntECsF4l742JTXTZTE6RST3+terXaKLSs+o?=
+ =?us-ascii?Q?FtC396fHOdQjAIi66PIp1ZXTl31FxMm62B/FdWYFpv/NXSmGdu2H85+znZvv?=
+ =?us-ascii?Q?cmhcpCWnzO72EAlzEFR7Z6wDOVcmoRf3yLvJX8FlGR9hNc4X6XhqJtGyMbzy?=
+ =?us-ascii?Q?fxLWBFqYMyI614AChokc8GP15rcHPQOLUUdCfd5wJeFSJGi8Rv1p3CyZOxOP?=
+ =?us-ascii?Q?Ii/VkBsh0h19cFjx5mul2y6L9osDsNvnzdUb2i6TaWojNpn0VdFC6U9Kd5Yp?=
+ =?us-ascii?Q?CYoJjlaWIIdp4TSp9f5v9AOv42X/gooef9uGzwqZYM5YoUK7GFH02sGTkOzd?=
+ =?us-ascii?Q?l9fp+NlFskHSX1zmXqPSpqqFOOBS7Df7V+9CwhKHjmlBqQ8P2Shv/Dk+kTAU?=
+ =?us-ascii?Q?0Xwm/xjJWH5mHsWqiy7vp/F+Iuwjo1/AJ/MzzMHEeS7dZfbpG1GkhVNI3HLR?=
+ =?us-ascii?Q?YkunsFTBrz1egQWldLwvjDnBzY8Ua97Ml6tMpApIHPLGSTiIf1sao8437tqk?=
+ =?us-ascii?Q?ksg2+RTFXac6D7c7HVKlG0ZGy8ylOe91S4kLYUSqxWDLiifNvfTx+qI3lWgB?=
+ =?us-ascii?Q?VAj3s5WGcuSJ7PNwQlUoNzfWnGv78jyOfV6lbfjQ3efefAuoEC34ogDtICbM?=
+ =?us-ascii?Q?ljWwBmvqjHEQ5ya2EyV/dEZ35FNE4tfab6sFD1v7tFfQ7Q9DJYvrkts9+8da?=
+ =?us-ascii?Q?ClhYHyOWEukRNpRZ2FR6le4ExmjEWVJiOWosuCc09fyZsecu1ndmnQ8bX0Nb?=
+ =?us-ascii?Q?jWA6yof1BHB3rHOrSWeXK/rQQLVvPccH/26pyukXwbOcSX2tRCfFVV/kYVzZ?=
+ =?us-ascii?Q?pvZbC+ipc3n4Ij7/UhzQyawo2eugcpohDiksCdv3P9QClWQUH/ZFy+E9PlP8?=
+ =?us-ascii?Q?Z2p3b1pHPzPPSg4/Uj9Hfb2VDoiGq1zZapLQsukEqdOwtmBBzAZurfmgbdkU?=
+ =?us-ascii?Q?HKzDW16DQ/6idxB6i7/8zEHVI9lvQxg68GOrAIhOlwJOzWMphXfL+MYn6Sw6?=
+ =?us-ascii?Q?EUFvnwH6IpRODzaEA6qcG9LfEeM2h6MeRQJcwBKdBtxpVWVVQ0qlJfJ6ceSr?=
+ =?us-ascii?Q?uJ3Pl2Z3pAQF6oZSAVtMPz6F5retpUiNpkoGUbQHSv7752IyS0ParLcgDbTo?=
+ =?us-ascii?Q?e54H30bIHQeZchuJV5AnMVsZUfI/IDeV3fdsEWo5SIybRaCsuUTRT6OhZqez?=
+ =?us-ascii?Q?yIbo731RJv6zotTZBSYzA5+McsC0XtA23MocSzzZR5XVHwlrl83zbTZE6zr4?=
+ =?us-ascii?Q?Bny1es/pnPDyVNUaPnKya9onfFtGehWbDT0Sb0fH9rfh7Hg8tj7duqQYKbjw?=
+ =?us-ascii?Q?5xxf23UYESK5/nJrX0Lphwu5o+tY2nYDwmFs31Pj5zFVrLCl1INbwKWSs2Qk?=
+ =?us-ascii?Q?VNdVg2urZCpPMd5lVQQe9OFvPDT7iXTCYhXnB5RSYRuwvTJlL86Fuu+aUYkK?=
+ =?us-ascii?Q?mxk1YHM6rG7Y9nrGpmMlgRiAe2eNWKzsUqQy5mSK8sZrQYiYNqzbaWsM9pVr?=
+ =?us-ascii?Q?B21Uk7PlocvFPqTvJ5HjLVINLIpt/X1Fht2TGNEC?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB4739.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d75362a0-deaf-4029-4292-08db155bcc68
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Feb 2023 05:07:01.8180
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: F34KKOG5AT7XaeWAWUizsznBRzmH4vGuK6DOppjrrWuXZJDTZ4DOFjVqr/KCDOfwo8e29YusjsIiy7Q5/C/p3g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8206
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 17, 2023 at 2:09=E2=80=AFAM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> Hi Yu,
->
-> scripts/get_maintainers.pl is your friend for getting the right set of
-> emails for a series :) Don't know about others, but generally I would
-> prefer to be Cc'ed on an entire series (to gather context) than just an
-> individual patch.
-
-Will do. Thank you.
-
-> On Thu, Feb 16, 2023 at 09:12:28PM -0700, Yu Zhao wrote:
-> > This patch adds kvm_arch_test_clear_young() for the vast majority of
-> > VMs that are not pKVM and run on hardware that sets the accessed bit
-> > in KVM page tables.
+>=20
+> Nit, "Align" is a confusing because it's often used to refer to indentati=
+on.  Maybe?
+>=20
+>    KVM: Fix comments that refer to the non-existent install_new_memslots(=
+)
+>=20
+> On Mon, Feb 20, 2023, Jun Miao wrote:
+> > The function of install_new_memslots() is replaced by
+> kvm_swap_active_memslots().
+> > In order to avoid confusion, align the name in the comments which alway=
+s be
+> ignored.
 > >
-> > It relies on two techniques, RCU and cmpxchg, to safely test and clear
-> > the accessed bit without taking the MMU lock. The former protects KVM
-> > page tables from being freed while the latter clears the accessed bit
-> > atomically against both the hardware and other software page table
-> > walkers.
-> >
-> > Signed-off-by: Yu Zhao <yuzhao@google.com>
+> > Fixes: a54d806688fe "KVM: Keep memslots in tree-based structures instea=
+d of
+> array-based ones")
+> > Signed-off-by: Jun Miao <jun.miao@intel.com>
 > > ---
-> >  arch/arm64/include/asm/kvm_host.h       |  7 +++
-> >  arch/arm64/include/asm/kvm_pgtable.h    |  8 +++
-> >  arch/arm64/include/asm/stage2_pgtable.h | 43 ++++++++++++++
-> >  arch/arm64/kvm/arm.c                    |  1 +
-> >  arch/arm64/kvm/hyp/pgtable.c            | 51 ++--------------
-> >  arch/arm64/kvm/mmu.c                    | 77 ++++++++++++++++++++++++-
-> >  6 files changed, 141 insertions(+), 46 deletions(-)
+> >  Documentation/virt/kvm/locking.rst | 2 +-
+> >  include/linux/kvm_host.h           | 4 ++--
+> >  virt/kvm/kvm_main.c                | 4 ++--
+> >  3 files changed, 5 insertions(+), 5 deletions(-)
 > >
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm=
-/kvm_host.h
-> > index 35a159d131b5..572bcd321586 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -1031,4 +1031,11 @@ static inline void kvm_hyp_reserve(void) { }
-> >  void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
-> >  bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu);
-> >
-> > +/* see the comments on the generic kvm_arch_has_test_clear_young() */
-> > +#define kvm_arch_has_test_clear_young kvm_arch_has_test_clear_young
-> > +static inline bool kvm_arch_has_test_clear_young(void)
-> > +{
-> > +     return IS_ENABLED(CONFIG_KVM) && cpu_has_hw_af() && !is_protected=
-_kvm_enabled();
-> > +}
->
-> Why does the lack of FEAT_HAFDBS preclude the use of the test-and-clear
-> notifier?
+> > diff --git a/Documentation/virt/kvm/locking.rst
+> b/Documentation/virt/kvm/locking.rst
+> > index 14c4e9fa501d..ac0e549a3ae7 100644
+> > --- a/Documentation/virt/kvm/locking.rst
+> > +++ b/Documentation/virt/kvm/locking.rst
+> > @@ -21,7 +21,7 @@ The acquisition orders for mutexes are as follows:
+> >  - kvm->mn_active_invalidate_count ensures that pairs of
+> >    invalidate_range_start() and invalidate_range_end() callbacks
+> >    use the same memslots array.  kvm->slots_lock and kvm->slots_arch_lo=
+ck
+> > -  are taken on the waiting side in install_new_memslots, so MMU notifi=
+ers
+> > +  are taken on the waiting side in kvm_swap_active_memslots, so MMU
+> notifiers
+>=20
+> Can you send a v2 and opportunistically add () to the blurbs that don't h=
+ave it?
+> I.e. so these are all "kvm_swap_active_memslots()"?
+>=20
+I will send V2 with the lost "()", thank you for the warm and accurate advi=
+ce.
 
-This all comes down to the return on investment. We could
-theoretically make it work but the complexity and the poor performance
-would outweigh the benefits -- VM memory overcommit mostly happens in
-Cloud and none of the major Cloud vendors use pre v8.2 [1].
-
-[1] https://lore.kernel.org/linux-mm/CAOUHufbbs2gG+DPvSOw_N_Kx7FWdZvpdJUvLz=
-ko-BDQ8vfd6Xg@mail.gmail.com/
-
-> On implementations without FEAT_HAFDBS, hardware will generate a data
-> abort for software to set the access flag. Regardless of whether
-> software or hardware is responsible for updating the PTE that
-> information is available in the page tables.
-
-Agreed, the s/w emulation of the A-bit has poor performance. With the
-forward looking in mind, businesses who wish to overcommit host memory
-will eventually all move onto v8.2 and later. This is another reason
-not to worry about pre v8.2 (or 32-bit for that matter).
-
-> Also, I'm at a loss for why we'd need to test if CONFIG_KVM is enabled.
-> My expectation is that we should provide an implementation that returns
-> false if !CONFIG_KVM, avoiding the need to repeat that bit in every
-> single implementation of the function.
-
-We do have that default implementation. But we still need to disable
-this implementation when !CONFIG_KVM (it isn't protected by #ifdef
-CONFIG_KVM).
-
-> > +
-> >  #endif /* __ARM64_KVM_HOST_H__ */
-> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/=
-asm/kvm_pgtable.h
-> > index 63f81b27a4e3..8c9a04388c88 100644
-> > --- a/arch/arm64/include/asm/kvm_pgtable.h
-> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> > @@ -105,6 +105,7 @@ static inline bool kvm_level_supports_block_mapping=
-(u32 level)
-> >   * @put_page:                        Decrement the refcount on a page.=
- When the
-> >   *                           refcount reaches 0 the page is automatica=
-lly
-> >   *                           freed.
-> > + * @put_page_rcu:            RCU variant of put_page().
-> >   * @page_count:                      Return the refcount of a page.
-> >   * @phys_to_virt:            Convert a physical address into a virtual
-> >   *                           address mapped in the current context.
-> > @@ -122,6 +123,7 @@ struct kvm_pgtable_mm_ops {
-> >       void            (*free_removed_table)(void *addr, u32 level);
-> >       void            (*get_page)(void *addr);
-> >       void            (*put_page)(void *addr);
-> > +     void            (*put_page_rcu)(void *addr);
->
-> Why do we need this? We already defer dropping the last reference count
-> on a page to an RCU callback. Have you observed issues with the existing
-> implementation?
-
-That's on the reader path, i.e., collapsing PTEs into a PMD, which
-RCU-frees the PTE table.
-
-On the writer path, unmapping wasn't protected by RCU before this
-patch, and put_page_rcu() makes it so.
-
-> >       int             (*page_count)(void *addr);
-> >       void*           (*phys_to_virt)(phys_addr_t phys);
-> >       phys_addr_t     (*virt_to_phys)(void *addr);
-> > @@ -188,6 +190,12 @@ typedef bool (*kvm_pgtable_force_pte_cb_t)(u64 add=
-r, u64 end,
-> >   *                                   children.
-> >   * @KVM_PGTABLE_WALK_SHARED:         Indicates the page-tables may be =
-shared
-> >   *                                   with other software walkers.
-> > + *
-> > + * kvm_arch_test_clear_young() is a special case. It relies on two
-> > + * techniques, RCU and cmpxchg, to safely test and clear the accessed
-> > + * bit without taking the MMU lock. The former protects KVM page table=
-s
-> > + * from being freed while the latter clears the accessed bit atomicall=
-y
-> > + * against both the hardware and other software page table walkers.
-> >   */
-> >  enum kvm_pgtable_walk_flags {
-> >       KVM_PGTABLE_WALK_LEAF                   =3D BIT(0),
-> > diff --git a/arch/arm64/include/asm/stage2_pgtable.h b/arch/arm64/inclu=
-de/asm/stage2_pgtable.h
-> > index c8dca8ae359c..350437661d4b 100644
-> > --- a/arch/arm64/include/asm/stage2_pgtable.h
-> > +++ b/arch/arm64/include/asm/stage2_pgtable.h
-> > @@ -30,4 +30,47 @@
-> >   */
-> >  #define kvm_mmu_cache_min_pages(kvm) (kvm_stage2_levels(kvm) - 1)
-> >
-> > +#define KVM_PTE_TYPE                 BIT(1)
-> > +#define KVM_PTE_TYPE_BLOCK           0
-> > +#define KVM_PTE_TYPE_PAGE            1
-> > +#define KVM_PTE_TYPE_TABLE           1
-> > +
-> > +#define KVM_PTE_LEAF_ATTR_LO         GENMASK(11, 2)
-> > +
-> > +#define KVM_PTE_LEAF_ATTR_LO_S1_ATTRIDX      GENMASK(4, 2)
-> > +#define KVM_PTE_LEAF_ATTR_LO_S1_AP   GENMASK(7, 6)
-> > +#define KVM_PTE_LEAF_ATTR_LO_S1_AP_RO        3
-> > +#define KVM_PTE_LEAF_ATTR_LO_S1_AP_RW        1
-> > +#define KVM_PTE_LEAF_ATTR_LO_S1_SH   GENMASK(9, 8)
-> > +#define KVM_PTE_LEAF_ATTR_LO_S1_SH_IS        3
-> > +#define KVM_PTE_LEAF_ATTR_LO_S1_AF   BIT(10)
-> > +
-> > +#define KVM_PTE_LEAF_ATTR_LO_S2_MEMATTR      GENMASK(5, 2)
-> > +#define KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R       BIT(6)
-> > +#define KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W       BIT(7)
-> > +#define KVM_PTE_LEAF_ATTR_LO_S2_SH   GENMASK(9, 8)
-> > +#define KVM_PTE_LEAF_ATTR_LO_S2_SH_IS        3
-> > +#define KVM_PTE_LEAF_ATTR_LO_S2_AF   BIT(10)
-> > +
-> > +#define KVM_PTE_LEAF_ATTR_HI         GENMASK(63, 51)
-> > +
-> > +#define KVM_PTE_LEAF_ATTR_HI_SW              GENMASK(58, 55)
-> > +
-> > +#define KVM_PTE_LEAF_ATTR_HI_S1_XN   BIT(54)
-> > +
-> > +#define KVM_PTE_LEAF_ATTR_HI_S2_XN   BIT(54)
-> > +
-> > +#define KVM_PTE_LEAF_ATTR_S2_PERMS   (KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R |=
- \
-> > +                                      KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W |=
- \
-> > +                                      KVM_PTE_LEAF_ATTR_HI_S2_XN)
-> > +
-> > +#define KVM_INVALID_PTE_OWNER_MASK   GENMASK(9, 2)
-> > +#define KVM_MAX_OWNER_ID             1
-> > +
-> > +/*
-> > + * Used to indicate a pte for which a 'break-before-make' sequence is =
-in
-> > + * progress.
-> > + */
-> > +#define KVM_INVALID_PTE_LOCKED               BIT(10)
-> > +
->
-> If there is a need to do these sort of moves, please do it in a separate
-> patch. It pollutes the context of the functional change you're making.
->
-> >  #endif       /* __ARM64_S2_PGTABLE_H_ */
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 9c5573bc4614..6770bc47f5c9 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -191,6 +191,7 @@ vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcp=
-u, struct vm_fault *vmf)
-> >   */
-> >  void kvm_arch_destroy_vm(struct kvm *kvm)
-> >  {
-> > +     kvm_free_stage2_pgd(&kvm->arch.mmu);
-> >
-> >       bitmap_free(kvm->arch.pmu_filter);
-> >       free_cpumask_var(kvm->arch.supported_cpus);
-> >
->
-> [...]
->
-> > +struct test_clear_young_arg {
-> > +     struct kvm_gfn_range *range;
-> > +     gfn_t lsb_gfn;
-> > +     unsigned long *bitmap;
-> > +};
-> > +
-> > +static int stage2_test_clear_young(const struct kvm_pgtable_visit_ctx =
-*ctx,
-> > +                                enum kvm_pgtable_walk_flags flags)
-> > +{
-> > +     struct test_clear_young_arg *arg =3D ctx->arg;
-> > +     gfn_t gfn =3D ctx->addr / PAGE_SIZE;
-> > +     kvm_pte_t new =3D ctx->old & ~KVM_PTE_LEAF_ATTR_LO_S2_AF;
-> > +
-> > +     VM_WARN_ON_ONCE(!page_count(virt_to_page(ctx->ptep)));
-> > +     VM_WARN_ON_ONCE(gfn < arg->range->start || gfn >=3D arg->range->e=
-nd);
->
-> Do we really need to be _this_ pedantic about sanity checking?
-
-Will remove them. (My experience with the world's large fleets is that
-Murphy's law is always true.)
-
-> > +     if (!kvm_pte_valid(new))
-> > +             return 0;
-> > +
-> > +     if (new =3D=3D ctx->old)
-> > +             return 0;
-> > +
-> > +     /* see the comments on the generic kvm_arch_has_test_clear_young(=
-) */
-> > +     if (__test_and_change_bit(arg->lsb_gfn - gfn, arg->bitmap))
-> > +             cmpxchg64(ctx->ptep, ctx->old, new);
->
-> Why not use stage2_try_set_pte()? Not only is it idiomatic with the rest
-> of the stage-2 code, it also will 'do the right thing' according to the
-> locking scheme of the caller if we decide to change it at some point.
-
-It's not exported. Do you prefer it to be exported?
-
-> > +     return 0;
-> > +}
-> > +
-> > +bool kvm_arch_test_clear_young(struct kvm *kvm, struct kvm_gfn_range *=
-range,
-> > +                            gfn_t lsb_gfn, unsigned long *bitmap)
-> > +{
-> > +     u64 start =3D range->start * PAGE_SIZE;
-> > +     u64 end =3D range->end * PAGE_SIZE;
-> > +     struct test_clear_young_arg arg =3D {
-> > +             .range          =3D range,
-> > +             .lsb_gfn        =3D lsb_gfn,
-> > +             .bitmap         =3D bitmap,
-> > +     };
-> > +     struct kvm_pgtable_walker walker =3D {
-> > +             .cb             =3D stage2_test_clear_young,
-> > +             .arg            =3D &arg,
-> > +             .flags          =3D KVM_PGTABLE_WALK_LEAF,
-> > +     };
-> > +
-> > +     BUILD_BUG_ON(is_hyp_code());
->
-> See prior comment about sanity checking.
->
-> > +     if (WARN_ON_ONCE(!kvm_arch_has_test_clear_young()))
-> > +             return false;
->
-> Same here...
->
-> > +     /* see the comments on kvm_pgtable_walk_flags */
-> > +     rcu_read_lock();
-> > +
-> > +     kvm_pgtable_walk(kvm->arch.mmu.pgt, start, end - start, &walker);
-> > +
-> > +     rcu_read_unlock();
->
-> The rcu_read_{lock,unlock}() is entirely superfluous.
-
-Not really. I didn't use the KVM_PGTABLE_WALK_SHARED flag above. Yes,
-it would be more consistent with the rest of the ARM code. My POV is
-that it would be less consistent with other archs, which I fully
-expect you to disagree :)
-
-I could add it and remove rcu_read_{lock,unlock}() if you prefer that way.
-
-> Of course, it is somewhat hidden by the fact that we must use
-> abstractions to support host and EL2 use of the page table code, but we
-> already make use of RCU to protect the stage-2 of a 'regular' VM.
->
-> > +     return true;
-> > +}
-> > +
-> >  bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
-> >  {
-> >       if (!kvm->arch.mmu.pgt)
-> > @@ -1848,7 +1924,6 @@ void kvm_arch_memslots_updated(struct kvm *kvm, u=
-64 gen)
-> >
-> >  void kvm_arch_flush_shadow_all(struct kvm *kvm)
-> >  {
-> > -     kvm_free_stage2_pgd(&kvm->arch.mmu);
-> >  }
->
-> Doesn't this become a blatant correctness issue? This entirely fails to
-> uphold the exact expectations of the call.
-
-I moved kvm_free_stage2_pgd() into kvm_arch_destroy_vm()  above so
-that the mmu notifer SRCU will protect pgd at destruction. Don't worry
-about this for now. I refactor this change and put_page_rcu() into a
-separate patch to make it more clearer -- without them, RCU page table
-walkers won't be safe against VM destruction and unmap.
+--Jun
+> Thanks!
