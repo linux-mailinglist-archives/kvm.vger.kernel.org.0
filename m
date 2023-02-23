@@ -2,85 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 23A776A0EE0
-	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 18:46:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DC5A16A0F2B
+	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 19:09:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230217AbjBWRqH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Feb 2023 12:46:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33862 "EHLO
+        id S231177AbjBWSJU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Feb 2023 13:09:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229480AbjBWRqF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Feb 2023 12:46:05 -0500
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B58D4FCAD;
-        Thu, 23 Feb 2023 09:46:04 -0800 (PST)
-Received: by mail-lf1-x12a.google.com with SMTP id m7so14647604lfj.8;
-        Thu, 23 Feb 2023 09:46:03 -0800 (PST)
+        with ESMTP id S230499AbjBWSJT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Feb 2023 13:09:19 -0500
+Received: from mail-vs1-xe36.google.com (mail-vs1-xe36.google.com [IPv6:2607:f8b0:4864:20::e36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 054AB113EE
+        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 10:09:04 -0800 (PST)
+Received: by mail-vs1-xe36.google.com with SMTP id s1so539110vsk.5
+        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 10:09:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1677174362;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=google.com; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gYIq09mCIdt8L8URFfe+pag31rri9xn6YRZUfSTQ4cQ=;
-        b=H/MKnTDnvFdWxcQfGw3ysDrqU8kxVqbL6vEJjW7HtOr4msWrzCGUY1PDxLUYdKo3PM
-         YLiEhEfthAIfkhDAArA4Ip+CysYZj3Ioym0g5zEOeTAbR+I2gMGXTUzHHV7bH2DWWNjl
-         xaSi8T4miZA00aVNpols7SD8/uKpin4Fz6UzJK/FMK4U5osorpRZc+UEgpJUbyK12qiE
-         UJdqkl2EYvKLRNn5+Vj0qVUk+ldaRk4W3GITriXGJDuD2OUgJwdNZS1jTj4dNe5gK7Vs
-         jplpcMZp/JSF/7m0eWlLZD+JHHGcUCVmkq8Cb1F2fTQCoIcyQGMYpYZ9oT9RF9y3UeUN
-         OuVQ==
+        bh=ZFS2s1TR/3Kjk49puEHZLo8Qp1XbI3IEgMXOzJt184k=;
+        b=T5IJAdz1LLwq9Wpe/lYsePig5wU3ht7E3XBfh+hgfH9QST0GfyYIgBlwgpI5O4mani
+         rZIblgtTc6rbIYvr29cW1lsZGQDsNNjbLJmM9HYUEKikey9Qql1PRkJPgYlaRmFu5e2N
+         LGj2FMYFaOEkWL8mGYvTQ3Vn7z0ODfq96Tsg1YXvbb5WVEEyoz5Sfs0JGBUwPeZzM21h
+         27AMPaY+3E8diGs3Qq+0UvjwD32cBcn5tHRKFEFz4XJWCYmEnw744gDyE01cZp3Q9MRJ
+         C7l0NSF4td3tovqrUj6grQE1k5M5JoTxHepZybKKiQDz154BjPBgwzQNflKkDkbRn1Fi
+         zNqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677174362;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gYIq09mCIdt8L8URFfe+pag31rri9xn6YRZUfSTQ4cQ=;
-        b=HKl+TpbOdb45pCN1VGmeiqec/J+nyF3QR+5aWD9lNEYe2Ze8+4kVW0r6+npERJVLa1
-         R5Tl0aWe+EBSdbD5+mcaaNCKp7COZVJHU6yFEZFWNEIKFPJZTGEB0p9rgDMuokFl499d
-         4nGCg6BaEhFYWf4szZoTqc8bHgTIGsSneHcOZPV90ZgU8U4737JUM9kPjCB/B4+8fqRh
-         PYVMbvjy7HQEE7s8rSdYdNBm5WgTW6kL/SddccFqkdWX0Cegdo7x86hstL/mGtvTTbWu
-         ErCBOrHxgleX4EGsrV4ZOMukA6f2rMy87KfrK46e2H8HfN22FkWGB4VJzJdUyoK1kza8
-         lxVg==
-X-Gm-Message-State: AO0yUKU/7M//cCpakjF2x3tlFXEo0nmyrqb2c9VgaeQhZz7ZLmH3K/jE
-        3qXIkrn+BhsxlDR6FoSOjW0=
-X-Google-Smtp-Source: AK7set/HWDu0Z1JwR4f2MLULVfhlz20LZD27Q64dW7aOz28mIbVbVwBH7uH3dA7q/4XucNCFko4n6A==
-X-Received: by 2002:ac2:5496:0:b0:4d7:bda4:e6ae with SMTP id t22-20020ac25496000000b004d7bda4e6aemr4409072lfk.3.1677174362080;
-        Thu, 23 Feb 2023 09:46:02 -0800 (PST)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id v6-20020ac25606000000b004b550c26949sm1025697lfd.290.2023.02.23.09.46.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Feb 2023 09:46:01 -0800 (PST)
-Date:   Thu, 23 Feb 2023 19:46:00 +0200
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
-        <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
-        <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
-        <thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
-        <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
-        <jmattson@google.com>, <luto@kernel.org>,
-        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
-        <pgonda@google.com>, <peterz@infradead.org>,
-        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
-        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
-        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH RFC v8 32/56] KVM: SVM: Add initial SEV-SNP support
-Message-ID: <20230223194600.000018ac@gmail.com>
-In-Reply-To: <20230220183847.59159-33-michael.roth@amd.com>
-References: <20230220183847.59159-1-michael.roth@amd.com>
-        <20230220183847.59159-33-michael.roth@amd.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        bh=ZFS2s1TR/3Kjk49puEHZLo8Qp1XbI3IEgMXOzJt184k=;
+        b=AH7N2JHDFNy7FLCytm7uOeDmjxiMF55Ap1fon4H7+wi9kO9kXGgnyCrw6XFqIPXr3z
+         7acyXbMAXATevzhba13CPkch059excRGMVZ+tOqwyytrDZU2IEFPRTBoXKmf6dxXCF5D
+         1yWBVRjN6jMXPa4SU0NbnEuDH7fM43XjPM5QGSJU6mmxek+1QI9+KS1sU/ZpSzY6NER+
+         GE4cUjF2gIlOHoTmTsaYz+9ZeWs4eOAoG23Flvy/mCk7S/ZY2Axx2N9PR3jatY0l1bfX
+         KGzE8GzZYfxweIXJofSwg8A7BB6xG190+xusd92U6yihpYykcwgpP0ojB5O0iyL1D2u1
+         T3IQ==
+X-Gm-Message-State: AO0yUKV+7UYVBwjGGkxTFrLrp+z0+eU3zKM624+RpKXeUFCU7Y9rLWiN
+        pjekOy2NBmpKc8l1TzBZFbdRcqh5v6/zcvv3DerOeA==
+X-Google-Smtp-Source: AK7set/BLzsOKlrQCPCfz1/Srjggdbaz1bD3yeHmhdVN17JBRgqFpgtS/JiELfEpEe2qyTgQFGrUqdU1JBFociC1vOk=
+X-Received: by 2002:a05:6102:22c2:b0:414:d29b:497c with SMTP id
+ a2-20020a05610222c200b00414d29b497cmr479716vsh.6.1677175740528; Thu, 23 Feb
+ 2023 10:09:00 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+References: <20230217041230.2417228-1-yuzhao@google.com> <20230217041230.2417228-6-yuzhao@google.com>
+ <Y/elw7CTvVWt0Js6@google.com>
+In-Reply-To: <Y/elw7CTvVWt0Js6@google.com>
+From:   Yu Zhao <yuzhao@google.com>
+Date:   Thu, 23 Feb 2023 11:08:21 -0700
+Message-ID: <CAOUHufbAKpv95k6rVedstjD_7JzP0RrbOD652gyZh2vbAjGPOg@mail.gmail.com>
+Subject: Re: [PATCH mm-unstable v1 5/5] mm: multi-gen LRU: use mmu_notifier_test_clear_young()
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Michael Larabel <michael@michaellarabel.com>,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, x86@kernel.org,
+        linux-mm@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -88,100 +76,91 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 20 Feb 2023 12:38:23 -0600
-Michael Roth <michael.roth@amd.com> wrote:
+On Thu, Feb 23, 2023 at 10:43=E2=80=AFAM Sean Christopherson <seanjc@google=
+.com> wrote:
+>
+> On Thu, Feb 16, 2023, Yu Zhao wrote:
+> > An existing selftest can quickly demonstrate the effectiveness of this
+> > patch. On a generic workstation equipped with 128 CPUs and 256GB DRAM:
+>
+> Not my area of maintenance, but a non-existent changelog (for all intents=
+ and
+> purposes) for a change of this size and complexity is not acceptable.
 
-> From: Brijesh Singh <brijesh.singh@amd.com>
-> 
-> The next generation of SEV is called SEV-SNP (Secure Nested Paging).
-> SEV-SNP builds upon existing SEV and SEV-ES functionality  while adding new
-> hardware based security protection. SEV-SNP adds strong memory encryption
-> integrity protection to help prevent malicious hypervisor-based attacks
-> such as data replay, memory re-mapping, and more, to create an isolated
-> execution environment.
-> 
-> The SNP feature is added incrementally, the later patches adds a new module
-> parameters that can be used to enabled SEV-SNP in the KVM.
-> 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->  arch/x86/kvm/svm/sev.c | 10 +++++++++-
->  arch/x86/kvm/svm/svm.h |  8 ++++++++
->  2 files changed, 17 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 9e9efb42a766..51db01b282eb 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -58,6 +58,9 @@ module_param_named(sev_es, sev_es_enabled, bool, 0444);
->  #define sev_es_enabled false
->  #endif /* CONFIG_KVM_AMD_SEV */
->  
-> +/* enable/disable SEV-SNP support */
-> +static bool sev_snp_enabled;
-> +
->  #define AP_RESET_HOLD_NONE		0
->  #define AP_RESET_HOLD_NAE_EVENT		1
->  #define AP_RESET_HOLD_MSR_PROTO		2
-> @@ -2306,6 +2309,7 @@ void __init sev_hardware_setup(void)
->  {
->  #ifdef CONFIG_KVM_AMD_SEV
->  	unsigned int eax, ebx, ecx, edx, sev_asid_count, sev_es_asid_count;
-> +	bool sev_snp_supported = false;
->  	bool sev_es_supported = false;
->  	bool sev_supported = false;
->  
-> @@ -2385,12 +2389,16 @@ void __init sev_hardware_setup(void)
->  	if (misc_cg_set_capacity(MISC_CG_RES_SEV_ES, sev_es_asid_count))
->  		goto out;
->  
-> -	pr_info("SEV-ES supported: %u ASIDs\n", sev_es_asid_count);
->  	sev_es_supported = true;
-> +	sev_snp_supported = sev_snp_enabled && cpu_feature_enabled(X86_FEATURE_SEV_SNP);
-> +
-> +	pr_info("SEV-ES %ssupported: %u ASIDs\n",
-> +		sev_snp_supported ? "and SEV-SNP " : "", sev_es_asid_count);
->  
->  out:
->  	sev_enabled = sev_supported;
->  	sev_es_enabled = sev_es_supported;
-> +	sev_snp_enabled = sev_snp_supported;
->  #endif
->  }
->  
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 5efcf036ccad..8eb1b51e92f5 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -76,6 +76,7 @@ enum {
->  struct kvm_sev_info {
->  	bool active;		/* SEV enabled guest */
->  	bool es_active;		/* SEV-ES enabled guest */
-> +	bool snp_active;	/* SEV-SNP enabled guest */
->  	unsigned int asid;	/* ASID used for this guest */
->  	unsigned int handle;	/* SEV firmware handle */
->  	int fd;			/* SEV device fd */
-> @@ -323,6 +324,13 @@ static __always_inline bool sev_es_guest(struct kvm *kvm)
->  #endif
->  }
->  
-> +static inline bool sev_snp_guest(struct kvm *kvm)
-> +{
-> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> +
-> +	return sev_es_guest(kvm) && sev->snp_active;
-> +}
-> +
+Will fix.
 
-Maybe also use __always_inline like sev_es_guest() above?
+> >   $ sudo max_guest_memory_test -c 64 -m 250 -s 250
+> >
+> >   MGLRU      run2
+> >   ---------------
+> >   Before    ~600s
+> >   After      ~50s
+> >   Off       ~250s
+> >
+> >   kswapd (MGLRU before)
+> >     100.00%  balance_pgdat
+> >       100.00%  shrink_node
+> >         100.00%  shrink_one
+> >           99.97%  try_to_shrink_lruvec
+> >             99.06%  evict_folios
+> >               97.41%  shrink_folio_list
+> >                 31.33%  folio_referenced
+> >                   31.06%  rmap_walk_file
+> >                     30.89%  folio_referenced_one
+> >                       20.83%  __mmu_notifier_clear_flush_young
+> >                         20.54%  kvm_mmu_notifier_clear_flush_young
+> >   =3D>                      19.34%  _raw_write_lock
+> >
+> >   kswapd (MGLRU after)
+> >     100.00%  balance_pgdat
+> >       100.00%  shrink_node
+> >         100.00%  shrink_one
+> >           99.97%  try_to_shrink_lruvec
+> >             99.51%  evict_folios
+> >               71.70%  shrink_folio_list
+> >                 7.08%  folio_referenced
+> >                   6.78%  rmap_walk_file
+> >                     6.72%  folio_referenced_one
+> >                       5.60%  lru_gen_look_around
+> >   =3D>                    1.53%  __mmu_notifier_test_clear_young
+>
+> Do you happen to know how much of the improvement is due to batching, and=
+ how
+> much is due to using a walkless walk?
 
-It seems solved some warnings before:
+No. I have three benchmarks running at the moment:
+1. Windows SQL server guest on x86 host,
+2. Apache Spark guest on arm64 host, and
+3. Memcached guest on ppc64 host.
 
-https://lore.kernel.org/all/20210624095147.880513802@infradead.org/
+If you are really interested in that, I can reprioritize -- I need to
+stop 1) and use that machine to get the number for you.
 
->  static inline void vmcb_mark_all_dirty(struct vmcb *vmcb)
->  {
->  	vmcb->control.clean = 0;
+> > @@ -5699,6 +5797,9 @@ static ssize_t show_enabled(struct kobject *kobj,=
+ struct kobj_attribute *attr, c
+> >       if (arch_has_hw_nonleaf_pmd_young() && get_cap(LRU_GEN_NONLEAF_YO=
+UNG))
+> >               caps |=3D BIT(LRU_GEN_NONLEAF_YOUNG);
+> >
+> > +     if (kvm_arch_has_test_clear_young() && get_cap(LRU_GEN_SPTE_WALK)=
+)
+> > +             caps |=3D BIT(LRU_GEN_SPTE_WALK);
+>
+> As alluded to in patch 1, unless batching the walks even if KVM does _not=
+_ support
+> a lockless walk is somehow _worse_ than using the existing mmu_notifier_c=
+lear_flush_young(),
+> I think batching the calls should be conditional only on LRU_GEN_SPTE_WAL=
+K.  Or
+> if we want to avoid batching when there are no mmu_notifier listeners, pr=
+obe
+> mmu_notifiers.  But don't call into KVM directly.
 
+I'm not sure I fully understand. Let's present the problem on the MM
+side: assuming KVM supports lockless walks, batching can still be
+worse (very unlikely), because GFNs can exhibit no memory locality at
+all. So this option allows userspace to disable batching.
+
+I fully understand why you don't want MM to call into KVM directly. No
+acceptable ways to set up a clear interface between MM and KVM other
+than the MMU notifier?
