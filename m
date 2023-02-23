@@ -2,194 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 145F66A0A86
-	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 14:31:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 12D3E6A0B96
+	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 15:13:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233628AbjBWNbe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Feb 2023 08:31:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33502 "EHLO
+        id S234082AbjBWONZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Feb 2023 09:13:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232110AbjBWNbd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Feb 2023 08:31:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2BFCE8
-        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 05:30:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677159043;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xDZjjn5RmTUwK0Z5V9GwPISKFG/ulCR4w2ujGzMQ8xs=;
-        b=fAgmF5kLEN8GtLpNWZD3cChmm0NWhbGmIG0Gie3aRWKYdeYghmM3FX3lCvWfKDfKrK/orA
-        aHOqsto6LSq/tTHwM5Kv4uTXxHsjpU2SY5UF4mliGCmvupiMFCSWDbcYvmRkmRyvbRfEdN
-        +sWQXLhYnahqmiNrV5TB07YUAB8Bs70=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-668-l5oJ7BT_NeGD30oy6ZPNDg-1; Thu, 23 Feb 2023 08:30:42 -0500
-X-MC-Unique: l5oJ7BT_NeGD30oy6ZPNDg-1
-Received: by mail-wm1-f70.google.com with SMTP id n27-20020a05600c3b9b00b003e9ca0f4677so1322447wms.8
-        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 05:30:41 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xDZjjn5RmTUwK0Z5V9GwPISKFG/ulCR4w2ujGzMQ8xs=;
-        b=keuQV0qPHxFINujmtvDA+lChuG03II1NVz4Vb6DqqnTUrhkX3gcVGfmBXvCgHf+jUX
-         ta0Ec0pabpOwUosoiR9akEmt1d510/k5j4OQUe2rLrGv9eZp4euEcsxvm3FWR/LCSCSA
-         XGcGmr3i4Dl64kHNQQ3cughPVqnwBxAgT5G5DxeLjuDiLsyLhjmwS2CeRsoVA5FYpeQz
-         d7FHphIU9w89G3mvhR1GWEehkIyHjltB/9b/MEuZ2LxOJ307RB7zC4VkCa8qHNEwMa1l
-         Nl8wvZwlvXh4+sCCgAfeUKhNOa83TzNnezown0hBjjpptqLhOrvOcnUfO3u8oiA45t9B
-         k80w==
-X-Gm-Message-State: AO0yUKWoKSRTUL3jKohHe+EODCHHSLfblOmLOOBpsgb75s/bnIOZrbPv
-        d7vNPbh+GfvTsWjp567d1xhEE5sXixBmHW+nGMT0wjhYg5lH8I5aYoJ2N3KhCyaZd5qcWbWAH89
-        zzK9zfIzSm2Ez
-X-Received: by 2002:a05:600c:747:b0:3db:262a:8ef with SMTP id j7-20020a05600c074700b003db262a08efmr3129443wmn.38.1677159040878;
-        Thu, 23 Feb 2023 05:30:40 -0800 (PST)
-X-Google-Smtp-Source: AK7set+vs2EMUMC2hNEDAwemSeRcndJMLxlIfrGTmmFUqLnvwkn1/5jjhheBJB9YtQHEw/bX6YJfYQ==
-X-Received: by 2002:a05:600c:747:b0:3db:262a:8ef with SMTP id j7-20020a05600c074700b003db262a08efmr3129421wmn.38.1677159040576;
-        Thu, 23 Feb 2023 05:30:40 -0800 (PST)
-Received: from [192.168.8.104] (tmo-100-40.customers.d1-online.com. [80.187.100.40])
-        by smtp.gmail.com with ESMTPSA id u10-20020a5d514a000000b002c55ed9e314sm8763681wrt.64.2023.02.23.05.30.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Feb 2023 05:30:39 -0800 (PST)
-Message-ID: <74aa9221-debc-84a6-d5bf-0a549018c7c9@redhat.com>
-Date:   Thu, 23 Feb 2023 14:30:37 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        with ESMTP id S233513AbjBWONY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Feb 2023 09:13:24 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26F5A2332E
+        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 06:13:23 -0800 (PST)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31NECLJU002916;
+        Thu, 23 Feb 2023 14:13:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=G8Y1tG5cyVju22NcyeTVHx7S4BXX+hfZbpp8x+4dwJQ=;
+ b=Lwgwjz49qgYqKw8BxNlG3oWeA583nmqaubYTz9DdHpKXC1Soiri7qTClSs7a64jZsBls
+ HA4Oj3PPNcqa69PhpWgrgz3elNiMvM5y6Tm/3XdtxoOqTJjbHpvurGnu/tS9pN+B6j9F
+ SoOCAMtyW1CK98ZnYfLffEYPGW1rK/tL05dJOar7vYa5Z2dvygKdGj9HoUqiZwvEFJ9B
+ jGgIwjmxe2/VkRASQePb0MwJ5Uqwu1RRWlRdZ8Erjg8ocbHqU5cIhlOo+gBah4XcMy5S
+ BFL+nxbLWBbltKDnLVi9j+XGRmjjRruryYJenMXWWAc14dFjNDgaZLHaPJbRvwIndQyl 7Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nx9pug0hm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 23 Feb 2023 14:13:08 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31NECvtL008162;
+        Thu, 23 Feb 2023 14:13:08 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nx9pug0h1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 23 Feb 2023 14:13:08 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31N8uRXY007338;
+        Thu, 23 Feb 2023 14:13:05 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3ntpa6ern7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 23 Feb 2023 14:13:05 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31NED1nx23134578
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 23 Feb 2023 14:13:01 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C54522004B;
+        Thu, 23 Feb 2023 14:13:01 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5AD2220040;
+        Thu, 23 Feb 2023 14:13:01 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.164.163])
+        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Thu, 23 Feb 2023 14:13:01 +0000 (GMT)
+Message-ID: <969c9ec842174876d514d082afe1c383baf58b99.camel@linux.ibm.com>
+Subject: Re: [PATCH v16 02/11] s390x/cpu topology: add topology entries on
+ CPU hotplug
+From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To:     pierre <pierre@imap.linux.ibm.com>, Thomas Huth <thuth@redhat.com>
+Cc:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org,
+        qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
         richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
         mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
         ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
         armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        nsg@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
-        clg@kaod.org
+        frankja@linux.ibm.com, berrange@redhat.com, clg@kaod.org
+Date:   Thu, 23 Feb 2023 15:13:01 +0100
+In-Reply-To: <a19eb89ab4841e389e72b50ec017ae01@imap.linux.ibm.com>
 References: <20230222142105.84700-1-pmorel@linux.ibm.com>
- <20230222142105.84700-4-pmorel@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v16 03/11] target/s390x/cpu topology: handle STSI(15) and
- build the SYSIB
-In-Reply-To: <20230222142105.84700-4-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+         <20230222142105.84700-3-pmorel@linux.ibm.com>
+         <4bd16293-62e8-d7ea-dab4-9e5cb0208812@redhat.com>
+         <a19eb89ab4841e389e72b50ec017ae01@imap.linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.3 (3.46.3-1.fc37) 
+MIME-Version: 1.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: OPgKtQsmFgLHN4CDS9qiQuTH-NcForNk
+X-Proofpoint-GUID: SOEf9730xJfzujg0SkO-1kLWvCLDfCY1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-23_08,2023-02-23_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ lowpriorityscore=0 spamscore=0 malwarescore=0 mlxscore=0 bulkscore=0
+ mlxlogscore=999 priorityscore=1501 suspectscore=0 adultscore=0
+ clxscore=1015 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302230115
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/02/2023 15.20, Pierre Morel wrote:
-> On interception of STSI(15.1.x) the System Information Block
-> (SYSIB) is built from the list of pre-ordered topology entries.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
-...
-> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> index d654267a71..c899f4e04b 100644
-> --- a/target/s390x/cpu.h
-> +++ b/target/s390x/cpu.h
-> @@ -560,6 +560,25 @@ typedef struct SysIB_322 {
->   } SysIB_322;
->   QEMU_BUILD_BUG_ON(sizeof(SysIB_322) != 4096);
->   
-> +#define S390_TOPOLOGY_MAG  6
-> +#define S390_TOPOLOGY_MAG6 0
-> +#define S390_TOPOLOGY_MAG5 1
-> +#define S390_TOPOLOGY_MAG4 2
-> +#define S390_TOPOLOGY_MAG3 3
-> +#define S390_TOPOLOGY_MAG2 4
-> +#define S390_TOPOLOGY_MAG1 5
-> +/* Configuration topology */
-> +typedef struct SysIB_151x {
-> +    uint8_t  reserved0[2];
-> +    uint16_t length;
-> +    uint8_t  mag[S390_TOPOLOGY_MAG];
-> +    uint8_t  reserved1;
-> +    uint8_t  mnest;
-> +    uint32_t reserved2;
-> +    char tle[];
-> +} QEMU_PACKED QEMU_ALIGNED(8) SysIB_151x;
-> +QEMU_BUILD_BUG_ON(sizeof(SysIB_151x) != 16);
+On Thu, 2023-02-23 at 15:06 +0100, pierre wrote:
+> On 2023-02-23 13:53, Thomas Huth wrote:
+> > On 22/02/2023 15.20, Pierre Morel wrote:
+> > > The topology information are attributes of the CPU and are
+> > > specified during the CPU device creation.
+> > ...
+> > > diff --git a/include/hw/s390x/cpu-topology.h=20
+> > > b/include/hw/s390x/cpu-topology.h
+> > > index 83f31604cc..fa7f885a9f 100644
+> > > --- a/include/hw/s390x/cpu-topology.h
+> > > +++ b/include/hw/s390x/cpu-topology.h
+> > > @@ -10,6 +10,47 @@
+> > >   #ifndef HW_S390X_CPU_TOPOLOGY_H
+> > >   #define HW_S390X_CPU_TOPOLOGY_H
+> > >   +#include "qemu/queue.h"
+> > > +#include "hw/boards.h"
+> > > +#include "qapi/qapi-types-machine-target.h"
+> > > +
+> > >   #define S390_TOPOLOGY_CPU_IFL   0x03
+> > >   +typedef struct S390Topology {
+> > > +    uint8_t *cores_per_socket;
+> > > +    CpuTopology *smp;
+> > > +    CpuS390Polarization polarization;
+> > > +} S390Topology;
+> > > +
+> > > +#ifdef CONFIG_KVM
+> > > +bool s390_has_topology(void);
+> > > +void s390_topology_setup_cpu(MachineState *ms, S390CPU *cpu, Error=
+=20
+> > > **errp);
+> > > +#else
+> > > +static inline bool s390_has_topology(void)
+> > > +{
+> > > +       return false;
+> > > +}
+> > > +static inline void s390_topology_setup_cpu(MachineState *ms,
+> > > +                                           S390CPU *cpu,
+> > > +                                           Error **errp) {}
+> > > +#endif
+> > > +
+> > > +extern S390Topology s390_topology;
+> > > +int s390_socket_nb(S390CPU *cpu);
+> > > +
+> > > +static inline int s390_std_socket(int n, CpuTopology *smp)
+> > > +{
+> > > +    return (n / smp->cores) % smp->sockets;
+> > > +}
+> > > +
+> > > +static inline int s390_std_book(int n, CpuTopology *smp)
+> > > +{
+> > > +    return (n / (smp->cores * smp->sockets)) % smp->books;
+> > > +}
+> > > +
+> > > +static inline int s390_std_drawer(int n, CpuTopology *smp)
+> > > +{
+> > > +    return (n / (smp->cores * smp->sockets * smp->books)) %=20
+> > > smp->books;
+> >=20
+> > Shouldn't that be " % smp->drawers" instead?
+>=20
+> /o\  Yes it is of course.
+> thanks.
 
-I think one of the two is enough, either QEMU_PACKED or QEMU_BUILD_BUG_ON. 
-Since QEMU_PACKED caused us some troubles in the past already, I'd prefer 
-QEMU_BUILD_BUG_ON only here.
-
-Also, do we really need the QEMU_ALIGNED() here? ... I don't think so, and 
-we also hardly use that anywhere else in the s390x code, so please drop 
-that, too (unless there is a real reason for this?).
-
-> @@ -567,9 +586,62 @@ typedef union SysIB {
->       SysIB_221 sysib_221;
->       SysIB_222 sysib_222;
->       SysIB_322 sysib_322;
-> +    SysIB_151x sysib_151x;
->   } SysIB;
->   QEMU_BUILD_BUG_ON(sizeof(SysIB) != 4096);
->   
-> +/*
-> + * CPU Topology List provided by STSI with fc=15 provides a list
-> + * of two different Topology List Entries (TLE) types to specify
-> + * the topology hierarchy.
-> + *
-> + * - Container Topology List Entry
-> + *   Defines a container to contain other Topology List Entries
-> + *   of any type, nested containers or CPU.
-> + * - CPU Topology List Entry
-> + *   Specifies the CPUs position, type, entitlement and polarization
-> + *   of the CPUs contained in the last Container TLE.
-> + *
-> + * There can be theoretically up to five levels of containers, QEMU
-> + * uses only three levels, the drawer's, book's and socket's level.
-> + *
-> + * A container of with a nesting level (NL) greater than 1 can only
-> + * contain another container of nesting level NL-1.
-> + *
-> + * A container of nesting level 1 (socket), contains as many CPU TLE
-> + * as needed to describe the position and qualities of all CPUs inside
-> + * the container.
-> + * The qualities of a CPU are polarization, entitlement and type.
-> + *
-> + * The CPU TLE defines the position of the CPUs of identical qualities
-> + * using a 64bits mask which first bit has its offset defined by
-> + * the CPU address orgin field of the CPU TLE like in:
-> + * CPU address = origin * 64 + bit position within the mask
-> + *
-> + */
-> +/* Container type Topology List Entry */
-> +typedef struct SysIBTl_container {
-> +        uint8_t nl;
-> +        uint8_t reserved[6];
-> +        uint8_t id;
-> +} QEMU_PACKED QEMU_ALIGNED(8) SysIBTl_container;
-
-dito, please drop QEMU_PACKED and QEMU_ALIGNED() if possible.
-
-> +QEMU_BUILD_BUG_ON(sizeof(SysIBTl_container) != 8);
-> +
-> +/* CPU type Topology List Entry */
-> +typedef struct SysIBTl_cpu {
-> +        uint8_t nl;
-> +        uint8_t reserved0[3];
-> +#define SYSIB_TLE_POLARITY_MASK 0x03
-> +#define SYSIB_TLE_DEDICATED     0x04
-> +        uint8_t flags;
-> +        uint8_t type;
-> +        uint16_t origin;
-> +        uint64_t mask;
-> +} QEMU_PACKED QEMU_ALIGNED(8) SysIBTl_cpu;
-
-dito
-
-  Thomas
+You can also just drop the modulo, since
+n < core * sockets * books * drawers. Not that % drawers does any harm ofc.
+>=20
+[...]
 
