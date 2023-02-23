@@ -2,128 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 14AEC6A0476
-	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 10:07:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9ADF76A049F
+	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 10:19:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233112AbjBWJHQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Feb 2023 04:07:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36188 "EHLO
+        id S233881AbjBWJTD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Feb 2023 04:19:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232238AbjBWJHO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Feb 2023 04:07:14 -0500
-Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D169848E38;
-        Thu, 23 Feb 2023 01:07:12 -0800 (PST)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailout.nyi.internal (Postfix) with ESMTP id 835E65C011B;
-        Thu, 23 Feb 2023 04:07:10 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute5.internal (MEProxy); Thu, 23 Feb 2023 04:07:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
-        :cc:content-type:date:date:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to; s=fm1; t=1677143230; x=1677229630; bh=SlVfI1SWS9
-        Y9mAoOlL1DgHom0T2b0UsGN6oj+8Qk3tw=; b=LohVrk+XhC9T3KQKLiRhC93SSN
-        QAHm3KubWcAV4ILHy13r8Xy++QRQImr/VMeU8quz05stfigL3om8CrgH0LlAYYHp
-        pR7V8krmjn6ThaFCImZNoWlFuZSXb/VVHXq1GVbm9CgTqVqxNmQjynNkzrVycvmG
-        QR74rLaHCNZBhhZymObWtDPJggD9IXNfDzZ4b+ePZGewmBYL58hFWzQm9fx0tlV/
-        DVtfLQJ+hKnJ8/ThsD+G8x8sa5GRSPvcJ6CH6wOqAHS98AeNn6+JbM4SGpiIcxqn
-        m+i5D/cGfLZeKYTaEeVTFj/LiBxZblXDt0be6L4bfJxwHBSKRZcDkHWkMBSg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm1; t=1677143230; x=1677229630; bh=SlVfI1SWS9Y9mAoOlL1DgHom0T2b
-        0UsGN6oj+8Qk3tw=; b=oRwhlMhbufKMqAkr4BMofP+qUyGKRguKNjhrHD/sQgUh
-        Ja3wvw9yK6NW2lT1KaAtzPYVzwIc7B/Sa0bv1ig39ECa0da+gKIfoG5MNFDr1dsP
-        dVBBjlq898NXy2+eJJeQB+LNKTuNYWFo1zr+em8Mvc4doZVbUzupB6MhPeo1pFct
-        B9/tcyGKgzrkILfLZiK3TZQzDfi08BIGltEvJVn1e+DqMrqVVS9cKE6KAtuAvHnX
-        IR+fU86UUce7haoph36NRgtdmI9y+Slc87r8dLxVjRCEjpKdBtHHQA89RnI/6P33
-        IWkiImBAq6fG2zA84FUjVWw0vxj3QBzXwL0s1TLmUg==
-X-ME-Sender: <xms:viz3Yz2m1jn7N-IzAh2fB4WFJ6Be8Br4Nmp3Fd1ThbdGUrnP_1LHyA>
-    <xme:viz3YyGy8eduZUTDoLWjGDbJPQWaoqRllhmGzXjTL66qHpOSYMmqDFaGacnDlON6U
-    u0DuTedha_TFA>
-X-ME-Received: <xmr:viz3Yz7WvrPPiSlnzO3RPOj2Gbl8Q96x5MnX1qCc9Xo61u5i6tjjR5aGuAoVKNTlfYuQ8YqHxOuDEI-UeMoziQpYwzrVCspl7ad8gw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrudektddguddvhecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefirhgv
-    ghcumffjuceoghhrvghgsehkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpeeghe
-    euhefgtdeluddtleekfeegjeetgeeikeehfeduieffvddufeefleevtddtvdenucffohhm
-    rghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
-    hmpehmrghilhhfrhhomhepghhrvghgsehkrhhorghhrdgtohhm
-X-ME-Proxy: <xmx:viz3Y41YyIZ1lOgyQ2AkviRg2_FQDIww94J38mfkuDrKup24n4E8UA>
-    <xmx:viz3Y2EmHIdE23Y7luZGLhmvGKZmTyK-nImBfVNaqwdep7HGZPWeWA>
-    <xmx:viz3Y58ZytGAXg-lSD2wSiOVuqcw7GG7L6x4F2WlKno5tICUHZf40Q>
-    <xmx:viz3Y-8SzdoUeT50BEPLbyjnkvrHE1AFPcpXsx3gnrz5byHBZMnJ8w>
-Feedback-ID: i787e41f1:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 23 Feb 2023 04:07:09 -0500 (EST)
-Date:   Thu, 23 Feb 2023 10:07:07 +0100
-From:   Greg KH <greg@kroah.com>
-To:     Ovidiu Panait <ovidiu.panait@eng.windriver.com>
-Cc:     stable@vger.kernel.org, pbonzini@redhat.com, kvm@vger.kernel.org,
-        Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH 6.1/5.15/5.10/5.4 1/1] KVM: VMX: Execute IBPB on emulated
- VM-exit when guest has IBRS
-Message-ID: <Y/csu6ScK0XqhIPL@kroah.com>
-References: <20230222100625.1409958-1-ovidiu.panait@eng.windriver.com>
+        with ESMTP id S229502AbjBWJTC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Feb 2023 04:19:02 -0500
+Received: from mail-vs1-xe33.google.com (mail-vs1-xe33.google.com [IPv6:2607:f8b0:4864:20::e33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5937810266
+        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 01:19:01 -0800 (PST)
+Received: by mail-vs1-xe33.google.com with SMTP id d20so6547633vsf.11
+        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 01:19:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1677143940;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jJG07+p6MKBGS+KUMirk1JxFZsTo6RYQStGyBrR/Eec=;
+        b=VTUwGjwxIdIk+8DQo1F08zqK342XkE0IyISiKy445xlO4gn5BcvtIN8ObhUibjnPdh
+         +8QCDzAGRnNMibyH/sRteQ9ut7OJkOEsJ8kPkEGYc9OBnih7SfNQpowLXMcwoFUvs1K0
+         6ELBLUgwh0HmEnFhlM7FrYYPj3mzKwUNEEOe1h31zEj9FFkZtgtvcDAl/ADLU4zCLTaC
+         CZOb1xxY9uT50WPXBxvhwk3EuLggirXkkdcMLU8rlZo6fi998cB25h17CFWSnwQ6kgUi
+         scHNy8oFEGRxc67FjqT0UL/HkF89zud1sd74gtEScsUHorUBPQzjefZ88i8TDYmSUg2T
+         qgLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1677143940;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jJG07+p6MKBGS+KUMirk1JxFZsTo6RYQStGyBrR/Eec=;
+        b=DdW9Z1ASmFRbWWRJSSiPUL+vnwfzn83bC6cJ5KFT96DYG8su1/WrInujw1yDInER7K
+         AmSkeosRsu2AXSkvy/VQqv9d6dwTK7fRJQRXyGWMLYoJf3MAFNDJOFQHMTiAxLhoIC82
+         KGoUS2kDehhpwQEZMKTZ+2PF8Y8npg+K+J/BpmOX/dP7o1JVwi2W+tLH075JQvc3nAnh
+         otGiBeTpgmTycAL91pxtCeU4VmrSvjeBOD9gzT3pe1GjEfRor4fzL6La75vVVsFiBB7y
+         rfU5qnBcGspVUa+GfzpVnTzDInJo6tc99xb1kacEmDx89AjsNhp6drRBklJtjA3YVeOj
+         QOjg==
+X-Gm-Message-State: AO0yUKWwPo/yfF0saoOXTAsgkB912XGpuqAEMZqjxvQi3WIjtYLMbIOO
+        4yfDv51QdvFrkkk1znb6G9aTtnDZzG/8x/uEXr1lIg==
+X-Google-Smtp-Source: AK7set+fL9K7BQue1MVWJ997o1Uw4HQUESRxfTJt3q61lF9gsBJ2K4+iBi+Hrae4wfMfj+Ek0HWi8Lg5PF2Mvbw7Sx4=
+X-Received: by 2002:a1f:aa41:0:b0:412:948:73ff with SMTP id
+ t62-20020a1faa41000000b00412094873ffmr251161vke.13.1677143940266; Thu, 23 Feb
+ 2023 01:19:00 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230222100625.1409958-1-ovidiu.panait@eng.windriver.com>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20230217041230.2417228-1-yuzhao@google.com> <20230217041230.2417228-4-yuzhao@google.com>
+ <CAOUHufYSx-edDVCZSauOzwOJG6Av0++0TFT4ko8qWq7vLi_mjw@mail.gmail.com>
+ <86lekwy8d7.wl-maz@kernel.org> <CAOUHufbbs2gG+DPvSOw_N_Kx7FWdZvpdJUvLzko-BDQ8vfd6Xg@mail.gmail.com>
+ <86a614ycs3.wl-maz@kernel.org>
+In-Reply-To: <86a614ycs3.wl-maz@kernel.org>
+From:   Yu Zhao <yuzhao@google.com>
+Date:   Thu, 23 Feb 2023 02:18:24 -0700
+Message-ID: <CAOUHufYLmu7oowXZ5YmVJqgx5dHWdz-1eaqPiVzUq3RAY4e_6A@mail.gmail.com>
+Subject: Re: [PATCH mm-unstable v1 3/5] kvm/arm64: add kvm_arch_test_clear_young()
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+        Michael Larabel <michael@michaellarabel.com>,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, x86@kernel.org,
+        linux-mm@google.com, Andrew Morton <akpm@linux-foundation.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 22, 2023 at 12:06:25PM +0200, Ovidiu Panait wrote:
-> From: Jim Mattson <jmattson@google.com>
-> 
-> commit 2e7eab81425ad6c875f2ed47c0ce01e78afc38a5 upstream.
-> 
-> According to Intel's document on Indirect Branch Restricted
-> Speculation, "Enabling IBRS does not prevent software from controlling
-> the predicted targets of indirect branches of unrelated software
-> executed later at the same predictor mode (for example, between two
-> different user applications, or two different virtual machines). Such
-> isolation can be ensured through use of the Indirect Branch Predictor
-> Barrier (IBPB) command." This applies to both basic and enhanced IBRS.
-> 
-> Since L1 and L2 VMs share hardware predictor modes (guest-user and
-> guest-kernel), hardware IBRS is not sufficient to virtualize
-> IBRS. (The way that basic IBRS is implemented on pre-eIBRS parts,
-> hardware IBRS is actually sufficient in practice, even though it isn't
-> sufficient architecturally.)
-> 
-> For virtual CPUs that support IBRS, add an indirect branch prediction
-> barrier on emulated VM-exit, to ensure that the predicted targets of
-> indirect branches executed in L1 cannot be controlled by software that
-> was executed in L2.
-> 
-> Since we typically don't intercept guest writes to IA32_SPEC_CTRL,
-> perform the IBPB at emulated VM-exit regardless of the current
-> IA32_SPEC_CTRL.IBRS value, even though the IBPB could technically be
-> deferred until L1 sets IA32_SPEC_CTRL.IBRS, if IA32_SPEC_CTRL.IBRS is
-> clear at emulated VM-exit.
-> 
-> This is CVE-2022-2196.
-> 
-> Fixes: 5c911beff20a ("KVM: nVMX: Skip IBPB when switching between vmcs01 and vmcs02")
-> Cc: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
-> Link: https://lore.kernel.org/r/20221019213620.1953281-3-jmattson@google.com
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Ovidiu Panait <ovidiu.panait@eng.windriver.com>
-> ---
+On Thu, Feb 23, 2023 at 2:03=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
+:
+>
+> On Thu, 23 Feb 2023 03:58:47 +0000,
+> Yu Zhao <yuzhao@google.com> wrote:
+> >
+> > On Fri, Feb 17, 2023 at 2:00=E2=80=AFAM Marc Zyngier <maz@kernel.org> w=
+rote:
+> > >
+> > > On Fri, 17 Feb 2023 04:21:28 +0000,
+> > > Yu Zhao <yuzhao@google.com> wrote:
+> > > >
+> > > > On Thu, Feb 16, 2023 at 9:12 PM Yu Zhao <yuzhao@google.com> wrote:
+> > > > >
+> > > > > This patch adds kvm_arch_test_clear_young() for the vast majority=
+ of
+> > > > > VMs that are not pKVM and run on hardware that sets the accessed =
+bit
+> > > > > in KVM page tables.
+> > >
+> > > I'm really interested in how you can back this statement. 90% of the
+> > > HW I have access to is not FEAT_HWAFDB capable, either because it
+> > > predates the feature or because the feature is too buggy to be useful=
+.
+> >
+> > This is my expericen too -- most devices are pre v8.2.
+>
+> And yet you have no issue writing the above. Puzzling.
 
-This was already added to the queues, thanks.
+That's best to my knowledge. Mind enlightening me?
 
-greg k-h
+> > > Do you have numbers?
+> >
+> > Let's do a quick market survey by segment. The following only applies
+> > to ARM CPUs:
+> >
+> > 1. Phones: none of the major Android phone vendors sell phones running
+> > VMs; no other major Linux phone vendors.
+>
+> Maybe you should have a reality check and look at what your own
+> employer is shipping.
+
+Which model? I'll look it up and see how/how I missed it.
+
+> > 2. Laptops: only a very limited number of Chromebooks run VMs, namely
+> > ACRVM. No other major Linux laptop vendors.
+>
+> Again, your employer disagree.
+
+What do you mean? Sorry, I'm a little surprised here... I do know *a
+lot* about Chromebooks.
+
+> > 3. Desktops: no major Linux desktop vendors.
+>
+> My desktop disagree (I send this from my arm64 desktop VM ).
+
+A model number please?
+
+> > 4. Embedded/IoT/Router: no major Linux vendors run VMs (Android Auto
+> > can be a VM guest on QNX host).
+>
+> This email is brought to you via a router VM on an arm64 box.
+
+More details?
+
+> > 5. Cloud: this is where the vast majority VMs come from. Among the
+> > vendors available to the general public, Ampere is the biggest player.
+> > Here [1] is a list of its customers. The A-bit works well even on its
+> > EVT products (Neoverse cores).
+>
+> Just the phone stuff dwarfs the number of cloud hosts.
+
+Please point me to something that I can work on so that I wouldn't
+sound so ignorant next time.
