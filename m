@@ -2,56 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 185AE6A12D9
-	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 23:34:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 29CB76A12DD
+	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 23:40:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229605AbjBWWeX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Feb 2023 17:34:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36206 "EHLO
+        id S229540AbjBWWk3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Feb 2023 17:40:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229487AbjBWWeW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Feb 2023 17:34:22 -0500
-Received: from mail-io1-xd49.google.com (mail-io1-xd49.google.com [IPv6:2607:f8b0:4864:20::d49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FB8412BC5
-        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 14:34:21 -0800 (PST)
-Received: by mail-io1-xd49.google.com with SMTP id i70-20020a6b3b49000000b0074c7f0b085dso6199035ioa.22
-        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 14:34:21 -0800 (PST)
+        with ESMTP id S229476AbjBWWk2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Feb 2023 17:40:28 -0500
+Received: from mail-io1-xd4a.google.com (mail-io1-xd4a.google.com [IPv6:2607:f8b0:4864:20::d4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D20354A06
+        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 14:40:27 -0800 (PST)
+Received: by mail-io1-xd4a.google.com with SMTP id t68-20020a6bc347000000b0074caed3a2d2so85309iof.12
+        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 14:40:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=f5G8pOd3SsfHOvb383fp62P/cWOAfsSg8HgIFePsLTI=;
-        b=Qts9DQIFDgpqPqkY2OB27ix9hDXO1g3+ptGVYA1Iak34y4N1HJjFRKpLPGhtgJBV0g
-         2k0YDKTOX564NphkIu58VRqd6vDYuFiIB86gEWhsUurO5VrtrgCHt4JcOVZ7Q4dYbOEE
-         /udVuJxucJpD3gnT/ALck3wSRWXavzAHIR9SfqDkKK4ooPA6HAlXQ44/cnuG20rqr25j
-         eFrEAJLrP1tLlGzm+0lPHKozvjct25Ntr3XXP9bpFvZza+jZEtz9SuJ1aQwPEFMdCJ/4
-         PJ9s1SuANSRqZQQ38Jl5sKU8n+9HghXjLKphcYQ70P3HX4M5ctZ5+Sh4mYdxQxS3yXLR
-         liBA==
+        bh=H7DW1E7YDz23DUtDKapMOgWWzaxvMLvR5mEfkeUQPGk=;
+        b=Jhluh9+e5VRpjYu5+kcBiTA94nGVEILdRx7wwIvaiTJjLwaZFO2mOl/BrEnLr+dySN
+         vUJMjDh79tOham1v5ryHa+M00dxh7b4tY1Xz/O+ncjzzyxKxLKyHJHua1HOXENJk7FaN
+         +QXXyFuWQfJl7bafhkPoK/8Eom7tvtF05PwOTRpbnlIzgM6vJ1nqhtwoCcP2zhCXS47H
+         Cc7EatoGy3sYeGUCierAqMzFWXu0KHeDUzFxyiIMcf6QwGK8aDBC9ZECLrDg9xsvVVQ/
+         nKC9izGs4oVvgbaazrUnqT3uuX9GLMRs7vyWEQ8TID9KkhUIPVsjn/pTCAJYnB18IoNe
+         8dPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=f5G8pOd3SsfHOvb383fp62P/cWOAfsSg8HgIFePsLTI=;
-        b=FmehCgfTHkhmDOdHOVdbQySuuThXV9QItiLVQzdPQyqi3r8YVvyxWAZKz0EtLsv49O
-         1ZAAIkvZB4kI+O3yDFZiz2l3hQ+L6+oIc8FsUO5yzjYXUwkyvc5mHJMLs2gRK6ZBV58M
-         d7BAZ6tFyufWgJPOD1XgNueWPte2lsgrJ6tG3KIoEbb8Bhluc6UIhNeXCGFzYwp+MPPh
-         UyE0g7CtDN+pf65CmP+qBucuUAZSox9CZkfGMuqXyPGahhqOcrs9mXMj82jgEmG+qxV2
-         XYDZxW+f/VKeNWvRl2FNwEi93MoRcfF642ob4Pdj0EwwYcRaXkO5jDIKM4Zsi11L9t0k
-         tkHA==
-X-Gm-Message-State: AO0yUKV9Xsf6Qy58pVhdGDvYp2NnrF/T17wRLdrwyFG5kB+BJfjIusGT
-        WCY8qAwxKp8hdHbaRqLvOe+9c1wB+SZXwEZvgQ==
-X-Google-Smtp-Source: AK7set8TaSIyth8jADCSw+x57VUjquM5K/QIekc64rxEpvlrEXEvHiHLNvBm/FfKB1f11iiuNTja2L3YSW+/JELC6Q==
+        bh=H7DW1E7YDz23DUtDKapMOgWWzaxvMLvR5mEfkeUQPGk=;
+        b=E+Tv1puC5q9OrHDzu8Uncrhj43IKPhdyvf3/ki/hYNe8bM/+e8ax8eA1mTuO+GN4vb
+         6L4G1uFURlWKUkk6dUJSsD99BkHWQXzMzomLtEFR5taOYP5UjzPIcyl0duoTESsmcs7i
+         Qe5OGhJXRtuRvC3tGnY3YwRxyHeTaM+fdJ3R2ptMK+D/8OMA8mOhrx/SbL7Cwvw5trI3
+         rUwtb44A5/1A1QeIuaRVI8HT7t/laJ+3lqVkqWQ4s/C+DOdokuC8NnL8quutxuh3dHih
+         4rGGhQ/li21f0UuFR5Ox9hlVhofMOe8CtqSfJKQD7t+2X1RpSQh8NE1JRfBT7vvwVWrY
+         4grw==
+X-Gm-Message-State: AO0yUKXrOSH4IhdC4ReV1jcVXhXfeMD0iBhLg5MB5U0JElQsuA/7PChB
+        AIig7x3DUGqhJwTnTAytcc/IiMegM8aNZ313wQ==
+X-Google-Smtp-Source: AK7set9wg+5HcHPYkzP9dXHsc+T600jg65CBBFaIxpNQfWNqODZyyLry6GpHALNx1bvDDiS0OqkdfbWH0jUWpKBqUA==
 X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a05:6638:10f5:b0:3b7:9d19:fec7 with
- SMTP id g21-20020a05663810f500b003b79d19fec7mr5136649jae.0.1677191660511;
- Thu, 23 Feb 2023 14:34:20 -0800 (PST)
-Date:   Thu, 23 Feb 2023 22:34:19 +0000
-In-Reply-To: <20230216142123.2638675-7-maz@kernel.org> (message from Marc
- Zyngier on Thu, 16 Feb 2023 14:21:13 +0000)
+ (user=coltonlewis job=sendgmr) by 2002:a05:6e02:ee1:b0:30e:e796:23c1 with
+ SMTP id j1-20020a056e020ee100b0030ee79623c1mr3693592ilk.1.1677192026614; Thu,
+ 23 Feb 2023 14:40:26 -0800 (PST)
+Date:   Thu, 23 Feb 2023 22:40:25 +0000
+In-Reply-To: <20230216142123.2638675-8-maz@kernel.org> (message from Marc
+ Zyngier on Thu, 16 Feb 2023 14:21:14 +0000)
 Mime-Version: 1.0
-Message-ID: <gsntzg948104.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH 06/16] KVM: arm64: timers: Use CNTPOFF_EL2 to offset the
- physical timer
+Message-ID: <gsnty1oo80py.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH 07/16] KVM: arm64: timers: Allow physical offset without CNTPOFF_EL2
 From:   Colton Lewis <coltonlewis@google.com>
 To:     Marc Zyngier <maz@kernel.org>
 Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -71,48 +70,81 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-CNTPOFF_EL2 should probably be added to the vcpu_sysreg enum in
-kvm_host.h for this patch. This seemed like the most relevant commit.
-
 Marc Zyngier <maz@kernel.org> writes:
 
-> +static bool has_cntpoff(void)
-> +{
-> +	return (has_vhe() && cpus_have_final_cap(ARM64_HAS_ECV_CNTPOFF));
-> +}
+> +/* If _pred is true, set bit in _set, otherwise set it in _clr */
+> +#define assign_clear_set_bit(_pred, _bit, _clr, _set)			\
+> +	do {								\
+> +		if (_pred)						\
+> +			(_set) |= (_bit);				\
+> +		else							\
+> +			(_clr) |= (_bit);				\
+> +	} while (0)
 > +
 
-This being used to guard the register in set_cntpoff seems to say that
-we can only write CNTPOFF in VHE mode. Since it's possible the
-underlying hardware could still support CNTPOFF even if KVM is running
-in nVHE mode, should there be a way to set CNTPOFF in nVHE mode? Is that
-possible?
+I don't think the do-while wrapper is necessary. Is there any reason
+besides style guide conformance?
 
-This caused some confusion for me on my implementation as some teammates
-thought so but I could not get an implementation working for nVHE mode.
+> +	/*
+> +	 * We have two possibility to deal with a physical offset:
+> +	 *
+> +	 * - Either we have CNTPOFF (yay!) or the offset is 0:
+> +	 *   we let the guest freely access the HW
+> +	 *
+> +	 * - or neither of these condition apply:
+> +	 *   we trap accesses to the HW, but still use it
+> +	 *   after correcting the physical offset
+> +	 */
+> +	if (!has_cntpoff() && timer_get_offset(map->direct_ptimer))
+> +		tpt = tpc = true;
 
-> @@ -84,7 +89,7 @@ u64 timer_get_cval(struct arch_timer_context *ctxt)
+If there are only two possibilites, then two different booleans makes
+things more complicated than it has to be.
 
->   static u64 timer_get_offset(struct arch_timer_context *ctxt)
+> +	assign_clear_set_bit(tpt, CNTHCTL_EL1PCEN << 10, set, clr);
+> +	assign_clear_set_bit(tpc, CNTHCTL_EL1PCTEN << 10, set, clr);
+
+Might be good to name the 10 something like VHE_SHIFT so people know why
+it is applied.
+
+> +
+> +
+> +	timer_set_traps(vcpu, &map);
+>   }
+
+>   bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu)
+> @@ -1293,27 +1363,12 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+>   }
+
+>   /*
+> - * On VHE system, we only need to configure the EL2 timer trap register  
+> once,
+> - * not for every world switch.
+> - * The host kernel runs at EL2 with HCR_EL2.TGE == 1,
+> - * and this makes those bits have no effect for the host kernel  
+> execution.
+> + * If we have CNTPOFF, permanently set ECV to enable it.
+>    */
+>   void kvm_timer_init_vhe(void)
 >   {
-> -	if (ctxt->offset.vm_offset)
-> +	if (ctxt && ctxt->offset.vm_offset)
->   		return *ctxt->offset.vm_offset;
+> -	/* When HCR_EL2.E2H ==1, EL1PCEN and EL1PCTEN are shifted by 10 */
+> -	u32 cnthctl_shift = 10;
+> -	u64 val;
+> -
+> -	/*
+> -	 * VHE systems allow the guest direct access to the EL1 physical
+> -	 * timer/counter.
+> -	 */
+> -	val = read_sysreg(cnthctl_el2);
+> -	val |= (CNTHCTL_EL1PCEN << cnthctl_shift);
+> -	val |= (CNTHCTL_EL1PCTEN << cnthctl_shift);
+>   	if (cpus_have_final_cap(ARM64_HAS_ECV_CNTPOFF))
+> -		val |= CNTHCTL_ECV;
+> -	write_sysreg(val, cnthctl_el2);
+> +		sysreg_clear_set(cntkctl_el1, 0, CNTHCTL_ECV);
+>   }
 
->   	return 0;
-
-nit: this change should be in the previous commit
-
-> @@ -480,6 +491,7 @@ static void timer_save_state(struct  
-> arch_timer_context *ctx)
->   		write_sysreg_el0(0, SYS_CNTP_CTL);
->   		isb();
-
-> +		set_cntpoff(0);
->   		break;
->   	case NR_KVM_TIMERS:
->   		BUG();
-
-This seems to say CNTPOFF will be reset to 0 every time a vcpu
-switches out. What if the host originally had some value other than 0?
-Is KVM responsible for that context?
+What is the reason for moving these register writes from initialization
+to vcpu load time? This contradicts the comment that says this is only
+needed once and not at every world switch. Seems like doing more work
+for no reason.
