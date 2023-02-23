@@ -2,84 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E3B6D6A0DCD
-	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 17:22:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A7556A0E55
+	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 18:09:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234126AbjBWQWr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Feb 2023 11:22:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55700 "EHLO
+        id S229551AbjBWRJn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Feb 2023 12:09:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233399AbjBWQWp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Feb 2023 11:22:45 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AF1117CFC;
-        Thu, 23 Feb 2023 08:22:44 -0800 (PST)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31NG0PpQ018502;
-        Thu, 23 Feb 2023 16:22:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=i2EuYrmKAcZOK6gHWGbraQGKswiqhfiip50aZ1tl3DA=;
- b=Rz0hsGr85EmiZlKTIlFBs9eKNgUkykzwAHKsW2HNnb9Vu6PPeLJsvYq/myIyKR/nI/63
- ltLNvXZXvkU93sFd74PYt6XfYwEou8q01sMPPHm5sd2/WCEEJ2vojzAQ8k+Mjknyu+Ro
- y+HpRBChBDt4Gq0GztAwpaklV1kfUoT+49q+FBCTl8vw2TbeSzuS99UIX8DUmYQch4tE
- dfQBUieK/kzQYGbKRDh3BirJ5MBmP8fxN5uhxIIoLVzh29DMY6CV75bY7F362YkoG0qE
- LcUBCOTgYgG/+tjvC2nzaMCARgEslfWu2Cls4UivW5DKMWiUdUU4W1YrFUmUOgI6LS3V mw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nxarsshe3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Feb 2023 16:22:44 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31NG0Wh9019682;
-        Thu, 23 Feb 2023 16:22:43 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nxarsshd0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Feb 2023 16:22:43 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31N7tx4N001654;
-        Thu, 23 Feb 2023 16:22:40 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3ntpa657ce-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Feb 2023 16:22:40 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31NGMbDm27853492
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 23 Feb 2023 16:22:37 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E25D52004B;
-        Thu, 23 Feb 2023 16:22:36 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9C01A20040;
-        Thu, 23 Feb 2023 16:22:36 +0000 (GMT)
-Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 23 Feb 2023 16:22:36 +0000 (GMT)
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     borntraeger@linux.ibm.com, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com, david@redhat.com, mimu@linux.ibm.com,
-        agordeev@linux.ibm.com
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: [PATCH v1] KVM: s390: interrupt: fix virtual-physical confusion for next alert GISA
-Date:   Thu, 23 Feb 2023 17:22:36 +0100
-Message-Id: <20230223162236.51569-1-nrb@linux.ibm.com>
-X-Mailer: git-send-email 2.39.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: YbRJv3Wrw5tK2xVIuROTfbx9ooDsOKnb
-X-Proofpoint-ORIG-GUID: e2naCEkQNk_TANA01sxbocW1uDhxxquq
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
- definitions=2023-02-23_10,2023-02-23_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxlogscore=999
- lowpriorityscore=0 priorityscore=1501 spamscore=0 impostorscore=0
- mlxscore=0 phishscore=0 adultscore=0 malwarescore=0 bulkscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302230132
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        with ESMTP id S229470AbjBWRJm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Feb 2023 12:09:42 -0500
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C99E2D6F
+        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 09:09:40 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-536c6ce8d74so128070677b3.9
+        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 09:09:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ESEYfucHSnOWaZatj5hNQPiLl3UqdNvq9+VGnD33XD0=;
+        b=eacT4PM6bk+JAGYX8AtEreTJLTfD+mSJsjox9puZbiJhIzz/wIxHhoNqBFIAXYayu7
+         ix2AdCa9GlyQPz6wKG3LR8o4NT+280wasX8/AykGzPPWlG6F17mnxqyPEg7H8lCLwAiX
+         eXH6zqI0g24xM5ZEDyA5U2YNv7s9H603+yWuiAeHry6HpCAAUQ5/Ypm3z9qWSoASZAJv
+         GIl+kmJbNVHeS7mmPwXAdOExvjZqQ9ItW1uw3DrabrHDmj3KBFLmoGmyQYc+K7/u+5MN
+         XBySfkomcCwXORKGamuW5yTLWSpURcpZFsI0uJbe36YJ/e/6tvZI8z6lN62S38fr6TXv
+         yALQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ESEYfucHSnOWaZatj5hNQPiLl3UqdNvq9+VGnD33XD0=;
+        b=KXo6Ye8WYpv2n9A45Bojp/wTe7p+Vo43sSI47eQt/gX89HMhvzoY+prEo5WqIs6NLY
+         ab4KVU6IMjdoZ5ruhUboVgVdzkTr8/7wqzrhNaBj7aVJ7jvO7+6eKNKYAyLkFvmgQUHx
+         XbAhdpXAF/eL8WltykPBtylAc2w+TbALkjcFM24wvlTP8atknbiwNkrAWveXnGPezUG6
+         7/TlqtvORL+HtvS4o9Ik3dMnbPP3vYkLnXeIGOGLaVrMIjtuA3GAd7bSvrKb6zO/kDvg
+         ZGuYxy6+B0LpjdcpBN9f7QwsV1+kbleMwR/sAnmSkY3pdyupAtOser6f6FKOvDAQH4X3
+         A/cQ==
+X-Gm-Message-State: AO0yUKX7RbpZK4OVd3BJETKLz3INfMzwo4udUh0GOumIdeVwkqG2b9mm
+        KpY9RiqzcePMn7bPcIvzyHfMgSe00aw=
+X-Google-Smtp-Source: AK7set+o4nZnorUIfwBQUKqlnrrJeoYQJz7sG9NME5jj+i7H5Ea4MTUvMN+YCmQEaMe31ZnG3Fe5siKK8IQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:b60b:0:b0:52f:45a:5b00 with SMTP id
+ u11-20020a81b60b000000b0052f045a5b00mr2611344ywh.2.1677172179211; Thu, 23 Feb
+ 2023 09:09:39 -0800 (PST)
+Date:   Thu, 23 Feb 2023 09:09:37 -0800
+In-Reply-To: <CAOUHufaK-BHdajDZJKjn_LU-gMkUTKa_9foMB8g-u9DyrVhPwg@mail.gmail.com>
+Mime-Version: 1.0
+References: <20230217041230.2417228-1-yuzhao@google.com> <20230217041230.2417228-3-yuzhao@google.com>
+ <Y++q/lglE6FJBdjt@google.com> <CAOUHufaK-BHdajDZJKjn_LU-gMkUTKa_9foMB8g-u9DyrVhPwg@mail.gmail.com>
+Message-ID: <Y/ed0XYAPx+7pukA@google.com>
+Subject: Re: [PATCH mm-unstable v1 2/5] kvm/x86: add kvm_arch_test_clear_young()
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yu Zhao <yuzhao@google.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Michael Larabel <michael@michaellarabel.com>,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, x86@kernel.org,
+        linux-mm@google.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -87,41 +73,87 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We sometimes put a virtual address in next_alert, which should always be
-a physical address, since it is shared with hardware.
+On Wed, Feb 22, 2023, Yu Zhao wrote:
+> On Fri, Feb 17, 2023 at 9:27 AM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Thu, Feb 16, 2023, Yu Zhao wrote:
+> > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > > index 6aaae18f1854..d2995c9e8f07 100644
+> > > --- a/arch/x86/include/asm/kvm_host.h
+> > > +++ b/arch/x86/include/asm/kvm_host.h
+> > > @@ -1367,6 +1367,12 @@ struct kvm_arch {
+> > >        *      the MMU lock in read mode + the tdp_mmu_pages_lock or
+> > >        *      the MMU lock in write mode
+> > >        *
+> > > +      * kvm_arch_test_clear_young() is a special case. It relies on two
+> >
+> > No, it's not.  The TDP MMU already employs on RCU and CMPXCHG.
+> 
+> It is -- you read it out of context :)
 
-This currently works, because virtual and physical addresses are
-the same.
+Ah, the special case is that it's fully lockless.  That's still not all that
+special, e.g. see kvm_tdp_mmu_walk_lockless_{begin,end}().
 
-Add phys_to_virt() to resolve the virtual-physical confusion.
+>          * For reads, this list is protected by:
+>          *      the MMU lock in read mode + RCU or
+>          *      the MMU lock in write mode
+>          *
+>          * For writes, this list is protected by:
+>          *      the MMU lock in read mode + the tdp_mmu_pages_lock or
+>          *      the MMU lock in write mode
+>          *
+>          * kvm_arch_test_clear_young() is a special case.
+>          ...
+> 
+>         struct list_head tdp_mmu_roots;
+> 
+> > Just drop the
+> > entire comment.
+> 
+> Let me move it into kvm_arch_test_clear_young().
 
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
----
- arch/s390/kvm/interrupt.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+No, I do not want kvm_arch_test_clear_young(), or any other one-off function, to
+be "special".  I love the idea of a lockless walk, but I want it to be a formal,
+documented way to walk TDP MMU roots.  I.e. add macro to go with for_each_tdp_mmu_root()
+and the yield-safe variants.
 
-diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-index ab26aa53ee37..20743c5b000a 100644
---- a/arch/s390/kvm/interrupt.c
-+++ b/arch/s390/kvm/interrupt.c
-@@ -305,7 +305,7 @@ static inline u8 gisa_get_ipm_or_restore_iam(struct kvm_s390_gisa_interrupt *gi)
- 
- static inline int gisa_in_alert_list(struct kvm_s390_gisa *gisa)
- {
--	return READ_ONCE(gisa->next_alert) != (u32)(u64)gisa;
-+	return READ_ONCE(gisa->next_alert) != (u32)virt_to_phys(gisa);
- }
- 
- static inline void gisa_set_ipm_gisc(struct kvm_s390_gisa *gisa, u32 gisc)
-@@ -3167,7 +3167,7 @@ void kvm_s390_gisa_init(struct kvm *kvm)
- 	hrtimer_init(&gi->timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
- 	gi->timer.function = gisa_vcpu_kicker;
- 	memset(gi->origin, 0, sizeof(struct kvm_s390_gisa));
--	gi->origin->next_alert = (u32)(u64)gi->origin;
-+	gi->origin->next_alert = (u32)virt_to_phys(gi->origin);
- 	VM_EVENT(kvm, 3, "gisa 0x%pK initialized", gi->origin);
- }
- 
--- 
-2.39.1
+/* blah blah blah */
+#define for_each_tdp_mmu_root_lockless(_kvm, _root, _as_id)		\
+	list_for_each_entry_rcu(_root, &kvm->arch.tdp_mmu_roots, link)	\
+		if (refcount_read(&root->tdp_mmu_root_count) &&		\
+		    kvm_mmu_page_as_id(_root) != _as_id) {		\
+		} else
 
+> Also I want to be clear:
+> 1. We can't just focus on here and now; we need to consider the distant future.
+
+I 100% agree, but those words need to be backed up by actions.  This series is
+littered with code that is not maintainable long term, e.g. open coding stuff
+that belongs in helpers and/or for which KVM already provides helpers, copy-pasting
+__kvm_handle_hva_range() instead of extending it to have a lockless option, poking
+directly into KVM from mm/ code, etc.
+
+I apologize for being so blunt.  My intent isn't to be rude/snarky, it's to set
+very clear expectations for getting any of these changes merges.  I asbolutely do
+want to land improvments to KVM's test+clear young flows, but it needs to be done
+in a way that is maintainable and doesn't saddle KVM with more tech debt.
+
+> 2. From my POV, "see the comments on ..." is like the index of a book.
+
+And my _very_ strong preference is to provide the "index" via code, not comments.
+
+> > Clearing a single bit doesn't need a CMPXCHG.  Please weigh in on a relevant series
+> > that is modifying the aging flows[*], I want to have exactly one helper for aging
+> > TDP MMU SPTEs.
+> >
+> > [*] https://lore.kernel.org/all/20230211014626.3659152-5-vipinsh@google.com
+> 
+> I'll take a look at that series. clear_bit() probably won't cause any
+> practical damage but is technically wrong because, for example, it can
+> end up clearing the A-bit in a non-leaf PMD. (cmpxchg will just fail
+> in this case, obviously.)
+
+Eh, not really.  By that argument, clearing an A-bit in a huge PTE is also technically
+wrong because the target gfn may or may not have been accessed.  The only way for
+KVM to clear a A-bit in a non-leaf entry is if the entry _was_ a huge PTE, but was
+replaced between the "is leaf" and the clear_bit().
