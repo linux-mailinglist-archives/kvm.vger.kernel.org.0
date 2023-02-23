@@ -2,257 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 225576A0CA6
-	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 16:12:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7628A6A0D54
+	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 16:52:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234490AbjBWPMo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Feb 2023 10:12:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54078 "EHLO
+        id S234394AbjBWPw1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Feb 2023 10:52:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234221AbjBWPMn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Feb 2023 10:12:43 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA69655C29;
-        Thu, 23 Feb 2023 07:12:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=aq6msu5wWTPXr2hq9ENV1K+nznEgR4h/xhY2EvVzKv8=; b=Gb/QIDNUTYAwi4+0ZZDURfC1aJ
-        mS0WNmJr66xEGUcFS09tPyS3au/B/FlpFASVNopiO2OBSWhE0ObgbYETqt1MlPhbnZQy/n0iBZfzO
-        FpBAx9P/su4db8Y0CccAwCm1HZ471S48kJNmCwyD8Asl7z7RBWzZ2V101XoZ5Xv6PsZj1GDw2O8jM
-        /YYzfJoELYQOAOyov/A4JICE4MAfCWNE5BeovsB4PwQQFUWcfb8CosFwDhju9uS8LAwpGXByW0bOC
-        g6ytGIitII2CzpD6EojlSICOD6y3/+w63IoMfsG5p8nCvmSb6tTxzoG51Y5IZn5ucothJNwDf8eWv
-        8AlC05eA==;
-Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.infradead.org)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pVDGL-00ESZd-0C; Thu, 23 Feb 2023 15:12:01 +0000
-Message-ID: <eb6717dfc4ceb99803c0396f950db7c3231c75ef.camel@infradead.org>
-Subject: Re: [PATCH v9 0/8] Parallel CPU bringup for x86_64
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Usama Arif <usama.arif@bytedance.com>, kim.phillips@amd.com
-Cc:     arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
-        pbonzini@redhat.com, paulmck@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
-        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
-        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
-        simon.evans@bytedance.com, liangma@liangbit.com,
-        Ashok Raj <ashok.raj@intel.com>
-Date:   Thu, 23 Feb 2023 15:12:00 +0000
-In-Reply-To: <87zg94la7l.ffs@tglx>
-References: <20230215145425.420125-1-usama.arif@bytedance.com>
-         <62ee53770b4010f065346b7f2a1200013836be97.camel@infradead.org>
-         <87a615mz2x.ffs@tglx>
-         <701ce2da00e559d517d4e48bd5d88ccae1198e44.camel@infradead.org>
-         <87zg94la7l.ffs@tglx>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-hkj4SafacA4WXW2cEqev"
-User-Agent: Evolution 3.44.4-0ubuntu1 
-MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229509AbjBWPw0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Feb 2023 10:52:26 -0500
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E71834DE2D
+        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 07:52:25 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-536bf635080so133020787b3.23
+        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 07:52:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=UkklNGUUAaK1vCDWe+TDfWu4XSmMJya7Wl/vS0LMkUI=;
+        b=C8ix/G0JijY1Zc5kmosFOwEiMiq8b/X3133BWrJoKoxbF4es/1ye/WsV4d/CkFjNA5
+         avhffPWhrrHuce4syMTI3vxKirlIiYx5GfGvJauvV2sPYrvax/G7R0/Y/tWhdlSqvsJ1
+         9H8d8ZGRdduJLNrhDNs5PTj8mW/8gPVfgV4OfyZvrB9p2jm2mDiRYIAJ5KdNm7v2x605
+         PWZP2HRKqYFpchV1Ju8Lqx8rphuYpLUfBKfI9LRJN1nTHPFnT/LXaBHb48+fU8b0jkvW
+         pso2az7U3xqLq/TRpK9JLKC8RQTY16Tbf3tijcQ2nUTINX8LuQL7dgweXGLh9im7WWrk
+         dTqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UkklNGUUAaK1vCDWe+TDfWu4XSmMJya7Wl/vS0LMkUI=;
+        b=TPry65ZaUCyIEFVb0jxGNuwKe4VZ9EsjUMX7a8MDINGZipGOKhiOb8PvfBqAzCh+8z
+         dVI+JlzRnv7MbCI/gkCBWF1dzae2jsV5iPJPxUWJloLwUykH/LFUzpAMQVgkgJXTsNP1
+         nvE040FcLw3gi8W1J8yH+kDGShs+rMe3TD4fQPv5/AU6CKaHFi/d+PUqW1Al48bK/POO
+         ZbLyshC6fr+YiQ+9gte7phuPmbjvBh7XAJKxrpvfwwfyzlX/QTbmqkviOE3k4qMj63ok
+         oDH+8nV7SF7/dd7Guay5S5ETImyOHIrUtQSy3vdRx6pvMU09Add8bO2SfTw+9UQ1kV7k
+         KabA==
+X-Gm-Message-State: AO0yUKVL0/lQncmUxmrFuGa5NnC9JuED6TI9gAMYC64+ZO9RAbjZly/f
+        4pnZrGEwuTrMh127i52IOJTe3BopYoU=
+X-Google-Smtp-Source: AK7set8+uftFlQenWcXkkuB/bA7KV5q1nJGyyu+g3zlS+cdZsjwdyESQBdGoj8c7Ng9UfVGPAwl/LY8Q5ZU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:3c2:b0:965:7799:3845 with SMTP id
+ g2-20020a05690203c200b0096577993845mr1089495ybs.553.1677167544938; Thu, 23
+ Feb 2023 07:52:24 -0800 (PST)
+Date:   Thu, 23 Feb 2023 07:52:23 -0800
+In-Reply-To: <20230223142130.2338972-1-quanfafu@gmail.com>
+Mime-Version: 1.0
+References: <20230223142130.2338972-1-quanfafu@gmail.com>
+Message-ID: <Y/eLt4kqKh0G7kKd@google.com>
+Subject: Re: [PATCH] KVM/x86: fix comment that should be user fault
+From:   Sean Christopherson <seanjc@google.com>
+To:     Quanfa Fu <quanfafu@gmail.com>
+Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Feb 23, 2023, Quanfa Fu wrote:
+> The content of comment should be user fault not read. In order to avoid
+> confusion, fix the comment.
 
---=-hkj4SafacA4WXW2cEqev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+No, the existing comment is correct.  Ignoring optional extensions, EPT doesn't
+differntiate between Supervisor and User, but does support !READABLE mappings.
+And so KVM piggybacks PFERR_USER_MASK to track whether or not an EPT fault occurred
+on a read access.
 
-On Thu, 2023-02-23 at 15:37 +0100, Thomas Gleixner wrote:
-> David!
->=20
-> On Thu, Feb 23 2023 at 11:07, David Woodhouse wrote:
-> > On Wed, 2023-02-22 at 17:42 +0100, Thomas Gleixner wrote:
-> > > The low hanging fruit which brings most is the identification/topolog=
-y
-> > > muck and the microcode loading. That needs to be addressed first anyw=
-ay.
-> >=20
-> > Agreed, thanks.
->=20
-> So the problem with microcode loading is that we must ensure that a HT
-> sibling is not executing anything else than a trivial loop waiting for
-> the update to complete. So something like this should work:
->=20
-> =C2=A0=C2=A0 1) Kick all CPUs into life and let them run up to cpu_init()=
- and
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 retrieve only the topology information.
->
-> =C2=A0=C2=A0 2) Wait for all CPUs to reach this point
->
-> =C2=A0=C2=A0 3) Release all primary HT threads so they can load microcode=
- in
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 parallel. The secondary HT threads stay in=
- the wait loop and are
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 released once the primary thread has finis=
-hed the microcode
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 update.
->=20
-> =C2=A0=C2=A0 4) Let the CPUs do the full CPUID readout and let them synch=
-ronize
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 with the control CPU again.
->=20
-> =C2=A0=C2=A0 5) Complete bringup one by one
-
-
-Can we move the microcode loading to happen earlier, during the x86-
-specific CPUHP_BP_PARALLEL_DYN stage(s) while they're running in
-parallel.
-
-In the existing set of patches, we send INIT/SIPI/SIPI to each CPU in
-parallel and they run to the first part of start_secondary(), up to the
-point where it calls cpu_init_secondary() and sets their bit in
-cpu_initialized_mask, then spinning and waiting for cpu_callout_mask.
-
-
-My "part 2" test patch does another round in parallel, setting each
-CPU's bit in 'cpu_callout_mask' and letting them run a bit further
-through start_secondary() until they get to the end of smp_callin(),
-where they set their bit in smp_callin_mask and (in my patch) wait for
-their bit in a new cpu_finishup_mask to be set =E2=80=94 which is what rele=
-ases
-them to proceed to completion in the final native_cpu_up() bringup.
-
-So perhaps the BSP doesn't need to coordinate anything here, if we can
-let the siblings work it out between themselves in the (now-)parallel
-stage at the end of smp_callin()? And only set their bit in
-smp_callin_mask when the microcode update is done?
-
-Hm, maybe it's as simple as the first=C2=B9 thread on a core waiting for al=
-l
-its siblings' bits in cpu_callin_mask to be set, and *then* doing the
-update before setting its own bit?
-
-=C2=B9 As long as we define "first" as the one with the lowest CPU#, which
-means that the BSP won't release any of the siblings before it releases
-the "first".
-
-Then the siblings are just spinning on cpu_callin_mask anyway; they
-don't need to do anything *more*.
-
-Probably worth knocking it up and seeing how badly it explodes?
-
-
-
---=-hkj4SafacA4WXW2cEqev
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMjIzMTUxMjAwWjAvBgkqhkiG9w0BCQQxIgQgQPUMOEuR
-8FcXAnFq4QV2QRtdWe0pr3tPhFfzCr3K8Yswgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgATxxZheDxfPue6ybreT+n3FMX8k5VcnTB/
-/YP2H5D1aS8Q57lP8VORuNQOsqKAnFlD1txW0vZEQsrkbOXnUR7nSy/7mMyomdVsceAZ8dFXBRca
-SMWpON/2C+ok8PERdUE+L7ofH2/FvpDcQPobWUVba3FwQg+hiGGNG/CwenK/qWNIPmic5xwZQdoP
-pcsJKAh3XpJ4tiIYAolR2CJP0BxQqRCjSFIICE4p0OwWoawO0zQ6Z+lsejCHfdwhKZGOomuAVB6/
-OEGli8oJQKKhV3NlGGdhzYuU2bEg604G0lF1U6mZNyrkyuyygNtJQvxxaHeb/uMSkJF31uafIvMu
-RGJJFFwmCJgk9OdKiCSvXsd/+nR3xL56zyQkjEtjlQBWFwX8dn15R9DAHms4Q6OeMXDTxxp5Ftj5
-prMc6dtKiFahEVBPL2u7xQaqS/0sFny9wLZWmJjEJmR+Vt+0dtKmkYHO9YyG7iBuxQXP7HIPXnI7
-JG3ViYKvH1OLhfEz3PeJLAkvEP6+j9gAYkspEjZ0qvhVbCsE7qnmnR1O12HmUZWOnLlk6JWZeNH6
-f5TTgNxINNFS987kPug8lj47j35xAs+ZEF2RQHNat6D0p/Q4qr39GdVTubv2DRTZCRhwdrwBC8QS
-Q+59AXGLbWKfHa3RWDPkuRc5USr7iKh5h5DMDq4zXwAAAAAAAA==
-
-
---=-hkj4SafacA4WXW2cEqev--
+> 
+> Signed-off-by: Quanfa Fu <quanfafu@gmail.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 7eec0226d56a..3c1012039517 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -5668,7 +5668,7 @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
+>  	gpa = vmcs_read64(GUEST_PHYSICAL_ADDRESS);
+>  	trace_kvm_page_fault(vcpu, gpa, exit_qualification);
+>  
+> -	/* Is it a read fault? */
+> +	/* Is it a user fault? */
+>  	error_code = (exit_qualification & EPT_VIOLATION_ACC_READ)
+>  		     ? PFERR_USER_MASK : 0;
+>  	/* Is it a write fault? */
+> -- 
+> 2.31.1
+> 
+> 
