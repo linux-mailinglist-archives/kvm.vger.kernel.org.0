@@ -2,76 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EE3946A110B
-	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 21:10:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 041A46A1110
+	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 21:11:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229711AbjBWUKR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Feb 2023 15:10:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34562 "EHLO
+        id S229736AbjBWULP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Feb 2023 15:11:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229635AbjBWUKP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Feb 2023 15:10:15 -0500
-Received: from mail-vs1-xe32.google.com (mail-vs1-xe32.google.com [IPv6:2607:f8b0:4864:20::e32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38B322ED74
-        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 12:10:13 -0800 (PST)
-Received: by mail-vs1-xe32.google.com with SMTP id s1so1184051vsk.5
-        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 12:10:13 -0800 (PST)
+        with ESMTP id S229677AbjBWULN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Feb 2023 15:11:13 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9841631E02
+        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 12:11:04 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id r3-20020a17090aa08300b00237541d0c22so180351pjp.3
+        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 12:11:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tb4E/KDAfmO+OWY5M3vwQnCShVGqXeIPzhu+t6ji2TI=;
-        b=Buy8GsfJbaC7xe6w4gIMVDaR17FRMpXubc52+8pPyuvFEIOFipuVV1KBEuKEAKh0El
-         7DlCtGhjvPy6R3F83LlbXWVkFsviditFGOnyOFNuaCOFkrNwI/obEofFnE7fHFIFAjz5
-         TS0RlbZVFOqi87gU5+jO/2VyNSZYlD1MRdH/KauUtlrOFE91xF4O4zPf42C2bpL/k3d4
-         f10eOthZsxd161U/wfkLecBG0lA6RlgWgp1Y7V0lS1+X71MKNI7c2knUOng4oSETF3N3
-         4wA3dsBYF7sv1XPjiAiCOtvvfYyIrBnGgsjlWHce/SoH5Z12GmZZtRDih8OTERcpCo1Z
-         77Kw==
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=55699jwMjbFJeBpbG2LE+BTnQXK31us786DsAXZgIPE=;
+        b=hTRQs+IlFB2czaT78epgbSkW7NJ8wSJnDnuRCBte4p5S/ALVRjLCKHjShVSrlqlGRB
+         bPDNG3CPPATHJ6JYHrLK3edkw/K0AeMhae0St31kEfWksA7kO2qAEGw6C/7xx+lIUTFt
+         w3HYo1y9OFrfBqTnWOLx8/DM3Im3H7WNdAsHbnII8klQ4PboKK/QO8bhLJ32hokFQDCS
+         roFjYu5iIpVl15bmLSiHgh/R+6pvgnBfMwPnCGxd4DI2GC3StAlvzXWAJGOI9J6AIWr8
+         2FaZdIvO0cLTISL4KAt2/p+5Q0ppMkZZ2tomQmymCk75C9ANTiDsU43f5TXzpQ2SIaEY
+         ZsOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tb4E/KDAfmO+OWY5M3vwQnCShVGqXeIPzhu+t6ji2TI=;
-        b=GHXkfP+WTo4yj2SjBz8VbLjmxmYImnddo7lwaRQ7v+rZ7nwrsVRKw5Qvy0GLpWy0sE
-         ZO0+sPeLQe3J1lj+UVj9Fy9h+upf1AKAyLltJY7KmcwWEYxJHrv11H70p8dCmIMeLWaa
-         myyNZAsdWXSuL20vvo/8sWB1te++Hs40+8YwQhud+9YoadxNMWwpj2j+iAP65/cyX4ML
-         OoaAEWNN6EikEV76XATG86Qz5fXukgIF9wgo2aeXfDkRTwNvKMrmuQYaGyVUspHQy+Ec
-         BrYTqdaKfMsJBXWeZk4qWF4ZiU1heOMZzO9lkD8cHNRMzdnmKqTY9d4+qd9d72L411rG
-         r25w==
-X-Gm-Message-State: AO0yUKWLu1NG90Rs5v8jbp9UqfHhn2ovpMd/gHMcJujFTFpcoE0fTerK
-        imNPmhz9Ce8JCOIhQFEOjDS9fI9LdaNmIhUNSbTKHw9W4WFoouSz
-X-Google-Smtp-Source: AK7set/BdoUj1YfuS8JpwJQ04kHrKoqkmuSB4hZ/qUc3HI+kpJOsmACSu4zfNA2VRxx+6n1Ke4C2BNibi2yxxoTp1zE=
-X-Received: by 2002:a05:6102:3181:b0:414:34d3:89a with SMTP id
- c1-20020a056102318100b0041434d3089amr752650vsh.6.1677183012138; Thu, 23 Feb
- 2023 12:10:12 -0800 (PST)
-MIME-Version: 1.0
-References: <20230217041230.2417228-1-yuzhao@google.com> <20230217041230.2417228-6-yuzhao@google.com>
- <Y/elw7CTvVWt0Js6@google.com> <CAOUHufbAKpv95k6rVedstjD_7JzP0RrbOD652gyZh2vbAjGPOg@mail.gmail.com>
- <Y/e6Z+KIl6sYJoRg@google.com> <CAOUHufbwcqx21T=zmvYpnX_Mnd2A0KkPORbtxnJEwKuUKVSPzA@mail.gmail.com>
- <Y/fFWyYPu5Jf0de1@google.com>
-In-Reply-To: <Y/fFWyYPu5Jf0de1@google.com>
-From:   Yu Zhao <yuzhao@google.com>
-Date:   Thu, 23 Feb 2023 13:09:33 -0700
-Message-ID: <CAOUHufYWktz4SNjL_o_2oZNcJLXserwCot-Prv4UEG9uzn57rg@mail.gmail.com>
-Subject: Re: [PATCH mm-unstable v1 5/5] mm: multi-gen LRU: use mmu_notifier_test_clear_young()
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Johannes Weiner <hannes@cmpxchg.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Michael Larabel <michael@michaellarabel.com>,
-        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, x86@kernel.org,
-        linux-mm@google.com
-Content-Type: text/plain; charset="UTF-8"
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=55699jwMjbFJeBpbG2LE+BTnQXK31us786DsAXZgIPE=;
+        b=KRRYrtTOChndFzp5gswoL5GLijj7avExAAzq/vlnIJFYm68A2gJM4wwm4Y2u9HPnLh
+         gxU2bH631fNC9MljtxYX/9RHplFd9N9NmOSmPqAKatJyH3lBE/UJjj6/7pWknnecP/LS
+         pi4wjgNgluKD7TKJ7LZtCgMHu6pmPwk09D/BhyQYOkSMyp1ci68IXvwMSuidG3MMqVkY
+         CFZ4R6kdYUZpad6Zlc/tsjtFIuUa2Gd9QjQL1ogojjwOkKhXRGaX4pVBZmRK62IsHK75
+         Cze/3iIdckxOWAZcJVoj99ZDNC1T1ulgsaLAtzEY5+xpFuXdEXIPnXltk6JlFvRwGsoL
+         /UyA==
+X-Gm-Message-State: AO0yUKWZomBok4yhSuCWa489nk0DtJmS4i4zvygWqaiptgV7rC/vtWcr
+        g6nhBbq+fxaTPp8ktFUrf9GgJ34OuWA=
+X-Google-Smtp-Source: AK7set/xVU7e+hcQGopYGt0G0UxcObhRMKgAuOrglBsZ+Kh49SNgMlfHyd+w7UyIxZTuaBRQUdOK7V+VDrU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:a386:b0:19b:b3da:13d1 with SMTP id
+ x6-20020a170902a38600b0019bb3da13d1mr2115573pla.0.1677183064010; Thu, 23 Feb
+ 2023 12:11:04 -0800 (PST)
+Date:   Thu, 23 Feb 2023 12:11:02 -0800
+In-Reply-To: <CAF7b7mor-QHwLCLQ_sp4sOJTztRGVOzpBupeuiCicA3YG=-TTQ@mail.gmail.com>
+Mime-Version: 1.0
+References: <20230215011614.725983-1-amoorthy@google.com> <20230215011614.725983-7-amoorthy@google.com>
+ <Y+0VK6vZpMqAQ2Dc@google.com> <CAF7b7mor-QHwLCLQ_sp4sOJTztRGVOzpBupeuiCicA3YG=-TTQ@mail.gmail.com>
+Message-ID: <Y/fIVp5GUS35vCH1@google.com>
+Subject: Re: [PATCH 6/8] kvm/x86: Add mem fault exit on EPT violations
+From:   Sean Christopherson <seanjc@google.com>
+To:     Anish Moorthy <amoorthy@google.com>
+Cc:     kvm@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,57 +69,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 23, 2023 at 12:58=E2=80=AFPM Sean Christopherson <seanjc@google=
-.com> wrote:
->
-> On Thu, Feb 23, 2023, Yu Zhao wrote:
-> > On Thu, Feb 23, 2023 at 12:11=E2=80=AFPM Sean Christopherson <seanjc@go=
-ogle.com> wrote:
-> > >
-> > > On Thu, Feb 23, 2023, Yu Zhao wrote:
-> > > > > As alluded to in patch 1, unless batching the walks even if KVM d=
-oes _not_ support
-> > > > > a lockless walk is somehow _worse_ than using the existing mmu_no=
-tifier_clear_flush_young(),
-> > > > > I think batching the calls should be conditional only on LRU_GEN_=
-SPTE_WALK.  Or
-> > > > > if we want to avoid batching when there are no mmu_notifier liste=
-ners, probe
-> > > > > mmu_notifiers.  But don't call into KVM directly.
-> > > >
-> > > > I'm not sure I fully understand. Let's present the problem on the M=
-M
-> > > > side: assuming KVM supports lockless walks, batching can still be
-> > > > worse (very unlikely), because GFNs can exhibit no memory locality =
-at
-> > > > all. So this option allows userspace to disable batching.
-> > >
-> > > I'm asking the opposite.  Is there a scenario where batching+lock is =
-worse than
-> > > !batching+lock?  If not, then don't make batching depend on lockless =
-walks.
+On Wed, Feb 22, 2023, Anish Moorthy wrote:
+> On Wed, Feb 15, 2023 at 9:24=E2=80=AFAM Sean Christopherson <seanjc@googl=
+e.com> wrote:
 > >
-> > Yes, absolutely. batching+lock means we take/release mmu_lock for
-> > every single PTE in the entire VA space -- each small batch contains
-> > 64 PTEs but the entire batch is the whole KVM.
->
-> Who is "we"?
+> > On Wed, Feb 15, 2023, Anish Moorthy wrote:
+> > > +     if (mem_fault_nowait) {
+> > > +             if (fault->pfn =3D=3D KVM_PFN_ERR_FAULT) {
+> > > +                     vcpu->run->exit_reason =3D KVM_EXIT_MEMORY_FAUL=
+T;
+> > > +                     vcpu->run->memory_fault.gpa =3D fault->gfn << P=
+AGE_SHIFT;
+> > > +                     vcpu->run->memory_fault.size =3D PAGE_SIZE;
+> >
+> > This belongs in a separate patch, and the exit stuff should be filled i=
+n by
+> > kvm_handle_error_pfn().  Then this if-statement goes away entirely beca=
+use the
+> > "if (!async)" will always evaluate true in the nowait case.
+>=20
+> Hi Sean, what exactly did you want "in a separate patch"?
 
-Oops -- shouldn't have used "we".
+Separate "exit if fast gup() fails", a.k.a. nowait, from "exit with KVM_EXI=
+T_MEMORY_FAULT
+instead of -EFAULT on errors".  I.e. don't tie KVM_EXIT_MEMORY_FAULT to the=
+ fast
+gup() capability (or memslot flag?).  That way filing vcpu->run->memory_fau=
+lt
+lands in a separate, largely generic patch, and this patch only introduces =
+the
+fast gup() logic.
 
-> I don't see anything in the kernel that triggers walking the whole
-> VMA, e.g. lru_gen_look_around() limits the walk to a single PMD.  I feel =
-like I'm
-> missing something...
-
-walk_mm() -> walk_pud_range() -> walk_pmd_range() -> walk_pte_range()
--> test_spte_young() -> mmu_notifier_test_clear_young().
-
-MGLRU takes two passes: during the first pass, it sweeps entire VA
-space on each MM (per MM/KVM); during the second pass, it uses the rmap on =
-each
-folio (per folio). The look around exploits the (spatial) locality in
-the second pass, to get the best out of the expensive per folio rmap
-walk.
-
-(The first pass can't handle shared mappings; the second pass can.)
+That probably means adding yet another capability, but capabilities are che=
+ap.
