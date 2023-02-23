@@ -2,157 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B4FC6A0F60
-	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 19:24:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 127546A0F6B
+	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 19:26:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231330AbjBWSYD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Feb 2023 13:24:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38690 "EHLO
+        id S229793AbjBWS0J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Feb 2023 13:26:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230139AbjBWSYC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Feb 2023 13:24:02 -0500
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 666984346F
-        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 10:23:58 -0800 (PST)
-Received: by mail-pf1-x449.google.com with SMTP id d7-20020a056a0010c700b005a8ee90fbc6so5749161pfu.4
-        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 10:23:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cPNG5uIkry6SPqM4BN2SEB/cHBlElEpC9OaRo7SwP1M=;
-        b=bYsrefngLcy0tfHlns6aMlsdH2oIXTPT7lCylB/IL5DVPx4RFU9eL+p5YVECAPtS2s
-         usebFCow9QCqMP5Aq02575uRXKS0mk//xQRfDBsRpRdC2zmDEyg2ryuBNb/sp+DPWgwF
-         VuLa1AcmuUwAE3iCUPltPHtYeTAZILzvYPi2vnJHhG0/8yhA2WDigL3Zx02Bro1ht/wk
-         s8xh5/L//ScWeIcEScF2iwWK8oEw3PkhR9lUeMjlbwQX3a8MxONyGn4ttyjC8lyqJYZ/
-         JY6qaBvtT0VySspOSF5NLPqjE3eDxO/SX5MhEIUMI9EksUAeRqergYUfiuOc1l/z/1f1
-         4c7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=cPNG5uIkry6SPqM4BN2SEB/cHBlElEpC9OaRo7SwP1M=;
-        b=Kf7kj+KlvV+5ky00WJ1wuzJ71wi0niDRhkfb24lQAeYJ8JMd/Y/2IUFt3MZ4pycZa6
-         RIrXkrwaZQReqf5wPpZ2aS0NOs5vL857OJ1lgAOmo5RHxvNrrkflXOwEMofoPsVTRFgd
-         jNlmD/93Epr5ptu0PKBBiaw1BLnezvFXLUkbW7J2cNP74ZxKJf0cH7e1+PaIqLioBC76
-         OqHoKzMe25ignXqzz7SW4Nm82nbj1SXz4ilTKWL3Pn/L5xofhxzeDo5uWvbgkOpuJTKH
-         aT0+xUQeK8N6PmeN79y5JRZwBTKJO/oIursAkaTkvDe5UgbxsXsLCut3rj1yBE99Olc5
-         uWmg==
-X-Gm-Message-State: AO0yUKUEn+rBFE6qO98xXux4NiERp+ituJ3pDoeLs2c/fdXFED0wbtY1
-        tBMSGsaByWU+IEf5KxG6M412ABY2vSI=
-X-Google-Smtp-Source: AK7set/qgsnXlcUCBL6IPFbm1InDpYCFgJKykWmAkZmrH7WbhMO1WH0I80dbu7seLELSE2a0nC1NZ0yIDIg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:aa7:8a53:0:b0:593:dc61:2161 with SMTP id
- n19-20020aa78a53000000b00593dc612161mr1985673pfa.2.1677176637799; Thu, 23 Feb
- 2023 10:23:57 -0800 (PST)
-Date:   Thu, 23 Feb 2023 10:23:56 -0800
-In-Reply-To: <CAOUHufYw9Mc-w1E-Jkqnt869bVJ0AxOB5_grSEMcdMdDODDdCw@mail.gmail.com>
-Mime-Version: 1.0
-References: <20230217041230.2417228-1-yuzhao@google.com> <20230217041230.2417228-3-yuzhao@google.com>
- <Y++q/lglE6FJBdjt@google.com> <CAOUHufaK-BHdajDZJKjn_LU-gMkUTKa_9foMB8g-u9DyrVhPwg@mail.gmail.com>
- <Y/ed0XYAPx+7pukA@google.com> <CAOUHufYw9Mc-w1E-Jkqnt869bVJ0AxOB5_grSEMcdMdDODDdCw@mail.gmail.com>
-Message-ID: <Y/evPJg9gvXxO1hs@google.com>
-Subject: Re: [PATCH mm-unstable v1 2/5] kvm/x86: add kvm_arch_test_clear_young()
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yu Zhao <yuzhao@google.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Michael Larabel <michael@michaellarabel.com>,
-        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, x86@kernel.org,
-        linux-mm@google.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229487AbjBWS0H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Feb 2023 13:26:07 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2D6558495
+        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 10:26:02 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 6DD57B81AA9
+        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 18:26:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10612C433D2;
+        Thu, 23 Feb 2023 18:26:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1677176760;
+        bh=faUGEHXZIAbc4vaLIXbC1j60CezNNU8Sq6BxoorVfHQ=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=bE8v63YP37SIEjHPA1H9PNoZanbayAVlPhToj40ymVgfkifJbsnsF/kUCIKAGfIqz
+         yenpvkNeP89uUBfnorpr6A7rEcNbJNli9GWw4tnPlldq/LuIGL5A+6WIliODLSufJq
+         O7eo1arRgPnWmF2JNoUC5quNHGVpon+bEL8H1MgvRUqnPcGpsOiQ3Vjd7vAWj1NWrY
+         WexQtRqTiHvgMuqxqR9Q3iteRE3YkOTjmxZrEeeF2qSXVsj+mvcVJb5Qy38mdIu0Jx
+         cWzgxcpfJhUb0mr9kbGOVYWb4QFNEoi+pqh2SCXw0mk4MVjcWQF40U8LGBKvofYC/H
+         rBg8HfFNvAlmw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pVGI1-00CiDK-My;
+        Thu, 23 Feb 2023 18:25:57 +0000
+Date:   Thu, 23 Feb 2023 18:25:57 +0000
+Message-ID: <867cw8xmq2.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Simon Veith <sveith@amazon.de>, dwmw2@infradead.org
+Subject: Re: [PATCH 08/16] KVM: arm64: timers: Allow userspace to set the counter offsets
+In-Reply-To: <Y/ZEGHkw5Jft19RP@linux.dev>
+References: <20230216142123.2638675-1-maz@kernel.org>
+        <20230216142123.2638675-9-maz@kernel.org>
+        <Y+6pqz3pCwu7izZL@linux.dev>
+        <86k00gy4so.wl-maz@kernel.org>
+        <Y+/7mO1sxH4jThmu@linux.dev>
+        <86bkllyku2.wl-maz@kernel.org>
+        <Y/ZEGHkw5Jft19RP@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de, dwmw2@infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 23, 2023, Yu Zhao wrote:
-> On Thu, Feb 23, 2023 at 10:09=E2=80=AFAM Sean Christopherson <seanjc@goog=
-le.com> wrote:
-> > > I'll take a look at that series. clear_bit() probably won't cause any
-> > > practical damage but is technically wrong because, for example, it ca=
-n
-> > > end up clearing the A-bit in a non-leaf PMD. (cmpxchg will just fail
-> > > in this case, obviously.)
-> >
-> > Eh, not really.  By that argument, clearing an A-bit in a huge PTE is a=
-lso technically
-> > wrong because the target gfn may or may not have been accessed.
->=20
-> Sorry, I don't understand. You mean clear_bit() on a huge PTE is
-> technically wrong? Yes, that's what I mean. (cmpxchg() on a huge PTE
-> is not.)
->=20
-> > The only way for
-> > KVM to clear a A-bit in a non-leaf entry is if the entry _was_ a huge P=
-TE, but was
-> > replaced between the "is leaf" and the clear_bit().
->=20
-> I think there is a misunderstanding here. Let me be more specific:
-> 1. Clearing the A-bit in a non-leaf entry is technically wrong because
-> that's not our intention.
-> 2. When we try to clear_bit() on a leaf PMD, it can at the same time
-> become a non-leaf PMD, which causes 1) above, and therefore is
-> technically wrong.
-> 3. I don't think 2) could do any real harm, so no practically no problem.
-> 4. cmpxchg() can avoid 2).
->=20
-> Does this make sense?
+On Wed, 22 Feb 2023 16:34:32 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> On Wed, Feb 22, 2023 at 11:56:53AM +0000, Marc Zyngier wrote:
+> 
+> > > Chewing on this a bit more, I don't think userspace has any business
+> > > messing with virtual and physical time independently, especially when
+> > > nested virtualization comes into play.
+> > 
+> > Well, NV already ignores the virtual offset completely (see how the
+> > virtual timer gets its offset reassigned at reset time).
+> 
+> I'll need to have a look at that, but if we need to ignore user input on
+> the shiny new interface for NV then I really do wonder if it is the
+> right fit.
 
-I understand what you're saying, but clearing an A-bit on a non-leaf PMD th=
-at
-_just_ got converted from a leaf PMD is "wrong" if and only if the intented
-behavior is nonsensical.
+The thing is, I'm not keen making the interface modal. Modes suck and
+lead to invasive userspace changes. I'd rather ignore irrelevant
+parameters than change the way userspace works. And you don't *have*
+to provide the virtual offset with NV.
 
-Without an explicit granluarity from the caller, the intent is to either (a=
-) reap
-A-bit on leaf PTEs, or (b) reap A-bit at the highest possible granularity. =
- (a) is
-nonsensical because because it provides zero guarantees to the caller as to=
- the
-granularity of the information.  Leaf vs. non-leaf matters for the life cyc=
-le of
-page tables and guest accesses, e.g. KVM needs to zap _only_ leaf SPTEs whe=
-n
-handling an mmu_notifier invalidation, but when it comes to the granularity=
- of the
-A-bit, leaf vs. non-leaf has no meaning.  On KVM x86, a PMD covers 2MiB of =
-GPAs
-regardless of whether it's a leaf or non-leaf PMD.
+> > I previously toyed with this idea, and I really like it. However, the
+> > problem with this is that it breaks the current behaviour of having
+> > two different values for CNTVCT and CNTPCT in the guest, and CNTPCT
+> > representing the counter value on the host.
+> > 
+> > Such a VM cannot be migrated *today*, but not everybody cares about
+> > migration. My "dual offset" approach allows the current behaviour to
+> > persist, and such a VM to be migrated. The luser even gets the choice
+> > of preserving counter continuity in the guest or to stay without a
+> > physical offset and reflect the host's counter.
+> > 
+> > Is it a good behaviour? Of course not. Does anyone depend on it? I
+> > have no idea, but odds are that someone does. Can we break their toys?
+> > The jury is still out.
+> 
+> Well, I think the new interface presents an opportunity to change the
+> rules around counter migration, and the illusion of two distinct offsets
+> for physical / virtual counters will need to be broken soon enough for
+> NV.
 
-If the intent is (b), then clearing the A-bit on a PMD a few cycles after t=
-he PMD
-was converted from leaf to non-leaf is a pointless distinction, because it =
-yields
-the same end result as clearing the A-bit just a few cycles earlier, when t=
-he PMD
-was a leaf.
+Broken in the kernel, sure. Do we need to involve userspace in what
+was an initial mis-design of the API? Changing these rules mean
+changing the way userspace works, and I'm not keen on going there.
 
-Actually, if I'm reading patch 5 correctly, this is all much ado about noth=
-ing,
-because the MGLRU code only kicks in only for non-huge PTEs, and KVM cannot=
- have
-larger mappings than the primary MMU, i.e. should not encounter huge PTEs.
+> Do we need to bend over backwards for a theoretical use case with
+> the new UAPI? If anyone depends on the existing behavior then they can
+> continue to use the old UAPI to partially migrate the guest counters.
 
-On that topic, if the assumption is that the bitmap is used only for non-hu=
-ge PTEs,
-then x86's kvm_arch_test_clear_young() needs to be hardened to process only=
- 4KiB
-PTEs, and probably to WARN if a huge PTE is encountered.  That assumption s=
-hould
-also be documented.
+I don't buy the old/new thing. My take is that these things should be
+cumulative if there isn't a hard reason to break the existing API.
 
-If that assumption is incorrect, then kvm_arch_test_clear_young() is broken=
- and/or
-the expected behavior of the bitmap isn't fully defined.
+> My previous suggestion of tying the physical and virtual counters
+> together at VM creation would definitely break such a use case, though,
+> so we'd be at the point of requiring explicit opt-in from userspace.
+
+I'm trying to find a middle ground, so bear with me. Here's the
+situation as I see it:
+
+(1) a VM that is migrating today can only set the virtual offset and
+    doesn't affect the physical counter. This behaviour must be
+    preserved in we cannot prove that nobody relies on it.
+
+(2) setting the physical offset could be done by two means:
+
+    (a) writing the counter register (like we do for CNTVCT)
+    (b) providing an offset via a side channel
+
+I think (1) must stay forever, just like we still support the old
+GICv2 implicit initialisation.
+
+(2a) is also desirable as it requires no extra work on the VMM side.
+Just restore the damn thing, and nothing changes (we're finally able
+to migrate the physical timer). (2b) really is icing on the cake.
+
+The question is whether we can come up with an API offering (2b) that
+still allows (1) and (2a). I'd be happy with a new API that, when
+used, resets both offsets to the same value, matching your pretty
+picture. But the dual offsetting still has to exist internally.
+
+When it comes to NV, it uses either the physical offset that has been
+provided by writing CNTPCT, or the one that has been written via the
+new API. Under the hood, this is the same piece of data, of course.
+
+The only meaningful difference with my initial proposal is that there
+is no new virtual offset API. It is either register writes that obey
+the same rules as before, or a single offset setting.
+
+> > And I think that's the point where we differ. I can completely imagine
+> > some in-VM code using the physical counter to export some timestamping
+> > to the host (for tracing purposes, amongst other things).
+> 
+> So in this case the guest and userspace would already be in cahoots, so
+> userspace could choose to not use UAPI. Hell, if userspace did
+> absolutely nothing then it all continues to work.
+
+Userspace, yes. Not necessarily the VMM. Let's say my guest spits a
+bunch of timestamped traces over a network connection, which I then
+correlate with host traces (all similarities with a shipping product
+are completely fortuitous...). The VMM isn't involved at all here.
+
+> Oh, we're definitely on the hook for any existing misuse of observable
+> KVM behavior. I just think if we're at the point of adding new UAPI we
+> may as well lay down some new rules with userspace to avoid surprises.
+> 
+> OTOH, ignoring the virtual offset for NV is another way out of the mess,
+> but it just bothers me we're about to ignore input on a brand new
+> UAPI...
+
+I think my single-offset suggestion should answer your questioning.
+
+Thoughts?
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
