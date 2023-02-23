@@ -2,80 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 662FC6A003B
-	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 01:55:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 379176A0083
+	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 02:16:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232971AbjBWAzW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Feb 2023 19:55:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39394 "EHLO
+        id S232772AbjBWBQW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Feb 2023 20:16:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230048AbjBWAzU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Feb 2023 19:55:20 -0500
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D2C337546
-        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 16:55:18 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5376fa4106eso55055107b3.7
-        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 16:55:18 -0800 (PST)
+        with ESMTP id S229999AbjBWBQU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Feb 2023 20:16:20 -0500
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79CED76AD
+        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 17:16:19 -0800 (PST)
+Received: by mail-wm1-x334.google.com with SMTP id j19-20020a05600c1c1300b003e9b564fae9so2436255wms.2
+        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 17:16:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=3azLqXR2vSKV5L2PaJh+3T6s1vBztgHEFOD2woEyPYw=;
-        b=ll/kgw4EhN1QBjkzhFZB0Ail1ORJy+AyUBj3Zon2zA6YZR6bvv6MRVw4xL88tq8Az8
-         UNfJYuIlxPRqkMZxma4EfhQVLDz+WB3n7N3GgnS6/N71B9VGL9L1wJxicWIzPEsnhNbY
-         jwqQtYqGUwQCJ7O/Ie7nc1bEP4GmGEJpB8DCFusadZrYSFRLnQZARIT1I0plRhGyCTgj
-         klqga5wY1X/qhy0ohB1y16mctfilFHsYR3l8CX6UQd0Ok2HUyZRCt5JjEmEyFz3N4ySp
-         AUxoMU/xS8Z5QEE7WS4WTYYb6USgkUVSpxiH8hOE9if2xvRinxF+p0VrjEGBhDPd5C7e
-         03hg==
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ACruxKNejY1sXBH2D6SAHOO/I8K6z+cEyI/uP3OdVLQ=;
+        b=rXHrIyyIgAOG1TQ0RI3OmbHq/PpdTHXP+lSpuVviTpi4WBNyrTRPwN5YZ7dlCWDput
+         oOgA26MutDrZw5FCC/JsXNXVxRGoaN0F/k7OLBfimzcK1b4IRakIS+BeB3rLA2GlKbcx
+         QfMAJpD67t6K5yasK1mo56zU2sY7XBAWIkYjmVvlliGdsdfCqvqM317ZzU7tZld7Na03
+         lSD7bfLoCFYhplpDpPQMZSTxmFhb1iQfJD/26QYiSoSlvB/dbDwKhSwQTBnr2nh5cV4i
+         4+T9uCwHGJ/srZR+BW/vTaJzWzOUNFEy3kf2M1FUDeO1qg41JJjMGuntknkKf3p4HG/c
+         E+OA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3azLqXR2vSKV5L2PaJh+3T6s1vBztgHEFOD2woEyPYw=;
-        b=45V44tzqmsK/2kYCBmlg84OS1wOpvVZOEbwYEzsyZqM/zsXhrAatvsHqSnhk4giJCP
-         gd/elOFlg/egbDuLmzMvr9jKTGlVxpUZCsUAWLfGK+apP7oYPhauq66ufpPMQSbFKih1
-         odsgj6wDC57xxfUq8O1tI7zywTb23BlaPPqx/65Z2sbiL7PamDAvy751RqTK7pmYR2ao
-         L+PzcDPnk6arUyV4Y6UgxqW3ZDh3poNNvD6vXZ8pQi4a1MXRy11I5Pc/0O9OIBJnFW+c
-         i1DqfvdgwyV6m/U5ZVJjvTUuz4jNRbws5cwXtc+X61Ina49+XROgXfNBAQmAT8kdKhzF
-         C4jQ==
-X-Gm-Message-State: AO0yUKXGfmXhGtGGK3TPCQPbdqVwSfmhFhPaaGNom6caidqRzIxhwktv
-        Qa8iXZTj5JkYg6U26Bbwyl197o94Ye5YmwLzMA==
-X-Google-Smtp-Source: AK7set/bRW8kyMySNfR/6zy0z0kR68DNc8Wiwl2R9ueq8c35MSB8zjbIqdtnOK6awXZtxDJCM5SBJnFOM9ODRuSA8Q==
-X-Received: from ackerleytng-cloudtop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1f5f])
- (user=ackerleytng job=sendgmr) by 2002:a05:6902:1028:b0:a27:3ecd:6 with SMTP
- id x8-20020a056902102800b00a273ecd0006mr761629ybt.1.1677113717462; Wed, 22
- Feb 2023 16:55:17 -0800 (PST)
-Date:   Thu, 23 Feb 2023 00:55:16 +0000
-In-Reply-To: <20230216100150.yv2ehwrdcfzbdhcq@box.shutemov.name> (kirill@shutemov.name)
-Mime-Version: 1.0
-Message-ID: <diqzsfex5hfv.fsf@ackerleytng-cloudtop.c.googlers.com>
-Subject: Re: [RFC PATCH 1/2] mm: restrictedmem: Allow userspace to specify
- mount_path for memfd_restricted
-From:   Ackerley Tng <ackerleytng@google.com>
-To:     "Kirill A. Shutemov" <kirill@shutemov.name>
-Cc:     kvm@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, qemu-devel@nongnu.org,
-        chao.p.peng@linux.intel.com, aarcange@redhat.com,
-        ak@linux.intel.com, akpm@linux-foundation.org, arnd@arndb.de,
-        bfields@fieldses.org, bp@alien8.de, corbet@lwn.net,
-        dave.hansen@intel.com, david@redhat.com, ddutile@redhat.com,
-        dhildenb@redhat.com, hpa@zytor.com, hughd@google.com,
-        jlayton@kernel.org, jmattson@google.com, joro@8bytes.org,
-        jun.nakajima@intel.com, kirill.shutemov@linux.intel.com,
-        linmiaohe@huawei.com, luto@kernel.org, mail@maciej.szmigiero.name,
-        mhocko@suse.com, michael.roth@amd.com, mingo@redhat.com,
-        naoya.horiguchi@nec.com, pbonzini@redhat.com, qperret@google.com,
-        rppt@kernel.org, seanjc@google.com, shuah@kernel.org,
-        steven.price@arm.com, tabba@google.com, tglx@linutronix.de,
-        vannapurve@google.com, vbabka@suse.cz, vkuznets@redhat.com,
-        wanpengli@tencent.com, wei.w.wang@intel.com, x86@kernel.org,
-        yu.c.zhang@linux.intel.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ACruxKNejY1sXBH2D6SAHOO/I8K6z+cEyI/uP3OdVLQ=;
+        b=d5eASbyBA/5CwAN9qkX+yfOY5dj33FTg+RFscSeRtMAXSh52qZbhJuJLljA72fXa/i
+         vypk8Jw47Gb+pJZWVwjjwjNS7rORFwW77ugNd09PEIvk6DwxKMGoQUXI06W4b+kgm9Qc
+         1AQW6fXahORdgHRawan5GU4Ivw3znrkChJqMQHivlG2nlTDjO7FLyKDaRbjkWf0jy+GL
+         Fku7TFfQKLt3RGPY5LOdjrxfAks1ZQEAPX6bkxK2PYep6AOLfG2iNlOal72ZzG5hiyEm
+         zRLb75ziyfWUeh0PaGnO6YAg7d7SO/FBStDO1K5bTlyzYpQHLVBOClrPAdUE9dnFdVjX
+         FTDA==
+X-Gm-Message-State: AO0yUKURAWz+04FXJqVtmuVquxFTpbCsoZZfJ2wMTpsAyV+ufXmMTCmr
+        Sty/gjrqFi2w7g3AFXO1g5lW01df9vS0bWjJFqFtYQ==
+X-Google-Smtp-Source: AK7set8lHxU0d80KxQe0PVvWY9UsJj6vGKnanrB6lTrTk+z5PUj+s5l9toLxbmscxhEUqNUdo3KSabmNbaetRlcaErs=
+X-Received: by 2002:a05:600c:c16:b0:3e1:fb35:4247 with SMTP id
+ fm22-20020a05600c0c1600b003e1fb354247mr1547498wmb.132.1677114977931; Wed, 22
+ Feb 2023 17:16:17 -0800 (PST)
+MIME-Version: 1.0
+References: <20230215011614.725983-1-amoorthy@google.com> <20230215011614.725983-6-amoorthy@google.com>
+ <87mt5fz5g6.wl-maz@kernel.org> <CAF7b7mr3iDBYWvX+ZPA1JeZgezX-BDo8VArwnjuzHUeWJmO32Q@mail.gmail.com>
+ <Y+6iX6a22+GEuH1b@google.com> <CAF7b7mqeXcHdFHewX3enn-vxf6y7CUWjXjB3TXithZ_PnzVLQQ@mail.gmail.com>
+ <Y+/kgMxQPOswAz/2@google.com>
+In-Reply-To: <Y+/kgMxQPOswAz/2@google.com>
+From:   Anish Moorthy <amoorthy@google.com>
+Date:   Wed, 22 Feb 2023 17:16:06 -0800
+Message-ID: <CAF7b7mpMiw=6o6vTsqFR6HUUCJL+1MSTDUsMaKLnS1NqyVf-9A@mail.gmail.com>
+Subject: Re: [PATCH 5/8] kvm: Add cap/kvm_run field for memory fault exits
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -83,64 +72,83 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Feb 17, 2023 at 12:33=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote
+> > > > I don't think flags are a good idea for this, as it comes with the
+> > > > illusion that both events can happen on a single exit. In reality, =
+these
+> > > > are mutually exclusive.
+>
+> They aren't mutually exclusive.  Obviously KVM will only detect one other=
+ the
+> other, but it's entirely possible that a guest could be accessing the "wr=
+ong"
+> flavor of a page _and_ for that flavor to not be faulted in.  A smart use=
+rspace
+> should see that (a) it needs to change the memory attributes and (b) that=
+ it
+> needs to demand the to-be-installed page from the source.
+>
+> > > > A fault type/code would be better here, with the option to add flag=
+s at
+> > > > a later date that could be used to further describe the exit (if
+> > > > needed).
+> > >
+> > > Agreed.
+>
+> Not agreed :-)
+> ...
+> Hard "no" on a separate exit reason unless someone comes up with a very c=
+ompelling
+> argument.
+>
+> Chao's UPM series is not yet merged, i.e. is not set in stone.  If the pr=
+oposed
+> functionality in Chao's series is lacking and/or will conflict with this =
+UFFD,
+> then we can and should address those issues _before_ it gets merged.
 
-"Kirill A. Shutemov" <kirill@shutemov.name> writes:
+Ok so I have a v2 of the series basically ready to go, but I realized
+that I should
+probably have brought up my modified API here to make sure it was
+sane: so, I'll do
+that first
 
-> On Thu, Feb 16, 2023 at 12:41:16AM +0000, Ackerley Tng wrote:
->> By default, the backing shmem file for a restrictedmem fd is created
->> on shmem's kernel space mount.
+In v2, I've
+(1)  renamed the kvm cap from KVM_CAP_MEM_FAULT_NOWAIT to
+KVM_CAP_MEMORY_FAULT_EXIT due to Sean's earlier comment
 
->> With this patch, an optional tmpfs mount can be specified, which will
->> be used as the mountpoint for backing the shmem file associated with a
->> restrictedmem fd.
+> gup_fast() failing in itself isn't interesting.  The _intended_ behavior =
+is that
+> KVM will exit if and only if the guest accesses a valid page that hasn't =
+yet been
+> transfered from the source, but the _actual_ behavior is that KVM will ex=
+it if
+> the page isn't faulted in for _any_ reason.  Even tagging the access NOWA=
+IT is
+> speculative to some degree, as that suggests the access may have succeede=
+d if
+> KVM "waited", which may or may not be true.
 
->> This change is modeled after how sys_open() can create an unnamed
->> temporary file in a given directory with O_TMPFILE.
+(2) kept the definition of kvm_run.memory_fault as
+struct {
+    __u64 flags;
+    __u64 gpa;
+    __ u64 len;
+} memory_fault;
+which, apart from the name of the "len" field, is exactly what Chao
+has in their series.
+flags remains a bitfield describing the reason for the memory fault:
+in the two places
+this series generates this fault, it sets a bit in flags. Userspace is
+meant to check whether
+a memory_fault was generated due to KVM_CAP_MEMORY_FAULT_EXIT using the
+KVM_MEMORY_FAULT_EXIT_REASON_ABSENT mask.
 
->> This will help restrictedmem fds inherit the properties of the
->> provided tmpfs mounts, for example, hugepage allocation hints, NUMA
->> binding hints, etc.
+(3) switched over to a memslot flag: KVM_CAP_MEMORY_FAULT_EXIT simply
+indicates whether this flag is supported. As such, trying to enable
+the new capability
+directly generates an EINVAL, which is meant to make the incorrect usage cl=
+ear.
 
->> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
->> ---
->>   include/linux/syscalls.h           |  2 +-
->>   include/uapi/linux/restrictedmem.h |  8 ++++
->>   mm/restrictedmem.c                 | 63 +++++++++++++++++++++++++++---
->>   3 files changed, 66 insertions(+), 7 deletions(-)
->>   create mode 100644 include/uapi/linux/restrictedmem.h
-
->> diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
->> index f9e9e0c820c5..4b8efe9a8680 100644
->> --- a/include/linux/syscalls.h
->> +++ b/include/linux/syscalls.h
->> @@ -1056,7 +1056,7 @@ asmlinkage long sys_memfd_secret(unsigned int  
->> flags);
->>   asmlinkage long sys_set_mempolicy_home_node(unsigned long start,  
->> unsigned long len,
->>   					    unsigned long home_node,
->>   					    unsigned long flags);
->> -asmlinkage long sys_memfd_restricted(unsigned int flags);
->> +asmlinkage long sys_memfd_restricted(unsigned int flags, const char  
->> __user *mount_path);
-
->>   /*
->>    * Architecture-specific system calls
-
-> I'm not sure what the right practice now: do we provide string that
-> contains mount path or fd that represents the filesystem (returned from
-> fsmount(2) or open_tree(2)).
-
-> fd seems more flexible: it allows to specify unbind mounts.
-
-I tried out the suggestion of passing fds to memfd_restricted() instead
-of strings.
-
-One benefit I see of using fds is interface uniformity: it feels more
-aligned with other syscalls like fsopen(), fsconfig(), and fsmount() in
-terms of using and passing around fds.
-
-Other than being able to use a mount without a path attached to the
-mount, are there any other benefits of using fds over using the path string?
-
-Should I post the patches that allows specifying a mount using fds?
-Should I post them as a separate RFC, or as a new revision to this RFC?
+Hopefully this all appears sane?
