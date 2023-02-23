@@ -2,283 +2,279 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA4326A070D
-	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 12:08:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 159676A08FC
+	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 13:54:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233540AbjBWLIR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Feb 2023 06:08:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45482 "EHLO
+        id S233618AbjBWMyC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Feb 2023 07:54:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231312AbjBWLIQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Feb 2023 06:08:16 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4328D211D4;
-        Thu, 23 Feb 2023 03:08:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=TcX/9gR3x1bq0AWtM9csP9ROkqe3BQkhW207gbyGyu0=; b=kPmSa64tyvRnW7s4Brt4TGbTJm
-        JzKuG39vCiPZC89eadjHGycGC5U8YB/xQtSHlLO8DYKSCAmRyGpCSutGa6XdWEXaD+1y2j+yLpRXJ
-        F/jkFTDWj1XT4yNY4MJeN8eV3RCF3aqoD9Yq6bPvuSxH8cNadorl0c7t547L47fTnLrcI4lzEs/Zo
-        L3KaA2v4YiC2fqTq4ywzB+Z4fJ+iqmgDmrpcQrMMGHWOQl/WWz4C652DqMq15imMmIjbdpcSO/rQM
-        BoK7O2bpSIn40rygHZlMmrUuBITNAKXfld5BdeHNsj1TT7WII9Isxcp3qwwJpmJFZQxWjLCG7AxE6
-        4kHU4tRQ==;
-Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.infradead.org)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pV9Ri-00EIgN-Dq; Thu, 23 Feb 2023 11:07:31 +0000
-Message-ID: <701ce2da00e559d517d4e48bd5d88ccae1198e44.camel@infradead.org>
-Subject: Re: [PATCH v9 0/8] Parallel CPU bringup for x86_64
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Usama Arif <usama.arif@bytedance.com>, kim.phillips@amd.com
-Cc:     arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
-        pbonzini@redhat.com, paulmck@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
-        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
-        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
-        simon.evans@bytedance.com, liangma@liangbit.com
-Date:   Thu, 23 Feb 2023 11:07:29 +0000
-In-Reply-To: <87a615mz2x.ffs@tglx>
-References: <20230215145425.420125-1-usama.arif@bytedance.com>
-         <62ee53770b4010f065346b7f2a1200013836be97.camel@infradead.org>
-         <87a615mz2x.ffs@tglx>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-0PYTut9F7C00iFvK2Bdl"
-User-Agent: Evolution 3.44.4-0ubuntu1 
+        with ESMTP id S232420AbjBWMyB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Feb 2023 07:54:01 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 402074499
+        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 04:53:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1677156796;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=gxRHoavd4MDmnqbIu/ZiSEYwI9vrqzu7Su5XsON/qAY=;
+        b=Sbo+IF3mdjZpAs8zE/qcLvnIz0RltK5cas/arTfQOVTSEH7YCz8UhrSqwWkNNZHTxoXAcN
+        56jcK3jsGqlJq2uwmZs/Jb22fT4J953AZ3zb5Ar34m1RhhkWJafGX3LrR05gjX3zYFbpQV
+        B2eDlj/wSnbyTbu4FLs68PzUZ6Ldtu4=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-515-GSscDYoGO7uBC6Sz9pxj3g-1; Thu, 23 Feb 2023 07:53:15 -0500
+X-MC-Unique: GSscDYoGO7uBC6Sz9pxj3g-1
+Received: by mail-wm1-f72.google.com with SMTP id z6-20020a7bc7c6000000b003e0107732f4so4987706wmk.1
+        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 04:53:15 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gxRHoavd4MDmnqbIu/ZiSEYwI9vrqzu7Su5XsON/qAY=;
+        b=XQOARXOZNwIiXs0joWaLtTq3142yLW05vNVGwfD9QYo61Pkvl6bcbHLSqqbh6O2EXl
+         le+kLU5wO3kIclJNlB4/biCV76yKpGF+9Tb56tJGleDJ2Usl1BDu6OKod0SHcYl/u8+z
+         M1w0Y5L5w6L6hljVGhxcg7N4s/OdJd6tY97qjVg4rA1EmgplkcOgcNyzR4Q7vhFfHG9k
+         g/9AWIVAbB6x2x6m1dcVa7PZp76cIoLindND92HUU2YPll03uoO0mWMETWSl0prFxo16
+         O7ErmeMzrdoYXNcb0iZ5uaOZIsTAMZPSLk+qPSyU4Mxa8fs4SqsoO5PsqUOcL8c11vBC
+         PnkA==
+X-Gm-Message-State: AO0yUKXWDNLUcSC5dQX4vwSO2eOVYvfxKKidam/mtjyQWO8t3gPTcOhE
+        nfnjGBNIiRH7bBFQd73RqMWigwR4UhBd52GWLRZIrimF1chJMdBFh1Fn6ESvPo99bYg4v7abZZN
+        hy6dgIxUEs2Wj
+X-Received: by 2002:a5d:6950:0:b0:2bf:cfb4:2e1 with SMTP id r16-20020a5d6950000000b002bfcfb402e1mr10823686wrw.45.1677156794180;
+        Thu, 23 Feb 2023 04:53:14 -0800 (PST)
+X-Google-Smtp-Source: AK7set/L9zPBxv9S/OC02opzujXuGfsuJlgG4MIe0xcMDd7fYDFMq1nf+trYQ1oVjS/UdxtdoNUF0A==
+X-Received: by 2002:a5d:6950:0:b0:2bf:cfb4:2e1 with SMTP id r16-20020a5d6950000000b002bfcfb402e1mr10823662wrw.45.1677156793883;
+        Thu, 23 Feb 2023 04:53:13 -0800 (PST)
+Received: from [192.168.8.104] (tmo-100-40.customers.d1-online.com. [80.187.100.40])
+        by smtp.gmail.com with ESMTPSA id v26-20020a5d591a000000b002c573cff730sm7162515wrd.68.2023.02.23.04.53.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Feb 2023 04:53:12 -0800 (PST)
+Message-ID: <4bd16293-62e8-d7ea-dab4-9e5cb0208812@redhat.com>
+Date:   Thu, 23 Feb 2023 13:53:10 +0100
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Content-Language: en-US
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
+        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
+        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
+        nsg@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
+        clg@kaod.org
+References: <20230222142105.84700-1-pmorel@linux.ibm.com>
+ <20230222142105.84700-3-pmorel@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH v16 02/11] s390x/cpu topology: add topology entries on CPU
+ hotplug
+In-Reply-To: <20230222142105.84700-3-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 22/02/2023 15.20, Pierre Morel wrote:
+> The topology information are attributes of the CPU and are
+> specified during the CPU device creation.
+...
+> diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topology.h
+> index 83f31604cc..fa7f885a9f 100644
+> --- a/include/hw/s390x/cpu-topology.h
+> +++ b/include/hw/s390x/cpu-topology.h
+> @@ -10,6 +10,47 @@
+>   #ifndef HW_S390X_CPU_TOPOLOGY_H
+>   #define HW_S390X_CPU_TOPOLOGY_H
+>   
+> +#include "qemu/queue.h"
+> +#include "hw/boards.h"
+> +#include "qapi/qapi-types-machine-target.h"
+> +
+>   #define S390_TOPOLOGY_CPU_IFL   0x03
+>   
+> +typedef struct S390Topology {
+> +    uint8_t *cores_per_socket;
+> +    CpuTopology *smp;
+> +    CpuS390Polarization polarization;
+> +} S390Topology;
+> +
+> +#ifdef CONFIG_KVM
+> +bool s390_has_topology(void);
+> +void s390_topology_setup_cpu(MachineState *ms, S390CPU *cpu, Error **errp);
+> +#else
+> +static inline bool s390_has_topology(void)
+> +{
+> +       return false;
+> +}
+> +static inline void s390_topology_setup_cpu(MachineState *ms,
+> +                                           S390CPU *cpu,
+> +                                           Error **errp) {}
+> +#endif
+> +
+> +extern S390Topology s390_topology;
+> +int s390_socket_nb(S390CPU *cpu);
+> +
+> +static inline int s390_std_socket(int n, CpuTopology *smp)
+> +{
+> +    return (n / smp->cores) % smp->sockets;
+> +}
+> +
+> +static inline int s390_std_book(int n, CpuTopology *smp)
+> +{
+> +    return (n / (smp->cores * smp->sockets)) % smp->books;
+> +}
+> +
+> +static inline int s390_std_drawer(int n, CpuTopology *smp)
+> +{
+> +    return (n / (smp->cores * smp->sockets * smp->books)) % smp->books;
 
---=-0PYTut9F7C00iFvK2Bdl
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Shouldn't that be " % smp->drawers" instead?
 
-On Wed, 2023-02-22 at 17:42 +0100, Thomas Gleixner wrote:
-> David!
->=20
-> On Wed, Feb 22 2023 at 10:11, David Woodhouse wrote:
-> > On Wed, 2023-02-15 at 14:54 +0000, Usama Arif wrote:
-> > So the next thing that might be worth looking at is allowing the APs
-> > all to be running their hotplug thread simultaneously, bringing
-> > themselves from CPUHP_BRINGUP_CPU to CPUHP_AP_ONLINE. This series eats
-> > the initial INIT/SIPI/SIPI latency, but if there's any significant time
-> > in the AP hotplug thread, that could be worth parallelising.
->=20
-> On a 112 CPU machine (64 cores, HT enabled) the bringup takes
->=20
-> Setup and SIPIs sent:=C2=A0=C2=A0=C2=A0 49 ms
-> Bringup each CPU:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0516 ms
->=20
-> That's about 500 ms faster than a non-parallel bringup!
->=20
-> Now looking at the 516 ms, which is ~4.7 ms/CPU. The vast majority of the
-> time is spent on the APs in
->=20
-> =C2=A0=C2=A0=C2=A0=C2=A0 cpu_init() -> ucode_cpu_init()
->=20
-> for the primary threads of each core. The secondary threads are quickly
-> (1us) out of ucode_cpu_init() because the primary thread already loaded
-> it.
->=20
-> A microcode load on that machine takes ~7.5 ms per primary thread on
-> average which sums up to 7.5 * 55 =3D 412.5 ms
->=20
-> The threaded bringup after CPU_AP_ONLINE takes about 100us per CPU.
+> +}
+> +
+>   #endif
+> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+> new file mode 100644
+> index 0000000000..59f2cc15c7
+> --- /dev/null
+> +++ b/hw/s390x/cpu-topology.c
+> @@ -0,0 +1,270 @@
+> +/*
+> + * CPU Topology
+> + *
+> + * Copyright IBM Corp. 2022
+> + * Author(s): Pierre Morel <pmorel@linux.ibm.com>
+> +
+> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+> + * your option) any later version. See the COPYING file in the top-level
+> + * directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "qemu/error-report.h"
+> +#include "hw/qdev-properties.h"
+> +#include "hw/boards.h"
+> +#include "qemu/typedefs.h"
+> +#include "target/s390x/cpu.h"
+> +#include "hw/s390x/s390-virtio-ccw.h"
+> +#include "hw/s390x/cpu-topology.h"
+> +
+> +/*
+> + * s390_topology is used to keep the topology information.
+> + * .cores_per_socket: tracks information on the count of cores
+> + *                    per socket.
+> + * .smp: keeps track of the machine topology.
+> + *
+> + */
+> +S390Topology s390_topology = {
+> +    /* will be initialized after the cpu model is realized */
+> +    .cores_per_socket = NULL,
+> +    .smp = NULL,
+> +    .polarization = S390_CPU_POLARIZATION_HORIZONTAL,
+> +};
+> +
+> +/**
+> + * s390_socket_nb:
+> + * @cpu: s390x CPU
+> + *
+> + * Returns the socket number used inside the cores_per_socket array
+> + * for a cpu.
+> + */
+> +int s390_socket_nb(S390CPU *cpu)
+> +{
+> +    return (cpu->env.drawer_id * s390_topology.smp->books + cpu->env.book_id) *
+> +           s390_topology.smp->sockets + cpu->env.socket_id;
+> +}
+> +
+> +/**
+> + * s390_has_topology:
+> + *
+> + * Return value: if the topology is supported by the machine.
+> + */
+> +bool s390_has_topology(void)
+> +{
+> +    return false;
+> +}
+> +
+> +/**
+> + * s390_topology_init:
+> + * @ms: the machine state where the machine topology is defined
+> + *
+> + * Keep track of the machine topology.
+> + *
+> + * Allocate an array to keep the count of cores per socket.
+> + * The index of the array starts at socket 0 from book 0 and
+> + * drawer 0 up to the maximum allowed by the machine topology.
+> + */
+> +static void s390_topology_init(MachineState *ms)
+> +{
+> +    CpuTopology *smp = &ms->smp;
+> +
+> +    s390_topology.smp = smp;
+> +    s390_topology.cores_per_socket = g_new0(uint8_t, smp->sockets *
+> +                                            smp->books * smp->drawers);
+> +}
+> +
+> +/**
+> + * s390_topology_cpu_default:
+> + * @cpu: pointer to a S390CPU
+> + * @errp: Error pointer
+> + *
+> + * Setup the default topology if no attributes are already set.
+> + * Passing a CPU with some, but not all, attributes set is considered
+> + * an error.
+> + *
+> + * The function calculates the (drawer_id, book_id, socket_id)
+> + * topology by filling the cores starting from the first socket
+> + * (0, 0, 0) up to the last (smp->drawers, smp->books, smp->sockets).
+> + *
+> + * CPU type, entitlement and dedication have defaults values set in the
+> + * s390x_cpu_properties, however entitlement is forced to 0 'none' when
+> + * the polarization is horizontale.
+> + */
+> +static void s390_topology_cpu_default(S390CPU *cpu, Error **errp)
+> +{
+> +    CpuTopology *smp = s390_topology.smp;
+> +    CPUS390XState *env = &cpu->env;
+> +
+> +    /* All geometry topology attributes must be set or all unset */
+> +    if ((env->socket_id < 0 || env->book_id < 0 || env->drawer_id < 0) &&
+> +        (env->socket_id >= 0 || env->book_id >= 0 || env->drawer_id >= 0)) {
+> +        error_setg(errp,
+> +                   "Please define all or none of the topology geometry attributes");
+> +        return;
+> +    }
+> +
+> +    /* Check if one of the geometry topology is unset */
+> +    if (env->socket_id < 0) {
+> +        /* Calculate default geometry topology attributes */
+> +        env->socket_id = s390_std_socket(env->core_id, smp);
+> +        env->book_id = s390_std_book(env->core_id, smp);
+> +        env->drawer_id = s390_std_drawer(env->core_id, smp);
+> +    }
+> +
+> +    if (s390_topology.polarization == S390_CPU_POLARIZATION_HORIZONTAL) {
+> +        env->entitlement = 0;
 
-Nice analysis; thanks!
+Should this be S390_CPU_ENTITLEMENT_HORIZONTAL instead of 0 ?
 
-> identify_secondary_cpu() is one of the longer functions which takes
-> ~125us / CPU summing up to 13ms
+> +    }
+> +}
 
-Hm, shouldn't that one already be parallelised by my 'part 2' patch?
-
-It's called from smp_store_cpu_info(), from smp_callin(), which is
-called from somewhere in the middle of start_secondary().
-
-And if the comments I helpfully added to that function for the benefit
-of our future selves are telling the truth, the AP is free to get that
-far once the BSP has set its bit in cpu_callout_mask, which happens in
-do_wait_cpu_initialized().
-
-So
-https://git.infradead.org/users/dwmw2/linux.git/commitdiff/4b5731e05b0#patc=
-h3
-ought to parallelise that. But Usama emirically reported that 'part 2'
-didn't add any noticeable benefit, not even those 13ms? On a *larger*
-machine.
-
-
-> The TSC sync check for the first CPU on the second socket consumes
-> 20ms. That's only once per socket, intra socket is using MSR_TSC_ADJUST,
-> which is more or less free.
->=20
-> So the 516 ms are wasted here:
->=20
-> =C2=A0=C2=A0 total=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 516 ms
-> =C2=A0=C2=A0 ucode_cpu_init()=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 412 ms
-> =C2=A0=C2=A0 identify_secondary_cpu()=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 13 ms
-> =C2=A0=C2=A0 2ndsocket_tsc_sync=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 20=
- ms
-> =C2=A0=C2=A0 threaded bringup=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 12 ms
-> =C2=A0=C2=A0 rest=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 59 ms
->=20
-> So the rest is about 530us per CPU, which is just the sum of many small
-> functions, lock contentions...
->=20
-> Getting rid of the micro code overhead is possible. There is no reason
-> to serialize that between the cores. But it needs serialization vs. HT
-> siblings, which requires to move identify_secondary_cpu() and its caller
-> smp_store_cpu_info() ahead of the synchronization point and then have
-> serialization between the siblings. That's going to be a major surgery
-> and inspection effort to ensure that there are no hidden assumptions
-> about global hotplug serialization.=20
->=20
-> So that would cut the total cost down to ~100ms plus the
-> preparatory/SIPI stage of 60ms which sums up to about 160ms and about
-> 1.5ms per CPU total.
->=20
-> Further optimization starts to be questionable IMO. It's surely possible
-> somehow, but then you really have to go and inspect each and every
-> function in those code pathes, add local locking, etc. Not to talk about
-> the required mess in the core code to support that.
->=20
-> The low hanging fruit which brings most is the identification/topology
-> muck and the microcode loading. That needs to be addressed first anyway.
-
-Agreed, thanks.
-
-
---=-0PYTut9F7C00iFvK2Bdl
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMjIzMTEwNzI5WjAvBgkqhkiG9w0BCQQxIgQgj+rQ0PQO
-oqRp7pWDbFXMGG2FifBdla46wTWKj7uxHcwwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgA5fksoLoDQewOVktjxGL2kxxCkWdtMYFB1
-wkHSYspw0p1pfmYJFGRxWNHyWGgisKCqFNr3dnysdea1Y7/GOIAjMRuxcysA6DHdpH1CQHH8mhnw
-vS3GmgvwjLNlFxsk4E+T9Y60RKKZplecU1KuF7usJNNiMOh+7GU1s1aDFU9v4ybP6gaLgSvWoF9R
-ofdY4hdTcZSrO1oeNGLDAvmc+EidtkDDdvPZMtYxXggb9sH9HYBQu0zk3/rafOfZR8wlnbWZ6ihR
-uFb2gktp0IceVc3AnQ6vEgPyI7eOJOEtavXKHavFlgQTeRhiL0ElcFbjRuJ+erweRp4/jqVpGqLX
-b+roXttChVjYMyQq+Rf+ly8PxMyy7rOxnxwicSgDcD1rJNQhJFGvN2HG8LaFcHPrapMKlkWGDwdH
-IOeAY+LF22C32Klf8MkN6NeplEyMCv3m4dkvKLpRc8a6NZ6LjezulNGh1pU5g2WLwa/HVO7Ujfn4
-V/YUwSOHpbAiXHGRROyheq8COhXd1zHZOHDdKCcP0LVtbF3MevhW0ofcT9bXbSG1QTVXK2qchBNV
-EfxPBMN81qNlrhXVcvEeDlgvm0gjkpRtGGk09QfiOSJMDZ/nKmL40c3MDR5XS0jbr2hYBj1WoVz0
-ssSBmnIgzznqFhRYUZj1i5SGw/zqeYzZv/SDCOvDJwAAAAAAAA==
+  Thomas
 
 
---=-0PYTut9F7C00iFvK2Bdl--
