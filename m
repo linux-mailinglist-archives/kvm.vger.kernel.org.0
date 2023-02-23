@@ -2,74 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9ADF76A049F
-	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 10:19:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 60B216A0539
+	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 10:51:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233881AbjBWJTD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Feb 2023 04:19:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46960 "EHLO
+        id S234118AbjBWJvF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Feb 2023 04:51:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229502AbjBWJTC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Feb 2023 04:19:02 -0500
-Received: from mail-vs1-xe33.google.com (mail-vs1-xe33.google.com [IPv6:2607:f8b0:4864:20::e33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5937810266
-        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 01:19:01 -0800 (PST)
-Received: by mail-vs1-xe33.google.com with SMTP id d20so6547633vsf.11
-        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 01:19:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1677143940;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jJG07+p6MKBGS+KUMirk1JxFZsTo6RYQStGyBrR/Eec=;
-        b=VTUwGjwxIdIk+8DQo1F08zqK342XkE0IyISiKy445xlO4gn5BcvtIN8ObhUibjnPdh
-         +8QCDzAGRnNMibyH/sRteQ9ut7OJkOEsJ8kPkEGYc9OBnih7SfNQpowLXMcwoFUvs1K0
-         6ELBLUgwh0HmEnFhlM7FrYYPj3mzKwUNEEOe1h31zEj9FFkZtgtvcDAl/ADLU4zCLTaC
-         CZOb1xxY9uT50WPXBxvhwk3EuLggirXkkdcMLU8rlZo6fi998cB25h17CFWSnwQ6kgUi
-         scHNy8oFEGRxc67FjqT0UL/HkF89zud1sd74gtEScsUHorUBPQzjefZ88i8TDYmSUg2T
-         qgLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677143940;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jJG07+p6MKBGS+KUMirk1JxFZsTo6RYQStGyBrR/Eec=;
-        b=DdW9Z1ASmFRbWWRJSSiPUL+vnwfzn83bC6cJ5KFT96DYG8su1/WrInujw1yDInER7K
-         AmSkeosRsu2AXSkvy/VQqv9d6dwTK7fRJQRXyGWMLYoJf3MAFNDJOFQHMTiAxLhoIC82
-         KGoUS2kDehhpwQEZMKTZ+2PF8Y8npg+K+J/BpmOX/dP7o1JVwi2W+tLH075JQvc3nAnh
-         otGiBeTpgmTycAL91pxtCeU4VmrSvjeBOD9gzT3pe1GjEfRor4fzL6La75vVVsFiBB7y
-         rfU5qnBcGspVUa+GfzpVnTzDInJo6tc99xb1kacEmDx89AjsNhp6drRBklJtjA3YVeOj
-         QOjg==
-X-Gm-Message-State: AO0yUKWwPo/yfF0saoOXTAsgkB912XGpuqAEMZqjxvQi3WIjtYLMbIOO
-        4yfDv51QdvFrkkk1znb6G9aTtnDZzG/8x/uEXr1lIg==
-X-Google-Smtp-Source: AK7set+fL9K7BQue1MVWJ997o1Uw4HQUESRxfTJt3q61lF9gsBJ2K4+iBi+Hrae4wfMfj+Ek0HWi8Lg5PF2Mvbw7Sx4=
-X-Received: by 2002:a1f:aa41:0:b0:412:948:73ff with SMTP id
- t62-20020a1faa41000000b00412094873ffmr251161vke.13.1677143940266; Thu, 23 Feb
- 2023 01:19:00 -0800 (PST)
-MIME-Version: 1.0
-References: <20230217041230.2417228-1-yuzhao@google.com> <20230217041230.2417228-4-yuzhao@google.com>
- <CAOUHufYSx-edDVCZSauOzwOJG6Av0++0TFT4ko8qWq7vLi_mjw@mail.gmail.com>
- <86lekwy8d7.wl-maz@kernel.org> <CAOUHufbbs2gG+DPvSOw_N_Kx7FWdZvpdJUvLzko-BDQ8vfd6Xg@mail.gmail.com>
- <86a614ycs3.wl-maz@kernel.org>
-In-Reply-To: <86a614ycs3.wl-maz@kernel.org>
-From:   Yu Zhao <yuzhao@google.com>
-Date:   Thu, 23 Feb 2023 02:18:24 -0700
-Message-ID: <CAOUHufYLmu7oowXZ5YmVJqgx5dHWdz-1eaqPiVzUq3RAY4e_6A@mail.gmail.com>
-Subject: Re: [PATCH mm-unstable v1 3/5] kvm/arm64: add kvm_arch_test_clear_young()
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-        Michael Larabel <michael@michaellarabel.com>,
-        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, x86@kernel.org,
-        linux-mm@google.com, Andrew Morton <akpm@linux-foundation.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
+        with ESMTP id S233354AbjBWJvD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Feb 2023 04:51:03 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 933224E5E0;
+        Thu, 23 Feb 2023 01:51:02 -0800 (PST)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31N9BvQi014177;
+        Thu, 23 Feb 2023 09:51:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=N/XuGgMKaCuFUtxVdJeCg7Zs1AlJN7w9T5wtYEj77Jc=;
+ b=mGBioPdAuecwgCEmmO+sggEhlmlzNQ3mFB7PGsTeyV4KT9JaQW+PjPZ1yO9z9oTr0oeg
+ nc13+aOonvclxCGbSGQgiRbElBj6LpoD7fHi6YHMAZwkLRWooUmxSR9mlOBmrvXR/ZAj
+ uB49Fg8Dn1xitPn5Yf3BKl2hTh0xrE786YFmIMtR7mEx0xC5OTBTEPXsXN/mNEgyvppx
+ PEjDaN2TaoAF/g1ahVFOKX4KcJwiN2hn71HIERAbCW7L9IoCcwphYUyPr7kQW7FxERTn
+ rOk0c0I3RugxIa6daZS4LySihExMtVblNTTAiWJ3YaiPDyM/buz9FHSJuMDNoC1n+N1M hQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nx59y8sy7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 23 Feb 2023 09:51:02 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31N9npQV012373;
+        Thu, 23 Feb 2023 09:51:01 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nx59y8sxd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 23 Feb 2023 09:51:01 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31N7uchM016569;
+        Thu, 23 Feb 2023 09:50:59 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3ntpa6eh0h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 23 Feb 2023 09:50:59 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31N9otiO45154576
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 23 Feb 2023 09:50:56 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D483620043;
+        Thu, 23 Feb 2023 09:50:55 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7129E20040;
+        Thu, 23 Feb 2023 09:50:55 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.221.152])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Thu, 23 Feb 2023 09:50:55 +0000 (GMT)
+Message-ID: <e8d21eb5afde7fd9114e225692222fa8902c4e7a.camel@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v1] s390x: Add tests for execute-type
+ instructions
+From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>
+Cc:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Date:   Thu, 23 Feb 2023 10:50:55 +0100
+In-Reply-To: <167713875438.6442.2406479682969262260@t14-nrb.local>
+References: <20230222114742.1208584-1-nsg@linux.ibm.com>
+         <167713875438.6442.2406479682969262260@t14-nrb.local>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+User-Agent: Evolution 3.46.3 (3.46.3-1.fc37) 
+MIME-Version: 1.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: e9kvbgsnPD18ymPoCadSXb9-QyXaSfI_
+X-Proofpoint-GUID: xZxkXEQU3vJ4EOvsAu3VqXo4EH6z9mdb
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-23_04,2023-02-22_02,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
+ spamscore=0 priorityscore=1501 lowpriorityscore=0 phishscore=0 mlxscore=0
+ suspectscore=0 impostorscore=0 adultscore=0 malwarescore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
+ definitions=main-2302230083
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,77 +95,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 23, 2023 at 2:03=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
-:
->
-> On Thu, 23 Feb 2023 03:58:47 +0000,
-> Yu Zhao <yuzhao@google.com> wrote:
-> >
-> > On Fri, Feb 17, 2023 at 2:00=E2=80=AFAM Marc Zyngier <maz@kernel.org> w=
-rote:
-> > >
-> > > On Fri, 17 Feb 2023 04:21:28 +0000,
-> > > Yu Zhao <yuzhao@google.com> wrote:
-> > > >
-> > > > On Thu, Feb 16, 2023 at 9:12 PM Yu Zhao <yuzhao@google.com> wrote:
-> > > > >
-> > > > > This patch adds kvm_arch_test_clear_young() for the vast majority=
- of
-> > > > > VMs that are not pKVM and run on hardware that sets the accessed =
-bit
-> > > > > in KVM page tables.
-> > >
-> > > I'm really interested in how you can back this statement. 90% of the
-> > > HW I have access to is not FEAT_HWAFDB capable, either because it
-> > > predates the feature or because the feature is too buggy to be useful=
-.
-> >
-> > This is my expericen too -- most devices are pre v8.2.
->
-> And yet you have no issue writing the above. Puzzling.
+On Thu, 2023-02-23 at 08:52 +0100, Nico Boehr wrote:
+> Quoting Nina Schoetterl-Glausch (2023-02-22 12:47:42)
+> > Test the instruction address used by targets of an execute instruction.
+> > When the target instruction calculates a relative address, the result i=
+s
+> > relative to the target instruction, not the execute instruction.
+> >=20
+> > Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+> [...]
+> > diff --git a/s390x/Makefile b/s390x/Makefile
+> > index 97a61611..6cf8018b 100644
+> > --- a/s390x/Makefile
+> > +++ b/s390x/Makefile
+> > @@ -39,6 +39,7 @@ tests +=3D $(TEST_DIR)/panic-loop-extint.elf
+> >  tests +=3D $(TEST_DIR)/panic-loop-pgm.elf
+> >  tests +=3D $(TEST_DIR)/migration-sck.elf
+> >  tests +=3D $(TEST_DIR)/exittime.elf
+> > +tests +=3D $(TEST_DIR)/ex.elf
+>=20
+> You didn't add your new test to unittests.cfg, is this intentional?
 
-That's best to my knowledge. Mind enlightening me?
+Nope, I just forgot.
 
-> > > Do you have numbers?
-> >
-> > Let's do a quick market survey by segment. The following only applies
-> > to ARM CPUs:
-> >
-> > 1. Phones: none of the major Android phone vendors sell phones running
-> > VMs; no other major Linux phone vendors.
->
-> Maybe you should have a reality check and look at what your own
-> employer is shipping.
+@Thomas, I guess I should also add it to s390x-kvm in .gitlab-ci.yml,
+since the test passes on KVM?
 
-Which model? I'll look it up and see how/how I missed it.
+>=20
+> Otherwise:
+>=20
+> Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
 
-> > 2. Laptops: only a very limited number of Chromebooks run VMs, namely
-> > ACRVM. No other major Linux laptop vendors.
->
-> Again, your employer disagree.
-
-What do you mean? Sorry, I'm a little surprised here... I do know *a
-lot* about Chromebooks.
-
-> > 3. Desktops: no major Linux desktop vendors.
->
-> My desktop disagree (I send this from my arm64 desktop VM ).
-
-A model number please?
-
-> > 4. Embedded/IoT/Router: no major Linux vendors run VMs (Android Auto
-> > can be a VM guest on QNX host).
->
-> This email is brought to you via a router VM on an arm64 box.
-
-More details?
-
-> > 5. Cloud: this is where the vast majority VMs come from. Among the
-> > vendors available to the general public, Ampere is the biggest player.
-> > Here [1] is a list of its customers. The A-bit works well even on its
-> > EVT products (Neoverse cores).
->
-> Just the phone stuff dwarfs the number of cloud hosts.
-
-Please point me to something that I can work on so that I wouldn't
-sound so ignorant next time.
+Thanks!
