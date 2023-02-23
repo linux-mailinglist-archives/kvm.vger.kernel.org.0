@@ -2,83 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BC076A00A0
-	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 02:32:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EA3D46A01A4
+	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 04:59:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233045AbjBWBcD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Feb 2023 20:32:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38834 "EHLO
+        id S232976AbjBWD71 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Feb 2023 22:59:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232721AbjBWBb5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Feb 2023 20:31:57 -0500
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3626F3D93C
-        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 17:31:56 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id q5-20020a170902788500b0019b0c60afa8so5546204pll.12
-        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 17:31:56 -0800 (PST)
+        with ESMTP id S232484AbjBWD70 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Feb 2023 22:59:26 -0500
+Received: from mail-vs1-xe2e.google.com (mail-vs1-xe2e.google.com [IPv6:2607:f8b0:4864:20::e2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8ACC525960
+        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 19:59:24 -0800 (PST)
+Received: by mail-vs1-xe2e.google.com with SMTP id v3so12747476vse.0
+        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 19:59:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Say+6a1ZyYr+UuCKdaAjxZI4dgG3bJdQNiusmWUgqvk=;
-        b=ZftMo2Jr/MYc+TnSUI/NqHqeLeV4TeeVWH0yMAlI85IeiLcuVkcU0Xi9yTYAL4Ti4N
-         Pcptnd77UOE+Ubfxn8QRWMdZmWSY4akFCQf6v1PFTzO870zP5UiH0CvKAUAI60rjhMim
-         A2kOh6/xUtroxJBIX+ZIQDEuJ2pVebSSpDtdCRhVuxII0dGn+QairZ/42WYH8onaX3sW
-         VTadd7UYWVbVvmpPJT8zKlqq4fO8PhGLg1iNudHVb3yTAkso/TczAQYjur3wkh3ATGMq
-         V9iE2XTX1+ukTikznIFKOxl8ReNuuDE+7TSPpoSVLKtc3hqyAmK9WjjTQq/mdtnRLNoK
-         xRbw==
+        d=google.com; s=20210112; t=1677124763;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=H32nxJKYLFgX94VN5oR58FHUZwCnE+gpSinuTrZzCc0=;
+        b=V4Q5l6WLAj/WwxnVZRzvheA/iOME8vS7OMCgLQWsVt/tZ1p+FehahQQjYkfBEwnn5l
+         TKqvMJ4ouOnvNtwLpkdvRKTTNQhJdK8GWjwAgSM5gu2EhnU0opER4l31mwe55domXE0w
+         Hh/RGdOf2a1K2z7Re8lyE0yCVzCTzILxkZUcQXewKdfJ3nDh+Cx8jTMdJZGQX0pZkZUY
+         4CAifutvKd9vpOwllaoBeMHWTAZ8SHL+wtWN3Q2twnpq3HAsmolU0vVpaO0k7gzLbvmc
+         s3sDmxNfwKOsOYTnd2jaudx9jqxs70BYLlpqGNm2hwnZxrqrv9nxqoKIAVBvW5yE8AKf
+         bHlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Say+6a1ZyYr+UuCKdaAjxZI4dgG3bJdQNiusmWUgqvk=;
-        b=XHyoMdBvh5sFfKMdUwDOuCdPcajeMuqldLUEZvpO5JsVa2ZNihsBcRa6KTGclwoA9s
-         YaTiXNOcShJ6BDg9tBVJf12+5B7pej/77qcDFEsdCDkEFvgeBusr7sboeeMsfDlAIb5e
-         /4g+m0H7UqfmL+4iSpVzchxqtqq4CqGISYyfQPHbJw8u9rPsfctUUYJdnJHJ7bJblNL/
-         BETGD7nUeb9eP2C7KdXsyWIpF4mNBoKfTbz7hpNO5o/YETPltRlhBk+hwxtCKUXUZ5/g
-         qP2WWF3Ss0zRnnSS5601D7ky9BMuqI7E+sfwMFalncCgNEWve03VmuW1jZ6UloPSkapB
-         nPuA==
-X-Gm-Message-State: AO0yUKXl3wooYluYMurwHbDPkCiS/qQTKhRfOtDMHNjQyhddntpIvApf
-        R/ct3HGbYoRFoz7TJMtslCXT3uIYoAXPrA7Fww==
-X-Google-Smtp-Source: AK7set8In7pASIkwc5RmcKGC5gPhzEpeOqmjGbH5z8/aZP8m2bTicadsvcxB91Z6rAsHkHh1dfvaP8X5FauAcxQlUQ==
-X-Received: from ackerleytng-cloudtop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1f5f])
- (user=ackerleytng job=sendgmr) by 2002:a17:90a:49ca:b0:231:1d90:7b1b with
- SMTP id l10-20020a17090a49ca00b002311d907b1bmr79634pjm.2.1677115915638; Wed,
- 22 Feb 2023 17:31:55 -0800 (PST)
-Date:   Thu, 23 Feb 2023 01:31:54 +0000
-In-Reply-To: <20230220030412.fgh3f5qzgihz4f4x@yy-desk-7060> (message from Yuan
- Yao on Mon, 20 Feb 2023 11:04:12 +0800)
-Mime-Version: 1.0
-Message-ID: <diqzk0099ng5.fsf@ackerleytng-cloudtop.c.googlers.com>
-Subject: Re: [RFC PATCH 0/2] Add flag as THP allocation hint for
- memfd_restricted() syscall
-From:   Ackerley Tng <ackerleytng@google.com>
-To:     Yuan Yao <yuan.yao@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, qemu-devel@nongnu.org, aarcange@redhat.com,
-        ak@linux.intel.com, akpm@linux-foundation.org, arnd@arndb.de,
-        bfields@fieldses.org, bp@alien8.de, chao.p.peng@linux.intel.com,
-        corbet@lwn.net, dave.hansen@intel.com, david@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com, hpa@zytor.com,
-        hughd@google.com, jlayton@kernel.org, jmattson@google.com,
-        joro@8bytes.org, jun.nakajima@intel.com,
-        kirill.shutemov@linux.intel.com, linmiaohe@huawei.com,
-        luto@kernel.org, mail@maciej.szmigiero.name, mhocko@suse.com,
-        michael.roth@amd.com, mingo@redhat.com, naoya.horiguchi@nec.com,
-        pbonzini@redhat.com, qperret@google.com, rppt@kernel.org,
-        seanjc@google.com, shuah@kernel.org, steven.price@arm.com,
-        tabba@google.com, tglx@linutronix.de, vannapurve@google.com,
-        vbabka@suse.cz, vkuznets@redhat.com, wanpengli@tencent.com,
-        wei.w.wang@intel.com, x86@kernel.org, yu.c.zhang@linux.intel.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
-Content-Transfer-Encoding: base64
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        d=1e100.net; s=20210112; t=1677124763;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=H32nxJKYLFgX94VN5oR58FHUZwCnE+gpSinuTrZzCc0=;
+        b=CalxLNZCfcN7FlxkqrDoUITyCwkGz8PU78KRXADVWzPGkeUsgi3JTSpWHdjfMwrn7Z
+         R3iBk9r1cz1/jCLMycqjr0gs8TzqruhGZ738+HTcjvz1NnyJFvkF08p5WrqkzCwbhP1J
+         KdN6HkeYyDU8dW5djhWez9miwwBpP2W77ih8MpBqa8cSIhbuGBqB5boz6YZBHAn0ZFl9
+         yMBbM7zJsYr83QmXKLMqj0+pg61IjvEzBdT4u62/D+7Sq50YUnZ80eW5LPvq11qDAwjw
+         BL27mDnh+zsOdoCAlQlW1s1kAfwzT0K5Qu5FzfjQNNObrqIdxgh8FAXtPNQJmRX/c9Kf
+         IeFA==
+X-Gm-Message-State: AO0yUKX19aruQ+4Dx0a8Ph6qauxIijpO4ZscD8Qvm64m/UU+yfRk7Gbb
+        Ku62kpkLOkQGRvuSx+TIeHCXCQYfmAc66xiKVDL1sQ==
+X-Google-Smtp-Source: AK7set8d4Kt8nwIvSPEaytrIpcGaTkhsSfI3kbZZEBvM/1NXFxRlVl/iWmVtGErpsTF5b/RMhuHUh6LwD5LpoKFSFjM=
+X-Received: by 2002:a1f:aa41:0:b0:412:948:73ff with SMTP id
+ t62-20020a1faa41000000b00412094873ffmr143108vke.13.1677124763494; Wed, 22 Feb
+ 2023 19:59:23 -0800 (PST)
+MIME-Version: 1.0
+References: <20230217041230.2417228-1-yuzhao@google.com> <20230217041230.2417228-4-yuzhao@google.com>
+ <CAOUHufYSx-edDVCZSauOzwOJG6Av0++0TFT4ko8qWq7vLi_mjw@mail.gmail.com> <86lekwy8d7.wl-maz@kernel.org>
+In-Reply-To: <86lekwy8d7.wl-maz@kernel.org>
+From:   Yu Zhao <yuzhao@google.com>
+Date:   Wed, 22 Feb 2023 20:58:47 -0700
+Message-ID: <CAOUHufbbs2gG+DPvSOw_N_Kx7FWdZvpdJUvLzko-BDQ8vfd6Xg@mail.gmail.com>
+Subject: Re: [PATCH mm-unstable v1 3/5] kvm/arm64: add kvm_arch_test_clear_young()
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+        Michael Larabel <michael@michaellarabel.com>,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, x86@kernel.org,
+        linux-mm@google.com, Andrew Morton <akpm@linux-foundation.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -86,52 +75,78 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-WXVhbiBZYW8gPHl1YW4ueWFvQGxpbnV4LmludGVsLmNvbT4gd3JpdGVzOg0KDQo+IE9uIFNhdCwg
-RmViIDE4LCAyMDIzIGF0IDEyOjQzOjAwQU0gKzAwMDAsIEFja2VybGV5IFRuZyB3cm90ZToNCj4+
-IEhlbGxvLA0KDQo+PiBUaGlzIHBhdGNoc2V0IGJ1aWxkcyB1cG9uIHRoZSBtZW1mZF9yZXN0cmlj
-dGVkKCkgc3lzdGVtIGNhbGwgdGhhdCBoYXMNCj4+IGJlZW4gZGlzY3Vzc2VkIGluIHRoZSDigJhL
-Vk06IG1tOiBmZC1iYXNlZCBhcHByb2FjaCBmb3Igc3VwcG9ydGluZyBLVk3igJkNCj4+IHBhdGNo
-IHNlcmllcywgYXQNCj4+IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2xrbWwvMjAyMjEyMDIwNjEz
-NDcuMTA3MDI0Ni0xLWNoYW8ucC5wZW5nQGxpbnV4LmludGVsLmNvbS9ULyNtN2U5NDRkNzg5MmFm
-ZGQxZDYyYTAzYTI4N2JkNDg4YzU2ZTM3N2IwYw0KDQo+PiBUaGUgdHJlZSBjYW4gYmUgZm91bmQg
-YXQ6DQo+PiBodHRwczovL2dpdGh1Yi5jb20vZ29vZ2xlcHJvZGtlcm5lbC9saW51eC1jYy90cmVl
-L3Jlc3RyaWN0ZWRtZW0tcm1mZC1odWdlcGFnZQ0KDQo+PiBGb2xsb3dpbmcgdGhlIFJGQyB0byBw
-cm92aWRlIG1vdW50IGZvciBtZW1mZF9yZXN0cmljdGVkKCkgc3lzY2FsbCBhdA0KPj4gaHR0cHM6
-Ly9sb3JlLmtlcm5lbC5vcmcvbGttbC9jb3Zlci4xNjc2NTA3NjYzLmdpdC5hY2tlcmxleXRuZ0Bn
-b29nbGUuY29tL1QvI3UsDQo+PiB0aGlzIHBhdGNoc2V0IGFkZHMgdGhlIFJNRkRfSFVHRVBBR0Ug
-ZmxhZyB0byB0aGUgbWVtZmRfcmVzdHJpY3RlZCgpDQo+PiBzeXNjYWxsLCB3aGljaCB3aWxsIGhp
-bnQgdGhlIGtlcm5lbCB0byB1c2UgVHJhbnNwYXJlbnQgSHVnZVBhZ2VzIHRvDQo+PiBiYWNrIHJl
-c3RyaWN0ZWRtZW0gcGFnZXMuDQoNCj4+IFRoaXMgc3VwcGxlbWVudHMgdGhlIGludGVyZmFjZSBw
-cm9wb3NlZCBlYXJsaWVyLCB3aGljaCByZXF1aXJlcyB0aGUNCj4+IGNyZWF0aW9uIG9mIGEgdG1w
-ZnMgbW91bnQgdG8gYmUgcGFzc2VkIHRvIG1lbWZkX3Jlc3RyaWN0ZWQoKSwgd2l0aCBhDQo+PiBt
-b3JlIGRpcmVjdCBwZXItZmlsZSBoaW50Lg0KDQo+PiBEZXBlbmRlbmNpZXM6DQoNCj4+ICsgU2Vh
-buKAmXMgaXRlcmF0aW9uIG9mIHRoZSDigJhLVk06IG1tOiBmZC1iYXNlZCBhcHByb2FjaCBmb3Ig
-c3VwcG9ydGluZw0KPj4gICAgS1ZN4oCZIHBhdGNoIHNlcmllcyBhdA0KPj4gICAgaHR0cHM6Ly9n
-aXRodWIuY29tL3NlYW4tamMvbGludXgvdHJlZS94ODYvdXBtX2Jhc2Vfc3VwcG9ydA0KPj4gKyBQ
-cm9wb3NlZCBmaXggZm9yIHJlc3RyaWN0ZWRtZW1fZ2V0YXR0cigpIGFzIG1lbnRpb25lZCBvbiB0
-aGUgbWFpbGluZw0KPj4gICAgbGlzdCBhdA0KPj4gICAgIA0KPj4gaHR0cHM6Ly9sb3JlLmtlcm5l
-bC5vcmcvbGttbC9kaXF6emdhMGZ2OTYuZnNmQGFja2VybGV5dG5nLWNsb3VkdG9wLXNnLmMuZ29v
-Z2xlcnMuY29tLw0KPj4gKyBIdWdo4oCZcyBwYXRjaDoNCj4+ICAgICANCj4+IGh0dHBzOi8vbG9y
-ZS5rZXJuZWwub3JnL2xrbWwvYzE0MGY1NmEtMWFhMy1mN2FlLWI3ZDEtOTNkYTdkNWEzNTcyQGdv
-b2dsZS5jb20vLA0KPj4gICAgd2hpY2ggcHJvdmlkZXMgZnVuY3Rpb25hbGl0eSBpbiBzaG1lbSB0
-aGF0IHJlYWRzIHRoZSBWTV9IVUdFUEFHRQ0KPj4gICAgZmxhZyBpbiBrZXkgZnVuY3Rpb25zIHNo
-bWVtX2lzX2h1Z2UoKSBhbmQgc2htZW1fZ2V0X2lub2RlKCkNCg0KPiBXaWxsIEh1Z2gncyBwYXRj
-aCBiZSBtZXJnZWQgaW50byA2LjMgPyBJIGRpZG4ndCBmaW5kIGl0IGluIDYuMi1yYzguDQo+IElN
-SE8gdGhpcyBwYXRjaCB3b24ndCB3b3JrIHdpdGhvdXQgSHVnaCdzIHBhdGNoLCBvciBhdCBsZWFz
-dCBuZWVkDQo+IGFub3RoZXIgd2F5LCBlLmcuIEhNRU1fU0IoaW5vZGUtPmlfc2IpLT5odWdlLg0K
-DQoNCkh1Z2gncyBwYXRjaCBpcyBzdGlsbCBwZW5kaW5nIGRpc2N1c3Npb24gYW5kIG1heSBub3Qg
-YmUgbWVyZ2VkIHNvDQpzb29uLiBUaGVzZSBwYXRjaGVzIHdpbGwgbm90IHdvcmsgd2l0aG91dCBI
-dWdoJ3MgcGF0Y2guDQoNCkkgd291bGQgbGlrZSB0byB1bmRlcnN0YW5kIHdoYXQgdGhlIGNvbW11
-bml0eSB0aGlua3Mgb2YgdGhlIHByb3Bvc2VkDQppbnRlcmZhY2UgKFJNRkRfSFVHRVBBR0UgZmxh
-ZywgcGFzc2VkIHRvIHRoZSBtZW1mZF9yZXN0cmljdGVkKCkNCnN5c2NhbGwpLiBJZiB0aGlzIGlu
-dGVyZmFjZSBpcyBmYXZvcmFibHkgcmVjZWl2ZWQsIHdlIGNhbiBkZWZpbml0ZWx5DQpmaW5kIGFu
-b3RoZXIgd2F5IGZvciBzaG1lbSB0byBzdXBwb3J0IHRoaXMgaW50ZXJmYWNlLg0KDQpJZiBJIHVu
-ZGVyc3RhbmQgY29ycmVjdGx5LCBTSE1FTV9TQihpbm9kZS0+aV9zYiktPmh1Z2UgY2hlY2tzIHRo
-ZSBzdGF0ZQ0Kb2YgaHVnZXBhZ2UtbmVzcyBmb3IgdGhlIHN1cGVyYmxvY2suIFNpbmNlIHRoZSBw
-cm9wb3NlZCBpbnRlcmZhY2Ugd2lsbA0Kb25seSBhZmZlY3QgYSBzaW5nbGUgZmlsZSwgd2Ugd2ls
-bCBuZWVkIHNvbWV0aGluZyBjbG9zZXIgdG8NCg0KICAgICBib29sIHNobWVtX2lzX2h1Z2Uoc3Ry
-dWN0IHZtX2FyZWFfc3RydWN0ICp2bWEsIHN0cnVjdCBpbm9kZSAqaW5vZGUsDQogICAgICAgICAg
-ICAgICAgICAgICAgICBwZ29mZl90IGluZGV4LCBib29sIHNobWVtX2h1Z2VfZm9yY2UpDQogICAg
-IHsNCiAgICAgICAgICAgICAuLi4NCg0KICAgICAgICAgICAgIGlmIChTSE1FTV9JKGlub2RlKS0+
-ZmxhZ3MgJiBWTV9IVUdFUEFHRSkNCiAgICAgICAgICAgICAgICAgICAgIHJldHVybiB0cnVlOw0K
-DQogICAgICAgICAgICAgLi4uDQogICAgIH0NCg0KZnJvbSBIdWdoJ3MgcGF0Y2guDQo=
+On Fri, Feb 17, 2023 at 2:00=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
+:
+>
+> On Fri, 17 Feb 2023 04:21:28 +0000,
+> Yu Zhao <yuzhao@google.com> wrote:
+> >
+> > On Thu, Feb 16, 2023 at 9:12 PM Yu Zhao <yuzhao@google.com> wrote:
+> > >
+> > > This patch adds kvm_arch_test_clear_young() for the vast majority of
+> > > VMs that are not pKVM and run on hardware that sets the accessed bit
+> > > in KVM page tables.
+>
+> I'm really interested in how you can back this statement. 90% of the
+> HW I have access to is not FEAT_HWAFDB capable, either because it
+> predates the feature or because the feature is too buggy to be useful.
+
+This is my expericen too -- most devices are pre v8.2.
+
+> Do you have numbers?
+
+Let's do a quick market survey by segment. The following only applies
+to ARM CPUs:
+
+1. Phones: none of the major Android phone vendors sell phones running
+VMs; no other major Linux phone vendors.
+2. Laptops: only a very limited number of Chromebooks run VMs, namely
+ACRVM. No other major Linux laptop vendors.
+3. Desktops: no major Linux desktop vendors.
+4. Embedded/IoT/Router: no major Linux vendors run VMs (Android Auto
+can be a VM guest on QNX host).
+5. Cloud: this is where the vast majority VMs come from. Among the
+vendors available to the general public, Ampere is the biggest player.
+Here [1] is a list of its customers. The A-bit works well even on its
+EVT products (Neoverse cores).
+
+[1] https://en.wikipedia.org/wiki/Ampere_Computing
+
+> > > It relies on two techniques, RCU and cmpxchg, to safely test and clea=
+r
+> > > the accessed bit without taking the MMU lock. The former protects KVM
+> > > page tables from being freed while the latter clears the accessed bit
+> > > atomically against both the hardware and other software page table
+> > > walkers.
+> > >
+> > > Signed-off-by: Yu Zhao <yuzhao@google.com>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_host.h       |  7 +++
+> > >  arch/arm64/include/asm/kvm_pgtable.h    |  8 +++
+> > >  arch/arm64/include/asm/stage2_pgtable.h | 43 ++++++++++++++
+> > >  arch/arm64/kvm/arm.c                    |  1 +
+> > >  arch/arm64/kvm/hyp/pgtable.c            | 51 ++--------------
+> > >  arch/arm64/kvm/mmu.c                    | 77 +++++++++++++++++++++++=
++-
+> > >  6 files changed, 141 insertions(+), 46 deletions(-)
+> >
+> > Adding Marc and Will.
+> >
+> > Can you please add other interested parties that I've missed?
+>
+> The MAINTAINERS file has it all:
+>
+> KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)
+> M:      Marc Zyngier <maz@kernel.org>
+> M:      Oliver Upton <oliver.upton@linux.dev>
+> R:      James Morse <james.morse@arm.com>
+> R:      Suzuki K Poulose <suzuki.poulose@arm.com>
+> R:      Zenghui Yu <yuzenghui@huawei.com>
+> L:      kvmarm@lists.linux.dev
+>
+> May I suggest that you repost your patch and Cc the interested
+> parties yourself? I guess most folks will want to see this in context,
+> and not as a random, isolated change with no rationale.
+
+This clarified it. Thanks. (I was hesitant to spam people with the
+entire series containing changes to other architectures.)
