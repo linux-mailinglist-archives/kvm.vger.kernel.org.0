@@ -2,279 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 159676A08FC
-	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 13:54:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EAF316A0A65
+	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 14:21:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233618AbjBWMyC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Feb 2023 07:54:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49194 "EHLO
+        id S234140AbjBWNV4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Feb 2023 08:21:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232420AbjBWMyB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Feb 2023 07:54:01 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 402074499
-        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 04:53:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677156796;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=gxRHoavd4MDmnqbIu/ZiSEYwI9vrqzu7Su5XsON/qAY=;
-        b=Sbo+IF3mdjZpAs8zE/qcLvnIz0RltK5cas/arTfQOVTSEH7YCz8UhrSqwWkNNZHTxoXAcN
-        56jcK3jsGqlJq2uwmZs/Jb22fT4J953AZ3zb5Ar34m1RhhkWJafGX3LrR05gjX3zYFbpQV
-        B2eDlj/wSnbyTbu4FLs68PzUZ6Ldtu4=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-515-GSscDYoGO7uBC6Sz9pxj3g-1; Thu, 23 Feb 2023 07:53:15 -0500
-X-MC-Unique: GSscDYoGO7uBC6Sz9pxj3g-1
-Received: by mail-wm1-f72.google.com with SMTP id z6-20020a7bc7c6000000b003e0107732f4so4987706wmk.1
-        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 04:53:15 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gxRHoavd4MDmnqbIu/ZiSEYwI9vrqzu7Su5XsON/qAY=;
-        b=XQOARXOZNwIiXs0joWaLtTq3142yLW05vNVGwfD9QYo61Pkvl6bcbHLSqqbh6O2EXl
-         le+kLU5wO3kIclJNlB4/biCV76yKpGF+9Tb56tJGleDJ2Usl1BDu6OKod0SHcYl/u8+z
-         M1w0Y5L5w6L6hljVGhxcg7N4s/OdJd6tY97qjVg4rA1EmgplkcOgcNyzR4Q7vhFfHG9k
-         g/9AWIVAbB6x2x6m1dcVa7PZp76cIoLindND92HUU2YPll03uoO0mWMETWSl0prFxo16
-         O7ErmeMzrdoYXNcb0iZ5uaOZIsTAMZPSLk+qPSyU4Mxa8fs4SqsoO5PsqUOcL8c11vBC
-         PnkA==
-X-Gm-Message-State: AO0yUKXWDNLUcSC5dQX4vwSO2eOVYvfxKKidam/mtjyQWO8t3gPTcOhE
-        nfnjGBNIiRH7bBFQd73RqMWigwR4UhBd52GWLRZIrimF1chJMdBFh1Fn6ESvPo99bYg4v7abZZN
-        hy6dgIxUEs2Wj
-X-Received: by 2002:a5d:6950:0:b0:2bf:cfb4:2e1 with SMTP id r16-20020a5d6950000000b002bfcfb402e1mr10823686wrw.45.1677156794180;
-        Thu, 23 Feb 2023 04:53:14 -0800 (PST)
-X-Google-Smtp-Source: AK7set/L9zPBxv9S/OC02opzujXuGfsuJlgG4MIe0xcMDd7fYDFMq1nf+trYQ1oVjS/UdxtdoNUF0A==
-X-Received: by 2002:a5d:6950:0:b0:2bf:cfb4:2e1 with SMTP id r16-20020a5d6950000000b002bfcfb402e1mr10823662wrw.45.1677156793883;
-        Thu, 23 Feb 2023 04:53:13 -0800 (PST)
-Received: from [192.168.8.104] (tmo-100-40.customers.d1-online.com. [80.187.100.40])
-        by smtp.gmail.com with ESMTPSA id v26-20020a5d591a000000b002c573cff730sm7162515wrd.68.2023.02.23.04.53.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Feb 2023 04:53:12 -0800 (PST)
-Message-ID: <4bd16293-62e8-d7ea-dab4-9e5cb0208812@redhat.com>
-Date:   Thu, 23 Feb 2023 13:53:10 +0100
+        with ESMTP id S232420AbjBWNVy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Feb 2023 08:21:54 -0500
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB3F555067;
+        Thu, 23 Feb 2023 05:21:53 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cqFRxbCBJpUMsTOxiNUSbqOmXsBeJzmEQG+MO9Ead8tT0AEf1rtMGE8BoxEvCXMkHRpfwMaUIBpfYJur3GJRDlzz7f4MAMrq0DXJuK5lmL16OHtZ0yxTn4LITYdMRbLRLDBV4QgdNMRg4z8mSxlKQf5f9w2Qcb5p9Ul1xu/W6aJ4Bc4VJoY/bIQr5EfEBweFu77VLlBe3xpKDvx4AfLycEsUFuKrz5sN0G+QYA1E9349v6OYk5oJVeIme4dLGdBSGtHNApATOh5dqdxoW92MwaG/DIXJEnmDOR3CW47ps3t1nhaOzzqmCxLVhX0mPoDFMlyCPnRl4epg0SKDYP7wtg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=03EObfSPPoIOQSA/BvFvuRrfCC1wZBSjj2QBV3sXEz4=;
+ b=TGLNbW7lxkmR6Qp3Awk1vkO4WuoUphgMQ5daKOy6RbEok1Njlm3YG+sJbk1f/ATomp0uzvjr1QcTvU4bWJyo6Fz8KKy/4A71O+NNZ7NHj3kIS83TaG+dw6LRFDW5MbFLFTIpsjAgS064bzuXX91lvOF6s8nZcBYQ6RbbVY3eLRWeZXtPKGB5rQG//DAY120+KrEy4ayCltWt3PqsV+ns30MWXr+0FSNlRboR+sCAwVuueCpXM3lvPh8lQUt1MvqeG59e8CzfxaacIOFn1iPd6aQtc5l0xg//G3VdYPLbzMcuFnwP6ExLYCPQGfD2nPEeHmeCZgKJX6HmA1lT8JxoYw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=03EObfSPPoIOQSA/BvFvuRrfCC1wZBSjj2QBV3sXEz4=;
+ b=I603RNfpD2xq5O3fpwCbI/pk/xpyW2pU16LrABTb9sNuj7a0b4q9N3qtlkAYzB9vldTAO9YIlmdDGB5Oz+qinD7FqvO3MqS+rwYj3iPmCjQtUtiXQpSjiaerY2GbvnwSLhIaJuJdEcbfti8AkPGIknuUINQoUbcAAtIx2eASVOwWtabLvpGg1sf31Kk8yAtxAJ1j9oFz8MpbpytJk+mKm9KMZE+xAKDO41mu3WWI64/yL632QzewQii/wG8260ffUdt+lM9AOE00T9b32CFftkjqoM8pRIiniwxl496XAJmTth3W1LYvR8+7/AVIMJYrXtrLoKO70kKDspale45y7A==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by MN2PR12MB4373.namprd12.prod.outlook.com (2603:10b6:208:261::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.20; Thu, 23 Feb
+ 2023 13:21:52 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3cb3:2fce:5c8f:82ee]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3cb3:2fce:5c8f:82ee%4]) with mapi id 15.20.6134.021; Thu, 23 Feb 2023
+ 13:21:51 +0000
+Date:   Thu, 23 Feb 2023 09:21:49 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "jasowang@redhat.com" <jasowang@redhat.com>
+Subject: Re: [PATCH v4 09/19] vfio/pci: Accept device fd for hot reset
+Message-ID: <Y/dobS6gdSkxnPH7@nvidia.com>
+References: <20230221034812.138051-1-yi.l.liu@intel.com>
+ <20230221034812.138051-10-yi.l.liu@intel.com>
+ <BL1PR11MB5271D122329B6908BDE1F8328CAA9@BL1PR11MB5271.namprd11.prod.outlook.com>
+ <DS0PR11MB7529B33D098225CFAAA7D63FC3AA9@DS0PR11MB7529.namprd11.prod.outlook.com>
+ <Y/ZOOClu8nXy2toX@nvidia.com>
+ <BN9PR11MB52767915B9A5E509BC90E0888CAB9@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB52767915B9A5E509BC90E0888CAB9@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: BL0PR05CA0008.namprd05.prod.outlook.com
+ (2603:10b6:208:91::18) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        nsg@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
-        clg@kaod.org
-References: <20230222142105.84700-1-pmorel@linux.ibm.com>
- <20230222142105.84700-3-pmorel@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v16 02/11] s390x/cpu topology: add topology entries on CPU
- hotplug
-In-Reply-To: <20230222142105.84700-3-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|MN2PR12MB4373:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5ca57987-41a0-473b-bd35-08db15a0ecdd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: TYXGORKk3z7sJhJgdujtYuT3sqOy87gZFm8hxvzbrOvYv90fECb/RCwYZK4sHMjHWGieclZ84mHTKWnrs+alwBBZKD0NRkhoKEGAMjZ5QIU4mPAB7fYv/OjIsTlJVWZX7h5rvw03t9TcZ3k+k6hJG6hNO72yVK67syzhtIZ3sMBB7Ji70DzIohkuwm3McsjJQDL1bFGnsz4rBe7R9bPbKAzyTbDbXXjshQR9XPkaRCVST0X9bcxVMX+Okv8eUFb1VGBPwbz3YUDnQDtOXw7BMbq/HviItJ0aNNn1EYh5sVk6hD6NSK19q32FHT24vUhajAV0KHPpfhhdOtJQ/pnUiZGtlrnDwCp15HeMdpWmlzxkaaCZSTthVwb03z8yEn2yBHjQhk+g/46CXDeKaeStVYF542oiRSn/t7Xfoc5TPiCH7k1XsvHXHuheXaJpOk68apttZkR9UzxtPv1OcDBGkVpMNWwIYbTgnsC7LaP4AO0erEPdYEZuuUYU4jH2FwHcYVNIBfjr8x2V2vUGtqAoMrv+mJa+tjEbA4UeuFcZNeJocEVFinomUwd1SOGhaPJzOyGdLgwZiIewG14WNxCRQZrKlmXpoKhB2mrF8Wa16lz83xAxAdq7DUoLkbvv2TM6OGaV60+dU/MHHn6VgwkOnQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(136003)(366004)(39860400002)(346002)(396003)(376002)(451199018)(66476007)(41300700001)(8936002)(6486002)(83380400001)(5660300002)(7416002)(86362001)(4326008)(6916009)(6512007)(2906002)(66556008)(26005)(8676002)(66946007)(186003)(54906003)(2616005)(478600001)(316002)(6506007)(38100700002)(36756003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?L6dRJbnpIBgqrzCi+DqB87l2gu78GBu/fJ6j9WMyV73vwzcl/GlAKTqv7piF?=
+ =?us-ascii?Q?04HFojQerhFc804Hs0SnkifohusGq9OCh9bYv15uhXzsmx/sb9ZueC/3wy23?=
+ =?us-ascii?Q?J9p7MYrD4UkmmVd8T9idBbdE0+q5MLPGRwSxuSdjJswDBNxhK1q9bEJdPyzk?=
+ =?us-ascii?Q?csO4HrY2GpU1WLM0tukLelGb++m7d2EJVUrS0wVh2JP3xHQt3VFUun641jLo?=
+ =?us-ascii?Q?OZQ37pv5A+1OgpPLHj/bfaXTPNPcgDwAv0DwKdXBw7UbRQXFHz5PsESIiI46?=
+ =?us-ascii?Q?HE5qAHJZow+abWeEqrfhGU0my6El0oOJf/wQ8GuarMIBdamZbB1p3IUHcyrr?=
+ =?us-ascii?Q?X2ekhFXxRwNqImRsWKHhk6yO1FM2whEiw4mhYYtO0WLyJs8/Ux3fXnwg5XgL?=
+ =?us-ascii?Q?ip3PDpkud4prpqJy4wNRBBPpR2B/RSdU0KePpsr7rD6fEu/R25Bam1BzvgZ6?=
+ =?us-ascii?Q?PwD6lKSB02jIKL3y4xVeByJS3gzYDb+ewX2M1shg6v8P9ac+wc+uza5sJBvP?=
+ =?us-ascii?Q?bZ4uFBEpwKV9q5qEvNp7xlfHejrfRH/UT5sSZ3oeo2fkVYLhNkpBIR8nOwbj?=
+ =?us-ascii?Q?fscaKp/P3fBEQsfDMUjs796Uxd6E+xWjdn/hZeok7/3YI9Tc9Eez7rwnkruN?=
+ =?us-ascii?Q?q3GDSDSjDPiMgstSk/jINTZzZIY1a8FsgoIp3UCLnPwAAgJiln1UL7+XAvMe?=
+ =?us-ascii?Q?TTnrtDB+OFUN5kO33uP0rFIgrR0dTh8nB3bMyqlNDS33aSx8WwIxsD/LowUE?=
+ =?us-ascii?Q?EHPKMHCJeD7by7T5rlaE7ytZfxJfOqvWWS42nTOfVq6EWX+w9YJWTQLpkuVj?=
+ =?us-ascii?Q?MzLyk91ZD3NgcRseGnuTFrlLlKHsuCaKPk0BNIVXK9mtWqF61HrvRrwfIR62?=
+ =?us-ascii?Q?99sVlI6S6PPEvvxgxruUEjm1YvCIYV4gzhzM29FolHXK/s/DTPAw81jXVPhT?=
+ =?us-ascii?Q?zS4KA/gvwF1EdbS2loUZKsfFoyj2h5YVyzCLuvdl2aea9q8MIsk5GsUQ+K5v?=
+ =?us-ascii?Q?rceHO/qSDI4LSTcYF7lEPIPL620QIYckBGmdYzNwsvA1iq8Td2UrZmvROoKG?=
+ =?us-ascii?Q?f+3lK3r2bDynSGNZlTkwinFZ4dv3fCc2L9pScJBplHLViayCBllKk0NCzBcS?=
+ =?us-ascii?Q?yewSzW4LDi03Y5f/uhwRcvtlxFa64Fo1AU+i3GwY4WX4TWE18ylC8hq+qeOB?=
+ =?us-ascii?Q?bdMmIJax9mJp+qO13WCJgLGlro2XfptgN4yvJzDGZLBq+miASbUOjrYtLOBF?=
+ =?us-ascii?Q?3t2Wd/JlcrXX2BrDXTY4g/+qtcKmjPhA9KlFRsIfnVxX3z7psmpSZl7CR0Ll?=
+ =?us-ascii?Q?EUgUZXIh4noBfZiR4MRrot8jNy+lIbc3sj2WJiuF2/53n4zhD1BkTbVxVs7T?=
+ =?us-ascii?Q?bCUEcy8x+ZeF79Y8N+AhCt2S04wcSNC+iTKMAvwc2Q2+zPAbtpAgY6Xpdn+U?=
+ =?us-ascii?Q?9ufBWp1gkwne0yUmzAnb6ZnJH4wQYDCmMWEvNdpE7u1gZTCOt8dEFusyEQ17?=
+ =?us-ascii?Q?wpbBQGEv49V/SNNR+7YaqPsUbxvLSlWYby08TxPAPaGVe1IDOWnn4t6ykCmI?=
+ =?us-ascii?Q?gUrxg1V4zHPzcYCVJUP8rOsVPqFhX1B1biS5xDLv?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5ca57987-41a0-473b-bd35-08db15a0ecdd
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Feb 2023 13:21:51.7973
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: oyMfA1Jj7snSuVDDtepAYWjhYs7F4MAMVLBqNhwo7GZARFufMPQsil7s5ePbA8E5
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4373
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/02/2023 15.20, Pierre Morel wrote:
-> The topology information are attributes of the CPU and are
-> specified during the CPU device creation.
-...
-> diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topology.h
-> index 83f31604cc..fa7f885a9f 100644
-> --- a/include/hw/s390x/cpu-topology.h
-> +++ b/include/hw/s390x/cpu-topology.h
-> @@ -10,6 +10,47 @@
->   #ifndef HW_S390X_CPU_TOPOLOGY_H
->   #define HW_S390X_CPU_TOPOLOGY_H
->   
-> +#include "qemu/queue.h"
-> +#include "hw/boards.h"
-> +#include "qapi/qapi-types-machine-target.h"
-> +
->   #define S390_TOPOLOGY_CPU_IFL   0x03
->   
-> +typedef struct S390Topology {
-> +    uint8_t *cores_per_socket;
-> +    CpuTopology *smp;
-> +    CpuS390Polarization polarization;
-> +} S390Topology;
-> +
-> +#ifdef CONFIG_KVM
-> +bool s390_has_topology(void);
-> +void s390_topology_setup_cpu(MachineState *ms, S390CPU *cpu, Error **errp);
-> +#else
-> +static inline bool s390_has_topology(void)
-> +{
-> +       return false;
-> +}
-> +static inline void s390_topology_setup_cpu(MachineState *ms,
-> +                                           S390CPU *cpu,
-> +                                           Error **errp) {}
-> +#endif
-> +
-> +extern S390Topology s390_topology;
-> +int s390_socket_nb(S390CPU *cpu);
-> +
-> +static inline int s390_std_socket(int n, CpuTopology *smp)
-> +{
-> +    return (n / smp->cores) % smp->sockets;
-> +}
-> +
-> +static inline int s390_std_book(int n, CpuTopology *smp)
-> +{
-> +    return (n / (smp->cores * smp->sockets)) % smp->books;
-> +}
-> +
-> +static inline int s390_std_drawer(int n, CpuTopology *smp)
-> +{
-> +    return (n / (smp->cores * smp->sockets * smp->books)) % smp->books;
+On Thu, Feb 23, 2023 at 07:55:21AM +0000, Tian, Kevin wrote:
+> > From: Jason Gunthorpe
+> > Sent: Thursday, February 23, 2023 1:18 AM
+> > 
+> > > > static bool vfio_dev_in_groups(struct vfio_pci_core_device *vdev,
+> > > >                                struct vfio_pci_group_info *groups)
+> > > > {
+> > > >  	unsigned int i;
+> > > >
+> > > > 	for (i = 0; i < groups->count; i++)
+> > > > 		if (vfio_file_has_dev(groups->files[i], &vdev->vdev))
+> > > > 			return true;
+> > > > 	return false;
+> > > > }
+> > > >
+> > > > Presumably when cdev fd is provided above should compare iommu
+> > > > group of the fd and that of the vdev. Otherwise it expects the user
+> > > > to have full access to every device in the set which is impractical.
+> > 
+> > No, it should check the dev's directly, userspace has to provide every
+> > dev in the dev set to do a reset. We should not allow userspace to
+> > take a shortcut based on hidden group stuff.
+> > 
+> > The dev set is already unrelated to the groups, and userspace cannot
+> > discover the devset, so nothing has changed.
+> 
+> Agree. But I envision there might be a user-visible impact.
+> 
+> Say a scenario where group happens to overlap with devset. Let's say
+> two devices in the group/devset.
+> 
+> An existing deployment assigns only dev1 to Qemu. In this case dev1
+> is resettable via group fd given dev2 cannot be opened by another
+> user.
 
-Shouldn't that be " % smp->drawers" instead?
+Oh, that is just because we took a shortcut in this logic and assumed
+that if the group is open then all the devices are opened by the same
+security domain.
 
-> +}
-> +
->   #endif
-> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
-> new file mode 100644
-> index 0000000000..59f2cc15c7
-> --- /dev/null
-> +++ b/hw/s390x/cpu-topology.c
-> @@ -0,0 +1,270 @@
-> +/*
-> + * CPU Topology
-> + *
-> + * Copyright IBM Corp. 2022
-> + * Author(s): Pierre Morel <pmorel@linux.ibm.com>
-> +
-> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
-> + * your option) any later version. See the COPYING file in the top-level
-> + * directory.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "qemu/error-report.h"
-> +#include "hw/qdev-properties.h"
-> +#include "hw/boards.h"
-> +#include "qemu/typedefs.h"
-> +#include "target/s390x/cpu.h"
-> +#include "hw/s390x/s390-virtio-ccw.h"
-> +#include "hw/s390x/cpu-topology.h"
-> +
-> +/*
-> + * s390_topology is used to keep the topology information.
-> + * .cores_per_socket: tracks information on the count of cores
-> + *                    per socket.
-> + * .smp: keeps track of the machine topology.
-> + *
-> + */
-> +S390Topology s390_topology = {
-> +    /* will be initialized after the cpu model is realized */
-> +    .cores_per_socket = NULL,
-> +    .smp = NULL,
-> +    .polarization = S390_CPU_POLARIZATION_HORIZONTAL,
-> +};
-> +
-> +/**
-> + * s390_socket_nb:
-> + * @cpu: s390x CPU
-> + *
-> + * Returns the socket number used inside the cores_per_socket array
-> + * for a cpu.
-> + */
-> +int s390_socket_nb(S390CPU *cpu)
-> +{
-> +    return (cpu->env.drawer_id * s390_topology.smp->books + cpu->env.book_id) *
-> +           s390_topology.smp->sockets + cpu->env.socket_id;
-> +}
-> +
-> +/**
-> + * s390_has_topology:
-> + *
-> + * Return value: if the topology is supported by the machine.
-> + */
-> +bool s390_has_topology(void)
-> +{
-> +    return false;
-> +}
-> +
-> +/**
-> + * s390_topology_init:
-> + * @ms: the machine state where the machine topology is defined
-> + *
-> + * Keep track of the machine topology.
-> + *
-> + * Allocate an array to keep the count of cores per socket.
-> + * The index of the array starts at socket 0 from book 0 and
-> + * drawer 0 up to the maximum allowed by the machine topology.
-> + */
-> +static void s390_topology_init(MachineState *ms)
-> +{
-> +    CpuTopology *smp = &ms->smp;
-> +
-> +    s390_topology.smp = smp;
-> +    s390_topology.cores_per_socket = g_new0(uint8_t, smp->sockets *
-> +                                            smp->books * smp->drawers);
-> +}
-> +
-> +/**
-> + * s390_topology_cpu_default:
-> + * @cpu: pointer to a S390CPU
-> + * @errp: Error pointer
-> + *
-> + * Setup the default topology if no attributes are already set.
-> + * Passing a CPU with some, but not all, attributes set is considered
-> + * an error.
-> + *
-> + * The function calculates the (drawer_id, book_id, socket_id)
-> + * topology by filling the cores starting from the first socket
-> + * (0, 0, 0) up to the last (smp->drawers, smp->books, smp->sockets).
-> + *
-> + * CPU type, entitlement and dedication have defaults values set in the
-> + * s390x_cpu_properties, however entitlement is forced to 0 'none' when
-> + * the polarization is horizontale.
-> + */
-> +static void s390_topology_cpu_default(S390CPU *cpu, Error **errp)
-> +{
-> +    CpuTopology *smp = s390_topology.smp;
-> +    CPUS390XState *env = &cpu->env;
-> +
-> +    /* All geometry topology attributes must be set or all unset */
-> +    if ((env->socket_id < 0 || env->book_id < 0 || env->drawer_id < 0) &&
-> +        (env->socket_id >= 0 || env->book_id >= 0 || env->drawer_id >= 0)) {
-> +        error_setg(errp,
-> +                   "Please define all or none of the topology geometry attributes");
-> +        return;
-> +    }
-> +
-> +    /* Check if one of the geometry topology is unset */
-> +    if (env->socket_id < 0) {
-> +        /* Calculate default geometry topology attributes */
-> +        env->socket_id = s390_std_socket(env->core_id, smp);
-> +        env->book_id = s390_std_book(env->core_id, smp);
-> +        env->drawer_id = s390_std_drawer(env->core_id, smp);
-> +    }
-> +
-> +    if (s390_topology.polarization == S390_CPU_POLARIZATION_HORIZONTAL) {
-> +        env->entitlement = 0;
+But we can also more clearly state that any closed device is
+acceptable for reset and doesn't need to be presented.
 
-Should this be S390_CPU_ENTITLEMENT_HORIZONTAL instead of 0 ?
+So, like this:
 
-> +    }
-> +}
+		if (cur_vma->vdev.open_count &&
+		    !vfio_dev_in_groups(cur_vma, groups) &&
+		    !iommufd_ctx_has_device(iommufd_ctx, &cur_vma->pdev->dev)) {
+			ret = -EINVAL;
+			goto err_undo;
+		}
 
-  Thomas
-
-
+Jason
