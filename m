@@ -2,118 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E5A46A1076
-	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 20:19:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 64D346A107B
+	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 20:21:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229928AbjBWTTB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Feb 2023 14:19:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40556 "EHLO
+        id S231844AbjBWTVr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Feb 2023 14:21:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229900AbjBWTS7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Feb 2023 14:18:59 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DBB26010F
-        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 11:17:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677179802;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6KU3Ox2Ew/Jsk/EiHqSrTUkdmsrVL1tultoFc9/FEnc=;
-        b=LX3zs5H4JOmBKVuXhj+jYxTd9gp067GWYvoRDuh0XqEykMwPvLeK41l0ElXrIRHKUEGD8D
-        7y9+g61fCt0vOISBhqsbHQcmDCO4SgCLyM6ZTI7qvTpjirt6v8RwrjOVF1OnAg0Oi9C1kj
-        LYvusSZ3KzxC0Hn4PUJKnyq9ORx+l1Y=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-56-V7L6GyaxNRSeq1CgiUf0FA-1; Thu, 23 Feb 2023 14:16:40 -0500
-X-MC-Unique: V7L6GyaxNRSeq1CgiUf0FA-1
-Received: by mail-wm1-f71.google.com with SMTP id e17-20020a05600c219100b003e21fa60ec1so91497wme.2
-        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 11:16:40 -0800 (PST)
+        with ESMTP id S230124AbjBWTVm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Feb 2023 14:21:42 -0500
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCDCAAD1F
+        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 11:21:40 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-53865bdc1b1so32800787b3.16
+        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 11:21:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZopDWrZnbH+TBZHwFmu9lqsS8DLdv4K+JgWTWbyi1iU=;
+        b=H4d0auWygP+hmWPqWDO3qHOcWpnYjVNf506Kv9RG0yijBoQVPVDvpSxMBTdo4uUJGO
+         MLoFt/yVDt/rfg/KEjjWlgTsmtn2v/BJ7mcJ0tNJd/5B2yEYthUWMcP49jnHZIFS2xWD
+         PYy85xVSu7OInOx0VfGConFKXB/8dzggfBGddjwi36FY4Kr5lsfQrJsHMyzxbXSZ6ul6
+         eCrHhGBT4UNlyZ86MP+6pfLoRnP4BLJ+Xa6gqTf/lpjJRMImNB9r2JninNlL079C7W8J
+         WgAk4CnNyPXAa81eo8Y6q3j7OEpZehi0vMcVGDQwUdb/BDgWqwnBxKdZk8Lqvnm0cjJZ
+         PEtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6KU3Ox2Ew/Jsk/EiHqSrTUkdmsrVL1tultoFc9/FEnc=;
-        b=aUZsXuCshxVrxAWZ4nZIOi6ebItwxMsIw9ef62FGm2WU4U+yt9zqjqw4WHARKzxijs
-         WQuion4IB0ViBjiU07B6IXgs1gkTSAS14TS/CaI3LC0mmqGjpRlviwd8CTR9PFnxl+Ho
-         7XHNS8nVKIRWPWDyRdKR+4My0i7eF37Q3OSUWm7iZrsCjZOApMvo6syAV70w7tAB++kZ
-         XVYDlilFXZl9/NHaHlhAevL/7Kwn+MttBoB+GYsZkWS/qYI6tzZS3d3Y46ThC/SgaVFe
-         hWED4yTyzGv4PWQBCd0hEpDSIypYLuZ0pfxmJH/l5lBfOIVGT2bCFWRdohQW3u+0VmuX
-         BJmA==
-X-Gm-Message-State: AO0yUKW1agIQ2JWXgSwTHYNpPOk8rcTnKBCLwCzZFQn/HBdeLqtRh+ct
-        YTDN9jxWufwjEvfbO+pbgdchUK3TXME5jd1h9fCax11JLkGIrhfAkXLM2DGmIl768Zg2MPOPbBv
-        mCdPqbHpXj1XG
-X-Received: by 2002:a05:600c:1da5:b0:3e2:1dac:b071 with SMTP id p37-20020a05600c1da500b003e21dacb071mr11790413wms.13.1677179799896;
-        Thu, 23 Feb 2023 11:16:39 -0800 (PST)
-X-Google-Smtp-Source: AK7set9+rCcRcA2Owu9q2As55Ch182UG72EUT9DZuObj8BilvSgnJCjNXKMZATz95zng1AvEyGI2Jw==
-X-Received: by 2002:a05:600c:1da5:b0:3e2:1dac:b071 with SMTP id p37-20020a05600c1da500b003e21dacb071mr11790403wms.13.1677179799635;
-        Thu, 23 Feb 2023 11:16:39 -0800 (PST)
-Received: from [192.168.8.104] (tmo-100-40.customers.d1-online.com. [80.187.100.40])
-        by smtp.gmail.com with ESMTPSA id t4-20020adff044000000b002c5694aef92sm10903913wro.21.2023.02.23.11.16.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Feb 2023 11:16:38 -0800 (PST)
-Message-ID: <8ddf067b-4c0e-7c4c-6820-c76e874400ba@redhat.com>
-Date:   Thu, 23 Feb 2023 20:16:37 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [kvm-unit-tests PATCH v1] s390x: Add tests for execute-type
- instructions
-Content-Language: en-US
-To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20230222114742.1208584-1-nsg@linux.ibm.com>
- <167713875438.6442.2406479682969262260@t14-nrb.local>
- <e8d21eb5afde7fd9114e225692222fa8902c4e7a.camel@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <e8d21eb5afde7fd9114e225692222fa8902c4e7a.camel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ZopDWrZnbH+TBZHwFmu9lqsS8DLdv4K+JgWTWbyi1iU=;
+        b=PHdt5GTTp2dpf7m0KEo+Xa3Ac77qo9cuKuZSWVYBsIKxIr2z/QeAbM1XuCEOEoISTJ
+         h/3Te3cw4ggtqjehc59ObpdiRSZ39IpEzXngEkSwH6ZIaCPNpJ4NxRICTPQpDaaxV1kH
+         D6fk5nDEmEBqPXnUP4eLyFHf4YSjyWJP1ErHXwywlmrbreqY8kP564EF07yemlHnElK8
+         CFAgVIjZYFArSCPMu/Cl99M4sb88Wjjg0P3FsJdAG+ypIz2DkWpMa3LItvw1X4C5e7CN
+         SotxFtzVie9SYk1etHDOr1d0J/wozVz/Ff00GDBSW8KOicFvi5VowaiqodCPQY614MnO
+         43RA==
+X-Gm-Message-State: AO0yUKV5YhkTRF2+td6Gv6WjHhIn9UtyQDprj7O/QLWJ1aegvMu6umvT
+        cTM80BPHkke8mS3BwDjeL3QhM5o4T14=
+X-Google-Smtp-Source: AK7set8Y6PDK0RpzEk696ekGVhLGOajZqUcJ01xvSF46QVcIbnp7Dq+AUoIZCvKnF1H54bpA/2pnHYcG804=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:11cd:b0:8a3:d147:280b with SMTP id
+ n13-20020a05690211cd00b008a3d147280bmr4056323ybu.3.1677180100192; Thu, 23 Feb
+ 2023 11:21:40 -0800 (PST)
+Date:   Thu, 23 Feb 2023 11:21:38 -0800
+In-Reply-To: <CAOUHufbhKsWzXZP_VgOTVkKgZhU=LaXJBRKcaAk++d6sLk1ktA@mail.gmail.com>
+Mime-Version: 1.0
+References: <20230217041230.2417228-1-yuzhao@google.com> <20230217041230.2417228-3-yuzhao@google.com>
+ <Y++q/lglE6FJBdjt@google.com> <CAOUHufaK-BHdajDZJKjn_LU-gMkUTKa_9foMB8g-u9DyrVhPwg@mail.gmail.com>
+ <Y/ed0XYAPx+7pukA@google.com> <CAOUHufYw9Mc-w1E-Jkqnt869bVJ0AxOB5_grSEMcdMdDODDdCw@mail.gmail.com>
+ <Y/evPJg9gvXxO1hs@google.com> <CAOUHufYx8JUT0T11jxuqknHzUHOYm7kLm_JfgP3LmRrFe=E20Q@mail.gmail.com>
+ <Y/e006bZOYXIFE/j@google.com> <CAOUHufbhKsWzXZP_VgOTVkKgZhU=LaXJBRKcaAk++d6sLk1ktA@mail.gmail.com>
+Message-ID: <Y/e8wgqFSr8voAto@google.com>
+Subject: Re: [PATCH mm-unstable v1 2/5] kvm/x86: add kvm_arch_test_clear_young()
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yu Zhao <yuzhao@google.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Michael Larabel <michael@michaellarabel.com>,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, x86@kernel.org,
+        linux-mm@google.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/02/2023 10.50, Nina Schoetterl-Glausch wrote:
-> On Thu, 2023-02-23 at 08:52 +0100, Nico Boehr wrote:
->> Quoting Nina Schoetterl-Glausch (2023-02-22 12:47:42)
->>> Test the instruction address used by targets of an execute instruction.
->>> When the target instruction calculates a relative address, the result is
->>> relative to the target instruction, not the execute instruction.
->>>
->>> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
->> [...]
->>> diff --git a/s390x/Makefile b/s390x/Makefile
->>> index 97a61611..6cf8018b 100644
->>> --- a/s390x/Makefile
->>> +++ b/s390x/Makefile
->>> @@ -39,6 +39,7 @@ tests += $(TEST_DIR)/panic-loop-extint.elf
->>>   tests += $(TEST_DIR)/panic-loop-pgm.elf
->>>   tests += $(TEST_DIR)/migration-sck.elf
->>>   tests += $(TEST_DIR)/exittime.elf
->>> +tests += $(TEST_DIR)/ex.elf
->>
->> You didn't add your new test to unittests.cfg, is this intentional?
-> 
-> Nope, I just forgot.
-> 
-> @Thomas, I guess I should also add it to s390x-kvm in .gitlab-ci.yml,
-> since the test passes on KVM?
+On Thu, Feb 23, 2023, Yu Zhao wrote:
+> On Thu, Feb 23, 2023 at 11:47=E2=80=AFAM Sean Christopherson <seanjc@goog=
+le.com> wrote:
+> >
+> > On Thu, Feb 23, 2023, Yu Zhao wrote:
+> > > On Thu, Feb 23, 2023 at 11:24=E2=80=AFAM Sean Christopherson <seanjc@=
+google.com> wrote:
+> > > >
+> > > > On Thu, Feb 23, 2023, Yu Zhao wrote:
+> > > > > On Thu, Feb 23, 2023 at 10:09=E2=80=AFAM Sean Christopherson <sea=
+njc@google.com> wrote:
+> > > > > > > I'll take a look at that series. clear_bit() probably won't c=
+ause any
+> > > > > > > practical damage but is technically wrong because, for exampl=
+e, it can
+> > > > > > > end up clearing the A-bit in a non-leaf PMD. (cmpxchg will ju=
+st fail
+> > > > > > > in this case, obviously.)
+> > > > > >
+> > > > > > Eh, not really.  By that argument, clearing an A-bit in a huge =
+PTE is also technically
+> > > > > > wrong because the target gfn may or may not have been accessed.
+> > > > >
+> > > > > Sorry, I don't understand. You mean clear_bit() on a huge PTE is
+> > > > > technically wrong? Yes, that's what I mean. (cmpxchg() on a huge =
+PTE
+> > > > > is not.)
+> > > > >
+> > > > > > The only way for
+> > > > > > KVM to clear a A-bit in a non-leaf entry is if the entry _was_ =
+a huge PTE, but was
+> > > > > > replaced between the "is leaf" and the clear_bit().
+> > > > >
+> > > > > I think there is a misunderstanding here. Let me be more specific=
+:
+> > > > > 1. Clearing the A-bit in a non-leaf entry is technically wrong be=
+cause
+> > > > > that's not our intention.
+> > > > > 2. When we try to clear_bit() on a leaf PMD, it can at the same t=
+ime
+> > > > > become a non-leaf PMD, which causes 1) above, and therefore is
+> > > > > technically wrong.
+> > > > > 3. I don't think 2) could do any real harm, so no practically no =
+problem.
+> > > > > 4. cmpxchg() can avoid 2).
+> > > > >
+> > > > > Does this make sense?
+> > > >
+> > > > I understand what you're saying, but clearing an A-bit on a non-lea=
+f PMD that
+> > > > _just_ got converted from a leaf PMD is "wrong" if and only if the =
+intented
+> > > > behavior is nonsensical.
+> > >
+> > > Sorry, let me rephrase:
+> > > 1. Clearing the A-bit in a non-leaf entry is technically wrong becaus=
+e
+> > > we didn't make sure there is the A-bit there --  the bit we are
+> > > clearing can be something else. (Yes, we know it's not, but we didn't
+> > > define this behavior, e.g., a macro to designate that bit for non-lea=
+f
+> > > entries.
+> >
+> > Heh, by that definition, anything and everything is "technically wrong"=
+.
+>=20
+> I really don't see how what I said, in our context,
+>=20
+>   "Clearing the A-bit in a non-leaf entry is technically wrong because
+> we didn't make sure there is the A-bit there"
+>=20
+> can infer
+>=20
+>   "anything and everything is "technically wrong"."
+>=20
+> And how what I said can be an analogy to
+>=20
+>   "An Intel CPU might support SVM, even though we know no such CPUs
+> exist, so requiring AMD or Hygon to enable SVM is technically wrong."
+>=20
+> BTW, here is a bug caused by clearing the A-bit in non-leaf entries in
+> a different scenario:
+> https://lore.kernel.org/linux-mm/20221123064510.16225-1-jgross@suse.com/
+>=20
+> Let's just agree to disagree.
 
-Yes, please (unless your test requires the latest and greatest shiny 
-upstream kernel - we don't have that on the machine available yet).
+No, because I don't want anyone to leave with the impression that relying o=
+n the
+Accessed bit to uniformly exist (or not) at all levels in the TDP MMU is so=
+mehow
+technically wrong.  The link you posted is about running as a Xen guest, an=
+d is
+in arch-agnostic code.  That is wildly different than what we are talking a=
+bout
+here, where the targets are strictly limited to x86-64 TDP, and the existen=
+ce of
+the Accessed bit is architecturally defined.
 
-  Thomas
-
+In this code, there are exactly two flavors of paging that can be in use, a=
+nd
+using clear_bit() to clear shadow_accessed_mask is safe for both, full stop=
+.
