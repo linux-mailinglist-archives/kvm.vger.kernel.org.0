@@ -2,67 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 425446A12DF
-	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 23:41:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 20CC66A1379
+	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 00:04:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229557AbjBWWlR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Feb 2023 17:41:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40178 "EHLO
+        id S229520AbjBWXEU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Feb 2023 18:04:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229463AbjBWWlQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Feb 2023 17:41:16 -0500
-Received: from mail-io1-xd4a.google.com (mail-io1-xd4a.google.com [IPv6:2607:f8b0:4864:20::d4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6043154A3A
-        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 14:41:15 -0800 (PST)
-Received: by mail-io1-xd4a.google.com with SMTP id z9-20020a6b0a09000000b0074c9d317fc7so2670875ioi.17
-        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 14:41:15 -0800 (PST)
+        with ESMTP id S229553AbjBWXET (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Feb 2023 18:04:19 -0500
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DC1C3CE0B
+        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 15:04:13 -0800 (PST)
+Received: by mail-wm1-x330.google.com with SMTP id j19-20020a05600c1c1300b003e9b564fae9so877533wms.2
+        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 15:04:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=njxIFRU6oa+bMFJp4SuHumf2vOky2GO0uHGNatkMWic=;
-        b=gzX0he6fpyBfnaDeQpfldthAsDjjo1Wpv2jFwTY5MDXv4xgye4uUhlrSIBepktdx4z
-         74tPQc4yxz5NuE2Ud9YV8oyeylL419uuvjNcGkGrVLbpylqDGLHZyzQ7BJeOMKjiV5Vy
-         /OFyB0bXj9vS6toOvy0wtcK13pbSEdiNVc5ezmHcR/fBIY+YMOostsfdNwdZNZ3DmZFD
-         jILkuoUVClxm15bcf4WZw1WYUjuvpIzfA23W3W5TnWmt8QubAU39fsD3zpSI9kC21z0P
-         KdrirIsUjek+COyg7fQ0cYHrnQIci9TRK6eEaPr0Yo6hGmu3sVx50XDg+5DBS8v6ue2H
-         jTtw==
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NBvLs7lBdngoivVBipp1LXFFXJN3i+RNM180w+5RMpk=;
+        b=FiW8FwLdaJJ3Ejjd8nyNwAr16lZiqCiWjrdhHgRCBrD29k4cTTuoO43E6OE6+RXxdm
+         DHWkG2Ci1ZVjpiMA+2MwuTvId9vGiyOkzw1sP2iTYZUndR8Fxrw3RKXwRZrkAhOMH3zN
+         VhnKUS9yhk6KVPLEbh/HiwMMdgkVsr6LrOJ3IzeK28lDwjC3oGihN2rvVPZhy7hXCUuy
+         +j4tMRNs4dp6jhHMEumvTo6YoAq6kIEHIr/4578Ei93YY4HME/5l9udr4fwKo1lg2br/
+         uGTP2RZk2YBHi9SFOTgeOoimxocxDRkzrcdnaedgkxlzoPTv0hMa6HQZaJgZKJaX+2ln
+         sAlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=njxIFRU6oa+bMFJp4SuHumf2vOky2GO0uHGNatkMWic=;
-        b=rZJ+gz6B6zmaa9Y7e4OaQHsZRXAmCc+siZVrAk9nWOasnHLgD9+2Xaj760N/hAXOXe
-         lxCrkphbmQ2Kdem3nIyFYAdnouIzhCd8pisNLgf1pekungTf1/m/6DpNG//Dx2+GQ9bd
-         RLv+hUafLNDHO8N3l5mQrN6sSGkBFRcUdadked6pCQQg6Rf3yFm13alEI4IYBz5d5rKz
-         9HwN39sZ5MHPBNyer9P8wNGYhH2j7KN/bkalm8+kWUJSGhpr5burNogKt98fHSaWwssy
-         wbI2XcevJpanICyZL9iuu3qgqghMgHLmdErzAMYOd+/TxtdCWDu9pHmicRNIOEUvYWgx
-         /Ruw==
-X-Gm-Message-State: AO0yUKWqkeXkuqxB/shURITikOq0D8NbjL/nRYX1uniO9DPqSgoMUW8/
-        RF5x/0e6/qOpUnBl4vTmTHI6tOJzvK3NLYBSgA==
-X-Google-Smtp-Source: AK7set8eU6LXXGNsXhypWuPasNfU+Jy+y/Y6+I7CCNgTvs1mrAWB6o6YN6KK+svTCaLeqtyLcQ/Gja8X8X4Clja/KQ==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a02:84e7:0:b0:3c5:d3e:9c82 with SMTP
- id f94-20020a0284e7000000b003c50d3e9c82mr4336134jai.5.1677192074809; Thu, 23
- Feb 2023 14:41:14 -0800 (PST)
-Date:   Thu, 23 Feb 2023 22:41:13 +0000
-In-Reply-To: <20230216142123.2638675-9-maz@kernel.org> (message from Marc
- Zyngier on Thu, 16 Feb 2023 14:21:15 +0000)
-Mime-Version: 1.0
-Message-ID: <gsntwn4880om.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH 08/16] KVM: arm64: timers: Allow userspace to set the
- counter offsets
-From:   Colton Lewis <coltonlewis@google.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
-        suzuki.poulose@arm.com, oliver.upton@linux.dev,
-        yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de,
-        dwmw2@infradead.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NBvLs7lBdngoivVBipp1LXFFXJN3i+RNM180w+5RMpk=;
+        b=Fg2FIsvHqpZCcjMNCM9KqwpUlOSas9WkVrh/eQ1g9iCdUmlfrkOSgz1EhxNis3Bgyl
+         4YmgN4LOzJeUlc0Yma/2eAbNA7tEEeRzItvPa513yru3e3OWBTGRFe1NGwd6yLGw8Trv
+         AZ3XYzfeOuuzRPWFaJAEAPNxJ9OX+QQCcc5VG5yEwxfSaAXZGN7cIlPBprvhwDD8sZa7
+         6QNw9LXzlIN+nCZq4wFpmVYUIItSkNLFOoc9Ud9w3JgsemSzcaoirdS5Nf7O0mLA3Nnw
+         KxTjTt1TNfrgnwSStopi9+5QCHJ3u5fOUTa/mTOI7F8ULkG+x03Qubeji7o6PaOK4x7U
+         O1aA==
+X-Gm-Message-State: AO0yUKUruHUqS9Md0aHY21DZ3dWlsAuQGtFp0b+XbxFzjOoxP4EJbN75
+        SWXrHfG4dSo77h4E6cezgzEKFbbGj9iU8HyeqvJE5va80070jPuDLT0=
+X-Google-Smtp-Source: AK7set+VtUK1cA8uSpz2nZ/w7KJYKiO0L1FLuVMi7a6aDY8/1fPK0lUXVW0clmShU02l4J3XkQDFtwlnehZTO1kKeRw=
+X-Received: by 2002:a05:600c:4f44:b0:3df:97de:8baf with SMTP id
+ m4-20020a05600c4f4400b003df97de8bafmr656780wmq.8.1677193451582; Thu, 23 Feb
+ 2023 15:04:11 -0800 (PST)
+MIME-Version: 1.0
+References: <20230215011614.725983-1-amoorthy@google.com> <20230215011614.725983-6-amoorthy@google.com>
+ <87mt5fz5g6.wl-maz@kernel.org> <CAF7b7mr3iDBYWvX+ZPA1JeZgezX-BDo8VArwnjuzHUeWJmO32Q@mail.gmail.com>
+ <Y+6iX6a22+GEuH1b@google.com> <CAF7b7mqeXcHdFHewX3enn-vxf6y7CUWjXjB3TXithZ_PnzVLQQ@mail.gmail.com>
+ <Y+/kgMxQPOswAz/2@google.com> <CAF7b7mpMiw=6o6vTsqFR6HUUCJL+1MSTDUsMaKLnS1NqyVf-9A@mail.gmail.com>
+ <Y/fS0eab7GG0NVKS@google.com>
+In-Reply-To: <Y/fS0eab7GG0NVKS@google.com>
+From:   Anish Moorthy <amoorthy@google.com>
+Date:   Thu, 23 Feb 2023 15:03:35 -0800
+Message-ID: <CAF7b7mqV4p_t4yJx6yyFFk7AQ2w6jVDCXUQfA+aza_OQya2qfA@mail.gmail.com>
+Subject: Re: [PATCH 5/8] kvm: Add cap/kvm_run field for memory fault exits
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        James Houghton <jthoughton@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,60 +74,80 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Marc Zyngier <maz@kernel.org> writes:
+On Thu, Feb 23, 2023 at 12:55=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote:
+> Off-topic, please adjust whatever email client you're using to not wrap s=
+o
+> agressively and at seeming random times.
+> As written, this makes my eyes bleed, whereas formatting like so does not=
+ :-)
 
-> Once this new API is used, there is no going back, and the counters
-> cannot be written to to set the offsets implicitly (the writes
-> are instead ignored).
+Oof, that *is* pretty bad. I think I have the cause figured out
+though, so I'll be careful about that from now on :)
 
-Why do this? I can't see a reason for disabling the other API the first
-time this one is used.
+>   Ok so I have a v2 of the series basically ready to go, but I realized t=
+hat I
+>   should probably have brought up my modified API here to make sure it wa=
+s sane:
+>   so, I'll do that first
+>
+>   ...
+>
+>   which, apart from the name of the "len" field, is exactly what Chao
+>   has in their series.
+>
+>   Flags remains a bitfield describing the reason for the memory fault:
+>   in the two places this series generates this fault, it sets a bit in fl=
+ags.
+>   Userspace is meant to check whether a memory_fault was generated due to
+>   KVM_CAP_MEMORY_FAULT_EXIT using the KVM_MEMORY_FAULT_EXIT_REASON_ABSENT=
+ mask.
+>
+> > flags remains a bitfield describing the reason for the memory fault:
+> > in the two places
+> > this series generates this fault, it sets a bit in flags. Userspace is
+> > meant to check whether
+> > a memory_fault was generated due to KVM_CAP_MEMORY_FAULT_EXIT using the
+> > KVM_MEMORY_FAULT_EXIT_REASON_ABSENT mask.
+>
+> Before sending a new version, let's bottom out on whether or not a
+> KVM_MEMORY_FAULT_EXIT_REASON_ABSENT flag is necessary.  I'm not dead set =
+against
+> a flag, but as I called out earlier[*], it can have false positives.  I.e=
+. userspace
+> needs to be able to suss out the real problem anyways.  And if userspace =
+needs to
+> be that smart, what's the point of the flag?
+>
+> [*] https://lore.kernel.org/all/Y+%2FkgMxQPOswAz%2F2@google.com
 
-> In keeping with the architecture, the offsets are expressed as
-> a delta that is substracted from the physical counter value.
-                   ^
-nit: subtracted
+My understanding of your previous message was off: I didn't realize
+that fast gup would also fail for present mappings where the
+read/write permission was incorrect. So I'd agree that
+KVM_MEMORY_FAULT_EXIT_REASON_ABSENT should be dropped: best not to
+mislead with false positives.
 
-> +/*
-> + * Counter/Timer offset structure. Describe the virtual/physical offsets.
-> + * To be used with KVM_ARM_SET_CNT_OFFSETS.
-> + */
-> +struct kvm_arm_counter_offsets {
-> +	__u64 virtual_offset;
-> +	__u64 physical_offset;
-> +
-> +#define KVM_COUNTER_SET_VOFFSET_FLAG	(1UL << 0)
-> +#define KVM_COUNTER_SET_POFFSET_FLAG	(1UL << 1)
-> +
-> +	__u64 flags;
-> +	__u64 reserved;
-> +};
-> +
+> >
+> > (3) switched over to a memslot flag: KVM_CAP_MEMORY_FAULT_EXIT simply
+> > indicates whether this flag is supported.
+>
+> The new memslot flag should depend on KVM_CAP_MEMORY_FAULT_EXIT, but
+> KVM_CAP_MEMORY_FAULT_EXIT should be a standalone thing, i.e. should conve=
+rt "all"
+> guest-memory -EFAULTS to KVM_CAP_MEMORY_FAULT_EXIT.  All in quotes becaus=
+e I would
+> likely be ok with a partial conversion for the initial implementation if =
+there
+> are paths that would require an absurd amount of work to convert.
 
-It looks weird to have the #defines in the middle of the struct like
-that. I think it would be easier to read with the #defines before the
-struct.
+I'm actually not sure where all of the sources of guest-memory
+-EFAULTs are or how I'd go about finding them. Is the standalone
+behavior of KVM_CAP_MEMORY_FAULT_EXIT something you're suggesting
+because that new name is too broad for what it does right now? If so
+then I'd rather just rename it again: but if that functionality should
+be included with this series, then I'll take a look at the required
+work given a couple of pointers :)
 
-> @@ -852,9 +852,11 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
->   	ptimer->vcpu = vcpu;
->   	ptimer->offset.vm_offset = &vcpu->kvm->arch.offsets.poffset;
-
-> -	/* Synchronize cntvoff across all vtimers of a VM. */
-> -	timer_set_offset(vtimer, kvm_phys_timer_read());
-> -	timer_set_offset(ptimer, 0);
-> +	/* Synchronize offsets across timers of a VM if not already provided */
-> +	if (!test_bit(KVM_ARCH_FLAG_COUNTER_OFFSETS, &vcpu->kvm->arch.flags)) {
-> +		timer_set_offset(vtimer, kvm_phys_timer_read());
-> +		timer_set_offset(ptimer, 0);
-> +	}
-
->   	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
->   	timer->bg_timer.function = kvm_bg_timer_expire;
-
-The code says "assign the offsets if the KVM_ARCH_FLAG_COUNTER_OFFSETS
-flag is not on". The flag name is confusing and made it hard for me to
-understand the intent. I think the intent is to only assign the offsets
-if the user has not called the API to provide some offsets (that would
-have been assigned in the API call along with flipping the flag
-on). With that in mind, I would prefer the flag name reference the
-user. KVM_ARCH_FLAG_USER_OFFSETS
+I will say, a partial implementation seems worse than no
+implementation: isn't there a risk that someone ends up depending on
+the incomplete behavior?
