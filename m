@@ -2,86 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E5FB6A039D
-	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 09:15:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E7656A03EC
+	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 09:35:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233380AbjBWIPr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Feb 2023 03:15:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42028 "EHLO
+        id S233404AbjBWIfw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Feb 2023 03:35:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233298AbjBWIPp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Feb 2023 03:15:45 -0500
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBDE74D62E;
-        Thu, 23 Feb 2023 00:15:03 -0800 (PST)
-Received: by mail-lj1-x231.google.com with SMTP id z42so2391758ljq.13;
-        Thu, 23 Feb 2023 00:15:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=433bYYY/TmoUpHBBY/tF9/GMluKPjfLdJmiTSrcvVWQ=;
-        b=ktgvXtmjePsRRHA2T3w8lM2xrjXS/08CD5atW+arTYAcRj8dsMzcBKjOLIP5saXWZx
-         vMYppLTWw+nrGswXuDS6tugtxeNF9G9TDd3bvsTcgCzQcdHWqKD3aES8A2O76C6tHgcm
-         vBeXi6ziB7vO6zOA26AEOu9fPi98odlT/tYmiE2VwQ/feJ8JAeaKO+1V6B8CI4TwR/aM
-         0NmuvOYBPLsCifYLfuNIPpbGWgpblX1/72Xk+KuO8WMwkVyEC2iIAQYx6b5LlxHKFOdM
-         ne5mpbMdbr+HsuO8kWAIhw2gL6U2pQA11lN2DbL30A+8Mbba0JbRa1QKOP1AvyB4A4fE
-         4lpA==
+        with ESMTP id S229745AbjBWIfv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Feb 2023 03:35:51 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 983D44DBE0
+        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 00:34:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1677141193;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Pb7w4ZwmllJKAxdvXoWC2qlcadJkuk1d2W5cm7uRXhs=;
+        b=KFvmTHR8wQgEmpimpqPvCpOFqWwlE9KZSGFw0RIriAkTAV1kRsR54bdsUP7YlENfaRckZU
+        YxocFOMdmrwI7U17iCoHbqtg0JFHBWAXhEiABM5OO8RT2G9onMAUi1QITWVKreC5ftTEo0
+        LtkxBvbJRbFnKbhvDObahwr2K42MmCw=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-101-tFhk-WxQN8uyXBVhIQRPkg-1; Thu, 23 Feb 2023 03:33:11 -0500
+X-MC-Unique: tFhk-WxQN8uyXBVhIQRPkg-1
+Received: by mail-wr1-f71.google.com with SMTP id r3-20020a5d6c63000000b002bff57fc7fcso2253905wrz.19
+        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 00:33:11 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=433bYYY/TmoUpHBBY/tF9/GMluKPjfLdJmiTSrcvVWQ=;
-        b=1G2B1KiqUoWjOw88QwjSbZvt43UBHQg76yjOIUw6xCJ4518GohjfgoaHNgr6DSJ2IJ
-         /r8kIgvGq45xDbIiN10CPOFFDhnA7lFzUFqd9oSW2hP7zuYaCSZgm7X8BznJBtO541I0
-         PM2Cgv8w6xfinn6rqVfdPs9Vi3AkYcrLL2x6DVdYo3pIFb+mZVmUgXvRyX6/ztuDB2E8
-         dFp6jloIE4IGc72vB/+4ZGA38JCr5p2SU/UajFaAN9ExRIltxfb8534uhZkzMwnMKYBN
-         URkSlwyla4jp23zfnP/bI/OiTjheMZ1SZrAv+QNNDH3WsF1KQuGAUUofboMr77KiWRxy
-         S10A==
-X-Gm-Message-State: AO0yUKVJoVnNduvIMarEds4ys5cSsyDAvcvIwzqP/C0qEIdW6ttb+/P8
-        t27F5vTaJePQTnhaaW6SHKwUq6abSiI=
-X-Google-Smtp-Source: AK7set/Ixb3WSqFMEhxCzQ689X3ZTVmK8ruI8pPEZ7ylGKFiKBp4ONoeUFKy8Fks/gcWB3v04QjpIw==
-X-Received: by 2002:a2e:bd06:0:b0:290:6302:8c7e with SMTP id n6-20020a2ebd06000000b0029063028c7emr4290489ljq.3.1677140099620;
-        Thu, 23 Feb 2023 00:14:59 -0800 (PST)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id 10-20020ac2568a000000b004db39e80733sm1244450lfr.155.2023.02.23.00.14.59
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Pb7w4ZwmllJKAxdvXoWC2qlcadJkuk1d2W5cm7uRXhs=;
+        b=Avn61PsEBFkZLKyOVEKa1zzyCpUioYfKnVh8HyjbM0j0zoxgL8CVSBlyBKveQMHQPB
+         1gqbjUWZwU86VSN/qrbojfGntGjVqq/EluZUyZmKiNGhjZwAHcJ6H1eBUKVEddedu8xc
+         AiTWVlSLI+s90ZUAIuj3OMlw4/UR/d8R3HtHgGCrjQGAcCXnbnZRkfJOx1mQ65P6tK7I
+         agbMljEGiw9+V5BlBCuyR1I5jNxkA/iYpV0todULyKo3ec+I+yu5e9NEfmVeKBVbpWu6
+         X9fAiUySfg1F5Wv1okn952OEskP6qV95gIi1zBTbibQjK5tiogKqHcUmA7aza0nredQk
+         XMEQ==
+X-Gm-Message-State: AO0yUKU4CUMeAckGNw0aZE0fdDaHKEuzbimK2+znFge1FIgsfUjzzeJC
+        5yP+SW3sAxRlPTpATXUE1UwH8/3rMdbVW99n0qmqf5to+FJ2XCcRcH6x7bMkyvnl6DaN9pb/9IR
+        hQe15AfjXalvj
+X-Received: by 2002:a05:600c:30ca:b0:3dc:2af8:83c0 with SMTP id h10-20020a05600c30ca00b003dc2af883c0mr2283475wmn.31.1677141190726;
+        Thu, 23 Feb 2023 00:33:10 -0800 (PST)
+X-Google-Smtp-Source: AK7set8/exPXYpvKkvDp6cpXvZsIC9vGGhoQN2dLEUnoPfBZuj4eAL8aTXYmGKtnim/iTbvzOclz9Q==
+X-Received: by 2002:a05:600c:30ca:b0:3dc:2af8:83c0 with SMTP id h10-20020a05600c30ca00b003dc2af883c0mr2283459wmn.31.1677141190392;
+        Thu, 23 Feb 2023 00:33:10 -0800 (PST)
+Received: from starship ([89.237.96.70])
+        by smtp.gmail.com with ESMTPSA id k18-20020a05600c409200b003db06224953sm11465807wmh.41.2023.02.23.00.33.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Feb 2023 00:14:59 -0800 (PST)
-Date:   Thu, 23 Feb 2023 10:14:57 +0200
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-To:     "Kalra, Ashish" <ashish.kalra@amd.com>
-Cc:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
-        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, nikunj.dadhania@amd.com,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH RFC v8 28/56] crypto: ccp: Provide APIs to query
- extended attestation report
-Message-ID: <20230223101457.000051ae@gmail.com>
-In-Reply-To: <8462a7e8-f021-6b55-75b4-5dbdaf013897@amd.com>
-References: <20230220183847.59159-1-michael.roth@amd.com>
-        <20230220183847.59159-29-michael.roth@amd.com>
-        <20230222222421.00001a62@gmail.com>
-        <8462a7e8-f021-6b55-75b4-5dbdaf013897@amd.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        Thu, 23 Feb 2023 00:33:09 -0800 (PST)
+Message-ID: <092591cbcc40fbbcc42abd3f603b6d782f411770.camel@redhat.com>
+Subject: Re: [PATCH] KVM: x86: disable on 32-bit unless CONFIG_BROKEN
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Thomas Huth <thuth@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, "Daniel P. Berrange" <berrange@redhat.com>
+Date:   Thu, 23 Feb 2023 10:33:08 +0200
+In-Reply-To: <05144c6d-922c-e70d-e625-c60952b60f3c@redhat.com>
+References: <20220926165112.603078-1-pbonzini@redhat.com>
+         <YzMt24/14n1BVdnI@google.com>
+         <ed74c9a9d6a0d2fd2ad8bd98214ad36e97c243a0.camel@redhat.com>
+         <15291c3f-d55c-a206-9261-253a1a33dce1@redhat.com>
+         <YzRycXDnWgMDgbD7@google.com>
+         <ad97d0671774a873175c71c6435763a33569f669.camel@redhat.com>
+         <YzSKhUEg3L1eMKOR@google.com>
+         <08dab49f-9ca4-4978-4482-1815cf168e74@redhat.com>
+         <b8fa9561295bb6af2b7fcaa8125c6a3b89b305c7.camel@redhat.com>
+         <06d04f32-8403-4d7f-76a1-11a7fac3078e@redhat.com>
+         <Y/aWx4EiDzKW6RHe@google.com>
+         <05144c6d-922c-e70d-e625-c60952b60f3c@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -89,167 +90,61 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 22 Feb 2023 16:35:43 -0600
-"Kalra, Ashish" <ashish.kalra@amd.com> wrote:
-
-> On 2/22/2023 2:24 PM, Zhi Wang wrote:
-> > On Mon, 20 Feb 2023 12:38:19 -0600
-> > Michael Roth <michael.roth@amd.com> wrote:
+On Thu, 2023-02-23 at 08:01 +0100, Thomas Huth wrote:
+> On 22/02/2023 23.27, Sean Christopherson wrote:
+> > On Fri, Feb 17, 2023, Thomas Huth wrote:
+> > > On 29/09/2022 15.52, Maxim Levitsky wrote:
+> > > > On Thu, 2022-09-29 at 15:26 +0200, Paolo Bonzini wrote:
+> > > > > On 9/28/22 19:55, Sean Christopherson wrote:
+> > > > > > > As far as my opinion goes I do volunteer to test this code more often,
+> > > > > > > and I do not want to see the 32 bit KVM support be removed*yet*.
+> > > > > > 
+> > > > > > Yeah, I 100% agree that it shouldn't be removed until we have equivalent test
+> > > > > > coverage.  But I do think it should an "off-by-default" sort of thing.  Maybe
+> > > > > > BROKEN is the wrong dependency though?  E.g. would EXPERT be a better option?
+> > > > > 
+> > > > > Yeah, maybe EXPERT is better but I'm not sure of the equivalent test
+> > > > > coverage.  32-bit VMX/SVM kvm-unit-tests are surely a good idea, but
+> > > > > what's wrong with booting an older guest?
+> > > > >  From my point of view, using the same kernel source for host and the guest
+> > > > is easier because you know that both kernels behave the same.
+> > > > 
+> > > > About EXPERT, IMHO these days most distros already dropped 32 bit suport thus anyway
+> > > > one needs to compile a recent 32 bit kernel manually - thus IMHO whoever
+> > > > these days compiles a 32 bit kernel, knows what they are doing.
+> > > > 
+> > > > I personally would wait few more releases when there is a pressing reason to remove
+> > > > this support.
+> > > 
+> > > FWIW, from the QEMU perspective, it would be very helpful to remove 32-bit
+> > > KVM support from the kernel. The QEMU project currently struggles badly with
+> > > keeping everything tested in the CI in a reasonable amount of time. The
+> > > 32-bit KVM kernel support is the only reason to keep the qemu-system-i386
+> > > binary around - everything else can be covered with the qemu-system-x86_64
+> > > binary that is a superset of the -i386 variant (except for the KVM part as
+> > > far as I know).
+> > > Sure, we could also drop qemu-system-i386 from the CI without dropping the
+> > > 32-bit KVM code in the kernel, but I guess things will rather bitrot there
+> > > even faster in that case, so I'd appreciate if the kernel could drop the
+> > > 32-bit in the near future, too.
 > > 
-> > It seems in the discussion:
-> > https://lore.kernel.org/lkml/f18fae8b-a928-cd82-e0b3-eac62ad3e106@amd.com/,
-> > this API is going to be removed. Will that fix land in this patch series or not?
-> > If not, It would be better to mention it in the comment message of this one
-> > or patch 45.
-> > If yes, I guess this patch is not needed.
-> >   
+> > Ya, I would happily drop support for 32-bit kernels today, the only sticking point
+> > is the lack of 32-bit shadow paging test coverage, which unfortunately is a rather
+> > large point.  :-(
 > 
-> This API is definitely not going to be removed.
+>  From your point of view, would it be OK if QEMU dropped qemu-system-i386? 
+> I.e. would it be fine to use older versions of QEMU only for that test 
+> coverage (or do you even use a different userspace for testing that)?
 > 
-> There will be some fixes and optimizations added to the API 
-> implementation (as per the discussions) and that will be included in v9.
+>   Thomas
 > 
 
-Thanks.
+From my point of view qemu-system-x86_64 does run 32 bit guests just fine.
 
-I should use the term "this API is going to be refined" as
-snp_guest_ext_guest_request() is going to be renamed and refined. I gave
-this comment because when digging this patch, I found this API was going to be
-changed in the discussion based on v7 when digging this patch. It would be
-really nice to mention it in the v8 so that some review efforts can be saved.
-For example, some people might choose to skip reviewing this one in v8 and get
-back on it in the next version when it is ready. Or people can also evaluate
-the possible changes in v9 when reviewing this part.
+The only exception that I know is that gdbstub is somewhat broken, but that can be probably
+fixed.
 
-> Thanks,
-> Ashish
-> 
-> >> From: Brijesh Singh <brijesh.singh@amd.com>
-> >>
-> >> Version 2 of the GHCB specification defines VMGEXIT that is used to get
-> >> the extended attestation report. The extended attestation report includes
-> >> the certificate blobs provided through the SNP_SET_EXT_CONFIG.
-> >>
-> >> The snp_guest_ext_guest_request() will be used by the hypervisor to get
-> >> the extended attestation report. See the GHCB specification for more
-> >> details.
-> >>
-> >> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> >> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> >> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> >> ---
-> >>   drivers/crypto/ccp/sev-dev.c | 47 ++++++++++++++++++++++++++++++++++++
-> >>   include/linux/psp-sev.h      | 33 +++++++++++++++++++++++++
-> >>   2 files changed, 80 insertions(+)
-> >>
-> >> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> >> index b56b00ca2cd4..e65563bc8298 100644
-> >> --- a/drivers/crypto/ccp/sev-dev.c
-> >> +++ b/drivers/crypto/ccp/sev-dev.c
-> >> @@ -2017,6 +2017,53 @@ int sev_guest_df_flush(int *error)
-> >>   }
-> >>   EXPORT_SYMBOL_GPL(sev_guest_df_flush);
-> >>   
-> >> +int snp_guest_ext_guest_request(struct sev_data_snp_guest_request *data,
-> >> +				unsigned long vaddr, unsigned long *npages, unsigned long *fw_err)
-> >> +{
-> >> +	unsigned long expected_npages;
-> >> +	struct sev_device *sev;
-> >> +	int rc;
-> >> +
-> >> +	if (!psp_master || !psp_master->sev_data)
-> >> +		return -ENODEV;
-> >> +
-> >> +	sev = psp_master->sev_data;
-> >> +
-> >> +	if (!sev->snp_initialized)
-> >> +		return -EINVAL;
-> >> +
-> >> +	mutex_lock(&sev->snp_certs_lock);
-> >> +	/*
-> >> +	 * Check if there is enough space to copy the certificate chain. Otherwise
-> >> +	 * return ERROR code defined in the GHCB specification.
-> >> +	 */
-> >> +	expected_npages = sev->snp_certs_len >> PAGE_SHIFT;
-> >> +	if (*npages < expected_npages) {
-> >> +		*npages = expected_npages;
-> >> +		*fw_err = SNP_GUEST_REQ_INVALID_LEN;
-> >> +		mutex_unlock(&sev->snp_certs_lock);
-> >> +		return -EINVAL;
-> >> +	}
-> >> +
-> >> +	rc = sev_do_cmd(SEV_CMD_SNP_GUEST_REQUEST, data, (int *)fw_err);
-> >> +	if (rc) {
-> >> +		mutex_unlock(&sev->snp_certs_lock);
-> >> +		return rc;
-> >> +	}
-> >> +
-> >> +	/* Copy the certificate blob */
-> >> +	if (sev->snp_certs_data) {
-> >> +		*npages = expected_npages;
-> >> +		memcpy((void *)vaddr, sev->snp_certs_data, *npages << PAGE_SHIFT);
-> >> +	} else {
-> >> +		*npages = 0;
-> >> +	}
-> >> +
-> >> +	mutex_unlock(&sev->snp_certs_lock);
-> >> +	return rc;
-> >> +}
-> >> +EXPORT_SYMBOL_GPL(snp_guest_ext_guest_request);
-> >> +
-> >>   static void sev_exit(struct kref *ref)
-> >>   {
-> >>   	misc_deregister(&misc_dev->misc);
-> >> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-> >> index d19744807471..81bafc049eca 100644
-> >> --- a/include/linux/psp-sev.h
-> >> +++ b/include/linux/psp-sev.h
-> >> @@ -931,6 +931,32 @@ void snp_free_firmware_page(void *addr);
-> >>    */
-> >>   void snp_mark_pages_offline(unsigned long pfn, unsigned int npages);
-> >>   
-> >> +/**
-> >> + * snp_guest_ext_guest_request - perform the SNP extended guest request command
-> >> + *  defined in the GHCB specification.
-> >> + *
-> >> + * @data: the input guest request structure
-> >> + * @vaddr: address where the certificate blob need to be copied.
-> >> + * @npages: number of pages for the certificate blob.
-> >> + *    If the specified page count is less than the certificate blob size, then the
-> >> + *    required page count is returned with error code defined in the GHCB spec.
-> >> + *    If the specified page count is more than the certificate blob size, then
-> >> + *    page count is updated to reflect the amount of valid data copied in the
-> >> + *    vaddr.
-> >> + *
-> >> + * @sev_ret: sev command return code
-> >> + *
-> >> + * Returns:
-> >> + * 0 if the sev successfully processed the command
-> >> + * -%ENODEV    if the sev device is not available
-> >> + * -%ENOTSUPP  if the sev does not support SEV
-> >> + * -%ETIMEDOUT if the sev command timed out
-> >> + * -%EIO       if the sev returned a non-zero return code
-> >> + */
-> >> +int snp_guest_ext_guest_request(struct sev_data_snp_guest_request *data,
-> >> +				unsigned long vaddr, unsigned long *npages,
-> >> +				unsigned long *error);
-> >> +
-> >>   #else	/* !CONFIG_CRYPTO_DEV_SP_PSP */
-> >>   
-> >>   static inline int
-> >> @@ -968,6 +994,13 @@ static inline void *snp_alloc_firmware_page(gfp_t mask)
-> >>   
-> >>   static inline void snp_free_firmware_page(void *addr) { }
-> >>   
-> >> +static inline int snp_guest_ext_guest_request(struct sev_data_snp_guest_request *data,
-> >> +					      unsigned long vaddr, unsigned long *n,
-> >> +					      unsigned long *error)
-> >> +{
-> >> +	return -ENODEV;
-> >> +}
-> >> +
-> >>   #endif	/* CONFIG_CRYPTO_DEV_SP_PSP */
-> >>   
-> >>   #endif	/* __PSP_SEV_H__ */  
-> >   
+
+Best regards,
+	Maxim Levitsky
 
