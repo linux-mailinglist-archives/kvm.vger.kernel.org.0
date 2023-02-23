@@ -2,153 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 379176A0083
-	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 02:16:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 274606A008C
+	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 02:23:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232772AbjBWBQW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Feb 2023 20:16:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55274 "EHLO
+        id S233187AbjBWBX1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Feb 2023 20:23:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229999AbjBWBQU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Feb 2023 20:16:20 -0500
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79CED76AD
-        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 17:16:19 -0800 (PST)
-Received: by mail-wm1-x334.google.com with SMTP id j19-20020a05600c1c1300b003e9b564fae9so2436255wms.2
-        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 17:16:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ACruxKNejY1sXBH2D6SAHOO/I8K6z+cEyI/uP3OdVLQ=;
-        b=rXHrIyyIgAOG1TQ0RI3OmbHq/PpdTHXP+lSpuVviTpi4WBNyrTRPwN5YZ7dlCWDput
-         oOgA26MutDrZw5FCC/JsXNXVxRGoaN0F/k7OLBfimzcK1b4IRakIS+BeB3rLA2GlKbcx
-         QfMAJpD67t6K5yasK1mo56zU2sY7XBAWIkYjmVvlliGdsdfCqvqM317ZzU7tZld7Na03
-         lSD7bfLoCFYhplpDpPQMZSTxmFhb1iQfJD/26QYiSoSlvB/dbDwKhSwQTBnr2nh5cV4i
-         4+T9uCwHGJ/srZR+BW/vTaJzWzOUNFEy3kf2M1FUDeO1qg41JJjMGuntknkKf3p4HG/c
-         E+OA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ACruxKNejY1sXBH2D6SAHOO/I8K6z+cEyI/uP3OdVLQ=;
-        b=d5eASbyBA/5CwAN9qkX+yfOY5dj33FTg+RFscSeRtMAXSh52qZbhJuJLljA72fXa/i
-         vypk8Jw47Gb+pJZWVwjjwjNS7rORFwW77ugNd09PEIvk6DwxKMGoQUXI06W4b+kgm9Qc
-         1AQW6fXahORdgHRawan5GU4Ivw3znrkChJqMQHivlG2nlTDjO7FLyKDaRbjkWf0jy+GL
-         Fku7TFfQKLt3RGPY5LOdjrxfAks1ZQEAPX6bkxK2PYep6AOLfG2iNlOal72ZzG5hiyEm
-         zRLb75ziyfWUeh0PaGnO6YAg7d7SO/FBStDO1K5bTlyzYpQHLVBOClrPAdUE9dnFdVjX
-         FTDA==
-X-Gm-Message-State: AO0yUKURAWz+04FXJqVtmuVquxFTpbCsoZZfJ2wMTpsAyV+ufXmMTCmr
-        Sty/gjrqFi2w7g3AFXO1g5lW01df9vS0bWjJFqFtYQ==
-X-Google-Smtp-Source: AK7set8lHxU0d80KxQe0PVvWY9UsJj6vGKnanrB6lTrTk+z5PUj+s5l9toLxbmscxhEUqNUdo3KSabmNbaetRlcaErs=
-X-Received: by 2002:a05:600c:c16:b0:3e1:fb35:4247 with SMTP id
- fm22-20020a05600c0c1600b003e1fb354247mr1547498wmb.132.1677114977931; Wed, 22
- Feb 2023 17:16:17 -0800 (PST)
+        with ESMTP id S233133AbjBWBX0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Feb 2023 20:23:26 -0500
+Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9D48D2005F;
+        Wed, 22 Feb 2023 17:23:18 -0800 (PST)
+Received: from loongson.cn (unknown [10.20.42.120])
+        by gateway (Coremail) with SMTP id _____8CxEZQEwPZj+uwDAA--.2399S3;
+        Thu, 23 Feb 2023 09:23:16 +0800 (CST)
+Received: from [10.20.42.120] (unknown [10.20.42.120])
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8Axvr4CwPZjolc5AA--.43950S3;
+        Thu, 23 Feb 2023 09:23:15 +0800 (CST)
+Subject: Re: [PATCH v2 06/29] LoongArch: KVM: Implement vcpu create and
+ destroy interface
+To:     Paolo Bonzini <pbonzini@redhat.com>
+References: <20230220065735.1282809-1-zhaotianrui@loongson.cn>
+ <20230220065735.1282809-7-zhaotianrui@loongson.cn>
+ <cbd95763-ec38-63f7-89bf-c8b01aa7df77@redhat.com>
+ <abfa3fbc-e234-d0ab-ec35-90d9c251bf79@loongson.cn>
+ <a9623c91-a28a-d91d-5311-fcfc4bd13247@redhat.com>
+Cc:     Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn
+From:   Tianrui Zhao <zhaotianrui@loongson.cn>
+Message-ID: <bb5ad31a-cac1-bbfd-789a-a371eece4e9e@loongson.cn>
+Date:   Thu, 23 Feb 2023 09:23:14 +0800
+User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:45.0) Gecko/20100101
+ Thunderbird/45.4.0
 MIME-Version: 1.0
-References: <20230215011614.725983-1-amoorthy@google.com> <20230215011614.725983-6-amoorthy@google.com>
- <87mt5fz5g6.wl-maz@kernel.org> <CAF7b7mr3iDBYWvX+ZPA1JeZgezX-BDo8VArwnjuzHUeWJmO32Q@mail.gmail.com>
- <Y+6iX6a22+GEuH1b@google.com> <CAF7b7mqeXcHdFHewX3enn-vxf6y7CUWjXjB3TXithZ_PnzVLQQ@mail.gmail.com>
- <Y+/kgMxQPOswAz/2@google.com>
-In-Reply-To: <Y+/kgMxQPOswAz/2@google.com>
-From:   Anish Moorthy <amoorthy@google.com>
-Date:   Wed, 22 Feb 2023 17:16:06 -0800
-Message-ID: <CAF7b7mpMiw=6o6vTsqFR6HUUCJL+1MSTDUsMaKLnS1NqyVf-9A@mail.gmail.com>
-Subject: Re: [PATCH 5/8] kvm: Add cap/kvm_run field for memory fault exits
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
-        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <a9623c91-a28a-d91d-5311-fcfc4bd13247@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: AQAAf8Axvr4CwPZjolc5AA--.43950S3
+X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
+X-Coremail-Antispam: 1Uk129KBjvJXoWxJrWUJF4DGrW8Aw1kXr1UZFb_yoW8Gryxpa
+        4kAan09r4DJryxJ3WqgF17ZFyI9rW8ZryUWF1DWrWUX3yDtrn3Ar18K3s8CF98ur1kZ3W0
+        qFWvgFn5A3WYyrDanT9S1TB71UUUUjDqnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
+        qI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUIcSsGvfJTRUUU
+        bqxYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s
+        1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xv
+        wVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4
+        x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r4UJVWxJr1l
+        n4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6x
+        ACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r126r1DMcIj6I8E
+        87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0V
+        AS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCF
+        s4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI
+        8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41l
+        IxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIx
+        AIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2
+        jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8Dl1DUUUUU==
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 17, 2023 at 12:33=E2=80=AFPM Sean Christopherson <seanjc@google=
-.com> wrote
-> > > > I don't think flags are a good idea for this, as it comes with the
-> > > > illusion that both events can happen on a single exit. In reality, =
-these
-> > > > are mutually exclusive.
+
+
+在 2023年02月22日 20:17, Paolo Bonzini 写道:
+> On 2/22/23 02:52, Tianrui Zhao wrote:
+>>>
+>>>> +    vcpu->arch.guest_eentry = (unsigned long)kvm_context->kvm_eentry;
+>>>> +    vcpu->arch.vcpu_run = kvm_context->kvm_enter_guest;
+>>>> +    vcpu->arch.handle_exit = _kvm_handle_exit;
+>>>
+>>> Here as well, whatever is constant must not be stored in struct 
+>>> kvm_arch_vcpu.
+>>>
+>>> Paolo
+>>
+>> Thanks,  we use this in vcpu_arch because the vcpu_arch is used as 
+>> argument in switch.S' methods, we can quickly access the guest_eentry 
+>> and handle_exit by using the  KVM_ARCH_GEENTRY, KVM_ARCH_HANDLE_EXIT 
+>> offsets. If we change to global variable , we should relocate it in 
+>> switch.S and may lead  to lower accessing speed.
 >
-> They aren't mutually exclusive.  Obviously KVM will only detect one other=
- the
-> other, but it's entirely possible that a guest could be accessing the "wr=
-ong"
-> flavor of a page _and_ for that flavor to not be faulted in.  A smart use=
-rspace
-> should see that (a) it needs to change the memory attributes and (b) that=
- it
-> needs to demand the to-be-installed page from the source.
+> For guest_eentry and handle_exit this is correct so you can add a 
+> comment in kvm_host.h, like
 >
-> > > > A fault type/code would be better here, with the option to add flag=
-s at
-> > > > a later date that could be used to further describe the exit (if
-> > > > needed).
-> > >
-> > > Agreed.
+>     /* Pointers stored here for easy access from assembly code. */
 >
-> Not agreed :-)
-> ...
-> Hard "no" on a separate exit reason unless someone comes up with a very c=
-ompelling
-> argument.
+> However, vcpu->arch.vcpu_run is not used in switch.S so there is no 
+> need to store it in struct kvm_arch_vcpu.  Since you're already going 
+> to move kvm_enter_guest out of kvm_context and into a global variable, 
+> please give it the right pointer-to-function type instead of using 
+> unsigned long.
 >
-> Chao's UPM series is not yet merged, i.e. is not set in stone.  If the pr=
-oposed
-> functionality in Chao's series is lacking and/or will conflict with this =
-UFFD,
-> then we can and should address those issues _before_ it gets merged.
+> Paolo
 
-Ok so I have a v2 of the series basically ready to go, but I realized
-that I should
-probably have brought up my modified API here to make sure it was
-sane: so, I'll do
-that first
+Thanks, I will remove this vcpu_run and replace it with the new global 
+variable, and fix the pointer-to-function type.
 
-In v2, I've
-(1)  renamed the kvm cap from KVM_CAP_MEM_FAULT_NOWAIT to
-KVM_CAP_MEMORY_FAULT_EXIT due to Sean's earlier comment
+Thanks
+Tianrui Zhao
 
-> gup_fast() failing in itself isn't interesting.  The _intended_ behavior =
-is that
-> KVM will exit if and only if the guest accesses a valid page that hasn't =
-yet been
-> transfered from the source, but the _actual_ behavior is that KVM will ex=
-it if
-> the page isn't faulted in for _any_ reason.  Even tagging the access NOWA=
-IT is
-> speculative to some degree, as that suggests the access may have succeede=
-d if
-> KVM "waited", which may or may not be true.
 
-(2) kept the definition of kvm_run.memory_fault as
-struct {
-    __u64 flags;
-    __u64 gpa;
-    __ u64 len;
-} memory_fault;
-which, apart from the name of the "len" field, is exactly what Chao
-has in their series.
-flags remains a bitfield describing the reason for the memory fault:
-in the two places
-this series generates this fault, it sets a bit in flags. Userspace is
-meant to check whether
-a memory_fault was generated due to KVM_CAP_MEMORY_FAULT_EXIT using the
-KVM_MEMORY_FAULT_EXIT_REASON_ABSENT mask.
-
-(3) switched over to a memslot flag: KVM_CAP_MEMORY_FAULT_EXIT simply
-indicates whether this flag is supported. As such, trying to enable
-the new capability
-directly generates an EINVAL, which is meant to make the incorrect usage cl=
-ear.
-
-Hopefully this all appears sane?
