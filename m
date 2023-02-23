@@ -2,190 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A1D6A6A025A
-	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 06:26:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 13BE46A025E
+	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 06:29:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233004AbjBWF0W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Feb 2023 00:26:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47442 "EHLO
+        id S232761AbjBWF34 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Feb 2023 00:29:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229453AbjBWF0U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Feb 2023 00:26:20 -0500
-Received: from mail-vs1-xe33.google.com (mail-vs1-xe33.google.com [IPv6:2607:f8b0:4864:20::e33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB7ED4344D
-        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 21:26:18 -0800 (PST)
-Received: by mail-vs1-xe33.google.com with SMTP id f31so13259960vsv.1
-        for <kvm@vger.kernel.org>; Wed, 22 Feb 2023 21:26:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AXEnUJIuw3DsBBpeEas97UQaCI4+fKGVwu8RQPcIlxs=;
-        b=ebfMrTiO8jVZApxkACFGkW19OKcseaGjzh5HjIfu8MAU62l8YkK9wYnBFkU6I+6zuE
-         AUDCEHsZSZ9mbCKKWNPTplXuqS87aYdUMgEd5/HJTFPzZF9uHLGfh+f//SGkFgG2WUUC
-         VMrPZXwgvdZQ0a9Rdfoin9rPnC9lwtXHaGCdiIAVtUZ+zDzePE60bEA2n80H6qz2mPub
-         YZRSOEb//hMVhNQrFI5fjyJOTZ5EPIveLNi+6mlZv8sUqb9Y6C+ziwSJjuW7/BuocHT5
-         ypJ99wrjoFqAACPuG1lbl4B3N9wqDvRcpL/jBCfwY1kMxbLPNuarGmvnmO4vjdaXxv4a
-         SkyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AXEnUJIuw3DsBBpeEas97UQaCI4+fKGVwu8RQPcIlxs=;
-        b=ozg1UcSi8iT3uSY3ZapagSWKSFuPthFweA8iB2wWD97S/x5gMFYgb6qTiTTscG8DkW
-         Eo8Bgf6Fymv3JlzkLQOIcAdM85FJIEWgx6z7URyhPQqqyNqxy4UoE24T6i7AqFvaMt4O
-         29NiDqivQ4x7sJmAk3GX27fh1l5f2424Uc/TufVDMzdMbY/YeXTmQoRP1kS6wbShb1IA
-         U3+My5CDTZyvqOouyeclWI8qEszaO0pX5gz+aq7M3qlwFV6F2qbV3bt9X7+ghPqSnzcv
-         bqYUr/dAcuX+EfMIK7OWWm5OLCAGyS5oolFIJlcgIrfke0cWzqy2ArINiQuLwy8LkVaH
-         wB5Q==
-X-Gm-Message-State: AO0yUKUGMGvh124lzXDlfZQiX+y+6D7ojv3SxKNekKKWN1nZm+g5+/X9
-        7p6LdoTFvp0FnMFtG4eG0Gjo/pKztH2sWmUuu+V16Q==
-X-Google-Smtp-Source: AK7set/r/f8pGhkIjYGiLVLtcsnWRFxpAmGZdfZxTguMU1aVP5zVqu1WLV5ZRnN+vLq9szVFT6NHenS4YuDGWsM46AY=
-X-Received: by 2002:a05:6102:108f:b0:41e:d8b5:ee40 with SMTP id
- s15-20020a056102108f00b0041ed8b5ee40mr553492vsr.26.1677129977589; Wed, 22 Feb
- 2023 21:26:17 -0800 (PST)
+        with ESMTP id S229461AbjBWF3z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Feb 2023 00:29:55 -0500
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A24B3CA05;
+        Wed, 22 Feb 2023 21:29:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1677130193; x=1708666193;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=K8IMeI4Bvp4oHzpdzTBMsmizPfZAgqXCDZxNy/3Bn1k=;
+  b=dPSW90Hrbt3dBW2+kwmBglQiU77wCdG0gd40pddHm1bMUctH+rDZjLoS
+   SqxntP+k0CmQJMVXRhqNKSqF7m5NgNhWeFulEgEkSgPe1zOhnPmLAkond
+   wN840y+AfRFac0ts+W8RtvrLjR5uxP1PtdhnSuSfM3ZcU+w+RjeYuuJpv
+   jwdsk+i60fQ0M6MebuFvPnd+RhEA7F1D84HTVfJTWr1y6jlkiDCptz0tt
+   7uC2Kvpuyq/dwNqKce6eVXxik/bmrsCz38uh9oJybwdvchy6K1k6DQ48q
+   /jF6QGqQXG9PSmM8CyETlcStlCehLHw+8JjfEA/L6UX68zAn31O47ys/d
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10629"; a="331789151"
+X-IronPort-AV: E=Sophos;i="5.97,320,1669104000"; 
+   d="scan'208";a="331789151"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Feb 2023 21:29:53 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10629"; a="672342758"
+X-IronPort-AV: E=Sophos;i="5.97,320,1669104000"; 
+   d="scan'208";a="672342758"
+Received: from ubuntu.bj.intel.com ([10.238.155.108])
+  by orsmga002.jf.intel.com with ESMTP; 22 Feb 2023 21:29:50 -0800
+From:   Jun Miao <jun.miao@intel.com>
+To:     pbonzini@redhat.com, seanjc@google.com
+Cc:     kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jun.miao@intel.com
+Subject: [PATCH v2] KVM: Fix comments that refer to the non-existent install_new_memslots()
+Date:   Thu, 23 Feb 2023 13:28:51 +0800
+Message-Id: <20230223052851.1054799-1-jun.miao@intel.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-References: <20230217041230.2417228-1-yuzhao@google.com> <20230217041230.2417228-4-yuzhao@google.com>
- <Y+9EUeUIS/ZUe2vw@linux.dev> <Y++kiJwUIh55jkvl@google.com>
-In-Reply-To: <Y++kiJwUIh55jkvl@google.com>
-From:   Yu Zhao <yuzhao@google.com>
-Date:   Wed, 22 Feb 2023 22:25:41 -0700
-Message-ID: <CAOUHufYVWvEG=EMBEffnurQhJSb5WN75NVVXPhWghWFR9Aa94A@mail.gmail.com>
-Subject: Re: [PATCH mm-unstable v1 3/5] kvm/arm64: add kvm_arch_test_clear_young()
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Michael Larabel <michael@michaellarabel.com>,
-        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, x86@kernel.org,
-        linux-mm@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 17, 2023 at 9:00=E2=80=AFAM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Fri, Feb 17, 2023, Oliver Upton wrote:
-> > Hi Yu,
-> >
-> > scripts/get_maintainers.pl is your friend for getting the right set of
-> > emails for a series :) Don't know about others, but generally I would
-> > prefer to be Cc'ed on an entire series (to gather context) than just an
-> > individual patch.
->
-> +1
->
-> >
-> > On Thu, Feb 16, 2023 at 09:12:28PM -0700, Yu Zhao wrote:
-> > > This patch adds kvm_arch_test_clear_young() for the vast majority of
-> > > VMs that are not pKVM and run on hardware that sets the accessed bit
-> > > in KVM page tables.
->
-> At least for the x86 changes, please read Documentation/process/maintaine=
-r-tip.rst
-> and rewrite the changelogs.
+The function of install_new_memslots() was replaced by kvm_swap_active_memslots().
+In order to avoid confusion, fix the comments that refer the non-existent name of
+install_new_memslots which always be ignored.
 
-I see -- will remove "this patch".
+Fixes: a54d806688fe ("KVM: Keep memslots in tree-based structures instead of array-based ones")
+Signed-off-by: Jun Miao <jun.miao@intel.com>
+---
+ Documentation/virt/kvm/locking.rst |  2 +-
+ include/linux/kvm_host.h           |  4 ++--
+ virt/kvm/kvm_main.c                | 10 +++++-----
+ 3 files changed, 8 insertions(+), 8 deletions(-)
 
-> > > It relies on two techniques, RCU and cmpxchg, to safely test and clea=
-r
-> > > the accessed bit without taking the MMU lock. The former protects KVM
-> > > page tables from being freed while the latter clears the accessed bit
-> > > atomically against both the hardware and other software page table
-> > > walkers.
-> > >
-> > > Signed-off-by: Yu Zhao <yuzhao@google.com>
-> > > ---
-> > >  arch/arm64/include/asm/kvm_host.h       |  7 +++
-> > >  arch/arm64/include/asm/kvm_pgtable.h    |  8 +++
-> > >  arch/arm64/include/asm/stage2_pgtable.h | 43 ++++++++++++++
-> > >  arch/arm64/kvm/arm.c                    |  1 +
-> > >  arch/arm64/kvm/hyp/pgtable.c            | 51 ++--------------
-> > >  arch/arm64/kvm/mmu.c                    | 77 +++++++++++++++++++++++=
-+-
-> > >  6 files changed, 141 insertions(+), 46 deletions(-)
-> > >
-> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/a=
-sm/kvm_host.h
-> > > index 35a159d131b5..572bcd321586 100644
-> > > --- a/arch/arm64/include/asm/kvm_host.h
-> > > +++ b/arch/arm64/include/asm/kvm_host.h
-> > > @@ -1031,4 +1031,11 @@ static inline void kvm_hyp_reserve(void) { }
-> > >  void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
-> > >  bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu);
-> > >
-> > > +/* see the comments on the generic kvm_arch_has_test_clear_young() *=
-/
->
-> Please eliminate all of these "see the comments on blah", in every case t=
-hey do
-> nothing more than redirect the reader to something they're likely already=
- aware of.
->
-> > > +#define kvm_arch_has_test_clear_young kvm_arch_has_test_clear_young
-> > > +static inline bool kvm_arch_has_test_clear_young(void)
-> > > +{
-> > > +   return IS_ENABLED(CONFIG_KVM) && cpu_has_hw_af() && !is_protected=
-_kvm_enabled();
-> > > +}
->
-> ...
->
-> > Also, I'm at a loss for why we'd need to test if CONFIG_KVM is enabled.
-> > My expectation is that we should provide an implementation that returns
-> > false if !CONFIG_KVM, avoiding the need to repeat that bit in every
-> > single implementation of the function.
->
-> mm/vmscan.c uses kvm_arch_has_test_clear_young().  I have opinions on tha=
-t, but
-> I'll hold off on expressing them until there's actual justification prese=
-nted
-> somewhere.
->
-> Yu, this series and each patch needs a big pile of "why".  I get that the=
- goal
-> is to optimize memory oversubscribe, but there needs to be justification =
-for
-> why this is KVM only, why nested VMs and !A/D hardware are out of scope, =
-why yet
-> another mmu_notifier hook is being added, etc.
+diff --git a/Documentation/virt/kvm/locking.rst b/Documentation/virt/kvm/locking.rst
+index 14c4e9fa501d..6e03ad853c27 100644
+--- a/Documentation/virt/kvm/locking.rst
++++ b/Documentation/virt/kvm/locking.rst
+@@ -21,7 +21,7 @@ The acquisition orders for mutexes are as follows:
+ - kvm->mn_active_invalidate_count ensures that pairs of
+   invalidate_range_start() and invalidate_range_end() callbacks
+   use the same memslots array.  kvm->slots_lock and kvm->slots_arch_lock
+-  are taken on the waiting side in install_new_memslots, so MMU notifiers
++  are taken on the waiting side in kvm_swap_active_memslots(), so MMU notifiers
+   must not take either kvm->slots_lock or kvm->slots_arch_lock.
+ 
+ For SRCU:
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 8ada23756b0e..98605bd25060 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -58,7 +58,7 @@
+ 
+ /*
+  * Bit 63 of the memslot generation number is an "update in-progress flag",
+- * e.g. is temporarily set for the duration of install_new_memslots().
++ * e.g. is temporarily set for the duration of kvm_swap_active_memslots().
+  * This flag effectively creates a unique generation number that is used to
+  * mark cached memslot data, e.g. MMIO accesses, as potentially being stale,
+  * i.e. may (or may not) have come from the previous memslots generation.
+@@ -713,7 +713,7 @@ struct kvm {
+ 	 * use by the VM. To be used under the slots_lock (above) or in a
+ 	 * kvm->srcu critical section where acquiring the slots_lock would
+ 	 * lead to deadlock with the synchronize_srcu in
+-	 * install_new_memslots.
++	 * kvm_swap_active_memslots().
+ 	 */
+ 	struct mutex slots_arch_lock;
+ 	struct mm_struct *mm; /* userspace tied to this vm */
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index d255964ec331..9f9077a898dc 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1298,7 +1298,7 @@ static void kvm_destroy_vm(struct kvm *kvm)
+ 	 * At this point, pending calls to invalidate_range_start()
+ 	 * have completed but no more MMU notifiers will run, so
+ 	 * mn_active_invalidate_count may remain unbalanced.
+-	 * No threads can be waiting in install_new_memslots as the
++	 * No threads can be waiting in kvm_swap_active_memslots() as the
+ 	 * last reference on KVM has been dropped, but freeing
+ 	 * memslots would deadlock without this manual intervention.
+ 	 */
+@@ -1742,13 +1742,13 @@ static void kvm_invalidate_memslot(struct kvm *kvm,
+ 	kvm_arch_flush_shadow_memslot(kvm, old);
+ 	kvm_arch_guest_memory_reclaimed(kvm);
+ 
+-	/* Was released by kvm_swap_active_memslots, reacquire. */
++	/* Was released by kvm_swap_active_memslots(), reacquire. */
+ 	mutex_lock(&kvm->slots_arch_lock);
+ 
+ 	/*
+ 	 * Copy the arch-specific field of the newly-installed slot back to the
+ 	 * old slot as the arch data could have changed between releasing
+-	 * slots_arch_lock in install_new_memslots() and re-acquiring the lock
++	 * slots_arch_lock in kvm_swap_active_memslots() and re-acquiring the lock
+ 	 * above.  Writers are required to retrieve memslots *after* acquiring
+ 	 * slots_arch_lock, thus the active slot's data is guaranteed to be fresh.
+ 	 */
+@@ -1810,11 +1810,11 @@ static int kvm_set_memslot(struct kvm *kvm,
+ 	int r;
+ 
+ 	/*
+-	 * Released in kvm_swap_active_memslots.
++	 * Released in kvm_swap_active_memslots().
+ 	 *
+ 	 * Must be held from before the current memslots are copied until
+ 	 * after the new memslots are installed with rcu_assign_pointer,
+-	 * then released before the synchronize srcu in kvm_swap_active_memslots.
++	 * then released before the synchronize srcu in kvm_swap_active_memslots().
+ 	 *
+ 	 * When modifying memslots outside of the slots_lock, must be held
+ 	 * before reading the pointer to the current memslots until after all
+-- 
+2.32.0
 
-I totally agree.
-
-This is an optimization, not a bug fix. It can't be justified without
-performance numbers from some common use cases. That burden of proof
-clearly rests on me -- I will follow up on that.
-
-For now, I want to make sure the methodical part is clear:
-1. We only have limited resources and we need to prioritize major use cases=
-.
-2. We can only improve one thing at a time and we can't cover
-everything at the same time.
-3. We need to focus on the return on investment and the future.
-
-I hope everyone by now agrees with my "the vast majority of VMs ..."
-assertion. If not, I'm happy to revisit that [1]. If so, the next step
-would be whether we want to focus on the vast majority first. I think
-this naturally answers why the nested VMs and !AD h/w are out of
-scope, at the moment (I didn't spell this out; probably I should in
-v2). After we have taken the first step, we probably can decide
-whether there is enough resource and demand to cover the low return on
-investment part (but complexity but less common use cases).
-
-[1] https://lore.kernel.org/linux-mm/20230217041230.2417228-1-yuzhao@google=
-.com/
