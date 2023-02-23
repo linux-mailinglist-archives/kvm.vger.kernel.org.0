@@ -2,192 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 854C76A1084
-	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 20:25:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 331D76A1088
+	for <lists+kvm@lfdr.de>; Thu, 23 Feb 2023 20:25:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231515AbjBWTY7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Feb 2023 14:24:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48930 "EHLO
+        id S231279AbjBWTZy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Feb 2023 14:25:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232161AbjBWTY4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Feb 2023 14:24:56 -0500
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ED572A6F1
-        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 11:24:29 -0800 (PST)
-Received: by mail-wr1-x435.google.com with SMTP id h14so2925579wru.4
-        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 11:24:29 -0800 (PST)
+        with ESMTP id S230399AbjBWTZx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Feb 2023 14:25:53 -0500
+Received: from mail-vs1-xe29.google.com (mail-vs1-xe29.google.com [IPv6:2607:f8b0:4864:20::e29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 637A519F07
+        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 11:25:52 -0800 (PST)
+Received: by mail-vs1-xe29.google.com with SMTP id m10so15371392vso.4
+        for <kvm@vger.kernel.org>; Thu, 23 Feb 2023 11:25:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2WUW7m+MbriTC2U91BdHy5e/gS4PISvFC5pTDLmthLM=;
-        b=ilbHouOcMp+Ekq6J6OxGkNWAHX+j0tnci9ZYJcNsD94BPqkA9VNn8wfF97nhtcNeQF
-         Rd2z3EXCI0Sn7HT2F67rBc9ihauFrLPUUqsHyi9WvdDAlDGyQyhGwjYmvtHhY8gtCLbM
-         Li0/DDwKlwYmlmD4opJ6zUJxEfc4I7ua8ZnD/hvSldueDmBpsmMHa86MWBnTtlC16u6g
-         X4QwVXUOVq2nDuuTpcV2nua5qO8LYNbQT87/hjsRzekX24ggd5wHIVssJlS0cvZNWOYU
-         s9xoaObEUEJ6Av3uydZz4xBCPm1svPwNbiSu/DgeNnfhuaxdVytpXwmZa8XfBTmdSXum
-         0N4Q==
+        d=google.com; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RaN2m3eSdvQkZvFXVE5UwMtaHXh9kInOcPsQSxfuApo=;
+        b=EdY0Zf42ZDRE5qttzyl6jWrHpR09fR1WYt885kd5Np43hjOjFvTgv/qafLuP2e/iYn
+         Q5NiW0sXJQ99vo9CaNQ0NgLbSkRRmaO8aMUbNLNlhu2ZbabhX9zEOX5k/kc2LuYCJFtr
+         qQnSvXzZNvaThZ8gqnSKqcakXE3Dm5AGNefE0M3sBomy7U9GtpPIIzmUgxTF3/IyYYmw
+         3J4ppBng3VEdZz4yGITOqYKi96kzh8seeVMxnEEhXUZrW50AtA5j0DmRye+ILDXMuKh9
+         5yZ+74iJ6VpGIZ9GKicdgFx5BWvLcdUTerJkJh4BQ8UOfIm5uv4FE50NVc66HSEwySfk
+         y1sQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2WUW7m+MbriTC2U91BdHy5e/gS4PISvFC5pTDLmthLM=;
-        b=lrob8/mleqERgTf8/nLbYLkZyB+s2g3EWFms6XAcCO/E2VYOcxzlHka+1XRQuipDt2
-         3g12XaEM7UCItuZ3Zof+jmwlwtOfgtR5zlvvVOrVTf02ByOWz+/6Jq4HZFJXbkHdvUhX
-         YV7uUobvNGGAdUDnJOh8bUT3+pGdIST4Z3z8yZGEJNkErh6uYMkFs+kGR7bKd7DJo+PL
-         P4PsykoYIkiR0+u7/6Dn2wJvVRk6SlA8IEDmXR8lk1vk0L1QIM91yxkAz7Bfi3XvpEYN
-         6VPD86Mp3dcBCvzYnM6uDAn9JVqUImd81OgJP55QdXz3xvN6l8QCWDdGXkNqJ2VmGMRM
-         ZUxw==
-X-Gm-Message-State: AO0yUKW3fSzMXxpg0WACy7j+j7GHaxXy9j9Wc8Dk0M2F/oyq44WPD7V7
-        7YEaLpaY4GybGslvrEP1BN5zKg==
-X-Google-Smtp-Source: AK7set9p6BDFOcjNFXYyjjdbXmPAVFfJL/xQjIIlsS//FUfrvOZd8nYyaGDj0Mt2ghpDvo6g0B6b/w==
-X-Received: by 2002:a5d:6645:0:b0:2c5:509b:dc54 with SMTP id f5-20020a5d6645000000b002c5509bdc54mr11486541wrw.0.1677180267855;
-        Thu, 23 Feb 2023 11:24:27 -0800 (PST)
-Received: from ?IPV6:2a02:6b6a:b566:0:5ee0:5af0:64bd:6198? ([2a02:6b6a:b566:0:5ee0:5af0:64bd:6198])
-        by smtp.gmail.com with ESMTPSA id j21-20020a5d6e55000000b002c3f81c51b6sm12375109wrz.90.2023.02.23.11.24.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Feb 2023 11:24:27 -0800 (PST)
-Message-ID: <97e1f2aa-d823-1aea-a41f-8024ba5075aa@bytedance.com>
-Date:   Thu, 23 Feb 2023 19:24:26 +0000
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RaN2m3eSdvQkZvFXVE5UwMtaHXh9kInOcPsQSxfuApo=;
+        b=35TLmimrlae+WeDYwSJWg3RGejCxnzx1MCiWgCGrr5kqpMOCDW8KLHP+M3eDMdhh5a
+         IYcV+BDrGrtyNirWE7dWT8EzmqevAZZTe03zOZ3aIbt5BYAs87elpAYpClm1u2OldFTc
+         Z/Zf8CPB/t8k7YjyOhQmyj+JfYAcm02TK3SfFJST9wyQfxhldOKb4O6tb4jxw0MoBEze
+         W9Dh2VpS8/qfzRvbyYEyFubTzKEEWS36an0fdU+x7GK/Wj9zDj9PklzPejJHm+BNOhi1
+         lgqdmBtTgQxohxCYdYICLBNp5XNAn+Tw7EGeKUWFrIlJ4BI/uKbuSPCS32AavoXHAQWq
+         MgiQ==
+X-Gm-Message-State: AO0yUKWaNaSxR/JKNd/5/EwxuM4etmtaPH+lC1UYzWKDf6vfmZ+q4QFr
+        4KM85B9zipawE8KHPyiz1fepgmV1HcBlNyHyP2RSuJjys8jTQFpIH/g=
+X-Google-Smtp-Source: AK7set+MwFQXgKVqTLbdOfE3WTC6SqYAp6Rxgj82MRbQDTDH/3m6ISbS4ACZu2dBD1p1qYLzl2lVlP0QCPWzHhdfVlA=
+X-Received: by 2002:a05:6102:5d9:b0:415:74b4:6067 with SMTP id
+ v25-20020a05610205d900b0041574b46067mr633121vsf.6.1677180351265; Thu, 23 Feb
+ 2023 11:25:51 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [External] Re: [PATCH v9 0/8] Parallel CPU bringup for x86_64
-Content-Language: en-US
-To:     David Woodhouse <dwmw2@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>, kim.phillips@amd.com
-Cc:     arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
-        pbonzini@redhat.com, paulmck@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
-        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
-        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
-        simon.evans@bytedance.com, liangma@liangbit.com
-References: <20230215145425.420125-1-usama.arif@bytedance.com>
- <62ee53770b4010f065346b7f2a1200013836be97.camel@infradead.org>
- <87a615mz2x.ffs@tglx>
- <701ce2da00e559d517d4e48bd5d88ccae1198e44.camel@infradead.org>
-From:   Usama Arif <usama.arif@bytedance.com>
-In-Reply-To: <701ce2da00e559d517d4e48bd5d88ccae1198e44.camel@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+References: <20230217041230.2417228-1-yuzhao@google.com> <20230217041230.2417228-3-yuzhao@google.com>
+ <Y++q/lglE6FJBdjt@google.com> <CAOUHufaK-BHdajDZJKjn_LU-gMkUTKa_9foMB8g-u9DyrVhPwg@mail.gmail.com>
+ <Y/ed0XYAPx+7pukA@google.com> <CAOUHufYw9Mc-w1E-Jkqnt869bVJ0AxOB5_grSEMcdMdDODDdCw@mail.gmail.com>
+ <Y/evPJg9gvXxO1hs@google.com> <CAOUHufYx8JUT0T11jxuqknHzUHOYm7kLm_JfgP3LmRrFe=E20Q@mail.gmail.com>
+ <Y/e006bZOYXIFE/j@google.com> <CAOUHufbhKsWzXZP_VgOTVkKgZhU=LaXJBRKcaAk++d6sLk1ktA@mail.gmail.com>
+ <Y/e8wgqFSr8voAto@google.com>
+In-Reply-To: <Y/e8wgqFSr8voAto@google.com>
+From:   Yu Zhao <yuzhao@google.com>
+Date:   Thu, 23 Feb 2023 12:25:12 -0700
+Message-ID: <CAOUHufbVBVrO=ixNT-5nzQ=kOFDh6CYhdg0VT4c8gDd7rdE6Hg@mail.gmail.com>
+Subject: Re: [PATCH mm-unstable v1 2/5] kvm/x86: add kvm_arch_test_clear_young()
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Michael Larabel <michael@michaellarabel.com>,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, x86@kernel.org,
+        linux-mm@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Feb 23, 2023 at 12:21=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote:
+>
+> On Thu, Feb 23, 2023, Yu Zhao wrote:
+> > On Thu, Feb 23, 2023 at 11:47=E2=80=AFAM Sean Christopherson <seanjc@go=
+ogle.com> wrote:
+> > >
+> > > On Thu, Feb 23, 2023, Yu Zhao wrote:
+> > > > On Thu, Feb 23, 2023 at 11:24=E2=80=AFAM Sean Christopherson <seanj=
+c@google.com> wrote:
+> > > > >
+> > > > > On Thu, Feb 23, 2023, Yu Zhao wrote:
+> > > > > > On Thu, Feb 23, 2023 at 10:09=E2=80=AFAM Sean Christopherson <s=
+eanjc@google.com> wrote:
+> > > > > > > > I'll take a look at that series. clear_bit() probably won't=
+ cause any
+> > > > > > > > practical damage but is technically wrong because, for exam=
+ple, it can
+> > > > > > > > end up clearing the A-bit in a non-leaf PMD. (cmpxchg will =
+just fail
+> > > > > > > > in this case, obviously.)
+> > > > > > >
+> > > > > > > Eh, not really.  By that argument, clearing an A-bit in a hug=
+e PTE is also technically
+> > > > > > > wrong because the target gfn may or may not have been accesse=
+d.
+> > > > > >
+> > > > > > Sorry, I don't understand. You mean clear_bit() on a huge PTE i=
+s
+> > > > > > technically wrong? Yes, that's what I mean. (cmpxchg() on a hug=
+e PTE
+> > > > > > is not.)
+> > > > > >
+> > > > > > > The only way for
+> > > > > > > KVM to clear a A-bit in a non-leaf entry is if the entry _was=
+_ a huge PTE, but was
+> > > > > > > replaced between the "is leaf" and the clear_bit().
+> > > > > >
+> > > > > > I think there is a misunderstanding here. Let me be more specif=
+ic:
+> > > > > > 1. Clearing the A-bit in a non-leaf entry is technically wrong =
+because
+> > > > > > that's not our intention.
+> > > > > > 2. When we try to clear_bit() on a leaf PMD, it can at the same=
+ time
+> > > > > > become a non-leaf PMD, which causes 1) above, and therefore is
+> > > > > > technically wrong.
+> > > > > > 3. I don't think 2) could do any real harm, so no practically n=
+o problem.
+> > > > > > 4. cmpxchg() can avoid 2).
+> > > > > >
+> > > > > > Does this make sense?
+> > > > >
+> > > > > I understand what you're saying, but clearing an A-bit on a non-l=
+eaf PMD that
+> > > > > _just_ got converted from a leaf PMD is "wrong" if and only if th=
+e intented
+> > > > > behavior is nonsensical.
+> > > >
+> > > > Sorry, let me rephrase:
+> > > > 1. Clearing the A-bit in a non-leaf entry is technically wrong beca=
+use
+> > > > we didn't make sure there is the A-bit there --  the bit we are
+> > > > clearing can be something else. (Yes, we know it's not, but we didn=
+'t
+> > > > define this behavior, e.g., a macro to designate that bit for non-l=
+eaf
+> > > > entries.
+> > >
+> > > Heh, by that definition, anything and everything is "technically wron=
+g".
+> >
+> > I really don't see how what I said, in our context,
+> >
+> >   "Clearing the A-bit in a non-leaf entry is technically wrong because
+> > we didn't make sure there is the A-bit there"
+> >
+> > can infer
+> >
+> >   "anything and everything is "technically wrong"."
+> >
+> > And how what I said can be an analogy to
+> >
+> >   "An Intel CPU might support SVM, even though we know no such CPUs
+> > exist, so requiring AMD or Hygon to enable SVM is technically wrong."
+> >
+> > BTW, here is a bug caused by clearing the A-bit in non-leaf entries in
+> > a different scenario:
+> > https://lore.kernel.org/linux-mm/20221123064510.16225-1-jgross@suse.com=
+/
+> >
+> > Let's just agree to disagree.
+>
+> No, because I don't want anyone to leave with the impression that relying=
+ on the
+> Accessed bit to uniformly exist (or not) at all levels in the TDP MMU is =
+somehow
+> technically wrong.  The link you posted is about running as a Xen guest, =
+and is
+> in arch-agnostic code.  That is wildly different than what we are talking=
+ about
+> here, where the targets are strictly limited to x86-64 TDP, and the exist=
+ence of
+> the Accessed bit is architecturally defined.
 
+Yes, I see now.
 
-On 23/02/2023 11:07, David Woodhouse wrote:
-> On Wed, 2023-02-22 at 17:42 +0100, Thomas Gleixner wrote:
->> David!
->>
->> On Wed, Feb 22 2023 at 10:11, David Woodhouse wrote:
->>> On Wed, 2023-02-15 at 14:54 +0000, Usama Arif wrote:
->>> So the next thing that might be worth looking at is allowing the APs
->>> all to be running their hotplug thread simultaneously, bringing
->>> themselves from CPUHP_BRINGUP_CPU to CPUHP_AP_ONLINE. This series eats
->>> the initial INIT/SIPI/SIPI latency, but if there's any significant time
->>> in the AP hotplug thread, that could be worth parallelising.
->>
->> On a 112 CPU machine (64 cores, HT enabled) the bringup takes
->>
->> Setup and SIPIs sent:    49 ms
->> Bringup each CPU:       516 ms
->>
->> That's about 500 ms faster than a non-parallel bringup!
->>
->> Now looking at the 516 ms, which is ~4.7 ms/CPU. The vast majority of the
->> time is spent on the APs in
->>
->>       cpu_init() -> ucode_cpu_init()
->>
->> for the primary threads of each core. The secondary threads are quickly
->> (1us) out of ucode_cpu_init() because the primary thread already loaded
->> it.
->>
->> A microcode load on that machine takes ~7.5 ms per primary thread on
->> average which sums up to 7.5 * 55 = 412.5 ms
->>
->> The threaded bringup after CPU_AP_ONLINE takes about 100us per CPU.
-> 
-> Nice analysis; thanks!
-> 
->> identify_secondary_cpu() is one of the longer functions which takes
->> ~125us / CPU summing up to 13ms
-> 
-> Hm, shouldn't that one already be parallelised by my 'part 2' patch?
-> 
-> It's called from smp_store_cpu_info(), from smp_callin(), which is
-> called from somewhere in the middle of start_secondary().
-> 
-> And if the comments I helpfully added to that function for the benefit
-> of our future selves are telling the truth, the AP is free to get that
-> far once the BSP has set its bit in cpu_callout_mask, which happens in
-> do_wait_cpu_initialized().
-> 
-> So
-> https://git.infradead.org/users/dwmw2/linux.git/commitdiff/4b5731e05b0#patch3
-> ought to parallelise that. But Usama emirically reported that 'part 2'
-> didn't add any noticeable benefit, not even those 13ms? On a *larger*
-> machine.
-> 
+Sorry to say this, but this is all I needed to hear: "the existence of
+the Accessed bit is architecturally defined". (I didn't know and see
+this is what you meant.)
 
-So I am using a similar machine to Thomas 128 CPU machine (64 cores, HT 
-enabled). I have microcode config disabled, so I guess I get similar 
-numbers to Thomas, i.e. 100ms (516 - 412) ms. I do see a difference of 
-~3ms with part2 which I thought is maybe within the margin of error for 
-measuring, but I guess it isn't. After seeing the ~70ms that is cut with 
-reusing timer calibration, I didnt really then focus much on part 2 
-then. I guess that ~70ms is the "rest" from Thomas' table below?
-
-Thanks,
-Usama
-
-> 
->> The TSC sync check for the first CPU on the second socket consumes
->> 20ms. That's only once per socket, intra socket is using MSR_TSC_ADJUST,
->> which is more or less free.
->>
->> So the 516 ms are wasted here:
->>
->>     total                                516 ms
->>     ucode_cpu_init()                     412 ms
->>     identify_secondary_cpu()              13 ms
->>     2ndsocket_tsc_sync                    20 ms
->>     threaded bringup                      12 ms
->>     rest                                  59 ms
->>
->> So the rest is about 530us per CPU, which is just the sum of many small
->> functions, lock contentions...
->>
->> Getting rid of the micro code overhead is possible. There is no reason
->> to serialize that between the cores. But it needs serialization vs. HT
->> siblings, which requires to move identify_secondary_cpu() and its caller
->> smp_store_cpu_info() ahead of the synchronization point and then have
->> serialization between the siblings. That's going to be a major surgery
->> and inspection effort to ensure that there are no hidden assumptions
->> about global hotplug serialization.
->>
->> So that would cut the total cost down to ~100ms plus the
->> preparatory/SIPI stage of 60ms which sums up to about 160ms and about
->> 1.5ms per CPU total.
->>
->> Further optimization starts to be questionable IMO. It's surely possible
->> somehow, but then you really have to go and inspect each and every
->> function in those code pathes, add local locking, etc. Not to talk about
->> the required mess in the core code to support that.
->>
->> The low hanging fruit which brings most is the identification/topology
->> muck and the microcode loading. That needs to be addressed first anyway.
-> 
-> Agreed, thanks.
-> 
+> In this code, there are exactly two flavors of paging that can be in use,=
+ and
+> using clear_bit() to clear shadow_accessed_mask is safe for both, full st=
+op.
