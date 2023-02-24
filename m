@@ -2,131 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 33EC26A1B14
-	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 12:04:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 55E106A1B1C
+	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 12:08:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230354AbjBXLEn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Feb 2023 06:04:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40638 "EHLO
+        id S230272AbjBXLIF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Feb 2023 06:08:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229946AbjBXLES (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Feb 2023 06:04:18 -0500
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70D1569AE1;
-        Fri, 24 Feb 2023 03:02:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1677236564; x=1708772564;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=iP2Q1rCCDs5/6HCe0OSpJ2pmAxSDIeCTZ67VN6uLvus=;
-  b=pPWphUBSiz1NdTtOTkC2fXgTtGF88KvTD65BGDV6xjn8grcLyrmKlMgF
-   kG0Gy3op4gxetj7fQYqJacRfnVHeU32LJggmWGUuffAPgVqE5oNEMyIRm
-   MKAi6ysIz9XauHSpY5OUM5xObxufv4cnO5ZxqURqayrbqToQ7OprL5f4q
-   I=;
-X-IronPort-AV: E=Sophos;i="5.97,324,1669075200"; 
-   d="scan'208";a="185961388"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-93c3b254.us-east-1.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2023 11:02:02 +0000
-Received: from EX13MTAUWC002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-        by email-inbound-relay-iad-1a-m6i4x-93c3b254.us-east-1.amazon.com (Postfix) with ESMTPS id 138A3E431E;
-        Fri, 24 Feb 2023 11:01:50 +0000 (UTC)
-Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
- EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
- id 15.0.1497.45; Fri, 24 Feb 2023 11:01:48 +0000
-Received: from [0.0.0.0] (10.253.83.51) by EX19D020UWC004.ant.amazon.com
- (10.13.138.149) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.24; Fri, 24 Feb
- 2023 11:01:40 +0000
-Message-ID: <f79922de-c498-b471-01f3-54c35ee415ad@amazon.com>
-Date:   Fri, 24 Feb 2023 12:01:38 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.8.0
-Subject: Re: [PATCH RFC v8 45/56] KVM: SVM: Provide support for
- SNP_GUEST_REQUEST NAE event
-Content-Language: en-US
-To:     Michael Roth <michael.roth@amd.com>, <kvm@vger.kernel.org>
-CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-        <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <tglx@linutronix.de>,
-        <mingo@redhat.com>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
-        <hpa@zytor.com>, <ardb@kernel.org>, <pbonzini@redhat.com>,
-        <seanjc@google.com>, <vkuznets@redhat.com>, <jmattson@google.com>,
-        <luto@kernel.org>, <dave.hansen@linux.intel.com>, <slp@redhat.com>,
-        <pgonda@google.com>, <peterz@infradead.org>,
-        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
-        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
-        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-References: <20230220183847.59159-1-michael.roth@amd.com>
- <20230220183847.59159-46-michael.roth@amd.com>
-From:   Alexander Graf <graf@amazon.com>
-In-Reply-To: <20230220183847.59159-46-michael.roth@amd.com>
-X-Originating-IP: [10.253.83.51]
-X-ClientProxiedBy: EX19D040UWA002.ant.amazon.com (10.13.139.113) To
- EX19D020UWC004.ant.amazon.com (10.13.138.149)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
-X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        NICE_REPLY_A,RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S230034AbjBXLHj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Feb 2023 06:07:39 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65EF361EF3
+        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 03:05:46 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id CD47F61239
+        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 11:05:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 378E7C433D2;
+        Fri, 24 Feb 2023 11:05:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1677236745;
+        bh=XEX7VRnNTIkhFRg32m665yeVGktUtrzWJaoPwljZ308=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=h6J8Wxa6UA66DhLDGBWrOOUovne9SFTStlpin19vqy7Kfx8dz6TOycwoVafCinPzE
+         fMQb0IwRQ3s0aAuJOkwqZm4otLvfHRC8pQze8coHQ5nlRjjniy1pEUjsav8TjRC0tt
+         M3UHGYV1ZCdrJq0E4chg+lTQNrqakF9dQ9TLnUDW4C2QyBDr+7yZrDuFbp4dFdtBU7
+         rkcIj+nYNdjR+HIIyThfgLPWT6IQZI8xN6PxUlsywbPyniqPBsOJL0f6wvxr7rb1OG
+         fniCvuzIxBj4c00VdM2TbF9nhts/K6s7lQEpBkfMQeXIJbZidS0iwsMwoJ/umO/Bk/
+         DF7hK+NHslGWg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pVVtW-00Cs9z-Ud;
+        Fri, 24 Feb 2023 11:05:43 +0000
+Date:   Fri, 24 Feb 2023 11:05:42 +0000
+Message-ID: <861qmfxr09.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+        KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Oliver Upton <oupton@google.com>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH v2 1/6] KVM: arm64: Move CPU ID feature registers emulation into a separate file
+In-Reply-To: <CAAeT=FwdjrPm9i6rxrGQKEuu+x5VU+mKEJER5C7RYtid6nmZWQ@mail.gmail.com>
+References: <20230212215830.2975485-1-jingzhangos@google.com>
+        <20230212215830.2975485-2-jingzhangos@google.com>
+        <CAAeT=FwdjrPm9i6rxrGQKEuu+x5VU+mKEJER5C7RYtid6nmZWQ@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: reijiw@google.com, jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@google.com, will@kernel.org, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, tabba@google.com, ricarkol@google.com, rananta@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ck9uIDIwLjAyLjIzIDE5OjM4LCBNaWNoYWVsIFJvdGggd3JvdGU6Cj4gRnJvbTogQnJpamVzaCBT
-aW5naCA8YnJpamVzaC5zaW5naEBhbWQuY29tPgo+Cj4gVmVyc2lvbiAyIG9mIEdIQ0Igc3BlY2lm
-aWNhdGlvbiBhZGRlZCB0aGUgc3VwcG9ydCBmb3IgdHdvIFNOUCBHdWVzdAo+IFJlcXVlc3QgTWVz
-c2FnZSBOQUUgZXZlbnRzLiBUaGUgZXZlbnRzIGFsbG93cyBmb3IgYW4gU0VWLVNOUCBndWVzdCB0
-bwo+IG1ha2UgcmVxdWVzdCB0byB0aGUgU0VWLVNOUCBmaXJtd2FyZSB0aHJvdWdoIGh5cGVydmlz
-b3IgdXNpbmcgdGhlCj4gU05QX0dVRVNUX1JFUVVFU1QgQVBJIGRlZmluZSBpbiB0aGUgU0VWLVNO
-UCBmaXJtd2FyZSBzcGVjaWZpY2F0aW9uLgo+Cj4gVGhlIFNOUF9FWFRfR1VFU1RfUkVRVUVTVCBp
-cyBzaW1pbGFyIHRvIFNOUF9HVUVTVF9SRVFVRVNUIHdpdGggdGhlCj4gZGlmZmVyZW5jZSBvZiBh
-biBhZGRpdGlvbmFsIGNlcnRpZmljYXRlIGJsb2IgdGhhdCBjYW4gYmUgcGFzc2VkIHRocm91Z2gK
-PiB0aGUgU05QX1NFVF9DT05GSUcgaW9jdGwgZGVmaW5lZCBpbiB0aGUgQ0NQIGRyaXZlci4gVGhl
-IENDUCBkcml2ZXIKPiBwcm92aWRlcyBzbnBfZ3Vlc3RfZXh0X2d1ZXN0X3JlcXVlc3QoKSB0aGF0
-IGlzIHVzZWQgYnkgdGhlIEtWTSB0byBnZXQKPiBib3RoIHRoZSByZXBvcnQgYW5kIGNlcnRpZmlj
-YXRlIGRhdGEgYXQgb25jZS4KPgo+IFNpZ25lZC1vZmYtYnk6IEJyaWplc2ggU2luZ2ggPGJyaWpl
-c2guc2luZ2hAYW1kLmNvbT4KPiBTaWduZWQtb2ZmLWJ5OiBBc2hpc2ggS2FscmEgPGFzaGlzaC5r
-YWxyYUBhbWQuY29tPgo+IFNpZ25lZC1vZmYtYnk6IE1pY2hhZWwgUm90aCA8bWljaGFlbC5yb3Ro
-QGFtZC5jb20+Cj4gLS0tCj4gICBhcmNoL3g4Ni9rdm0vc3ZtL3Nldi5jIHwgMTg1ICsrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tCj4gICBhcmNoL3g4Ni9rdm0vc3ZtL3N2
-bS5oIHwgICAyICsKPiAgIDIgZmlsZXMgY2hhbmdlZCwgMTgxIGluc2VydGlvbnMoKyksIDYgZGVs
-ZXRpb25zKC0pCj4KPiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYva3ZtL3N2bS9zZXYuYyBiL2FyY2gv
-eDg2L2t2bS9zdm0vc2V2LmMKPiBpbmRleCAxOTdiMWY5MDQ1NjcuLjkyMTc5NjE0MTAyZSAxMDA2
-NDQKPiAtLS0gYS9hcmNoL3g4Ni9rdm0vc3ZtL3Nldi5jCj4gKysrIGIvYXJjaC94ODYva3ZtL3N2
-bS9zZXYuYwo+IEBAIC0zMjcsNiArMzI3LDcgQEAgc3RhdGljIGludCBzZXZfZ3Vlc3RfaW5pdChz
-dHJ1Y3Qga3ZtICprdm0sIHN0cnVjdCBrdm1fc2V2X2NtZCAqYXJncCkKPiAgICAgICAgICAgICAg
-ICAgIGlmIChyZXQpCj4gICAgICAgICAgICAgICAgICAgICAgICAgIGdvdG8gZV9mcmVlOwo+Cj4g
-KyAgICAgICAgICAgICAgIG11dGV4X2luaXQoJnNldi0+Z3Vlc3RfcmVxX2xvY2spOwo+ICAgICAg
-ICAgICAgICAgICAgcmV0ID0gc2V2X3NucF9pbml0KCZhcmdwLT5lcnJvciwgZmFsc2UpOwo+ICAg
-ICAgICAgIH0gZWxzZSB7Cj4gICAgICAgICAgICAgICAgICByZXQgPSBzZXZfcGxhdGZvcm1faW5p
-dCgmYXJncC0+ZXJyb3IpOwo+IEBAIC0yMDU5LDIzICsyMDYwLDM0IEBAIGludCBzZXZfdm1fbW92
-ZV9lbmNfY29udGV4dF9mcm9tKHN0cnVjdCBrdm0gKmt2bSwgdW5zaWduZWQgaW50IHNvdXJjZV9m
-ZCkKPiAgICAqLwo+ICAgc3RhdGljIHZvaWQgKnNucF9jb250ZXh0X2NyZWF0ZShzdHJ1Y3Qga3Zt
-ICprdm0sIHN0cnVjdCBrdm1fc2V2X2NtZCAqYXJncCkKPiAgIHsKPiArICAgICAgIHN0cnVjdCBr
-dm1fc2V2X2luZm8gKnNldiA9ICZ0b19rdm1fc3ZtKGt2bSktPnNldl9pbmZvOwo+ICAgICAgICAg
-IHN0cnVjdCBzZXZfZGF0YV9zbnBfYWRkciBkYXRhID0ge307Cj4gLSAgICAgICB2b2lkICpjb250
-ZXh0Owo+ICsgICAgICAgdm9pZCAqY29udGV4dCwgKmNlcnRzX2RhdGE7Cj4gICAgICAgICAgaW50
-IHJjOwo+Cj4gKyAgICAgICAvKiBBbGxvY2F0ZSBtZW1vcnkgdXNlZCBmb3IgdGhlIGNlcnRzIGRh
-dGEgaW4gU05QIGd1ZXN0IHJlcXVlc3QgKi8KPiArICAgICAgIGNlcnRzX2RhdGEgPSBremFsbG9j
-KFNFVl9GV19CTE9CX01BWF9TSVpFLCBHRlBfS0VSTkVMX0FDQ09VTlQpOwo+ICsgICAgICAgaWYg
-KCFjZXJ0c19kYXRhKQo+ICsgICAgICAgICAgICAgICByZXR1cm4gTlVMTDsKCgpJIGRvbid0IHVu
-ZGVyc3RhbmQgd2h5IHRoaXMgaXMgcGFydCBvZiB0aGUgY29udGV4dCBjcmVhdGlvbiwgd2hpY2gg
-YWdhaW4gCmlzIHBhcnQgb2YgdGhlIEtWTV9TRVZfU05QX0xBVU5DSF9TVEFSVCBvcC4gV291bGQg
-eW91IG1pbmQgdG8gY3JlYXRlIGEgCnNlcGFyYXRlIG9wIGZvciB0aGlzIGFuZCB0aGVuIGNoZWNr
-IGxhdGVyIG9uIHdoaWxlIHlvdSB1c2UgdGhlIGJ1ZmZlciAKd2hldGhlciBpdCB3YXMgZXZlciBh
-bGxvY2F0ZWQ/CgoKQWxleAoKCgoKCkFtYXpvbiBEZXZlbG9wbWVudCBDZW50ZXIgR2VybWFueSBH
-bWJICktyYXVzZW5zdHIuIDM4CjEwMTE3IEJlcmxpbgpHZXNjaGFlZnRzZnVlaHJ1bmc6IENocmlz
-dGlhbiBTY2hsYWVnZXIsIEpvbmF0aGFuIFdlaXNzCkVpbmdldHJhZ2VuIGFtIEFtdHNnZXJpY2h0
-IENoYXJsb3R0ZW5idXJnIHVudGVyIEhSQiAxNDkxNzMgQgpTaXR6OiBCZXJsaW4KVXN0LUlEOiBE
-RSAyODkgMjM3IDg3OQoKCg==
+On Fri, 24 Feb 2023 01:01:44 +0000,
+Reiji Watanabe <reijiw@google.com> wrote:
 
+[...]
+
+> > +const struct sys_reg_desc *kvm_arm_find_id_reg(const struct sys_reg_params *params)
+> > +{
+> 
+> You might want to check if the param indicates the ID register,
+> before running the binary search for the ID register table.
+> (I have the same comment to kvm_arm_get_id_reg() and
+> kvm_arm_set_id_reg()).
+
+It would be much better if the discrimination was done in
+emulate_sys_reg(), just like we do for NV[1].
+
+Save yourself pointless search on the critical path, and make the
+decoding tree visible in one place.
+
+> 
+> > +       return find_reg(params, id_reg_descs, ARRAY_SIZE(id_reg_descs));
+> > +}
+> > +
+> > +void kvm_arm_reset_id_regs(struct kvm_vcpu *vcpu)
+> > +{
+> > +       unsigned long i;
+> > +
+> > +       for (i = 0; i < ARRAY_SIZE(id_reg_descs); i++)
+> > +               if (id_reg_descs[i].reset)
+> > +                       id_reg_descs[i].reset(vcpu, &id_reg_descs[i]);
+> > +}
+> > +
+> > +int kvm_arm_get_id_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> > +{
+> > +       return kvm_sys_reg_get_user(vcpu, reg,
+> > +                                   id_reg_descs, ARRAY_SIZE(id_reg_descs));
+> > +}
+> > +
+> > +int kvm_arm_set_id_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> > +{
+> > +       return kvm_sys_reg_set_user(vcpu, reg,
+> > +                                   id_reg_descs, ARRAY_SIZE(id_reg_descs));
+> > +}
+> > +
+> > +bool kvm_arm_check_idreg_table(void)
+> > +{
+> > +       return check_sysreg_table(id_reg_descs, ARRAY_SIZE(id_reg_descs), false);
+> > +}
+> > +
+> > +/* Assumed ordered tables, see kvm_sys_reg_table_init. */
+> 
+> I don't think we need this comment, as the code doesn't seem to
+> assume that.
+
+Yeah, it only makes sense for the binary search.
+
+Thanks,
+
+	M.
+
+[1] https://lore.kernel.org/linux-arm-kernel/20230131092504.2880505-1-maz@kernel.org/T/#mced7be0152816d3a1d02cf8c8b95d3ab3ef4e0c8
+
+-- 
+Without deviation from the norm, progress is not possible.
