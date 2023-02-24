@@ -2,69 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 55E106A1B1C
-	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 12:08:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 505F86A1B5D
+	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 12:24:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230272AbjBXLIF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Feb 2023 06:08:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40934 "EHLO
+        id S230057AbjBXLYa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Feb 2023 06:24:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230034AbjBXLHj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Feb 2023 06:07:39 -0500
+        with ESMTP id S229622AbjBXLY3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Feb 2023 06:24:29 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65EF361EF3
-        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 03:05:46 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20031136CE
+        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 03:24:28 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id CD47F61239
-        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 11:05:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 378E7C433D2;
-        Fri, 24 Feb 2023 11:05:45 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B27256111C
+        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 11:24:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 254F0C433D2;
+        Fri, 24 Feb 2023 11:24:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677236745;
-        bh=XEX7VRnNTIkhFRg32m665yeVGktUtrzWJaoPwljZ308=;
+        s=k20201202; t=1677237867;
+        bh=POLtIEWemq/X2ktJkENoM0iNTh4ccYZX11buWwrbHTs=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=h6J8Wxa6UA66DhLDGBWrOOUovne9SFTStlpin19vqy7Kfx8dz6TOycwoVafCinPzE
-         fMQb0IwRQ3s0aAuJOkwqZm4otLvfHRC8pQze8coHQ5nlRjjniy1pEUjsav8TjRC0tt
-         M3UHGYV1ZCdrJq0E4chg+lTQNrqakF9dQ9TLnUDW4C2QyBDr+7yZrDuFbp4dFdtBU7
-         rkcIj+nYNdjR+HIIyThfgLPWT6IQZI8xN6PxUlsywbPyniqPBsOJL0f6wvxr7rb1OG
-         fniCvuzIxBj4c00VdM2TbF9nhts/K6s7lQEpBkfMQeXIJbZidS0iwsMwoJ/umO/Bk/
-         DF7hK+NHslGWg==
+        b=QthxYOP8LE68BGb+1ckD+bAQsV0YSJmv71uqunwEWCtPVBFdawjCl7fRe5QEjNZA9
+         aUU/KUAYfCbNswNAEwaHUfQRLX3gWbG1TemahUtr2WdgUpgCYH/Lb7Vg8kQjOHl18A
+         ucbt6Zbm/X0xEvizIrmYnm6DJpOJeEIRGiw4ZamUMcUjn+qx0/hcfqN5rBAHRkvitT
+         BbSFS+/doYG1t1U/sbi774n7DUci3jp+L/WimHBU57nAwMXPVb103FHJHg2Gs2nGZt
+         3WVYo7ogg3m+Tkjm7r7MqdNAq0WaxewpJc6OY/1zPAck0X4nRY5cNSreh6h9s+jCry
+         Kckv3t2hv9uAg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pVVtW-00Cs9z-Ud;
-        Fri, 24 Feb 2023 11:05:43 +0000
-Date:   Fri, 24 Feb 2023 11:05:42 +0000
-Message-ID: <861qmfxr09.wl-maz@kernel.org>
+        id 1pVWBc-00CsMI-Jw;
+        Fri, 24 Feb 2023 11:24:24 +0000
+Date:   Fri, 24 Feb 2023 11:24:24 +0000
+Message-ID: <86zg93wbkn.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-        KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Oliver Upton <oupton@google.com>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [PATCH v2 1/6] KVM: arm64: Move CPU ID feature registers emulation into a separate file
-In-Reply-To: <CAAeT=FwdjrPm9i6rxrGQKEuu+x5VU+mKEJER5C7RYtid6nmZWQ@mail.gmail.com>
-References: <20230212215830.2975485-1-jingzhangos@google.com>
-        <20230212215830.2975485-2-jingzhangos@google.com>
-        <CAAeT=FwdjrPm9i6rxrGQKEuu+x5VU+mKEJER5C7RYtid6nmZWQ@mail.gmail.com>
+To:     Colton Lewis <coltonlewis@google.com>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+        suzuki.poulose@arm.com, oliver.upton@linux.dev,
+        yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de,
+        dwmw2@infradead.org
+Subject: Re: [PATCH 08/16] KVM: arm64: timers: Allow userspace to set the counter offsets
+In-Reply-To: <gsntwn4880om.fsf@coltonlewis-kvm.c.googlers.com>
+References: <20230216142123.2638675-9-maz@kernel.org>
+        <gsntwn4880om.fsf@coltonlewis-kvm.c.googlers.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: reijiw@google.com, jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@google.com, will@kernel.org, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, tabba@google.com, ricarkol@google.com, rananta@google.com
+X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de, dwmw2@infradead.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -76,67 +68,92 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 24 Feb 2023 01:01:44 +0000,
-Reiji Watanabe <reijiw@google.com> wrote:
-
-[...]
-
-> > +const struct sys_reg_desc *kvm_arm_find_id_reg(const struct sys_reg_params *params)
-> > +{
+On Thu, 23 Feb 2023 22:41:13 +0000,
+Colton Lewis <coltonlewis@google.com> wrote:
 > 
-> You might want to check if the param indicates the ID register,
-> before running the binary search for the ID register table.
-> (I have the same comment to kvm_arm_get_id_reg() and
-> kvm_arm_set_id_reg()).
+> Marc Zyngier <maz@kernel.org> writes:
+> 
+> > Once this new API is used, there is no going back, and the counters
+> > cannot be written to to set the offsets implicitly (the writes
+> > are instead ignored).
+> 
+> Why do this? I can't see a reason for disabling the other API the first
+> time this one is used.
 
-It would be much better if the discrimination was done in
-emulate_sys_reg(), just like we do for NV[1].
+I can't see a reason not to. The new API is VM-wide. The old one
+operates on a per-vcpu basis. What sense does it make to accept
+something that directly conflicts with the previous actions from
+userspace?
 
-Save yourself pointless search on the critical path, and make the
-decoding tree visible in one place.
+Once userspace has bought into the new API, it should use it
+consistently.  The only reason we don't reject the write with an error
+is to allow userspace to keep using the vcpu register dump as an
+opaque object that it doesn't have to scan and amend.
 
 > 
-> > +       return find_reg(params, id_reg_descs, ARRAY_SIZE(id_reg_descs));
-> > +}
-> > +
-> > +void kvm_arm_reset_id_regs(struct kvm_vcpu *vcpu)
-> > +{
-> > +       unsigned long i;
-> > +
-> > +       for (i = 0; i < ARRAY_SIZE(id_reg_descs); i++)
-> > +               if (id_reg_descs[i].reset)
-> > +                       id_reg_descs[i].reset(vcpu, &id_reg_descs[i]);
-> > +}
-> > +
-> > +int kvm_arm_get_id_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> > +{
-> > +       return kvm_sys_reg_get_user(vcpu, reg,
-> > +                                   id_reg_descs, ARRAY_SIZE(id_reg_descs));
-> > +}
-> > +
-> > +int kvm_arm_set_id_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> > +{
-> > +       return kvm_sys_reg_set_user(vcpu, reg,
-> > +                                   id_reg_descs, ARRAY_SIZE(id_reg_descs));
-> > +}
-> > +
-> > +bool kvm_arm_check_idreg_table(void)
-> > +{
-> > +       return check_sysreg_table(id_reg_descs, ARRAY_SIZE(id_reg_descs), false);
-> > +}
-> > +
-> > +/* Assumed ordered tables, see kvm_sys_reg_table_init. */
+> > In keeping with the architecture, the offsets are expressed as
+> > a delta that is substracted from the physical counter value.
+>                   ^
+> nit: subtracted
 > 
-> I don't think we need this comment, as the code doesn't seem to
-> assume that.
+> > +/*
+> > + * Counter/Timer offset structure. Describe the virtual/physical offsets.
+> > + * To be used with KVM_ARM_SET_CNT_OFFSETS.
+> > + */
+> > +struct kvm_arm_counter_offsets {
+> > +	__u64 virtual_offset;
+> > +	__u64 physical_offset;
+> > +
+> > +#define KVM_COUNTER_SET_VOFFSET_FLAG	(1UL << 0)
+> > +#define KVM_COUNTER_SET_POFFSET_FLAG	(1UL << 1)
+> > +
+> > +	__u64 flags;
+> > +	__u64 reserved;
+> > +};
+> > +
+> 
+> It looks weird to have the #defines in the middle of the struct like
+> that. I think it would be easier to read with the #defines before the
+> struct.
 
-Yeah, it only makes sense for the binary search.
+I do like it, as it perfectly shows in which context these #defines
+are valid. This is also a common idiom used all over the existing KVM
+code (just take a look at kvm_run for the canonical example).
 
-Thanks,
+> 
+> > @@ -852,9 +852,11 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+> >   	ptimer->vcpu = vcpu;
+> >   	ptimer->offset.vm_offset = &vcpu->kvm->arch.offsets.poffset;
+> 
+> > -	/* Synchronize cntvoff across all vtimers of a VM. */
+> > -	timer_set_offset(vtimer, kvm_phys_timer_read());
+> > -	timer_set_offset(ptimer, 0);
+> > +	/* Synchronize offsets across timers of a VM if not already provided */
+> > +	if (!test_bit(KVM_ARCH_FLAG_COUNTER_OFFSETS, &vcpu->kvm->arch.flags)) {
+> > +		timer_set_offset(vtimer, kvm_phys_timer_read());
+> > +		timer_set_offset(ptimer, 0);
+> > +	}
+> 
+> >   	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
+> >   	timer->bg_timer.function = kvm_bg_timer_expire;
+> 
+> The code says "assign the offsets if the KVM_ARCH_FLAG_COUNTER_OFFSETS
+> flag is not on". The flag name is confusing and made it hard for me to
+> understand the intent. I think the intent is to only assign the offsets
+> if the user has not called the API to provide some offsets (that would
+> have been assigned in the API call along with flipping the flag
+> on). With that in mind, I would prefer the flag name reference the
+> user. KVM_ARCH_FLAG_USER_OFFSETS
+
+All offsets are provided by the user, no matter what API they used, so
+I don't think this adds much clarity. The real distinction is between
+the offsets being set by writing a vcpu attribute or a VM attribute.
+
+By this token, I'd suggest KVM_ARM_FLAG_VM_COUNTER_OFFSETS.
+
+Thoughts?
 
 	M.
-
-[1] https://lore.kernel.org/linux-arm-kernel/20230131092504.2880505-1-maz@kernel.org/T/#mced7be0152816d3a1d02cf8c8b95d3ab3ef4e0c8
 
 -- 
 Without deviation from the norm, progress is not possible.
