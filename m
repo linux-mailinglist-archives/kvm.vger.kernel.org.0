@@ -2,66 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3538B6A2253
-	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 20:28:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 223C16A2309
+	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 21:07:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229541AbjBXT2i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Feb 2023 14:28:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54710 "EHLO
+        id S229778AbjBXUH4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Feb 2023 15:07:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229461AbjBXT2g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Feb 2023 14:28:36 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FB6726865
-        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 11:28:35 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id fa3-20020a17090af0c300b002377eefb6acso26391pjb.3
-        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 11:28:35 -0800 (PST)
+        with ESMTP id S229802AbjBXUHx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Feb 2023 15:07:53 -0500
+Received: from mail-io1-xd4a.google.com (mail-io1-xd4a.google.com [IPv6:2607:f8b0:4864:20::d4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD267B47D
+        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 12:07:31 -0800 (PST)
+Received: by mail-io1-xd4a.google.com with SMTP id i3-20020a0566022c8300b0073a6a9f8f45so58489iow.11
+        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 12:07:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:reply-to:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=t9//kZJYNl4izvytHF7z7Dnucu90xh6NKNXZlIG10fQ=;
-        b=N4uMwwIz4FqjJ9FM8/Jp2dnnYhdKN41elaX5w3ce3TcrdJG/W8EzXo3Yi6XXAApxat
-         80fUNj04Wt0Mse771QGq815Duvq4PiqIinQw/9T4b5o/7Ab8ktWzMNfcd0O2NPP4q1EJ
-         h5GkgGVtdvXGynoBCOACvKv3NzUhoCRL3v01WsRueoyIDKdEzrr+AYcnm7F0S7TWrn5d
-         nqMdz+krg34hQNLWGqMUn5qdkBNA96qSIj4DHhKD8xVs+B70heBy/Tc4xGa6Vs694+ne
-         sX+45w5v0A2FobeG0JGG06WeLYgYsoaAbeGOHTuZMyhtpbEJ68nOgL84y1o4B5I/UTLO
-         86Tg==
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=b9eEgAqxwwT4oBExX9UxWqccj7ZXr1sZAWCiBgAFhOg=;
+        b=iqgI5WzFSxMSY27jQbX6h/A7/1NbpKWYqj67NeQey9WRvdfy8LcaF9g7Ztkco4ORBR
+         f5DJCdkG2NVVQPUeBftttAXkjkT/5h39/fppVpX5BovT39UKAJi54mPw6sa9s8RCxfu3
+         i4m6G3HBZh/9Fg8VrElnnk/q668v6koXeArvYu3PDRdW2FHIBjynX4W4bz7K7TVKvj1R
+         RRIx9ccSLl5TknS4xxZrxMamMKcGI3wGDD9cOOANW8x7ExtWLgHirQVWHsX2if5S68pu
+         V8qaBkcmfs3+pI/+RAQtAQ5a7tErrFuOfhodyg7L8E3Qs6UPQIgvV2euXEhkCEqBnAhh
+         bBsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:reply-to:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=t9//kZJYNl4izvytHF7z7Dnucu90xh6NKNXZlIG10fQ=;
-        b=ywz8ArScjyeEio3UyzILAJ8jrOcHNbxM2rRNeilG8TY9vrZfItqOm8PiT/H2bXttpd
-         /ZbmeNHuo8G2C8aYiEhg0y8gKw8lNSfWOTwnexlqqgKREUZTF6s+xXT4Kvu7CajEB+Lv
-         SKodHQtzLVS/eBDzNCCx69b428sVebBuNfW7PTmDZr2YxbCtzc6AcliTnIaAgLHTzZz8
-         /rkeWuvOgF1/uc7QUfHn0z7CofbZeLLPoLv4Qyzxog+wGd6HhxnKVBBMwbLgut4zJ1sY
-         H1jwUbH9jwAh2IFvmja3EY+EecdEoWVoYA9ohIvjs7fxQrMTEjMbGfYnTntvj96i2EWq
-         Rpbg==
-X-Gm-Message-State: AO0yUKWDmnT6xDannpOK/5CoEkXsi3o+e4MrczirCbtAHv5rdP2P4ZjW
-        /ayjtwnhYcXXobC14smTfu5QT++5RSs=
-X-Google-Smtp-Source: AK7set8gQnDgd8AG5QXkVWmuSwCeOQmUnx+cCbmPxxPkcEWiuy9vkA0Ac3gAhRdY8KBGrIYdYWvh2l2spTc=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a02:241:b0:502:f8a4:86db with SMTP id
- bi1-20020a056a02024100b00502f8a486dbmr333807pgb.1.1677266914636; Fri, 24 Feb
- 2023 11:28:34 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 24 Feb 2023 11:28:32 -0800
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=b9eEgAqxwwT4oBExX9UxWqccj7ZXr1sZAWCiBgAFhOg=;
+        b=jF+CMQoXleSWPQ7lA1s2wCQ0hseZt7+ltb/oy9gtFYecQMAmrnxBCT6uiojT8bDaIJ
+         OTaot2XqrFHwJ0MqFLnCemEiK9wxBcf22Ax758QGnDoDELrt0qOTgcBsMOq+w76t3wlS
+         62qo2hvxdLC4JTqa3Qi06eQroBF40f8omiCH+CFFAiE0dQ/vizq6rvEBS08zEEEXr8iD
+         v5zZ3H+v1Xx9ChZef7VdgmMl2mEadEobM7XqBo3WhuJiPlaONMjt6H0BamUFD6rA5B/k
+         Oo4G7Fs58f1qEE4SdoJ42/JNOAH7qllbEqxtTHOlA+I1MiNMpdsHK3Zhd5pCsodSoliH
+         0w3g==
+X-Gm-Message-State: AO0yUKXR/4ESwM23y2ftdNCwucwKqEtsjqafWsNbcALqKlmxNISgiVYX
+        AOCqQ24Fnj6ABNX7qzsyP4P1LeASQuXXIvHK3g==
+X-Google-Smtp-Source: AK7set/EAaM8y0wwRhjkt0dNHV7aQnp40+jiSD+YRka4vFYDirCN0RN1NCz2qoO9U8PIUH0WXao1xULkaWnv7uKVkA==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a02:a186:0:b0:3a7:e46f:7d30 with SMTP
+ id n6-20020a02a186000000b003a7e46f7d30mr6586704jah.3.1677269251262; Fri, 24
+ Feb 2023 12:07:31 -0800 (PST)
+Date:   Fri, 24 Feb 2023 20:07:30 +0000
+In-Reply-To: <20230216142123.2638675-1-maz@kernel.org> (message from Marc
+ Zyngier on Thu, 16 Feb 2023 14:21:07 +0000)
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.39.2.722.g9855ee24e9-goog
-Message-ID: <20230224192832.1286267-1-seanjc@google.com>
-Subject: [PATCH] KVM: MIPS: Make kvm_mips_callbacks const
-From:   Sean Christopherson <seanjc@google.com>
-To:     Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Cc:     linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        "=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?=" <philmd@linaro.org>,
-        Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Message-ID: <gsntlekm969p.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH 00/16] KVM: arm64: Rework timer offsetting for fun and profit
+From:   Colton Lewis <coltonlewis@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+        suzuki.poulose@arm.com, oliver.upton@linux.dev,
+        yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de,
+        dwmw2@infradead.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
@@ -72,49 +69,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Make kvm_mips_callbacks fully const as it's now hardcoded to point at
-kvm_vz_callbacks, the only remaining the set of callbacks.
+Hello Marc,
 
-Link: https://lore.kernel.org/all/beb697c2-dfad-780e-4638-76b229f28731@lina=
-ro.org
-Suggested-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/mips/include/asm/kvm_host.h | 2 +-
- arch/mips/kvm/vz.c               | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+This patch is of special interest to me as I was working on my own
+ECV/CNTPOFF implementation, although mine was more narrow and doesn't
+address any of your other goals. As far as I can tell at the moment,
+your patch can cover the uses of mine, so I will dedicate
+myself to reviewing and testing yours. Please include me on any future
+rerolls of this patch.
 
-diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_h=
-ost.h
-index 2803c9c21ef9..957121a495f0 100644
---- a/arch/mips/include/asm/kvm_host.h
-+++ b/arch/mips/include/asm/kvm_host.h
-@@ -757,7 +757,7 @@ struct kvm_mips_callbacks {
- 	int (*vcpu_run)(struct kvm_vcpu *vcpu);
- 	void (*vcpu_reenter)(struct kvm_vcpu *vcpu);
- };
--extern struct kvm_mips_callbacks *kvm_mips_callbacks;
-+extern const struct kvm_mips_callbacks * const kvm_mips_callbacks;
- int kvm_mips_emulation_init(void);
-=20
- /* Debug: dump vcpu state */
-diff --git a/arch/mips/kvm/vz.c b/arch/mips/kvm/vz.c
-index dafab003ea0d..3d21cbfa7443 100644
---- a/arch/mips/kvm/vz.c
-+++ b/arch/mips/kvm/vz.c
-@@ -3305,7 +3305,7 @@ static struct kvm_mips_callbacks kvm_vz_callbacks =3D=
- {
- };
-=20
- /* FIXME: Get rid of the callbacks now that trap-and-emulate is gone. */
--struct kvm_mips_callbacks *kvm_mips_callbacks =3D &kvm_vz_callbacks;
-+const struct kvm_mips_callbacks * const kvm_mips_callbacks =3D &kvm_vz_cal=
-lbacks;
-=20
- int kvm_mips_emulation_init(void)
- {
+Marc Zyngier <maz@kernel.org> writes:
 
-base-commit: 3ad108511e1c19ff3a3fcb9a39b3eaebf4dd4054
---=20
-2.39.2.722.g9855ee24e9-goog
+> This series aims at satisfying multiple goals:
 
+> - allow a VMM to atomically restore a timer offset for a whole VM
+>    instead of updating the offset each time a vcpu get its counter
+>    written
+
+> - allow a VMM to save/restore the physical timer context, something
+>    that we cannot do at the moment due to the lack of offsetting
+
+> - provide a framework that is suitable for NV support, where we get
+>    both global and per timer, per vcpu offsetting
+
+
+If I am understanding your changes correctly, you introduce some VM-wide
+timers with no hardware backing and a new API to access them from
+userspace. This is useful both because it makes the code simpler (no
+need to manually keep registers in sync), and so CNT{V,P}OFF can be
+appropriately virtualized with NV. Is that a fair summary of the
+important bits?
+
+> This has been moderately tested with nVHE, VHE and NV. I do not have
+> access to CNTPOFF-aware HW, so the jury is still out on that one. Note
+> that the NV patches in this series are here to give a perspective on
+> how this gets used.
+
+> I've updated the arch_timer selftest to allow offsets to be provided
+> from the command line, but the arch_test is pretty flimsy and tends to
+> fail with an error==EINTR, even without this series. Something to
+> investigate.
+
+I can help you with testing because I have access to CNTPOFF-aware
+hardware and emulators. Is there anything you are especially interested
+to try out?
