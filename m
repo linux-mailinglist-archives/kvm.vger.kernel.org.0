@@ -2,61 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 99EAC6A2471
-	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 23:48:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ABF456A247E
+	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 23:51:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229524AbjBXWsD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Feb 2023 17:48:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55522 "EHLO
+        id S229529AbjBXWvI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Feb 2023 17:51:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229379AbjBXWsC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Feb 2023 17:48:02 -0500
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C7FD298D9
-        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 14:48:01 -0800 (PST)
-Received: by mail-pf1-x449.google.com with SMTP id h13-20020a056a00218d00b005a8da78efedso249449pfi.2
-        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 14:48:01 -0800 (PST)
+        with ESMTP id S229488AbjBXWvH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Feb 2023 17:51:07 -0500
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44A011B2D6
+        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 14:51:05 -0800 (PST)
+Received: by mail-ed1-x52e.google.com with SMTP id cy6so3279729edb.5
+        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 14:51:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=z9P0Y4g8n6fMmAjFzRTId2kiNvMd7dTYme5yR7tmEhI=;
-        b=Wv/iNvk9SQt1W/iATMCLEWtg8Qgg9CysAxQqH3Mu3M1EnqNF9jB94EZh4hJVu2b6Jy
-         MuFbPENs1Kn1lWgdY/pTEfWrlXkVChMX5GCfkTM+iNEQH/A46a77PHAqWl4VzfIjh248
-         +KsIX9wuwZTcIJK8op4sd0FUkylhIiN4B4r9mZkrm+CqblKLOOlHuvfZiQJI+8zf5Hnd
-         lxoajiWtkc+BIT2krOyo14sLcgU7JSeJN8pu+2luaua65TkkrnyVBw1cvRWfaZYFbA4u
-         RB8ZrJRRlKhI7hMzA/vviPMJ1O7WJlHoOcyc6Abcft8rTbLmMdIAq6SHwVVyYkkhYGhQ
-         NBhw==
+        d=linux-foundation.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=XetVmJJp94Tm+T8Ok6omBAdD9XAfcZ6uupziRkiZMk4=;
+        b=O992ZC0d4Fin+fSMDEuc/r4oFcV7GuLj9xW5Jaak+IJxNIGgsgHvuvCcZiaX+GMlBS
+         N776OX1MKa2ocMIExB/CvqrGqgUncIQxhKN3EjfIdflSlixcjzb9Pf0PvLdScnculsFz
+         Jb+JalT+9UXEQKhI1dBBcBnwv7Q14O8TVsOwU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=z9P0Y4g8n6fMmAjFzRTId2kiNvMd7dTYme5yR7tmEhI=;
-        b=aL4BhaCRY+cULuKNTMP4XajFs6kRsd58mSYMc5VleL2SOpZeIfAarOKTMD81a1kM9D
-         gMgd7/nwDtBvmClCudA9N/mAJQiybmNFIdZ5ES7B9VlbaExyOVItt0VPchsmmiiHsKSy
-         EhXeK+7fgMLoGmWlu/6/9CeXlGQk+KQnnENlwfRNc4tqaN5c7KY6/GwdvMWoyKxzFLdz
-         8QyBkR2xqIKHHOlv7O6WWygDHyyAOsnVH0VdIVAAVEPprqty8uQpSwQ93FAlloX5OOmQ
-         c/e2NTXX/t9PGz9gD0lrJZMzFTb8k5xfOrE+ra31Zd3GRxsflmk9WGyC1/3QMqodxvoE
-         ndYw==
-X-Gm-Message-State: AO0yUKWyfu7A2ygh2srM8gMICYTBvo2PbcYLqmxJvFotG6LoRNESV8ht
-        m7+KlsDFmLPYESva/dUxhj77n6pSld6V9voP9c8QILyaMQyz7uuKMXm9T/XOLtSBkZbdjeV3Xlv
-        Z6vP1Fydjrvya3xl9kNRm+h7FfjA/tFy+FS/MpJK+munrg/q18Bl/TwA2wQ==
-X-Google-Smtp-Source: AK7set8cydcfojLpqB+kDso4HhKtgLcCcqfb7aa6EHFhc027H7B+9L9dHqtuzZ5rVDdsVSeW4p5194/06jc=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a65:6b84:0:b0:4f1:cd3a:3e83 with SMTP id
- d4-20020a656b84000000b004f1cd3a3e83mr472247pgw.3.1677278880573; Fri, 24 Feb
- 2023 14:48:00 -0800 (PST)
-Date:   Fri, 24 Feb 2023 14:47:59 -0800
-Mime-Version: 1.0
-Message-ID: <Y/k+n6HqfLNmmmtM@google.com>
-Subject: [FYI] KVM x86 6.4 status/plan
-From:   Sean Christopherson <seanjc@google.com>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_20,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XetVmJJp94Tm+T8Ok6omBAdD9XAfcZ6uupziRkiZMk4=;
+        b=3sM+Dk7miYmwW05dpkZckD6jPDkZVRl9/oJHLxDdRRxNhKbzhs8cRZ6sm+UXapsQAk
+         UScsWZKv5kg9Rs9ITDXSHz0MMmpOs1TlRELVslPmc9X4mssO6xr8b4A05GKso12Od/qK
+         hmO2fqH73J2VJe3O/6YttSQ4TK4g7qlpE5Rl3YFf4mYE9Cb5LL3jKde6+Qb704+R/qYA
+         vXGgP5Qp593ozObppXnm7rlx3wE49gx/f6zki6g2Q3gmlms6BZe8PhlFyXLD9mj47HwZ
+         bdb+aB6PQck5vm8oJorZNAxYtQ9SCrfDQdLQHR/eqf5aeArdBYgnf6B28lzzz1h/Zkbh
+         LNpQ==
+X-Gm-Message-State: AO0yUKVPrr1eIAYQJ4vZCmgRae4HtSXkLk2cViK9DdLc//uFuCboj8m+
+        WczAlMa4Fs6/upsZ9PYTBw8CyiDK8bdXcqH2vsSg/w==
+X-Google-Smtp-Source: AK7set+JUJGS4taTF2L4iG7qSnErZT/B9l94aSS+gXotcCJFECvjzbG6kwXbbzPZjNqKXP8t1enfOw==
+X-Received: by 2002:a17:906:9f19:b0:879:ec1a:4ac with SMTP id fy25-20020a1709069f1900b00879ec1a04acmr33104346ejc.76.1677279063456;
+        Fri, 24 Feb 2023 14:51:03 -0800 (PST)
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com. [209.85.208.45])
+        by smtp.gmail.com with ESMTPSA id m9-20020a170906234900b008d85435f914sm91320eja.98.2023.02.24.14.51.02
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Feb 2023 14:51:02 -0800 (PST)
+Received: by mail-ed1-f45.google.com with SMTP id ee7so3349454edb.2
+        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 14:51:02 -0800 (PST)
+X-Received: by 2002:a50:9fae:0:b0:4ab:4d34:9762 with SMTP id
+ c43-20020a509fae000000b004ab4d349762mr8258013edf.5.1677279062350; Fri, 24 Feb
+ 2023 14:51:02 -0800 (PST)
+MIME-Version: 1.0
+References: <Y/Tlx8j3i17n5bzL@nvidia.com>
+In-Reply-To: <Y/Tlx8j3i17n5bzL@nvidia.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri, 24 Feb 2023 14:50:45 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wiy2XRdvxchyuVYJJ618sAcGiPPam14z8yAW+kyCzgPmA@mail.gmail.com>
+Message-ID: <CAHk-=wiy2XRdvxchyuVYJJ618sAcGiPPam14z8yAW+kyCzgPmA@mail.gmail.com>
+Subject: Re: [GIT PULL] Please pull IOMMUFD subsystem changes
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     iommu@lists.linux.dev, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Kevin Tian <kevin.tian@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -64,7 +73,19 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-FYI, I'll be offline all of next week, and will be back online March 6th.  I have
-a few series of my own I want to refresh when I get back, but after that I plan
-on switching into review mode for 6.4.  If fortune favors me, stuff should start
-getting queued for 6.4 shortly after 6.3-rc2.
+On Tue, Feb 21, 2023 at 7:39 AM Jason Gunthorpe <jgg@nvidia.com> wrote:
+>
+> iommufd for 6.3
+>
+> Some polishing and small fixes for iommufd:
+
+Hmm. About half the patches seem to not be about iommufd, but about
+'isolated_msi', which isn't even mentioned in the pull request at all
+(well, it's there in the shortlog, but not in the actual "this is what
+happened")
+
+I already merged it, and am not sure what I would add to the commit
+message, but I really would have liked to see that mentioned,
+considering that it wasn't some small part of it all.
+
+              Linus
