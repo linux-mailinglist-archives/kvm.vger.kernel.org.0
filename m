@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 78B606A2458
-	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 23:37:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 87A886A2459
+	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 23:37:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229656AbjBXWhK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Feb 2023 17:37:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44140 "EHLO
+        id S229752AbjBXWhM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Feb 2023 17:37:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229563AbjBXWhH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Feb 2023 17:37:07 -0500
+        with ESMTP id S229729AbjBXWhI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Feb 2023 17:37:08 -0500
 Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC4E41B2D3
-        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 14:37:05 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id m9-20020a17090a7f8900b0023769205928so1859066pjl.6
-        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 14:37:05 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 764336F42B
+        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 14:37:07 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id fa3-20020a17090af0c300b002377eefb6acso144533pjb.3
+        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 14:37:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UK2Im1BEXAy6ijd16h4AX9V+lLFWq6BP9P20yLZbsYA=;
-        b=Wlo7/9HLpKgw/3Sv1De24kjKRcv1up0BCe2hwc+CMEM0VdJuV3MSbMc5jPekFDjfxj
-         JyWO3DUYJOrEPrl8i60Z8okvees7jFlhgdehTcf4gGZt8yUBdHBiPihD+J2K9qeZZeMT
-         NVtQJ0ZGfM1gQZaynMBCAJxAHAvX7DZXju3u5ajh6AGNDcjFRZYU+ffxIqgxwckAGy+F
-         qLUx7HXfI/RkZj8e2P+So1FhVxwd7F2GZJt5X/9PfTX992GJoFz+Z2665DY4ZdWT5HSq
-         R9TZTUWTjacbD5MtHJqzb6lD46xoi6QCQlUfcVhuucnHEGOd4KXfcEf86kOzWZxx5PEO
-         I5pw==
+        bh=G4UV7DWOQlYve4HyAdnVWF3PbtUTr/TT861HIpwxpQE=;
+        b=jtmVotXbFj/LbxfLYiIM4VYmb+ZcqFLJ0yf3lwLBE0eOxtEauPeD3PXOr31zoAaYSU
+         QufYDYAvmoHL+GE6QKkSQcPDHNB3EQxyc2RYh4wteVr0RsVov+uxosmKmaqXIEFfAKZZ
+         VBXUVoatCSD8q//cRt4YxUPc/GeuRCCbzLq4gT4Ri+rn/Pn/1Wi4SnaRiuAqhOSrgUl6
+         QOHg9hcnsgtbjLSAqlV5EAD6mQi4ZqJqroi7zZQEIJ01ppF08Kxz7STXvbWGq7qR+xeL
+         9GHNNwyWfjQIG8wguAEB3Qx2IV/UHw6MP3fbCVBktEPYzlcV/yohQxVDioKPjgTYLDiP
+         N+yA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UK2Im1BEXAy6ijd16h4AX9V+lLFWq6BP9P20yLZbsYA=;
-        b=bbW5NoEiUVL6CsQtBEKIdWt9TldTKbEaARmdk6t69WRtXiX3sHLSUSwSi94LqbflXk
-         OWH0iVuZDs1gpMwpHw5/skbCq6Pq4Fmx/kjXLmyEPgGWnxGArDVhalx5bJNZJLaImPn4
-         ztiIkDn09CnkWyyXPD4vB+Xew/loqH/LlE9rA9XgR0ROA7j2wz9dmIDD81PvqEEgINm2
-         LQW+lMEgHsc91LkRC62p0i0IwH/bEr2hb5HtpsqvIvWlWRKopqx3nID3pCojJ2cNJYkr
-         kPETSJcyx2wsJvwrD5kcUuEjJaKYlq3GVP6wp0L+kjrrJqqO0GnulPXqnJhvC2644WBL
-         ga5w==
-X-Gm-Message-State: AO0yUKXubeF2NHFjo8hCItoWI+hlhbv2FJuwyT6cyHpsSQYMX7sZaffL
-        GLgjxjoIfFneKI4n2B8qv+VESrr2hw1O0nXkQItU8YUFv0ADKz0zvL69ANlSluhvd1yM7bWmeit
-        bgilOFwAVZoI6LT5qxeOCAHD+/nfIUqNj5rMBq+OCyq+QfOPlxFouubU9yZcUzzuH6h9Z
-X-Google-Smtp-Source: AK7set9bXx49vs62zVddXNeWWmvc5NVRdHr8tmDVAsz42P6OZJ4nEN7bNBXowXqRZ+S6//CJUqNqZWbW1LckHTu2
+        bh=G4UV7DWOQlYve4HyAdnVWF3PbtUTr/TT861HIpwxpQE=;
+        b=on8Ux6JVLD93VLIUwYJsjt50N+6nj8mTpNZtD3DLHjoLAyB6G2h/RpgM2+yVDx2UMY
+         EDcyZ+Vi1iCurI8YpOdsS6cuYe1mY/aJ1OdJRcWWHKiMAFozhYl2INGt2igeBoLSkx7m
+         2YeVKMqIcoRbzltm+tGYon2K5q16mb43xjLQZYdk/tMb5mxJkKYnSfYYtsGziwbH/0HD
+         7UBsFqy02m39NkP0m1Hp4e1dr28HePnOwQrNHKF3Tws6X1SYoTrmanoqsISh9M2+OUoP
+         bYnAdy+cAyyQOi5Q8JR/PvU6X8Oach4u4VSE7VWcagwWxiorHbojjkzA7hbM0R8Ryd4C
+         3fPg==
+X-Gm-Message-State: AO0yUKV4Tsz+qJcVKGpX5Mxa4z63oqIWCgxnvt8AgyLvE2eZq+NE3bgZ
+        6Ia8K18AZuK07LJa2Y49K0enOR5WvKI4ocQBV7CQK4gwS9jNds0dOGBjfoNOh/Vh1DeJgGoQXQg
+        60ocQRCiH1vxTSf34HZIgn4YR7mi/SQvDiwwhyIJCSY/vcBlSmJJVSiAYWH41S7HRpPNm
+X-Google-Smtp-Source: AK7set/HjDmLwnfI/pb2B6neofTLG2Tregi71la+5NyZ7IwVK0giDCjqjM86iUKt7V4r6+TtltlSlydjff6zRy9X
 X-Received: from aaronlewis-2.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:519c])
- (user=aaronlewis job=sendgmr) by 2002:a17:903:3302:b0:19b:20a5:c18a with SMTP
- id jk2-20020a170903330200b0019b20a5c18amr3545113plb.12.1677278225236; Fri, 24
- Feb 2023 14:37:05 -0800 (PST)
-Date:   Fri, 24 Feb 2023 22:36:02 +0000
+ (user=aaronlewis job=sendgmr) by 2002:a17:90a:9c2:b0:233:caec:5710 with SMTP
+ id 60-20020a17090a09c200b00233caec5710mr2203143pjo.3.1677278226813; Fri, 24
+ Feb 2023 14:37:06 -0800 (PST)
+Date:   Fri, 24 Feb 2023 22:36:03 +0000
 In-Reply-To: <20230224223607.1580880-1-aaronlewis@google.com>
 Mime-Version: 1.0
 References: <20230224223607.1580880-1-aaronlewis@google.com>
 X-Mailer: git-send-email 2.39.2.637.g21b0678d19-goog
-Message-ID: <20230224223607.1580880-4-aaronlewis@google.com>
-Subject: [PATCH v3 3/8] KVM: x86: Clear all supported AVX-512 xfeatures if
- they are not all set
+Message-ID: <20230224223607.1580880-5-aaronlewis@google.com>
+Subject: [PATCH v3 4/8] KVM: x86: Clear AVX-512 xfeatures if SSE or AVX is clear
 From:   Aaron Lewis <aaronlewis@google.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
@@ -69,34 +68,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Be a good citizen and don't allow any of the supported AVX-512
-xfeatures[1] to be set if they can't all be set.  That way userspace or
-a guest doesn't fail if it attempts to set them in XCR0.
+A requirement for setting AVX-512 is to have both SSE and AVX enabled.
+Add these masks to ensure AVX-512 gets cleared if either SSE or AVX
+are clear.
 
-[1] CPUID.(EAX=0DH,ECX=0):EAX.OPMASK[bit-5]
-    CPUID.(EAX=0DH,ECX=0):EAX.ZMM_Hi256[bit-6]
-    CPUID.(EAX=0DH,ECX=0):EAX.ZMM_Hi16_ZMM[bit-7]
-
-Suggested-by: Jim Mattson <jmattson@google.com>
 Signed-off-by: Aaron Lewis <aaronlewis@google.com>
 ---
- arch/x86/kvm/cpuid.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ arch/x86/kvm/cpuid.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index b2e7407cd114..76379a51a16d 100644
+index 76379a51a16d..1eff76f836a2 100644
 --- a/arch/x86/kvm/cpuid.c
 +++ b/arch/x86/kvm/cpuid.c
-@@ -68,6 +68,10 @@ static u64 sanitize_xcr0(u64 xcr0)
+@@ -68,7 +68,7 @@ static u64 sanitize_xcr0(u64 xcr0)
  	if ((xcr0 & mask) != mask)
  		xcr0 &= ~mask;
  
-+	mask = XFEATURE_MASK_AVX512;
-+	if ((xcr0 & mask) != mask)
-+		xcr0 &= ~XFEATURE_MASK_AVX512;
-+
- 	return xcr0;
- }
+-	mask = XFEATURE_MASK_AVX512;
++	mask = XFEATURE_MASK_AVX512 | XFEATURE_MASK_SSE | XFEATURE_MASK_YMM;
+ 	if ((xcr0 & mask) != mask)
+ 		xcr0 &= ~XFEATURE_MASK_AVX512;
  
 -- 
 2.39.2.637.g21b0678d19-goog
