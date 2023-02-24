@@ -2,130 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D5C246A1F74
-	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 17:16:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9038E6A1F78
+	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 17:17:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229826AbjBXQQr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Feb 2023 11:16:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44480 "EHLO
+        id S229868AbjBXQR1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Feb 2023 11:17:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229817AbjBXQQp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Feb 2023 11:16:45 -0500
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 639C270EEC
-        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 08:16:42 -0800 (PST)
-Received: by mail-pf1-x449.google.com with SMTP id i11-20020a056a00224b00b005d44149eb06so4668965pfu.10
-        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 08:16:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ByVfkV4Kg0xQl/QzeZ3aF7bFQg5cuRP9o4M+2l+1QKc=;
-        b=BM1FfHzgxMewIj4HhgkSYt7dJqL5ULeJ3s2CoLIwqCVFDifrPnhDqkOOH11czafGGK
-         ARL+JhFq9fSe3mz+aU2JB0t9CgUr+svs6Cys35y8+8njln7xNQw3jErFO3vWBmY9MNrX
-         NRjnHBx6yUKvR6VfOOmBGKDHp7obW4h7Y8+g6U3DSCnW2T/Z4wY7tQTQJcslBAI7ZXgO
-         h2+7s15oG6kPxKz02nZGnNj6KooDb7xJ1iykcSqk3p0hYEZeu3fCW6Ir4nbQANOCvXzQ
-         btcT+4igkGE4x2WTIOx/Kd1KDyfm98OXp53vdYvw04c2F2nJq6cjdOs/RWtHdtr/qunk
-         NLgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ByVfkV4Kg0xQl/QzeZ3aF7bFQg5cuRP9o4M+2l+1QKc=;
-        b=wOS/JT7ou0/ctrjzp9j5YNnsqtv/+GurKLjV15gbLLfUTyEdzgdy0yrNoDUmToy4/a
-         stpXiTDll2JORFqdSWMBZSmVHBJ+22MHotLoFBnz29i9DowH2GydpibGZ2GmdaFtsPxp
-         rrFMQ9RCSWXV8QaPaNilESEfeIQJ7DolCfl8Rdrxcq0xqpjj3CPc9TBVGRCt1PG9ehXA
-         xDytrm4LRaBzYvmx56hUgnzozlg4JvOl23FRemRSPUuiKbMbo6w15cchhpD7Uvge14g2
-         NRsjJFnlDdmpsrZevHhCHvZhoqxAV677XxRXOD/+3X3GuY1p1qzkifptyyVpseCEYOTG
-         Rmvw==
-X-Gm-Message-State: AO0yUKVWIN/5vX9DRFamGA5dK4Zyqt9qfLVGziqCvtvIh7TBKUuHPff3
-        T0uckjwLEa5Mw/nkleS+XsozXtjjDEE=
-X-Google-Smtp-Source: AK7set8E8rFcUHRVLDwqW0KCkEYyhSC7jIe9uIMQnKtZswJN8MvAro10BiCqXLSIuqmxAnT+kYSxOG5JAHg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a62:8602:0:b0:5df:9809:6220 with SMTP id
- x2-20020a628602000000b005df98096220mr1517427pfd.3.1677255401689; Fri, 24 Feb
- 2023 08:16:41 -0800 (PST)
-Date:   Fri, 24 Feb 2023 08:16:40 -0800
-In-Reply-To: <20230224092552.6olrcx2ryo4sexxm@linux.intel.com>
-Mime-Version: 1.0
-References: <20230217231022.816138-1-seanjc@google.com> <20230217231022.816138-9-seanjc@google.com>
- <20230221152349.ulcjtbnvziair7ff@linux.intel.com> <20230221153306.qubx7tfmasnvodeu@linux.intel.com>
- <Y/VYN3n/lHePiDxM@google.com> <20230222064931.ppz6berhfr4edewf@linux.intel.com>
- <Y/ZFJfspU6L2RmQS@google.com> <20230224092552.6olrcx2ryo4sexxm@linux.intel.com>
-Message-ID: <Y/ji6MAlEmbNfZzf@google.com>
-Subject: Re: [PATCH 08/12] KVM: nSVM: Use KVM-governed feature framework to
- track "vVM{SAVE,LOAD} enabled"
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yu Zhang <yu.c.zhang@linux.intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229643AbjBXQR0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Feb 2023 11:17:26 -0500
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5ED58679A9;
+        Fri, 24 Feb 2023 08:17:22 -0800 (PST)
+Received: from [192.168.2.1] (77-166-152-30.fixed.kpn.net [77.166.152.30])
+        by linux.microsoft.com (Postfix) with ESMTPSA id 390D120B9C3D;
+        Fri, 24 Feb 2023 08:17:20 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 390D120B9C3D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1677255441;
+        bh=qRbpr0mo3xoPDxDkui69w/iMTWGJFuTVtDxTNoOJRKs=;
+        h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+        b=LiWSIIFlY9HGgMz2TB69jqOBWziWRArRGag+jg1fkk9mSZDQSuHwHtyhhKUJSGH6C
+         yqYD6vP21yOFqwzJjU19q19mJqfJ/1H77aQcXl4R7+/CP9sX0dJHvHYOXTSBMq2DQy
+         mduckMo9X9TVL8zRvUvd37jOiEgcxeIrTN3lfS+c=
+Message-ID: <113888e0-ba94-deca-57a1-d3549d55a315@linux.microsoft.com>
+Date:   Fri, 24 Feb 2023 17:17:18 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: "KVM: x86/mmu: Overhaul TDP MMU zapping and flushing" breaks SVM
+ on Hyper-V
+Content-Language: en-US
+From:   Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Tianyu Lan <ltykernel@gmail.com>,
+        "Michael Kelley (LINUX)" <mikelley@microsoft.com>
+References: <43980946-7bbf-dcef-7e40-af904c456250@linux.microsoft.com>
+ <Y+p1j7tYT+16MX6B@google.com>
+ <35ff8f48-2677-78ea-b5f3-329c75ce65c9@redhat.com>
+ <Y+qLe42h9ZPRINrG@google.com>
+ <CABgObfaZQOvt6v0yGz3MR7FBU7DcrTTGmS6M8RWCX0uy6WML1Q@mail.gmail.com>
+ <20d189fc-8d20-8083-b448-460cc0420151@linux.microsoft.com>
+ <Y+1ZpxAkome9s1Ve@google.com>
+ <7e1d3590-2205-401c-c6f5-e4da534d85a7@linux.microsoft.com>
+In-Reply-To: <7e1d3590-2205-401c-c6f5-e4da534d85a7@linux.microsoft.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-19.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS,USER_IN_DEF_DKIM_WL,
+        USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 24, 2023, Yu Zhang wrote:
-> On Wed, Feb 22, 2023 at 08:39:01AM -0800, Sean Christopherson wrote:
-> > +Maxim
-> > 
-> > On Wed, Feb 22, 2023, Yu Zhang wrote:
-> > > On Tue, Feb 21, 2023 at 03:48:07PM -0800, Sean Christopherson wrote:
-> > Nope, my interpretation is wrong.  vmload_vmsave_interception() clears the upper
-> > bits of SYSENTER_{EIP,ESP}
-> > 
-> > 	if (vmload) {
-> > 		svm_copy_vmloadsave_state(svm->vmcb, vmcb12);
-> > 		svm->sysenter_eip_hi = 0;
-> > 		svm->sysenter_esp_hi = 0;
-> > 	} else {
-> > 		svm_copy_vmloadsave_state(vmcb12, svm->vmcb);
-> > 	}
-> > 
-> > From commit adc2a23734ac ("KVM: nSVM: improve SYSENTER emulation on AMD"):
-> >     
-> >     3. Disable vmload/vmsave virtualization if vendor=GenuineIntel.
-> >        (It is somewhat insane to set vendor=GenuineIntel and still enable
-> >        SVM for the guest but well whatever).
-> >        Then zero the high 32 bit parts when kvm intercepts and emulates vmload.
-> > 
-> > Presumably AMD hardware loads only the lower 32 bits, which would leave garbage
-> > in the upper bits and even leak state from L1 to L2 (again ignoring the fact that
-> > exposing SVM to an Intel vCPU is bonkers).
-> Is it because L1 is a VM migrated from Intel platform to AMD's?
-
-I believe so.
-
-> So w/o commit adc2a23734ac ("KVM: nSVM: improve SYSENTER emulation on AMD"):
-> 1> L1 could be a "GenuineIntel" with SVM capability (bizarre as it is), running
-> in 64-bit mode.
-> 2> With no interception of MSR writes to the SYSENTER_EIP/ESP, L1 may set its
-> SYSENTER_EIP/ESP to a 64-bit value successfully (though sysenter/sysexit may
-> fail).
-
-Yes, though the MSRs don't need to be passed through, KVM emulates the full 64 bits
-if the guest CPUID model is Intel.
-
-> 3> L2 could be in 32-bit mode. And if virtual vmload/vmsave is enabled for L1,
-> only lower 32 bits of those MSRs will be loaded, leaking the higher 32 bits.
+On 16/02/2023 15:40, Jeremi Piotrowski wrote:
+> On 15/02/2023 23:16, Sean Christopherson wrote:
+>> On Tue, Feb 14, 2023, Jeremi Piotrowski wrote:
+>>> On 13/02/2023 20:56, Paolo Bonzini wrote:
+>>>> On Mon, Feb 13, 2023 at 8:12 PM Sean Christopherson <seanjc@google.com> wrote:
+>>>>>> Depending on the performance results of adding the hypercall to
+>>>>>> svm_flush_tlb_current, the fix could indeed be to just disable usage of
+>>>>>> HV_X64_NESTED_ENLIGHTENED_TLB.
+>>>>>
+>>>>> Minus making nested SVM (L3) mutually exclusive, I believe this will do the trick:
+>>>>>
+>>>>> +       /* blah blah blah */
+>>>>> +       hv_flush_tlb_current(vcpu);
+>>>>> +
+>>>>
+>>>> Yes, it's either this or disabling the feature.
+>>>>
+>>>> Paolo
+>>>
+>>> Combining the two sub-threads: both of the suggestions:
+>>>
+>>> a) adding a hyperv_flush_guest_mapping(__pa(root->spt) after kvm_tdp_mmu_get_vcpu_root_hpa's call to tdp_mmu_alloc_sp()
+>>> b) adding a hyperv_flush_guest_mapping(vcpu->arch.mmu->root.hpa) to svm_flush_tlb_current()
+>>>
+>>> appear to work in my test case (L2 vm startup until panic due to missing rootfs).
+>>>
+>>> But in both these cases (and also when I completely disable HV_X64_NESTED_ENLIGHTENED_TLB)
+>>> the runtime of an iteration of the test is noticeably longer compared to tdp_mmu=0.
+>>
+>> Hmm, what is test doing?
 > 
-> Is above scenario the reason of Maxim's fix?
+> Booting through OVMF and kernel with no rootfs provided, and panic=-1 specified on the
+> kernel command line. It's a pure startup time test.
+> 
 
-Yes, that's my understanding.
+Hi Sean,
 
-> But why it is related to nested migration? 
+Have you been able to reproduce this by any chance?
 
-I understand why it's related, but I don't understand why we bothered to add "support"
-for this.
+I would be glad to see either of the two fixes getting merged (b) or a) if it doesn't require
+special L3 nested handling) in order to get this regression resolved.
 
-In theory, if L1 is migrated by L0 while L1 is running an L2 that uses SYSENTER,
-problems will occur.  I'm a bit lost as to how this matters in practice, as KVM
-doesn't support cross-vendor nested virtualization, and if L1 can be enlightened
-to the point where it can switch from VMX=>SVM during migration, what's the point
-of doing a migration?
+Jeremi
