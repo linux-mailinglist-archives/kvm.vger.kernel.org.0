@@ -2,61 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D4FD86A1D92
-	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 15:39:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AD216A1D94
+	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 15:39:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229993AbjBXOjf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Feb 2023 09:39:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56794 "EHLO
+        id S229948AbjBXOj5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Feb 2023 09:39:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229957AbjBXOj3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Feb 2023 09:39:29 -0500
+        with ESMTP id S229978AbjBXOjv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Feb 2023 09:39:51 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49D74671C5
-        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 06:38:47 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F2B41027F
+        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 06:39:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677249526;
+        s=mimecast20190719; t=1677249556;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=F2Gy4jFQ+zLSzSW8KrNNW+axZfls8gC7MpzkteIHstE=;
-        b=ISiHdA/+l8nnb2ZNj/qbuR0m+fCexDGXjFC/hlXP8e/P0QDHra4QkuoNkLDkH7aVxSy1cD
-        k47M+kr6gS6M2Ij8OdZQJQs1H0vAAdPgJF4P/wfGNL+pBESmaY1UTobT80zwbwHISWOBsR
-        8F0AbadFQEejK7N+670UfCwTKQS7hok=
+        bh=Gwn5Ws8pxKxzUZXXgDM8XZWBxd9YpYFMiMTVV+pdj6o=;
+        b=CaUVW6rMooib/8pbeqddYtEXLrUVwV/Sjcy7XQFKIBzbHysFy1jhnEpYMvLqS7cOJe5NCQ
+        eJkb/ZHPW+xr74ysICLYcw6lFiwqfgPF26icQ04mpK6wcHCI5ynNtaylf6yjNgJPEgWBBR
+        NtO2ermDed5Tj58hlqyaHRf3h12IDjQ=
 Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
  [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-119-S7JFb-UFOuCJAdJFO213qA-1; Fri, 24 Feb 2023 09:38:45 -0500
-X-MC-Unique: S7JFb-UFOuCJAdJFO213qA-1
-Received: by mail-wm1-f69.google.com with SMTP id x18-20020a1c7c12000000b003e1e7d3cf9fso1305946wmc.3
-        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 06:38:44 -0800 (PST)
+ us-mta-227-mVepaZAZOZuPFGOhyqBcdA-1; Fri, 24 Feb 2023 09:39:14 -0500
+X-MC-Unique: mVepaZAZOZuPFGOhyqBcdA-1
+Received: by mail-wm1-f69.google.com with SMTP id x18-20020a1c7c12000000b003e1e7d3cf9fso1306405wmc.3
+        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 06:39:14 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=F2Gy4jFQ+zLSzSW8KrNNW+axZfls8gC7MpzkteIHstE=;
-        b=qhXH1vrrVHRYnXjzcUpzC2o14JxZrZdjghdGlFqpeuifZruUjIrH1ldns3HqUwiS7/
-         bTq9tu1zRcivbYaDN5kbqIWyGxRHEZOk0JT8gK5coyTA44jlB/CGQXOjSZi67MRTDfr/
-         msjbcSxR8S0QqLCjyOepIzabTH4pVf/vqOZDHzjhpaV80j0wUvSfwvgfSbi+YPctIAZ6
-         mfTcGCJYgI8wxypoH5OUYiqNsQZpRABprDri7mLOodi2LnAzcsciqfo3WI0TpKR/40X+
-         hg+8hFQG9F4ZSf4trApQN5Y3aw2UNOP/KQckLziZ1ex47PMjb9sxs9+Edm7NJxcz/bK9
-         XJPg==
-X-Gm-Message-State: AO0yUKWns7t4IQUvERA7n+uIUyvfK05Zwj2pgfNQYLFEja45hxKbpcCY
-        M1U0BfGmrzXFSqojFGnkqLhMhMQwEz/FTquSrjHCgv/e8b8IdebbHUWl/xrp1ZKgaXXnuYlIWDJ
-        MBOVZ6C5lctz574vmNQ==
-X-Received: by 2002:a1c:7709:0:b0:3ea:fc95:7bf with SMTP id t9-20020a1c7709000000b003eafc9507bfmr2549613wmi.30.1677249523663;
-        Fri, 24 Feb 2023 06:38:43 -0800 (PST)
-X-Google-Smtp-Source: AK7set9tLVciTVQHdrXjudS/wXkv9w4eH0viCfjQ59ETlgYApLfO7oWjZ7S1UtLnq/jiiyKjNB6iAg==
-X-Received: by 2002:a1c:7709:0:b0:3ea:fc95:7bf with SMTP id t9-20020a1c7709000000b003eafc9507bfmr2549588wmi.30.1677249523503;
-        Fri, 24 Feb 2023 06:38:43 -0800 (PST)
+        bh=Gwn5Ws8pxKxzUZXXgDM8XZWBxd9YpYFMiMTVV+pdj6o=;
+        b=lexjmX44hfVBGUgY3nWtgFIOxJByTr/SPTeDRtTChJGWk5t7USGILTQ8yvJZkcCAev
+         hSAJ+Box+wSiCaatMDk+f/1ymjRcOfc7ZExddVSRrP7euzHlHTkjHXVnhop+PocivdRn
+         OEJKPc/t6MUM2uWL+tcvpOIlKQvanFr+uOw4vpDJPAKywGeRPwK7JJgsjigKfxQZ/Yh4
+         1GW8ldRQthEtPQuO3BvJKmYVsBclnFm6CUr15BsSuq7XjdwSAxrK4oQWSZrOhw9jlxAO
+         49thj9CIFA0XAfhgd/HSFU7Q634HzWwMgGyxoYZx7JfFnAcvR/+mp28KfBJjcnjew3iR
+         it1w==
+X-Gm-Message-State: AO0yUKUU80RrNmuYp+tTBCujKwLTE2mQ5pchXO4pQ3rA4K1K7WILZ8mz
+        1NnEqD1gaSxauSgFQN/R/3QW37gt9WE/FNg4uAtjhTzaEDfHskdb4cq1i3tuxYvXVpfGAi6dWEc
+        6V9Xsk10zfzwL
+X-Received: by 2002:adf:f292:0:b0:2c7:1b4d:a6e2 with SMTP id k18-20020adff292000000b002c71b4da6e2mr2266919wro.60.1677249553852;
+        Fri, 24 Feb 2023 06:39:13 -0800 (PST)
+X-Google-Smtp-Source: AK7set+JEAJuy0JHtdqXFML9piRLztw7qQrOJspvl54b6l6a7RnPlb9+iCzf6dVnOLd0xNVE0Xd+dQ==
+X-Received: by 2002:adf:f292:0:b0:2c7:1b4d:a6e2 with SMTP id k18-20020adff292000000b002c71b4da6e2mr2266897wro.60.1677249553531;
+        Fri, 24 Feb 2023 06:39:13 -0800 (PST)
 Received: from starship ([89.237.96.70])
-        by smtp.gmail.com with ESMTPSA id ja20-20020a05600c557400b003dfefe115b9sm3062964wmb.0.2023.02.24.06.38.41
+        by smtp.gmail.com with ESMTPSA id x17-20020adff651000000b002c563b124basm13574658wrp.103.2023.02.24.06.39.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Feb 2023 06:38:43 -0800 (PST)
-Message-ID: <818358bee687c999d715a90f594eb02207c74e82.camel@redhat.com>
-Subject: Re: [PATCH v2 05/11] KVM: x86: emulator: stop using raw host flags
+        Fri, 24 Feb 2023 06:39:13 -0800 (PST)
+Message-ID: <810f38d2d8328b0f24bc8b11b71092546ec22eef.camel@redhat.com>
+Subject: Re: [PATCH v2 07/11] KVM: x86: add a delayed hardware NMI injection
+ interface
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     kvm@vger.kernel.org, Sandipan Das <sandipan.das@amd.com>,
@@ -75,17 +76,17 @@ Cc:     kvm@vger.kernel.org, Sandipan Das <sandipan.das@amd.com>,
         Jing Liu <jing2.liu@intel.com>,
         Wyes Karny <wyes.karny@amd.com>, x86@kernel.org,
         "H. Peter Anvin" <hpa@zytor.com>
-Date:   Fri, 24 Feb 2023 16:38:40 +0200
-In-Reply-To: <Y9RzSJuGmIQf1kxA@google.com>
+Date:   Fri, 24 Feb 2023 16:39:10 +0200
+In-Reply-To: <Y9R1w8kfQjCNnEfl@google.com>
 References: <20221129193717.513824-1-mlevitsk@redhat.com>
-         <20221129193717.513824-6-mlevitsk@redhat.com> <Y9RzSJuGmIQf1kxA@google.com>
+         <20221129193717.513824-8-mlevitsk@redhat.com> <Y9R1w8kfQjCNnEfl@google.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -93,32 +94,102 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 2023-01-28 at 00:58 +0000, Sean Christopherson wrote:
+On Sat, 2023-01-28 at 01:09 +0000, Sean Christopherson wrote:
 > On Tue, Nov 29, 2022, Maxim Levitsky wrote:
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index f18f579ebde81c..85d2a12c214dda 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -8138,9 +8138,14 @@ static void emulator_set_nmi_mask(struct x86_emulate_ctxt *ctxt, bool masked)
-> >  	static_call(kvm_x86_set_nmi_mask)(emul_to_vcpu(ctxt), masked);
+> > This patch adds two new vendor callbacks:
+> 
+> No "this patch" please, just say what it does.
+> 
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index 684a5519812fb2..46993ce61c92db 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -871,8 +871,13 @@ struct kvm_vcpu_arch {
+> >  	u64 tsc_scaling_ratio; /* current scaling ratio */
+> >  
+> >  	atomic_t nmi_queued;  /* unprocessed asynchronous NMIs */
+> > -	unsigned nmi_pending; /* NMI queued after currently running handler */
+> > +
+> > +	unsigned int nmi_pending; /*
+> > +				   * NMI queued after currently running handler
+> > +				   * (not including a hardware pending NMI (e.g vNMI))
+> > +				   */
+> 
+> Put the block comment above.  I'd say collapse all of the comments about NMIs into
+> a single big block comment.
+> 
+> >  	bool nmi_injected;    /* Trying to inject an NMI this entry */
+> > +
+> >  	bool smi_pending;    /* SMI queued after currently running handler */
+> >  	u8 handling_intr_from_guest;
+> >  
+> > @@ -10015,13 +10022,34 @@ static void process_nmi(struct kvm_vcpu *vcpu)
+> >  	 * Otherwise, allow two (and we'll inject the first one immediately).
+> >  	 */
+> >  	if (static_call(kvm_x86_get_nmi_mask)(vcpu) || vcpu->arch.nmi_injected)
+> > -		limit = 1;
+> > +		limit--;
+> > +
+> > +	/* Also if there is already a NMI hardware queued to be injected,
+> > +	 * decrease the limit again
+> > +	 */
+> 
+> 	/*
+> 	 * Block comment ...
+> 	 */
+> 
+> > +	if (static_call(kvm_x86_get_hw_nmi_pending)(vcpu))
+> 
+> I'd prefer "is_hw_nmi_pending()" over "get", even if it means not pairing with
+> "set".  Though I think that's a good thing since they aren't perfect pairs.
+> 
+> > +		limit--;
+> >  
+> > -	vcpu->arch.nmi_pending += atomic_xchg(&vcpu->arch.nmi_queued, 0);
+> > +	if (limit <= 0)
+> > +		return;
+> > +
+> > +	/* Attempt to use hardware NMI queueing */
+> > +	if (static_call(kvm_x86_set_hw_nmi_pending)(vcpu)) {
+> > +		limit--;
+> > +		nmi_to_queue--;
+> > +	}
+> > +
+> > +	vcpu->arch.nmi_pending += nmi_to_queue;
+> >  	vcpu->arch.nmi_pending = min(vcpu->arch.nmi_pending, limit);
+> >  	kvm_make_request(KVM_REQ_EVENT, vcpu);
 > >  }
 > >  
-> > -static unsigned emulator_get_hflags(struct x86_emulate_ctxt *ctxt)
-> > +static bool emulator_in_smm(struct x86_emulate_ctxt *ctxt)
-> >  {
-> > -	return emul_to_vcpu(ctxt)->arch.hflags;
-> > +	return emul_to_vcpu(ctxt)->arch.hflags & HF_SMM_MASK;
+> > +/* Return total number of NMIs pending injection to the VM */
+> > +int kvm_get_total_nmi_pending(struct kvm_vcpu *vcpu)
+> > +{
+> > +	return vcpu->arch.nmi_pending + static_call(kvm_x86_get_hw_nmi_pending)(vcpu);
 > 
-> This needs to be is_smm() as HF_SMM_MASK is undefined if CONFIG_KVM_SMM=n.
+> Nothing cares about the total count, this can just be;
+
+I wanted to have the interface to be a bit more generic so that in theory you could have
+more that one hardware NMI pending. I don't care much about it.
+
+
+Best regards,
+	Maxim Levitsky
+
+> 
+> 
+> 	bool kvm_is_nmi_pending(struct kvm_vcpu *vcpu)
+> 	{
+> 		return vcpu->arch.nmi_pending ||
+> 		       static_call(kvm_x86_is_hw_nmi_pending)(vcpu);
+> 	}
+> 
 > 
 > > +}
 > > +
-> > +static bool emulator_in_guest_mode(struct x86_emulate_ctxt *ctxt)
-> > +{
-> > +	return emul_to_vcpu(ctxt)->arch.hflags & HF_GUEST_MASK;
-> 
-> And just use is_guest_mode() here.
-> 
+> >  void kvm_make_scan_ioapic_request_mask(struct kvm *kvm,
+> >  				       unsigned long *vcpu_bitmap)
+> >  {
+> > -- 
+> > 2.26.3
+> > 
 
-Makes sense.
 
