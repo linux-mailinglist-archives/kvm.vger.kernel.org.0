@@ -2,145 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8451F6A1A5B
-	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 11:33:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 65AAC6A1AB1
+	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 11:56:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230363AbjBXKdp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Feb 2023 05:33:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58802 "EHLO
+        id S230258AbjBXK4A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Feb 2023 05:56:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229880AbjBXKc7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Feb 2023 05:32:59 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6401E69AFB;
-        Fri, 24 Feb 2023 02:31:58 -0800 (PST)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31OA3Fmc026695;
-        Fri, 24 Feb 2023 10:31:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : references : from : subject : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=MgyB3An/rfDorfOmnS1Qb76soeG2jIhRLWXC8Adq0p0=;
- b=RYtPTvo1hF1PqkjyQOWK8M9Rd1IQjSLx8MpxPctdySyxvNkptMuBA7pz+vxvRT3/Gk4L
- dK9qYks/KYwtGmzuESmJX70oVBVa6xRBiMYacFcgMeVNPzwDc8JNsWuohnRIMu81HHOl
- xExEUqfJmL/SPX2b/RW5EBjBMF/iO2w4QO//5Y3z6sZa9O0O/UPcYpiJysOi5BP+lO40
- R93HqtBdRl8/YtKDl+7nztaoigqZYIjgWjOePA8byF1xtau+23e509nxhPtajfrMkiGl
- K4UfL8b9Do0K8z/6AJwy86upLsz21nTaFEF6tL/ZgvOVQs+Dzy0fjbyn+HP7ECLWlSIL mQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nxu550ken-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Feb 2023 10:31:33 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31OA5HIl000627;
-        Fri, 24 Feb 2023 10:31:33 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nxu550ke2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Feb 2023 10:31:32 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31NMZV8F016665;
-        Fri, 24 Feb 2023 10:31:31 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3ntpa6fu53-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Feb 2023 10:31:31 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31OAVRl952101502
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 24 Feb 2023 10:31:27 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id ACE9920043;
-        Fri, 24 Feb 2023 10:31:27 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3565A20040;
-        Fri, 24 Feb 2023 10:31:27 +0000 (GMT)
-Received: from [9.171.22.148] (unknown [9.171.22.148])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 24 Feb 2023 10:31:27 +0000 (GMT)
-Message-ID: <e9ea477a-29fd-9957-9a80-5aca300edee8@linux.ibm.com>
-Date:   Fri, 24 Feb 2023 11:31:26 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-To:     Nico Boehr <nrb@linux.ibm.com>, borntraeger@linux.ibm.com,
-        imbrenda@linux.ibm.com, david@redhat.com, mimu@linux.ibm.com,
-        agordeev@linux.ibm.com
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20230223162236.51569-1-nrb@linux.ibm.com>
-Content-Language: en-US
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v1] KVM: s390: interrupt: fix virtual-physical confusion
- for next alert GISA
-In-Reply-To: <20230223162236.51569-1-nrb@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 6QeBoIFATPhHQv6g3CiIATtwL86sVzW0
-X-Proofpoint-GUID: 41LlA4ASA6y36iLpduWFsinfBenoBeV0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
- definitions=2023-02-24_04,2023-02-23_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxlogscore=999
- mlxscore=0 suspectscore=0 impostorscore=0 phishscore=0 priorityscore=1501
- adultscore=0 malwarescore=0 lowpriorityscore=0 spamscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
- definitions=main-2302240083
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S230056AbjBXKza (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Feb 2023 05:55:30 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC97C6695A
+        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 02:54:57 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 7AFCCB81B2C
+        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 10:54:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 429C2C433EF;
+        Fri, 24 Feb 2023 10:54:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1677236095;
+        bh=Cl2GUFWLQFIfBTovBT5tWYqPK+1em50HlxfgOszatnc=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=hQMfN1d0IiKT7fplbjM/f530emlY9ua9C2XRB5pjHAccKXRczmK5RkgA5eJEEACsb
+         1cSwp0WJ8JA+vKwlRRE/rIExUfhjZYUUXYyoeB3ZWl/K3VkP9zTqCzTlzEMWR5TWkg
+         dmiEr7QV/6kbKXGyBv+D1TC/zQKXtfHPVYgEGkYtQfXMq+lbFokuGAQEyQmXEnxe5C
+         QaP20xqkbvS8wjG3w4MVrf+Pf4YZJ4q4BIyp20PLGA/EQvE3+rDdl5pwNsnD9+/M/X
+         NHCCxmItyfsfL6268nCx5zmAAvTqEFRBDY++Xt6yha+wbpSVDKNYlfVgHgirXI9nKl
+         UxarXecTk0pkQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pVVj2-00Cry5-Rm;
+        Fri, 24 Feb 2023 10:54:52 +0000
+Date:   Fri, 24 Feb 2023 10:54:52 +0000
+Message-ID: <86356vxrib.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Colton Lewis <coltonlewis@google.com>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+        suzuki.poulose@arm.com, oliver.upton@linux.dev,
+        yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de,
+        dwmw2@infradead.org
+Subject: Re: [PATCH 07/16] KVM: arm64: timers: Allow physical offset without CNTPOFF_EL2
+In-Reply-To: <gsnty1oo80py.fsf@coltonlewis-kvm.c.googlers.com>
+References: <20230216142123.2638675-8-maz@kernel.org>
+        <gsnty1oo80py.fsf@coltonlewis-kvm.c.googlers.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de, dwmw2@infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/23/23 17:22, Nico Boehr wrote:
-> We sometimes put a virtual address in next_alert, which should always be
-> a physical address, since it is shared with hardware.
+On Thu, 23 Feb 2023 22:40:25 +0000,
+Colton Lewis <coltonlewis@google.com> wrote:
 > 
-> This currently works, because virtual and physical addresses are
-> the same.
+> 
+> Marc Zyngier <maz@kernel.org> writes:
+> 
+> > +/* If _pred is true, set bit in _set, otherwise set it in _clr */
+> > +#define assign_clear_set_bit(_pred, _bit, _clr, _set)			\
+> > +	do {								\
+> > +		if (_pred)						\
+> > +			(_set) |= (_bit);				\
+> > +		else							\
+> > +			(_clr) |= (_bit);				\
+> > +	} while (0)
+> > +
+> 
+> I don't think the do-while wrapper is necessary. Is there any reason
+> besides style guide conformance?
 
-I'd replace that with something like:
+It is if you want to avoid a stray ';'.
 
-The gisa next alert address is defined as a host absolute address so 
-let's use virt_to_phys() to make sure we always write an absolute 
-address to this hardware structure.
+> > +	/*
+> > +	 * We have two possibility to deal with a physical offset:
+> > +	 *
+> > +	 * - Either we have CNTPOFF (yay!) or the offset is 0:
+> > +	 *   we let the guest freely access the HW
+> > +	 *
+> > +	 * - or neither of these condition apply:
+> > +	 *   we trap accesses to the HW, but still use it
+> > +	 *   after correcting the physical offset
+> > +	 */
+> > +	if (!has_cntpoff() && timer_get_offset(map->direct_ptimer))
+> > +		tpt = tpc = true;
+> 
+> If there are only two possibilites, then two different booleans makes
+> things more complicated than it has to be.
 
-This is not a bug since we're currently still running as a virtual == 
-physical kernel but plan to move away from that.
+Each boolean denotes a different architectural state. They are
+separate so that someone can:
+
+- easily understand what is going on
+
+- affect one without affecting the other when extending this code
+
+The "common state" is what we had before, and it was a real pig to
+reverse engineer *my own code*. Yes, this is job security, but I don't
+think that's a good enough reason! ;-)
+
+So I contend that two bools make things far simpler to reason about
+these things.
 
 > 
-> Add phys_to_virt() to resolve the virtual-physical confusion.
-
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-
+> > +	assign_clear_set_bit(tpt, CNTHCTL_EL1PCEN << 10, set, clr);
+> > +	assign_clear_set_bit(tpc, CNTHCTL_EL1PCTEN << 10, set, clr);
 > 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> ---
->   arch/s390/kvm/interrupt.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-> index ab26aa53ee37..20743c5b000a 100644
-> --- a/arch/s390/kvm/interrupt.c
-> +++ b/arch/s390/kvm/interrupt.c
-> @@ -305,7 +305,7 @@ static inline u8 gisa_get_ipm_or_restore_iam(struct kvm_s390_gisa_interrupt *gi)
->   
->   static inline int gisa_in_alert_list(struct kvm_s390_gisa *gisa)
->   {
-> -	return READ_ONCE(gisa->next_alert) != (u32)(u64)gisa;
-> +	return READ_ONCE(gisa->next_alert) != (u32)virt_to_phys(gisa);
->   }
->   
->   static inline void gisa_set_ipm_gisc(struct kvm_s390_gisa *gisa, u32 gisc)
-> @@ -3167,7 +3167,7 @@ void kvm_s390_gisa_init(struct kvm *kvm)
->   	hrtimer_init(&gi->timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
->   	gi->timer.function = gisa_vcpu_kicker;
->   	memset(gi->origin, 0, sizeof(struct kvm_s390_gisa));
-> -	gi->origin->next_alert = (u32)(u64)gi->origin;
-> +	gi->origin->next_alert = (u32)virt_to_phys(gi->origin);
->   	VM_EVENT(kvm, 3, "gisa 0x%pK initialized", gi->origin);
->   }
->   
+> Might be good to name the 10 something like VHE_SHIFT so people know why
+> it is applied.
 
+VHE_SHIFT really doesn't mean more that '10' because it doesn't tell
+you *why* you have to do this.
+
+The real way of solving that one is it move everything to the sysreg
+generation *and* have a way to contextualise the sysreg generation
+based on features and other controls (see the discussion about
+FEAT_CCIDX as an example).
+
+>
+> > +
+> > +
+> > +	timer_set_traps(vcpu, &map);
+> >   }
+> 
+> >   bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu)
+> > @@ -1293,27 +1363,12 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+> >   }
+> 
+> >   /*
+> > - * On VHE system, we only need to configure the EL2 timer trap
+> > register once,
+> > - * not for every world switch.
+> > - * The host kernel runs at EL2 with HCR_EL2.TGE == 1,
+> > - * and this makes those bits have no effect for the host kernel
+> > execution.
+> > + * If we have CNTPOFF, permanently set ECV to enable it.
+> >    */
+> >   void kvm_timer_init_vhe(void)
+> >   {
+> > -	/* When HCR_EL2.E2H ==1, EL1PCEN and EL1PCTEN are shifted by 10 */
+> > -	u32 cnthctl_shift = 10;
+> > -	u64 val;
+> > -
+> > -	/*
+> > -	 * VHE systems allow the guest direct access to the EL1 physical
+> > -	 * timer/counter.
+> > -	 */
+> > -	val = read_sysreg(cnthctl_el2);
+> > -	val |= (CNTHCTL_EL1PCEN << cnthctl_shift);
+> > -	val |= (CNTHCTL_EL1PCTEN << cnthctl_shift);
+> >   	if (cpus_have_final_cap(ARM64_HAS_ECV_CNTPOFF))
+> > -		val |= CNTHCTL_ECV;
+> > -	write_sysreg(val, cnthctl_el2);
+> > +		sysreg_clear_set(cntkctl_el1, 0, CNTHCTL_ECV);
+> >   }
+> 
+> What is the reason for moving these register writes from initialization
+> to vcpu load time? This contradicts the comment that says this is only
+> needed once and not at every world switch. Seems like doing more work
+> for no reason.
+
+You did notice that the comment got *removed*, so that there is no
+contradiction?
+
+You also understand that with a physical offset, and in the absence of
+CNTPOFF, we cannot grant access to the physical counter/timer to the
+guest?
+
+Finally, given that we always have to write various bits of
+CNTKCTL_EL1 for other reasons, moving this settings shouldn't result
+in any extra work (specially considering that they don't require any
+extra synchronisation).
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
