@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C80A6A182D
-	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 09:45:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F3106A185D
+	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 09:59:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229810AbjBXIpi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Feb 2023 03:45:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57862 "EHLO
+        id S229874AbjBXI7b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Feb 2023 03:59:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229808AbjBXIpg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Feb 2023 03:45:36 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E81F14DE13
-        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 00:45:34 -0800 (PST)
+        with ESMTP id S229690AbjBXI71 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Feb 2023 03:59:27 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18857158B4
+        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 00:59:26 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 85F286183C
-        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 08:45:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3792C433EF;
-        Fri, 24 Feb 2023 08:45:33 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 31E8ACE22D9
+        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 08:59:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32054C433D2;
+        Fri, 24 Feb 2023 08:59:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677228333;
-        bh=x68lYKVO9lmqPKgv59m1eIrEFYVBsjreJW3pT+T2BJc=;
+        s=k20201202; t=1677229162;
+        bh=11vK/L/5PpDDe6mKxD8lC9D0OP25ipWMak2rzttxd+o=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=patKlPWJVS8nFfoDBPpH548plmlym09To5NHd4+f7Hxbn++shiWxtvwF6PiMnAAYe
-         7cSdhob8NTeXw4aX97Wkj0uOU/L2YrHeE7MfZjnq4s2lC5uE3+cjwY+XgVMCIQVIJy
-         AwV94RwoGG1JjtSG/OCkJtT6MhMWGye9QPhZKoOlGC5vf5/8IX7DWqMsjb1GP0DJSV
-         rwwVQWtGpSK9ZVWjtlDDDl44Gpbtek66hPsAChiG/fdSD0Cc0dtWqhfT9vWluqN0Dr
-         9js+Fb2ieeTLJS9FGJV/P1r9O0xIGd7BquWc8j/BgI7fwQN6JgDo7mGgDztE+mUadl
-         EwK9DdBgUkaGw==
+        b=P4l5HBgMl5WZWBki5KRuxAPlbEqY1Dkb7A9uHsHYEDaKdaMfA+VRYdFf6C2nRis90
+         T9a7R4tdfpytm+RBUQ8SlbHBWS6Co+hlRQJf3cc+67Vp3i8lzVoLxZMwRlOlfxZl0u
+         E0J5Ou83q6F+3QcrVa6RlTZi6FdSDXZLLr640Gn/BCv7BznLSrWNxxW2lawFSzkaev
+         f8vOhcST9PyHl7X4lXCf1Uoo8fIAkkWV2v86iz66ueXcxz04Hqv+XFVehkqM7uE2FL
+         uUr49itTlg52Zkkt/YclXf6ylsMeBfANnqn8dgnaUO4R6y/MEpHaCO0eRda2tPifZc
+         da3zANEfReImg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pVThq-00CqLC-Ib;
-        Fri, 24 Feb 2023 08:45:31 +0000
-Date:   Fri, 24 Feb 2023 08:45:30 +0000
-Message-ID: <865ybrxxhx.wl-maz@kernel.org>
+        id 1pVTvD-00CqTD-NT;
+        Fri, 24 Feb 2023 08:59:19 +0000
+Date:   Fri, 24 Feb 2023 08:59:19 +0000
+Message-ID: <864jrbxwuw.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Colton Lewis <coltonlewis@google.com>
 Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -46,10 +46,10 @@ Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         suzuki.poulose@arm.com, oliver.upton@linux.dev,
         yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de,
         dwmw2@infradead.org
-Subject: Re: [PATCH 00/16] KVM: arm64: Rework timer offsetting for fun and profit
-In-Reply-To: <gsnt4jrc9fsm.fsf@coltonlewis-kvm.c.googlers.com>
-References: <20230216142123.2638675-1-maz@kernel.org>
-        <gsnt4jrc9fsm.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH 06/16] KVM: arm64: timers: Use CNTPOFF_EL2 to offset the physical timer
+In-Reply-To: <gsntzg948104.fsf@coltonlewis-kvm.c.googlers.com>
+References: <20230216142123.2638675-7-maz@kernel.org>
+        <gsntzg948104.fsf@coltonlewis-kvm.c.googlers.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -59,8 +59,8 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de, dwmw2@infradead.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,74 +68,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 23 Feb 2023 22:29:29 +0000,
+On Thu, 23 Feb 2023 22:34:19 +0000,
 Colton Lewis <coltonlewis@google.com> wrote:
 > 
-> Hello Marc,
 > 
-> This patch is of special interest to me as I was working on my own
-> ECV/CNTPOFF implementation, although mine was more narrow and doesn't
-> address any of your other goals. As far as I can tell at the moment,
-> your patch can cover the uses of mine, so I will dedicate
-> myself to reviewing and testing yours. Please include me on any future
-> rerolls of this patch.
+> CNTPOFF_EL2 should probably be added to the vcpu_sysreg enum in
+> kvm_host.h for this patch. This seemed like the most relevant commit.
 > 
 > Marc Zyngier <maz@kernel.org> writes:
 > 
-> > This series aims at satisfying multiple goals:
+> > +static bool has_cntpoff(void)
+> > +{
+> > +	return (has_vhe() && cpus_have_final_cap(ARM64_HAS_ECV_CNTPOFF));
+> > +}
+> > +
 > 
-> > - allow a VMM to atomically restore a timer offset for a whole VM
-> >    instead of updating the offset each time a vcpu get its counter
-> >    written
-> 
-> > - allow a VMM to save/restore the physical timer context, something
-> >    that we cannot do at the moment due to the lack of offsetting
-> 
-> > - provide a framework that is suitable for NV support, where we get
-> >    both global and per timer, per vcpu offsetting
-> 
-> 
-> If I am understanding your changes correctly, you introduce some VM-wide
-> timers with no hardware backing and a new API to access them from
-> userspace. This is useful both because it makes the code simpler (no
-> need to manually keep registers in sync), and so CNT{V,P}OFF can be
-> appropriately virtualized with NV. Is that a fair summary of the
-> important bits?
+> This being used to guard the register in set_cntpoff seems to say that
+> we can only write CNTPOFF in VHE mode. Since it's possible the
+> underlying hardware could still support CNTPOFF even if KVM is running
+> in nVHE mode, should there be a way to set CNTPOFF in nVHE mode? Is that
+> possible?
 
-I think you are conflating a lot of things:
-
-- We always were able to fully emulate a timer: see how non-VHE
-  emulates the physical timer. What this allows is to move a HW timer
-  from being "direct" to being *partially* emulated, still using the
-  HW, but offsetting the counter (and thus requiring trapping).
-
-- CNTPOFF isn't virtualised yet. Actually, none of ECV is virtualised.
-  And I'm not convinced it can be virtualised if the HW doesn't
-  support it.
-
-- There is no new API for the timers. We only expose the physical
-  timer within the existing API. The new API is solely for the purpose
-  of setting the offsets.
+It would have to happen at EL2 (the register is called CNTPOFF_EL2,
+which should give you a clue). This code execute at EL1 when running
+nVHE, so any CNTPOFF_EL2 access would UNDEF.
 
 > 
-> > This has been moderately tested with nVHE, VHE and NV. I do not have
-> > access to CNTPOFF-aware HW, so the jury is still out on that one. Note
-> > that the NV patches in this series are here to give a perspective on
-> > how this gets used.
-> 
-> > I've updated the arch_timer selftest to allow offsets to be provided
-> > from the command line, but the arch_test is pretty flimsy and tends to
-> > fail with an error==EINTR, even without this series. Something to
-> > investigate.
-> 
-> I can help you with testing because I have access to CNTPOFF-aware
-> hardware and emulators. Is there anything you are especially interested
-> to try out?
+> This caused some confusion for me on my implementation as some teammates
+> thought so but I could not get an implementation working for nVHE mode.
 
-Well, anything that makes use of CNTPOFF would be most helpful,
-assuming you're confident that the quality of implementation of the HW
-is sufficient (I have terrible memories of finding timer bugs in
-emulation due to badly emulated clock domains...).
+Using CNTPOFF for nVHE is utterly pointless unless you start
+offloading the host's physical timer to the EL2 physical timer on
+entry. Otherwise, you completely screw the host timer and everybody
+dies.
+
+> > @@ -84,7 +89,7 @@ u64 timer_get_cval(struct arch_timer_context *ctxt)
+> 
+> >   static u64 timer_get_offset(struct arch_timer_context *ctxt)
+> >   {
+> > -	if (ctxt->offset.vm_offset)
+> > +	if (ctxt && ctxt->offset.vm_offset)
+> >   		return *ctxt->offset.vm_offset;
+> 
+> >   	return 0;
+> 
+> nit: this change should be in the previous commit
+
+No. I don't even think this is required anymore, due to the way the
+offset is now handled on the VHE-only path.
+
+> 
+> > @@ -480,6 +491,7 @@ static void timer_save_state(struct
+> > arch_timer_context *ctx)
+> >   		write_sysreg_el0(0, SYS_CNTP_CTL);
+> >   		isb();
+> 
+> > +		set_cntpoff(0);
+> >   		break;
+> >   	case NR_KVM_TIMERS:
+> >   		BUG();
+> 
+> This seems to say CNTPOFF will be reset to 0 every time a vcpu
+> switches out. What if the host originally had some value other than 0?
+> Is KVM responsible for that context?
+
+The host never has any value other than zero, just like it doesn't
+have a value other than 0 for CNTVOFF_EL2. See the comment a few lines
+above that explain the rationale for CNTVOFF, which mostly applies to
+CNTPOFF as well.
 
 Thanks,
 
