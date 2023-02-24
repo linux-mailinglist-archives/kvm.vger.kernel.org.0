@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A9B956A171B
-	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 08:28:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 392606A171F
+	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 08:28:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229804AbjBXH2D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Feb 2023 02:28:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40206 "EHLO
+        id S229863AbjBXH2Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Feb 2023 02:28:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229712AbjBXH15 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Feb 2023 02:27:57 -0500
+        with ESMTP id S229785AbjBXH2A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Feb 2023 02:28:00 -0500
 Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24F9F63DD1;
-        Thu, 23 Feb 2023 23:27:30 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0475865AD;
+        Thu, 23 Feb 2023 23:27:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677223650; x=1708759650;
+  t=1677223675; x=1708759675;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=pa/cUeOfLDEP4cCNm1hlvFI0kYRiN/TNYCvAsLAxF3I=;
-  b=jPugHKnk4TE7Gtx3DQcFx9EeDvFRCFz/ZZyEmATFUx7tBZfTOOq9FMF1
-   vYufS7WkRzCH4mJoKoVsie0ixlHZVr5cUTRrVEGwHV0Ce210hWF5AaTSl
-   bqB02dsWQAmZZkrJyMf8DFfWK9994xQFjrIb9ptJS70SdGWI2OaHXWAEy
-   4/PHKCcqF4qeQcr/ptxDDbfkrFhKj1gNcXDIKBysaxawsao3z8Z+xIyM8
-   ycajb5Eg3A4UE5mqF36nIpgKe/oRPHjbveYkE5owwA4A0j1LeG2PRaspO
-   oGD+tHj6IotiNigX+N8lWi8zqljpH9/Cv5UllGWk0VUGIzJJKOaLAAzK+
+  bh=5ojl4mrz7EluvMPfPkXTnSlfudBddxu4Pmb5fcSRBp4=;
+  b=Tp63Vz3gpKZhF217zJNL3ZZ6XzIRQ0GD+MZOhoYw0XZIPXlNh/vdLLjP
+   wf1M4gksykRmZ/m0jCBV6r4RJfCyOybh1ap6/I85Rtp6NOYZU2vq75+LF
+   yPTfBbkM7PbpztJyyHMck0kbE6jp/AzswcQ6GajRpS5pf0H19QPMT2ETD
+   EPuw9uBJj5sfv4jv/n8+6v5liiJDTpTlBmZs/bPhNzGlv4l7Z/HnlnotQ
+   HKQMRr3xraXQC0nEDio/o7+kyeR4ywSy1wCXY4XsbkJTQWml6hTfYnEpa
+   gHP+k1ed3AFa1y6RqncyA5IWkq+j+mo1NKzeO+h9lnqwmw/Ju1gb2ufsH
    g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10630"; a="334835948"
+X-IronPort-AV: E=McAfee;i="6500,9779,10630"; a="334835959"
 X-IronPort-AV: E=Sophos;i="5.97,324,1669104000"; 
-   d="scan'208";a="334835948"
+   d="scan'208";a="334835959"
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
   by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2023 23:27:21 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10630"; a="815639197"
+X-IronPort-AV: E=McAfee;i="6500,9779,10630"; a="815639200"
 X-IronPort-AV: E=Sophos;i="5.97,324,1669104000"; 
-   d="scan'208";a="815639197"
+   d="scan'208";a="815639200"
 Received: from unknown (HELO fred..) ([172.25.112.68])
   by fmsmga001.fm.intel.com with ESMTP; 23 Feb 2023 23:27:20 -0800
 From:   Xin Li <xin3.li@intel.com>
@@ -44,9 +44,9 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         dave.hansen@linux.intel.com, hpa@zytor.com, peterz@infradead.org,
         andrew.cooper3@citrix.com, seanjc@google.com, pbonzini@redhat.com,
         ravi.v.shankar@intel.com
-Subject: [RFC PATCH v3 04/32] x86/traps: add external_interrupt() to dispatch external interrupts
-Date:   Thu, 23 Feb 2023 23:01:17 -0800
-Message-Id: <20230224070145.3572-5-xin3.li@intel.com>
+Subject: [RFC PATCH v3 05/32] x86/traps: export external_interrupt() for VMX IRQ reinjection
+Date:   Thu, 23 Feb 2023 23:01:18 -0800
+Message-Id: <20230224070145.3572-6-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230224070145.3572-1-xin3.li@intel.com>
 References: <20230224070145.3572-1-xin3.li@intel.com>
@@ -62,68 +62,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
+To eliminate dispatching IRQ through the IDT, export external_interrupt()
+for VMX IRQ reinjection.
 
-Add external_interrupt() to dispatch external interrupts to their
-handlers. If an external interrupt is a system interrupt, dipatch
-it through system_interrupt_handler_table, otherwise call into
-dispatch_common_interrupt().
-
-Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
-Co-developed-by: Xin Li <xin3.li@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
- arch/x86/kernel/traps.c | 41 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+ arch/x86/include/asm/traps.h |  2 ++
+ arch/x86/kernel/traps.c      | 14 ++++++++++++++
+ 2 files changed, 16 insertions(+)
 
+diff --git a/arch/x86/include/asm/traps.h b/arch/x86/include/asm/traps.h
+index 46f5e4e2a346..da4c21ed68b4 100644
+--- a/arch/x86/include/asm/traps.h
++++ b/arch/x86/include/asm/traps.h
+@@ -56,4 +56,6 @@ void __noreturn handle_stack_overflow(struct pt_regs *regs,
+ 	void f (struct pt_regs *regs)
+ typedef DECLARE_SYSTEM_INTERRUPT_HANDLER((*system_interrupt_handler));
+ 
++int external_interrupt(struct pt_regs *regs, unsigned int vector);
++
+ #endif /* _ASM_X86_TRAPS_H */
 diff --git a/arch/x86/kernel/traps.c b/arch/x86/kernel/traps.c
-index c0f7666140da..31ad645be2fb 100644
+index 31ad645be2fb..cebba1f49e19 100644
 --- a/arch/x86/kernel/traps.c
 +++ b/arch/x86/kernel/traps.c
-@@ -1499,6 +1499,47 @@ void __init install_system_interrupt_handler(unsigned int n, const void *asm_add
- 	alloc_intr_gate(n, asm_addr);
+@@ -1540,6 +1540,20 @@ int external_interrupt(struct pt_regs *regs, unsigned int vector)
+ 	return 0;
  }
  
-+#ifndef CONFIG_X86_LOCAL_APIC
++#if IS_ENABLED(CONFIG_KVM_INTEL)
 +/*
-+ * Used when local APIC is not compiled into the kernel, but
-+ * external_interrupt() needs dispatch_spurious_interrupt().
++ * KVM VMX reinjects IRQ on its current stack, it's a sync call
++ * thus the values in the pt_regs structure are not used in
++ * executing IRQ handlers, except cs.RPL and flags.IF, which
++ * are both always 0 in the VMX IRQ reinjection context.
++ *
++ * However, the pt_regs structure is sometimes used in stack
++ * dump, e.g., show_regs(). So let the caller, i.e., KVM VMX
++ * decide how to initialize the input pt_regs structure.
 + */
-+DEFINE_IDTENTRY_IRQ(spurious_interrupt)
-+{
-+	pr_info("Spurious interrupt (vector 0x%x) on CPU#%d, should never happen.\n",
-+		vector, smp_processor_id());
-+}
++EXPORT_SYMBOL_GPL(external_interrupt);
 +#endif
-+
-+/*
-+ * External interrupt dispatch function.
-+ *
-+ * Until/unless dispatch_common_interrupt() can be taught to deal with the
-+ * special system vectors, split the dispatch.
-+ *
-+ * Note: dispatch_common_interrupt() already deals with IRQ_MOVE_CLEANUP_VECTOR.
-+ */
-+int external_interrupt(struct pt_regs *regs, unsigned int vector)
-+{
-+	unsigned int sysvec = vector - FIRST_SYSTEM_VECTOR;
-+
-+	if (vector < FIRST_EXTERNAL_VECTOR) {
-+		pr_err("invalid external interrupt vector %d\n", vector);
-+		return -EINVAL;
-+	}
-+
-+	if (sysvec < NR_SYSTEM_VECTORS) {
-+		if (system_interrupt_handlers[sysvec])
-+			system_interrupt_handlers[sysvec](regs);
-+		else
-+			dispatch_spurious_interrupt(regs, vector);
-+	} else {
-+		dispatch_common_interrupt(regs, vector);
-+	}
-+
-+	return 0;
-+}
 +
  void __init trap_init(void)
  {
