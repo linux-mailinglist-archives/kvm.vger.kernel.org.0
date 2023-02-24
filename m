@@ -2,186 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B9936A1FB7
-	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 17:34:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DD6A6A1FFA
+	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 17:48:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229908AbjBXQeu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Feb 2023 11:34:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34702 "EHLO
+        id S230015AbjBXQsX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Feb 2023 11:48:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229881AbjBXQeq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Feb 2023 11:34:46 -0500
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D399144BD;
-        Fri, 24 Feb 2023 08:34:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677256485; x=1708792485;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=f4c18coto8+HDnq3B20rP2UjB3F+aIkPmnXnlYKu5Ck=;
-  b=gAAbqYcQjshu/VwF5NStb05kHzZfZXK5a5dQg+/pQ4FGZk281zmTyD6j
-   N2dhG6m9KEEj4y0ZsfxfwsWRQ5U/imx+RggHE336TB/E1heXhAg2Ja048
-   5Y4IYqnEUwPaVv8DrQUgPAjUX2IGbyE1tFOxAk87znAJJS5vwYLTCStqY
-   SZo8PhnwM78xTcttYkxPQCgzNLsLW/xmQqN2CqoT4h3C6N2esqCMAaJtT
-   VUttt/TW3ZdZuaqC5kordoYkEiQ1ScxTrV/uXZSEqbxmW6bQ4DOhQCejv
-   mzXoYwCXyjurwF9HbD4g+elkEpT09rDWYnZwYESQ1homtRn+za9edReLK
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10631"; a="313155345"
-X-IronPort-AV: E=Sophos;i="5.97,325,1669104000"; 
-   d="scan'208";a="313155345"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2023 08:34:41 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10631"; a="782422336"
-X-IronPort-AV: E=Sophos;i="5.97,325,1669104000"; 
-   d="scan'208";a="782422336"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmsmga002.fm.intel.com with ESMTP; 24 Feb 2023 08:34:41 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Fri, 24 Feb 2023 08:34:40 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Fri, 24 Feb 2023 08:34:40 -0800
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16 via Frontend Transport; Fri, 24 Feb 2023 08:34:40 -0800
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.168)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.16; Fri, 24 Feb 2023 08:34:39 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SKU/dZnqviYoI7FMKOLsJUpy4IO78w19YuEAMvHgJl2bkbw4f6ICfxMuAI15MmLyHsfg46ZBtydHzZ6Py/Lpkbx3menISpj8egwZ509qgmU2XxEsyoqKCA0V08t+yREe1u/ZY0bD5I7+RoRzUcUSqwR8dnKVD9u87PAHNVvZiKnPd2fnYrNAkNbyPlmkTP6R5al5SV862SEGhOkI4HhP1OyukGYwKEhfzSSl7Y3rGprLkaLmPvCwJ8nJw5EAtJLkKLn9f2hs1O3eFQ+7uDgOvgO6yOc0iXf8BwnF99h+PmgmbuGSODTKlwAvupvNFMO4+bVgZJuFOLvhrFD9xHv0QQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=f4c18coto8+HDnq3B20rP2UjB3F+aIkPmnXnlYKu5Ck=;
- b=N3mGjUzIR2RnHVv9qYvsJFXEiDmJTAJJXkT2gviCPkICC/yrmmGkCjHKq+dm/HWe9ejpXMNi8sW8EWMB5a/HhnjXIMRzFlIkBH95GzXhCM7S1MDesY/mjhhaBfgXJffPXxsnhqOOAmO2llKUopkf6aRKu2BRC9t5WbuK1ld3yPOFvgV5kBbapQySgxj/8IpBVCE/E/rWaH1jczMrVPggra8MpEOe1XcoiUrR9674xt4zT50PV5v4jmmyMqM7+qFhHV0SFCu1YHRMTYhoIQLgH+jurL6pvSyszqBfvestlCCFZGSE4iGp6OOrCYH+Y7uJL3KbSjtVmu+oEi1LkwhHPA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from SA1PR11MB6734.namprd11.prod.outlook.com (2603:10b6:806:25d::22)
- by PH0PR11MB4967.namprd11.prod.outlook.com (2603:10b6:510:41::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.21; Fri, 24 Feb
- 2023 16:34:36 +0000
-Received: from SA1PR11MB6734.namprd11.prod.outlook.com
- ([fe80::7576:1f4a:2a6c:72f7]) by SA1PR11MB6734.namprd11.prod.outlook.com
- ([fe80::7576:1f4a:2a6c:72f7%2]) with mapi id 15.20.6134.024; Fri, 24 Feb 2023
- 16:34:36 +0000
-From:   "Li, Xin3" <xin3.li@intel.com>
-To:     "andrew.cooper3@citrix.com" <andrew.cooper3@citrix.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Shankar, Ravi V" <ravi.v.shankar@intel.com>
-Subject: RE: [RFC PATCH v3 15/32] x86/fred: make unions for the cs and ss
- fields in struct pt_regs
-Thread-Topic: [RFC PATCH v3 15/32] x86/fred: make unions for the cs and ss
- fields in struct pt_regs
-Thread-Index: AQHZSCGoAtP+d2NP6kO8XHsOE5TSfq7d7fwAgABcnqA=
-Date:   Fri, 24 Feb 2023 16:34:36 +0000
-Message-ID: <SA1PR11MB673406B8B43E18F0BD11C8DBA8A89@SA1PR11MB6734.namprd11.prod.outlook.com>
-References: <20230224070145.3572-1-xin3.li@intel.com>
- <20230224070145.3572-16-xin3.li@intel.com>
- <bf1ad4c3-73eb-0f8f-e627-a7e0785fe903@citrix.com>
-In-Reply-To: <bf1ad4c3-73eb-0f8f-e627-a7e0785fe903@citrix.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA1PR11MB6734:EE_|PH0PR11MB4967:EE_
-x-ms-office365-filtering-correlation-id: c8da665e-6a3d-43b3-0aaf-08db16850465
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ETVWOirXSt+vflRPplhMbjWSBCEFKjxy5Te27bB4ngCPS/8xYikvT3X6zsyQZLYaFXe0AHaWvptC43iEoqq+oXNroZxV2pRROSqhAsTqf4m4MR/HhWzMG9Uz9JSi7xPzB//STOQtlCjgUcllYijLmYiiq66XJBkAUpnm2knTy2uCYDN86TQC6+bGMlEVbfHUsVEnHLHqaEKRU0iaH6IbbytdUX/UecD5lRBX3fgcfHCh4jAV/RTeyTuyLZMAI+ocsO6MLsIBlcksxmZXkzS4t1OQPrWz0USU9zbiKzWsPCZwm6Vh0p0u/2Dgm7vkSX3pgG67dM7/zqC85r05PqRkNxWjBHtj0zzCQCA0oaqZ6BVv7yMvpuMuCHBCsRZkOZCNfhh4UdL2P/qZulUzlRkqpDT+jn14FiCHVcFJuSf/AEMw7S7W91ael06xGSFou09qsZssgS4kK+kf591Wg5Kz/vGJ/YLGXy5TX15oG3kJW6qMoC2LovnEK5eJfWAs5CrCX7NXUbGLucbmLs5SOL7+FlvJ9zg6vGAR/QjtW+fQ6M3ah6fxc/vau22MGRYCgRxNCIuePF6AzoW1t6FuohoH+27HtunAMePiKsEdHPq+CHtRUZpKs//pHRSCWvawrcbzAKhkrXfTCqQrEnLe32NnmvUrLi+wuc0Qjg0ylyA2zyqXM7XLdInO1h60tLWbioiqKXZ5rJUIEozheeimnTEtQw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR11MB6734.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(396003)(346002)(376002)(136003)(366004)(39860400002)(451199018)(82960400001)(8676002)(7416002)(4326008)(4744005)(8936002)(64756008)(52536014)(2906002)(41300700001)(55016003)(38100700002)(5660300002)(66446008)(122000001)(9686003)(7696005)(26005)(33656002)(186003)(6506007)(86362001)(71200400001)(316002)(38070700005)(66476007)(76116006)(66946007)(66556008)(110136005)(478600001)(54906003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?a1BlMUVyaXFMNVRFWk1oQnpLZkdCWVo5eSs0L2tmS1J6dG9wQnhyNmVYdWRw?=
- =?utf-8?B?OWlEUVZnWkhtTndwaXUycndzOEdWdityU3RMQzE1SnErU3BXYjY1QTkwWk1k?=
- =?utf-8?B?Q1NrQTY5M0x4RGpnZ0tCeEJMdncrY0FFODhlQUp0am1qTVgyb09UdTJKWlNF?=
- =?utf-8?B?WmFiaktrMHZ2ZnJscVVaMk04SlIvMWI3VGZCSkpicUxKak5qWHVFNmdBNklK?=
- =?utf-8?B?UVp0RUZnbWxINU1RQnFDTEFET1FtMnhpYk1reTNoWVNpdU9LR1FRLzhrNFl0?=
- =?utf-8?B?WXpyOWJhVms3a0dsY1M2YlpYMTNPRkNteUVFcmtCVmhDaktPWnRkdWcxZklo?=
- =?utf-8?B?clB3ajFvL1hmTlZyMytaRFBZMkE2T1JzMThNV0tQbmd4TmNXQUFZL2tYOWEw?=
- =?utf-8?B?UDlyMGtlVGY2Z1EraGlKTnJ6MStKNkNtb2doekFkNmdXK0lMWmNXR0paZC82?=
- =?utf-8?B?aCtheUdIdUkybnp5MHNSaHlYanN4RzZPYkpHb21mMlRBRnN2YmZhUHpIbjB2?=
- =?utf-8?B?MXNrK2hDWTdrdzFoUTRldDFncFRXY25XZjRUWFl5WEswT3QzazdSS1dua2pz?=
- =?utf-8?B?M2tDbldkWWZVOE9ST2V6eTdzM0tqZmgzSDdoMlJkNGxnd2w2L2lTZ2pGMVJm?=
- =?utf-8?B?Mm5qa3pLdSs3K1ZJT21NT3k2MGEyRzVvMXVSRzBPUlVNSkR2SFBIMjNKclJv?=
- =?utf-8?B?TVlnNjVkR3pJZWJhWDl4Z0J4U1R6dDd5SFk3OXU5TEw2RjhZVVNsVXFwNHRV?=
- =?utf-8?B?YXJXUWNBRFg1eHpQa0x6VGZxM050TDV5d3g5N0s3d3lKR3RxQ0pGbWNScXB6?=
- =?utf-8?B?eUN4NUF1YnFZaU5RV0poeUd2LzVYd3hMZXNpMVN6UzIraUlLTjhRRnVsWDMv?=
- =?utf-8?B?QlZMWUI3bHI4SU5LOUJ4UTVORVNKdngvMTJ1cndkNEQxYnpHaklxZjU3VXZs?=
- =?utf-8?B?Qlc4ZVN3dm1DcWdyVDAxKzZ0ZUF4THNwcUhQZXU4eldWVGo0ekhpUlJRd2Zx?=
- =?utf-8?B?UmNteXRzMExqMjdENUdoSHAwMndyZEluTDZ3Q2JrYVkrdFFGOFF1LzB0RjBE?=
- =?utf-8?B?Ylp6eFVzZlliNWhhd2w1OUIxNHdnWUdmN3UxdlFmVENHWkZHN2RrbXRIODhh?=
- =?utf-8?B?ODFCQURod1AzNEZ3c3ZhWkprTXcwQzRJeDlMZmttS05nS1AzanVGMlZWUytx?=
- =?utf-8?B?RE1KU0dBdkptcVM0SDZuTGVaeGxhcFFieCtEOTBGVVo0SEE4Z0ZwMVdGNUZ4?=
- =?utf-8?B?QVowbFU4dGRYdUozeWtXOXRtZXV5MjFEMzZkTndIaVBDRkFpb095NzhpQUFV?=
- =?utf-8?B?eWVQN3dKTUluRzFlRFl5c3lHYUkwaWsxVm90Wk9USVYzMWpBanRoYUt4cVFt?=
- =?utf-8?B?V2R0WnZWb0RGSWU1aytaYW14RXFIVkt4Zk9TV09WbWluYzBJL2JKWjhObEI3?=
- =?utf-8?B?ejJwU050OVQwQ0NiNDRHeFJJWW40L3NaUFNtOGdBenUvQTZBUml6TU9wTEJI?=
- =?utf-8?B?STdyZGhLb3VTVWJ5OUZ4V1FYSWFreUVyWk1xUFppanl2NDc2a0NhSmgwMzJT?=
- =?utf-8?B?ODVpQ0pBUitIREFaR1ZPS052UVV0aHN3VThFM214NHQwNTBQazFFWEVCMkRD?=
- =?utf-8?B?M21yaEppeFptZGRMeHJrWHRJem9neUg0Zjl6b1FBNlVCQlpqQW1GRG1Ld2V2?=
- =?utf-8?B?eEh3WlIrazA0dXE5NVRtYXhoMnUzazJzdDVXUFVQMTcwSmFNTjZJOTM5UTAx?=
- =?utf-8?B?VlFPbFFNbkw4R1hjVVhVRWdpK3R6bW9jNUVsL2dPc0F4bFJERXNjYTFPS0Fp?=
- =?utf-8?B?QUlaWmU3RnpYa0x2SWpPV3B4eDhOcGxuTkhhaVJ5N0pCRERUYVE0UE5LK2lU?=
- =?utf-8?B?U2NxZlNUY0pYUXV5aC9ZVEdJSURWR1pKVDd5bTBzWU9rdnlhT1p2TmdsUDhM?=
- =?utf-8?B?UkJXUFpEQitnZExWdmJvN3hjVTQ0MVZ2WTRKVll2ZVhleGxjYjA4aEtNNXc4?=
- =?utf-8?B?OWlaczRZa1B3K054UmF3c0VMdEZWaGVWT0l6NEZCRHVlendxeWJLdnUreGll?=
- =?utf-8?B?ajIyRGwxTnVnV2Z3TkkzT2tOdnhtaGZhbjlKZGZMT0UrbURxaXRkcnBBRi9Q?=
- =?utf-8?Q?x0pw=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR11MB6734.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c8da665e-6a3d-43b3-0aaf-08db16850465
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Feb 2023 16:34:36.3093
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: P79AoNlGO8bzCiRtGwGWCrxFHnC6ba9w+Z3Umi7uXfOn7zX3z6gnmWT9gStHqSu/YpLgVTN6j7oyl6djh2Rfcw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4967
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229539AbjBXQsW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Feb 2023 11:48:22 -0500
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD6051EBDF
+        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 08:48:20 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id x30-20020a056a00189e00b005a8e8833e93so6994604pfh.12
+        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 08:48:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ILR0j/26JTsbcQk101qnmkclUDQ7nmjDuNRVz9SIjzI=;
+        b=PjUhLjR5FU+VRl8izc310auUt5M2kk/e9s/SRQxu6s50yPRY0S9RACug3nUHBfk9C3
+         XzuqZHweYxk2chzDD/KWsWWaXMZqvDKyMdfBxiYzJlid7LAt9rwCiBmDBqCIKdmwqcXn
+         Hd8lAbl5j8WCHvCZXwPt8ajRA2PokgkH7hksN04xcuSf0/hK3knYe9ujdVJjNz/wmvpI
+         wqGOS4l3qEkIQ0IZ4xXzzEode6GfYKh1OB2Fd7tDQHxc+FWBbZHZZIHHAg39rReSWpfm
+         hE6dNCLGYAy9ATyjnW4hEjjkaeSbxyFFsLjGRKgKkzOoT6Iuy9fqNys9+ukLkDLmeeGB
+         kezg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ILR0j/26JTsbcQk101qnmkclUDQ7nmjDuNRVz9SIjzI=;
+        b=YU8XaCt/O3KeDc+cux8lepjF5q3DWlh1oX8qbnyw5OSU5uwgEwJvAfWoMJ87LxG1k/
+         /djL+kvVKn/yyCWlvRV3TCffPGOuG8QJPaepO/Gwfp3Y+YDmBzfKhT5igQqXOJcNlNA9
+         7O7z47toYZozu6P6S9nKGqQDV3e+rmPjo42+rjLC9K8lpQs+lUI/ChISzl0k8OCFO92K
+         Ras6wm8I1ZLGgqDnLLCdmOQ2FidoWKHTb3+duLlVHt7wGaszUtKXPNpMozE/cLJRIX6U
+         7JzuFYhJZu4bdmIUThc9c93lT4KTFPHRVFMJU4VZCL/Y0IQyw4E3H0XQAt48Le+bDsAk
+         rCWQ==
+X-Gm-Message-State: AO0yUKWTWiu8w/ze34/umDq0/fvMP1kVSf8XH7k2NoQjZnlWfjUi4XkZ
+        OZE33jyZ1Web+8sFenMXgtylLhJTmPk=
+X-Google-Smtp-Source: AK7set8aro7L74Rqb5E5ITiT/vmpAgslfSFlgbbLNq7rVNbg/bLDNVUGqn9MNt5Fkz4J25zobYFuEDhSnxc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:f7c7:b0:19c:140d:aad7 with SMTP id
+ h7-20020a170902f7c700b0019c140daad7mr3144766plw.4.1677257300003; Fri, 24 Feb
+ 2023 08:48:20 -0800 (PST)
+Date:   Fri, 24 Feb 2023 08:48:18 -0800
+In-Reply-To: <3ad0d6fdd65a90150358c62161e392736f55a1b4.camel@redhat.com>
+Mime-Version: 1.0
+References: <20221129193717.513824-1-mlevitsk@redhat.com> <20221129193717.513824-3-mlevitsk@redhat.com>
+ <Y9RuQz8dAT7DZGYk@google.com> <Y9hybI65So5X2LFg@google.com> <3ad0d6fdd65a90150358c62161e392736f55a1b4.camel@redhat.com>
+Message-ID: <Y/jqUgR6zTcptcxw@google.com>
+Subject: Re: [PATCH v2 02/11] KVM: nSVM: clean up the copying of V_INTR bits
+ from vmcb02 to vmcb12
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Sandipan Das <sandipan.das@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+        Jiaxi Chen <jiaxi.chen@linux.intel.com>,
+        Babu Moger <babu.moger@amd.com>, linux-kernel@vger.kernel.org,
+        Jing Liu <jing2.liu@intel.com>,
+        Wyes Karny <wyes.karny@amd.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiA+ICsJdW5pb24gew0KPiA+ICsJCXVuc2lnbmVkIGxvbmcgIGNzbDsgLyogQ1MgKyBhbnkgZmll
-bGRzIGFib3ZlIGl0ICovDQo+IA0KPiBJIGd1ZXNzIHRoYXQgQ1NMIGhlcmUgaXMgc3VwcG9zZWQg
-dG8gbWVhbiBjcyBsb25nLCBidXQgQ1NMIChDdXJyZW50IFN0YWNrIExldmVsKSBpcyBhDQo+IG5l
-dyB0ZXJtIGluIHRoZSBGUkVEIHNwZWMgd2hpY2ggaXNuJ3QgdGhpcy4NCg0KR29vZCBjYXRjaCEN
-Cg0KPiANCj4gVGhpcyBjYXVzZXMgY2hhbmdlcyBzdWNoIGFzIHRoZSBmaW5hbCBodW5rIGluIHBh
-dGNoIDI3IHRvIHJlYWQgaW5jb3JyZWN0bHksIGRlc3BpdGUNCj4gYmVpbmcgdGVjaG5pY2FsbHkg
-Y29ycmVjdC4NCj4gDQo+IGNzX3Nsb3Qgd291bGQgYmUgbXVjaCBjbGVhcmVyIGluIGNvZGUsIGJ1
-dCB0YmgsIGV2ZW4gY3NfbCB3b3VsZCBiZSBiZXR0ZXIgdGhhbiB0aGUNCj4gdmVyc2lvbiB3aXRo
-b3V0IGFuIHVuZGVyc2NvcmUuDQoNCmNzX3Nsb3Qgc291bmRzIGEgZ29vZCB0ZXJtIHVubGVzcyBz
-b21lb25lIGNvbWVzIHVwIHdpdGggYSBiZXR0ZXIgb25lLg0KDQo+IA0KPiBBbmQgb2J2aW91c2x5
-LCB3aGF0ZXZlciBpcyBkb25lIGhlcmUgc2hvdWxkIGJlIG1pcnJvcmVkIGZvciBzcy4NCg0KUHJv
-YmFibHkgc3Nfc2xvdCB0aGVuLg0KICBYaW4NCg==
+On Fri, Feb 24, 2023, Maxim Levitsky wrote:
+> On Tue, 2023-01-31 at 01:44 +0000, Sean Christopherson wrote:
+> > On Sat, Jan 28, 2023, Sean Christopherson wrote:
+> > So I think this over two patches?
+> > 
+> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> > index 05d38944a6c0..ad1e70ac8669 100644
+> > --- a/arch/x86/kvm/svm/nested.c
+> > +++ b/arch/x86/kvm/svm/nested.c
+> > @@ -139,13 +139,18 @@ void recalc_intercepts(struct vcpu_svm *svm)
+> >  
+> >         if (g->int_ctl & V_INTR_MASKING_MASK) {
+> >                 /*
+> > -                * Once running L2 with HF_VINTR_MASK, EFLAGS.IF and CR8
+> > -                * does not affect any interrupt we may want to inject;
+> > -                * therefore, writes to CR8 are irrelevant to L0, as are
+> > -                * interrupt window vmexits.
+> > +                * If L2 is active and V_INTR_MASKING is enabled in vmcb12,
+> > +                * disable intercept of CR8 writes as L2's CR8 does not affect
+> > +                * any interrupt KVM may want to inject.
+> > +                *
+> > +                * Similarly, disable intercept of virtual interrupts (used to
+> > +                * detect interrupt windows) if the saved RFLAGS.IF is '0', as
+> > +                * the effective RFLAGS.IF for L1 interrupts will never be set
+> > +                * while L2 is running (L2's RFLAGS.IF doesn't affect L1 IRQs).
+> >                  */
+> >                 vmcb_clr_intercept(c, INTERCEPT_CR8_WRITE);
+> > -               vmcb_clr_intercept(c, INTERCEPT_VINTR);
+> > +               if (!(svm->vmcb01.ptr->save.rflags & X86_EFLAGS_IF))
+> > +                       vmcb_clr_intercept(c, INTERCEPT_VINTR);
+> 
+> How about instead moving this code to svm_set_vintr?
+
+I considered that, but it doesn't handle the case where INTERCEPT_VINTR was set
+in vmcb01 before nested VMRUN, i.e. KVM is waiting for an interrupt window at
+the time of L1, and L1 doesn't set RFLAGS.IF=1 prior to VMRUN.
+
+> That is, in the guest mode, if the guest has V_INTR_MASKING_MASK, then
+> then a nested VM exit is the next point the interrupt window could open,
+> thus we don't set VINTR)
+> 
+> Or even better put the logic in svm_enable_irq_window (that is avoid
+> calling svm_set_vintr in the first place).
+> 
+> I also think that it worth it to add a warning that 'svm_set_intercept'
+> didn't work, that is didn't really set an intercept.
+
+Heh, I had coded that up too, but switched to bailing from svm_set_vintr() if the
+intercept was disabled because of the aforementioned scenario.
+
+> In theory that can result in nasty CVEs in addition to logic bugs as you found.
+
+I don't think this can result in a CVE, at least not without even worse bugs in
+L1.  KVM uses INTERCEPT_VINTR purely to detect interrupt windows, and failure to
+configure an IRQ window would at worst cause KVM to delay an IRQ.  If a missing
+or late IRQ lets L2 extract data from L1, then L1 has problems of its own.
+
+> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> > index b103fe7cbc82..59d2891662ef 100644
+> > --- a/arch/x86/kvm/svm/svm.c
+> > +++ b/arch/x86/kvm/svm/svm.c
+> > @@ -1580,6 +1580,16 @@ static void svm_set_vintr(struct vcpu_svm *svm)
+> >  
+> >         svm_set_intercept(svm, INTERCEPT_VINTR);
+> >  
+> > +       /*
+> > +        * Recalculating intercepts may have clear the VINTR intercept.  If
+> > +        * V_INTR_MASKING is enabled in vmcb12, then the effective RFLAGS.IF
+> > +        * for L1 physical interrupts is L1's RFLAGS.IF at the time of VMRUN.
+> > +        * Requesting an interrupt window if save.RFLAGS.IF=0 is pointless as
+> > +        * interrupts will never be unblocked while L2 is running.
+> > +        */
+> > +       if (!svm_is_intercept(svm, INTERCEPT_VINTR))
+> > +               return;
+> 
+> This won't be needed if we don't call the svm_set_vintr in the first place.
+> 
+> > +
+> >         /*
+> >          * This is just a dummy VINTR to actually cause a vmexit to happen.
+> >          * Actual injection of virtual interrupts happens through EVENTINJ.
+> > 
+> 
+> 
+> 
+> With all this said, I also want to note that this patch has *nothing* to do with VNMI,
+> I only added it due to some refactoring, so feel free to drop it from vNMI queue,
+> and deal with those bugs separately.
+
+Ya, let's tackle this in a separate series.  I'll circle back to this after rc1
+(I'm OOO next week).
+
+Santosh, in the next version of the vNMI series, can you drop any patches that
+aren't strictly necessary to enable vNMI?
