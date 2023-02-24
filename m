@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BD7A46A1726
-	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 08:28:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CB4D6A1727
+	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 08:28:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229606AbjBXH2W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Feb 2023 02:28:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40416 "EHLO
+        id S229926AbjBXH2X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Feb 2023 02:28:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229723AbjBXH2B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Feb 2023 02:28:01 -0500
+        with ESMTP id S229813AbjBXH2E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Feb 2023 02:28:04 -0500
 Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39B0415557;
-        Thu, 23 Feb 2023 23:27:58 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 391EC3645D;
+        Thu, 23 Feb 2023 23:28:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677223678; x=1708759678;
+  t=1677223680; x=1708759680;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=+NHRufqx3uD2JDcRRkT2OSWUCnw5FRpH1XcQKduLdUk=;
-  b=RWE/jgop6PK+myh+sc+KbWayTeRsrt7ahNHsRduhhV6CsZO1/Ue0WoSF
-   v+F+ePZQDSi6n9J4OPKWKrvG69ecxMRbNG5AWjSS0qReIlvOzTq968A0/
-   3+eHNSk0jTmrTzm0aKfiEU85MWWEWcRR0/GL5NmUHiZ4GpsnciRJNBBN+
-   XH3KjvRrYeLvHd1He0AqIdxfJZIZAQQKZ9yy1ABppaznTzEPCjl34KRle
-   106joPE1JhYmvWlSNH8JsIn7G+7SbqIPWbWdi6IDPntaG8fUUs5+ZFkK/
-   MYI0ZRhdK4pwhuRA7VY9J1QTTc9ppL4NYRROaDh0u244tRLjncAR9yIcn
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10630"; a="334835987"
+  bh=6QHPRwIE+z7Ui/OjlYLx1iEgisWIGhf7tIyqWsGywtA=;
+  b=efReIt8PnRFBlQAJYL6d92TBIB8Bjkk+RTq6qYDgQYvn2dem5csZP2IB
+   WX+J3o160kZ/30Yeuh20iN7Wzn0Nn3pEbvF4B6Evq0NVZbndX6b/+Fp/D
+   9D8oltpXJAckmEDwBU90+fzx7uUnWC3CELgIGQPo3qyxmtd7qs+G13BhJ
+   p2kghDwSXpM1iQ/p4zU+IxVb/gQ+OzHjzwIf9KrVenSMtHPWokyfkc9gB
+   S9tUFE1nDsKySCzrew3hkWqI41VsYrr89NlvM+y88vfbYbR4ewMMxu9Pi
+   t5VMgxYSM0DCDx5gsKuXT3gHZXHTq8/L43ilO5snUnyARwchI/tSNJ3P8
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10630"; a="334835992"
 X-IronPort-AV: E=Sophos;i="5.97,324,1669104000"; 
-   d="scan'208";a="334835987"
+   d="scan'208";a="334835992"
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2023 23:27:21 -0800
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2023 23:27:22 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10630"; a="815639213"
+X-IronPort-AV: E=McAfee;i="6500,9779,10630"; a="815639216"
 X-IronPort-AV: E=Sophos;i="5.97,324,1669104000"; 
-   d="scan'208";a="815639213"
+   d="scan'208";a="815639216"
 Received: from unknown (HELO fred..) ([172.25.112.68])
   by fmsmga001.fm.intel.com with ESMTP; 23 Feb 2023 23:27:21 -0800
 From:   Xin Li <xin3.li@intel.com>
@@ -44,9 +44,9 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         dave.hansen@linux.intel.com, hpa@zytor.com, peterz@infradead.org,
         andrew.cooper3@citrix.com, seanjc@google.com, pbonzini@redhat.com,
         ravi.v.shankar@intel.com
-Subject: [RFC PATCH v3 09/32] x86/cpu: add X86_CR4_FRED macro
-Date:   Thu, 23 Feb 2023 23:01:22 -0800
-Message-Id: <20230224070145.3572-10-xin3.li@intel.com>
+Subject: [RFC PATCH v3 10/32] x86/fred: add Kconfig option for FRED (CONFIG_X86_FRED)
+Date:   Thu, 23 Feb 2023 23:01:23 -0800
+Message-Id: <20230224070145.3572-11-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230224070145.3572-1-xin3.li@intel.com>
 References: <20230224070145.3572-1-xin3.li@intel.com>
@@ -64,52 +64,34 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
 
-Add X86_CR4_FRED macro for the FRED bit in %cr4. This bit should be a
-pinned bit, not to be changed after initialization.
+Add the configuration option CONFIG_X86_FRED to enable FRED.
 
 Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
- arch/x86/include/uapi/asm/processor-flags.h |  2 ++
- arch/x86/kernel/cpu/common.c                | 11 ++++++++---
- 2 files changed, 10 insertions(+), 3 deletions(-)
+ arch/x86/Kconfig | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/arch/x86/include/uapi/asm/processor-flags.h b/arch/x86/include/uapi/asm/processor-flags.h
-index c47cc7f2feeb..a90933f1ff41 100644
---- a/arch/x86/include/uapi/asm/processor-flags.h
-+++ b/arch/x86/include/uapi/asm/processor-flags.h
-@@ -132,6 +132,8 @@
- #define X86_CR4_PKE		_BITUL(X86_CR4_PKE_BIT)
- #define X86_CR4_CET_BIT		23 /* enable Control-flow Enforcement Technology */
- #define X86_CR4_CET		_BITUL(X86_CR4_CET_BIT)
-+#define X86_CR4_FRED_BIT	32 /* enable FRED kernel entry */
-+#define X86_CR4_FRED		_BITULL(X86_CR4_FRED_BIT)
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index a825bf031f49..da62178bb246 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -500,6 +500,15 @@ config X86_CPU_RESCTRL
  
- /*
-  * x86-64 Task Priority Register, CR8
-diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
-index 831a1a07d357..21237cb0aa93 100644
---- a/arch/x86/kernel/cpu/common.c
-+++ b/arch/x86/kernel/cpu/common.c
-@@ -412,10 +412,15 @@ static __always_inline void setup_umip(struct cpuinfo_x86 *c)
- 	cr4_clear_bits(X86_CR4_UMIP);
- }
+ 	  Say N if unsure.
  
--/* These bits should not change their value after CPU init is finished. */
-+/*
-+ * These bits should not change their value after CPU init is finished.
-+ * The explicit cast to unsigned long suppresses a warning on i386 for
-+ * x86-64 only feature bits >= 32.
-+ */
- static const unsigned long cr4_pinned_mask =
--	X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_UMIP |
--	X86_CR4_FSGSBASE | X86_CR4_CET;
-+	(unsigned long)
-+	(X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_UMIP |
-+	 X86_CR4_FSGSBASE | X86_CR4_CET | X86_CR4_FRED);
- static DEFINE_STATIC_KEY_FALSE_RO(cr_pinning);
- static unsigned long cr4_pinned_bits __ro_after_init;
- 
++config X86_FRED
++	bool "Flexible Return and Event Delivery"
++	depends on X86_64
++	help
++	  When enabled, try to use Flexible Return and Event Delivery
++	  instead of the legacy SYSCALL/SYSENTER/IDT architecture for
++	  ring transitions and exception/interrupt handling if the
++	  system supports.
++
+ if X86_32
+ config X86_BIGSMP
+ 	bool "Support for big SMP systems with more than 8 CPUs"
 -- 
 2.34.1
 
