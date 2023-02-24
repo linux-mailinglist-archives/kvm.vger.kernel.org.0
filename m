@@ -2,86 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2AA106A1DFC
-	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 16:06:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FF9A6A1E66
+	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 16:20:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229777AbjBXPGj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Feb 2023 10:06:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52884 "EHLO
+        id S230154AbjBXPU2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Feb 2023 10:20:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229470AbjBXPGh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Feb 2023 10:06:37 -0500
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CACC679B6;
-        Fri, 24 Feb 2023 07:06:36 -0800 (PST)
-Received: by mail-lj1-x232.google.com with SMTP id e9so14426517ljn.9;
-        Fri, 24 Feb 2023 07:06:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=r3QZB4TfMdCwmEYdbGrhQi/oX08bvtvcvl8M28Xvs1g=;
-        b=C1Gl8NWEYK3WMxfju4xsAu9HaKmq8aXEd7DJYgqK6k94bdTiWaCBwCm3WADAIPy67s
-         Ea/TP3czgCcAgvWk0Xe7Dp56xBZ45Hj8tFRnF2T0kKu5JyA7D0D/UvkLbSnVm/M1keE0
-         Gi3Q2sOiSLEgV8XZRXZ1eB9d3jdOeRxW2k2K3UY9O/oBGLew0FEorv9babK8B+4Iq+G7
-         OYtt0Cgumic0hQ0Vt7eoTbWh0+raaiee8xAs7yVZczQJH1shkFo+++BqzLjbnqFAf/Um
-         Z99cG9NIXVRMEWoqsQuOmRLugAuZS9r5ShZZ1xMnlr1l41BYy9qp5G8dLK2u3D0ePDcz
-         emrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=r3QZB4TfMdCwmEYdbGrhQi/oX08bvtvcvl8M28Xvs1g=;
-        b=HP6ChdQ0oqK1pgfj8FpK6j4lCVXTf0GaltjodHtYtaP0pnL8i+5KavTZS+4dwnL60m
-         NCqZQVmgFoXXGLCEniwJgfa6lu9igTVsKEqMMbLGIyl4l7oFJ1wbENGrCsbpLcXIOJGQ
-         sMdMnv6064+sw5I/rh6TMH0OlqGq8IuMcmGl51OwzFtv7O9RBwg0j3S5uHR9R4sSzTPQ
-         bIQ084qDdimk8Jb90Utjs6OTqhPKGFq8hyEp+T+/zFU/xp4dC6eW4MovWaP9GuELDW4f
-         gnDjJDYrP/qA9Heu3hcH7zP3Ufj0heOHZy7ksGGgF0NLl8Ov7KX89ZJLhoCi8B8VN/f6
-         RREw==
-X-Gm-Message-State: AO0yUKV7fZ/gTcpgiJydbMOYzfW+iEZMa8ZTwxQWp4ndfU0P400hbH0Z
-        awJ+9Bf9gXIli+7O/CRbsX0=
-X-Google-Smtp-Source: AK7set+vcOPNv5TrtvcImV1tnxleSzTn9w+ohnJhraUXj9D7VsufdJnfvxHEIBXmp//BnkJdKCHRqA==
-X-Received: by 2002:a05:651c:554:b0:293:2c7e:bf53 with SMTP id q20-20020a05651c055400b002932c7ebf53mr8216266ljp.0.1677251193686;
-        Fri, 24 Feb 2023 07:06:33 -0800 (PST)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id p25-20020a2ea4d9000000b00295a32db4e1sm346142ljm.91.2023.02.24.07.06.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Feb 2023 07:06:33 -0800 (PST)
-Date:   Fri, 24 Feb 2023 17:06:31 +0200
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
-        <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
-        <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
-        <thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
-        <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
-        <jmattson@google.com>, <luto@kernel.org>,
-        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
-        <pgonda@google.com>, <peterz@infradead.org>,
-        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
-        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
-        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH RFC v8 41/56] KVM: SVM: Add support to handle MSR based
- Page State Change VMGEXIT
-Message-ID: <20230224170631.000016f1@gmail.com>
-In-Reply-To: <20230220183847.59159-42-michael.roth@amd.com>
-References: <20230220183847.59159-1-michael.roth@amd.com>
-        <20230220183847.59159-42-michael.roth@amd.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        with ESMTP id S230026AbjBXPU1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Feb 2023 10:20:27 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 884854236;
+        Fri, 24 Feb 2023 07:20:26 -0800 (PST)
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31ODokfC009501;
+        Fri, 24 Feb 2023 15:20:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=u7M/BIHuAzO2fIa9ZDseapSOAqx0643dIybcOBcLCvo=;
+ b=HePvnviNOoKTeRvu0HKgcPPXoNwCe4DaqMxQ4HICTLgnIecYAs1KGpbLJDbQnb3Q5QK4
+ 2n4gKt5kKMHrg6zQCCHBxNau5HHeclEiezGvUGodEsSMZcBJ7rOD7Vm02SihDfFl4Iq2
+ 2s91wLLe/hReSizIpT7+LEo25iDHtLRGsU0Rw0/CW9QYOBrZHp2fxwsFqGL8ls0a6/Fn
+ pfd1K6JISoxhDwl2bghDRDsgm6voSk4Lf1oZOzKLw4IJS9dy95rh7p05JUfeZSgMq/Lr
+ S4XMMY2MDq/soCDCQKMhmRWZvFbmRYG1mj/Ej45+EuoZjClNfGKZ2IZclE2qVUXgujCs 3Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nxxfft855-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 24 Feb 2023 15:20:25 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31OEWf37017684;
+        Fri, 24 Feb 2023 15:20:25 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nxxfft84e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 24 Feb 2023 15:20:24 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31O5jXnY008477;
+        Fri, 24 Feb 2023 15:20:23 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma06fra.de.ibm.com (PPS) with ESMTPS id 3ntnxf64kw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 24 Feb 2023 15:20:23 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31OFKJai21299872
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 24 Feb 2023 15:20:19 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9B14B20043;
+        Fri, 24 Feb 2023 15:20:19 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6013620040;
+        Fri, 24 Feb 2023 15:20:19 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 24 Feb 2023 15:20:19 +0000 (GMT)
+From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        Nico Boehr <nrb@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v2] s390x: Add tests for execute-type instructions
+Date:   Fri, 24 Feb 2023 16:20:15 +0100
+Message-Id: <20230224152015.2943564-1-nsg@linux.ibm.com>
+X-Mailer: git-send-email 2.37.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_FILL_THIS_FORM_SHORT
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: lPX8M-iIaelnm0tlX9PpmHShNQAj5U-6
+X-Proofpoint-ORIG-GUID: WSfHcjl5Gbf4ccFZiVi1lSzENiVHn9uI
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-24_10,2023-02-24_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
+ phishscore=0 mlxlogscore=999 impostorscore=0 mlxscore=0 suspectscore=0
+ malwarescore=0 priorityscore=1501 lowpriorityscore=0 clxscore=1015
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302240117
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -89,173 +90,165 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 20 Feb 2023 12:38:32 -0600
-Michael Roth <michael.roth@amd.com> wrote:
+Test the instruction address used by targets of an execute instruction.
+When the target instruction calculates a relative address, the result is
+relative to the target instruction, not the execute instruction.
 
-> From: Brijesh Singh <brijesh.singh@amd.com>
-> 
-> SEV-SNP VMs can ask the hypervisor to change the page state in the RMP
-> table to be private or shared using the Page State Change MSR protocol
-> as defined in the GHCB specification.
-> 
-> Forward these requests to userspace via KVM_EXIT_VMGEXIT so the VMM can
-> issue the KVM ioctls to update the page state accordingly.
-> 
+Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
+---
 
-It would be better to describe the design purpose. Like, why should the
-page state change VMGEIXT be forwarded to the userspace instead of being
-handled in the kernel.
 
-> Co-developed-by: Michael Roth <michael.roth@amd.com>
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> ---
->  arch/x86/include/asm/sev-common.h |  9 ++++++++
->  arch/x86/kvm/svm/sev.c            | 25 +++++++++++++++++++++++
->  arch/x86/kvm/trace.h              | 34 +++++++++++++++++++++++++++++++
->  arch/x86/kvm/x86.c                |  1 +
->  4 files changed, 69 insertions(+)
-> 
-> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
-> index 0a9055cdfae2..ee38f7408470 100644
-> --- a/arch/x86/include/asm/sev-common.h
-> +++ b/arch/x86/include/asm/sev-common.h
-> @@ -93,6 +93,10 @@ enum psc_op {
->  };
->  
->  #define GHCB_MSR_PSC_REQ		0x014
-> +#define GHCB_MSR_PSC_GFN_POS		12
-> +#define GHCB_MSR_PSC_GFN_MASK		GENMASK_ULL(39, 0)
-> +#define GHCB_MSR_PSC_OP_POS		52
-> +#define GHCB_MSR_PSC_OP_MASK		0xf
->  #define GHCB_MSR_PSC_REQ_GFN(gfn, op)			\
->  	/* GHCBData[55:52] */				\
->  	(((u64)((op) & 0xf) << 52) |			\
-> @@ -102,6 +106,11 @@ enum psc_op {
->  	GHCB_MSR_PSC_REQ)
->  
->  #define GHCB_MSR_PSC_RESP		0x015
-> +#define GHCB_MSR_PSC_ERROR_POS		32
-> +#define GHCB_MSR_PSC_ERROR_MASK		GENMASK_ULL(31, 0)
-> +#define GHCB_MSR_PSC_ERROR		GENMASK_ULL(31, 0)
-> +#define GHCB_MSR_PSC_RSVD_POS		12
-> +#define GHCB_MSR_PSC_RSVD_MASK		GENMASK_ULL(19, 0)
->  #define GHCB_MSR_PSC_RESP_VAL(val)			\
->  	/* GHCBData[63:32] */				\
->  	(((u64)(val) & GENMASK_ULL(63, 32)) >> 32)
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 2613311f4fcc..a1a2686dde7b 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -30,6 +30,7 @@
->  #include "svm_ops.h"
->  #include "cpuid.h"
->  #include "trace.h"
-> +#include "mmu.h"
->  
->  #ifndef CONFIG_KVM_AMD_SEV
->  /*
-> @@ -3345,6 +3346,23 @@ static void set_ghcb_msr(struct vcpu_svm *svm, u64 value)
->  	svm->vmcb->control.ghcb_gpa = value;
->  }
->  
-> +/*
-> + * TODO: need to get the value set by userspace in vcpu->run->vmgexit.ghcb_msr
-> + * and process that here accordingly.
-> + */
-> +static int snp_complete_psc_msr_protocol(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vcpu_svm *svm = to_svm(vcpu);
-> +
-> +	set_ghcb_msr_bits(svm, 0,
-> +			  GHCB_MSR_PSC_ERROR_MASK, GHCB_MSR_PSC_ERROR_POS);
-> +
-> +	set_ghcb_msr_bits(svm, 0, GHCB_MSR_PSC_RSVD_MASK, GHCB_MSR_PSC_RSVD_POS);
-> +	set_ghcb_msr_bits(svm, GHCB_MSR_PSC_RESP, GHCB_MSR_INFO_MASK, GHCB_MSR_INFO_POS);
-> +
-> +	return 1; /* resume */
-> +}
-> +
->  static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
->  {
->  	struct vmcb_control_area *control = &svm->vmcb->control;
-> @@ -3445,6 +3463,13 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
->  				  GHCB_MSR_INFO_POS);
->  		break;
->  	}
-> +	case GHCB_MSR_PSC_REQ:
-> +		vcpu->run->exit_reason = KVM_EXIT_VMGEXIT;
-> +		vcpu->run->vmgexit.ghcb_msr = control->ghcb_gpa;
-> +		vcpu->arch.complete_userspace_io = snp_complete_psc_msr_protocol;
-> +
-> +		ret = -1;
-> +		break;
->  	case GHCB_MSR_TERM_REQ: {
->  		u64 reason_set, reason_code;
->  
-> diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-> index 83843379813e..65861d2d086c 100644
-> --- a/arch/x86/kvm/trace.h
-> +++ b/arch/x86/kvm/trace.h
-> @@ -7,6 +7,7 @@
->  #include <asm/svm.h>
->  #include <asm/clocksource.h>
->  #include <asm/pvclock-abi.h>
-> +#include <asm/sev-common.h>
->  
->  #undef TRACE_SYSTEM
->  #define TRACE_SYSTEM kvm
-> @@ -1831,6 +1832,39 @@ TRACE_EVENT(kvm_vmgexit_msr_protocol_exit,
->  		  __entry->vcpu_id, __entry->ghcb_gpa, __entry->result)
->  );
->  
-> +/*
-> + * Tracepoint for the SEV-SNP page state change processing
-> + */
-> +#define psc_operation					\
-> +	{SNP_PAGE_STATE_PRIVATE, "private"},		\
-> +	{SNP_PAGE_STATE_SHARED,  "shared"}		\
-> +
-> +TRACE_EVENT(kvm_snp_psc,
-> +	TP_PROTO(unsigned int vcpu_id, u64 pfn, u64 gpa, u8 op, int level),
-> +	TP_ARGS(vcpu_id, pfn, gpa, op, level),
-> +
-> +	TP_STRUCT__entry(
-> +		__field(int, vcpu_id)
-> +		__field(u64, pfn)
-> +		__field(u64, gpa)
-> +		__field(u8, op)
-> +		__field(int, level)
-> +	),
-> +
-> +	TP_fast_assign(
-> +		__entry->vcpu_id = vcpu_id;
-> +		__entry->pfn = pfn;
-> +		__entry->gpa = gpa;
-> +		__entry->op = op;
-> +		__entry->level = level;
-> +	),
-> +
-> +	TP_printk("vcpu %u, pfn %llx, gpa %llx, op %s, level %d",
-> +		  __entry->vcpu_id, __entry->pfn, __entry->gpa,
-> +		  __print_symbolic(__entry->op, psc_operation),
-> +		  __entry->level)
-> +);
-> +
->  #endif /* _TRACE_KVM_H */
->  
->  #undef TRACE_INCLUDE_PATH
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 268c3d16894d..0154fc7a28c1 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -13515,6 +13515,7 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_enter);
->  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_exit);
->  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_msr_protocol_enter);
->  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_msr_protocol_exit);
-> +EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_snp_psc);
->  
->  static int __init kvm_x86_init(void)
->  {
+v1 -> v2:
+ * add test to unittests.cfg and .gitlab-ci.yml
+ * pick up R-b (thanks Nico)
+
+
+TCG does the address calculation relative to the execute instruction.
+
+
+ s390x/Makefile      |  1 +
+ s390x/ex.c          | 92 +++++++++++++++++++++++++++++++++++++++++++++
+ s390x/unittests.cfg |  3 ++
+ .gitlab-ci.yml      |  1 +
+ 4 files changed, 97 insertions(+)
+ create mode 100644 s390x/ex.c
+
+diff --git a/s390x/Makefile b/s390x/Makefile
+index 97a61611..6cf8018b 100644
+--- a/s390x/Makefile
++++ b/s390x/Makefile
+@@ -39,6 +39,7 @@ tests += $(TEST_DIR)/panic-loop-extint.elf
+ tests += $(TEST_DIR)/panic-loop-pgm.elf
+ tests += $(TEST_DIR)/migration-sck.elf
+ tests += $(TEST_DIR)/exittime.elf
++tests += $(TEST_DIR)/ex.elf
+ 
+ pv-tests += $(TEST_DIR)/pv-diags.elf
+ 
+diff --git a/s390x/ex.c b/s390x/ex.c
+new file mode 100644
+index 00000000..1bf4d8cd
+--- /dev/null
++++ b/s390x/ex.c
+@@ -0,0 +1,92 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright IBM Corp. 2023
++ *
++ * Test EXECUTE (RELATIVE LONG).
++ */
++
++#include <libcflat.h>
++
++static void test_basr(void)
++{
++	uint64_t ret_addr, after_ex;
++
++	report_prefix_push("BASR");
++	asm volatile ( ".pushsection .rodata\n"
++		"0:	basr	%[ret_addr],0\n"
++		"	.popsection\n"
++
++		"	larl	%[after_ex],1f\n"
++		"	exrl	0,0b\n"
++		"1:\n"
++		: [ret_addr] "=d" (ret_addr),
++		  [after_ex] "=d" (after_ex)
++	);
++
++	report(ret_addr == after_ex, "return address after EX");
++	report_prefix_pop();
++}
++
++/*
++ * According to PoP (Branch-Address Generation), the address is relative to
++ * BRAS when it is the target of an execute-type instruction.
++ */
++static void test_bras(void)
++{
++	uint64_t after_target, ret_addr, after_ex, branch_addr;
++
++	report_prefix_push("BRAS");
++	asm volatile ( ".pushsection .text.ex_bras, \"x\"\n"
++		"0:	bras	%[ret_addr],1f\n"
++		"	nopr	%%r7\n"
++		"1:	larl	%[branch_addr],0\n"
++		"	j	4f\n"
++		"	.popsection\n"
++
++		"	larl	%[after_target],1b\n"
++		"	larl	%[after_ex],3f\n"
++		"2:	exrl	0,0b\n"
++		"3:	larl	%[branch_addr],0\n"
++		"4:\n"
++
++		"	.if (1b - 0b) != (3b - 2b)\n"
++		"	.error	\"right and wrong target must have same offset\"\n"
++		"	.endif\n"
++		: [after_target] "=d" (after_target),
++		  [ret_addr] "=d" (ret_addr),
++		  [after_ex] "=d" (after_ex),
++		  [branch_addr] "=d" (branch_addr)
++	);
++
++	report(after_target == branch_addr, "address calculated relative to BRAS");
++	report(ret_addr == after_ex, "return address after EX");
++	report_prefix_pop();
++}
++
++static void test_larl(void)
++{
++	uint64_t target, addr;
++
++	report_prefix_push("LARL");
++	asm volatile ( ".pushsection .rodata\n"
++		"0:	larl	%[addr],0\n"
++		"	.popsection\n"
++
++		"	larl	%[target],0b\n"
++		"	exrl	0,0b\n"
++		: [target] "=d" (target),
++		  [addr] "=d" (addr)
++	);
++
++	report(target == addr, "address calculated relative to LARL");
++	report_prefix_pop();
++}
++
++int main(int argc, char **argv)
++{
++	test_basr();
++	test_bras();
++	test_larl();
++
++	return report_summary();
++}
+diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+index d97eb5e9..b61faf07 100644
+--- a/s390x/unittests.cfg
++++ b/s390x/unittests.cfg
+@@ -215,3 +215,6 @@ file = migration-skey.elf
+ smp = 2
+ groups = migration
+ extra_params = -append '--parallel'
++
++[execute]
++file = ex.elf
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index ad7949c9..a999f64a 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -275,6 +275,7 @@ s390x-kvm:
+   - ACCEL=kvm ./run_tests.sh
+       selftest-setup intercept emulator sieve sthyi diag10 diag308 pfmf
+       cmm vector gs iep cpumodel diag288 stsi sclp-1g sclp-3g css skrf sie
++      execute
+       | tee results.txt
+   - grep -q PASS results.txt && ! grep -q FAIL results.txt
+  only:
+
+base-commit: e3c5c3ef2524c58023073c0fadde2e8ae3c04ec6
+-- 
+2.36.1
 
