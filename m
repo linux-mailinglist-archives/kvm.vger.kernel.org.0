@@ -2,102 +2,288 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 984126A2511
-	for <lists+kvm@lfdr.de>; Sat, 25 Feb 2023 00:30:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A67226A253E
+	for <lists+kvm@lfdr.de>; Sat, 25 Feb 2023 00:56:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229520AbjBXXaV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Feb 2023 18:30:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59674 "EHLO
+        id S229638AbjBXX4N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Feb 2023 18:56:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229468AbjBXXaU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Feb 2023 18:30:20 -0500
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBE446BF5A;
-        Fri, 24 Feb 2023 15:30:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677281419; x=1708817419;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=iYG64KQ8eDbP4/BqEcmXVFBG++OPO7afYUzLr08b6cg=;
-  b=mXoBqhTzG9XLc1n8QlcxO7aYqA3aaKqzmCdsWbf/ERZTXQoWxJ5LpxVr
-   8Ba3PUw/mwef02Rwkwos19fzkMRqHv1F7SosXnDs3ENZRyW/sHAs13vuH
-   mokb9Vguozks2zznJ5tZxIXrGOdV22FYP46BeW9/i5LBliVgLsXmHqa39
-   GOTACWm/r1ocBK2gZbDZxRD1AJqneaMMhviHnxkyuoGptXwWfmg3q7OLP
-   RbfxStoyufA+r5muS/z8jhJ6IgZR22VsI2iqo3huY7YCcBqsFIQXIs4Y7
-   zObEyOm+5ufr5YoBLd8tfQ9xX2wLTv2fnxyWWVXO1KFF/yLd9c0UQ4Fv6
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10631"; a="398334904"
-X-IronPort-AV: E=Sophos;i="5.97,326,1669104000"; 
-   d="scan'208";a="398334904"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2023 15:30:19 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10631"; a="847106500"
-X-IronPort-AV: E=Sophos;i="5.97,326,1669104000"; 
-   d="scan'208";a="847106500"
-Received: from ydu6-mobl1.gar.corp.intel.com (HELO desk) ([10.209.68.79])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2023 15:30:18 -0800
-Date:   Fri, 24 Feb 2023 15:30:04 -0800
-From:   "pawan.kumar.gupta@linux.intel.com" 
-        <pawan.kumar.gupta@linux.intel.com>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     "Luck, Tony" <tony.luck@intel.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Kim Phillips <kim.phillips@amd.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "Ostrovsky, Boris" <boris.ostrovsky@oracle.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        "Martins, Joao" <joao.m.martins@oracle.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "Wilk, Konrad" <konrad.wilk@oracle.com>,
+        with ESMTP id S229622AbjBXX4M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Feb 2023 18:56:12 -0500
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25FAE57096
+        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 15:56:10 -0800 (PST)
+Received: by mail-pf1-x42d.google.com with SMTP id n5so425736pfv.11
+        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 15:56:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=roI2102NVn8tZj8AT0mqQAS15kZ5FO9em57hIeDNwj0=;
+        b=QB5cj7QKPC4eETDdYpgWnv3fyPKxoD9KZMEpY6QM0fHRGhMhDE4uxjfcIAoTovvyd6
+         h+ff9uW223/aV2TtJYDG4H6O5DdJAERUpY6e/VUR8g2Xbvv7rG6lSk2Zft5rgHL4mPqi
+         nnEugeB85k/jI5MnwhOTyqWPfmvxztT6Aj8C4yKN8OcWw4L+GP1tAnKhiSLAKgq49Co4
+         GljDwHscPWZ7fNKEpdlUBZ4r2+JKDNTJ4H/B3enW9G2Cw5JmeLX1Ftn3pzzBDR1u9A3t
+         Ihqm3IYqgD5EuUqKgbBYpq6HyScjibA9/wo5+/onFYXHUBFrrgKD/WYgI0F2XJrs76+B
+         wnMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=roI2102NVn8tZj8AT0mqQAS15kZ5FO9em57hIeDNwj0=;
+        b=eyQFKOl8xPavwxOBUiW7APTeCozLDMxljBWCio25X1aT8yloFDlBmmv2W/IoNXcCC5
+         8hXyVuyUWtT8iBRtNZizNjYV+IA07IHmO7eOzwYG8Xj5zVPVyyP3Gjgm2wKA7z1MKUn/
+         AIB5C8j3XTZXFZ3lZq++ZSCF4dAXd/SNTXT/2ruCwWel1pCs3XXWK9xjJxs2GV02weOs
+         rpzjsO27nXN4olq2rl2f0KRzyVYZxuiQgFdv6107UFWJfqZavGtt64W6bbRBLc42StQe
+         Yc0CBPlAAlZCrvJnw0TybCyNy3DvqmMIE0ySzAk4aRQqetsMa6uRvGsb8ndKAZrHyQxa
+         8jFw==
+X-Gm-Message-State: AO0yUKWjMXaa9DVAwl2Spr/OzhCv8t6KpBBoMMhVWhLnPj23d59Rf96G
+        QYr7NwPjhtSLDdiwPI1E6b0s/Q==
+X-Google-Smtp-Source: AK7set91H8uZuErh0/LuDjee/awTv2DYiHBWv4zGyaBtHG2f3acLLiXNiqNVrCCS2NWZB/r598n+iw==
+X-Received: by 2002:aa7:9ed2:0:b0:5e3:2f9b:b5e8 with SMTP id r18-20020aa79ed2000000b005e32f9bb5e8mr3480281pfq.4.1677282968888;
+        Fri, 24 Feb 2023 15:56:08 -0800 (PST)
+Received: from google.com (77.62.105.34.bc.googleusercontent.com. [34.105.62.77])
+        by smtp.gmail.com with ESMTPSA id s25-20020a63af59000000b004f1cb6ffe81sm45530pgo.64.2023.02.24.15.56.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Feb 2023 15:56:08 -0800 (PST)
+Date:   Fri, 24 Feb 2023 23:56:04 +0000
+From:   Mingwei Zhang <mizhang@google.com>
+To:     "Chang S. Bae" <chang.seok.bae@intel.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "Woodhouse, David" <dwmw@amazon.co.uk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Gross, Jurgen" <jgross@suse.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Alexey Kardashevskiy <aik@amd.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v9 7/8] x86/cpu: Support AMD Automatic IBRS
-Message-ID: <20230224233004.rf2nzgqvz5c2b73u@desk>
-References: <20230124163319.2277355-1-kim.phillips@amd.com>
- <20230124163319.2277355-8-kim.phillips@amd.com>
- <20230224185257.o3mcmloei5zqu7wa@treble>
- <Y/knUC0s+rg6ef2r@zn.tnic>
- <20230224213522.nofavod2jzhn22wp@treble>
- <Y/kzGEqafzQkbU4T@zn.tnic>
- <SJ1PR11MB60834960ECAC976C1D328A86FCA89@SJ1PR11MB6083.namprd11.prod.outlook.com>
- <Y/k2TWHpq1M8QiSa@zn.tnic>
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Jim Mattson <jmattson@google.com>,
+        Venkatesh Srinivas <venkateshs@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Chao Gao <chao.gao@intel.com>
+Subject: Re: [PATCH v3 01/13] x86/fpu/xstate: Avoid getting xstate address of
+ init_fpstate if fpstate contains the component
+Message-ID: <Y/lOlBWTNgROPl0P@google.com>
+References: <20230221163655.920289-1-mizhang@google.com>
+ <20230221163655.920289-2-mizhang@google.com>
+ <e91b9172-8a2e-e299-a84f-1e9331c51cb7@intel.com>
+ <87ilfum6xh.ffs@tglx>
+ <CAL715WKLQxxeyFqiKbKsUmQ8bZf2f=rwADyKj1ftgROA+dhpXg@mail.gmail.com>
+ <ea9d7394-73dd-23c0-ea05-d0ec4fcebb55@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y/k2TWHpq1M8QiSa@zn.tnic>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <ea9d7394-73dd-23c0-ea05-d0ec4fcebb55@intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 24, 2023 at 11:12:29PM +0100, Borislav Petkov wrote:
-> On Fri, Feb 24, 2023 at 10:03:16PM +0000, Luck, Tony wrote:
-> > Should also include Pawan as another unfortunate soul sucked
-> > into keeping that file up to date with the latest wreckage. If not
-> > as "M", at least as "R":
-> > 
-> > R: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+On Wed, Feb 22, 2023, Chang S. Bae wrote:
+> On 2/22/2023 10:40 AM, Mingwei Zhang wrote:
+> > > > We have this [1]:
+> > > > 
+> > > >        if (fpu_state_size_dynamic())
+> > > >                mask &= (header.xfeatures | xinit->header.xcomp_bv);
+> > > > 
+> > > > If header.xfeatures[18] = 0 then mask[18] = 0 because
+> > > > xinit->header.xcomp_bv[18] = 0. Then, it won't hit that code. So, I'm
+> > > > confused about the problem that you described here.
+> > > 
+> > > Read the suggested changelog I wrote in my reply to Mingwei.
+> > > 
+> > > TLDR:
+> > > 
+> > >          xsave.header.xfeatures[18] = 1
+> > >          xinit.header.xfeatures[18] = 0
+> > >      ->  mask[18] = 1
+> > >      ->  __raw_xsave_addr(xsave, 18)     <- Success
+> > >      ->  __raw_xsave_addr(xinit, 18)     <- WARN
 > 
-> We probably should hear from him before you offer his soul into the
-> purgatory of hardware speculation.
+> Oh, sigh.. This should be caught last time.
+> 
+> Hmm, then since we store init state for legacy ones [1], unless it is too
+> aggressive, perhaps the loop can be simplified like this:
+> 
+> diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
+> index 714166cc25f2..2dac6f5f3ade 100644
+> --- a/arch/x86/kernel/fpu/xstate.c
+> +++ b/arch/x86/kernel/fpu/xstate.c
+> @@ -1118,21 +1118,13 @@ void __copy_xstate_to_uabi_buf(struct membuf to,
+> struct fpstate *fpstate,
+>         zerofrom = offsetof(struct xregs_state, extended_state_area);
+> 
+>         /*
+> -        * The ptrace buffer is in non-compacted XSAVE format.  In
+> -        * non-compacted format disabled features still occupy state space,
+> -        * but there is no state to copy from in the compacted
+> -        * init_fpstate. The gap tracking will zero these states.
+> +        * Indicate which states to copy from fpstate. When not present in
+> +        * fpstate, those extended states are either initialized or
+> +        * disabled. They are also known to have an all zeros init state.
+> +        * Thus, remove them from 'mask' to zero those features in the user
+> +        * buffer instead of retrieving them from init_fpstate.
+>          */
+> -       mask = fpstate->user_xfeatures;
 
-I will be happy to review what I can.
+Do we need to change this line and the comments? I don't see any of
+these was relevant to this issue. The original code semantic is to
+traverse all user_xfeatures, if it is available in fpstate, copy it from
+there; otherwise, copy it from init_fpstate. We do not assume the
+component in init_fpstate (but not in fpstate) are all zeros, do we? If
+it is safe to assume that, then it might be ok. But at least in this
+patch, I want to keep the original semantics as is without the
+assumption.
+> -
+> -       /*
+> -        * Dynamic features are not present in init_fpstate. When they are
+> -        * in an all zeros init state, remove those from 'mask' to zero
+> -        * those features in the user buffer instead of retrieving them
+> -        * from init_fpstate.
+> -        */
+> -       if (fpu_state_size_dynamic())
+> -               mask &= (header.xfeatures | xinit->header.xcomp_bv);
+> +       mask = header.xfeatures;
 
-Soulfully yours,
-Pawan
+Same here. Let's not adding this optimization in this patch.
+
+>
+>         for_each_extended_xfeature(i, mask) {
+>                 /*
+> @@ -1151,9 +1143,8 @@ void __copy_xstate_to_uabi_buf(struct membuf to,
+> struct fpstate *fpstate,
+>                         pkru.pkru = pkru_val;
+>                         membuf_write(&to, &pkru, sizeof(pkru));
+>                 } else {
+> -                       copy_feature(header.xfeatures & BIT_ULL(i), &to,
+> +                       membuf_write(&to,
+>                                      __raw_xsave_addr(xsave, i),
+> -                                    __raw_xsave_addr(xinit, i),
+>                                      xstate_sizes[i]);
+>                 }
+>                 /*
+> 
+> > Chang: to reproduce this issue, you can simply run the amx_test in the
+> > kvm selftest directory.
+> 
+> Yeah, I was able to reproduce it with this ptrace test:
+> 
+> diff --git a/tools/testing/selftests/x86/amx.c
+> b/tools/testing/selftests/x86/amx.c
+> index 625e42901237..ae02bc81846d 100644
+> --- a/tools/testing/selftests/x86/amx.c
+> +++ b/tools/testing/selftests/x86/amx.c
+> @@ -14,8 +14,10 @@
+>  #include <sys/auxv.h>
+>  #include <sys/mman.h>
+>  #include <sys/shm.h>
+> +#include <sys/ptrace.h>
+>  #include <sys/syscall.h>
+>  #include <sys/wait.h>
+> +#include <sys/uio.h>
+> 
+>  #include "../kselftest.h" /* For __cpuid_count() */
+> 
+> @@ -826,6 +828,76 @@ static void test_context_switch(void)
+>         free(finfo);
+>  }
+> 
+> +/* Ptrace test */
+> +
+> +static bool inject_tiledata(pid_t target)
+> +{
+> +       struct xsave_buffer *xbuf;
+> +       struct iovec iov;
+> +
+> +       xbuf = alloc_xbuf();
+> +       if (!xbuf)
+> +               fatal_error("unable to allocate XSAVE buffer");
+> +
+> +       load_rand_tiledata(xbuf);
+> +
+> +       memcpy(&stashed_xsave->bytes[xtiledata.xbuf_offset],
+> +              &xbuf->bytes[xtiledata.xbuf_offset],
+> +              xtiledata.size);
+> +
+> +       iov.iov_base = xbuf;
+> +       iov.iov_len = xbuf_size;
+> +
+> +       if (ptrace(PTRACE_SETREGSET, target, (uint32_t)NT_X86_XSTATE, &iov))
+> +               fatal_error("PTRACE_SETREGSET");
+> +
+> +       if (ptrace(PTRACE_GETREGSET, target, (uint32_t)NT_X86_XSTATE, &iov))
+> +               err(1, "PTRACE_GETREGSET");
+> +
+> +       if (!memcmp(&stashed_xsave->bytes[xtiledata.xbuf_offset],
+> +                   &xbuf->bytes[xtiledata.xbuf_offset],
+> +                   xtiledata.size))
+> +               return true;
+> +       else
+> +               return false;
+> +}
+> +
+> +static void test_ptrace(void)
+> +{
+> +       pid_t child;
+> +       int status;
+> +
+> +       child = fork();
+> +       if (child < 0) {
+> +               err(1, "fork");
+> +       } else if (!child) {
+> +               if (ptrace(PTRACE_TRACEME, 0, NULL, NULL))
+> +                       err(1, "PTRACE_TRACEME");
+> +
+> +               /* Use the state to expand the kernel buffer */
+> +               load_rand_tiledata(stashed_xsave);
+> +
+> +               raise(SIGTRAP);
+> +               _exit(0);
+> +       }
+> +
+> +       do {
+> +               wait(&status);
+> +       } while (WSTOPSIG(status) != SIGTRAP);
+> +
+> +       printf("\tInject tile data via ptrace()\n");
+> +
+> +       if (inject_tiledata(child))
+> +               printf("[OK]\tTile data was written on ptracee.\n");
+> +       else
+> +               printf("[FAIL]\tTile data was not written on ptracee.\n");
+> +
+> +       ptrace(PTRACE_DETACH, child, NULL, NULL);
+> +       wait(&status);
+> +       if (!WIFEXITED(status) || WEXITSTATUS(status))
+> +               err(1, "ptrace test");
+> +}
+> +
+>  int main(void)
+>  {
+>         /* Check hardware availability at first */
+> @@ -846,6 +918,8 @@ int main(void)
+>         ctxtswtest_config.num_threads = 5;
+>         test_context_switch();
+> 
+> +       test_ptrace();
+> +
+>         clearhandler(SIGILL);
+>         free_stashed_xsave();
+> 
+> Thanks,
+> Chang
+> 
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/x86/kernel/fpu/xstate.c#n386
+> 
+
+Nice one. Yeah both ptrace and KVM are calling this function so the above
+code would also be enough to trigger the bug.
+
+
+Thanks.
+-Mingwei
