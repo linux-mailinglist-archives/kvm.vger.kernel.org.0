@@ -2,129 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C61E6A24F3
-	for <lists+kvm@lfdr.de>; Sat, 25 Feb 2023 00:23:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 67F946A2507
+	for <lists+kvm@lfdr.de>; Sat, 25 Feb 2023 00:27:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229721AbjBXXXK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Feb 2023 18:23:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50492 "EHLO
+        id S229960AbjBXX1d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Feb 2023 18:27:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229532AbjBXXXJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Feb 2023 18:23:09 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE840231D4;
-        Fri, 24 Feb 2023 15:23:08 -0800 (PST)
-Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
+        with ESMTP id S229709AbjBXX1a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Feb 2023 18:27:30 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90E17679A9;
+        Fri, 24 Feb 2023 15:27:26 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 3C4411EC0725;
-        Sat, 25 Feb 2023 00:23:07 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1677280987;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=j0zvR/GW8qESlMENYKavRs5BBeojGzLc+Igg/tiAP10=;
-        b=LYcoaFyr631Gy3vC9r2lkRIy/pHYb5Kb6lwDjloyRBA8QwwjuE990CgNkiI00nprv/0KY6
-        Ow1/wyGRtZpeSkENTyGShz1PCjHPGgaTgNLqDi831UepcbiOdqO9CYXIgJchcHY3q6BhKB
-        OqDjqbOoXrxYig5kP9pSfm8H+jGlEbM=
-Date:   Sat, 25 Feb 2023 00:23:02 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Josh Poimboeuf <jpoimboe@kernel.org>
-Cc:     Kim Phillips <kim.phillips@amd.com>, x86@kernel.org,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Juergen Gross <jgross@suse.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Alexey Kardashevskiy <aik@amd.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v9 7/8] x86/cpu: Support AMD Automatic IBRS
-Message-ID: <Y/lG1v28zQx976Pz@zn.tnic>
-References: <20230124163319.2277355-1-kim.phillips@amd.com>
- <20230124163319.2277355-8-kim.phillips@amd.com>
- <20230224185257.o3mcmloei5zqu7wa@treble>
- <Y/knUC0s+rg6ef2r@zn.tnic>
- <Y/k/ZXUXOFiBhOiI@zn.tnic>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Y/k/ZXUXOFiBhOiI@zn.tnic>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        by ams.source.kernel.org (Postfix) with ESMTPS id 368FDB81D64;
+        Fri, 24 Feb 2023 23:27:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id ECB58C4339C;
+        Fri, 24 Feb 2023 23:27:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1677281244;
+        bh=n645UGmCRsD8B402VG8f29+Unah6hw5bUNA0zxb8/b4=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=TMybbokhW3YmBW4bGh6B5V4TzoROIVXT9h4ZKEtHUy37yLjnFH/IOZjqwfYRZ5J6Y
+         v06lgQu/MPN3pKTRhKVK3Hq24rU4q4baW2PqJYfXkO+JAdYm6msPdj5nCfe3MaWEks
+         W5GXz1yFrd9dGxWg5+EMfzZ24oqmn/7gTB2y2cL5aatcamXf5lqgBG7Prvjy2WsNc0
+         FcugA9eDZpF7hkMPFOmsmwrpVq+4F6jK1uqpktmzfbsFQmnA6e7gMMltdScual/An3
+         mcdipK1KJXdW6175oqGNexZ5BMpkpXNLSsQvrMcYB11DStO55A2qrljVkX9bT9Z9+N
+         +oyWC4kgbeAlg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DBD75C43151;
+        Fri, 24 Feb 2023 23:27:23 +0000 (UTC)
+Subject: Re: [GIT PULL] Please pull IOMMUFD subsystem changes
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <Y/Tlx8j3i17n5bzL@nvidia.com>
+References: <Y/Tlx8j3i17n5bzL@nvidia.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <Y/Tlx8j3i17n5bzL@nvidia.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/jgg/iommufd.git tags/for-linus-iommufd
+X-PR-Tracked-Commit-Id: 939204e4df962982cbc84acc26b29b421dd530a8
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 143c7bc6496c886ce5db2a2f9cec580494690170
+Message-Id: <167728124389.28021.2369650643044234170.pr-tracker-bot@kernel.org>
+Date:   Fri, 24 Feb 2023 23:27:23 +0000
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        iommu@lists.linux.dev, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Kevin Tian <kevin.tian@intel.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 24, 2023 at 11:51:17PM +0100, Borislav Petkov wrote:
-> Or, actually, we should simply write it again because it is the init
-> path and not really a hot path but it should damn well make sure that
-> that bit gets set.
+The pull request you sent on Tue, 21 Feb 2023 11:39:51 -0400:
 
-Yeah, we have this fancy msr_set_bit() interface which saves us the MSR
-write when not needed. And it also tells us that. :-)
+> git://git.kernel.org/pub/scm/linux/kernel/git/jgg/iommufd.git tags/for-linus-iommufd
 
-So we can do:
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/143c7bc6496c886ce5db2a2f9cec580494690170
 
-diff --git a/arch/x86/kernel/cpu/amd.c b/arch/x86/kernel/cpu/amd.c
-index 380753b14cab..2aa089aa23db 100644
---- a/arch/x86/kernel/cpu/amd.c
-+++ b/arch/x86/kernel/cpu/amd.c
-@@ -996,6 +996,12 @@ static void init_amd(struct cpuinfo_x86 *c)
- 		msr_set_bit(MSR_K7_HWCR, MSR_K7_HWCR_IRPERF_EN_BIT);
- 
- 	check_null_seg_clears_base(c);
-+
-+	if (cpu_has(c, X86_FEATURE_AUTOIBRS)) {
-+		int ret = msr_set_bit(MSR_EFER, _EFER_AUTOIBRS);
-+
-+		pr_info("%s: CPU%d, ret: %d\n", __func__, smp_processor_id(), ret);
-+	}
- }
- 
- #ifdef CONFIG_X86_32
-
----
-
-and the output looks like this:
-
-[    3.046607] x86: Booting SMP configuration:
-[    3.046609] .... node  #0, CPUs:          #1
-[    2.874768] init_amd: CPU1, ret: 0
-[    3.046873]    #2
-[    2.874768] init_amd: CPU2, ret: 0
-[    3.049155]    #3
-[    2.874768] init_amd: CPU3, ret: 0
-[    3.050834]    #4
-[    2.874768] init_amd: CPU4, ret: 0
-...
-
-which says that the bit was already set - which confirms the
-trampoline setting thing.
-
-And doing the write again serves as a guard when in the future we decide
-to not set EFER anymore - I doubt it - but we can't allow ourselves to
-not set the autoibrs bit so one more RDMSR on init doesn't matter.
-
-Proper patch tomorrow.
-
-Thx.
+Thank you!
 
 -- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
