@@ -2,73 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F2426A2039
-	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 18:03:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FE956A203A
+	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 18:03:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230083AbjBXRDQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Feb 2023 12:03:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36038 "EHLO
+        id S230088AbjBXRDY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Feb 2023 12:03:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229532AbjBXRDO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Feb 2023 12:03:14 -0500
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64F46A5D2
-        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 09:03:09 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id y2so12819612pjg.3
-        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 09:03:09 -0800 (PST)
+        with ESMTP id S229532AbjBXRDX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Feb 2023 12:03:23 -0500
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B828C46A2
+        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 09:03:13 -0800 (PST)
+Received: by mail-pl1-x636.google.com with SMTP id ky4so153501plb.3
+        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 09:03:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=sifive.com; s=google;
         h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=AlKKel+cEzUa4nWulxqzQ6V6S4zBsnEjdcY3a0TOoBk=;
-        b=PFkVseWH6FYDa2QPWImXVwfI6wbxmjaZhktQRlb5siMyemaCYGewGR989TRUVx9Nrf
-         ZwUmEbPlA77eMOEnn0vSv7867SRLP2mpv5NxOgWu3oGja/szg9NTHy+7b6WoL3WNemLT
-         ShazTTf/SYmncboXMu1h55Cs5iFosxdwprx/HHutV4Hh+/Z923km2ncgeeBb2qVZ3Uc6
-         bytRzD3cQX5CqmGZ5rnMoPWzijAWdDpnoC0FLVcx96y6McA/cRSo8YAb9e7LsPnNGV9+
-         XVQrYfSTbaXxYu6sV0OD4xhI234l9vPuEN3dV9JwgOsC+GqFHxv6d9eAwory042ZgMYJ
-         DqYA==
+        bh=gGZWEGHhXqO9OeXhoDxEGsON6GC4YBeiRX5XbYj9IGA=;
+        b=ghKPeKR0G7uqNkPIH1npSQFQIWcsGSKvYwwCyhwQTOj1TK5WP1/aNJ87vT0C1mdcnO
+         ht5/8+RtBaKIBxaPDYvuzQsOxqiMvI534Qu4gaxQ+XfWL9g2HKUXKKWh1ey/XkDk9aE4
+         uOginkp7cstMsnvp873wEwWYntVED1Z4ero00tYFcx5ZsZFedEvwzeLBaW2pWlE7ZkvX
+         SRYhb5BU8VVVN5y4d3J1ryOd+P61zO/X+cx91jMeI/8uHICjlll5wYhewyKdfmnsTgxM
+         4UtNUvfkSRXbex1Rs90s99OR/M3QkP960CJkZZXziXCoNG/Qs9eq5X/jSB4btL/i3pcv
+         y8KQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=references:in-reply-to:message-id:date:subject:cc:to:from
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AlKKel+cEzUa4nWulxqzQ6V6S4zBsnEjdcY3a0TOoBk=;
-        b=CYxohqlJWrwH/vE/kMSjtZYl35W09NsdaMe/bukI7fz9JHOEkg8qxTTGi7hlgooQaC
-         chyYlQP2QR38rjq0lmaE4htttbc/W5GZ9HeD50bJHRMCj6VWWgEDkfV+rWIg2K5RY1nV
-         ZLSMm6wrlDmKzQvjdSZYft5NjJZK1V61pXJNGjdZg5RLttEqJ1kIFyX2LsSrLsPaae9V
-         s3I7Lq0yVQUKvNMaOuig9bTWDnlRnpxujZTGB2KC3ml8Ybr8TZnHicdXmMS56bmOYW5i
-         1wdB5HSY/LiayRTIhcZd4e7dZIDS2jHjjngLZ8aVMAcIjb6TS+wbQaV0XNYcqd/z/DtF
-         Xs0A==
-X-Gm-Message-State: AO0yUKVohozx1uXO2jcZOzOhUSQ4EpIxvoGhv1A3D/S/WTAnLySo5lBU
-        oqGphuCyGNAi9sv1n8xwGILE8g==
-X-Google-Smtp-Source: AK7set9uimFJXh/iOMry0tS54oA8/EwH5nN2iSDih6nh3Z8BSKitt4coCFXsd5HOnF67hJpXpp+rZg==
-X-Received: by 2002:a17:903:1208:b0:19a:eb93:6165 with SMTP id l8-20020a170903120800b0019aeb936165mr19452666plh.22.1677258188637;
-        Fri, 24 Feb 2023 09:03:08 -0800 (PST)
+        bh=gGZWEGHhXqO9OeXhoDxEGsON6GC4YBeiRX5XbYj9IGA=;
+        b=Yf5OU1h718QI9mHYEHqlxbvfc26ycAtmIrvSUl7dww8vcQA5FbiCTDwElbAVfhkFF2
+         E1NOmXqCB3s76mdLupQ+uN+j8GSytZWeAj3RPCI0h8GInZDl0Cf6164XFOsX54nqyu+h
+         JWUUSQaQFp5va2tQQSRbD5p3CtDiJ9g83d96TMQPJ8zmeGCPTMxMbYm7hD77fjzoKJBL
+         JZed33TWcgeFNxZeFyNDyeFB12R2a0aznrdZv7yZpLGnb5UEWH3EZs1NR1GUZkdZRFrc
+         B5czWmga5DITvDvPEvKQqDIgHSvya6C1x/vcz5E6o5751uade04i31kIPHDx673vyAos
+         9PBg==
+X-Gm-Message-State: AO0yUKUtPVNiij5q5sY+8uAWOrFU3aoYJCBdxuhtapmp0QKHGpURD/f8
+        KSP1mUUsXUOvyVK/cuNuO3jzZw==
+X-Google-Smtp-Source: AK7set/PDa9oZC/tYXZAV4EbClHLZdMbVmxGR97qkvUkEEVLbHU3vmzGKHxKFJkEDjHgyyUthiP+iw==
+X-Received: by 2002:a17:903:1ce:b0:19a:c65d:f97 with SMTP id e14-20020a17090301ce00b0019ac65d0f97mr24637061plh.41.1677258193134;
+        Fri, 24 Feb 2023 09:03:13 -0800 (PST)
 Received: from hsinchu25.internal.sifive.com (59-124-168-89.hinet-ip.hinet.net. [59.124.168.89])
-        by smtp.gmail.com with ESMTPSA id b12-20020a170902b60c00b0019472226769sm9234731pls.251.2023.02.24.09.03.04
+        by smtp.gmail.com with ESMTPSA id b12-20020a170902b60c00b0019472226769sm9234731pls.251.2023.02.24.09.03.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Feb 2023 09:03:08 -0800 (PST)
+        Fri, 24 Feb 2023 09:03:12 -0800 (PST)
 From:   Andy Chiu <andy.chiu@sifive.com>
 To:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
         anup@brainfault.org, atishp@atishpatra.org,
         kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
 Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, Vincent Chen <vincent.chen@sifive.com>,
-        Andy Chiu <andy.chiu@sifive.com>,
+        guoren@linux.alibaba.com, Andy Chiu <andy.chiu@sifive.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
         Albert Ou <aou@eecs.berkeley.edu>,
-        Eric Biederman <ebiederm@xmission.com>,
-        Kees Cook <keescook@chromium.org>, Guo Ren <guoren@kernel.org>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        Nick Knight <nick.knight@sifive.com>,
-        Sunil V L <sunilvl@ventanamicro.com>,
-        Kefeng Wang <wangkefeng.wang@huawei.com>,
-        Zong Li <zong.li@sifive.com>,
-        Andrew Bresticker <abrestic@rivosinc.com>,
-        Al Viro <viro@zeniv.linux.org.uk>
-Subject: [PATCH -next v14 14/19] riscv: signal: Report signal frame size to userspace via auxv
-Date:   Fri, 24 Feb 2023 17:01:13 +0000
-Message-Id: <20230224170118.16766-15-andy.chiu@sifive.com>
+        Vincent Chen <vincent.chen@sifive.com>,
+        Guo Ren <guoren@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>,
+        Andrew Bresticker <abrestic@rivosinc.com>
+Subject: [PATCH -next v14 15/19] riscv: signal: validate altstack to reflect Vector
+Date:   Fri, 24 Feb 2023 17:01:14 +0000
+Message-Id: <20230224170118.16766-16-andy.chiu@sifive.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230224170118.16766-1-andy.chiu@sifive.com>
 References: <20230224170118.16766-1-andy.chiu@sifive.com>
@@ -81,150 +73,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Vincent Chen <vincent.chen@sifive.com>
+MINSIGSTKSZ alone have become less informative by the time an user calls
+sigaltstack(), as the kernel starts to support extensions that
+dynamically introduce footprint on a signal frame. For example, an RV64V
+implementation with vlen = 512 may occupy 2K + 40 + 12 Bytes of a signal
+frame with the upcoming Vector support. And there is no need for
+reserving the extra sigframe for some processes that do not execute any
+V-instructions.
 
-The vector register belongs to the signal context. They need to be stored
-and restored as entering and leaving the signal handler. According to the
-V-extension specification, the maximum length of the vector registers can
-be 2^(XLEN-1). Hence, if userspace refers to the MINSIGSTKSZ to create a
-sigframe, it may not be enough. To resolve this problem, this patch refers
-to the commit 94b07c1f8c39c
-("arm64: signal: Report signal frame size to userspace via auxv") to enable
-userspace to know the minimum required sigframe size through the auxiliary
-vector and use it to allocate enough memory for signal context.
+Thus, provide the function sigaltstack_size_valid() to validate its size
+based on current allocation status of supported extensions.
 
-Note that auxv always reports size of the sigframe as if V exists for
-all starting processes, whenever the kernel has CONFIG_RISCV_ISA_V. The
-reason is that users usually reference this value to allocate an
-alternative signal stack, and the user may use V anytime. So the user
-must reserve a space for V-context in sigframe in case that the signal
-handler invokes after the kernel allocating V.
-
-Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
-Signed-off-by: Vincent Chen <vincent.chen@sifive.com>
 Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
 ---
- arch/riscv/include/asm/elf.h         |  9 +++++++++
- arch/riscv/include/asm/processor.h   |  2 ++
- arch/riscv/include/uapi/asm/auxvec.h |  1 +
- arch/riscv/kernel/signal.c           | 20 +++++++++++++++-----
- 4 files changed, 27 insertions(+), 5 deletions(-)
+ arch/riscv/kernel/signal.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/arch/riscv/include/asm/elf.h b/arch/riscv/include/asm/elf.h
-index 30e7d2455960..ca23c4f6c440 100644
---- a/arch/riscv/include/asm/elf.h
-+++ b/arch/riscv/include/asm/elf.h
-@@ -105,6 +105,15 @@ do {								\
- 		get_cache_size(3, CACHE_TYPE_UNIFIED));		\
- 	NEW_AUX_ENT(AT_L3_CACHEGEOMETRY,			\
- 		get_cache_geometry(3, CACHE_TYPE_UNIFIED));	\
-+	/*							 \
-+	 * Should always be nonzero unless there's a kernel bug. \
-+	 * If we haven't determined a sensible value to give to	 \
-+	 * userspace, omit the entry:				 \
-+	 */							 \
-+	if (likely(signal_minsigstksz))				 \
-+		NEW_AUX_ENT(AT_MINSIGSTKSZ, signal_minsigstksz); \
-+	else							 \
-+		NEW_AUX_ENT(AT_IGNORE, 0);			 \
- } while (0)
- #define ARCH_HAS_SETUP_ADDITIONAL_PAGES
- struct linux_binprm;
-diff --git a/arch/riscv/include/asm/processor.h b/arch/riscv/include/asm/processor.h
-index f0ddf691ac5e..38ded8c5f207 100644
---- a/arch/riscv/include/asm/processor.h
-+++ b/arch/riscv/include/asm/processor.h
-@@ -7,6 +7,7 @@
- #define _ASM_RISCV_PROCESSOR_H
- 
- #include <linux/const.h>
-+#include <linux/cache.h>
- 
- #include <vdso/processor.h>
- 
-@@ -81,6 +82,7 @@ int riscv_of_parent_hartid(struct device_node *node, unsigned long *hartid);
- extern void riscv_fill_hwcap(void);
- extern int arch_dup_task_struct(struct task_struct *dst, struct task_struct *src);
- 
-+extern unsigned long signal_minsigstksz __ro_after_init;
- #endif /* __ASSEMBLY__ */
- 
- #endif /* _ASM_RISCV_PROCESSOR_H */
-diff --git a/arch/riscv/include/uapi/asm/auxvec.h b/arch/riscv/include/uapi/asm/auxvec.h
-index fb187a33ce58..2c50d9ca30e0 100644
---- a/arch/riscv/include/uapi/asm/auxvec.h
-+++ b/arch/riscv/include/uapi/asm/auxvec.h
-@@ -35,5 +35,6 @@
- 
- /* entries in ARCH_DLINFO */
- #define AT_VECTOR_SIZE_ARCH	9
-+#define AT_MINSIGSTKSZ 51
- 
- #endif /* _UAPI_ASM_RISCV_AUXVEC_H */
 diff --git a/arch/riscv/kernel/signal.c b/arch/riscv/kernel/signal.c
-index 76c0480ee4cd..aa8ee95dee2d 100644
+index aa8ee95dee2d..aff441e83a98 100644
 --- a/arch/riscv/kernel/signal.c
 +++ b/arch/riscv/kernel/signal.c
-@@ -21,6 +21,8 @@
- #include <asm/vector.h>
- #include <asm/csr.h>
- 
-+unsigned long __ro_after_init signal_minsigstksz;
+@@ -494,3 +494,11 @@ void __init init_rt_signal_env(void)
+ 	 */
+ 	signal_minsigstksz = cal_rt_frame_size(true);
+ }
 +
- extern u32 __user_rt_sigreturn[2];
- static size_t riscv_v_sc_size;
- 
-@@ -195,7 +197,7 @@ static long restore_sigcontext(struct pt_regs *regs,
- 	return -EINVAL;
- }
- 
--static size_t cal_rt_frame_size(void)
-+static size_t cal_rt_frame_size(bool cal_all)
- {
- 	struct rt_sigframe __user *frame;
- 	size_t frame_size;
-@@ -203,8 +205,10 @@ static size_t cal_rt_frame_size(void)
- 
- 	frame_size = sizeof(*frame);
- 
--	if (has_vector() && riscv_v_vstate_query(task_pt_regs(current)))
--		total_context_size += riscv_v_sc_size;
-+	if (has_vector()) {
-+		if (cal_all || riscv_v_vstate_query(task_pt_regs(current)))
-+			total_context_size += riscv_v_sc_size;
-+	}
- 	/*
- 	 * Preserved a __riscv_ctx_hdr for END signal context header if an
- 	 * extension uses __riscv_extra_ext_header
-@@ -225,7 +229,7 @@ SYSCALL_DEFINE0(rt_sigreturn)
- 	struct rt_sigframe __user *frame;
- 	struct task_struct *task;
- 	sigset_t set;
--	size_t frame_size = cal_rt_frame_size();
-+	size_t frame_size = cal_rt_frame_size(false);
- 
- 	/* Always make any pending restarted system calls return -EINTR */
- 	current->restart_block.fn = do_no_restart_syscall;
-@@ -320,7 +324,7 @@ static int setup_rt_frame(struct ksignal *ksig, sigset_t *set,
- {
- 	struct rt_sigframe __user *frame;
- 	long err = 0;
--	size_t frame_size = cal_rt_frame_size();
-+	size_t frame_size = cal_rt_frame_size(false);
- 
- 	frame = get_sigframe(ksig, regs, frame_size);
- 	if (!access_ok(frame, frame_size))
-@@ -483,4 +487,10 @@ void __init init_rt_signal_env(void)
- {
- 	riscv_v_sc_size = sizeof(struct __riscv_ctx_hdr) +
- 			  sizeof(struct __sc_riscv_v_state) + riscv_v_vsize;
-+	/*
-+	 * Determine the stack space required for guaranteed signal delivery.
-+	 * The signal_minsigstksz will be populated into the AT_MINSIGSTKSZ entry
-+	 * in the auxiliary array at process startup.
-+	 */
-+	signal_minsigstksz = cal_rt_frame_size(true);
- }
++#ifdef CONFIG_DYNAMIC_SIGFRAME
++bool sigaltstack_size_valid(size_t ss_size)
++{
++	return ss_size > cal_rt_frame_size(false);
++}
++#endif /* CONFIG_DYNAMIC_SIGFRAME */
++
 -- 
 2.17.1
 
