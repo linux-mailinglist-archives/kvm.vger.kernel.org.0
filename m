@@ -2,66 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B7DA6A21D4
-	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 19:53:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CDEFB6A21FE
+	for <lists+kvm@lfdr.de>; Fri, 24 Feb 2023 20:03:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229861AbjBXSxE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Feb 2023 13:53:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49748 "EHLO
+        id S229959AbjBXTD3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Feb 2023 14:03:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229500AbjBXSxD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Feb 2023 13:53:03 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B608C11678;
-        Fri, 24 Feb 2023 10:53:02 -0800 (PST)
+        with ESMTP id S229630AbjBXTD2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Feb 2023 14:03:28 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 652711B2F8
+        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 11:03:26 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4F144B81D01;
-        Fri, 24 Feb 2023 18:53:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F8FDC433EF;
-        Fri, 24 Feb 2023 18:52:59 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 1B869B81CF5
+        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 19:03:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BECAEC433EF;
+        Fri, 24 Feb 2023 19:03:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677264779;
-        bh=A7n0ZKEV3cT4ofTZftMjL2isGjA2th4kIutljiN1v3w=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=VAQmaoo+pliGlOcJZDWF7wr0OHnK8MBoL7p6yl9g0lcyTSXoLnww4OQpGkl/N6aCx
-         YMR28JD4cYki84qFyRu2lgMs9TwP284t+xbrvosCtKvSx4ngPewRlPPqFWfAKzQRxb
-         3Ox1TMPjoJ0r5xIcTCZqSN1tgrS3RkXW7BG1GXIn/ayPx31gNMzPIePr/VGOMKPyfx
-         z+FJzeLSWtqvvhyYOCzVnM36ODD/98+wA8wfRifBx/nySiYW73Ko889COJTRc57/As
-         dgeFa3PCi0hnqcl47WRpH/BdjXSgFc3adh9WlMeqYxTsb5e/2h+vY4qSgmS8Q5zRwz
-         Uprw6OvKEtiQA==
-Date:   Fri, 24 Feb 2023 10:52:57 -0800
-From:   Josh Poimboeuf <jpoimboe@kernel.org>
-To:     Kim Phillips <kim.phillips@amd.com>
-Cc:     x86@kernel.org, Borislav Petkov <bp@alien8.de>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Juergen Gross <jgross@suse.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Alexey Kardashevskiy <aik@amd.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v9 7/8] x86/cpu: Support AMD Automatic IBRS
-Message-ID: <20230224185257.o3mcmloei5zqu7wa@treble>
-References: <20230124163319.2277355-1-kim.phillips@amd.com>
- <20230124163319.2277355-8-kim.phillips@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230124163319.2277355-8-kim.phillips@amd.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        s=k20201202; t=1677265403;
+        bh=gCXvVswG+5BJ4eLw8cXXd2lIKc6j1StQlEVV4zpsmGY=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=bteC247cuY8lqVHIP5fSW8WbA80ZJaeeA0QA2eU9K5g7K0UGRNPpDn+xnVoGV6GJa
+         ERbEYw/u4vNPBQmhE39jH7ueEuWpRRpev1dV4dbjpl6rB+9z1LlPX6bPaOcT0v/OU/
+         6fZ+Ddop7SjirvXVRd/fpkt2Gg3Mnr3za2u1G79Xd7MAcxocwgdDTOR0tnKV3/LQlJ
+         0bnazS3Hx6QMeIvXPuZq+cktOM4xr99F9YWhwbgjI9X+Dz9+GQ0fuPqX5JlQsmU7c8
+         4B1pJPQ19oRaX1ei938Qiz4o5nwBwnKFSwSC0mCH4t2hiz7ktHjc3Z5gXiWmI+s0CM
+         XqH21f28/LMTQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pVdLl-00Czbp-BB;
+        Fri, 24 Feb 2023 19:03:21 +0000
+Date:   Fri, 24 Feb 2023 19:03:21 +0000
+Message-ID: <86v8jqx4w6.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Joey Gouly <joey.gouly@arm.com>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Russell King <rmk+kernel@armlinux.org.uk>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>, nd@arm.com
+Subject: Re: [PATCH 08/18] KVM: arm64: nv: Handle HCR_EL2.NV system register traps
+In-Reply-To: <Y/kDp9nYrAmYuh6y@linux.dev>
+References: <20230209175820.1939006-1-maz@kernel.org>
+        <20230209175820.1939006-9-maz@kernel.org>
+        <20230224173915.GA17407@e124191.cambridge.arm.com>
+        <Y/kDp9nYrAmYuh6y@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, catalin.marinas@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, rmk+kernel@armlinux.org.uk, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, nd@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,17 +76,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 24, 2023 at 10:33:18AM -0600, Kim Phillips wrote:
-> @@ -1495,8 +1495,12 @@ static void __init spectre_v2_select_mitigation(void)
->  		pr_err(SPECTRE_V2_EIBRS_EBPF_MSG);
->  
->  	if (spectre_v2_in_ibrs_mode(mode)) {
-> -		x86_spec_ctrl_base |= SPEC_CTRL_IBRS;
-> -		update_spec_ctrl(x86_spec_ctrl_base);
-> +		if (boot_cpu_has(X86_FEATURE_AUTOIBRS)) {
-> +			msr_set_bit(MSR_EFER, _EFER_AUTOIBRS);
+On Fri, 24 Feb 2023 18:36:23 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> Hi Joey,
+> 
+> On Fri, Feb 24, 2023 at 05:39:15PM +0000, Joey Gouly wrote:
+> > I'm having an issue with this commit where a VCPU is getting a CNTVOFF_EL2 set
+> > to 0, so it sees the same time as the host system, and the other VCPU has the
+> > correct offset.
+> 
+> Yikes!
+> 
+> > The flow of execution looks like this:
+> > 	KVM_CREATE_VCPU 0 (VMM) ->
+> > 		kvm_timer_vcpu_init ->
+> > 			update_vtimer_cntvoff (VCPU0.CNTVOFF_EL2=kvm_phys_timer_read)
+> > 	KVM_ARM_VCPU_INIT (VMM) ->
+> > 		kvm_arch_vcpu_ioctl_vcpu_init ->
+> > 			kvm_vcpu_set_target ->
+> > 				kvm_reset_vcpu ->
+> > 					kvm_reset_sys_regs (VCPU0.CNTVOFF_EL2=0)
+> > 
+> > 	KVM_CREATE_VCPU 1 (VMM) ->
+> > 		kvm_timer_vcpu_init ->
+> > 			update_vtimer_cntvoff (VCPU0.CNTVOFF_EL2=VCPU1.CNTVOFF_EL2=kvm_phys_timer_read)
+> > 	KVM_ARM_VCPU_INIT (VMM) ->
+> > 		kvm_arch_vcpu_ioctl_vcpu_init ->
+> > 			kvm_vcpu_set_target ->
+> > 				kvm_reset_vcpu ->
+> > 					kvm_reset_sys_regs (VCPU1.CNTVOFF_EL2=0)
+> > 
+> > 	At this point VCPU0 has CNTVOFF_EL2 == kvm_phys_timer_read, and VCPU1
+> > 	has CNTVOFF_EL2 == 0.
+> > 
+> > The VCPUs having different CNTVOFF_EL2 valuess is just a symptom of the fact that
+> > CNTVOFF_EL2 is now reset in kvm_reset_sys_regs.
+> 
+> Right, and the fundamental problem at hand is that we used CNTVOFF_EL2
+> to stash the _host's_ offset even though we are trying to change the
+> meaning of it to be part of the virtual EL2's context.
 
-Doesn't this only enable it on the boot CPU?
+What is driving me nuts is that I have never managed to reproduce the
+problem so far. I guess I have too much crap in my tree to spot it...
+
+> 
+> > The following patch gets it booting again, but I'm sure it's not the right fix.
+> 
+> I'd rather we just break the host away from using the shadow reg
+> altogether and separately track the host offset. As it so happens Marc
+> has a patch that does exactly that [*].
+
+Yup, might as well fix that *and* kill the lock inversion issue in one
+go...
+
+> Marc, do you want to resend that patch in isolation addressing the
+> feedback and link to this bug report?
+> 
+> [*] https://lore.kernel.org/kvmarm/20230216142123.2638675-6-maz@kernel.org/
+
+Joey, could you please give that patch a go, just to be on the safe
+side?
+
+Thanks,
+
+	M.
 
 -- 
-Josh
+Without deviation from the norm, progress is not possible.
