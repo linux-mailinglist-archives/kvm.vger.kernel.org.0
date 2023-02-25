@@ -2,80 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B44F6A2B5F
-	for <lists+kvm@lfdr.de>; Sat, 25 Feb 2023 19:47:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 67F306A2B8C
+	for <lists+kvm@lfdr.de>; Sat, 25 Feb 2023 20:51:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229641AbjBYSrI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 25 Feb 2023 13:47:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42282 "EHLO
+        id S229640AbjBYTu1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 25 Feb 2023 14:50:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229512AbjBYSrG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 25 Feb 2023 13:47:06 -0500
-Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60EDC17148;
-        Sat, 25 Feb 2023 10:47:05 -0800 (PST)
-Received: by mail-oi1-x233.google.com with SMTP id bg11so2144297oib.5;
-        Sat, 25 Feb 2023 10:47:05 -0800 (PST)
+        with ESMTP id S229593AbjBYTu0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 25 Feb 2023 14:50:26 -0500
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9951B15146
+        for <kvm@vger.kernel.org>; Sat, 25 Feb 2023 11:50:24 -0800 (PST)
+Received: by mail-lf1-x12c.google.com with SMTP id r27so3424380lfe.10
+        for <kvm@vger.kernel.org>; Sat, 25 Feb 2023 11:50:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mU8ouxaMVERSCUbXEf9OwfJ4PuquWDWLaI3fKf0e7O0=;
-        b=i2gR2OWZzLr/IrXj7DUSMkK5l8xThJQ+UBmRFwSBdr0293XSFQKpoTBRObmlutJn3l
-         akOz0p9AyqFE3HfBxbrrWvgHimJDoWdXkPCrMyhII+GrpgMM6ICsOH1mi8map0ukXw3M
-         tYdfUw05uyL27NCkoo45uWOoqi52ojqYSONUh3dm/39O8BZmb0I/PpVIXwqrqcKCbQpU
-         ms7WV52PrRkQfuwe/092kqnqCZzbfYzs23WcfIeKPTToClGRLgGMwgc5a3LWS3WTQ0FR
-         Su3YAOz1sYkADVnxEDIN5Qq/EJZPa1zr12aGQkiwqzu19FgWfEyEckgo5XzGqOCDfgv1
-         T7zQ==
+        d=linux-foundation.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=FQ06yesyUgRY5DSL1h615Nm6fkq1Vhy1HsTju3YI3UI=;
+        b=ZxiqbkUqEBDW1KNccJkKK7LUehWcaHJqIx3XuFbnY0uj4GN7vGXNoMgM5/cavjr+eG
+         S2Kis6MUPpPXHH77SUCKr0RJ+zmzrUB7pGcj7cYvyAVN8DMoK0njiV/r8E4ayS2IIvv3
+         BpeF5BTztR59OOV/oLZdOZU6cfSr1Q6W0MNXw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mU8ouxaMVERSCUbXEf9OwfJ4PuquWDWLaI3fKf0e7O0=;
-        b=XW6Z7D76ClqIAkT8kX5WdfKTFrh0vl0ha0m6fxtR7v05EfGkh7emVIH2Ys/Jb68WuE
-         vJl50hRB90rpxUMhIEvrnlzwGscuOY+h7a4S2Cn3mG3MytlQfm2kJYYp11oixc93K+YF
-         RqsZyjNULm5QVpr+uVFelzMxgvyTNdBtgxUv3x1ZMia1ia9bPeRWA7+m8igeNJkgYSlL
-         FWWGmVIsUx0v+iAcqrBkc3pqT9klmUHQ5yOMKM5s6/c5N8fd8LaZsZqKs1wJjshF6eS0
-         YOecuNoSof/xAYllUWeY67HipcBxj41OXIMzVPwCa7Pw/ZSAfeApjl7gkYtQuQEXHp9d
-         /03Q==
-X-Gm-Message-State: AO0yUKUTYZEiEVddQGCAgLDCDcfuULAkPzLG3dvXT92zN1RoqZs8sb2p
-        rIIzbYYHWkxkpTGfqDJea/U=
-X-Google-Smtp-Source: AK7set8VkV7Xov5x1fGY/9JN477Pgs4zaXeT7d9Ep3yomVCmotjwktaMsPjW73v7lwJwTsd9my6GUQ==
-X-Received: by 2002:a05:6808:199:b0:37f:8682:9383 with SMTP id w25-20020a056808019900b0037f86829383mr7756010oic.9.1677350824676;
-        Sat, 25 Feb 2023 10:47:04 -0800 (PST)
-Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id eb3-20020a056808634300b0037d8c2ff0acsm1162023oib.12.2023.02.25.10.47.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 25 Feb 2023 10:47:03 -0800 (PST)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Date:   Sat, 25 Feb 2023 10:47:02 -0800
-From:   Guenter Roeck <linux@roeck-us.net>
-To:     Yury Norov <yury.norov@gmail.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH 3/5] lib/bitmap: add test for bitmap_{from,to}_arr64
-Message-ID: <20230225184702.GA3587246@roeck-us.net>
-References: <20220428205116.861003-1-yury.norov@gmail.com>
- <20220428205116.861003-4-yury.norov@gmail.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FQ06yesyUgRY5DSL1h615Nm6fkq1Vhy1HsTju3YI3UI=;
+        b=MJ5SbKL0KQFeEq7L+gHzmizHWsx9FEX1fzIyd5ONGSxShIenhTWAn0c9671sHECRoO
+         5+bJAklaox67WPsrRmXaIe/f13F5DyK5zhb5jK7773cET7lxWBPX/XD0LmdgFHflOLee
+         raBAZ6HBcwwlM5GV1TDdrQ1+FsFUMiPQyBP/xTrp6CZxjMCYtfFkT3MQlA8bUp79DWpD
+         FPQ95ksa6GQsUf8RhwddNinBZCC0Ai+26j5+gu9sDFAgnmivwUWkLxnmUk0yomnL5gMC
+         9hP1dJ2JazGPsshHVCbyJ2u+zArEUsDojotznS7VgzRvY7cHAxgj4HERW1CL3cG7QUkn
+         YBWg==
+X-Gm-Message-State: AO0yUKUfnUfsnQ/D770OjLiaHW3Y+pFXqk5S8XLiQFjEiztxMCODJ5S/
+        T05Zj+3vK6kJcoHNaFJt+KscIhzrnf1oWW1C2Ic//Q==
+X-Google-Smtp-Source: AK7set/F/aXB7bRVqfur95omnIXAuF5B4lbiguFs9/pza7+PkGYHMG+q8ul+p7+M4l1Mh/I8RFKOoA==
+X-Received: by 2002:ac2:508f:0:b0:4dd:a772:8d24 with SMTP id f15-20020ac2508f000000b004dda7728d24mr2484406lfm.32.1677354623836;
+        Sat, 25 Feb 2023 11:50:23 -0800 (PST)
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com. [209.85.208.174])
+        by smtp.gmail.com with ESMTPSA id g17-20020ac25391000000b004d6f86c52fcsm285756lfh.193.2023.02.25.11.50.23
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 25 Feb 2023 11:50:23 -0800 (PST)
+Received: by mail-lj1-f174.google.com with SMTP id b13so2481194ljf.6
+        for <kvm@vger.kernel.org>; Sat, 25 Feb 2023 11:50:23 -0800 (PST)
+X-Received: by 2002:a17:907:60cd:b0:8f5:2e0e:6dc5 with SMTP id
+ hv13-20020a17090760cd00b008f52e0e6dc5mr2490334ejc.0.1677354173776; Sat, 25
+ Feb 2023 11:42:53 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220428205116.861003-4-yury.norov@gmail.com>
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+References: <20230220194045-mutt-send-email-mst@kernel.org> <20230223020356-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20230223020356-mutt-send-email-mst@kernel.org>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sat, 25 Feb 2023 11:42:36 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wg-az1yPKQmmDMnTMdUrg8hLzPUiUtUQu9d2EbdquBOnQ@mail.gmail.com>
+Message-ID: <CAHk-=wg-az1yPKQmmDMnTMdUrg8hLzPUiUtUQu9d2EbdquBOnQ@mail.gmail.com>
+Subject: Re: [GIT PULL] virtio,vhost,vdpa: features, fixes
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        almasrymina@google.com, alvaro.karsz@solid-run.com,
+        anders.roxell@linaro.org, bagasdotme@gmail.com,
+        bhelgaas@google.com, colin.i.king@gmail.com,
+        dmitry.fomichev@wdc.com, elic@nvidia.com, eperezma@redhat.com,
+        hch@lst.de, jasowang@redhat.com, kangjie.xu@linux.alibaba.com,
+        leiyang@redhat.com, liming.wu@jaguarmicro.com,
+        lingshan.zhu@intel.com, liubo03@inspur.com, lkft@linaro.org,
+        mie@igel.co.jp, m.szyprowski@samsung.com,
+        ricardo.canuelo@collabora.com, sammler@google.com,
+        sebastien.boeuf@intel.com, sfr@canb.auug.org.au,
+        si-wei.liu@oracle.com, stable@vger.kernel.org, stefanha@gmail.com,
+        suwan.kim027@gmail.com, xuanzhuo@linux.alibaba.com,
+        yangyingliang@huawei.com, zyytlz.wz@163.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -84,83 +86,13 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Wed, Feb 22, 2023 at 11:06 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> Did I muck this one up?  Pls let me know and maybe I can fix it up
+> before the merge window closes.
 
-On Thu, Apr 28, 2022 at 01:51:14PM -0700, Yury Norov wrote:
-> Test newly added bitmap_{from,to}_arr64() functions similarly to
-> already existing bitmap_{from,to}_arr32() tests.
-> 
-> Signed-off-by: Yury Norov <yury.norov@gmail.com>
+No much-ups, I've just been merging other things, and came back to
+architectures updates and virtualization now, so it's next in my
+queue.
 
-Ever since this test is in the tree, several of my boot tests show
-lots of messages such as
-
-test_bitmap: bitmap_to_arr64(nbits == 1): tail is not safely cleared: 0xa5a5a5a500000001 (must be 0x0000000000000001)
-test_bitmap: bitmap_to_arr64(nbits == 2): tail is not safely cleared: 0xa5a5a5a500000001 (must be 0x0000000000000003)
-test_bitmap: bitmap_to_arr64(nbits == 3): tail is not safely cleared: 0xa5a5a5a500000001 (must be 0x0000000000000007)
-...
-test_bitmap: bitmap_to_arr64(nbits == 927): tail is not safely cleared: 0xa5a5a5a500000000 (must be 0x000000007fffffff)
-test_bitmap: bitmap_to_arr64(nbits == 928): tail is not safely cleared: 0xa5a5a5a580000000 (must be 0x00000000ffffffff)
-
-but then:
-
-test_bitmap: all 6550 tests passed
-
-The message suggests an error, given that it is displayed with pr_err,
-but the summary suggests otherwise.
-
-Is the message just noise, or is there a problem ?
-
-Thanks,
-Guenter
-
-> ---
->  lib/test_bitmap.c | 25 +++++++++++++++++++++++++
->  1 file changed, 25 insertions(+)
-> 
-> diff --git a/lib/test_bitmap.c b/lib/test_bitmap.c
-> index 0c82f07f74fc..d5923a640457 100644
-> --- a/lib/test_bitmap.c
-> +++ b/lib/test_bitmap.c
-> @@ -585,6 +585,30 @@ static void __init test_bitmap_arr32(void)
->  	}
->  }
->  
-> +static void __init test_bitmap_arr64(void)
-> +{
-> +	unsigned int nbits, next_bit;
-> +	u64 arr[EXP1_IN_BITS / 64];
-> +	DECLARE_BITMAP(bmap2, EXP1_IN_BITS);
-> +
-> +	memset(arr, 0xa5, sizeof(arr));
-> +
-> +	for (nbits = 0; nbits < EXP1_IN_BITS; ++nbits) {
-> +		memset(bmap2, 0xff, sizeof(arr));
-> +		bitmap_to_arr64(arr, exp1, nbits);
-> +		bitmap_from_arr64(bmap2, arr, nbits);
-> +		expect_eq_bitmap(bmap2, exp1, nbits);
-> +
-> +		next_bit = find_next_bit(bmap2, round_up(nbits, BITS_PER_LONG), nbits);
-> +		if (next_bit < round_up(nbits, BITS_PER_LONG))
-> +			pr_err("bitmap_copy_arr64(nbits == %d:"
-> +				" tail is not safely cleared: %d\n", nbits, next_bit);
-> +
-> +		if (nbits < EXP1_IN_BITS - 64)
-> +			expect_eq_uint(arr[DIV_ROUND_UP(nbits, 64)], 0xa5a5a5a5);
-> +	}
-> +}
-> +
->  static void noinline __init test_mem_optimisations(void)
->  {
->  	DECLARE_BITMAP(bmap1, 1024);
-> @@ -852,6 +876,7 @@ static void __init selftest(void)
->  	test_copy();
->  	test_replace();
->  	test_bitmap_arr32();
-> +	test_bitmap_arr64();
->  	test_bitmap_parse();
->  	test_bitmap_parselist();
->  	test_bitmap_printlist();
-> -- 
-> 2.32.0
-> 
+           Linus
