@@ -2,65 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 021D56A2911
-	for <lists+kvm@lfdr.de>; Sat, 25 Feb 2023 11:32:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 78FC16A2915
+	for <lists+kvm@lfdr.de>; Sat, 25 Feb 2023 11:34:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229557AbjBYKcx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 25 Feb 2023 05:32:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49586 "EHLO
+        id S229520AbjBYKeQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 25 Feb 2023 05:34:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229473AbjBYKcv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 25 Feb 2023 05:32:51 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D2D710D0
-        for <kvm@vger.kernel.org>; Sat, 25 Feb 2023 02:32:50 -0800 (PST)
+        with ESMTP id S229495AbjBYKeO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 25 Feb 2023 05:34:14 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3010128D1B
+        for <kvm@vger.kernel.org>; Sat, 25 Feb 2023 02:34:14 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id CC5FAB80907
-        for <kvm@vger.kernel.org>; Sat, 25 Feb 2023 10:32:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65D39C433D2;
-        Sat, 25 Feb 2023 10:32:47 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B4AA160A77
+        for <kvm@vger.kernel.org>; Sat, 25 Feb 2023 10:34:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27721C433D2;
+        Sat, 25 Feb 2023 10:34:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677321167;
-        bh=GWWCYFWq7FJcty/g4faf96mwq52yRHHXEaQ/c2U22o4=;
+        s=k20201202; t=1677321253;
+        bh=7WQkbyJnkoeszCQNg0KtPZdoNpoaX0qi2rpLodXjZwA=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=bPgOumt43neLBbsnV9VJ7q5Vp9nkVia0+yEQgAKax39vbwpsWliRiSoYWRYcXmKVt
-         HttypUTrEOJ+ejh16ha3rIrT135cJVQ4TAG+bgUd5Gv4JcH8C9Y0CZSIQJ8y6bW5Ta
-         lzGRIgXAj58rsS74Go5l2bfyiLUdmdnHk5BCpcUiKSIJdx189zL7Rx4Mk5Bi1p/E9T
-         Q3QYqDY1xaN6MSDhGpuH43mbVwvGqeLNsvuKO5XOsQjD6aHv/Qj/6/LZ3Q/t4gxt7N
-         L/0igZtlFN2I2y/AR4bONaRhvFWtoaqCFl6tsHV4+SJg3K8Nx3vi+4SNCUkq5CpLnO
-         LeXktVsHa86LQ==
+        b=jabOTYe8xMnpMp0spzrkOo2nen8Ya3DhbzkT3EfFYEM0f0PIZANFBvR7Uq/Q1c3Rh
+         O3bbpxhIeJpPV6BNxplpDpMdKq3NeJ2Ctz/i80yA3OMv54LPPHtVMAiLEMNry9c+fm
+         atIAOFLk1GjI3e37lAgYutXBwkysj5bzctRZ4YK98jBhFZoYMGolCePC3lwJV5FdQZ
+         ZM5VF8JTOt+2J7xfRsnhKI/+gyA0TMZF1R7Ap0o5gW4KVq3o8ury5QKIf4QUamVLwI
+         FxHc7ty1Ec5cKSDQ4BkemWC992l2d8nrnSggAlV0DFBeTk71AITAUz7aYTkpKi2p1T
+         ZYRFhvv1kop8A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pVrrB-00D6vI-03;
-        Sat, 25 Feb 2023 10:32:45 +0000
-Date:   Sat, 25 Feb 2023 10:32:40 +0000
-Message-ID: <87cz5ydohj.wl-maz@kernel.org>
+        id 1pVrsT-00D6wY-Mt;
+        Sat, 25 Feb 2023 10:34:06 +0000
+Date:   Sat, 25 Feb 2023 10:34:05 +0000
+Message-ID: <87bklidof6.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Colton Lewis <coltonlewis@google.com>
 Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
         suzuki.poulose@arm.com, oliver.upton@linux.dev,
         yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de,
-        dwmw2@infradead.org
-Subject: Re: [PATCH 12/16] KVM: arm64: nv: timers: Add a per-timer, per-vcpu offset
-In-Reply-To: <gsntk006968w.fsf@coltonlewis-kvm.c.googlers.com>
-References: <20230216142123.2638675-13-maz@kernel.org>
-        <gsntk006968w.fsf@coltonlewis-kvm.c.googlers.com>
+        dwmw2@infradead.org, christoffer.dall@arm.com
+Subject: Re: [PATCH 13/16] KVM: arm64: nv: timers: Support hyp timer emulation
+In-Reply-To: <gsntilfq968g.fsf@coltonlewis-kvm.c.googlers.com>
+References: <20230216142123.2638675-14-maz@kernel.org>
+        <gsntilfq968g.fsf@coltonlewis-kvm.c.googlers.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de, dwmw2@infradead.org
+X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de, dwmw2@infradead.org, christoffer.dall@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,38 +68,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 24 Feb 2023 20:07:59 +0000,
+On Fri, 24 Feb 2023 20:08:15 +0000,
 Colton Lewis <coltonlewis@google.com> wrote:
 > 
+> I hope someone else looks at this one because I don't understand NV.
+
+Don't worry, you're not alone.
+
 > Marc Zyngier <maz@kernel.org> writes:
 > 
-> > diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-> > index 62ef4883e644..e76e513b90c5 100644
-> > --- a/include/kvm/arm_arch_timer.h
-> > +++ b/include/kvm/arm_arch_timer.h
-> > @@ -29,6 +29,11 @@ struct arch_timer_offset {
-> >   	 * structure. If NULL, assume a zero offset.
-> >   	 */
-> >   	u64	*vm_offset;
-> > +	/*
-> > +	 * If set, pointer to one of the offsets in the vcpu's sysreg
-> > +	 * array. If NULL, assume a zero offset.
-> > +	 */
-> > +	u64	*vcpu_offset;
-> >   };
+> > +	struct arch_timer_context *ctx;
+> > +
+> > +	ctx = (vcpu_has_nv(vcpu) && is_hyp_ctxt(vcpu)) ? vcpu_hvtimer(vcpu)
+> > +						       : vcpu_vtimer(vcpu);
 > 
-> >   struct arch_timer_vm_offsets {
-> > --
-> > 2.34.1
-> 
-> This pointer isn't initialized until next commit and this commit is
-> small so I think it should be merged with the next one.
+> I don't think that ternary is the easiest to read and would prefer an if
+> statement.
 
-Like the rest of the vcpu structure, this is of course initialised to
-zero. Yes, the patch is small. It does *one* thing, which is to plug a
-new offset.
-
-Should it be buried into a much bigger patch? I don't think so.
+As the saying goes, there is no accounting for taste. Do you see a
+technical issue with this statement?
 
 	M.
 
