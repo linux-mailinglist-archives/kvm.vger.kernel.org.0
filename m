@@ -2,170 +2,251 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 755C16A26B8
-	for <lists+kvm@lfdr.de>; Sat, 25 Feb 2023 02:53:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D4EA6A26D2
+	for <lists+kvm@lfdr.de>; Sat, 25 Feb 2023 03:36:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229728AbjBYBw6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Feb 2023 20:52:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50066 "EHLO
+        id S229557AbjBYCgH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Feb 2023 21:36:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229773AbjBYBwv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Feb 2023 20:52:51 -0500
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2087.outbound.protection.outlook.com [40.107.94.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 276DB40D9;
-        Fri, 24 Feb 2023 17:52:49 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Q+pW39Pl26zuwL9eZBShNo9yBOEuWr3t7iik+uBEvN/MUUFbx0A+Va5/74TzCVVcK6RIEdIEXLaYKJMcgPFp38YyxhFYNLDnSchcHCFBSlF1t5iPmX7rwPmsHAKVHCoR3YWVc4DWYiQIAdNCMe+J3EEQQjFPVFaHvm3jav2gPkMrbSa5ZPTd51pu5g2As9ByMW9mLUml73ooxdTzKp5twmvxeTbv+Dj6iBckC9P9+NiSkRbUb+I+2ybcGN1FVl40CSKv+zOhZ2CwkUNQVkgeDs0DheKOBX2WWphTuS7tTjbgHVIX8a9DH9bxTaWlbV4OEtAUQ+mhEsttDOUMWA5ivw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5s1jf6ea1wA0fPeiaXnc1s7nqCL56nNg7YPhq8BV1+Y=;
- b=N8kboPGQxgRG/mxcUClDKVWsv1+nmh7Y32Ysma3SWDtZtKLUzG/3XZXgoeHaPl2vbLbMxyuwbqaFCEpnUC7YpTzIZUk78k4kl6PqxQ5M00SR9c4DYXjs8rvyioOlx6IktCKV49SykayddNyVZL3U/C9ldJDdZsSWEjO+lmB/VEtFGKtEWyYTgwYCxbnf8bON4vLorGtao9GaavjlXJ3HZlG+UYcfVQoIEajUfyB5MJr7eoagKwPHsOtGgV2fYyJI5KjzR43bbBmgsRh3HxyzuKnfl3asMHybxmWwMG6+/myNv7aiVEy5s6GSHDNANx0WpkXkMaeiFbpfaTVHPSlF+Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5s1jf6ea1wA0fPeiaXnc1s7nqCL56nNg7YPhq8BV1+Y=;
- b=WMSyESYd88IvJbTpds5j+kZyYik9/lTejmoXyJ+juEwFcM29uz0OU05YFYcOFKIzOA9NL68K9Hl+G8Uuq3GY7hsKOtUif/5GDgVoJrcHWRgmW02VJZtICPReU6DWdivqCPBUrWdBkxqhOCNrQajiKBB/t7Hze+D8vG0KkuJXJdC1EaL9x8VlYV0tk/y5255NrBxaiCQoj5QlxdCeFfkKNF4AHTaunK0r7v6ARskzPWbNBv/N+ThUBbexGMZHOX1YApo+tTQB8g8M9wJFXTwSy9cx6/SGF7Tnr7Nlr7AOfTOQE/Tpcm5kszN1nS8CEQkOoKnpIIJioPcZnnICFwC37g==
-Received: from MW4PR03CA0219.namprd03.prod.outlook.com (2603:10b6:303:b9::14)
- by MW4PR12MB6899.namprd12.prod.outlook.com (2603:10b6:303:208::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.21; Sat, 25 Feb
- 2023 01:52:47 +0000
-Received: from CO1NAM11FT008.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:b9:cafe::91) by MW4PR03CA0219.outlook.office365.com
- (2603:10b6:303:b9::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.25 via Frontend
- Transport; Sat, 25 Feb 2023 01:52:47 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CO1NAM11FT008.mail.protection.outlook.com (10.13.175.191) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6156.11 via Frontend Transport; Sat, 25 Feb 2023 01:52:47 +0000
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Fri, 24 Feb
- 2023 17:52:33 -0800
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail203.nvidia.com
- (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Fri, 24 Feb
- 2023 17:52:32 -0800
-Received: from Asurada-Nvidia.nvidia.com (10.127.8.12) by mail.nvidia.com
- (10.129.68.6) with Microsoft SMTP Server id 15.2.986.36 via Frontend
- Transport; Fri, 24 Feb 2023 17:52:32 -0800
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     <jgg@nvidia.com>, <kevin.tian@intel.com>, <joro@8bytes.org>,
-        <will@kernel.org>, <robin.murphy@arm.com>,
-        <alex.williamson@redhat.com>, <shuah@kernel.org>
-CC:     <yi.l.liu@intel.com>, <linux-kernel@vger.kernel.org>,
-        <iommu@lists.linux.dev>, <kvm@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>, <mjrosato@linux.ibm.com>,
-        <farman@linux.ibm.com>
-Subject: [PATCH v3 5/5] iommufd/selftest: Add coverage for access->ioas replacement
-Date:   Fri, 24 Feb 2023 17:51:42 -0800
-Message-ID: <4d371c99faf55baa771a0cb00f90338145af0c8d.1677288789.git.nicolinc@nvidia.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <cover.1677288789.git.nicolinc@nvidia.com>
-References: <cover.1677288789.git.nicolinc@nvidia.com>
+        with ESMTP id S229452AbjBYCgG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Feb 2023 21:36:06 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1C481B2DD
+        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 18:36:04 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id h17-20020a17090aea9100b0023739b10792so1111411pjz.1
+        for <kvm@vger.kernel.org>; Fri, 24 Feb 2023 18:36:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=oJ4h5Gqoyl05jSC/FXmh53k03kp+gFsTu89ZEOLEYMg=;
+        b=Ix3+5FH8YfS1+VGeYEXLuBQZPzo2WZCOWWrA3ac5Gg22L8VNhcoz928BknbmdFbjny
+         kaz46jJRwxN/8jO9KIzkcJyNc3meYusVaqi41SgEQKUlXDTVMCfF9HexiGNFXlHUJdik
+         iLpRxuOgys6JwfbUuxT2qnjoEeLa9j49M3dkdmsuJFLTNDxexgQvCKQFVX4r0VTbvWtR
+         /pF1LlpY0ot4y4imKuobKWUod5mkbzmI+eFL/a6IzgmSCZ41iNcr+km2FgUdtBtaq8TF
+         nReVGNVOdGUbB/LxFvLPSSo7Wf/Hg+G/r1Tx5OU3uzT3QgpJqcQeMMaAakBaT/+NHmnr
+         mP4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oJ4h5Gqoyl05jSC/FXmh53k03kp+gFsTu89ZEOLEYMg=;
+        b=zx3xc72bXuleTfGlS8d5isfEjKs++eCTCofUa+3ixoTUXV3A+6LZ/okJNA4QCFGTYE
+         kGIcOpQ5jZo/HR1lqeHOFj6Q8xnWYwLeWgrfpnJo9D5bgatuYd7JDT6Eq2QdHxIf6thj
+         AQixJ6l6bvyvzmGfxhpuR2gBV2L6yvCiFWP/ZiAqZ0XlCbymvz6wJN4+NrCqNMGh8yGh
+         S9DGkGLTzLSFrO9ebbagfv5BIAsrgpaUfvNeOiXIZDPVsOkYfPFHc/GAGynr/HScH5NJ
+         d49BdqNYgG59yRUt3EwdC8T2zjrid3l4uZa3/0gmY+j5z9JMqi3qyS4Zwgf+2c8ocW3P
+         6dZg==
+X-Gm-Message-State: AO0yUKWZxwV+npv+F+k4yZ7DHcS9UKxdsB4YcI7xZkR53uGdqXbk9q+b
+        smVYlsUAnb72ouPqmcO9QVecNxreJojS/WMRViXYvw==
+X-Google-Smtp-Source: AK7set/Jp9EcqT0pkztNybGqBbTHDrVZWovLCFuf4Jsdhl/SusPMRD3rZHrZFa41Y7d8yyj2IrXuDBTyREmnPerDazg=
+X-Received: by 2002:a17:902:f782:b0:19c:b3ce:d316 with SMTP id
+ q2-20020a170902f78200b0019cb3ced316mr2788547pln.2.1677292563766; Fri, 24 Feb
+ 2023 18:36:03 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1NAM11FT008:EE_|MW4PR12MB6899:EE_
-X-MS-Office365-Filtering-Correlation-Id: 16a21842-4bfb-4fa2-e9b0-08db16d2fed1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: RE70/s2C40QRw1g3URwZ5Dfe7+xedMJnkBeztt/5kykBGtO4IBrD8F556b3v8937+xfxQRE4Pp7qR3LfcBggPctAo6G/esQ6JF8QK+P3GxIRzXLLiaBdCP6q67qkZZjCoVsHqd848gL2x9rojmKE6/w4+L6J8HUI5Y/M3jM/u7rMM0uGEtz7gYCVQixYFYWl91cuK33Cw6vm/34oBucVvJ3p4LWL33rE7Aj6PDZBtCLbSciyjTmwWAglMMQq930t4hn6nD2yF7QpFedXNZQZrOH0jDUbPrIzqN+VB57IsfWJmsOPm6EQlLcM8Zje3JOxfnHS90dCZPQWU9q6ot9wYoVbAuU5+6AFkpUn1JrNwk7ng17pPgoaPyCSoHjic+zSsiL/ohWMLJX4KBJzB7xtTAmsVKf++R6l2sFo+4FhmOof5oyuyedMbaIDX1jt48CHoNBi/T3u9bUm5UETJOCgZcKNKQwPt2dZrcvY5nO1bcoM+KtgGDfqxzimEPflfopmSkCvePExaxD+28LU5zJBJFAHtDn1fFxZTPIfZEnil5Oyb7p0McImOptRYx8UvEsJ9/b5XSy2W1NnmzNLjkjA9F2XE0igbqz9D/lbJAzbYedhUHLwMMevAyXIt7/Zs7LLp8ZrhKsarVoeAsZ3qvFZutZREtkn5mgp5EQon8syF04XXE1q98uxnRalKey99X4iNFisAJUmtxG3fqSEfHUUIVeshR+ORVUZIEqri0GIo64=
-X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230025)(4636009)(376002)(346002)(39860400002)(136003)(396003)(451199018)(46966006)(40470700004)(36840700001)(83380400001)(82740400003)(47076005)(2616005)(426003)(7636003)(336012)(34020700004)(82310400005)(36860700001)(110136005)(7696005)(356005)(54906003)(316002)(40460700003)(2906002)(36756003)(6666004)(26005)(186003)(478600001)(40480700001)(86362001)(7416002)(41300700001)(8936002)(5660300002)(4326008)(8676002)(70586007)(70206006);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2023 01:52:47.5607
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 16a21842-4bfb-4fa2-e9b0-08db16d2fed1
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT008.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6899
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+References: <20230212215830.2975485-1-jingzhangos@google.com> <20230212215830.2975485-5-jingzhangos@google.com>
+In-Reply-To: <20230212215830.2975485-5-jingzhangos@google.com>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Fri, 24 Feb 2023 18:35:47 -0800
+Message-ID: <CAAeT=FxXNvkd4qg83oYciahbADGPSoHb+KYRfrCRWx2s43b7qA@mail.gmail.com>
+Subject: Re: [PATCH v2 4/6] KVM: arm64: Use per guest ID register for ID_AA64DFR0_EL1.PMUVer
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oupton@google.com>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add replace coverage as a part of user_copy test case. It basically
-repeats the copy test after replacing the old ioas with a new one.
+Hi Jing,
 
-Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
----
- tools/testing/selftests/iommu/iommufd.c | 29 +++++++++++++++++++++++--
- 1 file changed, 27 insertions(+), 2 deletions(-)
+On Sun, Feb 12, 2023 at 1:58 PM Jing Zhang <jingzhangos@google.com> wrote:
+>
+> With per guest ID registers, PMUver settings from userspace
+> can be stored in its corresponding ID register.
+>
+> No functional change intended.
+>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 11 ++++----
+>  arch/arm64/kvm/arm.c              |  6 -----
+>  arch/arm64/kvm/id_regs.c          | 44 +++++++++++++++++++++++--------
+>  include/kvm/arm_pmu.h             |  6 +++--
+>  4 files changed, 43 insertions(+), 24 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index f64347eb77c2..effb61a9a855 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -218,6 +218,12 @@ struct kvm_arch {
+>  #define KVM_ARCH_FLAG_EL1_32BIT                                4
+>         /* PSCI SYSTEM_SUSPEND enabled for the guest */
+>  #define KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED           5
+> +       /*
+> +        * AA64DFR0_EL1.PMUver was set as ID_AA64DFR0_EL1_PMUVer_IMP_DEF
+> +        * or DFR0_EL1.PerfMon was set as ID_DFR0_EL1_PerfMon_IMPDEF from
+> +        * userspace for VCPUs without PMU.
+> +        */
+> +#define KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU
 
-diff --git a/tools/testing/selftests/iommu/iommufd.c b/tools/testing/selftests/iommu/iommufd.c
-index 65f1847de5a5..76f2ac73bb45 100644
---- a/tools/testing/selftests/iommu/iommufd.c
-+++ b/tools/testing/selftests/iommu/iommufd.c
-@@ -1252,7 +1252,13 @@ TEST_F(iommufd_mock_domain, user_copy)
- 		.dst_iova = MOCK_APERTURE_START,
- 		.length = BUFFER_SIZE,
- 	};
--	unsigned int ioas_id;
-+	struct iommu_ioas_unmap unmap_cmd = {
-+		.size = sizeof(unmap_cmd),
-+		.ioas_id = self->ioas_id,
-+		.iova = MOCK_APERTURE_START,
-+		.length = BUFFER_SIZE,
-+	};
-+	unsigned int new_ioas_id, ioas_id;
- 
- 	/* Pin the pages in an IOAS with no domains then copy to an IOAS with domains */
- 	test_ioctl_ioas_alloc(&ioas_id);
-@@ -1270,11 +1276,30 @@ TEST_F(iommufd_mock_domain, user_copy)
- 	ASSERT_EQ(0, ioctl(self->fd, IOMMU_IOAS_COPY, &copy_cmd));
- 	check_mock_iova(buffer, MOCK_APERTURE_START, BUFFER_SIZE);
- 
-+	/* Now replace the ioas with a new one */
-+	test_ioctl_ioas_alloc(&new_ioas_id);
-+	test_ioctl_ioas_map_id(new_ioas_id, buffer, BUFFER_SIZE,
-+			       &copy_cmd.src_iova);
-+	test_cmd_access_set_ioas(access_cmd.id, new_ioas_id);
-+
-+	/* Destroy the old ioas and cleanup copied mapping */
-+	ASSERT_EQ(0, ioctl(self->fd, IOMMU_IOAS_UNMAP, &unmap_cmd));
-+	test_ioctl_destroy(ioas_id);
-+
-+	/* Then run the same test again with the new ioas */
-+	access_cmd.access_pages.iova = copy_cmd.src_iova;
-+	ASSERT_EQ(0,
-+		  ioctl(self->fd, _IOMMU_TEST_CMD(IOMMU_TEST_OP_ACCESS_PAGES),
-+			&access_cmd));
-+	copy_cmd.src_ioas_id = new_ioas_id;
-+	ASSERT_EQ(0, ioctl(self->fd, IOMMU_IOAS_COPY, &copy_cmd));
-+	check_mock_iova(buffer, MOCK_APERTURE_START, BUFFER_SIZE);
-+
- 	test_cmd_destroy_access_pages(
- 		access_cmd.id, access_cmd.access_pages.out_access_pages_id);
- 	test_cmd_destroy_access(access_cmd.id);
- 
--	test_ioctl_destroy(ioas_id);
-+	test_ioctl_destroy(new_ioas_id);
- }
- 
- TEST_F(iommufd_mock_domain, replace)
--- 
-2.39.2
+As Oliver suggested, it might be better to not expose IMPDEF PMU
+(but expose as 0), since it is not effectively supported by KVM.
+(We need to be careful not to have migration from old KVM fail though)
 
+
+>
+>         unsigned long flags;
+>
+> @@ -230,11 +236,6 @@ struct kvm_arch {
+>
+>         cpumask_var_t supported_cpus;
+>
+> -       struct {
+> -               u8 imp:4;
+> -               u8 unimp:4;
+> -       } dfr0_pmuver;
+> -
+>         /* Hypercall features firmware registers' descriptor */
+>         struct kvm_smccc_features smccc_feat;
+>
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index c78d68d011cb..fb2de2cb98cb 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -138,12 +138,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>         kvm_arm_set_default_id_regs(kvm);
+>         kvm_arm_init_hypercalls(kvm);
+>
+> -       /*
+> -        * Initialise the default PMUver before there is a chance to
+> -        * create an actual PMU.
+> -        */
+> -       kvm->arch.dfr0_pmuver.imp = kvm_arm_pmu_get_pmuver_limit();
+> -
+>         return 0;
+>
+>  err_free_cpumask:
+> diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
+> index bc4c408a43eb..14ae03a1d8d0 100644
+> --- a/arch/arm64/kvm/id_regs.c
+> +++ b/arch/arm64/kvm/id_regs.c
+> @@ -21,9 +21,12 @@
+>  static u8 vcpu_pmuver(const struct kvm_vcpu *vcpu)
+>  {
+>         if (kvm_vcpu_has_pmu(vcpu))
+> -               return vcpu->kvm->arch.dfr0_pmuver.imp;
+> -
+> -       return vcpu->kvm->arch.dfr0_pmuver.unimp;
+> +               return FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
+> +                               IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1));
+> +       else if (test_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags))
+> +               return ID_AA64DFR0_EL1_PMUVer_IMP_DEF;
+> +       else
+> +               return 0;
+>  }
+>
+>  static u8 perfmon_to_pmuver(u8 perfmon)
+> @@ -267,10 +270,15 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+>         if (val)
+>                 return -EINVAL;
+>
+> -       if (valid_pmu)
+> -               vcpu->kvm->arch.dfr0_pmuver.imp = pmuver;
+> -       else
+> -               vcpu->kvm->arch.dfr0_pmuver.unimp = pmuver;
+> +       if (valid_pmu) {
+> +               IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
+> +               IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) |=
+> +                       FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), pmuver);
+
+The original code keeps ID_AA64DFR0_EL1.PMUVer and ID_DFR0_EL1.PerfMon
+values consistent (if one of them is update, the other one is also
+updated accordingly).  To keep the same behavior, shouldn't we update
+the other one as well when one of them is updated ?
+
+Thank you,
+Reiji
+
+
+> +       } else if (pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF) {
+> +               set_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags);
+> +       } else {
+> +               clear_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags);
+> +       }
+>
+>         return 0;
+>  }
+> @@ -307,10 +315,15 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+>         if (val)
+>                 return -EINVAL;
+>
+> -       if (valid_pmu)
+> -               vcpu->kvm->arch.dfr0_pmuver.imp = perfmon_to_pmuver(perfmon);
+> -       else
+> -               vcpu->kvm->arch.dfr0_pmuver.unimp = perfmon_to_pmuver(perfmon);
+> +       if (valid_pmu) {
+> +               IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) &= ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
+> +               IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) |=
+> +                       FIELD_PREP(ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon), perfmon_to_pmuver(perfmon));
+> +       } else if (perfmon == ID_DFR0_EL1_PerfMon_IMPDEF) {
+> +               set_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags);
+> +       } else {
+> +               clear_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags);
+> +       }
+>
+>         return 0;
+>  }
+> @@ -534,4 +547,13 @@ void kvm_arm_set_default_id_regs(struct kvm *kvm)
+>         }
+>
+>         IDREG(kvm, SYS_ID_AA64PFR0_EL1) = val;
+> +
+> +       /*
+> +        * Initialise the default PMUver before there is a chance to
+> +        * create an actual PMU.
+> +        */
+> +       IDREG(kvm, SYS_ID_AA64DFR0_EL1) &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
+> +       IDREG(kvm, SYS_ID_AA64DFR0_EL1) |=
+> +               FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
+> +                          kvm_arm_pmu_get_pmuver_limit());
+>  }
+> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> index 628775334d5e..eef67b7d9751 100644
+> --- a/include/kvm/arm_pmu.h
+> +++ b/include/kvm/arm_pmu.h
+> @@ -92,8 +92,10 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
+>  /*
+>   * Evaluates as true when emulating PMUv3p5, and false otherwise.
+>   */
+> -#define kvm_pmu_is_3p5(vcpu)                                           \
+> -       (vcpu->kvm->arch.dfr0_pmuver.imp >= ID_AA64DFR0_EL1_PMUVer_V3P5)
+> +#define kvm_pmu_is_3p5(vcpu)                                                                   \
+> +       (kvm_vcpu_has_pmu(vcpu) &&                                                              \
+> +        FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),                                  \
+> +                IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1)) >= ID_AA64DFR0_EL1_PMUVer_V3P5)
+>
+>  u8 kvm_arm_pmu_get_pmuver_limit(void);
+>
+> --
+> 2.39.1.581.gbfd45094c4-goog
+>
