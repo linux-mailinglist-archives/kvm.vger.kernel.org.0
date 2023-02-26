@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BCFF96A2F2D
-	for <lists+kvm@lfdr.de>; Sun, 26 Feb 2023 12:08:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B639B6A2F31
+	for <lists+kvm@lfdr.de>; Sun, 26 Feb 2023 12:08:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229516AbjBZLIO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 26 Feb 2023 06:08:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35938 "EHLO
+        id S229673AbjBZLIk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 26 Feb 2023 06:08:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229536AbjBZLIM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 26 Feb 2023 06:08:12 -0500
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6817D337
-        for <kvm@vger.kernel.org>; Sun, 26 Feb 2023 03:08:07 -0800 (PST)
-Received: by mail-wm1-x32b.google.com with SMTP id r19-20020a05600c459300b003eb3e2a5e7bso543182wmo.0
-        for <kvm@vger.kernel.org>; Sun, 26 Feb 2023 03:08:07 -0800 (PST)
+        with ESMTP id S229640AbjBZLIi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 26 Feb 2023 06:08:38 -0500
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 891B3D33F
+        for <kvm@vger.kernel.org>; Sun, 26 Feb 2023 03:08:08 -0800 (PST)
+Received: by mail-wm1-x32c.google.com with SMTP id ay29-20020a05600c1e1d00b003e9f4c2b623so5254840wmb.3
+        for <kvm@vger.kernel.org>; Sun, 26 Feb 2023 03:08:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=bytedance.com; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8SFcyAg12RLJRTJdp4mtixGxiIqYpnMS3znV8hvpPts=;
-        b=hI78QYpmhKZwO4mzxF/UimiezGc+2wFxUxNXZcbhVXrN9v/kQruAnueLLprhAIc2+g
-         rPhZDr3ZD/ZkWIyLwkdY8ngMUMXEpbK8u3uCNalhHOSIeSov/5w2tH7+1z19audJ4EGB
-         DdSi1lgBp+q/uyAquDfAiknnRnWqPZAUdewkZ1MRaB0wFkZOu9/FCVfsS+N1mMJzCVMv
-         2eRjeK5kNtUy3xUIHAO0qr5aujHcDbor/Jj2leiS6m3k0sk0xrTmdUCDEuZH/PvjxLQu
-         tRg/bXyDdTS72ALHi4dov5j801ALNrAbnquooCspjLIlrOru1+a1Cl76vYYIirJjvXHC
-         y4vQ==
+        bh=7yne835l8M0Qgk6uaQXrJLgxrNefMQSePYhKpKknocM=;
+        b=Vdmli2xdqqTFvFajej6BB3WjL5gX6kzXUQGsY/1NZ8H7n5Gnr4CKYxNsCZXbok81JA
+         zVSdR0aOwQ5OQLk7wimvdRz7uv7ebiDukmGfPNpSBzLWFX+PHn/QmHr6mk1hKqEerdWo
+         13DqD17obUw8AE2Iurcm2ND4c/p6rPkZiq1Up0YrBfQS3R2+xPg5Yy7U5z0PRVFsRYNN
+         nUjuZu0ro9na0ZN2HWU9tQMqE3LJxIiHet33Duwdt5VhpMbN62ZoANHgob46Pj5cfDeY
+         kIacdjh1vIClKSrtoSVAUejXgkyd60bxL+DGr5VJo6oE8xZ7AiYokCKxOzRbsuty8aGH
+         k2jQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8SFcyAg12RLJRTJdp4mtixGxiIqYpnMS3znV8hvpPts=;
-        b=ugMaVdlgO+cypLjrgIWrx1N2T4ve/V76umCgYnI/i8wBwCdpvywWcL//ZTPD8b6l8R
-         1chS5WODo6ayCBIKxVsQ9DxAtZktuqSKf90D/y5uqTUVEbBOAKBFu7T1RlveLxEx91t0
-         LExywUIA0Yf8FZyulpfT2Wt47Y6k9cJ7OuywK0LfUbmmRVwFiokQ7G+/VxqbGOjOZbuE
-         EkFkVHn0im9cIgN7JgAHlNmXFkGCd0PXfVYadQqEEp5Rv9TGH4Brmo03VuPJ4t85RduE
-         g2qHW0P8cg/UGXCxUlRaxM6ntvo5DkyN654diy/hwZdm8wIcYNVrA4rgWON/VPebkKJZ
-         jAUQ==
-X-Gm-Message-State: AO0yUKUOgBQuG35QlDufT2q1pyQUOkZE8iCa8+Rv8RdAMP9tLUTvq6vN
-        lAaNuGV4XObCMSL9HdjzKPdGlA==
-X-Google-Smtp-Source: AK7set/LY/smYP6Xt8GC2+xB49frpFQfsGIj1taJE3tW1pIsoPs+q6wG3SkBE9YCU6gJHv+g3wJ3Ug==
-X-Received: by 2002:a05:600c:3b1e:b0:3ea:e5fc:a5a4 with SMTP id m30-20020a05600c3b1e00b003eae5fca5a4mr7617365wms.1.1677409685966;
-        Sun, 26 Feb 2023 03:08:05 -0800 (PST)
+        bh=7yne835l8M0Qgk6uaQXrJLgxrNefMQSePYhKpKknocM=;
+        b=hdKjauEiiUQ108+VvQ2OyMBxrbC2U00wwHIcfd8Kc62XHg5MU7a04D5xQpEfeJBcFC
+         DXVcj4cjYQP6LEwFIqglfh2fgk7sRcYpXlYShmB0gHrL86cMoGlxo6l31txnoomz7LSk
+         /3NUYyeG5cYwhwjP9rMxwJixBRki1tEM+tio4Dr0jd35yrzJETG/TgRDBYXq36svfe1S
+         P9cKhDkTS3aSfX4mHrWILcIjvCdEMDKkn4nAQQlTGiDBQSKoqBjByJuDXOG8e8oVriM5
+         DsLUDnv+VUTp8HIoQiaoCHEznKPvKn1Qh9zaaSvdGkXHnwlJ3D1ac9ghtKrU2Nw8fN8v
+         0owA==
+X-Gm-Message-State: AO0yUKU8jD2BS3KsWzT7hiYQrmpUCS5rdGPkS3tiJczCa6zl7bXDlDP9
+        MuOHR9AfctxXUqEEBeNZ3WyTrQ==
+X-Google-Smtp-Source: AK7set8VA1MdA7EstdhABEExeukBObw/u6YGE6PPbmpKTdascGMc7HKvvsm7g+D8EmsS2mEdAEzrLA==
+X-Received: by 2002:a05:600c:829:b0:3eb:399d:ab24 with SMTP id k41-20020a05600c082900b003eb399dab24mr1739119wmp.28.1677409686868;
+        Sun, 26 Feb 2023 03:08:06 -0800 (PST)
 Received: from usaari01.cust.communityfibre.co.uk ([2a02:6b6a:b566:0:df7b:4668:3e23:d0c9])
-        by smtp.gmail.com with ESMTPSA id v22-20020a1cf716000000b003e1fee8baacsm9157318wmh.25.2023.02.26.03.08.05
+        by smtp.gmail.com with ESMTPSA id v22-20020a1cf716000000b003e1fee8baacsm9157318wmh.25.2023.02.26.03.08.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 Feb 2023 03:08:05 -0800 (PST)
+        Sun, 26 Feb 2023 03:08:06 -0800 (PST)
 From:   Usama Arif <usama.arif@bytedance.com>
 To:     dwmw2@infradead.org, tglx@linutronix.de, kim.phillips@amd.com,
         brgerst@gmail.com
@@ -63,9 +63,9 @@ Cc:     piotrgorski@cachyos.org, oleksandr@natalenko.name,
         simon.evans@bytedance.com, liangma@liangbit.com,
         David Woodhouse <dwmw@amazon.co.uk>,
         Usama Arif <usama.arif@bytedance.com>
-Subject: [PATCH v12 01/11] x86/apic/x2apic: Allow CPU cluster_mask to be populated in parallel
-Date:   Sun, 26 Feb 2023 11:07:52 +0000
-Message-Id: <20230226110802.103134-2-usama.arif@bytedance.com>
+Subject: [PATCH v12 02/11] cpu/hotplug: Move idle_thread_get() to <linux/smpboot.h>
+Date:   Sun, 26 Feb 2023 11:07:53 +0000
+Message-Id: <20230226110802.103134-3-usama.arif@bytedance.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230226110802.103134-1-usama.arif@bytedance.com>
 References: <20230226110802.103134-1-usama.arif@bytedance.com>
@@ -73,8 +73,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -83,231 +82,63 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-Each of the sibling CPUs in a cluster uses the same clustermask. The first
-CPU in a cluster will need a new clustermask allocated, while subsequent
-siblings will use the same clustermask as the first.
+Instead of relying purely on the special-case wrapper in bringup_cpu()
+to pass the idle thread to __cpu_up(), expose idle_thread_get() so that
+the architecture code can obtain it directly when necessary.
 
-However, the CPU being brought up cannot yet perform memory allocations
-at the point that this occurs in init_x2apic_ldr().
+This will be useful when the existing __cpu_up() is split into multiple
+phases, only *one* of which will actually need the idle thread.
 
-So at present, the alloc_clustermask() function allocates a clustermask
-just in case it's needed, storing it in the global cluster_hotplug_mask.
-A CPU which is the first sibling of a cluster will "take" it from there
-and set cluster_hotplug_mask to NULL, in order for alloc_clustermask()
-to allocate a new one before bringing up the next CPU.
+If the architecture code is to register its new pre-bringup states with
+the cpuhp core, having a special-case wrapper to pass extra arguments is
+non-trivial and it's easier just to let the arch register its function
+pointer to be invoked with the standard API.
 
-To facilitate parallel bringup of CPUs in future, switch to a model
-where alloc_clustermask() prepopulates the clustermask in the per_cpu
-data for each present CPU in the cluster in advance. All that the CPU
-needs to do for itself in init_x2apic_ldr() is set its own bit in that
-mask.
-
-The 'node' and 'clusterid' members of struct cluster_mask are thus
-redundant, and it can become a simple struct cpumask instead.
-
-Suggested-by: Thomas Gleixner <tglx@linutronix.de>
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
 Signed-off-by: Usama Arif <usama.arif@bytedance.com>
 Tested-by: Paul E. McKenney <paulmck@kernel.org>
 Tested-by: Kim Phillips <kim.phillips@amd.com>
 Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
 ---
- arch/x86/kernel/apic/x2apic_cluster.c | 126 +++++++++++++++++---------
- 1 file changed, 82 insertions(+), 44 deletions(-)
+ include/linux/smpboot.h | 7 +++++++
+ kernel/smpboot.h        | 2 --
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kernel/apic/x2apic_cluster.c b/arch/x86/kernel/apic/x2apic_cluster.c
-index e696e22d0531..b2b2b7f3e03f 100644
---- a/arch/x86/kernel/apic/x2apic_cluster.c
-+++ b/arch/x86/kernel/apic/x2apic_cluster.c
-@@ -9,11 +9,7 @@
+diff --git a/include/linux/smpboot.h b/include/linux/smpboot.h
+index 9d1bc65d226c..3862addcaa34 100644
+--- a/include/linux/smpboot.h
++++ b/include/linux/smpboot.h
+@@ -5,6 +5,13 @@
+ #include <linux/types.h>
  
- #include "local.h"
- 
--struct cluster_mask {
--	unsigned int	clusterid;
--	int		node;
--	struct cpumask	mask;
--};
-+#define apic_cluster(apicid) ((apicid) >> 4)
- 
- /*
-  * __x2apic_send_IPI_mask() possibly needs to read
-@@ -23,8 +19,7 @@ struct cluster_mask {
- static u32 *x86_cpu_to_logical_apicid __read_mostly;
- 
- static DEFINE_PER_CPU(cpumask_var_t, ipi_mask);
--static DEFINE_PER_CPU_READ_MOSTLY(struct cluster_mask *, cluster_masks);
--static struct cluster_mask *cluster_hotplug_mask;
-+static DEFINE_PER_CPU_READ_MOSTLY(struct cpumask *, cluster_masks);
- 
- static int x2apic_acpi_madt_oem_check(char *oem_id, char *oem_table_id)
- {
-@@ -60,10 +55,10 @@ __x2apic_send_IPI_mask(const struct cpumask *mask, int vector, int apic_dest)
- 
- 	/* Collapse cpus in a cluster so a single IPI per cluster is sent */
- 	for_each_cpu(cpu, tmpmsk) {
--		struct cluster_mask *cmsk = per_cpu(cluster_masks, cpu);
-+		struct cpumask *cmsk = per_cpu(cluster_masks, cpu);
- 
- 		dest = 0;
--		for_each_cpu_and(clustercpu, tmpmsk, &cmsk->mask)
-+		for_each_cpu_and(clustercpu, tmpmsk, cmsk)
- 			dest |= x86_cpu_to_logical_apicid[clustercpu];
- 
- 		if (!dest)
-@@ -71,7 +66,7 @@ __x2apic_send_IPI_mask(const struct cpumask *mask, int vector, int apic_dest)
- 
- 		__x2apic_send_IPI_dest(dest, vector, APIC_DEST_LOGICAL);
- 		/* Remove cluster CPUs from tmpmask */
--		cpumask_andnot(tmpmsk, tmpmsk, &cmsk->mask);
-+		cpumask_andnot(tmpmsk, tmpmsk, cmsk);
- 	}
- 
- 	local_irq_restore(flags);
-@@ -105,55 +100,98 @@ static u32 x2apic_calc_apicid(unsigned int cpu)
- 
- static void init_x2apic_ldr(void)
- {
--	struct cluster_mask *cmsk = this_cpu_read(cluster_masks);
--	u32 cluster, apicid = apic_read(APIC_LDR);
--	unsigned int cpu;
-+	struct cpumask *cmsk = this_cpu_read(cluster_masks);
- 
--	x86_cpu_to_logical_apicid[smp_processor_id()] = apicid;
-+	BUG_ON(!cmsk);
- 
--	if (cmsk)
--		goto update;
--
--	cluster = apicid >> 16;
--	for_each_online_cpu(cpu) {
--		cmsk = per_cpu(cluster_masks, cpu);
--		/* Matching cluster found. Link and update it. */
--		if (cmsk && cmsk->clusterid == cluster)
--			goto update;
-+	cpumask_set_cpu(smp_processor_id(), cmsk);
-+}
+ struct task_struct;
 +
-+/*
-+ * As an optimisation during boot, set the cluster_mask for all present
-+ * CPUs at once, to prevent each of them having to iterate over the others
-+ * to find the existing cluster_mask.
-+ */
-+static void prefill_clustermask(struct cpumask *cmsk, unsigned int cpu, u32 cluster)
-+{
-+	int cpu_i;
++#ifdef CONFIG_GENERIC_SMP_IDLE_THREAD
++struct task_struct *idle_thread_get(unsigned int cpu);
++#else
++static inline struct task_struct *idle_thread_get(unsigned int cpu) { return NULL; }
++#endif
 +
-+	for_each_present_cpu(cpu_i) {
-+		struct cpumask **cpu_cmsk = &per_cpu(cluster_masks, cpu_i);
-+		u32 apicid = apic->cpu_present_to_apicid(cpu_i);
-+
-+		if (apicid == BAD_APICID || cpu_i == cpu || apic_cluster(apicid) != cluster)
-+			continue;
-+
-+		if (WARN_ON_ONCE(*cpu_cmsk == cmsk))
-+			continue;
-+
-+		BUG_ON(*cpu_cmsk);
-+		*cpu_cmsk = cmsk;
- 	}
--	cmsk = cluster_hotplug_mask;
--	cmsk->clusterid = cluster;
--	cluster_hotplug_mask = NULL;
--update:
--	this_cpu_write(cluster_masks, cmsk);
--	cpumask_set_cpu(smp_processor_id(), &cmsk->mask);
- }
+ /* Cookie handed to the thread_fn*/
+ struct smpboot_thread_data;
  
--static int alloc_clustermask(unsigned int cpu, int node)
-+static int alloc_clustermask(unsigned int cpu, u32 cluster, int node)
- {
-+	struct cpumask *cmsk = NULL;
-+	unsigned int cpu_i;
-+
-+	/*
-+	 * At boot time, the CPU present mask is stable. The cluster mask is
-+	 * allocated for the first CPU in the cluster and propagated to all
-+	 * present siblings in the cluster. If the cluster mask is already set
-+	 * on entry to this function for a given CPU, there is nothing to do.
-+	 */
- 	if (per_cpu(cluster_masks, cpu))
- 		return 0;
-+
-+	if (system_state < SYSTEM_RUNNING)
-+		goto alloc;
-+
- 	/*
--	 * If a hotplug spare mask exists, check whether it's on the right
--	 * node. If not, free it and allocate a new one.
-+	 * On post boot hotplug for a CPU which was not present at boot time,
-+	 * iterate over all possible CPUs (even those which are not present
-+	 * any more) to find any existing cluster mask.
- 	 */
--	if (cluster_hotplug_mask) {
--		if (cluster_hotplug_mask->node == node)
--			return 0;
--		kfree(cluster_hotplug_mask);
-+	for_each_possible_cpu(cpu_i) {
-+		u32 apicid = apic->cpu_present_to_apicid(cpu_i);
-+
-+		if (apicid != BAD_APICID && apic_cluster(apicid) == cluster) {
-+			cmsk = per_cpu(cluster_masks, cpu_i);
-+			/*
-+			 * If the cluster is already initialized, just store
-+			 * the mask and return. There's no need to propagate.
-+			 */
-+			if (cmsk) {
-+				per_cpu(cluster_masks, cpu) = cmsk;
-+				return 0;
-+			}
-+		}
- 	}
--
--	cluster_hotplug_mask = kzalloc_node(sizeof(*cluster_hotplug_mask),
--					    GFP_KERNEL, node);
--	if (!cluster_hotplug_mask)
-+	/*
-+	 * No CPU in the cluster has ever been initialized, so fall through to
-+	 * the boot time code which will also populate the cluster mask for any
-+	 * other CPU in the cluster which is (now) present.
-+	 */
-+alloc:
-+	cmsk = kzalloc_node(sizeof(*cmsk), GFP_KERNEL, node);
-+	if (!cmsk)
- 		return -ENOMEM;
--	cluster_hotplug_mask->node = node;
-+	per_cpu(cluster_masks, cpu) = cmsk;
-+	prefill_clustermask(cmsk, cpu, cluster);
-+
- 	return 0;
- }
+diff --git a/kernel/smpboot.h b/kernel/smpboot.h
+index 34dd3d7ba40b..60c609318ad6 100644
+--- a/kernel/smpboot.h
++++ b/kernel/smpboot.h
+@@ -5,11 +5,9 @@
+ struct task_struct;
  
- static int x2apic_prepare_cpu(unsigned int cpu)
- {
--	if (alloc_clustermask(cpu, cpu_to_node(cpu)) < 0)
-+	u32 phys_apicid = apic->cpu_present_to_apicid(cpu);
-+	u32 cluster = apic_cluster(phys_apicid);
-+	u32 logical_apicid = (cluster << 16) | (1 << (phys_apicid & 0xf));
-+
-+	x86_cpu_to_logical_apicid[cpu] = logical_apicid;
-+
-+	if (alloc_clustermask(cpu, cluster, cpu_to_node(cpu)) < 0)
- 		return -ENOMEM;
- 	if (!zalloc_cpumask_var(&per_cpu(ipi_mask, cpu), GFP_KERNEL))
- 		return -ENOMEM;
-@@ -162,10 +200,10 @@ static int x2apic_prepare_cpu(unsigned int cpu)
- 
- static int x2apic_dead_cpu(unsigned int dead_cpu)
- {
--	struct cluster_mask *cmsk = per_cpu(cluster_masks, dead_cpu);
-+	struct cpumask *cmsk = per_cpu(cluster_masks, dead_cpu);
- 
- 	if (cmsk)
--		cpumask_clear_cpu(dead_cpu, &cmsk->mask);
-+		cpumask_clear_cpu(dead_cpu, cmsk);
- 	free_cpumask_var(per_cpu(ipi_mask, dead_cpu));
- 	return 0;
- }
+ #ifdef CONFIG_GENERIC_SMP_IDLE_THREAD
+-struct task_struct *idle_thread_get(unsigned int cpu);
+ void idle_thread_set_boot_cpu(void);
+ void idle_threads_init(void);
+ #else
+-static inline struct task_struct *idle_thread_get(unsigned int cpu) { return NULL; }
+ static inline void idle_thread_set_boot_cpu(void) { }
+ static inline void idle_threads_init(void) { }
+ #endif
 -- 
 2.25.1
 
