@@ -2,175 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 40AA76A4819
-	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 18:34:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 154E26A4931
+	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 19:06:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229684AbjB0Rez (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Feb 2023 12:34:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46074 "EHLO
+        id S230122AbjB0SGq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Feb 2023 13:06:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229790AbjB0Res (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Feb 2023 12:34:48 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3D83BBA5
-        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 09:34:41 -0800 (PST)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31RGpfMG026739;
-        Mon, 27 Feb 2023 17:34:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Z4MQjNfpT/pG5Ir8oEEcSXH0GeCk+FTPmNQ9BuLSP1E=;
- b=QA7s6KMs2IiqAY/ZEjwI6+uD1aR2UqtfZdCP+jtVVzvGSM6m3FYc2SWKILSJoLXZYPrl
- psxe6wk0T5zbmiS7kuUW18igibKSHwRH5YOz8uXYjhcRTUsHtxQrq81ojXkNYSWT31f2
- qBHfI0+E3MTN3/5XBHUN5vk76J9IsKnTbsSbfDDT2AoebEAh4YY2TzE3lVkW76ZJfnkY
- CD3eSWctHdbDf8sZMWUdruj/MpbFhkEjsKKaMUh16WhFKjxblyusK/9KR/FeTt2rJtPh
- Fa8iAFJg76zvloqau5RynolujSHJJErSyqpWhZpctkJhImiVz1H4tZO6dujhhk27ySyr zQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p0u1rb2v1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Feb 2023 17:34:33 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31RH3SW0016597;
-        Mon, 27 Feb 2023 17:34:32 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p0u1rb2u3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Feb 2023 17:34:32 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31QMtiMe018440;
-        Mon, 27 Feb 2023 17:34:29 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3nybbdhm52-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Feb 2023 17:34:29 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31RHYQqc22151494
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 27 Feb 2023 17:34:26 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2C6952004B;
-        Mon, 27 Feb 2023 17:34:26 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C01DD20043;
-        Mon, 27 Feb 2023 17:34:24 +0000 (GMT)
-Received: from [9.171.54.232] (unknown [9.171.54.232])
-        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-        Mon, 27 Feb 2023 17:34:24 +0000 (GMT)
-Message-ID: <0a5c020e-4827-4e6c-ab2c-2e4c47285f33@linux.ibm.com>
-Date:   Mon, 27 Feb 2023 18:34:23 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH v16 11/11] docs/s390x/cpu topology: document s390x cpu
- topology
-Content-Language: en-US
-To:     Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        nsg@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
-        clg@kaod.org
-References: <20230222142105.84700-1-pmorel@linux.ibm.com>
- <20230222142105.84700-12-pmorel@linux.ibm.com>
- <039b5a0f-4440-324c-d5a7-54e9e1c89ea8@redhat.com>
- <dcac1561-8c91-310c-7e9f-db9fff3b00a7@linux.ibm.com>
- <365c5bca-eda6-52dd-a90c-12de397bedf6@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <365c5bca-eda6-52dd-a90c-12de397bedf6@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: VXr9Ndm6xS3faKTZ9wzTzcU7MnYFcnlA
-X-Proofpoint-ORIG-GUID: eEikCUMIKpcrtnoHcBQXvN-N1JeIEDLo
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
- definitions=2023-02-27_13,2023-02-27_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- clxscore=1015 suspectscore=0 bulkscore=0 mlxlogscore=999 malwarescore=0
- spamscore=0 impostorscore=0 priorityscore=1501 mlxscore=0 adultscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302270137
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229862AbjB0SGo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Feb 2023 13:06:44 -0500
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02B3524127
+        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 10:06:16 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5395c8fc4a1so110427347b3.5
+        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 10:06:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=CCs6UT8o6jWjsVnlpOlGQvwvfh2gZBztGVt5ejScdkA=;
+        b=n1Hm70B2pVQ4JlAhGiUDyj4CEH8k0YYYiRK+CxFnN6Ks5AuOrDlHiK9oH4W9oR6D/Z
+         IyAD9aW7E6kJPybduNEV2dOGlxSucL/cGgipuHi8rs8KB6gj2Mb7+ZMgxgc6HiW7t74w
+         r6TtEub/Ib2L65WI0R/PZrqIF3GvfS5n64uVujKPFkeCh0/CDcBxibe+cUGdL4Gs4FSr
+         rck6QYtvVtC6jUs3hMWknorvuedx97yfjeQ4/38KVfggUKU7rSIg1Xy33rKgKSCFTeU6
+         IDlFX/b8umtqUw/L8+NF64Erf7JpxHtUoWok77B/UBFxLIQPpMXOowJlWJIlZD2NtbcP
+         nbNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CCs6UT8o6jWjsVnlpOlGQvwvfh2gZBztGVt5ejScdkA=;
+        b=VqYoqtt4hCLvahR6xt/jiJI3UVmwXoU0An0W4owkA9Ndq9Sb2RJVSzlJbfj15DhHfr
+         EBywox6ysTwuJnMfh8MvkN/42wkb7n/2b5V3mY1LsCsQvrba66V6afHgKRz4Ho+SxBKU
+         5L28xOB5tRR+sZI+dMkzoFEkOUG6mlKQr9l+jhEr60PkPdYlxsqcLMz/iZoR8I5Bsz6P
+         8AZ8fMSmfchXgjrtEZPC8AZS46BknPH+1WyTbe3IZuksYJV5QeAf0l4JCdEk8SSBtrq9
+         ih9vOqR18mqlRV/igQzh9kNBqv2BAkXKmDdHap4cz6lTxBvv797prDN0j37TJohWgqWH
+         b5zg==
+X-Gm-Message-State: AO0yUKWZmdIfYkcNRVV/00sLLLNM6CfJ1R7oJjHwCv1GWoSQ3JfCgd2W
+        QCCOJvH6hvfinxP9BGkVKpt4v4GYeSzHLHLwSA==
+X-Google-Smtp-Source: AK7set/qINqQKKt6kZE0c8d6Ua2qChgsBAHGHkegT5aaQvUm1/8fbeJe6dPKfUwIaRlyeMAyPAhNbh4GJO50EFxRGQ==
+X-Received: from ackerleytng-cloudtop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1f5f])
+ (user=ackerleytng job=sendgmr) by 2002:a05:6902:118c:b0:a06:538f:265f with
+ SMTP id m12-20020a056902118c00b00a06538f265fmr8185254ybu.4.1677521173110;
+ Mon, 27 Feb 2023 10:06:13 -0800 (PST)
+Date:   Mon, 27 Feb 2023 18:06:01 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.2.722.g9855ee24e9-goog
+Message-ID: <20230227180601.104318-1-ackerleytng@google.com>
+Subject: [PATCH v2 1/1] KVM: selftests: Adjust VM's initial stack address to
+ align with SysV ABI spec
+From:   Ackerley Tng <ackerleytng@google.com>
+To:     pbonzini@redhat.com, shuah@kernel.org, seanjc@google.com,
+        dmatlack@google.com, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     erdemaktas@google.com, vannapurve@google.com, sagis@google.com,
+        mail@maciej.szmigiero.name, Ackerley Tng <ackerleytng@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Align the guest stack to match calling sequence requirements in
+section "The Stack Frame" of the System V ABI AMD64 Architecture
+Processor Supplement, which requires the value (%rsp + 8), NOT %rsp,
+to be a multiple of 16 when control is transferred to the function
+entry point. I.e. in a normal function call, %rsp needs to be 16-byte
+aligned _before_ CALL, not after.
 
-On 2/27/23 15:27, Thomas Huth wrote:
-> On 27/02/2023 15.17, Pierre Morel wrote:
->>
->> On 2/27/23 14:58, Thomas Huth wrote:
->>> On 22/02/2023 15.21, Pierre Morel wrote:
->>>> Add some basic examples for the definition of cpu topology
->>>> in s390x.
->>>>
->>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->>>> ---
->>>>   docs/system/s390x/cpu-topology.rst | 378 
->>>> +++++++++++++++++++++++++++++
->>>>   docs/system/target-s390x.rst       |   1 +
->>>>   2 files changed, 379 insertions(+)
->>>>   create mode 100644 docs/system/s390x/cpu-topology.rst
->>>>
->>>> diff --git a/docs/system/s390x/cpu-topology.rst 
->>>> b/docs/system/s390x/cpu-topology.rst
->>>> new file mode 100644
->>>> index 0000000000..d470e28b97
->>>> --- /dev/null
->>>> +++ b/docs/system/s390x/cpu-topology.rst
->>>> @@ -0,0 +1,378 @@
->>>> +CPU topology on s390x
->>>> +=====================
->>>> +
->>>> +Since QEMU 8.0, CPU topology on s390x provides up to 3 levels of
->>>> +topology containers: drawers, books, sockets, defining a tree shaped
->>>> +hierarchy.
->>>> +
->>>> +The socket container contains one or more CPU entries consisting
->>>> +of a bitmap of three dentical CPU attributes:
->>>
->>> What do you mean by "dentical" here?
->>
->> :D i.. dentical
->>
->> I change it to identical
->
-> Ok, but even with "i" at the beginning, it does not make too much 
-> sense here to me - I'd interpret "identical" as "same", but these 
-> attributes have clearly different meanings, haven't they?
->
->  Thomas
->
->
-Ah OK I understand what is unclear.
+This fixes unexpected #GPs in guest code when the compiler uses SSE
+instructions, e.g. to initialize memory, as many SSE instructions
+require memory operands (including those on the stack) to be
+16-byte-aligned.
 
-What I mean is that in each socket we have several CPU TLE entries each 
-entry has different attributes values and contains CPU bit in the mask 
-for CPU with identical attributes.
+Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+---
 
-For example,
+This patch is a follow-up from discussions at
+https://lore.kernel.org/lkml/20230121001542.2472357-9-ackerleytng@google.com/
 
-in the case of horizontal polarization, we have one CPU TLE entry for 
-low entitlement, one CPU TLE for medium entitlement, one for high 
-entitlement and one for high entitlement with dedicated CPU
+v1 -> v2: Cleaned the patch up after getting comments from Sean in
 
-in the case of horizontal polarization we have one CPU TLE for non 
-dedicated CPU and one for dedicated CPU.
+v1: https://lore.kernel.org/lkml/Y%2FfHLdvKHlK6D%2F1v@google.com/
 
-Only CPU TLE with at least one bit (CPU) set in the mask is written 
-inside the SYSIB.
+Please also see
+https://lore.kernel.org/lkml/20230227174654.94641-1-ackerleytng@google.com/
+regarding providing alignment macros for selftests.
 
-Regards,
+---
+ .../selftests/kvm/lib/x86_64/processor.c       | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
-Pierre
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+index ae1e573d94ce..a0669d31bb85 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+@@ -5,6 +5,7 @@
+  * Copyright (C) 2018, Google LLC.
+  */
 
++#include "linux/bitmap.h"
+ #include "test_util.h"
+ #include "kvm_util.h"
+ #include "processor.h"
+@@ -573,6 +574,21 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
+ 				       DEFAULT_GUEST_STACK_VADDR_MIN,
+ 				       MEM_REGION_DATA);
 
++	stack_vaddr += DEFAULT_STACK_PGS * getpagesize();
++
++	/*
++	 * Align stack to match calling sequence requirements in section "The
++	 * Stack Frame" of the System V ABI AMD64 Architecture Processor
++	 * Supplement, which requires the value (%rsp + 8) to be a multiple of
++	 * 16 when control is transferred to the function entry point.
++	 *
++	 * If this code is ever used to launch a vCPU with 32-bit entry point it
++	 * may need to subtract 4 bytes instead of 8 bytes.
++	 */
++	TEST_ASSERT(IS_ALIGNED(stack_vaddr, PAGE_SIZE),
++		    "__vm_vaddr_alloc() did not provide a page-aligned address");
++	stack_vaddr -= 8;
++
+ 	vcpu = __vm_vcpu_add(vm, vcpu_id);
+ 	vcpu_init_cpuid(vcpu, kvm_get_supported_cpuid());
+ 	vcpu_setup(vm, vcpu);
+@@ -580,7 +596,7 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
+ 	/* Setup guest general purpose registers */
+ 	vcpu_regs_get(vcpu, &regs);
+ 	regs.rflags = regs.rflags | 0x2;
+-	regs.rsp = stack_vaddr + (DEFAULT_STACK_PGS * getpagesize());
++	regs.rsp = stack_vaddr;
+ 	regs.rip = (unsigned long) guest_code;
+ 	vcpu_regs_set(vcpu, &regs);
 
-
+--
+2.39.2.722.g9855ee24e9-goog
