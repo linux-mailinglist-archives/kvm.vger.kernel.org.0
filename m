@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 035926A4CE9
-	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 22:15:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A9EF66A4CE8
+	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 22:15:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229944AbjB0VPL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Feb 2023 16:15:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51708 "EHLO
+        id S229909AbjB0VPK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Feb 2023 16:15:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229921AbjB0VPI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Feb 2023 16:15:08 -0500
+        with ESMTP id S229746AbjB0VPG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Feb 2023 16:15:06 -0500
 Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62984265AB;
-        Mon, 27 Feb 2023 13:14:59 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02F4E2684A;
+        Mon, 27 Feb 2023 13:14:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1677532499; x=1709068499;
+  t=1677532498; x=1709068498;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=QTDsYLHvG7I09WLI5isIEq1xwFB/a+7VTMu/FzazcPQ=;
-  b=QMNY+mPaCro/3XU/eJC6hABwXYObObyL1pUr/qyvAdSScUJnF7W2Wt2U
-   CENwEZ7yMpvb+f86WsO0HDoM4rPn/QzX88GrerBVyyDrjofdU3aJEuVSU
-   ducnUzPKrECZ85quSlQDWh+G0xjEeyas7A5GSHAF8lPFhPf+d0axcUclv
-   M=;
+  bh=+X2600KfN0m5ZqG1NqIyA9OmLfKGo7rr2urm8ZQTI2s=;
+  b=ZuRM4s124eYnB/MW31AvVoA4bI0ws8XHnrfZzzo9Z79I/bvFLkpJtFMh
+   iiyY982Vq6I7WIIE8wqUEYpSPoiyRApQ7KZGLg3CRGTa+UJIGVIlrPU2e
+   oB3Gu3AqT4hKUFb/OMqtmEQ8r8I+1Q1OrOv1m2xTFdgzeUUCVMQPdd1HR
+   4=;
 X-IronPort-AV: E=Sophos;i="5.98,220,1673913600"; 
-   d="scan'208";a="187220989"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-b404fda3.us-east-1.amazon.com) ([10.25.36.210])
+   d="scan'208";a="187221001"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-fa5fe5fb.us-west-2.amazon.com) ([10.25.36.210])
   by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2023 21:05:58 +0000
-Received: from EX13MTAUWB001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-        by email-inbound-relay-iad-1d-m6i4x-b404fda3.us-east-1.amazon.com (Postfix) with ESMTPS id 9AB1A839DB;
-        Mon, 27 Feb 2023 21:05:52 +0000 (UTC)
+Received: from EX13MTAUWB002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-pdx-2c-m6i4x-fa5fe5fb.us-west-2.amazon.com (Postfix) with ESMTPS id E542040DFE;
+        Mon, 27 Feb 2023 21:05:56 +0000 (UTC)
 Received: from EX19D002ANA003.ant.amazon.com (10.37.240.141) by
- EX13MTAUWB001.ant.amazon.com (10.43.161.207) with Microsoft SMTP Server (TLS)
- id 15.0.1497.45; Mon, 27 Feb 2023 21:05:51 +0000
+ EX13MTAUWB002.ant.amazon.com (10.43.161.202) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.45; Mon, 27 Feb 2023 21:05:56 +0000
 Received: from b0f1d8753182.ant.amazon.com (10.95.130.142) by
  EX19D002ANA003.ant.amazon.com (10.37.240.141) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.24; Mon, 27 Feb 2023 21:05:47 +0000
+ 15.2.1118.24; Mon, 27 Feb 2023 21:05:51 +0000
 From:   Takahiro Itazuri <itazur@amazon.com>
 To:     <kvm@vger.kernel.org>, <x86@kernel.org>
 CC:     Sean Christopherson <seanjc@google.com>,
@@ -48,9 +48,9 @@ CC:     Sean Christopherson <seanjc@google.com>,
         <linux-kernel@vger.kernel.org>,
         "Takahiro Itazuri" <zulinx86@gmail.com>,
         Takahiro Itazuri <itazur@amazon.com>
-Subject: [PATCH 1/2] x86/cpufeatures: Add AMD-specific IBRS bits
-Date:   Mon, 27 Feb 2023 21:05:25 +0000
-Message-ID: <20230227210526.83182-2-itazur@amazon.com>
+Subject: [PATCH 2/2] KVM: x86: Propagate AMD-specific IBRS related bits
+Date:   Mon, 27 Feb 2023 21:05:26 +0000
+Message-ID: <20230227210526.83182-3-itazur@amazon.com>
 X-Mailer: git-send-email 2.38.0
 In-Reply-To: <20230227210526.83182-1-itazur@amazon.com>
 References: <20230227210526.83182-1-itazur@amazon.com>
@@ -70,30 +70,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-AMD processors have some AMD-specific IBRS related bits in CPUID
-Fn8000_0008_EBX (ref: AMD64 Architecture Programmer's Manual, Volume 3:
-General-Purpose and System Instructions).
+Add AMD-specific IBRS related bits to be propagated to guests.
 
 Signed-off-by: Takahiro Itazuri <itazur@amazon.com>
 ---
- arch/x86/include/asm/cpufeatures.h | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/x86/kvm/cpuid.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-index 8f39c46197b8..cd7245507745 100644
---- a/arch/x86/include/asm/cpufeatures.h
-+++ b/arch/x86/include/asm/cpufeatures.h
-@@ -324,7 +324,10 @@
- #define X86_FEATURE_AMD_IBPB		(13*32+12) /* "" Indirect Branch Prediction Barrier */
- #define X86_FEATURE_AMD_IBRS		(13*32+14) /* "" Indirect Branch Restricted Speculation */
- #define X86_FEATURE_AMD_STIBP		(13*32+15) /* "" Single Thread Indirect Branch Predictors */
-+#define X86_FEATURE_AMD_IBRS_ALWAYS_ON	(13*32+16) /* "" Indirect Branch Restricted Speculation always-on preferred */
- #define X86_FEATURE_AMD_STIBP_ALWAYS_ON	(13*32+17) /* "" Single Thread Indirect Branch Predictors always-on preferred */
-+#define X86_FEATURE_AMD_IBRS_PREFERRED	(13*32+18) /* "" Indirect Branch Restricted Speculation preferred over software */
-+#define X86_FEATURE_AMD_IBRS_SAME_MODE	(13*32+19) /* "" Indirect Branch Restricted Speculation provides same mode protection */
- #define X86_FEATURE_AMD_PPIN		(13*32+23) /* Protected Processor Inventory Number */
- #define X86_FEATURE_AMD_SSBD		(13*32+24) /* "" Speculative Store Bypass Disable */
- #define X86_FEATURE_VIRT_SSBD		(13*32+25) /* Virtualized Speculative Store Bypass Disable */
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 596061c1610e..829ca79076df 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -704,8 +704,9 @@ void kvm_set_cpu_caps(void)
+ 	kvm_cpu_cap_mask(CPUID_8000_0008_EBX,
+ 		F(CLZERO) | F(XSAVEERPTR) |
+ 		F(WBNOINVD) | F(AMD_IBPB) | F(AMD_IBRS) | F(AMD_SSBD) | F(VIRT_SSBD) |
+-		F(AMD_SSB_NO) | F(AMD_STIBP) | F(AMD_STIBP_ALWAYS_ON) |
+-		__feature_bit(KVM_X86_FEATURE_AMD_PSFD)
++		F(AMD_SSB_NO) | F(AMD_STIBP) | F(X86_FEATURE_AMD_IBRS_ALWAYS_ON) |
++		F(AMD_STIBP_ALWAYS_ON) | F(X86_FEATURE_AMD_IBRS_PREFERRED) |
++		F(X86_FEATURE_AMD_IBRS_SAME_MODE) | __feature_bit(KVM_X86_FEATURE_AMD_PSFD)
+ 	);
+ 
+ 	/*
 -- 
 2.38.0
 
