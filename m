@@ -2,52 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 594DC6A4D81
-	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 22:45:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B26D6A4D7E
+	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 22:45:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230127AbjB0Vpi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Feb 2023 16:45:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54194 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230123AbjB0Vpg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S230139AbjB0Vpg (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Mon, 27 Feb 2023 16:45:36 -0500
-Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C200C1ADF6;
-        Mon, 27 Feb 2023 13:45:29 -0800 (PST)
-Received: by mail-ot1-x336.google.com with SMTP id a14-20020a056830100e00b00690ed91749aso4410258otp.7;
-        Mon, 27 Feb 2023 13:45:29 -0800 (PST)
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54172 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229693AbjB0Vpe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Feb 2023 16:45:34 -0500
+Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 842141BAEE;
+        Mon, 27 Feb 2023 13:45:31 -0800 (PST)
+Received: by mail-ot1-x32e.google.com with SMTP id v1-20020a9d6041000000b0068d4a8a8d2dso4393520otj.12;
+        Mon, 27 Feb 2023 13:45:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=tuhD4iL/HxIBp2Kwqi0Bl1yPTrRqIcGB+aRhHOA8ccY=;
-        b=Fv9OugYojrJOxXMYa0Lr81s8i48T6D9GNxhltqStALa5qMcMYOyxVG6p6XZsmiLOmf
-         OATZ2Em1d6av37qlpd85Pd90kM8gxhz4S6Xa2b2DfcIOFCcfMO/v0n0W9hYsb+TmfV9Z
-         Pk1FUCGpEYOOeNzbACrylaaxgW/it5ahoBk5M7HUoDvAyqMa3xopuwKFe5opf6QJjI/G
-         eqM3rJEiG0pMwrZRvv5VvvQHp/S0u5mbCHLs53IgOhUXzk8lhzgEWwXz3JYCnRa7tW/U
-         TL5Vety2g0NFMM4U2QW/eFLI0GAZzcsScxVRvhRVutiJSZcrMD9HFN2Yl7r3ohO6xEkV
-         JHDw==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kfkr/Dz64psO49jb2sCIBi5L9nMCTcssTUOvBykXPRI=;
+        b=osPgSKZIbWUPkX1P6DGPStyaykfwRRNQLUanbiOzRTVtfAGgGoCmk0qW1/ogsWl/C3
+         nM1RfW8sEe3wIIcCn5RPFCZEL9usYO4wi3Q9ZQCGR8JDMCLsUH0a8bpTgdYj2XKaWrVC
+         7I4tXl8nOPXwEdQqM95zfA0hEFY4rWYvheusgUuQQRBTJ56NoYVKOByTzYt0fwF76GbK
+         dfEZDHj6yL1A4WJsUzRKyq0B+h8ZXfusKhL9kGWIaBLam3J7p8LRU2So6FbfUEVvBMPM
+         jLIVIzCIAN8pu66WoA9I8vtCsQc9ChImXVWV6Qi8/Y0rdZeNB9iNYCQwUO/fq4wqgUVM
+         aUgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tuhD4iL/HxIBp2Kwqi0Bl1yPTrRqIcGB+aRhHOA8ccY=;
-        b=xmUDx3KqlrNrwpRcj/p7WF1BnOs36yBqwjKUnfXbpB3QHYq7bJek7o7DPOkzWVH9Ci
-         wCnUVUXmX1kjgzj6T79JTmQr1MLNz+EQMON1HKkE85ii/AU6Q41b2bmOVWRaCCdhiTGI
-         1molQM/AOmPYsW3rYyKpzjjGISh0v22iWWfsBDKYKBKtDtLCfdTLJXqGdf9LNh6Wr+o9
-         5U/xaQDlIPVUA4PfiuemxkF0A7eocbqkBji4oIZCFPie+TD5gKTmp4SeUELMUQHl9iJB
-         d1N42pAJlkxo5VS0g6q4RwsUajsEKvbVa88vwpNpGQwFAotzhJfXJuFY39tdE/N4pwtd
-         us3w==
-X-Gm-Message-State: AO0yUKVvGMM5R0AdTiVElI4tCJXmPh9wP5e8RVscfBoPh2CRZu4R4x2Z
-        snLRYJjsdlVYd7gISfYw5q+cHoxmnpg=
-X-Google-Smtp-Source: AK7set8RUUrbKGQSb+u4+Hl8zi+rULsdULMXS1ABVD1QOuGgtfNBOgoqQ0wlgWeX+mX8+sd7wsZrkQ==
-X-Received: by 2002:a05:6830:6518:b0:693:be07:356a with SMTP id cm24-20020a056830651800b00693be07356amr404769otb.2.1677534328472;
-        Mon, 27 Feb 2023 13:45:28 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kfkr/Dz64psO49jb2sCIBi5L9nMCTcssTUOvBykXPRI=;
+        b=DP/b9jnCQaElRDQt3LNq8n8GDANU+uRnVTKHMzBoAgxqwYvPsvPspg1gBN3rebDnSw
+         LwEmJxVY0uiYs5ZrzOjjpUw1aE0K928knaChS4cqAQB2FXRvRPNzOgRKSKbYXqRtdJjN
+         C0a97xJ9i1ecDajgJbk8NLF1/p5NaJ1erue8TZNcE8F3MHrWw/Fr7wiiC5OPC0yxGM+X
+         xCxa+GuK4QGkwkqDtd3CCBLOMVYmg7Qk2/xvw/HrtVTU/5urPv465EqPYhWo58jwI5To
+         vNNcmtgmkYeHKQ2kIQrfx+Q5xpMlIA6jYjZCUhokv1ey+nbGvuAkO8GwMa4f12pIMTbX
+         9GSg==
+X-Gm-Message-State: AO0yUKWSXcKI8JInMWYEl73BoF9H5ouKgawV7Mnt7Lvgp8Aw+mBQCxMz
+        3VCEma/9rl7jRhu/Htf8UAPZ12M6DgU=
+X-Google-Smtp-Source: AK7set/gCu6d0ZKgwZbN/D4iSrNnH4erq2Uz6ro8buqv2WpMpkbspRDKy8GVV1SdvXPhjoF/xmMH8w==
+X-Received: by 2002:a05:6830:601b:b0:693:d7bf:dbe8 with SMTP id bx27-20020a056830601b00b00693d7bfdbe8mr5279912otb.10.1677534330410;
+        Mon, 27 Feb 2023 13:45:30 -0800 (PST)
 Received: from localhost ([12.97.180.36])
-        by smtp.gmail.com with ESMTPSA id h8-20020a056830164800b0068bb73bd95esm3011168otr.58.2023.02.27.13.45.27
+        by smtp.gmail.com with ESMTPSA id m17-20020a4add11000000b00524faf3d2d7sm2102658oou.41.2023.02.27.13.45.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Feb 2023 13:45:27 -0800 (PST)
+        Mon, 27 Feb 2023 13:45:29 -0800 (PST)
 From:   Yury Norov <yury.norov@gmail.com>
 To:     linux-kernel@vger.kernel.org,
         Alexander Gordeev <agordeev@linux.ibm.com>,
@@ -64,10 +65,12 @@ To:     linux-kernel@vger.kernel.org,
         Vasily Gorbik <gor@linux.ibm.com>, linux-s390@vger.kernel.org,
         kvm@vger.kernel.org
 Cc:     Yury Norov <yury.norov@gmail.com>
-Subject: [PATCH 1/2] lib/test_bitmap: increment failure counter properly
-Date:   Mon, 27 Feb 2023 13:45:23 -0800
-Message-Id: <20230227214524.914050-1-yury.norov@gmail.com>
+Subject: [PATCH 2/2] lib/bitmap: drop optimization of bitmap_{from,to}_arr64
+Date:   Mon, 27 Feb 2023 13:45:24 -0800
+Message-Id: <20230227214524.914050-2-yury.norov@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230227214524.914050-1-yury.norov@gmail.com>
+References: <20230227214524.914050-1-yury.norov@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -80,102 +83,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The tests that don't use expect_eq() macro to determine that a test is
-failured must increment failed_tests explicitly.
+bitmap_{from,to}_arr64() optimization is overly optimistic on 32-bit LE
+architectures when it's wired to bitmap_copy_clear_tail().
+
+bitmap_copy_clear_tail() takes care of unused bits in the bitmap up to
+the next word boundary. But on 32-bit machines when copying bits from
+bitmap to array of 64-bit words, it's expected that the unused part of
+a recipient array must be cleared up to 64-bit boundary, so the last 4
+bytes may stay untouched when nbits % 64 <= 32.
+
+While the copying part of the optimization works correct, that clear-tail
+trick makes corresponding tests reasonably fail:
+
+test_bitmap: bitmap_to_arr64(nbits == 1): tail is not safely cleared: 0xa5a5a5a500000001 (must be 0x0000000000000001)
+
+Fix it by removing bitmap_{from,to}_arr64() optimization for 32-bit LE
+arches.
 
 Reported-by: Guenter Roeck <linux@roeck-us.net>
 Link: https://lore.kernel.org/lkml/20230225184702.GA3587246@roeck-us.net/
+Fixes: 0a97953fd221 ("lib: add bitmap_{from,to}_arr64")
 Signed-off-by: Yury Norov <yury.norov@gmail.com>
+Tested-by: Guenter Roeck <linux@roeck-us.net>
 ---
- lib/test_bitmap.c | 18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
+ include/linux/bitmap.h | 8 +++-----
+ lib/bitmap.c           | 2 +-
+ 2 files changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/lib/test_bitmap.c b/lib/test_bitmap.c
-index 8954610ec683..c4b90d145398 100644
---- a/lib/test_bitmap.c
-+++ b/lib/test_bitmap.c
-@@ -471,6 +471,7 @@ static void __init test_bitmap_parselist(void)
- 		if (err != ptest.errno) {
- 			pr_err("parselist: %d: input is %s, errno is %d, expected %d\n",
- 					i, ptest.in, err, ptest.errno);
-+			failed_tests++;
- 			continue;
- 		}
+diff --git a/include/linux/bitmap.h b/include/linux/bitmap.h
+index 40e53a2ecc0d..7d4c90eb3df4 100644
+--- a/include/linux/bitmap.h
++++ b/include/linux/bitmap.h
+@@ -302,12 +302,10 @@ void bitmap_to_arr32(u32 *buf, const unsigned long *bitmap,
+ #endif
  
-@@ -479,6 +480,7 @@ static void __init test_bitmap_parselist(void)
- 			pr_err("parselist: %d: input is %s, result is 0x%lx, expected 0x%lx\n",
- 					i, ptest.in, bmap[0],
- 					*ptest.expected);
-+			failed_tests++;
- 			continue;
- 		}
+ /*
+- * On 64-bit systems bitmaps are represented as u64 arrays internally. On LE32
+- * machines the order of hi and lo parts of numbers match the bitmap structure.
+- * In both cases conversion is not needed when copying data from/to arrays of
+- * u64.
++ * On 64-bit systems bitmaps are represented as u64 arrays internally. So,
++ * the conversion is not needed when copying data from/to arrays of u64.
+  */
+-#if (BITS_PER_LONG == 32) && defined(__BIG_ENDIAN)
++#if BITS_PER_LONG == 32
+ void bitmap_from_arr64(unsigned long *bitmap, const u64 *buf, unsigned int nbits);
+ void bitmap_to_arr64(u64 *buf, const unsigned long *bitmap, unsigned int nbits);
+ #else
+diff --git a/lib/bitmap.c b/lib/bitmap.c
+index 1c81413c51f8..ddb31015e38a 100644
+--- a/lib/bitmap.c
++++ b/lib/bitmap.c
+@@ -1495,7 +1495,7 @@ void bitmap_to_arr32(u32 *buf, const unsigned long *bitmap, unsigned int nbits)
+ EXPORT_SYMBOL(bitmap_to_arr32);
+ #endif
  
-@@ -512,11 +514,13 @@ static void __init test_bitmap_printlist(void)
- 
- 	if (ret != slen + 1) {
- 		pr_err("bitmap_print_to_pagebuf: result is %d, expected %d\n", ret, slen);
-+		failed_tests++;
- 		goto out;
- 	}
- 
- 	if (strncmp(buf, expected, slen)) {
- 		pr_err("bitmap_print_to_pagebuf: result is %s, expected %s\n", buf, expected);
-+		failed_tests++;
- 		goto out;
- 	}
- 
-@@ -584,6 +588,7 @@ static void __init test_bitmap_parse(void)
- 		if (err != test.errno) {
- 			pr_err("parse: %d: input is %s, errno is %d, expected %d\n",
- 					i, test.in, err, test.errno);
-+			failed_tests++;
- 			continue;
- 		}
- 
-@@ -592,6 +597,7 @@ static void __init test_bitmap_parse(void)
- 			pr_err("parse: %d: input is %s, result is 0x%lx, expected 0x%lx\n",
- 					i, test.in, bmap[0],
- 					*test.expected);
-+			failed_tests++;
- 			continue;
- 		}
- 
-@@ -616,10 +622,12 @@ static void __init test_bitmap_arr32(void)
- 
- 		next_bit = find_next_bit(bmap2,
- 				round_up(nbits, BITS_PER_LONG), nbits);
--		if (next_bit < round_up(nbits, BITS_PER_LONG))
-+		if (next_bit < round_up(nbits, BITS_PER_LONG)) {
- 			pr_err("bitmap_copy_arr32(nbits == %d:"
- 				" tail is not safely cleared: %d\n",
- 				nbits, next_bit);
-+			failed_tests++;
-+		}
- 
- 		if (nbits < EXP1_IN_BITS - 32)
- 			expect_eq_uint(arr[DIV_ROUND_UP(nbits, 32)],
-@@ -642,15 +650,19 @@ static void __init test_bitmap_arr64(void)
- 		expect_eq_bitmap(bmap2, exp1, nbits);
- 
- 		next_bit = find_next_bit(bmap2, round_up(nbits, BITS_PER_LONG), nbits);
--		if (next_bit < round_up(nbits, BITS_PER_LONG))
-+		if (next_bit < round_up(nbits, BITS_PER_LONG)) {
- 			pr_err("bitmap_copy_arr64(nbits == %d:"
- 				" tail is not safely cleared: %d\n", nbits, next_bit);
-+			failed_tests++;
-+		}
- 
- 		if ((nbits % 64) &&
--		    (arr[(nbits - 1) / 64] & ~GENMASK_ULL((nbits - 1) % 64, 0)))
-+		    (arr[(nbits - 1) / 64] & ~GENMASK_ULL((nbits - 1) % 64, 0))) {
- 			pr_err("bitmap_to_arr64(nbits == %d): tail is not safely cleared: 0x%016llx (must be 0x%016llx)\n",
- 			       nbits, arr[(nbits - 1) / 64],
- 			       GENMASK_ULL((nbits - 1) % 64, 0));
-+			failed_tests++;
-+		}
- 
- 		if (nbits < EXP1_IN_BITS - 64)
- 			expect_eq_uint(arr[DIV_ROUND_UP(nbits, 64)], 0xa5a5a5a5);
+-#if (BITS_PER_LONG == 32) && defined(__BIG_ENDIAN)
++#if BITS_PER_LONG == 32
+ /**
+  * bitmap_from_arr64 - copy the contents of u64 array of bits to bitmap
+  *	@bitmap: array of unsigned longs, the destination bitmap
 -- 
 2.34.1
 
