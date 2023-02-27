@@ -2,188 +2,248 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 801E96A4209
-	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 13:51:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 67EC86A4281
+	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 14:21:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229653AbjB0Mvz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Feb 2023 07:51:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34628 "EHLO
+        id S229991AbjB0NVX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Feb 2023 08:21:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229470AbjB0Mvy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Feb 2023 07:51:54 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F31E113D4B
-        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 04:51:52 -0800 (PST)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31RAxjjL026690;
-        Mon, 27 Feb 2023 12:51:39 GMT
+        with ESMTP id S229486AbjB0NVW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Feb 2023 08:21:22 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5C171CAFA
+        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 05:21:20 -0800 (PST)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31RCp6rV015539;
+        Mon, 27 Feb 2023 13:21:14 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
  from : to : cc : date : in-reply-to : references : content-type :
  content-transfer-encoding : mime-version; s=pp1;
- bh=cduFZsxbHCwIMqUUdtVBrltvaeYrlg4SYyh56QtzuDg=;
- b=rtuaZ5d2EznAa+7KYVz4znyNTYfOn6eTg/102Y/pRg0N2+TZrRHw2/x826N8/V2zNL54
- EEtEAdd1x53yQNUtGQHH4E8mbxxBZwmj+FF1qO5XI2i095NMHQzDh+DkPugiNCzaxOpM
- iy+s5mmHE0HUgdlZD+a/nSFZSg2hDLllZRLjRFmiMDIuI0j20Uq9TsZnTtxj+pXFLVs4
- 8oHf0QAMmMaQ+lYuW+p0jLOybyUK3H1b31hQPrwtOYzlYKjVlDMna+QU6rXO38D/n7g5
- n1SczxHoZJbMP6pWfNniIgK4czdYBH1bLeNyJ6E8SIW77xOSYt6VWvXp58N4mFzVnxg0 ZQ== 
+ bh=0dQyWyKFFypT3sBoHpxT8vqxBKgb1B8es9OdRG2qFoc=;
+ b=qfZr44ZrxZc9iiHE8hAMR/irihThCNhWBZ+ukQdG2MtiS8Xv1m9gQXYjsuRxcwFKDP7G
+ o18Ke35efP3UFDOI+fYBYRqdNUmZkBiLLBCKF5MulT++t+SkpAtyoHGrv0E2bsiydeEr
+ Iqh1hMZ7nsAuV3/lV/7lmtV2xupf4gaP0q7c0x5aX6idULbv9Aqm68dTUUYXQpr+If3w
+ 0gRI1lQU/Q8dtLScJ79ZjLEvOMscdEv2RutXAFqbahehTCXCSrdbwb9d+qCeBvyHCxZZ
+ IvgWHJ/UyYC39jAzM1NsWJhDqupT8CxFGp8TeCr4tO889BaYsj/kk2I6LrsZnBNxdJxZ Xg== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p0u8qtpww-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p0vvqgsqb-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Feb 2023 12:51:38 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31RBlg62024254;
-        Mon, 27 Feb 2023 12:51:38 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p0u8qtpq9-1
+        Mon, 27 Feb 2023 13:21:14 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31RDEsCV031312;
+        Mon, 27 Feb 2023 13:21:14 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p0vvqgsp6-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Feb 2023 12:51:38 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31R4D83f031070;
-        Mon, 27 Feb 2023 12:51:24 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3nybdfsefp-1
+        Mon, 27 Feb 2023 13:21:14 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31R2jg12030383;
+        Mon, 27 Feb 2023 13:21:12 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3nybbysfg7-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Feb 2023 12:51:23 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31RCpKrZ61800788
+        Mon, 27 Feb 2023 13:21:12 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31RDL87259507068
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 27 Feb 2023 12:51:20 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 118D120043;
-        Mon, 27 Feb 2023 12:51:20 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8CAD120040;
-        Mon, 27 Feb 2023 12:51:19 +0000 (GMT)
+        Mon, 27 Feb 2023 13:21:08 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5BDE72004B;
+        Mon, 27 Feb 2023 13:21:08 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E0DB120040;
+        Mon, 27 Feb 2023 13:21:07 +0000 (GMT)
 Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.148.35])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 27 Feb 2023 12:51:19 +0000 (GMT)
-Message-ID: <d8da6f7d1e3addcb63614f548ed77ac1b8895e63.camel@linux.ibm.com>
-Subject: Re: [PATCH v16 08/11] qapi/s390x/cpu topology: set-cpu-topology
- monitor command
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Mon, 27 Feb 2023 13:21:07 +0000 (GMT)
+Message-ID: <01fa83156fa7452b0e45fe9df8d799b1f3589295.camel@linux.ibm.com>
+Subject: Re: [PATCH v16 03/11] target/s390x/cpu topology: handle STSI(15)
+ and build the SYSIB
 From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To:     Markus Armbruster <armbru@redhat.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org,
-        qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
         seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
         berrange@redhat.com, clg@kaod.org
-Date:   Mon, 27 Feb 2023 13:51:19 +0100
-In-Reply-To: <87v8jnqorg.fsf@pond.sub.org>
+Date:   Mon, 27 Feb 2023 14:21:07 +0100
+In-Reply-To: <20230222142105.84700-4-pmorel@linux.ibm.com>
 References: <20230222142105.84700-1-pmorel@linux.ibm.com>
-         <20230222142105.84700-9-pmorel@linux.ibm.com>
-         <aaf4aa7b7350e88f65fc03f148146e38fe4f7fdb.camel@linux.ibm.com>
-         <0a93eb0e-2552-07b7-2067-f46d542126f4@redhat.com>
-         <9e1cbbe11ac1429335c288e817a21f19f8f4af87.camel@linux.ibm.com>
-         <87v8jnqorg.fsf@pond.sub.org>
+         <20230222142105.84700-4-pmorel@linux.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 MIME-Version: 1.0
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: y3-cCLFJ0hg8pXB5Np8e2y6j0ZCyYwR6
-X-Proofpoint-GUID: D0OYw_YqB4zz-QV1Jqu5FvBI4kOSlMA_
+X-Proofpoint-ORIG-GUID: aYv3Ucynyd3eI4nttDC8qHClN6gY8l1Q
+X-Proofpoint-GUID: By2CxkTmW7QiEwWXa3Qba-l3r8Rch0Xf
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
  definitions=2023-02-27_10,2023-02-27_01,2023-02-09_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- lowpriorityscore=0 spamscore=0 malwarescore=0 suspectscore=0 phishscore=0
- adultscore=0 priorityscore=1501 mlxscore=0 mlxlogscore=618 impostorscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302270097
+ priorityscore=1501 phishscore=0 mlxscore=0 lowpriorityscore=0
+ mlxlogscore=999 malwarescore=0 adultscore=0 clxscore=1015 suspectscore=0
+ spamscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2212070000 definitions=main-2302270102
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2023-02-27 at 13:25 +0100, Markus Armbruster wrote:
-> Nina Schoetterl-Glausch <nsg@linux.ibm.com> writes:
+On Wed, 2023-02-22 at 15:20 +0100, Pierre Morel wrote:
+> On interception of STSI(15.1.x) the System Information Block
+> (SYSIB) is built from the list of pre-ordered topology entries.
 >=20
-> > On Mon, 2023-02-27 at 08:59 +0100, Thomas Huth wrote:
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  include/hw/s390x/cpu-topology.h |  21 +++
+>  include/hw/s390x/sclp.h         |   1 +
+>  target/s390x/cpu.h              |  72 ++++++++
+>  hw/s390x/cpu-topology.c         |  14 +-
+>  target/s390x/kvm/cpu_topology.c | 312 ++++++++++++++++++++++++++++++++
+>  target/s390x/kvm/kvm.c          |   5 +-
+>  target/s390x/kvm/meson.build    |   3 +-
+>  7 files changed, 425 insertions(+), 3 deletions(-)
+>  create mode 100644 target/s390x/kvm/cpu_topology.c
 >=20
-> [...]
->=20
-> > > I'm not sure whether double inclusion works with the QAPI parser (sin=
-ce this=20
-> > > might code to be generated twice) ... have you tried?
-> >=20
-> > I haven't, the documentation says:
-> >=20
-> > > Include directives
-> > > ------------------
-> > >=20
-> > > Syntax::
-> > >=20
-> > >     INCLUDE =3D { 'include': STRING }
-> > >=20
-> > > The QAPI schema definitions can be modularized using the 'include' di=
-rective::
-> > >=20
-> > >  { 'include': 'path/to/file.json' }
-> > >=20
-> > > The directive is evaluated recursively, and include paths are relativ=
-e
-> > > to the file using the directive.  Multiple includes of the same file
-> > > are idempotent.
-> >=20
-> > Which is why I thought it should work, but I guess this is a statement =
-about
-> > including the same file twice in another file and not about including t=
-he same
-> > file from two files.
->=20
-> No, this is intended to say multiple inclusion is fine, regardless where
-> the include directives are.
->=20
-> An include directive has two effects:
->=20
-> 1. If the included file has not been included already, pull in its
->    contents.
->=20
-> 2. Insert #include in generated C.  Example: qdev.json includes
->    qom.json.  The generated qapi-*-qdev.h include qapi-types-qom.h.
->=20
->    Including any required modules, as recommended by qapi-code-gen.rst,
->    results in properly self-contained generated headers.
+> diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topol=
+ogy.h
+> index fa7f885a9f..8dc42d2942 100644
+> --- a/include/hw/s390x/cpu-topology.h
+> +++ b/include/hw/s390x/cpu-topology.h
+> @@ -16,8 +16,29 @@
+> =20
+>  #define S390_TOPOLOGY_CPU_IFL   0x03
+> =20
+> +typedef union s390_topology_id {
+> +    uint64_t id;
+> +    struct {
+> +        uint8_t level5;
 
-Ok, thanks. Not sure if another phrasing would be better given the intended
-meaning is the way I read it initially.
+You could rename this to sentinel, since that's the only use case and
+if there ever is another level the sentinel implementation might need
+to be changed anyway.
 
+> +        uint8_t drawer;
+> +        uint8_t book;
+> +        uint8_t socket;
+> +        uint8_t dedicated;
+> +        uint8_t entitlement;
+> +        uint8_t type;
+> +        uint8_t origin;
+> +    };
+> +} s390_topology_id;
+> +
 >=20
-> > But then, as far as I can tell, the build system only builds qapi-schem=
-a.json,
-> > which includes all other files, so it could apply.
->=20
-> Yes, qapi-schema.json is the main module, which includes all the others.
->=20
-> In fact, it includes all the others *directly*.  Why?
->=20
-> We generate documentation in source order.  Included material gets
-> inserted right at the first inclusion; subsequent inclusions have no
-> effect.
->=20
-> If we put all first inclusions right into qapi-schema.json, the order of
-> things in documentation is visible right there, and won't change just
-> because we change inclusions deeper down.
->=20
-> Questions?
+[...]
 
-CpuS390Entitlement would be useful in both machine.json and machine-target.=
-json
-because query-cpu-fast is defined in machine.json and set-cpu-topology is d=
-efined
-in machine-target.json.
-So then the question is where best to define CpuS390Entitlement.
-In machine.json and include machine.json in machine-target.json?
-Or define it in another file and include it from both?
+> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> index d654267a71..c899f4e04b 100644
+> --- a/target/s390x/cpu.h
+> +++ b/target/s390x/cpu.h
+> @@ -560,6 +560,25 @@ typedef struct SysIB_322 {
+>=20
+[...]
+> =20
+> +/*
+> + * CPU Topology List provided by STSI with fc=3D15 provides a list
+> + * of two different Topology List Entries (TLE) types to specify
+> + * the topology hierarchy.
+> + *
+> + * - Container Topology List Entry
+> + *   Defines a container to contain other Topology List Entries
+> + *   of any type, nested containers or CPU.
+> + * - CPU Topology List Entry
+> + *   Specifies the CPUs position, type, entitlement and polarization
+> + *   of the CPUs contained in the last Container TLE.
+> + *
+> + * There can be theoretically up to five levels of containers, QEMU
+> + * uses only three levels, the drawer's, book's and socket's level.
+> + *
+> + * A container of with a nesting level (NL) greater than 1 can only
 
-Thanks
+s/of//
 
+> + * contain another container of nesting level NL-1.
+> + *
+> + * A container of nesting level 1 (socket), contains as many CPU TLE
+> + * as needed to describe the position and qualities of all CPUs inside
+> + * the container.
+> + * The qualities of a CPU are polarization, entitlement and type.
+> + *
+> + * The CPU TLE defines the position of the CPUs of identical qualities
+> + * using a 64bits mask which first bit has its offset defined by
+> + * the CPU address orgin field of the CPU TLE like in:
+> + * CPU address =3D origin * 64 + bit position within the mask
+> + *
+> + */
+> +/* Container type Topology List Entry */
+> +typedef struct SysIBTl_container {
+> +        uint8_t nl;
+> +        uint8_t reserved[6];
+> +        uint8_t id;
+> +} QEMU_PACKED QEMU_ALIGNED(8) SysIBTl_container;
+> +QEMU_BUILD_BUG_ON(sizeof(SysIBTl_container) !=3D 8);
+> +
+[...]
+> +
+> +/**
+> + * s390_topology_from_cpu:
+> + * @cpu: The S390CPU
+> + *
+> + * Initialize the topology id from the CPU environment.
+> + */
+> +static s390_topology_id s390_topology_from_cpu(S390CPU *cpu)
+> +{
+> +    s390_topology_id topology_id =3D {0};
+> +
+> +    topology_id.drawer =3D cpu->env.drawer_id;
+> +    topology_id.book =3D cpu->env.book_id;
+> +    topology_id.socket =3D cpu->env.socket_id;
+> +    topology_id.origin =3D cpu->env.core_id / 64;
+> +    topology_id.type =3D S390_TOPOLOGY_CPU_IFL;
+> +    topology_id.dedicated =3D cpu->env.dedicated;
+> +
+> +    if (s390_topology.polarization =3D=3D S390_CPU_POLARIZATION_VERTICAL=
+) {
+> +        /*
+> +         * Vertical polarization with dedicated CPU implies
+> +         * vertical high entitlement.
+> +         */
+> +        if (topology_id.dedicated) {
+> +            topology_id.entitlement =3D S390_CPU_ENTITLEMENT_HIGH;
+> +        } else {
+> +            topology_id.entitlement =3D cpu->env.entitlement;
+> +        }
 
+I don't see why you need this if, it should already be correct.
+
+> +    }
+
+I'd suggest the following:
+* rename entitlement in s390_topology_id back to polarization, but keep ent=
+itlement everywhere else.
+* remove horizontal/none from CpuS390Entitlement, this way the user cannot =
+set it,
+	and it doesn't show up in the output of query-cpus-fast.
+* this is where you convert between the two, so:
+	if horizontal, id.polarization =3D 0,
+	otherwise id.polarization =3D entitlement + 1, or a switch case.
+* in patch 6 in s390_topology_set_cpus_entitlement you don't set the entitl=
+ement if the polarization
+	is horizontal, which is ok because of the conversion above.
+
+> +
+> +    return topology_id;
+> +}
+> +
+>=20
+[...]
 
