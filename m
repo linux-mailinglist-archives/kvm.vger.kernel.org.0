@@ -2,181 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 335406A3F5A
-	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 11:19:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ECDAE6A3FB2
+	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 11:50:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230124AbjB0KTK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Feb 2023 05:19:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58982 "EHLO
+        id S229545AbjB0KuQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Feb 2023 05:50:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229760AbjB0KTI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Feb 2023 05:19:08 -0500
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15F5A7697
-        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 02:19:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1677493146; x=1709029146;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=sojdSkzgAlSHlPcxfvTgJuh5oLl0x4fCBeR1P4DYod0=;
-  b=0RAQqZqm7k/xrH0h5qkk9Y5bvZSPXFVvp9buS80VxtaTdCy57bUvMFTN
-   jXCqK+935i1l8zG/9HTknPtk90aESP2hhTEwWU8vi64SOAqdoMp/Po3iU
-   pO/LeNggrIWqLFlUtrlMy44uJ3i56JdabXNbSdbXKAUurpdU2HEkwlCnQ
-   qrIwkARJ6guijkXcjGvgmX+huypqpVuZ+XQ+cd6gerdZKf+V03mSoEDr5
-   zUNHvEoT30p9jOQ1Od7FfGxAYmBoh8ey0pHmgByew+Eb/vpZsHM89cxAj
-   dYhaZH9UEFCTh8wM+40IFXAsgLAO+IqKnNtWZc+2+c6qwJkVRb9ple1QX
-   g==;
-X-IronPort-AV: E=Sophos;i="5.97,331,1669100400"; 
-   d="asc'?scan'208";a="139211448"
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 27 Feb 2023 03:19:05 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Mon, 27 Feb 2023 03:19:03 -0700
-Received: from wendy (10.10.115.15) by chn-vm-ex03.mchp-main.com
- (10.10.85.151) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.16 via Frontend
- Transport; Mon, 27 Feb 2023 03:19:01 -0700
-Date:   Mon, 27 Feb 2023 10:18:34 +0000
-From:   Conor Dooley <conor.dooley@microchip.com>
-To:     Andy Chiu <andy.chiu@sifive.com>
-CC:     <linux-riscv@lists.infradead.org>, <palmer@dabbelt.com>,
-        <anup@brainfault.org>, <atishp@atishpatra.org>,
-        <kvm-riscv@lists.infradead.org>, <kvm@vger.kernel.org>,
-        <vineetg@rivosinc.com>, <greentime.hu@sifive.com>,
-        <guoren@linux.alibaba.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>
-Subject: Re: [PATCH -next v14 19/19] riscv: Enable Vector code to be built
-Message-ID: <Y/yDeurep0ZBnLdR@wendy>
-References: <20230224170118.16766-1-andy.chiu@sifive.com>
- <20230224170118.16766-20-andy.chiu@sifive.com>
+        with ESMTP id S229727AbjB0KuO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Feb 2023 05:50:14 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47A92CDEB
+        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 02:50:13 -0800 (PST)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31R8wurt003418;
+        Mon, 27 Feb 2023 10:49:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=loQabxH0vlWcORAj5uxHBi3M5P3wdozhyzCWtaJeRck=;
+ b=cIXXUJWkr4r7spOv3n63BAYksohZ+AzGFAxu220Cb+K7go9mfFrAM+L/SlRPw6TG+PxN
+ 0vKC+c7I0tu4FtmLVCIFMEWE0XYOoIVIlf6CgNN0PjYozISVs//HpomDMWIq+YMgA4TB
+ RS+rklyg0uAtCaH5Hat3T5hKpLOwd5TbMcnuyT2XV2xlxubyYjrpVbg+U3RRjQJSxnT4
+ oai65ZsjyLWrb8yZreSAfr6GXJv9IVjSGqutg+r9IEzqBxOXZxsf7d8TO/r3hY2ZhFje
+ DAUj1VLcTzFfPnnLsW1ppSLOxUWxs4E3cH9PxAbJjTrwWBdPSLagcqYXnIs/+4dsEeeU Tw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nyv91f33w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Feb 2023 10:49:58 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31RAAVNs019842;
+        Mon, 27 Feb 2023 10:49:57 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nyv91f33c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Feb 2023 10:49:57 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31Q7EF62011251;
+        Mon, 27 Feb 2023 10:49:55 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3nybe2hc31-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Feb 2023 10:49:55 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31RAnpW359441548
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 27 Feb 2023 10:49:51 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A92E32004B;
+        Mon, 27 Feb 2023 10:49:51 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3914820065;
+        Mon, 27 Feb 2023 10:49:51 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.148.35])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Mon, 27 Feb 2023 10:49:51 +0000 (GMT)
+Message-ID: <9e1cbbe11ac1429335c288e817a21f19f8f4af87.camel@linux.ibm.com>
+Subject: Re: [PATCH v16 08/11] qapi/s390x/cpu topology: set-cpu-topology
+ monitor command
+From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To:     Thomas Huth <thuth@redhat.com>,
+        Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
+        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
+        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
+        frankja@linux.ibm.com, berrange@redhat.com, clg@kaod.org
+Date:   Mon, 27 Feb 2023 11:49:51 +0100
+In-Reply-To: <0a93eb0e-2552-07b7-2067-f46d542126f4@redhat.com>
+References: <20230222142105.84700-1-pmorel@linux.ibm.com>
+         <20230222142105.84700-9-pmorel@linux.ibm.com>
+         <aaf4aa7b7350e88f65fc03f148146e38fe4f7fdb.camel@linux.ibm.com>
+         <0a93eb0e-2552-07b7-2067-f46d542126f4@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="1gdVvARvsfu9C4N3"
-Content-Disposition: inline
-In-Reply-To: <20230224170118.16766-20-andy.chiu@sifive.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: pYQPhDFn51YB9QZWwukRZm99_ShcjQjp
+X-Proofpoint-GUID: n52v-nduhPK6KcvYawdLMLEcr3amnidW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-26_22,2023-02-24_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
+ spamscore=0 impostorscore=0 lowpriorityscore=0 malwarescore=0
+ clxscore=1011 bulkscore=0 suspectscore=0 mlxlogscore=999
+ priorityscore=1501 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2212070000 definitions=main-2302270081
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---1gdVvARvsfu9C4N3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Hey Andy,
-
-On Fri, Feb 24, 2023 at 05:01:18PM +0000, Andy Chiu wrote:
-> From: Guo Ren <guoren@linux.alibaba.com>
+On Mon, 2023-02-27 at 08:59 +0100, Thomas Huth wrote:
+> On 24/02/2023 18.15, Nina Schoetterl-Glausch wrote:
+> > On Wed, 2023-02-22 at 15:21 +0100, Pierre Morel wrote:
+> > > The modification of the CPU attributes are done through a monitor
+> > > command.
+> > >=20
+> > > It allows to move the core inside the topology tree to optimize
+> > > the cache usage in the case the host's hypervisor previously
+> > > moved the CPU.
+> > >=20
+> > > The same command allows to modify the CPU attributes modifiers
+> > > like polarization entitlement and the dedicated attribute to notify
+> > > the guest if the host admin modified scheduling or dedication of a vC=
+PU.
+> > >=20
+> > > With this knowledge the guest has the possibility to optimize the
+> > > usage of the vCPUs.
+> > >=20
+> > > The command has a feature unstable for the moment.
+> > >=20
+> > > Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> > > ---
+> > >   qapi/machine-target.json |  35 +++++++++
+> > >   include/monitor/hmp.h    |   1 +
+> > >   hw/s390x/cpu-topology.c  | 154 ++++++++++++++++++++++++++++++++++++=
++++
+> > >   hmp-commands.hx          |  17 +++++
+> > >   4 files changed, 207 insertions(+)
+> > >=20
+> > > diff --git a/qapi/machine-target.json b/qapi/machine-target.json
+> > > index a52cc32f09..baa9d273cf 100644
+> > > --- a/qapi/machine-target.json
+> > > +++ b/qapi/machine-target.json
+> > > @@ -354,3 +354,38 @@
+> > >   { 'enum': 'CpuS390Polarization',
+> > >     'prefix': 'S390_CPU_POLARIZATION',
+> > >     'data': [ 'horizontal', 'vertical' ] }
+> > > +
+> > > +##
+> > > +# @set-cpu-topology:
+> > > +#
+> > > +# @core-id: the vCPU ID to be moved
+> > > +# @socket-id: optional destination socket where to move the vCPU
+> > > +# @book-id: optional destination book where to move the vCPU
+> > > +# @drawer-id: optional destination drawer where to move the vCPU
+> > > +# @entitlement: optional entitlement
+> > > +# @dedicated: optional, if the vCPU is dedicated to a real CPU
+> > > +#
+> > > +# Features:
+> > > +# @unstable: This command may still be modified.
+> > > +#
+> > > +# Modifies the topology by moving the CPU inside the topology
+> > > +# tree or by changing a modifier attribute of a CPU.
+> > > +# Default value for optional parameter is the current value
+> > > +# used by the CPU.
+> > > +#
+> > > +# Returns: Nothing on success, the reason on failure.
+> > > +#
+> > > +# Since: 8.0
+> > > +##
+> > > +{ 'command': 'set-cpu-topology',
+> > > +  'data': {
+> > > +      'core-id': 'uint16',
+> > > +      '*socket-id': 'uint16',
+> > > +      '*book-id': 'uint16',
+> > > +      '*drawer-id': 'uint16',
+> > > +      '*entitlement': 'str',
+> >=20
+> > How about you add a machine-common.json and define CpuS390Entitlement t=
+here,
+> > and then include it from both machine.json and machine-target.json?
 >=20
-> This patch adds a config which enables vector feature from the kernel
-> space.
+> I'm not sure whether double inclusion works with the QAPI parser (since t=
+his=20
+> might code to be generated twice) ... have you tried?
+
+I haven't, the documentation says:
+
+> Include directives
+> ------------------
 >=20
-> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
-> Co-developed-by: Greentime Hu <greentime.hu@sifive.com>
-> Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
-> Suggested-by: Vineet Gupta <vineetg@rivosinc.com>
-> Suggested-by: Atish Patra <atishp@atishpatra.org>
-> Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
-
-At this point, you've basically re-written this patch and should be
-listed as a co-author at the very least!
-
-> ---
->  arch/riscv/Kconfig  | 18 ++++++++++++++++++
->  arch/riscv/Makefile |  3 ++-
->  2 files changed, 20 insertions(+), 1 deletion(-)
+> Syntax::
 >=20
-> diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-> index 81eb031887d2..19deeb3bb36b 100644
-> --- a/arch/riscv/Kconfig
-> +++ b/arch/riscv/Kconfig
-> @@ -418,6 +418,24 @@ config RISCV_ISA_SVPBMT
-> =20
->  	   If you don't know what to do here, say Y.
-> =20
-> +config TOOLCHAIN_HAS_V
-> +	bool
-> +	default y
-> +	depends on !64BIT || $(cc-option,-mabi=3Dlp64 -march=3Drv64iv)
-> +	depends on !32BIT || $(cc-option,-mabi=3Dilp32 -march=3Drv32iv)
-> +	depends on LLD_VERSION >=3D 140000 || LD_VERSION >=3D 23800
-> +
-> +config RISCV_ISA_V
-> +	bool "VECTOR extension support"
-> +	depends on TOOLCHAIN_HAS_V
-> +	select DYNAMIC_SIGFRAME
+>     INCLUDE =3D { 'include': STRING }
+>=20
+> The QAPI schema definitions can be modularized using the 'include' direct=
+ive::
+>=20
+>  { 'include': 'path/to/file.json' }
+>=20
+> The directive is evaluated recursively, and include paths are relative
+> to the file using the directive.  Multiple includes of the same file
+> are idempotent.
 
-So, nothing here makes V depend on CONFIG_FPU...
+Which is why I thought it should work, but I guess this is a statement abou=
+t
+including the same file twice in another file and not about including the s=
+ame
+file from two files.
 
-> +	default y
-> +	help
-> +	  Say N here if you want to disable all vector related procedure
-> +	  in the kernel.
-> +
-> +	  If you don't know what to do here, say Y.
-> +
->  config TOOLCHAIN_HAS_ZBB
->  	bool
->  	default y
-> diff --git a/arch/riscv/Makefile b/arch/riscv/Makefile
-> index 76989561566b..375a048b11cb 100644
-> --- a/arch/riscv/Makefile
-> +++ b/arch/riscv/Makefile
-> @@ -56,6 +56,7 @@ riscv-march-$(CONFIG_ARCH_RV32I)	:=3D rv32ima
->  riscv-march-$(CONFIG_ARCH_RV64I)	:=3D rv64ima
->  riscv-march-$(CONFIG_FPU)		:=3D $(riscv-march-y)fd
-
-=2E..but march only contains fd if CONFIG_FPU is enabled...
-
->  riscv-march-$(CONFIG_RISCV_ISA_C)	:=3D $(riscv-march-y)c
-> +riscv-march-$(CONFIG_RISCV_ISA_V)	:=3D $(riscv-march-y)v
-> =20
->  # Newer binutils versions default to ISA spec version 20191213 which mov=
-es some
->  # instructions from the I extension to the Zicsr and Zifencei extensions.
-> @@ -65,7 +66,7 @@ riscv-march-$(toolchain-need-zicsr-zifencei) :=3D $(ris=
-cv-march-y)_zicsr_zifencei
->  # Check if the toolchain supports Zihintpause extension
->  riscv-march-$(CONFIG_TOOLCHAIN_HAS_ZIHINTPAUSE) :=3D $(riscv-march-y)_zi=
-hintpause
-> =20
-> -KBUILD_CFLAGS +=3D -march=3D$(subst fd,,$(riscv-march-y))
-> +KBUILD_CFLAGS +=3D -march=3D$(subst fdv,,$(riscv-march-y))
-
-=2E..so I think this will not work if !CONFIG_FPU && RISCV_ISA_V.
-IIRC, vector uses some floating point opcodes, but does it (or Linux's
-implementation) actually depend on having floating point support in the
-kernel?
-If not, this cannot be done in a oneliner. Otherwise, CONFIG_RISCV_ISA_V
-should explicitly depend on CONFIG_FPU.
-
->  KBUILD_AFLAGS +=3D -march=3D$(riscv-march-y)
-> =20
->  KBUILD_CFLAGS +=3D -mno-save-restore
-> --=20
-> 2.17.1
+But then, as far as I can tell, the build system only builds qapi-schema.js=
+on,
+which includes all other files, so it could apply.
 >=20
 >=20
+>   Thomas
+>=20
 
---1gdVvARvsfu9C4N3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCY/yDegAKCRB4tDGHoIJi
-0i4IAP41YdSGjTqH1QRgMkRLPFQfD7HiWOHOEkYVUdbXjzsq9wEAmGW2shtjgjDR
-YeMqZLkAuUwj0SL5IEQRz1gI0B4f0Qk=
-=BDSG
------END PGP SIGNATURE-----
-
---1gdVvARvsfu9C4N3--
