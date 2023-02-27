@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 766F36A3CFE
-	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 09:29:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D24866A3D00
+	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 09:29:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231625AbjB0I3V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Feb 2023 03:29:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59254 "EHLO
+        id S231744AbjB0I3X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Feb 2023 03:29:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231268AbjB0I22 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Feb 2023 03:28:28 -0500
+        with ESMTP id S231548AbjB0I23 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Feb 2023 03:28:29 -0500
 Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3A3F1EFEB;
-        Mon, 27 Feb 2023 00:25:33 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 043EE1F90F;
+        Mon, 27 Feb 2023 00:25:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677486333; x=1709022333;
+  t=1677486335; x=1709022335;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=kMBId5tgd/jYNAEuydqBQUWh1H/FrqNDIwg30f6z/Lw=;
-  b=kBvSYjN6gmEAs1VWR6VbLwcKSXFHCmb/3YrT9huu5PGxt2f4YF8lHEsd
-   O7FWIEVsKd61MY5Ttqo/L//gJLdJwuM46hxNnWhBRjr+g4RE0HmviIDLO
-   1sCL31lt4A7yoKttCLI384eYhxLmKZzqhNIW5Us38dpjK2mO1R7lhVslz
-   tZ391nqroSvfqqj6S3wdnYxDfZ/eRXAmgohEdo4jLQPhBvv87bPs6kBLD
-   QQR1RkAXObwRHWZZShp0sUgMFRE+kKBxH3DJ1CbdE3IBCyIbSpl3U7QQw
-   MQaPrlvkCawXLC/gjW+m4ioJfIIv3NnYYTmkDubtiADwLPEyFP/4C0qM6
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10633"; a="317608979"
+  bh=O8o1EMXeBw3pZWezBLuqppwDDHiSfLvw2sREaH393wE=;
+  b=KddnKwPlGlmJ++xspP9jAlLiMavmgYm54prvCJIOWI1Cc8vcsvMzRkJp
+   lHUflpFzE+S0v5WDZhrzPlzabh6+6ZMk1dwxCWCslWEP0Z/l5KV5X5C7u
+   zB6FERAkh0jxn7u9Qai2G7ZyE+pbjGjcEi6ns2Wigmitf54IX1O7hkfxE
+   Sobx6jycGrgIAA+Vs1x8ITPUY2MFGZ95JRqWFJb+O4fHxDwdxx/TkEBnZ
+   BkB3RSlatT6QGw6HlYc4EzM1xXZOrqh2tPU20GtxMn+AD32OfjIUt7oms
+   pi4Ks+fszYO/JaS2TL46NYbzvRY9jeSzZHtdHKppQBIHQrMikHg9I2Bn9
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10633"; a="317608983"
 X-IronPort-AV: E=Sophos;i="5.97,331,1669104000"; 
-   d="scan'208";a="317608979"
+   d="scan'208";a="317608983"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
   by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2023 00:24:15 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10633"; a="783242337"
+X-IronPort-AV: E=McAfee;i="6500,9779,10633"; a="783242340"
 X-IronPort-AV: E=Sophos;i="5.97,331,1669104000"; 
-   d="scan'208";a="783242337"
+   d="scan'208";a="783242340"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2023 00:24:15 -0800
 From:   isaku.yamahata@intel.com
@@ -45,10 +45,11 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Sagi Shahar <sagis@google.com>,
         David Matlack <dmatlack@google.com>,
         Kai Huang <kai.huang@intel.com>,
-        Zhi Wang <zhi.wang.linux@gmail.com>
-Subject: [PATCH v12 072/106] KVM: TDX: Implement methods to inject NMI
-Date:   Mon, 27 Feb 2023 00:23:11 -0800
-Message-Id: <4dcdb9d3fd2d25d9ba8e2b68248f6d19978b9ffa.1677484918.git.isaku.yamahata@intel.com>
+        Zhi Wang <zhi.wang.linux@gmail.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [PATCH v12 073/106] KVM: VMX: Modify NMI and INTR handlers to take intr_info as function argument
+Date:   Mon, 27 Feb 2023 00:23:12 -0800
+Message-Id: <ef1b82711ecbeb4bfd524fa64643a25de2c24136.1677484918.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1677484918.git.isaku.yamahata@intel.com>
 References: <cover.1677484918.git.isaku.yamahata@intel.com>
@@ -63,144 +64,83 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-TDX vcpu control structure defines one bit for pending NMI for VMM to
-inject NMI by setting the bit without knowing TDX vcpu NMI states.  Because
-the vcpu state is protected, VMM can't know about NMI states of TDX vcpu.
-The TDX module handles actual injection and NMI states transition.
+TDX uses different ABI to get information about VM exit.  Pass intr_info to
+the NMI and INTR handlers instead of pulling it from vcpu_vmx in
+preparation for sharing the bulk of the handlers with TDX.
 
-Add methods for NMI and treat NMI can be injected always.
+When the guest TD exits to VMM, RAX holds status and exit reason, RCX holds
+exit qualification etc rather than the VMCS fields because VMM doesn't have
+access to the VMCS.  The eventual code will be
 
+VMX:
+  - get exit reason, intr_info, exit_qualification, and etc from VMCS
+  - call NMI/INTR handlers (common code)
+
+TDX:
+  - get exit reason, intr_info, exit_qualification, and etc from guest
+    registers
+  - call NMI/INTR handlers (common code)
+
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/vmx/main.c    | 64 +++++++++++++++++++++++++++++++++++---
- arch/x86/kvm/vmx/tdx.c     |  5 +++
- arch/x86/kvm/vmx/x86_ops.h |  2 ++
- 3 files changed, 66 insertions(+), 5 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index cfcd5818f8cb..134f03a891b4 100644
---- a/arch/x86/kvm/vmx/main.c
-+++ b/arch/x86/kvm/vmx/main.c
-@@ -294,6 +294,60 @@ static void vt_flush_tlb_guest(struct kvm_vcpu *vcpu)
- 	vmx_flush_tlb_guest(vcpu);
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index f68ee2f5586b..5081679eba4a 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6861,28 +6861,27 @@ static void handle_nm_fault_irqoff(struct kvm_vcpu *vcpu)
+ 		rdmsrl(MSR_IA32_XFD_ERR, vcpu->arch.guest_fpu.xfd_err);
  }
  
-+static void vt_inject_nmi(struct kvm_vcpu *vcpu)
-+{
-+	if (is_td_vcpu(vcpu)) {
-+		tdx_inject_nmi(vcpu);
-+		return;
-+	}
-+
-+	vmx_inject_nmi(vcpu);
-+}
-+
-+static int vt_nmi_allowed(struct kvm_vcpu *vcpu, bool for_injection)
-+{
-+	/*
-+	 * The TDX module manages NMI windows and NMI reinjection, and hides NMI
-+	 * blocking, all KVM can do is throw an NMI over the wall.
-+	 */
-+	if (is_td_vcpu(vcpu))
-+		return true;
-+
-+	return vmx_nmi_allowed(vcpu, for_injection);
-+}
-+
-+static bool vt_get_nmi_mask(struct kvm_vcpu *vcpu)
-+{
-+	/*
-+	 * Assume NMIs are always unmasked.  KVM could query PEND_NMI and treat
-+	 * NMIs as masked if a previous NMI is still pending, but SEAMCALLs are
-+	 * expensive and the end result is unchanged as the only relevant usage
-+	 * of get_nmi_mask() is to limit the number of pending NMIs, i.e. it
-+	 * only changes whether KVM or the TDX module drops an NMI.
-+	 */
-+	if (is_td_vcpu(vcpu))
-+		return false;
-+
-+	return vmx_get_nmi_mask(vcpu);
-+}
-+
-+static void vt_set_nmi_mask(struct kvm_vcpu *vcpu, bool masked)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return;
-+
-+	vmx_set_nmi_mask(vcpu, masked);
-+}
-+
-+static void vt_enable_nmi_window(struct kvm_vcpu *vcpu)
-+{
-+	/* Refer the comment in vt_get_nmi_mask(). */
-+	if (is_td_vcpu(vcpu))
-+		return;
-+
-+	vmx_enable_nmi_window(vcpu);
-+}
-+
- static void vt_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa,
- 			int pgd_level)
+-static void handle_exception_nmi_irqoff(struct vcpu_vmx *vmx)
++static void handle_exception_nmi_irqoff(struct kvm_vcpu *vcpu, u32 intr_info)
  {
-@@ -473,14 +527,14 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.get_interrupt_shadow = vt_get_interrupt_shadow,
- 	.patch_hypercall = vmx_patch_hypercall,
- 	.inject_irq = vt_inject_irq,
--	.inject_nmi = vmx_inject_nmi,
-+	.inject_nmi = vt_inject_nmi,
- 	.inject_exception = vmx_inject_exception,
- 	.cancel_injection = vt_cancel_injection,
- 	.interrupt_allowed = vt_interrupt_allowed,
--	.nmi_allowed = vmx_nmi_allowed,
--	.get_nmi_mask = vmx_get_nmi_mask,
--	.set_nmi_mask = vmx_set_nmi_mask,
--	.enable_nmi_window = vmx_enable_nmi_window,
-+	.nmi_allowed = vt_nmi_allowed,
-+	.get_nmi_mask = vt_get_nmi_mask,
-+	.set_nmi_mask = vt_set_nmi_mask,
-+	.enable_nmi_window = vt_enable_nmi_window,
- 	.enable_irq_window = vt_enable_irq_window,
- 	.update_cr8_intercept = vmx_update_cr8_intercept,
- 	.set_virtual_apic_mode = vmx_set_virtual_apic_mode,
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 455060f39018..42ab1f13a48f 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -749,6 +749,11 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu)
- 	return EXIT_FASTPATH_NONE;
+ 	const unsigned long nmi_entry = (unsigned long)asm_exc_nmi_noist;
+-	u32 intr_info = vmx_get_intr_info(&vmx->vcpu);
+ 
+ 	/* if exit due to PF check for async PF */
+ 	if (is_page_fault(intr_info))
+-		vmx->vcpu.arch.apf.host_apf_flags = kvm_read_and_reset_apf_flags();
++		vcpu->arch.apf.host_apf_flags = kvm_read_and_reset_apf_flags();
+ 	/* if exit due to NM, handle before interrupts are enabled */
+ 	else if (is_nm_fault(intr_info))
+-		handle_nm_fault_irqoff(&vmx->vcpu);
++		handle_nm_fault_irqoff(vcpu);
+ 	/* Handle machine checks before interrupts are enabled */
+ 	else if (is_machine_check(intr_info))
+ 		kvm_machine_check();
+ 	/* We need to handle NMIs before interrupts are enabled */
+ 	else if (is_nmi(intr_info))
+-		handle_interrupt_nmi_irqoff(&vmx->vcpu, nmi_entry);
++		handle_interrupt_nmi_irqoff(vcpu, nmi_entry);
  }
  
-+void tdx_inject_nmi(struct kvm_vcpu *vcpu)
-+{
-+	td_management_write8(to_tdx(vcpu), TD_VCPU_PEND_NMI, 1);
-+}
-+
- void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int pgd_level)
+-static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
++static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu,
++					     u32 intr_info)
  {
- 	td_vmcs_write64(to_tdx(vcpu), SHARED_EPT_POINTER, root_hpa & PAGE_MASK);
-diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-index fdad8f0edd6a..3aaee10aaa29 100644
---- a/arch/x86/kvm/vmx/x86_ops.h
-+++ b/arch/x86/kvm/vmx/x86_ops.h
-@@ -165,6 +165,7 @@ u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio);
+-	u32 intr_info = vmx_get_intr_info(vcpu);
+ 	unsigned int vector = intr_info & INTR_INFO_VECTOR_MASK;
+ 	gate_desc *desc = (gate_desc *)host_idt_base + vector;
  
- void tdx_deliver_interrupt(struct kvm_lapic *apic, int delivery_mode,
- 			   int trig_mode, int vector);
-+void tdx_inject_nmi(struct kvm_vcpu *vcpu);
+@@ -6902,9 +6901,9 @@ void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu)
+ 		return;
  
- int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
+ 	if (vmx->exit_reason.basic == EXIT_REASON_EXTERNAL_INTERRUPT)
+-		handle_external_interrupt_irqoff(vcpu);
++		handle_external_interrupt_irqoff(vcpu, vmx_get_intr_info(vcpu));
+ 	else if (vmx->exit_reason.basic == EXIT_REASON_EXCEPTION_NMI)
+-		handle_exception_nmi_irqoff(vmx);
++		handle_exception_nmi_irqoff(vcpu, vmx_get_intr_info(vcpu));
+ }
  
-@@ -200,6 +201,7 @@ static inline u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
- 
- static inline void tdx_deliver_interrupt(struct kvm_lapic *apic, int delivery_mode,
- 					 int trig_mode, int vector) {}
-+static inline void tdx_inject_nmi(struct kvm_vcpu *vcpu) {}
- 
- static inline int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp) { return -EOPNOTSUPP; }
- 
+ /*
 -- 
 2.25.1
 
