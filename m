@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EBE2E6A363C
-	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 02:49:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 231B16A363D
+	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 02:49:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229650AbjB0BtT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 26 Feb 2023 20:49:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44490 "EHLO
+        id S229663AbjB0Btq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 26 Feb 2023 20:49:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229486AbjB0BtS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 26 Feb 2023 20:49:18 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2F4512861
-        for <kvm@vger.kernel.org>; Sun, 26 Feb 2023 17:49:16 -0800 (PST)
+        with ESMTP id S229486AbjB0Btp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 26 Feb 2023 20:49:45 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8758312BCA
+        for <kvm@vger.kernel.org>; Sun, 26 Feb 2023 17:49:43 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 20929B80C97
-        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 01:49:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F302C433D2;
-        Mon, 27 Feb 2023 01:49:13 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 33915B80BA8
+        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 01:49:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1DA8C433D2;
+        Mon, 27 Feb 2023 01:49:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677462553;
-        bh=0BBSfBMFAYCSLhehEJB5tJxJ44xvuDCIzbM3y/zDNjM=;
+        s=k20201202; t=1677462580;
+        bh=N98coiog7xXXXOg80oMitUY2K7E6Pq67WIRyjCLoe7M=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=biCo3cn8MU4m8MW5lzVCJabXdaEJjXHKzKnKS4pnShqPJoAPh5Ayk5PJPDGL8kdNc
-         Cz1oN9DRGCkAM54+eka6sEYZfhQ9vaXtDFmbsXJW4Wo1bYJMvYXSiIye7+eZj+mi1s
-         80fhJUFGWaYXa1KuIfbe+r/wjIFovup4UvUwf+l673kHq1f4bAiFFAJuURTHtF4vTN
-         6nrNfgsoIY0YHeZE/x1umgVVTfVqsgavy0VPjtmmsBWFIBFW/2gUdzv4nFAchi7ZDC
-         uaJrGp6Pd5L4jNl8ankEu2IA+e+bs2FAJUM1ZQrWtvw8XsauE1Q500M4aG481xRFnW
-         aw4P2qO2uM+ZA==
+        b=rzaMZ7UHpUulp5TBP5H8mdG6zS2F5PkxU0lIThokkq574pFDQx3kKfZmOQwSPCSnF
+         GCjKnnI68eiufLbbj7dDmMJbu6cI+uhBLdnvjMf/npKTEMUWQce7rjRGWvN396p2w3
+         nksYR6C+Vqe7qjh931j5kUXwU5q/7WTJIOkSFaZNDUOEmqi3F9WNeTpxF0doIo9MLd
+         nq+kf6zcuXnHZ0ApKiSGgXqPpQOuh/iSzottxJUuXlBErIdbU5NbrJjEji2UjfWprD
+         EMN5STJJUpzz7BgCNeLJkIawh3U4zdaP7HISAU5ZJ3X9eQzroI/G01vJUAAM9hnSI+
+         S/j1VuN1yGifQ==
 Received: from [47.176.216.2] (helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pWSda-00DPAh-Sa;
-        Mon, 27 Feb 2023 01:49:11 +0000
-Date:   Mon, 27 Feb 2023 01:49:09 +0000
-Message-ID: <878rgjev3e.wl-maz@kernel.org>
+        id 1pWSe2-00DPB0-7K;
+        Mon, 27 Feb 2023 01:49:38 +0000
+Date:   Mon, 27 Feb 2023 01:49:37 +0000
+Message-ID: <877cw3ev2m.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Shivam Kumar <shivam.kumar1@nutanix.com>
 Cc:     pbonzini@redhat.com, seanjc@google.com, james.morse@arm.com,
@@ -47,9 +47,9 @@ Cc:     pbonzini@redhat.com, seanjc@google.com, james.morse@arm.com,
         Shaju Abraham <shaju.abraham@nutanix.com>,
         Manish Mishra <manish.mishra@nutanix.com>,
         Anurag Madnawat <anurag.madnawat@nutanix.com>
-Subject: Re: [PATCH v8 1/3] KVM: Implement dirty quota-based throttling of vcpus
-In-Reply-To: <20230225204758.17726-2-shivam.kumar1@nutanix.com>
-References: <20230225204758.17726-1-shivam.kumar1@nutanix.com>  <20230225204758.17726-2-shivam.kumar1@nutanix.com>
+Subject: Re: [PATCH v8 3/3] KVM: arm64: Dirty quota-based throttling of vcpus
+In-Reply-To: <20230225204758.17726-4-shivam.kumar1@nutanix.com>
+References: <20230225204758.17726-1-shivam.kumar1@nutanix.com>  <20230225204758.17726-4-shivam.kumar1@nutanix.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -59,8 +59,8 @@ X-SA-Exim-Connect-IP: 47.176.216.2
 X-SA-Exim-Rcpt-To: shivam.kumar1@nutanix.com, pbonzini@redhat.com, seanjc@google.com, james.morse@arm.com, borntraeger@linux.ibm.com, david@redhat.com, aravind.retnakaran@nutanix.com, kvm@vger.kernel.org, shaju.abraham@nutanix.com, manish.mishra@nutanix.com, anurag.madnawat@nutanix.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,20 +68,13 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 25 Feb 2023 20:47:57 +0000,
+On Sat, 25 Feb 2023 20:48:01 +0000,
 Shivam Kumar <shivam.kumar1@nutanix.com> wrote:
 > 
-> Define dirty_quota_bytes variable to track and throttle memory
-> dirtying for every vcpu. This variable stores the number of bytes the
-> vcpu is allowed to dirty. To dirty more, the vcpu needs to request
-> more quota by exiting to userspace.
-> 
-> Implement update_dirty_quota function which
-> 
-> i) Decreases dirty_quota_bytes by arch-specific page size whenever a
-> page is dirtied.
-> ii) Raises a KVM request KVM_REQ_DIRTY_QUOTA_EXIT whenever the dirty
-> quota is exhausted (i.e. dirty_quota_bytes <= 0).
+> Call update_dirty_quota whenever a page is marked dirty with
+> appropriate arch-specific page size. Process the KVM request
+> KVM_REQ_DIRTY_QUOTA_EXIT (raised by update_dirty_quota) to exit to
+> userspace with exit reason KVM_EXIT_DIRTY_QUOTA_EXHAUSTED.
 > 
 > Suggested-by: Shaju Abraham <shaju.abraham@nutanix.com>
 > Suggested-by: Manish Mishra <manish.mishra@nutanix.com>
@@ -89,150 +82,62 @@ Shivam Kumar <shivam.kumar1@nutanix.com> wrote:
 > Signed-off-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
 > Signed-off-by: Shivam Kumar <shivam.kumar1@nutanix.com>
 > ---
->  Documentation/virt/kvm/api.rst | 17 +++++++++++++++++
->  include/linux/kvm_host.h       |  5 +++++
->  include/uapi/linux/kvm.h       |  8 ++++++++
->  tools/include/uapi/linux/kvm.h |  1 +
->  virt/kvm/Kconfig               |  3 +++
->  virt/kvm/kvm_main.c            | 31 +++++++++++++++++++++++++++++++
->  6 files changed, 65 insertions(+)
+>  arch/arm64/kvm/Kconfig | 1 +
+>  arch/arm64/kvm/arm.c   | 7 +++++++
+>  arch/arm64/kvm/mmu.c   | 3 +++
+>  3 files changed, 11 insertions(+)
 > 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 62de0768d6aa..3a283fe212d8 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6688,6 +6688,23 @@ Please note that the kernel is allowed to use the kvm_run structure as the
->  primary storage for certain register types. Therefore, the kernel may use the
->  values in kvm_run even if the corresponding bit in kvm_dirty_regs is not set.
->  
-> +::
-> +
-> +	/*
-> +	 * Number of bytes the vCPU is allowed to dirty if KVM_CAP_DIRTY_QUOTA is
-> +	 * enabled. KVM_RUN exits with KVM_EXIT_DIRTY_QUOTA_EXHAUSTED if this quota
-> +	 * is exhausted, i.e. dirty_quota_bytes <= 0.
-> +	 */
-> +	long dirty_quota_bytes;
-> +
-> +Please note that enforcing the quota is best effort. Dirty quota is reduced by
-> +arch-specific page size when any guest page is dirtied. Also, the guest may dirty
-> +multiple pages before KVM can recheck the quota.
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index ca6eadeb7d1a..8e7dea2c3a9f 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -44,6 +44,7 @@ menuconfig KVM
+>  	select SCHED_INFO
+>  	select GUEST_PERF_EVENTS if PERF_EVENTS
+>  	select INTERVAL_TREE
+> +	select HAVE_KVM_DIRTY_QUOTA
 
-What are the events that trigger such quota reduction?
+So this is selected unconditionally...
 
-> +
-> +::
-> +  };
-> +
-> +
+>  	help
+>  	  Support hosting virtualized guest machines.
 >  
->  6. Capabilities that can be enabled on vCPUs
->  ============================================
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 8ada23756b0e..f5ce343c64f2 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -167,6 +167,7 @@ static inline bool is_error_page(struct page *page)
->  #define KVM_REQ_VM_DEAD			(1 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
->  #define KVM_REQ_UNBLOCK			2
->  #define KVM_REQ_DIRTY_RING_SOFT_FULL	3
-> +#define KVM_REQ_DIRTY_QUOTA_EXIT	4
->  #define KVM_REQUEST_ARCH_BASE		8
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 3bd732eaf087..5162b2fc46a1 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -757,6 +757,13 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
 >  
->  /*
-> @@ -800,6 +801,9 @@ struct kvm {
->  	bool dirty_ring_with_bitmap;
->  	bool vm_bugged;
->  	bool vm_dead;
+>  		if (kvm_dirty_ring_check_request(vcpu))
+>  			return 0;
+> +
 > +#ifdef CONFIG_HAVE_KVM_DIRTY_QUOTA
-> +	bool dirty_quota_enabled;
-> +#endif
->  
->  #ifdef CONFIG_HAVE_KVM_PM_NOTIFIER
->  	struct notifier_block pm_notifier;
-> @@ -1235,6 +1239,7 @@ struct kvm_memory_slot *gfn_to_memslot(struct kvm *kvm, gfn_t gfn);
->  bool kvm_is_visible_gfn(struct kvm *kvm, gfn_t gfn);
->  bool kvm_vcpu_is_visible_gfn(struct kvm_vcpu *vcpu, gfn_t gfn);
->  unsigned long kvm_host_page_size(struct kvm_vcpu *vcpu, gfn_t gfn);
-> +void update_dirty_quota(struct kvm *kvm, unsigned long page_size_bytes);
->  void mark_page_dirty_in_slot(struct kvm *kvm, const struct kvm_memory_slot *memslot, gfn_t gfn);
->  void mark_page_dirty(struct kvm *kvm, gfn_t gfn);
->  
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index d77aef872a0a..ddb9d3d797c4 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -264,6 +264,7 @@ struct kvm_xen_exit {
->  #define KVM_EXIT_RISCV_SBI        35
->  #define KVM_EXIT_RISCV_CSR        36
->  #define KVM_EXIT_NOTIFY           37
-> +#define KVM_EXIT_DIRTY_QUOTA_EXHAUSTED 38
->  
->  /* For KVM_EXIT_INTERNAL_ERROR */
->  /* Emulate instruction failed. */
-> @@ -526,6 +527,12 @@ struct kvm_run {
->  		struct kvm_sync_regs regs;
->  		char padding[SYNC_REGS_SIZE_BYTES];
->  	} s;
-> +	/*
-> +	 * Number of bytes the vCPU is allowed to dirty if KVM_CAP_DIRTY_QUOTA is
-> +	 * enabled. KVM_RUN exits with KVM_EXIT_DIRTY_QUOTA_EXHAUSTED if this quota
-> +	 * is exhausted, i.e. dirty_quota_bytes <= 0.
-> +	 */
-> +	long dirty_quota_bytes;
->  };
->  
->  /* for KVM_REGISTER_COALESCED_MMIO / KVM_UNREGISTER_COALESCED_MMIO */
-> @@ -1184,6 +1191,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
->  #define KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP 225
->  #define KVM_CAP_PMU_EVENT_MASKED_EVENTS 226
-> +#define KVM_CAP_DIRTY_QUOTA 227
->  
->  #ifdef KVM_CAP_IRQ_ROUTING
->  
-> diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
-> index 55155e262646..48f236e2b836 100644
-> --- a/tools/include/uapi/linux/kvm.h
-> +++ b/tools/include/uapi/linux/kvm.h
-> @@ -1175,6 +1175,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
->  #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
->  #define KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP 225
-> +#define KVM_CAP_DIRTY_QUOTA 227
->  
->  #ifdef KVM_CAP_IRQ_ROUTING
->  
-> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> index b74916de5183..ccaa332d88f9 100644
-> --- a/virt/kvm/Kconfig
-> +++ b/virt/kvm/Kconfig
-> @@ -19,6 +19,9 @@ config HAVE_KVM_IRQ_ROUTING
->  config HAVE_KVM_DIRTY_RING
->         bool
->  
-> +config HAVE_KVM_DIRTY_QUOTA
-> +       bool
-> +
->  # Only strongly ordered architectures can select this, as it doesn't
->  # put any explicit constraint on userspace ordering. They can also
->  # select the _ACQ_REL version.
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index d255964ec331..744b955514ce 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -3096,6 +3096,9 @@ static int __kvm_write_guest_page(struct kvm *kvm,
->  	r = __copy_to_user((void __user *)addr + offset, data, len);
->  	if (r)
->  		return -EFAULT;
-> +#ifdef CONFIG_HAVE_KVM_DIRTY_QUOTA
-> +	update_dirty_quota(kvm, PAGE_SIZE);
-> +#endif
 
-Why PAGE_SIZE? Why not 'len'? Why if the page was already dirtied? Why
-should it be accounted for multiple times? In most cases, this is the
-*hypervisor* writing to the guest, not the vcpu. Why should this be
-accounted to the vcpu quota?
+... and yet you litter the arch code with #ifdefs...
+
+> +		if (kvm_check_request(KVM_REQ_DIRTY_QUOTA_EXIT, vcpu)) {
+> +			vcpu->run->exit_reason = KVM_EXIT_DIRTY_QUOTA_EXHAUSTED;
+> +			return 0;
+
+What rechecks the quota on entry?
+
+> +		}
+> +#endif
+>  	}
+>  
+>  	return 1;
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 7113587222ff..baf416046f46 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1390,6 +1390,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	/* Mark the page dirty only if the fault is handled successfully */
+>  	if (writable && !ret) {
+>  		kvm_set_pfn_dirty(pfn);
+> +#ifdef CONFIG_HAVE_KVM_DIRTY_QUOTA
+> +		update_dirty_quota(kvm, fault_granule);
+
+fault_granule isn't necessarily the amount that gets dirtied.
 
 	M.
 
