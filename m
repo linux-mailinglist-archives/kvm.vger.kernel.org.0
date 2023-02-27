@@ -2,295 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E5E246A4658
-	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 16:45:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D63E56A470D
+	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 17:32:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229896AbjB0Ppl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Feb 2023 10:45:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58788 "EHLO
+        id S229836AbjB0Qc4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Feb 2023 11:32:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229728AbjB0Ppf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Feb 2023 10:45:35 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C48DD23843;
-        Mon, 27 Feb 2023 07:44:52 -0800 (PST)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31RF0GSZ012483;
-        Mon, 27 Feb 2023 15:44:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : references : from : subject : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=jfk3d1zG7Y4es69SBEoaWorqTjrlfE08sbEXJkO2cLY=;
- b=jz26USHnA0e/rmVgM8m9nwo9Sdrx8XvOACzFkwxHqtoRibRTCvVi238mVh4noFVudtzG
- LkjYPBWoUPpzZrM/mnk4ll3R2F9DuFnmKsOJjkJTWE1gsKm+4qwwL4CRdI3iaJHnqIBg
- oVfCpVqEvbUAV8t+pXr1WIg117AGLMAIzUBhoquDBhwoQgjxQQUm4WmQVwwXV41pYOfh
- mJUtDGYXfhbUlyIfDvBM8G9cpv4ieWS2eV7tozEObScFd/HZcANnTT8T7gzR4cMQ09o+
- y5Uu6jtCmPWL5hm4MPF7rzMDifyTth0hoHo4+LMgQqFOsMr+iQq/ka7taM1gRilFIVkf dA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p0w20mf54-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Feb 2023 15:44:51 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31RFPwMB004530;
-        Mon, 27 Feb 2023 15:44:51 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p0w20mf4p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Feb 2023 15:44:51 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31R67dGA023377;
-        Mon, 27 Feb 2023 15:44:49 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma04fra.de.ibm.com (PPS) with ESMTPS id 3nybab1hxq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Feb 2023 15:44:49 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31RFijvL63177036
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 27 Feb 2023 15:44:45 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 640662004B;
-        Mon, 27 Feb 2023 15:44:45 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EF86820040;
-        Mon, 27 Feb 2023 15:44:44 +0000 (GMT)
-Received: from [9.171.95.33] (unknown [9.171.95.33])
-        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 27 Feb 2023 15:44:44 +0000 (GMT)
-Message-ID: <0d48cb35-738a-af5e-419a-5827dc6e3531@linux.ibm.com>
-Date:   Mon, 27 Feb 2023 16:44:44 +0100
+        with ESMTP id S229744AbjB0Qcy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Feb 2023 11:32:54 -0500
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13DE3527E
+        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 08:32:53 -0800 (PST)
+Received: by mail-wr1-x431.google.com with SMTP id e37so4393018wri.10
+        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 08:32:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IoYGatWSvQRgweQA0GC8tXFSXKJ5/Iad9YexwVGxcig=;
+        b=DBzJ4Kh1nAhW9mzymQMn0YEQKZmEthpxpRNWaXWEnyEPpWQ7O57QKdOvn/it4W238T
+         toL+B6i+zEzGIAAZSw0V/3WW+UpN/Se0hUwgMladYn0fx2YZIB4h2FEcja4d+4+PDKv+
+         1Q6Bvd45NkbZ2dLPqN+oOEToHY77kK5zp1UI9HLTo1k3naJD9TufyDHo5ltW5EDJDt+l
+         5U0nDz0nhS6f1Wc0roDcGrMxDZuT4Y4KkKHkXUOYYdf93/+6SXt94d3R6cPZxifIUYgM
+         0zBGgipF7s4SQQz3DMWh861aeSZ6YmWclTLPOL09wlPfUpbztD34Y/mX4XaE11h+PORx
+         amsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IoYGatWSvQRgweQA0GC8tXFSXKJ5/Iad9YexwVGxcig=;
+        b=Bi3CerRg1Cv8IDhg+nbObb5v1ZJfSGgx/PoT24hr51eTbNwkTKd9xAteVKFfXk5vqw
+         k7bMkYYeTFl4ubrNjmUmWyIRMAyrvTRH681dQdhpV1nxg9Z3/p0h65OPBjCcEwm2zCSD
+         l7mKfmH6gVmPwbR6LXGiDxxI/f/giYuI0wFxf7nCBgBRSyApw4lg8+AoB0IT50zfUu6Z
+         HljV1gDxxQZ45dMAoDlvAmySIdk18OdKyXFlN5npXpEZDygQ1y0LYiSfb7Lx6IWSMUih
+         i3yrJi8sVbntAbFbWObAmWARabCBxtZqf6Gq5NV8Va3I9LAlDSiBZKYvhXeP7+Ox9l0d
+         MxFQ==
+X-Gm-Message-State: AO0yUKWtBc4KRIc3HGdopamEBVNsvk8IjOo1FMm3ufvrnz2Ypwd5M2vz
+        AkVWPYIPElRiyyu+p/66dKJBXw==
+X-Google-Smtp-Source: AK7set+BmZtVxjSiExjRciXj4iu4AswXVOqK7ahGer1JspHdlO4S1Xv8EqAaO8/tgqfzEr/CPfuOjA==
+X-Received: by 2002:adf:eccf:0:b0:2c7:e424:eeb8 with SMTP id s15-20020adfeccf000000b002c7e424eeb8mr8344937wro.57.1677515571554;
+        Mon, 27 Feb 2023 08:32:51 -0800 (PST)
+Received: from ?IPV6:2a02:6b6a:b566:0:6caa:9121:bec9:a2a9? ([2a02:6b6a:b566:0:6caa:9121:bec9:a2a9])
+        by smtp.gmail.com with ESMTPSA id m7-20020adfe947000000b002c70f5627d5sm7389120wrn.63.2023.02.27.08.32.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Feb 2023 08:32:51 -0800 (PST)
+Message-ID: <0f4dc622-6273-8abc-bf9a-d4f737ccb8e9@bytedance.com>
+Date:   Mon, 27 Feb 2023 16:32:50 +0000
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
+ Thunderbird/102.4.2
+Subject: Re: [External] Re: [PATCH v12 00/11] Parallel CPU bringup for x86_64
 Content-Language: en-US
-To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20230224152015.2943564-1-nsg@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v2] s390x: Add tests for execute-type
- instructions
-In-Reply-To: <20230224152015.2943564-1-nsg@linux.ibm.com>
+To:     David Woodhouse <dwmw2@infradead.org>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        tglx@linutronix.de, kim.phillips@amd.com, brgerst@gmail.com
+Cc:     piotrgorski@cachyos.org, arjan@linux.intel.com, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        x86@kernel.org, pbonzini@redhat.com, paulmck@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
+        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
+        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
+        simon.evans@bytedance.com, liangma@liangbit.com
+References: <20230226110802.103134-1-usama.arif@bytedance.com>
+ <5650744.DvuYhMxLoT@natalenko.name>
+ <819d8fa2-b73e-e32f-5442-452aa2c0d752@bytedance.com>
+ <5e8ad90a-1dc6-95c2-e020-5e95da6f9eda@bytedance.com>
+ <90c7efe278fed0616275ed64215ec1fe249f16f5.camel@infradead.org>
+From:   Usama Arif <usama.arif@bytedance.com>
+In-Reply-To: <90c7efe278fed0616275ed64215ec1fe249f16f5.camel@infradead.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: WVlS-lK9KE1bobUFyS39qRg1HkLuIqjX
-X-Proofpoint-GUID: gIh20hXN6pNP7dCpWWZiPO3YxDMLtvHO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
- definitions=2023-02-27_12,2023-02-27_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 spamscore=0
- lowpriorityscore=0 mlxscore=0 malwarescore=0 adultscore=0 mlxlogscore=999
- bulkscore=0 suspectscore=0 phishscore=0 priorityscore=1501 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
- definitions=main-2302270119
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/24/23 16:20, Nina Schoetterl-Glausch wrote:
-> Test the instruction address used by targets of an execute instruction.
-> When the target instruction calculates a relative address, the result is
-> relative to the target instruction, not the execute instruction.
-
-For instructions like execute where the details matter it's a great idea 
-to have a lot of comments maybe even loose references to the PoP so 
-people can read up on the issue more easily.
 
 
+On 27/02/2023 15:29, David Woodhouse wrote:
+> On Mon, 2023-02-27 at 06:14 +0000, Usama Arif wrote:
+>>
+>> diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
+>> index 17bdd6122dca..5d709aa67df4 100644
+>> --- a/arch/x86/kernel/head_64.S
+>> +++ b/arch/x86/kernel/head_64.S
+>> @@ -273,7 +273,11 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify,
+>> SYM_L_GLOBAL)
+>>           cmpl    (%rbx,%rcx,4), %edx
+>>           jz      .Lsetup_cpu
+>>           inc     %ecx
+>> +#if (NR_CPUS == 1) || defined(CONFIG_FORCE_NR_CPUS)
+>> +       cmpl    $NR_CPUS, %ecx
+>> +#else
+>>           cmpl    nr_cpu_ids(%rip), %ecx
+>> +#endif
+>>           jb      .Lfind_cpunr
+>>
+>>           /*  APIC ID not found in the table. Drop the trampoline lock
+>> and bail. */
 > 
-> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-> Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
-> ---
+> The whitespace looks dodgy there but maybe that's just your mail client?
 > 
-> 
-> v1 -> v2:
->   * add test to unittests.cfg and .gitlab-ci.yml
->   * pick up R-b (thanks Nico)
-> 
-> 
-> TCG does the address calculation relative to the execute instruction.
+> Given this code is already in #ifdef CONFIG_SMP, can NR_CPUS be 1?
 
-Always?
-I.e. what are you telling me here?
+Ah yes, we have
 
-> 
-> 
->   s390x/Makefile      |  1 +
->   s390x/ex.c          | 92 +++++++++++++++++++++++++++++++++++++++++++++
->   s390x/unittests.cfg |  3 ++
->   .gitlab-ci.yml      |  1 +
->   4 files changed, 97 insertions(+)
->   create mode 100644 s390x/ex.c
-> 
-> diff --git a/s390x/Makefile b/s390x/Makefile
-> index 97a61611..6cf8018b 100644
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -39,6 +39,7 @@ tests += $(TEST_DIR)/panic-loop-extint.elf
->   tests += $(TEST_DIR)/panic-loop-pgm.elf
->   tests += $(TEST_DIR)/migration-sck.elf
->   tests += $(TEST_DIR)/exittime.elf
-> +tests += $(TEST_DIR)/ex.elf
->   
->   pv-tests += $(TEST_DIR)/pv-diags.elf
->   
-> diff --git a/s390x/ex.c b/s390x/ex.c
-> new file mode 100644
-> index 00000000..1bf4d8cd
-> --- /dev/null
-> +++ b/s390x/ex.c
-> @@ -0,0 +1,92 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright IBM Corp. 2023
-> + *
-> + * Test EXECUTE (RELATIVE LONG).
-> + */
-> +
-> +#include <libcflat.h>
-> +
+config NR_CPUS_RANGE_BEGIN
+	int
+	default NR_CPUS_RANGE_END if MAXSMP
+	default    1 if !SMP
+	default    2
 
-Take my words with some salt, I never had a close look at the branch 
-instructions other than brc.
-
-This is "branch and save" and the "r" in "basr" says that it's the RR 
-variant. It's not relative the way that "bras" is, right?
-
-Hence ret_addr and after_ex both point to 1f.
-
-I'd like to have a comment here that states that this is not a relative 
-branch at all. The r specifies the instruction format.
-
-> +static void test_basr(void)
-> +{
-> +	uint64_t ret_addr, after_ex;
-> +
-> +	report_prefix_push("BASR");
-> +	asm volatile ( ".pushsection .rodata\n"
-> +		"0:	basr	%[ret_addr],0\n"
-> +		"	.popsection\n"
-> +
-> +		"	larl	%[after_ex],1f\n"
-> +		"	exrl	0,0b\n"
-> +		"1:\n"
-> +		: [ret_addr] "=d" (ret_addr),
-> +		  [after_ex] "=d" (after_ex)
-> +	);
-> +
-> +	report(ret_addr == after_ex, "return address after EX");
-> +	report_prefix_pop();
-> +}
-> +
-> +/*
-> + * According to PoP (Branch-Address Generation), the address is relative to
-> + * BRAS when it is the target of an execute-type instruction.
-> + */
-
-Is there any merit in testing the other br* instructions as well or are 
-they running through the same TCG function?
-
-> +static void test_bras(void)
-> +{
-> +	uint64_t after_target, ret_addr, after_ex, branch_addr;
-> +
-> +	report_prefix_push("BRAS");
-> +	asm volatile ( ".pushsection .text.ex_bras, \"x\"\n"
-> +		"0:	bras	%[ret_addr],1f\n"
-> +		"	nopr	%%r7\n"
-> +		"1:	larl	%[branch_addr],0\n"
-> +		"	j	4f\n"
-> +		"	.popsection\n"
-> +
-> +		"	larl	%[after_target],1b\n"
-> +		"	larl	%[after_ex],3f\n"
-> +		"2:	exrl	0,0b\n"
-> +		"3:	larl	%[branch_addr],0\n"
-> +		"4:\n"
-> +
-> +		"	.if (1b - 0b) != (3b - 2b)\n"
-> +		"	.error	\"right and wrong target must have same offset\"\n"
-> +		"	.endif\n"
-> +		: [after_target] "=d" (after_target),
-> +		  [ret_addr] "=d" (ret_addr),
-> +		  [after_ex] "=d" (after_ex),
-> +		  [branch_addr] "=d" (branch_addr)
-> +	);
-> +
-> +	report(after_target == branch_addr, "address calculated relative to BRAS");
-> +	report(ret_addr == after_ex, "return address after EX");
-> +	report_prefix_pop();
-> +}
-> +
-
-Add:
-/* larl follows the address generation of relative branch instructions */
-> +static void test_larl(void)
-> +{
-> +	uint64_t target, addr;
-> +
-> +	report_prefix_push("LARL");
-> +	asm volatile ( ".pushsection .rodata\n"
-> +		"0:	larl	%[addr],0\n"
-> +		"	.popsection\n"
-> +
-> +		"	larl	%[target],0b\n"
-> +		"	exrl	0,0b\n"
-> +		: [target] "=d" (target),
-> +		  [addr] "=d" (addr)
-> +	);
-> +
-> +	report(target == addr, "address calculated relative to LARL");
-> +	report_prefix_pop();
-> +}
-> +
-> +int main(int argc, char **argv)
-> +{
-
-We're missing push and pop around the test function block so that we 
-know which file generated the output.
-
-report_prefix_push("execute");
-
-> +	test_basr();
-> +	test_bras();
-> +	test_larl();
-
-report_prefix_pop();
-
-> +	return report_summary();
-> +}
-> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-> index d97eb5e9..b61faf07 100644
-> --- a/s390x/unittests.cfg
-> +++ b/s390x/unittests.cfg
-> @@ -215,3 +215,6 @@ file = migration-skey.elf
->   smp = 2
->   groups = migration
->   extra_params = -append '--parallel'
-> +
-> +[execute]
-> +file = ex.elf
-> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-> index ad7949c9..a999f64a 100644
-> --- a/.gitlab-ci.yml
-> +++ b/.gitlab-ci.yml
-> @@ -275,6 +275,7 @@ s390x-kvm:
->     - ACCEL=kvm ./run_tests.sh
->         selftest-setup intercept emulator sieve sthyi diag10 diag308 pfmf
->         cmm vector gs iep cpumodel diag288 stsi sclp-1g sclp-3g css skrf sie
-> +      execute
->         | tee results.txt
->     - grep -q PASS results.txt && ! grep -q FAIL results.txt
->    only:
-> 
-> base-commit: e3c5c3ef2524c58023073c0fadde2e8ae3c04ec6
-
+in arch/x86/Kconfig which doesn't let us select 1 for NR_CPUS if SMP is 
+enabled, so this should be enough
+diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
+index 17bdd6122dca..c79ae67492e1 100644
+--- a/arch/x86/kernel/head_64.S
++++ b/arch/x86/kernel/head_64.S
+@@ -273,7 +273,11 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify, 
+SYM_L_GLOBAL)
+         cmpl    (%rbx,%rcx,4), %edx
+         jz      .Lsetup_cpu
+         inc     %ecx
++#if defined(CONFIG_FORCE_NR_CPUS)
++       cmpl    $NR_CPUS, %ebx
++#else
+         cmpl    nr_cpu_ids(%rip), %ecx
++#endif
+         jb      .Lfind_cpunr
