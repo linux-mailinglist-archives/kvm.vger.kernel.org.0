@@ -2,69 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 04A8D6A4439
-	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 15:21:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2082D6A445B
+	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 15:28:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229471AbjB0OVa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Feb 2023 09:21:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35700 "EHLO
+        id S229724AbjB0O2J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Feb 2023 09:28:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230246AbjB0OV0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Feb 2023 09:21:26 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 953B21EBCD
-        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 06:21:20 -0800 (PST)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31RDML3s016855;
-        Mon, 27 Feb 2023 14:21:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=RsAxUUz0zgh9BKP41wSzsi47XFekGI2SIWw/XcnFn40=;
- b=M75HUxY0jp6leEOBFv6jcnHyTuVa3TzKbOqfO04ruFzf5w+cL67A87RlQuyjsRQJ4C8F
- VJZnaLNR4tizvTGufxiUcfSd30BCZ3JKtrk96b4swqBwO/XZDRALb2R+WzFRQ9jSFiXO
- CvTYGTRfDI0xGDhz3HkpHCxu0vBTRdBaOeg0WUinzN5MYmPiaG7JyzmpqwfkX+/18G4F
- HHGZ2WE+IcuqxS0LUXJodM8hvN6J+Q6QVBu5WbdUH+IGAJS62TzkAxXYM+LagcBHAX0V
- 95729ZfeD+dkzqLavvA8UuSN9/+lv7zJ2XEnJb3JLJZjV9TW+2FTgSb5+C5PvFi0Muse HA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3p0ufs4m6p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Feb 2023 14:21:09 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31RE0jVs029359;
-        Mon, 27 Feb 2023 14:21:08 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3p0ufs4m5v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Feb 2023 14:21:08 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31RBBH8n024312;
-        Mon, 27 Feb 2023 14:21:06 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-        by ppma04fra.de.ibm.com (PPS) with ESMTPS id 3nybab1g5a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Feb 2023 14:21:06 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31REL2wD27853246
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 27 Feb 2023 14:21:03 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C3D9420040;
-        Mon, 27 Feb 2023 14:21:02 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A8D6320049;
-        Mon, 27 Feb 2023 14:21:00 +0000 (GMT)
-Received: from [9.171.14.212] (unknown [9.171.14.212])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-        Mon, 27 Feb 2023 14:21:00 +0000 (GMT)
-Message-ID: <7cd54252-3d58-10c8-6aae-f620ff83c8cb@linux.ibm.com>
-Date:   Mon, 27 Feb 2023 15:20:58 +0100
+        with ESMTP id S229549AbjB0O2I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Feb 2023 09:28:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E8FF17CD9
+        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 06:27:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1677508040;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=XpUVmUxP9Hjlacn8N0Dmk25mmERAn/Ff687O+zJOal0=;
+        b=GrKOqVMwByoukj+OqhMRMI7WwZVcUQbTnu1+i7/AjGNKw/mMvSnqY1q2SVp6Zunb7vwxgq
+        lP4oP5vy96h19N1wgXZjfBhggBNvZKLqMSE84ci7zeeOYkLvLE2qxvEDiv8rWmcfjIxCFx
+        q6pS9m4Ak23mVl3rPbgLsvPiRUt3eig=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-453-9nWmxfo6Nt6ZxEzoBZfvCg-1; Mon, 27 Feb 2023 09:27:19 -0500
+X-MC-Unique: 9nWmxfo6Nt6ZxEzoBZfvCg-1
+Received: by mail-wr1-f71.google.com with SMTP id o15-20020a05600002cf00b002c54a27803cso900543wry.22
+        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 06:27:17 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XpUVmUxP9Hjlacn8N0Dmk25mmERAn/Ff687O+zJOal0=;
+        b=LU5RsSZvnc6uN3rb6iMOtYwTNbWbRXXG4vo/tvLBu+4+E1WqWJ64xNbtLE/i7NrZoP
+         X0tGCBXyzx8uEEUukoaKMUbl+gnnaIeOZedPo23n2JiRg3zHYfxKfzCzrqS/ICP/OZvc
+         RwjgCBghuQpCtbBL6lD8cuCXCpcRysEDE0+cVMcSqmQDWJdMOxtq7qNy13yx+x565VwJ
+         o6FtL5lvROKVkhhhhZ/I5xc6UaeTTWFEuuPHeVV7tMqSZyJHZ9dUNdGX6GmMjHX62h93
+         O/JvQMLG5i8KqR/CXfS+5JL3PqSt/qNGcLrOZ7i+KqY8ks+YcxQjxvtmwZT3fvKYSnoc
+         5vrQ==
+X-Gm-Message-State: AO0yUKXD2Y/tmO5HRwxIZW09mJtCWxiK4K5y5NVtKfZ4AarSf9sfCn7F
+        Fg09gIxG+buBztl2m0cQCzAfY9xkw5MYM3Dlhmu+PvF0XBTGqP96eji+RWQ8HkVqlhMnQCYoRgc
+        imIIIPb2sSF9O
+X-Received: by 2002:a05:600c:70a:b0:3df:eecc:de2b with SMTP id i10-20020a05600c070a00b003dfeeccde2bmr15835620wmn.11.1677508036867;
+        Mon, 27 Feb 2023 06:27:16 -0800 (PST)
+X-Google-Smtp-Source: AK7set+kx3pf+OK3eqMXfBQR/57KFFHAJgwXKARMS0xFg1AD+XyBsMvWXMiu92JMAfWbirYJv2HFnQ==
+X-Received: by 2002:a05:600c:70a:b0:3df:eecc:de2b with SMTP id i10-20020a05600c070a00b003dfeeccde2bmr15835590wmn.11.1677508036615;
+        Mon, 27 Feb 2023 06:27:16 -0800 (PST)
+Received: from [192.168.0.2] (ip-109-43-176-150.web.vodafone.de. [109.43.176.150])
+        by smtp.gmail.com with ESMTPSA id u17-20020adff891000000b002c553e061fdsm7185802wrp.112.2023.02.27.06.27.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Feb 2023 06:27:16 -0800 (PST)
+Message-ID: <365c5bca-eda6-52dd-a90c-12de397bedf6@redhat.com>
+Date:   Mon, 27 Feb 2023 15:27:14 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH v16 00/11] s390x: CPU Topology
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [PATCH v16 11/11] docs/s390x/cpu topology: document s390x cpu
+ topology
 Content-Language: en-US
-To:     Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
 Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
         richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
         mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
@@ -73,197 +72,63 @@ Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
         nsg@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
         clg@kaod.org
 References: <20230222142105.84700-1-pmorel@linux.ibm.com>
- <c41ca0c4-3e38-1afa-f113-9f5cb5313995@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <c41ca0c4-3e38-1afa-f113-9f5cb5313995@redhat.com>
+ <20230222142105.84700-12-pmorel@linux.ibm.com>
+ <039b5a0f-4440-324c-d5a7-54e9e1c89ea8@redhat.com>
+ <dcac1561-8c91-310c-7e9f-db9fff3b00a7@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <dcac1561-8c91-310c-7e9f-db9fff3b00a7@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: GoE_EGAFSkKCWQeCNjyNXqWk9g1ypZ6g
-X-Proofpoint-ORIG-GUID: i4pQyrZNKhvxlUzgxorBVMmB1tYrNHdq
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
- definitions=2023-02-27_10,2023-02-27_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
- priorityscore=1501 mlxscore=0 suspectscore=0 lowpriorityscore=0
- adultscore=0 spamscore=0 clxscore=1015 mlxlogscore=999 phishscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302270109
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 27/02/2023 15.17, Pierre Morel wrote:
+> 
+> On 2/27/23 14:58, Thomas Huth wrote:
+>> On 22/02/2023 15.21, Pierre Morel wrote:
+>>> Add some basic examples for the definition of cpu topology
+>>> in s390x.
+>>>
+>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>>> ---
+>>>   docs/system/s390x/cpu-topology.rst | 378 +++++++++++++++++++++++++++++
+>>>   docs/system/target-s390x.rst       |   1 +
+>>>   2 files changed, 379 insertions(+)
+>>>   create mode 100644 docs/system/s390x/cpu-topology.rst
+>>>
+>>> diff --git a/docs/system/s390x/cpu-topology.rst 
+>>> b/docs/system/s390x/cpu-topology.rst
+>>> new file mode 100644
+>>> index 0000000000..d470e28b97
+>>> --- /dev/null
+>>> +++ b/docs/system/s390x/cpu-topology.rst
+>>> @@ -0,0 +1,378 @@
+>>> +CPU topology on s390x
+>>> +=====================
+>>> +
+>>> +Since QEMU 8.0, CPU topology on s390x provides up to 3 levels of
+>>> +topology containers: drawers, books, sockets, defining a tree shaped
+>>> +hierarchy.
+>>> +
+>>> +The socket container contains one or more CPU entries consisting
+>>> +of a bitmap of three dentical CPU attributes:
+>>
+>> What do you mean by "dentical" here?
+> 
+> :D i.. dentical
+> 
+> I change it to identical
 
-On 2/27/23 15:00, Thomas Huth wrote:
-> On 22/02/2023 15.20, Pierre Morel wrote:
->> Hi,
->>
->> No big changes here, some bug corrections and comments modifications
->> following Thomas and Nina comments and Daniel and Markus reommandations.
->>
->> Implementation discussions
->> ==========================
->>
->> CPU models
->> ----------
->>
->> Since the facility 11, S390_FEAT_CONFIGURATION_TOPOLOGY is already
->> in the CPU model for old QEMU we could not activate it as usual from
->> KVM but needed a KVM capability: KVM_CAP_S390_CPU_TOPOLOGY.
->> Checking and enabling this capability enables facility 11,
->> S390_FEAT_CONFIGURATION_TOPOLOGY.
->>
->> It is the responsibility of the admin to ensure the same CPU
->> model for source and target host in a migration.
->>
->> Migration
->> ---------
->>
->> When the target guest is started, the Multi-processor Topology Change
->> Report (MTCR) bit is set during the creation of the vCPU by KVM.
->> We do not need to migrate its state, in the worst case, the target
->> guest will see the MTCR and actualize its view of the topology
->> without necessity, but this will be done only one time.
->>
->> Reset
->> -----
->>
->> Reseting the topology is done during subsystem reset, the
->> polarization is reset to horizontal polarization.
->>
->> Topology attributes
->> -------------------
->>
->> The topology attributes are carried by the CPU object and defined
->> on object creation.
->> In the case the new attributes, socket, book, drawer, dedicated,
->> polarity are not provided QEMU provides defaults values.
->>
->> - Geometry defaults
->>    The geometry default are based on the core-id of the core to
->>    fill the geometry in a monotone way starting with drawer 0,
->>    book 0, and filling socket 0 with the number of cores per socket,
->>    then filling socket 1, socket 2 ... etc until the book is complete
->>    and all books until the first drawer is complete before starting with
->>    the next drawer.
->>
->>    This allows to keep existing start scripts and Libvirt existing
->>    interface until it is extended.
->>
->> - Modifiers defaults
->>    Default polarization is horizontal
->>    Default dedication is not dedicated.
->>
->> Dynamic topology modification
->> -----------------------------
->>
->> QAPI interface is extended with:
->> - a command: 'x-set-cpu-topology'
->> - a query: extension of 'query-cpus-fast'
->> - an event: 'CPU_POLARITY_CHANGE'
->>
->> The admin may use query-cpus-fast to verify the topology provided
->> to the guest and x-set-cpu-topology to modify it.
->>
->> The event CPU_POLARITY_CHANGE is sent when the guest successfuly
->> uses the PTF(2) instruction to request a polarization change.
->> In that case, the admin is supposed to modify the CPU provisioning
->> accordingly.
->>
->> Testing
->> =======
->>
->> To use the QEMU patches, you will need Linux V6-rc1 or newer,
->> or use the following Linux mainline patches:
->>
->> f5ecfee94493 2022-07-20 KVM: s390: resetting the Topology-Change-Report
->> 24fe0195bc19 2022-07-20 KVM: s390: guest support for topology function
->> 0130337ec45b 2022-07-20 KVM: s390: Cleanup ipte lock access and SIIF 
->> fac..
->>
->> Currently this code is for KVM only, I have no idea if it is interesting
->> to provide a TCG patch. If ever it will be done in another series.
->>
->> Documentation
->> =============
->>
->> To have a better understanding of the S390x CPU Topology and its
->> implementation in QEMU you can have a look at the documentation in the
->> last patch of this series.
->>
->> The admin will want to match the host and the guest topology, taking
->> into account that the guest does not recognize multithreading.
->> Consequently, two vCPU assigned to threads of the same real CPU should
->> preferably be assigned to the same socket of the guest machine.
->>
->>
->> Regards,
->> Pierre
->>
->> Pierre Morel (11):
->>    s390x/cpu topology: add s390 specifics to CPU topology
->>    s390x/cpu topology: add topology entries on CPU hotplug
->>    target/s390x/cpu topology: handle STSI(15) and build the SYSIB
->>    s390x/sclp: reporting the maximum nested topology entries
->>    s390x/cpu topology: resetting the Topology-Change-Report
->>    s390x/cpu topology: interception of PTF instruction
->>    target/s390x/cpu topology: activating CPU topology
->>    qapi/s390x/cpu topology: set-cpu-topology monitor command
->>    machine: adding s390 topology to query-cpu-fast
->>    qapi/s390x/cpu topology: CPU_POLARIZATION_CHANGE qapi event
->>    docs/s390x/cpu topology: document s390x cpu topology
->>
->>   docs/system/s390x/cpu-topology.rst | 378 ++++++++++++++++++++
->>   docs/system/target-s390x.rst       |   1 +
->>   qapi/machine-target.json           |  81 +++++
->>   qapi/machine.json                  |  37 +-
->>   include/hw/boards.h                |  10 +-
->>   include/hw/s390x/cpu-topology.h    |  78 +++++
->>   include/hw/s390x/s390-virtio-ccw.h |   6 +
->>   include/hw/s390x/sclp.h            |   4 +-
->>   include/monitor/hmp.h              |   1 +
->>   target/s390x/cpu.h                 |  78 +++++
->>   target/s390x/kvm/kvm_s390x.h       |   1 +
->>   hw/core/machine-qmp-cmds.c         |   2 +
->>   hw/core/machine-smp.c              |  48 ++-
->>   hw/core/machine.c                  |   4 +
->>   hw/s390x/cpu-topology.c            | 534 +++++++++++++++++++++++++++++
->>   hw/s390x/s390-virtio-ccw.c         |  27 +-
->>   hw/s390x/sclp.c                    |   5 +
->>   softmmu/vl.c                       |   6 +
->>   target/s390x/cpu-sysemu.c          |  13 +
->>   target/s390x/cpu.c                 |   7 +
->>   target/s390x/cpu_models.c          |   1 +
->>   target/s390x/kvm/cpu_topology.c    | 312 +++++++++++++++++
->>   target/s390x/kvm/kvm.c             |  42 ++-
->>   hmp-commands.hx                    |  17 +
->>   hw/s390x/meson.build               |   1 +
->>   qemu-options.hx                    |   7 +-
->>   target/s390x/kvm/meson.build       |   3 +-
->>   27 files changed, 1685 insertions(+), 19 deletions(-)
->>   create mode 100644 docs/system/s390x/cpu-topology.rst
->>   create mode 100644 include/hw/s390x/cpu-topology.h
->>   create mode 100644 hw/s390x/cpu-topology.c
->>   create mode 100644 target/s390x/kvm/cpu_topology.c
->
-> Any chance that you could also add some qtests for checking that the 
-> topology works as expected? I.e. set some topology via the command 
-> line, then use QMP to check whether all CPUs got the right settings?
->
->  Thomas
->
-Yes I intend to develop some tests but it will take some time to develop 
-it I need to do change of polarization from inside the guest and qmp 
-from the host.
+Ok, but even with "i" at the beginning, it does not make too much sense here 
+to me - I'd interpret "identical" as "same", but these attributes have 
+clearly different meanings, haven't they?
 
-Regards,
-
-Pierre
-
-
+  Thomas
 
