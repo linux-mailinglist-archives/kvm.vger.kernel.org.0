@@ -2,96 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 55C576A39EC
-	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 05:00:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C07E6A3A30
+	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 05:49:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229627AbjB0EA5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 26 Feb 2023 23:00:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38754 "EHLO
+        id S229766AbjB0EtD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 26 Feb 2023 23:49:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229545AbjB0EA4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 26 Feb 2023 23:00:56 -0500
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2083.outbound.protection.outlook.com [40.107.237.83])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85CCD449D;
-        Sun, 26 Feb 2023 20:00:53 -0800 (PST)
+        with ESMTP id S229470AbjB0EtB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 26 Feb 2023 23:49:01 -0500
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2068.outbound.protection.outlook.com [40.107.94.68])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F32D5E07C;
+        Sun, 26 Feb 2023 20:48:59 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nRRUPLrpzZdP9kpRkU+2WiztXWJ6Lc7WErLA0n8BvRfdU7NMvmetHZSNPvnTepLPM0n0M3dD5CyIECSsStZemJPS5SIUVijeXTgPFc3y8SiJsPkv44mCJQBWjXvhBSEhe31kdDlEsfbSIVzTn8ElYwW0A5cLB9LGXXBYkTnb/oeMoQ5mcMBSaetUUBOeoXbVmg4MzrtpGEQWyAJGCMAWk9SZ2okV3zNPRW++vKQinzNOBWNFNIeVKmOZkO00r8sEXakOA4IQtx5NxIGoMUQJxsq/zSza4vpBbLZL3XFSq42uiMt9f286U5upmIWBNM8EprKAM0qkd9fD71UiJh6q2w==
+ b=X/WSmbT1rToi/x1TTtXTsO7wooqh1Op9Kqnu3cNf+N1GnBDZZNZ1TRPl3PdceBU0iidP5oHYowZMuf3Zi3eCgsP0aaS28wNf+l+1WPWeBLjXXeXkPHJsjBzqSoN8QZK21U4yCmIN6qdalWTI/+AXNQVvjh/nCHvnmgeKws9FYC04L8/tU4RfRj153LNTHo1G9AccSF/T6mMcyXO4WyGGaC5kNdkHFSSXHYXoptDSCGZcJ0Pth1J4Kh0wWSKfQ58gVnq2FqNWj11fvq4/0mVuKRBO5JbXVmijJYuE73e6/ZSVJhonrf8WpukgUi7kTjTR9Cz57+2h/AJ8fXAyZVcoIA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9u4xVXYBKQLka0SdRLlVEKG9tVqHgP9QE+7II39nWow=;
- b=TRUpU11cDXga+IPJ1RnHk8V8loc69zlAU43pbZz1D9oFF0mBWqJDYsQj5YaYgaMQGd5YpjdhfX2fxessUk3Y17CiJZI46vmAA5n1GcKwt/mxNSgDY0oO5DiFDV9c+tYqTAanP1iU+mTrRhD4X2pznxgmAw2L9AD1pki5OtdWB6G1Q5FrHP5M12SVDuYE28VHBju9dLFIo0pt+XIMjSIZszzXeLPvwXpcpel/oCRfhJGrxH2x6ZrUd9iV0ixPvSP9MtTuXrSnxMaIx9R6l+slbfCTjIgs45/shc48gMKTMrSU8jnmj8ckeec2ESz1IkJ190+GLcXqQVXk4UocsBwSEw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
+ bh=gP5JSg2K15+7va1tKR169qYpIWhp283+cmvH+ShgHgU=;
+ b=BXjkC8ZmZxtdskFce59EQGzhQekmNm9YLcmX3kwa8I6HZBSjygV2LfNPHZB018Hmo2fZIDmZ4gruSMoV/4Xg+Ww+FgNI//sGhZeti8mOSb+CQ+T/8ptP06rUij7wOBO8aHHsfens88moxikIxLlSlyVNGXYs98YQARQF6eR+45npprigQvcy4XyqLOysPcZaAiqa98M9kXkk6i99AtCDz/v0zA6KM9ZoLYg/x4O7HsDOsyrvrIDNvaXGfIh6jraL4JxP4nyrGypL6KV6elqPD3elaZj5YYryuI+xffn+KKm8T0S27aLMJXsXIBVNmgRtai8JcT/UYoiLb4GyhHfaTQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9u4xVXYBKQLka0SdRLlVEKG9tVqHgP9QE+7II39nWow=;
- b=iPBQSgjT8p3oPG8cF9NqRCiriWHDRRvNOZ63DiN6w8O4A/gyEQTAZWbmjmQmBv9mkZ03dsjKuAiyUO6Ma/BD7/fCkd9K6HmOl9fP63AYYFkOgyIQ9aM6Hju8ADhBnkJ0bzia2r9UF7V0yo16WaH9LilGbpXj4mU6E7agFb1i89I=
-Received: from DS7PR03CA0227.namprd03.prod.outlook.com (2603:10b6:5:3ba::22)
- by IA0PR12MB7724.namprd12.prod.outlook.com (2603:10b6:208:430::12) with
+ bh=gP5JSg2K15+7va1tKR169qYpIWhp283+cmvH+ShgHgU=;
+ b=jcNV4CtvScDDkBwxJJ8z8r4R8cFczr+/frTl3tROnAJJNoqheSvqe864H4XpEWuiroqG0iB5YvJJJVUnTU/ZwAQAwedz9ODQGfu/WLy3PJShgwea7uEtWLULSzoZ9A3uO+XJv4/7jRaO6GXyHbIqbQ0oOaUNAXRMOMLhoYKybow=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CY5PR12MB6323.namprd12.prod.outlook.com (2603:10b6:930:20::11)
+ by SN7PR12MB8001.namprd12.prod.outlook.com (2603:10b6:806:340::5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.25; Mon, 27 Feb
- 2023 03:57:23 +0000
-Received: from DM6NAM11FT114.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:3ba:cafe::9d) by DS7PR03CA0227.outlook.office365.com
- (2603:10b6:5:3ba::22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.29 via Frontend
- Transport; Mon, 27 Feb 2023 03:57:23 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT114.mail.protection.outlook.com (10.13.172.206) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6156.12 via Frontend Transport; Mon, 27 Feb 2023 03:57:23 +0000
-Received: from BLR-L-SASHUKLA.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Sun, 26 Feb
- 2023 21:57:18 -0600
+ 2023 04:48:57 +0000
+Received: from CY5PR12MB6323.namprd12.prod.outlook.com
+ ([fe80::c110:892:21d6:9a5f]) by CY5PR12MB6323.namprd12.prod.outlook.com
+ ([fe80::c110:892:21d6:9a5f%4]) with mapi id 15.20.6134.024; Mon, 27 Feb 2023
+ 04:48:57 +0000
+Message-ID: <0d272ca4-a96c-9ee0-47b0-9434687b8dc9@amd.com>
+Date:   Mon, 27 Feb 2023 10:17:10 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.2
+Subject: Re: [PATCHv3 00/10] SVM: virtual NMI
 From:   Santosh Shukla <santosh.shukla@amd.com>
-To:     <kvm@vger.kernel.org>, <seanjc@google.com>
-CC:     <pbonzini@redhat.com>, <jmattson@google.com>, <joro@8bytes.org>,
-        <linux-kernel@vger.kernel.org>, <mail@maciej.szmigiero.name>,
-        <mlevitsk@redhat.com>, <thomas.lendacky@amd.com>,
-        <vkuznets@redhat.com>
-Subject: [PATCHv3 10/10] KVM: nSVM: implement support for nested VNMI
-Date:   Mon, 27 Feb 2023 09:24:00 +0530
-Message-ID: <20230227035400.1498-11-santosh.shukla@amd.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230227035400.1498-1-santosh.shukla@amd.com>
+To:     kvm@vger.kernel.org, seanjc@google.com
+Cc:     pbonzini@redhat.com, jmattson@google.com, joro@8bytes.org,
+        linux-kernel@vger.kernel.org, mail@maciej.szmigiero.name,
+        mlevitsk@redhat.com, thomas.lendacky@amd.com, vkuznets@redhat.com
 References: <20230227035400.1498-1-santosh.shukla@amd.com>
+Content-Language: en-US
+In-Reply-To: <20230227035400.1498-1-santosh.shukla@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN2PR01CA0155.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:26::10) To CY5PR12MB6323.namprd12.prod.outlook.com
+ (2603:10b6:930:20::11)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT114:EE_|IA0PR12MB7724:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2f73c24a-64dd-45b3-b459-08db1876bb6c
+X-MS-TrafficTypeDiagnostic: CY5PR12MB6323:EE_|SN7PR12MB8001:EE_
+X-MS-Office365-Filtering-Correlation-Id: f7c38851-b091-422d-1c17-08db187def8a
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: b2FYZ68RVOM26ioss4wsAUt+vA8/nqGkL4iaygKZAHJTbFQFYn5u0sazX3zDyi9HLrE8yQjq4JU963kJ77JxvfeNObsetK9pYarKw9TzhVRLRfTdOP1Kvtq0yzENbnX0p82eALmcx0ec7gxpbjHzeSHg2J4dybBfd69NhK+ScEo4eGQ+mBzGLI4ZPgU3Ef3WWq37410F4NDLiXh2h1DvUXpo4L5WsZ3br00xu9305beyk3ZWgoYwYmWGCP0Pw669PKeaJBq5KhV6SKC55ElpBYl3aBcXXc9d0LgHz/ZjJNm8IAUYuRtuhuYn24ATa6kD3pD1G+EmXQMQYICcef5N6gzbCj6u3ZUlaSr2PNAbZnKl/RvzU8lmymwdq3+/+LB718RTRx3iz+28+yw63V9ePXvEIoXfAOD12ixUdhbs8SFx0mo7ISmLJyk2V07tt2F6fqqt2P+K/DCk13Vsy/r5DfYyFWgHDYsQCQEM6hmxkgwmU6/KfQC8Za4/v3+24IyW1D7v0ZhvS7qz1mQd6bJrshk+nlTNRo9+ffYCUQkTCWgM1H6IOBn1iSvEcVSYNwXsy1DHXCP58d1apbFIUuKnp6ocj9lX0kJUawT9htOfy5K90BtUE7dG7L8OqpqFcOGMhO7yOKNaP7s+2WCCWeOstHPfhcMjygS/9I5wZqsIi/n0lygWGYyK4XpCZPVPdFbo9CH9tr06swZmRMO3dVm/tvHWtlPhTJ0kvjJXYZTfV54=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(396003)(39860400002)(136003)(346002)(376002)(451199018)(46966006)(40470700004)(36840700001)(40460700003)(16526019)(82740400003)(81166007)(356005)(4326008)(8936002)(41300700001)(70586007)(8676002)(2906002)(70206006)(36860700001)(5660300002)(40480700001)(336012)(26005)(478600001)(7696005)(44832011)(1076003)(186003)(426003)(2616005)(6666004)(47076005)(966005)(83380400001)(316002)(36756003)(82310400005)(86362001)(54906003)(110136005)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: xeew86/e+naK9a9HQD37jqNOtaTphmZ75f5Uzvm9eM1hz/PHbtqzQYL4rbRKzn7MKWmHEZSVddgGagUMftA2JZs3gkk1nskn+E7GaWwMeWCWl0VCZ2g/PZGHQXS9gyHcOnM27o9ly1R9805kIO5LMX2y2hOhUlL4GC7ibJYdeEHHWJyzitcQDQZoaQHZC7r4IeThigQolctiRY3I13ZiCcFxg5T9SzZgqa5skMEQi0bO7w75fgaadkvtasrhX9hVavL9o9wOxIGujI28RjE58Ygbo7hqa0cX+89Dnd2dey/kytKG6lgvak1RC+eKbTAV3jGJ4Qt14vSnOACT6736THzJ905bVN3YwqcmrLiNk48I4U/pmBqJlIfc+J3D1AHXOOMcFHm2tOrtM1gtgJLmmR6GL4O2/icCiNt6D3GvNeHWMd5z9YS4rcZ4oRXnCq12f2eivkBe1VJaRHxAgViy+VkSvFI3ttT4PNv4xut2zCP0coch8lw/ntMwtduxTIpeEI4s+XeM8N6ZmsngWtFyGCDqONnyoQmsYJB4lbZP0xNnVpQiMPDwz2kVnJqNLIof/0oDds9KuhFcBDJtTSB8Zf68lWMX9LYE06JpdDL+NPulVlY18M3X3k4x0dFWnKJWZBnK3gfMzUieu75DVkKKHTaHmVQPQC3Ep9hvIWw0iCiuXujeH1gGNw3wmQjLBR2W3IfmS5wG9ACe4YJlgxYyphfgxYENpxCtGwIC4eiwmAQe8ArB8sC9h01aGbKon4Nz7axHRxJxxDGFuY1GNzZPSA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6323.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(136003)(366004)(396003)(39860400002)(376002)(346002)(451199018)(38100700002)(83380400001)(66946007)(41300700001)(8936002)(66556008)(186003)(8676002)(66476007)(4326008)(2906002)(5660300002)(44832011)(6512007)(6506007)(478600001)(6666004)(53546011)(26005)(2616005)(966005)(316002)(36756003)(86362001)(31696002)(31686004)(6486002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MmxUbCtUMytKSGtjWkdYMlVvRXJ3YkR4RzBCQWdtSTlGMDNvNWRDMGRWTU12?=
+ =?utf-8?B?ZWIzS2tDVlpYS2NONXBnWHNlL1ZlWHJKVU5xT3ZHa0JRTWg0R0JaN29EV3pH?=
+ =?utf-8?B?c2hnNWJJQkFMdTdFRE1QMzdYNkgra2lBNzJaVmdRZTVYb0ptSUJaRXBSUUxE?=
+ =?utf-8?B?OGFTaTVNWVowMmU0VlNRTnZlWkRXWWwyVjE2VVprbUd0VUJodDB4Nno5N2Vo?=
+ =?utf-8?B?ek1HeGxQdEpwMjBBbFAvQjMzaVBSS2lRYkZ4R05BNG9IaWNNeW85NmhhanpZ?=
+ =?utf-8?B?WEpZdWg4SmlocHFXZWJJdDRvK1E1TU1rbENoN1lGZ3dwVHZoUW0xTTlqUHo2?=
+ =?utf-8?B?ZEVBcndYUUMxcVJxRzA5cTVKK3pEeXpvTGxiNFEvU3pZSWNSN0VvaWo3OWVB?=
+ =?utf-8?B?M2RhbUUvR2FLYTZVSmFQRjhyajFudDUvWGQzcU1xODlGVHU3azRrTUJwL2dS?=
+ =?utf-8?B?a0hhdUREa3ZPQVowZHoyalI4amd4UWhrSDBvL2RQc2hYeTdiQkZqTXB3VU5J?=
+ =?utf-8?B?SUphQ3dIVnMvUzRCUDJqOUFQaWl0QWNHRGQ5Q3JzNHdWYk8vM2lOUHJYaFdC?=
+ =?utf-8?B?RFp2S0wxM1N0eDh1Z3VDcXlyV3BiTlBBT1YvTktQWHhvcW80S0J6cmRmU01C?=
+ =?utf-8?B?R2NNYnVJN05lYnBQSjk4VUxPQURvME4vdEhlMUcyNHNhdERzbEJBM09kOHdY?=
+ =?utf-8?B?U0VGdThMUy82cE5NeU5BbmRXdkZmRlFkZnZhc09FSlY5RkJLeGJaN0N4TzJj?=
+ =?utf-8?B?VVpEMmxCM0NFZE9paGRDdWJROHdvVkNkUnBiTmIzU3J4VlFCUWU4eEdkSGNq?=
+ =?utf-8?B?WDRIN0poTkhZTHRJT1F1OEU1cHFBVEw0MXZteStta0wzbjR6dnBkbmtuajRp?=
+ =?utf-8?B?WHpDVDV2UnFxRlNxYmZIRlZzem5mUkJyUllCbFlINlk3WktvZ2pxNDdqcFc5?=
+ =?utf-8?B?Ukh0U0E4VnlmeEVRWTZJSDk5a1V3elFaVmRFMjV6Ry9YZlRMaDVtakM0dWJM?=
+ =?utf-8?B?ZHZGUVpjK3k1eTFFWmdFaHhMamlBd0dEbWxXcS9IMDlqdG9Wa0pwRm9KVEJz?=
+ =?utf-8?B?VmJjWHZZYS9uM0svSytoaThlMkJIb01LV2NOeExJcnFqYjJCWXZtcEdZamd5?=
+ =?utf-8?B?VGw2QlhaRGprMWdSYkdlbWpDdlBDTzJsejB4RExwVktNVWhEV2ZJejhRWjVT?=
+ =?utf-8?B?eUdneWdKRkhMeVV2SUQrclNiM2lEeThFT0s4bkdKQ3VHT2xKVXBBbTdxKy9L?=
+ =?utf-8?B?Y0ZtbkpyaHIvUjA5dndaS1phVWJSbDNyUzhxODVFQ2JGdnFDVEh1UjVMS0xa?=
+ =?utf-8?B?NTk4SzBGMm5yN01ha0FtTmFzU1FlY2ZlbzZ4MncrZm44VFFidXk4eENHUFE5?=
+ =?utf-8?B?R25JblVPWWt5YTBCMTNhd1hOQXdkUG9GUFYzOVpmd3NUM0g3cmo1THY3Z0w2?=
+ =?utf-8?B?RnN2S2VnWGJWY0JzdU91RGQ0S1FkY0lXS1RPVU9Jc0tUOC9xL2hyN1NhVGh5?=
+ =?utf-8?B?M2VveFVRcDgxRHVDYnAwVTZLWUhscW9rWXJyeWdKMGtMRmRMdytNTHpIR05u?=
+ =?utf-8?B?dW5TMkJ0RGxwWCthb1laeE5jVFFPVUdHdVc0c2s3bmJaMUlzTnpDYVplSm9q?=
+ =?utf-8?B?YW96dW1zNGpwRGgyQ1M3RGRSRjZrcndiSE1nVi9YVmRoQU5WL2sxRWxqM21m?=
+ =?utf-8?B?MGFJYUxic2VvY3lDcTBnb0RwMlFqSTM0T0UyL0NqQ1dQLzQ4aWQ0ZzBNQWJv?=
+ =?utf-8?B?ajdkTTBWcDdES2dyVGdpNm1vM0t6bGx2T0NraFVNMW1OS1dxMjU3QTY4UjZj?=
+ =?utf-8?B?Q2w0cGNVc1JHUWFabUtzSVpTMFVyTzhkRXVTbGxiYzErRFhGUXlsbkdaMlc4?=
+ =?utf-8?B?c0JFN1NVRDN2TGNSZWFYeG9Ca0UvSzh3ajlFUkVNNDFnVHZOeFVWK3BEczRJ?=
+ =?utf-8?B?d1Y2SzkrMXBpTUNQVzlaNDZBa3ptV09hTXQ0VEh2K240S1ZweWw5dmwwcWdP?=
+ =?utf-8?B?ZnZzRmdESDI1elZlcVcyckUyRCtiT3ZRWHRIUG94dldiNmM0VVNkZnk4S3R4?=
+ =?utf-8?B?Y0xwTHd3cmVCQzN6ZHJrbU12ajJ3cTYrK29rbzhWMEVSc1ZhQ0gzVjIvMDdF?=
+ =?utf-8?Q?mTLMXZOo/YnX6cZKzmmc5p3n1?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Feb 2023 03:57:23.1946
+X-MS-Exchange-CrossTenant-Network-Message-Id: f7c38851-b091-422d-1c17-08db187def8a
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6323.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Feb 2023 04:48:57.5278
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2f73c24a-64dd-45b3-b459-08db1876bb6c
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT114.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7724
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: zYLQSONoIbIo2Mz0dxve3kb7a1HbKSZzjbGT3Q+TDuLSICqNqwYHTEds8JN+mo5cw3lCzR0dJpv4UQH48TGmMw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB8001
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -100,145 +124,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Allows L1 to use vNMI to accelerate its injection of NMI
-to L2 by passing through vNMI int_ctl bits from vmcb12
-to/from vmcb02.
 
-In case of L1 and L2 both using VNMI- Copy VNMI bits from vmcb12 to
-vmcb02 during entry and vice-versa during exit.
-And in case of L1 uses VNMI and L2 doesn't- Copy VNMI bits from vmcb01 to
-vmcb02 during entry and vice-versa during exit.
 
-Tested with the KVM-unit-test and Nested Guest scenario.
+On 2/27/2023 9:23 AM, Santosh Shukla wrote:
+> v2:
+> https://lore.kernel.org/all/0f56e139-4c7f-5220-a4a2-99f87f45fd83@amd.com/
+> 
+> v3:
 
-Co-developed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
----
-v3:
-- Fix identiation and style issue.
-- Fix SOB
-- Removed `svm->nmi_masked` var use for nested svm case.
-- Reworded the commit description.
-https://lore.kernel.org/all/Y9m15P8xQ2dxvIzd@google.com/
+Pl. ignore this series, I missed out sending one additional patch in this series..
+"0001-KVM-nSVM-Don-t-sync-vmcb02-V_IRQ-back-to-vmcb12-if-K.patch"
+which was part of v2 review comment.. will send v4 right-away. Sorry for the noise!.,
 
- arch/x86/kvm/svm/nested.c | 33 +++++++++++++++++++++++++++++++++
- arch/x86/kvm/svm/svm.c    |  5 +++++
- arch/x86/kvm/svm/svm.h    |  6 ++++++
- 3 files changed, 44 insertions(+)
+Thanks,
+Santosh
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 74e9e9e76d77..b018fe2fdf88 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -281,6 +281,11 @@ static bool __nested_vmcb_check_controls(struct kvm_vcpu *vcpu,
- 	if (CC(!nested_svm_check_tlb_ctl(vcpu, control->tlb_ctl)))
- 		return false;
- 
-+	if (CC((control->int_ctl & V_NMI_ENABLE_MASK) &&
-+	       !vmcb12_is_intercept(control, INTERCEPT_NMI))) {
-+		return false;
-+	}
-+
- 	return true;
- }
- 
-@@ -436,6 +441,9 @@ void nested_sync_control_from_vmcb02(struct vcpu_svm *svm)
- 	if (nested_vgif_enabled(svm))
- 		mask |= V_GIF_MASK;
- 
-+	if (nested_vnmi_enabled(svm))
-+		mask |= V_NMI_BLOCKING_MASK | V_NMI_PENDING_MASK;
-+
- 	svm->nested.ctl.int_ctl        &= ~mask;
- 	svm->nested.ctl.int_ctl        |= svm->vmcb->control.int_ctl & mask;
- }
-@@ -655,6 +663,17 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
- 	else
- 		int_ctl_vmcb01_bits |= (V_GIF_MASK | V_GIF_ENABLE_MASK);
- 
-+	if (vnmi) {
-+		if (vmcb01->control.int_ctl & V_NMI_PENDING_MASK) {
-+			svm->vcpu.arch.nmi_pending++;
-+			kvm_make_request(KVM_REQ_EVENT, &svm->vcpu);
-+		}
-+		if (nested_vnmi_enabled(svm))
-+			int_ctl_vmcb12_bits |= (V_NMI_PENDING_MASK |
-+						V_NMI_ENABLE_MASK |
-+						V_NMI_BLOCKING_MASK);
-+	}
-+
- 	/* Copied from vmcb01.  msrpm_base can be overwritten later.  */
- 	vmcb02->control.nested_ctl = vmcb01->control.nested_ctl;
- 	vmcb02->control.iopm_base_pa = vmcb01->control.iopm_base_pa;
-@@ -1058,6 +1077,20 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
- 		svm_update_lbrv(vcpu);
- 	}
- 
-+	if (vnmi) {
-+		if (vmcb02->control.int_ctl & V_NMI_BLOCKING_MASK)
-+			vmcb01->control.int_ctl |= V_NMI_BLOCKING_MASK;
-+		else
-+			vmcb01->control.int_ctl &= ~V_NMI_BLOCKING_MASK;
-+
-+		if (vcpu->arch.nmi_pending) {
-+			vcpu->arch.nmi_pending--;
-+			vmcb01->control.int_ctl |= V_NMI_PENDING_MASK;
-+		} else
-+			vmcb01->control.int_ctl &= ~V_NMI_PENDING_MASK;
-+
-+	}
-+
- 	/*
- 	 * On vmexit the  GIF is set to false and
- 	 * no event can be injected in L1.
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 84d9d2566629..08b7856e2da2 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4226,6 +4226,8 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 
- 	svm->vgif_enabled = vgif && guest_cpuid_has(vcpu, X86_FEATURE_VGIF);
- 
-+	svm->vnmi_enabled = vnmi && guest_cpuid_has(vcpu, X86_FEATURE_AMD_VNMI);
-+
- 	svm_recalc_instruction_intercepts(vcpu, svm);
- 
- 	/* For sev guests, the memory encryption bit is not reserved in CR3.  */
-@@ -4981,6 +4983,9 @@ static __init void svm_set_cpu_caps(void)
- 		if (vgif)
- 			kvm_cpu_cap_set(X86_FEATURE_VGIF);
- 
-+		if (vnmi)
-+			kvm_cpu_cap_set(X86_FEATURE_AMD_VNMI);
-+
- 		/* Nested VM can receive #VMEXIT instead of triggering #GP */
- 		kvm_cpu_cap_set(X86_FEATURE_SVME_ADDR_CHK);
- 	}
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index fb48c347bbe0..e229eadbf1ce 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -266,6 +266,7 @@ struct vcpu_svm {
- 	bool pause_filter_enabled         : 1;
- 	bool pause_threshold_enabled      : 1;
- 	bool vgif_enabled                 : 1;
-+	bool vnmi_enabled                 : 1;
- 
- 	u32 ldr_reg;
- 	u32 dfr_reg;
-@@ -540,6 +541,11 @@ static inline bool nested_npt_enabled(struct vcpu_svm *svm)
- 	return svm->nested.ctl.nested_ctl & SVM_NESTED_CTL_NP_ENABLE;
- }
- 
-+static inline bool nested_vnmi_enabled(struct vcpu_svm *svm)
-+{
-+	return svm->vnmi_enabled && (svm->nested.ctl.int_ctl & V_NMI_ENABLE_MASK);
-+}
-+
- static inline bool is_x2apic_msrpm_offset(u32 offset)
- {
- 	/* 4 msrs per u8, and 4 u8 in u32 */
--- 
-2.25.1
+>  - 09/11: Clubbed x86_ops delayed NMI with vNMI changes into one,
+>    for better readability purpose (Sean Suggestion)
+>  - Series includes suggestion and fixes proposed in v2 series.
+>    Refer each patch for change history(v2-->v3).
+> 
+> Series based on [1] and tested on AMD EPYC-Genoa.
+> 
+> 
+> APM: ((Ch-15.21.10 - NMI Virtualization)
+> https://www.amd.com/en/support/tech-docs/amd64-architecture-programmers-manual-volumes-1-5
+> 
+> Past history and work refer v5-
+> https://lkml.org/lkml/2022/10/27/261
+> 
+> Thanks,
+> Santosh
+> [1] https://github.com/kvm-x86/linux branch kvm-x86/next(62ef199250cd46f)
+> 
+> 
+> Maxim Levitsky (2):
+>   KVM: nSVM: Raise event on nested VM exit if L1 doesn't intercept IRQs
+>   KVM: SVM: add wrappers to enable/disable IRET interception
+> 
+> Santosh Shukla (5):
+>   KVM: nSVM: Disable intercept of VINTR if saved RFLAG.IF is 0
+>   x86/cpu: Add CPUID feature bit for VNMI
+>   KVM: SVM: Add VNMI bit definition
+>   KVM: x86: add support for delayed virtual NMI injection interface
+>   KVM: nSVM: implement support for nested VNMI
+> 
+> Sean Christopherson (3):
+>   KVM: x86: Raise an event request when processing NMIs if an NMI is
+>     pending
+>   KVM: x86: Tweak the code and comment related to handling concurrent
+>     NMIs
+>   KVM: x86: Save/restore all NMIs when multiple NMIs are pending
+> 
+>  arch/x86/include/asm/cpufeatures.h |   1 +
+>  arch/x86/include/asm/kvm-x86-ops.h |   2 +
+>  arch/x86/include/asm/kvm_host.h    |  11 ++-
+>  arch/x86/include/asm/svm.h         |   9 ++
+>  arch/x86/kvm/svm/nested.c          |  73 +++++++++++++-
+>  arch/x86/kvm/svm/svm.c             | 152 +++++++++++++++++++++++------
+>  arch/x86/kvm/svm/svm.h             |  28 ++++++
+>  arch/x86/kvm/x86.c                 |  46 +++++++--
+>  8 files changed, 279 insertions(+), 43 deletions(-)
+> 
 
