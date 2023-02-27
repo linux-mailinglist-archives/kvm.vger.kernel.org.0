@@ -2,166 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E69A6A41D1
-	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 13:40:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 801E96A4209
+	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 13:51:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229560AbjB0Mk1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Feb 2023 07:40:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54528 "EHLO
+        id S229653AbjB0Mvz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Feb 2023 07:51:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229515AbjB0Mk0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Feb 2023 07:40:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE5661DBA9
-        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 04:39:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677501590;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cMMqs3SVTvebSpFoMCgni9IV5ypQSyPPBlVp3D5v8+4=;
-        b=T5fdLO+mZ2rQVrKZzXJPVj+zj+1qxEIO3VyEMbzpUt2KyLH04u2SUQB5wtuYAZap613Bg9
-        GJnINkEBliyoV4cFQ7B9PEvLNW0kt5quDBzHbKF2864B1WiJMOydRr6G3VRJdKdyQ6nuhO
-        dspLKDT5kK3OoUkXI9uakea8zVVbS8M=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-572-4wUrZAu4M-G9AbILdQ0F1w-1; Mon, 27 Feb 2023 07:39:48 -0500
-X-MC-Unique: 4wUrZAu4M-G9AbILdQ0F1w-1
-Received: by mail-wr1-f70.google.com with SMTP id r3-20020a5d6c63000000b002bff57fc7fcso799712wrz.19
-        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 04:39:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cMMqs3SVTvebSpFoMCgni9IV5ypQSyPPBlVp3D5v8+4=;
-        b=W4ikhDBzYeh6eJ8E3YwFkQUa7JsUY1+2ivLP8xWTGU+29L2OwgQuZTHx25k2fP9t1w
-         dpLJ57Y86YLJIdw92uPJ9aQQ/AyjQk2EJ+8xXhGMrrbgCikXQ0Vzq/+HK6JDKQlVza5J
-         8if6wTzJf2zKlljqyi906xZXUMuxySBrAr4eCAAoBFy1///sdUvyFw15dJj36svzd9yP
-         O8ine13ArxUN7tylpR+PEo44UocXulxT4BArzCnujNIqJ8FOPBoMICdzxlMPSypzMuJA
-         +P5lNtWV90LsDjV9gwG+OuIMF+uR1U3sg+/Hb7lYxesFAPzJvTrBiW/dny1orklSxmnI
-         l+uQ==
-X-Gm-Message-State: AO0yUKVziGD/WrCHDLi/Zm67jEqYAXfspQxYk48yZGMmIh+i20+9mWmV
-        4ehgUSRKcKsjvAMzVmCO1bQxX+b/BWYdAZ5iT8UV02+VbJqjTOJ7386B9JOeU4LwwdD8eQXFuvJ
-        zgqdWf8kOOcEt
-X-Received: by 2002:a05:600c:4b30:b0:3e2:147f:ac1a with SMTP id i48-20020a05600c4b3000b003e2147fac1amr16862847wmp.21.1677501587841;
-        Mon, 27 Feb 2023 04:39:47 -0800 (PST)
-X-Google-Smtp-Source: AK7set9KPsx6+1T3kuKidRwsQAIPZyfimjAZLiWjTRLNbUcke4Oge0qHZsM8yzLru/NcsBv3NBFMiw==
-X-Received: by 2002:a05:600c:4b30:b0:3e2:147f:ac1a with SMTP id i48-20020a05600c4b3000b003e2147fac1amr16862831wmp.21.1677501587534;
-        Mon, 27 Feb 2023 04:39:47 -0800 (PST)
-Received: from [192.168.0.2] (ip-109-43-176-150.web.vodafone.de. [109.43.176.150])
-        by smtp.gmail.com with ESMTPSA id u6-20020a05600c00c600b003e21dcccf9fsm12279156wmm.16.2023.02.27.04.39.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Feb 2023 04:39:47 -0800 (PST)
-Message-ID: <f6854f27-2c32-dc07-883d-9cbfc9d49c48@redhat.com>
-Date:   Mon, 27 Feb 2023 13:39:45 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        with ESMTP id S229470AbjB0Mvy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Feb 2023 07:51:54 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F31E113D4B
+        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 04:51:52 -0800 (PST)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31RAxjjL026690;
+        Mon, 27 Feb 2023 12:51:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=cduFZsxbHCwIMqUUdtVBrltvaeYrlg4SYyh56QtzuDg=;
+ b=rtuaZ5d2EznAa+7KYVz4znyNTYfOn6eTg/102Y/pRg0N2+TZrRHw2/x826N8/V2zNL54
+ EEtEAdd1x53yQNUtGQHH4E8mbxxBZwmj+FF1qO5XI2i095NMHQzDh+DkPugiNCzaxOpM
+ iy+s5mmHE0HUgdlZD+a/nSFZSg2hDLllZRLjRFmiMDIuI0j20Uq9TsZnTtxj+pXFLVs4
+ 8oHf0QAMmMaQ+lYuW+p0jLOybyUK3H1b31hQPrwtOYzlYKjVlDMna+QU6rXO38D/n7g5
+ n1SczxHoZJbMP6pWfNniIgK4czdYBH1bLeNyJ6E8SIW77xOSYt6VWvXp58N4mFzVnxg0 ZQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p0u8qtpww-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Feb 2023 12:51:38 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31RBlg62024254;
+        Mon, 27 Feb 2023 12:51:38 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p0u8qtpq9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Feb 2023 12:51:38 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31R4D83f031070;
+        Mon, 27 Feb 2023 12:51:24 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3nybdfsefp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Feb 2023 12:51:23 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31RCpKrZ61800788
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 27 Feb 2023 12:51:20 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 118D120043;
+        Mon, 27 Feb 2023 12:51:20 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8CAD120040;
+        Mon, 27 Feb 2023 12:51:19 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.148.35])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Mon, 27 Feb 2023 12:51:19 +0000 (GMT)
+Message-ID: <d8da6f7d1e3addcb63614f548ed77ac1b8895e63.camel@linux.ibm.com>
+Subject: Re: [PATCH v16 08/11] qapi/s390x/cpu topology: set-cpu-topology
+ monitor command
+From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To:     Markus Armbruster <armbru@redhat.com>
+Cc:     Thomas Huth <thuth@redhat.com>,
+        Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org,
+        qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
         richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
         mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
         ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        nsg@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
-        clg@kaod.org
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+Date:   Mon, 27 Feb 2023 13:51:19 +0100
+In-Reply-To: <87v8jnqorg.fsf@pond.sub.org>
 References: <20230222142105.84700-1-pmorel@linux.ibm.com>
- <20230222142105.84700-7-pmorel@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v16 06/11] s390x/cpu topology: interception of PTF
- instruction
-In-Reply-To: <20230222142105.84700-7-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+         <20230222142105.84700-9-pmorel@linux.ibm.com>
+         <aaf4aa7b7350e88f65fc03f148146e38fe4f7fdb.camel@linux.ibm.com>
+         <0a93eb0e-2552-07b7-2067-f46d542126f4@redhat.com>
+         <9e1cbbe11ac1429335c288e817a21f19f8f4af87.camel@linux.ibm.com>
+         <87v8jnqorg.fsf@pond.sub.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+MIME-Version: 1.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: y3-cCLFJ0hg8pXB5Np8e2y6j0ZCyYwR6
+X-Proofpoint-GUID: D0OYw_YqB4zz-QV1Jqu5FvBI4kOSlMA_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-27_10,2023-02-27_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ lowpriorityscore=0 spamscore=0 malwarescore=0 suspectscore=0 phishscore=0
+ adultscore=0 priorityscore=1501 mlxscore=0 mlxlogscore=618 impostorscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302270097
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/02/2023 15.21, Pierre Morel wrote:
-> When the host supports the CPU topology facility, the PTF
-> instruction with function code 2 is interpreted by the SIE,
-> provided that the userland hypervisor activates the interpretation
-> by using the KVM_CAP_S390_CPU_TOPOLOGY KVM extension.
-> 
-> The PTF instructions with function code 0 and 1 are intercepted
-> and must be emulated by the userland hypervisor.
-> 
-> During RESET all CPU of the configuration are placed in
-> horizontal polarity.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->   include/hw/s390x/s390-virtio-ccw.h |  6 +++
->   hw/s390x/cpu-topology.c            | 85 ++++++++++++++++++++++++++++++
->   target/s390x/kvm/kvm.c             | 11 ++++
->   3 files changed, 102 insertions(+)
-> 
-> diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
-> index 9bba21a916..c1d46e78af 100644
-> --- a/include/hw/s390x/s390-virtio-ccw.h
-> +++ b/include/hw/s390x/s390-virtio-ccw.h
-> @@ -30,6 +30,12 @@ struct S390CcwMachineState {
->       uint8_t loadparm[8];
->   };
->   
-> +#define S390_PTF_REASON_NONE (0x00 << 8)
-> +#define S390_PTF_REASON_DONE (0x01 << 8)
-> +#define S390_PTF_REASON_BUSY (0x02 << 8)
-> +#define S390_TOPO_FC_MASK 0xffUL
-> +void s390_handle_ptf(S390CPU *cpu, uint8_t r1, uintptr_t ra);
-> +
->   struct S390CcwMachineClass {
->       /*< private >*/
->       MachineClass parent_class;
-> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
-> index 08642e0e04..40253a2444 100644
-> --- a/hw/s390x/cpu-topology.c
-> +++ b/hw/s390x/cpu-topology.c
-> @@ -87,6 +87,89 @@ static void s390_topology_init(MachineState *ms)
->       QTAILQ_INSERT_HEAD(&s390_topology.list, entry, next);
->   }
->   
-> +/**
-> + * s390_topology_set_cpus_entitlement:
-> + * @polarization: polarization requested by the caller
-> + *
-> + * Set all CPU entitlement according to polarization and
-> + * dedication.
-> + * Default vertical entitlement is S390_CPU_ENTITLEMENT_MEDIUM as
-> + * it does not require host modification of the CPU provisioning
-> + * until the host decide to modify individual CPU provisioning
-> + * using QAPI interface.
-> + * However a dedicated vCPU will have a S390_CPU_ENTITLEMENT_HIGH
-> + * entitlement.
-> + */
-> +static void s390_topology_set_cpus_entitlement(int polarization)
-> +{
-> +    CPUState *cs;
-> +
-> +    CPU_FOREACH(cs) {
-> +        if (polarization == S390_CPU_POLARIZATION_HORIZONTAL) {
-> +            S390_CPU(cs)->env.entitlement = 0;
+On Mon, 2023-02-27 at 13:25 +0100, Markus Armbruster wrote:
+> Nina Schoetterl-Glausch <nsg@linux.ibm.com> writes:
+>=20
+> > On Mon, 2023-02-27 at 08:59 +0100, Thomas Huth wrote:
+>=20
+> [...]
+>=20
+> > > I'm not sure whether double inclusion works with the QAPI parser (sin=
+ce this=20
+> > > might code to be generated twice) ... have you tried?
+> >=20
+> > I haven't, the documentation says:
+> >=20
+> > > Include directives
+> > > ------------------
+> > >=20
+> > > Syntax::
+> > >=20
+> > >     INCLUDE =3D { 'include': STRING }
+> > >=20
+> > > The QAPI schema definitions can be modularized using the 'include' di=
+rective::
+> > >=20
+> > >  { 'include': 'path/to/file.json' }
+> > >=20
+> > > The directive is evaluated recursively, and include paths are relativ=
+e
+> > > to the file using the directive.  Multiple includes of the same file
+> > > are idempotent.
+> >=20
+> > Which is why I thought it should work, but I guess this is a statement =
+about
+> > including the same file twice in another file and not about including t=
+he same
+> > file from two files.
+>=20
+> No, this is intended to say multiple inclusion is fine, regardless where
+> the include directives are.
+>=20
+> An include directive has two effects:
+>=20
+> 1. If the included file has not been included already, pull in its
+>    contents.
+>=20
+> 2. Insert #include in generated C.  Example: qdev.json includes
+>    qom.json.  The generated qapi-*-qdev.h include qapi-types-qom.h.
+>=20
+>    Including any required modules, as recommended by qapi-code-gen.rst,
+>    results in properly self-contained generated headers.
 
-Maybe use S390_CPU_ENTITLEMENT_HORIZONTAL instead of "0" ?
+Ok, thanks. Not sure if another phrasing would be better given the intended
+meaning is the way I read it initially.
 
-> +        } else if (S390_CPU(cs)->env.dedicated) {
-> +            S390_CPU(cs)->env.entitlement = S390_CPU_ENTITLEMENT_HIGH;
-> +        } else {
-> +            S390_CPU(cs)->env.entitlement = S390_CPU_ENTITLEMENT_MEDIUM;
-> +        }
-> +    }
-> +}
+>=20
+> > But then, as far as I can tell, the build system only builds qapi-schem=
+a.json,
+> > which includes all other files, so it could apply.
+>=20
+> Yes, qapi-schema.json is the main module, which includes all the others.
+>=20
+> In fact, it includes all the others *directly*.  Why?
+>=20
+> We generate documentation in source order.  Included material gets
+> inserted right at the first inclusion; subsequent inclusions have no
+> effect.
+>=20
+> If we put all first inclusions right into qapi-schema.json, the order of
+> things in documentation is visible right there, and won't change just
+> because we change inclusions deeper down.
+>=20
+> Questions?
 
-With the nit above fixed:
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+CpuS390Entitlement would be useful in both machine.json and machine-target.=
+json
+because query-cpu-fast is defined in machine.json and set-cpu-topology is d=
+efined
+in machine-target.json.
+So then the question is where best to define CpuS390Entitlement.
+In machine.json and include machine.json in machine-target.json?
+Or define it in another file and include it from both?
+
+Thanks
+
+
 
