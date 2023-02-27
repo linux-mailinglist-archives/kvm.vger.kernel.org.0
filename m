@@ -2,146 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BD2626A42C4
-	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 14:34:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7185D6A430C
+	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 14:40:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229948AbjB0NeS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Feb 2023 08:34:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45274 "EHLO
+        id S229545AbjB0Nkw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Feb 2023 08:40:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230195AbjB0Ndu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Feb 2023 08:33:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3ABA7AD1A
-        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 05:32:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677504775;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hPF6OqkldqKMAfXygeIPr6QHZzjaTi2wskjIdYzJSBk=;
-        b=bSXorY18q3une212ebBYQTuZvT9uJldgYQgNaObLMtacF0Tl4rfjvUfW+kvd0CgI7yQPZ0
-        zvY7cFmtivLsKvcNnfoU7kV3GCC7trGj7iZengEnwmVT9ImWRqba2lIHyx/KRjgXO45mM4
-        CEAM2XQKbPdcG+nB8y2VfyRQ+sZT4zI=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-189-skj44yuuOxmcOd7Xv8KsLw-1; Mon, 27 Feb 2023 08:32:53 -0500
-X-MC-Unique: skj44yuuOxmcOd7Xv8KsLw-1
-Received: by mail-wm1-f70.google.com with SMTP id l20-20020a05600c1d1400b003e10d3e1c23so5353005wms.1
-        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 05:32:53 -0800 (PST)
+        with ESMTP id S229501AbjB0Nkv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Feb 2023 08:40:51 -0500
+Received: from mail-qv1-xf31.google.com (mail-qv1-xf31.google.com [IPv6:2607:f8b0:4864:20::f31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E06DC83FA
+        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 05:40:49 -0800 (PST)
+Received: by mail-qv1-xf31.google.com with SMTP id ff4so4439797qvb.2
+        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 05:40:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bluespec-com.20210112.gappssmtp.com; s=20210112; t=1677505249;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8JIiHToWm3JJX3vLcdAdWPiMyNkhL1NymqgcmOqFXnc=;
+        b=E6fDCBRzXaSEcmbwYppIr9fPG+rbeM4a7GwiXp3RIMWLGIV2hWHjvG4lfYVUELvHR1
+         3vE7Rtnst+AMB2XcOoBcViFlLK79I75brt9VDJQE69HvFDx4MlWzw2n41KoEcU9NZmdA
+         00AcATFg9PM2emTkkLKBI7uiWkVg6TXuvNg+QrnxI8Aevzs2AfaueO+dXN3ZHNkb0RSJ
+         BlKoc01/zX+q386MMzpPhXIsnv43o2eM+Fa0eDmiHlvpNtcsVn7EzBvTKS3NBGx8pImz
+         8CmcBN4v00Iua9D7twVrIPnr0IRR9Ax3X8/iaP44Qrgr7hngvwbE/BD8l2Q9Mhlt2s7z
+         oarg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20210112; t=1677505249;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hPF6OqkldqKMAfXygeIPr6QHZzjaTi2wskjIdYzJSBk=;
-        b=f7E2iSeQuhvB2ZqU+MZ+SgJNVjpmVt6fYmttMJHpeaFTUOmAwQ+PP51+8JUzn+eWZD
-         A3ixuheQt7r808pDwiNWIgZYf3VSaHl59GKU5nk5RHmIhTBlZsl8kKbmZ/A2sMuuw2H7
-         aI6Ty8vCwQ0BThLAstrjcWS6N1D9EUnIB6muVbSoVif761DQuI2e4BssF8wD+w0ttYZF
-         psj85hY2jHsigWiD8dzEhT6URHclcDhBEkGlNMGXvqLOY+Cjcfmsczuv3mMSVldS3jza
-         BUoY8mCPq36MZ4SLj6+ii/U8TolHBWmKdR2O8w+JEc+e5+vYJ7YgAFQ2XSCHfY5P81ps
-         P7AQ==
-X-Gm-Message-State: AO0yUKUNvleMz0RJVFbJ8VGdhvZ2UAD5bw2hiQPJn5YfXlN1fTls88bh
-        UHtRf2YiDgXeAp7FPWrE6c1abBgbwZNZ0s54WLw0yHG2sEEPV/ADOvOSVcqMVK4QSLlN3NFcWJ7
-        LsjSp5zMYRZBh
-X-Received: by 2002:a05:600c:1c86:b0:3ea:ed4d:38f6 with SMTP id k6-20020a05600c1c8600b003eaed4d38f6mr12435580wms.4.1677504772806;
-        Mon, 27 Feb 2023 05:32:52 -0800 (PST)
-X-Google-Smtp-Source: AK7set/HHsOVoCqCSi4LLgNkgXWJ8tbRO76NvBzHEZr9RzACY5CRnnRRggW5lBz8VKGsyv0o7aCVfQ==
-X-Received: by 2002:a05:600c:1c86:b0:3ea:ed4d:38f6 with SMTP id k6-20020a05600c1c8600b003eaed4d38f6mr12435555wms.4.1677504772515;
-        Mon, 27 Feb 2023 05:32:52 -0800 (PST)
-Received: from [192.168.0.2] (ip-109-43-176-150.web.vodafone.de. [109.43.176.150])
-        by smtp.gmail.com with ESMTPSA id c2-20020a5d4cc2000000b002bfd524255esm6983507wrt.43.2023.02.27.05.32.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Feb 2023 05:32:51 -0800 (PST)
-Message-ID: <9a029d4e-4794-9a6a-7516-bed8feb39d97@redhat.com>
-Date:   Mon, 27 Feb 2023 14:32:50 +0100
+        bh=8JIiHToWm3JJX3vLcdAdWPiMyNkhL1NymqgcmOqFXnc=;
+        b=GGUTAIpVMdiXCzNGUcDW3Q72eLS3mTZWCBgAMYihp/bp5CaPSBUvnd8seYCNp+qZ/G
+         NgMl190/rB6uGSvRawEo0pRQIyBJ4hig5oIA/FGwLMV3HvYNbw5HCHiQm0l53sdg5sdn
+         293b2H1kJZKZZ3y2sxg4PNTI5h1wejA07yExwfd4HNxzodhwieIuKjcmPejvb1T5ldmY
+         zkjFsAz0NTK9javfSmYT2rGePsx+mnvdbFh0vNYRoJIX3gX3pHLVvB2pfOmmJJVEUpJe
+         Gj09sx4skJ2p0Q69fID4+vMn7KpN5bwkBlOdvbG9QXn8H9uhqHzwHZKa6nK5ECIdlnwj
+         iJZw==
+X-Gm-Message-State: AO0yUKUl8Y5mWx+xwzYdKhhEhirVZUsO/M/VSAsFANg9Rrkrzt4Wz+Ri
+        QFuyGMedj3Qp52RXyf0qGNdw
+X-Google-Smtp-Source: AK7set962+ZodxtJuVn4KwIsiWzvasBAywTTkE+5fyPW8lu8CRTF3VS1E28pdLmsqnRVvjQBwlLV7Q==
+X-Received: by 2002:a05:6214:194a:b0:56e:a88f:70d0 with SMTP id q10-20020a056214194a00b0056ea88f70d0mr51430834qvk.27.1677505248894;
+        Mon, 27 Feb 2023 05:40:48 -0800 (PST)
+Received: from bruce.bluespec.com ([102.129.235.233])
+        by smtp.gmail.com with ESMTPSA id 124-20020a370b82000000b007425ef4cbc2sm4884423qkl.100.2023.02.27.05.40.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Feb 2023 05:40:48 -0800 (PST)
+Date:   Mon, 27 Feb 2023 08:40:46 -0500
+From:   Darius Rad <darius@bluespec.com>
+To:     Conor Dooley <conor.dooley@microchip.com>
+Cc:     Andy Chiu <andy.chiu@sifive.com>, linux-riscv@lists.infradead.org,
+        palmer@dabbelt.com, anup@brainfault.org, atishp@atishpatra.org,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        vineetg@rivosinc.com, greentime.hu@sifive.com,
+        guoren@linux.alibaba.com, Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>
+Subject: Re: [PATCH -next v14 19/19] riscv: Enable Vector code to be built
+Message-ID: <Y/yy3sDX2AxvBD0f@bruce.bluespec.com>
+Mail-Followup-To: Conor Dooley <conor.dooley@microchip.com>,
+        Andy Chiu <andy.chiu@sifive.com>, linux-riscv@lists.infradead.org,
+        palmer@dabbelt.com, anup@brainfault.org, atishp@atishpatra.org,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        vineetg@rivosinc.com, greentime.hu@sifive.com,
+        guoren@linux.alibaba.com, Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>
+References: <20230224170118.16766-1-andy.chiu@sifive.com>
+ <20230224170118.16766-20-andy.chiu@sifive.com>
+ <Y/yDeurep0ZBnLdR@wendy>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [PATCH v16 10/11] qapi/s390x/cpu topology:
- CPU_POLARIZATION_CHANGE qapi event
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        nsg@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
-        clg@kaod.org
-References: <20230222142105.84700-1-pmorel@linux.ibm.com>
- <20230222142105.84700-11-pmorel@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20230222142105.84700-11-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Y/yDeurep0ZBnLdR@wendy>
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NEUTRAL autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/02/2023 15.21, Pierre Morel wrote:
-> When the guest asks to change the polarization this change
-> is forwarded to the admin using QAPI.
-> The admin is supposed to take according decisions concerning
-> CPU provisioning.
+On Mon, Feb 27, 2023 at 10:18:34AM +0000, Conor Dooley wrote:
+> Hey Andy,
+> 
+> On Fri, Feb 24, 2023 at 05:01:18PM +0000, Andy Chiu wrote:
+> > From: Guo Ren <guoren@linux.alibaba.com>
+> > 
+> > This patch adds a config which enables vector feature from the kernel
+> > space.
+> > 
+> > Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+> > Co-developed-by: Greentime Hu <greentime.hu@sifive.com>
+> > Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
+> > Suggested-by: Vineet Gupta <vineetg@rivosinc.com>
+> > Suggested-by: Atish Patra <atishp@atishpatra.org>
+> > Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
+> 
+> At this point, you've basically re-written this patch and should be
+> listed as a co-author at the very least!
+> 
+> > ---
+> >  arch/riscv/Kconfig  | 18 ++++++++++++++++++
+> >  arch/riscv/Makefile |  3 ++-
+> >  2 files changed, 20 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+> > index 81eb031887d2..19deeb3bb36b 100644
+> > --- a/arch/riscv/Kconfig
+> > +++ b/arch/riscv/Kconfig
+> > @@ -418,6 +418,24 @@ config RISCV_ISA_SVPBMT
+> >  
+> >  	   If you don't know what to do here, say Y.
+> >  
+> > +config TOOLCHAIN_HAS_V
+> > +	bool
+> > +	default y
+> > +	depends on !64BIT || $(cc-option,-mabi=lp64 -march=rv64iv)
+> > +	depends on !32BIT || $(cc-option,-mabi=ilp32 -march=rv32iv)
+> > +	depends on LLD_VERSION >= 140000 || LD_VERSION >= 23800
+> > +
+> > +config RISCV_ISA_V
+> > +	bool "VECTOR extension support"
+> > +	depends on TOOLCHAIN_HAS_V
+> > +	select DYNAMIC_SIGFRAME
+> 
+> So, nothing here makes V depend on CONFIG_FPU...
+> 
+> > +	default y
+> > +	help
+> > +	  Say N here if you want to disable all vector related procedure
+> > +	  in the kernel.
+> > +
+> > +	  If you don't know what to do here, say Y.
+> > +
+> >  config TOOLCHAIN_HAS_ZBB
+> >  	bool
+> >  	default y
+> > diff --git a/arch/riscv/Makefile b/arch/riscv/Makefile
+> > index 76989561566b..375a048b11cb 100644
+> > --- a/arch/riscv/Makefile
+> > +++ b/arch/riscv/Makefile
+> > @@ -56,6 +56,7 @@ riscv-march-$(CONFIG_ARCH_RV32I)	:= rv32ima
+> >  riscv-march-$(CONFIG_ARCH_RV64I)	:= rv64ima
+> >  riscv-march-$(CONFIG_FPU)		:= $(riscv-march-y)fd
+> 
+> ...but march only contains fd if CONFIG_FPU is enabled...
+> 
+> >  riscv-march-$(CONFIG_RISCV_ISA_C)	:= $(riscv-march-y)c
+> > +riscv-march-$(CONFIG_RISCV_ISA_V)	:= $(riscv-march-y)v
+> >  
+> >  # Newer binutils versions default to ISA spec version 20191213 which moves some
+> >  # instructions from the I extension to the Zicsr and Zifencei extensions.
+> > @@ -65,7 +66,7 @@ riscv-march-$(toolchain-need-zicsr-zifencei) := $(riscv-march-y)_zicsr_zifencei
+> >  # Check if the toolchain supports Zihintpause extension
+> >  riscv-march-$(CONFIG_TOOLCHAIN_HAS_ZIHINTPAUSE) := $(riscv-march-y)_zihintpause
+> >  
+> > -KBUILD_CFLAGS += -march=$(subst fd,,$(riscv-march-y))
+> > +KBUILD_CFLAGS += -march=$(subst fdv,,$(riscv-march-y))
+> 
+> ...so I think this will not work if !CONFIG_FPU && RISCV_ISA_V.
+> IIRC, vector uses some floating point opcodes, but does it (or Linux's
+> implementation) actually depend on having floating point support in the
+> kernel?
 
-I still find it weird talking about "the admin" here. I don't think any 
-human will monitor this event to take action on it. Maybe rather talk about 
-the "upper layer" (libvirt) or whatever you have in mind to monitor this event?
+Yes.
 
-> diff --git a/qapi/machine-target.json b/qapi/machine-target.json
-> index baa9d273cf..e7a9049c1f 100644
-> --- a/qapi/machine-target.json
-> +++ b/qapi/machine-target.json
-> @@ -389,3 +389,37 @@
->     'features': [ 'unstable' ],
->     'if': { 'all': [ 'TARGET_S390X' ] }
->   }
-> +
-> +##
-> +# @CPU_POLARIZATION_CHANGE:
-> +#
-> +# Emitted when the guest asks to change the polarization.
-> +#
-> +# @polarization: polarization specified by the guest
-> +#
-> +# Features:
-> +# @unstable: This command may still be modified.
-> +#
-> +# The guest can tell the host (via the PTF instruction) whether the
-> +# CPUs should be provisioned using horizontal or vertical polarization.
-> +#
-> +# On horizontal polarization the host is expected to provision all vCPUs
-> +# equally.
-> +# On vertical polarization the host can provision each vCPU differently.
-> +# The guest will get information on the details of the provisioning
-> +# the next time it uses the STSI(15) instruction.
-> +#
-> +# Since: 8.0
-> +#
-> +# Example:
-> +#
-> +# <- { "event": "CPU_POLARIZATION_CHANGE",
-> +#      "data": { "polarization": 0 },
-> +#      "timestamp": { "seconds": 1401385907, "microseconds": 422329 } }
-> +#
+"The V extension requires the scalar processor implements the F and D
+extensions", RISC-V "V" Vector Extension, Section 18.3. V: Vector Extension
+for Application Processors.
 
-I'd remove the final empty line.
-
-> +##
-> +{ 'event': 'CPU_POLARIZATION_CHANGE',
-> +  'data': { 'polarization': 'CpuS390Polarization' },
-> +  'features': [ 'unstable' ],
-> +  'if': { 'all': [ 'TARGET_S390X', 'CONFIG_KVM' ] }
-> +}
-
-  Thomas
+> If not, this cannot be done in a oneliner. Otherwise, CONFIG_RISCV_ISA_V
+> should explicitly depend on CONFIG_FPU.
+> 
+> >  KBUILD_AFLAGS += -march=$(riscv-march-y)
+> >  
+> >  KBUILD_CFLAGS += -mno-save-restore
+> > -- 
+> > 2.17.1
+> > 
+> > 
 
