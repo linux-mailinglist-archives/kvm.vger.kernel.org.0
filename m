@@ -2,54 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 85A016A3D58
-	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 09:36:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DB366A3D6D
+	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 09:50:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231544AbjB0Ig1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Feb 2023 03:36:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50896 "EHLO
+        id S231528AbjB0Iuq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Feb 2023 03:50:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232624AbjB0Ifv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Feb 2023 03:35:51 -0500
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0522B212BF
-        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 00:31:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677486678; x=1709022678;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=D4m94Ys9nnxpXljCqvikZjpfa2GzPnyw3v/1gupN41c=;
-  b=kXhSIYdxT6dNR8XHYnlwSexkOvkAM142J23nY0CJnCYCEs5DGpyJpTSh
-   f4/13lrt5NU+8xR1UHG9cShpGOLOiI1Fi9sl6gAMXzPP0Qib8hHEPy6+V
-   LfKyx6K2gBAG0bJDGmLxD/YKMKKbJv6ZQa/OsIr63iZgY1jYM5iVI3KMS
-   sfBE56ZtI6kYA8gYsIdTTEa3/al5xy/QNIFmIxDyoomDgo34DKaWTLMoW
-   SHn+0qrz4zJ/rrl630e/eFDjjewnaaYmUEqzP9k3Xw15TIm6RUFISfdT3
-   4R47F05i3HZONcyuJcNvV83LdB5aQ4/kwnkHkAhwnYl/MszjXQtLDz89q
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10633"; a="313480571"
-X-IronPort-AV: E=Sophos;i="5.97,331,1669104000"; 
-   d="scan'208";a="313480571"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2023 00:26:06 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10633"; a="797519826"
-X-IronPort-AV: E=Sophos;i="5.97,331,1669104000"; 
-   d="scan'208";a="797519826"
-Received: from sqa-gate.sh.intel.com (HELO robert-clx2.tsp.org) ([10.239.48.212])
-  by orsmga004.jf.intel.com with ESMTP; 27 Feb 2023 00:26:04 -0800
-From:   Robert Hoo <robert.hu@linux.intel.com>
-To:     seanjc@google.com, pbonzini@redhat.com, chao.gao@intel.com,
-        binbin.wu@linux.intel.com
-Cc:     kvm@vger.kernel.org, Robert Hoo <robert.hu@linux.intel.com>
-Subject: [kvm-unit-tests PATCH v1] x86: Add test case for LAM_SUP
-Date:   Mon, 27 Feb 2023 16:25:57 +0800
-Message-Id: <20230227082557.403584-1-robert.hu@linux.intel.com>
-X-Mailer: git-send-email 2.31.1
+        with ESMTP id S230292AbjB0IuP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Feb 2023 03:50:15 -0500
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2062b.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e8a::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEB79A26D;
+        Mon, 27 Feb 2023 00:42:57 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kLJ/c25XFm4noYvXpSzXgVejeVBx3luFl/sUtDAvloe2cR9sFWUoD/7QrKJn/8TN7ih/KODIyMeR5gfvvwOcbGqnFlDJYqeHbNOG34fnQIPC5CzRq6DfhRNsodC3nUQq5xlG+9LApahwZonVONLUNB8TJtVHH7kj+tUltoViozxwiaLCVg2blNazG0NRk/NkZH+HtExcHZrOhCuoiy9Ef+6rDfnvPVdJxqst41cWPTQYY0j3M5+CstExbbhqsuUA5O8huxga32jbHPh9P43+oR5EZCm50gEkHsWYba1vlDW7G2uO3aJ+1MJFIPcaDdgm3kf/CvOkQ9XIisb6t71BOA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=gd7MYIu4mHbFu38bGyi94/NKEegCYzVzkeE5RgtBi8o=;
+ b=VGlk9MC8uvMgfdu9ZWHcKWaFB6WKfKH509wL6WoU6uRqd/7YRVIJ3WVAuWe94Ri0l1Yyu/DTJ9E5KFcaNuN4XxSC/S2ZYRVgt9PYixWQ8kD5nhV6qw95kMvqa1uCZGxEtG9n/3mTtL2LuIc53Ajv07bZ0Js4cXSg8xEEb2YeaxY6LZOwn51QiOCCZTU2x3yRVDwkMhEZe52Y4eqTNhmeW/RjCnzRQsOlR/Rz2kB2PF7CGM3RngRlP8Zp8vKaVMI4F0WsCIhbFe+DXUNW7U0Y5N90/xoTEJd41WMTNhX2hg8DUik4jwNxjDpRYVrWniEy1Pz0wHSi9feP+wEkMvhUXw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gd7MYIu4mHbFu38bGyi94/NKEegCYzVzkeE5RgtBi8o=;
+ b=Fxn8ixa2a7UNywUGiLCqN5A1NXRx46rCFMBgqS6NQ4hRW4ktsNhjYggi4ibn9IbWS50Klla2pPgEZonKdtgQlDeFPYdewisaNISpqWawfaaCQd1+8GdRBj0Z0zzQoSPFUyNIDV5wW3fdKOghKGmrIOTdFGQnJnehfZO5ZVeD35U=
+Received: from MW4PR02CA0018.namprd02.prod.outlook.com (2603:10b6:303:16d::17)
+ by DM4PR12MB7576.namprd12.prod.outlook.com (2603:10b6:8:10c::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.29; Mon, 27 Feb
+ 2023 08:41:21 +0000
+Received: from CO1NAM11FT036.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:16d:cafe::fa) by MW4PR02CA0018.outlook.office365.com
+ (2603:10b6:303:16d::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.27 via Frontend
+ Transport; Mon, 27 Feb 2023 08:41:21 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CO1NAM11FT036.mail.protection.outlook.com (10.13.174.124) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6156.16 via Frontend Transport; Mon, 27 Feb 2023 08:41:21 +0000
+Received: from BLR-L-SASHUKLA.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 27 Feb
+ 2023 02:41:14 -0600
+From:   Santosh Shukla <santosh.shukla@amd.com>
+To:     <kvm@vger.kernel.org>, <seanjc@google.com>
+CC:     <pbonzini@redhat.com>, <jmattson@google.com>, <joro@8bytes.org>,
+        <linux-kernel@vger.kernel.org>, <mail@maciej.szmigiero.name>,
+        <mlevitsk@redhat.com>, <thomas.lendacky@amd.com>,
+        <vkuznets@redhat.com>
+Subject: [PATCHv4 02/11] KVM: nSVM: Disable intercept of VINTR if saved RFLAG.IF is 0
+Date:   Mon, 27 Feb 2023 14:10:07 +0530
+Message-ID: <20230227084016.3368-3-santosh.shukla@amd.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230227084016.3368-1-santosh.shukla@amd.com>
+References: <20230227084016.3368-1-santosh.shukla@amd.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1NAM11FT036:EE_|DM4PR12MB7576:EE_
+X-MS-Office365-Filtering-Correlation-Id: c564e090-dc91-4a6d-6cf6-08db189e6733
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: rECC4YCr4ELFVE91c3kEzKwo2IGQWQUehNvAlEeUNzdCMDlM7V/pbLQfFCNnP5W7+Bf7RLQUuuZr0E5IG5M/v9l2PphS5vJN+rmZYNQDwAZH0aACIo8z2XA9wow1DfG5iiUYPlqdH1Vff7rTuMH5uHXhUFHU4O/Kcmu26sgUYDSaAWHJYTBvVCCK21tTxIIoQREet9ZB38XGFLgkX7rPj6GkLeS1JnkXfmnq9bTb2tz7+gFzqhKlfZqnojJV4q7NUIzIrafcHnI1GBSFMMCTMwSB6GZEVBEOpgw3EA6IqaALg+1LMOqeEEvPdaqqyaPQdYlFgCTUOg1Ey/ITt7iRR9FuAnBC5LfTb5krQlbUtA2MkVwCAEBBhxcE0tJWHFUh9BsWQHl0Q/sqIE1chkP/BB0u4zkeGQ/LxytFXrS8qEqo8bLTSkXleg34Oa4Lyn1EyJL2GtdbGfoG0wYafxfcqK0JaGIW5OKmuC0MBI3R8P0T3pJvV+GfO7klLLdHVI//mPtcwM1vdz1PB6cRp4s+cVcggwPa5nSzWST1i+/v5PxoRkx3y0t0Jdt8eopNg+zESIV8GUSbw9orzw6Aa3ILvqxJ8YRByBywG/yjCyXc1aUFqs6nnt0JZCgpts98lCyRdGSG9qcb7qZ5IrM17Vf1pPeMrlEqT098/4396Z8L2LyIceEQTDL2KAFQn8qXsZiDIk4LediW5TLV6D0pygTsQTYxXifE/4JvgGiYyhinqYo=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(376002)(396003)(136003)(346002)(39860400002)(451199018)(46966006)(40470700004)(36840700001)(336012)(47076005)(426003)(110136005)(54906003)(316002)(40460700003)(36756003)(40480700001)(86362001)(356005)(81166007)(36860700001)(82740400003)(1076003)(82310400005)(6666004)(83380400001)(2616005)(186003)(26005)(16526019)(5660300002)(2906002)(8936002)(966005)(7696005)(478600001)(4326008)(41300700001)(44832011)(8676002)(70586007)(70206006)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Feb 2023 08:41:21.6817
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: c564e090-dc91-4a6d-6cf6-08db189e6733
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT036.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7576
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,SPF_HELO_PASS,
         SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -57,260 +99,73 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This unit test covers:
-1. CR4.LAM_SUP toggle has expected behavior according to LAM status.
-2. Memory access (here is strcpy() for test example) with supervisor mode
-address containing LAM meta data, behave as expected per LAM status.
-3. MMIO memory access with supervisor mode address containing LAM meta
-data, behave as expected per LAM status.
+From: Santosh Shukla <Santosh.Shukla@amd.com>
 
-In x86/unittests.cfg, add 2 test cases/guest conf, with and without LAM.
+Disable intercept of virtual interrupts (used to
+detect interrupt windows) if the saved RFLAGS.IF is '0', as
+the effective RFLAGS.IF for L1 interrupts will never be set
+while L2 is running (L2's RFLAGS.IF doesn't affect L1 IRQs).
 
-Note:
-LAM_U57 is covered by running kselftests/x86/lam in guest; and
-exepecting LAM_U48 test will be complemented there when Kernel supports it.
-
-LAM feature spec: https://cdrdv2.intel.com/v1/dl/getContent/671368, Chap 10
-LINEAR ADDRESS MASKING (LAM)
-
-Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Santosh Shukla <Santosh.Shukla@amd.com>
 ---
- lib/x86/processor.h |   3 +
- x86/Makefile.x86_64 |   1 +
- x86/lam_sup.c       | 170 ++++++++++++++++++++++++++++++++++++++++++++
- x86/unittests.cfg   |  10 +++
- 4 files changed, 184 insertions(+)
- create mode 100644 x86/lam_sup.c
+v3:
+https://lore.kernel.org/all/Y9hybI65So5X2LFg@google.com/
+suggested by Sean.
 
-diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-index 3d58ef7..c6b1db6 100644
---- a/lib/x86/processor.h
-+++ b/lib/x86/processor.h
-@@ -105,6 +105,8 @@
- #define X86_CR4_CET		BIT(X86_CR4_CET_BIT)
- #define X86_CR4_PKS_BIT		(24)
- #define X86_CR4_PKS		BIT(X86_CR4_PKS_BIT)
-+#define X86_CR4_LAM_SUP_BIT	(28)
-+#define X86_CR4_LAM_SUP	BIT(X86_CR4_LAM_SUP_BIT)
+ arch/x86/kvm/svm/nested.c | 15 ++++++++++-----
+ arch/x86/kvm/svm/svm.c    | 10 ++++++++++
+ 2 files changed, 20 insertions(+), 5 deletions(-)
+
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index fbade158d368..107258ed46ee 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -139,13 +139,18 @@ void recalc_intercepts(struct vcpu_svm *svm)
  
- #define X86_EFLAGS_CF_BIT	(0)
- #define X86_EFLAGS_CF		BIT(X86_EFLAGS_CF_BIT)
-@@ -248,6 +250,7 @@ static inline bool is_intel(void)
- #define	X86_FEATURE_SPEC_CTRL		(CPUID(0x7, 0, EDX, 26))
- #define	X86_FEATURE_ARCH_CAPABILITIES	(CPUID(0x7, 0, EDX, 29))
- #define	X86_FEATURE_PKS			(CPUID(0x7, 0, ECX, 31))
-+#define	X86_FEATURE_LAM			(CPUID(0x7, 1, EAX, 26))
+ 	if (g->int_ctl & V_INTR_MASKING_MASK) {
+ 		/*
+-		 * Once running L2 with HF_VINTR_MASK, EFLAGS.IF and CR8
+-		 * does not affect any interrupt we may want to inject;
+-		 * therefore, writes to CR8 are irrelevant to L0, as are
+-		 * interrupt window vmexits.
++		 * If L2 is active and V_INTR_MASKING is enabled in vmcb12,
++		 * disable intercept of CR8 writes as L2's CR8 does not affect
++		 * any interrupt KVM may want to inject.
++		 *
++		 * Similarly, disable intercept of virtual interrupts (used to
++		 * detect interrupt windows) if the saved RFLAGS.IF is '0', as
++		 * the effective RFLAGS.IF for L1 interrupts will never be set
++		 * while L2 is running (L2's RFLAGS.IF doesn't affect L1 IRQs).
+ 		 */
+ 		vmcb_clr_intercept(c, INTERCEPT_CR8_WRITE);
+-		vmcb_clr_intercept(c, INTERCEPT_VINTR);
++		if (!(svm->vmcb01.ptr->save.rflags & X86_EFLAGS_IF))
++			vmcb_clr_intercept(c, INTERCEPT_VINTR);
+ 	}
  
- /*
-  * Extended Leafs, a.k.a. AMD defined
-diff --git a/x86/Makefile.x86_64 b/x86/Makefile.x86_64
-index f483dea..af626cc 100644
---- a/x86/Makefile.x86_64
-+++ b/x86/Makefile.x86_64
-@@ -34,6 +34,7 @@ tests += $(TEST_DIR)/rdpru.$(exe)
- tests += $(TEST_DIR)/pks.$(exe)
- tests += $(TEST_DIR)/pmu_lbr.$(exe)
- tests += $(TEST_DIR)/pmu_pebs.$(exe)
-+tests += $(TEST_DIR)/lam_sup.$(exe)
+ 	/*
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index b43775490074..cf6ae093ed19 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1583,6 +1583,16 @@ static void svm_set_vintr(struct vcpu_svm *svm)
  
- ifeq ($(CONFIG_EFI),y)
- tests += $(TEST_DIR)/amd_sev.$(exe)
-diff --git a/x86/lam_sup.c b/x86/lam_sup.c
-new file mode 100644
-index 0000000..67d5b5e
---- /dev/null
-+++ b/x86/lam_sup.c
-@@ -0,0 +1,170 @@
-+/*
-+ * Intel LAM_SUP unit test
-+ *
-+ * Copyright (C) 2023 Intel
-+ *
-+ * Author: Robert Hoo <robert.hu@linux.intel.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2 or
-+ * later.
-+ */
-+
-+#include "libcflat.h"
-+#include "processor.h"
-+#include "desc.h"
-+#include "vmalloc.h"
-+#include "alloc_page.h"
-+#include "vm.h"
-+#include "asm/io.h"
-+#include "ioram.h"
-+
-+#define LAM57_BITS 6
-+#define LAM48_BITS 15
-+#define LAM57_MASK	GENMASK_ULL(62, 57)
-+#define LAM48_MASK	GENMASK_ULL(62, 48)
-+
-+static int gp_count;
-+static jmp_buf jbuf;
-+
-+static int get_lam_bits(void)
-+{
-+	if (this_cpu_has(X86_FEATURE_LA57) && read_cr4() & X86_CR4_LA57)
-+		return LAM57_BITS;
-+	else
-+		return LAM48_BITS;
-+}
-+
-+/* According to LAM mode, set metadata in high bits */
-+static u64 set_metadata(u64 src, unsigned long lam)
-+{
-+	u64 metadata;
-+
-+	switch (lam) {
-+	case LAM57_BITS: /* Set metadata in bits 62:57 */
-+		metadata = (rdtsc() & ((1UL << LAM57_BITS) - 1)) << 57;
-+		metadata |= (src & ~(LAM57_MASK));
-+		break;
-+	case LAM48_BITS: /* Set metadata in bits 62:48 */
-+		metadata = (rdtsc() & ((1UL << LAM48_BITS) - 1)) << 48;
-+		metadata |= (src & ~(LAM48_MASK));
-+		break;
-+	default:
-+		metadata = src;
-+		break;
-+	}
-+
-+	return metadata;
-+}
-+
-+static void handle_gp(struct ex_regs *regs)
-+{
-+	report_info("#GP caught, error_code = %ld\n", regs->error_code);
-+	gp_count++;
-+	longjmp(jbuf, 1);
-+}
-+
-+/* Refer to emulator.c */
-+static void test_mov(void *mem)
-+{
-+	unsigned long t1, t2;
-+
-+	// test mov reg, r/m and mov r/m, reg
-+	t1 = 0x123456789abcdefull & -1ul;
-+	asm volatile("mov %[t1], (%[mem])\n\t"
-+		     "mov (%[mem]), %[t2]"
-+		     : [t2]"=r"(t2)
-+		     : [t1]"r"(t1), [mem]"r"(mem)
-+		     : "memory");
-+}
-+
-+
-+int main(int ac, char **av)
-+{
-+	unsigned long cr4;
-+	volatile bool lam_enumerated;
-+	int vector, expect_vector;
-+	u64 *ptr;
-+	int lam_bits;
-+	void *vaddr, *mem;
-+	phys_addr_t paddr;
-+	handler old;
-+
-+	lam_enumerated = this_cpu_has(X86_FEATURE_LAM);
-+	if (!lam_enumerated)
-+		report_info("This CPU doesn't support LAM feature\n");
-+	else
-+		report_info("This CPU supports LAM feature\n");
-+
-+	expect_vector = lam_enumerated ? 0 : GP_VECTOR;
-+
-+	/* Set CR4.LAM_SUP */
-+	cr4 = read_cr4();
-+	vector = write_cr4_safe(cr4 | X86_CR4_LAM_SUP);
-+
-+	if (lam_enumerated)
-+		report(vector == expect_vector && (cr4 | X86_CR4_LAM_SUP) == read_cr4(),
-+		       "Set CR4.LAM_SUP");
-+	else
-+		report(vector == expect_vector, "Set CR4.LAM_SUP");
-+
-+	/* Clear CR4.LAM_SUP */
-+	cr4 = read_cr4();
-+	vector = write_cr4_safe(cr4 & ~X86_CR4_LAM_SUP);
-+	expect_vector = 0;
-+	report(vector == expect_vector && (cr4 & ~X86_CR4_LAM_SUP) == read_cr4(),
-+	       "Clear CR4.LAM_SUP");
-+
-+	/* Re-set CR4.LAM_SUP for next tests */
-+	cr4 = read_cr4();
-+	vector = write_cr4_safe(cr4 | X86_CR4_LAM_SUP);
-+	expect_vector = lam_enumerated ? 0 : GP_VECTOR;
-+	if (lam_enumerated)
-+		report(vector == expect_vector && (cr4 | X86_CR4_LAM_SUP) == read_cr4(),
-+			"Re-enable CR4.LAM_SUP");
-+	else
-+		report(vector == expect_vector, "Re-enable CR4.LAM_SUP");
-+
-+	/* Try access Supervisor mode address with meta data */
-+	setup_vm();
-+	vaddr = alloc_vpage();
-+	paddr = virt_to_phys(alloc_page());
-+
-+	install_page(current_page_table(), paddr, vaddr);
-+	old = handle_exception(GP_VECTOR, handle_gp);
-+
-+	strcpy((char *)vaddr, "LAM SUP Test origin string.");
-+
-+	lam_bits = get_lam_bits();
-+	ptr = (u64 *)set_metadata((u64)vaddr, lam_bits);
-+
-+	if (setjmp(jbuf) == 0)
-+		strcpy((char *)ptr, "LAM SUP Test NEW string.");
-+
-+	if (lam_enumerated && (read_cr4() & X86_CR4_LAM_SUP))
-+		report(gp_count == 0, "strcpy with tagged addr succeed");
-+	else
-+		report(gp_count > 0, "strcpy with tagged addr cause #GP");
-+
-+	/* emulator coverage. referred to emulator.c */
-+	gp_count = 0;
-+	mem = alloc_vpage();
-+	install_page((void *)read_cr3(), IORAM_BASE_PHYS, mem);
-+
-+	ptr = (u64 *)set_metadata((u64)mem, lam_bits);
-+	if (setjmp(jbuf) == 0)
-+		test_mov(ptr);
-+
-+	if (lam_enumerated && (read_cr4() & X86_CR4_LAM_SUP))
-+		report(gp_count == 0, "MMIO cpy test for emulator succeed");
-+	else
-+		report(gp_count > 0, "MMIO cpy test for emulator cause #GP");
-+
+ 	svm_set_intercept(svm, INTERCEPT_VINTR);
+ 
 +	/*
-+	 * Restore old #GP handler, though mostly likely effectively
-+	 * unnecessary, for symmetry and conservativeness.
++	 * Recalculating intercepts may have clear the VINTR intercept.  If
++	 * V_INTR_MASKING is enabled in vmcb12, then the effective RFLAGS.IF
++	 * for L1 physical interrupts is L1's RFLAGS.IF at the time of VMRUN.
++	 * Requesting an interrupt window if save.RFLAGS.IF=0 is pointless as
++	 * interrupts will never be unblocked while L2 is running.
 +	 */
-+	handle_exception(GP_VECTOR, old);
++	if (!svm_is_intercept(svm, INTERCEPT_VINTR))
++		return;
 +
-+	return report_summary();
-+}
-+
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index f324e32..08a9b20 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -478,3 +478,13 @@ file = cet.flat
- arch = x86_64
- smp = 2
- extra_params = -enable-kvm -m 2048 -cpu host
-+
-+[intel-lam]
-+file = lam_sup.flat
-+arch = x86_64
-+extra_params = -enable-kvm -cpu host
-+
-+[intel-no-lam]
-+file = lam_sup.flat
-+arch = x86_64
-+extra_params = -enable-kvm -cpu host,-lam
-
-base-commit: e3c5c3ef2524c58023073c0fadde2e8ae3c04ec6
+ 	/*
+ 	 * This is just a dummy VINTR to actually cause a vmexit to happen.
+ 	 * Actual injection of virtual interrupts happens through EVENTINJ.
 -- 
-2.31.1
+2.25.1
 
