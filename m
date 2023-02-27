@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C3676A3CBB
-	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 09:26:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D9BA6A3C87
+	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 09:25:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231383AbjB0I0x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Feb 2023 03:26:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55130 "EHLO
+        id S230387AbjB0IZO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Feb 2023 03:25:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230328AbjB0IYi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Feb 2023 03:24:38 -0500
+        with ESMTP id S230205AbjB0IYu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Feb 2023 03:24:50 -0500
 Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 670C21A652;
-        Mon, 27 Feb 2023 00:24:13 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E000D1C303;
+        Mon, 27 Feb 2023 00:24:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677486253; x=1709022253;
+  t=1677486254; x=1709022254;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=PWnXznMMeziyc9Hs5eWqvj28CFaE86kvU5fCx1QnDYQ=;
-  b=a1eiobxWh7MTIwaqmjarhVCqzC/xE+C76wCx+OItVP2fJCyyCeyVt0B2
-   BgdbEPR0bp6BdnhhRqu8eKASG3gl1spsufJ6f5ucP3T8EyhBJRDR1p71G
-   aJCa27Gy7P4n9O9HeIBHPX3gzI5P9zTNonQOgCCL7obBHhkzITYvbv8F5
-   bx538BAgd1dhezw/SusNTehfuHR0zki3blBAvg12UtatsyFx718kRAyBX
-   4uiTbQdCyeFr1/vgbBuyosF/agPvE/f6amcvvdIEpS0chEjSKJGjfLvkS
-   WbyhF/xDLBV/rzh19jV10mzjOLL5sFSKNbZgFQQHzxx3QDNVjPqtEeIFK
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10633"; a="317608757"
+  bh=VCu6jpU86EpIGkSblys4cK9cOLbJ9NW8iFkKQFkQpM8=;
+  b=jWA301taI8CSjvpcBBX/CfAsMLJGYVhNI9gU/28WH0YwkKcLDiE8+OoW
+   jbjqRyTlGTlLnRkz7zpVhWRUpPeESoLvfjzqYCEThHt5ZZd9lqpQ80IRG
+   4hi/MBHosrFmqfUBqvW4701+0DM07sMlMjQXMsSmnxd+oocuqxGMhQhBV
+   6miq0G/AYb6odJTtTY9vNMsGNWIfrHFLgdAJFGIvPFkBdTzrO472bm3Ll
+   El0v0t61dmFAeSmjsnAFS7S7PL3ugLEEkVyTrM3YIqyjDDLccEp+ZVxh9
+   0acsIVUIMzGgDS/Dnw5xDvFyOor2VCmSwg6Tc+wb3xot9yjjCXc5AA31w
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10633"; a="317608759"
 X-IronPort-AV: E=Sophos;i="5.97,331,1669104000"; 
-   d="scan'208";a="317608757"
+   d="scan'208";a="317608759"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
   by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2023 00:24:05 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10633"; a="783242122"
+X-IronPort-AV: E=McAfee;i="6500,9779,10633"; a="783242129"
 X-IronPort-AV: E=Sophos;i="5.97,331,1669104000"; 
-   d="scan'208";a="783242122"
+   d="scan'208";a="783242129"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2023 00:24:04 -0800
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2023 00:24:05 -0800
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
@@ -46,9 +46,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         David Matlack <dmatlack@google.com>,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>
-Subject: [PATCH v12 023/106] [MARKER] The start of TDX KVM patch series: KVM TDP refactoring for TDX
-Date:   Mon, 27 Feb 2023 00:22:22 -0800
-Message-Id: <3b8904822cc7ae6fd813a76e02fb741838f79094.1677484918.git.isaku.yamahata@intel.com>
+Subject: [PATCH v12 024/106] KVM: Allow page-sized MMU caches to be initialized with custom 64-bit values
+Date:   Mon, 27 Feb 2023 00:22:23 -0800
+Message-Id: <de154ee8d96bd337d0c9ae82d2ababad059decb4.1677484918.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1677484918.git.isaku.yamahata@intel.com>
 References: <cover.1677484918.git.isaku.yamahata@intel.com>
@@ -63,29 +63,72 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+From: Sean Christopherson <seanjc@google.com>
 
-This empty commit is to mark the start of patch series of KVM TDP
-refactoring for TDX.
+Add support to MMU caches for initializing a page with a custom 64-bit
+value, e.g. to pre-fill an entire page table with non-zero PTE values.
+The functionality will be used by x86 to support Intel's TDX, which needs
+to set bit 63 in all non-present PTEs in order to prevent !PRESENT page
+faults from getting reflected into the guest (Intel's EPT Violation #VE
+architecture made the less than brilliant decision of having the per-PTE
+behavior be opt-out instead of opt-in).
 
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- Documentation/virt/kvm/intel-tdx-layer-status.rst | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/linux/kvm_types.h |  1 +
+ virt/kvm/kvm_main.c       | 16 ++++++++++++++--
+ 2 files changed, 15 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/virt/kvm/intel-tdx-layer-status.rst b/Documentation/virt/kvm/intel-tdx-layer-status.rst
-index 88343749d4c2..f10aff0b060e 100644
---- a/Documentation/virt/kvm/intel-tdx-layer-status.rst
-+++ b/Documentation/virt/kvm/intel-tdx-layer-status.rst
-@@ -24,6 +24,6 @@ Patch Layer status
- * TD vcpu enter/exit:                   Not yet
- * TD vcpu interrupts/exit/hypercall:    Not yet
+diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+index 2728d49bbdf6..7c2b9332b7c5 100644
+--- a/include/linux/kvm_types.h
++++ b/include/linux/kvm_types.h
+@@ -94,6 +94,7 @@ struct kvm_mmu_memory_cache {
+ 	int nobjs;
+ 	gfp_t gfp_zero;
+ 	gfp_t gfp_custom;
++	u64 init_value;
+ 	struct kmem_cache *kmem_cache;
+ 	int capacity;
+ 	void **objects;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index f8495e27d210..87400796df6e 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -381,12 +381,17 @@ static void kvm_flush_shadow_all(struct kvm *kvm)
+ static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
+ 					       gfp_t gfp_flags)
+ {
++	void *page;
++
+ 	gfp_flags |= mc->gfp_zero;
  
--* KVM MMU GPA shared bits:              Applying
--* KVM TDP refactoring for TDX:          Not yet
-+* KVM MMU GPA shared bits:              Applied
-+* KVM TDP refactoring for TDX:          Applying
- * KVM TDP MMU hooks:                    Not yet
+ 	if (mc->kmem_cache)
+ 		return kmem_cache_alloc(mc->kmem_cache, gfp_flags);
+-	else
+-		return (void *)__get_free_page(gfp_flags);
++
++	page = (void *)__get_free_page(gfp_flags);
++	if (page && mc->init_value)
++		memset64(page, mc->init_value, PAGE_SIZE / sizeof(mc->init_value));
++	return page;
+ }
+ 
+ int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity, int min)
+@@ -401,6 +406,13 @@ int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity,
+ 		if (WARN_ON_ONCE(!capacity))
+ 			return -EIO;
+ 
++		/*
++		 * Custom init values can be used only for page allocations,
++		 * and obviously conflict with __GFP_ZERO.
++		 */
++		if (WARN_ON_ONCE(mc->init_value && (mc->kmem_cache || mc->gfp_zero)))
++			return -EIO;
++
+ 		mc->objects = kvmalloc_array(sizeof(void *), capacity, gfp);
+ 		if (!mc->objects)
+ 			return -ENOMEM;
 -- 
 2.25.1
 
