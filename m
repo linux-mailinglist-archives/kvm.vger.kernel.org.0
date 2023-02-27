@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C812B6A3C71
-	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 09:24:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D4E556A3C72
+	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 09:24:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230299AbjB0IYc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Feb 2023 03:24:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55030 "EHLO
+        id S230305AbjB0IYd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Feb 2023 03:24:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229560AbjB0IYM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Feb 2023 03:24:12 -0500
+        with ESMTP id S230189AbjB0IYN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Feb 2023 03:24:13 -0500
 Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95142EC50;
-        Mon, 27 Feb 2023 00:24:09 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F0D51165A;
+        Mon, 27 Feb 2023 00:24:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677486249; x=1709022249;
+  t=1677486250; x=1709022250;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=aUkxk0K+ujM2vXAltuKHLqNEsWK1nhlL3i5SZD9Eemg=;
-  b=k8xV4BU8nj7T4b4gMDQlkzLq1nrvUBY7buCrApA6MMnWZ/2X+b8rBpNX
-   eDih0Yiw/ACOCKNXfsgy1wHHlLIlygNq04bDzQf1Q6hL6wikApiDhzDgF
-   A5YpUbPkL6fvjY0k4gh2ARXCIs4lEv0Ag1m4dWuTAqzhESTr06ovF9DsG
-   GNMbZWQVcD/Gp3gF/GX/9k3HJmrOK4OjY1EW7lDMg/L2c+zvM7k+bXiNr
-   3MgoOXtyl+yDDSEq4fInCxqKIJnkB3jxNIsxOo8lRbjWBBqDg4ASydmUv
-   Pwe5he6lQetZPFDV7UtaydKIf+TY0pKAK0rP/seA163X8FbvBDog/0Nuu
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10633"; a="317608719"
+  bh=zCc6NW7WYHgo5usOtP96CBCwLP0H+JhEtaoEGU4OuyU=;
+  b=Z4gyfwj8+8Uz0vJ1EPp4mowFiOgugKHuZlDNi2f/QyBQJ4Hgz8D69VHr
+   haa2DAfVExPtoqg9pRYHdXMNVu5FGrqzXv8Tu4tc2pigS1zNY6I1A5xqk
+   29PuT17xtLkEALFhaGp3r74aqIiiuPhcL+J0C6bTL5Itjg8NsgFE25QOU
+   nRbofBFfwwKEy1mLt1kzTU1YpPtbGahI9aWaLDV/3T7tuk+CLLxg22yBg
+   GlncoabpYGTAWZyRrhfOC3ZU6d/0T/D9nzzBEXlZrIcuvCnsMeQI6s3TK
+   LxTw3o4O2WrceTPSiD1h4eJYRsP9KcxN5uVwkZj9hFDUhV8seVPgHndzU
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10633"; a="317608724"
 X-IronPort-AV: E=Sophos;i="5.97,331,1669104000"; 
-   d="scan'208";a="317608719"
+   d="scan'208";a="317608724"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
   by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2023 00:24:03 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10633"; a="783242060"
+X-IronPort-AV: E=McAfee;i="6500,9779,10633"; a="783242067"
 X-IronPort-AV: E=Sophos;i="5.97,331,1669104000"; 
-   d="scan'208";a="783242060"
+   d="scan'208";a="783242067"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2023 00:24:03 -0800
 From:   isaku.yamahata@intel.com
@@ -46,9 +46,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         David Matlack <dmatlack@google.com>,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>
-Subject: [PATCH v12 015/106] KVM: TDX: Make pmu_intel.c ignore guest TD case
-Date:   Mon, 27 Feb 2023 00:22:14 -0800
-Message-Id: <0fbac4f1a4c25536cd53ad2194ee1b25d17d1702.1677484918.git.isaku.yamahata@intel.com>
+Subject: [PATCH v12 016/106] KVM: TDX: Refuse to unplug the last cpu on the package
+Date:   Mon, 27 Feb 2023 00:22:15 -0800
+Message-Id: <2569a9b652be6e69ef69b5a930cdb170f773b4aa.1677484918.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1677484918.git.isaku.yamahata@intel.com>
 References: <cover.1677484918.git.isaku.yamahata@intel.com>
@@ -65,243 +65,210 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Because TDX KVM doesn't support PMU yet (it's future work of TDX KVM
-support as another patch series) and pmu_intel.c touches vmx specific
-structure in vcpu initialization, as workaround add dummy structure to
-struct vcpu_tdx and pmu_intel.c can ignore TDX case.
+In order to reclaim TDX HKID, (i.e. when deleting guest TD), needs to call
+TDH.PHYMEM.PAGE.WBINVD on all packages.  If we have active TDX HKID, refuse
+to offline the last online cpu to guarantee at least one CPU online per
+package. Add arch callback for cpu offline.
+Because TDX doesn't support suspend by the TDX 1.0 spec, this also refuses
+suspend if TDs are running.  If no TD is running, suspend is allowed.
 
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/pmu_intel.c | 46 +++++++++++++++++++++++++++++++++++-
- arch/x86/kvm/vmx/pmu_intel.h | 28 ++++++++++++++++++++++
- arch/x86/kvm/vmx/tdx.h       |  8 ++++++-
- arch/x86/kvm/vmx/vmx.c       |  2 +-
- arch/x86/kvm/vmx/vmx.h       | 32 +------------------------
- 5 files changed, 82 insertions(+), 34 deletions(-)
- create mode 100644 arch/x86/kvm/vmx/pmu_intel.h
+ arch/x86/include/asm/kvm-x86-ops.h |  1 +
+ arch/x86/include/asm/kvm_host.h    |  1 +
+ arch/x86/kvm/vmx/main.c            |  1 +
+ arch/x86/kvm/vmx/tdx.c             | 43 +++++++++++++++++++++++++++++-
+ arch/x86/kvm/vmx/x86_ops.h         |  2 ++
+ arch/x86/kvm/x86.c                 |  5 ++++
+ include/linux/kvm_host.h           |  1 +
+ virt/kvm/kvm_main.c                | 12 +++++++--
+ 8 files changed, 63 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index efce9ad70e4e..39f43b0290c5 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -19,6 +19,7 @@
- #include "lapic.h"
- #include "nested.h"
- #include "pmu.h"
-+#include "tdx.h"
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index c30d2d2ad686..f763981b7dbc 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -18,6 +18,7 @@ KVM_X86_OP(check_processor_compatibility)
+ KVM_X86_OP(hardware_enable)
+ KVM_X86_OP(hardware_disable)
+ KVM_X86_OP(hardware_unsetup)
++KVM_X86_OP_OPTIONAL_RET0(offline_cpu)
+ KVM_X86_OP(has_emulated_msr)
+ KVM_X86_OP(vcpu_after_set_cpuid)
+ KVM_X86_OP(is_vm_type_supported)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index f4e82ee3d668..5ca84fd5bd43 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1543,6 +1543,7 @@ struct kvm_x86_ops {
+ 	int (*hardware_enable)(void);
+ 	void (*hardware_disable)(void);
+ 	void (*hardware_unsetup)(void);
++	int (*offline_cpu)(void);
+ 	bool (*has_emulated_msr)(struct kvm *kvm, u32 index);
+ 	void (*vcpu_after_set_cpuid)(struct kvm_vcpu *vcpu);
  
- #define MSR_PMC_FULL_WIDTH_BIT      (MSR_IA32_PMC0 - MSR_IA32_PERFCTR0)
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index cdc73c09bf0b..a15ee25d47e0 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -108,6 +108,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.check_processor_compatibility = vmx_check_processor_compat,
  
-@@ -37,6 +38,26 @@ static struct kvm_event_hw_type_mapping intel_arch_events[] = {
- /* mapping between fixed pmc index and intel_arch_events array */
- static int fixed_pmc_events[] = {1, 0, 7};
+ 	.hardware_unsetup = vt_hardware_unsetup,
++	.offline_cpu = tdx_offline_cpu,
  
-+struct lbr_desc *vcpu_to_lbr_desc(struct kvm_vcpu *vcpu)
-+{
-+#ifdef CONFIG_INTEL_TDX_HOST
-+	if (is_td_vcpu(vcpu))
-+		return &to_tdx(vcpu)->lbr_desc;
-+#endif
-+
-+	return &to_vmx(vcpu)->lbr_desc;
-+}
-+
-+struct x86_pmu_lbr *vcpu_to_lbr_records(struct kvm_vcpu *vcpu)
-+{
-+#ifdef CONFIG_INTEL_TDX_HOST
-+	if (is_td_vcpu(vcpu))
-+		return &to_tdx(vcpu)->lbr_desc.records;
-+#endif
-+
-+	return &to_vmx(vcpu)->lbr_desc.records;
-+}
-+
- static void reprogram_fixed_counters(struct kvm_pmu *pmu, u64 data)
+ 	.hardware_enable = vmx_hardware_enable,
+ 	.hardware_disable = vmx_hardware_disable,
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index b172fcb075b2..8d657bacc050 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -63,6 +63,7 @@ static struct tdx_info tdx_info;
+  */
+ static DEFINE_MUTEX(tdx_lock);
+ static struct mutex *tdx_mng_key_config_lock;
++static atomic_t nr_configured_hkid;
+ 
+ static __always_inline hpa_t set_hkid_to_hpa(hpa_t pa, u16 hkid)
  {
- 	struct kvm_pmc *pmc;
-@@ -169,6 +190,23 @@ static inline struct kvm_pmc *get_fw_gp_pmc(struct kvm_pmu *pmu, u32 msr)
- 	return get_gp_pmc(pmu, msr, MSR_IA32_PMC0);
+@@ -238,7 +239,8 @@ void tdx_mmu_release_hkid(struct kvm *kvm)
+ 		pr_err("tdh_mng_key_freeid failed. HKID %d is leaked.\n",
+ 			kvm_tdx->hkid);
+ 		return;
+-	}
++	} else
++		atomic_dec(&nr_configured_hkid);
+ 
+ free_hkid:
+ 	tdx_hkid_free(kvm_tdx);
+@@ -615,6 +617,8 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params)
+ 		if (ret)
+ 			break;
+ 	}
++	if (!ret)
++		atomic_inc(&nr_configured_hkid);
+ 	cpus_read_unlock();
+ 	free_cpumask_var(packages);
+ 	if (ret)
+@@ -833,3 +837,40 @@ void tdx_hardware_unsetup(void)
+ 	/* kfree accepts NULL. */
+ 	kfree(tdx_mng_key_config_lock);
  }
- 
-+bool intel_pmu_lbr_is_compatible(struct kvm_vcpu *vcpu)
++
++int tdx_offline_cpu(void)
 +{
-+	if (is_td_vcpu(vcpu))
-+		return false;
-+	return cpuid_model_is_consistent(vcpu);
-+}
++	int curr_cpu = smp_processor_id();
++	cpumask_var_t packages;
++	int ret = 0;
++	int i;
 +
-+bool intel_pmu_lbr_is_enabled(struct kvm_vcpu *vcpu)
-+{
-+	struct x86_pmu_lbr *lbr = vcpu_to_lbr_records(vcpu);
-+
-+	if (is_td_vcpu(vcpu))
-+		return false;
-+
-+	return lbr->nr && (vcpu_get_perf_capabilities(vcpu) & PMU_CAP_LBR_FMT);
-+}
-+
- static bool intel_pmu_is_valid_lbr_msr(struct kvm_vcpu *vcpu, u32 index)
- {
- 	struct x86_pmu_lbr *records = vcpu_to_lbr_records(vcpu);
-@@ -279,6 +317,9 @@ int intel_pmu_create_guest_lbr_event(struct kvm_vcpu *vcpu)
- 					PERF_SAMPLE_BRANCH_USER,
- 	};
- 
-+	if (WARN_ON_ONCE(is_td_vcpu(vcpu)))
++	/* No TD is running.  Allow any cpu to be offline. */
++	if (!atomic_read(&nr_configured_hkid))
 +		return 0;
 +
- 	if (unlikely(lbr_desc->event)) {
- 		__set_bit(INTEL_PMC_IDX_FIXED_VLBR, pmu->pmc_in_use);
- 		return 0;
-@@ -588,7 +629,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 		INTEL_PMC_MAX_GENERIC, pmu->nr_arch_fixed_counters);
- 
- 	perf_capabilities = vcpu_get_perf_capabilities(vcpu);
--	if (cpuid_model_is_consistent(vcpu) &&
-+	if (intel_pmu_lbr_is_compatible(vcpu) &&
- 	    (perf_capabilities & PMU_CAP_LBR_FMT))
- 		x86_perf_get_lbr(&lbr_desc->records);
- 	else
-@@ -644,6 +685,9 @@ static void intel_pmu_reset(struct kvm_vcpu *vcpu)
- 	struct kvm_pmc *pmc = NULL;
- 	int i;
- 
-+	if (is_td_vcpu(vcpu))
-+		return;
-+
- 	for (i = 0; i < KVM_INTEL_PMC_MAX_GENERIC; i++) {
- 		pmc = &pmu->gp_counters[i];
- 
-diff --git a/arch/x86/kvm/vmx/pmu_intel.h b/arch/x86/kvm/vmx/pmu_intel.h
-new file mode 100644
-index 000000000000..66bba47c1269
---- /dev/null
-+++ b/arch/x86/kvm/vmx/pmu_intel.h
-@@ -0,0 +1,28 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef __KVM_X86_VMX_PMU_INTEL_H
-+#define  __KVM_X86_VMX_PMU_INTEL_H
-+
-+struct lbr_desc *vcpu_to_lbr_desc(struct kvm_vcpu *vcpu);
-+struct x86_pmu_lbr *vcpu_to_lbr_records(struct kvm_vcpu *vcpu);
-+
-+bool intel_pmu_lbr_is_compatible(struct kvm_vcpu *vcpu);
-+bool intel_pmu_lbr_is_enabled(struct kvm_vcpu *vcpu);
-+int intel_pmu_create_guest_lbr_event(struct kvm_vcpu *vcpu);
-+
-+struct lbr_desc {
-+	/* Basic info about guest LBR records. */
-+	struct x86_pmu_lbr records;
-+
 +	/*
-+	 * Emulate LBR feature via passthrough LBR registers when the
-+	 * per-vcpu guest LBR event is scheduled on the current pcpu.
-+	 *
-+	 * The records may be inaccurate if the host reclaims the LBR.
++	 * In order to reclaim TDX HKID, (i.e. when deleting guest TD), need to
++	 * call TDH.PHYMEM.PAGE.WBINVD on all packages to program all memory
++	 * controller with pconfig.  If we have active TDX HKID, refuse to
++	 * offline the last online cpu.
 +	 */
-+	struct perf_event *event;
-+
-+	/* True if LBRs are marked as not intercepted in the MSR bitmap */
-+	bool msr_passthrough;
-+};
-+
-+#endif /* __KVM_X86_VMX_PMU_INTEL_H */
-diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-index 1e00e75b1c5e..5728820fed5e 100644
---- a/arch/x86/kvm/vmx/tdx.h
-+++ b/arch/x86/kvm/vmx/tdx.h
-@@ -4,6 +4,7 @@
++	if (!zalloc_cpumask_var(&packages, GFP_KERNEL))
++		return -ENOMEM;
++	for_each_online_cpu(i) {
++		if (i != curr_cpu)
++			cpumask_set_cpu(topology_physical_package_id(i), packages);
++	}
++	/* Check if this cpu is the last online cpu of this package. */
++	if (!cpumask_test_cpu(topology_physical_package_id(curr_cpu), packages))
++		ret = -EBUSY;
++	free_cpumask_var(packages);
++	if (ret)
++		/*
++		 * Because it's hard for human operator to understand the
++		 * reason, warn it.
++		 */
++		pr_warn_ratelimited("TDX requires all packages to have an online CPU. "
++				    "Delete all TDs in order to offline all CPUs of a package.\n");
++	return ret;
++}
+diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+index e497a5347329..4960e7d58add 100644
+--- a/arch/x86/kvm/vmx/x86_ops.h
++++ b/arch/x86/kvm/vmx/x86_ops.h
+@@ -142,6 +142,7 @@ int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
+ void tdx_hardware_unsetup(void);
+ bool tdx_is_vm_type_supported(unsigned long type);
+ int tdx_dev_ioctl(void __user *argp);
++int tdx_offline_cpu(void);
  
- #ifdef CONFIG_INTEL_TDX_HOST
+ int tdx_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
+ int tdx_vm_init(struct kvm *kvm);
+@@ -153,6 +154,7 @@ static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return -ENOS
+ static inline void tdx_hardware_unsetup(void) {}
+ static inline bool tdx_is_vm_type_supported(unsigned long type) { return false; }
+ static inline int tdx_dev_ioctl(void __user *argp) { return -EOPNOTSUPP; };
++static inline int tdx_offline_cpu(void) { return 0; }
  
-+#include "pmu_intel.h"
- #include "tdx_ops.h"
- 
- struct kvm_tdx {
-@@ -21,7 +22,12 @@ struct kvm_tdx {
- 
- struct vcpu_tdx {
- 	struct kvm_vcpu	vcpu;
--	/* TDX specific members follow. */
-+
-+	/*
-+	 * Dummy to make pmu_intel not corrupt memory.
-+	 * TODO: Support PMU for TDX.  Future work.
-+	 */
-+	struct lbr_desc lbr_desc;
- };
- 
- static inline bool is_td(struct kvm *kvm)
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index bddbdd2988f4..5d2ff4d964bd 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2434,7 +2434,7 @@ int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 			if ((data & PMU_CAP_LBR_FMT) !=
- 			    (kvm_caps.supported_perf_cap & PMU_CAP_LBR_FMT))
- 				return 1;
--			if (!cpuid_model_is_consistent(vcpu))
-+			if (!intel_pmu_lbr_is_compatible(vcpu))
- 				return 1;
- 		}
- 		if (data & PERF_CAP_PEBS_FORMAT) {
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index a3da84f4ea45..d49d0ace9fb8 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -11,6 +11,7 @@
- #include "capabilities.h"
- #include "../kvm_cache_regs.h"
- #include "posted_intr.h"
-+#include "pmu_intel.h"
- #include "vmcs.h"
- #include "vmx_ops.h"
- #include "../cpuid.h"
-@@ -105,22 +106,6 @@ static inline bool intel_pmu_has_perf_global_ctrl(struct kvm_pmu *pmu)
- 	return pmu->version > 1;
+ static inline int tdx_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap) { return -EINVAL; };
+ static inline int tdx_vm_init(struct kvm *kvm) { return -EOPNOTSUPP; }
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index b2dd5670f552..a2a2d62d490a 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12119,6 +12119,11 @@ void kvm_arch_hardware_disable(void)
+ 	drop_user_return_notifiers();
  }
  
--struct lbr_desc {
--	/* Basic info about guest LBR records. */
--	struct x86_pmu_lbr records;
--
--	/*
--	 * Emulate LBR feature via passthrough LBR registers when the
--	 * per-vcpu guest LBR event is scheduled on the current pcpu.
--	 *
--	 * The records may be inaccurate if the host reclaims the LBR.
--	 */
--	struct perf_event *event;
--
--	/* True if LBRs are marked as not intercepted in the MSR bitmap */
--	bool msr_passthrough;
--};
--
- /*
-  * The nested_vmx structure is part of vcpu_vmx, and holds information we need
-  * for correct emulation of VMX (i.e., nested VMX) on this vcpu.
-@@ -650,21 +635,6 @@ static inline struct vcpu_vmx *to_vmx(struct kvm_vcpu *vcpu)
- 	return container_of(vcpu, struct vcpu_vmx, vcpu);
++int kvm_arch_offline_cpu(unsigned int cpu)
++{
++	return static_call(kvm_x86_offline_cpu)();
++}
++
+ bool kvm_vcpu_is_reset_bsp(struct kvm_vcpu *vcpu)
+ {
+ 	return vcpu->kvm->arch.bsp_vcpu_id == vcpu->vcpu_id;
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 7b0bef248dd8..f6470338d5fa 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1478,6 +1478,7 @@ static inline void kvm_create_vcpu_debugfs(struct kvm_vcpu *vcpu) {}
+ int kvm_arch_hardware_enable(void);
+ void kvm_arch_hardware_disable(void);
+ #endif
++int kvm_arch_offline_cpu(unsigned int cpu);
+ int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu);
+ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu);
+ int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu);
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 3f1a55834440..f8495e27d210 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -5509,13 +5509,21 @@ static void hardware_disable_nolock(void *junk)
+ 	__this_cpu_write(hardware_enabled, false);
  }
  
--static inline struct lbr_desc *vcpu_to_lbr_desc(struct kvm_vcpu *vcpu)
--{
--	return &to_vmx(vcpu)->lbr_desc;
--}
--
--static inline struct x86_pmu_lbr *vcpu_to_lbr_records(struct kvm_vcpu *vcpu)
--{
--	return &vcpu_to_lbr_desc(vcpu)->records;
--}
--
--static inline bool intel_pmu_lbr_is_enabled(struct kvm_vcpu *vcpu)
--{
--	return !!vcpu_to_lbr_records(vcpu)->nr;
--}
--
- void intel_pmu_cross_mapped_check(struct kvm_pmu *pmu);
- int intel_pmu_create_guest_lbr_event(struct kvm_vcpu *vcpu);
- void vmx_passthrough_lbr_msrs(struct kvm_vcpu *vcpu);
++__weak int kvm_arch_offline_cpu(unsigned int cpu)
++{
++	return 0;
++}
++
+ static int kvm_offline_cpu(unsigned int cpu)
+ {
++	int r = 0;
++
+ 	mutex_lock(&kvm_lock);
+-	if (kvm_usage_count)
++	r = kvm_arch_offline_cpu(cpu);
++	if (!r && kvm_usage_count)
+ 		hardware_disable_nolock(NULL);
+ 	mutex_unlock(&kvm_lock);
+-	return 0;
++	return r;
+ }
+ 
+ static void hardware_disable_all_nolock(void)
 -- 
 2.25.1
 
