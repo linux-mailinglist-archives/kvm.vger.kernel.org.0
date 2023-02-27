@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A1076A3C6C
-	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 09:24:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 859456A3C6B
+	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 09:24:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230263AbjB0IY0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Feb 2023 03:24:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54810 "EHLO
+        id S230254AbjB0IYZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Feb 2023 03:24:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230157AbjB0IYJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230162AbjB0IYJ (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 27 Feb 2023 03:24:09 -0500
 Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B22E41165A;
-        Mon, 27 Feb 2023 00:24:07 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 878C01B56A;
+        Mon, 27 Feb 2023 00:24:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677486247; x=1709022247;
+  t=1677486248; x=1709022248;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=vt6CFftujemCX1PnCsrk85Rf20s9RBT08Ts/E/nchBc=;
-  b=C5KsLI+X4tw7SKCG6HQJDPsGAW9hCGZVXlDxd3Ea52TJOsLComf637ms
-   SCPMmEEccQ3sXGSmc+Y46QYXjor6i6bGoUtcbV45KVBKxHalXATA74IPh
-   a68+62eCzlizgBaiV8c1IOiPy0OIky/cw5H1v7YESFz6F3t9Cn5Xw8Drv
-   RO1HRdpft9MpkxnZX0EgaXzPHuboLV42E2F2+g7gG5g6aCjFbRMshDHDD
-   iUmF0qFnTUlc8C/RFfMmUmdHfQ+CChpbt334tlmqlJ9MRffQpPUSj30SS
-   oX7bFwY0H+O84nHJ2Wg3KQ5ZRWvpih+Q86/wVcn11BDlhJadqcu/9mAXo
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10633"; a="317608700"
+  bh=ZHtH5cD+sidHdCeHBrWYu6ZRCepDrZPF+TBklpC+idg=;
+  b=QmvguWykQ707u+UBZ3vMGTw5NcHoVZtVruPyeP5ffPiQsXSfdHBtZTze
+   m/jfmbIzkXdagwzpeQEJZMhMd5/pHiq4n+1VhiYaLoKjiMLxgypuUyMEv
+   +FRdwCD3HhzyvqyXn8/RSO+SaLisKk3NmAqKBrB196YnexZBiMTpPL4zq
+   Nn9r+BIM+//m4yH1GL9QbWqrz+jbYcYNMghgz6sGZi4BLZUpqyuku2pWD
+   YlZ5YsR1HUJFb+uJwmEkapW0/PoxCsYqCK+Kwi9GceLPkTLQzNSWL7YH4
+   43iZtUrKEylXnqcAnpV4i3NTGPwUvQeEBeVJD9pQZphpPkb2AzsveAcgf
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10633"; a="317608705"
 X-IronPort-AV: E=Sophos;i="5.97,331,1669104000"; 
-   d="scan'208";a="317608700"
+   d="scan'208";a="317608705"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2023 00:24:02 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10633"; a="783242041"
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2023 00:24:03 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10633"; a="783242044"
 X-IronPort-AV: E=Sophos;i="5.97,331,1669104000"; 
-   d="scan'208";a="783242041"
+   d="scan'208";a="783242044"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2023 00:24:02 -0800
 From:   isaku.yamahata@intel.com
@@ -46,9 +46,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         David Matlack <dmatlack@google.com>,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>
-Subject: [PATCH v12 010/106] KVM: TDX: Add place holder for TDX VM specific mem_enc_op ioctl
-Date:   Mon, 27 Feb 2023 00:22:09 -0800
-Message-Id: <4e6cea32d83276bb887c1e484cb8389fa5728df7.1677484918.git.isaku.yamahata@intel.com>
+Subject: [PATCH v12 011/106] KVM: x86, tdx: Make KVM_CAP_MAX_VCPUS backend specific
+Date:   Mon, 27 Feb 2023 00:22:10 -0800
+Message-Id: <ec9ee6f90f8c5702baee7f70e03caa2f4e92adf7.1677484918.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1677484918.git.isaku.yamahata@intel.com>
 References: <cover.1677484918.git.isaku.yamahata@intel.com>
@@ -65,141 +65,92 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Add a place holder function for TDX specific VM-scoped ioctl as mem_enc_op.
-TDX specific sub-commands will be added to retrieve/pass TDX specific
-parameters.  Make mem_enc_ioctl non-optional as it's not optional now.
-
-KVM_MEMORY_ENCRYPT_OP was introduced for VM-scoped operations specific for
-guest state-protected VM.  It defined subcommands for technology-specific
-operations under KVM_MEMORY_ENCRYPT_OP.  Despite its name, the subcommands
-are not limited to memory encryption, but various technology-specific
-operations are defined.  It's natural to repurpose KVM_MEMORY_ENCRYPT_OP
-for TDX specific operations and define subcommands.
-
-TDX requires VM-scoped TDX-specific operations for device model, for
-example, qemu.  Getting system-wide parameters, TDX-specific VM
-initialization.
+TDX has its own limitation on the maximum number of vcpus.  Make it backend
+specific and return TDX specific value for KVM_CAP_MAX_VCPUS.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/include/asm/kvm-x86-ops.h |  2 +-
- arch/x86/kvm/vmx/main.c            |  9 +++++++++
- arch/x86/kvm/vmx/tdx.c             | 26 ++++++++++++++++++++++++++
- arch/x86/kvm/vmx/x86_ops.h         |  4 ++++
- arch/x86/kvm/x86.c                 |  4 ----
- 5 files changed, 40 insertions(+), 5 deletions(-)
+ arch/x86/include/asm/kvm-x86-ops.h |  1 +
+ arch/x86/include/asm/kvm_host.h    |  1 +
+ arch/x86/kvm/vmx/main.c            | 13 +++++++++++++
+ arch/x86/kvm/x86.c                 |  2 ++
+ 4 files changed, 17 insertions(+)
 
 diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index b46dcac078b2..58fbaa05fc8c 100644
+index 58fbaa05fc8c..6914f1d61803 100644
 --- a/arch/x86/include/asm/kvm-x86-ops.h
 +++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -117,7 +117,7 @@ KVM_X86_OP(enter_smm)
- KVM_X86_OP(leave_smm)
- KVM_X86_OP(enable_smi_window)
- #endif
--KVM_X86_OP_OPTIONAL(dev_mem_enc_ioctl)
-+KVM_X86_OP(dev_mem_enc_ioctl)
- KVM_X86_OP_OPTIONAL(mem_enc_ioctl)
- KVM_X86_OP_OPTIONAL(mem_enc_register_region)
- KVM_X86_OP_OPTIONAL(mem_enc_unregister_region)
+@@ -21,6 +21,7 @@ KVM_X86_OP(hardware_unsetup)
+ KVM_X86_OP(has_emulated_msr)
+ KVM_X86_OP(vcpu_after_set_cpuid)
+ KVM_X86_OP(is_vm_type_supported)
++KVM_X86_OP_OPTIONAL(max_vcpus);
+ KVM_X86_OP(vm_init)
+ KVM_X86_OP_OPTIONAL(vm_destroy)
+ KVM_X86_OP_OPTIONAL_RET0(vcpu_precreate)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 58fc697095fd..1c761c9e1edb 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1547,6 +1547,7 @@ struct kvm_x86_ops {
+ 	void (*vcpu_after_set_cpuid)(struct kvm_vcpu *vcpu);
+ 
+ 	bool (*is_vm_type_supported)(unsigned long vm_type);
++	int (*max_vcpus)(struct kvm *kvm);
+ 	unsigned int vm_size;
+ 	int (*vm_init)(struct kvm *kvm);
+ 	void (*vm_destroy)(struct kvm *kvm);
 diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 620742d98ed3..d90da9fd75bf 100644
+index d90da9fd75bf..41c2e4a1b157 100644
 --- a/arch/x86/kvm/vmx/main.c
 +++ b/arch/x86/kvm/vmx/main.c
-@@ -37,6 +37,14 @@ static int vt_vm_init(struct kvm *kvm)
- 	return vmx_vm_init(kvm);
+@@ -6,6 +6,7 @@
+ #include "nested.h"
+ #include "pmu.h"
+ #include "tdx.h"
++#include "tdx_arch.h"
+ 
+ static bool enable_tdx __ro_after_init;
+ module_param_named(tdx, enable_tdx, bool, 0444);
+@@ -16,6 +17,17 @@ static bool vt_is_vm_type_supported(unsigned long type)
+ 		(enable_tdx && tdx_is_vm_type_supported(type));
  }
  
-+static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
++static int vt_max_vcpus(struct kvm *kvm)
 +{
-+	if (!is_td(kvm))
-+		return -ENOTTY;
++	if (!kvm)
++		return KVM_MAX_VCPUS;
 +
-+	return tdx_vm_ioctl(kvm, argp);
++	if (is_td(kvm))
++		return min3(kvm->max_vcpus, KVM_MAX_VCPUS, TDX_MAX_VCPUS);
++
++	return kvm->max_vcpus;
 +}
 +
- #define VMX_REQUIRED_APICV_INHIBITS		       \
- (						       \
-        BIT(APICV_INHIBIT_REASON_DISABLE)|	       \
-@@ -190,6 +198,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.vcpu_deliver_sipi_vector = kvm_vcpu_deliver_sipi_vector,
- 
- 	.dev_mem_enc_ioctl = tdx_dev_ioctl,
-+	.mem_enc_ioctl = vt_mem_enc_ioctl,
- };
- 
- struct kvm_x86_init_ops vt_init_ops __initdata = {
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 7a42eee995f6..cfedb2592725 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -67,6 +67,32 @@ int tdx_dev_ioctl(void __user *argp)
- 	return 0;
- }
- 
-+int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
-+{
-+	struct kvm_tdx_cmd tdx_cmd;
-+	int r;
-+
-+	if (copy_from_user(&tdx_cmd, argp, sizeof(struct kvm_tdx_cmd)))
-+		return -EFAULT;
-+	if (tdx_cmd.error || tdx_cmd.unused)
-+		return -EINVAL;
-+
-+	mutex_lock(&kvm->lock);
-+
-+	switch (tdx_cmd.id) {
-+	default:
-+		r = -EINVAL;
-+		goto out;
-+	}
-+
-+	if (copy_to_user(argp, &tdx_cmd, sizeof(struct kvm_tdx_cmd)))
-+		r = -EFAULT;
-+
-+out:
-+	mutex_unlock(&kvm->lock);
-+	return r;
-+}
-+
- static int __init tdx_module_setup(void)
+ static __init int vt_hardware_setup(void)
  {
- 	const struct tdsysinfo_struct *tdsysinfo;
-diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-index 5dc3f0d11427..6598e16f8e9f 100644
---- a/arch/x86/kvm/vmx/x86_ops.h
-+++ b/arch/x86/kvm/vmx/x86_ops.h
-@@ -141,10 +141,14 @@ void vmx_setup_mce(struct kvm_vcpu *vcpu);
- int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
- bool tdx_is_vm_type_supported(unsigned long type);
- int tdx_dev_ioctl(void __user *argp);
-+
-+int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
- #else
- static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return -ENOSYS; }
- static inline bool tdx_is_vm_type_supported(unsigned long type) { return false; }
- static inline int tdx_dev_ioctl(void __user *argp) { return -EOPNOTSUPP; };
-+
-+static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOPNOTSUPP; }
- #endif
+ 	int ret;
+@@ -68,6 +80,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.has_emulated_msr = vmx_has_emulated_msr,
  
- #endif /* __KVM_X86_VMX_X86_OPS_H */
+ 	.is_vm_type_supported = vt_is_vm_type_supported,
++	.max_vcpus = vt_max_vcpus,
+ 	.vm_size = sizeof(struct kvm_vmx),
+ 	.vm_init = vt_vm_init,
+ 	.vm_destroy = vmx_vm_destroy,
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index c7459bc8b315..3e00fb7863a8 100644
+index 3e00fb7863a8..c54baa3973f2 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -6961,10 +6961,6 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 		goto out;
- 	}
- 	case KVM_MEMORY_ENCRYPT_OP: {
--		r = -ENOTTY;
--		if (!kvm_x86_ops.mem_enc_ioctl)
--			goto out;
--
- 		r = static_call(kvm_x86_mem_enc_ioctl)(kvm, argp);
+@@ -4490,6 +4490,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
  		break;
- 	}
+ 	case KVM_CAP_MAX_VCPUS:
+ 		r = KVM_MAX_VCPUS;
++		if (kvm_x86_ops.max_vcpus)
++			r = static_call(kvm_x86_max_vcpus)(kvm);
+ 		break;
+ 	case KVM_CAP_MAX_VCPU_ID:
+ 		r = KVM_MAX_VCPU_IDS;
 -- 
 2.25.1
 
