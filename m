@@ -2,155 +2,377 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EA80C6A3DC4
-	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 10:05:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B9756A3E4C
+	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 10:27:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229830AbjB0JFf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Feb 2023 04:05:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59824 "EHLO
+        id S229775AbjB0J1q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Feb 2023 04:27:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229515AbjB0JFV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Feb 2023 04:05:21 -0500
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2060a.outbound.protection.outlook.com [IPv6:2a01:111:f400:7eab::60a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0187E1F932;
-        Mon, 27 Feb 2023 00:55:45 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VE6k4FXKGya4dEl9LXtQgytAxPldWzdINkPmU8L5UmEHgAInwZ9VtBM2eDL2D5lTLQ17O+/3hrRsfODW7sHrZpcwulVz17PEmRWubYlwuIZ7nrFz5SDVV5fIP64eGI9Y/OrwOC3Twtr52OJe+f4R11CEv/hsP/PDFcX+RkkeF921MgDHulZsWtBTd/XcT5CSVH5FhcWuOYj2CMDCypBOf3JBz5BhL9sK6ciphEiIVD6QcPzEQJGmL7K85F0PSiMaUW986WkJYdT2xIBE1mnC2zSP/o9/F//4/ywdQOmri4M4Vx1bPU7Q9EkzwmslbPm/oIYucuw6N2PrY9ND94r7eQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rxnFIqUQ+cmEzzQR6Ld4Tbpvux413oM9nXqAupa0lDM=;
- b=VtAIqK9SLfyX7tpwjWTuUCYZTHiMVTH0VAATWVIHGMttJ0b9XBxpFjjD5POf8g+LCggi3UobxtM0va/3ofUk6qB3DFNhld3JAmVzcbnlbYtl8Umd4MtaipPS5LeHkuuWUxa02SsylCmPy6BxSC275nsYLYeVifPY8DReaK/lL6K1u5fTo7P58lFNRIg4CH5fiVpOSl8TpV7avtBRTcjO6K8++lFIhKs6lNRdTewaZPrUsjmYH9m5Fiv4NYcEKCXci5DDFR97qtY68nBSjSBx9QHn3XAiCL8oSa/UkZ1leQx1X3gE6Ik+Bd80Z06WqLcoRHUp+54x3uH6Zo5VViTLyA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rxnFIqUQ+cmEzzQR6Ld4Tbpvux413oM9nXqAupa0lDM=;
- b=sQlVTYGhYRLRuIOijBzbtSPIWWvavmOI1EZycmLPSb17Yj3C+vTQor62DuvaYab1VKFuJX+Xj/mgs9WeewfSVkxhEodHe4aDt9hxdo1lHn6dfdgXrSYMPTr7TervmLLgJenORj5NKQLZ2AcNIUQxqC0SovjPGkXrXBMPMy8vcGs=
-Received: from MW4PR03CA0157.namprd03.prod.outlook.com (2603:10b6:303:8d::12)
- by MW4PR12MB7484.namprd12.prod.outlook.com (2603:10b6:303:212::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.25; Mon, 27 Feb
- 2023 08:40:48 +0000
-Received: from CO1NAM11FT035.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:8d:cafe::24) by MW4PR03CA0157.outlook.office365.com
- (2603:10b6:303:8d::12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.28 via Frontend
- Transport; Mon, 27 Feb 2023 08:40:48 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1NAM11FT035.mail.protection.outlook.com (10.13.175.36) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6156.16 via Frontend Transport; Mon, 27 Feb 2023 08:40:47 +0000
-Received: from BLR-L-SASHUKLA.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 27 Feb
- 2023 02:40:43 -0600
-From:   Santosh Shukla <santosh.shukla@amd.com>
-To:     <kvm@vger.kernel.org>, <seanjc@google.com>
-CC:     <pbonzini@redhat.com>, <jmattson@google.com>, <joro@8bytes.org>,
-        <linux-kernel@vger.kernel.org>, <mail@maciej.szmigiero.name>,
-        <mlevitsk@redhat.com>, <thomas.lendacky@amd.com>,
-        <vkuznets@redhat.com>
-Subject: [PATCHv4 01/11] KVM: nSVM: Don't sync vmcb02 V_IRQ back to vmcb12 if KVM (L0) is intercepting VINTR
-Date:   Mon, 27 Feb 2023 14:10:06 +0530
-Message-ID: <20230227084016.3368-2-santosh.shukla@amd.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230227084016.3368-1-santosh.shukla@amd.com>
-References: <20230227084016.3368-1-santosh.shukla@amd.com>
+        with ESMTP id S229558AbjB0J1p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Feb 2023 04:27:45 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1AB74EDD
+        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 01:27:41 -0800 (PST)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31R81gXA018017;
+        Mon, 27 Feb 2023 08:53:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=5YVzVlwODytShxUg9rR03xiXKcAqp/zotPfkL6R8oYY=;
+ b=CEPte2GIzWkvAHnqxDPj/tDXVUQE5smkvgFpM9m7MqC/Po0qs14IZoEuikEDWtMpfse5
+ 1jk0w2KS3xPbV2/Wb8wNk7/bm4D6sAKUVnp4gAkJtDwMFl5N9c3cOqdkeBuRRsg5lshS
+ 9M3VkAuBAgmbUFFPN1/wp9K8gQ78Npl1en+A8zfEv+06K7W3tvMBqWnmkU5QtU/5L0RN
+ F0uZaCzNc9dh2UZcCC+YQnvGfyc7M+eFEzC4a6n2mCigtnCVZA8WoUIAwhY4QhmHMalg
+ se9a3aSMMAwvA6W+93BImZEPU9PhLnSezf2NoBW6pv/Gzr0tHII8nozd2KasCcLOfCLg iQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p0rn0s9tn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Feb 2023 08:53:02 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31R81S9o016251;
+        Mon, 27 Feb 2023 08:53:01 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p0rn0s9sx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Feb 2023 08:53:01 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31QI0PNO019401;
+        Mon, 27 Feb 2023 08:52:59 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+        by ppma06fra.de.ibm.com (PPS) with ESMTPS id 3nybdbh9gv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Feb 2023 08:52:58 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31R8qtwV42205494
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 27 Feb 2023 08:52:55 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E112B2004D;
+        Mon, 27 Feb 2023 08:52:54 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B204120043;
+        Mon, 27 Feb 2023 08:52:53 +0000 (GMT)
+Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com.com (unknown [9.171.37.166])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Mon, 27 Feb 2023 08:52:53 +0000 (GMT)
+From:   Pierre Morel <pmorel@linux.ibm.com>
+To:     qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
+        frankja@linux.ibm.com, berrange@redhat.com, clg@kaod.org
+Subject: [PATCH v17 08/12] qapi/s390x/cpu topology: set-cpu-topology monitor command
+Date:   Mon, 27 Feb 2023 09:52:46 +0100
+Message-Id: <20230227085247.11502-1-pmorel@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <c80290f87e2c8377dc33584ec33ce77e1f58f091.camel@linux.ibm.com>
+References: <c80290f87e2c8377dc33584ec33ce77e1f58f091.camel@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1NAM11FT035:EE_|MW4PR12MB7484:EE_
-X-MS-Office365-Filtering-Correlation-Id: 22cab38b-e67e-427b-5ace-08db189e531d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 1mUDF6RmcMdfVpGAGflBe9m1DMuNCst/1461WhREenmVPepTOjpVea/327UmvLBMncp+q75UKlb+4VY7f04Nvby5NuMdOPF3kZNEdmTMqG7Wz6bdRRAYzivWnpkt/5B4tf5lTjtBPrXDO/YmQXijiAs8x9JYMcUANEoR+63ElHHwBY6S3+aDoogtXVyk3zx7EBG1Qt9MtnA5QIpyC56uMuRu1jTJSKLGMrz1zcfkgHj4+sV/wZ4yR4plryC48tiTL21ZBfBvVTz5fnCrY1/Q2l3CY3Z5PBAg4l0xRN8CF6Ul7N5uO5hQE+2WnNX8YpUqqWUL2eyUSEG3okBLbJwZj74kqS95f83eaKmb3i32ZjQDlTjtVpQk6xFjeGEuThIo4rARaWH2cPxEBA0i1yPOegcfmB//t4MKU0yxeFMVpQDnykqYCFJQQKgj9qDLXzboO3+rkKZ7QsxAic8RMQPguloW7O6iM1nfN/T81LUQhZYbMFrS83wu95nx6nvbfr6gexB99Z1bHZUiqYt8FHz3TSMqj2sS789BgyHxzhcetaxoayG8Ub5b+YDtL2+vVjaYAdkRfRkRwriZqjySl15yTGsqZPLOUPHDcFdy4DDB773gvHw0ne3a5AXWr/aTC0htyw5t9KBvJZVeCEcQZR4QhSoNO3p77SkT1mFvfZZZCrk5OrW/GSBmHSwMyGN4/IeD8ujOLsTGTjccMcIyts/RzykpmrclPUTMPKpViBwqFNs=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(346002)(396003)(136003)(376002)(39860400002)(451199018)(46966006)(40470700004)(36840700001)(83380400001)(966005)(316002)(36756003)(54906003)(110136005)(82310400005)(86362001)(40460700003)(16526019)(44832011)(2906002)(7696005)(36860700001)(8936002)(70586007)(5660300002)(8676002)(70206006)(41300700001)(4326008)(1076003)(6666004)(186003)(2616005)(26005)(47076005)(478600001)(336012)(40480700001)(426003)(81166007)(356005)(82740400003)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Feb 2023 08:40:47.9670
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 22cab38b-e67e-427b-5ace-08db189e531d
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT035.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7484
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,SPF_HELO_PASS,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: D6bGE8HCYLlcp1kRMUdukepyJxZ6J6JV
+X-Proofpoint-ORIG-GUID: yJ_7IWOJ6XUpj0jFn42qV-wo0oF8KMnM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-26_22,2023-02-24_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
+ priorityscore=1501 spamscore=0 mlxscore=0 impostorscore=0 suspectscore=0
+ bulkscore=0 lowpriorityscore=0 malwarescore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
+ definitions=main-2302270066
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Santosh Shukla <Santosh.Shukla@amd.com>
+The modification of the CPU attributes are done through a monitor
+command.
 
-Don't sync vmcb02 V_IRQ back to vmcb12 if KVM (L0) is intercepting
-virtual interrupts in order to request an interrupt window, as KVM
-has usurped vmcb02's int_ctl.  If an interrupt window opens before
-the next VM-Exit, svm_clear_vintr() will restore vmcb12's int_ctl.
-If no window opens, V_IRQ will be correctly preserved in vmcb12's
-int_ctl (because it was never recognized while L2 was running).
+It allows to move the core inside the topology tree to optimize
+the cache usage in the case the host's hypervisor previously
+moved the CPU.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Santosh Shukla <Santosh.Shukla@amd.com>
+The same command allows to modify the CPU attributes modifiers
+like polarization entitlement and the dedicated attribute to notify
+the guest if the host admin modified scheduling or dedication of a vCPU.
+
+With this knowledge the guest has the possibility to optimize the
+usage of the vCPUs.
+
+The command has a feature unstable for the moment.
+
+Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 ---
-v4:
-https://lore.kernel.org/all/Y9hybI65So5X2LFg@google.com/
-suggested by Sean.
+ qapi/machine-target.json |  35 +++++++++
+ include/monitor/hmp.h    |   1 +
+ hw/s390x/cpu-topology.c  | 154 +++++++++++++++++++++++++++++++++++++++
+ hmp-commands.hx          |  17 +++++
+ 4 files changed, 207 insertions(+)
 
- arch/x86/kvm/svm/nested.c | 21 ++++++++++-----------
- 1 file changed, 10 insertions(+), 11 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 05d38944a6c0..fbade158d368 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -416,18 +416,17 @@ void nested_sync_control_from_vmcb02(struct vcpu_svm *svm)
+diff --git a/qapi/machine-target.json b/qapi/machine-target.json
+index a52cc32f09..baa9d273cf 100644
+--- a/qapi/machine-target.json
++++ b/qapi/machine-target.json
+@@ -354,3 +354,38 @@
+ { 'enum': 'CpuS390Polarization',
+   'prefix': 'S390_CPU_POLARIZATION',
+   'data': [ 'horizontal', 'vertical' ] }
++
++##
++# @set-cpu-topology:
++#
++# @core-id: the vCPU ID to be moved
++# @socket-id: optional destination socket where to move the vCPU
++# @book-id: optional destination book where to move the vCPU
++# @drawer-id: optional destination drawer where to move the vCPU
++# @entitlement: optional entitlement
++# @dedicated: optional, if the vCPU is dedicated to a real CPU
++#
++# Features:
++# @unstable: This command may still be modified.
++#
++# Modifies the topology by moving the CPU inside the topology
++# tree or by changing a modifier attribute of a CPU.
++# Default value for optional parameter is the current value
++# used by the CPU.
++#
++# Returns: Nothing on success, the reason on failure.
++#
++# Since: 8.0
++##
++{ 'command': 'set-cpu-topology',
++  'data': {
++      'core-id': 'uint16',
++      '*socket-id': 'uint16',
++      '*book-id': 'uint16',
++      '*drawer-id': 'uint16',
++      '*entitlement': 'str',
++      '*dedicated': 'bool'
++  },
++  'features': [ 'unstable' ],
++  'if': { 'all': [ 'TARGET_S390X' ] }
++}
+diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
+index 2220f14fc9..4e65e6d08e 100644
+--- a/include/monitor/hmp.h
++++ b/include/monitor/hmp.h
+@@ -178,5 +178,6 @@ void hmp_ioport_read(Monitor *mon, const QDict *qdict);
+ void hmp_ioport_write(Monitor *mon, const QDict *qdict);
+ void hmp_boot_set(Monitor *mon, const QDict *qdict);
+ void hmp_info_mtree(Monitor *mon, const QDict *qdict);
++void hmp_set_cpu_topology(Monitor *mon, const QDict *qdict);
  
- 	/* Only a few fields of int_ctl are written by the processor.  */
- 	mask = V_IRQ_MASK | V_TPR_MASK;
--	if (!(svm->nested.ctl.int_ctl & V_INTR_MASKING_MASK) &&
--	    svm_is_intercept(svm, INTERCEPT_VINTR)) {
--		/*
--		 * In order to request an interrupt window, L0 is usurping
--		 * svm->vmcb->control.int_ctl and possibly setting V_IRQ
--		 * even if it was clear in L1's VMCB.  Restoring it would be
--		 * wrong.  However, in this case V_IRQ will remain true until
--		 * interrupt_window_interception calls svm_clear_vintr and
--		 * restores int_ctl.  We can just leave it aside.
--		 */
-+	/*
-+	 * Don't sync vmcb02 V_IRQ back to vmcb12 if KVM (L0) is intercepting
-+	 * virtual interrupts in order to request an interrupt window, as KVM
-+	 * has usurped vmcb02's int_ctl.  If an interrupt window opens before
-+	 * the next VM-Exit, svm_clear_vintr() will restore vmcb12's int_ctl.
-+	 * If no window opens, V_IRQ will be correctly preserved in vmcb12's
-+	 * int_ctl (because it was never recognized while L2 was running).
-+	 */
-+	if (svm_is_intercept(svm, INTERCEPT_VINTR) &&
-+	   !test_bit(INTERCEPT_VINTR, (unsigned long *)svm->nested.ctl.intercepts))
- 		mask &= ~V_IRQ_MASK;
--	}
+ #endif
+diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+index 3a2dcc67a5..daec896fbf 100644
+--- a/hw/s390x/cpu-topology.c
++++ b/hw/s390x/cpu-topology.c
+@@ -19,6 +19,12 @@
+ #include "hw/s390x/s390-virtio-ccw.h"
+ #include "hw/s390x/cpu-topology.h"
+ #include "qapi/qapi-types-machine-target.h"
++#include "qapi/qapi-types-machine.h"
++#include "qapi/qapi-commands-machine-target.h"
++#include "qapi/qmp/qdict.h"
++#include "monitor/hmp.h"
++#include "monitor/monitor.h"
++
+ /*
+  * s390_topology is used to keep the topology information.
+  * .cores_per_socket: tracks information on the count of cores
+@@ -310,6 +316,26 @@ static void s390_topology_add_core_to_socket(S390CPU *cpu, int drawer_id,
+     }
+ }
  
- 	if (nested_vgif_enabled(svm))
- 		mask |= V_GIF_MASK;
++/**
++ * s390_topology_need_report
++ * @cpu: Current cpu
++ * @drawer_id: future drawer ID
++ * @book_id: future book ID
++ * @socket_id: future socket ID
++ *
++ * A modified topology change report is needed if the
++ */
++static int s390_topology_need_report(S390CPU *cpu, int drawer_id,
++                                   int book_id, int socket_id,
++                                   uint16_t entitlement, bool dedicated)
++{
++    return cpu->env.drawer_id != drawer_id ||
++           cpu->env.book_id != book_id ||
++           cpu->env.socket_id != socket_id ||
++           cpu->env.entitlement != entitlement ||
++           cpu->env.dedicated != dedicated;
++}
++
+ /**
+  * s390_update_cpu_props:
+  * @ms: the machine state
+@@ -376,3 +402,131 @@ void s390_topology_setup_cpu(MachineState *ms, S390CPU *cpu, Error **errp)
+     /* topology tree is reflected in props */
+     s390_update_cpu_props(ms, cpu);
+ }
++
++/*
++ * qmp and hmp implementations
++ */
++
++#define TOPOLOGY_SET(n) do {                                \
++                            if (has_ ## n) {                \
++                                calc_ ## n = n;             \
++                            } else {                        \
++                                calc_ ## n = cpu->env.n;    \
++                            }                               \
++                        } while (0)
++
++static void s390_change_topology(uint16_t core_id,
++                                 bool has_socket_id, uint16_t socket_id,
++                                 bool has_book_id, uint16_t book_id,
++                                 bool has_drawer_id, uint16_t drawer_id,
++                                 bool has_entitlement, uint16_t entitlement,
++                                 bool has_dedicated, bool dedicated,
++                                 Error **errp)
++{
++    MachineState *ms = current_machine;
++    uint16_t calc_dedicated, calc_entitlement;
++    uint16_t calc_socket_id, calc_book_id, calc_drawer_id;
++    S390CPU *cpu;
++    int report_needed;
++    ERRP_GUARD();
++
++    if (core_id >= ms->smp.max_cpus) {
++        error_setg(errp, "Core-id %d out of range!", core_id);
++        return;
++    }
++
++    cpu = (S390CPU *)ms->possible_cpus->cpus[core_id].cpu;
++    if (!cpu) {
++        error_setg(errp, "Core-id %d does not exist!", core_id);
++        return;
++    }
++
++    /* Get unprovided attributes from cpu and verify the new topology */
++    TOPOLOGY_SET(entitlement);
++    TOPOLOGY_SET(dedicated);
++    TOPOLOGY_SET(socket_id);
++    TOPOLOGY_SET(book_id);
++    TOPOLOGY_SET(drawer_id);
++
++    s390_topology_check(calc_socket_id, calc_book_id, calc_drawer_id,
++                        calc_entitlement, calc_dedicated, errp);
++    if (*errp) {
++        return;
++    }
++
++    /* Move the CPU into its new socket */
++    s390_topology_add_core_to_socket(cpu, calc_drawer_id, calc_book_id,
++                                     calc_socket_id, false, errp);
++    if (*errp) {
++        return;
++    }
++
++    /* Check if we need to report the modified topology */
++    report_needed = s390_topology_need_report(cpu, calc_drawer_id, calc_book_id,
++                                              calc_socket_id, calc_entitlement,
++                                              calc_dedicated);
++
++    /* All checks done, report new topology into the vCPU */
++    cpu->env.drawer_id = calc_drawer_id;
++    cpu->env.book_id = calc_book_id;
++    cpu->env.socket_id = calc_socket_id;
++    cpu->env.dedicated = calc_dedicated;
++    cpu->env.entitlement = calc_entitlement;
++
++    /* topology tree is reflected in props */
++    s390_update_cpu_props(ms, cpu);
++
++    /* Advertise the topology change */
++    if (report_needed) {
++        s390_cpu_topology_set_changed(true);
++    }
++}
++
++void qmp_set_cpu_topology(uint16_t core,
++                         bool has_socket, uint16_t socket,
++                         bool has_book, uint16_t book,
++                         bool has_drawer, uint16_t drawer,
++                         const char *entitlement_str,
++                         bool has_dedicated, bool dedicated,
++                         Error **errp)
++{
++    bool has_entitlement = false;
++    int entitlement;
++    ERRP_GUARD();
++
++    if (!s390_has_topology()) {
++        error_setg(errp, "This machine doesn't support topology");
++        return;
++    }
++
++    entitlement = qapi_enum_parse(&CpuS390Entitlement_lookup, entitlement_str,
++                                  -1, errp);
++    if (*errp) {
++        return;
++    }
++    has_entitlement = entitlement >= 0;
++
++    s390_change_topology(core, has_socket, socket, has_book, book,
++                         has_drawer, drawer, has_entitlement, entitlement,
++                         has_dedicated, dedicated, errp);
++}
++
++void hmp_set_cpu_topology(Monitor *mon, const QDict *qdict)
++{
++    const uint16_t core = qdict_get_int(qdict, "core-id");
++    bool has_socket    = qdict_haskey(qdict, "socket-id");
++    const uint16_t socket = qdict_get_try_int(qdict, "socket-id", 0);
++    bool has_book    = qdict_haskey(qdict, "book-id");
++    const uint16_t book = qdict_get_try_int(qdict, "book-id", 0);
++    bool has_drawer    = qdict_haskey(qdict, "drawer-id");
++    const uint16_t drawer = qdict_get_try_int(qdict, "drawer-id", 0);
++    const char *entitlement = qdict_get_try_str(qdict, "entitlement");
++    bool has_dedicated    = qdict_haskey(qdict, "dedicated");
++    const bool dedicated = qdict_get_try_bool(qdict, "dedicated", false);
++    Error *local_err = NULL;
++
++    qmp_set_cpu_topology(core, has_socket, socket, has_book, book,
++                           has_drawer, drawer, entitlement,
++                           has_dedicated, dedicated, &local_err);
++    hmp_handle_error(mon, local_err);
++}
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index fbb5daf09b..328522abda 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -1815,3 +1815,20 @@ SRST
+   Dump the FDT in dtb format to *filename*.
+ ERST
+ #endif
++
++#if defined(TARGET_S390X)
++    {
++        .name       = "set-cpu-topology",
++        .args_type  = "core-id:l,socket-id:l?,book-id:l?,drawer-id:l?,entitlement:s?,dedicated:b?",
++        .params     = "core-id [socket-id] [book-id] [drawer-id] [entitlement] [dedicated]",
++        .help       = "Move CPU 'core' to 'socket/book/drawer' "
++                      "optionally modifies entitlement and dedication",
++        .cmd        = hmp_set_cpu_topology,
++    },
++
++SRST
++``set-cpu-topology`` *core-id* *socket-id* *book-id* *drawer-id* *entitlement* *dedicated*
++  Modify CPU topology for the CPU *core-id* to move on *socket-id* *book-id* *drawer-id*
++  with topology attributes *entitlement* *dedicated*.
++ERST
++#endif
 -- 
-2.25.1
+2.31.1
 
