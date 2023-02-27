@@ -2,77 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B26D6A4D7E
-	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 22:45:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7282E6A4D8B
+	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 22:48:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230139AbjB0Vpg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Feb 2023 16:45:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54172 "EHLO
+        id S230171AbjB0VsS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Feb 2023 16:48:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229693AbjB0Vpe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Feb 2023 16:45:34 -0500
-Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 842141BAEE;
-        Mon, 27 Feb 2023 13:45:31 -0800 (PST)
-Received: by mail-ot1-x32e.google.com with SMTP id v1-20020a9d6041000000b0068d4a8a8d2dso4393520otj.12;
-        Mon, 27 Feb 2023 13:45:31 -0800 (PST)
+        with ESMTP id S230170AbjB0VsP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Feb 2023 16:48:15 -0500
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F5D322798;
+        Mon, 27 Feb 2023 13:48:12 -0800 (PST)
+Received: by mail-pg1-x529.google.com with SMTP id q23so4455342pgt.7;
+        Mon, 27 Feb 2023 13:48:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kfkr/Dz64psO49jb2sCIBi5L9nMCTcssTUOvBykXPRI=;
-        b=osPgSKZIbWUPkX1P6DGPStyaykfwRRNQLUanbiOzRTVtfAGgGoCmk0qW1/ogsWl/C3
-         nM1RfW8sEe3wIIcCn5RPFCZEL9usYO4wi3Q9ZQCGR8JDMCLsUH0a8bpTgdYj2XKaWrVC
-         7I4tXl8nOPXwEdQqM95zfA0hEFY4rWYvheusgUuQQRBTJ56NoYVKOByTzYt0fwF76GbK
-         dfEZDHj6yL1A4WJsUzRKyq0B+h8ZXfusKhL9kGWIaBLam3J7p8LRU2So6FbfUEVvBMPM
-         jLIVIzCIAN8pu66WoA9I8vtCsQc9ChImXVWV6Qi8/Y0rdZeNB9iNYCQwUO/fq4wqgUVM
-         aUgg==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ErGexxN3zJKfa8w4LZol695vYh8JJqDay56LGf9Oqdo=;
+        b=SDBg+t0SigbljRdSAsK27YboxtVT2Z8HGLY8Okh3Ki8Q5DPYqFklAOR1YTDbTZvcoT
+         tlYKBEP5i+YkcpsBLkakOZrfoRTtTwxUDamXa2lqm85fLidsAGqhOip1zx6NHEq08TGR
+         0fzvxlLZF04hr+uXcRIoIEEZYM8ENkUEh58EN44tVxrQ0/P1Rd72ZhmUR/hDpprQEmEW
+         LJz/SreDu77LW4frUW1JJrkJkcJLjZHkQcZGI/gTficO81o9hLiT4waYB3rX4AOz8u9v
+         9CtnpW1uq/fg97HYezs0Sznrt9b6SVidV7JEFm0vliJxksb8+1Y+198xmiXabPkbg1Ms
+         GsEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kfkr/Dz64psO49jb2sCIBi5L9nMCTcssTUOvBykXPRI=;
-        b=DP/b9jnCQaElRDQt3LNq8n8GDANU+uRnVTKHMzBoAgxqwYvPsvPspg1gBN3rebDnSw
-         LwEmJxVY0uiYs5ZrzOjjpUw1aE0K928knaChS4cqAQB2FXRvRPNzOgRKSKbYXqRtdJjN
-         C0a97xJ9i1ecDajgJbk8NLF1/p5NaJ1erue8TZNcE8F3MHrWw/Fr7wiiC5OPC0yxGM+X
-         xCxa+GuK4QGkwkqDtd3CCBLOMVYmg7Qk2/xvw/HrtVTU/5urPv465EqPYhWo58jwI5To
-         vNNcmtgmkYeHKQ2kIQrfx+Q5xpMlIA6jYjZCUhokv1ey+nbGvuAkO8GwMa4f12pIMTbX
-         9GSg==
-X-Gm-Message-State: AO0yUKWSXcKI8JInMWYEl73BoF9H5ouKgawV7Mnt7Lvgp8Aw+mBQCxMz
-        3VCEma/9rl7jRhu/Htf8UAPZ12M6DgU=
-X-Google-Smtp-Source: AK7set/gCu6d0ZKgwZbN/D4iSrNnH4erq2Uz6ro8buqv2WpMpkbspRDKy8GVV1SdvXPhjoF/xmMH8w==
-X-Received: by 2002:a05:6830:601b:b0:693:d7bf:dbe8 with SMTP id bx27-20020a056830601b00b00693d7bfdbe8mr5279912otb.10.1677534330410;
-        Mon, 27 Feb 2023 13:45:30 -0800 (PST)
-Received: from localhost ([12.97.180.36])
-        by smtp.gmail.com with ESMTPSA id m17-20020a4add11000000b00524faf3d2d7sm2102658oou.41.2023.02.27.13.45.29
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ErGexxN3zJKfa8w4LZol695vYh8JJqDay56LGf9Oqdo=;
+        b=L0xK8LfYw8cRBc4JjfrHzdAN+1LbJ+s7mWM1mI5/s5F703M3IfLVBCdleilfqNSN7a
+         /ZKPQLnBO3r+r2dkzwAeolTQn5sZEYc1qDn2Sefz7wVs7pTMR7LoYYLtNTLclAYtpmlp
+         aCO76qF+GVKoqrObtkGHoradHcoa5+9Gsly89Rpf8d+gVwCpcVZ4ljDzGXfO2lzIA9LM
+         AMAnUx1R2GaK1G8USI++I8MY//f0qRbMoo6Pxwv826R3zV0PHwY8A/eSi8cu357AlWnE
+         7NkpICfqH77yv82w81Iz4lhZKUs3Op/GWy0b+pt7uca4n1UvO0D8lbgSrZ2KUjj/bZBw
+         uwIA==
+X-Gm-Message-State: AO0yUKUL0EbZcq1YehbMfzl3ORxOVMI93KrBJT53m1Kf69oZWkmyj3Ho
+        JWHFn4VuixSQ1DcTMpPlQF42pXqDTy8=
+X-Google-Smtp-Source: AK7set/NtzCU1wlNr6Wi3FkCZ2h1FX+qS/srLMiB1wsXTGe5maB/JENjwZVz9VCppeLgLq4OASH7ow==
+X-Received: by 2002:aa7:9805:0:b0:5aa:4df7:7eef with SMTP id e5-20020aa79805000000b005aa4df77eefmr440902pfl.6.1677534492023;
+        Mon, 27 Feb 2023 13:48:12 -0800 (PST)
+Received: from localhost ([192.55.54.55])
+        by smtp.gmail.com with ESMTPSA id q26-20020a63751a000000b00502e6c22c42sm4342866pgc.59.2023.02.27.13.48.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Feb 2023 13:45:29 -0800 (PST)
-From:   Yury Norov <yury.norov@gmail.com>
-To:     linux-kernel@vger.kernel.org,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Alexander Lobakin <aleksander.lobakin@intel.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Yury Norov <yury.norov@gmail.com>
-Subject: [PATCH 2/2] lib/bitmap: drop optimization of bitmap_{from,to}_arr64
-Date:   Mon, 27 Feb 2023 13:45:24 -0800
-Message-Id: <20230227214524.914050-2-yury.norov@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230227214524.914050-1-yury.norov@gmail.com>
-References: <20230227214524.914050-1-yury.norov@gmail.com>
+        Mon, 27 Feb 2023 13:48:11 -0800 (PST)
+Date:   Mon, 27 Feb 2023 13:48:09 -0800
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "Aktas, Erdem" <erdemaktas@google.com>,
+        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+        "dmatlack@google.com" <dmatlack@google.com>,
+        "Christopherson,, Sean" <seanjc@google.com>
+Subject: Re: [PATCH v11 021/113] KVM: TDX: Refuse to unplug the last cpu on
+ the package
+Message-ID: <20230227214809.GJ4175971@ls.amr.corp.intel.com>
+References: <cover.1673539699.git.isaku.yamahata@intel.com>
+ <ecf02459d319789aca1b9399ed8fda47c03812df.1673539699.git.isaku.yamahata@intel.com>
+ <d95328039ba69346c30555def1991bddc385ddd4.camel@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <d95328039ba69346c30555def1991bddc385ddd4.camel@intel.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -83,66 +80,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-bitmap_{from,to}_arr64() optimization is overly optimistic on 32-bit LE
-architectures when it's wired to bitmap_copy_clear_tail().
+On Mon, Jan 16, 2023 at 10:23:16AM +0000,
+"Huang, Kai" <kai.huang@intel.com> wrote:
 
-bitmap_copy_clear_tail() takes care of unused bits in the bitmap up to
-the next word boundary. But on 32-bit machines when copying bits from
-bitmap to array of 64-bit words, it's expected that the unused part of
-a recipient array must be cleared up to 64-bit boundary, so the last 4
-bytes may stay untouched when nbits % 64 <= 32.
+> On Thu, 2023-01-12 at 08:31 -0800, isaku.yamahata@intel.com wrote:
+> > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > 
+> > In order to reclaim TDX HKID, (i.e. when deleting guest TD), needs to call
+> > TDH.PHYMEM.PAGE.WBINVD on all packages.  If we have used TDX HKID, refuse
+> > to offline the last online cpu. Add arch callback for cpu offline.
+> 
+> I think it is worth to talk about suspend staff, i.e. why we only refuse to
+> offline the last cpu when there's active TD, but not choose to offline the last
+> cpu when TDX is enabled in KVM.  People may not be able to understand
+> immediately the reason behind this design.
 
-While the copying part of the optimization works correct, that clear-tail
-trick makes corresponding tests reasonably fail:
+Updated the comment.
 
-test_bitmap: bitmap_to_arr64(nbits == 1): tail is not safely cleared: 0xa5a5a5a500000001 (must be 0x0000000000000001)
+> Btw, I certainly don't want to speak for Sean, but it seems this was suggested
+> by Sean?  If so, add a 'Suggested-by' tag?
 
-Fix it by removing bitmap_{from,to}_arr64() optimization for 32-bit LE
-arches.
+Added suggested-by.
 
-Reported-by: Guenter Roeck <linux@roeck-us.net>
-Link: https://lore.kernel.org/lkml/20230225184702.GA3587246@roeck-us.net/
-Fixes: 0a97953fd221 ("lib: add bitmap_{from,to}_arr64")
-Signed-off-by: Yury Norov <yury.norov@gmail.com>
-Tested-by: Guenter Roeck <linux@roeck-us.net>
----
- include/linux/bitmap.h | 8 +++-----
- lib/bitmap.c           | 2 +-
- 2 files changed, 4 insertions(+), 6 deletions(-)
+> > 
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > ---
+> > 
+> 
+> [snip]
+> 
+> > +
+> > +int tdx_offline_cpu(void)
+> > +{
+> > +	int curr_cpu = smp_processor_id();
+> > +	cpumask_var_t packages;
+> > +	int ret = 0;
+> > +	int i;
+> > +
+> > +	if (!atomic_read(&nr_configured_hkid))
+> > +		return 0;
+> 
+> As mentioned above, I think it also worth to add some comment here.  When people
+> are trying to understand some code, I think mostly they are just going to look
+> at the code itself, but won't use 'git blame' to dig out the entire changelog to
+> understand some code.
 
-diff --git a/include/linux/bitmap.h b/include/linux/bitmap.h
-index 40e53a2ecc0d..7d4c90eb3df4 100644
---- a/include/linux/bitmap.h
-+++ b/include/linux/bitmap.h
-@@ -302,12 +302,10 @@ void bitmap_to_arr32(u32 *buf, const unsigned long *bitmap,
- #endif
- 
- /*
-- * On 64-bit systems bitmaps are represented as u64 arrays internally. On LE32
-- * machines the order of hi and lo parts of numbers match the bitmap structure.
-- * In both cases conversion is not needed when copying data from/to arrays of
-- * u64.
-+ * On 64-bit systems bitmaps are represented as u64 arrays internally. So,
-+ * the conversion is not needed when copying data from/to arrays of u64.
-  */
--#if (BITS_PER_LONG == 32) && defined(__BIG_ENDIAN)
-+#if BITS_PER_LONG == 32
- void bitmap_from_arr64(unsigned long *bitmap, const u64 *buf, unsigned int nbits);
- void bitmap_to_arr64(u64 *buf, const unsigned long *bitmap, unsigned int nbits);
- #else
-diff --git a/lib/bitmap.c b/lib/bitmap.c
-index 1c81413c51f8..ddb31015e38a 100644
---- a/lib/bitmap.c
-+++ b/lib/bitmap.c
-@@ -1495,7 +1495,7 @@ void bitmap_to_arr32(u32 *buf, const unsigned long *bitmap, unsigned int nbits)
- EXPORT_SYMBOL(bitmap_to_arr32);
- #endif
- 
--#if (BITS_PER_LONG == 32) && defined(__BIG_ENDIAN)
-+#if BITS_PER_LONG == 32
- /**
-  * bitmap_from_arr64 - copy the contents of u64 array of bits to bitmap
-  *	@bitmap: array of unsigned longs, the destination bitmap
+Makes sense. Added a comment.
 -- 
-2.34.1
-
+Isaku Yamahata <isaku.yamahata@gmail.com>
