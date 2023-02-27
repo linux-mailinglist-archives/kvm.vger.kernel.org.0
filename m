@@ -2,74 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B55356A4D98
-	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 22:54:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C4C386A4DA3
+	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 22:58:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229602AbjB0Vyn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Feb 2023 16:54:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34412 "EHLO
+        id S229751AbjB0V6V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Feb 2023 16:58:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229496AbjB0Vym (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Feb 2023 16:54:42 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F2B020560
-        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 13:54:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677534840;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=NH1zCP7fchiReMFqu555SwmXjnCrBh0XjRIbNOlyPW8=;
-        b=iJyi0S45rNUfqGcbzQOs93fhrJfj2NQwY89GE8TG6avazsxutiBXVAEy5AJ4NoBLPIZBpi
-        W+/fcoUhqzF4yKVt5lgL06MJ50kAdviSgi2N2GuAfqvsfC3Nd6OBa3s+Irnbediw9YV/HS
-        us/clbyPsUaktJipsbmCu+yofl3d+sE=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-426-WmxUVh-oNTC0BsGVwla43A-1; Mon, 27 Feb 2023 16:53:59 -0500
-X-MC-Unique: WmxUVh-oNTC0BsGVwla43A-1
-Received: by mail-ed1-f71.google.com with SMTP id dm14-20020a05640222ce00b0046790cd9082so10647151edb.21
-        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 13:53:58 -0800 (PST)
+        with ESMTP id S229608AbjB0V6U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Feb 2023 16:58:20 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA49F7281;
+        Mon, 27 Feb 2023 13:58:13 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id x20-20020a17090a8a9400b00233ba727724so177292pjn.1;
+        Mon, 27 Feb 2023 13:58:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wFgPcL8KVOlQG1KgcGofHxwMq+phFfsr6crnqyLQQyA=;
+        b=g8Re+oMCNJ/TgBGdp4BiEDryk3mjGerCWemdRaEoiJOvYS/7tTMMjKaNmt925pHZGX
+         zHQvPq3MC9TFeHhfHtCvemiVNG4K18uJTdW1SxiFkYhHf0uknjbAEzFDI8pRJML8muM+
+         dWNCzX8NK4bhsHCyXHrZbYWrfXz/iXNYaQykMQi6hYmYe+b9ftph4/NEyfGTt3F4HLNH
+         pljkPD+Oo7hh5G7hf9GDqTC093F8KG+l1BaLObNIdJOfeZmG31s2JCFhtssATRdq/ZCD
+         mS1jYuixxjxdUiwgIGPIjtSxI6uq4H8XRKxamZwEqJt+okxkQ58UzgF055Nhe6WJmwk6
+         TirQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NH1zCP7fchiReMFqu555SwmXjnCrBh0XjRIbNOlyPW8=;
-        b=7kaovSMTcdP4W7V4VWGnY31jUMyvMUowmPNAh+seMvZYKyoz3fpamIc0SfHJQ0fr1r
-         3SIAbek4VCFH1YICQRxN90m7DiWBqFMFjbP63lgKDTJ2c/JbAPLdyBqXXkKFzCNZTg0Z
-         K4uSre2WkIMJzHFLhETEIQHd8wvp1z+/KKIwnUSERq5n3xtg/8t6PpyiMI+/USBCPnM5
-         XugSBWOKwwT4o8qAaSMU9Bj8Jm6qtejju/ZirXbltlre96nTKr1mTnPGxu5W84XHkfx3
-         U1vElvy7Kvz9SsmfIyG/wNQiTiLI+2x9n2LMn/NPY7fgz05gGrcXbdrr5RjsL2GQ/cX4
-         QR2w==
-X-Gm-Message-State: AO0yUKVgaaifRetfU6XQKGho/tVZiC7+5zhmfyRUQorj0/aKfI7N+yDT
-        EQaPeWpDTa3igyh4sI1DNcOq8pgcqnNGCGfL8z2nA9mIW9OveA9OS9DoBj+5mLcEf1Oij/OvhEa
-        Q3TZlAORbo/FX
-X-Received: by 2002:a17:907:20ca:b0:87b:d2b3:67ca with SMTP id qq10-20020a17090720ca00b0087bd2b367camr159468ejb.75.1677534838091;
-        Mon, 27 Feb 2023 13:53:58 -0800 (PST)
-X-Google-Smtp-Source: AK7set9ogYP9qlfEFY1lD8iKUQGWG7h/CDs1XyL2Fcs+3FtFVG3WfF+4nQOz3bzdoERPheVvemFjnQ==
-X-Received: by 2002:a17:907:20ca:b0:87b:d2b3:67ca with SMTP id qq10-20020a17090720ca00b0087bd2b367camr159448ejb.75.1677534837776;
-        Mon, 27 Feb 2023 13:53:57 -0800 (PST)
-Received: from redhat.com ([2.52.141.194])
-        by smtp.gmail.com with ESMTPSA id o15-20020a1709064f8f00b008b17662e1f7sm3721063eju.53.2023.02.27.13.53.56
+        bh=wFgPcL8KVOlQG1KgcGofHxwMq+phFfsr6crnqyLQQyA=;
+        b=f960oaidUS4Jy3u8+WmbAKH1Yekf/6TP/Qxcaj9Dp6JDlKTBhkv/wC1w0T/++f7l6o
+         dc0re45z/Pd2A48t0veQfH8JqPZx/MCu6DkFeVyBS4q7TD0a0PVbwxV/0kzkCveQ7ycI
+         s7krSsNbCf73LxrOdVpiXhku08eLK2YLaKXCwrtJVsP9Ps81doUMrd6fI8T6CCSkd/UF
+         40mjfCWSIZRuaPO9OWjmR9GifkYap4/L9bcYpYzEL6bjqBGO7sCOHXVJlWhuQ1vv8rCA
+         LgVW+26Z17mPSmTSpN7MNyUKo3bhT7qpUMYGvK+4lUbgz5i/R6dauEA0Z8Tql6BWppMy
+         iduA==
+X-Gm-Message-State: AO0yUKXKBWI6HWTO2TXnIgWFhHAZ93DRYJv0A0M+3Gh6bfpSBFW5ASBd
+        IWCl37zP2kNhsOPNVRl6d4CnISZ/HlI=
+X-Google-Smtp-Source: AK7set+5Omb4ClWPydT4jEk78/I+pwk3G4znG+tewbGh3pNAOo0tskbURqtW8DovI2zb92q2jXMcQA==
+X-Received: by 2002:a17:902:c1d2:b0:19c:e484:b45 with SMTP id c18-20020a170902c1d200b0019ce4840b45mr417927plc.27.1677535093066;
+        Mon, 27 Feb 2023 13:58:13 -0800 (PST)
+Received: from localhost ([192.55.54.55])
+        by smtp.gmail.com with ESMTPSA id b21-20020a170902d31500b0019a8e559345sm5042507plc.167.2023.02.27.13.58.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Feb 2023 13:53:57 -0800 (PST)
-Date:   Mon, 27 Feb 2023 16:53:53 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jacob Keller <jacob.e.keller@intel.com>
-Cc:     kvm@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH] vhost: use struct_size and size_add to compute flex
- array sizes
-Message-ID: <20230227165340-mutt-send-email-mst@kernel.org>
-References: <20230227214127.3678392-1-jacob.e.keller@intel.com>
+        Mon, 27 Feb 2023 13:58:12 -0800 (PST)
+Date:   Mon, 27 Feb 2023 13:58:10 -0800
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "Aktas, Erdem" <erdemaktas@google.com>,
+        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+        "dmatlack@google.com" <dmatlack@google.com>,
+        "Christopherson,, Sean" <seanjc@google.com>
+Subject: Re: [PATCH v11 033/113] KVM: x86/mmu: Track shadow MMIO value on a
+ per-VM basis
+Message-ID: <20230227215810.GN4175971@ls.amr.corp.intel.com>
+References: <cover.1673539699.git.isaku.yamahata@intel.com>
+ <e3a95546186bc010c11da4152b8980a86702b6a9.1673539699.git.isaku.yamahata@intel.com>
+ <886ee34123be83bbe565c5d02e5b0d4c000ef5a6.camel@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230227214127.3678392-1-jacob.e.keller@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+In-Reply-To: <886ee34123be83bbe565c5d02e5b0d4c000ef5a6.camel@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,58 +81,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 27, 2023 at 01:41:27PM -0800, Jacob Keller wrote:
-> The vhost_get_avail_size and vhost_get_used_size functions compute the size
-> of structures with flexible array members with an additional 2 bytes if the
-> VIRTIO_RING_F_EVENT_IDX feature flag is set. Convert these functions to use
-> struct_size() and size_add() instead of coding the calculation by hand.
-> 
-> This ensures that the calculations will saturate at SIZE_MAX rather than
-> overflowing.
-> 
-> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Jason Wang <jasowang@redhat.com>
-> Cc: virtualization@lists.linux-foundation.org
-> Cc: kvm@vger.kernel.org
+On Mon, Jan 16, 2023 at 11:16:04AM +0000,
+"Huang, Kai" <kai.huang@intel.com> wrote:
 
+> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> > index 6111e3e9266d..dffacb7eb15a 100644
+> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> > @@ -19,6 +19,14 @@ int kvm_mmu_init_tdp_mmu(struct kvm *kvm)
+> >  {
+> >  	struct workqueue_struct *wq;
+> >  
+> > +	/*
+> > +	 * TDs require mmio_caching to clear suppress_ve bit of SPTE for GPA
+> > +	 * of MMIO so that TD can convert #VE triggered by MMIO into
+> > +	 * TDG.VP.VMCALL<MMIO>.
+> > +	 */
+> > +	if (kvm->arch.vm_type == KVM_X86_TDX_VM && !enable_mmio_caching)
+> > +		return -EOPNOTSUPP;
+> 
+> SEV-ES does the check in hardware_setup:
+> 
+> void __init sev_hardware_setup(void)
+> {
+> 	...
+> 	/*
+>          * SEV-ES requires MMIO caching as KVM doesn't have access to the guest
+>          * instruction stream, i.e. can't emulate in response to a #NPF and
+>          * instead relies on #NPF(RSVD) being reflected into the guest as #VC
+>          * (the guest can then do a #VMGEXIT to request MMIO emulation).
+>          */
+>         if (!enable_mmio_caching)
+>                 goto out;
+> 
+> 	...
+> }
+> 
+> TDX should be done in the same way.
+> 
+> And IMO this chunk really doesn't belong to this patch -- I interpret this patch
+> as a "infrastructure patch to track shadow MMIO value on per-VM basis" (which
+> even should have no functional change IMHO), but this chunk is clearly doing
+> more than that.
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-
-Will merge, thanks!
-> ---
-> 
-> I found this using a coccinelle patch I developed and submitted at [1].
-> 
-> [1]: https://lore.kernel.org/all/20230227202428.3657443-1-jacob.e.keller@intel.com/
-> 
->  drivers/vhost/vhost.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> index f11bdbe4c2c5..43fa626d4e44 100644
-> --- a/drivers/vhost/vhost.c
-> +++ b/drivers/vhost/vhost.c
-> @@ -436,8 +436,7 @@ static size_t vhost_get_avail_size(struct vhost_virtqueue *vq,
->  	size_t event __maybe_unused =
->  	       vhost_has_feature(vq, VIRTIO_RING_F_EVENT_IDX) ? 2 : 0;
->  
-> -	return sizeof(*vq->avail) +
-> -	       sizeof(*vq->avail->ring) * num + event;
-> +	return size_add(struct_size(vq->avail, ring, num), event);
->  }
->  
->  static size_t vhost_get_used_size(struct vhost_virtqueue *vq,
-> @@ -446,8 +445,7 @@ static size_t vhost_get_used_size(struct vhost_virtqueue *vq,
->  	size_t event __maybe_unused =
->  	       vhost_has_feature(vq, VIRTIO_RING_F_EVENT_IDX) ? 2 : 0;
->  
-> -	return sizeof(*vq->used) +
-> -	       sizeof(*vq->used->ring) * num + event;
-> +	return size_add(struct_size(vq->used, ring, num), event);
->  }
->  
->  static size_t vhost_get_desc_size(struct vhost_virtqueue *vq,
-> -- 
-> 2.39.1.405.gd4c25cc71f83
-
+It's cleaner to do in hardware_setup().  So I moved the logic into
+hardware_setup() and an independent patch.
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
