@@ -2,136 +2,277 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F41016A41A8
-	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 13:26:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 018A06A41CE
+	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 13:39:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229619AbjB0M0C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Feb 2023 07:26:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44974 "EHLO
+        id S229771AbjB0Mj0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Feb 2023 07:39:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229535AbjB0M0A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Feb 2023 07:26:00 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 213C5A5D9
-        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 04:25:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677500712;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=/D7tQ/gvj6J6RaU9Iv6dlgG5G7wnXshRvfDZGTvLJx4=;
-        b=SzT5e3VdRKIiFaDry8Kv1JuwJaBCCXUoKw1GgqK8TSVP1RRvQ03F6+TH6N2S3PhtUE9aiF
-        iP4oS2Pbgyxc4nkJIqLLmly0pXxjMKYUzK4lEAomvDTltXpJz4ImstZUjCglazA7tsjcfP
-        KBOkZwVxjJk5PXzR4A96SkbpF5jzewU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-531-iPIuThf7OPm4zqBmIqJA2Q-1; Mon, 27 Feb 2023 07:25:09 -0500
-X-MC-Unique: iPIuThf7OPm4zqBmIqJA2Q-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 45FC295D605;
-        Mon, 27 Feb 2023 12:25:08 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.39.192.88])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 229BE40C6EC4;
-        Mon, 27 Feb 2023 12:25:08 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-        id 3457421E6A1F; Mon, 27 Feb 2023 13:25:07 +0100 (CET)
-From:   Markus Armbruster <armbru@redhat.com>
-To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org,
-        qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
-        berrange@redhat.com, clg@kaod.org
-Subject: Re: [PATCH v16 08/11] qapi/s390x/cpu topology: set-cpu-topology
- monitor command
-References: <20230222142105.84700-1-pmorel@linux.ibm.com>
-        <20230222142105.84700-9-pmorel@linux.ibm.com>
-        <aaf4aa7b7350e88f65fc03f148146e38fe4f7fdb.camel@linux.ibm.com>
-        <0a93eb0e-2552-07b7-2067-f46d542126f4@redhat.com>
-        <9e1cbbe11ac1429335c288e817a21f19f8f4af87.camel@linux.ibm.com>
-Date:   Mon, 27 Feb 2023 13:25:07 +0100
-In-Reply-To: <9e1cbbe11ac1429335c288e817a21f19f8f4af87.camel@linux.ibm.com>
-        (Nina Schoetterl-Glausch's message of "Mon, 27 Feb 2023 11:49:51
-        +0100")
-Message-ID: <87v8jnqorg.fsf@pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+        with ESMTP id S229696AbjB0MjX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Feb 2023 07:39:23 -0500
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1DD71DBB8
+        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 04:39:17 -0800 (PST)
+Received: by mail-wr1-x42d.google.com with SMTP id h14so6055751wru.4
+        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 04:39:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KrHnIRC2jYaBC2e4yjaTMbWngYwHrNBQLzk9oe0LwQ8=;
+        b=ipqan8Z/X8py+cun9tPrIy3YkCXeKQIQMGe0gQw5Ir28CoJv9qGxi0cSXXmcbFNf5x
+         T7rs48cYcBcDaCa5/8oauPUl0Y4M9rTU/jZ57CJr/DHvVAohNe4svkw5ZQ/b9F9+L7IW
+         4APqQnjinQhs+4yjXjjs5y4l27jUiGNo36CrTZGohJsahtX8XeAX7Zsp97D0KwLtnNZF
+         l9XP/213uMwrchnQ7XixIrL86wDy0ukjlImqNLkyRukNELDBF2aT1DvHGb2a5iktnF2x
+         5PRJjRGnQJi1cMURPKUT/fcDpxAzwTK+Vnlv+sYHYTA4EQ0S9FwevzcyZPm7EC/sxPUB
+         Wvlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KrHnIRC2jYaBC2e4yjaTMbWngYwHrNBQLzk9oe0LwQ8=;
+        b=oDFaCAJibH3WqFrBRynWM5wA3Yl2fTeQUYJ2p6UHkTi/nqITdveZqqs+feV8cm5xhl
+         Mm7fXP7WqpcZN4WQ0r6VpL/k8DLjTzr6zjmTRfyJdq9+UxiUzPKE+ZFFWy9TkJHg6Sz6
+         2fRl56i8r8bMzajZYPKcBNVT8V3tAD1AmV9O4BlrqvQd8q1V41H4ujfau2G2RF9vBvkk
+         5hx8yPEkLcv3faRH5dzYP/m3AWPo346Hx8br5SWQaspHXH7fRvP6T2BrmsI4CZkTWWwm
+         c9Ajnn5np5WdlQcmNGWKhjvCDq6JVxwpWeSGFQaQpPsjzbndjTcESCeNQsqjJz17T3dl
+         dAlg==
+X-Gm-Message-State: AO0yUKVV6ELJ3ELqczYZzmKJZIVto1I44ZqYy2XfPdS0HnUOjvhS03pc
+        7Ofaq3asICgs6YMfigVA8NnUVA==
+X-Google-Smtp-Source: AK7set+3uQ6qbyBkMLLFYEu8tvEwP6ogs6g4tYqcG8r3AVgVfN6mlbg6ABxOYVG37prkgmc5cTRGeg==
+X-Received: by 2002:a05:6000:1205:b0:2c7:454:cee3 with SMTP id e5-20020a056000120500b002c70454cee3mr19747497wrx.7.1677501556499;
+        Mon, 27 Feb 2023 04:39:16 -0800 (PST)
+Received: from localhost.localdomain ([81.0.6.76])
+        by smtp.gmail.com with ESMTPSA id l7-20020a5d5267000000b002c8ed82c56csm7001894wrc.116.2023.02.27.04.39.14
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 27 Feb 2023 04:39:15 -0800 (PST)
+From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+To:     qemu-devel@nongnu.org
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        John Snow <jsnow@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Fabiano Rosas <farosas@suse.de>,
+        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+        kvm@vger.kernel.org
+Subject: [PULL 004/123] gdbstub: Use vaddr type for generic insert/remove_breakpoint() API
+Date:   Mon, 27 Feb 2023 13:36:48 +0100
+Message-Id: <20230227123847.27110-5-philmd@linaro.org>
+X-Mailer: git-send-email 2.38.1
+In-Reply-To: <20230227123847.27110-1-philmd@linaro.org>
+References: <20230227123847.27110-1-philmd@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Nina Schoetterl-Glausch <nsg@linux.ibm.com> writes:
+Both insert/remove_breakpoint() handlers are used in system and
+user emulation. We can not use the 'hwaddr' type on user emulation,
+we have to use 'vaddr' which is defined as "wide enough to contain
+any #target_ulong virtual address".
 
-> On Mon, 2023-02-27 at 08:59 +0100, Thomas Huth wrote:
+gdbstub.c doesn't require to include "exec/hwaddr.h" anymore.
 
-[...]
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Fabiano Rosas <farosas@suse.de>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Message-Id: <20221216215519.5522-4-philmd@linaro.org>
+---
+ accel/kvm/kvm-all.c        | 4 ++--
+ accel/kvm/kvm-cpus.h       | 4 ++--
+ accel/tcg/tcg-accel-ops.c  | 4 ++--
+ gdbstub/gdbstub.c          | 1 -
+ gdbstub/internals.h        | 6 ++++--
+ gdbstub/softmmu.c          | 5 ++---
+ gdbstub/user.c             | 5 ++---
+ include/sysemu/accel-ops.h | 6 +++---
+ 8 files changed, 17 insertions(+), 18 deletions(-)
 
->> I'm not sure whether double inclusion works with the QAPI parser (since this 
->> might code to be generated twice) ... have you tried?
->
-> I haven't, the documentation says:
->
->> Include directives
->> ------------------
->> 
->> Syntax::
->> 
->>     INCLUDE = { 'include': STRING }
->> 
->> The QAPI schema definitions can be modularized using the 'include' directive::
->> 
->>  { 'include': 'path/to/file.json' }
->> 
->> The directive is evaluated recursively, and include paths are relative
->> to the file using the directive.  Multiple includes of the same file
->> are idempotent.
->
-> Which is why I thought it should work, but I guess this is a statement about
-> including the same file twice in another file and not about including the same
-> file from two files.
-
-No, this is intended to say multiple inclusion is fine, regardless where
-the include directives are.
-
-An include directive has two effects:
-
-1. If the included file has not been included already, pull in its
-   contents.
-
-2. Insert #include in generated C.  Example: qdev.json includes
-   qom.json.  The generated qapi-*-qdev.h include qapi-types-qom.h.
-
-   Including any required modules, as recommended by qapi-code-gen.rst,
-   results in properly self-contained generated headers.
-
-> But then, as far as I can tell, the build system only builds qapi-schema.json,
-> which includes all other files, so it could apply.
-
-Yes, qapi-schema.json is the main module, which includes all the others.
-
-In fact, it includes all the others *directly*.  Why?
-
-We generate documentation in source order.  Included material gets
-inserted right at the first inclusion; subsequent inclusions have no
-effect.
-
-If we put all first inclusions right into qapi-schema.json, the order of
-things in documentation is visible right there, and won't change just
-because we change inclusions deeper down.
-
-Questions?
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 9b26582655..79b3d58a9c 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -3305,7 +3305,7 @@ bool kvm_supports_guest_debug(void)
+     return kvm_has_guest_debug;
+ }
+ 
+-int kvm_insert_breakpoint(CPUState *cpu, int type, hwaddr addr, hwaddr len)
++int kvm_insert_breakpoint(CPUState *cpu, int type, vaddr addr, vaddr len)
+ {
+     struct kvm_sw_breakpoint *bp;
+     int err;
+@@ -3343,7 +3343,7 @@ int kvm_insert_breakpoint(CPUState *cpu, int type, hwaddr addr, hwaddr len)
+     return 0;
+ }
+ 
+-int kvm_remove_breakpoint(CPUState *cpu, int type, hwaddr addr, hwaddr len)
++int kvm_remove_breakpoint(CPUState *cpu, int type, vaddr addr, vaddr len)
+ {
+     struct kvm_sw_breakpoint *bp;
+     int err;
+diff --git a/accel/kvm/kvm-cpus.h b/accel/kvm/kvm-cpus.h
+index fd63fe6a59..ca40add32c 100644
+--- a/accel/kvm/kvm-cpus.h
++++ b/accel/kvm/kvm-cpus.h
+@@ -19,8 +19,8 @@ void kvm_cpu_synchronize_post_reset(CPUState *cpu);
+ void kvm_cpu_synchronize_post_init(CPUState *cpu);
+ void kvm_cpu_synchronize_pre_loadvm(CPUState *cpu);
+ bool kvm_supports_guest_debug(void);
+-int kvm_insert_breakpoint(CPUState *cpu, int type, hwaddr addr, hwaddr len);
+-int kvm_remove_breakpoint(CPUState *cpu, int type, hwaddr addr, hwaddr len);
++int kvm_insert_breakpoint(CPUState *cpu, int type, vaddr addr, vaddr len);
++int kvm_remove_breakpoint(CPUState *cpu, int type, vaddr addr, vaddr len);
+ void kvm_remove_all_breakpoints(CPUState *cpu);
+ 
+ #endif /* KVM_CPUS_H */
+diff --git a/accel/tcg/tcg-accel-ops.c b/accel/tcg/tcg-accel-ops.c
+index 19cbf1db3a..d9228fd403 100644
+--- a/accel/tcg/tcg-accel-ops.c
++++ b/accel/tcg/tcg-accel-ops.c
+@@ -116,7 +116,7 @@ static inline int xlat_gdb_type(CPUState *cpu, int gdbtype)
+     return cputype;
+ }
+ 
+-static int tcg_insert_breakpoint(CPUState *cs, int type, hwaddr addr, hwaddr len)
++static int tcg_insert_breakpoint(CPUState *cs, int type, vaddr addr, vaddr len)
+ {
+     CPUState *cpu;
+     int err = 0;
+@@ -147,7 +147,7 @@ static int tcg_insert_breakpoint(CPUState *cs, int type, hwaddr addr, hwaddr len
+     }
+ }
+ 
+-static int tcg_remove_breakpoint(CPUState *cs, int type, hwaddr addr, hwaddr len)
++static int tcg_remove_breakpoint(CPUState *cs, int type, vaddr addr, vaddr len)
+ {
+     CPUState *cpu;
+     int err = 0;
+diff --git a/gdbstub/gdbstub.c b/gdbstub/gdbstub.c
+index be88ca0d71..c3fbc31123 100644
+--- a/gdbstub/gdbstub.c
++++ b/gdbstub/gdbstub.c
+@@ -48,7 +48,6 @@
+ #include "sysemu/runstate.h"
+ #include "semihosting/semihost.h"
+ #include "exec/exec-all.h"
+-#include "exec/hwaddr.h"
+ #include "sysemu/replay.h"
+ 
+ #include "internals.h"
+diff --git a/gdbstub/internals.h b/gdbstub/internals.h
+index eabb0341d1..b23999f951 100644
+--- a/gdbstub/internals.h
++++ b/gdbstub/internals.h
+@@ -9,9 +9,11 @@
+ #ifndef _INTERNALS_H_
+ #define _INTERNALS_H_
+ 
++#include "exec/cpu-common.h"
++
+ bool gdb_supports_guest_debug(void);
+-int gdb_breakpoint_insert(CPUState *cs, int type, hwaddr addr, hwaddr len);
+-int gdb_breakpoint_remove(CPUState *cs, int type, hwaddr addr, hwaddr len);
++int gdb_breakpoint_insert(CPUState *cs, int type, vaddr addr, vaddr len);
++int gdb_breakpoint_remove(CPUState *cs, int type, vaddr addr, vaddr len);
+ void gdb_breakpoint_remove_all(CPUState *cs);
+ 
+ #endif /* _INTERNALS_H_ */
+diff --git a/gdbstub/softmmu.c b/gdbstub/softmmu.c
+index f208c6cf15..129575e510 100644
+--- a/gdbstub/softmmu.c
++++ b/gdbstub/softmmu.c
+@@ -11,7 +11,6 @@
+ 
+ #include "qemu/osdep.h"
+ #include "exec/gdbstub.h"
+-#include "exec/hwaddr.h"
+ #include "sysemu/cpus.h"
+ #include "internals.h"
+ 
+@@ -24,7 +23,7 @@ bool gdb_supports_guest_debug(void)
+     return false;
+ }
+ 
+-int gdb_breakpoint_insert(CPUState *cs, int type, hwaddr addr, hwaddr len)
++int gdb_breakpoint_insert(CPUState *cs, int type, vaddr addr, vaddr len)
+ {
+     const AccelOpsClass *ops = cpus_get_accel();
+     if (ops->insert_breakpoint) {
+@@ -33,7 +32,7 @@ int gdb_breakpoint_insert(CPUState *cs, int type, hwaddr addr, hwaddr len)
+     return -ENOSYS;
+ }
+ 
+-int gdb_breakpoint_remove(CPUState *cs, int type, hwaddr addr, hwaddr len)
++int gdb_breakpoint_remove(CPUState *cs, int type, vaddr addr, vaddr len)
+ {
+     const AccelOpsClass *ops = cpus_get_accel();
+     if (ops->remove_breakpoint) {
+diff --git a/gdbstub/user.c b/gdbstub/user.c
+index 033e5fdd71..484bd8f461 100644
+--- a/gdbstub/user.c
++++ b/gdbstub/user.c
+@@ -9,7 +9,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "exec/hwaddr.h"
+ #include "exec/gdbstub.h"
+ #include "hw/core/cpu.h"
+ #include "internals.h"
+@@ -20,7 +19,7 @@ bool gdb_supports_guest_debug(void)
+     return true;
+ }
+ 
+-int gdb_breakpoint_insert(CPUState *cs, int type, hwaddr addr, hwaddr len)
++int gdb_breakpoint_insert(CPUState *cs, int type, vaddr addr, vaddr len)
+ {
+     CPUState *cpu;
+     int err = 0;
+@@ -41,7 +40,7 @@ int gdb_breakpoint_insert(CPUState *cs, int type, hwaddr addr, hwaddr len)
+     }
+ }
+ 
+-int gdb_breakpoint_remove(CPUState *cs, int type, hwaddr addr, hwaddr len)
++int gdb_breakpoint_remove(CPUState *cs, int type, vaddr addr, vaddr len)
+ {
+     CPUState *cpu;
+     int err = 0;
+diff --git a/include/sysemu/accel-ops.h b/include/sysemu/accel-ops.h
+index 8cc7996def..30690c71bd 100644
+--- a/include/sysemu/accel-ops.h
++++ b/include/sysemu/accel-ops.h
+@@ -10,7 +10,7 @@
+ #ifndef ACCEL_OPS_H
+ #define ACCEL_OPS_H
+ 
+-#include "exec/hwaddr.h"
++#include "exec/cpu-common.h"
+ #include "qom/object.h"
+ 
+ #define ACCEL_OPS_SUFFIX "-ops"
+@@ -48,8 +48,8 @@ struct AccelOpsClass {
+ 
+     /* gdbstub hooks */
+     bool (*supports_guest_debug)(void);
+-    int (*insert_breakpoint)(CPUState *cpu, int type, hwaddr addr, hwaddr len);
+-    int (*remove_breakpoint)(CPUState *cpu, int type, hwaddr addr, hwaddr len);
++    int (*insert_breakpoint)(CPUState *cpu, int type, vaddr addr, vaddr len);
++    int (*remove_breakpoint)(CPUState *cpu, int type, vaddr addr, vaddr len);
+     void (*remove_all_breakpoints)(CPUState *cpu);
+ };
+ 
+-- 
+2.38.1
 
