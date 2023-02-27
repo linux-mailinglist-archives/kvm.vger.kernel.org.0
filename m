@@ -2,147 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CF39F6A4390
-	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 15:00:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A8486A43E4
+	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 15:12:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229749AbjB0OAh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Feb 2023 09:00:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48200 "EHLO
+        id S230029AbjB0OMM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Feb 2023 09:12:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229566AbjB0OAf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Feb 2023 09:00:35 -0500
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2053.outbound.protection.outlook.com [40.107.244.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D15F912064;
-        Mon, 27 Feb 2023 06:00:34 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=E5xO2EHVVg9i4BREYTH5hFVgNvdVvh36BQaCBdvYs+p3ZKb6Ic6ljG4UbE9tr7d+aQwLDTX1F7k6uDF5WaYiWbQTNOqiTlwswhHtSuHhlxNeD8fsbN+St3TMJxXr5lvsJrvqe8gWSG5eIU5Chr6oxipv+kky4s9UhNyQVLrsuzphfanh50ZuW+bXkzm2h69DYaTCgKt1yWn0YLA7XEjNNFTNPY6TUeoJAVM/IrCOAoewZjvpZV8CnxTlkll0JcqBj3P5NnxPHYfHCJn4/rOGXOkH2uQeGrRLtosJ8T8p1rFgpUqxtJ/aIjGvuQGsXryQtv0VIIFu6phki/JLRmzJUA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tYfkqvIp2aJo2Wu9/j86NB+gIRKso1wugOeDUGf2Odg=;
- b=ZWsy94CCps89ha33ISSa3rMH5IJX+y5Ek/p0dOqpvpxXT5wpG+buUdv0+5KKpaM+j+Mg2KmTpgi2/9inVBbCZhT7CbEkwS4OqbkfIJ2w05WQIWDHV+N1iAVOva5ox/0k599pDZ6J3thDvExQM1WqIJKWG0aRW4ilyVcRORkBLA9MZ/GCs7fXs//12ArdJ5Ji1XqPwbRffXRjkvf4Ear+rbVxHHqcLrwwyJPqnDQpK6ZCMXBIGqaAj3sF8MjbWdrsq8K/w6Ni87opeWi3PK0YoyzuymWhdcDZEwXx8jJrUhBkmOmjzxmqhxL3aA7YdR3nNytZPopMB/kFUX93ppse5g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tYfkqvIp2aJo2Wu9/j86NB+gIRKso1wugOeDUGf2Odg=;
- b=eQyoOAaGs1D6GRuGMtEn+EI0yta4oDzSpnV8NR8VCZriUs/31rSM2OHHw4abi0c+wn+Tpp1+k7hmrUy1PNPvXghGsyLLEXfyPxu44udT2sEeAO33rzH/T71q2UgcBub/PBDacbUsLJ2Z1TDQG1iFpdjHYWR6aUyyJDUznzO4hz+KhsxCndLbAD42VgNVQygLVwZudBSyFT4JmMSagrgHYCsTY1iKnu5px21FFta3vaiGe0Qy6ZobsDxXkb95Iz5NeT+uiKQkKKqXCGjN9HlBtSug70tDPjZi4NlXY4qJKQUjFaKY7nTL/v17YQ3RNSpYP+XdLDcrRqEQeVO/LE/dFg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DM4PR12MB6638.namprd12.prod.outlook.com (2603:10b6:8:b5::5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6134.29; Mon, 27 Feb 2023 14:00:31 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3cb3:2fce:5c8f:82ee]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3cb3:2fce:5c8f:82ee%4]) with mapi id 15.20.6134.029; Mon, 27 Feb 2023
- 14:00:31 +0000
-Date:   Mon, 27 Feb 2023 10:00:30 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Baolu Lu <baolu.lu@linux.intel.com>
-Cc:     iommu@lists.linux.dev, Kevin Tian <kevin.tian@intel.com>,
-        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
-        Nicolin Chen <nicolinc@nvidia.com>, Yi Liu <yi.l.liu@intel.com>
-Subject: Re: [PATCH 09/14] iommufd: Add iommufd_device_replace()
-Message-ID: <Y/y3fnSJZB7QhAKM@nvidia.com>
-References: <9-v1-7612f88c19f5+2f21-iommufd_alloc_jgg@nvidia.com>
- <909ee61a-9cbd-eda1-89a2-349348eeb735@linux.intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <909ee61a-9cbd-eda1-89a2-349348eeb735@linux.intel.com>
-X-ClientProxiedBy: MN2PR20CA0039.namprd20.prod.outlook.com
- (2603:10b6:208:235::8) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S229783AbjB0OML (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Feb 2023 09:12:11 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D7F61F5F3
+        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 06:12:10 -0800 (PST)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31RCwGmc026762;
+        Mon, 27 Feb 2023 14:11:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=XltuIMq36m0ajhKQ7upmU3Dd3wV1feKXreEaVrIQNTg=;
+ b=JOD9JMuh9OY7L1n2rsKP6eqnbCcB1kDQv2CjdJmNnHFOFH8TsKuI0PaXEFrz1cKiRRQC
+ 6YKXkjSqQIDd55BIZ/f8al7Sq6TcVEV/MVXyOrnOyPvnlSAvpImAzuPIfKQnjhG26H8T
+ BNc8B6dSw9XlGigf/iene8u6qmwz8DFiu0YI4eOjM8O6uTw8dU3sGnYN7jcj1ifQ9voF
+ MXwAch5qHUMDkxgJ7biCIoIcQZf0iE+bO3i60ey0Q4u1I8rvdDBNGO98yYT6xIDsrhhS
+ llznt9EPDVwGIccFNUUKAdfUwaCI+tbccLqLqH/vyWGhiUq6j/KBrWIcVeSlJLstsJfZ 9Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p0u1r5cwk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Feb 2023 14:11:55 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31RDQprc003376;
+        Mon, 27 Feb 2023 14:11:55 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p0u1r5cvf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Feb 2023 14:11:55 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31R83bSC026638;
+        Mon, 27 Feb 2023 14:11:52 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3nybb4j2wk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Feb 2023 14:11:52 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31REBnYN21365390
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 27 Feb 2023 14:11:49 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 25E222004B;
+        Mon, 27 Feb 2023 14:11:49 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4EF9A20049;
+        Mon, 27 Feb 2023 14:11:47 +0000 (GMT)
+Received: from [9.171.14.212] (unknown [9.171.14.212])
+        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Mon, 27 Feb 2023 14:11:47 +0000 (GMT)
+Message-ID: <9d80a9d9-e640-2fe7-6e66-4b3277a3ba5e@linux.ibm.com>
+Date:   Mon, 27 Feb 2023 15:11:46 +0100
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM4PR12MB6638:EE_
-X-MS-Office365-Filtering-Correlation-Id: 94a18dab-9f8f-4092-8587-08db18cafd01
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Y7l8pmNM2nZX1MmAN92O9rJTw7F+q6u46o9jxJqPbRdXplxorUrWM9ZwPu5EfhAjAheg9kndp+gVMwYSGIy4LEFkdFIXTMtQ9ypduegvNwhr0U9eunyAU/QUmBrkrS6Emd7sCGnNoaf0+d4hXfxw+Yj39qI8aX/S+P4aHgv9CqTvGIN1GgKltuSf5BV1pvZ0rsNqF1WQn5EO96GbvMQNxDGcAgas7fxevmJmP6dH9ZF+7zqcM33fCqvAxKihZ1VieySR9vldCY4OANOtMlemMN+V/rrXAYz3qp3AltwJdmwxVg8yNcow2kGh+b0+OEJAF8I6UfUoRTUVgzcccRxS6ZfsdBS/9eSy05wPg8vzBl4ZyrYZWuPZvICK6IDvEB9dt5CXJAZkb8NHbV4iW+uH/qB/pur8maADLvKl+dho5lpCSMk++ljoGE/xrg+6r2wLQdjU3960O+k5EakjmcO94kZo1IX5ulk3srZDb2ZtLD1rWIHCY7JZpcDCd754E2VFg+cIgVhQV/Rog0jpNDOsqzqcqI/dmCSu8281V6n+V0YMSOXOfMv9on52+ZEJkZ9HQHM9Q4jriASd6KAajlBYT0w+zvWMlqKi98cCvm5rDHSeV3Y3tUjFZoubhsCvRVKePNk2++zaZ3SQlc79d39mmg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(396003)(39860400002)(366004)(376002)(346002)(136003)(451199018)(36756003)(66556008)(66476007)(8676002)(66946007)(6916009)(8936002)(41300700001)(4326008)(5660300002)(2906002)(86362001)(38100700002)(478600001)(6486002)(316002)(54906003)(6506007)(53546011)(26005)(6512007)(2616005)(186003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?fF3Ai1beD0BFBS20yMbL2Xd4eXP7ruDTr2LcQCjaAyd5jAyQW+T7Xqoezl1s?=
- =?us-ascii?Q?3T6gbQoNiey6zpMsaLJ1I4PAA2Ze8lsIZ8poS/Xwniky4Wz9+ziErG8F0EWg?=
- =?us-ascii?Q?q1XOBrYMz+elqLpBysHL2yiF/Cjpp6LR5Aaz849iTAgeHgqIB8balW9ItgIh?=
- =?us-ascii?Q?GitGf+EHbQjJWohCx+M3hLNC1E5J4iVQPVhbb/+QJscqmVeYcQGtmtyhXTEP?=
- =?us-ascii?Q?Z4eQX6dLXHLkNI/iwxNdePp4V3UHOz4VJyE+Pk/Bz/h4D0C3jqylF6+aknW3?=
- =?us-ascii?Q?HKjpLvU3n15JasY8JXFWv6XTnGC9LjwxXZznA+TtJJdUS0JvEbhkcxQVOKU9?=
- =?us-ascii?Q?efX65H6Z/ayNJCeB58CN6RtVzZuF2MXvOw4PQZaYVdidL3b/VTU28T1xrn81?=
- =?us-ascii?Q?gbrzioAwH8V3b126QHc732P0jD2GI3YUaCeuzLVtDlKF0dBBPUXs+5upblYr?=
- =?us-ascii?Q?H0czEaukHBLKa61CR1T3d+HIR8EReAM+wZo2qWaqXDGw3/8c2Y+GTi9yfhdJ?=
- =?us-ascii?Q?spz53Brf5pxU5PmtqB3qBnIe9mo6ozJmxXs1pFKkwnK84GO+a4Tn+K/x2Rj6?=
- =?us-ascii?Q?6w0V0riwHFaCxMW4yRb+qs49TOob6xfTH2SUtZO/lFyKzIQXBJ9MUL/0U2mB?=
- =?us-ascii?Q?NgslpRtFJeLDESEJMRC/wNhKYuKx/K97ELXS/kOo9omkbGJdkMmMfMNrGWHC?=
- =?us-ascii?Q?RbsL8qjQXs1G14Xy39iPSSIty1DzDCDw58YrsLWOaStHP72VCEfK2DQwm90L?=
- =?us-ascii?Q?+8d+y8XFpx4N51mSb1o5gZgGxpCtRjS9CbpfgEdo1CobX67Mfnkqqp2cfLTh?=
- =?us-ascii?Q?U2dP2Bn2CP5EXfIEif+0WYoI/QyDi/Vgd25sjpPnppsr2EQoPzMSvMz1ozFS?=
- =?us-ascii?Q?6j4tKrKD/TnWSPKjvJfqR6acIFby5LIQ6G7cn8iWDICG8aYn183uDGvLaIAz?=
- =?us-ascii?Q?387w5ChuagQmgcnGINLmI2K52p/P4agO0T969vxHQEhp2K0/EGri6t+Bzdqf?=
- =?us-ascii?Q?zwRDRxNeDDPwGAgtCZ30wkkp4QMvz+fVrWMU0JReaaA/iRAu61VfS+gfCUCz?=
- =?us-ascii?Q?uBu0YNsvfcPbnUk66LnNl6UOe/v1IPRT128gl4JRZ/Bp2/hg838ZShufZo9S?=
- =?us-ascii?Q?52IHCkjQV37kexN28a6xHPmSxZwt0EmYXmEwsCHf6GWVqvwRvGiFkJMm+ooM?=
- =?us-ascii?Q?DoMmqHxYZjXYE8L2t44KtB6vf5+aZo2Q6uz2HofCOy6mO++K/3ggj+4BW7CN?=
- =?us-ascii?Q?GcjgfkwSLh8AOS/7YBCBk8cV7S6tRtpsEtacA2AFFMIPbkZQLC3pE3VEZ080?=
- =?us-ascii?Q?aSzl3sxPNyJ1vHKphSDU6aGx4GEVa0tV7cXgX3QEKHxdmzdrH3GLnA362zJO?=
- =?us-ascii?Q?jR05KZxcofdfqRFi3f6v8Nv5s3OQt8zwoorQx7BV1TbShNOZf1NKTOR/9eGY?=
- =?us-ascii?Q?MZBgPIVcvjIsa2rqu3SE/lshNR01T8wR3u0mrEDZcKf49HGcVCQRueWA47uO?=
- =?us-ascii?Q?7BS09sh6jtFK6XVHg6fOOVg5XFInVuoLR743YDlmX/qJVNrgO/oP5N0KdBU2?=
- =?us-ascii?Q?E7gYkIqJBRkkmFPjMU42yIgjPGyR+ieU7aEwXnAD?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 94a18dab-9f8f-4092-8587-08db18cafd01
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Feb 2023 14:00:31.6657
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qaaqc+lLkQjF5YZpB8BwjoEQBKHLyvcf1Uqym6XOhKxokP5aED9Kn+RHmtjweUBA
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6638
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH v16 08/11] qapi/s390x/cpu topology: set-cpu-topology
+ monitor command
+Content-Language: en-US
+To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+References: <20230222142105.84700-1-pmorel@linux.ibm.com>
+ <20230222142105.84700-9-pmorel@linux.ibm.com>
+ <aaf4aa7b7350e88f65fc03f148146e38fe4f7fdb.camel@linux.ibm.com>
+ <4335eac8-ba5d-5b6c-b19f-4b10a793ba0c@linux.ibm.com>
+ <7504a2a236c314bcb5a2030c65b95b32d8b896bf.camel@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <7504a2a236c314bcb5a2030c65b95b32d8b896bf.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 7jZPJoJl782ix4mCwmW1033rZFLpKo-G
+X-Proofpoint-ORIG-GUID: 22PfbI7GgoBa_1NqCqBt0jzjTXbTnnVD
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-27_10,2023-02-27_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ clxscore=1015 suspectscore=0 bulkscore=0 mlxlogscore=999 malwarescore=0
+ spamscore=0 impostorscore=0 priorityscore=1501 mlxscore=0 adultscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302270109
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Feb 26, 2023 at 11:13:16AM +0800, Baolu Lu wrote:
-> On 2/25/23 8:27 AM, Jason Gunthorpe wrote:
-> > +/**
-> > + * iommufd_device_attach - Connect a device to an iommu_domain
-> > + * @idev: device to attach
-> > + * @pt_id: Input a IOMMUFD_OBJ_IOAS, or IOMMUFD_OBJ_HW_PAGETABLE
-> > + *         Output the IOMMUFD_OBJ_HW_PAGETABLE ID
-> 
-> "Output the hwpt ID" only happens when the caller input an IOAS object
-> and an auto domain was selected or created for the device.
-> 
-> Do I understand it right?
 
-Technically it always outputs the hwpt, if a hwpt is in put then the
-same hwpt is output.
+On 2/27/23 13:15, Nina Schoetterl-Glausch wrote:
+> On Mon, 2023-02-27 at 11:57 +0100, Pierre Morel wrote:
+>> On 2/24/23 18:15, Nina Schoetterl-Glausch wrote:
+>>> On Wed, 2023-02-22 at 15:21 +0100, Pierre Morel wrote:
+>>>> The modification of the CPU attributes are done through a monitor
+>>>> command.
+>>>>
+>>>> It allows to move the core inside the topology tree to optimize
+>>>> the cache usage in the case the host's hypervisor previously
+>>>> moved the CPU.
+>>>>
+>>>> The same command allows to modify the CPU attributes modifiers
+>>>> like polarization entitlement and the dedicated attribute to notify
+>>>> the guest if the host admin modified scheduling or dedication of a vCPU.
+>>>>
+>>>> With this knowledge the guest has the possibility to optimize the
+>>>> usage of the vCPUs.
+>>>>
+>>>> The command has a feature unstable for the moment.
+>>>>
+>>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>>>> ---
+>>>>    qapi/machine-target.json |  35 +++++++++
+>>>>    include/monitor/hmp.h    |   1 +
+>>>>    hw/s390x/cpu-topology.c  | 154 +++++++++++++++++++++++++++++++++++++++
+>>>>    hmp-commands.hx          |  17 +++++
+>>>>    4 files changed, 207 insertions(+)
+>>>>
+> [...]
+>>>> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+>>>> index ed5fc75381..3a7eb441a3 100644
+>>>> --- a/hw/s390x/cpu-topology.c
+>>>> +++ b/hw/s390x/cpu-topology.c
+>>>> @@ -19,6 +19,12 @@
+>>>>
+> [...]
+>>>> +
+>>>> +void qmp_set_cpu_topology(uint16_t core,
+>>>> +                         bool has_socket, uint16_t socket,
+>>>> +                         bool has_book, uint16_t book,
+>>>> +                         bool has_drawer, uint16_t drawer,
+>>>> +                         const char *entitlement_str,
+>>>> +                         bool has_dedicated, bool dedicated,
+>>>> +                         Error **errp)
+>>>> +{
+>>>> +    bool has_entitlement = false;
+>>>> +    int entitlement;
+>>>> +    ERRP_GUARD();
+>>>> +
+>>>> +    if (!s390_has_topology()) {
+>>>> +        error_setg(errp, "This machine doesn't support topology");
+>>>> +        return;
+>>>> +    }
+>>>> +
+>>>> +    entitlement = qapi_enum_parse(&CpuS390Entitlement_lookup, entitlement_str,
+>>>> +                                  -1, errp);
+>>>> +    if (*errp) {
+>>>> +        return;
+>>>> +    }
+>>>> +    has_entitlement = entitlement >= 0;
+>>> Doesn't this allow setting horizontal entitlement? Which shouldn't be possible,
+>>> only the guest can do it.
+>>
+>> IMHO it does not, the polarization is set by the guest through the PTF
+>> instruction, but entitlement is set by the host.
+> Yes, so when the guests requests vertical polarization, all cpus have a
+> (vertical) entitlement assigned and will show up as vertical in STSI.
+> But now, by using the qmp command, the polarization can be reset to horizontal,
+> even though the guest didn't ask for it.
 
-> >   EXPORT_SYMBOL_NS_GPL(iommufd_device_attach, IOMMUFD);
-> > +/**
-> > + * iommufd_device_replace - Change the device's iommu_domain
-> > + * @idev: device to change
-> > + * @pt_id: Input a IOMMUFD_OBJ_IOAS, or IOMMUFD_OBJ_HW_PAGETABLE
-> > + *         Output the IOMMUFD_OBJ_HW_PAGETABLE ID
-> 
-> If my above understanding is correct, then replace will never output a
-> hwpt id as it only happens after a successful attach.
 
-Replace calls iommufd_device_auto_get_domain() which always sets pt_id
-on success?
+Right, I will change this
 
-If a HWPT was passed in then it just leaves it unchanged which is also
-correct.
 
-Jason
+Regards,
+
+Pierre
+
