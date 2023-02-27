@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 32C196A3CE4
-	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 09:28:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E01D26A3CE6
+	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 09:28:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231613AbjB0I22 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Feb 2023 03:28:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55310 "EHLO
+        id S231620AbjB0I23 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Feb 2023 03:28:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231350AbjB0I1o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Feb 2023 03:27:44 -0500
+        with ESMTP id S231518AbjB0I1r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Feb 2023 03:27:47 -0500
 Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12C0B1EBC4;
-        Mon, 27 Feb 2023 00:25:13 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8DD61E2B2;
+        Mon, 27 Feb 2023 00:25:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1677486314; x=1709022314;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ven1HxTVimVypG4T/5nPJRVxUdsPtANYR+ssWz9PhF4=;
-  b=SI+7jjou2eyUjrU+YZexT4dg9HxbJ3yZbVhH+ZaHrrhqsu8yL6F8p5o8
-   hVSBFLMlJDqgXff/CW9KngqtujfOQk8Au8KeV45GNIw/JEXfPaZhU1rgO
-   SG/IBeUTLgUPTeZxAhngx2Bj1sCtr5RP0XxecPnuelG68OsnmB7Lv4BX2
-   joJZhXguDzIJ1+BudmB2HWJMAkT24Z7yhXrbH9QXQdNCGXh9SRQgncYuy
-   k2OBm3UUOrjZjA/xd1pN3M4wD5kx8O8WSWkw8MZSAE3pHPe1knBPZ+lxp
-   TyGnK11v30dO08cLATUB+jJyeJjCQcRYYhQ5rUuMhBoiBDIZ4tgt6aNG6
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10633"; a="317608933"
+  bh=2MZHmHkMFeF59QdyZJqNO+OmKhW9N2Ox4GCrmhtpfBg=;
+  b=n3Ikr6+iPNi8gQNn1DlbAnv/JtfhVbbqH2pFCQqKac8NETGF7ffNzOwT
+   TbbKowbbmN0HS/6cUcU7v97llaNxQH+s5u+0h+eAE6LdJZ1Sgvask1VGs
+   ZLCKvPGgPUPWQd8BeidA/fyW7OuZieouVbmCmsR/yEZzo45xiBv3706Zf
+   UT66L2a57v6AE17g0xa0rMeYZSt7AXzEbMipR60t2xK1jxjR+o/HzkZCY
+   SLe7R2IWvJEg+3kvYLY8LU8P7Y/ggu2VAONPikgm+KzlxiQoD9GzLQA5g
+   H+UQBK6zGvp410mP0ZLpEZkp1gRwNpK4pI9qyV52Lb4C74gwEZHJNDX4i
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10633"; a="317608944"
 X-IronPort-AV: E=Sophos;i="5.97,331,1669104000"; 
-   d="scan'208";a="317608933"
+   d="scan'208";a="317608944"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
   by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2023 00:24:14 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10633"; a="783242276"
+X-IronPort-AV: E=McAfee;i="6500,9779,10633"; a="783242283"
 X-IronPort-AV: E=Sophos;i="5.97,331,1669104000"; 
-   d="scan'208";a="783242276"
+   d="scan'208";a="783242283"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2023 00:24:13 -0800
 From:   isaku.yamahata@intel.com
@@ -46,9 +46,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         David Matlack <dmatlack@google.com>,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>
-Subject: [PATCH v12 061/106] KVM: TDX: restore user ret MSRs
-Date:   Mon, 27 Feb 2023 00:23:00 -0800
-Message-Id: <500381b5c5bc357b39f3a1c3135513698716cff7.1677484918.git.isaku.yamahata@intel.com>
+Subject: [PATCH v12 062/106] [MARKER] The start of TDX KVM patch series: TD vcpu exits/interrupts/hypercalls
+Date:   Mon, 27 Feb 2023 00:23:01 -0800
+Message-Id: <2f18e1a5dcf8077aab938bcaeee5307d6440597b.1677484918.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1677484918.git.isaku.yamahata@intel.com>
 References: <cover.1677484918.git.isaku.yamahata@intel.com>
@@ -65,83 +65,35 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Several user ret MSRs are clobbered on TD exit.  Restore those values on
-TD exit and before returning to ring 3.
+This empty commit is to mark the start of patch series of TD vcpu
+exits, interrupts, and hypercalls.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/vmx/tdx.c | 43 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 43 insertions(+)
+ Documentation/virt/kvm/intel-tdx-layer-status.rst | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index dee63c3931c8..de8d2d4b03aa 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -506,6 +506,28 @@ void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- 	return;
- }
+diff --git a/Documentation/virt/kvm/intel-tdx-layer-status.rst b/Documentation/virt/kvm/intel-tdx-layer-status.rst
+index 58bff496abda..010c387ef5cc 100644
+--- a/Documentation/virt/kvm/intel-tdx-layer-status.rst
++++ b/Documentation/virt/kvm/intel-tdx-layer-status.rst
+@@ -13,6 +13,7 @@ What qemu can do
+ - Qemu can create/destroy vcpu of TDX vm type.
+ - Qemu can populate initial guest memory image.
+ - Qemu can finalize guest TD.
++- Qemu can start to run vcpu. But vcpu can not make progress yet.
  
-+struct tdx_uret_msr {
-+	u32 msr;
-+	unsigned int slot;
-+	u64 defval;
-+};
-+
-+static struct tdx_uret_msr tdx_uret_msrs[] = {
-+	{.msr = MSR_SYSCALL_MASK,},
-+	{.msr = MSR_STAR,},
-+	{.msr = MSR_LSTAR,},
-+	{.msr = MSR_TSC_AUX,},
-+};
-+
-+static void tdx_user_return_update_cache(void)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(tdx_uret_msrs); i++)
-+		kvm_user_return_update_cache(tdx_uret_msrs[i].slot,
-+					     tdx_uret_msrs[i].defval);
-+}
-+
- static void tdx_restore_host_xsave_state(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
-@@ -545,6 +567,7 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu)
+ Patch Layer status
+ ------------------
+@@ -23,7 +24,7 @@ Patch Layer status
+ * TD vcpu creation/destruction:         Applied
+ * TDX EPT violation:                    Applied
+ * TD finalization:                      Applied
+-* TD vcpu enter/exit:                   Applying
++* TD vcpu enter/exit:                   Applied
+ * TD vcpu interrupts/exit/hypercall:    Not yet
  
- 	tdx_vcpu_enter_exit(vcpu, tdx);
- 
-+	tdx_user_return_update_cache();
- 	tdx_restore_host_xsave_state(vcpu);
- 	tdx->host_state_need_restore = true;
- 
-@@ -1635,6 +1658,26 @@ int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
- 		return -EINVAL;
- 	}
- 
-+	for (i = 0; i < ARRAY_SIZE(tdx_uret_msrs); i++) {
-+		/*
-+		 * Here it checks if MSRs (tdx_uret_msrs) can be saved/restored
-+		 * before returning to user space.
-+		 *
-+		 * this_cpu_ptr(user_return_msrs)->registered isn't checked
-+		 * because the registration is done at vcpu runtime by
-+		 * kvm_set_user_return_msr().
-+		 * Here is setting up cpu feature before running vcpu,
-+		 * registered is already false.
-+		 */
-+		tdx_uret_msrs[i].slot = kvm_find_user_return_msr(tdx_uret_msrs[i].msr);
-+		if (tdx_uret_msrs[i].slot == -1) {
-+			/* If any MSR isn't supported, it is a KVM bug */
-+			pr_err("MSR %x isn't included by kvm_find_user_return_msr\n",
-+				tdx_uret_msrs[i].msr);
-+			return -EIO;
-+		}
-+	}
-+
- 	max_pkgs = topology_max_packages();
- 	tdx_mng_key_config_lock = kcalloc(max_pkgs, sizeof(*tdx_mng_key_config_lock),
- 				   GFP_KERNEL);
+ * KVM MMU GPA shared bits:              Applied
 -- 
 2.25.1
 
