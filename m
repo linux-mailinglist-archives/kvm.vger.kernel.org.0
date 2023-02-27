@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 434216A3D76
-	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 09:53:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D53086A3D78
+	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 09:53:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231499AbjB0IxR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Feb 2023 03:53:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43416 "EHLO
+        id S231593AbjB0Ixe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Feb 2023 03:53:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229842AbjB0Iwq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Feb 2023 03:52:46 -0500
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on20611.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e8b::611])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E8351EBF7;
-        Mon, 27 Feb 2023 00:45:37 -0800 (PST)
+        with ESMTP id S230348AbjB0IxE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Feb 2023 03:53:04 -0500
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on20607.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e8b::607])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05AFF211FB;
+        Mon, 27 Feb 2023 00:45:50 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VyB+WpaDaEiHX3Boil9LPddzHLuSofNHnHKxSCCjQX+YGhFRLo0+0O0pDV9RGyg4hnTJAuAq7HZSWECqb+ro3ccVo4XxHMaoXMhADYt5n4rp0dV4aPBEB7fp2/os4V+92AFRXxHNcVF+7PPtR7t8YnFOkVftrivhYtypqMfM6miS7y11O2z7OPqa08Ae4kgke3sVeoPkg2CJHg+RsDG9J0XvpveTOJs8hnG3UKeP9jAkwcsuePZYfPVhByrrStlhF/+6RiwzXlHO8/MBXvnOXb86PcPphMKDT6xKKls9JQjcHAfasKEP+x7NoP5uevFIHmDXI79P81hjU2pLiZcBog==
+ b=Hz+MXSDoe2oujSPOi94HVmDgaxRuMXiDnxet6cCojqytDWDV/uQRwM5FXoC5W0val4wo5/PbPGftOKpX/LuSoKOu7Nlul6a/6ifISyNO5SCqcdW5aKKBLZqoWMbyKA0/yHArHrZhQh9UfvxtmqjEeZXj27xJh2mzts1N6Tstju0fEZ7O47pGVAj8R6nrdmph26kQF2zdWjmLJX7ikeCPX5ctJHQqARRqVOrA6wxI4PRJZjfQtABkzQre5QX82mp0pJjLKyLsaJ4YHqCDS6Aq+5JEljkxmLJ4rqX3n8Wk+HubJKVEgGbVq5jwpBG4kEC2tEJlwwpwK1tKf1h3s0tIhg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5ZoJBnY5c1ZWHmeG/NH0VLZt3i7xb5uH/tahYI69Vkw=;
- b=HPmGlwMQTpsi1NMRsMXM3m/qlBNP2DyQ/ZI+HzRBMbVyhFcmDnsFgVhXQOvKeCw2q5BczDy9HjkVBWldg0eM0F6bmXi/9dUdT9+miRp+hMROXID2Uu/EbFqVZRSsfAcVkSCgAiyLb1TYtpUG2Ue+35/KBhsd4HJ79DrywJz9Wf5KqxGroeXaqhNUQlpdOOdNqWowdgLcCaArfpNSaRBFyonsI6gzEZLLlmSAf3ZUjSV2NYQ7Cj1JKngIcIZB+4f/BxNeU0mqLlWsSKrj+Y+x5Gg8JUqcy57v+8WKtcQ5N5uhPSHsmtNJ2eBjd+ZeUJLzvYJNr6QFZxUU/CW6rIM3fA==
+ bh=OomX125WHtEtfsV+1qUccQcIwk0c/ySbmyUbcxEXG54=;
+ b=AkPb0rRl3fVRoKoisMSCwg1rrmXZrSo+N2BDPGTqFywcRVpsbrifWeDZ3t05Z2cI09EEx0w/4TNTZM7JrZLhSyYIRiJvPLDdycsu+EUtqYkEA8oHyBdZY3g3ynPvqRvHu47aAvigtJ7Stec5xPpJfEqYgw7edf8RoXbEeKR0aRCGTsDDF1IL82onPCqjy2f7WOsZLuEbyQaP7GZ1F6pjMXXnk46kvf7BvTHfnVPwrtfBOuGHRlirip59diVKo8M2vyI50SvHxfGkF9gECg/dmLt0Dk9ToxW0BAFTYVj1OCJHzijoC3yeNNYjWdqipnnLUxrLA5k0vLf3fXNUs0KkXA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5ZoJBnY5c1ZWHmeG/NH0VLZt3i7xb5uH/tahYI69Vkw=;
- b=2i+CezfS3JsBcqyB99gBSxOcLwZYFmzCY70cBrfQpXNAA6GTr5lRZ6pa6OIDdtsDJ1UaVcjg9d21g9PInxYV71j8S9uKO2QFzQEqTf6QVdZtL34vSNKJLwy3WiW59zmFlDjEXtXFb1rzs8ROHDFleKHJGq/244yv2MqhMM6AO0s=
-Received: from MW4PR03CA0226.namprd03.prod.outlook.com (2603:10b6:303:b9::21)
- by PH8PR12MB8430.namprd12.prod.outlook.com (2603:10b6:510:259::11) with
+ bh=OomX125WHtEtfsV+1qUccQcIwk0c/ySbmyUbcxEXG54=;
+ b=ARtGMiuf85BkIPjCskzIrT5mTNBH4CigycbN6AjRVvJdG6qjGF0mozHk8+tIBU+URkx294oIkDVLJ//mzCDCTU2VXanHTqMcn+nZ1nIl9EaEeEF/Gz47S4WkIIADbgC0Bil9dO1FVXQL7CvHgyYuiaX5X49Rziyu+TFOcIqtu2o=
+Received: from BN9PR03CA0504.namprd03.prod.outlook.com (2603:10b6:408:130::29)
+ by CY8PR12MB7753.namprd12.prod.outlook.com (2603:10b6:930:85::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.26; Mon, 27 Feb
- 2023 08:43:59 +0000
-Received: from CO1NAM11FT033.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:b9:cafe::78) by MW4PR03CA0226.outlook.office365.com
- (2603:10b6:303:b9::21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.28 via Frontend
- Transport; Mon, 27 Feb 2023 08:43:58 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.24; Mon, 27 Feb
+ 2023 08:44:17 +0000
+Received: from BN8NAM11FT092.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:130:cafe::cb) by BN9PR03CA0504.outlook.office365.com
+ (2603:10b6:408:130::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.29 via Frontend
+ Transport; Mon, 27 Feb 2023 08:44:16 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -46,22 +46,22 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1NAM11FT033.mail.protection.outlook.com (10.13.174.247) with Microsoft SMTP
+ BN8NAM11FT092.mail.protection.outlook.com (10.13.176.180) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6156.16 via Frontend Transport; Mon, 27 Feb 2023 08:43:58 +0000
+ 15.20.6156.16 via Frontend Transport; Mon, 27 Feb 2023 08:44:16 +0000
 Received: from BLR-L-SASHUKLA.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 27 Feb
- 2023 02:43:54 -0600
+ 2023 02:44:12 -0600
 From:   Santosh Shukla <santosh.shukla@amd.com>
 To:     <kvm@vger.kernel.org>, <seanjc@google.com>
 CC:     <pbonzini@redhat.com>, <jmattson@google.com>, <joro@8bytes.org>,
         <linux-kernel@vger.kernel.org>, <mail@maciej.szmigiero.name>,
         <mlevitsk@redhat.com>, <thomas.lendacky@amd.com>,
         <vkuznets@redhat.com>
-Subject: [PATCHv4 08/11] x86/cpu: Add CPUID feature bit for VNMI
-Date:   Mon, 27 Feb 2023 14:10:13 +0530
-Message-ID: <20230227084016.3368-9-santosh.shukla@amd.com>
+Subject: [PATCHv4 09/11] KVM: SVM: Add VNMI bit definition
+Date:   Mon, 27 Feb 2023 14:10:14 +0530
+Message-ID: <20230227084016.3368-10-santosh.shukla@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230227084016.3368-1-santosh.shukla@amd.com>
 References: <20230227084016.3368-1-santosh.shukla@amd.com>
@@ -73,23 +73,23 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1NAM11FT033:EE_|PH8PR12MB8430:EE_
-X-MS-Office365-Filtering-Correlation-Id: c0f226e7-fc0d-4ac6-a7e6-08db189ec4c3
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT092:EE_|CY8PR12MB7753:EE_
+X-MS-Office365-Filtering-Correlation-Id: ffaabbe0-0f78-4190-8d6c-08db189ecf8e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ZKLCUgdd0JWRnhdxmsS3IgIIGlw5rAT8csXkbFWQTHNFxWxbjZaBUwNF+9I9Kvy8glrQClK6WYmQg1flVKPA1pXR/2oqEech7WDXiP7gxbSCXPsrx8YBORC017vLRX7knWhmJplFgA6q4L2IXe3WgmuYYdhp6wGZgvaF0pYf8b3Zq8PQJP3AKHGsPqzJtt6TGYsEXOyUYbFKD89wnif+R1P0wGhVrqowimPuwLI+DnkjeZIDEUOx5xk3L2PpDYRRgzO1dij1hOVXFinT9vDqS9LkJrueNTNxXsnHTQxQuBPk/daWUlCAEqA82l96qoHklOMq3Ho+On13s9sNeJYaQXTHxHW1wR0sNfat06kQDaHsHFgouQBTyv8t8AlL9Abhq7qWlhi/CnuvZ8ec+ALdTWP6A48RR8UdnD2fqk7t5lZKL4z1BbUVuY3Sfjw/QR6fX2Hfvg+kUNfAm5hSGh4S7wsdkHJzZiBuIsQGWWffjEDOjVohpZ6FsaJbNPyEm8Q1Mk0Qbt3UOvjCWrpI5np/MoM8kdKK4gmkazm1QVNRYJcWn8tALyqDqv5QelwzrinFRnqCrfLp/jprY7w37inKEg1Ziec5dyo1ntDz4kR6mKv8bQtu6pasmelzu+F32Q6h+Yg2aVfOxUnVPVwD84rOM6F7jeDbMJQgy0uYr9XNjQMCa/dC28E5ABT0VAQK6ZXJqrUfozRN2f034P4A4ncTUbJ0A7NIrp3f+ya7Tyr30ZI=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(376002)(39860400002)(136003)(396003)(346002)(451199018)(36840700001)(46966006)(40470700004)(44832011)(36860700001)(82310400005)(426003)(8936002)(5660300002)(47076005)(82740400003)(2906002)(81166007)(336012)(2616005)(41300700001)(70586007)(70206006)(8676002)(356005)(186003)(16526019)(4326008)(6666004)(26005)(1076003)(36756003)(478600001)(7696005)(54906003)(110136005)(40480700001)(86362001)(316002)(40460700003)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: IjkIPTM+LJUeYtmdB1dV/S4/0Eln0FwUuNeknoRvRqBXAj+CsGvxSJAPITf5l6WDUcmyvg2AdYfJlZMKqod/j2iAD3vG9iMs0sycJz5RedzGZXAinDO894JmRzDeNHVfbtD8gCFw2wAeLztjAhfI2Q6BGsiwpRMpcqY3vhYMnqdTVxPp48cYs+17U2yWxNOgAAA2oHp3w/hUVcajwwZbBIIoHo6B8e90lwzqKOxikMfEvPfZonZkPQkO6HEtNjPr435HRqP74i7isFuXcC2OPd2XeNjvEs19H7IKuVwn24/NlcM7IPM0WKzUIg+d3aiAd3O5q1caI2QI2jIHQVmVLNG2OTGPHhgmrSxb7OhbU6v2EQNmv+nmcIxloNSaPrS/vmaYEwK/1HvfcTWdqMaNTEY9bkQEG7ifFtJ0bvif+tlLztNN3T4caZ9s6bJZczGcQCvl4PGQLPWXHQK8WDY9chHRxhn5fUcRvAUStSUOdP0p0fRJtaT/f+37VJh62CFk2iqSZYFPXAgQPVx02SrZfgri1YpqrqT8OYwanugpc2llqpCcR7xUW7aqM6RULpCUcYmaIRGh+4h/NJaoO8MK+JkbLfcOozIErNlEriDlzJrCQXa+OAxxIUxRSL+K5UGDUmN+gyiPkf5xRpGenIw7C++5x9jgUq9yS4G1qVKEijFsBH8CFaptQTOsA8Wv7FCkmJBme9UVaWNNV5OZeE/O6Hb2u3PQpvb/zOEYUMKASoU=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(136003)(396003)(346002)(376002)(39860400002)(451199018)(40470700004)(36840700001)(46966006)(8936002)(54906003)(16526019)(81166007)(26005)(336012)(36756003)(186003)(316002)(1076003)(356005)(478600001)(40460700003)(7696005)(966005)(44832011)(2906002)(40480700001)(86362001)(2616005)(110136005)(5660300002)(82740400003)(82310400005)(47076005)(426003)(83380400001)(70206006)(70586007)(8676002)(41300700001)(36860700001)(4326008)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Feb 2023 08:43:58.6550
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Feb 2023 08:44:16.8713
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c0f226e7-fc0d-4ac6-a7e6-08db189ec4c3
+X-MS-Exchange-CrossTenant-Network-Message-Id: ffaabbe0-0f78-4190-8d6c-08db189ecf8e
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT033.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT092.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB8430
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7753
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,SPF_HELO_PASS,
         SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
@@ -99,34 +99,63 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-VNMI feature allows the hypervisor to inject NMI into the guest w/o
-using Event injection mechanism, The benefit of using VNMI over the
-event Injection that does not require tracking the Guest's NMI state and
-intercepting the IRET for the NMI completion. VNMI achieves that by
-exposing 3 capability bits in VMCB intr_cntrl which helps with
-virtualizing NMI injection and NMI_Masking.
+VNMI exposes 3 capability bits (V_NMI, V_NMI_MASK, and V_NMI_ENABLE) to
+virtualize NMI and NMI_MASK, Those capability bits are part of
+VMCB::intr_ctrl -
+V_NMI_PENDING_MASK(11) - Indicates whether a virtual NMI is pending in the
+guest.
+V_NMI_BLOCKING_MASK(12) - Indicates whether virtual NMI is masked in the
+guest.
+V_NMI_ENABLE_MASK(26) - Enables the NMI virtualization feature for the
+guest.
 
-The presence of this feature is indicated via the CPUID function
-0x8000000A_EDX[25].
+When Hypervisor wants to inject NMI, it will set V_NMI bit, Processor
+will clear the V_NMI bit and Set the V_NMI_MASK which means the Guest is
+handling NMI, After the guest handled the NMI, The processor will clear
+the V_NMI_MASK on the successful completion of IRET instruction Or if
+VMEXIT occurs while delivering the virtual NMI.
+
+To enable the VNMI capability, Hypervisor need to program
+V_NMI_ENABLE_MASK bit 1.
 
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
 ---
- arch/x86/include/asm/cpufeatures.h | 1 +
- 1 file changed, 1 insertion(+)
+v3:
+- Renamed V_NMI bits per Sean's v2 comment for
+  better readability.
+https://lore.kernel.org/all/66f93354-22b1-a2aa-f64c-6e70b9b8063c@amd.com/
 
-diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-index cdb7e1492311..b3ae49f36008 100644
---- a/arch/x86/include/asm/cpufeatures.h
-+++ b/arch/x86/include/asm/cpufeatures.h
-@@ -365,6 +365,7 @@
- #define X86_FEATURE_VGIF		(15*32+16) /* Virtual GIF */
- #define X86_FEATURE_X2AVIC		(15*32+18) /* Virtual x2apic */
- #define X86_FEATURE_V_SPEC_CTRL		(15*32+20) /* Virtual SPEC_CTRL */
-+#define X86_FEATURE_AMD_VNMI		(15*32+25) /* Virtual NMI */
- #define X86_FEATURE_SVME_ADDR_CHK	(15*32+28) /* "" SVME addr check */
+ arch/x86/include/asm/svm.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+index cb1ee53ad3b1..9691081d9231 100644
+--- a/arch/x86/include/asm/svm.h
++++ b/arch/x86/include/asm/svm.h
+@@ -183,6 +183,12 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+ #define V_GIF_SHIFT 9
+ #define V_GIF_MASK (1 << V_GIF_SHIFT)
  
- /* Intel-defined CPU features, CPUID level 0x00000007:0 (ECX), word 16 */
++#define V_NMI_PENDING_SHIFT 11
++#define V_NMI_PENDING_MASK (1 << V_NMI_PENDING_SHIFT)
++
++#define V_NMI_BLOCKING_SHIFT 12
++#define V_NMI_BLOCKING_MASK (1 << V_NMI_BLOCKING_SHIFT)
++
+ #define V_INTR_PRIO_SHIFT 16
+ #define V_INTR_PRIO_MASK (0x0f << V_INTR_PRIO_SHIFT)
+ 
+@@ -197,6 +203,9 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+ #define V_GIF_ENABLE_SHIFT 25
+ #define V_GIF_ENABLE_MASK (1 << V_GIF_ENABLE_SHIFT)
+ 
++#define V_NMI_ENABLE_SHIFT 26
++#define V_NMI_ENABLE_MASK (1 << V_NMI_ENABLE_SHIFT)
++
+ #define AVIC_ENABLE_SHIFT 31
+ #define AVIC_ENABLE_MASK (1 << AVIC_ENABLE_SHIFT)
+ 
 -- 
 2.25.1
 
