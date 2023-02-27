@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 36F466A3CB3
-	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 09:26:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4296D6A3CBE
+	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 09:27:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231363AbjB0I0k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Feb 2023 03:26:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55258 "EHLO
+        id S231278AbjB0I04 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Feb 2023 03:26:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231234AbjB0IZ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Feb 2023 03:25:59 -0500
+        with ESMTP id S231265AbjB0I0D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Feb 2023 03:26:03 -0500
 Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6F601CF45;
-        Mon, 27 Feb 2023 00:24:28 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC7951A494;
+        Mon, 27 Feb 2023 00:24:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677486268; x=1709022268;
+  t=1677486274; x=1709022274;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=8S92uRGEDTJGnSHCFrEvDnFy25uhgD3zt+1Ujpc9p0Q=;
-  b=OEi709ICY85xc26WC5b9NDGfpV4HQlAQaaO2mvqiWgNgxJzlBQMfKWKR
-   HBzzfK2tcJkaXuvyVjVD24YI7Gih7NMolnGMNklXeDrrZQuGUA2J7YCBf
-   Oe3gvO/9Ol7M0TPL4ZyTIti2OazpVeEdQTEMlyed004rMWpnYR1NeHr7k
-   Cq+2GYtT85FRtcUNufs0TCDXnzx6JirYVnSmxZ3wFj2m/85fhC7uzbBXV
-   ltFVwk1ILf8oQh9MIm6X/WgiudPBNE65AsOSy5qN+Q0YiLaEeoZD1a37s
-   ygNlV5fO1oOsPWTD5dXGmx1DRUDBDlVEqk16GwGmjklh/ejvatkck5/8I
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10633"; a="317608841"
+  bh=bAyBc4s3tiQ/01jXFwZRD2ovwWFrfG+pQJPt5k9h7e8=;
+  b=ksm94Tzgna+Ram9a/aL4ZZ9uNiW+5dYXvxxSPywzF5PGBboiH0b3jZhV
+   6PCPGwhSYd0LfcaxUCZJJ+JzX29A+PwEDfdJlHwepYVCE5tQgZ+lEy76+
+   iHW4SkSROS6576it/hg5kWrOVo1Re6dE+ZmOqom3Z+VuufsXU5U5MY5KZ
+   g4C3rS4ezNchQebUiwBd5jW4HpXTqVXiRbq1YSPn4nXAtcij/l6ljo00P
+   tXR1kIuadLP59iZ4RaiqY697DpErhfcFc0uOpD1pmK8wCCmF6wS8AiDp/
+   xosFFzS+USolOhbwUk015944siqedhvwlp6VJO7S1Y+Q0B64GReRaTCd7
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10633"; a="317608853"
 X-IronPort-AV: E=Sophos;i="5.97,331,1669104000"; 
-   d="scan'208";a="317608841"
+   d="scan'208";a="317608853"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
   by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2023 00:24:10 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10633"; a="783242195"
+X-IronPort-AV: E=McAfee;i="6500,9779,10633"; a="783242199"
 X-IronPort-AV: E=Sophos;i="5.97,331,1669104000"; 
-   d="scan'208";a="783242195"
+   d="scan'208";a="783242199"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2023 00:24:08 -0800
 From:   isaku.yamahata@intel.com
@@ -46,10 +46,11 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         David Matlack <dmatlack@google.com>,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH v12 042/106] KVM: x86/mmu: Disallow dirty logging for x86 TDX
-Date:   Mon, 27 Feb 2023 00:22:41 -0800
-Message-Id: <40b8dbc590de6b75a0778d3fd3d5781848a642ef.1677484918.git.isaku.yamahata@intel.com>
+        Yan Zhao <yan.y.zhao@intel.com>,
+        Yuan Yao <yuan.yao@linux.intel.com>
+Subject: [PATCH v12 043/106] KVM: x86/mmu: TDX: Do not enable page track for TD guest
+Date:   Mon, 27 Feb 2023 00:22:42 -0800
+Message-Id: <29d0cc81c60c2d48c47c2a8fd9243ac9b6bc0e63.1677484918.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1677484918.git.isaku.yamahata@intel.com>
 References: <cover.1677484918.git.isaku.yamahata@intel.com>
@@ -64,161 +65,33 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+From: Yan Zhao <yan.y.zhao@intel.com>
 
-TDX doesn't support dirty logging.  Report dirty logging isn't supported so
-that device model, for example qemu, can properly handle it.  Silently
-ignore on dirty logging on private GFNs of TDX.
+TDX does not support write protection and hence page track.
+Though !tdp_enabled and kvm_shadow_root_allocated(kvm) are always false
+for TD guest, should also return false when external write tracking is
+enabled.
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Cc: Yuan Yao <yuan.yao@linux.intel.com>
+Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 ---
- arch/x86/kvm/mmu/mmu.c     |  3 +++
- arch/x86/kvm/mmu/tdp_mmu.c | 36 +++++++++++++++++++++++++++++++++++-
- arch/x86/kvm/x86.c         |  8 ++++++++
- include/linux/kvm_host.h   |  1 +
- virt/kvm/kvm_main.c        | 10 +++++++++-
- 5 files changed, 56 insertions(+), 2 deletions(-)
+ arch/x86/kvm/mmu/page_track.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 621ac8ea54d6..6421f92e618e 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -6690,6 +6690,9 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
- 	for_each_rmap_spte(rmap_head, &iter, sptep) {
- 		sp = sptep_to_sp(sptep);
+diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
+index 0a2ac438d647..d738d318ce17 100644
+--- a/arch/x86/kvm/mmu/page_track.c
++++ b/arch/x86/kvm/mmu/page_track.c
+@@ -22,6 +22,9 @@
  
-+		/* Private page dirty logging is not supported yet. */
-+		KVM_BUG_ON(is_private_sptep(sptep), kvm);
-+
- 		/*
- 		 * We cannot do huge page mapping for indirect shadow pages,
- 		 * which are found on the last rmap (level = 1) when not using
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 106e858ee39a..573f38e472f3 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1476,9 +1476,27 @@ static __always_inline bool kvm_tdp_mmu_handle_gfn(struct kvm *kvm,
- 	 * into this helper allow blocking; it'd be dead, wasteful code.
- 	 */
- 	for_each_tdp_mmu_root(kvm, root, range->slot->as_id) {
-+		gfn_t start;
-+		gfn_t end;
-+
-+		/*
-+		 * For now, operation on private GPA, e.g. dirty page logging,
-+		 * isn't supported yet.
-+		 */
-+		if (is_private_sp(root))
-+			continue;
-+
- 		rcu_read_lock();
- 
--		tdp_root_for_each_leaf_pte(iter, root, range->start, range->end)
-+		/*
-+		 * For TDX shared mapping, set GFN shared bit to the range,
-+		 * so the handler() doesn't need to set it, to avoid duplicated
-+		 * code in multiple handler()s.
-+		 */
-+		start = kvm_gfn_shared(kvm, range->start);
-+		end = kvm_gfn_shared(kvm, range->end);
-+
-+		tdp_root_for_each_leaf_pte(iter, root, start, end)
- 			ret |= handler(kvm, &iter, range);
- 
- 		rcu_read_unlock();
-@@ -1961,6 +1979,13 @@ void kvm_tdp_mmu_clear_dirty_pt_masked(struct kvm *kvm,
- 	struct kvm_mmu_page *root;
- 
- 	lockdep_assert_held_write(&kvm->mmu_lock);
-+	/*
-+	 * First TDX generation doesn't support clearing dirty bit,
-+	 * since there's no secure EPT API to support it.  For now silently
-+	 * ignore KVM_CLEAR_DIRTY_LOG.
-+	 */
-+	if (!kvm_arch_dirty_log_supported(kvm))
-+		return;
- 	for_each_tdp_mmu_root(kvm, root, slot->as_id)
- 		clear_dirty_pt_masked(kvm, root, gfn, mask, wrprot);
- }
-@@ -2080,6 +2105,15 @@ bool kvm_tdp_mmu_write_protect_gfn(struct kvm *kvm,
- 	bool spte_set = false;
- 
- 	lockdep_assert_held_write(&kvm->mmu_lock);
-+
-+	/*
-+	 * First TDX generation doesn't support write protecting private
-+	 * mappings, silently ignore the request.  KVM_GET_DIRTY_LOG etc
-+	 * can reach here, no warning.
-+	 */
-+	if (!kvm_arch_dirty_log_supported(kvm))
+ bool kvm_page_track_write_tracking_enabled(struct kvm *kvm)
+ {
++	if (kvm->arch.vm_type == KVM_X86_PROTECTED_VM)
 +		return false;
 +
- 	for_each_tdp_mmu_root(kvm, root, slot->as_id)
- 		spte_set |= write_protect_gfn(kvm, root, gfn, min_level);
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index b5b51342c9a9..89ee421e0cbf 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12549,6 +12549,9 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
- 	u32 new_flags = new ? new->flags : 0;
- 	bool log_dirty_pages = new_flags & KVM_MEM_LOG_DIRTY_PAGES;
- 
-+	if (!kvm_arch_dirty_log_supported(kvm) && log_dirty_pages)
-+		return;
-+
- 	/*
- 	 * Update CPU dirty logging if dirty logging is being toggled.  This
- 	 * applies to all operations.
-@@ -13521,6 +13524,11 @@ int kvm_sev_es_string_io(struct kvm_vcpu *vcpu, unsigned int size,
+ 	return IS_ENABLED(CONFIG_KVM_EXTERNAL_WRITE_TRACKING) ||
+ 	       !tdp_enabled || kvm_shadow_root_allocated(kvm);
  }
- EXPORT_SYMBOL_GPL(kvm_sev_es_string_io);
- 
-+bool kvm_arch_dirty_log_supported(struct kvm *kvm)
-+{
-+	return kvm->arch.vm_type != KVM_X86_PROTECTED_VM;
-+}
-+
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_entry);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_exit);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_fast_mmio);
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 5e4bf78025e3..04debfe30572 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1495,6 +1495,7 @@ bool kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu);
- int kvm_arch_post_init_vm(struct kvm *kvm);
- void kvm_arch_pre_destroy_vm(struct kvm *kvm);
- int kvm_arch_create_vm_debugfs(struct kvm *kvm);
-+bool kvm_arch_dirty_log_supported(struct kvm *kvm);
- 
- #ifndef __KVM_HAVE_ARCH_VM_ALLOC
- /*
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 42f01d0d6a49..e9f8225f3406 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1700,10 +1700,18 @@ static void kvm_replace_memslot(struct kvm *kvm,
- 	}
- }
- 
-+bool __weak kvm_arch_dirty_log_supported(struct kvm *kvm)
-+{
-+	return true;
-+}
-+
- static int check_memory_region_flags(struct kvm *kvm,
- 				     const struct kvm_userspace_memory_region2 *mem)
- {
--	u32 valid_flags = KVM_MEM_LOG_DIRTY_PAGES;
-+	u32 valid_flags = 0;
-+
-+	if (kvm_arch_dirty_log_supported(kvm))
-+		valid_flags |= KVM_MEM_LOG_DIRTY_PAGES;
- 
- 	if (kvm_arch_has_private_mem(kvm))
- 		valid_flags |= KVM_MEM_PRIVATE;
 -- 
 2.25.1
 
