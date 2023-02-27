@@ -2,198 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A81B6A4616
-	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 16:30:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 427A26A4626
+	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 16:35:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229739AbjB0Pa0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Feb 2023 10:30:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46482 "EHLO
+        id S229629AbjB0PfW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Feb 2023 10:35:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229975AbjB0PaZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Feb 2023 10:30:25 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51586C167;
-        Mon, 27 Feb 2023 07:30:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=gz8hdH9bFd0e4NDFd1eIEb5EimtV3uh+pRybRzbjun8=; b=nla2VbHMvDwHmBDnzrzpuFVCXb
-        ulhJwF2RYoVz0Onkmd0WFmK1tc6LJMKy97bBR2aJrgY2KwITbxpw+X2CU7DGL7eIMCyXy4vgY28kl
-        TAOmxMgqqjk3zbJea3+0Jy9Mk6mFbKaiKxoQhcB2p4jtQhIJqPbCu6ZEhZaCRSaqj9gv6n7W7yhSE
-        CRdF/tHk9UbQLYNu57VMfqTUdkXcTHOuURKyA0F9DXF14/vRfyqiSntHgiOT2lvMpUp0KH4A5v2Se
-        MYIrqbZ9OVasXAQnCnpr3Q0Z5OvQgzY/ZQQyzg0a27ELG4ImnC+WFrhYDLjJiEQlZN6u/THoabX1L
-        XFzZx97g==;
-Received: from [2001:8b0:10b:5:8acb:cc69:1699:a2e9] (helo=u3832b3a9db3152.ant.amazon.com)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pWfRQ-000D5k-W3; Mon, 27 Feb 2023 15:29:29 +0000
-Message-ID: <90c7efe278fed0616275ed64215ec1fe249f16f5.camel@infradead.org>
-Subject: Re: [External] Re: [PATCH v12 00/11] Parallel CPU bringup for x86_64
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Usama Arif <usama.arif@bytedance.com>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        tglx@linutronix.de, kim.phillips@amd.com, brgerst@gmail.com
-Cc:     piotrgorski@cachyos.org, arjan@linux.intel.com, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        x86@kernel.org, pbonzini@redhat.com, paulmck@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
-        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
-        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
-        simon.evans@bytedance.com, liangma@liangbit.com
-Date:   Mon, 27 Feb 2023 15:29:27 +0000
-In-Reply-To: <5e8ad90a-1dc6-95c2-e020-5e95da6f9eda@bytedance.com>
-References: <20230226110802.103134-1-usama.arif@bytedance.com>
-         <5650744.DvuYhMxLoT@natalenko.name>
-         <819d8fa2-b73e-e32f-5442-452aa2c0d752@bytedance.com>
-         <5e8ad90a-1dc6-95c2-e020-5e95da6f9eda@bytedance.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-ya5puaBjsDwKiYfb06b3"
-User-Agent: Evolution 3.44.4-0ubuntu1 
+        with ESMTP id S229527AbjB0PfV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Feb 2023 10:35:21 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB4D1F965
+        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 07:34:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1677512075;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=pf57iGYw7tc5yWrllmnQ1KbHMXZrJwdvHRaL6K/RmqM=;
+        b=KmTk+yxp5Iflq9Q1P7h7JnTAyXRWiszM2fon8xWXGzH3jP2iwuFTAhF6TUflI8RyUvwArr
+        lzVW0iLCyYxkwoRiiBwCEmdOkxnn3EI5QGIhZvVR4aDoD0EWeoZKoJH6JkirMrNmLud7nU
+        1I3cDt6Gj72ECNVpqbeLUO/ZbW7gx+8=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-356-I015Qc6ONw2s2eSUN08pUw-1; Mon, 27 Feb 2023 10:34:32 -0500
+X-MC-Unique: I015Qc6ONw2s2eSUN08pUw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DDD8A1C068C8;
+        Mon, 27 Feb 2023 15:34:31 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.39.193.92])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B2DF4140EBF4;
+        Mon, 27 Feb 2023 15:34:31 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+        id 94A2521E6A1F; Mon, 27 Feb 2023 16:34:23 +0100 (CET)
+From:   Markus Armbruster <armbru@redhat.com>
+To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Cc:     Thomas Huth <thuth@redhat.com>,
+        Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org,
+        qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
+        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+Subject: Re: [PATCH v16 08/11] qapi/s390x/cpu topology: set-cpu-topology
+ monitor command
+References: <20230222142105.84700-1-pmorel@linux.ibm.com>
+        <20230222142105.84700-9-pmorel@linux.ibm.com>
+        <aaf4aa7b7350e88f65fc03f148146e38fe4f7fdb.camel@linux.ibm.com>
+        <0a93eb0e-2552-07b7-2067-f46d542126f4@redhat.com>
+        <9e1cbbe11ac1429335c288e817a21f19f8f4af87.camel@linux.ibm.com>
+        <87v8jnqorg.fsf@pond.sub.org>
+        <d8da6f7d1e3addcb63614f548ed77ac1b8895e63.camel@linux.ibm.com>
+Date:   Mon, 27 Feb 2023 16:34:23 +0100
+In-Reply-To: <d8da6f7d1e3addcb63614f548ed77ac1b8895e63.camel@linux.ibm.com>
+        (Nina Schoetterl-Glausch's message of "Mon, 27 Feb 2023 13:51:19
+        +0100")
+Message-ID: <871qmbqg00.fsf@pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Nina Schoetterl-Glausch <nsg@linux.ibm.com> writes:
 
---=-ya5puaBjsDwKiYfb06b3
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+> CpuS390Entitlement would be useful in both machine.json and machine-target.json
+> because query-cpu-fast is defined in machine.json and set-cpu-topology is defined
+> in machine-target.json.
+> So then the question is where best to define CpuS390Entitlement.
+> In machine.json and include machine.json in machine-target.json?
+> Or define it in another file and include it from both?
 
-T24gTW9uLCAyMDIzLTAyLTI3IGF0IDA2OjE0ICswMDAwLCBVc2FtYSBBcmlmIHdyb3RlOgo+IAo+
-IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rZXJuZWwvaGVhZF82NC5TIGIvYXJjaC94ODYva2VybmVs
-L2hlYWRfNjQuUwo+IGluZGV4IDE3YmRkNjEyMmRjYS4uNWQ3MDlhYTY3ZGY0IDEwMDY0NAo+IC0t
-LSBhL2FyY2gveDg2L2tlcm5lbC9oZWFkXzY0LlMKPiArKysgYi9hcmNoL3g4Ni9rZXJuZWwvaGVh
-ZF82NC5TCj4gQEAgLTI3Myw3ICsyNzMsMTEgQEAgU1lNX0lOTkVSX0xBQkVMKHNlY29uZGFyeV9z
-dGFydHVwXzY0X25vX3ZlcmlmeSwgCj4gU1lNX0xfR0xPQkFMKQo+IMKgwqDCoMKgwqDCoMKgwqAg
-Y21wbMKgwqDCoCAoJXJieCwlcmN4LDQpLCAlZWR4Cj4gwqDCoMKgwqDCoMKgwqDCoCBqesKgwqDC
-oMKgwqAgLkxzZXR1cF9jcHUKPiDCoMKgwqDCoMKgwqDCoMKgIGluY8KgwqDCoMKgICVlY3gKPiAr
-I2lmIChOUl9DUFVTID09IDEpIHx8IGRlZmluZWQoQ09ORklHX0ZPUkNFX05SX0NQVVMpCj4gK8Kg
-wqDCoMKgwqDCoCBjbXBswqDCoMKgICROUl9DUFVTLCAlZWN4Cj4gKyNlbHNlCj4gwqDCoMKgwqDC
-oMKgwqDCoCBjbXBswqDCoMKgIG5yX2NwdV9pZHMoJXJpcCksICVlY3gKPiArI2VuZGlmCj4gwqDC
-oMKgwqDCoMKgwqDCoCBqYsKgwqDCoMKgwqAgLkxmaW5kX2NwdW5yCj4gCj4gwqDCoMKgwqDCoMKg
-wqDCoCAvKsKgIEFQSUMgSUQgbm90IGZvdW5kIGluIHRoZSB0YWJsZS4gRHJvcCB0aGUgdHJhbXBv
-bGluZSBsb2NrCj4gYW5kIGJhaWwuICovCgpUaGUgd2hpdGVzcGFjZSBsb29rcyBkb2RneSB0aGVy
-ZSBidXQgbWF5YmUgdGhhdCdzIGp1c3QgeW91ciBtYWlsIGNsaWVudD8KCkdpdmVuIHRoaXMgY29k
-ZSBpcyBhbHJlYWR5IGluICNpZmRlZiBDT05GSUdfU01QLCBjYW4gTlJfQ1BVUyBiZSAxPwo=
+Either should work.
 
+If you include machine.json into machine-target.json, the
+qapi-FOO-machine-target.h will include the qapi-FOO-machine.h.  No big
+deal, I think: affects just eight .c.
 
---=-ya5puaBjsDwKiYfb06b3
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMjI3MTUyOTI3WjAvBgkqhkiG9w0BCQQxIgQgpxAYqkDQ
-CKm57x8MbxOFlS82q1ZKUIfW6xnkoRbAnVcwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBYC0iXT9/nYHBvL+W41oKqYFYb5RpWrNpQ
-kSEYNxs3BoGRkbDIty/GeKGeM5UKBDdas3hgWaZjTWscQQ8FpCm0wXPq5XWn/2Z1dHkqxrFQJ2Wl
-bJJqbKvVG8Zme/hkARbpqT6WJyv9d5sNnYud6784Qsi6tjU0oAfODho2mgro2M5vstraIrOspAm1
-4Gj9B4Q0J0FU/N/MeyXw2L8Tj6BXlP3zCIGy3yGOBoQ0oo3iLn8hURHLHIiAfhynNVUysbF0GYHk
-AOqbJi9H4h1g9gn5eDuCvd4WADqDraTkTXXjgy0Ob0SRiA0SqdSdQKWCGaRKk3FZl1cBXR3jpEf9
-/40r/QPgUzu0z1uomlkpQ6sRVDDs6SqF3/dB/FgXNfKKfACMdO4eXFQVtlLm61+y5HjYVe21JN/Z
-EUNaK7BNDUbfT9C3EOjRZ5rTDzqx6i6pxgyvuPy39hldSD7BkF6NM/TKu0A/Wv0WaK4jdbarZBOH
-bbUzRvCnQWNItF+vnUdEo3gauk5K1wyUqzx6T5as4F+ldxkhZivsX25dkym7o4dywxWSfbzc7KDW
-ga4K9VSsDvml/7P7SW5w7RjdgAiEZeeOpkeM5G9a7Yi+H8DLX4rKwmHI4AAgHROfnNywReou3ACI
-D0S9Emxz5jOQ7FsS7WckrvpCWc9A43evnMmMT5Lv+wAAAAAAAA==
-
-
---=-ya5puaBjsDwKiYfb06b3--
