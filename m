@@ -2,161 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CD2C06A456E
-	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 15:59:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 11B466A4584
+	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 16:02:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230015AbjB0O7W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Feb 2023 09:59:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42722 "EHLO
+        id S230071AbjB0PCk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Feb 2023 10:02:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230025AbjB0O7S (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Feb 2023 09:59:18 -0500
-Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FE972203A;
-        Mon, 27 Feb 2023 06:59:15 -0800 (PST)
-Received: by mail-io1-xd30.google.com with SMTP id i202so2650268ioa.3;
-        Mon, 27 Feb 2023 06:59:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y3GCNwTUZB8kzZG/gYuYfLxJdLZvnUgoAzuOHI0jCdY=;
-        b=S6iE4D8qfxp6Zf1z3MJFBlZvXshZkI5deCZvjwk+Ldb5nohj3XWFLrnHHGtLYjtpx5
-         oU0r2v3M2QIFIGv/8jJeeU8W7jhYa+6ExZe2xNYpgzExSDhxbGewLxaIvwe/I+bMA1oq
-         uO4toeIGCyx4xb4iP1v7uDywXR4F7fnjoh+z817RaSDJJXcPzQkzhPQoBfA3heXqWbGW
-         6sRN+cosKJEzPmmSh1BcQqDGckK6oX2ee/3bIm/UXnoXBB4gHxEzC5oEi9eBlLD2MqZ9
-         dAlTQYmOpMlb0KMqA93mffS2JIc1598FbG56zC2dOEMJELIpXTwmfGvljO3uv7kOFtHM
-         Q8XQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :sender:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Y3GCNwTUZB8kzZG/gYuYfLxJdLZvnUgoAzuOHI0jCdY=;
-        b=bi0ff8U4b0/1G5ErkJhWN/K1exwvWtoDJjfPL3mEhUCPpKmHglRvIqEmUZF3eKVbmU
-         oaeNJ4gJ2iYI+Xl13h02yb0aWs2/jN3udqqOKswn7hzaFzuSQFZ08tQsZWZqOKNB2a3S
-         p2JUhhHWqWsFI63sG/S1ztR70bFUhzSMGuhgSlElQ27mhQqNIYQER+lBgysAHCC22dX5
-         HLk55LNvNN0xCzh5oBQ5sclCm3cJLGtzsAhf2G2soPAybHmd8dF0r1P1wq3pQIcNP4Dq
-         qxdiIWmHqznYfSudNT6HtQpQ++HhYWvCXB+hxnsEIHnwUj4sUY/gfio14t5slSYKZp1N
-         pOgA==
-X-Gm-Message-State: AO0yUKVfejR2uR8SaZdKbcT5ANq9AOyxAze6gadnT6oGAUNqyEm+f4Ru
-        2NCD2vdGLWYJ3shuvMLjnz0=
-X-Google-Smtp-Source: AK7set9dR0iQjzKlEIv6bGw6qiR9kUVSzphDuGcQaV2R+/Hhe/OK3u3U1m2vKlQLNv6dC/YksZGM7w==
-X-Received: by 2002:a6b:7504:0:b0:6e9:d035:45df with SMTP id l4-20020a6b7504000000b006e9d03545dfmr15378337ioh.6.1677509954692;
-        Mon, 27 Feb 2023 06:59:14 -0800 (PST)
-Received: from ?IPV6:2600:1700:e321:62f0:329c:23ff:fee3:9d7c? ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id m20-20020a92c534000000b00315813e404esm2015491ili.58.2023.02.27.06.59.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Feb 2023 06:59:14 -0800 (PST)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Message-ID: <19587ea3-e54c-e3b0-5341-eb7ee486474b@roeck-us.net>
-Date:   Mon, 27 Feb 2023 06:59:12 -0800
+        with ESMTP id S229983AbjB0PCh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Feb 2023 10:02:37 -0500
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2085.outbound.protection.outlook.com [40.107.94.85])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C56D61EBED;
+        Mon, 27 Feb 2023 07:02:35 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WQeTYf9iL6MzD8jGBZKY4LRRLl/BkrbUP9fGKxN9Y54RtJOx+1U+w9H9wNKYjsrKbn+uRyfAhGyzMvnlVhAGw02Y4VCFZo3vyHoEpijCan+oU8RL3/tN2t3gSWhao4T0VtE2QNpp9BmLST629h5UGa3DUpWeKDKFiPBukDjnDuBY8PZRR+ua4vZPFJv8qoKAuOtOKMAZvM6m6HnSNF/nhOH54TWO61Yqh41Dt5IXRa9qjczbFwo9YivMUu6GhI1cXOW2HjvnvUq0HrRQwF3JSNnGqzpVnt2lofzEGd3i5YkPwB1J7QieKxhN37hqJaLu0xavQ4KvYiy08gOY0tx1pQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=pr72OOHKT6UrlUQ9tz/heDjryEmN2wwxGocpsgtHSXY=;
+ b=DMiOCRrfhA0KNsvLwSJ3RWaG6Y9/fIbWAEUfxsD2r9Aid9De6hGS/GP1HmLOhIjwonQ0uFl1s4tO0Ig1t7v/LT6e95DHsGrMom7VouM4W/9m0/mcB3FTQx9Beu1vZyXlOZ46Nc2Gz1uyVYpQvmNviRvlJKQS5Mjx0gk2mQkxaeYD4aK+Pjzpjyn3LcirFOSXxNG4jbWF5EJ1MYl5MD9ynKyaOdgEJqUnsR0t0yweVJhC3bUHlMldF0WFBC9BBu19Asjz4yH5hChoF0LyKXTeaHX2XghM4V1blfCBNBqgfYelNoSJgnTMQs9MAbzRR+qR1ojh6V7JdFFucAFuBv0S9w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pr72OOHKT6UrlUQ9tz/heDjryEmN2wwxGocpsgtHSXY=;
+ b=fDzynzXcnyFeDcPr5TXUxOU3qDUCQ12mb0RvogVklGUxMhJMrAH/l96F9W2aCJK7GFoiT+UrrYVfecq87TR0gcT9ZfmQEtFw5/D7IBoUO5dwssIkXZ/aVA9F0OXaG1HQy204AY2wWnJ1JMx+M9UPJU5VNmZmVBK3sfbutgTymslWt/5Kp6G42hRmu69RdDm5VkIykOdVvf6oo622dJISZii7YB4e335VIwOpm3Sq7QI4VIS0+jgeFCMfD75LsbqoRM8ZPZwiQZ+5T7zgyAUUt4N6g5TIVlY5qOYumgoHILLLvutQJxJsX01SUgm5HtJTX5DAkaDPsQshO7IxRoU3iQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by BN9PR12MB5354.namprd12.prod.outlook.com (2603:10b6:408:103::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.26; Mon, 27 Feb
+ 2023 15:02:33 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3cb3:2fce:5c8f:82ee]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3cb3:2fce:5c8f:82ee%4]) with mapi id 15.20.6134.029; Mon, 27 Feb 2023
+ 15:02:33 +0000
+Date:   Mon, 27 Feb 2023 11:02:32 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Nicolin Chen <nicolinc@nvidia.com>
+Cc:     iommu@lists.linux.dev, Kevin Tian <kevin.tian@intel.com>,
+        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
+        Yi Liu <yi.l.liu@intel.com>
+Subject: Re: [PATCH 14/14] iommufd/selftest: Add a selftest for
+ IOMMU_HWPT_ALLOC
+Message-ID: <Y/zGCLb5aGmxWPHu@nvidia.com>
+References: <0-v1-7612f88c19f5+2f21-iommufd_alloc_jgg@nvidia.com>
+ <14-v1-7612f88c19f5+2f21-iommufd_alloc_jgg@nvidia.com>
+ <Y/uzM8PD/XY0WI7f@Asurada-Nvidia>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y/uzM8PD/XY0WI7f@Asurada-Nvidia>
+X-ClientProxiedBy: BL0PR1501CA0032.namprd15.prod.outlook.com
+ (2603:10b6:207:17::45) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH 3/5] lib/bitmap: add test for bitmap_{from,to}_arr64
-Content-Language: en-US
-To:     Alexander Lobakin <aleksander.lobakin@intel.com>,
-        Yury Norov <yury.norov@gmail.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Alexander Lobakin <alexandr.lobakin@intel.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20220428205116.861003-1-yury.norov@gmail.com>
- <20220428205116.861003-4-yury.norov@gmail.com>
- <20230225184702.GA3587246@roeck-us.net> <Y/qhL8kSzzhMm+tO@yury-laptop>
- <Y/qilU0cW6ebmrnM@yury-laptop>
- <95377047-6b26-b434-fc90-2289fccc2a0b@intel.com>
-From:   Guenter Roeck <linux@roeck-us.net>
-In-Reply-To: <95377047-6b26-b434-fc90-2289fccc2a0b@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BN9PR12MB5354:EE_
+X-MS-Office365-Filtering-Correlation-Id: ac99f7a2-8293-4772-eac3-08db18d3a7a1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: GP2xv1K2Vrm3TfjsROQWEZgrBt4I6JJBjokMz1a3+JX5UpbVYme/qStgILoelLTJaAyiBcBbf8rnVT2ttj2Lf/H+/Rij8qCtmgcup7byaJ7Caklv+TCCGVXlqJLHe61AV6ZFDroZbNiKXkYFVM+ib01aUpHoahmgm6CW+l+hbhrK4gbsRDY20nFjXd9GYgPm0nV1hDAeZI7hQ0payrZrelbTV7agw5MgPx1OY1NAuUgfvBxQj658LNcBfmxojrE3Rfx6JDLp7RX0XBvSelcNIWGpBb0SiuSvCLfAfToob4oYTN75eq7OPCan0LDTZltsrgrsduhvSmeVMUdzpykgl+GdnkCtNo3Ox1kf3dN7stG5xK48Blx4jO5njGdcD4AGnNJXqUuM3ZQTac8A/aC2ZgqH2fyx0521Rj2VDHF1LznKWf2Gf7D3Olx7xhnow/ao4AcZut4qpzvr+EnlmNUIm9aT3myS7j4RhxzPy6AGaNhrNOCTJBfqwYvEmsqzWVNfauU6AkwCl9Nv5acUsRDrackfZA8eucRm8SR9yB00FegLyWbdcm+LMNJH3HhsZNs83P1uBgvTYX1KXsDg7IpHKbaaYTbpXIBCNIjAiXRUaOe8cQI09ar9K5FY/ZdlpQDsiJ25lL6xRMEjOqIFsltwBA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(39860400002)(376002)(136003)(396003)(366004)(346002)(451199018)(6862004)(8936002)(5660300002)(4744005)(66556008)(66476007)(66946007)(8676002)(4326008)(2906002)(54906003)(6636002)(316002)(478600001)(37006003)(41300700001)(6486002)(186003)(6512007)(26005)(6506007)(2616005)(86362001)(36756003)(38100700002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?zKU1KAZgGdVXw0DHs2duATyhWiTSRktqdOsYmrb42e5yg/FyLF4CU1Y/Fa4O?=
+ =?us-ascii?Q?2jl4NCBH9Ch5ylPKVwcGTN4MNlDIlGp8hCu1SNGhd5A2nYBXUDdTcFlWH9Fi?=
+ =?us-ascii?Q?jBMlJjM7wFzy7jMbRNXY/iP6c+HE9L+IB0YHt2V5b+caCyJIT5myTWudU6R4?=
+ =?us-ascii?Q?AdxqNoSPFClxG4GheiSlKHYdALoYH7CvyrDRKR4+IuENC57Dr64yvmKogdEw?=
+ =?us-ascii?Q?lxdbnEh53M5mPDz5BZLW8F1mPHdwpNocJzesOrmUiaoNfQ5oRywC8Y49s1Mb?=
+ =?us-ascii?Q?sHX91oO295W63ZWuZoXNmT0mEycafLAbIfuQzE9zoc1uQ6AuuV62De7tOR5v?=
+ =?us-ascii?Q?0x6D4Es5YQtMvxKgP9JvL7Yznpjd+W8EMQ1kfGGvxsFR9quQa7G7J0mhnUck?=
+ =?us-ascii?Q?9cu20OujlXzDe+YgkU2J35jXNnmZmdHlrJAE3U8RCY7YompZf2GAyS2jjXLi?=
+ =?us-ascii?Q?sQKprtbePZO3nZBL91ScH0BhdgdMsITEvjU3K5ofXZbHbnDHFo5LKo2SmHJU?=
+ =?us-ascii?Q?k8qZQ7mOEF+tkNnIMV/Qteh4j5p0EPZ/a1yCoY3wv2JgQITJ38Wpb4KcN1OV?=
+ =?us-ascii?Q?eCBq+tKhh3TElDP7h+uTxLfuq1JJnZqkzp3SufkmR0CXZ1Dmf6BMHaWCX2HO?=
+ =?us-ascii?Q?CXL8v1VljaVG5JuPL93y2pAhxsOZAe2sSJwPN6ziblen/khk1+R2LDmVlomS?=
+ =?us-ascii?Q?DqLPssXm89cWsjiNHVUYW2aqBQbwD575aQ/NL01No6fzAyDl9WcSvhRbDORI?=
+ =?us-ascii?Q?YIMPyDMOw6hicJhSScVI1AOtxqwV9nPXwwIhpOFyXTnvf8YSj+W277cm5PXh?=
+ =?us-ascii?Q?ndvTST/PTMfAWDHDq1cLMnhh69iawmjNY4VF9Kk6dNWJ6VLtfnk5kEPJnJU+?=
+ =?us-ascii?Q?/WCdp6h0z7mH0xPvTDy3Kq5XdtnU8xXy2Yp6tlqv4eLfGkSUzF8dFX5jOGtc?=
+ =?us-ascii?Q?bvAypDeL5T80riNz++zR7QfIzN2QXRFof1aMpjT9I+ue/P2xP8qdoErl6TsN?=
+ =?us-ascii?Q?/Nuiygvi96h3K89XifPn9p7J1BHYf6Q0wXc4O/lTBMfFETfq71C7tAog4adN?=
+ =?us-ascii?Q?cLMydA0lhm7vL63clSD0aSum6wksbHs+MSgBDsTPH2xGK/sl9E+vL3Cn4Z+g?=
+ =?us-ascii?Q?k40zi6BAE6+E62Vrygz6RZu+B9+DEOUd22uUM15a8jn2s8u5QrbUjRjN7mkz?=
+ =?us-ascii?Q?BkprldVyMIDdnmkEeek24HylroM/zMQkvPyTlO3zY2CphkUn/ubAAl50tpya?=
+ =?us-ascii?Q?FonhoYIJtalqOGg6m2egTjTeh45XQodpVjbJW3pI6Ah3ikLoF9AWlkOeNors?=
+ =?us-ascii?Q?hcl7Ra1YcExyF4w/Xuc5kN8gLradgQhHYSVFrexd5FnCPasIRQFZfr4CIGLo?=
+ =?us-ascii?Q?p3HZd7ZtIQH2OkiCGHBlPsfNPn/vVbXHbnPmr3V2rs6fFDj3j35XUzjDSH4Z?=
+ =?us-ascii?Q?6v0GtdTS3RCfVuuzLaxY6k08V49UUKtl6Y//G/WyCcXHvtJ7YLPNYFQ4Dzbc?=
+ =?us-ascii?Q?nQrVIZe7AxYzxqakJvkaqzpoMMh6AB29VGSDvaIApJ87qLTYUXWQoIsk/a4Q?=
+ =?us-ascii?Q?Sx9AAr3nJ55dHZm5aMCDv+6/vkhV6kwRaARPefi/?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ac99f7a2-8293-4772-eac3-08db18d3a7a1
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Feb 2023 15:02:33.4816
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: I6b04TjJCbFILpgsNv08vE+MsMXNztSQwl9HH6JbFDjwoemv5oBlD7piNQRX4ANc
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5354
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/27/23 06:46, Alexander Lobakin wrote:
-> From: Yury Norov <yury.norov@gmail.com>
-> Date: Sat, 25 Feb 2023 16:06:45 -0800
+On Sun, Feb 26, 2023 at 11:29:55AM -0800, Nicolin Chen wrote:
+> On Fri, Feb 24, 2023 at 08:27:59PM -0400, Jason Gunthorpe wrote:
+>   
+> > +static int _test_cmd_hwpt_alloc(int fd, __u32 device_id, __u32 pt_id,
+> > +					 __u32 *hwpt_id)
+> > +{
+> > +	struct iommu_hwpt_alloc cmd = {
+> > +		.size = sizeof(cmd),
+> > +		.dev_id = device_id,
+> > +		.pt_id = pt_id,
+> > +	};
+> > +	int ret;
 > 
->> On Sat, Feb 25, 2023 at 04:05:02PM -0800, Yury Norov wrote:
->>> On Sat, Feb 25, 2023 at 10:47:02AM -0800, Guenter Roeck wrote:
->>>> Hi,
->>>>
->>>> On Thu, Apr 28, 2022 at 01:51:14PM -0700, Yury Norov wrote:
->>>>> Test newly added bitmap_{from,to}_arr64() functions similarly to
->>>>> already existing bitmap_{from,to}_arr32() tests.
->>>>>
->>>>> Signed-off-by: Yury Norov <yury.norov@gmail.com>
->>>>
->>>> Ever since this test is in the tree, several of my boot tests show
->>>> lots of messages such as
->>>>
->>>> test_bitmap: bitmap_to_arr64(nbits == 1): tail is not safely cleared: 0xa5a5a5a500000001 (must be 0x0000000000000001)
-> 
-> Hmmm, the whole 4 bytes weren't touched.
-> 
->>>> test_bitmap: bitmap_to_arr64(nbits == 2): tail is not safely cleared: 0xa5a5a5a500000001 (must be 0x0000000000000003)
->>>> test_bitmap: bitmap_to_arr64(nbits == 3): tail is not safely cleared: 0xa5a5a5a500000001 (must be 0x0000000000000007)
-> 
-> This is where it gets worse...
-> 
->>>> ...
->>>> test_bitmap: bitmap_to_arr64(nbits == 927): tail is not safely cleared: 0xa5a5a5a500000000 (must be 0x000000007fffffff)
->>>> test_bitmap: bitmap_to_arr64(nbits == 928): tail is not safely cleared: 0xa5a5a5a580000000 (must be 0x00000000ffffffff)
-> 
-> I don't see the pattern how the actual result gets generated. But the
-> problem is in the bitmap code rather than in the subtest -- "must be"s
-> are fully correct.
-> 
-> Given that the 0xa5s are present in the upper 32 bits, it is Big Endian
-> I guess? Maybe even 32-bit Big Endian? Otherwise I'd start concerning
-> how comes it doesn't reproduce on x86_64s :D
-> 
+> Can we do "s/device_id/idev_id" to differentiate it from the
+> "device_id" being used for a selftest device object?
 
-It does reproduce on 32-bit x86 builds, and as far as I can see
-it is only seen with 32-bit little endian systems.
+I renamed the selftest device object to 'stdev_id' instead
 
-Guenter
-
->>>
->>> This may be a real problem. Can you share what's the system is? What's
->>> endianness and register length?
->>>
->>> + Alexander Lobakin, the author of the exact subtest.
->>
->> Forgot to add
-> 
-> Oh, thanks for letting me know!
-> 
->>    
->>>> but then:
->>>>
->>>> test_bitmap: all 6550 tests passed
->>>
->>> It's because corresponding error path doesn't increment failed_tests
->>> counter. I'll send a fix shortly.
-> 
-> [...]
-> 
-> Thanks,
-> Olek
-
+Jason
