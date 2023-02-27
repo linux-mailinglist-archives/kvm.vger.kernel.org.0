@@ -2,46 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8EA316A47BA
-	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 18:18:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 40AA76A4819
+	for <lists+kvm@lfdr.de>; Mon, 27 Feb 2023 18:34:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230003AbjB0RST (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Feb 2023 12:18:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55644 "EHLO
+        id S229684AbjB0Rez (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Feb 2023 12:34:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229781AbjB0RSR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Feb 2023 12:18:17 -0500
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A77E96EB0;
-        Mon, 27 Feb 2023 09:18:15 -0800 (PST)
-Received: from vm02.corp.microsoft.com (unknown [167.220.196.155])
-        by linux.microsoft.com (Postfix) with ESMTPSA id A6B2F20BC5E7;
-        Mon, 27 Feb 2023 09:18:13 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com A6B2F20BC5E7
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1677518295;
-        bh=fknedrBN9SwzuVi6ot1s6RGt4uHR8qcI6hAfSyjoEfM=;
-        h=From:To:Cc:Subject:Date:From;
-        b=ThR2HyTEPb8Z4zjVX+cn1Rno45lCerw0KQn0uxlZNWM1DtDzFCX+sAc8fK61cK1Rn
-         0lcaY50yjzua3uHlxiKwxCunnqxlbws+KanjnafbyzzZGWhxLCRufKHaSxGPOAU6XE
-         JJUGO1/hJdQ0CZUWDtOoClvOXhMDOWonCG1rmTQo=
-From:   Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>,
-        kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tianyu Lan <ltykernel@gmail.com>,
-        Michael Kelley <mikelley@microsoft.com>
-Subject: [PATCH] KVM: SVM: Disable TDP MMU when running on Hyper-V
-Date:   Mon, 27 Feb 2023 17:17:51 +0000
-Message-Id: <20230227171751.1211786-1-jpiotrowski@linux.microsoft.com>
-X-Mailer: git-send-email 2.25.1
+        with ESMTP id S229790AbjB0Res (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Feb 2023 12:34:48 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3D83BBA5
+        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 09:34:41 -0800 (PST)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31RGpfMG026739;
+        Mon, 27 Feb 2023 17:34:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Z4MQjNfpT/pG5Ir8oEEcSXH0GeCk+FTPmNQ9BuLSP1E=;
+ b=QA7s6KMs2IiqAY/ZEjwI6+uD1aR2UqtfZdCP+jtVVzvGSM6m3FYc2SWKILSJoLXZYPrl
+ psxe6wk0T5zbmiS7kuUW18igibKSHwRH5YOz8uXYjhcRTUsHtxQrq81ojXkNYSWT31f2
+ qBHfI0+E3MTN3/5XBHUN5vk76J9IsKnTbsSbfDDT2AoebEAh4YY2TzE3lVkW76ZJfnkY
+ CD3eSWctHdbDf8sZMWUdruj/MpbFhkEjsKKaMUh16WhFKjxblyusK/9KR/FeTt2rJtPh
+ Fa8iAFJg76zvloqau5RynolujSHJJErSyqpWhZpctkJhImiVz1H4tZO6dujhhk27ySyr zQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p0u1rb2v1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Feb 2023 17:34:33 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31RH3SW0016597;
+        Mon, 27 Feb 2023 17:34:32 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p0u1rb2u3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Feb 2023 17:34:32 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31QMtiMe018440;
+        Mon, 27 Feb 2023 17:34:29 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3nybbdhm52-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Feb 2023 17:34:29 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31RHYQqc22151494
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 27 Feb 2023 17:34:26 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2C6952004B;
+        Mon, 27 Feb 2023 17:34:26 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C01DD20043;
+        Mon, 27 Feb 2023 17:34:24 +0000 (GMT)
+Received: from [9.171.54.232] (unknown [9.171.54.232])
+        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Mon, 27 Feb 2023 17:34:24 +0000 (GMT)
+Message-ID: <0a5c020e-4827-4e6c-ab2c-2e4c47285f33@linux.ibm.com>
+Date:   Mon, 27 Feb 2023 18:34:23 +0100
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH v16 11/11] docs/s390x/cpu topology: document s390x cpu
+ topology
+Content-Language: en-US
+To:     Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
+        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
+        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
+        nsg@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
+        clg@kaod.org
+References: <20230222142105.84700-1-pmorel@linux.ibm.com>
+ <20230222142105.84700-12-pmorel@linux.ibm.com>
+ <039b5a0f-4440-324c-d5a7-54e9e1c89ea8@redhat.com>
+ <dcac1561-8c91-310c-7e9f-db9fff3b00a7@linux.ibm.com>
+ <365c5bca-eda6-52dd-a90c-12de397bedf6@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <365c5bca-eda6-52dd-a90c-12de397bedf6@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-19.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_PASS,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: VXr9Ndm6xS3faKTZ9wzTzcU7MnYFcnlA
+X-Proofpoint-ORIG-GUID: eEikCUMIKpcrtnoHcBQXvN-N1JeIEDLo
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-27_13,2023-02-27_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ clxscore=1015 suspectscore=0 bulkscore=0 mlxlogscore=999 malwarescore=0
+ spamscore=0 impostorscore=0 priorityscore=1501 mlxscore=0 adultscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302270137
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -49,150 +102,75 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-TDP MMU has been broken on AMD CPUs when running on Hyper-V since v5.17.
-The issue was first introduced by two commmits:
 
-- bb95dfb9e2dfbe6b3f5eb5e8a20e0259dadbe906 "KVM: x86/mmu: Defer TLB
-  flush to caller when freeing TDP MMU shadow pages"
-- efd995dae5eba57c5d28d6886a85298b390a4f07 "KVM: x86/mmu: Zap defunct
-  roots via asynchronous worker"
+On 2/27/23 15:27, Thomas Huth wrote:
+> On 27/02/2023 15.17, Pierre Morel wrote:
+>>
+>> On 2/27/23 14:58, Thomas Huth wrote:
+>>> On 22/02/2023 15.21, Pierre Morel wrote:
+>>>> Add some basic examples for the definition of cpu topology
+>>>> in s390x.
+>>>>
+>>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>>>> ---
+>>>>   docs/system/s390x/cpu-topology.rst | 378 
+>>>> +++++++++++++++++++++++++++++
+>>>>   docs/system/target-s390x.rst       |   1 +
+>>>>   2 files changed, 379 insertions(+)
+>>>>   create mode 100644 docs/system/s390x/cpu-topology.rst
+>>>>
+>>>> diff --git a/docs/system/s390x/cpu-topology.rst 
+>>>> b/docs/system/s390x/cpu-topology.rst
+>>>> new file mode 100644
+>>>> index 0000000000..d470e28b97
+>>>> --- /dev/null
+>>>> +++ b/docs/system/s390x/cpu-topology.rst
+>>>> @@ -0,0 +1,378 @@
+>>>> +CPU topology on s390x
+>>>> +=====================
+>>>> +
+>>>> +Since QEMU 8.0, CPU topology on s390x provides up to 3 levels of
+>>>> +topology containers: drawers, books, sockets, defining a tree shaped
+>>>> +hierarchy.
+>>>> +
+>>>> +The socket container contains one or more CPU entries consisting
+>>>> +of a bitmap of three dentical CPU attributes:
+>>>
+>>> What do you mean by "dentical" here?
+>>
+>> :D i.. dentical
+>>
+>> I change it to identical
+>
+> Ok, but even with "i" at the beginning, it does not make too much 
+> sense here to me - I'd interpret "identical" as "same", but these 
+> attributes have clearly different meanings, haven't they?
+>
+>  Thomas
+>
+>
+Ah OK I understand what is unclear.
 
-The root cause is that since then there are missing TLB flushes which
-are required by HV_X64_NESTED_ENLIGHTENED_TLB. The failure manifests
-as L2 guest VMs being unable to complete boot due to memory
-inconsistencies between L1 and L2 guests which lead to various
-assertion/emulation failures.
+What I mean is that in each socket we have several CPU TLE entries each 
+entry has different attributes values and contains CPU bit in the mask 
+for CPU with identical attributes.
 
-The HV_X64_NESTED_ENLIGHTENED_TLB enlightenment is always exposed by
-Hyper-V on AMD and is always used by Linux. The TLB flush required by
-HV_X64_NESTED_ENLIGHTENED_TLB is much stricter than the local TLB flush
-that TDP MMU wants to issue. We have also found that with TDP MMU L2 guest
-boot performance on AMD is reproducibly slower compared to when TDP MMU is
-disabled.
+For example,
 
-Disable TDP MMU when using SVM Hyper-V for the time being while we
-search for a better fix.
+in the case of horizontal polarization, we have one CPU TLE entry for 
+low entitlement, one CPU TLE for medium entitlement, one for high 
+entitlement and one for high entitlement with dedicated CPU
 
-Link: https://lore.kernel.org/lkml/43980946-7bbf-dcef-7e40-af904c456250@linux.microsoft.com/t/#u
-Signed-off-by: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
----
-Based on kvm-x86-mmu-6.3. The approach used here does not apply cleanly to
-<=v6.2. This would be needed in stable too, and I don't know about putting
-fixes tags.
+in the case of horizontal polarization we have one CPU TLE for non 
+dedicated CPU and one for dedicated CPU.
 
-Jeremi
+Only CPU TLE with at least one bit (CPU) set in the mask is written 
+inside the SYSIB.
 
- arch/x86/include/asm/kvm_host.h |  3 ++-
- arch/x86/kvm/mmu/mmu.c          |  5 +++--
- arch/x86/kvm/svm/svm.c          |  6 +++++-
- arch/x86/kvm/svm/svm_onhyperv.h | 10 ++++++++++
- arch/x86/kvm/vmx/vmx.c          |  3 ++-
- 5 files changed, 22 insertions(+), 5 deletions(-)
+Regards,
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 4d2bc08794e4..a0868ae3688d 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -2031,7 +2031,8 @@ void kvm_mmu_invpcid_gva(struct kvm_vcpu *vcpu, gva_t gva, unsigned long pcid);
- void kvm_mmu_new_pgd(struct kvm_vcpu *vcpu, gpa_t new_pgd);
- 
- void kvm_configure_mmu(bool enable_tdp, int tdp_forced_root_level,
--		       int tdp_max_root_level, int tdp_huge_page_level);
-+		       int tdp_max_root_level, int tdp_huge_page_level,
-+		       bool enable_tdp_mmu);
- 
- static inline u16 kvm_read_ldt(void)
- {
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index c91ee2927dd7..5c0e28a7a3bc 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5787,14 +5787,15 @@ void kvm_mmu_invpcid_gva(struct kvm_vcpu *vcpu, gva_t gva, unsigned long pcid)
- }
- 
- void kvm_configure_mmu(bool enable_tdp, int tdp_forced_root_level,
--		       int tdp_max_root_level, int tdp_huge_page_level)
-+		       int tdp_max_root_level, int tdp_huge_page_level,
-+		       bool enable_tdp_mmu)
- {
- 	tdp_enabled = enable_tdp;
- 	tdp_root_level = tdp_forced_root_level;
- 	max_tdp_level = tdp_max_root_level;
- 
- #ifdef CONFIG_X86_64
--	tdp_mmu_enabled = tdp_mmu_allowed && tdp_enabled;
-+	tdp_mmu_enabled = tdp_mmu_allowed && tdp_enabled && enable_tdp_mmu;
- #endif
- 	/*
- 	 * max_huge_page_level reflects KVM's MMU capabilities irrespective
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index d13cf53e7390..070c3f7f8c9f 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4925,6 +4925,7 @@ static __init int svm_hardware_setup(void)
- 	struct page *iopm_pages;
- 	void *iopm_va;
- 	int r;
-+	bool enable_tdp_mmu;
- 	unsigned int order = get_order(IOPM_SIZE);
- 
- 	/*
-@@ -4991,9 +4992,12 @@ static __init int svm_hardware_setup(void)
- 	if (!boot_cpu_has(X86_FEATURE_NPT))
- 		npt_enabled = false;
- 
-+	enable_tdp_mmu = svm_hv_enable_tdp_mmu();
-+
- 	/* Force VM NPT level equal to the host's paging level */
- 	kvm_configure_mmu(npt_enabled, get_npt_level(),
--			  get_npt_level(), PG_LEVEL_1G);
-+			  get_npt_level(), PG_LEVEL_1G,
-+			  enable_tdp_mmu);
- 	pr_info("Nested Paging %sabled\n", npt_enabled ? "en" : "dis");
- 
- 	/* Setup shadow_me_value and shadow_me_mask */
-diff --git a/arch/x86/kvm/svm/svm_onhyperv.h b/arch/x86/kvm/svm/svm_onhyperv.h
-index 6981c1e9a809..aa49ac5d66bc 100644
---- a/arch/x86/kvm/svm/svm_onhyperv.h
-+++ b/arch/x86/kvm/svm/svm_onhyperv.h
-@@ -30,6 +30,11 @@ static inline void svm_hv_init_vmcb(struct vmcb *vmcb)
- 		hve->hv_enlightenments_control.msr_bitmap = 1;
- }
- 
-+static inline bool svm_hv_enable_tdp_mmu(void)
-+{
-+	return !(npt_enabled && ms_hyperv.nested_features & HV_X64_NESTED_ENLIGHTENED_TLB);
-+}
-+
- static inline void svm_hv_hardware_setup(void)
- {
- 	if (npt_enabled &&
-@@ -84,6 +89,11 @@ static inline void svm_hv_init_vmcb(struct vmcb *vmcb)
- {
- }
- 
-+static inline bool svm_hv_enable_tdp_mmu(void)
-+{
-+	return true;
-+}
-+
- static inline void svm_hv_hardware_setup(void)
- {
- }
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index c788aa382611..4d3808755d39 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -8442,7 +8442,8 @@ static __init int hardware_setup(void)
- 	vmx_setup_me_spte_mask();
- 
- 	kvm_configure_mmu(enable_ept, 0, vmx_get_max_tdp_level(),
--			  ept_caps_to_lpage_level(vmx_capability.ept));
-+			  ept_caps_to_lpage_level(vmx_capability.ept),
-+			  true);
- 
- 	/*
- 	 * Only enable PML when hardware supports PML feature, and both EPT
--- 
-2.25.1
+Pierre
+
+
+
 
