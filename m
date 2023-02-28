@@ -2,107 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A177B6A6220
-	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 23:07:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 22AEE6A6223
+	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 23:09:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229935AbjB1WHv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Feb 2023 17:07:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57912 "EHLO
+        id S229923AbjB1WJT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Feb 2023 17:09:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229735AbjB1WHs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Feb 2023 17:07:48 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A65BC2F7B0
-        for <kvm@vger.kernel.org>; Tue, 28 Feb 2023 14:07:47 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4E9BFB80ECC
-        for <kvm@vger.kernel.org>; Tue, 28 Feb 2023 22:07:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC476C433D2;
-        Tue, 28 Feb 2023 22:07:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677622064;
-        bh=FApbKilY3GXJ4q89pXMD20d4s4g8bNIn5KjKszQhVjo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ZQBWRFx7k93CR0cw9Cb6i3MAbh5DNDM7hP3Vyt8lDR084A4h0Tc8gH54eeddC7UVg
-         sC3Ja57LIBCLkJidvWeJQbAIzGEgJ2cY8Z9n9RaH6OUTbaRz5gdwWPGvatLL+RgOoV
-         yNk3tw+X7Z4M4DiQzDBKH13k9SAVJ34fdvoOpY6JQPEG5a8OGlr87seFs7ZjKBm7SN
-         ZuzvzzRf8zcuI/1mYctq7zfv60nBRB6JiZB3F7ersDLGL6GIQnaUdxNUs6+UH+n8bH
-         DS6JVaW7mZHp9UNlPncNZ83DwWcjjZBQ1tEgE3I2zxXExsyuB0tA0xlN5woTPH+DC5
-         duv2VoUpDXiyQ==
-Date:   Tue, 28 Feb 2023 22:07:38 +0000
-From:   Conor Dooley <conor@kernel.org>
-To:     Andy Chiu <andy.chiu@sifive.com>
-Cc:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
-        anup@brainfault.org, atishp@atishpatra.org,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        vineetg@rivosinc.com, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, Guo Ren <ren_guo@c-sky.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Heiko Stuebner <heiko.stuebner@vrull.eu>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Atish Patra <atishp@rivosinc.com>,
-        Jisheng Zhang <jszhang@kernel.org>,
-        Dao Lu <daolu@rivosinc.com>,
-        Vincent Chen <vincent.chen@sifive.com>,
-        Guo Ren <guoren@kernel.org>,
-        Tsukasa OI <research_trasio@irq.a4lg.com>
-Subject: Re: [PATCH -next v14 02/19] riscv: Extending cpufeature.c to detect
- V-extension
-Message-ID: <Y/57KguRXH4H5zDd@spud>
-References: <20230224170118.16766-1-andy.chiu@sifive.com>
- <20230224170118.16766-3-andy.chiu@sifive.com>
+        with ESMTP id S229548AbjB1WJR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Feb 2023 17:09:17 -0500
+Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FA8C7AB6;
+        Tue, 28 Feb 2023 14:09:16 -0800 (PST)
+Received: by mail-qt1-x836.google.com with SMTP id ay9so12295808qtb.9;
+        Tue, 28 Feb 2023 14:09:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1677622155;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ElzNfX4GjaaLF5eErquCaYeuK/Or8StIZN6B5eFp3VI=;
+        b=nKk+3RKoMV3sv/aF3KndF+sExc24k8XNkK6PAbs3TwFGWlQ5LE9E63vQgLJbmfpaBb
+         PzPiZtn5Nqdv4A4M8LViKE8XZT+QOfu1bEU4uR094ADSUu4cT6Wt067TPAWcVf4gK5/P
+         P9noDHMaMnyYlNUkS+2GrMOu5uHzm6Dz3l99toCEaSO0Daoy0JT+SIvfh+wLoKA+TTRR
+         xO0frT6733LN7zm/YtpuMKcnHmKfQnr0jbQ+rAkj4MgMm1In85cMYu5CGeVW/1wNg6Wk
+         FfwfiIaE/xYzzvH5wdRWBrW1CmqzxnC2TNu4dkFheE7Nn9SaNgMgr5GdUhQp7C0b936N
+         mbqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1677622155;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ElzNfX4GjaaLF5eErquCaYeuK/Or8StIZN6B5eFp3VI=;
+        b=lNXeT+zoeGMkb/qiyN4Qxosn8H6Z2jZFrmprc7NHCUuXzZ30qcwnN13V33bb/+78X6
+         wNMfIaw7xozPqZXXDEQVposgBuvdTth7e1K+92Ck6XtVIDv1I6Y1i7blMGGAck6pI3Ia
+         bFqPCWSNbQ7L9WqfHNQGc8PleeSfXZDV2LbU5hRh3cBpA+i0zYV7KYBKT+iEIJBdVs34
+         bYdr7Qxeo7Y5aSAy/5oDtBtsGuRrlM195G3jg7ZPQrO5gkc9LNL2d3uD9PhBXSVJY0SI
+         kkwsdNx3IlNX8KS3T1b4XrywOjeIzFbS9BjBhCxxPeXEHUdmSHo2VI26N4y5NYog2/0q
+         cthw==
+X-Gm-Message-State: AO0yUKVRZMRO38dM9KQs0fVSfde848MCJhaXY+XY1Sf4MFqnhCZlltiv
+        4SbYCJ/w3SKI6H6OPiPWJj4GRJL2HrISyFTZ3Q==
+X-Google-Smtp-Source: AK7set9Z/v6X0lvyuqr9Eu2aEbzgMuD1yVw/iuBxTvo2kJ7Mjf1mkYkSx7vbYu7XXwufe62bQxGcqZXIVeOXDVKWNy0=
+X-Received: by 2002:ac8:5901:0:b0:3bf:b95e:1768 with SMTP id
+ 1-20020ac85901000000b003bfb95e1768mr1170735qty.10.1677622155219; Tue, 28 Feb
+ 2023 14:09:15 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="TTOC1DDLd5I06q+Z"
-Content-Disposition: inline
-In-Reply-To: <20230224170118.16766-3-andy.chiu@sifive.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20230226110802.103134-1-usama.arif@bytedance.com>
+ <20230226110802.103134-8-usama.arif@bytedance.com> <878rghmrn2.ffs@tglx>
+In-Reply-To: <878rghmrn2.ffs@tglx>
+From:   Brian Gerst <brgerst@gmail.com>
+Date:   Tue, 28 Feb 2023 17:09:03 -0500
+Message-ID: <CAMzpN2hwwZ64MycrCfqKw-Hu_8Xfvz_LdzMgiJ_Ho=x6HFYGVA@mail.gmail.com>
+Subject: Re: [PATCH v12 07/11] x86/smpboot: Remove early_gdt_descr on 64-bit
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     Usama Arif <usama.arif@bytedance.com>, dwmw2@infradead.org,
+        kim.phillips@amd.com, piotrgorski@cachyos.org,
+        oleksandr@natalenko.name, arjan@linux.intel.com, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        x86@kernel.org, pbonzini@redhat.com, paulmck@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
+        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
+        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
+        simon.evans@bytedance.com, liangma@liangbit.com,
+        David Woodhouse <dwmw@amazon.co.uk>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Feb 28, 2023 at 4:01=E2=80=AFPM Thomas Gleixner <tglx@linutronix.de=
+> wrote:
+>
+> On Sun, Feb 26 2023 at 11:07, Usama Arif wrote:
+> > @@ -265,7 +265,12 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify, SY=
+M_L_GLOBAL)
+> >        * addresses where we're currently running on. We have to do that=
+ here
+> >        * because in 32bit we couldn't load a 64bit linear address.
+> >        */
+> > -     lgdt    early_gdt_descr(%rip)
+> > +     subq    $16, %rsp
+> > +     movw    $(GDT_SIZE-1), (%rsp)
+> > +     leaq    gdt_page(%rdx), %rax
+>
+> Even on !SMP gdt_page is in the 0...__per_cpu_end range. Which means
+> that on !SMP this results in:
+>
+>       leaq    0xb000(%rdx),%rax
+>
+> and RDX is 0. That's not really a valid GDT pointer, right?
 
---TTOC1DDLd5I06q+Z
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+No.  On !SMP per-cpu variables are normal variables in the .data
+section.  They are not gathered together in the per-cpu section and
+are not accessed with the GS prefix.
 
-On Fri, Feb 24, 2023 at 05:01:01PM +0000, Andy Chiu wrote:
-> From: Guo Ren <ren_guo@c-sky.com>
->=20
-> Add V-extension into riscv_isa_ext_keys array and detect it with isa
-> string parsing.
->=20
-> Signed-off-by: Guo Ren <ren_guo@c-sky.com>
-> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
-> Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
-> Suggested-by: Vineet Gupta <vineetg@rivosinc.com>
-> Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
+ffffffff810000c9:       48 8d 82 00 10 81 82    lea    0x82811000(%rdx),%ra=
+x
+                        ffffffff810000cc: R_X86_64_32S  gdt_page
 
-Looks grand, and thanks for switching to IS_ENABLED().
-Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+ffffffff82811000 D gdt_page
 
-Thanks,
-Conor.
+So RDX=3D0 is correct.
 
+> > +     movq    %rax, 2(%rsp)
+> > +     lgdt    (%rsp)
+>
+> and obviously that's equally broken for the task stack part:
+>
+> >       movq    pcpu_hot + X86_current_task(%rdx), %rax
 
---TTOC1DDLd5I06q+Z
-Content-Type: application/pgp-signature; name="signature.asc"
+Same as gdt_page:
 
------BEGIN PGP SIGNATURE-----
+ffffffff810000b1:       48 8b 82 00 88 a8 82    mov    0x82a88800(%rdx),%ra=
+x
+                        ffffffff810000b4: R_X86_64_32S  pcpu_hot
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCY/57KgAKCRB4tDGHoIJi
-0qhbAQDvniHcdbGl6PEkgQ/Y+JTRcHbc8r6Qu04xT5YNTTRlOgD9EjJIwx8OCOwo
-ghoz1TDN+aklvl21oLAoJhe8b1JR9gc=
-=1fxM
------END PGP SIGNATURE-----
+ffffffff82a88800 D pcpu_hot
 
---TTOC1DDLd5I06q+Z--
+> This needs:
+>
+> --- a/arch/x86/kernel/head_64.S
+> +++ b/arch/x86/kernel/head_64.S
+> @@ -239,7 +239,7 @@ SYM_INNER_LABEL(secondary_startup_64_no_
+>         /* Get the per cpu offset for the given CPU# which is in ECX */
+>         movq    __per_cpu_offset(,%rcx,8), %rdx
+>  #else
+> -       xorl    %edx, %edx
+> +       leaq    INIT_PER_CPU_VAR(fixed_percpu_data)(%rip), %rdx
+>  #endif /* CONFIG_SMP */
+>
+>         /*
+>
+> in the initial_stack patch, which then allows to remove this hunk in the
+> initial_gs patch:
+>
+> @@ -286,9 +286,6 @@ SYM_INNER_LABEL(secondary_startup_64_no_
+>          * the per cpu areas are set up.
+>          */
+>         movl    $MSR_GS_BASE,%ecx
+> -#ifndef CONFIG_SMP
+> -       leaq    INIT_PER_CPU_VAR(fixed_percpu_data)(%rip), %rdx
+> -#endif
+
+On !SMP the only thing GSBASE is used for is the stack protector
+canary, which is in fixed_percpu_data.  There is no per-cpu section.
+
+FWIW, I posted a patch set a while back that switched x86-64 to use
+the options added to newer compilers controlling where the canary is
+located, allowing it to become a standard per-cpu variable and
+removing the need to force the per-cpu section to be zero-based.
+However it was not accepted at that time, due to removing support for
+stack protector on older compilers (GCC < 8.1).
+
+>         movl    %edx, %eax
+>         shrq    $32, %rdx
+>         wrmsr
+>
+> Maybe we should enforce CONFIG_SMP=3Dy first :)
+
+Makes sense, only the earliest generations of x86-64 processors have a
+single core/thread, and an SMP kernel can still run on them.
+
+--
+Brian Gerst
