@@ -2,131 +2,250 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA5976A501A
-	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 01:18:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A7D246A50C0
+	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 02:31:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229827AbjB1ASE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Feb 2023 19:18:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50148 "EHLO
+        id S229817AbjB1Bbi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Feb 2023 20:31:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229481AbjB1ASD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Feb 2023 19:18:03 -0500
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2064.outbound.protection.outlook.com [40.107.237.64])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D55B13DE5;
-        Mon, 27 Feb 2023 16:18:01 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=D+4LgMc0zhpNNDELfc2xlf8fo6tCijsZTg3NyIH0wQhVWvLqRKXoji7xv1FCeER3Hjssx4D1o8w4Ifmambe17sRtC2HgkdhQJqHd/EujcoQZBrVMKjOrpa1ykMalD9LKor+2BpibKpj4H+IBMingkOQNPtmFu3MwGwKEqs/U5d2gCSs9odUULpxN8VNdA03qMGMffJZ78oT+ZGUM9FoHo3vLU6htCPJ7aZdeGUvlEbdCn8TPB9pQuZJzy40GqccE87LTMtdeT5bhZq7j0liStGq64UpNOtl8gSHxnVLSCtCRvUma3fkO6RtmI9aUNGx3Cy6FkAx+KGDQWRnSkiFaWA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=H15CRLyaxYSA/YU5L0tz8pFa9Y0L+wefwgiVMwnOx2M=;
- b=U7LUVjsyJw/zyX6kGxrOKX9BH5HPCfrQt+gip2EKR0COh0YKGWsLw8tX/Bpm9SYoRhvGjzMbUK5/ecibp7ZeBdfmKNwXhXAsfrT4JbRuU3puha3Y0Kt5eTUOHbVpp1zYJ2rofmnXHbxE+ZekdqEeAOkNeXK3u5J7BB1oZvG2AOHTsBzcDgPFTAyCB+QPg+5gnoUQaPELFE4FJi4JFEU2UqV0m4LEyd9LqS0KckLdJORPqTeay/fxYP2qss2Y/n015+J3XZu3P7hIk5Oi/ZVpAj1iJtlgT/s2x38wMU/jxw5iWu9IlPb5ySMTybgqEyAHERqeEyMARJUe9RYAFQKWFA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=lists.linux.dev smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=H15CRLyaxYSA/YU5L0tz8pFa9Y0L+wefwgiVMwnOx2M=;
- b=DrIPrBnvXtBbBJqSD9tcQdKO5sk42wj+YyfTLg0zjMLOd1HHPEb7t/qUhQvH3IT/39c/EjYJuqGeDnSZt5RbkDuKHIh0nHAEnJHKi90EmJYz0l4FlkcxL9pwS+mbpihVvchVrOEeAZwgc+CvIxAJF2hvgicgOWw2lMHG9Uiv1iLuCKXsaFgo9EBjzrHx5eMS/TzpafipW8y0PTVLHFUbQW/lqDD/GZAMtKxKuqirezduTb47nxjlYAaPpnKzLP67viG1Ddu6qiScBdlYgj1nxOoH4i+cQcqHmemn4Brd/c62d9XwXJAXvdNb919NYpc5g9OVdpnuYZtgLCdju4W4Wg==
-Received: from CY5P221CA0073.NAMP221.PROD.OUTLOOK.COM (2603:10b6:930:9::10) by
- DM4PR12MB5940.namprd12.prod.outlook.com (2603:10b6:8:6b::10) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6134.26; Tue, 28 Feb 2023 00:17:59 +0000
-Received: from CY4PEPF0000C970.namprd02.prod.outlook.com
- (2603:10b6:930:9:cafe::3e) by CY5P221CA0073.outlook.office365.com
- (2603:10b6:930:9::10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.29 via Frontend
- Transport; Tue, 28 Feb 2023 00:17:59 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CY4PEPF0000C970.mail.protection.outlook.com (10.167.242.8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6156.12 via Frontend Transport; Tue, 28 Feb 2023 00:17:58 +0000
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Mon, 27 Feb 2023
- 16:17:49 -0800
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail205.nvidia.com
- (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Mon, 27 Feb
- 2023 16:17:49 -0800
-Received: from Asurada-Nvidia (10.127.8.12) by mail.nvidia.com (10.129.68.7)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5 via Frontend
- Transport; Mon, 27 Feb 2023 16:17:48 -0800
-Date:   Mon, 27 Feb 2023 16:17:47 -0800
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     <iommu@lists.linux.dev>, Kevin Tian <kevin.tian@intel.com>,
-        <linux-kselftest@vger.kernel.org>, <kvm@vger.kernel.org>,
-        Yi Liu <yi.l.liu@intel.com>
-Subject: Re: [PATCH 14/14] iommufd/selftest: Add a selftest for
- IOMMU_HWPT_ALLOC
-Message-ID: <Y/1IK4kVz07xiY8G@Asurada-Nvidia>
-References: <0-v1-7612f88c19f5+2f21-iommufd_alloc_jgg@nvidia.com>
- <14-v1-7612f88c19f5+2f21-iommufd_alloc_jgg@nvidia.com>
- <Y/uzM8PD/XY0WI7f@Asurada-Nvidia>
- <Y/zGCLb5aGmxWPHu@nvidia.com>
+        with ESMTP id S229605AbjB1Bbh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Feb 2023 20:31:37 -0500
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9685546A6
+        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 17:31:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1677547895; x=1709083895;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Bj32I2zAx6+PHeK2dScNijceSDn4ytHmW8zFPbZVOCE=;
+  b=KCWEYEztSnLp9gXKsyACr9/okOsUO3AOXLh/WK5QrEVzODmZgQIpts5G
+   cej7elVX5yhzrczDICVWCAOOiYue7um0eYNA787WdFHGpWhnx8e5B/0TI
+   0SefnSWA5yFXZTJekHxQCQxmR0FEL32Xt0oySjpwSZ00yIZhauol68YbG
+   Ste/oylyALAQ6Zq13DlW+xB6cbBj7RNht3Qo6k9zl8RFmmgp3l28xUVPZ
+   2qxHsYk1TuBaFxWCaDaRPTwfBskgBeErdRvjFuPLpHUOAt3/tA7ii4P5w
+   qeg1Ozu0LpaPdWfAy8y8itFfgm8Y6LKBohZ30heZCkUpgGOU+385U5NHv
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10634"; a="317820490"
+X-IronPort-AV: E=Sophos;i="5.98,220,1673942400"; 
+   d="scan'208";a="317820490"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2023 17:31:35 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10634"; a="706389138"
+X-IronPort-AV: E=Sophos;i="5.98,220,1673942400"; 
+   d="scan'208";a="706389138"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
+  by orsmga001.jf.intel.com with ESMTP; 27 Feb 2023 17:31:31 -0800
+Date:   Tue, 28 Feb 2023 09:31:31 +0800
+From:   Yuan Yao <yuan.yao@linux.intel.com>
+To:     Shivam Kumar <shivam.kumar1@nutanix.com>
+Cc:     pbonzini@redhat.com, seanjc@google.com, maz@kernel.org,
+        james.morse@arm.com, borntraeger@linux.ibm.com, david@redhat.com,
+        aravind.retnakaran@nutanix.com, kvm@vger.kernel.org,
+        Shaju Abraham <shaju.abraham@nutanix.com>,
+        Manish Mishra <manish.mishra@nutanix.com>,
+        Anurag Madnawat <anurag.madnawat@nutanix.com>
+Subject: Re: [PATCH v8 2/3] KVM: x86: Dirty quota-based throttling of vcpus
+Message-ID: <20230228013131.o4xw3ikacrgyjc52@yy-desk-7060>
+References: <20230225204758.17726-1-shivam.kumar1@nutanix.com>
+ <20230225204758.17726-3-shivam.kumar1@nutanix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y/zGCLb5aGmxWPHu@nvidia.com>
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000C970:EE_|DM4PR12MB5940:EE_
-X-MS-Office365-Filtering-Correlation-Id: b27cf57c-f0c4-4912-f496-08db19213f55
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8DmRfPG+Fhqx4nYO1u0/RbvIFmCfKktUyQkQQGo5jSqQCNG/qgbvj+VcTEB+sW56Qb9fKfbRC8aNZeGs4fMJkqOz2SiMkn+W7xdBCYEC+dXc+kIFlwTxwNUPfzQbYLZV7tgMs7PI8ezzv6Oct9Fd+Q+Rxf2TX2qKAVdVoAghMnzfF6XpXuYLWypghagxOco5fgpGYRuxjQyAYPLicJao4qc5G4kb4W7lDWdI+ISeWnH85lz/hek4FPxz8TsVN+oXuqkEqYtGJwQgOo11f9yaUydsF4yd+s3GMabBGQIJMatVT/gKLC9mtFkx/65LWtbRLSDpWgISkKsErF5LREwtu65TYMOCRLWeKkr8pVP105LEDp8E0JBDj5ujFm0cqWhPfWPZQ1JKEy8+emfEqi9E/or/904wEvdYlgqPLq8Ocm1sJQGljF/7LXb3WfcSGS7thQikq/6Ty+k5sXJYCbiStXvV/4Du7kLFan3JbOJOb4gYIap4j7V3Ju+RCS+x2xq2qZOul0iuknzinxL93Gwrmje+TxoS5vqO00nfDCSwqdd9bPi5msHL/V1so9zad+jwyPaV8N/9kMFP2Pr61C5Otdlio3+Zs6TE05ckhr4urg9NX1m15KezSpCfvgUX+YGYQAkLHjNjboRUqduvUAPdMIAWC0C2REcepjRKPsEPJPiVo1+Wp/gm4ybbbteG3tKKGy4l2VjSnV6OKx8pMit2PQ==
-X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230025)(4636009)(346002)(376002)(396003)(39860400002)(136003)(451199018)(36840700001)(46966006)(40470700004)(9686003)(26005)(36860700001)(186003)(426003)(47076005)(82310400005)(356005)(7636003)(55016003)(86362001)(82740400003)(40460700003)(40480700001)(336012)(33716001)(70206006)(4326008)(8676002)(70586007)(6862004)(8936002)(4744005)(5660300002)(478600001)(41300700001)(54906003)(2906002)(6636002)(316002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Feb 2023 00:17:58.9177
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b27cf57c-f0c4-4912-f496-08db19213f55
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000C970.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5940
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <20230225204758.17726-3-shivam.kumar1@nutanix.com>
+User-Agent: NeoMutt/20171215
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 27, 2023 at 11:02:32AM -0400, Jason Gunthorpe wrote:
-> On Sun, Feb 26, 2023 at 11:29:55AM -0800, Nicolin Chen wrote:
-> > On Fri, Feb 24, 2023 at 08:27:59PM -0400, Jason Gunthorpe wrote:
-> >   
-> > > +static int _test_cmd_hwpt_alloc(int fd, __u32 device_id, __u32 pt_id,
-> > > +					 __u32 *hwpt_id)
-> > > +{
-> > > +	struct iommu_hwpt_alloc cmd = {
-> > > +		.size = sizeof(cmd),
-> > > +		.dev_id = device_id,
-> > > +		.pt_id = pt_id,
-> > > +	};
-> > > +	int ret;
-> > 
-> > Can we do "s/device_id/idev_id" to differentiate it from the
-> > "device_id" being used for a selftest device object?
-> 
-> I renamed the selftest device object to 'stdev_id' instead
+On Sat, Feb 25, 2023 at 08:47:59PM +0000, Shivam Kumar wrote:
+> Call update_dirty_quota whenever a page is marked dirty with
+> appropriate arch-specific page size. Process the KVM request
+> KVM_REQ_DIRTY_QUOTA_EXIT (raised by update_dirty_quota) to exit to
+> userspace with exit reason KVM_EXIT_DIRTY_QUOTA_EXHAUSTED.
+>
+> Suggested-by: Shaju Abraham <shaju.abraham@nutanix.com>
+> Suggested-by: Manish Mishra <manish.mishra@nutanix.com>
+> Co-developed-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
+> Signed-off-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
+> Signed-off-by: Shivam Kumar <shivam.kumar1@nutanix.com>
+> ---
+>  arch/x86/kvm/Kconfig       |  1 +
+>  arch/x86/kvm/mmu/mmu.c     |  8 +++++++-
+>  arch/x86/kvm/mmu/spte.c    |  3 +++
+>  arch/x86/kvm/mmu/tdp_mmu.c |  3 +++
+>  arch/x86/kvm/vmx/vmx.c     |  5 +++++
+>  arch/x86/kvm/x86.c         | 16 ++++++++++++++++
+>  arch/x86/kvm/xen.c         | 12 +++++++++++-
+>  7 files changed, 46 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> index 8e578311ca9d..8621a9512572 100644
+> --- a/arch/x86/kvm/Kconfig
+> +++ b/arch/x86/kvm/Kconfig
+> @@ -48,6 +48,7 @@ config KVM
+>  	select KVM_VFIO
+>  	select SRCU
+>  	select INTERVAL_TREE
+> +	select HAVE_KVM_DIRTY_QUOTA
+>  	select HAVE_KVM_PM_NOTIFIER if PM
+>  	select KVM_GENERIC_HARDWARE_ENABLING
+>  	help
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index c8ebe542c565..e0c8348ecdf1 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3323,8 +3323,14 @@ fast_pf_fix_direct_spte(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+>  	if (!try_cmpxchg64(sptep, &old_spte, new_spte))
+>  		return false;
+>
+> -	if (is_writable_pte(new_spte) && !is_writable_pte(old_spte))
+> +	if (is_writable_pte(new_spte) && !is_writable_pte(old_spte)) {
+> +#ifdef CONFIG_HAVE_KVM_DIRTY_QUOTA
+> +		struct kvm_mmu_page *sp = sptep_to_sp(sptep);
+> +
+> +		update_dirty_quota(vcpu->kvm, (1L << SPTE_LEVEL_SHIFT(sp->role.level)));
+> +#endif
+>  		mark_page_dirty_in_slot(vcpu->kvm, fault->slot, fault->gfn);
 
-Cool. I will pull-rebase.
+Possible to call update_dirty_quota() from mark_page_dirty_in_slot() ?
+Then other Architectures can be covered yet.
 
-Thanks
-Nic
+> +	}
+>
+>  	return true;
+>  }
+> diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+> index c15bfca3ed15..15f4f1d97ce9 100644
+> --- a/arch/x86/kvm/mmu/spte.c
+> +++ b/arch/x86/kvm/mmu/spte.c
+> @@ -243,6 +243,9 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+>  	if ((spte & PT_WRITABLE_MASK) && kvm_slot_dirty_track_enabled(slot)) {
+>  		/* Enforced by kvm_mmu_hugepage_adjust. */
+>  		WARN_ON(level > PG_LEVEL_4K);
+> +#ifdef CONFIG_HAVE_KVM_DIRTY_QUOTA
+> +		update_dirty_quota(vcpu->kvm, (1L << SPTE_LEVEL_SHIFT(level)));
+> +#endif
+>  		mark_page_dirty_in_slot(vcpu->kvm, slot, gfn);
+>  	}
+>
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 7c25dbf32ecc..4bf98e96343d 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -358,6 +358,9 @@ static void handle_changed_spte_dirty_log(struct kvm *kvm, int as_id, gfn_t gfn,
+>
+>  	if ((!is_writable_pte(old_spte) || pfn_changed) &&
+>  	    is_writable_pte(new_spte)) {
+> +#ifdef CONFIG_HAVE_KVM_DIRTY_QUOTA
+> +		update_dirty_quota(kvm, (1L << SPTE_LEVEL_SHIFT(level)));
+> +#endif
+>  		slot = __gfn_to_memslot(__kvm_memslots(kvm, as_id), gfn);
+>  		mark_page_dirty_in_slot(kvm, slot, gfn);
+>  	}
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index bcac3efcde41..da4c6342a647 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -5861,6 +5861,11 @@ static int handle_invalid_guest_state(struct kvm_vcpu *vcpu)
+>  		 */
+>  		if (__xfer_to_guest_mode_work_pending())
+>  			return 1;
+> +
+> +#ifdef CONFIG_HAVE_KVM_DIRTY_QUOTA
+> +		if (kvm_test_request(KVM_REQ_DIRTY_QUOTA_EXIT, vcpu))
+> +			return 1;
+> +#endif
+>  	}
+>
+>  	return 1;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 7713420abab0..1733be829197 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3092,6 +3092,9 @@ static void kvm_setup_guest_pvclock(struct kvm_vcpu *v,
+>
+>  	guest_hv_clock->version = ++vcpu->hv_clock.version;
+>
+> +#ifdef CONFIG_HAVE_KVM_DIRTY_QUOTA
+> +	update_dirty_quota(v->kvm, PAGE_SIZE);
+> +#endif
+>  	mark_page_dirty_in_slot(v->kvm, gpc->memslot, gpc->gpa >> PAGE_SHIFT);
+>  	read_unlock_irqrestore(&gpc->lock, flags);
+>
+> @@ -3566,6 +3569,9 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
+>   out:
+>  	user_access_end();
+>   dirty:
+> +#ifdef CONFIG_HAVE_KVM_DIRTY_QUOTA
+> +	update_dirty_quota(vcpu->kvm, PAGE_SIZE);
+> +#endif
+>  	mark_page_dirty_in_slot(vcpu->kvm, ghc->memslot, gpa_to_gfn(ghc->gpa));
+>  }
+>
+> @@ -4815,6 +4821,9 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
+>  	if (!copy_to_user_nofault(&st->preempted, &preempted, sizeof(preempted)))
+>  		vcpu->arch.st.preempted = KVM_VCPU_PREEMPTED;
+>
+> +#ifdef CONFIG_HAVE_KVM_DIRTY_QUOTA
+> +	update_dirty_quota(vcpu->kvm, PAGE_SIZE);
+> +#endif
+>  	mark_page_dirty_in_slot(vcpu->kvm, ghc->memslot, gpa_to_gfn(ghc->gpa));
+>  }
+>
+> @@ -10514,6 +10523,13 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  			r = 0;
+>  			goto out;
+>  		}
+> +#ifdef CONFIG_HAVE_KVM_DIRTY_QUOTA
+> +		if (kvm_check_request(KVM_REQ_DIRTY_QUOTA_EXIT, vcpu)) {
+> +			vcpu->run->exit_reason = KVM_EXIT_DIRTY_QUOTA_EXHAUSTED;
+> +			r = 0;
+> +			goto out;
+> +		}
+> +#endif
+>
+>  		/*
+>  		 * KVM_REQ_HV_STIMER has to be processed after
+> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+> index 40edf4d1974c..00a3ac438539 100644
+> --- a/arch/x86/kvm/xen.c
+> +++ b/arch/x86/kvm/xen.c
+> @@ -435,9 +435,16 @@ static void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, bool atomic)
+>
+>  	read_unlock_irqrestore(&gpc1->lock, flags);
+>
+> +#ifdef CONFIG_HAVE_KVM_DIRTY_QUOTA
+> +	update_dirty_quota(v->kvm, PAGE_SIZE);
+> +#endif
+>  	mark_page_dirty_in_slot(v->kvm, gpc1->memslot, gpc1->gpa >> PAGE_SHIFT);
+> -	if (user_len2)
+> +	if (user_len2) {
+> +#ifdef CONFIG_HAVE_KVM_DIRTY_QUOTA
+> +		update_dirty_quota(v->kvm, PAGE_SIZE);
+> +#endif
+>  		mark_page_dirty_in_slot(v->kvm, gpc2->memslot, gpc2->gpa >> PAGE_SHIFT);
+> +	}
+>  }
+>
+>  void kvm_xen_update_runstate(struct kvm_vcpu *v, int state)
+> @@ -549,6 +556,9 @@ void kvm_xen_inject_pending_events(struct kvm_vcpu *v)
+>  	if (v->arch.xen.upcall_vector)
+>  		kvm_xen_inject_vcpu_vector(v);
+>
+> +#ifdef CONFIG_HAVE_KVM_DIRTY_QUOTA
+> +	update_dirty_quota(v->kvm, PAGE_SIZE);
+> +#endif
+>  	mark_page_dirty_in_slot(v->kvm, gpc->memslot, gpc->gpa >> PAGE_SHIFT);
+>  }
+>
+> --
+> 2.22.3
+>
