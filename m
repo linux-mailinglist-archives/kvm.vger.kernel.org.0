@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5BC0C6A52ED
-	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 07:23:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A5D86A52EE
+	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 07:23:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229451AbjB1GXU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Feb 2023 01:23:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48008 "EHLO
+        id S229518AbjB1GXW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Feb 2023 01:23:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229915AbjB1GXS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Feb 2023 01:23:18 -0500
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41565113D9
-        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 22:23:17 -0800 (PST)
-Received: by mail-pf1-x44a.google.com with SMTP id a23-20020a62bd17000000b0058db55a8d7aso4671353pff.21
-        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 22:23:17 -0800 (PST)
+        with ESMTP id S229537AbjB1GXV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Feb 2023 01:23:21 -0500
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E373125AF
+        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 22:23:19 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-536bbaeceeaso189416297b3.11
+        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 22:23:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ksmKTtmSjXd5Cz3+4oYXyLBynC+x6diBnvSRhIvjy0o=;
-        b=n9XU35B8tynwKYgi4xrspPhRLm5F5nehMO6wT4NG0uyPuobSuNOYzFq91o6l2tjkql
-         IYqjRrh7r0e5DFw2cGF19q5QUSUNFoUVl3jXo7fGRNl6tRgwEJ5R6AHouG8NsOFYoOwv
-         4Pdu7m/Hfeja1fxuy6qaCpOVfPOHue7iEW682cl/a4etVYJPhL6si2fvXcaW7/G4LW0M
-         tyitRYM8djmWZ/ZZn7XS4CEfx58+KAolwtbOApoCYWhAkacIQhT9F2tkWq2hmlZ87sY9
-         TpG9kiwWEIRq5ux/SlaHB+DSngmSjnPeDSGqO08cdXllPXg8vIU17qEdkXXvEMmjmoUL
-         Qe4g==
+        bh=hsnxwH3HlkdWJXjZ8A6A7W0Th8Htp6CqQw1NclxamXI=;
+        b=HeBtcxckNYals4VqX4TJwaQ3NiAi2b3l9cE+nAKHwrdfzqBETgO71foJdR9nLI2U70
+         Bw9YybL7aVzExnKc0UHOCts4zv/Or/QSHcQHWrvncmuTGmgirLbtgJLDKnD1soehNnQb
+         la6tAA99cjG8POvV4764iu8b5W38RGw8zxbPXidmyNu4eFfjjbIZUQm7ikRwp53/ucEL
+         RTsgqWulYi47L2jzSpMPvBttyUUU9UFKZCYTPzGw5SNnagCNsC/VzbsNAGU9AAc+G/cy
+         D1TREbx6esHIFrV/SnrWQAO9EGx0cJh37fMyseIahFTUP8uuWuzG4RF+Gl3j0+y+BNTP
+         7dzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ksmKTtmSjXd5Cz3+4oYXyLBynC+x6diBnvSRhIvjy0o=;
-        b=wTbowhM6P6/ZUyk12DHGYOgCn1o+Kdsg5J3akrFGs69FUFzzlhXxMrw9i1hUThfbnF
-         vfKq+BZIlGCSiRIQhuSNSpLQYaQePi+EkxoVJAcqhVt1dhfjhwWFcX9need9UNUoiYqs
-         kfsvHaqkP3QOXlJ+RUd0sXxDw2KXEAjhFSDMGnZDLabvYpVoALBhizPdMGLdgeB9WUCJ
-         D8TD9Pz0JYP+DNsgc5hMadoa2wfF63DK5RCTqTwTTlu+eQx6BSXNAG/fXNEjFJlzdRYm
-         n8lOGh5YXZ0QrqCWUNvdTwrXPeTZCbDpgdkL+6G6adJ6/ttEre0+A94Dfe5XFc2UxHSO
-         wkJg==
-X-Gm-Message-State: AO0yUKX1C0ssLdVCt3m9V6UciYbVDwYk1NTIKaTRqiLQFE3Rb255wTjZ
-        yJBeZqDXwKspRvCbbpgB3flZ1CgQfJHVeNVA9V6+OffD8w7+NvLZ0/IPuUyaBKFuo1kUUnIXwmx
-        3RrXCFdJhm8BupUT9Iq0y58V5dtLb73poJfvui6SpsUCGIFJOwomYKwfTvIy+kQMYBUH6o54=
-X-Google-Smtp-Source: AK7set+5JyLrcmMolmaG7a5YGTJXYFOnxgrw77brtPDDmlnF5XevYDwEcIfwLazuMVLZM4ifJlQW4aedvahgXfdT1A==
+        bh=hsnxwH3HlkdWJXjZ8A6A7W0Th8Htp6CqQw1NclxamXI=;
+        b=OljJwzEk0Nm/34YMZEZB8f0BJWq/B9raukOik3qpcB6vMlRNdbRFdleJIF8yk2rUyu
+         2opiiX2vdcKfPiAg5CcbD5K2tuKCVX/1wIaSNSmYxxkYhb8mMV/LzP65lIZnO6Bwi9AN
+         0XSzk4mp0tIanAyJNFUiPl+qPQYJow5bF79F8cBTtxVx4332ZwzgCThVUYgJ1whHTOHp
+         MZoQW4vbkjJhaPKK99svtwWqocUkyY0A4tUykDvxXpt9El0tsfK2L8YfDx4lGB/GlSp0
+         oj7XRUIN7DU01aK40bR62GZStAC60Kk4b2F+zWbFj003hiCPX2HWer+rihw0YS4UBDL8
+         6zJg==
+X-Gm-Message-State: AO0yUKVC7YWAJQSHSGEJxugUF9W/WiS1PlFES/u9XvDshdnepA1Qdpn9
+        XdWV/bmLywl7LBGNEJUjXUYW42uRrN41//uapRvEvsZCVVZ/ymcoJ13pFMA94JNcug0sMNTM+Di
+        INg/bZPzQIAZQMcM2NlxPbfgJvEjcu622TQOXDNOkmbk2RKnHs2nb/J1vHzSvkxlTjx9vR+I=
+X-Google-Smtp-Source: AK7set+bXEIqdkFU1yB7FFCeehq3jX191RFxT1juzbwTCekpIQj0ipoQfOlt3UzRhjBUslbDwUQO0mSmftfCHKyE2g==
 X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a17:90a:9482:b0:233:d64d:4c29 with
- SMTP id s2-20020a17090a948200b00233d64d4c29mr710336pjo.4.1677565396504; Mon,
- 27 Feb 2023 22:23:16 -0800 (PST)
-Date:   Tue, 28 Feb 2023 06:22:44 +0000
+ (user=jingzhangos job=sendgmr) by 2002:a5b:a10:0:b0:87a:957b:fd67 with SMTP
+ id k16-20020a5b0a10000000b0087a957bfd67mr774390ybq.10.1677565398291; Mon, 27
+ Feb 2023 22:23:18 -0800 (PST)
+Date:   Tue, 28 Feb 2023 06:22:45 +0000
 In-Reply-To: <20230228062246.1222387-1-jingzhangos@google.com>
 Mime-Version: 1.0
 References: <20230228062246.1222387-1-jingzhangos@google.com>
 X-Mailer: git-send-email 2.39.2.722.g9855ee24e9-goog
-Message-ID: <20230228062246.1222387-5-jingzhangos@google.com>
-Subject: [PATCH v3 4/6] KVM: arm64: Use per guest ID register for ID_AA64DFR0_EL1.PMUVer
+Message-ID: <20230228062246.1222387-6-jingzhangos@google.com>
+Subject: [PATCH v3 5/6] KVM: arm64: Introduce ID register specific descriptor
 From:   Jing Zhang <jingzhangos@google.com>
 To:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
         ARMLinux <linux-arm-kernel@lists.infradead.org>,
@@ -77,164 +77,339 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-With per guest ID registers, PMUver settings from userspace
-can be stored in its corresponding ID register.
+Introduce an ID feature register specific descriptor to include ID
+register specific fields and callbacks besides its corresponding
+general system register descriptor.
+New fields for ID register descriptor would be added later when it
+is necessary to support a writable ID register.
 
 No functional change intended.
 
+Co-developed-by: Reiji Watanabe <reijiw@google.com>
+Signed-off-by: Reiji Watanabe <reijiw@google.com>
 Signed-off-by: Jing Zhang <jingzhangos@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h | 11 ++++---
- arch/arm64/kvm/arm.c              |  6 ----
- arch/arm64/kvm/id_regs.c          | 52 ++++++++++++++++++++++++-------
- include/kvm/arm_pmu.h             |  6 ++--
- 4 files changed, 51 insertions(+), 24 deletions(-)
+ arch/arm64/kvm/id_regs.c  | 184 ++++++++++++++++++++++++++++----------
+ arch/arm64/kvm/sys_regs.c |   2 +-
+ arch/arm64/kvm/sys_regs.h |   1 +
+ 3 files changed, 138 insertions(+), 49 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index f64347eb77c2..effb61a9a855 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -218,6 +218,12 @@ struct kvm_arch {
- #define KVM_ARCH_FLAG_EL1_32BIT				4
- 	/* PSCI SYSTEM_SUSPEND enabled for the guest */
- #define KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED		5
-+	/*
-+	 * AA64DFR0_EL1.PMUver was set as ID_AA64DFR0_EL1_PMUVer_IMP_DEF
-+	 * or DFR0_EL1.PerfMon was set as ID_DFR0_EL1_PerfMon_IMPDEF from
-+	 * userspace for VCPUs without PMU.
-+	 */
-+#define KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU		6
- 
- 	unsigned long flags;
- 
-@@ -230,11 +236,6 @@ struct kvm_arch {
- 
- 	cpumask_var_t supported_cpus;
- 
--	struct {
--		u8 imp:4;
--		u8 unimp:4;
--	} dfr0_pmuver;
--
- 	/* Hypercall features firmware registers' descriptor */
- 	struct kvm_smccc_features smccc_feat;
- 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index c78d68d011cb..fb2de2cb98cb 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -138,12 +138,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	kvm_arm_set_default_id_regs(kvm);
- 	kvm_arm_init_hypercalls(kvm);
- 
--	/*
--	 * Initialise the default PMUver before there is a chance to
--	 * create an actual PMU.
--	 */
--	kvm->arch.dfr0_pmuver.imp = kvm_arm_pmu_get_pmuver_limit();
--
- 	return 0;
- 
- err_free_cpumask:
 diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
-index 36859e4caf02..21ec8fc10d79 100644
+index 21ec8fc10d79..fc0dcd557cbb 100644
 --- a/arch/arm64/kvm/id_regs.c
 +++ b/arch/arm64/kvm/id_regs.c
-@@ -21,9 +21,12 @@
+@@ -18,6 +18,10 @@
+ 
+ #include "sys_regs.h"
+ 
++struct id_reg_desc {
++	const struct sys_reg_desc	reg_desc;
++};
++
  static u8 vcpu_pmuver(const struct kvm_vcpu *vcpu)
  {
  	if (kvm_vcpu_has_pmu(vcpu))
--		return vcpu->kvm->arch.dfr0_pmuver.imp;
--
--	return vcpu->kvm->arch.dfr0_pmuver.unimp;
-+		return FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
-+				IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1));
-+	else if (test_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags))
-+		return ID_AA64DFR0_EL1_PMUVer_IMP_DEF;
-+	else
-+		return 0;
+@@ -326,21 +330,25 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
  }
  
- static u8 perfmon_to_pmuver(u8 perfmon)
-@@ -256,10 +259,19 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
- 	if (val)
- 		return -EINVAL;
- 
--	if (valid_pmu)
--		vcpu->kvm->arch.dfr0_pmuver.imp = pmuver;
--	else
--		vcpu->kvm->arch.dfr0_pmuver.unimp = pmuver;
-+	if (valid_pmu) {
-+		IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
-+		IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) |=
-+			FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), pmuver);
-+
-+		IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) &= ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
-+		IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) |=
-+			FIELD_PREP(ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon), pmuver);
-+	} else if (pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF) {
-+		set_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags);
-+	} else {
-+		clear_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags);
-+	}
- 
- 	return 0;
+ /* sys_reg_desc initialiser for known cpufeature ID registers */
+-#define ID_SANITISED(name) {			\
+-	SYS_DESC(SYS_##name),			\
+-	.access	= access_id_reg,		\
+-	.get_user = get_id_reg,			\
+-	.set_user = set_id_reg,			\
+-	.visibility = id_visibility,		\
++#define ID_SANITISED(name) {				\
++	.reg_desc = {					\
++		SYS_DESC(SYS_##name),			\
++		.access	= access_id_reg,		\
++		.get_user = get_id_reg,			\
++		.set_user = set_id_reg,			\
++		.visibility = id_visibility,		\
++	},						\
  }
-@@ -296,10 +308,19 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
- 	if (val)
- 		return -EINVAL;
  
--	if (valid_pmu)
--		vcpu->kvm->arch.dfr0_pmuver.imp = perfmon_to_pmuver(perfmon);
--	else
--		vcpu->kvm->arch.dfr0_pmuver.unimp = perfmon_to_pmuver(perfmon);
-+	if (valid_pmu) {
-+		IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) &= ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
-+		IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) |= FIELD_PREP(
-+			ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon), perfmon_to_pmuver(perfmon));
-+
-+		IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
-+		IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) |= FIELD_PREP(
-+			ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), perfmon_to_pmuver(perfmon));
-+	} else if (perfmon == ID_DFR0_EL1_PerfMon_IMPDEF) {
-+		set_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags);
-+	} else {
-+		clear_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags);
-+	}
- 
- 	return 0;
+ /* sys_reg_desc initialiser for known cpufeature ID registers */
+-#define AA32_ID_SANITISED(name) {		\
+-	SYS_DESC(SYS_##name),			\
+-	.access	= access_id_reg,		\
+-	.get_user = get_id_reg,			\
+-	.set_user = set_id_reg,			\
+-	.visibility = aa32_id_visibility,	\
++#define AA32_ID_SANITISED(name) {			\
++	.reg_desc = {					\
++		SYS_DESC(SYS_##name),			\
++		.access	= access_id_reg,		\
++		.get_user = get_id_reg,			\
++		.set_user = set_id_reg,			\
++		.visibility = aa32_id_visibility,	\
++	},						\
  }
-@@ -543,4 +564,13 @@ void kvm_arm_set_default_id_regs(struct kvm *kvm)
- 	}
  
- 	IDREG(kvm, SYS_ID_AA64PFR0_EL1) = val;
-+
-+	/*
-+	 * Initialise the default PMUver before there is a chance to
-+	 * create an actual PMU.
-+	 */
-+	IDREG(kvm, SYS_ID_AA64DFR0_EL1) &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
-+	IDREG(kvm, SYS_ID_AA64DFR0_EL1) |=
-+		FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
-+			   kvm_arm_pmu_get_pmuver_limit());
- }
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 628775334d5e..eef67b7d9751 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -92,8 +92,10 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
  /*
-  * Evaluates as true when emulating PMUv3p5, and false otherwise.
+@@ -348,12 +356,14 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+  * register with encoding Op0=3, Op1=0, CRn=0, CRm=crm, Op2=op2
+  * (1 <= crm < 8, 0 <= Op2 < 8).
   */
--#define kvm_pmu_is_3p5(vcpu)						\
--	(vcpu->kvm->arch.dfr0_pmuver.imp >= ID_AA64DFR0_EL1_PMUVer_V3P5)
-+#define kvm_pmu_is_3p5(vcpu)									\
-+	(kvm_vcpu_has_pmu(vcpu) &&								\
-+	 FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),					\
-+		 IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1)) >= ID_AA64DFR0_EL1_PMUVer_V3P5)
+-#define ID_UNALLOCATED(crm, op2) {			\
+-	Op0(3), Op1(0), CRn(0), CRm(crm), Op2(op2),	\
+-	.access = access_id_reg,			\
+-	.get_user = get_id_reg,				\
+-	.set_user = set_id_reg,				\
+-	.visibility = raz_visibility			\
++#define ID_UNALLOCATED(crm, op2) {				\
++	.reg_desc = {						\
++		Op0(3), Op1(0), CRn(0), CRm(crm), Op2(op2),	\
++		.access = access_id_reg,			\
++		.get_user = get_id_reg,				\
++		.set_user = set_id_reg,				\
++		.visibility = raz_visibility			\
++	},							\
+ }
  
- u8 kvm_arm_pmu_get_pmuver_limit(void);
+ /*
+@@ -361,15 +371,17 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+  * For now, these are exposed just like unallocated ID regs: they appear
+  * RAZ for the guest.
+  */
+-#define ID_HIDDEN(name) {			\
+-	SYS_DESC(SYS_##name),			\
+-	.access = access_id_reg,		\
+-	.get_user = get_id_reg,			\
+-	.set_user = set_id_reg,			\
+-	.visibility = raz_visibility,		\
++#define ID_HIDDEN(name) {				\
++	.reg_desc = {					\
++		SYS_DESC(SYS_##name),			\
++		.access = access_id_reg,		\
++		.get_user = get_id_reg,			\
++		.set_user = set_id_reg,			\
++		.visibility = raz_visibility,		\
++	},						\
+ }
  
+-static const struct sys_reg_desc id_reg_descs[] = {
++static const struct id_reg_desc id_reg_descs[KVM_ARM_ID_REG_NUM] = {
+ 	/*
+ 	 * ID regs: all ID_SANITISED() entries here must have corresponding
+ 	 * entries in arm64_ftr_regs[].
+@@ -379,9 +391,13 @@ static const struct sys_reg_desc id_reg_descs[] = {
+ 	/* CRm=1 */
+ 	AA32_ID_SANITISED(ID_PFR0_EL1),
+ 	AA32_ID_SANITISED(ID_PFR1_EL1),
+-	{ SYS_DESC(SYS_ID_DFR0_EL1), .access = access_id_reg,
+-	  .get_user = get_id_reg, .set_user = set_id_dfr0_el1,
+-	  .visibility = aa32_id_visibility, },
++	{ .reg_desc = {
++		SYS_DESC(SYS_ID_DFR0_EL1),
++		.access = access_id_reg,
++		.get_user = get_id_reg,
++		.set_user = set_id_dfr0_el1,
++		.visibility = aa32_id_visibility, },
++	},
+ 	ID_HIDDEN(ID_AFR0_EL1),
+ 	AA32_ID_SANITISED(ID_MMFR0_EL1),
+ 	AA32_ID_SANITISED(ID_MMFR1_EL1),
+@@ -410,8 +426,12 @@ static const struct sys_reg_desc id_reg_descs[] = {
+ 
+ 	/* AArch64 ID registers */
+ 	/* CRm=4 */
+-	{ SYS_DESC(SYS_ID_AA64PFR0_EL1), .access = access_id_reg,
+-	  .get_user = get_id_reg, .set_user = set_id_aa64pfr0_el1, },
++	{ .reg_desc = {
++		SYS_DESC(SYS_ID_AA64PFR0_EL1),
++		.access = access_id_reg,
++		.get_user = get_id_reg,
++		.set_user = set_id_aa64pfr0_el1, },
++	},
+ 	ID_SANITISED(ID_AA64PFR1_EL1),
+ 	ID_UNALLOCATED(4, 2),
+ 	ID_UNALLOCATED(4, 3),
+@@ -421,8 +441,12 @@ static const struct sys_reg_desc id_reg_descs[] = {
+ 	ID_UNALLOCATED(4, 7),
+ 
+ 	/* CRm=5 */
+-	{ SYS_DESC(SYS_ID_AA64DFR0_EL1), .access = access_id_reg,
+-	  .get_user = get_id_reg, .set_user = set_id_aa64dfr0_el1, },
++	{ .reg_desc = {
++		SYS_DESC(SYS_ID_AA64DFR0_EL1),
++		.access = access_id_reg,
++		.get_user = get_id_reg,
++		.set_user = set_id_aa64dfr0_el1, },
++	},
+ 	ID_SANITISED(ID_AA64DFR1_EL1),
+ 	ID_UNALLOCATED(5, 2),
+ 	ID_UNALLOCATED(5, 3),
+@@ -461,12 +485,12 @@ static const struct sys_reg_desc id_reg_descs[] = {
+  */
+ int emulate_id_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *params)
+ {
+-	const struct sys_reg_desc *r;
++	u32 id;
+ 
+-	r = find_reg(params, id_reg_descs, ARRAY_SIZE(id_reg_descs));
++	id = reg_to_encoding(params);
+ 
+-	if (likely(r)) {
+-		perform_access(vcpu, params, r);
++	if (likely(is_id_reg(id))) {
++		perform_access(vcpu, params, &id_reg_descs[IDREG_IDX(id)].reg_desc);
+ 	} else {
+ 		print_sys_reg_msg(params,
+ 				  "Unsupported guest id_reg access at: %lx [%08lx]\n",
+@@ -483,38 +507,102 @@ void kvm_arm_reset_id_regs(struct kvm_vcpu *vcpu)
+ 	unsigned long i;
+ 
+ 	for (i = 0; i < ARRAY_SIZE(id_reg_descs); i++)
+-		if (id_reg_descs[i].reset)
+-			id_reg_descs[i].reset(vcpu, &id_reg_descs[i]);
++		if (id_reg_descs[i].reg_desc.reset)
++			id_reg_descs[i].reg_desc.reset(vcpu, &id_reg_descs[i].reg_desc);
+ }
+ 
+ int kvm_arm_get_id_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ {
+-	return kvm_sys_reg_get_user(vcpu, reg,
+-				    id_reg_descs, ARRAY_SIZE(id_reg_descs));
++	u64 __user *uaddr = (u64 __user *)(unsigned long)reg->addr;
++	const struct sys_reg_desc *r;
++	struct sys_reg_params params;
++	u64 val;
++	int ret;
++	u32 id;
++
++	if (!index_to_params(reg->id, &params))
++		return -ENOENT;
++	id = reg_to_encoding(&params);
++
++	if (!is_id_reg(id))
++		return -ENOENT;
++
++	r = &id_reg_descs[IDREG_IDX(id)].reg_desc;
++	if (r->get_user) {
++		ret = (r->get_user)(vcpu, r, &val);
++	} else {
++		ret = 0;
++		val = IDREG(vcpu->kvm, id);
++	}
++
++	if (!ret)
++		ret = put_user(val, uaddr);
++
++	return ret;
+ }
+ 
+ int kvm_arm_set_id_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ {
+-	return kvm_sys_reg_set_user(vcpu, reg,
+-				    id_reg_descs, ARRAY_SIZE(id_reg_descs));
++	u64 __user *uaddr = (u64 __user *)(unsigned long)reg->addr;
++	const struct sys_reg_desc *r;
++	struct sys_reg_params params;
++	u64 val;
++	int ret;
++	u32 id;
++
++	if (!index_to_params(reg->id, &params))
++		return -ENOENT;
++	id = reg_to_encoding(&params);
++
++	if (!is_id_reg(id))
++		return -ENOENT;
++
++	if (get_user(val, uaddr))
++		return -EFAULT;
++
++	r = &id_reg_descs[IDREG_IDX(id)].reg_desc;
++
++	if (sysreg_user_write_ignore(vcpu, r))
++		return 0;
++
++	if (r->set_user) {
++		ret = (r->set_user)(vcpu, r, val);
++	} else {
++		WARN_ONCE(1, "ID register set_user callback is NULL\n");
++		ret = 0;
++	}
++
++	return ret;
+ }
+ 
+ bool kvm_arm_check_idreg_table(void)
+ {
+-	return check_sysreg_table(id_reg_descs, ARRAY_SIZE(id_reg_descs), false);
++	unsigned int i;
++
++	for (i = 0; i < ARRAY_SIZE(id_reg_descs); i++) {
++		const struct sys_reg_desc *r = &id_reg_descs[i].reg_desc;
++
++		if (IDREG_IDX(reg_to_encoding(r)) != i) {
++			kvm_err("id_reg table %pS entry %d not set correctly\n",
++				&id_reg_descs[i].reg_desc, i);
++			return false;
++		}
++	}
++
++	return true;
+ }
+ 
+ int kvm_arm_walk_id_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
+ {
+-	const struct sys_reg_desc *i2, *end2;
++	const struct id_reg_desc *i2, *end2;
+ 	unsigned int total = 0;
+ 	int err;
+ 
+ 	i2 = id_reg_descs;
+ 	end2 = id_reg_descs + ARRAY_SIZE(id_reg_descs);
+ 
+-	while (i2 != end2) {
+-		err = walk_one_sys_reg(vcpu, i2++, &uind, &total);
++	for (; i2 != end2; i2++) {
++		err = walk_one_sys_reg(vcpu, &(i2->reg_desc), &uind, &total);
+ 		if (err)
+ 			return err;
+ 	}
+@@ -532,12 +620,12 @@ void kvm_arm_set_default_id_regs(struct kvm *kvm)
+ 	u64 val;
+ 
+ 	for (i = 0; i < ARRAY_SIZE(id_reg_descs); i++) {
+-		id = reg_to_encoding(&id_reg_descs[i]);
++		id = reg_to_encoding(&id_reg_descs[i].reg_desc);
+ 		if (WARN_ON_ONCE(!is_id_reg(id)))
+ 			/* Shouldn't happen */
+ 			continue;
+ 
+-		if (id_reg_descs[i].visibility == raz_visibility)
++		if (id_reg_descs[i].reg_desc.visibility == raz_visibility)
+ 			/* Hidden or reserved ID register */
+ 			continue;
+ 
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 568ebc0fb15c..7b63d9038639 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2519,7 +2519,7 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
+  * Userspace API
+  *****************************************************************************/
+ 
+-static bool index_to_params(u64 id, struct sys_reg_params *params)
++bool index_to_params(u64 id, struct sys_reg_params *params)
+ {
+ 	switch (id & KVM_REG_SIZE_MASK) {
+ 	case KVM_REG_SIZE_U64:
+diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+index 9231d89889c7..094a7f19d93f 100644
+--- a/arch/arm64/kvm/sys_regs.h
++++ b/arch/arm64/kvm/sys_regs.h
+@@ -239,6 +239,7 @@ static inline bool is_id_reg(u32 id)
+ 
+ void perform_access(struct kvm_vcpu *vcpu, struct sys_reg_params *params,
+ 		    const struct sys_reg_desc *r);
++bool index_to_params(u64 id, struct sys_reg_params *params);
+ const struct sys_reg_desc *get_reg_by_id(u64 id,
+ 					 const struct sys_reg_desc table[],
+ 					 unsigned int num);
 -- 
 2.39.2.722.g9855ee24e9-goog
 
