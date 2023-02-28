@@ -2,252 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5984B6A5006
-	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 01:09:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DA5976A501A
+	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 01:18:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229762AbjB1AJV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Feb 2023 19:09:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41038 "EHLO
+        id S229827AbjB1ASE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Feb 2023 19:18:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229661AbjB1AJN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Feb 2023 19:09:13 -0500
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEDE17284
-        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 16:08:57 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-536a4eba107so173417877b3.19
-        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 16:08:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=D006eQccB/YfCTWYisON8RLDYL9oi52cmWtPqe0hG2Q=;
-        b=gIjh3nfFBZCEmbLZxY9cp1FvHn6RY9fe8XhwD5eRTHENgNlVSZqBPNdH3YXYazv8fN
-         5CnAiRZJwapuD3+6VAkcz9hrM9K7mX+4KYAnVGVnj7eWOc2xT2vwMI1vw42XRSXkJf0c
-         Ss0+sAsslnDn0MFqH+k1e1LTDdwK0orODPOk5QA3qhO/1+tDpBqKtPwhZzTsDfnKSxQ6
-         5TtWXV2yrqe6E5JiXzdg5djApMgbEQeqVlP6fqPO3Z7iahCFAUdHwiMrv3azVHqZUEc8
-         XQfgbMx+WznNOM/tv/wmChpzbKQqvkxmMoYsSSWVeLgxx0RN6zIdJt+L7Pe5HM1bY0j/
-         KGBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=D006eQccB/YfCTWYisON8RLDYL9oi52cmWtPqe0hG2Q=;
-        b=1P3zID4eZ27oXIKNd185cggNC192h+uil2c32Rw+LXoVSMbUDRghowspeY8/1nKiLL
-         Kvtp0jvBKJygTwr76gBXZHGEYI0JFpC7LmRhcvtYe1QCTPAxdXr+35qk2Amd8ggp+XQF
-         wOTGU16SiYzwnBww4wMdxVAkBoenw0rlsJOxH0IJTr/TmOil80X4MtOdS9L/SSOBnKpq
-         X3uchEtf4aSAu5923Sqx2U7/CtbgP/Zn2tV4vo+phAdbtqjZwv7muFdgeVBjN6jUv6Pz
-         onPTrOzS/3ilBChlt/9aO9D/37D/uDicjdVEQdimMbNN8H1c1GyPtUc8/ZFWRhQaIGDr
-         Fk+A==
-X-Gm-Message-State: AO0yUKUeuQNdLiXju9T4FAuzpifx9IahvpSAReU5zL+XGTLq5HL7vHQi
-        eV8VE7rFwtXaw1Scb+N5GIMMGFMhOIPGJiffRVVpdXxExw+sTHstyGldurfyKnrwC2vk67YyvNg
-        /NUW8IvBwiG1FmL3eS4FvPSf1VhfMzYU92McXRDoRahp9RT6f+gMA8WENvyl1lbOtOZjY
-X-Google-Smtp-Source: AK7set9MNbJkLgYlOqaghuoB+g0Ly4IF+DHAlQPysp1TABiQUhD2j9IAmfXheWt96/oV4RNHlHXooUwUbmg5GufK
-X-Received: from aaronlewis-2.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:519c])
- (user=aaronlewis job=sendgmr) by 2002:a05:6902:118c:b0:a06:538f:265f with
- SMTP id m12-20020a056902118c00b00a06538f265fmr8975885ybu.4.1677542936347;
- Mon, 27 Feb 2023 16:08:56 -0800 (PST)
-Date:   Tue, 28 Feb 2023 00:06:44 +0000
-In-Reply-To: <20230228000644.3204402-1-aaronlewis@google.com>
-Mime-Version: 1.0
-References: <20230228000644.3204402-1-aaronlewis@google.com>
-X-Mailer: git-send-email 2.39.2.722.g9855ee24e9-goog
-Message-ID: <20230228000644.3204402-6-aaronlewis@google.com>
-Subject: [PATCH v2 5/5] KVM: selftests: Test the PMU event "Instructions retired"
-From:   Aaron Lewis <aaronlewis@google.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
-        like.xu.linux@gmail.com, Aaron Lewis <aaronlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229481AbjB1ASD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Feb 2023 19:18:03 -0500
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2064.outbound.protection.outlook.com [40.107.237.64])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D55B13DE5;
+        Mon, 27 Feb 2023 16:18:01 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=D+4LgMc0zhpNNDELfc2xlf8fo6tCijsZTg3NyIH0wQhVWvLqRKXoji7xv1FCeER3Hjssx4D1o8w4Ifmambe17sRtC2HgkdhQJqHd/EujcoQZBrVMKjOrpa1ykMalD9LKor+2BpibKpj4H+IBMingkOQNPtmFu3MwGwKEqs/U5d2gCSs9odUULpxN8VNdA03qMGMffJZ78oT+ZGUM9FoHo3vLU6htCPJ7aZdeGUvlEbdCn8TPB9pQuZJzy40GqccE87LTMtdeT5bhZq7j0liStGq64UpNOtl8gSHxnVLSCtCRvUma3fkO6RtmI9aUNGx3Cy6FkAx+KGDQWRnSkiFaWA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=H15CRLyaxYSA/YU5L0tz8pFa9Y0L+wefwgiVMwnOx2M=;
+ b=U7LUVjsyJw/zyX6kGxrOKX9BH5HPCfrQt+gip2EKR0COh0YKGWsLw8tX/Bpm9SYoRhvGjzMbUK5/ecibp7ZeBdfmKNwXhXAsfrT4JbRuU3puha3Y0Kt5eTUOHbVpp1zYJ2rofmnXHbxE+ZekdqEeAOkNeXK3u5J7BB1oZvG2AOHTsBzcDgPFTAyCB+QPg+5gnoUQaPELFE4FJi4JFEU2UqV0m4LEyd9LqS0KckLdJORPqTeay/fxYP2qss2Y/n015+J3XZu3P7hIk5Oi/ZVpAj1iJtlgT/s2x38wMU/jxw5iWu9IlPb5ySMTybgqEyAHERqeEyMARJUe9RYAFQKWFA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=lists.linux.dev smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=H15CRLyaxYSA/YU5L0tz8pFa9Y0L+wefwgiVMwnOx2M=;
+ b=DrIPrBnvXtBbBJqSD9tcQdKO5sk42wj+YyfTLg0zjMLOd1HHPEb7t/qUhQvH3IT/39c/EjYJuqGeDnSZt5RbkDuKHIh0nHAEnJHKi90EmJYz0l4FlkcxL9pwS+mbpihVvchVrOEeAZwgc+CvIxAJF2hvgicgOWw2lMHG9Uiv1iLuCKXsaFgo9EBjzrHx5eMS/TzpafipW8y0PTVLHFUbQW/lqDD/GZAMtKxKuqirezduTb47nxjlYAaPpnKzLP67viG1Ddu6qiScBdlYgj1nxOoH4i+cQcqHmemn4Brd/c62d9XwXJAXvdNb919NYpc5g9OVdpnuYZtgLCdju4W4Wg==
+Received: from CY5P221CA0073.NAMP221.PROD.OUTLOOK.COM (2603:10b6:930:9::10) by
+ DM4PR12MB5940.namprd12.prod.outlook.com (2603:10b6:8:6b::10) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6134.26; Tue, 28 Feb 2023 00:17:59 +0000
+Received: from CY4PEPF0000C970.namprd02.prod.outlook.com
+ (2603:10b6:930:9:cafe::3e) by CY5P221CA0073.outlook.office365.com
+ (2603:10b6:930:9::10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.29 via Frontend
+ Transport; Tue, 28 Feb 2023 00:17:59 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CY4PEPF0000C970.mail.protection.outlook.com (10.167.242.8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6156.12 via Frontend Transport; Tue, 28 Feb 2023 00:17:58 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Mon, 27 Feb 2023
+ 16:17:49 -0800
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Mon, 27 Feb
+ 2023 16:17:49 -0800
+Received: from Asurada-Nvidia (10.127.8.12) by mail.nvidia.com (10.129.68.7)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5 via Frontend
+ Transport; Mon, 27 Feb 2023 16:17:48 -0800
+Date:   Mon, 27 Feb 2023 16:17:47 -0800
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     <iommu@lists.linux.dev>, Kevin Tian <kevin.tian@intel.com>,
+        <linux-kselftest@vger.kernel.org>, <kvm@vger.kernel.org>,
+        Yi Liu <yi.l.liu@intel.com>
+Subject: Re: [PATCH 14/14] iommufd/selftest: Add a selftest for
+ IOMMU_HWPT_ALLOC
+Message-ID: <Y/1IK4kVz07xiY8G@Asurada-Nvidia>
+References: <0-v1-7612f88c19f5+2f21-iommufd_alloc_jgg@nvidia.com>
+ <14-v1-7612f88c19f5+2f21-iommufd_alloc_jgg@nvidia.com>
+ <Y/uzM8PD/XY0WI7f@Asurada-Nvidia>
+ <Y/zGCLb5aGmxWPHu@nvidia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <Y/zGCLb5aGmxWPHu@nvidia.com>
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000C970:EE_|DM4PR12MB5940:EE_
+X-MS-Office365-Filtering-Correlation-Id: b27cf57c-f0c4-4912-f496-08db19213f55
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 8DmRfPG+Fhqx4nYO1u0/RbvIFmCfKktUyQkQQGo5jSqQCNG/qgbvj+VcTEB+sW56Qb9fKfbRC8aNZeGs4fMJkqOz2SiMkn+W7xdBCYEC+dXc+kIFlwTxwNUPfzQbYLZV7tgMs7PI8ezzv6Oct9Fd+Q+Rxf2TX2qKAVdVoAghMnzfF6XpXuYLWypghagxOco5fgpGYRuxjQyAYPLicJao4qc5G4kb4W7lDWdI+ISeWnH85lz/hek4FPxz8TsVN+oXuqkEqYtGJwQgOo11f9yaUydsF4yd+s3GMabBGQIJMatVT/gKLC9mtFkx/65LWtbRLSDpWgISkKsErF5LREwtu65TYMOCRLWeKkr8pVP105LEDp8E0JBDj5ujFm0cqWhPfWPZQ1JKEy8+emfEqi9E/or/904wEvdYlgqPLq8Ocm1sJQGljF/7LXb3WfcSGS7thQikq/6Ty+k5sXJYCbiStXvV/4Du7kLFan3JbOJOb4gYIap4j7V3Ju+RCS+x2xq2qZOul0iuknzinxL93Gwrmje+TxoS5vqO00nfDCSwqdd9bPi5msHL/V1so9zad+jwyPaV8N/9kMFP2Pr61C5Otdlio3+Zs6TE05ckhr4urg9NX1m15KezSpCfvgUX+YGYQAkLHjNjboRUqduvUAPdMIAWC0C2REcepjRKPsEPJPiVo1+Wp/gm4ybbbteG3tKKGy4l2VjSnV6OKx8pMit2PQ==
+X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230025)(4636009)(346002)(376002)(396003)(39860400002)(136003)(451199018)(36840700001)(46966006)(40470700004)(9686003)(26005)(36860700001)(186003)(426003)(47076005)(82310400005)(356005)(7636003)(55016003)(86362001)(82740400003)(40460700003)(40480700001)(336012)(33716001)(70206006)(4326008)(8676002)(70586007)(6862004)(8936002)(4744005)(5660300002)(478600001)(41300700001)(54906003)(2906002)(6636002)(316002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Feb 2023 00:17:58.9177
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: b27cf57c-f0c4-4912-f496-08db19213f55
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000C970.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5940
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add testing for the event "Instructions retired" (0xc0) in the PMU
-event filter on both Intel and AMD to ensure that the event doesn't
-count when it is disallowed.  Unlike most of the other events, the
-event "Instructions retired", will be incremented by KVM when an
-instruction is emulated.  Test that this case is being properly handled
-and that KVM doesn't increment the counter when that event is
-disallowed.
+On Mon, Feb 27, 2023 at 11:02:32AM -0400, Jason Gunthorpe wrote:
+> On Sun, Feb 26, 2023 at 11:29:55AM -0800, Nicolin Chen wrote:
+> > On Fri, Feb 24, 2023 at 08:27:59PM -0400, Jason Gunthorpe wrote:
+> >   
+> > > +static int _test_cmd_hwpt_alloc(int fd, __u32 device_id, __u32 pt_id,
+> > > +					 __u32 *hwpt_id)
+> > > +{
+> > > +	struct iommu_hwpt_alloc cmd = {
+> > > +		.size = sizeof(cmd),
+> > > +		.dev_id = device_id,
+> > > +		.pt_id = pt_id,
+> > > +	};
+> > > +	int ret;
+> > 
+> > Can we do "s/device_id/idev_id" to differentiate it from the
+> > "device_id" being used for a selftest device object?
+> 
+> I renamed the selftest device object to 'stdev_id' instead
 
-Signed-off-by: Aaron Lewis <aaronlewis@google.com>
----
- .../kvm/x86_64/pmu_event_filter_test.c        | 80 ++++++++++++++-----
- 1 file changed, 62 insertions(+), 18 deletions(-)
+Cool. I will pull-rebase.
 
-diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-index 78bb48fcd33e..9e932b99d4fa 100644
---- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-@@ -54,6 +54,21 @@
- 
- #define AMD_ZEN_BR_RETIRED EVENT(0xc2, 0)
- 
-+
-+/*
-+ * "Retired instructions", from Processor Programming Reference
-+ * (PPR) for AMD Family 17h Model 01h, Revision B1 Processors,
-+ * Preliminary Processor Programming Reference (PPR) for AMD Family
-+ * 17h Model 31h, Revision B0 Processors, and Preliminary Processor
-+ * Programming Reference (PPR) for AMD Family 19h Model 01h, Revision
-+ * B1 Processors Volume 1 of 2.
-+ *                      --- and ---
-+ * "Instructions retired", from the Intel SDM, volume 3,
-+ * "Pre-defined Architectural Performance Events."
-+ */
-+
-+#define INST_RETIRED EVENT(0xc0, 0)
-+
- /*
-  * This event list comprises Intel's eight architectural events plus
-  * AMD's "retired branch instructions" for Zen[123] (and possibly
-@@ -61,7 +76,7 @@
-  */
- static const uint64_t event_list[] = {
- 	EVENT(0x3c, 0),
--	EVENT(0xc0, 0),
-+	INST_RETIRED,
- 	EVENT(0x3c, 1),
- 	EVENT(0x2e, 0x4f),
- 	EVENT(0x2e, 0x41),
-@@ -71,6 +86,16 @@ static const uint64_t event_list[] = {
- 	AMD_ZEN_BR_RETIRED,
- };
- 
-+struct perf_results {
-+	union {
-+		uint64_t raw;
-+		struct {
-+			uint64_t br_count:32;
-+			uint64_t ir_count:32;
-+		};
-+	};
-+};
-+
- /*
-  * If we encounter a #GP during the guest PMU sanity check, then the guest
-  * PMU is not functional. Inform the hypervisor via GUEST_SYNC(0).
-@@ -102,13 +127,20 @@ static void check_msr(uint32_t msr, uint64_t bits_to_flip)
- 
- static uint64_t test_guest(uint32_t msr_base)
- {
-+	struct perf_results r;
- 	uint64_t br0, br1;
-+	uint64_t ir0, ir1;
- 
- 	br0 = rdmsr(msr_base + 0);
-+	ir0 = rdmsr(msr_base + 1);
- 	__asm__ __volatile__("loop ." : "+c"((int){NUM_BRANCHES}));
- 	br1 = rdmsr(msr_base + 0);
-+	ir1 = rdmsr(msr_base + 1);
- 
--	return br1 - br0;
-+	r.br_count = br1 - br0;
-+	r.ir_count = ir1 - ir0;
-+
-+	return r.raw;
- }
- 
- static void intel_guest_code(void)
-@@ -119,15 +151,17 @@ static void intel_guest_code(void)
- 	GUEST_SYNC(1);
- 
- 	for (;;) {
--		uint64_t count;
-+		uint64_t counts;
- 
- 		wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 0);
- 		wrmsr(MSR_P6_EVNTSEL0, ARCH_PERFMON_EVENTSEL_ENABLE |
- 		      ARCH_PERFMON_EVENTSEL_OS | INTEL_BR_RETIRED);
--		wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 0x1);
-+		wrmsr(MSR_P6_EVNTSEL1, ARCH_PERFMON_EVENTSEL_ENABLE |
-+		      ARCH_PERFMON_EVENTSEL_OS | INST_RETIRED);
-+		wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 0x3);
- 
--		count = test_guest(MSR_IA32_PMC0);
--		GUEST_SYNC(count);
-+		counts = test_guest(MSR_IA32_PMC0);
-+		GUEST_SYNC(counts);
- 	}
- }
- 
-@@ -143,14 +177,16 @@ static void amd_guest_code(void)
- 	GUEST_SYNC(1);
- 
- 	for (;;) {
--		uint64_t count;
-+		uint64_t counts;
- 
- 		wrmsr(MSR_K7_EVNTSEL0, 0);
- 		wrmsr(MSR_K7_EVNTSEL0, ARCH_PERFMON_EVENTSEL_ENABLE |
- 		      ARCH_PERFMON_EVENTSEL_OS | AMD_ZEN_BR_RETIRED);
-+		wrmsr(MSR_K7_EVNTSEL1, ARCH_PERFMON_EVENTSEL_ENABLE |
-+		      ARCH_PERFMON_EVENTSEL_OS | INST_RETIRED);
- 
--		count = test_guest(MSR_K7_PERFCTR0);
--		GUEST_SYNC(count);
-+		counts = test_guest(MSR_K7_PERFCTR0);
-+		GUEST_SYNC(counts);
- 	}
- }
- 
-@@ -250,19 +286,25 @@ static struct kvm_pmu_event_filter *remove_event(struct kvm_pmu_event_filter *f,
- 	return f;
- }
- 
--#define ASSERT_PMC_COUNTING(count)							\
-+#define ASSERT_PMC_COUNTING(counts)							\
- do {											\
--	if (count && count != NUM_BRANCHES)						\
--		pr_info("%s: Branch instructions retired = %lu (expected %u)\n",	\
--			__func__, count, NUM_BRANCHES);					\
--	TEST_ASSERT(count, "%s: Branch instructions retired = %lu (expected > 0)",	\
--		    __func__, count);							\
-+	struct perf_results r = {.raw = counts};					\
-+	if (r.br_count && r.br_count != NUM_BRANCHES)					\
-+		pr_info("%s: Branch instructions retired = %u (expected %u)\n",		\
-+			__func__, r.br_count, NUM_BRANCHES);				\
-+	TEST_ASSERT(r.br_count,	"%s: Branch instructions retired = %u (expected > 0)",	\
-+		    __func__, r.br_count);						\
-+	TEST_ASSERT(r.ir_count,	"%s: Instructions retired = %u (expected > 0)",		\
-+		    __func__, r.ir_count);						\
- } while (0)
- 
--#define ASSERT_PMC_NOT_COUNTING(count)							\
-+#define ASSERT_PMC_NOT_COUNTING(counts)							\
- do {											\
--	TEST_ASSERT(!count, "%s: Branch instructions retired = %lu (expected 0)",	\
--		    __func__, count);							\
-+	struct perf_results r = {.raw = counts};					\
-+	TEST_ASSERT(!r.br_count, "%s: Branch instructions retired = %u (expected 0)",	\
-+		    __func__, r.br_count);						\
-+	TEST_ASSERT(!r.ir_count, "%s: Instructions retired = %u (expected 0)",		\
-+		    __func__, r.ir_count);						\
- } while (0)
- 
- static void test_without_filter(struct kvm_vcpu *vcpu)
-@@ -317,6 +359,7 @@ static void test_not_member_deny_list(struct kvm_vcpu *vcpu)
- 	struct kvm_pmu_event_filter *f = event_filter(KVM_PMU_EVENT_DENY);
- 	uint64_t c;
- 
-+	remove_event(f, INST_RETIRED);
- 	remove_event(f, INTEL_BR_RETIRED);
- 	remove_event(f, AMD_ZEN_BR_RETIRED);
- 	c = test_with_filter(vcpu, f);
-@@ -330,6 +373,7 @@ static void test_not_member_allow_list(struct kvm_vcpu *vcpu)
- 	struct kvm_pmu_event_filter *f = event_filter(KVM_PMU_EVENT_ALLOW);
- 	uint64_t c;
- 
-+	remove_event(f, INST_RETIRED);
- 	remove_event(f, INTEL_BR_RETIRED);
- 	remove_event(f, AMD_ZEN_BR_RETIRED);
- 	c = test_with_filter(vcpu, f);
--- 
-2.39.2.722.g9855ee24e9-goog
-
+Thanks
+Nic
