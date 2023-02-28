@@ -2,119 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 27B896A60EC
-	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 22:06:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D98B6A6150
+	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 22:37:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229705AbjB1VGg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Feb 2023 16:06:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53504 "EHLO
+        id S229847AbjB1VhO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Feb 2023 16:37:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229565AbjB1VGe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Feb 2023 16:06:34 -0500
+        with ESMTP id S229511AbjB1VhN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Feb 2023 16:37:13 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1B2E6EBF
-        for <kvm@vger.kernel.org>; Tue, 28 Feb 2023 13:05:31 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4450634020
+        for <kvm@vger.kernel.org>; Tue, 28 Feb 2023 13:36:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677618330;
+        s=mimecast20190719; t=1677620192;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=0/5hmQVwpzcKmo7ZySLNvsyz1qAPMMBkqrZKd0ciXbk=;
-        b=AsK4gTBvUHwFRY727XMjHCBXsbQENr9ReSTbV4DGEL7l1o6RbG30rKiOqu30dqW+d38r34
-        yfwUWNXw/NB2EwwjonbHjG08WRyED1PZWIu60RGG0FQe0s9+rS2eQGuRTjmgioxWHfnoCH
-        JMi7FBtE/Y/U21q0daQKlZVjRRhi+/U=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=Fr6G339eh4CzZb9wRNzdMKECxjo2Rk+TLv6cPbI33P8=;
+        b=SNIo3FCAGjAJvRoLuaxJ3/RkQJ3sBqXZ3+mUk7R74WAR/wjyWRPDsfCS5UjT/xZoq7OtlM
+        h3nE0xTi1hdTzWOnjGPYZuGMNC0vSX6i32oG6x9Jryxjz/CTF4vSYJEDsPxyd5+gKNdyQl
+        iJj4e/PHj9gdIa/4fLhrj5o8Y126wh4=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-616-AVUEKjFtN8u9pC-rj57nAA-1; Tue, 28 Feb 2023 16:05:29 -0500
-X-MC-Unique: AVUEKjFtN8u9pC-rj57nAA-1
-Received: by mail-wr1-f70.google.com with SMTP id u5-20020a5d6da5000000b002cd82373455so765616wrs.9
-        for <kvm@vger.kernel.org>; Tue, 28 Feb 2023 13:05:29 -0800 (PST)
+ us-mta-122-BtT0JNMQOtGzTCUSh0Ao-Q-1; Tue, 28 Feb 2023 16:36:30 -0500
+X-MC-Unique: BtT0JNMQOtGzTCUSh0Ao-Q-1
+Received: by mail-wm1-f72.google.com with SMTP id k26-20020a05600c0b5a00b003dfe4bae099so4762800wmr.0
+        for <kvm@vger.kernel.org>; Tue, 28 Feb 2023 13:36:30 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0/5hmQVwpzcKmo7ZySLNvsyz1qAPMMBkqrZKd0ciXbk=;
-        b=eaEx7CXTWQSa2NLZLRYbA0aV1ZWG4e0Nh0NaDygI5dopmxmK2Rw5C6KP4KdbV2a+lK
-         yCWM+RF7gJ/3Lgh1eJCH77BbRI/igR0xWJ8z3MTj6bTNngMGYoUkLkfLifks3dKiH4lM
-         65SI6TsQHfHDVFmzpxxbb5QF/od4iph/C1QRf6HYs5MTYHZSFYkI1HHBmHqkUQfSmQOH
-         64nhxCVlo0TYKKIeZi9VXStPb4yiTIG72OVocE5Xu2MYXDBQpcYiIU94hwjdUe64mHoI
-         DgvFea/zgJZZ5ubizquxJhb8hTvGENe8SHB/23GrElLVsszz2I0gDzaygYFPfXzou/Zf
-         ZG2Q==
-X-Gm-Message-State: AO0yUKWAZc/nuh8pbd39Dz9fb/Q9vYXOwsuZ/gn7tVPvQxyjIuotlI6U
-        9zFfHEAd601q0g7UDYPt8z/jCd/FWENYXi9OzteGz7Mh0ovv8jM5iYd+rHl7rgkspJQgVvmh9FI
-        xiEOOOiU6cvnHFRAlySqnYjLmIkJOs9XsBSnfhpXuUzfcDzRJAM5Yy1Zp1ug5dS0PMy5J
-X-Received: by 2002:a05:600c:1d28:b0:3e2:147f:ac1a with SMTP id l40-20020a05600c1d2800b003e2147fac1amr3385158wms.21.1677618328470;
-        Tue, 28 Feb 2023 13:05:28 -0800 (PST)
-X-Google-Smtp-Source: AK7set9zrY1Ob9BThSVmM8VM9t39M7li3rs0M0P+LAVMOqBxDLKVC6qz7tgEwMKRPuRCd+1G8HlP3w==
-X-Received: by 2002:a05:600c:1d28:b0:3e2:147f:ac1a with SMTP id l40-20020a05600c1d2800b003e2147fac1amr3385132wms.21.1677618328092;
-        Tue, 28 Feb 2023 13:05:28 -0800 (PST)
-Received: from [192.168.8.100] (tmo-112-221.customers.d1-online.com. [80.187.112.221])
-        by smtp.gmail.com with ESMTPSA id bh22-20020a05600c3d1600b003e01493b136sm17087499wmb.43.2023.02.28.13.05.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Feb 2023 13:05:27 -0800 (PST)
-Message-ID: <04213fad-909f-e86d-caaa-c559917b2e4d@redhat.com>
-Date:   Tue, 28 Feb 2023 22:05:25 +0100
+        d=1e100.net; s=20210112; t=1677620189;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Fr6G339eh4CzZb9wRNzdMKECxjo2Rk+TLv6cPbI33P8=;
+        b=TPVzrdBZdjxyyynf9TjpzD4D2o6aAmbaOKrM3LRXpTtQsCybaADoblQVRQ24tSjNpY
+         fJnaqp+EAwV01LXX5hoxQ8DoqUDQ2WZ6AuVUg4C91CGskOg3lNmmdeCZRAJAn0ZPq+R7
+         XhaM8y4aLykdgpRE1c8qkYDbFMlHA2X2jVWr/LCy5cHbH7X3e/XPfojFaDdIBpPQXfm/
+         51L0Wn0GCSmQyIygerOEAZ+5jLJTO1jYjoXmbq5B2SfTPofdUR13amGAau4pJefb9UfT
+         M5UNPTXOd5hq5BUiKxN4i0S7fGVm891RkbLp3BgfaRxYiGa6dCG5xqtq1YR+e3q64jtN
+         tYSQ==
+X-Gm-Message-State: AO0yUKVNCjL2a9yeFRGzNjffsh+62/cTQRgy/HMSLy1GVW/8LcvMLVe3
+        eQtrJAFhlj5Aru8bPuMY9xvkDJv/8d49LBp+aasCR2ZjZHQVKTLUw5jy14lbBTI1pbt10r5TUnU
+        LX5kVX+z1l0YD
+X-Received: by 2002:a05:600c:310c:b0:3eb:395b:8b62 with SMTP id g12-20020a05600c310c00b003eb395b8b62mr3713259wmo.39.1677620189701;
+        Tue, 28 Feb 2023 13:36:29 -0800 (PST)
+X-Google-Smtp-Source: AK7set9Z8lGr1yxjI9Ypmg9yFzicADc+OvbqqKFlwiu50yEmyScxxP766NN0zApqhzmUJ0CYnPz/ow==
+X-Received: by 2002:a05:600c:310c:b0:3eb:395b:8b62 with SMTP id g12-20020a05600c310c00b003eb395b8b62mr3713241wmo.39.1677620189364;
+        Tue, 28 Feb 2023 13:36:29 -0800 (PST)
+Received: from redhat.com ([2.52.141.194])
+        by smtp.gmail.com with ESMTPSA id m25-20020a7bca59000000b003db0bb81b6asm13684976wml.1.2023.02.28.13.36.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Feb 2023 13:36:28 -0800 (PST)
+Date:   Tue, 28 Feb 2023 16:36:22 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Bobby Eshleman <bobby.eshleman@bytedance.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Martin KaFai Lau <martin.lau@linux.dev>,
+        Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        KP Singh <kpsingh@kernel.org>,
+        Stanislav Fomichev <sdf@google.com>,
+        Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+        Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Cong Wang <cong.wang@bytedance.com>
+Subject: Re: [PATCH net-next v3 1/3] vsock: support sockmap
+Message-ID: <20230228163518-mutt-send-email-mst@kernel.org>
+References: <20230227-vsock-sockmap-upstream-v3-0-7e7f4ce623ee@bytedance.com>
+ <20230227-vsock-sockmap-upstream-v3-1-7e7f4ce623ee@bytedance.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [PATCH v2 6/6] KVM: Change return type of kvm_arch_vm_ioctl() to
- "int"
-Content-Language: en-US
-From:   Thomas Huth <thuth@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Steven Price <steven.price@arm.com>,
-        Cornelia Huck <cohuck@redhat.com>
-References: <20230208140105.655814-1-thuth@redhat.com>
- <20230208140105.655814-7-thuth@redhat.com>
-In-Reply-To: <20230208140105.655814-7-thuth@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230227-vsock-sockmap-upstream-v3-1-7e7f4ce623ee@bytedance.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/02/2023 15.01, Thomas Huth wrote:
-> All kvm_arch_vm_ioctl() implementations now only deal with "int"
-> types as return values, so we can change the return type of these
-> functions to use "int" instead of "long".
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->   arch/arm64/kvm/arm.c       | 3 +--
->   arch/mips/kvm/mips.c       | 4 ++--
->   arch/powerpc/kvm/powerpc.c | 5 ++---
->   arch/riscv/kvm/vm.c        | 3 +--
->   arch/s390/kvm/kvm-s390.c   | 3 +--
->   arch/x86/kvm/x86.c         | 3 +--
->   include/linux/kvm_host.h   | 3 +--
->   7 files changed, 9 insertions(+), 15 deletions(-)
+On Tue, Feb 28, 2023 at 07:04:34PM +0000, Bobby Eshleman wrote:
+> @@ -1241,19 +1252,34 @@ static int vsock_dgram_connect(struct socket *sock,
+>  
+>  	memcpy(&vsk->remote_addr, remote_addr, sizeof(vsk->remote_addr));
+>  	sock->state = SS_CONNECTED;
+> +	sk->sk_state = TCP_ESTABLISHED;
+>  
+>  out:
+>  	release_sock(sk);
+>  	return err;
+>  }
 
-Ping!
 
-Unless I missed something, I think this series had enough review ... Paolo, 
-could you maybe queue the whole series, since it's mostly an 
-architecture-wide clean up?
+How is this related? Maybe add a comment to explain? Does
+TCP_ESTABLISHED make sense for all types of sockets?
 
-  Thanks,
-   Thomas
+-- 
+MST
 
