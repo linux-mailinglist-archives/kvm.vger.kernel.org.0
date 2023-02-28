@@ -2,120 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 481CD6A5EF6
-	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 19:46:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E98D66A5F34
+	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 20:06:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229845AbjB1Sq6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Feb 2023 13:46:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47494 "EHLO
+        id S229876AbjB1TGb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Feb 2023 14:06:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229804AbjB1Sq4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Feb 2023 13:46:56 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E6992CFE3
-        for <kvm@vger.kernel.org>; Tue, 28 Feb 2023 10:46:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677609970;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hks2t1Dz9i5s4NS46kF2yC/7sRBZA14ESYqi1LXB6L0=;
-        b=FoARa4ox4EO9VMxgWbvT28ZJ4QGKdMosRT7MBMYuC4MdSfaKckSLtbb/ffPlpK2GHrki3x
-        XldpoZorYJ+GmD+78dFD23+UrkuVx9jTp8I09i597O76K7y9vYniWo42lcmjiHwXevdtDi
-        HNO4f6hpH6JljAGluHIt2xwIYQh5PyA=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-53-W-woIHJUP5S409VVGj4teg-1; Tue, 28 Feb 2023 13:46:09 -0500
-X-MC-Unique: W-woIHJUP5S409VVGj4teg-1
-Received: by mail-il1-f198.google.com with SMTP id v18-20020a056e0213d200b00316ec11c950so6478896ilj.4
-        for <kvm@vger.kernel.org>; Tue, 28 Feb 2023 10:46:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hks2t1Dz9i5s4NS46kF2yC/7sRBZA14ESYqi1LXB6L0=;
-        b=lCyt5RBcKcZhNiyW7dr7F1ex1/XrFLlRFjzABEDDPMMop/wrTcb32uChW3YLsYdUwU
-         hVQOUCsmLiZSLIw2v4oT3QLSjkGaHnROes4G734YXJmG3laIuxH+XgkdoZkME/Za6MN8
-         zAutGbnF5uGXKJ0nzAof3SvSYKl00qrmanJ1tIOZWOQWPO6Zzfgsid0qXsw7OpCVXejI
-         t32I3+gB5j7kIgdGxb4unYjukGiFbPVNWjeE00nKgh6yaLz/FmsOErMWt8Io9P0m8ADy
-         LJQ+i13ISK7SIOnqslApJe9nPsO+6XwWeHBr/dKINI95R2h/P0fGGZC4Slm4G145e4hg
-         4QdA==
-X-Gm-Message-State: AO0yUKVpgEKvrNsCM0Z0GZvjB/zEhZ+9oSLJqVM6YbgIj+pGXDKc95O6
-        XE+Xe15/6BKGUSZnu+AI5HZb5uE0DDAulCQSIOBoCgBARNU3cLJ+lQfp7BMuKqLINyMJpDxL2rj
-        M9mPQe7sdGuyT
-X-Received: by 2002:a05:6e02:184f:b0:315:9937:600a with SMTP id b15-20020a056e02184f00b003159937600amr4394181ilv.26.1677609968129;
-        Tue, 28 Feb 2023 10:46:08 -0800 (PST)
-X-Google-Smtp-Source: AK7set8U1y5WFhis6co3VoQ0Omoi0PUchVx/aBYY0Z7SuhKAa/r9pd9po0jRwbhlDUMfCJcbrrSTCg==
-X-Received: by 2002:a05:6e02:184f:b0:315:9937:600a with SMTP id b15-20020a056e02184f00b003159937600amr4394164ilv.26.1677609967824;
-        Tue, 28 Feb 2023 10:46:07 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id w19-20020a5d9cd3000000b00704608527d1sm3316040iow.37.2023.02.28.10.46.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Feb 2023 10:46:06 -0800 (PST)
-Date:   Tue, 28 Feb 2023 11:46:06 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Tasos Sahanidis <tasos@tasossah.com>
-Cc:     Abhishek Sahu <abhsahu@nvidia.com>, kvm@vger.kernel.org
-Subject: Re: Bug: Completion-Wait loop timed out with vfio
-Message-ID: <20230228114606.446e8db2.alex.williamson@redhat.com>
-In-Reply-To: <31c2caf4-57b2-be1a-cf15-146903f7b2a1@tasossah.com>
-References: <a01fa87d-bd42-e108-606b-78759edcecf8@tasossah.com>
-        <bcc9d355-b464-7eaf-238c-e95d2f65c93d@nvidia.com>
-        <31c2caf4-57b2-be1a-cf15-146903f7b2a1@tasossah.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        with ESMTP id S229820AbjB1TG2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Feb 2023 14:06:28 -0500
+Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6FDC31E0E;
+        Tue, 28 Feb 2023 11:06:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1677611178; x=1709147178;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=ji1cHpBv5/5kGQg/cBO8SihfSuHNBBaEf12NhCoRr2I=;
+  b=GalQ5RvEppT8Kheu5vT8bOufJJz8lBhXr1MwTdBlOALHeh8MuavZ7FOT
+   4NGi/bwUqqNQUcsCtCUrdT4nO3GznuHxNBxB5BPI0uEZQ5esX08eHKm1X
+   MImeDbEoZAE7OH7dPEHNzDbktMUOZ8D8ABMNkvfKn/KyFeYpcHNXB1I5A
+   I=;
+X-IronPort-AV: E=Sophos;i="5.98,222,1673913600"; 
+   d="scan'208";a="187760472"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-e7094f15.us-west-2.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2023 18:14:42 +0000
+Received: from EX13MTAUWB001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-pdx-2c-m6i4x-e7094f15.us-west-2.amazon.com (Postfix) with ESMTPS id E87C940DB9;
+        Tue, 28 Feb 2023 18:14:41 +0000 (UTC)
+Received: from EX19D002ANA003.ant.amazon.com (10.37.240.141) by
+ EX13MTAUWB001.ant.amazon.com (10.43.161.207) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.45; Tue, 28 Feb 2023 18:14:41 +0000
+Received: from b0f1d8753182.ant.amazon.com (10.106.83.6) by
+ EX19D002ANA003.ant.amazon.com (10.37.240.141) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.24; Tue, 28 Feb 2023 18:14:36 +0000
+From:   Takahiro Itazuri <itazur@amazon.com>
+To:     <bp@alien8.de>
+CC:     <dave.hansen@linux.intel.com>, <itazur@amazon.com>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <mingo@redhat.com>, <pbonzini@redhat.com>, <seanjc@google.com>,
+        <tglx@linutronix.de>, <x86@kernel.org>, <zulinx86@gmail.com>
+Subject: Re: [PATCH 0/2] KVM: x86: Propagate AMD-specific IBRS bits to guests
+Date:   Tue, 28 Feb 2023 18:13:45 +0000
+Message-ID: <20230228181345.40837-1-itazur@amazon.com>
+X-Mailer: git-send-email 2.38.0
+In-Reply-To: <Y/0jRXzbcbxTjqSS@zn.tnic>
+References: <Y/0jRXzbcbxTjqSS@zn.tnic>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.106.83.6]
+X-ClientProxiedBy: EX19D042UWB003.ant.amazon.com (10.13.139.135) To
+ EX19D002ANA003.ant.amazon.com (10.37.240.141)
+X-Spam-Status: No, score=-9.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SORTED_RECIPS,SPF_HELO_NONE,
+        SPF_PASS,USER_IN_DEF_SPF_WL autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 28 Feb 2023 09:33:53 +0200
-Tasos Sahanidis <tasos@tasossah.com> wrote:
+Date:   Mon, 27 Feb 2023 22:40:21 +0100
+From:   Borislav Petkov <bp@alien8.de>
+> On Mon, Feb 27, 2023 at 09:05:24PM +0000, Takahiro Itazuri wrote:
+> > VMMs retrieve supported CPUID features via KVM_GET_SUPPORTED_CPUID to
+> > construct CPUID information to be passed to KVM_SET_CPUID2. Most CPUID
+> > feature bits related to speculative attacks are propagated from host
+> > CPUID. But AMD processors have AMD-specific IBRS related bits in CPUID
+> > Fn8000_0008_EBX (ref: AMD64 Architecture Programmer's Manual Volume 3:
+> > General-Purpose and System Instructions) and some bits are not
+> > propagated to guests.
+> >
+> > Enable propagation of these bits to guests, so that VMMs don't have to
+> > enable them explicitly based on host CPUID.
+> 
+> How hard is it for the VMMs to enable them?
 
-> Thank you very much for your quick response, Abhishek.
-> 
-> > 1. Set disable_idle_d3 module parameter set and check if this issue happens.  
-> The issue does not happen with disable_idle_d3, which means I can at
-> least now use newer kernels. All the following commands were ran
-> *without* disable_idle_d3, so that the issue would occur.
-> 
-> > 2. Without starting the VM, check the status of following sysfs entries.  
-> I assume by /sys/bus/pci/devices/<B:D:F>/power/power_state you meant
-> /sys/bus/pci/devices/<B:D:F>/power_state, as the former doesn't exist.
-> 
-> # cat /sys/bus/pci/devices/0000\:06\:00.0/power/runtime_status
-> suspended
-> # cat /sys/bus/pci/devices/0000\:06\:00.0/power_state
-> D3hot
-> 
-> > 3. After issue happens, run the above command again.  
-> This is with the VM running and the errors in dmesg:
-> 
-> # cat /sys/bus/pci/devices/0000\:06\:00.0/power/runtime_status
-> active
-> # cat /sys/bus/pci/devices/0000\:06\:00.0/power_state
-> D0
+Actually it is not so hard. What VMMs need to do is:
+1. Get host CPUID value.
+2. Check if these bits are set.
+3. Modify the return value of KVM_GET_SUPPORTED_CPUID based on step 2.
+4. Pass it to KVM_SET_CPUID2.
 
+If these bits are propagated to guests same as other bits, VMMs can
+skip the above process.
 
-Can you do the same for the root port to the GPU, ex. use lspci -t to
-find the parent root port.  Since the device doesn't seem to be
-achieving D3cold (expected on a desktop system), the other significant
-change of the identified commit is that the root port will also enter a
-low power state.  Prior to that commit the device would enter D3hot, but
-we never touched the root port.  Perhaps confirm the root port now
-enters D3hot and compare lspci for the root port when using
-disable_idle_d3 to that found when trying to use the device without
-disable_idle_d3. Thanks,
+https://www.kernel.org/doc/Documentation/virtual/kvm/api.txt
+> This ioctl returns x86 cpuid features which are supported by both the
+> hardware and kvm in its default configuration.  Userspace can use the
+> information returned by this ioctl to construct cpuid information (for
+> KVM_SET_CPUID2) that is consistent with hardware, kernel, and
+> userspace capabilities, and with user requirements (for example, the
+> user may wish to constrain cpuid to emulate older hardware, or for
+> feature consistency across a cluster).
 
-Alex
+VMMs trust to some extent that KVM_GET_SUPPORTED_CPUID returns cpuid
+information consistent with hardware, although they should not for some
+leaves (like CPU topoligy). IMHO, propagating these bits without VMM
+actions would be helpful since guests come to know IBRS related
+information of processors by default and applies mitigations properly
+based on that information.
+
+Best regards,
+Takahiro Itazuri
 
