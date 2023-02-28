@@ -2,64 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E98D66A5F34
-	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 20:06:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C01C86A5F2D
+	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 20:06:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229876AbjB1TGb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Feb 2023 14:06:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37832 "EHLO
+        id S229565AbjB1TGQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Feb 2023 14:06:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229820AbjB1TG2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Feb 2023 14:06:28 -0500
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6FDC31E0E;
-        Tue, 28 Feb 2023 11:06:18 -0800 (PST)
+        with ESMTP id S229470AbjB1TGO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Feb 2023 14:06:14 -0500
+Received: from mail-qv1-xf31.google.com (mail-qv1-xf31.google.com [IPv6:2607:f8b0:4864:20::f31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D1B830E9E
+        for <kvm@vger.kernel.org>; Tue, 28 Feb 2023 11:06:12 -0800 (PST)
+Received: by mail-qv1-xf31.google.com with SMTP id f1so7579019qvx.13
+        for <kvm@vger.kernel.org>; Tue, 28 Feb 2023 11:06:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1677611178; x=1709147178;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=ji1cHpBv5/5kGQg/cBO8SihfSuHNBBaEf12NhCoRr2I=;
-  b=GalQ5RvEppT8Kheu5vT8bOufJJz8lBhXr1MwTdBlOALHeh8MuavZ7FOT
-   4NGi/bwUqqNQUcsCtCUrdT4nO3GznuHxNBxB5BPI0uEZQ5esX08eHKm1X
-   MImeDbEoZAE7OH7dPEHNzDbktMUOZ8D8ABMNkvfKn/KyFeYpcHNXB1I5A
-   I=;
-X-IronPort-AV: E=Sophos;i="5.98,222,1673913600"; 
-   d="scan'208";a="187760472"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-e7094f15.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2023 18:14:42 +0000
-Received: from EX13MTAUWB001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-pdx-2c-m6i4x-e7094f15.us-west-2.amazon.com (Postfix) with ESMTPS id E87C940DB9;
-        Tue, 28 Feb 2023 18:14:41 +0000 (UTC)
-Received: from EX19D002ANA003.ant.amazon.com (10.37.240.141) by
- EX13MTAUWB001.ant.amazon.com (10.43.161.207) with Microsoft SMTP Server (TLS)
- id 15.0.1497.45; Tue, 28 Feb 2023 18:14:41 +0000
-Received: from b0f1d8753182.ant.amazon.com (10.106.83.6) by
- EX19D002ANA003.ant.amazon.com (10.37.240.141) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.24; Tue, 28 Feb 2023 18:14:36 +0000
-From:   Takahiro Itazuri <itazur@amazon.com>
-To:     <bp@alien8.de>
-CC:     <dave.hansen@linux.intel.com>, <itazur@amazon.com>,
-        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <mingo@redhat.com>, <pbonzini@redhat.com>, <seanjc@google.com>,
-        <tglx@linutronix.de>, <x86@kernel.org>, <zulinx86@gmail.com>
-Subject: Re: [PATCH 0/2] KVM: x86: Propagate AMD-specific IBRS bits to guests
-Date:   Tue, 28 Feb 2023 18:13:45 +0000
-Message-ID: <20230228181345.40837-1-itazur@amazon.com>
-X-Mailer: git-send-email 2.38.0
-In-Reply-To: <Y/0jRXzbcbxTjqSS@zn.tnic>
-References: <Y/0jRXzbcbxTjqSS@zn.tnic>
+        d=bytedance.com; s=google; t=1677611171;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=G9Ysv1tcjH+fhyGoDw4XqDTEVUICL5OL1IO4ayklgzk=;
+        b=VLMYWLCpyG9X4gzuFdYxiV7f5THqkMJe6fuOSnQkoaLl47ZtPzYQwNe322VqQi9qSL
+         ac1KuE9C4Yz+vJX2XOsacZQjL65w0x9s5YhYFkZ0Wjx0zXH2Uhw2I1n55TOopxHI4oWN
+         qLeVGZHI9lesKsDSOkIpmPNyqqMHd8EB1PYeJur7qll/+GNK8XFqeJMRzs4laWxx8hVF
+         wPf/UZ0QmJw7RuuCWx8EFH6V1DcmDct7kU6v4WM8slo0+foMGlKuWm94jLvh1SYUntxK
+         hC2PQucXDwGGmu9v3nkfGeRVqJVycknzqFJUwHV0Awu3OzVFrGVYGb6uMn7ifz/zixCE
+         9wMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1677611171;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=G9Ysv1tcjH+fhyGoDw4XqDTEVUICL5OL1IO4ayklgzk=;
+        b=7o1IcDARlArChyF6F++xn0zS/8eqe8c3M4LnTKz7C5pDO0i6wbNmUjmzfQS86UpKSW
+         GrsZxi4emDsxNUhOQe8fgCAXDloZJkEYaBZo3XHMfipzu/j0LcSO6TcMllgnLUYyi7nw
+         4LQHvtZ98wt4CvI2qzbYOR7dg1YvgP2LLAYCW/DkAaB2OA7aJNiwE+JaUVfhzZs0f6qq
+         8NageToCZPW3EvpzCVfgMf0pZaPjHM1A69te+a4CLOskrsIvyCRenvWOqAhGr02wLFNU
+         zOI7SpIV2Hbi7X1m5s7veMljRYEV4g5kYt7AcHLGfnLUD4ENbPUo3y0YphOAJtxgLoO5
+         y1hA==
+X-Gm-Message-State: AO0yUKUbQp4q1ClH6giAxrzc/3hag4hBTUudmriczE/9sQxSogD/BSTP
+        ccss3v6jt08bhWjBnSzphq3TbA==
+X-Google-Smtp-Source: AK7set+1iX5Pp01ukBiqs5o3vFibeVRDzz2icAPzV4Mj5is2kveC5JCqCPAItpISdAhjboJeK+MonQ==
+X-Received: by 2002:a05:6214:3014:b0:56e:ff20:57c2 with SMTP id ke20-20020a056214301400b0056eff2057c2mr6277955qvb.10.1677611171233;
+        Tue, 28 Feb 2023 11:06:11 -0800 (PST)
+Received: from n217-072-012.byted.org ([130.44.212.123])
+        by smtp.gmail.com with ESMTPSA id p13-20020a05620a15ed00b006fed58fc1a3sm7242810qkm.119.2023.02.28.11.06.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Feb 2023 11:06:10 -0800 (PST)
+From:   Bobby Eshleman <bobby.eshleman@bytedance.com>
+Subject: [PATCH net-next v3 0/3] vsock: add support for sockmap
+Date:   Tue, 28 Feb 2023 19:04:33 +0000
+Message-Id: <20230227-vsock-sockmap-upstream-v3-0-7e7f4ce623ee@bytedance.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.106.83.6]
-X-ClientProxiedBy: EX19D042UWB003.ant.amazon.com (10.13.139.135) To
- EX19D002ANA003.ant.amazon.com (10.37.240.141)
-X-Spam-Status: No, score=-9.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SORTED_RECIPS,SPF_HELO_NONE,
-        SPF_PASS,USER_IN_DEF_SPF_WL autolearn=no autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAEFQ/mMC/12OTQrCMBSEryJv7ZM2Wq2uvIe4SJOJDZofklgU8
+ e6mbgQ3A8Mw882LMpJFpsPiRQmTzTb4atbLBalR+gvY6upJNGLdCLHjKQd15VmcjHyPuSRIx3u
+ 97VS/aXcbKaiWB5nBQ5JejXNdY8ItRAdf5jQmGPv4Yk/kUdjjUehcE5OC4zLWzR+2bXvO9xhDK
+ n94FbyHKna4gSfBDXe9MdJoNPttdxyeBbo+wEoFR+/3B7fELkPtAAAA
+To:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Martin KaFai Lau <martin.lau@linux.dev>,
+        Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        KP Singh <kpsingh@kernel.org>,
+        Stanislav Fomichev <sdf@google.com>,
+        Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+        Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Cong Wang <cong.wang@bytedance.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>
+X-Mailer: b4 0.12.1
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,47 +93,118 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Date:   Mon, 27 Feb 2023 22:40:21 +0100
-From:   Borislav Petkov <bp@alien8.de>
-> On Mon, Feb 27, 2023 at 09:05:24PM +0000, Takahiro Itazuri wrote:
-> > VMMs retrieve supported CPUID features via KVM_GET_SUPPORTED_CPUID to
-> > construct CPUID information to be passed to KVM_SET_CPUID2. Most CPUID
-> > feature bits related to speculative attacks are propagated from host
-> > CPUID. But AMD processors have AMD-specific IBRS related bits in CPUID
-> > Fn8000_0008_EBX (ref: AMD64 Architecture Programmer's Manual Volume 3:
-> > General-Purpose and System Instructions) and some bits are not
-> > propagated to guests.
-> >
-> > Enable propagation of these bits to guests, so that VMMs don't have to
-> > enable them explicitly based on host CPUID.
-> 
-> How hard is it for the VMMs to enable them?
+Add support for sockmap to vsock.
 
-Actually it is not so hard. What VMMs need to do is:
-1. Get host CPUID value.
-2. Check if these bits are set.
-3. Modify the return value of KVM_GET_SUPPORTED_CPUID based on step 2.
-4. Pass it to KVM_SET_CPUID2.
+We're testing usage of vsock as a way to redirect guest-local UDS
+requests to the host and this patch series greatly improves the
+performance of such a setup.
 
-If these bits are propagated to guests same as other bits, VMMs can
-skip the above process.
+Compared to copying packets via userspace, this improves throughput by
+121% in basic testing.
 
-https://www.kernel.org/doc/Documentation/virtual/kvm/api.txt
-> This ioctl returns x86 cpuid features which are supported by both the
-> hardware and kvm in its default configuration.  Userspace can use the
-> information returned by this ioctl to construct cpuid information (for
-> KVM_SET_CPUID2) that is consistent with hardware, kernel, and
-> userspace capabilities, and with user requirements (for example, the
-> user may wish to constrain cpuid to emulate older hardware, or for
-> feature consistency across a cluster).
+Tested as follows.
 
-VMMs trust to some extent that KVM_GET_SUPPORTED_CPUID returns cpuid
-information consistent with hardware, although they should not for some
-leaves (like CPU topoligy). IMHO, propagating these bits without VMM
-actions would be helpful since guests come to know IBRS related
-information of processors by default and applies mitigations properly
-based on that information.
+Setup: guest unix dgram sender -> guest vsock redirector -> host vsock
+       server
+Threads: 1
+Payload: 64k
+No sockmap:
+- 76.3 MB/s
+- The guest vsock redirector was
+  "socat VSOCK-CONNECT:2:1234 UNIX-RECV:/path/to/sock"
+Using sockmap (this patch):
+- 168.8 MB/s (+121%)
+- The guest redirector was a simple sockmap echo server,
+  redirecting unix ingress to vsock 2:1234 egress.
+- Same sender and server programs
+
+*Note: these numbers are from RFC v1
+
+Only the virtio transport has been tested. The loopback transport was
+used in writing bpf/selftests, but not thoroughly tested otherwise.
+
+This series requires the skb patch.
+
+Changes in v3:
+- vsock/bpf: Refactor wait logic in vsock_bpf_recvmsg() to avoid
+  backwards goto
+- vsock/bpf: Check psock before acquiring slock
+- vsock/bpf: Return bool instead of int of 0 or 1
+- vsock/bpf: Wrap macro args __sk/__psock in parens
+- vsock/bpf: Place comment trailer */ on separate line
+
+Changes in v2:
+- vsock/bpf: rename vsock_dgram_* -> vsock_*
+- vsock/bpf: change sk_psock_{get,put} and {lock,release}_sock() order
+  to minimize slock hold time
+- vsock/bpf: use "new style" wait
+- vsock/bpf: fix bug in wait log
+- vsock/bpf: add check that recvmsg sk_type is one dgram, seqpacket, or
+  stream.  Return error if not one of the three.
+- virtio/vsock: comment __skb_recv_datagram() usage
+- virtio/vsock: do not init copied in read_skb()
+- vsock/bpf: add ifdef guard around struct proto in dgram_recvmsg()
+- selftests/bpf: add vsock loopback config for aarch64
+- selftests/bpf: add vsock loopback config for s390x
+- selftests/bpf: remove vsock device from vmtest.sh qemu machine
+- selftests/bpf: remove CONFIG_VIRTIO_VSOCKETS=y from config.x86_64
+- vsock/bpf: move transport-related (e.g., if (!vsk->transport)) checks
+  out of fast path
+
+Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+---
+Bobby Eshleman (3):
+      vsock: support sockmap
+      selftests/bpf: add vsock to vmtest.sh
+      selftests/bpf: Add a test case for vsock sockmap
+
+ drivers/vhost/vsock.c                              |   1 +
+ include/linux/virtio_vsock.h                       |   1 +
+ include/net/af_vsock.h                             |  17 ++
+ net/vmw_vsock/Makefile                             |   1 +
+ net/vmw_vsock/af_vsock.c                           |  55 ++++++-
+ net/vmw_vsock/virtio_transport.c                   |   2 +
+ net/vmw_vsock/virtio_transport_common.c            |  24 +++
+ net/vmw_vsock/vsock_bpf.c                          | 175 +++++++++++++++++++++
+ net/vmw_vsock/vsock_loopback.c                     |   2 +
+ tools/testing/selftests/bpf/config.aarch64         |   2 +
+ tools/testing/selftests/bpf/config.s390x           |   3 +
+ tools/testing/selftests/bpf/config.x86_64          |   3 +
+ .../selftests/bpf/prog_tests/sockmap_listen.c      | 163 +++++++++++++++++++
+ 13 files changed, 443 insertions(+), 6 deletions(-)
+---
+base-commit: d83115ce337a632f996e44c9f9e18cadfcf5a094
+change-id: 20230118-support-vsock-sockmap-connectible-2e1297d2111a
 
 Best regards,
-Takahiro Itazuri
+--
+Bobby Eshleman <bobby.eshleman@bytedance.com>
+
+---
+Bobby Eshleman (3):
+      vsock: support sockmap
+      selftests/bpf: add vsock to vmtest.sh
+      selftests/bpf: add a test case for vsock sockmap
+
+ drivers/vhost/vsock.c                              |   1 +
+ include/linux/virtio_vsock.h                       |   1 +
+ include/net/af_vsock.h                             |  17 ++
+ net/vmw_vsock/Makefile                             |   1 +
+ net/vmw_vsock/af_vsock.c                           |  55 ++++++-
+ net/vmw_vsock/virtio_transport.c                   |   2 +
+ net/vmw_vsock/virtio_transport_common.c            |  25 +++
+ net/vmw_vsock/vsock_bpf.c                          | 174 +++++++++++++++++++++
+ net/vmw_vsock/vsock_loopback.c                     |   2 +
+ tools/testing/selftests/bpf/config.aarch64         |   2 +
+ tools/testing/selftests/bpf/config.s390x           |   3 +
+ tools/testing/selftests/bpf/config.x86_64          |   3 +
+ .../selftests/bpf/prog_tests/sockmap_listen.c      | 163 +++++++++++++++++++
+ 13 files changed, 443 insertions(+), 6 deletions(-)
+---
+base-commit: c2ea552065e43d05bce240f53c3185fd3a066204
+change-id: 20230227-vsock-sockmap-upstream-9d65c84174a2
+
+Best regards,
+-- 
+Bobby Eshleman <bobby.eshleman@bytedance.com>
 
