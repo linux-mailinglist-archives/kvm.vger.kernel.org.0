@@ -2,62 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A7D246A50C0
-	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 02:31:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BE036A50E0
+	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 02:59:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229817AbjB1Bbi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Feb 2023 20:31:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40850 "EHLO
+        id S229752AbjB1B7b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Feb 2023 20:59:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229605AbjB1Bbh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Feb 2023 20:31:37 -0500
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9685546A6
-        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 17:31:35 -0800 (PST)
+        with ESMTP id S229520AbjB1B7a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Feb 2023 20:59:30 -0500
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10F26CA36;
+        Mon, 27 Feb 2023 17:59:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677547895; x=1709083895;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Bj32I2zAx6+PHeK2dScNijceSDn4ytHmW8zFPbZVOCE=;
-  b=KCWEYEztSnLp9gXKsyACr9/okOsUO3AOXLh/WK5QrEVzODmZgQIpts5G
-   cej7elVX5yhzrczDICVWCAOOiYue7um0eYNA787WdFHGpWhnx8e5B/0TI
-   0SefnSWA5yFXZTJekHxQCQxmR0FEL32Xt0oySjpwSZ00yIZhauol68YbG
-   Ste/oylyALAQ6Zq13DlW+xB6cbBj7RNht3Qo6k9zl8RFmmgp3l28xUVPZ
-   2qxHsYk1TuBaFxWCaDaRPTwfBskgBeErdRvjFuPLpHUOAt3/tA7ii4P5w
-   qeg1Ozu0LpaPdWfAy8y8itFfgm8Y6LKBohZ30heZCkUpgGOU+385U5NHv
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10634"; a="317820490"
+  t=1677549570; x=1709085570;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=tM9zExhdsZkMDzEMOeD9THty+rKAp+OwuxntkkK6SV4=;
+  b=dfz5czKc0uhe1GVPQ0dpeb5CnHiOoq0+X7MsLJX3DEga97knl13ZZ5jl
+   n2gXqDx9GzuBFgk4UhwfCUk7d1F6rgNIJrbYXfQn0AOX+S3VGrVcYJiX+
+   tcAcOb+L5fpC52yMgI1J0Or49DmwUt3dtXs+DblXE/4QdBlI8ClWTNBXs
+   zGy+L9DY5vhRmaLbUxw742DOtPVIibaAQHE8c0grE9z8Rh9bBMv8iYTtR
+   sfSW7GUdrmlXNQ4CTlbLJeiHZfRQChJaRLFNadA7zdkG6jw3uD8BfxQIx
+   hjjwIgx4opcxdyUoJlS9L6EXuL9rwv5hJOH+zIrFd3sGle4/DutSrVBTH
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10634"; a="361583332"
 X-IronPort-AV: E=Sophos;i="5.98,220,1673942400"; 
-   d="scan'208";a="317820490"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2023 17:31:35 -0800
+   d="scan'208";a="361583332"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2023 17:59:29 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10634"; a="706389138"
+X-IronPort-AV: E=McAfee;i="6500,9779,10634"; a="762982545"
 X-IronPort-AV: E=Sophos;i="5.98,220,1673942400"; 
-   d="scan'208";a="706389138"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by orsmga001.jf.intel.com with ESMTP; 27 Feb 2023 17:31:31 -0800
-Date:   Tue, 28 Feb 2023 09:31:31 +0800
-From:   Yuan Yao <yuan.yao@linux.intel.com>
-To:     Shivam Kumar <shivam.kumar1@nutanix.com>
-Cc:     pbonzini@redhat.com, seanjc@google.com, maz@kernel.org,
-        james.morse@arm.com, borntraeger@linux.ibm.com, david@redhat.com,
-        aravind.retnakaran@nutanix.com, kvm@vger.kernel.org,
-        Shaju Abraham <shaju.abraham@nutanix.com>,
-        Manish Mishra <manish.mishra@nutanix.com>,
-        Anurag Madnawat <anurag.madnawat@nutanix.com>
-Subject: Re: [PATCH v8 2/3] KVM: x86: Dirty quota-based throttling of vcpus
-Message-ID: <20230228013131.o4xw3ikacrgyjc52@yy-desk-7060>
-References: <20230225204758.17726-1-shivam.kumar1@nutanix.com>
- <20230225204758.17726-3-shivam.kumar1@nutanix.com>
+   d="scan'208";a="762982545"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.48]) ([10.239.159.48])
+  by FMSMGA003.fm.intel.com with ESMTP; 27 Feb 2023 17:59:27 -0800
+Message-ID: <adfd78d1-006e-5e7c-236b-cc00e8afb8c0@linux.intel.com>
+Date:   Tue, 28 Feb 2023 09:50:52 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230225204758.17726-3-shivam.kumar1@nutanix.com>
-User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Cc:     baolu.lu@linux.intel.com, iommu@lists.linux.dev,
+        Kevin Tian <kevin.tian@intel.com>,
+        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
+        Nicolin Chen <nicolinc@nvidia.com>, Yi Liu <yi.l.liu@intel.com>
+Subject: Re: [PATCH 09/14] iommufd: Add iommufd_device_replace()
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@nvidia.com>
+References: <9-v1-7612f88c19f5+2f21-iommufd_alloc_jgg@nvidia.com>
+ <cdbc3707-d326-26d4-3adc-ff2ed80aa2ba@linux.intel.com>
+ <Y/y3A4LJqunT0ZwS@nvidia.com>
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <Y/y3A4LJqunT0ZwS@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -65,187 +67,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Feb 25, 2023 at 08:47:59PM +0000, Shivam Kumar wrote:
-> Call update_dirty_quota whenever a page is marked dirty with
-> appropriate arch-specific page size. Process the KVM request
-> KVM_REQ_DIRTY_QUOTA_EXIT (raised by update_dirty_quota) to exit to
-> userspace with exit reason KVM_EXIT_DIRTY_QUOTA_EXHAUSTED.
->
-> Suggested-by: Shaju Abraham <shaju.abraham@nutanix.com>
-> Suggested-by: Manish Mishra <manish.mishra@nutanix.com>
-> Co-developed-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
-> Signed-off-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
-> Signed-off-by: Shivam Kumar <shivam.kumar1@nutanix.com>
-> ---
->  arch/x86/kvm/Kconfig       |  1 +
->  arch/x86/kvm/mmu/mmu.c     |  8 +++++++-
->  arch/x86/kvm/mmu/spte.c    |  3 +++
->  arch/x86/kvm/mmu/tdp_mmu.c |  3 +++
->  arch/x86/kvm/vmx/vmx.c     |  5 +++++
->  arch/x86/kvm/x86.c         | 16 ++++++++++++++++
->  arch/x86/kvm/xen.c         | 12 +++++++++++-
->  7 files changed, 46 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-> index 8e578311ca9d..8621a9512572 100644
-> --- a/arch/x86/kvm/Kconfig
-> +++ b/arch/x86/kvm/Kconfig
-> @@ -48,6 +48,7 @@ config KVM
->  	select KVM_VFIO
->  	select SRCU
->  	select INTERVAL_TREE
-> +	select HAVE_KVM_DIRTY_QUOTA
->  	select HAVE_KVM_PM_NOTIFIER if PM
->  	select KVM_GENERIC_HARDWARE_ENABLING
->  	help
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index c8ebe542c565..e0c8348ecdf1 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3323,8 +3323,14 @@ fast_pf_fix_direct_spte(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
->  	if (!try_cmpxchg64(sptep, &old_spte, new_spte))
->  		return false;
->
-> -	if (is_writable_pte(new_spte) && !is_writable_pte(old_spte))
-> +	if (is_writable_pte(new_spte) && !is_writable_pte(old_spte)) {
-> +#ifdef CONFIG_HAVE_KVM_DIRTY_QUOTA
-> +		struct kvm_mmu_page *sp = sptep_to_sp(sptep);
-> +
-> +		update_dirty_quota(vcpu->kvm, (1L << SPTE_LEVEL_SHIFT(sp->role.level)));
-> +#endif
->  		mark_page_dirty_in_slot(vcpu->kvm, fault->slot, fault->gfn);
+On 2/27/23 9:58 PM, Jason Gunthorpe wrote:
+> On Sun, Feb 26, 2023 at 11:01:59AM +0800, Baolu Lu wrote:
+>> On 2/25/23 8:27 AM, Jason Gunthorpe wrote:
+>>> @@ -437,25 +517,77 @@ int iommufd_device_attach(struct iommufd_device *idev, u32 *pt_id)
+>>>    		struct iommufd_ioas *ioas =
+>>>    			container_of(pt_obj, struct iommufd_ioas, obj);
+>>> -		rc = iommufd_device_auto_get_domain(idev, ioas, pt_id);
+>>> -		if (rc)
+>>> +		destroy_hwpt = iommufd_device_auto_get_domain(idev, ioas, pt_id,
+>>> +							      do_attach);
+>>> +		if (IS_ERR(destroy_hwpt))
+>>>    			goto out_put_pt_obj;
+>>>    		break;
+>>>    	}
+>>>    	default:
+>>> -		rc = -EINVAL;
+>>> +		destroy_hwpt = ERR_PTR(-EINVAL);
+>>>    		goto out_put_pt_obj;
+>>>    	}
+>>> +	iommufd_put_object(pt_obj);
+>>> -	refcount_inc(&idev->obj.users);
+>>> -	rc = 0;
+>>> +	/* This destruction has to be after we unlock everything */
+>>> +	if (destroy_hwpt)
+>> Should this be
+>>
+>> 	if (!IS_ERR_OR_NULL(destroy_hwpt))
+>>
+>> ?
+> Never use IS_ERR_OR_NULL ..
 
-Possible to call update_dirty_quota() from mark_page_dirty_in_slot() ?
-Then other Architectures can be covered yet.
+Can you please elaborate a bit on this? I can still see a lot of use of
+it in the tree.
 
-> +	}
->
->  	return true;
->  }
-> diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-> index c15bfca3ed15..15f4f1d97ce9 100644
-> --- a/arch/x86/kvm/mmu/spte.c
-> +++ b/arch/x86/kvm/mmu/spte.c
-> @@ -243,6 +243,9 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
->  	if ((spte & PT_WRITABLE_MASK) && kvm_slot_dirty_track_enabled(slot)) {
->  		/* Enforced by kvm_mmu_hugepage_adjust. */
->  		WARN_ON(level > PG_LEVEL_4K);
-> +#ifdef CONFIG_HAVE_KVM_DIRTY_QUOTA
-> +		update_dirty_quota(vcpu->kvm, (1L << SPTE_LEVEL_SHIFT(level)));
-> +#endif
->  		mark_page_dirty_in_slot(vcpu->kvm, slot, gfn);
->  	}
->
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 7c25dbf32ecc..4bf98e96343d 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -358,6 +358,9 @@ static void handle_changed_spte_dirty_log(struct kvm *kvm, int as_id, gfn_t gfn,
->
->  	if ((!is_writable_pte(old_spte) || pfn_changed) &&
->  	    is_writable_pte(new_spte)) {
-> +#ifdef CONFIG_HAVE_KVM_DIRTY_QUOTA
-> +		update_dirty_quota(kvm, (1L << SPTE_LEVEL_SHIFT(level)));
-> +#endif
->  		slot = __gfn_to_memslot(__kvm_memslots(kvm, as_id), gfn);
->  		mark_page_dirty_in_slot(kvm, slot, gfn);
->  	}
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index bcac3efcde41..da4c6342a647 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -5861,6 +5861,11 @@ static int handle_invalid_guest_state(struct kvm_vcpu *vcpu)
->  		 */
->  		if (__xfer_to_guest_mode_work_pending())
->  			return 1;
-> +
-> +#ifdef CONFIG_HAVE_KVM_DIRTY_QUOTA
-> +		if (kvm_test_request(KVM_REQ_DIRTY_QUOTA_EXIT, vcpu))
-> +			return 1;
-> +#endif
->  	}
->
->  	return 1;
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 7713420abab0..1733be829197 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -3092,6 +3092,9 @@ static void kvm_setup_guest_pvclock(struct kvm_vcpu *v,
->
->  	guest_hv_clock->version = ++vcpu->hv_clock.version;
->
-> +#ifdef CONFIG_HAVE_KVM_DIRTY_QUOTA
-> +	update_dirty_quota(v->kvm, PAGE_SIZE);
-> +#endif
->  	mark_page_dirty_in_slot(v->kvm, gpc->memslot, gpc->gpa >> PAGE_SHIFT);
->  	read_unlock_irqrestore(&gpc->lock, flags);
->
-> @@ -3566,6 +3569,9 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
->   out:
->  	user_access_end();
->   dirty:
-> +#ifdef CONFIG_HAVE_KVM_DIRTY_QUOTA
-> +	update_dirty_quota(vcpu->kvm, PAGE_SIZE);
-> +#endif
->  	mark_page_dirty_in_slot(vcpu->kvm, ghc->memslot, gpa_to_gfn(ghc->gpa));
->  }
->
-> @@ -4815,6 +4821,9 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
->  	if (!copy_to_user_nofault(&st->preempted, &preempted, sizeof(preempted)))
->  		vcpu->arch.st.preempted = KVM_VCPU_PREEMPTED;
->
-> +#ifdef CONFIG_HAVE_KVM_DIRTY_QUOTA
-> +	update_dirty_quota(vcpu->kvm, PAGE_SIZE);
-> +#endif
->  	mark_page_dirty_in_slot(vcpu->kvm, ghc->memslot, gpa_to_gfn(ghc->gpa));
->  }
->
-> @@ -10514,6 +10523,13 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->  			r = 0;
->  			goto out;
->  		}
-> +#ifdef CONFIG_HAVE_KVM_DIRTY_QUOTA
-> +		if (kvm_check_request(KVM_REQ_DIRTY_QUOTA_EXIT, vcpu)) {
-> +			vcpu->run->exit_reason = KVM_EXIT_DIRTY_QUOTA_EXHAUSTED;
-> +			r = 0;
-> +			goto out;
-> +		}
-> +#endif
->
->  		/*
->  		 * KVM_REQ_HV_STIMER has to be processed after
-> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-> index 40edf4d1974c..00a3ac438539 100644
-> --- a/arch/x86/kvm/xen.c
-> +++ b/arch/x86/kvm/xen.c
-> @@ -435,9 +435,16 @@ static void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, bool atomic)
->
->  	read_unlock_irqrestore(&gpc1->lock, flags);
->
-> +#ifdef CONFIG_HAVE_KVM_DIRTY_QUOTA
-> +	update_dirty_quota(v->kvm, PAGE_SIZE);
-> +#endif
->  	mark_page_dirty_in_slot(v->kvm, gpc1->memslot, gpc1->gpa >> PAGE_SHIFT);
-> -	if (user_len2)
-> +	if (user_len2) {
-> +#ifdef CONFIG_HAVE_KVM_DIRTY_QUOTA
-> +		update_dirty_quota(v->kvm, PAGE_SIZE);
-> +#endif
->  		mark_page_dirty_in_slot(v->kvm, gpc2->memslot, gpc2->gpa >> PAGE_SHIFT);
-> +	}
->  }
->
->  void kvm_xen_update_runstate(struct kvm_vcpu *v, int state)
-> @@ -549,6 +556,9 @@ void kvm_xen_inject_pending_events(struct kvm_vcpu *v)
->  	if (v->arch.xen.upcall_vector)
->  		kvm_xen_inject_vcpu_vector(v);
->
-> +#ifdef CONFIG_HAVE_KVM_DIRTY_QUOTA
-> +	update_dirty_quota(v->kvm, PAGE_SIZE);
-> +#endif
->  	mark_page_dirty_in_slot(v->kvm, gpc->memslot, gpc->gpa >> PAGE_SHIFT);
->  }
->
-> --
-> 2.22.3
->
+> 
+> What am I missing? all the flows that could possibly have err_ptr here
+> do goto_out_put_pt_obj ?
+
+Oh yes! You are right. All err_ptr's have gone to an error handling
+path.
+
+Best regards,
+baolu
