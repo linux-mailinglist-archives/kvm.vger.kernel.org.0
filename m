@@ -2,320 +2,270 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D15B6A5F3D
-	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 20:07:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 037D86A5F60
+	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 20:12:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229672AbjB1THB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Feb 2023 14:07:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37756 "EHLO
+        id S229639AbjB1TME (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Feb 2023 14:12:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229926AbjB1TGs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Feb 2023 14:06:48 -0500
-Received: from mail-qv1-xf34.google.com (mail-qv1-xf34.google.com [IPv6:2607:f8b0:4864:20::f34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E06D311F4
-        for <kvm@vger.kernel.org>; Tue, 28 Feb 2023 11:06:15 -0800 (PST)
-Received: by mail-qv1-xf34.google.com with SMTP id m4so7624951qvq.3
-        for <kvm@vger.kernel.org>; Tue, 28 Feb 2023 11:06:15 -0800 (PST)
+        with ESMTP id S229445AbjB1TMD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Feb 2023 14:12:03 -0500
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29AD31FE8;
+        Tue, 28 Feb 2023 11:12:02 -0800 (PST)
+Received: by mail-lf1-x12e.google.com with SMTP id m7so14577286lfj.8;
+        Tue, 28 Feb 2023 11:12:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1677611175;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UIPShpwFBCYz5smR+qhCdj+vTupAZLYJ+BSAmGqlhiA=;
-        b=BtxvQit9noeByVyBx0JmiXyj/L0uIJJje5Qqs/ohmI35v9Tl/Y6799SyAWXhF+NhPz
-         LdoxtWwZvysaMcGE4PH5sRIRNgHP0B3GQLqpPsiexw+Af1LQpPJaSLwqfkdK4Yq4M2xx
-         1lZ+6duN4JDzvQz7hMMXLyBdkWVdkSMHGMH6YjJnDZS0nSNpTNFY7PqrmM31yimbawK6
-         5lvWs9ItqZzH13d24JkQU64NJiy4MqQJeiQaQl8P6+aUEV4mW9uGwrkhgfEF1uwV1r5Q
-         Qi0ENeXXnmSRsxuH1oaFpJb+aj0dl/3AS8x/xTemPQWNqqdDOqAdrlzt/TUMBkhTxvg8
-         CTHw==
+        d=gmail.com; s=20210112; t=1677611520;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:date:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uv7zPB/3/n/GjotxPr3QAZ4fe2v+az1qjxPnevupIu0=;
+        b=BfMMLuS5eSNj/Ge+TUpVvYl+FYWzdyNRKWJ+xpggvWkmwP80jfH5IayK0shL2PiNmF
+         U5c7C6XGKocmqu9lu6iucY5RFxep3UTIjMecuocKxZfFtZloKpLSmEYJy2/mk6H46O0s
+         BQrvtUKPnQHx0rcaBtxXBw7JRnJ/qEdj2weTpk0+GLVe52DONvIQanmhWdgM5JMmSYuF
+         kE+JmQS85MtKbowNvjIl1DE8s137VHAc97GRfKpnsYRT4f2ODxdo3AMC9SGl6cXA4Wue
+         yvkrPrrMs3bC61/OOetNvwBPJCHNcVJxxOog/bLvxI7sRFkV/CqE6nMM1nLeRvmhrYui
+         np/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677611175;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20210112; t=1677611520;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UIPShpwFBCYz5smR+qhCdj+vTupAZLYJ+BSAmGqlhiA=;
-        b=1mkZlrq2guaYjpRkEurOGI9t+1pxGu+l8XULe8xXO+04g/ib1efsZA0nUSq11aTiAq
-         gk/YEnOacvXoDrgznfow1/03iXH4SEu/pkb9yE/GOSJfCLhd2fEHGs62ItQYbdWoEfIL
-         eW6sLbMqadHCwNyRzz8LlKXUYEi+8sYlWD4lPK8wwKRai3K1zzQb+I7IkSZuWVoHaH0m
-         q1gLjnaeRekIVddH8+cZ+TvLcYyxVTYqFEMw0i/220LWWvQQRfGKjTvJFsaW/zp3Ntw7
-         4t16hU8QEOMKIFMpX6KwlBSFrJau3LmzEkcirQVbH0QzOR8lCBwbV47SsJw9x9FYBmua
-         ehIA==
-X-Gm-Message-State: AO0yUKU8xhbUYDpqbqBWMw9RJUWRzRwCbdHdb1eW4HWmWofiljmtEFC7
-        I5UgcqxxeakXzrcQAUNIyBCMgQ==
-X-Google-Smtp-Source: AK7set/TlONdvgMrNTXddW8UdHq+iPD5BWKnDFq4DIQ2SlQL6Ufke1meOiRMU7e2h5UhWhxt1A2/Lw==
-X-Received: by 2002:a05:6214:f09:b0:537:727f:ac28 with SMTP id gw9-20020a0562140f0900b00537727fac28mr8403727qvb.27.1677611174879;
-        Tue, 28 Feb 2023 11:06:14 -0800 (PST)
-Received: from n217-072-012.byted.org ([130.44.212.123])
-        by smtp.gmail.com with ESMTPSA id p13-20020a05620a15ed00b006fed58fc1a3sm7242810qkm.119.2023.02.28.11.06.13
+        bh=uv7zPB/3/n/GjotxPr3QAZ4fe2v+az1qjxPnevupIu0=;
+        b=ruZ1ZWwotrMLoklbylIB/5q+C5yYyaep0EZ1e8bnm4+FAu6Fv3P2gtSIXKSUBkiYsK
+         0hKdytWO6E0VaMwi+R/WbbuQ/zls2cj+b88VSUkFm1tjMYl77qNUihn1bllTNi4Jds9l
+         YTdWoSsPi1qZuQEw8CvNJaVl6JhB4vauGOkcHIMLuEdblzLHjnystib3S/rEJh5mXobY
+         tWXkPYEnvqZNGBNEdQY677++qwq07Oo7j9gDVRZr5icTRK0iXVXAEUGappWyKoqvfohV
+         FqIP/SYHTAjorxOOB44eT3K+wKZs08nNMF7li7suJtFyTnvOCG7omu+rbPaRrU3IWa4W
+         FEqQ==
+X-Gm-Message-State: AO0yUKWr59iduwxxLdC/chJunyiKVKJASq+1kqabu6Qsv/M61pciM7Be
+        mMWW4au9kFwQapplUrf6c0U=
+X-Google-Smtp-Source: AK7set8yCOjxHk7icQ9ufval00Ha+MWUzClI0rlxUuq3jsmZAk2MiIPR4enIzec0MGw/UdqPETNCyA==
+X-Received: by 2002:ac2:44a9:0:b0:4d2:c70a:fe0a with SMTP id c9-20020ac244a9000000b004d2c70afe0amr834685lfm.2.1677611520244;
+        Tue, 28 Feb 2023 11:12:00 -0800 (PST)
+Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
+        by smtp.gmail.com with ESMTPSA id b7-20020ac24107000000b004db297957e8sm1441198lfi.305.2023.02.28.11.11.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Feb 2023 11:06:14 -0800 (PST)
-From:   Bobby Eshleman <bobby.eshleman@bytedance.com>
-Date:   Tue, 28 Feb 2023 19:04:36 +0000
-Subject: [PATCH net-next v3 3/3] selftests/bpf: add a test case for vsock
- sockmap
+        Tue, 28 Feb 2023 11:12:00 -0800 (PST)
+From:   Zhi Wang <zhi.wang.linux@gmail.com>
+X-Google-Original-From: Zhi Wang <zhi.wang.linux@intel.com>
+Date:   Tue, 28 Feb 2023 21:11:57 +0200
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
+        <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
+        <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
+        <thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
+        <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
+        <jmattson@google.com>, <luto@kernel.org>,
+        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
+        <pgonda@google.com>, <peterz@infradead.org>,
+        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
+        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
+        <tony.luck@intel.com>, <marcorr@google.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
+        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH RFC v8 44/56] KVM: SVM: Add support to handle the RMP
+ nested page fault
+Message-ID: <20230228211157.0000071b@intel.com>
+In-Reply-To: <20230220183847.59159-45-michael.roth@amd.com>
+References: <20230220183847.59159-1-michael.roth@amd.com>
+        <20230220183847.59159-45-michael.roth@amd.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230227-vsock-sockmap-upstream-v3-3-7e7f4ce623ee@bytedance.com>
-References: <20230227-vsock-sockmap-upstream-v3-0-7e7f4ce623ee@bytedance.com>
-In-Reply-To: <20230227-vsock-sockmap-upstream-v3-0-7e7f4ce623ee@bytedance.com>
-To:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        KP Singh <kpsingh@kernel.org>,
-        Stanislav Fomichev <sdf@google.com>,
-        Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-        Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Cong Wang <cong.wang@bytedance.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>
-X-Mailer: b4 0.12.1
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a test case testing the redirection from connectible AF_VSOCK
-sockets to connectible AF_UNIX sockets.
+On Mon, 20 Feb 2023 12:38:35 -0600
+Michael Roth <michael.roth@amd.com> wrote:
 
-Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
----
- .../selftests/bpf/prog_tests/sockmap_listen.c      | 163 +++++++++++++++++++++
- 1 file changed, 163 insertions(+)
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c b/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
-index 2cf0c7a3fe23..8b5a2e09c9ed 100644
---- a/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
-+++ b/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
-@@ -18,6 +18,7 @@
- #include <string.h>
- #include <sys/select.h>
- #include <unistd.h>
-+#include <linux/vm_sockets.h>
- 
- #include <bpf/bpf.h>
- #include <bpf/libbpf.h>
-@@ -249,6 +250,16 @@ static void init_addr_loopback6(struct sockaddr_storage *ss, socklen_t *len)
- 	*len = sizeof(*addr6);
- }
- 
-+static void init_addr_loopback_vsock(struct sockaddr_storage *ss, socklen_t *len)
-+{
-+	struct sockaddr_vm *addr = memset(ss, 0, sizeof(*ss));
-+
-+	addr->svm_family = AF_VSOCK;
-+	addr->svm_port = VMADDR_PORT_ANY;
-+	addr->svm_cid = VMADDR_CID_LOCAL;
-+	*len = sizeof(*addr);
-+}
-+
- static void init_addr_loopback(int family, struct sockaddr_storage *ss,
- 			       socklen_t *len)
- {
-@@ -259,6 +270,9 @@ static void init_addr_loopback(int family, struct sockaddr_storage *ss,
- 	case AF_INET6:
- 		init_addr_loopback6(ss, len);
- 		return;
-+	case AF_VSOCK:
-+		init_addr_loopback_vsock(ss, len);
-+		return;
- 	default:
- 		FAIL("unsupported address family %d", family);
- 	}
-@@ -1434,6 +1448,8 @@ static const char *family_str(sa_family_t family)
- 		return "IPv6";
- 	case AF_UNIX:
- 		return "Unix";
-+	case AF_VSOCK:
-+		return "VSOCK";
- 	default:
- 		return "unknown";
- 	}
-@@ -1644,6 +1660,151 @@ static void test_unix_redir(struct test_sockmap_listen *skel, struct bpf_map *ma
- 	unix_skb_redir_to_connected(skel, map, sotype);
- }
- 
-+/* Returns two connected loopback vsock sockets */
-+static int vsock_socketpair_connectible(int sotype, int *v0, int *v1)
-+{
-+	struct sockaddr_storage addr;
-+	socklen_t len = sizeof(addr);
-+	int s, p, c;
-+
-+	s = socket_loopback(AF_VSOCK, sotype);
-+	if (s < 0)
-+		return -1;
-+
-+	c = xsocket(AF_VSOCK, sotype | SOCK_NONBLOCK, 0);
-+	if (c == -1)
-+		goto close_srv;
-+
-+	if (getsockname(s, sockaddr(&addr), &len) < 0)
-+		goto close_cli;
-+
-+	if (connect(c, sockaddr(&addr), len) < 0 && errno != EINPROGRESS) {
-+		FAIL_ERRNO("connect");
-+		goto close_cli;
-+	}
-+
-+	len = sizeof(addr);
-+	p = accept_timeout(s, sockaddr(&addr), &len, IO_TIMEOUT_SEC);
-+	if (p < 0)
-+		goto close_cli;
-+
-+	*v0 = p;
-+	*v1 = c;
-+
-+	return 0;
-+
-+close_cli:
-+	close(c);
-+close_srv:
-+	close(s);
-+
-+	return -1;
-+}
-+
-+static void vsock_unix_redir_connectible(int sock_mapfd, int verd_mapfd,
-+					 enum redir_mode mode, int sotype)
-+{
-+	const char *log_prefix = redir_mode_str(mode);
-+	char a = 'a', b = 'b';
-+	int u0, u1, v0, v1;
-+	int sfd[2];
-+	unsigned int pass;
-+	int err, n;
-+	u32 key;
-+
-+	zero_verdict_count(verd_mapfd);
-+
-+	if (socketpair(AF_UNIX, SOCK_STREAM | SOCK_NONBLOCK, 0, sfd))
-+		return;
-+
-+	u0 = sfd[0];
-+	u1 = sfd[1];
-+
-+	err = vsock_socketpair_connectible(sotype, &v0, &v1);
-+	if (err) {
-+		FAIL("vsock_socketpair_connectible() failed");
-+		goto close_uds;
-+	}
-+
-+	err = add_to_sockmap(sock_mapfd, u0, v0);
-+	if (err) {
-+		FAIL("add_to_sockmap failed");
-+		goto close_vsock;
-+	}
-+
-+	n = write(v1, &a, sizeof(a));
-+	if (n < 0)
-+		FAIL_ERRNO("%s: write", log_prefix);
-+	if (n == 0)
-+		FAIL("%s: incomplete write", log_prefix);
-+	if (n < 1)
-+		goto out;
-+
-+	n = recv(mode == REDIR_INGRESS ? u0 : u1, &b, sizeof(b), MSG_DONTWAIT);
-+	if (n < 0)
-+		FAIL("%s: recv() err, errno=%d", log_prefix, errno);
-+	if (n == 0)
-+		FAIL("%s: incomplete recv", log_prefix);
-+	if (b != a)
-+		FAIL("%s: vsock socket map failed, %c != %c", log_prefix, a, b);
-+
-+	key = SK_PASS;
-+	err = xbpf_map_lookup_elem(verd_mapfd, &key, &pass);
-+	if (err)
-+		goto out;
-+	if (pass != 1)
-+		FAIL("%s: want pass count 1, have %d", log_prefix, pass);
-+out:
-+	key = 0;
-+	bpf_map_delete_elem(sock_mapfd, &key);
-+	key = 1;
-+	bpf_map_delete_elem(sock_mapfd, &key);
-+
-+close_vsock:
-+	close(v0);
-+	close(v1);
-+
-+close_uds:
-+	close(u0);
-+	close(u1);
-+}
-+
-+static void vsock_unix_skb_redir_connectible(struct test_sockmap_listen *skel,
-+					     struct bpf_map *inner_map,
-+					     int sotype)
-+{
-+	int verdict = bpf_program__fd(skel->progs.prog_skb_verdict);
-+	int verdict_map = bpf_map__fd(skel->maps.verdict_map);
-+	int sock_map = bpf_map__fd(inner_map);
-+	int err;
-+
-+	err = xbpf_prog_attach(verdict, sock_map, BPF_SK_SKB_VERDICT, 0);
-+	if (err)
-+		return;
-+
-+	skel->bss->test_ingress = false;
-+	vsock_unix_redir_connectible(sock_map, verdict_map, REDIR_EGRESS, sotype);
-+	skel->bss->test_ingress = true;
-+	vsock_unix_redir_connectible(sock_map, verdict_map, REDIR_INGRESS, sotype);
-+
-+	xbpf_prog_detach2(verdict, sock_map, BPF_SK_SKB_VERDICT);
-+}
-+
-+static void test_vsock_redir(struct test_sockmap_listen *skel, struct bpf_map *map)
-+{
-+	const char *family_name, *map_name;
-+	char s[MAX_TEST_NAME];
-+
-+	family_name = family_str(AF_VSOCK);
-+	map_name = map_type_str(map);
-+	snprintf(s, sizeof(s), "%s %s %s", map_name, family_name, __func__);
-+	if (!test__start_subtest(s))
-+		return;
-+
-+	vsock_unix_skb_redir_connectible(skel, map, SOCK_STREAM);
-+	vsock_unix_skb_redir_connectible(skel, map, SOCK_SEQPACKET);
-+}
-+
- static void test_reuseport(struct test_sockmap_listen *skel,
- 			   struct bpf_map *map, int family, int sotype)
- {
-@@ -2015,12 +2176,14 @@ void serial_test_sockmap_listen(void)
- 	run_tests(skel, skel->maps.sock_map, AF_INET6);
- 	test_unix_redir(skel, skel->maps.sock_map, SOCK_DGRAM);
- 	test_unix_redir(skel, skel->maps.sock_map, SOCK_STREAM);
-+	test_vsock_redir(skel, skel->maps.sock_map);
- 
- 	skel->bss->test_sockmap = false;
- 	run_tests(skel, skel->maps.sock_hash, AF_INET);
- 	run_tests(skel, skel->maps.sock_hash, AF_INET6);
- 	test_unix_redir(skel, skel->maps.sock_hash, SOCK_DGRAM);
- 	test_unix_redir(skel, skel->maps.sock_hash, SOCK_STREAM);
-+	test_vsock_redir(skel, skel->maps.sock_hash);
- 
- 	test_sockmap_listen__destroy(skel);
- }
-
--- 
-2.30.2
+> From: Brijesh Singh <brijesh.singh@amd.com>
+> 
+> When SEV-SNP is enabled in the guest, the hardware places restrictions
+> on all memory accesses based on the contents of the RMP table. When
+> hardware encounters RMP check failure caused by the guest memory access
+> it raises the #NPF. The error code contains additional information on
+> the access type. See the APM volume 2 for additional information.
+> 
+> Page state changes are handled by userspace, so if an RMP fault is
+> triggered as a result of an RMP NPT fault, exit to userspace just like
+> with explicit page-state change requests.
+> 
+> RMP NPT faults can also occur if the guest pvalidates a 2M page as 4K,
+> in which case the RMP entries need to be PSMASH'd. Handle this case
+> immediately in the kernel.
+> 
+> Co-developed-by: Michael Roth <michael.roth@amd.com>
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> ---
+>  arch/x86/kvm/svm/sev.c | 84 ++++++++++++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/svm/svm.c | 21 +++++++++--
+>  arch/x86/kvm/svm/svm.h |  1 +
+>  3 files changed, 102 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 102966c43e28..197b1f904567 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -3347,6 +3347,13 @@ static void set_ghcb_msr(struct vcpu_svm *svm, u64 value)
+>  	svm->vmcb->control.ghcb_gpa = value;
+>  }
+>  
+> +static int snp_rmptable_psmash(struct kvm *kvm, kvm_pfn_t pfn)
+> +{
+> +	pfn = pfn & ~(KVM_PAGES_PER_HPAGE(PG_LEVEL_2M) - 1);
+> +
+> +	return psmash(pfn);
+> +}
+> +
+>  /*
+>   * TODO: need to get the value set by userspace in vcpu->run->vmgexit.ghcb_msr
+>   * and process that here accordingly.
+> @@ -3872,3 +3879,80 @@ void sev_adjust_mapping_level(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int *le
+>  	pr_debug("%s: GFN: 0x%llx, PFN: 0x%llx, level: %d, rmp_level: %d, level_orig: %d, assigned: %d\n",
+>  		 __func__, gfn, pfn, *level, rmp_level, level_orig, assigned);
+>  }
+> +
+> +void handle_rmp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code)
+> +{
+> +	int order, rmp_level, assigned, ret;
+> +	struct kvm_memory_slot *slot;
+> +	struct kvm *kvm = vcpu->kvm;
+> +	kvm_pfn_t pfn;
+> +	gfn_t gfn;
+> +
+> +	/*
+> +	 * Private memslots punt handling of implicit page state changes to
+                             ^put
+> +	 * userspace, so the only RMP faults expected here for
+> +	 * PFERR_GUEST_SIZEM_MASK. Anything else suggests that the RMP table has
+> +	 * gotten out of sync with the private memslot.
+> +	 *
+> +	 * TODO: However, this case has also been noticed when an access occurs
+> +	 * to an NPT mapping that has just been split/PSMASHED, in which case
+> +	 * PFERR_GUEST_SIZEM_MASK might not be set. In those cases it should be
+> +	 * safe to ignore and let the guest retry, but log these just in case
+> +	 * for now.
+> +	 */
+> +	if (!(error_code & PFERR_GUEST_SIZEM_MASK)) {
+> +		pr_warn_ratelimited("Unexpected RMP fault for GPA 0x%llx, error_code 0x%llx",
+> +				    gpa, error_code);
+> +		return;
+> +	}
+> +
+> +	gfn = gpa >> PAGE_SHIFT;
+> +
+> +	/*
+> +	 * Only RMPADJUST/PVALIDATE should cause PFERR_GUEST_SIZEM.
+> +	 *
+> +	 * For PVALIDATE, this should only happen if a guest PVALIDATEs a 4K GFN
+> +	 * that is backed by a huge page in the host whose RMP entry has the
+> +	 * hugepage/assigned bits set. With UPM, that should only ever happen
+> +	 * for private pages.
+> +	 *
+> +	 * For RMPADJUST, this assumption might not hold, in which case handling
+> +	 * for obtaining the PFN from HVA-backed memory may be needed. For now,
+> +	 * just print warnings.
+> +	 */
+> +	if (!kvm_mem_is_private(kvm, gfn)) {
+> +		pr_warn_ratelimited("Unexpected RMP fault, size-mismatch for non-private GPA 0x%llx\n",
+> +				    gpa);
+> +		return;
+> +	}
+> +
+> +	slot = gfn_to_memslot(kvm, gfn);
+> +	if (!kvm_slot_can_be_private(slot)) {
+> +		pr_warn_ratelimited("Unexpected RMP fault, non-private slot for GPA 0x%llx\n",
+> +				    gpa);
+> +		return;
+> +	}
+> +
+> +	ret = kvm_restrictedmem_get_pfn(slot, gfn, &pfn, &order);
+> +	if (ret) {
+> +		pr_warn_ratelimited("Unexpected RMP fault, no private backing page for GPA 0x%llx\n",
+> +				    gpa);
+> +		return;
+> +	}
+> +
+> +	assigned = snp_lookup_rmpentry(pfn, &rmp_level);
+> +	if (assigned != 1) {
+> +		pr_warn_ratelimited("Unexpected RMP fault, no assigned RMP entry for GPA 0x%llx\n",
+> +				    gpa);
+> +		goto out;
+> +	}
+> +
+> +	ret = snp_rmptable_psmash(kvm, pfn);
+> +	if (ret)
+> +		pr_err_ratelimited("Unable to split RMP entries for GPA 0x%llx PFN 0x%llx ret %d\n",
+> +				   gpa, pfn, ret);
+> +
+> +out:
+> +	kvm_zap_gfn_range(kvm, gfn, gfn + PTRS_PER_PMD);
+> +	put_page(pfn_to_page(pfn));
+> +}
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 9eb750c8b04c..f9ab4bf6d245 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -1976,15 +1976,28 @@ static int pf_interception(struct kvm_vcpu *vcpu)
+>  static int npf_interception(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+> +	int rc;
+>  
+>  	u64 fault_address = svm->vmcb->control.exit_info_2;
+>  	u64 error_code = svm->vmcb->control.exit_info_1;
+>  
+>  	trace_kvm_page_fault(vcpu, fault_address, error_code);
+> -	return kvm_mmu_page_fault(vcpu, fault_address, error_code,
+> -			static_cpu_has(X86_FEATURE_DECODEASSISTS) ?
+> -			svm->vmcb->control.insn_bytes : NULL,
+> -			svm->vmcb->control.insn_len);
+> +	rc = kvm_mmu_page_fault(vcpu, fault_address, error_code,
+> +				static_cpu_has(X86_FEATURE_DECODEASSISTS) ?
+> +				svm->vmcb->control.insn_bytes : NULL,
+> +				svm->vmcb->control.insn_len);
+> +
+> +	/*
+> +	 * rc == 0 indicates a userspace exit is needed to handle page
+> +	 * transitions, so do that first before updating the RMP table.
+> +	 */
+> +	if (error_code & PFERR_GUEST_RMP_MASK) {
+> +		if (rc == 0)
+> +			return rc;
+> +		handle_rmp_page_fault(vcpu, fault_address, error_code);
+> +	}
+> +
+> +	return rc;
+>  }
+>  
+>  static int db_interception(struct kvm_vcpu *vcpu)
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 0c655a4d32d5..13b00233b315 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -714,6 +714,7 @@ void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa);
+>  void sev_es_unmap_ghcb(struct vcpu_svm *svm);
+>  struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu);
+>  void sev_adjust_mapping_level(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int *level);
+> +void handle_rmp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code);
+>  
+>  /* vmenter.S */
+>  
 
