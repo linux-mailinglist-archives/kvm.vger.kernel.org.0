@@ -2,760 +2,252 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D85C6A52EF
-	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 07:23:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F22CA6A534E
+	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 07:59:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229976AbjB1GXZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Feb 2023 01:23:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48166 "EHLO
+        id S230170AbjB1G7A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Feb 2023 01:59:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229958AbjB1GXY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Feb 2023 01:23:24 -0500
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEA3ADBD9
-        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 22:23:20 -0800 (PST)
-Received: by mail-pf1-x449.google.com with SMTP id p36-20020a056a000a2400b005f72df7d97bso2613661pfh.19
-        for <kvm@vger.kernel.org>; Mon, 27 Feb 2023 22:23:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3ZJEOIST+SJnVqj4X4EJIooT5+OMH7gtCygAbIcw5/o=;
-        b=HOAzcHnWIKy59peqwYVLYPmkBW88kX6M6h4m8LZOC6KTdTZqOUGksXrllYSZZBgNlO
-         LcU07l8I9Um+TSAnm/dBUlDhEElAv/SaxCL0B/q0MZ/wStVdzIsItXJVw0Q8OX26dHfi
-         eXEoarwEYq3ZzCmCy9rLUqKDJKELWz9Ow2jgRTSRj9T91ikd3dcLO4FI9emIo754H1f1
-         twjkW8QjNBEm2UdIezmN2jF4uNGyb1gR4zW0URSRwTSbVXFgCwCw8XHGuhQhAQoNPlGv
-         k8SbC4nTOtfBkFFN+NhWevRUjnPTjNgOYwzUZZdHH+qu5DFl6B+VOiyy4YtYzsy+Fpdu
-         vSVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3ZJEOIST+SJnVqj4X4EJIooT5+OMH7gtCygAbIcw5/o=;
-        b=MiTVXiAId/k+iw0WFPY3QfG5DWO9DF5EuxeTdzPRn/9dPqLcNMf/Wl+wZ+myZGK9qm
-         grJUYw9ufykXKisviQ5OLvaucmUnLOHquBKIC8zoEoDnlKeUyBU6xLj55TDQRT1HaGoW
-         59waIDpmfANDyrACoLgYbCZIhMuR3k5zzrFv3+waS8r9kqrMW52SWu1VHtyj9WNeTpV4
-         9xkasat09NFpu1WnrDJWDMi56/w+WAi3pznzHeAmhei/fzhi36rhTv81FKievrPWFYex
-         WLCSpM3C8ephVzrgM99GlTD1uZHZ/Ds8OZbnI3dlLkAaln+Ro05TqppCypKFoZHQDE83
-         sBFA==
-X-Gm-Message-State: AO0yUKUSnjTL+SO+lcgta3dsFlaCTXX4/W4Rhzd3IepO4MQdh/dZgrnL
-        KjgZKBo1gHoLI4J8gXYx3yPl7kd9psEBxf2Iwn0YlqgJJgomT6kVaxvFfxC3QHe3zrdzEGSgq95
-        bUYYV1NEIr3hDyvLEEGUNfaCHEQNHevoZULphHHkCyZdu4JhWX48cV9ShrH1lC86x/lBruC8=
-X-Google-Smtp-Source: AK7set/XCWNuZIE5xs0cryaGGU6aq3EXiAEpwBYEoDhYVbHJMzWqLXTpvZNNbZfenMnAEafXr4tycuUX47vC65zgCw==
-X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a17:90a:d344:b0:233:bc72:1c69 with
- SMTP id i4-20020a17090ad34400b00233bc721c69mr701770pjx.9.1677565400176; Mon,
- 27 Feb 2023 22:23:20 -0800 (PST)
-Date:   Tue, 28 Feb 2023 06:22:46 +0000
-In-Reply-To: <20230228062246.1222387-1-jingzhangos@google.com>
-Mime-Version: 1.0
-References: <20230228062246.1222387-1-jingzhangos@google.com>
-X-Mailer: git-send-email 2.39.2.722.g9855ee24e9-goog
-Message-ID: <20230228062246.1222387-7-jingzhangos@google.com>
-Subject: [PATCH v3 6/6] KVM: arm64: Refactor writings for PMUVer/CSV2/CSV3
-From:   Jing Zhang <jingzhangos@google.com>
-To:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@google.com>
-Cc:     Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S230241AbjB1G6v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Feb 2023 01:58:51 -0500
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D4FA298E2;
+        Mon, 27 Feb 2023 22:58:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1677567523; x=1709103523;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=V9ATX6fImnfXz/FUsByfntsCY5wB7qmVhuDhTRctzwo=;
+  b=mlLp+/NKs9vTWKbDLWETeAypTpfC25lL0MBjZIJBh6CpKaMcC9xPaO+0
+   lkaI0DBVVQMgzdaJ2qvCfqNN5yMlcI3LxGEqgzbLnuUOIdyF4Z7DAexkD
+   B741DCvklGv9lE0xYoGOyRlRf2l6QhBfcn/kZnGVb2B/ufSMbzu0Ok1w5
+   nDQmIxKXel3seds1flRIueejkZdtBq2lSWYB3EoMzAaWFBLjLHWakR241
+   RF7AopUaZDAG8y4f6HlegwSGeN8redNkLKOPffiosKaxsaZoeqac1rwbs
+   yEtJeNRBDKGYPq76ov4AqY1VDiYLD7JzbXNqqSr9QV43WmPR2z02SmApi
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10634"; a="396629694"
+X-IronPort-AV: E=Sophos;i="5.98,221,1673942400"; 
+   d="scan'208";a="396629694"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2023 22:58:42 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10634"; a="848151556"
+X-IronPort-AV: E=Sophos;i="5.98,221,1673942400"; 
+   d="scan'208";a="848151556"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orsmga005.jf.intel.com with ESMTP; 27 Feb 2023 22:58:41 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Mon, 27 Feb 2023 22:58:41 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21 via Frontend Transport; Mon, 27 Feb 2023 22:58:41 -0800
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.47) by
+ edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.16; Mon, 27 Feb 2023 22:58:40 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DgBt12EMTEMS3Cor2pHnVotLW4UE3ZtmHNSwnuSdAupnna0Gx7Xu2n1Jo5BWiO7Op9RK1eeOyEVGMbgHivYomenioEGrveRvE7VxA9LP4WuqZ37b6pH0iM8Lj2lKPtNQpmIE2ZcmPxy8MZv/8zI3Cr/aCHTizQHmKkCf48M2I24mUOSQVzID1fzjmNoM/yz28VAgYnw9HHSXhIPmLFlONTPbOHf+458F/Za0rBmDAdkPAM4c3FnblS5mwztRQMdMBmF4ffBu7InRt2F8R2dKmkvd7P7tk44MTZ5aMRYdZRrzkmo1uj7ESG8NFbqYeoPXyQEZrffjpHlusxRx1v1ejw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=V9ATX6fImnfXz/FUsByfntsCY5wB7qmVhuDhTRctzwo=;
+ b=NY5c0fojg/8alF+aV/3U8CmcVeGxeqPVZUBB7Th1Uz+H2mgdwi2WFSUY7tsVVbvBMRtAl5e+KaFPrQtKqLMp09S5BqIiE2XU2UInU7K0p7g0ZUX8HTP6nA80bIIiJ4Zjlgz9S2SQeJy4iWAoGZkzGvF6jtcpKPXjpn8WODwFQTDLAzWS8NpsacvWiGPaagxVQmaJlDI19NzYbpqQdoDZhEYoLnGpcW1q7521KAWzjD4lREYwJXAlAvbazEH2pKfLu1l/hRAshIPjcJbQHWy1hGu0/RadMgRifUM2RpCPM+UC0cWkWkeuNnN2IwVPKLZ2NAlnfy8PpJmaaGjShJz8PA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by DS0PR11MB7768.namprd11.prod.outlook.com (2603:10b6:8:138::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.29; Tue, 28 Feb
+ 2023 06:58:39 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::6f7:944a:aaad:301f]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::6f7:944a:aaad:301f%9]) with mapi id 15.20.6134.029; Tue, 28 Feb 2023
+ 06:58:38 +0000
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>
+Subject: RE: [PATCH v5 10/19] vfio: Add infrastructure for bind_iommufd from
+ userspace
+Thread-Topic: [PATCH v5 10/19] vfio: Add infrastructure for bind_iommufd from
+ userspace
+Thread-Index: AQHZSpxK4wL3BAz2vkuMw78Q2DEYMa7jHbWAgACHOBCAAERLMA==
+Date:   Tue, 28 Feb 2023 06:58:38 +0000
+Message-ID: <DS0PR11MB75298144318DBA9690DC756FC3AC9@DS0PR11MB7529.namprd11.prod.outlook.com>
+References: <20230227111135.61728-1-yi.l.liu@intel.com>
+ <20230227111135.61728-11-yi.l.liu@intel.com> <Y/z2mY97uPsCs6Ix@nvidia.com>
+ <DS0PR11MB75292E7DCC6FFEBF5B5DF66AC3AC9@DS0PR11MB7529.namprd11.prod.outlook.com>
+In-Reply-To: <DS0PR11MB75292E7DCC6FFEBF5B5DF66AC3AC9@DS0PR11MB7529.namprd11.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS0PR11MB7529:EE_|DS0PR11MB7768:EE_
+x-ms-office365-filtering-correlation-id: 3dd4c553-ee03-4f03-a5de-08db195937d2
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: e6TZUG4K16PBUTlOF4GnLWCAOqo1nxAD4EYqLZPU+gRFdesCpj9jI1vBz7+Q5RYw1RtXhoz7qi3uopWolsGmUMMyCmkYcaOJ1VaAkrcRV49iaVLzL7pzPbJZY8YK8dsPgS6piI7VzjAwMBG1psCyrKd1LAQDBQJGx0z371XE1vxjiAVdxAm4rP5JANEC3hRhgq+ipaPuz4gQnk29PuBGf5PRnlC6dow6edw30GwVWAFy093wRf7Q0l7TC8iUMKwgWfgryyVj+VnQYzqlPWS3QPo2B4kbNTUczKOBup1l1p++H/G74HB2pdsbe+tgbz0Pp1B9/J+7H6/y3aJdXqMVKO9Qyjo7BjtQOsq3kHAuXH7EGmdoVsZ1Uatl83ymn5xnZmcNACWyw5OriomzJOiEJGy9THSpwdJqQFSiZJZ5pDJ1oc6juC6YY+5bGfO8a/75QNHfY+7iyXR9S9R7XV3lIFbPClQBYLofqKH2tstUACLxD3lCw+Y3tynYb+FO2n+NI81DUXxSd2MIooLJBguuSS1t1dLBBgbHq4BvsndVyYfWSaWnV9D3msBZ69BhfXSqyMTmSlGD5cc5uJHm/VykUwE3ipvdgmIubybvMD8d5T9yzbmD3k/i2seJBixoxOKatV38UnePp7RAE589xK59SYVBht33vVbOTcTM6hqmqHuP1TPnPIicZ6iBGmbz5YAIdZ+KfVcA75x3LbQeLF7nZA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(376002)(39860400002)(136003)(396003)(366004)(346002)(451199018)(33656002)(54906003)(316002)(83380400001)(71200400001)(66476007)(7696005)(6506007)(2940100002)(26005)(9686003)(5660300002)(478600001)(186003)(52536014)(8936002)(41300700001)(38070700005)(2906002)(86362001)(7416002)(66946007)(66556008)(76116006)(64756008)(38100700002)(8676002)(4326008)(6916009)(82960400001)(122000001)(55016003)(66446008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?WFR5Y2RWYkM4SldZYTFVTWQ4TnRHU3dZVEZPeWFadzhFQUkvRTBrYjQvYWNh?=
+ =?utf-8?B?K3NvUHpueVdMQWs5WldtV2t4VlN4NWFmUlpWb3pLWmhIVzlPRUtUdVJnd3ZL?=
+ =?utf-8?B?dy9mdjd5Q2hJMnFXTkdxRUJVQTJ2TlcwUlFWbVd3YzNuZlBMbUlnOUJjcHZK?=
+ =?utf-8?B?ZjYzN3lBTU1FZXhldTFiVUpsNWEraElOcUVENE9xQktRd0RIMjFvQXRMWFBq?=
+ =?utf-8?B?d1dtQkRvU0oxUHYxMXd3MDI1aXhGWlBiYUxkZEdTTTFFVzM3dnBJZVpMV0FN?=
+ =?utf-8?B?L2dydGdLb2FocWJURGsxeTk1dHppSXdoRnNObWp1dVk2eEVucENwSFVjUmVQ?=
+ =?utf-8?B?UElYWVUzdStMYUttMUUrbU1nejBSQXZaVzhCZHlmVk45aXVxdVIzcWZXV2Q2?=
+ =?utf-8?B?WFNmL09MbGdKUUx4STRLdHoxMnlKRGFPVmllNG0zaEtIZS9kSFdlMDRYckxF?=
+ =?utf-8?B?ekI5S28vR2xiL1EyYjZtekEvL1Fvc2FOTit2RGVTMXgyYVhyZmFPMWgrdFZW?=
+ =?utf-8?B?TzlVUVR3RWppcHpvbGd3dysrK2xFa2R2a1M1ZHJ4MVJsa2wzRk41dFM1VHU4?=
+ =?utf-8?B?WUpmaXpoeFZBWlViNFBmMVBIejZJMkRBeXIrOTJ0bVFKN2xtY0I2UWc1WkdD?=
+ =?utf-8?B?MnNUalV6RHoxeU9aSW9sNHYyUXU4MzNoL1daaVBXNW1YUlF2SXJ3aUpXdEZo?=
+ =?utf-8?B?NzJVTFd6SG5nSGVKVTRDd3ovNHIwdEYzWi81ak56SG1zZ2NMekd4Q0s0eE9V?=
+ =?utf-8?B?WUhjNzI4QUo5US85dEFyeDdSamFsRlZ1MGxxQnFUMTk4Q1dvMmkyRi85NEdN?=
+ =?utf-8?B?OWZlMXhkcW1Hanc1dFBjOXdSNmY0dlJ3eWhkck5kRHFPMXQ0Z3RFQUlIaUFm?=
+ =?utf-8?B?a3QxZU5oVXpFVDRUUjZlN0x1azIyd1ZjOEorMHFOSjFhcmtoY3V3a3d4Qm1L?=
+ =?utf-8?B?b1FDeUpDZ3dxaUJYeVBMbjJMME0xenlaQWh4UG9LR1Eyd1NHV0Q5WkpEdmMr?=
+ =?utf-8?B?aStGYUp3Zk85eW9XdThOTDJxb3ZNMXNRbGdXVWM3c1VhL3FZWWlRdTFLazQ2?=
+ =?utf-8?B?VHQ3ejJCamxMNmtRN1ZLZGdnbk0xaVVhcHZGL2h1TWd4UFJQb1lGMVArTXZt?=
+ =?utf-8?B?NUV3WFU0Y0UyMENGV0l0OGF6K2IveWJiSm9aNVZzcFQwWEQrVG5HRWJoMVZi?=
+ =?utf-8?B?WUUyVXhhY0VDcDMyRVNmc1BUZUt2dUJFdUhxaTE0RnVKMDZqbTBYRXp6Q09t?=
+ =?utf-8?B?T3NuNW9tcERNNFhyTDl2Sy96VGZQcGFZKzFKOUZnbUpIZTNxT3ppRHIrZUFX?=
+ =?utf-8?B?bGtUTjBFNUYyMnQvaVZnRzQzS1R5M2l3VWRKaG84WERzaFpiUXE1K1ZHbnhq?=
+ =?utf-8?B?Y2RTenVDVk4ybnBiMTZNMTl4WjBycUZLTDd1U3BsdDg3QjUxaXUwdjZlNFdo?=
+ =?utf-8?B?NHJqRWVIeUZvbHVXQjdhMm1CTG8zQUxld2lIeFhtTkZmeFhkQStoMTQyQlRp?=
+ =?utf-8?B?VGQxL1MwQUdmTXh4RjJWbWVLYjZ5bC96aHd1OEUwOW5hRFVRYmZiS3pyTzE3?=
+ =?utf-8?B?WXpucERMUGVhUGZ5V0FlbHVpVFo2aEFZZEhudzNEUXdjdFVqVm1xS282cnRL?=
+ =?utf-8?B?dHdJTTM2UlJoV3ZqaTFSRytjWDFWY2thR0JOdldOVlBDUW9vNGhMQ25IL1pR?=
+ =?utf-8?B?QUVqWDk1d0REcFFIWTZqeDRmekc5OHhpYnZrTGNBb2JJN0FTSmYrVEpwbU80?=
+ =?utf-8?B?Smo5VUNUNmgwWDVZMlpvdDJJaDduVWdnbGlnbi9kTkg4S3dDU2dHTHRQelpQ?=
+ =?utf-8?B?SjExbERiU0cyTC9OZlR5NUN4RkIrRGphb1JLZDZTbkhMZGdhbHZCM2lrNkVy?=
+ =?utf-8?B?NGVKLzQ2d0lNSHVlT2VEWTNFM1Y5S25yaVE1WVY3OWdrQVdETURCOGc1Rk14?=
+ =?utf-8?B?Y1dBYlk0STVUSU51VUxUME9WYnIzZWhlM3ZnTkZMMmZ5VUZpdHZxa3NEcU9q?=
+ =?utf-8?B?eGtmODVNZTNNVmlXb3FxRG1GWTdzQU12RjVwVW5kaEJ5Nm1zd2dCdnh3clJV?=
+ =?utf-8?B?cHB0a0t6eEFNeDdDSVN3V2RZSnU2SFZyakpuSEVQYWtWL2J3ZDFMVXlaeUY5?=
+ =?utf-8?Q?n+duw9ZTRJka10s2sW8M1rFJX?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3dd4c553-ee03-4f03-a5de-08db195937d2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Feb 2023 06:58:38.2236
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: oOStA15jmQlZzmyBjI86nuZmII17HHDkc1eQTdAOHxYBGyFILtpsDFaE5SQk8Xe+g4Dn1oPQ0t6umD79vRLNOA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7768
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Save KVM sanitised ID register value in ID descriptor (kvm_sys_val).
-Add an init callback for every ID register to setup kvm_sys_val.
-All per VCPU sanitizations are still handled on the fly during ID
-register read and write from userspace.
-An arm64_ftr_bits array is used to indicate writable feature fields.
-
-Refactor writings for ID_AA64PFR0_EL1.[CSV2|CSV3],
-ID_AA64DFR0_EL1.PMUVer and ID_DFR0_ELF.PerfMon based on utilities
-introduced by ID register descriptor.
-
-No functional change intended.
-
-Co-developed-by: Reiji Watanabe <reijiw@google.com>
-Signed-off-by: Reiji Watanabe <reijiw@google.com>
-Signed-off-by: Jing Zhang <jingzhangos@google.com>
----
- arch/arm64/include/asm/cpufeature.h |  25 +++
- arch/arm64/include/asm/kvm_host.h   |   2 +-
- arch/arm64/kernel/cpufeature.c      |  26 +--
- arch/arm64/kvm/arm.c                |   2 +-
- arch/arm64/kvm/id_regs.c            | 325 ++++++++++++++++++++--------
- arch/arm64/kvm/sys_regs.c           |   3 +-
- arch/arm64/kvm/sys_regs.h           |   2 +-
- 7 files changed, 261 insertions(+), 124 deletions(-)
-
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index fc2c739f48f1..493ec530eefc 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -64,6 +64,30 @@ struct arm64_ftr_bits {
- 	s64		safe_val; /* safe value for FTR_EXACT features */
- };
- 
-+#define __ARM64_FTR_BITS(SIGNED, VISIBLE, STRICT, TYPE, SHIFT, WIDTH, SAFE_VAL) \
-+	{						\
-+		.sign = SIGNED,				\
-+		.visible = VISIBLE,			\
-+		.strict = STRICT,			\
-+		.type = TYPE,				\
-+		.shift = SHIFT,				\
-+		.width = WIDTH,				\
-+		.safe_val = SAFE_VAL,			\
-+	}
-+
-+/* Define a feature with unsigned values */
-+#define ARM64_FTR_BITS(VISIBLE, STRICT, TYPE, SHIFT, WIDTH, SAFE_VAL) \
-+	__ARM64_FTR_BITS(FTR_UNSIGNED, VISIBLE, STRICT, TYPE, SHIFT, WIDTH, SAFE_VAL)
-+
-+/* Define a feature with a signed value */
-+#define S_ARM64_FTR_BITS(VISIBLE, STRICT, TYPE, SHIFT, WIDTH, SAFE_VAL) \
-+	__ARM64_FTR_BITS(FTR_SIGNED, VISIBLE, STRICT, TYPE, SHIFT, WIDTH, SAFE_VAL)
-+
-+#define ARM64_FTR_END					\
-+	{						\
-+		.width = 0,				\
-+	}
-+
- /*
-  * Describe the early feature override to the core override code:
-  *
-@@ -911,6 +935,7 @@ static inline unsigned int get_vmid_bits(u64 mmfr1)
- 	return 8;
- }
- 
-+s64 arm64_ftr_safe_value(const struct arm64_ftr_bits *ftrp, s64 new, s64 cur);
- struct arm64_ftr_reg *get_arm64_ftr_reg(u32 sys_id);
- 
- extern struct arm64_ftr_override id_aa64mmfr1_override;
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index effb61a9a855..4795f81b31b4 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1015,7 +1015,7 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
- long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
- 				struct kvm_arm_copy_mte_tags *copy_tags);
- 
--void kvm_arm_set_default_id_regs(struct kvm *kvm);
-+void kvm_arm_init_id_regs(struct kvm *kvm);
- 
- /* Guest/host FPSIMD coordination helpers */
- int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 23bd2a926b74..e18848ee4b98 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -139,30 +139,6 @@ void dump_cpu_features(void)
- 	pr_emerg("0x%*pb\n", ARM64_NCAPS, &cpu_hwcaps);
- }
- 
--#define __ARM64_FTR_BITS(SIGNED, VISIBLE, STRICT, TYPE, SHIFT, WIDTH, SAFE_VAL) \
--	{						\
--		.sign = SIGNED,				\
--		.visible = VISIBLE,			\
--		.strict = STRICT,			\
--		.type = TYPE,				\
--		.shift = SHIFT,				\
--		.width = WIDTH,				\
--		.safe_val = SAFE_VAL,			\
--	}
--
--/* Define a feature with unsigned values */
--#define ARM64_FTR_BITS(VISIBLE, STRICT, TYPE, SHIFT, WIDTH, SAFE_VAL) \
--	__ARM64_FTR_BITS(FTR_UNSIGNED, VISIBLE, STRICT, TYPE, SHIFT, WIDTH, SAFE_VAL)
--
--/* Define a feature with a signed value */
--#define S_ARM64_FTR_BITS(VISIBLE, STRICT, TYPE, SHIFT, WIDTH, SAFE_VAL) \
--	__ARM64_FTR_BITS(FTR_SIGNED, VISIBLE, STRICT, TYPE, SHIFT, WIDTH, SAFE_VAL)
--
--#define ARM64_FTR_END					\
--	{						\
--		.width = 0,				\
--	}
--
- static void cpu_enable_cnp(struct arm64_cpu_capabilities const *cap);
- 
- static bool __system_matches_cap(unsigned int n);
-@@ -790,7 +766,7 @@ static u64 arm64_ftr_set_value(const struct arm64_ftr_bits *ftrp, s64 reg,
- 	return reg;
- }
- 
--static s64 arm64_ftr_safe_value(const struct arm64_ftr_bits *ftrp, s64 new,
-+s64 arm64_ftr_safe_value(const struct arm64_ftr_bits *ftrp, s64 new,
- 				s64 cur)
- {
- 	s64 ret = 0;
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index fb2de2cb98cb..e539d9ca9d01 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -135,7 +135,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	/* The maximum number of VCPUs is limited by the host's GIC model */
- 	kvm->max_vcpus = kvm_arm_default_max_vcpus();
- 
--	kvm_arm_set_default_id_regs(kvm);
-+	kvm_arm_init_id_regs(kvm);
- 	kvm_arm_init_hypercalls(kvm);
- 
- 	return 0;
-diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
-index fc0dcd557cbb..6578bce81854 100644
---- a/arch/arm64/kvm/id_regs.c
-+++ b/arch/arm64/kvm/id_regs.c
-@@ -18,10 +18,88 @@
- 
- #include "sys_regs.h"
- 
-+/*
-+ * Number of entries in id_reg_desc's ftr_bits[] (Number of 4 bits fields
-+ * in 64 bit register + 1 entry for a terminator entry).
-+ */
-+#define	FTR_FIELDS_NUM	17
-+
- struct id_reg_desc {
- 	const struct sys_reg_desc	reg_desc;
-+	/*
-+	 * KVM sanitised ID register value.
-+	 * It is the default value for per VM emulated ID register.
-+	 */
-+	u64 kvm_sys_val;
-+	/*
-+	 * Used to validate the ID register values with arm64_check_features().
-+	 * The last item in the array must be terminated by an item whose
-+	 * width field is zero as that is expected by arm64_check_features().
-+	 * Only feature bits defined in this array are writable.
-+	 */
-+	struct arm64_ftr_bits	ftr_bits[FTR_FIELDS_NUM];
-+
-+	/*
-+	 * Basically init() is used to setup the KVM sanitised value
-+	 * stored in kvm_sys_val.
-+	 */
-+	void (*init)(struct id_reg_desc *idr);
- };
- 
-+static struct id_reg_desc id_reg_descs[];
-+
-+/**
-+ * arm64_check_features() - Check if a feature register value constitutes
-+ * a subset of features indicated by @limit.
-+ *
-+ * @ftrp: Pointer to an array of arm64_ftr_bits. It must be terminated by
-+ * an item whose width field is zero.
-+ * @val: The feature register value to check
-+ * @limit: The limit value of the feature register
-+ *
-+ * This function will check if each feature field of @val is the "safe" value
-+ * against @limit based on @ftrp[], each of which specifies the target field
-+ * (shift, width), whether or not the field is for a signed value (sign),
-+ * how the field is determined to be "safe" (type), and the safe value
-+ * (safe_val) when type == FTR_EXACT (safe_val won't be used by this
-+ * function when type != FTR_EXACT). Any other fields in arm64_ftr_bits
-+ * won't be used by this function. If a field value in @val is the same
-+ * as the one in @limit, it is always considered the safe value regardless
-+ * of the type. For register fields that are not in @ftrp[], only the value
-+ * in @limit is considered the safe value.
-+ *
-+ * Return: 0 if all the fields are safe. Otherwise, return negative errno.
-+ */
-+static int arm64_check_features(const struct arm64_ftr_bits *ftrp, u64 val, u64 limit)
-+{
-+	u64 mask = 0;
-+
-+	for (; ftrp->width; ftrp++) {
-+		s64 f_val, f_lim, safe_val;
-+
-+		f_val = arm64_ftr_value(ftrp, val);
-+		f_lim = arm64_ftr_value(ftrp, limit);
-+		mask |= arm64_ftr_mask(ftrp);
-+
-+		if (f_val == f_lim)
-+			safe_val = f_val;
-+		else
-+			safe_val = arm64_ftr_safe_value(ftrp, f_val, f_lim);
-+
-+		if (safe_val != f_val)
-+			return -E2BIG;
-+	}
-+
-+	/*
-+	 * For fields that are not indicated in ftrp, values in limit are the
-+	 * safe values.
-+	 */
-+	if ((val & ~mask) != (limit & ~mask))
-+		return -E2BIG;
-+
-+	return 0;
-+}
-+
- static u8 vcpu_pmuver(const struct kvm_vcpu *vcpu)
- {
- 	if (kvm_vcpu_has_pmu(vcpu))
-@@ -67,7 +145,6 @@ u64 kvm_arm_read_id_reg_with_encoding(const struct kvm_vcpu *vcpu, u32 id)
- 	case SYS_ID_AA64PFR0_EL1:
- 		if (!vcpu_has_sve(vcpu))
- 			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_SVE);
--		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_AMU);
- 		if (kvm_vgic_global_state.type == VGIC_V3) {
- 			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC);
- 			val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC), 1);
-@@ -94,15 +171,10 @@ u64 kvm_arm_read_id_reg_with_encoding(const struct kvm_vcpu *vcpu, u32 id)
- 			val &= ~ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_WFxT);
- 		break;
- 	case SYS_ID_AA64DFR0_EL1:
--		/* Limit debug to ARMv8.0 */
--		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_DebugVer);
--		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_DebugVer), 6);
- 		/* Set PMUver to the required version */
- 		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
- 		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
- 				  vcpu_pmuver(vcpu));
--		/* Hide SPE from guests */
--		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMSVer);
- 		break;
- 	case SYS_ID_DFR0_EL1:
- 		val &= ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
-@@ -161,9 +233,15 @@ static int get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 		      u64 val)
- {
--	/* This is what we mean by invariant: you can't change it. */
--	if (val != read_id_reg(vcpu, rd))
--		return -EINVAL;
-+	int ret;
-+	int id = reg_to_encoding(rd);
-+
-+	ret = arm64_check_features(id_reg_descs[IDREG_IDX(id)].ftr_bits, val,
-+				   id_reg_descs[IDREG_IDX(id)].kvm_sys_val);
-+	if (ret)
-+		return ret;
-+
-+	IDREG(vcpu->kvm, id) = val;
- 
- 	return 0;
- }
-@@ -197,12 +275,47 @@ static unsigned int aa32_id_visibility(const struct kvm_vcpu *vcpu,
- 	return id_visibility(vcpu, r);
- }
- 
-+static void init_id_reg(struct id_reg_desc *idr)
-+{
-+	idr->kvm_sys_val = read_sanitised_ftr_reg(reg_to_encoding(&idr->reg_desc));
-+}
-+
-+static void init_id_aa64pfr0_el1(struct id_reg_desc *idr)
-+{
-+	u64 val;
-+	u32 id = reg_to_encoding(&idr->reg_desc);
-+
-+	val = read_sanitised_ftr_reg(id);
-+	/*
-+	 * The default is to expose CSV2 == 1 if the HW isn't affected.
-+	 * Although this is a per-CPU feature, we make it global because
-+	 * asymmetric systems are just a nuisance.
-+	 *
-+	 * Userspace can override this as long as it doesn't promise
-+	 * the impossible.
-+	 */
-+	if (arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED) {
-+		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2);
-+		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2), 1);
-+	}
-+	if (arm64_get_meltdown_state() == SPECTRE_UNAFFECTED) {
-+		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3);
-+		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3), 1);
-+	}
-+
-+	val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_AMU);
-+
-+	val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC);
-+	val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC), 1);
-+
-+	idr->kvm_sys_val = val;
-+}
-+
- static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
- 			       const struct sys_reg_desc *rd,
- 			       u64 val)
- {
- 	u8 csv2, csv3;
--	u64 sval = val;
- 
- 	/*
- 	 * Allow AA64PFR0_EL1.CSV2 to be set from userspace as long as
-@@ -220,16 +333,29 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
- 	    (csv3 && arm64_get_meltdown_state() != SPECTRE_UNAFFECTED))
- 		return -EINVAL;
- 
--	/* We can only differ with CSV[23], and anything else is an error */
--	val ^= read_id_reg(vcpu, rd);
--	val &= ~(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2) |
--		 ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3));
--	if (val)
--		return -EINVAL;
-+	return set_id_reg(vcpu, rd, val);
-+}
- 
--	IDREG_RD(vcpu->kvm, rd) = sval;
-+static void init_id_aa64dfr0_el1(struct id_reg_desc *idr)
-+{
-+	u64 val;
-+	u32 id = reg_to_encoding(&idr->reg_desc);
- 
--	return 0;
-+	val = read_sanitised_ftr_reg(id);
-+	/* Limit debug to ARMv8.0 */
-+	val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_DebugVer);
-+	val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_DebugVer), 6);
-+	/*
-+	 * Initialise the default PMUver before there is a chance to
-+	 * create an actual PMU.
-+	 */
-+	val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
-+	val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
-+			  kvm_arm_pmu_get_pmuver_limit());
-+	/* Hide SPE from guests */
-+	val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMSVer);
-+
-+	idr->kvm_sys_val = val;
- }
- 
- static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
-@@ -238,6 +364,7 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
- {
- 	u8 pmuver, host_pmuver;
- 	bool valid_pmu;
-+	int ret;
- 
- 	host_pmuver = kvm_arm_pmu_get_pmuver_limit();
- 
-@@ -257,35 +384,55 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
- 	if (kvm_vcpu_has_pmu(vcpu) != valid_pmu)
- 		return -EINVAL;
- 
--	/* We can only differ with PMUver, and anything else is an error */
--	val ^= read_id_reg(vcpu, rd);
--	val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
--	if (val)
--		return -EINVAL;
--
- 	if (valid_pmu) {
--		IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
--		IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) |=
--			FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), pmuver);
-+		ret = set_id_reg(vcpu, rd, val);
-+		if (ret)
-+			return ret;
- 
- 		IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) &= ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
- 		IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) |=
- 			FIELD_PREP(ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon), pmuver);
--	} else if (pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF) {
--		set_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags);
- 	} else {
--		clear_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags);
-+		/* We can only differ with PMUver, and anything else is an error */
-+		val ^= read_id_reg(vcpu, rd);
-+		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
-+		if (val)
-+			return -EINVAL;
-+
-+		if (pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF)
-+			set_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags);
-+		else
-+			clear_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags);
-+
- 	}
- 
- 	return 0;
- }
- 
-+static void init_id_dfr0_el1(struct id_reg_desc *idr)
-+{
-+	u64 val;
-+	u32 id = reg_to_encoding(&idr->reg_desc);
-+
-+	val = read_sanitised_ftr_reg(id);
-+	/*
-+	 * Initialise the default PMUver before there is a chance to
-+	 * create an actual PMU.
-+	 */
-+	val &= ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
-+	val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon),
-+			  kvm_arm_pmu_get_pmuver_limit());
-+
-+	idr->kvm_sys_val = val;
-+}
-+
- static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
- 			   const struct sys_reg_desc *rd,
- 			   u64 val)
- {
- 	u8 perfmon, host_perfmon;
- 	bool valid_pmu;
-+	int ret;
- 
- 	host_perfmon = pmuver_to_perfmon(kvm_arm_pmu_get_pmuver_limit());
- 
-@@ -306,38 +453,43 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
- 	if (kvm_vcpu_has_pmu(vcpu) != valid_pmu)
- 		return -EINVAL;
- 
--	/* We can only differ with PerfMon, and anything else is an error */
--	val ^= read_id_reg(vcpu, rd);
--	val &= ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
--	if (val)
--		return -EINVAL;
--
- 	if (valid_pmu) {
--		IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) &= ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
--		IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) |= FIELD_PREP(
--			ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon), perfmon_to_pmuver(perfmon));
-+		ret = set_id_reg(vcpu, rd, val);
-+		if (ret)
-+			return ret;
- 
- 		IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
- 		IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) |= FIELD_PREP(
- 			ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), perfmon_to_pmuver(perfmon));
--	} else if (perfmon == ID_DFR0_EL1_PerfMon_IMPDEF) {
--		set_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags);
- 	} else {
--		clear_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags);
-+		/* We can only differ with PerfMon, and anything else is an error */
-+		val ^= read_id_reg(vcpu, rd);
-+		val &= ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
-+		if (val)
-+			return -EINVAL;
-+
-+		if (perfmon == ID_DFR0_EL1_PerfMon_IMPDEF)
-+			set_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags);
-+		else
-+			clear_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags);
- 	}
- 
- 	return 0;
- }
- 
- /* sys_reg_desc initialiser for known cpufeature ID registers */
-+#define SYS_DESC_SANITISED(name) {			\
-+	SYS_DESC(SYS_##name),				\
-+	.access	= access_id_reg,			\
-+	.get_user = get_id_reg,				\
-+	.set_user = set_id_reg,				\
-+	.visibility = id_visibility,			\
-+}
-+
- #define ID_SANITISED(name) {				\
--	.reg_desc = {					\
--		SYS_DESC(SYS_##name),			\
--		.access	= access_id_reg,		\
--		.get_user = get_id_reg,			\
--		.set_user = set_id_reg,			\
--		.visibility = id_visibility,		\
--	},						\
-+	.reg_desc = SYS_DESC_SANITISED(name),		\
-+	.ftr_bits = { ARM64_FTR_END, },			\
-+	.init = init_id_reg,				\
- }
- 
- /* sys_reg_desc initialiser for known cpufeature ID registers */
-@@ -349,6 +501,8 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
- 		.set_user = set_id_reg,			\
- 		.visibility = aa32_id_visibility,	\
- 	},						\
-+	.ftr_bits = { ARM64_FTR_END, },			\
-+	.init = init_id_reg,				\
- }
- 
- /*
-@@ -364,6 +518,7 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
- 		.set_user = set_id_reg,				\
- 		.visibility = raz_visibility			\
- 	},							\
-+	.ftr_bits = { ARM64_FTR_END, },				\
- }
- 
- /*
-@@ -379,9 +534,10 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
- 		.set_user = set_id_reg,			\
- 		.visibility = raz_visibility,		\
- 	},						\
-+	.ftr_bits = { ARM64_FTR_END, },			\
- }
- 
--static const struct id_reg_desc id_reg_descs[KVM_ARM_ID_REG_NUM] = {
-+static struct id_reg_desc id_reg_descs[KVM_ARM_ID_REG_NUM] = {
- 	/*
- 	 * ID regs: all ID_SANITISED() entries here must have corresponding
- 	 * entries in arm64_ftr_regs[].
-@@ -397,6 +553,11 @@ static const struct id_reg_desc id_reg_descs[KVM_ARM_ID_REG_NUM] = {
- 		.get_user = get_id_reg,
- 		.set_user = set_id_dfr0_el1,
- 		.visibility = aa32_id_visibility, },
-+	  .ftr_bits = {
-+		ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE,
-+			ID_DFR0_EL1_PerfMon_SHIFT, ID_DFR0_EL1_PerfMon_WIDTH, 0),
-+		ARM64_FTR_END, },
-+	  .init = init_id_dfr0_el1,
- 	},
- 	ID_HIDDEN(ID_AFR0_EL1),
- 	AA32_ID_SANITISED(ID_MMFR0_EL1),
-@@ -431,6 +592,13 @@ static const struct id_reg_desc id_reg_descs[KVM_ARM_ID_REG_NUM] = {
- 		.access = access_id_reg,
- 		.get_user = get_id_reg,
- 		.set_user = set_id_aa64pfr0_el1, },
-+	  .ftr_bits = {
-+		ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE,
-+			ID_AA64PFR0_EL1_CSV2_SHIFT, ID_AA64PFR0_EL1_CSV2_WIDTH, 0),
-+		ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE,
-+			ID_AA64PFR0_EL1_CSV3_SHIFT, ID_AA64PFR0_EL1_CSV3_WIDTH, 0),
-+		ARM64_FTR_END, },
-+	  .init = init_id_aa64pfr0_el1,
- 	},
- 	ID_SANITISED(ID_AA64PFR1_EL1),
- 	ID_UNALLOCATED(4, 2),
-@@ -446,6 +614,11 @@ static const struct id_reg_desc id_reg_descs[KVM_ARM_ID_REG_NUM] = {
- 		.access = access_id_reg,
- 		.get_user = get_id_reg,
- 		.set_user = set_id_aa64dfr0_el1, },
-+	  .ftr_bits = {
-+		ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE,
-+			ID_AA64DFR0_EL1_PMUVer_SHIFT, ID_AA64DFR0_EL1_PMUVer_WIDTH, 0),
-+		ARM64_FTR_END, },
-+	  .init = init_id_aa64dfr0_el1,
- 	},
- 	ID_SANITISED(ID_AA64DFR1_EL1),
- 	ID_UNALLOCATED(5, 2),
-@@ -575,7 +748,7 @@ int kvm_arm_set_id_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	return ret;
- }
- 
--bool kvm_arm_check_idreg_table(void)
-+bool kvm_arm_idreg_table_init(void)
- {
- 	unsigned int i;
- 
-@@ -587,6 +760,9 @@ bool kvm_arm_check_idreg_table(void)
- 				&id_reg_descs[i].reg_desc, i);
- 			return false;
- 		}
-+
-+		if (id_reg_descs[i].init)
-+			id_reg_descs[i].init(&id_reg_descs[i]);
- 	}
- 
- 	return true;
-@@ -610,55 +786,16 @@ int kvm_arm_walk_id_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
- }
- 
- /*
-- * Set the guest's ID registers that are defined in id_reg_descs[]
-- * with ID_SANITISED() to the host's sanitized value.
-+ * Initialize the guest's ID registers with KVM sanitised values that were setup
-+ * during ID register descriptors initialization.
-  */
--void kvm_arm_set_default_id_regs(struct kvm *kvm)
-+void kvm_arm_init_id_regs(struct kvm *kvm)
- {
- 	int i;
- 	u32 id;
--	u64 val;
- 
- 	for (i = 0; i < ARRAY_SIZE(id_reg_descs); i++) {
- 		id = reg_to_encoding(&id_reg_descs[i].reg_desc);
--		if (WARN_ON_ONCE(!is_id_reg(id)))
--			/* Shouldn't happen */
--			continue;
--
--		if (id_reg_descs[i].reg_desc.visibility == raz_visibility)
--			/* Hidden or reserved ID register */
--			continue;
--
--		val = read_sanitised_ftr_reg(id);
--		IDREG(kvm, id) = val;
-+		IDREG(kvm, id) = id_reg_descs[i].kvm_sys_val;
- 	}
--	/*
--	 * The default is to expose CSV2 == 1 if the HW isn't affected.
--	 * Although this is a per-CPU feature, we make it global because
--	 * asymmetric systems are just a nuisance.
--	 *
--	 * Userspace can override this as long as it doesn't promise
--	 * the impossible.
--	 */
--	val = IDREG(kvm, SYS_ID_AA64PFR0_EL1);
--
--	if (arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED) {
--		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2);
--		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2), 1);
--	}
--	if (arm64_get_meltdown_state() == SPECTRE_UNAFFECTED) {
--		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3);
--		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3), 1);
--	}
--
--	IDREG(kvm, SYS_ID_AA64PFR0_EL1) = val;
--
--	/*
--	 * Initialise the default PMUver before there is a chance to
--	 * create an actual PMU.
--	 */
--	IDREG(kvm, SYS_ID_AA64DFR0_EL1) &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
--	IDREG(kvm, SYS_ID_AA64DFR0_EL1) |=
--		FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
--			   kvm_arm_pmu_get_pmuver_limit());
- }
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 7b63d9038639..e09730a6cba4 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2912,14 +2912,13 @@ int __init kvm_sys_reg_table_init(void)
- 	unsigned int i;
- 
- 	/* Make sure tables are unique and in order. */
--	valid &= kvm_arm_check_idreg_table();
- 	valid &= check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs), false);
- 	valid &= check_sysreg_table(cp14_regs, ARRAY_SIZE(cp14_regs), true);
- 	valid &= check_sysreg_table(cp14_64_regs, ARRAY_SIZE(cp14_64_regs), true);
- 	valid &= check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs), true);
- 	valid &= check_sysreg_table(cp15_64_regs, ARRAY_SIZE(cp15_64_regs), true);
- 	valid &= check_sysreg_table(invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs), false);
--
-+	valid &= kvm_arm_idreg_table_init();
- 	if (!valid)
- 		return -EINVAL;
- 
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index 094a7f19d93f..379e42d70caf 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -260,7 +260,7 @@ int emulate_id_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *params);
- void kvm_arm_reset_id_regs(struct kvm_vcpu *vcpu);
- int kvm_arm_get_id_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
- int kvm_arm_set_id_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
--bool kvm_arm_check_idreg_table(void);
-+bool kvm_arm_idreg_table_init(void);
- int kvm_arm_walk_id_regs(struct kvm_vcpu *vcpu, u64 __user *uind);
- u64 kvm_arm_read_id_reg_with_encoding(const struct kvm_vcpu *vcpu, u32 id);
- 
--- 
-2.39.2.722.g9855ee24e9-goog
-
+PiBGcm9tOiBMaXUsIFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4NCj4gU2VudDogVHVlc2RheSwg
+RmVicnVhcnkgMjgsIDIwMjMgMTA6MzUgQU0NCj4gDQo+ID4gRnJvbTogSmFzb24gR3VudGhvcnBl
+IDxqZ2dAbnZpZGlhLmNvbT4NCj4gPiBTZW50OiBUdWVzZGF5LCBGZWJydWFyeSAyOCwgMjAyMyAy
+OjMwIEFNDQo+ID4NCj4gPiBPbiBNb24sIEZlYiAyNywgMjAyMyBhdCAwMzoxMToyNkFNIC0wODAw
+LCBZaSBMaXUgd3JvdGU6DQo+ID4gPiBGb3IgdGhlIGRldmljZSBmZCBvcGVuZWQgZnJvbSBjZGV2
+LCB1c2Vyc3BhY2UgbmVlZHMgdG8gYmluZCBpdCB0byBhbg0KPiA+ID4gaW9tbXVmZCBhbmQgYXR0
+YWNoIGl0IHRvIElPQVMgbWFuYWdlZCBieSBpb21tdWZkLiBXaXRoIHN1Y2gNCj4gPiBvcGVyYXRp
+b25zLA0KPiA+ID4gdXNlcnNwYWNlIGNhbiBzZXQgdXAgYSBzZWN1cmUgRE1BIGNvbnRleHQgYW5k
+IGhlbmNlIGFjY2VzcyBkZXZpY2UuDQo+ID4gPg0KPiA+ID4gVGhpcyBjaGFuZ2VzIHRoZSBleGlz
+dGluZyB2ZmlvX2lvbW11ZmRfYmluZCgpIHRvIGFjY2VwdCBhIHB0X2lkIHBvaW50ZXINCj4gPiA+
+IGFzIGFuIG9wdGlvbmFsIGlucHV0LCBhbmQgYWxzbyBhbiBkZXZfaWQgcG9pbnRlciB0byBzZWxl
+Y3RpdmVseSByZXR1cm4NCj4gPiA+IHRoZSBkZXZfaWQgdG8gcHJlcGFyZSBmb3IgYWRkaW5nIGJp
+bmRfaW9tbXVmZCBpb2N0bCwgd2hpY2ggZG9lcyB0aGUNCj4gYmluZA0KPiA+ID4gZmlyc3QgYW5k
+IHRoZW4gYXR0YWNoIElPQVMuDQo+ID4gPg0KPiA+ID4gU2lnbmVkLW9mZi1ieTogWWkgTGl1IDx5
+aS5sLmxpdUBpbnRlbC5jb20+DQo+ID4gPiBSZXZpZXdlZC1ieTogS2V2aW4gVGlhbiA8a2V2aW4u
+dGlhbkBpbnRlbC5jb20+DQo+ID4gPiAtLS0NCj4gPiA+ICBkcml2ZXJzL3ZmaW8vZ3JvdXAuYyAg
+ICAgfCAxNyArKysrKysrKysrKysrKy0tLQ0KPiA+ID4gIGRyaXZlcnMvdmZpby9pb21tdWZkLmMg
+ICB8IDIxICsrKysrKysrKy0tLS0tLS0tLS0tLQ0KPiA+ID4gIGRyaXZlcnMvdmZpby92ZmlvLmgg
+ICAgICB8ICA5ICsrKysrKy0tLQ0KPiA+ID4gIGRyaXZlcnMvdmZpby92ZmlvX21haW4uYyB8IDEw
+ICsrKysrKy0tLS0NCj4gPiA+ICA0IGZpbGVzIGNoYW5nZWQsIDM1IGluc2VydGlvbnMoKyksIDIy
+IGRlbGV0aW9ucygtKQ0KPiA+ID4NCj4gPiA+IGRpZmYgLS1naXQgYS9kcml2ZXJzL3ZmaW8vZ3Jv
+dXAuYyBiL2RyaXZlcnMvdmZpby9ncm91cC5jDQo+ID4gPiBpbmRleCBkODc3MWQ1ODVjYjEuLmU0
+NDIzMjU1MTQ0OCAxMDA2NDQNCj4gPiA+IC0tLSBhL2RyaXZlcnMvdmZpby9ncm91cC5jDQo+ID4g
+PiArKysgYi9kcml2ZXJzL3ZmaW8vZ3JvdXAuYw0KPiA+ID4gQEAgLTE2OSw2ICsxNjksNyBAQCBz
+dGF0aWMgdm9pZA0KPiA+IHZmaW9fZGV2aWNlX2dyb3VwX2dldF9rdm1fc2FmZShzdHJ1Y3QgdmZp
+b19kZXZpY2UgKmRldmljZSkNCj4gPiA+ICBzdGF0aWMgaW50IHZmaW9fZGV2aWNlX2dyb3VwX29w
+ZW4oc3RydWN0IHZmaW9fZGV2aWNlX2ZpbGUgKmRmKQ0KPiA+ID4gIHsNCj4gPiA+ICAJc3RydWN0
+IHZmaW9fZGV2aWNlICpkZXZpY2UgPSBkZi0+ZGV2aWNlOw0KPiA+ID4gKwl1MzIgaW9hc19pZDsN
+Cj4gPiA+ICAJaW50IHJldDsNCj4gPiA+DQo+ID4gPiAgCW11dGV4X2xvY2soJmRldmljZS0+Z3Jv
+dXAtPmdyb3VwX2xvY2spOw0KPiA+ID4gQEAgLTE3Nyw2ICsxNzgsMTMgQEAgc3RhdGljIGludCB2
+ZmlvX2RldmljZV9ncm91cF9vcGVuKHN0cnVjdA0KPiA+IHZmaW9fZGV2aWNlX2ZpbGUgKmRmKQ0K
+PiA+ID4gIAkJZ290byBvdXRfdW5sb2NrOw0KPiA+ID4gIAl9DQo+ID4gPg0KPiA+ID4gKwlpZiAo
+ZGV2aWNlLT5ncm91cC0+aW9tbXVmZCkgew0KPiA+ID4gKwkJcmV0ID0gaW9tbXVmZF92ZmlvX2Nv
+bXBhdF9pb2FzX2lkKGRldmljZS0+Z3JvdXAtDQo+ID4gPmlvbW11ZmQsDQo+ID4gPiArCQkJCQkJ
+ICAmaW9hc19pZCk7DQo+ID4gPiArCQlpZiAocmV0KQ0KPiA+ID4gKwkJCWdvdG8gb3V0X3VubG9j
+azsNCj4gPiA+ICsJfQ0KPiA+DQo+ID4gSSBkb24ndCByZWFsbHkgbGlrZSB0aGlzIGJlaW5nIG1v
+dmVkIG91dCBvZiBpb21tdWZkLmMNCj4gPg0KPiA+IFBhc3MgaW4gYSBOVUxMIHB0X2lkIGFuZCB0
+aGUgZG8gc29tZQ0KPiA+DQo+ID4gPiAtaW50IHZmaW9faW9tbXVmZF9iaW5kKHN0cnVjdCB2Zmlv
+X2RldmljZSAqdmRldiwgc3RydWN0IGlvbW11ZmRfY3R4DQo+ID4gKmljdHgpDQo+ID4gPiAraW50
+IHZmaW9faW9tbXVmZF9iaW5kKHN0cnVjdCB2ZmlvX2RldmljZSAqdmRldiwgc3RydWN0IGlvbW11
+ZmRfY3R4DQo+ID4gKmljdHgsDQo+ID4gPiArCQkgICAgICB1MzIgKmRldl9pZCwgdTMyICpwdF9p
+ZCkNCj4gPiA+ICB7DQo+ID4gPiAtCXUzMiBpb2FzX2lkOw0KPiA+ID4gIAl1MzIgZGV2aWNlX2lk
+Ow0KPiA+ID4gIAlpbnQgcmV0Ow0KPiA+ID4NCj4gPiA+IEBAIC0yOSwxNyArMjksMTQgQEAgaW50
+IHZmaW9faW9tbXVmZF9iaW5kKHN0cnVjdCB2ZmlvX2RldmljZSAqdmRldiwNCj4gPiBzdHJ1Y3Qg
+aW9tbXVmZF9jdHggKmljdHgpDQo+ID4gPiAgCWlmIChyZXQpDQo+ID4gPiAgCQlyZXR1cm4gcmV0
+Ow0KPiA+ID4NCj4gPiA+IC0JcmV0ID0gaW9tbXVmZF92ZmlvX2NvbXBhdF9pb2FzX2lkKGljdHgs
+ICZpb2FzX2lkKTsNCj4gPiA+IC0JaWYgKHJldCkNCj4gPiA+IC0JCWdvdG8gZXJyX3VuYmluZDsN
+Cj4gPg0KPiA+ICAgaW9faW9tbXVmZF9iaW5kKHN0cnVjdCB2ZmlvX2RldmljZSAqdmRldiwgc3Ry
+dWN0IGlvbW11ZmRfY3R4ICppY3R4LA0KPiA+IAkJICAgICAgdTMyICpkZXZfaWQsIHUzMiAqcHRf
+aWQpDQo+ID4gew0KPiA+ICAgIHUzMiB0bXBfcHRfaWQ7DQo+ID4gICAgaWYgKCFwdF9pZCkgew0K
+PiA+ICAgICAgICBwdF9pZCA9ICZ0bXBfcHRfaWQ7DQo+ID4gICAgICAgIHJldCA9IGlvbW11ZmRf
+dmZpb19jb21wYXRfaW9hc19pZChpY3R4LCBwdF9pZCk7DQo+ID4gICAgICAgIGlmIChyZXQpDQo+
+ID4gCQlnb3RvIGVycl91bmJpbmQ7DQo+ID4NCj4gPiAgICB9DQo+ID4NCj4gPiBUbyBoYW5kbGUg
+aXQNCj4gPg0KPiA+IEFuZCB0aGUgY29tbWl0IG1lc3NhZ2UgaXMgc29ydCBvZiBvdXQgb2Ygc3lu
+YyB3aXRoIHRoZSBwYXRjaCwgbW9yZSBsaWtlOg0KPiA+DQo+ID4gdmZpbzogUGFzcyB0aGUgcHRf
+aWQgYXMgYW4gYXJndW1lbnQgdG8gdmZpb19pb21tdWZkX2JpbmQoKQ0KPiA+DQo+ID4gVG8gc3Vw
+cG9ydCBiaW5kaW5nIHRoZSBjZGV2IHRoZSBwdF9pZCBtdXN0IGNvbWUgZnJvbSB1c2Vyc3BhY2Ug
+aW5zdGVhZA0KPiA+IG9mIGJlaW5nIGZvcmNlZCB0byB0aGUgY29tcGF0X2lvYXNfaWQuDQo+ID4N
+Cg0KU2VlbXMgbGlrZSBwdF9pZCBpcyBubyBtb3JlIG5lZWRlZCBpbiB0aGUgdmZpb19pb21tdWZk
+X2JpbmQoKQ0Kc2luY2UgaXQgY2FuIGdldCBjb21wYXRfaW9hc19pZCBpbiB0aGUgZnVuY3Rpb24g
+aXRzZWxmLiBDZGV2IHBhdGgNCm5ldmVyIHBhc3NlcyBhIHB0X2lkIHRvIHZmaW9faW9tbXVmZF9i
+aW5kKCkgYXMgaXRzIGF0dGFjaCBpcyBkb25lDQpieSBzZXBhcmF0ZSBBVFRBQ0ggaW9jdGwuIENh
+biB3ZSB1c2UgdGhlIGRldl9pZCBwb2ludGVyIHRvIGluZGljYXRlDQppZiBpdCBuZWVkcyB0byBn
+ZXQgdGhlIGNvbXBhdCBpb2FzIGFuZCBhdHRhY2ggaXQ/DQoNCnZmaW9faW9tbXVmZF9iaW5kKHN0
+cnVjdCB2ZmlvX2RldmljZSAqdmRldiwgc3RydWN0IGlvbW11ZmRfY3R4ICppY3R4LA0KCQkgICAg
+ICB1MzIgKmRldl9pZCkNCnsNCi4uLg0KICAgICAgICBpZiAoIWRldl9pZCkgew0KICAgICAgICAg
+ICAgIHUzMiBpb2FzX2lkOw0KDQogICAgICAgICAgICAgcmV0ID0gaW9tbXVmZF92ZmlvX2NvbXBh
+dF9pb2FzX2lkKGljdHgsICZpb2FzX2lkKTsNCiAgICAgICAgICAgICBpZiAocmV0KQ0KCQlnb3Rv
+IGVycl91bmJpbmQ7DQoNCiAgICAgICAgICAgICByZXQgPSB2ZGV2LT5vcHMtPmF0dGFjaF9pb2Fz
+KHZkZXYsICZpb2FzX2lkKTsNCiAgICAgICAgICAgICBpZiAocmV0KQ0KCQlnb3RvIGVycl91bmJp
+bmQ7DQogICAgICAgfQ0KLi4uDQp9DQoNClJlZ2FyZHMsDQpZaSBMaXUNCg==
