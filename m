@@ -2,119 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B3216A62CA
-	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 23:48:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C942B6A62D6
+	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 23:50:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229679AbjB1Ws5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Feb 2023 17:48:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41242 "EHLO
+        id S229756AbjB1WuV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Feb 2023 17:50:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229518AbjB1Wsz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Feb 2023 17:48:55 -0500
-Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B4E934022;
-        Tue, 28 Feb 2023 14:48:54 -0800 (PST)
-Received: by mail-qt1-x832.google.com with SMTP id h19so12397029qtk.7;
-        Tue, 28 Feb 2023 14:48:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1677624533;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GMtqDIiFEWDHqHhFJAnoEDLZ4UDoy4mDDU97fKecDF8=;
-        b=WIsalkXZRgcopURSxgd68sqTAV+TNnE7NCzw2iNl4mEswIm0aa7+zns9MTJ/4LOmnD
-         mX5DxRjJFqOzPVIg70PH7nCJx1xzV9SzmssLTOcm0QBJ+A2WH7w8rLTJ4ADXlSRXKW2L
-         u2j7nqIjaYS3IJyHj3Tm++qezDoXTg72vxAjCzoRR++51Pqg/wFansBEhbEZ4udMtL1k
-         9LIjBD3gEE8R2ePrAHMxWqD9lIiS6zg630xnU6OwZkniIsmkLRbxoUM3PCLwMegvfTty
-         FsTmAX+QDtxlO21V7Wbl2/zCowQTDrnZwB6ws63eAxu4DB8V7k+vxxeHr1QjMPsQ1gT3
-         nb2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677624533;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GMtqDIiFEWDHqHhFJAnoEDLZ4UDoy4mDDU97fKecDF8=;
-        b=WeTSfJ1HAStY+mYD+93myiICXc4WBdjj1AiU6Fk2PmqubalVK27DAspyEU93efFpKb
-         kGEj36VwRcftemfQsOg19m4bBlOzPARvrzIXKWxj+d1SmBMp1epRnTxnqtPVfMN6eNvp
-         GqQLmbes2As5oc6WqmzCj1/ELxHYV3G5DYVvKknZqBVloqgYLnzxCqiPbrlDy4dH3uYx
-         jtYKAvzChaUIkG6V6qqtwZzTJJedpnNUKHSG+G2XyCFT3Qg5CrLK6f7GdnGxVPc2A7V9
-         rPWrTqunvSO1vN/YFKahFUuTzH74SuSge5vWDZD/uyvgClJBjiVr+ByxQzW97k9muWFm
-         JcHg==
-X-Gm-Message-State: AO0yUKVP4K+Xf9sml8h3PDbdDWWe7LlemK9mFrl//klC+xeLslT+3NJ8
-        nLRT9B58zl8OpEuz6oBSH9EMU4gqUaz+Szw72w==
-X-Google-Smtp-Source: AK7set+RBzlEbfpSy8+eyRrEcKw3S9nC0Ehapi+Zo4Zw2VvowvF8usAqZdvthYyXq29rxKiE1PP3b4n1tKXga0xATyE=
-X-Received: by 2002:ac8:4299:0:b0:3bf:d9e4:8063 with SMTP id
- o25-20020ac84299000000b003bfd9e48063mr995349qtl.10.1677624533552; Tue, 28 Feb
- 2023 14:48:53 -0800 (PST)
+        with ESMTP id S229787AbjB1WuT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Feb 2023 17:50:19 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60A90360A5;
+        Tue, 28 Feb 2023 14:50:16 -0800 (PST)
+Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id D503C1EC04DA;
+        Tue, 28 Feb 2023 23:50:13 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1677624613;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=sf2h3hi220E781ncSCCtEipOWUHmkqQMWL7hGDGs3OU=;
+        b=LEYXMPAFbAW4NWRuAf3pW92Ggky+YFQ2w/c6gX6ukaNNjIMfuSn6VUMA8o3A8TsM4MMja1
+        5h6UewXSwWZL6AffZ+tL3vrX+Z/nkmqybH6gqm7KoIGCahS9S6452n0QJhxqsWu4tvKGnl
+        PlEt0VoBxw2lgPsNdSK6iAF0Ca00DiI=
+Date:   Tue, 28 Feb 2023 23:50:09 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Takahiro Itazuri <itazur@amazon.com>
+Cc:     dave.hansen@linux.intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mingo@redhat.com,
+        pbonzini@redhat.com, seanjc@google.com, tglx@linutronix.de,
+        x86@kernel.org, zulinx86@gmail.com
+Subject: Re: [PATCH 0/2] KVM: x86: Propagate AMD-specific IBRS bits to guests
+Message-ID: <Y/6FIeJ5KCOfKEPN@zn.tnic>
+References: <Y/5oBKi6vjZe83ac@zn.tnic>
+ <20230228222416.61484-1-itazur@amazon.com>
 MIME-Version: 1.0
-References: <20230226110802.103134-1-usama.arif@bytedance.com>
- <20230226110802.103134-8-usama.arif@bytedance.com> <878rghmrn2.ffs@tglx>
- <35264451eabdf967eb31069cb814e8a05ee3179b.camel@infradead.org> <cf7a1657159219cea61ffef567280e2e88d1f670.camel@infradead.org>
-In-Reply-To: <cf7a1657159219cea61ffef567280e2e88d1f670.camel@infradead.org>
-From:   Brian Gerst <brgerst@gmail.com>
-Date:   Tue, 28 Feb 2023 17:48:42 -0500
-Message-ID: <CAMzpN2hQArxf2mAVq55uMx9VhTjUD-VDEVAD406RScfsrjdAjQ@mail.gmail.com>
-Subject: Re: [PATCH v12 07/11] x86/smpboot: Remove early_gdt_descr on 64-bit
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Usama Arif <usama.arif@bytedance.com>, kim.phillips@amd.com,
-        piotrgorski@cachyos.org, oleksandr@natalenko.name,
-        arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
-        pbonzini@redhat.com, paulmck@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
-        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
-        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
-        simon.evans@bytedance.com, liangma@liangbit.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230228222416.61484-1-itazur@amazon.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 28, 2023 at 5:41=E2=80=AFPM David Woodhouse <dwmw2@infradead.or=
-g> wrote:
->
-> On Tue, 2023-02-28 at 21:57 +0000, David Woodhouse wrote:
-> >
-> > ----------------
-> > IN:
-> > 0xffffffffa20000b2:  48 31 d2                 xorq     %rdx, %rdx
-> > 0xffffffffa20000b5:  48 8b 82 c0 74 d5 a3     movq     -0x5c2a8b40(%rdx=
-), %rax
-> > 0xffffffffa20000bc:  48 8b a0 58 14 00 00     movq     0x1458(%rax), %r=
-sp
-> > 0xffffffffa20000c3:  48 83 ec 10              subq     $0x10, %rsp
-> > 0xffffffffa20000c7:  66 c7 04 24 7f 00        movw     $0x7f, (%rsp)
-> > 0xffffffffa20000cd:  48 8d 82 00 10 81 a3     leaq     -0x5c7ef000(%rdx=
-), %rax
-> > 0xffffffffa20000d4:  48 89 44 24 02           movq     %rax, 2(%rsp)
-> > 0xffffffffa20000d9:  0f 01 14 24              lgdtq    (%rsp)
-> > 0xffffffffa20000dd:  48 83 c4 10              addq     $0x10, %rsp
-> > 0xffffffffa20000e1:  31 c0                    xorl     %eax, %eax
-> > 0xffffffffa20000e3:  8e d8                    movl     %eax, %ds
-> >
-> > I cannot work out where the value -0x5c7ef000 comes from, but it
-> > doesn't seem to be the 0xb000 you claimed, and my brain is hurting
-> > again...
->
-> Turning off CONFIG_RANDOMIZE_BASE (or just looking at the vmlinux
-> disassembly instead as Brian did) helps to resolve that FWIW.
->
-> I've changed it to zero all of %rdx and pushed it back to the v12bis
-> branch.
+On Tue, Feb 28, 2023 at 10:24:16PM +0000, Takahiro Itazuri wrote:
+> I'm still a kernel newbie and I don't have a strong opinion for that.
+> I just thought it would be helpful if the KVM_GET_SUPPORTED_CPUID API
+> returns the same security information as the host, as long as it is
+> harmless.
 
-xorl %edx, %edx is preferred, as a 32-bit operation zero-extends to
-the full 64-bit register.  Using xorq to clear any of the lower 8
-registers adds an unnecessary REX prefix.  Just one of many quirks of
-the x86 instruction set...
+Not harmless - cpufeatures.h should contain flags which the kernel uses
+and not *every* CPUID bit out there.
 
---
-Brian Gerst
+If you want to advertize flags to guests, see
+arch/x86/kvm/reverse_cpuid.h and the KVM-only feature flags. You can add
+them there.
+
+> https://documentation.suse.com/sles/15-SP1/html/SLES-all/cha-spectre.html
+
+Well, I was against adding that to the documentation when I was at SUSE
+but ...
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
