@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7AE7F6A56A2
-	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 11:27:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 926A66A56D1
+	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 11:33:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231253AbjB1K1T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Feb 2023 05:27:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39264 "EHLO
+        id S230293AbjB1KdC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Feb 2023 05:33:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231206AbjB1K1Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Feb 2023 05:27:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BA8F2006F
-        for <kvm@vger.kernel.org>; Tue, 28 Feb 2023 02:26:28 -0800 (PST)
+        with ESMTP id S230249AbjB1KdA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Feb 2023 05:33:00 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D67CD3C2F
+        for <kvm@vger.kernel.org>; Tue, 28 Feb 2023 02:32:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677579987;
+        s=mimecast20190719; t=1677580332;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=MDfMtxXzFQrOJbPCiOn60FjJ4o5RbbkA4AqIa3ieAbM=;
-        b=NVFhnUp26w/UTdrZj39PgpbwmuAJnrxbp3LNscZsAd8zgoQRWWnt6QF9J/pISF2+0xP2eK
-        jia4eJQit8Lfn1JVfB72gyimG3NHziEAEN8tti62vGekraWSiHfiljjHew/yPA93C0RiTA
-        dZuQFNKqZWSKCGEGUJDqkh3pOH4g9VE=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=pWE/IH7Gk0DOgzMvd0Lmdxjp64jnYWrJuTM5923X0kE=;
+        b=Lt+N7wWFmnChMA292fPo1vPyNjczdrKd4xEFY4NnwOCaRwHi8DS+SeGROhEAVeAQEMPZ/q
+        legc2NMRzsFD/7akTWLNn6+DBDxiAkQr1ZgPPFKd8iXcjtS65gB1rhJdH49DwiHX129kc0
+        u5u8bcyn/9ciEc7XXtthQW67vNDqH3o=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-638-Y2IUOPb9PkePjZaJ8RcMuA-1; Tue, 28 Feb 2023 05:26:25 -0500
-X-MC-Unique: Y2IUOPb9PkePjZaJ8RcMuA-1
-Received: by mail-wr1-f71.google.com with SMTP id m15-20020adfa3cf000000b002be0eb97f4fso1421970wrb.8
-        for <kvm@vger.kernel.org>; Tue, 28 Feb 2023 02:26:25 -0800 (PST)
+ us-mta-21-eQE3l2JJP8ek__28QaGzBA-1; Tue, 28 Feb 2023 05:32:10 -0500
+X-MC-Unique: eQE3l2JJP8ek__28QaGzBA-1
+Received: by mail-wr1-f69.google.com with SMTP id g6-20020adfa486000000b002c55ef1ec94so1422589wrb.0
+        for <kvm@vger.kernel.org>; Tue, 28 Feb 2023 02:32:10 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MDfMtxXzFQrOJbPCiOn60FjJ4o5RbbkA4AqIa3ieAbM=;
-        b=MYYbUhaOAAz5BTdYuMq/7luGWqFd3q4xHY0/kW8e36WrA6vgoNIszk82EdfKgNMTlr
-         DlNEx/DC2nXwtKy37Q9+XrNiG5WIWJgQ4cSbOE1tJE/okAQM/DJL5Z5HxpnEqHX5apie
-         dRY5sJ9Oy89XS7ww8mIU1xnxtCq8XeCUpkTPIA0ngP5mU26SFeLi9W0NO+xDxaVLr+7m
-         UjE7E2O/uQT1gfhQCABcyOE9IlUnQkU/rRytEZTeR98TlbXjxlvg6WN8Gmuaf40AH1Cb
-         Ee4l4sO1zXH62lST0a8myCJ59WMkBszxrk+EoMXmLO4Fv8l/tBOGkM9xEoWqJ/mTDSDT
-         Ch4Q==
-X-Gm-Message-State: AO0yUKV+CLD4j6Nhx+KLMd9risQHtAY0USCd5Vl3WK3X9Gx8Jtcrhem0
-        oG+i5yNjQomdJ+FbsTnTT/cZtJVaxDSZeLydV7kOfzClf5npGOJpu6/Qkuf0BVyzePH+Pue4eN/
-        0NmGXldKLh2At
-X-Received: by 2002:a05:600c:4b28:b0:3eb:39e7:35fe with SMTP id i40-20020a05600c4b2800b003eb39e735femr1619718wmp.30.1677579984450;
-        Tue, 28 Feb 2023 02:26:24 -0800 (PST)
-X-Google-Smtp-Source: AK7set/C6MKWw0xixGzqMyKbw92PptZzuISaOIFG9J8ILfyAAEOfPLXJ9kl34y318rcejVMrMLMjgw==
-X-Received: by 2002:a05:600c:4b28:b0:3eb:39e7:35fe with SMTP id i40-20020a05600c4b2800b003eb39e735femr1619707wmp.30.1677579984138;
-        Tue, 28 Feb 2023 02:26:24 -0800 (PST)
+        bh=pWE/IH7Gk0DOgzMvd0Lmdxjp64jnYWrJuTM5923X0kE=;
+        b=nZrUrMJ3/fI0clj9xenEwk/Epy3i5FWZ8oBr6auMn2UpjYfdX4S5IJlGPBfYXoL0oK
+         rpGCAy+lRMQHxAH3y/1VUx/lWyXOmoqPIJYLkmuMvb9izZKUOLvCU1rkAxqITgHjtcWt
+         B0GLmpUIByYxniQKzL78aSwTraFaDjTrGN5zkHEQBcNEZikU6H/C5Npk1SLUspBqa/EF
+         p1mpCNOya4HMYb7ULQ8GbtYuuy7dnO1o4+xF6w5UwWefUecc/KlgxQ0OOq3ZeyHaV4uw
+         +FKZhP66O7pZTiOHetbeVtLeWjahTcqx0O0NZmk48XIrk9dYeMi6l1Wf2C80TRWxNncF
+         VoQg==
+X-Gm-Message-State: AO0yUKVIIuyRRKCie+y2a/fQl4c473LITMA2AVvAKG4FHvahkXi1CbFL
+        oKCAOGHsAjIV6Y4uQKZ1wTik1vIRB1USwmYI5KY2rcqAFTEtzGYP5BgSVUf1PVwO47ff50xLAkE
+        T+j0eD4qnYfMf
+X-Received: by 2002:a5d:6f1b:0:b0:2bf:bf05:85ac with SMTP id ay27-20020a5d6f1b000000b002bfbf0585acmr1808253wrb.23.1677580329580;
+        Tue, 28 Feb 2023 02:32:09 -0800 (PST)
+X-Google-Smtp-Source: AK7set9ZFVtpNUSDKjWbiaTH1BQVRiKxdUcmbd6hiGVcxOhG2xmXBJ61c13FJ8zRMszkvybFURNUgQ==
+X-Received: by 2002:a5d:6f1b:0:b0:2bf:bf05:85ac with SMTP id ay27-20020a5d6f1b000000b002bfbf0585acmr1808234wrb.23.1677580329303;
+        Tue, 28 Feb 2023 02:32:09 -0800 (PST)
 Received: from sgarzare-redhat (c-115-213.cust-q.wadsl.it. [212.43.115.213])
-        by smtp.gmail.com with ESMTPSA id n41-20020a05600c3ba900b003e20fa01a86sm12877242wms.13.2023.02.28.02.26.22
+        by smtp.gmail.com with ESMTPSA id k28-20020a5d525c000000b002c556a4f1casm9321915wrc.42.2023.02.28.02.32.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Feb 2023 02:26:23 -0800 (PST)
-Date:   Tue, 28 Feb 2023 11:26:19 +0100
+        Tue, 28 Feb 2023 02:32:08 -0800 (PST)
+Date:   Tue, 28 Feb 2023 11:32:05 +0100
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     Krasnov Arseniy <AVKrasnov@sberdevices.ru>
 Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
@@ -72,20 +72,21 @@ Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
         <virtualization@lists.linux-foundation.org>,
         "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
         kernel <kernel@sberdevices.ru>
-Subject: Re: [RFC PATCH v1 07/12] vsock/virtio: MGS_ZEROCOPY flag support
-Message-ID: <20230228102619.yevqfgx2vj5aeyn4@sgarzare-redhat>
+Subject: Re: [RFC PATCH v1 12/12] test/vsock: MSG_ZEROCOPY support for
+ vsock_perf
+Message-ID: <20230228103205.6vorc4z363wtxwlk@sgarzare-redhat>
 References: <0e7c6fc4-b4a6-a27b-36e9-359597bba2b5@sberdevices.ru>
- <716333a1-d6d1-3dde-d04a-365d4a361bfe@sberdevices.ru>
- <20230216151622.xu5jhha3wvc3us2b@sgarzare-redhat>
- <f76705ca-f20a-3286-3c61-46a953518991@sberdevices.ru>
+ <03570f48-f56a-2af4-9579-15a685127aeb@sberdevices.ru>
+ <20230216152945.qdh6vrq66pl2bfxe@sgarzare-redhat>
+ <d5de8b79-f903-d65f-a5bc-e591578144e7@sberdevices.ru>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1; format=flowed
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <f76705ca-f20a-3286-3c61-46a953518991@sberdevices.ru>
+In-Reply-To: <d5de8b79-f903-d65f-a5bc-e591578144e7@sberdevices.ru>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -93,177 +94,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 20, 2023 at 09:04:04AM +0000, Krasnov Arseniy wrote:
->On 16.02.2023 18:16, Stefano Garzarella wrote:
->> On Mon, Feb 06, 2023 at 07:00:35AM +0000, Arseniy Krasnov wrote:
->>> This adds main logic of MSG_ZEROCOPY flag processing for packet
->>> creation. When this flag is set and user's iov iterator fits for
->>> zerocopy transmission, call 'get_user_pages()' and add returned
->>> pages to the newly created skb.
+On Mon, Feb 20, 2023 at 09:05:12AM +0000, Krasnov Arseniy wrote:
+>On 16.02.2023 18:29, Stefano Garzarella wrote:
+>> On Mon, Feb 06, 2023 at 07:06:32AM +0000, Arseniy Krasnov wrote:
+>>> To use this option pass '--zc' parameter:
+>>
+>> --zerocopy or --zero-copy maybe better follow what we did with the other parameters :-)
+>>
+>>>
+>>> ./vsock_perf --zc --sender <cid> --port <port> --bytes <bytes to send>
+>>>
+>>> With this option MSG_ZEROCOPY flag will be passed to the 'send()' call.
 >>>
 >>> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 >>> ---
->>> net/vmw_vsock/virtio_transport_common.c | 212 ++++++++++++++++++++++--
->>> 1 file changed, 195 insertions(+), 17 deletions(-)
+>>> tools/testing/vsock/vsock_perf.c | 127 +++++++++++++++++++++++++++++--
+>>> 1 file changed, 120 insertions(+), 7 deletions(-)
 >>>
->>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->>> index 05ce97b967ad..69e37f8a68a6 100644
->>> --- a/net/vmw_vsock/virtio_transport_common.c
->>> +++ b/net/vmw_vsock/virtio_transport_common.c
->>> @@ -37,6 +37,169 @@ virtio_transport_get_ops(struct vsock_sock *vsk)
->>>     return container_of(t, struct virtio_transport, transport);
->>> }
+>>> diff --git a/tools/testing/vsock/vsock_perf.c b/tools/testing/vsock/vsock_perf.c
+>>> index a72520338f84..1d435be9b48e 100644
+>>> --- a/tools/testing/vsock/vsock_perf.c
+>>> +++ b/tools/testing/vsock/vsock_perf.c
+>>> @@ -18,6 +18,8 @@
+>>> #include <poll.h>
+>>> #include <sys/socket.h>
+>>> #include <linux/vm_sockets.h>
+>>> +#include <sys/mman.h>
+>>> +#include <linux/errqueue.h>
 >>>
+>>> #define DEFAULT_BUF_SIZE_BYTES    (128 * 1024)
+>>> #define DEFAULT_TO_SEND_BYTES    (64 * 1024)
+>>> @@ -28,9 +30,14 @@
+>>> #define BYTES_PER_GB        (1024 * 1024 * 1024ULL)
+>>> #define NSEC_PER_SEC        (1000000000ULL)
+>>>
+>>> +#ifndef SOL_VSOCK
+>>> +#define SOL_VSOCK 287
+>>> +#endif
 >>
->> I'd use bool if we don't need to return an error value in the following
->> new functions.
->>
->>> +static int virtio_transport_can_zcopy(struct iov_iter *iov_iter,
->>> +                      size_t free_space)
->>> +{
->>> +    size_t pages;
->>> +    int i;
->>> +
->>> +    if (!iter_is_iovec(iov_iter))
->>> +        return -1;
->>> +
->>> +    if (iov_iter->iov_offset)
->>> +        return -1;
->>> +
->>> +    /* We can't send whole iov. */
->>> +    if (free_space < iov_iter->count)
->>> +        return -1;
->>> +
->>> +    for (pages = 0, i = 0; i < iov_iter->nr_segs; i++) {
->>> +        const struct iovec *iovec;
->>> +        int pages_in_elem;
->>> +
->>> +        iovec = &iov_iter->iov[i];
->>> +
->>> +        /* Base must be page aligned. */
->>> +        if (offset_in_page(iovec->iov_base))
->>> +            return -1;
->>> +
->>> +        /* Only last element could have not page aligned size.  */
->>> +        if (i != (iov_iter->nr_segs - 1)) {
->>> +            if (offset_in_page(iovec->iov_len))
->>> +                return -1;
->>> +
->>> +            pages_in_elem = iovec->iov_len >> PAGE_SHIFT;
->>> +        } else {
->>> +            pages_in_elem = round_up(iovec->iov_len, PAGE_SIZE);
->>> +            pages_in_elem >>= PAGE_SHIFT;
->>> +        }
->>> +
->>> +        /* In case of user's pages - one page is one frag. */
->>> +        if (pages + pages_in_elem > MAX_SKB_FRAGS)
->>> +            return -1;
->>> +
->>> +        pages += pages_in_elem;
->>> +    }
->>> +
->>> +    return 0;
->>> +}
->>> +
->>> +static int virtio_transport_init_zcopy_skb(struct vsock_sock *vsk,
->>> +                       struct sk_buff *skb,
->>> +                       struct iov_iter *iter,
->>> +                       bool zerocopy)
->>> +{
->>> +    struct ubuf_info_msgzc *uarg_zc;
->>> +    struct ubuf_info *uarg;
->>> +
->>> +    uarg = msg_zerocopy_realloc(sk_vsock(vsk),
->>> +                    iov_length(iter->iov, iter->nr_segs),
->>> +                    NULL);
->>> +
->>> +    if (!uarg)
->>> +        return -1;
->>> +
->>> +    uarg_zc = uarg_to_msgzc(uarg);
->>> +    uarg_zc->zerocopy = zerocopy ? 1 : 0;
->>> +
->>> +    skb_zcopy_init(skb, uarg);
->>> +
->>> +    return 0;
->>> +}
->>> +
->>> +static int virtio_transport_fill_nonlinear_skb(struct sk_buff *skb,
->>> +                           struct vsock_sock *vsk,
->>> +                           struct virtio_vsock_pkt_info *info)
->>> +{
->>> +    struct iov_iter *iter;
->>> +    int frag_idx;
->>> +    int seg_idx;
->>> +
->>> +    iter = &info->msg->msg_iter;
->>> +    frag_idx = 0;
->>> +    VIRTIO_VSOCK_SKB_CB(skb)->curr_frag = 0;
->>> +    VIRTIO_VSOCK_SKB_CB(skb)->frag_off = 0;
->>> +
->>> +    /* At this moment:
->>> +     * 1) 'iov_offset' is zero.
->>> +     * 2) Every 'iov_base' and 'iov_len' are also page aligned
->>> +     *    (except length of the last element).
->>> +     * 3) Number of pages in this iov <= MAX_SKB_FRAGS.
->>> +     * 4) Length of the data fits in current credit space.
->>> +     */
->>> +    for (seg_idx = 0; seg_idx < iter->nr_segs; seg_idx++) {
->>> +        struct page *user_pages[MAX_SKB_FRAGS];
->>> +        const struct iovec *iovec;
->>> +        size_t last_frag_len;
->>> +        size_t pages_in_seg;
->>> +        int page_idx;
->>> +
->>> +        iovec = &iter->iov[seg_idx];
->>> +        pages_in_seg = iovec->iov_len >> PAGE_SHIFT;
->>> +
->>> +        if (iovec->iov_len % PAGE_SIZE) {
->>> +            last_frag_len = iovec->iov_len % PAGE_SIZE;
->>> +            pages_in_seg++;
->>> +        } else {
->>> +            last_frag_len = PAGE_SIZE;
->>> +        }
->>> +
->>> +        if (get_user_pages((unsigned long)iovec->iov_base,
->>> +                   pages_in_seg, FOLL_GET, user_pages,
->>> +                   NULL) != pages_in_seg)
->>> +            return -1;
->>
->> Reading the get_user_pages() documentation, this should pin the user
->> pages, so we should be fine if we then expose them in the virtqueue.
->>
->> But reading Documentation/core-api/pin_user_pages.rst it seems that
->> drivers should use "pin_user_pages*() for DMA-pinned pages", so I'm not
->> sure what we should do.
->>
->That is really interesting question for me too. IIUC 'pin_user_pages()'
->sets special value to ref counter of page, so we can distinguish such
->pages from the others. I've grepped for pinned pages check and found,
->the it is used in mm/vmscan.c by calling 'folio_maybe_dma_pinned()' during
->page lists processing. Seems 'pin_user_pages()' is more strict version of
->'get_user_pages()' and it is recommended to use 'pin_' when data on these
->pages will be accessed.
->I think, i'll check which API is used in the TCP implementation for zerocopy
->transmission.
->
->> Additional advice would be great!
->>
->> Anyway, when we are done using the pages, we should call put_page() or
->> unpin_user_page() depending on how we pin them.
->>
->In case of 'get_user_pages()' everything is ok here: when such skb
->will be released, 'put_page()' will be called for every frag page
->of it, so there is no page leak.
+>> I thought we use the current kernel headers when we compile the tests,
+>> do we need to fix something in the makefile?
+>Not sure, of course we are using uapi. But i see, that defines like SOL_XXX is not
+>defined in uapi headers. For example SOL_IP is defined in include/linux/socket.h,
+>but userspace app uses SOL_IP from in.h (at least on my machine). E.g. SOL_XXX is
+>not exported to user.
 
-Got it!
+Right, I see only few SOL_* in the uapi, e.g. SOL_TIPC in 
+uapi/linux/tipc.h
 
->But in case of 'pin_user_pages()',
->i will need to unpin in manually before calling 'consume_skb()'
->after it is processed by virtio device. But anyway - it is not a
->problem.
-
-Yep.
+So it's fine for now, otherwise we can define it in 
+uapi/linux/vm_sockets.h
 
 Thanks,
 Stefano
