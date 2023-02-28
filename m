@@ -2,131 +2,467 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AABAE6A6090
-	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 21:44:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B47AC6A608C
+	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 21:44:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229722AbjB1Uoz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Feb 2023 15:44:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33858 "EHLO
+        id S229686AbjB1UoQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Feb 2023 15:44:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229758AbjB1Uox (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Feb 2023 15:44:53 -0500
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28EE859FB;
-        Tue, 28 Feb 2023 12:44:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
-        :MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
-        Sender:Reply-To:Content-ID:Content-Description;
-        bh=Rtyk/933i49ixLph7CNpZDmvFerPzLAHEB/U4/br/XQ=; b=aU4Rkt00RfXf4/xidYpX0mbQoT
-        w5fWIxbq+awg5/9wDZhDWQ778Cftd3nDQAZNxujgc5/IDM5k2ZaHnl07hj6XrkA4mf51i3JJfAKDl
-        iTZkN7AUASYhuX/wT0w8p8VBnznvf0l9OqfG9in5Dn1n5UCA1DArGHywa+6e9uaI9SBN0dNibXqeQ
-        7GDtc5DBFAZzm28tVfoG0bIc5AvUmb7pzEmxydWhGhdQ5VFnoOuZEdJX1tOtKBaIzfKC/EDSXXRop
-        zJ1RiYfHM3qD7nbzb9QX9YNRSaopZvyPD/kHOjkt1eimOt0mhApSEvwvdxnS9wW8AcO/7q6yJYR9K
-        xziaZCtg==;
-Received: from [2a00:23ee:1191:17a9:ac09:981:11d9:64d9] (helo=[IPv6:::1])
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1pX6p8-00EfBz-2x;
-        Tue, 28 Feb 2023 20:43:48 +0000
-Date:   Tue, 28 Feb 2023 20:43:41 +0000
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Usama Arif <usama.arif@bytedance.com>, kim.phillips@amd.com,
-        brgerst@gmail.com
-CC:     piotrgorski@cachyos.org, oleksandr@natalenko.name,
-        arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
-        pbonzini@redhat.com, paulmck@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
-        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
-        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
-        simon.evans@bytedance.com, liangma@liangbit.com
-Subject: Re: [PATCH v12 06/11] x86/smpboot: Remove initial_stack on 64-bit
-User-Agent: K-9 Mail for Android
-In-Reply-To: <87edq9mto0.ffs@tglx>
-References: <20230226110802.103134-1-usama.arif@bytedance.com> <20230226110802.103134-7-usama.arif@bytedance.com> <87k001n4xo.ffs@tglx> <c6863590f5fbf139f6aec50d0f3bc8e8b00cfcaf.camel@infradead.org> <87edq9mto0.ffs@tglx>
-Message-ID: <64B60F62-3760-43A0-A0FB-C349DA70C013@infradead.org>
+        with ESMTP id S229529AbjB1UoO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Feb 2023 15:44:14 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62CFD34F61;
+        Tue, 28 Feb 2023 12:44:12 -0800 (PST)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31SKIiP1028980;
+        Tue, 28 Feb 2023 20:44:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=3cAKNPdY/je/VAJCQqPJXqOobmzmeY3lD9oc6tOrSm4=;
+ b=Zt8lu7GLTdEVV1rzyKt7G0dzpLvlEM4Uk1B7HXCT47Omrrrmyn6YWMK8P8fQ0eRiXkn3
+ nhmcwx20Z9m13EsvxfyVqh2yMipHGO5OJPZSnc4xNfPT755NhgRREnjnq4ovk9GK9JZV
+ pNeOkFKXLCb1naMHodIuX3laKGPhCB/Ux+szPilGkVWVNmiL+bCE5MDMddyYQgrtuIsr
+ mkJvGg9/U26cXE6qIJrcXJ+CRReZ7bLnZkQ1P6aZLBIcIwrwR5qPAx5X0ABo3Tt1rp7k
+ v80RQ4nr5bbukvITnZJMay6LXMGUVo95KdC+ghoT3zf9KUgzd0IXDjHL8S4BudYFmH/S qA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p1rhrghdp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Feb 2023 20:44:11 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31SKRaC7031755;
+        Tue, 28 Feb 2023 20:44:10 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p1rhrghch-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Feb 2023 20:44:10 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31SJbgvx026427;
+        Tue, 28 Feb 2023 20:44:09 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3nybb4kjtn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Feb 2023 20:44:09 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31SKi5vD63242742
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 28 Feb 2023 20:44:05 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2183D20040;
+        Tue, 28 Feb 2023 20:44:05 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E315220043;
+        Tue, 28 Feb 2023 20:44:04 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 28 Feb 2023 20:44:04 +0000 (GMT)
+From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v3] s390x: Add tests for execute-type instructions
+Date:   Tue, 28 Feb 2023 21:44:03 +0100
+Message-Id: <20230228204403.460107-1-nsg@linux.ibm.com>
+X-Mailer: git-send-email 2.37.2
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: BkB8BnzdQhlwMty4XDzEmxjyOlv17ykq
+X-Proofpoint-GUID: A9dEaEdLHRIsfDr846pp8L1XLOkEfojx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-02-28_17,2023-02-28_03,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
+ phishscore=0 lowpriorityscore=0 malwarescore=0 spamscore=0 clxscore=1015
+ suspectscore=0 mlxlogscore=999 bulkscore=0 adultscore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
+ definitions=main-2302280169
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Test the instruction address used by targets of an execute instruction.
+When the target instruction calculates a relative address, the result is
+relative to the target instruction, not the execute instruction.
+
+Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+---
 
 
-On 28 February 2023 20:17:19 GMT, Thomas Gleixner <tglx@linutronix=2Ede> w=
-rote:
->On Tue, Feb 28 2023 at 17:09, David Woodhouse wrote:
->> On Tue, 2023-02-28 at 17:13 +0100, Thomas Gleixner wrote:
->>> As this patch is now part of the parallel boot series and actually
->>> introduces smpboot_control, the above is neither accurate nor useful=
-=2E
->>
->> Better commit message, add a comment where we abuse current->thread=2Es=
-p
->> in the sleep path=2E Didn't remove the {} which would be added back in
->> the very next patch=2E Pushed to my tree for Usama's next round=2E
->
->Ok=2E
->
->> However, we start by introducing one more: smpboot_control=2E For now t=
-his
->
->s/we// :)
+v2 -> v3:
+ * add some comments (thanks Janosch)
+ * add two new tests (drop Nico's R-b)
+ * push prefix
 
-Yeah, actually spotted that one as I hit send and it's different in the gi=
-t tree already=2E
+v1 -> v2:
+ * add test to unittests.cfg and .gitlab-ci.yml
+ * pick up R-b (thanks Nico)
 
 
->> merely holds the CPU# of the CPU which is coming up=2E That CPU can the=
-n
->> find its own per-cpu data, and everything else it needs can be found fr=
-om
->> there, allowing the other global variables to be removed=2E
->>
->> First to be removed is initial_stack=2E Each CPU can load %rsp from its
->> current_task->thread=2Esp instead=2E That is already set up with the co=
-rrect
->> idle thread for APs=2E Set up the =2Esp field in INIT_THREAD on x86 so =
-that
->> the BSP also finds a suitable stack pointer in the static per-cpu data
->> when coming up on first boot=2E
->>
->> On resume from S3, the CPU needs a temporary stack because its idle tas=
-k
->> is already active=2E Instead of setting initial_stack, the sleep code c=
-an
->> simply set its own current->thread=2Esp to point to the temporary stack=
-=2E
->> The true stack pointer will get restored with the rest of the CPU
->> context in do_suspend_lowlevel()=2E
->
->Thanks for writing this up!
->
->> +	/*
->> +	 * As each CPU starts up, it will find its own stack pointer
->> +	 * from its current_task->thread=2Esp=2E Typically that will be
->> +	 * the idle thread for a newly-started AP, or even the boot
->> +	 * CPU which will find it set to &init_task in the static
->> +	 * per-cpu data=2E
->> +	 *
->> +	 * Make the resuming CPU use the temporary stack at startup
->> +	 * by setting current->thread=2Esp to point to that=2E The true
->> +	 * %rsp will be restored with the rest of the CPU context,
->> +	 * by do_suspend_lowlevel()=2E
->
->Right, but what restores current->thread=2Esp? thread=2Esp is used by
->unwinders=2E=2E=2E
+TCG does the address calculation relative to the execute instruction.
+Everything that has an operand that is relative to the instruction given by
+the immediate in the instruction and goes through in2_ri2 in TCG has this
+problem, because in2_ri2 does the calculation relative to pc_next which is the
+address of the EX(RL).
+That should make fixing it easier tho.
 
-Unwinding a thread that is actually *on* the CPU? By the time it's taken o=
-ff, won't ->thread=2Esp have been written out again? I figured it was just =
-a dead variable while the actual %rsp was in use?
+
+Range-diff against v2:
+1:  08bae04a ! 1:  136eb2a2 s390x: Add tests for execute-type instructions
+    @@ Commit message
+         relative to the target instruction, not the execute instruction.
+     
+         Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+    -    Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
+     
+      ## s390x/Makefile ##
+     @@ s390x/Makefile: tests += $(TEST_DIR)/panic-loop-extint.elf
+    @@ s390x/ex.c (new)
+     + * Copyright IBM Corp. 2023
+     + *
+     + * Test EXECUTE (RELATIVE LONG).
+    ++ * These instruction execute a target instruction. The target instruction is formed
+    ++ * by reading an instruction from memory and optionally modifying some of its bits.
+    ++ * The execution of the target instruction is the same as if it was executed
+    ++ * normally as part of the instruction sequence, except for the instruction
+    ++ * address and the instruction-length code.
+     + */
+     +
+     +#include <libcflat.h>
+     +
+    ++/*
+    ++ * BRANCH AND SAVE, register register variant.
+    ++ * Saves the next instruction address (address from PSW + length of instruction)
+    ++ * to the first register. No branch is taken in this test, because 0 is
+    ++ * specified as target.
+    ++ * BASR does *not* perform a relative address calculation with an intermediate.
+    ++ */
+     +static void test_basr(void)
+     +{
+     +	uint64_t ret_addr, after_ex;
+    @@ s390x/ex.c (new)
+     +}
+     +
+     +/*
+    -+ * According to PoP (Branch-Address Generation), the address is relative to
+    -+ * BRAS when it is the target of an execute-type instruction.
+    ++ * BRANCH RELATIVE AND SAVE.
+    ++ * According to PoP (Branch-Address Generation), the address calculated relative
+    ++ * to the instruction address is relative to BRAS when it is the target of an
+    ++ * execute-type instruction, not relative to the execute-type instruction.
+     + */
+     +static void test_bras(void)
+     +{
+    @@ s390x/ex.c (new)
+     +	report_prefix_pop();
+     +}
+     +
+    ++/*
+    ++ * LOAD ADDRESS RELATIVE LONG.
+    ++ * If it is the target of an execute-type instruction, the address is relative
+    ++ * to the LARL.
+    ++ */
+     +static void test_larl(void)
+     +{
+     +	uint64_t target, addr;
+    @@ s390x/ex.c (new)
+     +	report_prefix_pop();
+     +}
+     +
+    ++/* LOAD LOGICAL RELATIVE LONG.
+    ++ * If it is the target of an execute-type instruction, the address is relative
+    ++ * to the LLGFRL.
+    ++ */
+    ++static void test_llgfrl(void)
+    ++{
+    ++	uint64_t target, value;
+    ++
+    ++	report_prefix_push("LLGFRL");
+    ++	asm volatile ( ".pushsection .rodata\n"
+    ++		"	.balign	4\n"
+    ++		"0:	llgfrl	%[value],0\n"
+    ++		"	.popsection\n"
+    ++
+    ++		"	llgfrl	%[target],0b\n"
+    ++		"	exrl	0,0b\n"
+    ++		: [target] "=d" (target),
+    ++		  [value] "=d" (value)
+    ++	);
+    ++
+    ++	report(target == value, "loaded correct value");
+    ++	report_prefix_pop();
+    ++}
+    ++
+    ++/*
+    ++ * COMPARE RELATIVE LONG
+    ++ * If it is the target of an execute-type instruction, the address is relative
+    ++ * to the CRL.
+    ++ */
+    ++static void test_crl(void)
+    ++{
+    ++	uint32_t program_mask, cc, crl_word;
+    ++
+    ++	report_prefix_push("CRL");
+    ++	asm volatile ( ".pushsection .rodata\n"
+    ++		"	.balign	4\n" //operand of crl must be word aligned
+    ++		"0:	crl	%[crl_word],0\n"
+    ++		"	.popsection\n"
+    ++
+    ++		"	lrl	%[crl_word],0b\n"
+    ++		//align (pad with nop), in case the wrong bad operand is used
+    ++		"	.balignw 4,0x0707\n"
+    ++		"	exrl	0,0b\n"
+    ++		"	ipm	%[program_mask]\n"
+    ++		: [program_mask] "=d" (program_mask),
+    ++		  [crl_word] "=d" (crl_word)
+    ++		:: "cc"
+    ++	);
+    ++
+    ++	cc = program_mask >> 28;
+    ++	report(!cc, "operand compared to is relative to CRL");
+    ++	report_prefix_pop();
+    ++}
+    ++
+     +int main(int argc, char **argv)
+     +{
+    ++	report_prefix_push("ex");
+     +	test_basr();
+     +	test_bras();
+     +	test_larl();
+    ++	test_llgfrl();
+    ++	test_crl();
+    ++	report_prefix_pop();
+     +
+     +	return report_summary();
+     +}
+
+ s390x/Makefile      |   1 +
+ s390x/ex.c          | 169 ++++++++++++++++++++++++++++++++++++++++++++
+ s390x/unittests.cfg |   3 +
+ .gitlab-ci.yml      |   1 +
+ 4 files changed, 174 insertions(+)
+ create mode 100644 s390x/ex.c
+
+diff --git a/s390x/Makefile b/s390x/Makefile
+index 97a61611..6cf8018b 100644
+--- a/s390x/Makefile
++++ b/s390x/Makefile
+@@ -39,6 +39,7 @@ tests += $(TEST_DIR)/panic-loop-extint.elf
+ tests += $(TEST_DIR)/panic-loop-pgm.elf
+ tests += $(TEST_DIR)/migration-sck.elf
+ tests += $(TEST_DIR)/exittime.elf
++tests += $(TEST_DIR)/ex.elf
+ 
+ pv-tests += $(TEST_DIR)/pv-diags.elf
+ 
+diff --git a/s390x/ex.c b/s390x/ex.c
+new file mode 100644
+index 00000000..3a22e496
+--- /dev/null
++++ b/s390x/ex.c
+@@ -0,0 +1,169 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright IBM Corp. 2023
++ *
++ * Test EXECUTE (RELATIVE LONG).
++ * These instruction execute a target instruction. The target instruction is formed
++ * by reading an instruction from memory and optionally modifying some of its bits.
++ * The execution of the target instruction is the same as if it was executed
++ * normally as part of the instruction sequence, except for the instruction
++ * address and the instruction-length code.
++ */
++
++#include <libcflat.h>
++
++/*
++ * BRANCH AND SAVE, register register variant.
++ * Saves the next instruction address (address from PSW + length of instruction)
++ * to the first register. No branch is taken in this test, because 0 is
++ * specified as target.
++ * BASR does *not* perform a relative address calculation with an intermediate.
++ */
++static void test_basr(void)
++{
++	uint64_t ret_addr, after_ex;
++
++	report_prefix_push("BASR");
++	asm volatile ( ".pushsection .rodata\n"
++		"0:	basr	%[ret_addr],0\n"
++		"	.popsection\n"
++
++		"	larl	%[after_ex],1f\n"
++		"	exrl	0,0b\n"
++		"1:\n"
++		: [ret_addr] "=d" (ret_addr),
++		  [after_ex] "=d" (after_ex)
++	);
++
++	report(ret_addr == after_ex, "return address after EX");
++	report_prefix_pop();
++}
++
++/*
++ * BRANCH RELATIVE AND SAVE.
++ * According to PoP (Branch-Address Generation), the address calculated relative
++ * to the instruction address is relative to BRAS when it is the target of an
++ * execute-type instruction, not relative to the execute-type instruction.
++ */
++static void test_bras(void)
++{
++	uint64_t after_target, ret_addr, after_ex, branch_addr;
++
++	report_prefix_push("BRAS");
++	asm volatile ( ".pushsection .text.ex_bras, \"x\"\n"
++		"0:	bras	%[ret_addr],1f\n"
++		"	nopr	%%r7\n"
++		"1:	larl	%[branch_addr],0\n"
++		"	j	4f\n"
++		"	.popsection\n"
++
++		"	larl	%[after_target],1b\n"
++		"	larl	%[after_ex],3f\n"
++		"2:	exrl	0,0b\n"
++		"3:	larl	%[branch_addr],0\n"
++		"4:\n"
++
++		"	.if (1b - 0b) != (3b - 2b)\n"
++		"	.error	\"right and wrong target must have same offset\"\n"
++		"	.endif\n"
++		: [after_target] "=d" (after_target),
++		  [ret_addr] "=d" (ret_addr),
++		  [after_ex] "=d" (after_ex),
++		  [branch_addr] "=d" (branch_addr)
++	);
++
++	report(after_target == branch_addr, "address calculated relative to BRAS");
++	report(ret_addr == after_ex, "return address after EX");
++	report_prefix_pop();
++}
++
++/*
++ * LOAD ADDRESS RELATIVE LONG.
++ * If it is the target of an execute-type instruction, the address is relative
++ * to the LARL.
++ */
++static void test_larl(void)
++{
++	uint64_t target, addr;
++
++	report_prefix_push("LARL");
++	asm volatile ( ".pushsection .rodata\n"
++		"0:	larl	%[addr],0\n"
++		"	.popsection\n"
++
++		"	larl	%[target],0b\n"
++		"	exrl	0,0b\n"
++		: [target] "=d" (target),
++		  [addr] "=d" (addr)
++	);
++
++	report(target == addr, "address calculated relative to LARL");
++	report_prefix_pop();
++}
++
++/* LOAD LOGICAL RELATIVE LONG.
++ * If it is the target of an execute-type instruction, the address is relative
++ * to the LLGFRL.
++ */
++static void test_llgfrl(void)
++{
++	uint64_t target, value;
++
++	report_prefix_push("LLGFRL");
++	asm volatile ( ".pushsection .rodata\n"
++		"	.balign	4\n"
++		"0:	llgfrl	%[value],0\n"
++		"	.popsection\n"
++
++		"	llgfrl	%[target],0b\n"
++		"	exrl	0,0b\n"
++		: [target] "=d" (target),
++		  [value] "=d" (value)
++	);
++
++	report(target == value, "loaded correct value");
++	report_prefix_pop();
++}
++
++/*
++ * COMPARE RELATIVE LONG
++ * If it is the target of an execute-type instruction, the address is relative
++ * to the CRL.
++ */
++static void test_crl(void)
++{
++	uint32_t program_mask, cc, crl_word;
++
++	report_prefix_push("CRL");
++	asm volatile ( ".pushsection .rodata\n"
++		"	.balign	4\n" //operand of crl must be word aligned
++		"0:	crl	%[crl_word],0\n"
++		"	.popsection\n"
++
++		"	lrl	%[crl_word],0b\n"
++		//align (pad with nop), in case the wrong bad operand is used
++		"	.balignw 4,0x0707\n"
++		"	exrl	0,0b\n"
++		"	ipm	%[program_mask]\n"
++		: [program_mask] "=d" (program_mask),
++		  [crl_word] "=d" (crl_word)
++		:: "cc"
++	);
++
++	cc = program_mask >> 28;
++	report(!cc, "operand compared to is relative to CRL");
++	report_prefix_pop();
++}
++
++int main(int argc, char **argv)
++{
++	report_prefix_push("ex");
++	test_basr();
++	test_bras();
++	test_larl();
++	test_llgfrl();
++	test_crl();
++	report_prefix_pop();
++
++	return report_summary();
++}
+diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+index d97eb5e9..b61faf07 100644
+--- a/s390x/unittests.cfg
++++ b/s390x/unittests.cfg
+@@ -215,3 +215,6 @@ file = migration-skey.elf
+ smp = 2
+ groups = migration
+ extra_params = -append '--parallel'
++
++[execute]
++file = ex.elf
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index ad7949c9..a999f64a 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -275,6 +275,7 @@ s390x-kvm:
+   - ACCEL=kvm ./run_tests.sh
+       selftest-setup intercept emulator sieve sthyi diag10 diag308 pfmf
+       cmm vector gs iep cpumodel diag288 stsi sclp-1g sclp-3g css skrf sie
++      execute
+       | tee results.txt
+   - grep -q PASS results.txt && ! grep -q FAIL results.txt
+  only:
+
+base-commit: e3c5c3ef2524c58023073c0fadde2e8ae3c04ec6
+-- 
+2.36.1
+
