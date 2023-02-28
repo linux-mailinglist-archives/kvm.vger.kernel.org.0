@@ -2,152 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 774CB6A5E1E
-	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 18:20:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F31CC6A5E48
+	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 18:35:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229524AbjB1RUo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Feb 2023 12:20:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44754 "EHLO
+        id S229653AbjB1Rff (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Feb 2023 12:35:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbjB1RUn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Feb 2023 12:20:43 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 716CF1ABE8;
-        Tue, 28 Feb 2023 09:20:42 -0800 (PST)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31SGYfvf005109;
-        Tue, 28 Feb 2023 17:20:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=ik5iaUcn4aUanPaSreO3KU4tHAIQK1wl+/Jl2te1YGY=;
- b=gTAxVgynl29/2AztDyYR5FgEw952hFNxCQzUcANYMokOnyTDJpYfYYojpkUaTCD1KWHd
- GD4/Jw4xW8Cl/PDO1tMowJVpzY9+KqggcjPnPuQzWuOKGrzLxiuywwSMteaa5ckgEpqI
- GLaTx2SU65/Xl2EXrbmotMSfepeNLEf6cn5+5Dp3vtaBUrNFb+pDHmxNToVNOk6acRRI
- /aUvuhlvfO6omVuLrgXnCZNkUwUHCaNV5saQ0FYe4wxNnbtHXhuvZ18ygNuopu/jp/ic
- 6UScHpt7k0SOMSVaYbtUiGQaDmYwotGG1neZKTqk3qqh95AAgpbR4zxkPKgl6KNTQQY1 qQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p1n8qh680-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Feb 2023 17:20:41 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31SHHO0D011199;
-        Tue, 28 Feb 2023 17:20:41 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p1n8qh678-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Feb 2023 17:20:40 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31SD0k0h001589;
-        Tue, 28 Feb 2023 17:20:39 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-        by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3nybdftesa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Feb 2023 17:20:39 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31SHKZZ065667342
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 28 Feb 2023 17:20:35 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 877D22004B;
-        Tue, 28 Feb 2023 17:20:35 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0AC7B20043;
-        Tue, 28 Feb 2023 17:20:35 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.171.17.91])
-        by smtpav03.fra02v.mail.ibm.com (Postfix) with SMTP;
-        Tue, 28 Feb 2023 17:20:34 +0000 (GMT)
-Date:   Tue, 28 Feb 2023 18:20:33 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH 3/3] s390x: pv: Add IPL reset tests
-Message-ID: <20230228182033.67876b8b@p-imbrenda>
-In-Reply-To: <171b551d-5c44-172e-4bdc-65cdb6e446ce@linux.ibm.com>
-References: <20230201084833.39846-1-frankja@linux.ibm.com>
-        <20230201084833.39846-4-frankja@linux.ibm.com>
-        <20230217174219.71163eb5@p-imbrenda>
-        <171b551d-5c44-172e-4bdc-65cdb6e446ce@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        with ESMTP id S229509AbjB1Rfe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Feb 2023 12:35:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E379C17163
+        for <kvm@vger.kernel.org>; Tue, 28 Feb 2023 09:34:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1677605689;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=s/AGn97AI8YGBk4aLDSy0vGS4XOOuR9v1pJVC2xh3L4=;
+        b=GWKEogZO+CTxOCv30EgVvTVlG1CIQDuHPJ05sedwPaWHhS+jhjK/s/zJa9WyHfirTLj3fB
+        wyQnKnEiyY0EtZYmZBATxvja5UxdqW9oX3dzwOKb+yHY+PIpsIdbOzvJ2SF/q6NLmYkemE
+        lWHhZjZKqH4onQwsSVRQ17DJ3ra3GCs=
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
+ [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-196-u_gRZzNoMBO6rujaVf6nFw-1; Tue, 28 Feb 2023 12:34:44 -0500
+X-MC-Unique: u_gRZzNoMBO6rujaVf6nFw-1
+Received: by mail-pg1-f198.google.com with SMTP id y1-20020a631801000000b00503696ca95dso2039253pgl.1
+        for <kvm@vger.kernel.org>; Tue, 28 Feb 2023 09:34:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:in-reply-to:mime-version:references
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=s/AGn97AI8YGBk4aLDSy0vGS4XOOuR9v1pJVC2xh3L4=;
+        b=Z3AkoMf/tNgSpaNMCA47B5cYeuBYgr9fJbPCpqVydEfINh+z8NtSdTIbkWZ2jaZv/L
+         Rg5wwIJvKjrLikG3JUox/s8qpvNqk1LQLQYMUsjOXput6qRSEzYSqQnxt0BHafjHndfO
+         q0etySI6BwCTTl4+KiAHk4Hk7HByuOzjk3NXwCNzHgmcOAR0xnvUXYDOHM37Deh+bMH1
+         CAqrLQkeiOmUkkKzjehjHvwV8LNhOz3WiZC1jIPfSuP+xNmSCaYjjMMU9hQFZ8Yc9Qlu
+         RHZkOJZdz18Pi3N3SrHl+6cn0nlDY2Hk4w6InMKUCNpDeuQfE7y3/uTvO2IrcaWGAep6
+         IzPg==
+X-Gm-Message-State: AO0yUKXLg2oPxK5ldAG+aCyyQ5p+i/5npkIWx9fl+zD+0p6fd093HnDk
+        WvpHX/SHGZRe8EhTde4TjffYm83MP9nEem3CQTx/i3yPJbCuts0lOWi3AzF32PmnbxVWSTRP64a
+        b+pwXptmQyGGz0aI6t+XYJyC2tcfV
+X-Received: by 2002:a17:90a:d3ca:b0:237:9cbe:22ad with SMTP id d10-20020a17090ad3ca00b002379cbe22admr1447600pjw.5.1677605683449;
+        Tue, 28 Feb 2023 09:34:43 -0800 (PST)
+X-Google-Smtp-Source: AK7set9HBdfALl9hzkys09ig8qmlnSHkfeZ6cIjUfNir/WVqf5tyDK6+if2qahCLYc4pe5NO434js9PXHlT/9uuJsZs=
+X-Received: by 2002:a17:90a:d3ca:b0:237:9cbe:22ad with SMTP id
+ d10-20020a17090ad3ca00b002379cbe22admr1447585pjw.5.1677605683150; Tue, 28 Feb
+ 2023 09:34:43 -0800 (PST)
+Received: from 744723338238 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 28 Feb 2023 09:34:42 -0800
+From:   Andrea Bolognani <abologna@redhat.com>
+References: <20230228150216.77912-1-cohuck@redhat.com> <20230228150216.77912-2-cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: ipNZiBzeX2Z7YnXQI3Q3XKjYT0PL5zcZ
-X-Proofpoint-GUID: xLn4LsokSqwx5-XEwYaq88T0Yh-GWlUr
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-02-28_13,2023-02-28_03,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- clxscore=1015 mlxscore=0 spamscore=0 adultscore=0 malwarescore=0
- impostorscore=0 lowpriorityscore=0 suspectscore=0 mlxlogscore=999
- phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302280141
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230228150216.77912-2-cohuck@redhat.com>
+Date:   Tue, 28 Feb 2023 09:34:42 -0800
+Message-ID: <CABJz62OHjrq_V1QD4g4azzLm812EJapPEja81optr8o7jpnaHQ@mail.gmail.com>
+Subject: Re: [PATCH v6 1/2] arm/kvm: add support for MTE
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Peter Maydell <peter.maydell@linaro.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Laurent Vivier <lvivier@redhat.com>, qemu-arm@nongnu.org,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Eric Auger <eauger@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Juan Quintela <quintela@redhat.com>,
+        Gavin Shan <gshan@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>,
+        Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 21 Feb 2023 10:26:11 +0100
-Janosch Frank <frankja@linux.ibm.com> wrote:
+On Tue, Feb 28, 2023 at 04:02:15PM +0100, Cornelia Huck wrote:
+> Introduce a new cpu feature flag to control MTE support. To preserve
+> backwards compatibility for tcg, MTE will continue to be enabled as
+> long as tag memory has been provided.
+>
+> If MTE has been enabled, we need to disable migration, as we do not
+> yet have a way to migrate the tags as well. Therefore, MTE will stay
+> off with KVM unless requested explicitly.
+>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  docs/system/arm/cpu-features.rst |  21 ++++++
+>  hw/arm/virt.c                    |   2 +-
+>  target/arm/cpu.c                 |  18 ++---
+>  target/arm/cpu.h                 |   1 +
+>  target/arm/cpu64.c               | 110 +++++++++++++++++++++++++++++++
+>  target/arm/internals.h           |   1 +
+>  target/arm/kvm.c                 |  29 ++++++++
+>  target/arm/kvm64.c               |   5 ++
+>  target/arm/kvm_arm.h             |  19 ++++++
+>  target/arm/monitor.c             |   1 +
+>  10 files changed, 194 insertions(+), 13 deletions(-)
 
-[...]
+I've given a quick look with libvirt integration in mind, and
+everything seem fine.
 
-> 
-> >> +/* Execute the diag500 which will set the subcode we execute in gr2 */
-> >> +diag	0, 0, 0x500
-> >> +
-> >> +/*
-> >> + * A valid PGM new PSW can be a real problem since we never fall out
-> >> + * of SIE and therefore effectively loop forever. 0 is a valid PSW
-> >> + * therefore we re-use the reset_psw as this has the short PSW
-> >> + * bit set which is invalid for a long PSW like the exception new
-> >> + * PSWs.
-> >> + *
-> >> + * For subcode 0/1 there are no PGMs to consider.
-> >> + */
-> >> +lgrl   %r5, reset_psw
-> >> +stg    %r5, GEN_LC_PGM_NEW_PSW
-> >> +
-> >> +/* Clean registers that are used */
-> >> +xgr	%r0, %r0
-> >> +xgr	%r1, %r1
-> >> +xgr	%r3, %r3
-> >> +xgr	%r4, %r4
-> >> +xgr	%r5, %r5
-> >> +xgr	%r6, %r6
-> >> +
-> >> +/* Subcode 0 - Modified Clear */  
-> > 
-> > what about subcode 1?  
-> 
-> My guess is that this hasn't been removed after a re-work of the code.
-> I suggest to remove the comment.
+Specifically, MTE is advertised in the output of qom-list-properties
+both for max-arm-cpu and the latest virt-X.Y-machine, which means
+that libvirt can easily and reliably figure out whether MTE support
+is available.
 
-sounds good
+> +MTE CPU Property
+> +================
+> +
+> +The ``mte`` property controls the Memory Tagging Extension. For TCG, it requires
+> +presence of tag memory (which can be turned on for the ``virt`` machine via
+> +``mte=on``). For KVM, it requires the ``KVM_CAP_ARM_MTE`` capability; until
+> +proper migration support is implemented, enabling MTE will install a migration
+> +blocker.
 
-> 
-> >   
-> >> +SET_RESET_PSW_ADDR done
-> >> +diag	%r0, %r2, 0x308
-> >> +
-> >> +/* Should never be executed because of the reset PSW */
-> >> +diag	0, 0, 0x44
-> >> +
-> >> +done:
-> >> +lghi	%r1, 42
-> >> +diag	%r1, 0, 0x9c
-> >> +
-> >> +
-> >> +	.align	8
-> >> +reset_psw:
-> >> +	.quad	0x0008000180000000  
-> >   
-> 
+Is it okay to use -machine virt,mte=on unconditionally for both KVM
+and TCG guests when MTE support is requested, or will that not work
+for the former?
+
+> +If not specified explicitly via ``on`` or ``off``, MTE will be available
+> +according to the following rules:
+> +
+> +* When TCG is used, MTE will be available if and only if tag memory is available;
+> +  i.e. it preserves the behaviour prior to the introduction of the feature.
+> +
+> +* When KVM is used, MTE will default to off, so that migration will not
+> +  unintentionally be blocked. This might change in a future QEMU version.
+
+If and when this changes, we should ensure that the new default
+behavior doesn't affect existing machine types, otherwise we will
+break guest ABI for existing VMs.
+
+-- 
+Andrea Bolognani / Red Hat / Virtualization
 
