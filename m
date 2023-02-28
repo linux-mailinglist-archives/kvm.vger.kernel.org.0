@@ -2,119 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A8B426A62A7
-	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 23:40:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 27B896A60EC
+	for <lists+kvm@lfdr.de>; Tue, 28 Feb 2023 22:06:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229681AbjB1Wkj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Feb 2023 17:40:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60346 "EHLO
+        id S229705AbjB1VGg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Feb 2023 16:06:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229595AbjB1Wki (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Feb 2023 17:40:38 -0500
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 119762E0CB;
-        Tue, 28 Feb 2023 14:40:09 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id me6-20020a17090b17c600b0023816b0c7ceso7300962pjb.2;
-        Tue, 28 Feb 2023 14:40:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1677624007;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=k1M39pp6BOTJLqCwHMILP4cFGR727Jpzqg5ju78BWx8=;
-        b=Oz6li5x7qu54218EoqDEzjLgff3Vj2grOCtgtsoWTNgT6AYnNiUcIuRQiqcJOEA5gZ
-         lokkfjPyQ+w2r3I5ruEt9DFdVy3H+AEbsZWNRLJfP9IrivZCulnotDP2dkKjCHW2jezd
-         oH/1GsAf3wBT5OLBNz4wyDvwXNa1SJ1QxHOLzEYf1Kl89mujGFgm28uhD1qlomCjEflr
-         bCeRRfAqUwJtDDixVCbany7a9KpomAINGpJM705L2yJVBZK4mK9qrIQDIxc6JJIFd9yF
-         tjQFz536hqsfFmqM8whmhUnWETcCHagKQ8gjozlmnJvIEERWUuH+zGpWm83+hejyxPyb
-         WJ+A==
+        with ESMTP id S229565AbjB1VGe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Feb 2023 16:06:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1B2E6EBF
+        for <kvm@vger.kernel.org>; Tue, 28 Feb 2023 13:05:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1677618330;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0/5hmQVwpzcKmo7ZySLNvsyz1qAPMMBkqrZKd0ciXbk=;
+        b=AsK4gTBvUHwFRY727XMjHCBXsbQENr9ReSTbV4DGEL7l1o6RbG30rKiOqu30dqW+d38r34
+        yfwUWNXw/NB2EwwjonbHjG08WRyED1PZWIu60RGG0FQe0s9+rS2eQGuRTjmgioxWHfnoCH
+        JMi7FBtE/Y/U21q0daQKlZVjRRhi+/U=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-616-AVUEKjFtN8u9pC-rj57nAA-1; Tue, 28 Feb 2023 16:05:29 -0500
+X-MC-Unique: AVUEKjFtN8u9pC-rj57nAA-1
+Received: by mail-wr1-f70.google.com with SMTP id u5-20020a5d6da5000000b002cd82373455so765616wrs.9
+        for <kvm@vger.kernel.org>; Tue, 28 Feb 2023 13:05:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677624007;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=k1M39pp6BOTJLqCwHMILP4cFGR727Jpzqg5ju78BWx8=;
-        b=I7cIpliuWGRGqFKm2A1s8ZUg4Jc5n6dHM/3e9ZtF6BcBzO1IITWjl4OuMl5P5dv4FJ
-         7ONEXzuv/jR/twhujq4lDNtYJMrNyRC38iq+ae6y5CesvFcXYhTOHWhsMuB6fW97p41p
-         3vWDN7kkxBxphtO6XzW5nwN5QNlzjDw2ul7OhCCttl4GANVBVJexGy8Q1C39SenUSHBW
-         fA+Ko4aBMJuNxd2oS2aLO62x1kQwcP+Mbo1RnY3vDHJL5EseOT/CAN47vdQgVCaTtawl
-         0TVPbsXt9EL96vzv7xQCz0svBzfiiDxGUaval8Ln64eRjC1kapMVDhi1gNKoYh2QnvwJ
-         XJdg==
-X-Gm-Message-State: AO0yUKWekz0uoPRulgFUu0JZ2WZm1qXZQFZfo8xsBt/gtJXbBSSn4gyG
-        yUrkiv/N58OmHGJs4gAMzPw=
-X-Google-Smtp-Source: AK7set/cI3/YGAgHbDcqpXTyWxlPEBObsGXe9DTePwqU5sY2tx6bSstbGZUhiztB9D0VuAUQRYFuKA==
-X-Received: by 2002:a17:903:187:b0:199:1996:71ec with SMTP id z7-20020a170903018700b00199199671ecmr4957460plg.16.1677624007358;
-        Tue, 28 Feb 2023 14:40:07 -0800 (PST)
-Received: from localhost (c-73-164-155-12.hsd1.wa.comcast.net. [73.164.155.12])
-        by smtp.gmail.com with ESMTPSA id l6-20020a170902d34600b0019cb8ffd209sm7029866plk.229.2023.02.28.14.40.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Feb 2023 14:40:06 -0800 (PST)
-Date:   Sat, 18 Feb 2023 07:25:41 +0000
-From:   Bobby Eshleman <bobbyeshleman@gmail.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        Cong Wang <cong.wang@bytedance.com>, kvm@vger.kernel.org,
-        Alexei Starovoitov <ast@kernel.org>,
-        virtualization@lists.linux-foundation.org,
-        Song Liu <song@kernel.org>, Eric Dumazet <edumazet@google.com>,
-        Stanislav Fomichev <sdf@google.com>,
-        linux-kselftest@vger.kernel.org, Shuah Khan <shuah@kernel.org>,
-        Mykola Lysenko <mykolal@fb.com>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        Yonghong Song <yhs@fb.com>, Paolo Abeni <pabeni@redhat.com>,
-        KP Singh <kpsingh@kernel.org>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>, Hao Luo <haoluo@google.com>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jiri Olsa <jolsa@kernel.org>, bpf@vger.kernel.org,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH net-next v3 1/3] vsock: support sockmap
-Message-ID: <Y/B9ddkfQw6Ae/lY@bullseye>
-References: <20230227-vsock-sockmap-upstream-v3-0-7e7f4ce623ee@bytedance.com>
- <20230227-vsock-sockmap-upstream-v3-1-7e7f4ce623ee@bytedance.com>
- <20230228163518-mutt-send-email-mst@kernel.org>
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0/5hmQVwpzcKmo7ZySLNvsyz1qAPMMBkqrZKd0ciXbk=;
+        b=eaEx7CXTWQSa2NLZLRYbA0aV1ZWG4e0Nh0NaDygI5dopmxmK2Rw5C6KP4KdbV2a+lK
+         yCWM+RF7gJ/3Lgh1eJCH77BbRI/igR0xWJ8z3MTj6bTNngMGYoUkLkfLifks3dKiH4lM
+         65SI6TsQHfHDVFmzpxxbb5QF/od4iph/C1QRf6HYs5MTYHZSFYkI1HHBmHqkUQfSmQOH
+         64nhxCVlo0TYKKIeZi9VXStPb4yiTIG72OVocE5Xu2MYXDBQpcYiIU94hwjdUe64mHoI
+         DgvFea/zgJZZ5ubizquxJhb8hTvGENe8SHB/23GrElLVsszz2I0gDzaygYFPfXzou/Zf
+         ZG2Q==
+X-Gm-Message-State: AO0yUKWAZc/nuh8pbd39Dz9fb/Q9vYXOwsuZ/gn7tVPvQxyjIuotlI6U
+        9zFfHEAd601q0g7UDYPt8z/jCd/FWENYXi9OzteGz7Mh0ovv8jM5iYd+rHl7rgkspJQgVvmh9FI
+        xiEOOOiU6cvnHFRAlySqnYjLmIkJOs9XsBSnfhpXuUzfcDzRJAM5Yy1Zp1ug5dS0PMy5J
+X-Received: by 2002:a05:600c:1d28:b0:3e2:147f:ac1a with SMTP id l40-20020a05600c1d2800b003e2147fac1amr3385158wms.21.1677618328470;
+        Tue, 28 Feb 2023 13:05:28 -0800 (PST)
+X-Google-Smtp-Source: AK7set9zrY1Ob9BThSVmM8VM9t39M7li3rs0M0P+LAVMOqBxDLKVC6qz7tgEwMKRPuRCd+1G8HlP3w==
+X-Received: by 2002:a05:600c:1d28:b0:3e2:147f:ac1a with SMTP id l40-20020a05600c1d2800b003e2147fac1amr3385132wms.21.1677618328092;
+        Tue, 28 Feb 2023 13:05:28 -0800 (PST)
+Received: from [192.168.8.100] (tmo-112-221.customers.d1-online.com. [80.187.112.221])
+        by smtp.gmail.com with ESMTPSA id bh22-20020a05600c3d1600b003e01493b136sm17087499wmb.43.2023.02.28.13.05.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Feb 2023 13:05:27 -0800 (PST)
+Message-ID: <04213fad-909f-e86d-caaa-c559917b2e4d@redhat.com>
+Date:   Tue, 28 Feb 2023 22:05:25 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230228163518-mutt-send-email-mst@kernel.org>
-X-Spam-Status: No, score=1.3 required=5.0 tests=BAYES_00,DATE_IN_PAST_96_XX,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
-        autolearn_force=no version=3.4.6
-X-Spam-Level: *
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [PATCH v2 6/6] KVM: Change return type of kvm_arch_vm_ioctl() to
+ "int"
+Content-Language: en-US
+From:   Thomas Huth <thuth@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Steven Price <steven.price@arm.com>,
+        Cornelia Huck <cohuck@redhat.com>
+References: <20230208140105.655814-1-thuth@redhat.com>
+ <20230208140105.655814-7-thuth@redhat.com>
+In-Reply-To: <20230208140105.655814-7-thuth@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 28, 2023 at 04:36:22PM -0500, Michael S. Tsirkin wrote:
-> On Tue, Feb 28, 2023 at 07:04:34PM +0000, Bobby Eshleman wrote:
-> > @@ -1241,19 +1252,34 @@ static int vsock_dgram_connect(struct socket *sock,
-> >  
-> >  	memcpy(&vsk->remote_addr, remote_addr, sizeof(vsk->remote_addr));
-> >  	sock->state = SS_CONNECTED;
-> > +	sk->sk_state = TCP_ESTABLISHED;
-> >  
-> >  out:
-> >  	release_sock(sk);
-> >  	return err;
-> >  }
+On 08/02/2023 15.01, Thomas Huth wrote:
+> All kvm_arch_vm_ioctl() implementations now only deal with "int"
+> types as return values, so we can change the return type of these
+> functions to use "int" instead of "long".
 > 
-> 
-> How is this related? Maybe add a comment to explain? Does
-> TCP_ESTABLISHED make sense for all types of sockets?
-> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>   arch/arm64/kvm/arm.c       | 3 +--
+>   arch/mips/kvm/mips.c       | 4 ++--
+>   arch/powerpc/kvm/powerpc.c | 5 ++---
+>   arch/riscv/kvm/vm.c        | 3 +--
+>   arch/s390/kvm/kvm-s390.c   | 3 +--
+>   arch/x86/kvm/x86.c         | 3 +--
+>   include/linux/kvm_host.h   | 3 +--
+>   7 files changed, 9 insertions(+), 15 deletions(-)
 
-Hey Michael, definitely, I can leave a comment.
+Ping!
 
-The real reason is due to this piece of logic in sockmap:
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/net/core/sock_map.c?h=v6.2#n531
+Unless I missed something, I think this series had enough review ... Paolo, 
+could you maybe queue the whole series, since it's mostly an 
+architecture-wide clean up?
 
-And because of it, you see the same thing in (for example)
-unix_dgram_connect():
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/net/unix/af_unix.c?h=v6.2#n1394
+  Thanks,
+   Thomas
 
-I believe it makes sense for these other socket types.
