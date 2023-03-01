@@ -2,99 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F402C6A70B7
-	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 17:21:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 859E06A7141
+	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 17:34:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229592AbjCAQVX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Mar 2023 11:21:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40692 "EHLO
+        id S230205AbjCAQet (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Mar 2023 11:34:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229520AbjCAQVW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Mar 2023 11:21:22 -0500
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55BEE305FD;
-        Wed,  1 Mar 2023 08:21:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677687680; x=1709223680;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=99e5KN1R/O+8i5rO5OW9FmQOG2BY+kuQaZF2MSYyEdI=;
-  b=kSTQ+90Gyh7lYHXDEcCtJqRnWelh8frjSm3LXip4dMLQ5ztkNjIIcQwr
-   e9xAYMcQGpNkQx6bGM/mg9ZNZreDH/5SVbBuv+Hu+27KSJvqDvBPd0Tuw
-   gQvhN3NNSy+VymZE1TL8TBtwHIBxbFZR9AourJ64yegi4lnL/W6p8wDTo
-   EBMeBXXdKAMh2nPd4eomeAIQgYMzHvz+kgIrBLm6jppzJm2iKqx038XjJ
-   bYyf3xFLQqpnMusG4d4SlGoja1r29T/F8EfIev/A1JG15hV6jlVhD6q2A
-   JsyIx0IE6lum2ECsiQyH6BkTOSRqdQGjFytPNv6TMT8BSzr68KDX9In+w
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="335942692"
-X-IronPort-AV: E=Sophos;i="5.98,225,1673942400"; 
-   d="scan'208";a="335942692"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2023 08:21:19 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="674623570"
-X-IronPort-AV: E=Sophos;i="5.98,225,1673942400"; 
-   d="scan'208";a="674623570"
-Received: from asaha3-mobl1.amr.corp.intel.com (HELO [10.251.12.67]) ([10.251.12.67])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2023 08:21:18 -0800
-Message-ID: <a15fc9a5-c136-47f7-e15e-776a511f3cdb@intel.com>
-Date:   Wed, 1 Mar 2023 08:21:17 -0800
+        with ESMTP id S229887AbjCAQe1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Mar 2023 11:34:27 -0500
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on20630.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e89::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 015A94AFE5;
+        Wed,  1 Mar 2023 08:33:48 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=h+/6An29Ui7JX4+52Nbtl6UBP4WmudqeYr8l7Xh2UZdQMFedjYyYmzr7qRrGtCeIYW3HWFpuxq+78YgdWRwnhI9T5Cxb4yT6yHhKNCHnhZOlL+KKYjJbTOl14EdSnut4kiBS/wfNDWrGDUrVIcV3HDac9bMEI5Qu3iM6fs5YxsksYaz/HzI/eozAS2+6bJFUSgM92ym7TALVnkWW+JPBGPp50NTtex1apxHYTbjk32pENB1jaffAObO2Zbsc/FRcTDNRmHrfdMQoeY9wYa+X360kz3TdH+/m0iyx37bDQ9397bcVdfg7gwwMP5MtXOREBpOuaKeNcFkG69c+xLuUAg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Kgt/t44JTJCTnDFzAl0CVVo0jn+uJ7arC8wDiyGxeyY=;
+ b=JyighItzvlzeSDAjwuwzhk3Ysk3+R746wvf2u+DVQO0X2SsjYHOq8OebcTH7inl31qiNoF9WkkPPqfgGc5Ri4/erVZkTfnPFZyQjJi2VmsPeR0dWC2HHUVzQK5qnvgGFVZhz4aMm7o3w737Sejeh4ATLmJlDXOcIzcTXsVxsExVktJe7hCrD1bT8h3ZJw4Nt7hKiBXBRE4W1bt5T64rL/bEm0EplqMmmO/S+4gV1q47vqbQyMyymWvCQalUQ1R+H7AE0eINShYaihsQP5iQJs4n8kQZUV4v4pevp73q3A8lMYDGwme3yg1FcogcfGJvFMgh8cKJA9mUHiYkTXCKOgg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Kgt/t44JTJCTnDFzAl0CVVo0jn+uJ7arC8wDiyGxeyY=;
+ b=Jg+kkJrfahNW7jAEQ2XYkBTQeWEjx+mB/ttEvee5eTpbJzDHDPGf/4zIWoEBjNGo5g6/JShdv04bUOe94z3pikeulZMEcOd702xX0tenu3IIhJO5fPwxrFopbjbo0DFkjU6jw2rP2JmRd8gzITkWLiqe4+nQ+IsjKU0qzY0Y9EQ=
+Received: from BN9PR03CA0927.namprd03.prod.outlook.com (2603:10b6:408:107::32)
+ by MN0PR12MB5786.namprd12.prod.outlook.com (2603:10b6:208:375::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.30; Wed, 1 Mar
+ 2023 16:32:21 +0000
+Received: from BN8NAM11FT082.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:107:cafe::d9) by BN9PR03CA0927.outlook.office365.com
+ (2603:10b6:408:107::32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.30 via Frontend
+ Transport; Wed, 1 Mar 2023 16:32:21 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ BN8NAM11FT082.mail.protection.outlook.com (10.13.176.94) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6156.12 via Frontend Transport; Wed, 1 Mar 2023 16:32:21 +0000
+Received: from SATLEXMB07.amd.com (10.181.41.45) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Wed, 1 Mar
+ 2023 10:32:20 -0600
+Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB07.amd.com
+ (10.181.41.45) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Wed, 1 Mar
+ 2023 08:32:20 -0800
+Received: from xndengvm004102.xilinx.com (10.180.168.240) by
+ SATLEXMB04.amd.com (10.181.40.145) with Microsoft SMTP Server id 15.1.2375.34
+ via Frontend Transport; Wed, 1 Mar 2023 10:32:16 -0600
+From:   Gautam Dawar <gautam.dawar@amd.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC:     <linux-net-drivers@amd.com>, <harpreet.anand@amd.com>,
+        <tanuj.kamde@amd.com>, Gautam Dawar <gautam.dawar@amd.com>
+Subject: [PATCH] vhost-vdpa: free iommu domain after last use during cleanup
+Date:   Wed, 1 Mar 2023 22:02:01 +0530
+Message-ID: <20230301163203.29883-1-gautam.dawar@amd.com>
+X-Mailer: git-send-email 2.30.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH RFC v8 17/56] x86/fault: Add support to handle the RMP
- fault for user address
-Content-Language: en-US
-To:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
-Cc:     linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
-        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        nikunj.dadhania@amd.com, Brijesh Singh <brijesh.singh@amd.com>,
-        Jarkko Sakkinen <jarkko.sakkinen@profian.com>
-References: <20230220183847.59159-1-michael.roth@amd.com>
- <20230220183847.59159-18-michael.roth@amd.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <20230220183847.59159-18-michael.roth@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT082:EE_|MN0PR12MB5786:EE_
+X-MS-Office365-Filtering-Correlation-Id: f2110bdf-e1fc-4793-6d87-08db1a7287e3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: YiWBJGDz895Kxro8GTfraBe0rLM8Q6xJEcr75lsh5uaoZQfkO6s/h6FpjGpWxVywVCv7Gpn2veAaL8I0lzRjYC0e1xTIzphaytFFOa9dGLN/fed8sCbDktE+DBZcDysAoGhrDJP/DKdAKoOZPDklCUEK046SJ4HsYYYFdbjPGb/avvhTLg9E5DzwywbYoQxetYs2oZJNHbgbcydUZU2ZlQp7caDURG7EGMm8L4CNvL4RwyeBaneBVuQhYtpUbuIAYlv088khtiuGQ5rQm9knlujAO8ZdroJnDmrwEP0yAy09sV/33jX220bS/y5miMiluHOOY15kFrZFYefKQkL3jz5taX4Gs5iuaZ95OCPrTeAIxpv2Pq6LrCD7GTEwW8Kyx6dQovIr5BOIfLH7uXn2thPKaRG4QljWOUt+wOrHP40QYyvqdf1fxgnqdFuU9Y3wE1noAOfK12l16euPV8aiNoHk367clUQj9ZISF2DRgoitaW/ed49hxvbpSWK1ekk8UE+Tmx6NjElpwzgSpu4dzxJw8sebetNG5CGtmTtbZ8DtyHMAk/rka1DatM+huBindeV2JYqPqUI/sPeJlNxqzdBKro3cCIBXDCUBpNstpcigpZDBF8s/GaC/NdzbqTon8KbShNytrUAkFqdsykgOabg1wZ7eBW3IfbGtw3WSYAbqPaqSiegmf7QaFrstWBVtUFyz5W/cJAcN6KaaBMG2gITAdJsQNSZwLPti0Z/c4Ok=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(346002)(396003)(39860400002)(136003)(376002)(451199018)(46966006)(36840700001)(40470700004)(26005)(2906002)(5660300002)(6666004)(8936002)(8676002)(70206006)(44832011)(70586007)(54906003)(110136005)(316002)(478600001)(186003)(1076003)(36860700001)(2616005)(426003)(47076005)(336012)(82310400005)(41300700001)(83380400001)(4326008)(82740400003)(36756003)(86362001)(40460700003)(356005)(81166007)(40480700001)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Mar 2023 16:32:21.1011
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f2110bdf-e1fc-4793-6d87-08db1a7287e3
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT082.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5786
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,SPF_HELO_PASS,
+        SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/20/23 10:38, Michael Roth wrote:
-> +static int handle_split_page_fault(struct vm_fault *vmf)
-> +{
-> +	__split_huge_pmd(vmf->vma, vmf->pmd, vmf->address, false, NULL);
-> +	return 0;
-> +}
-> +
->  /*
->   * By the time we get here, we already hold the mm semaphore
->   *
-> @@ -5078,6 +5084,10 @@ static vm_fault_t __handle_mm_fault(struct vm_area_struct *vma,
->  				pmd_migration_entry_wait(mm, vmf.pmd);
->  			return 0;
->  		}
-> +
-> +		if (flags & FAULT_FLAG_PAGE_SPLIT)
-> +			return handle_split_page_fault(&vmf);
+Currently vhost_vdpa_cleanup() unmaps the DMA mappings by calling
+`iommu_unmap(v->domain, map->start, map->size);`
+from vhost_vdpa_general_unmap() when the parent vDPA driver doesn't
+provide DMA config operations.
 
-I asked this long ago, but how do you prevent these faults from
-occurring on hugetlbfs mappings that can't be split?
+However, the IOMMU domain referred to by `v->domain` is freed in
+vhost_vdpa_free_domain() before vhost_vdpa_cleanup() in
+vhost_vdpa_release() which results in NULL pointer de-reference.
+Accordingly, moving the call to vhost_vdpa_free_domain() in
+vhost_vdpa_cleanup() would makes sense. This will also help
+detaching the dma device in error handling of vhost_vdpa_alloc_domain().
+
+This issue was observed on terminating QEMU with SIGQUIT.
+
+Fixes: 037d4305569a ("vhost-vdpa: call vhost_vdpa_cleanup during the release")
+Signed-off-by: Gautam Dawar <gautam.dawar@amd.com>
+---
+ drivers/vhost/vdpa.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+index ec32f785dfde..b7657984dd8d 100644
+--- a/drivers/vhost/vdpa.c
++++ b/drivers/vhost/vdpa.c
+@@ -1134,6 +1134,7 @@ static int vhost_vdpa_alloc_domain(struct vhost_vdpa *v)
+ 
+ err_attach:
+ 	iommu_domain_free(v->domain);
++	v->domain = NULL;
+ 	return ret;
+ }
+ 
+@@ -1178,6 +1179,7 @@ static void vhost_vdpa_cleanup(struct vhost_vdpa *v)
+ 			vhost_vdpa_remove_as(v, asid);
+ 	}
+ 
++	vhost_vdpa_free_domain(v);
+ 	vhost_dev_cleanup(&v->vdev);
+ 	kfree(v->vdev.vqs);
+ }
+@@ -1250,7 +1252,6 @@ static int vhost_vdpa_release(struct inode *inode, struct file *filep)
+ 	vhost_vdpa_clean_irq(v);
+ 	vhost_vdpa_reset(v);
+ 	vhost_dev_stop(&v->vdev);
+-	vhost_vdpa_free_domain(v);
+ 	vhost_vdpa_config_put(v);
+ 	vhost_vdpa_cleanup(v);
+ 	mutex_unlock(&d->mutex);
+-- 
+2.30.1
 
