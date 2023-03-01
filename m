@@ -2,186 +2,235 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 29DAF6A6666
-	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 04:17:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EB85A6A6685
+	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 04:37:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229437AbjCADR4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Feb 2023 22:17:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57992 "EHLO
+        id S229617AbjCADhB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Feb 2023 22:37:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229564AbjCADRy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Feb 2023 22:17:54 -0500
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 263B737B41;
-        Tue, 28 Feb 2023 19:17:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677640670; x=1709176670;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=evVzLItUN4/M90uAluLpynabE0KX7s69yqAcqx+HErY=;
-  b=Dyaooki8HS8AafV8uh0MCbCDhu4FG3eiN5yzvri0bRuemIrbsNWuSMiK
-   1NAaqur2T3XZX4hEsmWzi6aakYVnSAhPTHpveDcAaU+aq2KBY683rF+wJ
-   1mYrAuajScqFw5C+H3nm6qehOgRT8hUtKyecLY7DKLBGZ3aZAwCY8KH8o
-   IieVAQKtTqXkQGvVn8AfYQNjWv8PcTGLitdASnINqaO10iZ5TsXFRCRtK
-   AIxA9drkQWOR3dS3P+bAGTMBPdBcpjJ4RJsVgozFCdFG2QhGspnDZdGmP
-   aCwN0k4JLNyM/rZe0V7HiePXCgRB58znxBEcRKtwvBElV/Fc1gyml/QGR
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10635"; a="336603519"
-X-IronPort-AV: E=Sophos;i="5.98,223,1673942400"; 
-   d="scan'208";a="336603519"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2023 19:17:49 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10635"; a="738463733"
-X-IronPort-AV: E=Sophos;i="5.98,223,1673942400"; 
-   d="scan'208";a="738463733"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmsmga008.fm.intel.com with ESMTP; 28 Feb 2023 19:17:49 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Tue, 28 Feb 2023 19:17:49 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Tue, 28 Feb 2023 19:17:48 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21 via Frontend Transport; Tue, 28 Feb 2023 19:17:48 -0800
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.109)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.16; Tue, 28 Feb 2023 19:17:48 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Y5vKCGzS5pzdEP9ZjTP7gAydDofbPEeNXjzfN6yAHn9mwduNr0nXwvHPnbyDcm/N3Xxy2gxTwBseU0/tSmiohqQ8EFY0Xc93Bbc07j08zbkUKMoy26VOKBh0EjQWDmTeNvCj1K4ZkqU0fM4DW05BouggNNCryWM3LfgUEJFOmoMrkab30n71S9ZnpADGnKF6d7H8vHb4e9wmeqY9pSgk4zLcMY2/+68uifDhPBA9tgXS+CzXWOwqIN/cU99SIQEVjO1EXLaQFgkNmb8i7VjM18NrD7p4OaebTwBb3QP95sj6dM+dWvLfoTrtjQum2drZ/WTY3nWhXg8yH2zFBSNDzQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=evVzLItUN4/M90uAluLpynabE0KX7s69yqAcqx+HErY=;
- b=OmCHMo+yRB4TBM49NgoUnzgpo8rR/fWvfRjiNNS4CPhJjMPMAVPEAVXvrXxtN6xHkGg/C962dOTT8rxgOSxcZPZsRX25tPGH5eBmaMis5k0zZ1soEnutam+Z+s5yA8jGSBJQ9U+7jjeKZU1Kv4hk+1jLI5kvbJfYhb3Rc5tLn0fCicrTqTUDfHDrlTwhNlxmiocf+2mXuKIarTGw6mjl2ujacwy2GSdAyWQ2IOOtss8YHLgc9K9+pDkGklc0XMxY1Cmxk2WTxzXDFaPh/eoExJnBaKLeGXjfd88Q03NAUovJ92rcA5cn6nX3KKFFZ92l81A0KVQn4oVQq9nYqVNjMQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from SA1PR11MB6734.namprd11.prod.outlook.com (2603:10b6:806:25d::22)
- by SA2PR11MB4938.namprd11.prod.outlook.com (2603:10b6:806:fb::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.19; Wed, 1 Mar
- 2023 03:17:45 +0000
-Received: from SA1PR11MB6734.namprd11.prod.outlook.com
- ([fe80::7576:1f4a:2a6c:72f7]) by SA1PR11MB6734.namprd11.prod.outlook.com
- ([fe80::7576:1f4a:2a6c:72f7%2]) with mapi id 15.20.6134.027; Wed, 1 Mar 2023
- 03:17:45 +0000
-From:   "Li, Xin3" <xin3.li@intel.com>
-To:     "H. Peter Anvin" <hpa@zytor.com>,
-        "andrew.cooper3@citrix.com" <andrew.cooper3@citrix.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Shankar, Ravi V" <ravi.v.shankar@intel.com>
-Subject: RE: [RFC PATCH v3 15/32] x86/fred: make unions for the cs and ss
- fields in struct pt_regs
-Thread-Topic: [RFC PATCH v3 15/32] x86/fred: make unions for the cs and ss
- fields in struct pt_regs
-Thread-Index: AQHZSCGoAtP+d2NP6kO8XHsOE5TSfq7d7fwAgABcnqCABu0ZgIAAEI2w
-Date:   Wed, 1 Mar 2023 03:17:45 +0000
-Message-ID: <SA1PR11MB6734131B9260C07CF1DCFECFA8AD9@SA1PR11MB6734.namprd11.prod.outlook.com>
-References: <20230224070145.3572-1-xin3.li@intel.com>
- <20230224070145.3572-16-xin3.li@intel.com>
- <bf1ad4c3-73eb-0f8f-e627-a7e0785fe903@citrix.com>
- <SA1PR11MB673406B8B43E18F0BD11C8DBA8A89@SA1PR11MB6734.namprd11.prod.outlook.com>
- <89026D19-3E98-4D88-820B-36A29488D46D@zytor.com>
-In-Reply-To: <89026D19-3E98-4D88-820B-36A29488D46D@zytor.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA1PR11MB6734:EE_|SA2PR11MB4938:EE_
-x-ms-office365-filtering-correlation-id: 842e450a-54f1-4501-23f2-08db1a0386cb
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Mc58HNrqRHIWGThW/zIlNyJzpN/cUkw2D2Cn+eyZFWyA/rwnrWHjIs5VL3E9XeLG44NFYTDamgUi1mCsLWvHSvx3oh7LUgUnPwI6kRC6dLtSNRtn68CafTzE05DzTl7YtpnvXPrq3VvMTTopDS8EPdSdmdQwvUTnuiH8eoXG2uBc4IebSVOY/49kXxhDlH9lBW/Xy/InqSMqmglXmS9nt0juDaAGgNICuTYwb5RG4xeOBl18+OXu+SWpJvT2FUsTqL9RspOG8YkYIGasDGe4htjfHPSh9wpJpe0p09jviVtOU7HfoE2onhFAws8xOX5fd8/LaOgyJ4hsGp5KV17HmrUNoRd7cv7wRTy5DtDkZdLA5X0UD6+nhp2jSlfyW56oxpCd08ad/msW9KFLBWLzG7zYP3tnKMSOi5XQ3dnwY0jfYsTGGRSpchfssvqIKB26APaWtakuDinZiksQBuW9977Z/3fPnVl4vxBeFBe5bgOkRS9LSRns5FyaVpPhEh5nZPzNk6mZbyT8/f6KmC2bSQvLmUySxjNYAxnkt87c8ZPr6bk2jAY4WwiutuULEwm+Oy+8N2pPl84ZG02WW03GE1tCiXD1VWFWrmAENm1a4B9YAzxClAIIaqMTLVwKcDhkL1R0sslO3X6irExaGfRvgOJe+lDhZTaYW4ebTVUjQiFIvUy4S1A6QYM1m7vJn7glpaF+Qh5oW/mWgQ+UwuEWsA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR11MB6734.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(396003)(366004)(346002)(39860400002)(376002)(136003)(451199018)(33656002)(82960400001)(71200400001)(122000001)(6506007)(2906002)(186003)(26005)(38070700005)(5660300002)(55016003)(478600001)(9686003)(4326008)(66476007)(8676002)(41300700001)(76116006)(66556008)(4744005)(86362001)(66946007)(52536014)(7696005)(64756008)(66446008)(38100700002)(54906003)(110136005)(7416002)(8936002)(316002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?MWFWUUVLUS84b0plWUhyRENMb3NPMEF1RnlMQlBpUXdLYWhiYnEvL0ZaVXhp?=
- =?utf-8?B?UmVBZHJnRVNzeGJDZHBzQ2tyNDJ6MTcvZytHeUNVd2hYQmpKYnNyNTFLS1pV?=
- =?utf-8?B?MXRJSmFyRld1eDlIU2FzdnZ5NFRMbjAvOUI2NFV6VUdVTjY0UmtIVFhNZ3pw?=
- =?utf-8?B?UWJ4TnNMWE1xM2ZhNW8ydkIxUEUzRU1vdEFpVHJyQWZBd040WTlvYTM5bzhY?=
- =?utf-8?B?aS9VNDNKUjBPUzBmdnZFVkpjcmppTDhybFBYeU5xdGdHcTlqYTlUTlhKeFlk?=
- =?utf-8?B?Q28rYmRMemRvTGIyQ1pjT0UzbnJHblBkL3d3czNaMVk2ZXVrU3EzNVdOT0Zj?=
- =?utf-8?B?bUQwaGJvNUxhRmF5LzdNUCs4Z01kbGJUUk12WGZiWndnUzB0K0w1QUpHSWx2?=
- =?utf-8?B?V1VCSkNZMkZCZzBIR25uL0NMbU9nZEpuZnFYL1MwYjVhZXdEa1dpUUhlR2NB?=
- =?utf-8?B?QWt4Z1BBdCsyaGNhaXJTYmxBQVN3cjFWdnphRnZsQXJndXZITHVPKzl2SERT?=
- =?utf-8?B?azl0dmpnbE1kMXNOZnQ5TEFqQks4MFdwOTRld2pZVFlKbFhtVmUyREhuL1Ex?=
- =?utf-8?B?QVAwWUhJWHBWMGJjTGxBSmhxRTlNazRWNmxCWnBsWFpuYWdTaFVZUWFUQlg1?=
- =?utf-8?B?YXVKNHFmYU5aQ3lyZ2ZPRFdPVjZPbWZVYnEwM0pGUmxDTkZLbS9iOVFIYlVM?=
- =?utf-8?B?N1ZnK1RPU1ZrRnYwb1o4cjJ2MzZwY1dESHdrbENzOXd2am1UZ1lwMmVVNlQx?=
- =?utf-8?B?aGpPdnhjekJMd1Y5ZUVQK3RCM2FBNlljSEZhTFRIRVg2amZjOWVlUmNqSUxH?=
- =?utf-8?B?c3M1VmdVSVRTK0ovOWtwOWdKcmdTbGp2VTU4RHBoQUU0WGI0ei9qd2tOR052?=
- =?utf-8?B?RElLczBVdWpTNnBXSllFNDBwWFdQSHExM3hkcHdVMFd4R2RZL1ZUeU54Y1Q1?=
- =?utf-8?B?MGs0NVBDam44UGx5NFVYbDVnRUk0L1M5dWtmeHMzMUthY09wUTRZTXhyQUNS?=
- =?utf-8?B?WDQvRUQwWnJ2cUtqQjNNdzR3elRJVVoxRWFVZjZyNnNQWHVmMzJQZnRZcVhK?=
- =?utf-8?B?ejVxalV5YStuL2JNZGhzTVZESUlzRXBTdzMxRzN4cW9xdjJHdGtZK0lwc0wr?=
- =?utf-8?B?dU1OUTRPdk5OdmFyRkZ5M25hbmdJTlY4S2VpWmV2UHU5bWFZMFNxaXBibVNv?=
- =?utf-8?B?V1pxbTFwOWZEeVJwN1NydmRCMlRwZUFxYVJDRVNZWEEyLzNycGxMUFdwNzRG?=
- =?utf-8?B?eW1JOFBhSG1Ud3NTRjNHeE0vcUdnZDc4a1pqcjVpRjJpMGo3K0wrRXNtbzhs?=
- =?utf-8?B?THNNUU9pYWFyQnNPR09ycUtKaTAyT0p4RXpnTGcyaDUwdkNDTXNkQUFPUzdV?=
- =?utf-8?B?cTdqS283R2JsOUpaVFNZZWRFOHE5bkZmRXQ1YitGUVFpZm56RWt0WmhMOUxV?=
- =?utf-8?B?cWlGS1BHdUsxOTZHaG1OYkZGOFd4bjhLWXlCdi9aUDZOUmJBcUNTTkJxbW5X?=
- =?utf-8?B?NW5IR2owcDQ1eGMvVCtKU3MySXpwWWRDV2Fkd0J1TzdoN1d3MW1vaGtWSTUr?=
- =?utf-8?B?R3JUR25jYWVIVEtFT1RkcDhDTjRRUVZleHlybldtYWM5WmIyQlg2N1pYNmEx?=
- =?utf-8?B?R0tRRlFFUkpoWlpEWVQ3eHg5aFJ3SFBaZHZQZklsN0E3SUtqSVJwWlBFOUNq?=
- =?utf-8?B?V0U5SjdYWmIrS0d4KzNzcVhvMDE0YTZIQzQ1RGU3alNWTm5zV1V4TEs2bnZv?=
- =?utf-8?B?QjJncGhNVUIzT3hFNWRudkErUnRkVWFpelVHdmhLVG1SNWtteFMxWFJjcHVu?=
- =?utf-8?B?TlQwQXZwdHdWSHl4WVRRUUx3TWlUSzlqRlkvcG1nR2o5QnorMVl2dld6T1VR?=
- =?utf-8?B?QXREN2RYMmFXQXdlSjZkdnlUY2pmZDVRN2JXWVl6YkpRMk5PRktuREJHZlVC?=
- =?utf-8?B?c29XWGdyZHhyb05OekZIZ3l3dVdxUTZKMWlIZHRDVzhmcGtwTFIxOFNZVFVi?=
- =?utf-8?B?dWo3SkVGSG1tajhFTnRIS3ViT3YrbHpLaUJKQWlleHE4Tmo4MUJ0enQzYlZ0?=
- =?utf-8?B?aytFV1pOd1dMSjYwSW1WNGZzNUdIUlR4WUFYa1dTakgrVmtnZkJFR1dwc0xr?=
- =?utf-8?Q?cycE=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        with ESMTP id S229471AbjCADhA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Feb 2023 22:37:00 -0500
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26F3D7ABD
+        for <kvm@vger.kernel.org>; Tue, 28 Feb 2023 19:36:58 -0800 (PST)
+Received: by mail-ed1-x52c.google.com with SMTP id ee7so48664641edb.2
+        for <kvm@vger.kernel.org>; Tue, 28 Feb 2023 19:36:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20210112.gappssmtp.com; s=20210112; t=1677641816;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1ZAYTgdH3g2eA8KTBBY4GQlm36jelREL/yz68bJEPuM=;
+        b=Tj2mVbFT7fnS3TZ77xTENZyKAVr8LSBmBF5SW1DpFM8/r0A1EjopgCRIf7Cs4yFDMu
+         /oUx5ClByWGaFWMVCJmHR+5IUpDXWzbIwFTN4zJTbLS/Um7JEPVDub5JO3eaaSd0CN+1
+         TPLZyga2D0laYByTfldbfjj2vTzSf+yIPj93pgDFPO+FqD63aWnUkqk/hVzMOydGhAi7
+         ALYvhP7hlHseJk1gk+Pt035iESstyopmIDeTrnGmh2R2GANtp5VxFJ5oHEy0pBIVCdzZ
+         +N/wZi42fsScEEYF99++lT1dCnGNd4DBkZCVgjpzFsR32LoyfocsmGBNyd1j7eC75yd1
+         kfYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1677641816;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1ZAYTgdH3g2eA8KTBBY4GQlm36jelREL/yz68bJEPuM=;
+        b=LxglFVSR0k+XvCUpBn2/xr2+CGs2WwSuK57O5bjwB4KeeGTDdWqS8x4fEVG5LFY3Xp
+         pFRLTqvJAVgVGPAjjvxB3ObrenIjP7HbTbTKjCaVAOMDewMjqs060RksUnUOsrqA1WL+
+         jiTNMD4Pw42EpYxcOLnnfwNS4AvgpnBjljwhQXNqc4OksMyvRpvPxD2rFjZisPoRnZre
+         9fmBMLNxk3wh8WhNURquK+u9LF3Cxng0Cj6I5TkoUUOKSJ4YJ9UgZi64qaJ/Fwak7iHX
+         jacQXPUl3lJuNIDrQgYBJXMHyP/44JFvDNOkkRtap92UwuuEpG7IjhV4ZiMM9DN1opKW
+         zw1g==
+X-Gm-Message-State: AO0yUKUK67PtTK1NL0mhl5di+b8XrOMCBdAMTygRvQD4eyRcPVGQogGD
+        7lOfA3V4e7J9SM/r/HCrTbP9H+A1+BNhlmEPED3Urg==
+X-Google-Smtp-Source: AK7set+dLONCBXH4RidKQNVKyCSGG1a2E+iXTX58/fAlnCKopTiu8AO/bZzUT4U40KUp1mzv2LoYMpt5uHuzD9MiSX8=
+X-Received: by 2002:a17:906:3586:b0:8ab:b606:9728 with SMTP id
+ o6-20020a170906358600b008abb6069728mr2502509ejb.5.1677641816479; Tue, 28 Feb
+ 2023 19:36:56 -0800 (PST)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR11MB6734.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 842e450a-54f1-4501-23f2-08db1a0386cb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Mar 2023 03:17:45.1272
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: j5opg2krvaExrUSgUn5uI4yBkRaWCB+aTZtECI43EAkrecxuckQucuX3Km6BOgWajGoYGLpu4YOOb4dJYrN41Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB4938
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20230208140105.655814-1-thuth@redhat.com> <20230208140105.655814-7-thuth@redhat.com>
+In-Reply-To: <20230208140105.655814-7-thuth@redhat.com>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Wed, 1 Mar 2023 09:06:44 +0530
+Message-ID: <CAAhSdy2=_6wP9LYXbxajtkaes013oWF6O-fOizcz_QC2ivZfvw@mail.gmail.com>
+Subject: Re: [PATCH v2 6/6] KVM: Change return type of kvm_arch_vm_ioctl() to "int"
+To:     Thomas Huth <thuth@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Steven Price <steven.price@arm.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiA+PiBUaGlzIGNhdXNlcyBjaGFuZ2VzIHN1Y2ggYXMgdGhlIGZpbmFsIGh1bmsgaW4gcGF0Y2gg
-MjcgdG8gcmVhZA0KPiA+PiBpbmNvcnJlY3RseSwgZGVzcGl0ZSBiZWluZyB0ZWNobmljYWxseSBj
-b3JyZWN0Lg0KPiA+Pg0KPiA+PiBjc19zbG90IHdvdWxkIGJlIG11Y2ggY2xlYXJlciBpbiBjb2Rl
-LCBidXQgdGJoLCBldmVuIGNzX2wgd291bGQgYmUNCj4gPj4gYmV0dGVyIHRoYW4gdGhlIHZlcnNp
-b24gd2l0aG91dCBhbiB1bmRlcnNjb3JlLg0KPiA+DQo+ID5jc19zbG90IHNvdW5kcyBhIGdvb2Qg
-dGVybSB1bmxlc3Mgc29tZW9uZSBjb21lcyB1cCB3aXRoIGEgYmV0dGVyIG9uZS4NCj4gPg0KPiA+
-Pg0KPiA+PiBBbmQgb2J2aW91c2x5LCB3aGF0ZXZlciBpcyBkb25lIGhlcmUgc2hvdWxkIGJlIG1p
-cnJvcmVkIGZvciBzcy4NCj4gPg0KPiA+UHJvYmFibHkgc3Nfc2xvdCB0aGVuLg0KPiA+ICBYaW4N
-Cj4gPg0KPiANCj4gSSBjYWxsZWQgaXQgY3N4LCBmb3IgImNzIGV4dGVuZGVkIi4gImNzcSIgd291
-bGQgd29yaywgdG9vLg0KDQpjc3ggYW5kIHNzeCB0aGVuLg0K
+On Wed, Feb 8, 2023 at 7:31=E2=80=AFPM Thomas Huth <thuth@redhat.com> wrote=
+:
+>
+> All kvm_arch_vm_ioctl() implementations now only deal with "int"
+> types as return values, so we can change the return type of these
+> functions to use "int" instead of "long".
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+
+Looks good to me.
+
+For KVM RISC-V:
+Acked-by: Anup Patel <anup@brainfault.org>
+
+Regards,
+Anup
+
+> ---
+>  arch/arm64/kvm/arm.c       | 3 +--
+>  arch/mips/kvm/mips.c       | 4 ++--
+>  arch/powerpc/kvm/powerpc.c | 5 ++---
+>  arch/riscv/kvm/vm.c        | 3 +--
+>  arch/s390/kvm/kvm-s390.c   | 3 +--
+>  arch/x86/kvm/x86.c         | 3 +--
+>  include/linux/kvm_host.h   | 3 +--
+>  7 files changed, 9 insertions(+), 15 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 9c5573bc4614..e791ad6137b8 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1449,8 +1449,7 @@ static int kvm_vm_ioctl_set_device_addr(struct kvm =
+*kvm,
+>         }
+>  }
+>
+> -long kvm_arch_vm_ioctl(struct file *filp,
+> -                      unsigned int ioctl, unsigned long arg)
+> +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned lo=
+ng arg)
+>  {
+>         struct kvm *kvm =3D filp->private_data;
+>         void __user *argp =3D (void __user *)arg;
+> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+> index a25e0b73ee70..84cadaa2c2d3 100644
+> --- a/arch/mips/kvm/mips.c
+> +++ b/arch/mips/kvm/mips.c
+> @@ -1003,9 +1003,9 @@ void kvm_arch_flush_remote_tlbs_memslot(struct kvm =
+*kvm,
+>         kvm_flush_remote_tlbs(kvm);
+>  }
+>
+> -long kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned l=
+ong arg)
+> +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned lo=
+ng arg)
+>  {
+> -       long r;
+> +       int r;
+>
+>         switch (ioctl) {
+>         default:
+> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+> index 04494a4fb37a..6f6ba55c224f 100644
+> --- a/arch/powerpc/kvm/powerpc.c
+> +++ b/arch/powerpc/kvm/powerpc.c
+> @@ -2386,12 +2386,11 @@ static int kvmppc_get_cpu_char(struct kvm_ppc_cpu=
+_char *cp)
+>  }
+>  #endif
+>
+> -long kvm_arch_vm_ioctl(struct file *filp,
+> -                       unsigned int ioctl, unsigned long arg)
+> +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned lo=
+ng arg)
+>  {
+>         struct kvm *kvm __maybe_unused =3D filp->private_data;
+>         void __user *argp =3D (void __user *)arg;
+> -       long r;
+> +       int r;
+>
+>         switch (ioctl) {
+>         case KVM_PPC_GET_PVINFO: {
+> diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
+> index 65a964d7e70d..c13130ab459a 100644
+> --- a/arch/riscv/kvm/vm.c
+> +++ b/arch/riscv/kvm/vm.c
+> @@ -87,8 +87,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long =
+ext)
+>         return r;
+>  }
+>
+> -long kvm_arch_vm_ioctl(struct file *filp,
+> -                      unsigned int ioctl, unsigned long arg)
+> +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned lo=
+ng arg)
+>  {
+>         return -EINVAL;
+>  }
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 8ad1972b8a73..86ca49814983 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -2850,8 +2850,7 @@ static int kvm_s390_vm_mem_op(struct kvm *kvm, stru=
+ct kvm_s390_mem_op *mop)
+>         return r;
+>  }
+>
+> -long kvm_arch_vm_ioctl(struct file *filp,
+> -                      unsigned int ioctl, unsigned long arg)
+> +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned lo=
+ng arg)
+>  {
+>         struct kvm *kvm =3D filp->private_data;
+>         void __user *argp =3D (void __user *)arg;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 2d210ab47e21..52a8c993cd55 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -6645,8 +6645,7 @@ static int kvm_vm_ioctl_set_clock(struct kvm *kvm, =
+void __user *argp)
+>         return 0;
+>  }
+>
+> -long kvm_arch_vm_ioctl(struct file *filp,
+> -                      unsigned int ioctl, unsigned long arg)
+> +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned lo=
+ng arg)
+>  {
+>         struct kvm *kvm =3D filp->private_data;
+>         void __user *argp =3D (void __user *)arg;
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 4f26b244f6d0..ed2f1f02976b 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1398,8 +1398,7 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct k=
+vm_irq_level *irq_level,
+>                         bool line_status);
+>  int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>                             struct kvm_enable_cap *cap);
+> -long kvm_arch_vm_ioctl(struct file *filp,
+> -                      unsigned int ioctl, unsigned long arg);
+> +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned lo=
+ng arg);
+>  long kvm_arch_vm_compat_ioctl(struct file *filp, unsigned int ioctl,
+>                               unsigned long arg);
+>
+> --
+> 2.31.1
+>
+>
+> --
+> kvm-riscv mailing list
+> kvm-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/kvm-riscv
