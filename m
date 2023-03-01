@@ -2,63 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6EA726A6848
-	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 08:40:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B7F7B6A6893
+	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 09:08:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229691AbjCAHkf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Mar 2023 02:40:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47540 "EHLO
+        id S229660AbjCAIIa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Mar 2023 03:08:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229688AbjCAHkc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Mar 2023 02:40:32 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FA7214EB2;
-        Tue, 28 Feb 2023 23:40:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ttWWb83lPFGiQeRtqm27++0rUHzdV4C0EDYBhQeFAg4=; b=cOuWl0v2IutvxhuULi5zVZJl+O
-        WK3MAkMmlg+CayTVPVY+21o0MvBNaR4qaJfVH1zxpsPadQGdUulVzQ3oVeG6Ypf5BMquh0NmgzqWh
-        s2W+hrfXk0vyXo7KecoMlKJJ9ob7sNu5pBx1MP417yAgxDDGhhZPvzlzmB1lv2wsji7moh8Ql/Ope
-        qU/ezlsv64BJuyftG9+Zl3oZTdZFmKman9FS/OaJdFKj8AUOfqxVHlBNRzTA7B7VFQGhP9T1km+S4
-        sBMH7mDqtlOwKEJjqhGTbNpT2F4Id1gBKPaNh23Ew2MCHiqRFoEZkwZKBH/Oif5M5KNuy1Xvve1KC
-        k9ezgsmg==;
-Received: from [2001:8b0:10b:5:15b6:2526:f3a7:87e2] (helo=u3832b3a9db3152.ant.amazon.com)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pXH3t-001TAh-0Q; Wed, 01 Mar 2023 07:39:41 +0000
-Message-ID: <de01a4c227870c4cf52370aa00bc7b8ddf136da9.camel@infradead.org>
-Subject: Re: [PATCH v12 07/11] x86/smpboot: Remove early_gdt_descr on 64-bit
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     "H. Peter Anvin" <hpa@zytor.com>, Brian Gerst <brgerst@gmail.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Usama Arif <usama.arif@bytedance.com>, kim.phillips@amd.com,
-        piotrgorski@cachyos.org, oleksandr@natalenko.name,
-        arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, pbonzini@redhat.com,
-        paulmck@kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, rcu@vger.kernel.org, mimoja@mimoja.de,
-        hewenliang4@huawei.com, thomas.lendacky@amd.com, seanjc@google.com,
-        pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
-        punit.agrawal@bytedance.com, simon.evans@bytedance.com,
-        liangma@liangbit.com
-Date:   Wed, 01 Mar 2023 07:39:39 +0000
-In-Reply-To: <CE9D5D21-63D3-40B8-BC71-11F1A5A93F7E@zytor.com>
-References: <20230226110802.103134-1-usama.arif@bytedance.com>
-         <20230226110802.103134-8-usama.arif@bytedance.com> <878rghmrn2.ffs@tglx>
-         <35264451eabdf967eb31069cb814e8a05ee3179b.camel@infradead.org>
-         <cf7a1657159219cea61ffef567280e2e88d1f670.camel@infradead.org>
-         <CAMzpN2hQArxf2mAVq55uMx9VhTjUD-VDEVAD406RScfsrjdAjQ@mail.gmail.com>
-         <0E3AFDDA-039B-40F3-92A4-85CD96B1BB64@infradead.org>
-         <CE9D5D21-63D3-40B8-BC71-11F1A5A93F7E@zytor.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-73wSHZ8hjl5XquTWwGz+"
-User-Agent: Evolution 3.44.4-0ubuntu1 
+        with ESMTP id S229579AbjCAIIa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Mar 2023 03:08:30 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0189E37B42
+        for <kvm@vger.kernel.org>; Wed,  1 Mar 2023 00:07:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1677658062;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=XBUzpVsNi8uXzY6Qbe5jnFNe77NJbiWn1Iof9PhYLk4=;
+        b=MQKRt14QtuTGEqbT1vIuVt1zdiJrsMNLGzgJFyUcG2k+4obAPeKLvQQ7X57JKvPyflK76S
+        Q5suwzRAS8+utO/jQ8Wum2qC4E0cAKerVzT/hiRuQjmBIIdxWP9yTqJsSZXBjYBC7OmbqO
+        oy+9qICjqH90EP6GlNNwyRKF6GELWe4=
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
+ [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-246-mgQqppi_PY6hNAWezDTzVw-1; Wed, 01 Mar 2023 03:07:39 -0500
+X-MC-Unique: mgQqppi_PY6hNAWezDTzVw-1
+Received: by mail-pf1-f199.google.com with SMTP id p36-20020a056a000a2400b005f72df7d97bso4530173pfh.19
+        for <kvm@vger.kernel.org>; Wed, 01 Mar 2023 00:07:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1677658058;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XBUzpVsNi8uXzY6Qbe5jnFNe77NJbiWn1Iof9PhYLk4=;
+        b=ASeic1GT66IMlWStdPgGwqQ2UE0GXcAA3m3/bjaM1jTMbEIaEK52CgWwWwIg6RIb4D
+         E55/S8YiFyKEx/4lv2Wkg/OwDk6tTgwFksbIvQlj+WZJZlzVDpiAl+qzicFGNPafCMg4
+         QuF7Ft5VtKNCr3nYrVx1L6iRrotLmRiX5LsMuDqLHbPR6llP/Clz82zas3vvw1GWZijV
+         /vWC8P5YZPDirCwfQeNxGN8Xew8JYIsQzUvOZzwXg9BOJV8kKm9uRO41wF2K2VohLmgo
+         s8PNj2GN857uvdGWFc2mSA7ePo63QO2vSbp29lrc192mhFkp+VUmVDvqCIn1Sc8XaWF0
+         4ZQw==
+X-Gm-Message-State: AO0yUKWldVz/aB8b78V796L6SQ1e1cBThZ96cAixXBMgl4ow5MBeGqw4
+        QFz3PmyT144VGKtFCYWolmI2Ribi/eZoGu5y3fAespWiQ+/3b+s87luIWviLhKcWbFDYtzPVbq6
+        hwt5BhC4YEgcq
+X-Received: by 2002:a05:6a20:3d01:b0:cc:bf13:7b1c with SMTP id y1-20020a056a203d0100b000ccbf137b1cmr7215915pzi.0.1677658058090;
+        Wed, 01 Mar 2023 00:07:38 -0800 (PST)
+X-Google-Smtp-Source: AK7set+vX3NvGRhk/NweCuurkglXA2uikVFW05SMs9lJaPMRTaGXJzrBA6sfLJKX+WcrMpIJfuYOvA==
+X-Received: by 2002:a05:6a20:3d01:b0:cc:bf13:7b1c with SMTP id y1-20020a056a203d0100b000ccbf137b1cmr7215898pzi.0.1677658057767;
+        Wed, 01 Mar 2023 00:07:37 -0800 (PST)
+Received: from [10.66.61.39] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id s26-20020a63af5a000000b00502fdc69b97sm6724961pgo.67.2023.03.01.00.07.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Mar 2023 00:07:37 -0800 (PST)
+Message-ID: <65a7d0da-2840-58c5-db19-3e3e94c6c59c@redhat.com>
+Date:   Wed, 1 Mar 2023 16:07:33 +0800
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH 7/8] KVM: selftests: Add string formatting options to
+ ucall
+To:     Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com
+References: <20230301053425.3880773-1-aaronlewis@google.com>
+ <20230301053425.3880773-8-aaronlewis@google.com>
+Content-Language: en-US
+From:   Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <20230301053425.3880773-8-aaronlewis@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -66,166 +82,140 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-73wSHZ8hjl5XquTWwGz+
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2023-02-28 at 16:02 -0800, H. Peter Anvin wrote:
->=20
-> > Ewww. Couldn't the assembler choose to omit the REX prefix then? It
-> > does more tricksy things than that already.
-> >=20
-> > I almost prefer having the prefix but (in the morning) if you
-> > prefer I can put it back as it was with a comment about the zero-
-> > extension.
-> >=20
->=20
-> Like it or not, that's how the assembler currently works.
+On 3/1/23 13:34, Aaron Lewis wrote:
+> Add more flexibility to guest debugging and testing by adding
+> GUEST_PRINTF() and GUEST_ASSERT_FMT() to the ucall framework.
+> 
+> A buffer to hold the formatted string was added to the ucall struct.
+> That allows the guest/host to avoid the problem of passing an
+> arbitrary number of parameters between themselves when resolving the
+> string.  Instead, the string is resolved in the guest then passed
+> back to the host to be logged.
+> 
+> The formatted buffer is set to 1024 bytes which increases the size
+> of the ucall struct.  As a result, this will increase the number of
+> pages requested for the guest.
+> 
+> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+> ---
+>   .../selftests/kvm/include/ucall_common.h      | 19 +++++++++++++++++++
+>   .../testing/selftests/kvm/lib/ucall_common.c  | 19 +++++++++++++++++++
+>   2 files changed, 38 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/ucall_common.h b/tools/testing/selftests/kvm/include/ucall_common.h
+> index 0b1fde23729b..2a4400b6761a 100644
+> --- a/tools/testing/selftests/kvm/include/ucall_common.h
+> +++ b/tools/testing/selftests/kvm/include/ucall_common.h
+> @@ -13,15 +13,18 @@ enum {
+>   	UCALL_NONE,
+>   	UCALL_SYNC,
+>   	UCALL_ABORT,
+> +	UCALL_PRINTF,
+>   	UCALL_DONE,
+>   	UCALL_UNHANDLED,
+>   };
+>   
+>   #define UCALL_MAX_ARGS 7
+> +#define UCALL_BUFFER_LEN 1024
+>   
+>   struct ucall {
+>   	uint64_t cmd;
+>   	uint64_t args[UCALL_MAX_ARGS];
+> +	char buffer[UCALL_BUFFER_LEN];
+Hi Aaron,
 
-Last time someone told me "you can't tell the assembler what you
-actually mean; you have to tell it something different" I threw my toys
-out of the pram a little bit and implemented all of the 16-bit '-m16'
-support in LLVM/clang.
+A simple question, what if someone print too long in guest which exceed 
+the UCALL_BUFFER_LEN, it seems buffer overflow will happen since 
+vsprintf will not check the buffer length.
 
-On Tue, 2023-02-28 at 19:03 -0500, Brian Gerst wrote:
->=20
-> commit a7bea8308933aaeea76dad7d42a6e51000417626
-> Author: Jan Beulich <JBeulich@suse.com>
-> Date:   Mon Jul 2 04:31:54 2018 -0600
->=20
->     x86/asm/64: Use 32-bit XOR to zero registers
->=20
->     Some Intel CPUs don't recognize 64-bit XORs as zeroing idioms. Zeroin=
-g
->     idioms don't require execution bandwidth, as they're being taken care
->     of in the frontend (through register renaming). Use 32-bit XORs inste=
-ad.
->=20
-> Not that speed is important here, but it's good to be consistent
-> across the whole kernel.  Someone will eventually come by and fix it
-> up anyways, as there have been a few of these patches already in the
-> git history.
+Just in case, someone may don't know the limit and print too long.
 
-So there literally is a better encoding of this mnemonic which isn't
-just a byte shorter, but is also faster to execute. And one *hopes*
-that the compiler knows about it... yep... so why in $DEITY's name
-can't I type what I mean into an asm file? Isn't asm intricate enough
-already?
+Thanks,
+Shaoqin
+>   
+>   	/* Host virtual address of this struct. */
+>   	struct ucall *hva;
+> @@ -32,6 +35,7 @@ void ucall_arch_do_ucall(vm_vaddr_t uc);
+>   void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu);
+>   
+>   void ucall(uint64_t cmd, int nargs, ...);
+> +void ucall_fmt(uint64_t cmd, const char *fmt, ...);
+>   uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc);
+>   void ucall_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa);
+>   int ucall_header_size(void);
+> @@ -47,6 +51,7 @@ int ucall_header_size(void);
+>   #define GUEST_SYNC_ARGS(stage, arg1, arg2, arg3, arg4)	\
+>   				ucall(UCALL_SYNC, 6, "hello", stage, arg1, arg2, arg3, arg4)
+>   #define GUEST_SYNC(stage)	ucall(UCALL_SYNC, 2, "hello", stage)
+> +#define GUEST_PRINTF(fmt, _args...) ucall_fmt(UCALL_PRINTF, fmt, ##_args)
+>   #define GUEST_DONE()		ucall(UCALL_DONE, 0)
+>   
+>   enum guest_assert_builtin_args {
+> @@ -56,6 +61,18 @@ enum guest_assert_builtin_args {
+>   	GUEST_ASSERT_BUILTIN_NARGS
+>   };
+>   
+> +#define __GUEST_ASSERT_FMT(_condition, _condstr, format, _args...)	\
+> +do {									\
+> +	if (!(_condition))						\
+> +		ucall_fmt(UCALL_ABORT,					\
+> +		          "Failed guest assert: " _condstr		\
+> +		          " at %s:%ld\n  " format, 			\
+> +			  __FILE__, __LINE__, ##_args);			\
+> +} while (0)
+> +
+> +#define GUEST_ASSERT_FMT(_condition, format, _args...)	\
+> +	__GUEST_ASSERT_FMT(_condition, #_condition, format, ##_args)
+> +
+>   #define __GUEST_ASSERT(_condition, _condstr, _nargs, _args...)		\
+>   do {									\
+>   	if (!(_condition))						\
+> @@ -81,6 +98,8 @@ do {									\
+>   
+>   #define GUEST_ASSERT_EQ(a, b) __GUEST_ASSERT((a) == (b), #a " == " #b, 2, a, b)
+>   
+> +#define REPORT_GUEST_ASSERT_FMT(_ucall) TEST_FAIL("%s", _ucall.buffer)
+> +
+>   #define __REPORT_GUEST_ASSERT(_ucall, fmt, _args...)			\
+>   	TEST_FAIL("%s at %s:%ld\n" fmt,					\
+>   		  (const char *)(_ucall).args[GUEST_ERROR_STRING],	\
+> diff --git a/tools/testing/selftests/kvm/lib/ucall_common.c b/tools/testing/selftests/kvm/lib/ucall_common.c
+> index b6a75858fe0d..92ebc5db1c41 100644
+> --- a/tools/testing/selftests/kvm/lib/ucall_common.c
+> +++ b/tools/testing/selftests/kvm/lib/ucall_common.c
+> @@ -54,7 +54,9 @@ static struct ucall *ucall_alloc(void)
+>   	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
+>   		if (!test_and_set_bit(i, ucall_pool->in_use)) {
+>   			uc = &ucall_pool->ucalls[i];
+> +			uc->cmd = UCALL_NONE;
+>   			memset(uc->args, 0, sizeof(uc->args));
+> +			memset(uc->buffer, 0, sizeof(uc->buffer));
+>   			return uc;
+>   		}
+>   	}
+> @@ -75,6 +77,23 @@ static void ucall_free(struct ucall *uc)
+>   	clear_bit(uc - ucall_pool->ucalls, ucall_pool->in_use);
+>   }
+>   
+> +void ucall_fmt(uint64_t cmd, const char *fmt, ...)
+> +{
+> +	struct ucall *uc;
+> +	va_list va;
+> +
+> +	uc = ucall_alloc();
+> +	uc->cmd = cmd;
+> +
+> +	va_start(va, fmt);
+> +	vsprintf(uc->buffer, fmt, va);
+> +	va_end(va);
+> +
+> +	ucall_arch_do_ucall((vm_vaddr_t)uc->hva);
+> +
+> +	ucall_free(uc);
+> +}
+> +
+>   void ucall(uint64_t cmd, int nargs, ...)
+>   {
+>   	struct ucall *uc;
 
-Meh, life's too short. Not shaving that particular yak today. I've put
-the git tree back to using %edx, with a comment that it zero-extends.
-
-
---=-73wSHZ8hjl5XquTWwGz+
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMzAxMDczOTM5WjAvBgkqhkiG9w0BCQQxIgQgFYEDaEsJ
-HhApic8T4Vu6E9kwQ+sagG9uAvpDeUNnLx0wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCG/zw9yNUyFrEYUACLBNlNB+4EC/xkmeQn
-kV3KH43fNT/4EKnnqX4cvFxvy9jk1Zs7eN3bR+u/SEXavaGAN5K2ydYdqzGKmAHcnuuKRqlXyzgr
-xtwX57a9L70umtstZMKSHxiR0ZS/qpfzeOL3xdzoL+ETfpQ+gLR10+4ifsqTALVcIt2njlNxRVZT
-/aPUgeqhWx27yjb5umCdyI87GiFqeeUhARnYi5qdMvLySZ9u2DIdkvRxLOhwziaMWcawRJYhNMlN
-O+ee0HB4nfGfcUaVHeP3QMlrVS/godbXXMeSHBP1M4YQKr2+9mM3AZT9PhEoWGm/VhzoDoyY2dWJ
-4T/KQp5klrpP2q66VL//zmz8mzpwVOH25FBAPjZ7uJ8L8ypkgwgnrWJqFIqTGVivgvUaR8haV7Ve
-hSXPC9eZC1iF+XSMGIfHDxuQFlzTDWFF9QQtlIkiZbP6NrZzoxVSQ0x/CslzEg5Eyg1osQ2E3tda
-DA5NCsZaH/SQgINa7xpTlNJ4Bl/DwTUFFmHazgKP7mu2J9vQEIQzsXcaZtHVrz23+J22M075l/0h
-ba5YvckqJwy81IAExZVyd97PhRfOGLogHamSCQkLz86u93wLZMQ5sFQYoUgLM+LZikHQwNmvBGan
-x8dop7p0thgJ9u8+5SzWxuqM9+5SC5BOyASbmVz4MgAAAAAAAA==
-
-
---=-73wSHZ8hjl5XquTWwGz+--
