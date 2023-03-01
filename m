@@ -2,111 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 637F56A6F0E
-	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 16:11:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 25A466A7050
+	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 16:54:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230021AbjCAPLn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Mar 2023 10:11:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35542 "EHLO
+        id S229748AbjCAPyA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Mar 2023 10:54:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229563AbjCAPLm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Mar 2023 10:11:42 -0500
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C0F016897;
-        Wed,  1 Mar 2023 07:11:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677683501; x=1709219501;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=hjYr2EMRWWOBA1w4cnhzIu+T7tZBlHG4CpSb2cRhb34=;
-  b=NJpRKkRpt3/rHgSTAxW7Cfe4xrLcj7xTxAaVhCl+QmzqeJ5VQ/gmDrtV
-   vjGoQOpwZX0URqFhPruGS4A6Mu7caXc2SUlxT70+8zkgapsFYwO8RA4vr
-   T8v792GxcXnPD23LoB4vF+bypJ/V6oZgZbqLU4rG5cVpKnxwUR8xAEhb1
-   m26mL2tuLf2+hRWy5eb6LNhNtD69PMgbDs5moQFUapjgtF8dPG1Gpak4R
-   gYf1MO1azj7m8mfidv34qc5gBhRw/lQ0IiITib7wceTFG9H8zQSAN+93d
-   2cQatQGshVtoxvU7TYtHn8KYm6oa0JgiX3PsfngWN93AtRxXP16xtBtDK
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="318230725"
-X-IronPort-AV: E=Sophos;i="5.98,225,1673942400"; 
-   d="scan'208";a="318230725"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2023 07:11:38 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="920278181"
-X-IronPort-AV: E=Sophos;i="5.98,225,1673942400"; 
-   d="scan'208";a="920278181"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmsmga006.fm.intel.com with ESMTP; 01 Mar 2023 07:11:34 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.96)
-        (envelope-from <andriy.shevchenko@linux.intel.com>)
-        id 1pXO7B-00Dnz1-0F;
-        Wed, 01 Mar 2023 17:11:33 +0200
-Date:   Wed, 1 Mar 2023 17:11:32 +0200
-From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To:     Yury Norov <yury.norov@gmail.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Alexander Lobakin <aleksander.lobakin@intel.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH 1/2] lib/test_bitmap: increment failure counter properly
-Message-ID: <Y/9rJFJ9Pmzf6Waz@smile.fi.intel.com>
-References: <20230227214524.914050-1-yury.norov@gmail.com>
- <Y/00yaVqK2x3+pP3@smile.fi.intel.com>
- <Y/1ruRmnY4eU536Q@yury-laptop>
+        with ESMTP id S229625AbjCAPx7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Mar 2023 10:53:59 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3FEE457CC
+        for <kvm@vger.kernel.org>; Wed,  1 Mar 2023 07:53:19 -0800 (PST)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 321FflJ3022058;
+        Wed, 1 Mar 2023 15:53:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=eYVCkaSbJ2rtItwyr5vHtJzgeDl7SPSyuL7arfT9xBY=;
+ b=BcAgkj0r7AR9/EYqTJK5NcUyU2pGSGo0363RF92UvyescHSpxKFXIo/1V8mYc6/Eevef
+ udYuE5yTX8y4si0wISoIAou3YIh+DX3VCHPE7yubiBoFi35eVebQFUmCFpre78CbLL7x
+ 9b1KnsWqDOwysCzqQ3SsM7Hqg+GrwLtzSdqtTrlQcmI6ctHXWZMNQbY4vxZ5I3g1DF6G
+ ucLM2lalgDvD7r3vFpmxjnH9+qJ16DSv56WqiiOvJdtnk77MvdqZBi8n4MGdxoiMw9xu
+ b1Q5jOof7GYQWoeM32j7HclSjyGez/ROGALJGaQcxezTSSPS7KhMJjVq0S6fF2W79Bk0 EQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p29jqga9v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 01 Mar 2023 15:53:04 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 321FghSk027696;
+        Wed, 1 Mar 2023 15:53:04 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p29jqga8k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 01 Mar 2023 15:53:04 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3216FLrG032007;
+        Wed, 1 Mar 2023 15:52:07 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3nybcucnm1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 01 Mar 2023 15:52:07 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 321Fq3Ow34210428
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 1 Mar 2023 15:52:03 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 62FB320043;
+        Wed,  1 Mar 2023 15:52:03 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EFE3520040;
+        Wed,  1 Mar 2023 15:52:02 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.186.20])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Wed,  1 Mar 2023 15:52:02 +0000 (GMT)
+Message-ID: <ae00f540a0842d4a13b851ed0298812710dd8133.camel@linux.ibm.com>
+Subject: Re: [PATCH v16 11/11] docs/s390x/cpu topology: document s390x cpu
+ topology
+From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+Date:   Wed, 01 Mar 2023 16:52:02 +0100
+In-Reply-To: <20230222142105.84700-12-pmorel@linux.ibm.com>
+References: <20230222142105.84700-1-pmorel@linux.ibm.com>
+         <20230222142105.84700-12-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y/1ruRmnY4eU536Q@yury-laptop>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: T0u-hh0OVB53MYKHz-VxCyor-HNF2XV2
+X-Proofpoint-ORIG-GUID: HghytpWqyJetFn7mrY9QcUqjNGQ494vV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-01_11,2023-03-01_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ lowpriorityscore=0 clxscore=1015 phishscore=0 priorityscore=1501
+ adultscore=0 mlxlogscore=999 spamscore=0 malwarescore=0 bulkscore=0
+ mlxscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2303010127
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 27, 2023 at 06:49:29PM -0800, Yury Norov wrote:
-> On Tue, Feb 28, 2023 at 12:55:05AM +0200, Andy Shevchenko wrote:
-> > On Mon, Feb 27, 2023 at 01:45:23PM -0800, Yury Norov wrote:
-> > > The tests that don't use expect_eq() macro to determine that a test is
-> > > failured must increment failed_tests explicitly.
-> > 
-> > ...
-> > 
-> > >  			pr_err("bitmap_copy_arr32(nbits == %d:"
-> > >  				" tail is not safely cleared: %d\n",
-> > 
-> > Usually we don't split string literals (since checkpatch doesn't complain on a
-> > looong lines with them at the end of the line),
-> > 
-> > ...
-> > 
-> > >  			pr_err("bitmap_copy_arr64(nbits == %d:"
-> > >  				" tail is not safely cleared: %d\n", nbits, next_bit);
-> > 
-> > Ditto.
-> > 
-> > P.S. Seems a material for another patch.
-> 
-> If you're OK with this patch, can you give your review tag please?
+On Wed, 2023-02-22 at 15:21 +0100, Pierre Morel wrote:
+> Add some basic examples for the definition of cpu topology
+> in s390x.
+>=20
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  docs/system/s390x/cpu-topology.rst | 378 +++++++++++++++++++++++++++++
+>  docs/system/target-s390x.rst       |   1 +
+>  2 files changed, 379 insertions(+)
+>  create mode 100644 docs/system/s390x/cpu-topology.rst
+>=20
+> diff --git a/docs/system/s390x/cpu-topology.rst b/docs/system/s390x/cpu-t=
+opology.rst
+> new file mode 100644
+> index 0000000000..d470e28b97
+> --- /dev/null
+> +++ b/docs/system/s390x/cpu-topology.rst
+> @@ -0,0 +1,378 @@
+>=20
+[...]
+> +
+> +set-cpu-topology
+> +++++++++++++++++
+> +
+> +The command set-cpu-topology allows the admin to modify the topology
+> +tree or the topology modifiers of a vCPU in the configuration.
+> +
+> +.. code-block:: QMP
+> +
+> + -> { "execute": "set-cpu-topology",
+> +      "arguments": {
+> +         "core-id": 11,
+> +         "socket-id": 0,
+> +         "book-id": 0,
+> +         "drawer-id": 0,
+> +         "entitlement": low,
+> +         "dedicated": false
+> +      }
+> +    }
+> + <- {"return": {}}
 
-I'm fine with the series,
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-
--- 
-With Best Regards,
-Andy Shevchenko
+This fails when building the documenation.
+You need to get rid of the arrows and need "" around the low.
 
 
+[...]
