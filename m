@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA51C6A675B
-	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 06:34:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A6296A6760
+	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 06:34:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229790AbjCAFey (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Mar 2023 00:34:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56236 "EHLO
+        id S229802AbjCAFe4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Mar 2023 00:34:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229778AbjCAFeu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Mar 2023 00:34:50 -0500
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A57C832CDF
-        for <kvm@vger.kernel.org>; Tue, 28 Feb 2023 21:34:48 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-536c039f859so262085417b3.21
-        for <kvm@vger.kernel.org>; Tue, 28 Feb 2023 21:34:48 -0800 (PST)
+        with ESMTP id S229764AbjCAFev (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Mar 2023 00:34:51 -0500
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4852C1ADC1
+        for <kvm@vger.kernel.org>; Tue, 28 Feb 2023 21:34:50 -0800 (PST)
+Received: by mail-pg1-x549.google.com with SMTP id q68-20020a632a47000000b004f74bc0c71fso4174839pgq.18
+        for <kvm@vger.kernel.org>; Tue, 28 Feb 2023 21:34:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1677648888;
+        d=google.com; s=20210112; t=1677648889;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vuFdvY4jDZFH/7IewN0M02e7qpIZ5TbUelNV+nNNUX8=;
-        b=Op3SxeqvDXwRWHPc9iCbYi7VSiR0ECKgf8hfGcboTmuZ7R3yoH3PULdCyoTRHkYfc6
-         +SEZnXu86rmrL8WYLohTj5+7ks81G1iDP222ve+lZj4++aXxeHOtRjYGC9aY1e6RTAN0
-         Vr6eLwVfn+Hoj7FKUaGi0ok5e5ymAsriWP36elWvNDqra40G5Y3vCzQ6Amdpk38eNrZq
-         Qdc8IvXrKJMBg08jkcSflpI7jFbaK1sR8P7AVQqQWYVwGsegHJrs3XBtu7Oi/3I9GJlE
-         NXjfWuRuKVYlweK/uyEd+De0BNfoz50o2yXZ5zRqtkeIDR5+BHx1m6fRLnw7S9rjzOfk
-         +Lag==
+        bh=eAAYyK8vwtil/XqRLlZoyfP+rbFvoTDOm4hFzsm92oA=;
+        b=hqHGSORoVWqLmkQqW8pJAlq8KwtVrOcdIFvTvy3jGyyCttBrU7Np0jInFNxTVIpyRq
+         tPyi+p8ck0xPYDBMS5Vq1TCrZZdkaeMEqSQRYW8Q+lH8oi7LyPAQJ3LDzx3i+RMx7Y/j
+         BA6FbQptH4E0TiHpKjH/uCz+tID6ZGN5+iS2KLltHUonKon2cvso/TMJe/v3ZBmb+x8H
+         aJBz0OQd2kCyHQLcbnlkDZwiM0jdcIM84so50pVl4smBi3AAKa8WlynL0bKPbWzxj79u
+         81Hp9L3X0cw6zx0iWMhVhnX9BkfnNSr0maHYnwLpmg8OPJ2ejCM7kC+WYg2hmtE5tOgB
+         N/Ng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677648888;
+        d=1e100.net; s=20210112; t=1677648889;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vuFdvY4jDZFH/7IewN0M02e7qpIZ5TbUelNV+nNNUX8=;
-        b=utR6yej5izqYeVTGawI05YNpXruIYMaRghqlFqN8eMaCp6ghETMBfQhix3ZGg7LjZZ
-         z0EV3jc8H0sLrwWvvFA3NZS4KMCjbTmfhiMfv5f2dqpFFXSOMrATo1IRF5uzG10cx0Sr
-         ClmpY8hEzhxP0OApjQ7Yx8Fy2lXNI26jiIrCB10Hx/xnsSfI+aLKwCY4l3cQRqRYk+oU
-         eJIGhCkKT0pVlRFjmbkkO6IUqf3sSwtI0YI2dvE0fpZd2LDZfYWWYDs45cVYCfKCRABl
-         VKLldLTD3BQl8qAnqRxTx/g+fSD5eMOG79v2InVIvw6KlwZCOHEZUSTnqq4AH5+dLCFm
-         9FLA==
-X-Gm-Message-State: AO0yUKVCOJovjaYiw1h8owEZnfojgvFaY7Kb2pIZIUYNEmG2eih8YvX5
-        uY3a7Goevks99YpnPdUnFwDYb3D6mPgzn4/JIAFUH1v3iRCtoMFnE+4ky2zVclLKV7UY1uz2Fmq
-        o8gD0Irx0AqAtTa3Cg2W0aALVKRinIYiLuWH8Laux9aWXnvxDxxEmmw6Q83jO5m6x+YYi
-X-Google-Smtp-Source: AK7set+TBpJWgoq5oaWUnsK9cKAX2XQF2nlG/hEYwWQYJjguhkxPB2nO2w2bMDuQDn5R28HADgFqzYZk6zb0Zrn/
+        bh=eAAYyK8vwtil/XqRLlZoyfP+rbFvoTDOm4hFzsm92oA=;
+        b=2HrW8JIEpt3lBtRRigl17jBKhA3qMBr3EHDXVv5N/MQTjvrb4oUGoahcCzKvIyXlFK
+         gxyxEv0TzJeff0MJAPuLCENjsdO2CdTEfjfilXxO0mh1u/buwaHKMEUpnt8B8FYH32CC
+         OactS6uyXJssOcbPtdTxKK6RigdGQJCyQCIWsX+cu0Qy/sE/RWWSETkUPrqtsIGv/iRr
+         g5WX3NNCbRlNdGv9asRgQc5tpb4+A3FWI9MSRRcLfGCPR3rZT98Km8xLQX6J6A4x0Jcc
+         sEql0gfDd+n4kTd0ssMOkAOdA/NZE4yLH1FlrHLCHdyqHDoaPekZtA9wNIUZtfqyfWty
+         Oxdg==
+X-Gm-Message-State: AO0yUKVtCWI5TTDDufgpC/BzSS55nBoxKmH6CiYGWTbwygNpu7djnXu6
+        w0VAUCZxfSt7gbTXe+lVhAP7XgqNZW/yIIfBAx2Ekc8VLShq9WaezJFs03LtLTwRyYwip5/h78V
+        1J3vYr/YY0Q45IVfCsqY5jZ3H6X15mAI3E6N8qrXSEmlREG4iwaFNeqmvfVP2o9bFJGQs
+X-Google-Smtp-Source: AK7set+NZYFgsUFEPSpp/NjURXEN8Mvt2W8zy9D0r8fOH4WYBAsbH/euV3o7uk9k6dHmL0J4k/9fv4wktcFAaA8v
 X-Received: from aaronlewis-2.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:519c])
- (user=aaronlewis job=sendgmr) by 2002:a05:6902:4c2:b0:8ea:3d09:b125 with SMTP
- id v2-20020a05690204c200b008ea3d09b125mr2370302ybs.0.1677648887733; Tue, 28
- Feb 2023 21:34:47 -0800 (PST)
-Date:   Wed,  1 Mar 2023 05:34:22 +0000
+ (user=aaronlewis job=sendgmr) by 2002:a17:902:f7d1:b0:19c:140d:aad7 with SMTP
+ id h17-20020a170902f7d100b0019c140daad7mr1861398plw.4.1677648889508; Tue, 28
+ Feb 2023 21:34:49 -0800 (PST)
+Date:   Wed,  1 Mar 2023 05:34:23 +0000
 In-Reply-To: <20230301053425.3880773-1-aaronlewis@google.com>
 Mime-Version: 1.0
 References: <20230301053425.3880773-1-aaronlewis@google.com>
 X-Mailer: git-send-email 2.40.0.rc0.216.gc4246ad0f0-goog
-Message-ID: <20230301053425.3880773-6-aaronlewis@google.com>
-Subject: [PATCH 5/8] KVM: selftests: Add vsprintf() to KVM selftests
+Message-ID: <20230301053425.3880773-7-aaronlewis@google.com>
+Subject: [PATCH 6/8] KVM: selftests: Add additional pages to the guest to
+ accommodate ucall
 From:   Aaron Lewis <aaronlewis@google.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
@@ -68,93 +69,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add string formatting support to the guest by adding a local version
-of vsprintf with no dependencies on LIBC.
+Add additional pages to the guest to account for the number of pages
+the ucall framework uses.
 
-There were some minor fix-ups needed to get it compiling in selftests:
- - isdigit() was added as a local helper.
- - boot.h was switch for test_util.h.
- - printf and sprintf were removed.  Support for printing will go
-   through the ucall framework.
+This is done in preparation for adding string formatting options to
+the guest through ucall helpers.
 
 Signed-off-by: Aaron Lewis <aaronlewis@google.com>
 ---
- tools/testing/selftests/kvm/Makefile          |  1 +
- .../testing/selftests/kvm/include/test_util.h |  2 ++
- tools/testing/selftests/kvm/lib/printf.c      | 33 ++++---------------
- 3 files changed, 9 insertions(+), 27 deletions(-)
+ tools/testing/selftests/kvm/include/ucall_common.h | 1 +
+ tools/testing/selftests/kvm/lib/kvm_util.c         | 4 ++++
+ tools/testing/selftests/kvm/lib/ucall_common.c     | 5 +++++
+ 3 files changed, 10 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index cda631f10526..ce577b564616 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -23,6 +23,7 @@ LIBKVM += lib/guest_modes.c
- LIBKVM += lib/io.c
- LIBKVM += lib/kvm_util.c
- LIBKVM += lib/memstress.c
-+LIBKVM += lib/printf.c
- LIBKVM += lib/rbtree.c
- LIBKVM += lib/sparsebit.c
- LIBKVM += lib/test_util.c
-diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
-index 80d6416f3012..261852598a4a 100644
---- a/tools/testing/selftests/kvm/include/test_util.h
-+++ b/tools/testing/selftests/kvm/include/test_util.h
-@@ -177,4 +177,6 @@ static inline uint32_t atoi_non_negative(const char *name, const char *num_str)
- 	return num;
- }
+diff --git a/tools/testing/selftests/kvm/include/ucall_common.h b/tools/testing/selftests/kvm/include/ucall_common.h
+index 1a6aaef5ccae..0b1fde23729b 100644
+--- a/tools/testing/selftests/kvm/include/ucall_common.h
++++ b/tools/testing/selftests/kvm/include/ucall_common.h
+@@ -34,6 +34,7 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu);
+ void ucall(uint64_t cmd, int nargs, ...);
+ uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc);
+ void ucall_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa);
++int ucall_header_size(void);
  
-+int vsprintf(char *buf, const char *fmt, va_list args);
-+
- #endif /* SELFTEST_KVM_TEST_UTIL_H */
-diff --git a/tools/testing/selftests/kvm/lib/printf.c b/tools/testing/selftests/kvm/lib/printf.c
-index 1237beeb9540..d356e55cbc28 100644
---- a/tools/testing/selftests/kvm/lib/printf.c
-+++ b/tools/testing/selftests/kvm/lib/printf.c
-@@ -13,7 +13,12 @@
-  *
-  */
- 
--#include "boot.h"
-+#include "test_util.h"
-+
-+int isdigit(int ch)
-+{
-+	return (ch >= '0') && (ch <= '9');
-+}
- 
- static int skip_atoi(const char **s)
+ /*
+  * Perform userspace call without any associated data.  This bare call avoids
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index 3ea24a5f4c43..e1d6a2f40d2d 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -307,6 +307,7 @@ static uint64_t vm_nr_pages_required(enum vm_guest_mode mode,
+ 				     uint32_t nr_runnable_vcpus,
+ 				     uint64_t extra_mem_pages)
  {
-@@ -279,29 +284,3 @@ int vsprintf(char *buf, const char *fmt, va_list args)
- 	*str = '\0';
- 	return str - buf;
++	uint64_t page_size = vm_guest_mode_params[mode].page_size;
+ 	uint64_t nr_pages;
+ 
+ 	TEST_ASSERT(nr_runnable_vcpus,
+@@ -335,6 +336,9 @@ static uint64_t vm_nr_pages_required(enum vm_guest_mode mode,
+ 	 */
+ 	nr_pages += (nr_pages + extra_mem_pages) / PTES_PER_MIN_PAGE * 2;
+ 
++	/* Account for the number of pages needed by ucall. */
++	nr_pages += align_up(ucall_header_size(), page_size) / page_size;
++
+ 	return vm_adjust_num_guest_pages(mode, nr_pages);
  }
--
--int sprintf(char *buf, const char *fmt, ...)
--{
--	va_list args;
--	int i;
--
--	va_start(args, fmt);
--	i = vsprintf(buf, fmt, args);
--	va_end(args);
--	return i;
--}
--
--int printf(const char *fmt, ...)
--{
--	char printf_buf[1024];
--	va_list args;
--	int printed;
--
--	va_start(args, fmt);
--	printed = vsprintf(printf_buf, fmt, args);
--	va_end(args);
--
--	puts(printf_buf);
--
--	return printed;
--}
+ 
+diff --git a/tools/testing/selftests/kvm/lib/ucall_common.c b/tools/testing/selftests/kvm/lib/ucall_common.c
+index 2f0e2ea941cc..b6a75858fe0d 100644
+--- a/tools/testing/selftests/kvm/lib/ucall_common.c
++++ b/tools/testing/selftests/kvm/lib/ucall_common.c
+@@ -11,6 +11,11 @@ struct ucall_header {
+ 	struct ucall ucalls[KVM_MAX_VCPUS];
+ };
+ 
++int ucall_header_size(void)
++{
++	return sizeof(struct ucall_header);
++}
++
+ /*
+  * ucall_pool holds per-VM values (global data is duplicated by each VM), it
+  * must not be accessed from host code.
 -- 
 2.40.0.rc0.216.gc4246ad0f0-goog
 
