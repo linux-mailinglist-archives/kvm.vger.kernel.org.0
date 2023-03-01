@@ -2,84 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BA2E6A752E
-	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 21:21:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4AFDA6A755E
+	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 21:32:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229685AbjCAUVg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Mar 2023 15:21:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60346 "EHLO
+        id S229657AbjCAUcg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Mar 2023 15:32:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229511AbjCAUVf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Mar 2023 15:21:35 -0500
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C32051F9E;
-        Wed,  1 Mar 2023 12:21:16 -0800 (PST)
-Received: by mail-lj1-x233.google.com with SMTP id a32so433036ljr.9;
-        Wed, 01 Mar 2023 12:21:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1677702074;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:date:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LPRzczm2wGlm6Acu/l6huV/wn3LazkeUdQZ6PCCLChQ=;
-        b=cOhEeH1WbB9GB02Xj94/oBs4LLalpGpRsZt4noDlX08wznB4ETeULIsi5VI7ldE1PA
-         GG11jx4yRs8j2QJov16ykTRBTrMcizWt+c6X39zcmxE/ZPBO2WNede+2uqUsx5Nz2ivc
-         MZQ1hCq9xXrgB7aDiTxUq6sJ2uq+GTZYIOl5Kv+4CUUn0wMr99rA7aV7YCG9rDbyys5w
-         GzyiCTs1Eu6KgJXHdLbmRSqUpCSUkTWcd3P57qUMyjjii1AF9qsT245+4YaBYuiT91Ox
-         A4Sb8mcKmQGRSfo349KbqM4W9gQx3shQuqBpLDONuVBFmZxgAMbHgGW/99pBOEIH27in
-         bweg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677702074;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LPRzczm2wGlm6Acu/l6huV/wn3LazkeUdQZ6PCCLChQ=;
-        b=4BAvD6L0l9P4g33vTB7anFx2tcCtQAM4yBlVUroJqNwSyrQB8DMnRHEiVAt8xsAKHs
-         drsRNn3FtC1sFu2HHodcKgYGeULCQFgB0qDiN5ggOaXld8wJAoZEHhQ7spQskyRs3pvS
-         nl+44ND9V4OJn+ZTVJbZton2KpnCI9/0/YuRdVX8YXBbjwD6F6d8gr68+DuUt32Y9l9J
-         iMvtURsCkyDN+PpqopSA8G0dqhC6Dp/90TVMm5EUZMFSollMUKibvfMBmUla1g0w0d5W
-         T/TVzFDzYs+ibN16KRBjXB3h4j09WzbinkNUxg53rbG0OUr8Q4sevjDrHH62S0lVyPBo
-         IGww==
-X-Gm-Message-State: AO0yUKVgXZdTGKvLJywdb5n/EyRS1pYoardJg89A1/XU3n6vBI/PzhfY
-        u5lf8xFXGFVX+mwKMF9o+L8=
-X-Google-Smtp-Source: AK7set//lT5xo12hxlQxelQR8VrVKBkgBABiLB+SLWfCUjQ1QO8JK2l/Nl96Wcz0sxWliWJDTdMrfw==
-X-Received: by 2002:a2e:95d4:0:b0:293:1696:a042 with SMTP id y20-20020a2e95d4000000b002931696a042mr2137065ljh.4.1677702074195;
-        Wed, 01 Mar 2023 12:21:14 -0800 (PST)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id p17-20020a2eb991000000b00295b1ad177csm1595531ljp.68.2023.03.01.12.21.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Mar 2023 12:21:14 -0800 (PST)
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-X-Google-Original-From: Zhi Wang <zhi.wang.linux@intel.com>
-Date:   Wed, 1 Mar 2023 22:21:12 +0200
-To:     Steven Price <steven.price@arm.com>
-Cc:     Zhi Wang <zhi.wang.linux@gmail.com>, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Joey Gouly <joey.gouly@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev
-Subject: Re: [RFC PATCH 05/28] arm64: RME: Define the user ABI
-Message-ID: <20230301222112.00003bc7@intel.com>
-In-Reply-To: <8e803abd-8856-3c44-6262-40c026216c9a@arm.com>
-References: <20230127112248.136810-1-suzuki.poulose@arm.com>
-        <20230127112932.38045-1-steven.price@arm.com>
-        <20230127112932.38045-6-steven.price@arm.com>
-        <20230213180413.00000392@gmail.com>
-        <8e803abd-8856-3c44-6262-40c026216c9a@arm.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        with ESMTP id S229566AbjCAUcf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Mar 2023 15:32:35 -0500
+Received: from wout2-smtp.messagingengine.com (wout2-smtp.messagingengine.com [64.147.123.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BC5A498AA;
+        Wed,  1 Mar 2023 12:32:34 -0800 (PST)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+        by mailout.west.internal (Postfix) with ESMTP id 037E43200495;
+        Wed,  1 Mar 2023 15:32:31 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute6.internal (MEProxy); Wed, 01 Mar 2023 15:32:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        joshtriplett.org; h=cc:cc:content-type:date:date:from:from
+        :in-reply-to:in-reply-to:message-id:mime-version:references
+        :reply-to:sender:subject:subject:to:to; s=fm3; t=1677702751; x=
+        1677789151; bh=lpaY3yzktxWgStVHIEgSVgb+C52QCTyL8Dy+xs3UsQw=; b=Q
+        3gNNqwQ0h7Aq89bRhvI/QKiYr54LRSw5EQuwYLHqLgHea6XoUoz32MCGb2vlg6MN
+        G1SF4chdujmu6jIzqznkcCzxoGE/0/ylQj1pcu50DPnpNkuW1Cd9DgWeNhonkd4y
+        3h1bti9SFI10qj7GjE3Tzta/ZAr6HNbbUDM1wgGlDPiNOLNz87GUneMq4J/WIR8N
+        C1MaXe5QdoYc+H7ICG01KwM0PsuzKJr5bxI49iYLN74Z7MqHWGkJAmXQmLwu0pL7
+        UMpIU7kE7t4eDfnhW7LPmD4KtZgkOXbTwVE2rVh2gPE2NBU4aFzjtiBzazSDi6oX
+        Hnzf09Ae6Ldy9hBU6/AeA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
+        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:sender:subject:subject:to:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm1; t=1677702751; x=1677789151; bh=lpaY3yzktxWgStVHIEgSVgb+C52Q
+        CTyL8Dy+xs3UsQw=; b=YMa1sLm/8gdh7SGlUJFKQM+xbElReZ0btKaucvqRMcno
+        +FvExCANi/GwCz8ijlgySgcjfHxknhybjOfgFqpr15Yu9DqlHWNkk6kbAU63BRR1
+        Rhu7cLVm6OGqBnuGjLo1wAwYTuIWwQbZAkUfre8scVAyYG+Q2FdvzPeQiogYip/z
+        o2xg6ZYkt1RD+2GR0yi4UAGg8nd4g8sRpTLVSunRz+wb/BzBB6KwJmd8r9z9UcZ4
+        zTKEtAiQHq7aLIr3DaVoP4cns5BuGhMNEOITKwFobA2VecpLHSBo6fbZZmwVhcvN
+        wetrA+22bh0SyfYh/Fv0fkJN6IZ8IR1YeZbNTX1fcQ==
+X-ME-Sender: <xms:Xbb_Y5_jV3vPEVJVpDbOGxI-sJNFbY5gmfGAx3Q7ZrQVFJxoKgX1Ng>
+    <xme:Xbb_Y9vgdnunKPnfE9w3GsZTYLr6Vi_Dpu4DUOCXNNIbhNrcZprLO09yKCh62vKvJ
+    ytQwYSimgQ5rdEsMQQ>
+X-ME-Received: <xmr:Xbb_Y3DX5ooB2aQ9OR1NxdLaQp3opbx931AX_R0fbQ0RB0NZGQdpimGHYyk>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrudelhedgudeftdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpeflohhs
+    hhcuvfhrihhplhgvthhtuceojhhoshhhsehjohhshhhtrhhiphhlvghtthdrohhrgheqne
+    cuggftrfgrthhtvghrnhepudeigeehieejuedvtedufeevtdejfeegueefgffhkefgleef
+    teetledvtdfftefgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilh
+    hfrhhomhepjhhoshhhsehjohhshhhtrhhiphhlvghtthdrohhrgh
+X-ME-Proxy: <xmx:Xbb_Y9fG-4kDF5XUn6St4udhfZRRc7Eh3xMegAsrzH2h7TYEUS0llQ>
+    <xmx:Xbb_Y-OXUPGbgFBkAC5TD31lcdkn5Q6zhfU-S1598CoiIeHEjfU9lA>
+    <xmx:Xbb_Y_k58YcJGvySzupe-cjqiFNdeb8V4tKqLQ2xGGpFA6n-i7baNg>
+    <xmx:X7b_YxipEDIbmTuvN7pA8Ryi5KrEXJgJIli9o7b6bkymxhuAanvSHw>
+Feedback-ID: i83e94755:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 1 Mar 2023 15:32:26 -0500 (EST)
+Date:   Wed, 1 Mar 2023 12:32:26 -0800
+From:   Josh Triplett <josh@joshtriplett.org>
+To:     Arjan van de Ven <arjan@linux.intel.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Usama Arif <usama.arif@bytedance.com>, dwmw2@infradead.org,
+        kim.phillips@amd.com, brgerst@gmail.com, piotrgorski@cachyos.org,
+        oleksandr@natalenko.name, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
+        pbonzini@redhat.com, paulmck@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
+        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
+        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
+        simon.evans@bytedance.com, liangma@liangbit.com,
+        David Woodhouse <dwmw@amazon.co.uk>
+Subject: Re: [PATCH v12 07/11] x86/smpboot: Remove early_gdt_descr on 64-bit
+Message-ID: <Y/+2Wuunn1sIF8eT@localhost>
+References: <20230226110802.103134-1-usama.arif@bytedance.com>
+ <20230226110802.103134-8-usama.arif@bytedance.com>
+ <878rghmrn2.ffs@tglx>
+ <96c0c723-9976-a222-8dc8-a5da6a1a558e@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <96c0c723-9976-a222-8dc8-a5da6a1a558e@linux.intel.com>
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -87,186 +96,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 1 Mar 2023 11:54:34 +0000
-Steven Price <steven.price@arm.com> wrote:
-
-> On 13/02/2023 16:04, Zhi Wang wrote:
-> > On Fri, 27 Jan 2023 11:29:09 +0000
-> > Steven Price <steven.price@arm.com> wrote:
+On Tue, Feb 28, 2023 at 01:02:33PM -0800, Arjan van de Ven wrote:
+  Thomas Gleixner wrote:
 > > 
-> >> There is one (multiplexed) CAP which can be used to create, populate and
-> >> then activate the realm.
-> >>
-> >> Signed-off-by: Steven Price <steven.price@arm.com>
-> >> ---
-> >>  Documentation/virt/kvm/api.rst    |  1 +
-> >>  arch/arm64/include/uapi/asm/kvm.h | 63 +++++++++++++++++++++++++++++++
-> >>  include/uapi/linux/kvm.h          |  2 +
-> >>  3 files changed, 66 insertions(+)
-> >>
-> >> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> >> index 0dd5d8733dd5..f1a59d6fb7fc 100644
-> >> --- a/Documentation/virt/kvm/api.rst
-> >> +++ b/Documentation/virt/kvm/api.rst
-> >> @@ -4965,6 +4965,7 @@ Recognised values for feature:
-> >>  
-> >>    =====      ===========================================
-> >>    arm64      KVM_ARM_VCPU_SVE (requires KVM_CAP_ARM_SVE)
-> >> +  arm64      KVM_ARM_VCPU_REC (requires KVM_CAP_ARM_RME)
-> >>    =====      ===========================================
-> >>  
-> >>  Finalizes the configuration of the specified vcpu feature.
-> >> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> >> index a7a857f1784d..fcc0b8dce29b 100644
-> >> --- a/arch/arm64/include/uapi/asm/kvm.h
-> >> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> >> @@ -109,6 +109,7 @@ struct kvm_regs {
-> >>  #define KVM_ARM_VCPU_SVE		4 /* enable SVE for this CPU */
-> >>  #define KVM_ARM_VCPU_PTRAUTH_ADDRESS	5 /* VCPU uses address authentication */
-> >>  #define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* VCPU uses generic authentication */
-> >> +#define KVM_ARM_VCPU_REC		7 /* VCPU REC state as part of Realm */
-> >>  
-> >>  struct kvm_vcpu_init {
-> >>  	__u32 target;
-> >> @@ -401,6 +402,68 @@ enum {
-> >>  #define   KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES	3
-> >>  #define   KVM_DEV_ARM_ITS_CTRL_RESET		4
-> >>  
-> >> +/* KVM_CAP_ARM_RME on VM fd */
-> >> +#define KVM_CAP_ARM_RME_CONFIG_REALM		0
-> >> +#define KVM_CAP_ARM_RME_CREATE_RD		1
-> >> +#define KVM_CAP_ARM_RME_INIT_IPA_REALM		2
-> >> +#define KVM_CAP_ARM_RME_POPULATE_REALM		3
-> >> +#define KVM_CAP_ARM_RME_ACTIVATE_REALM		4
-> >> +
+> > Maybe we should enforce CONFIG_SMP=y first :)
 > > 
-> > It is a little bit confusing here. These seems more like 'commands' not caps.
-> > Will leave more comments after reviewing the later patches.
+> > Thanks,
 > 
-> Sorry for the slow response. Thank you for your review - I hope to post
-> a new version of this series (rebased on 6.3-rc1) in the coming weeks
-> with your comments addressed.
-> 
+> for 64 bit I can see the point of removing the !SMP case entirely from arch/x86 .
+> maybe even for 32 bit if it just makes the code simpler I suppose
 
-Hi:
+As one of the folks keeping an eye on tinyconfig and kernel size, I
+actually think we *should* make this change and rip out !CONFIG_SMP,
+albeit carefully.
 
-No worries. I spent most of my time on closing the review of TDX/SNP
-series recently while stopped at patch 16 of this series. I will try to
-finish the rest of this series this week.
+In particular, I would propose that we rip out !CONFIG_SMP, *but* we
+allow building with CONFIG_NR_CPUS=1. (And we could make sure in that
+case that the compiler can recognize that at compile time and optimize
+accordingly, so that it might provide some of the UP optimizations for
+us.)
 
-I am glad if my efforts help and more reviewers can smoothly jump in
-later.
- 
-> They are indeed commands - and using caps is a bit of a hack. The
-> benefit here is that all the Realm commands are behind the one
-> KVM_CAP_ARM_RME.
-> 
-> The options I can see are:
-> 
-> a) What I've got here - (ab)using KVM_ENABLE_CAP to perform commands.
-> 
-> b) Add new ioctls for each of the above stages (so 5 new ioctls on top
-> of the CAP for discovery). With any future extensions requiring new ioctls.
-> 
-> c) Add a single new multiplexing ioctl (along with the CAP for discovery).
-> 
-> I'm not massively keen on defining a new multiplexing scheme (c), but
-> equally (b) seems like it's burning through ioctl numbers. Which led me
-> to stick with (a) which at least keeps the rebasing simple (there's only
-> the one CAP number which could conflict) and there's already a
-> multiplexing scheme.
-> 
-> But I'm happy to change if there's consensus a different approach would
-> be preferable.
-> 
+Then, any *optimizations* for the "will only have one CPU, ever" case
+can move to CONFIG_NR_CPUS=1 rather than !CONFIG_SMP. I think many of
+those optimizations may be worth keeping for small embedded systems, or
+for cases like Linux-as-bootloader or similar.
 
-Let's see if others have different opinions.
-
-My coin goes to b as it is better to respect "what it is, make it explicit
-and clear" when coming to define the UABI. Ioctl number is for UABI. If
-it is going to burn out, IMHO, we need to find another way, perhaps another
-fd to group those ioctls, like KVM.
-
-1. a) seems abusing the usage of the cap. for sure, the benefit is obvious.
-2. c) seems hiding the details, which saves the ioctl numbers, but it didn't
-actually help a lot on the complexity and might end up with another bunch
-of "command code".
-
-> Thanks,
-> 
-> Steve
-> 
-> >> +#define KVM_CAP_ARM_RME_MEASUREMENT_ALGO_SHA256		0
-> >> +#define KVM_CAP_ARM_RME_MEASUREMENT_ALGO_SHA512		1
-> >> +
-> >> +#define KVM_CAP_ARM_RME_RPV_SIZE 64
-> >> +
-> >> +/* List of configuration items accepted for KVM_CAP_ARM_RME_CONFIG_REALM */
-> >> +#define KVM_CAP_ARM_RME_CFG_RPV			0
-> >> +#define KVM_CAP_ARM_RME_CFG_HASH_ALGO		1
-> >> +#define KVM_CAP_ARM_RME_CFG_SVE			2
-> >> +#define KVM_CAP_ARM_RME_CFG_DBG			3
-> >> +#define KVM_CAP_ARM_RME_CFG_PMU			4
-> >> +
-> >> +struct kvm_cap_arm_rme_config_item {
-> >> +	__u32 cfg;
-> >> +	union {
-> >> +		/* cfg == KVM_CAP_ARM_RME_CFG_RPV */
-> >> +		struct {
-> >> +			__u8	rpv[KVM_CAP_ARM_RME_RPV_SIZE];
-> >> +		};
-> >> +
-> >> +		/* cfg == KVM_CAP_ARM_RME_CFG_HASH_ALGO */
-> >> +		struct {
-> >> +			__u32	hash_algo;
-> >> +		};
-> >> +
-> >> +		/* cfg == KVM_CAP_ARM_RME_CFG_SVE */
-> >> +		struct {
-> >> +			__u32	sve_vq;
-> >> +		};
-> >> +
-> >> +		/* cfg == KVM_CAP_ARM_RME_CFG_DBG */
-> >> +		struct {
-> >> +			__u32	num_brps;
-> >> +			__u32	num_wrps;
-> >> +		};
-> >> +
-> >> +		/* cfg == KVM_CAP_ARM_RME_CFG_PMU */
-> >> +		struct {
-> >> +			__u32	num_pmu_cntrs;
-> >> +		};
-> >> +		/* Fix the size of the union */
-> >> +		__u8	reserved[256];
-> >> +	};
-> >> +};
-> >> +
-> >> +struct kvm_cap_arm_rme_populate_realm_args {
-> >> +	__u64 populate_ipa_base;
-> >> +	__u64 populate_ipa_size;
-> >> +};
-> >> +
-> >> +struct kvm_cap_arm_rme_init_ipa_args {
-> >> +	__u64 init_ipa_base;
-> >> +	__u64 init_ipa_size;
-> >> +};
-> >> +
-> >>  /* Device Control API on vcpu fd */
-> >>  #define KVM_ARM_VCPU_PMU_V3_CTRL	0
-> >>  #define   KVM_ARM_VCPU_PMU_V3_IRQ	0
-> >> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> >> index 20522d4ba1e0..fec1909e8b73 100644
-> >> --- a/include/uapi/linux/kvm.h
-> >> +++ b/include/uapi/linux/kvm.h
-> >> @@ -1176,6 +1176,8 @@ struct kvm_ppc_resize_hpt {
-> >>  #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
-> >>  #define KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP 225
-> >>  
-> >> +#define KVM_CAP_ARM_RME 300 // FIXME: Large number to prevent conflicts
-> >> +
-> >>  #ifdef KVM_CAP_IRQ_ROUTING
-> >>  
-> >>  struct kvm_irq_routing_irqchip {
-> > 
-> 
-
+The difference here would be that code written for !CONFIG_SMP today
+needs to account for the UP case for *correctness*, whereas code written
+for CONFIG_SMP can *optionally* consider CONFIG_NR_CPUS=1 for
+*performance*.
