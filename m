@@ -2,122 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 60C956A6527
-	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 02:58:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0886C6A6561
+	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 03:18:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229652AbjCAB6R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Feb 2023 20:58:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47560 "EHLO
+        id S229702AbjCACSY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Feb 2023 21:18:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229470AbjCAB6P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Feb 2023 20:58:15 -0500
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8E233AA5;
-        Tue, 28 Feb 2023 17:58:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677635894; x=1709171894;
-  h=message-id:date:mime-version:cc:subject:to:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=JvUgqcrgfQlznLASCJxhJivg+YLodSnLHw0JHLUxNf0=;
-  b=c7eVIA4S6o/WJReO3+yIlWpTvW2sZgAl8Dut15dnWHFYgoU61m2CX/lg
-   Osym+AnUNZjjWcVReWqOcnnKtDXbOn+C2n9X6neLUuRtRScVc+y3x/m03
-   57dcVBbV6PFyiii2ha43lPrOdkFWvKD5l2ju7cN9JcnrGUvgj5ORjgj25
-   q9TAsQbSuyFxspsAkz/jaW8+UwYg+ouGq2VI4326BGLBckv6YG1J8C6Of
-   T3tsTVBJx1lTOVZcCokUIdYTXAiZ/7+EkRCqALGozjUnigLTQ8taVoi01
-   gqTgwTpFsLwzqRVc4wlfBVWrmSGK5JGeHDaxmDDo95pFYIJFZJ2bZdSO6
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10635"; a="336590406"
-X-IronPort-AV: E=Sophos;i="5.98,223,1673942400"; 
-   d="scan'208";a="336590406"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2023 17:56:14 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10635"; a="651828038"
-X-IronPort-AV: E=Sophos;i="5.98,223,1673942400"; 
-   d="scan'208";a="651828038"
-Received: from allen-box.sh.intel.com (HELO [10.239.159.48]) ([10.239.159.48])
-  by orsmga006.jf.intel.com with ESMTP; 28 Feb 2023 17:56:12 -0800
-Message-ID: <91e8d0ee-ee28-0866-85c9-2b499a5dcc38@linux.intel.com>
-Date:   Wed, 1 Mar 2023 09:55:21 +0800
+        with ESMTP id S229530AbjCACSX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Feb 2023 21:18:23 -0500
+Received: from mail.zytor.com (unknown [IPv6:2607:7c80:54:3::138])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE603303CC;
+        Tue, 28 Feb 2023 18:18:13 -0800 (PST)
+Received: from [127.0.0.1] ([73.223.221.228])
+        (authenticated bits=0)
+        by mail.zytor.com (8.17.1/8.17.1) with ESMTPSA id 3212Ha9f851151
+        (version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+        Tue, 28 Feb 2023 18:17:37 -0800
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 3212Ha9f851151
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+        s=2023020601; t=1677637058;
+        bh=6IbQZJhnFOlhC3qqva1am5R2ecLau7SASYNqCxQJVAw=;
+        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+        b=crSHP7riXI6tzCCiCcc/yG9YtJv+zGuXN0PNfY0Aw5CEELjEIWPKma3NrG+z/9NM6
+         QwkRlhUQ6H8hkIDMd34C7T4eeRXub4ERuz5VympWYb0rvBM1lEHYcveyoSSfrjHuRZ
+         zXQuv7RHe1wPiHFy8c6WiVDM8Id2PgKUfhLLTH6HLME86jWzWKdWgxQsc8C5iEYHbZ
+         wA4Hv1vsnuZzaFJJEsN7U+w9hrDzw+BU5VAZwU0BmML1p0XBijbiH8a+SqpY2nTvxS
+         9+/fAKBuh1Wm3G9oSaGlAHolONAjGJXrEgUBXjj4USLVNNqg5vmKSwuuPPLTBOVNMD
+         6ymRt6QJ2cGqw==
+Date:   Tue, 28 Feb 2023 18:17:33 -0800
+From:   "H. Peter Anvin" <hpa@zytor.com>
+To:     "Li, Xin3" <xin3.li@intel.com>,
+        "andrew.cooper3@citrix.com" <andrew.cooper3@citrix.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+CC:     "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Shankar, Ravi V" <ravi.v.shankar@intel.com>
+Subject: =?US-ASCII?Q?RE=3A_=5BRFC_PATCH_v3_15/32=5D_x86/fred=3A_make_unio?= =?US-ASCII?Q?ns_for_the_cs_and_ss_fields_in_struct_pt=5Fregs?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <SA1PR11MB673406B8B43E18F0BD11C8DBA8A89@SA1PR11MB6734.namprd11.prod.outlook.com>
+References: <20230224070145.3572-1-xin3.li@intel.com> <20230224070145.3572-16-xin3.li@intel.com> <bf1ad4c3-73eb-0f8f-e627-a7e0785fe903@citrix.com> <SA1PR11MB673406B8B43E18F0BD11C8DBA8A89@SA1PR11MB6734.namprd11.prod.outlook.com>
+Message-ID: <89026D19-3E98-4D88-820B-36A29488D46D@zytor.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Cc:     baolu.lu@linux.intel.com, iommu@lists.linux.dev,
-        Kevin Tian <kevin.tian@intel.com>,
-        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
-        Nicolin Chen <nicolinc@nvidia.com>, Yi Liu <yi.l.liu@intel.com>
-Subject: Re: [PATCH 09/14] iommufd: Add iommufd_device_replace()
-To:     Jason Gunthorpe <jgg@nvidia.com>
-References: <9-v1-7612f88c19f5+2f21-iommufd_alloc_jgg@nvidia.com>
- <cdbc3707-d326-26d4-3adc-ff2ed80aa2ba@linux.intel.com>
- <Y/y3A4LJqunT0ZwS@nvidia.com>
- <adfd78d1-006e-5e7c-236b-cc00e8afb8c0@linux.intel.com>
- <Y/4G4u/uYA3eg7OY@nvidia.com>
-Content-Language: en-US
-From:   Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <Y/4G4u/uYA3eg7OY@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/28/23 9:51 PM, Jason Gunthorpe wrote:
-> On Tue, Feb 28, 2023 at 09:50:52AM +0800, Baolu Lu wrote:
->> On 2/27/23 9:58 PM, Jason Gunthorpe wrote:
->>> On Sun, Feb 26, 2023 at 11:01:59AM +0800, Baolu Lu wrote:
->>>> On 2/25/23 8:27 AM, Jason Gunthorpe wrote:
->>>>> @@ -437,25 +517,77 @@ int iommufd_device_attach(struct iommufd_device *idev, u32 *pt_id)
->>>>>     		struct iommufd_ioas *ioas =
->>>>>     			container_of(pt_obj, struct iommufd_ioas, obj);
->>>>> -		rc = iommufd_device_auto_get_domain(idev, ioas, pt_id);
->>>>> -		if (rc)
->>>>> +		destroy_hwpt = iommufd_device_auto_get_domain(idev, ioas, pt_id,
->>>>> +							      do_attach);
->>>>> +		if (IS_ERR(destroy_hwpt))
->>>>>     			goto out_put_pt_obj;
->>>>>     		break;
->>>>>     	}
->>>>>     	default:
->>>>> -		rc = -EINVAL;
->>>>> +		destroy_hwpt = ERR_PTR(-EINVAL);
->>>>>     		goto out_put_pt_obj;
->>>>>     	}
->>>>> +	iommufd_put_object(pt_obj);
->>>>> -	refcount_inc(&idev->obj.users);
->>>>> -	rc = 0;
->>>>> +	/* This destruction has to be after we unlock everything */
->>>>> +	if (destroy_hwpt)
->>>> Should this be
->>>>
->>>> 	if (!IS_ERR_OR_NULL(destroy_hwpt))
->>>>
->>>> ?
->>> Never use IS_ERR_OR_NULL ..
->> Can you please elaborate a bit on this? I can still see a lot of use of
->> it in the tree.
-> Yes, sadly. It is usually some signal of toxic confusion about what
-> things mean.
-> 
-> A function that returns an ERR_PTR should very rarely return NULL, and
-> if it does return NULL then NULL wasn't an error.
+On February 24, 2023 8:34:36 AM PST, "Li, Xin3" <xin3=2Eli@intel=2Ecom> wro=
+te:
+>> > +	union {
+>> > +		unsigned long  csl; /* CS + any fields above it */
+>>=20
+>> I guess that CSL here is supposed to mean cs long, but CSL (Current Sta=
+ck Level) is a
+>> new term in the FRED spec which isn't this=2E
+>
+>Good catch!
+>
+>>=20
+>> This causes changes such as the final hunk in patch 27 to read incorrec=
+tly, despite
+>> being technically correct=2E
+>>=20
+>> cs_slot would be much clearer in code, but tbh, even cs_l would be bett=
+er than the
+>> version without an underscore=2E
+>
+>cs_slot sounds a good term unless someone comes up with a better one=2E
+>
+>>=20
+>> And obviously, whatever is done here should be mirrored for ss=2E
+>
+>Probably ss_slot then=2E
+>  Xin
+>
 
-That's true.
-
-> Further you should never store an ERR_PTR in some structure and then
-> later try to test it, that is madness.
-> 
-> So with properly structured code the need should not exist.
-> 
-> https://lore.kernel.org/all/20130109150427.GL3931@n2100.arm.linux.org.uk/
-
-It's clear to me now. Thanks a lot for the explanation.
-
-Best regards,
-baolu
+I called it csx, for "cs extended"=2E "csq" would work, too=2E
