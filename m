@@ -2,149 +2,244 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ECD626A6401
-	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 01:03:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CCAC6A6432
+	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 01:24:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229712AbjCAADg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Feb 2023 19:03:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44180 "EHLO
+        id S229577AbjCAAYG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Feb 2023 19:24:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229481AbjCAADf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Feb 2023 19:03:35 -0500
-Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECD753C2A;
-        Tue, 28 Feb 2023 16:03:31 -0800 (PST)
-Received: by mail-qt1-x833.google.com with SMTP id c19so12502134qtn.13;
-        Tue, 28 Feb 2023 16:03:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1677629011;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y7xlEzbWy6v9JfLWv2ZpFnkkZM75lFiyxm9Fm1VS9Lo=;
-        b=MhDQY0UQ+y5lA4/Grc8SUZ3G1TlC3KIqrvzHzDI/kJi/x+70OIfJjfqdIGxV4g0cwQ
-         kxgAc/ybrHWiRPIduKLPvemwtLiUUHZbj/GFcrqmISn5bV2Z7HkIbYskSbx71X44LYFz
-         RIEHLjoRplEXyz+ZA8Rhxh2uJ5v9TryoybOXKtlTuwlm8z0B6x3Y+egeAAjZGd+0s4qi
-         eB0m95NF1OrZULRACKI3YFhVUh2LJ4F6UqkcYn7NMMI/rrFeBdNtYzqXflC18Y+Kt6Vf
-         mwZ2vDYjpjWwWdf1dW2M/mTx29M9mPFoL9X2eh4qMhLfyaO1o1dMQMq3B/LTlRRF37Wq
-         HdeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677629011;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=y7xlEzbWy6v9JfLWv2ZpFnkkZM75lFiyxm9Fm1VS9Lo=;
-        b=4z5+3RwB32zbjBWRRz3hMqCKg24sU1TouQW15kmOHvEyfza4LY7sHPLkxNY8iWONtM
-         Qc1Hs7QZdQ2/y3a6W1HGFeooX5FYz3lrd88+oZmlYEoHfEu7CeAP3or+8Yj2RFEH/uE9
-         CqvmFXjmMwOHplxd8malnz1Mi7R3kufbd1uIbAh1btCeJKGW0hltHjmscGReQYl2uPZJ
-         I7Wthyt295L9nZCL+9S2Uf0epy0E3r1EL2XXYy1noPU4kR39EeP6krTKRxF8S+Hn0Pdh
-         /GfexbHiFQ/1qvTzPVMOFXNiqenl46YSVRcK2VplQQww4UVN8ic3qiMO3yvJwpZnes1i
-         7L4w==
-X-Gm-Message-State: AO0yUKVgS34JWicKZqgfY58w5Tb5ipQP9to6I/UNY+LMLFMhtRhaT+ew
-        qvfmXH4GjZnu8Kb3DHTOErk5QJN4B4/4Fz0cnqK+3S6zO0i0
-X-Google-Smtp-Source: AK7set+P1K1zJUQOa4fDilf3cLbc+JrET/UoKH5Obbp5N5CViT8tULlyqxFRQ+0WHzNnqBwjP9p/9upM3tM4R346pGU=
-X-Received: by 2002:a05:622a:1ba4:b0:3bd:17aa:49b2 with SMTP id
- bp36-20020a05622a1ba400b003bd17aa49b2mr1965901qtb.5.1677629010966; Tue, 28
- Feb 2023 16:03:30 -0800 (PST)
+        with ESMTP id S229480AbjCAAYF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Feb 2023 19:24:05 -0500
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ED72B763;
+        Tue, 28 Feb 2023 16:24:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1677630244; x=1709166244;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=yoZkfu3SK5uDBzze9pglBHWSzN6bUknAkIvbsUywnaQ=;
+  b=U4pmSIr8QxgTf2sIxjMl34Gg5kYO4KwOOet1GzgtyjfOD7xgLknhpR5z
+   UeiL5P+BSouSSwVWMMfZ+zK1JORWtKLgGSzH6S4jeL1GuYqgEqKghIn2t
+   uQtp+u0n7AfaqQ9Wu8a1oHLNGujlfXyqZVhrHKE3MiWyPlZwh4a3nTOia
+   yM7rlziZiSrj1tKyEDbTsqtWUmoL8RzL/PA3Ypia/QiYx8EAgc0DoUgEh
+   ebSyIjTmQp2OLiXdfXPKXyk4WjaTzXHRz+ULOfU0QRzqa/Le0rIkOHzrC
+   0LN21llO9Ktea/Tvtu7myXu/n4bwyGSqYTr1yxxSc2Gp2KwCLO+iHDmRO
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10635"; a="334320108"
+X-IronPort-AV: E=Sophos;i="5.98,223,1673942400"; 
+   d="scan'208";a="334320108"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2023 16:24:02 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10635"; a="706774375"
+X-IronPort-AV: E=Sophos;i="5.98,223,1673942400"; 
+   d="scan'208";a="706774375"
+Received: from lkp-server01.sh.intel.com (HELO 3895f5c55ead) ([10.239.97.150])
+  by orsmga001.jf.intel.com with ESMTP; 28 Feb 2023 16:23:58 -0800
+Received: from kbuild by 3895f5c55ead with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pXAGD-0005kb-1U;
+        Wed, 01 Mar 2023 00:23:57 +0000
+Date:   Wed, 1 Mar 2023 08:23:02 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Tianrui Zhao <zhaotianrui@loongson.cn>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     oe-kbuild-all@lists.linux.dev, Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
+        Xi Ruoyao <xry111@xry111.site>
+Subject: Re: [PATCH v3 29/29] LoongArch: KVM: Enable kvm config and add the
+ makefile
+Message-ID: <202303010850.bV3yQ7cW-lkp@intel.com>
+References: <20230228070057.3687180-30-zhaotianrui@loongson.cn>
 MIME-Version: 1.0
-References: <20230226110802.103134-1-usama.arif@bytedance.com>
- <20230226110802.103134-8-usama.arif@bytedance.com> <878rghmrn2.ffs@tglx>
- <35264451eabdf967eb31069cb814e8a05ee3179b.camel@infradead.org>
- <cf7a1657159219cea61ffef567280e2e88d1f670.camel@infradead.org>
- <CAMzpN2hQArxf2mAVq55uMx9VhTjUD-VDEVAD406RScfsrjdAjQ@mail.gmail.com> <0E3AFDDA-039B-40F3-92A4-85CD96B1BB64@infradead.org>
-In-Reply-To: <0E3AFDDA-039B-40F3-92A4-85CD96B1BB64@infradead.org>
-From:   Brian Gerst <brgerst@gmail.com>
-Date:   Tue, 28 Feb 2023 19:03:19 -0500
-Message-ID: <CAMzpN2gEhC5q-FPv2iGmEzuk+LiRHF+Mn7EKWw7KbQ5NQUmG2g@mail.gmail.com>
-Subject: Re: [PATCH v12 07/11] x86/smpboot: Remove early_gdt_descr on 64-bit
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Usama Arif <usama.arif@bytedance.com>, kim.phillips@amd.com,
-        piotrgorski@cachyos.org, oleksandr@natalenko.name,
-        arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
-        pbonzini@redhat.com, paulmck@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
-        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
-        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
-        simon.evans@bytedance.com, liangma@liangbit.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230228070057.3687180-30-zhaotianrui@loongson.cn>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 28, 2023 at 6:43=E2=80=AFPM David Woodhouse <dwmw2@infradead.or=
-g> wrote:
->
->
->
-> On 28 February 2023 22:48:42 GMT, Brian Gerst <brgerst@gmail.com> wrote:
-> >On Tue, Feb 28, 2023 at 5:41=E2=80=AFPM David Woodhouse <dwmw2@infradead=
-.org> wrote:
-> >>
-> >> On Tue, 2023-02-28 at 21:57 +0000, David Woodhouse wrote:
-> >> >
-> >> > ----------------
-> >> > IN:
-> >> > 0xffffffffa20000b2:  48 31 d2                 xorq     %rdx, %rdx
-> >> > 0xffffffffa20000b5:  48 8b 82 c0 74 d5 a3     movq     -0x5c2a8b40(%=
-rdx), %rax
-> >> > 0xffffffffa20000bc:  48 8b a0 58 14 00 00     movq     0x1458(%rax),=
- %rsp
-> >> > 0xffffffffa20000c3:  48 83 ec 10              subq     $0x10, %rsp
-> >> > 0xffffffffa20000c7:  66 c7 04 24 7f 00        movw     $0x7f, (%rsp)
-> >> > 0xffffffffa20000cd:  48 8d 82 00 10 81 a3     leaq     -0x5c7ef000(%=
-rdx), %rax
-> >> > 0xffffffffa20000d4:  48 89 44 24 02           movq     %rax, 2(%rsp)
-> >> > 0xffffffffa20000d9:  0f 01 14 24              lgdtq    (%rsp)
-> >> > 0xffffffffa20000dd:  48 83 c4 10              addq     $0x10, %rsp
-> >> > 0xffffffffa20000e1:  31 c0                    xorl     %eax, %eax
-> >> > 0xffffffffa20000e3:  8e d8                    movl     %eax, %ds
-> >> >
-> >> > I cannot work out where the value -0x5c7ef000 comes from, but it
-> >> > doesn't seem to be the 0xb000 you claimed, and my brain is hurting
-> >> > again...
-> >>
-> >> Turning off CONFIG_RANDOMIZE_BASE (or just looking at the vmlinux
-> >> disassembly instead as Brian did) helps to resolve that FWIW.
-> >>
-> >> I've changed it to zero all of %rdx and pushed it back to the v12bis
-> >> branch.
-> >
-> >xorl %edx, %edx is preferred, as a 32-bit operation zero-extends to
-> >the full 64-bit register.  Using xorq to clear any of the lower 8
-> >registers adds an unnecessary REX prefix.  Just one of many quirks of
-> >the x86 instruction set...
->
-> Ewww. Couldn't the assembler choose to omit the REX prefix then? It does =
-more tricksy things than that already.
->
-> I almost prefer having the prefix but (in the morning) if you prefer I ca=
-n put it back as it was with a comment about the zero-extension.
+Hi Tianrui,
 
-commit a7bea8308933aaeea76dad7d42a6e51000417626
-Author: Jan Beulich <JBeulich@suse.com>
-Date:   Mon Jul 2 04:31:54 2018 -0600
+Thank you for the patch! Perhaps something to improve:
 
-    x86/asm/64: Use 32-bit XOR to zero registers
+[auto build test WARNING on kvm/queue]
+[also build test WARNING on linus/master v6.2 next-20230228]
+[cannot apply to kvm/linux-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-    Some Intel CPUs don't recognize 64-bit XORs as zeroing idioms. Zeroing
-    idioms don't require execution bandwidth, as they're being taken care
-    of in the frontend (through register renaming). Use 32-bit XORs instead=
-.
+url:    https://github.com/intel-lab-lkp/linux/commits/Tianrui-Zhao/LoongArch-KVM-Add-kvm-related-header-files/20230228-151250
+base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+patch link:    https://lore.kernel.org/r/20230228070057.3687180-30-zhaotianrui%40loongson.cn
+patch subject: [PATCH v3 29/29] LoongArch: KVM: Enable kvm config and add the makefile
+config: loongarch-allmodconfig (https://download.01.org/0day-ci/archive/20230301/202303010850.bV3yQ7cW-lkp@intel.com/config)
+compiler: loongarch64-linux-gcc (GCC) 12.1.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/7833c6dd07758557e28d69f9138c83adfbf06aeb
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Tianrui-Zhao/LoongArch-KVM-Add-kvm-related-header-files/20230228-151250
+        git checkout 7833c6dd07758557e28d69f9138c83adfbf06aeb
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=loongarch olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=loongarch SHELL=/bin/bash arch/loongarch/
 
-Not that speed is important here, but it's good to be consistent
-across the whole kernel.  Someone will eventually come by and fix it
-up anyways, as there have been a few of these patches already in the
-git history.
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202303010850.bV3yQ7cW-lkp@intel.com/
 
---
-Brian Gerst
+All warnings (new ones prefixed by >>):
+
+   In file included from include/trace/define_trace.h:102,
+                    from arch/loongarch/kvm/trace.h:169,
+                    from arch/loongarch/kvm/vcpu.c:14:
+   arch/loongarch/kvm/./trace.h: In function 'trace_raw_output_kvm_exit_gspr':
+>> arch/loongarch/kvm/./trace.h:69:23: warning: format '%lx' expects argument of type 'long unsigned int', but argument 3 has type 'unsigned int' [-Wformat=]
+      69 |             TP_printk("inst word: 0x%08lx",
+         |                       ^~~~~~~~~~~~~~~~~~~~
+   include/trace/trace_events.h:203:34: note: in definition of macro 'DECLARE_EVENT_CLASS'
+     203 |         trace_event_printf(iter, print);                                \
+         |                                  ^~~~~
+   include/trace/trace_events.h:45:30: note: in expansion of macro 'PARAMS'
+      45 |                              PARAMS(print));                   \
+         |                              ^~~~~~
+   arch/loongarch/kvm/./trace.h:58:1: note: in expansion of macro 'TRACE_EVENT'
+      58 | TRACE_EVENT(kvm_exit_gspr,
+         | ^~~~~~~~~~~
+   arch/loongarch/kvm/./trace.h:69:13: note: in expansion of macro 'TP_printk'
+      69 |             TP_printk("inst word: 0x%08lx",
+         |             ^~~~~~~~~
+   In file included from include/trace/trace_events.h:237:
+   arch/loongarch/kvm/./trace.h:69:41: note: format string is defined here
+      69 |             TP_printk("inst word: 0x%08lx",
+         |                                     ~~~~^
+         |                                         |
+         |                                         long unsigned int
+         |                                     %08x
+   arch/loongarch/kvm/./trace.h: In function 'trace_raw_output_kvm_exit':
+   arch/loongarch/kvm/./trace.h:54:31: warning: left-hand operand of comma expression has no effect [-Wunused-value]
+      54 |         ({ KVM_TRACE_EXIT_IDLE,         "IDLE" },                       \
+         |                               ^
+   include/trace/trace_events.h:203:34: note: in definition of macro 'DECLARE_EVENT_CLASS'
+     203 |         trace_event_printf(iter, print);                                \
+         |                                  ^~~~~
+   arch/loongarch/kvm/./trace.h:87:13: note: in expansion of macro 'TP_printk'
+      87 |             TP_printk("[%s]PC: 0x%08lx",
+         |             ^~~~~~~~~
+   arch/loongarch/kvm/./trace.h:88:23: note: in expansion of macro '__print_symbolic'
+      88 |                       __print_symbolic(__entry->reason,
+         |                       ^~~~~~~~~~~~~~~~
+   arch/loongarch/kvm/./trace.h:89:40: note: in expansion of macro 'kvm_trace_symbol_exit_types'
+      89 |                                        kvm_trace_symbol_exit_types),
+         |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+   arch/loongarch/kvm/./trace.h:54:48: error: expected ';' before '}' token
+      54 |         ({ KVM_TRACE_EXIT_IDLE,         "IDLE" },                       \
+         |                                                ^
+   include/trace/trace_events.h:203:34: note: in definition of macro 'DECLARE_EVENT_CLASS'
+     203 |         trace_event_printf(iter, print);                                \
+         |                                  ^~~~~
+   arch/loongarch/kvm/./trace.h:87:13: note: in expansion of macro 'TP_printk'
+      87 |             TP_printk("[%s]PC: 0x%08lx",
+         |             ^~~~~~~~~
+   arch/loongarch/kvm/./trace.h:88:23: note: in expansion of macro '__print_symbolic'
+      88 |                       __print_symbolic(__entry->reason,
+         |                       ^~~~~~~~~~~~~~~~
+   arch/loongarch/kvm/./trace.h:89:40: note: in expansion of macro 'kvm_trace_symbol_exit_types'
+      89 |                                        kvm_trace_symbol_exit_types),
+         |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+   arch/loongarch/kvm/./trace.h:54:49: error: expected ')' before ',' token
+      54 |         ({ KVM_TRACE_EXIT_IDLE,         "IDLE" },                       \
+         |                                                 ^
+   include/trace/trace_events.h:203:34: note: in definition of macro 'DECLARE_EVENT_CLASS'
+     203 |         trace_event_printf(iter, print);                                \
+         |                                  ^~~~~
+   arch/loongarch/kvm/./trace.h:87:13: note: in expansion of macro 'TP_printk'
+      87 |             TP_printk("[%s]PC: 0x%08lx",
+         |             ^~~~~~~~~
+   arch/loongarch/kvm/./trace.h:88:23: note: in expansion of macro '__print_symbolic'
+      88 |                       __print_symbolic(__entry->reason,
+         |                       ^~~~~~~~~~~~~~~~
+   arch/loongarch/kvm/./trace.h:89:40: note: in expansion of macro 'kvm_trace_symbol_exit_types'
+      89 |                                        kvm_trace_symbol_exit_types),
+         |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+   arch/loongarch/kvm/./trace.h:54:9: warning: initialization of 'long unsigned int' from 'char *' makes integer from pointer without a cast [-Wint-conversion]
+      54 |         ({ KVM_TRACE_EXIT_IDLE,         "IDLE" },                       \
+         |         ^
+   include/trace/trace_events.h:203:34: note: in definition of macro 'DECLARE_EVENT_CLASS'
+     203 |         trace_event_printf(iter, print);                                \
+         |                                  ^~~~~
+   arch/loongarch/kvm/./trace.h:87:13: note: in expansion of macro 'TP_printk'
+      87 |             TP_printk("[%s]PC: 0x%08lx",
+         |             ^~~~~~~~~
+   arch/loongarch/kvm/./trace.h:88:23: note: in expansion of macro '__print_symbolic'
+      88 |                       __print_symbolic(__entry->reason,
+         |                       ^~~~~~~~~~~~~~~~
+   arch/loongarch/kvm/./trace.h:89:40: note: in expansion of macro 'kvm_trace_symbol_exit_types'
+      89 |                                        kvm_trace_symbol_exit_types),
+         |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+   arch/loongarch/kvm/./trace.h:54:9: note: (near initialization for 'symbols[0].mask')
+      54 |         ({ KVM_TRACE_EXIT_IDLE,         "IDLE" },                       \
+         |         ^
+   include/trace/trace_events.h:203:34: note: in definition of macro 'DECLARE_EVENT_CLASS'
+     203 |         trace_event_printf(iter, print);                                \
+         |                                  ^~~~~
+   arch/loongarch/kvm/./trace.h:87:13: note: in expansion of macro 'TP_printk'
+      87 |             TP_printk("[%s]PC: 0x%08lx",
+         |             ^~~~~~~~~
+   arch/loongarch/kvm/./trace.h:88:23: note: in expansion of macro '__print_symbolic'
+      88 |                       __print_symbolic(__entry->reason,
+         |                       ^~~~~~~~~~~~~~~~
+   arch/loongarch/kvm/./trace.h:89:40: note: in expansion of macro 'kvm_trace_symbol_exit_types'
+      89 |                                        kvm_trace_symbol_exit_types),
+         |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+   arch/loongarch/kvm/./trace.h:54:9: error: initializer element is not constant
+      54 |         ({ KVM_TRACE_EXIT_IDLE,         "IDLE" },                       \
+         |         ^
+
+
+vim +69 arch/loongarch/kvm/./trace.h
+
+2747799ba604af Tianrui Zhao 2023-02-28  51  
+2747799ba604af Tianrui Zhao 2023-02-28  52  /* Tracepoints for VM exits */
+2747799ba604af Tianrui Zhao 2023-02-28  53  #define kvm_trace_symbol_exit_types					\
+2747799ba604af Tianrui Zhao 2023-02-28  54  	({ KVM_TRACE_EXIT_IDLE,		"IDLE" },			\
+2747799ba604af Tianrui Zhao 2023-02-28  55  	{ KVM_TRACE_EXIT_CACHE,		"CACHE" },			\
+2747799ba604af Tianrui Zhao 2023-02-28  56  	{ KVM_TRACE_EXIT_SIGNAL,	"Signal" })
+2747799ba604af Tianrui Zhao 2023-02-28  57  
+2747799ba604af Tianrui Zhao 2023-02-28  58  TRACE_EVENT(kvm_exit_gspr,
+2747799ba604af Tianrui Zhao 2023-02-28  59  	    TP_PROTO(struct kvm_vcpu *vcpu, unsigned int inst_word),
+2747799ba604af Tianrui Zhao 2023-02-28  60  	    TP_ARGS(vcpu, inst_word),
+2747799ba604af Tianrui Zhao 2023-02-28  61  	    TP_STRUCT__entry(
+2747799ba604af Tianrui Zhao 2023-02-28  62  			__field(unsigned int, inst_word)
+2747799ba604af Tianrui Zhao 2023-02-28  63  	    ),
+2747799ba604af Tianrui Zhao 2023-02-28  64  
+2747799ba604af Tianrui Zhao 2023-02-28  65  	    TP_fast_assign(
+2747799ba604af Tianrui Zhao 2023-02-28  66  			__entry->inst_word = inst_word;
+2747799ba604af Tianrui Zhao 2023-02-28  67  	    ),
+2747799ba604af Tianrui Zhao 2023-02-28  68  
+2747799ba604af Tianrui Zhao 2023-02-28 @69  	    TP_printk("inst word: 0x%08lx",
+2747799ba604af Tianrui Zhao 2023-02-28  70  		      __entry->inst_word)
+2747799ba604af Tianrui Zhao 2023-02-28  71  );
+2747799ba604af Tianrui Zhao 2023-02-28  72  
+2747799ba604af Tianrui Zhao 2023-02-28  73  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
