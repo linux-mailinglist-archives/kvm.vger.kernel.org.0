@@ -2,142 +2,274 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2063E6A75C8
-	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 22:01:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 652996A75E4
+	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 22:09:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229824AbjCAVBG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Mar 2023 16:01:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37032 "EHLO
+        id S229735AbjCAVJh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Mar 2023 16:09:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229786AbjCAVBD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Mar 2023 16:01:03 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA02D4E5C9
-        for <kvm@vger.kernel.org>; Wed,  1 Mar 2023 13:01:02 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 3EAC6B81145
-        for <kvm@vger.kernel.org>; Wed,  1 Mar 2023 21:01:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCD31C433EF;
-        Wed,  1 Mar 2023 21:00:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677704459;
-        bh=uFiPEF5SLKILtrhcsofkjCqm4Khs84ThWqK5VyBLNYc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=s+ZZ9hB7I+/6C3jmNSVw3DxwrR5rwTjJ2pKiWKvB/KvD6RBzoDb2lErFkyOq+MwYJ
-         e33C6QQ4faJnC2r80J+BFxK+anYRRWPtX4RS+tbAMul2JSv+Ggdz/ZydjDulWwRTG5
-         rhmDZDgGUZQstigcwrqVWBu8AG1oxb4PrlMrZ2YqRsQ7sW3nKEWs47CLPrgTywgm9A
-         jLZR2RqSwdjKFsVoxZyLiUvOl4LE80xhNAqv3LM/Djs/febwoXHGmJQ11lPa4ioZMa
-         rGlgNNRkhoT56socCiZ1aWlqoWSvcn+s/odcXDVOOhwZVRoIw5huySEefWhXhfHsxP
-         pSkgY1AdPeacA==
-Date:   Wed, 1 Mar 2023 21:00:54 +0000
-From:   Conor Dooley <conor@kernel.org>
-To:     Andy Chiu <andy.chiu@sifive.com>
-Cc:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
-        anup@brainfault.org, atishp@atishpatra.org,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        vineetg@rivosinc.com, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Vincent Chen <vincent.chen@sifive.com>,
-        Guo Ren <guoren@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>,
-        Andrew Bresticker <abrestic@rivosinc.com>
-Subject: Re: [PATCH -next v14 15/19] riscv: signal: validate altstack to
- reflect Vector
-Message-ID: <c9ae64d6-c11b-4309-a836-aa6d4eabc6e5@spud>
-References: <20230224170118.16766-1-andy.chiu@sifive.com>
- <20230224170118.16766-16-andy.chiu@sifive.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="gCgIlrwmSokGHDIR"
-Content-Disposition: inline
-In-Reply-To: <20230224170118.16766-16-andy.chiu@sifive.com>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229590AbjCAVJd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Mar 2023 16:09:33 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFA613E633
+        for <kvm@vger.kernel.org>; Wed,  1 Mar 2023 13:09:31 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id d185-20020a25e6c2000000b008fa1d22bd55so1702001ybh.21
+        for <kvm@vger.kernel.org>; Wed, 01 Mar 2023 13:09:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=wki+koK7r6w+SgEjoa4UmFEH60qFloywPNvWMkgzFuY=;
+        b=p3DVRXEAdxi4wMpcCTvVRbSDRy0FbtDXyeOnl2tjhV+hh94s7qFYwxxPU2zTlrquET
+         Fl3k9B3m+Xsh4n8E4HtuUaeVwKkgIdKveNK54JPIds1OIrGEx91mbVcKRDku8wEMUh3+
+         nrXNoxYrwemZiUgKmP7pk+41evVG8uSqN6cj8jnA5Y3S2n/sPyEPBBgT40bP/uYXfylR
+         scdwsfYTgbT4myORH2CmT/YlvCWaRLG340M7/KyQQsaKgoslwuUzOkYxEnrVAiCF4SPo
+         8ZcRUHTfsIwaTQHs4PwtMj18Wgx1M4W5Id87iRAnrNEeKkkqbwFFsnEip1GAE9Ejg4RZ
+         Et2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wki+koK7r6w+SgEjoa4UmFEH60qFloywPNvWMkgzFuY=;
+        b=Xp6XDnNAcUuLLjk5FAIOZUAD36oMozZziAudJszZGz8B6J26qY63ZAWzK7GgDv0vFQ
+         2mas3msQ6KlXCLtvrbB2jR8ciinyiZ6GJ+C6RUezgHcQOGVvy5S1L4DAD+dMLqwfpFtk
+         gKY61sWoYJU3NebBWZC0Ep2mZciXHXeoPr8J5dHIxpoZskGFsOt7djA8az1MjbNKuJEH
+         4wRD+lhHJ2NHlnn3enVNvi+e0ZlzeLqpu+w330gT4iu8OIfoOqdmxyQExMRjQ9Xj8SrQ
+         7Y+XVzNHziLInYq6TqaXRNEWuwNPtxwHaOwckZ+GELpKpq9wmrGG9ZgKcUtojwWGMnj/
+         U2/A==
+X-Gm-Message-State: AO0yUKVRWODr0arC/zBMugygPSYtkrVU0PFl6yySOBt1er5TufLgF3T4
+        kFvT1dQMImNgA1jfFALRmXOe6U3TnyAkGw==
+X-Google-Smtp-Source: AK7set/aMlaUpwuADSCT1u+W1xBEdPUIMTY4iq1FbK9m9WGM1GUxayQNVJU7Y0c6SstEhf9j9+r2ChhrUvT11Q==
+X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
+ (user=ricarkol job=sendgmr) by 2002:a5b:211:0:b0:a94:b0b6:50cb with SMTP id
+ z17-20020a5b0211000000b00a94b0b650cbmr4222004ybl.11.1677704971104; Wed, 01
+ Mar 2023 13:09:31 -0800 (PST)
+Date:   Wed,  1 Mar 2023 21:09:16 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.2.722.g9855ee24e9-goog
+Message-ID: <20230301210928.565562-1-ricarkol@google.com>
+Subject: [PATCH v5 00/12] Implement Eager Page Splitting for ARM
+From:   Ricardo Koller <ricarkol@google.com>
+To:     pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
+        yuzenghui@huawei.com, dmatlack@google.com
+Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
+        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
+        rananta@google.com, bgardon@google.com, ricarkol@gmail.com,
+        Ricardo Koller <ricarkol@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Eager Page Splitting improves the performance of dirty-logging (used
+in live migrations) when guest memory is backed by huge-pages.  It's
+an optimization used in Google Cloud since 2016 on x86, and for the
+last couple of months on ARM.
 
---gCgIlrwmSokGHDIR
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Background and motivation
+=========================
+Dirty logging is typically used for live-migration iterative copying.
+KVM implements dirty-logging at the PAGE_SIZE granularity (will refer
+to 4K pages from now on).  It does it by faulting on write-protected
+4K pages.  Therefore, enabling dirty-logging on a huge-page requires
+breaking it into 4K pages in the first place.  KVM does this breaking
+on fault, and because it's in the critical path it only maps the 4K
+page that faulted; every other 4K page is left unmapped.  This is not
+great for performance on ARM for a couple of reasons:
 
-On Fri, Feb 24, 2023 at 05:01:14PM +0000, Andy Chiu wrote:
-> MINSIGSTKSZ alone have become less informative by the time an user calls
-> sigaltstack(), as the kernel starts to support extensions that
-> dynamically introduce footprint on a signal frame.
+- Splitting on fault can halt vcpus for milliseconds in some
+  implementations. Splitting a block PTE requires using a broadcasted
+  TLB invalidation (TLBI) for every huge-page (due to the
+  break-before-make requirement). Note that x86 doesn't need this. We
+  observed some implementations that take millliseconds to complete
+  broadcasted TLBIs when done in parallel from multiple vcpus.  And
+  that's exactly what happens when doing it on fault: multiple vcpus
+  fault at the same time triggering TLBIs in parallel.
 
-This sentence is a bit difficult to understand. I find re-hashing the
-wording often helps me understand, so does the following mean the same
-thing:
-"Some extensions, such as vector, dynamically change the footprint of a
-signal frame, so MINSIGSTKSZ is no longer accurate"
-The wording "less informative" doesn't really mean anything, what could
-happen here is that the sigaltstack could be larger the MINSIGSTKSZ and
-would therefore be outright wrong?
+- Read intensive guest workloads end up paying for dirty-logging.
+  Only mapping the faulting 4K page means that all the other pages
+  that were part of the huge-page will now be unmapped. The effect is
+  that any access, including reads, now has to fault.
 
-> For example, an RV64V
-> implementation with vlen =3D 512 may occupy 2K + 40 + 12 Bytes of a signal
-> frame with the upcoming Vector support.
+Eager Page Splitting (on ARM)
+=============================
+Eager Page Splitting fixes the above two issues by eagerly splitting
+huge-pages when enabling dirty logging. The goal is to avoid doing it
+while faulting on write-protected pages. This is what the TDP MMU does
+for x86 [0], except that x86 does it for different reasons: to avoid
+grabbing the MMU lock on fault. Note that taking care of
+write-protection faults still requires grabbing the MMU lock on ARM,
+but not on x86 (with the fast_page_fault path).
 
-> And there is no need for
-> reserving the extra sigframe for some processes that do not execute any
-> V-instructions.
+An additional benefit of eagerly splitting huge-pages is that it can
+be done in a controlled way (e.g., via an IOCTL). This series provides
+two knobs for doing it, just like its x86 counterpart: when enabling
+dirty logging, and when using the KVM_CLEAR_DIRTY_LOG ioctl. The
+benefit of doing it on KVM_CLEAR_DIRTY_LOG is that this ioctl takes
+ranges, and not complete memslots like when enabling dirty logging.
+This means that the cost of splitting (mainly broadcasted TLBIs) can
+be throttled: split a range, wait for a bit, split another range, etc.
+The benefits of this approach were presented by Oliver Upton at KVM
+Forum 2022 [1].
 
-Can you reword this sentence like the following, substituting for "so xyz"
-please?
-"Processes that do not execute any vector instructions do not need to
-reserve the extra sigframe, so xyz".
+Implementation
+==============
+Patches 3-4 add a pgtable utility function for splitting huge block
+PTEs: kvm_pgtable_stage2_split(). Patches 5-9 add support for eagerly
+splitting huge-pages when enabling dirty-logging and when using the
+KVM_CLEAR_DIRTY_LOG ioctl. Note that this is just like what x86 does,
+and the code is actually based on it.  And finally, patch 9:
 
-> Thus, provide the function sigaltstack_size_valid() to validate its size
-> based on current allocation status of supported extensions.
->=20
-> Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
-> ---
->  arch/riscv/kernel/signal.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
->=20
-> diff --git a/arch/riscv/kernel/signal.c b/arch/riscv/kernel/signal.c
-> index aa8ee95dee2d..aff441e83a98 100644
-> --- a/arch/riscv/kernel/signal.c
-> +++ b/arch/riscv/kernel/signal.c
-> @@ -494,3 +494,11 @@ void __init init_rt_signal_env(void)
->  	 */
->  	signal_minsigstksz =3D cal_rt_frame_size(true);
->  }
-> +
-> +#ifdef CONFIG_DYNAMIC_SIGFRAME
-> +bool sigaltstack_size_valid(size_t ss_size)
-> +{
-> +	return ss_size > cal_rt_frame_size(false);
+	KVM: arm64: Use local TLBI on permission relaxation
 
-Seeing it here made me wonder, what does "cal" mean. I assume it is
-meant to be "calculate", but "cal" in my head is usually "calibrate".
-s/cal/get in the patch adding that function IMO.
+adds support for using local TLBIs instead of broadcasts when doing
+permission relaxation. This last patch is key to achieving good
+performance during dirty-logging, as eagerly breaking huge-pages
+replaces mapping new pages with permission relaxation. Got this patch
+(indirectly) from Marc Z.  and took the liberty of adding a commit
+message.
 
-> +}
-> +#endif /* CONFIG_DYNAMIC_SIGFRAME */
+Note: this applies on top of 6.2-rc6.
 
-The change itself, if my understanding is correct, looks fine...
+Performance evaluation
+======================
+The performance benefits were tested using the dirty_log_perf_test
+selftest with 2M huge-pages.
+
+The first test uses a write-only sequential workload where the stride
+is 2M instead of 4K [2]. The idea with this experiment is to emulate a
+random access pattern writing a different huge-page at every access.
+Observe that the benefit increases with the number of vcpus: up to
+5.76x for 152 vcpus. This table shows the guest dirtying time when
+using the CLEAR ioctl (and KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2):
+
+/dirty_log_perf_test_sparse -s anonymous_hugetlb_2mb -b 1G -v $i -i 3 -m 2
+
+	+-------+----------+------------------+
+	| vCPUs | 6.2-rc3  | 6.2-rc3 + series |
+	|       |    (ms)  |             (ms) |
+	+-------+----------+------------------+
+	|    1  |    2.63  |          1.66    |
+	|    2  |    2.95  |          1.70    |
+	|    4  |    3.21  |          1.71    |
+	|    8  |    4.97  |          1.78    |
+	|   16  |    9.51  |          1.82    |
+	|   32  |   20.15  |          3.03    |
+	|   64  |   40.09  |          5.80    |
+	|  128  |   80.08  |         12.24    |
+	|  152  |  109.81  |         15.14    |
+	+-------+----------+------------------+
+
+This secondv test measures the benefit of eager page splitting on read
+intensive workloads (1 write for every 10 reads). As in the other
+test, the benefit increases with the number of vcpus, up to 8.82x for
+152 vcpus. This table shows the guest dirtying time when using the
+CLEAR ioctl (and KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2):
+
+./dirty_log_perf_test -s anonymous_hugetlb_2mb -b 1G -v $i -i 3 -m 2 -w 10
+
+	+-------+----------+------------------+
+	| vCPUs | 6.2-rc3  | 6.2-rc3 + series |
+	|       |   (sec)  |            (sec) |
+	+-------+----------+------------------+
+	|    1  |    0.65  |          0.07    |
+	|    2  |    0.70  |          0.08    |
+	|    4  |    0.71  |          0.08    |
+	|    8  |    0.72  |          0.08    |
+	|   16  |    0.76  |          0.08    |
+	|   32  |    1.61  |          0.14    |
+	|   64  |    3.46  |          0.30    |
+	|  128  |    5.49  |          0.64    |
+	|  152  |    6.44  |          0.63    |
+	+-------+----------+------------------+
+
+Changes from v4:
+https://lore.kernel.org/kvmarm/20230218032314.635829-1-ricarkol@google.com/
+- nits on some comments (s/removed/unlinked and remove @new).
+  (Shaoqin)
+
+Changes from v3:
+https://lore.kernel.org/kvmarm/20230215174046.2201432-1-ricarkol@google.com/
+- KVM_PGTABLE_WALK_SKIP_CMO to use BIT(5). (Shaoqin)
+- Rewritten commit message for "Rename free_unlinked to free_removed"
+  using Oliver's suggestion. (Oliver)
+- "un" -> "an" typo. (Shaoqin)
+- kvm_pgtable_stage2_create_unlinked() to return a "kvm_pte_t *". (Oliver)
+- refactored stage2_block_get_nr_page_tables(). (Oliver)
+- /s/bock/block. (Shaoqin)
+
+Changes from v2:
+https://lore.kernel.org/kvmarm/20230206165851.3106338-1-ricarkol@google.com/
+- removed redundant kvm_pte_table() check from split walker function. (Gavin)
+- fix compilation of patch 8 by moving some definitions from path 9. (Gavin)
+- add comment for kvm_mmu_split_nr_page_tables(). (Gavin)
+
+Changes from v1:
+https://lore.kernel.org/kvmarm/20230113035000.480021-1-ricarkol@google.com/
+- added a capability to set the eager splitting chunk size. This
+  indirectly sets the number of pages in the cache. It also allows for
+  opting out of this feature. (Oliver, Marc)
+- changed kvm_pgtable_stage2_split() to split 1g huge-pages
+  using either 513 or 1 at a time (with a cache of 1). (Oliver, Marc)
+- added force_pte arg to kvm_pgtable_stage2_create_removed().
+- renamed free_removed to free_unlinked. (Ben and Oliver)
+- added KVM_PGTABLE_WALK ctx->flags for skipping BBM and CMO, instead
+  of KVM_PGTABLE_WALK_REMOVED. (Oliver)
+
+Changes from the RFC:
+https://lore.kernel.org/kvmarm/20221112081714.2169495-1-ricarkol@google.com/
+- dropped the changes to split on POST visits. No visible perf
+  benefit.
+- changed the kvm_pgtable_stage2_free_removed() implementation to
+  reuse the stage2 mapper.
+- dropped the FEAT_BBM changes and optimization. Will send this on a
+  different series.
 
 Thanks,
-Conor.
+Ricardo
 
---gCgIlrwmSokGHDIR
-Content-Type: application/pgp-signature; name="signature.asc"
+Marc Zyngier (1):
+  KVM: arm64: Use local TLBI on permission relaxation
 
------BEGIN PGP SIGNATURE-----
+Ricardo Koller (11):
+  KVM: arm64: Add KVM_PGTABLE_WALK ctx->flags for skipping BBM and CMO
+  KVM: arm64: Rename free_unlinked to free_removed
+  KVM: arm64: Add helper for creating unlinked stage2 subtrees
+  KVM: arm64: Add kvm_pgtable_stage2_split()
+  KVM: arm64: Refactor kvm_arch_commit_memory_region()
+  KVM: arm64: Add kvm_uninit_stage2_mmu()
+  KVM: arm64: Export kvm_are_all_memslots_empty()
+  KVM: arm64: Add KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+  KVM: arm64: Split huge pages when dirty logging is enabled
+  KVM: arm64: Open-code kvm_mmu_write_protect_pt_masked()
+  KVM: arm64: Split huge pages during KVM_CLEAR_DIRTY_LOG
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCY/+9BgAKCRB4tDGHoIJi
-0haLAPwO9CPhIOqvecgqTm+lWOANRXu+OJbVk5zrQgMt8AJprAEA0WiJw1aWRwhu
-ahSMEbkvlNYFf/HJF2dCDI7DhQEPAw4=
-=KcKm
------END PGP SIGNATURE-----
+ Documentation/virt/kvm/api.rst        |  26 ++++
+ arch/arm64/include/asm/kvm_asm.h      |   4 +
+ arch/arm64/include/asm/kvm_host.h     |  19 +++
+ arch/arm64/include/asm/kvm_mmu.h      |   1 +
+ arch/arm64/include/asm/kvm_pgtable.h  |  84 ++++++++++-
+ arch/arm64/kvm/arm.c                  |  22 +++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c    |  10 ++
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c |   6 +-
+ arch/arm64/kvm/hyp/nvhe/tlb.c         |  54 +++++++
+ arch/arm64/kvm/hyp/pgtable.c          | 194 ++++++++++++++++++++++++--
+ arch/arm64/kvm/hyp/vhe/tlb.c          |  32 +++++
+ arch/arm64/kvm/mmu.c                  | 188 +++++++++++++++++++++----
+ include/linux/kvm_host.h              |   2 +
+ include/uapi/linux/kvm.h              |   1 +
+ virt/kvm/kvm_main.c                   |   2 +-
+ 15 files changed, 591 insertions(+), 54 deletions(-)
 
---gCgIlrwmSokGHDIR--
+-- 
+2.39.2.722.g9855ee24e9-goog
+
