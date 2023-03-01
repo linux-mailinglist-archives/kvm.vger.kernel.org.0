@@ -2,271 +2,249 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CD6A56A75F0
-	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 22:10:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A5CF6A75FC
+	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 22:14:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229547AbjCAVKB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Mar 2023 16:10:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43732 "EHLO
+        id S229523AbjCAVOz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Mar 2023 16:14:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229824AbjCAVJ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Mar 2023 16:09:59 -0500
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4596B521F2
-        for <kvm@vger.kernel.org>; Wed,  1 Mar 2023 13:09:53 -0800 (PST)
-Received: by mail-pg1-x54a.google.com with SMTP id t185-20020a635fc2000000b00502e332493fso4859846pgb.12
-        for <kvm@vger.kernel.org>; Wed, 01 Mar 2023 13:09:53 -0800 (PST)
+        with ESMTP id S229540AbjCAVOp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Mar 2023 16:14:45 -0500
+Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BD074615E;
+        Wed,  1 Mar 2023 13:14:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BJLAJR4lXHPHq3Me/87q0IvvlwMB/K5VaYZ9dQFs+Xs=;
-        b=Dbt5hYrRVV8VLJ5SlGd7daEHp0vWm9ZMEz7aKiJPN0eLljSmVxMZX/2kXvZoxkhHL5
-         QyHxSsyvYpmWyrRp/bFE8IE9i9eUbJQFj8p5CnW5W6m3sEAkE8rjpbuQJ4xfi/FpRzmn
-         i4QpTyV/dChKN4cU+bcJKnc0KDgglI5b6bw95wsI/frmmHL9TYwoW8g5XiqsGLY4xuvh
-         VMKRFQdSPVHok2Z1N7ra48CUsuk9FG0JrsUouIHxQ7/2cfxSR0PCNDPnDkxuvyl9KguP
-         kQJm9iI+O+aTnq3UgBDpfp9kUap6tEJEz2WCHmgtgXQKA/2xmYljX4D+dZApiAjpbaaE
-         vCQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BJLAJR4lXHPHq3Me/87q0IvvlwMB/K5VaYZ9dQFs+Xs=;
-        b=dTQklg56qRW5nBmae56YiISmbZy58S1j5TzGZ6+Qr6FEw7CRSxmK9ow6vYpwdRLZS9
-         DUYIXFx0w22WklyUWsIVgOdZ0P1j36ZzgnxQ0qQSdeV3GOboYiM41IU7E76qOpWi75X/
-         ktaZOnpfIgDClIo8E/xQsDIBWboSoAa+YVe55zU7/Iv5FeGfUKP0JMZ/7eGE4usnIV/1
-         1h7/D5r4YaNIo8mQKhmuhqeCBpCurIj+U5NQIwO8AEAGCVfM6zJGxGqj8QjcVHKkUWdw
-         tavzwY8REVqDkd7W+ZNX7N4pV0j8ChOHVg790k0hKwdhDTPchSwWUF8Tnxg/Qt9yP0fd
-         QUZw==
-X-Gm-Message-State: AO0yUKU3/zu5bR7llzqQ698X5VrL2M0NpP5LMn0AbjTTsfWCmD1Cwz1o
-        m92psdzvUckuZh7rZXKAdN35BpoXDEgxEw==
-X-Google-Smtp-Source: AK7set97vlxCN7m1MDHOD/dkJDNcp8qSFC5ADTWqwufrcbV/A5WHBVqwRi73NB9M3taMFHVuWdTzVJ7m2MckzA==
-X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a17:90b:274b:b0:233:bada:17b5 with SMTP
- id qi11-20020a17090b274b00b00233bada17b5mr4783223pjb.4.1677704992546; Wed, 01
- Mar 2023 13:09:52 -0800 (PST)
-Date:   Wed,  1 Mar 2023 21:09:28 +0000
-In-Reply-To: <20230301210928.565562-1-ricarkol@google.com>
-Mime-Version: 1.0
-References: <20230301210928.565562-1-ricarkol@google.com>
-X-Mailer: git-send-email 2.39.2.722.g9855ee24e9-goog
-Message-ID: <20230301210928.565562-13-ricarkol@google.com>
-Subject: [PATCH v5 12/12] KVM: arm64: Use local TLBI on permission relaxation
-From:   Ricardo Koller <ricarkol@google.com>
-To:     pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
-        yuzenghui@huawei.com, dmatlack@google.com
-Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
-        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
-        rananta@google.com, bgardon@google.com, ricarkol@gmail.com,
-        Ricardo Koller <ricarkol@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1677705284; x=1709241284;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=jn0NFpqmDGIanynN4GD/qfXPDtGGr3jlNzNJqzI0Z7E=;
+  b=PYkydY8Vxjo7rOgrzC+jq2YziJ7/GrbSzWtoosnkm4Sc/W+IYSqcPYOV
+   +gXB3t3CPjHL7E3B2ptRYkqe8pyfaD9c6xAz1ALaXwDaElWh4ZAJ66sCx
+   1AqMXbGn5fTJthiIWn9szdJBoiRdRwE3RuSExuWROoe5a4I/CZ09xtQH8
+   Q=;
+X-IronPort-AV: E=Sophos;i="5.98,225,1673913600"; 
+   d="scan'208";a="266376608"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-f323d91c.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2023 21:14:34 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+        by email-inbound-relay-pdx-2b-m6i4x-f323d91c.us-west-2.amazon.com (Postfix) with ESMTPS id 3091440DA6;
+        Wed,  1 Mar 2023 21:14:30 +0000 (UTC)
+Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.45; Wed, 1 Mar 2023 21:14:29 +0000
+Received: from [0.0.0.0] (10.253.83.51) by EX19D020UWC004.ant.amazon.com
+ (10.13.138.149) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.24; Wed, 1 Mar
+ 2023 21:14:21 +0000
+Message-ID: <7eed5a32-6e68-6690-ac45-cec0868b8f5d@amazon.com>
+Date:   Wed, 1 Mar 2023 22:14:19 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.8.0
+Subject: Re: [PATCH RFC v8 47/56] KVM: SVM: Support SEV-SNP AP Creation NAE
+ event
+Content-Language: en-US
+To:     Zhi Wang <zhi.wang.linux@gmail.com>
+CC:     Michael Roth <michael.roth@amd.com>, <kvm@vger.kernel.org>,
+        <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+        <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <tglx@linutronix.de>,
+        <mingo@redhat.com>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
+        <hpa@zytor.com>, <ardb@kernel.org>, <pbonzini@redhat.com>,
+        <seanjc@google.com>, <vkuznets@redhat.com>, <jmattson@google.com>,
+        <luto@kernel.org>, <dave.hansen@linux.intel.com>, <slp@redhat.com>,
+        <pgonda@google.com>, <peterz@infradead.org>,
+        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
+        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
+        <tony.luck@intel.com>, <marcorr@google.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
+        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>
+References: <20230220183847.59159-1-michael.roth@amd.com>
+ <20230220183847.59159-48-michael.roth@amd.com>
+ <09696af0-b72d-29e7-862b-22ae4a630299@amazon.com>
+ <20230228224730.00007d21@intel.com>
+From:   Alexander Graf <graf@amazon.com>
+In-Reply-To: <20230228224730.00007d21@intel.com>
+X-Originating-IP: [10.253.83.51]
+X-ClientProxiedBy: EX19D040UWB002.ant.amazon.com (10.13.138.89) To
+ EX19D020UWC004.ant.amazon.com (10.13.138.149)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
+X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        NICE_REPLY_A,RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Marc Zyngier <maz@kernel.org>
-
-Broadcasted TLB invalidations (TLBI) are usually less performant than their
-local variant. In particular, we observed some implementations that take
-millliseconds to complete parallel broadcasted TLBIs.
-
-It's safe to use local, non-shareable, TLBIs when relaxing permissions on a
-PTE in the KVM case for a couple of reasons. First, according to the ARM
-Arm (DDI 0487H.a D5-4913), permission relaxation does not need
-break-before-make.  Second, KVM does not set the VTTBR_EL2.CnP bit, so each
-PE has its own TLB entry for the same page. KVM could tolerate that when
-doing permission relaxation (i.e., not having changes broadcasted to all
-PEs).
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Ricardo Koller <ricarkol@google.com>
----
- arch/arm64/include/asm/kvm_asm.h   |  4 +++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 10 ++++++
- arch/arm64/kvm/hyp/nvhe/tlb.c      | 54 ++++++++++++++++++++++++++++++
- arch/arm64/kvm/hyp/pgtable.c       |  2 +-
- arch/arm64/kvm/hyp/vhe/tlb.c       | 32 ++++++++++++++++++
- 5 files changed, 101 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 43c3bc0f9544..bb17b2ead4c7 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -68,6 +68,7 @@ enum __kvm_host_smccc_func {
- 	__KVM_HOST_SMCCC_FUNC___kvm_vcpu_run,
- 	__KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context,
- 	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa,
-+	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa_nsh,
- 	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid,
- 	__KVM_HOST_SMCCC_FUNC___kvm_flush_cpu_context,
- 	__KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff,
-@@ -225,6 +226,9 @@ extern void __kvm_flush_vm_context(void);
- extern void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu);
- extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa,
- 				     int level);
-+extern void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
-+					 phys_addr_t ipa,
-+					 int level);
- extern void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu);
- 
- extern void __kvm_timer_set_cntvoff(u64 cntvoff);
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 728e01d4536b..c6bf1e49ca93 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -125,6 +125,15 @@ static void handle___kvm_tlb_flush_vmid_ipa(struct kvm_cpu_context *host_ctxt)
- 	__kvm_tlb_flush_vmid_ipa(kern_hyp_va(mmu), ipa, level);
- }
- 
-+static void handle___kvm_tlb_flush_vmid_ipa_nsh(struct kvm_cpu_context *host_ctxt)
-+{
-+	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
-+	DECLARE_REG(phys_addr_t, ipa, host_ctxt, 2);
-+	DECLARE_REG(int, level, host_ctxt, 3);
-+
-+	__kvm_tlb_flush_vmid_ipa_nsh(kern_hyp_va(mmu), ipa, level);
-+}
-+
- static void handle___kvm_tlb_flush_vmid(struct kvm_cpu_context *host_ctxt)
- {
- 	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
-@@ -315,6 +324,7 @@ static const hcall_t host_hcall[] = {
- 	HANDLE_FUNC(__kvm_vcpu_run),
- 	HANDLE_FUNC(__kvm_flush_vm_context),
- 	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa),
-+	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa_nsh),
- 	HANDLE_FUNC(__kvm_tlb_flush_vmid),
- 	HANDLE_FUNC(__kvm_flush_cpu_context),
- 	HANDLE_FUNC(__kvm_timer_set_cntvoff),
-diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
-index d296d617f589..ef2b70587f93 100644
---- a/arch/arm64/kvm/hyp/nvhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-@@ -109,6 +109,60 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
- 	__tlb_switch_to_host(&cxt);
- }
- 
-+void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
-+				  phys_addr_t ipa, int level)
-+{
-+	struct tlb_inv_context cxt;
-+
-+	dsb(nshst);
-+
-+	/* Switch to requested VMID */
-+	__tlb_switch_to_guest(mmu, &cxt);
-+
-+	/*
-+	 * We could do so much better if we had the VA as well.
-+	 * Instead, we invalidate Stage-2 for this IPA, and the
-+	 * whole of Stage-1. Weep...
-+	 */
-+	ipa >>= 12;
-+	__tlbi_level(ipas2e1, ipa, level);
-+
-+	/*
-+	 * We have to ensure completion of the invalidation at Stage-2,
-+	 * since a table walk on another CPU could refill a TLB with a
-+	 * complete (S1 + S2) walk based on the old Stage-2 mapping if
-+	 * the Stage-1 invalidation happened first.
-+	 */
-+	dsb(nsh);
-+	__tlbi(vmalle1);
-+	dsb(nsh);
-+	isb();
-+
-+	/*
-+	 * If the host is running at EL1 and we have a VPIPT I-cache,
-+	 * then we must perform I-cache maintenance at EL2 in order for
-+	 * it to have an effect on the guest. Since the guest cannot hit
-+	 * I-cache lines allocated with a different VMID, we don't need
-+	 * to worry about junk out of guest reset (we nuke the I-cache on
-+	 * VMID rollover), but we do need to be careful when remapping
-+	 * executable pages for the same guest. This can happen when KSM
-+	 * takes a CoW fault on an executable page, copies the page into
-+	 * a page that was previously mapped in the guest and then needs
-+	 * to invalidate the guest view of the I-cache for that page
-+	 * from EL1. To solve this, we invalidate the entire I-cache when
-+	 * unmapping a page from a guest if we have a VPIPT I-cache but
-+	 * the host is running at EL1. As above, we could do better if
-+	 * we had the VA.
-+	 *
-+	 * The moral of this story is: if you have a VPIPT I-cache, then
-+	 * you should be running with VHE enabled.
-+	 */
-+	if (icache_is_vpipt())
-+		icache_inval_all_pou();
-+
-+	__tlb_switch_to_host(&cxt);
-+}
-+
- void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
- {
- 	struct tlb_inv_context cxt;
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 75726edba2f3..540f55a14b80 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -1148,7 +1148,7 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
- 	ret = stage2_update_leaf_attrs(pgt, addr, 1, set, clr, NULL, &level,
- 				       KVM_PGTABLE_WALK_SHARED);
- 	if (!ret)
--		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, pgt->mmu, addr, level);
-+		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa_nsh, pgt->mmu, addr, level);
- 	return ret;
- }
- 
-diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-index 24cef9b87f9e..e69da550cdc5 100644
---- a/arch/arm64/kvm/hyp/vhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/vhe/tlb.c
-@@ -111,6 +111,38 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
- 	__tlb_switch_to_host(&cxt);
- }
- 
-+void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
-+				  phys_addr_t ipa, int level)
-+{
-+	struct tlb_inv_context cxt;
-+
-+	dsb(nshst);
-+
-+	/* Switch to requested VMID */
-+	__tlb_switch_to_guest(mmu, &cxt);
-+
-+	/*
-+	 * We could do so much better if we had the VA as well.
-+	 * Instead, we invalidate Stage-2 for this IPA, and the
-+	 * whole of Stage-1. Weep...
-+	 */
-+	ipa >>= 12;
-+	__tlbi_level(ipas2e1, ipa, level);
-+
-+	/*
-+	 * We have to ensure completion of the invalidation at Stage-2,
-+	 * since a table walk on another CPU could refill a TLB with a
-+	 * complete (S1 + S2) walk based on the old Stage-2 mapping if
-+	 * the Stage-1 invalidation happened first.
-+	 */
-+	dsb(nsh);
-+	__tlbi(vmalle1);
-+	dsb(nsh);
-+	isb();
-+
-+	__tlb_switch_to_host(&cxt);
-+}
-+
- void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
- {
- 	struct tlb_inv_context cxt;
--- 
-2.39.2.722.g9855ee24e9-goog
+Ck9uIDI4LjAyLjIzIDIxOjQ3LCBaaGkgV2FuZyB3cm90ZToKPiBPbiBGcmksIDI0IEZlYiAyMDIz
+IDEzOjM3OjQ4ICswMTAwCj4gQWxleGFuZGVyIEdyYWYgPGdyYWZAYW1hem9uLmNvbT4gd3JvdGU6
+Cj4KPj4gT24gMjAuMDIuMjMgMTk6MzgsIE1pY2hhZWwgUm90aCB3cm90ZToKPj4+IEZyb206IFRv
+bSBMZW5kYWNreSA8dGhvbWFzLmxlbmRhY2t5QGFtZC5jb20+Cj4+Pgo+Pj4gQWRkIHN1cHBvcnQg
+Zm9yIHRoZSBTRVYtU05QIEFQIENyZWF0aW9uIE5BRSBldmVudC4gVGhpcyBhbGxvd3MgU0VWLVNO
+UAo+Pj4gZ3Vlc3RzIHRvIGFsdGVyIHRoZSByZWdpc3RlciBzdGF0ZSBvZiB0aGUgQVBzIG9uIHRo
+ZWlyIG93bi4gVGhpcyBhbGxvd3MKPj4+IHRoZSBndWVzdCBhIHdheSBvZiBzaW11bGF0aW5nIElO
+SVQtU0lQSS4KPj4+Cj4+PiBBIG5ldyBldmVudCwgS1ZNX1JFUV9VUERBVEVfUFJPVEVDVEVEX0dV
+RVNUX1NUQVRFLCBpcyBjcmVhdGVkIGFuZCB1c2VkCj4+PiBzbyBhcyB0byBhdm9pZCB1cGRhdGlu
+ZyB0aGUgVk1TQSBwb2ludGVyIHdoaWxlIHRoZSB2Q1BVIGlzIHJ1bm5pbmcuCj4+Pgo+Pj4gRm9y
+IENSRUFURQo+Pj4gICAgIFRoZSBndWVzdCBzdXBwbGllcyB0aGUgR1BBIG9mIHRoZSBWTVNBIHRv
+IGJlIHVzZWQgZm9yIHRoZSB2Q1BVIHdpdGgKPj4+ICAgICB0aGUgc3BlY2lmaWVkIEFQSUMgSUQu
+IFRoZSBHUEEgaXMgc2F2ZWQgaW4gdGhlIHN2bSBzdHJ1Y3Qgb2YgdGhlCj4+PiAgICAgdGFyZ2V0
+IHZDUFUsIHRoZSBLVk1fUkVRX1VQREFURV9QUk9URUNURURfR1VFU1RfU1RBVEUgZXZlbnQgaXMg
+YWRkZWQKPj4+ICAgICB0byB0aGUgdkNQVSBhbmQgdGhlbiB0aGUgdkNQVSBpcyBraWNrZWQuCj4+
+Pgo+Pj4gRm9yIENSRUFURV9PTl9JTklUOgo+Pj4gICAgIFRoZSBndWVzdCBzdXBwbGllcyB0aGUg
+R1BBIG9mIHRoZSBWTVNBIHRvIGJlIHVzZWQgZm9yIHRoZSB2Q1BVIHdpdGgKPj4+ICAgICB0aGUg
+c3BlY2lmaWVkIEFQSUMgSUQgdGhlIG5leHQgdGltZSBhbiBJTklUIGlzIHBlcmZvcm1lZC4gVGhl
+IEdQQSBpcwo+Pj4gICAgIHNhdmVkIGluIHRoZSBzdm0gc3RydWN0IG9mIHRoZSB0YXJnZXQgdkNQ
+VS4KPj4+Cj4+PiBGb3IgREVTVFJPWToKPj4+ICAgICBUaGUgZ3Vlc3QgaW5kaWNhdGVzIGl0IHdp
+c2hlcyB0byBzdG9wIHRoZSB2Q1BVLiBUaGUgR1BBIGlzIGNsZWFyZWQKPj4+ICAgICBmcm9tIHRo
+ZSBzdm0gc3RydWN0LCB0aGUgS1ZNX1JFUV9VUERBVEVfUFJPVEVDVEVEX0dVRVNUX1NUQVRFIGV2
+ZW50IGlzCj4+PiAgICAgYWRkZWQgdG8gdkNQVSBhbmQgdGhlbiB0aGUgdkNQVSBpcyBraWNrZWQu
+Cj4+Pgo+Pj4gVGhlIEtWTV9SRVFfVVBEQVRFX1BST1RFQ1RFRF9HVUVTVF9TVEFURSBldmVudCBo
+YW5kbGVyIHdpbGwgYmUgaW52b2tlZAo+Pj4gYXMgYSByZXN1bHQgb2YgdGhlIGV2ZW50IG9yIGFz
+IGEgcmVzdWx0IG9mIGFuIElOSVQuIFRoZSBoYW5kbGVyIHNldHMgdGhlCj4+PiB2Q1BVIHRvIHRo
+ZSBLVk1fTVBfU1RBVEVfVU5JTklUSUFMSVpFRCBzdGF0ZSwgc28gdGhhdCBhbnkgZXJyb3JzIHdp
+bGwKPj4+IGxlYXZlIHRoZSB2Q1BVIGFzIG5vdCBydW5uYWJsZS4gQW55IHByZXZpb3VzIFZNU0Eg
+cGFnZXMgdGhhdCB3ZXJlCj4+PiBpbnN0YWxsZWQgYXMgcGFydCBvZiBhbiBTRVYtU05QIEFQIENy
+ZWF0aW9uIE5BRSBldmVudCBhcmUgdW4tcGlubmVkLiBJZgo+Pj4gYSBuZXcgVk1TQSBpcyB0byBi
+ZSBpbnN0YWxsZWQsIHRoZSBWTVNBIGd1ZXN0IHBhZ2UgaXMgcGlubmVkIGFuZCBzZXQgYXMKPj4+
+IHRoZSBWTVNBIGluIHRoZSB2Q1BVIFZNQ0IgYW5kIHRoZSB2Q1BVIHN0YXRlIGlzIHNldCB0bwo+
+Pj4gS1ZNX01QX1NUQVRFX1JVTk5BQkxFLiBJZiBhIG5ldyBWTVNBIGlzIG5vdCB0byBiZSBpbnN0
+YWxsZWQsIHRoZSBWTVNBIGlzCj4+PiBjbGVhcmVkIGluIHRoZSB2Q1BVIFZNQ0IgYW5kIHRoZSB2
+Q1BVIHN0YXRlIGlzIGxlZnQgYXMKPj4+IEtWTV9NUF9TVEFURV9VTklOSVRJQUxJWkVEIHRvIHBy
+ZXZlbnQgaXQgZnJvbSBiZWluZyBydW4uCj4+Pgo+Pj4gU2lnbmVkLW9mZi1ieTogVG9tIExlbmRh
+Y2t5IDx0aG9tYXMubGVuZGFja3lAYW1kLmNvbT4KPj4+IFNpZ25lZC1vZmYtYnk6IEJyaWplc2gg
+U2luZ2ggPGJyaWplc2guc2luZ2hAYW1kLmNvbT4KPj4+IFNpZ25lZC1vZmYtYnk6IEFzaGlzaCBL
+YWxyYSA8YXNoaXNoLmthbHJhQGFtZC5jb20+Cj4+PiBbbWRyOiBhZGQgaGFuZGxpbmcgZm9yIHJl
+c3RyaWN0ZWRtZW1dCj4+PiBTaWduZWQtb2ZmLWJ5OiBNaWNoYWVsIFJvdGggPG1pY2hhZWwucm90
+aEBhbWQuY29tPgo+Pgo+PiBXaGF0IGlzIHRoZSBpbnRlbmRlZCBib290IHNlcXVlbmNlIGZvciBT
+RVYtU05QIGd1ZXN0cz8gRldJVyB3aXRoIHRoaXMKPj4gaW50ZXJmYWNlIGluIHBsYWNlLCBndWVz
+dHMgd2lsbCB0eXBpY2FsbHkgdXNlIGluLWd1ZXN0IFZNU0EgcGFnZXMgdG8KPj4gaG9sZCBzZWNv
+bmRhcnkgdmNwdSBzdGF0ZS4gQnV0IHRoYXQgbWVhbnMgd2UncmUgbm93IGFsbG9jYXRpbmcgNGti
+IG9mCj4+IG1lbW9yeSBmb3IgZXZlcnkgdmNwdSB0aGF0IHdlIGNyZWF0ZSB0aGF0IHdpbGwgYmUg
+Zm9yIG1vc3Qgb2YgdGhlCj4+IGd1ZXN0J3MgbGlmZXRpbWUgc3VwZXJmbHVvdXMuCj4+Cj4+IFdv
+dWxkbid0IGl0IG1ha2UgbW9yZSBzZW5zZSB0byBoYXZlIGEgbW9kZWwgd2hlcmUgd2Ugb25seSBh
+bGxvY2F0ZSB0aGUKPj4gVk1TQSBmb3IgdGhlIGJvb3QgQ1BVIGFuZCBsZWF2ZSBzZWNvbmRhcnkg
+YWxsb2NhdGlvbiB0byB0aGUgZ3Vlc3Q/IFdlCj4+IGFscmVhZHkgbmVlZCBmaXJtd2FyZSBjaGFu
+Z2VzIGZvciBTRVYtU05QIC0gbWF5IGFzIHdlbGwgbWFrZSB0aGlzIG9uZSBtb3JlLgo+Pgo+PiBb
+Li4uXQo+Pgo+Pj4gKwo+Pj4gK3N0YXRpYyBpbnQgc2V2X3NucF9hcF9jcmVhdGlvbihzdHJ1Y3Qg
+dmNwdV9zdm0gKnN2bSkKPj4+ICt7Cj4+PiArICAgICAgIHN0cnVjdCBrdm1fc2V2X2luZm8gKnNl
+diA9ICZ0b19rdm1fc3ZtKHN2bS0+dmNwdS5rdm0pLT5zZXZfaW5mbzsKPj4+ICsgICAgICAgc3Ry
+dWN0IGt2bV92Y3B1ICp2Y3B1ID0gJnN2bS0+dmNwdTsKPj4+ICsgICAgICAgc3RydWN0IGt2bV92
+Y3B1ICp0YXJnZXRfdmNwdTsKPj4+ICsgICAgICAgc3RydWN0IHZjcHVfc3ZtICp0YXJnZXRfc3Zt
+Owo+Pj4gKyAgICAgICB1bnNpZ25lZCBpbnQgcmVxdWVzdDsKPj4+ICsgICAgICAgdW5zaWduZWQg
+aW50IGFwaWNfaWQ7Cj4+PiArICAgICAgIGJvb2wga2ljazsKPj4+ICsgICAgICAgaW50IHJldDsK
+Pj4+ICsKPj4+ICsgICAgICAgcmVxdWVzdCA9IGxvd2VyXzMyX2JpdHMoc3ZtLT52bWNiLT5jb250
+cm9sLmV4aXRfaW5mb18xKTsKPj4+ICsgICAgICAgYXBpY19pZCA9IHVwcGVyXzMyX2JpdHMoc3Zt
+LT52bWNiLT5jb250cm9sLmV4aXRfaW5mb18xKTsKPj4+ICsKPj4+ICsgICAgICAgLyogVmFsaWRh
+dGUgdGhlIEFQSUMgSUQgKi8KPj4+ICsgICAgICAgdGFyZ2V0X3ZjcHUgPSBrdm1fZ2V0X3ZjcHVf
+YnlfaWQodmNwdS0+a3ZtLCBhcGljX2lkKTsKPj4KPj4gT3V0IG9mIGN1cmlvc2l0eTogVGhlIHRh
+cmdldCBDUFUgY2FuIGJlIG15IG93biB2Q1BVLCByaWdodD8KPj4KPj4KPj4+ICsgICAgICAgaWYg
+KCF0YXJnZXRfdmNwdSkgewo+Pj4gKyAgICAgICAgICAgICAgIHZjcHVfdW5pbXBsKHZjcHUsICJ2
+bWdleGl0OiBpbnZhbGlkIEFQIEFQSUMgSUQgWyUjeF0gZnJvbSBndWVzdFxuIiwKPj4+ICsgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBhcGljX2lkKTsKPj4+ICsgICAgICAgICAgICAgICByZXR1
+cm4gLUVJTlZBTDsKPj4+ICsgICAgICAgfQo+Pj4gKwo+Pj4gKyAgICAgICByZXQgPSAwOwo+Pj4g
+Kwo+Pj4gKyAgICAgICB0YXJnZXRfc3ZtID0gdG9fc3ZtKHRhcmdldF92Y3B1KTsKPj4+ICsKPj4+
+ICsgICAgICAgLyoKPj4+ICsgICAgICAgICogVGhlIHRhcmdldCB2Q1BVIGlzIHZhbGlkLCBzbyB0
+aGUgdkNQVSB3aWxsIGJlIGtpY2tlZCB1bmxlc3MgdGhlCj4+PiArICAgICAgICAqIHJlcXVlc3Qg
+aXMgZm9yIENSRUFURV9PTl9JTklULiBGb3IgYW55IGVycm9ycyBhdCB0aGlzIHN0YWdlLCB0aGUK
+Pj4+ICsgICAgICAgICoga2ljayB3aWxsIHBsYWNlIHRoZSB2Q1BVIGluIGFuIG5vbi1ydW5uYWJs
+ZSBzdGF0ZS4KPj4+ICsgICAgICAgICovCj4+PiArICAgICAgIGtpY2sgPSB0cnVlOwo+Pj4gKwo+
+Pj4gKyAgICAgICBtdXRleF9sb2NrKCZ0YXJnZXRfc3ZtLT5zZXZfZXMuc25wX3Ztc2FfbXV0ZXgp
+Owo+Pj4gKwo+Pj4gKyAgICAgICB0YXJnZXRfc3ZtLT5zZXZfZXMuc25wX3Ztc2FfZ3BhID0gSU5W
+QUxJRF9QQUdFOwo+Pj4gKyAgICAgICB0YXJnZXRfc3ZtLT5zZXZfZXMuc25wX2FwX2NyZWF0ZSA9
+IHRydWU7Cj4+PiArCj4+PiArICAgICAgIC8qIEludGVycnVwdCBpbmplY3Rpb24gbW9kZSBzaG91
+bGRuJ3QgY2hhbmdlIGZvciBBUCBjcmVhdGlvbiAqLwo+Pj4gKyAgICAgICBpZiAocmVxdWVzdCA8
+IFNWTV9WTUdFWElUX0FQX0RFU1RST1kpIHsKPj4+ICsgICAgICAgICAgICAgICB1NjQgc2V2X2Zl
+YXR1cmVzOwo+Pj4gKwo+Pj4gKyAgICAgICAgICAgICAgIHNldl9mZWF0dXJlcyA9IHZjcHUtPmFy
+Y2gucmVnc1tWQ1BVX1JFR1NfUkFYXTsKPj4+ICsgICAgICAgICAgICAgICBzZXZfZmVhdHVyZXMg
+Xj0gc2V2LT5zZXZfZmVhdHVyZXM7Cj4+PiArICAgICAgICAgICAgICAgaWYgKHNldl9mZWF0dXJl
+cyAmIFNWTV9TRVZfRkVBVF9JTlRfSU5KX01PREVTKSB7Cj4+PiArICAgICAgICAgICAgICAgICAg
+ICAgICB2Y3B1X3VuaW1wbCh2Y3B1LCAidm1nZXhpdDogaW52YWxpZCBBUCBpbmplY3Rpb24gbW9k
+ZSBbJSNseF0gZnJvbSBndWVzdFxuIiwKPj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIHZjcHUtPmFyY2gucmVnc1tWQ1BVX1JFR1NfUkFYXSk7Cj4+PiArICAgICAgICAgICAg
+ICAgICAgICAgICByZXQgPSAtRUlOVkFMOwo+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgZ290
+byBvdXQ7Cj4+PiArICAgICAgICAgICAgICAgfQo+Pj4gKyAgICAgICB9Cj4+PiArCj4+PiArICAg
+ICAgIHN3aXRjaCAocmVxdWVzdCkgewo+Pj4gKyAgICAgICBjYXNlIFNWTV9WTUdFWElUX0FQX0NS
+RUFURV9PTl9JTklUOgo+Pj4gKyAgICAgICAgICAgICAgIGtpY2sgPSBmYWxzZTsKPj4+ICsgICAg
+ICAgICAgICAgICBmYWxsdGhyb3VnaDsKPj4+ICsgICAgICAgY2FzZSBTVk1fVk1HRVhJVF9BUF9D
+UkVBVEU6Cj4+PiArICAgICAgICAgICAgICAgaWYgKCFwYWdlX2FkZHJlc3NfdmFsaWQodmNwdSwg
+c3ZtLT52bWNiLT5jb250cm9sLmV4aXRfaW5mb18yKSkgewo+Pj4gKyAgICAgICAgICAgICAgICAg
+ICAgICAgdmNwdV91bmltcGwodmNwdSwgInZtZ2V4aXQ6IGludmFsaWQgQVAgVk1TQSBhZGRyZXNz
+IFslI2xseF0gZnJvbSBndWVzdFxuIiwKPj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIHN2bS0+dm1jYi0+Y29udHJvbC5leGl0X2luZm9fMik7Cj4+PiArICAgICAgICAgICAg
+ICAgICAgICAgICByZXQgPSAtRUlOVkFMOwo+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgZ290
+byBvdXQ7Cj4+PiArICAgICAgICAgICAgICAgfQo+Pj4gKwo+Pj4gKyAgICAgICAgICAgICAgIC8q
+Cj4+PiArICAgICAgICAgICAgICAgICogTWFsaWNpb3VzIGd1ZXN0IGNhbiBSTVBBREpVU1QgYSBs
+YXJnZSBwYWdlIGludG8gVk1TQSB3aGljaAo+Pj4gKyAgICAgICAgICAgICAgICAqIHdpbGwgaGl0
+IHRoZSBTTlAgZXJyYXR1bSB3aGVyZSB0aGUgQ1BVIHdpbGwgaW5jb3JyZWN0bHkgc2lnbmFsCj4+
+PiArICAgICAgICAgICAgICAgICogYW4gUk1QIHZpb2xhdGlvbiAjUEYgaWYgYSBodWdlcGFnZSBj
+b2xsaWRlcyB3aXRoIHRoZSBSTVAgZW50cnkKPj4+ICsgICAgICAgICAgICAgICAgKiBvZiBWTVNB
+IHBhZ2UsIHJlamVjdCB0aGUgQVAgQ1JFQVRFIHJlcXVlc3QgaWYgVk1TQSBhZGRyZXNzIGZyb20K
+Pj4+ICsgICAgICAgICAgICAgICAgKiBndWVzdCBpcyAyTSBhbGlnbmVkLgo+Pgo+PiBUaGlzIHdp
+bGwgYnJlYWsgZ2VudWluZSBjdXJyZW50IExpbnV4IGtlcm5lbHMgdGhhdCBqdXN0IGhhcHBlbiB0
+bwo+PiBhbGxvY2F0ZSBhIGd1ZXN0IHBhZ2UsIG5vPyBJbiBmYWN0LCBnaXZlbiBlbm91Z2ggdkNQ
+VXMgeW91J3JlIGFsbW9zdAo+PiBndWFyYW50ZWVkIHRvIGhpdCBhbiBhbGlnbmVkIHN0cnVjdHVy
+ZSBzb21ld2hlcmUuIFdoYXQgaXMgdGhlIGd1ZXN0Cj4+IHN1cHBvc2VkIHRvIGRvIGluIHRoYXQg
+c2l0dWF0aW9uPwo+Pgo+Pgo+Pj4gKyAgICAgICAgICAgICAgICAqLwo+Pj4gKyAgICAgICAgICAg
+ICAgIGlmIChJU19BTElHTkVEKHN2bS0+dm1jYi0+Y29udHJvbC5leGl0X2luZm9fMiwgUE1EX1NJ
+WkUpKSB7Cj4+PiArICAgICAgICAgICAgICAgICAgICAgICB2Y3B1X3VuaW1wbCh2Y3B1LAo+Pj4g
+KyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgInZtZ2V4aXQ6IEFQIFZNU0EgYWRk
+cmVzcyBbJWxseF0gZnJvbSBndWVzdCBpcyB1bnNhZmUgYXMgaXQgaXMgMk0gYWxpZ25lZFxuIiwK
+Pj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN2bS0+dm1jYi0+Y29udHJv
+bC5leGl0X2luZm9fMik7Cj4+PiArICAgICAgICAgICAgICAgICAgICAgICByZXQgPSAtRUlOVkFM
+Owo+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgZ290byBvdXQ7Cj4+PiArICAgICAgICAgICAg
+ICAgfQo+Pj4gKwo+Pj4gKyAgICAgICAgICAgICAgIHRhcmdldF9zdm0tPnNldl9lcy5zbnBfdm1z
+YV9ncGEgPSBzdm0tPnZtY2ItPmNvbnRyb2wuZXhpdF9pbmZvXzI7Cj4+PiArICAgICAgICAgICAg
+ICAgYnJlYWs7Cj4+PiArICAgICAgIGNhc2UgU1ZNX1ZNR0VYSVRfQVBfREVTVFJPWToKPj4KPj4g
+SSBkb24ndCB1bmRlcnN0YW5kIHRoZSBkZXN0cm95IHBhdGguIFdoeSBkb2VzIHRoaXMgY2FzZSBk
+ZXN0cm95IGFueXRoaW5nPwo+Pgo+Pgo+Pj4gKyAgICAgICAgICAgICAgIGJyZWFrOwo+Pj4gKyAg
+ICAgICBkZWZhdWx0Ogo+Pj4gKyAgICAgICAgICAgICAgIHZjcHVfdW5pbXBsKHZjcHUsICJ2bWdl
+eGl0OiBpbnZhbGlkIEFQIGNyZWF0aW9uIHJlcXVlc3QgWyUjeF0gZnJvbSBndWVzdFxuIiwKPj4+
+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICByZXF1ZXN0KTsKPj4+ICsgICAgICAgICAgICAg
+ICByZXQgPSAtRUlOVkFMOwo+Pj4gKyAgICAgICAgICAgICAgIGJyZWFrOwo+Pj4gKyAgICAgICB9
+Cj4+PiArCj4+PiArb3V0Ogo+Pj4gKyAgICAgICBpZiAoa2ljaykgewo+Pj4gKyAgICAgICAgICAg
+ICAgIGlmICh0YXJnZXRfdmNwdS0+YXJjaC5tcF9zdGF0ZSA9PSBLVk1fTVBfU1RBVEVfVU5JTklU
+SUFMSVpFRCkKPj4+ICsgICAgICAgICAgICAgICAgICAgICAgIHRhcmdldF92Y3B1LT5hcmNoLm1w
+X3N0YXRlID0gS1ZNX01QX1NUQVRFX1JVTk5BQkxFOwo+Pgo+PiBXaGF0IGlmIHRoZSBndWVzdCBB
+UCBnb2VzIHRocm91Z2ggYSBjcmVhdGUgLT4gZGVzdHJveSAtPiBjcmVhdGUgY3ljbGU/Cj4+IFdp
+bGwgaXQgc3RheSBydW5uYWJsZSB3aGlsZSBkZXN0cm95ZWQ/Cj4gVGhlIGNvZGUgaXMgbm90IHZl
+cnkgc3RyYWlnaHRmb3J3YXJkLgo+Cj4gMSkgdGFyZ2V0X3N2bS0+c2V2X2VzLnNucF92bXNhX2dw
+YSBpcyBzZXQgYXMgSU5WQUxJRF9QQUdFIGluIHRoZSBiZWdpbm5pbmcgb2YgdGhpcyBmdW5jdGlv
+bi4KPgo+IDIpIElmIGEgREVTVFJPWSBpcyBoaXQgaW4gdGhpcyBmdW5jdGlvbiwgdGFyZ2V0X3N2
+bS0+c2V2X2VzLnNucF92bXNhX2dwYSB3aWxsIGJlCj4gbGVmdCBhcyBJTlZBTElEX1BBR0UuCj4K
+PiAzKSBBdCB0aGUgZW5kIG9mIHRoaXMgZnVuY3Rpb24sIGl0IGNhbGxzIGt2bV9tYWtlX3JlcXVl
+c3QoS1ZNX1JFUV9VUERBVEVfUFJPVEVDVEVEX0dVRVNUX1NUQVRFKS4KPgo+IDQpIEluIHRoZSB2
+Y3B1X2VudGVyX2d1ZXN0KCksIHRoZSBrdm1fdmNwdV9yZXNldCgpLT5zZXZfc25wX2luaXRfcHJv
+dGVjdGVkX2d1ZXN0X3N0YXRlKCkKPiAtPl9fc2V2X3NucF9pbml0X3Byb3RlY3RlZF9ndWVzdF9z
+dGF0ZSgpIGlzIGNhbGxlZC4KPgo+IDUpIFRoZSBtcF9zdGF0ZSBpcyBzZXQgdG8gS1ZNX01QX1NU
+QVRFX1NUT1BQRUQgYnkgZGVmYXVsdCBhbmQgdGhlIHJ1bnRpbWUgVk1TQSBpcwo+IGNsZWFyZWQu
+IFRoZW4gdGhlIGl0IHdpbGwgYmUgaW5pdGlhbGl6ZWQgYWNjb3JkaW5nIHRvIHRoZSBndWVzdCdz
+Cj4gY29uZmlndXJhdGlvbi4KPgo+IDYpIEFzIHRoZSBzbnBfdm1zYV9ncGEgaXMgc2V0IGFzIElO
+VkFMSURfUEFHRSBpbiAxLCB0aGUgbXBfc3RhdGUgd2lsbCBiZSBsZWZ0IGFzCj4gS1ZNX01QX1NU
+QVRFX1NUT1BQRUQuCj4KPiA3KSBXaXRoIHRoaXMgY29kZSBwaWVjZToKPgo+ICsgICAgICAgICAg
+ICAgICAgICAgICAgIGt2bV92Y3B1X3Jlc2V0KHZjcHUsIHRydWUpOwo+ICsgICAgICAgICAgICAg
+ICAgICAgICAgIGlmICh2Y3B1LT5hcmNoLm1wX3N0YXRlICE9IEtWTV9NUF9TVEFURV9SVU5OQUJM
+RSkKPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGdvdG8gb3V0Owo+Cj4gdmNwdV9l
+bnRlcl9ndWVzdCgpIGJhaWxzIG91dC4KCgpUaGFua3MgYSBsb3QgWmhpIGZvciB0aGUgZGV0YWls
+ZWQgZXhwbGFuYXRpb24hIEkgdGhpbmsgdGhpcyBjb2RlIGZsb3cgCndhbnRzIHRvIGJlY29tZSBz
+bGlnaHRseSBtb3JlIG9idmlvdXMuIEZvciBleGFtcGxlLCBpZiB3ZSBqdXN0IHNhaWQKCiDCoCBj
+YXNlIFNWTV9WTUdFWElUX0FQX0RFU1RST1k6CiDCoMKgwqAgLyogVGhpcyB3aWxsIHRlbGwgX19z
+ZXZfc25wX3VwZGF0ZV9wcm90ZWN0ZWRfZ3Vlc3Rfc3RhdGUgdG8gdW5tYXAgCnRoZSBWTVNBICov
+CiDCoMKgwqAgdGFyZ2V0X3N2bS0+c2V2X2VzLnNucF92bXNhX2dwYSA9IElOVkFMSURfUEFHRTsK
+IMKgwqDCoCBicmVhazsKCldlJ2QgZ2V0IGEgYmlnIHdpbiBpbiByZWFkYWJpbGl0eSB3aXRoIGxp
+dHRsZSBlZmZvcnQuIEl0IG1ha2VzIGl0IAppbW1lZGlhdGVseSBvYnZpb3VzIHdoZXJlIHRvIGxv
+b2sgZm9yIHRoZSBkZXN0cm95IG9wZXJhdGlvbi4KCgpBbGV4CgoKCgoKQW1hem9uIERldmVsb3Bt
+ZW50IENlbnRlciBHZXJtYW55IEdtYkgKS3JhdXNlbnN0ci4gMzgKMTAxMTcgQmVybGluCkdlc2No
+YWVmdHNmdWVocnVuZzogQ2hyaXN0aWFuIFNjaGxhZWdlciwgSm9uYXRoYW4gV2Vpc3MKRWluZ2V0
+cmFnZW4gYW0gQW10c2dlcmljaHQgQ2hhcmxvdHRlbmJ1cmcgdW50ZXIgSFJCIDE0OTE3MyBCClNp
+dHo6IEJlcmxpbgpVc3QtSUQ6IERFIDI4OSAyMzcgODc5CgoK
 
