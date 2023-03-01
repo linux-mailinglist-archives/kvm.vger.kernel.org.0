@@ -2,279 +2,311 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 48AD76A6B75
-	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 12:12:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 12C156A6BE7
+	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 12:53:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229941AbjCALMV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Mar 2023 06:12:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52538 "EHLO
+        id S229547AbjCALxc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Mar 2023 06:53:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbjCALMT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Mar 2023 06:12:19 -0500
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2076.outbound.protection.outlook.com [40.107.243.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FE5018B2B;
-        Wed,  1 Mar 2023 03:12:18 -0800 (PST)
+        with ESMTP id S229451AbjCALxb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Mar 2023 06:53:31 -0500
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2087.outbound.protection.outlook.com [40.107.244.87])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0A4C241C5
+        for <kvm@vger.kernel.org>; Wed,  1 Mar 2023 03:53:29 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GWatQxGVcFTPTeLP5oivEMKtMwbvFS0unh6Ak8t3DnFOI+fti+1bYp5OWBApb56Ai/N26m6RgoyoiiWL84RUrjbetpJJCzakzH3LK5NuHdSpGNIxIimOkbxX8LDcdRLD4SuMvfl1swxfm4Zl9TLRVcS5GKRcsH2jAF2j4GvfGUFaJ88s/A9Xts/qJYuQOFNKgwkYOEzNN2V8Xid0CN64f6Icj2I03hztK1EyzVQYofFPynbo4AJuFWpouqBDT5IHBEE2hYhHfNB7e3kxsZN8bD9TcDs/SQJGeFSJJVUe7Y84y3NNVA6b4intR/qwf+2wfGdk5EnwgCqfI7/W7lAb7g==
+ b=mYXEG1cepupmcA45p0ximdV6IAixKxbgaKevqty05MJM8t4r02+6Of4zYpAB6EnC7twxrE1ldFA0w3GI9VbWHxFoIVEeNZhSCvhqz7NY2yRVc10+4Cd95Ze+io2kbRv/ID0PazYPrmM4FI/AE9hGle2kJ88MVm5EFYlP9WDgkrBRqt59JpJW3ixll5d9WCOmIIMHw3nwFinUPHioSXhKelrdIHIzDCcsyZ4vaWJwWd/nlbZQ/CRV65BKYqYE01UDU1q9VjY2CS1lOGdiyC8d+7F2UIEI2OTv4Evg8L9K2shfPKXOLSo9Q3QsPpWoEPTfDvd4wjEnGaV7YJEFYm2bOA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=55OybL9vqp1n/WkXr1U+Um0rHbLtebXEuGnLRWuACZU=;
- b=Bnr6Levj8+6WcCo8ap90kLESre5C/epmaL/ntT0hIxbM3wz3wnyhIiJheOteHZRnDsnY6qhl6JRXraMh8Hf1tCdaD++04eC06ikG0zIX9ffUfpp9p5j5OpQEoloxnpQnz9Qjk3eKThkPFSaWpOZywogHlJQpEUigvfrj0IMUJg709s5g0MGqfrfboOGUp90g9noHX/EMlmvta/k5f5Obstbwoao4pwyMllfeDLgBqYPvB34tPpImSS1Z9dLcBr+ELSxdF/YAzJp/ahmZoW/QHUU4kZ4kJkPmN5h+CImOSBYZoeIv0qe20OP0jdQELEqveG1soVt8qSb6p9Q6YYmByA==
+ bh=JPLwTsRLU0aeLp076BGWJ67Jl98/mu7F7mSonQSrlxg=;
+ b=NXlG7wAAEW3fywL9Scd+rf5S6tlj9gaFEmTZLnZ+5RP7/LbCrGsss7IS9QeHVADFtTCVBWHZJmcoeViZBXre9FHGwn8hHm5UgD37BCkFtU0Nm/+kL1saXWPJu/QKc6Q+K9h4dZrXCNquU3SFadRSnguHf7OUC3faQYjiiq8sEMrKTevG5PrvtSLtpoRHw8oyACKiIf1Fkp1y7pWwxlVo6o4s+Fq+IHf8YMbXMZSEofwq+YX2NZJKjHNfQJ6Ilu3ecUuMQS44AXjdGP0U823KZS2QfPiVaeiAJcaxE4de/qvjNJ+xxd9QqYnGc2z9+aKLfVcMMlHeTN376bW+wDo6Gg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=55OybL9vqp1n/WkXr1U+Um0rHbLtebXEuGnLRWuACZU=;
- b=yXfd4yfe+Oqpgwj0OPKFYeHdfQe57C+XeAgNc2vahJTCcLjRQJ05608FJLGya1MR8dXUZTI3IXCNKRmWCQHpwy4ReNAw7Ak9Txt5XNTYwPJ8b9g5OFWoN3WU+8OPfGFbrGgQL1ipbHkjaJ2K2fHIl4ufR+SaiM2SGiHAbvso478=
+ bh=JPLwTsRLU0aeLp076BGWJ67Jl98/mu7F7mSonQSrlxg=;
+ b=cObw5habeCyTmNmq+Pu6BrAs4O0Yxu+k8bZbZbd71LuOXDK9OuFrj3uDsvGTVGzU1KePWfOWC8ooMZ2rHqHVDNgboviGj5ygTxf2HsLYCp1rE7yCCrBcP+0WrcYLiCSteEhhapDpOWjbMTjLpNezIb3bPTIkMXPVWQaNcl0quV/j+q20ySeZNX/b++wjXjQgkpfMDZptdK14R+P6FwsCvXr3q8T87nxlVlZ1piJ6awlWC2AI+fN+5qWAbjJVVLiHiNPl6fYaNT30OhLIg/+rkDMqKJPSWPYGf45Iv3TMP8EOS+b3xwkj8jW0uA7J4K+PC2qdMOmrRWesPgr6t7CtWg==
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB2810.namprd12.prod.outlook.com (2603:10b6:5:41::21) by
- MW4PR12MB6828.namprd12.prod.outlook.com (2603:10b6:303:209::13) with
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BL1PR12MB5304.namprd12.prod.outlook.com (2603:10b6:208:314::13)
+ by SA1PR12MB6679.namprd12.prod.outlook.com (2603:10b6:806:252::14) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.30; Wed, 1 Mar
- 2023 11:12:12 +0000
-Received: from DM6PR12MB2810.namprd12.prod.outlook.com
- ([fe80::bad5:8f56:fc07:15cf]) by DM6PR12MB2810.namprd12.prod.outlook.com
- ([fe80::bad5:8f56:fc07:15cf%3]) with mapi id 15.20.6134.025; Wed, 1 Mar 2023
- 11:12:11 +0000
-Message-ID: <e3c53388-f332-5b52-c724-a42d8ea624a7@amd.com>
-Date:   Wed, 1 Mar 2023 12:11:57 +0100
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.25; Wed, 1 Mar
+ 2023 11:53:26 +0000
+Received: from BL1PR12MB5304.namprd12.prod.outlook.com
+ ([fe80::aca1:caca:b2d7:35f]) by BL1PR12MB5304.namprd12.prod.outlook.com
+ ([fe80::aca1:caca:b2d7:35f%9]) with mapi id 15.20.6156.018; Wed, 1 Mar 2023
+ 11:53:26 +0000
+Message-ID: <80a7c60e-3c55-e920-e974-7b80868a6c53@nvidia.com>
+Date:   Wed, 1 Mar 2023 17:23:14 +0530
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [RFC PATCH V3 13/16] x86/sev: Add Check of #HV event in path
+ Thunderbird/102.6.1
+Subject: Re: Bug: Completion-Wait loop timed out with vfio
 Content-Language: en-US
-To:     Tianyu Lan <ltykernel@gmail.com>, luto@kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        seanjc@google.com, pbonzini@redhat.com, jgross@suse.com,
-        tiala@microsoft.com, kirill@shutemov.name,
-        jiangshan.ljs@antgroup.com, peterz@infradead.org,
-        ashish.kalra@amd.com, srutherford@google.com,
-        akpm@linux-foundation.org, anshuman.khandual@arm.com,
-        pawan.kumar.gupta@linux.intel.com, adrian.hunter@intel.com,
-        daniel.sneddon@linux.intel.com, alexander.shishkin@linux.intel.com,
-        sandipan.das@amd.com, ray.huang@amd.com, brijesh.singh@amd.com,
-        michael.roth@amd.com, thomas.lendacky@amd.com,
-        venu.busireddy@oracle.com, sterritt@google.com,
-        tony.luck@intel.com, samitolvanen@google.com, fenghua.yu@intel.com
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org
-References: <20230122024607.788454-1-ltykernel@gmail.com>
- <20230122024607.788454-14-ltykernel@gmail.com>
-From:   "Gupta, Pankaj" <pankaj.gupta@amd.com>
-In-Reply-To: <20230122024607.788454-14-ltykernel@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Tasos Sahanidis <tasos@tasossah.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     kvm@vger.kernel.org
+References: <a01fa87d-bd42-e108-606b-78759edcecf8@tasossah.com>
+ <bcc9d355-b464-7eaf-238c-e95d2f65c93d@nvidia.com>
+ <31c2caf4-57b2-be1a-cf15-146903f7b2a1@tasossah.com>
+ <20230228114606.446e8db2.alex.williamson@redhat.com>
+ <7c1980ec-d032-11c1-b09d-4db40611f268@tasossah.com>
+From:   Abhishek Sahu <abhsahu@nvidia.com>
+X-Nvconfidentiality: public
+In-Reply-To: <7c1980ec-d032-11c1-b09d-4db40611f268@tasossah.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR3P281CA0084.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:1f::20) To DM6PR12MB2810.namprd12.prod.outlook.com
- (2603:10b6:5:41::21)
+X-ClientProxiedBy: MA1P287CA0023.INDP287.PROD.OUTLOOK.COM
+ (2603:1096:a00:35::28) To BL1PR12MB5304.namprd12.prod.outlook.com
+ (2603:10b6:208:314::13)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB2810:EE_|MW4PR12MB6828:EE_
-X-MS-Office365-Filtering-Correlation-Id: bd344748-59f6-4966-4923-08db1a45cdff
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5304:EE_|SA1PR12MB6679:EE_
+X-MS-Office365-Filtering-Correlation-Id: 68b896d9-52e1-4dbf-84c3-08db1a4b9107
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: E/+o6Mj2hvdF7qsONDiHLYoq0PHcKE3QGU/ZIEvyZxaLiS/0dI4SPHsuJinz/O8Zoew7VpuboDszvpdmbmncLYr/8tmTSF8cS8wcvR/VNgLyUHWMwqlTX6aazfYUo6/MYxnhyIrhR3t38ezpJIVAAhMkywb9g4TGlPszDtfjM8skDWjDG+X2kUQ8WMS8b5Lj5jAbsO7n8H00HT2lO0I3CsP0Q664ewRWKT5euK5oIifP3hthrITAQY2lUKjOhs4OBVcGOu8YKq0SQf0rZ8bzYt9M7faTOf6uFNb+/0oU/HhHYX5c3BoCZ6sIxtBu7fUOeq+YKeAqgB7eQTKh+eHMc9O2aVcGdheZepuKCALskgzk9KcTQV7ok5w9MHylT691p16rP6jdyMXXY5uG2tV7H2p2qxRJ+bsoCSz2HvadeqL5hHzy2r73vluyghqfw0MAVxxVUsYoMICl4UKaAGsWyfqAzn/lDGYNb0sudgmRAOhPaON5qsiKbBBNas/muFyzRHZGb6xIiRExcajO0bhD9Sg/18OuuqsQSxZO+VKTOv/2911as5itw/oQev77+pp4ttZ8rCZZcvjgwHbRd6Mx5Hb6dMsW5wvqT0iF01U1tU3Wdp83vIMO5NJdQWL+vlu7aPIGwhP+i23WgXls4EpmVI/1X47+p/PIrCmdVTJEZ6M9oTNPdTa6fTnPQy1aw0uOD97R/X1DZDZJTEyi3eIPJB8HXwo7VnvMNtzqajvYCaARDREh5ezNgIITXOGzo4oq
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2810.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(136003)(396003)(39860400002)(346002)(366004)(376002)(451199018)(921005)(86362001)(31696002)(38100700002)(8676002)(5660300002)(36756003)(7406005)(7416002)(2906002)(66946007)(8936002)(66556008)(4326008)(66476007)(41300700001)(45080400002)(2616005)(53546011)(186003)(26005)(6506007)(83380400001)(6512007)(6666004)(478600001)(316002)(6486002)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: ug1hizJheQXZ6BQIDwHekCXVus/HnPsLvr0Z/w+99376v+SW8azWRr5s0YF2jZ8qwt/MzIbF98XEd45QxTvKRjv4xZX/IucU7sk6Fr/+TIXtlR5ESSoKlxq1gQkgflocqQYvrXfG9d2wu1bAswAha3Y1PhnGGE57G2c2NNXL8stZGDGVxVBaI+CwVNIfCxjBKjrjHiPlwOMNRrd/mVgHOUuidmQfmV+WFoVXJ0hWTIqn/t5u3caMV9enKclV1G67O5NkPuooxGbcYVeT6jzb4vntjzQ3DGCEVRPSJflLchzpHjP2HKSxQ2/tYQnqZiuRuUv7G0NtNAjKe05Y9caWIUwPg3P368qD9bcKjc3vgGawhCMPKiGDRWMn1oMMveFHovm2oRgbwQSmGBXkWL/F+xPYdq4T9ZqKWn8GMZQu2KaEsl7FvXrOTdVSr6bpfQ2QOAMTldDd0mCKNZh7T95ABeTW40fcaumPonh2p2a7lrgynW5ONC53L0iJQHv9RiT7hdbUPrHticSev9TxisrJmnZuneGKwBzmcB36cN5RLKoA7HbnWl4VbQ8HE4F6aJ5UptSxtYpSJOdKKZNQp0cHoVJ31ujg120rsrEVwqs1v5uiHEjL+SzQE0T79V8d+7AXpS7P00PN/pDf/V1IQ1a9+7veV1h4va8Ta9O2a497+RSRJK1QrVKugTevJ2iTK7IXOIZOpOZiiafgKngc2EqjnMRBnM24O1p09VIve3tUzfI=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5304.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(39860400002)(366004)(396003)(376002)(136003)(346002)(451199018)(8936002)(5660300002)(41300700001)(36756003)(2906002)(31686004)(4326008)(66476007)(66556008)(66946007)(31696002)(6486002)(83380400001)(316002)(38100700002)(86362001)(110136005)(6506007)(8676002)(26005)(53546011)(2616005)(478600001)(186003)(6666004)(6512007)(45980500001)(43740500002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WG1KaDhRc0VaNHBWc2FOUGxpV2I1dzVudU1KR2xQSDJ0Q3hkUGpCdHMvbWZB?=
- =?utf-8?B?SjZBMkRheUlXVVdXZWJ3WCtwTjFZdjZscTZsdVhsemJNTi9kUHNhSFFyZkpW?=
- =?utf-8?B?R2dqZGRrY3E0QiswMXFBQlhkUUlpTU5UMDFsVmRUc1R2TUlvRjl3TEc4R2Ja?=
- =?utf-8?B?aE9xWGdNNnpybzMzU2RkNWE2dndSVmgrWEFOVlZ6MFNhZTNNTVhjbG9yNm9a?=
- =?utf-8?B?YUltOUJtWVdOSW4vMFJUQzE1aWZjMzZYWFhPQlgwVmxjV2x1T2p0S0VNa21Z?=
- =?utf-8?B?TWlWYnl6dWtldy9zbityMEpZcnk3MDlwZEZGeng5aldSM3ZSdVB0Q0FYWTl5?=
- =?utf-8?B?bXMwaDlJSGpFWEFmc3l2U3hjcXFHVllOWllBRk9hcWkyNVVJb1hZUU41SHVD?=
- =?utf-8?B?M1dEblBYckFET3lLd2JhMlk4VkdzZHJKcFU1aFdiQzNjMW9udkpaOE5NOXV1?=
- =?utf-8?B?WUQ1SWR5VHlVcG5hRVNsRzBJVVRjT2hoLzVjM0FPQzBFR05PTXp1U3BRWWZv?=
- =?utf-8?B?WkRmY2VURFNRbldiRVhZTVBjaGdBaWh0V20zT01nTHAyWmVOelFpcmxFTjE5?=
- =?utf-8?B?T1RMQXJLNENOUUhubVhhOERtQ09YQmpBWWRBM1dQWEltSG00YVlqa0gvYlox?=
- =?utf-8?B?eUNnSHNtcFhEdFBBakM4R0RWVFNsWmxRSGVZSk8weGlCejZjOUNCSks0OXdI?=
- =?utf-8?B?RGFJUXVicTZBVm9mdUYrbUZlQ2p4b3Q2QWViNXNNSTQ2NWU0Q21vYmFIZVJ5?=
- =?utf-8?B?SVJUdmhnOE9xaVNXZ3JQTXNDUDVXbmQ0NG0vQ3htQ3hlcktESlFZZjZXQlZM?=
- =?utf-8?B?QXh4aTZnM2Ryd0h2RXRFaXcyNEtQWTdBZjU5TjlQcDYwTEY4ZS9ZOWVpTnBL?=
- =?utf-8?B?NlBqbGVFSTQ3Z1Vjc2JudzFYYUJBSlZob1JlaUxlU2MrNEYrRzhoNWJ1K29u?=
- =?utf-8?B?aitmdm9aNUI4Mk5YaEdpeVp2cnpDNWhoUHBlRm00bHpHaWthTVFoVDFsZXp6?=
- =?utf-8?B?U3NRcGdTdGNkek5PODM2TTRpVDdsNERidlg1eG00emYyK01qa0lXK2NzQUo0?=
- =?utf-8?B?dTdmUmVNdjNkVnVlU1M3R2o3MzBEVG82MUZKRkFXRXRyaFBDWmZ3ZXpYU1hR?=
- =?utf-8?B?S3BQOHQrWTZ1dTlpS0FOTWRtbkZYRi9UNXBYbTVNeVBGUEV3S092dGQrNHRC?=
- =?utf-8?B?WlltUmhmd3I1SUZiUWdiL3BIcHdQRVh0bTNtejI4bUZncjVhNnFFSkt0RWsz?=
- =?utf-8?B?aVVCWE1JTWxiVWFQb1R6aVpwMVArSURHL3NaMit4VVl3cTRvYUVRK09NSm1i?=
- =?utf-8?B?L2NSOFJjTlRlT2l5MXhtMm5UTUVsM0ZsbURlZDNNWUJUSHZiMkg5M3Rhc2lY?=
- =?utf-8?B?alRHc1hvSFAvMHhkL3k1ZmFDV0pqQ3ZCR3lnaUtQbTFnSjdNWC93bTBNd0Rl?=
- =?utf-8?B?MGsxanZqNnhrdDRpM3lrYlpuSVdWTXBzSitIV09BSGUvZUlFQnRoSUZ5emcz?=
- =?utf-8?B?STg4ZnlrRFcwMVc2UG1oREdBRjNmY1JmSlgySitXYjAvRmJ4ZkVRczhlOUow?=
- =?utf-8?B?OUVEcGc3NFlOb00wRDFpVjlsakxuMkJCU3U4TVZvbm1CWW5GQWxGM2xZM2VD?=
- =?utf-8?B?OVZ6R29UaUcwaTU0ZUgvL3NXQnpKR0tkTEZiVjBnU05oc3gzVzE5cGlPZlUv?=
- =?utf-8?B?YzhNRVdMQ2tQT3k3YWxTL0lpTTFnVkhidXpIWjRSRmZhT2tWTlA3QkJTc212?=
- =?utf-8?B?YWMxUG1aems3eDYzTEtBSTJyYkNqcmhyN09TcnRNRHNzUmZXdWRZSjFqTFEx?=
- =?utf-8?B?aGZYMkZYazVJR2VTdVMxa3FqWTZhSVdtSjF1c3FYL3lKa285NmRwd1o3NGdB?=
- =?utf-8?B?QTB5RjN4RkdZQTFBQ2lpQzZTNzJIWGtTcG5qSkFjNWVjN2ROeDRvY2ZBQWg5?=
- =?utf-8?B?NHdjSVl1VEs0bFBFMjRyeUVEYkh3L2NxM0M4eml4NGFvWW4wVG56SlRBdzZp?=
- =?utf-8?B?YWswRk82NGh0bld5ZHNiaml0YVhNQjhxZUYwakc3Si9aT2txMk1XWDMyVXJ2?=
- =?utf-8?B?N0F5TFkxSXRMYmh6UEE3RXJhSDJRTWE4eHA1Z2V3R3liTVpuSHN0ZjNMMDlZ?=
- =?utf-8?Q?qf8xKo0JYzh4ZYXlSNsjLCHfi?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bd344748-59f6-4966-4923-08db1a45cdff
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2810.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dTV0QTZoalJYOFJwOHpaQi9UQVV5TVNtNlowQ0hEcy9hdWdSZU5sZSsrek9O?=
+ =?utf-8?B?MHcrdTl6YVhobDhnNWQ0L3RuTEg2TjVxdFJleDROQ1pIOUZMdEtHRFY0WExQ?=
+ =?utf-8?B?K3p4aWJpTGJLZ0JobFFJTWZHL0h6MndWd3RUQm5IRnoyQmNQRWFYSDNhTnZG?=
+ =?utf-8?B?OEw2aTc2dVQrRjJkTmQrS3VleFd5WCtQamhPTnNDdDNNOEFVYlgxUE9KWmdo?=
+ =?utf-8?B?Rm9BQXRMTUM4OFk2VXZIWjVGZzlDNDBVbmFncHNoTjNzWmJlMDkvQlVPaEUr?=
+ =?utf-8?B?SElkWXlEcm45MGVEYzhIQVNzMkNvMFFqcHFNWEpLYXBRalc2a0poY3lvb0I2?=
+ =?utf-8?B?azRnZWY3bXJlbW9CTEJicDZPa1p4WEhNSjB6enB6cXd0KzJWNStBTDcxZmlM?=
+ =?utf-8?B?RThNZHhpdlRVT1RtWUQ4NVkwTHd5My9IYm10cUsyRVVnbXp0aHU3UU0zcEEy?=
+ =?utf-8?B?TkVmcmxTSmpuTlBoZnZFd2ZHZmJ4ejdhY2dna1NlbUlmeStERjdHNnA0L3hh?=
+ =?utf-8?B?dnhkRFNKMTNyTE9NcHUxa1NWNk1OMHBOMDZCMWhvdllmL29VbUg4b3hBQkR5?=
+ =?utf-8?B?WUhnajQvZ3FwRmpFUlRhTVZndzJSb3hwZzlQSmVaR0RSZ1E4K0FWTGxFTkU1?=
+ =?utf-8?B?enVXN0VjaWlmbXArREpzMWdSMjBUaE9kOXVZUTd3N3NPbGxDd3lvbmpQT08v?=
+ =?utf-8?B?cG9RYnduMkh1MkU4c3NuNUpXVnBQSGtQWGFneDFjenVvbzFzcWhYQmdsMm9J?=
+ =?utf-8?B?OEpreVBMYjdPdUgxRklkRS90L255cTA5K1gra0puMTBRd2xYbkpURDJwaWxF?=
+ =?utf-8?B?UDIwWUw3Q05COHNGSzlsYVM5NEdCcWxNdHFubFRqTWw0TU1rd1k0bUdoaDlw?=
+ =?utf-8?B?VlRXM2JQSnNWWXh1Tkw4eWtERlI1dkgyWUJKeDFQY2M1K0l4UzZibnFwU1Jv?=
+ =?utf-8?B?UVZZTmhNUVBhWVVPb2tXR0RDK3B5a28ya1RKUjhSYSsxRDdJMmZyaEwrMjJn?=
+ =?utf-8?B?VHhrYjdWZ3BJWmIreHF0ME1GYytPTVNVM1g1QjJEZ004c21DVjcvWitDMGc4?=
+ =?utf-8?B?RjBBZlNLVFpTQ3BRU0k1K2ZqblJMbU91dElyM1ROclpEdERLUnd3RXErZTFT?=
+ =?utf-8?B?Z2ZKalk0Mm1PbWQrVkFpc1IrWDFDK3IvdUVoazNDUUlBd05Hb3VIQ2p6bFBr?=
+ =?utf-8?B?MGI3Y2hhM0krbmdsNmRydHQ3K0NxREt0QmpBZkZiV1Nka2hBRWoyd1dEb3dy?=
+ =?utf-8?B?Ri9YUGR3aWtDSWlMZmxBUUNFc1NuN0laZzVlZC9tclJESWZEWjR1UVc0WHJW?=
+ =?utf-8?B?cVpiYUdnaTBuRXZSMkljbHl2OW4zZGt2U0Uyd0FBZzY3eHEyZWNUT3o4Y0ow?=
+ =?utf-8?B?VG40TThCay9GTTdTd05RK2RuSC8vVTBiQ1FzQk9nVi94TnZMNFpkUHBKSUpo?=
+ =?utf-8?B?cnJvbGhjWXhpODQ4dll1TEo4Zzl5dGx0ZXVJOTRmY1BzOTVtalY1Ylk1RVFz?=
+ =?utf-8?B?QUtwZzFJQ3lkZXB3UmZ2NzVkRS91czZIc0l1aXp4WXZLVXNrSHhaaFB3ZnlM?=
+ =?utf-8?B?bEphbVNocVlkcTRZNlg4eDZZdFVZeVJsbGtBM2lYRVg4THVuQ0hLeXdsQ0My?=
+ =?utf-8?B?UUtKcFpqK0F1S0ozQ2pZeTBYelhQUmVoRHRmSExEcDdJOHZqRlQ3T3ZEaGRP?=
+ =?utf-8?B?RmJHQmRFZVlLZHQxV2pqU2lhMVBuRkdEUlEvRnA0NXJzeVNwK0Q5UkdIUCt4?=
+ =?utf-8?B?T3RMR2xhV2JlQXlhZlRUMU9PN0FHWmtlUTFMMG1waGJMNU1vL2VGVjd2MXp3?=
+ =?utf-8?B?czFSVmRmYzNEZllSdGRnNEtyQm5DbWp1Z1d4NFVrWlZmdkdabnVmY2pqbExq?=
+ =?utf-8?B?eXNrR1c3Q0hMakFwTUhSa2RrdHhUTFh4ckh5eVhLakhYV0FnNEpNUFNVZUZx?=
+ =?utf-8?B?dGdyLzhkcDRacWlKb3JjU2trM2J5bERpdFBxSmp5ejdCMldyWmxmdTJyazFa?=
+ =?utf-8?B?ZUhkVFRPT1pNMFBLcVFuTi9uKzZrYUJJWFpOeW9sVHI5TEl0N09RbHZrejkr?=
+ =?utf-8?B?MHNiQllkV2FQUHg4a213Nnk4aXczdnVaMTFCREFiWWFpSjFZRVdjSkFJb3Vo?=
+ =?utf-8?Q?YpYlt6J+UqG9+q3FDFqzJtFPI?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 68b896d9-52e1-4dbf-84c3-08db1a4b9107
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5304.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Mar 2023 11:12:11.7307
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Mar 2023 11:53:26.4605
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Szf03JdYYiSP5oXU1GAYY1lxpGHgibA7co6G6kTL4Znbw7aWS790nhwuCM5jizbi7U/ORZCt9y3P6n9LGedbEQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6828
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-UserPrincipalName: uX43FRN/f3xhps+9PG9hidOMGCgMpDmncQKKutNuQDD5XqIFXcFcKWsN7gFYGlvH7xjKRYIoB93edsuMPFoXHw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6679
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+        SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/22/2023 3:46 AM, Tianyu Lan wrote:
-> From: Tianyu Lan <tiala@microsoft.com>
+On 3/1/2023 4:04 PM, Tasos Sahanidis wrote:
+> On 2023-02-28 20:46, Alex Williamson wrote:
+>> Can you do the same for the root port to the GPU, ex. use lspci -t to
+>> find the parent root port.  Since the device doesn't seem to be
+>> achieving D3cold (expected on a desktop system), the other significant
+>> change of the identified commit is that the root port will also enter a
+>> low power state.  Prior to that commit the device would enter D3hot, but
+>> we never touched the root port.  Perhaps confirm the root port now
+>> enters D3hot and compare lspci for the root port when using
+>> disable_idle_d3 to that found when trying to use the device without
+>> disable_idle_d3. Thanks,
+>>
+>> Alex
+>>
 > 
-> Add check_hv_pending() and check_hv_pending_after_irq() to
-> check queued #HV event when irq is disabled.
+> I seem to have trouble understanding the lspci tree.
 > 
-> Signed-off-by: Tianyu Lan <tiala@microsoft.com>
-> ---
->   arch/x86/entry/entry_64.S       | 18 +++++++++++++++
->   arch/x86/include/asm/irqflags.h | 10 +++++++++
->   arch/x86/kernel/sev.c           | 39 +++++++++++++++++++++++++++++++++
->   3 files changed, 67 insertions(+)
+
+ Can you please try following way to confirm the path
+
+ ls -l /sys/bus/pci/devices
+
+ It generally displays the full path like
+
+ 0000:03:00.0 -> ../../../devices/pci0000:00/0000:00:1c.5/0000:02:00.0/0000:03:00.0
+
+ Also, Can you please print the runtime PM control entry as well
+
+ /sys/bus/pci/devices/<root_port B:D:F>/power/control
+
+ Thanks,
+ Abhishek
+
+> The tree is as follows:
 > 
-> diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
-> index 6baec7653f19..aec8dc4443d1 100644
-> --- a/arch/x86/entry/entry_64.S
-> +++ b/arch/x86/entry/entry_64.S
-> @@ -1064,6 +1064,15 @@ SYM_CODE_END(paranoid_entry)
->    * R15 - old SPEC_CTRL
->    */
->   SYM_CODE_START_LOCAL(paranoid_exit)
-> +#ifdef CONFIG_AMD_MEM_ENCRYPT
-> +	/*
-> +	 * If a #HV was delivered during execution and interrupts were
-> +	 * disabled, then check if it can be handled before the iret
-> +	 * (which may re-enable interrupts).
-> +	 */
-> +	mov     %rsp, %rdi
-> +	call    check_hv_pending
-> +#endif
->   	UNWIND_HINT_REGS
->   
->   	/*
-> @@ -1188,6 +1197,15 @@ SYM_CODE_START(error_entry)
->   SYM_CODE_END(error_entry)
->   
->   SYM_CODE_START_LOCAL(error_return)
-> +#ifdef CONFIG_AMD_MEM_ENCRYPT
-> +	/*
-> +	 * If a #HV was delivered during execution and interrupts were
-> +	 * disabled, then check if it can be handled before the iret
-> +	 * (which may re-enable interrupts).
-> +	 */
-> +	mov     %rsp, %rdi
-> +	call    check_hv_pending
-> +#endif
->   	UNWIND_HINT_REGS
->   	DEBUG_ENTRY_ASSERT_IRQS_OFF
->   	testb	$3, CS(%rsp)
-> diff --git a/arch/x86/include/asm/irqflags.h b/arch/x86/include/asm/irqflags.h
-> index 7793e52d6237..fe46e59168dd 100644
-> --- a/arch/x86/include/asm/irqflags.h
-> +++ b/arch/x86/include/asm/irqflags.h
-> @@ -14,6 +14,10 @@
->   /*
->    * Interrupt control:
->    */
-> +#ifdef CONFIG_AMD_MEM_ENCRYPT
-> +void check_hv_pending(struct pt_regs *regs);
-> +void check_hv_pending_irq_enable(void);
-> +#endif
->   
->   /* Declaration required for gcc < 4.9 to prevent -Werror=missing-prototypes */
->   extern inline unsigned long native_save_fl(void);
-> @@ -43,12 +47,18 @@ static __always_inline void native_irq_disable(void)
->   static __always_inline void native_irq_enable(void)
->   {
->   	asm volatile("sti": : :"memory");
-> +#ifdef CONFIG_AMD_MEM_ENCRYPT
-> +	check_hv_pending_irq_enable();
-> +#endif
->   }
->   
->   static inline __cpuidle void native_safe_halt(void)
->   {
->   	mds_idle_clear_cpu_buffers();
->   	asm volatile("sti; hlt": : :"memory");
-> +#ifdef CONFIG_AMD_MEM_ENCRYPT
-> +	check_hv_pending_irq_enable();
-> +#endif
->   }
->   
->   static inline __cpuidle void native_halt(void)
-> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-> index a8862a2eff67..fe5e5e41433d 100644
-> --- a/arch/x86/kernel/sev.c
-> +++ b/arch/x86/kernel/sev.c
-> @@ -179,6 +179,45 @@ void noinstr __sev_es_ist_enter(struct pt_regs *regs)
->   	this_cpu_write(cpu_tss_rw.x86_tss.ist[IST_INDEX_VC], new_ist);
->   }
->   
-> +static void do_exc_hv(struct pt_regs *regs)
-> +{
-> +	/* Handle #HV exception. */
-> +}
-> +
-> +void check_hv_pending(struct pt_regs *regs)
-> +{
-> +	if (!cc_platform_has(CC_ATTR_GUEST_SEV_SNP))
-> +		return;
-> +
-> +	if ((regs->flags & X86_EFLAGS_IF) == 0)
-> +		return;
-
-Will this return and prevent guest from executing NMI's
-while irqs are disabled?
-
-Thanks,
-Pankaj
-
-> +
-> +	do_exc_hv(regs);
-> +}
-> +
-> +void check_hv_pending_irq_enable(void)
-> +{
-> +	unsigned long flags;
-> +	struct pt_regs regs;
-> +
-> +	if (!cc_platform_has(CC_ATTR_GUEST_SEV_SNP))
-> +		return;
-> +
-> +	memset(&regs, 0, sizeof(struct pt_regs));
-> +	asm volatile("movl %%cs, %%eax;" : "=a" (regs.cs));
-> +	asm volatile("movl %%ss, %%eax;" : "=a" (regs.ss));
-> +	regs.orig_ax = 0xffffffff;
-> +	regs.flags = native_save_fl();
-> +
-> +	/*
-> +	 * Disable irq when handle pending #HV events after
-> +	 * re-enabling irq.
-> +	 */
-> +	asm volatile("cli" : : : "memory");
-> +	do_exc_hv(&regs);
-> +	asm volatile("sti" : : : "memory");
-> +}
-> +
->   void noinstr __sev_es_ist_exit(void)
->   {
->   	unsigned long ist;
+> -[0000:00]-+-00.0  Advanced Micro Devices, Inc. [AMD] Starship/Matisse Root Complex
+> [...]      |
+>            +-01.2-[02-0d]----00.0-[03-0d]--+-01.0-[04-05]----00.0-[05]--+-00.0  Creative Labs EMU10k2/CA0100/CA0102/CA10200 [Sound Blaster Audigy Series]
+>            |                               |                            +-00.1  Creative Labs SB Audigy Game Port
+>            |                               |                            +-01.0  Brooktree Corporation Bt878 Video Capture
+>            |                               |                            \-01.1  Brooktree Corporation Bt878 Audio Capture
+>            |                               +-02.0-[06]--+-00.0  Advanced Micro Devices, Inc. [AMD/ATI] Bonaire XT [Radeon HD 7790/8770 / R7 360 / R9 260/360 OEM]
+>            |                               |            \-00.1  Advanced Micro Devices, Inc. [AMD/ATI] Tobago HDMI Audio [Radeon R7 360 / R9 360 OEM]
+>            |                               +-03.0-[07-08]----00.0-[08]--+-00.0  Philips Semiconductors SAA7131/SAA7133/SAA7135 Video Broadcast Decoder
+>            |                               |                            \-01.0  Yamaha Corporation YMF-744B [DS-1S Audio Controller]
+>            |                               +-05.0-[09]----00.0  Realtek Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit Ethernet Controller
+>            |                               +-06.0-[0a]--+-00.0  MosChip Semiconductor Technology Ltd. PCIe 9912 Multi-I/O Controller
+>            |                               |            +-00.1  MosChip Semiconductor Technology Ltd. PCIe 9912 Multi-I/O Controller
+>            |                               |            \-00.2  MosChip Semiconductor Technology Ltd. PCIe 9912 Multi-I/O Controller
+>            |                               +-08.0-[0b]--+-00.0  Advanced Micro Devices, Inc. [AMD] Starship/Matisse Reserved SPP
+>            |                               |            +-00.1  Advanced Micro Devices, Inc. [AMD] Matisse USB 3.0 Host Controller
+>            |                               |            \-00.3  Advanced Micro Devices, Inc. [AMD] Matisse USB 3.0 Host Controller
+>            |                               +-09.0-[0c]----00.0  Advanced Micro Devices, Inc. [AMD] FCH SATA Controller [AHCI mode]
+>            |                               \-0a.0-[0d]----00.0  Advanced Micro Devices, Inc. [AMD] FCH SATA Controller [AHCI mode]
+> [...]      |
+> 
+> The parent root port is either 0000:00:01.2 or 0000:00:02.0, correct?
+> 00:01.2 PCI bridge: Advanced Micro Devices, Inc. [AMD] Starship/Matisse GPP Bridge
+> 02:00.0 PCI bridge: Advanced Micro Devices, Inc. [AMD] Matisse Switch Upstream
+> 
+> If so, I tested in 5.18, both before and while running the VM, with 6.2
+> both with and without disable_idle_d3, and in all cases they stayed at D0.
+> 
+> Only difference was the card itself would be at D0 instead of D3hot with
+> disable_idle_d3. In the working 5.18, without disable_idle_d3, it would
+> still enter D3hot.
+> 
+> ==> 5_18_before_vm <==
+> # cat /sys/bus/pci/devices/0000:02:00.0/power_state
+> D0
+> # cat /sys/bus/pci/devices/0000:02:00.0/power/runtime_status
+> active
+> # cat /sys/bus/pci/devices/0000:00:01.2/power_state
+> D0
+> # cat /sys/bus/pci/devices/0000:00:01.2/power/runtime_status
+> active
+> # cat /sys/bus/pci/devices/0000:00:02.0/power_state
+> unknown
+> # cat /sys/bus/pci/devices/0000:00:02.0/power/runtime_status
+> active
+> # cat /sys/bus/pci/devices/0000:06:00.0/power_state
+> D3hot
+> # cat /sys/bus/pci/devices/0000:06:00.0/power/runtime_status
+> active
+> 
+> ==> 5_18_running_vm <==
+> # cat /sys/bus/pci/devices/0000:02:00.0/power_state
+> D0
+> # cat /sys/bus/pci/devices/0000:02:00.0/power/runtime_status
+> active
+> # cat /sys/bus/pci/devices/0000:00:01.2/power_state
+> D0
+> # cat /sys/bus/pci/devices/0000:00:01.2/power/runtime_status
+> active
+> # cat /sys/bus/pci/devices/0000:00:02.0/power_state
+> unknown
+> # cat /sys/bus/pci/devices/0000:00:02.0/power/runtime_status
+> active
+> # cat /sys/bus/pci/devices/0000:06:00.0/power_state
+> D0
+> # cat /sys/bus/pci/devices/0000:06:00.0/power/runtime_status
+> active
+> 
+> ==> 6_2_before_vm <==
+> # cat /sys/bus/pci/devices/0000:02:00.0/power_state
+> D0
+> # cat /sys/bus/pci/devices/0000:02:00.0/power/runtime_status
+> active
+> # cat /sys/bus/pci/devices/0000:00:01.2/power_state
+> D0
+> # cat /sys/bus/pci/devices/0000:00:01.2/power/runtime_status
+> active
+> # cat /sys/bus/pci/devices/0000:00:02.0/power_state
+> unknown
+> # cat /sys/bus/pci/devices/0000:00:02.0/power/runtime_status
+> active
+> # cat /sys/bus/pci/devices/0000:06:00.0/power_state
+> D3hot
+> # cat /sys/bus/pci/devices/0000:06:00.0/power/runtime_status
+> suspended
+> 
+> ==> 6_2_running_vm <==
+> # cat /sys/bus/pci/devices/0000:02:00.0/power_state
+> D0
+> # cat /sys/bus/pci/devices/0000:02:00.0/power/runtime_status
+> active
+> # cat /sys/bus/pci/devices/0000:00:01.2/power_state
+> D0
+> # cat /sys/bus/pci/devices/0000:00:01.2/power/runtime_status
+> active
+> # cat /sys/bus/pci/devices/0000:00:02.0/power_state
+> unknown
+> # cat /sys/bus/pci/devices/0000:00:02.0/power/runtime_status
+> active
+> # cat /sys/bus/pci/devices/0000:06:00.0/power_state
+> D0
+> # cat /sys/bus/pci/devices/0000:06:00.0/power/runtime_status
+> active
+> 
+> ==> 6_2_before_vm_disable_idle_d3 <==
+> # cat /sys/bus/pci/devices/0000:02:00.0/power_state
+> D0
+> # cat /sys/bus/pci/devices/0000:02:00.0/power/runtime_status
+> active
+> # cat /sys/bus/pci/devices/0000:00:01.2/power_state
+> D0
+> # cat /sys/bus/pci/devices/0000:00:01.2/power/runtime_status
+> active
+> # cat /sys/bus/pci/devices/0000:00:02.0/power_state
+> unknown
+> # cat /sys/bus/pci/devices/0000:00:02.0/power/runtime_status
+> active
+> # cat /sys/bus/pci/devices/0000:06:00.0/power_state
+> D0
+> # cat /sys/bus/pci/devices/0000:06:00.0/power/runtime_status
+> active
+> 
+> ==> 6_2_running_vm_disable_idle_d3 <==
+> # cat /sys/bus/pci/devices/0000:02:00.0/power_state
+> D0
+> # cat /sys/bus/pci/devices/0000:02:00.0/power/runtime_status
+> active
+> # cat /sys/bus/pci/devices/0000:00:01.2/power_state
+> D0
+> # cat /sys/bus/pci/devices/0000:00:01.2/power/runtime_status
+> active
+> # cat /sys/bus/pci/devices/0000:00:02.0/power_state
+> unknown
+> # cat /sys/bus/pci/devices/0000:00:02.0/power/runtime_status
+> active
+> # cat /sys/bus/pci/devices/0000:06:00.0/power_state
+> D0
+> # cat /sys/bus/pci/devices/0000:06:00.0/power/runtime_status
+> active
+> 
+> 0000:00:02.0 is Host bridge: Advanced Micro Devices, Inc. [AMD] Starship/Matisse PCIe Dummy Host Bridge
+> and can presumably be ignored.
+> 
+> --
+> Tasos
 
