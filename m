@@ -2,140 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 310546A6AAF
+	by mail.lfdr.de (Postfix) with ESMTP id EE4176A6AB0
 	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 11:18:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229613AbjCAKSc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Mar 2023 05:18:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37770 "EHLO
+        id S229470AbjCAKSe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Mar 2023 05:18:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbjCAKSb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S229546AbjCAKSb (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 1 Mar 2023 05:18:31 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 514BC38E9E
-        for <kvm@vger.kernel.org>; Wed,  1 Mar 2023 02:17:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677665865;
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD2691165C;
+        Wed,  1 Mar 2023 02:18:27 -0800 (PST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1677665905;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=8r3Y4Afs6nDzR97mneU0Nx74HX2j2HXQLqk/fLNz+hc=;
-        b=A19+H00cXKT07H8fDSQfdGrHpXHCDbwFtZWhudV7lpuNzr5TG7Km9z9M/fqaS/1dnnUrB7
-        DOHo6G7wu459mgBRHMPs0UjpBo92IdLsQ3T9/cV+OJPDwgV8g+N/ww+qUQ0we8G9HijQlY
-        zGkPwwObWOBiqIUnf6Bt//xY71Taoeg=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-283-6mHCLBv4PmGmk4Ky9GErJA-1; Wed, 01 Mar 2023 05:17:42 -0500
-X-MC-Unique: 6mHCLBv4PmGmk4Ky9GErJA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D5C7D3C0F195;
-        Wed,  1 Mar 2023 10:17:41 +0000 (UTC)
-Received: from localhost (dhcp-192-239.str.redhat.com [10.33.192.239])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 88AB42026D4B;
-        Wed,  1 Mar 2023 10:17:41 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Andrea Bolognani <abologna@redhat.com>
-Cc:     Peter Maydell <peter.maydell@linaro.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>, qemu-arm@nongnu.org,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Eric Auger <eauger@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Juan Quintela <quintela@redhat.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v6 1/2] arm/kvm: add support for MTE
-In-Reply-To: <CABJz62OHjrq_V1QD4g4azzLm812EJapPEja81optr8o7jpnaHQ@mail.gmail.com>
-Organization: Red Hat GmbH
-References: <20230228150216.77912-1-cohuck@redhat.com>
- <20230228150216.77912-2-cohuck@redhat.com>
- <CABJz62OHjrq_V1QD4g4azzLm812EJapPEja81optr8o7jpnaHQ@mail.gmail.com>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date:   Wed, 01 Mar 2023 11:17:40 +0100
-Message-ID: <874jr4dbcr.fsf@redhat.com>
+        bh=dTVLm7QV3FqdHoGTvptUn/GL7e91wGyjqa+G5LE4kRE=;
+        b=gchPJZhKSCwFzquiGfko72+gx3DVbQPZ7BttkjpHfSKyd5691tIN2YNAg+jIFmpqG9fbPZ
+        Z2CR/3NM9Ky4tbikre295dak/qUVGhxySKdjFOzF91JFxWOLGEJiR4p708sR0TR9QkPhfw
+        Z9H2F1mo0CNUFD837Esfc24AaqEyZ5fvB8/SWkjjQ1qUczV3bn9IxBPoIC4XdnAaMyyeyg
+        VNMB5kQO2p5jOCtwfsIiQraK8ffKLZvRV+FH9YRn7ktkRv9sa1sXtsJqRtN3VLpH2kJEy0
+        fe/08XjhzkGDBQXS1oicsyLR6nvPrJ+6qxr6ktOnnRs8+9oZP3xgh5DoeWiNqw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1677665905;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=dTVLm7QV3FqdHoGTvptUn/GL7e91wGyjqa+G5LE4kRE=;
+        b=ncYoBoqU9d2eDsdV0PEuEieNewZxDApJb2fsPe57RQavKOZej4itdoi05Ww+9UFKflfb+b
+        FAOEJ6H6LFYs3HCA==
+To:     David Woodhouse <dwmw2@infradead.org>,
+        Usama Arif <usama.arif@bytedance.com>, kim.phillips@amd.com,
+        brgerst@gmail.com
+Cc:     piotrgorski@cachyos.org, oleksandr@natalenko.name,
+        arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
+        pbonzini@redhat.com, paulmck@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
+        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
+        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
+        simon.evans@bytedance.com, liangma@liangbit.com
+Subject: Re: [PATCH v12 06/11] x86/smpboot: Remove initial_stack on 64-bit
+In-Reply-To: <64B60F62-3760-43A0-A0FB-C349DA70C013@infradead.org>
+References: <20230226110802.103134-1-usama.arif@bytedance.com>
+ <20230226110802.103134-7-usama.arif@bytedance.com> <87k001n4xo.ffs@tglx>
+ <c6863590f5fbf139f6aec50d0f3bc8e8b00cfcaf.camel@infradead.org>
+ <87edq9mto0.ffs@tglx> <64B60F62-3760-43A0-A0FB-C349DA70C013@infradead.org>
+Date:   Wed, 01 Mar 2023 11:18:24 +0100
+Message-ID: <87y1oglqq7.ffs@tglx>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 28 2023, Andrea Bolognani <abologna@redhat.com> wrote:
-
-> On Tue, Feb 28, 2023 at 04:02:15PM +0100, Cornelia Huck wrote:
->> Introduce a new cpu feature flag to control MTE support. To preserve
->> backwards compatibility for tcg, MTE will continue to be enabled as
->> long as tag memory has been provided.
+On Tue, Feb 28 2023 at 20:43, David Woodhouse wrote:
+> On 28 February 2023 20:17:19 GMT, Thomas Gleixner <tglx@linutronix.de> wrote:
+>>> +	 * Make the resuming CPU use the temporary stack at startup
+>>> +	 * by setting current->thread.sp to point to that. The true
+>>> +	 * %rsp will be restored with the rest of the CPU context,
+>>> +	 * by do_suspend_lowlevel().
 >>
->> If MTE has been enabled, we need to disable migration, as we do not
->> yet have a way to migrate the tags as well. Therefore, MTE will stay
->> off with KVM unless requested explicitly.
->>
->> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->> ---
->>  docs/system/arm/cpu-features.rst |  21 ++++++
->>  hw/arm/virt.c                    |   2 +-
->>  target/arm/cpu.c                 |  18 ++---
->>  target/arm/cpu.h                 |   1 +
->>  target/arm/cpu64.c               | 110 +++++++++++++++++++++++++++++++
->>  target/arm/internals.h           |   1 +
->>  target/arm/kvm.c                 |  29 ++++++++
->>  target/arm/kvm64.c               |   5 ++
->>  target/arm/kvm_arm.h             |  19 ++++++
->>  target/arm/monitor.c             |   1 +
->>  10 files changed, 194 insertions(+), 13 deletions(-)
+>>Right, but what restores current->thread.sp? thread.sp is used by
+>>unwinders...
 >
-> I've given a quick look with libvirt integration in mind, and
-> everything seem fine.
->
-> Specifically, MTE is advertised in the output of qom-list-properties
-> both for max-arm-cpu and the latest virt-X.Y-machine, which means
-> that libvirt can easily and reliably figure out whether MTE support
-> is available.
+> Unwinding a thread that is actually *on* the CPU?
 
-Great, thanks for having a look!
+No.
 
->
->> +MTE CPU Property
->> +================
->> +
->> +The ``mte`` property controls the Memory Tagging Extension. For TCG, it requires
->> +presence of tag memory (which can be turned on for the ``virt`` machine via
->> +``mte=on``). For KVM, it requires the ``KVM_CAP_ARM_MTE`` capability; until
->> +proper migration support is implemented, enabling MTE will install a migration
->> +blocker.
->
-> Is it okay to use -machine virt,mte=on unconditionally for both KVM
-> and TCG guests when MTE support is requested, or will that not work
-> for the former?
+> By the time it's taken off, won't ->thread.sp have been written out
+> again? I figured it was just a dead variable while the actual %rsp was
+> in use?
 
-QEMU will error out if you try this with KVM (basically, same behaviour
-as before.) Is that a problem for libvirt, or merely a bit inconvinient?
+Yes. It's not used when the thread is on the CPU. And you are right,
+it's saved and restored in switch_to(). Can you please add a comment to
+that effect?
 
->
->> +If not specified explicitly via ``on`` or ``off``, MTE will be available
->> +according to the following rules:
->> +
->> +* When TCG is used, MTE will be available if and only if tag memory is available;
->> +  i.e. it preserves the behaviour prior to the introduction of the feature.
->> +
->> +* When KVM is used, MTE will default to off, so that migration will not
->> +  unintentionally be blocked. This might change in a future QEMU version.
->
-> If and when this changes, we should ensure that the new default
-> behavior doesn't affect existing machine types, otherwise we will
-> break guest ABI for existing VMs.
+Thanks,
 
-Nod, such a change would need proper compat handling. It's not quite
-clear yet if we'll ever flip it, though.
+        tglx
+
 
