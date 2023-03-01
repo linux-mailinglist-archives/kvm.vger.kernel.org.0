@@ -2,51 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 785C16A6AE0
-	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 11:35:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B2716A6AF6
+	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 11:41:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229801AbjCAKfN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Mar 2023 05:35:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52408 "EHLO
+        id S229557AbjCAKlp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Mar 2023 05:41:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229799AbjCAKfK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Mar 2023 05:35:10 -0500
-Received: from devnull.tasossah.com (devnull.tasossah.com [IPv6:2001:41d0:1:e60e::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99000305ED
-        for <kvm@vger.kernel.org>; Wed,  1 Mar 2023 02:35:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=devnull.tasossah.com; s=vps; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:Subject:References:Cc:To:From:MIME-Version:Date:Message-ID:Sender
-        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=OBuPW6i4X5Ys8HJh2D9EDrbkm76m4Z2GvX39JdOYUM8=; b=BgGj34JNIaqdOvslukhZ6Sg8dA
-        njbzLG8MemdZR6wXP8/1RRQubJQYrpzVwpFAUkiufggT8GHNQhxNuC0mRzu+h6JUsYdkx+fh09KBK
-        vXZwrodP2Lu6WEkMUwj/pKzT7AsduYmREP4dxqDQoH7K3Pvz+bpkN5f0z93rQkAK731s=;
-Received: from [2a02:587:6a08:c500::298]
-        by devnull.tasossah.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.93)
-        (envelope-from <tasos@tasossah.com>)
-        id 1pXJnH-00CCR6-8Q; Wed, 01 Mar 2023 12:34:43 +0200
-Message-ID: <7c1980ec-d032-11c1-b09d-4db40611f268@tasossah.com>
-Date:   Wed, 1 Mar 2023 12:34:32 +0200
+        with ESMTP id S229445AbjCAKlo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Mar 2023 05:41:44 -0500
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F07E7270F;
+        Wed,  1 Mar 2023 02:41:42 -0800 (PST)
+Received: by mail-lf1-x131.google.com with SMTP id m6so17032917lfq.5;
+        Wed, 01 Mar 2023 02:41:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1677667301;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:date:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i+lwdyMLWrNCUvP02r0csUXgwLUgh7w7WbrI0pmUfWw=;
+        b=EPL5WVS3tFSDOLTSWnexGJFkVlGLQr63rDlUGz4KbfG1CDAdaTmo2PQBTQq6KzrjbW
+         Posj+feIgGObc/hvqjhm1JUTYHxypeB5N1OocI79dOg5jSq2bv+sk4pb2HdmvxOOmmd7
+         kRl1TGZgBle2bjJAoLH+sDKyB64RouLB6PL2gxNmqlYD0ypElu5VxW2EX+l9tByHslig
+         Y1z7C71RRCU/s/K3kV/UwHdMnBsKUCm9n3NLTbj+q8Hjdrkivc2LYA3SvekePOb1fwS3
+         LJe7wJqdjJRYBglMYo5q3AqhBRYqB9AgwFqATK7wS1TQR+nWogVw2Qa2+FLynzqPSsVq
+         5huA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1677667301;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=i+lwdyMLWrNCUvP02r0csUXgwLUgh7w7WbrI0pmUfWw=;
+        b=PlgJ1QE0+5rgSSQTiAjMFJsu1JEDanFE9/VXZLUsECIBMG2AeCW6eUJ0iHq81p8TD9
+         Zz4shZG8gk3iPutUWnJV/UVPbncj3M/6ld7ValNzalVzuQOevJ62vbJQEjuURdJcUAfv
+         6FzvANSHcj6urA2sd6pQnggifKEKG1fIX2XR5+Il2MemtMMCmbU8uOj5vs1cGuLJg+Gt
+         POiBsgu2fEWTbs/lU7dUV/K6oPar25deBVMGyeA1cZA4PXE641Y4bQT6lGIE/WX8k+aK
+         feUNPFmM2IekbNnKZ/MAzPqYzyVH4H5uX4mOBdVkvJjdPegioeFfZtiucVakb5th6nwJ
+         1ADw==
+X-Gm-Message-State: AO0yUKWs+pqZOVN+e8e/0X44EH6P1Ywaxbi/OT8dKLEF7qaa1NmZu4rJ
+        zL0yBcDL3i0VdDMEo9I5Tlg=
+X-Google-Smtp-Source: AK7set+11Iny2EdWmD9hXw83EgIIV1mL8orIaUR+ppxy5FtPa7r6ToSfgxtS+0dWKUJcZtFHIvc0pg==
+X-Received: by 2002:ac2:5197:0:b0:4b5:3e6e:382e with SMTP id u23-20020ac25197000000b004b53e6e382emr1459043lfi.4.1677667300743;
+        Wed, 01 Mar 2023 02:41:40 -0800 (PST)
+Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
+        by smtp.gmail.com with ESMTPSA id h5-20020a05651211c500b004dc48d91061sm1680896lfr.304.2023.03.01.02.41.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Mar 2023 02:41:40 -0800 (PST)
+From:   Zhi Wang <zhi.wang.linux@gmail.com>
+X-Google-Original-From: Zhi Wang <zhi.wang.linux@intel.com>
+Date:   Wed, 1 Mar 2023 12:41:38 +0200
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
+        <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
+        <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
+        <thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
+        <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
+        <jmattson@google.com>, <luto@kernel.org>,
+        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
+        <pgonda@google.com>, <peterz@infradead.org>,
+        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
+        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
+        <tony.luck@intel.com>, <marcorr@google.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
+        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>
+Subject: Re: [PATCH RFC v8 50/56] KVM: SEV: Handle restricted memory
+ invalidations for SNP
+Message-ID: <20230301124138.000004f9@intel.com>
+In-Reply-To: <20230220183847.59159-51-michael.roth@amd.com>
+References: <20230220183847.59159-1-michael.roth@amd.com>
+        <20230220183847.59159-51-michael.roth@amd.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-From:   Tasos Sahanidis <tasos@tasossah.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Abhishek Sahu <abhsahu@nvidia.com>, kvm@vger.kernel.org
-References: <a01fa87d-bd42-e108-606b-78759edcecf8@tasossah.com>
- <bcc9d355-b464-7eaf-238c-e95d2f65c93d@nvidia.com>
- <31c2caf4-57b2-be1a-cf15-146903f7b2a1@tasossah.com>
- <20230228114606.446e8db2.alex.williamson@redhat.com>
-Content-Language: en-US
-Subject: Re: Bug: Completion-Wait loop timed out with vfio
-In-Reply-To: <20230228114606.446e8db2.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,NICE_REPLY_A,SPF_HELO_PASS,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -54,166 +89,116 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023-02-28 20:46, Alex Williamson wrote:
-> Can you do the same for the root port to the GPU, ex. use lspci -t to
-> find the parent root port.  Since the device doesn't seem to be
-> achieving D3cold (expected on a desktop system), the other significant
-> change of the identified commit is that the root port will also enter a
-> low power state.  Prior to that commit the device would enter D3hot, but
-> we never touched the root port.  Perhaps confirm the root port now
-> enters D3hot and compare lspci for the root port when using
-> disable_idle_d3 to that found when trying to use the device without
-> disable_idle_d3. Thanks,
+On Mon, 20 Feb 2023 12:38:41 -0600
+Michael Roth <michael.roth@amd.com> wrote:
+
+> Implement a platform hook to do the work of restoring the direct map
+> entries and cleaning up RMP table entries for restricted memory that is
+> being freed back to the host.
 > 
-> Alex
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>  arch/x86/kvm/svm/sev.c | 62 ++++++++++++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/svm/svm.c |  1 +
+>  arch/x86/kvm/svm/svm.h |  1 +
+>  3 files changed, 64 insertions(+)
 > 
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 7a74a92cb39a..bedec90d034f 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -4509,3 +4509,65 @@ bool sev_fault_is_private(struct kvm *kvm, gpa_t gpa, u64 error_code, bool *priv
+>  
+>  	return true;
+>  }
+> +
+> +void sev_invalidate_private_range(struct kvm_memory_slot *slot, gfn_t start, gfn_t end)
+> +{
+> +	gfn_t gfn = start;
+> +
+> +	if (!sev_snp_guest(slot->kvm))
+> +		return;
+> +
+> +	if (!kvm_slot_can_be_private(slot)) {
+> +		pr_warn_ratelimited("SEV: Memslot for GFN: 0x%llx is not private.\n",
+> +				    gfn);
+> +		return;
+> +	}
+> +
 
-I seem to have trouble understanding the lspci tree.
+This is a generic check for both SNP and TDX, it should be moved to
+kvm_restrictedmem_invalidate_begin().
 
-The tree is as follows:
+> +	while (gfn <= end) {
+> +		gpa_t gpa = gfn_to_gpa(gfn);
+> +		int level = PG_LEVEL_4K;
+> +		int order, rc;
+> +		kvm_pfn_t pfn;
+> +
+> +		rc = kvm_restrictedmem_get_pfn(slot, gfn, &pfn, &order);
+> +		if (rc) {
+> +			pr_warn_ratelimited("SEV: Failed to retrieve restricted PFN for GFN 0x%llx, rc: %d\n",
+> +					    gfn, rc);
+> +			gfn++;
+> +			continue;
+> +		}
+> +
+> +		if (order) {
+> +			int rmp_level;
+> +
+> +			if (IS_ALIGNED(gpa, page_level_size(PG_LEVEL_2M)) &&
+> +			    gpa + page_level_size(PG_LEVEL_2M) <= gfn_to_gpa(end))
+> +				level = PG_LEVEL_2M;
+> +			else
+> +				pr_debug("%s: GPA 0x%llx is not aligned to 2M, skipping 2M directmap restoration\n",
+> +					 __func__, gpa);
+> +
+> +			/*
+> +			 * TODO: It may still be possible to restore 2M mapping here,
+> +			 * but keep it simple for now.
+> +			 */
+> +			if (level == PG_LEVEL_2M &&
+> +			    (!snp_lookup_rmpentry(pfn, &rmp_level) || rmp_level == PG_LEVEL_4K)) {
+> +				pr_debug("%s: PFN 0x%llx is not mapped as 2M private range, skipping 2M directmap restoration\n",
+> +					 __func__, pfn);
+> +				level = PG_LEVEL_4K;
+> +			}
+> +		}
+> +
+> +		pr_debug("%s: GPA %llx PFN %llx order %d level %d\n",
+> +			 __func__, gpa, pfn, order, level);
+> +		rc = snp_make_page_shared(slot->kvm, gpa, pfn, level);
+> +		if (rc)
+> +			pr_err("SEV: Failed to restore page to shared, GPA: 0x%llx PFN: 0x%llx order: %d rc: %d\n",
+> +			       gpa, pfn, order, rc);
+> +
+> +		gfn += page_level_size(level) >> PAGE_SHIFT;
+> +		put_page(pfn_to_page(pfn));
+> +		cond_resched();
+> +	}
+> +}
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 18e4a6c17d11..3fe5f13b5f3a 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -4862,6 +4862,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+>  	.adjust_mapping_level = sev_adjust_mapping_level,
+>  	.update_mem_attr = sev_update_mem_attr,
+>  	.fault_is_private = sev_fault_is_private,
+> +	.invalidate_restricted_mem = sev_invalidate_private_range,
+>  };
+>  
+>  /*
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 97038afa8020..857b674e68f0 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -727,6 +727,7 @@ void handle_rmp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code);
+>  void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu);
+>  int sev_update_mem_attr(struct kvm_memory_slot *slot, unsigned int attr,
+>  			gfn_t start, gfn_t end);
+> +void sev_invalidate_private_range(struct kvm_memory_slot *slot, gfn_t start, gfn_t end);
+>  
+>  bool sev_fault_is_private(struct kvm *kvm, gpa_t gpa, u64 error_code, bool *private_fault);
+>  
 
--[0000:00]-+-00.0  Advanced Micro Devices, Inc. [AMD] Starship/Matisse Root Complex
-[...]      |
-           +-01.2-[02-0d]----00.0-[03-0d]--+-01.0-[04-05]----00.0-[05]--+-00.0  Creative Labs EMU10k2/CA0100/CA0102/CA10200 [Sound Blaster Audigy Series]
-           |                               |                            +-00.1  Creative Labs SB Audigy Game Port
-           |                               |                            +-01.0  Brooktree Corporation Bt878 Video Capture
-           |                               |                            \-01.1  Brooktree Corporation Bt878 Audio Capture
-           |                               +-02.0-[06]--+-00.0  Advanced Micro Devices, Inc. [AMD/ATI] Bonaire XT [Radeon HD 7790/8770 / R7 360 / R9 260/360 OEM]
-           |                               |            \-00.1  Advanced Micro Devices, Inc. [AMD/ATI] Tobago HDMI Audio [Radeon R7 360 / R9 360 OEM]
-           |                               +-03.0-[07-08]----00.0-[08]--+-00.0  Philips Semiconductors SAA7131/SAA7133/SAA7135 Video Broadcast Decoder
-           |                               |                            \-01.0  Yamaha Corporation YMF-744B [DS-1S Audio Controller]
-           |                               +-05.0-[09]----00.0  Realtek Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit Ethernet Controller
-           |                               +-06.0-[0a]--+-00.0  MosChip Semiconductor Technology Ltd. PCIe 9912 Multi-I/O Controller
-           |                               |            +-00.1  MosChip Semiconductor Technology Ltd. PCIe 9912 Multi-I/O Controller
-           |                               |            \-00.2  MosChip Semiconductor Technology Ltd. PCIe 9912 Multi-I/O Controller
-           |                               +-08.0-[0b]--+-00.0  Advanced Micro Devices, Inc. [AMD] Starship/Matisse Reserved SPP
-           |                               |            +-00.1  Advanced Micro Devices, Inc. [AMD] Matisse USB 3.0 Host Controller
-           |                               |            \-00.3  Advanced Micro Devices, Inc. [AMD] Matisse USB 3.0 Host Controller
-           |                               +-09.0-[0c]----00.0  Advanced Micro Devices, Inc. [AMD] FCH SATA Controller [AHCI mode]
-           |                               \-0a.0-[0d]----00.0  Advanced Micro Devices, Inc. [AMD] FCH SATA Controller [AHCI mode]
-[...]      |
-
-The parent root port is either 0000:00:01.2 or 0000:00:02.0, correct?
-00:01.2 PCI bridge: Advanced Micro Devices, Inc. [AMD] Starship/Matisse GPP Bridge
-02:00.0 PCI bridge: Advanced Micro Devices, Inc. [AMD] Matisse Switch Upstream
-
-If so, I tested in 5.18, both before and while running the VM, with 6.2
-both with and without disable_idle_d3, and in all cases they stayed at D0.
-
-Only difference was the card itself would be at D0 instead of D3hot with
-disable_idle_d3. In the working 5.18, without disable_idle_d3, it would
-still enter D3hot.
-
-==> 5_18_before_vm <==
-# cat /sys/bus/pci/devices/0000:02:00.0/power_state
-D0
-# cat /sys/bus/pci/devices/0000:02:00.0/power/runtime_status
-active
-# cat /sys/bus/pci/devices/0000:00:01.2/power_state
-D0
-# cat /sys/bus/pci/devices/0000:00:01.2/power/runtime_status
-active
-# cat /sys/bus/pci/devices/0000:00:02.0/power_state
-unknown
-# cat /sys/bus/pci/devices/0000:00:02.0/power/runtime_status
-active
-# cat /sys/bus/pci/devices/0000:06:00.0/power_state
-D3hot
-# cat /sys/bus/pci/devices/0000:06:00.0/power/runtime_status
-active
-
-==> 5_18_running_vm <==
-# cat /sys/bus/pci/devices/0000:02:00.0/power_state
-D0
-# cat /sys/bus/pci/devices/0000:02:00.0/power/runtime_status
-active
-# cat /sys/bus/pci/devices/0000:00:01.2/power_state
-D0
-# cat /sys/bus/pci/devices/0000:00:01.2/power/runtime_status
-active
-# cat /sys/bus/pci/devices/0000:00:02.0/power_state
-unknown
-# cat /sys/bus/pci/devices/0000:00:02.0/power/runtime_status
-active
-# cat /sys/bus/pci/devices/0000:06:00.0/power_state
-D0
-# cat /sys/bus/pci/devices/0000:06:00.0/power/runtime_status
-active
-
-==> 6_2_before_vm <==
-# cat /sys/bus/pci/devices/0000:02:00.0/power_state
-D0
-# cat /sys/bus/pci/devices/0000:02:00.0/power/runtime_status
-active
-# cat /sys/bus/pci/devices/0000:00:01.2/power_state
-D0
-# cat /sys/bus/pci/devices/0000:00:01.2/power/runtime_status
-active
-# cat /sys/bus/pci/devices/0000:00:02.0/power_state
-unknown
-# cat /sys/bus/pci/devices/0000:00:02.0/power/runtime_status
-active
-# cat /sys/bus/pci/devices/0000:06:00.0/power_state
-D3hot
-# cat /sys/bus/pci/devices/0000:06:00.0/power/runtime_status
-suspended
-
-==> 6_2_running_vm <==
-# cat /sys/bus/pci/devices/0000:02:00.0/power_state
-D0
-# cat /sys/bus/pci/devices/0000:02:00.0/power/runtime_status
-active
-# cat /sys/bus/pci/devices/0000:00:01.2/power_state
-D0
-# cat /sys/bus/pci/devices/0000:00:01.2/power/runtime_status
-active
-# cat /sys/bus/pci/devices/0000:00:02.0/power_state
-unknown
-# cat /sys/bus/pci/devices/0000:00:02.0/power/runtime_status
-active
-# cat /sys/bus/pci/devices/0000:06:00.0/power_state
-D0
-# cat /sys/bus/pci/devices/0000:06:00.0/power/runtime_status
-active
-
-==> 6_2_before_vm_disable_idle_d3 <==
-# cat /sys/bus/pci/devices/0000:02:00.0/power_state
-D0
-# cat /sys/bus/pci/devices/0000:02:00.0/power/runtime_status
-active
-# cat /sys/bus/pci/devices/0000:00:01.2/power_state
-D0
-# cat /sys/bus/pci/devices/0000:00:01.2/power/runtime_status
-active
-# cat /sys/bus/pci/devices/0000:00:02.0/power_state
-unknown
-# cat /sys/bus/pci/devices/0000:00:02.0/power/runtime_status
-active
-# cat /sys/bus/pci/devices/0000:06:00.0/power_state
-D0
-# cat /sys/bus/pci/devices/0000:06:00.0/power/runtime_status
-active
-
-==> 6_2_running_vm_disable_idle_d3 <==
-# cat /sys/bus/pci/devices/0000:02:00.0/power_state
-D0
-# cat /sys/bus/pci/devices/0000:02:00.0/power/runtime_status
-active
-# cat /sys/bus/pci/devices/0000:00:01.2/power_state
-D0
-# cat /sys/bus/pci/devices/0000:00:01.2/power/runtime_status
-active
-# cat /sys/bus/pci/devices/0000:00:02.0/power_state
-unknown
-# cat /sys/bus/pci/devices/0000:00:02.0/power/runtime_status
-active
-# cat /sys/bus/pci/devices/0000:06:00.0/power_state
-D0
-# cat /sys/bus/pci/devices/0000:06:00.0/power/runtime_status
-active
-
-0000:00:02.0 is Host bridge: Advanced Micro Devices, Inc. [AMD] Starship/Matisse PCIe Dummy Host Bridge
-and can presumably be ignored.
-
---
-Tasos
