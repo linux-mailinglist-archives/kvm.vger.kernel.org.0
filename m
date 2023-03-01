@@ -2,103 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 455AE6A6D24
-	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 14:38:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C1CC36A6D78
+	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 14:53:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229790AbjCANiu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Mar 2023 08:38:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59684 "EHLO
+        id S229639AbjCANxR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Mar 2023 08:53:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229779AbjCANis (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Mar 2023 08:38:48 -0500
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5BC63C3C;
-        Wed,  1 Mar 2023 05:38:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677677926; x=1709213926;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=0ya9OVlQeRmAihszF7JDK54S+/9aNnOM4bPs8NX4tO8=;
-  b=ADTuM2wBUAYJk7VuWVV4b5NMxEB2Hca8XfHpxB/4Ag1ncPt9RGDPCjIg
-   NY6w3VSV9DRiwspDNa6FGnd1SSCIBZ4/n3okZIet3hVV57Q/Zi/Ra0iz8
-   tGaPjauRAt240MWGouQcaMOeX5YW9GZuKAN02yzJrPbL9r0XKIraYw49O
-   eOhjLfvbnIw6+GoSUmYRR7ZpTjC/UhMGB3svzjZTsOCwOBeXkDFxwL+zW
-   b8jFMLGN0cZ5e41qYOwtRL1xB4yyasF+hWMo6Vjp0Ayws52ttdRFqAF6c
-   VMIerKVySwQgITl840nU0sPwioHZ2qZ0bL4Ki5wYoVExnQs+MmNb6ncYP
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="334442618"
-X-IronPort-AV: E=Sophos;i="5.98,225,1673942400"; 
-   d="scan'208";a="334442618"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2023 05:38:46 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="624495674"
-X-IronPort-AV: E=Sophos;i="5.98,225,1673942400"; 
-   d="scan'208";a="624495674"
-Received: from tdx-lm.sh.intel.com ([10.239.53.27])
-  by orsmga003.jf.intel.com with ESMTP; 01 Mar 2023 05:38:44 -0800
-From:   Wei Wang <wei.w.wang@intel.com>
-To:     pbonzini@redhat.com, seanjc@google.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Wei Wang <wei.w.wang@intel.com>
-Subject: [PATCH v1] KVM: allow KVM_BUG/KVM_BUG_ON to handle 64-bit cond
-Date:   Wed,  1 Mar 2023 21:38:41 +0800
-Message-Id: <20230301133841.18007-1-wei.w.wang@intel.com>
-X-Mailer: git-send-email 2.27.0
+        with ESMTP id S230042AbjCANwp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Mar 2023 08:52:45 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43A007D9E
+        for <kvm@vger.kernel.org>; Wed,  1 Mar 2023 05:52:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1677678719;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=mftfQEi9wdaH6McKuPClmRUmMChN2OhoG+1UjGPOpjw=;
+        b=AIXUY9apdKrVPNzPQ9jpLaG/2Mi1Pw3tcexix89ipHBAYuIABqpcaYGP2D3KonbWDr9Gfw
+        ncP5ZsALiGDTjWrGbKcD6qYCZfCM41dG2da61/HZ4EirRhsfbdacCZ4mW+UFpSGznUSQAp
+        3i6nmynfCkbpl+z7pZaR/9+3BoISo5Y=
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
+ [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-479-0RSRVlXsOy6rCSkmUVbdqw-1; Wed, 01 Mar 2023 08:51:58 -0500
+X-MC-Unique: 0RSRVlXsOy6rCSkmUVbdqw-1
+Received: by mail-pl1-f199.google.com with SMTP id ki15-20020a170903068f00b0019ce282dc68so6923706plb.6
+        for <kvm@vger.kernel.org>; Wed, 01 Mar 2023 05:51:57 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:in-reply-to:mime-version:references
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mftfQEi9wdaH6McKuPClmRUmMChN2OhoG+1UjGPOpjw=;
+        b=GDjbnmvkEq0JUn5sx6MWgTTXzYv2fPicSc+54W2kpuMnaE07XkqxG20PwVMn9MHQhN
+         nXwgv7W3BzEnB6+ye7xQDutsDEsYBRMl6uOWQHditGGSS6uDPA66982fKeqXfUYXKyVb
+         dTzUNPrjw1tVfPLPUZmsgPO9mY8jUMCzzKK5VeYcfdKslourYzdA8j49eLjynBbq71jD
+         oz+sHhQUSFPgiB9cmGxE56CKzU/JMFLmpo9gKYeUXW1EwcjED9R6wHJirAYXx5+LMEXq
+         to59whVswrjEg3+dO8xfbJIp8lV0IDCdYRwHvYuiOPHBsSDvpURQmZJjKbGNPF5BiSxe
+         rkLg==
+X-Gm-Message-State: AO0yUKX7g93GQg8JsHlMhEY1uM10WKdsGNyAGAD8uONjOnjY2IwoWhpf
+        YRY+mi+uYlvB512Z6SogvvpD5c17NUaKRsDw8ZYHo2L3P4wNZaucJEHXMYdKi4hZVvHaUX7URqS
+        ZBKW0qkDrRzxicX2prtP5FuxOhNxs
+X-Received: by 2002:a17:902:a3cd:b0:19c:be03:ce10 with SMTP id q13-20020a170902a3cd00b0019cbe03ce10mr2318748plb.9.1677678717058;
+        Wed, 01 Mar 2023 05:51:57 -0800 (PST)
+X-Google-Smtp-Source: AK7set+VwIMpkQPmtqSDdknUDIutD4sizupNM19vKv5zm2iK/1JA7xp0lu/ds3MQ/WbVn6ZY+NHdJ+zI4iECpRjydb4=
+X-Received: by 2002:a17:902:a3cd:b0:19c:be03:ce10 with SMTP id
+ q13-20020a170902a3cd00b0019cbe03ce10mr2318736plb.9.1677678716764; Wed, 01 Mar
+ 2023 05:51:56 -0800 (PST)
+Received: from 744723338238 named unknown by gmailapi.google.com with
+ HTTPREST; Wed, 1 Mar 2023 05:51:56 -0800
+From:   Andrea Bolognani <abologna@redhat.com>
+References: <20230228150216.77912-1-cohuck@redhat.com> <20230228150216.77912-2-cohuck@redhat.com>
+ <CABJz62OHjrq_V1QD4g4azzLm812EJapPEja81optr8o7jpnaHQ@mail.gmail.com> <874jr4dbcr.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <874jr4dbcr.fsf@redhat.com>
+Date:   Wed, 1 Mar 2023 05:51:56 -0800
+Message-ID: <CABJz62MQH2U1QM26PcC3F1cy7t=53_mxkgViLKjcUMVmi29w+Q@mail.gmail.com>
+Subject: Re: [PATCH v6 1/2] arm/kvm: add support for MTE
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Peter Maydell <peter.maydell@linaro.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Laurent Vivier <lvivier@redhat.com>, qemu-arm@nongnu.org,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Eric Auger <eauger@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Juan Quintela <quintela@redhat.com>,
+        Gavin Shan <gshan@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>,
+        Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Current KVM_BUG and KVM_BUG_ON assumes that 'cond' passed from callers is
-32-bit as it casts 'cond' to the type of int. This will be wrong if 'cond'
-provided by a caller is 64-bit, e.g. an error code of 0xc0000d0300000000
-will be converted to 0, which is not expected. Improves the implementation
-by using !!(cond) in KVM_BUG and KVM_BUG_ON. Compared to changing 'int' to
-'int64_t', this has less LOCs.
+On Wed, Mar 01, 2023 at 11:17:40AM +0100, Cornelia Huck wrote:
+> On Tue, Feb 28 2023, Andrea Bolognani <abologna@redhat.com> wrote:
+> > On Tue, Feb 28, 2023 at 04:02:15PM +0100, Cornelia Huck wrote:
+> >> +MTE CPU Property
+> >> +================
+> >> +
+> >> +The ``mte`` property controls the Memory Tagging Extension. For TCG, it requires
+> >> +presence of tag memory (which can be turned on for the ``virt`` machine via
+> >> +``mte=on``). For KVM, it requires the ``KVM_CAP_ARM_MTE`` capability; until
+> >> +proper migration support is implemented, enabling MTE will install a migration
+> >> +blocker.
+> >
+> > Is it okay to use -machine virt,mte=on unconditionally for both KVM
+> > and TCG guests when MTE support is requested, or will that not work
+> > for the former?
+>
+> QEMU will error out if you try this with KVM (basically, same behaviour
+> as before.) Is that a problem for libvirt, or merely a bit inconvinient?
 
-Fixes: 0b8f11737cff ("KVM: Add infrastructure and macro to mark VM as bugged")
-Signed-off-by: Wei Wang <wei.w.wang@intel.com>
----
- include/linux/kvm_host.h | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+I'm actually a bit confused. The documentation for the mte property
+of the virt machine type says
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index f06635b24bd0..d77ddf82c5c8 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -881,20 +881,16 @@ static inline void kvm_vm_bugged(struct kvm *kvm)
- 
- #define KVM_BUG(cond, kvm, fmt...)				\
- ({								\
--	int __ret = (cond);					\
--								\
--	if (WARN_ONCE(__ret && !(kvm)->vm_bugged, fmt))		\
-+	if (WARN_ONCE(!!cond && !(kvm)->vm_bugged, fmt))	\
- 		kvm_vm_bugged(kvm);				\
--	unlikely(__ret);					\
-+	unlikely(!!cond);					\
- })
- 
- #define KVM_BUG_ON(cond, kvm)					\
- ({								\
--	int __ret = (cond);					\
--								\
--	if (WARN_ON_ONCE(__ret && !(kvm)->vm_bugged))		\
-+	if (WARN_ON_ONCE(!!(cond) && !(kvm)->vm_bugged))	\
- 		kvm_vm_bugged(kvm);				\
--	unlikely(__ret);					\
-+	unlikely(!!(cond));					\
- })
- 
- static inline void kvm_vcpu_srcu_read_lock(struct kvm_vcpu *vcpu)
+  mte
+    Set on/off to enable/disable emulating a guest CPU which implements
+    the Arm Memory Tagging Extensions. The default is off.
+
+So why is there a need to have a CPU property in addition to the
+existing machine type property?
+
+From the libvirt integration point of view, setting the machine type
+property only for TCG is not a problem.
+
 -- 
-2.27.0
+Andrea Bolognani / Red Hat / Virtualization
 
