@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BBBD16A64A2
-	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 02:19:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CB5E6A64A7
+	for <lists+kvm@lfdr.de>; Wed,  1 Mar 2023 02:19:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229803AbjCABTv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Feb 2023 20:19:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38710 "EHLO
+        id S229515AbjCABT4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Feb 2023 20:19:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229698AbjCABTp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Feb 2023 20:19:45 -0500
+        with ESMTP id S229841AbjCABTs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Feb 2023 20:19:48 -0500
 Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C9527A91;
-        Tue, 28 Feb 2023 17:19:40 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30BFC6590;
+        Tue, 28 Feb 2023 17:19:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677633580; x=1709169580;
+  t=1677633585; x=1709169585;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ImPmADVqHUDX7nQ1iAq93+gaWeJd3SbTcgMGwIsuMqg=;
-  b=TqH5UbW7CcGhVLemEZjKWV0qahgYORLaXM4aVMQNcOC9sRTp0mUfoOcX
-   eHB0CPEGTEoi4N2EVqC7B8FYDd513MNbXQfpWXTqKmYmXvHAPkMkaBGk9
-   ZSNvst39IdHg/0TjJolahiTJOyJar1J4j9CBnAHVRzKySmwChklmVGqoY
-   RidtNN82krXK2+tJZbj+kPk9pT4BblyvjZ/sSYINa1iBcCQ+ETTQfPqsG
-   Nb3RZ19nm9B0V9uo+lCutBOY0pMZ5E7b4LUW5MpDPBVJo0Q/EQG578EyL
-   Eiz2odGmzGvcykgh8DUlsW1BtnhWEnzEYwBCXuCHgl3M7IA03Dcta35In
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10635"; a="361867112"
+  bh=sCnaWKJVoDQfEgLdcpa7EQVCmkGidZhXadVH6hYb8Ys=;
+  b=D6n9DSVfWJ7gj4YQ/V79IMVI9g+b5OcJi6kbwMMqByqBj+9lh9Om53T1
+   uJRtoe5/tWL0LRkltF5YKnKEcFuvgfbDIhkWniqcm8lRxxyLdigtKyM8t
+   fas6MnVOosRA/LqA1PdA7RunLQJJGRdff8S1R9yqHQXJGSNCsHc70qafx
+   oNwwlGV28KPUjRvDfkt1Vlq8cLzgg01A8QNM6VRe0K5t3o+8RKBa7MxYY
+   QiEatMVUNNPE5TK670GhbryJeMVfTZP47Ci8m1aZBOW7Ie15ZkkfmM8Z5
+   GN+g4xOeR8lzZPSmOtrZrDxjq0QeMExaujEzckST8PXqCM57EGntrtfiW
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10635"; a="361867114"
 X-IronPort-AV: E=Sophos;i="5.98,223,1673942400"; 
-   d="scan'208";a="361867112"
+   d="scan'208";a="361867114"
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
   by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2023 17:19:38 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10635"; a="798242324"
+X-IronPort-AV: E=McAfee;i="6500,9779,10635"; a="798242336"
 X-IronPort-AV: E=Sophos;i="5.98,223,1673942400"; 
-   d="scan'208";a="798242324"
+   d="scan'208";a="798242336"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2023 17:19:37 -0800
 From:   isaku.yamahata@intel.com
@@ -46,9 +46,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         David Matlack <dmatlack@google.com>,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>
-Subject: [PATCH v12 2/6] KVM: x86/vmx: Refactor KVM VMX module init/exit functions
-Date:   Tue, 28 Feb 2023 17:19:12 -0800
-Message-Id: <bacb6554fcf5edc423dc34e44c6227e8a841173d.1677632938.git.isaku.yamahata@intel.com>
+Subject: [PATCH v12 3/6] KVM: TDX: Initialize the TDX module when loading the KVM intel kernel module
+Date:   Tue, 28 Feb 2023 17:19:13 -0800
+Message-Id: <64a9c956f265c625ea600fe70f6223a43747e3d2.1677632938.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <b17eee6a7d5379bf16419c0b38ed99433afbf62f.1677632938.git.isaku.yamahata@intel.com>
 References: <b17eee6a7d5379bf16419c0b38ed99433afbf62f.1677632938.git.isaku.yamahata@intel.com>
@@ -66,245 +66,211 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Currently, KVM VMX module initialization/exit functions are a single
-function each.  Refactor KVM VMX module initialization functions into KVM
-common part and VMX part so that TDX specific part can be added cleanly.
-Opportunistically refactor module exit function as well.
+TDX requires several initialization steps for KVM to create guest TDs.
+Detect CPU feature, enable VMX (TDX is based on VMX), detect the TDX module
+availability, and initialize it.
 
-The current module initialization flow is,
-0.) Check if VMX is supported,
-1.) hyper-v specific initialization,
-2.) system-wide x86 specific and vendor specific initialization,
-3.) Final VMX specific system-wide initialization,
-4.) calculate the sizes of VMX kvm structure and VMX vcpu structure,
-5.) report those sizes to the KVM common layer and KVM common
-    initialization
+There are several options on when to initialize the TDX module.  A.) kernel
+module loading time, B.) the first guest TD creation time.  A.) was chosen.
+With B.), a user may hit an error of the TDX initialization when trying to
+create the first guest TD.  The machine that fails to initialize the TDX
+module can't boot any guest TD further.  Such failure is undesirable and a
+surprise because the user expects that the machine can accommodate guest
+TD, but actually not.  So A.) is better than B.).
 
-Refactor the KVM VMX module initialization function into functions with a
-wrapper function to separate VMX logic in vmx.c from a file, main.c, common
-among VMX and TDX.  Introduce a wrapper function for vmx_init().
+Introduce a module parameter, enable_tdx, to explicitly enable TDX KVM
+support.  It's off by default to keep same behavior for those who don't use
+TDX.  Implement hardware_setup method to detect TDX feature of CPU.
+Because TDX requires all present CPUs to enable VMX (VMXON), the x86
+specific kvm_arch_post_hardware_enable_setup overrides the existing weak
+symbol of kvm_arch_post_hardware_enable_setup which is called at the KVM
+module initialization.
 
-The KVM architecture common layer allocates struct kvm with reported size
-for architecture-specific code.  The KVM VMX module defines its structure
-as struct vmx_kvm { struct kvm; VMX specific members;} and uses it as
-struct vmx kvm.  Similar for vcpu structure. TDX KVM patches will define
-TDX specific kvm and vcpu structures.
-
-The current module exit function is also a single function, a combination
-of VMX specific logic and common KVM logic.  Refactor it into VMX specific
-logic and KVM common logic.  This is just refactoring to keep the VMX
-specific logic in vmx.c from main.c.
-
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/main.c    | 51 +++++++++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/vmx.c     | 54 +++++---------------------------------
- arch/x86/kvm/vmx/x86_ops.h | 13 ++++++++-
- 3 files changed, 69 insertions(+), 49 deletions(-)
+ arch/x86/kvm/Makefile      |  1 +
+ arch/x86/kvm/vmx/main.c    | 18 +++++++++++++++-
+ arch/x86/kvm/vmx/tdx.c     | 44 ++++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/vmx.c     | 39 +++++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/x86_ops.h | 10 +++++++++
+ 5 files changed, 111 insertions(+), 1 deletion(-)
+ create mode 100644 arch/x86/kvm/vmx/tdx.c
 
+diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+index 0e894ae23cbc..4b01ab842ab7 100644
+--- a/arch/x86/kvm/Makefile
++++ b/arch/x86/kvm/Makefile
+@@ -25,6 +25,7 @@ kvm-$(CONFIG_KVM_SMM)	+= smm.o
+ kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
+ 			   vmx/hyperv.o vmx/nested.o vmx/posted_intr.o vmx/main.o
+ kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
++kvm-intel-$(CONFIG_INTEL_TDX_HOST)	+= vmx/tdx.o
+ 
+ kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o \
+ 			   svm/sev.o svm/hyperv.o
 diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index a59559ff140e..3f49e8e38b6b 100644
+index 3f49e8e38b6b..5c9f5e00b3c4 100644
 --- a/arch/x86/kvm/vmx/main.c
 +++ b/arch/x86/kvm/vmx/main.c
-@@ -165,3 +165,54 @@ struct kvm_x86_init_ops vt_init_ops __initdata = {
- 	.runtime_ops = &vt_x86_ops,
- 	.pmu_ops = &intel_pmu_ops,
- };
+@@ -6,6 +6,22 @@
+ #include "nested.h"
+ #include "pmu.h"
+ 
++static bool enable_tdx __ro_after_init;
++module_param_named(tdx, enable_tdx, bool, 0444);
 +
-+static int __init vt_init(void)
++static __init int vt_hardware_setup(void)
 +{
-+	unsigned int vcpu_size, vcpu_align;
-+	int r;
++	int ret;
 +
-+	if (!kvm_is_vmx_supported())
-+		return -EOPNOTSUPP;
++	ret = vmx_hardware_setup();
++	if (ret)
++		return ret;
 +
-+	/*
-+	 * Note, hv_init_evmcs() touches only VMX knobs, i.e. there's nothing
-+	 * to unwind if a later step fails.
-+	 */
-+	hv_init_evmcs();
-+
-+	r = kvm_x86_vendor_init(&vt_init_ops);
-+	if (r)
-+		return r;
-+
-+	r = vmx_init();
-+	if (r)
-+		goto err_vmx_init;
-+
-+	/*
-+	 * Common KVM initialization _must_ come last, after this, /dev/kvm is
-+	 * exposed to userspace!
-+	 */
-+	vt_x86_ops.vm_size = sizeof(struct kvm_vmx);
-+	vcpu_size = sizeof(struct vcpu_vmx);
-+	vcpu_align = __alignof__(struct vcpu_vmx);
-+	r = kvm_init(vcpu_size, vcpu_align, THIS_MODULE);
-+	if (r)
-+		goto err_kvm_init;
++	enable_tdx = enable_tdx && !tdx_hardware_setup(&vt_x86_ops);
 +
 +	return 0;
++}
 +
-+err_kvm_init:
-+	vmx_exit();
-+err_vmx_init:
-+	kvm_x86_vendor_exit();
+ #define VMX_REQUIRED_APICV_INHIBITS		       \
+ (						       \
+        BIT(APICV_INHIBIT_REASON_DISABLE)|	       \
+@@ -159,7 +175,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ };
+ 
+ struct kvm_x86_init_ops vt_init_ops __initdata = {
+-	.hardware_setup = vmx_hardware_setup,
++	.hardware_setup = vt_hardware_setup,
+ 	.handle_intel_pt_intr = NULL,
+ 
+ 	.runtime_ops = &vt_x86_ops,
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+new file mode 100644
+index 000000000000..d7a276118940
+--- /dev/null
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -0,0 +1,44 @@
++// SPDX-License-Identifier: GPL-2.0
++#include <linux/cpu.h>
++
++#include <asm/tdx.h>
++
++#include "capabilities.h"
++#include "x86_ops.h"
++#include "tdx.h"
++#include "x86.h"
++
++#undef pr_fmt
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
++
++static int __init tdx_module_setup(void)
++{
++	int ret;
++
++	ret = tdx_enable();
++	if (ret) {
++		pr_info("Failed to initialize TDX module.\n");
++		return ret;
++	}
++
++	pr_info("TDX is supported.\n");
++	return 0;
++}
++
++int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
++{
++	int r;
++
++	if (!enable_ept) {
++		pr_warn("Cannot enable TDX with EPT disabled\n");
++		return -EINVAL;
++	}
++
++	/* TDX requires VMX. */
++	r = vmxon_all();
++	if (!r)
++		r = tdx_module_setup();
++	vmxoff_all();
++
 +	return r;
 +}
-+module_init(vt_init);
-+
-+static void vt_exit(void)
-+{
-+	kvm_exit();
-+	kvm_x86_vendor_exit();
-+	vmx_exit();
-+}
-+module_exit(vt_exit);
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index c5c3ac01f957..d6845db3ab3f 100644
+index d6845db3ab3f..bddbdd2988f4 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -553,7 +553,7 @@ static int hv_enable_l2_tlb_flush(struct kvm_vcpu *vcpu)
- 	return 0;
+@@ -8104,6 +8104,45 @@ static unsigned int vmx_handle_intel_pt_intr(void)
+ 	return 1;
  }
  
--static __init void hv_init_evmcs(void)
-+__init void hv_init_evmcs(void)
++static __init void vmxon(void *arg)
++{
++	int cpu = raw_smp_processor_id();
++	u64 phys_addr = __pa(per_cpu(vmxarea, cpu));
++	atomic_t *failed = arg;
++	int r;
++
++	if (cr4_read_shadow() & X86_CR4_VMXE) {
++		r = -EBUSY;
++		goto out;
++	}
++
++	r = kvm_cpu_vmxon(phys_addr);
++out:
++	if (r)
++		atomic_inc(failed);
++}
++
++__init int vmxon_all(void)
++{
++	atomic_t failed = ATOMIC_INIT(0);
++
++	on_each_cpu(vmxon, &failed, 1);
++
++	if (atomic_read(&failed))
++		return -EBUSY;
++	return 0;
++}
++
++static __init void vmxoff(void *junk)
++{
++	cpu_vmxoff();
++}
++
++__init void vmxoff_all(void)
++{
++	on_each_cpu(vmxoff, NULL, 1);
++}
++
+ static __init void vmx_setup_user_return_msrs(void)
  {
- 	int cpu;
  
-@@ -589,7 +589,7 @@ static __init void hv_init_evmcs(void)
- 	}
- }
- 
--static void hv_reset_evmcs(void)
-+void hv_reset_evmcs(void)
- {
- 	struct hv_vp_assist_page *vp_ap;
- 
-@@ -613,10 +613,6 @@ static void hv_reset_evmcs(void)
- 	vp_ap->current_nested_vmcs = 0;
- 	vp_ap->enlighten_vmentry = 0;
- }
--
--#else /* IS_ENABLED(CONFIG_HYPERV) */
--static void hv_init_evmcs(void) {}
--static void hv_reset_evmcs(void) {}
- #endif /* IS_ENABLED(CONFIG_HYPERV) */
- 
- /*
-@@ -2743,7 +2739,7 @@ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
- 	return 0;
- }
- 
--static bool kvm_is_vmx_supported(void)
-+bool kvm_is_vmx_supported(void)
- {
- 	int cpu = raw_smp_processor_id();
- 
-@@ -8362,7 +8358,7 @@ static void vmx_cleanup_l1d_flush(void)
- 	l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_AUTO;
- }
- 
--static void __vmx_exit(void)
-+void vmx_exit(void)
- {
- 	allow_smaller_maxphyaddr = false;
- 
-@@ -8373,32 +8369,10 @@ static void __vmx_exit(void)
- 	vmx_cleanup_l1d_flush();
- }
- 
--static void vmx_exit(void)
--{
--	kvm_exit();
--	kvm_x86_vendor_exit();
--
--	__vmx_exit();
--}
--module_exit(vmx_exit);
--
--static int __init vmx_init(void)
-+int __init vmx_init(void)
- {
- 	int r, cpu;
- 
--	if (!kvm_is_vmx_supported())
--		return -EOPNOTSUPP;
--
--	/*
--	 * Note, hv_init_evmcs() touches only VMX knobs, i.e. there's nothing
--	 * to unwind if a later step fails.
--	 */
--	hv_init_evmcs();
--
--	r = kvm_x86_vendor_init(&vt_init_ops);
--	if (r)
--		return r;
--
- 	/*
- 	 * Must be called after common x86 init so enable_ept is properly set
- 	 * up. Hand the parameter mitigation value in which was stored in
-@@ -8408,7 +8382,7 @@ static int __init vmx_init(void)
- 	 */
- 	r = vmx_setup_l1d_flush(vmentry_l1d_flush_param);
- 	if (r)
--		goto err_l1d_flush;
-+		return r;
- 
- 	vmx_setup_fb_clear_ctrl();
- 
-@@ -8432,21 +8406,5 @@ static int __init vmx_init(void)
- 	if (!enable_ept)
- 		allow_smaller_maxphyaddr = true;
- 
--	/*
--	 * Common KVM initialization _must_ come last, after this, /dev/kvm is
--	 * exposed to userspace!
--	 */
--	r = kvm_init(sizeof(struct vcpu_vmx), __alignof__(struct vcpu_vmx),
--		     THIS_MODULE);
--	if (r)
--		goto err_kvm_init;
--
- 	return 0;
--
--err_kvm_init:
--	__vmx_exit();
--err_l1d_flush:
--	kvm_x86_vendor_exit();
--	return r;
- }
--module_init(vmx_init);
 diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-index e9ec4d259ff5..051b5c4b5c2f 100644
+index 051b5c4b5c2f..0f200aead411 100644
 --- a/arch/x86/kvm/vmx/x86_ops.h
 +++ b/arch/x86/kvm/vmx/x86_ops.h
-@@ -8,11 +8,22 @@
+@@ -20,6 +20,10 @@ bool kvm_is_vmx_supported(void);
+ int __init vmx_init(void);
+ void vmx_exit(void);
  
- #include "x86.h"
- 
--__init int vmx_hardware_setup(void);
-+#if IS_ENABLED(CONFIG_HYPERV)
-+__init void hv_init_evmcs(void);
-+void hv_reset_evmcs(void);
-+#else /* IS_ENABLED(CONFIG_HYPERV) */
-+static inline void hv_init_evmcs(void) {}
-+static inline void hv_reset_evmcs(void) {}
-+#endif /* IS_ENABLED(CONFIG_HYPERV) */
++__init int vmxon_all(void);
++__init void vmxoff_all(void);
++__init int vmx_hardware_setup(void);
 +
-+bool kvm_is_vmx_supported(void);
-+int __init vmx_init(void);
-+void vmx_exit(void);
- 
  extern struct kvm_x86_ops vt_x86_ops __initdata;
  extern struct kvm_x86_init_ops vt_init_ops __initdata;
  
-+__init int vmx_hardware_setup(void);
- void vmx_hardware_unsetup(void);
- int vmx_check_processor_compat(void);
- int vmx_hardware_enable(void);
+@@ -133,4 +137,10 @@ void vmx_cancel_hv_timer(struct kvm_vcpu *vcpu);
+ #endif
+ void vmx_setup_mce(struct kvm_vcpu *vcpu);
+ 
++#ifdef CONFIG_INTEL_TDX_HOST
++int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
++#else
++static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return -ENOSYS; }
++#endif
++
+ #endif /* __KVM_X86_VMX_X86_OPS_H */
 -- 
 2.25.1
 
