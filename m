@@ -2,68 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D79C6A7CB0
-	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 09:31:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3AF136A7CC5
+	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 09:34:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229567AbjCBIbZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Mar 2023 03:31:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39142 "EHLO
+        id S229616AbjCBIeQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Mar 2023 03:34:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbjCBIbY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Mar 2023 03:31:24 -0500
-Received: from mail.surechiers.com (mail.surechiers.com [80.211.239.236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9736238EB5
-        for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 00:31:22 -0800 (PST)
-Received: by mail.surechiers.com (Postfix, from userid 1002)
-        id E67BC82E78; Thu,  2 Mar 2023 09:31:17 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=surechiers.com;
-        s=mail; t=1677745879;
-        bh=xg3VVY9SU+I+f+ynMyY8e0Lum0EY/KrTvpy5BYTg7yw=;
-        h=Date:From:To:Subject:From;
-        b=kuArASY9jGycWAdWjcDbQcEO5dWCVOOb+NpAFNjWBtcytzsPWJxNC2+wXdStaXYjp
-         tSMflWva9wfJPA4U7z4hepJheUL0OpFBxIBZfVeVREJTODnGQJUHWv0hl/yAmmWZBz
-         PsqiWC0qoS2zflu+ys/hOFRwXHnd34OIX+mMsNH2hY1VPIfLmPFxCBpHyECzxV2kAA
-         +3WyjtTuyGHyEvMHMtryitGG97hrmz/f0F4YCgIwRaFfe6zmaD1O6lcEDpFzQAUVLo
-         9ziIR9oe+IA5YvnTt8XgJUQzWViUlbj1c4bAVCjaVKQ82Bl12LE3SyN6s9eY6oB24B
-         3RMsnneXHR/pg==
-Received: by mail.surechiers.com for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 08:31:16 GMT
-Message-ID: <20230302084500-0.1.g.rbt.0.cdh7z2fh5m@surechiers.com>
-Date:   Thu,  2 Mar 2023 08:31:16 GMT
-From:   =?UTF-8?Q? "J=C3=A1chym_Zdr=C3=A1hal" ?= 
-        <jachym.zdrahal@surechiers.com>
-To:     <kvm@vger.kernel.org>
-Subject: Renovace podlahy
-X-Mailer: mail.surechiers.com
+        with ESMTP id S229510AbjCBIeO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Mar 2023 03:34:14 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9360C14221
+        for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 00:33:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1677746009;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=J2wWYhw4IbCn2jiud1m9fHjCN/hg14p3hY5/TY/f9/s=;
+        b=EJ8O7lb/BaF1WzZscLWAQvJKrUX2B9an/qXahaGczc9/e9dxJnHCtcgfZHaJrYq3yP8nO8
+        0tRoxmeWNt4pINfWe099QJbabzvDYJEX+AlLSPBB3lgax1FCYzpEUZosyodJ3Dygwwn0+j
+        6tVpgvIoMwSjvfk02UfuEKToTQjtDWw=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-47-JK9eYWf0NX6C5PUt9lofxw-1; Thu, 02 Mar 2023 03:33:28 -0500
+X-MC-Unique: JK9eYWf0NX6C5PUt9lofxw-1
+Received: by mail-qk1-f197.google.com with SMTP id z23-20020a376517000000b00731b7a45b7fso9717849qkb.2
+        for <kvm@vger.kernel.org>; Thu, 02 Mar 2023 00:33:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1677746008;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J2wWYhw4IbCn2jiud1m9fHjCN/hg14p3hY5/TY/f9/s=;
+        b=JA3IAuZA9DPp1lnjvWFFYDH/hlW1sIj16gIhtBR9LILB2hztlis+37QVF7oj/OW14k
+         TQXJjGEzgpBjDTap8zyTQGmgY2FKFWbGgYSMxf8lyqszPAPLapZCmPxvuD3q+zXhp7If
+         +4iO6ZgdnxenExthHkFzXlNO9Hgcacnk3H9Faa1KPR6lpSjRCKiEQnTQau4O0qzFqrFd
+         oJudT7NPIXGWu8Ume4R4jNhXw7v1SMBAyof7zF3RYV3NsDPioOuQQsUUU1dTQJrVmo5I
+         aKS1+6r5Eo0dQzFQdBNtSZx0fFUeGXyr5FZiXkDAQzmxuYqTWaItuUdMiM4CWi1l47WV
+         E+Kg==
+X-Gm-Message-State: AO0yUKXg+XN6oeVeB7SVGjczRMtO1cdcw86U6fvMM7ic+rM573CLgiQy
+        A8tk9eA8xGOAOJ4tXPGhcHwlP1pGvS4IJ+QJSmtcLcnyNULX+qhXAZhicJzGEq34FHuB6FRUlGx
+        9yzG18SvI+aSeIheJDw==
+X-Received: by 2002:a05:6214:19c6:b0:56e:b5a0:29eb with SMTP id j6-20020a05621419c600b0056eb5a029ebmr17272847qvc.40.1677746007950;
+        Thu, 02 Mar 2023 00:33:27 -0800 (PST)
+X-Google-Smtp-Source: AK7set99YYiQIT3q7u8Fs8YEPbCbxaT865af9SQwhTIhLrsPHZ5cKOxrj+xqsWWZYUHwSbbTr5OKZw==
+X-Received: by 2002:a05:6214:19c6:b0:56e:b5a0:29eb with SMTP id j6-20020a05621419c600b0056eb5a029ebmr17272835qvc.40.1677746007699;
+        Thu, 02 Mar 2023 00:33:27 -0800 (PST)
+Received: from sgarzare-redhat ([212.43.115.213])
+        by smtp.gmail.com with ESMTPSA id d187-20020ae9efc4000000b007428e743508sm9907618qkg.70.2023.03.02.00.33.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Mar 2023 00:33:27 -0800 (PST)
+Date:   Thu, 2 Mar 2023 09:33:14 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Gautam Dawar <gautam.dawar@amd.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-net-drivers@amd.com,
+        harpreet.anand@amd.com, tanuj.kamde@amd.com
+Subject: Re: [PATCH] vhost-vdpa: free iommu domain after last use during
+ cleanup
+Message-ID: <20230302083314.xj2wlzkarvsmofd6@sgarzare-redhat>
+References: <20230301163203.29883-1-gautam.dawar@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=4.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FROM_FMBLA_NEWDOM28,
-        RCVD_IN_SBL_CSS,SPF_HELO_NONE,SPF_PASS,URIBL_CSS_A,URIBL_DBL_SPAM
-        autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Level: ****
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20230301163203.29883-1-gautam.dawar@amd.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dobr=C3=A9 r=C3=A1no,
+On Wed, Mar 01, 2023 at 10:02:01PM +0530, Gautam Dawar wrote:
+>Currently vhost_vdpa_cleanup() unmaps the DMA mappings by calling
+>`iommu_unmap(v->domain, map->start, map->size);`
+>from vhost_vdpa_general_unmap() when the parent vDPA driver doesn't
+>provide DMA config operations.
+>
+>However, the IOMMU domain referred to by `v->domain` is freed in
+>vhost_vdpa_free_domain() before vhost_vdpa_cleanup() in
+>vhost_vdpa_release() which results in NULL pointer de-reference.
+>Accordingly, moving the call to vhost_vdpa_free_domain() in
+>vhost_vdpa_cleanup() would makes sense. This will also help
+>detaching the dma device in error handling of vhost_vdpa_alloc_domain().
 
-m=C4=9Bli byste z=C3=A1jem o beze=C5=A1v=C3=A9, chemicky, n=C3=A1razu a o=
-t=C4=9Bru odoln=C3=A9 podlahy?
+Yep, good cleanup!
 
-Zaji=C5=A1=C5=A5uj=C3=AD spolehlivost bez ohledu na to, zda je pou=C5=BE=C3=
-=ADv=C3=A1te v n=C3=A1ro=C4=8Dn=C3=BDch v=C3=BDrobn=C3=ADch prostorech, s=
-kladech, komunika=C4=8Dn=C3=ADch tras=C3=A1ch nebo komer=C4=8Dn=C3=ADch p=
-rostor=C3=A1ch.
+>
+>This issue was observed on terminating QEMU with SIGQUIT.
+>
+>Fixes: 037d4305569a ("vhost-vdpa: call vhost_vdpa_cleanup during the release")
+>Signed-off-by: Gautam Dawar <gautam.dawar@amd.com>
+>---
+> drivers/vhost/vdpa.c | 3 ++-
+> 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Navrhli jsme snadno =C4=8Distiteln=C3=A9, hygienick=C3=A9 a protiskluzov=C3=
-=A9 podlahy pro pr=C5=AFmyslov=C3=A9 i komer=C4=8Dn=C3=AD pou=C5=BEit=C3=AD=
-=2E
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-Mohu nab=C3=ADdnout bezplatn=C3=BD audit va=C5=A1ich podlah spolu s kompl=
-exn=C3=AD anal=C3=BDzou podkladu. Mohu o tomhle zavolat?
-
-
-J=C3=A1chym Zdr=C3=A1hal
