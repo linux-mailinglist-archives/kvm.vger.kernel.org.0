@@ -2,77 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F054B6A7C6B
-	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 09:20:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C2746A7C6D
+	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 09:20:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229716AbjCBIU3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Mar 2023 03:20:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57008 "EHLO
+        id S229677AbjCBIUz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Mar 2023 03:20:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229510AbjCBIU2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Mar 2023 03:20:28 -0500
+        with ESMTP id S229756AbjCBIUq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Mar 2023 03:20:46 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 009DE1A640
-        for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 00:19:43 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E2F222006
+        for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 00:19:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677745182;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
+        s=mimecast20190719; t=1677745191;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=3QJC7xrknqCUo3QneAi3gtan/QiuwSf0HXodYL5voFQ=;
-        b=aPmyZbwLCW7pAtAxAOs0YXKXxtqCOYcky8vM0S10zFDKSJzgMhPjZuvHQ7A3+XJSTd6aAO
-        85Tx9oAjVNJUnDC1H2DeNqCuhM4z9hUk27mEpCRkoHiYjt/CqTsiZP0Zt6UAF1u3BBNPjk
-        bj2upZwNyrqmXh+scT07dc4i622ZvNs=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-278-TKrkba8uMf-OBtneiNu1Pg-1; Thu, 02 Mar 2023 03:19:41 -0500
-X-MC-Unique: TKrkba8uMf-OBtneiNu1Pg-1
-Received: by mail-qk1-f197.google.com with SMTP id 19-20020a370c13000000b007428253bb55so9626703qkm.23
-        for <kvm@vger.kernel.org>; Thu, 02 Mar 2023 00:19:41 -0800 (PST)
+        bh=zIjaXDXp4WiF/PZhzlcAElDicG/m9VQA0incK69mGeo=;
+        b=DlKKPiFvHmXpMEA1i04yqeUuVQFV+cBs+oyF4djGp6GbKsIZxOkcumfi0epNA3S3nL3oHB
+        oTTXBBjjfM+uOHy2vupu8+8cLnAsU54eEl12SoEYQoqKUdYDYabEOHVheAP1IuWcLCYTBZ
+        9qLePY5iXS0CCOQK8NvyAXnuGRkF7qs=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-20-FEB20ttcMbmqYKEAePzx2A-1; Thu, 02 Mar 2023 03:19:49 -0500
+X-MC-Unique: FEB20ttcMbmqYKEAePzx2A-1
+Received: by mail-qv1-f69.google.com with SMTP id l13-20020ad44d0d000000b004c74bbb0affso8430981qvl.21
+        for <kvm@vger.kernel.org>; Thu, 02 Mar 2023 00:19:49 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3QJC7xrknqCUo3QneAi3gtan/QiuwSf0HXodYL5voFQ=;
-        b=HCCvl6b24pHf9qgiMkwC+mCT+YWvJjqP80z/4WVvoX8lFdb0Ttr/CY9AQOCpxDQp6Z
-         XouOvCy6e+p1NLIWzwGR9BKrrRWZn2d82wP5+7mCAThWnOe1jzD8YvkD1V1HK9kIjmj8
-         b7pEXwatyllbnPH1h/ZGd8a9sUm6lhHfzOJHUz271DrSdMQr/Rho2h8ls0sqSN3wCSmt
-         ISVI+2Bsf8IsKmdt+hGAWRR2jchaH9br/9uHVu4mfnDsfPSSnmT/wMg4sjoTOND13hNW
-         EwJrvnnOPCiOJC4xQ71NvxU3MGxCSyBD+p8qdcrkuacs0mOv4ahgJiID8SenCFG5ina+
-         V/hQ==
-X-Gm-Message-State: AO0yUKWUoziEu6o7Fn+NLj5d5zDLmD9EQSAiat93XKcPLqXVq8y6xArK
-        MxAx7QlYZ/V/Io0bxaP7XruEPHpVZGXyvxqEVHlrdVDU8WVxJT5mejxVXr1MMUOOBxjgAeIJBWt
-        ffj/xM9ohRIIbwcgaBQ==
-X-Received: by 2002:a05:622a:1306:b0:3bd:1835:b001 with SMTP id v6-20020a05622a130600b003bd1835b001mr17100248qtk.20.1677745180484;
-        Thu, 02 Mar 2023 00:19:40 -0800 (PST)
-X-Google-Smtp-Source: AK7set9aLD2f3rBaPdQofL9Ou9Zba6yEy0mtfG4HkKo550DSwBneHUAn/2VtsAVxHAqpjBANLxb/Kg==
-X-Received: by 2002:a05:622a:1306:b0:3bd:1835:b001 with SMTP id v6-20020a05622a130600b003bd1835b001mr17100237qtk.20.1677745180263;
-        Thu, 02 Mar 2023 00:19:40 -0800 (PST)
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zIjaXDXp4WiF/PZhzlcAElDicG/m9VQA0incK69mGeo=;
+        b=h/Pm0bjCl0cVEXqUvLSiGEju8TnS9ywWTIGbr4oSvUuFOgz2pr+oZ/ByjQDi9pCJWd
+         9A3uuyT9nX4/LEm6nwEm2WpI93iaA2meKGFYRSydQ6QZfDS5YDiNbrM35CB83K8zl1MV
+         JkOvEYCtFXxB4NNDSd/UQ0D2RxJI8gNpv4StHQvJ0x7vQjKxGr0/f7nSDq1PHxW/zlsz
+         javh8D+FuFp+CyFgH9NzzgyEHvLt7bfG2LvjRhpFMiIEqYpwp2HGVnEdFNeqQmovC1xf
+         uWh4d0Kcbg9yFm6PCbFSahFOOV92MfMqHh+/fY6x8jBTRBdzyjL6k3O8fW8jAIIqEzx/
+         NaiQ==
+X-Gm-Message-State: AO0yUKXX4jhRjgRSdP1BQkk1IsjJ6p1hsqN/YZ0NcAyRMwQz+bIkfh4X
+        RXhDtfsA/0Im7WGgAZvS2l+osyqWwFajIIMBi2MwMHysxhF4WM8bh14enZSvTFPdMXfUMPzESvi
+        AgKzEEqUyUUro
+X-Received: by 2002:a05:6214:29e9:b0:56b:fa99:7866 with SMTP id jv9-20020a05621429e900b0056bfa997866mr15509750qvb.7.1677745189315;
+        Thu, 02 Mar 2023 00:19:49 -0800 (PST)
+X-Google-Smtp-Source: AK7set9DC0uf3w5/KZdo3iDCN05BT27ad4JPBOOjlaA8gZ1f4js38pJNLws5TY6JsybSloz9MoJvIQ==
+X-Received: by 2002:a05:6214:29e9:b0:56b:fa99:7866 with SMTP id jv9-20020a05621429e900b0056bfa997866mr15509741qvb.7.1677745189084;
+        Thu, 02 Mar 2023 00:19:49 -0800 (PST)
 Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id f7-20020ac80147000000b003b2957fb45bsm9910169qtg.8.2023.03.02.00.19.38
+        by smtp.gmail.com with ESMTPSA id g1-20020a37b601000000b00743049c2b15sm1221359qkf.66.2023.03.02.00.19.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Mar 2023 00:19:39 -0800 (PST)
-Message-ID: <a9799d3b-e7c5-89fd-a910-b574cff67913@redhat.com>
-Date:   Thu, 2 Mar 2023 09:19:36 +0100
+        Thu, 02 Mar 2023 00:19:48 -0800 (PST)
+Message-ID: <830e41b7-2e78-caff-7115-81be321bdad9@redhat.com>
+Date:   Thu, 2 Mar 2023 09:19:46 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [RESEND kvm-unit-tests 1/3] arm: gic: Write one bit per time in
- gic_irq_set_clr_enable()
+Subject: Re: [RESEND kvm-unit-tests 2/3] arm64: timer: Use
+ gic_enable/disable_irq() macro in timer test
 Content-Language: en-US
 To:     Shaoqin Huang <shahuang@redhat.com>, kvmarm@lists.linux.dev
 Cc:     Andrew Jones <andrew.jones@linux.dev>,
         "open list:ARM" <kvm@vger.kernel.org>
 References: <20230302030238.158796-1-shahuang@redhat.com>
- <20230302030238.158796-2-shahuang@redhat.com>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20230302030238.158796-2-shahuang@redhat.com>
+ <20230302030238.158796-3-shahuang@redhat.com>
+From:   Eric Auger <eauger@redhat.com>
+In-Reply-To: <20230302030238.158796-3-shahuang@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -85,49 +82,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Shaoqin,
+
 
 On 3/2/23 04:02, Shaoqin Huang wrote:
-> When use gic_irq_set_clr_enable() to disable an interrupt, it will
-> disable all interrupt since it first read from Interrupt Clear-Enable
-> Registers and then write this value with a mask back.
-
-nit: it first read from Interrupt Clear-Enable Registers where '1' indicates that forwarding of the corresponding interrupt is enabled
-
->
-> So diretly write one bit per time to enable or disable interrupt.
-directly
-> Fixes: cb573c2 ("arm: gic: Introduce gic_irq_set_clr_enable() helper")
+> Use gic_enable/disable_irq() to clean up the code.
+> 
 > Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
+
 Thanks
 
-Eirc
+Eric
+
 > ---
->  lib/arm/gic.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
->
-> diff --git a/lib/arm/gic.c b/lib/arm/gic.c
-> index 1bfcfcf..89a15fe 100644
-> --- a/lib/arm/gic.c
-> +++ b/lib/arm/gic.c
-> @@ -176,7 +176,6 @@ void gic_ipi_send_mask(int irq, const cpumask_t *dest)
->  void gic_irq_set_clr_enable(int irq, bool enable)
->  {
->  	u32 offset, split = 32, shift = (irq % 32);
-> -	u32 reg, mask = BIT(shift);
->  	void *base;
+>  arm/timer.c | 20 +++-----------------
+>  1 file changed, 3 insertions(+), 17 deletions(-)
+> 
+> diff --git a/arm/timer.c b/arm/timer.c
+> index c4e7b10..c0a8388 100644
+> --- a/arm/timer.c
+> +++ b/arm/timer.c
+> @@ -14,9 +14,6 @@
+>  #include <asm/gic.h>
+>  #include <asm/io.h>
 >  
->  	assert(irq < 1020);
-> @@ -199,8 +198,7 @@ void gic_irq_set_clr_enable(int irq, bool enable)
->  		assert(0);
->  	}
->  	base += offset + (irq / split) * 4;
-> -	reg = readl(base);
-> -	writel(reg | mask, base);
-> +	writel(BIT(shift), base);
+> -static void *gic_isenabler;
+> -static void *gic_icenabler;
+> -
+>  static bool ptimer_unsupported;
+>  
+>  static void ptimer_unsupported_handler(struct pt_regs *regs, unsigned int esr)
+> @@ -139,12 +136,12 @@ static struct timer_info ptimer_info = {
+>  
+>  static void set_timer_irq_enabled(struct timer_info *info, bool enabled)
+>  {
+> -	u32 val = 1 << PPI(info->irq);
+> +	u32 irq = PPI(info->irq);
+>  
+>  	if (enabled)
+> -		writel(val, gic_isenabler);
+> +		gic_enable_irq(irq);
+>  	else
+> -		writel(val, gic_icenabler);
+> +		gic_disable_irq(irq);
 >  }
 >  
->  enum gic_irq_state gic_irq_state(int irq)
+>  static void irq_handler(struct pt_regs *regs)
+> @@ -366,17 +363,6 @@ static void test_init(void)
+>  
+>  	gic_enable_defaults();
+>  
+> -	switch (gic_version()) {
+> -	case 2:
+> -		gic_isenabler = gicv2_dist_base() + GICD_ISENABLER;
+> -		gic_icenabler = gicv2_dist_base() + GICD_ICENABLER;
+> -		break;
+> -	case 3:
+> -		gic_isenabler = gicv3_sgi_base() + GICR_ISENABLER0;
+> -		gic_icenabler = gicv3_sgi_base() + GICR_ICENABLER0;
+> -		break;
+> -	}
+> -
+>  	install_irq_handler(EL1H_IRQ, irq_handler);
+>  	set_timer_irq_enabled(&ptimer_info, true);
+>  	set_timer_irq_enabled(&vtimer_info, true);
 
