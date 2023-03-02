@@ -2,118 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C8416A8C2F
-	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 23:50:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 976F56A8D1D
+	for <lists+kvm@lfdr.de>; Fri,  3 Mar 2023 00:36:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230145AbjCBWuT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Mar 2023 17:50:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36518 "EHLO
+        id S229971AbjCBXgs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Mar 2023 18:36:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230124AbjCBWuS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Mar 2023 17:50:18 -0500
-Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E9EC457C5
-        for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 14:50:15 -0800 (PST)
-Received: by mail-il1-x131.google.com with SMTP id a1so622480iln.9
-        for <kvm@vger.kernel.org>; Thu, 02 Mar 2023 14:50:15 -0800 (PST)
+        with ESMTP id S229660AbjCBXgr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Mar 2023 18:36:47 -0500
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD89746081
+        for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 15:36:46 -0800 (PST)
+Received: by mail-pg1-x52f.google.com with SMTP id 130so482443pgg.3
+        for <kvm@vger.kernel.org>; Thu, 02 Mar 2023 15:36:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1677797414;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=x338600Q7VIX0cVgTZIiqK+j8XOSNURHeS+9aau97o4=;
-        b=fYzDI7YEGJzsMcYSlufZAbcr4q7PjjLLjd/TjIzIxwzc+274KkH32RMirrp6xRwzWa
-         nrcM6oWMUUYpj0BgQosXGRqWER18ZxlPoeCbSOfEuTjEKiV2Tqykd4kqgaLwt1dUG340
-         nzHshtEVoy9SszbLC8uOvLMheWKMe3bKb0uVRVmCLy9Y0I0NLCxLhvigKkG22hsunVYN
-         mbfc4SnSr2Nx9PrAP5xPucpEiivhBCmi/JcwevNb6LQKaUO1t3eUMVoTTtUw89lVrSGw
-         R9j0Gj6qcmZnGe4kij2OQ0YJY9fybpHUXS9VTzS9Ab3+5oCQxolcsuiIiEr6Jv6mVfSQ
-         MeXA==
+        d=gmail.com; s=20210112; t=1677800206;
+        h=content-transfer-encoding:to:subject:message-id:date:from:sender
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=BgxI8luKvKPpK2hUBn1yPNdvu8ZuZS5lD3jYTE9pqDU=;
+        b=MRu3mAJXVNBjC/mrTnDTyncz5NotvXg+P24eA9GL1c3GXRYetRZ0BAQuQMY4lkipXX
+         4Fa6yRNs3Y9atgghwfHB3g7U8pztqQtz+BD8g9ULCRr8PCJvXmpjOBkUjEl9bflMWxRp
+         BsBYvtd8zl0mOEpPmabyPxdrf98z3dh7hqnJqoqt1IjOrezh7wtV5Nb5XOGkNIi3Ah+9
+         pq0C2cJk+io622q9wVjPUnCFTkfd8g2Sfp/PwQxc0rV+BWV+nd8aMmjXVtz5GKrKSANL
+         N97maXQ6/Z8r6XO+SOQlx0Khy8rtzT0xEubi/w1dV4ZfipFdVSFTKU74kMs1F/Xz5+HF
+         /ZsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677797414;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=x338600Q7VIX0cVgTZIiqK+j8XOSNURHeS+9aau97o4=;
-        b=f3wjrMAX//vzV5t4XJLqdXNxquzZu1UqNx4LSHuYF3K/q4j3hUhUgHvJLcnozjfHsy
-         9fI01dZyndtdeYg0z/2Tomu5739cObQRb+Dkh6x9BT+ddaF+1aTmTN1iBK799KFG3Ozr
-         Yr08dpUKTO+1mDhObr5nxBQOJRHSVJ5WX4zGRCt3p2053wx441JX+4yAwwdNpSgOErRW
-         dcMyU2t9TXXCFOcJnew8yVdOrkT2f7pNUNtz4MH1dZrPgLH3bkUcVHDWkBaWKSdQi6lJ
-         iI939Nb/M4Lz3Gawv45LXJOXnc8W93Dy7nkTof/+7eoIkzhbR1RnA/SJN9FHN3K5kp5d
-         2FiA==
-X-Gm-Message-State: AO0yUKUg7H2L1pOgR9aAqzgM08ZPz+HOMKA2/BIpvevXWjZPAWUEnFhJ
-        0oaSfr1J7k761jQZm+ACukgm1ihNrPwc6QNGT/si4A==
-X-Google-Smtp-Source: AK7set9Gz+L6bBFx0FCaiTRMVO266S9Eb5sIaFu9FBHZEnKh9iKHp20FB1hIr361REJb3krbTInmUSSwe3KwLqcM2f4=
-X-Received: by 2002:a05:6e02:928:b0:316:6c3a:88a1 with SMTP id
- o8-20020a056e02092800b003166c3a88a1mr34134ilt.6.1677797414374; Thu, 02 Mar
- 2023 14:50:14 -0800 (PST)
+        d=1e100.net; s=20210112; t=1677800206;
+        h=content-transfer-encoding:to:subject:message-id:date:from:sender
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BgxI8luKvKPpK2hUBn1yPNdvu8ZuZS5lD3jYTE9pqDU=;
+        b=JhmtE0hvDu87SGyk9U0n8uZZTgmamr+zj2GJ9ekdxn/wHE/xtnt1o9V4vVaA6YHte1
+         qOw3sbT29SAaoxkPwVT1+eu+J8CAXM/uvWJikmrI5YVGDqYPbhk2t2DN1yV5SorIjWh4
+         bJxFxEnFsUqKJzJUoUIidgaDF7JxCQB1kbI32RnSnk8Ce9kDclAEk3TakWctBtzPvmYL
+         q1ZkvTmkbs1LwugSyJ5MeR+BBdlsYT1jAeJcE7GdCE3GUAAIvS6QSMUav7DDxYD00xpP
+         RWW6YEok35OOffE6wIuYiwhcWbZ9cNY7yV0LxVnnr0YjqEs134k3IfZa/DypHpNaz8Jn
+         ekqw==
+X-Gm-Message-State: AO0yUKV7MX0YWjNG67/strxqDvYXXzLFhIFjNWsJVdwHLKlFgu4tV3Ry
+        d/gJm+7TPGfC5BG/nd48o1xldVx+PB4RcYwyaD4=
+X-Google-Smtp-Source: AK7set92ZXGcCs/JLfvCTK51XIkI9bxrWOqBnKMAw+w1roIdv4jiOPWppJ7hJgBsHvmH1+aI46XL9vNiAQfFCeg1SDI=
+X-Received: by 2002:a63:ee12:0:b0:503:7be0:ea51 with SMTP id
+ e18-20020a63ee12000000b005037be0ea51mr3802560pgi.9.1677800206122; Thu, 02 Mar
+ 2023 15:36:46 -0800 (PST)
 MIME-Version: 1.0
-References: <20230224223607.1580880-1-aaronlewis@google.com>
- <20230224223607.1580880-9-aaronlewis@google.com> <ZAEIPm05Ev12Mr0l@google.com>
-In-Reply-To: <ZAEIPm05Ev12Mr0l@google.com>
-From:   Aaron Lewis <aaronlewis@google.com>
-Date:   Thu, 2 Mar 2023 22:50:03 +0000
-Message-ID: <CAAAPnDF=upv3Un4VTrTsGsVY6-0Q9TkOEwjwhE0j0OewYKMx_w@mail.gmail.com>
-Subject: Re: [PATCH v3 8/8] KVM: selftests: Add XCR0 Test
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com,
-        seanjc@google.com
+Sender: a.ragnvar50@gmail.com
+Received: by 2002:ac4:d7c8:0:b0:5ea:afd9:251c with HTTP; Thu, 2 Mar 2023
+ 15:36:45 -0800 (PST)
+From:   Stepan CHERNOVETSKY <s.chernovetskyi@gmail.com>
+Date:   Fri, 3 Mar 2023 00:36:45 +0100
+X-Google-Sender-Auth: _rx7Jt22NUd-eaGPsEkf5KvrXvE
+Message-ID: <CADmpa4GX0TE3f98LLrjH0Y74x7A4r2Mx2kEd5=Tnuc8Wu_E9TA@mail.gmail.com>
+Subject: INVESTMENT PROPOSAL;.
+To:     undisclosed-recipients:;
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+X-Spam-Status: Yes, score=7.5 required=5.0 tests=ADVANCE_FEE_5_NEW,BAYES_50,
+        DEAR_SOMETHING,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,SUBJ_ALL_CAPS,UNDISC_MONEY autolearn=no
         autolearn_force=no version=3.4.6
+X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
+        *      https://www.dnswl.org/, no trust
+        *      [2607:f8b0:4864:20:0:0:0:52f listed in]
+        [list.dnswl.org]
+        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
+        *      [score: 0.5347]
+        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
+        *      provider
+        *      [a.ragnvar50[at]gmail.com]
+        *  0.5 SUBJ_ALL_CAPS Subject is all capitals
+        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
+        *  0.2 FREEMAIL_ENVFROM_END_DIGIT Envelope-from freemail username ends
+        *       in digit
+        *      [a.ragnvar50[at]gmail.com]
+        * -0.0 SPF_PASS SPF: sender matches SPF record
+        *  2.0 DEAR_SOMETHING BODY: Contains 'Dear (something)'
+        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
+        *       valid
+        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
+        *      envelope-from domain
+        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
+        *      author's domain
+        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+        *  1.1 ADVANCE_FEE_5_NEW Appears to be advance fee fraud (Nigerian
+        *      419)
+        *  3.0 UNDISC_MONEY Undisclosed recipients + money/fraud signs
+X-Spam-Level: *******
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 2, 2023 at 8:34=E2=80=AFPM Mingwei Zhang <mizhang@google.com> w=
-rote:
->
-> On Fri, Feb 24, 2023, Aaron Lewis wrote:
-> > Check both architectural rules and KVM's own software-defined rules to
-> > ensure the supported xfeatures[1] don't violate any of them.
-> >
-> > The architectural rules[2] and KVM's rules ensure for a given
-> > feature, e.g. sse, avx, amx, etc... their associated xfeatures are
-> > either all sets or none of them are set, and any dependencies
-> > are enabled if needed.
-> >
-> > [1] EDX:EAX of CPUID.(EAX=3D0DH,ECX=3D0)
-> > [2] SDM vol 1, 13.3 ENABLING THE XSAVE FEATURE SET AND XSAVE-ENABLED
-> >     FEATURES
-> >
-> > Signed-off-by: Aaron Lewis <aaronlewis@google.com>
->
-> Sorry, I did not get the point of this test? I run your test in an old
-> (unpatched) kernel on two machines: 1) one with AMX and 2) one without
-> it. (SPR and Skylake). Neither of them fails. Do you want to clarify a
-> little bit?
+Dear Sir/Madam,
 
-The only known issue exists on newer versions of the kernel when run
-on SPR.  It occurs after the syscall, prctl (to enable XTILEDATA), was
-introduced.  If you run this test without the fix[1] you will get the
-assert below, indicating the XTILECFG is supported by the guest, but
-XTILEDATA isn't.
+Please do not be embarrassed for contacting you through this medium; I
+got your contact from Google people search and then decided to contact
+you. My goal is to establish a viable business relationship with you
+there in your country.
 
-=3D=3D=3D=3D Test Assertion Failure =3D=3D=3D=3D
-  x86_64/xcr0_cpuid_test.c:116: false
-  pid=3D18124 tid=3D18124 errno=3D4 - Interrupted system call
-     1 0x0000000000401894: main at xcr0_cpuid_test.c:116
-     2 0x0000000000414263: __libc_start_call_main at libc-start.o:?
-     3 0x00000000004158af: __libc_start_main_impl at ??:?
-     4 0x0000000000401660: _start at ??:?
-  Failed guest assert: !__supported || __supported =3D=3D ((((((1ULL))) <<
-(18)) | ((((1ULL))) << (17)))) at x86_64/xcr0_cpuid_test.c:72
-0x20000 0x60000 0x0
+I am  Stepan L, CHERNOVETSKYI. from Kyiv (Ukraine); I was a
+businessman, Investor and Founder of Chernovetskyi Investment Group
+(CIG) in Kyiv before Russia=E2=80=99s Invasion of my country. My business h=
+as
+been destroyed by the Russian military troops and there are no
+meaningful economic activities going on in my country.
 
-[1] KVM: x86: Clear all supported AMX xfeatures if they are not all set
-https://lore.kernel.org/kvm/20230224223607.1580880-6-aaronlewis@google.com/
+I am looking for your help and assistance to buy properties and other
+investment projects, I consider it necessary to diversify my
+investment project in your country, due to the invasion of Russia to
+my country, Ukraine and to safeguard the future of my family.
 
->
->
-> Thanks.
-> -Mingwei
+Please, I would like to discuss with you the possibility of how we can
+work together as business partners and invest in your country through
+your assistance, if you can help me.
+
+Please, if you are interested in partnering with me, please respond
+urgently for more information.
+
+Yours Sincerely,
+Stepan L, CHERNOVETSKYI.
+Chairman and founder of Chernovetskyi Investment Group (CIG)
