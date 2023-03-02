@@ -2,187 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ECA9B6A78E9
-	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 02:37:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EE9476A7918
+	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 02:41:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229689AbjCBBhb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Mar 2023 20:37:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38934 "EHLO
+        id S229713AbjCBBl5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Mar 2023 20:41:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229662AbjCBBha (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Mar 2023 20:37:30 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8748434332;
-        Wed,  1 Mar 2023 17:37:28 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id A3F35CE1DF2;
-        Thu,  2 Mar 2023 01:37:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AF23C433EF;
-        Thu,  2 Mar 2023 01:37:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677721045;
-        bh=5TPfW2FAVzvukO9C6PIlJTa5cqjUicEsT/o6u0kTLzo=;
-        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-        b=EVR6tNVfJ2FRRUnVY8lhdnD9R/MkQqbe+bKD4xGjOYgAZ4jR4dz24HvMcSIrISHN4
-         ll3u7AOOIbHdQuM3MdAhhIR1i2PL3hXzmXIRL6v8j5oBR3LoiwZVGTcZUqZMnJFxSm
-         8AxSzdmYorgSkgOAKuN3MIsCZ8XGypUm/fDTVVyDHNsNZNW+Bnt1FroEdlHEPlAz3H
-         0y5O/zgVQxBsY71HGd759CyoPRiuwiMRh8YzLzplsUVn+EFYH29l81do49W9Kk8wdl
-         0ZszCVZHgRChG27O9Pmz71wfZWGXzIYRt7FnCe/ydt536Rs91zLZqpJjVEjfXwGakR
-         HAUt8rJuoiXxw==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-        id 9F1975C0377; Wed,  1 Mar 2023 17:37:24 -0800 (PST)
-Date:   Wed, 1 Mar 2023 17:37:24 -0800
-From:   "Paul E. McKenney" <paulmck@kernel.org>
-To:     Randy Dunlap <rdunlap@infradead.org>
-Cc:     Josh Triplett <josh@joshtriplett.org>,
-        Arjan van de Ven <arjan@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Usama Arif <usama.arif@bytedance.com>, dwmw2@infradead.org,
-        kim.phillips@amd.com, brgerst@gmail.com, piotrgorski@cachyos.org,
-        oleksandr@natalenko.name, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
-        pbonzini@redhat.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, rcu@vger.kernel.org, mimoja@mimoja.de,
-        hewenliang4@huawei.com, thomas.lendacky@amd.com, seanjc@google.com,
-        pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
-        punit.agrawal@bytedance.com, simon.evans@bytedance.com,
-        liangma@liangbit.com, David Woodhouse <dwmw@amazon.co.uk>
-Subject: Re: [PATCH v12 07/11] x86/smpboot: Remove early_gdt_descr on 64-bit
-Message-ID: <20230302013724.GO2948950@paulmck-ThinkPad-P17-Gen-1>
-Reply-To: paulmck@kernel.org
-References: <20230226110802.103134-1-usama.arif@bytedance.com>
- <20230226110802.103134-8-usama.arif@bytedance.com>
- <878rghmrn2.ffs@tglx>
- <96c0c723-9976-a222-8dc8-a5da6a1a558e@linux.intel.com>
- <Y/+2Wuunn1sIF8eT@localhost>
- <20230301221632.GI2948950@paulmck-ThinkPad-P17-Gen-1>
- <Y//Q4Mh6/65Keruu@localhost>
- <20230302002851.GK2948950@paulmck-ThinkPad-P17-Gen-1>
- <41baeedf-f3ee-7342-7a5e-097f9a3c4de0@infradead.org>
+        with ESMTP id S229686AbjCBBlz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Mar 2023 20:41:55 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97C0C457CC
+        for <kvm@vger.kernel.org>; Wed,  1 Mar 2023 17:41:24 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id u3-20020a17090a450300b00239db6d7d47so1182353pjg.4
+        for <kvm@vger.kernel.org>; Wed, 01 Mar 2023 17:41:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=nQ/k+I6vg3DIpuQkWsbGXKaDuFnWAPV+R/MRhIWgerE=;
+        b=M1faUwzF8K9LVMgFawTxpJg0odDzVyBttN0AF69uG9guWjiSvbhav1cNgD35gDMKu0
+         j1niW9n0QqE3EKJ1dLgwNzvMTsr/XSuX4cXlnqhLDSoEXOlwHLpg/HIGgMwqwQFoKLTY
+         /3p1wvO6ecQ1YgClypzXuo5Z+9McY/e//LJVhv3UX6Kpq0CIXJKrgmeQRoYvzMI1gJrs
+         GhDh8QtNI7ubX9ks3+BO7j6DV36t9q0rMBQcG43GtBzfzhnaGmfxqQjy6q1mxlVc/mvD
+         dmoYB0/AEPJc7ihdJU3WdhAsnYUJK781v7iYPrrNrt88tgTT5g7Myt5GjBx8YtQisLfu
+         4ZrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nQ/k+I6vg3DIpuQkWsbGXKaDuFnWAPV+R/MRhIWgerE=;
+        b=6GEkDJ8KtLw1fkqfsXQsPJ/O0SUjMHtYSSyBOnN2mEgii6zkOotASNLiavB4kmjcAI
+         Sa6q+8SukG5D9tYyjemfUgf5Y0z0Lth1IN2GM2ZgkTfdsd91KXLWhEH7tLTTtOMv5TsT
+         s2AY3rMvxcLGpGW4tzPYvYQuLt4xvpZ2zB/kh31aJfSAeMtCBnpW3309J2lPXOIKherY
+         ct8R39u4fRxYrLR6jNUZq8AJyVR2BELmDEAbOTIEFB5rGzvbBLO8GlP+J0RwZ6dB+EXk
+         vSwqStWYQ8X3Lbs+3vEkFYtxrwD14ivDkh1n6z+T7vMgg3YXMyA7wdPSU59NtO3ZNL5E
+         5GyQ==
+X-Gm-Message-State: AO0yUKXA37H5lDc4RmWSurWEf+oPEoYY5gGwXp2uuTnGaT4ZyyZashw/
+        hLw/xx+CYpxjc/mHP1nK1U+IHgmRhoCXT1VsyKWyJg==
+X-Google-Smtp-Source: AK7set96nV5WxVAFJCuff1YfyXG1LVejzmkonDIYcfNUk89kau/aG+VyPFxYaHWrc+2i5u58w4j88wEOxo3FDLY30SQ=
+X-Received: by 2002:a17:902:7841:b0:19d:1dfe:eac6 with SMTP id
+ e1-20020a170902784100b0019d1dfeeac6mr3274257pln.1.1677721282551; Wed, 01 Mar
+ 2023 17:41:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <41baeedf-f3ee-7342-7a5e-097f9a3c4de0@infradead.org>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20230220183847.59159-1-michael.roth@amd.com> <20230220183847.59159-55-michael.roth@amd.com>
+ <20230302020245.00006f57@gmail.com>
+In-Reply-To: <20230302020245.00006f57@gmail.com>
+From:   Dionna Amalie Glaze <dionnaglaze@google.com>
+Date:   Wed, 1 Mar 2023 17:41:11 -0800
+Message-ID: <CAAH4kHY6jm9PHjuGj18eyCC8H4oksuNkVL=igAh4P4BTsKs2xA@mail.gmail.com>
+Subject: Re: [PATCH RFC v8 54/56] x86/sev: Add KVM commands for instance certs
+To:     Zhi Wang <zhi.wang.linux@gmail.com>
+Cc:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
+        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
+        nikunj.dadhania@amd.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 01, 2023 at 05:05:39PM -0800, Randy Dunlap wrote:
-> 
-> 
-> On 3/1/23 16:28, Paul E. McKenney wrote:
-> > On Wed, Mar 01, 2023 at 02:25:36PM -0800, Josh Triplett wrote:
-> >> On Wed, Mar 01, 2023 at 02:16:32PM -0800, Paul E. McKenney wrote:
-> >>> On Wed, Mar 01, 2023 at 12:32:26PM -0800, Josh Triplett wrote:
-> >>>> On Tue, Feb 28, 2023 at 01:02:33PM -0800, Arjan van de Ven wrote:
-> >>>>   Thomas Gleixner wrote:
-> >>>>>>
-> >>>>>> Maybe we should enforce CONFIG_SMP=y first :)
-> >>>>>>
-> >>>>>> Thanks,
-> >>>>>
-> >>>>> for 64 bit I can see the point of removing the !SMP case entirely from arch/x86 .
-> >>>>> maybe even for 32 bit if it just makes the code simpler I suppose
-> >>>>
-> >>>> As one of the folks keeping an eye on tinyconfig and kernel size, I
-> >>>> actually think we *should* make this change and rip out !CONFIG_SMP,
-> >>>> albeit carefully.
-> >>>>
-> >>>> In particular, I would propose that we rip out !CONFIG_SMP, *but* we
-> >>>> allow building with CONFIG_NR_CPUS=1. (And we could make sure in that
-> >>>> case that the compiler can recognize that at compile time and optimize
-> >>>> accordingly, so that it might provide some of the UP optimizations for
-> >>>> us.)
-> >>>>
-> >>>> Then, any *optimizations* for the "will only have one CPU, ever" case
-> >>>> can move to CONFIG_NR_CPUS=1 rather than !CONFIG_SMP. I think many of
-> >>>> those optimizations may be worth keeping for small embedded systems, or
-> >>>> for cases like Linux-as-bootloader or similar.
-> >>>>
-> >>>> The difference here would be that code written for !CONFIG_SMP today
-> >>>> needs to account for the UP case for *correctness*, whereas code written
-> >>>> for CONFIG_SMP can *optionally* consider CONFIG_NR_CPUS=1 for
-> >>>> *performance*.
-> >>>
-> >>> It certainly would not make much sense to keep Tiny RCU and Tiny SRCU
-> >>> around if there was no CONFIG_SMP=n.
-> >>
-> >> On the contrary, I think it's entirely appropriate to keep them for
-> >> CONFIG_NR_CPUS=1; that's exactly the kind of simple optimization that
-> >> seems well worth having. (Ideal optimization: "very very simple for UP,
-> >> complex for SMP"; non-ideal optimization: "complex for SMP, differently
-> >> complex for UP".)
-> > 
-> > Fair enough, but how does removing CONFIG_SMP help with that?  Given that
-> > it is not all that hard to work around the lack of CONFIG_SMP for Tiny
-> > RCU and Tiny SRCU, then it cannot be all that hard to work around that
-> > lack for the use cases that you are trying to get rid of, right?
-> > 
-> > 							Thanx, Paul
-> > 
-> > ------------------------------------------------------------------------
-> > 
-> > diff --git a/kernel/rcu/Kconfig b/kernel/rcu/Kconfig
-> > index 9071182b1284b..7487bee3d4341 100644
-> > --- a/kernel/rcu/Kconfig
-> > +++ b/kernel/rcu/Kconfig
-> > @@ -7,7 +7,7 @@ menu "RCU Subsystem"
-> >  
-> >  config TREE_RCU
-> >  	bool
-> > -	default y if SMP
-> > +	default y if CONFIG_NR_CPUS = 1
-> >  	# Dynticks-idle tracking
-> >  	select CONTEXT_TRACKING_IDLE
-> >  	help
-> > @@ -31,7 +31,7 @@ config PREEMPT_RCU
-> >  
-> >  config TINY_RCU
-> >  	bool
-> > -	default y if !PREEMPTION && !SMP
-> > +	default y if !PREEMPTION && CONFIG_NR_CPUS != 1
-> >  	help
-> >  	  This option selects the RCU implementation that is
-> >  	  designed for UP systems from which real-time response
-> 
-> but drop the CONFIG_ prefixes...
+> > @@ -2089,6 +2089,7 @@ static void *snp_context_create(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> >               goto e_free;
+> >
+> >       sev->snp_certs_data = certs_data;
+> > +     sev->snp_certs_len = 0;
+> >
+> >       return context;
+> >
+>
+> Better to move the fix to PATCH 45.
+>
 
-Indeed.  What I don't understand is how the above passed some light
-rcutorture testing.  And the comparisons are backwards as well.
-Perhaps this time two bugs make working code?
+This part isn't a fix, but part of the implementation since
+snp_certs_len is added in this patch here
 
-How about the following?
+> > diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> > index 221b38d3c845..dced46559508 100644
+> > --- a/arch/x86/kvm/svm/svm.h
+> > +++ b/arch/x86/kvm/svm/svm.h
+> > @@ -94,6 +94,7 @@ struct kvm_sev_info {
+> >       u64 snp_init_flags;
+> >       void *snp_context;      /* SNP guest context page */
+> >       void *snp_certs_data;
+> > +     unsigned int snp_certs_len; /* Size of instance override for certs */
+> >       struct mutex guest_req_lock; /* Lock for guest request handling */
+> >
+> >       u64 sev_features;       /* Features set at VMSA creation */
 
-							Thanx, Paul
 
-------------------------------------------------------------------------
-
-diff --git a/kernel/rcu/Kconfig b/kernel/rcu/Kconfig
-index 9071182b1284b..a2ba97b949498 100644
---- a/kernel/rcu/Kconfig
-+++ b/kernel/rcu/Kconfig
-@@ -7,7 +7,7 @@ menu "RCU Subsystem"
- 
- config TREE_RCU
- 	bool
--	default y if SMP
-+	default y if NR_CPUS != 1
- 	# Dynticks-idle tracking
- 	select CONTEXT_TRACKING_IDLE
- 	help
-@@ -31,7 +31,7 @@ config PREEMPT_RCU
- 
- config TINY_RCU
- 	bool
--	default y if !PREEMPTION && !SMP
-+	default y if !PREEMPTION && NR_CPUS = 1
- 	help
- 	  This option selects the RCU implementation that is
- 	  designed for UP systems from which real-time response
+-- 
+-Dionna Glaze, PhD (she/her)
