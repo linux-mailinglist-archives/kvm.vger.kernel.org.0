@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E413C6A7B03
-	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 06:52:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EA4C46A7AEB
+	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 06:51:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230070AbjCBFwA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Mar 2023 00:52:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44802 "EHLO
+        id S229734AbjCBFvC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Mar 2023 00:51:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229971AbjCBFve (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Mar 2023 00:51:34 -0500
+        with ESMTP id S229799AbjCBFu4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Mar 2023 00:50:56 -0500
 Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AB7D521D7;
-        Wed,  1 Mar 2023 21:51:01 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 476194C6E1;
+        Wed,  1 Mar 2023 21:50:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677736261; x=1709272261;
+  t=1677736254; x=1709272254;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=LJAIMdwNFTUrVjDLTbKC/eMN5WktrEucLVbwGrEfGpc=;
-  b=cIlkQVWdtm12nZHIzbdnCkuv+FxLTsigcMK9m/FibReBdMaQEt5Qg37K
-   wqsQradwVOf2OhGH4zFw/bKWfVrzd7HloWozzzqOb0dRmfC9qE3VPMgAi
-   WtEaQZV4yZYBHYOWr+bS0ML1c/zNgsjRC7Jm1e6HDWDwLZmIF55WXqGn3
-   OC9YgwvD0q9LuyHNo5P30NEnfp1l6aEU79b/y6sXCDausr4SbfKHXNtPU
-   JybKcj29w67aKj53Cm9ZjdnlTCbK7lcocq4w0vMg1aAFhOMu6S4SXYeQO
-   A7CEIfkbpIz8p9BR255Z63gkjiIPKWylgp+y3n2z390BfyT/z35OESU/P
+  bh=bMX4XCzIvBalTCdycaBebYL7w+KbpVnH8+oaUrz4fJQ=;
+  b=bbo9k+K4SsranXdcP4Nwn0PsiTVv4AWuFiQwiUdeXS9vtWpK7OEYi9a3
+   JbRJ8cx2l/hK6ENT9ccbQe+s2dtyIKqxl3jzua9iWpPNBNfaEUjsSbj0+
+   +LP+f7aWJDFiZDxBPYBZYGJ37D+ngYlge2kIRx0icmWgPd0HDkeEuqSJw
+   WrSw+Ruj6WyY8OwD9tFgGLzeMxMNeosM0gmCzOhfR9yy2MCPUTGWTrIFd
+   1vvCYepC8JtUqa70oBo44jDRX5LKZmYo1nY/z/GIat6g1hvg55tN3oE8r
+   FdPq8zld1p/tIBcBdRNXKUvEKYJYX1Nk5x4sVgURyruKsjSVRHohExczg
    A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="420887206"
+X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="420887114"
 X-IronPort-AV: E=Sophos;i="5.98,226,1673942400"; 
-   d="scan'208";a="420887206"
+   d="scan'208";a="420887114"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2023 21:50:52 -0800
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2023 21:50:51 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="920530914"
+X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="920530918"
 X-IronPort-AV: E=Sophos;i="5.98,226,1673942400"; 
-   d="scan'208";a="920530914"
+   d="scan'208";a="920530918"
 Received: from unknown (HELO fred..) ([172.25.112.68])
   by fmsmga006.fm.intel.com with ESMTP; 01 Mar 2023 21:50:48 -0800
 From:   Xin Li <xin3.li@intel.com>
@@ -44,9 +44,9 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         dave.hansen@linux.intel.com, hpa@zytor.com, peterz@infradead.org,
         andrew.cooper3@citrix.com, seanjc@google.com, pbonzini@redhat.com,
         ravi.v.shankar@intel.com
-Subject: [PATCH v4 14/34] x86/fred: header file with FRED definitions
-Date:   Wed,  1 Mar 2023 21:24:51 -0800
-Message-Id: <20230302052511.1918-15-xin3.li@intel.com>
+Subject: [PATCH v4 15/34] x86/fred: make unions for the cs and ss fields in struct pt_regs
+Date:   Wed,  1 Mar 2023 21:24:52 -0800
+Message-Id: <20230302052511.1918-16-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230302052511.1918-1-xin3.li@intel.com>
 References: <20230302052511.1918-1-xin3.li@intel.com>
@@ -63,123 +63,103 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
 
-Add a header file for FRED prototypes and definitions.
+Make the cs and ss fields in struct pt_regs unions between the actual
+selector and the unsigned long stack slot. FRED uses this space to
+store additional flags.
+
+The printk changes are simply due to the cs and ss fields changed to
+unsigned short from unsigned long.
 
 Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
- arch/x86/include/asm/fred.h | 101 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 101 insertions(+)
- create mode 100644 arch/x86/include/asm/fred.h
 
-diff --git a/arch/x86/include/asm/fred.h b/arch/x86/include/asm/fred.h
-new file mode 100644
-index 000000000000..2f337162da73
---- /dev/null
-+++ b/arch/x86/include/asm/fred.h
-@@ -0,0 +1,101 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * arch/x86/include/asm/fred.h
-+ *
-+ * Macros for Flexible Return and Event Delivery (FRED)
-+ */
+Changes since v3:
+* Rename csl/ssl of the pt_regs structure to csx/ssx (x for extended)
+  (Andrew Cooper).
+---
+ arch/x86/entry/vsyscall/vsyscall_64.c |  2 +-
+ arch/x86/include/asm/ptrace.h         | 36 ++++++++++++++++++++++++---
+ arch/x86/kernel/process_64.c          |  2 +-
+ 3 files changed, 34 insertions(+), 6 deletions(-)
+
+diff --git a/arch/x86/entry/vsyscall/vsyscall_64.c b/arch/x86/entry/vsyscall/vsyscall_64.c
+index d234ca797e4a..2429ad0df068 100644
+--- a/arch/x86/entry/vsyscall/vsyscall_64.c
++++ b/arch/x86/entry/vsyscall/vsyscall_64.c
+@@ -76,7 +76,7 @@ static void warn_bad_vsyscall(const char *level, struct pt_regs *regs,
+ 	if (!show_unhandled_signals)
+ 		return;
+ 
+-	printk_ratelimited("%s%s[%d] %s ip:%lx cs:%lx sp:%lx ax:%lx si:%lx di:%lx\n",
++	printk_ratelimited("%s%s[%d] %s ip:%lx cs:%x sp:%lx ax:%lx si:%lx di:%lx\n",
+ 			   level, current->comm, task_pid_nr(current),
+ 			   message, regs->ip, regs->cs,
+ 			   regs->sp, regs->ax, regs->si, regs->di);
+diff --git a/arch/x86/include/asm/ptrace.h b/arch/x86/include/asm/ptrace.h
+index f4db78b09c8f..a61d860dc33c 100644
+--- a/arch/x86/include/asm/ptrace.h
++++ b/arch/x86/include/asm/ptrace.h
+@@ -82,13 +82,41 @@ struct pt_regs {
+  * On hw interrupt, it's IRQ number:
+  */
+ 	unsigned long orig_ax;
+-/* Return frame for iretq */
 +
-+#ifndef ASM_X86_FRED_H
-+#define ASM_X86_FRED_H
-+
-+#ifdef CONFIG_X86_FRED
-+
-+#include <linux/const.h>
-+#include <asm/asm.h>
-+
-+/*
-+ * FRED return instructions
-+ *
-+ * Replace with "ERETS"/"ERETU" once binutils support FRED return instructions.
-+ * The binutils version supporting FRED instructions is still TBD, and will
-+ * update once we have it.
-+ */
-+#define ERETS			_ASM_BYTES(0xf2,0x0f,0x01,0xca)
-+#define ERETU			_ASM_BYTES(0xf3,0x0f,0x01,0xca)
-+
-+/*
-+ * Event stack level macro for the FRED_STKLVLS MSR.
-+ * Usage example: FRED_STKLVL(X86_TRAP_DF, 3)
-+ * Multiple values can be ORd together.
-+ */
-+#define FRED_STKLVL(v,l)	(_AT(unsigned long, l) << (2*(v)))
-+
-+/* FRED_CONFIG MSR */
-+#define FRED_CONFIG_CSL_MASK		0x3
-+#define FRED_CONFIG_SHADOW_STACK_SPACE	_BITUL(3)
-+#define FRED_CONFIG_REDZONE(b)		__ALIGN_KERNEL_MASK((b), _UL(0x3f))
-+#define FRED_CONFIG_INT_STKLVL(l)	(_AT(unsigned long, l) << 9)
-+#define FRED_CONFIG_ENTRYPOINT(p)	_AT(unsigned long, (p))
-+
-+/* FRED event type and vector bit width and counts */
-+#define FRED_EVENT_TYPE_BITS		3 /* only 3 bits used in FRED 3.0 */
-+#define FRED_EVENT_TYPE_COUNT		_BITUL(FRED_EVENT_TYPE_BITS)
-+#define FRED_EVENT_VECTOR_BITS		8
-+#define FRED_EVENT_VECTOR_COUNT		_BITUL(FRED_EVENT_VECTOR_BITS)
-+
-+/* FRED EVENT_TYPE_OTHER vector numbers */
-+#define FRED_SYSCALL			1
-+#define FRED_SYSENTER			2
-+
-+/* Flags above the CS selector (regs->csx) */
-+#define FRED_CSL_ENABLE_NMI		_BITUL(28)
-+#define FRED_CSL_ALLOW_SINGLE_STEP	_BITUL(25)
-+#define FRED_CSL_INTERRUPT_SHADOW	_BITUL(24)
-+
-+#ifndef __ASSEMBLY__
-+
-+#include <linux/kernel.h>
-+#include <asm/ptrace.h>
-+
-+/* FRED stack frame information */
-+struct fred_info {
-+	unsigned long edata;	/* Event data: CR2, DR6, ... */
-+	unsigned long resv;
-+};
-+
-+/* Full format of the FRED stack frame */
-+struct fred_frame {
-+	struct pt_regs   regs;
-+	struct fred_info info;
-+};
-+
-+/* Getting the FRED frame information from a pt_regs pointer */
-+static __always_inline struct fred_info *fred_info(struct pt_regs *regs)
-+{
-+	return &container_of(regs, struct fred_frame, regs)->info;
-+}
-+
-+static __always_inline unsigned long fred_event_data(struct pt_regs *regs)
-+{
-+	return fred_info(regs)->edata;
-+}
-+
-+/*
-+ * How FRED event handlers are called.
-+ *
-+ * FRED event delivery establishes the full supervisor context
-+ * by pushing everything related to the event being delivered
-+ * to the FRED stack frame, e.g., the faulting linear address
-+ * of a #PF is pushed as event data of the FRED #PF stack frame.
-+ * Thus a struct pt_regs has everything needed and it's the only
-+ * input parameter required for a FRED event handler.
-+ */
-+#define DECLARE_FRED_HANDLER(f) void f (struct pt_regs *regs)
-+#define DEFINE_FRED_HANDLER(f) noinstr DECLARE_FRED_HANDLER(f)
-+typedef DECLARE_FRED_HANDLER((*fred_handler));
-+
-+#endif /* __ASSEMBLY__ */
-+
-+#endif /* CONFIG_X86_FRED */
-+
-+#endif /* ASM_X86_FRED_H */
++	/* Return frame for iretq/eretu/erets */
+ 	unsigned long ip;
+-	unsigned long cs;
++	union {
++		unsigned long  csx;	/* cs extended: CS + any fields above it */
++		struct __attribute__((__packed__)) {
++			unsigned short cs;	/* CS selector proper */
++			unsigned int current_stack_level: 2;
++			unsigned int __csx_resv1	: 6;
++			unsigned int interrupt_shadowed	: 1;
++			unsigned int software_initiated	: 1;
++			unsigned int __csx_resv2	: 2;
++			unsigned int nmi		: 1;
++			unsigned int __csx_resv3	: 3;
++			unsigned int __csx_resv4	: 32;
++		};
++	};
+ 	unsigned long flags;
+ 	unsigned long sp;
+-	unsigned long ss;
+-/* top of stack page */
++	union {
++		unsigned long  ssx;	/* ss extended: SS + any fields above it */
++		struct __attribute__((__packed__)) {
++			unsigned short ss;	/* SS selector proper */
++			unsigned int __ssx_resv1	: 16;
++			unsigned int vector		: 8;
++			unsigned int __ssx_resv2	: 8;
++			unsigned int type		: 4;
++			unsigned int __ssx_resv3	: 4;
++			unsigned int enclv		: 1;
++			unsigned int long_mode		: 1;
++			unsigned int nested		: 1;
++			unsigned int __ssx_resv4	: 1;
++			unsigned int instr_len		: 4;
++		};
++	};
+ };
+ 
+ #endif /* !__i386__ */
+diff --git a/arch/x86/kernel/process_64.c b/arch/x86/kernel/process_64.c
+index 4e34b3b68ebd..57de166dc61c 100644
+--- a/arch/x86/kernel/process_64.c
++++ b/arch/x86/kernel/process_64.c
+@@ -116,7 +116,7 @@ void __show_regs(struct pt_regs *regs, enum show_regs_mode mode,
+ 
+ 	printk("%sFS:  %016lx(%04x) GS:%016lx(%04x) knlGS:%016lx\n",
+ 	       log_lvl, fs, fsindex, gs, gsindex, shadowgs);
+-	printk("%sCS:  %04lx DS: %04x ES: %04x CR0: %016lx\n",
++	printk("%sCS:  %04x DS: %04x ES: %04x CR0: %016lx\n",
+ 		log_lvl, regs->cs, ds, es, cr0);
+ 	printk("%sCR2: %016lx CR3: %016lx CR4: %016lx\n",
+ 		log_lvl, cr2, cr3, cr4);
 -- 
 2.34.1
 
