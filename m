@@ -2,200 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 01B866A8AF6
-	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 22:05:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 83C476A8B09
+	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 22:12:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229634AbjCBVFi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Mar 2023 16:05:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58972 "EHLO
+        id S229677AbjCBVMu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Mar 2023 16:12:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229471AbjCBVFg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Mar 2023 16:05:36 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6AD31A48B
-        for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 13:04:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677791093;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EdnbjlV/XNQ2xABD+7i8aLqQ6C5aoh9/k3+KKrPoC4Q=;
-        b=WZhDLLxclCpk2LWNRp4AuLgNbC+zH8XnxaWs1l4AupjGx8vUrKgJdBJgvZ5osQ4AvzFyCG
-        OQyBTJAYefNcN36NRCNTCYo75wKyc9lFaS78zmXY0ZSC1qoQR0+s2rLRpIEGn568XmDtic
-        itR+K3B3Mkv14Z72GmOtM+38E04Gl4k=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-487-66UFAnByONa3yf2qdkupcg-1; Thu, 02 Mar 2023 16:04:51 -0500
-X-MC-Unique: 66UFAnByONa3yf2qdkupcg-1
-Received: by mail-il1-f197.google.com with SMTP id r13-20020a92c5ad000000b00316ecbf63c9so368405ilt.13
-        for <kvm@vger.kernel.org>; Thu, 02 Mar 2023 13:04:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EdnbjlV/XNQ2xABD+7i8aLqQ6C5aoh9/k3+KKrPoC4Q=;
-        b=DpsXQOrlaR0WTYLsSjEch2SkA4VY/iSme1kvdg2xSFcsgbOQfaQu5xahIZhT8wcfRq
-         y+g1nW95tpTSsaqvCmXgT2l4/3JSPJVnrB86faR52zNRvzyLGH4GNTZFp5Y9ifgYHAa6
-         EG6p6M5ydI4AIGWfuTrS/RWkl4uIwma/ry+/CVJquwmLrQatCoTgn0Cz4FcZ+KtdKMO6
-         3MgBNxuhRh9toCYWpZvszM0vYcL5tEVlzMnMfu6OV7CiQfov06WrVP4Wjaan8/Vq2kek
-         g00Ay9dsLnVCPekvpWpEdiAdZ1b4MVZ0qqS/3vVExq2WGOyMVB/CetFo/Em3VO8imokk
-         ZLdQ==
-X-Gm-Message-State: AO0yUKXn6OBABEU/rX2qCVIse4rdqdlCvBAbDcFL/1XSwhZYujEDKfDE
-        WvCqj8QCH/uEKr4R79To4lDZXBIGQa8k2WwmlaemCqlzLmS7XBIoo90qDT0hPkKLSrXugPtVO2v
-        P64POi0iraF/tIwK+4Q==
-X-Received: by 2002:a05:6e02:20e4:b0:317:3f4:c06c with SMTP id q4-20020a056e0220e400b0031703f4c06cmr7773620ilv.20.1677791090655;
-        Thu, 02 Mar 2023 13:04:50 -0800 (PST)
-X-Google-Smtp-Source: AK7set94uChKRWLMdqu/Ih+nuSAZEd1Mmf7EHZCWSlCtEFZv1sWj3peN/v4x5tVoV8vEfvWV2G/sUA==
-X-Received: by 2002:a05:6e02:20e4:b0:317:3f4:c06c with SMTP id q4-20020a056e0220e400b0031703f4c06cmr7773607ilv.20.1677791090355;
-        Thu, 02 Mar 2023 13:04:50 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id u2-20020a92da82000000b00313ca4be5e1sm109451iln.12.2023.03.02.13.04.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Mar 2023 13:04:49 -0800 (PST)
-Date:   Thu, 2 Mar 2023 14:04:48 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     "jgg@nvidia.com" <jgg@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Hao, Xudong" <xudong.hao@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>
-Subject: Re: [PATCH v5 09/19] vfio/pci: Allow passing zero-length fd array
- in VFIO_DEVICE_PCI_HOT_RESET
-Message-ID: <20230302140448.5a6a748a.alex.williamson@redhat.com>
-In-Reply-To: <DS0PR11MB75295B4B2578765C8B08AC7EC3B29@DS0PR11MB7529.namprd11.prod.outlook.com>
-References: <20230227111135.61728-1-yi.l.liu@intel.com>
-        <20230227111135.61728-10-yi.l.liu@intel.com>
-        <DS0PR11MB75295B4B2578765C8B08AC7EC3B29@DS0PR11MB7529.namprd11.prod.outlook.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        with ESMTP id S229447AbjCBVMt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Mar 2023 16:12:49 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B8BE57D11;
+        Thu,  2 Mar 2023 13:12:21 -0800 (PST)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 322KRihi009507;
+        Thu, 2 Mar 2023 21:11:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=C41PJKGqWAoHhNIrgZK/pcgj3ZWg/UjpjLf903DeDMI=;
+ b=kNVaJKbNkaXZPgIV7S7uWzeZ77ALDtBopJRrGSPLXBf0NzWwE1+D1uXUTFGWA7A1kJLW
+ z0lcazOwntdMekHSJ78uJKYPSuxX0H4sSeqtsLZD8GCnoHSyMqrEgKCiFKptHRZIOivp
+ 6sCeX5FPLx6SL5LhuYThw3785P5lCrvTcFbFC3QoosMx0R58PnlVSlADA85b4nbj94Dz
+ E0tgN85tdmJTGYHzIUCxFPjBcBcOWp+k1bzcd/zVCLh9qJRUqg3FVUwGolrYbd3S7qnP
+ E0z5Cd5YkJR7MjlNPTYJPsnyq0ghK+Kv9X2k0/SObKM7DI4xy9ol8wx7tWBrNodx6ppy Ew== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p32uygxn8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Mar 2023 21:11:29 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 322KmKgQ040718;
+        Thu, 2 Mar 2023 21:11:28 GMT
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p32uygxmc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Mar 2023 21:11:28 +0000
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 322IOh2t016406;
+        Thu, 2 Mar 2023 21:11:26 GMT
+Received: from smtprelay04.dal12v.mail.ibm.com ([9.208.130.102])
+        by ppma02dal.us.ibm.com (PPS) with ESMTPS id 3nybdm6qvq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Mar 2023 21:11:26 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+        by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 322LBPmh7799472
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 2 Mar 2023 21:11:25 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2CD965805F;
+        Thu,  2 Mar 2023 21:11:25 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 737F05805B;
+        Thu,  2 Mar 2023 21:11:15 +0000 (GMT)
+Received: from [9.65.199.252] (unknown [9.65.199.252])
+        by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Thu,  2 Mar 2023 21:11:15 +0000 (GMT)
+Message-ID: <740d3ee7-e981-0812-f21e-296a7f350388@linux.ibm.com>
+Date:   Thu, 2 Mar 2023 23:11:13 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH RFC v8 52/56] ccp: Add support to decrypt the page
+Content-Language: en-US
+To:     Tom Lendacky <thomas.lendacky@amd.com>,
+        Zhi Wang <zhi.wang.linux@gmail.com>,
+        Michael Roth <michael.roth@amd.com>
+Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, hpa@zytor.com, ardb@kernel.org,
+        pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+        slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        tobin@ibm.com, bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
+        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
+        nikunj.dadhania@amd.com, Brijesh Singh <brijesh.singh@amd.com>,
+        Dov Murik <dovmurik@linux.ibm.com>
+References: <20230220183847.59159-1-michael.roth@amd.com>
+ <20230220183847.59159-53-michael.roth@amd.com>
+ <20230301232045.0000502e@intel.com>
+ <e63ba525-644d-1a8c-afe7-2ced4a8fbb93@linux.ibm.com>
+ <36734887-6474-b43e-51ae-34f37e6670a5@amd.com>
+From:   Dov Murik <dovmurik@linux.ibm.com>
+In-Reply-To: <36734887-6474-b43e-51ae-34f37e6670a5@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: BH9z6nn2n8lzIHVH_MLBi3cktElaaSB7
+X-Proofpoint-ORIG-GUID: NKQS8NB6-1CcXMFAavhlGNyyCSi2rGOZ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-02_13,2023-03-02_02,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 phishscore=0
+ clxscore=1015 lowpriorityscore=0 malwarescore=0 suspectscore=0
+ priorityscore=1501 adultscore=0 bulkscore=0 mlxscore=0 spamscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2303020182
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2 Mar 2023 06:07:04 +0000
-"Liu, Yi L" <yi.l.liu@intel.com> wrote:
 
-> > From: Liu, Yi L <yi.l.liu@intel.com>
-> > Sent: Monday, February 27, 2023 7:11 PM  
-> [...]
-> > @@ -2392,13 +2416,25 @@ static int
-> > vfio_pci_dev_set_pm_runtime_get(struct vfio_device_set *dev_set)
-> >  	return ret;
-> >  }
-> > 
-> > +static bool vfio_dev_in_iommufd_ctx(struct vfio_pci_core_device *vdev,
-> > +				    struct iommufd_ctx *iommufd_ctx)
-> > +{
-> > +	struct iommufd_ctx *iommufd = vfio_device_iommufd(&vdev-  
-> > >vdev);  
-> > +
-> > +	if (!iommufd)
-> > +		return false;
-> > +
-> > +	return iommufd == iommufd_ctx;
-> > +}
-> > +
-> >  /*
-> >   * We need to get memory_lock for each device, but devices can share
-> > mmap_lock,
-> >   * therefore we need to zap and hold the vma_lock for each device, and
-> > only then
-> >   * get each memory_lock.
-> >   */
-> >  static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
-> > -				      struct vfio_pci_group_info *groups)
-> > +				      struct vfio_pci_group_info *groups,
-> > +				      struct iommufd_ctx *iommufd_ctx)
-> >  {
-> >  	struct vfio_pci_core_device *cur_mem;
-> >  	struct vfio_pci_core_device *cur_vma;
-> > @@ -2429,10 +2465,27 @@ static int vfio_pci_dev_set_hot_reset(struct
-> > vfio_device_set *dev_set,
-> > 
-> >  	list_for_each_entry(cur_vma, &dev_set->device_list,
-> > vdev.dev_set_list) {
-> >  		/*
-> > -		 * Test whether all the affected devices are contained by
-> > the
-> > -		 * set of groups provided by the user.
-> > +		 * Test whether all the affected devices can be reset by the
-> > +		 * user.  The affected devices may already been opened or
-> > not
-> > +		 * yet.
-> > +		 *
-> > +		 * For the devices not opened yet, user can reset them. The
-> > +		 * reason is that the hot reset is done under the protection
-> > +		 * of the dev_set->lock, and device open is also under this
-> > +		 * lock.  During the hot reset, such devices can not be
-> > opened
-> > +		 * by other users.
-> > +		 *
-> > +		 * For the devices that have been opened, needs to check
-> > the
-> > +		 * ownership.  If the user provides a set of group fds, the
-> > +		 * ownership check is done by checking if all the opened
-> > +		 * devices are contained by the groups.  If the user provides
-> > +		 * a zero-length fd array, the ownerhsip check is done by
-> > +		 * checking if all the opened devices are bound to the same
-> > +		 * iommufd_ctx.
-> >  		 */
-> > -		if (!vfio_dev_in_groups(cur_vma, groups)) {
-> > +		if (cur_vma->vdev.open_count &&
-> > +		    !vfio_dev_in_groups(cur_vma, groups) &&
-> > +		    !vfio_dev_in_iommufd_ctx(cur_vma, iommufd_ctx)) {  
+
+On 02/03/2023 16:33, Tom Lendacky wrote:
+> On 3/1/23 23:59, Dov Murik wrote:
+>> Hi Mike, Zhi,
+>>
+>> On 01/03/2023 23:20, Zhi Wang wrote:
+>>> On Mon, 20 Feb 2023 12:38:43 -0600
+>>> Michael Roth <michael.roth@amd.com> wrote:
+>>>
+>>>> From: Brijesh Singh <brijesh.singh@amd.com>
+>>>>
+>>>> Add support to decrypt guest encrypted memory. These API interfaces can
+>>>> be used for example to dump VMCBs on SNP guest exit.
+>>>>
+>>>
+>>> What kinds of check will be applied from firmware when VMM decrypts this
+>>> page? I suppose there has to be kinda mechanism to prevent VMM to
+>>> decrypt
+>>> any page in the guest. It would be nice to have some introduction about
+>>> it in the comments.
+>>>
+>>
+>> The SNP ABI spec says (section 8.27.2 SNP_DBG_DECRYPT):
+>>
+>>    The firmware checks that the guest's policy allows debugging. If not,
+>>    the firmware returns POLICY_FAILURE.
+>>
+>> and in the Guest Policy (section 4.3):
+>>
+>>    Bit 19 - DEBUG
+>>    0: Debugging is disallowed.
+>>    1: Debugging is allowed.
+>>
+>> In the kernel, that firmware error code is defined as
+>> SEV_RET_POLICY_FAILURE.
+>>
+>>
+>>>> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+>>>> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+>>>> [mdr: minor commit fixups]
+>>>> Signed-off-by: Michael Roth <michael.roth@amd.com>
+>>>> ---
+>>>>   drivers/crypto/ccp/sev-dev.c | 32 ++++++++++++++++++++++++++++++++
+>>>>   include/linux/psp-sev.h      | 22 ++++++++++++++++++++--
+>>>>   2 files changed, 52 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/drivers/crypto/ccp/sev-dev.c
+>>>> b/drivers/crypto/ccp/sev-dev.c
+>>>> index e65563bc8298..bf5167b2acfc 100644
+>>>> --- a/drivers/crypto/ccp/sev-dev.c
+>>>> +++ b/drivers/crypto/ccp/sev-dev.c
+>>>> @@ -2017,6 +2017,38 @@ int sev_guest_df_flush(int *error)
+>>>>   }
+>>>>   EXPORT_SYMBOL_GPL(sev_guest_df_flush);
+>>>>   +int snp_guest_dbg_decrypt_page(u64 gctx_pfn, u64 src_pfn, u64
+>>>> dst_pfn, int *error)
+>>>> +{
+>>>> +    struct sev_data_snp_dbg data = {0};
+>>>> +    struct sev_device *sev;
+>>>> +    int ret;
+>>>> +
+>>>> +    if (!psp_master || !psp_master->sev_data)
+>>>> +        return -ENODEV;
+>>>> +
+>>>> +    sev = psp_master->sev_data;
+>>>> +
+>>>> +    if (!sev->snp_initialized)
+>>>> +        return -EINVAL;
+>>>> +
+>>>> +    data.gctx_paddr = sme_me_mask | (gctx_pfn << PAGE_SHIFT);
+>>>> +    data.src_addr = sme_me_mask | (src_pfn << PAGE_SHIFT);
+>>>> +    data.dst_addr = sme_me_mask | (dst_pfn << PAGE_SHIFT);
+>>
+>> I guess this works, but I wonder why we need to turn on sme_me_mask on
+>> teh dst_addr.  I thought that the firmware decrypts the guest page
+>> (src_addr) to a plaintext page.  Couldn't find this requirement in the
+>> SNP spec.
 > 
-> Hi Alex, Jason,
+> This sme_me_mask tells the firmware how to access the host memory
+> (similar to how DMA uses sme_me_mask when supplying addresses to devices
+> under SME). This needs to match the pagetable mapping being used by the
+> host, otherwise the contents will appears as ciphertext to the host if
+> they are not in sync. Since the default pagetable mapping is encrypted,
+> the sme_me_mask bit must be provided on the destination address. So it
+> is not a spec requirement, but an SME implementation requirement.
 > 
-> There is one concern on this approach which is related to the
-> cdev noiommu mode. As patch 16 of this series, cdev path
-> supports noiommu mode by passing a negative iommufd to
-> kernel. In such case, the vfio_device is not bound to a valid
-> iommufd. Then the check in vfio_dev_in_iommufd_ctx() is
-> to be broken.
-> 
-> An idea is to add a cdev_noiommu flag in vfio_device, when
-> checking the iommufd_ictx, also check this flag. If all the opened
-> devices in the dev_set have vfio_device->cdev_noiommu==true,
-> then the reset is considered to be doable. But there is a special
-> case. If devices in this dev_set are opened by two applications
-> that operates in cdev noiommu mode, then this logic is not able
-> to differentiate them. In that case, should we allow the reset?
-> It seems to ok to allow reset since noiommu mode itself means
-> no security between the applications that use it. thoughts?
 
-I don't think the existing vulnerabilities of no-iommu mode should be
-carte blanche to add additional weaknesses.  Thanks,
+Ah, OK, that's clear now. Thanks Tom.
 
-Alex
-
+-Dov
