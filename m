@@ -2,273 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D709C6A8144
-	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 12:37:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B3076A8121
+	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 12:35:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230105AbjCBLhO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Mar 2023 06:37:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57114 "EHLO
+        id S229486AbjCBLfU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Mar 2023 06:35:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229861AbjCBLg6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Mar 2023 06:36:58 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 433054AFD7
-        for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 03:35:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677756946;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8ei7n2l78e4NFmvUi+bOVTMUuSnDAXEzTgyerL27l10=;
-        b=SiKWFQEsjux9pg7VcflKRjwXsMx2t4MEgSQjLUbocfexN4n7yUTyFIwasVmDxJk7tWjTSE
-        vfsCID+KZCOf3eTyu0KKix0o1V3uCBb+3jEAvXLriy85RpzoTFSyVpP39qdFtbcuA+uTE1
-        Opol4lLm/zofmnMhSnlIl8IFoZBfo68=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-28-S7RsMFl4O9eGqKmN52DCLw-1; Thu, 02 Mar 2023 06:35:45 -0500
-X-MC-Unique: S7RsMFl4O9eGqKmN52DCLw-1
-Received: by mail-qt1-f199.google.com with SMTP id g20-20020ac870d4000000b003b9c1013018so8260904qtp.18
-        for <kvm@vger.kernel.org>; Thu, 02 Mar 2023 03:35:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677756944;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8ei7n2l78e4NFmvUi+bOVTMUuSnDAXEzTgyerL27l10=;
-        b=gBIZ3GuVNUArn5HCp1VxBhDvMbLCuOX2CR3vLh47N105yJzr8g6zc58C4SYCRuCDFA
-         X29VUtUZaZ2ytgywnLgCVETrVxAQo6gd8MJL5XPV0KPOY9C/DYx0exHwCYPkLsCnn4RM
-         WUe8HfsLtI5hgVbJvTVD3/T2UYDUzAQyyki5cJK5U4PgkS4VALtk+yD3kmXCZKAsinXA
-         vBbFhVFNeczU3ilwUxz2YrNZGYAZq+yYp0NYggifTMW4OBtFrNvuxTk854kxFh/F1PUr
-         kpCgb/y4zoHd39eogL2mNsRikQ3qd/6j9mDGmqAztZAJMzk2Iy+658C0ipOY8q7wyML7
-         MykA==
-X-Gm-Message-State: AO0yUKWHPW/i/8GOLI+fRz9xFCrJFYLGlD7bwPUR914rqbS3WCVSFOg2
-        jxKF3tP3z8KO909lGK1ACiE6sN6Dn3KiZ5AS8cB+DrjH76NuJORID9WGrsOlmFkD6+t5UvaOgGC
-        N65RsGznOvz6Q
-X-Received: by 2002:a05:6214:23cc:b0:56f:796e:c3a5 with SMTP id hr12-20020a05621423cc00b0056f796ec3a5mr15695869qvb.4.1677756944507;
-        Thu, 02 Mar 2023 03:35:44 -0800 (PST)
-X-Google-Smtp-Source: AK7set8Ak8Ucf6C6K7kn5+/O12tTcTPMHjMyg5Hg/gChXMJzzgv24g/Sgnux1N4dFSCrO8nMsW3JDg==
-X-Received: by 2002:a05:6214:23cc:b0:56f:796e:c3a5 with SMTP id hr12-20020a05621423cc00b0056f796ec3a5mr15695849qvb.4.1677756944236;
-        Thu, 02 Mar 2023 03:35:44 -0800 (PST)
-Received: from step1.redhat.com (c-115-213.cust-q.wadsl.it. [212.43.115.213])
-        by smtp.gmail.com with ESMTPSA id m26-20020ae9e01a000000b00741d87eb5d1sm10630925qkk.105.2023.03.02.03.35.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Mar 2023 03:35:43 -0800 (PST)
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     virtualization@lists.linux-foundation.org
-Cc:     Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
-        eperezma@redhat.com, netdev@vger.kernel.org, stefanha@redhat.com,
-        linux-kernel@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
-        Stefano Garzarella <sgarzare@redhat.com>
-Subject: [PATCH v2 8/8] vdpa_sim: add support for user VA
-Date:   Thu,  2 Mar 2023 12:34:21 +0100
-Message-Id: <20230302113421.174582-9-sgarzare@redhat.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230302113421.174582-1-sgarzare@redhat.com>
-References: <20230302113421.174582-1-sgarzare@redhat.com>
+        with ESMTP id S229449AbjCBLfS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Mar 2023 06:35:18 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFA5D1B541;
+        Thu,  2 Mar 2023 03:35:16 -0800 (PST)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 322AiLsB030357;
+        Thu, 2 Mar 2023 11:34:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=dOAo4yP20BN2tMvLNTdTUQ9lWV9N88XXslr4sX2EaiY=;
+ b=NOy3uKXatHZhVjhlYrjt7dk9peFQ+ghLo3nhedJCxpLkT91i7tygH4K+wODyfBkGsFq+
+ +tydf3Q7mSMslJrrFP1RKERe0KWqkEZbaEcB+ZMov/jO9P7bKLQHMryatbYsH2IEFGJM
+ IVx1PX44rxqUvo7KWoHHVHEbUR1+OzSbmxSx+Sa+CkM2XbI6e0MTVyFBHCpyehGjsHcP
+ MZXRMI9gSZE+Z+p8ELs29MS3qFRtqfxWFCY96cw1dBk2RMPxG8NGyoVXjLjMDmhMiZg5
+ XB3mJ2Zp9YNUW99CvpjbE/6sgje4ZoOadttLjicyrupsB7PUMLHG4ZF8cWjaOkgBavLH rA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3p2tag996v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Mar 2023 11:34:39 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 322BPU3D010598;
+        Thu, 2 Mar 2023 11:34:38 GMT
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3p2tag996d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Mar 2023 11:34:38 +0000
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3229qNok024547;
+        Thu, 2 Mar 2023 11:34:37 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([9.208.129.117])
+        by ppma05wdc.us.ibm.com (PPS) with ESMTPS id 3nybe9vkru-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Mar 2023 11:34:37 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+        by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 322BYZi44260488
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 2 Mar 2023 11:34:35 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 90FD95805E;
+        Thu,  2 Mar 2023 11:34:35 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 83B3F5805B;
+        Thu,  2 Mar 2023 11:34:26 +0000 (GMT)
+Received: from [9.65.199.252] (unknown [9.65.199.252])
+        by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Thu,  2 Mar 2023 11:34:26 +0000 (GMT)
+Message-ID: <7bb7de5b-8650-d632-5d8d-13e961092514@linux.ibm.com>
+Date:   Thu, 2 Mar 2023 13:34:24 +0200
 MIME-Version: 1.0
-Content-type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH RFC v8 54/56] x86/sev: Add KVM commands for instance certs
+Content-Language: en-US
+To:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
+Cc:     linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, tobin@ibm.com, bp@alien8.de, vbabka@suse.cz,
+        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
+        ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+        Dionna Glaze <dionnaglaze@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>
+References: <20230220183847.59159-1-michael.roth@amd.com>
+ <20230220183847.59159-55-michael.roth@amd.com>
+From:   Dov Murik <dovmurik@linux.ibm.com>
+In-Reply-To: <20230220183847.59159-55-michael.roth@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: sW6S_sH2skBR2gF5i0T43zjzYupGR-JF
+X-Proofpoint-GUID: wwIKig-YXQZM25e08VegcV-Ep_P_1img
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-02_06,2023-03-02_02,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 phishscore=0
+ impostorscore=0 adultscore=0 malwarescore=0 priorityscore=1501
+ clxscore=1015 bulkscore=0 mlxlogscore=999 mlxscore=0 suspectscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2303020101
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The new "use_va" module parameter (default: false) is used in
-vdpa_alloc_device() to inform the vDPA framework that the device
-supports VA.
 
-vringh is initialized to use VA only when "use_va" is true and the
-user's mm has been bound. So, only when the bus supports user VA
-(e.g. vhost-vdpa).
 
-vdpasim_mm_work_fn work is used to attach the kthread to the user
-address space when the .bind_mm callback is invoked, and to detach
-it when the .unbind_mm callback is invoked.
+On 20/02/2023 20:38, Michael Roth wrote:
+> From: Dionna Glaze <dionnaglaze@google.com>
+> 
+> The /dev/sev device has the ability to store host-wide certificates for
+> the key used by the AMD-SP for SEV-SNP attestation report signing,
+> but for hosts that want to specify additional certificates that are
+> specific to the image launched in a VM, a different way is needed to
+> communicate those certificates.
+> 
+> Add two new KVM ioctl to handle this: KVM_SEV_SNP_{GET,SET}_CERTS
+> 
+> The certificates that are set with this command are expected to follow
+> the same format as the host certificates, but that format is opaque
+> to the kernel.
+> 
+> The new behavior for custom certificates is that the extended guest
+> request command will now return the overridden certificates if they
+> were installed for the instance. The error condition for a too small
+> data buffer is changed to return the overridden certificate data size
+> if there is an overridden certificate set installed.
+> 
+> Setting a 0 length certificate returns the system state to only return
+> the host certificates on an extended guest request.
+> 
+> Also increase the SEV_FW_BLOB_MAX_SIZE another 4K page to allow space
+> for an extra certificate.
+> 
+> Cc: Tom Lendacky <Thomas.Lendacky@amd.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> Signed-off-by: Dionna Glaze <dionnaglaze@google.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> [mdr: remove used of "we" and "this patch" in commit log]
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>  arch/x86/kvm/svm/sev.c   | 111 ++++++++++++++++++++++++++++++++++++++-
+>  arch/x86/kvm/svm/svm.h   |   1 +
+>  include/linux/psp-sev.h  |   2 +-
+>  include/uapi/linux/kvm.h |  12 +++++
+>  4 files changed, 123 insertions(+), 3 deletions(-)
+> 
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
+[...]
 
-Notes:
-    v2:
-    - `use_va` set to true by default [Eugenio]
-    - supported the new unbind_mm callback [Jason]
-    - removed the unbind_mm call in vdpasim_do_reset() [Jason]
-    - avoided to release the lock while call kthread_flush_work() since we
-      are now using a mutex to protect the device state
+> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+> index 92116e2b74fd..3b28b78938f6 100644
+> --- a/include/linux/psp-sev.h
+> +++ b/include/linux/psp-sev.h
+> @@ -22,7 +22,7 @@
+>  #define __psp_pa(x)	__pa(x)
+>  #endif
+>  
+> -#define SEV_FW_BLOB_MAX_SIZE	0x4000	/* 16KB */
+> +#define SEV_FW_BLOB_MAX_SIZE	0x5000	/* 20KB */
 
- drivers/vdpa/vdpa_sim/vdpa_sim.h |  1 +
- drivers/vdpa/vdpa_sim/vdpa_sim.c | 98 +++++++++++++++++++++++++++++++-
- 2 files changed, 97 insertions(+), 2 deletions(-)
+This change should be removed (it was also discussed in v7).  If I
+understand correctly, 16KB is a limit of the PSP.
 
-diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.h b/drivers/vdpa/vdpa_sim/vdpa_sim.h
-index 4774292fba8c..3a42887d05d9 100644
---- a/drivers/vdpa/vdpa_sim/vdpa_sim.h
-+++ b/drivers/vdpa/vdpa_sim/vdpa_sim.h
-@@ -59,6 +59,7 @@ struct vdpasim {
- 	struct vdpasim_virtqueue *vqs;
- 	struct kthread_worker *worker;
- 	struct kthread_work work;
-+	struct mm_struct *mm_bound;
- 	struct vdpasim_dev_attr dev_attr;
- 	/* mutex to synchronize virtqueue state */
- 	struct mutex mutex;
-diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-index a28103a67ae7..eda26bc33df5 100644
---- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
-+++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-@@ -35,10 +35,77 @@ module_param(max_iotlb_entries, int, 0444);
- MODULE_PARM_DESC(max_iotlb_entries,
- 		 "Maximum number of iotlb entries for each address space. 0 means unlimited. (default: 2048)");
- 
-+static bool use_va = true;
-+module_param(use_va, bool, 0444);
-+MODULE_PARM_DESC(use_va, "Enable/disable the device's ability to use VA");
-+
- #define VDPASIM_QUEUE_ALIGN PAGE_SIZE
- #define VDPASIM_QUEUE_MAX 256
- #define VDPASIM_VENDOR_ID 0
- 
-+struct vdpasim_mm_work {
-+	struct kthread_work work;
-+	struct mm_struct *mm;
-+	bool bind;
-+	int ret;
-+};
-+
-+static void vdpasim_mm_work_fn(struct kthread_work *work)
-+{
-+	struct vdpasim_mm_work *mm_work =
-+		container_of(work, struct vdpasim_mm_work, work);
-+
-+	mm_work->ret = 0;
-+
-+	if (mm_work->bind) {
-+		kthread_use_mm(mm_work->mm);
-+		//TODO: should we attach the cgroup of the mm owner?
-+	} else {
-+		kthread_unuse_mm(mm_work->mm);
-+	}
-+}
-+
-+static void vdpasim_worker_queue_mm(struct vdpasim *vdpasim,
-+				    struct vdpasim_mm_work *mm_work)
-+{
-+	struct kthread_work *work = &mm_work->work;
-+
-+	kthread_init_work(work, vdpasim_mm_work_fn);
-+	kthread_queue_work(vdpasim->worker, work);
-+
-+	kthread_flush_work(work);
-+}
-+
-+static int vdpasim_worker_bind_mm(struct vdpasim *vdpasim,
-+				  struct mm_struct *new_mm)
-+{
-+	struct vdpasim_mm_work mm_work;
-+
-+	mm_work.mm = new_mm;
-+	mm_work.bind = true;
-+
-+	vdpasim_worker_queue_mm(vdpasim, &mm_work);
-+
-+	if (!mm_work.ret)
-+		vdpasim->mm_bound = new_mm;
-+
-+	return mm_work.ret;
-+}
-+
-+static void vdpasim_worker_unbind_mm(struct vdpasim *vdpasim)
-+{
-+	struct vdpasim_mm_work mm_work;
-+
-+	if (!vdpasim->mm_bound)
-+		return;
-+
-+	mm_work.mm = vdpasim->mm_bound;
-+	mm_work.bind = false;
-+
-+	vdpasim_worker_queue_mm(vdpasim, &mm_work);
-+
-+	vdpasim->mm_bound = NULL;
-+}
- static struct vdpasim *vdpa_to_sim(struct vdpa_device *vdpa)
- {
- 	return container_of(vdpa, struct vdpasim, vdpa);
-@@ -59,8 +126,10 @@ static void vdpasim_queue_ready(struct vdpasim *vdpasim, unsigned int idx)
- {
- 	struct vdpasim_virtqueue *vq = &vdpasim->vqs[idx];
- 	uint16_t last_avail_idx = vq->vring.last_avail_idx;
-+	bool va_enabled = use_va && vdpasim->mm_bound;
- 
--	vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, true, false,
-+	vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, true,
-+			  va_enabled,
- 			  (struct vring_desc *)(uintptr_t)vq->desc_addr,
- 			  (struct vring_avail *)
- 			  (uintptr_t)vq->driver_addr,
-@@ -151,7 +220,7 @@ struct vdpasim *vdpasim_create(struct vdpasim_dev_attr *dev_attr,
- 	vdpa = __vdpa_alloc_device(NULL, ops,
- 				   dev_attr->ngroups, dev_attr->nas,
- 				   dev_attr->alloc_size,
--				   dev_attr->name, false);
-+				   dev_attr->name, use_va);
- 	if (IS_ERR(vdpa)) {
- 		ret = PTR_ERR(vdpa);
- 		goto err_alloc;
-@@ -571,6 +640,27 @@ static int vdpasim_set_map(struct vdpa_device *vdpa, unsigned int asid,
- 	return ret;
- }
- 
-+static int vdpasim_bind_mm(struct vdpa_device *vdpa, struct mm_struct *mm)
-+{
-+	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
-+	int ret;
-+
-+	mutex_lock(&vdpasim->mutex);
-+	ret = vdpasim_worker_bind_mm(vdpasim, mm);
-+	mutex_unlock(&vdpasim->mutex);
-+
-+	return ret;
-+}
-+
-+static void vdpasim_unbind_mm(struct vdpa_device *vdpa)
-+{
-+	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
-+
-+	mutex_lock(&vdpasim->mutex);
-+	vdpasim_worker_unbind_mm(vdpasim);
-+	mutex_unlock(&vdpasim->mutex);
-+}
-+
- static int vdpasim_dma_map(struct vdpa_device *vdpa, unsigned int asid,
- 			   u64 iova, u64 size,
- 			   u64 pa, u32 perm, void *opaque)
-@@ -667,6 +757,8 @@ static const struct vdpa_config_ops vdpasim_config_ops = {
- 	.set_group_asid         = vdpasim_set_group_asid,
- 	.dma_map                = vdpasim_dma_map,
- 	.dma_unmap              = vdpasim_dma_unmap,
-+	.bind_mm		= vdpasim_bind_mm,
-+	.unbind_mm		= vdpasim_unbind_mm,
- 	.free                   = vdpasim_free,
- };
- 
-@@ -701,6 +793,8 @@ static const struct vdpa_config_ops vdpasim_batch_config_ops = {
- 	.get_iova_range         = vdpasim_get_iova_range,
- 	.set_group_asid         = vdpasim_set_group_asid,
- 	.set_map                = vdpasim_set_map,
-+	.bind_mm		= vdpasim_bind_mm,
-+	.unbind_mm		= vdpasim_unbind_mm,
- 	.free                   = vdpasim_free,
- };
- 
--- 
-2.39.2
+-Dov
 
+
+>  
+>  /**
+>   * SEV platform state
