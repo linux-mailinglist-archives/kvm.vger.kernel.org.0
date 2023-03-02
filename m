@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A6EA6A7B15
-	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 06:53:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A6B446A7B18
+	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 06:53:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230131AbjCBFxB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Mar 2023 00:53:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47654 "EHLO
+        id S230185AbjCBFxH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Mar 2023 00:53:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230057AbjCBFwa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Mar 2023 00:52:30 -0500
+        with ESMTP id S230061AbjCBFwe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Mar 2023 00:52:34 -0500
 Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EFC555074;
-        Wed,  1 Mar 2023 21:51:32 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 659E841B69;
+        Wed,  1 Mar 2023 21:51:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677736292; x=1709272292;
+  t=1677736294; x=1709272294;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=5IBl0XY5xGj0Ul5jZJTZVlHtGnpVju3gJ8HZ07Stwk0=;
-  b=XrxBh89F5efoaqUKFckWHq+4kQ1aFc9XuAfUEvt6r9jAq/0HEHPXwOzt
-   tsAfVpsx1F/raEybyyBIOurjdMojuTbnubI9sFnMNkwMCSxK0aNOQuHV8
-   yoVsiAzGP1KGq2YBvBqf/GTBG6fT9PXxIUZ+ChhqsArl32ZtdCr3FQm2z
-   bEDA2v4GvdVpUqhXy2Wgm4VbN+DByPhq23xTbNW3YIuAqRWXOkGw5v69x
-   A/MS1xAvBM3jpDmevBQ0L769HZ0ZV6RjrPsymoP8zGnDlT6scS87PwZvC
-   XGgrSjmBoGha0eergh2v+lssqtswVEDPNh5zCLsn4gJi2+g9+CakswHnj
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="420887297"
+  bh=Ld6f/xX7p2ZEo7XaTPWc1rWGQxKM5Erhz0oCVevDNM4=;
+  b=D7G5HRbwD9HN1L4uaD50VFod2XYq8kiffqUSM/ov2jUUxm0KKDsmhOeE
+   7Bsv/or3lzAXUswRyNAnW/CV9pjMr8wA0klJx5Wuylac5ssqBMZiH5jOl
+   mMD5ooChGgJKu6Uy8EgOFk9JPP5XMfacDRJf1Fy9PTu0a9W0znZUpfipK
+   InrLu0HKUyHnImClVDLNhiQjinQOLqDEVMbIu9Ynf/BGgzRvJlsI6I/kZ
+   lNXvWEhwRJJAaKIn2TgLr/ZgJ8Dh0tvro6ymZWgQTdnljYIn/4w2gvTQt
+   fy3LcpvpM/1n4eYRHdmFjAhlPY9YcC+ewuDZWZ/glwbpfnD6LSjjnH5I7
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="420887312"
 X-IronPort-AV: E=Sophos;i="5.98,226,1673942400"; 
-   d="scan'208";a="420887297"
+   d="scan'208";a="420887312"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
   by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2023 21:50:52 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="920530970"
+X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="920530973"
 X-IronPort-AV: E=Sophos;i="5.98,226,1673942400"; 
-   d="scan'208";a="920530970"
+   d="scan'208";a="920530973"
 Received: from unknown (HELO fred..) ([172.25.112.68])
   by fmsmga006.fm.intel.com with ESMTP; 01 Mar 2023 21:50:51 -0800
 From:   Xin Li <xin3.li@intel.com>
@@ -44,9 +44,9 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         dave.hansen@linux.intel.com, hpa@zytor.com, peterz@infradead.org,
         andrew.cooper3@citrix.com, seanjc@google.com, pbonzini@redhat.com,
         ravi.v.shankar@intel.com
-Subject: [PATCH v4 29/34] x86/ia32: do not modify the DPL bits for a null selector
-Date:   Wed,  1 Mar 2023 21:25:06 -0800
-Message-Id: <20230302052511.1918-30-xin3.li@intel.com>
+Subject: [PATCH v4 30/34] x86/fred: allow FRED systems to use interrupt vectors 0x10-0x1f
+Date:   Wed,  1 Mar 2023 21:25:07 -0800
+Message-Id: <20230302052511.1918-31-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230302052511.1918-1-xin3.li@intel.com>
 References: <20230302052511.1918-1-xin3.li@intel.com>
@@ -61,67 +61,239 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When a null selector is to be loaded into a segment register,
-reload_segments() sets its DPL bits to 3. Later when the IRET
-instruction loads it, it zeros the segment register. The two
-operations offset each other to actually effect a nop.
+From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
 
-Unlike IRET, ERETU does not make any of DS, ES, FS, or GS null
-if it is found to have DPL < 3. It is expected that a FRED-enabled
-operating system will return to ring 3 (in compatibility mode)
-only when those segments all have DPL = 3.
+FRED inherits the Intel VT-x enhancement of classified events with
+a two-level event dispatch logic. The first-level dispatch is on
+the event type, and the second-level is on the event vector. This
+also means that vectors in different event types are orthogonal,
+thus, vectors 0x10-0x1f become available as hardware interrupts.
 
-Thus when FRED is enabled, we end up with having 3 in a segment
-register even when it is initially set to 0.
+Enable interrupt vectors 0x10-0x1f on FRED systems (interrupt 0x80 is
+already enabled.) Most of these changes are about removing the
+assumption that the lowest-priority vector is hard-wired to 0x20.
 
-Fix it by not modifying the DPL bits for a null selector.
-
+Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
- arch/x86/kernel/signal_32.c | 21 +++++++++++++--------
- 1 file changed, 13 insertions(+), 8 deletions(-)
+ arch/x86/include/asm/idtentry.h    |  4 ++--
+ arch/x86/include/asm/irq.h         |  5 +++++
+ arch/x86/include/asm/irq_vectors.h | 15 +++++++++++----
+ arch/x86/kernel/apic/apic.c        | 11 ++++++++---
+ arch/x86/kernel/apic/vector.c      |  8 +++++++-
+ arch/x86/kernel/fred.c             |  4 ++--
+ arch/x86/kernel/idt.c              |  6 +++---
+ arch/x86/kernel/irq.c              |  2 +-
+ arch/x86/kernel/traps.c            |  2 ++
+ 9 files changed, 41 insertions(+), 16 deletions(-)
 
-diff --git a/arch/x86/kernel/signal_32.c b/arch/x86/kernel/signal_32.c
-index 9027fc088f97..7796cf84fca2 100644
---- a/arch/x86/kernel/signal_32.c
-+++ b/arch/x86/kernel/signal_32.c
-@@ -36,22 +36,27 @@
- #ifdef CONFIG_IA32_EMULATION
- #include <asm/ia32_unistd.h>
+diff --git a/arch/x86/include/asm/idtentry.h b/arch/x86/include/asm/idtentry.h
+index bd43866f9c3e..57c891148b59 100644
+--- a/arch/x86/include/asm/idtentry.h
++++ b/arch/x86/include/asm/idtentry.h
+@@ -546,8 +546,8 @@ __visible noinstr void func(struct pt_regs *regs,			\
+  */
+ 	.align IDT_ALIGN
+ SYM_CODE_START(irq_entries_start)
+-    vector=FIRST_EXTERNAL_VECTOR
+-    .rept NR_EXTERNAL_VECTORS
++    vector=FIRST_EXTERNAL_VECTOR_IDT
++    .rept FIRST_SYSTEM_VECTOR - FIRST_EXTERNAL_VECTOR_IDT
+ 	UNWIND_HINT_IRET_REGS
+ 0 :
+ 	ENDBR
+diff --git a/arch/x86/include/asm/irq.h b/arch/x86/include/asm/irq.h
+index 768aa234cbb4..e4be6f8409ad 100644
+--- a/arch/x86/include/asm/irq.h
++++ b/arch/x86/include/asm/irq.h
+@@ -11,6 +11,11 @@
+ #include <asm/apicdef.h>
+ #include <asm/irq_vectors.h>
  
-+static inline u16 usrseg(u16 sel)
-+{
-+	return sel <= 3 ? sel : sel | 3;
-+}
++/*
++ * The first available IRQ vector
++ */
++extern unsigned int __ro_after_init first_external_vector;
 +
- static inline void reload_segments(struct sigcontext_32 *sc)
+ /*
+  * The irq entry code is in the noinstr section and the start/end of
+  * __irqentry_text is emitted via labels. Make the build fail if
+diff --git a/arch/x86/include/asm/irq_vectors.h b/arch/x86/include/asm/irq_vectors.h
+index 43dcb9284208..cb3670a7c18f 100644
+--- a/arch/x86/include/asm/irq_vectors.h
++++ b/arch/x86/include/asm/irq_vectors.h
+@@ -31,15 +31,23 @@
+ 
+ /*
+  * IDT vectors usable for external interrupt sources start at 0x20.
+- * (0x80 is the syscall vector, 0x30-0x3f are for ISA)
++ * (0x80 is the syscall vector, 0x30-0x3f are for ISA).
++ *
++ * With FRED we can also use 0x10-0x1f even though those overlap
++ * exception vectors as FRED distinguishes exceptions and interrupts.
++ * Therefore, FIRST_EXTERNAL_VECTOR is no longer a constant.
+  */
+-#define FIRST_EXTERNAL_VECTOR		0x20
++#define FIRST_EXTERNAL_VECTOR_IDT	0x20
++#define FIRST_EXTERNAL_VECTOR_FRED	0x10
++#define FIRST_EXTERNAL_VECTOR		first_external_vector
+ 
+ /*
+  * Reserve the lowest usable vector (and hence lowest priority)  0x20 for
+  * triggering cleanup after irq migration. 0x21-0x2f will still be used
+  * for device interrupts.
+  */
++#define IRQ_MOVE_CLEANUP_VECTOR_IDT	FIRST_EXTERNAL_VECTOR_IDT
++#define IRQ_MOVE_CLEANUP_VECTOR_FRED	FIRST_EXTERNAL_VECTOR_FRED
+ #define IRQ_MOVE_CLEANUP_VECTOR		FIRST_EXTERNAL_VECTOR
+ 
+ #define IA32_SYSCALL_VECTOR		0x80
+@@ -48,7 +56,7 @@
+  * Vectors 0x30-0x3f are used for ISA interrupts.
+  *   round up to the next 16-vector boundary
+  */
+-#define ISA_IRQ_VECTOR(irq)		(((FIRST_EXTERNAL_VECTOR + 16) & ~15) + irq)
++#define ISA_IRQ_VECTOR(irq)		(((FIRST_EXTERNAL_VECTOR_IDT + 16) & ~15) + irq)
+ 
+ /*
+  * Special IRQ vectors used by the SMP architecture, 0xf0-0xff
+@@ -114,7 +122,6 @@
+ #define FIRST_SYSTEM_VECTOR		NR_VECTORS
+ #endif
+ 
+-#define NR_EXTERNAL_VECTORS		(FIRST_SYSTEM_VECTOR - FIRST_EXTERNAL_VECTOR)
+ #define NR_SYSTEM_VECTORS		(NR_VECTORS - FIRST_SYSTEM_VECTOR)
+ 
+ /*
+diff --git a/arch/x86/kernel/apic/apic.c b/arch/x86/kernel/apic/apic.c
+index 20d9a604da7c..eef67f64aa81 100644
+--- a/arch/x86/kernel/apic/apic.c
++++ b/arch/x86/kernel/apic/apic.c
+@@ -1621,12 +1621,17 @@ static void setup_local_APIC(void)
+ 	/*
+ 	 * Set Task Priority to 'accept all except vectors 0-31'.  An APIC
+ 	 * vector in the 16-31 range could be delivered if TPR == 0, but we
+-	 * would think it's an exception and terrible things will happen.  We
+-	 * never change this later on.
++	 * would think it's an exception and terrible things will happen,
++	 * unless we are using FRED in which case interrupts and
++	 * exceptions are distinguished by type code.
++	 *
++	 * We never change this later on.
+ 	 */
++	BUG_ON(!first_external_vector);
++
+ 	value = apic_read(APIC_TASKPRI);
+ 	value &= ~APIC_TPRI_MASK;
+-	value |= 0x10;
++	value |= (first_external_vector - 0x10) & APIC_TPRI_MASK;
+ 	apic_write(APIC_TASKPRI, value);
+ 
+ 	/* Clear eventually stale ISR/IRR bits */
+diff --git a/arch/x86/kernel/apic/vector.c b/arch/x86/kernel/apic/vector.c
+index c1efebd27e6c..f4325445fd78 100644
+--- a/arch/x86/kernel/apic/vector.c
++++ b/arch/x86/kernel/apic/vector.c
+@@ -46,6 +46,7 @@ static struct irq_matrix *vector_matrix;
+ #ifdef CONFIG_SMP
+ static DEFINE_PER_CPU(struct hlist_head, cleanup_list);
+ #endif
++unsigned int first_external_vector = FIRST_EXTERNAL_VECTOR_IDT;
+ 
+ void lock_vector_lock(void)
  {
- 	unsigned int cur;
+@@ -796,7 +797,12 @@ int __init arch_early_irq_init(void)
+ 	 * Allocate the vector matrix allocator data structure and limit the
+ 	 * search area.
+ 	 */
+-	vector_matrix = irq_alloc_matrix(NR_VECTORS, FIRST_EXTERNAL_VECTOR,
++	if (cpu_feature_enabled(X86_FEATURE_FRED))
++		first_external_vector = FIRST_EXTERNAL_VECTOR_FRED;
++	else
++		first_external_vector = FIRST_EXTERNAL_VECTOR_IDT;
++
++	vector_matrix = irq_alloc_matrix(NR_VECTORS, first_external_vector,
+ 					 FIRST_SYSTEM_VECTOR);
+ 	BUG_ON(!vector_matrix);
  
- 	savesegment(gs, cur);
--	if ((sc->gs | 0x03) != cur)
--		load_gs_index(sc->gs | 0x03);
-+	if (usrseg(sc->gs) != cur)
-+		load_gs_index(usrseg(sc->gs));
- 	savesegment(fs, cur);
--	if ((sc->fs | 0x03) != cur)
--		loadsegment(fs, sc->fs | 0x03);
-+	if (usrseg(sc->fs) != cur)
-+		loadsegment(fs, usrseg(sc->fs));
- 	savesegment(ds, cur);
--	if ((sc->ds | 0x03) != cur)
--		loadsegment(ds, sc->ds | 0x03);
-+	if (usrseg(sc->ds) != cur)
-+		loadsegment(ds, usrseg(sc->ds));
- 	savesegment(es, cur);
--	if ((sc->es | 0x03) != cur)
--		loadsegment(es, sc->es | 0x03);
-+	if (usrseg(sc->es) != cur)
-+		loadsegment(es, usrseg(sc->es));
+diff --git a/arch/x86/kernel/fred.c b/arch/x86/kernel/fred.c
+index 827b58fd98d4..04f057219c6e 100644
+--- a/arch/x86/kernel/fred.c
++++ b/arch/x86/kernel/fred.c
+@@ -51,7 +51,7 @@ void __init fred_setup_apic(void)
+ {
+ 	int i;
+ 
+-	for (i = 0; i < FIRST_EXTERNAL_VECTOR; i++)
++	for (i = 0; i < FIRST_EXTERNAL_VECTOR_FRED; i++)
+ 		set_bit(i, system_vectors);
+ 
+ 	/*
+@@ -60,7 +60,7 @@ void __init fred_setup_apic(void)
+ 	 * /proc/interrupts.
+ 	 */
+ #ifdef CONFIG_SMP
+-	set_bit(IRQ_MOVE_CLEANUP_VECTOR, system_vectors);
++	set_bit(IRQ_MOVE_CLEANUP_VECTOR_FRED, system_vectors);
+ #endif
+ 
+ 	for (i = 0; i < NR_SYSTEM_VECTORS; i++) {
+diff --git a/arch/x86/kernel/idt.c b/arch/x86/kernel/idt.c
+index a58c6bc1cd68..d3fd86f85de9 100644
+--- a/arch/x86/kernel/idt.c
++++ b/arch/x86/kernel/idt.c
+@@ -131,7 +131,7 @@ static const __initconst struct idt_data apic_idts[] = {
+ 	INTG(RESCHEDULE_VECTOR,			asm_sysvec_reschedule_ipi),
+ 	INTG(CALL_FUNCTION_VECTOR,		asm_sysvec_call_function),
+ 	INTG(CALL_FUNCTION_SINGLE_VECTOR,	asm_sysvec_call_function_single),
+-	INTG(IRQ_MOVE_CLEANUP_VECTOR,		asm_sysvec_irq_move_cleanup),
++	INTG(IRQ_MOVE_CLEANUP_VECTOR_IDT,	asm_sysvec_irq_move_cleanup),
+ 	INTG(REBOOT_VECTOR,			asm_sysvec_reboot),
+ #endif
+ 
+@@ -274,13 +274,13 @@ static void __init idt_map_in_cea(void)
+  */
+ void __init idt_setup_apic_and_irq_gates(void)
+ {
+-	int i = FIRST_EXTERNAL_VECTOR;
++	int i = FIRST_EXTERNAL_VECTOR_IDT;
+ 	void *entry;
+ 
+ 	idt_setup_from_table(idt_table, apic_idts, ARRAY_SIZE(apic_idts), true);
+ 
+ 	for_each_clear_bit_from(i, system_vectors, FIRST_SYSTEM_VECTOR) {
+-		entry = irq_entries_start + IDT_ALIGN * (i - FIRST_EXTERNAL_VECTOR);
++		entry = irq_entries_start + IDT_ALIGN * (i - FIRST_EXTERNAL_VECTOR_IDT);
+ 		set_intr_gate(i, entry);
+ 	}
+ 
+diff --git a/arch/x86/kernel/irq.c b/arch/x86/kernel/irq.c
+index 7e125fff45ab..b7511e02959c 100644
+--- a/arch/x86/kernel/irq.c
++++ b/arch/x86/kernel/irq.c
+@@ -359,7 +359,7 @@ void fixup_irqs(void)
+ 	 * vector_lock because the cpu is already marked !online, so
+ 	 * nothing else will touch it.
+ 	 */
+-	for (vector = FIRST_EXTERNAL_VECTOR; vector < NR_VECTORS; vector++) {
++	for (vector = first_external_vector; vector < NR_VECTORS; vector++) {
+ 		if (IS_ERR_OR_NULL(__this_cpu_read(vector_irq[vector])))
+ 			continue;
+ 
+diff --git a/arch/x86/kernel/traps.c b/arch/x86/kernel/traps.c
+index c7253b4901f0..c46eba091728 100644
+--- a/arch/x86/kernel/traps.c
++++ b/arch/x86/kernel/traps.c
+@@ -1544,6 +1544,8 @@ DEFINE_IDTENTRY_IRQ(spurious_interrupt)
+ 	pr_info("Spurious interrupt (vector 0x%x) on CPU#%d, should never happen.\n",
+ 		vector, smp_processor_id());
  }
++
++unsigned int first_external_vector = FIRST_EXTERNAL_VECTOR_IDT;
+ #endif
  
- #define sigset32_t			compat_sigset_t
+ /*
 -- 
 2.34.1
 
