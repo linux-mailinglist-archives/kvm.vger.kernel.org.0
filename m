@@ -2,93 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C113C6A7E3A
-	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 10:43:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 439FE6A7E2E
+	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 10:43:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230040AbjCBJn4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Mar 2023 04:43:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48954 "EHLO
+        id S230071AbjCBJnI convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 2 Mar 2023 04:43:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229976AbjCBJnx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Mar 2023 04:43:53 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D22501ABC8
-        for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 01:43:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677750184;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=d89OVXlxjMSQtumMo8iJ9aTVkJfH2plqezFb7xBWsgk=;
-        b=eqn+G+P+Qt33gWo+dBLIfPRw78+VyfFV1EWhmB7V33XO1dbE5jd3Z0L0mBWkTY/eGy0Yee
-        8pGUXhSbGsqc3D0OVIatdX/M10oA/B3mf6vXB4rKpbvej9UrRNVTjdVYLXKCgLnVh1FsNd
-        zZa/JNC3cAJoF3Oa1pJQ6ZJFBxbHXBo=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-540-hUXw3iwwNcKimSHibIBqrA-1; Thu, 02 Mar 2023 04:43:02 -0500
-X-MC-Unique: hUXw3iwwNcKimSHibIBqrA-1
-Received: by mail-wr1-f72.google.com with SMTP id u5-20020a5d6da5000000b002cd82373455so1970031wrs.9
-        for <kvm@vger.kernel.org>; Thu, 02 Mar 2023 01:43:01 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677750180;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d89OVXlxjMSQtumMo8iJ9aTVkJfH2plqezFb7xBWsgk=;
-        b=0yCqmgkhUY9jRqj3uBRaen5aNvaIQl3MxgFkR+V2fPJHFz3uExx/P3Wdvc/ystJyha
-         nviFqs+rwOz0Uyj4+a4ZDRgu20yyzzfk+m7YTvI/qLQnTktt7lVMCUtXz7UHbdQV36cD
-         9H/SBzm6LcnDRI+NYD7oujuBl3N2wsPlbOHcCd5qUxGAUX+wRQiZkAaTdL1DxdX8Hots
-         z05oCLBYGajXFSBiCZqSUpslYvkrWu6LguWKrvrp/vhQaT7mRI/Edmp+OgVVQJ6jnUvn
-         4bJy/h9udaeisTeLOhMlgPoAAlav0ahYaP+r1/AFiRrVkULXWNE4PrNdIpep7MUhYQDS
-         sJaQ==
-X-Gm-Message-State: AO0yUKWXtQ/RIsN0bVeW18QEoVJ9Pfq5tddFHbCjv8OFJ+DULDsR64pr
-        CH2aEu3anKl/JXxKN0utmW1TVeBiaBnkCB6V2aEYcUDXosFeqMetAE42jyrokvgH8wl1KGtRFyx
-        280cjfUPdLkIJ
-X-Received: by 2002:a05:6000:109:b0:2c7:832:8ccf with SMTP id o9-20020a056000010900b002c708328ccfmr6829231wrx.53.1677750180704;
-        Thu, 02 Mar 2023 01:43:00 -0800 (PST)
-X-Google-Smtp-Source: AK7set9nk5hBKDN8uFgpRMSqC2bK9CM1B9gpcwEU3K7OKO3TTS1sST4u6uiJc3UO9g93rBdogImeAQ==
-X-Received: by 2002:a05:6000:109:b0:2c7:832:8ccf with SMTP id o9-20020a056000010900b002c708328ccfmr6829215wrx.53.1677750180357;
-        Thu, 02 Mar 2023 01:43:00 -0800 (PST)
-Received: from sgarzare-redhat (c-115-213.cust-q.wadsl.it. [212.43.115.213])
-        by smtp.gmail.com with ESMTPSA id o8-20020a5d4a88000000b002c70c99db74sm14580816wrq.86.2023.03.02.01.42.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Mar 2023 01:42:59 -0800 (PST)
-Date:   Thu, 2 Mar 2023 10:42:52 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Bobby Eshleman <bobby.eshleman@bytedance.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        KP Singh <kpsingh@kernel.org>,
-        Stanislav Fomichev <sdf@google.com>,
-        Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-        Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Cong Wang <cong.wang@bytedance.com>
-Subject: Re: [PATCH net-next v3 1/3] vsock: support sockmap
-Message-ID: <20230302094252.r3qnhdhlbpp7unna@sgarzare-redhat>
-References: <20230227-vsock-sockmap-upstream-v3-0-7e7f4ce623ee@bytedance.com>
- <20230227-vsock-sockmap-upstream-v3-1-7e7f4ce623ee@bytedance.com>
+        with ESMTP id S230052AbjCBJnG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Mar 2023 04:43:06 -0500
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAF319EE6;
+        Thu,  2 Mar 2023 01:43:03 -0800 (PST)
+Received: from lhrpeml100002.china.huawei.com (unknown [172.18.147.207])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4PS5kJ48fpz689Rs;
+        Thu,  2 Mar 2023 17:42:48 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
+ lhrpeml100002.china.huawei.com (7.191.160.241) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Thu, 2 Mar 2023 09:43:00 +0000
+Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
+ lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.021;
+ Thu, 2 Mar 2023 09:43:00 +0000
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Nicolin Chen <nicolinc@nvidia.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>
+CC:     "Liu, Yi L" <yi.l.liu@intel.com>, Jason Gunthorpe <jgg@nvidia.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>
+Subject: RE: [PATCH v5 00/19] Add vfio_device cdev for iommufd support
+Thread-Topic: [PATCH v5 00/19] Add vfio_device cdev for iommufd support
+Thread-Index: AQHZSpxHUh/YYv3qukeFp+lKFtoCf67jLB2AgACBDoCAAOlEAIAAn5IAgAIKi/A=
+Date:   Thu, 2 Mar 2023 09:43:00 +0000
+Message-ID: <b7c1f9d5b4b647f0b0686c3b99f3d006@huawei.com>
+References: <20230227111135.61728-1-yi.l.liu@intel.com>
+ <Y/0Cr/tcNCzzIAhi@nvidia.com>
+ <DS0PR11MB7529A422D4361B39CCA3D248C3AC9@DS0PR11MB7529.namprd11.prod.outlook.com>
+ <SA1PR11MB5873479F73CFBAA170717624F0AC9@SA1PR11MB5873.namprd11.prod.outlook.com>
+ <Y/64ejbhMiV77uUA@Asurada-Nvidia>
+In-Reply-To: <Y/64ejbhMiV77uUA@Asurada-Nvidia>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.202.227.178]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20230227-vsock-sockmap-upstream-v3-1-7e7f4ce623ee@bytedance.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -96,368 +77,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 28, 2023 at 07:04:34PM +0000, Bobby Eshleman wrote:
->This patch adds sockmap support for vsock sockets. It is intended to be
->usable by all transports, but only the virtio transport is implemented.
->
->Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
->---
-> drivers/vhost/vsock.c                   |   1 +
-> include/linux/virtio_vsock.h            |   1 +
-> include/net/af_vsock.h                  |  17 ++++
-> net/vmw_vsock/Makefile                  |   1 +
-> net/vmw_vsock/af_vsock.c                |  55 ++++++++--
-> net/vmw_vsock/virtio_transport.c        |   2 +
-> net/vmw_vsock/virtio_transport_common.c |  25 +++++
-> net/vmw_vsock/vsock_bpf.c               | 174 ++++++++++++++++++++++++++++++++
-> net/vmw_vsock/vsock_loopback.c          |   2 +
-> 9 files changed, 272 insertions(+), 6 deletions(-)
->
->diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
->index 1f3b89c885cc..3c6dc036b904 100644
->--- a/drivers/vhost/vsock.c
->+++ b/drivers/vhost/vsock.c
->@@ -439,6 +439,7 @@ static struct virtio_transport vhost_transport = {
-> 		.notify_send_post_enqueue = virtio_transport_notify_send_post_enqueue,
-> 		.notify_buffer_size       = virtio_transport_notify_buffer_size,
->
->+		.read_skb = virtio_transport_read_skb,
-> 	},
->
-> 	.send_pkt = vhost_transport_send_pkt,
->diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
->index 3f9c16611306..c58453699ee9 100644
->--- a/include/linux/virtio_vsock.h
->+++ b/include/linux/virtio_vsock.h
->@@ -245,4 +245,5 @@ u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 wanted);
-> void virtio_transport_put_credit(struct virtio_vsock_sock *vvs, u32 credit);
-> void virtio_transport_deliver_tap_pkt(struct sk_buff *skb);
-> int virtio_transport_purge_skbs(void *vsk, struct sk_buff_head *list);
->+int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t read_actor);
-> #endif /* _LINUX_VIRTIO_VSOCK_H */
->diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
->index 568a87c5e0d0..a73f5fbd296a 100644
->--- a/include/net/af_vsock.h
->+++ b/include/net/af_vsock.h
->@@ -75,6 +75,7 @@ struct vsock_sock {
-> 	void *trans;
-> };
->
->+s64 vsock_connectible_has_data(struct vsock_sock *vsk);
-> s64 vsock_stream_has_data(struct vsock_sock *vsk);
-> s64 vsock_stream_has_space(struct vsock_sock *vsk);
-> struct sock *vsock_create_connected(struct sock *parent);
->@@ -173,6 +174,9 @@ struct vsock_transport {
->
-> 	/* Addressing. */
-> 	u32 (*get_local_cid)(void);
->+
->+	/* Read a single skb */
->+	int (*read_skb)(struct vsock_sock *, skb_read_actor_t);
-> };
->
-> /**** CORE ****/
->@@ -225,5 +229,18 @@ int vsock_init_tap(void);
-> int vsock_add_tap(struct vsock_tap *vt);
-> int vsock_remove_tap(struct vsock_tap *vt);
-> void vsock_deliver_tap(struct sk_buff *build_skb(void *opaque), void *opaque);
->+int vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
->+			      int flags);
->+int vsock_dgram_recvmsg(struct socket *sock, struct msghdr *msg,
->+			       size_t len, int flags);
 
-Just because you have to resend a v4, here we can align as `checkpatch
---strict` suggests:
+> -----Original Message-----
+> From: Nicolin Chen [mailto:nicolinc@nvidia.com]
+> Sent: 01 March 2023 02:29
+> To: Xu, Terrence <terrence.xu@intel.com>
+> Cc: Liu, Yi L <yi.l.liu@intel.com>; Jason Gunthorpe <jgg@nvidia.com>;
+> alex.williamson@redhat.com; Tian, Kevin <kevin.tian@intel.com>;
+> joro@8bytes.org; robin.murphy@arm.com; cohuck@redhat.com;
+> eric.auger@redhat.com; kvm@vger.kernel.org; mjrosato@linux.ibm.com;
+> chao.p.peng@linux.intel.com; yi.y.sun@linux.intel.com; peterx@redhat.com;
+> jasowang@redhat.com; Shameerali Kolothum Thodi
+> <shameerali.kolothum.thodi@huawei.com>; lulu@redhat.com;
+> suravee.suthikulpanit@amd.com; intel-gvt-dev@lists.freedesktop.org;
+> intel-gfx@lists.freedesktop.org; linux-s390@vger.kernel.org; Hao, Xudong
+> <xudong.hao@intel.com>; Zhao, Yan Y <yan.y.zhao@intel.com>
+> Subject: Re: [PATCH v5 00/19] Add vfio_device cdev for iommufd support
+> 
+> On Tue, Feb 28, 2023 at 04:58:06PM +0000, Xu, Terrence wrote:
+> 
+> > Verified this series by "Intel GVT-g GPU device mediated passthrough" and
+> "Intel GVT-d GPU device direct passthrough" technologies.
+> > Both passed VFIO legacy mode / compat mode / cdev mode, including
+> negative tests.
+> >
+> > Tested-by: Terrence Xu <terrence.xu@intel.com>
+> 
+> Sanity-tested this series on ARM64 with my wip branch:
+> https://github.com/nicolinc/iommufd/commits/wip/iommufd-v6.2-nesting
+> (Covering new iommufd and vfio-compat)
 
-CHECK: Alignment should match open parenthesis
-#63: FILE: include/net/af_vsock.h:235:
-+int vsock_dgram_recvmsg(struct socket *sock, struct msghdr *msg,
-+			      size_t len, int flags);
+Hi Nicolin,
 
->+
->+#ifdef CONFIG_BPF_SYSCALL
->+extern struct proto vsock_proto;
->+int vsock_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool restore);
->+void __init vsock_bpf_build_proto(void);
->+#else
->+static inline void __init vsock_bpf_build_proto(void)
->+{}
->+#endif
->
-> #endif /* __AF_VSOCK_H__ */
->diff --git a/net/vmw_vsock/Makefile b/net/vmw_vsock/Makefile
->index 6a943ec95c4a..5da74c4a9f1d 100644
->--- a/net/vmw_vsock/Makefile
->+++ b/net/vmw_vsock/Makefile
->@@ -8,6 +8,7 @@ obj-$(CONFIG_HYPERV_VSOCKETS) += hv_sock.o
-> obj-$(CONFIG_VSOCKETS_LOOPBACK) += vsock_loopback.o
->
-> vsock-y += af_vsock.o af_vsock_tap.o vsock_addr.o
->+vsock-$(CONFIG_BPF_SYSCALL) += vsock_bpf.o
->
-> vsock_diag-y += diag.o
->
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index 19aea7cba26e..f2cc04fb8b13 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -116,10 +116,13 @@ static void vsock_sk_destruct(struct sock *sk);
-> static int vsock_queue_rcv_skb(struct sock *sk, struct sk_buff *skb);
->
-> /* Protocol family. */
->-static struct proto vsock_proto = {
->+struct proto vsock_proto = {
-> 	.name = "AF_VSOCK",
-> 	.owner = THIS_MODULE,
-> 	.obj_size = sizeof(struct vsock_sock),
->+#ifdef CONFIG_BPF_SYSCALL
->+	.psock_update_sk_prot = vsock_bpf_update_proto,
->+#endif
-> };
->
-> /* The default peer timeout indicates how long we will wait for a peer response
->@@ -865,7 +868,7 @@ s64 vsock_stream_has_data(struct vsock_sock *vsk)
-> }
-> EXPORT_SYMBOL_GPL(vsock_stream_has_data);
->
->-static s64 vsock_connectible_has_data(struct vsock_sock *vsk)
->+s64 vsock_connectible_has_data(struct vsock_sock *vsk)
-> {
-> 	struct sock *sk = sk_vsock(vsk);
->
->@@ -874,6 +877,7 @@ static s64 vsock_connectible_has_data(struct vsock_sock *vsk)
-> 	else
-> 		return vsock_stream_has_data(vsk);
-> }
->+EXPORT_SYMBOL_GPL(vsock_connectible_has_data);
->
-> s64 vsock_stream_has_space(struct vsock_sock *vsk)
-> {
->@@ -1131,6 +1135,13 @@ static __poll_t vsock_poll(struct file *file, struct socket *sock,
-> 	return mask;
-> }
->
->+static int vsock_read_skb(struct sock *sk, skb_read_actor_t read_actor)
->+{
->+	struct vsock_sock *vsk = vsock_sk(sk);
->+
->+	return vsk->transport->read_skb(vsk, read_actor);
->+}
->+
-> static int vsock_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
-> 			       size_t len)
-> {
->@@ -1241,19 +1252,34 @@ static int vsock_dgram_connect(struct socket *sock,
->
-> 	memcpy(&vsk->remote_addr, remote_addr, sizeof(vsk->remote_addr));
-> 	sock->state = SS_CONNECTED;
->+	sk->sk_state = TCP_ESTABLISHED;
->
-> out:
-> 	release_sock(sk);
-> 	return err;
-> }
->
->-static int vsock_dgram_recvmsg(struct socket *sock, struct msghdr *msg,
->-			       size_t len, int flags)
->+int vsock_dgram_recvmsg(struct socket *sock, struct msghdr *msg,
->+			size_t len, int flags)
-> {
->-	struct vsock_sock *vsk = vsock_sk(sock->sk);
->+#ifdef CONFIG_BPF_SYSCALL
->+	const struct proto *prot;
->+#endif
->+	struct vsock_sock *vsk;
->+	struct sock *sk;
->+
->+	sk = sock->sk;
->+	vsk = vsock_sk(sk);
->+
->+#ifdef CONFIG_BPF_SYSCALL
->+	prot = READ_ONCE(sk->sk_prot);
->+	if (prot != &vsock_proto)
->+		return prot->recvmsg(sk, msg, len, flags, NULL);
->+#endif
->
-> 	return vsk->transport->dgram_dequeue(vsk, msg, len, flags);
-> }
->+EXPORT_SYMBOL_GPL(vsock_dgram_recvmsg);
->
-> static const struct proto_ops vsock_dgram_ops = {
-> 	.family = PF_VSOCK,
->@@ -1272,6 +1298,7 @@ static const struct proto_ops vsock_dgram_ops = {
-> 	.recvmsg = vsock_dgram_recvmsg,
-> 	.mmap = sock_no_mmap,
-> 	.sendpage = sock_no_sendpage,
->+	.read_skb = vsock_read_skb,
-> };
->
-> static int vsock_transport_cancel_pkt(struct vsock_sock *vsk)
->@@ -2086,13 +2113,16 @@ static int __vsock_seqpacket_recvmsg(struct sock *sk, struct msghdr *msg,
-> 	return err;
-> }
->
->-static int
->+int
-> vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
-> 			  int flags)
-> {
-> 	struct sock *sk;
-> 	struct vsock_sock *vsk;
-> 	const struct vsock_transport *transport;
->+#ifdef CONFIG_BPF_SYSCALL
->+	const struct proto *prot;
->+#endif
-> 	int err;
->
-> 	sk = sock->sk;
->@@ -2139,6 +2169,14 @@ vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
-> 		goto out;
-> 	}
->
->+#ifdef CONFIG_BPF_SYSCALL
->+	prot = READ_ONCE(sk->sk_prot);
->+	if (prot != &vsock_proto) {
->+		release_sock(sk);
->+		return prot->recvmsg(sk, msg, len, flags, NULL);
->+	}
->+#endif
->+
-> 	if (sk->sk_type == SOCK_STREAM)
-> 		err = __vsock_stream_recvmsg(sk, msg, len, flags);
-> 	else
->@@ -2148,6 +2186,7 @@ vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
-> 	release_sock(sk);
-> 	return err;
-> }
->+EXPORT_SYMBOL_GPL(vsock_connectible_recvmsg);
->
-> static int vsock_set_rcvlowat(struct sock *sk, int val)
-> {
->@@ -2188,6 +2227,7 @@ static const struct proto_ops vsock_stream_ops = {
-> 	.mmap = sock_no_mmap,
-> 	.sendpage = sock_no_sendpage,
-> 	.set_rcvlowat = vsock_set_rcvlowat,
->+	.read_skb = vsock_read_skb,
-> };
->
-> static const struct proto_ops vsock_seqpacket_ops = {
->@@ -2209,6 +2249,7 @@ static const struct proto_ops vsock_seqpacket_ops = {
-> 	.recvmsg = vsock_connectible_recvmsg,
-> 	.mmap = sock_no_mmap,
-> 	.sendpage = sock_no_sendpage,
->+	.read_skb = vsock_read_skb,
-> };
->
-> static int vsock_create(struct net *net, struct socket *sock,
->@@ -2348,6 +2389,8 @@ static int __init vsock_init(void)
-> 		goto err_unregister_proto;
-> 	}
->
->+	vsock_bpf_build_proto();
->+
-> 	return 0;
->
-> err_unregister_proto:
->diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->index 28b5a8e8e094..e95df847176b 100644
->--- a/net/vmw_vsock/virtio_transport.c
->+++ b/net/vmw_vsock/virtio_transport.c
->@@ -457,6 +457,8 @@ static struct virtio_transport virtio_transport = {
-> 		.notify_send_pre_enqueue  = virtio_transport_notify_send_pre_enqueue,
-> 		.notify_send_post_enqueue = virtio_transport_notify_send_post_enqueue,
-> 		.notify_buffer_size       = virtio_transport_notify_buffer_size,
->+
->+		.read_skb = virtio_transport_read_skb,
-> 	},
->
-> 	.send_pkt = virtio_transport_send_pkt,
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index a1581c77cf84..f64527f32385 100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -1388,6 +1388,31 @@ int virtio_transport_purge_skbs(void *vsk, struct sk_buff_head *queue)
-> }
-> EXPORT_SYMBOL_GPL(virtio_transport_purge_skbs);
->
->+int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t recv_actor)
->+{
->+	struct virtio_vsock_sock *vvs = vsk->trans;
->+	struct sock *sk = sk_vsock(vsk);
->+	struct sk_buff *skb;
->+	int off = 0;
->+	int copied;
->+	int err;
->+
->+	spin_lock_bh(&vvs->rx_lock);
->+	/* Use __skb_recv_datagram() for race-free handling of the receive. It
->+	 * works for types other than dgrams.
->+	 */
->+	skb = __skb_recv_datagram(sk, &vvs->rx_queue, MSG_DONTWAIT, &off, &err);
->+	spin_unlock_bh(&vvs->rx_lock);
->+
->+	if (!skb)
->+		return err;
->+
->+	copied = recv_actor(sk, skb);
->+	kfree_skb(skb);
->+	return copied;
->+}
->+EXPORT_SYMBOL_GPL(virtio_transport_read_skb);
->+
-> MODULE_LICENSE("GPL v2");
-> MODULE_AUTHOR("Asias He");
-> MODULE_DESCRIPTION("common code for virtio vsock");
->diff --git a/net/vmw_vsock/vsock_bpf.c b/net/vmw_vsock/vsock_bpf.c
->new file mode 100644
->index 000000000000..9c71c163c684
->--- /dev/null
->+++ b/net/vmw_vsock/vsock_bpf.c
->@@ -0,0 +1,174 @@
->+// SPDX-License-Identifier: GPL-2.0
->+/* Copyright (c) 2022 Bobby Eshleman <bobby.eshleman@bytedance.com>
->+ *
->+ * Based off of net/unix/unix_bpf.c
->+ */
->+
->+#include <linux/bpf.h>
->+#include <linux/module.h>
->+#include <linux/skmsg.h>
->+#include <linux/socket.h>
->+#include <linux/wait.h>
->+#include <net/af_vsock.h>
->+#include <net/sock.h>
->+
->+#define vsock_sk_has_data(__sk, __psock)				\
->+		({	!skb_queue_empty(&(__sk)->sk_receive_queue) ||	\
->+			!skb_queue_empty(&(__psock)->ingress_skb) ||	\
->+			!list_empty(&(__psock)->ingress_msg);		\
->+		})
->+
->+static struct proto *vsock_prot_saved __read_mostly;
->+static DEFINE_SPINLOCK(vsock_prot_lock);
->+static struct proto vsock_bpf_prot;
->+
->+static bool vsock_has_data(struct sock *sk, struct sk_psock *psock)
->+{
->+	struct vsock_sock *vsk = vsock_sk(sk);
->+	s64 ret;
->+
->+	ret = vsock_connectible_has_data(vsk);
->+	if (ret > 0)
->+		return true;
->+
->+	return vsock_sk_has_data(sk, psock);
->+}
->+
->+static bool vsock_msg_wait_data(struct sock *sk, struct sk_psock *psock, long timeo)
->+{
->+	int ret;
+Thanks for the latest ARM64 branch. Do you have a working Qemu branch corresponding to the
+above one?
 
-`ret` can be bool now.
+I tried the https://github.com/nicolinc/qemu/tree/wip/iommufd_rfcv3%2Bnesting%2Bsmmuv3
+but for some reason not able to launch the Guest.
 
-The rest LGTM.
+Please let me know.
 
 Thanks,
-Stefano
-
+Shameer
