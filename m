@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 50B0A6A7B1F
-	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 06:53:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 06D396A7B1E
+	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 06:53:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230234AbjCBFxX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Mar 2023 00:53:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46842 "EHLO
+        id S230217AbjCBFxW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Mar 2023 00:53:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230093AbjCBFwu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Mar 2023 00:52:50 -0500
+        with ESMTP id S230142AbjCBFwt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Mar 2023 00:52:49 -0500
 Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40FE54ECCF;
-        Wed,  1 Mar 2023 21:51:43 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D7BA5678B;
+        Wed,  1 Mar 2023 21:51:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677736303; x=1709272303;
+  t=1677736302; x=1709272302;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=drfdD72JCLwJTt7+cCB8NZK4k9Ahl+N6L18C1+Wvw8g=;
-  b=Qj3sL9EngmGSQ9M5/NiZ4s5IsUiGdOMLa/D0AeebXWzpcz/HJiIkPj0r
-   6i9CFxCdv6IjYRL8l0PTTvR40W+btQREN0t57mHP2Iy1ZEXLuOv69DKG7
-   vR+RiUUzIwtB9lKIkr2lsyn3+NN5sbWKwNgTLBsB2YvyjCHF0OQQT3J91
-   q4/I+4FKtTSxFWt9onoOxwJ/GjMFnF9XXnrnJj+kXAt7lmHTuONlQXvab
-   ASoJ8bu/aSNGYakm9g933m1VIlF4eL2aS+48inv0Ii0JaM3JMQwpKuASQ
-   +R2iiQetsK1gK1YuMjUnl+QpqV/Id72hjSveQCpElM+IBrvfOLvC+d2ZM
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="420887326"
+  bh=nd37h2vxkhLXg5jhh870M6BiFI8TxVn0dDXlR1ukIGo=;
+  b=nswFl751pmmLDFyP37e7gHeibQgkZqHHeplFyVdpc8IzvD5JgDaDPUEf
+   Pk5JBq47p8Z+OPAdgLQ+vwuJ2Y61jmBwDlqQt5Pz2t4ft+9Sv5A+hRPZe
+   l6vNsNq/mqb0EGS/xU9T3Tip9a6BiejlNwIx6DqlP+zfOGa8hGH4n9MGo
+   ldkv4Qgaqs56/O04gRJjR0rUX8ykBzRz1qsXEU62UujgqyA/XdxH5IlZ9
+   eq5sdiec2qscph1OZ0h8+e0SZq7yIkzvaSU2JVdpRAQniNsGiqD1BoOi6
+   0Z4vvYtfG91rRYzrUEmXJSgRMLTo9b6ZHLmTHCRYCSZQkiSe+GUAvZuhA
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="420887327"
 X-IronPort-AV: E=Sophos;i="5.98,226,1673942400"; 
-   d="scan'208";a="420887326"
+   d="scan'208";a="420887327"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
   by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2023 21:50:52 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="920530976"
+X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="920530980"
 X-IronPort-AV: E=Sophos;i="5.98,226,1673942400"; 
-   d="scan'208";a="920530976"
+   d="scan'208";a="920530980"
 Received: from unknown (HELO fred..) ([172.25.112.68])
-  by fmsmga006.fm.intel.com with ESMTP; 01 Mar 2023 21:50:51 -0800
+  by fmsmga006.fm.intel.com with ESMTP; 01 Mar 2023 21:50:52 -0800
 From:   Xin Li <xin3.li@intel.com>
 To:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org
 Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         dave.hansen@linux.intel.com, hpa@zytor.com, peterz@infradead.org,
         andrew.cooper3@citrix.com, seanjc@google.com, pbonzini@redhat.com,
         ravi.v.shankar@intel.com
-Subject: [PATCH v4 31/34] x86/fred: allow dynamic stack frame size
-Date:   Wed,  1 Mar 2023 21:25:08 -0800
-Message-Id: <20230302052511.1918-32-xin3.li@intel.com>
+Subject: [PATCH v4 32/34] x86/fred: disable FRED by default in its early stage
+Date:   Wed,  1 Mar 2023 21:25:09 -0800
+Message-Id: <20230302052511.1918-33-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230302052511.1918-1-xin3.li@intel.com>
 References: <20230302052511.1918-1-xin3.li@intel.com>
@@ -61,248 +61,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A FRED stack frame could contain different amount of information for
-different event types, or perhaps even for different instances of the
-same event type. Thus we need to eliminate the need of any advance
-information of the stack frame size to allow dynamic stack frame size.
+Disable FRED by default in its early stage.
 
-Implement it through:
-  1) add a new field user_pt_regs to thread_info, and initialize it
-     with a pointer to a virtual pt_regs structure at the top of a
-     thread stack.
-  2) save a pointer to the user-space pt_regs structure created by
-     fred_entrypoint_user() to user_pt_regs in fred_entry_from_user().
-  3) initialize the init_thread_info's user_pt_regs with a pointer to
-     a virtual pt_regs structure at the top of init stack.
+To enable FRED, a new kernel command line option "fred" needs to be added.
 
-This approach also works for IDT, thus we unify the code.
-
-Suggested-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
- arch/x86/entry/entry_32.S           |  2 +-
- arch/x86/entry/entry_fred.c         |  2 ++
- arch/x86/include/asm/entry-common.h |  3 +++
- arch/x86/include/asm/processor.h    | 12 +++------
- arch/x86/include/asm/switch_to.h    |  3 +--
- arch/x86/include/asm/thread_info.h  | 41 ++++-------------------------
- arch/x86/kernel/head_32.S           |  3 +--
- arch/x86/kernel/process.c           |  5 ++++
- kernel/fork.c                       |  6 +++++
- 9 files changed, 27 insertions(+), 50 deletions(-)
+ Documentation/admin-guide/kernel-parameters.txt | 4 ++++
+ arch/x86/kernel/cpu/common.c                    | 3 +++
+ 2 files changed, 7 insertions(+)
 
-diff --git a/arch/x86/entry/entry_32.S b/arch/x86/entry/entry_32.S
-index 91397f58ac30..5adc4cf33d92 100644
---- a/arch/x86/entry/entry_32.S
-+++ b/arch/x86/entry/entry_32.S
-@@ -1244,7 +1244,7 @@ SYM_CODE_START(rewind_stack_and_make_dead)
- 	xorl	%ebp, %ebp
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index 6221a1d057dd..c55ea60e1a0c 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -1498,6 +1498,10 @@
+ 			Warning: use of this parameter will taint the kernel
+ 			and may cause unknown problems.
  
- 	movl	PER_CPU_VAR(pcpu_hot + X86_top_of_stack), %esi
--	leal	-TOP_OF_KERNEL_STACK_PADDING-PTREGS_SIZE(%esi), %esp
-+	leal	-PTREGS_SIZE(%esi), %esp
- 
- 	call	make_task_dead
- 1:	jmp 1b
-diff --git a/arch/x86/entry/entry_fred.c b/arch/x86/entry/entry_fred.c
-index 8d3e144670d6..a72167c83923 100644
---- a/arch/x86/entry/entry_fred.c
-+++ b/arch/x86/entry/entry_fred.c
-@@ -178,6 +178,8 @@ __visible noinstr void fred_entry_from_user(struct pt_regs *regs)
- 		[EVENT_TYPE_OTHER]	= fred_syscall_slow
- 	};
- 
-+	current->thread_info.user_pt_regs = regs;
++	fred
++			Forcefully enable flexible return and event delivery,
++			which is otherwise disabled by default.
 +
- 	/*
- 	 * FRED employs a two-level event dispatch mechanism, with
- 	 * the first-level on the type of an event and the second-level
-diff --git a/arch/x86/include/asm/entry-common.h b/arch/x86/include/asm/entry-common.h
-index 117903881fe4..5b7d0f47f188 100644
---- a/arch/x86/include/asm/entry-common.h
-+++ b/arch/x86/include/asm/entry-common.h
-@@ -12,6 +12,9 @@
- /* Check that the stack and regs on entry from user mode are sane. */
- static __always_inline void arch_enter_from_user_mode(struct pt_regs *regs)
- {
-+	if (!cpu_feature_enabled(X86_FEATURE_FRED))
-+		current->thread_info.user_pt_regs = regs;
+ 	ftrace=[tracer]
+ 			[FTRACE] will set and start the specified tracer
+ 			as early as possible in order to facilitate early
+diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
+index eea41cb8722e..4db5e619fc97 100644
+--- a/arch/x86/kernel/cpu/common.c
++++ b/arch/x86/kernel/cpu/common.c
+@@ -1467,6 +1467,9 @@ static void __init cpu_parse_early_param(void)
+ 	char *argptr = arg, *opt;
+ 	int arglen, taint = 0;
+ 
++	if (!cmdline_find_option_bool(boot_command_line, "fred"))
++		setup_clear_cpu_cap(X86_FEATURE_FRED);
 +
- 	if (IS_ENABLED(CONFIG_DEBUG_ENTRY)) {
- 		/*
- 		 * Make sure that the entry code gave us a sensible EFLAGS
-diff --git a/arch/x86/include/asm/processor.h b/arch/x86/include/asm/processor.h
-index 8d73004e4cac..4a50d2a2c14b 100644
---- a/arch/x86/include/asm/processor.h
-+++ b/arch/x86/include/asm/processor.h
-@@ -626,17 +626,11 @@ static inline void spin_lock_prefetch(const void *x)
- 	prefetchw(x);
- }
- 
--#define TOP_OF_INIT_STACK ((unsigned long)&init_stack + sizeof(init_stack) - \
--			   TOP_OF_KERNEL_STACK_PADDING)
-+#define TOP_OF_INIT_STACK ((unsigned long)&init_stack + sizeof(init_stack))
- 
--#define task_top_of_stack(task) ((unsigned long)(task_pt_regs(task) + 1))
-+#define task_top_of_stack(task) ((unsigned long)task_stack_page(task) + THREAD_SIZE)
- 
--#define task_pt_regs(task) \
--({									\
--	unsigned long __ptr = (unsigned long)task_stack_page(task);	\
--	__ptr += THREAD_SIZE - TOP_OF_KERNEL_STACK_PADDING;		\
--	((struct pt_regs *)__ptr) - 1;					\
--})
-+#define task_pt_regs(task) ((task)->thread_info.user_pt_regs)
- 
  #ifdef CONFIG_X86_32
- #define INIT_THREAD  {							  \
-diff --git a/arch/x86/include/asm/switch_to.h b/arch/x86/include/asm/switch_to.h
-index 00fd85abc1d2..0a31da150808 100644
---- a/arch/x86/include/asm/switch_to.h
-+++ b/arch/x86/include/asm/switch_to.h
-@@ -72,8 +72,7 @@ static inline void update_task_stack(struct task_struct *task)
- 		/*
- 		 * Will use WRMSRNS/WRMSRLIST for performance once it's upstreamed.
- 		 */
--		wrmsrl(MSR_IA32_FRED_RSP0,
--		       task_top_of_stack(task) + TOP_OF_KERNEL_STACK_PADDING);
-+		wrmsrl(MSR_IA32_FRED_RSP0, task_top_of_stack(task));
- 	} else if (cpu_feature_enabled(X86_FEATURE_XENPV)) {
- 		/* Xen PV enters the kernel on the thread stack. */
- 		load_sp0(task_top_of_stack(task));
-diff --git a/arch/x86/include/asm/thread_info.h b/arch/x86/include/asm/thread_info.h
-index 998483078d5f..ced0a01e0a3e 100644
---- a/arch/x86/include/asm/thread_info.h
-+++ b/arch/x86/include/asm/thread_info.h
-@@ -13,42 +13,6 @@
- #include <asm/percpu.h>
- #include <asm/types.h>
- 
--/*
-- * TOP_OF_KERNEL_STACK_PADDING is a number of unused bytes that we
-- * reserve at the top of the kernel stack.  We do it because of a nasty
-- * 32-bit corner case.  On x86_32, the hardware stack frame is
-- * variable-length.  Except for vm86 mode, struct pt_regs assumes a
-- * maximum-length frame.  If we enter from CPL 0, the top 8 bytes of
-- * pt_regs don't actually exist.  Ordinarily this doesn't matter, but it
-- * does in at least one case:
-- *
-- * If we take an NMI early enough in SYSENTER, then we can end up with
-- * pt_regs that extends above sp0.  On the way out, in the espfix code,
-- * we can read the saved SS value, but that value will be above sp0.
-- * Without this offset, that can result in a page fault.  (We are
-- * careful that, in this case, the value we read doesn't matter.)
-- *
-- * In vm86 mode, the hardware frame is much longer still, so add 16
-- * bytes to make room for the real-mode segments.
-- *
-- * x86-64 has a fixed-length stack frame, but it depends on whether
-- * or not FRED is enabled. Future versions of FRED might make this
-- * dynamic, but for now it is always 2 words longer.
-- */
--#ifdef CONFIG_X86_32
--# ifdef CONFIG_VM86
--#  define TOP_OF_KERNEL_STACK_PADDING 16
--# else
--#  define TOP_OF_KERNEL_STACK_PADDING 8
--# endif
--#else /* x86-64 */
--# ifdef CONFIG_X86_FRED
--#  define TOP_OF_KERNEL_STACK_PADDING (2*8)
--# else
--#  define TOP_OF_KERNEL_STACK_PADDING 0
--# endif
--#endif
--
- /*
-  * low level task data that entry.S needs immediate access to
-  * - this struct should fit entirely inside of one cache line
-@@ -56,6 +20,7 @@
-  */
- #ifndef __ASSEMBLY__
- struct task_struct;
-+struct pt_regs;
- #include <asm/cpufeature.h>
- #include <linux/atomic.h>
- 
-@@ -66,11 +31,14 @@ struct thread_info {
- #ifdef CONFIG_SMP
- 	u32			cpu;		/* current CPU */
- #endif
-+	struct pt_regs		*user_pt_regs;
- };
- 
-+#define INIT_TASK_PT_REGS ((struct pt_regs *)TOP_OF_INIT_STACK - 1)
- #define INIT_THREAD_INFO(tsk)			\
- {						\
- 	.flags		= 0,			\
-+	.user_pt_regs   = INIT_TASK_PT_REGS,	\
- }
- 
- #else /* !__ASSEMBLY__ */
-@@ -240,6 +208,7 @@ static inline int arch_within_stack_frames(const void * const stack,
- 
- extern void arch_task_cache_init(void);
- extern int arch_dup_task_struct(struct task_struct *dst, struct task_struct *src);
-+extern void arch_init_user_pt_regs(struct task_struct *tsk);
- extern void arch_release_task_struct(struct task_struct *tsk);
- extern void arch_setup_new_exec(void);
- #define arch_setup_new_exec arch_setup_new_exec
-diff --git a/arch/x86/kernel/head_32.S b/arch/x86/kernel/head_32.S
-index 67c8ed99144b..0201ddcd7576 100644
---- a/arch/x86/kernel/head_32.S
-+++ b/arch/x86/kernel/head_32.S
-@@ -517,8 +517,7 @@ SYM_DATA_END(initial_page_table)
-  * reliably detect the end of the stack.
-  */
- SYM_DATA(initial_stack,
--		.long init_thread_union + THREAD_SIZE -
--		SIZEOF_PTREGS - TOP_OF_KERNEL_STACK_PADDING)
-+		.long init_thread_union + THREAD_SIZE - SIZEOF_PTREGS)
- 
- __INITRODATA
- int_msg:
-diff --git a/arch/x86/kernel/process.c b/arch/x86/kernel/process.c
-index b650cde3f64d..e1c6350290ae 100644
---- a/arch/x86/kernel/process.c
-+++ b/arch/x86/kernel/process.c
-@@ -98,6 +98,11 @@ int arch_dup_task_struct(struct task_struct *dst, struct task_struct *src)
- 	return 0;
- }
- 
-+void arch_init_user_pt_regs(struct task_struct *tsk)
-+{
-+	tsk->thread_info.user_pt_regs = (struct pt_regs *)task_top_of_stack(tsk)- 1;
-+}
-+
- #ifdef CONFIG_X86_64
- void arch_release_task_struct(struct task_struct *tsk)
- {
-diff --git a/kernel/fork.c b/kernel/fork.c
-index f68954d05e89..85c4216bdcd8 100644
---- a/kernel/fork.c
-+++ b/kernel/fork.c
-@@ -958,6 +958,10 @@ int __weak arch_dup_task_struct(struct task_struct *dst,
- 	return 0;
- }
- 
-+void __weak arch_init_user_pt_regs(struct task_struct *tsk)
-+{
-+}
-+
- void set_task_stack_end_magic(struct task_struct *tsk)
- {
- 	unsigned long *stackend;
-@@ -985,6 +989,8 @@ static struct task_struct *dup_task_struct(struct task_struct *orig, int node)
- 	if (err)
- 		goto free_tsk;
- 
-+	arch_init_user_pt_regs(tsk);
-+
- #ifdef CONFIG_THREAD_INFO_IN_TASK
- 	refcount_set(&tsk->stack_refcount, 1);
- #endif
+ 	if (cmdline_find_option_bool(boot_command_line, "no387"))
+ #ifdef CONFIG_MATH_EMULATION
 -- 
 2.34.1
 
