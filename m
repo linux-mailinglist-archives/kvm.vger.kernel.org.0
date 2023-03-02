@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C40746A8948
-	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 20:14:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D16E46A8966
+	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 20:18:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229872AbjCBTO1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Mar 2023 14:14:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38690 "EHLO
+        id S229989AbjCBTOr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Mar 2023 14:14:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229790AbjCBTOY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Mar 2023 14:14:24 -0500
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C3711714A
-        for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 11:14:23 -0800 (PST)
-Received: by mail-wm1-x331.google.com with SMTP id bg16-20020a05600c3c9000b003eb34e21bdfso2569541wmb.0
-        for <kvm@vger.kernel.org>; Thu, 02 Mar 2023 11:14:23 -0800 (PST)
+        with ESMTP id S229877AbjCBTO2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Mar 2023 14:14:28 -0500
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C07942449A
+        for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 11:14:26 -0800 (PST)
+Received: by mail-wr1-x42e.google.com with SMTP id l1so116770wry.12
+        for <kvm@vger.kernel.org>; Thu, 02 Mar 2023 11:14:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2mDcBmWouGnqGshBynFnpTf0FCw+Ej8aBvk380H3UuI=;
-        b=BXhYzlIz4j2CWr7staJK2ZrwQKbpSJoV8+CqliJorOBQviI6qlvhy8hs/bRlc8iHzK
-         2d8waRQy+vebFK4XDNLRiTHY+tdbnJ0FfASQMOZ+rjY+pRu+vEGgpgdlfuMb6DjhEMgS
-         FK/nNatkJbpwbdhWrWI9tnYRH/dysVdyKNVqA8dGn+DwgFSM096dN388OZGadt3S6ruA
-         WhRe13FdZYLXrr/2thq3+du5LceKbDMJH+6IhHD+TADiQE96sHjcfg68vOyYSVhD4z0s
-         xxOEaxrH9bCsCQb3ZwQrPf01mEXK5fll2XGLUysUcP+9SuD6i8rvmaCgJ0SDXqX5IQ4J
-         mCUA==
+        bh=kebJRJ/Zd0hMxCtlzPa2wrDMn74tVWfVULcszCFYnrs=;
+        b=RHVfSsXSeOsHZgpUTWIlzcqkeEi3+plFRd6crMtuBIX/nPCnvRLS3NA5NERG9MQxDC
+         kLTG8utGQ9QSoL2omBP8n8BU69T6lQnPcQAHEn4BfU0784JW5LZ1h3B/dirN0aG0LOUn
+         ZGuJyeqfT+u4C5dfFRXEEKN0qyFtD0m/K16wJcdae9PY/dxrQVHb/bAtbVMCjXBYzZ6a
+         2f3Lhn2hfn6G34LFcDwxVJRnPPNxvjCjk3iEtZ7Rqa49kWFOzBjrZgCZQN1SA7vNIxE2
+         gY29OoR0T8jS/mYtLH59BH3VlNYg8yS9ILRxnl1jUabfs29WHqXloX8fEb9uGXXNKavg
+         6ARQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2mDcBmWouGnqGshBynFnpTf0FCw+Ej8aBvk380H3UuI=;
-        b=dIf6c6ajMXUjvro7o8pRwOHott0WawCeDY8OaUdTgaM3CcMIBkU9J/nME4ym715FWp
-         fAJmZU+obtfqOEYi2mon15K8Fqk8oms8OxKRuQMAjwuBfqn33S5tVJ/EPVWMk2NAZi4u
-         +O+AqxpO3So8p0aY7FsS4+JtkC1mAzIy0aGWgiGfXhk7I+RQfEgfy6g3ljRE+rjd2kPT
-         ALXDNb7PoU3Uu7KmsGxvz+M5qbiIMk2U5wqxL3JLz0xVS8S99igDL/yu4topZZrVF8P3
-         N8usO0SEL/cXSFpMCCZMoO2H8CEy910QRt7lc8X1UFuTtQnmfGHdEkO4KIIWf3tCjrjY
-         JamA==
-X-Gm-Message-State: AO0yUKVByWJ4dl5AHZdx52zHRo3pf6ToqLqHMlEYjcwrFdYYPbgKvg9q
-        nmREmQtGyU5NLylv5AeXqZAdzg==
-X-Google-Smtp-Source: AK7set9YxIWJrYn/MpIzDLybLevwDttFD09ikLI3/HBK8ztypWUCRjSint/bPii24PauHRFn4AZCgw==
-X-Received: by 2002:a05:600c:198e:b0:3eb:6878:5523 with SMTP id t14-20020a05600c198e00b003eb68785523mr250882wmq.12.1677784461721;
-        Thu, 02 Mar 2023 11:14:21 -0800 (PST)
+        bh=kebJRJ/Zd0hMxCtlzPa2wrDMn74tVWfVULcszCFYnrs=;
+        b=f0XS5tgvH9STTX2DZuTCbb09v4MBZcu3JKmXDZ6iJHFl3RBTNJEdf+bUURWCFa93BC
+         1PWeqzmZ58P3U8dzjvTdtit9b+NnBKZyxbjEMH5Pd/Nlehc9HSm2REHaqWxXIiZl0q+W
+         gGyHiNFAsMkylmnmxqcIUnp7ygWPv9VigsUYbuceg+BSk/GtTEZ7Nr4DEaaIa14gsIUo
+         eKNohcmHbRsWFZY1aGwKKu7XV4KK8M92se5sZun6CRmehm4fAEV84nu7LOzsJGTcKQzL
+         GjriOHkAvnuZQEvPTHSMXXBsRSgNsZVnKXGy5SytzuxshHJKo0AtnM5BMYlRcB9OzzUr
+         r8lA==
+X-Gm-Message-State: AO0yUKVfg6S2zLdg2qGkR83lfd7oy/OmuFLrhNZtocXfws51m5fhf31p
+        kQhx9LNGPMU4PFh1BiF7hLAuQw==
+X-Google-Smtp-Source: AK7set+D/4mTEhIX+7Jk/ThTEoGUCRN5R/1wUY3+La0dBKWoMtb+xw5AxRlJ8TNMrqyA30xvhuE2qg==
+X-Received: by 2002:a05:6000:10cc:b0:2c7:e60:abe8 with SMTP id b12-20020a05600010cc00b002c70e60abe8mr2230369wrx.9.1677784465139;
+        Thu, 02 Mar 2023 11:14:25 -0800 (PST)
 Received: from zen.linaroharston ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id k5-20020adfe8c5000000b002c56179d39esm162354wrn.44.2023.03.02.11.14.20
+        by smtp.gmail.com with ESMTPSA id b5-20020a05600c150500b003e91b9a92c9sm384899wmg.24.2023.03.02.11.14.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Mar 2023 11:14:20 -0800 (PST)
+        Thu, 02 Mar 2023 11:14:24 -0800 (PST)
 Received: from zen.lan (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id 0A81B1FFBB;
+        by zen.linaroharston (Postfix) with ESMTP id 234561FFC7;
         Thu,  2 Mar 2023 19:08:49 +0000 (GMT)
 From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To:     qemu-devel@nongnu.org
@@ -96,9 +96,9 @@ Cc:     Weiwei Li <liweiwei@iscas.ac.cn>,
         Taylor Simpson <tsimpson@quicinc.com>,
         Peter Maydell <peter.maydell@linaro.org>,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v4 18/26] gdbstub: fix address type of gdb_set_cpu_pc
-Date:   Thu,  2 Mar 2023 19:08:38 +0000
-Message-Id: <20230302190846.2593720-19-alex.bennee@linaro.org>
+Subject: [PATCH v4 19/26] gdbstub: don't use target_ulong while handling registers
+Date:   Thu,  2 Mar 2023 19:08:39 +0000
+Message-Id: <20230302190846.2593720-20-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230302190846.2593720-1-alex.bennee@linaro.org>
 References: <20230302190846.2593720-1-alex.bennee@linaro.org>
@@ -114,39 +114,72 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The underlying call uses vaddr and the comms API uses unsigned long
-long which will always fit. We don't need to deal in target_ulong
-here.
+This is a hangover from the original code. addr is misleading as it is
+only really a register id. While len will never exceed
+MAX_PACKET_LENGTH I've used size_t as that is what strlen returns.
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+
 ---
- gdbstub/gdbstub.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+v3
+  - fix commit message
+  - use unsigned for regid
+v4
+  - revert unsigned change
+---
+ gdbstub/gdbstub.c | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
 
 diff --git a/gdbstub/gdbstub.c b/gdbstub/gdbstub.c
-index 7301466ff5..b8aead03bd 100644
+index b8aead03bd..f1504af44f 100644
 --- a/gdbstub/gdbstub.c
 +++ b/gdbstub/gdbstub.c
-@@ -535,7 +535,7 @@ static void gdb_process_breakpoint_remove_all(GDBProcess *p)
- }
+@@ -1193,7 +1193,8 @@ static void handle_read_mem(GArray *params, void *user_ctx)
  
- 
--static void gdb_set_cpu_pc(target_ulong pc)
-+static void gdb_set_cpu_pc(vaddr pc)
+ static void handle_write_all_regs(GArray *params, void *user_ctx)
  {
-     CPUState *cpu = gdbserver_state.c_cpu;
+-    target_ulong addr, len;
++    int reg_id;
++    size_t len;
+     uint8_t *registers;
+     int reg_size;
  
-@@ -1290,7 +1290,7 @@ static void handle_file_io(GArray *params, void *user_ctx)
- static void handle_step(GArray *params, void *user_ctx)
- {
-     if (params->len) {
--        gdb_set_cpu_pc((target_ulong)get_param(params, 0)->val_ull);
-+        gdb_set_cpu_pc(get_param(params, 0)->val_ull);
+@@ -1205,9 +1206,10 @@ static void handle_write_all_regs(GArray *params, void *user_ctx)
+     len = strlen(get_param(params, 0)->data) / 2;
+     gdb_hextomem(gdbserver_state.mem_buf, get_param(params, 0)->data, len);
+     registers = gdbserver_state.mem_buf->data;
+-    for (addr = 0; addr < gdbserver_state.g_cpu->gdb_num_g_regs && len > 0;
+-         addr++) {
+-        reg_size = gdb_write_register(gdbserver_state.g_cpu, registers, addr);
++    for (reg_id = 0;
++         reg_id < gdbserver_state.g_cpu->gdb_num_g_regs && len > 0;
++         reg_id++) {
++        reg_size = gdb_write_register(gdbserver_state.g_cpu, registers, reg_id);
+         len -= reg_size;
+         registers += reg_size;
      }
+@@ -1216,15 +1218,16 @@ static void handle_write_all_regs(GArray *params, void *user_ctx)
  
-     cpu_single_step(gdbserver_state.c_cpu, gdbserver_state.sstep_flags);
+ static void handle_read_all_regs(GArray *params, void *user_ctx)
+ {
+-    target_ulong addr, len;
++    int reg_id;
++    size_t len;
+ 
+     cpu_synchronize_state(gdbserver_state.g_cpu);
+     g_byte_array_set_size(gdbserver_state.mem_buf, 0);
+     len = 0;
+-    for (addr = 0; addr < gdbserver_state.g_cpu->gdb_num_g_regs; addr++) {
++    for (reg_id = 0; reg_id < gdbserver_state.g_cpu->gdb_num_g_regs; reg_id++) {
+         len += gdb_read_register(gdbserver_state.g_cpu,
+                                  gdbserver_state.mem_buf,
+-                                 addr);
++                                 reg_id);
+     }
+     g_assert(len == gdbserver_state.mem_buf->len);
+ 
 -- 
 2.39.2
 
