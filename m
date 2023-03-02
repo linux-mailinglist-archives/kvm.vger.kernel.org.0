@@ -2,103 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D42C06A81F0
-	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 13:12:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 83FF56A81F1
+	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 13:13:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229974AbjCBML7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Mar 2023 07:11:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41298 "EHLO
+        id S229653AbjCBMNc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Mar 2023 07:13:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229800AbjCBML5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Mar 2023 07:11:57 -0500
+        with ESMTP id S229492AbjCBMNb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Mar 2023 07:13:31 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 165043E609
-        for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 04:11:08 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4CF03E60A
+        for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 04:12:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677759067;
+        s=mimecast20190719; t=1677759162;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ncKHv1h1opO4DA5kxu6YhoDiEOVtPQycDQ/UhO4F0qc=;
-        b=MiFQyRtTULULJ7bZJ4f/9l6fX6LvIm12m1JanGQmy7RWaiR/7kX9fF3qHnW0Mcc3G9Ra4P
-        V+cospVaALYdgocHpQy8OdIznK8pql9GYS5FnuuMSa7cyhpW6cwVW6lntjNFYs4djkrsgH
-        HrkX7rqKTEf7Lc1Yhoawx9I+AtSY2Us=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-173-782Ok0q-P-aI3yjiVDgVNQ-1; Thu, 02 Mar 2023 07:10:58 -0500
-X-MC-Unique: 782Ok0q-P-aI3yjiVDgVNQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2F4883806107;
-        Thu,  2 Mar 2023 12:10:58 +0000 (UTC)
-Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 227542026D4B;
-        Thu,  2 Mar 2023 12:10:58 +0000 (UTC)
-From:   Shaoqin Huang <shahuang@redhat.com>
-To:     kvmarm@lists.linux.dev
-Cc:     Shaoqin Huang <shahuang@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Andrew Jones <andrew.jones@linux.dev>,
-        kvm@vger.kernel.org (open list:ARM)
-Subject: [kvm-unit-tests PATCH v2 3/3] arm64: microbench: Use gic_enable_irq() macro in microbench test
-Date:   Thu,  2 Mar 2023 07:10:49 -0500
-Message-Id: <20230302121049.160466-4-shahuang@redhat.com>
-In-Reply-To: <20230302121049.160466-1-shahuang@redhat.com>
-References: <20230302121049.160466-1-shahuang@redhat.com>
+        bh=HtFtaTLhkJtMXijEa58s2Y5EfyyTLMzyM1VpQwrQ+Qo=;
+        b=DC59X3BhB3eGa/JUAUMXk7tzW4+geMPJG7mSMq8ivgQq2Jy5JcMyc6KCGt/OsVHGF+ba1N
+        62crR64D9YWN7JDJB8j/wOdgKkAsu0xR3WGQOwTaOoGFvgNjdxCHMRuXBvFUqgzwYSab29
+        mRTbTW50P/4PtfH5JbJzROCPc2EvMhw=
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
+ [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-595-aohY3X9MMp-2XHL_bk5oFw-1; Thu, 02 Mar 2023 07:12:40 -0500
+X-MC-Unique: aohY3X9MMp-2XHL_bk5oFw-1
+Received: by mail-pl1-f198.google.com with SMTP id z2-20020a170903018200b0019cfc0a566eso7671882plg.15
+        for <kvm@vger.kernel.org>; Thu, 02 Mar 2023 04:12:40 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HtFtaTLhkJtMXijEa58s2Y5EfyyTLMzyM1VpQwrQ+Qo=;
+        b=FaRSShpY7bVa2gjDZjWp8FkR2HQZyLMSoIsIP8+w+ghrK5zco5X6XF5lok0GD1WTh7
+         UFsIRZX/WPYvbhvvv7YLJp62gleUb8+qT418IdIot08B57XBBsLTTfjnLhN78AOw4Egm
+         aoFx5idypV61DSMP8axxmSXkT6rTuFa+4xs3Q2Vicypocj5vRsmoxDTnB44ipf6fyIvv
+         8onXWZ+DtNaIF9i+t65qESfkicp6otaFpdyN2y1yvv3uYm0nxiN86a4pk+3K3Sj+5DZc
+         7te6Q4fn49rZ9GajgiYnNiJaLRveqpZYKBhu7bhfNUeB/Qf1p0cXlm0+JiZLRBTosU2M
+         fQ6Q==
+X-Gm-Message-State: AO0yUKUuOK5dwYZS1AoR99ewZbLhtaz0tpF9CIcsyJ8Wx45pMXgi0PDh
+        v8EoHOW8kMpwxPVn1ZZWQqNDlTfhOTAN5+iS48SixHDqyiXUU0dyFF+GdNx0vVGi7bFLkvHmAd9
+        6e5YnDhAUA6AWjM85kK68
+X-Received: by 2002:a17:902:e74b:b0:19a:7217:32af with SMTP id p11-20020a170902e74b00b0019a721732afmr10871195plf.5.1677759159783;
+        Thu, 02 Mar 2023 04:12:39 -0800 (PST)
+X-Google-Smtp-Source: AK7set+lXh2ywAgxrTS03JOo9a92Dl/Rl74r2ipF/QnKaPY4SUvG5hHopddPLoVn4ctTSEg6aXiXHQ==
+X-Received: by 2002:a17:902:e74b:b0:19a:7217:32af with SMTP id p11-20020a170902e74b00b0019a721732afmr10871190plf.5.1677759159516;
+        Thu, 02 Mar 2023 04:12:39 -0800 (PST)
+Received: from [10.66.61.39] ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id y9-20020a1709027c8900b00186a2274382sm10156720pll.76.2023.03.02.04.12.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Mar 2023 04:12:39 -0800 (PST)
+Message-ID: <ae1f6ef0-2566-ad82-17b3-5637141be40e@redhat.com>
+Date:   Thu, 2 Mar 2023 20:12:35 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [kvm-unit-tests] arm: Replace the obsolete qemu script
+Content-Language: en-US
+To:     Andrew Jones <andrew.jones@linux.dev>
+Cc:     kvmarm@lists.linux.dev, "open list:ARM" <kvm@vger.kernel.org>
+References: <20230301071737.43760-1-shahuang@redhat.com>
+ <20230301125004.d5giadtz4yaqdjam@orel>
+ <5b019bd3-cc57-017a-e0f6-bf9ebc97ad11@redhat.com>
+ <20230302115229.cphrnp5qaxmdg6wz@orel>
+From:   Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <20230302115229.cphrnp5qaxmdg6wz@orel>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use gic_enable_irq() to clean up code.
 
-Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
----
- arm/micro-bench.c | 15 +--------------
- 1 file changed, 1 insertion(+), 14 deletions(-)
 
-diff --git a/arm/micro-bench.c b/arm/micro-bench.c
-index 8436612..090fda6 100644
---- a/arm/micro-bench.c
-+++ b/arm/micro-bench.c
-@@ -212,24 +212,11 @@ static void lpi_exec(void)
- 
- static bool timer_prep(void)
- {
--	void *gic_isenabler;
--
- 	gic_enable_defaults();
- 	install_irq_handler(EL1H_IRQ, gic_irq_handler);
- 	local_irq_enable();
- 
--	switch (gic_version()) {
--	case 2:
--		gic_isenabler = gicv2_dist_base() + GICD_ISENABLER;
--		break;
--	case 3:
--		gic_isenabler = gicv3_sgi_base() + GICR_ISENABLER0;
--		break;
--	default:
--		assert_msg(0, "Unreachable");
--	}
--
--	writel(1 << PPI(TIMER_VTIMER_IRQ), gic_isenabler);
-+	gic_enable_irq(PPI(TIMER_VTIMER_IRQ));
- 	write_sysreg(ARCH_TIMER_CTL_IMASK | ARCH_TIMER_CTL_ENABLE, cntv_ctl_el0);
- 	isb();
- 
+On 3/2/23 19:52, Andrew Jones wrote:
+> On Thu, Mar 02, 2023 at 06:09:36PM +0800, Shaoqin Huang wrote:
+>> Hi drew,
+>>
+>> On 3/1/23 20:50, Andrew Jones wrote:
+>>> On Wed, Mar 01, 2023 at 02:17:37AM -0500, Shaoqin Huang wrote:
+>>>> The qemu script used to detect the testdev is obsoleted, replace it
+>>>> with the modern way to detect if testdev exists.
+>>>
+>>> Hi Shaoqin,
+>>>
+>>> Can you please point out the oldest QEMU version for which the modern
+>>> way works?
+>>>
+>>>>
+>>>> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+>>>> ---
+>>>>    arm/run | 3 +--
+>>>>    1 file changed, 1 insertion(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/arm/run b/arm/run
+>>>> index 1284891..9800cfb 100755
+>>>> --- a/arm/run
+>>>> +++ b/arm/run
+>>>> @@ -59,8 +59,7 @@ if ! $qemu $M -device '?' 2>&1 | grep virtconsole > /dev/null; then
+>>>>    	exit 2
+>>>>    fi
+>>>> -if $qemu $M -chardev testdev,id=id -initrd . 2>&1 \
+>>>> -		| grep backend > /dev/null; then
+>>>> +if ! $qemu $M -chardev '?' 2>&1 | grep testdev > /dev/null; then
+>>>                                 ^ This shouldn't be necessary. afaict,
+>>> 			        only stdio is used
+>>>
+>>> We can change the 'grep testdev >/dev/null' to 'grep -q testdev'
+>>>
+>>
+>> This just remind me if we could also change
+>>
+>> if ! $qemu $M -device '?' 2>&1 | grep virtconsole > /dev/null; then
+>>
+>> to
+>>
+>> if ! $qemu $M -device '?' | grep -q virtconsole; then
+>>
+>> And all other place like that.
+> 
+> Yup.
+> 
+> Also, unrelated, but can you change your patch prefix to
+> 
+>    kvm-unit-tests PATCH
+> 
+> as suggested in the README? My filters are looking for 'PATCH'.
+> 
+
+Hi drew,
+
+My bad. Has update it.
+
+Thanks,
+Shaoqin
+
+> Thanks,
+> drew
+> 
+>>
+>> Thanks,
+>>
+>>>>    	echo "$qemu doesn't support chr-testdev. Exiting."
+>>>>    	exit 2
+>>>>    fi
+>>>> -- 
+>>>> 2.39.1
+>>>>
+>>>
+>>> Thanks,
+>>> drew
+>>>
+>>
+>> -- 
+>> Shaoqin
+>>
+> 
+
 -- 
-2.39.1
+Shaoqin
 
