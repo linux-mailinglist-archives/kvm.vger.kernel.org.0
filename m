@@ -2,195 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 96A5A6A858D
-	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 16:48:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E67246A85B6
+	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 17:00:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229651AbjCBPsw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Mar 2023 10:48:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48018 "EHLO
+        id S229617AbjCBQAn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Mar 2023 11:00:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229537AbjCBPsu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Mar 2023 10:48:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9B7D113EE
-        for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 07:48:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677772089;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=07sLndxtEbNcERZvee6i0lRr3/Y/p7RWfWIjrJTakUw=;
-        b=KdmrxJPhJgg5sZaeuVHr2+EMW/GCbWXgmzuMXwpvMiTgq1gzDqFTI77frp81pCi0Q46iY7
-        4pG2V6Dj7+T3LlrKZv5G8WA1PLVw/cQR+HRWK+riZU3/wwKDIrJA8pb/01uozoILFUdKVt
-        1V2U505NQrhYldN93xa2WPdzrzbMLFI=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-532-4hXySIn_P8WPQ0L4mcHVhg-1; Thu, 02 Mar 2023 10:48:06 -0500
-X-MC-Unique: 4hXySIn_P8WPQ0L4mcHVhg-1
-Received: by mail-wm1-f69.google.com with SMTP id x18-20020a1c7c12000000b003e1e7d3cf9fso1451438wmc.3
-        for <kvm@vger.kernel.org>; Thu, 02 Mar 2023 07:48:05 -0800 (PST)
+        with ESMTP id S229456AbjCBQAl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Mar 2023 11:00:41 -0500
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1CED4E5CA
+        for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 08:00:40 -0800 (PST)
+Received: by mail-pf1-x42b.google.com with SMTP id b20so10399363pfo.6
+        for <kvm@vger.kernel.org>; Thu, 02 Mar 2023 08:00:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1677772840;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=+n7+f74EnVFCcHgcGtgX5vTUUV3I+JQc1+ADtcVp6/U=;
+        b=HEbbJ8jEIaxHHVU/1ku69muhqUjhzqfva6ClGyoPAPPJ3bBgMu+ZAM5VjpeVj0L35i
+         typM3nlHCyHHbyE73JuAAix3JMiVQE2TZpvJQpqft31CA6lRQQzf3TXWd3oXaVpwWTNu
+         bDKt2FBVxVrdwGQFcmQkSTIpsjyMw++Hz3O0Jfzf7+TAyodureJkx1NKZX/E30Q5H+pB
+         gOC80DAjMM6vN8TTXIXa32+YIW0a0C3cwTHJ244us5paBpVvKoAODtiu+jHpxUUcog+I
+         /08myzzKe8GSsJCRU+TurrhAdbEmdIyOP3EN+KDiNnGdtbQ6HXL2g2jSW7SmWbDHmLLI
+         Mbxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677772084;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=07sLndxtEbNcERZvee6i0lRr3/Y/p7RWfWIjrJTakUw=;
-        b=cAYXCbBVNV7eksLM7zCtqXkviClAyS/iCUT+OQ3G2SArAZj7J6qLHMPdF8ctFMP6U3
-         AWwZZl38QqBNqGqwzwe0Hd0b9BfxUoaATrkA2ua3GfDWNTptF83gRRDFQkl8F9itjcFz
-         nOoossSovPCZyhm9ncOOvAR3nuUHmxvZTAGjs7E7FDVhKuaAP+8LJL8uYWv0nFTKZuTa
-         p9p1h7EE5YovxjAWXQCcNns4GEOwTmCjWg1RbMxXtBHx71htB5uIEyHWLsfV9R1ceq8F
-         1ygCfjU98cu9v5WkL284oDJq3P/0xc0JWZ7tGugpmVJVa7CMGPChjx3TcLhD0lQ7TOlL
-         kCKw==
-X-Gm-Message-State: AO0yUKWgQ5emw860cK5rX1QFaFHPkiTtqPxNNRshpBoq2Ij+d+aGfzJL
-        InxvC8BVXMXdIGVDHx9tkX8iEjKvXhag2uqI0bWz4C61DQ2Ubo9xr1hhyMmFkn69QKj50ofLRa5
-        SiJZifPjM5xSR
-X-Received: by 2002:a05:6000:1a42:b0:2c3:be89:7c2a with SMTP id t2-20020a0560001a4200b002c3be897c2amr1809001wry.13.1677772084120;
-        Thu, 02 Mar 2023 07:48:04 -0800 (PST)
-X-Google-Smtp-Source: AK7set/EzktI0OlHucSuQTWKTKC3fqx8GzoJhXbuJEu5Rqstra/4hZCkq7D6l1IWXwedBvmq/luXbw==
-X-Received: by 2002:a05:6000:1a42:b0:2c3:be89:7c2a with SMTP id t2-20020a0560001a4200b002c3be897c2amr1808989wry.13.1677772083843;
-        Thu, 02 Mar 2023 07:48:03 -0800 (PST)
-Received: from sgarzare-redhat (c-115-213.cust-q.wadsl.it. [212.43.115.213])
-        by smtp.gmail.com with ESMTPSA id s18-20020a7bc392000000b003eb20d4d4a8sm3202128wmj.44.2023.03.02.07.48.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Mar 2023 07:48:03 -0800 (PST)
-Date:   Thu, 2 Mar 2023 16:48:00 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Simon Horman <simon.horman@corigine.com>
-Cc:     virtualization@lists.linux-foundation.org,
-        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
-        eperezma@redhat.com, netdev@vger.kernel.org, stefanha@redhat.com,
-        linux-kernel@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v2 6/8] vdpa_sim: use kthread worker
-Message-ID: <20230302154800.z3i4fpjlvtb74efu@sgarzare-redhat>
-References: <20230302113421.174582-1-sgarzare@redhat.com>
- <20230302113421.174582-7-sgarzare@redhat.com>
- <ZADA/GgpbDoi+SzU@corigine.com>
+        d=1e100.net; s=20210112; t=1677772840;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+n7+f74EnVFCcHgcGtgX5vTUUV3I+JQc1+ADtcVp6/U=;
+        b=LlPdfiP6exh6nbX6v0faKa7PUlJ3DEgw1isw0PoycmIcSDr6tjWZbAcJvcVQI4yKnq
+         HJ2NoNVqABxoV92Dxb+pq4mMNRP1b4v3hQKyah80tk0A4k5TWXi65zxtdYyfYR+TYQ0E
+         /MIHgaycDalRGc+NoDr1IfXFG6vU+nnOmHjuckBCLMTOVyLP4yEWppBz+4hAEdL50L7N
+         jXQfMbJpkQMzFZSGjER+FFpUzTU4/kw5QWG7/XTt9kEsSSpy9LDBvUZvPb2X3/iQTuK4
+         E92yGH5fD+RuP36QpTd4qACw/yJ5u2oHP4hsDbl4FX6OeVCOke8mwiKYhPhYu8+ChvNl
+         NOBg==
+X-Gm-Message-State: AO0yUKUhQ7lw/UY0tRBfX1XW+/8wOKlWo/NHhUEd17c0OwiVWXkbPx4g
+        ZVJHAQyLPhMI6oL3JdOFd7cP5CRbpAdXOa/1wbYKSg==
+X-Google-Smtp-Source: AK7set8ms42GRJLYAmW5KSqRIj71kNl1rvKyCQyTWudRVQehdEEOxD2WaSzIwLb3DrjqRLymBnY9dsYEJbWBnm6p1Jc=
+X-Received: by 2002:a63:3347:0:b0:503:7cc9:3f8d with SMTP id
+ z68-20020a633347000000b005037cc93f8dmr3395682pgz.9.1677772840177; Thu, 02 Mar
+ 2023 08:00:40 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <ZADA/GgpbDoi+SzU@corigine.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+References: <20230228150216.77912-1-cohuck@redhat.com> <20230228150216.77912-2-cohuck@redhat.com>
+ <CABJz62OHjrq_V1QD4g4azzLm812EJapPEja81optr8o7jpnaHQ@mail.gmail.com>
+ <874jr4dbcr.fsf@redhat.com> <CABJz62MQH2U1QM26PcC3F1cy7t=53_mxkgViLKjcUMVmi29w+Q@mail.gmail.com>
+ <87sfeoblsa.fsf@redhat.com> <CAFEAcA8z9mS55oBySDYA6PHB=qcRQRH1Aa4WJidG8B=n+6CyEQ@mail.gmail.com>
+ <87cz5rmdlg.fsf@redhat.com>
+In-Reply-To: <87cz5rmdlg.fsf@redhat.com>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Thu, 2 Mar 2023 16:00:28 +0000
+Message-ID: <CAFEAcA-Q6hzgW-B52X5XEtZsvBX64qSr9wSKizLVYu58mPdXKw@mail.gmail.com>
+Subject: Re: [PATCH v6 1/2] arm/kvm: add support for MTE
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Andrea Bolognani <abologna@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Laurent Vivier <lvivier@redhat.com>, qemu-arm@nongnu.org,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Eric Auger <eauger@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Juan Quintela <quintela@redhat.com>,
+        Gavin Shan <gshan@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>,
+        Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 02, 2023 at 04:30:04PM +0100, Simon Horman wrote:
->On Thu, Mar 02, 2023 at 12:34:19PM +0100, Stefano Garzarella wrote:
->> Let's use our own kthread to run device jobs.
->> This allows us more flexibility, especially we can attach the kthread
->> to the user address space when vDPA uses user's VA.
->>
->> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
->> ---
->>  drivers/vdpa/vdpa_sim/vdpa_sim.h |  3 ++-
->>  drivers/vdpa/vdpa_sim/vdpa_sim.c | 17 ++++++++++++-----
->>  2 files changed, 14 insertions(+), 6 deletions(-)
->>
->> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.h b/drivers/vdpa/vdpa_sim/vdpa_sim.h
->> index acee20faaf6a..ce83f9130a5d 100644
->> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.h
->> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.h
->> @@ -57,7 +57,8 @@ struct vdpasim_dev_attr {
->>  struct vdpasim {
->>  	struct vdpa_device vdpa;
->>  	struct vdpasim_virtqueue *vqs;
->> -	struct work_struct work;
->> +	struct kthread_worker *worker;
->> +	struct kthread_work work;
->>  	struct vdpasim_dev_attr dev_attr;
->>  	/* spinlock to synchronize virtqueue state */
->>  	spinlock_t lock;
->> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
->> index a6ee830efc38..6feb29726c2a 100644
->> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
->> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
->> @@ -11,8 +11,8 @@
->>  #include <linux/module.h>
->>  #include <linux/device.h>
->>  #include <linux/kernel.h>
->> +#include <linux/kthread.h>
->>  #include <linux/slab.h>
->> -#include <linux/sched.h>
->>  #include <linux/dma-map-ops.h>
->>  #include <linux/vringh.h>
->>  #include <linux/vdpa.h>
->> @@ -116,7 +116,7 @@ static void vdpasim_do_reset(struct vdpasim *vdpasim)
->>  static const struct vdpa_config_ops vdpasim_config_ops;
->>  static const struct vdpa_config_ops vdpasim_batch_config_ops;
->>
->> -static void vdpasim_work_fn(struct work_struct *work)
->> +static void vdpasim_work_fn(struct kthread_work *work)
->>  {
->>  	struct vdpasim *vdpasim = container_of(work, struct vdpasim, work);
->>
->> @@ -159,7 +159,13 @@ struct vdpasim *vdpasim_create(struct vdpasim_dev_attr *dev_attr,
->>
->>  	vdpasim = vdpa_to_sim(vdpa);
->>  	vdpasim->dev_attr = *dev_attr;
->> -	INIT_WORK(&vdpasim->work, vdpasim_work_fn);
->> +
->> +	kthread_init_work(&vdpasim->work, vdpasim_work_fn);
->> +	vdpasim->worker = kthread_create_worker(0, "vDPA sim worker: %s",
->> +						dev_attr->name);
->> +	if (IS_ERR(vdpasim->worker))
->> +		goto err_iommu;
+On Thu, 2 Mar 2023 at 14:29, Cornelia Huck <cohuck@redhat.com> wrote:
 >
->Branching to err_iommu will result in a call to put_device(dev)...
+> On Thu, Mar 02 2023, Peter Maydell <peter.maydell@linaro.org> wrote:
+> > I think having MTE in the specific case of KVM behave differently
+> > to how we've done all these existing properties and how we've
+> > done MTE for TCG would be confusing. The simplest thing is to just
+> > follow the existing UI for TCG MTE.
+> >
+> > The underlying reason for this is that MTE in general is not a feature
+> > only of the CPU, but also of the whole system design. It happens
+> > that KVM gives us tagged RAM "for free" but that's an oddity
+> > of the KVM implementation -- in real hardware there needs to
+> > be system level support for tagging.
+>
+> Hm... the Linux kernel actually seems to consider MTE to be a cpu
+> feature (at least, it lists it in the cpu features).
+>
+> So, is your suggestion to use the 'mte' prop of the virt machine to mean
+> "enable all prereqs for MTE, i.e. allocate tag memory for TCG and enable
+> MTE in the kernel for KVM"? For TCG, we'll get MTE for the max cpu
+> model; for KVM, we'd get MTE for host (== max), but I'm wondering what
+> should happen if we get named cpu models and the user specifies one
+> where we won't have MTE (i.e. some pre-8.5 one)?
 
-Good catch!
+I think we can probably cross that bridge when we get to it,
+but I imagine the semantics would be "cortex-foo plus MTE"
+(in the same way that -cpu cortex-foo,+x,-y can add and
+subtract features from a baseline).
 
->
->> +
->>  	spin_lock_init(&vdpasim->lock);
->>  	spin_lock_init(&vdpasim->iommu_lock);
->
->... but dev is not initialised until the line following this hunk,
->which is:
->
->	dev = &vdpasim->vdpa.dev;
->
->In order to avoid leaking dev I _think_ the correct approach
->is to move the initialisation of dev above the branch to
->err_iommu, perhaps above the call to kthread_init_work()
->is a good place.
-
-Yep, I agree. I'll fix in v3.
-
-Thanks,
-Stefano
-
->
->This does move the assignment outside the locks above.
->But I _think_ that is ok.
->
->> @@ -212,7 +218,7 @@ EXPORT_SYMBOL_GPL(vdpasim_create);
->>
->>  void vdpasim_schedule_work(struct vdpasim *vdpasim)
->>  {
->> -	schedule_work(&vdpasim->work);
->> +	kthread_queue_work(vdpasim->worker, &vdpasim->work);
->>  }
->>  EXPORT_SYMBOL_GPL(vdpasim_schedule_work);
->>
->> @@ -612,7 +618,8 @@ static void vdpasim_free(struct vdpa_device *vdpa)
->>  	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
->>  	int i;
->>
->> -	cancel_work_sync(&vdpasim->work);
->> +	kthread_cancel_work_sync(&vdpasim->work);
->> +	kthread_destroy_worker(vdpasim->worker);
->>
->>  	for (i = 0; i < vdpasim->dev_attr.nvqs; i++) {
->>  		vringh_kiov_cleanup(&vdpasim->vqs[i].out_iov);
->> --
->> 2.39.2
->>
->
-
+thanks
+-- PMM
