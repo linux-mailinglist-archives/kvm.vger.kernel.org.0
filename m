@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C0A816A7EEE
-	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 10:55:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AD0936A7F0A
+	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 10:56:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230204AbjCBJy6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Mar 2023 04:54:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36662 "EHLO
+        id S230419AbjCBJ4B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Mar 2023 04:56:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37586 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230316AbjCBJyo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Mar 2023 04:54:44 -0500
+        with ESMTP id S230310AbjCBJz2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Mar 2023 04:55:28 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96B5F1ABC8
-        for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 01:53:59 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCF1915543
+        for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 01:54:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677750838;
+        s=mimecast20190719; t=1677750888;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=jAanRdQ6lew74x0O2AW3iUiZVFolX1emAfL8FQaMI/4=;
-        b=gzdALdWRMqb33PVvMB16FhKgqS4hEYbt8grKWAckL6CvyLN6dpP6UYdSCIaxhIJ+nlzrF1
-        xOY65khD392eWjv2syXp32y83CKeH2NgJuLN1LquoXNXmYvcvKMCenM172bo6dtywgvacF
-        uCYCO6rWYNHFckmr0E1jVmOtjTGx9XY=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=Jl4deYgtYQ06Ijfay6FIS+BGHtz4sq6QUOH6s3fzXLM=;
+        b=dRzBmyCVfCWFKJwGIAfbVXk52s5aFDzqkIJw0kdr6S/5LWpsu0qENizIybVInV6RJgki2d
+        TOhljfpc7w6zChD9UcflF3W19wqGYdF4EWKimFKXrYVe3NfGoGWvM5viObjO/qGad/AF6K
+        H0UYT983mnCZim3yhKWEVTdroVjX2ic=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-446-prNPW7EpPRKQuhlanS_ONQ-1; Thu, 02 Mar 2023 04:53:57 -0500
-X-MC-Unique: prNPW7EpPRKQuhlanS_ONQ-1
-Received: by mail-qv1-f69.google.com with SMTP id u18-20020a0cec92000000b0056ea549d728so8569171qvo.10
-        for <kvm@vger.kernel.org>; Thu, 02 Mar 2023 01:53:57 -0800 (PST)
+ us-mta-342-54yhk-t6O8WnlMGAwkVLxw-1; Thu, 02 Mar 2023 04:54:47 -0500
+X-MC-Unique: 54yhk-t6O8WnlMGAwkVLxw-1
+Received: by mail-qt1-f200.google.com with SMTP id p7-20020ac84607000000b003b9b6101f65so8139990qtn.11
+        for <kvm@vger.kernel.org>; Thu, 02 Mar 2023 01:54:46 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677750837;
+        d=1e100.net; s=20210112; t=1677750886;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jAanRdQ6lew74x0O2AW3iUiZVFolX1emAfL8FQaMI/4=;
-        b=RTTU7cvjvZMNvL7KsL4cFDpRM5jYHoBzw2emA2BCnJFTrAbBAytKgcRFYTsbhoHcPd
-         pzgPqsa1kRHFjirDH2Ww0ly/xICE9jn935YDyh4hPcSaRZATpF7UnWpoPKVh8o7dM8ZD
-         mKTCK2ZyGZo3py0tPpYcDH4KSrsz+hYwmYa254bRNh56HNKSCffrP4nX4Fu37AD2WN1A
-         qUGzaw9tmAkBvihdtgxoZcC8ef/LplVy3AwLPnSbtKk3EakXC/zS6M3CTWcmfIVvU3st
-         rH+JPfPihGm5rwgpoSMQXBdG6QmmFEQ45c5wGQJySLrnX2/BfL7c9DUlNtS8Mib5Rqns
-         U+jA==
-X-Gm-Message-State: AO0yUKUeq69GtFWuKHaeJKWJGUX0eiXZoNm4ZZ/UhFGaaJoTJaROs+/V
-        FBV/v/GPdZmDjZatUMi91UCDMfFgCtUN1APhngzHL2hBAAX1g9Dv7EMAgTpIDcUhrtCLIDKk2O+
-        /CnqqFnNjuXry
-X-Received: by 2002:ac8:7c4e:0:b0:3bf:c431:ea6e with SMTP id o14-20020ac87c4e000000b003bfc431ea6emr16382396qtv.3.1677750837183;
-        Thu, 02 Mar 2023 01:53:57 -0800 (PST)
-X-Google-Smtp-Source: AK7set+D27uSWXYnYHncolI/Nj6QVQLpZyQycFGgRCQpd47EnoDoYamAUXMK1mc3+TkNw/RjY6KEew==
-X-Received: by 2002:ac8:7c4e:0:b0:3bf:c431:ea6e with SMTP id o14-20020ac87c4e000000b003bfc431ea6emr16382365qtv.3.1677750836940;
-        Thu, 02 Mar 2023 01:53:56 -0800 (PST)
+        bh=Jl4deYgtYQ06Ijfay6FIS+BGHtz4sq6QUOH6s3fzXLM=;
+        b=DPUJ2j7K6TcHmk/qrqJKpp3m1zLk0HD8TFfoHWZne4JVKXVSvwC7dT/dbqYjJ+D64O
+         fYP2XlG0wqYw83icx2k7uWKXZ8+BsDuK6m4tGTP1P2vS3A86FmpuKr5re5lhfG81WaM4
+         rzN+qT42uChGfcoFNPrQ+hYz5DbDs9YYOFSAt5uN/QARWxlhZZG4Yb5xys40LifOheCX
+         h+t/fyytCnySAkZ75TRo0/SuTgQ9ofdT2ev0mGFoowHeV/W+SRTCR+Sa6/0OmvT4AE5W
+         ZXmSTjFtNQZUorDTATvyYhe0rCFXuI3aUEwiNqxsANbtw+hx9Xhq2Uouv8xBC9/rPNWP
+         4gtQ==
+X-Gm-Message-State: AO0yUKXDMQh3FwT8zRps59EZ/UxXPKw+v/RACaur3+SQSkca77JWb2gM
+        2OUhDG8X6zs5hB+vH56v5j+LedXIJ3lELIAWk/JN4oNDUxT/0knQpyMfi35Z6t4Kc4LaiI2QY7V
+        59J7dtSpOfdcG
+X-Received: by 2002:a05:6214:1c4f:b0:56e:ad32:2d66 with SMTP id if15-20020a0562141c4f00b0056ead322d66mr20116630qvb.10.1677750886506;
+        Thu, 02 Mar 2023 01:54:46 -0800 (PST)
+X-Google-Smtp-Source: AK7set/zHXtLONQKHsTMxBoLmedRcRQY43vgPItc+r7atw2mN0yr6/437PDMUCFGDoA9aWymkxnO/g==
+X-Received: by 2002:a05:6214:1c4f:b0:56e:ad32:2d66 with SMTP id if15-20020a0562141c4f00b0056ead322d66mr20116604qvb.10.1677750885976;
+        Thu, 02 Mar 2023 01:54:45 -0800 (PST)
 Received: from sgarzare-redhat (c-115-213.cust-q.wadsl.it. [212.43.115.213])
-        by smtp.gmail.com with ESMTPSA id x7-20020ac87007000000b003c00573aaffsm676414qtm.3.2023.03.02.01.53.49
+        by smtp.gmail.com with ESMTPSA id q11-20020a37430b000000b00742a252ba06sm8395133qka.135.2023.03.02.01.54.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Mar 2023 01:53:56 -0800 (PST)
-Date:   Thu, 2 Mar 2023 10:53:46 +0100
+        Thu, 02 Mar 2023 01:54:45 -0800 (PST)
+Date:   Thu, 2 Mar 2023 10:54:34 +0100
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     Bobby Eshleman <bobby.eshleman@bytedance.com>
 Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
@@ -78,17 +78,18 @@ Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
         Cong Wang <cong.wang@bytedance.com>
-Subject: Re: [PATCH net-next v3 2/3] selftests/bpf: add vsock to vmtest.sh
-Message-ID: <20230302095346.rbu6s3os4kz2bnbr@sgarzare-redhat>
+Subject: Re: [PATCH net-next v3 3/3] selftests/bpf: add a test case for vsock
+ sockmap
+Message-ID: <20230302095434.opufchwk7efiw4dv@sgarzare-redhat>
 References: <20230227-vsock-sockmap-upstream-v3-0-7e7f4ce623ee@bytedance.com>
- <20230227-vsock-sockmap-upstream-v3-2-7e7f4ce623ee@bytedance.com>
+ <20230227-vsock-sockmap-upstream-v3-3-7e7f4ce623ee@bytedance.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20230227-vsock-sockmap-upstream-v3-2-7e7f4ce623ee@bytedance.com>
+In-Reply-To: <20230227-vsock-sockmap-upstream-v3-3-7e7f4ce623ee@bytedance.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -96,20 +97,18 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 28, 2023 at 07:04:35PM +0000, Bobby Eshleman wrote:
->Add vsock loopback to the test kernel.
->
->This allows sockmap for vsock to be tested.
+On Tue, Feb 28, 2023 at 07:04:36PM +0000, Bobby Eshleman wrote:
+>Add a test case testing the redirection from connectible AF_VSOCK
+>sockets to connectible AF_UNIX sockets.
 >
 >Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
 >---
-> tools/testing/selftests/bpf/config.aarch64 | 2 ++
-> tools/testing/selftests/bpf/config.s390x   | 3 +++
-> tools/testing/selftests/bpf/config.x86_64  | 3 +++
-> 3 files changed, 8 insertions(+)
+> .../selftests/bpf/prog_tests/sockmap_listen.c      | 163 +++++++++++++++++++++
+> 1 file changed, 163 insertions(+)
 
-I already acked this in the v2, please bring them between versions if 
-there are no changes.
+Ditto.
+
+For the vsock part:
 
 Acked-by: Stefano Garzarella <sgarzare@redhat.com>
 
