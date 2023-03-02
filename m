@@ -2,133 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CF2F66A80E1
-	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 12:14:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2932D6A8101
+	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 12:27:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230214AbjCBLOE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Mar 2023 06:14:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35430 "EHLO
+        id S229706AbjCBL1M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Mar 2023 06:27:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48280 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230206AbjCBLN3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Mar 2023 06:13:29 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E7A341B4D
-        for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 03:13:04 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9C86561584
-        for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 11:13:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 341EFC4339C;
-        Thu,  2 Mar 2023 11:13:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677755582;
-        bh=78a13yEpeA5Ldcu7G0xUrs9jQbTgpI/ZVXJxl6apOi0=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=GHuu/UJ3xuwVyb2/hnG6qeRyFi+RH8qFcK805GHVNSg88LVuhf48SIZ55kUARSxBz
-         TqeUjyxV8iEvvkkGywqVkEzY7AbeEfVJRKjrpNzIQ7Y4PwGaWIeV0/PWKoaUs8pNmu
-         rORCVo3bA2M0KZMkk07U3Rj8In9+4I5GIc9ToDhcHT2M91CjxpkTK2CFYX7hgjdLPp
-         zhsjuu/cH25uMnFzwpj+h+e6RLY2Q7qRsyuFcjrvNKnQ2hEVC2PvDrGsJIpXKfc1fB
-         MTP/d61Ep7OwY+x2kwCrBbnghMk4hgQ/2ZS3BgmjQvu62nJTo3ytZAhnsqdMsoQl0v
-         P5fjQTmlDJK1g==
-From:   =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-To:     Andy Chiu <andy.chiu@sifive.com>, linux-riscv@lists.infradead.org,
-        palmer@dabbelt.com, anup@brainfault.org, atishp@atishpatra.org,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
-Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, Vincent Chen <vincent.chen@sifive.com>,
-        Andy Chiu <andy.chiu@sifive.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>, Guo Ren <guoren@kernel.org>,
-        Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH -next v14 08/19] riscv: Introduce struct/helpers to
- save/restore per-task Vector state
-In-Reply-To: <20230224170118.16766-9-andy.chiu@sifive.com>
-References: <20230224170118.16766-1-andy.chiu@sifive.com>
- <20230224170118.16766-9-andy.chiu@sifive.com>
-Date:   Thu, 02 Mar 2023 12:12:59 +0100
-Message-ID: <87r0u74dac.fsf@all.your.base.are.belong.to.us>
+        with ESMTP id S229502AbjCBL1L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Mar 2023 06:27:11 -0500
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E99B830B33;
+        Thu,  2 Mar 2023 03:27:09 -0800 (PST)
+Received: by mail-lj1-x229.google.com with SMTP id h3so17214778lja.12;
+        Thu, 02 Mar 2023 03:27:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1677756428;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TJb7ZUgVLyd0BezCYruMgzCjIaGRbn8MEvGz3yq2uQ8=;
+        b=DBbo45ZyhnENO2PQEeIoAWIfplHoenM9uv102K8FoBn5IlQ/F3IbS2pJVKCBQQl4Z3
+         cDacFzW6IqmfjlggpJyJ9u7ZveV4kUH8S4ZQ3eHeOuv3LnwPGSyq3prWTkijFNJLqgUz
+         zdKG6Br34pnwCnp9yjJda2djJ3YPnYovU6dDQnnKHBmqOlW4a5QvIdcuEajrNiwBg/VX
+         JDnor36TEOvosU86JgpMLKpRLVerkqcJEVFcyhKt+fiBpPpixQuTiCPymUf5JwpfPbEY
+         N5QbTv1xuWXUNGYWNDkI02TUeGtk1y3PbKzaKRJHDD/2Z+VF6Zy5cx6vlgQjDHHNBxxW
+         +GSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1677756428;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TJb7ZUgVLyd0BezCYruMgzCjIaGRbn8MEvGz3yq2uQ8=;
+        b=PNozBdNKVWkCRsFfFUugyGtiOb6jOaJfFDNxKbZysTlGrRI/Rd2lcHuZyDY8bhtVFW
+         rhEQPibnyZNQfZKp2Ua4wI1gQOvzGhgYPnTKBWMEaa6hyWFKA1Ijh2ZfnqXW1GWnEENf
+         +NaxnmOxIWzBWl4HidvREokS54TNSxy1mGOmUIjlqPSC4oUd8vChUaBolWAyCYnwSkd7
+         iZoo7EGAM4MKr19ZUu9HY/QR9W37Wxx7GcCzjCCyE8ckthUv0WPB/zrQzc9TVFeyBBQo
+         ZZkNou3obfcptfBVK/Ob33HcpOcxBJ0hirXgVZFOUMmBYtCHB489FQK6Ny/6gRP51UaI
+         H4Pw==
+X-Gm-Message-State: AO0yUKVUud7SMUVryMjB31EVbT4AvoFWAEowQvUzpmAvHUHDn+pfW5lQ
+        iOBlehIVTSEXdYrQ2E/xBF0=
+X-Google-Smtp-Source: AK7set/LBpmR3Ohx8+StI9clR/JKrsDH2fb2JnDl7qKrYvJxXVkoui0Q2HhcZRo8LAVSqRFwnfVepQ==
+X-Received: by 2002:a2e:c42:0:b0:295:a024:f3e2 with SMTP id o2-20020a2e0c42000000b00295a024f3e2mr2796902ljd.5.1677756428052;
+        Thu, 02 Mar 2023 03:27:08 -0800 (PST)
+Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
+        by smtp.gmail.com with ESMTPSA id be40-20020a05651c172800b002959b1162f0sm2057676ljb.96.2023.03.02.03.27.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Mar 2023 03:27:07 -0800 (PST)
+Date:   Thu, 2 Mar 2023 13:27:05 +0200
+From:   Zhi Wang <zhi.wang.linux@gmail.com>
+To:     Dionna Amalie Glaze <dionnaglaze@google.com>
+Cc:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
+        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
+        nikunj.dadhania@amd.com
+Subject: Re: [PATCH RFC v8 54/56] x86/sev: Add KVM commands for instance
+ certs
+Message-ID: <20230302132705.00001637@gmail.com>
+In-Reply-To: <CAAH4kHY6jm9PHjuGj18eyCC8H4oksuNkVL=igAh4P4BTsKs2xA@mail.gmail.com>
+References: <20230220183847.59159-1-michael.roth@amd.com>
+        <20230220183847.59159-55-michael.roth@amd.com>
+        <20230302020245.00006f57@gmail.com>
+        <CAAH4kHY6jm9PHjuGj18eyCC8H4oksuNkVL=igAh4P4BTsKs2xA@mail.gmail.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Andy Chiu <andy.chiu@sifive.com> writes:
+On Wed, 1 Mar 2023 17:41:11 -0800
+Dionna Amalie Glaze <dionnaglaze@google.com> wrote:
 
-> diff --git a/arch/riscv/include/asm/vector.h b/arch/riscv/include/asm/vec=
-tor.h
-> index 692d3ee2d2d3..9c025f2efdc3 100644
-> --- a/arch/riscv/include/asm/vector.h
-> +++ b/arch/riscv/include/asm/vector.h
-> @@ -31,11 +54,72 @@ static __always_inline void riscv_v_disable(void)
->  	csr_clear(CSR_SSTATUS, SR_VS);
->  }
->=20=20
-> +static __always_inline void __vstate_csr_save(struct __riscv_v_ext_state=
- *dest)
-> +{
-> +	asm volatile (
-> +		"csrr	%0, " CSR_STR(CSR_VSTART) "\n\t"
-> +		"csrr	%1, " CSR_STR(CSR_VTYPE) "\n\t"
-> +		"csrr	%2, " CSR_STR(CSR_VL) "\n\t"
-> +		"csrr	%3, " CSR_STR(CSR_VCSR) "\n\t"
-> +		: "=3Dr" (dest->vstart), "=3Dr" (dest->vtype), "=3Dr" (dest->vl),
-> +		  "=3Dr" (dest->vcsr) : :);
-> +}
-> +
-> +static __always_inline void __vstate_csr_restore(struct __riscv_v_ext_st=
-ate *src)
-> +{
-> +	asm volatile (
-> +		"vsetvl	 x0, %2, %1\n\t"
-> +		"csrw	" CSR_STR(CSR_VSTART) ", %0\n\t"
-> +		"csrw	" CSR_STR(CSR_VCSR) ", %3\n\t"
-> +		: : "r" (src->vstart), "r" (src->vtype), "r" (src->vl),
-> +		    "r" (src->vcsr) :);
-> +}
-> +
-> +static inline void __riscv_v_vstate_save(struct __riscv_v_ext_state *sav=
-e_to, void *datap)
-> +{
-> +	riscv_v_enable();
-> +	__vstate_csr_save(save_to);
-> +	asm volatile (
-> +		"vsetvli	t4, x0, e8, m8, ta, ma\n\t"
-> +		"vse8.v		v0, (%0)\n\t"
-> +		"add		%0, %0, t4\n\t"
-> +		"vse8.v		v8, (%0)\n\t"
-> +		"add		%0, %0, t4\n\t"
-> +		"vse8.v		v16, (%0)\n\t"
-> +		"add		%0, %0, t4\n\t"
-> +		"vse8.v		v24, (%0)\n\t"
-> +		: : "r" (datap) : "t4", "memory");
-> +	riscv_v_disable();
-> +}
-> +
-> +static inline void __riscv_v_vstate_restore(struct __riscv_v_ext_state *=
-restore_from,
-> +				    void *datap)
-> +{
-> +	riscv_v_enable();
-> +	asm volatile (
-> +		"vsetvli	t4, x0, e8, m8, ta, ma\n\t"
-> +		"vle8.v		v0, (%0)\n\t"
-> +		"add		%0, %0, t4\n\t"
-> +		"vle8.v		v8, (%0)\n\t"
-> +		"add		%0, %0, t4\n\t"
-> +		"vle8.v		v16, (%0)\n\t"
-> +		"add		%0, %0, t4\n\t"
-> +		"vle8.v		v24, (%0)\n\t"
-> +		: : "r" (datap) : "t4");
+> > > @@ -2089,6 +2089,7 @@ static void *snp_context_create(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> > >               goto e_free;
+> > >
+> > >       sev->snp_certs_data = certs_data;
+> > > +     sev->snp_certs_len = 0;
+> > >
+> > >       return context;
+> > >
+> >
+> > Better to move the fix to PATCH 45.
+> >
+> 
+> This part isn't a fix, but part of the implementation since
+> snp_certs_len is added in this patch here
+>
 
-Nit/question: For both enable/disable; Any reason to clobber t4, instead
-of using a scratch reg?
+I see. My bad. Was thinking it was the snp_serts_len in the global sev as
+they has the same name.
+ 
+> > > diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> > > index 221b38d3c845..dced46559508 100644
+> > > --- a/arch/x86/kvm/svm/svm.h
+> > > +++ b/arch/x86/kvm/svm/svm.h
+> > > @@ -94,6 +94,7 @@ struct kvm_sev_info {
+> > >       u64 snp_init_flags;
+> > >       void *snp_context;      /* SNP guest context page */
+> > >       void *snp_certs_data;
+> > > +     unsigned int snp_certs_len; /* Size of instance override for certs */
+> > >       struct mutex guest_req_lock; /* Lock for guest request handling */
+> > >
+> > >       u64 sev_features;       /* Features set at VMSA creation */
+> 
+> 
 
-Bj=C3=B6rn
