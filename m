@@ -2,273 +2,280 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3ED846A7B25
-	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 07:01:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7806B6A7B38
+	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 07:07:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229714AbjCBGBr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Mar 2023 01:01:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34228 "EHLO
+        id S229929AbjCBGHP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Mar 2023 01:07:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbjCBGBp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Mar 2023 01:01:45 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F09684D613;
-        Wed,  1 Mar 2023 22:01:10 -0800 (PST)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32252Z1k027917;
-        Thu, 2 Mar 2023 05:59:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=wUdfnguh4H8PLzbalZbcZFqO3C4N0DClhybUCKsJD00=;
- b=QgRVPGU6Mys64aRBI4Eo5frRm7YMTrCIYglVT5ffGukrjzdlrux9wTDTVvO+qn2MYuRc
- 4NRc0mD5AR3mzJB+mtm0cxGo+q6z5/uohubiiVZHmC6x0sGx/yE4llG9rVcSqAy5wDhp
- 50FyLMeg90yso9RxcV2voTU7SfpyKUxq+ESRscWeXowvQeQLO1DXGa25iIJBSNr2PyF6
- sLlR0G1fH/ISx5eiqsDx5ORXL7ujtsIVaOeAxxLWiVgWqqwbThnfIaAwrtldhKael82e
- GKG/2dsJ1My2WI1enj/S+74Bx5FtIwiHvb6BmIHQIuPlwqZBJtIl8cvRV1zY/vuUx5+Q cg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3p2naah3ca-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 02 Mar 2023 05:59:40 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3225uW8K004481;
-        Thu, 2 Mar 2023 05:59:39 GMT
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3p2naah3bk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 02 Mar 2023 05:59:39 +0000
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3224D9b2016017;
-        Thu, 2 Mar 2023 05:59:38 GMT
-Received: from smtprelay04.wdc07v.mail.ibm.com ([9.208.129.114])
-        by ppma02dal.us.ibm.com (PPS) with ESMTPS id 3nybdm1vwh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 02 Mar 2023 05:59:38 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-        by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3225xaEd53936468
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 2 Mar 2023 05:59:36 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1F5225805D;
-        Thu,  2 Mar 2023 05:59:36 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9538B5805C;
-        Thu,  2 Mar 2023 05:59:26 +0000 (GMT)
-Received: from [9.65.199.252] (unknown [9.65.199.252])
-        by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Thu,  2 Mar 2023 05:59:26 +0000 (GMT)
-Message-ID: <e63ba525-644d-1a8c-afe7-2ced4a8fbb93@linux.ibm.com>
-Date:   Thu, 2 Mar 2023 07:59:24 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH RFC v8 52/56] ccp: Add support to decrypt the page
-To:     Zhi Wang <zhi.wang.linux@gmail.com>,
-        Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, tobin@ibm.com, bp@alien8.de, vbabka@suse.cz,
-        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
-        ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Dov Murik <dovmurik@linux.ibm.com>
-References: <20230220183847.59159-1-michael.roth@amd.com>
- <20230220183847.59159-53-michael.roth@amd.com>
- <20230301232045.0000502e@intel.com>
+        with ESMTP id S229457AbjCBGHN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Mar 2023 01:07:13 -0500
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D12C1E283;
+        Wed,  1 Mar 2023 22:07:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1677737231; x=1709273231;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=uoNTErxqyxr5Lq9Z3o2wiOd1zARl408Nb9HYaU6XZsY=;
+  b=BfPza4Q+OMOckqnjh1Lf9iAX6TIOWBWKNCY932auPoCFYC1p2DeqPUag
+   B/bKqPHjiPpE3hXrbSTF+a1wSVVFIWZbJr7ncHqUSCB6msAkinYVFbRTS
+   852YUzZ6it69Nwt1lg6Rifv7/bJUBYCSV7oszADJp0VheM8wKKr6IrhHG
+   fNB17gYesweH0bJKK/t2A6GpsZ5jFM7kYasREabvycwiQZ7dQZSstg9FF
+   eCylA3AIMuGaN9fjAoAV/aMTzspOhhgRevUnY/kXGI2dmHMiE9vCZxGWI
+   NQ1Thw0HNbT6T3/n01CjlEYnMmM3+VRsUDAwjRLcBWsaAaIOPnH2LnrTM
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="420891189"
+X-IronPort-AV: E=Sophos;i="5.98,226,1673942400"; 
+   d="scan'208";a="420891189"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2023 22:07:10 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="674828908"
+X-IronPort-AV: E=Sophos;i="5.98,226,1673942400"; 
+   d="scan'208";a="674828908"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orsmga002.jf.intel.com with ESMTP; 01 Mar 2023 22:07:09 -0800
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Wed, 1 Mar 2023 22:07:08 -0800
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21 via Frontend Transport; Wed, 1 Mar 2023 22:07:08 -0800
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.174)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.21; Wed, 1 Mar 2023 22:07:07 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jUQt0/s85XWb0Bs96V89IvEJZ5anarb8SEK6mS7B1aIM8pqF31c6zR6MoiI1B3fZ5IEikXog+wz15122iAvrBjXDhC5paUHb2TmTJBRMNwaLvqlPNfWbC9jgX1oDnpN91Zfy3OvLQN6u6pN5bmjAzwyrUTqK5+vb+Z0X4qubognFldQ71xUqcY5Q/B38tYisff8B4I7MDv3B2exIp0PCnXsmKtUvN+jZG5ug2I9ZEhSEbLDl2mKJOzlBvP0g5S9XORAsG7Uke5fm4uElNg+Kla5xDzBl6ZVtGVsTDP9m7KCfQ4U1MWkM1ctx1QghR5NgU2gHHYJYcEfj4HHNxhGYvg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ayDgqcEySs8/eAqAJL2Zl2FjsHMmBHM70JQyU7r6nWI=;
+ b=U333hUwCcfyvyH7hGXMH4kej1zfCvijrNsD123zk6qr6zvDxzjCeN/wy7bMeV8Em0gVG7/HUeYZ8tjbepU87wa505pGfAdx7rYIkf2uRSYlA9xEPegRJqBvdXymKEpzvHpl5CZZxn6ivB8OEprmdE+w8JQVLmngDnmoeJIOqVE4GzbhBt1cHy8mRyzGWlEny1z6/N0jtuTx1AOFBGzPqjc4i9HrRFDwUUFybDuUtHwkI3ZUIK51ZZA3ZWjXnH/ytW5nA+FR3VlqIgNlj3M2cHqaZt53dDxevFiNzAWofvRIhlqcEWoKr2zFiWbwz7PhXRdAdTQpSa5yd/jJKRtIeEQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by PH0PR11MB5206.namprd11.prod.outlook.com (2603:10b6:510:3f::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6156.18; Thu, 2 Mar
+ 2023 06:07:06 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::6f7:944a:aaad:301f]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::6f7:944a:aaad:301f%8]) with mapi id 15.20.6134.030; Thu, 2 Mar 2023
+ 06:07:05 +0000
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>
+CC:     "joro@8bytes.org" <joro@8bytes.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>
+Subject: RE: [PATCH v5 09/19] vfio/pci: Allow passing zero-length fd array in
+ VFIO_DEVICE_PCI_HOT_RESET
+Thread-Topic: [PATCH v5 09/19] vfio/pci: Allow passing zero-length fd array in
+ VFIO_DEVICE_PCI_HOT_RESET
+Thread-Index: AQHZSpxNz0d7VXviIEytrFhyB5GUvK7m/3jg
+Date:   Thu, 2 Mar 2023 06:07:04 +0000
+Message-ID: <DS0PR11MB75295B4B2578765C8B08AC7EC3B29@DS0PR11MB7529.namprd11.prod.outlook.com>
+References: <20230227111135.61728-1-yi.l.liu@intel.com>
+ <20230227111135.61728-10-yi.l.liu@intel.com>
+In-Reply-To: <20230227111135.61728-10-yi.l.liu@intel.com>
+Accept-Language: en-US
 Content-Language: en-US
-From:   Dov Murik <dovmurik@linux.ibm.com>
-In-Reply-To: <20230301232045.0000502e@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 3cOt12L_luCZfkyo3GAAwwOwY32Q2VvV
-X-Proofpoint-ORIG-GUID: HE5DsgxGDI6IFPFb0VeD3SZ_AWQzgOpk
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-02_02,2023-03-01_03,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- bulkscore=0 malwarescore=0 phishscore=0 lowpriorityscore=0 mlxscore=0
- spamscore=0 clxscore=1011 impostorscore=0 mlxlogscore=999 adultscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2303020045
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS0PR11MB7529:EE_|PH0PR11MB5206:EE_
+x-ms-office365-filtering-correlation-id: 2e732251-e2ce-46a4-bb3e-08db1ae458de
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: hiroOkNwnHPa9zL3ha4L0FSnioi7ondCPSp1zRkgrRa5qMaOzC3FuUM4g6pTiHyvUoLFEMV9rf4ve0SgVUhNU7Z8qJzhEB7+duA+2x8RgRhs/asgjfvy8HW4yGIf0h1udtySHKZs5O9nOk9cQxayImfn4rY4DUu13YALMuHQZSnWAw8u1Iqdaz/BpzAcfoVNqyJQBUqr5q3lAnZ2gj2al69tMge5DvV5FROyrAuDd3DASXY0ie7Icp1EkNWb0paIu9LhwMOH0AEwxz/THosp2xlF/XBZqOKTgSKT0/nV+1tPmNOFRHlNkamiop3xJ0Io0rMWkNfsOSZgwULQNdRkxlZcSCXfVHGlgdmMdQcs+MwY4eDNm0Pe+DxLspTt2ilNqGrXma+laLsnlWn7e7fSGWu6ooWA/31ASgJhTxU0Cj98Z5Qj3LRCwwqoB5vZ4h1473nr4bQ9GgdAYO46jdl0W6axtDit7IY6e+23mbzO8ciXtZyq5WIs2HubuRGy30JuHP5Q0w7Z9fJxtcxhbWFdpoGnao4MQNR+BMgK6S7uZx/vQUs4Is5fMFXGR6aIKCY2dkpDz6auB6V7Am00GSpjW3KLOMYvOObqUg1Vf8Ky7pXTFF9BDwTr3fGVsGSCGbWNy3VzHa+DKuH8Xm+iF3q9/bFVraZBWG00awiFH/J1sGvzWaA8onImH6cCmwK23U8ihz3ZaVElfGF/lmxOMVVSxA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(366004)(136003)(396003)(376002)(39860400002)(346002)(451199018)(83380400001)(66946007)(38100700002)(122000001)(5660300002)(478600001)(8936002)(71200400001)(82960400001)(7416002)(33656002)(86362001)(55016003)(38070700005)(26005)(186003)(9686003)(6506007)(8676002)(64756008)(66446008)(66476007)(66556008)(7696005)(2906002)(76116006)(52536014)(316002)(4326008)(41300700001)(6636002)(110136005)(54906003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?XVRnvfVHwmAO2j5ViO6B9mesoELsYmCdRXtVvqcsJNlfLsXp1FyIymIhKxym?=
+ =?us-ascii?Q?dcNt5Xyc7q0azdm0LR+egazdFwGrgqtAkkE+Gx4ewaVBYg7JTXCZKoRyxnyS?=
+ =?us-ascii?Q?I9QT2dNEmKZomsu4HXknknrjhNSPHw0VEonuXWR0oFFzag5hKPUxFvYlcyiY?=
+ =?us-ascii?Q?fvr3/xv3RIgFLiL/mP6qVwSjqeQwaDr90YswWpmOq2mIFQbZluMZf8VVRs4W?=
+ =?us-ascii?Q?tvugg3Vzgrspqnl/BOYGvzMwrOHvWqTsqMhH/wbl72xR23Fx4w6y6+9TQK5E?=
+ =?us-ascii?Q?W5BolC4fS2vhVVZpYH/Foki5PTcXyH/nFIVwK04bj6Q+mbuqN/NosdOH466+?=
+ =?us-ascii?Q?mz88z2Kg7xRyQxdgDN5JaUCnnIfGbKi2RAAAhxdoT55RVdL1MVLecmJ0VPsS?=
+ =?us-ascii?Q?ASTpaJfkRXvFPt7pwm+XmBpZLk1OtrkOyLd20Sd9w2Dhda5/dM/7T+NIsqD4?=
+ =?us-ascii?Q?3bvHpe8HLgqDabRvFx0ywN67E4kIvyoWeU+/lFWn54eCYOBalAKglqDxKZKn?=
+ =?us-ascii?Q?NztG6VGtg+w21c9Oiba8ix5h88Pdr9gineBL+Sn9xsPCo+RvRuN3DchHP1cL?=
+ =?us-ascii?Q?dfuUbBSQoRtCfZeD77kvPcSuPg8ZDEnl/Zu+CJR+ZuV779D7qnktuV8WXY/i?=
+ =?us-ascii?Q?ZqXpRIl8FxmA64ac4sl2ZC7khXdABHWv6uau12JCCzkogWn+ZtjRoKYvzB/P?=
+ =?us-ascii?Q?41hdb/fHHwHLlhdwRdJWLbHaeGvrexLNb32qwN6vxxm+DZqRW19aO+OlE1cn?=
+ =?us-ascii?Q?x/1DGTAOjRNvim5q7dYzejs84OiZttUJhR6Cy0ZPsnh5sos+j9YB+6Rsy14a?=
+ =?us-ascii?Q?JGAjbra4kx4edg81J54yehJZQAbIGDUGaGEa6PMzDm9mGRMJlcjsR1lT8XW2?=
+ =?us-ascii?Q?AOneo2oSAqbmdeLmBhv3Tq+usSmttRo1koo6kPx6287kyFNc4W/RjXU8bAyx?=
+ =?us-ascii?Q?BKQ6Y20vNW5uXcV+qFxT13EMm+/EEcUOEOGcVGHZCg2+pGeNQxBGSSgKkEii?=
+ =?us-ascii?Q?9yTs+r6ZmXyLl94Cq09WxAzu8yIcJUJ4CyxbE8VuUnjQyyIe/Qb3Oaj1A8cR?=
+ =?us-ascii?Q?zwn8tr2Nr/lajbZpOl2Ub8d5IRzreFrDl24LxnTSxidBN8oZia1Zwl0HK9y4?=
+ =?us-ascii?Q?HtbjvlNjeTMN1HV2nr6ayMf6iM3Vv9gowUaVuRPfRg7YFYfrTwvGqvqWY+xE?=
+ =?us-ascii?Q?UQUst6FaQ1xQLd8dP3dlzU18wkL7A4xE1hEZ/MbgS1dSeotCAQKyZcOCOnjH?=
+ =?us-ascii?Q?jPrnmvjbIpLWTJQz1t0FEhXgZz8ehHAHWt1C7nViBCOegSL4UNmLSnFToDqE?=
+ =?us-ascii?Q?xJmR/c4nHDdsfZmFia7ibtGRX1zXVEkpw8ia0/QneTTUyYbLuEFyfZETKrW9?=
+ =?us-ascii?Q?GWnHelTOXNUFoBi77MprAa2d/hiSQJy1ZdShtwmuqzsUCRq+Gwyab62Cc+G1?=
+ =?us-ascii?Q?RIPZUbgSv5Y7+A+8o1KDhrPEUbwZrox7G4A55XRdl7CKIL3QMPKz2tDZ1pdy?=
+ =?us-ascii?Q?ukb4Vs776mbFkv/Oweq+izoX8r3/d7jE+3sRLhC6+j9/MsLgZsOlHxgFp6up?=
+ =?us-ascii?Q?L6sylNoPKoZ69gu/ObwPu+NO4GyuhIQkfqpKqeDD?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2e732251-e2ce-46a4-bb3e-08db1ae458de
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Mar 2023 06:07:04.8445
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: rdNh1Hi0owZXBpZesgde5fqJ7XtSjj6pyjfrAs4K7uZ/kAbcNuAXIV0JkPxFnJs424eV+3fEAbXMXHWMf9sSKA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5206
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Mike, Zhi,
+> From: Liu, Yi L <yi.l.liu@intel.com>
+> Sent: Monday, February 27, 2023 7:11 PM
+[...]
+> @@ -2392,13 +2416,25 @@ static int
+> vfio_pci_dev_set_pm_runtime_get(struct vfio_device_set *dev_set)
+>  	return ret;
+>  }
+>=20
+> +static bool vfio_dev_in_iommufd_ctx(struct vfio_pci_core_device *vdev,
+> +				    struct iommufd_ctx *iommufd_ctx)
+> +{
+> +	struct iommufd_ctx *iommufd =3D vfio_device_iommufd(&vdev-
+> >vdev);
+> +
+> +	if (!iommufd)
+> +		return false;
+> +
+> +	return iommufd =3D=3D iommufd_ctx;
+> +}
+> +
+>  /*
+>   * We need to get memory_lock for each device, but devices can share
+> mmap_lock,
+>   * therefore we need to zap and hold the vma_lock for each device, and
+> only then
+>   * get each memory_lock.
+>   */
+>  static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
+> -				      struct vfio_pci_group_info *groups)
+> +				      struct vfio_pci_group_info *groups,
+> +				      struct iommufd_ctx *iommufd_ctx)
+>  {
+>  	struct vfio_pci_core_device *cur_mem;
+>  	struct vfio_pci_core_device *cur_vma;
+> @@ -2429,10 +2465,27 @@ static int vfio_pci_dev_set_hot_reset(struct
+> vfio_device_set *dev_set,
+>=20
+>  	list_for_each_entry(cur_vma, &dev_set->device_list,
+> vdev.dev_set_list) {
+>  		/*
+> -		 * Test whether all the affected devices are contained by
+> the
+> -		 * set of groups provided by the user.
+> +		 * Test whether all the affected devices can be reset by the
+> +		 * user.  The affected devices may already been opened or
+> not
+> +		 * yet.
+> +		 *
+> +		 * For the devices not opened yet, user can reset them. The
+> +		 * reason is that the hot reset is done under the protection
+> +		 * of the dev_set->lock, and device open is also under this
+> +		 * lock.  During the hot reset, such devices can not be
+> opened
+> +		 * by other users.
+> +		 *
+> +		 * For the devices that have been opened, needs to check
+> the
+> +		 * ownership.  If the user provides a set of group fds, the
+> +		 * ownership check is done by checking if all the opened
+> +		 * devices are contained by the groups.  If the user provides
+> +		 * a zero-length fd array, the ownerhsip check is done by
+> +		 * checking if all the opened devices are bound to the same
+> +		 * iommufd_ctx.
+>  		 */
+> -		if (!vfio_dev_in_groups(cur_vma, groups)) {
+> +		if (cur_vma->vdev.open_count &&
+> +		    !vfio_dev_in_groups(cur_vma, groups) &&
+> +		    !vfio_dev_in_iommufd_ctx(cur_vma, iommufd_ctx)) {
 
-On 01/03/2023 23:20, Zhi Wang wrote:
-> On Mon, 20 Feb 2023 12:38:43 -0600
-> Michael Roth <michael.roth@amd.com> wrote:
-> 
->> From: Brijesh Singh <brijesh.singh@amd.com>
->>
->> Add support to decrypt guest encrypted memory. These API interfaces can
->> be used for example to dump VMCBs on SNP guest exit.
->>
-> 
-> What kinds of check will be applied from firmware when VMM decrypts this
-> page? I suppose there has to be kinda mechanism to prevent VMM to decrypt
-> any page in the guest. It would be nice to have some introduction about
-> it in the comments.
-> 
+Hi Alex, Jason,
 
-The SNP ABI spec says (section 8.27.2 SNP_DBG_DECRYPT):
+There is one concern on this approach which is related to the
+cdev noiommu mode. As patch 16 of this series, cdev path
+supports noiommu mode by passing a negative iommufd to
+kernel. In such case, the vfio_device is not bound to a valid
+iommufd. Then the check in vfio_dev_in_iommufd_ctx() is
+to be broken.
 
-  The firmware checks that the guest's policy allows debugging. If not,
-  the firmware returns POLICY_FAILURE.
+An idea is to add a cdev_noiommu flag in vfio_device, when
+checking the iommufd_ictx, also check this flag. If all the opened
+devices in the dev_set have vfio_device->cdev_noiommu=3D=3Dtrue,
+then the reset is considered to be doable. But there is a special
+case. If devices in this dev_set are opened by two applications
+that operates in cdev noiommu mode, then this logic is not able
+to differentiate them. In that case, should we allow the reset?
+It seems to ok to allow reset since noiommu mode itself means
+no security between the applications that use it. thoughts?
 
-and in the Guest Policy (section 4.3):
+>  			ret =3D -EINVAL;
+>  			goto err_undo;
+>  		}
+> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+> index 2e3cb284711d..64e862a02dad 100644
+> --- a/drivers/vfio/vfio.h
+> +++ b/drivers/vfio/vfio.h
+> @@ -225,6 +225,11 @@ static inline void vfio_container_cleanup(void)
+>  #if IS_ENABLED(CONFIG_IOMMUFD)
+>  int vfio_iommufd_bind(struct vfio_device *device, struct iommufd_ctx
+> *ictx);
+>  void vfio_iommufd_unbind(struct vfio_device *device);
+> +static inline struct iommufd_ctx *
+> +vfio_device_iommufd(struct vfio_device *device)
+> +{
+> +	return device->iommufd_ictx;
+> +}
+>  #else
 
-  Bit 19 - DEBUG
-  0: Debugging is disallowed.
-  1: Debugging is allowed.
-
-In the kernel, that firmware error code is defined as
-SEV_RET_POLICY_FAILURE.
-
-
->> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
->> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
->> [mdr: minor commit fixups]
->> Signed-off-by: Michael Roth <michael.roth@amd.com>
->> ---
->>  drivers/crypto/ccp/sev-dev.c | 32 ++++++++++++++++++++++++++++++++
->>  include/linux/psp-sev.h      | 22 ++++++++++++++++++++--
->>  2 files changed, 52 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
->> index e65563bc8298..bf5167b2acfc 100644
->> --- a/drivers/crypto/ccp/sev-dev.c
->> +++ b/drivers/crypto/ccp/sev-dev.c
->> @@ -2017,6 +2017,38 @@ int sev_guest_df_flush(int *error)
->>  }
->>  EXPORT_SYMBOL_GPL(sev_guest_df_flush);
->>  
->> +int snp_guest_dbg_decrypt_page(u64 gctx_pfn, u64 src_pfn, u64 dst_pfn, int *error)
->> +{
->> +	struct sev_data_snp_dbg data = {0};
->> +	struct sev_device *sev;
->> +	int ret;
->> +
->> +	if (!psp_master || !psp_master->sev_data)
->> +		return -ENODEV;
->> +
->> +	sev = psp_master->sev_data;
->> +
->> +	if (!sev->snp_initialized)
->> +		return -EINVAL;
->> +
->> +	data.gctx_paddr = sme_me_mask | (gctx_pfn << PAGE_SHIFT);
->> +	data.src_addr = sme_me_mask | (src_pfn << PAGE_SHIFT);
->> +	data.dst_addr = sme_me_mask | (dst_pfn << PAGE_SHIFT);
-
-I guess this works, but I wonder why we need to turn on sme_me_mask on
-teh dst_addr.  I thought that the firmware decrypts the guest page
-(src_addr) to a plaintext page.  Couldn't find this requirement in the
-SNP spec.
-
-
->> +
->> +	/* The destination page must be in the firmware state. */
->> +	if (rmp_mark_pages_firmware(data.dst_addr, 1, false))
->> +		return -EIO;
->> +
->> +	ret = sev_do_cmd(SEV_CMD_SNP_DBG_DECRYPT, &data, error);
->> +
->> +	/* Restore the page state */
->> +	if (snp_reclaim_pages(data.dst_addr, 1, false))
->> +		ret = -EIO;
->> +
->> +	return ret;
->> +}
->> +EXPORT_SYMBOL_GPL(snp_guest_dbg_decrypt_page);
->> +
->>  int snp_guest_ext_guest_request(struct sev_data_snp_guest_request *data,
->>  				unsigned long vaddr, unsigned long *npages, unsigned long *fw_err)
->>  {
->> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
->> index 81bafc049eca..92116e2b74fd 100644
->> --- a/include/linux/psp-sev.h
->> +++ b/include/linux/psp-sev.h
->> @@ -710,7 +710,6 @@ struct sev_data_snp_dbg {
->>  	u64 gctx_paddr;				/* In */
->>  	u64 src_addr;				/* In */
->>  	u64 dst_addr;				/* In */
->> -	u32 len;				/* In */
->>  } __packed;
-
-The comment above this ^^^ struct still lists the 'len' field, and also
-calls the first field 'handle' instead of 'gctx_paddr'.
-
-Also - why is this change happening in this patch? Why was the incorrect
-'len' field added in the first place in "[PATCH RFC v8 20/56]
-crypto:ccp: Define the SEV-SNP commands" ? (the comment fixes should
-probably go there too).
-
-
-
->>  
->>  /**
->> @@ -913,13 +912,27 @@ int sev_guest_decommission(struct sev_data_decommission *data, int *error);
->>   * @error: SEV command return code
->>   *
->>   * Returns:
->> + * 0 if the sev successfully processed the command
->> + * -%ENODEV    if the sev device is not available
->> + * -%ENOTSUPP  if the sev does not support SEV
->> + * -%ETIMEDOUT if the sev command timed out
->> + * -%EIO       if the sev returned a non-zero return code
->> + */
-
-I think that if the word 'sev' would be 'SEV' in this comment, the diff
-will be a bit less misleading (basically this patch should not introduce
-changes to sev_do_cmd).
-
--Dov
-
->> +int sev_do_cmd(int cmd, void *data, int *psp_ret);
->> +
->> +/**
->> + * snp_guest_dbg_decrypt_page - perform SEV SNP_DBG_DECRYPT command
->> + *
->> + * @sev_ret: sev command return code
->> + *
->> + * Returns:
->>   * 0 if the SEV successfully processed the command
->>   * -%ENODEV    if the SEV device is not available
->>   * -%ENOTSUPP  if the SEV does not support SEV
->>   * -%ETIMEDOUT if the SEV command timed out
->>   * -%EIO       if the SEV returned a non-zero return code
->>   */
->> -int sev_do_cmd(int cmd, void *data, int *psp_ret);
->> +int snp_guest_dbg_decrypt_page(u64 gctx_pfn, u64 src_pfn, u64 dst_pfn, int *error);
->>  
->>  void *psp_copy_user_blob(u64 uaddr, u32 len);
->>  void *snp_alloc_firmware_page(gfp_t mask);
->> @@ -987,6 +1000,11 @@ static inline void *psp_copy_user_blob(u64 __user uaddr, u32 len) { return ERR_P
->>  
->>  void snp_mark_pages_offline(unsigned long pfn, unsigned int npages) {}
->>  
->> +static inline int snp_guest_dbg_decrypt_page(u64 gctx_pfn, u64 src_pfn, u64 dst_pfn, int *error)
->> +{
->> +	return -ENODEV;
->> +}
->> +
->>  static inline void *snp_alloc_firmware_page(gfp_t mask)
->>  {
->>  	return NULL;
-> 
+Regards,
+Yi Liu
