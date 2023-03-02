@@ -2,122 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E8CB96A88AF
-	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 19:46:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 22A886A88D4
+	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 20:02:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229565AbjCBSqt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Mar 2023 13:46:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41632 "EHLO
+        id S229674AbjCBTCt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Mar 2023 14:02:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229480AbjCBSqs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Mar 2023 13:46:48 -0500
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 207CB515FA
-        for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 10:46:47 -0800 (PST)
-Received: by mail-pl1-x633.google.com with SMTP id v11so233924plz.8
-        for <kvm@vger.kernel.org>; Thu, 02 Mar 2023 10:46:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1677782806;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZFVy1NChotHCYXJVQP117OWHfuZeq72Zl4CyzCN0yEs=;
-        b=E/TPH0VOujJi/1gILhW/BBDnZbA8+X5I8p7gzsGHMMaNFhFsUucvL1r0lSqCbUmiGa
-         zjHNnwXCd/KPsZOjA83iEI4BFemkPoza3O0OwSfzN77hlNrfQ/ik2Yza2mdTB7O+5C95
-         M1jwKWJF/I/PXx/a6C/14/GIGLZyhhiETCd7IuHcEAhZRAVBgVI2vufFwm96qquV5YEN
-         K+iTt53GlsWdyYgykGSrDOun8EK4D9IGKhrbIs3WpRCxA2DmMEy3SRk+DWk3pJ9oEIMC
-         6XEbw/t0C2xGp6Ww2lHcUuB6DKascpj75g0ojw7qP+OaleSW/yQBLbPpqjfhdC+u3Qi/
-         KP+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677782806;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZFVy1NChotHCYXJVQP117OWHfuZeq72Zl4CyzCN0yEs=;
-        b=401iayqRvYN/qUXNasCd3Iri0Fo6AguvrSgjq5er6nPb102vJSQWCWqZPO6r7ZA4AE
-         3bzxY6CRR2vzoiKbICIpQZ/FnJM9DknSb1jsWB0vxHQo33gF3JEUc5JFRRXZhmaiwbqu
-         2nSSeuE3SRHOJyh6t5RjV/Hs8MAKzDKVT13IP6jxNS2ZhQUSqhEJ0UcjrCZaoZY4WDkl
-         h6zlH9MF1R52jlAGi7LBXHgWoIyi1bf1tD9xV1Lxx7JOCyhv27X9n5r+b/4EC5z4V4Ik
-         8AViyzqtHjWx/pWcWSL7CG8uv95bwuXtCXisH2g0orN/Hdpp71aWjZ2YNVuBkgD97/Gu
-         EQDg==
-X-Gm-Message-State: AO0yUKUioujTr4AF7sIhfnR4BKzV3qeI+LKAkK4KqC1mc5EeCwdazl5c
-        UbT+Xw9kGdZdmXq8T0UtSzHkzA==
-X-Google-Smtp-Source: AK7set8944u/7OAA9BNVygtciGCBE+hUBln/eftAicEsEPtx7EZ06zucDbjYpwuXA1F7RaPborv9Ow==
-X-Received: by 2002:a17:903:248:b0:19e:748c:d419 with SMTP id j8-20020a170903024800b0019e748cd419mr2560811plh.46.1677782806139;
-        Thu, 02 Mar 2023 10:46:46 -0800 (PST)
-Received: from google.com (77.62.105.34.bc.googleusercontent.com. [34.105.62.77])
-        by smtp.gmail.com with ESMTPSA id jy8-20020a17090342c800b001990e1aeae4sm49221plb.47.2023.03.02.10.46.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Mar 2023 10:46:45 -0800 (PST)
-Date:   Thu, 2 Mar 2023 18:46:42 +0000
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sagi Shahar <sagis@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Peter Shier <pshier@google.com>,
-        Anish Ghulati <aghulati@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        James Houghton <jthoughton@google.com>,
-        Anish Moorthy <amoorthy@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Axel Rasmussen <axelrasmussen@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Ashish Kalra <ashish.kalra@amd.com>,
-        Babu Moger <babu.moger@amd.com>, Chao Gao <chao.gao@intel.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Chenyi Qiang <chenyi.qiang@intel.com>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Guang Zeng <guang.zeng@intel.com>,
-        Hou Wenlong <houwenlong.hwl@antgroup.com>,
-        Jiaxi Chen <jiaxi.chen@linux.intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Jing Liu <jing2.liu@intel.com>,
-        Junaid Shahid <junaids@google.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Leonardo Bras <leobras@redhat.com>,
-        Like Xu <like.xu.linux@gmail.com>,
-        Li RongQing <lirongqing@baidu.com>,
-        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Michal Luczaj <mhal@rbox.co>,
-        Nikunj A Dadhania <nikunj@amd.com>,
-        Paul Durrant <pdurrant@amazon.com>,
-        Peng Hao <flyingpenghao@gmail.com>,
-        Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>,
-        Robert Hoo <robert.hu@linux.intel.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Wei Wang <wei.w.wang@intel.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Zhenzhong Duan <zhenzhong.duan@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] Documentation/process: Add a maintainer handbook for
- KVM x86
-Message-ID: <ZADvEmVmCOB5Db6z@google.com>
-References: <20230217225449.811957-1-seanjc@google.com>
- <20230217225449.811957-3-seanjc@google.com>
- <Y/AvSjsgLBWECLq2@google.com>
- <Y/VhzWCcC7LtGm4D@google.com>
+        with ESMTP id S229537AbjCBTCr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Mar 2023 14:02:47 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9740553290;
+        Thu,  2 Mar 2023 11:02:42 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 432622F4;
+        Thu,  2 Mar 2023 11:03:25 -0800 (PST)
+Received: from [10.57.90.27] (unknown [10.57.90.27])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0142C3F587;
+        Thu,  2 Mar 2023 11:02:37 -0800 (PST)
+Message-ID: <c1d9b82d-94a4-f2a2-fb39-6ae6b0729dc0@arm.com>
+Date:   Thu, 2 Mar 2023 19:02:36 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y/VhzWCcC7LtGm4D@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.7.2
+Subject: Re: [RFC] Support for Arm CCA VMs on Linux
+To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc:     linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andrew Jones <andrew.jones@linux.dev>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        James Morse <james.morse@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joey Gouly <Joey.Gouly@arm.com>, Marc Zyngier <maz@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Steven Price <steven.price@arm.com>,
+        Thomas Huth <thuth@redhat.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        kvmarm@lists.cs.columbia.edu,
+        Gareth Stockwell <Gareth.Stockwell@arm.com>
+References: <20230127112248.136810-1-suzuki.poulose@arm.com>
+ <Y+vBHXbxPBgHxzGY@work-vm> <fa49dcf2-00a0-660d-cdcd-bbb6db02bcd0@arm.com>
+ <ZADS5qMWoTy/uC6r@work-vm>
+From:   Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <ZADS5qMWoTy/uC6r@work-vm>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -125,40 +65,167 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 21, 2023, Sean Christopherson wrote:
-> On Sat, Feb 18, 2023, Mingwei Zhang wrote:
-> > On Fri, Feb 17, 2023, Sean Christopherson wrote:
-> > > +Coding Style
-> > > +~~~~~~~~~~~~
-> > > +When it comes to style, naming, patterns, etc., consistency is the number one
-> > > +priority in KVM x86.  If all else fails, match what already exists.
-> > > +
-> > > +With a few caveats listed below, follow the tip tree maintainers' preferred
-> > > +:ref:`maintainer-tip-coding-style`, as patches/series often touch both KVM and
-> > > +non-KVM x86 files, i.e. draw the attention of KVM *and* tip tree maintainers.
-> > > +
-> > > +Using reverse fir tree for variable declarations isn't strictly required,
-> > > +though it is still preferred.
-> > 
-> > What is the 'reverse fir tree'? Maybe, "Reverse Christmas Tree" is
-> > better to understand.
+On 02/03/2023 16:46, Dr. David Alan Gilbert wrote:
+> * Suzuki K Poulose (suzuki.poulose@arm.com) wrote:
+>> Hi Dave
+>>
+>> Thanks for your response, and apologies for the delay. Response, in line.
+>>
+>> On 14/02/2023 17:13, Dr. David Alan Gilbert wrote:
+>>> * Suzuki K Poulose (suzuki.poulose@arm.com) wrote:
+>>>> We are happy to announce the early RFC version of the Arm
+>>>> Confidential Compute Architecture (CCA) support for the Linux
+>>>> stack. The intention is to seek early feedback in the following areas:
+>>>>    * KVM integration of the Arm CCA
+>>>>    * KVM UABI for managing the Realms, seeking to generalise the operations
+>>>>      wherever possible with other Confidential Compute solutions.
+>>>>      Note: This version doesn't support Guest Private memory, which will be added
+>>>>      later (see below).
+>>>>    * Linux Guest support for Realms
+>>>>
+>>>> Arm CCA Introduction
+>>>> =====================
+>>>>
+>>>> The Arm CCA is a reference software architecture and implementation that builds
+>>>> on the Realm Management Extension (RME), enabling the execution of Virtual
+>>>> machines, while preventing access by more privileged software, such as hypervisor.
+>>>> The Arm CCA allows the hypervisor to control the VM, but removes the right for
+>>>> access to the code, register state or data that is used by VM.
+>>>> More information on the architecture is available here[0].
+>>>>
+>>>>       Arm CCA Reference Software Architecture
+>>>>
+>>>>           Realm World    ||    Normal World   ||  Secure World  ||
+>>>>                          ||        |          ||                ||
+>>>>    EL0 x-------x         || x----x | x------x ||                ||
+>>>>        | Realm |         || |    | | |      | ||                ||
+>>>>        |       |         || | VM | | |      | ||                ||
+>>>>    ----|  VM*  |---------||-|    |---|      |-||----------------||
+>>>>        |       |         || |    | | |  H   | ||                ||
+>>>>    EL1 x-------x         || x----x | |      | ||                ||
+>>>>            ^             ||        | |  o   | ||                ||
+>>>>            |             ||        | |      | ||                ||
+>>>>    ------- R*------------------------|  s  -|---------------------
+>>>>            S             ||          |      | ||                ||
+>>>>            I             ||          |  t   | ||                ||
+>>>>            |             ||          |      | ||                ||
+>>>>            v             ||          x------x ||                ||
+>>>>    EL2    RMM*           ||              ^    ||                ||
+>>>>            ^             ||              |    ||                ||
+>>>>    ========|=============================|========================
+>>>>            |                             | SMC
+>>>>            x--------- *RMI* -------------x
+>>>>
+>>>>    EL3                   Root World
+>>>>                          EL3 Firmware
+>>>>    ===============================================================
+>>>> Where :
+>>>>    RMM - Realm Management Monitor
+>>>>    RMI - Realm Management Interface
+>>>>    RSI - Realm Service Interface
+>>>>    SMC - Secure Monitor Call
+>>>
+>>> Hi,
+>>>     It's nice to see this full stack posted - thanks!
+>>>
+>>> Are there any pointers to information on attestation and similar
+>>> measurement things?  In particular, are there any plans for a vTPM
+>>
+>> The RMM v1.0 provides attestation and measurement services to the Realm,
+>> via Realm Service Interface (RSI) calls.
 > 
-> For some parts of the world, but not all.  For this, I want to follow whatever
-> description the tip tree uses, which as of today is "reverse fir tree", as this
-> is really a qualifier on the tip tree rules.
+> Can you point me at some docs for that?
+> 
 
-Some parts of the world is correct. In fact, in our world, we use
-'reverse Christmas Tree' more than the other. Check lore.kernel.org:
+It is part of the RMM specification [1], linked below.
+Please see "Chapter A7. Realm Measurement and Attestation"
 
-https://lore.kernel.org/all/?q=reverse+christmas+tree
-https://lore.kernel.org/all/?q=reverse+fir+tree
+[1] https://developer.arm.com/documentation/den0137/latest
 
-You will find the former is used 10x more frequent than the latter.
+>> However, there is no support
+>> for partitioning the Realm VM with v1.0. This is currently under
+>> development and should be available in the near future.
+>>
+>> With that in place, a vTPM could reside in a partition of the Realm VM along
+>> side the OS in another. Does that answer your question ?
+> 
+> Possibly; it would be great to be able to use a standard vTPM interface
+> here rather than have to do anything special.  People already have this
+> working on AMD SEV-SNP.
 
-Overall, I don't hold a strong opinion immediately after I understand
-the meaning of 'reverse fir tree' and I do agree that it is safer to
-follow the Linux Tip Tree Handbook.
+Ok.
 
-Also, thanks for the whole guideline.
+> 
+> Dave
 
--Mingwei
+...
+
+>>>>
+>>>> [1] RMM Specification Latest
+>>>>       https://developer.arm.com/documentation/den0137/latest
+
+
+Suzuki
+
+
+
+>>>>
+>>>> [2] RMM v1.0-Beta0 specification
+>>>>       https://developer.arm.com/documentation/den0137/1-0bet0/
+>>>>
+>>>> [3] Trusted Firmware RMM - TF-RMM
+>>>>       https://www.trustedfirmware.org/projects/tf-rmm/
+>>>>       GIT: https://git.trustedfirmware.org/TF-RMM/tf-rmm.git
+>>>>
+>>>> [4] FVP Base RevC AEM Model (available on x86_64 / Arm64 Linux)
+>>>>       https://developer.arm.com/Tools%20and%20Software/Fixed%20Virtual%20Platforms
+>>>>
+>>>> [5] Trusted Firmware for A class
+>>>>       https://www.trustedfirmware.org/projects/tf-a/
+>>>>
+>>>> [6] Linux kernel support for Arm-CCA
+>>>>       https://gitlab.arm.com/linux-arm/linux-cca
+>>>>       Host Support branch:	cca-host/rfc-v1
+>>>>       Guest Support branch:	cca-guest/rfc-v1
+>>>>
+>>>> [7] kvmtool support for Arm CCA
+>>>>       https://gitlab.arm.com/linux-arm/kvmtool-cca cca/rfc-v1
+>>>>
+>>>> [8] kvm-unit-tests support for Arm CCA
+>>>>       https://gitlab.arm.com/linux-arm/kvm-unit-tests-cca  cca/rfc-v1
+>>>>
+>>>> [9] Instructions for Building Firmware components and running the model, see
+>>>>       section 4.19.2 "Building and running TF-A with RME"
+>>>>       https://trustedfirmware-a.readthedocs.io/en/latest/components/realm-management-extension.html#building-and-running-tf-a-with-rme
+>>>>
+>>>> [10] fd based Guest Private memory for KVM
+>>>>      https://lkml.kernel.org/r/20221202061347.1070246-1-chao.p.peng@linux.intel.com
+>>>>
+>>>> Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+>>>> Cc: Andrew Jones <andrew.jones@linux.dev>
+>>>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>>>> Cc: Chao Peng <chao.p.peng@linux.intel.com>
+>>>> Cc: Christoffer Dall <christoffer.dall@arm.com>
+>>>> Cc: Fuad Tabba <tabba@google.com>
+>>>> Cc: James Morse <james.morse@arm.com>
+>>>> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
+>>>> Cc: Joey Gouly <Joey.Gouly@arm.com>
+>>>> Cc: Marc Zyngier <maz@kernel.org>
+>>>> Cc: Mark Rutland <mark.rutland@arm.com>
+>>>> Cc: Oliver Upton <oliver.upton@linux.dev>
+>>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>>>> Cc: Quentin Perret <qperret@google.com>
+>>>> Cc: Sean Christopherson <seanjc@google.com>
+>>>> Cc: Steven Price <steven.price@arm.com>
+>>>> Cc: Thomas Huth <thuth@redhat.com>
+>>>> Cc: Will Deacon <will@kernel.org>
+>>>> Cc: Zenghui Yu <yuzenghui@huawei.com>
+>>>> To: linux-coco@lists.linux.dev
+>>>> To: kvmarm@lists.linux.dev
+>>>> Cc: kvmarm@lists.cs.columbia.edu
+>>>> Cc: linux-arm-kernel@lists.infradead.org
+>>>> To: linux-kernel@vger.kernel.org
+>>>> To: kvm@vger.kernel.org
+>>>>
+>>
+
