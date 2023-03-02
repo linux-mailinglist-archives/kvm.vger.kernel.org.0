@@ -2,184 +2,389 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 10C8B6A8252
-	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 13:35:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 66A866A827F
+	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 13:43:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229787AbjCBMfS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Mar 2023 07:35:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32924 "EHLO
+        id S229492AbjCBMm7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Mar 2023 07:42:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229830AbjCBMfQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Mar 2023 07:35:16 -0500
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on20600.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e89::600])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F6CC305C3;
-        Thu,  2 Mar 2023 04:35:11 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gCldKgMX+UBd2ocAbprUIANKNYWhy7w2+iTZpX9/DXQi2xsrtL6pMyG+UB40FoZnXprRz21ehCUhRAAmRh+121wTVkBVBChVUYQLlCxLrZhYM7QFfzI6FGcu8GMxhiCWiJ9dtjpR67Bu3hwod6cbvU1DFnEaxve67LX9jayxb4dusp9T8wCcrDumDKyUxDspDeWWpPVNaoNXq5+AN8WyxCPtoUeiOOH2SDpIgTd31u4OnrQCxHiVC5JL04xLHM4eywZihDt8FBXqCuXPLnmySa44Y4CrpAWLULnYvW6IeY8rbZjDZATEf6Iaq3kvnt4XDdUzlLS/NODKTHIe3cQCXg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uacm4W8u/4YeXCgctKXpsodqmaDZpDlMkSzzJjJLHNI=;
- b=By+bmDNJx2iVYLkqGH3zFUsq0SIie3YQ+2k0J2ZIfz4GiAi1n82Q5EXPSsUcV8jdFiYn6ZZ7uq6/MJ0/gymgcBYdfRLIzShE9KFM9TCNsh+bge/B93P9/aBAFCLXtjFNEtv8lSSgpV7z3ajf6DdYlZaJUV6zViwPzo9vo+uNZhqv6xDGEtpaqFumvr3CK5b8fwIxKxz8cU/T8s9CXJEUVGFtmz3dqg7xfkb4k4JV8TWrfGE3i30WOcoI+OfPnChBsQw4ThvoU7iHusC/F0h1UTxSQEbqP/cDzDCtxXzNYOr2AZjLwz7BE8xsEoKOx3bHMJvh2H20nBY7F7ygF5NNSQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uacm4W8u/4YeXCgctKXpsodqmaDZpDlMkSzzJjJLHNI=;
- b=AyhGPH9c/nuUaU+xtC7xq1nSXOrXOakLin6c4FO3nMXxCqvOhGt3qh63/oYCrC2fW+M7vmVAl4ZvRQdKZ0l7vudLf8Bd7AQ0rjB3yOfXXFZnF3MXVSh3js50jyDgVLYmM3qyNREX4cXg3h70wrT/yy4U1wDTLOWXStJyIM67aKLMXAU1hCkT0+EtamHcpyID9RLTrEGRsdIPvY8quMgpIxjW6gM5FEYGQJzwLGAl7zpKopjXUplj7mPme5FJOwiNtP9782oHQV4iO/2FhOkRLCaMbL5eVMNmssSRyAEe1hFfAOvFFPq6aNGjzaVKIoceMq3My4luz8y6K4TgpIVqbA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DS7PR12MB5959.namprd12.prod.outlook.com (2603:10b6:8:7e::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6156.18; Thu, 2 Mar
- 2023 12:35:08 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3cb3:2fce:5c8f:82ee]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3cb3:2fce:5c8f:82ee%5]) with mapi id 15.20.6156.019; Thu, 2 Mar 2023
- 12:35:08 +0000
-Date:   Thu, 2 Mar 2023 08:35:04 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Hao, Xudong" <xudong.hao@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>
-Subject: Re: [PATCH v5 09/19] vfio/pci: Allow passing zero-length fd array in
- VFIO_DEVICE_PCI_HOT_RESET
-Message-ID: <ZACX+Np/IY7ygqL5@nvidia.com>
-References: <20230227111135.61728-1-yi.l.liu@intel.com>
- <20230227111135.61728-10-yi.l.liu@intel.com>
- <DS0PR11MB75295B4B2578765C8B08AC7EC3B29@DS0PR11MB7529.namprd11.prod.outlook.com>
- <BN9PR11MB527688810514A262471E4BB78CB29@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB527688810514A262471E4BB78CB29@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: BYAPR06CA0003.namprd06.prod.outlook.com
- (2603:10b6:a03:d4::16) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S229455AbjCBMm5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Mar 2023 07:42:57 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D27275FF6
+        for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 04:42:55 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id DA38AB81218
+        for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 12:42:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D88CC433EF;
+        Thu,  2 Mar 2023 12:42:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1677760972;
+        bh=EEgAdGgMKd7fneB3MrCFQZbHHomNu4DMTJf0w8KbB54=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=K5fUrpjcyUHtyAF6mb07D67mmGoLTz8OwcbL8DE2io5oGi8HLXmeDqhcS0tgglb/u
+         kfyicUcUs1bLXzhauAaKvzXglb79FFAEHAZ+hlFejF3q129Eprr+GZUBjtBuBeVdjn
+         +MhWVpLwhZpu0eArl7VXllfVwWeB52l7DuW9FiOcfB+IgJVTxa3RoN3anM6S+j0E1+
+         avT+eFA9J4u9GL9GQp1XUMcazHj1GZ0uaD4i/rRNv/YU2N4L6Rk9PTisROse2jq0Wl
+         NqslYHlKBGwqq2uOy1FIgXUbiR0dL1wRvPHi5Yq3//9FE9IS899zPjSPGhqdTzasVM
+         JsYMMjUvTqcag==
+From:   =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+To:     Andy Chiu <andy.chiu@sifive.com>, linux-riscv@lists.infradead.org,
+        palmer@dabbelt.com, anup@brainfault.org, atishp@atishpatra.org,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
+Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
+        guoren@linux.alibaba.com, Vincent Chen <vincent.chen@sifive.com>,
+        Andy Chiu <andy.chiu@sifive.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        Heiko Stuebner <heiko@sntech.de>, Guo Ren <guoren@kernel.org>,
+        =?utf-8?B?QmrDtnJuIFQ=?= =?utf-8?B?w7ZwZWw=?= 
+        <bjorn@rivosinc.com>, Wenting Zhang <zephray@outlook.com>,
+        Jisheng Zhang <jszhang@kernel.org>,
+        Xianting Tian <xianting.tian@linux.alibaba.com>,
+        David Hildenbrand <david@redhat.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Andrew Bresticker <abrestic@rivosinc.com>
+Subject: Re: [PATCH -next v14 13/19] riscv: signal: Add sigcontext
+ save/restore for vector
+In-Reply-To: <20230224170118.16766-14-andy.chiu@sifive.com>
+References: <20230224170118.16766-1-andy.chiu@sifive.com>
+ <20230224170118.16766-14-andy.chiu@sifive.com>
+Date:   Thu, 02 Mar 2023 13:42:49 +0100
+Message-ID: <87bklb494m.fsf@all.your.base.are.belong.to.us>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DS7PR12MB5959:EE_
-X-MS-Office365-Filtering-Correlation-Id: 91bbaac5-44ed-46ab-b01b-08db1b1a8e45
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: vjoIiHR5pgMwhc7+DQ3q3LlnOF9rPWfb6M8kcONSBOLWSUoBYq/HQDQ0kS8qz16ec6/WhVdENAdYoJRv17nJxmDN0+o48ebmJFJfCOL5yTq/0u7lsRnkNKNQbDSUH6JME0ea0bLTr/jzUyrjgfYjZWxx/OLVp9o8vs9Ekd/MQmrgs7rV9YirU+fDENGnjJTGvqCFBPWl7BTh4+/eppkB1xYhDGNPlN0epfqjz61hQAKwk0AWS9V7F3daGhVd5p/bEceC36wGelmfrXo//HjHxMwhyKUD4xr13rNFOhSRRzPqRmc7sbCv/afj0J7a+IEXW+XdDPdcUlnfKq4GdbnTaW+VfJUU22rlkbqRxmTp2sqwjlEfJM4oG4guSvFz9mIj7wHHqBuaDN3fWehGfLR4Z8Kyf/KznbB0qSGeHuFWJXqVzoheDX442Jgzy2DWiTBjof/sidTNQmH/4AmP9rxamX/8Wx/RTfWZboEu5q/ccAa/fcjK8ZqlXbBteUn7s5Fz7r1/MYTR9v2BG9YEsN09WB+S30yWiRb0kVZVYt59sHMxbdV0bNANDCkdsFt3L5zsiwu4z7fACKPQfT54OeeslIYuh+ONSBls3QSkzYQl3iWUcmbfmUNem/DLIWrRUCJztEo7ibYUNsik3fuzRx8ybw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(39860400002)(346002)(366004)(396003)(376002)(136003)(451199018)(7416002)(5660300002)(66899018)(4326008)(66476007)(8936002)(36756003)(83380400001)(41300700001)(2616005)(2906002)(66946007)(66556008)(8676002)(316002)(6486002)(38100700002)(6916009)(6506007)(26005)(6512007)(186003)(6666004)(54906003)(478600001)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?NpWwBE2rccrT5OuMPNvHWp/8SdJqYj0CFjaPoXLzz+9sPfprNt4+hBZI+IOH?=
- =?us-ascii?Q?BfiDBSAjLrl2czxx3gu9EnfuUt/0BU/K7PxZNRpytGDSQmLNBNoQdtlpMRjj?=
- =?us-ascii?Q?4nWlmGoEW6b4rNpGF4m3XGQJN9L93NiF1XB+xm1wvTzTAt/gP3fPyzITSi52?=
- =?us-ascii?Q?pn/08LL2r6L1JHlK956R326N8feZycwvcJ1i5cJQiA1Zvmpfr0CTMd9XJTAB?=
- =?us-ascii?Q?IpjuN7rlXDVAOSSv4qzN3MHCdtWFTGoosSX4ORKsYd+UzzIAC6YV90ltRGxW?=
- =?us-ascii?Q?XBWkwJyzyF26tEliG7DhERRCgECzEEjmbKDISz2xTbRTzCFW5GK56UUARbHb?=
- =?us-ascii?Q?VN1aDoFAkbJcwnwZ9S6iYVbFEnxcr9W76rFZdGF8vlvPn8Phs3kmyK+4RoQG?=
- =?us-ascii?Q?j1vTJ3JDAFMUVNCjTNXI4DOPwYBo+kxJfwFuzMDluSIpU5rceIlLWHJl+tOC?=
- =?us-ascii?Q?JNWLbwiFf8YcNLTDpjUTRKYmR7fnQT8epYoLjkI8jLRa286hNKApsRvya1ja?=
- =?us-ascii?Q?mI0xfnKFjdYhRQulDEbyrjiPb6KeEvU6KmkWZAME1+9vNnPw1q4m7wN35w48?=
- =?us-ascii?Q?8fBjkMhMIL9X9NS9qarK8ryme+oRmfM94l3tFH/Fb30tHupM2vBvOzsvsZQi?=
- =?us-ascii?Q?T7SN/DRxdC3xtPoeTPr/oxTnNnuQr4TLN3iBthpdlhrATS5f12jpimaMpSZ9?=
- =?us-ascii?Q?alpNDNdSQW4tTnH3SxA4MeWA2nfRsr3LIfhs3/8cGTL4rNL6SQlwNehQ5Evf?=
- =?us-ascii?Q?cJPTn4oiHq9aN0+Qepek9xHP7J+KA9Rv9PTsvMDJZuhhEjiADifYvXIU9ypp?=
- =?us-ascii?Q?7F3UMTz7eK4JaN6SlemSdMkY8A0WZsfDaESNgbeL9Q6j0/y7YTtrSxyj0563?=
- =?us-ascii?Q?AhjIFV/PPiOv06GMlS10B4emhwWWGq6LBjOZJRN3MDr093ap3k4kNGycz7Qy?=
- =?us-ascii?Q?LGBfc45b3xbU5eBarCkHoOgTnGwbReDXhPH8QGDkBqQeoQOaSvyfS27c8BVz?=
- =?us-ascii?Q?piempvXEGLvT2WerOz/g/lA7x6I6x1JQNIEg1+4ZdhgQ4z+U/3+AwoqpcOeI?=
- =?us-ascii?Q?SJJH6e8wFurY83QN+oE+Ox8dNejI3vOuBCNYNtjt4Wc6p/RWUGqoJHWdmtPu?=
- =?us-ascii?Q?q0bMaczGs794DhPIjrgG67RUeTEWK1aliSgFtlBt6CXoNI5eGhgsEYAWHahF?=
- =?us-ascii?Q?VeaaCaOEXn/PkDCToFOtM9jw6+ddNnsQJRouEtrl9el2aC36eHQO+jtXOSmu?=
- =?us-ascii?Q?YfVsw0+Jb/fUCh9AfxpkPsD/3mDU2IMCfB+RgWShl/0UIljqXqMnhqMnaKhy?=
- =?us-ascii?Q?XgQUBSTCWdh46eRUVFyWpkK+dclRYbMdZn/rrx+YFmXavB/7xno/xPHhcal4?=
- =?us-ascii?Q?nyKZFRwzHKrTyMHOBAq+sqR5iSa+1qH4wYdopSbodErZdbM2zR6Q9PhlUUCX?=
- =?us-ascii?Q?80uq2BQ7tmvtYKwgUjDcVjk6CzELKUr20HpaEs2LSQJkmhFQofGLVRp1dEvX?=
- =?us-ascii?Q?ZO3q25sAs/qALsgVlP3s6T6bAC5llA/ewKQYO5wrgLhCNP1PkHjKF0yzEiBh?=
- =?us-ascii?Q?lmeesnUgyH3jowXx03ecNB/ZJb3MP2OCzUOM8gkf?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 91bbaac5-44ed-46ab-b01b-08db1b1a8e45
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Mar 2023 12:35:07.6837
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: lX1z5mkpRKpsTktjkqTZ6e+ymmoChPu2jpD5rM1AaT9pf19CaQESiMB+753OaBdb
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5959
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        SPF_HELO_PASS,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 02, 2023 at 09:55:46AM +0000, Tian, Kevin wrote:
-> > From: Liu, Yi L <yi.l.liu@intel.com>
-> > Sent: Thursday, March 2, 2023 2:07 PM
-> > 
-> > > -		if (!vfio_dev_in_groups(cur_vma, groups)) {
-> > > +		if (cur_vma->vdev.open_count &&
-> > > +		    !vfio_dev_in_groups(cur_vma, groups) &&
-> > > +		    !vfio_dev_in_iommufd_ctx(cur_vma, iommufd_ctx)) {
-> > 
-> > Hi Alex, Jason,
-> > 
-> > There is one concern on this approach which is related to the
-> > cdev noiommu mode. As patch 16 of this series, cdev path
-> > supports noiommu mode by passing a negative iommufd to
-> > kernel. In such case, the vfio_device is not bound to a valid
-> > iommufd. Then the check in vfio_dev_in_iommufd_ctx() is
-> > to be broken.
-> > 
-> > An idea is to add a cdev_noiommu flag in vfio_device, when
-> > checking the iommufd_ictx, also check this flag. If all the opened
-> > devices in the dev_set have vfio_device->cdev_noiommu==true,
-> > then the reset is considered to be doable. But there is a special
-> > case. If devices in this dev_set are opened by two applications
-> > that operates in cdev noiommu mode, then this logic is not able
-> > to differentiate them. In that case, should we allow the reset?
-> > It seems to ok to allow reset since noiommu mode itself means
-> > no security between the applications that use it. thoughts?
-> > 
-> 
-> Probably we need still pass in a valid iommufd (instead of using
-> a negative value) in noiommu case to mark the ownership so the
-> check in the reset path can correctly catch whether an opened
-> device belongs to this user.
+Andy Chiu <andy.chiu@sifive.com> writes:
 
-There should be no iommufd at all in no-iommu mode
+> diff --git a/arch/riscv/kernel/setup.c b/arch/riscv/kernel/setup.c
+> index 376d2827e736..b9b3e03b2564 100644
+> --- a/arch/riscv/kernel/setup.c
+> +++ b/arch/riscv/kernel/setup.c
+> @@ -262,6 +262,8 @@ static void __init parse_dtb(void)
+>  #endif
+>  }
+>=20=20
+> +extern void __init init_rt_signal_env(void);
+> +
+>  void __init setup_arch(char **cmdline_p)
+>  {
+>  	parse_dtb();
+> @@ -299,6 +301,7 @@ void __init setup_arch(char **cmdline_p)
+>=20=20
+>  	riscv_init_cbom_blocksize();
+>  	riscv_fill_hwcap();
+> +	init_rt_signal_env();
+>  	apply_boot_alternatives();
+>  	if (IS_ENABLED(CONFIG_RISCV_ISA_ZICBOM) &&
+>  	    riscv_isa_extension_available(NULL, ZICBOM))
+> diff --git a/arch/riscv/kernel/signal.c b/arch/riscv/kernel/signal.c
+> index 0c8be5404a73..76c0480ee4cd 100644
+> --- a/arch/riscv/kernel/signal.c
+> +++ b/arch/riscv/kernel/signal.c
+> @@ -18,9 +18,11 @@
+>  #include <asm/signal.h>
+>  #include <asm/signal32.h>
+>  #include <asm/switch_to.h>
+> +#include <asm/vector.h>
+>  #include <asm/csr.h>
+>=20=20
+>  extern u32 __user_rt_sigreturn[2];
+> +static size_t riscv_v_sc_size;
 
-Adding one just to deal with noiommu reset seems pretty sad :\
+__ro_after_init?
 
-no-iommu is only really used by dpdk, and it doesn't invoke
-VFIO_DEVICE_PCI_HOT_RESET at all.
+>=20=20
+>  #define DEBUG_SIG 0
+>=20=20
+> @@ -62,34 +64,159 @@ static long save_fp_state(struct pt_regs *regs,
+>  #define restore_fp_state(task, regs) (0)
+>  #endif
+>=20=20
+> +#ifdef CONFIG_RISCV_ISA_V
+> +
+> +static long save_v_state(struct pt_regs *regs, void **sc_vec)
+> +{
+> +	/*
+> +	 * Put __sc_riscv_v_state to the user's signal context space pointed
+> +	 * by sc_vec and the datap point the address right
+> +	 * after __sc_riscv_v_state.
+> +	 */
+> +	struct __riscv_ctx_hdr __user *hdr =3D (struct __riscv_ctx_hdr *)(*sc_v=
+ec);
+                                             ^^^
+Remove unneccery cast and parenthesis.
 
-I'd say as long as VFIO_DEVICE_PCI_HOT_RESET works if only one vfio
-device is open using a empty list (eg we should ensure that the
-invoking cdev itself is allowed) then I think it is OK.
+> +	struct __sc_riscv_v_state __user *state =3D (struct __sc_riscv_v_state =
+*)(hdr + 1);
+> +	void __user *datap =3D state + 1;
+> +	long err;
+> +
+> +	/* datap is designed to be 16 byte aligned for better performance */
+> +	WARN_ON(unlikely(!IS_ALIGNED((unsigned long)datap, 16)));
+> +
+> +	riscv_v_vstate_save(current, regs);
+> +	/* Copy everything of vstate but datap. */
+> +	err =3D __copy_to_user(&state->v_state, &current->thread.vstate,
+> +			     offsetof(struct __riscv_v_ext_state, datap));
+> +	/* Copy the pointer datap itself. */
+> +	err |=3D __put_user(datap, &state->v_state.datap);
+> +	/* Copy the whole vector content to user space datap. */
+> +	err |=3D __copy_to_user(datap, current->thread.vstate.datap, riscv_v_vs=
+ize);
+> +	/* Copy magic to the user space after saving  all vector conetext */
+> +	err |=3D __put_user(RISCV_V_MAGIC, &hdr->magic);
+> +	err |=3D __put_user(riscv_v_sc_size, &hdr->size);
+> +	if (unlikely(err))
+> +		return err;
+> +
+> +	/* Only progress the sv_vec if everything has done successfully  */
+> +	*sc_vec +=3D riscv_v_sc_size;
+> +	return 0;
+> +}
+> +
+> +/*
+> + * Restore Vector extension context from the user's signal frame. This f=
+unction
+> + * assumes a valid extension header. So magic and size checking must be =
+done by
+> + * the caller.
+> + */
+> +static long __restore_v_state(struct pt_regs *regs, void *sc_vec)
+> +{
+> +	long err;
+> +	struct __sc_riscv_v_state __user *state =3D (struct __sc_riscv_v_state =
+*)(sc_vec);
+                                                  ^^^
+Remove unneccery cast and parenthesis.
 
-Jason
+> +	void __user *datap;
+> +
+> +	/* Copy everything of __sc_riscv_v_state except datap. */
+> +	err =3D __copy_from_user(&current->thread.vstate, &state->v_state,
+> +			       offsetof(struct __riscv_v_ext_state, datap));
+> +	if (unlikely(err))
+> +		return err;
+> +
+> +	/* Copy the pointer datap itself. */
+> +	err =3D __get_user(datap, &state->v_state.datap);
+> +	if (unlikely(err))
+> +		return err;
+> +	/*
+> +	 * Copy the whole vector content from user space datap. Use
+> +	 * copy_from_user to prevent information leak.
+> +	 */
+> +	err =3D copy_from_user(current->thread.vstate.datap, datap, riscv_v_vsi=
+ze);
+> +	if (unlikely(err))
+> +		return err;
+> +
+> +	riscv_v_vstate_restore(current, regs);
+> +
+> +	return err;
+> +}
+> +#else
+> +#define save_v_state(task, regs) (0)
+> +#define __restore_v_state(task, regs) (0)
+> +#endif
+> +
+>  static long restore_sigcontext(struct pt_regs *regs,
+>  	struct sigcontext __user *sc)
+
+This whole function; return in favor of goto, and remove the labels at
+the bottom.
+
+>  {
+> +	void *sc_ext_ptr =3D &sc->sc_extdesc.hdr;
+> +	__u32 rsvd;
+>  	long err;
+> -	size_t i;
+> -
+>  	/* sc_regs is structured the same as the start of pt_regs */
+>  	err =3D __copy_from_user(regs, &sc->sc_regs, sizeof(sc->sc_regs));
+>  	if (unlikely(err))
+> -		return err;
+> +		goto done;
+>  	/* Restore the floating-point state. */
+>  	if (has_fpu()) {
+>  		err =3D restore_fp_state(regs, &sc->sc_fpregs);
+>  		if (unlikely(err))
+> -			return err;
+> +			goto done;
+>  	}
+>=20=20
+> -	/* We support no other extension state at this time. */
+> -	for (i =3D 0; i < ARRAY_SIZE(sc->sc_fpregs.q.reserved); i++) {
+> -		u32 value;
+> -
+> -		err =3D __get_user(value, &sc->sc_fpregs.q.reserved[i]);
+> -		if (unlikely(err))
+> +	/* Check the reserved word before extensions parsing */
+> +	err =3D __get_user(rsvd, &sc->sc_extdesc.reserved);
+> +	if (unlikely(err))
+> +		goto done;
+> +	if (unlikely(rsvd))
+> +		goto invalid;
+> +
+> +	while (1 && !err) {
+> +		__u32 magic, size;
+> +		struct __riscv_ctx_hdr *head =3D (struct __riscv_ctx_hdr *)sc_ext_ptr;
+
+Remove unneccery cast.
+
+> +
+> +		err |=3D __get_user(magic, &head->magic);
+> +		err |=3D __get_user(size, &head->size);
+> +		if (err)
+> +			goto done;
+> +
+> +		sc_ext_ptr +=3D sizeof(struct __riscv_ctx_hdr);
+
+sizeof(*head);
+
+> +		switch (magic) {
+> +		case END_MAGIC:
+> +			if (size !=3D END_HDR_SIZE)
+> +				goto invalid;
+> +			goto done;
+> +		case RISCV_V_MAGIC:
+> +			if (!has_vector() || !riscv_v_vstate_query(regs))
+> +				goto invalid;
+> +			if (size !=3D riscv_v_sc_size)
+> +				goto invalid;
+> +			err =3D __restore_v_state(regs, sc_ext_ptr);
+>  			break;
+> -		if (value !=3D 0)
+> -			return -EINVAL;
+> +		default:
+> +			goto invalid;
+> +		}
+> +		sc_ext_ptr =3D ((void *)(head) + size);
+
+Unneccery parenthesis. "(void *)head + size" is enough
+
+>  	}
+> +done:
+>  	return err;
+> +invalid:
+> +	return -EINVAL;
+> +}
+> +
+> +static size_t cal_rt_frame_size(void)
+> +{
+> +	struct rt_sigframe __user *frame;
+> +	size_t frame_size;
+> +	size_t total_context_size =3D 0;
+> +
+> +	frame_size =3D sizeof(*frame);
+> +
+> +	if (has_vector() && riscv_v_vstate_query(task_pt_regs(current)))
+> +		total_context_size +=3D riscv_v_sc_size;
+> +	/*
+> +	 * Preserved a __riscv_ctx_hdr for END signal context header if an
+> +	 * extension uses __riscv_extra_ext_header
+> +	 */
+> +	if (total_context_size)
+> +		total_context_size +=3D sizeof(struct __riscv_ctx_hdr);
+> +
+> +	frame_size +=3D (total_context_size);
+
+Remove unneccery parenthesis.
+
+> +
+> +	frame_size =3D round_up(frame_size, 16);
+> +	return frame_size;
+> +
+>  }
+>=20=20
+>  SYSCALL_DEFINE0(rt_sigreturn)
+> @@ -98,13 +225,14 @@ SYSCALL_DEFINE0(rt_sigreturn)
+>  	struct rt_sigframe __user *frame;
+>  	struct task_struct *task;
+>  	sigset_t set;
+> +	size_t frame_size =3D cal_rt_frame_size();
+>=20=20
+>  	/* Always make any pending restarted system calls return -EINTR */
+>  	current->restart_block.fn =3D do_no_restart_syscall;
+>=20=20
+>  	frame =3D (struct rt_sigframe __user *)regs->sp;
+>=20=20
+> -	if (!access_ok(frame, sizeof(*frame)))
+> +	if (!access_ok(frame, frame_size))
+>  		goto badframe;
+>=20=20
+>  	if (__copy_from_user(&set, &frame->uc.uc_sigmask, sizeof(set)))
+> @@ -138,17 +266,22 @@ static long setup_sigcontext(struct rt_sigframe __u=
+ser *frame,
+>  	struct pt_regs *regs)
+>  {
+>  	struct sigcontext __user *sc =3D &frame->uc.uc_mcontext;
+> +	void *sc_ext_ptr =3D &sc->sc_extdesc.hdr;
+
+All the casts and parenthesis makes it hard to read. Change to
+	struct __riscv_ctx_hdr *sc_ext_ptr =3D &sc->sc_extdesc.hdr;
+
+
+>  	long err;
+> -	size_t i;
+>=20=20
+>  	/* sc_regs is structured the same as the start of pt_regs */
+>  	err =3D __copy_to_user(&sc->sc_regs, regs, sizeof(sc->sc_regs));
+>  	/* Save the floating-point state. */
+>  	if (has_fpu())
+>  		err |=3D save_fp_state(regs, &sc->sc_fpregs);
+> -	/* We support no other extension state at this time. */
+> -	for (i =3D 0; i < ARRAY_SIZE(sc->sc_fpregs.q.reserved); i++)
+> -		err |=3D __put_user(0, &sc->sc_fpregs.q.reserved[i]);
+> +	/* Save the vector state. */
+> +	if (has_vector() && riscv_v_vstate_query(regs))
+> +		err |=3D save_v_state(regs, &sc_ext_ptr);
+
+...and cast to (void **) after the change above...
+
+> +	/* Write zero to fp-reserved space and check it on restore_sigcontext */
+> +	err |=3D __put_user(0, &sc->sc_extdesc.reserved);
+> +	/* And put END __riscv_ctx_hdr at the end. */
+> +	err |=3D __put_user(END_MAGIC, &((struct __riscv_ctx_hdr *)sc_ext_ptr)-=
+>magic);
+> +	err |=3D __put_user(END_HDR_SIZE, &((struct __riscv_ctx_hdr *)sc_ext_pt=
+r)->size);
+
+...and change to:
+	err |=3D __put_user(END_MAGIC, &sc_ext_ptr->magic);
+	err |=3D __put_user(END_HDR_SIZE, &sc_ext_ptr->size);
+
+
+>  	return err;
+>  }
+>=20=20
+> @@ -172,6 +305,13 @@ static inline void __user *get_sigframe(struct ksign=
+al *ksig,
+>  	/* Align the stack frame. */
+>  	sp &=3D ~0xfUL;
+>=20=20
+> +	/*
+> +	 * Fail if the size of the altstack is not large enough for the
+> +	 * sigframe construction.
+> +	 */
+> +	if (current->sas_ss_size && sp < current->sas_ss_sp)
+> +		return (void __user __force *)(-1UL);
+
+Nit: Remove unneccery parenthesis.
+
+
+Bj=C3=B6rn
