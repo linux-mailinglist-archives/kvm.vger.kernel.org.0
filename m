@@ -2,149 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A755E6A78AE
-	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 02:06:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F30CE6A78B9
+	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 02:11:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229610AbjCBBGa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Mar 2023 20:06:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46546 "EHLO
+        id S229613AbjCBBLz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Mar 2023 20:11:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbjCBBG3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Mar 2023 20:06:29 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2EFA567A6;
-        Wed,  1 Mar 2023 17:06:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-        Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-        bh=CDt+m4AI+Ja7f8iL1HnP9+Emn/qOIFgs9//Kb9pOgJM=; b=dRXXgt8kLdn3jJrUOfCAcJ0y5+
-        ejYMmbzhA/IzNseTjds/k3XpudD5lY/1HO7J9IRVMQ6Eya8XyzM9TvsYznuwtU6kWD3tb83jDRnLL
-        yRn91RVl5auUFdZs3mPwjMXX4E/uKlzwMbRhE1c4u77lJ3YX2ECyuBkx2duQ94VguBcmu1CTyhVhI
-        8ngGoSpUNWt6SjAocAOWhsClwFRlfG1FzLvfGUEKyRUFqOYOT4/2geN+1s/yvnHCIKay0qV1kultp
-        DVEEa2NAtpXGBQmCIfzG1BbN7KHyB8OXktr3aHp7fS3ZYP1sgg60shLw6uUmlgVAQaPaeO2AvH04k
-        GrCregRA==;
-Received: from [2601:1c2:980:9ec0::df2f]
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pXXOA-000QGm-VI; Thu, 02 Mar 2023 01:05:43 +0000
-Message-ID: <41baeedf-f3ee-7342-7a5e-097f9a3c4de0@infradead.org>
-Date:   Wed, 1 Mar 2023 17:05:39 -0800
+        with ESMTP id S229470AbjCBBLy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Mar 2023 20:11:54 -0500
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 584CC23102;
+        Wed,  1 Mar 2023 17:11:51 -0800 (PST)
+Received: by mail-pj1-x102d.google.com with SMTP id y2so15237809pjg.3;
+        Wed, 01 Mar 2023 17:11:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1677719511;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=n+zNU2traPyY4e76JjN6VQpIVRi1XnP7HB+q7Nr0E/4=;
+        b=Mmro2sTZ/dgxsJ+grrWfL89raBn2OGoq/Drc+R2Mlxr8qJCZmZLA/1ORflcpcarfXt
+         gR3GoQYhl30tZ7KPX+gAhc/hDJ16+pItSV0/mZpg2Ps+DmYasaNQb6/pMUTAmboZxyc3
+         a6C95G2ajIvCLC/IFymCnpOcnEkjmMcLl7txXSfLXVMGXJnbPcu6hRnd4EZyRE1cSHrH
+         zOve4LFDhYzUTiHz9O8jevSmwTDVnLCRJSQVKt5brPYmp3tkz4aaCoB4ajw1Y8iduHgx
+         D16+EfXt1trqM6KVaN2fcJoJf3K3aST0AqjOMqTNlAIIrcb+p9RqZ8OFHPkx1Y3GXj+F
+         Lemg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1677719511;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=n+zNU2traPyY4e76JjN6VQpIVRi1XnP7HB+q7Nr0E/4=;
+        b=xx1RHmBB/hcO4G5kUKFQa9NUaXcP/kwxEJ4CZH8LxNBHhzx9lW4/xepxJQGVqPWj7w
+         nXK80h9PxbBwjJ+TQs9DmpYKlJW/DIJCkak9sDGjVLTUeCmsWu/kNfcCfgiySQq2e+y2
+         Z1BkauF916KL47jnvNYrpNZRjZS4qvjlKByKaZ/OZ9GlKSGmkDZVVCvn0JAmF2cGN3a2
+         W+ncI6iovFu2JdNuXAZmQGaig+HP7psMInQFbewSyY/cqrUXVYJLzitSLMXqIQkVbTnV
+         JrZpW4NJWhYTCrqHKW7jLSD7kO3fGbjChq3SQQXAWVyU5s/vzqi84Wr4knvgXCrJ2774
+         cLSA==
+X-Gm-Message-State: AO0yUKVtCH07IPhZPo3E0x6xqjX238d6I5/Y1/FPqVmgsENiECTrMf9J
+        X9ffmuaNRI1KXVPoNco7Ufo=
+X-Google-Smtp-Source: AK7set//9F6BtGJ1V3XpntmKtzHp1dSvX+v72vFs+x5Hmv+o7wUqfqc6rRldy2GK86dl72DVeRjtRA==
+X-Received: by 2002:a05:6a20:9388:b0:cc:59b7:79e6 with SMTP id x8-20020a056a20938800b000cc59b779e6mr330718pzh.24.1677719510548;
+        Wed, 01 Mar 2023 17:11:50 -0800 (PST)
+Received: from localhost ([192.55.54.55])
+        by smtp.gmail.com with ESMTPSA id l72-20020a63914b000000b005030a00085asm8139712pge.46.2023.03.01.17.11.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Mar 2023 17:11:49 -0800 (PST)
+Date:   Wed, 1 Mar 2023 17:11:48 -0800
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Chenyi Qiang <chenyi.qiang@intel.com>
+Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+        Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Zhi Wang <zhi.wang.linux@gmail.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [PATCH v12 013/106] KVM: TDX: create/destroy VM structure
+Message-ID: <20230302011148.GA2069594@ls.amr.corp.intel.com>
+References: <cover.1677484918.git.isaku.yamahata@intel.com>
+ <fd52ff91fbce051ecf9781af2e5c54138c995230.1677484918.git.isaku.yamahata@intel.com>
+ <e23b30cc-80a1-774f-7d58-a676d989b5ce@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH v12 07/11] x86/smpboot: Remove early_gdt_descr on 64-bit
-To:     paulmck@kernel.org, Josh Triplett <josh@joshtriplett.org>
-Cc:     Arjan van de Ven <arjan@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Usama Arif <usama.arif@bytedance.com>, dwmw2@infradead.org,
-        kim.phillips@amd.com, brgerst@gmail.com, piotrgorski@cachyos.org,
-        oleksandr@natalenko.name, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
-        pbonzini@redhat.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, rcu@vger.kernel.org, mimoja@mimoja.de,
-        hewenliang4@huawei.com, thomas.lendacky@amd.com, seanjc@google.com,
-        pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
-        punit.agrawal@bytedance.com, simon.evans@bytedance.com,
-        liangma@liangbit.com, David Woodhouse <dwmw@amazon.co.uk>
-References: <20230226110802.103134-1-usama.arif@bytedance.com>
- <20230226110802.103134-8-usama.arif@bytedance.com> <878rghmrn2.ffs@tglx>
- <96c0c723-9976-a222-8dc8-a5da6a1a558e@linux.intel.com>
- <Y/+2Wuunn1sIF8eT@localhost>
- <20230301221632.GI2948950@paulmck-ThinkPad-P17-Gen-1>
- <Y//Q4Mh6/65Keruu@localhost>
- <20230302002851.GK2948950@paulmck-ThinkPad-P17-Gen-1>
-Content-Language: en-US
-From:   Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20230302002851.GK2948950@paulmck-ThinkPad-P17-Gen-1>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <e23b30cc-80a1-774f-7d58-a676d989b5ce@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Mar 01, 2023 at 03:24:49PM +0800,
+Chenyi Qiang <chenyi.qiang@intel.com> wrote:
 
+> >  		return -EINVAL;
+> >  	}
+> >  
+> > +	max_pkgs = topology_max_packages();
+> > +	tdx_mng_key_config_lock = kcalloc(max_pkgs, sizeof(*tdx_mng_key_config_lock),
+> > +				   GFP_KERNEL);
+> > +	if (!tdx_mng_key_config_lock)
+> > +		return -ENOMEM;
+> > +	for (i = 0; i < max_pkgs; i++)
+> > +		mutex_init(&tdx_mng_key_config_lock[i]);
+> > +
+> >  	/* TDX requires VMX. */
+> >  	r = vmxon_all();
+> >  	if (!r)
+> > @@ -168,3 +600,9 @@ int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
+> >  
+> >  	return r;
+> >  }
+> > +
+> > +void tdx_hardware_unsetup(void)
+> > +{
+> 
+> To align with tdx_hardware_setup(), add some check like:
+> 
+> if (!enable_ept || !enable_tdx)
+> 	return;
+> 
 
-On 3/1/23 16:28, Paul E. McKenney wrote:
-> On Wed, Mar 01, 2023 at 02:25:36PM -0800, Josh Triplett wrote:
->> On Wed, Mar 01, 2023 at 02:16:32PM -0800, Paul E. McKenney wrote:
->>> On Wed, Mar 01, 2023 at 12:32:26PM -0800, Josh Triplett wrote:
->>>> On Tue, Feb 28, 2023 at 01:02:33PM -0800, Arjan van de Ven wrote:
->>>>   Thomas Gleixner wrote:
->>>>>>
->>>>>> Maybe we should enforce CONFIG_SMP=y first :)
->>>>>>
->>>>>> Thanks,
->>>>>
->>>>> for 64 bit I can see the point of removing the !SMP case entirely from arch/x86 .
->>>>> maybe even for 32 bit if it just makes the code simpler I suppose
->>>>
->>>> As one of the folks keeping an eye on tinyconfig and kernel size, I
->>>> actually think we *should* make this change and rip out !CONFIG_SMP,
->>>> albeit carefully.
->>>>
->>>> In particular, I would propose that we rip out !CONFIG_SMP, *but* we
->>>> allow building with CONFIG_NR_CPUS=1. (And we could make sure in that
->>>> case that the compiler can recognize that at compile time and optimize
->>>> accordingly, so that it might provide some of the UP optimizations for
->>>> us.)
->>>>
->>>> Then, any *optimizations* for the "will only have one CPU, ever" case
->>>> can move to CONFIG_NR_CPUS=1 rather than !CONFIG_SMP. I think many of
->>>> those optimizations may be worth keeping for small embedded systems, or
->>>> for cases like Linux-as-bootloader or similar.
->>>>
->>>> The difference here would be that code written for !CONFIG_SMP today
->>>> needs to account for the UP case for *correctness*, whereas code written
->>>> for CONFIG_SMP can *optionally* consider CONFIG_NR_CPUS=1 for
->>>> *performance*.
->>>
->>> It certainly would not make much sense to keep Tiny RCU and Tiny SRCU
->>> around if there was no CONFIG_SMP=n.
->>
->> On the contrary, I think it's entirely appropriate to keep them for
->> CONFIG_NR_CPUS=1; that's exactly the kind of simple optimization that
->> seems well worth having. (Ideal optimization: "very very simple for UP,
->> complex for SMP"; non-ideal optimization: "complex for SMP, differently
->> complex for UP".)
-> 
-> Fair enough, but how does removing CONFIG_SMP help with that?  Given that
-> it is not all that hard to work around the lack of CONFIG_SMP for Tiny
-> RCU and Tiny SRCU, then it cannot be all that hard to work around that
-> lack for the use cases that you are trying to get rid of, right?
-> 
-> 							Thanx, Paul
-> 
-> ------------------------------------------------------------------------
-> 
-> diff --git a/kernel/rcu/Kconfig b/kernel/rcu/Kconfig
-> index 9071182b1284b..7487bee3d4341 100644
-> --- a/kernel/rcu/Kconfig
-> +++ b/kernel/rcu/Kconfig
-> @@ -7,7 +7,7 @@ menu "RCU Subsystem"
->  
->  config TREE_RCU
->  	bool
-> -	default y if SMP
-> +	default y if CONFIG_NR_CPUS = 1
->  	# Dynticks-idle tracking
->  	select CONTEXT_TRACKING_IDLE
->  	help
-> @@ -31,7 +31,7 @@ config PREEMPT_RCU
->  
->  config TINY_RCU
->  	bool
-> -	default y if !PREEMPTION && !SMP
-> +	default y if !PREEMPTION && CONFIG_NR_CPUS != 1
->  	help
->  	  This option selects the RCU implementation that is
->  	  designed for UP systems from which real-time response
-
-but drop the CONFIG_ prefixes...
-
+Oh yes, thanks for catching it.
 -- 
-~Randy
+Isaku Yamahata <isaku.yamahata@gmail.com>
