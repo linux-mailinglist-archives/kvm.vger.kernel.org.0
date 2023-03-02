@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D2B06A7B11
-	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 06:52:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 23D706A7B09
+	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 06:52:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230032AbjCBFwx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Mar 2023 00:52:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47046 "EHLO
+        id S229908AbjCBFw2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Mar 2023 00:52:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230104AbjCBFwX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Mar 2023 00:52:23 -0500
+        with ESMTP id S230031AbjCBFvw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Mar 2023 00:51:52 -0500
 Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 497CD55047;
-        Wed,  1 Mar 2023 21:51:26 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F08A44ECC2;
+        Wed,  1 Mar 2023 21:51:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677736287; x=1709272287;
+  t=1677736270; x=1709272270;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=pLas5p/5GAmOvBK0uD9R5N8t9jJL8ZoKvTscvrwkS8w=;
-  b=Pd/0ZDSL1fPqBYZRIPo1FATEKZYxgGtgIK/oipGpz/CSMDqufEqh580J
-   VP3XMqHjC8/9nZodWifOuRgoBd+v8wExgOQ3m45MgCM4+c26ueHTQEgjw
-   KIb4BBx/hxmsI2RA5Mjj2Ru4Z2iq26v9ysr73QC4XOyBYlZwwoEwnNZg+
-   Ajd//Ooug4UxKQSrGyj96Nu2SdBc/r5+8vjMBVaD+RXSgyhUZKH8eQEBy
-   51Kpf9fusviOOdUdXkb8IySK2ePyoe/J/+OoQi5CaPEE1+BtbWfjXH+jb
-   yt3JZgo0Dle+3UY2kBS7kQAYibxxjTNhf/orKFRAuqrJFUTGb/pzaL+2M
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="420887292"
+  bh=iXYrw/l8XuMvDJL0/urb7Y4MFn+tao/ntyyueUqHbW8=;
+  b=ljkPnil6ch+/bbAJAhhLnVDhbeSvxM/faUIohObkRqCzVakrj4jSGgMq
+   Pg2qj+iTX/gvHRnMThEFg3GX/VLNAZftpQKjYVSP6kxdOVOsNa+93aCoZ
+   FVbN8s7RX/CHBwpLP/SO25Nh/oLjuo8cvfG2otVzNDW74SXIP9vm3enRc
+   mDx2IwaRhoPMmRJFlM1lLquZICjtfAE5r1aX1X1vksOmm+LmBOk4g+frm
+   FNiKt2KAltYPRNVeKwzWa8JoQ63KkKH+VR5Uka7q6qifR3rKtJn0z9/yi
+   qQ3S9oMrEwj6L9ZU1YyBLlVxjhIoUFexRj7PxnbfoJa6mS+BufXYx8gLx
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="420887258"
 X-IronPort-AV: E=Sophos;i="5.98,226,1673942400"; 
-   d="scan'208";a="420887292"
+   d="scan'208";a="420887258"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
   by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2023 21:50:52 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="920530960"
+X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="920530965"
 X-IronPort-AV: E=Sophos;i="5.98,226,1673942400"; 
-   d="scan'208";a="920530960"
+   d="scan'208";a="920530965"
 Received: from unknown (HELO fred..) ([172.25.112.68])
-  by fmsmga006.fm.intel.com with ESMTP; 01 Mar 2023 21:50:50 -0800
+  by fmsmga006.fm.intel.com with ESMTP; 01 Mar 2023 21:50:51 -0800
 From:   Xin Li <xin3.li@intel.com>
 To:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org
 Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         dave.hansen@linux.intel.com, hpa@zytor.com, peterz@infradead.org,
         andrew.cooper3@citrix.com, seanjc@google.com, pbonzini@redhat.com,
         ravi.v.shankar@intel.com
-Subject: [PATCH v4 27/34] x86/fred: allow single-step trap and NMI when starting a new thread
-Date:   Wed,  1 Mar 2023 21:25:04 -0800
-Message-Id: <20230302052511.1918-28-xin3.li@intel.com>
+Subject: [PATCH v4 28/34] x86/fred: fixup fault on ERETU by jumping to fred_entrypoint_user
+Date:   Wed,  1 Mar 2023 21:25:05 -0800
+Message-Id: <20230302052511.1918-29-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230302052511.1918-1-xin3.li@intel.com>
 References: <20230302052511.1918-1-xin3.li@intel.com>
@@ -61,91 +61,118 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
+If the stack frame contains an invalid user context (e.g. due to invalid SS,
+a non-canonical RIP, etc.) the ERETU instruction will trap (#SS or #GP).
 
-Allow single-step trap and NMI when starting a new thread, thus once
-the new thread returns to ring3, single-step trap and NMI are both
-enabled immediately.
+From a Linux point of view, this really should be considered a user space
+failure, so use the standard fault fixup mechanism to intercept the fault,
+fix up the exception frame, and redirect execution to fred_entrypoint_user.
+The end result is that it appears just as if the hardware had taken the
+exception immediately after completing the transition to user space.
 
-High-order 48 bits above the lowest 16 bit CS are discarded by the
-legacy IRET instruction, thus can be set unconditionally, even when
-FRED is not enabled.
-
-Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
+Suggested-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
- arch/x86/include/asm/fred.h  | 11 +++++++++++
- arch/x86/kernel/process_64.c | 13 +++++++------
- 2 files changed, 18 insertions(+), 6 deletions(-)
+ arch/x86/entry/entry_64_fred.S             |  8 +++++--
+ arch/x86/include/asm/extable_fixup_types.h |  4 +++-
+ arch/x86/mm/extable.c                      | 28 ++++++++++++++++++++++
+ 3 files changed, 37 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/include/asm/fred.h b/arch/x86/include/asm/fred.h
-index cd974edc8e8a..12449448e9bf 100644
---- a/arch/x86/include/asm/fred.h
-+++ b/arch/x86/include/asm/fred.h
-@@ -52,6 +52,14 @@
- #define FRED_CSL_ALLOW_SINGLE_STEP	_BITUL(25)
- #define FRED_CSL_INTERRUPT_SHADOW	_BITUL(24)
+diff --git a/arch/x86/entry/entry_64_fred.S b/arch/x86/entry/entry_64_fred.S
+index 1fb765fd3871..027ef8f1e600 100644
+--- a/arch/x86/entry/entry_64_fred.S
++++ b/arch/x86/entry/entry_64_fred.S
+@@ -5,8 +5,10 @@
+  * The actual FRED entry points.
+  */
+ #include <linux/linkage.h>
+-#include <asm/errno.h>
++#include <asm/asm.h>
+ #include <asm/asm-offsets.h>
++#include <asm/errno.h>
++#include <asm/export.h>
+ #include <asm/fred.h>
  
-+/*
-+ * High-order 48 bits above the lowest 16 bit CS are discarded by the
-+ * legacy IRET instruction, thus can be set unconditionally, even when
-+ * FRED is not enabled.
-+ */
-+#define CSL_PROCESS_START \
-+	(FRED_CSL_ENABLE_NMI | FRED_CSL_ALLOW_SINGLE_STEP)
+ #include "calling.h"
+@@ -38,7 +40,9 @@ SYM_CODE_START_NOALIGN(fred_entrypoint_user)
+ 	call	fred_entry_from_user
+ SYM_INNER_LABEL(fred_exit_user, SYM_L_GLOBAL)
+ 	FRED_EXIT
+-	ERETU
++1:	ERETU
 +
- #ifndef __ASSEMBLY__
++	_ASM_EXTABLE_TYPE(1b, fred_entrypoint_user, EX_TYPE_ERETU)
+ SYM_CODE_END(fred_entrypoint_user)
  
- #include <linux/kernel.h>
-@@ -115,6 +123,9 @@ void fred_setup_apic(void);
- #else
- #define cpu_init_fred_exceptions() BUG()
- #define fred_setup_apic() BUG()
-+
-+#define CSL_PROCESS_START 0
-+
- #endif /* CONFIG_X86_FRED */
+ /*
+diff --git a/arch/x86/include/asm/extable_fixup_types.h b/arch/x86/include/asm/extable_fixup_types.h
+index 991e31cfde94..1585c798a02f 100644
+--- a/arch/x86/include/asm/extable_fixup_types.h
++++ b/arch/x86/include/asm/extable_fixup_types.h
+@@ -64,6 +64,8 @@
+ #define	EX_TYPE_UCOPY_LEN4		(EX_TYPE_UCOPY_LEN | EX_DATA_IMM(4))
+ #define	EX_TYPE_UCOPY_LEN8		(EX_TYPE_UCOPY_LEN | EX_DATA_IMM(8))
  
- #endif /* ASM_X86_FRED_H */
-diff --git a/arch/x86/kernel/process_64.c b/arch/x86/kernel/process_64.c
-index ff6594dbea4a..b23850352e7d 100644
---- a/arch/x86/kernel/process_64.c
-+++ b/arch/x86/kernel/process_64.c
-@@ -55,6 +55,7 @@
- #include <asm/resctrl.h>
- #include <asm/unistd.h>
- #include <asm/fsgsbase.h>
+-#define EX_TYPE_ZEROPAD			20 /* longword load with zeropad on fault */
++#define	EX_TYPE_ZEROPAD			20 /* longword load with zeropad on fault */
++
++#define	EX_TYPE_ERETU			21
+ 
+ #endif
+diff --git a/arch/x86/mm/extable.c b/arch/x86/mm/extable.c
+index 60814e110a54..88a2c419ce8b 100644
+--- a/arch/x86/mm/extable.c
++++ b/arch/x86/mm/extable.c
+@@ -6,6 +6,7 @@
+ #include <xen/xen.h>
+ 
+ #include <asm/fpu/api.h>
 +#include <asm/fred.h>
- #ifdef CONFIG_IA32_EMULATION
- /* Not included via unistd.h */
- #include <asm/unistd_32_ia32.h>
-@@ -506,7 +507,7 @@ void x86_gsbase_write_task(struct task_struct *task, unsigned long gsbase)
- static void
- start_thread_common(struct pt_regs *regs, unsigned long new_ip,
- 		    unsigned long new_sp,
--		    unsigned int _cs, unsigned int _ss, unsigned int _ds)
-+		    u16 _cs, u16 _ss, u16 _ds)
- {
- 	WARN_ON_ONCE(regs != current_pt_regs());
- 
-@@ -521,11 +522,11 @@ start_thread_common(struct pt_regs *regs, unsigned long new_ip,
- 	loadsegment(ds, _ds);
- 	load_gs_index(0);
- 
--	regs->ip		= new_ip;
--	regs->sp		= new_sp;
--	regs->cs		= _cs;
--	regs->ss		= _ss;
--	regs->flags		= X86_EFLAGS_IF;
-+	regs->ip	= new_ip;
-+	regs->sp	= new_sp;
-+	regs->csx	= _cs | CSL_PROCESS_START;
-+	regs->ssx	= _ss;
-+	regs->flags	= X86_EFLAGS_IF | X86_EFLAGS_FIXED;
+ #include <asm/sev.h>
+ #include <asm/traps.h>
+ #include <asm/kdebug.h>
+@@ -195,6 +196,29 @@ static bool ex_handler_ucopy_len(const struct exception_table_entry *fixup,
+ 	return ex_handler_uaccess(fixup, regs, trapnr);
  }
  
- void
++#ifdef CONFIG_X86_FRED
++static bool ex_handler_eretu(const struct exception_table_entry *fixup,
++			     struct pt_regs *regs, unsigned long error_code)
++{
++	struct pt_regs *uregs = (struct pt_regs *)(regs->sp - offsetof(struct pt_regs, ip));
++	unsigned short ss = uregs->ss;
++	unsigned short cs = uregs->cs;
++
++	fred_info(uregs)->edata = fred_event_data(regs);
++	uregs->ssx = regs->ssx;
++	uregs->ss = ss;
++	uregs->csx = regs->csx;
++	uregs->current_stack_level = 0;
++	uregs->cs = cs;
++
++	/* Copy error code to uregs and adjust stack pointer accordingly */
++	uregs->orig_ax = error_code;
++	regs->sp -= 8;
++
++	return ex_handler_default(fixup, regs);
++}
++#endif
++
+ int ex_get_fixup_type(unsigned long ip)
+ {
+ 	const struct exception_table_entry *e = search_exception_tables(ip);
+@@ -272,6 +296,10 @@ int fixup_exception(struct pt_regs *regs, int trapnr, unsigned long error_code,
+ 		return ex_handler_ucopy_len(e, regs, trapnr, reg, imm);
+ 	case EX_TYPE_ZEROPAD:
+ 		return ex_handler_zeropad(e, regs, fault_addr);
++#ifdef CONFIG_X86_FRED
++	case EX_TYPE_ERETU:
++		return ex_handler_eretu(e, regs, error_code);
++#endif
+ 	}
+ 	BUG();
+ }
 -- 
 2.34.1
 
