@@ -2,74 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C2746A7C6D
-	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 09:20:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EB7AA6A7C6E
+	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 09:20:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229677AbjCBIUz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Mar 2023 03:20:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57340 "EHLO
+        id S229702AbjCBIU5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Mar 2023 03:20:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229756AbjCBIUq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Mar 2023 03:20:46 -0500
+        with ESMTP id S229564AbjCBIU4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Mar 2023 03:20:56 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E2F222006
-        for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 00:19:52 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B991D1D901
+        for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 00:20:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677745191;
+        s=mimecast20190719; t=1677745199;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=zIjaXDXp4WiF/PZhzlcAElDicG/m9VQA0incK69mGeo=;
-        b=DlKKPiFvHmXpMEA1i04yqeUuVQFV+cBs+oyF4djGp6GbKsIZxOkcumfi0epNA3S3nL3oHB
-        oTTXBBjjfM+uOHy2vupu8+8cLnAsU54eEl12SoEYQoqKUdYDYabEOHVheAP1IuWcLCYTBZ
-        9qLePY5iXS0CCOQK8NvyAXnuGRkF7qs=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-20-FEB20ttcMbmqYKEAePzx2A-1; Thu, 02 Mar 2023 03:19:49 -0500
-X-MC-Unique: FEB20ttcMbmqYKEAePzx2A-1
-Received: by mail-qv1-f69.google.com with SMTP id l13-20020ad44d0d000000b004c74bbb0affso8430981qvl.21
-        for <kvm@vger.kernel.org>; Thu, 02 Mar 2023 00:19:49 -0800 (PST)
+        bh=XoJEO/rrhsWrElsDeh33FRv7UGKPrM+4RlG9La9lfTc=;
+        b=BKjth3dLh1BS288iPIR9SKu7NpJ3vjw3QJW5M4gORM5jU3YSYoTH56YjQ6oQg4YFNgcvTa
+        JE9Lh/awKYdESEtdA2RBWuHXqn4+ZDOzEi5a9Ki/ZQTBvAlPTJdmOkcmgmOd1atxK5Omph
+        FL4uq+orCxoUb36O/up+SEQaJ2as0Z4=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-594-D0vJy8MLNrCBUMLrxQeo2A-1; Thu, 02 Mar 2023 03:19:58 -0500
+X-MC-Unique: D0vJy8MLNrCBUMLrxQeo2A-1
+Received: by mail-qk1-f198.google.com with SMTP id eb13-20020a05620a480d00b00742be8a1a17so6275338qkb.18
+        for <kvm@vger.kernel.org>; Thu, 02 Mar 2023 00:19:58 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zIjaXDXp4WiF/PZhzlcAElDicG/m9VQA0incK69mGeo=;
-        b=h/Pm0bjCl0cVEXqUvLSiGEju8TnS9ywWTIGbr4oSvUuFOgz2pr+oZ/ByjQDi9pCJWd
-         9A3uuyT9nX4/LEm6nwEm2WpI93iaA2meKGFYRSydQ6QZfDS5YDiNbrM35CB83K8zl1MV
-         JkOvEYCtFXxB4NNDSd/UQ0D2RxJI8gNpv4StHQvJ0x7vQjKxGr0/f7nSDq1PHxW/zlsz
-         javh8D+FuFp+CyFgH9NzzgyEHvLt7bfG2LvjRhpFMiIEqYpwp2HGVnEdFNeqQmovC1xf
-         uWh4d0Kcbg9yFm6PCbFSahFOOV92MfMqHh+/fY6x8jBTRBdzyjL6k3O8fW8jAIIqEzx/
-         NaiQ==
-X-Gm-Message-State: AO0yUKXX4jhRjgRSdP1BQkk1IsjJ6p1hsqN/YZ0NcAyRMwQz+bIkfh4X
-        RXhDtfsA/0Im7WGgAZvS2l+osyqWwFajIIMBi2MwMHysxhF4WM8bh14enZSvTFPdMXfUMPzESvi
-        AgKzEEqUyUUro
-X-Received: by 2002:a05:6214:29e9:b0:56b:fa99:7866 with SMTP id jv9-20020a05621429e900b0056bfa997866mr15509750qvb.7.1677745189315;
-        Thu, 02 Mar 2023 00:19:49 -0800 (PST)
-X-Google-Smtp-Source: AK7set9DC0uf3w5/KZdo3iDCN05BT27ad4JPBOOjlaA8gZ1f4js38pJNLws5TY6JsybSloz9MoJvIQ==
-X-Received: by 2002:a05:6214:29e9:b0:56b:fa99:7866 with SMTP id jv9-20020a05621429e900b0056bfa997866mr15509741qvb.7.1677745189084;
-        Thu, 02 Mar 2023 00:19:49 -0800 (PST)
+        bh=XoJEO/rrhsWrElsDeh33FRv7UGKPrM+4RlG9La9lfTc=;
+        b=IM0NvUVICx/ylq/vksAnwF68O66KNdqGNMfIsRBVL/jxz0cdqcomBMgZtBOsml4/uZ
+         O0wql1yLoALZZ6IwylyZwzpriaziNH9vNCnuz5mYX3wtPOxWkw60MoHGSng/xS7vG61z
+         Fl/WXUGiGtr12l66Zqv8H42QkYZ/06IWrQDAZ0z05LmfCwKGxvqrHvUuWwAfetxsKhTx
+         l3GhPG7y64ebBhBORiApAZ044Mr1OiH1J8JVq1ed5wXusRn4h5hmsCc3AkW4WZzPFjz8
+         p/qCVayeG028GQ79ImEr++9Qp31B563Zr4Yxq2HbdCzQn88cTyaCTVixIfCNIs48YryM
+         TBTw==
+X-Gm-Message-State: AO0yUKWfnPxDPIiIgavsR8fFdFusS0s35qeUGX2GVOrpKPP5ezr+gGu6
+        6g+Gt8zcXzr6DO9ayMk3Xx+ZRE91H9J9qfCFOj6qvH7IvXZVdZwZ1Sqv0dcK4WRTbYh05xXimVQ
+        4HQ2xzOZLauC8rpnafw==
+X-Received: by 2002:a05:622a:1a84:b0:3bf:b6ba:1c1f with SMTP id s4-20020a05622a1a8400b003bfb6ba1c1fmr17689093qtc.10.1677745197468;
+        Thu, 02 Mar 2023 00:19:57 -0800 (PST)
+X-Google-Smtp-Source: AK7set/f8FUy6jS5OC2id5Rsy6kJpPekovC1uYs9hy0AcMyf273M0RdPVTwqpf0GUC63NUgSX9UIcQ==
+X-Received: by 2002:a05:622a:1a84:b0:3bf:b6ba:1c1f with SMTP id s4-20020a05622a1a8400b003bfb6ba1c1fmr17689082qtc.10.1677745197262;
+        Thu, 02 Mar 2023 00:19:57 -0800 (PST)
 Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id g1-20020a37b601000000b00743049c2b15sm1221359qkf.66.2023.03.02.00.19.47
+        by smtp.gmail.com with ESMTPSA id d5-20020ac86685000000b003bfaf01af24sm9894512qtp.46.2023.03.02.00.19.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Mar 2023 00:19:48 -0800 (PST)
-Message-ID: <830e41b7-2e78-caff-7115-81be321bdad9@redhat.com>
-Date:   Thu, 2 Mar 2023 09:19:46 +0100
+        Thu, 02 Mar 2023 00:19:56 -0800 (PST)
+Message-ID: <58de2175-62f1-a873-872b-dff79c53fec9@redhat.com>
+Date:   Thu, 2 Mar 2023 09:19:54 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.0
-Subject: Re: [RESEND kvm-unit-tests 2/3] arm64: timer: Use
- gic_enable/disable_irq() macro in timer test
+Subject: Re: [RESEND kvm-unit-tests 3/3] arm64: microbench: Use
+ gic_enable_irq() macro in microbench test
 Content-Language: en-US
 To:     Shaoqin Huang <shahuang@redhat.com>, kvmarm@lists.linux.dev
 Cc:     Andrew Jones <andrew.jones@linux.dev>,
         "open list:ARM" <kvm@vger.kernel.org>
 References: <20230302030238.158796-1-shahuang@redhat.com>
- <20230302030238.158796-3-shahuang@redhat.com>
+ <20230302030238.158796-4-shahuang@redhat.com>
 From:   Eric Auger <eauger@redhat.com>
-In-Reply-To: <20230302030238.158796-3-shahuang@redhat.com>
+In-Reply-To: <20230302030238.158796-4-shahuang@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -82,69 +82,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
+Hi Shaoqin,
 
 On 3/2/23 04:02, Shaoqin Huang wrote:
-> Use gic_enable/disable_irq() to clean up the code.
+> Use gic_enable_irq() to clean up code.
 > 
 > Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-
-Thanks
-
 Eric
-
 > ---
->  arm/timer.c | 20 +++-----------------
->  1 file changed, 3 insertions(+), 17 deletions(-)
+>  arm/micro-bench.c | 15 +--------------
+>  1 file changed, 1 insertion(+), 14 deletions(-)
 > 
-> diff --git a/arm/timer.c b/arm/timer.c
-> index c4e7b10..c0a8388 100644
-> --- a/arm/timer.c
-> +++ b/arm/timer.c
-> @@ -14,9 +14,6 @@
->  #include <asm/gic.h>
->  #include <asm/io.h>
+> diff --git a/arm/micro-bench.c b/arm/micro-bench.c
+> index 8436612..090fda6 100644
+> --- a/arm/micro-bench.c
+> +++ b/arm/micro-bench.c
+> @@ -212,24 +212,11 @@ static void lpi_exec(void)
 >  
-> -static void *gic_isenabler;
-> -static void *gic_icenabler;
-> -
->  static bool ptimer_unsupported;
->  
->  static void ptimer_unsupported_handler(struct pt_regs *regs, unsigned int esr)
-> @@ -139,12 +136,12 @@ static struct timer_info ptimer_info = {
->  
->  static void set_timer_irq_enabled(struct timer_info *info, bool enabled)
+>  static bool timer_prep(void)
 >  {
-> -	u32 val = 1 << PPI(info->irq);
-> +	u32 irq = PPI(info->irq);
->  
->  	if (enabled)
-> -		writel(val, gic_isenabler);
-> +		gic_enable_irq(irq);
->  	else
-> -		writel(val, gic_icenabler);
-> +		gic_disable_irq(irq);
->  }
->  
->  static void irq_handler(struct pt_regs *regs)
-> @@ -366,17 +363,6 @@ static void test_init(void)
->  
+> -	void *gic_isenabler;
+> -
 >  	gic_enable_defaults();
+>  	install_irq_handler(EL1H_IRQ, gic_irq_handler);
+>  	local_irq_enable();
 >  
 > -	switch (gic_version()) {
 > -	case 2:
 > -		gic_isenabler = gicv2_dist_base() + GICD_ISENABLER;
-> -		gic_icenabler = gicv2_dist_base() + GICD_ICENABLER;
 > -		break;
 > -	case 3:
 > -		gic_isenabler = gicv3_sgi_base() + GICR_ISENABLER0;
-> -		gic_icenabler = gicv3_sgi_base() + GICR_ICENABLER0;
 > -		break;
+> -	default:
+> -		assert_msg(0, "Unreachable");
 > -	}
 > -
->  	install_irq_handler(EL1H_IRQ, irq_handler);
->  	set_timer_irq_enabled(&ptimer_info, true);
->  	set_timer_irq_enabled(&vtimer_info, true);
+> -	writel(1 << PPI(TIMER_VTIMER_IRQ), gic_isenabler);
+> +	gic_enable_irq(PPI(TIMER_VTIMER_IRQ));
+>  	write_sysreg(ARCH_TIMER_CTL_IMASK | ARCH_TIMER_CTL_ENABLE, cntv_ctl_el0);
+>  	isb();
+>  
 
