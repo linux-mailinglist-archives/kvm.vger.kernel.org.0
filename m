@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D59C6A8925
-	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 20:09:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F3A8F6A8922
+	for <lists+kvm@lfdr.de>; Thu,  2 Mar 2023 20:09:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229826AbjCBTJZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Mar 2023 14:09:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33068 "EHLO
+        id S229825AbjCBTJV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Mar 2023 14:09:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229791AbjCBTJL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Mar 2023 14:09:11 -0500
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61F50311F6
-        for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 11:08:52 -0800 (PST)
-Received: by mail-wm1-x32f.google.com with SMTP id fm20-20020a05600c0c1400b003ead37e6588so2505260wmb.5
-        for <kvm@vger.kernel.org>; Thu, 02 Mar 2023 11:08:52 -0800 (PST)
+        with ESMTP id S229634AbjCBTJK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Mar 2023 14:09:10 -0500
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 361D730B1C
+        for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 11:08:51 -0800 (PST)
+Received: by mail-wm1-x334.google.com with SMTP id l7-20020a05600c1d0700b003eb5e6d906bso2058450wms.5
+        for <kvm@vger.kernel.org>; Thu, 02 Mar 2023 11:08:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=62eIWH+UgNDIO9tL0abCF5DS6hbxUYuKBS98TK1uNAY=;
-        b=Y2EwnqrCp+qDTcFz1EW3YC21JHlRf1J8aYrGwA16D/IrPQ+aPQqDJHH+7FThelkDFB
-         8P/fukV7yJd4T0msEj12mSBV5ljzbAuK6Sg3R+g9QsoN5jpHqQxlkHkrKYLjXCAIuFRL
-         5S5C5B39krQZ0rFy9pIr/itagrEREMhfC3EVUx+d4tsUUzcbvDECSEuEHxCVWJS8GDxC
-         gXYle4/apt0EhZXe174MMqRCyJIGjlK8TLBqhbQwZEZaz/OdMjUChqu5R1h8exkjYA67
-         CeV9ATLtLKGKbS65+050zb/YnCyfCHofOiHTJPzr5sRxrbwBNYOAwmSee/eKW7BsEBor
-         vDBw==
+        bh=0VnUmt7qfbdjJswH/byMgVhjPRUgQaVzwcTJc8xq4ac=;
+        b=QSkntCo8//QHM+qN2ra4aI8hdkWC+ht0pBvtV383mIUzalM5SwPcmcZfLUyAf9WYae
+         6xRvwgRL/BefaIVvH5sxpRloJtVY4fWPd48n0K4MAM2YjV8IMjaDeiv4VEcq4bz58ljQ
+         okzFyfaO4pxrNnk5QcuyBhLHG1PKN3BxQ7acuYBVQNY6tuoroKGOU8JqhyC75XCTL+zd
+         6KBTecHx/arxunAFc4rRJd+EEp/CkjufYmAhWPOK+K9aZlLtFtagG3rMtasSL83kxSkd
+         rcaiCnJDqE2NvCMwnaAWPYO3Qxtj0yWqj/vqXixwY3NzKN/qVNPI6y2TKGBrYMY8aGU/
+         P2lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=62eIWH+UgNDIO9tL0abCF5DS6hbxUYuKBS98TK1uNAY=;
-        b=2j1kLFGxfLy7S6lV6PuHq7mieJ9sGf03yrxadbzt6EPYB97JhzpC+gnGqQjpWwwBAA
-         BWmbmQQzryUajUfWr9zygSdpML1OQmIZCdwwDTB1Egf6Hg1IzTjyczZwxLUccNeMxt4t
-         tyxpSIuG/266cLGkF/0xeaZdWWtmqJsQOeHb8Tw/THb64kA+8e+Mcgdd6F1ITPeNy+Wo
-         vYZNTFVJ+vd+web5ZYUJVxOLhmC8VonaJ4eeHlldrEQQykDqfBRiGGYLAfhZYgKnhj5J
-         xpJHjcbuW4j7vk0UBcQtX/UYT4YopOIg7oXjaO4QsdadaSw1ZUKc5r118lej9jTY07y7
-         g2YA==
-X-Gm-Message-State: AO0yUKWtIXTQLPC09S1vobUuKhb6cy7aLPH2ZMs7lsZG2OXCI9VHc5Sv
-        vn1tOib12zLJE99f68+1TG2bHA==
-X-Google-Smtp-Source: AK7set+DZpUV+fLm5EmXNvZFeuE5OsROlq+aBaJRW0JmuEXUuessAEZ306eoy59qqadcmgINWU/Wgg==
-X-Received: by 2002:a05:600c:170a:b0:3eb:37ce:4c3d with SMTP id c10-20020a05600c170a00b003eb37ce4c3dmr4634014wmn.38.1677784130856;
-        Thu, 02 Mar 2023 11:08:50 -0800 (PST)
+        bh=0VnUmt7qfbdjJswH/byMgVhjPRUgQaVzwcTJc8xq4ac=;
+        b=YOp0FMPmCIBNPNyY0BnJ/jBrZDTXUgRvsCAupcnZVYUFIOrMGrPlf9TMsjWqQfcTSJ
+         5rXXrD9wdzz7IsILr8Tlo58QKcMNSZ2WSo0smo9+Bn7rNqyYhTa8eZYyFDjMQLM+WEPx
+         kJg0h2DYpLIrQbStN8+ycDUnV+be1lCM4wQe2ZWsQ6Cxj0lJ5rV8Anktjl8Icj4gWMhy
+         xZflQkAukRXwSdPBqgeuOPasQu36GpdeD2vCNASMsEMU2t09e3yz2XVm6Gw/ISTtVnho
+         ew+kFpZm4/XuScnTu1rGr+YX7FnO+VBqA2KrwslLcfCba0xlqF0L4uO0VOv2KBfee0TP
+         CRQA==
+X-Gm-Message-State: AO0yUKUPAEqcq4/gY3BFr6Fb7oDZMIJ6xeCp18JRAnqwQAL5G1o9M9F0
+        jggd1on13aWtUTwbEISNAg9hFA==
+X-Google-Smtp-Source: AK7set9jLa15pVk9h+VS90mNQ/EzlL9CbZ10zFu9ShNxHjncJQlY3cx5qMvRKMMj39b4FkvcLDkmAQ==
+X-Received: by 2002:a05:600c:a45:b0:3ea:f883:180 with SMTP id c5-20020a05600c0a4500b003eaf8830180mr8878958wmq.7.1677784129606;
+        Thu, 02 Mar 2023 11:08:49 -0800 (PST)
 Received: from zen.linaroharston ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id a10-20020a5d508a000000b002c54241b4fesm125929wrt.80.2023.03.02.11.08.47
+        by smtp.gmail.com with ESMTPSA id o10-20020a05600c164a00b003e20cf0408esm328831wmn.40.2023.03.02.11.08.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 02 Mar 2023 11:08:48 -0800 (PST)
 Received: from zen.lan (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id 07E891FFBC;
+        by zen.linaroharston (Postfix) with ESMTP id 232F51FFBD;
         Thu,  2 Mar 2023 19:08:47 +0000 (GMT)
 From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To:     qemu-devel@nongnu.org
@@ -96,9 +96,9 @@ Cc:     Weiwei Li <liweiwei@iscas.ac.cn>,
         Taylor Simpson <tsimpson@quicinc.com>,
         Peter Maydell <peter.maydell@linaro.org>,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v4 04/26] gdbstub: clean-up indent on gdb_exit
-Date:   Thu,  2 Mar 2023 19:08:24 +0000
-Message-Id: <20230302190846.2593720-5-alex.bennee@linaro.org>
+Subject: [PATCH v4 05/26] gdbstub: define separate user/system structures
+Date:   Thu,  2 Mar 2023 19:08:25 +0000
+Message-Id: <20230302190846.2593720-6-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230302190846.2593720-1-alex.bennee@linaro.org>
 References: <20230302190846.2593720-1-alex.bennee@linaro.org>
@@ -114,60 +114,268 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Otherwise checkpatch will throw a hissy fit on the later patches that
-split this function up.
+In preparation for moving user/softmmu specific bits from the main
+gdbstub file we need to separate the connection details into a
+user/softmmu state. As these will eventually be defined in their own
+files we move them out of the common GDBState structure.
 
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+
 ---
- gdbstub/gdbstub.c | 28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
+v3
+  - split into gdbserver_[user|system]_state now to avoid later hoop
+  jumping
+---
+ gdbstub/gdbstub.c | 94 ++++++++++++++++++++++++++---------------------
+ 1 file changed, 53 insertions(+), 41 deletions(-)
 
 diff --git a/gdbstub/gdbstub.c b/gdbstub/gdbstub.c
-index fb9c49e0fd..63b56f0027 100644
+index 63b56f0027..1e6f8978b5 100644
 --- a/gdbstub/gdbstub.c
 +++ b/gdbstub/gdbstub.c
-@@ -3021,27 +3021,27 @@ static void gdb_read_byte(uint8_t ch)
- /* Tell the remote gdb that the process has exited.  */
- void gdb_exit(int code)
+@@ -341,6 +341,22 @@ enum RSState {
+     RS_CHKSUM1,
+     RS_CHKSUM2,
+ };
++
++#ifdef CONFIG_USER_ONLY
++typedef struct {
++    int fd;
++    char *socket_path;
++    int running_state;
++} GDBUserState;
++static GDBUserState gdbserver_user_state;
++#else
++typedef struct {
++    CharBackend chr;
++    Chardev *mon_chr;
++} GDBSystemState;
++static GDBSystemState gdbserver_system_state;
++#endif
++
+ typedef struct GDBState {
+     bool init;       /* have we been initialised? */
+     CPUState *c_cpu; /* current CPU for step/continue ops */
+@@ -353,14 +369,6 @@ typedef struct GDBState {
+     int line_csum; /* checksum at the end of the packet */
+     GByteArray *last_packet;
+     int signal;
+-#ifdef CONFIG_USER_ONLY
+-    int fd;
+-    char *socket_path;
+-    int running_state;
+-#else
+-    CharBackend chr;
+-    Chardev *mon_chr;
+-#endif
+     bool multiprocess;
+     GDBProcess *processes;
+     int process_num;
+@@ -412,15 +420,17 @@ static int get_char(void)
+     int ret;
+ 
+     for(;;) {
+-        ret = recv(gdbserver_state.fd, &ch, 1, 0);
++        ret = recv(gdbserver_user_state.fd, &ch, 1, 0);
+         if (ret < 0) {
+-            if (errno == ECONNRESET)
+-                gdbserver_state.fd = -1;
+-            if (errno != EINTR)
++            if (errno == ECONNRESET) {
++                gdbserver_user_state.fd = -1;
++            }
++            if (errno != EINTR) {
+                 return -1;
++            }
+         } else if (ret == 0) {
+-            close(gdbserver_state.fd);
+-            gdbserver_state.fd = -1;
++            close(gdbserver_user_state.fd);
++            gdbserver_user_state.fd = -1;
+             return -1;
+         } else {
+             break;
+@@ -479,7 +489,7 @@ static inline void gdb_continue(void)
  {
--  char buf[4];
-+    char buf[4];
  
--  if (!gdbserver_state.init) {
--      return;
--  }
-+    if (!gdbserver_state.init) {
-+        return;
-+    }
  #ifdef CONFIG_USER_ONLY
--  if (gdbserver_state.socket_path) {
--      unlink(gdbserver_state.socket_path);
--  }
--  if (gdbserver_state.fd < 0) {
--      return;
--  }
-+    if (gdbserver_state.socket_path) {
-+        unlink(gdbserver_state.socket_path);
-+    }
-+    if (gdbserver_state.fd < 0) {
-+        return;
-+    }
- #endif
+-    gdbserver_state.running_state = 1;
++    gdbserver_user_state.running_state = 1;
+     trace_gdbstub_op_continue();
+ #else
+     if (!runstate_needs_reset()) {
+@@ -508,7 +518,7 @@ static int gdb_continue_partial(char *newstates)
+             cpu_single_step(cpu, gdbserver_state.sstep_flags);
+         }
+     }
+-    gdbserver_state.running_state = 1;
++    gdbserver_user_state.running_state = 1;
+ #else
+     int flag = 0;
  
--  trace_gdbstub_op_exiting((uint8_t)code);
-+    trace_gdbstub_op_exiting((uint8_t)code);
+@@ -560,7 +570,7 @@ static void put_buffer(const uint8_t *buf, int len)
+     int ret;
  
--  snprintf(buf, sizeof(buf), "W%02x", (uint8_t)code);
--  put_packet(buf);
-+    snprintf(buf, sizeof(buf), "W%02x", (uint8_t)code);
-+    put_packet(buf);
- 
- #ifndef CONFIG_USER_ONLY
--  qemu_chr_fe_deinit(&gdbserver_state.chr, true);
-+    qemu_chr_fe_deinit(&gdbserver_state.chr, true);
+     while (len > 0) {
+-        ret = send(gdbserver_state.fd, buf, len, 0);
++        ret = send(gdbserver_user_state.fd, buf, len, 0);
+         if (ret < 0) {
+             if (errno != EINTR)
+                 return;
+@@ -572,7 +582,7 @@ static void put_buffer(const uint8_t *buf, int len)
+ #else
+     /* XXX this blocks entire thread. Rewrite to use
+      * qemu_chr_fe_write and background I/O callbacks */
+-    qemu_chr_fe_write_all(&gdbserver_state.chr, buf, len);
++    qemu_chr_fe_write_all(&gdbserver_system_state.chr, buf, len);
  #endif
  }
  
+@@ -2094,7 +2104,8 @@ static void handle_query_rcmd(GArray *params, void *user_ctx)
+     len = len / 2;
+     hextomem(gdbserver_state.mem_buf, get_param(params, 0)->data, len);
+     g_byte_array_append(gdbserver_state.mem_buf, &zero, 1);
+-    qemu_chr_be_write(gdbserver_state.mon_chr, gdbserver_state.mem_buf->data,
++    qemu_chr_be_write(gdbserver_system_state.mon_chr,
++                      gdbserver_state.mem_buf->data,
+                       gdbserver_state.mem_buf->len);
+     put_packet("OK");
+ }
+@@ -3027,10 +3038,10 @@ void gdb_exit(int code)
+         return;
+     }
+ #ifdef CONFIG_USER_ONLY
+-    if (gdbserver_state.socket_path) {
+-        unlink(gdbserver_state.socket_path);
++    if (gdbserver_user_state.socket_path) {
++        unlink(gdbserver_user_state.socket_path);
+     }
+-    if (gdbserver_state.fd < 0) {
++    if (gdbserver_user_state.fd < 0) {
+         return;
+     }
+ #endif
+@@ -3041,7 +3052,7 @@ void gdb_exit(int code)
+     put_packet(buf);
+ 
+ #ifndef CONFIG_USER_ONLY
+-    qemu_chr_fe_deinit(&gdbserver_state.chr, true);
++    qemu_chr_fe_deinit(&gdbserver_system_state.chr, true);
+ #endif
+ }
+ 
+@@ -3077,7 +3088,7 @@ gdb_handlesig(CPUState *cpu, int sig)
+     char buf[256];
+     int n;
+ 
+-    if (!gdbserver_state.init || gdbserver_state.fd < 0) {
++    if (!gdbserver_state.init || gdbserver_user_state.fd < 0) {
+         return sig;
+     }
+ 
+@@ -3095,15 +3106,15 @@ gdb_handlesig(CPUState *cpu, int sig)
+     }
+     /* put_packet() might have detected that the peer terminated the
+        connection.  */
+-    if (gdbserver_state.fd < 0) {
++    if (gdbserver_user_state.fd < 0) {
+         return sig;
+     }
+ 
+     sig = 0;
+     gdbserver_state.state = RS_IDLE;
+-    gdbserver_state.running_state = 0;
+-    while (gdbserver_state.running_state == 0) {
+-        n = read(gdbserver_state.fd, buf, 256);
++    gdbserver_user_state.running_state = 0;
++    while (gdbserver_user_state.running_state == 0) {
++        n = read(gdbserver_user_state.fd, buf, 256);
+         if (n > 0) {
+             int i;
+ 
+@@ -3114,9 +3125,9 @@ gdb_handlesig(CPUState *cpu, int sig)
+             /* XXX: Connection closed.  Should probably wait for another
+                connection before continuing.  */
+             if (n == 0) {
+-                close(gdbserver_state.fd);
++                close(gdbserver_user_state.fd);
+             }
+-            gdbserver_state.fd = -1;
++            gdbserver_user_state.fd = -1;
+             return sig;
+         }
+     }
+@@ -3130,7 +3141,7 @@ void gdb_signalled(CPUArchState *env, int sig)
+ {
+     char buf[4];
+ 
+-    if (!gdbserver_state.init || gdbserver_state.fd < 0) {
++    if (!gdbserver_state.init || gdbserver_user_state.fd < 0) {
+         return;
+     }
+ 
+@@ -3145,7 +3156,7 @@ static void gdb_accept_init(int fd)
+     gdbserver_state.processes[0].attached = true;
+     gdbserver_state.c_cpu = gdb_first_attached_cpu();
+     gdbserver_state.g_cpu = gdbserver_state.c_cpu;
+-    gdbserver_state.fd = fd;
++    gdbserver_user_state.fd = fd;
+     gdb_has_xml = false;
+ }
+ 
+@@ -3277,7 +3288,7 @@ int gdbserver_start(const char *port_or_path)
+     if (port > 0 && gdb_accept_tcp(gdb_fd)) {
+         return 0;
+     } else if (gdb_accept_socket(gdb_fd)) {
+-        gdbserver_state.socket_path = g_strdup(port_or_path);
++        gdbserver_user_state.socket_path = g_strdup(port_or_path);
+         return 0;
+     }
+ 
+@@ -3289,11 +3300,11 @@ int gdbserver_start(const char *port_or_path)
+ /* Disable gdb stub for child processes.  */
+ void gdbserver_fork(CPUState *cpu)
+ {
+-    if (!gdbserver_state.init || gdbserver_state.fd < 0) {
++    if (!gdbserver_state.init || gdbserver_user_state.fd < 0) {
+         return;
+     }
+-    close(gdbserver_state.fd);
+-    gdbserver_state.fd = -1;
++    close(gdbserver_user_state.fd);
++    gdbserver_user_state.fd = -1;
+     cpu_breakpoint_remove_all(cpu, BP_GDB);
+     cpu_watchpoint_remove_all(cpu, BP_GDB);
+ }
+@@ -3487,21 +3498,22 @@ int gdbserver_start(const char *device)
+                                    NULL, NULL, &error_abort);
+         monitor_init_hmp(mon_chr, false, &error_abort);
+     } else {
+-        qemu_chr_fe_deinit(&gdbserver_state.chr, true);
+-        mon_chr = gdbserver_state.mon_chr;
++        qemu_chr_fe_deinit(&gdbserver_system_state.chr, true);
++        mon_chr = gdbserver_system_state.mon_chr;
+         reset_gdbserver_state();
+     }
+ 
+     create_processes(&gdbserver_state);
+ 
+     if (chr) {
+-        qemu_chr_fe_init(&gdbserver_state.chr, chr, &error_abort);
+-        qemu_chr_fe_set_handlers(&gdbserver_state.chr, gdb_chr_can_receive,
++        qemu_chr_fe_init(&gdbserver_system_state.chr, chr, &error_abort);
++        qemu_chr_fe_set_handlers(&gdbserver_system_state.chr,
++                                 gdb_chr_can_receive,
+                                  gdb_chr_receive, gdb_chr_event,
+                                  NULL, &gdbserver_state, NULL, true);
+     }
+     gdbserver_state.state = chr ? RS_IDLE : RS_INACTIVE;
+-    gdbserver_state.mon_chr = mon_chr;
++    gdbserver_system_state.mon_chr = mon_chr;
+     gdbserver_state.current_syscall_cb = NULL;
+ 
+     return 0;
 -- 
 2.39.2
 
