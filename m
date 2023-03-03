@@ -2,154 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D55BD6A9A21
-	for <lists+kvm@lfdr.de>; Fri,  3 Mar 2023 16:01:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A2FE96A9A9D
+	for <lists+kvm@lfdr.de>; Fri,  3 Mar 2023 16:28:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231432AbjCCPBR convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 3 Mar 2023 10:01:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44344 "EHLO
+        id S231319AbjCCP2o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Mar 2023 10:28:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231389AbjCCPBK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Mar 2023 10:01:10 -0500
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CBB0637CA;
-        Fri,  3 Mar 2023 07:01:07 -0800 (PST)
-Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.200])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4PSrdJ6cxfz6H7B7;
-        Fri,  3 Mar 2023 22:56:04 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
- lhrpeml500005.china.huawei.com (7.191.163.240) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Fri, 3 Mar 2023 15:01:03 +0000
-Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
- lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.021;
- Fri, 3 Mar 2023 15:01:03 +0000
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     Nicolin Chen <nicolinc@nvidia.com>
-CC:     "Xu, Terrence" <terrence.xu@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, Jason Gunthorpe <jgg@nvidia.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Hao, Xudong" <xudong.hao@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>
-Subject: RE: [PATCH v5 00/19] Add vfio_device cdev for iommufd support
-Thread-Topic: [PATCH v5 00/19] Add vfio_device cdev for iommufd support
-Thread-Index: AQHZSpxHUh/YYv3qukeFp+lKFtoCf67jLB2AgACBDoCAAOlEAIAAn5IAgAIKi/CAAO3wAIAA+kPA
-Date:   Fri, 3 Mar 2023 15:01:03 +0000
-Message-ID: <d59a0262d5bf423c9e49ad4ac6015296@huawei.com>
-References: <20230227111135.61728-1-yi.l.liu@intel.com>
- <Y/0Cr/tcNCzzIAhi@nvidia.com>
- <DS0PR11MB7529A422D4361B39CCA3D248C3AC9@DS0PR11MB7529.namprd11.prod.outlook.com>
- <SA1PR11MB5873479F73CFBAA170717624F0AC9@SA1PR11MB5873.namprd11.prod.outlook.com>
- <Y/64ejbhMiV77uUA@Asurada-Nvidia>
- <b7c1f9d5b4b647f0b0686c3b99f3d006@huawei.com>
- <ZAE2J0I1LiBjWUnm@Asurada-Nvidia>
-In-Reply-To: <ZAE2J0I1LiBjWUnm@Asurada-Nvidia>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.202.227.178]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        with ESMTP id S229957AbjCCP2n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Mar 2023 10:28:43 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E753418B23;
+        Fri,  3 Mar 2023 07:28:41 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 90ABA22CB1;
+        Fri,  3 Mar 2023 15:28:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1677857320; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=L8AyWiAIq00eH63iNHHtdW6GZAdQH8mZn7Eq8c9MeEw=;
+        b=dr+oLHzclmXO04/iJ9ki90C5t7maT5EUjsDO6UqNQmS5qsM/U7HsjCoKEqAvk+b7yRS8Z9
+        UMOWnaO0czslTE9wwRStMuiaT/Sh91vSWzXHUJEk9yN6dpWvKs9efWAMDYY5sUBSAK5qSE
+        +emINk7vBQu5tSZFQK3v29U9GUdLS2E=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1677857320;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=L8AyWiAIq00eH63iNHHtdW6GZAdQH8mZn7Eq8c9MeEw=;
+        b=933j/fR/dfZkxvtKeDKbP5LGrgSyjKVLpT6IWqNfB6CdpD5bcQLSgbzDx1PslqcBl2CETr
+        +HLaOVsTiknBfLAw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 074B0139D3;
+        Fri,  3 Mar 2023 15:28:40 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id hsfpACgSAmQHOwAAMHmgww
+        (envelope-from <vbabka@suse.cz>); Fri, 03 Mar 2023 15:28:40 +0000
+Message-ID: <b48ad925-eff0-8421-730a-6da13bf93ab6@suse.cz>
+Date:   Fri, 3 Mar 2023 16:28:39 +0100
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH RFC v8 12/56] x86/sev: Add RMP entry lookup helpers
+Content-Language: en-US
+To:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
+Cc:     linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        bp@alien8.de, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
+        nikunj.dadhania@amd.com, Brijesh Singh <brijesh.singh@amd.com>
+References: <20230220183847.59159-1-michael.roth@amd.com>
+ <20230220183847.59159-13-michael.roth@amd.com>
+From:   Vlastimil Babka <vbabka@suse.cz>
+In-Reply-To: <20230220183847.59159-13-michael.roth@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-> -----Original Message-----
-> From: Nicolin Chen [mailto:nicolinc@nvidia.com]
-> Sent: 02 March 2023 23:51
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> Cc: Xu, Terrence <terrence.xu@intel.com>; Liu, Yi L <yi.l.liu@intel.com>;
-> Jason Gunthorpe <jgg@nvidia.com>; alex.williamson@redhat.com; Tian,
-> Kevin <kevin.tian@intel.com>; joro@8bytes.org; robin.murphy@arm.com;
-> cohuck@redhat.com; eric.auger@redhat.com; kvm@vger.kernel.org;
-> mjrosato@linux.ibm.com; chao.p.peng@linux.intel.com;
-> yi.y.sun@linux.intel.com; peterx@redhat.com; jasowang@redhat.com;
-> lulu@redhat.com; suravee.suthikulpanit@amd.com;
-> intel-gvt-dev@lists.freedesktop.org; intel-gfx@lists.freedesktop.org;
-> linux-s390@vger.kernel.org; Hao, Xudong <xudong.hao@intel.com>; Zhao,
-> Yan Y <yan.y.zhao@intel.com>
-> Subject: Re: [PATCH v5 00/19] Add vfio_device cdev for iommufd support
+On 2/20/23 19:38, Michael Roth wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
 > 
-> On Thu, Mar 02, 2023 at 09:43:00AM +0000, Shameerali Kolothum Thodi
-> wrote:
+> The snp_lookup_page_in_rmptable() can be used by the host to read the RMP
+> entry for a given page. The RMP entry format is documented in AMD PPR, see
+> https://bugzilla.kernel.org/attachment.cgi?id=296015.
 > 
-> > Hi Nicolin,
-> >
-> > Thanks for the latest ARM64 branch. Do you have a working Qemu branch
-> corresponding to the
-> > above one?
-> >
-> > I tried the
-> https://github.com/nicolinc/qemu/tree/wip/iommufd_rfcv3%2Bnesting%2B
-> smmuv3
-> > but for some reason not able to launch the Guest.
-> >
-> > Please let me know.
-> 
-> I do use that branch. It might not be that robust though as it
-> went through a big rebase.
+> Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
 
-Ok. The issue seems to be quite random in nature and only happens when there
-are multiple vCPUs. Also doesn't look like related to VFIO device assignment
-as I can reproduce Guest hang without it by only having nested-smmuv3 and
-iommufd object.
+> +/*
+> + * Return 1 if the RMP entry is assigned, 0 if it exists but is not assigned,
+> + * and -errno if there is no corresponding RMP entry.
+> + */
 
-./qemu-system-aarch64-iommuf -machine virt,gic-version=3,iommu=nested-smmuv3,iommufd=iommufd0 \
--enable-kvm -cpu host -m 1G -smp cpus=8,maxcpus=8 \
--object iommufd,id=iommufd0 \
--bios QEMU_EFI.fd \
--kernel Image-6.2-iommufd \
--initrd rootfs-iperf.cpio \
--net none \
--nographic \
--append "rdinit=init console=ttyAMA0 root=/dev/vda rw earlycon=pl011,0x9000000" \
--trace events=events \
--D trace_iommufd 
+Hmm IMHO the kernel's idiomatic way is to return 0 on "success" and I'd
+assume the more intuitive expectation of success here if the entry is
+assigned? The various callers seem to differ though so I guess it depends on
+context. Some however don't distinguish their "failure" from an ERR and
+maybe they should, at least for the purposes of the various printks?
 
-When the issue happens, no output on terminal as if Qemu is in a locked state.
-
- Can you try with the followings?
-> 
-> --trace "iommufd*" --trace "smmu*" --trace "vfio_*" --trace "pci_*" --trace
-> "msi_*" --trace "nvme_*"
-
-The only trace events with above are this,
-
-iommufd_backend_connect fd=22 owned=1 users=1 (0)
-smmu_add_mr smmuv3-iommu-memory-region-0-0
-
-I haven't debugged this further. Please let me know if issue is reproducible 
-with multiple vCPUs at your end. For now will focus on VFIO dev specific tests.
-
-Thanks,
-Shameer 
-
-
+> +int snp_lookup_rmpentry(u64 pfn, int *level)
+> +{
+> +	struct rmpentry *e;
+> +
+> +	e = __snp_lookup_rmpentry(pfn, level);
+> +	if (IS_ERR(e))
+> +		return PTR_ERR(e);
+> +
+> +	return !!rmpentry_assigned(e);
+> +}
+> +EXPORT_SYMBOL_GPL(snp_lookup_rmpentry);
 
