@@ -2,57 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BDD06AA126
-	for <lists+kvm@lfdr.de>; Fri,  3 Mar 2023 22:29:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F9086AA12F
+	for <lists+kvm@lfdr.de>; Fri,  3 Mar 2023 22:30:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231707AbjCCV3f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Mar 2023 16:29:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39650 "EHLO
+        id S231747AbjCCVaA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Mar 2023 16:30:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231292AbjCCV3e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Mar 2023 16:29:34 -0500
-Received: from raptorengineering.com (mail.raptorengineering.com [23.155.224.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21AEB113F3
-        for <kvm@vger.kernel.org>; Fri,  3 Mar 2023 13:29:33 -0800 (PST)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.rptsys.com (Postfix) with ESMTP id A167A37E2A81FF
-        for <kvm@vger.kernel.org>; Fri,  3 Mar 2023 15:29:32 -0600 (CST)
-Received: from mail.rptsys.com ([127.0.0.1])
-        by localhost (vali.starlink.edu [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id q_HZQ-I47o_s for <kvm@vger.kernel.org>;
-        Fri,  3 Mar 2023 15:29:31 -0600 (CST)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.rptsys.com (Postfix) with ESMTP id 974DE37E2A81FC
-        for <kvm@vger.kernel.org>; Fri,  3 Mar 2023 15:29:31 -0600 (CST)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.rptsys.com 974DE37E2A81FC
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=raptorengineering.com; s=B8E824E6-0BE2-11E6-931D-288C65937AAD;
-        t=1677878971; bh=Qw849OOgiRQVEmqDZcKDayAuNzk8xRfl/g0iaBfk71A=;
-        h=Date:From:To:Message-ID:MIME-Version;
-        b=ddbyqnPpNfRMm4ziJ4wybxO5blTHah2Lj6oeevG6SJsSRn2eEWXx7bWCCmjeR+LSn
-         zBy8JNW9NbjxCrOkg+8qlse7yQa/D6XdshN9z2o8ryL4S8n0Z3CPHdFQy/DYurHSeG
-         wmPD60bNT4wwZ3zpAtSEZW8nbozOy809lN+TdSHg=
-X-Virus-Scanned: amavisd-new at rptsys.com
-Received: from mail.rptsys.com ([127.0.0.1])
-        by localhost (vali.starlink.edu [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id QD3G-sevuih9 for <kvm@vger.kernel.org>;
-        Fri,  3 Mar 2023 15:29:31 -0600 (CST)
-Received: from vali.starlink.edu (localhost [127.0.0.1])
-        by mail.rptsys.com (Postfix) with ESMTP id 7A8D837E2A81F9
-        for <kvm@vger.kernel.org>; Fri,  3 Mar 2023 15:29:31 -0600 (CST)
-Date:   Fri, 3 Mar 2023 15:29:31 -0600 (CST)
-From:   Timothy Pearson <tpearson@raptorengineering.com>
-To:     kvm <kvm@vger.kernel.org>
-Message-ID: <1800735206.16280460.1677878971462.JavaMail.zimbra@raptorengineeringinc.com>
-Subject: [PATCH 1/5] KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE support platform
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+        with ESMTP id S231738AbjCCV36 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Mar 2023 16:29:58 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1EB315C87;
+        Fri,  3 Mar 2023 13:29:57 -0800 (PST)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 323LC2Kk037241;
+        Fri, 3 Mar 2023 21:29:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=4tKpQjyCVxm+zcaOQlBgWVbXx35RnrGGSZPi8xunkKg=;
+ b=FTD29dE259v+nhX1gsjASQWLdD3tYD8egwA86tMCsG8W1flKrHkpQ+NJvg6JRaym9EGG
+ 90rW8+F9C2tnurAR5D6zFNysI8koHNuEVzPwuZsRGd8D11qRYVTG9D/THd7gEeL4hsma
+ 4z8XhM1YBsA25VJHREidIKfbbJ8/Ftiwc7Ts9SBbDpXThA7RUEiVOT/is5wRWth+876W
+ PBKu/wEcKz141hF0eee738VaydyJ73EnB7z2j0JKy7qLOHkIdPRsnARV8FqskG7MVP85
+ 2ux/qwlDgHTp0zNRxHskOR3QoNwSv3fkps4Tg8Q8cvtnq8iaLfexbvw8sJISEzpuRCj2 gA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p3rke0da9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 03 Mar 2023 21:29:43 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 323LIibY017284;
+        Fri, 3 Mar 2023 21:29:43 GMT
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p3rke0d9q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 03 Mar 2023 21:29:42 +0000
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 323JFCPE005621;
+        Fri, 3 Mar 2023 21:29:41 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([9.208.129.117])
+        by ppma04dal.us.ibm.com (PPS) with ESMTPS id 3nybexxeyt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 03 Mar 2023 21:29:41 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+        by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 323LTd3t55050582
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 3 Mar 2023 21:29:40 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DB1245805E;
+        Fri,  3 Mar 2023 21:29:39 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 160355805B;
+        Fri,  3 Mar 2023 21:29:37 +0000 (GMT)
+Received: from [9.65.215.88] (unknown [9.65.215.88])
+        by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Fri,  3 Mar 2023 21:29:36 +0000 (GMT)
+Message-ID: <9f06b141-223d-710b-b8b2-6f57b2afb02e@linux.ibm.com>
+Date:   Fri, 3 Mar 2023 16:29:36 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH v5 00/19] Add vfio_device cdev for iommufd support
+Content-Language: en-US
+To:     Nicolin Chen <nicolinc@nvidia.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>
+Cc:     "Liu, Yi L" <yi.l.liu@intel.com>, Jason Gunthorpe <jgg@nvidia.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>
+References: <20230227111135.61728-1-yi.l.liu@intel.com>
+ <Y/0Cr/tcNCzzIAhi@nvidia.com>
+ <DS0PR11MB7529A422D4361B39CCA3D248C3AC9@DS0PR11MB7529.namprd11.prod.outlook.com>
+ <SA1PR11MB5873479F73CFBAA170717624F0AC9@SA1PR11MB5873.namprd11.prod.outlook.com>
+ <Y/64ejbhMiV77uUA@Asurada-Nvidia>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+In-Reply-To: <Y/64ejbhMiV77uUA@Asurada-Nvidia>
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: ily9JCOrlmUQ7iG8vpjaLOjC_EaASRyy
+X-Proofpoint-ORIG-GUID: e69JxHb8q15QE4ojBx5smmhbMjMu2hDX
 Content-Transfer-Encoding: 7bit
-X-Mailer: Zimbra 8.5.0_GA_3042 (ZimbraWebClient - GC110 (Linux)/8.5.0_GA_3042)
-Thread-Index: K3gIJcJJ3dRxuW7SWc++5cXicUFt/Q==
-Thread-Topic: Make KVM_CAP_IRQFD_RESAMPLE support platform
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-03_05,2023-03-03_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
+ mlxlogscore=999 spamscore=0 malwarescore=0 adultscore=0 mlxscore=0
+ bulkscore=0 lowpriorityscore=0 clxscore=1011 suspectscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2303030178
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -60,131 +118,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From 15838ef9ac1c4d8c471a367bd9b7a3b283ad0ce6 Mon Sep 17 00:00:00 2001
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Mon, 2 May 2022 15:34:49 +1000
-Subject: [PATCH 1/5] KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE support platform
- dependent
+On 2/28/23 9:29 PM, Nicolin Chen wrote:
+> On Tue, Feb 28, 2023 at 04:58:06PM +0000, Xu, Terrence wrote:
+> 
+>> Verified this series by "Intel GVT-g GPU device mediated passthrough" and "Intel GVT-d GPU device direct passthrough" technologies.
+>> Both passed VFIO legacy mode / compat mode / cdev mode, including negative tests.
+>>
+>> Tested-by: Terrence Xu <terrence.xu@intel.com>
+> 
+> Sanity-tested this series on ARM64 with my wip branch:
+> https://github.com/nicolinc/iommufd/commits/wip/iommufd-v6.2-nesting
+> (Covering new iommufd and vfio-compat)
+> 
+> Tested-by: Nicolin Chen <nicolinc@nvidia.com>
 
-When introduced, IRQFD resampling worked on POWER8 with XICS. However
-KVM on POWER9 has never implemented it - the compatibility mode code
-("XICS-on-XIVE") misses the kvm_notify_acked_irq() call and the native
-XIVE mode does not handle INTx in KVM at all.
+Tested a few different flavors of this series on s390 (I grabbed the most recent v6 copy from github):
 
-This moved the capability support advertising to platforms and stops
-advertising it on XIVE, i.e. POWER9 and later.
+legacy (IOMMUFD=n): vfio-pci, vfio-ccw, vfio-ap
+compat (CONFIG_IOMMUFD_VFIO_CONTAINER=y): vfio-pci, vfio-ccw, vfio-ap
+compat+cdev+group (VFIO_DEVICE_CDEV=y && VFIO_GROUP=y): vfio-pci (over cdev using Yi's qemu branch as well as via group), vfio-ccw and vfio-ap via group
+compat+cdev-only (VFIO_DEVICE_CDEV=y && VFIO_GROUP=n): vfio-pci using Yi's qemu branch
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-Signed-off-by: Timothy Pearson <tpearson@raptorengineering.com>
----
- arch/arm64/kvm/arm.c       | 3 +++
- arch/mips/kvm/mips.c       | 3 +++
- arch/powerpc/kvm/powerpc.c | 6 ++++++
- arch/riscv/kvm/vm.c        | 3 +++
- arch/s390/kvm/kvm-s390.c   | 3 +++
- arch/x86/kvm/x86.c         | 3 +++
- virt/kvm/kvm_main.c        | 1 -
- 7 files changed, 21 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 9c5573bc4614..a1135096f4ef 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -230,6 +230,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_VCPU_ATTRIBUTES:
- 	case KVM_CAP_PTP_KVM:
- 	case KVM_CAP_ARM_SYSTEM_SUSPEND:
-+#ifdef CONFIG_HAVE_KVM_IRQFD
-+	case KVM_CAP_IRQFD_RESAMPLE:
-+#endif
- 		r = 1;
- 		break;
- 	case KVM_CAP_SET_GUEST_DEBUG2:
-diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-index a25e0b73ee70..0f3de470a73e 100644
---- a/arch/mips/kvm/mips.c
-+++ b/arch/mips/kvm/mips.c
-@@ -1071,6 +1071,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_READONLY_MEM:
- 	case KVM_CAP_SYNC_MMU:
- 	case KVM_CAP_IMMEDIATE_EXIT:
-+#ifdef CONFIG_HAVE_KVM_IRQFD
-+	case KVM_CAP_IRQFD_RESAMPLE:
-+#endif
- 		r = 1;
- 		break;
- 	case KVM_CAP_NR_VCPUS:
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index 04494a4fb37a..fc836236201d 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -591,6 +591,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		break;
- #endif
- 
-+#ifdef CONFIG_HAVE_KVM_IRQFD
-+	case KVM_CAP_IRQFD_RESAMPLE:
-+		r = !xive_enabled();
-+		break;
-+#endif
-+
- 	case KVM_CAP_PPC_ALLOC_HTAB:
- 		r = hv_enabled;
- 		break;
-diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
-index 65a964d7e70d..0ef7a6168018 100644
---- a/arch/riscv/kvm/vm.c
-+++ b/arch/riscv/kvm/vm.c
-@@ -65,6 +65,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_READONLY_MEM:
- 	case KVM_CAP_MP_STATE:
- 	case KVM_CAP_IMMEDIATE_EXIT:
-+#ifdef CONFIG_HAVE_KVM_IRQFD
-+	case KVM_CAP_IRQFD_RESAMPLE:
-+#endif
- 		r = 1;
- 		break;
- 	case KVM_CAP_NR_VCPUS:
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index e4890e04b210..16b8d0b05650 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -585,6 +585,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_SET_GUEST_DEBUG:
- 	case KVM_CAP_S390_DIAG318:
- 	case KVM_CAP_S390_MEM_OP_EXTENSION:
-+#ifdef CONFIG_HAVE_KVM_IRQFD
-+	case KVM_CAP_IRQFD_RESAMPLE:
-+#endif
- 		r = 1;
- 		break;
- 	case KVM_CAP_SET_GUEST_DEBUG2:
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index da4bbd043a7b..9334907b3d96 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4422,6 +4422,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_VAPIC:
- 	case KVM_CAP_ENABLE_CAP:
- 	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
-+#ifdef CONFIG_HAVE_KVM_IRQFD
-+	case KVM_CAP_IRQFD_RESAMPLE:
-+#endif
- 		r = 1;
- 		break;
- 	case KVM_CAP_EXIT_HYPERCALL:
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 9c60384b5ae0..85c1f3d3bd99 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4487,7 +4487,6 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
- #endif
- #ifdef CONFIG_HAVE_KVM_IRQFD
- 	case KVM_CAP_IRQFD:
--	case KVM_CAP_IRQFD_RESAMPLE:
- #endif
- 	case KVM_CAP_IOEVENTFD_ANY_LENGTH:
- 	case KVM_CAP_CHECK_EXTENSION_VM:
--- 
-2.30.2
-
+Tested-by: Matthew Rosato <mjrosato@linux.ibm.com>
