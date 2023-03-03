@@ -2,104 +2,308 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C9F56A98FC
-	for <lists+kvm@lfdr.de>; Fri,  3 Mar 2023 15:00:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C4F66A9906
+	for <lists+kvm@lfdr.de>; Fri,  3 Mar 2023 15:05:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231214AbjCCOAu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Mar 2023 09:00:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43818 "EHLO
+        id S230369AbjCCOFD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Mar 2023 09:05:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229957AbjCCOAs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Mar 2023 09:00:48 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81EBE6151E;
-        Fri,  3 Mar 2023 06:00:46 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id D62402052E;
-        Fri,  3 Mar 2023 14:00:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1677852044; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=wxV+vqRqP5FA17gWzru5WaqMedSYhLnPR0idRcduX0g=;
-        b=mGmx8NKmZojc13Vh+SoX62xVgQwefRgdcp9BblO5KfAFLL6taXUCrIP1i+Q6fSjo56vaQV
-        ioQvf+LNpmkhBAl3kw7hNZQTIX0WYJ9jqNKoQZGx3K2O/T5t2qIgR7sQN5OrFb11xozY+I
-        ugzz2FCwcnOVP6Ydqi1Uy0UDOSh8Vjw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1677852044;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=wxV+vqRqP5FA17gWzru5WaqMedSYhLnPR0idRcduX0g=;
-        b=TLAgG9NwjxbPa5h72UbYo83Q/SnmtX0VCXL9B8AUov5zk8kSBDzwc5rtAF7zbGyc6AT+qY
-        KpQFcjqya9sSrOBQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 519EA1329E;
-        Fri,  3 Mar 2023 14:00:44 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id Yw8/E4z9AWSfCgAAMHmgww
-        (envelope-from <vbabka@suse.cz>); Fri, 03 Mar 2023 14:00:44 +0000
-Message-ID: <86906f29-9853-6e18-6e03-7b689088ed5d@suse.cz>
-Date:   Fri, 3 Mar 2023 15:00:43 +0100
+        with ESMTP id S229754AbjCCOFC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Mar 2023 09:05:02 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EEDE15FEB8;
+        Fri,  3 Mar 2023 06:05:00 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9033C143D;
+        Fri,  3 Mar 2023 06:05:43 -0800 (PST)
+Received: from [10.1.39.22] (e122027.cambridge.arm.com [10.1.39.22])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CC74E3F93E;
+        Fri,  3 Mar 2023 06:04:57 -0800 (PST)
+Message-ID: <10be86c3-96ac-399f-850d-2ceaace22e24@arm.com>
+Date:   Fri, 3 Mar 2023 14:04:56 +0000
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH RFC v8 08/56] KVM: SEV: Rename sev_{pin,unpin}_memory
-Content-Language: en-US
-To:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
-Cc:     linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        bp@alien8.de, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        nikunj.dadhania@amd.com, Nikunj A Dadhania <nikunj@amd.com>
-References: <20230220183847.59159-1-michael.roth@amd.com>
- <20230220183847.59159-9-michael.roth@amd.com>
-From:   Vlastimil Babka <vbabka@suse.cz>
-In-Reply-To: <20230220183847.59159-9-michael.roth@amd.com>
+ Thunderbird/102.7.1
+Subject: Re: [RFC PATCH 09/28] arm64: RME: RTT handling
+To:     Zhi Wang <zhi.wang.linux@gmail.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Joey Gouly <joey.gouly@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev
+References: <20230127112248.136810-1-suzuki.poulose@arm.com>
+ <20230127112932.38045-1-steven.price@arm.com>
+ <20230127112932.38045-10-steven.price@arm.com>
+ <20230213194421.00005f7b@gmail.com>
+Content-Language: en-GB
+From:   Steven Price <steven.price@arm.com>
+In-Reply-To: <20230213194421.00005f7b@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_SOFTFAIL autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/20/23 19:37, Michael Roth wrote:
-> From: Nikunj A Dadhania <nikunj@amd.com>
+On 13/02/2023 17:44, Zhi Wang wrote:
+> On Fri, 27 Jan 2023 11:29:13 +0000
+> Steven Price <steven.price@arm.com> wrote:
 > 
-> Rename sev_{pin|unpin}_memory to sev_memory_{get|put}_pages. Apart
-> from pinning the pages, sev_pin_memory also populates the pages array
-> which is used by its callers. SEV guest using restricted memfd do not
-> to pin the memory but will require the pages array to be populated.
+>> The RMM owns the stage 2 page tables for a realm, and KVM must request
+>> that the RMM creates/destroys entries as necessary. The physical pages
+>> to store the page tables are delegated to the realm as required, and can
+>> be undelegated when no longer used.
+>>
+> 
+> This is only an introduction to RTT handling. While this patch is mostly like
+> RTT teardown, better add more introduction to this patch. Also maybe refine
+> the tittle to reflect what this patch is actually doing.
 
-  ^need to?
+You've a definite point that this patch is mostly about RTT teardown.
+Technically it also adds the RTT creation path (realm_rtt_create) -
+hence the generic patch title.
 
-> Rename the function appropriately.
+But I'll definitely expand the commit message to mention the complexity
+of tear down which is the bulk of the patch.
+
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>>  arch/arm64/include/asm/kvm_rme.h |  19 +++++
+>>  arch/arm64/kvm/mmu.c             |   7 +-
+>>  arch/arm64/kvm/rme.c             | 139 +++++++++++++++++++++++++++++++
+>>  3 files changed, 162 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
+>> index a6318af3ed11..eea5118dfa8a 100644
+>> --- a/arch/arm64/include/asm/kvm_rme.h
+>> +++ b/arch/arm64/include/asm/kvm_rme.h
+>> @@ -35,5 +35,24 @@ u32 kvm_realm_ipa_limit(void);
+>>  int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
+>>  int kvm_init_realm_vm(struct kvm *kvm);
+>>  void kvm_destroy_realm(struct kvm *kvm);
+>> +void kvm_realm_destroy_rtts(struct realm *realm, u32 ia_bits, u32 start_level);
+>> +
+>> +#define RME_RTT_BLOCK_LEVEL	2
+>> +#define RME_RTT_MAX_LEVEL	3
+>> +
+>> +#define RME_PAGE_SHIFT		12
+>> +#define RME_PAGE_SIZE		BIT(RME_PAGE_SHIFT)
+>> +/* See ARM64_HW_PGTABLE_LEVEL_SHIFT() */
+>> +#define RME_RTT_LEVEL_SHIFT(l)	\
+>> +	((RME_PAGE_SHIFT - 3) * (4 - (l)) + 3)
+>> +#define RME_L2_BLOCK_SIZE	BIT(RME_RTT_LEVEL_SHIFT(2))
+>> +
+>> +static inline unsigned long rme_rtt_level_mapsize(int level)
+>> +{
+>> +	if (WARN_ON(level > RME_RTT_MAX_LEVEL))
+>> +		return RME_PAGE_SIZE;
+>> +
+>> +	return (1UL << RME_RTT_LEVEL_SHIFT(level));
+>> +}
+>>  
+>>  #endif
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index 22c00274884a..f29558c5dcbc 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -834,16 +834,17 @@ void stage2_unmap_vm(struct kvm *kvm)
+>>  void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+>>  {
+>>  	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
+>> -	struct kvm_pgtable *pgt = NULL;
+>> +	struct kvm_pgtable *pgt;
+>>  
+>>  	write_lock(&kvm->mmu_lock);
+>> +	pgt = mmu->pgt;
+>>  	if (kvm_is_realm(kvm) &&
+>>  	    kvm_realm_state(kvm) != REALM_STATE_DYING) {
+>> -		/* TODO: teardown rtts */
+>>  		write_unlock(&kvm->mmu_lock);
+>> +		kvm_realm_destroy_rtts(&kvm->arch.realm, pgt->ia_bits,
+>> +				       pgt->start_level);
+>>  		return;
+>>  	}
+>> -	pgt = mmu->pgt;
+>>  	if (pgt) {
+>>  		mmu->pgd_phys = 0;
+>>  		mmu->pgt = NULL;
+>> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
+>> index 0c9d70e4d9e6..f7b0e5a779f8 100644
+>> --- a/arch/arm64/kvm/rme.c
+>> +++ b/arch/arm64/kvm/rme.c
+>> @@ -73,6 +73,28 @@ static int rmi_check_version(void)
+>>  	return 0;
+>>  }
+>>  
+>> +static void realm_destroy_undelegate_range(struct realm *realm,
+>> +					   unsigned long ipa,
+>> +					   unsigned long addr,
+>> +					   ssize_t size)
+>> +{
+>> +	unsigned long rd = virt_to_phys(realm->rd);
+>> +	int ret;
+>> +
+>> +	while (size > 0) {
+>> +		ret = rmi_data_destroy(rd, ipa);
+>> +		WARN_ON(ret);
+>> +		ret = rmi_granule_undelegate(addr);
+>> +
+> As the return value is not documented, what will happen if a page undelegate
+> failed? Leaked? Some explanation is required here.
+
+Yes - it's leaked. I'll add a comment to explain the get_page() call.
+
+Thanks,
+
+Steve
+
+>> +		if (ret)
+>> +			get_page(phys_to_page(addr));
+>> +
+>> +		addr += PAGE_SIZE;
+>> +		ipa += PAGE_SIZE;
+>> +		size -= PAGE_SIZE;
+>> +	}
+>> +}
+>> +
+>>  static unsigned long create_realm_feat_reg0(struct kvm *kvm)
+>>  {
+>>  	unsigned long ia_bits = VTCR_EL2_IPA(kvm->arch.vtcr);
+>> @@ -170,6 +192,123 @@ static int realm_create_rd(struct kvm *kvm)
+>>  	return r;
+>>  }
+>>  
+>> +static int realm_rtt_destroy(struct realm *realm, unsigned long addr,
+>> +			     int level, phys_addr_t rtt_granule)
+>> +{
+>> +	addr = ALIGN_DOWN(addr, rme_rtt_level_mapsize(level - 1));
+>> +	return rmi_rtt_destroy(rtt_granule, virt_to_phys(realm->rd), addr,
+>> +			level);
+>> +}
+>> +
+>> +static int realm_destroy_free_rtt(struct realm *realm, unsigned long addr,
+>> +				  int level, phys_addr_t rtt_granule)
+>> +{
+>> +	if (realm_rtt_destroy(realm, addr, level, rtt_granule))
+>> +		return -ENXIO;
+>> +	if (!WARN_ON(rmi_granule_undelegate(rtt_granule)))
+>> +		put_page(phys_to_page(rtt_granule));
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int realm_rtt_create(struct realm *realm,
+>> +			    unsigned long addr,
+>> +			    int level,
+>> +			    phys_addr_t phys)
+>> +{
+>> +	addr = ALIGN_DOWN(addr, rme_rtt_level_mapsize(level - 1));
+>> +	return rmi_rtt_create(phys, virt_to_phys(realm->rd), addr, level);
+>> +}
+>> +
+>> +static int realm_tear_down_rtt_range(struct realm *realm, int level,
+>> +				     unsigned long start, unsigned long end)
+>> +{
+>> +	phys_addr_t rd = virt_to_phys(realm->rd);
+>> +	ssize_t map_size = rme_rtt_level_mapsize(level);
+>> +	unsigned long addr, next_addr;
+>> +	bool failed = false;
+>> +
+>> +	for (addr = start; addr < end; addr = next_addr) {
+>> +		phys_addr_t rtt_addr, tmp_rtt;
+>> +		struct rtt_entry rtt;
+>> +		unsigned long end_addr;
+>> +
+>> +		next_addr = ALIGN(addr + 1, map_size);
+>> +
+>> +		end_addr = min(next_addr, end);
+>> +
+>> +		if (rmi_rtt_read_entry(rd, ALIGN_DOWN(addr, map_size),
+>> +				       level, &rtt)) {
+>> +			failed = true;
+>> +			continue;
+>> +		}
+>> +
+>> +		rtt_addr = rmi_rtt_get_phys(&rtt);
+>> +		WARN_ON(level != rtt.walk_level);
+>> +
+>> +		switch (rtt.state) {
+>> +		case RMI_UNASSIGNED:
+>> +		case RMI_DESTROYED:
+>> +			break;
+>> +		case RMI_TABLE:
+>> +			if (realm_tear_down_rtt_range(realm, level + 1,
+>> +						      addr, end_addr)) {
+>> +				failed = true;
+>> +				break;
+>> +			}
+>> +			if (IS_ALIGNED(addr, map_size) &&
+>> +			    next_addr <= end &&
+>> +			    realm_destroy_free_rtt(realm, addr, level + 1,
+>> +						   rtt_addr))
+>> +				failed = true;
+>> +			break;
+>> +		case RMI_ASSIGNED:
+>> +			WARN_ON(!rtt_addr);
+>> +			/*
+>> +			 * If there is a block mapping, break it now, using the
+>> +			 * spare_page. We are sure to have a valid delegated
+>> +			 * page at spare_page before we enter here, otherwise
+>> +			 * WARN once, which will be followed by further
+>> +			 * warnings.
+>> +			 */
+>> +			tmp_rtt = realm->spare_page;
+>> +			if (level == 2 &&
+>> +			    !WARN_ON_ONCE(tmp_rtt == PHYS_ADDR_MAX) &&
+>> +			    realm_rtt_create(realm, addr,
+>> +					     RME_RTT_MAX_LEVEL, tmp_rtt)) {
+>> +				WARN_ON(1);
+>> +				failed = true;
+>> +				break;
+>> +			}
+>> +			realm_destroy_undelegate_range(realm, addr,
+>> +						       rtt_addr, map_size);
+>> +			/*
+>> +			 * Collapse the last level table and make the spare page
+>> +			 * reusable again.
+>> +			 */
+>> +			if (level == 2 &&
+>> +			    realm_rtt_destroy(realm, addr, RME_RTT_MAX_LEVEL,
+>> +					      tmp_rtt))
+>> +				failed = true;
+>> +			break;
+>> +		case RMI_VALID_NS:
+>> +			WARN_ON(rmi_rtt_unmap_unprotected(rd, addr, level));
+>> +			break;
+>> +		default:
+>> +			WARN_ON(1);
+>> +			failed = true;
+>> +			break;
+>> +		}
+>> +	}
+>> +
+>> +	return failed ? -EINVAL : 0;
+>> +}
+>> +
+>> +void kvm_realm_destroy_rtts(struct realm *realm, u32 ia_bits, u32 start_level)
+>> +{
+>> +	realm_tear_down_rtt_range(realm, start_level, 0, (1UL << ia_bits));
+>> +}
+>> +
+>>  /* Protects access to rme_vmid_bitmap */
+>>  static DEFINE_SPINLOCK(rme_vmid_lock);
+>>  static unsigned long *rme_vmid_bitmap;
 > 
-> No functional change intended.
-> 
-> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
 
