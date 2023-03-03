@@ -2,103 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7216A6A8FB3
-	for <lists+kvm@lfdr.de>; Fri,  3 Mar 2023 04:13:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 400706A8FBE
+	for <lists+kvm@lfdr.de>; Fri,  3 Mar 2023 04:16:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229833AbjCCDNQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Mar 2023 22:13:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60324 "EHLO
+        id S229534AbjCCDQm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Mar 2023 22:16:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229810AbjCCDNO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Mar 2023 22:13:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D18EC57D13
-        for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 19:12:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677813150;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ncKHv1h1opO4DA5kxu6YhoDiEOVtPQycDQ/UhO4F0qc=;
-        b=Y6cHhro8UaOQGSrZn5nuVkRPcO/n4yR/m4Y3Slh4b+sJ2I9XtuSr+33qmvCP/rOOmfBNba
-        9Tso7fyo56PutpPwkIKahoajsXSKsVlkO3bX0itIV1Tvz+IG5qoPt/7WS28/wgJxYlVKwe
-        f6S3sytNMF6Ij/MjvUOgg5qo1OzyLmE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-116-e2nKKxRJMJmBTJN0Ujc7dQ-1; Thu, 02 Mar 2023 22:12:28 -0500
-X-MC-Unique: e2nKKxRJMJmBTJN0Ujc7dQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 24D3D101A521;
-        Fri,  3 Mar 2023 03:12:28 +0000 (UTC)
-Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1956C492C3E;
-        Fri,  3 Mar 2023 03:12:28 +0000 (UTC)
-From:   Shaoqin Huang <shahuang@redhat.com>
-To:     kvmarm@lists.linux.dev
-Cc:     Shaoqin Huang <shahuang@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Andrew Jones <andrew.jones@linux.dev>,
-        kvm@vger.kernel.org (open list:ARM)
-Subject: [kvm-unit-tests PATCH v3 3/3] arm64: microbench: Use gic_enable_irq() macro in microbench test
-Date:   Thu,  2 Mar 2023 22:11:47 -0500
-Message-Id: <20230303031148.162816-4-shahuang@redhat.com>
-In-Reply-To: <20230303031148.162816-1-shahuang@redhat.com>
-References: <20230303031148.162816-1-shahuang@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229455AbjCCDQl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Mar 2023 22:16:41 -0500
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35FAD14E89
+        for <kvm@vger.kernel.org>; Thu,  2 Mar 2023 19:16:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1677813400; x=1709349400;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=+8gvJUDXxmZ+UtGthuw4GOct7S5wYe8KrsxwKfLVQws=;
+  b=YRdvQnrjJJTxsY+HJTlptO+v2vlNLiczV6IjvNXJDUy14nbxrc7T9bBb
+   2rlNhWwb5A1nHhx4qMCwj6sXhzRGVbzzsBIM/rq96NqlCMDGOlGbydRjk
+   fmDq5+75dU+R0NWRluFssn2kJRl0nwmX8HoSB7lH55eP8brv3KYciQEPE
+   m2iqXIR+luwlvXkRyBjpElKPsrdiFbe1nE5j7GDj90XQez5QLLtQZpExZ
+   RkvcgtdGeq/np8aPcKz8qYOAPPLIyoIJ1NqvAPag8kg2AxelCul6wz5ol
+   7YtpZb3a9JBNI9Qbhflc5/wG1gjj403aeSN4zMQh8rJM3TuIxw/cxC4HS
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10637"; a="362534069"
+X-IronPort-AV: E=Sophos;i="5.98,229,1673942400"; 
+   d="scan'208";a="362534069"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2023 19:16:39 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10637"; a="818316566"
+X-IronPort-AV: E=Sophos;i="5.98,229,1673942400"; 
+   d="scan'208";a="818316566"
+Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
+  by fmsmga001.fm.intel.com with ESMTP; 02 Mar 2023 19:16:38 -0800
+Message-ID: <f1714f362630c29e7aeab24dcf75244d7fc41802.camel@linux.intel.com>
+Subject: Re: [PATCH v5 4/5] KVM: x86: emulation: Apply LAM mask when
+ emulating data access in 64-bit mode
+From:   Robert Hoo <robert.hu@linux.intel.com>
+To:     Binbin Wu <binbin.wu@linux.intel.com>, seanjc@google.com,
+        pbonzini@redhat.com, chao.gao@intel.com
+Cc:     kvm@vger.kernel.org
+Date:   Fri, 03 Mar 2023 11:16:37 +0800
+In-Reply-To: <52e5514d-89f3-f060-71fb-01da3fe81a7a@linux.intel.com>
+References: <20230227084547.404871-1-robert.hu@linux.intel.com>
+         <20230227084547.404871-5-robert.hu@linux.intel.com>
+         <79b1563b-71e3-3a3d-0812-76cca32fc7b3@linux.intel.com>
+         <871716083508732b474ae22b381a58be66889707.camel@linux.intel.com>
+         <52e5514d-89f3-f060-71fb-01da3fe81a7a@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-10.el7) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use gic_enable_irq() to clean up code.
+On Fri, 2023-03-03 at 09:08 +0800, Binbin Wu wrote:
+> On 3/2/2023 9:16 PM, Robert Hoo wrote:
+> > On Thu, 2023-03-02 at 14:41 +0800, Binbin Wu wrote:
+> > > __linearize is not the only path the modified LAM canonical check
+> > > needed, also some vmexits path should be taken care of, like VMX,
+> > > SGX
+> > > ENCLS.
+> > > 
+> > 
+> > SGX isn't in this version's implementation's scope, like nested
+> > LAM.
+> 
+> LAM in SGX enclave mode is not the scope of the this version.
+> But I think since the capability is exposed to guest, 
 
-Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
----
- arm/micro-bench.c | 15 +--------------
- 1 file changed, 1 insertion(+), 14 deletions(-)
+I think you can document this or other method to call out this to user.
+Even Kernel enabling doesn't include SGX interaction yet, I doubt if
+it's that urgent for KVM to do this at this phase.
 
-diff --git a/arm/micro-bench.c b/arm/micro-bench.c
-index 8436612..090fda6 100644
---- a/arm/micro-bench.c
-+++ b/arm/micro-bench.c
-@@ -212,24 +212,11 @@ static void lpi_exec(void)
- 
- static bool timer_prep(void)
- {
--	void *gic_isenabler;
--
- 	gic_enable_defaults();
- 	install_irq_handler(EL1H_IRQ, gic_irq_handler);
- 	local_irq_enable();
- 
--	switch (gic_version()) {
--	case 2:
--		gic_isenabler = gicv2_dist_base() + GICD_ISENABLER;
--		break;
--	case 3:
--		gic_isenabler = gicv3_sgi_base() + GICR_ISENABLER0;
--		break;
--	default:
--		assert_msg(0, "Unreachable");
--	}
--
--	writel(1 << PPI(TIMER_VTIMER_IRQ), gic_isenabler);
-+	gic_enable_irq(PPI(TIMER_VTIMER_IRQ));
- 	write_sysreg(ARCH_TIMER_CTL_IMASK | ARCH_TIMER_CTL_ENABLE, cntv_ctl_el0);
- 	isb();
- 
--- 
-2.39.1
+> need to cover the 
+> case if the guest use the supervisor mode pointer
+
+No business with pointer mode here, I think.
+
+>  as the operand of SGX 
+> EENCS operations.
+> 
+> 
+> > 
+> > > Also the instruction INVLPG, INVPCID should have some special
+> > > handling
+> > > since LAM is not applied to the memory operand of the two
+> > > instruction
+> > > according to the LAM spec.
+> > 
+> > The spec's meaning on these 2 is: LAM masking doesn't apply to
+> > their
+> > operands (the address), so the behavior is like before LAM feature
+> > introduced. No change.
+> 
+> Yes, LAM are not applied to the 2 instrustions, but the __linearize
+> is 
+> changed.
+> For example, the emulation of invlpg (em_invpg) will also call it.
+> So 
+> need to handle the case specificlly.
+> Can add a flag as the input of linearize to indicate the LAM check
+> and 
+> untag is needed or not.
+> 
+No need.
+
+"The INVLPG instruction ...
+LAM does not apply to the specified memory address. Thus, in 64-bit
+mode, ** if the memory address specified is in non-canonical form then
+the INVLPG is the same as a NOP. **
+
+The INVPCID instruction ...
+LAM does not apply to the specified memory address, and in 64-bit
+mode ** if this memory address is in non-canonical form then the
+processor generates a #GP(0) exception. **"
+
+You can double confirm in SDM: Before-and-After LAM introduced, the
+behavior hasn't changed. Thus you don't need to worry about these 2
+INS's emulations.
 
