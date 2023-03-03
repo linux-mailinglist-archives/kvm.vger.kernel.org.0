@@ -2,66 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 445296A9384
-	for <lists+kvm@lfdr.de>; Fri,  3 Mar 2023 10:15:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6643E6A9387
+	for <lists+kvm@lfdr.de>; Fri,  3 Mar 2023 10:15:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229817AbjCCJPe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Mar 2023 04:15:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45780 "EHLO
+        id S229953AbjCCJPo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Mar 2023 04:15:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230026AbjCCJPc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Mar 2023 04:15:32 -0500
+        with ESMTP id S229530AbjCCJPm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Mar 2023 04:15:42 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0B29457E8
-        for <kvm@vger.kernel.org>; Fri,  3 Mar 2023 01:14:33 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 124C3149A7
+        for <kvm@vger.kernel.org>; Fri,  3 Mar 2023 01:14:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677834872;
+        s=mimecast20190719; t=1677834897;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ElE1LjbREKSESr9EiwNTgI8SniA5dGYSmsKj5Ma/fSU=;
-        b=bjy0bnmrzrDYDGDzFO8YGZ3uRXAzt50TVdh9wU/zTCU1+/o5ZQmaj2ceCp0bk/wrLm1hdo
-        WTT6IfU73LLQdDXtK1bs5fzZQXoeKevL7KoPwlrC3K2S6/yIj+yk1L9dtfJ668ZaDAYqO4
-        TzRZdmneRx/rysAC7WGbnuN2uxOVBBY=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=Wnl4G7Xh5CvB+FtHVG1C7RoK/+CAnEZD+17PHCsomsk=;
+        b=TWCt55kR6f5V+yjK8OxAEbGlQp+oXrPJQP5jSqT/j2m54QJ2YG52WgvZKuLJRaQoqjHDnp
+        cRUga4B3ecZF/vFiIBeOr0TwExTMB6HcB6qKHylI1duDLSNkSXXjzf9gott1cT7G3ncXIb
+        GhXGmqqTYCi2pEjWPeHPfEriPlg+MrE=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-573-YvPQuF2uNMin7BPKEUaEBg-1; Fri, 03 Mar 2023 04:14:31 -0500
-X-MC-Unique: YvPQuF2uNMin7BPKEUaEBg-1
-Received: by mail-qk1-f198.google.com with SMTP id d72-20020ae9ef4b000000b0072db6346c39so984910qkg.16
-        for <kvm@vger.kernel.org>; Fri, 03 Mar 2023 01:14:31 -0800 (PST)
+ us-mta-455-Ezj1rjf0Ov-MHdjR879lFw-1; Fri, 03 Mar 2023 04:14:56 -0500
+X-MC-Unique: Ezj1rjf0Ov-MHdjR879lFw-1
+Received: by mail-qv1-f69.google.com with SMTP id m1-20020a05621402a100b004bb706b3a27so1060137qvv.20
+        for <kvm@vger.kernel.org>; Fri, 03 Mar 2023 01:14:56 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677834871;
+        d=1e100.net; s=20210112; t=1677834895;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ElE1LjbREKSESr9EiwNTgI8SniA5dGYSmsKj5Ma/fSU=;
-        b=fDnFswr9fUCEkm/p7GkcZgJEq1w9SqeTkdp/dhIwu9mGEGT3GSpOgI2KUntqXeBf/z
-         K6M3PkAPS1oQOVdm5cYnZkQLEOqXOJHkOKHNs8zrBH6wdsJnGChACSj0GLa9H5h7DMgA
-         ZsliDB0vCe+PzuQdLtBer2lYUVJ2jZUqiaKwZOKg0lrXQQIRUKYLwkfwmWkuEgUtiJOi
-         Bdwdxcjceqj2af9uAYQcxUZ9t9H7Gx/QaOVeOWShaP2hMpt4J8REhVpHoqD6e1p0FDxN
-         +tXqFtgUvKElu1Y2dYuUM3rSqbpVmbkT4ofwZgkIKfloo9ipXIbc98NtzSckRLI2A+ij
-         raDg==
-X-Gm-Message-State: AO0yUKWnVgWIaYzi9Bl7d1QofOmxZKPFlrgnibXnE5I+sGCjazg0B/jY
-        ZMBxz/7daPmcDB5fDKgPqkLBPyZlBNS2CTDtKnnjp1y2ERcRfqW5/yULJzKuzH2yFNA7NBljMnU
-        ejzESxXj4socn
-X-Received: by 2002:a05:622a:1753:b0:3bf:daa8:cacc with SMTP id l19-20020a05622a175300b003bfdaa8caccmr1890688qtk.3.1677834871085;
-        Fri, 03 Mar 2023 01:14:31 -0800 (PST)
-X-Google-Smtp-Source: AK7set+ExrTlvAdM0fij85zmPZ19kivkSvquwQopzeOB1lF6a91tW8NLVLGuWTzAYp6FLn0X26n1aA==
-X-Received: by 2002:a05:622a:1753:b0:3bf:daa8:cacc with SMTP id l19-20020a05622a175300b003bfdaa8caccmr1890666qtk.3.1677834870790;
-        Fri, 03 Mar 2023 01:14:30 -0800 (PST)
+        bh=Wnl4G7Xh5CvB+FtHVG1C7RoK/+CAnEZD+17PHCsomsk=;
+        b=YfE9qkL4llPw7nRQG8Eoci/tSxikYUfVL4bPgRqMu1IJU1YF+SrW42yMJAmdSvkKo9
+         u9Or5UZHw1uegYNSY5b0/yh3KMWMfFNnZVQuPsTFWlQBw/J2mxpOhpmgZ8tuCCXP3vTy
+         0gRi4Ff92QATPBibnZP6rOEHmoiwfZaIyfsa4gesMYl9EQyiQ4+V+plbCeZSyxpJqy7c
+         Gm/EyozogVnIGR85ldze2PN1KWXVaW6i5je0ZvDQfLPEF1V6Yl67ZJUslv/N94Rg1vql
+         7Le2oSLeDCA6Np1GtOHmOQyqdB7i3w2LMU6LrIDL0CsoPlZyFPKo0eOiGqW1RutdltkE
+         qluw==
+X-Gm-Message-State: AO0yUKVa5WUefV2OpTglrTKm+dMl1NIb482Mv73n+F8FmKPcj7YxNrhJ
+        cxIOtobD4knRugjU381t9iyhPPAEK2VYUo2HRNjgpaEyHEW+eb3l1A4fL86rXh48GxsSmqRzqQD
+        sTjRPTqopddN/
+X-Received: by 2002:a0c:f252:0:b0:56e:89b9:9a92 with SMTP id z18-20020a0cf252000000b0056e89b99a92mr1677886qvl.0.1677834895606;
+        Fri, 03 Mar 2023 01:14:55 -0800 (PST)
+X-Google-Smtp-Source: AK7set8Oon3JEryPmpvkzn4BXeyH+owWGVq0cEzAlMUQ2IC/xiSsTl75uAXSBNWx0LttYq51PFDSXQ==
+X-Received: by 2002:a0c:f252:0:b0:56e:89b9:9a92 with SMTP id z18-20020a0cf252000000b0056e89b99a92mr1677844qvl.0.1677834895127;
+        Fri, 03 Mar 2023 01:14:55 -0800 (PST)
 Received: from [10.66.61.39] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id o62-20020a375a41000000b0073fe1056b00sm1338448qkb.55.2023.03.03.01.14.25
+        by smtp.gmail.com with ESMTPSA id d11-20020a05620a158b00b0073b8745fd39sm1323195qkk.110.2023.03.03.01.14.49
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 Mar 2023 01:14:30 -0800 (PST)
-Message-ID: <ed801052-008d-42e4-2c91-517783637c5f@redhat.com>
-Date:   Fri, 3 Mar 2023 17:14:22 +0800
+        Fri, 03 Mar 2023 01:14:54 -0800 (PST)
+Message-ID: <78db9523-880c-2899-2cee-a07dc9b8f282@redhat.com>
+Date:   Fri, 3 Mar 2023 17:14:47 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.8.0
-Subject: Re: [PATCH v5 05/12] KVM: arm64: Refactor
- kvm_arch_commit_memory_region()
+Subject: Re: [PATCH v5 06/12] KVM: arm64: Add kvm_uninit_stage2_mmu()
 Content-Language: en-US
 To:     Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com,
         maz@kernel.org, oupton@google.com, yuzenghui@huawei.com,
@@ -72,9 +71,9 @@ Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
         eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
         rananta@google.com, bgardon@google.com, ricarkol@gmail.com
 References: <20230301210928.565562-1-ricarkol@google.com>
- <20230301210928.565562-6-ricarkol@google.com>
+ <20230301210928.565562-7-ricarkol@google.com>
 From:   Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20230301210928.565562-6-ricarkol@google.com>
+In-Reply-To: <20230301210928.565562-7-ricarkol@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -90,54 +89,56 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 On 3/2/23 05:09, Ricardo Koller wrote:
-> Refactor kvm_arch_commit_memory_region() as a preparation for a future
-> commit to look cleaner and more understandable. Also, it looks more
-> like its x86 counterpart (in kvm_mmu_slot_apply_flags()).
+> Add kvm_uninit_stage2_mmu() and move kvm_free_stage2_pgd() into it. A
+> future commit will add some more things to do inside of
+> kvm_uninit_stage2_mmu().
 > 
 > No functional change intended.
 > 
 > Signed-off-by: Ricardo Koller <ricarkol@google.com>
 Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
 > ---
->   arch/arm64/kvm/mmu.c | 15 +++++++++++----
->   1 file changed, 11 insertions(+), 4 deletions(-)
+>   arch/arm64/include/asm/kvm_mmu.h | 1 +
+>   arch/arm64/kvm/mmu.c             | 7 ++++++-
+>   2 files changed, 7 insertions(+), 1 deletion(-)
 > 
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index e4a7e6369499..058f3ae5bc26 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -167,6 +167,7 @@ void free_hyp_pgds(void);
+>   
+>   void stage2_unmap_vm(struct kvm *kvm);
+>   int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long type);
+> +void kvm_uninit_stage2_mmu(struct kvm *kvm);
+>   void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
+>   int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>   			  phys_addr_t pa, unsigned long size, bool writable);
 > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 9bd3c2cfb476..d2c5e6992459 100644
+> index d2c5e6992459..812633a75e74 100644
 > --- a/arch/arm64/kvm/mmu.c
 > +++ b/arch/arm64/kvm/mmu.c
-> @@ -1761,20 +1761,27 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
->   				   const struct kvm_memory_slot *new,
->   				   enum kvm_mr_change change)
->   {
-> +	bool log_dirty_pages = new && new->flags & KVM_MEM_LOG_DIRTY_PAGES;
-> +
->   	/*
->   	 * At this point memslot has been committed and there is an
->   	 * allocated dirty_bitmap[], dirty pages will be tracked while the
->   	 * memory slot is write protected.
->   	 */
-> -	if (change != KVM_MR_DELETE && new->flags & KVM_MEM_LOG_DIRTY_PAGES) {
-> +	if (log_dirty_pages) {
-> +
-> +		if (change == KVM_MR_DELETE)
-> +			return;
-> +
->   		/*
->   		 * If we're with initial-all-set, we don't need to write
->   		 * protect any pages because they're all reported as dirty.
->   		 * Huge pages and normal pages will be write protect gradually.
->   		 */
-> -		if (!kvm_dirty_log_manual_protect_and_init_set(kvm)) {
-> -			kvm_mmu_wp_memory_region(kvm, new->id);
-> -		}
-> +		if (kvm_dirty_log_manual_protect_and_init_set(kvm))
-> +			return;
-> +
-> +		kvm_mmu_wp_memory_region(kvm, new->id);
->   	}
+> @@ -766,6 +766,11 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+>   	return err;
 >   }
 >   
+> +void kvm_uninit_stage2_mmu(struct kvm *kvm)
+> +{
+> +	kvm_free_stage2_pgd(&kvm->arch.mmu);
+> +}
+> +
+>   static void stage2_unmap_memslot(struct kvm *kvm,
+>   				 struct kvm_memory_slot *memslot)
+>   {
+> @@ -1855,7 +1860,7 @@ void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen)
+>   
+>   void kvm_arch_flush_shadow_all(struct kvm *kvm)
+>   {
+> -	kvm_free_stage2_pgd(&kvm->arch.mmu);
+> +	kvm_uninit_stage2_mmu(kvm);
+>   }
+>   
+>   void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
 
 -- 
 Shaoqin
