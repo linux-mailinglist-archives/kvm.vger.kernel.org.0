@@ -2,147 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 39A7E6A8D5D
-	for <lists+kvm@lfdr.de>; Fri,  3 Mar 2023 00:53:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DD3AF6A8E3B
+	for <lists+kvm@lfdr.de>; Fri,  3 Mar 2023 01:43:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229568AbjCBXxW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Mar 2023 18:53:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39068 "EHLO
+        id S229563AbjCCAns (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Mar 2023 19:43:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229486AbjCBXxU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Mar 2023 18:53:20 -0500
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2081.outbound.protection.outlook.com [40.107.212.81])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF8AFEFB0;
-        Thu,  2 Mar 2023 15:53:17 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JKqe2Q5tmiCXT2UkAEb+PXmg2IViUKQrSxy3uit7FrRnqzNkJjmSLS+OMKz3pQuAXIGefjmfepMEOWrVkjTzNc9IvVMfAJpcN0pazwqf+aXIHTGYfAOIBgM/Qoj9C6C5kcKGmzh1P6bFfCw5UkFmJn/LhHMOBFn3tlKo5//fw6RZhhqKIotxIwxI/qSXOT+WW6u4rMtoBL5fkchb0jkdKRRVRXaj/ddNAzDKUdEb45KreQI6VB3cBqSMSoXj0h73gDNLaLBHOpnqpsKjoRpNsIzBiDAh1uXZczvoVuMemXHHHlvsVIMtdbj0YVMGMd+x9yB5aKWGxDceT63VNeTd2g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=moWfVH4QsSUw7vyFEjfh1cCM8dMMOBnh7IGFqGrTElU=;
- b=PxXIWrblxNBJdQdaNaPOb26kovv0TVa9v8y+prl9fipk28dkKkHhW/l56o9oyEguzid7vFOBX8HuQXeCTmTLKVHHfM3a5A1TVkWqS2Q5XNQRzMPKE+38HiDCa6XevZPAjoJfMALYCsSaJkdW1mcQ4SfFQAJQvF1leavRL+8I8NqPMD+j1gCpnQxKY3oTk3cM4I7zVzkRNnoIq4RhKZFvb9xMicLuTRFMIx4W9+d5GSQ1v6DtpODQGsZlq/hkzN5J9x3IhRhbgw69qBeFYGTCVe/DEAhTSEQAB8Fo4jfb5vcYIIVH0P8E1mGHaHdnc/GFQov6lJKqoj5g/LpN0SAU7Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=moWfVH4QsSUw7vyFEjfh1cCM8dMMOBnh7IGFqGrTElU=;
- b=nuhzwNAe5hnFCxQ1+4XoXVwg4vKz84oseQq0/U4GQKeH23Yjkm1hvECG7V5FnKYcFNcRIQkFknvxRFw1KJur5jm6y7JrRdd5pyYenRBh9NfphtzRNPrzj0QZ6z5mTGFmU5P/GP3Lt3q2Cwy0y2VFusDdbjPAbtGzacrqep/umSnGvpwECHhmPvQELPk/2aeoSeOH80dP6VzlXMm8FDWC8Eknjz8ylAfNqKKi0aPD7EmQgrr7/Fpy6uHXiqSjbqcHczwIAQkapLx8yUh1/S76MZfrD6KEj98WbswAlDiHx13IF4dmbWVPdEGjBf3TojKCwRyExhLpaa0NsPXTHvTkpg==
-Received: from DS7PR03CA0105.namprd03.prod.outlook.com (2603:10b6:5:3b7::20)
- by SJ0PR12MB6783.namprd12.prod.outlook.com (2603:10b6:a03:44e::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6156.20; Thu, 2 Mar
- 2023 23:53:13 +0000
-Received: from DS1PEPF0000E63B.namprd02.prod.outlook.com
- (2603:10b6:5:3b7:cafe::85) by DS7PR03CA0105.outlook.office365.com
- (2603:10b6:5:3b7::20) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6156.19 via Frontend
- Transport; Thu, 2 Mar 2023 23:53:13 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- DS1PEPF0000E63B.mail.protection.outlook.com (10.167.17.73) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6156.12 via Frontend Transport; Thu, 2 Mar 2023 23:53:13 +0000
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Thu, 2 Mar 2023
- 15:53:11 -0800
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail203.nvidia.com
- (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Thu, 2 Mar 2023
- 15:53:10 -0800
-Received: from Asurada-Nvidia (10.127.8.11) by mail.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5 via Frontend
- Transport; Thu, 2 Mar 2023 15:53:09 -0800
-Date:   Thu, 2 Mar 2023 15:53:08 -0800
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-CC:     "jgg@nvidia.com" <jgg@nvidia.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "will@kernel.org" <will@kernel.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "shuah@kernel.org" <shuah@kernel.org>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
+        with ESMTP id S229437AbjCCAnq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Mar 2023 19:43:46 -0500
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AC6912BE6;
+        Thu,  2 Mar 2023 16:43:45 -0800 (PST)
+Received: by mail-pl1-x62e.google.com with SMTP id y11so1115198plg.1;
+        Thu, 02 Mar 2023 16:43:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1677804225;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=3tN2TJD6h5Tdg/xMggzqyAbykrMyjvz4T9+nHOb9PzY=;
+        b=IhKNMoT2evP1Z83EI+3N0wlMMT8Y4oWNBiqIo3CdVAlSbx1F0Tmta/tZDph2CJVDlM
+         I2RFlYJ3Z1x7P7efqfzgWMRFctg44Vw5FR2MPrIlHpMG2rNeZkXOOB3STTazzxBRbE/k
+         aC6vUF0YR+ubItS3K0ovNeeU66O/clT8eAjBpjeeqCQuAFS7NWc1c3Eugv9Aq0N5rMDd
+         AC+iW2yPunVOr70K8BFFQ3flh9kiWu6ItsJgIEFPuFV84A7k1KeFoyP8zHg4KFzO10/C
+         Qn4ASALrmXNGW71XEAS3dN1a/m8lr6tOMd2IVx+2LFmk2qW1Eg/5BZ+kPUeZkGAWt2h0
+         rn0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1677804225;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3tN2TJD6h5Tdg/xMggzqyAbykrMyjvz4T9+nHOb9PzY=;
+        b=vw4rzYpH88g+xnoxnHHc1MKqg28JrUPdqMscXUTI2i6fLMSwCCfDlUFR9KJ5Q9TF04
+         NcXzqyCvuonYhAYetjix1eHFUg084VgfniPham8u4TmYHRZkzdg6w1Gbn+4lZfyYQt3w
+         ntDEW/UFvKmiLmx8a6QLVC6qmdUkvbOcWZpEBOuhK0kpNfogKGptYhQOhEHOzjm1pKEf
+         XwAoMiZgsy7m4AD4aQ/5nyjNulbAEQlIUSwFGHaSSQ6qJtJvMVjHeCecC3cVEKiUM2yw
+         7YwDYZgA5DyDtBys4wWdHn+IJQ50lJBfYuMWyrbMauKJDknGkbuOLVtHVyHHyb1VPXua
+         kw5w==
+X-Gm-Message-State: AO0yUKVuH6Zwf30RwZELgdToaOtWgTTBznGKs/jATU6IOWC7E8tz2xZ3
+        gxfT9kdmvufTBEo3zq3mZdZ6W+gZ01I=
+X-Google-Smtp-Source: AK7set8Y33AwWEq1Mye/AsYcC4+xRBNsnMCr2mw4GlaGQhfZ8xn1rJs7SKabiw+qbNkIVHUCdN4K4A==
+X-Received: by 2002:a17:90b:314d:b0:237:6178:33b1 with SMTP id ip13-20020a17090b314d00b00237617833b1mr13738245pjb.19.1677804224519;
+        Thu, 02 Mar 2023 16:43:44 -0800 (PST)
+Received: from localhost ([192.55.54.55])
+        by smtp.gmail.com with ESMTPSA id lx3-20020a17090b4b0300b00233bc4edb77sm2201582pjb.25.2023.03.02.16.43.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Mar 2023 16:43:43 -0800 (PST)
+Date:   Thu, 2 Mar 2023 16:43:41 -0800
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Shahar, Sagi" <sagis@google.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "Aktas, Erdem" <erdemaktas@google.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "farman@linux.ibm.com" <farman@linux.ibm.com>
-Subject: Re: [PATCH v3 4/5] iommufd: Add replace support in
- iommufd_access_set_ioas()
-Message-ID: <ZAE25M7ZhKmk6CIY@Asurada-Nvidia>
-References: <cover.1677288789.git.nicolinc@nvidia.com>
- <a104b334d3cc148620ac1f2aa465fc14be556e63.1677288789.git.nicolinc@nvidia.com>
- <BN9PR11MB527636AE29756D8A188912998CB29@BN9PR11MB5276.namprd11.prod.outlook.com>
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "dmatlack@google.com" <dmatlack@google.com>
+Subject: Re: [PATCH v11 023/113] KVM: TDX: allocate/free TDX vcpu structure
+Message-ID: <20230303004341.GC2069594@ls.amr.corp.intel.com>
+References: <cover.1673539699.git.isaku.yamahata@intel.com>
+ <db53b2c6c7718df7df89bb36b83257a2588b58e1.1673539699.git.isaku.yamahata@intel.com>
+ <76cd219cadf3f5e06eb10b592de121ed0db056eb.camel@intel.com>
+ <20230228110632.GV4175971@ls.amr.corp.intel.com>
+ <7dd3b2a9406bdfd574ae12f0f4651e3fe6c4b82a.camel@intel.com>
+ <20230228201858.GY4175971@ls.amr.corp.intel.com>
+ <a455c53dc1cdf81790f2996056cdd13cff482d9b.camel@intel.com>
+ <20230301003512.GA3852341@ls.amr.corp.intel.com>
+ <033e4e9c870046027e51f5811aa6c2ac64389987.camel@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <BN9PR11MB527636AE29756D8A188912998CB29@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF0000E63B:EE_|SJ0PR12MB6783:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6be67238-4029-43e8-c026-08db1b794906
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 1gpQlQ9ILSuC2/gknpDS1S1a0/ID5xScbv01SWP6UmrVhyDhFJ+/Z7auzn1Qs28FUbMkxHLj9ft9WqPfyxPvZF2z/LXiQBQh7+LiZnpfqJK46R2piCwxBqvJqgXNFVQrdbh0Ak8ucW8cm3xBOJjVncmHYxXBzvtUfTDag5wTGtXkLc2Xjw7uGDzMRjo8a25P9xvUPak5Puh2tHn9PU3n+WQy6IMwo9ysstbz6LVZOXVjsBkGWJdWaYc6VrqcugFugXG2gdN3iQ66JOQaBhv5ncsjnBPvFgVXpzOifnKx0ot/jIDZuKIfCS2xBrO7/Szv1myyEAOcZKjh+IjNMe85sOcScYAm7DhNQlk1+oQImW61KGKuBZT1I0Y+fXKv7DfnCRbLdGuZtMyD03TZzqZAYNqhUtqDi8eZlIWD3dzfKuTFRXzUWUkzeQoPl+sIsdDgIe5GX3mNAt1OmsJXKazIfN+vnRG9FW3j9upeUnZZrbvjzLxXRiZAHV36vZC+lbgEU3/KQFrCDBor1/0vWmYGFY/w7/H2OqBPhdhfGyDVEKIRcXK9fsVGJyFoaI85K2A++d1HFuJ1ePits1pRs96B9bswVxgnjHOmSf4STaDqYbg4Z3UlJek7xlA7aC8sAa7JCoxH9GR/bFAcVN9yokAouScXafIo41LMRl+z+w65bu6uq23GfZd2YeuY9TndAFMS/wPWx45SCnecvuOICq6z9w==
-X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230025)(4636009)(136003)(39860400002)(376002)(346002)(396003)(451199018)(36840700001)(40470700004)(46966006)(83380400001)(36860700001)(426003)(47076005)(40460700003)(478600001)(7636003)(82740400003)(7416002)(5660300002)(356005)(40480700001)(86362001)(82310400005)(55016003)(8936002)(336012)(9686003)(186003)(26005)(33716001)(8676002)(70586007)(2906002)(4326008)(4744005)(6916009)(70206006)(316002)(41300700001)(54906003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Mar 2023 23:53:13.1822
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6be67238-4029-43e8-c026-08db1b794906
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF0000E63B.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6783
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <033e4e9c870046027e51f5811aa6c2ac64389987.camel@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 02, 2023 at 08:23:54AM +0000, Tian, Kevin wrote:
-> External email: Use caution opening links or attachments
-> 
-> 
-> > From: Nicolin Chen <nicolinc@nvidia.com>
-> > Sent: Saturday, February 25, 2023 9:52 AM
-> >
-> > +     /*
-> > +      * Set ioas to NULL to block any further iommufd_access_pin_pages().
-> > +      * iommufd_access_unpin_pages() can continue using access-
-> > >ioas_unpin.
-> > +      */
-> > +     access->ioas = NULL;
-> > +
-> > +     mutex_unlock(&access->ioas_lock);
-> > +     access->ops->unmap(access->data, 0, ULONG_MAX);
-> > +     mutex_lock(&access->ioas_lock);
-> 
-> This should check whether @unmap is valid.
+On Wed, Mar 01, 2023 at 12:49:06AM +0000,
+"Huang, Kai" <kai.huang@intel.com> wrote:
 
-Will change to 
-+	if (access->ops->unmap) {
-+		mutex_unlock(&access->ioas_lock);
-+		access->ops->unmap(access->data, 0, ULONG_MAX);
-+		mutex_lock(&access->ioas_lock);
-+	}
+> On Tue, 2023-02-28 at 16:35 -0800, Isaku Yamahata wrote:
+> > On Tue, Feb 28, 2023 at 09:49:10PM +0000,
+> > "Huang, Kai" <kai.huang@intel.com> wrote:
+> > 
+> > > On Tue, 2023-02-28 at 12:18 -0800, Isaku Yamahata wrote:
+> > > > On Tue, Feb 28, 2023 at 11:52:59AM +0000,
+> > > > "Huang, Kai" <kai.huang@intel.com> wrote:
+> > > > 
+> > > > > On Tue, 2023-02-28 at 03:06 -0800, Isaku Yamahata wrote:
+> > > > > > > > +	if (!e)
+> > > > > > > > +		return -ENOMEM;
+> > > > > > > > +	*e  = (struct kvm_cpuid_entry2) {
+> > > > > > > > +		.function = 1,	/* Features for X2APIC */
+> > > > > > > > +		.index = 0,
+> > > > > > > > +		.eax = 0,
+> > > > > > > > +		.ebx = 0,
+> > > > > > > > +		.ecx = 1ULL << 21,	/* X2APIC */
+> > > > > > > > +		.edx = 0,
+> > > > > > > > +	};
+> > > > > > > > +	vcpu->arch.cpuid_entries = e;
+> > > > > > > > +	vcpu->arch.cpuid_nent = 1;
+> > > > > > > 
+> > > > > > > As mentioned above, why doing it here? Won't be this be overwritten later in
+> > > > > > > KVM_SET_CPUID2?
+> > > > > > 
+> > > > > > Yes, user space VMM can overwrite cpuid[0x1] and APIC base MSR.  But it
+> > > > > > doesn't
+> > > > > > matter because it's a bug of user space VMM. user space VMM has to keep the
+> > > > > > consistency of cpuid and MSRs.
+> > > > > > Because TDX module virtualizes cpuid[0x1].x2apic to fixed 1, KVM value doesn't
+> > > > > > matter after vcpu creation.
+> > > > > > Because KVM virtualizes APIC base as read only to guest, cpuid[0x1].x2apic
+> > > > > > doesn't matter after vcpu creation as long as user space VMM keeps KVM APIC
+> > > > > > BASE
+> > > > > > value.
+> > > > > > 
+> > > > > 
+> > > > > Contrary, can we depend on userspace VMM to set x2APIC in CPUID, but not do this
+> > > > > in KVM?  If userspace doesn't do it, we treat it as userspace's bug.
+> > > > > 
+> > > > > Plus, userspace anyway needs to set x2APIC in CPUID regardless whether you have
+> > > > > done above here, correct?
+> > > > > 
+> > > > > I don't see the point of doing above in KVM because you are neither enforcing
+> > > > > anything in KVM, nor you are reducing effort of userspace.
+> > > > 
+> > > > Good idea. I can drop cpuid part from tdx_vcpu_create() and apic base part from
+> > > > tdx_vcpu_reset(). It needs to modify tdx_has_emulated_msr() to allow user space
+> > > > VMM to update APIC BASE MSR.
+> > > 
+> > > My personal preference would be:
+> > > 
+> > > 1) In KVM_SET_CPUID2, we do sanity check of CPUIDs provided by userspace, and
+> > > return error if not met (i.e X2APIC isn't advertised).  We already have cases
+> > > that KVM_SET_CPUID2 can fail, so extending to do TDX-specific check seems
+> > > reasonable to me too.
+> > 
+> > This is moot. The current check does only check maxphys address bit size and
+> > specified xfeatures are supported by host.  It's bare minimum for kvm to work.
+> > It doesn't try to check consistency.
+> > 
+> > 
+> > > 2) For APIC_BASE, you can just initialize the MSR in tdx_vcpu_reset() and ignore
+> > > any update (+pr_warn()?) to MSR_IA32_APIC_BASE.
+> > 
+> > The x86 common code for KVM_CREATE_VCPU, kvm_arch_vcpu_create(), calls vcpu_create,
+> > creates lapic, and calls vcpu_reset(). 
+> > 
+> > Setting ACPI BASE MSR with X2APIC enabled, checks if cpuid x2apic bit is set.
+> > Please notice guest_cpuid_has(vcpu, X86_FEATURE_X2APIC) in kvm_set_apic_base().
+> > To work around it, one way is set cpuid artificially in create method as this
+> > patch does.  Other way would be to introduce another version of
+> > kvm_set_apic_base() that doesn't check cpuid dedicated for this purpose.
+> > The third option is to make it user space responsibility to set initial reset
+> > value of APIC BASE MSR.
+> > 
+> > Which option do you prefer?
+> > 
+> 
+> I just recall you have already set all CPUIDs via tdx_td_init().  I would do
+> below:
+> 
+> 1) keep all CPUIDs in tdx_td_init(), and make vcpu->cpuid point to that.
+> 2) Ignore KVM_SET_CPUID2 for TDX guest (+ pr_warn(), etc).
+> 3) Set TDX-fixed CPU registers/msrs, etc in reset_vcpu().
 
-Thanks!
-Nic
+Finally I come up with the following flow.
+
+- KVM_CREATE_VCPU
+  - tdx_vcpu_create()
+    no cpuid, no msr operation
+- KVM_SET_CPUID2
+  user space has to set cpuid...x2apic=1
+- KVM_TDX_INIT_VCPU
+  tdx_vcpu_ioctl() sets APIC_BASE MSR to x2apic enabled.
+  Here if user space VMM doesn't set cpuid properly, it results in error.
+
+ACPI_BASE MSR is read only for both user space VMM and guest TD.
+cpuid:
+After KVM_TDX_INIT_VCPU, user space VMM can update it by KVM_SET_CPUID2.
+KVM doesn't care.  Guest TD see cpuid.x2apic value virtualized by TDX module
+while KVM internally doesn't use the value because APIC_BASE won't change.
+
+
+Thanks,
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
