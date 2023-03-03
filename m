@@ -2,62 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E9FF06A971B
-	for <lists+kvm@lfdr.de>; Fri,  3 Mar 2023 13:17:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 807B46A9726
+	for <lists+kvm@lfdr.de>; Fri,  3 Mar 2023 13:19:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231150AbjCCMRf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Mar 2023 07:17:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36266 "EHLO
+        id S231203AbjCCMTy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Mar 2023 07:19:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229959AbjCCMRe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Mar 2023 07:17:34 -0500
-Received: from mail-wm1-x34a.google.com (mail-wm1-x34a.google.com [IPv6:2a00:1450:4864:20::34a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3D1D5F538
-        for <kvm@vger.kernel.org>; Fri,  3 Mar 2023 04:17:33 -0800 (PST)
-Received: by mail-wm1-x34a.google.com with SMTP id l20-20020a05600c1d1400b003e10d3e1c23so2763230wms.1
-        for <kvm@vger.kernel.org>; Fri, 03 Mar 2023 04:17:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1677845852;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=D03Dx4Z6sjOCGLIbT2UoYAjEZ9PiPy+/g5LTNKuL45w=;
-        b=Li4J2KcZYUwJ0+D32V0Voa3V2Fc7c1SAukOUyuJMz+1qJgDxWG5Mb/c0Pq2qncUSf9
-         O6WmmN86zj6E0X8RgB0Ro+QOInprnevHI+aS7ISR6MHjtVFCVkrfHVqh5rXbo2N6Kewi
-         oeiTMMuCsieHVI7LrKM190aXE7iCE1jidcyQMyKer4ohKWZb4oaQge72giBABF4f46pF
-         nok0QFh/bMF1GCp8KqqGFTrpOUArwvAtXA+faSAHzQpSMnp7zpFIs3AcpIqwjeNcu7iy
-         jRlByIJm8C4goZhiIv4cGqHMjUpaT1MWei6KpLtemLltf3GRR+g7JbOJoEC6KNOlFJUh
-         okaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677845852;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=D03Dx4Z6sjOCGLIbT2UoYAjEZ9PiPy+/g5LTNKuL45w=;
-        b=WgEtF+kAz8U5vb7WxZtbj5bNpHM+vody+iQMS0FR0djU5/9jSKBbs6tEbG0YHAT7lj
-         12M9QKH8KyOOXHqCTPesp7MTd64bG9cVel2VBDR5roeWI6UaqwRiV+1ekzGM83flFnZr
-         wxvL2vy0rrGQsWFh8Vowu4qt+oGGo67XZoiQIYWh/4e0wZDsC2sv/jCy4bf+0TE0w5sj
-         0EeLHUZL4s9n9J0bEjatx9jCWGtCL92c9VerjXAG/LadkeizIim4IugsBOjsG2pMjRBq
-         x4CyPRJ+d93LBN4E8wEqJzcRb2xWkrJyfAQXoCcwJvygHnzIJckCv4FqIEAjvTm+s/s1
-         +CMA==
-X-Gm-Message-State: AO0yUKVtQ5nwztIaTXWQg8BbMCLAcfujBThjllPTWH8xA77XNB2GwE10
-        Dh+ckA6hRYypsmdmUpqQIvF9woOJm8E8PA==
-X-Google-Smtp-Source: AK7set/c/MIucZ0glMbV3kmk9UjPTLjQCjs1sWZdMYqqGtZH/zqjJTxTivaya6tTDuXll5hXepyDxnHM5jHhDw==
-X-Received: from mostafa.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:333c])
- (user=smostafa job=sendgmr) by 2002:a05:600c:798:b0:3df:d8c9:caa9 with SMTP
- id z24-20020a05600c079800b003dfd8c9caa9mr370367wmo.7.1677845852143; Fri, 03
- Mar 2023 04:17:32 -0800 (PST)
-Date:   Fri,  3 Mar 2023 12:11:52 +0000
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.40.0.rc0.216.gc4246ad0f0-goog
-Message-ID: <20230303121151.3489618-1-smostafa@google.com>
-Subject: [PATCH] vfio/platform: Fix reset_required behaviour
-From:   Mostafa Saleh <smostafa@google.com>
-To:     eric.auger@redhat.com, alex.williamson@redhat.com
-Cc:     cohuck@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, smostafa@google.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        with ESMTP id S229747AbjCCMTx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Mar 2023 07:19:53 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EAA1C360A8;
+        Fri,  3 Mar 2023 04:19:51 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C2FE42F4;
+        Fri,  3 Mar 2023 04:20:34 -0800 (PST)
+Received: from [10.57.90.45] (unknown [10.57.90.45])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A77B93F93E;
+        Fri,  3 Mar 2023 04:19:47 -0800 (PST)
+Message-ID: <2418536c-2658-18d6-f70c-c1af5adaa816@arm.com>
+Date:   Fri, 3 Mar 2023 12:19:46 +0000
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.7.2
+Subject: Re: [RFC] Support for Arm CCA VMs on Linux
+To:     Andrew Jones <andrew.jones@linux.dev>,
+        Jean-Philippe Brucker <jpb@kernel.org>
+Cc:     Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Itaru Kitayama <itaru.kitayama@gmail.com>,
+        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        James Morse <james.morse@arm.com>,
+        Joey Gouly <Joey.Gouly@arm.com>, Marc Zyngier <maz@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Steven Price <steven.price@arm.com>,
+        Thomas Huth <thuth@redhat.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.cs.columbia.edu
+References: <20230127112248.136810-1-suzuki.poulose@arm.com>
+ <Y9PtKJ3Wicc19JF1@myrica>
+ <CANW9uyud8RTkqgiL=64wV712QMxtAyubqeyCJ0vpcADJ42VqJA@mail.gmail.com>
+ <Y/8Y3WLmiw6+Z5AS@myrica>
+ <CANW9uysnvGCwANu+_6dp9+3rvHGOkThT9d0K2qpQV4exdmYWoA@mail.gmail.com>
+ <20230303094618.GC361458@myrica>
+ <1c91b777-982e-e71a-4829-51744e9555c5@arm.com>
+ <20230303113905.GD361458@myrica> <20230303120800.ahtyc6et77ig4s27@orel>
+From:   Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20230303120800.ahtyc6et77ig4s27@orel>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -65,51 +69,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-vfio_platform_device has a flag reset_required that can be set from
-module_param or vfio driver which indicates that reset is not a
-requirement and it bypasses related checks.
+On 03/03/2023 12:08, Andrew Jones wrote:
+> On Fri, Mar 03, 2023 at 11:39:05AM +0000, Jean-Philippe Brucker wrote:
+>> On Fri, Mar 03, 2023 at 09:54:47AM +0000, Suzuki K Poulose wrote:
+>>> On 03/03/2023 09:46, Jean-Philippe Brucker wrote:
+>>>> On Thu, Mar 02, 2023 at 07:12:24AM +0900, Itaru Kitayama wrote:
+>>>>>>> I've tried your series in Real on CCA Host, but the KVM arch init
+>>>>>>> emits an Invalid argument error and terminates.
+>>>>
+>>>> This was the KVM_SET_ONE_REG for the SVE vector size. During my tests I
+>>>> didn't enable SVE in the host but shrinkwrap enables more options.
+>>>
+>>> Does the Qemu check for SVE capability on /dev/kvm ? For kvmtool, we
+>>> changed to using the VM instance and that would prevent using SVE,
+>>> until the RMM supports it.
+>>
+>> Yes, QEMU does check the SVE cap on /dev/kvm. I can propose changing it or
+>> complementing it with a VM check in my next version, it seems to work
+>> (though I need to double-check the VM fd lifetime). Same goes for
+>> KVM_CAP_STEAL_TIME, which I need to disable explicitly at the moment.
+> 
+> I'm probably missing something since I haven't looked at this, but I'm
+> wondering what the "VM instance" check is and why it should be necessary.
 
-This was introduced and implemented in vfio_platform_probe_common in
-"b5add544d67 vfio, platform: make reset driver a requirement by default"
+Userspace can check for a KVM_CAP_ on KVM fd (/dev/kvm) or a VM fd
+(returned via KVM_CREATE_VM).
 
-However, vfio_platform_probe_common was removed in
-"ac1237912fb vfio/amba: Use the new device life cycle helpers"
+> Shouldn't KVM only expose capabilities which it can provide? I.e. the
 
-And new implementation added in vfio_platform_init_common in
-"5f6c7e0831a vfio/platform: Use the new device life cycle helpers"
+Correct, given now that we have different "types" of VMs possible on
+Arm64, (Normal vs Realm vs pVM), the capabilities of each of these
+could be different and thus we should use the KVM_CAP_ on the VM fd (
+referred to VM instance above) and not the generic KVM fd.
 
-which causes an error even if vfio-platform.reset_required=0, as it
-only guards printing and not the return as before.
+> "VM instance" check should be done by KVM and, when it fails, the SVE and
+> steal-time capabilities should return 0.
+> 
 
-This patch fixes this by returning 0 if there is no reset function
-for the device and reset_required=0. This is also consistent with
-checks in vfio_platform_open_device and vfio_platform_close_device.
+Correct.
 
-Signed-off-by: Mostafa Saleh <smostafa@google.com>
----
- drivers/vfio/platform/vfio_platform_common.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+Suzuki
 
-diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
-index 1a0a238ffa35..7325ff463cf0 100644
---- a/drivers/vfio/platform/vfio_platform_common.c
-+++ b/drivers/vfio/platform/vfio_platform_common.c
-@@ -650,10 +650,13 @@ int vfio_platform_init_common(struct vfio_platform_device *vdev)
- 	mutex_init(&vdev->igate);
- 
- 	ret = vfio_platform_get_reset(vdev);
--	if (ret && vdev->reset_required)
-+	if (ret && vdev->reset_required) {
- 		dev_err(dev, "No reset function found for device %s\n",
- 			vdev->name);
--	return ret;
-+		return ret;
-+	}
-+
-+	return 0;
- }
- EXPORT_SYMBOL_GPL(vfio_platform_init_common);
- 
--- 
-2.40.0.rc0.216.gc4246ad0f0-goog
+> Thanks,
+> drew
 
