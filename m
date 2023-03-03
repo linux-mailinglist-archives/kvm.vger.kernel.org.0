@@ -2,462 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 14A446A9910
-	for <lists+kvm@lfdr.de>; Fri,  3 Mar 2023 15:05:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B6326A995A
+	for <lists+kvm@lfdr.de>; Fri,  3 Mar 2023 15:24:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231281AbjCCOFu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Mar 2023 09:05:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49116 "EHLO
+        id S230239AbjCCOYX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Mar 2023 09:24:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231318AbjCCOFh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Mar 2023 09:05:37 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 47550618BE;
-        Fri,  3 Mar 2023 06:05:23 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2CFB4143D;
-        Fri,  3 Mar 2023 06:06:06 -0800 (PST)
-Received: from [10.1.39.22] (e122027.cambridge.arm.com [10.1.39.22])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9B10E3F93E;
-        Fri,  3 Mar 2023 06:05:15 -0800 (PST)
-Message-ID: <4eca4c83-db1f-02fb-8401-39548abfadb7@arm.com>
-Date:   Fri, 3 Mar 2023 14:05:13 +0000
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [RFC PATCH 13/28] arm64: RME: Allow VMM to set RIPAS
-Content-Language: en-GB
-To:     Zhi Wang <zhi.wang.linux@gmail.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Joey Gouly <joey.gouly@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev
-References: <20230127112248.136810-1-suzuki.poulose@arm.com>
- <20230127112932.38045-1-steven.price@arm.com>
- <20230127112932.38045-14-steven.price@arm.com>
- <20230217150724.00006820@gmail.com>
-From:   Steven Price <steven.price@arm.com>
-In-Reply-To: <20230217150724.00006820@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+        with ESMTP id S230101AbjCCOYW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Mar 2023 09:24:22 -0500
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D8F912F18
+        for <kvm@vger.kernel.org>; Fri,  3 Mar 2023 06:24:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1677853461; x=1709389461;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=Yz+jwlRPJfMxoehQU1Cx9fvgqYB69yc8GYOqMQgEZk0=;
+  b=Duxy0WN6Uj2PRNXq9FEVcehEoU6Me4gIzdjs5yksqdPQSu3/qnrvShX7
+   6GM6T+E2tmvhk4a8+w5UnoF2IzlzxdSz9jUlS19nFuDghTwePFqKUwxDh
+   K5FPYLupW+wlK3SjILBJBs4m5+8bzu5ttcRARRoF0QFcG4uoGIJBxe7vk
+   OKonn8y+aVYMukX/ceH65NZqJsZvUBQhCFueH3JKJU4dmvrCASxmODHWf
+   qs6JkfFUN93n1YwkLU+HVXP+KE1zzpYWS8STIg+/cOpnlt6Wb4WzyonDi
+   qQCpSvDlU/JfQF+Ws1rX91kt0Ee9RjZRwjGD4uTGiXIIOzJa5SjxQASbL
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10637"; a="315450009"
+X-IronPort-AV: E=Sophos;i="5.98,230,1673942400"; 
+   d="scan'208";a="315450009"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2023 06:23:58 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10637"; a="668666972"
+X-IronPort-AV: E=Sophos;i="5.98,230,1673942400"; 
+   d="scan'208";a="668666972"
+Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
+  by orsmga007.jf.intel.com with ESMTP; 03 Mar 2023 06:23:51 -0800
+Message-ID: <580137f7c866c7caadb3ff92d50169cd9a12dae2.camel@linux.intel.com>
+Subject: Re: [PATCH v5 3/5] KVM: x86: Virtualize CR3.LAM_{U48,U57}
+From:   Robert Hoo <robert.hu@linux.intel.com>
+To:     Chao Gao <chao.gao@intel.com>
+Cc:     seanjc@google.com, pbonzini@redhat.com, binbin.wu@linux.intel.com,
+        kvm@vger.kernel.org
+Date:   Fri, 03 Mar 2023 22:23:50 +0800
+In-Reply-To: <ZAGR1qG2ehb8iXDL@gao-cwp>
+References: <20230227084547.404871-1-robert.hu@linux.intel.com>
+         <20230227084547.404871-4-robert.hu@linux.intel.com>
+         <ZAGR1qG2ehb8iXDL@gao-cwp>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-10.el7) 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/02/2023 13:07, Zhi Wang wrote:
-> On Fri, 27 Jan 2023 11:29:17 +0000
-> Steven Price <steven.price@arm.com> wrote:
+On Fri, 2023-03-03 at 14:21 +0800, Chao Gao wrote:
+> On Mon, Feb 27, 2023 at 04:45:45PM +0800, Robert Hoo wrote:
+> > LAM feature uses 2 high bits in CR3 (bit 62 for LAM_U48 and bit 61
+> > for
+> > LAM_U57) to enable/config LAM feature for user mode addresses. The
+> > LAM
+> > masking is done before legacy canonical checks.
+> > 
+> > To virtualize LAM CR3 bits usage, this patch:
+> > 1. Don't reserve these 2 bits when LAM is enable on the vCPU.
+> > Previously
+> > when validate CR3, kvm uses kvm_vcpu_is_legal_gpa(), now define
+> > kvm_vcpu_is_valid_cr3() which is actually kvm_vcpu_is_legal_gpa()
+> > + CR3.LAM bits validation. Substitutes
+> > kvm_vcpu_is_legal/illegal_gpa()
+> > with kvm_vcpu_is_valid_cr3() in call sites where is validating CR3
+> > rather
+> > than pure GPA.
+> > 2. mmu::get_guest_pgd(), its implementation is get_cr3() which
+> > returns
+> > whole guest CR3 value. Strip LAM bits in those call sites that need
+> > pure
+> > PGD value, e.g. mmu_alloc_shadow_roots(),
+> > FNAME(walk_addr_generic)().
+> > 3. When form a new guest CR3 (vmx_load_mmu_pgd()), melt in LAM bit
+> > (kvm_get_active_lam()).
+> > 4. When guest sets CR3, identify ONLY-LAM-bits-toggling cases,
+> > where it is
+> > unnecessary to make new pgd, but just make request of load pgd,
+> > then new
+> > CR3.LAM bits configuration will be melt in (above point 3). To be
+> > conservative, this case still do TLB flush.
+> > 5. For nested VM entry, allow the 2 CR3 bits set in corresponding
+> > VMCS host/guest fields.
 > 
->> Each page within the protected region of the realm guest can be marked
->> as either RAM or EMPTY. Allow the VMM to control this before the guest
->> has started and provide the equivalent functions to change this (with
->> the guest's approval) at runtime.
->>
+> isn't this already covered by item #1 above?
+
+Ah, it is to address your comments on last version. To repeat/emphasize
+again, doesn't harm, does it?;) 
 > 
-> The above is just the purpose of this patch. It would be better to have one
-> more paragraph to describe what this patch does (building RTT and set IPA
-> state in the RTT) and explain something might confuse people, for example
-> the spare page.
-
-I'll improve the commit message.
-
-> The spare page is really confusing. When reading __alloc_delegated_page()
-> , it looks like a mechanism to cache a delegated page for the realm. But later
-> in the teardown path, it looks like a workaround. What if the allocation of 
-> the spare page failed in the RTT tear down path? 
-
-Yeah the spare_page is a bit messy. Ultimately the idea is that rather
-than having to delegate a page to the RMM temporarily just for breaking
-up a block mapping which is going to be freed, we keep one spare for the
-purpose. This also reduces the chance of an allocation failure while
-trying to free memory.
-
-One area of confusion, and something that might be worth revisiting, is
-that the spare_page is also used opportunistically in
-realm_create_rtt_levels(). Again this makes sense in the case where a
-temporary page is needed when creating a block mapping, but the code
-doesn't distinguish between this and just creating RTTs for normal mappings.
-
-This leads to the rather unfortunate situation that it's not actually
-possible to rely on there being a spare_page and therefore this is
-pre-populated in kvm_realm_unmap_range(), but with a possibility that
-allocation failure could occur resulting in the function failing (which
-is 'handled' by a WARN_ON).
-
-> I understand this must be a temporary solution. It would be really nice to
-> have a big picture or some basic introduction to the future plan. 
-
-Sadly I don't currently have a "big picture" plan at the moment. I am
-quite tempted to split spare_page into two:
-
- * A 'guaranteed' spare page purely for destroying block mappings. This
-would be allocated when the realm is created and only used for the
-purpose of tearing down mappings.
-
- * A temporary spare page used as a minor optimisation during block
-mapping creation - rather than immediately freeing the page back when
-folding we can hold on to it with the assumption that it's likely to be
-useful for creating further mappings in the same call.
-
-However, to be honest, this is all a bit academic because as it stands
-block mappings can't really be used. But when we switch over to using
-the memfd approach hopefully huge pages can be translated to block mappings.
-
-Steve
-
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->>  arch/arm64/include/asm/kvm_rme.h |   4 +
->>  arch/arm64/kvm/rme.c             | 288 +++++++++++++++++++++++++++++++
->>  2 files changed, 292 insertions(+)
->>
->> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
->> index 4b219ebe1400..3e75cedaad18 100644
->> --- a/arch/arm64/include/asm/kvm_rme.h
->> +++ b/arch/arm64/include/asm/kvm_rme.h
->> @@ -47,6 +47,10 @@ void kvm_realm_destroy_rtts(struct realm *realm, u32 ia_bits, u32 start_level);
->>  int kvm_create_rec(struct kvm_vcpu *vcpu);
->>  void kvm_destroy_rec(struct kvm_vcpu *vcpu);
->>  
->> +int realm_set_ipa_state(struct kvm_vcpu *vcpu,
->> +			unsigned long addr, unsigned long end,
->> +			unsigned long ripas);
->> +
->>  #define RME_RTT_BLOCK_LEVEL	2
->>  #define RME_RTT_MAX_LEVEL	3
->>  
->> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
->> index d79ed889ca4d..b3ea79189839 100644
->> --- a/arch/arm64/kvm/rme.c
->> +++ b/arch/arm64/kvm/rme.c
->> @@ -73,6 +73,58 @@ static int rmi_check_version(void)
->>  	return 0;
->>  }
->>  
->> +static phys_addr_t __alloc_delegated_page(struct realm *realm,
->> +					  struct kvm_mmu_memory_cache *mc, gfp_t flags)
->> +{
->> +	phys_addr_t phys = PHYS_ADDR_MAX;
->> +	void *virt;
->> +
->> +	if (realm->spare_page != PHYS_ADDR_MAX) {
->> +		swap(realm->spare_page, phys);
->> +		goto out;
->> +	}
->> +
->> +	if (mc)
->> +		virt = kvm_mmu_memory_cache_alloc(mc);
->> +	else
->> +		virt = (void *)__get_free_page(flags);
->> +
->> +	if (!virt)
->> +		goto out;
->> +
->> +	phys = virt_to_phys(virt);
->> +
->> +	if (rmi_granule_delegate(phys)) {
->> +		free_page((unsigned long)virt);
->> +
->> +		phys = PHYS_ADDR_MAX;
->> +	}
->> +
->> +out:
->> +	return phys;
->> +}
->> +
->> +static phys_addr_t alloc_delegated_page(struct realm *realm,
->> +					struct kvm_mmu_memory_cache *mc)
->> +{
->> +	return __alloc_delegated_page(realm, mc, GFP_KERNEL);
->> +}
->> +
->> +static void free_delegated_page(struct realm *realm, phys_addr_t phys)
->> +{
->> +	if (realm->spare_page == PHYS_ADDR_MAX) {
->> +		realm->spare_page = phys;
->> +		return;
->> +	}
->> +
->> +	if (WARN_ON(rmi_granule_undelegate(phys))) {
->> +		/* Undelegate failed: leak the page */
->> +		return;
->> +	}
->> +
->> +	free_page((unsigned long)phys_to_virt(phys));
->> +}
->> +
->>  static void realm_destroy_undelegate_range(struct realm *realm,
->>  					   unsigned long ipa,
->>  					   unsigned long addr,
->> @@ -220,6 +272,30 @@ static int realm_rtt_create(struct realm *realm,
->>  	return rmi_rtt_create(phys, virt_to_phys(realm->rd), addr, level);
->>  }
->>  
->> +static int realm_create_rtt_levels(struct realm *realm,
->> +				   unsigned long ipa,
->> +				   int level,
->> +				   int max_level,
->> +				   struct kvm_mmu_memory_cache *mc)
->> +{
->> +	if (WARN_ON(level == max_level))
->> +		return 0;
->> +
->> +	while (level++ < max_level) {
->> +		phys_addr_t rtt = alloc_delegated_page(realm, mc);
->> +
->> +		if (rtt == PHYS_ADDR_MAX)
->> +			return -ENOMEM;
->> +
->> +		if (realm_rtt_create(realm, ipa, level, rtt)) {
->> +			free_delegated_page(realm, rtt);
->> +			return -ENXIO;
->> +		}
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->>  static int realm_tear_down_rtt_range(struct realm *realm, int level,
->>  				     unsigned long start, unsigned long end)
->>  {
->> @@ -309,6 +385,206 @@ void kvm_realm_destroy_rtts(struct realm *realm, u32 ia_bits, u32 start_level)
->>  	realm_tear_down_rtt_range(realm, start_level, 0, (1UL << ia_bits));
->>  }
->>  
->> +void kvm_realm_unmap_range(struct kvm *kvm, unsigned long ipa, u64 size)
->> +{
->> +	u32 ia_bits = kvm->arch.mmu.pgt->ia_bits;
->> +	u32 start_level = kvm->arch.mmu.pgt->start_level;
->> +	unsigned long end = ipa + size;
->> +	struct realm *realm = &kvm->arch.realm;
->> +	phys_addr_t tmp_rtt = PHYS_ADDR_MAX;
->> +
->> +	if (end > (1UL << ia_bits))
->> +		end = 1UL << ia_bits;
->> +	/*
->> +	 * Make sure we have a spare delegated page for tearing down the
->> +	 * block mappings. We must use Atomic allocations as we are called
->> +	 * with kvm->mmu_lock held.
->> +	 */
->> +	if (realm->spare_page == PHYS_ADDR_MAX) {
->> +		tmp_rtt = __alloc_delegated_page(realm, NULL, GFP_ATOMIC);
->> +		/*
->> +		 * We don't have to check the status here, as we may not
->> +		 * have a block level mapping. Delay any error to the point
->> +		 * where we need it.
->> +		 */
->> +		realm->spare_page = tmp_rtt;
->> +	}
->> +
->> +	realm_tear_down_rtt_range(&kvm->arch.realm, start_level, ipa, end);
->> +
->> +	/* Free up the atomic page, if there were any */
->> +	if (tmp_rtt != PHYS_ADDR_MAX) {
->> +		free_delegated_page(realm, tmp_rtt);
->> +		/*
->> +		 * Update the spare_page after we have freed the
->> +		 * above page to make sure it doesn't get cached
->> +		 * in spare_page.
->> +		 * We should re-write this part and always have
->> +		 * a dedicated page for handling block mappings.
->> +		 */
->> +		realm->spare_page = PHYS_ADDR_MAX;
->> +	}
->> +}
->> +
->> +static int set_ipa_state(struct kvm_vcpu *vcpu,
->> +			 unsigned long ipa,
->> +			 unsigned long end,
->> +			 int level,
->> +			 unsigned long ripas)
->> +{
->> +	struct kvm *kvm = vcpu->kvm;
->> +	struct realm *realm = &kvm->arch.realm;
->> +	struct rec *rec = &vcpu->arch.rec;
->> +	phys_addr_t rd_phys = virt_to_phys(realm->rd);
->> +	phys_addr_t rec_phys = virt_to_phys(rec->rec_page);
->> +	unsigned long map_size = rme_rtt_level_mapsize(level);
->> +	int ret;
->> +
->> +	while (ipa < end) {
->> +		ret = rmi_rtt_set_ripas(rd_phys, rec_phys, ipa, level, ripas);
->> +
->> +		if (!ret) {
->> +			if (!ripas)
->> +				kvm_realm_unmap_range(kvm, ipa, map_size);
->> +		} else if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
->> +			int walk_level = RMI_RETURN_INDEX(ret);
->> +
->> +			if (walk_level < level) {
->> +				ret = realm_create_rtt_levels(realm, ipa,
->> +							      walk_level,
->> +							      level, NULL);
->> +				if (ret)
->> +					return ret;
->> +				continue;
->> +			}
->> +
->> +			if (WARN_ON(level >= RME_RTT_MAX_LEVEL))
->> +				return -EINVAL;
->> +
->> +			/* Recurse one level lower */
->> +			ret = set_ipa_state(vcpu, ipa, ipa + map_size,
->> +					    level + 1, ripas);
->> +			if (ret)
->> +				return ret;
->> +		} else {
->> +			WARN(1, "Unexpected error in %s: %#x\n", __func__,
->> +			     ret);
->> +			return -EINVAL;
->> +		}
->> +		ipa += map_size;
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->> +static int realm_init_ipa_state(struct realm *realm,
->> +				unsigned long ipa,
->> +				unsigned long end,
->> +				int level)
->> +{
->> +	unsigned long map_size = rme_rtt_level_mapsize(level);
->> +	phys_addr_t rd_phys = virt_to_phys(realm->rd);
->> +	int ret;
->> +
->> +	while (ipa < end) {
->> +		ret = rmi_rtt_init_ripas(rd_phys, ipa, level);
->> +
->> +		if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
->> +			int cur_level = RMI_RETURN_INDEX(ret);
->> +
->> +			if (cur_level < level) {
->> +				ret = realm_create_rtt_levels(realm, ipa,
->> +							      cur_level,
->> +							      level, NULL);
->> +				if (ret)
->> +					return ret;
->> +				/* Retry with the RTT levels in place */
->> +				continue;
->> +			}
->> +
->> +			/* There's an entry at a lower level, recurse */
->> +			if (WARN_ON(level >= RME_RTT_MAX_LEVEL))
->> +				return -EINVAL;
->> +
->> +			realm_init_ipa_state(realm, ipa, ipa + map_size,
->> +					     level + 1);
->> +		} else if (WARN_ON(ret)) {
->> +			return -ENXIO;
->> +		}
->> +
->> +		ipa += map_size;
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->> +static int find_map_level(struct kvm *kvm, unsigned long start, unsigned long end)
->> +{
->> +	int level = RME_RTT_MAX_LEVEL;
->> +
->> +	while (level > get_start_level(kvm) + 1) {
->> +		unsigned long map_size = rme_rtt_level_mapsize(level - 1);
->> +
->> +		if (!IS_ALIGNED(start, map_size) ||
->> +		    (start + map_size) > end)
->> +			break;
->> +
->> +		level--;
->> +	}
->> +
->> +	return level;
->> +}
->> +
->> +int realm_set_ipa_state(struct kvm_vcpu *vcpu,
->> +			unsigned long addr, unsigned long end,
->> +			unsigned long ripas)
->> +{
->> +	int ret = 0;
->> +
->> +	while (addr < end) {
->> +		int level = find_map_level(vcpu->kvm, addr, end);
->> +		unsigned long map_size = rme_rtt_level_mapsize(level);
->> +
->> +		ret = set_ipa_state(vcpu, addr, addr + map_size, level, ripas);
->> +		if (ret)
->> +			break;
->> +
->> +		addr += map_size;
->> +	}
->> +
->> +	return ret;
->> +}
->> +
->> +static int kvm_init_ipa_range_realm(struct kvm *kvm,
->> +				    struct kvm_cap_arm_rme_init_ipa_args *args)
->> +{
->> +	int ret = 0;
->> +	gpa_t addr, end;
->> +	struct realm *realm = &kvm->arch.realm;
->> +
->> +	addr = args->init_ipa_base;
->> +	end = addr + args->init_ipa_size;
->> +
->> +	if (end < addr)
->> +		return -EINVAL;
->> +
->> +	if (kvm_realm_state(kvm) != REALM_STATE_NEW)
->> +		return -EBUSY;
->> +
->> +	while (addr < end) {
->> +		int level = find_map_level(kvm, addr, end);
->> +		unsigned long map_size = rme_rtt_level_mapsize(level);
->> +
->> +		ret = realm_init_ipa_state(realm, addr, addr + map_size, level);
->> +		if (ret)
->> +			break;
->> +
->> +		addr += map_size;
->> +	}
->> +
->> +	return ret;
->> +}
->> +
->>  /* Protects access to rme_vmid_bitmap */
->>  static DEFINE_SPINLOCK(rme_vmid_lock);
->>  static unsigned long *rme_vmid_bitmap;
->> @@ -460,6 +736,18 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
->>  
->>  		r = kvm_create_realm(kvm);
->>  		break;
->> +	case KVM_CAP_ARM_RME_INIT_IPA_REALM: {
->> +		struct kvm_cap_arm_rme_init_ipa_args args;
->> +		void __user *argp = u64_to_user_ptr(cap->args[1]);
->> +
->> +		if (copy_from_user(&args, argp, sizeof(args))) {
->> +			r = -EFAULT;
->> +			break;
->> +		}
->> +
->> +		r = kvm_init_ipa_range_realm(kvm, &args);
->> +		break;
->> +	}
->>  	default:
->>  		r = -EINVAL;
->>  		break;
+(...)
+> > 
+> > +static inline u64 kvm_get_active_lam(struct kvm_vcpu *vcpu)
+> > +{
+> > +	return kvm_read_cr3(vcpu) & (X86_CR3_LAM_U48 |
+> > X86_CR3_LAM_U57);
+> > +}
 > 
+> I think it is better to define a mask (like reserved_gpa_bits):
+> 
+> kvm_vcpu_arch {
+> 	...
+> 
+> 	/*
+> 	 * Bits in CR3 used to enable certain features. These bits
+> don't
+> 	 * participate in page table walking. They should be masked to
+> 	 * get the base address of page table. When shadow paging is
+> 	 * used, these bits should be kept as is in the shadow CR3.
+> 	 */
+> 	u64 cr3_control_bits;
+> 
+
+I don't strongly object this. But per SDM, CR3.bit[63:MAXPHYADDR] are
+reserved; and MAXPHYADDR is at most 52 [1]. So can we assert and simply
+define the MASK bit[63:52]? (I did this in v3 and prior)
+
+[1] CPUID.80000008H:EAX[7:0] reports the physical-address width
+supported by the processor. (For processors
+that do not support CPUID function 80000008H, the width is generally 36
+if CPUID.01H:EDX.PAE [bit 6] = 1
+and 32 otherwise.) This width is referred to as MAXPHYADDR. MAXPHYADDR
+is at most 52. (SDM 4.1.4 Enumeration of Paging Features by CPUID)
+
+> and initialize the mask in kvm_vcpu_after_set_cpuid():
+> 
+> 	if (guest_cpuid_has(X86_FEATURE_LAM))
+> 		vcpu->arch.cr3_control_bits = X86_CR3_LAM_U48 |
+> X86_CR3_LAM_U57;
+> 
+> then add helpers to extract/mask control bits.
+> 
+> It is cleaner and can avoid looking up guest CPUID at runtime.
+>  And if
+> AMD has a similar feature (e.g., some CR3 bits are used as control
+> bits),
+> it is easy to support that feature.
 
