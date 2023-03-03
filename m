@@ -2,233 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 019656A9DB7
-	for <lists+kvm@lfdr.de>; Fri,  3 Mar 2023 18:30:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B2C696A9DC8
+	for <lists+kvm@lfdr.de>; Fri,  3 Mar 2023 18:36:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231196AbjCCRax (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Mar 2023 12:30:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48214 "EHLO
+        id S231238AbjCCRg1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Mar 2023 12:36:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230246AbjCCRav (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Mar 2023 12:30:51 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 586E358B6D
-        for <kvm@vger.kernel.org>; Fri,  3 Mar 2023 09:30:49 -0800 (PST)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 323GukwA018507;
-        Fri, 3 Mar 2023 17:30:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=47F1DWFtBGizjToc2m7xKpJ1vHYfN5KHZIGAIsGBNpg=;
- b=k+15uplQZrG3U8G5vw/BZJJ2HDPms7LdqCpoZqxPM8erFSTy5YZFD5uuNZihC36iDskt
- iGkkcGp7Ectbq7YVxuYr1IYIQcv6ZufiuxfI9OUxC/loEU/i35/PK5ZCSyi89als9fJx
- HJYm7GLF+Np0hQ9QiXpw4cgmhhZVysMIcoTFqJCw70WyWcwPeJLhbY9poDzY3BhOZKJy
- faMYwYzz621FdkY0l0ZXlxcpO7XtNV1GURwkBa6Gl5e50vxxdKkbj1ZfuaenRfn6dtwJ
- 0OpLJ4VP5R3GzR3P5PFVKUpwxZgs65z1MxE+TIoTHVJdM62rBIMmP67ZyRTK7SSAL3qT 2A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p3mv2s02b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Mar 2023 17:30:32 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 323HFKIB014628;
-        Fri, 3 Mar 2023 17:30:31 GMT
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p3mv2s01f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Mar 2023 17:30:31 +0000
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 323GZaCD030160;
-        Fri, 3 Mar 2023 17:30:30 GMT
-Received: from smtprelay06.wdc07v.mail.ibm.com ([9.208.129.118])
-        by ppma03dal.us.ibm.com (PPS) with ESMTPS id 3nybcn53yy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Mar 2023 17:30:30 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-        by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 323HUSrR58589506
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 3 Mar 2023 17:30:28 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 39B3958059;
-        Fri,  3 Mar 2023 17:30:28 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CDF3B5805D;
-        Fri,  3 Mar 2023 17:30:24 +0000 (GMT)
-Received: from [9.65.215.88] (unknown [9.65.215.88])
-        by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Fri,  3 Mar 2023 17:30:24 +0000 (GMT)
-Message-ID: <6e04ab8f-dc84-e9c2-deea-2b6b31678b53@linux.ibm.com>
-Date:   Fri, 3 Mar 2023 12:30:24 -0500
+        with ESMTP id S231190AbjCCRgY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Mar 2023 12:36:24 -0500
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D91415C84
+        for <kvm@vger.kernel.org>; Fri,  3 Mar 2023 09:36:23 -0800 (PST)
+Received: by mail-pj1-x102c.google.com with SMTP id me6-20020a17090b17c600b0023816b0c7ceso6907143pjb.2
+        for <kvm@vger.kernel.org>; Fri, 03 Mar 2023 09:36:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1677864983;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=UjNXU1tEXsuTG4huv7r5UMJSNLOXXYqAwRyDV6iA0nY=;
+        b=s9e/fu31hth4h2Ezrh++sCZEz7apyCzhh/ecfgZdCSv3b1e+JENsCuofnmp09mrVjb
+         pLww16Zs2kSFitsAi0qb3RHZlU2GofisOBInmnPL/l1FDgQ1Bg12c2oPMvNUtVIiNU3p
+         l8XFzb5HGZCekKW01QSWvD0VW768QdWuqh5g4eLGo1XCrAsuAqT/PLG1XOtxZaZcH7qj
+         M7ZWdyC3sLFRnsMybpfu6AspGCkBwDkNOjxb2wBcVLI9kJAfd7StdtDX4AWnlZdC7jmi
+         iCRQQ6VsJNu8vkh+Lf49Q3V5z5IsUV5JC5ojhGaBywaV8oV2sEF3cLrK6UdINl3nNJWd
+         tSiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1677864983;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UjNXU1tEXsuTG4huv7r5UMJSNLOXXYqAwRyDV6iA0nY=;
+        b=X6mC6hpreE8o80AoBLz67KKw8lC7095Lq1U7mGa9o1S9OWBhBQwGfSUDfF01tDV/yI
+         86noicBETSl+yTVYVNhZbf73RVO2PwS/JxTSQgj7pTmNpAgqqWUh0ECD04fkRR8aHgAV
+         IyBOCLqkgh41LYYtDf8jJII6ib1kWW0Znv5HNTSeMg/HA1Crb8HMXBhwhdggUkGLZ8br
+         vSwwqmna7jBtu150mqcVI7jNAhhzBd0oyCOdkd9ZN2STeXYyiutG/IP6lYcbYp32cQ1v
+         b/Tifi6u7c+OonbO3WyB3XqRdu/d+pKJOey6VVP4h6QHbfK+nEm4KKRsvB/In669FoFg
+         rzpg==
+X-Gm-Message-State: AO0yUKXbwWCugjnA8Ja9jNA4q9gkO3MKHgHcy3Bo2Ejk8av5p3FHdjJ2
+        qw1wumaHRhxRL9Cf9O1Q7kV4VK25LnoULgc5r+Q=
+X-Google-Smtp-Source: AK7set8thLIQH+7wkXPgqf3SnXnzYHJkd3YmLbiqXBcBE1bnZIf/qgdzipF1B7Rgs/q/mlvoGHpmTg==
+X-Received: by 2002:a17:90b:4f8c:b0:237:6178:33b1 with SMTP id qe12-20020a17090b4f8c00b00237617833b1mr2565701pjb.19.1677864982773;
+        Fri, 03 Mar 2023 09:36:22 -0800 (PST)
+Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
+        by smtp.gmail.com with ESMTPSA id fv24-20020a17090b0e9800b002340f58e19bsm1763623pjb.45.2023.03.03.09.36.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Mar 2023 09:36:21 -0800 (PST)
+Date:   Fri, 3 Mar 2023 09:36:17 -0800
+From:   David Matlack <dmatlack@google.com>
+To:     Mingwei Zhang <mizhang@google.com>
+Cc:     "Wang, Wei W" <wei.w.wang@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v1] KVM: allow KVM_BUG/KVM_BUG_ON to handle 64-bit cond
+Message-ID: <ZAIwEZdYcrs5EcHE@google.com>
+References: <20230301133841.18007-1-wei.w.wang@intel.com>
+ <CALzav=eRYpnfg7bVQpVawAMraFdHu3OzqWr55Pg1SJC_Uh8t=Q@mail.gmail.com>
+ <DS0PR11MB637348F1351260F8B7E97A15DCB29@DS0PR11MB6373.namprd11.prod.outlook.com>
+ <ZAAsIBUuIIO1prZT@google.com>
+ <DS0PR11MB6373DAA05CEF9AB8A83A6499DCB29@DS0PR11MB6373.namprd11.prod.outlook.com>
+ <CAL715WLo90-JkJe6=GfX755t1jvaW-kqD_w++hv3Ed53fhLC3w@mail.gmail.com>
+ <DS0PR11MB63735E9AC8F4636AF27DAA4ADCB39@DS0PR11MB6373.namprd11.prod.outlook.com>
+ <CAL715WJsV3tPkMDK0exgHeuKOP9kJtc62Ra0jnRhT1Gd6AiEWg@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [RFC v3 11/18] vfio/ccw: Use vfio_[attach/detach]_device
-Content-Language: en-US
-To:     Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
-        yi.l.liu@intel.com, yi.y.sun@intel.com, alex.williamson@redhat.com,
-        clg@redhat.com, qemu-devel@nongnu.org
-Cc:     david@gibson.dropbear.id.au, thuth@redhat.com,
-        farman@linux.ibm.com, akrowiak@linux.ibm.com, pasic@linux.ibm.com,
-        jjherne@linux.ibm.com, jasowang@redhat.com, kvm@vger.kernel.org,
-        jgg@nvidia.com, nicolinc@nvidia.com, kevin.tian@intel.com,
-        chao.p.peng@intel.com, peterx@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, zhangfei.gao@linaro.org,
-        berrange@redhat.com, apopple@nvidia.com,
-        suravee.suthikulpanit@amd.com
-References: <20230131205305.2726330-1-eric.auger@redhat.com>
- <20230131205305.2726330-12-eric.auger@redhat.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <20230131205305.2726330-12-eric.auger@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 1BF0UqKHEVygJKGqohoxOqHZQaQOp0v8
-X-Proofpoint-ORIG-GUID: sL-Jy66EMMXs9AalEXvnAnlyUEiK4slD
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-03_03,2023-03-03_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
- impostorscore=0 bulkscore=0 mlxlogscore=999 malwarescore=0 spamscore=0
- priorityscore=1501 lowpriorityscore=0 clxscore=1011 phishscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2303030148
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAL715WJsV3tPkMDK0exgHeuKOP9kJtc62Ra0jnRhT1Gd6AiEWg@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/31/23 3:52 PM, Eric Auger wrote:
-> Let the vfio-ccw device use vfio_attach_device() and
-> vfio_detach_device(), hence hiding the details of the used
-> IOMMU backend.
+On Thu, Mar 02, 2023 at 09:53:35PM -0800, Mingwei Zhang wrote:
+> On Thu, Mar 2, 2023 at 5:50 PM Wang, Wei W <wei.w.wang@intel.com> wrote:
+> >
+> > On Friday, March 3, 2023 2:12 AM, Mingwei Zhang wrote:
+> > > > On Thursday, March 2, 2023 12:55 PM, Mingwei Zhang wrote:
+> > > > > I don't get it. Why bothering the type if we just do this?
+> > > > >
+> > > > > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > > > > index 4f26b244f6d0..10455253c6ea 100644
+> > > > > --- a/include/linux/kvm_host.h
+> > > > > +++ b/include/linux/kvm_host.h
+> > > > > @@ -848,7 +848,7 @@ static inline void kvm_vm_bugged(struct kvm
+> > > > > *kvm)
+> > > > >
+> > > > >  #define KVM_BUG(cond, kvm, fmt...)                           \
+> > > > >  ({                                                           \
+> > > > > -     int __ret = (cond);                                     \
+> > > > > +     int __ret = !!(cond);                                   \
+> > > >
+> > > > This is essentially "bool __ret". No biggie to change it this way.
+> > >
+> > > !! will return an int, not a boolean, but it is used as a boolean.
+> >
+> > What's the point of defining it as an int when actually being used as a Boolean?
+> > Original returning of an 'int' is a bug in this sense. Either returning a Boolean or
+> > the same type (length) as cond is good way to me.
 > 
-> Also now all the devices have been migrated to use the new
-> vfio_attach_device/vfio_detach_device API, let's turn the
-> legacy functions into static functions, local to container.c.
+> What's the point of using an integer? I think we need to ask the
+> original author. But I think one of the reasons might be convenience
+> as the return value. I am not sure if we can return a boolean in the
+> function. But it should be fine here since it is a macro.
 > 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> Anyway, returning an 'int' is not a bug. The bug is the casting from
+> 'cond' to the integer that may lose information and this is what you
+> have captured.
 
-Hi Eric,
+typeof() won't work if cond is a bitfield. See commit 8d4fbcfbe0a4 ("Fix
+WARN_ON() on bitfield ops") from Linus from back in 2007:
 
-While testing the cdev series on s390 I ran into a couple of issues with this patch, see below.
+commit 8d4fbcfbe0a4bfc73e7f0297c59ae514e1f1436f
+Author: Linus Torvalds <torvalds@woody.linux-foundation.org>
+Date:   Tue Jul 31 21:12:07 2007 -0700
 
-> ---
->  include/hw/vfio/vfio-common.h |   4 --
->  hw/vfio/ccw.c                 | 118 ++++++++--------------------------
->  hw/vfio/container.c           |   8 +--
->  3 files changed, 32 insertions(+), 98 deletions(-)
-> 
-> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> index 9465c4b021..1580f9617c 100644
-> --- a/include/hw/vfio/vfio-common.h
-> +++ b/include/hw/vfio/vfio-common.h
-> @@ -176,10 +176,6 @@ void vfio_region_unmap(VFIORegion *region);
->  void vfio_region_exit(VFIORegion *region);
->  void vfio_region_finalize(VFIORegion *region);
->  void vfio_reset_handler(void *opaque);
-> -VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp);
-> -void vfio_put_group(VFIOGroup *group);
-> -int vfio_get_device(VFIOGroup *group, const char *name,
-> -                    VFIODevice *vbasedev, Error **errp);
->  int vfio_attach_device(VFIODevice *vbasedev, AddressSpace *as, Error **errp);
->  void vfio_detach_device(VFIODevice *vbasedev);
->  
-> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-> index 0354737666..6fde7849cc 100644
-> --- a/hw/vfio/ccw.c
-> +++ b/hw/vfio/ccw.c
-> @@ -579,27 +579,32 @@ static void vfio_ccw_put_region(VFIOCCWDevice *vcdev)
->      g_free(vcdev->io_region);
->  }
->  
-> -static void vfio_ccw_put_device(VFIOCCWDevice *vcdev)
-> -{
-> -    g_free(vcdev->vdev.name);
-> -    vfio_put_base_device(&vcdev->vdev);
-> -}
-> -
-> -static void vfio_ccw_get_device(VFIOGroup *group, VFIOCCWDevice *vcdev,
-> -                                Error **errp)
-> +static void vfio_ccw_realize(DeviceState *dev, Error **errp)
->  {
-> +    CcwDevice *ccw_dev = DO_UPCAST(CcwDevice, parent_obj, dev);
-> +    S390CCWDevice *cdev = DO_UPCAST(S390CCWDevice, parent_obj, ccw_dev);
-> +    VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
-> +    S390CCWDeviceClass *cdc = S390_CCW_DEVICE_GET_CLASS(cdev);
-> +    VFIODevice *vbasedev = &vcdev->vdev;
-> +    Error *err = NULL;
->      char *name = g_strdup_printf("%x.%x.%04x", vcdev->cdev.hostid.cssid,
->                                   vcdev->cdev.hostid.ssid,
->                                   vcdev->cdev.hostid.devid);
+    Fix WARN_ON() on bitfield ops
 
+    Alexey Dobriyan noticed that the new WARN_ON() semantics that were
+    introduced by commit 684f978347deb42d180373ac4c427f82ef963171 (to also
+    return the value to be warned on) didn't compile when given a bitfield,
+    because the typeof doesn't work for bitfields.
 
-We can't get these cssid, ssid, devid values quite yet, they are currently 0s.  That has to happen after cdc->realize()
+    So instead of the typeof trick, use an "int" variable together with a
+    "!!(x)" expression, as suggested by Al Viro.
 
+    To make matters more interesting, Paul Mackerras points out that that is
+    sub-optimal on Power, but the old asm-coded comparison seems to be buggy
+    anyway on 32-bit Power if the conditional was 64-bit, so I think there
+    are more problems there.
 
-> -    VFIODevice *vbasedev;
-> +    int ret;
->  
-> -    QLIST_FOREACH(vbasedev, &group->device_list, next) {
-> -        if (strcmp(vbasedev->name, name) == 0) {
-> -            error_setg(errp, "vfio: subchannel %s has already been attached",
-> -                       name);
-> -            goto out_err;
-> +    /* Call the class init function for subchannel. */
-> +    if (cdc->realize) {
-> +        cdc->realize(cdev, vcdev->vdev.sysfsdev, &err);
-> +        if (err) {
-> +            goto out_err_propagate;
->          }
->      }
-> +    vbasedev->sysfsdev = g_strdup_printf("/sys/bus/css/devices/%s/%s",
-> +                                         name, cdev->mdevid);
-> +    vbasedev->ops = &vfio_ccw_ops;
-> +    vbasedev->type = VFIO_DEVICE_TYPE_CCW;
-> +    vbasedev->name = name;
+    Regardless, the new WARN_ON() semantics may have been a bad idea.  But
+    this at least avoids the more serious complications.
 
-vbasedev->name is being set to the wrong value here, it needs to be the uuid.
+    Cc: Alexey Dobriyan <adobriyan@sw.ru>
+    Cc: Herbert Xu <herbert@gondor.apana.org.au>
+    Cc: Paul Mackerras <paulus@samba.org>
+    Cc: Al Viro <viro@ftp.linux.org.uk>
+    Cc: Ingo Molnar <mingo@elte.hu>
+    Cc: Andrew Morton <akpm@osdl.org>
+    Signed-off-by: Linus Torvalds <torvalds@osdl.org>
 
-See below for a suggested diff on top of this patch that solves the issue for me.
+diff --git a/include/asm-generic/bug.h b/include/asm-generic/bug.h
+index 344e3091af24..d56fedbb457a 100644
+--- a/include/asm-generic/bug.h
++++ b/include/asm-generic/bug.h
+@@ -33,7 +33,7 @@ struct bug_entry {
 
-Thanks,
-Matt
+ #ifndef HAVE_ARCH_WARN_ON
+ #define WARN_ON(condition) ({                                          \
+-       typeof(condition) __ret_warn_on = (condition);                  \
++       int __ret_warn_on = !!(condition);                              \
+        if (unlikely(__ret_warn_on)) {                                  \
+                printk("WARNING: at %s:%d %s()\n", __FILE__,            \
+                        __LINE__, __FUNCTION__);                        \
+@
+[...]
 
-diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-index 6fde7849cc..394b73358f 100644
---- a/hw/vfio/ccw.c
-+++ b/hw/vfio/ccw.c
-@@ -587,9 +587,6 @@ static void vfio_ccw_realize(DeviceState *dev, Error **errp)
-     S390CCWDeviceClass *cdc = S390_CCW_DEVICE_GET_CLASS(cdev);
-     VFIODevice *vbasedev = &vcdev->vdev;
-     Error *err = NULL;
--    char *name = g_strdup_printf("%x.%x.%04x", vcdev->cdev.hostid.cssid,
--                                 vcdev->cdev.hostid.ssid,
--                                 vcdev->cdev.hostid.devid);
-     int ret;
- 
-     /* Call the class init function for subchannel. */
-@@ -599,11 +596,14 @@ static void vfio_ccw_realize(DeviceState *dev, Error **errp)
-             goto out_err_propagate;
-         }
-     }
--    vbasedev->sysfsdev = g_strdup_printf("/sys/bus/css/devices/%s/%s",
--                                         name, cdev->mdevid);
-+    vbasedev->sysfsdev = g_strdup_printf("/sys/bus/css/devices/%x.%x.%04x/%s",
-+                                         vcdev->cdev.hostid.cssid,
-+                                         vcdev->cdev.hostid.ssid,
-+                                         vcdev->cdev.hostid.devid,
-+                                         cdev->mdevid);
-     vbasedev->ops = &vfio_ccw_ops;
-     vbasedev->type = VFIO_DEVICE_TYPE_CCW;
--    vbasedev->name = name;
-+    vbasedev->name = g_strdup(cdev->mdevid);
-     vbasedev->dev = &vcdev->cdev.parent_obj.parent_obj;
- 
-     /*
+As for int versus bool, I don't see a strong argument for either. So let's
+stick with int since that's what the current code is using and that
+aligns with the generic kernel WARN_ON().
 
-
+If someone wants to propose using a bool instead of an int that should
+be a separate commit anyway and needs an actual justification.
