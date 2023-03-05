@@ -2,168 +2,221 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C73446AADC1
-	for <lists+kvm@lfdr.de>; Sun,  5 Mar 2023 02:32:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CAAA46AAF46
+	for <lists+kvm@lfdr.de>; Sun,  5 Mar 2023 12:22:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229559AbjCEBb5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 4 Mar 2023 20:31:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54208 "EHLO
+        id S229659AbjCELW3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 5 Mar 2023 06:22:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229520AbjCEBb4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 4 Mar 2023 20:31:56 -0500
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA52D168AD
-        for <kvm@vger.kernel.org>; Sat,  4 Mar 2023 17:31:54 -0800 (PST)
+        with ESMTP id S229509AbjCELW2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 5 Mar 2023 06:22:28 -0500
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A61EA5F5;
+        Sun,  5 Mar 2023 03:22:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677979914; x=1709515914;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=wC35bTP1xKMibyony9om/7+WH37+iYVjZWkiqn8nCbU=;
-  b=L91fITTa3d35TkqO/1Jwb5gQiJyC5F/Aik5yMynEoFqSt7CMpBF+sACV
-   nN9bG4SMuxbibjXy+fdVqT+oOe66KjmjJlIiuvG3j4erh607t7J/vNbsU
-   hRFxmniMFKgrmBZrP6BT1s01Q41c8aXSB/UooHsbTpPiS4QmvLAxeN0yb
-   WVBrNma8rGYdYmAuyCUmSdoaGxwq57ZKsJL99l4aD2Oof78yNIU/ja2jJ
-   Y1br36+ev8Sp2KWDpjxHv/nAI+nXAByfLISb9GCjbb8u+EcF/eIybHhL9
-   JB+jTHtHC/MvN4TThw6AicLMtPyG33tQ+fdvbgv3XBJCg3GoCj71F4x+i
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10639"; a="335353750"
-X-IronPort-AV: E=Sophos;i="5.98,234,1673942400"; 
-   d="scan'208";a="335353750"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2023 17:31:54 -0800
+  t=1678015347; x=1709551347;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=YspSz6HVobERfe6tNMqxvlJoMX2cvmnkOE7gTDTCvwc=;
+  b=hWy9tgX/YFwWU79t0lL5ivVoWxHJR6yXsTGPhEntx5uGF24GVndYUQUW
+   golAzVZKiPMHor92slTwEMZdDquFvss5RPMsyJPX+1aO5KfMngyvb70rm
+   4rTuJPXUqZvnPCeHp8dNgAKO8N8pm0MgoONmqCsEopQRxa30oWO2KZP3N
+   h/T1rAChrY9kC7px1KuMUp1pcI0gTer2FRQTB4T8mjB5isvrNyFHxDxTX
+   OtfmoiwvPPRbtVRGK+lD1vly+2n3/konGwbBaEKns+B2JVXps2+lWXiui
+   +CKrEYsXQZ++98eRX8zrfmBpaeiXfs5+m4+qIdhN7SrtOm+1bd8wYdugx
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10639"; a="336883397"
+X-IronPort-AV: E=Sophos;i="5.98,235,1673942400"; 
+   d="scan'208";a="336883397"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2023 03:22:27 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10639"; a="739914059"
-X-IronPort-AV: E=Sophos;i="5.98,234,1673942400"; 
-   d="scan'208";a="739914059"
-Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
-  by fmsmga008.fm.intel.com with ESMTP; 04 Mar 2023 17:31:53 -0800
-Message-ID: <88dd1570086f4a553a8dffbde71770cb51163388.camel@linux.intel.com>
-Subject: Re: [PATCH v5 3/5] KVM: x86: Virtualize CR3.LAM_{U48,U57}
-From:   Robert Hoo <robert.hu@linux.intel.com>
-To:     Chao Gao <chao.gao@intel.com>
-Cc:     seanjc@google.com, pbonzini@redhat.com, binbin.wu@linux.intel.com,
-        kvm@vger.kernel.org
-Date:   Sun, 05 Mar 2023 09:31:52 +0800
-In-Reply-To: <ZAIX7m177/rQEl22@gao-cwp>
-References: <20230227084547.404871-1-robert.hu@linux.intel.com>
-         <20230227084547.404871-4-robert.hu@linux.intel.com>
-         <ZAGR1qG2ehb8iXDL@gao-cwp>
-         <580137f7c866c7caadb3ff92d50169cd9a12dae2.camel@linux.intel.com>
-         <ZAIX7m177/rQEl22@gao-cwp>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-10.el7) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-IronPort-AV: E=McAfee;i="6500,9779,10639"; a="764924029"
+X-IronPort-AV: E=Sophos;i="5.98,235,1673942400"; 
+   d="scan'208";a="764924029"
+Received: from lkp-server01.sh.intel.com (HELO 776573491cc5) ([10.239.97.150])
+  by FMSMGA003.fm.intel.com with ESMTP; 05 Mar 2023 03:22:24 -0800
+Received: from kbuild by 776573491cc5 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pYmRb-0002im-2h;
+        Sun, 05 Mar 2023 11:22:23 +0000
+Date:   Sun, 5 Mar 2023 19:21:47 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>,
+        virtualization@lists.linux-foundation.org
+Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
+        eperezma@redhat.com, netdev@vger.kernel.org, stefanha@redhat.com,
+        linux-kernel@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
+        Stefano Garzarella <sgarzare@redhat.com>
+Subject: Re: [PATCH v2 6/8] vdpa_sim: use kthread worker
+Message-ID: <202303051841.bPAIzJRy-lkp@intel.com>
+References: <20230302113421.174582-7-sgarzare@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230302113421.174582-7-sgarzare@redhat.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2023-03-03 at 23:53 +0800, Chao Gao wrote:
-> On Fri, Mar 03, 2023 at 10:23:50PM +0800, Robert Hoo wrote:
-> > On Fri, 2023-03-03 at 14:21 +0800, Chao Gao wrote:
-> > > On Mon, Feb 27, 2023 at 04:45:45PM +0800, Robert Hoo wrote:
-> > > > LAM feature uses 2 high bits in CR3 (bit 62 for LAM_U48 and bit
-> > > > 61
-> > > > for
-> > > > LAM_U57) to enable/config LAM feature for user mode addresses.
-> > > > The
-> > > > LAM
-> > > > masking is done before legacy canonical checks.
-> > > > 
-> > > > To virtualize LAM CR3 bits usage, this patch:
-> > > > 1. Don't reserve these 2 bits when LAM is enable on the vCPU.
-> > > > Previously
-> > > > when validate CR3, kvm uses kvm_vcpu_is_legal_gpa(), now define
-> > > > kvm_vcpu_is_valid_cr3() which is actually
-> > > > kvm_vcpu_is_legal_gpa()
-> > > > + CR3.LAM bits validation. Substitutes
-> > > > kvm_vcpu_is_legal/illegal_gpa()
-> > > > with kvm_vcpu_is_valid_cr3() in call sites where is validating
-> > > > CR3
-> > > > rather
-> > > > than pure GPA.
-> > > > 2. mmu::get_guest_pgd(), its implementation is get_cr3() which
-> > > > returns
-> > > > whole guest CR3 value. Strip LAM bits in those call sites that
-> > > > need
-> > > > pure
-> > > > PGD value, e.g. mmu_alloc_shadow_roots(),
-> > > > FNAME(walk_addr_generic)().
-> > > > 3. When form a new guest CR3 (vmx_load_mmu_pgd()), melt in LAM
-> > > > bit
-> > > > (kvm_get_active_lam()).
-> > > > 4. When guest sets CR3, identify ONLY-LAM-bits-toggling cases,
-> > > > where it is
-> > > > unnecessary to make new pgd, but just make request of load pgd,
-> > > > then new
-> > > > CR3.LAM bits configuration will be melt in (above point 3). To
-> > > > be
-> > > > conservative, this case still do TLB flush.
-> > > > 5. For nested VM entry, allow the 2 CR3 bits set in
-> > > > corresponding
-> > > > VMCS host/guest fields.
-> > > 
-> > > isn't this already covered by item #1 above?
-> > 
-> > Ah, it is to address your comments on last version. To
-> > repeat/emphasize
-> > again, doesn't harm, does it?;) 
-> 
-> It is confusing. Trying to merge #5 to #1:
+Hi Stefano,
 
-Well this is kind of subjective. I don't have any bias on this.
-> 
-> If LAM is supported, bits 62:61 (LAM_U48 and LAM_U57) are not
-> reserved
-> in CR3. VM entry also allows the two bits to be set in CR3 field in
-> guest-state and host-state area of the VMCS. Previously ...
-> 
-> > > 
-> > 
-> > (...)
-> > > > 
-> > > > +static inline u64 kvm_get_active_lam(struct kvm_vcpu *vcpu)
-> > > > +{
-> > > > +	return kvm_read_cr3(vcpu) & (X86_CR3_LAM_U48 |
-> > > > X86_CR3_LAM_U57);
-> > > > +}
-> > > 
-> > > I think it is better to define a mask (like reserved_gpa_bits):
-> > > 
-> > > kvm_vcpu_arch {
-> > > 	...
-> > > 
-> > > 	/*
-> > > 	 * Bits in CR3 used to enable certain features. These bits
-> > > don't
-> > > 	 * participate in page table walking. They should be masked to
-> > > 	 * get the base address of page table. When shadow paging is
-> > > 	 * used, these bits should be kept as is in the shadow CR3.
-> > > 	 */
-> > > 	u64 cr3_control_bits;
-> > > 
-> > 
-> > I don't strongly object this. But per SDM, CR3.bit[63:MAXPHYADDR]
-> > are
-> > reserved; and MAXPHYADDR is at most 52 [1]. So can we assert and
-> > simply
-> > define the MASK bit[63:52]? (I did this in v3 and prior)
-> 
-> No. Setting any bit in 60:52 should be rejected. And setting bit 62
-> or
-> 61 should be allowed if LAM is supported by the vCPU. I don't see how
-> your proposal can distinguish these two cases.
+I love your patch! Perhaps something to improve:
 
-No you didn't get my point.
-Perhaps you can take a look at v3 patch and prior
-https://lore.kernel.org/kvm/20221209044557.1496580-4-robert.hu@linux.intel.com/
+[auto build test WARNING on mst-vhost/linux-next]
+[also build test WARNING on linus/master next-20230303]
+[cannot apply to v6.2]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-define CR3_HIGH_RSVD_MASK, given "MAXPHYADDR is at most 52" is stated
-in SDM.
+url:    https://github.com/intel-lab-lkp/linux/commits/Stefano-Garzarella/vdpa-add-bind_mm-unbind_mm-callbacks/20230302-193850
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
+patch link:    https://lore.kernel.org/r/20230302113421.174582-7-sgarzare%40redhat.com
+patch subject: [PATCH v2 6/8] vdpa_sim: use kthread worker
+config: i386-allyesconfig (https://download.01.org/0day-ci/archive/20230305/202303051841.bPAIzJRy-lkp@intel.com/config)
+compiler: clang version 14.0.6 (https://github.com/llvm/llvm-project f28c006a5895fc0e329fe15fead81e37457cb1d1)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/5b2107457ac0e7b1bb0aa3635ebf13b02e82bb78
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Stefano-Garzarella/vdpa-add-bind_mm-unbind_mm-callbacks/20230302-193850
+        git checkout 5b2107457ac0e7b1bb0aa3635ebf13b02e82bb78
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=i386 olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=i386 SHELL=/bin/bash drivers/net/wireless/ath/ath10k/ drivers/vdpa/vdpa_sim/ fs/erofs/
 
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202303051841.bPAIzJRy-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/vdpa/vdpa_sim/vdpa_sim.c:166:6: warning: variable 'dev' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
+           if (IS_ERR(vdpasim->worker))
+               ^~~~~~~~~~~~~~~~~~~~~~~
+   drivers/vdpa/vdpa_sim/vdpa_sim.c:213:13: note: uninitialized use occurs here
+           put_device(dev);
+                      ^~~
+   drivers/vdpa/vdpa_sim/vdpa_sim.c:166:2: note: remove the 'if' if its condition is always false
+           if (IS_ERR(vdpasim->worker))
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/vdpa/vdpa_sim/vdpa_sim.c:132:20: note: initialize the variable 'dev' to silence this warning
+           struct device *dev;
+                             ^
+                              = NULL
+   1 warning generated.
+
+
+vim +166 drivers/vdpa/vdpa_sim/vdpa_sim.c
+
+   125	
+   126	struct vdpasim *vdpasim_create(struct vdpasim_dev_attr *dev_attr,
+   127				       const struct vdpa_dev_set_config *config)
+   128	{
+   129		const struct vdpa_config_ops *ops;
+   130		struct vdpa_device *vdpa;
+   131		struct vdpasim *vdpasim;
+   132		struct device *dev;
+   133		int i, ret = -ENOMEM;
+   134	
+   135		if (!dev_attr->alloc_size)
+   136			return ERR_PTR(-EINVAL);
+   137	
+   138		if (config->mask & BIT_ULL(VDPA_ATTR_DEV_FEATURES)) {
+   139			if (config->device_features &
+   140			    ~dev_attr->supported_features)
+   141				return ERR_PTR(-EINVAL);
+   142			dev_attr->supported_features =
+   143				config->device_features;
+   144		}
+   145	
+   146		if (batch_mapping)
+   147			ops = &vdpasim_batch_config_ops;
+   148		else
+   149			ops = &vdpasim_config_ops;
+   150	
+   151		vdpa = __vdpa_alloc_device(NULL, ops,
+   152					   dev_attr->ngroups, dev_attr->nas,
+   153					   dev_attr->alloc_size,
+   154					   dev_attr->name, false);
+   155		if (IS_ERR(vdpa)) {
+   156			ret = PTR_ERR(vdpa);
+   157			goto err_alloc;
+   158		}
+   159	
+   160		vdpasim = vdpa_to_sim(vdpa);
+   161		vdpasim->dev_attr = *dev_attr;
+   162	
+   163		kthread_init_work(&vdpasim->work, vdpasim_work_fn);
+   164		vdpasim->worker = kthread_create_worker(0, "vDPA sim worker: %s",
+   165							dev_attr->name);
+ > 166		if (IS_ERR(vdpasim->worker))
+   167			goto err_iommu;
+   168	
+   169		spin_lock_init(&vdpasim->lock);
+   170		spin_lock_init(&vdpasim->iommu_lock);
+   171	
+   172		dev = &vdpasim->vdpa.dev;
+   173		dev->dma_mask = &dev->coherent_dma_mask;
+   174		if (dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64)))
+   175			goto err_iommu;
+   176		vdpasim->vdpa.mdev = dev_attr->mgmt_dev;
+   177	
+   178		vdpasim->config = kzalloc(dev_attr->config_size, GFP_KERNEL);
+   179		if (!vdpasim->config)
+   180			goto err_iommu;
+   181	
+   182		vdpasim->vqs = kcalloc(dev_attr->nvqs, sizeof(struct vdpasim_virtqueue),
+   183				       GFP_KERNEL);
+   184		if (!vdpasim->vqs)
+   185			goto err_iommu;
+   186	
+   187		vdpasim->iommu = kmalloc_array(vdpasim->dev_attr.nas,
+   188					       sizeof(*vdpasim->iommu), GFP_KERNEL);
+   189		if (!vdpasim->iommu)
+   190			goto err_iommu;
+   191	
+   192		vdpasim->iommu_pt = kmalloc_array(vdpasim->dev_attr.nas,
+   193						  sizeof(*vdpasim->iommu_pt), GFP_KERNEL);
+   194		if (!vdpasim->iommu_pt)
+   195			goto err_iommu;
+   196	
+   197		for (i = 0; i < vdpasim->dev_attr.nas; i++)
+   198			vhost_iotlb_init(&vdpasim->iommu[i], max_iotlb_entries, 0);
+   199	
+   200		vdpasim->buffer = kvmalloc(dev_attr->buffer_size, GFP_KERNEL);
+   201		if (!vdpasim->buffer)
+   202			goto err_iommu;
+   203	
+   204		for (i = 0; i < dev_attr->nvqs; i++)
+   205			vringh_set_iotlb(&vdpasim->vqs[i].vring, &vdpasim->iommu[0],
+   206					 &vdpasim->iommu_lock);
+   207	
+   208		vdpasim->vdpa.dma_dev = dev;
+   209	
+   210		return vdpasim;
+   211	
+   212	err_iommu:
+   213		put_device(dev);
+   214	err_alloc:
+   215		return ERR_PTR(ret);
+   216	}
+   217	EXPORT_SYMBOL_GPL(vdpasim_create);
+   218	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
