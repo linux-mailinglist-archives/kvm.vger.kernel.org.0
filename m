@@ -2,83 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CA85D6AB170
-	for <lists+kvm@lfdr.de>; Sun,  5 Mar 2023 17:52:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 08F5A6AB1F3
+	for <lists+kvm@lfdr.de>; Sun,  5 Mar 2023 21:07:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229685AbjCEQwj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 5 Mar 2023 11:52:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42196 "EHLO
+        id S229615AbjCEUHx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 5 Mar 2023 15:07:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbjCEQwi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 5 Mar 2023 11:52:38 -0500
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E58CDCDC3
-        for <kvm@vger.kernel.org>; Sun,  5 Mar 2023 08:52:37 -0800 (PST)
-Received: by mail-ed1-x535.google.com with SMTP id x3so29229813edb.10
-        for <kvm@vger.kernel.org>; Sun, 05 Mar 2023 08:52:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ge1WTr2yS2AL+JZ8zp/0KvvQMq7DOSFberU+bBdXxxk=;
-        b=ifyDmzR8dM3mb+XNHNzy2CWoiDStOdXU2jPhA5qA5igt7YbTu3CZemwuTqif+sJXLN
-         NRrEv7wOoUKusnvWdKEJARiksqA1gyS+4Re4egMCGcopcq9LzkI1dPSl0FUhCGOnJzar
-         zaV88+yaKqeC9KDFqctAmDln72AWxTrimw/XMzqqDV1Wbz7dZLePbTelYv5f8tJHlwN2
-         TlO3RLadJFAMhB3o8A974CAeDBXXgEWsl5mEl065GBaNzfqaQv1JGVEw7vv3HPTM9ZsS
-         pCjqraErpodK0t8MXh44Mx2yZ/BJx43Zl9qA/gM0r6zQvfTtvsivwvfTPl9HPjuRBM9H
-         y54Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ge1WTr2yS2AL+JZ8zp/0KvvQMq7DOSFberU+bBdXxxk=;
-        b=qZpByEVaeSkI+5o2NprHSpkjN7NsdZsdi6FVa+0xtB8+tSH4q/5o8a4x+flQ13uVeG
-         FXUEbnD4UTikyFHxgyAzrs2xyFGRKS+/E+Hftq1o8YwOHrr/W/Z2VpocToaYKQygKDDC
-         Bl2UTOTQatR6aCz8FirF7aBv7tHtvTSeGSDhcmeFrE3wu2Bz4MvKperk9WfSaW2CgFid
-         6TXpanVsdlFBxbTWMviNrs6XItzLDnXcrsnt2n+h6iNaJtT6nf3qRBzLeAJrcOu0ZxdL
-         AXsrBUdlCbSKsAaZV+0JFS3mPq4u9IyMzZ98oJvLrlYaxNN5sGHXfKS+19C5mGkwZFnq
-         9e/Q==
-X-Gm-Message-State: AO0yUKV3cXa1Ie4GLIP2WisRw/XC03SGuThFev1GdWHawVgHfvjTnZ7I
-        jvJFg1KFZyzXx+ul3U0lYFhrHe2Ogu9EXwBpZAqWsDAMYutUIQ==
-X-Google-Smtp-Source: AK7set+5mlqD1LyMacjPZxEd5bjsc8YmOfvUTUbqGytH8s/Rt9c3nwCBSPX49ByFTeqYvhLpaHXA5J/ruBBdKlXqpIo=
-X-Received: by 2002:a17:906:310d:b0:87b:d50f:6981 with SMTP id
- 13-20020a170906310d00b0087bd50f6981mr3354860ejx.14.1678035156122; Sun, 05 Mar
- 2023 08:52:36 -0800 (PST)
+        with ESMTP id S229579AbjCEUHw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 5 Mar 2023 15:07:52 -0500
+Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98AA916AD3;
+        Sun,  5 Mar 2023 12:07:48 -0800 (PST)
+Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
+        by mx.sberdevices.ru (Postfix) with ESMTP id A395F5FD04;
+        Sun,  5 Mar 2023 23:07:45 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1678046865;
+        bh=HJc6SOI5RX3x6uTZNKZKhZWULwHOcmQ+GQH6cylyxbA=;
+        h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type;
+        b=MKH3GAre/bXpUfp/gEA84lbVBHhrYRHZBzoJg+Okm7xqYI+czrX71EzhYe8sFniNk
+         DDNcoy+YQ75czEIUd4KbrxCuRBo/MroVSesCn55keVJ+zuMaMPoi9EO8YWm+BswKnR
+         a2dn8+8i2SLOcAe8ixZ7aE2zMxlOQLnGSOOJS55YrHXuevwqxAN26ani4DWMsvjHhP
+         dbkneNJHwSRgt1nTvCJZpMHkNZP0Xc3+6r10Rt02dTfG0dKMCwDidnVkC88xTwDK6E
+         r0QbcjaDDt4CszFaApUAC4ZBg2TYcJgmZOxmzHoAuZd4v2qaTPVkjxYMJG9l6BSH89
+         gvzu43ryxZqfA==
+Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
+        by mx.sberdevices.ru (Postfix) with ESMTP;
+        Sun,  5 Mar 2023 23:07:40 +0300 (MSK)
+Message-ID: <a7ab414b-5e41-c7b6-250b-e8401f335859@sberdevices.ru>
+Date:   Sun, 5 Mar 2023 23:04:45 +0300
 MIME-Version: 1.0
-From:   "David N." <taact135200@gmail.com>
-Date:   Sun, 5 Mar 2023 11:52:25 -0500
-Message-ID: <CACQapsBJxdH2SpwuSgD1rKhqymw9vAME+BdzLO82a=hV2V5=Lw@mail.gmail.com>
-Subject: Bug: Intel Arc A-Series GPUs VFIO pass through no video out
-To:     kvm@vger.kernel.org
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Content-Language: en-US
+To:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>
+CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
+        <avkrasnov@sberdevices.ru>
+From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
+Subject: [RFC PATCH v2 0/4] virtio/vsock: fix credit update logic
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [172.16.1.6]
+X-ClientProxiedBy: S-MS-EXCH01.sberdevices.ru (172.16.1.4) To
+ S-MS-EXCH01.sberdevices.ru (172.16.1.4)
+X-KSMG-Rule-ID: 4
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Status: not scanned, disabled by settings
+X-KSMG-AntiSpam-Interceptor-Info: not scanned
+X-KSMG-AntiPhishing: not scanned, disabled by settings
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2023/03/05 16:13:00 #20917262
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Hello,
 
-I'm not entirely sure if this is the right place for this. I'd
-previously opened a report on the Intel GPU Community Issue Tracker
-and they suggested I open a bug for the VM software I'm using.
+this patchset fixes three things in skbuff handling:
+1) Current implementation of 'virtio_transport_dec_rx_pkt()':
 
-The issue:
+   value to update 'rx_bytes' and 'fwd_cnt' is calculated as:
 
-If you try to pass through an Intel Arc A770 LE (or any other Arc
-A-series GPU) from a Linux host to a Windows guest, you do not get any
-video out or detected monitors on the Arc card. But, the card is being
-picked up by the drivers and will run whatever workload you throw at
-it, there's just no picture on the monitor. The monitor detects
-something on VM boot, but nothing other than a black screen is
-visible.
+   skb_headroom(skb) - sizeof(struct virtio_vsock_hdr) - skb->len;
 
-There is a "fix" discovered by taoj17v on reddit: Unplug the display
-cables from the GPU, boot the host and then the VM. Once the guest has
-finished booting, connect the cables.
+   i'm a little bit confused about subtracting 'skb->len'. It is clear,
+   that difference between first two components is number of bytes copied
+   to user. 'skb_headroom()' is delta between 'data' and 'head'. 'data'
+   is incremented on each copy data to user from skb by call 'skb_pull()'
+   (at the same moment, 'skb->len' is decremented to the same amount of
+   bytes). 'head' points to the header of the packet. But what is purpose
+   of 'skb->len' here? For SOCK_STREAM is has no effect because this
+   logic is called only when 'skb->len' == 0, but for SOCK_SEQPACKET and
+   other future calls i think it is buggy.
 
-He also points out that it is likely a bug in the firmware.
+2) For SOCK_SEQPACKET all sk_buffs are handled only once - after dequeue
+   each sk_buff is removed, so user will never read rest of the data.
+   Thus we need to update credit parameters of the socket ('rx_bytes' and
+   'fwd_cnt') like whole sk_buff is read - so call 'skb_pull()' for the
+   whole buffer.
+
+3) For SOCK_STREAM when 'memcpy_to_msg()' fails it fixes 'rx_bytes'
+   update (like in 2)) and frees current skbuff.
+
+Test is also added to vsock_test. It does two attempts to read data from
+socket - first attempt to invalid buffer (kernel must drop skb). Second
+attempt is performed with valid buffer and MSG_DONTWAIT flag. If socket's
+queue will be empty (skbuff was dropped due to 'memcpy_to_msg()' fail
+and 'rx_bytes' which controls data waiting set to 0), such call will
+return immediately with EAGAIN.
+
+Link to v1 on lore:
+https://lore.kernel.org/netdev/c2d3e204-89d9-88e9-8a15-3fe027e56b4b@sberdevices.ru/
+
+Change log:
+
+v1 -> v2:
+ - For SOCK_SEQPACKET call 'skb_pull()' also in case of copy failure or
+   dropping skbuff (when we just waiting message end).
+ - Handle copy failure for SOCK_STREAM in the same manner (plus free
+   current skbuff).
+ - Replace bug repdroducer with new test in vsock_test.c
+
+Arseniy Krasnov (4):
+  virtio/vsock: fix 'rx_bytes'/'fwd_cnt' calculation
+  virtio/vsock: remove all data from sk_buff
+  virtio/vsock: free skb on data copy failure
+  test/vsock: invalid buffer tests
+
+ net/vmw_vsock/virtio_transport_common.c |  10 ++-
+ tools/testing/vsock/vsock_test.c        | 106 ++++++++++++++++++++++++
+ 2 files changed, 113 insertions(+), 3 deletions(-)
+
+-- 
+2.25.1
