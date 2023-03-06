@@ -2,81 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EA4D26AC5AC
-	for <lists+kvm@lfdr.de>; Mon,  6 Mar 2023 16:40:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F0046AC5EB
+	for <lists+kvm@lfdr.de>; Mon,  6 Mar 2023 16:52:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229925AbjCFPkg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Mar 2023 10:40:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42228 "EHLO
+        id S230325AbjCFPwV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Mar 2023 10:52:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230171AbjCFPjk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Mar 2023 10:39:40 -0500
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 777DF36476;
-        Mon,  6 Mar 2023 07:39:04 -0800 (PST)
-Received: by mail-lf1-x12f.google.com with SMTP id i28so13382576lfv.0;
-        Mon, 06 Mar 2023 07:39:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678117072;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5hDMsqcdGIfiCOVeyjU4Ba4iMqQn+GOWjCwhWYk6SdI=;
-        b=cg1/O1TWCoAT+12txvkiPpk8WOQTLsVbbyntUVywAm++PWVMzFM4JjQRWDOUOYRScg
-         pvFU352A9exDJyfmr6d8LqJgbi0luBH+enT3u31nc54Hmh05vWYHCkSSe7oGk7lmhxyE
-         gQSPcdZk5nGsoTod4x/9xM1gvrso7kjeMYYHWi2P08jqU+eAbw3oqFZsorHQ0S/CRtHA
-         d+foYcEAUnenuImuL8oP9UXM5FRNCKBTKRUghgv+c1d+jCyNJQcf5Z8sqJZPTHfcasad
-         gO4Za/039IiZBBKhDDxAJK9l/nUdtBwyQUaEdwEM3X27LHjxursB5jxdMGtDxQkwzSHu
-         Mqpw==
+        with ESMTP id S229784AbjCFPwU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Mar 2023 10:52:20 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44DB933468
+        for <kvm@vger.kernel.org>; Mon,  6 Mar 2023 07:51:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1678117888;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Q86XLZ7Q4ZHp1CUGcCN/NjLhC2ggJRWLx1s//bOcLDM=;
+        b=IDGY3v4CGTQZ5idFWVW87EHcy0lVva+Ckm1QP33JE4zD1o0xlMWDuXOwOCDMlbt0PLkbsw
+        cuVE2g+sX2EJtbLsfVEBTjN60pf/ea00y0B1DV8muqwcvqkb291HZ7z4hWMKGOsuizk4Rt
+        32ElIB+cwlfCStYB3uVtvK3uVAFrA3w=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-412-6Ek2mt9LOBaAqjoSX7Lvvg-1; Mon, 06 Mar 2023 10:51:27 -0500
+X-MC-Unique: 6Ek2mt9LOBaAqjoSX7Lvvg-1
+Received: by mail-qt1-f197.google.com with SMTP id p7-20020ac84607000000b003b9b6101f65so5392206qtn.11
+        for <kvm@vger.kernel.org>; Mon, 06 Mar 2023 07:51:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678117072;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5hDMsqcdGIfiCOVeyjU4Ba4iMqQn+GOWjCwhWYk6SdI=;
-        b=t7icR6ihNyHtWLDcUjxeHNRlMJYHk0yT1ktqNZZ+HBZgr1LFWgPSl+1bMw96U8YifU
-         CxX6DXaKJV5Q7lXOc+qRFLH2/Lcqjup29vdDr0X2jWIIrJ+86/lDclQ5SvrUs7MN3Ds4
-         nqC10Kkjrjscps7ZO9CYMLNApOh1t/F/SLjHSQRwlBi6/lZbqY3rm6Cgvee7Jb3txtQF
-         ovZ2g/sCQKJyHOtRupPY8CkEBfGBxWaRJ7770vSqFEjFDzS1QIaIP/avVojq9C9OHaQF
-         ymcCBHwbKuQBK+9mdERt5WJmajgJoDjJWQWuGilit5HxeedeHZt6EL9i4Z8ET4zMauU4
-         GXvA==
-X-Gm-Message-State: AO0yUKVhYeCloZz5/CWFzY4wp2LwE1HVU0AbrlsIYzw6HVNaRBYuPQCt
-        uqCXT15dx44+wuN2GuSCphw=
-X-Google-Smtp-Source: AK7set/mMWXfBFsiLU1XkaTiImOSmqnWmfXifYoeEmJfJYsfZbSf6DihYHx9KRJq7C6ZcNvQWlxpEQ==
-X-Received: by 2002:a19:f011:0:b0:4cb:3a60:65c9 with SMTP id p17-20020a19f011000000b004cb3a6065c9mr2589865lfc.2.1678117072501;
-        Mon, 06 Mar 2023 07:37:52 -0800 (PST)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id g22-20020ac25396000000b004cb14fa604csm1680397lfh.262.2023.03.06.07.37.52
+        d=1e100.net; s=20210112; t=1678117887;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q86XLZ7Q4ZHp1CUGcCN/NjLhC2ggJRWLx1s//bOcLDM=;
+        b=BdT603WL2RtqGQ+W3mGhUMpnjjUfE5fEet+8/pvsf9vPl49YWDVYbG7YUdVXi1JTri
+         bzh99R6pB3Nyd47pCG+WhIhrcxDMgpzZenRIIWG2J0ZdjOj5xgbkVO2zyZBDRmgQtv0o
+         OArYSKfGhmLbAJHPweE8M4Tk0mwh322vagco8Ia9mB2kzjtaPbeMjxVS8MI+YTf8lmLq
+         kcpe3QGRvLnSilXQwve5Ovkglt8LEns6EfNVYC0/71C4Iw0/MrlXyRexDqleDwLsl0F1
+         PQOiWdvr4XThxl20+HYoetDU3xunz0ptYECkZb++NlILwnY73vtQGuLzkeOCFvkIwj9S
+         GG+A==
+X-Gm-Message-State: AO0yUKXMGjVzqesI0jK/suSFVZBUvgqL3/Ok56ECc41qjaT1BxEPZEWA
+        B3H2i7xGII+KSenIe6juh6M9c0vu3cNnEuRvHh9aLwlEGGZTXnhY1HB/rR0B5PF0fMLds1bwGpb
+        H60QWY5nluwiG
+X-Received: by 2002:a05:622a:c:b0:3b9:bc8c:c207 with SMTP id x12-20020a05622a000c00b003b9bc8cc207mr26969676qtw.18.1678117886723;
+        Mon, 06 Mar 2023 07:51:26 -0800 (PST)
+X-Google-Smtp-Source: AK7set8J+A3R80v+MVqfE2WCygPas52Ry5LmPSFlnPMQvzMyOQV6nh5+6ZCsftO+pkisfBFlvJJ58Q==
+X-Received: by 2002:a05:622a:c:b0:3b9:bc8c:c207 with SMTP id x12-20020a05622a000c00b003b9bc8cc207mr26969642qtw.18.1678117886394;
+        Mon, 06 Mar 2023 07:51:26 -0800 (PST)
+Received: from sgarzare-redhat (host-82-57-51-170.retail.telecomitalia.it. [82.57.51.170])
+        by smtp.gmail.com with ESMTPSA id q17-20020ac84111000000b003bfa52112f9sm7805681qtl.4.2023.03.06.07.51.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Mar 2023 07:37:52 -0800 (PST)
-Date:   Mon, 6 Mar 2023 17:37:51 +0200
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-To:     Steven Price <steven.price@arm.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Joey Gouly <joey.gouly@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev
-Subject: Re: [RFC PATCH 15/28] KVM: arm64: Handle realm MMIO emulation
-Message-ID: <20230306173751.000026d4@gmail.com>
-In-Reply-To: <20230127112932.38045-16-steven.price@arm.com>
-References: <20230127112248.136810-1-suzuki.poulose@arm.com>
-        <20230127112932.38045-1-steven.price@arm.com>
-        <20230127112932.38045-16-steven.price@arm.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        Mon, 06 Mar 2023 07:51:25 -0800 (PST)
+Date:   Mon, 6 Mar 2023 16:51:21 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseniy Krasnov <avkrasnov@sberdevices.ru>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel@sberdevices.ru, oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v2 2/4] virtio/vsock: remove all data from sk_buff
+Message-ID: <20230306155121.7xwxzgxtle7qjbnc@sgarzare-redhat>
+References: <a7ab414b-5e41-c7b6-250b-e8401f335859@sberdevices.ru>
+ <dfadea17-a91e-105f-c213-a73f9731c8bd@sberdevices.ru>
+ <20230306120857.6flftb3fftmsceyl@sgarzare-redhat>
+ <b18e3b13-3386-e9ee-c817-59588e6d5fb6@sberdevices.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <b18e3b13-3386-e9ee-c817-59588e6d5fb6@sberdevices.ru>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,78 +86,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 27 Jan 2023 11:29:19 +0000
-Steven Price <steven.price@arm.com> wrote:
+On Mon, Mar 06, 2023 at 06:31:22PM +0300, Arseniy Krasnov wrote:
+>
+>
+>On 06.03.2023 15:08, Stefano Garzarella wrote:
+>> On Sun, Mar 05, 2023 at 11:07:37PM +0300, Arseniy Krasnov wrote:
+>>> In case of SOCK_SEQPACKET all sk_buffs are used once - after read some
+>>> data from it, it will be removed, so user will never read rest of the
+>>> data. Thus we need to update credit parameters of the socket like whole
+>>> sk_buff is read - so call 'skb_pull()' for the whole buffer.
+>>>
+>>> Fixes: 71dc9ec9ac7d ("virtio/vsock: replace virtio_vsock_pkt with sk_buff")
+>>> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>>> ---
+>>> net/vmw_vsock/virtio_transport_common.c | 2 +-
+>>> 1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> Maybe we could avoid this patch if we directly use pkt_len as I
+>> suggested in the previous patch.
+>Hm, may be we can avoid calling 'skb_pull()' here if 'virtio_transport_dec_rx_pkt()'
+>will use integer argument?
 
-> MMIO emulation for a realm cannot be done directly with the VM's
-> registers as they are protected from the host. However the RMM interface
-> provides a structure member for providing the read/written value and
+Yep, exactly!
 
-More details would be better for helping the review. I can only see the
-emulated mmio value from the device model (kvmtool or kvm_io_bus) is put into
-the GPRS[0] of the RecEntry object. But the rest of the flow is missing.
+>Just call 'virtio_transport_dec_rx_pkt(skb->len)'. skb
 
-I guess RMM copies the value in the RecEntry.GPRS[0] to the target GPR in the
-guest context in RMI_REC_ENTER when seeing RMI_EMULATED_MMIO. This is for
-the guest MMIO read path.
+It depends on how we call virtio_transport_inc_rx_pkt(). If we use
+hdr->len there I would use the same to avoid confusion. Plus that's the
+value the other peer sent us, so definitely the right value to increase
+fwd_cnt with. But if skb->len always reflects it, then that's fine.
 
-How about the MMIO write path? I don't see where the RecExit.GPRS[0] is loaded
-to a varible and returned to the userspace.
+>is never returned to queue to read it again, so i think may be there is no sense for
+>extra call 'skb_pull'?
 
-> we can transfer this to the appropriate VCPU's register entry and then
-> depend on the generic MMIO handling code in KVM.
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
->  arch/arm64/kvm/mmio.c | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
-> index 3dd38a151d2a..c4879fa3a8d3 100644
-> --- a/arch/arm64/kvm/mmio.c
-> +++ b/arch/arm64/kvm/mmio.c
-> @@ -6,6 +6,7 @@
->  
->  #include <linux/kvm_host.h>
->  #include <asm/kvm_emulate.h>
-> +#include <asm/rmi_smc.h>
->  #include <trace/events/kvm.h>
->  
->  #include "trace.h"
-> @@ -109,6 +110,9 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
->  			       &data);
->  		data = vcpu_data_host_to_guest(vcpu, data, len);
->  		vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu), data);
-> +
-> +		if (vcpu_is_rec(vcpu))
-> +			vcpu->arch.rec.run->entry.gprs[0] = data;
+Right!
 
-I think the guest context is maintained by RMM (while KVM can only touch
-Rec{Entry, Exit} object) so that guest context in the legacy VHE mode is
-unused.
-
-If yes, I guess here is should be:
-
-if (unlikely(vcpu_is_rec(vcpu)))
-	vcpu->arch.rec.run->entry.gprs[0] = data;
-else
-	vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu), data);
-
->  	}
->  
->  	/*
-> @@ -179,6 +183,9 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
->  	run->mmio.len		= len;
->  	vcpu->mmio_needed	= 1;
->  
-> +	if (vcpu_is_rec(vcpu))
-> +		vcpu->arch.rec.run->entry.flags |= RMI_EMULATED_MMIO;
-> +
-
-Wouldn't it be better to set this in the kvm_handle_mmio_return where the MMIO
-read emulation has been surely successful?
-
->  	if (!ret) {
->  		/* We handled the access successfully in the kernel. */
->  		if (!is_write)
+Thanks,
+Stefano
 
