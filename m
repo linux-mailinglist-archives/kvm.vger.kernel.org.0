@@ -2,82 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 71E296ABEE4
-	for <lists+kvm@lfdr.de>; Mon,  6 Mar 2023 12:58:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B305E6ABEFE
+	for <lists+kvm@lfdr.de>; Mon,  6 Mar 2023 13:03:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230146AbjCFL6b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Mar 2023 06:58:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48004 "EHLO
+        id S230135AbjCFMDm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Mar 2023 07:03:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230135AbjCFL6Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Mar 2023 06:58:24 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91DDA298DE
-        for <kvm@vger.kernel.org>; Mon,  6 Mar 2023 03:57:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678103848;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=pPpIjkKFXmzX5D1Lt9KnLFbKezSVbVCSbxUA3anhA3E=;
-        b=ApEf1+/+HLfQLpzAP1ydgnumgG+exLjxKHmbWIdCVu993/7sGBLL8MBq0jHPfY3lSSLvv8
-        foekKFRL5MhC6GXy1YeQw2m/js/rDItc0hXnfJmemQHQyi8mm3PW5bNS8yQ0tuI3oO7FjS
-        ZPVEweYr36NuQjWnXrekt4bggBxpguc=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-562-Fp2jnfxyOFuAaq_0xRLLsw-1; Mon, 06 Mar 2023 06:57:25 -0500
-X-MC-Unique: Fp2jnfxyOFuAaq_0xRLLsw-1
-Received: by mail-qt1-f199.google.com with SMTP id k19-20020ac86053000000b003bd0d4e3a50so5010996qtm.9
-        for <kvm@vger.kernel.org>; Mon, 06 Mar 2023 03:57:25 -0800 (PST)
+        with ESMTP id S229995AbjCFMDh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Mar 2023 07:03:37 -0500
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 842D91E5CD
+        for <kvm@vger.kernel.org>; Mon,  6 Mar 2023 04:03:35 -0800 (PST)
+Received: by mail-wr1-x433.google.com with SMTP id h14so8547105wru.4
+        for <kvm@vger.kernel.org>; Mon, 06 Mar 2023 04:03:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20210112.gappssmtp.com; s=20210112; t=1678104214;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=EcYvXsX9BDvRsAMkLCutb/mxJegXnEsqufZwCKPPSWU=;
+        b=EisX+/XR8eWYQrSrb1fvzTMV8o3UdilJiuunyUwgZder+upWOZobUSvPvWHsvAUh9l
+         L/rx2pL9Pb2sk58XeWsTKw/0aQtfOas4zNk+Dy/wMig6rh4vhQkwdHqqYu8Af8ENw65L
+         ImRNxXCZU5kDX4gb/efN0PAtC59SNNGvDqRQqKdH7o8Ogg6qF1WAvLCSqswI9zX7RbVy
+         HzE1kWYye8/QOgLZPnwj9XhON/evjRa7gn4iH7VzvGMhT3wnLVW2dI2Eu+gXwddfrGuG
+         96qg62rWtInKC4pousM1024rMFcxdAeCujxMuz8O+SY9/XYimB7OWFDLq/l6wirGVCG2
+         vOvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678103845;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pPpIjkKFXmzX5D1Lt9KnLFbKezSVbVCSbxUA3anhA3E=;
-        b=Vl9NaTxNe22Y3/Z+Q4qcv5Ofykg8436nwRqq+KmigTtKoOi+kZrIPyIk09I1TXa2Iz
-         ctzeP+8WWNAwNmRtZrJ7ff4GfLW6jGMMrDbdotPopByTT9QVwPDVtaHuHmLEgxLHrAwX
-         Ki+7OGpmB2XfJeKg2obh7zlyJnU59i7Pvo1eSoptXcPyQU9hA6xXR7pcn+eJLv6RUnlU
-         jEM/em8mJKpdEJzoBb0Wpgxgq3JM4aeH5mOEA41abMe8tjFL7TrJbzFMPvpYFTUUHFbr
-         +Nf2mkhXlAZSaLzEHgXSDrjZle4EfMziv0Q1vRea5gWbf2R+HRaTBaYyZYzPWSGHj4zD
-         /uLg==
-X-Gm-Message-State: AO0yUKXeK82LoRmAd6nwwTc6oPH238dMpuZV9Ryh6FP1VE/CS8Nb4iRt
-        NZkW85EKh6/rhmQwNw2bAHzCYo7mHmQecgQKjbsgjXdRkwnlWCYBxptVJXyh3TWgF0tIpMPzuKL
-        P4zzT6JdvFSdy
-X-Received: by 2002:a05:6214:410d:b0:56e:b1e0:3ff2 with SMTP id kc13-20020a056214410d00b0056eb1e03ff2mr15201394qvb.9.1678103845435;
-        Mon, 06 Mar 2023 03:57:25 -0800 (PST)
-X-Google-Smtp-Source: AK7set9fZZTVv9FvGEcGdunZeC28/B+zMV+iRBJXM9Wbl6wp+Gpc50VQTGrmBz+6u9VcqXUQGM9WAg==
-X-Received: by 2002:a05:6214:410d:b0:56e:b1e0:3ff2 with SMTP id kc13-20020a056214410d00b0056eb1e03ff2mr15201363qvb.9.1678103845151;
-        Mon, 06 Mar 2023 03:57:25 -0800 (PST)
-Received: from sgarzare-redhat (host-82-57-51-170.retail.telecomitalia.it. [82.57.51.170])
-        by smtp.gmail.com with ESMTPSA id j2-20020a37b902000000b0074231ac1723sm7398083qkf.28.2023.03.06.03.57.22
+        d=1e100.net; s=20210112; t=1678104214;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EcYvXsX9BDvRsAMkLCutb/mxJegXnEsqufZwCKPPSWU=;
+        b=h3nxvCrVh1I96KTy1oQuarRkYp0r8Gi8r0JqRUUSJ/ICrLJ/3ILM3a2YuZwy5Jxu7E
+         yKb69RmfWGYOL+yKN/2Sv+Hx6zxYKIgiG+VF3EYVsgIpcS1CpOEQMq/GcnJGnmDLm5Xp
+         oqvTt4wuK3v4R5BhN9mmZcH9v93ui94cvITukrR6nFxLLOhj/DrT2cyQFNv6iHolwlIb
+         h2EXfP4NmGc55VXzEOw9iTsRs0yMJEKTKKMkpBQ4hzpkzjiEdnjViXr5fAjhIQONFxIF
+         3tzCJ0CoQaug9CT9Q3nJqsoFoMLdb6jZklJ8cAO0u/jL2RowvhU5l/Ole9aS1PvueEwD
+         MLfg==
+X-Gm-Message-State: AO0yUKW/aLbfJ1lhhgYk7JzivRTiLMNTN39mmj8swM9AGTdRi4JXmAlU
+        rEhNaPnGPOmx/OTZZjsC7MQmJg==
+X-Google-Smtp-Source: AK7set/SMvcl6mQs4rTalvjyKqpue8aSCFcZ3HosTUKZRyTEnmDacpQOF3E502WDSJmIO9yItsU/Hw==
+X-Received: by 2002:a5d:650d:0:b0:2bf:ae19:d8e4 with SMTP id x13-20020a5d650d000000b002bfae19d8e4mr6694975wru.16.1678104214045;
+        Mon, 06 Mar 2023 04:03:34 -0800 (PST)
+Received: from localhost.localdomain (cpc90948-gill19-2-0-cust524.20-1.cable.virginm.net. [81.105.82.13])
+        by smtp.gmail.com with ESMTPSA id k7-20020a05600c080700b003e21ba8684dsm10106959wmp.26.2023.03.06.04.03.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Mar 2023 03:57:24 -0800 (PST)
-Date:   Mon, 6 Mar 2023 12:57:18 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseniy Krasnov <avkrasnov@sberdevices.ru>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel@sberdevices.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v2 1/4] virtio/vsock: fix 'rx_bytes'/'fwd_cnt'
- calculation
-Message-ID: <20230306115718.2h7munjxd2royuzq@sgarzare-redhat>
-References: <a7ab414b-5e41-c7b6-250b-e8401f335859@sberdevices.ru>
- <4a3f3978-1093-4c0a-663f-28d77eeb0806@sberdevices.ru>
+        Mon, 06 Mar 2023 04:03:33 -0800 (PST)
+From:   Rajnesh Kanwal <rkanwal@rivosinc.com>
+To:     rkanwal@rivosinc.com, atishp@rivosinc.com
+Cc:     apatel@ventanamicro.com, kvm@vger.kernel.org,
+        alexandru.elisei@arm.com, will@kernel.org,
+        julien.thierry.kdev@gmail.com, maz@kernel.org,
+        andre.przywara@arm.com, jean-philippe@linaro.org
+Subject: [PATCH kvmtool 1/1] Add virtio-transport option and deprecate force-pci and virtio-legacy.
+Date:   Mon,  6 Mar 2023 12:03:29 +0000
+Message-Id: <20230306120329.535320-1-rkanwal@rivosinc.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <4a3f3978-1093-4c0a-663f-28d77eeb0806@sberdevices.ru>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -85,123 +69,189 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Mar 05, 2023 at 11:06:26PM +0300, Arseniy Krasnov wrote:
->Substraction of 'skb->len' is redundant here: 'skb_headroom()' is delta
->between 'data' and 'head' pointers, e.g. it is number of bytes returned
->to user (of course accounting size of header). 'skb->len' is number of
->bytes rest in buffer.
->
->Fixes: 71dc9ec9ac7d ("virtio/vsock: replace virtio_vsock_pkt with sk_buff")
->Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->---
-> net/vmw_vsock/virtio_transport_common.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
->
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index a1581c77cf84..2e2a773df5c1 100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -255,7 +255,7 @@ static void virtio_transport_dec_rx_pkt(struct virtio_vsock_sock *vvs,
-> {
-> 	int len;
->
->-	len = skb_headroom(skb) - sizeof(struct virtio_vsock_hdr) - skb->len;
->+	len = skb_headroom(skb) - sizeof(struct virtio_vsock_hdr);
+This is a follow-up patch for [0] which introduced --force-pci option
+for riscv. As per the discussion it was concluded to add virtio-tranport
+option taking in four options (pci, pci-legacy, mmio, mmio-legacy).
 
-IIUC virtio_transport_dec_rx_pkt() is always called after skb_pull(),
-so skb_headroom() is returning the amount of space we removed.
+With this change force-pci and virtio-legacy are both deprecated and
+arm's default transport changes from MMIO to PCI as agreed in [0].
+This is also true for riscv.
 
-Looking at the other patches in this series, I think maybe we should
-change virtio_transport_dec_rx_pkt() and virtio_transport_inc_rx_pkt()
-by passing the value to subtract or add directly.
-Since some times we don't remove the whole payload, so it would be
-better to call it with the value in hdr->len.
+Nothing changes for other architectures.
 
-I mean something like this (untested):
+[0]: https://lore.kernel.org/all/20230118172007.408667-1-rkanwal@rivosinc.com/
 
-index a1581c77cf84..9e69ae7a9a96 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -241,21 +241,18 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
-  }
+Signed-off-by: Rajnesh Kanwal <rkanwal@rivosinc.com>
+---
+ arm/include/arm-common/kvm-arch.h        |  5 ----
+ arm/include/arm-common/kvm-config-arch.h |  8 +++----
+ builtin-run.c                            | 11 +++++++--
+ include/kvm/kvm-config.h                 |  2 +-
+ include/kvm/kvm.h                        |  6 +----
+ include/kvm/virtio.h                     |  2 ++
+ riscv/include/kvm/kvm-arch.h             |  3 ---
+ virtio/core.c                            | 29 ++++++++++++++++++++++++
+ 8 files changed, 46 insertions(+), 20 deletions(-)
 
-  static bool virtio_transport_inc_rx_pkt(struct virtio_vsock_sock *vvs,
--                                       struct sk_buff *skb)
-+                                       u32 len)
-  {
--       if (vvs->rx_bytes + skb->len > vvs->buf_alloc)
-+       if (vvs->rx_bytes + len > vvs->buf_alloc)
-                 return false;
-
--       vvs->rx_bytes += skb->len;
-+       vvs->rx_bytes += len;
-         return true;
-  }
-
-  static void virtio_transport_dec_rx_pkt(struct virtio_vsock_sock *vvs,
--                                       struct sk_buff *skb)
-+                                       u32 len)
-  {
--       int len;
+diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
+index b2ae373..60eec02 100644
+--- a/arm/include/arm-common/kvm-arch.h
++++ b/arm/include/arm-common/kvm-arch.h
+@@ -80,11 +80,6 @@
+ 
+ #define KVM_VM_TYPE		0
+ 
+-#define VIRTIO_DEFAULT_TRANS(kvm)					\
+-	((kvm)->cfg.arch.virtio_trans_pci ?				\
+-	 ((kvm)->cfg.virtio_legacy ? VIRTIO_PCI_LEGACY : VIRTIO_PCI) :	\
+-	 ((kvm)->cfg.virtio_legacy ? VIRTIO_MMIO_LEGACY : VIRTIO_MMIO))
 -
--       len = skb_headroom(skb) - sizeof(struct virtio_vsock_hdr) - skb->len;
-         vvs->rx_bytes -= len;
-         vvs->fwd_cnt += len;
-  }
-@@ -388,7 +385,7 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
-                 skb_pull(skb, bytes);
-
-                 if (skb->len == 0) {
--                       virtio_transport_dec_rx_pkt(vvs, skb);
-+                       virtio_transport_dec_rx_pkt(vvs, bytes);
-                         consume_skb(skb);
-                 } else {
-                         __skb_queue_head(&vvs->rx_queue, skb);
-@@ -437,17 +434,17 @@ static int virtio_transport_seqpacket_do_dequeue(struct vsock_sock *vsk,
-
-         while (!msg_ready) {
-                 struct virtio_vsock_hdr *hdr;
-+               size_t pkt_len;
-
-                 skb = __skb_dequeue(&vvs->rx_queue);
-                 if (!skb)
-                         break;
-                 hdr = virtio_vsock_hdr(skb);
-+               pkt_len = (size_t)le32_to_cpu(hdr->len);
-
-                 if (dequeued_len >= 0) {
--                       size_t pkt_len;
-                         size_t bytes_to_copy;
-
--                       pkt_len = (size_t)le32_to_cpu(hdr->len);
-                         bytes_to_copy = min(user_buf_len, pkt_len);
-
-                         if (bytes_to_copy) {
-@@ -484,7 +481,7 @@ static int virtio_transport_seqpacket_do_dequeue(struct vsock_sock *vsk,
-                                 msg->msg_flags |= MSG_EOR;
-                 }
-
--               virtio_transport_dec_rx_pkt(vvs, skb);
-+               virtio_transport_dec_rx_pkt(vvs, pkt_len);
-                 kfree_skb(skb);
-         }
-
-@@ -1040,7 +1037,7 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
-
-         spin_lock_bh(&vvs->rx_lock);
-
--       can_enqueue = virtio_transport_inc_rx_pkt(vvs, skb);
-+       can_enqueue = virtio_transport_inc_rx_pkt(vvs, len);
-         if (!can_enqueue) {
-                 free_pkt = true;
-                 goto out;
-
-When we used vsock_pkt, we were passing the structure because the `len`
-field was immutable (and copied from the header), whereas with skb it
-can change and so we introduced these errors.
-
-What do you think?
-
-Thanks,
-Stefano
+ #define VIRTIO_RING_ENDIAN	(VIRTIO_ENDIAN_LE | VIRTIO_ENDIAN_BE)
+ 
+ #define ARCH_HAS_PCI_EXP	1
+diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
+index 9949bfe..2e620fd 100644
+--- a/arm/include/arm-common/kvm-config-arch.h
++++ b/arm/include/arm-common/kvm-config-arch.h
+@@ -7,7 +7,6 @@ struct kvm_config_arch {
+ 	const char	*dump_dtb_filename;
+ 	const char	*vcpu_affinity;
+ 	unsigned int	force_cntfrq;
+-	bool		virtio_trans_pci;
+ 	bool		aarch32_guest;
+ 	bool		has_pmuv3;
+ 	bool		mte_disabled;
+@@ -28,9 +27,10 @@ int irqchip_parser(const struct option *opt, const char *arg, int unset);
+ 		     "Specify Generic Timer frequency in guest DT to "		\
+ 		     "work around buggy secure firmware *Firmware should be "	\
+ 		     "updated to program CNTFRQ correctly*"),			\
+-	OPT_BOOLEAN('\0', "force-pci", &(cfg)->virtio_trans_pci,		\
+-		    "Force virtio devices to use PCI as their default "		\
+-		    "transport"),						\
++	OPT_CALLBACK_NOOPT('\0', "force-pci", NULL, '\0',			\
++			   "Force virtio devices to use PCI as their default "	\
++			   "transport [Deprecated: Use --virtio-transport "	\
++			   "option instead]", virtio_tranport_parser, kvm),	\
+         OPT_CALLBACK('\0', "irqchip", &(cfg)->irqchip,				\
+ 		     "[gicv2|gicv2m|gicv3|gicv3-its]",				\
+ 		     "Type of interrupt controller to emulate in the guest",	\
+diff --git a/builtin-run.c b/builtin-run.c
+index bb7e6e8..50e8796 100644
+--- a/builtin-run.c
++++ b/builtin-run.c
+@@ -200,8 +200,15 @@ static int mem_parser(const struct option *opt, const char *arg, int unset)
+ 			" rootfs"),					\
+ 	OPT_STRING('\0', "hugetlbfs", &(cfg)->hugetlbfs_path, "path",	\
+ 			"Hugetlbfs path"),				\
+-	OPT_BOOLEAN('\0', "virtio-legacy", &(cfg)->virtio_legacy,	\
+-		    "Use legacy virtio transport"),			\
++	OPT_CALLBACK_NOOPT('\0', "virtio-legacy",			\
++			   &(cfg)->virtio_transport, '\0',		\
++			   "Use legacy virtio transport [Deprecated:"	\
++			   " Use --virtio-transport option instead]",	\
++			   virtio_tranport_parser, NULL),		\
++	OPT_CALLBACK('\0', "virtio-transport", &(cfg)->virtio_transport,\
++		     "[pci|pci-legacy|mmio|mmio-legacy]",		\
++		     "Type of virtio transport",			\
++		     virtio_tranport_parser, NULL),			\
+ 									\
+ 	OPT_GROUP("Kernel options:"),					\
+ 	OPT_STRING('k', "kernel", &(cfg)->kernel_filename, "kernel",	\
+diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
+index 368e6c7..592b035 100644
+--- a/include/kvm/kvm-config.h
++++ b/include/kvm/kvm-config.h
+@@ -64,7 +64,7 @@ struct kvm_config {
+ 	bool no_dhcp;
+ 	bool ioport_debug;
+ 	bool mmio_debug;
+-	bool virtio_legacy;
++	int virtio_transport;
+ };
+ 
+ #endif
+diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
+index 3872dc6..7015def 100644
+--- a/include/kvm/kvm.h
++++ b/include/kvm/kvm.h
+@@ -45,11 +45,7 @@ struct kvm_cpu;
+ typedef void (*mmio_handler_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data,
+ 				u32 len, u8 is_write, void *ptr);
+ 
+-/* Archs can override this in kvm-arch.h */
+-#ifndef VIRTIO_DEFAULT_TRANS
+-#define VIRTIO_DEFAULT_TRANS(kvm) \
+-	((kvm)->cfg.virtio_legacy ? VIRTIO_PCI_LEGACY : VIRTIO_PCI)
+-#endif
++#define VIRTIO_DEFAULT_TRANS(kvm) (kvm)->cfg.virtio_transport
+ 
+ enum {
+ 	KVM_VMSTATE_RUNNING,
+diff --git a/include/kvm/virtio.h b/include/kvm/virtio.h
+index 94bddef..4a733f5 100644
+--- a/include/kvm/virtio.h
++++ b/include/kvm/virtio.h
+@@ -248,4 +248,6 @@ void virtio_set_guest_features(struct kvm *kvm, struct virtio_device *vdev,
+ void virtio_notify_status(struct kvm *kvm, struct virtio_device *vdev,
+ 			  void *dev, u8 status);
+ 
++int virtio_tranport_parser(const struct option *opt, const char *arg, int unset);
++
+ #endif /* KVM__VIRTIO_H */
+diff --git a/riscv/include/kvm/kvm-arch.h b/riscv/include/kvm/kvm-arch.h
+index 1e130f5..4106099 100644
+--- a/riscv/include/kvm/kvm-arch.h
++++ b/riscv/include/kvm/kvm-arch.h
+@@ -46,9 +46,6 @@
+ 
+ #define KVM_VM_TYPE		0
+ 
+-#define VIRTIO_DEFAULT_TRANS(kvm) \
+-	((kvm)->cfg.virtio_legacy ? VIRTIO_MMIO_LEGACY : VIRTIO_MMIO)
+-
+ #define VIRTIO_RING_ENDIAN	VIRTIO_ENDIAN_LE
+ 
+ #define ARCH_HAS_PCI_EXP	1
+diff --git a/virtio/core.c b/virtio/core.c
+index ea0e5b6..4b863c7 100644
+--- a/virtio/core.c
++++ b/virtio/core.c
+@@ -21,6 +21,35 @@ const char* virtio_trans_name(enum virtio_trans trans)
+ 	return "unknown";
+ }
+ 
++int virtio_tranport_parser(const struct option *opt, const char *arg, int unset)
++{
++	enum virtio_trans *type = opt->value;
++
++	if (!strcmp(opt->long_name, "virtio-transport")) {
++		if (!strcmp(arg, "pci")) {
++			*type = VIRTIO_PCI;
++		} else if (!strcmp(arg, "pci-legacy")) {
++			*type = VIRTIO_PCI_LEGACY;
++#if defined(CONFIG_ARM) || defined(CONFIG_ARM64) || defined(CONFIG_RISCV)
++		} else if (!strcmp(arg, "mmio")) {
++			*type = VIRTIO_MMIO;
++		} else if (!strcmp(arg, "mmio-legacy")) {
++			*type = VIRTIO_MMIO_LEGACY;
++#endif
++		} else {
++			pr_err("virtio-transport: unknown type \"%s\"\n", arg);
++			return -1;
++		}
++	} else if (!strcmp(opt->long_name, "virtio-legacy")) {
++		*type = VIRTIO_PCI_LEGACY;
++	} else if (!strcmp(opt->long_name, "force-pci")) {
++		struct kvm *kvm = opt->ptr;
++		kvm->cfg.virtio_transport = VIRTIO_PCI;
++	}
++
++	return 0;
++}
++
+ void virt_queue__used_idx_advance(struct virt_queue *queue, u16 jump)
+ {
+ 	u16 idx = virtio_guest_to_host_u16(queue, queue->vring.used->idx);
+-- 
+2.25.1
 
