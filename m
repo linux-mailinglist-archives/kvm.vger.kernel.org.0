@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 47BA26AD1D0
+	by mail.lfdr.de (Postfix) with ESMTP id 9E3E96AD1D1
 	for <lists+kvm@lfdr.de>; Mon,  6 Mar 2023 23:41:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230161AbjCFWlv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Mar 2023 17:41:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43170 "EHLO
+        id S229806AbjCFWly (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Mar 2023 17:41:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230127AbjCFWlp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Mar 2023 17:41:45 -0500
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37ED474337
-        for <kvm@vger.kernel.org>; Mon,  6 Mar 2023 14:41:42 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id la3-20020a170902fa0300b0019ca5ddecedso6597923plb.1
-        for <kvm@vger.kernel.org>; Mon, 06 Mar 2023 14:41:42 -0800 (PST)
+        with ESMTP id S229662AbjCFWlr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Mar 2023 17:41:47 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DDAD78CAC
+        for <kvm@vger.kernel.org>; Mon,  6 Mar 2023 14:41:43 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id fa21-20020a17090af0d500b00237b14b60a4so2983366pjb.6
+        for <kvm@vger.kernel.org>; Mon, 06 Mar 2023 14:41:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678142501;
+        d=google.com; s=20210112; t=1678142503;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IgIlDEBO3hBgEG9gel6dE65YzklyZJEz6k7NHt2Zk6M=;
-        b=aAvXgQFxXMRp/VPlQA8gq3OEIOGeRr56iAvWaFd6sstiqZr0Zawx9Z398mOWpF+2Ud
-         GRTkoNY101GNHpcTsMf0UfKI6VXc6fyrnLm4lp1Mr1+l2xUTwzVYOFZD6AH+npaWkXzm
-         3aVgO3L1QbuLnMYJtuEMmhi+TIf8Ef0zRZKrntMy8bqSdfKHIRSIFPaOHuXUUgXVwfua
-         5uIafCmWgGLxcKgUBnymT+gLziBpdLr/rAyCowZavzGge+VcmZ+PgnXdiVSwS4iOFcqu
-         R4/QgcOIHxCYrTIQfho49OhRUXfgBwI5UoNN71e76zPwkKJ6vOhW5ITrJRul8rrZFSQ/
-         AtOA==
+        bh=ntsWJChvbXfy8t9EA+eQUOa7LNpcvZXYoCa+kOc7Xxo=;
+        b=QE3wGxcpDkwXukGXapdK3z5AcvymfM9fTDSInE4aMcqqqhApqI13rGs3g8WKQUaPS/
+         zZ6kNb4R7uz/pdmbRfaqJcYVYuRq+bQgvKsN86OU0tlFIWLibxnJpuqg0yKTzMCyuR1X
+         pL28Sm386yDPzPua4c49qPfANPTKuZn9aWIUurbKMbZucDPpluT8Syfvw708TGu5WMO0
+         hjDTHUxu7yWc5s4/oRuSPQU74v9qCJL0SWCVXIoKKH6qhy3+hgUFKF39UdJnzPCFwNtA
+         PsAmluDoVGVvbeYF4h5LW3dAFwVLGK0yDNSdG3miH//Ijl6QzEc9pgGGk9eEMrDtuikC
+         CFZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678142501;
+        d=1e100.net; s=20210112; t=1678142503;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IgIlDEBO3hBgEG9gel6dE65YzklyZJEz6k7NHt2Zk6M=;
-        b=3fq0IPaxHJjPCcRg09JzJIkC6l1J/6okDuxzs8dQdksIYvAumWyn836w+dLe9tHvU2
-         3vnVv4CTSiHh8CFrbzOaxNdDcVWylH7MCBk3CgicNtdFdF0wvZXfImyRwtXTPGBIQGFS
-         k881m6StLV46d76MJBipKtggY4cd27ORp3mcbOLSRk/kCS1czi4yhErU+lo9qh6tKMPr
-         mMkaP4xiXV1vG5pa/cPR8Ois0eF+4f/btWb/EZOMqitTge0jRmvP8n27TjK6WC4T2A66
-         LStwnxOqjTiVtM1yj9N/8zeHDbiNgXf34W2JWEzELckv4WugFi5MC+djCRe6VKnF38EY
-         wf0A==
-X-Gm-Message-State: AO0yUKUS9517zjyHjDnh/ATb2akDA4tQjO0A7gYWWLWQevfw7Ya/e67c
-        yiyK5LL8zrlEMV4SR7adezhtsjkX0ZPX
-X-Google-Smtp-Source: AK7set/En9Q/8v9ziiTVNBNjcULdErMB0XNxJpifIOtjunDo7/A+/RXyjrxTrsbzR235Afaol2oomqlvrqIZ
+        bh=ntsWJChvbXfy8t9EA+eQUOa7LNpcvZXYoCa+kOc7Xxo=;
+        b=dlckyA6VP5z6KgjdArV4R/9aLIUCgoFaCqlKIYU+xu3QFoQHu6mEaMXVSX/24ojm4p
+         53dAojxzKUVPpMhu8mNhFTs6+fty3mrfD7FG52n3KMh/I9HxEqCicoIF+MsUmw01xRJT
+         gm319LwN+IqDZM8//RV5RhwJ4jFhYqKHckJvVkLwUyWrEd5Gj0PPQRSEdIx0YI+xdzRg
+         Mjtogo8aGQvVcDmmBUjP8eJRPFDAnif1ZTn0sB6u9tF9kxg8eH+FN1ZgjHKdqQggcvLw
+         aTkS9j9Y9WjOfIEqCBXphukbtmQrflDhZzogxSGPBvIkq5NSYFzkLLoF8giJveuzMQD0
+         /BEQ==
+X-Gm-Message-State: AO0yUKU8hY8fM9h3jtiqnUiCKTZJj3oMxJ6bDO84FZSkd3eh31fNj7Q0
+        Y/4tyQqDLmPrc/BA7royblAvQDV8DDkT
+X-Google-Smtp-Source: AK7set+ZI2aBqjIrxBqymLM25KRuDPXvrPAuiXEE5P98Cs7Ib72ELWHQ9A1FvjqxxCOH6L09ow62WHf25Ci6
 X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
- (user=vipinsh job=sendgmr) by 2002:a17:903:449:b0:19a:87dd:9206 with SMTP id
- iw9-20020a170903044900b0019a87dd9206mr4869867plb.0.1678142501654; Mon, 06 Mar
- 2023 14:41:41 -0800 (PST)
-Date:   Mon,  6 Mar 2023 14:41:13 -0800
+ (user=vipinsh job=sendgmr) by 2002:a63:7e11:0:b0:503:913f:77b9 with SMTP id
+ z17-20020a637e11000000b00503913f77b9mr4352737pgc.6.1678142503145; Mon, 06 Mar
+ 2023 14:41:43 -0800 (PST)
+Date:   Mon,  6 Mar 2023 14:41:14 -0800
 In-Reply-To: <20230306224127.1689967-1-vipinsh@google.com>
 Mime-Version: 1.0
 References: <20230306224127.1689967-1-vipinsh@google.com>
 X-Mailer: git-send-email 2.40.0.rc0.216.gc4246ad0f0-goog
-Message-ID: <20230306224127.1689967-5-vipinsh@google.com>
-Subject: [Patch v4 04/18] KVM: x86/mmu: Shrink shadow page caches via MMU shrinker
+Message-ID: <20230306224127.1689967-6-vipinsh@google.com>
+Subject: [Patch v4 05/18] KVM: x86/mmu: Add split_shadow_page_cache pages to
+ global count of MMU cache pages
 From:   Vipin Sharma <vipinsh@google.com>
 To:     seanjc@google.com, pbonzini@redhat.com, bgardon@google.com,
         dmatlack@google.com
@@ -60,7 +61,7 @@ Cc:     jmattson@google.com, mizhang@google.com, kvm@vger.kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,125 +69,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Shrink shadow page caches via MMU shrinker based on
-kvm_total_unused_cached_pages. Traverse each vCPU of all of the VMs,
-empty the caches and exit the shrinker when sufficient number of pages
-have been freed. Also, move processed VMs to the end of vm_list so that
-next time other VMs are tortured first.
+Add pages in split_shadow_page_cache to the global counter
+kvm_total_unused_cached_pages. These pages will be freed by MMU shrinker
+in future commit.
 
 Signed-off-by: Vipin Sharma <vipinsh@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c   | 55 +++++++++++++++++++++++++++++++++++-----
- include/linux/kvm_host.h |  1 +
- virt/kvm/kvm_main.c      |  6 ++++-
- 3 files changed, 54 insertions(+), 8 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 13f41b7ac280..df8dcb7e5de7 100644
+index df8dcb7e5de7..0ebb8a2eaf47 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -6693,16 +6693,57 @@ void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen)
- 	}
- }
- 
--static unsigned long
--mmu_shrink_scan(struct shrinker *shrink, struct shrink_control *sc)
--{
--	return SHRINK_STOP;
-+static unsigned long mmu_shrink_scan(struct shrinker *shrink,
-+				     struct shrink_control *sc)
-+{
-+	struct kvm *kvm, *next_kvm, *first_kvm = NULL;
-+	struct kvm_mmu_memory_cache *cache;
-+	unsigned long i, freed = 0;
-+	struct mutex *cache_lock;
-+	struct kvm_vcpu *vcpu;
-+
-+	mutex_lock(&kvm_lock);
-+	list_for_each_entry_safe(kvm, next_kvm, &vm_list, vm_list) {
-+		if (first_kvm == kvm)
-+			break;
-+
-+		if (!first_kvm)
-+			first_kvm = kvm;
-+
-+		list_move_tail(&kvm->vm_list, &vm_list);
-+
-+		kvm_for_each_vcpu(i, vcpu, kvm) {
-+			cache = &vcpu->arch.mmu_shadow_page_cache;
-+			cache_lock = &vcpu->arch.mmu_shadow_page_cache_lock;
-+			if (mutex_trylock(cache_lock)) {
-+				if (cache->nobjs) {
-+					freed += cache->nobjs;
-+					kvm_mmu_empty_memory_cache(cache);
-+				}
-+				mutex_unlock(cache_lock);
-+				if (freed >= sc->nr_to_scan)
-+					goto out;
-+			}
-+		}
-+	}
-+out:
-+	mutex_unlock(&kvm_lock);
-+	if (freed) {
-+		percpu_counter_sub(&kvm_total_unused_cached_pages, freed);
-+		return freed;
-+	} else {
-+		return SHRINK_STOP;
-+	}
- }
- 
--static unsigned long
--mmu_shrink_count(struct shrinker *shrink, struct shrink_control *sc)
-+static unsigned long mmu_shrink_count(struct shrinker *shrink,
-+				      struct shrink_control *sc)
+@@ -6149,7 +6149,9 @@ static void mmu_free_vm_memory_caches(struct kvm *kvm)
  {
--	return SHRINK_EMPTY;
-+	s64 count = percpu_counter_sum(&kvm_total_unused_cached_pages);
-+
-+	WARN_ON(count < 0);
-+	return count <= 0 ? SHRINK_EMPTY : count;
-+
+ 	kvm_mmu_free_memory_cache(&kvm->arch.split_desc_cache);
+ 	kvm_mmu_free_memory_cache(&kvm->arch.split_page_header_cache);
+-	kvm_mmu_free_memory_cache(&kvm->arch.split_shadow_page_cache);
++	mutex_lock(&kvm->slots_lock);
++	mmu_free_sp_memory_cache(&kvm->arch.split_shadow_page_cache);
++	mutex_unlock(&kvm->slots_lock);
  }
  
- static struct shrinker mmu_shrinker = {
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 8ada23756b0e..5cfa42c130e0 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1361,6 +1361,7 @@ void kvm_flush_remote_tlbs(struct kvm *kvm);
- int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min);
- int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity, int min);
- int kvm_mmu_memory_cache_nr_free_objects(struct kvm_mmu_memory_cache *mc);
-+void kvm_mmu_empty_memory_cache(struct kvm_mmu_memory_cache *mc);
- void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc);
- void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
- #endif
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index d255964ec331..536d8ab6e61f 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -430,7 +430,7 @@ int kvm_mmu_memory_cache_nr_free_objects(struct kvm_mmu_memory_cache *mc)
- 	return mc->nobjs;
+ void kvm_mmu_uninit_vm(struct kvm *kvm)
+@@ -6303,7 +6305,7 @@ static int topup_split_caches(struct kvm *kvm)
+ 	if (r)
+ 		return r;
+ 
+-	return kvm_mmu_topup_memory_cache(&kvm->arch.split_shadow_page_cache, 1);
++	return mmu_topup_sp_memory_cache(&kvm->arch.split_shadow_page_cache, 1);
  }
  
--void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc)
-+void kvm_mmu_empty_memory_cache(struct kvm_mmu_memory_cache *mc)
- {
- 	while (mc->nobjs) {
- 		if (mc->kmem_cache)
-@@ -438,7 +438,11 @@ void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc)
- 		else
- 			free_page((unsigned long)mc->objects[--mc->nobjs]);
- 	}
-+}
+ static struct kvm_mmu_page *shadow_mmu_get_sp_for_split(struct kvm *kvm, u64 *huge_sptep)
+@@ -6328,6 +6330,7 @@ static struct kvm_mmu_page *shadow_mmu_get_sp_for_split(struct kvm *kvm, u64 *hu
+ 	/* Direct SPs do not require a shadowed_info_cache. */
+ 	caches.page_header_cache = &kvm->arch.split_page_header_cache;
+ 	caches.shadow_page_cache = &kvm->arch.split_shadow_page_cache;
++	caches.count_shadow_page_allocation = true;
  
-+void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc)
-+{
-+	kvm_mmu_empty_memory_cache(mc);
- 	kvfree(mc->objects);
- 
- 	mc->objects = NULL;
+ 	/* Safe to pass NULL for vCPU since requesting a direct SP. */
+ 	return __kvm_mmu_get_shadow_page(kvm, NULL, &caches, gfn, role);
 -- 
 2.40.0.rc0.216.gc4246ad0f0-goog
 
