@@ -2,85 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6CEFD6AC815
-	for <lists+kvm@lfdr.de>; Mon,  6 Mar 2023 17:34:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 260A56ACB1B
+	for <lists+kvm@lfdr.de>; Mon,  6 Mar 2023 18:46:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229876AbjCFQel (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Mar 2023 11:34:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44712 "EHLO
+        id S230097AbjCFRqe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Mar 2023 12:46:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229905AbjCFQe2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Mar 2023 11:34:28 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF47E2BF3A
-        for <kvm@vger.kernel.org>; Mon,  6 Mar 2023 08:33:14 -0800 (PST)
+        with ESMTP id S230421AbjCFRqH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Mar 2023 12:46:07 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73F873A86E
+        for <kvm@vger.kernel.org>; Mon,  6 Mar 2023 09:44:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678120329;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=d9yibYb7BiHv8VUJHHc1xSbchMTl79O8SC4SNRlYdVk=;
-        b=KBhXDVn0tSbL/YMaQZXQ3Vx/xPm6R7TcJBjbE79q9QsORCaphuszs0TAJeXoEvtjVN1NNJ
-        M0oUWSS2hatXLTZjvV3oSmjAaPhgCCN9keiLDe7sURNCTLA2Y2AAWSKHqRpgCCwAQ6Jucw
-        Ra9apprznC61jG0WwyH1t/OElPhPFJQ=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+        s=mimecast20190719; t=1678124641;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:mime-version:mime-version:
+         content-type:content-type:  content-transfer-encoding:content-transfer-encoding;
+        bh=DYFP8HuE+yaNzeKTTTVNqRqJhb/S7jiZ0JcSofqiuRU=;
+        b=SWZGs8hZcuaA4NGlSEfcJqgq/4yWaWqSQgpMqPGtCN7qa1zx3Eq3jnBkswJdJ3tX53e9Gd
+        jp78EB4Al2mcsRD72VIqZJbnOLmYdqW8K622eJUP8A2yGdxMvwPJ7GzyroPZ43lwnvGFR9
+        FyBOkc2gBuwzVILDGqbrOJ39SXE3b1s=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-529-wdkAapH0MNumTWP3k3AI5Q-1; Mon, 06 Mar 2023 11:18:57 -0500
-X-MC-Unique: wdkAapH0MNumTWP3k3AI5Q-1
-Received: by mail-qk1-f200.google.com with SMTP id d72-20020ae9ef4b000000b0072db6346c39so5664726qkg.16
-        for <kvm@vger.kernel.org>; Mon, 06 Mar 2023 08:18:57 -0800 (PST)
+ us-mta-669-JlHvj7k9O5ynLltc-wr4UQ-1; Mon, 06 Mar 2023 11:29:39 -0500
+X-MC-Unique: JlHvj7k9O5ynLltc-wr4UQ-1
+Received: by mail-ed1-f71.google.com with SMTP id ec11-20020a0564020d4b00b004e2cb85c8bcso5556374edb.16
+        for <kvm@vger.kernel.org>; Mon, 06 Mar 2023 08:29:38 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678119537;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d9yibYb7BiHv8VUJHHc1xSbchMTl79O8SC4SNRlYdVk=;
-        b=NBn0uGSb5vygIJJGnZSyxlQAO0WR1mNz46JUdycyt1zTnFzHf8oENRnrt6LmMSH+lj
-         8UYMppBfJ5DgkLs8eXO6vSAI3fhmOn3i5bq7V/gqJmKRb3fUAPY1zQLE0WgHZdIn+C3G
-         as2xE/h7LsSBgyLGi4rWjCms2BFu/RANbDQqEz7YjBz7xNUu7+B2mVgmlT5zxaFq3Ny2
-         RqbeNpXtMFns3/+P7i7or6U+a66Jdj1nFlp1HXqsEUx9lcI4k0PAHVnuGOKLckbKXqGs
-         mCMTxuyvluizoRWcfQTxUjDxeHZKs6sGnNOIZbEWZVYJl+4E88m6qVpLYecRCzRlILAk
-         C+jg==
-X-Gm-Message-State: AO0yUKV9B5X9H8Vo6wD1qhRPmbWyNT7AZtouw3Hef4rp1goFVO/aL2pg
-        Zmu+B3xlIAL53LElhm3x6WbRHviWTo9vwUPE+q975pxbqWqH10QOyL41J/x7BKC0pPoWjVnwSZp
-        z715HZATZJV8n
-X-Received: by 2002:ac8:57c4:0:b0:3bf:c7ac:37e4 with SMTP id w4-20020ac857c4000000b003bfc7ac37e4mr21646900qta.53.1678119536885;
-        Mon, 06 Mar 2023 08:18:56 -0800 (PST)
-X-Google-Smtp-Source: AK7set8J4YE/RXJjUhe6KmcGADN++XZIQZ5a1lW56p6P5SGInNCKdizbMZ77Gy1LukOOT+Xou8kNBQ==
-X-Received: by 2002:ac8:57c4:0:b0:3bf:c7ac:37e4 with SMTP id w4-20020ac857c4000000b003bfc7ac37e4mr21646869qta.53.1678119536628;
-        Mon, 06 Mar 2023 08:18:56 -0800 (PST)
-Received: from sgarzare-redhat (host-82-57-51-170.retail.telecomitalia.it. [82.57.51.170])
-        by smtp.gmail.com with ESMTPSA id l5-20020ac87245000000b003b9a426d626sm7744060qtp.22.2023.03.06.08.18.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Mar 2023 08:18:56 -0800 (PST)
-Date:   Mon, 6 Mar 2023 17:18:52 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseniy Krasnov <avkrasnov@sberdevices.ru>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel@sberdevices.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v2 2/4] virtio/vsock: remove all data from sk_buff
-Message-ID: <20230306161852.4s7qf4qm3fnwjck7@sgarzare-redhat>
-References: <a7ab414b-5e41-c7b6-250b-e8401f335859@sberdevices.ru>
- <dfadea17-a91e-105f-c213-a73f9731c8bd@sberdevices.ru>
- <20230306120857.6flftb3fftmsceyl@sgarzare-redhat>
- <b18e3b13-3386-e9ee-c817-59588e6d5fb6@sberdevices.ru>
- <20230306155121.7xwxzgxtle7qjbnc@sgarzare-redhat>
- <9b882d45-3d9d-c44d-a172-f23fff54962b@sberdevices.ru>
+        d=1e100.net; s=20210112; t=1678120177;
+        h=content-transfer-encoding:subject:reply-to:from:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=DYFP8HuE+yaNzeKTTTVNqRqJhb/S7jiZ0JcSofqiuRU=;
+        b=YMkhi+QBEe1pMmFqSOyivZ1gxeefQtL25yAL6LAVw/mv8Ui5vHcCrspogYrEiLvUb+
+         QX1/rgTcT+K0MuxJQGIsIo2L0l1YSC/YCpbaaipp2f7LLw+PI+Mc0wp4vcqghuDl42Vh
+         fNKctZl4ZU8xqJ26GGccgr/eYxt4YgTfKWSmgk4hJkY+OiQLX36+ZIYw9Kam5jN5M5lV
+         oFzD9Q1ksosxSPI0qmy61SnxUnsuVSgPRWKmm4m/CIDA6IDaqDxT8y5HkV8Yo3WKaMqi
+         jw+31uptAWMsAZtWFlgYlML8PVk4P6e9348G8GVEia/4PHI/plBdJ5nCNlCsofbYNZHM
+         n+Ow==
+X-Gm-Message-State: AO0yUKWM5Y0uwINi0xupqyp9QFUqpICF/WXjM9HHYqQWZS/AZnv6bxS4
+        G3qL2R+oe8vO4gQgh+Ajj0z1yjIp+Gq7hoWhf13UheLcE6MbshBOB/SWih0QiF4fL9VA+pOwhhw
+        Zwx9Yl3LbVc36
+X-Received: by 2002:a17:906:da89:b0:8b1:7de6:e292 with SMTP id xh9-20020a170906da8900b008b17de6e292mr14890419ejb.9.1678120177372;
+        Mon, 06 Mar 2023 08:29:37 -0800 (PST)
+X-Google-Smtp-Source: AK7set/wyuFHbxDX/+lcHjnLlx2Nkm7CeI7Shdjq4qxCXPT/2t+nGQRlBbeQ12jrS6iK7BAuPFccfg==
+X-Received: by 2002:a17:906:da89:b0:8b1:7de6:e292 with SMTP id xh9-20020a170906da8900b008b17de6e292mr14890395ejb.9.1678120177010;
+        Mon, 06 Mar 2023 08:29:37 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id fx14-20020a1709069e8e00b008e56a0d546csm4734899ejc.123.2023.03.06.08.29.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 06 Mar 2023 08:29:36 -0800 (PST)
+Message-ID: <52e4dfe2-128e-2a1a-b627-6aceebfbb5b0@redhat.com>
+Date:   Mon, 6 Mar 2023 17:29:35 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <9b882d45-3d9d-c44d-a172-f23fff54962b@sberdevices.ru>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Content-Language: en-US
+To:     qemu-devel <qemu-devel@nongnu.org>, KVM list <kvm@vger.kernel.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Reply-To: "kvm-forum-2023-pc@redhat.com" <kvm-forum-2023-pc@redhat.com>
+Subject: KVM Forum 2023: Call for presentations
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -88,54 +76,108 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 06, 2023 at 07:00:10PM +0300, Arseniy Krasnov wrote:
->
->
->On 06.03.2023 18:51, Stefano Garzarella wrote:
->> On Mon, Mar 06, 2023 at 06:31:22PM +0300, Arseniy Krasnov wrote:
->>>
->>>
->>> On 06.03.2023 15:08, Stefano Garzarella wrote:
->>>> On Sun, Mar 05, 2023 at 11:07:37PM +0300, Arseniy Krasnov wrote:
->>>>> In case of SOCK_SEQPACKET all sk_buffs are used once - after read some
->>>>> data from it, it will be removed, so user will never read rest of the
->>>>> data. Thus we need to update credit parameters of the socket like whole
->>>>> sk_buff is read - so call 'skb_pull()' for the whole buffer.
->>>>>
->>>>> Fixes: 71dc9ec9ac7d ("virtio/vsock: replace virtio_vsock_pkt with sk_buff")
->>>>> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->>>>> ---
->>>>> net/vmw_vsock/virtio_transport_common.c | 2 +-
->>>>> 1 file changed, 1 insertion(+), 1 deletion(-)
->>>>
->>>> Maybe we could avoid this patch if we directly use pkt_len as I
->>>> suggested in the previous patch.
->>> Hm, may be we can avoid calling 'skb_pull()' here if 'virtio_transport_dec_rx_pkt()'
->>> will use integer argument?
->>
->> Yep, exactly!
->>
->>> Just call 'virtio_transport_dec_rx_pkt(skb->len)'. skb
->>
->> It depends on how we call virtio_transport_inc_rx_pkt(). If we use
->> hdr->len there I would use the same to avoid confusion. Plus that's the
->> value the other peer sent us, so definitely the right value to increase
->> fwd_cnt with. But if skb->len always reflects it, then that's fine.
->i've checked 'virtio_transport_rx_work()', it calls 'virtio_vsock_skb_rx_put()' which
->sets 'skb->len'. Value is used from header, so seems 'skb->len' == 'hdr->len' in this
->case.
+###########################
+KVM Forum 2023
+June 14-15, 2023
+Brno, Czech Republic
+https://kvm-forum.qemu.org/
+###########################
 
-Thank you for checking it.
+KVM Forum is an annual event that presents a rare opportunity for 
+developers and users to discuss the state of Linux virtualization 
+technology and plan for the challenges ahead. Sessions include updates 
+on the state of the KVM virtualization stack, planning for the future, 
+and many opportunities for attendees to collaborate.
 
-However, I still think it is better to use `hdr->len` (we have to assign 
-it to `pkt_len` anyway, as in the proposal I sent for patch 1), 
-otherwise we have to go every time to check if skb_* functions touch 
-skb->len.
+This year's event will be held in Brno, Czech Republic on June 14-15, 
+2023.  It will be in-person only and will be held right before the 
+DevConf.CZ open source community conference.
 
-E.g. skb_pull() decrease skb->len, so I'm not sure we can call 
-virtio_transport_dec_rx_pkt(skb->len) if we don't remove `skb_pull(skb, 
-bytes_to_copy);` inside the loop.
+June 14 will be at least partly dedicated to a hackathon or "day of 
+BoFs". This will provide time for people to get together and discuss 
+strategic decisions, as well as other topics that are best solved within 
+smaller groups.
 
-Thanks,
-Stefano
+
+CALL FOR PRESENTATIONS
+======================
+
+We encourage you to submit presentations at 
+https://kvm-forum.qemu.org/2023/cfp.  Suggested topics include:
+
+* Scalability and Optimization
+
+* Hardening and security
+
+* Confidential computing
+
+* Testing
+
+* KVM and the Linux Kernel:
+   * New Features and Ports
+   * Device Passthrough: VFIO, mdev, vDPA
+   * Network Virtualization
+   * Virtio and vhost
+
+* Virtual Machine Monitors and Management:
+   * VMM Implementation: APIs, Live Migration, Performance Tuning, etc.
+   * Multi-process VMMs: vhost-user, vfio-user, QEMU Storage Daemon
+   * QEMU without KVM: Hypervisor.framework and other hypervisors
+   * Managing KVM: Libvirt, KubeVirt, Kata Containers
+
+* Emulation:
+   * New Devices, Boards and Architectures
+   * CPU Emulation and Binary Translation
+
+
+IMPORTANT DATES
+===============
+
+The deadline for submitting presentations is April 2, 2023 - 11:59 PM PDT.
+
+Accepted speakers will be notified on April 17, 2023.
+
+
+ATTENDING KVM FORUM
+===================
+
+Admission to KVM Forum and DevConf.CZ is free. However, registration is 
+required and the number of attendees is limited by the space available 
+at the venue. You can register for KVM Forum 2023 at
+
+    https://kvm-forum.qemu.org/2023/register/
+
+The DevConf.CZ program will feature technical talks on a variety of 
+topics, including cloud and virtualization infrastructure—so make sure 
+to register for DevConf.CZ as well if you would like to attend.
+
+We are committed to fostering an open and welcoming environment at our 
+conference. Participants are expected to abide by the Devconf.cz code of 
+conduct and media policy:
+
+    https://www.devconf.info/coc/
+    https://www.devconf.info/media-policy/
+
+
+GETTING TO BRNO
+===============
+
+Brno has a small international airport with flights from London 
+(Stansted) and other European cities.
+
+Other nearby airports include Vienna, Bratislava and Prague. Travelling 
+to Brno is easiest from Vienna Schwechat Airport, from where there are 
+direct buses operated by RegioJet:
+
+    https://regiojet.com/?fromLocationId=10204055&toLocationId=10202002
+
+More detailed information will be posted on the DevConf.CZ website 
+closer to the conference.
+
+
+CONTACTS
+========
+
+Reach out to us should you have any questions. The program committee may 
+be contacted as a group via email: kvm-forum-2023-pc@redhat.com.
 
