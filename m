@@ -2,65 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A69B76AD1EA
-	for <lists+kvm@lfdr.de>; Mon,  6 Mar 2023 23:43:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 254596AD2FB
+	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 00:47:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230326AbjCFWnV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Mar 2023 17:43:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44152 "EHLO
+        id S229699AbjCFXrC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Mar 2023 18:47:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230293AbjCFWmv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Mar 2023 17:42:51 -0500
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A3DE79B14
-        for <kvm@vger.kernel.org>; Mon,  6 Mar 2023 14:42:24 -0800 (PST)
-Received: by mail-pf1-x449.google.com with SMTP id h14-20020aa786ce000000b005a89856900eso6168967pfo.14
-        for <kvm@vger.kernel.org>; Mon, 06 Mar 2023 14:42:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678142526;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OeL8Ykd+iCS6JS8scOAtZXT6SgE3Ouj+/URgOQ2sX3s=;
-        b=hk8vRpbEWBqSY4vpUw9bpWUeCVvQ/YeUcq66u5udQO+XKtmkRe5XynuiaC71UhBsmb
-         MJX5G46cSivSg2VyHO2BLfr3zi+MPvsQQPrlUg0fklhseJRi492oFo6Omn0JeoMCiIDA
-         ehcsBIttFvLE0M6Z0VE3ZVD8e2ATxMcgmx5gk5b88p/1DDvplGFnZ99N1VQ7grjJ2hX1
-         m4Rs2BUrBU3Yjazwt4qvtCMRJMwPuvSnaYwonWVuEmnwDyA2W/r/85gkfWZjutvxQf7J
-         yo2LwCs1SLZHtKalYgNMvcaZgVakuyiUlG+IUprqGugBQTirUZbsBqM8O4BeJRmWkQO4
-         hLDg==
+        with ESMTP id S229483AbjCFXrB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Mar 2023 18:47:01 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C477E521C9
+        for <kvm@vger.kernel.org>; Mon,  6 Mar 2023 15:46:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1678146371;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=wJJ/SPwRxfJctF2aTdUZ7XudcJ8pB5qw99SDvRIMbf8=;
+        b=IzqffoWbDyVFl5q4lIJhuEf93R9XQOYkwHVcBGf6CYgqBFbu4ixUnGBx0ia3hMXsJBq0ka
+        Z+Jamzwt3OjDMddbfUuekroIAqW+n5kMurMkQG9R+h9fVZ75N87kvSahCDIHCPM1PyM6Ut
+        w6SVAA/2eE5CrjQ0sRIbMxWZ2xhYETY=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-609-Enr7yulpO3GFuDaSB6eksQ-1; Mon, 06 Mar 2023 18:46:10 -0500
+X-MC-Unique: Enr7yulpO3GFuDaSB6eksQ-1
+Received: by mail-il1-f197.google.com with SMTP id z8-20020a92cd08000000b00317b27a795aso6116652iln.0
+        for <kvm@vger.kernel.org>; Mon, 06 Mar 2023 15:46:10 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678142526;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OeL8Ykd+iCS6JS8scOAtZXT6SgE3Ouj+/URgOQ2sX3s=;
-        b=uZdBn0VkCagEYXOT8p1EzUbIG00OltBvq+eTKQAtEZrMf/I6FsLVQ6KNoZGursprHp
-         aoSm0q03au8Uphbo2ozwfKXm2EbVoriqGaZAhCGbLkXvnZnSN8geox6nawBko4JwMdrS
-         2cf6J1Aih7ehLRI2ZE1TcXy0UODJKhYD5FDt6V+lsONELOaKrGp9y4i67wDB6F9bw98P
-         0JjWVbKWfpXqKcBlwR9hFvkuPaM+OrDbwk3EOFGZooih69S/JON0AZbbsYgud0r2mo43
-         p9WI5Woghosl1XuqJwGB1wCU5kwEGCHbVL5cSjsb1sON271YJhQVJBuVPCl8/0QUJIeY
-         LX5A==
-X-Gm-Message-State: AO0yUKWdIyZgunJ6W9urBdtH/W4pDu07oDQzf/5LtbfW2UVmLo/NDKTK
-        hkUTVymz24q3bSURAqgSS/9wcpWTkhsi
-X-Google-Smtp-Source: AK7set/bN7t34vpFP3b5g8As+ZIP6EwS/0kB74bTqu6kV7sDF35fTifkklq2UmD/u6GAqDmSpVbet0qAjEWc
-X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
- (user=vipinsh job=sendgmr) by 2002:a17:90b:504:b0:233:df5f:4778 with SMTP id
- r4-20020a17090b050400b00233df5f4778mr4600717pjz.6.1678142526350; Mon, 06 Mar
- 2023 14:42:06 -0800 (PST)
-Date:   Mon,  6 Mar 2023 14:41:27 -0800
-In-Reply-To: <20230306224127.1689967-1-vipinsh@google.com>
-Mime-Version: 1.0
-References: <20230306224127.1689967-1-vipinsh@google.com>
-X-Mailer: git-send-email 2.40.0.rc0.216.gc4246ad0f0-goog
-Message-ID: <20230306224127.1689967-19-vipinsh@google.com>
-Subject: [Patch v4 18/18] KVM: x86/mmu: Reduce default mmu memory cache size
-From:   Vipin Sharma <vipinsh@google.com>
-To:     seanjc@google.com, pbonzini@redhat.com, bgardon@google.com,
-        dmatlack@google.com
-Cc:     jmattson@google.com, mizhang@google.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Vipin Sharma <vipinsh@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        d=1e100.net; s=20210112; t=1678146369;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wJJ/SPwRxfJctF2aTdUZ7XudcJ8pB5qw99SDvRIMbf8=;
+        b=5j+D7JhHfSxHUoGeNo4+mhQHICeDnx+rgcYpvU1q+kcK/2/WYbMwg75OAt09tmbYVw
+         nxDEDdRV4l5ryBn/s6koTxXN41JY9OT5QmeDpRjlg0oKafqOZseAM5jw6MAljHfiyow7
+         +pOXg5piYxGtN3dzNKgtszoWGfaqCocEExW6cePBDvmLdPN9icu04XXXb0IsfydrG6Q9
+         e9SbV7XwEScPl3qI2OpTkJs39o1wfRfGXAqBqa8Hw65mpvtaTSSJpD5FJh0iai5mf9zJ
+         ZC+SGj6JrU0xLQkmvEngU6J22d3My/ZS202WjeDXUyOyiMUxRW5bT1UNzuDQaLtXrMmH
+         QbAg==
+X-Gm-Message-State: AO0yUKUTuhts1g51uaPWathS/Tg0yvigyqqH9ZBoRzv+g7IN7wpQ61Tz
+        HB+A8XsX1viFuTO0Jah9Trkazfizgs8Br/nJLcCvsXsnCi03MVBqLB368ohOLFH8vwBkyj7SuXP
+        OBC/2qRI5goPnb5k16wP/
+X-Received: by 2002:a05:6e02:1d05:b0:317:97ab:e5d1 with SMTP id i5-20020a056e021d0500b0031797abe5d1mr11906020ila.12.1678146369675;
+        Mon, 06 Mar 2023 15:46:09 -0800 (PST)
+X-Google-Smtp-Source: AK7set94N5VJMPCYD2NcAdIOMsENYGwUy/huUKdq/gUq6blF75kCFaPgAlIPt5CkJ0wV+aRjWL2gbA==
+X-Received: by 2002:a05:6e02:1d05:b0:317:97ab:e5d1 with SMTP id i5-20020a056e021d0500b0031797abe5d1mr11906013ila.12.1678146369475;
+        Mon, 06 Mar 2023 15:46:09 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id k20-20020a5d91d4000000b0074c80aa17f0sm3700936ior.0.2023.03.06.15.46.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Mar 2023 15:46:09 -0800 (PST)
+Date:   Mon, 6 Mar 2023 16:46:07 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Timothy Pearson <tpearson@raptorengineering.com>
+Cc:     kvm <kvm@vger.kernel.org>, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH v2 0/4] Reenable VFIO support on POWER systems
+Message-ID: <20230306164607.1455ee81.alex.williamson@redhat.com>
+In-Reply-To: <8398361.16996856.1678123793664.JavaMail.zimbra@raptorengineeringinc.com>
+References: <8398361.16996856.1678123793664.JavaMail.zimbra@raptorengineeringinc.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,68 +77,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Reduce KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE to PT64_ROOT_MAX_LEVEL - 1.
-Opportunistically, use this reduced value for topping up caches.
+On Mon, 6 Mar 2023 11:29:53 -0600 (CST)
+Timothy Pearson <tpearson@raptorengineering.com> wrote:
 
-There was no specific reason to set this value to 40. With addition of
-multi NUMA node caches, it is good to save space and make these cachees
-lean.
+> This patch series reenables VFIO support on POWER systems.  It
+> is based on Alexey Kardashevskiys's patch series, rebased and
+> successfully tested under QEMU with a Marvell PCIe SATA controller
+> on a POWER9 Blackbird host.
+> 
+> Alexey Kardashevskiy (3):
+>   powerpc/iommu: Add "borrowing" iommu_table_group_ops
+>   powerpc/pci_64: Init pcibios subsys a bit later
+>   powerpc/iommu: Add iommu_ops to report capabilities and allow blocking
+>     domains
+> 
+> Timothy Pearson (1):
+>   Add myself to MAINTAINERS for Power VFIO support
+> 
+>  MAINTAINERS                               |   5 +
+>  arch/powerpc/include/asm/iommu.h          |   6 +-
+>  arch/powerpc/include/asm/pci-bridge.h     |   7 +
+>  arch/powerpc/kernel/iommu.c               | 246 +++++++++++++++++++++-
+>  arch/powerpc/kernel/pci_64.c              |   2 +-
+>  arch/powerpc/platforms/powernv/pci-ioda.c |  36 +++-
+>  arch/powerpc/platforms/pseries/iommu.c    |  27 +++
+>  arch/powerpc/platforms/pseries/pseries.h  |   4 +
+>  arch/powerpc/platforms/pseries/setup.c    |   3 +
+>  drivers/vfio/vfio_iommu_spapr_tce.c       |  96 ++-------
+>  10 files changed, 338 insertions(+), 94 deletions(-)
+> 
 
-Signed-off-by: Vipin Sharma <vipinsh@google.com>
----
- arch/x86/include/asm/kvm_types.h | 6 +++++-
- arch/x86/kvm/mmu/mmu.c           | 8 ++++----
- 2 files changed, 9 insertions(+), 5 deletions(-)
+For vfio and MAINTAINERS portions,
 
-diff --git a/arch/x86/include/asm/kvm_types.h b/arch/x86/include/asm/kvm_types.h
-index 08f1b57d3b62..80aff231b708 100644
---- a/arch/x86/include/asm/kvm_types.h
-+++ b/arch/x86/include/asm/kvm_types.h
-@@ -2,6 +2,10 @@
- #ifndef _ASM_X86_KVM_TYPES_H
- #define _ASM_X86_KVM_TYPES_H
- 
--#define KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE 40
-+/*
-+ * For each fault only PT64_ROOT_MAX_LEVEL - 1 pages are needed. Root
-+ * page is allocated in a separate flow.
-+ */
-+#define KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE (PT64_ROOT_MAX_LEVEL - 1)
- 
- #endif /* _ASM_X86_KVM_TYPES_H */
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 6d44a4e08328..5463ce6e52fa 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -713,11 +713,11 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
- 	if (kvm_numa_aware_page_table_enabled(vcpu->kvm)) {
- 		for_each_online_node(nid) {
- 			r = mmu_topup_sp_memory_cache(&vcpu->arch.mmu_shadow_page_cache[nid],
--						      PT64_ROOT_MAX_LEVEL);
-+						      KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE);
- 		}
- 	} else {
- 		r = mmu_topup_sp_memory_cache(&vcpu->arch.mmu_shadow_page_cache[nid],
--					      PT64_ROOT_MAX_LEVEL);
-+					      KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE);
- 	}
- 
- 	if (r)
-@@ -725,12 +725,12 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
- 
- 	if (maybe_indirect) {
- 		r = mmu_topup_sp_memory_cache(&vcpu->arch.mmu_shadowed_info_cache,
--					      PT64_ROOT_MAX_LEVEL);
-+					      KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE);
- 		if (r)
- 			return r;
- 	}
- 	return kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_page_header_cache,
--					  PT64_ROOT_MAX_LEVEL);
-+					  KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE);
- }
- 
- static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
--- 
-2.40.0.rc0.216.gc4246ad0f0-goog
+Acked-by: Alex Williamson <alex.williamson@redhat.com>
+
+I'll note though that spapr_tce_take_ownership() looks like it copied a
+bug from the old tce_iommu_take_ownership() where tbl and tbl->it_map
+are tested before calling iommu_take_ownership() but not in the unwind
+loop, ie. tables we might have skipped on setup are unconditionally
+released on unwind.  Thanks,
+
+Alex
 
