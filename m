@@ -2,95 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7DD3F6AF35A
-	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 20:04:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 384756AF54E
+	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 20:24:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233633AbjCGTED (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Mar 2023 14:04:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43190 "EHLO
+        id S234122AbjCGTYO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Mar 2023 14:24:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233619AbjCGTDe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Mar 2023 14:03:34 -0500
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB654BD4FD
-        for <kvm@vger.kernel.org>; Tue,  7 Mar 2023 10:49:24 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-536af109f9aso146147147b3.13
-        for <kvm@vger.kernel.org>; Tue, 07 Mar 2023 10:49:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678214964;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=i4l+z8dxC6FwBWTTdD6vm7lmaVH1fdhpvQWMtCJJJTg=;
-        b=pgA+qJCRpGKYwP1/DluHxy7PHWVYw4qRQW0VWpuVE6dJdsSylk+SeVw4u/P/Jc522u
-         iNCffuZxlrdGIsbKU5NAZq3WWDqW66OqXb5MfNovTq6g8Itz+9XR0pUnXBZRCmyNXL3V
-         bdn0wPkod0OItE6/B0oZACNk2ijf49WMMcweOmDJtTS4QslrWalndD3VK3oHl53AST58
-         noL9YOB24is1fqM50mIdy3qwQ2pYhS5F8GtH0//FSr+CiCteRBAAZ0ZDf624d5F7lvMF
-         tQR1wGm4EG3L7SPFzG++T5kp65GdwLNIuSGC9Wq2SROjhBcO/cH9lgEVDSYohI25muVx
-         rLhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678214964;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=i4l+z8dxC6FwBWTTdD6vm7lmaVH1fdhpvQWMtCJJJTg=;
-        b=l1e5F0ZNJpCI2IoaYDpCo3K83EbDaNClksAS8KbQwdlpVKEr2YBeRPfHRvgaXwPLvH
-         TBDg5x/GD7g89puwXKGjpcWrwGMnY/Gn1HcpuWfh+F7ouiWkyMazZVPnh6s8W6HRaQuX
-         1fZiRzlF5tJFtdV9gBU1O/1UJGwFf6D0vfxN6DFHrPFAK6X0lfdVvXa/edbganx+4XXj
-         9kFSJbmI1oRUVnaUnyw98xfj7tkb8qHHaWiuzvZnTpq97q0xCOvfdnfZ9F8Rj+3X/qql
-         F8oAOjTKS9twjJT96IWhc4a839OprU5PyeBvsEb6Vf9AEqmIZT0Q5iI1BnHNknegLeuU
-         4arg==
-X-Gm-Message-State: AO0yUKXDMRYfugDCZjSY0sPP08G0UTKdcmngcB6gpWcQqA2ek0obSnp9
-        MyCul0EdFc2VdoeCM2SpHM/AHFQprP8=
-X-Google-Smtp-Source: AK7set/NWAg8xdGFj8VA9sFcQdnpct7pJMc0kT8W/MVHNjSKtOv5NRNFEeoH4WcLXJ4acxdiFZavmxReRVc=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:b206:0:b0:8bd:4ab5:18f4 with SMTP id
- i6-20020a25b206000000b008bd4ab518f4mr12227961ybj.6.1678214963986; Tue, 07 Mar
- 2023 10:49:23 -0800 (PST)
-Date:   Tue, 7 Mar 2023 10:49:22 -0800
-In-Reply-To: <20230306215450.GFZAZhKnr6zMCeeDNd@fat_crate.local>
-Mime-Version: 1.0
-References: <Y/5oBKi6vjZe83ac@zn.tnic> <20230228222416.61484-1-itazur@amazon.com>
- <Y/6FIeJ5KCOfKEPN@zn.tnic> <ZAZYKe4L8jhMG4An@google.com> <20230306214419.GDZAZes941k+4NPgDL@fat_crate.local>
- <25249e7d-4fd9-e1c1-8efb-31750740ec27@redhat.com> <20230306215450.GFZAZhKnr6zMCeeDNd@fat_crate.local>
-Message-ID: <ZAeHMgp9U7giJpHs@google.com>
-Subject: Re: [PATCH 0/2] KVM: x86: Propagate AMD-specific IBRS bits to guests
-From:   Sean Christopherson <seanjc@google.com>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Takahiro Itazuri <itazur@amazon.com>,
-        dave.hansen@linux.intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
-        x86@kernel.org, zulinx86@gmail.com
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S234110AbjCGTXy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Mar 2023 14:23:54 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A227ACE2B;
+        Tue,  7 Mar 2023 11:09:25 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id C3741B817C2;
+        Tue,  7 Mar 2023 19:09:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 347C4C433D2;
+        Tue,  7 Mar 2023 19:09:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1678216162;
+        bh=kv61pPeZdtdgwx4Z+2SU5Ux9voCWAYw/Wef2lFVUXR4=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=EwHS15YgmZfC7nWEekBy0VWecv4ceSu2Ii+YrBjksnSmkqlZTxIbjFmHlqXAL6VSj
+         niwYQeuQ9wk9cFjthClMYiqoJlN3ItsZZhYBwzfsR54bcJY/qIFrhF7KM2D5sXDPyk
+         VFPK7qAVGsDMXsjPQCcbKS65dp/gXshuxE1gPkyQ=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     stable@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        patches@lists.linux.dev, Andy Nguyen <theflow@google.com>,
+        Thomas Lendacky <thomas.lendacky@amd.com>,
+        Peter Gonda <pgonda@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 5.15 468/567] KVM: SVM: Fix potential overflow in SEVs send|receive_update_data()
+Date:   Tue,  7 Mar 2023 18:03:24 +0100
+Message-Id: <20230307165926.158959863@linuxfoundation.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230307165905.838066027@linuxfoundation.org>
+References: <20230307165905.838066027@linuxfoundation.org>
+User-Agent: quilt/0.67
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 06, 2023, Borislav Petkov wrote:
-> On Mon, Mar 06, 2023 at 10:47:18PM +0100, Paolo Bonzini wrote:
-> > It's very rare that KVM can provide a CPUID feature if the kernel has
-> > masked it,
-> 
-> I'm talking about pure hw feature bits which don't need any enablement.
-> Like AVX512 insns subset support or something else which the hw does
-> without the need for the kernel.
-> 
-> Those should be KVM-only if baremetal doesn't use them.
+From: Peter Gonda <pgonda@google.com>
 
-I don't see what such a rule buys us beyond complexity and, IMO, unnecessary
-maintenance burden.  As Paolo pointed out, when there's an existing word, the
-only "cost" is the existence of the #define.  The bit is still present in the
-capabilities, and KVM relies on this!  And as mentioned in the tangent about
-reworking cpufeatures[*], I get a _lot_ of value out of cpufeatures.h being fully
-populated for known bits (in defined words).
+commit f94f053aa3a5d6ff17951870483d9eb9e13de2e2 upstream.
 
-Forcing KVM to #define bits in reverse_cpuid.h just because the kernel doesn't
-need the macro will inevitably lead to confusion for KVM developers, both when
-writing new code and when reading existing code.
+KVM_SEV_SEND_UPDATE_DATA and KVM_SEV_RECEIVE_UPDATE_DATA have an integer
+overflow issue. Params.guest_len and offset are both 32 bits wide, with a
+large params.guest_len the check to confirm a page boundary is not
+crossed can falsely pass:
 
-[*] https://lore.kernel.org/all/Y8nhtjFcsB63UsmQ@google.com
+    /* Check if we are crossing the page boundary *
+    offset = params.guest_uaddr & (PAGE_SIZE - 1);
+    if ((params.guest_len + offset > PAGE_SIZE))
+
+Add an additional check to confirm that params.guest_len itself is not
+greater than PAGE_SIZE.
+
+Note, this isn't a security concern as overflow can happen if and only if
+params.guest_len is greater than 0xfffff000, and the FW spec says these
+commands fail with lengths greater than 16KB, i.e. the PSP will detect
+KVM's goof.
+
+Fixes: 15fb7de1a7f5 ("KVM: SVM: Add KVM_SEV_RECEIVE_UPDATE_DATA command")
+Fixes: d3d1af85e2c7 ("KVM: SVM: Add KVM_SEND_UPDATE_DATA command")
+Reported-by: Andy Nguyen <theflow@google.com>
+Suggested-by: Thomas Lendacky <thomas.lendacky@amd.com>
+Signed-off-by: Peter Gonda <pgonda@google.com>
+Cc: David Rientjes <rientjes@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org
+Cc: stable@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+Link: https://lore.kernel.org/r/20230207171354.4012821-1-pgonda@google.com
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ arch/x86/kvm/svm/sev.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -1277,7 +1277,7 @@ static int sev_send_update_data(struct k
+ 
+ 	/* Check if we are crossing the page boundary */
+ 	offset = params.guest_uaddr & (PAGE_SIZE - 1);
+-	if ((params.guest_len + offset > PAGE_SIZE))
++	if (params.guest_len > PAGE_SIZE || (params.guest_len + offset) > PAGE_SIZE)
+ 		return -EINVAL;
+ 
+ 	/* Pin guest memory */
+@@ -1457,7 +1457,7 @@ static int sev_receive_update_data(struc
+ 
+ 	/* Check if we are crossing the page boundary */
+ 	offset = params.guest_uaddr & (PAGE_SIZE - 1);
+-	if ((params.guest_len + offset > PAGE_SIZE))
++	if (params.guest_len > PAGE_SIZE || (params.guest_len + offset) > PAGE_SIZE)
+ 		return -EINVAL;
+ 
+ 	hdr = psp_copy_user_blob(params.hdr_uaddr, params.hdr_len);
+
+
