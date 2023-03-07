@@ -2,301 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A705E6AD459
-	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 03:03:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 261286AD4A6
+	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 03:26:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229742AbjCGCD5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Mar 2023 21:03:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33998 "EHLO
+        id S229628AbjCGC0E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Mar 2023 21:26:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229545AbjCGCDz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Mar 2023 21:03:55 -0500
-Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 56ADF39CD7;
-        Mon,  6 Mar 2023 18:03:51 -0800 (PST)
-Received: from loongson.cn (unknown [10.20.42.170])
-        by gateway (Coremail) with SMTP id _____8AxJEyGmwZkEicJAA--.11657S3;
-        Tue, 07 Mar 2023 10:03:50 +0800 (CST)
-Received: from [10.20.42.170] (unknown [10.20.42.170])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8Cxnb6EmwZk3mxNAA--.8949S3;
-        Tue, 07 Mar 2023 10:03:48 +0800 (CST)
-Message-ID: <8c1042bb-6103-a248-2cd5-19c55ec8d83d@loongson.cn>
-Date:   Tue, 7 Mar 2023 10:03:48 +0800
+        with ESMTP id S229545AbjCGC0A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Mar 2023 21:26:00 -0500
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D2DE30298;
+        Mon,  6 Mar 2023 18:25:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1678155959; x=1709691959;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=At4e7f0M94Tcj7c8GXNKqZO3dXNfEpotNAwodaTcHWU=;
+  b=Md7dL1JS/1WocgOxIiovrPyjIQlcHaRroS3uI6/6J8aG32UltJJKmGI4
+   NG26ums8e4IeFUb0mMQzRLh9GXpcAxl2zeWBlxgqq8IxG3YMw50R+Glvi
+   KJr4l95ZIUDqMpFAvm0KFtEMFi6Ez/js0MGPLP7hBypGW6g0rPs/6zx+P
+   7zQ06S3dRb05JHSnU4BHjeS0VLt28xXbssdHAA4IXA7X7JBIpRdtnk87K
+   7WJhB7C6ssgNIBSfA/IUjYhBWM5MmEJ6BfsnB7+rZpvlzKeX2hFV0rLPa
+   CS7SwbKxXHnz3UhQ5rvSD4ATXWTR7Lykeyj896yid70EG7yZZ4QMLWkBD
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10641"; a="324049736"
+X-IronPort-AV: E=Sophos;i="5.98,238,1673942400"; 
+   d="scan'208";a="324049736"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2023 18:25:58 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10641"; a="1005680292"
+X-IronPort-AV: E=Sophos;i="5.98,238,1673942400"; 
+   d="scan'208";a="1005680292"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.105])
+  by fmsmga005.fm.intel.com with ESMTP; 06 Mar 2023 18:25:48 -0800
+Date:   Tue, 7 Mar 2023 10:18:09 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Ackerley Tng <ackerleytng@google.com>
+Cc:     vannapurve@google.com, seanjc@google.com, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        shuah@kernel.org, yang.zhong@intel.com, ricarkol@google.com,
+        aaronlewis@google.com, wei.w.wang@intel.com,
+        kirill.shutemov@linux.intel.com, corbet@lwn.net, hughd@google.com,
+        jlayton@kernel.org, bfields@fieldses.org,
+        akpm@linux-foundation.org, yu.c.zhang@linux.intel.com,
+        jun.nakajima@intel.com, dave.hansen@intel.com,
+        michael.roth@amd.com, qperret@google.com, steven.price@arm.com,
+        ak@linux.intel.com, david@redhat.com, luto@kernel.org,
+        vbabka@suse.cz, marcorr@google.com, erdemaktas@google.com,
+        pgonda@google.com, nikunj@amd.com, diviness@google.com,
+        maz@kernel.org, dmatlack@google.com, axelrasmussen@google.com,
+        maciej.szmigiero@oracle.com, mizhang@google.com, bgardon@google.com
+Subject: Re: [V2 PATCH 0/6] KVM: selftests: selftests for fd-based private
+ memory
+Message-ID: <20230307021809.GA2143916@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20230222025019.GA1628054@chaop.bj.intel.com>
+ <diqzlek9spuj.fsf@ackerleytng-cloudtop.c.googlers.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH v3 14/29] LoongArch: KVM: Implement vcpu load and vcpu put
- operations
-Content-Language: en-US
-To:     Tianrui Zhao <zhaotianrui@loongson.cn>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Huacai Chen <chenhuacai@kernel.org>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Xi Ruoyao <xry111@xry111.site>
-References: <20230228070057.3687180-1-zhaotianrui@loongson.cn>
- <20230228070057.3687180-15-zhaotianrui@loongson.cn>
-From:   maobibo <maobibo@loongson.cn>
-In-Reply-To: <20230228070057.3687180-15-zhaotianrui@loongson.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8Cxnb6EmwZk3mxNAA--.8949S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBjvJXoWxKF4ftw48Cr4xXry7AFyxKrg_yoWfWry3pr
-        1qgayxurWUt3ZrtF15ArsFvr15WF4Sy34rXr17JrW2qrn8Zr95Aa1IyFy7AFyFq3WxXFyI
-        ywn8CrZa9r4ktw7anT9S1TB71UUUUjDqnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
-        qI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUIcSsGvfJTRUUU
-        bqkYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s
-        1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xv
-        wVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84
-        ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AKxVW8Jr0_Cr1U
-        M2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zV
-        CFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUAVWUtwAv7VC2
-        z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2
-        IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E
-        4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxVWUJVWUGw
-        C20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48J
-        MIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMI
-        IF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E
-        87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07j5o7tUUUUU=
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <diqzlek9spuj.fsf@ackerleytng-cloudtop.c.googlers.com>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-在 2023/2/28 15:00, Tianrui Zhao 写道:
-> Implement loongarch vcpu load and vcpu put operations, including
-> load csr value into hardware and save csr value into vcpu structure.
+On Mon, Mar 06, 2023 at 06:21:24PM +0000, Ackerley Tng wrote:
+> Chao Peng <chao.p.peng@linux.intel.com> writes:
 > 
-> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
-> ---
->  arch/loongarch/kvm/vcpu.c | 192 ++++++++++++++++++++++++++++++++++++++
->  1 file changed, 192 insertions(+)
+> > On Fri, Feb 10, 2023 at 11:59:23AM -0800, Vishal Annapurve wrote:
+> > > On Tue, Jan 17, 2023 at 7:11 PM Vishal Annapurve
+> > > <vannapurve@google.com> wrote:
+> > > >
+> > > > ...
 > 
-> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
-> index 615f68d082f8..14c89208936f 100644
-> --- a/arch/loongarch/kvm/vcpu.c
-> +++ b/arch/loongarch/kvm/vcpu.c
-> @@ -771,6 +771,198 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
->  	}
->  }
->  
-> +static int _kvm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-> +{
-> +	struct kvm_context *context;
-> +	struct loongarch_csrs *csr = vcpu->arch.csr;
-> +	bool migrated, all;
-> +
-> +	/*
-> +	 * Have we migrated to a different CPU?
-> +	 * If so, any old guest TLB state may be stale.
-> +	 */
-> +	migrated = (vcpu->arch.last_sched_cpu != cpu);
-> +
-> +	/*
-> +	 * Was this the last VCPU to run on this CPU?
-> +	 * If not, any old guest state from this VCPU will have been clobbered.
-> +	 */
-> +	context = per_cpu_ptr(vcpu->kvm->arch.vmcs, cpu);
-> +	all = migrated || (context->last_vcpu != vcpu);
-> +	context->last_vcpu = vcpu;
-> +
-> +	/*
-> +	 * Restore timer state regardless
-> +	 */
-> +	kvm_restore_timer(vcpu);
-> +
-> +	/* Control guest page CCA attribute */
-> +	change_csr_gcfg(CSR_GCFG_MATC_MASK, CSR_GCFG_MATC_ROOT);
-> +	/* Don't bother restoring registers multiple times unless necessary */
-> +	if (!all)
-> +		return 0;
-> +
-> +	write_csr_gcntc((ulong)vcpu->kvm->arch.time_offset);
-> +	/*
-> +	 * Restore guest CSR registers
-> +	 */
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_CRMD);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_PRMD);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_EUEN);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_MISC);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_ECFG);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_ERA);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_BADV);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_BADI);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_EENTRY);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_TLBIDX);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_TLBEHI);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_TLBELO0);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_TLBELO1);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_ASID);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_PGDL);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_PGDH);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_PWCTL0);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_PWCTL1);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_STLBPGSIZE);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_RVACFG);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_CPUID);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_KS0);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_KS1);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_KS2);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_KS3);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_KS4);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_KS5);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_KS6);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_KS7);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_TMID);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_CNTC);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_TLBRENTRY);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_TLBRBADV);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_TLBRERA);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_TLBRSAVE);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_TLBRELO0);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_TLBRELO1);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_TLBREHI);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_TLBRPRMD);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_DMWIN0);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_DMWIN1);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_DMWIN2);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_DMWIN3);
-> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_LLBCTL);
-> +
-> +	/* restore Root.Guestexcept from unused Guest guestexcept register */
-> +	write_csr_gintc(csr->csrs[LOONGARCH_CSR_GINTC]);
-> +
-> +	/*
-> +	 * We should clear linked load bit to break interrupted atomics. This
-> +	 * prevents a SC on the next VCPU from succeeding by matching a LL on
-> +	 * the previous VCPU.
-> +	 */
-> +	if (vcpu->kvm->created_vcpus > 1)
-> +		set_gcsr_llbctl(CSR_LLBCTL_WCLLB);
-> +
-> +	return 0;
-> +}
-> +
-> +void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-> +{
-> +	unsigned long flags;
-> +
-> +	local_irq_save(flags);
-> +	vcpu->cpu = cpu;
-> +	if (vcpu->arch.last_sched_cpu != cpu) {
-> +		kvm_debug("[%d->%d]KVM VCPU[%d] switch\n",
-> +				vcpu->arch.last_sched_cpu, cpu, vcpu->vcpu_id);
-> +		/*
-> +		 * Migrate the timer interrupt to the current CPU so that it
-> +		 * always interrupts the guest and synchronously triggers a
-> +		 * guest timer interrupt.
-> +		 */
-> +		kvm_migrate_count(vcpu);
-> +	}
-> +
-> +	/* restore guest state to registers */
-> +	_kvm_vcpu_load(vcpu, cpu);
-> +	local_irq_restore(flags);
-> +}
-> +
-> +static int _kvm_vcpu_put(struct kvm_vcpu *vcpu, int cpu)
-> +{
-> +	struct loongarch_csrs *csr = vcpu->arch.csr;
-> +
-> +	kvm_lose_fpu(vcpu);
-Hi Tianrui,
+> > > > > Last question, do you have a list of testcases that you consider
+> > > "required" for
+> > > > > UPM?  My off-the-cuff list of selftests I want to have before
+> > > merging UPM is pretty
+> > > > > short at this point:
+> > > > >
+> > > > >   - Negative testing of the memslot changes, e.g. bad alignment,
+> > > bad fd,
+> > > > >     illegal memslot updates, etc.
+> > > > >   - Negative testing of restrictedmem, e.g. various combinations
+> > > of overlapping
+> > > > >     bindings of a single restrictedmem instance.
+> > > > >   - Access vs. conversion stress, e.g. accessing a region in the
+> > > guest while it's
+> > > > >     concurrently converted by the host, maybe with fancy guest
+> > > code to try and
+> > > > >     detect TLB or ordering bugs?
+> > > >
+> > > > List of testcases that I was tracking (covered by the current
+> > > > selftests) as required:
+> > > > 1) Ensure private memory contents are not accessible to host userspace
+> > > > using the HVA
+> > > > 2) Ensure shared memory contents are visible/accessible from both host
+> > > > userspace and the guest
+> > > > 3) Ensure 1 and 2 holds across explicit memory conversions
+> > > > 4) Exercise memory conversions with mixed shared/private memory pages
+> > > > in a huge page to catch issues like [2]
+> > > > 5) Ensure that explicit memory conversions don't affect nearby GPA
+> > > ranges
+> > > >
+> > > > Test Cases that will be covered by TDX/SNP selftests (in addition to
+> > > > above scenarios):
+> > > > 6) Ensure 1 and 2 holds across implicit memory conversions
+> > > > 7) Ensure that implicit memory conversions don't affect nearby GPA
+> > > ranges
+> > > >
+> > > > Additional testcases possible:
+> > > > 8) Running conversion tests for non-overlapping GPA ranges of
+> > > > same/different memslots from multiple vcpus
+> > > >
+> > > > [1] - https://github.com/sean-jc/linux/commit/7e536bf3c45c623425bc84e8a96634efc3a619ed
+> > > > [2] - https://lore.kernel.org/linux-mm/CAGtprH82H_fjtRbL0KUxOkgOk4pgbaEbAydDYfZ0qxz41JCnAQ@mail.gmail.com/
+> 
+> > > List of additional testcases that could help increase basic coverage
+> > > (including what sean mentioned earlier):
+> > > 1) restrictedmem functionality testing
+> > >      - read/write/mmap should not work
+> > >      - fstat/fallocate should work as expected
+> > > 2) restrictedmem registration/modification testing with:
+> > >      - bad alignment, bad fd, modifying properties of existing memslot
+> > >      - Installing multiple memslots with ranges within the same
+> > > restricted mem files
+> > >      - deleting memslots with restricted memfd while guests are
+> > > being executed
+> 
+> > In case you havn't started, I will work on 1) and 2) for the following
+> > days. As a start, I will first add restrictedmem tests (without KVM) then
+> > move to new memslots related tests.
+> 
+> > Chao
+> 
+> > > 3) Runtime restricted mem testing:
+> > >      - Access vs conversion testing from multiple vcpus
+> > >      - conversion and access to non-overlapping ranges from multiple vcpus
+> 
+> > > Regards,
+> > > Vishal
+> 
+> Chao, I'll work on
+> 
+> + Running conversion tests for non-overlapping GPA ranges of
+>   same/different memslots from multiple vcpus
+> + Deleting memslots with restricted memfd while guests are being
+>   executed
+> + Installing multiple memslots with ranges within the same restricted
+>   mem files
+> 
+> this week.
 
-Can we add KVM_LARCH_CSR bit in vcpu->arch.aux_inuse similiar with
-KVM_LARCH_FPU? It means that sw csr is consistent with hw csr registers.
+Thanks Ackerley. Looks good to me.
 
-And clear this bit when returning to guest, set this bit in this function
-_kvm_vcpu_put. If it is true, we need not copy to sw csr from hw, and for
-SET_ONE_REG function, both sw/hw csr register will be set.
+BTW, for whom may have interest, below are the testcases I added:
+https://github.com/chao-p/linux/commit/24dd1257d5c93acb8c8cc6c76c51cf6869970f8a
+https://github.com/chao-p/linux/commit/39a872ef09d539ce0c953451152eb05276b87018
+https://github.com/chao-p/linux/commit/ddd2c92b268a2fdc6158f82a6169ad1a57f2a01d
 
-
-Regards
-Bibo, Mao
-
-> +
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_CRMD);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_PRMD);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_EUEN);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_MISC);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_ECFG);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_ERA);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_BADV);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_BADI);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_EENTRY);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_TLBIDX);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_TLBEHI);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_TLBELO0);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_TLBELO1);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_ASID);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_PGDL);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_PGDH);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_PGD);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_PWCTL0);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_PWCTL1);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_STLBPGSIZE);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_RVACFG);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_CPUID);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_PRCFG1);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_PRCFG2);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_PRCFG3);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_KS0);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_KS1);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_KS2);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_KS3);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_KS4);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_KS5);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_KS6);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_KS7);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_TMID);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_CNTC);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_LLBCTL);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_TLBRENTRY);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_TLBRBADV);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_TLBRERA);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_TLBRSAVE);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_TLBRELO0);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_TLBRELO1);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_TLBREHI);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_TLBRPRMD);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_DMWIN0);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_DMWIN1);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_DMWIN2);
-> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_DMWIN3);
-> +
-> +	/* save Root.Guestexcept in unused Guest guestexcept register */
-> +	kvm_save_timer(vcpu);
-> +	csr->csrs[LOONGARCH_CSR_GINTC] = read_csr_gintc();
-> +	return 0;
-> +}
-> +
-> +void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
-> +{
-> +	unsigned long flags;
-> +	int cpu;
-> +
-> +	local_irq_save(flags);
-> +	cpu = smp_processor_id();
-> +	vcpu->arch.last_sched_cpu = cpu;
-> +	vcpu->cpu = -1;
-> +
-> +	/* save guest state in registers */
-> +	_kvm_vcpu_put(vcpu, cpu);
-> +	local_irq_restore(flags);
-> +}
-> +
->  int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  {
->  	int r = -EINTR;
-
+Chao
