@@ -2,62 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BDCE76AE950
-	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 18:22:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DE80E6AEB2E
+	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 18:41:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231443AbjCGRWu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Mar 2023 12:22:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40668 "EHLO
+        id S232035AbjCGRlC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Mar 2023 12:41:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231298AbjCGRW0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Mar 2023 12:22:26 -0500
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9AC1D52E
-        for <kvm@vger.kernel.org>; Tue,  7 Mar 2023 09:17:57 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id a9-20020a170902b58900b0019e2eafafddso7954147pls.7
-        for <kvm@vger.kernel.org>; Tue, 07 Mar 2023 09:17:57 -0800 (PST)
+        with ESMTP id S232034AbjCGRkk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Mar 2023 12:40:40 -0500
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35E81A54C1
+        for <kvm@vger.kernel.org>; Tue,  7 Mar 2023 09:36:51 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id la3-20020a170902fa0300b0019ca5ddecedso8004743plb.1
+        for <kvm@vger.kernel.org>; Tue, 07 Mar 2023 09:36:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678209477;
+        d=google.com; s=20210112; t=1678210610;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BQbU304qvSe6nuiEdh3ek4tMw5wjustEnfRjLs3CfHM=;
-        b=j+aMVBky7KGuSLjcrRldCBoPalyFGKtwLYUzNYdAPt3sGxrfr7whsHi+EOY3ovdrih
-         fcbrsz+5WW9wXg9ZmX/TgxhOiMrNneN2O3Ta1NQU2+mmWdX7l7BoV2V8MOKwIGrAkOrp
-         BYo0ZcOhBviE0jiUuBOmk07QuXlHTW/u1y1pYDIqHmJ44bP1e3IeiMDDqMKXyNRjWpeX
-         d7TkFgTvceOtLjiwyAtUbqNWz1DkZHjZaC2U688CBRYhR4WNI2P8KEzlrHuSVPwY8sH+
-         Pr3VymEjZYKWrTK17O95PvhD591awdOlK3F+EWPFM1sWmZbheOi3805hBnwFLN9eN6xo
-         KGUw==
+        bh=PxpL9SaKPLHbA1QJI98FYZl3BCCEz9LLYkrnEJ9FjEs=;
+        b=e1fzQlSnDJCAcz4K9UBRHdg0rSfo66vsFG7yP3aQFTzXqFznVEGMz8KeRdUQulyF7k
+         J7jAl/bQMfOaOcqJSj/qsL16y7lrF8Qtq6dp3GRaXN7nUANPlsJDDNX8H6onGWZMLZ1Q
+         ojjvxdsDy25LxoEZOifEcDtE8W/WILkWax7uM10ZO4aRo+ikeGbrH+mSDT07UcQR/SqJ
+         +TMoK2tjcJ7vaK44JDVzOR5FfmqeRkFfxod7YiwpvODGttvbt4QWrlh1k029nhWxyuzV
+         D+NaRtV3MH4UdBCAFjyWs6aOZAf8JPKbwerIQJcreV+HAhDiZ71sKtidlp3v/BhzD9C3
+         Qe3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678209477;
+        d=1e100.net; s=20210112; t=1678210610;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BQbU304qvSe6nuiEdh3ek4tMw5wjustEnfRjLs3CfHM=;
-        b=t2n11nIsWGLdbc1UZksO9i5hDAAd701PvXuBIiFErGTk6OTfmOGdwaeRScaKeD+Dnq
-         b2MTb+Ha8ISDwJu2+GIZre9BFR+DFVqeRTypHc3tbf5+RLB9yLr789V0839O4LlTOXdz
-         UZrxicwmJK44nvaGzhyDKlcxRm2ycfM8ojz/1aA2ItzKeUuNXv4zUFnwXPmKMCptjMoH
-         WigWWbHtDtnUImWxi8b1W4GFHNrkZ/BN5Xq7GNpLBPCUBTYHuks+SLuVTFNzeBrKuQoY
-         ATYJWCozTeKVuM4h21vtdthIJ0aXTLcT7nH2EaRtQzvGK+DGcQoBBARL2QiHpUEQ+3fc
-         ahfw==
-X-Gm-Message-State: AO0yUKWESKd6AT2HIAVvn7+yp0mKJeZnPC3Prikx4lGJ91x8rCgD6UbD
-        uxjPjlPBKHV7790dmeERnp2o45TlHqw=
-X-Google-Smtp-Source: AK7set8sR8ySb9lpmNR1FMTrx/uaJ4kn2aKYyg7bzNnvLBuFScEEfqZhvbQg/F1tThOSaIDmSJDvM3qvYmo=
+        bh=PxpL9SaKPLHbA1QJI98FYZl3BCCEz9LLYkrnEJ9FjEs=;
+        b=uFMjm/zHjDh1fWapufHUclxJEvVk3q9k83AbLbjPWvexi1JHZdTm/v9zOWDjiN0iRG
+         hEDq0KYY/4Ens0010WQL6ftxKJMbDsm7d39/aBBWYzEfyJqY4RV1xxYR/sRMIf5J+sg6
+         xjxxrU8OCa6pf/GU6lnZBObiN3Jq/qc+zDU1C459cfhKh8eYubg59DU2FkdgUIo8NQDB
+         lNMyjUb3vQqrVWtYp8fq83cF3sguQ8buRlWGvQReCWCPmWi5PNJhTX6DS615GuMUJwG/
+         6ejxfeFgFtPyn7dZxKtwDjY4LE1fZCDAaDqglFCAw5jkwyCww53IacWu/D7S//jur/pl
+         oJHA==
+X-Gm-Message-State: AO0yUKX22qC+h1fyGxw3/X829tK7pdAd4v/cLVRLDRD3GCyyhoJ7j929
+        br1UZz8aIlDXDKU7IiKw2d35/AAl4Ho=
+X-Google-Smtp-Source: AK7set9sNtzP9C+hlG/N8yqWacbflBWRYd1F0puMDP8ANixRXK41/z2vt1aEJdT3a0zQwl4kkns17hbDW7g=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:3246:b0:19c:9037:d742 with SMTP id
- ji6-20020a170903324600b0019c9037d742mr6229067plb.1.1678209477326; Tue, 07 Mar
- 2023 09:17:57 -0800 (PST)
-Date:   Tue, 7 Mar 2023 09:17:55 -0800
-In-Reply-To: <3aec157afb6727e603d80c2232b3718033295f13.camel@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a63:7453:0:b0:503:bb5:4cec with SMTP id
+ e19-20020a637453000000b005030bb54cecmr5528891pgn.7.1678210610636; Tue, 07 Mar
+ 2023 09:36:50 -0800 (PST)
+Date:   Tue, 7 Mar 2023 09:36:49 -0800
+In-Reply-To: <20230227171751.1211786-1-jpiotrowski@linux.microsoft.com>
 Mime-Version: 1.0
-References: <20230301105438.599196-1-kai.huang@intel.com> <ZAA1+EMTIkBJvdZF@gao-cwp>
- <3aec157afb6727e603d80c2232b3718033295f13.camel@intel.com>
-Message-ID: <ZAdxNgv0M6P63odE@google.com>
-Subject: Re: [PATCH] KVM: VMX: Make setup_vmcs_config() preemption disabled
+References: <20230227171751.1211786-1-jpiotrowski@linux.microsoft.com>
+Message-ID: <ZAd2MRNLw1JAXmOf@google.com>
+Subject: Re: [PATCH] KVM: SVM: Disable TDP MMU when running on Hyper-V
 From:   Sean Christopherson <seanjc@google.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     Chao Gao <chao.gao@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Tianyu Lan <ltykernel@gmail.com>,
+        Michael Kelley <mikelley@microsoft.com>
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -69,86 +69,141 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 02, 2023, Huang, Kai wrote:
-> On Thu, 2023-03-02 at 13:36 +0800, Gao, Chao wrote:
-> > On Wed, Mar 01, 2023 at 11:54:38PM +1300, Kai Huang wrote:
-> > > Make setup_vmcs_config() preemption disabled so it always performs on
-> > > the same local cpu.
-> > > 
-> > > During module loading time, KVM intends to call setup_vmcs_config() to
-> > > set up the global VMCS configurations on _one_ cpu in hardware_setup(),
+On Mon, Feb 27, 2023, Jeremi Piotrowski wrote:
+> Disable TDP MMU when using SVM Hyper-V for the time being while we
+> search for a better fix.
 
-That may have been the very original intention, but I don't think it has been the
-true intention for a very long time.
+...
 
-> > > Change the existing setup_vmcs_config() to __setup_vmcs_config() and
-> > > call the latter directly in the compatibility check code path.  Change
-> > > setup_vmcs_config() to call __setup_vmcs_config() with preemption
-> > > disabled so __setup_vmcs_config() is always done on the same cpu.
-> > 
-> > Maybe you can simply disable preemption in hardware_setup() although I
-> > don't have a strong preference.
-> > 
-> > nested_vmx_setup_ctls_msrs() also reads some MSRs and sets up part of
-> > vmcs_conf, should it be called on the same CPU as setup_vmcs_config()?
-> 
-> Yes I think so.  I missed this :)
-> 
-> Not sure whether there are other similar places too even outside of
-> hardware_setup().
-> 
-> But compatibility check only checks things calculated via setup_vmcs_config()
-> and nested_vmx_setup_ctls_msrs(), so I think it's fair to only put
-> hardware_setup() inside preemption disabled.
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index c91ee2927dd7..5c0e28a7a3bc 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -5787,14 +5787,15 @@ void kvm_mmu_invpcid_gva(struct kvm_vcpu *vcpu, gva_t gva, unsigned long pcid)
+>  }
+>  
+>  void kvm_configure_mmu(bool enable_tdp, int tdp_forced_root_level,
+> -		       int tdp_max_root_level, int tdp_huge_page_level)
+> +		       int tdp_max_root_level, int tdp_huge_page_level,
+> +		       bool enable_tdp_mmu)
+>  {
+>  	tdp_enabled = enable_tdp;
+>  	tdp_root_level = tdp_forced_root_level;
+>  	max_tdp_level = tdp_max_root_level;
+>  
+>  #ifdef CONFIG_X86_64
+> -	tdp_mmu_enabled = tdp_mmu_allowed && tdp_enabled;
+> +	tdp_mmu_enabled = tdp_mmu_allowed && tdp_enabled && enable_tdp_mmu;
+>  #endif
 
-Disabling preemption across hardware_setup() isn't feasible as there are a number
-of allocations that might sleep.  But disabling preemption isn't necessary to
-ensure setup runs on one CPU, that only requires disabling _migration_.  So _if_
-we want to handle this in the kernel, we could simply do:
+Thinking about this more, I would rather revert commit 1e0c7d40758b ("KVM: SVM:
+hyper-v: Remote TLB flush for SVM") or fix the thing properly straitaway.  KVM
+doesn't magically handle the flushes correctly for the shadow/legacy MMU, KVM just
+happens to get lucky and not run afoul of the underlying bugs.  The revert appears
+to be reasonably straightforward (see bottom).
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 541982de5762..9126fdf02649 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9470,7 +9470,9 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
-        int r;
+And _if_ we want to hack-a-fix it, then I would strongly prefer a very isolated,
+obviously hacky fix, e.g.
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 36e4561554ca..a9ba4ae14fda 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -5779,8 +5779,13 @@ void kvm_configure_mmu(bool enable_tdp, int tdp_forced_root_level,
+        tdp_root_level = tdp_forced_root_level;
+        max_tdp_level = tdp_max_root_level;
  
-        mutex_lock(&vendor_module_lock);
-+       migrate_disable();
-        r = __kvm_x86_vendor_init(ops);
-+       migrate_enable();
-        mutex_unlock(&vendor_module_lock);
++       /*
++        * FIXME: Remove the enlightened TLB restriction when KVM properly
++        * handles TLB flushes for said enlightenment.
++        */.
+ #ifdef CONFIG_X86_64
+-       tdp_mmu_enabled = tdp_mmu_allowed && tdp_enabled;
++       tdp_mmu_enabled = tdp_mmu_allowed && tdp_enabled &&
++                         !(ms_hyperv.nested_features & HV_X64_NESTED_ENLIGHTENED_TLB);
+ #endif
+        /*
+         * max_huge_page_level reflects KVM's MMU capabilities irrespective
+
+
+
+
+The revert...
+
+---
+ arch/x86/kvm/svm/svm.c          |  3 ---
+ arch/x86/kvm/svm/svm_onhyperv.h | 27 ---------------------------
+ 2 files changed, 30 deletions(-)
+
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 11068e8eb969..292650dc85a0 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1320,7 +1320,6 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
+ 	if (sev_guest(vcpu->kvm))
+ 		sev_init_vmcb(svm);
  
-        return r;
+-	svm_hv_init_vmcb(vmcb);
+ 	init_vmcb_after_set_cpuid(vcpu);
+ 
+ 	vmcb_mark_all_dirty(vmcb);
+@@ -4075,8 +4074,6 @@ static void svm_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa,
+ 		svm->vmcb->control.nested_cr3 = __sme_set(root_hpa);
+ 		vmcb_mark_dirty(svm->vmcb, VMCB_NPT);
+ 
+-		hv_track_root_tdp(vcpu, root_hpa);
+-
+ 		cr3 = vcpu->arch.cr3;
+ 	} else if (root_level >= PT64_ROOT_4LEVEL) {
+ 		cr3 = __sme_set(root_hpa) | kvm_get_active_pcid(vcpu);
+diff --git a/arch/x86/kvm/svm/svm_onhyperv.h b/arch/x86/kvm/svm/svm_onhyperv.h
+index 6981c1e9a809..5118fd273e73 100644
+--- a/arch/x86/kvm/svm/svm_onhyperv.h
++++ b/arch/x86/kvm/svm/svm_onhyperv.h
+@@ -15,31 +15,8 @@ static struct kvm_x86_ops svm_x86_ops;
+ 
+ int svm_hv_enable_l2_tlb_flush(struct kvm_vcpu *vcpu);
+ 
+-static inline void svm_hv_init_vmcb(struct vmcb *vmcb)
+-{
+-	struct hv_vmcb_enlightenments *hve = &vmcb->control.hv_enlightenments;
+-
+-	BUILD_BUG_ON(sizeof(vmcb->control.hv_enlightenments) !=
+-		     sizeof(vmcb->control.reserved_sw));
+-
+-	if (npt_enabled &&
+-	    ms_hyperv.nested_features & HV_X64_NESTED_ENLIGHTENED_TLB)
+-		hve->hv_enlightenments_control.enlightened_npt_tlb = 1;
+-
+-	if (ms_hyperv.nested_features & HV_X64_NESTED_MSR_BITMAP)
+-		hve->hv_enlightenments_control.msr_bitmap = 1;
+-}
+-
+ static inline void svm_hv_hardware_setup(void)
+ {
+-	if (npt_enabled &&
+-	    ms_hyperv.nested_features & HV_X64_NESTED_ENLIGHTENED_TLB) {
+-		pr_info(KBUILD_MODNAME ": Hyper-V enlightened NPT TLB flush enabled\n");
+-		svm_x86_ops.tlb_remote_flush = hv_remote_flush_tlb;
+-		svm_x86_ops.tlb_remote_flush_with_range =
+-				hv_remote_flush_tlb_with_range;
+-	}
+-
+ 	if (ms_hyperv.nested_features & HV_X64_NESTED_DIRECT_FLUSH) {
+ 		int cpu;
+ 
+@@ -80,10 +57,6 @@ static inline void svm_hv_update_vp_id(struct vmcb *vmcb, struct kvm_vcpu *vcpu)
+ }
+ #else
+ 
+-static inline void svm_hv_init_vmcb(struct vmcb *vmcb)
+-{
+-}
+-
+ static inline void svm_hv_hardware_setup(void)
+ {
+ }
 
+base-commit: cb8748a781fe983e451f616ce4861a1c49ce79dd
+-- 
 
-But I'm not convinced we should handle this in the kernel.  Many of the checks,
-especially in SVM, query boot_cpu_has(), not this_cpu_has(), i.e. to truly perform
-setup on a single CPU, all of those would need to be converted to this_cpu_has().
-
-Some of those boot_cpu_has() calls should be changed regardless of whether or not
-migration is disabled, e.g. kvm_is_svm_supported() is arguably straight up buggy
-due to cpu_has_svm() checking the boot CPU (I'll fix that by adding a patch after
-open coding cpu_has_svm() into kvm_is_svm_supported()[*]).
-
-But things like kvm_timer_init() should NOT be blindlgly converted to this_cpu_has(),
-because the teardown path needs to mirror the setup path, e.g. if KVM ended up
-running on frankenstein hardware where not all CPUs have a constant TSC, KVM could
-leave a callback dangling and hose the kernel.  Obviously such hardware wouldn't
-correctly run VMs, but crashing the kernel is a touch worse than KVM not working
-correctly.
-
-I'm not totally against converting to this_cpu_has() for the setup, as it would be
-more intuitive in a lot of ways.  But, I don't think pinning the task actually
-hardens KVM in a meaningful way.  If there are any divergences between CPUs, then
-either KVM will notice before running VMs, e.g. the VMCS sanity checks, or KVM will
-never notice, e.g. the myriad runtime paths that check boot_cpu_has() (or variants
-thereof) without sanity checking across CPUs.  And if userspace _really_ wants to
-have guarantees about how setup is performed, e.g. for repeatable, deterministic
-behavior, then userspace should force loading of KVM to be done on CPU0.
-
-So my vote is to leave things as-is (modulo the cpu_has_svm() mess).  But maybe add
-documentation to explain the caveats about loading KVM, and how userspace can
-mitigate those caveats?
-
-[*] https://lore.kernel.org/all/20221201232655.290720-14-seanjc@google.com
