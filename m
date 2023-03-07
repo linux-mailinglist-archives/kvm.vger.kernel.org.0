@@ -2,284 +2,301 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 29A4F6AD3C3
-	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 02:19:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A705E6AD459
+	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 03:03:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229811AbjCGBTv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Mar 2023 20:19:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47206 "EHLO
+        id S229742AbjCGCD5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Mar 2023 21:03:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229692AbjCGBTu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Mar 2023 20:19:50 -0500
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D73B32A157
-        for <kvm@vger.kernel.org>; Mon,  6 Mar 2023 17:19:44 -0800 (PST)
-Received: by mail-pf1-x435.google.com with SMTP id cp12so7104760pfb.5
-        for <kvm@vger.kernel.org>; Mon, 06 Mar 2023 17:19:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678151984;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XlvRoDOZGkFFgyhD/mAoM2l807X5W3icksKBlwcwVSw=;
-        b=QInKjmq1d/lftVQQm3th9Xnc9fmHpsAazEnocQ1JESHI8/EHInm050AJuFFRaHY10m
-         ohkGhMwSBZENGVjd97tBBfwhB8GwQoCyj7YgC4WAcDqaujdeRIlnwLU98cHu1pkCkjoA
-         Yn1jRMWpPHTd0U4EIJLiTQ4iKqrIOD1tMAQZKNFI1rnkucCttBvcGXGWSRh4QqKBQAKF
-         df51ZCR6fxjvrJ+f2l254vk7RSNii9/N+X9HlgcpOkIJymtRVu0ErufD9BUtoiBBEqGU
-         oInYp9F5TxJAV0DGVmNo5vy55b+Xtismbdjmym/uV0oCnSQnQcWM1WLeainoOjxfh7Re
-         0WnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678151984;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XlvRoDOZGkFFgyhD/mAoM2l807X5W3icksKBlwcwVSw=;
-        b=Cr/g3xPXSx4jObutUQ7h7IWFGE3nIv/GNL04wNfpErRMx0yZba0jjybvVetIsZgEg7
-         XL58Z1Faj4O7YMLnH1Ab/1xOqGOyDMn9GNe+bOsCByqxlDsE2MXRtPz3QQkoWDC/ZKZ5
-         bkJS7eMRdJav4prEvw7OZRVvKnN0jOAnXJOytdK7pztZ5zHzIiUtvFMIFjQ6ydnsudN5
-         T3w+/85NHbu0Ba9VUqM6LohRUm8too4WG5lXsuOeqsVjfyGrrGtGu7pgVDlGizMVW8Es
-         60x2NuhibaQr6sZqi5tqw0lqK3UKFYNhl0jmDLYmCK7bEea2OPIYeT8ErKE59QbGheWR
-         Mqig==
-X-Gm-Message-State: AO0yUKUUEsQ9ZNBc+Y6E/wv5X+G66s7Uf9kN/pD0mNhUW3UFOuI7zqlE
-        GW28D5WAJ5AKdq8/eC/bqI3T4E4FlcEHq5JDkudUFg==
-X-Google-Smtp-Source: AK7set/8/oT7jPhV0zxjPPXpQxyJk5AbN05kjN+U/CvY4iejQ8uOmh0pRiMH5vHPQJuCpzoyHo13sQlQyXOv4EyoHrU=
-X-Received: by 2002:a63:7356:0:b0:4fc:a80e:e6ec with SMTP id
- d22-20020a637356000000b004fca80ee6ecmr4270561pgn.5.1678151983944; Mon, 06 Mar
- 2023 17:19:43 -0800 (PST)
+        with ESMTP id S229545AbjCGCDz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Mar 2023 21:03:55 -0500
+Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 56ADF39CD7;
+        Mon,  6 Mar 2023 18:03:51 -0800 (PST)
+Received: from loongson.cn (unknown [10.20.42.170])
+        by gateway (Coremail) with SMTP id _____8AxJEyGmwZkEicJAA--.11657S3;
+        Tue, 07 Mar 2023 10:03:50 +0800 (CST)
+Received: from [10.20.42.170] (unknown [10.20.42.170])
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8Cxnb6EmwZk3mxNAA--.8949S3;
+        Tue, 07 Mar 2023 10:03:48 +0800 (CST)
+Message-ID: <8c1042bb-6103-a248-2cd5-19c55ec8d83d@loongson.cn>
+Date:   Tue, 7 Mar 2023 10:03:48 +0800
 MIME-Version: 1.0
-References: <20230215010717.3612794-1-rananta@google.com> <20230215010717.3612794-11-rananta@google.com>
-In-Reply-To: <20230215010717.3612794-11-rananta@google.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Mon, 6 Mar 2023 17:19:27 -0800
-Message-ID: <CAAeT=FyCQxhhFqhfWbFQB9uAcUxmktRa3SC_Yfne2f_MEeXOJw@mail.gmail.com>
-Subject: Re: [REPOST PATCH 10/16] selftests: KVM: aarch64: Add KVM EVTYPE
- filter PMU test
-To:     Raghavendra Rao Ananta <rananta@google.com>
-Cc:     Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
-        Ricardo Koller <ricarkol@google.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH v3 14/29] LoongArch: KVM: Implement vcpu load and vcpu put
+ operations
+Content-Language: en-US
+To:     Tianrui Zhao <zhaotianrui@loongson.cn>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Xi Ruoyao <xry111@xry111.site>
+References: <20230228070057.3687180-1-zhaotianrui@loongson.cn>
+ <20230228070057.3687180-15-zhaotianrui@loongson.cn>
+From:   maobibo <maobibo@loongson.cn>
+In-Reply-To: <20230228070057.3687180-15-zhaotianrui@loongson.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: AQAAf8Cxnb6EmwZk3mxNAA--.8949S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBjvJXoWxKF4ftw48Cr4xXry7AFyxKrg_yoWfWry3pr
+        1qgayxurWUt3ZrtF15ArsFvr15WF4Sy34rXr17JrW2qrn8Zr95Aa1IyFy7AFyFq3WxXFyI
+        ywn8CrZa9r4ktw7anT9S1TB71UUUUjDqnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
+        qI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUIcSsGvfJTRUUU
+        bqkYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s
+        1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xv
+        wVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84
+        ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AKxVW8Jr0_Cr1U
+        M2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zV
+        CFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUAVWUtwAv7VC2
+        z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2
+        IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E
+        4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxVWUJVWUGw
+        C20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48J
+        MIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMI
+        IF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E
+        87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07j5o7tUUUUU=
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Raghu,
 
-On Tue, Feb 14, 2023 at 5:07=E2=80=AFPM Raghavendra Rao Ananta
-<rananta@google.com> wrote:
->
-> KVM doest't allow the guests to modify the filter types
-> such counting events in nonsecure/secure-EL2, EL3, and
-> so on. Validate the same by force-configuring the bits
-> in PMXEVTYPER_EL0, PMEVTYPERn_EL0, and PMCCFILTR_EL0
-> registers.
->
-> The test extends further by trying to create an event
-> for counting only in EL2 and validates if the counter
-> is not progressing.
->
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+
+在 2023/2/28 15:00, Tianrui Zhao 写道:
+> Implement loongarch vcpu load and vcpu put operations, including
+> load csr value into hardware and save csr value into vcpu structure.
+> 
+> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
 > ---
->  .../testing/selftests/kvm/aarch64/vpmu_test.c | 85 +++++++++++++++++++
->  1 file changed, 85 insertions(+)
->
-> diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_test.c b/tools/test=
-ing/selftests/kvm/aarch64/vpmu_test.c
-> index 3dfb770b538e9..5c166df245589 100644
-> --- a/tools/testing/selftests/kvm/aarch64/vpmu_test.c
-> +++ b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
-> @@ -15,6 +15,10 @@
->   * of allowing or denying the events. The guest validates it by
->   * checking if it's able to count only the events that are allowed.
->   *
-> + * 3. KVM doesn't allow the guest to count the events attributed with
-> + * higher exception levels (EL2, EL3). Verify this functionality by
-> + * configuring and trying to count the events for EL2 in the guest.
-> + *
->   * Copyright (c) 2022 Google LLC.
->   *
->   */
-> @@ -23,6 +27,7 @@
->  #include <test_util.h>
->  #include <vgic.h>
->  #include <asm/perf_event.h>
-> +#include <linux/arm-smccc.h>
->  #include <linux/bitfield.h>
->  #include <linux/bitmap.h>
->
-> @@ -259,6 +264,7 @@ struct vpmu_vm {
->  enum test_stage {
->         TEST_STAGE_COUNTER_ACCESS =3D 1,
->         TEST_STAGE_KVM_EVENT_FILTER,
-> +       TEST_STAGE_KVM_EVTYPE_FILTER,
->  };
->
->  struct guest_data {
-> @@ -678,6 +684,70 @@ static void guest_event_filter_test(unsigned long *p=
-mu_filter)
->         }
+>  arch/loongarch/kvm/vcpu.c | 192 ++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 192 insertions(+)
+> 
+> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+> index 615f68d082f8..14c89208936f 100644
+> --- a/arch/loongarch/kvm/vcpu.c
+> +++ b/arch/loongarch/kvm/vcpu.c
+> @@ -771,6 +771,198 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+>  	}
 >  }
->
-> +static void guest_evtype_filter_test(void)
+>  
+> +static int _kvm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
 > +{
-> +       int i;
-> +       struct pmc_accessor *acc;
-> +       uint64_t typer, cnt;
-> +       struct arm_smccc_res res;
+> +	struct kvm_context *context;
+> +	struct loongarch_csrs *csr = vcpu->arch.csr;
+> +	bool migrated, all;
 > +
-> +       pmu_enable();
+> +	/*
+> +	 * Have we migrated to a different CPU?
+> +	 * If so, any old guest TLB state may be stale.
+> +	 */
+> +	migrated = (vcpu->arch.last_sched_cpu != cpu);
 > +
-> +       /*
-> +        * KVM blocks the guests from creating events for counting in Sec=
-ure/Non-Secure Hyp (EL2),
-> +        * Monitor (EL3), and Multithreading configuration. It applies th=
-e mask
-> +        * ARMV8_PMU_EVTYPE_MASK against guest accesses to PMXEVTYPER_EL0=
-, PMEVTYPERn_EL0,
-> +        * and PMCCFILTR_EL0 registers to prevent this. Check if KVM hono=
-rs this using all possible
-> +        * ways to configure the EVTYPER.
-> +        */
-
-I would prefer to break long lines into multiple lines for these comments
-(or other comments in these patches), as "Linux kernel coding style"
-suggests.
----
-[https://www.kernel.org/doc/html/latest/process/coding-style.html#breaking-=
-long-lines-and-strings]
-
-The preferred limit on the length of a single line is 80 columns.
-
-Statements longer than 80 columns should be broken into sensible
-chunks, unless exceeding 80 columns significantly increases
-readability and does not hide information.
----
-
-> +       for (i =3D 0; i < ARRAY_SIZE(pmc_accessors); i++) {
-> +               acc =3D &pmc_accessors[i];
+> +	/*
+> +	 * Was this the last VCPU to run on this CPU?
+> +	 * If not, any old guest state from this VCPU will have been clobbered.
+> +	 */
+> +	context = per_cpu_ptr(vcpu->kvm->arch.vmcs, cpu);
+> +	all = migrated || (context->last_vcpu != vcpu);
+> +	context->last_vcpu = vcpu;
 > +
-> +               /* Set all filter bits (31-24), readback, and check again=
-st the mask */
-> +               acc->write_typer(0, 0xff000000);
-> +               typer =3D acc->read_typer(0);
+> +	/*
+> +	 * Restore timer state regardless
+> +	 */
+> +	kvm_restore_timer(vcpu);
 > +
-> +               GUEST_ASSERT_2((typer | ARMV8_PMU_EVTYPE_EVENT) =3D=3D AR=
-MV8_PMU_EVTYPE_MASK,
-> +                               typer | ARMV8_PMU_EVTYPE_EVENT, ARMV8_PMU=
-_EVTYPE_MASK);
-
-It appears that bits[29:26] don't have to be zero depending on
-feature availability to the guest (Those bits needs to be zero
-only when relevant features are not available on the guest).
-So, the expected value must be changed depending on the feature
-availability if the test checks those bits.
-I have the same comment for the cycle counter.
-
+> +	/* Control guest page CCA attribute */
+> +	change_csr_gcfg(CSR_GCFG_MATC_MASK, CSR_GCFG_MATC_ROOT);
+> +	/* Don't bother restoring registers multiple times unless necessary */
+> +	if (!all)
+> +		return 0;
 > +
-> +               /*
-> +                * Regardless of ARMV8_PMU_EVTYPE_MASK, KVM sets perf att=
-r.exclude_hv
-> +                * to not count NS-EL2 events. Verify this functionality =
-by configuring
-> +                * a NS-EL2 event, for which the couunt shouldn't increme=
-nt.
-> +                */
-> +               typer =3D ARMV8_PMUV3_PERFCTR_INST_RETIRED;
-> +               typer |=3D ARMV8_PMU_INCLUDE_EL2 | ARMV8_PMU_EXCLUDE_EL1 =
-| ARMV8_PMU_EXCLUDE_EL0;
-> +               acc->write_typer(0, typer);
-> +               acc->write_cntr(0, 0);
-> +               enable_counter(0);
+> +	write_csr_gcntc((ulong)vcpu->kvm->arch.time_offset);
+> +	/*
+> +	 * Restore guest CSR registers
+> +	 */
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_CRMD);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_PRMD);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_EUEN);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_MISC);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_ECFG);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_ERA);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_BADV);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_BADI);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_EENTRY);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_TLBIDX);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_TLBEHI);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_TLBELO0);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_TLBELO1);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_ASID);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_PGDL);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_PGDH);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_PWCTL0);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_PWCTL1);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_STLBPGSIZE);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_RVACFG);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_CPUID);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_KS0);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_KS1);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_KS2);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_KS3);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_KS4);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_KS5);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_KS6);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_KS7);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_TMID);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_CNTC);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_TLBRENTRY);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_TLBRBADV);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_TLBRERA);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_TLBRSAVE);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_TLBRELO0);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_TLBRELO1);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_TLBREHI);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_TLBRPRMD);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_DMWIN0);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_DMWIN1);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_DMWIN2);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_DMWIN3);
+> +	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_LLBCTL);
 > +
-> +               /* Issue a hypercall to enter EL2 and return */
-> +               memset(&res, 0, sizeof(res));
-> +               smccc_hvc(ARM_SMCCC_VERSION_FUNC_ID, 0, 0, 0, 0, 0, 0, 0,=
- &res);
+> +	/* restore Root.Guestexcept from unused Guest guestexcept register */
+> +	write_csr_gintc(csr->csrs[LOONGARCH_CSR_GINTC]);
 > +
-> +               cnt =3D acc->read_cntr(0);
-> +               GUEST_ASSERT_3(cnt =3D=3D 0, cnt, typer, i);
-> +       }
+> +	/*
+> +	 * We should clear linked load bit to break interrupted atomics. This
+> +	 * prevents a SC on the next VCPU from succeeding by matching a LL on
+> +	 * the previous VCPU.
+> +	 */
+> +	if (vcpu->kvm->created_vcpus > 1)
+> +		set_gcsr_llbctl(CSR_LLBCTL_WCLLB);
 > +
-> +       /* Check the same sequence for the Cycle counter */
-> +       write_pmccfiltr(0xff000000);
-> +       typer =3D read_pmccfiltr();
-> +       GUEST_ASSERT_2((typer | ARMV8_PMU_EVTYPE_EVENT) =3D=3D ARMV8_PMU_=
-EVTYPE_MASK,
-> +                               typer | ARMV8_PMU_EVTYPE_EVENT, ARMV8_PMU=
-_EVTYPE_MASK);
-> +
-> +       typer =3D ARMV8_PMU_INCLUDE_EL2 | ARMV8_PMU_EXCLUDE_EL1 | ARMV8_P=
-MU_EXCLUDE_EL0;
-> +       write_pmccfiltr(typer);
-> +       reset_cycle_counter();
-> +       enable_cycle_counter();
-> +
-> +       /* Issue a hypercall to enter EL2 and return */
-> +       memset(&res, 0, sizeof(res));
-> +       smccc_hvc(ARM_SMCCC_VERSION_FUNC_ID, 0, 0, 0, 0, 0, 0, 0, &res);
-> +
-> +       cnt =3D read_cycle_counter();
-
-Perhaps it's worth considering having the helpers for PMC registers
-(e.g. write_cntr()) accepting the cycle counter as the index=3D=3D31
-to simplify the test code implementation ?
-
-Thank you,
-Reiji
-
-> +       GUEST_ASSERT_2(cnt =3D=3D 0, cnt, typer);
+> +	return 0;
 > +}
 > +
->  static void guest_code(void)
->  {
->         switch (guest_data.test_stage) {
-> @@ -687,6 +757,9 @@ static void guest_code(void)
->         case TEST_STAGE_KVM_EVENT_FILTER:
->                 guest_event_filter_test(guest_data.pmu_filter);
->                 break;
-> +       case TEST_STAGE_KVM_EVTYPE_FILTER:
-> +               guest_evtype_filter_test();
-> +               break;
->         default:
->                 GUEST_ASSERT_1(0, guest_data.test_stage);
->         }
-> @@ -1014,10 +1087,22 @@ static void run_kvm_event_filter_test(void)
->         run_kvm_event_filter_error_tests();
->  }
->
-> +static void run_kvm_evtype_filter_test(void)
+> +void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
 > +{
-> +       struct vpmu_vm *vpmu_vm;
+> +	unsigned long flags;
 > +
-> +       guest_data.test_stage =3D TEST_STAGE_KVM_EVTYPE_FILTER;
+> +	local_irq_save(flags);
+> +	vcpu->cpu = cpu;
+> +	if (vcpu->arch.last_sched_cpu != cpu) {
+> +		kvm_debug("[%d->%d]KVM VCPU[%d] switch\n",
+> +				vcpu->arch.last_sched_cpu, cpu, vcpu->vcpu_id);
+> +		/*
+> +		 * Migrate the timer interrupt to the current CPU so that it
+> +		 * always interrupts the guest and synchronously triggers a
+> +		 * guest timer interrupt.
+> +		 */
+> +		kvm_migrate_count(vcpu);
+> +	}
 > +
-> +       vpmu_vm =3D create_vpmu_vm(guest_code, NULL);
-> +       run_vcpu(vpmu_vm->vcpu);
-> +       destroy_vpmu_vm(vpmu_vm);
+> +	/* restore guest state to registers */
+> +	_kvm_vcpu_load(vcpu, cpu);
+> +	local_irq_restore(flags);
 > +}
 > +
->  static void run_tests(uint64_t pmcr_n)
+> +static int _kvm_vcpu_put(struct kvm_vcpu *vcpu, int cpu)
+> +{
+> +	struct loongarch_csrs *csr = vcpu->arch.csr;
+> +
+> +	kvm_lose_fpu(vcpu);
+Hi Tianrui,
+
+Can we add KVM_LARCH_CSR bit in vcpu->arch.aux_inuse similiar with
+KVM_LARCH_FPU? It means that sw csr is consistent with hw csr registers.
+
+And clear this bit when returning to guest, set this bit in this function
+_kvm_vcpu_put. If it is true, we need not copy to sw csr from hw, and for
+SET_ONE_REG function, both sw/hw csr register will be set.
+
+
+Regards
+Bibo, Mao
+
+> +
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_CRMD);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_PRMD);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_EUEN);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_MISC);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_ECFG);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_ERA);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_BADV);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_BADI);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_EENTRY);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_TLBIDX);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_TLBEHI);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_TLBELO0);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_TLBELO1);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_ASID);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_PGDL);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_PGDH);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_PGD);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_PWCTL0);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_PWCTL1);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_STLBPGSIZE);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_RVACFG);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_CPUID);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_PRCFG1);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_PRCFG2);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_PRCFG3);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_KS0);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_KS1);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_KS2);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_KS3);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_KS4);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_KS5);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_KS6);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_KS7);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_TMID);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_CNTC);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_LLBCTL);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_TLBRENTRY);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_TLBRBADV);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_TLBRERA);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_TLBRSAVE);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_TLBRELO0);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_TLBRELO1);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_TLBREHI);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_TLBRPRMD);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_DMWIN0);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_DMWIN1);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_DMWIN2);
+> +	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_DMWIN3);
+> +
+> +	/* save Root.Guestexcept in unused Guest guestexcept register */
+> +	kvm_save_timer(vcpu);
+> +	csr->csrs[LOONGARCH_CSR_GINTC] = read_csr_gintc();
+> +	return 0;
+> +}
+> +
+> +void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+> +{
+> +	unsigned long flags;
+> +	int cpu;
+> +
+> +	local_irq_save(flags);
+> +	cpu = smp_processor_id();
+> +	vcpu->arch.last_sched_cpu = cpu;
+> +	vcpu->cpu = -1;
+> +
+> +	/* save guest state in registers */
+> +	_kvm_vcpu_put(vcpu, cpu);
+> +	local_irq_restore(flags);
+> +}
+> +
+>  int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
 >  {
->         run_counter_access_tests(pmcr_n);
->         run_kvm_event_filter_test();
-> +       run_kvm_evtype_filter_test();
->  }
->
->  /*
-> --
-> 2.39.1.581.gbfd45094c4-goog
->
+>  	int r = -EINTR;
+
