@@ -2,74 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 146096AD5C8
-	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 04:44:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BB2B6AD5D1
+	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 04:46:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229886AbjCGDoT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Mar 2023 22:44:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35374 "EHLO
+        id S230079AbjCGDqF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Mar 2023 22:46:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229653AbjCGDoS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Mar 2023 22:44:18 -0500
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB79E1CF50
-        for <kvm@vger.kernel.org>; Mon,  6 Mar 2023 19:44:16 -0800 (PST)
-Received: by mail-pl1-x634.google.com with SMTP id v11so12754727plz.8
-        for <kvm@vger.kernel.org>; Mon, 06 Mar 2023 19:44:16 -0800 (PST)
+        with ESMTP id S229619AbjCGDqA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Mar 2023 22:46:00 -0500
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E2FA4AFF2
+        for <kvm@vger.kernel.org>; Mon,  6 Mar 2023 19:45:58 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id ju20-20020a170903429400b0019ea5ea044aso5281876plb.21
+        for <kvm@vger.kernel.org>; Mon, 06 Mar 2023 19:45:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678160656;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fTzKm/aW2GG4ntfas/EqyluRDMLGRctb+sq4SdATNd0=;
-        b=B32iYkDWJILZ8UenijGZt8EGGHJqVOzJX6zaGy6cxDLtLWiC9/pAeyGO7Zc5MJbwkk
-         YIMlLPVKuf+N8PHaoVpEuITEHfUKlH1fIs5P51/crFDDTU4wbjma3E7ZRIqzplVoXhnQ
-         e3XrWhi2EkfXVySFE9acBE8OEj1pmMA4cYObed5XEbnePOzASctJ/fR/BbQ27Lblm1KI
-         p/SB9VPz9Cj7ZTg82fPgVe1w4VeLWG13LQpLvHnhpRFDNySBoPDysrD2UDfa9H2+2xgR
-         RTm14gREljDzRRzUAgbeCPLR6zQuHBtLLdTqsmVLbtM6htR6p/6dZq5K5XOXvcFBdNO4
-         ukQQ==
+        d=google.com; s=20210112; t=1678160758;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=iF39vlORTLqs7f0jTnhmArpcKNX0qEbbkoEZZe/ErDM=;
+        b=p/yfAugM11dFwrcc9xopXwfzM10BV4KSQzIDLhyu4cXYrJ6Va6eeWYHOEyoSXmnSI/
+         uyWenu0xqDDstWY9ZJmv4H91tLSM9oWw7UEaDlF0p4d/hTcSpZl5XV4uWj3+UYx7T8B9
+         NQExdUGh1y9JFp1lJFt6keV/5G3Tven1ZxPNuKgnY1+GrvdgWgWoyajV6OAFg2pq8JFr
+         vDZxebvCJ+8qcnu+czr6CZpGpiPVC+8goGtfuTx/MdvD8hllXUMvbnqB/ai0ZbPW+A5x
+         y+JR7OoHJXirg1qddTHwk59jnwPzgSq1EMXyu+6JOQgdv21CpmtoXxMRDy/7lC/hF4fb
+         59Sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678160656;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fTzKm/aW2GG4ntfas/EqyluRDMLGRctb+sq4SdATNd0=;
-        b=lSPWT840URPm0UhB30vxothebnC+4PHQX0k0YQaYIZoP4tafpPwtFiOIf+RGRRDizT
-         PpFTe6lD9UamLg3hb84w9WqVWb6PAtXFgG7qfS1fPg9t+J2h/7cpnfih1MmsHLfz7n8a
-         Afmxnn00eNVjGpxLfn4IXCcgc0R9p3uDKX2jw+WqY+5WF5c2iKLrvrN6vCvRCLNVVkzF
-         yUpZvz6cpmdQx/CQX/8OxS4EO1QWuTbg5+ehI5SiVAABWWw+zBs448MFCnTpJ7wlKdpO
-         M2AN7hpCGAKKNLM3UhkZ5bNGalsAVzWkStfdGP1YYiWoMzn3Jax+SaYCSxhC28Kcf+CP
-         0ctg==
-X-Gm-Message-State: AO0yUKX0P58GH0xYuQcRPgDeD5gy3TLzgbgYfcDp7qKzVIUgp3UTEY9+
-        vdH0HYh1Y9nw0/w5YcW34LHGSooQfJPewA0Jrs8JEg==
-X-Google-Smtp-Source: AK7set9LV79ltHOZ94E3xmULEq7pjwpJGNVbZurVvbdk/UN9//6xDvIx5rPlU7cTgaW1v1fX9bXDQmBR2lkQ5UX+OqU=
-X-Received: by 2002:a17:902:f783:b0:19c:140d:aada with SMTP id
- q3-20020a170902f78300b0019c140daadamr5000620pln.2.1678160655784; Mon, 06 Mar
- 2023 19:44:15 -0800 (PST)
-MIME-Version: 1.0
-References: <20230215010717.3612794-1-rananta@google.com> <20230215010717.3612794-12-rananta@google.com>
-In-Reply-To: <20230215010717.3612794-12-rananta@google.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Mon, 6 Mar 2023 19:43:59 -0800
-Message-ID: <CAAeT=FwdkFLzp0S+T7L_ppbaU5VvdfT1Uuubm3cjuDKykJchNQ@mail.gmail.com>
-Subject: Re: [REPOST PATCH 11/16] selftests: KVM: aarch64: Add vCPU migration
- test for PMU
-To:     Raghavendra Rao Ananta <rananta@google.com>
-Cc:     Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
-        Ricardo Koller <ricarkol@google.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+        d=1e100.net; s=20210112; t=1678160758;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iF39vlORTLqs7f0jTnhmArpcKNX0qEbbkoEZZe/ErDM=;
+        b=5ZJeN5knGzCtL+vEwUfT2u0OzVhlYeS/lpCojloaEGiTEtV4o5RRvEUho7p3rMzx/8
+         N1/dbyTMNzsJY9lPUuE9uTL5Qwyekgzo3QS6KWd1waJhAajDDDAgbsHTUyHK9THcv8QL
+         cxcBXmNdmmyIU8FEXg890TvUbZA2uPhPxIrFLkcrIpJQXLd05pJggGaf+EGG1Uf1dWA5
+         6tEaj7A9tnQOY090P4kPoCcxzvNWNxNJuzj9rlOEvPaqwhqz/ghdUJd1+hwV5M1tPIqO
+         J2RWPAgTKchPEFJib5CLPFZg+Ec6zniwkwRwft51364BkeXEHpieHKQuezI4A9Q2dbyU
+         kUQw==
+X-Gm-Message-State: AO0yUKX9EdEAAcpSFklt0Wab/4gmvl4P5ZpaHZ/av7DbyKhle/5nh1B2
+        T9gDZ6kpptmVeuxW0CC4Kkn+W3x7JrEE3g==
+X-Google-Smtp-Source: AK7set9mrxnrB/l4Bp+rc3TAsih9VKbZaLiyhTn/fwUqAhML5nSqt1bGJ8JRGOQQw0R8jPsGWv8TUOfnuHdsJQ==
+X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
+ (user=ricarkol job=sendgmr) by 2002:a62:834b:0:b0:5e2:c313:a660 with SMTP id
+ h72-20020a62834b000000b005e2c313a660mr5605985pfe.6.1678160757794; Mon, 06 Mar
+ 2023 19:45:57 -0800 (PST)
+Date:   Tue,  7 Mar 2023 03:45:43 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.40.0.rc0.216.gc4246ad0f0-goog
+Message-ID: <20230307034555.39733-1-ricarkol@google.com>
+Subject: [PATCH v6 00/12] Implement Eager Page Splitting for ARM
+From:   Ricardo Koller <ricarkol@google.com>
+To:     pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
+        yuzenghui@huawei.com, dmatlack@google.com
+Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
+        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
+        rananta@google.com, bgardon@google.com, ricarkol@gmail.com,
+        Ricardo Koller <ricarkol@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,376 +70,213 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Raghu,
+Eager Page Splitting improves the performance of dirty-logging (used
+in live migrations) when guest memory is backed by huge-pages.  It's
+an optimization used in Google Cloud since 2016 on x86, and for the
+last couple of months on ARM.
 
-On Tue, Feb 14, 2023 at 5:07=E2=80=AFPM Raghavendra Rao Ananta
-<rananta@google.com> wrote:
->
-> Implement a stress test for KVM by frequently force-migrating the
-> vCPU to random pCPUs in the system. This would validate the
-> save/restore functionality of KVM and starting/stopping of
-> PMU counters as necessary.
->
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> ---
->  .../testing/selftests/kvm/aarch64/vpmu_test.c | 195 +++++++++++++++++-
->  1 file changed, 193 insertions(+), 2 deletions(-)
->
-> diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_test.c b/tools/test=
-ing/selftests/kvm/aarch64/vpmu_test.c
-> index 5c166df245589..0c9d801f4e602 100644
-> --- a/tools/testing/selftests/kvm/aarch64/vpmu_test.c
-> +++ b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
-> @@ -19,9 +19,15 @@
->   * higher exception levels (EL2, EL3). Verify this functionality by
->   * configuring and trying to count the events for EL2 in the guest.
->   *
-> + * 4. Since the PMU registers are per-cpu, stress KVM by frequently
-> + * migrating the guest vCPU to random pCPUs in the system, and check
-> + * if the vPMU is still behaving as expected.
-> + *
->   * Copyright (c) 2022 Google LLC.
->   *
->   */
-> +#define _GNU_SOURCE
-> +
->  #include <kvm_util.h>
->  #include <processor.h>
->  #include <test_util.h>
-> @@ -30,6 +36,11 @@
->  #include <linux/arm-smccc.h>
->  #include <linux/bitfield.h>
->  #include <linux/bitmap.h>
-> +#include <stdlib.h>
-> +#include <pthread.h>
-> +#include <sys/sysinfo.h>
-> +
-> +#include "delay.h"
->
->  /* The max number of the PMU event counters (excluding the cycle counter=
-) */
->  #define ARMV8_PMU_MAX_GENERAL_COUNTERS (ARMV8_PMU_MAX_COUNTERS - 1)
-> @@ -37,6 +48,8 @@
->  /* The max number of event numbers that's supported */
->  #define ARMV8_PMU_MAX_EVENTS           64
->
-> +#define msecs_to_usecs(msec)           ((msec) * 1000LL)
-> +
->  /*
->   * The macros and functions below for reading/writing PMEV{CNTR,TYPER}<n=
->_EL0
->   * were basically copied from arch/arm64/kernel/perf_event.c.
-> @@ -265,6 +278,7 @@ enum test_stage {
->         TEST_STAGE_COUNTER_ACCESS =3D 1,
->         TEST_STAGE_KVM_EVENT_FILTER,
->         TEST_STAGE_KVM_EVTYPE_FILTER,
-> +       TEST_STAGE_VCPU_MIGRATION,
->  };
->
->  struct guest_data {
-> @@ -275,6 +289,19 @@ struct guest_data {
->
->  static struct guest_data guest_data;
->
-> +#define VCPU_MIGRATIONS_TEST_ITERS_DEF         1000
-> +#define VCPU_MIGRATIONS_TEST_MIGRATION_FREQ_MS 2
-> +
-> +struct test_args {
-> +       int vcpu_migration_test_iter;
-> +       int vcpu_migration_test_migrate_freq_ms;
-> +};
-> +
-> +static struct test_args test_args =3D {
-> +       .vcpu_migration_test_iter =3D VCPU_MIGRATIONS_TEST_ITERS_DEF,
-> +       .vcpu_migration_test_migrate_freq_ms =3D VCPU_MIGRATIONS_TEST_MIG=
-RATION_FREQ_MS,
-> +};
-> +
->  static void guest_sync_handler(struct ex_regs *regs)
->  {
->         uint64_t esr, ec;
-> @@ -352,7 +379,6 @@ static bool pmu_event_is_supported(uint64_t event)
->                 GUEST_ASSERT_3(!(_tval & mask), _tval, mask, set_expected=
-);\
->  }
->
-> -
->  /*
->   * Extra instructions inserted by the compiler would be difficult to com=
-pensate
->   * for, so hand assemble everything between, and including, the PMCR acc=
-esses
-> @@ -459,6 +485,13 @@ static void test_event_count(uint64_t event, int pmc=
-_idx, bool expect_count)
->         }
->  }
->
-> +static void test_basic_pmu_functionality(void)
-> +{
-> +       /* Test events on generic and cycle counters */
-> +       test_instructions_count(0, true);
-> +       test_cycles_count(true);
-> +}
-> +
->  /*
->   * Check if @mask bits in {PMCNTEN,PMINTEN,PMOVS}{SET,CLR} registers
->   * are set or cleared as specified in @set_expected.
-> @@ -748,6 +781,16 @@ static void guest_evtype_filter_test(void)
->         GUEST_ASSERT_2(cnt =3D=3D 0, cnt, typer);
->  }
->
-> +static void guest_vcpu_migration_test(void)
-> +{
-> +       /*
-> +        * While the userspace continuously migrates this vCPU to random =
-pCPUs,
-> +        * run basic PMU functionalities and verify the results.
-> +        */
-> +       while (test_args.vcpu_migration_test_iter--)
-> +               test_basic_pmu_functionality();
-> +}
-> +
->  static void guest_code(void)
->  {
->         switch (guest_data.test_stage) {
-> @@ -760,6 +803,9 @@ static void guest_code(void)
->         case TEST_STAGE_KVM_EVTYPE_FILTER:
->                 guest_evtype_filter_test();
->                 break;
-> +       case TEST_STAGE_VCPU_MIGRATION:
-> +               guest_vcpu_migration_test();
-> +               break;
->         default:
->                 GUEST_ASSERT_1(0, guest_data.test_stage);
->         }
-> @@ -837,6 +883,7 @@ create_vpmu_vm(void *guest_code, struct kvm_pmu_event=
-_filter *pmu_event_filters)
->
->         vpmu_vm->vm =3D vm =3D vm_create(1);
->         vm_init_descriptor_tables(vm);
-> +
->         /* Catch exceptions for easier debugging */
->         for (ec =3D 0; ec < ESR_EC_NUM; ec++) {
->                 vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT, ec,
-> @@ -881,6 +928,8 @@ static void run_vcpu(struct kvm_vcpu *vcpu)
->         struct ucall uc;
->
->         sync_global_to_guest(vcpu->vm, guest_data);
-> +       sync_global_to_guest(vcpu->vm, test_args);
-> +
->         vcpu_run(vcpu);
->         switch (get_ucall(vcpu, &uc)) {
->         case UCALL_ABORT:
-> @@ -1098,11 +1147,112 @@ static void run_kvm_evtype_filter_test(void)
->         destroy_vpmu_vm(vpmu_vm);
->  }
->
-> +struct vcpu_migrate_data {
-> +       struct vpmu_vm *vpmu_vm;
-> +       pthread_t *pt_vcpu;
+Background and motivation
+=========================
+Dirty logging is typically used for live-migration iterative copying.
+KVM implements dirty-logging at the PAGE_SIZE granularity (will refer
+to 4K pages from now on).  It does it by faulting on write-protected
+4K pages.  Therefore, enabling dirty-logging on a huge-page requires
+breaking it into 4K pages in the first place.  KVM does this breaking
+on fault, and because it's in the critical path it only maps the 4K
+page that faulted; every other 4K page is left unmapped.  This is not
+great for performance on ARM for a couple of reasons:
 
-Nit: Originally, I wasn't sure what 'pt' stands for.
-Also, the 'pt_vcpu' made me think this would be a pointer to a vCPU.
-Perhaps renaming this to 'vcpu_pthread' might be more clear ?
+- Splitting on fault can halt vcpus for milliseconds in some
+  implementations. Splitting a block PTE requires using a broadcasted
+  TLB invalidation (TLBI) for every huge-page (due to the
+  break-before-make requirement). Note that x86 doesn't need this. We
+  observed some implementations that take millliseconds to complete
+  broadcasted TLBIs when done in parallel from multiple vcpus.  And
+  that's exactly what happens when doing it on fault: multiple vcpus
+  fault at the same time triggering TLBIs in parallel.
 
+- Read intensive guest workloads end up paying for dirty-logging.
+  Only mapping the faulting 4K page means that all the other pages
+  that were part of the huge-page will now be unmapped. The effect is
+  that any access, including reads, now has to fault.
 
-> +       bool vcpu_done;
-> +};
-> +
-> +static void *run_vcpus_migrate_test_func(void *arg)
-> +{
-> +       struct vcpu_migrate_data *migrate_data =3D arg;
-> +       struct vpmu_vm *vpmu_vm =3D migrate_data->vpmu_vm;
-> +
-> +       run_vcpu(vpmu_vm->vcpu);
-> +       migrate_data->vcpu_done =3D true;
-> +
-> +       return NULL;
-> +}
-> +
-> +static uint32_t get_pcpu(void)
-> +{
-> +       uint32_t pcpu;
-> +       unsigned int nproc_conf;
-> +       cpu_set_t online_cpuset;
-> +
-> +       nproc_conf =3D get_nprocs_conf();
-> +       sched_getaffinity(0, sizeof(cpu_set_t), &online_cpuset);
-> +
-> +       /* Randomly find an available pCPU to place the vCPU on */
-> +       do {
-> +               pcpu =3D rand() % nproc_conf;
-> +       } while (!CPU_ISSET(pcpu, &online_cpuset));
-> +
-> +       return pcpu;
-> +}
-> +
-> +static int migrate_vcpu(struct vcpu_migrate_data *migrate_data)
+Eager Page Splitting (on ARM)
+=============================
+Eager Page Splitting fixes the above two issues by eagerly splitting
+huge-pages when enabling dirty logging. The goal is to avoid doing it
+while faulting on write-protected pages. This is what the TDP MMU does
+for x86 [0], except that x86 does it for different reasons: to avoid
+grabbing the MMU lock on fault. Note that taking care of
+write-protection faults still requires grabbing the MMU lock on ARM,
+but not on x86 (with the fast_page_fault path).
 
-Nit: You might want to pass a pthread_t rather than migrate_data
-unless the function uses some more fields of the data in the
-following patches.
+An additional benefit of eagerly splitting huge-pages is that it can
+be done in a controlled way (e.g., via an IOCTL). This series provides
+two knobs for doing it, just like its x86 counterpart: when enabling
+dirty logging, and when using the KVM_CLEAR_DIRTY_LOG ioctl. The
+benefit of doing it on KVM_CLEAR_DIRTY_LOG is that this ioctl takes
+ranges, and not complete memslots like when enabling dirty logging.
+This means that the cost of splitting (mainly broadcasted TLBIs) can
+be throttled: split a range, wait for a bit, split another range, etc.
+The benefits of this approach were presented by Oliver Upton at KVM
+Forum 2022 [1].
 
-> +{
-> +       int ret;
-> +       cpu_set_t cpuset;
-> +       uint32_t new_pcpu =3D get_pcpu();
-> +
-> +       CPU_ZERO(&cpuset);
-> +       CPU_SET(new_pcpu, &cpuset);
-> +
-> +       pr_debug("Migrating vCPU to pCPU: %u\n", new_pcpu);
-> +
-> +       ret =3D pthread_setaffinity_np(*migrate_data->pt_vcpu, sizeof(cpu=
-set), &cpuset);
-> +
-> +       /* Allow the error where the vCPU thread is already finished */
-> +       TEST_ASSERT(ret =3D=3D 0 || ret =3D=3D ESRCH,
-> +                   "Failed to migrate the vCPU to pCPU: %u; ret: %d\n", =
-new_pcpu, ret);
-> +
-> +       return ret;
-> +}
-> +
-> +static void *vcpus_migrate_func(void *arg)
-> +{
-> +       struct vcpu_migrate_data *migrate_data =3D arg;
-> +
-> +       while (!migrate_data->vcpu_done) {
-> +               usleep(msecs_to_usecs(test_args.vcpu_migration_test_migra=
-te_freq_ms));
-> +               migrate_vcpu(migrate_data);
-> +       }
-> +
-> +       return NULL;
-> +}
-> +
-> +static void run_vcpu_migration_test(uint64_t pmcr_n)
-> +{
-> +       int ret;
-> +       struct vpmu_vm *vpmu_vm;
-> +       pthread_t pt_vcpu, pt_sched;
-> +       struct vcpu_migrate_data migrate_data =3D {
-> +               .pt_vcpu =3D &pt_vcpu,
-> +               .vcpu_done =3D false,
-> +       };
-> +
-> +       __TEST_REQUIRE(get_nprocs() >=3D 2, "At least two pCPUs needed fo=
-r vCPU migration test");
+Implementation
+==============
+Patches 3-4 add a pgtable utility function for splitting huge block
+PTEs: kvm_pgtable_stage2_split(). Patches 5-9 add support for eagerly
+splitting huge-pages when enabling dirty-logging and when using the
+KVM_CLEAR_DIRTY_LOG ioctl. Note that this is just like what x86 does,
+and the code is actually based on it.  And finally, patch 9:
 
-Considering that get_pcpu() chooses the target CPU from CPUs returned
-from sched_getaffinity(), I would think the test should use the number of
-the bits set in the returned cpu_set_t from sched_getaffinity() here
-instead of get_nprocs(), as those numbers could be different (e.g.  if the
-test runs with taskset with a subset of the CPUs on the system).
+	KVM: arm64: Use local TLBI on permission relaxation
 
+adds support for using local TLBIs instead of broadcasts when doing
+permission relaxation. This last patch is key to achieving good
+performance during dirty-logging, as eagerly breaking huge-pages
+replaces mapping new pages with permission relaxation. Got this patch
+(indirectly) from Marc Z.  and took the liberty of adding a commit
+message.
 
-> +
-> +       guest_data.test_stage =3D TEST_STAGE_VCPU_MIGRATION;
-> +       guest_data.expected_pmcr_n =3D pmcr_n;
-> +
-> +       migrate_data.vpmu_vm =3D vpmu_vm =3D create_vpmu_vm(guest_code, N=
-ULL);
-> +
-> +       /* Initialize random number generation for migrating vCPUs to ran=
-dom pCPUs */
-> +       srand(time(NULL));
-> +
-> +       /* Spawn a vCPU thread */
-> +       ret =3D pthread_create(&pt_vcpu, NULL, run_vcpus_migrate_test_fun=
-c, &migrate_data);
-> +       TEST_ASSERT(!ret, "Failed to create the vCPU thread");
-> +
-> +       /* Spawn a scheduler thread to force-migrate vCPUs to various pCP=
-Us */
-> +       ret =3D pthread_create(&pt_sched, NULL, vcpus_migrate_func, &migr=
-ate_data);
+Note: this applies on top of 6.3-rc1.
 
-Why do you want to spawn another thread to run vcpus_migrate_func(),
-rather than calling that from the current thread ?
+Performance evaluation
+======================
+The performance benefits were tested using the dirty_log_perf_test
+selftest with 2M huge-pages.
 
+The first test uses a write-only sequential workload where the stride
+is 2M instead of 4K [2]. The idea with this experiment is to emulate a
+random access pattern writing a different huge-page at every access.
+Observe that the benefit increases with the number of vcpus: up to
+5.76x for 152 vcpus. This table shows the guest dirtying time when
+using the CLEAR ioctl (and KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2):
 
-> +       TEST_ASSERT(!ret, "Failed to create the scheduler thread for migr=
-ating the vCPUs");
-> +
-> +       pthread_join(pt_sched, NULL);
-> +       pthread_join(pt_vcpu, NULL);
-> +
-> +       destroy_vpmu_vm(vpmu_vm);
-> +}
-> +
->  static void run_tests(uint64_t pmcr_n)
->  {
->         run_counter_access_tests(pmcr_n);
->         run_kvm_event_filter_test();
->         run_kvm_evtype_filter_test();
-> +       run_vcpu_migration_test(pmcr_n);
->  }
->
->  /*
-> @@ -1121,12 +1271,53 @@ static uint64_t get_pmcr_n_limit(void)
->         return FIELD_GET(ARMV8_PMU_PMCR_N, pmcr);
->  }
->
-> -int main(void)
-> +static void print_help(char *name)
-> +{
-> +       pr_info("Usage: %s [-h] [-i vcpu_migration_test_iterations] [-m v=
-cpu_migration_freq_ms]\n",
-> +               name);
-> +       pr_info("\t-i: Number of iterations of vCPU migrations test (defa=
-ult: %u)\n",
-> +               VCPU_MIGRATIONS_TEST_ITERS_DEF);
-> +       pr_info("\t-m: Frequency (in ms) of vCPUs to migrate to different=
- pCPU. (default: %u)\n",
-> +               VCPU_MIGRATIONS_TEST_MIGRATION_FREQ_MS);
-> +       pr_info("\t-h: print this help screen\n");
-> +}
-> +
-> +static bool parse_args(int argc, char *argv[])
-> +{
-> +       int opt;
-> +
-> +       while ((opt =3D getopt(argc, argv, "hi:m:")) !=3D -1) {
-> +               switch (opt) {
-> +               case 'i':
-> +                       test_args.vcpu_migration_test_iter =3D
-> +                               atoi_positive("Nr vCPU migration iteratio=
-ns", optarg);
-> +                       break;
-> +               case 'm':
-> +                       test_args.vcpu_migration_test_migrate_freq_ms =3D
-> +                               atoi_positive("vCPU migration frequency",=
- optarg);
-> +                       break;
-> +               case 'h':
-> +               default:
-> +                       goto err;
-> +               }
-> +       }
-> +
-> +       return true;
-> +
-> +err:
-> +       print_help(argv[0]);
-> +       return false;
-> +}
-> +
-> +int main(int argc, char *argv[])
->  {
->         uint64_t pmcr_n;
->
->         TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PMU_V3));
->
-> +       if (!parse_args(argc, argv))
-> +               exit(KSFT_SKIP);
-> +
->         pmcr_n =3D get_pmcr_n_limit();
->         run_tests(pmcr_n);
->
-> --
-> 2.39.1.581.gbfd45094c4-goog
->
+/dirty_log_perf_test_sparse -s anonymous_hugetlb_2mb -b 1G -v $i -i 3 -m 2
+
+	+-------+----------+------------------+
+	| vCPUs | 6.2-rc3  | 6.2-rc3 + series |
+	|       |    (ms)  |             (ms) |
+	+-------+----------+------------------+
+	|    1  |    2.63  |          1.66    |
+	|    2  |    2.95  |          1.70    |
+	|    4  |    3.21  |          1.71    |
+	|    8  |    4.97  |          1.78    |
+	|   16  |    9.51  |          1.82    |
+	|   32  |   20.15  |          3.03    |
+	|   64  |   40.09  |          5.80    |
+	|  128  |   80.08  |         12.24    |
+	|  152  |  109.81  |         15.14    |
+	+-------+----------+------------------+
+
+This secondv test measures the benefit of eager page splitting on read
+intensive workloads (1 write for every 10 reads). As in the other
+test, the benefit increases with the number of vcpus, up to 8.82x for
+152 vcpus. This table shows the guest dirtying time when using the
+CLEAR ioctl (and KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2):
+
+./dirty_log_perf_test -s anonymous_hugetlb_2mb -b 1G -v $i -i 3 -m 2 -w 10
+
+	+-------+----------+------------------+
+	| vCPUs | 6.2-rc3  | 6.2-rc3 + series |
+	|       |   (sec)  |            (sec) |
+	+-------+----------+------------------+
+	|    1  |    0.65  |          0.07    |
+	|    2  |    0.70  |          0.08    |
+	|    4  |    0.71  |          0.08    |
+	|    8  |    0.72  |          0.08    |
+	|   16  |    0.76  |          0.08    |
+	|   32  |    1.61  |          0.14    |
+	|   64  |    3.46  |          0.30    |
+	|  128  |    5.49  |          0.64    |
+	|  152  |    6.44  |          0.63    |
+	+-------+----------+------------------+
+
+Changes from v5:
+https://lore.kernel.org/kvmarm/20230301210928.565562-1-ricarkol@google.com/
+- fixed message in "Use local TLBI on permission relaxation". (Vladimir)
+- s/removed/unlinked in first commit message. (Shaoqin)
+- rebased series
+- collected r-b's from Shaoqin
+
+Changes from v4:
+https://lore.kernel.org/kvmarm/20230218032314.635829-1-ricarkol@google.com/
+- nits on some comments (s/removed/unlinked and remove @new).
+  (Shaoqin)
+
+Changes from v3:
+https://lore.kernel.org/kvmarm/20230215174046.2201432-1-ricarkol@google.com/
+- KVM_PGTABLE_WALK_SKIP_CMO to use BIT(5). (Shaoqin)
+- Rewritten commit message for "Rename free_unlinked to free_removed"
+  using Oliver's suggestion. (Oliver)
+- "un" -> "an" typo. (Shaoqin)
+- kvm_pgtable_stage2_create_unlinked() to return a "kvm_pte_t *". (Oliver)
+- refactored stage2_block_get_nr_page_tables(). (Oliver)
+- /s/bock/block. (Shaoqin)
+
+Changes from v2:
+https://lore.kernel.org/kvmarm/20230206165851.3106338-1-ricarkol@google.com/
+- removed redundant kvm_pte_table() check from split walker function. (Gavin)
+- fix compilation of patch 8 by moving some definitions from path 9. (Gavin)
+- add comment for kvm_mmu_split_nr_page_tables(). (Gavin)
+
+Changes from v1:
+https://lore.kernel.org/kvmarm/20230113035000.480021-1-ricarkol@google.com/
+- added a capability to set the eager splitting chunk size. This
+  indirectly sets the number of pages in the cache. It also allows for
+  opting out of this feature. (Oliver, Marc)
+- changed kvm_pgtable_stage2_split() to split 1g huge-pages
+  using either 513 or 1 at a time (with a cache of 1). (Oliver, Marc)
+- added force_pte arg to kvm_pgtable_stage2_create_removed().
+- renamed free_removed to free_unlinked. (Ben and Oliver)
+- added KVM_PGTABLE_WALK ctx->flags for skipping BBM and CMO, instead
+  of KVM_PGTABLE_WALK_REMOVED. (Oliver)
+
+Changes from the RFC:
+https://lore.kernel.org/kvmarm/20221112081714.2169495-1-ricarkol@google.com/
+- dropped the changes to split on POST visits. No visible perf
+  benefit.
+- changed the kvm_pgtable_stage2_free_removed() implementation to
+  reuse the stage2 mapper.
+- dropped the FEAT_BBM changes and optimization. Will send this on a
+  different series.
 
 Thanks,
-Reiji
+Ricardo
+
+Marc Zyngier (1):
+  KVM: arm64: Use local TLBI on permission relaxation
+
+Ricardo Koller (11):
+  KVM: arm64: Rename free_removed to free_unlinked
+  KVM: arm64: Add KVM_PGTABLE_WALK ctx->flags for skipping BBM and CMO
+  KVM: arm64: Add helper for creating unlinked stage2 subtrees
+  KVM: arm64: Add kvm_pgtable_stage2_split()
+  KVM: arm64: Refactor kvm_arch_commit_memory_region()
+  KVM: arm64: Add kvm_uninit_stage2_mmu()
+  KVM: arm64: Export kvm_are_all_memslots_empty()
+  KVM: arm64: Add KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+  KVM: arm64: Split huge pages when dirty logging is enabled
+  KVM: arm64: Open-code kvm_mmu_write_protect_pt_masked()
+  KVM: arm64: Split huge pages during KVM_CLEAR_DIRTY_LOG
+
+ Documentation/virt/kvm/api.rst        |  26 ++++
+ arch/arm64/include/asm/kvm_asm.h      |   4 +
+ arch/arm64/include/asm/kvm_host.h     |  19 +++
+ arch/arm64/include/asm/kvm_mmu.h      |   1 +
+ arch/arm64/include/asm/kvm_pgtable.h  |  84 ++++++++++-
+ arch/arm64/kvm/arm.c                  |  22 +++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c    |  10 ++
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c |   6 +-
+ arch/arm64/kvm/hyp/nvhe/tlb.c         |  54 +++++++
+ arch/arm64/kvm/hyp/pgtable.c          | 194 ++++++++++++++++++++++++--
+ arch/arm64/kvm/hyp/vhe/tlb.c          |  32 +++++
+ arch/arm64/kvm/mmu.c                  | 188 +++++++++++++++++++++----
+ include/linux/kvm_host.h              |   2 +
+ include/uapi/linux/kvm.h              |   1 +
+ virt/kvm/kvm_main.c                   |   2 +-
+ 15 files changed, 591 insertions(+), 54 deletions(-)
+
+-- 
+2.40.0.rc0.216.gc4246ad0f0-goog
+
