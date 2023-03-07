@@ -2,102 +2,451 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BAEB6AD5C1
-	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 04:40:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 146096AD5C8
+	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 04:44:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229960AbjCGDkd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Mar 2023 22:40:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59588 "EHLO
+        id S229886AbjCGDoT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Mar 2023 22:44:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229635AbjCGDkc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Mar 2023 22:40:32 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB86D2E0E3
-        for <kvm@vger.kernel.org>; Mon,  6 Mar 2023 19:40:27 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id me6-20020a17090b17c600b0023816b0c7ceso15283360pjb.2
-        for <kvm@vger.kernel.org>; Mon, 06 Mar 2023 19:40:27 -0800 (PST)
+        with ESMTP id S229653AbjCGDoS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Mar 2023 22:44:18 -0500
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB79E1CF50
+        for <kvm@vger.kernel.org>; Mon,  6 Mar 2023 19:44:16 -0800 (PST)
+Received: by mail-pl1-x634.google.com with SMTP id v11so12754727plz.8
+        for <kvm@vger.kernel.org>; Mon, 06 Mar 2023 19:44:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dankook-ac-kr.20210112.gappssmtp.com; s=20210112; t=1678160427;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=SOv8muTU07U92XozAkeK6WRLTHSE9zCFuGRi/TSymo8=;
-        b=QHbUmKNl0fLY+emQllxBnXmO+4TjiX5VgHHImKoKpJ6aMOZrIj8KIsWbeoJTyTPLah
-         1JZPproFZO3Lu2EjgYvqnUHduYQGnNxo1zLSFUZo6Zp4oTNJF/uocLqJLPnPN1YylbxP
-         w/AbMldhYUJM953LxOFaJzY+w8kwqXsq6FBFmcIt+bZYWR/jm52Wm6lnqxv43pR5754z
-         Xk0PqgEleYN3HjRKQrihd9tvii1xJHu9Ke6lQmDt41hUkTNS7OkcKHZkW/hXGrLqAvui
-         A0X3N54pJtY9ua5XBZ2L4zkLv8qEkIJ0HoeqBsEI0x8VGThCVMBJ1bidLyHkP8NxBQa6
-         P0bg==
+        d=google.com; s=20210112; t=1678160656;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fTzKm/aW2GG4ntfas/EqyluRDMLGRctb+sq4SdATNd0=;
+        b=B32iYkDWJILZ8UenijGZt8EGGHJqVOzJX6zaGy6cxDLtLWiC9/pAeyGO7Zc5MJbwkk
+         YIMlLPVKuf+N8PHaoVpEuITEHfUKlH1fIs5P51/crFDDTU4wbjma3E7ZRIqzplVoXhnQ
+         e3XrWhi2EkfXVySFE9acBE8OEj1pmMA4cYObed5XEbnePOzASctJ/fR/BbQ27Lblm1KI
+         p/SB9VPz9Cj7ZTg82fPgVe1w4VeLWG13LQpLvHnhpRFDNySBoPDysrD2UDfa9H2+2xgR
+         RTm14gREljDzRRzUAgbeCPLR6zQuHBtLLdTqsmVLbtM6htR6p/6dZq5K5XOXvcFBdNO4
+         ukQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678160427;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SOv8muTU07U92XozAkeK6WRLTHSE9zCFuGRi/TSymo8=;
-        b=64PgYSTSPZKlaZfi/k65/D8weYXyQA9Y78Zz8lxaFIpVhQvCAo8Gp2sadNP6EJbsPv
-         4hKmaQXpOfDiRkWh5IEFeD0zOROoHbMWiUJ5IBfEMa8Up39/BaDajFz+AqhEl1L8EbxC
-         99D7ZbL1e2gkNgx+S3Srv+AZOxkc34GlqnDJKUC5N0mLJQpw4AmiY6ABn2qqn2DuIZiO
-         0ZFk3QFhqMRbfUEfu01wnUWy8/HwKco5zN78VGmJOAn0Q3YUbOkxwCpHM7nx/e2zM0Oy
-         IJ+7bkl/qxhDIePN3uX5OsX411nLQg7dLxq93iCguwdlHwXZK26cWsI/DJNt9yecm4AC
-         HT4A==
-X-Gm-Message-State: AO0yUKUw9fTZFCGcMnjHLHatY4QT7K6KZ9mL8ftQnybqW9gSh+jnq/8T
-        Z3LE834IAytW58/401SLhLvuHDZOt1KOREC2ZFw=
-X-Google-Smtp-Source: AK7set9fg+11Sf7CPd3sSqSwOwSjNAzdDidOD5Q+q4uaJeVQIB75J+pPfN/GHSSHN10ON9h/WbqoGQ==
-X-Received: by 2002:a17:90b:1d8f:b0:237:161e:3329 with SMTP id pf15-20020a17090b1d8f00b00237161e3329mr13221671pjb.40.1678160427139;
-        Mon, 06 Mar 2023 19:40:27 -0800 (PST)
-Received: from localhost.localdomain ([220.149.244.126])
-        by smtp.googlemail.com with ESMTPSA id c2-20020a17090a674200b0023670dbb82fsm6601370pjm.25.2023.03.06.19.40.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Mar 2023 19:40:26 -0800 (PST)
-From:   Seunggyun Lee <sglee97@dankook.ac.kr>
-To:     alex.williamson@redhat.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] vfio/pci/vfio_pci_core.c: add IORESOURCE_EXCLUSIVE flag
-Date:   Tue,  7 Mar 2023 12:40:18 +0900
-Message-Id: <20230307034018.36980-1-sglee97@dankook.ac.kr>
-X-Mailer: git-send-email 2.25.1
+        d=1e100.net; s=20210112; t=1678160656;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fTzKm/aW2GG4ntfas/EqyluRDMLGRctb+sq4SdATNd0=;
+        b=lSPWT840URPm0UhB30vxothebnC+4PHQX0k0YQaYIZoP4tafpPwtFiOIf+RGRRDizT
+         PpFTe6lD9UamLg3hb84w9WqVWb6PAtXFgG7qfS1fPg9t+J2h/7cpnfih1MmsHLfz7n8a
+         Afmxnn00eNVjGpxLfn4IXCcgc0R9p3uDKX2jw+WqY+5WF5c2iKLrvrN6vCvRCLNVVkzF
+         yUpZvz6cpmdQx/CQX/8OxS4EO1QWuTbg5+ehI5SiVAABWWw+zBs448MFCnTpJ7wlKdpO
+         M2AN7hpCGAKKNLM3UhkZ5bNGalsAVzWkStfdGP1YYiWoMzn3Jax+SaYCSxhC28Kcf+CP
+         0ctg==
+X-Gm-Message-State: AO0yUKX0P58GH0xYuQcRPgDeD5gy3TLzgbgYfcDp7qKzVIUgp3UTEY9+
+        vdH0HYh1Y9nw0/w5YcW34LHGSooQfJPewA0Jrs8JEg==
+X-Google-Smtp-Source: AK7set9LV79ltHOZ94E3xmULEq7pjwpJGNVbZurVvbdk/UN9//6xDvIx5rPlU7cTgaW1v1fX9bXDQmBR2lkQ5UX+OqU=
+X-Received: by 2002:a17:902:f783:b0:19c:140d:aada with SMTP id
+ q3-20020a170902f78300b0019c140daadamr5000620pln.2.1678160655784; Mon, 06 Mar
+ 2023 19:44:15 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+References: <20230215010717.3612794-1-rananta@google.com> <20230215010717.3612794-12-rananta@google.com>
+In-Reply-To: <20230215010717.3612794-12-rananta@google.com>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Mon, 6 Mar 2023 19:43:59 -0800
+Message-ID: <CAAeT=FwdkFLzp0S+T7L_ppbaU5VvdfT1Uuubm3cjuDKykJchNQ@mail.gmail.com>
+Subject: Re: [REPOST PATCH 11/16] selftests: KVM: aarch64: Add vCPU migration
+ test for PMU
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
+        Ricardo Koller <ricarkol@google.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-While using a pci device (GPU) through the vfio-pci passthrough in QEMU
-VM, host can mmap the PCI device which used by the guest through sysfs.
+Hi Raghu,
 
-In this case, when the guest used the PCI device, the host could also
-access the data stored in the PCI device memory.
+On Tue, Feb 14, 2023 at 5:07=E2=80=AFPM Raghavendra Rao Ananta
+<rananta@google.com> wrote:
+>
+> Implement a stress test for KVM by frequently force-migrating the
+> vCPU to random pCPUs in the system. This would validate the
+> save/restore functionality of KVM and starting/stopping of
+> PMU counters as necessary.
+>
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  .../testing/selftests/kvm/aarch64/vpmu_test.c | 195 +++++++++++++++++-
+>  1 file changed, 193 insertions(+), 2 deletions(-)
+>
+> diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_test.c b/tools/test=
+ing/selftests/kvm/aarch64/vpmu_test.c
+> index 5c166df245589..0c9d801f4e602 100644
+> --- a/tools/testing/selftests/kvm/aarch64/vpmu_test.c
+> +++ b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
+> @@ -19,9 +19,15 @@
+>   * higher exception levels (EL2, EL3). Verify this functionality by
+>   * configuring and trying to count the events for EL2 in the guest.
+>   *
+> + * 4. Since the PMU registers are per-cpu, stress KVM by frequently
+> + * migrating the guest vCPU to random pCPUs in the system, and check
+> + * if the vPMU is still behaving as expected.
+> + *
+>   * Copyright (c) 2022 Google LLC.
+>   *
+>   */
+> +#define _GNU_SOURCE
+> +
+>  #include <kvm_util.h>
+>  #include <processor.h>
+>  #include <test_util.h>
+> @@ -30,6 +36,11 @@
+>  #include <linux/arm-smccc.h>
+>  #include <linux/bitfield.h>
+>  #include <linux/bitmap.h>
+> +#include <stdlib.h>
+> +#include <pthread.h>
+> +#include <sys/sysinfo.h>
+> +
+> +#include "delay.h"
+>
+>  /* The max number of the PMU event counters (excluding the cycle counter=
+) */
+>  #define ARMV8_PMU_MAX_GENERAL_COUNTERS (ARMV8_PMU_MAX_COUNTERS - 1)
+> @@ -37,6 +48,8 @@
+>  /* The max number of event numbers that's supported */
+>  #define ARMV8_PMU_MAX_EVENTS           64
+>
+> +#define msecs_to_usecs(msec)           ((msec) * 1000LL)
+> +
+>  /*
+>   * The macros and functions below for reading/writing PMEV{CNTR,TYPER}<n=
+>_EL0
+>   * were basically copied from arch/arm64/kernel/perf_event.c.
+> @@ -265,6 +278,7 @@ enum test_stage {
+>         TEST_STAGE_COUNTER_ACCESS =3D 1,
+>         TEST_STAGE_KVM_EVENT_FILTER,
+>         TEST_STAGE_KVM_EVTYPE_FILTER,
+> +       TEST_STAGE_VCPU_MIGRATION,
+>  };
+>
+>  struct guest_data {
+> @@ -275,6 +289,19 @@ struct guest_data {
+>
+>  static struct guest_data guest_data;
+>
+> +#define VCPU_MIGRATIONS_TEST_ITERS_DEF         1000
+> +#define VCPU_MIGRATIONS_TEST_MIGRATION_FREQ_MS 2
+> +
+> +struct test_args {
+> +       int vcpu_migration_test_iter;
+> +       int vcpu_migration_test_migrate_freq_ms;
+> +};
+> +
+> +static struct test_args test_args =3D {
+> +       .vcpu_migration_test_iter =3D VCPU_MIGRATIONS_TEST_ITERS_DEF,
+> +       .vcpu_migration_test_migrate_freq_ms =3D VCPU_MIGRATIONS_TEST_MIG=
+RATION_FREQ_MS,
+> +};
+> +
+>  static void guest_sync_handler(struct ex_regs *regs)
+>  {
+>         uint64_t esr, ec;
+> @@ -352,7 +379,6 @@ static bool pmu_event_is_supported(uint64_t event)
+>                 GUEST_ASSERT_3(!(_tval & mask), _tval, mask, set_expected=
+);\
+>  }
+>
+> -
+>  /*
+>   * Extra instructions inserted by the compiler would be difficult to com=
+pensate
+>   * for, so hand assemble everything between, and including, the PMCR acc=
+esses
+> @@ -459,6 +485,13 @@ static void test_event_count(uint64_t event, int pmc=
+_idx, bool expect_count)
+>         }
+>  }
+>
+> +static void test_basic_pmu_functionality(void)
+> +{
+> +       /* Test events on generic and cycle counters */
+> +       test_instructions_count(0, true);
+> +       test_cycles_count(true);
+> +}
+> +
+>  /*
+>   * Check if @mask bits in {PMCNTEN,PMINTEN,PMOVS}{SET,CLR} registers
+>   * are set or cleared as specified in @set_expected.
+> @@ -748,6 +781,16 @@ static void guest_evtype_filter_test(void)
+>         GUEST_ASSERT_2(cnt =3D=3D 0, cnt, typer);
+>  }
+>
+> +static void guest_vcpu_migration_test(void)
+> +{
+> +       /*
+> +        * While the userspace continuously migrates this vCPU to random =
+pCPUs,
+> +        * run basic PMU functionalities and verify the results.
+> +        */
+> +       while (test_args.vcpu_migration_test_iter--)
+> +               test_basic_pmu_functionality();
+> +}
+> +
+>  static void guest_code(void)
+>  {
+>         switch (guest_data.test_stage) {
+> @@ -760,6 +803,9 @@ static void guest_code(void)
+>         case TEST_STAGE_KVM_EVTYPE_FILTER:
+>                 guest_evtype_filter_test();
+>                 break;
+> +       case TEST_STAGE_VCPU_MIGRATION:
+> +               guest_vcpu_migration_test();
+> +               break;
+>         default:
+>                 GUEST_ASSERT_1(0, guest_data.test_stage);
+>         }
+> @@ -837,6 +883,7 @@ create_vpmu_vm(void *guest_code, struct kvm_pmu_event=
+_filter *pmu_event_filters)
+>
+>         vpmu_vm->vm =3D vm =3D vm_create(1);
+>         vm_init_descriptor_tables(vm);
+> +
+>         /* Catch exceptions for easier debugging */
+>         for (ec =3D 0; ec < ESR_EC_NUM; ec++) {
+>                 vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT, ec,
+> @@ -881,6 +928,8 @@ static void run_vcpu(struct kvm_vcpu *vcpu)
+>         struct ucall uc;
+>
+>         sync_global_to_guest(vcpu->vm, guest_data);
+> +       sync_global_to_guest(vcpu->vm, test_args);
+> +
+>         vcpu_run(vcpu);
+>         switch (get_ucall(vcpu, &uc)) {
+>         case UCALL_ABORT:
+> @@ -1098,11 +1147,112 @@ static void run_kvm_evtype_filter_test(void)
+>         destroy_vpmu_vm(vpmu_vm);
+>  }
+>
+> +struct vcpu_migrate_data {
+> +       struct vpmu_vm *vpmu_vm;
+> +       pthread_t *pt_vcpu;
 
-Regarding this, there is a routine to check IORESOURCE_EXCLUSIVE through
-iomem_is_exclusive() in pci_mmap_resource() of pci-sysfs.c, but vfio-pci
-driver doesn't seem to set that flag.
+Nit: Originally, I wasn't sure what 'pt' stands for.
+Also, the 'pt_vcpu' made me think this would be a pointer to a vCPU.
+Perhaps renaming this to 'vcpu_pthread' might be more clear ?
 
-Wouldn't it be better to use pci_request_selected_regions_exclusive() to
-set the IORESOURCE_EXCLUSIVE flag rather than
-pci_request_selected_regions() that was used previously?
 
-Signed-off-by: Seunggyun Lee <sglee97@dankook.ac.kr>
----
- drivers/vfio/pci/vfio_pci_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> +       bool vcpu_done;
+> +};
+> +
+> +static void *run_vcpus_migrate_test_func(void *arg)
+> +{
+> +       struct vcpu_migrate_data *migrate_data =3D arg;
+> +       struct vpmu_vm *vpmu_vm =3D migrate_data->vpmu_vm;
+> +
+> +       run_vcpu(vpmu_vm->vcpu);
+> +       migrate_data->vcpu_done =3D true;
+> +
+> +       return NULL;
+> +}
+> +
+> +static uint32_t get_pcpu(void)
+> +{
+> +       uint32_t pcpu;
+> +       unsigned int nproc_conf;
+> +       cpu_set_t online_cpuset;
+> +
+> +       nproc_conf =3D get_nprocs_conf();
+> +       sched_getaffinity(0, sizeof(cpu_set_t), &online_cpuset);
+> +
+> +       /* Randomly find an available pCPU to place the vCPU on */
+> +       do {
+> +               pcpu =3D rand() % nproc_conf;
+> +       } while (!CPU_ISSET(pcpu, &online_cpuset));
+> +
+> +       return pcpu;
+> +}
+> +
+> +static int migrate_vcpu(struct vcpu_migrate_data *migrate_data)
 
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index 26a541cc64d1..9731ac35b3ad 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -1779,7 +1779,7 @@ int vfio_pci_core_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma
- 	 * we need to request the region and the barmap tracks that.
- 	 */
- 	if (!vdev->barmap[index]) {
--		ret = pci_request_selected_regions(pdev,
-+		ret = pci_request_selected_regions_exclusive(pdev,
- 						   1 << index, "vfio-pci");
- 		if (ret)
- 			return ret;
--- 
-2.25.1
+Nit: You might want to pass a pthread_t rather than migrate_data
+unless the function uses some more fields of the data in the
+following patches.
 
+> +{
+> +       int ret;
+> +       cpu_set_t cpuset;
+> +       uint32_t new_pcpu =3D get_pcpu();
+> +
+> +       CPU_ZERO(&cpuset);
+> +       CPU_SET(new_pcpu, &cpuset);
+> +
+> +       pr_debug("Migrating vCPU to pCPU: %u\n", new_pcpu);
+> +
+> +       ret =3D pthread_setaffinity_np(*migrate_data->pt_vcpu, sizeof(cpu=
+set), &cpuset);
+> +
+> +       /* Allow the error where the vCPU thread is already finished */
+> +       TEST_ASSERT(ret =3D=3D 0 || ret =3D=3D ESRCH,
+> +                   "Failed to migrate the vCPU to pCPU: %u; ret: %d\n", =
+new_pcpu, ret);
+> +
+> +       return ret;
+> +}
+> +
+> +static void *vcpus_migrate_func(void *arg)
+> +{
+> +       struct vcpu_migrate_data *migrate_data =3D arg;
+> +
+> +       while (!migrate_data->vcpu_done) {
+> +               usleep(msecs_to_usecs(test_args.vcpu_migration_test_migra=
+te_freq_ms));
+> +               migrate_vcpu(migrate_data);
+> +       }
+> +
+> +       return NULL;
+> +}
+> +
+> +static void run_vcpu_migration_test(uint64_t pmcr_n)
+> +{
+> +       int ret;
+> +       struct vpmu_vm *vpmu_vm;
+> +       pthread_t pt_vcpu, pt_sched;
+> +       struct vcpu_migrate_data migrate_data =3D {
+> +               .pt_vcpu =3D &pt_vcpu,
+> +               .vcpu_done =3D false,
+> +       };
+> +
+> +       __TEST_REQUIRE(get_nprocs() >=3D 2, "At least two pCPUs needed fo=
+r vCPU migration test");
+
+Considering that get_pcpu() chooses the target CPU from CPUs returned
+from sched_getaffinity(), I would think the test should use the number of
+the bits set in the returned cpu_set_t from sched_getaffinity() here
+instead of get_nprocs(), as those numbers could be different (e.g.  if the
+test runs with taskset with a subset of the CPUs on the system).
+
+
+> +
+> +       guest_data.test_stage =3D TEST_STAGE_VCPU_MIGRATION;
+> +       guest_data.expected_pmcr_n =3D pmcr_n;
+> +
+> +       migrate_data.vpmu_vm =3D vpmu_vm =3D create_vpmu_vm(guest_code, N=
+ULL);
+> +
+> +       /* Initialize random number generation for migrating vCPUs to ran=
+dom pCPUs */
+> +       srand(time(NULL));
+> +
+> +       /* Spawn a vCPU thread */
+> +       ret =3D pthread_create(&pt_vcpu, NULL, run_vcpus_migrate_test_fun=
+c, &migrate_data);
+> +       TEST_ASSERT(!ret, "Failed to create the vCPU thread");
+> +
+> +       /* Spawn a scheduler thread to force-migrate vCPUs to various pCP=
+Us */
+> +       ret =3D pthread_create(&pt_sched, NULL, vcpus_migrate_func, &migr=
+ate_data);
+
+Why do you want to spawn another thread to run vcpus_migrate_func(),
+rather than calling that from the current thread ?
+
+
+> +       TEST_ASSERT(!ret, "Failed to create the scheduler thread for migr=
+ating the vCPUs");
+> +
+> +       pthread_join(pt_sched, NULL);
+> +       pthread_join(pt_vcpu, NULL);
+> +
+> +       destroy_vpmu_vm(vpmu_vm);
+> +}
+> +
+>  static void run_tests(uint64_t pmcr_n)
+>  {
+>         run_counter_access_tests(pmcr_n);
+>         run_kvm_event_filter_test();
+>         run_kvm_evtype_filter_test();
+> +       run_vcpu_migration_test(pmcr_n);
+>  }
+>
+>  /*
+> @@ -1121,12 +1271,53 @@ static uint64_t get_pmcr_n_limit(void)
+>         return FIELD_GET(ARMV8_PMU_PMCR_N, pmcr);
+>  }
+>
+> -int main(void)
+> +static void print_help(char *name)
+> +{
+> +       pr_info("Usage: %s [-h] [-i vcpu_migration_test_iterations] [-m v=
+cpu_migration_freq_ms]\n",
+> +               name);
+> +       pr_info("\t-i: Number of iterations of vCPU migrations test (defa=
+ult: %u)\n",
+> +               VCPU_MIGRATIONS_TEST_ITERS_DEF);
+> +       pr_info("\t-m: Frequency (in ms) of vCPUs to migrate to different=
+ pCPU. (default: %u)\n",
+> +               VCPU_MIGRATIONS_TEST_MIGRATION_FREQ_MS);
+> +       pr_info("\t-h: print this help screen\n");
+> +}
+> +
+> +static bool parse_args(int argc, char *argv[])
+> +{
+> +       int opt;
+> +
+> +       while ((opt =3D getopt(argc, argv, "hi:m:")) !=3D -1) {
+> +               switch (opt) {
+> +               case 'i':
+> +                       test_args.vcpu_migration_test_iter =3D
+> +                               atoi_positive("Nr vCPU migration iteratio=
+ns", optarg);
+> +                       break;
+> +               case 'm':
+> +                       test_args.vcpu_migration_test_migrate_freq_ms =3D
+> +                               atoi_positive("vCPU migration frequency",=
+ optarg);
+> +                       break;
+> +               case 'h':
+> +               default:
+> +                       goto err;
+> +               }
+> +       }
+> +
+> +       return true;
+> +
+> +err:
+> +       print_help(argv[0]);
+> +       return false;
+> +}
+> +
+> +int main(int argc, char *argv[])
+>  {
+>         uint64_t pmcr_n;
+>
+>         TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PMU_V3));
+>
+> +       if (!parse_args(argc, argv))
+> +               exit(KSFT_SKIP);
+> +
+>         pmcr_n =3D get_pmcr_n_limit();
+>         run_tests(pmcr_n);
+>
+> --
+> 2.39.1.581.gbfd45094c4-goog
+>
+
+Thanks,
+Reiji
