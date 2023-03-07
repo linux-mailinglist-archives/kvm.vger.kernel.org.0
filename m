@@ -2,54 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F0DF36AD383
-	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 01:55:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 480E96AD384
+	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 01:55:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229650AbjCGAzy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Mar 2023 19:55:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55730 "EHLO
+        id S229667AbjCGAzz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Mar 2023 19:55:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229582AbjCGAzw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Mar 2023 19:55:52 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 793632884F
-        for <kvm@vger.kernel.org>; Mon,  6 Mar 2023 16:55:51 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id d185-20020a25e6c2000000b008fa1d22bd55so12495537ybh.21
-        for <kvm@vger.kernel.org>; Mon, 06 Mar 2023 16:55:51 -0800 (PST)
+        with ESMTP id S229609AbjCGAzx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Mar 2023 19:55:53 -0500
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 090D34D625
+        for <kvm@vger.kernel.org>; Mon,  6 Mar 2023 16:55:53 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id z19-20020a056a001d9300b005d8fe305d8bso6398198pfw.22
+        for <kvm@vger.kernel.org>; Mon, 06 Mar 2023 16:55:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678150550;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=NGOAsr/xqDKppYOJ/B6BgMqUFwruIKR4W1/kqwYVKdU=;
-        b=P9sNKQAy94nPOzIs/Vh6lGutXWcqu6GzArgbiSMPghU2no1bh9QzHar4qhAfqfi6m+
-         xEbC6chzYduJdmy/kZ5MASeHGctIRQDoIzrbu7YaOzffKTIPdwU19dRncRHSa/ukeUCB
-         2noxBMIJ6NnPpxBU9vfBF2SzR/UyaAORbhLogT7yel45OGmwsujoGHre9K/OUnXM+Iqu
-         kMY6NJOLG0k0YYFJdzLUbhXPYwX21pgax7FJAS+3sTXeBxkfD436o3zxEuTIMyMXOVz9
-         dojOBuzQzZcZFQ0QKbEuIT8V1f8iLKk5WeNSbe/GlTAbmVuQoGj0ZdvSMbM81mJSpu+i
-         UQJQ==
+        d=google.com; s=20210112; t=1678150552;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZwyOZObRLYb6tuk6PR7L2PNoNFObpjWwxfEZdLgVaPA=;
+        b=dwJkE5pk0hfUG61DLaX2Y06PM4FQTc+Y4cdw51qunbNLfZhdqAHO7Fyu2C6o+XPlOI
+         aESNyE6UJFFjj/+KFfh/f4+3LQ27fCyvSZdnPnndyV8AKLBoK2DUiqo/Hw9IruUouUvM
+         ed5bEFe367h5UeMc21PhHDC/KSDfQ/zF5tT4h6L24iHS7BNsVJn8cUsC4t1Fx3f7OGfZ
+         qUDgHxRcPWwa1p1EKnQFvSXGedVjTy4diSdd1wKWQpLcXo3w799e91PWWXLI2JRJec6B
+         D4rCW2ASpqMwJj2Y2iipWRWzON81qX/91e7Ag9E1MPERzj46aMjsl31RWLSne2jTSWUm
+         Y+4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678150550;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NGOAsr/xqDKppYOJ/B6BgMqUFwruIKR4W1/kqwYVKdU=;
-        b=vy/eBwgdPhusENQxXSs72YHLO/1Ga8MghOmAiKihslva/DfO/WVbVjTYMlSl13CgxH
-         JmTVqxNzntdjaLx6fnZn1qYZuDDRhLnDl1ibKoUPLGyZRDEs6pm67qjyBSIi+W8Uk5Fw
-         v4Zw/2jGSdQ6w41WFgSpGz+JmnagFtM6agJjwb0Aldr4G5cVlZIhnQu/MBhvGUwJWujS
-         TrgoEpYeQKIz4OCJ4DmWkW1eZI3ABR2d4CbiKEYCvmeFrG8YnPqjSBS0UTOOqRTGYBSl
-         1WMVMB3WDGq8VCIq6EUOVicZ4YhRhe+frb9Ns3AB+6KODTZ8sZ0WORi1TvMNuSvFC+re
-         jd3w==
-X-Gm-Message-State: AO0yUKXsEc7nT5aicgx9BSNLcBN/1y+0G96qJdpSszhxGaJtToz2bVJp
-        3W8Rv40idpt24kIcAZvwqGpVlYB/XDRsVw==
-X-Google-Smtp-Source: AK7set+nBWaQGBVvicbgEkF6BzgmuF83Gj7qqSI2zrITrp/ATWf2xTkfT2ApCEM/61SxXhjzYkJKHuvHUz0PlA==
+        d=1e100.net; s=20210112; t=1678150552;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZwyOZObRLYb6tuk6PR7L2PNoNFObpjWwxfEZdLgVaPA=;
+        b=4kwj782qs2Aab/+vvQGTd1JvKwWkAFZEOKIkNLVS1NtdRDaCKg9S8WdzQji6CeCsIw
+         X6w60gQmQi+cyochBBEXwSyb0Stmdv1vWzJ+LV3vXyYuoqfVwO1Rx6a4zCIops19wwDh
+         QaHW7oPi0DD1kLhGMgfucgfnbIcR6NdOGJ7AYdsFH4MvoxdiWDhAroFVPYI8ZhSF/Grt
+         3XyPwYgQkKwh8/P02E3RPoSB0yxHRuiXxQyxTgk0n8pRrsi1Bq4kSTr2E9zEvlty4FYE
+         aWyZeHhtSXQa0xtQAMoVCJeqRJkmasqvdK6fKbhMnWJu5a8THf1HzA9ZyfnaUUkbRh1E
+         X/qA==
+X-Gm-Message-State: AO0yUKXw+tEz6mgAhpclZG+3qw9jX7Vzrdl0WRl2mcN0vl9O4PWYOvwy
+        8BpRuAuzhGmXrY2gddwaynqwZ6r/ZQB8ag==
+X-Google-Smtp-Source: AK7set8ZFaD5p31RQ9fgHeWlLtsjRWac0liLl8RdRdq54x2PW4vkp8f8v29azpwh3z4OgYrTnWn72WKrv5bn0g==
 X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a05:6902:208:b0:a98:bd27:91de with SMTP
- id j8-20020a056902020800b00a98bd2791demr7552025ybs.7.1678150550782; Mon, 06
- Mar 2023 16:55:50 -0800 (PST)
-Date:   Mon,  6 Mar 2023 16:55:45 -0800
+ (user=dmatlack job=sendgmr) by 2002:a17:903:2606:b0:199:56f2:3fc4 with SMTP
+ id jd6-20020a170903260600b0019956f23fc4mr5104205plb.8.1678150552522; Mon, 06
+ Mar 2023 16:55:52 -0800 (PST)
+Date:   Mon,  6 Mar 2023 16:55:46 -0800
+In-Reply-To: <20230307005547.607353-1-dmatlack@google.com>
 Mime-Version: 1.0
+References: <20230307005547.607353-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.40.0.rc0.216.gc4246ad0f0-goog
-Message-ID: <20230307005547.607353-1-dmatlack@google.com>
-Subject: [kvm-unit-tests PATCH 0/2] x86: Fixes for rdpid test
+Message-ID: <20230307005547.607353-2-dmatlack@google.com>
+Subject: [kvm-unit-tests PATCH 1/2] x86: Run the tsc test with -cpu max
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, David Matlack <dmatlack@google.com>
@@ -64,21 +66,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix 2 small issues with the rdpid test that is a part of x86/tsc.c.
-Notably, the test is not currently running since qemu is not configured
-to advertise RDPID support and fixing that uncovers a bug in the test
-when compiling with Clang.
+Run the tsc test with -cpu max to enable RDPID testing. The current
+configuration (-cpu kvm64,+rdtscp) does not include RDPID even if the
+host supports. In effect, test_rdpid() never runs.
 
-David Matlack (2):
-  x86: Run the tsc test with -cpu max
-  x86: Mark RDPID asm volatile to avoid dropping instructions
+Use max instead of adding +rdpid to the existing configuration to avoid
+this biting someone in the future if they add a test for a new feature.
 
- x86/tsc.c         | 2 +-
+Fixes: 10631a5bebd8 ("x86: tsc: add rdpid test")
+Signed-off-by: David Matlack <dmatlack@google.com>
+---
  x86/unittests.cfg | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-base-commit: e3c5c3ef2524c58023073c0fadde2e8ae3c04ec6
+diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+index f324e32d60ef..c4eaa8ef9bab 100644
+--- a/x86/unittests.cfg
++++ b/x86/unittests.cfg
+@@ -247,7 +247,7 @@ extra_params = -cpu Opteron_G1,vendor=AuthenticAMD
+ 
+ [tsc]
+ file = tsc.flat
+-extra_params = -cpu kvm64,+rdtscp
++extra_params = -cpu max
+ 
+ [tsc_adjust]
+ file = tsc_adjust.flat
 -- 
 2.40.0.rc0.216.gc4246ad0f0-goog
 
