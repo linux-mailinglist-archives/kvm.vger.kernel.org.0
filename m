@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9ED7E6AD57B
-	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 04:09:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D65C6AD55D
+	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 04:09:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230310AbjCGDFv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Mar 2023 22:05:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42868 "EHLO
+        id S229619AbjCGDFx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Mar 2023 22:05:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230210AbjCGDF2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230244AbjCGDF2 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 6 Mar 2023 22:05:28 -0500
 Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51BA278CAF;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BF0979B03;
         Mon,  6 Mar 2023 19:05:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1678158325; x=1709694325;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=8lktqN9Ow6nF5dYh+N7FoY+KesvEnknJu52aiBKcpfg=;
-  b=ewelpOh7+t3F74UDTx8YAnXVH0e0i158mPgmyEq/bLj1D0w63TS9flTu
-   JjL7JACyYt/CJbQzcpgmZ1zT0Eup/bsyjpFJnKS0ifocIFuctLDjf7RMj
-   3bva5PR99ebalag9SqJ/ChES4wjo99X3nRl8jNpC6Q2i7n75YAT4xx5lO
-   YgHjielNkyRf5UVKcjSfrnHBWd/vDSJcVkN8LO2StALqND1CNIShSAnte
-   vOdJPG6nVO6spwS6eCy4ie5anVDxDolzpmfMXGMMRaB9PYe4aLaxKKiRR
-   AsQ66uhtiPqm8q9/L3f28Xutm7JnMRxOdq2GMVim4jbx2QGfxXtVetGGN
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10641"; a="338072401"
+  bh=wcw4oWWYVKLi17TGIcBaJWkCmV6EYpXPXC/uF0gD9d8=;
+  b=h/GU3U2HytzCtsGI5JWuWVQaCvlFQcnW1iAlVv5yIdKzlMEe/UywIlO4
+   TYjlQXrPHgIj0t3bCgHioyFOSUkHU9V3Lf/PWO6X+6s3syb4CtgvwE2aT
+   RQ/P5s95OvLNzl5l9yEVbSijLJ4lSuC3iLrfBEtINmyKyi6WU/IM6GbUi
+   a0GFbvirNsI0ibZYTiMeCxx8T02RZkvCklFdwG5jk4GOWfRckrukM5oKo
+   d8TJ+4s+OB1y1x+AospMUomzEs7ClJPmedGSp6CeZCZqFj0lsn3YMjKlz
+   1mH8Eld6mgoSJBh61b8trZPW+QSirCFdEipN1NNvKWL+tAoS3ZRd20oIo
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10641"; a="338072410"
 X-IronPort-AV: E=Sophos;i="5.98,238,1673942400"; 
-   d="scan'208";a="338072401"
+   d="scan'208";a="338072410"
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
   by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2023 19:05:14 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10641"; a="676409783"
+X-IronPort-AV: E=McAfee;i="6500,9779,10641"; a="676409793"
 X-IronPort-AV: E=Sophos;i="5.98,238,1673942400"; 
-   d="scan'208";a="676409783"
+   d="scan'208";a="676409793"
 Received: from unknown (HELO fred..) ([172.25.112.68])
-  by orsmga002.jf.intel.com with ESMTP; 06 Mar 2023 19:05:13 -0800
+  by orsmga002.jf.intel.com with ESMTP; 06 Mar 2023 19:05:14 -0800
 From:   Xin Li <xin3.li@intel.com>
 To:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org
 Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         dave.hansen@linux.intel.com, hpa@zytor.com, peterz@infradead.org,
         andrew.cooper3@citrix.com, seanjc@google.com, pbonzini@redhat.com,
         ravi.v.shankar@intel.com
-Subject: [PATCH v5 10/34] x86/fred: add Kconfig option for FRED (CONFIG_X86_FRED)
-Date:   Mon,  6 Mar 2023 18:39:22 -0800
-Message-Id: <20230307023946.14516-11-xin3.li@intel.com>
+Subject: [PATCH v5 11/34] x86/fred: if CONFIG_X86_FRED is disabled, disable FRED support
+Date:   Mon,  6 Mar 2023 18:39:23 -0800
+Message-Id: <20230307023946.14516-12-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230307023946.14516-1-xin3.li@intel.com>
 References: <20230307023946.14516-1-xin3.li@intel.com>
@@ -64,35 +64,70 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
 
-Add the configuration option CONFIG_X86_FRED to enable FRED.
+Add CONFIG_X86_FRED to <asm/disabled-features.h> to make
+cpu_feature_enabled() work correctly with FRED.
 
+Originally-by: Megha Dey <megha.dey@intel.com>
 Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
- arch/x86/Kconfig | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ arch/x86/include/asm/disabled-features.h       | 8 +++++++-
+ tools/arch/x86/include/asm/disabled-features.h | 8 +++++++-
+ 2 files changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index a825bf031f49..da62178bb246 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -500,6 +500,15 @@ config X86_CPU_RESCTRL
+diff --git a/arch/x86/include/asm/disabled-features.h b/arch/x86/include/asm/disabled-features.h
+index 5dfa4fb76f4b..56838de9cb23 100644
+--- a/arch/x86/include/asm/disabled-features.h
++++ b/arch/x86/include/asm/disabled-features.h
+@@ -99,6 +99,12 @@
+ # define DISABLE_TDX_GUEST	(1 << (X86_FEATURE_TDX_GUEST & 31))
+ #endif
  
- 	  Say N if unsure.
- 
-+config X86_FRED
-+	bool "Flexible Return and Event Delivery"
-+	depends on X86_64
-+	help
-+	  When enabled, try to use Flexible Return and Event Delivery
-+	  instead of the legacy SYSCALL/SYSENTER/IDT architecture for
-+	  ring transitions and exception/interrupt handling if the
-+	  system supports.
++#ifdef CONFIG_X86_FRED
++# define DISABLE_FRED 0
++#else
++# define DISABLE_FRED (1 << (X86_FEATURE_FRED & 31))
++#endif
 +
- if X86_32
- config X86_BIGSMP
- 	bool "Support for big SMP systems with more than 8 CPUs"
+ /*
+  * Make sure to add features to the correct mask
+  */
+@@ -115,7 +121,7 @@
+ #define DISABLED_MASK10	0
+ #define DISABLED_MASK11	(DISABLE_RETPOLINE|DISABLE_RETHUNK|DISABLE_UNRET| \
+ 			 DISABLE_CALL_DEPTH_TRACKING)
+-#define DISABLED_MASK12	0
++#define DISABLED_MASK12	(DISABLE_FRED)
+ #define DISABLED_MASK13	0
+ #define DISABLED_MASK14	0
+ #define DISABLED_MASK15	0
+diff --git a/tools/arch/x86/include/asm/disabled-features.h b/tools/arch/x86/include/asm/disabled-features.h
+index c44b56f7ffba..2d3ec539dcc7 100644
+--- a/tools/arch/x86/include/asm/disabled-features.h
++++ b/tools/arch/x86/include/asm/disabled-features.h
+@@ -99,6 +99,12 @@
+ # define DISABLE_TDX_GUEST	(1 << (X86_FEATURE_TDX_GUEST & 31))
+ #endif
+ 
++#ifdef CONFIG_X86_FRED
++# define DISABLE_FRED 0
++#else
++# define DISABLE_FRED (1 << (X86_FEATURE_FRED & 31))
++#endif
++
+ /*
+  * Make sure to add features to the correct mask
+  */
+@@ -115,7 +121,7 @@
+ #define DISABLED_MASK10	0
+ #define DISABLED_MASK11	(DISABLE_RETPOLINE|DISABLE_RETHUNK|DISABLE_UNRET| \
+ 			 DISABLE_CALL_DEPTH_TRACKING)
+-#define DISABLED_MASK12	0
++#define DISABLED_MASK12	(DISABLE_FRED)
+ #define DISABLED_MASK13	0
+ #define DISABLED_MASK14	0
+ #define DISABLED_MASK15	0
 -- 
 2.34.1
 
