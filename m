@@ -2,111 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D26B96AF556
-	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 20:24:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BCA66AF438
+	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 20:15:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234019AbjCGTYU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Mar 2023 14:24:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53732 "EHLO
+        id S230444AbjCGTPB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Mar 2023 14:15:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234059AbjCGTYA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Mar 2023 14:24:00 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82FF0B0498;
-        Tue,  7 Mar 2023 11:09:39 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        with ESMTP id S233835AbjCGTOg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Mar 2023 14:14:36 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2796F7E7AC;
+        Tue,  7 Mar 2023 10:58:13 -0800 (PST)
+Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1E94B61532;
-        Tue,  7 Mar 2023 19:09:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 145FCC433EF;
-        Tue,  7 Mar 2023 19:09:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1678216178;
-        bh=KCEuBy+vQlq+l6jOKnFcuSzdCEdjOiwxyU8c70mIZxU=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=KdaElJu1QNRElKjtTpsvC90rKQfg66qf3Ta73+keqOuWlVanA9XibKrANe10ZZSOJ
-         G1p45PV3UEVMoVaL7qj9CWJTDuZit1KuoHPY1OfyoLvdn6giyfPqwPgRK9JXE7ay9+
-         y1Q0yuEdWG2aH5UKOKBpZzI+AN4Z06b9puxpGokQ=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     stable@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        patches@lists.linux.dev, Randy Dunlap <rdunlap@infradead.org>,
-        Vineeth Pillai <viremana@linux.microsoft.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: [PATCH 5.15 469/567] KVM: SVM: hyper-v: placate modpost section mismatch error
-Date:   Tue,  7 Mar 2023 18:03:25 +0100
-Message-Id: <20230307165926.208565593@linuxfoundation.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230307165905.838066027@linuxfoundation.org>
-References: <20230307165905.838066027@linuxfoundation.org>
-User-Agent: quilt/0.67
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id B68141EC03CA;
+        Tue,  7 Mar 2023 19:58:11 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1678215491;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=j9UdRduiFLUBTidAQ4yNTj8dDk3AVNZs37HLqoaeIPs=;
+        b=bg33dwve99R6zfkG4pNPV4/f3XQXjhnjz1zjzB2af8yEl7OWnzS1UTXLRrEZCuAmJlyXeP
+        3yCfrF+WrhWO+0gkL17fZoh/wTfomWHKqEsDVLXSsCITuOTYAsXp+s92lV9p1VGMCFJS4L
+        HSgJTkmbOfRSDoxhQYTzBXTXN7LOCHQ=
+Date:   Tue, 7 Mar 2023 19:58:11 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Takahiro Itazuri <itazur@amazon.com>,
+        dave.hansen@linux.intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
+        x86@kernel.org, zulinx86@gmail.com
+Subject: Re: [PATCH 0/2] KVM: x86: Propagate AMD-specific IBRS bits to guests
+Message-ID: <20230307185811.GEZAeJQ8U+NYySH8up@fat_crate.local>
+References: <Y/5oBKi6vjZe83ac@zn.tnic>
+ <20230228222416.61484-1-itazur@amazon.com>
+ <Y/6FIeJ5KCOfKEPN@zn.tnic>
+ <ZAZYKe4L8jhMG4An@google.com>
+ <20230306214419.GDZAZes941k+4NPgDL@fat_crate.local>
+ <25249e7d-4fd9-e1c1-8efb-31750740ec27@redhat.com>
+ <20230306215450.GFZAZhKnr6zMCeeDNd@fat_crate.local>
+ <ZAeHMgp9U7giJpHs@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ZAeHMgp9U7giJpHs@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Randy Dunlap <rdunlap@infradead.org>
+On Tue, Mar 07, 2023 at 10:49:22AM -0800, Sean Christopherson wrote:
+> I don't see what such a rule buys us beyond complexity and, IMO, unnecessary
+> maintenance burden.  As Paolo pointed out, when there's an existing word, the
 
-commit 45dd9bc75d9adc9483f0c7d662ba6e73ed698a0b upstream.
+Maybe I wasn't clear enough - I don't mind existing words. What I mind
+is adding new ones only for KVM's sake.
 
-modpost reports section mismatch errors/warnings:
-WARNING: modpost: vmlinux.o: section mismatch in reference: svm_hv_hardware_setup (section: .text) -> (unknown) (section: .init.data)
-WARNING: modpost: vmlinux.o: section mismatch in reference: svm_hv_hardware_setup (section: .text) -> (unknown) (section: .init.data)
-WARNING: modpost: vmlinux.o: section mismatch in reference: svm_hv_hardware_setup (section: .text) -> (unknown) (section: .init.data)
+-- 
+Regards/Gruss,
+    Boris.
 
-This "(unknown) (section: .init.data)" all refer to svm_x86_ops.
-
-Tag svm_hv_hardware_setup() with __init to fix a modpost warning as the
-non-stub implementation accesses __initdata (svm_x86_ops), i.e. would
-generate a use-after-free if svm_hv_hardware_setup() were actually invoked
-post-init.  The helper is only called from svm_hardware_setup(), which is
-also __init, i.e. lack of __init is benign other than the modpost warning.
-
-Fixes: 1e0c7d40758b ("KVM: SVM: hyper-v: Remote TLB flush for SVM")
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Vineeth Pillai <viremana@linux.microsoft.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org
-Cc: stable@vger.kernel.org
-Reviewed-by: Sean Christopherson <seanjc@google.com>
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Message-Id: <20230222073315.9081-1-rdunlap@infradead.org>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- arch/x86/kvm/svm/svm_onhyperv.h |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
---- a/arch/x86/kvm/svm/svm_onhyperv.h
-+++ b/arch/x86/kvm/svm/svm_onhyperv.h
-@@ -48,7 +48,7 @@ static inline void svm_hv_init_vmcb(stru
- 		hve->hv_enlightenments_control.enlightened_npt_tlb = 1;
- }
- 
--static inline void svm_hv_hardware_setup(void)
-+static inline __init void svm_hv_hardware_setup(void)
- {
- 	if (npt_enabled &&
- 	    ms_hyperv.nested_features & HV_X64_NESTED_ENLIGHTENED_TLB) {
-@@ -112,7 +112,7 @@ static inline void svm_hv_init_vmcb(stru
- {
- }
- 
--static inline void svm_hv_hardware_setup(void)
-+static inline __init void svm_hv_hardware_setup(void)
- {
- }
- 
-
-
+https://people.kernel.org/tglx/notes-about-netiquette
