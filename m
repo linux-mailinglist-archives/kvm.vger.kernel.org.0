@@ -2,484 +2,470 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 804F46AF5AB
-	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 20:28:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EF6E56AF5BB
+	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 20:33:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234213AbjCGT23 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Mar 2023 14:28:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37178 "EHLO
+        id S234226AbjCGTdc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Mar 2023 14:33:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234153AbjCGT2J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Mar 2023 14:28:09 -0500
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37DC2B5FED
-        for <kvm@vger.kernel.org>; Tue,  7 Mar 2023 11:14:10 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id lm13-20020a170903298d00b0019a8c8a13dfso8185407plb.16
-        for <kvm@vger.kernel.org>; Tue, 07 Mar 2023 11:14:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678216446;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Wt+tMy1RH9zC84sq0to0cY0x7+Xv2yMTzgsmC8ZQ7cM=;
-        b=D+BRUMlsQmhPM7Km19r0cwtSovSQv0WAERIfkRDuEbsEadkI29Rz8sSQqIRpfAPEa/
-         uCEsFKnPst88VAZKSkPZjffh5S3WZTxUmNU4Xw/KSiy4soV/n0dJgIrEl9OXSPbIfQQK
-         KLOBXvGg6LH2ugOhFB2E2wpPrpDgxCLKWf0LPJlLMfhxqqsHvu6JPcw14TUVTqqyGFlZ
-         BGsXgEkUEMCjAYmlzNQrRRX203Kz1uOE6SMPxmDIVc7khBpDDg6yCWpgZR7rxAtYpjv/
-         SqkEiQXtopyaQBB3xjjHp9QzaFJ66vn2U3nSuUXKNCqd3tZoY5qhFiJPfWWt4zAY4ldo
-         w8FQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678216446;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Wt+tMy1RH9zC84sq0to0cY0x7+Xv2yMTzgsmC8ZQ7cM=;
-        b=e2xm+rcnAY2oHCij3+SfPgu+mnWSD9QetIBajkldau4fCxUcHKP5r1opmNS3FVm9yg
-         C31mSsSnJMOUEtCt3E98Iqj/sqXjL9s5F8p6puZxm3VK7+1jgoS03+aKXM0AoV5yqrSX
-         SwbHmW/81l9zazGKVKnjny87KKofGc/X6YdxRtG+jDG71WINEXEewyma7sOipGc4THWv
-         PAa42vmzuifvAW8DyCAj3X2mUKNO7hWd50DlLLq6PtUNd4jUXkbC71d1o1CDsjP4li/W
-         xKUhQpcuUmFs15Y2FdY2uLVI78+WLiRo9ZadPm+QfdF1GfdCjpsfDi0atxzMvO1UmJTE
-         H5KQ==
-X-Gm-Message-State: AO0yUKX0nbnRO3wyYlXeV2OyRCAcCvVnkglEZN/auZu9sdJJ5N2v4mlF
-        dV0lhzmM+Fg2GZNN5e+mycQWaXyIfh9kPOR5pw==
-X-Google-Smtp-Source: AK7set9XmMrWXZ6mpUlbpcFneSpuxawFmXBvqn5A78lIM65RH9bBDorwkD1ukffGVS/euOjwrQaunWK8N4egR11Vkw==
-X-Received: from ackerleytng-cloudtop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1f5f])
- (user=ackerleytng job=sendgmr) by 2002:a17:90a:8e83:b0:237:1fe0:b151 with
- SMTP id f3-20020a17090a8e8300b002371fe0b151mr5483530pjo.8.1678216446569; Tue,
- 07 Mar 2023 11:14:06 -0800 (PST)
-Date:   Tue, 07 Mar 2023 19:14:05 +0000
-In-Reply-To: <20221202061347.1070246-10-chao.p.peng@linux.intel.com> (message
- from Chao Peng on Fri,  2 Dec 2022 14:13:47 +0800)
-Mime-Version: 1.0
-Message-ID: <diqzcz5kz85e.fsf@ackerleytng-cloudtop.c.googlers.com>
-Subject: Re: [PATCH v10 9/9] KVM: Enable and expose KVM_MEM_PRIVATE
-From:   Ackerley Tng <ackerleytng@google.com>
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        pbonzini@redhat.com, corbet@lwn.net, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, arnd@arndb.de, naoya.horiguchi@nec.com,
-        linmiaohe@huawei.com, x86@kernel.org, hpa@zytor.com,
-        hughd@google.com, jlayton@kernel.org, bfields@fieldses.org,
-        akpm@linux-foundation.org, shuah@kernel.org, rppt@kernel.org,
-        steven.price@arm.com, mail@maciej.szmigiero.name, vbabka@suse.cz,
-        vannapurve@google.com, yu.c.zhang@linux.intel.com,
-        chao.p.peng@linux.intel.com, kirill.shutemov@linux.intel.com,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com, qperret@google.com,
-        tabba@google.com, michael.roth@amd.com, mhocko@suse.com,
-        wei.w.wang@intel.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S234128AbjCGTdG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Mar 2023 14:33:06 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 290B11FCE;
+        Tue,  7 Mar 2023 11:19:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=wYe+Go4VrLCiIrrSpPOWf/AVpFZ/vpQ7xqMlpyKqI4U=; b=HwuvqgHcpMmnXVMKFCfpRJdvID
+        SEjJNq+x5Kuw8b91Gvn8kS+IixuOWBKR23jp+F93LnVSgD826HfLC5n2TWGWJTsnjjY6yejB1qUCH
+        x7CimS34KeqdQBVd3rkmjJWpBbnmstcnydkkKH3arRTBxUss6E8Jsb9/u3h7KvRbsswR6DIXAU5K8
+        BSGPZBvaBOhAdEQln/I5qXXVEgbbW2UFV7h1oAJuI/yUPoxMKk4G0Ztok3T9Z63UoYA8hZhmsk4ZP
+        ifSlyttFhtyKHHA3tw+Bbg7iQOs24jKOUig5eUD7I3Xp7hwr87Q1hAslIwGbiJ03voKzYfo1Pf+Hg
+        KHVTIRGA==;
+Received: from [2001:8b0:10b:5:640c:634b:db90:9c87] (helo=u3832b3a9db3152.ant.amazon.com)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pZcpc-006g7X-Jj; Tue, 07 Mar 2023 19:18:41 +0000
+Message-ID: <269ed38b5eed9c3a259c183d59d4f1eb5128f132.camel@infradead.org>
+Subject: Re: [PATCH v13 00/11] Parallel CPU bringup for x86_64
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Tom Lendacky <thomas.lendacky@amd.com>,
+        Usama Arif <usama.arif@bytedance.com>, tglx@linutronix.de,
+        kim.phillips@amd.com, brgerst@gmail.com,
+        "Rapan, Sabin" <sabrapan@amazon.com>
+Cc:     piotrgorski@cachyos.org, oleksandr@natalenko.name,
+        arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
+        pbonzini@redhat.com, paulmck@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
+        seanjc@google.com, pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
+        punit.agrawal@bytedance.com, simon.evans@bytedance.com,
+        liangma@liangbit.com
+Date:   Tue, 07 Mar 2023 19:18:38 +0000
+In-Reply-To: <effbb6e2-c5a1-af7f-830d-8d7088f57477@amd.com>
+References: <20230302111227.2102545-1-usama.arif@bytedance.com>
+         <faa0eb3bb8ba0326d501516a057ab46eaf1f3c05.camel@infradead.org>
+         <effbb6e2-c5a1-af7f-830d-8d7088f57477@amd.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-FBV/TvOr8jnJ945TDkfB"
+User-Agent: Evolution 3.44.4-0ubuntu1 
+MIME-Version: 1.0
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Chao Peng <chao.p.peng@linux.intel.com> writes:
 
-> Register/unregister private memslot to fd-based memory backing store
-> restrictedmem and implement the callbacks for restrictedmem_notifier:
->    - invalidate_start()/invalidate_end() to zap the existing memory
->      mappings in the KVM page table.
->    - error() to request KVM_REQ_MEMORY_MCE and later exit to userspace
->      with KVM_EXIT_SHUTDOWN.
+--=-FBV/TvOr8jnJ945TDkfB
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> Expose KVM_MEM_PRIVATE for memslot and KVM_MEMORY_ATTRIBUTE_PRIVATE for
-> KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES to userspace but either are
-> controlled by kvm_arch_has_private_mem() which should be rewritten by
-> architecture code.
+On Tue, 2023-03-07 at 10:45 -0600, Tom Lendacky wrote:
+> On 3/7/23 08:42, David Woodhouse wrote:
+> > On Thu, 2023-03-02 at 11:12 +0000, Usama Arif wrote:
+> > > The main code change over v12 is to fix the build error when
+> > > CONFIG_FORCE_NR_CPUS is present.
+> > >=20
+> > > The commit message for removing initial stack has also been improved,=
+ typos
+> > > have been fixed and extra comments have been added to make code clear=
+er.
+> >=20
+> > Might something like this make it work in parallel with SEV-SNP? If so,
+> > I can clean it up and adjust the C code to actually invoke it...
+>=20
+> This should be ok for both SEV-ES and SEV-SNP.
 
-Could we perhaps rename KVM_MEM_PRIVATE to KVM_MEM_PROTECTED, to be in
-line with KVM_X86_PROTECTED_VM?
+Thanks. So... something like this then?
 
-I feel that a memslot that has the KVM_MEM_PRIVATE flag need not always
-be private; It can sometimes be providing memory that is shared and
-also accessible from the host.
+Is static_branch_unlikely(&sev_es_enable_key) the right thing to use,
+and does that cover SNP too?
 
-KVM_MEMORY_ATTRIBUTE_PRIVATE is fine as-is because this flag is set when
-the guest memory is meant to be backed by private memory.
+Pushed to
+https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/paralle=
+l-6.2-rc8-v12bis
 
-KVM_MEMORY_EXIT_FLAG_PRIVATE is also okay because the flag is used to
-indicate when the memory error is caused by a private access (as opposed
-to a shared access).
+=46rom d03aed91e5cfe840f4b18820fe6aed1765687321 Mon Sep 17 00:00:00 2001
+From: David Woodhouse <dwmw@amazon.co.uk>
+Date: Tue, 7 Mar 2023 19:06:50 +0000
+Subject: [PATCH] x86/smpboot: Allow parallel bringup for SEV-ES
 
-kvm_slot_can_be_private() could perhaps be renamed kvm_is_protected_slot()?
+Enable parallel bringup for SEV-ES guests. The APs can't actually
+execute the CPUID instruction directly during early startup, but they
+can make the GHCB call directly instead, just as the VC trap handler
+would do.
+
+Factor out a prepare_parallel_bringup() function to help reduce the level
+of complexity by allowing a simple 'return false' in the bail-out cases/
+
+Thanks to Sabin for talking me through the way this works.
+
+Suggested-by: Sabin Rapan <sabrapan@amazon.com>
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+---
+ arch/x86/include/asm/sev-common.h |   3 +
+ arch/x86/include/asm/smp.h        |   3 +-
+ arch/x86/kernel/head_64.S         |  27 ++++++-
+ arch/x86/kernel/smpboot.c         | 112 ++++++++++++++++++------------
+ 4 files changed, 98 insertions(+), 47 deletions(-)
+
+diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-c=
+ommon.h
+index b8357d6ecd47..f25df4bd318e 100644
+--- a/arch/x86/include/asm/sev-common.h
++++ b/arch/x86/include/asm/sev-common.h
+@@ -70,6 +70,7 @@
+ 	/* GHCBData[63:12] */				\
+ 	(((u64)(v) & GENMASK_ULL(63, 12)) >> 12)
+=20
++#ifndef __ASSEMBLY__
+ /*
+  * SNP Page State Change Operation
+  *
+@@ -160,6 +161,8 @@ struct snp_psc_desc {
+=20
+ #define GHCB_RESP_CODE(v)		((v) & GHCB_MSR_INFO_MASK)
+=20
++#endif /* __ASSEMBLY__ */
++
+ /*
+  * Error codes related to GHCB input that can be communicated back to the =
+guest
+  * by setting the lower 32-bits of the GHCB SW_EXITINFO1 field to 2.
+diff --git a/arch/x86/include/asm/smp.h b/arch/x86/include/asm/smp.h
+index defe76ee9e64..b3f67a764bfa 100644
+--- a/arch/x86/include/asm/smp.h
++++ b/arch/x86/include/asm/smp.h
+@@ -204,7 +204,8 @@ extern unsigned int smpboot_control;
+ /* Control bits for startup_64 */
+ #define STARTUP_APICID_CPUID_0B	0x80000000
+ #define STARTUP_APICID_CPUID_01	0x40000000
++#define STARTUP_APICID_SEV_ES	0x20000000
+=20
+-#define STARTUP_PARALLEL_MASK (STARTUP_APICID_CPUID_01 | STARTUP_APICID_CP=
+UID_0B)
++#define STARTUP_PARALLEL_MASK (STARTUP_APICID_CPUID_01 | STARTUP_APICID_CP=
+UID_0B | STARTUP_APICID_SEV_ES)
+=20
+ #endif /* _ASM_X86_SMP_H */
+diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
+index c35f7c173832..3f5904eab678 100644
+--- a/arch/x86/kernel/head_64.S
++++ b/arch/x86/kernel/head_64.S
+@@ -26,7 +26,7 @@
+ #include <asm/nospec-branch.h>
+ #include <asm/fixmap.h>
+ #include <asm/smp.h>
+-
++#include <asm/sev-common.h>
+ /*
+  * We are not able to switch in one step to the final KERNEL ADDRESS SPACE
+  * because we need identity-mapped pages.
+@@ -242,6 +242,7 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify, SYM_L_G=
+LOBAL)
+ 	 *
+ 	 * Bit 31	STARTUP_APICID_CPUID_0B flag (use CPUID 0x0b)
+ 	 * Bit 30	STARTUP_APICID_CPUID_01 flag (use CPUID 0x01)
++	 * Bit 29	STARTUP_APICID_SEV_ES flag (CPUID 0x0b via GHCB MSR)
+ 	 * Bit 0-24	CPU# if STARTUP_APICID_CPUID_xx flags are not set
+ 	 */
+ 	movl	smpboot_control(%rip), %ecx
+@@ -249,6 +250,8 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify, SYM_L_G=
+LOBAL)
+ 	jnz	.Luse_cpuid_0b
+ 	testl	$STARTUP_APICID_CPUID_01, %ecx
+ 	jnz	.Luse_cpuid_01
++	testl	$STARTUP_APICID_SEV_ES, %ecx
++	jnz	.Luse_sev_cpuid_0b
+ 	andl	$0x0FFFFFFF, %ecx
+ 	jmp	.Lsetup_cpu
+=20
+@@ -259,6 +262,28 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify, SYM_L_=
+GLOBAL)
+ 	shr	$24, %edx
+ 	jmp	.Lsetup_AP
+=20
++.Luse_sev_cpuid_0b:
++	/* Set the GHCB MSR to request CPUID 0xB_EDX */
++	movl	$MSR_AMD64_SEV_ES_GHCB, %ecx
++	movl	$(GHCB_CPUID_REQ_EDX << 30) | GHCB_MSR_CPUID_REQ, %eax
++	movl	$0x0B, %edx
++	wrmsr
++
++	/* Perform GHCB MSR protocol */
++	vmgexit
++
++	/*
++	 * Get the result. After the RDMSR:
++	 *   EAX should be 0xc0000005
++	 *   EDX should have the CPUID register value and since EDX
++	 *   is the target register, no need to move the result.
++	 */
++	rdmsr
++	andl	$GHCB_MSR_INFO_MASK, %eax
++	cmpl	$GHCB_MSR_CPUID_RESP, %eax
++	jne	1f
++	jmp	.Lsetup_AP
++
+ .Luse_cpuid_0b:
+ 	mov	$0x0B, %eax
+ 	xorl	%ecx, %ecx
+diff --git a/arch/x86/kernel/smpboot.c b/arch/x86/kernel/smpboot.c
+index 9d956571ecc1..d194c4ffeef8 100644
+--- a/arch/x86/kernel/smpboot.c
++++ b/arch/x86/kernel/smpboot.c
+@@ -1510,6 +1510,71 @@ void __init smp_prepare_cpus_common(void)
+ 	set_cpu_sibling_map(0);
+ }
+=20
++
++/*
++ * We can do 64-bit AP bringup in parallel if the CPU reports its APIC
++ * ID in CPUID (either leaf 0x0B if we need the full APIC ID in X2APIC
++ * mode, or leaf 0x01 if 8 bits are sufficient). Otherwise it's too
++ * hard. And not for SEV-ES guests because they can't use CPUID that
++ * early.
++ */
++static bool __init prepare_parallel_bringup(void)
++{
++	if (IS_ENABLED(CONFIG_X86_32) || boot_cpu_data.cpuid_level < 1)
++		return false;
++
++	if (x2apic_mode) {
++		unsigned int eax, ebx, ecx, edx;
++
++		if (boot_cpu_data.cpuid_level < 0xb)
++			return false;
++
++		/*
++		 * To support parallel bringup in x2apic mode, the AP will need
++		 * to obtain its APIC ID from CPUID 0x0B, since CPUID 0x01 has
++		 * only 8 bits. Check that it is present and seems correct.
++		 */
++		cpuid_count(0xb, 0, &eax, &ebx, &ecx, &edx);
++
++		/*
++		 * AMD says that if executed with an umimplemented level in
++		 * ECX, then it will return all zeroes in EAX. Intel says it
++		 * will return zeroes in both EAX and EBX. Checking only EAX
++		 * should be sufficient.
++		 */
++		if (!eax) {
++			pr_info("Disabling parallel bringup because CPUID 0xb looks untrustwort=
+hy\n");
++			return false;
++		}
++
++		if (IS_ENABLED(AMD_MEM_ENCRYPT) && static_branch_unlikely(&sev_es_enable=
+_key)) {
++			pr_debug("Using SEV-ES CPUID 0xb for parallel CPU startup\n");
++			smpboot_control =3D STARTUP_APICID_SEV_ES;
++		} else if (cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT)) {
++			/*
++			 * Other forms of memory encryption need to implement a way of
++			 * finding the APs' APIC IDs that early.
++			 */
++			return false;
++		} else {
++			pr_debug("Using CPUID 0xb for parallel CPU startup\n");
++			smpboot_control =3D STARTUP_APICID_CPUID_0B;
++		}
++	} else {
++		if (cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT))
++			return false;
++
++		/* Without X2APIC, what's in CPUID 0x01 should suffice. */
++		pr_debug("Using CPUID 0x1 for parallel CPU startup\n");
++		smpboot_control =3D STARTUP_APICID_CPUID_01;
++	}
++
++	cpuhp_setup_state_nocalls(CPUHP_BP_PARALLEL_DYN, "x86/cpu:kick",
++				  native_cpu_kick, NULL);
++
++	return true;
++}
++
+ /*
+  * Prepare for SMP bootup.
+  * @max_cpus: configured maximum number of CPUs, It is a legacy parameter
+@@ -1550,51 +1615,8 @@ void __init native_smp_prepare_cpus(unsigned int max=
+_cpus)
+=20
+ 	speculative_store_bypass_ht_init();
+=20
+-	/*
+-	 * We can do 64-bit AP bringup in parallel if the CPU reports
+-	 * its APIC ID in CPUID (either leaf 0x0B if we need the full
+-	 * APIC ID in X2APIC mode, or leaf 0x01 if 8 bits are
+-	 * sufficient). Otherwise it's too hard. And not for SEV-ES
+-	 * guests because they can't use CPUID that early.
+-	 */
+-	if (IS_ENABLED(CONFIG_X86_32) || boot_cpu_data.cpuid_level < 1 ||
+-	    (x2apic_mode && boot_cpu_data.cpuid_level < 0xb) ||
+-	    cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT))
+-		do_parallel_bringup =3D false;
+-
+-	if (do_parallel_bringup && x2apic_mode) {
+-		unsigned int eax, ebx, ecx, edx;
+-
+-		/*
+-		 * To support parallel bringup in x2apic mode, the AP will need
+-		 * to obtain its APIC ID from CPUID 0x0B, since CPUID 0x01 has
+-		 * only 8 bits. Check that it is present and seems correct.
+-		 */
+-		cpuid_count(0xb, 0, &eax, &ebx, &ecx, &edx);
+-
+-		/*
+-		 * AMD says that if executed with an umimplemented level in
+-		 * ECX, then it will return all zeroes in EAX. Intel says it
+-		 * will return zeroes in both EAX and EBX. Checking only EAX
+-		 * should be sufficient.
+-		 */
+-		if (eax) {
+-			pr_debug("Using CPUID 0xb for parallel CPU startup\n");
+-			smpboot_control =3D STARTUP_APICID_CPUID_0B;
+-		} else {
+-			pr_info("Disabling parallel bringup because CPUID 0xb looks untrustwort=
+hy\n");
+-			do_parallel_bringup =3D false;
+-		}
+-	} else if (do_parallel_bringup) {
+-		/* Without X2APIC, what's in CPUID 0x01 should suffice. */
+-		pr_debug("Using CPUID 0x1 for parallel CPU startup\n");
+-		smpboot_control =3D STARTUP_APICID_CPUID_01;
+-	}
+-
+-	if (do_parallel_bringup) {
+-		cpuhp_setup_state_nocalls(CPUHP_BP_PARALLEL_DYN, "x86/cpu:kick",
+-					  native_cpu_kick, NULL);
+-	}
++	if (do_parallel_bringup)
++		do_parallel_bringup =3D prepare_parallel_bringup();
+=20
+ 	snp_set_wakeup_secondary_cpu();
+ }
+--=20
+2.39.0
 
 
-> Co-developed-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> Reviewed-by: Fuad Tabba <tabba@google.com>
-> ---
->   arch/x86/include/asm/kvm_host.h |   1 +
->   arch/x86/kvm/x86.c              |  13 +++
->   include/linux/kvm_host.h        |   3 +
->   virt/kvm/kvm_main.c             | 179 +++++++++++++++++++++++++++++++-
->   4 files changed, 191 insertions(+), 5 deletions(-)
 
-> diff --git a/arch/x86/include/asm/kvm_host.h  
-> b/arch/x86/include/asm/kvm_host.h
-> index 7772ab37ac89..27ef31133352 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -114,6 +114,7 @@
->   	KVM_ARCH_REQ_FLAGS(31, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
->   #define KVM_REQ_HV_TLB_FLUSH \
->   	KVM_ARCH_REQ_FLAGS(32, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-> +#define KVM_REQ_MEMORY_MCE		KVM_ARCH_REQ(33)
+--=-FBV/TvOr8jnJ945TDkfB
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
->   #define CR0_RESERVED_BITS                                               \
->   	(~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_TS \
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 5aefcff614d2..c67e22f3e2ee 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -6587,6 +6587,13 @@ int kvm_arch_pm_notifier(struct kvm *kvm, unsigned  
-> long state)
->   }
->   #endif /* CONFIG_HAVE_KVM_PM_NOTIFIER */
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMzA3MTkxODM4WjAvBgkqhkiG9w0BCQQxIgQgNofIQ/9V
+oIfj48JGd6Fgz6vGyY9ApttQhj+f+yRNVlYwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCIYVIzAMFrWASKJHqNGRDT56r4ZkcH3P7F
+HLsPKEGywZvARX4nNxILX6+Jr0k5X+EYHeNhDjmbm5vJ4B5bypKTZfLSGvOPN2aP7kF7ksHhxRdw
+E0NEVMYjWy8v3yLS8h+4KIxcKC4wCp29KQ8WV2i4CvFZpxPWpnhtZFfV3tLh2Rh364DL39U11Tmu
+c1p2oT+nHtF9tY1jQJLwx1Pst3XXvtHd4YmMF0HyY7FdyOJlJDrv2zDwwxWsjKWOZKcFUDRDkGNW
+jJyee4Px9ayjgJ/ToWmuPvLdrfr4yq6Hr4/BqOeB0g9HzXQAfuHj9KzF56m4gsWhLgPiIWjI/oiJ
+E0cU8tB62zUjxLC8qEGwqhYAfANIol1KbFTbbaIJ6lTHGNlwA6eZqDUoA6GjgMkNOFfTuR/DtSW4
+HO0F7Sa78j9qLSeSWBe+PrZukkS+qYbhoyiH92RysKph4ozHbXZqozSQ6lKo2XGBoYnYZ/qbhAJQ
+3MY7zYwNrKE37XCvm6pQulbezbF7SDkm89Kl9+3fmGD9x2f26UyokvT8Ata38OW5ZljY+QDr4MPE
+mpe6gRG2JhE+LX21BaFKvWhSNrTfKUUGSS8nd/K3NT3OKCguFYmn1M5r3RutbV9Zi7ZJaSYXUbWu
+OM5R1bj0ptN8O2es4/TO7qQECZshHhO3M7EtBppn2wAAAAAAAA==
 
-> +#ifdef CONFIG_HAVE_KVM_RESTRICTED_MEM
-> +void kvm_arch_memory_mce(struct kvm *kvm)
-> +{
-> +	kvm_make_all_cpus_request(kvm, KVM_REQ_MEMORY_MCE);
-> +}
-> +#endif
-> +
->   static int kvm_vm_ioctl_get_clock(struct kvm *kvm, void __user *argp)
->   {
->   	struct kvm_clock_data data = { 0 };
-> @@ -10357,6 +10364,12 @@ static int vcpu_enter_guest(struct kvm_vcpu  
-> *vcpu)
 
->   		if (kvm_check_request(KVM_REQ_UPDATE_CPU_DIRTY_LOGGING, vcpu))
->   			static_call(kvm_x86_update_cpu_dirty_logging)(vcpu);
-> +
-> +		if (kvm_check_request(KVM_REQ_MEMORY_MCE, vcpu)) {
-> +			vcpu->run->exit_reason = KVM_EXIT_SHUTDOWN;
-> +			r = 0;
-> +			goto out;
-> +		}
->   	}
-
->   	if (kvm_check_request(KVM_REQ_EVENT, vcpu) || req_int_win ||
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 153842bb33df..f032d878e034 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -590,6 +590,7 @@ struct kvm_memory_slot {
->   	struct file *restricted_file;
->   	loff_t restricted_offset;
->   	struct restrictedmem_notifier notifier;
-> +	struct kvm *kvm;
->   };
-
->   static inline bool kvm_slot_can_be_private(const struct kvm_memory_slot  
-> *slot)
-> @@ -2363,6 +2364,8 @@ static inline int kvm_restricted_mem_get_pfn(struct  
-> kvm_memory_slot *slot,
->   	*pfn = page_to_pfn(page);
->   	return ret;
->   }
-> +
-> +void kvm_arch_memory_mce(struct kvm *kvm);
->   #endif /* CONFIG_HAVE_KVM_RESTRICTED_MEM */
-
->   #endif
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index e107afea32f0..ac835fc77273 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -936,6 +936,121 @@ static int kvm_init_mmu_notifier(struct kvm *kvm)
-
->   #endif /* CONFIG_MMU_NOTIFIER && KVM_ARCH_WANT_MMU_NOTIFIER */
-
-> +#ifdef CONFIG_HAVE_KVM_RESTRICTED_MEM
-> +static bool restrictedmem_range_is_valid(struct kvm_memory_slot *slot,
-> +					 pgoff_t start, pgoff_t end,
-> +					 gfn_t *gfn_start, gfn_t *gfn_end)
-> +{
-> +	unsigned long base_pgoff = slot->restricted_offset >> PAGE_SHIFT;
-> +
-> +	if (start > base_pgoff)
-> +		*gfn_start = slot->base_gfn + start - base_pgoff;
-> +	else
-> +		*gfn_start = slot->base_gfn;
-> +
-> +	if (end < base_pgoff + slot->npages)
-> +		*gfn_end = slot->base_gfn + end - base_pgoff;
-> +	else
-> +		*gfn_end = slot->base_gfn + slot->npages;
-> +
-> +	if (*gfn_start >= *gfn_end)
-> +		return false;
-> +
-> +	return true;
-> +}
-> +
-> +static void kvm_restrictedmem_invalidate_begin(struct  
-> restrictedmem_notifier *notifier,
-> +					       pgoff_t start, pgoff_t end)
-> +{
-> +	struct kvm_memory_slot *slot = container_of(notifier,
-> +						    struct kvm_memory_slot,
-> +						    notifier);
-> +	struct kvm *kvm = slot->kvm;
-> +	gfn_t gfn_start, gfn_end;
-> +	struct kvm_gfn_range gfn_range;
-> +	int idx;
-> +
-> +	if (!restrictedmem_range_is_valid(slot, start, end,
-> +					  &gfn_start, &gfn_end))
-> +		return;
-> +
-> +	gfn_range.start = gfn_start;
-> +	gfn_range.end = gfn_end;
-> +	gfn_range.slot = slot;
-> +	gfn_range.pte = __pte(0);
-> +	gfn_range.may_block = true;
-> +
-> +	idx = srcu_read_lock(&kvm->srcu);
-> +	KVM_MMU_LOCK(kvm);
-> +
-> +	kvm_mmu_invalidate_begin(kvm);
-> +	kvm_mmu_invalidate_range_add(kvm, gfn_start, gfn_end);
-> +	if (kvm_unmap_gfn_range(kvm, &gfn_range))
-> +		kvm_flush_remote_tlbs(kvm);
-> +
-> +	KVM_MMU_UNLOCK(kvm);
-> +	srcu_read_unlock(&kvm->srcu, idx);
-> +}
-> +
-> +static void kvm_restrictedmem_invalidate_end(struct  
-> restrictedmem_notifier *notifier,
-> +					     pgoff_t start, pgoff_t end)
-> +{
-> +	struct kvm_memory_slot *slot = container_of(notifier,
-> +						    struct kvm_memory_slot,
-> +						    notifier);
-> +	struct kvm *kvm = slot->kvm;
-> +	gfn_t gfn_start, gfn_end;
-> +
-> +	if (!restrictedmem_range_is_valid(slot, start, end,
-> +					  &gfn_start, &gfn_end))
-> +		return;
-> +
-> +	KVM_MMU_LOCK(kvm);
-> +	kvm_mmu_invalidate_end(kvm);
-> +	KVM_MMU_UNLOCK(kvm);
-> +}
-> +
-> +static void kvm_restrictedmem_error(struct restrictedmem_notifier  
-> *notifier,
-> +				    pgoff_t start, pgoff_t end)
-> +{
-> +	struct kvm_memory_slot *slot = container_of(notifier,
-> +						    struct kvm_memory_slot,
-> +						    notifier);
-> +	kvm_arch_memory_mce(slot->kvm);
-> +}
-> +
-> +static struct restrictedmem_notifier_ops kvm_restrictedmem_notifier_ops  
-> = {
-> +	.invalidate_start = kvm_restrictedmem_invalidate_begin,
-> +	.invalidate_end = kvm_restrictedmem_invalidate_end,
-> +	.error = kvm_restrictedmem_error,
-> +};
-> +
-> +static inline void kvm_restrictedmem_register(struct kvm_memory_slot  
-> *slot)
-> +{
-> +	slot->notifier.ops = &kvm_restrictedmem_notifier_ops;
-> +	restrictedmem_register_notifier(slot->restricted_file, &slot->notifier);
-> +}
-> +
-> +static inline void kvm_restrictedmem_unregister(struct kvm_memory_slot  
-> *slot)
-> +{
-> +	restrictedmem_unregister_notifier(slot->restricted_file,
-> +					  &slot->notifier);
-> +}
-> +
-> +#else /* !CONFIG_HAVE_KVM_RESTRICTED_MEM */
-> +
-> +static inline void kvm_restrictedmem_register(struct kvm_memory_slot  
-> *slot)
-> +{
-> +	WARN_ON_ONCE(1);
-> +}
-> +
-> +static inline void kvm_restrictedmem_unregister(struct kvm_memory_slot  
-> *slot)
-> +{
-> +	WARN_ON_ONCE(1);
-> +}
-> +
-> +#endif /* CONFIG_HAVE_KVM_RESTRICTED_MEM */
-> +
->   #ifdef CONFIG_HAVE_KVM_PM_NOTIFIER
->   static int kvm_pm_notifier_call(struct notifier_block *bl,
->   				unsigned long state,
-> @@ -980,6 +1095,11 @@ static void kvm_destroy_dirty_bitmap(struct  
-> kvm_memory_slot *memslot)
->   /* This does not remove the slot from struct kvm_memslots data  
-> structures */
->   static void kvm_free_memslot(struct kvm *kvm, struct kvm_memory_slot  
-> *slot)
->   {
-> +	if (slot->flags & KVM_MEM_PRIVATE) {
-> +		kvm_restrictedmem_unregister(slot);
-> +		fput(slot->restricted_file);
-> +	}
-> +
->   	kvm_destroy_dirty_bitmap(slot);
-
->   	kvm_arch_free_memslot(kvm, slot);
-> @@ -1551,10 +1671,14 @@ static void kvm_replace_memslot(struct kvm *kvm,
->   	}
->   }
-
-> -static int check_memory_region_flags(const struct kvm_user_mem_region  
-> *mem)
-> +static int check_memory_region_flags(struct kvm *kvm,
-> +				     const struct kvm_user_mem_region *mem)
->   {
->   	u32 valid_flags = KVM_MEM_LOG_DIRTY_PAGES;
-
-> +	if (kvm_arch_has_private_mem(kvm))
-> +		valid_flags |= KVM_MEM_PRIVATE;
-> +
->   #ifdef __KVM_HAVE_READONLY_MEM
->   	valid_flags |= KVM_MEM_READONLY;
->   #endif
-> @@ -1630,6 +1754,9 @@ static int kvm_prepare_memory_region(struct kvm  
-> *kvm,
->   {
->   	int r;
-
-> +	if (change == KVM_MR_CREATE && new->flags & KVM_MEM_PRIVATE)
-> +		kvm_restrictedmem_register(new);
-> +
->   	/*
->   	 * If dirty logging is disabled, nullify the bitmap; the old bitmap
->   	 * will be freed on "commit".  If logging is enabled in both old and
-> @@ -1658,6 +1785,9 @@ static int kvm_prepare_memory_region(struct kvm  
-> *kvm,
->   	if (r && new && new->dirty_bitmap && (!old || !old->dirty_bitmap))
->   		kvm_destroy_dirty_bitmap(new);
-
-> +	if (r && change == KVM_MR_CREATE && new->flags & KVM_MEM_PRIVATE)
-> +		kvm_restrictedmem_unregister(new);
-> +
->   	return r;
->   }
-
-> @@ -1963,7 +2093,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
->   	int as_id, id;
->   	int r;
-
-> -	r = check_memory_region_flags(mem);
-> +	r = check_memory_region_flags(kvm, mem);
->   	if (r)
->   		return r;
-
-> @@ -1982,6 +2112,10 @@ int __kvm_set_memory_region(struct kvm *kvm,
->   	     !access_ok((void __user *)(unsigned long)mem->userspace_addr,
->   			mem->memory_size))
->   		return -EINVAL;
-> +	if (mem->flags & KVM_MEM_PRIVATE &&
-> +		(mem->restricted_offset & (PAGE_SIZE - 1) ||
-> +		 mem->restricted_offset > U64_MAX - mem->memory_size))
-> +		return -EINVAL;
->   	if (as_id >= KVM_ADDRESS_SPACE_NUM || id >= KVM_MEM_SLOTS_NUM)
->   		return -EINVAL;
->   	if (mem->guest_phys_addr + mem->memory_size < mem->guest_phys_addr)
-> @@ -2020,6 +2154,9 @@ int __kvm_set_memory_region(struct kvm *kvm,
->   		if ((kvm->nr_memslot_pages + npages) < kvm->nr_memslot_pages)
->   			return -EINVAL;
->   	} else { /* Modify an existing slot. */
-> +		/* Private memslots are immutable, they can only be deleted. */
-> +		if (mem->flags & KVM_MEM_PRIVATE)
-> +			return -EINVAL;
->   		if ((mem->userspace_addr != old->userspace_addr) ||
->   		    (npages != old->npages) ||
->   		    ((mem->flags ^ old->flags) & KVM_MEM_READONLY))
-> @@ -2048,10 +2185,28 @@ int __kvm_set_memory_region(struct kvm *kvm,
->   	new->npages = npages;
->   	new->flags = mem->flags;
->   	new->userspace_addr = mem->userspace_addr;
-> +	if (mem->flags & KVM_MEM_PRIVATE) {
-> +		new->restricted_file = fget(mem->restricted_fd);
-> +		if (!new->restricted_file ||
-> +		    !file_is_restrictedmem(new->restricted_file)) {
-> +			r = -EINVAL;
-> +			goto out;
-> +		}
-> +		new->restricted_offset = mem->restricted_offset;
-> +	}
-> +
-> +	new->kvm = kvm;
-
->   	r = kvm_set_memslot(kvm, old, new, change);
->   	if (r)
-> -		kfree(new);
-> +		goto out;
-> +
-> +	return 0;
-> +
-> +out:
-> +	if (new->restricted_file)
-> +		fput(new->restricted_file);
-> +	kfree(new);
->   	return r;
->   }
->   EXPORT_SYMBOL_GPL(__kvm_set_memory_region);
-> @@ -2351,6 +2506,8 @@ static int kvm_vm_ioctl_clear_dirty_log(struct kvm  
-> *kvm,
->   #ifdef CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES
->   static u64 kvm_supported_mem_attributes(struct kvm *kvm)
->   {
-> +	if (kvm_arch_has_private_mem(kvm))
-> +		return KVM_MEMORY_ATTRIBUTE_PRIVATE;
->   	return 0;
->   }
-
-> @@ -4822,16 +4979,28 @@ static long kvm_vm_ioctl(struct file *filp,
->   	}
->   	case KVM_SET_USER_MEMORY_REGION: {
->   		struct kvm_user_mem_region mem;
-> -		unsigned long size = sizeof(struct kvm_userspace_memory_region);
-> +		unsigned int flags_offset = offsetof(typeof(mem), flags);
-> +		unsigned long size;
-> +		u32 flags;
-
->   		kvm_sanity_check_user_mem_region_alias();
-
-> +		memset(&mem, 0, sizeof(mem));
-> +
->   		r = -EFAULT;
-> +		if (get_user(flags, (u32 __user *)(argp + flags_offset)))
-> +			goto out;
-> +
-> +		if (flags & KVM_MEM_PRIVATE)
-> +			size = sizeof(struct kvm_userspace_memory_region_ext);
-> +		else
-> +			size = sizeof(struct kvm_userspace_memory_region);
-> +
->   		if (copy_from_user(&mem, argp, size))
->   			goto out;
-
->   		r = -EINVAL;
-> -		if (mem.flags & KVM_MEM_PRIVATE)
-> +		if ((flags ^ mem.flags) & KVM_MEM_PRIVATE)
->   			goto out;
-
->   		r = kvm_vm_ioctl_set_memory_region(kvm, &mem);
+--=-FBV/TvOr8jnJ945TDkfB--
