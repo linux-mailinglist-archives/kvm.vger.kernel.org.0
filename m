@@ -2,209 +2,532 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA0CE6AD701
-	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 06:55:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E99E6AD726
+	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 07:10:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230176AbjCGFzL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Mar 2023 00:55:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59950 "EHLO
+        id S230395AbjCGGKM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Mar 2023 01:10:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230294AbjCGFzF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Mar 2023 00:55:05 -0500
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43C303B64A;
-        Mon,  6 Mar 2023 21:54:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678168491; x=1709704491;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=iNOxTmXJxy+niwGuU7QDLq4maQmaGHqMcJv3qS318J4=;
-  b=Blzt4w+HT1vHK+H3sFj2oshrDIYGNsAFQ4oy1DYXJbp9JdZOWXabZFB9
-   9el1Eeg56qrUvt1Nyw9WwbH7pesnD+fAM7fHTKhrXT39ImtTTQUWwOkw0
-   YO4pmQkbjyggFGbqSrt/4TZI1oqatmKGRsIesfdGyzfMn621DtFLT88Nr
-   sfMEuWRvxo6PejNuc09LeFNYyY5EBZXmPD3+2JCtgTch8fi62Qpq43xHd
-   mnUcnYHScQ1YTD0qcC94W1vGc4pn6gDpNLXihodGESrh+GE15irsDPHQj
-   RUnbwrsT8CNuf7M0kdtFBLUfMsTP+iM4VyGHZ7tVFEzEcJ94mtCShUzcP
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10641"; a="324075759"
-X-IronPort-AV: E=Sophos;i="5.98,240,1673942400"; 
-   d="scan'208";a="324075759"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2023 21:54:50 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10641"; a="922213771"
-X-IronPort-AV: E=Sophos;i="5.98,240,1673942400"; 
-   d="scan'208";a="922213771"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmsmga006.fm.intel.com with ESMTP; 06 Mar 2023 21:54:50 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Mon, 6 Mar 2023 21:54:50 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Mon, 6 Mar 2023 21:54:49 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21 via Frontend Transport; Mon, 6 Mar 2023 21:54:49 -0800
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.104)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.21; Mon, 6 Mar 2023 21:54:48 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=l0xkjfaGalBhP4wqmegK30XSbadqI4bCIbqOvYyw3jmyqYf+F+WphKhBiA0bbwLI6OBk44SouXU2ibgM9euEwny18/x+PE/chKvfr1iydW1vwTKPC4rwvRl/cKsSoLhqbWPHx+Of1e6nEwTQIbbwUK6NxNbAGHAnVgj624M5ihiVTdWUSJOVcLWtBXqrNexX90RBgl2JH0Whp8XOUMPFdI4wmlSh3j7v9JsbYJkOdlcwIFrQSSsNVwNlyHbIw+qNSQu3ydj+Sn1jlafZzZdAJglrNF0E/x42NWvlKQzJHM8/NTUicMd98pXFa+z7bfqeuEMxRi0VUoTSykPNpKKFEA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vO/xh33wf0NmywCeTRcAIy1IIDmdg1D+Qo0P057R1gA=;
- b=l+EJVrnv66Gffl0XzFZRNUpIe6BbY3VRJWTRodfn33VszfBJn7wDsY34UOL4AXasnSO5gxrqEWDq7OYhQX0WTxtKVyXNPxWNQknXzalDWpJrEa+KCXTsu69tAXOyEPk6/MVcNzVJ/VjVfhP4I8w0S2VaZl8AMrnYTJuR9k6YjMu1DH971QVy85vCh6Wh014zaudBo3OVGoGdznZ2f/WTSAUWayqnsqJN4cKSAl7STW0WQflpavOYJbyB0hq2aiOJVJeo7jLlImg8QxeaB/cgA1VX5awCE6IhpnuJ/Z3RVvsUmuBJt0PGpY3ZOcv9xe1Yuqm84vQDWS+P/GZHs6Je5w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by SA1PR11MB8349.namprd11.prod.outlook.com (2603:10b6:806:383::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6156.28; Tue, 7 Mar
- 2023 05:54:46 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::1aac:b695:f7c5:bcac]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::1aac:b695:f7c5:bcac%9]) with mapi id 15.20.6156.028; Tue, 7 Mar 2023
- 05:54:46 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Jason Gunthorpe <jgg@ziepe.ca>,
-        "K V P, Satyanarayana" <satyanarayana.k.v.p@intel.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>
-Subject: RE: [PATCH] vfio/pci: Add DVSEC PCI Extended Config Capability to
- user visible list.
-Thread-Topic: [PATCH] vfio/pci: Add DVSEC PCI Extended Config Capability to
- user visible list.
-Thread-Index: AQHZTZTPYSblfLFSOUeGl9RPc4dsUa7tzAoAgAEJKbA=
-Date:   Tue, 7 Mar 2023 05:54:46 +0000
-Message-ID: <BN9PR11MB52764ABF8381FCDB8CE0FFF78CB79@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20230303055426.2299006-1-satyanarayana.k.v.p@intel.com>
- <ZAXxTiWU489dDssW@ziepe.ca>
-In-Reply-To: <ZAXxTiWU489dDssW@ziepe.ca>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|SA1PR11MB8349:EE_
-x-ms-office365-filtering-correlation-id: c8f12ff4-8582-4772-b435-08db1ed074f0
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: pGaMiCHRQxZGFkmU+8y1rksROveLRm7ohzK5XqBnOqe1WHhFUP/qwZnGnVD7T0O39wv/vIxbZCDIdJvVnkD8jjGldpUpgzqUo/pP2M+i0rHF8GXD8LF1KlxHtTnZDXl71HEtcJg0SQMNeT1dnGgKb5IQOiUS734oiQ5BWAO4PhoWeGlBvFEU0iQA4wSnYBUNmVTeCzrOanSOOD8HReq+m1MGvMN2RiJqvjHZ3uBcWSCsFMHbt3/7/vtQTBKPkeXmpEyPnVMw0hU3Fky77AJdCAE0yLSqr9n8a4xYFrbDqNkWOMBSGjc3d75KGZ6jzOY98Uh4SW1CP1NULZBQ2bOKwihyvBymjb8fzPPCFvSMKEc98D8OEzb4NxXsXb8gHufiysOyHoMJ8yNyBXPy39bTziG3SZzedxILYFnsxMNuci21ATrUg2LxjVO+H9M6gaUr82XWPjPXchh/zW8ZEEblFUa3QldwYwjgNlG0Daf4Mq90EqpjzWBgAstm0P/+0H4hHbcctr2mbkvfchPOCyFzb9V1sYpONWOpWskfsrHRQTB3g9gXiN/Yta+1SE2FdJbb1GnZ5YTI4wMooWlEfKDYVg95u5sEWuZE80zzkvoMpHfDRb+y5mXKBamm55WEXvSXsMaEVaHBkd7TELVCu9wvf4+3e9gadgVevMEj1e7KGwbbHRwpHwMew7MB8sG+t1C8j9I8IwAh+vylk5lDWU6v2g==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(39860400002)(136003)(366004)(376002)(396003)(346002)(451199018)(6636002)(54906003)(316002)(6506007)(55016003)(122000001)(86362001)(38070700005)(71200400001)(82960400001)(38100700002)(478600001)(110136005)(7696005)(26005)(33656002)(9686003)(186003)(5660300002)(41300700001)(52536014)(8936002)(64756008)(2906002)(66446008)(66946007)(76116006)(66476007)(4326008)(8676002)(66556008);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?u4p0Y0Tkwbq8zGhjt1JwKv82IBE7jMDzeul1GAEXL+QYud7gVKHpxIMY6piQ?=
- =?us-ascii?Q?kM/HiUwRV9zetmo68vb7P1je6CYRhpHRr/e9GQjqzMEaztvK5GEvA2qErFam?=
- =?us-ascii?Q?81hFkhDd6sWA7ELFI4gjmsfySziM8MeL0fgecqiWK+X7STSrWiks9Zs05Cly?=
- =?us-ascii?Q?KoCiCV7olYAv9VXalB1MQhJWMBKzPTAQY+MJ35HEckgDaa3EL3YJEzycc0JR?=
- =?us-ascii?Q?+bcLesPW/S+e+xBjqjrK/+WoUolVHEOrFnofAcrlJc7g7xiQH86/CJUfR/8f?=
- =?us-ascii?Q?r0b5KxAuOTLtIi6wmv+O8QtzHOOCn6/Agm59rG5jBD/Jibivv7OnZzKKrjWZ?=
- =?us-ascii?Q?wtNaQpqZH+Fu6FbYvV+z1Yva+j/tDmAoDShvMcFVzdVH0jJdCp2WzlWy3l/R?=
- =?us-ascii?Q?Hk79iCbG83LZuj9h1soifMIayRWDGLpEaORqYAETZPUtYubqyO7LSPjATr7n?=
- =?us-ascii?Q?2wZZh4STSxvNdhZLmaUrjA0OroKHSvJDTEVSsV+j2ZzgI8oOkkP83qjHt1sb?=
- =?us-ascii?Q?/DaxzKlU6h6bT4oHurFZS8xf+N9xBGPRraVePANJUgxHCsstpotM2CefbYGb?=
- =?us-ascii?Q?fesy1CoNuAvJEfRWLZjrvjCDOp1PwD0XrIJqIeVofVrOvr2m/56JsZ46nAJi?=
- =?us-ascii?Q?VmfVPTJDct4sbDwA+GqTEBT89o9cdrsXRZofMdkm3+xml0n/+GwoU36HwoK/?=
- =?us-ascii?Q?5XrnxdsrEV3cOsf23kgNHdsiTeIuXoZFoCzqsU8p38405F8FuuXuArVgTrHQ?=
- =?us-ascii?Q?dt2OiRuxTk3R2WHW68IhdOaUKFCUgkpFYH7glfTvWQgFpmMitMHKym0Xki4f?=
- =?us-ascii?Q?YLiYF9V/XfgrYrfLtmUs2m9Qb+vUFx6ks6XIjRXlg+R5QnpRe6PqKziaRx4f?=
- =?us-ascii?Q?AlFDJ/s/8r3jX2DpCtTdg3w965cF0nNUIEgqutAIdb5iaa2KREagHWtoFvKg?=
- =?us-ascii?Q?3SjSXYIZX0wFI7tceWos4qVBTZNLUfY/Hjas/zCvv5oWZX6XZ5xIScXXZbpD?=
- =?us-ascii?Q?htbTKLr3zzZSKvJrn0N5oCZEn7N1xccT5qvKmX5j8YCdnaquknlitZOEj5Mv?=
- =?us-ascii?Q?IFKuSEGXl+s4Te+FdvUS46sSYbYoV41rR0FfCUwKd4Mvys532+f+p0xMTmiT?=
- =?us-ascii?Q?AtTK1qVoBf4BIO/cZTjeI+8b+htQ//+2kVI9jhJP5sT+MHbj1JhlclzXUeVo?=
- =?us-ascii?Q?3buCVRDVy5wi1kjbYHE63ijLD53pECg2DShrlsAup2fIJTVLUVLfUgbXUkO3?=
- =?us-ascii?Q?lJqp9k8fWAVz+F2Ba7mhBz0fd1gfQlJMm9w1wu8eg51k7aefLUJiO/+nHDeE?=
- =?us-ascii?Q?lTl2qIqD1a1TKvhn7cYan4nI+m/R4vApxerqLwS1dU8vlv8LQ7NeuhhfI0rP?=
- =?us-ascii?Q?XSyKrKgff6HE1Jud4W7HvCNjSzrq3kC4+kFk0rFbo/L2dnjrLWCnWmMAxA/g?=
- =?us-ascii?Q?/FjNncabHCyXSFCznc8tn7+2XpZE7da4nv3BDWX6BcBowEPTVi7OJKaIfMCk?=
- =?us-ascii?Q?Cf03XUe3JUX1c3nhPwtR2y0vVLVL8MGt8GQeow5Vr/KSuRfh9fYxLmxg1v4N?=
- =?us-ascii?Q?eYB6iMES91uDSkWqKGFiwRix5d3yUT6MG1Y2VQIY?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S230210AbjCGGKK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Mar 2023 01:10:10 -0500
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4071431E19
+        for <kvm@vger.kernel.org>; Mon,  6 Mar 2023 22:10:07 -0800 (PST)
+Received: by mail-pl1-x634.google.com with SMTP id x11so8467917pln.12
+        for <kvm@vger.kernel.org>; Mon, 06 Mar 2023 22:10:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1678169407;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dgLjsFmwNjBPnsrBKiPb+yNJklce3/QTLLfNgQRf7fg=;
+        b=UNAExAWxQ7psWq0fdCPD8BToMH1tvnmzAv7KZ0MfxJW8CkkLxiwLds6GkkTxRjaJry
+         r09F38DAr5dqFro9IwPQ/pc88KstWMdYHwiqZ6hFqjZFMzZLJZshGfqxW8fLCXgwePIk
+         oS0pngwg1kykmc0QLg2ZTdFfqBPzgdzhbTq3MHcdBS5a81ze33P+6SnXptNN3oVqHJuc
+         k/P/H93opr+XAqFw/Gkaoh4oAwJKj8+75Wk3g2s4u+B9vsGA4RFDEVW5ETRNLVAJTA8W
+         sCtvMCrAERy5d6q78qhGgedHV3Mek0Wh7m8CUE+NNwse7tGuDXbt7MKgiE/C/7uCOkzR
+         FPSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678169407;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dgLjsFmwNjBPnsrBKiPb+yNJklce3/QTLLfNgQRf7fg=;
+        b=ItH9Bjw3pjrqXQUy0rh6W9Pzo3Kfw0jug9zH5xx38Hra+QF3w7arjJ1xkiT0A85q55
+         29rNhQrZrwR68dzk4M6yt2P3HsFZsrjqSAYAGPqhyaIpw9GrEhIRc2R1OakTmeMxbYU+
+         KDGytWVB0ATqSbuGsLswaSdZz/PxthZGEi8CKQH3SJleQmyexPjg0WxQYefdpJrBsUNr
+         MKpcmmEh72L9c35RYer67n0zHiG/qeOKn/wkHIbgEbwAgeFrNleUq40D5Xo6v4B6Qnja
+         YVi6vZWZO/sZycfZ3QXMnBciDTY3WNY7G7qzGb/AiytR3yWRMi8l55Df+SXwJFuIRu2W
+         rWug==
+X-Gm-Message-State: AO0yUKX7lJMSQ4q9ZIO/ivJtTsJHjd3XN25IHGAisLOTdVHOB731t3G4
+        tl1Pwgc+VWtjA+ZNn2s5xG2xHScEhnsx+jzyzXzf0w==
+X-Google-Smtp-Source: AK7set9gY21dT6ZE8NpllykoZMh//mFXUtZEvVb7PvD3SUPOBUhN6WyrR02EsMl8HtF9ZB23EGl3yZxbjPGiaWw9rc4=
+X-Received: by 2002:a17:90a:1c02:b0:234:bed1:1012 with SMTP id
+ s2-20020a17090a1c0200b00234bed11012mr4740344pjs.6.1678169406050; Mon, 06 Mar
+ 2023 22:10:06 -0800 (PST)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c8f12ff4-8582-4772-b435-08db1ed074f0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Mar 2023 05:54:46.6395
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: OgX0fEmKvyq7XkkZJwf8KzzwFndkTJpVb4w1gcqMQiqL2LaURkbQdawrUudo3E3RUC1JSux6L1Xd3ySGMyLl8w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB8349
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+References: <20230215010717.3612794-1-rananta@google.com> <20230215010717.3612794-13-rananta@google.com>
+In-Reply-To: <20230215010717.3612794-13-rananta@google.com>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Mon, 6 Mar 2023 22:09:49 -0800
+Message-ID: <CAAeT=Fyy-3fsN3aWRtX9AoBoHVXyWmY+TJAOuty3Tz=kH5HmJA@mail.gmail.com>
+Subject: Re: [REPOST PATCH 12/16] selftests: KVM: aarch64: Test PMU
+ overflow/IRQ functionality
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
+        Ricardo Koller <ricarkol@google.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Jason Gunthorpe <jgg@ziepe.ca>
-> Sent: Monday, March 6, 2023 9:58 PM
->=20
-> On Fri, Mar 03, 2023 at 05:54:26AM +0000, K V P, Satyanarayana wrote:
-> > Intel Platform Monitoring Technology (PMT) support is indicated by
-> presence
-> > of an Intel defined PCIe Designated Vendor Specific Extended Capabiliti=
-es
-> > (DVSEC) structure with a PMT specific ID.However DVSEC structures may
-> also
-> > be used by Intel to indicate support for other features. The Out Of Ban=
-d
-> Management
-> > Services Module (OOBMSM) uses DVSEC to enumerate several features,
-> including PMT.
-> >
-> > The current VFIO driver does not pass DVSEC capabilities to virtual mac=
-hine
-> (VM)
-> > which makes intel_vsec driver not to work in the VM. This series adds
-> DVSEC
-> > capability to user visible list to allow its use with VFIO.
-> >
-> > Signed-off-by: K V P Satyanarayana <satyanarayana.k.v.p@intel.com>
-> > ---
-> >  drivers/vfio/pci/vfio_pci_config.c | 8 ++++++++
-> >  1 file changed, 8 insertions(+)
->=20
-> Wasn't the IDXD/SIOV team proposing to use the fact that DVSEC doesn't
-> propogate to indicate that IMS doesn't work?
->=20
-> Did this plan get abandoned? It seems at odds with this patch.
+Hi Raghu,
 
-No. Guest IMS will be indicated via hypercall/vIR as planned.=20
+On Tue, Feb 14, 2023 at 5:07=E2=80=AFPM Raghavendra Rao Ananta
+<rananta@google.com> wrote:
+>
+> Extend the vCPU migration test to also validate the vPMU's
+> functionality when set up for overflow conditions.
+>
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  .../testing/selftests/kvm/aarch64/vpmu_test.c | 223 ++++++++++++++++--
+>  1 file changed, 198 insertions(+), 25 deletions(-)
+>
+> diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_test.c b/tools/test=
+ing/selftests/kvm/aarch64/vpmu_test.c
+> index 0c9d801f4e602..066dc17fa3906 100644
+> --- a/tools/testing/selftests/kvm/aarch64/vpmu_test.c
+> +++ b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
+> @@ -21,7 +21,9 @@
+>   *
+>   * 4. Since the PMU registers are per-cpu, stress KVM by frequently
+>   * migrating the guest vCPU to random pCPUs in the system, and check
+> - * if the vPMU is still behaving as expected.
+> + * if the vPMU is still behaving as expected. The sub-tests include
+> + * testing basic functionalities such as basic counters behavior,
+> + * overflow, and overflow interrupts.
+>   *
+>   * Copyright (c) 2022 Google LLC.
+>   *
+> @@ -41,13 +43,27 @@
+>  #include <sys/sysinfo.h>
+>
+>  #include "delay.h"
+> +#include "gic.h"
+> +#include "spinlock.h"
+>
+>  /* The max number of the PMU event counters (excluding the cycle counter=
+) */
+>  #define ARMV8_PMU_MAX_GENERAL_COUNTERS (ARMV8_PMU_MAX_COUNTERS - 1)
+>
+> +/* The cycle counter bit position that's common among the PMU registers =
+*/
+> +#define ARMV8_PMU_CYCLE_COUNTER_IDX    31
+> +
+>  /* The max number of event numbers that's supported */
+>  #define ARMV8_PMU_MAX_EVENTS           64
+>
+> +#define PMU_IRQ                                23
+> +
+> +#define COUNT_TO_OVERFLOW      0xFULL
+> +#define PRE_OVERFLOW_32                (GENMASK(31, 0) - COUNT_TO_OVERFL=
+OW + 1)
+> +#define PRE_OVERFLOW_64                (GENMASK(63, 0) - COUNT_TO_OVERFL=
+OW + 1)
+> +
+> +#define GICD_BASE_GPA  0x8000000ULL
+> +#define GICR_BASE_GPA  0x80A0000ULL
+> +
+>  #define msecs_to_usecs(msec)           ((msec) * 1000LL)
+>
+>  /*
+> @@ -162,6 +178,17 @@ static inline void write_sel_evtyper(int sel, unsign=
+ed long val)
+>         isb();
+>  }
+>
+> +static inline void write_pmovsclr(unsigned long val)
+> +{
+> +       write_sysreg(val, pmovsclr_el0);
+> +       isb();
+> +}
+> +
+> +static unsigned long read_pmovsclr(void)
+> +{
+> +       return read_sysreg(pmovsclr_el0);
+> +}
+> +
+>  static inline void enable_counter(int idx)
+>  {
+>         uint64_t v =3D read_sysreg(pmcntenset_el0);
+> @@ -178,11 +205,33 @@ static inline void disable_counter(int idx)
+>         isb();
+>  }
+>
+> +static inline void enable_irq(int idx)
+> +{
+> +       uint64_t v =3D read_sysreg(pmcntenset_el0);
+> +
+> +       write_sysreg(BIT(idx) | v, pmintenset_el1);
+> +       isb();
+> +}
+> +
+> +static inline void disable_irq(int idx)
+> +{
+> +       uint64_t v =3D read_sysreg(pmcntenset_el0);
+> +
+> +       write_sysreg(BIT(idx) | v, pmintenclr_el1);
+> +       isb();
+> +}
+> +
+>  static inline uint64_t read_cycle_counter(void)
+>  {
+>         return read_sysreg(pmccntr_el0);
+>  }
+>
+> +static inline void write_cycle_counter(uint64_t v)
+> +{
+> +       write_sysreg(v, pmccntr_el0);
+> +       isb();
+> +}
+> +
+>  static inline void reset_cycle_counter(void)
+>  {
+>         uint64_t v =3D read_sysreg(pmcr_el0);
+> @@ -289,6 +338,15 @@ struct guest_data {
+>
+>  static struct guest_data guest_data;
+>
+> +/* Data to communicate among guest threads */
+> +struct guest_irq_data {
+> +       uint32_t pmc_idx_bmap;
+> +       uint32_t irq_received_bmap;
+> +       struct spinlock lock;
+> +};
+> +
+> +static struct guest_irq_data guest_irq_data;
+> +
+>  #define VCPU_MIGRATIONS_TEST_ITERS_DEF         1000
+>  #define VCPU_MIGRATIONS_TEST_MIGRATION_FREQ_MS 2
+>
+> @@ -322,6 +380,79 @@ static void guest_sync_handler(struct ex_regs *regs)
+>         expected_ec =3D INVALID_EC;
+>  }
+>
+> +static void guest_validate_irq(int pmc_idx, uint32_t pmovsclr, uint32_t =
+pmc_idx_bmap)
 
->=20
-> Why would you use a "Platform Monitoring Technology" device with VFIO
-> anyhow?
+Can you please add a comment about what is pmc_idx_bmap ?
 
-Ack. I guess it's a monitoring capability per PCI device to form a
-platform-level monitoring technology. But w/o all those background
-and usage description it's really strange to pass a 'platform' capability
-into a guest.
 
->=20
-> Honestly I'm a bit reluctant to allow arbitary config space, some of
-> the stuff people put there can be dangerous.
->=20
+> +{
+> +       /*
+> +        * Fail if there's an interrupt from unexpected PMCs.
+> +        * All the expected events' IRQs may not arrive at the same time.
+> +        * Hence, check if the interrupt is valid only if it's expected.
+> +        */
+> +       if (pmovsclr & BIT(pmc_idx)) {
+> +               GUEST_ASSERT_3(pmc_idx_bmap & BIT(pmc_idx), pmc_idx, pmov=
+sclr, pmc_idx_bmap);
+> +               write_pmovsclr(BIT(pmc_idx));
+> +       }
+> +}
+> +
+> +static void guest_irq_handler(struct ex_regs *regs)
+> +{
+> +       uint32_t pmc_idx_bmap;
+> +       uint64_t i, pmcr_n =3D get_pmcr_n();
+> +       uint32_t pmovsclr =3D read_pmovsclr();
+> +       unsigned int intid =3D gic_get_and_ack_irq();
+> +
+> +       /* No other IRQ apart from the PMU IRQ is expected */
+> +       GUEST_ASSERT_1(intid =3D=3D PMU_IRQ, intid);
+> +
+> +       spin_lock(&guest_irq_data.lock);
 
-Probably an allowed list to manage which DVSEC ID can be exposed
-to userspace via vfio-pci, e.g. if the PMT ID in this patch is proved
-to be safe for a meaningful usage?
+Could you explain why this lock is required in this patch ??
+If this is used to serialize the interrupt context code and
+the normal (non-interrupt) context code, you might want to
+disable the IRQ ?  Using the spin lock won't work well for
+that if the interrupt handler is invoked while the normal
+context code grabs the lock.
+Having said that, since execute_precise_instrs() disables the PMU
+ via PMCR, and does isb after that, I don't think the overflow
+interrupt is delivered while the normal context code is in
+pmu_irq_*() anyway.
+
+> +       pmc_idx_bmap =3D READ_ONCE(guest_irq_data.pmc_idx_bmap);
+> +
+> +       for (i =3D 0; i < pmcr_n; i++)
+> +               guest_validate_irq(i, pmovsclr, pmc_idx_bmap);
+> +       guest_validate_irq(ARMV8_PMU_CYCLE_COUNTER_IDX, pmovsclr, pmc_idx=
+_bmap);
+> +
+> +       /* Mark IRQ as recived for the corresponding PMCs */
+> +       WRITE_ONCE(guest_irq_data.irq_received_bmap, pmovsclr);
+> +       spin_unlock(&guest_irq_data.lock);
+> +
+> +       gic_set_eoi(intid);
+> +}
+> +
+> +static int pmu_irq_received(int pmc_idx)
+> +{
+> +       bool irq_received;
+> +
+> +       spin_lock(&guest_irq_data.lock);
+> +       irq_received =3D READ_ONCE(guest_irq_data.irq_received_bmap) & BI=
+T(pmc_idx);
+> +       WRITE_ONCE(guest_irq_data.irq_received_bmap, guest_irq_data.pmc_i=
+dx_bmap & ~BIT(pmc_idx));
+> +       spin_unlock(&guest_irq_data.lock);
+> +
+> +       return irq_received;
+> +}
+> +
+> +static void pmu_irq_init(int pmc_idx)
+> +{
+> +       write_pmovsclr(BIT(pmc_idx));
+> +
+> +       spin_lock(&guest_irq_data.lock);
+> +       WRITE_ONCE(guest_irq_data.irq_received_bmap, guest_irq_data.pmc_i=
+dx_bmap & ~BIT(pmc_idx));
+> +       WRITE_ONCE(guest_irq_data.pmc_idx_bmap, guest_irq_data.pmc_idx_bm=
+ap | BIT(pmc_idx));
+> +       spin_unlock(&guest_irq_data.lock);
+> +
+> +       enable_irq(pmc_idx);
+> +}
+> +
+> +static void pmu_irq_exit(int pmc_idx)
+> +{
+> +       write_pmovsclr(BIT(pmc_idx));
+> +
+> +       spin_lock(&guest_irq_data.lock);
+> +       WRITE_ONCE(guest_irq_data.irq_received_bmap, guest_irq_data.pmc_i=
+dx_bmap & ~BIT(pmc_idx));
+> +       WRITE_ONCE(guest_irq_data.pmc_idx_bmap, guest_irq_data.pmc_idx_bm=
+ap & ~BIT(pmc_idx));
+> +       spin_unlock(&guest_irq_data.lock);
+> +
+> +       disable_irq(pmc_idx);
+> +}
+> +
+>  /*
+>   * Run the given operation that should trigger an exception with the
+>   * given exception class. The exception handler (guest_sync_handler)
+> @@ -420,12 +551,20 @@ static void execute_precise_instrs(int num, uint32_=
+t pmcr)
+>         precise_instrs_loop(loop, pmcr);
+>  }
+>
+> -static void test_instructions_count(int pmc_idx, bool expect_count)
+> +static void test_instructions_count(int pmc_idx, bool expect_count, bool=
+ test_overflow)
+>  {
+>         int i;
+>         struct pmc_accessor *acc;
+> -       uint64_t cnt;
+> -       int instrs_count =3D 100;
+> +       uint64_t cntr_val =3D 0;
+> +       int instrs_count =3D 500;
+
+Can we set instrs_count based on the value we set for cntr_val?
+(so that instrs_count can be adjusted automatically when we change the
+value of cntr_val ?)
+
+> +
+> +       if (test_overflow) {
+> +               /* Overflow scenarios can only be tested when a count is =
+expected */
+> +               GUEST_ASSERT_1(expect_count, pmc_idx);
+> +
+> +               cntr_val =3D PRE_OVERFLOW_32;
+> +               pmu_irq_init(pmc_idx);
+> +       }
+>
+>         enable_counter(pmc_idx);
+>
+> @@ -433,41 +572,68 @@ static void test_instructions_count(int pmc_idx, bo=
+ol expect_count)
+>         for (i =3D 0; i < ARRAY_SIZE(pmc_accessors); i++) {
+>                 acc =3D &pmc_accessors[i];
+>
+> -               pmu_disable_reset();
+> -
+> +               acc->write_cntr(pmc_idx, cntr_val);
+>                 acc->write_typer(pmc_idx, ARMV8_PMUV3_PERFCTR_INST_RETIRE=
+D);
+>
+> -               /* Enable the PMU and execute precisely number of instruc=
+tions as a workload */
+> -               execute_precise_instrs(instrs_count, read_sysreg(pmcr_el0=
+) | ARMV8_PMU_PMCR_E);
+> +               /*
+> +                * Enable the PMU and execute a precise number of instruc=
+tions as a workload.
+> +                * Since execute_precise_instrs() disables the PMU at the=
+ end, 'instrs_count'
+> +                * should have enough instructions to raise an IRQ.
+> +                */
+> +               execute_precise_instrs(instrs_count, ARMV8_PMU_PMCR_E);
+>
+> -               /* If a count is expected, the counter should be increase=
+d by 'instrs_count' */
+> -               cnt =3D acc->read_cntr(pmc_idx);
+> -               GUEST_ASSERT_4(expect_count =3D=3D (cnt =3D=3D instrs_cou=
+nt),
+> -                               i, expect_count, cnt, instrs_count);
+> +               /*
+> +                * If an overflow is expected, only check for the overfla=
+g flag.
+> +                * As overflow interrupt is enabled, the interrupt would =
+add additional
+> +                * instructions and mess up the precise instruction count=
+. Hence, measure
+> +                * the instructions count only when the test is not set u=
+p for an overflow.
+> +                */
+> +               if (test_overflow) {
+> +                       GUEST_ASSERT_2(pmu_irq_received(pmc_idx), pmc_idx=
+, i);
+> +               } else {
+> +                       uint64_t cnt =3D acc->read_cntr(pmc_idx);
+> +
+> +                       GUEST_ASSERT_4(expect_count =3D=3D (cnt =3D=3D in=
+strs_count),
+> +                                       pmc_idx, i, cnt, expect_count);
+> +               }
+>         }
+>
+> -       disable_counter(pmc_idx);
+> +       if (test_overflow)
+> +               pmu_irq_exit(pmc_idx);
+>  }
+>
+> -static void test_cycles_count(bool expect_count)
+> +static void test_cycles_count(bool expect_count, bool test_overflow)
+>  {
+>         uint64_t cnt;
+>
+> -       pmu_enable();
+> -       reset_cycle_counter();
+> +       if (test_overflow) {
+> +               /* Overflow scenarios can only be tested when a count is =
+expected */
+> +               GUEST_ASSERT(expect_count);
+> +
+> +               write_cycle_counter(PRE_OVERFLOW_64);
+> +               pmu_irq_init(ARMV8_PMU_CYCLE_COUNTER_IDX);
+> +       } else {
+> +               reset_cycle_counter();
+> +       }
+>
+>         /* Count cycles in EL0 and EL1 */
+>         write_pmccfiltr(0);
+>         enable_cycle_counter();
+>
+> +       /* Enable the PMU and execute precisely number of instructions as=
+ a workload */
+
+Can you please add a comment why we do this (500 times) iterations ?
+Can we set the iteration number based on the initial value of the
+cycle counter ?
+
+> +       execute_precise_instrs(500, read_sysreg(pmcr_el0) | ARMV8_PMU_PMC=
+R_E);
+>         cnt =3D read_cycle_counter();
+  >
+>         /*
+>          * If a count is expected by the test, the cycle counter should b=
+e increased by
+> -        * at least 1, as there is at least one instruction between enabl=
+ing the
+> +        * at least 1, as there are a number of instructions between enab=
+ling the
+>          * counter and reading the counter.
+>          */
+
+"at least 1" doesn't seem to be consistent with the GUEST_ASSERT_2 below
+when test_overflow is true, considering the initial value of the cycle coun=
+ter.
+Shouldn't this GUEST_ASSERT_2 be executed only if test_overflow is false ?
+(Or do you want to adjust the comment ?)
+
+>         GUEST_ASSERT_2(expect_count =3D=3D (cnt > 0), cnt, expect_count);
+> +       if (test_overflow) {
+> +               GUEST_ASSERT_2(pmu_irq_received(ARMV8_PMU_CYCLE_COUNTER_I=
+DX), cnt, expect_count);
+> +               pmu_irq_exit(ARMV8_PMU_CYCLE_COUNTER_IDX);
+> +       }
+>
+>         disable_cycle_counter();
+>         pmu_disable_reset();
+> @@ -477,19 +643,28 @@ static void test_event_count(uint64_t event, int pm=
+c_idx, bool expect_count)
+>  {
+>         switch (event) {
+>         case ARMV8_PMUV3_PERFCTR_INST_RETIRED:
+> -               test_instructions_count(pmc_idx, expect_count);
+> +               test_instructions_count(pmc_idx, expect_count, false);
+>                 break;
+>         case ARMV8_PMUV3_PERFCTR_CPU_CYCLES:
+> -               test_cycles_count(expect_count);
+> +               test_cycles_count(expect_count, false);
+>                 break;
+>         }
+>  }
+>
+>  static void test_basic_pmu_functionality(void)
+>  {
+> +       local_irq_disable();
+> +       gic_init(GIC_V3, 1, (void *)GICD_BASE_GPA, (void *)GICR_BASE_GPA)=
+;
+> +       gic_irq_enable(PMU_IRQ);
+> +       local_irq_enable();
+> +
+>         /* Test events on generic and cycle counters */
+> -       test_instructions_count(0, true);
+> -       test_cycles_count(true);
+> +       test_instructions_count(0, true, false);
+> +       test_cycles_count(true, false);
+> +
+> +       /* Test overflow with interrupts on generic and cycle counters */
+> +       test_instructions_count(0, true, true);
+> +       test_cycles_count(true, true);
+>  }
+>
+>  /*
+> @@ -813,9 +988,6 @@ static void guest_code(void)
+>         GUEST_DONE();
+>  }
+>
+> -#define GICD_BASE_GPA  0x8000000ULL
+> -#define GICR_BASE_GPA  0x80A0000ULL
+> -
+>  static unsigned long *
+>  set_event_filters(struct kvm_vcpu *vcpu, struct kvm_pmu_event_filter *pm=
+u_event_filters)
+>  {
+> @@ -866,7 +1038,7 @@ create_vpmu_vm(void *guest_code, struct kvm_pmu_even=
+t_filter *pmu_event_filters)
+>         struct kvm_vcpu *vcpu;
+>         struct kvm_vcpu_init init;
+>         uint8_t pmuver, ec;
+> -       uint64_t dfr0, irq =3D 23;
+> +       uint64_t dfr0, irq =3D PMU_IRQ;
+>         struct vpmu_vm *vpmu_vm;
+>         struct kvm_device_attr irq_attr =3D {
+>                 .group =3D KVM_ARM_VCPU_PMU_V3_CTRL,
+> @@ -883,6 +1055,7 @@ create_vpmu_vm(void *guest_code, struct kvm_pmu_even=
+t_filter *pmu_event_filters)
+>
+>         vpmu_vm->vm =3D vm =3D vm_create(1);
+>         vm_init_descriptor_tables(vm);
+> +       vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT, guest_irq_ha=
+ndler);
+>
+>         /* Catch exceptions for easier debugging */
+>         for (ec =3D 0; ec < ESR_EC_NUM; ec++) {
+> --
+> 2.39.1.581.gbfd45094c4-goog
+>
+
+Thanks,
+Reiji
