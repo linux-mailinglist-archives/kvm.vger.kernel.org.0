@@ -2,77 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 77E786AD39C
-	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 02:00:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 11CF56AD3AF
+	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 02:04:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229679AbjCGBAd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Mar 2023 20:00:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59758 "EHLO
+        id S229659AbjCGBE3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Mar 2023 20:04:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229483AbjCGBAc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Mar 2023 20:00:32 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 843C6366A7
-        for <kvm@vger.kernel.org>; Mon,  6 Mar 2023 16:59:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678150785;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1butyJsvNx4YJ9aTrzHZe+e8dMXHZLy0RXs3Qcm93D8=;
-        b=KfwFZEzt8pZoPVjqpNfh680j3ZCkvsZKgDCFvRu20JYFIxHPXERZ8LqnBJlv0qHC/Y8aZZ
-        S1HxhPHcqjyew/3kRHRumUr2GrugrYhOScMFtqwRutTA5e2QyUqNh7gGDruf0FTVPjq+Io
-        fxrCqeYQ1PgUV8MP4X9zlp/an8Qiv64=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-247-V2Lq3s7TMMKoxktDGmQyTA-1; Mon, 06 Mar 2023 19:59:44 -0500
-X-MC-Unique: V2Lq3s7TMMKoxktDGmQyTA-1
-Received: by mail-il1-f199.google.com with SMTP id i7-20020a056e021b0700b0031dc4cdc47cso3832678ilv.23
-        for <kvm@vger.kernel.org>; Mon, 06 Mar 2023 16:59:44 -0800 (PST)
+        with ESMTP id S229772AbjCGBE2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Mar 2023 20:04:28 -0500
+Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC09B4741F
+        for <kvm@vger.kernel.org>; Mon,  6 Mar 2023 17:04:27 -0800 (PST)
+Received: by mail-oi1-x229.google.com with SMTP id e21so8546226oie.1
+        for <kvm@vger.kernel.org>; Mon, 06 Mar 2023 17:04:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1678151067;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TwNOBz5cHclDTneIIBsBs0gZjoQhRh5NPATMEM3PAnk=;
+        b=LpJcgSLD0tT69e9lRlce9T9OgurQ2lZyqvRUGeYcs2VAKq+q/sxDd+iNx18Ue8sRSM
+         oork3vWFhg+480AwWtL6Wxfp9EM/COjoxssLNDxTMqmTHGnItVfg4Dk9qmxU0IpKktjO
+         SEMBHVruAy74UMT4APsP62woNsBtji8tTLRZkAHrGinn/bUur+DLnYzohqdf6JpofgS1
+         sGHWDtmEskTmeCGt+S0dr+vg+ZFpSNO6xIHuucBai9rthsapyLG3y1iOT8UnQG9FtjVV
+         HgSbO2qGJVMwSIPCLcdvMDrOITgDAuCVAfmkxPGr+jaN8EsBcXhRF0uXigOJU2vRiRzA
+         xMsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678150783;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1butyJsvNx4YJ9aTrzHZe+e8dMXHZLy0RXs3Qcm93D8=;
-        b=umlMje9biFPSjJ8+jPfFzAgB9Pcne1V5uHMTSyr7oeWrA7BTBiUHNi5vlnVFb3oeqN
-         jZM33PETBbE+lyNHSwgENcNXnzme5qLF2RWRoFvmBbxcAbdgpYdzP5YVifYN7sbw8AcK
-         Cux5sy/kUp4U5jYoXAwDi6KV5KD1ltQB58BAl2TcqEJP4by5yEV58Sw2pExu2UA+VvUf
-         7HRVQtr23bGr5DsDl3xYeYgBXUqJ987yJ8w0LPlC4IdOyG2urAhnByn5DsdvtxQC/9e/
-         PxeV+XDoYqxofuTn0dYigyoO0Nf7FlDJLrbzFDMw9TH+BMmcWDqd89EJlvtp+ZPjT8rX
-         +LKw==
-X-Gm-Message-State: AO0yUKWxGSPCIsmkEvmUCvdSIGBuXQBAb5/YNPnSDIXdxbCJxDq+76dl
-        fQZBBYxc5GxPYumwgU0ee2zwgjVLLYg/Rh75I4CVcJHC/NlinfRIchg8vMrSQcMTFmr8cVBy1GU
-        RwvCxhLU51eBOHzXgJvYU
-X-Received: by 2002:a05:6e02:1bab:b0:302:a58f:38ab with SMTP id n11-20020a056e021bab00b00302a58f38abmr9629297ili.0.1678150783456;
-        Mon, 06 Mar 2023 16:59:43 -0800 (PST)
-X-Google-Smtp-Source: AK7set9E202+BpRrrc/VXxnbDo2DKaUh4BY1R7k7N5AcOmllutHuvV3fBkUhGWPtLN+RPuE41J41aA==
-X-Received: by 2002:a05:6e02:1bab:b0:302:a58f:38ab with SMTP id n11-20020a056e021bab00b00302a58f38abmr9629289ili.0.1678150783220;
-        Mon, 06 Mar 2023 16:59:43 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id q23-20020a02c8d7000000b003a60da2bf58sm3589389jao.39.2023.03.06.16.59.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Mar 2023 16:59:42 -0800 (PST)
-Date:   Mon, 6 Mar 2023 17:59:41 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Timothy Pearson <tpearson@raptorengineering.com>
-Cc:     kvm <kvm@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
-Subject: Re: [PATCH v2 0/4] Reenable VFIO support on POWER systems
-Message-ID: <20230306175941.1b69bb14.alex.williamson@redhat.com>
-In-Reply-To: <1817332573.17073558.1678149322645.JavaMail.zimbra@raptorengineeringinc.com>
-References: <8398361.16996856.1678123793664.JavaMail.zimbra@raptorengineeringinc.com>
-        <20230306164607.1455ee81.alex.williamson@redhat.com>
-        <1817332573.17073558.1678149322645.JavaMail.zimbra@raptorengineeringinc.com>
-Organization: Red Hat
+        d=1e100.net; s=20210112; t=1678151067;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TwNOBz5cHclDTneIIBsBs0gZjoQhRh5NPATMEM3PAnk=;
+        b=jxhuyM8MI311B6gD26/Q7++bz27TFK326Uf5cDcxqsJHwNfA6T6YKqlWjaFwVk+YVt
+         csgUJaZ0t2KQD1AZn9s5sNr/BfQagzskQR9X/xTVO+TO9dhwawy6Qcnm31FSKVtZndIU
+         iRMtmINam+78skbVNTd/8OK5Lz0xo4NdimEM0TipTWxaK9vGc9Gq8V9KRuj6vSsJX0oB
+         NmJvJTP+qzQeORXaVvQQa19yZ2h4/ZxYAzyfBZxEk76Y5E4feueacTsELR9dV4m96wjA
+         UInHzvWiMYAIPPg3E2DQm56OMo6EDilsm9YcaRXwuUWCsCy1Fcluubg0oxEO458PJQpd
+         kwDA==
+X-Gm-Message-State: AO0yUKUrGOp9rxhBqs5Xuq1zRTRJOfFicjSJpboNdyBQHw48YZsmnbgK
+        UorW3JuGnuLi3zS9p/jjWieg33490pMyhOIPEoaVNw==
+X-Google-Smtp-Source: AK7set8GhL4eLE9iEbKqGXNNBtn7FjvVAB5h6qKrGrldD1MBIj7QSGYWA/dEMs5gA2FeukXGtICseW3U+vp0IqQknEM=
+X-Received: by 2002:a54:450a:0:b0:384:2fe1:39c with SMTP id
+ l10-20020a54450a000000b003842fe1039cmr4102041oil.5.1678151066824; Mon, 06 Mar
+ 2023 17:04:26 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+References: <20230307005547.607353-1-dmatlack@google.com> <20230307005547.607353-3-dmatlack@google.com>
+In-Reply-To: <20230307005547.607353-3-dmatlack@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 6 Mar 2023 17:04:15 -0800
+Message-ID: <CALMp9eSWmW810V5kzYDkgXyEyLapEUbQPZmA4655a03_eSJDig@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH 2/2] x86: Mark RDPID asm volatile to avoid
+ dropping instructions
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Greg Thelen <gthelen@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,63 +70,18 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 6 Mar 2023 18:35:22 -0600 (CST)
-Timothy Pearson <tpearson@raptorengineering.com> wrote:
-
-> ----- Original Message -----
-> > From: "Alex Williamson" <alex.williamson@redhat.com>
-> > To: "Timothy Pearson" <tpearson@raptorengineering.com>
-> > Cc: "kvm" <kvm@vger.kernel.org>, "linuxppc-dev" <linuxppc-dev@lists.ozlabs.org>
-> > Sent: Monday, March 6, 2023 5:46:07 PM
-> > Subject: Re: [PATCH v2 0/4] Reenable VFIO support on POWER systems  
-> 
-> > On Mon, 6 Mar 2023 11:29:53 -0600 (CST)
-> > Timothy Pearson <tpearson@raptorengineering.com> wrote:
-> >   
-> >> This patch series reenables VFIO support on POWER systems.  It
-> >> is based on Alexey Kardashevskiys's patch series, rebased and
-> >> successfully tested under QEMU with a Marvell PCIe SATA controller
-> >> on a POWER9 Blackbird host.
-> >> 
-> >> Alexey Kardashevskiy (3):
-> >>   powerpc/iommu: Add "borrowing" iommu_table_group_ops
-> >>   powerpc/pci_64: Init pcibios subsys a bit later
-> >>   powerpc/iommu: Add iommu_ops to report capabilities and allow blocking
-> >>     domains
-> >> 
-> >> Timothy Pearson (1):
-> >>   Add myself to MAINTAINERS for Power VFIO support
-> >> 
-> >>  MAINTAINERS                               |   5 +
-> >>  arch/powerpc/include/asm/iommu.h          |   6 +-
-> >>  arch/powerpc/include/asm/pci-bridge.h     |   7 +
-> >>  arch/powerpc/kernel/iommu.c               | 246 +++++++++++++++++++++-
-> >>  arch/powerpc/kernel/pci_64.c              |   2 +-
-> >>  arch/powerpc/platforms/powernv/pci-ioda.c |  36 +++-
-> >>  arch/powerpc/platforms/pseries/iommu.c    |  27 +++
-> >>  arch/powerpc/platforms/pseries/pseries.h  |   4 +
-> >>  arch/powerpc/platforms/pseries/setup.c    |   3 +
-> >>  drivers/vfio/vfio_iommu_spapr_tce.c       |  96 ++-------
-> >>  10 files changed, 338 insertions(+), 94 deletions(-)
-> >>   
-> > 
-> > For vfio and MAINTAINERS portions,
-> > 
-> > Acked-by: Alex Williamson <alex.williamson@redhat.com>
-> > 
-> > I'll note though that spapr_tce_take_ownership() looks like it copied a
-> > bug from the old tce_iommu_take_ownership() where tbl and tbl->it_map
-> > are tested before calling iommu_take_ownership() but not in the unwind
-> > loop, ie. tables we might have skipped on setup are unconditionally
-> > released on unwind.  Thanks,
-> > 
-> > Alex  
-> 
-> Thanks for that.  I'll put together a patch to get rid of that
-> potential bug that can be applied after this series is merged, unless
-> you'd rather I resubmit a v3 with the issue fixed?
-
-Follow-up fix is fine by me.  Thanks,
-
-Alex
-
+On Mon, Mar 6, 2023 at 4:56=E2=80=AFPM David Matlack <dmatlack@google.com> =
+wrote:
+>
+> Mark the asm statement that generates the RDPID instruction volatile.
+> The compiler within its rights to drop subsequent RDPID asm statements
+> (after the first) since the inputs never change.
+>
+> This fixes the tsc test on hardware that supports rdpid when built with
+> the latest Clang compiler.
+>
+> Fixes: 10631a5bebd8 ("x86: tsc: add rdpid test")
+> Reported-by: Greg Thelen <gthelen@google.com>
+> Suggested-by: Greg Thelen <gthelen@google.com>
+> Signed-off-by: David Matlack <dmatlack@google.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
