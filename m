@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D774F6AD54B
-	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 04:05:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 07D506AD563
+	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 04:09:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230045AbjCGDFh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Mar 2023 22:05:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42838 "EHLO
+        id S230298AbjCGDFk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Mar 2023 22:05:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230219AbjCGDF1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230240AbjCGDF1 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 6 Mar 2023 22:05:27 -0500
 Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B0DA7C9C7;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A41897C9D9;
         Mon,  6 Mar 2023 19:05:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1678158324; x=1709694324;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=9JZohEEZ3OOYA+uz2zlIPReipLAVM4kv9u7LWFHKKew=;
-  b=nCNfgLecKyfLTMQZWhRPdggkav5W2Akq3MZ/hY5rdEPG3MuhmX4jo1Ao
-   YLhUz2ivUgZ6bjjSrkVcmmidrlGsYF2TpM0kwzwSMsC3QiWfWz+xPsZMw
-   2QXOFmZfBaJ6XkrGGHBwgZybGeQQlKOClVuFWqdebsenuG9JHPCAAzRCE
-   Ngg3rHI+FlVKznqct19qGdLv9cO5HynqBoLfqreSTb2fCMebZ2IulHwho
-   7l2MXKCdeMH/dZhTYDiDm4SYyo7Da8D0WAX3IrdLOuLLapTqE5ATNTuDy
-   Pi3dhgDPpCPAd5PyypS8d6HHjrNgxhnGb9wflf2pYKaHZeCZAD16NFDFK
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10641"; a="338072372"
+  bh=4lCYxmSNxB+oTxZx5ZOjZmvc7OZS0xLkR1RLWDKH14M=;
+  b=nAA6v6S6ujRfWlvW1kElO/nB566LZ2rEF8VIlI+u48oN7aa6kXw5WerO
+   Hslmxyy7OKoJyTyFMPgbiYDdw4AMfKz/QBKZshP1o/hEJJYYu4/b78zJJ
+   imyb8GIUv/CE4sFZwtLl3k0pV8QfBgN6Quagaq5+bVXPMWGrKqy2fooDG
+   uNjjyuBejUTFfyxKzx3dWmVw4QsiOk1cH3AaVKKSxUkgqNk4Zjoti+vcN
+   LVyGCfMwDzx2F15aBEShR+adnROxOBDSAe1FAkY8S/ZBg6DaOWJRsrQz2
+   9GtJlJWsIQ3HxVpbeyLLYYqRaa86DBqrZwoLjGoZck7YyC2uu5TBAT7xv
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10641"; a="338072382"
 X-IronPort-AV: E=Sophos;i="5.98,238,1673942400"; 
-   d="scan'208";a="338072372"
+   d="scan'208";a="338072382"
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
   by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2023 19:05:13 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10641"; a="676409739"
+X-IronPort-AV: E=McAfee;i="6500,9779,10641"; a="676409750"
 X-IronPort-AV: E=Sophos;i="5.98,238,1673942400"; 
-   d="scan'208";a="676409739"
+   d="scan'208";a="676409750"
 Received: from unknown (HELO fred..) ([172.25.112.68])
   by orsmga002.jf.intel.com with ESMTP; 06 Mar 2023 19:05:12 -0800
 From:   Xin Li <xin3.li@intel.com>
@@ -44,9 +44,9 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         dave.hansen@linux.intel.com, hpa@zytor.com, peterz@infradead.org,
         andrew.cooper3@citrix.com, seanjc@google.com, pbonzini@redhat.com,
         ravi.v.shankar@intel.com
-Subject: [PATCH v5 07/34] x86/opcode: add ERETU, ERETS instructions to x86-opcode-map
-Date:   Mon,  6 Mar 2023 18:39:19 -0800
-Message-Id: <20230307023946.14516-8-xin3.li@intel.com>
+Subject: [PATCH v5 08/34] x86/objtool: teach objtool about ERETU and ERETS
+Date:   Mon,  6 Mar 2023 18:39:20 -0800
+Message-Id: <20230307023946.14516-9-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230307023946.14516-1-xin3.li@intel.com>
 References: <20230307023946.14516-1-xin3.li@intel.com>
@@ -64,44 +64,46 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
 
-Add the instruction opcodes used by FRED: ERETU, ERETS.
-
-Opcode number is per public FRED draft spec v3.0.
+Update the objtool decoder to know about the ERETU and ERETS
+instructions (type INSN_CONTEXT_SWITCH.)
 
 Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
- arch/x86/lib/x86-opcode-map.txt       | 2 +-
- tools/arch/x86/lib/x86-opcode-map.txt | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ tools/objtool/arch/x86/decode.c | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/lib/x86-opcode-map.txt b/arch/x86/lib/x86-opcode-map.txt
-index 5168ee0360b2..7a269e269dc0 100644
---- a/arch/x86/lib/x86-opcode-map.txt
-+++ b/arch/x86/lib/x86-opcode-map.txt
-@@ -1052,7 +1052,7 @@ EndTable
+diff --git a/tools/objtool/arch/x86/decode.c b/tools/objtool/arch/x86/decode.c
+index 9ef024fd648c..8e9c802f78ec 100644
+--- a/tools/objtool/arch/x86/decode.c
++++ b/tools/objtool/arch/x86/decode.c
+@@ -509,11 +509,20 @@ int arch_decode_instruction(struct objtool_file *file, const struct section *sec
  
- GrpTable: Grp7
- 0: SGDT Ms | VMCALL (001),(11B) | VMLAUNCH (010),(11B) | VMRESUME (011),(11B) | VMXOFF (100),(11B) | PCONFIG (101),(11B) | ENCLV (000),(11B)
--1: SIDT Ms | MONITOR (000),(11B) | MWAIT (001),(11B) | CLAC (010),(11B) | STAC (011),(11B) | ENCLS (111),(11B)
-+1: SIDT Ms | MONITOR (000),(11B) | MWAIT (001),(11B) | CLAC (010),(11B) | STAC (011),(11B) | ENCLS (111),(11B) | ERETU (F3),(010),(11B) | ERETS (F2),(010),(11B)
- 2: LGDT Ms | XGETBV (000),(11B) | XSETBV (001),(11B) | VMFUNC (100),(11B) | XEND (101)(11B) | XTEST (110)(11B) | ENCLU (111),(11B)
- 3: LIDT Ms
- 4: SMSW Mw/Rv
-diff --git a/tools/arch/x86/lib/x86-opcode-map.txt b/tools/arch/x86/lib/x86-opcode-map.txt
-index 5168ee0360b2..7a269e269dc0 100644
---- a/tools/arch/x86/lib/x86-opcode-map.txt
-+++ b/tools/arch/x86/lib/x86-opcode-map.txt
-@@ -1052,7 +1052,7 @@ EndTable
+ 		if (op2 == 0x01) {
  
- GrpTable: Grp7
- 0: SGDT Ms | VMCALL (001),(11B) | VMLAUNCH (010),(11B) | VMRESUME (011),(11B) | VMXOFF (100),(11B) | PCONFIG (101),(11B) | ENCLV (000),(11B)
--1: SIDT Ms | MONITOR (000),(11B) | MWAIT (001),(11B) | CLAC (010),(11B) | STAC (011),(11B) | ENCLS (111),(11B)
-+1: SIDT Ms | MONITOR (000),(11B) | MWAIT (001),(11B) | CLAC (010),(11B) | STAC (011),(11B) | ENCLS (111),(11B) | ERETU (F3),(010),(11B) | ERETS (F2),(010),(11B)
- 2: LGDT Ms | XGETBV (000),(11B) | XSETBV (001),(11B) | VMFUNC (100),(11B) | XEND (101)(11B) | XTEST (110)(11B) | ENCLU (111),(11B)
- 3: LIDT Ms
- 4: SMSW Mw/Rv
+-			if (modrm == 0xca)
+-				insn->type = INSN_CLAC;
+-			else if (modrm == 0xcb)
+-				insn->type = INSN_STAC;
+-
++			switch (insn_last_prefix_id(&ins)) {
++			case INAT_PFX_REPE:
++			case INAT_PFX_REPNE:
++				if (modrm == 0xca)
++					/* eretu/erets */
++					insn->type = INSN_CONTEXT_SWITCH;
++				break;
++			default:
++				if (modrm == 0xca)
++					insn->type = INSN_CLAC;
++				else if (modrm == 0xcb)
++					insn->type = INSN_STAC;
++				break;
++			}
+ 		} else if (op2 >= 0x80 && op2 <= 0x8f) {
+ 
+ 			insn->type = INSN_JUMP_CONDITIONAL;
 -- 
 2.34.1
 
