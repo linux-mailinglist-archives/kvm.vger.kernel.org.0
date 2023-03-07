@@ -2,69 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1CFA86AE6B1
-	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 17:35:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0AFC56AE6C9
+	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 17:37:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229670AbjCGQf0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Mar 2023 11:35:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41368 "EHLO
+        id S230495AbjCGQhP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Mar 2023 11:37:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230398AbjCGQef (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Mar 2023 11:34:35 -0500
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FB8E392A2
-        for <kvm@vger.kernel.org>; Tue,  7 Mar 2023 08:33:08 -0800 (PST)
-Received: by mail-pl1-x649.google.com with SMTP id i6-20020a170902c94600b0019d16e4ac0bso7896201pla.5
-        for <kvm@vger.kernel.org>; Tue, 07 Mar 2023 08:33:08 -0800 (PST)
+        with ESMTP id S230156AbjCGQfr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Mar 2023 11:35:47 -0500
+Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D72650F9E
+        for <kvm@vger.kernel.org>; Tue,  7 Mar 2023 08:34:27 -0800 (PST)
+Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-536af432ee5so255640557b3.0
+        for <kvm@vger.kernel.org>; Tue, 07 Mar 2023 08:34:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678206772;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cAnPTKFPaZZYbMqYNII6LME42nYkJ5JY0hW7y0YDxo0=;
-        b=YNj3WP/xnWkrqPeVn2wy7dFzf5QgS1Khs46WBIdFRrUDayakJ8EkvixqL1rgvHQ66S
-         0WwS9nQHhqrjKFID3Pf4qvqEZykGEAOOAZLDbJgY80csvDFJr+7qsMK+Jlbey9swPQp0
-         Vn/W263LRvE4cqaxVPjSu8LcCuJjVbo3XrkooSGzhsLcL1+aqBXzaGdsaeQWltwQ2HNp
-         O+1oBFQEhvDJ2dOaQsEgZFGI9w2V2Sq+w46tmAkgW8g6IH6CSxW2LwhxRY28C6YpXvik
-         p/jyW7fqQvE/jN06u/x1zwcDZdw5Nr6Bpy4+r5v0szcuKSX0lvPDWugxQbehZ7EP5dsY
-         S7VQ==
+        d=google.com; s=20210112; t=1678206863;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=jvy9w3/ryl+HeOiWnr51O81EEv//kB8rMScsDmnxcVI=;
+        b=nHQRzgSxT/F3jYeyWfizGLaZZb4WMNxMfddgFeYAE9wd0gfi784f1U4vIWL62Y4vYQ
+         jZzm9V7a7rsykrc1ucRZdzMaztKoZgAP3QOsYGvNhZW78NMRxWFDj9zka8tpx2PbKFtK
+         nXWKnkcT/98rA3QSVqoAQAZn7qfZ1/qQUsER+wsBsPlDvX4nr8B31SNjwJ7q9V+Md6Se
+         Pxj2H+jV579lIQNBLuY7ZaV6YglxQseENH7afBNzesYujhbmTsGetmkFetbrRKtd3ee7
+         CYfAQ/OM0Helv+z2R7KWkPO212PMlWxdobaAtdzrJGGgSYvZhEXlix/aMUnPc7iVnbW9
+         2mTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678206772;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cAnPTKFPaZZYbMqYNII6LME42nYkJ5JY0hW7y0YDxo0=;
-        b=GxkPr3UIvY1pjEg7hm3/tESyIvJIP/kdmZZsJlbyS74HocBzjQQEl9YKywhrQX3OIV
-         6OVoW/hQgIS2jcbBT8APuh3eStaiPxEwcxtEox9dslilPaDrbD+S0m1CwcxQBEGTxNrf
-         sw+Oww96bTryp532IcDB0VfhMgfDaLKSmrGiH15t7N0WoGttX8COwX+uFWTOvaAvA0RC
-         IayCAEHprOfInxo4vb+/0wqOu0NKo2+937qG0XypCm0GybA8WbJgohfY4pQ9JnjQaG0B
-         SrHYrhTOOskgPK/G6mVJDbittLFn7BJTcsXRP3omYTitM4b0XufqZ7jwcLpQOSmacya7
-         bq7Q==
-X-Gm-Message-State: AO0yUKUPhSXr3MV2Vc83V4gusuN8XhesSSnWab9WJj/oL48vrFbQ3Mw/
-        eJI5bHnrGyeQoqvwAIEWxLkUyB/r18k=
-X-Google-Smtp-Source: AK7set/8v1ZNAjS83kEp7/gE5+UwxP45nURQeh1otLfp7DadjsPCEHMwMobVdy5avOeQ63lA6fX63aSw4Ac=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:6846:b0:19c:9999:e922 with SMTP id
- f6-20020a170902684600b0019c9999e922mr5839338pln.5.1678206772333; Tue, 07 Mar
- 2023 08:32:52 -0800 (PST)
-Date:   Tue, 7 Mar 2023 16:32:50 +0000
-In-Reply-To: <20230227065437.j7f7rfadut532fud@linux.intel.com>
-Mime-Version: 1.0
-References: <20230217231022.816138-1-seanjc@google.com> <20230217231022.816138-9-seanjc@google.com>
- <20230221152349.ulcjtbnvziair7ff@linux.intel.com> <20230221153306.qubx7tfmasnvodeu@linux.intel.com>
- <Y/VYN3n/lHePiDxM@google.com> <20230222064931.ppz6berhfr4edewf@linux.intel.com>
- <Y/ZFJfspU6L2RmQS@google.com> <20230224092552.6olrcx2ryo4sexxm@linux.intel.com>
- <Y/ji6MAlEmbNfZzf@google.com> <20230227065437.j7f7rfadut532fud@linux.intel.com>
-Message-ID: <ZAdmecm4Pp7pT3jM@google.com>
-Subject: Re: [PATCH 08/12] KVM: nSVM: Use KVM-governed feature framework to
- track "vVM{SAVE,LOAD} enabled"
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yu Zhang <yu.c.zhang@linux.intel.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        d=1e100.net; s=20210112; t=1678206863;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jvy9w3/ryl+HeOiWnr51O81EEv//kB8rMScsDmnxcVI=;
+        b=pTZGE6s852rS94n7cnEXILHoIkE9qGc+vb+xEpHkm155AIQ2WMVH+qi5Q4/1kOSuS7
+         Z9yfTHtewGOZLH8BMuiOGaTEtyl0xwo42hdaTOBfIEGfQiC4LZ+vAcm1oYuP4BXHb9B6
+         ukhvCdyG1w44JmkzNGMb5/KGQpPPbUwbJfbILjY6RhejOdJ/Nol8HvJqpM6vJqypOVvo
+         DOm89R7H3vWhZtib1tf6F0HyDQiEl0bTTGsJ+foyKCKA8x1NXudLBTQ08BUJe/ibAXtp
+         J0M8X5VeY5QNY26YvHWuveRqgYLH7MHihs1xRiGwg+60Rk8CiXH+f8CgLLDC5x07rhm4
+         btcQ==
+X-Gm-Message-State: AO0yUKVJwrEbQo8ct52v70mvuhrDcORzN2w8D+QdpT+CUo9odPb90oxX
+        rOrVXOEssYTPcMKhsC797YtEzTKZouZHXl0iHAa2qg==
+X-Google-Smtp-Source: AK7set+3Ae82E2oyDdBQvhCz8/W7lre94tpExRQKqu9Vvxb+ihPyjwxLWLNbdGRIiQaD2wFxSmRMuuDIRDrGASsf/IU=
+X-Received: by 2002:a81:b704:0:b0:53c:7047:14c4 with SMTP id
+ v4-20020a81b704000000b0053c704714c4mr9200209ywh.8.1678206863562; Tue, 07 Mar
+ 2023 08:34:23 -0800 (PST)
+MIME-Version: 1.0
+References: <20230224223607.1580880-1-aaronlewis@google.com>
+ <20230224223607.1580880-8-aaronlewis@google.com> <ZAJjoiZopqIXDoDc@google.com>
+ <CAAAPnDGjNjWczonLU1NNv4zk8865bpGB=Df-W-r4Wy=qi1--CA@mail.gmail.com>
+In-Reply-To: <CAAAPnDGjNjWczonLU1NNv4zk8865bpGB=Df-W-r4Wy=qi1--CA@mail.gmail.com>
+From:   Mingwei Zhang <mizhang@google.com>
+Date:   Tue, 7 Mar 2023 08:33:47 -0800
+Message-ID: <CAL715WJNPiX7_8Kv1wC-Yd3GQjd_xJ7opF_QP1ezfcbcYORVTA@mail.gmail.com>
+Subject: Re: [PATCH v3 7/8] KVM: selftests: Add XFEATURE masks to common code
+To:     Aaron Lewis <aaronlewis@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com,
+        seanjc@google.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,38 +69,14 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 27, 2023, Yu Zhang wrote:
-> On Fri, Feb 24, 2023 at 08:16:40AM -0800, Sean Christopherson wrote:
-> > On Fri, Feb 24, 2023, Yu Zhang wrote:
-> > > But why it is related to nested migration? 
-> > 
-> > I understand why it's related, but I don't understand why we bothered to add "support"
-> > for this.
-> > 
-> > In theory, if L1 is migrated by L0 while L1 is running an L2 that uses SYSENTER,
-> > problems will occur.  I'm a bit lost as to how this matters in practice, as KVM
-> > doesn't support cross-vendor nested virtualization, and if L1 can be enlightened
-> > to the point where it can switch from VMX=>SVM during migration, what's the point
-> > of doing a migration?
-> 
-> Oh. So that is what people call "nested migration". I had thought "nested
-> migration" is to migrate L2. Instead, it is still a migration of L1 with
-> VMX/SVM capability... :(
+> > Can I take your commit into my series? This seems to be closely related
+> > with amx_test itself without much relationship with the xcr0 test.
+> > Thoughts?
+>
+> Yes, please do.  I still need to have it here to have access to the
+> common xfeatures.
 
-More or less, yes.  I personally would prefer a less ambiguous description, e.g.
-"migration with nested VMs", but unfortunately I can't mind control others :-)
- 
-> Is it a possible scenario that:
-> 1> A L1 VM is created on Intel platform, with VMX capability virtualized
-> to it.
-> 2> The SYSENTER_EIP/ESP is set to a 64-bit value in L1.
-> 3> Before creating a L2 VM, this L1 VM is migrated to a AMD machine.
-> 4> The migrated L1 VM is exposed with SVM capability.
-> 5> And then when L1 tries to create L2, the virtual vmload/vmsave shall
-> be disabled.
-> 
-> But is step 4> a valid operation in KVM?   
+hmm, you are right. Then, this series should go before the selftest series.
 
-It's valid in KVM (as L0), but I don't see how L1 can handle it cleanly without
-an absurd level of enlightenment.  And if L1 is highly enlightened, I don't see
-why it's desirable to do cross-vendor migration of the VM.
+Thanks.
+-Mingwei
