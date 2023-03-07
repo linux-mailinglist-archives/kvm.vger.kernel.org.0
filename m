@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 30BC96AD575
-	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 04:09:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CBD1C6AD551
+	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 04:09:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231206AbjCGDIU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Mar 2023 22:08:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43108 "EHLO
+        id S230218AbjCGDIS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Mar 2023 22:08:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231161AbjCGDHp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Mar 2023 22:07:45 -0500
+        with ESMTP id S231151AbjCGDHl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Mar 2023 22:07:41 -0500
 Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44E6087A02;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4517C87A23;
         Mon,  6 Mar 2023 19:06:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1678158374; x=1709694374;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=qJRDv1JU3EvBoam3ACq+r69aYmF+cFETAZ2lAy63Iv0=;
-  b=M4NaJqFjiHGVFafB6zOO46uLyk2CuFmlKks6EFh4Ha+YhS/sER3Texol
-   LpEvoOIa2gijPhKFjV+aXNXRsuJ93oF4UMOebHCDNH61bm/VkF4zOUjr5
-   d7yyHHJOieuZcKU3pxg+n5AlQ8sS8PzLgugwlt838CEhtxolJjUwRMAdy
-   2b0ITG7s86o5Nfx2Jg87su1w+xGr0CKler46DZKvU3jJ2CXGqBXXJGN+9
-   CO+qrMZNoiUVRVt+ZBHvY4R04x7QsA8UixD/aGTnmlm1fOeFSHnsJJJk9
-   4Ce0sToKVhIU+ZWHOwsbQVMAmnw8U/tO0kA9JpEydOrwZJD9xm091vULp
+  bh=ldK8JEsrDCe0H7nzPkeyohBcSS2VhVlUfGora58zyTs=;
+  b=gYUd1i5p3deU1a1+kFJPfJk4eomdmH6lOxmc6qsu+Gr+NU5l8BlT8EmT
+   sRChkgj/gRtxAPW9GdXvCuA7w7fVvHrevUkVf6mugSbd+xpsEPHISfMZT
+   RXO9b+tE7G07P7WwgHukCGFr7CxfnwQsSkPKyALVks1NY6/Ut/uH0Khq4
+   FfLIAMXa40Gsbuf0vL/4QNjCLTFhpc+yjjpnroDWrjsTc0+wNbPQCV8iq
+   do89m4ky2SSoiBLURfulzR2Td7/xzUJGMZ3qQEqE6189xyqyba9bUs4+/
+   zcu6Eu7i+BIfJXmLgq2hwRVQJqH9+VFPheQ+vSKAghgh4hYco+ajKZvCy
    Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10641"; a="338072643"
+X-IronPort-AV: E=McAfee;i="6500,9779,10641"; a="338072644"
 X-IronPort-AV: E=Sophos;i="5.98,238,1673942400"; 
-   d="scan'208";a="338072643"
+   d="scan'208";a="338072644"
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
   by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2023 19:05:24 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10641"; a="676409959"
+X-IronPort-AV: E=McAfee;i="6500,9779,10641"; a="676409966"
 X-IronPort-AV: E=Sophos;i="5.98,238,1673942400"; 
-   d="scan'208";a="676409959"
+   d="scan'208";a="676409966"
 Received: from unknown (HELO fred..) ([172.25.112.68])
   by orsmga002.jf.intel.com with ESMTP; 06 Mar 2023 19:05:23 -0800
 From:   Xin Li <xin3.li@intel.com>
@@ -44,9 +44,9 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         dave.hansen@linux.intel.com, hpa@zytor.com, peterz@infradead.org,
         andrew.cooper3@citrix.com, seanjc@google.com, pbonzini@redhat.com,
         ravi.v.shankar@intel.com
-Subject: [PATCH v5 33/34] KVM: x86/vmx: call external_interrupt() to handle IRQ in IRQ caused VM exits
-Date:   Mon,  6 Mar 2023 18:39:45 -0800
-Message-Id: <20230307023946.14516-34-xin3.li@intel.com>
+Subject: [PATCH v5 34/34] KVM: x86/vmx: execute "int $2" to handle NMI in NMI caused VM exits when FRED is enabled
+Date:   Mon,  6 Mar 2023 18:39:46 -0800
+Message-Id: <20230307023946.14516-35-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230307023946.14516-1-xin3.li@intel.com>
 References: <20230307023946.14516-1-xin3.li@intel.com>
@@ -62,15 +62,16 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When FRED is enabled, IDT is gone, thus call external_interrupt() to handle
-IRQ in IRQ caused VM exits.
+Execute "int $2" to handle NMI in NMI caused VM exits when FRED is enabled.
 
-Create an event return stack frame with the host context immediately after
-a VM exit for calling external_interrupt(). All other fields of the pt_regs
-structure are cleared to 0. Refer to the discussion about the register values
-in the pt_regs structure at:
+Like IRET for IDT, ERETS/ERETU are required to end the NMI handler for FRED
+to unblock NMI ASAP (w/ bit 28 of CS set). And there are 2 approaches to
+invoke the FRED NMI handler:
+1) execute "int $2", let the h/w do the job.
+2) create a FRED NMI stack frame on the current kernel stack with ASM,
+   and then jump to fred_entrypoint_kernel in arch/x86/entry/entry_64_fred.S.
 
-  https://lore.kernel.org/kvm/ef2c54f7-14b9-dcbb-c3c4-1533455e7a18@redhat.com/
+1) is preferred as we want less ASM.
 
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
@@ -79,52 +80,34 @@ Signed-off-by: Xin Li <xin3.li@intel.com>
 Changes since v4:
 *) Do NOT use the term "injection", which in the KVM context means to
    reinject an event into the guest (Sean Christopherson).
-*) Use cs/ss instead of csx/ssx when initializing the pt_regs structure
-   for calling external_interrupt(), otherwise it breaks i386 build.
+*) Add the explanation of why to execute "int $2" to invoke the NMI handler
+   in NMI caused VM exits (Sean Christopherson).
 ---
- arch/x86/kvm/vmx/vmx.c | 22 +++++++++++++++++++++-
- 1 file changed, 21 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/vmx.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index bcac3efcde41..3ebeaab34b2e 100644
+index 3ebeaab34b2e..4f12ead2266b 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -47,6 +47,7 @@
- #include <asm/mshyperv.h>
- #include <asm/mwait.h>
- #include <asm/spec-ctrl.h>
-+#include <asm/traps.h>
- #include <asm/virtext.h>
- #include <asm/vmx.h>
- 
-@@ -6923,7 +6924,26 @@ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
- 		return;
- 
- 	kvm_before_interrupt(vcpu, KVM_HANDLING_IRQ);
--	vmx_do_interrupt_irqoff(gate_offset(desc));
-+	if (cpu_feature_enabled(X86_FEATURE_FRED)) {
-+		struct vcpu_vmx *vmx = to_vmx(vcpu);
-+		struct pt_regs regs = {};
-+
+@@ -7229,7 +7229,16 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
+ 	if ((u16)vmx->exit_reason.basic == EXIT_REASON_EXCEPTION_NMI &&
+ 	    is_nmi(vmx_get_intr_info(vcpu))) {
+ 		kvm_before_interrupt(vcpu, KVM_HANDLING_NMI);
+-		vmx_do_nmi_irqoff();
 +		/*
-+		 * Create an event return stack frame with the
-+		 * host context immediately after a VM exit.
++		 * Like IRET for IDT, ERETS/ERETU are required to end the NMI
++		 * handler for FRED to unblock NMI ASAP (w/ bit 28 of CS set).
 +		 *
-+		 * All other fields of the pt_regs structure are
-+		 * cleared to 0.
++		 * Invoke the FRED NMI handler through executing "int $2".
 +		 */
-+		regs.ss		= __KERNEL_DS;
-+		regs.sp		= vmx->loaded_vmcs->host_state.rsp;
-+		regs.flags	= X86_EFLAGS_FIXED;
-+		regs.cs		= __KERNEL_CS;
-+		regs.ip		= (unsigned long)vmx_vmexit;
-+
-+		external_interrupt(&regs, vector);
-+	} else
-+		vmx_do_interrupt_irqoff(gate_offset(desc));
- 	kvm_after_interrupt(vcpu);
++		if (cpu_feature_enabled(X86_FEATURE_FRED))
++			asm volatile("int $2");
++		else
++			vmx_do_nmi_irqoff();
+ 		kvm_after_interrupt(vcpu);
+ 	}
  
- 	vcpu->arch.at_instruction_boundary = true;
 -- 
 2.34.1
 
