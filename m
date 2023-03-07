@@ -2,62 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0AFC56AE6C9
-	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 17:37:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 13C6C6AE6DA
+	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 17:39:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230495AbjCGQhP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Mar 2023 11:37:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40450 "EHLO
+        id S230417AbjCGQjg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Mar 2023 11:39:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230156AbjCGQfr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Mar 2023 11:35:47 -0500
-Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D72650F9E
-        for <kvm@vger.kernel.org>; Tue,  7 Mar 2023 08:34:27 -0800 (PST)
-Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-536af432ee5so255640557b3.0
-        for <kvm@vger.kernel.org>; Tue, 07 Mar 2023 08:34:27 -0800 (PST)
+        with ESMTP id S230052AbjCGQjO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Mar 2023 11:39:14 -0500
+Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E25E996093
+        for <kvm@vger.kernel.org>; Tue,  7 Mar 2023 08:36:33 -0800 (PST)
+Received: by mail-yb1-xb34.google.com with SMTP id e194so12020532ybf.1
+        for <kvm@vger.kernel.org>; Tue, 07 Mar 2023 08:36:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678206863;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=jvy9w3/ryl+HeOiWnr51O81EEv//kB8rMScsDmnxcVI=;
-        b=nHQRzgSxT/F3jYeyWfizGLaZZb4WMNxMfddgFeYAE9wd0gfi784f1U4vIWL62Y4vYQ
-         jZzm9V7a7rsykrc1ucRZdzMaztKoZgAP3QOsYGvNhZW78NMRxWFDj9zka8tpx2PbKFtK
-         nXWKnkcT/98rA3QSVqoAQAZn7qfZ1/qQUsER+wsBsPlDvX4nr8B31SNjwJ7q9V+Md6Se
-         Pxj2H+jV579lIQNBLuY7ZaV6YglxQseENH7afBNzesYujhbmTsGetmkFetbrRKtd3ee7
-         CYfAQ/OM0Helv+z2R7KWkPO212PMlWxdobaAtdzrJGGgSYvZhEXlix/aMUnPc7iVnbW9
-         2mTA==
+        d=google.com; s=20210112; t=1678206992;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YTtKRWqbwOakiT5wLHajjWYxdhCo3hERieQBolp5/vE=;
+        b=MThh9HgYlIX8P2Ynk7YnPovsvHl3/TLIntSap+A/VK4IFabVSlozALZJ2RqMTE6iaV
+         nhqHu2LdfyL0829yoT4Crlf7cW/LE8rWj2nZlrMsW7hnCMYoyRKXRhq2RobHYw9q+Okd
+         v0oeDA3zOHO21JCKaT1eLf4n1p4sVvecVW/ASmyT9a5kMdEdpWLI8EPHWST9Rz1MaAG6
+         Yv8IY7tBjtT+prvGUW1vnT3WeloOX+tJqhJQMWhJvUTjzTnfX8Yyzp0qe9ULEVV//QXG
+         sY+4gTcm2n/PxUwIVsFfNsZlVV/AM3IxfJGozTHq4vIJKJUyaC3KkT1exdVrkBcgBID8
+         S7DA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678206863;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jvy9w3/ryl+HeOiWnr51O81EEv//kB8rMScsDmnxcVI=;
-        b=pTZGE6s852rS94n7cnEXILHoIkE9qGc+vb+xEpHkm155AIQ2WMVH+qi5Q4/1kOSuS7
-         Z9yfTHtewGOZLH8BMuiOGaTEtyl0xwo42hdaTOBfIEGfQiC4LZ+vAcm1oYuP4BXHb9B6
-         ukhvCdyG1w44JmkzNGMb5/KGQpPPbUwbJfbILjY6RhejOdJ/Nol8HvJqpM6vJqypOVvo
-         DOm89R7H3vWhZtib1tf6F0HyDQiEl0bTTGsJ+foyKCKA8x1NXudLBTQ08BUJe/ibAXtp
-         J0M8X5VeY5QNY26YvHWuveRqgYLH7MHihs1xRiGwg+60Rk8CiXH+f8CgLLDC5x07rhm4
-         btcQ==
-X-Gm-Message-State: AO0yUKVJwrEbQo8ct52v70mvuhrDcORzN2w8D+QdpT+CUo9odPb90oxX
-        rOrVXOEssYTPcMKhsC797YtEzTKZouZHXl0iHAa2qg==
-X-Google-Smtp-Source: AK7set+3Ae82E2oyDdBQvhCz8/W7lre94tpExRQKqu9Vvxb+ihPyjwxLWLNbdGRIiQaD2wFxSmRMuuDIRDrGASsf/IU=
-X-Received: by 2002:a81:b704:0:b0:53c:7047:14c4 with SMTP id
- v4-20020a81b704000000b0053c704714c4mr9200209ywh.8.1678206863562; Tue, 07 Mar
- 2023 08:34:23 -0800 (PST)
+        d=1e100.net; s=20210112; t=1678206992;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YTtKRWqbwOakiT5wLHajjWYxdhCo3hERieQBolp5/vE=;
+        b=jX4hZK+sbs/A+zGmGG4Nl1UHj9f7YzLVNMs/flEI4JfJUbeIw4lwAXp6uGyn/dmG+x
+         T/Bqm/+M5D8Yoh8qz/Dy//pjZwRlneDajNao9BqF6KMNm74CmwJ9UDpA4pMu9yzw/LDA
+         OPWTxxbyOnpnYQBK1a1wZWS/5lSsLmYt5fz24UZhHx7RyUvIoHnUCQu1CEhrxOFS8Fnh
+         0/4V4lxD1ZU5j1WDYub04SHUjAky83D1HdDpqY8Mjlz2hvPpCBb9zh59bPcu1aWod3ZF
+         r+xHOm7LUa48J1h77NEhxFQrApLmuoovD+C2QSJaS8NT4+vbK0uaMxa3lTC3Ke4mZXCE
+         KuJw==
+X-Gm-Message-State: AO0yUKXbggpcsTM922DS6XjhjsZE6V9oebsaNRWyOfy0LDAYb09kW6KU
+        ogcKMtpi84DGB4fcIQfd/LB3r9izxRqwQeyGyA2eug==
+X-Google-Smtp-Source: AK7set81IXSQxjNIrrYjq/+5nyfj1iJjvfOipuQXOoy7NftexY39u1ZAHsJIFfWDQqX7BXeNfInnwGMxbDJjzYirTX0=
+X-Received: by 2002:a25:9702:0:b0:a36:3875:56be with SMTP id
+ d2-20020a259702000000b00a36387556bemr9048746ybo.10.1678206992335; Tue, 07 Mar
+ 2023 08:36:32 -0800 (PST)
 MIME-Version: 1.0
-References: <20230224223607.1580880-1-aaronlewis@google.com>
- <20230224223607.1580880-8-aaronlewis@google.com> <ZAJjoiZopqIXDoDc@google.com>
- <CAAAPnDGjNjWczonLU1NNv4zk8865bpGB=Df-W-r4Wy=qi1--CA@mail.gmail.com>
-In-Reply-To: <CAAAPnDGjNjWczonLU1NNv4zk8865bpGB=Df-W-r4Wy=qi1--CA@mail.gmail.com>
+References: <20230307135233.54684-1-wei.w.wang@intel.com>
+In-Reply-To: <20230307135233.54684-1-wei.w.wang@intel.com>
 From:   Mingwei Zhang <mizhang@google.com>
-Date:   Tue, 7 Mar 2023 08:33:47 -0800
-Message-ID: <CAL715WJNPiX7_8Kv1wC-Yd3GQjd_xJ7opF_QP1ezfcbcYORVTA@mail.gmail.com>
-Subject: Re: [PATCH v3 7/8] KVM: selftests: Add XFEATURE masks to common code
-To:     Aaron Lewis <aaronlewis@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com,
-        seanjc@google.com
+Date:   Tue, 7 Mar 2023 08:35:56 -0800
+Message-ID: <CAL715WJFJLtVy_pooEVzsteEq35Wqa9LDFc_gfRjMEm0McfB-w@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: allow KVM_BUG/KVM_BUG_ON to handle 64-bit cond
+To:     Wei Wang <wei.w.wang@intel.com>
+Cc:     seanjc@google.com, dmatlack@google.com, isaku.yamahata@gmail.com,
+        pbonzini@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -69,14 +70,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > Can I take your commit into my series? This seems to be closely related
-> > with amx_test itself without much relationship with the xcr0 test.
-> > Thoughts?
+On Tue, Mar 7, 2023 at 5:52=E2=80=AFAM Wei Wang <wei.w.wang@intel.com> wrot=
+e:
 >
-> Yes, please do.  I still need to have it here to have access to the
-> common xfeatures.
-
-hmm, you are right. Then, this series should go before the selftest series.
-
-Thanks.
--Mingwei
+> Current KVM_BUG and KVM_BUG_ON assume that 'cond' passed from callers is
+> 32-bit as it casts 'cond' to the type of int. This will be wrong if 'cond=
+'
+> provided by a caller is 64-bit, e.g. an error code of 0xc0000d0300000000
+> will be converted to 0, which is not expected.
+>
+> Improves the implementation by using bool in KVM_BUG and KVM_BUG_ON.
+> 'bool' is preferred to 'int' as __ret is essentially used as a boolean
+> and coding-stytle.rst documents that use of bool is encouraged to improve
+> readability and is often a better option than 'int' for storing boolean
+> values.
+>
+> Fixes: 0b8f11737cff ("KVM: Add infrastructure and macro to mark VM as bug=
+ged")
+> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> ---
+Reviewed-by: Mingwei Zhang <mizhang@google.com>
