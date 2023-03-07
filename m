@@ -2,45 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 887B16AEC60
-	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 18:54:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FB396AEC66
+	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 18:55:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229760AbjCGRyn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Mar 2023 12:54:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45082 "EHLO
+        id S229651AbjCGRzI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Mar 2023 12:55:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230466AbjCGRyS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Mar 2023 12:54:18 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE46994F68;
-        Tue,  7 Mar 2023 09:49:07 -0800 (PST)
+        with ESMTP id S232282AbjCGRy1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Mar 2023 12:54:27 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC504A2F08;
+        Tue,  7 Mar 2023 09:49:11 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 95DBA6150C;
-        Tue,  7 Mar 2023 17:49:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E30BC433D2;
-        Tue,  7 Mar 2023 17:49:05 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 5ABD7B8169C;
+        Tue,  7 Mar 2023 17:49:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FE8BC433EF;
+        Tue,  7 Mar 2023 17:49:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1678211346;
-        bh=+M1gEsg3qEIv515pBeyxMHFtrxXp6A5XzXwfNBlR9Zo=;
+        s=korg; t=1678211349;
+        bh=ch7KaQcbim/15R+s37djgUEAiy602Smc48y+7FjJHC8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ayuyW1a4AeqVn0puUPO6lGfTmriye8wkvkSK/4ASJXZ2qIEmGn6HekvZQAG/7k6YZ
-         dIsNSaw+GpGqPPFFpU9VRkr2Ri2LjM9h6eisnnTRQ/zULEBCzRMUxPDKC6mow/Dy4m
-         EjN46CuHUGtZwbFDXrSfDRTAwAN6hT6+hlxfYGUg=
+        b=v6TiMBW0ptuB367SMKDd+OnJwqKRrBhmi3ZXBZp7NXuHkW18ap3k56AM5yYuZVhVN
+         A0MUFNokHUOJXKihEqXC2BsAt3LprhjXMt6Nv77wobo+wS2i/aejxXW3t9c5broYQw
+         xPgycQ2lSd2Ac093KK9WE8+FpZ1nzzLJxVptZbvA=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     stable@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        patches@lists.linux.dev, Andy Nguyen <theflow@google.com>,
-        Thomas Lendacky <thomas.lendacky@amd.com>,
-        Peter Gonda <pgonda@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 6.2 0833/1001] KVM: SVM: Fix potential overflow in SEVs send|receive_update_data()
-Date:   Tue,  7 Mar 2023 18:00:05 +0100
-Message-Id: <20230307170057.940444308@linuxfoundation.org>
+        patches@lists.linux.dev, Randy Dunlap <rdunlap@infradead.org>,
+        Vineeth Pillai <viremana@linux.microsoft.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: [PATCH 6.2 0834/1001] KVM: SVM: hyper-v: placate modpost section mismatch error
+Date:   Tue,  7 Mar 2023 18:00:06 +0100
+Message-Id: <20230307170057.987429663@linuxfoundation.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230307170022.094103862@linuxfoundation.org>
 References: <20230307170022.094103862@linuxfoundation.org>
@@ -48,8 +46,8 @@ User-Agent: quilt/0.67
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -58,65 +56,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Peter Gonda <pgonda@google.com>
+From: Randy Dunlap <rdunlap@infradead.org>
 
-commit f94f053aa3a5d6ff17951870483d9eb9e13de2e2 upstream.
+commit 45dd9bc75d9adc9483f0c7d662ba6e73ed698a0b upstream.
 
-KVM_SEV_SEND_UPDATE_DATA and KVM_SEV_RECEIVE_UPDATE_DATA have an integer
-overflow issue. Params.guest_len and offset are both 32 bits wide, with a
-large params.guest_len the check to confirm a page boundary is not
-crossed can falsely pass:
+modpost reports section mismatch errors/warnings:
+WARNING: modpost: vmlinux.o: section mismatch in reference: svm_hv_hardware_setup (section: .text) -> (unknown) (section: .init.data)
+WARNING: modpost: vmlinux.o: section mismatch in reference: svm_hv_hardware_setup (section: .text) -> (unknown) (section: .init.data)
+WARNING: modpost: vmlinux.o: section mismatch in reference: svm_hv_hardware_setup (section: .text) -> (unknown) (section: .init.data)
 
-    /* Check if we are crossing the page boundary *
-    offset = params.guest_uaddr & (PAGE_SIZE - 1);
-    if ((params.guest_len + offset > PAGE_SIZE))
+This "(unknown) (section: .init.data)" all refer to svm_x86_ops.
 
-Add an additional check to confirm that params.guest_len itself is not
-greater than PAGE_SIZE.
+Tag svm_hv_hardware_setup() with __init to fix a modpost warning as the
+non-stub implementation accesses __initdata (svm_x86_ops), i.e. would
+generate a use-after-free if svm_hv_hardware_setup() were actually invoked
+post-init.  The helper is only called from svm_hardware_setup(), which is
+also __init, i.e. lack of __init is benign other than the modpost warning.
 
-Note, this isn't a security concern as overflow can happen if and only if
-params.guest_len is greater than 0xfffff000, and the FW spec says these
-commands fail with lengths greater than 16KB, i.e. the PSP will detect
-KVM's goof.
-
-Fixes: 15fb7de1a7f5 ("KVM: SVM: Add KVM_SEV_RECEIVE_UPDATE_DATA command")
-Fixes: d3d1af85e2c7 ("KVM: SVM: Add KVM_SEND_UPDATE_DATA command")
-Reported-by: Andy Nguyen <theflow@google.com>
-Suggested-by: Thomas Lendacky <thomas.lendacky@amd.com>
-Signed-off-by: Peter Gonda <pgonda@google.com>
-Cc: David Rientjes <rientjes@google.com>
+Fixes: 1e0c7d40758b ("KVM: SVM: hyper-v: Remote TLB flush for SVM")
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Vineeth Pillai <viremana@linux.microsoft.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>
 Cc: kvm@vger.kernel.org
 Cc: stable@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
-Link: https://lore.kernel.org/r/20230207171354.4012821-1-pgonda@google.com
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Message-Id: <20230222073315.9081-1-rdunlap@infradead.org>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- arch/x86/kvm/svm/sev.c |    4 ++--
+ arch/x86/kvm/svm/svm_onhyperv.h |    4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -1293,7 +1293,7 @@ static int sev_send_update_data(struct k
+--- a/arch/x86/kvm/svm/svm_onhyperv.h
++++ b/arch/x86/kvm/svm/svm_onhyperv.h
+@@ -30,7 +30,7 @@ static inline void svm_hv_init_vmcb(stru
+ 		hve->hv_enlightenments_control.msr_bitmap = 1;
+ }
  
- 	/* Check if we are crossing the page boundary */
- 	offset = params.guest_uaddr & (PAGE_SIZE - 1);
--	if ((params.guest_len + offset > PAGE_SIZE))
-+	if (params.guest_len > PAGE_SIZE || (params.guest_len + offset) > PAGE_SIZE)
- 		return -EINVAL;
+-static inline void svm_hv_hardware_setup(void)
++static inline __init void svm_hv_hardware_setup(void)
+ {
+ 	if (npt_enabled &&
+ 	    ms_hyperv.nested_features & HV_X64_NESTED_ENLIGHTENED_TLB) {
+@@ -84,7 +84,7 @@ static inline void svm_hv_init_vmcb(stru
+ {
+ }
  
- 	/* Pin guest memory */
-@@ -1473,7 +1473,7 @@ static int sev_receive_update_data(struc
+-static inline void svm_hv_hardware_setup(void)
++static inline __init void svm_hv_hardware_setup(void)
+ {
+ }
  
- 	/* Check if we are crossing the page boundary */
- 	offset = params.guest_uaddr & (PAGE_SIZE - 1);
--	if ((params.guest_len + offset > PAGE_SIZE))
-+	if (params.guest_len > PAGE_SIZE || (params.guest_len + offset) > PAGE_SIZE)
- 		return -EINVAL;
- 
- 	hdr = psp_copy_user_blob(params.hdr_uaddr, params.hdr_len);
 
 
