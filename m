@@ -2,80 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D7226ADA68
-	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 10:32:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 676EA6ADB6B
+	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 11:08:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230341AbjCGJcI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Mar 2023 04:32:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52096 "EHLO
+        id S229953AbjCGKIf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Mar 2023 05:08:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229994AbjCGJcG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Mar 2023 04:32:06 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 347EE8A3A8
-        for <kvm@vger.kernel.org>; Tue,  7 Mar 2023 01:31:10 -0800 (PST)
+        with ESMTP id S229525AbjCGKId (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Mar 2023 05:08:33 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5803D5071B
+        for <kvm@vger.kernel.org>; Tue,  7 Mar 2023 02:07:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678181469;
+        s=mimecast20190719; t=1678183660;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ROZo+Hm2nwaruvzp5tLmXfiaUhDZcP6CcaTEU4f9q20=;
-        b=S+QR1ImOrGwQjLROwzTPinvPUwbWczYv+5HAS0pm3qLpbJ0Mtfzm9ESXsp8yv0yaJ17mwZ
-        erR/qnq4Y/4+6N3ahnWqAd9eAsVV/r2qZolfAoW9TMxCGqlQ4qe0WeXqmftRnes8DJ/Fq6
-        M2/mv0/meIN8aOtFdG1Z31ePSO02QWg=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=V1JmY/X7PnOboq8EJYmDJS1+dUQ3/lbmiwhls6dYBpI=;
+        b=dFcfymV3HusHCuvLeJSoyYlPo4XU7HRw8WZYsp3/kDhKcsOY0xBBoE8Zug1F3oqrA+tA2K
+        VgvMHPS/kqJYNCBdbSQXQkIZDed0764+mwdADx9KqQzsM/2RxBR6JmYNDFJNlEZiOR1If0
+        uYA3SxEnVWtCIkP0wt5jDGhKwkNvb94=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-324-iMBngBvOPxqbFJE4FTyHVg-1; Tue, 07 Mar 2023 04:31:08 -0500
-X-MC-Unique: iMBngBvOPxqbFJE4FTyHVg-1
-Received: by mail-wm1-f71.google.com with SMTP id m28-20020a05600c3b1c00b003e7d4662b83so8029743wms.0
-        for <kvm@vger.kernel.org>; Tue, 07 Mar 2023 01:31:08 -0800 (PST)
+ us-mta-539-WmlojaelNcCsSzw3ngC2Gg-1; Tue, 07 Mar 2023 05:07:39 -0500
+X-MC-Unique: WmlojaelNcCsSzw3ngC2Gg-1
+Received: by mail-qk1-f197.google.com with SMTP id e14-20020a05620a208e00b0074270b9960dso7057609qka.22
+        for <kvm@vger.kernel.org>; Tue, 07 Mar 2023 02:07:39 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678181465;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ROZo+Hm2nwaruvzp5tLmXfiaUhDZcP6CcaTEU4f9q20=;
-        b=DS/9Gbh49/GvMRxW+ce8Wne/Nixjmm+RPuCRK+ojD4Lx9m5Q0KG5Fr5/73P4FFpnnl
-         C1uHLMuYXixjPrafeWHrdMkZXjQt+XWnapeLqDQoEkakd4PMiPKSuWU3jdY+HL0EyUg8
-         XWqrGdZDBODkwdtnKO/t6flhesje3ymtLzFTFzDP4WvKBGg2HC0YBXdVGXQSrU7TOxYY
-         uJxdPgAqpu58vYIK6fxWsvT9YRA3jedSrlWdhywTHQyorXLDj64cNFKCb1hkuqXWPDV0
-         Jn593xsEMmfiEMVQilOuzp4BKRKiNo3HdKZRsQbQkAbeRmapCjKQaAJ9l//z0PthUUut
-         xx1A==
-X-Gm-Message-State: AO0yUKXgklMvmOfPRMMu6fDQFITap2DevRiW4Tfr+EVtfsWXG7Y+AtzP
-        5iahxFglpEAuYCUUlFE2fDEkr0ys27LRxZstDJb5s8ayqn8lUMMPSPUapXFum1qTTbv43BWeWjP
-        dEl7weXmcpeGo
-X-Received: by 2002:a05:600c:474f:b0:3df:deb5:6ff5 with SMTP id w15-20020a05600c474f00b003dfdeb56ff5mr12407885wmo.24.1678181465558;
-        Tue, 07 Mar 2023 01:31:05 -0800 (PST)
-X-Google-Smtp-Source: AK7set8nRlHuSVvS3Y2XSx89Qt+KslRCgHQzi54Bw407xKpxIWyRaTqJXGns7ik+zzvdl7UyrHzyXg==
-X-Received: by 2002:a05:600c:474f:b0:3df:deb5:6ff5 with SMTP id w15-20020a05600c474f00b003dfdeb56ff5mr12407858wmo.24.1678181465188;
-        Tue, 07 Mar 2023 01:31:05 -0800 (PST)
-Received: from sgarzare-redhat (host-82-57-51-170.retail.telecomitalia.it. [82.57.51.170])
-        by smtp.gmail.com with ESMTPSA id e15-20020a5d594f000000b002c56046a3b5sm12073447wri.53.2023.03.07.01.31.03
+        d=1e100.net; s=20210112; t=1678183659;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=V1JmY/X7PnOboq8EJYmDJS1+dUQ3/lbmiwhls6dYBpI=;
+        b=C8+e/PocXDgbl03mxjO92Xfw8ynl2v7vTl+KwmKz2K2dIklsh3c5vXUujYPoY1gxNq
+         B8/SmN+OvL6cXRrXXm6AS2yqlegYVhTuTDxF14TBvp5KZej2/wrxjRt25ORZOCSB4+F/
+         dCH5Omlggv/bCryIkYJbBiuQFjJZ6dIvSpp+hz/raPWbZe94GJVGycyXpiG7gL3ghbVm
+         Z4f6brxaC/P8PgqZHIuDaVDnUw4EK7vENCjgQ7oN39FrfTMxEQahPXDEsHC6KkRUSzdO
+         xpxsDEni3j25O4xOMe8qETjCi7OyPVyY9rS0qi12rCngycX6QO+mWLLOl7zSfUjhj0Oz
+         TGUw==
+X-Gm-Message-State: AO0yUKW0QAAVZurwt3Y4wWuEPNzSEQx4FyxLceU3G3/eJTs5KW/sBBDZ
+        5utrwb8myVdRQaVkD2jrVvfIpm9Qs7buAwb6LKLIpiGhkPhwetKJhkWuI8dYRup+31O5RoQYwDm
+        oUtVCy3mbIQbP
+X-Received: by 2002:a05:622a:1b8b:b0:3b9:a372:e456 with SMTP id bp11-20020a05622a1b8b00b003b9a372e456mr21883571qtb.57.1678183658709;
+        Tue, 07 Mar 2023 02:07:38 -0800 (PST)
+X-Google-Smtp-Source: AK7set9jXvJ/iByIcmR56T2v/fG4zz6UvdsgF/Ku3RFa4sMV5+n5z41yjt+N0gTGyI4HFsr1IZghoQ==
+X-Received: by 2002:a05:622a:1b8b:b0:3b9:a372:e456 with SMTP id bp11-20020a05622a1b8b00b003b9a372e456mr21883545qtb.57.1678183658360;
+        Tue, 07 Mar 2023 02:07:38 -0800 (PST)
+Received: from fedora (g2.ign.cz. [91.219.240.8])
+        by smtp.gmail.com with ESMTPSA id e10-20020a05620a014a00b0071a02d712b0sm9293177qkn.99.2023.03.07.02.07.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Mar 2023 01:31:04 -0800 (PST)
-Date:   Tue, 7 Mar 2023 10:31:01 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Eugenio Perez Martin <eperezma@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org,
-        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
-        netdev@vger.kernel.org, stefanha@redhat.com,
-        linux-kernel@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v2 4/8] vringh: support VA with iotlb
-Message-ID: <20230307093101.3nfxhadkyevszmyj@sgarzare-redhat>
-References: <20230302113421.174582-1-sgarzare@redhat.com>
- <20230302113421.174582-5-sgarzare@redhat.com>
- <CAJaqyWdeEzKnYuX-c348vVg0PpUH4y-e1dSLhRvYem=MEDKE=Q@mail.gmail.com>
+        Tue, 07 Mar 2023 02:07:37 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org
+Cc:     kvm@vger.kernel.org, Tianyu Lan <ltykernel@gmail.com>,
+        Michael Kelley <mikelley@microsoft.com>
+Subject: Re: [PATCH] KVM: SVM: Disable TDP MMU when running on Hyper-V
+In-Reply-To: <c6bb4b57-f134-d992-7f30-be80151fb67e@linux.microsoft.com>
+References: <20230227171751.1211786-1-jpiotrowski@linux.microsoft.com>
+ <87lek9zs05.fsf@redhat.com>
+ <c6bb4b57-f134-d992-7f30-be80151fb67e@linux.microsoft.com>
+Date:   Tue, 07 Mar 2023 11:07:33 +0100
+Message-ID: <87a60ozxga.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJaqyWdeEzKnYuX-c348vVg0PpUH4y-e1dSLhRvYem=MEDKE=Q@mail.gmail.com>
+Content-Type: text/plain
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -83,190 +79,231 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 03, 2023 at 03:38:57PM +0100, Eugenio Perez Martin wrote:
->On Thu, Mar 2, 2023 at 12:35 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
->>
->> vDPA supports the possibility to use user VA in the iotlb messages.
->> So, let's add support for user VA in vringh to use it in the vDPA
->> simulators.
->>
->> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
->> ---
->>
->> Notes:
->>     v2:
->>     - replace kmap_atomic() with kmap_local_page() [see previous patch]
->>     - fix cast warnings when build with W=1 C=1
->>
->>  include/linux/vringh.h            |   5 +-
->>  drivers/vdpa/mlx5/net/mlx5_vnet.c |   2 +-
->>  drivers/vdpa/vdpa_sim/vdpa_sim.c  |   4 +-
->>  drivers/vhost/vringh.c            | 247 ++++++++++++++++++++++++------
->>  4 files changed, 205 insertions(+), 53 deletions(-)
->>
->> diff --git a/include/linux/vringh.h b/include/linux/vringh.h
->> index 1991a02c6431..d39b9f2dcba0 100644
->> --- a/include/linux/vringh.h
->> +++ b/include/linux/vringh.h
->> @@ -32,6 +32,9 @@ struct vringh {
->>         /* Can we get away with weak barriers? */
->>         bool weak_barriers;
->>
->> +       /* Use user's VA */
->> +       bool use_va;
->> +
->>         /* Last available index we saw (ie. where we're up to). */
->>         u16 last_avail_idx;
->>
->> @@ -279,7 +282,7 @@ void vringh_set_iotlb(struct vringh *vrh, struct vhost_iotlb *iotlb,
->>                       spinlock_t *iotlb_lock);
->>
->>  int vringh_init_iotlb(struct vringh *vrh, u64 features,
->> -                     unsigned int num, bool weak_barriers,
->> +                     unsigned int num, bool weak_barriers, bool use_va,
->>                       struct vring_desc *desc,
->>                       struct vring_avail *avail,
->>                       struct vring_used *used);
->> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
->> index 3a0e721aef05..babc8dd171a6 100644
->> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
->> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
->> @@ -2537,7 +2537,7 @@ static int setup_cvq_vring(struct mlx5_vdpa_dev *mvdev)
->>
->>         if (mvdev->actual_features & BIT_ULL(VIRTIO_NET_F_CTRL_VQ))
->>                 err = vringh_init_iotlb(&cvq->vring, mvdev->actual_features,
->> -                                       MLX5_CVQ_MAX_ENT, false,
->> +                                       MLX5_CVQ_MAX_ENT, false, false,
->>                                         (struct vring_desc *)(uintptr_t)cvq->desc_addr,
->>                                         (struct vring_avail *)(uintptr_t)cvq->driver_addr,
->>                                         (struct vring_used *)(uintptr_t)cvq->device_addr);
->> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
->> index 6a0a65814626..481eb156658b 100644
->> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
->> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
->> @@ -60,7 +60,7 @@ static void vdpasim_queue_ready(struct vdpasim *vdpasim, unsigned int idx)
->>         struct vdpasim_virtqueue *vq = &vdpasim->vqs[idx];
->>         uint16_t last_avail_idx = vq->vring.last_avail_idx;
->>
->> -       vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, true,
->> +       vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, true, false,
->>                           (struct vring_desc *)(uintptr_t)vq->desc_addr,
->>                           (struct vring_avail *)
->>                           (uintptr_t)vq->driver_addr,
->> @@ -81,7 +81,7 @@ static void vdpasim_vq_reset(struct vdpasim *vdpasim,
->>         vq->cb = NULL;
->>         vq->private = NULL;
->>         vringh_init_iotlb(&vq->vring, vdpasim->dev_attr.supported_features,
->> -                         VDPASIM_QUEUE_MAX, false, NULL, NULL, NULL);
->> +                         VDPASIM_QUEUE_MAX, false, false, NULL, NULL, NULL);
->>
->>         vq->vring.notify = NULL;
->>  }
->> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
->> index 0ba3ef809e48..61c79cea44ca 100644
->> --- a/drivers/vhost/vringh.c
->> +++ b/drivers/vhost/vringh.c
->> @@ -1094,15 +1094,99 @@ EXPORT_SYMBOL(vringh_need_notify_kern);
->>
->>  #if IS_REACHABLE(CONFIG_VHOST_IOTLB)
->>
->> -static int iotlb_translate(const struct vringh *vrh,
->> -                          u64 addr, u64 len, u64 *translated,
->> -                          struct bio_vec iov[],
->> -                          int iov_size, u32 perm)
->> +static int iotlb_translate_va(const struct vringh *vrh,
->> +                             u64 addr, u64 len, u64 *translated,
->> +                             struct iovec iov[],
->> +                             int iov_size, u32 perm)
+Jeremi Piotrowski <jpiotrowski@linux.microsoft.com> writes:
+
+> On 06/03/2023 18:52, Vitaly Kuznetsov wrote:
+>> Jeremi Piotrowski <jpiotrowski@linux.microsoft.com> writes:
+>> 
+>>> TDP MMU has been broken on AMD CPUs when running on Hyper-V since v5.17.
+>>> The issue was first introduced by two commmits:
+>>>
+>>> - bb95dfb9e2dfbe6b3f5eb5e8a20e0259dadbe906 "KVM: x86/mmu: Defer TLB
+>>>   flush to caller when freeing TDP MMU shadow pages"
+>>> - efd995dae5eba57c5d28d6886a85298b390a4f07 "KVM: x86/mmu: Zap defunct
+>>>   roots via asynchronous worker"
+>>>
+>>> The root cause is that since then there are missing TLB flushes which
+>>> are required by HV_X64_NESTED_ENLIGHTENED_TLB.
+>> 
+>> Please share more details on what's actually missing as you get them,
+>> I'd like to understand which flushes can be legally avoided on bare
+>> hardware and Hyper-V/VMX but not on Hyper-V/SVM.
+>> 
+>
+> See the linked thread here
+> https://lore.kernel.org/lkml/20d189fc-8d20-8083-b448-460cc0420151@linux.microsoft.com/#t
+> for all the details/analyses but the summary was that either of these 2
+> options would work, with a) having less flushes (footnote: less flushes is not necessarily
+> better):
+>
+> a) adding a hyperv_flush_guest_mapping(__pa(root->spt) after kvm_tdp_mmu_get_vcpu_root_hpa's call to tdp_mmu_alloc_sp()
+> b) adding a hyperv_flush_guest_mapping(vcpu->arch.mmu->root.hpa) to svm_flush_tlb_current()
+>
+> These are only needed on Hyper-V/SVM because of how the enlightenment works (needs an explicit
+> flush to rebuild L0 shadow page tables). Hyper-V/VMX does not need any changes and currently
+> works. Let me know if you need more information on something here, I'll try to get it.
+>
+
+Ah, I missed the whole party! Thanks for the pointers!
+
+>>>  The failure manifests
+>>> as L2 guest VMs being unable to complete boot due to memory
+>>> inconsistencies between L1 and L2 guests which lead to various
+>>> assertion/emulation failures.
+
+Which levels are we talking about here, *real* L1 and L2 or L1 and L2
+from KVM's perspective (real L2 and L3)?
+
+>>>
+>>> The HV_X64_NESTED_ENLIGHTENED_TLB enlightenment is always exposed by
+>>> Hyper-V on AMD and is always used by Linux. The TLB flush required by
+>>> HV_X64_NESTED_ENLIGHTENED_TLB is much stricter than the local TLB flush
+>>> that TDP MMU wants to issue. We have also found that with TDP MMU L2 guest
+>>> boot performance on AMD is reproducibly slower compared to when TDP MMU is
+>>> disabled.
+>>>
+>>> Disable TDP MMU when using SVM Hyper-V for the time being while we
+>>> search for a better fix.
+>> 
+>> I'd suggest we go the other way around: disable
+>> HV_X64_NESTED_ENLIGHTENED_TLB on SVM:
+>
+> Paolo suggested disabling TDP_MMU when HV_X64_NESTED_ENLIGHTENED_TLB is used, and
+> I prefer that option too. The enlighenment does offer a nice performance advantage
+> with non-TDP_MMU, and I did not see TDP_MMU perform any better compared to that.
+> Afaik the code to use the enlightenment on Hyper-V/SVM was written/tested before
+> TDP_MMU became the default.
+>
+> If you have a specific scenario in mind, we could test and see what the implications
+> are there.
+
+I don't have a strong opinion here, I've suggested a smaller change so
+it's easier to backport it to stable kernels and easier to revert when a
+proper fix comes to mainline. For performance implication, I'd only
+consider non-nested scenarios from KVM's perspective (i.e. real L2 from
+Hyper-V's PoV), as running L3 is unlikely a common use-case and, if I
+understood correctly, is broken anyway.
+
+>
+>> 
+>> diff --git a/arch/x86/kvm/svm/svm_onhyperv.h b/arch/x86/kvm/svm/svm_onhyperv.h
+>> index 6981c1e9a809..be98da5a4277 100644
+>> --- a/arch/x86/kvm/svm/svm_onhyperv.h
+>> +++ b/arch/x86/kvm/svm/svm_onhyperv.h
+>> @@ -32,7 +32,8 @@ static inline void svm_hv_init_vmcb(struct vmcb *vmcb)
+>>  
+>>  static inline void svm_hv_hardware_setup(void)
 >>  {
->>         struct vhost_iotlb_map *map;
->>         struct vhost_iotlb *iotlb = vrh->iotlb;
->> +       u64 s = 0, last = addr + len - 1;
->>         int ret = 0;
->> +
->> +       spin_lock(vrh->iotlb_lock);
->> +
->> +       while (len > s) {
->> +               u64 size;
->> +
->> +               if (unlikely(ret >= iov_size)) {
->> +                       ret = -ENOBUFS;
->> +                       break;
->> +               }
->> +
->> +               map = vhost_iotlb_itree_first(iotlb, addr, last);
->> +               if (!map || map->start > addr) {
->> +                       ret = -EINVAL;
->> +                       break;
->> +               } else if (!(map->perm & perm)) {
->> +                       ret = -EPERM;
->> +                       break;
->> +               }
->> +
->> +               size = map->size - addr + map->start;
->> +               iov[ret].iov_len = min(len - s, size);
->> +               iov[ret].iov_base = (void __user *)(unsigned long)
->> +                                   (map->addr + addr - map->start);
->> +               s += size;
->> +               addr += size;
->> +               ++ret;
->> +       }
->> +
->> +       spin_unlock(vrh->iotlb_lock);
->> +
->> +       if (translated)
->> +               *translated = min(len, s);
->> +
->> +       return ret;
->> +}
+>> -       if (npt_enabled &&
+>> +       /* A comment about missing TLB flushes */
+>> +       if (!tdp_mmu_enabled && npt_enabled &&
+>>             ms_hyperv.nested_features & HV_X64_NESTED_ENLIGHTENED_TLB) {
+>>                 pr_info(KBUILD_MODNAME ": Hyper-V enlightened NPT TLB flush enabled\n");
+>>                 svm_x86_ops.tlb_remote_flush = hv_remote_flush_tlb;
+>> 
+>> this way we won't have a not-obvious-at-all MMU change on Hyper-V. I
+>> understand this may have some performance implications but MMU switch
+>> has some as well.
+>> 
+>>>
+>>> Link: https://lore.kernel.org/lkml/43980946-7bbf-dcef-7e40-af904c456250@linux.microsoft.com/t/#u
+>>> Signed-off-by: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+>>> ---
+>>> Based on kvm-x86-mmu-6.3. The approach used here does not apply cleanly to
+>>> <=v6.2. This would be needed in stable too, and I don't know about putting
+>>> fixes tags.
+>> 
+>> Cc: stable@vger.kernel.org # 5.17.0 
+>> 
+>> should do)
+>> 
+>>>
+>>> Jeremi
+>>>
+>>>  arch/x86/include/asm/kvm_host.h |  3 ++-
+>>>  arch/x86/kvm/mmu/mmu.c          |  5 +++--
+>>>  arch/x86/kvm/svm/svm.c          |  6 +++++-
+>>>  arch/x86/kvm/svm/svm_onhyperv.h | 10 ++++++++++
+>>>  arch/x86/kvm/vmx/vmx.c          |  3 ++-
+>>>  5 files changed, 22 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+>>> index 4d2bc08794e4..a0868ae3688d 100644
+>>> --- a/arch/x86/include/asm/kvm_host.h
+>>> +++ b/arch/x86/include/asm/kvm_host.h
+>>> @@ -2031,7 +2031,8 @@ void kvm_mmu_invpcid_gva(struct kvm_vcpu *vcpu, gva_t gva, unsigned long pcid);
+>>>  void kvm_mmu_new_pgd(struct kvm_vcpu *vcpu, gpa_t new_pgd);
+>>>  
+>>>  void kvm_configure_mmu(bool enable_tdp, int tdp_forced_root_level,
+>>> -		       int tdp_max_root_level, int tdp_huge_page_level);
+>>> +		       int tdp_max_root_level, int tdp_huge_page_level,
+>>> +		       bool enable_tdp_mmu);
+>>>  
+>>>  static inline u16 kvm_read_ldt(void)
+>>>  {
+>>> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+>>> index c91ee2927dd7..5c0e28a7a3bc 100644
+>>> --- a/arch/x86/kvm/mmu/mmu.c
+>>> +++ b/arch/x86/kvm/mmu/mmu.c
+>>> @@ -5787,14 +5787,15 @@ void kvm_mmu_invpcid_gva(struct kvm_vcpu *vcpu, gva_t gva, unsigned long pcid)
+>>>  }
+>>>  
+>>>  void kvm_configure_mmu(bool enable_tdp, int tdp_forced_root_level,
+>>> -		       int tdp_max_root_level, int tdp_huge_page_level)
+>>> +		       int tdp_max_root_level, int tdp_huge_page_level,
+>>> +		       bool enable_tdp_mmu)
+>>>  {
+>>>  	tdp_enabled = enable_tdp;
+>>>  	tdp_root_level = tdp_forced_root_level;
+>>>  	max_tdp_level = tdp_max_root_level;
+>>>  
+>>>  #ifdef CONFIG_X86_64
+>>> -	tdp_mmu_enabled = tdp_mmu_allowed && tdp_enabled;
+>>> +	tdp_mmu_enabled = tdp_mmu_allowed && tdp_enabled && enable_tdp_mmu;
+>>>  #endif
+>>>  	/*
+>>>  	 * max_huge_page_level reflects KVM's MMU capabilities irrespective
+>>> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+>>> index d13cf53e7390..070c3f7f8c9f 100644
+>>> --- a/arch/x86/kvm/svm/svm.c
+>>> +++ b/arch/x86/kvm/svm/svm.c
+>>> @@ -4925,6 +4925,7 @@ static __init int svm_hardware_setup(void)
+>>>  	struct page *iopm_pages;
+>>>  	void *iopm_va;
+>>>  	int r;
+>>> +	bool enable_tdp_mmu;
+>>>  	unsigned int order = get_order(IOPM_SIZE);
+>>>  
+>>>  	/*
+>>> @@ -4991,9 +4992,12 @@ static __init int svm_hardware_setup(void)
+>>>  	if (!boot_cpu_has(X86_FEATURE_NPT))
+>>>  		npt_enabled = false;
+>>>  
+>>> +	enable_tdp_mmu = svm_hv_enable_tdp_mmu();
+>>> +
+>>>  	/* Force VM NPT level equal to the host's paging level */
+>>>  	kvm_configure_mmu(npt_enabled, get_npt_level(),
+>>> -			  get_npt_level(), PG_LEVEL_1G);
+>>> +			  get_npt_level(), PG_LEVEL_1G,
+>>> +			  enable_tdp_mmu);
+>>>  	pr_info("Nested Paging %sabled\n", npt_enabled ? "en" : "dis");
+>>>  
+>>>  	/* Setup shadow_me_value and shadow_me_mask */
+>>> diff --git a/arch/x86/kvm/svm/svm_onhyperv.h b/arch/x86/kvm/svm/svm_onhyperv.h
+>>> index 6981c1e9a809..aa49ac5d66bc 100644
+>>> --- a/arch/x86/kvm/svm/svm_onhyperv.h
+>>> +++ b/arch/x86/kvm/svm/svm_onhyperv.h
+>>> @@ -30,6 +30,11 @@ static inline void svm_hv_init_vmcb(struct vmcb *vmcb)
+>>>  		hve->hv_enlightenments_control.msr_bitmap = 1;
+>>>  }
+>>>  
+>>> +static inline bool svm_hv_enable_tdp_mmu(void)
+>>> +{
+>>> +	return !(npt_enabled && ms_hyperv.nested_features & HV_X64_NESTED_ENLIGHTENED_TLB);
+>>> +}
+>>> +
+>>>  static inline void svm_hv_hardware_setup(void)
+>>>  {
+>>>  	if (npt_enabled &&
+>>> @@ -84,6 +89,11 @@ static inline void svm_hv_init_vmcb(struct vmcb *vmcb)
+>>>  {
+>>>  }
+>>>  
+>>> +static inline bool svm_hv_enable_tdp_mmu(void)
+>>> +{
+>>> +	return true;
+>>> +}
+>>> +
+>>>  static inline void svm_hv_hardware_setup(void)
+>>>  {
+>>>  }
+>>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>>> index c788aa382611..4d3808755d39 100644
+>>> --- a/arch/x86/kvm/vmx/vmx.c
+>>> +++ b/arch/x86/kvm/vmx/vmx.c
+>>> @@ -8442,7 +8442,8 @@ static __init int hardware_setup(void)
+>>>  	vmx_setup_me_spte_mask();
+>>>  
+>>>  	kvm_configure_mmu(enable_ept, 0, vmx_get_max_tdp_level(),
+>>> -			  ept_caps_to_lpage_level(vmx_capability.ept));
+>>> +			  ept_caps_to_lpage_level(vmx_capability.ept),
+>>> +			  true);
+>>>  
+>>>  	/*
+>>>  	 * Only enable PML when hardware supports PML feature, and both EPT
+>> 
 >
->It seems to me iotlb_translate_va and iotlb_translate_pa are very
->similar, their only difference is that the argument is that iov is
->iovec instead of bio_vec. And how to fill it, obviously.
->
->It would be great to merge both functions, only differing with a
->conditional on vrh->use_va, or generics, or similar. Or, if following
->the style of the rest of vringh code, to provide a callback to fill
->iovec (although I like conditional more).
->
->However I cannot think of an easy way to perform that without long
->macros or type erasure.
 
-I agree and I tried, but then I got messed up and let it go.
-
-But maybe with the callback it shouldn't be too messy, I can try it and
-see what comes out :-)
-
->
->> +
->> +static inline int copy_from_va(const struct vringh *vrh, void *dst, void *src,
->> +                              u64 len, u64 *translated)
->> +{
->> +       struct iovec iov[16];
->> +       struct iov_iter iter;
->> +       int ret;
->> +
->> +       ret = iotlb_translate_va(vrh, (u64)(uintptr_t)src, len, translated, iov,
->> +                                ARRAY_SIZE(iov), VHOST_MAP_RO);
->> +       if (ret == -ENOBUFS)
->> +               ret = ARRAY_SIZE(iov);
->> +       else if (ret < 0)
->> +               return ret;
->> +
->> +       iov_iter_init(&iter, ITER_SOURCE, iov, ret, *translated);
->> +
->> +       return copy_from_iter(dst, *translated, &iter);
->
->Maybe a good baby step for DRY is to return the iov_iter in
->copy_from/to_va/pa here?
-
-Good point! I'll try it.
-
->
->But I'm ok with this version too.
->
->Acked-by: Eugenio Pérez Martin <eperezma@redhat.com>
-
-Thanks for the review!
-Stefano
+-- 
+Vitaly
 
