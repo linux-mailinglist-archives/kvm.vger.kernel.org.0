@@ -2,79 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E2596AF6AF
-	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 21:27:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F1ED6AF71E
+	for <lists+kvm@lfdr.de>; Tue,  7 Mar 2023 22:01:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230184AbjCGU1f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Mar 2023 15:27:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44368 "EHLO
+        id S230471AbjCGVB3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Mar 2023 16:01:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230000AbjCGU1c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Mar 2023 15:27:32 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ABBE422F
-        for <kvm@vger.kernel.org>; Tue,  7 Mar 2023 12:27:30 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id q9-20020a17090a9f4900b00237d026fc55so8613249pjv.3
-        for <kvm@vger.kernel.org>; Tue, 07 Mar 2023 12:27:30 -0800 (PST)
+        with ESMTP id S230264AbjCGVBW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Mar 2023 16:01:22 -0500
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DBC09E31E
+        for <kvm@vger.kernel.org>; Tue,  7 Mar 2023 13:00:50 -0800 (PST)
+Received: by mail-wm1-x32b.google.com with SMTP id p16so8637403wmq.5
+        for <kvm@vger.kernel.org>; Tue, 07 Mar 2023 13:00:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678220850;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WGcASroMdccxdn62Jjtjh8PVnJGDXhBcjr99ONuCvY4=;
-        b=OwwLfDPKljzAkPvlj0S/FrolNQFkMYhVCSYaPZA6BhlyFeubRSg3vonk6akM+nwgAx
-         dcS6vYx/LWgfF4nSPN+n5wRbJl1+oX04X/RQuea86YN+QKQuGEhXA8GHTKbpJNljgVbg
-         1tgLB7KavCS6Q8io76xaUiHKm29QSamSGbG7VBUDlQZNg7fOcC8uJ1SLfFlvvf38+NHp
-         H0+zdtAOsLWl91QdOI5eJY+EmcNzqsXqCw01IvZ9IrObznTsFWqkSsLtumj8X2Gb549e
-         mgTJkRz7STcC9OGGE966xqlp75dxFmI9JO9DcpLgaboo61ZXNHLGYkcot+ahXB1p5gKf
-         Im0w==
+        d=bytedance.com; s=google; t=1678222849;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZiWKyCKsYgQsvAQyb2xD/X2o3aURk6fuaflgIR8iSQ4=;
+        b=BMIYiSis2+aabp49ceTNPqBoCLm6q/4kyfwl5yGyHxTpOKhwh1tZih4+ol7WNnRLWr
+         EckKpnJrl07beVzZuP1JODe40FDDJuQwWLD3bGoCS0Mm6uOHk9LF8an5koz7vJQrl/dO
+         V9kmmPp+wAxxVHL2RdmXK8HgIzhXjZG5mWryMrkHebZZnG2r5TVxDcCrIHoRTUMdQPNs
+         szKjTPDtEh16y33F6yqqK8uMHEPGwnofbSG0zVe2qC8JnEpWEW8atXVuHfCNqkEXsd8i
+         JnV2eOKV3LdmBIxnE8QmuG7WdbcbSBBOubKXAEadcxODd3rL+4hL9LJVMlQHy//6uLQQ
+         3blQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678220850;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WGcASroMdccxdn62Jjtjh8PVnJGDXhBcjr99ONuCvY4=;
-        b=VsluNLNL43ob2LJxPA/Rqb/yLOk6X6n8jFOv0RGDw11PoNTyPb9mLjot+tEWY2cBJO
-         N2gPeIy6+7bT/tLV+adchV8G/kyHbaXI2oZSQXL07MNg8Bg1CnhNmXpI3rAKEnHYQlIw
-         SAFrGqQhefI40rz9HkVTEJT5xJss2H+bFN2FaQWcC4PG+hL/1Ksft/gXKvpxvAbxyJ6O
-         LJy20S7q26hxJtKipDRdYev4xqaibCyt/Q2yK4Oa2cRiuS9/BbWk5dVBoSovdYL2jH82
-         P7Ch4bWCAvwGcNovuQ1OQeqb57oKcpc5aHwZxS85yry3unXO3IwZyhVEaNgsqbyjXNCJ
-         Dv4Q==
-X-Gm-Message-State: AO0yUKXDnkY5BfnQihmphIA3YIXG22tHRiX06j4GW6vStHzH00ZvZTME
-        b4et/f6uBt5RKDDiSd/fPy72RQ1qopU=
-X-Google-Smtp-Source: AK7set9n+PBGh5X4bHcHssSmlZaRESH4dUDPeHJTAkKKGP+YbNHu8+uM5MNsGFpRsbe7uC0L5WQKdFmMJ3c=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:2948:0:b0:503:7bcd:9806 with SMTP id
- bu8-20020a632948000000b005037bcd9806mr5442294pgb.4.1678220850029; Tue, 07 Mar
- 2023 12:27:30 -0800 (PST)
-Date:   Tue, 7 Mar 2023 12:27:28 -0800
-In-Reply-To: <diqzcz5kz85e.fsf@ackerleytng-cloudtop.c.googlers.com>
-Mime-Version: 1.0
-References: <20221202061347.1070246-10-chao.p.peng@linux.intel.com> <diqzcz5kz85e.fsf@ackerleytng-cloudtop.c.googlers.com>
-Message-ID: <ZAeeMA9pPYwFiuaX@google.com>
-Subject: Re: [PATCH v10 9/9] KVM: Enable and expose KVM_MEM_PRIVATE
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ackerley Tng <ackerleytng@google.com>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
-        qemu-devel@nongnu.org, pbonzini@redhat.com, corbet@lwn.net,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, arnd@arndb.de, naoya.horiguchi@nec.com,
-        linmiaohe@huawei.com, x86@kernel.org, hpa@zytor.com,
-        hughd@google.com, jlayton@kernel.org, bfields@fieldses.org,
-        akpm@linux-foundation.org, shuah@kernel.org, rppt@kernel.org,
-        steven.price@arm.com, mail@maciej.szmigiero.name, vbabka@suse.cz,
-        vannapurve@google.com, yu.c.zhang@linux.intel.com,
-        kirill.shutemov@linux.intel.com, luto@kernel.org,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        david@redhat.com, aarcange@redhat.com, ddutile@redhat.com,
-        dhildenb@redhat.com, qperret@google.com, tabba@google.com,
-        michael.roth@amd.com, mhocko@suse.com, wei.w.wang@intel.com
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        d=1e100.net; s=20210112; t=1678222849;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZiWKyCKsYgQsvAQyb2xD/X2o3aURk6fuaflgIR8iSQ4=;
+        b=O4EKJd/p+dpyTZl71xo9c24hnjAPESjyfXTyDx3LH+GVGAtDH63hqU1OZrRVUwyszW
+         MlOKUJHYHoJC4lwWX0bA6c88SakJJjalV47ni8wH/m9XFuNwX2Ojg1StbMnFGH2Vi2VE
+         mv4cRtVLGm3tpWJ6OmhajD5R5nYdSLlcD2I3YEsaY3xsm8gdxJgl48cq2Gm2Fz/t1FTZ
+         FKyuSCCV/N41xB0umRMQjhIdK/eLIqhWO+eYey+7O/t26i/Xf52FimjAbPTUBWWpQFUY
+         zXzxFp0DqcoUhLRrWLIUaH/cRjZWKAFQB+k+QBvSdhQ3GFQQSh7P9OSJGk8V6d6GjA/h
+         4bAg==
+X-Gm-Message-State: AO0yUKXUqIIa+pncENPR7De+frSNdGPDMlC4bOokkW9e9xbV0OrLIHCP
+        Cb364NPsZITimDbwkft8cOAuzg==
+X-Google-Smtp-Source: AK7set8+9/DumNsGhMPBhvbpwOv9d/L451f47xO9+A5TiXwFCw/MOvhQ6h6Bn/5f3TUFmMyC7xTX1Q==
+X-Received: by 2002:a05:600c:1c96:b0:3eb:3300:1d13 with SMTP id k22-20020a05600c1c9600b003eb33001d13mr13894148wms.14.1678222848676;
+        Tue, 07 Mar 2023 13:00:48 -0800 (PST)
+Received: from ?IPV6:2a02:6b6a:b566:0:52ca:aea8:eb67:a912? ([2a02:6b6a:b566:0:52ca:aea8:eb67:a912])
+        by smtp.gmail.com with ESMTPSA id he5-20020a05600c540500b003e2058a7109sm17692993wmb.14.2023.03.07.13.00.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Mar 2023 13:00:48 -0800 (PST)
+Message-ID: <cb82069c-cd81-1799-91c7-dea79916ab1a@bytedance.com>
+Date:   Tue, 7 Mar 2023 21:00:47 +0000
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [External] Re: [PATCH v13 00/11] Parallel CPU bringup for x86_64
+Content-Language: en-US
+To:     David Woodhouse <dwmw2@infradead.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>, tglx@linutronix.de,
+        kim.phillips@amd.com, brgerst@gmail.com,
+        "Rapan, Sabin" <sabrapan@amazon.com>
+Cc:     piotrgorski@cachyos.org, oleksandr@natalenko.name,
+        arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
+        pbonzini@redhat.com, paulmck@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
+        seanjc@google.com, pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
+        punit.agrawal@bytedance.com, simon.evans@bytedance.com,
+        liangma@liangbit.com
+References: <20230302111227.2102545-1-usama.arif@bytedance.com>
+ <faa0eb3bb8ba0326d501516a057ab46eaf1f3c05.camel@infradead.org>
+ <effbb6e2-c5a1-af7f-830d-8d7088f57477@amd.com>
+ <269ed38b5eed9c3a259c183d59d4f1eb5128f132.camel@infradead.org>
+From:   Usama Arif <usama.arif@bytedance.com>
+In-Reply-To: <269ed38b5eed9c3a259c183d59d4f1eb5128f132.camel@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,45 +87,97 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Please trim your replies so that readers don't need to scan through a hundred or
-so lines of quotes just to confirm there's nothing there.
 
-On Tue, Mar 07, 2023, Ackerley Tng wrote:
-> Chao Peng <chao.p.peng@linux.intel.com> writes:
-> 
-> > Register/unregister private memslot to fd-based memory backing store
-> > restrictedmem and implement the callbacks for restrictedmem_notifier:
-> >    - invalidate_start()/invalidate_end() to zap the existing memory
-> >      mappings in the KVM page table.
-> >    - error() to request KVM_REQ_MEMORY_MCE and later exit to userspace
-> >      with KVM_EXIT_SHUTDOWN.
-> 
-> > Expose KVM_MEM_PRIVATE for memslot and KVM_MEMORY_ATTRIBUTE_PRIVATE for
-> > KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES to userspace but either are
-> > controlled by kvm_arch_has_private_mem() which should be rewritten by
-> > architecture code.
-> 
-> Could we perhaps rename KVM_MEM_PRIVATE to KVM_MEM_PROTECTED, to be in
-> line with KVM_X86_PROTECTED_VM?
-> 
-> I feel that a memslot that has the KVM_MEM_PRIVATE flag need not always
-> be private; It can sometimes be providing memory that is shared and
-> also accessible from the host.
-> 
-> KVM_MEMORY_ATTRIBUTE_PRIVATE is fine as-is because this flag is set when
-> the guest memory is meant to be backed by private memory.
-> 
-> KVM_MEMORY_EXIT_FLAG_PRIVATE is also okay because the flag is used to
-> indicate when the memory error is caused by a private access (as opposed
-> to a shared access).
-> 
-> kvm_slot_can_be_private() could perhaps be renamed kvm_is_protected_slot()?
 
-No to this suggestion.  I agree that KVM_MEM_PRIVATE is a bad name, but
-kvm_is_protected_slot() is just as wrong.  The _only_ thing that the flag controls
-is whether whether or not the memslot has an fd that is bound to restricted memory.
-The memslot itself is not protected in any way, and if the entire memslot is mapped
-shared, then the data backed by the memslot isn't protected either.
 
-What about KVM_MEM_CAN_BE_PRIVATE?  KVM_MEM_PRIVATIZABLE is more succinct, but
-AFAICT that's a made up word, and IMO is unnecessarily fancy.
+> diff --git a/arch/x86/kernel/smpboot.c b/arch/x86/kernel/smpboot.c
+> index 9d956571ecc1..d194c4ffeef8 100644
+> --- a/arch/x86/kernel/smpboot.c
+> +++ b/arch/x86/kernel/smpboot.c
+> @@ -1510,6 +1510,71 @@ void __init smp_prepare_cpus_common(void)
+>   	set_cpu_sibling_map(0);
+>   }
+>   
+> +
+> +/*
+> + * We can do 64-bit AP bringup in parallel if the CPU reports its APIC
+> + * ID in CPUID (either leaf 0x0B if we need the full APIC ID in X2APIC
+> + * mode, or leaf 0x01 if 8 bits are sufficient). Otherwise it's too
+> + * hard. And not for SEV-ES guests because they can't use CPUID that
+> + * early.
+> + */
+> +static bool __init prepare_parallel_bringup(void)
+> +{
+> +	if (IS_ENABLED(CONFIG_X86_32) || boot_cpu_data.cpuid_level < 1)
+> +		return false;
+> +
+> +	if (x2apic_mode) {
+> +		unsigned int eax, ebx, ecx, edx;
+> +
+> +		if (boot_cpu_data.cpuid_level < 0xb)
+> +			return false;
+> +
+> +		/*
+> +		 * To support parallel bringup in x2apic mode, the AP will need
+> +		 * to obtain its APIC ID from CPUID 0x0B, since CPUID 0x01 has
+> +		 * only 8 bits. Check that it is present and seems correct.
+> +		 */
+> +		cpuid_count(0xb, 0, &eax, &ebx, &ecx, &edx);
+> +
+> +		/*
+> +		 * AMD says that if executed with an umimplemented level in
+> +		 * ECX, then it will return all zeroes in EAX. Intel says it
+> +		 * will return zeroes in both EAX and EBX. Checking only EAX
+> +		 * should be sufficient.
+> +		 */
+> +		if (!eax) {
+> +			pr_info("Disabling parallel bringup because CPUID 0xb looks untrustworthy\n");
+> +			return false;
+> +		}
+> +
+> +		if (IS_ENABLED(AMD_MEM_ENCRYPT) && static_branch_unlikely(&sev_es_enable_key)) {
+> +			pr_debug("Using SEV-ES CPUID 0xb for parallel CPU startup\n");
+> +			smpboot_control = STARTUP_APICID_SEV_ES;
+> +		} else if (cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT)) {
+> +			/*
+> +			 * Other forms of memory encryption need to implement a way of
+> +			 * finding the APs' APIC IDs that early.
+> +			 */
+> +			return false;
+> +		} else {
+> +			pr_debug("Using CPUID 0xb for parallel CPU startup\n");
+> +			smpboot_control = STARTUP_APICID_CPUID_0B;
+
+I believe TDX guests with x2apic mode will end up here and enable 
+parallel smp if Sean was correct in this 
+(https://lore.kernel.org/all/Y91PoIfc2jdRv0WG@google.com/). i.e. "TDX 
+guest state is also encrypted, but TDX doesn't return true 
+CC_ATTR_GUEST_STATE_ENCRYPT.".
+
+So I believe the above else if 
+(cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT)) is not useful as thats 
+set for just SEV-ES guests? which is covered in the if part.
+
+Thanks,
+Usama
+
+
+> +		}
+> +	} else {
+> +		if (cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT))
+> +			return false;
+> +
+> +		/* Without X2APIC, what's in CPUID 0x01 should suffice. */
+> +		pr_debug("Using CPUID 0x1 for parallel CPU startup\n");
+> +		smpboot_control = STARTUP_APICID_CPUID_01;
+> +	}
+> +
+> +	cpuhp_setup_state_nocalls(CPUHP_BP_PARALLEL_DYN, "x86/cpu:kick",
+> +				  native_cpu_kick, NULL);
+> +
+> +	return true;
+> +}
+> +
+>   /*
+>    * Prepare for SMP bootup.
+
