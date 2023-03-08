@@ -2,165 +2,273 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7AEB56B0C34
-	for <lists+kvm@lfdr.de>; Wed,  8 Mar 2023 16:08:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C6016B0C71
+	for <lists+kvm@lfdr.de>; Wed,  8 Mar 2023 16:20:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231869AbjCHPIo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Mar 2023 10:08:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43090 "EHLO
+        id S231611AbjCHPUC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Mar 2023 10:20:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55700 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232075AbjCHPI1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Mar 2023 10:08:27 -0500
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2047.outbound.protection.outlook.com [40.107.212.47])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 962C362D96;
-        Wed,  8 Mar 2023 07:08:21 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HuPQzZkqsH+pcWPTcGPYTM07nGe9g2yv8UmB2OXiYX0TS71ZRcLqYX/n74NEJqBrTSz9H9dj0J5Udafeav6i/7nmcNQelqEjsKFlupV0J8m1HzcTDWlrPD7P+cSwyQoTFVkeHmHsomktL+feMOPk7oLm7O2v45JeyxFJY4OVwXHmv3bTquGMIJ1D0d8VcQYHddYVduUULUZ0W96izJ8RUo63Wbr3bnEM85xUleuh7gmd7/2XAphlVv6HX9HL02rfZZqbML4a1YZs8ZYzWXMMxpf8FRngwMP+gmcUEhAnmUSeTPuwE7BGbalG5A3Xuzgyxw7Asb2XPpD+hS8CDX1RVQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DmuUdoMkzkzdkZwOzixlqJtO5WAMXcENvqxEl/g6Z7k=;
- b=FO4dmh2beQL+03ynn2bmEUewArcchITfu6G8CEFqT08vGt1cIEYLC+eQXtRMsyBd1H74VErsaI1V4qOkNzIOnjWIQnh03rJCMeN5WY2wmuQtKulyQBZ1H8yi0k3w5t2YCRF2+BoFYSzb6Ab5Y18uJQb6po6p37he18VsXjCjtwCXgOsGuFXmGX8EvzfVUHDPKjm8t5vsZZ3ixDXotVN1y6UlvHKcsQkZZvuEZVrhRZeSlAhiFIHsi7ME4qBgaV7BFmJAadzddUrXPZMiMQc827n6Uti4iFiVgYW9Xnoh9dQTSB/4agR/fEhI7cjYi1Q9m6BrMuG14ns9EzJkcx0p6A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DmuUdoMkzkzdkZwOzixlqJtO5WAMXcENvqxEl/g6Z7k=;
- b=KPGQJgm+TIwEeUYAXwsvCTuEw6Pbqy87fF743xipEFKkTCyNwq6DsKEK1xNSsFzS7z//Og4bn7rO42/rYJl0uTNF/VfCtf/DEH9lUbGyBpcG9RGIYRnAn+JiO0dtPP/x5Mj+2vfkpnQkWjdY9ZvanexBz7hcrdAUEAsNJcXyxXlMo/0pbE4WS/zGzPWoBXPCMrBHFPLLQE+DyPn+reauMpAG/WGLCt8TkG30h0uWAlTgMOet0vVlTcnIgAFcC2615bfFAjDV9bY9QQVsILm3mJaTodLlDKPvd5SJ8oqJf4VlsYw3LzbcfvaEccsS5C2A7Fjie5YrT4/HeA96eVKlSg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by BN9PR12MB5354.namprd12.prod.outlook.com (2603:10b6:408:103::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.17; Wed, 8 Mar
- 2023 15:08:19 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::ef6d:fdf6:352f:efd1]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::ef6d:fdf6:352f:efd1%3]) with mapi id 15.20.6178.017; Wed, 8 Mar 2023
- 15:08:19 +0000
-Date:   Wed, 8 Mar 2023 11:08:16 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Hao, Xudong" <xudong.hao@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>
-Subject: Re: [PATCH v5 09/19] vfio/pci: Allow passing zero-length fd array in
- VFIO_DEVICE_PCI_HOT_RESET
-Message-ID: <ZAik4NxbNAuJrvSi@nvidia.com>
-References: <BN9PR11MB527688810514A262471E4BB78CB29@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZACX+Np/IY7ygqL5@nvidia.com>
- <DS0PR11MB7529531834C0A9F1D294A5CCC3B29@DS0PR11MB7529.namprd11.prod.outlook.com>
- <BN9PR11MB5276B825071A4819479079A68CB39@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20230303095542.2bfce5c2.alex.williamson@redhat.com>
- <ZAXny4NDDq42NUxE@nvidia.com>
- <BN9PR11MB52760ABC93BCE7FB53A131038CB79@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZAcvzvhkt9QhCmdi@nvidia.com>
- <DS0PR11MB7529A864CB1C149CF8B19E78C3B79@DS0PR11MB7529.namprd11.prod.outlook.com>
- <BN9PR11MB527616204417D92A1BEB5FDA8CB49@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB527616204417D92A1BEB5FDA8CB49@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: BY3PR03CA0004.namprd03.prod.outlook.com
- (2603:10b6:a03:39a::9) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S232107AbjCHPTq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Mar 2023 10:19:46 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D7D993128
+        for <kvm@vger.kernel.org>; Wed,  8 Mar 2023 07:19:39 -0800 (PST)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 328DMXe9018844
+        for <kvm@vger.kernel.org>; Wed, 8 Mar 2023 15:19:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=kKA0wVdGslcDrfgLS9hLAImmqYm0AfMKN2yGYx4RDz8=;
+ b=FPcX2YBVrZ5t3oZ886JQk40ajIrpK/1FfK+QqLGOl/j2k1rcWSy/HZoQUGK9FX5PeACl
+ xvlNaDGMbnMOkOPmN6cus4i66OeGXZMXQqnBRXEnsJYfYy/r5YR+e3QA94HGvQF6hfvG
+ 9+gssuDk4CY2dG9QlUnTpvskNYhbfVqbiCYvaxAfUCyjxRnvBFgac0JUL0aJDmXl1PPt
+ rlKI5QZj12IK2KZJlU3GklOk08XUXxTMOp634NU6qLY/qH1sfdh3rstdW3Xqoy9pl9gu
+ Q96CGS64l9j59FaYSGIvCErInGd0ELcnz+/Of80Jwqzli9AENpBEv627ogllxFpuuDjf AA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p6ry3ef1s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 08 Mar 2023 15:19:38 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 328ELW4w008630
+        for <kvm@vger.kernel.org>; Wed, 8 Mar 2023 15:19:38 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p6ry3ef0x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 08 Mar 2023 15:19:38 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3280bbbP032279;
+        Wed, 8 Mar 2023 15:19:35 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3p6g038r0d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 08 Mar 2023 15:19:35 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 328FJWrt28574416
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 8 Mar 2023 15:19:32 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 585F620049;
+        Wed,  8 Mar 2023 15:19:32 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DA5FA20040;
+        Wed,  8 Mar 2023 15:19:31 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.179.29.172])
+        by smtpav05.fra02v.mail.ibm.com (Postfix) with SMTP;
+        Wed,  8 Mar 2023 15:19:31 +0000 (GMT)
+Date:   Wed, 8 Mar 2023 16:12:28 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Marc Hartmayer <mhartmay@linux.ibm.com>
+Cc:     <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        Nico Boehr <nrb@linux.ibm.com>, Thomas Huth <thuth@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v3 6/7] s390x: define a macro for the
+ stack frame size
+Message-ID: <20230308161228.3d4b89bb@p-imbrenda>
+In-Reply-To: <20230307091051.13945-7-mhartmay@linux.ibm.com>
+References: <20230307091051.13945-1-mhartmay@linux.ibm.com>
+        <20230307091051.13945-7-mhartmay@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BN9PR12MB5354:EE_
-X-MS-Office365-Filtering-Correlation-Id: b22529be-3158-45ad-5704-08db1fe6f383
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 1aturlci3FLz2ISKhJtvtJ7VazkcqHw/puOWGCChrTLQIGiJNnDNq73X+guQegrWHXv3wHqJb3ZCtJ64ml/SlC/ixOS3ydE+kmzrFVFh3IgLNqnj6LdkgnomD7Ilt0WQA7V+OChRdeU+u2YbXS5YI8JQTaAC7SK0rPEqHkvTOJ4mG6Xe7QTAPyry6ACs+zeHTlMHDN2NbYwG+K5jIHXwSffXav0Ld4OAqRHV/dtykc2njB1tPID053nr8KlV46bwQRQPb/1BhUuSxLHqcU1zlZ1vKF9k6TcPF+h0oaKj9dFNTABtS7BBbGtgGOwnnS6aOzr3M2JFVCl56sd0g9IknMw+ih+pWU92xtKGJkdrZPqudJf/9F2xB4vVDk2DIZLKVBWxwrFgyG8IYQkfNJjsOTSvNaAd04aOZW3q7OdOLu7do34a4oZJkV2JkF97fiBXCTi5lzFKriCM8mrsUO9SUKNr0uLCi6gWYONOdXj4skjKBu/I8l1L7/2OUXktciDAV4UwDaHH0u7PUegsaZ8x2CqrKIFJugE98PzJFbeR49NIYJF9reZGyWcg2EIjaKvx0i8gCRF9KAXugYsYBDCan+loVaY4scLV95q+khkKqDDI8eEjHJrp5wFiryLPAEK0v4RziBbexN+uuEuEzBChpQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(39860400002)(366004)(346002)(396003)(376002)(136003)(451199018)(316002)(6666004)(4326008)(6916009)(66556008)(8676002)(66946007)(66476007)(6486002)(478600001)(54906003)(83380400001)(36756003)(2906002)(4744005)(186003)(38100700002)(2616005)(26005)(6512007)(6506007)(5660300002)(8936002)(7416002)(86362001)(41300700001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?wDRu1thMJHcXzOS0pLEqp5hKi/2n7rtUPPWUpNkdJ5NPKfD2BFaTX2b11J2k?=
- =?us-ascii?Q?PqZsz12uxXF7dtYW7B3jzyXoSwP+NoZtIoWugk0SHDkj02gma7CcrF07Fm4s?=
- =?us-ascii?Q?k6LiSVAB3tpgsPu+zsLG4SoZpStUhjklZIP2M8IvYUgNGluyLRQvwTWOnvKq?=
- =?us-ascii?Q?nzsnS0ZekYj0sLW2IGjveqfO1NeXJRuDOuBp69dXqSfPFACKoKPEpdhwkBMW?=
- =?us-ascii?Q?5nk8l0LrMZ0CcetG+l0GB1Jv9sn1uEzZKrXBQN4ZuntVDeHZ6Jdk5TUpEppz?=
- =?us-ascii?Q?BEcUpd7iI411GWgNvqoWg0s4vifLTYy6aO3i05IiYw8nGSisjzFroutgYnsP?=
- =?us-ascii?Q?05g5R33EruZHQaozJw+5MrGL+NvDqB3SIKoGQ7ivVi0fAAhvff1xbDlVLb1a?=
- =?us-ascii?Q?xcj9S0PIubove16aGfMGsm5Ogdk6MVkw2T+WwTv2z38oFRIrzpjj3XBnpDBI?=
- =?us-ascii?Q?A6rKPwemdJzyVwXpK/KRkteQtFkbdMc/UAaCm6Zi+0WkcFJk/PkdrAn0r7Mg?=
- =?us-ascii?Q?D3S6y4V/HVAqwpjmhzmovZr9YhD1C3DymykO5fbqPhoOfF88EOFI4+h4YOVs?=
- =?us-ascii?Q?uE6G8M9wWsuOoJw+GcoqvadLsqsns08cKxuE7Dt/PGDqs+SvM0kVai9B9JEY?=
- =?us-ascii?Q?jy19RgXcPjOwsO6cNonm66wlMQ6JP3zqNNnkEVMBsTkbL+E2vH8ctvBqzRn8?=
- =?us-ascii?Q?uzMUv1Z3Peb1sQWm9bEb4eMjPc+bVzRn0WXfbhrTUOEIzDdB97N1lE2mEsfz?=
- =?us-ascii?Q?sK/YTp1oLyUIFNA0bkzfCi2+j0I4OofWTHIbfCybpTFbJECc5hxIJED/GVN8?=
- =?us-ascii?Q?PMffzK0M6jQPDZrNl5aqabSaaVdP38pwF3WsGvl8gvyxdQWgny4/7f/Bgk4X?=
- =?us-ascii?Q?otNnPyYlijMlKnV7HEqEvwiyH45QVa7MTnxxveXPdwOHDSipBBd0e7PbA03K?=
- =?us-ascii?Q?R+5L3jFHY6VTdp/H8shiHOR3Qu8jmVIpLl65wr0mKSmQTzCW3SP5k8xcXTxl?=
- =?us-ascii?Q?kTu6KkZuXD4zLPAVcPAMNWExPKjWjrh2yVK+AEuj0NWuxtBFDQgEW2KwppVz?=
- =?us-ascii?Q?/vexHtCaBNBdSCiDLXd4726EaziKhKvVkx8DJBLTNyEumAAcJ4Xp/RGXIJ4L?=
- =?us-ascii?Q?EIxVeFjTQ2uSo2Q6XOCgqfFb0bggSBEnUdwvfpYvAJT4o4DsdXBotTVjZvz3?=
- =?us-ascii?Q?dMHA7bqe1+8q68Zgzfyg2nlQOBVHEpMG97bocvsyPDO5NZcy/sCg0hbO7Fvo?=
- =?us-ascii?Q?nq32zvJSIh3MWgCuRmJMc7D7ix+FmisP4RwCF34y133XMlci7ks7UNJnp79y?=
- =?us-ascii?Q?mmV9VZ+zJhFC5s4FGkAPRN6KhOBZlI/N89tBzYdaE2V+qetlpKrs8sAXmh48?=
- =?us-ascii?Q?+hOZibBEVEo0e3SA0F3jmwP49LWzhdJM1UuQo86O0XdkpAjztzpXgfgQVdAh?=
- =?us-ascii?Q?s25mF1hTfpVHgRepKEM+I5abVsYdTRB1xV6/dmIB7TsdNj6byhOxIhTLJnzq?=
- =?us-ascii?Q?6kxxPppgXsTNJkxYP8fR9ECpKoz1TCVcXlWo88k94FLziV6oVdQOgx8i6XxE?=
- =?us-ascii?Q?eTlBfPKJNgAdTUquxxRIOWWVcLu42101OKyI78gw?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b22529be-3158-45ad-5704-08db1fe6f383
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Mar 2023 15:08:19.3478
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: i49rYkwq5jGeGY92vAoE+x7msCIFF3c8uC/eNPq3ZhPueWpV0HVzfjpDzKNzHo/K
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5354
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: RY8Ng6k_OkfNY6gcmVQX1efuTP2YCyfC
+X-Proofpoint-ORIG-GUID: op2n-PYmDB7aHm42cVPk_RY6SuqjSrDf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-08_08,2023-03-08_03,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 impostorscore=0
+ mlxlogscore=999 priorityscore=1501 lowpriorityscore=0 spamscore=0
+ bulkscore=0 malwarescore=0 phishscore=0 suspectscore=0 clxscore=1015
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2303080129
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 08, 2023 at 07:26:08AM +0000, Tian, Kevin wrote:
->  * Userspace requests hot reset for the devices it uses.  Due to the
->  * underlying topology, multiple devices can be affected in the reset
->  * while some might be opened by another user. To avoid interference
->  * the calling user must ensure all affected devices, if opened, are
->  * owned by itself.
->  *
->  * The ownership can be proved in three ways:
->  *   - An array of group fds
->  *   - An array of device fds
->  *   - A zero-length array
->  *
->  * In the last case all affected devices which are opened by this user must
->  * have been bound to a same iommufd_ctx.
+On Tue,  7 Mar 2023 10:10:50 +0100
+Marc Hartmayer <mhartmay@linux.ibm.com> wrote:
+
+> Define and use a macro for the stack frame size. While at it, fix
+> whitespace in the `gs_handler_asm` block.
 > 
-> and with this change let's rename 'group_fds'  to 'fds'
+> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+> Co-developed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 
-Looks right
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-Jason
+> ---
+>  lib/s390x/asm-offsets.c     |  1 +
+>  s390x/Makefile              |  2 +-
+>  s390x/cstart64.S            |  2 +-
+>  s390x/flat.lds.S            |  4 +++-
+>  s390x/gs.c                  | 38 +++++++++++++++++++++----------------
+>  s390x/macros.S              |  4 ++--
+>  s390x/snippets/c/flat.lds.S |  6 ++++--
+>  7 files changed, 34 insertions(+), 23 deletions(-)
+> 
+> diff --git a/lib/s390x/asm-offsets.c b/lib/s390x/asm-offsets.c
+> index f612f3277a95..188dd2e51181 100644
+> --- a/lib/s390x/asm-offsets.c
+> +++ b/lib/s390x/asm-offsets.c
+> @@ -87,6 +87,7 @@ int main(void)
+>  	OFFSET(STACK_FRAME_INT_GRS0, stack_frame_int, grs0);
+>  	OFFSET(STACK_FRAME_INT_GRS1, stack_frame_int, grs1);
+>  	DEFINE(STACK_FRAME_INT_SIZE, sizeof(struct stack_frame_int));
+> +	DEFINE(STACK_FRAME_SIZE, sizeof(struct stack_frame));
+>  
+>  	return 0;
+>  }
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index e13a04eecb3e..fc8201f7762b 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -160,7 +160,7 @@ $(SNIPPET_DIR)/c/%.gbin: $(SNIPPET_DIR)/c/%.o $(snippet_lib) $(FLATLIBS) $(SNIPP
+>  	$(OBJCOPY) -I binary -O elf64-s390 -B "s390:64-bit" $< $@
+>  
+>  lds-autodepend-flags = -MMD -MF $(dir $*).$(notdir $*).d -MT $@
+> -%.lds: %.lds.S
+> +%.lds: %.lds.S $(asm-offsets)
+>  	$(CPP) $(lds-autodepend-flags) $(CPPFLAGS) -P -C -o $@ $<
+>  
+>  .SECONDEXPANSION:
+> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
+> index 6f83da2a6c0a..468ace3ea4df 100644
+> --- a/s390x/cstart64.S
+> +++ b/s390x/cstart64.S
+> @@ -38,7 +38,7 @@ start:
+>  	/* setup stack */
+>  	larl	%r15, stackptr
+>  	/* Clear first stack frame */
+> -	xc      0(160,%r15), 0(%r15)
+> +	xc      0(STACK_FRAME_SIZE,%r15), 0(%r15)
+>  	/* setup initial PSW mask + control registers*/
+>  	larl	%r1, initial_psw
+>  	lpswe	0(%r1)
+> diff --git a/s390x/flat.lds.S b/s390x/flat.lds.S
+> index 952f6cd457ed..0cb7e383cc76 100644
+> --- a/s390x/flat.lds.S
+> +++ b/s390x/flat.lds.S
+> @@ -1,3 +1,5 @@
+> +#include <asm/asm-offsets.h>
+> +
+>  SECTIONS
+>  {
+>  	.lowcore : {
+> @@ -44,6 +46,6 @@ SECTIONS
+>  	/*
+>  	 * stackptr set with initial stack frame preallocated
+>  	 */
+> -	stackptr = . - 160;
+> +	stackptr = . - STACK_FRAME_SIZE;
+>  	stacktop = .;
+>  }
+> diff --git a/s390x/gs.c b/s390x/gs.c
+> index 4993eb8f43a9..9ae893eaf89a 100644
+> --- a/s390x/gs.c
+> +++ b/s390x/gs.c
+> @@ -9,6 +9,7 @@
+>   *    Janosch Frank <frankja@linux.ibm.com>
+>   */
+>  #include <libcflat.h>
+> +#include <asm/asm-offsets.h>
+>  #include <asm/page.h>
+>  #include <asm/facility.h>
+>  #include <asm/interrupt.h>
+> @@ -35,22 +36,27 @@ static inline unsigned long load_guarded(unsigned long *p)
+>  
+>  /* guarded-storage event handler and finally it calls gs_handler */
+>  extern void gs_handler_asm(void);
+> -	asm(".globl gs_handler_asm\n"
+> -	    "gs_handler_asm:\n"
+> -	    "	    lgr	    %r14,%r15\n" 		/* Save current stack address in r14 */
+> -	    "	    aghi    %r15,-320\n" 		/* Allocate stack frame */
+> -	    "	    stmg    %r0,%r13,192(%r15)\n" 	/* Store regs to save area */
+> -	    "	    stg	    %r14,312(%r15)\n"
+> -	    "	    la	    %r2,160(%r15)\n" 		/* Store gscb address in this_cb */
+> -	    "	    .insn   rxy,0xe30000000049,0,160(%r15)\n" /* stgsc */
+> -	    "	    lg	    %r14,24(%r2)\n" 		/* Get GSEPLA from GSCB*/
+> -	    "	    lg	    %r14,40(%r14)\n" 		/* Get GSERA from GSEPL*/
+> -	    "	    stg	    %r14,304(%r15)\n" 		/* Store GSERA in r14 of reg save area */
+> -	    "	    brasl   %r14,gs_handler\n" 		/* Jump to gs_handler */
+> -	    "	    lmg	    %r0,%r15,192(%r15)\n" 	/* Restore regs */
+> -	    "	    aghi    %r14, 6\n" 			/* Add lgg instr len to GSERA */
+> -	    "	    br	    %r14\n" 			/* Jump to next instruction after lgg */
+> -	    "	    .size gs_handler_asm,.-gs_handler_asm\n");
+> +	asm (          ".macro	STGSC	args:vararg\n"
+> +		"	.insn	rxy,0xe30000000049,\\args\n"
+> +		"	.endm\n"
+> +		"	.globl	gs_handler_asm\n"
+> +		"gs_handler_asm:\n"
+> +		"	lgr	%r14,%r15\n"				/* Save current stack address in r14 */
+> +		".Lgs_handler_frame = 16*8+32+" xstr(STACK_FRAME_SIZE) "\n"
+> +		"	aghi	%r15,-(.Lgs_handler_frame)\n"		/* Allocate stack frame */
+> +		"	stmg	%r0,%r13,192(%r15)\n"			/* Store regs to save area */
+> +		"	stg	%r14,312(%r15)\n"
+> +		"	la	%r2," xstr(STACK_FRAME_SIZE) "(%r15)\n"	/* Store gscb address in this_cb */
+> +		"	STGSC	%r0," xstr(STACK_FRAME_SIZE) "(%r15)\n"
+> +		"	lg	%r14,24(%r2)\n"				/* Get GSEPLA from GSCB*/
+> +		"	lg	%r14,40(%r14)\n"			/* Get GSERA from GSEPL*/
+> +		"	stg	%r14,304(%r15)\n"			/* Store GSERA in r14 of reg save area */
+> +		"	brasl	%r14,gs_handler\n"			/* Jump to gs_handler */
+> +		"	lmg	%r0,%r15,192(%r15)\n"			/* Restore regs */
+> +		"	aghi	%r14, 6\n"				/* Add lgg instr len to GSERA */
+> +		"	br	%r14\n"					/* Jump to next instruction after lgg */
+> +		".size gs_handler_asm,.-gs_handler_asm\n"
+> +	);
+>  
+>  void gs_handler(struct gs_cb *this_cb)
+>  {
+> diff --git a/s390x/macros.S b/s390x/macros.S
+> index 13cff299488f..e2a56a366c70 100644
+> --- a/s390x/macros.S
+> +++ b/s390x/macros.S
+> @@ -21,14 +21,14 @@
+>  	/* Save the stack address in GR2 which is the first function argument */
+>  	lgr     %r2, %r15
+>  	/* Allocate stack space for called C function, as specified in s390 ELF ABI */
+> -	slgfi   %r15, 160
+> +	slgfi   %r15, STACK_FRAME_SIZE
+>  	/*
+>  	 * Save the address of the interrupt stack into the back chain
+>  	 * of the called function.
+>  	 */
+>  	stg     %r2, STACK_FRAME_INT_BACKCHAIN(%r15)
+>  	brasl	%r14, \c_func
+> -	algfi   %r15, 160
+> +	algfi   %r15, STACK_FRAME_SIZE
+>  	RESTORE_REGS_STACK
+>  	lpswe	\old_psw
+>  	.endm
+> diff --git a/s390x/snippets/c/flat.lds.S b/s390x/snippets/c/flat.lds.S
+> index 9e5eb66bec23..468b5f1eebe8 100644
+> --- a/s390x/snippets/c/flat.lds.S
+> +++ b/s390x/snippets/c/flat.lds.S
+> @@ -1,3 +1,5 @@
+> +#include <asm/asm-offsets.h>
+> +
+>  SECTIONS
+>  {
+>  	.lowcore : {
+> @@ -18,9 +20,9 @@ SECTIONS
+>  	. = 0x4000;
+>  	/*
+>  	 * The stack grows down from 0x4000 to 0x2000, we pre-allocoate
+> -	 * a frame via the -160.
+> +	 * a frame via the -STACK_FRAME_SIZE.
+>  	 */
+> -	stackptr = . - 160;
+> +	stackptr = . - STACK_FRAME_SIZE;
+>  	stacktop = .;
+>  	/* Start text 0x4000 */
+>  	.text : {
+
