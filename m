@@ -2,71 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 244136B11EA
-	for <lists+kvm@lfdr.de>; Wed,  8 Mar 2023 20:20:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 95AA46B1268
+	for <lists+kvm@lfdr.de>; Wed,  8 Mar 2023 20:47:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230171AbjCHTUi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Mar 2023 14:20:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40024 "EHLO
+        id S230130AbjCHTr4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Mar 2023 14:47:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230116AbjCHTUe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Mar 2023 14:20:34 -0500
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E547FCB057
-        for <kvm@vger.kernel.org>; Wed,  8 Mar 2023 11:20:29 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-536c02ed619so179403687b3.8
-        for <kvm@vger.kernel.org>; Wed, 08 Mar 2023 11:20:29 -0800 (PST)
+        with ESMTP id S230183AbjCHTrc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Mar 2023 14:47:32 -0500
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25020D23BF
+        for <kvm@vger.kernel.org>; Wed,  8 Mar 2023 11:47:04 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id x10-20020a170902ea8a00b0019cdb7d7f91so9861690plb.4
+        for <kvm@vger.kernel.org>; Wed, 08 Mar 2023 11:47:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678303229;
+        d=google.com; s=20210112; t=1678304799;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=sXztXyvrvN9bsakbPlodS5GFLpkk++yypcbAWFMSHmY=;
-        b=p8FeuFkAu3sszD5MFXuoYTac3YpRSaOdjg3pD9dnMlJ3DlQ4pasDn5FQFWks3+M8zc
-         H7fNbl88cgGbcYqrVBsH2ZkYQ6okotRXciGWra8YMOw1ssL4XEO+CHzFZ3nWwWqNYKLq
-         DIBR0q10OXZCUIfMkyi11/dFqwLlhaLjlLpn0yJWZDOA5v1UnLt2yZoC0Q3N6sWns1Vz
-         cgMRilljVCp4kmAsSRdmwkFZjvCV42m+Z8GIwP6DDirdJ2OdHS6At1eEf+5mrHetOvSX
-         3tK5eCn7ObP6jxwvuhoOXo74MHsCSINzUeSIdQyid3FMolBWYaKz28st3vp9wIxpvq0F
-         dDfg==
+        bh=8K+skstIorBf4DO4xiKvTjFg8B1guHfyomv2cSoRlkU=;
+        b=oscWZyVIKuD+5RN/CYMNwzMIZRLVDkku3qenfsQklmPOETHDtIdc1HtIwUHIZhvNs4
+         4AhSIzg9/KYMps9YAxzd4/K479WPdDZ2cct89YxB13X70dp9Hx2SVrC6Hw3gcvMNYKOD
+         lx6Yo1IbkjZorpNEAhs/1YwbbEK0ZnP+qwNQcAGJ5TD5sjpY1oR9t/VAfHTB1Oj8AQVc
+         IjtnWHCsZvBruZaKWuYjMdxmelLbl+hWLHRflroo0mEsX6nKF7CD0hyKbHfxuNIpueqT
+         rFE6YjRv1hsThI05exIfK5ifiSQjo4qQ+cJX4Ru0Hddox6g7T/fB0CySPV6lSO2iOfmu
+         fcJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678303229;
+        d=1e100.net; s=20210112; t=1678304799;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=sXztXyvrvN9bsakbPlodS5GFLpkk++yypcbAWFMSHmY=;
-        b=0urjqOYUU9EMMNfxYe6TSeZNfSKwhHZzpKcsdvV4gcTVjN28XMlgZYTKObSD2J4LBT
-         7oQPOjbQolZR8EjgtDVz5w+158stJlZUnft9QGpuducQ12U8Ax63M1eq0OkuDSg8QfGd
-         fFx/8U4XLOgZrA5RHBQXBeKfOAO0yEuTfIx/ZUiRCY2mZHDoG2mpcWUd7S5SYWRvJTg8
-         JUSxBQY1QoiAvqFDqdboaBn3W9tI34IYgwxC9vs5v8J4JnXYwx2tLDe7OIZVS9Eyuj0E
-         8o1zA6olSbtEbfO2pica9kgm6FEzLT1l5UcUVfE6qYzTOM8A59kRo52xje/V8blfkMaN
-         6KfQ==
-X-Gm-Message-State: AO0yUKUsgPOOZ0t+iRSy80p8qKfSWdhfYdV8s+4HsqOoiQCL4/Aifbm7
-        hagGQ7kGb1Hz8HyB7jIDFO/8h17uy5s=
-X-Google-Smtp-Source: AK7set+932HDdiP+gklWVGvRUySVpn3/TrBoNZcPqjk1lCBt9IoujaL82YBg5Exc/4XVOLmvfAyJCzdF85g=
+        bh=8K+skstIorBf4DO4xiKvTjFg8B1guHfyomv2cSoRlkU=;
+        b=nupsV1F055hzuanYjye8qqrx/MMXIgrYKLbH2KZiM+AtRH0OMDn7TcflRZ5Lj8bdpM
+         X6sZZmWX+1UGC5+++vdm78/i5I5lzXmWSRCClxuEnxMYSkAvXuvtMbel9v+R+bGLW9K2
+         S/+r2m4NB1QxI9iR6aroBEfPdx73rIKfxF+5NqqyIQgCs69X8oGGOOr6FWaGjGUQUSt9
+         Tc0uaiEi0faFmO6VoDKC7v6ks1VUy9nLHVgluajqH/s03rnRsfsMixWMFr3lHLUFEYJe
+         4cwbZ2oEttLShE95tTwDM4xihp9K0jYaSbtDd5+kewvENpQ9rLYuQ9uAJozVi3sjq4OO
+         AYaQ==
+X-Gm-Message-State: AO0yUKWBqXnDmPbo7t+G3Xf9JON+A6mpUoZqkLhEXO8ZF2kGt7iRn4P3
+        wo2Hdhmp9WALaln3GfiTHC8T2VIbHqc=
+X-Google-Smtp-Source: AK7set/V5smxoJB3Uf+v02cnHqPtoI8uSrm7wsi5KeYdHlf3zS7j38lBDNPFF3dK/Og9SWFRvxn78SKancI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:208:b0:9fe:195a:ce0d with SMTP id
- j8-20020a056902020800b009fe195ace0dmr9258740ybs.10.1678303229120; Wed, 08 Mar
- 2023 11:20:29 -0800 (PST)
-Date:   Wed, 8 Mar 2023 11:20:27 -0800
-In-Reply-To: <c940389f-c086-9d0e-7150-f57b3866ae82@linux.microsoft.com>
+ (user=seanjc job=sendgmr) by 2002:a17:90a:9512:b0:237:50b6:9a09 with SMTP id
+ t18-20020a17090a951200b0023750b69a09mr7273568pjo.0.1678304798958; Wed, 08 Mar
+ 2023 11:46:38 -0800 (PST)
+Date:   Wed, 8 Mar 2023 11:46:37 -0800
+In-Reply-To: <741d411a-c5a2-71ae-fba9-52cdebb88cfd@gmail.com>
 Mime-Version: 1.0
-References: <20230227171751.1211786-1-jpiotrowski@linux.microsoft.com>
- <ZAd2MRNLw1JAXmOf@google.com> <CABgObfa1578yKuw3sqnCeLXpyyKmMPgNaftP9HCdgHNM9Tztjw@mail.gmail.com>
- <ZAfZPA5Ed7STUT2B@google.com> <fb088e26-8c9c-bcac-6083-5945d2d9c16e@linux.microsoft.com>
- <c940389f-c086-9d0e-7150-f57b3866ae82@linux.microsoft.com>
-Message-ID: <ZAjf+8D5/HhZxGyR@google.com>
-Subject: Re: [PATCH] KVM: SVM: Disable TDP MMU when running on Hyper-V
+References: <20230307141400.1486314-1-aaronlewis@google.com>
+ <20230307141400.1486314-2-aaronlewis@google.com> <1c7a20c4-742c-9c42-970e-19626323e367@gmail.com>
+ <CAAAPnDFuEhhv+3orZ0EGMq4kAm3_p335kRAMOf=ZcLi_pcnPKQ@mail.gmail.com>
+ <ZAdfX+S323JVWNZC@google.com> <741d411a-c5a2-71ae-fba9-52cdebb88cfd@gmail.com>
+Message-ID: <ZAjmHbG9h+gut0bs@google.com>
+Subject: Re: [PATCH v3 1/5] KVM: x86/pmu: Prevent the PMU from counting
+ disallowed events
 From:   Sean Christopherson <seanjc@google.com>
-To:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Tianyu Lan <ltykernel@gmail.com>,
-        Michael Kelley <mikelley@microsoft.com>
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Aaron Lewis <aaronlewis@google.com>, pbonzini@redhat.com,
+        jmattson@google.com, kvm@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,116 +73,113 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 08, 2023, Jeremi Piotrowski wrote:
-> On 08/03/2023 16:55, Jeremi Piotrowski wrote:
+On Wed, Mar 08, 2023, Like Xu wrote:
+> On 8/3/2023 12:01 am, Sean Christopherson wrote:
+> > On Tue, Mar 07, 2023, Aaron Lewis wrote:
+> > > On Tue, Mar 7, 2023 at 7:19=E2=80=AFAM Like Xu <like.xu.linux@gmail.c=
+om> wrote:
+> > > > > ---
+> > > > >    arch/x86/kvm/pmu.c | 13 ++++++++-----
+> > > > >    1 file changed, 8 insertions(+), 5 deletions(-)
+> > > > >=20
+> > > > > diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> > > > > index 612e6c70ce2e..9914a9027c60 100644
+> > > > > --- a/arch/x86/kvm/pmu.c
+> > > > > +++ b/arch/x86/kvm/pmu.c
+> > > > > @@ -400,6 +400,12 @@ static bool check_pmu_event_filter(struct kv=
+m_pmc *pmc)
+> > > > >        return is_fixed_event_allowed(filter, pmc->idx);
+> > > > >    }
+> > > > >=20
+> > > > > +static bool event_is_allowed(struct kvm_pmc *pmc)
+> > > >=20
+> > > > Nit, an inline event_is_allowed() here might be better.
+> > >=20
+> > > I purposely didn't inline this because Sean generally discourages its
+> > > use and has commented in several reviews to not use 'inline' and
+> > > instead leave it up to the compiler to decide, unless using
+> > > __always_inline.
 > >=20
-> >=20
-> > On 08/03/2023 01:39, Sean Christopherson wrote:
-> >> On Wed, Mar 08, 2023, Paolo Bonzini wrote:
-> >>> On Tue, Mar 7, 2023 at 6:36=E2=80=AFPM Sean Christopherson <seanjc@go=
-ogle.com> wrote:
-> >>>> Thinking about this more, I would rather revert commit 1e0c7d40758b =
-("KVM: SVM:
-> >>>> hyper-v: Remote TLB flush for SVM") or fix the thing properly strait=
-away.  KVM
-> >>>> doesn't magically handle the flushes correctly for the shadow/legacy=
- MMU, KVM just
-> >>>> happens to get lucky and not run afoul of the underlying bugs.
-> >>>
-> >>> I don't think it's about luck---the legacy MMU's zapping/invalidation
-> >>> seems to invoke the flush hypercall correctly:
-> >>
-> >> ...for the paths that Jeremi has exercised, and for which a stale TLB =
-entry is
-> >> fatal to L2.  E.g. kvm_unmap_gfn_range() does not have a range-based T=
-LB flush
-> >> in its path and fully relies on the buggy kvm_flush_remote_tlbs().
-> >>
-> >=20
-> > Why do you say "buggy kvm_flush_remote_tlbs"? kvm_flush_remote_tlbs cal=
-ls the hypercall
-> > that is needed, I don't see how this might be an issue of a missing "ra=
-nge-based TLB flush".
-> >=20
-> > kvm_unmap_gfn_range is called from kvm_mmu_notifier_invalidate_range_st=
-art and 'flush_on_ret=3Dtrue'
-> > is set, so it is followed by kvm_flush_remote_tlbs which calls hv_remot=
-e_flush_tlb.
-> >=20
-> >> In other words, KVM is getting lucky :-)
-> >>
-> >>> Jeremi, did you ever track the call stack where
-> >>> hyperv_nested_flush_guest_mapping is triggered?
-> >>
-> >> I don't think it matters.  As above, it only takes one path where KVM =
-is fully
-> >> relying on kvm_flush_remote_tlbs() for the whole thing to fall apart
+> > Ya.
 >=20
-> Slowly I'm starting to understand what we've been talking about, thank yo=
-u :)
+> I think we all respect mainatiner's personal preferences for sure. Howeve=
+r,
+> I'm not sure how to define Sean's "generally discourage", nor does my
+> binary bi-directional verifier-bot (losing control of these details at th=
+e code
+> level can be frustrating, especially for people who care about performanc=
+e
+> gains but can't use the fresh new tool chain for some supply chain policy
+> reasons),
+
+I'm not buying that argument.  Modern compilers are much smarter than human=
+s when
+it comes to performance optimizations and will do the right thing 99% of th=
+e time.
+There are exceptions, e.g. coercing the compiler into generating arithmetic=
+ instead
+of conditional branches, but those are few and far between.
+
+If you care about performance to the point where a CALL+RET (which is not a=
+t all
+expensive on modern CPUs) and _maybe_ a few arithmetic ops are concerning, =
+_and_
+your toolchain is so awful that I can't do a good job of optimizing straigh=
+tforward
+code like this, then you have much bigger problems.
+
+If someone can provide data to show that forcing a particularly function to=
+ be
+inlined meaningful changes runtime performance, then I'll happily take a pa=
+tch.
+
+> and we don't have someone like Sean or other kernel worlds to eliminate a=
+ll
+> inline in the kernel world.
+
+Huh?  I'm not saying "inline is bad", I'm saying modern compilers are plent=
+y smart
+enough to inline (or not) when appropriate in the overwhelming majority of =
+cases,
+and that outside of select edge cases and truly performance critical paths,=
+ the
+days when humans can handcode better code than the compiler are long gone. =
+ For
+functions that should result in literally one or two instructions, I'm fine=
+ with
+tagging them inline even though I think it's unnecessary.  But this propose=
+d
+helper is not that case.
+
+> > > I think the sentiment is either use the strong hint or don't use it a=
+t all.
+> > > This seems like an example of where the compiler can decide, and a st=
+rong
+> > > hint isn't needed.
+> >=20
+> > Not quite.  __always_inline is not a hint, it's a command.  The kernel =
+*requires*
+> > functions tagged with __always_inline to be (surprise!) always inlined,=
+ even when
+> > building with features that cause the compiler to generate non-inlined =
+functions
+> > for even the most trivial helpers, e.g. KASAN can cause a literal nop f=
+unction to
+> > be non-inlined.  __alway_inlined is used to ensure like no-instrumentat=
+ion regions
+> > and __init sections are preserved when invoking common helpers.
 >=20
-> Paolo/Sean, what do you think about smth like the following, except I wou=
-ld make
-> it SVM only, and I'd need to think about what to do with the return.
-> I believe this accurately reflects what the optimization is about. hv_tra=
-ck_root_tdp
-> is called from kvm_mmu_load_pgd, which covers both kvm_mmu_load and kvm_m=
-mu_new_pgd
-> (which requests KVM_REQ_LOAD_MMU_PGD).
+> So, do you think "__always_inline event_is_allowed()" in the highly recur=
+ring
+> path reprogram_counter() is a better move ? I'd say yes, and am not willi=
+ng
+> to risk paying for a function call overhead since any advancement in this
+> direction is encouraged.
 
-It's close, but KVM doesn't *always* need to flush when loading a root.  KV=
-M needs
-to flush when loading a brand spanking new root, which is the kvm_mmu_load(=
-) path.
-But when KVM loads a root via KVM_REQ_LOAD_MMU_PGD/kvm_mmu_new_pgd(), a flu=
-sh may
-or may not be necessary, e.g. if KVM reuses an old, but still valid, root (=
-each
-vCPU has a 3-entry root cache) and a TLB flush isn't architecturally requir=
-ed, then
-there is no need to flush.
-
-And as mentioned in the other tendril of this thread, I'd really like to fi=
-x
-svm_flush_tlb_current() since it's technically broken, even though it's hig=
-hly
-unlikely (maybe even impossible?) to cause issues in practice.
-
-> diff --git a/arch/x86/kvm/kvm_onhyperv.c b/arch/x86/kvm/kvm_onhyperv.c
-> index 482d6639ef88..6a5bd3cbace8 100644
-> --- a/arch/x86/kvm/kvm_onhyperv.c
-> +++ b/arch/x86/kvm/kvm_onhyperv.c
-> @@ -29,6 +29,18 @@ static inline int hv_remote_flush_root_tdp(hpa_t root_=
-tdp,
->  		return hyperv_flush_guest_mapping(root_tdp);
->  }
-> =20
-> +static int hv_vcpu_flush_tlb_current(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_arch *kvm_arch =3D &vcpu->kvm->arch;
-> +	hpa_t root_tdp =3D vcpu->arch.hv_root_tdp;
-> +	int ret;
-> +
-> +	ret =3D hyperv_flush_guest_mapping(root_tdp);
-> +	if (!ret)
-> +		kvm_arch->hv_root_tdp =3D root_tdp;
-> +	return ret;
-> +}
-> +
->  int hv_remote_flush_tlb_with_range(struct kvm *kvm,
->  		struct kvm_tlb_range *range)
->  {
-> @@ -101,8 +113,10 @@ void hv_track_root_tdp(struct kvm_vcpu *vcpu, hpa_t =
-root_tdp)
->  	if (kvm_x86_ops.tlb_remote_flush =3D=3D hv_remote_flush_tlb) {
->  		spin_lock(&kvm_arch->hv_root_tdp_lock);
->  		vcpu->arch.hv_root_tdp =3D root_tdp;
-> -		if (root_tdp !=3D kvm_arch->hv_root_tdp)
-> +		if (root_tdp !=3D kvm_arch->hv_root_tdp) {
->  			kvm_arch->hv_root_tdp =3D INVALID_PAGE;
-> +			hv_vcpu_flush_tlb_current(vcpu);
-> +		}
->  		spin_unlock(&kvm_arch->hv_root_tdp_lock);
->  	}
->  }
->=20
+Absolutely not.  __always_inline is for situations where the code _must_ be=
+ inlined,
+or as above, where someone can prove with data that (a) modern compilers ar=
+en't
+smart enough to do the right thing and (b) that inlining provides meaningfu=
+l
+performance benefits.
