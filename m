@@ -2,251 +2,290 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 328676B0E6D
-	for <lists+kvm@lfdr.de>; Wed,  8 Mar 2023 17:18:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8AB916B0F11
+	for <lists+kvm@lfdr.de>; Wed,  8 Mar 2023 17:43:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229956AbjCHQSj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Mar 2023 11:18:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54636 "EHLO
+        id S229830AbjCHQnD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Mar 2023 11:43:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229817AbjCHQSe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Mar 2023 11:18:34 -0500
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2049.outbound.protection.outlook.com [40.107.220.49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 565A45C9D8;
-        Wed,  8 Mar 2023 08:18:32 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TpTpFNetVpKd6xpNY5wi97fyHb0jYT9CFCWMOI6XG3zWjTNCQnS0BbrDZFF9/2+2Z/1cJCYAI2v1Ha0f/BiMYmRK00hTOh1mwoiW5Ymb56MRdeemLH1WEMImEYzBJVYTxXqObe/b749R5SpczWKqoIxpUqwGAM+SP/yDBgcUU2Sm423JTrxB6TMHrsY3V8rnB55e+6zaKScA7T3vyBEk/TCRfMyXWFauz4JAW1twqId4yas/XW40UlRlDTzi5CosvTibaLZFSZSbxjXbStLkI28lbejeZpLptUD77Lmnqrgq5tEzNpsje7frf123LgSd+dCkyP2MQXQm0rpP+gacVA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=m5KQkv9OMYdoR66YLzSYfcspeil79aV/4IT2zyy2NWU=;
- b=fMWoNffoNx5WjvnIhfMDYlnks/znOBTJbSR56ZtMEmpyruHiZrzBHWcBsn6VTfVixR3L825I2FdxIPE5MfvqRCQJkHIe96m4QHXBM1BFDOKP8WqCFf/X2wFZAQwf6dFtFTa4wIq3lHMYhNqkcLI6OJgXCm1RdN+ikZE3zPPvTD5yVek8Yu8A60bNIMYzvQBzXYwSRemRgSORNyeQCpxyRm6CCONHWntUSZfHm0ZBgYLShUmaSNy36IuAtw4AvZF7+dMwZEyCGpNcZ2Xqc9l0Skof+cQjE/UOMYBE+50P0y7yFdakQY6XnY18AxcGYaNN517GeO1AR/VaduOan2OD9A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=m5KQkv9OMYdoR66YLzSYfcspeil79aV/4IT2zyy2NWU=;
- b=B7GhCKsS9lvqPqe92RoDQX7Q/V/5LS4BidoGgiGhjpWTg2l//zvcVuAJoofDLtOPeOGjG8ZMm6gDoHvQEbUY4Cs4a96rVCG5UGobwsdQzhwFxKl4NJY7iEglPP/tiORs2xsIpZ6O4IKwWSL4WFPZbusapRKmDgtPSUaXvaJfYjo=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB2810.namprd12.prod.outlook.com (2603:10b6:5:41::21) by
- DM4PR12MB7622.namprd12.prod.outlook.com (2603:10b6:8:109::18) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6156.28; Wed, 8 Mar 2023 16:18:28 +0000
-Received: from DM6PR12MB2810.namprd12.prod.outlook.com
- ([fe80::bad5:8f56:fc07:15cf]) by DM6PR12MB2810.namprd12.prod.outlook.com
- ([fe80::bad5:8f56:fc07:15cf%3]) with mapi id 15.20.6156.028; Wed, 8 Mar 2023
- 16:18:28 +0000
-Message-ID: <5061dfee-636c-6b68-8f33-5f32e5bfa093@amd.com>
-Date:   Wed, 8 Mar 2023 17:18:13 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [RFC PATCH V3 13/16] x86/sev: Add Check of #HV event in path
-From:   "Gupta, Pankaj" <pankaj.gupta@amd.com>
-To:     Tianyu Lan <ltykernel@gmail.com>, luto@kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        seanjc@google.com, pbonzini@redhat.com, jgross@suse.com,
-        tiala@microsoft.com, kirill@shutemov.name,
-        jiangshan.ljs@antgroup.com, peterz@infradead.org,
-        ashish.kalra@amd.com, srutherford@google.com,
-        akpm@linux-foundation.org, anshuman.khandual@arm.com,
-        pawan.kumar.gupta@linux.intel.com, adrian.hunter@intel.com,
-        daniel.sneddon@linux.intel.com, alexander.shishkin@linux.intel.com,
-        sandipan.das@amd.com, ray.huang@amd.com, brijesh.singh@amd.com,
-        michael.roth@amd.com, thomas.lendacky@amd.com,
-        venu.busireddy@oracle.com, sterritt@google.com,
-        tony.luck@intel.com, samitolvanen@google.com, fenghua.yu@intel.com
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org
-References: <20230122024607.788454-1-ltykernel@gmail.com>
- <20230122024607.788454-14-ltykernel@gmail.com>
- <e3c53388-f332-5b52-c724-a42d8ea624a7@amd.com>
-Content-Language: en-US
-In-Reply-To: <e3c53388-f332-5b52-c724-a42d8ea624a7@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: FR0P281CA0130.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:97::17) To DM6PR12MB2810.namprd12.prod.outlook.com
- (2603:10b6:5:41::21)
+        with ESMTP id S229844AbjCHQmw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Mar 2023 11:42:52 -0500
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 482CDC808A
+        for <kvm@vger.kernel.org>; Wed,  8 Mar 2023 08:42:51 -0800 (PST)
+Received: by mail-pf1-x432.google.com with SMTP id ce7so10599628pfb.9
+        for <kvm@vger.kernel.org>; Wed, 08 Mar 2023 08:42:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1678293771;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8jyRnKyecrW7vP/Tu61lZO3sKDddw2/r4+Uv90AznIc=;
+        b=ESXZfwiSuVBdhkOLNrz71N9bDHs0hhd51WOwRLhF7te+E6KfNSD57BgmXOytxBg2Kg
+         5kJDR53Z2zTnkFizQVesgQEuLe7LNz1OZERCxvlcA9uLeITIF8X+mxBtzYDGUccpCgyY
+         AeTO53tYK78bx0RyTm1JlN6dHhhSyrtR9UG3HXiDK1T9WvEX9W9FmRb48cEfrktKe5HJ
+         ESUzrBIDsSebJy+Pg4+Mp0u9cFuB5oPK8Vvd+VoLM+8C7lLAEMNihayp5jQjfhqoZ9d4
+         Ety7PPV+cap23G1uzK787clmDPTiDOgJwtfYBOJHwEjFGa87GF6fN5Fsz/iDe3CN177Y
+         9zYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678293771;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8jyRnKyecrW7vP/Tu61lZO3sKDddw2/r4+Uv90AznIc=;
+        b=iUhL9G/NhBCIdmzTpei/ETDCV8YD2FdrBCgMwFGX97IksoYcgBn28Y8fQFpIbD6Gbz
+         BrkwYaxnO4pCyXP7+UoIlL2knHSBkXwrsdebODUZDTLAv7JgMHQPKYBF2nRtZt7WddN/
+         D1dq4X1UME2LSw+XI0SjowJ8BJYD06Rl+NB0hKJnBctiVbkQy0OU2gE8EjjThfqysJoP
+         wmxqdmz+n1TyZLY/B8AOW+LQyeaqTeCCayFkwYgFDpQEeASlpBJLj2FE28AyHb+BDa/u
+         Uk6u99tdJmt0Mx9yHh5hOXlrqkRjeaddvt14A+rDo0wnL/l2nsssz5p1RvE3N3N/rB6D
+         KuXw==
+X-Gm-Message-State: AO0yUKWZfbtk2SIRb3hRP9LOoxrkeK/A+G8gZWRjIhFuBAr6nOg3Z3V6
+        aaRnF5VhhSTfz+kPJm5dB/60F+FFAXoKJ71USeoGIQ==
+X-Google-Smtp-Source: AK7set99AJCec8w5hkQZHk7IsFNbM2llBM/sMMjJoECvz07OciAnFzUmj2WxnzqIRWz7xpJWnHUHQbwXO4oQvyLnSG0=
+X-Received: by 2002:a63:3c52:0:b0:502:f4c6:3992 with SMTP id
+ i18-20020a633c52000000b00502f4c63992mr6915852pgn.4.1678293770456; Wed, 08 Mar
+ 2023 08:42:50 -0800 (PST)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB2810:EE_|DM4PR12MB7622:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5e3c610b-15da-4824-d10f-08db1ff0c062
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: QwzbxmUSYcAAy77TAhAod8Uy3Jax5z+I8OZfxQCkc+k4RBzqVQ4dHHOoNt4Lg49FkQXFBFjtd0vn9A2aJIEohYH9925Ud7wqWgZ27PhgNxqRhw1HlxmTkUeliUT6Mm5CVgdTv+S/h4cMwOsi4LISABCWN34DsANY6+RqR4nrBMR57UFu0TKUZPK5q6yM+2ZY7W2MWq0mumcrOVvqhiVkxoYnSYwDQSF8QMv1pcDTBDmu1pEktrjhkNE9IyyG8gLBYjm7VpmvyAn6TOm1ZCeH03m+JkK3rj/6X5CbinqNMK+QWO4WJQihPNb8Hb7KlJoEAfW1E1KFDeXO1kKrKJbtDvg4zy6B4gIv1e9DfDMX9zMpSVey31D/eUCh6CIOofdOAEWc50YyQJ6yxIUPdiGLzXlMA/uQOWtjKcUzzEM9xwORdQmwXb8mvwvxZkCg+h2NrUoDkJ/CO+PCdyBVZb3ywU35IIqdQXXHxHNIe2jMqRxKQOyoJvd+JEVxWcQrdR9O/197lD2+ZrHkysL4uQVCLH6XLJKHvrud0FJACRzj07Wc5RD655iwrFOQK0aO8gT3kI6WgQP4O6d5g6gc2QjqDPB1ykCUwTAUGMa7skH7naNSZ0PUX0Hdk52xS1wTEVZz10FO1+wBU6CVOw3vHHyY7ZUUz+C3VX6y9Ft4K0UbyHojq6rAKm+owxtusKqbR33r3+qpWo5EUvEUpj9KEdjXcn5Hi/oNpdHQocGK48NId+BE9KASEcrI5CunHAX7m+GN
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2810.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(396003)(39860400002)(366004)(346002)(376002)(136003)(451199018)(31686004)(316002)(36756003)(83380400001)(31696002)(86362001)(6506007)(6486002)(186003)(45080400002)(66476007)(2906002)(7406005)(6666004)(41300700001)(7416002)(8676002)(66946007)(2616005)(6512007)(26005)(478600001)(66556008)(53546011)(8936002)(4326008)(38100700002)(5660300002)(921005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QWd2MFdtcW1TSTg5eUJudDZtNFJtdWlicll0NDUxWWl6T1p1dHhjNytEY2NW?=
- =?utf-8?B?U2krQXIwdEpJRTRvYXdBY0VBSE9VQ0luTG1VWUd0SFJXOUVxREZrWVJqNE5s?=
- =?utf-8?B?WGxINks4QWs5SEYrNmN5RFlRRmN5cVRkYVZBUGxJVWljSkFzb3ZIMWQwdGtR?=
- =?utf-8?B?aDI0bkI1enBzVjlsVUdlc1RpUHVENFFuRjQyMUhzdkZrR2lCaUJRaFFoU1RO?=
- =?utf-8?B?RldLNk9abkRBVWZNOVkzdCtMQms5bkVMWDgzTjl2YlVySGV4ekN3NVh6eEhY?=
- =?utf-8?B?RVlxZFpYZDJibW1oZXl6T3ZWcHhDOCszN3VBN1FsR3VjWHlQRnlTVXZuSGg2?=
- =?utf-8?B?d292NndxalBVZk42Z2YrWXdZV1RGUkFjVEZ2QUczUTNPbmE5aFRoa0orb211?=
- =?utf-8?B?bG5HZ0pQdTl3NklWWS93emFhSzQwZWFWc05sUUx4YWREZElZZko5Ly9hNHpp?=
- =?utf-8?B?T1RCWHdaMFNaLzZsdEtOZkZEQjNCNmp4alptVURkMExVRkhjQnJISTVlSkNw?=
- =?utf-8?B?Q1MyYWd5anlBdXZzTC9TZjlTOGJ5b2lxZ244Zm5zd0x4MVk4SzdsK0JOWWNk?=
- =?utf-8?B?UXh3bTFDQTRLNTdzZ1dKTUQzQ3NCWEZJaGE4eTVkdG5LQ1RqZGtHYjg1bjQv?=
- =?utf-8?B?TDdrZmJwNE03ZGMvejcva3RjaFRhdkQyUmRKZ3JwVGpwUnVDVjJzNUpLaUJZ?=
- =?utf-8?B?KytUWmx1MHdUdTliZ1FWQU9SeUg1RGxEQnYwVjV2MmVEa2dvd2U1SU9IOVFx?=
- =?utf-8?B?cm95dFlrY1BFKzdJM21JY2ZXRHBKTmR4RFZtTlFXZ1JDUDM0ajBXdnFWNCtJ?=
- =?utf-8?B?YTRJMzhlNFFmZ05UU0JNQjRvZFBGOFRYUExPMnl3cGlYZWpsUDdFN1lSeFZ4?=
- =?utf-8?B?U01CUUg4cTVYUFBYeUJKTSs0MzN4RUNteHlYZVR3UjRJcG42YnVISVhrRVNr?=
- =?utf-8?B?bTFPM0VseFUxaXA4bEp3Uld5enNsTHVFZkxJdGxYeVZaUTJmY21sMTczVzVG?=
- =?utf-8?B?Z1JHZWZEVEo3dU0xRkxzTlAzZWJ1bkFKNnVCT0xlYVQvZG5oZXhoeUlzZnZW?=
- =?utf-8?B?R1RkZVNkUWk3YkNRMkNiVDBlWVB2QmFLcXdWalcvajl2MEJ3Tm1kTjl2Y0ZQ?=
- =?utf-8?B?ZVNRZ2xVYUV3QmlpMGRMcEluaE1mSWt1czFQZVlUaENDNmpjUS9TQStwVUJB?=
- =?utf-8?B?ejJoNlZKeVRTRmRyRUxLWE00RWp6ZmVOejRWeXVKd3NsTkZVZW9peHB5SXdx?=
- =?utf-8?B?a1p0NWZqQzZwaFFJZ2d4K3dEblFjM2I1OXVXR1hZZS9mTUxabllvcGRnbEVF?=
- =?utf-8?B?T3dBUW5HR1hTbW1uYzU3eGM5SnBWc1d6SkRYYWdmZ3lFV3hhWDExaENpR3lo?=
- =?utf-8?B?STE1RHdQMzJVbzhWZnhNdzdoK08xMldld0RWamt0V0lmVGhFeXpVWHZsQWNO?=
- =?utf-8?B?TlE1Z0tlNXY5cHNhQnlHaSttVS9vR0tQNjBQeTFjWEEyTWZjeS84aGhKNlBU?=
- =?utf-8?B?OHFPKzdFS2pQRFRHZ0tFeml1WWx6N0E2MHNKYnlYS0d0VjBVVzNnQmt0UHhB?=
- =?utf-8?B?V0lTYWNsTVZOb0duV2dRV0xPUm5qcUh3MVZJRUhTR1dtdHNhZHpSSTJzQTZq?=
- =?utf-8?B?b0RzMGNjNEY2WTI3eWJwejBwNkVVNnNLZXVoV21ESmxiWE14dWhwQXVNeVlJ?=
- =?utf-8?B?bG81anprMHM0U3B0dkF1VjJHNTFSTUsvZEFlVjlnM2hFMHJvc1d4c0xPNTN5?=
- =?utf-8?B?UGFHaFVDejdJRTBOa0QybkRqRHh5SS90bjFDL3NKSjM5a3lTUG1xa3BwTTNO?=
- =?utf-8?B?RWdON2JNTjFuRytlQlRhUXlYd21yOHBmbGJ0OFhCQ2xob3ZabEdNV3pIZWxa?=
- =?utf-8?B?OGs1bnc1b0xyVytPdkFFK2M2aU1sZ3VmeGNlU1Z6RVl0cUI1c3VzOGlSVkhv?=
- =?utf-8?B?NGNnN2NuYnJJL2pvc25QbWcvOWd2L2dFYUovMnhaS3JoWThiR0V2cXRUK0tL?=
- =?utf-8?B?YUJzOHlpT1RXdFdsMVRDVU1qSlJBYXBHVUNLd2xKQndqOHJXWlM2QVpGRVBN?=
- =?utf-8?B?R1JrdGdmWUZha0dSbW5WZ28vK2FjdVdrK21jZkphNnQyYVVtMEVyalQzMStu?=
- =?utf-8?Q?8gV/GssbBylHNrV7qnuUIRPOx?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5e3c610b-15da-4824-d10f-08db1ff0c062
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2810.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Mar 2023 16:18:28.6651
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Q00zt1nqUdYoFYzYe2slpyaL+SEq/5BrQQRb/stG3rRDU85GorG1UYFPq3vJHwg9IDo+RE4Re/eM/XKiUYPvpA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7622
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+References: <20230228062246.1222387-1-jingzhangos@google.com> <20230228062246.1222387-5-jingzhangos@google.com>
+In-Reply-To: <20230228062246.1222387-5-jingzhangos@google.com>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Wed, 8 Mar 2023 08:42:34 -0800
+Message-ID: <CAAeT=Fzm_O-fbk2+jCExtnk7x4XXO1UwiviMmn0BU53A7Ea9WQ@mail.gmail.com>
+Subject: Re: [PATCH v3 4/6] KVM: arm64: Use per guest ID register for ID_AA64DFR0_EL1.PMUVer
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oupton@google.com>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/1/2023 12:11 PM, Gupta, Pankaj wrote:
-> On 1/22/2023 3:46 AM, Tianyu Lan wrote:
->> From: Tianyu Lan <tiala@microsoft.com>
->>
->> Add check_hv_pending() and check_hv_pending_after_irq() to
->> check queued #HV event when irq is disabled.
->>
->> Signed-off-by: Tianyu Lan <tiala@microsoft.com>
->> ---
->>   arch/x86/entry/entry_64.S       | 18 +++++++++++++++
->>   arch/x86/include/asm/irqflags.h | 10 +++++++++
->>   arch/x86/kernel/sev.c           | 39 +++++++++++++++++++++++++++++++++
->>   3 files changed, 67 insertions(+)
->>
->> diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
->> index 6baec7653f19..aec8dc4443d1 100644
->> --- a/arch/x86/entry/entry_64.S
->> +++ b/arch/x86/entry/entry_64.S
->> @@ -1064,6 +1064,15 @@ SYM_CODE_END(paranoid_entry)
->>    * R15 - old SPEC_CTRL
->>    */
->>   SYM_CODE_START_LOCAL(paranoid_exit)
->> +#ifdef CONFIG_AMD_MEM_ENCRYPT
->> +    /*
->> +     * If a #HV was delivered during execution and interrupts were
->> +     * disabled, then check if it can be handled before the iret
->> +     * (which may re-enable interrupts).
->> +     */
->> +    mov     %rsp, %rdi
->> +    call    check_hv_pending
->> +#endif
->>       UNWIND_HINT_REGS
->>       /*
->> @@ -1188,6 +1197,15 @@ SYM_CODE_START(error_entry)
->>   SYM_CODE_END(error_entry)
->>   SYM_CODE_START_LOCAL(error_return)
->> +#ifdef CONFIG_AMD_MEM_ENCRYPT
->> +    /*
->> +     * If a #HV was delivered during execution and interrupts were
->> +     * disabled, then check if it can be handled before the iret
->> +     * (which may re-enable interrupts).
->> +     */
->> +    mov     %rsp, %rdi
->> +    call    check_hv_pending
->> +#endif
->>       UNWIND_HINT_REGS
->>       DEBUG_ENTRY_ASSERT_IRQS_OFF
->>       testb    $3, CS(%rsp)
->> diff --git a/arch/x86/include/asm/irqflags.h 
->> b/arch/x86/include/asm/irqflags.h
->> index 7793e52d6237..fe46e59168dd 100644
->> --- a/arch/x86/include/asm/irqflags.h
->> +++ b/arch/x86/include/asm/irqflags.h
->> @@ -14,6 +14,10 @@
->>   /*
->>    * Interrupt control:
->>    */
->> +#ifdef CONFIG_AMD_MEM_ENCRYPT
->> +void check_hv_pending(struct pt_regs *regs);
->> +void check_hv_pending_irq_enable(void);
->> +#endif
->>   /* Declaration required for gcc < 4.9 to prevent 
->> -Werror=missing-prototypes */
->>   extern inline unsigned long native_save_fl(void);
->> @@ -43,12 +47,18 @@ static __always_inline void native_irq_disable(void)
->>   static __always_inline void native_irq_enable(void)
->>   {
->>       asm volatile("sti": : :"memory");
->> +#ifdef CONFIG_AMD_MEM_ENCRYPT
->> +    check_hv_pending_irq_enable();
->> +#endif
->>   }
->>   static inline __cpuidle void native_safe_halt(void)
->>   {
->>       mds_idle_clear_cpu_buffers();
->>       asm volatile("sti; hlt": : :"memory");
->> +#ifdef CONFIG_AMD_MEM_ENCRYPT
->> +    check_hv_pending_irq_enable();
->> +#endif
->>   }
->>   static inline __cpuidle void native_halt(void)
->> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
->> index a8862a2eff67..fe5e5e41433d 100644
->> --- a/arch/x86/kernel/sev.c
->> +++ b/arch/x86/kernel/sev.c
->> @@ -179,6 +179,45 @@ void noinstr __sev_es_ist_enter(struct pt_regs 
->> *regs)
->>       this_cpu_write(cpu_tss_rw.x86_tss.ist[IST_INDEX_VC], new_ist);
->>   }
->> +static void do_exc_hv(struct pt_regs *regs)
->> +{
->> +    /* Handle #HV exception. */
->> +}
->> +
->> +void check_hv_pending(struct pt_regs *regs)
->> +{
->> +    if (!cc_platform_has(CC_ATTR_GUEST_SEV_SNP))
->> +        return;
->> +
->> +    if ((regs->flags & X86_EFLAGS_IF) == 0)
->> +        return;
-> 
-> Will this return and prevent guest from executing NMI's
-> while irqs are disabled?
+Hi Jing,
 
-I think we need to handle NMI's even when irqs are disabled.
+On Mon, Feb 27, 2023 at 10:23=E2=80=AFPM Jing Zhang <jingzhangos@google.com=
+> wrote:
+>
+> With per guest ID registers, PMUver settings from userspace
+> can be stored in its corresponding ID register.
+>
+> No functional change intended.
+>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 11 ++++---
+>  arch/arm64/kvm/arm.c              |  6 ----
+>  arch/arm64/kvm/id_regs.c          | 52 ++++++++++++++++++++++++-------
+>  include/kvm/arm_pmu.h             |  6 ++--
+>  4 files changed, 51 insertions(+), 24 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/k=
+vm_host.h
+> index f64347eb77c2..effb61a9a855 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -218,6 +218,12 @@ struct kvm_arch {
+>  #define KVM_ARCH_FLAG_EL1_32BIT                                4
+>         /* PSCI SYSTEM_SUSPEND enabled for the guest */
+>  #define KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED           5
+> +       /*
+> +        * AA64DFR0_EL1.PMUver was set as ID_AA64DFR0_EL1_PMUVer_IMP_DEF
+> +        * or DFR0_EL1.PerfMon was set as ID_DFR0_EL1_PerfMon_IMPDEF from
+> +        * userspace for VCPUs without PMU.
+> +        */
+> +#define KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU             6
+>
+>         unsigned long flags;
+>
+> @@ -230,11 +236,6 @@ struct kvm_arch {
+>
+>         cpumask_var_t supported_cpus;
+>
+> -       struct {
+> -               u8 imp:4;
+> -               u8 unimp:4;
+> -       } dfr0_pmuver;
+> -
+>         /* Hypercall features firmware registers' descriptor */
+>         struct kvm_smccc_features smccc_feat;
+>
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index c78d68d011cb..fb2de2cb98cb 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -138,12 +138,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long =
+type)
+>         kvm_arm_set_default_id_regs(kvm);
+>         kvm_arm_init_hypercalls(kvm);
+>
+> -       /*
+> -        * Initialise the default PMUver before there is a chance to
+> -        * create an actual PMU.
+> -        */
+> -       kvm->arch.dfr0_pmuver.imp =3D kvm_arm_pmu_get_pmuver_limit();
+> -
+>         return 0;
+>
+>  err_free_cpumask:
+> diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
+> index 36859e4caf02..21ec8fc10d79 100644
+> --- a/arch/arm64/kvm/id_regs.c
+> +++ b/arch/arm64/kvm/id_regs.c
+> @@ -21,9 +21,12 @@
+>  static u8 vcpu_pmuver(const struct kvm_vcpu *vcpu)
+>  {
+>         if (kvm_vcpu_has_pmu(vcpu))
+> -               return vcpu->kvm->arch.dfr0_pmuver.imp;
+> -
+> -       return vcpu->kvm->arch.dfr0_pmuver.unimp;
+> +               return FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVe=
+r),
+> +                               IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1));
+> +       else if (test_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm-=
+>arch.flags))
+> +               return ID_AA64DFR0_EL1_PMUVer_IMP_DEF;
+> +       else
+> +               return 0;
+>  }
+>
+>  static u8 perfmon_to_pmuver(u8 perfmon)
+> @@ -256,10 +259,19 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcp=
+u,
+>         if (val)
+>                 return -EINVAL;
+>
+> -       if (valid_pmu)
+> -               vcpu->kvm->arch.dfr0_pmuver.imp =3D pmuver;
+> -       else
+> -               vcpu->kvm->arch.dfr0_pmuver.unimp =3D pmuver;
+> +       if (valid_pmu) {
+> +               IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) &=3D ~ARM64_FEATURE=
+_MASK(ID_AA64DFR0_EL1_PMUVer);
+> +               IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) |=3D
+> +                       FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMU=
+Ver), pmuver);
+> +
+> +               IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) &=3D ~ARM64_FEATURE_MAS=
+K(ID_DFR0_EL1_PerfMon);
+> +               IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) |=3D
+> +                       FIELD_PREP(ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon=
+), pmuver);
 
-As we reset "no_further_signal" in hv_raw_handle_exception()
-and return from check_hv_pending() when irqs are disabled, this
-can result in loss/delay of NMI event?
+The pmuver must be converted to perfmon for ID_DFR0_EL1.
 
-Thanks,
-Pankaj
+Also, I think those registers should be updated atomically, although PMUver
+specified by userspace will be normally the same for all vCPUs with
+PMUv3 configured (I have the same comment for set_id_dfr0_el1()).
+
+
+> +       } else if (pmuver =3D=3D ID_AA64DFR0_EL1_PMUVer_IMP_DEF) {
+> +               set_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->a=
+rch.flags);
+> +       } else {
+> +               clear_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm-=
+>arch.flags);
+> +       }
+>
+>         return 0;
+>  }
+> @@ -296,10 +308,19 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+>         if (val)
+>                 return -EINVAL;
+>
+> -       if (valid_pmu)
+> -               vcpu->kvm->arch.dfr0_pmuver.imp =3D perfmon_to_pmuver(per=
+fmon);
+> -       else
+> -               vcpu->kvm->arch.dfr0_pmuver.unimp =3D perfmon_to_pmuver(p=
+erfmon);
+> +       if (valid_pmu) {
+> +               IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) &=3D ~ARM64_FEATURE_MAS=
+K(ID_DFR0_EL1_PerfMon);
+> +               IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) |=3D FIELD_PREP(
+> +                       ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon), perfmon_=
+to_pmuver(perfmon));
+
+The perfmon value should be set for ID_DFR0_EL1 (not pmuver).
+
+> +
+> +               IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) &=3D ~ARM64_FEATURE=
+_MASK(ID_AA64DFR0_EL1_PMUVer);
+> +               IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) |=3D FIELD_PREP(
+> +                       ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), perfm=
+on_to_pmuver(perfmon));
+> +       } else if (perfmon =3D=3D ID_DFR0_EL1_PerfMon_IMPDEF) {
+> +               set_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->a=
+rch.flags);
+> +       } else {
+> +               clear_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm-=
+>arch.flags);
+> +       }
+>
+>         return 0;
+>  }
+> @@ -543,4 +564,13 @@ void kvm_arm_set_default_id_regs(struct kvm *kvm)
+>         }
+>
+>         IDREG(kvm, SYS_ID_AA64PFR0_EL1) =3D val;
+> +
+> +       /*
+> +        * Initialise the default PMUver before there is a chance to
+> +        * create an actual PMU.
+> +        */
+> +       IDREG(kvm, SYS_ID_AA64DFR0_EL1) &=3D ~ARM64_FEATURE_MASK(ID_AA64D=
+FR0_EL1_PMUVer);
+> +       IDREG(kvm, SYS_ID_AA64DFR0_EL1) |=3D
+> +               FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
+> +                          kvm_arm_pmu_get_pmuver_limit());
+>  }
+> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> index 628775334d5e..eef67b7d9751 100644
+> --- a/include/kvm/arm_pmu.h
+> +++ b/include/kvm/arm_pmu.h
+> @@ -92,8 +92,10 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
+>  /*
+>   * Evaluates as true when emulating PMUv3p5, and false otherwise.
+>   */
+> -#define kvm_pmu_is_3p5(vcpu)                                           \
+> -       (vcpu->kvm->arch.dfr0_pmuver.imp >=3D ID_AA64DFR0_EL1_PMUVer_V3P5=
+)
+> +#define kvm_pmu_is_3p5(vcpu)                                            =
+                       \
+> +       (kvm_vcpu_has_pmu(vcpu) &&                                       =
+                       \
+
+What is the reason for adding this kvm_vcpu_has_pmu() checking ?
+I don't think this patch's changes necessitated this.
+
+> +        FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),           =
+                       \
+> +                IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1)) >=3D ID_AA64DFR0_=
+EL1_PMUVer_V3P5)
+>
+>  u8 kvm_arm_pmu_get_pmuver_limit(void);
+>
+> --
+> 2.39.2.722.g9855ee24e9-goog
+>
+>
+
+Thank you,
+Reiji
