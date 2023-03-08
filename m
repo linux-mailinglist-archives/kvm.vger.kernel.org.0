@@ -2,103 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D10176B0B0F
-	for <lists+kvm@lfdr.de>; Wed,  8 Mar 2023 15:27:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A74B6B0BA6
+	for <lists+kvm@lfdr.de>; Wed,  8 Mar 2023 15:42:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231816AbjCHO0y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Mar 2023 09:26:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54590 "EHLO
+        id S232151AbjCHOma (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Mar 2023 09:42:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231645AbjCHO0o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Mar 2023 09:26:44 -0500
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2060.outbound.protection.outlook.com [40.107.92.60])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95F85C3E27;
-        Wed,  8 Mar 2023 06:26:38 -0800 (PST)
+        with ESMTP id S230268AbjCHOmI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Mar 2023 09:42:08 -0500
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2048.outbound.protection.outlook.com [40.107.95.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05AED5AB65;
+        Wed,  8 Mar 2023 06:40:21 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BLS42hZ38uSCszISFzAVaFGuW6+L1Dmor9OOPzGwMZBnBtWhcOUuD+PeHvQHwYPzwqCkwinST6UgHElvVv1EbTJbQlSP8jDoRPqRzl/vJAzBHIgqRMk2hcmP2Yg5iQPGTEkvi4Kiil9IGrlBiNAaspWq2THnmPiG7lAI3c06//v5o/wtWY2GJqDSMepSyKBtNA3SF3NhA6KDgiYJX1pVPfANc83JOlm4Q1VDjFr2R8vfdTFFWh4Val0l/ge86g9hilBDtCWv/u+FdmDXlwrvJdcLFmBnbDUY58f5ydNlk+oE4hOIdr2VPqsKB/bipZC1Hedn2PshZEM7LPo4LnfNFA==
+ b=BSgh3es5Z5+vlYFO1zPyMdi5FBourMj6biSuvvTnIi+167hoTcETV6MAAGpJdI49b1oVVPKNMMGg6D18I9eXj6XXYXrV2/sNBbsuZ+3xC/YA08Bm6/5oQ6JhDldOwR7N6DByGvKETqenj0GYkFKdtIzBgj9Ll795AFszlW1x/iX7vQetNNhrXFCU1g2PxvA3T4QEEqCThktWGccRFGjAQ9ZXINzCLdEilw0WqCGDd/tlmERMkDBrtHSlyr9B7B6XQH56C8hYhdykfSkGKj5BsIKpzVWPMGIUoSQ+e64QNOsbas4dThdvCVUdVou36R8V5U/GHJDbZNpJ35hcHOTPqw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lEHEiva0AInWLMPGMorLpy6fr1b2GpNjaBysPbPcCOw=;
- b=fklRz0ibqsHhU+/guB5tHro+6CChQQlnkabJM+Xhq5hqjCZ+oMxt3jyy4zQAk43LQ4jEIrwN2nWl6QFQ4pB6/UQbTZ4F7B1NNW4S4HxI3j19FqlQxYAt3MXjl6mQlUYJt22irIefyz31Kn9+330DDyXDIHXkpRDPSOVs2GqiCYdITfdSj0hX0ZJAa2uF6H68ydTxyioxFihC4VBo6MALD2ugyX5E2VYOsHc5cAHY0/RrCmJY/nWLbi0uOvDK/Cz52iwbXmNrXUOVXyhs3IUqYLMzgVcyhNBTJgOExiTqyFRELJfxBnQckgDutDxZCAi3ULUn48bnRVGMPHeZBYK7Lw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.233) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ bh=atBV9oX8EnFArO3sNPcGS/SUQi/AFpC2Ym91MpqwLrA=;
+ b=UD5pTTGH4pTv5WevtF6LLG3HAaCf2Msh1hAWH/1xQ6xqtutcwMtKH6nB9h/Gu3z2F7RGJCMjQyrVrDjee5CgQ7N7vDXlLNRyFZNLF9RIR+pepyk6pb5+mlxLTnWaLcllRgXQ+qMe10LI1AogmcyKziYFnhxSIEsgPFq5ngoOAiZXL7TB9Zi1UG0yZn1C6qFPM/vu68MF6H9CUEAyGwI1LuHuyKVs55oN/oq2SOMoROuoMIPwU8Wh70gQjdC7BuFWvP14I6SNtluQ5DMSUEZrd0njLVw5TlhvsfHiWdza+ziiNVIgjsNdzXF7cEiCffjiSHFr9uHI62sUOxUCPDXA2Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lEHEiva0AInWLMPGMorLpy6fr1b2GpNjaBysPbPcCOw=;
- b=DIvSE+xLdvyru41ugUp6dqeRkL9D+9y4JixJYNZm5Xs4ODVrU9ENFGdB8/U8xpRhs0mWT5vPwV1KjT1LiSNzYrr/C/xtU2i18BrVgLivBLoRso7IziBvJXxQoaaho1OHCHKYEUBMj1v954606thj2nfaDnnTZSi8mBj8s/BIfKSUMjlLsK2zwNeVl6ud9cii50F3cMesxCVfmM0q3nll7HAlJy+w3LHbWbhMt0O2So6592C8kBTB5aJPbB8rKh9pl6dpQOQtBo6+kiN5uAQzGBVtfeDb2J9CUVABInJhY/WEcnVX+p8jNkYHw+zDJlza+R2WRZ1XgC7bKelri0nNBQ==
-Received: from BN9PR03CA0532.namprd03.prod.outlook.com (2603:10b6:408:131::27)
- by CY8PR12MB7611.namprd12.prod.outlook.com (2603:10b6:930:9b::19) with
+ bh=atBV9oX8EnFArO3sNPcGS/SUQi/AFpC2Ym91MpqwLrA=;
+ b=stnY6ehT4ECWT3mIjU2Exz9WqPIEeCTnDmShVLMi908UCyvufM0y0wornZ+oBOXWRSPlu7Nhx9wn5O+o2HcPyDRpirponP6DcCTgA3X/6fzvRv8LvrDAiP2cXTlIZn92OuSu7A2nLiKNXjBK1lp0Ip6vkdfpP4uXB0PSGtQ9kA8=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
+ by CH0PR12MB8529.namprd12.prod.outlook.com (2603:10b6:610:18d::5) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6156.29; Wed, 8 Mar
- 2023 14:26:36 +0000
-Received: from BN8NAM11FT060.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:131:cafe::c4) by BN9PR03CA0532.outlook.office365.com
- (2603:10b6:408:131::27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.17 via Frontend
- Transport; Wed, 8 Mar 2023 14:26:36 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.233) by
- BN8NAM11FT060.mail.protection.outlook.com (10.13.177.211) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6178.18 via Frontend Transport; Wed, 8 Mar 2023 14:26:36 +0000
-Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
- (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Wed, 8 Mar 2023
- 06:26:24 -0800
-Received: from drhqmail203.nvidia.com (10.126.190.182) by
- drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.37; Wed, 8 Mar 2023 06:26:23 -0800
-Received: from Asurada-Nvidia.nvidia.com (10.127.8.11) by mail.nvidia.com
- (10.126.190.182) with Microsoft SMTP Server id 15.2.986.5 via Frontend
- Transport; Wed, 8 Mar 2023 06:26:23 -0800
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     <jgg@nvidia.com>, <kevin.tian@intel.com>, <joro@8bytes.org>,
-        <will@kernel.org>, <robin.murphy@arm.com>,
-        <alex.williamson@redhat.com>, <shuah@kernel.org>
-CC:     <yi.l.liu@intel.com>, <linux-kernel@vger.kernel.org>,
-        <iommu@lists.linux.dev>, <kvm@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>, <mjrosato@linux.ibm.com>,
-        <farman@linux.ibm.com>
-Subject: [PATCH v4 5/5] vfio: Support IO page table replacement
-Date:   Wed, 8 Mar 2023 06:26:02 -0800
-Message-ID: <600343ffb282ff3bed5eb98a9255c0084d01a859.1678284812.git.nicolinc@nvidia.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <cover.1678284812.git.nicolinc@nvidia.com>
-References: <cover.1678284812.git.nicolinc@nvidia.com>
-MIME-Version: 1.0
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6156.27; Wed, 8 Mar
+ 2023 14:40:14 +0000
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::5b56:bf13:70be:ea60]) by DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::5b56:bf13:70be:ea60%4]) with mapi id 15.20.6178.017; Wed, 8 Mar 2023
+ 14:40:14 +0000
+Message-ID: <cd1c741d-101d-ea3f-f5a3-498e2f54af34@amd.com>
+Date:   Wed, 8 Mar 2023 08:40:11 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH v13 00/11] Parallel CPU bringup for x86_64
+Content-Language: en-US
+To:     David Woodhouse <dwmw2@infradead.org>,
+        Usama Arif <usama.arif@bytedance.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "Phillips, Kim" <kim.phillips@amd.com>,
+        "brgerst@gmail.com" <brgerst@gmail.com>,
+        "Rapan, Sabin" <sabrapan@amazon.com>
+Cc:     "piotrgorski@cachyos.org" <piotrgorski@cachyos.org>,
+        "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
+        "arjan@linux.intel.com" <arjan@linux.intel.com>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "hpa@zytor.com" <hpa@zytor.com>, "x86@kernel.org" <x86@kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "paulmck@kernel.org" <paulmck@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "rcu@vger.kernel.org" <rcu@vger.kernel.org>,
+        "mimoja@mimoja.de" <mimoja@mimoja.de>,
+        "hewenliang4@huawei.com" <hewenliang4@huawei.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "pmenzel@molgen.mpg.de" <pmenzel@molgen.mpg.de>,
+        "fam.zheng@bytedance.com" <fam.zheng@bytedance.com>,
+        "punit.agrawal@bytedance.com" <punit.agrawal@bytedance.com>,
+        "simon.evans@bytedance.com" <simon.evans@bytedance.com>,
+        "liangma@liangbit.com" <liangma@liangbit.com>
+References: <20230302111227.2102545-1-usama.arif@bytedance.com>
+ <faa0eb3bb8ba0326d501516a057ab46eaf1f3c05.camel@infradead.org>
+ <effbb6e2-c5a1-af7f-830d-8d7088f57477@amd.com>
+ <269ed38b5eed9c3a259c183d59d4f1eb5128f132.camel@infradead.org>
+ <0c56683a-c258-46f6-056e-e85da8a557db@amd.com>
+ <3bfbbd92-b2ed-8189-7b57-0533f6c87ae7@amd.com>
+ <1975308c952236895f2d8f0e56af9db288eaf330.camel@infradead.org>
+ <39f23da7-1e77-4535-21a6-00f77a382ae5@amd.com>
+ <ba8aae2eafdeb09ec1a41d45ab3c2e4cdaf7a28f.camel@infradead.org>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <ba8aae2eafdeb09ec1a41d45ab3c2e4cdaf7a28f.camel@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
+X-ClientProxiedBy: CH0P220CA0011.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:610:ef::13) To DM4PR12MB5229.namprd12.prod.outlook.com
+ (2603:10b6:5:398::12)
+MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN8NAM11FT060:EE_|CY8PR12MB7611:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7324f2f7-7edc-407e-802e-08db1fe11fc9
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|CH0PR12MB8529:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0350dc34-a8ee-4eb5-2d29-08db1fe30747
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: FRhummsE804Gc78CWoI49EcOI8MS97zKCxpieW8/j+2qLBz6ClZnNbz6bkP3iIoujrQb0p8uSDDUFEAb3svwlu6zZAjfeurseFfwzGboT8tjL1CC0ddSH6RlCPzxpDuaY7UUuSw2qpyu+BbIESD/wsCoYAlAfExjL+5LH0rl2vbPt64HMJ4VDryseDhvfFtKyg4IYF07i0dTZC30Qo0domzr47QdLvVog2j6DTMEXJwakvWKMNta1mOK/sHdlH8Qsy0Cin9yZRvoc2ZRN/YXQdJWwaYQ1g/r1zAZTuW79YMwJyXOih++zAe+QPZeM+om1bNw1sINstiazQvod5SXvt6LfR6Aph3ZoKgfE+qJFjuwDLYf4o5q4/gBeybnxz1FrNE3+RaeJNxQydBq6APzeZegz7YBF9LaRtd+ckcQXChUgyP+zjRxG1TO2DnE7ZDOf7CxU8A7sAa5voFhzTuoC/sCeFEMvE2FFNc8LWjMedlnr8mwqMthMvbLkB18jbnmK2Jrty4ukrxHuAJMcri66hG/4OIii2NPanGlANIdbJT1pQr2TXIGEU1XjGctgVVDDKndGf2b08BiAAS0BxMLRw1m9LKN3pAzMRCwIUqwDSzCyNyrzYGCeZdEr91BeJoW00LSrXuYjPOJbUnXaDRHuyEqplakdRTon8gdoZpjfPFsGHCjg3AgzO923JFIn5z2oL5vzywihA4Fxq3hiskOwg==
-X-Forefront-Antispam-Report: CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230025)(4636009)(346002)(396003)(376002)(136003)(39860400002)(451199018)(36840700001)(40470700004)(46966006)(8676002)(36756003)(356005)(8936002)(41300700001)(4326008)(7416002)(70206006)(5660300002)(70586007)(7636003)(86362001)(82740400003)(36860700001)(7696005)(6666004)(478600001)(110136005)(54906003)(316002)(83380400001)(47076005)(40460700003)(82310400005)(2906002)(426003)(2616005)(186003)(336012)(26005)(40480700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Mar 2023 14:26:36.2584
+X-Microsoft-Antispam-Message-Info: vuLh1bqbpiIoOFo3qtPeGo7l2wzFyQd+QzV2aZ3mVxTspuOuMBFn7EVxFqGPsGKin6s718LgMNFuGW/oTDzG1QY5loO/7EZDSn7nNmdUNv1I505O7kRLKagxbZY0/KLMddKFooWjtSM6d8/ZIZ9LASQjBTSwPkvsWeVWFl/b2pJe9njHW918AXJ/cApHEmpi0NdNO7IcpFiZSQJkCDr28s4ox1znwe10XCQdKDK7iTOKEA3O395YwOduH/XjkMtga2zDpzRfpPCBW5nELd/GnO5ix6Hux9kFati3UgyOzTe4Fz0dMB3eS7j7NUY9DCUvTEj5CGDxzpeXUdabR3uvae2OLo7zAUepK6O6hu1ETPZtdMtE3sFeUaCqbPDW+jE9nz+tpgM+KrmRlXxQwDAR1XeARrAcP3gKJu445oX/8WddOBMuY+sUKSLo9b8RfICrcHFb7Ivfvx0x+rRST615zoa6GwkOrKypIT/nfioKXBzd7z3F870EMLgEcuqjTUYk5n/qo6hgrw3vXfqqEkPFwHop+SHAfb2rtMiawrrN5TK6RtGuiqzyzqFGuaKu27PVE/DDXvDDhxYT/hB7b08cQ8yCfDXO0qhLLjtr90o+iop87SVkmVxlIESb7OZVLOSxAIDUqxL39fJlaivljcbb4IM1pvHkhIfHWK5BsBv8pXiTJ79MF7KzF4j2Po2BuKxFm7ShGjx7ZUu66yAvbhXbXB0xSJkvJ4uHx3DPjEVcWII=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(39860400002)(376002)(396003)(366004)(136003)(346002)(451199018)(38100700002)(966005)(5660300002)(6486002)(31686004)(2906002)(53546011)(6512007)(6506007)(26005)(2616005)(6666004)(186003)(86362001)(7416002)(31696002)(66946007)(66476007)(66556008)(36756003)(478600001)(8676002)(4326008)(54906003)(83380400001)(41300700001)(316002)(8936002)(110136005)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TEI2QUdac2tjWms4MDExdnEzL1dEWVN6cC8yRXA2T0lGTlhZdmxQTmREN0pL?=
+ =?utf-8?B?akZFVm1ZdUpiclMwclMzNjhDcnpoMGIyb3JORUJ3MmhVbU1NYkdLdDR6aTlQ?=
+ =?utf-8?B?Yis4MVA5cHMvY29qMm5DU0ZUSklhMG1vRldiRHJ1UE9NWFVrMzVLMHk1SHhi?=
+ =?utf-8?B?bFFSaXdDY2xGYU5kZFZMemVkVUFuUis1VGJLQ0tld3ozSXYzVmFaR1YxZXN2?=
+ =?utf-8?B?SWp6KzcydEpndzRDU3h4VjdWcU1oR0tRdkkzNEZLa25lSCtvUU41cW01VGJ3?=
+ =?utf-8?B?YlR6M1hRb2h2UnJZc09GMVVwNkJDNTE3d0lTQXIzZlBVK1V2YWlNaWJiR2t2?=
+ =?utf-8?B?K2FxaGlUazBXbWwyL1dYSXpLbGV6VXkzemNYRE5JNzl1VUhuSHFpNkZWSy95?=
+ =?utf-8?B?NmVFSzMvdG5iTUdHb0tzVWx4cDd5NGEwTlhYQmFaeXg2bUY0R2VVcUxwUVcy?=
+ =?utf-8?B?NVhLL3FLME4zVlNzT1BHS2ZSZ3B1aGZaUW5FdENNL0RUelBiOFNVNFZTcjRi?=
+ =?utf-8?B?NjArc1JOd3p2bWs3UFBXU3AyWFN0TnBpYkwvWlZZeGVKOW1QREJLOTJSV2Y0?=
+ =?utf-8?B?dlF1R1NIWTJsR2JaajFjUytPck9GU2RnOTAwZE45WTgxODc4cUFGTmkzNHFa?=
+ =?utf-8?B?WldSVDEybmxkREV1OEcrdm1GdVZHT2FEUG0yL3pTZmI1QmlWRTB0MU4zdzh0?=
+ =?utf-8?B?V3NGeWdWV3dsTzZST0pBZ1VOMXBsNW9GbHNsRWRXZDg3SzU1STFVM2psL0xx?=
+ =?utf-8?B?STBHTkVCRm9XWjl1REFKRkd5QUQwcGluL3ZUL1UwbEhERmR1K281dDJuNmM5?=
+ =?utf-8?B?VVYwQjdXakhpY2FleXdCUWtFUU5zSXJ4OGIydSt0UTZQVWlTdS9NZS9XRWhC?=
+ =?utf-8?B?dytITW1ESmtWKzkzL1BWWHFRTE1lbEJlNkJPcERKaUxMNWhNcHdJUFE5b3Nv?=
+ =?utf-8?B?dW9HQ0Y5ZkFSWENlRWZTVWVjQUtSMUNtS3pQM3VhUnYrQjZqTkhPYlArQzJh?=
+ =?utf-8?B?djgweDNFbmdzTVpKSlUzejZqUUROd2ZKTFJic04vYkJRQXYvTFZhNU9XL1Zr?=
+ =?utf-8?B?UEVseUVta0JiYmlORllEcWhyaVBiTFovdFJEWHY1K2QrdjQxVnQ0Z0hGOHBL?=
+ =?utf-8?B?UzhvWjZzeVliL3l2UzVOQnFvSWRKRU51SzFNM01tQUFDZ0xzTjVIb1pxQUhD?=
+ =?utf-8?B?b3JoMzhyUEgrWVNndFI3dERkV3NFMlFXbDFuZEpoZTQ2VzRLdHA1R2c1d2t0?=
+ =?utf-8?B?a3hYMXZLTFFudFlpQ2MxalVYMG5LM2pLdmNLcFl3Mjk5N2JrNHF2Y09vWkFJ?=
+ =?utf-8?B?WmQ1VTQyalQ3bGF3anR1Sng0eHBralg0NW5hbE43eW1wUGg1SjZjYkxBSmJh?=
+ =?utf-8?B?ekNxeU1NVzB3alBHZERWS2VPZmlxNDlnL1NKcnpvWVFydmJlMmdOSTdqcGFD?=
+ =?utf-8?B?VllNVGpLYThRN0RaeThxbzRTTGJmai9uRnhCak52MUUxUWNGOTJIU1dZZGNx?=
+ =?utf-8?B?TjBQTDlQQlRKVjRnSldMWGRBaEw0RUEybXVCZ05nK0lydkw0eElMZUg3UGtj?=
+ =?utf-8?B?U2VHTVZzaXN3SFE5OUl5WnRLL0doMi91Y05IRWVaeTFXeWd1d3EvYTZzM2Vl?=
+ =?utf-8?B?S3MrWmdIbmhETXdTZHRhbDBVQkIrY1VneTRoWmh0blVoVXJOTUN6MjVVOWtH?=
+ =?utf-8?B?bFFzQklXNDBPaVhBeFdCNE9TM3pmaldRelE2N0YxMUV1Ym4wczEyTURzY3NJ?=
+ =?utf-8?B?RWJ2aVgvNmRMWUUwUXNIWHk2QWNnb3ZUS2Z0VzlnS0V0OVB3K1REV1ROY3dW?=
+ =?utf-8?B?ZFJKSVd5Nk5DbnN2T1puRkpjTjZydzFoQ0NtMnM3VkhaaHBWYzNmWnhCbjNl?=
+ =?utf-8?B?Wmt5R3owY0o2VVhmcm1aL0VlNXV1dmpONXgrOVZaMitGNzFqd0F5SEVBYVAw?=
+ =?utf-8?B?RWREcTV6bjNESUVWVSt6SFU5aGlrWW9wbnN4c0Y1RHFxTkVSVm1aZ3RhZzJS?=
+ =?utf-8?B?Sk1VSlNhaUxDTWlrcHFLR0FQNzBMWDlQY25xcjZ5SGh4dWk4R09xT3E4SU1H?=
+ =?utf-8?B?SDZhUzA5Tk55MnlLUkExOWFHdmJBTVh3Ri9OYVExZ09XMm5XaXVNcUFrTEh6?=
+ =?utf-8?Q?O6bry/mXwSbzZdF8UNeIR0J4H?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0350dc34-a8ee-4eb5-2d29-08db1fe30747
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Mar 2023 14:40:14.4605
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7324f2f7-7edc-407e-802e-08db1fe11fc9
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT060.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7611
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5EoW9LaMGRC+IfM78IcXKc59x8lvx8UIHQOXjed6Gwjb5OPZC7OnlKcxbFPLB2PpqKFe3HblLenoq0Bu+fOx4g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB8529
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
         URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -107,53 +154,108 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now both the physical path and the emulated path should support an IO page
-table replacement.
+On 3/8/23 03:04, David Woodhouse wrote:
+> On Tue, 2023-03-07 at 16:55 -0600, Tom Lendacky wrote:
+>> On 3/7/23 16:27, David Woodhouse wrote:
+>>> On Tue, 2023-03-07 at 16:22 -0600, Tom Lendacky wrote:
+>>>>
+>>>> I did some Qemu/KVM testing. One thing I noticed is that on AMD, CPUID 0xB
+>>>> EAX will be non-zero only if SMT is enabled. So just booting some guests
+>>>> without CPU topology never did parallel booting ("smpboot: Disabling
+>>>> parallel bringup because CPUID 0xb looks untrustworthy"). I would imagine
+>>>> a bare-metal system that has diabled SMT will not do parallel booting, too
+>>>> (but I haven't had time to test that).
+>>>
+>>> Interesting, thanks. Should I change to checking for *both* EAX and EBX
+>>> being zero? That's what I did first, after reading only the Intel SDM.
+>>> But I changed to only EAX because the AMD doc only says that EAX will
+>>> be zero for unsupported leaves.
+>>
+>>   From a baremetal perspective, I think that works. Rome was the first
+>> generation to support x2apic, and the PPR for Rome states that 0's are
+>> returned in all 4 registers for undefined function numbers.
+>>
+>> For virtualization, at least Qemu/KVM, that also looks to be a safe test.
+> 
+> At Sean's suggestion, I've switched it to use the existing
+> check_extended_topology_leaf() which checks for EBX being non-zero, and
+> CH being 1 (SMT_TYPE).
+> 
+> I also made it work even if the kernel isn't using x2apic mode (is that
+> even possible, or does SEV-ES require the MSR-based access anyway?)
+> 
+> It just looked odd handling SEV-ES in the CPUID 0x0B path but not the
+> CPUID 0x01 case, and I certainly didn't want to implement the asm side
+> for handling CPUID 0x01 via the GHCB protocol. And this way I can pull
+> the check for CC_ATTR_GUEST_STATE_ENCRYPT up above. Which I've kept for
+> now for the reason described in the comment, but I won't die on that
+> hill.
 
-Call iommufd_device_replace() when vdev->iommufd_attached is true.
+You can boot an SEV-ES guest in apic mode, but that would be unusual, so I 
+think this approach is fine.
 
-Also update the VFIO_DEVICE_ATTACH_IOMMUFD_PT kdoc in the uAPI header.
+Thanks,
+Tom
 
-Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
----
- drivers/vfio/iommufd.c    | 6 +++---
- include/uapi/linux/vfio.h | 6 ++++++
- 2 files changed, 9 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/vfio/iommufd.c b/drivers/vfio/iommufd.c
-index 8a9457d0a33c..a245a8e0c8ab 100644
---- a/drivers/vfio/iommufd.c
-+++ b/drivers/vfio/iommufd.c
-@@ -145,9 +145,9 @@ int vfio_iommufd_physical_attach_ioas(struct vfio_device *vdev, u32 *pt_id)
- 		return -EINVAL;
- 
- 	if (vdev->iommufd_attached)
--		return -EBUSY;
--
--	rc = iommufd_device_attach(vdev->iommufd_device, pt_id);
-+		rc = iommufd_device_replace(vdev->iommufd_device, pt_id);
-+	else
-+		rc = iommufd_device_attach(vdev->iommufd_device, pt_id);
- 	if (rc)
- 		return rc;
- 	vdev->iommufd_attached = true;
-diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index 692156a708bb..14375826a25b 100644
---- a/include/uapi/linux/vfio.h
-+++ b/include/uapi/linux/vfio.h
-@@ -243,6 +243,12 @@ struct vfio_device_bind_iommufd {
-  *
-  * Undo by VFIO_DEVICE_DETACH_IOMMUFD_PT or device fd close.
-  *
-+ * If a vfio device is currently attached to a valid hw_pagetable, without doing
-+ * a VFIO_DEVICE_DETACH_IOMMUFD_PT, a second VFIO_DEVICE_ATTACH_IOMMUFD_PT ioctl
-+ * passing in another hw_pagetable (hwpt) id is allowed. This action, also known
-+ * as a hw_pagetable replacement, will replace the device's currently attached
-+ * hw_pagetable with a new hw_pagetable corresponding to the given pt_id.
-+ *
-  * @argsz:	user filled size of this data.
-  * @flags:	must be 0.
-  * @pt_id:	Input the target id which can represent an ioas or a hwpt
--- 
-2.39.2
-
+> 
+> https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/parallel-6.2-v14
+> 
+> Looks like this:
+> 
+> /*
+>   * We can do 64-bit AP bringup in parallel if the CPU reports its APIC
+>   * ID in CPUID (either leaf 0x0B if we need the full APIC ID in X2APIC
+>   * mode, or leaf 0x01 if 8 bits are sufficient). Otherwise it's too
+>   * hard.
+>   */
+> static bool prepare_parallel_bringup(void)
+> {
+> 	bool has_sev_es = IS_ENABLED(CONFIG_AMD_MEM_ENCRYPT) &&
+> 		static_branch_unlikely(&sev_es_enable_key);
+> 
+> 	if (IS_ENABLED(CONFIG_X86_32))
+> 		return false;
+> 
+> 	/*
+> 	 * Encrypted guests other than SEV-ES (in the future) will need to
+> 	 * implement an early way of finding the APIC ID, since they will
+> 	 * presumably block direct CPUID too. Be kind to our future selves
+> 	 * by warning here instead of just letting them break. Parallel
+> 	 * startup doesn't have to be in the first round of enabling patches
+> 	 * for any such technology.
+> 	 */
+> 	if (cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT) || !has_sev_es) {
+> 		pr_info("Disabling parallel bringup due to guest memory encryption\n");
+> 		return false;
+> 	}
+> 
+> 	if (x2apic_mode || has_sev_es) {
+> 		if (boot_cpu_data.cpuid_level < 0x0b)
+> 			return false;
+> 
+> 		if (check_extended_topology_leaf(0x0b) != 0) {
+> 			pr_info("Disabling parallel bringup because CPUID 0xb looks untrustworthy\n");
+> 			return false;
+> 		}
+> 
+> 		if (has_sev_es) {
+> 			pr_debug("Using SEV-ES CPUID 0xb for parallel CPU startup\n");
+> 			smpboot_control = STARTUP_APICID_SEV_ES;
+> 		} else {
+> 			pr_debug("Using CPUID 0xb for parallel CPU startup\n");
+> 			smpboot_control = STARTUP_APICID_CPUID_0B;
+> 		}
+> 	} else {
+> 		/* Without X2APIC, what's in CPUID 0x01 should suffice. */
+> 		if (boot_cpu_data.cpuid_level < 0x01)
+> 			return false;
+> 
+> 		pr_debug("Using CPUID 0x1 for parallel CPU startup\n");
+> 		smpboot_control = STARTUP_APICID_CPUID_01;
+> 	}
+> 
+> 	cpuhp_setup_state_nocalls(CPUHP_BP_PARALLEL_DYN, "x86/cpu:kick",
+> 				  native_cpu_kick, NULL);
+> 	return true;
+> }
+> 
