@@ -2,91 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C9496B1472
-	for <lists+kvm@lfdr.de>; Wed,  8 Mar 2023 22:47:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF8B86B14E0
+	for <lists+kvm@lfdr.de>; Wed,  8 Mar 2023 23:17:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229933AbjCHVrB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Mar 2023 16:47:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45198 "EHLO
+        id S230208AbjCHWRc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Mar 2023 17:17:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229967AbjCHVqz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Mar 2023 16:46:55 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2CE059809
-        for <kvm@vger.kernel.org>; Wed,  8 Mar 2023 13:46:30 -0800 (PST)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 328KViTj007249
-        for <kvm@vger.kernel.org>; Wed, 8 Mar 2023 21:46:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=60M3Iqg/CHx6u83ZmS5Y+tmWwPck8YBkxDhRrMN4WXE=;
- b=A3iJNoqMWnKtmYlZfO8DRwyh02h3/KAnMC7DnjkxqVyTdCnuEoA2GnPzjCWgxWYw0uul
- Fx6aaP18uKbALWsvVPWGHdeQumJidFSDB2fctYvwN3KPCmN5ryQhj8Wk9bl7d3myhvGb
- +4Q8Wdpaay/QIyOdxBR4eOabFFvEmfVNpY3zcKDXokBUz5anT9unhpT20opewH1IBhAE
- f+efsDJt1toe/xjQfXI0z1HEnxXtCCHle0T6Y09GL7sppX2dUOhPFVpEGSULxGWMpwHL
- bJTtI6A+OCVvkd6FG17dIZ0jzJX8CHRlsWvftF1NHThmQxB5ExlKRfJgh5HaWG3V/WwJ xA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p6s9afkcj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 08 Mar 2023 21:46:30 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 328LbRNc014900
-        for <kvm@vger.kernel.org>; Wed, 8 Mar 2023 21:46:29 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p6s9afkbn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Mar 2023 21:46:29 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 328IJs5t015019;
-        Wed, 8 Mar 2023 21:46:27 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3p6gbw90te-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Mar 2023 21:46:27 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 328LkNV465798504
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 8 Mar 2023 21:46:23 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7E9302004F;
-        Wed,  8 Mar 2023 21:46:23 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0EB1F20040;
-        Wed,  8 Mar 2023 21:46:23 +0000 (GMT)
-Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.174.72])
-        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed,  8 Mar 2023 21:46:22 +0000 (GMT)
-Message-ID: <8eed60ee20e370a8d0784340d802e498e5542c77.camel@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v3 6/7] s390x: define a macro for the
- stack frame size
-From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To:     Marc Hartmayer <mhartmay@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>, Thomas Huth <thuth@redhat.com>
-Date:   Wed, 08 Mar 2023 22:46:22 +0100
-In-Reply-To: <20230307091051.13945-7-mhartmay@linux.ibm.com>
-References: <20230307091051.13945-1-mhartmay@linux.ibm.com>
-         <20230307091051.13945-7-mhartmay@linux.ibm.com>
+        with ESMTP id S229691AbjCHWRb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Mar 2023 17:17:31 -0500
+Received: from mail-yw1-x1132.google.com (mail-yw1-x1132.google.com [IPv6:2607:f8b0:4864:20::1132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B4526484B
+        for <kvm@vger.kernel.org>; Wed,  8 Mar 2023 14:17:28 -0800 (PST)
+Received: by mail-yw1-x1132.google.com with SMTP id 00721157ae682-536b7ffdd34so331013327b3.6
+        for <kvm@vger.kernel.org>; Wed, 08 Mar 2023 14:17:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1678313847;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ncfhrCpS1P9fhc/2j13MHGSrZrNoZGtzGt6BdpI5u5c=;
+        b=LEa9vLflpeuYhw+ouFGy0nRrpxnMvd/qO4xLcFHKClLlgWiXSGJj/wJvU2tdLdzRtM
+         8fkaZIpA9v+J+2fxBg8XKmU7PTdFG2+9Y/0h3FKx26VjdjukePTlLmgJ2Xi97jWpzVCI
+         7NOkrVTe6b4UtZn4Cr62QRMe/QYRmzU04nn5wCFIKVE187ZcNhyPw0fOh0g/qfYAVa73
+         z8P6dAwmz1TOyrlCRpybhkvic3KdtP4rtXtyScazD+bDBVbPSH82MS2A8ZIoOvGekV4c
+         /i128BBPalN8uJon1jUJz60cENTPsJsVx8Hxx2vgHMkoJP0oNurUm1EJmLuYjFCef2jT
+         exFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678313847;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ncfhrCpS1P9fhc/2j13MHGSrZrNoZGtzGt6BdpI5u5c=;
+        b=QTFKcDAsQRkHhTJ3E1AVlyIGn6i/MyKxAJlhOcw11jG4iSaovDBMV2H7voxRbo9+kI
+         QxcgJaiYM+l3bTCY+UlZjylELG3qWezmc30PUHjpLJBlMHXaPjyUcc++uZloHWrQL5Oi
+         EONuDmg+hnVhirNhmIQCK4hTu/GN7TnzLuntPMK9WYnNNZx542D+XSlsYyZQfb1/Wl6U
+         lqXHv53C41D0DaYcce3fo5/WgmjdzsYEcI1D/g+OG47IIsE3vHA/a38UPZRXkR6iguBW
+         op6G5fmeP0Mi3+nV76DOsp/0Xx3MLcVaB+1wwUpM+bZtOeNsQiaAWMtKeMr1cw8IQM00
+         dWVQ==
+X-Gm-Message-State: AO0yUKXrI2cSozFOb9LIVVuXUrXbFSpeecW+4kZPhMo6YcpEp9BJD6Dy
+        n2WNDe0tbUvAmARzHGbzUmvI2ip/tsDi7ns0Q0z/TQ==
+X-Google-Smtp-Source: AK7set/jY+wDFdJxlgt4HTSi9tKXekbNF7x9coeeff+Lpjl95jbtsUQQqV8CQjULDHigA8h3T3Lkbv9CrggJ4hcrnz4=
+X-Received: by 2002:a81:431e:0:b0:533:8080:16ee with SMTP id
+ q30-20020a81431e000000b00533808016eemr12767819ywa.10.1678313847363; Wed, 08
+ Mar 2023 14:17:27 -0800 (PST)
+MIME-Version: 1.0
+References: <20230306224127.1689967-1-vipinsh@google.com> <20230306224127.1689967-4-vipinsh@google.com>
+ <20230308223331.00000234@gmail.com>
+In-Reply-To: <20230308223331.00000234@gmail.com>
+From:   Vipin Sharma <vipinsh@google.com>
+Date:   Wed, 8 Mar 2023 14:16:51 -0800
+Message-ID: <CAHVum0cMAwyQamr5yxCB56DSy7QHuCvTG06qRrJCGiZWQV+ZTw@mail.gmail.com>
+Subject: Re: [Patch v4 03/18] KVM: x86/mmu: Track count of pages in KVM MMU
+ page caches globally
+To:     Zhi Wang <zhi.wang.linux@gmail.com>
+Cc:     seanjc@google.com, pbonzini@redhat.com, bgardon@google.com,
+        dmatlack@google.com, jmattson@google.com, mizhang@google.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
-MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: a5irvRBVXWs1X48fzh3GvB6j1xfP3j2m
-X-Proofpoint-GUID: OHWouHEhCj_KCgTXKLflLut8g5Ept5fo
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-08_15,2023-03-08_03,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- bulkscore=0 phishscore=0 clxscore=1015 impostorscore=0 mlxlogscore=999
- priorityscore=1501 suspectscore=0 mlxscore=0 spamscore=0 adultscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2303080182
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -94,13 +72,80 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2023-03-07 at 10:10 +0100, Marc Hartmayer wrote:
-> Define and use a macro for the stack frame size. While at it, fix
-> whitespace in the `gs_handler_asm` block.
->=20
-> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-> Co-developed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+On Wed, Mar 8, 2023 at 12:33=E2=80=AFPM Zhi Wang <zhi.wang.linux@gmail.com>=
+ wrote:
+>
+> On Mon,  6 Mar 2023 14:41:12 -0800
+> Vipin Sharma <vipinsh@google.com> wrote:
+> > +/**
+> > + * Caller should hold mutex lock corresponding to cache, if available.
+> > + */
+> > +static int mmu_topup_sp_memory_cache(struct kvm_mmu_memory_cache *cach=
+e,
+> > +                                  int min)
+> > +{
+> > +     int orig_nobjs, r;
+> > +
+> > +     orig_nobjs =3D cache->nobjs;
+> > +     r =3D kvm_mmu_topup_memory_cache(cache, min);
+> > +     if (orig_nobjs !=3D cache->nobjs)
+> > +             percpu_counter_add(&kvm_total_unused_cached_pages,
+> > +                                (cache->nobjs - orig_nobjs));
+> > +
+> > +     return r;
+> > +}
+> > +
+>
+> Maybe kvm_mmu_topup_shadow_page_cache() would be better?
+>
+> As a user of kvm_mmu_topup_memory_cache(), mmu_topup_memory_cache() is no=
+t
+> supposed to directly touch the kvm_mmu_memory_cache meta data.
+>
+> The name "mmu_topup_sp_memory_cache()" seems similar with "mmu_topup_memo=
+ry_cache()".
+> Renaming it would make its level self-documenting.
+>
 
-Reviewed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Sounds good. I will rename it.
 
-[...]
+> > @@ -4396,25 +4438,28 @@ static int kvm_tdp_mmu_page_fault(struct kvm_vc=
+pu *vcpu,
+> >       if (r !=3D RET_PF_INVALID)
+> >               return r;
+> >
+> > +     mutex_lock(&vcpu->arch.mmu_shadow_page_cache_lock);
+>
+> Can you elaborate more why this lock is required? When will this lock con=
+tend?
+
+This lock is not needed in this patch. In the patch 4 when I am
+freeing up the cache in MMU shrinker this lock is used. In an internal
+discussion Sean also mentioned it. I will move it to the patch where
+it is actually used.
+
+>
+> 1) Previously mmu_topup_memory_caches() works fine without a lock.
+> 2) IMHO I was suspecting if this lock seems affects the parallelization
+> of the TDP MMU fault handling.
+>
+> TDP MMU fault handling is intend to be optimized for parallelization faul=
+t
+> handling by taking a read lock and operating the page table via atomic
+> operations. Multiple fault handling can enter the TDP MMU fault path
+> because of read_lock(&vcpu->kvm->mmu_lock) below.
+>
+> W/ this lock, it seems the part of benefit of parallelization is gone
+> because the lock can contend earlier above. Will this cause performance
+> regression?
+
+This is a per vCPU lock, with this lock each vCPU will still be able
+to perform parallel fault handling without contending for lock.
+
+>
+> If the lock will not contend above, then I am not sure if we need it.
+>
+
+Not in this patch, but in patch 4 we will need it when clearing cache
+via MMU shrinker. I will move it to the patch where it is actually
+needed.
