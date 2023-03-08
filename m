@@ -2,130 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 75B566AFCFA
-	for <lists+kvm@lfdr.de>; Wed,  8 Mar 2023 03:46:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EF3916AFD1C
+	for <lists+kvm@lfdr.de>; Wed,  8 Mar 2023 03:56:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229751AbjCHCq1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Mar 2023 21:46:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40572 "EHLO
+        id S229456AbjCHC4i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Mar 2023 21:56:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229477AbjCHCqZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Mar 2023 21:46:25 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A65B74617C
-        for <kvm@vger.kernel.org>; Tue,  7 Mar 2023 18:46:24 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id p3-20020a17090ad30300b0023a1cd5065fso713983pju.0
-        for <kvm@vger.kernel.org>; Tue, 07 Mar 2023 18:46:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678243584;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pt5tPy+2NnTQIteoPh6hYGXMnAj6nH0zpr+kADpbsRA=;
-        b=o0JEqanW4lMt0wj7QxjjraR6Suh1mhnHW2AQz4xfwOaIBoXILGqPZzk4JHlvB9DHrd
-         /2GKAArmaA4ONCzY2daUvo+GwCxYT9LhAxsm597MBS/7hN9Fu1ZTg1ErVISLGYyWMAzY
-         CjeBJQ2Azm8pczJRsJcFL3fVW06GLY1H9XnvRxJjtZigIyM9zGBsuTwyehc/XVYuf880
-         L61gKRdvMyB+xrIzmFfvTGo/gtUys80hdyB88jruuDSWyypmHzdB9Hfei+czuVGNai82
-         KY4ztMm8C7QptnzoQ2jqcVLv7DvF4nUN9eYzCTUjCxuSsmfgBvmquyA2XMtAVFu2ycM2
-         scAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678243584;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pt5tPy+2NnTQIteoPh6hYGXMnAj6nH0zpr+kADpbsRA=;
-        b=Wc/oXcLWfMD+CY6VT1t+vXTr82F8O7jgTQrDLZEtZROTgWdVAOqhFeH/mnPyVQjVM8
-         GzH6elEEb6UqDPkUr+wW4KUDjAl3tuQKo9wjQntm2o2bW1l7h4VFU7XzE562MunsEk3q
-         I2bZFvT4oC7R3BGUqD5Pea/RNMgQJe6o/7eV609cBaC0+AbLXaDSjBerC14ZjpeMstp8
-         IHDujpbeVrzjOY1Kb27dqNJTD3GPbk9OzjzFDdbiRINzqsvDh0ubhR7vKJAEUmeVnkFn
-         iWcq787VJJjteH+9EMc20Q5QPrqzX1gD+QAJjeDNDyEP6tXTd7Sjx+mG87eC0XbogpPl
-         DLTQ==
-X-Gm-Message-State: AO0yUKUMuacFrkbZWQ1hKcZq9YyZ3iPiYgyJekXDYTVzzmcTWffn6OHt
-        7CsZ264A8pKPhVAJDip7n40=
-X-Google-Smtp-Source: AK7set/M0nEfdRsLAHvrVzLeJHtVMPDDqAuijzZgYhQ7gIqUy5iPE2bAsQK8UH8wCwJhY1C3/w0cfQ==
-X-Received: by 2002:a05:6a20:4290:b0:bf:5d4e:704b with SMTP id o16-20020a056a20429000b000bf5d4e704bmr17889710pzj.32.1678243554230;
-        Tue, 07 Mar 2023 18:45:54 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id bm16-20020a056a00321000b005a84ef49c63sm8458375pfb.214.2023.03.07.18.45.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Mar 2023 18:45:53 -0800 (PST)
-Message-ID: <741d411a-c5a2-71ae-fba9-52cdebb88cfd@gmail.com>
-Date:   Wed, 8 Mar 2023 10:45:48 +0800
+        with ESMTP id S229832AbjCHC4f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Mar 2023 21:56:35 -0500
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 067ADA42C7;
+        Tue,  7 Mar 2023 18:56:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1678244192; x=1709780192;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=77QN2i2yZdUO/+6hL9TXXMuujJSXaX/G0JyFEyUwuBI=;
+  b=JnKmbcc/DDP+SpPAG9scSBATM+0KuVNJTNQpM/ay3tyYuoVsuTDqroxu
+   J2P1/SXWk/c7lOnsbGyI2yg6T3YRJhA8CCsFAi0SCjgJKtGNqlty5e567
+   6ysM26fqGnpiJKEliNnMM4pIMjvboOoV+WUkk0MwythSI9H1+lrh3daI1
+   0aMaHeK2rFqOVbvdzGX0XnchLu14O9ZeehFXbGX4JUlA6pqUGzHWNQhAG
+   awRKNta8AOyTGNTX7GqxLVW+RC7AaNiMkxPS7XKoO4QssFb9QU66Xp6bT
+   3U1RtF/bnq3iB+xI9Puw34eOZnvGDqqzZgF7bc5Zb/uV+yl+b5xe3Eb06
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10642"; a="336060472"
+X-IronPort-AV: E=Sophos;i="5.98,242,1673942400"; 
+   d="scan'208";a="336060472"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2023 18:56:31 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10642"; a="800598186"
+X-IronPort-AV: E=Sophos;i="5.98,242,1673942400"; 
+   d="scan'208";a="800598186"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.48]) ([10.239.159.48])
+  by orsmga004.jf.intel.com with ESMTP; 07 Mar 2023 18:56:29 -0800
+Message-ID: <b2a3ebf2-272d-2f4f-2489-253c4973a6db@linux.intel.com>
+Date:   Wed, 8 Mar 2023 10:55:31 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.8.0
-Subject: Re: [PATCH v3 1/5] KVM: x86/pmu: Prevent the PMU from counting
- disallowed events
-To:     Sean Christopherson <seanjc@google.com>,
-        Aaron Lewis <aaronlewis@google.com>
-Cc:     pbonzini@redhat.com, jmattson@google.com, kvm@vger.kernel.org
-References: <20230307141400.1486314-1-aaronlewis@google.com>
- <20230307141400.1486314-2-aaronlewis@google.com>
- <1c7a20c4-742c-9c42-970e-19626323e367@gmail.com>
- <CAAAPnDFuEhhv+3orZ0EGMq4kAm3_p335kRAMOf=ZcLi_pcnPKQ@mail.gmail.com>
- <ZAdfX+S323JVWNZC@google.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Cc:     baolu.lu@linux.intel.com, kvm@vger.kernel.org,
+        Nicolin Chen <nicolinc@nvidia.com>, Yi Liu <yi.l.liu@intel.com>
+Subject: Re: [PATCH v2 01/17] iommufd: Move isolated msi enforcement to
+ iommufd_device_bind()
 Content-Language: en-US
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <ZAdfX+S323JVWNZC@google.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>, iommu@lists.linux.dev,
+        Kevin Tian <kevin.tian@intel.com>,
+        linux-kselftest@vger.kernel.org
+References: <1-v2-51b9896e7862+8a8c-iommufd_alloc_jgg@nvidia.com>
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <1-v2-51b9896e7862+8a8c-iommufd_alloc_jgg@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/3/2023 12:01 am, Sean Christopherson wrote:
-> On Tue, Mar 07, 2023, Aaron Lewis wrote:
->> On Tue, Mar 7, 2023 at 7:19 AM Like Xu <like.xu.linux@gmail.com> wrote:
->>>> ---
->>>>    arch/x86/kvm/pmu.c | 13 ++++++++-----
->>>>    1 file changed, 8 insertions(+), 5 deletions(-)
->>>>
->>>> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
->>>> index 612e6c70ce2e..9914a9027c60 100644
->>>> --- a/arch/x86/kvm/pmu.c
->>>> +++ b/arch/x86/kvm/pmu.c
->>>> @@ -400,6 +400,12 @@ static bool check_pmu_event_filter(struct kvm_pmc *pmc)
->>>>        return is_fixed_event_allowed(filter, pmc->idx);
->>>>    }
->>>>
->>>> +static bool event_is_allowed(struct kvm_pmc *pmc)
->>>
->>> Nit, an inline event_is_allowed() here might be better.
->>
->> I purposely didn't inline this because Sean generally discourages its
->> use and has commented in several reviews to not use 'inline' and
->> instead leave it up to the compiler to decide, unless using
->> __always_inline.
+On 3/8/23 8:35 AM, Jason Gunthorpe wrote:
+> With the recent rework this no longer needs to be done at domain
+> attachment time, we know if the device is usable by iommufd when we bind
+> it.
 > 
-> Ya.
-
-I think we all respect mainatiner's personal preferences for sure. However,
-I'm not sure how to define Sean's "generally discourage", nor does my
-binary bi-directional verifier-bot (losing control of these details at the code
-level can be frustrating, especially for people who care about performance
-gains but can't use the fresh new tool chain for some supply chain policy
-reasons), and we don't have someone like Sean or other kernel worlds to
-eliminate all inline in the kernel world.
-
+> The value of msi_device_has_isolated_msi() is not allowed to change while
+> a driver is bound.
 > 
->> I think the sentiment is either use the strong hint or don't use it at all.
->> This seems like an example of where the compiler can decide, and a strong
->> hint isn't needed.
+> Reviewed-by: Kevin Tian<kevin.tian@intel.com>
+> Signed-off-by: Jason Gunthorpe<jgg@nvidia.com>
+> ---
+>   drivers/iommu/iommufd/device.c | 38 ++++++++++++++++++----------------
+>   1 file changed, 20 insertions(+), 18 deletions(-)
 > 
-> Not quite.  __always_inline is not a hint, it's a command.  The kernel *requires*
-> functions tagged with __always_inline to be (surprise!) always inlined, even when
-> building with features that cause the compiler to generate non-inlined functions
-> for even the most trivial helpers, e.g. KASAN can cause a literal nop function to
-> be non-inlined.  __alway_inlined is used to ensure like no-instrumentation regions
-> and __init sections are preserved when invoking common helpers.
+> diff --git a/drivers/iommu/iommufd/device.c b/drivers/iommu/iommufd/device.c
+> index c6f4852a8a0c08..63b65cdfe97f29 100644
+> --- a/drivers/iommu/iommufd/device.c
+> +++ b/drivers/iommu/iommufd/device.c
+> @@ -60,6 +60,26 @@ struct iommufd_device *iommufd_device_bind(struct iommufd_ctx *ictx,
+>   	if (!group)
+>   		return ERR_PTR(-ENODEV);
+>   
+> +	/*
+> +	 * For historical compat with VFIO the insecure interrupt path is
+> +	 * allowed if the module parameter is set. Insecure means that a MemWr
+> +	 * operation from the device (eg a simple DMA) cannot trigger an
 
-So, do you think "__always_inline event_is_allowed()" in the highly recurring path
-reprogram_counter() is a better move ? I'd say yes, and am not willing to risk 
-paying
-for a function call overhead since any advancement in this direction is encouraged.
+Nit:
+
+"... cannot trigger an ..." or "... can trigger an ..."?
+
+> +	 * interrupt outside this iommufd context.
+> +	 */
+> +	if (!iommufd_selftest_is_mock_dev(dev) &&
+> +	    !iommu_group_has_isolated_msi(group)) {
+> +		if (!allow_unsafe_interrupts) {
+> +			rc = -EPERM;
+> +			goto out_group_put;
+> +		}
+> +
+> +		dev_warn(
+> +			dev,
+> +			"MSI interrupts are not secure, they cannot be isolated by the platform. "
+> +			"Check that platform features like interrupt remapping are enabled. "
+> +			"Use the \"allow_unsafe_interrupts\" module parameter to override\n");
+> +	}
+
+Anyway,
+
+Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
+
+Best regards,
+baolu
