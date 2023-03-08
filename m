@@ -2,75 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6AA536B0031
-	for <lists+kvm@lfdr.de>; Wed,  8 Mar 2023 08:48:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 730546B0021
+	for <lists+kvm@lfdr.de>; Wed,  8 Mar 2023 08:46:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229851AbjCHHsU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Mar 2023 02:48:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52100 "EHLO
+        id S229686AbjCHHqO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Mar 2023 02:46:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229501AbjCHHsS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Mar 2023 02:48:18 -0500
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 449764ECD9;
-        Tue,  7 Mar 2023 23:48:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678261696; x=1709797696;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=MPjpMnF2pYRp601r/CV/4rcJZOvf9VGuPDqjdu0MkGE=;
-  b=laniImVi/D2OeyIXehqaJ1zzZgBwQv/O8iHVcJwyW9RnrGhjjeh5Iy06
-   v/3ZjqzAybk9UYcf+LicxxLSkK/v8/0566QBATg8EKngSTM4qbxaDIgKt
-   jrJ9v+tIdSTKVyt8CYxuU3dk3u84bx/6dlQ1jdYkTTqC17CYUes/7tpyl
-   lv0EJXHvXfE8QxlbpXt36kY3AnpkJ6sKiC0TWYRX2DtpGa2l6MHBdKVKA
-   ABEllsjxoS+0r4LeWFg47aYl6KFICzMzCW2SLHf9BDh2PnolOfzebFxPb
-   lKAoeYqSQe0OalzGEQLRmmxgk7hRmQJkLcTwAjKk/K6tfKUDyFgXLJ+E8
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10642"; a="363727024"
-X-IronPort-AV: E=Sophos;i="5.98,243,1673942400"; 
-   d="scan'208";a="363727024"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2023 23:48:15 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10642"; a="745821383"
-X-IronPort-AV: E=Sophos;i="5.98,243,1673942400"; 
-   d="scan'208";a="745821383"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.105])
-  by fmsmga004.fm.intel.com with ESMTP; 07 Mar 2023 23:48:04 -0800
-Date:   Wed, 8 Mar 2023 15:40:26 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Ackerley Tng <ackerleytng@google.com>
-Cc:     seanjc@google.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
-        qemu-devel@nongnu.org, pbonzini@redhat.com, corbet@lwn.net,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, arnd@arndb.de, naoya.horiguchi@nec.com,
-        linmiaohe@huawei.com, x86@kernel.org, hpa@zytor.com,
-        hughd@google.com, jlayton@kernel.org, bfields@fieldses.org,
-        akpm@linux-foundation.org, shuah@kernel.org, rppt@kernel.org,
-        steven.price@arm.com, mail@maciej.szmigiero.name, vbabka@suse.cz,
-        vannapurve@google.com, yu.c.zhang@linux.intel.com,
-        kirill.shutemov@linux.intel.com, luto@kernel.org,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        david@redhat.com, aarcange@redhat.com, ddutile@redhat.com,
-        dhildenb@redhat.com, qperret@google.com, tabba@google.com,
-        michael.roth@amd.com, mhocko@suse.com, wei.w.wang@intel.com
-Subject: Re: [PATCH v10 9/9] KVM: Enable and expose KVM_MEM_PRIVATE
-Message-ID: <20230308074026.GA2183207@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20230128140030.GB700688@chaop.bj.intel.com>
- <diqz5ybc3xsr.fsf@ackerleytng-cloudtop.c.googlers.com>
+        with ESMTP id S229659AbjCHHqM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Mar 2023 02:46:12 -0500
+Received: from out-5.mta0.migadu.com (out-5.mta0.migadu.com [IPv6:2001:41d0:1004:224b::5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 474CDA6150
+        for <kvm@vger.kernel.org>; Tue,  7 Mar 2023 23:46:07 -0800 (PST)
+Date:   Wed, 8 Mar 2023 07:46:00 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1678261565;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=WKzyZZ5TvHHv+nFcORL1XTaFGVCC5mIp3QEkslOGjpM=;
+        b=pecnibry7D0AwevOwIcO8UrAJTSKX40E+DlEkvW+GKrHUO3XhEWYK89YgKhyyDma0I3nlW
+        +8aMPyy+tAec1ZV/rmxDkbLBB36GwHf2BGoHVGo2SjoNI/TWgors07Tv1PU/Zit5+xS3ux
+        rQpO1uuv/KwLWBboGjF3wDl7r2NSC5U=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Simon Veith <sveith@amazon.de>, dwmw2@infradead.org
+Subject: Re: [PATCH 08/16] KVM: arm64: timers: Allow userspace to set the
+ counter offsets
+Message-ID: <ZAg9ONoYhUoa0mH9@linux.dev>
+References: <20230216142123.2638675-1-maz@kernel.org>
+ <20230216142123.2638675-9-maz@kernel.org>
+ <Y+6pqz3pCwu7izZL@linux.dev>
+ <86k00gy4so.wl-maz@kernel.org>
+ <Y+/7mO1sxH4jThmu@linux.dev>
+ <86bkllyku2.wl-maz@kernel.org>
+ <Y/ZEGHkw5Jft19RP@linux.dev>
+ <867cw8xmq2.wl-maz@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <diqz5ybc3xsr.fsf@ackerleytng-cloudtop.c.googlers.com>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+In-Reply-To: <867cw8xmq2.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
         URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,93 +59,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 08, 2023 at 12:13:24AM +0000, Ackerley Tng wrote:
-> Chao Peng <chao.p.peng@linux.intel.com> writes:
-> 
-> > On Sat, Jan 14, 2023 at 12:01:01AM +0000, Sean Christopherson wrote:
-> > > On Fri, Dec 02, 2022, Chao Peng wrote:
-> > ...
-> > > Strongly prefer to use similar logic to existing code that detects wraps:
-> 
-> > > 		mem->restricted_offset + mem->memory_size < mem->restricted_offset
-> 
-> > > This is also where I'd like to add the "gfn is aligned to offset"
-> > > check, though
-> > > my brain is too fried to figure that out right now.
-> 
-> > Used count_trailing_zeros() for this TODO, unsure we have other better
-> > approach.
-> 
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index afc8c26fa652..fd34c5f7cd2f 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -56,6 +56,7 @@
-> >   #include <asm/processor.h>
-> >   #include <asm/ioctl.h>
-> >   #include <linux/uaccess.h>
-> > +#include <linux/count_zeros.h>
-> 
-> >   #include "coalesced_mmio.h"
-> >   #include "async_pf.h"
-> > @@ -2087,6 +2088,19 @@ static bool kvm_check_memslot_overlap(struct
-> > kvm_memslots *slots, int id,
-> >   	return false;
-> >   }
-> 
-> > +/*
-> > + * Return true when ALIGNMENT(offset) >= ALIGNMENT(gpa).
-> > + */
-> > +static bool kvm_check_rmem_offset_alignment(u64 offset, u64 gpa)
-> > +{
-> > +	if (!offset)
-> > +		return true;
-> > +	if (!gpa)
-> > +		return false;
-> > +
-> > +	return !!(count_trailing_zeros(offset) >= count_trailing_zeros(gpa));
-> 
-> Perhaps we could do something like
-> 
-> #define lowest_set_bit(val) (val & -val)
-> 
-> and use
-> 
-> return lowest_set_bit(offset) >= lowest_set_bit(gpa);
+Hey Marc,
 
-I see kernel already has fls64(), that looks what we need ;)
+On Thu, Feb 23, 2023 at 06:25:57PM +0000, Marc Zyngier wrote:
 
+[...]
+
+> > Do we need to bend over backwards for a theoretical use case with
+> > the new UAPI? If anyone depends on the existing behavior then they can
+> > continue to use the old UAPI to partially migrate the guest counters.
 > 
-> Please help me to understand: why must ALIGNMENT(offset) >=
-> ALIGNMENT(gpa)? Why is it not sufficient to have both gpa and offset be
-> aligned to PAGE_SIZE?
+> I don't buy the old/new thing. My take is that these things should be
+> cumulative if there isn't a hard reason to break the existing API.
 
-Yes, it's sufficient. Here we just want to be conservative on the uAPI
-as Sean explained this at [1]:
+Unsurprisingly, I may have been a bit confusing in my replies to you.
 
-  I would rather reject memslot if the gfn has lesser alignment than the
-  offset. I'm totally ok with this approach _if_ there's a use case. 
-  Until such a use case presents itself, I would rather be conservative
-  from a uAPI perspective.
+I have zero interest in breaking the existing API. Any suggestion of
+'changing the rules' was more along the lines of providing an alternate
+scheme for the counters and letting the quirks of the old interface
+continue.
 
-[1] https://lore.kernel.org/all/Y8HldeHBrw+OOZVm@google.com/
-
-Chao
+> > My previous suggestion of tying the physical and virtual counters
+> > together at VM creation would definitely break such a use case, though,
+> > so we'd be at the point of requiring explicit opt-in from userspace.
 > 
-> > +}
-> > +
-> >   /*
-> >    * Allocate some memory and give it an address in the guest physical
-> > address
-> >    * space.
-> > @@ -2128,7 +2142,8 @@ int __kvm_set_memory_region(struct kvm *kvm,
-> >   	if (mem->flags & KVM_MEM_PRIVATE &&
-> >   	    (mem->restrictedmem_offset & (PAGE_SIZE - 1) ||
-> >   	     mem->restrictedmem_offset + mem->memory_size <
-> > mem->restrictedmem_offset ||
-> > -	     0 /* TODO: require gfn be aligned with restricted offset */))
-> > +	     !kvm_check_rmem_offset_alignment(mem->restrictedmem_offset,
-> > +					      mem->guest_phys_addr)))
-> >   		return -EINVAL;
-> >   	if (as_id >= kvm_arch_nr_memslot_as_ids(kvm) || id >= KVM_MEM_SLOTS_NUM)
-> >   		return -EINVAL;
+> I'm trying to find a middle ground, so bear with me. Here's the
+> situation as I see it:
+> 
+> (1) a VM that is migrating today can only set the virtual offset and
+>     doesn't affect the physical counter. This behaviour must be
+>     preserved in we cannot prove that nobody relies on it.
+> 
+> (2) setting the physical offset could be done by two means:
+> 
+>     (a) writing the counter register (like we do for CNTVCT)
+>     (b) providing an offset via a side channel
+> 
+> I think (1) must stay forever, just like we still support the old
+> GICv2 implicit initialisation.
+
+No argument here. Unless userspace pokes some new bit of UAPI, the old
+behavior of CNTVCT must live on.
+
+> (2a) is also desirable as it requires no extra work on the VMM side.
+> Just restore the damn thing, and nothing changes (we're finally able
+> to migrate the physical timer). (2b) really is icing on the cake.
+> 
+> The question is whether we can come up with an API offering (2b) that
+> still allows (1) and (2a). I'd be happy with a new API that, when
+> used, resets both offsets to the same value, matching your pretty
+> picture. But the dual offsetting still has to exist internally.
+> 
+> When it comes to NV, it uses either the physical offset that has been
+> provided by writing CNTPCT, or the one that has been written via the
+> new API. Under the hood, this is the same piece of data, of course.
+> 
+> The only meaningful difference with my initial proposal is that there
+> is no new virtual offset API. It is either register writes that obey
+> the same rules as before, or a single offset setting.
+
+I certainly agree that (2a) is highly desirable to get existing VMMs to
+'do the right thing' for free. Playing devil's advocate, would this not
+also break the tracing example you've given of correlating timestamps
+between the host and guest? I wouldn't expect a userspace + VM tracing
+contraption to live migrate but restoring from a snapshot seems
+plausible.
+
+Regardless, I like the general direction you've proposed. IIUC, you'll
+want to go ahead with ignoring writes to CNT{P,V}CT if the offset was
+written by userspace, right?
+
+-- 
+Thanks,
+Oliver
