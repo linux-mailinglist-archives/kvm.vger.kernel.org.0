@@ -2,80 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A2E786B069D
-	for <lists+kvm@lfdr.de>; Wed,  8 Mar 2023 13:06:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 55F916B06B8
+	for <lists+kvm@lfdr.de>; Wed,  8 Mar 2023 13:16:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231210AbjCHMGg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Mar 2023 07:06:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46124 "EHLO
+        id S231274AbjCHMQQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Mar 2023 07:16:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231200AbjCHMGd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Mar 2023 07:06:33 -0500
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DC9BB9537;
-        Wed,  8 Mar 2023 04:06:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678277191; x=1709813191;
-  h=message-id:date:mime-version:cc:subject:to:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Yd93i2dOo6ed11qzFdtxF6UdpnUwTKEvMIcacA1cc3E=;
-  b=joAJ4PVSn7oRDkc+1mt18sUk8HZoef7lv4ZVlBa1hMuPDulwuzZprFzc
-   k81tAubwVeE/Y5aC8M6xBJXrW3x+TKWsv0JsCBeWA6nTRNxZ+emawhRvC
-   +LM6jQmJw7L0VC6UfCx1LPc/UVK61RgtEq5QapkBMYhrXlaHQBy4rAS/w
-   LT3tXCox6ejGiEGBFpEUZAgr+1TwGoS5+ZBU54Zk06w13/yKgzif6HdJF
-   Fietxa8Y63YvygT6tDrBQPyYwR58AELjU0cs4BMshZFqmgW/kZaT2S1Rt
-   c93EcG4B6nCoIf+f8PIcFSoqJ1vWwH3NNbEkG1hFI1ojnf7rrrTmnpq8T
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10642"; a="337653894"
-X-IronPort-AV: E=Sophos;i="5.98,243,1673942400"; 
-   d="scan'208";a="337653894"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2023 04:06:30 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10642"; a="787100271"
-X-IronPort-AV: E=Sophos;i="5.98,243,1673942400"; 
-   d="scan'208";a="787100271"
-Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.254.208.136]) ([10.254.208.136])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2023 04:06:28 -0800
-Message-ID: <1d261af5-d34d-bfdd-d7ce-70bdc7368d9d@linux.intel.com>
-Date:   Wed, 8 Mar 2023 20:06:26 +0800
+        with ESMTP id S231216AbjCHMQL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Mar 2023 07:16:11 -0500
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2D249BA4A
+        for <kvm@vger.kernel.org>; Wed,  8 Mar 2023 04:16:07 -0800 (PST)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-27-ZwokEwwKO2-vd15XSZuFEA-1; Wed, 08 Mar 2023 12:16:04 +0000
+X-MC-Unique: ZwokEwwKO2-vd15XSZuFEA-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.47; Wed, 8 Mar
+ 2023 12:15:56 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.047; Wed, 8 Mar 2023 12:15:56 +0000
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'David Woodhouse' <dwmw2@infradead.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Usama Arif <usama.arif@bytedance.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "Phillips, Kim" <kim.phillips@amd.com>,
+        "brgerst@gmail.com" <brgerst@gmail.com>,
+        "Rapan, Sabin" <sabrapan@amazon.com>
+CC:     "piotrgorski@cachyos.org" <piotrgorski@cachyos.org>,
+        "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
+        "arjan@linux.intel.com" <arjan@linux.intel.com>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "hpa@zytor.com" <hpa@zytor.com>, "x86@kernel.org" <x86@kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "paulmck@kernel.org" <paulmck@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "rcu@vger.kernel.org" <rcu@vger.kernel.org>,
+        "mimoja@mimoja.de" <mimoja@mimoja.de>,
+        "hewenliang4@huawei.com" <hewenliang4@huawei.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "pmenzel@molgen.mpg.de" <pmenzel@molgen.mpg.de>,
+        "fam.zheng@bytedance.com" <fam.zheng@bytedance.com>,
+        "punit.agrawal@bytedance.com" <punit.agrawal@bytedance.com>,
+        "simon.evans@bytedance.com" <simon.evans@bytedance.com>,
+        "liangma@liangbit.com" <liangma@liangbit.com>
+Subject: RE: [PATCH v13 00/11] Parallel CPU bringup for x86_64
+Thread-Topic: [PATCH v13 00/11] Parallel CPU bringup for x86_64
+Thread-Index: AQHZUZ1JrrsGLfc9/UqVDEYgWl/q367wy8Sw
+Date:   Wed, 8 Mar 2023 12:15:56 +0000
+Message-ID: <5aef7e908e1d492386d568ef36b75493@AcuMS.aculab.com>
+References: <20230302111227.2102545-1-usama.arif@bytedance.com>
+         <faa0eb3bb8ba0326d501516a057ab46eaf1f3c05.camel@infradead.org>
+         <effbb6e2-c5a1-af7f-830d-8d7088f57477@amd.com>
+         <269ed38b5eed9c3a259c183d59d4f1eb5128f132.camel@infradead.org>
+         <0c56683a-c258-46f6-056e-e85da8a557db@amd.com>
+         <3bfbbd92-b2ed-8189-7b57-0533f6c87ae7@amd.com>
+         <1975308c952236895f2d8f0e56af9db288eaf330.camel@infradead.org>
+         <39f23da7-1e77-4535-21a6-00f77a382ae5@amd.com>
+ <ba8aae2eafdeb09ec1a41d45ab3c2e4cdaf7a28f.camel@infradead.org>
+In-Reply-To: <ba8aae2eafdeb09ec1a41d45ab3c2e4cdaf7a28f.camel@infradead.org>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Cc:     baolu.lu@linux.intel.com, kvm@vger.kernel.org,
-        Nicolin Chen <nicolinc@nvidia.com>, Yi Liu <yi.l.liu@intel.com>
-Subject: Re: [PATCH v2 04/17] iommu: Export iommu_get_resv_regions()
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
 Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>, iommu@lists.linux.dev,
-        Kevin Tian <kevin.tian@intel.com>,
-        linux-kselftest@vger.kernel.org
-References: <4-v2-51b9896e7862+8a8c-iommufd_alloc_jgg@nvidia.com>
-From:   Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <4-v2-51b9896e7862+8a8c-iommufd_alloc_jgg@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023/3/8 8:35, Jason Gunthorpe wrote:
-> iommufd wants to use this in the next patch. For some reason the
-> iommu_put_resv_regions() was already exported.
+RnJvbTogRGF2aWQgV29vZGhvdXNlDQo+IFNlbnQ6IDA4IE1hcmNoIDIwMjMgMDk6MDUNCi4uLg0K
+PiBodHRwczovL2dpdC5pbmZyYWRlYWQub3JnL3VzZXJzL2R3bXcyL2xpbnV4LmdpdC9zaG9ydGxv
+Zy9yZWZzL2hlYWRzL3BhcmFsbGVsLTYuMi12MTQNCj4gDQo+IExvb2tzIGxpa2UgdGhpczoNCj4g
+DQo+IC8qDQo+ICAqIFdlIGNhbiBkbyA2NC1iaXQgQVAgYnJpbmd1cCBpbiBwYXJhbGxlbCBpZiB0
+aGUgQ1BVIHJlcG9ydHMgaXRzIEFQSUMNCj4gICogSUQgaW4gQ1BVSUQgKGVpdGhlciBsZWFmIDB4
+MEIgaWYgd2UgbmVlZCB0aGUgZnVsbCBBUElDIElEIGluIFgyQVBJQw0KPiAgKiBtb2RlLCBvciBs
+ZWFmIDB4MDEgaWYgOCBiaXRzIGFyZSBzdWZmaWNpZW50KS4gT3RoZXJ3aXNlIGl0J3MgdG9vDQo+
+ICAqIGhhcmQuDQo+ICAqLw0KPiBzdGF0aWMgYm9vbCBwcmVwYXJlX3BhcmFsbGVsX2JyaW5ndXAo
+dm9pZCkNCj4gew0KPiAJYm9vbCBoYXNfc2V2X2VzID0gSVNfRU5BQkxFRChDT05GSUdfQU1EX01F
+TV9FTkNSWVBUKSAmJg0KPiAJCXN0YXRpY19icmFuY2hfdW5saWtlbHkoJnNldl9lc19lbmFibGVf
+a2V5KTsNCj4gDQo+IAlpZiAoSVNfRU5BQkxFRChDT05GSUdfWDg2XzMyKSkNCj4gCQlyZXR1cm4g
+ZmFsc2U7DQo+IA0KPiAJLyoNCj4gCSAqIEVuY3J5cHRlZCBndWVzdHMgb3RoZXIgdGhhbiBTRVYt
+RVMgKGluIHRoZSBmdXR1cmUpIHdpbGwgbmVlZCB0bw0KPiAJICogaW1wbGVtZW50IGFuIGVhcmx5
+IHdheSBvZiBmaW5kaW5nIHRoZSBBUElDIElELCBzaW5jZSB0aGV5IHdpbGwNCj4gCSAqIHByZXN1
+bWFibHkgYmxvY2sgZGlyZWN0IENQVUlEIHRvby4gQmUga2luZCB0byBvdXIgZnV0dXJlIHNlbHZl
+cw0KPiAJICogYnkgd2FybmluZyBoZXJlIGluc3RlYWQgb2YganVzdCBsZXR0aW5nIHRoZW0gYnJl
+YWsuIFBhcmFsbGVsDQo+IAkgKiBzdGFydHVwIGRvZXNuJ3QgaGF2ZSB0byBiZSBpbiB0aGUgZmly
+c3Qgcm91bmQgb2YgZW5hYmxpbmcgcGF0Y2hlcw0KPiAJICogZm9yIGFueSBzdWNoIHRlY2hub2xv
+Z3kuDQo+IAkgKi8NCj4gCWlmIChjY19wbGF0Zm9ybV9oYXMoQ0NfQVRUUl9HVUVTVF9TVEFURV9F
+TkNSWVBUKSB8fCAhaGFzX3Nldl9lcykgew0KPiAJCXByX2luZm8oIkRpc2FibGluZyBwYXJhbGxl
+bCBicmluZ3VwIGR1ZSB0byBndWVzdCBtZW1vcnkgZW5jcnlwdGlvblxuIik7DQo+IAkJcmV0dXJu
+IGZhbHNlOw0KPiAJfQ0KDQpUaGF0IGxvb2tzIHdyb25nLCB3b24ndCBoYXNfc2V2X2VzIGFsbW9z
+dCBhbHdheXMgYmUgZmFsc2UNCnNvIGl0IHByaW50cyB0aGUgbWVzc2FnZSBhbmQgcmV0dXJucz8N
+Ck1heWJlIHMvfHwvJiYvID8NCg0KCURhdmlkDQoNCi0NClJlZ2lzdGVyZWQgQWRkcmVzcyBMYWtl
+c2lkZSwgQnJhbWxleSBSb2FkLCBNb3VudCBGYXJtLCBNaWx0b24gS2V5bmVzLCBNSzEgMVBULCBV
+Sw0KUmVnaXN0cmF0aW9uIE5vOiAxMzk3Mzg2IChXYWxlcykNCg==
 
-"virtio-iommu calls it and can be modular."
-
-https://lore.kernel.org/all/20220708093332.GA28988@lst.de/
-
-> Signed-off-by: Jason Gunthorpe<jgg@nvidia.com>
-
-Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
-
-Best regards,
-baolu
