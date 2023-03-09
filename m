@@ -2,185 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D46C36B2B11
-	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 17:44:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B73546B2BE9
+	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 18:21:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230259AbjCIQn5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Mar 2023 11:43:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50532 "EHLO
+        id S229955AbjCIRVN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Mar 2023 12:21:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229989AbjCIQne (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Mar 2023 11:43:34 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20730F34DB
-        for <kvm@vger.kernel.org>; Thu,  9 Mar 2023 08:32:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678379528;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=OhtE1bGBZ1SlZ7+wLdUpGqS+X/sS9BNBWD0AiRRx31M=;
-        b=SRxRtc6pxBrEHQdRO+S0gSbQAAemrNoWqhDizZTG8x6MLwrXvXL3HqicqxdZLdC4gZ1TgW
-        CweWiYz9DUqNN3f1QNNCrPJO9msEUVoyiMrBXU32CfVHcsXyMYqoTVUDhoZ4lvHB0umire
-        5//ObZhMP2LFIFzok5hs+tn1Bx9og2E=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-494-3Tevf2XNONGCtJr-pvApVw-1; Thu, 09 Mar 2023 11:32:06 -0500
-X-MC-Unique: 3Tevf2XNONGCtJr-pvApVw-1
-Received: by mail-qt1-f198.google.com with SMTP id r4-20020ac867c4000000b003bfefb6dd58so1377329qtp.2
-        for <kvm@vger.kernel.org>; Thu, 09 Mar 2023 08:32:06 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678379526;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OhtE1bGBZ1SlZ7+wLdUpGqS+X/sS9BNBWD0AiRRx31M=;
-        b=loeXwC02ojwfgK1ZF444R5N1XExdj4hSCLlGIEwmGp8SYBxr17J/uOqnQTBDSYn2AX
-         3dem/iixWE43uHiVA23NH+cbA7YHYFpJEOswrxvTcjExdCLVf4Glv2y7riAuvqePtneM
-         cS9M+mqJG2cgVG4+NEzbaGygcZLQVXjwRhh8Mh2d66EhPJW1ybOIssQzuzlvBqxJCxZu
-         Z+4E1z8uqbPikdsHxQatCP03Inzjw+N4XmDN9HEfFJj+ZaDL9T5MVS2u6CvzjGRKc6Q+
-         dLokdLEqH3DL6NE8CSvRKX5doR0mvKcDdQPt6sgLDm6gD/2zlqcV+qDZKpAPiv//j/Ym
-         8WkA==
-X-Gm-Message-State: AO0yUKUkignqcK5xY+XY1EpoPuz/ZOoUqKXlom+TDY27BUyBufD7iw6g
-        n3nhSHjjRLEn6CVXcuFoluUjHo3MnILtq4ORQayZ3jpuLlC9B/BQNIb36CQLnBSCZcFHp99H+zx
-        UYJf+HEThvtU/
-X-Received: by 2002:ac8:5a4b:0:b0:3bf:d00a:2eae with SMTP id o11-20020ac85a4b000000b003bfd00a2eaemr38124781qta.47.1678379526077;
-        Thu, 09 Mar 2023 08:32:06 -0800 (PST)
-X-Google-Smtp-Source: AK7set9xKlCfrkruhxAK7QF576WQLTA90MiAGXjylmK3sCO1SvBxFAjAgjIt/fQoszp9URGRyn+5OQ==
-X-Received: by 2002:ac8:5a4b:0:b0:3bf:d00a:2eae with SMTP id o11-20020ac85a4b000000b003bfd00a2eaemr38124756qta.47.1678379525784;
-        Thu, 09 Mar 2023 08:32:05 -0800 (PST)
-Received: from sgarzare-redhat (host-82-57-51-170.retail.telecomitalia.it. [82.57.51.170])
-        by smtp.gmail.com with ESMTPSA id s188-20020a3745c5000000b00742bc037f29sm13579401qka.120.2023.03.09.08.32.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Mar 2023 08:32:05 -0800 (PST)
-Date:   Thu, 9 Mar 2023 17:32:00 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseniy Krasnov <avkrasnov@sberdevices.ru>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel@sberdevices.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v3 0/4] several updates to virtio/vsock
-Message-ID: <20230309163200.lq6dzop724diafpf@sgarzare-redhat>
-References: <0abeec42-a11d-3a51-453b-6acf76604f2e@sberdevices.ru>
- <20230309162150.qqrlqmqghi5muucx@sgarzare-redhat>
- <a1788ed6-89d4-27da-a049-99e29edea4cb@sberdevices.ru>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
+        with ESMTP id S230437AbjCIRVF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Mar 2023 12:21:05 -0500
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2060.outbound.protection.outlook.com [40.107.223.60])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D83B661312;
+        Thu,  9 Mar 2023 09:21:03 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=deOa48gyN54cotpHu4RmrMDdC0YT1d+w8D2tkGJXqb++mFbRna7aqJFGMU38zjU0XowR/psrS5kS6hIQ7Rxj3uYowGxfM9KZY8eQ1yKMaBmnKsD2b/ejUvFDuBo7rbOOJnkEV+hZDaj4pf0LD+C9yN1p9U/Yf1zf8lhtla9PmUOtDmQDV4mJlcboQj9OPVt4lbYFcDAemG8pz8KXwQ1SanoggNjlHFdI6/XzQujkGb/NChAuDIvTkE6CNq6cEyAig/YJuKZg/+Rvi70YfGBXmr3LXVKqzc1HTOHBPtcY4c8YNZTHITzJ4fGorVp0Y9g+6k0nsCihKuDYoKuv6ReWRA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=I2ColwMjueZ+u0KnqnMFLSfhm2F+7iidraEBEVbTypw=;
+ b=L7/4jxxxzn863xeVnTtq48kgzKWGmMO63OmJ2DjW0vg9H0dtuOj9Ss8GjCEg8AApNo8OGIuh0Ji8gwtSvwm52a+QVAdNMOg2ja5gFm395xyEUO6hqUwaNT1e5oEBvQ101B3PmnYuXR/eVyDmvQON5mWPzZces1Jy4Rbth2fjbN/C++qe2wfrX0k1ZFt7+3NBrz2BxiiIjTDwAzPt57IFPzKxLCcwCbDscUDlkPN0x5BDAXcRjqdZOi2X1bBzEvHM8031IIkkz5LHuBTIWEyMmjYKfOcl9PmT1gkK11yen01mFwyxKYQiABJJOaNoUq6cR9jHpZSzX6+tPUwniShvNg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=I2ColwMjueZ+u0KnqnMFLSfhm2F+7iidraEBEVbTypw=;
+ b=cEVx0kUnpa6PHUxikye8ju8uO2xU+ekdi/eL3SPfotyy7Q6WxN2ZwoddlnZakmBkMpcFaiff1zyEHm3wEJVPsz3sEmaX4SCPtFyectO1OVOlVyE33hD4K4gjaKRN3dAhNoqY8aNkNHci+2WF8e5sCSukXigkBIT1A19mXbsCA3KITD7FVFDzdPegDDlMKXLghg9UfstxN6iGy926a0Jw68n7MaRTBO+qnPDl9Cnp4UTiVxqimhs9z/7pVKyHF5ON9ts5ERKXJN6Rq6g6jOpW8MftVkOqAdIo3cLqS/g6uAqMmwBbZGAGYvOS8CszuK/kRUIkBS3a+RmnASfo23+3ow==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by DS7PR12MB6166.namprd12.prod.outlook.com (2603:10b6:8:99::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.19; Thu, 9 Mar
+ 2023 17:21:01 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::ef6d:fdf6:352f:efd1]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::ef6d:fdf6:352f:efd1%3]) with mapi id 15.20.6178.017; Thu, 9 Mar 2023
+ 17:21:01 +0000
+Date:   Thu, 9 Mar 2023 13:20:58 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Baolu Lu <baolu.lu@linux.intel.com>
+Cc:     Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org,
+        alex.williamson@redhat.com, kevin.tian@intel.com,
+        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
+        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v2 3/4] iommufd: Add IOMMU_DEVICE_GET_HW_INFO
+Message-ID: <ZAoVemZoGpx16P9E@nvidia.com>
+References: <20230309075358.571567-1-yi.l.liu@intel.com>
+ <20230309075358.571567-4-yi.l.liu@intel.com>
+ <6c1b221e-df8d-4b82-10e5-aa3027819d45@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <a1788ed6-89d4-27da-a049-99e29edea4cb@sberdevices.ru>
+In-Reply-To: <6c1b221e-df8d-4b82-10e5-aa3027819d45@linux.intel.com>
+X-ClientProxiedBy: SJ0PR05CA0141.namprd05.prod.outlook.com
+ (2603:10b6:a03:33d::26) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DS7PR12MB6166:EE_
+X-MS-Office365-Filtering-Correlation-Id: 13dbb63c-e221-44e6-94a1-08db20c2a7da
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: VT1nl0c+OvHMYgMlqI+4AS39leT1VGIN7iENUds09JmQIqfL6dwmhgqger0+pm1b/9z6/8p5Rery0UIbVb8rU+zvrjQX0S80aYg2yo9sZRobU7KIcdR4TZWHtHknD9EQXwAL8MzP0Ofqm2XhpHLLEGQrJFJ9nWa+Ar318V9CXQfUHEtPpaTN3on04hrAWlH0+eFw7Mts3iM7agyaGD3K33iq+VcogmCPkDIkAOkW+0g5T1G45Ih2Aj/ael8GP8c+TD0Sez4tZsmpJzeHVirIdeq4z/SYy4IUdNgh8egWckIMS0JgLYeLXOIEKhiwHZfOW9BDsLhrQQK43pKDmKm5xrpM0feDBVjN68aWs4sVRBBg1cgr7MNBWChwKV9p5iFHXQbkUEmI+MaDPkaslJtWLI3xM4CnsNEnWSdaN7t5jOeqVyGYBiZmnkAx6PGl0esWk56w+5h0XNa35OBMSOZyyUW4C2aHhSlw5vEJTDrQE3bMIRieue4FZXHgJQSrx44ctmIsKanqk/FmVebWijd21o1bz84VqIaM93vzIja3pKgklDzucyx+NjYGxP1WQyPeDR9EmZpKufti10ysNoN2KIQHU4Rh+spah+S2Mi6IiOs+ni4FuWsF7w7e/fAAH3re1txX0fY4uwlxO8mzxoh7aQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(346002)(396003)(39860400002)(366004)(376002)(136003)(451199018)(36756003)(6486002)(316002)(6916009)(5660300002)(7416002)(2906002)(8936002)(66476007)(66946007)(8676002)(66556008)(4744005)(41300700001)(4326008)(26005)(86362001)(186003)(6666004)(2616005)(478600001)(6512007)(6506007)(38100700002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?giTJ0eotKAMxQIF7wp1ZUApxmz5yMAew0KcHZTLWr/sIGrAmyUq4Nt7Iep2q?=
+ =?us-ascii?Q?VIRb+hvU/kUJ/pyDh+BLX86wLAOo7kc0x+jzQQS/8kgjdOzbm4Uz0aqYYHy9?=
+ =?us-ascii?Q?UVAMSOlfQNb/Gqlcgs21oGJvwqDu8FBOim6a+8lA7R1oyQl+zUxNEtfq+wtW?=
+ =?us-ascii?Q?g4CucP0l2PmpMXMKBLfEHUmxFDvLtdk2KZwNrsREgb6CVHCctvCO4AnxeJZ5?=
+ =?us-ascii?Q?Qfb8892r6oK4gNQgaKpMu5/2Roprouh9Ay8l2nk6EXlYdqzfjNmreNBO2GtN?=
+ =?us-ascii?Q?y/R4hu4FnB0AXkQWx/p8GdAbZhcDybTEcYHEBFvD6w+pkddLB0YOGuXgVKlM?=
+ =?us-ascii?Q?MY5hQv1qHscNdQJf873X3/ISP9F6PGgu0mOpMGm4Jrgcsoce/P3T+Sauhbcw?=
+ =?us-ascii?Q?UIhAPPWefz8ah/LLIfX5IkZzzIyMq+wL+eMyKX3Tolk5QMK8KycyXMFUpkiw?=
+ =?us-ascii?Q?l6ogq+Q0VEdkCZ1mQh/KToy/k+ekSS+96v/+fC91eMbFIuY5wsgeXZT9fR3B?=
+ =?us-ascii?Q?f17iYH2XoxykM/pYzFg7n/UcCfSpQjAs9TtWEz6LBfpvIN85O7omJODCBzlx?=
+ =?us-ascii?Q?u7nCPFtCcHRJccOYRIJIARdftJZKx2sSBqsqYKm2CkfvMEM7qK6nTc+0FsWk?=
+ =?us-ascii?Q?mo+93kNk9YXz1XcllsbsMyMvvzef9dim/Dr+2OalNy1ZxeJH/kGw2DK3cWYr?=
+ =?us-ascii?Q?CLTzwRQqfX0fllTLwFvVYVL+u6qCW94lTWm44PXwyCyu1raSej1sS9rRaV4S?=
+ =?us-ascii?Q?vV94w2Ip2g0oS0rEol+T+phmLLUAqdS3EboLe38zhx7yWXMcuallun7choiE?=
+ =?us-ascii?Q?Q3blllUhOfjdyZr7p40oWi5+TJ8JLSeAmliDtAV7Imb38NRfhoj2fbaZW4GB?=
+ =?us-ascii?Q?5EMRgXD/JttfQUO2Kp/daLeEucp+/kSyQQXPRWTspz/2aZSgdjG+HQw2nzdG?=
+ =?us-ascii?Q?J8F4hh6+q+7+SN7U8L8rfJ9rESXCI1D6TeoL757pMmgnO44D2GAD0Npwgx72?=
+ =?us-ascii?Q?IUPJiGXY12uaG2ffoX+lGoVtm+4Vxht4hE0Sm9kkw4J9nUbgFnrIwwtfqhYO?=
+ =?us-ascii?Q?ylATfeRAfCyI+etZ89CJz3mwbq3SWt8P5RvON0WQrg3nEtPGMXDN0b131uiH?=
+ =?us-ascii?Q?0GGG7N8h5KVAxVvh6QJcgslrw7yobB20ZxcmDXsimNc/VQiSFoAt66RTQVgc?=
+ =?us-ascii?Q?BuzKOmyYROdlh3wmZcYqZfUB/y7dPoLrs3RXrfhteIy/Aym+HoU56hiSRy2t?=
+ =?us-ascii?Q?HyKcFjmEAJa1qRSo0yKiqb45MNouHE7hxD2KY13XI9Xd9gJM99FfKsPEkz1S?=
+ =?us-ascii?Q?NIMK4YiSl2QhxhfS7DAjjIe5gLnI4biwEtc9cJ57WBONC/g+koOrKsemf0Fs?=
+ =?us-ascii?Q?QqO40jC/K2r0y5pD5pHZ2udur/nag3wF84E6DKYvU8EeY7RBDoY2UvHQtMvJ?=
+ =?us-ascii?Q?OIh07oIpTD1ztND7gWmV9BUw1mZc7C8zLJpOE6gPndKNaFK6j5rnfub3uApi?=
+ =?us-ascii?Q?PJrc/cVFz9+dEputYfi7GlyBDsRkdD0Ht8c4PK3h2JWpGKWVGn0xXbnUP615?=
+ =?us-ascii?Q?9y0BN2dW35AD8jIlmMwLeLgq4jDlglVRm4Bhb1tG?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 13dbb63c-e221-44e6-94a1-08db20c2a7da
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Mar 2023 17:21:01.7577
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Gv61OLbGV0junHtjKKjf8Px7pNcISTq5M+T33gFlGN+xJHeH+WWst7skgqF3ugmW
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6166
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 09, 2023 at 07:20:20PM +0300, Arseniy Krasnov wrote:
->
->
->On 09.03.2023 19:21, Stefano Garzarella wrote:
->> On Thu, Mar 09, 2023 at 01:10:36PM +0300, Arseniy Krasnov wrote:
->>> Hello,
->>>
->>> this patchset evolved from previous v2 version (see link below). It does
->>> several updates to virtio/vsock:
->>> 1) Changes 'virtio_transport_inc/dec_rx_pkt()' interface. Now instead of
->>>   using skbuff state ('head' and 'data' pointers) to update 'fwd_cnt'
->>>   and 'rx_bytes', integer value is passed as an input argument. This
->>>   makes code more simple, because in this case we don't need to udpate
->>>   skbuff state before calling 'virtio_transport_inc/dec_rx_pkt()'. In
->>>   more common words - we don't need to change skbuff state to update
->>>   'rx_bytes' and 'fwd_cnt' correctly.
->>> 2) For SOCK_STREAM, when copying data to user fails, current skbuff is
->>>   not dropped. Next read attempt will use same skbuff and last offset.
->>>   Instead of 'skb_dequeue()', 'skb_peek()' + '__skb_unlink()' are used.
->>>   This behaviour was implemented before skbuff support.
->>> 3) For SOCK_SEQPACKET it removes unneeded 'skb_pull()' call, because for
->>>   this type of socket each skbuff is used only once: after removing it
->>>   from socket's queue, it will be freed anyway.
->>>
->>> Test for 2) also added:
->>> Test tries to 'recv()' data to NULL buffer, then does 'recv()' with valid
->>> buffer. For SOCK_STREAM second 'recv()' must return data, because skbuff
->>> must not be dropped, but for SOCK_SEQPACKET skbuff will be dropped by
->>> kernel, and 'recv()' will return EAGAIN.
->>>
->>> Link to v1 on lore:
->>> https://lore.kernel.org/netdev/c2d3e204-89d9-88e9-8a15-3fe027e56b4b@sberdevices.ru/
->>>
->>> Link to v2 on lore:
->>> https://lore.kernel.org/netdev/a7ab414b-5e41-c7b6-250b-e8401f335859@sberdevices.ru/
->>>
->>> Change log:
->>>
->>> v1 -> v2:
->>> - For SOCK_SEQPACKET call 'skb_pull()' also in case of copy failure or
->>>   dropping skbuff (when we just waiting message end).
->>> - Handle copy failure for SOCK_STREAM in the same manner (plus free
->>>   current skbuff).
->>> - Replace bug repdroducer with new test in vsock_test.c
->>>
->>> v2 -> v3:
->>> - Replace patch which removes 'skb->len' subtraction from function
->>>   'virtio_transport_dec_rx_pkt()' with patch which updates functions
->>>   'virtio_transport_inc/dec_rx_pkt()' by passing integer argument
->>>   instead of skbuff pointer.
->>> - Replace patch which drops skbuff when copying to user fails with
->>>   patch which changes this behaviour by keeping skbuff in queue until
->>>   it has no data.
->>> - Add patch for SOCK_SEQPACKET which removes redundant 'skb_pull()'
->>>   call on read.
->>> - I remove "Fixes" tag from all patches, because all of them now change
->>>   code logic, not only fix something.
->>
->> Yes, but they solve the problem, so we should use the tag (I think at
->> least in patch 1 and 3).
->>
->> We usually use the tag when we are fixing a problem introduced by a
->> previous change. So we need to backport the patch to the stable branches
->> as well, and we need the tag to figure out which branches have the patch
->> or not.
->Ahh, sorry. Ok. I see now :)
+On Thu, Mar 09, 2023 at 09:50:18PM +0800, Baolu Lu wrote:
 
-No problem at all :-)
+> > +	if (cmd->flags || cmd->__reserved || !cmd->data_len)
+> > +		return -EOPNOTSUPP;
+> > +
+> > +	idev = iommufd_get_device(ucmd, cmd->dev_id);
+> > +	if (IS_ERR(idev))
+> > +		return PTR_ERR(idev);
+> > +
+> > +	ops = dev_iommu_ops(idev->dev);
+> > +	if (!ops || !ops->hw_info) {
+> 
+> dev_iommu_ops() will never return a NULL.
+> 
+> Need below check
+> 
+> 	dev->iommu && dev->iommu->iommu_dev
+> 
+> before dev_iommu_ops(). Perhaps something like below?
+> 
+> 	if (!dev->iommu || !dev->iommu->iommu_dev)
+> 		return -EINVAL;
 
-I think also patch 2 can have the Fixes tag.
+At this point the device has become owned through the ownership API,
+it absolutely has to have an iommu and an ops. No need to check
+anything.
 
-Thanks,
-Stefano
-
->
->Thanks, Arseniy
->>
->> Thanks,
->> Stefano
->>
->>>
->>> Arseniy Krasnov (4):
->>>  virtio/vsock: don't use skbuff state to account credit
->>>  virtio/vsock: remove redundant 'skb_pull()' call
->>>  virtio/vsock: don't drop skbuff on copy failure
->>>  test/vsock: copy to user failure test
->>>
->>> net/vmw_vsock/virtio_transport_common.c |  29 +++---
->>> tools/testing/vsock/vsock_test.c        | 118 ++++++++++++++++++++++++
->>> 2 files changed, 131 insertions(+), 16 deletions(-)
->>>
->>> -- 
->>> 2.25.1
->>>
->>
->
-
+Jason
