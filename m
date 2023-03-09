@@ -2,458 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 08D756B28ED
-	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 16:37:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8367A6B2928
+	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 16:51:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231310AbjCIPhS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Mar 2023 10:37:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37380 "EHLO
+        id S231318AbjCIPv0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Mar 2023 10:51:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231271AbjCIPhP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Mar 2023 10:37:15 -0500
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B66EEE76E;
-        Thu,  9 Mar 2023 07:37:13 -0800 (PST)
-Received: by mail-lj1-x22d.google.com with SMTP id h9so2274518ljq.2;
-        Thu, 09 Mar 2023 07:37:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678376231;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WSQcujc2kwGQSePpHgxgwi8K0GJNp7T3Uc/zRsclurQ=;
-        b=WQ1LOiSbV56+O4sh5Ol5P0kD2tDh0x8HPjmmGFsknqJ8AppPxqG5yULr4ps4DQWIi5
-         wOkdGk2WVqu/dFvT3YnBzBwxzkemqzUWX4/efz2MojM1ivLOUu78EWDy5WOpkJIvpmwN
-         VbmYPBT9y5Orc0puV6rY55sYNlY6MWx0jFsLTFOICikyM2hia0fc643Z157aztciD5Ps
-         VqgJpGjikCJUin+YRMmPwnpxbsRRBVcjDgGJHWATFBiCtI4JQbYhWT5DwrZE5eUM/I/D
-         M3g9MSl6u4gHsrl/qilWyAqWxud3SzUkkMNQCu6niArhjsMA9qwWJR0xl2cuWGKuBYC3
-         hp5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678376231;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WSQcujc2kwGQSePpHgxgwi8K0GJNp7T3Uc/zRsclurQ=;
-        b=ETd/ITR/NxmNCK4FOX00dTS2vBmWpVzNiEIg9nVaQa00eufDbSTDxWSMbv9KiL6pHD
-         GoYAfVM5c3USyi/Y7SdgObMUWMsE0Yqcf7bGcQ3wZVcoWUdySCZofFm+YesT7Vc8XGej
-         VkUAlq+Ghz2x3W5uoAroFn7bIrGm1yzDDmNzbvSYZmIdQIKMJuch6YhqHEyjk6Y8smr6
-         9SJbz4y0Mrn8Vtmp7e5zpOVsimGSiZnR3rGVB5GYhSVUyuQuVFIHwWTbW+d5hxXfUDL1
-         gQw9l+4aQbdNbQOCvsSHuDMFEwGPlCza86KPPEKGSxHy4lFRUy8DQI5srXUcaFbU9R2o
-         OnIQ==
-X-Gm-Message-State: AO0yUKXWGtqytn0YOvpqO4CWjZYx5UuIVTyw76zjSD3uSF4sCuwrLs0K
-        qFLia8wY53vW+lPOl6Pb5VE=
-X-Google-Smtp-Source: AK7set+akWcf3RvlgwhEcWbwuX77poa5WpQ7cmiU0YF+X+ZmuHhzc4uBCo9R3RBLqD6sfOF0wzS57A==
-X-Received: by 2002:a2e:99c8:0:b0:295:9d09:e27 with SMTP id l8-20020a2e99c8000000b002959d090e27mr6925667ljj.3.1678376231162;
-        Thu, 09 Mar 2023 07:37:11 -0800 (PST)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id 2-20020a2e0502000000b00293530f5765sm3019896ljf.113.2023.03.09.07.37.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Mar 2023 07:37:11 -0800 (PST)
-Date:   Thu, 9 Mar 2023 17:37:09 +0200
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-To:     Vipin Sharma <vipinsh@google.com>
-Cc:     seanjc@google.com, pbonzini@redhat.com, bgardon@google.com,
-        dmatlack@google.com, jmattson@google.com, mizhang@google.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [Patch v4 03/18] KVM: x86/mmu: Track count of pages in KVM MMU
- page caches globally
-Message-ID: <20230309173709.0000505e@gmail.com>
-In-Reply-To: <20230306224127.1689967-4-vipinsh@google.com>
-References: <20230306224127.1689967-1-vipinsh@google.com>
-        <20230306224127.1689967-4-vipinsh@google.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        with ESMTP id S231436AbjCIPvT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Mar 2023 10:51:19 -0500
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2049.outbound.protection.outlook.com [40.107.102.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4423BF2F89;
+        Thu,  9 Mar 2023 07:51:17 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eTw4S1VX/T0sZ1uNDOTf75gXPAqtcy46XmjIvko/YfUkgLwXYcoi03FuFg2x9MCmJLstbWds1J/UUBNJgamOl48Eu4hlY202eV+LggGkG87HdjZqXPe96ZT7CBVep1xUplz4p4J0nuaQGX46zq4crxZSsb2TSXC3vFmzlo94Vb0MLloZM6EOPmCyrjsjkMDHzmxEc/OFrkNDok9v2FJTjYClf6gVxUPuSlmnZg4rhMham18D8tAB0PjTTiSxiFj8XvK9ASd/6o8Xj1zmFFd3Aw3rRm/HKltMFkkeppxg8pxvqHNy2CYnnJlijXaWXem3z4aOcyOheRJL1r9TLUqmeQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=b1aAlz6lI3GgUoo8UqNIqpFZm0oqfy4qOAxq2Y7jQSc=;
+ b=ZK6sAMvmWYN6708ECwdF0CEJyC+pAhL3/tCIZlvVzlUb33GyY+DpntbDjNBjV0hozewvyYbv7HIHi48FTTcYUScFnaG7mVdZMwvXwYfEnwfSGmDlSqXxuDMrPy06hVbbxZz6wWiDWEFzWE/3gxxI726Hz+7UW/aRTAoEBzii2GW7ChLvMderZeAnaLh3/ISRLqVGZXVmRiK8ukUFbeSfVQrd4K+cWWdxeBdLamQW0yQ1Bat2Rx0wOzEKbYknvqQdk5RPdpGIxeFQNJCtP7IwbfgwitZgHxvbHcw2ZSit0wdTxTA7/i2j4U8DQU5K8rzS7jwN9X16bNP+YGbZErvZyg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=b1aAlz6lI3GgUoo8UqNIqpFZm0oqfy4qOAxq2Y7jQSc=;
+ b=s9sA4ZH8Id+u/wJbuX3kXsFmeLBZaRYvpbX/PvPJu1hwHpJMVSDqmGUfYG/SwpeIUmp/9EwmD7bkQZQ07kqazhk8Gd/HwfSKvMgkz6b+yHWB8pJGvp+LtfaUVtnHUx3gpBSy+shDoAzodrPCumj59PEHTEDc41z72hE/32nJCHMgB6jjo59f06waEtU7urNKGpln6BQIoCikqzpNJEGCSxjsrzwqptVxxqrogiethzssaDUBzGnSbaExvoQNNHq6Z+5vhLn0r9RfUSpnYlQU0MiHphZ86/A1rCFyzzRinw1xp4j0V5JHBU7GZPikTh5nuF/lNQN0p8Q0DhJF62w+FQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by MN0PR12MB6149.namprd12.prod.outlook.com (2603:10b6:208:3c7::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6156.29; Thu, 9 Mar
+ 2023 15:51:14 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::ef6d:fdf6:352f:efd1]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::ef6d:fdf6:352f:efd1%3]) with mapi id 15.20.6178.017; Thu, 9 Mar 2023
+ 15:51:14 +0000
+Date:   Thu, 9 Mar 2023 11:51:11 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Baolu Lu <baolu.lu@linux.intel.com>
+Cc:     iommu@lists.linux.dev, Kevin Tian <kevin.tian@intel.com>,
+        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
+        Nicolin Chen <nicolinc@nvidia.com>, Yi Liu <yi.l.liu@intel.com>
+Subject: Re: [PATCH v2 02/17] iommufd: Add iommufd_group
+Message-ID: <ZAoAb8SJwC3EItM5@nvidia.com>
+References: <2-v2-51b9896e7862+8a8c-iommufd_alloc_jgg@nvidia.com>
+ <3469063c-7ed4-3fda-0280-2cc6b4e6fd98@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3469063c-7ed4-3fda-0280-2cc6b4e6fd98@linux.intel.com>
+X-ClientProxiedBy: BYAPR06CA0071.namprd06.prod.outlook.com
+ (2603:10b6:a03:14b::48) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|MN0PR12MB6149:EE_
+X-MS-Office365-Filtering-Correlation-Id: b10dbe3d-6cb0-4d4c-27e4-08db20b61ccd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Hy8vpsnW8xmTdZb3lvxwflZoQokIkOyU958Z8yFSWCSBisXLf36nv8v6LEDM1HeQhA57NtsGshFBs3papoLWBDlmrGjcalPSoCWw69dPLEP4TzNyYN5Lrjv7vOjq/Ez0mJeJ+iKq46aQLSLHfGbGJtm2sLE3svr8CgZfs6g0jzKjBLQBWj27WFrXwGQl3cDgT20tN7/E0xgEZ6pqlTcNtQ8uO9PT1Dnjk4IXfSequ5DcUzImEm3grvzBNHkFxz9ZkaupkH5fx+Zpi0XUu0m8adyrP5+ICTo3ZV+zXAQHNrgZlMLELFUaoatQ3oNWg5qHmyZjpI1KHeqfIeG20VCi3dFylhkwZdYZuNr0nEz4QWTyyce+Hq4xjIr04DEo+QwloKdWVf9aS1UjfohkBD6mV82ojbR1OqG4VpnlWzpvOCH+u7Syk80ycIkNBD51ZR0c27iSU8WLnQPOU8nQDFokZo2TUFB7CNGBdwsJemU4vMTpmqbl0zHrLCgISyS0/rbziqRLMRJ/MktKRwP2ZgUEXKtDmgDDO5faN0horOMYziC4HEuE/pickrk7AW3+alV2HJ8SBA3ZgoYffApqdWSQ9YqtM4PU+ANmhvJBtqBlEOKntiNWx7G3/Ayw4wBqRVhPiCOO2ylxfd4BdaIpcyYsrw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(136003)(366004)(396003)(39860400002)(346002)(376002)(451199018)(478600001)(6666004)(5660300002)(86362001)(186003)(2906002)(6512007)(26005)(6506007)(6486002)(36756003)(2616005)(53546011)(83380400001)(66946007)(66476007)(66556008)(4326008)(6916009)(38100700002)(8676002)(8936002)(41300700001)(316002)(54906003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?zcC54q6MUCrAqb/30IchGgKv8fu+AUvtP19W47cirQ3OEnWLfKv/X6lFZYDi?=
+ =?us-ascii?Q?RsnKH36Wb89nW+FqSHBMUBGJQrul20mw12wib9hwmAw3xgsKXy/URpANgSA+?=
+ =?us-ascii?Q?NJATR5vTisqyQIeRNC5lSTpn6P6hfSG6HrSITwngKeafEKz3g7KKqo+/UDgw?=
+ =?us-ascii?Q?hyBGzCweJ2TRS1+uzPheG71wY0xlN2/R6lLcd8expqOFRkFPXcPAjMDEea/z?=
+ =?us-ascii?Q?V1+9cNTP+GSzTNyOQrDzkFVoJ69+MUkRc7Hg1l2jC+aTzanLbNFrnPG2Reqw?=
+ =?us-ascii?Q?OYuIyaKYzISmrCzTUO0u5od3Y+r3JlRdmdd3huy0R+oAqHB4m1GrsV2mvhB3?=
+ =?us-ascii?Q?7JHyv5PwzcWovbaJPlBezaNt/jwONqAlCGyEX8WGkZXVnlUdaGWbmjrOFczO?=
+ =?us-ascii?Q?dZjf09vAkp+cq4Lua5azE8rN00cnliLLVVcHaaSTwr18gIRUJ4ZjIpO/XbAX?=
+ =?us-ascii?Q?vbX2ZWsd+GN0SRGEmxD4UsV5tbMU+GgH/zQIZth5LUJa5W+Glw//OJQuilXy?=
+ =?us-ascii?Q?yYuVi1a+mPBoUY/tv9YN/5xacHapdZgoUT5MLF7+q3TJxzW8eJOUhl2kpq7f?=
+ =?us-ascii?Q?f49WbbQIBKjhUhc10BgthHgzD9IqYT+oTnyznZ3KXPRmlCBTH13VegbF6dhO?=
+ =?us-ascii?Q?FZ7GlK9xxjzrezI7Af+U8QyHLLYLqTD6jGLjaGmgai9QeljjP+0u6EYpc2U/?=
+ =?us-ascii?Q?LxY7bhhwJX7zWbhK4gOF33I1dweRGTPCCZSthq+Gt8qITHMkS3NyCFyd/3MH?=
+ =?us-ascii?Q?RcqyNxVy/Jej1VqMDlajzq+t5HkXVgWoGrjWt2nZLRGyoaw9VSBo7Es4f2ic?=
+ =?us-ascii?Q?9/qYCIKNdSbesVjcWFGpQWia7C+a6oVjySzOfrMXqlal/PDa/rpF1Q11CTGD?=
+ =?us-ascii?Q?UEP6LMYYMTD+vPZLzDcxmH48uG9LzP78+xL44nqr0sxybr760wmqh2NFUGZe?=
+ =?us-ascii?Q?O1wf4SD/vIpfsKXPnwRcfXibJ8WAGYzQx+4o0FutV85TGNP2UuJTVo/nvUFP?=
+ =?us-ascii?Q?oqulg7v1NOjOU7Q8jr1dtaa5jZOa8rx30eIphROGDTnyfWGeXJ13aVYchN9k?=
+ =?us-ascii?Q?dABPYTaWOBjbmk4rB8LE2MZCfD5yDhS2PkM9tMqrLdm9Sxixns0Omq5GVwo0?=
+ =?us-ascii?Q?Ox6fxoH7Gn/tL0H+JB+Vjyth/cnVEQ+VsD5mcOklKgKkk5h5T0btKCYk5VQP?=
+ =?us-ascii?Q?iIlhb8VUcaz7M5XOrHQZ2W3LJgDXcOu0BPyeWH/UAZLTZ3JEjxPo5rW1bGpm?=
+ =?us-ascii?Q?vdTATsrWhHoJsmKFfJ0/0a9wEUQmBbhXNj3iw5iqJMUtV1Sjra+VOJamXLx/?=
+ =?us-ascii?Q?cj29MKNywAHjUmlE618b3/GIZauaj2hcC9xK7KuU0EQtpBJnZtdoX55REbch?=
+ =?us-ascii?Q?0C+dqy3ghWsVTXMFADaG1LkHXtpnFdbGHyFU3M8xwW7GNJG2haHX88KFEgEo?=
+ =?us-ascii?Q?oe4TLZlDdp3UffE5qLTq/ctXKUv2bu7xFZSEEP+s/kVtAEDeSWYgjQ2YyAWu?=
+ =?us-ascii?Q?JoFJ5aTGnlRnkhG+oBIgx/n/cvGSLngDYVIX19ElwGN0ZT7eThUOpBU1Ivqm?=
+ =?us-ascii?Q?9oZWePWhOtuKvsq3XMfZT8RsIBR2QtXqfX67ooVB?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b10dbe3d-6cb0-4d4c-27e4-08db20b61ccd
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Mar 2023 15:51:14.3806
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FhEKvXCvpcm/KE85ITD7mEgvkXUEy5GkntO/vKTMkJn8APJj+3K86HOd0Il8DHvF
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6149
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon,  6 Mar 2023 14:41:12 -0800
-Vipin Sharma <vipinsh@google.com> wrote:
-
-> Create a global counter for total number of pages available
-> in MMU page caches across all VMs. Add mmu_shadow_page_cache
-> pages to this counter.
+On Wed, Mar 08, 2023 at 11:18:11AM +0800, Baolu Lu wrote:
+> On 3/8/23 8:35 AM, Jason Gunthorpe wrote:
+> > When the hwpt to device attachment is fairly static we could get
+> > away with the simple approach of keeping track of the groups via a
+> > device list. But with replace this is infeasible.
+> > 
+> > Add an automatically managed struct that is 1:1 with the iommu_group
+> > per-ictx so we can store the necessary tracking information there.
+> > 
+> > Signed-off-by: Jason Gunthorpe<jgg@nvidia.com>
 > 
-> This accounting will be used in future commits to shrink MMU caches via
-> KVM MMU shrinker.
-> 
-> Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> ---
->  arch/x86/include/asm/kvm_host.h |  5 ++
->  arch/x86/kvm/mmu/mmu.c          | 90 ++++++++++++++++++++++++++++-----
->  arch/x86/kvm/mmu/mmu_internal.h |  2 +
->  arch/x86/kvm/mmu/paging_tmpl.h  | 25 +++++----
->  arch/x86/kvm/mmu/tdp_mmu.c      |  3 +-
->  5 files changed, 100 insertions(+), 25 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index ebbe692acf3f..4322c7020d5d 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -791,6 +791,11 @@ struct kvm_vcpu_arch {
->  	struct kvm_mmu_memory_cache mmu_shadowed_info_cache;
->  	struct kvm_mmu_memory_cache mmu_page_header_cache;
->  
-> +	/*
-> +	 * Protect allocation and release of pages from mmu_shadow_page_cache.
-> +	 */
-> +	struct mutex mmu_shadow_page_cache_lock;
-> +
->  	/*
->  	 * QEMU userspace and the guest each have their own FPU state.
->  	 * In vcpu_run, we switch between the user and guest FPU contexts.
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 3a452989f5cd..13f41b7ac280 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -167,6 +167,11 @@ struct kvm_shadow_walk_iterator {
->  static struct kmem_cache *pte_list_desc_cache;
->  struct kmem_cache *mmu_page_header_cache;
->  
-> +/*
-> + * Global count of unused pages in MMU page caches across all VMs.
-> + */
-> +static struct percpu_counter kvm_total_unused_cached_pages;
-> +
->  static void mmu_spte_set(u64 *sptep, u64 spte);
->  
->  struct kvm_mmu_role_regs {
-> @@ -667,6 +672,34 @@ static void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
->  	}
->  }
->  
-> +/**
-> + * Caller should hold mutex lock corresponding to cache, if available.
-> + */
-> +static int mmu_topup_sp_memory_cache(struct kvm_mmu_memory_cache *cache,
-> +				     int min)
-> +{
-> +	int orig_nobjs, r;
-> +
-> +	orig_nobjs = cache->nobjs;
-> +	r = kvm_mmu_topup_memory_cache(cache, min);
-> +	if (orig_nobjs != cache->nobjs)
-> +		percpu_counter_add(&kvm_total_unused_cached_pages,
-> +				   (cache->nobjs - orig_nobjs));
-> +
-> +	return r;
-> +}
-> +
-> +/**
-> + * Caller should hold mutex lock corresponding to kvm_mmu_memory_cache, if
-> + * available.
-> + */
-> +static void mmu_free_sp_memory_cache(struct kvm_mmu_memory_cache *cache)
-> +{
-> +	if (cache->nobjs)
-> +		percpu_counter_sub(&kvm_total_unused_cached_pages, cache->nobjs);
-> +	kvm_mmu_free_memory_cache(cache);
-> +}
-> +
->  static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
->  {
->  	int r;
-> @@ -676,10 +709,11 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
->  				       1 + PT64_ROOT_MAX_LEVEL + PTE_PREFETCH_NUM);
->  	if (r)
->  		return r;
-> -	r = kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_shadow_page_cache,
-> -				       PT64_ROOT_MAX_LEVEL);
-> +
-> +	r = mmu_topup_sp_memory_cache(&vcpu->arch.mmu_shadow_page_cache, PT64_ROOT_MAX_LEVEL);
->  	if (r)
->  		return r;
-> +
->  	if (maybe_indirect) {
->  		r = kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_shadowed_info_cache,
->  					       PT64_ROOT_MAX_LEVEL);
-> @@ -693,7 +727,9 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
->  static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
->  {
->  	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache);
-> -	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_shadow_page_cache);
-> +	mutex_lock(&vcpu->arch.mmu_shadow_page_cache_lock);
-> +	mmu_free_sp_memory_cache(&vcpu->arch.mmu_shadow_page_cache);
-> +	mutex_unlock(&vcpu->arch.mmu_shadow_page_cache_lock);
->  	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_shadowed_info_cache);
->  	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_header_cache);
->  }
-> @@ -2148,6 +2184,7 @@ struct shadow_page_caches {
->  	struct kvm_mmu_memory_cache *page_header_cache;
->  	struct kvm_mmu_memory_cache *shadow_page_cache;
->  	struct kvm_mmu_memory_cache *shadowed_info_cache;
-> +	bool count_shadow_page_allocation;
->  };
->  
->  static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm *kvm,
-> @@ -2159,7 +2196,8 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm *kvm,
->  	struct kvm_mmu_page *sp;
->  
->  	sp = kvm_mmu_memory_cache_alloc(caches->page_header_cache);
-> -	sp->spt = kvm_mmu_memory_cache_alloc(caches->shadow_page_cache);
-> +	sp->spt = mmu_sp_memory_cache_alloc(caches->shadow_page_cache,
-> +					    caches->count_shadow_page_allocation);
->  	if (!role.direct)
->  		sp->shadowed_translation = kvm_mmu_memory_cache_alloc(caches->shadowed_info_cache);
->  
-> @@ -2216,6 +2254,7 @@ static struct kvm_mmu_page *kvm_mmu_get_shadow_page(struct kvm_vcpu *vcpu,
->  		.page_header_cache = &vcpu->arch.mmu_page_header_cache,
->  		.shadow_page_cache = &vcpu->arch.mmu_shadow_page_cache,
->  		.shadowed_info_cache = &vcpu->arch.mmu_shadowed_info_cache,
-> +		.count_shadow_page_allocation = true,
->  	};
->  
->  	return __kvm_mmu_get_shadow_page(vcpu->kvm, vcpu, &caches, gfn, role);
-> @@ -4314,29 +4353,32 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
->  	if (r != RET_PF_INVALID)
->  		return r;
->  
-> +	mutex_lock(&vcpu->arch.mmu_shadow_page_cache_lock);
->  	r = mmu_topup_memory_caches(vcpu, false);
->  	if (r)
-> -		return r;
-> +		goto out_page_cache_unlock;
->  
->  	r = kvm_faultin_pfn(vcpu, fault, ACC_ALL);
->  	if (r != RET_PF_CONTINUE)
-> -		return r;
-> +		goto out_page_cache_unlock;
->  
->  	r = RET_PF_RETRY;
->  	write_lock(&vcpu->kvm->mmu_lock);
->  
->  	if (is_page_fault_stale(vcpu, fault))
-> -		goto out_unlock;
-> +		goto out_mmu_unlock;
->  
->  	r = make_mmu_pages_available(vcpu);
->  	if (r)
-> -		goto out_unlock;
-> +		goto out_mmu_unlock;
->  
->  	r = direct_map(vcpu, fault);
->  
-> -out_unlock:
-> +out_mmu_unlock:
->  	write_unlock(&vcpu->kvm->mmu_lock);
->  	kvm_release_pfn_clean(fault->pfn);
-> +out_page_cache_unlock:
-> +	mutex_unlock(&vcpu->arch.mmu_shadow_page_cache_lock);
->  	return r;
->  }
->  
-> @@ -4396,25 +4438,28 @@ static int kvm_tdp_mmu_page_fault(struct kvm_vcpu *vcpu,
->  	if (r != RET_PF_INVALID)
->  		return r;
->  
-> +	mutex_lock(&vcpu->arch.mmu_shadow_page_cache_lock);
->  	r = mmu_topup_memory_caches(vcpu, false);
->  	if (r)
-> -		return r;
-> +		goto out_page_cache_unlock;
->  
->  	r = kvm_faultin_pfn(vcpu, fault, ACC_ALL);
->  	if (r != RET_PF_CONTINUE)
-> -		return r;
-> +		goto out_page_cache_unlock;
->  
->  	r = RET_PF_RETRY;
->  	read_lock(&vcpu->kvm->mmu_lock);
->  
->  	if (is_page_fault_stale(vcpu, fault))
-> -		goto out_unlock;
-> +		goto out_mmu_unlock;
->  
->  	r = kvm_tdp_mmu_map(vcpu, fault);
->  
-> -out_unlock:
-> +out_mmu_unlock:
->  	read_unlock(&vcpu->kvm->mmu_lock);
->  	kvm_release_pfn_clean(fault->pfn);
-> +out_page_cache_unlock:
-> +	mutex_unlock(&vcpu->arch.mmu_shadow_page_cache_lock);
->  	return r;
->  }
->  #endif
-> @@ -5394,6 +5439,7 @@ int kvm_mmu_load(struct kvm_vcpu *vcpu)
->  {
->  	int r;
->  
-> +	mutex_lock(&vcpu->arch.mmu_shadow_page_cache_lock);
->  	r = mmu_topup_memory_caches(vcpu, !vcpu->arch.mmu->root_role.direct);
->  	if (r)
->  		goto out;
-> @@ -5420,6 +5466,7 @@ int kvm_mmu_load(struct kvm_vcpu *vcpu)
->  	 */
->  	static_call(kvm_x86_flush_tlb_current)(vcpu);
->  out:
-> +	mutex_unlock(&vcpu->arch.mmu_shadow_page_cache_lock);
->  	return r;
->  }
->  
-> @@ -5924,6 +5971,7 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
->  	vcpu->arch.mmu_page_header_cache.gfp_zero = __GFP_ZERO;
->  
->  	vcpu->arch.mmu_shadow_page_cache.gfp_zero = __GFP_ZERO;
-> +	mutex_init(&vcpu->arch.mmu_shadow_page_cache_lock);
->  
->  	vcpu->arch.mmu = &vcpu->arch.root_mmu;
->  	vcpu->arch.walk_mmu = &vcpu->arch.root_mmu;
-> @@ -6769,12 +6817,17 @@ int kvm_mmu_vendor_module_init(void)
->  	if (!mmu_page_header_cache)
->  		goto out;
->  
-> +	if (percpu_counter_init(&kvm_total_unused_cached_pages, 0, GFP_KERNEL))
-> +		goto out;
-> +
->  	ret = register_shrinker(&mmu_shrinker, "x86-mmu");
->  	if (ret)
-> -		goto out;
-> +		goto out_shrinker;
->  
->  	return 0;
->  
-> +out_shrinker:
-> +	percpu_counter_destroy(&kvm_total_unused_cached_pages);
->  out:
->  	mmu_destroy_caches();
->  	return ret;
-> @@ -6792,6 +6845,7 @@ void kvm_mmu_vendor_module_exit(void)
->  {
->  	mmu_destroy_caches();
->  	unregister_shrinker(&mmu_shrinker);
-> +	percpu_counter_destroy(&kvm_total_unused_cached_pages);
->  }
->  
->  /*
-> @@ -6994,3 +7048,11 @@ void kvm_mmu_pre_destroy_vm(struct kvm *kvm)
->  	if (kvm->arch.nx_huge_page_recovery_thread)
->  		kthread_stop(kvm->arch.nx_huge_page_recovery_thread);
->  }
-> +
-> +void *mmu_sp_memory_cache_alloc(struct kvm_mmu_memory_cache *shadow_page_cache,
-> +				bool count_allocation)
+> The iommufd_get_group() helper looks long. I went through it carefully
+> and didn't find any problems. However, is it possible to add a mutex in
+> ictx to protect the group array? Can it be simpler?
 
-Is it necessary to have the control of count_allocation in every call of
-mmu_sp_memory_cache_alloc() instead of taking
-shadow_page_cache->count_shadow_page_allocation directly?
+We have a spinlock to protect the array, that is why it is so long
+because we don't want to hold the spinlock and also allocate memory.
 
-> +{
-> +	if (count_allocation && shadow_page_cache->nobjs)
-> +		percpu_counter_dec(&kvm_total_unused_cached_pages);
-> +	return kvm_mmu_memory_cache_alloc(shadow_page_cache);
-> +}
-> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-> index cc58631e2336..798cfbf0a36b 100644
-> --- a/arch/x86/kvm/mmu/mmu_internal.h
-> +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> @@ -338,5 +338,7 @@ void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
->  
->  void track_possible_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp);
->  void untrack_possible_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp);
-> +void *mmu_sp_memory_cache_alloc(struct kvm_mmu_memory_cache *cache,
-> +				bool count_allocation);
->  
->  #endif /* __KVM_X86_MMU_INTERNAL_H */
-> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-> index 57f0b75c80f9..1dea9be6849d 100644
-> --- a/arch/x86/kvm/mmu/paging_tmpl.h
-> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-> @@ -821,9 +821,10 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
->  		return RET_PF_EMULATE;
->  	}
->  
-> +	mutex_lock(&vcpu->arch.mmu_shadow_page_cache_lock);
->  	r = mmu_topup_memory_caches(vcpu, true);
->  	if (r)
-> -		return r;
-> +		goto out_page_cache_unlock;
->  
->  	vcpu->arch.write_fault_to_shadow_pgtable = false;
->  
-> @@ -837,7 +838,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
->  
->  	r = kvm_faultin_pfn(vcpu, fault, walker.pte_access);
->  	if (r != RET_PF_CONTINUE)
-> -		return r;
-> +		goto out_page_cache_unlock;
->  
->  	/*
->  	 * Do not change pte_access if the pfn is a mmio page, otherwise
-> @@ -862,16 +863,18 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
->  	write_lock(&vcpu->kvm->mmu_lock);
->  
->  	if (is_page_fault_stale(vcpu, fault))
-> -		goto out_unlock;
-> +		goto out_mmu_unlock;
->  
->  	r = make_mmu_pages_available(vcpu);
->  	if (r)
-> -		goto out_unlock;
-> +		goto out_mmu_unlock;
->  	r = FNAME(fetch)(vcpu, fault, &walker);
->  
-> -out_unlock:
-> +out_mmu_unlock:
->  	write_unlock(&vcpu->kvm->mmu_lock);
->  	kvm_release_pfn_clean(fault->pfn);
-> +out_page_cache_unlock:
-> +	mutex_unlock(&vcpu->arch.mmu_shadow_page_cache_lock);
->  	return r;
->  }
->  
-> @@ -897,17 +900,18 @@ static void FNAME(invlpg)(struct kvm_vcpu *vcpu, gva_t gva, hpa_t root_hpa)
->  
->  	vcpu_clear_mmio_info(vcpu, gva);
->  
-> +	if (!VALID_PAGE(root_hpa)) {
-> +		WARN_ON(1);
-> +		return;
-> +	}
-> +
-> +	mutex_lock(&vcpu->arch.mmu_shadow_page_cache_lock);
->  	/*
->  	 * No need to check return value here, rmap_can_add() can
->  	 * help us to skip pte prefetch later.
->  	 */
->  	mmu_topup_memory_caches(vcpu, true);
->  
-> -	if (!VALID_PAGE(root_hpa)) {
-> -		WARN_ON(1);
-> -		return;
-> -	}
-> -
->  	write_lock(&vcpu->kvm->mmu_lock);
->  	for_each_shadow_entry_using_root(vcpu, root_hpa, gva, iterator) {
->  		level = iterator.level;
-> @@ -943,6 +947,7 @@ static void FNAME(invlpg)(struct kvm_vcpu *vcpu, gva_t gva, hpa_t root_hpa)
->  			break;
->  	}
->  	write_unlock(&vcpu->kvm->mmu_lock);
-> +	mutex_unlock(&vcpu->arch.mmu_shadow_page_cache_lock);
->  }
->  
->  /* Note, @addr is a GPA when gva_to_gpa() translates an L2 GPA to an L1 GPA. */
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 7c25dbf32ecc..fa6eb1e9101e 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -265,7 +265,8 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp(struct kvm_vcpu *vcpu)
->  	struct kvm_mmu_page *sp;
->  
->  	sp = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
-> -	sp->spt = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
-> +	sp->spt = mmu_sp_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache,
-> +					    true);
->  
->  	return sp;
->  }
+This is still the "short" version because it doesn't also use RCU :)
 
+It is true though, it would be nice if xarray.c had a helper for this
+"return existing w/ ref or allocate and ref" pattern.
+
+Jason
