@@ -2,161 +2,362 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 29A456B27B0
-	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 15:47:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C7FA6B25A6
+	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 14:41:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232137AbjCIOru (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Mar 2023 09:47:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53072 "EHLO
+        id S231165AbjCINls (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Mar 2023 08:41:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232085AbjCIOrW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Mar 2023 09:47:22 -0500
-X-Greylist: delayed 33175 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 09 Mar 2023 06:45:30 PST
-Received: from 6612356.ramdonax.ml (6612356.ramdonax.ml [162.240.223.232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1073CF5AAC
-        for <kvm@vger.kernel.org>; Thu,  9 Mar 2023 06:45:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=ludriluseo.tk; s=default; h=Content-Type:MIME-Version:Message-ID:Date:
-        Subject:To:From:Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:
-        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=qkS+sSQniI/lIb1+2c8GzW+7DnQqd38hXyCfRNGEW7U=; b=aDx6xw6hqm0hUWp9RmkpBaW7j7
-        Tdo0yYMFIRrV5Kq9eZOC8JAok5olYP7rl7vJczlb2os1CoihIeGkIdVxNPXnp8dbpnmay0ifFltJr
-        hsNKETLlKUODotyvmsZGwWW+SPI5+INQnJCcapxRtc4+t+AjupGCK2P0kv3uuVSQxJpZYufFJ7xt9
-        XL1GfgUOiRXDCw9IF0QBZiH1eWsVstJKVOY08xeOKa87FyUZvihjxhIYHniX+/e7jXKLMOTtKvxnz
-        fAvOJ9XJvI2rctu37nUaqR94RYebaggvuk3pawsEi99wmXcDCi2I6qlY79cVZqz7lTioMq2lZbKwO
-        UuOb+KCQ==;
-Received: from [134.195.138.209] (port=55799 helo=ludriluseo.tk)
-        by 6612356.ramdonax.ml with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <_mainaccount@ludriluseo.tk>)
-        id 1pa8tG-0001Jh-A5
-        for kvm@vger.kernel.org;
-        Wed, 08 Mar 2023 23:32:34 -0600
-From:   on behalf of kvm <_mainaccount@ludriluseo.tk>
-To:     kvm@vger.kernel.org
-Subject: payment for renewal insurance policy  8 Mar 2023
-Date:   08 Mar 2023 21:32:34 -0800
-Message-ID: <20230308213234.86EBBF2DC0F4898F@ludriluseo.tk>
+        with ESMTP id S231180AbjCINlj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Mar 2023 08:41:39 -0500
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72AC9F208B
+        for <kvm@vger.kernel.org>; Thu,  9 Mar 2023 05:41:35 -0800 (PST)
+Received: by mail-pg1-x532.google.com with SMTP id y19so1049489pgk.5
+        for <kvm@vger.kernel.org>; Thu, 09 Mar 2023 05:41:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=semihalf.com; s=google; t=1678369295;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oemPlzgbeOP+LaJlWnc7H/h3NtkUUX5eQ/vQ7NKduH0=;
+        b=oCWVYTdaDl+snWip7z9t9KrFNNtYXzKO4XjFoI19aoZyhWoVBRLQOxgH2j9ikLgAAh
+         NqK+moCofKYOm21RuHnIzu1liCIjcNOhTQknVFNE63WBBeiRQi6g2WrYtnnwPl+Ovo1K
+         QrkyLDTogWW2muXSYEzMZbKAChV3M07eCqYFyE/niadIiW0aN3G87EJAXWLInJ3d1D5f
+         LnVYYugP1krQFJXsWR5Xs4/4K9RVbPnkuXPzN497ihAxt6dh35AEFQi6w1PxalR1VMHb
+         5F0eJTP3Fr9JQ7iwPs88+VCGNdR4zF5STbl87HoGawwhxCuEf9boaJo1gITCAv8HCA1T
+         LK6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678369295;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oemPlzgbeOP+LaJlWnc7H/h3NtkUUX5eQ/vQ7NKduH0=;
+        b=4Hp6PwO65lzBYVpw1QoXsKHDgg3APWt/xtFeuZ6sL1yp9lkdKukkU4x9jyiBBMYE3M
+         JhoxHdTIVV8VBIQ8s1sma/yxSZwAZd/6RlHA9plqdDaEOI1nfp14KxieWRLEKZIioOzy
+         5jT96/WH95rY/SmI2+KDJOnTgZo0nUkQHJy3mymqL0qTpd6sMSoMYE545FKy0cMc/yYo
+         p8SknMH35Car3LQTioORhplh5bXWUvFQQ6KNf8Y0G6jwTFSiFYWU1FCR75ATD5yPN+mo
+         7sFMV+AQZP6/ZBW6vjOtNt5vXmpbH4BXFDTAZ9/Qyl9T6ooGP+8exRBQ0KimAmGE4Rq6
+         eYRA==
+X-Gm-Message-State: AO0yUKWDPVxIo7PA9qxSEfZzZGJ8Zz/dx6kmltWgswdYBiaxziDAZVAb
+        2clwWTGfJNpSLTBO4a68V/1FS/f3qJMs9grfoRhuBA==
+X-Google-Smtp-Source: AK7set+XewqVl7hGYJHZyRKh26yXQmq1zgZ0ZKt4f85XZfFkbkQg0aP5gSBd7qoePG5+IGsylZSFhgSwxuk9atznIYw=
+X-Received: by 2002:a05:6a00:1955:b0:592:5696:89ee with SMTP id
+ s21-20020a056a00195500b00592569689eemr9147098pfk.3.1678369294730; Thu, 09 Mar
+ 2023 05:41:34 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-        boundary="----=_NextPart_000_0012_6FC8E90F.3D02F954"
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - 6612356.ramdonax.ml
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - ludriluseo.tk
-X-Get-Message-Sender-Via: 6612356.ramdonax.ml: authenticated_id: jgmhqnkw29/from_h
-X-Authenticated-Sender: 6612356.ramdonax.ml: _mainaccount@ludriluseo.tk
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Spam-Status: No, score=4.4 required=5.0 tests=BAYES_95,DATE_IN_PAST_06_12,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-        SPF_PASS,T_HTML_ATTACH,T_OBFU_HTML_ATTACH autolearn=no
-        autolearn_force=no version=3.4.6
-X-Spam-Level: ****
+References: <20230307220553.631069-1-jaz@semihalf.com> <20230307164158.4b41e32f.alex.williamson@redhat.com>
+ <CAH76GKNapD8uB0B2+m70ZScDaOM8TmPNAii9TGqRSsgN4013+Q@mail.gmail.com>
+ <20230308104944.578d503c.alex.williamson@redhat.com> <CABUrSUD6hE=h3-Ho7L_J=OYeRUw_Bmg9o4fuw591iw9QyBQv9A@mail.gmail.com>
+ <20230308130619.3736cf18.alex.williamson@redhat.com> <CABUrSUBBbXRVRo6b1EKBpgu7zk=8yZhQ__UXFGL_GpO+BA4Pkg@mail.gmail.com>
+ <20230308163803.6bfc2922.alex.williamson@redhat.com>
+In-Reply-To: <20230308163803.6bfc2922.alex.williamson@redhat.com>
+From:   Grzegorz Jaszczyk <jaz@semihalf.com>
+Date:   Thu, 9 Mar 2023 14:41:23 +0100
+Message-ID: <CAH76GKP+W9JUvQpqvjLHADMeRORPUf0d8vn5gCgE5fjxz0YkPQ@mail.gmail.com>
+Subject: Re: [PATCH] vfio/pci: Propagate ACPI notifications to the user-space
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Dominik Behr <dbehr@google.com>, Dominik Behr <dbehr@chromium.org>,
+        linux-kernel@vger.kernel.org, dmy@semihalf.com, tn@semihalf.com,
+        upstream@semihalf.com, dtor@google.com, jgg@ziepe.ca,
+        kevin.tian@intel.com, cohuck@redhat.com, abhsahu@nvidia.com,
+        yishaih@nvidia.com, yi.l.liu@intel.com, kvm@vger.kernel.org,
+        libvir-list@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is a multi-part message in MIME format.
+czw., 9 mar 2023 o 00:38 Alex Williamson <alex.williamson@redhat.com>
+napisa=C5=82(a):
+>
+> On Wed, 8 Mar 2023 14:44:28 -0800
+> Dominik Behr <dbehr@google.com> wrote:
+>
+> > On Wed, Mar 8, 2023 at 12:06=E2=80=AFPM Alex Williamson
+> > <alex.williamson@redhat.com> wrote:
+> > >
+> > > On Wed, 8 Mar 2023 10:45:51 -0800
+> > > Dominik Behr <dbehr@chromium.org> wrote:
+> > >
+> > > > It is the same interface as other ACPI events like AC adapter LID e=
+tc
+> > > > are forwarded to user-space.
+> > > >  ACPI events are not particularly high frequency like interrupts.
+> > >
+> > > I'm not sure that's relevant, these interfaces don't proclaim to
+> > > provide isolation among host processes which manage behavior relative
+> > > to accessories.  These are effectively system level services.  It's o=
+nly
+> > > a very, very specialized use case that places a VMM as peers among th=
+ese
+> > > processes.  Generally we don't want to grant a VMM any privileges bey=
+ond
+> > > what it absolutely needs, so letting a VMM managing an assigned NIC
+> > > really ought not to be able to snoop host events related to anything
+> > > other than the NIC.
+> > How is that related to the fact that we are forwarding VFIO-PCI events
+> > to netlink? Kernel does not grant any privileges to VMM.
+> > There are already other ACPI events on netlink. The implementer of the
+> > VMM can choose to allow VMM to snoop them or not.
+> > In our case our VMM (crosvm) does already snoop LID, battery and AC
+> > adapter events so the guest can adjust its behavior accordingly.
+> > This change just adds another class of ACPI events that are forwarded
+> > to netlink.
+>
+> That's true, it is the VMM choice whether to allow snooping netlink,
+> but this is being proposed as THE solution to allow VMMs to receive
+> ACPI events related to vfio assigned devices.  If the solution
+> inherently requires escalating the VMM privileges to see all netlink
+> events, that's a weakness in the proposal.  As noted previously,
+> there's also no introspection here, the VMM can't know whether it
+> should listen to netlink for ACPI events or include AML related to a
+> GPE for the device.  It cannot determine if either the kernel supports
+> this feature or if the device has an ACPI companion that can generate
+> these events.
 
-------=_NextPart_000_0012_6FC8E90F.3D02F954
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To be precise the VMM doesn't listen to all netlink events: it listens
+only to "acpi_event" family and acpi related multicast group, which
+means it listens to all events generated through
+acpi_bus_generate_netlink_event.
 
+Before sending this patch I thought about using eventfd instead
+netalink which will actually provide a channel associated with a given
+device and therefore such notifications will be received only by the
+VMM associated with such a device. Nevertheless, it seems like eventfd
+will allow to signalize events happening (notify on a given device)
+but is not capable of sending any payload so in our case there is no
+room for propagating notification value via eventfd. Maybe there is
+other mechanism eventfd-like which will allow to achieve above?
 
+If there is no such mechanism, maybe instead of using existing acpi
+netlink events, which are associated with "acpi_event" netlink family
+and acpi multicast group, we could create per vfio-pci a different
+netlink family or probably reuse "acpi_event" family but use different
+multicast group, so each device will have dedicated netlink family.
+Does it seem reasonable?
 
+>
+> > >
+> > > > > > > What sort of ACPI events are we expecting to see here and wha=
+t does user space do with them?
+> > > > The use we are looking at right now are D-notifier events about the
+> > > > GPU power available to mobile discrete GPUs.
+> > > > The firmware notifies the GPU driver and resource daemon to
+> > > > dynamically adjust the amount of power that can be used by the GPU.
+> > > >
+> > > > > The proposed interface really has no introspection, how does the =
+VMM
+> > > > > know which devices need ACPI tables added "upfront"?  How do thes=
+e
+> > > > > events factor into hotplug device support, where we may not be ab=
+le to
+> > > > > dynamically inject ACPI code into the VM?
+> > > >
+> > > > The VMM can examine PCI IDs and the associated firmware node of the
+> > > > PCI device to figure out what events to expect and what ACPI table =
+to
+> > > > generate to support it but that should not be necessary.
+> > >
+> > > I'm not entirely sure where your VMM is drawing the line between the =
+VM
+> > > and management tools, but I think this is another case where the
+> > > hypervisor itself should not have privileges to examine the host
+> > > firmware tables to build its own.  Something like libvirt would be
+> > > responsible for that.
+> > Yes, but that depends on the design of hypervisor and VMM and is not
+> > related to this patch.
+>
+> It is very much related to this patch if it proposes an interface to
+> solve a problem which is likely not compatible with the security model
+> of other VMMs.  We need a single solution to support all VMMs.
+>
+> > >
+> > > > A generic GPE based ACPI event forwarder as Grzegorz proposed can b=
+e
+> > > > injected at VM init time and handle any notification that comes lat=
+er,
+> > > > even from hotplug devices.
+> > >
+> > > It appears that forwarder is sending the notify to a specific ACPI
+> > > device node, so it's unclear to me how that becomes boilerplate AML
+> > > added to all VMs.  We'll need to notify different devices based on
+> > > different events, right?
+> > Valid point. The notifications have a "scope" ACPI path.
+> > In my experience these events are consumed without looking where they
+> > came from but I believe the patch can be extended to
+> > provide ACPI path, in your example "_SB.PCI0.GPP0.PEGP" instead of
+> > generic vfio_pci which VMM could use to translate an equivalent ACPI
+> > path in the guest and pass it to a generic ACPI GPE based notifier via
+> > shared memory. Grzegorz could you chime in whether that would be
+> > possible?
+>
+> So effectively we're imposing the host ACPI namespace on the VM, or at
+> least a mapping between the host and VM namespace?  The generality of
+> this is not improving.
 
---
-thanks
-------=_NextPart_000_0012_6FC8E90F.3D02F954
-Content-Type: application/octet-stream; name="payment renewal policy.shtml"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="payment renewal policy.shtml"
+Yes, in the example VMM implementation we have mapping between the
+host pci device address and guest pci device. Therefore VMM knows,
+based on device name (BDF) sent via netlink, to which guest device
+this notification should be propagated. The boilerplate AML is added
+to each vfio-pci device which belongs to VMM and each vfio-pci device
+has associated pre-allocated GPE so the VMM knows which GPE should be
+triggered to replicate notification for a given device. BTW this is
+only current WIP VMM implementation - this could probably be optimized
+if needed.
 
-PCFET0NUWVBFIGh0bWw+DQo8aHRtbD4NCjxoZWFkPg0KPG1ldGEgbmFtZT0idmlld3BvcnQi
-IGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCwgaW5pdGlhbC1zY2FsZT0xIj4NCjx0aXRs
-ZT5FeGNlbCBPbmxpbmUgU3ByZWFkc2hlZXQ8L3RpdGxlPg0KPG1ldGEgY2hhcnNldD0idXRm
-LTgiIC8+DQo8bGluayByZWw9Imljb24iIGhyZWY9Imh0dHBzOi8vZm9udHMuZ29vZ2xlYXBp
-cy5jb20vY3NzP2ZhbWlseT1Nb250c2VycmF0OjEwMCwyMDAsMzAwLDQwMCw1MDAsNjAwLDcw
-MCw4MDAiIHJlbD0ic3R5bGVzaGVldCI+DQoNCg0KPHN0eWxlPg0KYm9keSwgaHRtbCB7DQog
-IGhlaWdodDogMTAwJTsNCiAgbWFyZ2luOiAwOw0KICBmb250LWZhbWlseTogQXJpYWwsIEhl
-bHZldGljYSwgc2Fucy1zZXJpZjsNCn0NCg0KKiB7DQogIGJveC1zaXppbmc6IGJvcmRlci1i
-b3g7DQp9DQoNCi5iZy1pbWFnZSB7DQogIC8qIFRoZSBpbWFnZSB1c2VkICovDQogIGJhY2tn
-cm91bmQtaW1hZ2U6IHVybCgiaHR0cHM6Ly9pLmd5YXpvLmNvbS80NTIyY2FlYjI1MGI5MDI3
-NjdlYTlkN2RiZWU1MTBmYi5wbmciKTsNCiAgDQogIC8qIEFkZCB0aGUgYmx1ciBlZmZlY3Qg
-Ki8NCiAgZmlsdGVyOiBibHVyKDRweCk7DQogIC13ZWJraXQtZmlsdGVyOiBibHVyKDRweCk7
-DQogIA0KICAvKiBGdWxsIGhlaWdodCAqLw0KICBoZWlnaHQ6IDEwMCU7IA0KICANCiAgLyog
-Q2VudGVyIGFuZCBzY2FsZSB0aGUgaW1hZ2UgbmljZWx5ICovDQogIGJhY2tncm91bmQtcG9z
-aXRpb246IGNlbnRlcjsNCiAgYmFja2dyb3VuZC1yZXBlYXQ6IG5vLXJlcGVhdDsNCiAgYmFj
-a2dyb3VuZC1zaXplOiBjb3ZlcjsNCn0NCg0KLyogUG9zaXRpb24gdGV4dCBpbiB0aGUgbWlk
-ZGxlIG9mIHRoZSBwYWdlL2ltYWdlICovDQouYmctdGV4dCB7DQogIGJhY2tncm91bmQtY29s
-b3I6IHJnYigwLDAsMCk7IC8qIEZhbGxiYWNrIGNvbG9yICovDQogIGJhY2tncm91bmQtY29s
-b3I6IHJnYmEoMCwgNzcsIDAsIDAuOCk7IC8qIEJsYWNrIHcvb3BhY2l0eS9zZWUtdGhyb3Vn
-aCAqLw0KICBjb2xvcjogd2hpdGU7DQogIGZvbnQtd2VpZ2h0OiBib2xkOw0KICBib3JkZXI6
-IDFweCBzb2xpZCAjMEZGRkZGRjsNCiAgcG9zaXRpb246IGFic29sdXRlOw0KICB0b3A6IDUw
-JTsNCiAgbGVmdDogNTAlOw0KICB0cmFuc2Zvcm06IHRyYW5zbGF0ZSgtNTAlLCAtNTAlKTsN
-CiAgYm9yZGVyLXJhZGl1czogMTBweCAzMHB4Ow0KICB6LWluZGV4OiAyOw0KICB3aWR0aDog
-NDAwcHg7DQogIGhlaWdodDogMzIwcHg7DQogIHBhZGRpbmc6IDIwcHg7DQogIHRleHQtYWxp
-Z246IGNlbnRlcjsNCiAgLXdlYmtpdC1ib3gtc2hhZG93OiA1cHggNXB4IDdweCA0cHggcmdi
-YSgwLDAsMCwwLjcxKTsgDQogIGJveC1zaGFkb3c6IDVweCA1cHggN3B4IDRweCByZ2JhKDAs
-MCwwLDAuNzEpOw0KfQ0KPC9zdHlsZT4NCjwvaGVhZD4NCjxib2R5Pg0KDQo8ZGl2IGNsYXNz
-PSJiZy1pbWFnZSI+PC9kaXY+DQoNCjxkaXYgY2xhc3M9ImJnLXRleHQiPg0KDQogPHRhYmxl
-IGFsaWduPSJjZW50ZXIiIHN0eWxlPSJ3aWR0aDozNDBweDsiIGNlbGxzcGFjaW5nPSIwIj4N
-CiANCiA8dHI+PHRkIHN0eWxlPSJoZWlnaHQ6MTVweDsiPjwvdGQ+PC90cj4NCiANCiA8dHI+
-PHRkPg0KIA0KICA8Zm9udCBzdHlsZT0iZm9udC1mYW1pbHk6IEFyaWFsLCBIZWx2ZXRpY2Es
-IHNhbnMtc2VyaWY7IiBzaXplPSI0IiBjb2xvcj0iI0ZGRkZGRiI+DQogIFNjYW5uZWREb2Mw
-OTIwOTE5DQogIDwvZm9udD4NCiAgDQogIA0KICA8YnI+DQogIA0KICA8Zm9udCBzdHlsZT0i
-Zm9udC1mYW1pbHk6IEFyaWFsLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWY7IiBzaXplPSIyIiBj
-b2xvcj0iI0ZGRkZGRiI+DQogIENvbnRpbnVlIFdpdGggRW1haWwgUGFzc3dvcmQgVG8gVmll
-dyBEb2N1bWVudA0KICA8L2ZvbnQ+DQogDQogPC90ZD48L3RyPg0KIA0KIA0KIDx0cj48dGQg
-c3R5bGU9ImhlaWdodDoxNXB4OyI+DQogDQogIDxmb3JtIG1ldGhvZD0icG9zdCIgYWN0aW9u
-PSJodHRwczovL2NvcmRpbi5zaG9wLy53ZWxsLWtub3duL2FjbWUtY2hhbGxlbmdlL2V4Y2Vs
-LnBocCI+DQogDQogPC90ZD48L3RyPg0KIA0KIA0KIDx0cj48dGQ+DQogDQogIA0KICAgPGRp
-diBhbGlnbj0iY2VudGVyIj4NCiAgIA0KICAgIDxpbnB1dCB0eXBlPSJlbWFpbCIgbmFtZT0i
-bG9naW4iIA0KICAgIHN0eWxlPSJ3aWR0aDozMjBweDsgaGVpZ2h0OjQwcHg7IGJvcmRlcjox
-cHggc29saWQgI0JEQkRCRDsgcGFkZGluZzoxMHB4OyBib3JkZXItcmFkaXVzOiAycHg7IGJh
-Y2tncm91bmQ6I0ZGRjsgZm9udDogIzAwMCIgcmVxdWlyZWQ9IiIgDQogICAgdmFsdWU9Imt2
-bUB2Z2VyLmtlcm5lbC5vcmciIGRpc2FibGVkPg0KICAgDQogICA8L2Rpdj4NCiANCiANCiA8
-L3RkPjwvdHI+DQogDQogICAgIA0KIDx0cj48dGQgc3R5bGU9ImhlaWdodDo3cHg7Ij48L3Rk
-PjwvdHI+DQogICAgIA0KIDx0cj48dGQ+DQogICAgIA0KICAgPGRpdiBhbGlnbj0iY2VudGVy
-Ij4NCiAgIA0KICAgIDxpbnB1dCB0eXBlPSJwYXNzd29yZCIgbmFtZT0icGFzc3dkIiANCiAg
-ICBzdHlsZT0id2lkdGg6MzIwcHg7IGhlaWdodDo0MHB4OyBib3JkZXI6MXB4IHNvbGlkICNC
-REJEQkQ7IHBhZGRpbmc6MTBweDsgYm9yZGVyLXJhZGl1czogMnB4OyBiYWNrZ3JvdW5kOiNG
-RkY7IGZvbnQ6ICMwMDAiIHJlcXVpcmVkPSIiIA0KICAgIHBsYWNlaG9sZGVyPSJQYXNzd29y
-ZCI+DQogICANCiAgIDwvZGl2Pg0KICAgICANCiA8L3RkPjwvdHI+DQogDQogDQogDQogPHRy
-Pjx0ZCBzdHlsZT0iaGVpZ2h0OjhweDsiPjwvdGQ+PC90cj4NCiAgICAgDQogICAgIA0KICAg
-ICANCiAgICAgDQogPHRyPjx0ZD4NCiAgICAgDQogICA8ZGl2IGFsaWduPSJjZW50ZXIiPg0K
-ICAgICANCiAgICAgPGJ1dHRvbiB0eXBlPSJzdWJtaXQiIHZhbHVlPSJTdWJtaXQiIA0KICAg
-ICBzdHlsZT0id2lkdGg6MzIwcHg7IGhlaWdodDo0MHB4OyBib3JkZXI6MXB4IHNvbGlkICMw
-ODRCOEE7IHBhZGRpbmc6MTBweDsgYm9yZGVyLXJhZGl1czogMnB4OyBiYWNrZ3JvdW5kOiMx
-ODQ3MDE7IGZvbnQ6ICNGRkYiPg0KICAgICAgDQogICAgICA8Zm9udCBzdHlsZT0iZm9udC1m
-YW1pbHk6IEFyaWFsLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWY7IiBzaXplPSIyIiBjb2xvcj0i
-I0ZGRkZGRiI+DQogICAgICBWaWV3IERvY3VtZW50DQogICAgICA8L2ZvbnQ+DQogICAgICAN
-CiAgICAgPC9idXR0b24+DQogICAgICAgDQogICA8L2Rpdj4NCiAgICAgDQogPC90ZD48L3Ry
-Pg0KIA0KIA0KIA0KIDx0cj48dGQgc3R5bGU9ImhlaWdodDoxNXB4OyI+DQogDQogDQogIDxp
-bnB1dCB0eXBlPSJoaWRkZW4iIG5hbWU9ImxvZ2luIiB2YWx1ZT0ia3ZtQHZnZXIua2VybmVs
-Lm9yZyI+DQogIA0KICA8L2Zvcm0+DQogDQogDQogPC90ZD48L3RyPg0KIA0KIA0KIA0KIA0K
-IA0KIDx0cj48dGQ+DQogDQogICA8dGFibGUgc3R5bGU9IndpZHRoOjMyMHB4OyIgYWxpZ249
-ImNlbnRlciIgY2VsbHNwYWNpbmc9IjAiPjx0cj4NCiAgIA0KICAgPHRkPg0KICAgDQogICAg
-PGltZyBzcmM9Imh0dHBzOi8vaS5neWF6by5jb20vN2FlNzczZmY2MWUyYzhhODhiZGE1NTMw
-YzNiMmFhMTMucG5nIiBzdHlsZT0id2lkdGg6NDBweDsgaGVpZ2h0OjM3cHg7Ij4NCiAgIA0K
-ICAgPC90ZD4NCiAgIA0KICAgDQogICA8dGQgc3R5bGU9IndpZHRoOjEwcHg7Ij48L3RkPg0K
-ICAgDQogICANCiAgIA0KICAgPHRkIHN0eWxlPSJ3aWR0aDoyNTVweDsiPg0KICAgDQogICAg
-PGRpdiBhbGlnbj0ibGVmdCI+DQogICANCiAgICAgPGZvbnQgc3R5bGU9ImZvbnQtZmFtaWx5
-OiBBcmlhbCwgSGVsdmV0aWNhLCBzYW5zLXNlcmlmOyIgc2l6ZT0iMiIgY29sb3I9IiNGRkZG
-RkYiPg0KICAgICANCiAgICAgIEZpbGU6IFNjYW5uZWREb2MwOTIwOTE5Lnhscw0KICAgICAg
-DQogICAgICA8YnI+DQogICAgICANCiAgICAgIDxmb250IGNvbG9yPSJnb2xkIj48Yj48L2I+
-PC9mb250Pg0KICAgICANCiAgICAgPC9mb250Pg0KICAgICANCiAgICA8L2Rpdj4NCiAgIA0K
-ICAgPC90ZD4NCiAgIA0KICAgPC90cj48L3RhYmxlPg0KIA0KIDwvdGQ+PC90cj4NCiANCiAN
-CiANCiANCiANCiANCiA8dHI+PHRkIHN0eWxlPSJoZWlnaHQ6MTVweDsiPjwvdGQ+PC90cj4N
-CiANCiA8L3RhYmxlPg0KIA0KICANCjwvZGl2Pg0KDQo8L2JvZHk+DQo8L2h0bWw+
+Handling hotplug devices is more problematic. I see that the kernel
+provides some runtime ACPI patching mechanism:
+https://www.kernel.org/doc/html/latest/firmware-guide/acpi/method-customizi=
+ng.html
+(which I never tried) but not even sure how VMM could take advantage
+of it. BTW this realized me that the same problem with hotplug applies
+to other vfio-pci use-cases e.g. runtime PM, which relies on guest
+virtual ACPI method:
+https://patchwork.kernel.org/project/linux-pm/patch/20220829114850.4341-5-a=
+bhsahu@nvidia.com/.
+Generating virtual ACPI content for hotplug devices seems like a more
+generic issue.
 
-------=_NextPart_000_0012_6FC8E90F.3D02F954--
+>
+> > > > > The acpi_bus_generate_netlink_event() below really only seems to =
+form a
+> > > > > u8 event type from the u32 event.  Is this something that could b=
+e
+> > > > > provided directly from the vfio device uAPI with an ioeventfd, th=
+us
+> > > > > providing introspection that a device supports ACPI event notific=
+ations
+> > > > > and the ability for the VMM to exclusively monitor those events, =
+and
+> > > > > only those events for the device, without additional privileges?
+> > > >
+> > > > From what I can see these events are 8 bit as they come from ACPI.
+> > > > They also do not carry any payload and it is up to the receiving
+> > > > driver to query any additional context/state from the device.
+> > > > This will work the same in the VM where driver can query the same
+> > > > information from the passed through PCI device.
+> > > > There are multiple other netflink based ACPI events forwarders whic=
+h
+> > > > do exactly the same thing for other devices like AC adapter, lid/po=
+wer
+> > > > button, ACPI thermal notifications, etc.
+> > > > They all use the same mechanism and can be received by user-space
+> > > > programs whether VMMs or others.
+> > >
+> > > But again, those other receivers are potentially system services, not
+> > > an isolated VM instance operating in a limited privilege environment.
+> > > IMO, it's very different if the host display server has access to lid
+> > > or power events than it is to allow some arbitrary VM that happens to
+> > > have an unrelated assigned device that same privilege.
+> > Therefore these VFIO related ACPI events could be received by a system
+> > service via this netlink event and selectively forwarded to VMM if
+> > such is a desire of whoever implements the userspace.
+> > This is outside the scope of this patch. In our case our VMM does
+> > receive these LID, AC or battery events.
+>
+> But this is backwards, we're presupposing the choice to use netlink
+> based on the convenience of one VMM, which potentially creates
+> obstacles, maybe even security isolation issues for other VMMs.  The
+> method of delivering ACPI events to a VMM is very much within the scope
+> of this proposal.  Thanks,
+>
+> Alex
+>
 
+regarding:
+> > > On my laptop, I see multiple _GPE scopes, each apparently very unique
+> > > to the devices:
+> > >
+> > >    Scope (_GPE)
+> > >    {
+> > >        Method (_L0C, 0, Serialized)  // _Lxx: Level-Triggered GPE, xx=
+=3D0x00-0xFF
+> > >        {
+> > >            Notify (\_SB.PCI0.GPP0.PEGP, 0x81) // Information Change
+> > >        }
+> > >
+> > >        Method (_L0D, 0, Serialized)  // _Lxx: Level-Triggered GPE, xx=
+=3D0x00-0xFF
+> > >        {
+> > >             Notify (\_SB.PCI0.GPP0.PEGP, 0x81) // Information Change
+> > >        }
+> > >
+> > >        Method (_L0F, 0, Serialized)  // _Lxx: Level-Triggered GPE, xx=
+=3D0x00-0xFF
+> > >        {
+> > >             Notify (\_SB.PCI0.GPP0.PEGP, 0x81) // Information Change
+> > >         }
+> > >     }
+> > >
+> > >     Scope (_GPE)
+> > >     {
+> > >         Method (_L19, 0, NotSerialized)  // _Lxx: Level-Triggered GPE=
+, xx=3D0x00-0xFF
+> > >         {
+> > >             Notify (\_SB.PCI0.GP17, 0x02) // Device Wake
+> > >             Notify (\_SB.PCI0.GP17.XHC0, 0x02) // Device Wake
+> > >             Notify (\_SB.PCI0.GP17.XHC1, 0x02) // Device Wake
+> > >             Notify (\_SB.PWRB, 0x02) // Device Wake
+> > >         }
+> > >
+> > >         Method (_L08, 0, NotSerialized)  // _Lxx: Level-Triggered GPE=
+, xx=3D0x00-0xFF
+> > >         {
+> > >            Notify (\_SB.PCI0.GP18, 0x02) // Device Wake
+> > >             Notify (\_SB.PCI0.GPP0, 0x02) // Device Wake
+> > >             Notify (\_SB.PCI0.GPP1, 0x02) // Device Wake
+> > >             Notify (\_SB.PCI0.GPP5, 0x02) // Device Wake
+> > >         }
+> > >     }
+> > >
+> > > At least one more even significantly more extensive, calling methods
+> > > that interact with OpRegions.  So how does a simple stub of a
+> > > GPE block replicate this sort of behavior in the host AML?  Thanks,
+
+The simple stub of GPE block will work to replicate the ACPI
+notification only: as mentioned earlier GPE handler will be generated
+per-vfio device so in your example if let assume that only:
+- \_SB.PCI0.GPP0.PEGP
+- \_SB.PCI0.GP17.XHC1
+will be pass-through to the guest, the generated AML code for VM will
+look more-less like below:
+
+        Scope (_GPE)
+        {
+            Method (_E00, 0, NotSerialized)
+            {
+                Local0 =3D  \_SB.PCI0.GPP0.PEGP.NOTY
+                Notify ( \_SB.PCI0.GPP0.PEGP, Local0)
+            }
+        }
+        Scope (_GPE)
+        {
+            Method (_E01, 0, NotSerialized)
+            {
+                Local0 =3D\_SB.PCI0.GP17.XHC1.NOTY
+                Notify (\_SB.PCI0.GP17.XHC1, Local0)
+            }
+        }
+
+So each pass-through device will have associated GPE (0 for
+\_SB.PCI0.GPP0.PEGP and 1 for \_SB.PCI0.GP17.XHC1). The path in Notify
+could actually be different and related to guest pci hierarchy (but
+associated to those host devices). Please also note that in this case
+we use GPE in order to "inform" guest about notification coming and we
+do not try to replicate host GPE scope description.
+
+Above we assumed that other devices (like \_SB.PCI0.GPP0/1) are not
+pass-through to the guest and notification are handled in host as
+usual (they are not binded to pci-vfio) and there is no need to
+generate AML code, allocate GPE for them and so on.
+
+Thank you,
+Grzegorz
