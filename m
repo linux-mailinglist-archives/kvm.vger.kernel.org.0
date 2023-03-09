@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 95B4D6B3041
-	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 23:15:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E0646B306A
+	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 23:20:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230236AbjCIWPN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Mar 2023 17:15:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50502 "EHLO
+        id S230330AbjCIWUv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Mar 2023 17:20:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229835AbjCIWPK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Mar 2023 17:15:10 -0500
-Received: from mail-oa1-x2f.google.com (mail-oa1-x2f.google.com [IPv6:2001:4860:4864:20::2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBF26F82A6
-        for <kvm@vger.kernel.org>; Thu,  9 Mar 2023 14:15:09 -0800 (PST)
-Received: by mail-oa1-x2f.google.com with SMTP id 586e51a60fabf-17638494edbso3870926fac.10
-        for <kvm@vger.kernel.org>; Thu, 09 Mar 2023 14:15:09 -0800 (PST)
+        with ESMTP id S231324AbjCIWUp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Mar 2023 17:20:45 -0500
+Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDB3698EA1
+        for <kvm@vger.kernel.org>; Thu,  9 Mar 2023 14:20:07 -0800 (PST)
+Received: by mail-oi1-x22d.google.com with SMTP id bg11so2855584oib.5
+        for <kvm@vger.kernel.org>; Thu, 09 Mar 2023 14:20:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678400109;
+        d=google.com; s=20210112; t=1678400358;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=E3PQRMfxQpWw1EQQGErwxaTj11IIxbXvdV9zBZ1y4E8=;
-        b=Y9RgqY/R49EUCbBlDxx4d3nanzjLIn3mMjcmuVW56VS1awQnqsRW+zJP5wohesNJch
-         zg1I7QVEFGP6FlohW41/rXg+b2cqCqxW6BLcDDqbions+nu/IonS5GIGWuNYbKlP6sDn
-         oVGM/BN6Ky7XOdJqN7qcl4WRWFaF2rNx+y8u4LFkVEZgP6KG5MuemD7Fq3jcVwU4/x4o
-         L362NHXei92hxGxrvgWRqVPrz/7Z6PdwujtF/h61LOOfYglO5eZ/jds+x4zP6cSm65Ad
-         j0P5ccYOf4x/JJvz+FgB/NknLjbaQ9B4plsCKGR1KiZQQ/JKJaXsWE2h40V4WldgmCEy
-         4sBg==
+        bh=jym0nUiEEbOOCFzlnlOfW+LijEktB+G0Iqs6BtQtNZI=;
+        b=s+CvGVw1kC4Rp4CiFuDvNherDkdkqI71dca1eQMFFKnt/ztNDdolfJ3V/EFzX9CoGL
+         Zmq3uiPhG+DhMSodJ1+x/pYKXPB0TcR6piRswV/C6I7kOvMB6XwoZqw7DDrCIEVmLqzV
+         jhoWc1JhFiRfIowkQ3YowN/5iBUTsmvT8jLRN7ZBntHzDbRcNk//PIuhxaOwSB5IoAJX
+         ZXgoIlisxtV8sMd5bsquQc7mP1euMQy32d4gKV6OPnhst+oRTpfIx+BB/ATMzOVtB2T2
+         uPqSHkcOMPRvQwCC69BQ4qqfYios5ZgcNabJL4CGaGrNYoZfdRiPpe94s/+VKEb7Yaft
+         kNlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678400109;
+        d=1e100.net; s=20210112; t=1678400358;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=E3PQRMfxQpWw1EQQGErwxaTj11IIxbXvdV9zBZ1y4E8=;
-        b=jcBSU247gPnkLoxsvgXAFnavBEtPDhu+PQyQDCJkUAYUsbSB6dFmLe0dt1O0dJwyHI
-         db3o3JMlowyELr45wLTgNqopABx5VjcMycbzNtYWw1cmf2MVaso9idwuhWEkht5LT9qD
-         qlQl2fFjbj09Pn6pwTF8CaPXUtlQN0ZHkFVR12kaZceD/ETGzbcqNHmzo+kdlMb7tBMf
-         6NmCBseAMFYUYdloxaFKfeulF+mg96vhoGTP0NVQ21rVUJHeTYFuJWHc05d6OhlGL/ZI
-         xUb5xrxe4wMgi5IkwRzvxoVphFLEMnsUpkmW8bW58Ylv+Mq/gVqQQMPH978HO6RP8zBI
-         mh/w==
-X-Gm-Message-State: AO0yUKVRacMp3KD8pJ8zVJT5mgnT4OBFxFDbPcIdlNVReBIFxIhlTv13
-        BdqALHTEnjaRTEla5og+EBljGXA3JVyv3SX8nVAt2Q==
-X-Google-Smtp-Source: AK7set/32BBIrvEDt0fltBRnip4rqPQdBgJQQDjXpdLAI3JvJVq6nj0esM2VH3efuTnhloEU4dl5EHGiLl6+aSSX9Ec=
-X-Received: by 2002:a05:6870:a2c2:b0:176:4a71:6fdc with SMTP id
- w2-20020a056870a2c200b001764a716fdcmr8314733oak.9.1678400109081; Thu, 09 Mar
- 2023 14:15:09 -0800 (PST)
+        bh=jym0nUiEEbOOCFzlnlOfW+LijEktB+G0Iqs6BtQtNZI=;
+        b=4RN+Ye26J8pmsBwbBY8dQZf5Dg/ffwYWJu3fQhK/j+fa16GJnbQfzq+bDgd5QJvIrI
+         /pxVHTOKc2f8TxaDwlo7aHPrEbjfEgtVLaGFzQXxb5SfI8T//SVdvttAh7jCWtrqlnj0
+         iHS4TRpEnTQ1dt3RJRQeIZ7O4VdanpHG1pszwupgQf9rm6bzGlwd76Fr0BxPYbgrw1UU
+         jRwKWpPHvlOKIx/TrIvOsqSCFmYEYGQTsITn+Vexjz2QV8bgHnlWrw1U9TlIM7HQAXVd
+         YBft7zXO2d7K0/O2h88/FZYmP7GYqfxQF9M31Eq+jWyVD64MPzPBfAn8e9b/wes/Py2g
+         6OKA==
+X-Gm-Message-State: AO0yUKVgVwkZOpng6Ex6++P0CRfE78oZOBqumzVRwyL7G+r8I08M+PSO
+        XCuJ/ihv5xaOPDwDuRV6HmlSNKRowxAvnO/TI1nxNg==
+X-Google-Smtp-Source: AK7set+PZFyz/IkkqHj3/hze6nBpdrjOZL7Z92InN2k9JiBNkaLuMMQTPuvGBxTXFbyreldmu/TdVrCVAIl6lmnmJy4=
+X-Received: by 2002:a54:4102:0:b0:37f:ab56:ff42 with SMTP id
+ l2-20020a544102000000b0037fab56ff42mr8087904oic.9.1678400358006; Thu, 09 Mar
+ 2023 14:19:18 -0800 (PST)
 MIME-Version: 1.0
-References: <20230215010717.3612794-1-rananta@google.com> <20230215010717.3612794-7-rananta@google.com>
- <CAAeT=FyrgUjQWhL75n7z43msubHHghhy3Tj2JjsYop14f3kFhg@mail.gmail.com>
-In-Reply-To: <CAAeT=FyrgUjQWhL75n7z43msubHHghhy3Tj2JjsYop14f3kFhg@mail.gmail.com>
+References: <20230215010717.3612794-1-rananta@google.com> <20230215010717.3612794-8-rananta@google.com>
+ <CAAeT=FxVyHVRTj_78Jebz9nsc79yfYcbOu2c2hcekJTLgKFFaQ@mail.gmail.com>
+In-Reply-To: <CAAeT=FxVyHVRTj_78Jebz9nsc79yfYcbOu2c2hcekJTLgKFFaQ@mail.gmail.com>
 From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Thu, 9 Mar 2023 14:14:58 -0800
-Message-ID: <CAJHc60z87hz7tVfHyiO6wcYXDKLMNZzRE2V8jWB-5rekR1xkAg@mail.gmail.com>
-Subject: Re: [REPOST PATCH 06/16] tools: arm64: perf_event: Define Cycle
- counter enable/overflow bits
+Date:   Thu, 9 Mar 2023 14:19:07 -0800
+Message-ID: <CAJHc60w7gwUJ_rh6B3F_9SD_uxEDMRLFyahowGpCi54-84y3Hg@mail.gmail.com>
+Subject: Re: [REPOST PATCH 07/16] selftests: KVM: aarch64: Add PMU cycle
+ counter helpers
 To:     Reiji Watanabe <reijiw@google.com>
 Cc:     Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
         Ricardo Koller <ricarkol@google.com>,
@@ -70,7 +70,7 @@ Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,7 +80,7 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Hi Reiji,
 
-On Thu, Mar 2, 2023 at 4:47=E2=80=AFPM Reiji Watanabe <reijiw@google.com> w=
+On Thu, Mar 2, 2023 at 7:06=E2=80=AFPM Reiji Watanabe <reijiw@google.com> w=
 rote:
 >
 > Hi Raghu,
@@ -88,33 +88,51 @@ rote:
 > On Tue, Feb 14, 2023 at 5:07=E2=80=AFPM Raghavendra Rao Ananta
 > <rananta@google.com> wrote:
 > >
-> > Add the definitions of ARMV8_PMU_CNTOVS_C (Cycle counter overflow
-> > bit) for overflow status registers and ARMV8_PMU_CNTENSET_C (Cycle
-> > counter enable bit) for PMCNTENSET_EL0 register.
+> > Add basic helpers for the test to access the cycle counter
+> > registers. The helpers will be used in the upcoming patches
+> > to run the tests related to cycle counter.
+> >
+> > No functional change intended.
 > >
 > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 > > ---
-> >  tools/arch/arm64/include/asm/perf_event.h | 7 +++++++
-> >  1 file changed, 7 insertions(+)
+> >  .../testing/selftests/kvm/aarch64/vpmu_test.c | 40 +++++++++++++++++++
+> >  1 file changed, 40 insertions(+)
 > >
-> > diff --git a/tools/arch/arm64/include/asm/perf_event.h b/tools/arch/arm=
-64/include/asm/perf_event.h
-> > index 97e49a4d4969f..8ce23aabf6fe6 100644
-> > --- a/tools/arch/arm64/include/asm/perf_event.h
-> > +++ b/tools/arch/arm64/include/asm/perf_event.h
-> > @@ -222,9 +222,11 @@
-> >  /*
-> >   * PMOVSR: counters overflow flag status reg
-> >   */
-> > +#define ARMV8_PMU_CNTOVS_C      (1 << 31) /* Cycle counter overflow bi=
-t */
+> > diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_test.c b/tools/te=
+sting/selftests/kvm/aarch64/vpmu_test.c
+> > index d72c3c9b9c39f..15aebc7d7dc94 100644
+> > --- a/tools/testing/selftests/kvm/aarch64/vpmu_test.c
+> > +++ b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
+> > @@ -147,6 +147,46 @@ static inline void disable_counter(int idx)
+> >         isb();
+> >  }
+> >
+> > +static inline uint64_t read_cycle_counter(void)
+> > +{
+> > +       return read_sysreg(pmccntr_el0);
+> > +}
+> > +
+> > +static inline void reset_cycle_counter(void)
+> > +{
+> > +       uint64_t v =3D read_sysreg(pmcr_el0);
+> > +
+> > +       write_sysreg(ARMV8_PMU_PMCR_C | v, pmcr_el0);
+> > +       isb();
+> > +}
+> > +
+> > +static inline void enable_cycle_counter(void)
+> > +{
+> > +       uint64_t v =3D read_sysreg(pmcntenset_el0);
+> > +
+> > +       write_sysreg(ARMV8_PMU_CNTENSET_C | v, pmcntenset_el0);
+> > +       isb();
+> > +}
 >
-> Nit: This macro doesn't seem to be used in any of the patches.
-> Do we need this ?
+> You might want to use enable_counter() and disable_counter()
+> from enable_cycle_counter() and disable_cycle_counter() respectively?
 >
-Ah, I think originally I intended to use this instead of defining my
-own ARMV8_PMU_CYCLE_COUNTER_IDX to align with other pmc idx-es. But I
-think the latter is better. I'll remove ARMV8_PMU_CNTOVS_C.
+Yes, that should work. I'll do that.
 
 Thank you.
 Raghavendra
@@ -122,30 +140,29 @@ Raghavendra
 > Thank you,
 > Reiji
 >
->
-> >  #define        ARMV8_PMU_OVSR_MASK             0xffffffff      /* Mask=
- for writable bits */
-> >  #define        ARMV8_PMU_OVERFLOWED_MASK       ARMV8_PMU_OVSR_MASK
-> >
 > > +
-> >  /*
-> >   * PMXEVTYPER: Event selection reg
-> >   */
-> > @@ -247,6 +249,11 @@
-> >  #define ARMV8_PMU_USERENR_CR   (1 << 2) /* Cycle counter can be read a=
-t EL0 */
-> >  #define ARMV8_PMU_USERENR_ER   (1 << 3) /* Event counter can be read a=
-t EL0 */
-> >
-> > +/*
-> > + * PMCNTENSET: Count Enable set reg
-> > + */
-> > +#define ARMV8_PMU_CNTENSET_C    (1 << 31) /* Cycle counter enable bit =
-*/
+> > +static inline void disable_cycle_counter(void)
+> > +{
+> > +       uint64_t v =3D read_sysreg(pmcntenset_el0);
 > > +
-> >  /* PMMIR_EL1.SLOTS mask */
-> >  #define ARMV8_PMU_SLOTS_MASK   0xff
-> >
+> > +       write_sysreg(ARMV8_PMU_CNTENSET_C | v, pmcntenclr_el0);
+> > +       isb();
+> > +}
+> > +
+> > +static inline void write_pmccfiltr(unsigned long val)
+> > +{
+> > +       write_sysreg(val, pmccfiltr_el0);
+> > +       isb();
+> > +}
+> > +
+> > +static inline uint64_t read_pmccfiltr(void)
+> > +{
+> > +       return read_sysreg(pmccfiltr_el0);
+> > +}
+> > +
+> >  static inline uint64_t get_pmcr_n(void)
+> >  {
+> >         return FIELD_GET(ARMV8_PMU_PMCR_N, read_sysreg(pmcr_el0));
 > > --
 > > 2.39.1.581.gbfd45094c4-goog
 > >
