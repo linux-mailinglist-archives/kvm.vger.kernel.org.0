@@ -2,56 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F36F6B186B
-	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 02:03:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D49F6B1868
+	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 02:03:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229916AbjCIBD4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Mar 2023 20:03:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37360 "EHLO
+        id S229935AbjCIBDv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Mar 2023 20:03:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229776AbjCIBDu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Mar 2023 20:03:50 -0500
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 345949BE39
-        for <kvm@vger.kernel.org>; Wed,  8 Mar 2023 17:03:39 -0800 (PST)
-Received: by mail-pg1-x549.google.com with SMTP id y1-20020a631801000000b00503696ca95dso66785pgl.1
-        for <kvm@vger.kernel.org>; Wed, 08 Mar 2023 17:03:39 -0800 (PST)
+        with ESMTP id S229866AbjCIBDs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Mar 2023 20:03:48 -0500
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3306A8F702
+        for <kvm@vger.kernel.org>; Wed,  8 Mar 2023 17:03:41 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id f1-20020a17090aa78100b00239fd9e3e17so300417pjq.5
+        for <kvm@vger.kernel.org>; Wed, 08 Mar 2023 17:03:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678323819;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=m4Kgj90WAIRpMSk15gHVq1rdI6z2bGt/9q+3/N1bx1M=;
-        b=cUy/iFCRkRNH+7tPQLWb+98G4wIahK2hGkuUeg6xfDpvcgUCGF8UTqGTpWuVvzgHcB
-         WY8jDNLE1IDwFQ8EYUk/Wk+mmpum2gsubEnDtiv/35GkqBX0XA3cfEKXtNrNo5wlshdN
-         XmCOyAbfl7BxnKqWbCx+4PlXYmAkjH+frEdXAOwVqk8qMgox5p4vQPh/tAAyylGA/qZ5
-         73TrIG8Xeuw2Gu2s/60UxvJcwWGawwUhhAhEdeb8Citqpzt5BdpD3iFKZvQEMhDYXWEh
-         RY+3t+K8HVxuLkP90h90L2BIFD5e7xWjbUSl8D7+sJMS08jMJPBjn24Ojq94AR8nuJmz
-         APBw==
+        d=google.com; s=20210112; t=1678323821;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=eLrm9fDiRBcPQp3b31j/DpW4EfSCKANv/2wGm8l5Z0w=;
+        b=FI11iTobWjTUbGawAnDCrACDLyZdJVydKvQZlRejApyFnD6DqtNLx9JxKXgN4ISNXZ
+         aV2ZyUvIGNeuRnY9WRYjTVVTyjcDStqsOMeC2V3Ndr+7WBn3DGcAypV/sv7VlF3S01eC
+         50yXbaCXhmBLX6I/4qZVz8Uct8YPhnokFmt9aVwu4SVUadmHAtmXkF3A80kikj/31Foi
+         2hDsnPSObNSQS+wT3sBE9Q/ZWHZoPKdvxKOhnR9KeYtFLLqWgQwCNbPtulUMCyjh8kGU
+         qAHyV6ez8Ht//J24sPk+92ZMuBi/ycUc2/C36lnOKOAxOba3n7vknI0/6tr1rCsfGckb
+         HZbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678323819;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=m4Kgj90WAIRpMSk15gHVq1rdI6z2bGt/9q+3/N1bx1M=;
-        b=aPRmKr+fGdupzxioCU3/dgrknoNkPyKE0f7TE9BRHfGS/I7C14LOPoZTyiXJkWdz72
-         wY/y2SbGiSixHUZTTzwj2AS3uxn05ALwCyLD7hYZKsaHJSjocVR66skkTB/tV2W2aIZh
-         i/X1auBuZ3JixOoiGq5UO4d6AqOtMZ9jUU09x3W2pxjP1LWunV26DfUFEwZoxEJFaVI/
-         GfCstrJgPEefZHI8JSTasV/XFrInZ+RzPrOBDADi/luAntICwNKwDwutAjBouYnbjhBE
-         2+id/NCvF7GN9K9cM1jVloyK8HxhrC9zCQrZ5UHMzUjYsIqa6zhiQ4f0U70m8AzVpb59
-         NZ5g==
-X-Gm-Message-State: AO0yUKX3+F81cBws+Axd79QNn5W8jzMYMwfXoY2/Zumu3JqaDsgAcTFo
-        eTEXCXPQsSwBNw3tXNmjCC1KXIm9aCU=
-X-Google-Smtp-Source: AK7set9P0T5ki9oZRXwb/iIWoWX/zO8NZrmywgby8NUI9KSxtnR70fM7ain7q1jp9/XvIvMglKUGVokEFgg=
+        d=1e100.net; s=20210112; t=1678323821;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eLrm9fDiRBcPQp3b31j/DpW4EfSCKANv/2wGm8l5Z0w=;
+        b=3DOEcdKBspOcFwaXFqrZx9oZxBvTFqXxXtZBSZyFFOKItq60CbuFjScUN8nMTd+onP
+         /nDWKd3nJZQvxWNtj3LITKHwfTwGIZSj04KcWzsIwpMD8yUtmyQCg5d2ahJYsZjq1i99
+         SFZXi1rfWS72lr/jqMNBe0MOGceE6bXyhvPA8zmeiZ7pjfYKODw/0FbZxh/3TCRd0VUb
+         ZW22E5OEipUFFaWe8jg1pcdKYYLXvBc3v0ciWv82FBLBdLIh5ZTPB4m+qI/0GmYHcX6B
+         j7+cczocGHi8Ljd03kRIbpHKWOOMvjf/ryFmqUgiPr+TmydKQXh4VFru+l2mmVkEsIEQ
+         akFQ==
+X-Gm-Message-State: AO0yUKX0gMjTD69fIS8fdLBlNz+YOolOSomq7Iz3NNPYerDfP/b7seYk
+        DD+BuFtKaC0/9NJS3w3lw+5GYsdZdxs=
+X-Google-Smtp-Source: AK7set9pjM4WjDhtCijXKLdAzulTvTyMZDnBV+LVC3pXBtYjx4Xm0BGS2RlOlvl5eBNwp1vXLFdTABoe+7w=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a62:ce87:0:b0:5da:cbe6:c0fb with SMTP id
- y129-20020a62ce87000000b005dacbe6c0fbmr8596647pfg.4.1678323819285; Wed, 08
- Mar 2023 17:03:39 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:903:278d:b0:19c:1869:3558 with SMTP id
+ jw13-20020a170903278d00b0019c18693558mr7700376plb.5.1678323821086; Wed, 08
+ Mar 2023 17:03:41 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  8 Mar 2023 17:03:34 -0800
+Date:   Wed,  8 Mar 2023 17:03:35 -0800
+In-Reply-To: <20230309010336.519123-1-seanjc@google.com>
 Mime-Version: 1.0
+References: <20230309010336.519123-1-seanjc@google.com>
 X-Mailer: git-send-email 2.40.0.rc1.284.g88254d51c5-goog
-Message-ID: <20230309010336.519123-1-seanjc@google.com>
-Subject: [PATCH v2 0/2] Documentation/process: Add a maintainer handbook for
- KVM x86
+Message-ID: <20230309010336.519123-2-seanjc@google.com>
+Subject: [PATCH v2 1/2] Documentation/process: Add a label for the tip tree
+ handbook's coding style
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
@@ -110,7 +113,7 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -118,44 +121,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dcumentation for contributing to KVM x86, round 2!
+Add a label for the tip tree's "Coding style notes" so that a forthcoming
+KVM x86 handbook can reference/piggyback the tip tree's preferred coding
+style.
 
-v2:
- - Fix a KVM_GET_SUPPORTED_CPUID typo. [Yuan]
- - Give Cthulhu the respect it deserves. [Like]
- - Explicitly state that selftests vs. KVM patches need to maintain
-   bisection (when possible). [Like]
- - Change the recommended base from topic branches to "next" (and plan on
-   providing stable, persistent git objects via tags). [David W]
- - Add a blurb to provide guidance for series that touch non-x86 arch
-   code. [Yu]
- - Clarify when (not) to reference/quote specs (APM and SDM). [Maciej]
- - Add preferences for shortlog length. [Maciej]
- - Exempt things like comment fixes from testing requirements. [Maciej]
- - Add a foreword to try and make the doc less scary to newcomers. [Maciej]
- - Add a rule for testing Documentation/ changes.
- - Clarify that fixes for the current cycle may be carried in the KVM x86
-   tree, but are usually taken directly by Paolo. [Robert]
- - Tweak the "Changelog" section to call out that using imperative mood
-   and avoiding pronouns is the most important rule.
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ Documentation/process/maintainer-tip.rst | 2 ++
+ 1 file changed, 2 insertions(+)
 
-v1: https://lore.kernel.org/all/20230217225449.811957-1-seanjc@google.com
-
-
-Sean Christopherson (2):
-  Documentation/process: Add a label for the tip tree handbook's coding
-    style
-  Documentation/process: Add a maintainer handbook for KVM x86
-
- .../process/maintainer-handbooks.rst          |   1 +
- Documentation/process/maintainer-kvm-x86.rst  | 391 ++++++++++++++++++
- Documentation/process/maintainer-tip.rst      |   2 +
- MAINTAINERS                                   |   1 +
- 4 files changed, 395 insertions(+)
- create mode 100644 Documentation/process/maintainer-kvm-x86.rst
-
-
-base-commit: 3ac88fa4605ec98e545fb3ad0154f575fda2de5f
+diff --git a/Documentation/process/maintainer-tip.rst b/Documentation/process/maintainer-tip.rst
+index 572a3289c9cb..ad0540d6882b 100644
+--- a/Documentation/process/maintainer-tip.rst
++++ b/Documentation/process/maintainer-tip.rst
+@@ -452,6 +452,8 @@ and can be added to an existing kernel config by running:
+ Some of these options are x86-specific and can be left out when testing
+ on other architectures.
+ 
++.. _maintainer-tip-coding-style:
++
+ Coding style notes
+ ------------------
+ 
 -- 
 2.40.0.rc1.284.g88254d51c5-goog
 
