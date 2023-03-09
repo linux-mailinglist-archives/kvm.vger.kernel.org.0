@@ -2,97 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E1F6B6B1DC4
-	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 09:22:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BCB776B1DE9
+	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 09:25:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229546AbjCIIWY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Mar 2023 03:22:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50086 "EHLO
+        id S229727AbjCIIYh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Mar 2023 03:24:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230200AbjCIIWB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Mar 2023 03:22:01 -0500
-Received: from out-14.mta1.migadu.com (out-14.mta1.migadu.com [IPv6:2001:41d0:203:375::e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7DD5B4219
-        for <kvm@vger.kernel.org>; Thu,  9 Mar 2023 00:19:20 -0800 (PST)
-Date:   Thu, 9 Mar 2023 08:19:05 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1678349958;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=x50v67TYwBiKWgeN27hRP+v0wvobGEIlSfVqgnbcpZE=;
-        b=VhYz7y8T/2f5wHgbuvYDigGr5lA7gNx2UEc+6kPfl51jVXEKmODWQrK+erpNl3I+fYAGk0
-        OLP4W54Mdr1zZDcTnZtBmtEdcQWprwRVwxmeRnoIvopUISYuw3tOVeHyt7tzXXc7thjBxD
-        Sz2a8RbgDpGxbCDWDzaFfHz5kYp6oVc=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Bagas Sanjaya <bagasdotme@gmail.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sagi Shahar <sagis@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Peter Shier <pshier@google.com>,
-        Anish Ghulati <aghulati@google.com>,
-        James Houghton <jthoughton@google.com>,
-        Anish Moorthy <amoorthy@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Axel Rasmussen <axelrasmussen@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Ashish Kalra <ashish.kalra@amd.com>,
-        Babu Moger <babu.moger@amd.com>, Chao Gao <chao.gao@intel.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Chenyi Qiang <chenyi.qiang@intel.com>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Guang Zeng <guang.zeng@intel.com>,
-        Hou Wenlong <houwenlong.hwl@antgroup.com>,
-        Jiaxi Chen <jiaxi.chen@linux.intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Jing Liu <jing2.liu@intel.com>,
-        Junaid Shahid <junaids@google.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Leonardo Bras <leobras@redhat.com>,
-        Like Xu <like.xu.linux@gmail.com>,
-        Li RongQing <lirongqing@baidu.com>,
-        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Michal Luczaj <mhal@rbox.co>,
-        Mingwei Zhang <mizhang@google.com>,
-        Nikunj A Dadhania <nikunj@amd.com>,
-        Paul Durrant <pdurrant@amazon.com>,
-        Peng Hao <flyingpenghao@gmail.com>,
-        Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>,
-        Robert Hoo <robert.hu@linux.intel.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Wei Wang <wei.w.wang@intel.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Zhenzhong Duan <zhenzhong.duan@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] Documentation/process: Add a maintainer handbook
- for KVM x86
-Message-ID: <ZAmWefGcsBwcODxW@linux.dev>
-References: <20230309010336.519123-1-seanjc@google.com>
- <20230309010336.519123-3-seanjc@google.com>
- <ZAlGeYAmvhPmVmGe@debian.me>
+        with ESMTP id S230419AbjCIIYA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Mar 2023 03:24:00 -0500
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA3C9B8F2B;
+        Thu,  9 Mar 2023 00:22:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1678350166; x=1709886166;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=1BqCuzwrx1sAGErM7heQwG3PZAKj4z7gGmdrSQhTQJU=;
+  b=I9XuFC+/EnuxLXGm6ajJnqm43zcrlXdCM54lMJnDq28fuAjGANyQxqoQ
+   q5KmVL69AJn3MAHKpnISU29+sHEP3cPV2ryz7aK6qeRtNK19JCCGBG/sd
+   vfL58oXZLi7uYM06OLFTLvxX8bt5bAJ9xp5srhf/P0J2HGvums9V55kOy
+   HBAVjYaxQ0+2GOy4rHEbEcqUFwy31eAyynrtKuprnoQc+ABSbQxhBI1IP
+   hYXAjZebOhjlhME0etU7F3irU+ABXzwV77wnJLzkhwO/vf+Jy7XjFRFfi
+   1ADKEzyxRRmcTSl+DVNj42XlYIVwpsCyeeu/44LOhJAgT2wfKuiXosRNi
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10643"; a="364026161"
+X-IronPort-AV: E=Sophos;i="5.98,245,1673942400"; 
+   d="scan'208";a="364026161"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2023 00:22:44 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10643"; a="787474147"
+X-IronPort-AV: E=Sophos;i="5.98,245,1673942400"; 
+   d="scan'208";a="787474147"
+Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
+  by fmsmga002.fm.intel.com with ESMTP; 09 Mar 2023 00:22:10 -0800
+From:   Yi Liu <yi.l.liu@intel.com>
+To:     joro@8bytes.org, alex.williamson@redhat.com, jgg@nvidia.com,
+        kevin.tian@intel.com, robin.murphy@arm.com,
+        baolu.lu@linux.intel.com
+Cc:     cohuck@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
+        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.l.liu@intel.com,
+        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: [PATCH v2 0/5] Add Intel VT-d nested translation
+Date:   Thu,  9 Mar 2023 00:22:02 -0800
+Message-Id: <20230309082207.612346-1-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZAlGeYAmvhPmVmGe@debian.me>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -100,47 +65,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 09, 2023 at 09:37:45AM +0700, Bagas Sanjaya wrote:
-> On Wed, Mar 08, 2023 at 05:03:36PM -0800, Sean Christopherson wrote:
-> > +As a general guideline, use ``kvm-x86/next`` even if a patch/series touches
-> > +multiple architectures, i.e. isn't strictly scoped to x86.  Using any of the
-> > +branches from the main KVM tree is usually a less good option as they likely
-> > +won't have many, if any, changes for the next release, i.e. using the main KVM
-> > +tree as a base is more likely to yield conflicts.  And if there are non-trivial
-> > +conflicts with multiple architectures, coordination between maintainers will be
-> > +required no matter what base is used.  Note, this is far from a hard rule, i.e.
-> > +use a different base for multi-arch series if that makes the most sense.
+This is to add Intel VT-d nested translation based on IOMMUFD nesting
+infrastructure. As the iommufd nesting infrastructure series[1], iommu
+core supports new ops to report iommu hardware information, allocate
+domains with user data and sync stage-1 IOTLB. The data required in
+the three paths are vendor-specific, so
 
-I don't think this is the best way to coordinate with other architectures.
-Regardless of whether you intended this to be prescriptive, I'm worried most
-folks will follow along and just base patches on kvm-x86/next anyway.
+1) IOMMU_HW_INFO_TYPE_INTEL_VTD and struct iommu_device_info_vtd are
+   defined to report iommu hardware information for Intel VT-d .
+2) IOMMU_HWPT_DATA_VTD_S1 is defined for the Intel VT-d stage-1 page
+   table, it will be used in the stage-1 domain allocation and IOTLB
+   syncing path. struct iommu_hwpt_intel_vtd is defined to pass user_data
+   for the Intel VT-d stage-1 domain allocation.
+   struct iommu_hwpt_invalidate_intel_vtd is defined to pass the data for
+   the Intel VT-d stage-1 IOTLB invalidation.
 
-It'd be easier to just have multi-arch series use a stable base (i.e. a
-release candidate) by default. That'd avoid the undesirable case where merging
-a shared branch brings with it some random point in another arch's /next
-history.
+With above IOMMUFD extensions, the intel iommu driver implements the three
+callbacks to support nested translation.
 
-If a different approach makes sense for a particular series then we can
-discuss it on the list and arrive at something agreeable for all parties
-involved.
+Complete code can be found in [2], QEMU could can be found in [3].
 
-> That means patches that primarily kvm ARM changes should be based on
-> kvm-x86/next, right?
+base-commit: f01f1c95684dd18c15dd0e51b4fd6e796a0a2c0e
 
-No, don't do that.
+[1] https://lore.kernel.org/linux-iommu/20230309080910.607396-1-yi.l.liu@intel.com/
+[2] https://github.com/yiliu1765/iommufd/tree/iommufd_nesting
+[3] https://github.com/yiliu1765/qemu/tree/wip/iommufd_rfcv3%2Bnesting
 
-Patches aimed at KVM/arm64 should be based on a sensible release candidate.
-We tend to contstruct the kvmarm/next with an early-ish release candidate
-(rc2-rc4). For example the 6.3 pull request was based on 6.2-rc4. We use topic
-branches in a slightly different manner than x86, creating ad-hoc branches for
-individual patch series grabbed from the list.
+Change log:
+v2:
+ - The iommufd infrastructure is split to be separate series.
 
-If one has a series that conflicts with/depends on another that is in-flight
-or already picked up then that should be mentioned in the cover letter.
-Ultimately its up to the maintainer(s) to address conflicts, and neither
-Marc nor I are afraid to ask for a rebase/respin if it makes our lives
-easier to glue it all together.
+v1: https://lore.kernel.org/linux-iommu/20230209043153.14964-1-yi.l.liu@intel.com/
+
+Regards,
+        Yi Liu
+
+Lu Baolu (4):
+  iommu/vt-d: Implement hw_info for iommu capability query
+  iommu/vt-d: Extend dmar_domain to support nested domain
+  iommu/vt-d: Add helper to setup pasid nested translation
+  iommu/vt-d: Add nested domain support
+
+Yi Liu (1):
+  iommufd: Add nesting related data structures for Intel VT-d
+
+ drivers/iommu/intel/Makefile         |   2 +-
+ drivers/iommu/intel/iommu.c          |  57 ++++++++---
+ drivers/iommu/intel/iommu.h          |  51 ++++++++--
+ drivers/iommu/intel/nested.c         | 143 +++++++++++++++++++++++++++
+ drivers/iommu/intel/pasid.c          | 142 ++++++++++++++++++++++++++
+ drivers/iommu/intel/pasid.h          |   2 +
+ drivers/iommu/iommufd/hw_pagetable.c |   7 +-
+ drivers/iommu/iommufd/main.c         |   5 +
+ include/uapi/linux/iommufd.h         | 136 +++++++++++++++++++++++++
+ 9 files changed, 522 insertions(+), 23 deletions(-)
+ create mode 100644 drivers/iommu/intel/nested.c
 
 -- 
-Thanks,
-Oliver
+2.34.1
+
