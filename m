@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 735076B2AED
-	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 17:38:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 68C2F6B2B03
+	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 17:41:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230004AbjCIQi2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Mar 2023 11:38:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37668 "EHLO
+        id S230100AbjCIQlh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Mar 2023 11:41:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229970AbjCIQh5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Mar 2023 11:37:57 -0500
+        with ESMTP id S229729AbjCIQlC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Mar 2023 11:41:02 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3785FF9EF6
-        for <kvm@vger.kernel.org>; Thu,  9 Mar 2023 08:27:52 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE49910B1EC
+        for <kvm@vger.kernel.org>; Thu,  9 Mar 2023 08:29:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678379258;
+        s=mimecast20190719; t=1678379383;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=lxt5/Bn7cdaTgX2DWKCr4A5WUfM36Gr/gY5+wUSWUT8=;
-        b=DR6HkWniyavZWhuO/64ujnRKzcoPypI8jbrHAFKrXDyyNmUu5OmMmL1Df/iQ/xrEQFSQYj
-        1rfHdYlbtEG7hatg534iU6OuvDz7pTnebzekQDDhWEQ3fYclJfcAZr0crFFYNcaAbcZB6B
-        2YxjNHClTGiZK9bFyUvseFiHG/XvbLo=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=qkGMBcAqnKS6JyN4vXTerExSnh7y8GSPNATG4aVOfrc=;
+        b=Duwo8umPcihhbKZTUZvUgkiRkwEoIyjdLpTA2dDa6koagz5nlJ1gGc5gkrcMPcah5HppL2
+        ASDcUOaQ3GB52e5dJhdqOQvYMTRLRwEZdTE3H7XyUIu2JG+v8BNIZ0JdizAmuvqqFmTW3G
+        c1vprc/gAUKK+aI2S9Hsg0Qzscw+3hs=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-67-CvSueDN9Nzal7Tec1vg0xg-1; Thu, 09 Mar 2023 11:27:37 -0500
-X-MC-Unique: CvSueDN9Nzal7Tec1vg0xg-1
-Received: by mail-qk1-f200.google.com with SMTP id e14-20020a05620a208e00b0074270b9960dso1444545qka.22
-        for <kvm@vger.kernel.org>; Thu, 09 Mar 2023 08:27:37 -0800 (PST)
+ us-mta-81-gKxdh77QPFKqKcWTUvl6lA-1; Thu, 09 Mar 2023 11:29:41 -0500
+X-MC-Unique: gKxdh77QPFKqKcWTUvl6lA-1
+Received: by mail-qv1-f71.google.com with SMTP id ef20-20020a0562140a7400b004c72d0e92bcso1442740qvb.12
+        for <kvm@vger.kernel.org>; Thu, 09 Mar 2023 08:29:41 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678379256;
+        d=1e100.net; s=20210112; t=1678379381;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lxt5/Bn7cdaTgX2DWKCr4A5WUfM36Gr/gY5+wUSWUT8=;
-        b=g/qu/qOxwUrv9cvfyiCbZ9UegpovhvD/lEieKGL2ilbs1xgl5LsfrGa8Pp76wHnAuX
-         VbHXGMPtj7K0wC/wa6b6zMPpPn4JQbfQCzahC4R2qXsosb0YzQT/2ffPij9NkHL5sRPp
-         K37626Rcow7YU+/y2VxP/eQbS8kBwz18dA+c7iAKOQ18LfUrpDGnlaiWFZC9CKQ8h0SG
-         zIVeYc6s+VCTnVmkGv1VUOAmDnXOjfK63aeVDKj2GF5y/fC2wfjMqP5uGSA38dgbS0h3
-         lfu+lgXQX0xZqDBy+uQDJ46tq1Ws1I546LE7tP7/cD0xDoWZx22+3myHsLjOi5J77dRM
-         Y1Rw==
-X-Gm-Message-State: AO0yUKWt9lHBfCHfyuCxyuTVhlufRzKRw6zjYc5lVPWrRWvM7umAMDUO
-        lcPStdqppzUlop8r1I+aCh/P9/FMoDyr+DR1s2JPswo4SqUL67/xjXQt4akOyhPQxqsou+d4lzi
-        kqY8stE4iUssR
-X-Received: by 2002:ac8:4e8f:0:b0:3b8:ca58:ee4c with SMTP id 15-20020ac84e8f000000b003b8ca58ee4cmr37414141qtp.2.1678379256608;
-        Thu, 09 Mar 2023 08:27:36 -0800 (PST)
-X-Google-Smtp-Source: AK7set+MCqXSR1PGob1I4pk09gGcs+URcwUiCZ4YjiXliMTVJKdjLHjJ73m9gwkInj/O5e3oS12kjQ==
-X-Received: by 2002:ac8:4e8f:0:b0:3b8:ca58:ee4c with SMTP id 15-20020ac84e8f000000b003b8ca58ee4cmr37414110qtp.2.1678379256342;
-        Thu, 09 Mar 2023 08:27:36 -0800 (PST)
+        bh=qkGMBcAqnKS6JyN4vXTerExSnh7y8GSPNATG4aVOfrc=;
+        b=Pg0Dx9QCrM3Jrxn9JleVKMypUvZGF7cXXygFNC+qJwMQrkkHt2Qz6va7DxMj5d+q/y
+         IgwriKt8qLvRJ2A968e9xy+IIVcH4wDCsr1Fi+EoarhSteLGhStkxWmqjg9land17qOp
+         E89pkRh9x2ZYbO9UHMul6D6iLskuAsWQiAkv/A7BCo7iuk2I9eTGZjxqamDjPvv5D2Y0
+         nIYpdF5I3CTZC2GjY2jmGe7R6GFSqbn1rfkrRC2C/4fIulHYYFkNPeAP0iGzEiOJhoWW
+         DSV2YqJndQZ+ppzb//FGd8ggAtKfkrWGaX138GJqy2+u0ZKK3N5oyR7Y8Z/jj2jOvwY9
+         NxmA==
+X-Gm-Message-State: AO0yUKUmH/903f2uJZftX9juJaQjzraiUd3d8/2ZYgPKWQpQPcOCjPX4
+        fZuV8b61u3eVaEkjy3V2byZeCiL82IQmF20yzBRwT1GITJLXRXAyVoSUE0G8PRAsGCfGvfCgYV3
+        XQ3oFuYwwe5Nf
+X-Received: by 2002:ac8:5c02:0:b0:3b8:525e:15ec with SMTP id i2-20020ac85c02000000b003b8525e15ecmr43003996qti.27.1678379381156;
+        Thu, 09 Mar 2023 08:29:41 -0800 (PST)
+X-Google-Smtp-Source: AK7set/wt8PRwAtM1Bf3zAU+80K15G/N3ODjmPX5KS1M+6kzBy453+fWsgrmcpFNeaN7ieLbWU2BRw==
+X-Received: by 2002:ac8:5c02:0:b0:3b8:525e:15ec with SMTP id i2-20020ac85c02000000b003b8525e15ecmr43003941qti.27.1678379380798;
+        Thu, 09 Mar 2023 08:29:40 -0800 (PST)
 Received: from sgarzare-redhat (host-82-57-51-170.retail.telecomitalia.it. [82.57.51.170])
-        by smtp.gmail.com with ESMTPSA id 6-20020a05620a040600b006f9ddaaf01esm13666192qkp.102.2023.03.09.08.27.33
+        by smtp.gmail.com with ESMTPSA id r13-20020a05622a034d00b0039cc0fbdb61sm14575595qtw.53.2023.03.09.08.29.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Mar 2023 08:27:35 -0800 (PST)
-Date:   Thu, 9 Mar 2023 17:27:26 +0100
+        Thu, 09 Mar 2023 08:29:40 -0800 (PST)
+Date:   Thu, 9 Mar 2023 17:29:35 +0100
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     Arseniy Krasnov <avkrasnov@sberdevices.ru>
 Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
@@ -66,18 +66,18 @@ Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
         kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
         netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
         kernel@sberdevices.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v3 1/4] virtio/vsock: don't use skbuff state to
- account credit
-Message-ID: <20230309162726.lzkacyg3lfow4cfg@sgarzare-redhat>
+Subject: Re: [RFC PATCH v3 2/4] virtio/vsock: remove redundant 'skb_pull()'
+ call
+Message-ID: <20230309162935.c76hilqo3s22fysd@sgarzare-redhat>
 References: <0abeec42-a11d-3a51-453b-6acf76604f2e@sberdevices.ru>
- <453d77fd-8344-26d8-bb44-7ed829b7de47@sberdevices.ru>
+ <ea7a542b-8772-e204-6b2b-a60d89614f3b@sberdevices.ru>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <453d77fd-8344-26d8-bb44-7ed829b7de47@sberdevices.ru>
+In-Reply-To: <ea7a542b-8772-e204-6b2b-a60d89614f3b@sberdevices.ru>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -85,123 +85,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 09, 2023 at 01:11:46PM +0300, Arseniy Krasnov wrote:
->This replaces use of skbuff state to calculate new 'rx_bytes'/'fwd_cnt'
->values with explicit value as input argument. This makes code more
->simple, because it is not needed to change skbuff state before each
->call to update 'rx_bytes'/'fwd_cnt'.
+On Thu, Mar 09, 2023 at 01:12:42PM +0300, Arseniy Krasnov wrote:
 
-I think we should also describe the issues you found that we are fixinig
-now, for example the wrong calculation in virtio_transport_dec_rx_pkt().
+I would add:
 
-Something like this:
+Since we now no longer use `skb->len` to update credit, ...
 
-   `skb->len` can vary when we partially read the data, this complicates
-   the calculation of credit to be updated in
-   virtio_transport_inc_rx_pkt()/virtio_transport_dec_rx_pkt().
-
-   Also in virtio_transport_dec_rx_pkt() we were miscalculating the
-   credit since `skb->len` was redundant.
-
-   For these reasons, let's replace the use ...
-   (continue with what is written in this commit message)
-
-And we should add the Fixes tag:
-
-Fixes: 71dc9ec9ac7d ("virtio/vsock: replace virtio_vsock_pkt with sk_buff")
-
+>There is no sense to update skbuff state, because it is used only once
+>after dequeue to copy data and then will be released.
 >
 >Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 >---
-> net/vmw_vsock/virtio_transport_common.c | 23 +++++++++++------------
-> 1 file changed, 11 insertions(+), 12 deletions(-)
->
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index a1581c77cf84..618680fd9906 100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -241,21 +241,18 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
-> }
->
-> static bool virtio_transport_inc_rx_pkt(struct virtio_vsock_sock *vvs,
->-					struct sk_buff *skb)
->+					u32 len)
-> {
->-	if (vvs->rx_bytes + skb->len > vvs->buf_alloc)
->+	if (vvs->rx_bytes + len > vvs->buf_alloc)
-> 		return false;
->
->-	vvs->rx_bytes += skb->len;
->+	vvs->rx_bytes += len;
-> 	return true;
-> }
->
-> static void virtio_transport_dec_rx_pkt(struct virtio_vsock_sock *vvs,
->-					struct sk_buff *skb)
->+					u32 len)
-> {
->-	int len;
->-
->-	len = skb_headroom(skb) - sizeof(struct virtio_vsock_hdr) - skb->len;
-> 	vvs->rx_bytes -= len;
-> 	vvs->fwd_cnt += len;
-> }
->@@ -388,7 +385,9 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
-> 		skb_pull(skb, bytes);
->
-> 		if (skb->len == 0) {
->-			virtio_transport_dec_rx_pkt(vvs, skb);
->+			u32 pkt_len = le32_to_cpu(virtio_vsock_hdr(skb)->len);
+> net/vmw_vsock/virtio_transport_common.c | 1 -
+> 1 file changed, 1 deletion(-)
 
-Good catch! In my proposal I used `bytes` wrongly!
-
-The rest LGTM!
+The patch LGTM!
 
 Stefano
 
->+
->+			virtio_transport_dec_rx_pkt(vvs, pkt_len);
-> 			consume_skb(skb);
-> 		} else {
-> 			__skb_queue_head(&vvs->rx_queue, skb);
->@@ -437,17 +436,17 @@ static int virtio_transport_seqpacket_do_dequeue(struct vsock_sock *vsk,
 >
-> 	while (!msg_ready) {
-> 		struct virtio_vsock_hdr *hdr;
->+		size_t pkt_len;
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index 618680fd9906..9a411475e201 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -465,7 +465,6 @@ static int virtio_transport_seqpacket_do_dequeue(struct vsock_sock *vsk,
+> 					dequeued_len = err;
+> 				} else {
+> 					user_buf_len -= bytes_to_copy;
+>-					skb_pull(skb, bytes_to_copy);
+> 				}
 >
-> 		skb = __skb_dequeue(&vvs->rx_queue);
-> 		if (!skb)
-> 			break;
-> 		hdr = virtio_vsock_hdr(skb);
->+		pkt_len = (size_t)le32_to_cpu(hdr->len);
->
-> 		if (dequeued_len >= 0) {
->-			size_t pkt_len;
-> 			size_t bytes_to_copy;
->
->-			pkt_len = (size_t)le32_to_cpu(hdr->len);
-> 			bytes_to_copy = min(user_buf_len, pkt_len);
->
-> 			if (bytes_to_copy) {
->@@ -484,7 +483,7 @@ static int virtio_transport_seqpacket_do_dequeue(struct vsock_sock *vsk,
-> 				msg->msg_flags |= MSG_EOR;
-> 		}
->
->-		virtio_transport_dec_rx_pkt(vvs, skb);
->+		virtio_transport_dec_rx_pkt(vvs, pkt_len);
-> 		kfree_skb(skb);
-> 	}
->
->@@ -1040,7 +1039,7 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
->
-> 	spin_lock_bh(&vvs->rx_lock);
->
->-	can_enqueue = virtio_transport_inc_rx_pkt(vvs, skb);
->+	can_enqueue = virtio_transport_inc_rx_pkt(vvs, len);
-> 	if (!can_enqueue) {
-> 		free_pkt = true;
-> 		goto out;
+> 				spin_lock_bh(&vvs->rx_lock);
 >-- 
 >2.25.1
 >
