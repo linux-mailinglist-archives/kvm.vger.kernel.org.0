@@ -2,61 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F1566B2BFF
-	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 18:26:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 569F06B2C2E
+	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 18:40:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230246AbjCIR0A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Mar 2023 12:26:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47410 "EHLO
+        id S230075AbjCIRki (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Mar 2023 12:40:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229917AbjCIRZ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Mar 2023 12:25:58 -0500
+        with ESMTP id S229774AbjCIRkg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Mar 2023 12:40:36 -0500
 Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4A1EF31E7
-        for <kvm@vger.kernel.org>; Thu,  9 Mar 2023 09:25:56 -0800 (PST)
-Received: by mail-pl1-x649.google.com with SMTP id p10-20020a170902e74a00b0019ec1acba17so1411363plf.0
-        for <kvm@vger.kernel.org>; Thu, 09 Mar 2023 09:25:56 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA13EFAAE7
+        for <kvm@vger.kernel.org>; Thu,  9 Mar 2023 09:40:35 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id iw4-20020a170903044400b0019ccafc1fbeso1415923plb.3
+        for <kvm@vger.kernel.org>; Thu, 09 Mar 2023 09:40:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678382756;
+        d=google.com; s=20210112; t=1678383635;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nAzHwxIzKgR5cpPFlKSmTV6wBjCG9GNYIIeb+EiWOEw=;
-        b=pcfEThEU4Vasj7WYR/Waxpaik/NppP6KUs9ppDrOWtyN2K2o4KqOmGK0EDNvaR1PpN
-         /UnLgb4a0okqN8xPoiVdvT3V4a3xQpbxcpQw+hqc3obdWDA1zbjdpsZMinO2+XGf0pnk
-         tx9vE4rRQCJ5voH+cpItfZtOeBNDgs3HFupLFCjAMoI4yqWp5+vfnERiQVRovGhbDJlD
-         OI+CCOqeKsFNSgk9agGxkWOLj6VAn6Cx55qyTcqfd2JJGxyGwRwezuRC/2e6nTnTf9sd
-         6ToNYA8q0vemzt2KRH+BjeI+gz/XbfE+MvBJgD+F+nwK3UPkZ0AbCSmlQJnwfuNg6ozs
-         ZadA==
+        bh=FMpG6QqC6hhrGl7QyTuyVx8ARghXDw/6XzjfUQpd64U=;
+        b=D/D3EgchKsiUdj5mlSTQ+Ok6aeaCq1dG8+qQMkOxZ7eugU5DM9o/1dj56peM5nV7xZ
+         ux7nQLkAXPYszpdD9hAlgY2/sIyE1k73uNyuLDieL3TReaT8qAD6ImwUAjsHc3myenJR
+         FWrMpRB7Nki33S0YJQJQS9DRErPKvxeBK7Em21L+6ixo1rHYbSSdeC0YWoG0beAdfvjU
+         00YxqveXzQYkD/Y7wCOyG1SE0sknD4nAiDi3LmwHfGaLj567di27VM7k1l/bVpPCWLGU
+         lUeCqLW4qtdoTrruby9k7EFnrOSBUTJrs78mpAwhWcXOoS7eQV82wPungBlgsGdHqSgP
+         42Ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678382756;
+        d=1e100.net; s=20210112; t=1678383635;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nAzHwxIzKgR5cpPFlKSmTV6wBjCG9GNYIIeb+EiWOEw=;
-        b=tUrb3esTdeUKt7Mp1I9d9g/s+ZyFocclh009kOGmixWyAiuKijv2z0/6Oy3bc/stCW
-         A6WCk6r+L7K43PMn47dvvsPNi7kRTYjzB91biK9jj3kqX7d3SMnZ9dIM3wOZySip+sib
-         T7NfhYjxEZCbRYJ8NPQ+MqjqGk9xSfHeXb40l6iea1sGXT1EYHDe56P7clepHxOXsYjT
-         lPRjg+2xiD2BPA5GOpl1MNQY1wzn0N/DA2rmr3C7L33T++3fvFFOI71wHKxNxIJfrBQm
-         6TmnNN2SDG6N7bt9AjAR1iSxBDxSWBTh6D5Dhmsh9t4aG80l7mPbbXPKZbQEHdsVYg9m
-         l1sA==
-X-Gm-Message-State: AO0yUKUsumi020HrNbPXoEle4qVUGSnXLb7A8JXteCoR6YFXxq48aIjG
-        xljkHNQfpP5lGoy84dU/6XiPSjC08ng=
-X-Google-Smtp-Source: AK7set/wzMVIYZAs4ttZZ0eOPrOq++LXdebZdExp7oCzxxYkXloK+akjBCXw06ZtDEXNHa6PBgMRsLH3hjo=
+        bh=FMpG6QqC6hhrGl7QyTuyVx8ARghXDw/6XzjfUQpd64U=;
+        b=Ewv+6G7IrJItevBHPswt563/7kDIQhCGlUAqCKZQpka3bjokIuFDBonhXphBO2IQst
+         EpgvZ1b0Lqg3+cScafFiWe0jaGePS5YU+BajJ8bVFYo/BAGA6YeR70zCnyDDtitCX08v
+         MQqE/1qqU+V3rwc2LyCkNieMf1dQRBkQWLmnHqx0Erwtj+J9+sTpQe7ECjfsA1ZdSJ5p
+         Amv/CiVk9kNdQ98buUin+6xW7KVOTPMl5qZVuAv0llzFZ+DDBQ3nxJcXHioa08BiAOEa
+         d2Iq++XulwQkUwWPhwpdWxNn4q1mHZkO+3faTmKr5mNO+QkWbd4ZD/0BDnqtbxsx52QS
+         phGg==
+X-Gm-Message-State: AO0yUKUs5QuyomgfgjPGQzX90LeZp48sszqT8V+fnfKrn0hoAlzrd+ZY
+        RbGGIHlgtqMylxkRrvrXUPA/9tG5lqk=
+X-Google-Smtp-Source: AK7set/K8mLaAxGwzT1+biG01J4A21PfKNmxCXL7Ak5krO/ojpRMzIhImPmz2N4awPbZsK6+EPZg9zLX070=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:4293:b0:199:ab4:e140 with SMTP id
- ju19-20020a170903429300b001990ab4e140mr8601038plb.6.1678382756129; Thu, 09
- Mar 2023 09:25:56 -0800 (PST)
-Date:   Thu, 9 Mar 2023 09:25:54 -0800
-In-Reply-To: <ZAmWefGcsBwcODxW@linux.dev>
+ (user=seanjc job=sendgmr) by 2002:a17:903:2585:b0:19e:b69e:531b with SMTP id
+ jb5-20020a170903258500b0019eb69e531bmr6666236plb.12.1678383635166; Thu, 09
+ Mar 2023 09:40:35 -0800 (PST)
+Date:   Thu, 9 Mar 2023 09:40:33 -0800
+In-Reply-To: <ZAlGeYAmvhPmVmGe@debian.me>
 Mime-Version: 1.0
 References: <20230309010336.519123-1-seanjc@google.com> <20230309010336.519123-3-seanjc@google.com>
- <ZAlGeYAmvhPmVmGe@debian.me> <ZAmWefGcsBwcODxW@linux.dev>
-Message-ID: <ZAoWogdeET5N0mug@google.com>
+ <ZAlGeYAmvhPmVmGe@debian.me>
+Message-ID: <ZAoaEUfr5nnLzZbv@google.com>
 Subject: Re: [PATCH v2 2/2] Documentation/process: Add a maintainer handbook
  for KVM x86
 From:   Sean Christopherson <seanjc@google.com>
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Bagas Sanjaya <bagasdotme@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+To:     Bagas Sanjaya <bagasdotme@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>,
@@ -64,6 +63,7 @@ Cc:     Bagas Sanjaya <bagasdotme@gmail.com>,
         Erdem Aktas <erdemaktas@google.com>,
         Peter Shier <pshier@google.com>,
         Anish Ghulati <aghulati@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
         James Houghton <jthoughton@google.com>,
         Anish Moorthy <amoorthy@google.com>,
         Ben Gardon <bgardon@google.com>,
@@ -119,65 +119,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 09, 2023, Oliver Upton wrote:
-> On Thu, Mar 09, 2023 at 09:37:45AM +0700, Bagas Sanjaya wrote:
-> > On Wed, Mar 08, 2023 at 05:03:36PM -0800, Sean Christopherson wrote:
-> > > +As a general guideline, use ``kvm-x86/next`` even if a patch/series touches
-> > > +multiple architectures, i.e. isn't strictly scoped to x86.  Using any of the
-> > > +branches from the main KVM tree is usually a less good option as they likely
-> > > +won't have many, if any, changes for the next release, i.e. using the main KVM
-> > > +tree as a base is more likely to yield conflicts.  And if there are non-trivial
-> > > +conflicts with multiple architectures, coordination between maintainers will be
-> > > +required no matter what base is used.  Note, this is far from a hard rule, i.e.
-> > > +use a different base for multi-arch series if that makes the most sense.
+On Thu, Mar 09, 2023, Bagas Sanjaya wrote:
+> On Wed, Mar 08, 2023 at 05:03:36PM -0800, Sean Christopherson wrote:
+> > +If a patch touches multiple topics, traverse up the conceptual tree to find the
+> > +first common parent (which is often simply ``x86``).  When in doubt,
+> > +``git log path/to/file`` should provide a reasonable hint.
 > 
-> I don't think this is the best way to coordinate with other architectures.
-> Regardless of whether you intended this to be prescriptive, I'm worried most
-> folks will follow along and just base patches on kvm-x86/next anyway.
+> What do you mean by conceptual tree?  Is it Patch subject prefix?
 
-Probably, but for the target audience (KVM x86 contributors), that's likely the
-least awful base 99% of the time.
+Not really?  I'm struggling to describe it in words.  What I mean is something
+like this
 
-> It'd be easier to just have multi-arch series use a stable base (i.e. a
-> release candidate) by default. That'd avoid the undesirable case where merging
-> a shared branch brings with it some random point in another arch's /next
-> history.
+                 x86
+               /  |  \
+             VMX pmu  SVM
+            /            \
+          nVMX          nSVM
 
-You're conflating the base of the patch series with the branch it is applied to.
-I'm most definitely not proposing that multi-arch series from x86 contributors
-always be routed through kvm-x86.  It's ultimately the responsibility of the
-maintainers, not the contributors, to avoid funky merges and histories.  If a
-series warrants a dedicated topic branch, then we need to create said topic branch
-off a stable, common base, irrespective of what the contributor based their patches
-on.
+e.g. if a patch touches VMX and SVM, use "x86".  But it's a bit more complex than
+that, e.g. a VMX-focused patch that just happens to touch Intel-specific PMU
+code should probably be tagged "VMX", not "x86" or "pmu".
 
-If a series from an x86 contributor applies cleanly on kvm-x86/next but not on
--rc2 (or whatever), then the reverse would also likely be true (if the contributor
-used -rc2 as the base).  In other words, for series with non-trivial modifications
-to other architectures and/or common KVM code, IMO the base used for the _initial_
-posting doesn't matter all that much for us maintainers since such series will
-likely require additional attention no matter what base is used.
+Massaging subjects when applying is easy enough, and there will always be some
+amount of subjectivity, so unless this is outright confusing (or someone has a
+better, succinct, and easy-to-understand description), I'll probably just leave
+this section as-is.
 
-On the flip side, the vast majority of "multi-arch" series in KVM tend to be focused
-on a single architecture, with only incidental contact to other architectures and/or
-common KVM code.  Those types of series will likely be routed through their "target"
-arch tree, and so for x86, using kvm-x86/next as the base is preferrable.
-
-My goal with suggesting/prescribing kvm-x86/next to contributors is to make the
-easy things easy.  On my end, that means having _predictable_ submissions and
-minimizing the number of avoidable conflicts.  For contributors, that means having
-a very simple rule/guideline.  "Use kvm-x86/next unless you know better" satisfies
-all those conditions.
-
-> If a different approach makes sense for a particular series then we can
-> discuss it on the list and arrive at something agreeable for all parties
-> involved.
+> > +KVM selftests that are associated with KVM changes, e.g. regression tests for
+> > +bug fixes, should be posted along with the KVM changes as a single series.  The
+> > +standard kernel rules for bisection apply, i.e. KVM changes that result in test
+> > +failures should be ordered after the selftests updates, and vice versa, new
+> > +tests that fail due to KVM bugs should be ordered after the KVM fixes.
 > 
-> > That means patches that primarily kvm ARM changes should be based on
-> > kvm-x86/next, right?
-> 
-> No, don't do that.
+> Did you mean that in a patch series, selftest patches are placed after
+> their corresponding KVM changes?
 
-+<infinity symbol>
-
-This doc is specifically for KVM x86.
+No, I meant what I wrote.  If a KVM change will break a test (uncommon, but it
+does happen), then the selftest should be patched first so that there are no
+unnecessary test failures in the git history.  But when adding a regression test,
+the KVM bug fix should come first so that again, there are no unnecessary failures
+if someone tests an arbitrary commit, e.g. during bisection.
