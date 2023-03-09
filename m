@@ -2,87 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C3B2D6B16B6
-	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 00:39:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F36F6B186B
+	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 02:03:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230379AbjCHXjT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Mar 2023 18:39:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36408 "EHLO
+        id S229916AbjCIBD4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Mar 2023 20:03:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230307AbjCHXiz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Mar 2023 18:38:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B227193F2
-        for <kvm@vger.kernel.org>; Wed,  8 Mar 2023 15:38:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678318688;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vQh0drW5TlB+nMRkrwjuf/guCjqUNLrt66sZFoz2Zx4=;
-        b=UXOseoEq++iGsV4ooDmYTqhSCQ1ZcXAzgQqnlP/VWjki9zh07Tvcg5fzBH2N4TMHdXPVaG
-        8Vb6wLHLaXtU64p1JXYgaIuAmpyzhtGkkNgewvJH3uMgaYtkQlF0/pOcMcx++OuSF8PZ9D
-        Yvbb/gVwJXxSdMmxBo0GpqX+6eoyAy4=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-212-GCv5fdpBO_GHp61LWIrj6g-1; Wed, 08 Mar 2023 18:38:07 -0500
-X-MC-Unique: GCv5fdpBO_GHp61LWIrj6g-1
-Received: by mail-il1-f197.google.com with SMTP id q8-20020a92ca48000000b00320ed437f04so83680ilo.19
-        for <kvm@vger.kernel.org>; Wed, 08 Mar 2023 15:38:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678318686;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        with ESMTP id S229776AbjCIBDu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Mar 2023 20:03:50 -0500
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 345949BE39
+        for <kvm@vger.kernel.org>; Wed,  8 Mar 2023 17:03:39 -0800 (PST)
+Received: by mail-pg1-x549.google.com with SMTP id y1-20020a631801000000b00503696ca95dso66785pgl.1
+        for <kvm@vger.kernel.org>; Wed, 08 Mar 2023 17:03:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1678323819;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vQh0drW5TlB+nMRkrwjuf/guCjqUNLrt66sZFoz2Zx4=;
-        b=tODFq+wU07wI4noca9UyxZqv5o5mBWC1ORSAel2Lh4OJbAuTw5eCwRAv9qNrKcY5VC
-         GXlopk+6O2cB6HUvs20ydHq2OP4nlTC7jCNmpL2sN2OQpgbiMtSAQNh0eMnMhgZPsXyH
-         AOk3HqrDI6oEL57jeLv40iyE3kLeTxxC2qdA22XFpeIVLPRJsFYE+URDJildnDKb+BXb
-         YnKz0JYPZfFpO7Ns8B55bb3TYNMaQvX6aLI8EblBwid6OfUmXh9Pyr/Mlr8/Hug0jApI
-         P5cqUFiAqHr4Xdcz4wkGJ1/UlUL3JRcTnYHHs0OFZS9V0ru59Q9kbNZnSqjuT5JCrMj6
-         NLgg==
-X-Gm-Message-State: AO0yUKXOHFJI7xSUqo1fypfPZm3gO7uI2z1F2RUHq4KhZfeT0fTzRR1Y
-        xq4YM4nYO0VO8KnM6RHzFfF4/MGgkNfU6zRiQuwIu3FnEgR82ZPGfaSpa7uUSWtm32y4n8ApXko
-        UB4s4uh8IiCHy
-X-Received: by 2002:a5d:904e:0:b0:74c:87b5:a083 with SMTP id v14-20020a5d904e000000b0074c87b5a083mr222477ioq.17.1678318686531;
-        Wed, 08 Mar 2023 15:38:06 -0800 (PST)
-X-Google-Smtp-Source: AK7set8ZTTdc1V8/mXUIfkFzmtAh6Sqf9otuzL5L9q7AV9CasEm1PWwPQVqwzZCh+DKWPHf2/8jSaw==
-X-Received: by 2002:a5d:904e:0:b0:74c:87b5:a083 with SMTP id v14-20020a5d904e000000b0074c87b5a083mr222461ioq.17.1678318686224;
-        Wed, 08 Mar 2023 15:38:06 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id p11-20020a92d28b000000b003192b0b85eesm4890627ilp.81.2023.03.08.15.38.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Mar 2023 15:38:05 -0800 (PST)
-Date:   Wed, 8 Mar 2023 16:38:03 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Dominik Behr <dbehr@google.com>
-Cc:     Dominik Behr <dbehr@chromium.org>,
-        Grzegorz Jaszczyk <jaz@semihalf.com>,
-        linux-kernel@vger.kernel.org, dmy@semihalf.com, tn@semihalf.com,
-        upstream@semihalf.com, dtor@google.com, jgg@ziepe.ca,
-        kevin.tian@intel.com, cohuck@redhat.com, abhsahu@nvidia.com,
-        yishaih@nvidia.com, yi.l.liu@intel.com, kvm@vger.kernel.org,
-        libvir-list@redhat.com
-Subject: Re: [PATCH] vfio/pci: Propagate ACPI notifications to the
- user-space
-Message-ID: <20230308163803.6bfc2922.alex.williamson@redhat.com>
-In-Reply-To: <CABUrSUBBbXRVRo6b1EKBpgu7zk=8yZhQ__UXFGL_GpO+BA4Pkg@mail.gmail.com>
-References: <20230307220553.631069-1-jaz@semihalf.com>
-        <20230307164158.4b41e32f.alex.williamson@redhat.com>
-        <CAH76GKNapD8uB0B2+m70ZScDaOM8TmPNAii9TGqRSsgN4013+Q@mail.gmail.com>
-        <20230308104944.578d503c.alex.williamson@redhat.com>
-        <CABUrSUD6hE=h3-Ho7L_J=OYeRUw_Bmg9o4fuw591iw9QyBQv9A@mail.gmail.com>
-        <20230308130619.3736cf18.alex.williamson@redhat.com>
-        <CABUrSUBBbXRVRo6b1EKBpgu7zk=8yZhQ__UXFGL_GpO+BA4Pkg@mail.gmail.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        bh=m4Kgj90WAIRpMSk15gHVq1rdI6z2bGt/9q+3/N1bx1M=;
+        b=cUy/iFCRkRNH+7tPQLWb+98G4wIahK2hGkuUeg6xfDpvcgUCGF8UTqGTpWuVvzgHcB
+         WY8jDNLE1IDwFQ8EYUk/Wk+mmpum2gsubEnDtiv/35GkqBX0XA3cfEKXtNrNo5wlshdN
+         XmCOyAbfl7BxnKqWbCx+4PlXYmAkjH+frEdXAOwVqk8qMgox5p4vQPh/tAAyylGA/qZ5
+         73TrIG8Xeuw2Gu2s/60UxvJcwWGawwUhhAhEdeb8Citqpzt5BdpD3iFKZvQEMhDYXWEh
+         RY+3t+K8HVxuLkP90h90L2BIFD5e7xWjbUSl8D7+sJMS08jMJPBjn24Ojq94AR8nuJmz
+         APBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678323819;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=m4Kgj90WAIRpMSk15gHVq1rdI6z2bGt/9q+3/N1bx1M=;
+        b=aPRmKr+fGdupzxioCU3/dgrknoNkPyKE0f7TE9BRHfGS/I7C14LOPoZTyiXJkWdz72
+         wY/y2SbGiSixHUZTTzwj2AS3uxn05ALwCyLD7hYZKsaHJSjocVR66skkTB/tV2W2aIZh
+         i/X1auBuZ3JixOoiGq5UO4d6AqOtMZ9jUU09x3W2pxjP1LWunV26DfUFEwZoxEJFaVI/
+         GfCstrJgPEefZHI8JSTasV/XFrInZ+RzPrOBDADi/luAntICwNKwDwutAjBouYnbjhBE
+         2+id/NCvF7GN9K9cM1jVloyK8HxhrC9zCQrZ5UHMzUjYsIqa6zhiQ4f0U70m8AzVpb59
+         NZ5g==
+X-Gm-Message-State: AO0yUKX3+F81cBws+Axd79QNn5W8jzMYMwfXoY2/Zumu3JqaDsgAcTFo
+        eTEXCXPQsSwBNw3tXNmjCC1KXIm9aCU=
+X-Google-Smtp-Source: AK7set9P0T5ki9oZRXwb/iIWoWX/zO8NZrmywgby8NUI9KSxtnR70fM7ain7q1jp9/XvIvMglKUGVokEFgg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a62:ce87:0:b0:5da:cbe6:c0fb with SMTP id
+ y129-20020a62ce87000000b005dacbe6c0fbmr8596647pfg.4.1678323819285; Wed, 08
+ Mar 2023 17:03:39 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Wed,  8 Mar 2023 17:03:34 -0800
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.40.0.rc1.284.g88254d51c5-goog
+Message-ID: <20230309010336.519123-1-seanjc@google.com>
+Subject: [PATCH v2 0/2] Documentation/process: Add a maintainer handbook for
+ KVM x86
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sagi Shahar <sagis@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Peter Shier <pshier@google.com>,
+        Anish Ghulati <aghulati@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        James Houghton <jthoughton@google.com>,
+        Anish Moorthy <amoorthy@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Axel Rasmussen <axelrasmussen@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Ashish Kalra <ashish.kalra@amd.com>,
+        Babu Moger <babu.moger@amd.com>, Chao Gao <chao.gao@intel.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Chenyi Qiang <chenyi.qiang@intel.com>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Guang Zeng <guang.zeng@intel.com>,
+        Hou Wenlong <houwenlong.hwl@antgroup.com>,
+        Jiaxi Chen <jiaxi.chen@linux.intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        Jing Liu <jing2.liu@intel.com>,
+        Junaid Shahid <junaids@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Leonardo Bras <leobras@redhat.com>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Li RongQing <lirongqing@baidu.com>,
+        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Michal Luczaj <mhal@rbox.co>,
+        Mingwei Zhang <mizhang@google.com>,
+        Nikunj A Dadhania <nikunj@amd.com>,
+        Paul Durrant <pdurrant@amazon.com>,
+        Peng Hao <flyingpenghao@gmail.com>,
+        Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>,
+        Robert Hoo <robert.hu@linux.intel.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Wei Wang <wei.w.wang@intel.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Zhenzhong Duan <zhenzhong.duan@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -90,135 +118,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 8 Mar 2023 14:44:28 -0800
-Dominik Behr <dbehr@google.com> wrote:
+Dcumentation for contributing to KVM x86, round 2!
 
-> On Wed, Mar 8, 2023 at 12:06=E2=80=AFPM Alex Williamson
-> <alex.williamson@redhat.com> wrote:
-> >
-> > On Wed, 8 Mar 2023 10:45:51 -0800
-> > Dominik Behr <dbehr@chromium.org> wrote:
-> > =20
-> > > It is the same interface as other ACPI events like AC adapter LID etc
-> > > are forwarded to user-space.
-> > >  ACPI events are not particularly high frequency like interrupts. =20
-> >
-> > I'm not sure that's relevant, these interfaces don't proclaim to
-> > provide isolation among host processes which manage behavior relative
-> > to accessories.  These are effectively system level services.  It's only
-> > a very, very specialized use case that places a VMM as peers among these
-> > processes.  Generally we don't want to grant a VMM any privileges beyond
-> > what it absolutely needs, so letting a VMM managing an assigned NIC
-> > really ought not to be able to snoop host events related to anything
-> > other than the NIC. =20
-> How is that related to the fact that we are forwarding VFIO-PCI events
-> to netlink? Kernel does not grant any privileges to VMM.
-> There are already other ACPI events on netlink. The implementer of the
-> VMM can choose to allow VMM to snoop them or not.
-> In our case our VMM (crosvm) does already snoop LID, battery and AC
-> adapter events so the guest can adjust its behavior accordingly.
-> This change just adds another class of ACPI events that are forwarded
-> to netlink.
+v2:
+ - Fix a KVM_GET_SUPPORTED_CPUID typo. [Yuan]
+ - Give Cthulhu the respect it deserves. [Like]
+ - Explicitly state that selftests vs. KVM patches need to maintain
+   bisection (when possible). [Like]
+ - Change the recommended base from topic branches to "next" (and plan on
+   providing stable, persistent git objects via tags). [David W]
+ - Add a blurb to provide guidance for series that touch non-x86 arch
+   code. [Yu]
+ - Clarify when (not) to reference/quote specs (APM and SDM). [Maciej]
+ - Add preferences for shortlog length. [Maciej]
+ - Exempt things like comment fixes from testing requirements. [Maciej]
+ - Add a foreword to try and make the doc less scary to newcomers. [Maciej]
+ - Add a rule for testing Documentation/ changes.
+ - Clarify that fixes for the current cycle may be carried in the KVM x86
+   tree, but are usually taken directly by Paolo. [Robert]
+ - Tweak the "Changelog" section to call out that using imperative mood
+   and avoiding pronouns is the most important rule.
 
-That's true, it is the VMM choice whether to allow snooping netlink,
-but this is being proposed as THE solution to allow VMMs to receive
-ACPI events related to vfio assigned devices.  If the solution
-inherently requires escalating the VMM privileges to see all netlink
-events, that's a weakness in the proposal.  As noted previously,
-there's also no introspection here, the VMM can't know whether it
-should listen to netlink for ACPI events or include AML related to a
-GPE for the device.  It cannot determine if either the kernel supports
-this feature or if the device has an ACPI companion that can generate
-these events.
+v1: https://lore.kernel.org/all/20230217225449.811957-1-seanjc@google.com
 
-> > =20
-> > > > > > What sort of ACPI events are we expecting to see here and what =
-does user space do with them? =20
-> > > The use we are looking at right now are D-notifier events about the
-> > > GPU power available to mobile discrete GPUs.
-> > > The firmware notifies the GPU driver and resource daemon to
-> > > dynamically adjust the amount of power that can be used by the GPU.
-> > > =20
-> > > > The proposed interface really has no introspection, how does the VMM
-> > > > know which devices need ACPI tables added "upfront"?  How do these
-> > > > events factor into hotplug device support, where we may not be able=
- to
-> > > > dynamically inject ACPI code into the VM? =20
-> > >
-> > > The VMM can examine PCI IDs and the associated firmware node of the
-> > > PCI device to figure out what events to expect and what ACPI table to
-> > > generate to support it but that should not be necessary. =20
-> >
-> > I'm not entirely sure where your VMM is drawing the line between the VM
-> > and management tools, but I think this is another case where the
-> > hypervisor itself should not have privileges to examine the host
-> > firmware tables to build its own.  Something like libvirt would be
-> > responsible for that. =20
-> Yes, but that depends on the design of hypervisor and VMM and is not
-> related to this patch.
 
-It is very much related to this patch if it proposes an interface to
-solve a problem which is likely not compatible with the security model
-of other VMMs.  We need a single solution to support all VMMs.
+Sean Christopherson (2):
+  Documentation/process: Add a label for the tip tree handbook's coding
+    style
+  Documentation/process: Add a maintainer handbook for KVM x86
 
-> > =20
-> > > A generic GPE based ACPI event forwarder as Grzegorz proposed can be
-> > > injected at VM init time and handle any notification that comes later,
-> > > even from hotplug devices. =20
-> >
-> > It appears that forwarder is sending the notify to a specific ACPI
-> > device node, so it's unclear to me how that becomes boilerplate AML
-> > added to all VMs.  We'll need to notify different devices based on
-> > different events, right? =20
-> Valid point. The notifications have a "scope" ACPI path.
-> In my experience these events are consumed without looking where they
-> came from but I believe the patch can be extended to
-> provide ACPI path, in your example "_SB.PCI0.GPP0.PEGP" instead of
-> generic vfio_pci which VMM could use to translate an equivalent ACPI
-> path in the guest and pass it to a generic ACPI GPE based notifier via
-> shared memory. Grzegorz could you chime in whether that would be
-> possible?
+ .../process/maintainer-handbooks.rst          |   1 +
+ Documentation/process/maintainer-kvm-x86.rst  | 391 ++++++++++++++++++
+ Documentation/process/maintainer-tip.rst      |   2 +
+ MAINTAINERS                                   |   1 +
+ 4 files changed, 395 insertions(+)
+ create mode 100644 Documentation/process/maintainer-kvm-x86.rst
 
-So effectively we're imposing the host ACPI namespace on the VM, or at
-least a mapping between the host and VM namespace?  The generality of
-this is not improving.
 
-> > > > The acpi_bus_generate_netlink_event() below really only seems to fo=
-rm a
-> > > > u8 event type from the u32 event.  Is this something that could be
-> > > > provided directly from the vfio device uAPI with an ioeventfd, thus
-> > > > providing introspection that a device supports ACPI event notificat=
-ions
-> > > > and the ability for the VMM to exclusively monitor those events, and
-> > > > only those events for the device, without additional privileges? =20
-> > >
-> > > From what I can see these events are 8 bit as they come from ACPI.
-> > > They also do not carry any payload and it is up to the receiving
-> > > driver to query any additional context/state from the device.
-> > > This will work the same in the VM where driver can query the same
-> > > information from the passed through PCI device.
-> > > There are multiple other netflink based ACPI events forwarders which
-> > > do exactly the same thing for other devices like AC adapter, lid/power
-> > > button, ACPI thermal notifications, etc.
-> > > They all use the same mechanism and can be received by user-space
-> > > programs whether VMMs or others. =20
-> >
-> > But again, those other receivers are potentially system services, not
-> > an isolated VM instance operating in a limited privilege environment.
-> > IMO, it's very different if the host display server has access to lid
-> > or power events than it is to allow some arbitrary VM that happens to
-> > have an unrelated assigned device that same privilege. =20
-> Therefore these VFIO related ACPI events could be received by a system
-> service via this netlink event and selectively forwarded to VMM if
-> such is a desire of whoever implements the userspace.
-> This is outside the scope of this patch. In our case our VMM does
-> receive these LID, AC or battery events.
-
-But this is backwards, we're presupposing the choice to use netlink
-based on the convenience of one VMM, which potentially creates
-obstacles, maybe even security isolation issues for other VMMs.  The
-method of delivering ACPI events to a VMM is very much within the scope
-of this proposal.  Thanks,
-
-Alex
+base-commit: 3ac88fa4605ec98e545fb3ad0154f575fda2de5f
+-- 
+2.40.0.rc1.284.g88254d51c5-goog
 
