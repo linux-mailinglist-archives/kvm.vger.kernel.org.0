@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 68C2F6B2B03
-	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 17:41:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 55D136B2B06
+	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 17:41:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230100AbjCIQlh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Mar 2023 11:41:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42292 "EHLO
+        id S229747AbjCIQlx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Mar 2023 11:41:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229729AbjCIQlC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Mar 2023 11:41:02 -0500
+        with ESMTP id S229968AbjCIQlb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Mar 2023 11:41:31 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE49910B1EC
-        for <kvm@vger.kernel.org>; Thu,  9 Mar 2023 08:29:43 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE33C1111CC
+        for <kvm@vger.kernel.org>; Thu,  9 Mar 2023 08:30:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678379383;
+        s=mimecast20190719; t=1678379423;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=qkGMBcAqnKS6JyN4vXTerExSnh7y8GSPNATG4aVOfrc=;
-        b=Duwo8umPcihhbKZTUZvUgkiRkwEoIyjdLpTA2dDa6koagz5nlJ1gGc5gkrcMPcah5HppL2
-        ASDcUOaQ3GB52e5dJhdqOQvYMTRLRwEZdTE3H7XyUIu2JG+v8BNIZ0JdizAmuvqqFmTW3G
-        c1vprc/gAUKK+aI2S9Hsg0Qzscw+3hs=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=ZBLRuHkI1YAXHhp9FH7h8P44ZeZyI6cLn1n7/g70EHY=;
+        b=chIKqAvjFRt45A1S3hDQu9J/qxwo+m8PclRZez1eCtjU16Qb32C0phIQshW6uXf+TUYkEK
+        ThALYVDU0eLXTDIYegSz2tjXgvKmA5h5iAlHmNWcNMyK8UCyWODfC3xsEDzCU0kRVGsNHe
+        FTIMHE0FXK1IKDZVboJna05/PJyAgBw=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-81-gKxdh77QPFKqKcWTUvl6lA-1; Thu, 09 Mar 2023 11:29:41 -0500
-X-MC-Unique: gKxdh77QPFKqKcWTUvl6lA-1
-Received: by mail-qv1-f71.google.com with SMTP id ef20-20020a0562140a7400b004c72d0e92bcso1442740qvb.12
-        for <kvm@vger.kernel.org>; Thu, 09 Mar 2023 08:29:41 -0800 (PST)
+ us-mta-311--axX9V-fN4SnHwRpowCSjQ-1; Thu, 09 Mar 2023 11:30:22 -0500
+X-MC-Unique: -axX9V-fN4SnHwRpowCSjQ-1
+Received: by mail-qt1-f200.google.com with SMTP id l2-20020ac87242000000b003bfecc6d046so1335458qtp.17
+        for <kvm@vger.kernel.org>; Thu, 09 Mar 2023 08:30:22 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678379381;
+        d=1e100.net; s=20210112; t=1678379420;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qkGMBcAqnKS6JyN4vXTerExSnh7y8GSPNATG4aVOfrc=;
-        b=Pg0Dx9QCrM3Jrxn9JleVKMypUvZGF7cXXygFNC+qJwMQrkkHt2Qz6va7DxMj5d+q/y
-         IgwriKt8qLvRJ2A968e9xy+IIVcH4wDCsr1Fi+EoarhSteLGhStkxWmqjg9land17qOp
-         E89pkRh9x2ZYbO9UHMul6D6iLskuAsWQiAkv/A7BCo7iuk2I9eTGZjxqamDjPvv5D2Y0
-         nIYpdF5I3CTZC2GjY2jmGe7R6GFSqbn1rfkrRC2C/4fIulHYYFkNPeAP0iGzEiOJhoWW
-         DSV2YqJndQZ+ppzb//FGd8ggAtKfkrWGaX138GJqy2+u0ZKK3N5oyR7Y8Z/jj2jOvwY9
-         NxmA==
-X-Gm-Message-State: AO0yUKUmH/903f2uJZftX9juJaQjzraiUd3d8/2ZYgPKWQpQPcOCjPX4
-        fZuV8b61u3eVaEkjy3V2byZeCiL82IQmF20yzBRwT1GITJLXRXAyVoSUE0G8PRAsGCfGvfCgYV3
-        XQ3oFuYwwe5Nf
-X-Received: by 2002:ac8:5c02:0:b0:3b8:525e:15ec with SMTP id i2-20020ac85c02000000b003b8525e15ecmr43003996qti.27.1678379381156;
-        Thu, 09 Mar 2023 08:29:41 -0800 (PST)
-X-Google-Smtp-Source: AK7set/wt8PRwAtM1Bf3zAU+80K15G/N3ODjmPX5KS1M+6kzBy453+fWsgrmcpFNeaN7ieLbWU2BRw==
-X-Received: by 2002:ac8:5c02:0:b0:3b8:525e:15ec with SMTP id i2-20020ac85c02000000b003b8525e15ecmr43003941qti.27.1678379380798;
-        Thu, 09 Mar 2023 08:29:40 -0800 (PST)
+        bh=ZBLRuHkI1YAXHhp9FH7h8P44ZeZyI6cLn1n7/g70EHY=;
+        b=T4bVzsyPWl92p8M1dvnJWNVO2Fka44hlfdA4YoO7+pKqz/Caq02TLRNzxx+oNwU4t6
+         omyuaCmHnt0tv3MgKGbnRrsMn5NWJZPnHiAUorlV+0ke8ietCKIWWNpk3yHAkcJMH6Qq
+         QA1G+/Fqw0lpSQaKxWbiXAhOkBsqHsFkCXCCKMFPHuLaQ2ywKTa4bYQNRVKrivz0FOLg
+         IQiAu4hjvh4Ec6IeoJDXcLNzS3pXrlF8UqmC5pyM8Xxl3UqM/SWFUTiLZiRzLp/J7DbI
+         uvGaT2yvTrl/B9aL6G7zsDobvKw0+SuNYhJ/Wk/bSojjhinAzKe9/wpi4yRfJBCDONuf
+         NlZw==
+X-Gm-Message-State: AO0yUKXh2G42ZW8XtosQ+Y/8+Xeh9f7LmbZDXJbvveS+dOvUN3G9OrYR
+        uXmYWR4l+eoPk3TRKfQaV1Kha5qryK+dkUJUJSq1jL9z9+T8dgDQx9eFjGx9XBtg2yDZ0NASt3W
+        dtb5Wv3Ql6MnL
+X-Received: by 2002:a05:622a:2c2:b0:3bd:140c:91ed with SMTP id a2-20020a05622a02c200b003bd140c91edmr31398137qtx.52.1678379419975;
+        Thu, 09 Mar 2023 08:30:19 -0800 (PST)
+X-Google-Smtp-Source: AK7set+2F5YD7K/oepsMoEBVn/ZxPDtpNxoaMpPiPeM3V37KrU7smzm/aTYuFBcKJvHFaue9aD1htw==
+X-Received: by 2002:a05:622a:2c2:b0:3bd:140c:91ed with SMTP id a2-20020a05622a02c200b003bd140c91edmr31398103qtx.52.1678379419700;
+        Thu, 09 Mar 2023 08:30:19 -0800 (PST)
 Received: from sgarzare-redhat (host-82-57-51-170.retail.telecomitalia.it. [82.57.51.170])
-        by smtp.gmail.com with ESMTPSA id r13-20020a05622a034d00b0039cc0fbdb61sm14575595qtw.53.2023.03.09.08.29.37
+        by smtp.gmail.com with ESMTPSA id d199-20020ae9efd0000000b007423e52f9d2sm13770583qkg.71.2023.03.09.08.30.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Mar 2023 08:29:40 -0800 (PST)
-Date:   Thu, 9 Mar 2023 17:29:35 +0100
+        Thu, 09 Mar 2023 08:30:19 -0800 (PST)
+Date:   Thu, 9 Mar 2023 17:30:14 +0100
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     Arseniy Krasnov <avkrasnov@sberdevices.ru>
 Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
@@ -66,15 +66,15 @@ Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
         kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
         netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
         kernel@sberdevices.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v3 2/4] virtio/vsock: remove redundant 'skb_pull()'
- call
-Message-ID: <20230309162935.c76hilqo3s22fysd@sgarzare-redhat>
+Subject: Re: [RFC PATCH v3 3/4] virtio/vsock: don't drop skbuff on copy
+ failure
+Message-ID: <20230309163014.kqpmucbksiqwblbg@sgarzare-redhat>
 References: <0abeec42-a11d-3a51-453b-6acf76604f2e@sberdevices.ru>
- <ea7a542b-8772-e204-6b2b-a60d89614f3b@sberdevices.ru>
+ <d140f8c3-d7d9-89b3-94ce-207c1f7990da@sberdevices.ru>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <ea7a542b-8772-e204-6b2b-a60d89614f3b@sberdevices.ru>
+In-Reply-To: <d140f8c3-d7d9-89b3-94ce-207c1f7990da@sberdevices.ru>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
@@ -85,37 +85,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 09, 2023 at 01:12:42PM +0300, Arseniy Krasnov wrote:
+On Thu, Mar 09, 2023 at 01:13:51PM +0300, Arseniy Krasnov wrote:
+>This returns behaviour of SOCK_STREAM read as before skbuff usage. When
 
-I would add:
-
-Since we now no longer use `skb->len` to update credit, ...
-
->There is no sense to update skbuff state, because it is used only once
->after dequeue to copy data and then will be released.
->
->Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->---
-> net/vmw_vsock/virtio_transport_common.c | 1 -
-> 1 file changed, 1 deletion(-)
+So we need the Fixes tag:
+Fixes: 71dc9ec9ac7d ("virtio/vsock: replace virtio_vsock_pkt with sk_buff")
 
 The patch LGTM!
 
 Stefano
 
+>copying to user fails current skbuff won't be dropped, but returned to
+>sockets's queue. Technically instead of 'skb_dequeue()', 'skb_peek()' is
+>called and when skbuff becomes empty, it is removed from queue by
+>'__skb_unlink()'.
+>
+>Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>---
+> net/vmw_vsock/virtio_transport_common.c | 5 ++---
+> 1 file changed, 2 insertions(+), 3 deletions(-)
 >
 >diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index 618680fd9906..9a411475e201 100644
+>index 9a411475e201..6564192e7f20 100644
 >--- a/net/vmw_vsock/virtio_transport_common.c
 >+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -465,7 +465,6 @@ static int virtio_transport_seqpacket_do_dequeue(struct vsock_sock *vsk,
-> 					dequeued_len = err;
-> 				} else {
-> 					user_buf_len -= bytes_to_copy;
->-					skb_pull(skb, bytes_to_copy);
-> 				}
+>@@ -364,7 +364,7 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
 >
-> 				spin_lock_bh(&vvs->rx_lock);
+> 	spin_lock_bh(&vvs->rx_lock);
+> 	while (total < len && !skb_queue_empty(&vvs->rx_queue)) {
+>-		skb = __skb_dequeue(&vvs->rx_queue);
+>+		skb = skb_peek(&vvs->rx_queue);
+>
+> 		bytes = len - total;
+> 		if (bytes > skb->len)
+>@@ -388,9 +388,8 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+> 			u32 pkt_len = le32_to_cpu(virtio_vsock_hdr(skb)->len);
+>
+> 			virtio_transport_dec_rx_pkt(vvs, pkt_len);
+>+			__skb_unlink(skb, &vvs->rx_queue);
+> 			consume_skb(skb);
+>-		} else {
+>-			__skb_queue_head(&vvs->rx_queue, skb);
+> 		}
+> 	}
+>
 >-- 
 >2.25.1
 >
