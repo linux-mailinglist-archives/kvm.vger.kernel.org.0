@@ -2,239 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B45F6B1D22
-	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 08:55:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 639256B1D56
+	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 09:08:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229928AbjCIHzu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Mar 2023 02:55:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56340 "EHLO
+        id S229830AbjCIIIv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Mar 2023 03:08:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230100AbjCIHyc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Mar 2023 02:54:32 -0500
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 666C5C15C;
-        Wed,  8 Mar 2023 23:54:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678348451; x=1709884451;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=jmUqj4gFzFf1bk/blwMUJTq0+ikbJFi2lqRYVPnMXWw=;
-  b=gRpz4ic+Kg7rCIGL5W+BBFbO/DHS9i/NWbHM6Sm6bkv/h1hOe6x8OSEm
-   hDWOCPuk3UenGDcZ5zM4CmvTbBYcp8tGs2KKPNOQEyLmomzyhno3rbtQ5
-   3E1OtecO1tOijqUq+/Sb65+/JHGwbX0S2IrfG/FRdLLQoXBMw0LotG5bW
-   SZzQYibO8H2C9nVkGnTKlWk5PKnysqs1oUClqiokVBC/cz2F0l687KVnR
-   ci76yotBPWrIcAGPTwlZUQaNFo79C6bJHberg6Cin7ub0Pi7NlWIe+WMn
-   yyUN/LJEjBJ9+Xh1rjnMwdXbA5iqeLrIu2WEjhSh63LlMwJFipEMG55xi
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10643"; a="422652868"
-X-IronPort-AV: E=Sophos;i="5.98,245,1673942400"; 
-   d="scan'208";a="422652868"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2023 23:54:04 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10643"; a="851432770"
-X-IronPort-AV: E=Sophos;i="5.98,245,1673942400"; 
-   d="scan'208";a="851432770"
-Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by orsmga005.jf.intel.com with ESMTP; 08 Mar 2023 23:54:04 -0800
-From:   Yi Liu <yi.l.liu@intel.com>
-To:     joro@8bytes.org, alex.williamson@redhat.com, jgg@nvidia.com,
-        kevin.tian@intel.com, robin.murphy@arm.com,
-        baolu.lu@linux.intel.com
-Cc:     cohuck@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
-        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.l.liu@intel.com,
-        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: [PATCH v2 4/4] iommufd/selftest: Add coverage for IOMMU_DEVICE_GET_HW_INFO ioctl
-Date:   Wed,  8 Mar 2023 23:53:58 -0800
-Message-Id: <20230309075358.571567-5-yi.l.liu@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230309075358.571567-1-yi.l.liu@intel.com>
-References: <20230309075358.571567-1-yi.l.liu@intel.com>
+        with ESMTP id S229549AbjCIIIt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Mar 2023 03:08:49 -0500
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2062.outbound.protection.outlook.com [40.107.243.62])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03AFA65C67
+        for <kvm@vger.kernel.org>; Thu,  9 Mar 2023 00:08:47 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=e31epS+W1LeqHRNqa9gJrkMYxzz62V3MWlJboNcAxjvcXEwiNP4ilIOwCUPIK6aB9GaBtLbA3ana35mFfRs7Z5Qrr3Q96UPbsLX0IBToHtR+musxmS5vMmDLC97/vqZBj7N1p4xkdfjmnqr15uAtqpJcNpl4NFcmkgLRvbgpTUh+Cb+pWt0E9LLddQkIHlQhQWLAiMIb+3+vQliDujs89Vhm6gmoibdOo5NxeH8atvr7HsLlMUYCaGV4bZGkvV70FgU0Is7rrU6g3VogcVV+5cAMbr9Wlt/7j0EyrgQy7vauhsG5Pm5Kndpc1gaZZZyOsVxbLnjorLKtaNVkUUAVLg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lB71E7COpy8zRmA3WNKpWJaEfiF72Bf3IHTydwv0WMw=;
+ b=aUDUd0hA1tlvqrlcW7bzcdVe5/MaHPXn0QwqolspGdsk6Z0cVZu/C9XxFjgA1m/XJoF+LpJmMHcfhsHiSqnUnNesHPTs31NzWdEsZmPZUQ8x8BLmiqd6lIXCil9PodG+XYPKgJ9pT/JT9PGhoISB6hYocN1W/ovDPBQTWjGhi8oiiiIYRPIGW+kd337gTB/HVv5cTeADoW5gvH3nq4P7mcyegCqhrI4Ma1LvOTSScCTE3nLUfA3UvHi5xyy4po2bwx75kDxD6FRxnDOj71YQTv0RXwV3Z3kl49GgTEn6QQcaWjUcRXFnnJBq4C8cRUl3d2k7ybICgn85zEwxqTkVuA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lB71E7COpy8zRmA3WNKpWJaEfiF72Bf3IHTydwv0WMw=;
+ b=fXmpssC3XS4tZGU17V/g0vCfl8BApjmOatkIt1idvcIuwn1YsRp2qPke1S9jy2utqa7A9rXqAE9wjNyaQBAtnKFYpnS/kzyljNciRV2X8TogUcneLxhoMqGNlQ8g6OrsU7Osym5pzl+vgthcVwCiM1D1TYaacXd9ava5HTGzobKtgTp0Pqp/KXbfHXq5AiYpceZ1XfoNYJJjDUlEKT8G37HKKzcN5uj1ityY56Y+ZN+o3y1iqnxGrssTPnci6YOKTW9w/z9+sM9+DV91royICvU/oGwo4I9UEMoHEKWEzp6FSIqfIQnPwJn4vIB/lfICuliZk2aL4SycJI/YbVGQEw==
+Received: from BN9PR03CA0396.namprd03.prod.outlook.com (2603:10b6:408:111::11)
+ by BL0PR12MB4865.namprd12.prod.outlook.com (2603:10b6:208:17c::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.19; Thu, 9 Mar
+ 2023 08:08:45 +0000
+Received: from BL02EPF000108EA.namprd05.prod.outlook.com
+ (2603:10b6:408:111:cafe::3c) by BN9PR03CA0396.outlook.office365.com
+ (2603:10b6:408:111::11) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.18 via Frontend
+ Transport; Thu, 9 Mar 2023 08:08:45 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BL02EPF000108EA.mail.protection.outlook.com (10.167.241.203) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6178.13 via Frontend Transport; Thu, 9 Mar 2023 08:08:45 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Thu, 9 Mar 2023
+ 00:08:38 -0800
+Received: from [172.27.13.10] (10.126.231.37) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Thu, 9 Mar 2023
+ 00:08:35 -0800
+Message-ID: <0b8ed235-777f-3752-e416-b50ea87f638c@nvidia.com>
+Date:   Thu, 9 Mar 2023 10:08:33 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH vfio] vfio/mlx5: Fix the report of dirty_bytes upon
+ pre-copy
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     <jgg@nvidia.com>, <kvm@vger.kernel.org>, <kevin.tian@intel.com>,
+        <joao.m.martins@oracle.com>, <leonro@nvidia.com>,
+        <maorg@nvidia.com>, <avihaih@nvidia.com>
+References: <20230308155723.108218-1-yishaih@nvidia.com>
+ <20230308135639.1378418d.alex.williamson@redhat.com>
+Content-Language: en-US
+From:   Yishai Hadas <yishaih@nvidia.com>
+In-Reply-To: <20230308135639.1378418d.alex.williamson@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.126.231.37]
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF000108EA:EE_|BL0PR12MB4865:EE_
+X-MS-Office365-Filtering-Correlation-Id: de8f93d3-3598-4bfb-ea4b-08db2075812f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: soXdZhOSZCI2E4CT9+0y0fvaKZnLD1YH5RiRrZzikLXr0QSUGbFxXkFMeuiTjzUZektn61zaRVpcoHDGBfJf+QOBWncAxkfjGYHwryOPlAvT0vAADD/cITIAo8tfQyJHXs5+ztASyiOVmp7MjYyVvXSXweRhgi/tUbnmPS6i2M4DNqk7v6RXEh8L5PlgA/usZNARrSrEqc3S/m+VygZHFKRnG86hQDAd8xXMshLQGwjAUdx2ZcVBBYsY35B1CDcXzhLStjUnTxiw3quCjxqMeo1TAW8b8AeVDdxggFpCX5woWR/rnz2iEHcTp+mHcoR0mohNO3jzXpWzMNmY2YDGGvFicJHn8fUcl7WiPxnRG6t1cdgFTbh6i4wtD4wLjeZXNvq4Z0iVPgrjktIABL7bKR1lFssKJUcja2Ae+XKXJ6FsGgI1SHyQtyAW0rcE8D5K+xdtDk5qo1usJqxrVKuqKr06YvU4brct3rWlS3ncxSM3dO572fkbPq23N3Qfak6BkJrMUOZQSL6SnO+TA/iNti5NAO9MEgx3eNCoJBu60LDoVxc5QDMJJBpBUQ953b2tEeNRX28TCuEFh2ntiidroeSnu8TcXRFK/GwStAQjB5Dx/VhvUaSszMgGNJQrLmWlTFYzYaGkUVgOSkS5b5fHRzNr78+NEy2oJIet78iZhbJvmQloErJsKoy6AKGGVfIPvnXl/4twfjGN8/5rSRmPhrs4IWuRDWW8JfHOhBV5QZKLEo3Lkb3u2xWirRUOuCRtQcHz2wanIDKENuTzW+tp8g==
+X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230025)(4636009)(39860400002)(136003)(376002)(396003)(346002)(451199018)(36840700001)(46966006)(336012)(47076005)(426003)(31686004)(16576012)(316002)(54906003)(36756003)(40480700001)(86362001)(31696002)(82740400003)(36860700001)(7636003)(356005)(26005)(53546011)(107886003)(83380400001)(186003)(82310400005)(16526019)(2616005)(8936002)(5660300002)(478600001)(41300700001)(2906002)(6916009)(70206006)(8676002)(4326008)(70586007)(14143004)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Mar 2023 08:08:45.1689
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: de8f93d3-3598-4bfb-ea4b-08db2075812f
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BL02EPF000108EA.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB4865
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Nicolin Chen <nicolinc@nvidia.com>
+On 08/03/2023 22:56, Alex Williamson wrote:
+> On Wed, 8 Mar 2023 17:57:23 +0200
+> Yishai Hadas <yishaih@nvidia.com> wrote:
+>
+>> Fix the report of dirty_bytes upon pre-copy to include both the existing
+>> data on the migration file and the device extra bytes.
+>>
+>> This gives a better close estimation to what can be passed any more as
+>> part of pre-copy.
+>>
+>> Fixes: 0dce165b1adf ("vfio/mlx5: Introduce vfio precopy ioctl implementation")
+>> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+>> ---
+>>   drivers/vfio/pci/mlx5/main.c | 14 ++++----------
+>>   1 file changed, 4 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/drivers/vfio/pci/mlx5/main.c b/drivers/vfio/pci/mlx5/main.c
+>> index e897537a9e8a..d95fd382814c 100644
+>> --- a/drivers/vfio/pci/mlx5/main.c
+>> +++ b/drivers/vfio/pci/mlx5/main.c
+>> @@ -442,16 +442,10 @@ static long mlx5vf_precopy_ioctl(struct file *filp, unsigned int cmd,
+>>   	if (migf->pre_copy_initial_bytes > *pos) {
+>>   		info.initial_bytes = migf->pre_copy_initial_bytes - *pos;
+>>   	} else {
+>> -		buf = mlx5vf_get_data_buff_from_pos(migf, *pos, &end_of_data);
+>> -		if (buf) {
+>> -			info.dirty_bytes = buf->start_pos + buf->length - *pos;
+>> -		} else {
+>> -			if (!end_of_data) {
+>> -				ret = -EINVAL;
+>> -				goto err_migf_unlock;
+>> -			}
+>> -			info.dirty_bytes = inc_length;
+>> -		}
+>> +		info.dirty_bytes = migf->max_pos - *pos;
+>> +		if (!info.dirty_bytes)
+>> +			end_of_data = true;
+>> +		info.dirty_bytes += inc_length;
+>>   	}
+>>   
+>>   	if (!end_of_data || !inc_length) {
+> This is intended for v6.3, correct?  Thanks,
 
-Add a mock_domain_hw_info function and an iommu_hw_info_selftest data
-structure. This allows to test the IOMMU_DEVICE_GET_HW_INFO ioctl by
-passing the test_reg value for the mock_dev.
+Yes, thanks.
 
-Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
-Signed-off-by: Yi Liu <yi.l.liu@intel.com>
----
- drivers/iommu/iommufd/device.c                |  1 +
- drivers/iommu/iommufd/iommufd_test.h          | 15 +++++++++++
- drivers/iommu/iommufd/selftest.c              | 16 ++++++++++++
- tools/testing/selftests/iommu/iommufd.c       | 17 +++++++++++-
- tools/testing/selftests/iommu/iommufd_utils.h | 26 +++++++++++++++++++
- 5 files changed, 74 insertions(+), 1 deletion(-)
+Yishai
 
-diff --git a/drivers/iommu/iommufd/device.c b/drivers/iommu/iommufd/device.c
-index 6948539488a5..5c352807d946 100644
---- a/drivers/iommu/iommufd/device.c
-+++ b/drivers/iommu/iommufd/device.c
-@@ -8,6 +8,7 @@
- 
- #include "io_pagetable.h"
- #include "iommufd_private.h"
-+#include "iommufd_test.h"
- 
- static bool allow_unsafe_interrupts;
- module_param(allow_unsafe_interrupts, bool, S_IRUGO | S_IWUSR);
-diff --git a/drivers/iommu/iommufd/iommufd_test.h b/drivers/iommu/iommufd/iommufd_test.h
-index da1898a9128f..578691602d94 100644
---- a/drivers/iommu/iommufd/iommufd_test.h
-+++ b/drivers/iommu/iommufd/iommufd_test.h
-@@ -100,4 +100,19 @@ struct iommu_test_cmd {
- };
- #define IOMMU_TEST_CMD _IO(IOMMUFD_TYPE, IOMMUFD_CMD_BASE + 32)
- 
-+/* Mock structs for IOMMU_DEVICE_GET_HW_INFO ioctl */
-+#define IOMMU_HW_INFO_TYPE_SELFTEST	0xfeedbeef
-+#define IOMMU_HW_INFO_SELFTEST_REGVAL	0xdeadbeef
-+
-+/**
-+ * struct iommu_hw_info_selftest
-+ *
-+ * @flags: Must be set to 0
-+ * @test_reg: Pass IOMMU_HW_INFO_SELFTEST_REGVAL to user selftest program
-+ */
-+struct iommu_hw_info_selftest {
-+	__u32 flags;
-+	__u32 test_reg;
-+};
-+
- #endif
-diff --git a/drivers/iommu/iommufd/selftest.c b/drivers/iommu/iommufd/selftest.c
-index d7832ffc3aa6..b50ec3528ec1 100644
---- a/drivers/iommu/iommufd/selftest.c
-+++ b/drivers/iommu/iommufd/selftest.c
-@@ -128,6 +128,20 @@ static struct iommu_domain mock_blocking_domain = {
- 	.ops = &mock_blocking_ops,
- };
- 
-+static void *mock_domain_hw_info(struct device *dev, u32 *length)
-+{
-+	struct iommu_hw_info_selftest *info;
-+
-+	info = kzalloc(sizeof(*info), GFP_KERNEL);
-+	if (!info)
-+		return ERR_PTR(-ENOMEM);
-+
-+	info->test_reg = IOMMU_HW_INFO_SELFTEST_REGVAL;
-+	*length = sizeof(*info);
-+
-+	return info;
-+}
-+
- static struct iommu_domain *mock_domain_alloc(unsigned int iommu_domain_type)
- {
- 	struct mock_iommu_domain *mock;
-@@ -279,6 +293,8 @@ static void mock_domain_set_plaform_dma_ops(struct device *dev)
- static const struct iommu_ops mock_ops = {
- 	.owner = THIS_MODULE,
- 	.pgsize_bitmap = MOCK_IO_PAGE_SIZE,
-+	.driver_type = IOMMU_HW_INFO_TYPE_SELFTEST,
-+	.hw_info = mock_domain_hw_info,
- 	.domain_alloc = mock_domain_alloc,
- 	.capable = mock_domain_capable,
- 	.set_platform_dma_ops = mock_domain_set_plaform_dma_ops,
-diff --git a/tools/testing/selftests/iommu/iommufd.c b/tools/testing/selftests/iommu/iommufd.c
-index 5c33b6b52c65..d2ce2ddbdc40 100644
---- a/tools/testing/selftests/iommu/iommufd.c
-+++ b/tools/testing/selftests/iommu/iommufd.c
-@@ -124,6 +124,7 @@ TEST_F(iommufd, cmd_length)
- 	TEST_LENGTH(iommu_ioas_unmap, IOMMU_IOAS_UNMAP);
- 	TEST_LENGTH(iommu_option, IOMMU_OPTION);
- 	TEST_LENGTH(iommu_vfio_ioas, IOMMU_VFIO_IOAS);
-+	TEST_LENGTH(iommu_hw_info, IOMMU_DEVICE_GET_HW_INFO);
- #undef TEST_LENGTH
- }
- 
-@@ -188,6 +189,7 @@ FIXTURE(iommufd_ioas)
- 	uint32_t ioas_id;
- 	uint32_t stdev_id;
- 	uint32_t hwpt_id;
-+	uint32_t device_id;
- 	uint64_t base_iova;
- };
- 
-@@ -214,7 +216,7 @@ FIXTURE_SETUP(iommufd_ioas)
- 
- 	for (i = 0; i != variant->mock_domains; i++) {
- 		test_cmd_mock_domain(self->ioas_id, &self->stdev_id,
--				     &self->hwpt_id, NULL);
-+				     &self->hwpt_id, &self->device_id);
- 		self->base_iova = MOCK_APERTURE_START;
- 	}
- }
-@@ -293,6 +295,19 @@ TEST_F(iommufd_ioas, ioas_area_auto_destroy)
- 	}
- }
- 
-+TEST_F(iommufd_ioas, device_get_hw_info)
-+{
-+	struct iommu_hw_info_selftest info;
-+
-+	if (self->device_id) {
-+		test_cmd_device_get_hw_info(self->device_id, sizeof(info), &info);
-+		assert(info.test_reg == IOMMU_HW_INFO_SELFTEST_REGVAL);
-+	} else {
-+		test_err_device_get_hw_info(ENOENT, self->device_id,
-+					    sizeof(info), &info);
-+	}
-+}
-+
- TEST_F(iommufd_ioas, area)
- {
- 	int i;
-diff --git a/tools/testing/selftests/iommu/iommufd_utils.h b/tools/testing/selftests/iommu/iommufd_utils.h
-index 399779acce23..b57e1e60f69d 100644
---- a/tools/testing/selftests/iommu/iommufd_utils.h
-+++ b/tools/testing/selftests/iommu/iommufd_utils.h
-@@ -345,3 +345,29 @@ static void teardown_iommufd(int fd, struct __test_metadata *_metadata)
- 	})
- 
- #endif
-+
-+static int _test_cmd_device_get_hw_info(int fd, __u32 device_id,
-+					__u32 data_len, void *data)
-+{
-+	struct iommu_hw_info cmd = {
-+		.size = sizeof(cmd),
-+		.dev_id = device_id,
-+		.data_len = data_len,
-+		.data_ptr = (uint64_t)data,
-+	};
-+	int ret;
-+
-+	ret = ioctl(fd, IOMMU_DEVICE_GET_HW_INFO, &cmd);
-+	if (ret)
-+		return ret;
-+	return 0;
-+}
-+
-+#define test_cmd_device_get_hw_info(device_id, data_len, data)         \
-+	ASSERT_EQ(0, _test_cmd_device_get_hw_info(self->fd, device_id, \
-+						  data_len, data))
-+
-+#define test_err_device_get_hw_info(_errno, device_id, data_len, data) \
-+	EXPECT_ERRNO(_errno,                                        \
-+		     _test_cmd_device_get_hw_info(self->fd, device_id, \
-+						  data_len, data))
--- 
-2.34.1
 
