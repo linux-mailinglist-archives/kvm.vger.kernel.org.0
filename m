@@ -2,175 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F31C96B2A92
-	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 17:11:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B072A6B2AD1
+	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 17:32:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230252AbjCIQLc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Mar 2023 11:11:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37478 "EHLO
+        id S230476AbjCIQcs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Mar 2023 11:32:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230280AbjCIQJC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Mar 2023 11:09:02 -0500
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72516FD2B5;
-        Thu,  9 Mar 2023 08:04:10 -0800 (PST)
-Received: by mail-lf1-x129.google.com with SMTP id s22so2906545lfi.9;
-        Thu, 09 Mar 2023 08:04:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678377833;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Wa4DJnUNex0Q5SmMM7G6Bl7IfXMX2NMMstgM+nrmnc4=;
-        b=NbK46nUCwuSRR1zcr7DjNON0u8fAsqYo4AVrIrsK6XnXURpAXrmTZVbX4Q70oQOX2u
-         MLWvfRPlOI9gST6crznfb55uEzC/JhhxOU9tFWpLVpXEbwBMB3IhuAMbQ5nX9lT6Q3v7
-         HfHHcYNut4ZzjXb7dTp5JZKC+wWmG1SLtsQxkpvXRV85fBzco5redHt9Jl3trXT3zku4
-         ZRmDzqEZK4sO2uUPm4nu1ycctgMOVAydp8mlbEGjlfASRMGa0VXDUDTMs2FidL3lL8za
-         vL+0tUOQ5J1520hsc7/bVoYtxt+KMoqkD7yasDA5X+JFCoCeJICXtlMRK+lU4OXjg2io
-         9Qcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678377833;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Wa4DJnUNex0Q5SmMM7G6Bl7IfXMX2NMMstgM+nrmnc4=;
-        b=3HS+vSXhmn2x3ytRKhIKdex9zoMtTFRT9iuNCVUaXM0LwLgbG3KZboLC9O894gCHLu
-         73gxTQWzNidq04rGugUe+2RiBF/LstnbetsUE1k1X2JrReIlfqCBu4oUWOV1Ws3IJIwv
-         +ZZQZVQuvzX0aM4VcwMcXqDQzIUlDZypPKc9yE80CUMAfE0aA+kVRxOBbuTvJwz4VNGV
-         sEW2AUN0vuIN6av0tILRYcLBBCCUzCfaWq3r8/VJVoX5vPoU7TWEQzypqkU29IbzCWu6
-         GNTkP4ZEXUX1SovlFS5MTx1u85Gve+vhpCBjEf8YDEOug4Ac68Xvk19va2u28TFrdghW
-         E9ng==
-X-Gm-Message-State: AO0yUKX4KznsF97B2u1xJsFlUctIVNvKQSKNEnP/5CZpcbLIvHzmQRYv
-        3+kYYWSRPZqU2I8F6h+jtJVKt5MUMwJ0NQ==
-X-Google-Smtp-Source: AK7set9366TmnRPWcZQLG84bc43lQ1B94tSttnWxUTCUfB5NDRoBwfiqzWiUsiTByUL0iIdS5RjuAg==
-X-Received: by 2002:ac2:44a3:0:b0:4db:1e4a:74aa with SMTP id c3-20020ac244a3000000b004db1e4a74aamr6423168lfm.1.1678377832593;
-        Thu, 09 Mar 2023 08:03:52 -0800 (PST)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id a15-20020a056512020f00b004db3900da02sm2676005lfo.73.2023.03.09.08.03.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Mar 2023 08:03:52 -0800 (PST)
-Date:   Thu, 9 Mar 2023 18:03:51 +0200
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-To:     Vipin Sharma <vipinsh@google.com>
-Cc:     seanjc@google.com, pbonzini@redhat.com, bgardon@google.com,
-        dmatlack@google.com, jmattson@google.com, mizhang@google.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [Patch v4 07/18] KVM: x86/mmu: Unconditionally count
- allocations from MMU page caches
-Message-ID: <20230309180351.000059bd@gmail.com>
-In-Reply-To: <20230306224127.1689967-8-vipinsh@google.com>
-References: <20230306224127.1689967-1-vipinsh@google.com>
-        <20230306224127.1689967-8-vipinsh@google.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        with ESMTP id S229614AbjCIQc1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Mar 2023 11:32:27 -0500
+Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86C695A6F4;
+        Thu,  9 Mar 2023 08:24:12 -0800 (PST)
+Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
+        by mx.sberdevices.ru (Postfix) with ESMTP id AABC25FD16;
+        Thu,  9 Mar 2023 19:23:24 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1678379004;
+        bh=EyTvpN4uMn4RAx5VHlCi+JShMPq/ATAlo5vfvsx5t7I=;
+        h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+        b=BOS3W4hL13GYcIkyEf3x1WCW2RO+yErg77QInwNZBjnpUAhQbMGF7l1gC1tIftnnI
+         EpBmox6JCMX26SybqWt9dYc6ySvnQo9Qtjx7BKayOFtBrlqGOqgsZZZ/62T6HUBQo7
+         sKn2yFDLYTNH+wJvjp/PNIJgaKW9oSnJtLz8d2v0i4Tk01ZNPc+TU6mjlI5GR+YM7Y
+         kqYGullPXnmaHzFW9n7PY9rZrnSC1sGO0iTSqVo0ibyriycfdtHe1yscwysUk7RIUm
+         tIsDmr2iuR2ENzXJ1fHdXoaLdGytAhkoUcufHp9HcsRH1c+Ruz70tHy7PYjS7G6Gya
+         5Y/A9sKUHpSmA==
+Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
+        by mx.sberdevices.ru (Postfix) with ESMTP;
+        Thu,  9 Mar 2023 19:23:20 +0300 (MSK)
+Message-ID: <a1788ed6-89d4-27da-a049-99e29edea4cb@sberdevices.ru>
+Date:   Thu, 9 Mar 2023 19:20:20 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [RFC PATCH v3 0/4] several updates to virtio/vsock
+Content-Language: en-US
+To:     Stefano Garzarella <sgarzare@redhat.com>
+CC:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
+References: <0abeec42-a11d-3a51-453b-6acf76604f2e@sberdevices.ru>
+ <20230309162150.qqrlqmqghi5muucx@sgarzare-redhat>
+From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
+In-Reply-To: <20230309162150.qqrlqmqghi5muucx@sgarzare-redhat>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [172.16.1.6]
+X-ClientProxiedBy: S-MS-EXCH02.sberdevices.ru (172.16.1.5) To
+ S-MS-EXCH01.sberdevices.ru (172.16.1.4)
+X-KSMG-Rule-ID: 4
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Status: not scanned, disabled by settings
+X-KSMG-AntiSpam-Interceptor-Info: not scanned
+X-KSMG-AntiPhishing: not scanned, disabled by settings
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2023/03/09 14:25:00 #20928723
+X-KSMG-AntiVirus-Status: Clean, skipped
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon,  6 Mar 2023 14:41:16 -0800
-Vipin Sharma <vipinsh@google.com> wrote:
 
-Ah, it is removed here. :)
 
-> Remove count_shadow_page_allocations from struct shadow_page_caches{}.
-> Remove count_allocation boolean condition check from
-> mmu_sp_memory_cache_alloc().
+On 09.03.2023 19:21, Stefano Garzarella wrote:
+> On Thu, Mar 09, 2023 at 01:10:36PM +0300, Arseniy Krasnov wrote:
+>> Hello,
+>>
+>> this patchset evolved from previous v2 version (see link below). It does
+>> several updates to virtio/vsock:
+>> 1) Changes 'virtio_transport_inc/dec_rx_pkt()' interface. Now instead of
+>>   using skbuff state ('head' and 'data' pointers) to update 'fwd_cnt'
+>>   and 'rx_bytes', integer value is passed as an input argument. This
+>>   makes code more simple, because in this case we don't need to udpate
+>>   skbuff state before calling 'virtio_transport_inc/dec_rx_pkt()'. In
+>>   more common words - we don't need to change skbuff state to update
+>>   'rx_bytes' and 'fwd_cnt' correctly.
+>> 2) For SOCK_STREAM, when copying data to user fails, current skbuff is
+>>   not dropped. Next read attempt will use same skbuff and last offset.
+>>   Instead of 'skb_dequeue()', 'skb_peek()' + '__skb_unlink()' are used.
+>>   This behaviour was implemented before skbuff support.
+>> 3) For SOCK_SEQPACKET it removes unneeded 'skb_pull()' call, because for
+>>   this type of socket each skbuff is used only once: after removing it
+>>   from socket's queue, it will be freed anyway.
+>>
+>> Test for 2) also added:
+>> Test tries to 'recv()' data to NULL buffer, then does 'recv()' with valid
+>> buffer. For SOCK_STREAM second 'recv()' must return data, because skbuff
+>> must not be dropped, but for SOCK_SEQPACKET skbuff will be dropped by
+>> kernel, and 'recv()' will return EAGAIN.
+>>
+>> Link to v1 on lore:
+>> https://lore.kernel.org/netdev/c2d3e204-89d9-88e9-8a15-3fe027e56b4b@sberdevices.ru/
+>>
+>> Link to v2 on lore:
+>> https://lore.kernel.org/netdev/a7ab414b-5e41-c7b6-250b-e8401f335859@sberdevices.ru/
+>>
+>> Change log:
+>>
+>> v1 -> v2:
+>> - For SOCK_SEQPACKET call 'skb_pull()' also in case of copy failure or
+>>   dropping skbuff (when we just waiting message end).
+>> - Handle copy failure for SOCK_STREAM in the same manner (plus free
+>>   current skbuff).
+>> - Replace bug repdroducer with new test in vsock_test.c
+>>
+>> v2 -> v3:
+>> - Replace patch which removes 'skb->len' subtraction from function
+>>   'virtio_transport_dec_rx_pkt()' with patch which updates functions
+>>   'virtio_transport_inc/dec_rx_pkt()' by passing integer argument
+>>   instead of skbuff pointer.
+>> - Replace patch which drops skbuff when copying to user fails with
+>>   patch which changes this behaviour by keeping skbuff in queue until
+>>   it has no data.
+>> - Add patch for SOCK_SEQPACKET which removes redundant 'skb_pull()'
+>>   call on read.
+>> - I remove "Fixes" tag from all patches, because all of them now change
+>>   code logic, not only fix something.
 > 
-> Both split_shadow_page_cache and mmu_shadow_page_cache are counted in
-> global count of unused cache pages. count_shadow_page_allocations
-> boolean is obsolete and can be removed.
+> Yes, but they solve the problem, so we should use the tag (I think at
+> least in patch 1 and 3).
 > 
-> Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c          | 11 +++--------
->  arch/x86/kvm/mmu/mmu_internal.h |  3 +--
->  arch/x86/kvm/mmu/tdp_mmu.c      |  3 +--
->  3 files changed, 5 insertions(+), 12 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 73a0ac9c11ce..0a0962d8108b 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -2184,7 +2184,6 @@ struct shadow_page_caches {
->  	struct kvm_mmu_memory_cache *page_header_cache;
->  	struct kvm_mmu_memory_cache *shadow_page_cache;
->  	struct kvm_mmu_memory_cache *shadowed_info_cache;
-> -	bool count_shadow_page_allocation;
->  };
->  
->  static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm *kvm,
-> @@ -2196,8 +2195,7 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm *kvm,
->  	struct kvm_mmu_page *sp;
->  
->  	sp = kvm_mmu_memory_cache_alloc(caches->page_header_cache);
-> -	sp->spt = mmu_sp_memory_cache_alloc(caches->shadow_page_cache,
-> -					    caches->count_shadow_page_allocation);
-> +	sp->spt = mmu_sp_memory_cache_alloc(caches->shadow_page_cache);
->  	if (!role.direct)
->  		sp->shadowed_translation = kvm_mmu_memory_cache_alloc(caches->shadowed_info_cache);
->  
-> @@ -2254,7 +2252,6 @@ static struct kvm_mmu_page *kvm_mmu_get_shadow_page(struct kvm_vcpu *vcpu,
->  		.page_header_cache = &vcpu->arch.mmu_page_header_cache,
->  		.shadow_page_cache = &vcpu->arch.mmu_shadow_page_cache,
->  		.shadowed_info_cache = &vcpu->arch.mmu_shadowed_info_cache,
-> -		.count_shadow_page_allocation = true,
->  	};
->  
->  	return __kvm_mmu_get_shadow_page(vcpu->kvm, vcpu, &caches, gfn, role);
-> @@ -6330,7 +6327,6 @@ static struct kvm_mmu_page *shadow_mmu_get_sp_for_split(struct kvm *kvm, u64 *hu
->  	/* Direct SPs do not require a shadowed_info_cache. */
->  	caches.page_header_cache = &kvm->arch.split_page_header_cache;
->  	caches.shadow_page_cache = &kvm->arch.split_shadow_page_cache;
-> -	caches.count_shadow_page_allocation = true;
->  
->  	/* Safe to pass NULL for vCPU since requesting a direct SP. */
->  	return __kvm_mmu_get_shadow_page(kvm, NULL, &caches, gfn, role);
-> @@ -7101,10 +7097,9 @@ void kvm_mmu_pre_destroy_vm(struct kvm *kvm)
->  		kthread_stop(kvm->arch.nx_huge_page_recovery_thread);
->  }
->  
-> -void *mmu_sp_memory_cache_alloc(struct kvm_mmu_memory_cache *shadow_page_cache,
-> -				bool count_allocation)
-> +void *mmu_sp_memory_cache_alloc(struct kvm_mmu_memory_cache *shadow_page_cache)
->  {
-> -	if (count_allocation && shadow_page_cache->nobjs)
-> +	if (shadow_page_cache->nobjs)
->  		percpu_counter_dec(&kvm_total_unused_cached_pages);
->  	return kvm_mmu_memory_cache_alloc(shadow_page_cache);
->  }
-> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-> index 798cfbf0a36b..a607314348e3 100644
-> --- a/arch/x86/kvm/mmu/mmu_internal.h
-> +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> @@ -338,7 +338,6 @@ void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
->  
->  void track_possible_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp);
->  void untrack_possible_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp);
-> -void *mmu_sp_memory_cache_alloc(struct kvm_mmu_memory_cache *cache,
-> -				bool count_allocation);
-> +void *mmu_sp_memory_cache_alloc(struct kvm_mmu_memory_cache *cache);
->  
->  #endif /* __KVM_X86_MMU_INTERNAL_H */
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index fa6eb1e9101e..d1e85012a008 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -265,8 +265,7 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp(struct kvm_vcpu *vcpu)
->  	struct kvm_mmu_page *sp;
->  
->  	sp = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
-> -	sp->spt = mmu_sp_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache,
-> -					    true);
-> +	sp->spt = mmu_sp_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
->  
->  	return sp;
->  }
+> We usually use the tag when we are fixing a problem introduced by a
+> previous change. So we need to backport the patch to the stable branches
+> as well, and we need the tag to figure out which branches have the patch
+> or not.
+Ahh, sorry. Ok. I see now :)
 
+Thanks, Arseniy
+> 
+> Thanks,
+> Stefano
+> 
+>>
+>> Arseniy Krasnov (4):
+>>  virtio/vsock: don't use skbuff state to account credit
+>>  virtio/vsock: remove redundant 'skb_pull()' call
+>>  virtio/vsock: don't drop skbuff on copy failure
+>>  test/vsock: copy to user failure test
+>>
+>> net/vmw_vsock/virtio_transport_common.c |  29 +++---
+>> tools/testing/vsock/vsock_test.c        | 118 ++++++++++++++++++++++++
+>> 2 files changed, 131 insertions(+), 16 deletions(-)
+>>
+>> -- 
+>> 2.25.1
+>>
+> 
