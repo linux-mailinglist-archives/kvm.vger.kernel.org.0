@@ -2,150 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B73546B2BE9
-	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 18:21:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F1566B2BFF
+	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 18:26:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229955AbjCIRVN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Mar 2023 12:21:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33552 "EHLO
+        id S230246AbjCIR0A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Mar 2023 12:26:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230437AbjCIRVF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Mar 2023 12:21:05 -0500
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2060.outbound.protection.outlook.com [40.107.223.60])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D83B661312;
-        Thu,  9 Mar 2023 09:21:03 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=deOa48gyN54cotpHu4RmrMDdC0YT1d+w8D2tkGJXqb++mFbRna7aqJFGMU38zjU0XowR/psrS5kS6hIQ7Rxj3uYowGxfM9KZY8eQ1yKMaBmnKsD2b/ejUvFDuBo7rbOOJnkEV+hZDaj4pf0LD+C9yN1p9U/Yf1zf8lhtla9PmUOtDmQDV4mJlcboQj9OPVt4lbYFcDAemG8pz8KXwQ1SanoggNjlHFdI6/XzQujkGb/NChAuDIvTkE6CNq6cEyAig/YJuKZg/+Rvi70YfGBXmr3LXVKqzc1HTOHBPtcY4c8YNZTHITzJ4fGorVp0Y9g+6k0nsCihKuDYoKuv6ReWRA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=I2ColwMjueZ+u0KnqnMFLSfhm2F+7iidraEBEVbTypw=;
- b=L7/4jxxxzn863xeVnTtq48kgzKWGmMO63OmJ2DjW0vg9H0dtuOj9Ss8GjCEg8AApNo8OGIuh0Ji8gwtSvwm52a+QVAdNMOg2ja5gFm395xyEUO6hqUwaNT1e5oEBvQ101B3PmnYuXR/eVyDmvQON5mWPzZces1Jy4Rbth2fjbN/C++qe2wfrX0k1ZFt7+3NBrz2BxiiIjTDwAzPt57IFPzKxLCcwCbDscUDlkPN0x5BDAXcRjqdZOi2X1bBzEvHM8031IIkkz5LHuBTIWEyMmjYKfOcl9PmT1gkK11yen01mFwyxKYQiABJJOaNoUq6cR9jHpZSzX6+tPUwniShvNg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=I2ColwMjueZ+u0KnqnMFLSfhm2F+7iidraEBEVbTypw=;
- b=cEVx0kUnpa6PHUxikye8ju8uO2xU+ekdi/eL3SPfotyy7Q6WxN2ZwoddlnZakmBkMpcFaiff1zyEHm3wEJVPsz3sEmaX4SCPtFyectO1OVOlVyE33hD4K4gjaKRN3dAhNoqY8aNkNHci+2WF8e5sCSukXigkBIT1A19mXbsCA3KITD7FVFDzdPegDDlMKXLghg9UfstxN6iGy926a0Jw68n7MaRTBO+qnPDl9Cnp4UTiVxqimhs9z/7pVKyHF5ON9ts5ERKXJN6Rq6g6jOpW8MftVkOqAdIo3cLqS/g6uAqMmwBbZGAGYvOS8CszuK/kRUIkBS3a+RmnASfo23+3ow==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DS7PR12MB6166.namprd12.prod.outlook.com (2603:10b6:8:99::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.19; Thu, 9 Mar
- 2023 17:21:01 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::ef6d:fdf6:352f:efd1]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::ef6d:fdf6:352f:efd1%3]) with mapi id 15.20.6178.017; Thu, 9 Mar 2023
- 17:21:01 +0000
-Date:   Thu, 9 Mar 2023 13:20:58 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Baolu Lu <baolu.lu@linux.intel.com>
-Cc:     Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org,
-        alex.williamson@redhat.com, kevin.tian@intel.com,
-        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
-        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
-        peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v2 3/4] iommufd: Add IOMMU_DEVICE_GET_HW_INFO
-Message-ID: <ZAoVemZoGpx16P9E@nvidia.com>
-References: <20230309075358.571567-1-yi.l.liu@intel.com>
- <20230309075358.571567-4-yi.l.liu@intel.com>
- <6c1b221e-df8d-4b82-10e5-aa3027819d45@linux.intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6c1b221e-df8d-4b82-10e5-aa3027819d45@linux.intel.com>
-X-ClientProxiedBy: SJ0PR05CA0141.namprd05.prod.outlook.com
- (2603:10b6:a03:33d::26) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DS7PR12MB6166:EE_
-X-MS-Office365-Filtering-Correlation-Id: 13dbb63c-e221-44e6-94a1-08db20c2a7da
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: VT1nl0c+OvHMYgMlqI+4AS39leT1VGIN7iENUds09JmQIqfL6dwmhgqger0+pm1b/9z6/8p5Rery0UIbVb8rU+zvrjQX0S80aYg2yo9sZRobU7KIcdR4TZWHtHknD9EQXwAL8MzP0Ofqm2XhpHLLEGQrJFJ9nWa+Ar318V9CXQfUHEtPpaTN3on04hrAWlH0+eFw7Mts3iM7agyaGD3K33iq+VcogmCPkDIkAOkW+0g5T1G45Ih2Aj/ael8GP8c+TD0Sez4tZsmpJzeHVirIdeq4z/SYy4IUdNgh8egWckIMS0JgLYeLXOIEKhiwHZfOW9BDsLhrQQK43pKDmKm5xrpM0feDBVjN68aWs4sVRBBg1cgr7MNBWChwKV9p5iFHXQbkUEmI+MaDPkaslJtWLI3xM4CnsNEnWSdaN7t5jOeqVyGYBiZmnkAx6PGl0esWk56w+5h0XNa35OBMSOZyyUW4C2aHhSlw5vEJTDrQE3bMIRieue4FZXHgJQSrx44ctmIsKanqk/FmVebWijd21o1bz84VqIaM93vzIja3pKgklDzucyx+NjYGxP1WQyPeDR9EmZpKufti10ysNoN2KIQHU4Rh+spah+S2Mi6IiOs+ni4FuWsF7w7e/fAAH3re1txX0fY4uwlxO8mzxoh7aQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(346002)(396003)(39860400002)(366004)(376002)(136003)(451199018)(36756003)(6486002)(316002)(6916009)(5660300002)(7416002)(2906002)(8936002)(66476007)(66946007)(8676002)(66556008)(4744005)(41300700001)(4326008)(26005)(86362001)(186003)(6666004)(2616005)(478600001)(6512007)(6506007)(38100700002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?giTJ0eotKAMxQIF7wp1ZUApxmz5yMAew0KcHZTLWr/sIGrAmyUq4Nt7Iep2q?=
- =?us-ascii?Q?VIRb+hvU/kUJ/pyDh+BLX86wLAOo7kc0x+jzQQS/8kgjdOzbm4Uz0aqYYHy9?=
- =?us-ascii?Q?UVAMSOlfQNb/Gqlcgs21oGJvwqDu8FBOim6a+8lA7R1oyQl+zUxNEtfq+wtW?=
- =?us-ascii?Q?g4CucP0l2PmpMXMKBLfEHUmxFDvLtdk2KZwNrsREgb6CVHCctvCO4AnxeJZ5?=
- =?us-ascii?Q?Qfb8892r6oK4gNQgaKpMu5/2Roprouh9Ay8l2nk6EXlYdqzfjNmreNBO2GtN?=
- =?us-ascii?Q?y/R4hu4FnB0AXkQWx/p8GdAbZhcDybTEcYHEBFvD6w+pkddLB0YOGuXgVKlM?=
- =?us-ascii?Q?MY5hQv1qHscNdQJf873X3/ISP9F6PGgu0mOpMGm4Jrgcsoce/P3T+Sauhbcw?=
- =?us-ascii?Q?UIhAPPWefz8ah/LLIfX5IkZzzIyMq+wL+eMyKX3Tolk5QMK8KycyXMFUpkiw?=
- =?us-ascii?Q?l6ogq+Q0VEdkCZ1mQh/KToy/k+ekSS+96v/+fC91eMbFIuY5wsgeXZT9fR3B?=
- =?us-ascii?Q?f17iYH2XoxykM/pYzFg7n/UcCfSpQjAs9TtWEz6LBfpvIN85O7omJODCBzlx?=
- =?us-ascii?Q?u7nCPFtCcHRJccOYRIJIARdftJZKx2sSBqsqYKm2CkfvMEM7qK6nTc+0FsWk?=
- =?us-ascii?Q?mo+93kNk9YXz1XcllsbsMyMvvzef9dim/Dr+2OalNy1ZxeJH/kGw2DK3cWYr?=
- =?us-ascii?Q?CLTzwRQqfX0fllTLwFvVYVL+u6qCW94lTWm44PXwyCyu1raSej1sS9rRaV4S?=
- =?us-ascii?Q?vV94w2Ip2g0oS0rEol+T+phmLLUAqdS3EboLe38zhx7yWXMcuallun7choiE?=
- =?us-ascii?Q?Q3blllUhOfjdyZr7p40oWi5+TJ8JLSeAmliDtAV7Imb38NRfhoj2fbaZW4GB?=
- =?us-ascii?Q?5EMRgXD/JttfQUO2Kp/daLeEucp+/kSyQQXPRWTspz/2aZSgdjG+HQw2nzdG?=
- =?us-ascii?Q?J8F4hh6+q+7+SN7U8L8rfJ9rESXCI1D6TeoL757pMmgnO44D2GAD0Npwgx72?=
- =?us-ascii?Q?IUPJiGXY12uaG2ffoX+lGoVtm+4Vxht4hE0Sm9kkw4J9nUbgFnrIwwtfqhYO?=
- =?us-ascii?Q?ylATfeRAfCyI+etZ89CJz3mwbq3SWt8P5RvON0WQrg3nEtPGMXDN0b131uiH?=
- =?us-ascii?Q?0GGG7N8h5KVAxVvh6QJcgslrw7yobB20ZxcmDXsimNc/VQiSFoAt66RTQVgc?=
- =?us-ascii?Q?BuzKOmyYROdlh3wmZcYqZfUB/y7dPoLrs3RXrfhteIy/Aym+HoU56hiSRy2t?=
- =?us-ascii?Q?HyKcFjmEAJa1qRSo0yKiqb45MNouHE7hxD2KY13XI9Xd9gJM99FfKsPEkz1S?=
- =?us-ascii?Q?NIMK4YiSl2QhxhfS7DAjjIe5gLnI4biwEtc9cJ57WBONC/g+koOrKsemf0Fs?=
- =?us-ascii?Q?QqO40jC/K2r0y5pD5pHZ2udur/nag3wF84E6DKYvU8EeY7RBDoY2UvHQtMvJ?=
- =?us-ascii?Q?OIh07oIpTD1ztND7gWmV9BUw1mZc7C8zLJpOE6gPndKNaFK6j5rnfub3uApi?=
- =?us-ascii?Q?PJrc/cVFz9+dEputYfi7GlyBDsRkdD0Ht8c4PK3h2JWpGKWVGn0xXbnUP615?=
- =?us-ascii?Q?9y0BN2dW35AD8jIlmMwLeLgq4jDlglVRm4Bhb1tG?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 13dbb63c-e221-44e6-94a1-08db20c2a7da
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Mar 2023 17:21:01.7577
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Gv61OLbGV0junHtjKKjf8Px7pNcISTq5M+T33gFlGN+xJHeH+WWst7skgqF3ugmW
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6166
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229917AbjCIRZ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Mar 2023 12:25:58 -0500
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4A1EF31E7
+        for <kvm@vger.kernel.org>; Thu,  9 Mar 2023 09:25:56 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id p10-20020a170902e74a00b0019ec1acba17so1411363plf.0
+        for <kvm@vger.kernel.org>; Thu, 09 Mar 2023 09:25:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1678382756;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=nAzHwxIzKgR5cpPFlKSmTV6wBjCG9GNYIIeb+EiWOEw=;
+        b=pcfEThEU4Vasj7WYR/Waxpaik/NppP6KUs9ppDrOWtyN2K2o4KqOmGK0EDNvaR1PpN
+         /UnLgb4a0okqN8xPoiVdvT3V4a3xQpbxcpQw+hqc3obdWDA1zbjdpsZMinO2+XGf0pnk
+         tx9vE4rRQCJ5voH+cpItfZtOeBNDgs3HFupLFCjAMoI4yqWp5+vfnERiQVRovGhbDJlD
+         OI+CCOqeKsFNSgk9agGxkWOLj6VAn6Cx55qyTcqfd2JJGxyGwRwezuRC/2e6nTnTf9sd
+         6ToNYA8q0vemzt2KRH+BjeI+gz/XbfE+MvBJgD+F+nwK3UPkZ0AbCSmlQJnwfuNg6ozs
+         ZadA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678382756;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nAzHwxIzKgR5cpPFlKSmTV6wBjCG9GNYIIeb+EiWOEw=;
+        b=tUrb3esTdeUKt7Mp1I9d9g/s+ZyFocclh009kOGmixWyAiuKijv2z0/6Oy3bc/stCW
+         A6WCk6r+L7K43PMn47dvvsPNi7kRTYjzB91biK9jj3kqX7d3SMnZ9dIM3wOZySip+sib
+         T7NfhYjxEZCbRYJ8NPQ+MqjqGk9xSfHeXb40l6iea1sGXT1EYHDe56P7clepHxOXsYjT
+         lPRjg+2xiD2BPA5GOpl1MNQY1wzn0N/DA2rmr3C7L33T++3fvFFOI71wHKxNxIJfrBQm
+         6TmnNN2SDG6N7bt9AjAR1iSxBDxSWBTh6D5Dhmsh9t4aG80l7mPbbXPKZbQEHdsVYg9m
+         l1sA==
+X-Gm-Message-State: AO0yUKUsumi020HrNbPXoEle4qVUGSnXLb7A8JXteCoR6YFXxq48aIjG
+        xljkHNQfpP5lGoy84dU/6XiPSjC08ng=
+X-Google-Smtp-Source: AK7set/wzMVIYZAs4ttZZ0eOPrOq++LXdebZdExp7oCzxxYkXloK+akjBCXw06ZtDEXNHa6PBgMRsLH3hjo=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:4293:b0:199:ab4:e140 with SMTP id
+ ju19-20020a170903429300b001990ab4e140mr8601038plb.6.1678382756129; Thu, 09
+ Mar 2023 09:25:56 -0800 (PST)
+Date:   Thu, 9 Mar 2023 09:25:54 -0800
+In-Reply-To: <ZAmWefGcsBwcODxW@linux.dev>
+Mime-Version: 1.0
+References: <20230309010336.519123-1-seanjc@google.com> <20230309010336.519123-3-seanjc@google.com>
+ <ZAlGeYAmvhPmVmGe@debian.me> <ZAmWefGcsBwcODxW@linux.dev>
+Message-ID: <ZAoWogdeET5N0mug@google.com>
+Subject: Re: [PATCH v2 2/2] Documentation/process: Add a maintainer handbook
+ for KVM x86
+From:   Sean Christopherson <seanjc@google.com>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Bagas Sanjaya <bagasdotme@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sagi Shahar <sagis@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Peter Shier <pshier@google.com>,
+        Anish Ghulati <aghulati@google.com>,
+        James Houghton <jthoughton@google.com>,
+        Anish Moorthy <amoorthy@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Axel Rasmussen <axelrasmussen@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Ashish Kalra <ashish.kalra@amd.com>,
+        Babu Moger <babu.moger@amd.com>, Chao Gao <chao.gao@intel.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Chenyi Qiang <chenyi.qiang@intel.com>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Guang Zeng <guang.zeng@intel.com>,
+        Hou Wenlong <houwenlong.hwl@antgroup.com>,
+        Jiaxi Chen <jiaxi.chen@linux.intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        Jing Liu <jing2.liu@intel.com>,
+        Junaid Shahid <junaids@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Leonardo Bras <leobras@redhat.com>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Li RongQing <lirongqing@baidu.com>,
+        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Michal Luczaj <mhal@rbox.co>,
+        Mingwei Zhang <mizhang@google.com>,
+        Nikunj A Dadhania <nikunj@amd.com>,
+        Paul Durrant <pdurrant@amazon.com>,
+        Peng Hao <flyingpenghao@gmail.com>,
+        Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>,
+        Robert Hoo <robert.hu@linux.intel.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Wei Wang <wei.w.wang@intel.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Zhenzhong Duan <zhenzhong.duan@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 09, 2023 at 09:50:18PM +0800, Baolu Lu wrote:
+On Thu, Mar 09, 2023, Oliver Upton wrote:
+> On Thu, Mar 09, 2023 at 09:37:45AM +0700, Bagas Sanjaya wrote:
+> > On Wed, Mar 08, 2023 at 05:03:36PM -0800, Sean Christopherson wrote:
+> > > +As a general guideline, use ``kvm-x86/next`` even if a patch/series touches
+> > > +multiple architectures, i.e. isn't strictly scoped to x86.  Using any of the
+> > > +branches from the main KVM tree is usually a less good option as they likely
+> > > +won't have many, if any, changes for the next release, i.e. using the main KVM
+> > > +tree as a base is more likely to yield conflicts.  And if there are non-trivial
+> > > +conflicts with multiple architectures, coordination between maintainers will be
+> > > +required no matter what base is used.  Note, this is far from a hard rule, i.e.
+> > > +use a different base for multi-arch series if that makes the most sense.
+> 
+> I don't think this is the best way to coordinate with other architectures.
+> Regardless of whether you intended this to be prescriptive, I'm worried most
+> folks will follow along and just base patches on kvm-x86/next anyway.
 
-> > +	if (cmd->flags || cmd->__reserved || !cmd->data_len)
-> > +		return -EOPNOTSUPP;
-> > +
-> > +	idev = iommufd_get_device(ucmd, cmd->dev_id);
-> > +	if (IS_ERR(idev))
-> > +		return PTR_ERR(idev);
-> > +
-> > +	ops = dev_iommu_ops(idev->dev);
-> > +	if (!ops || !ops->hw_info) {
-> 
-> dev_iommu_ops() will never return a NULL.
-> 
-> Need below check
-> 
-> 	dev->iommu && dev->iommu->iommu_dev
-> 
-> before dev_iommu_ops(). Perhaps something like below?
-> 
-> 	if (!dev->iommu || !dev->iommu->iommu_dev)
-> 		return -EINVAL;
+Probably, but for the target audience (KVM x86 contributors), that's likely the
+least awful base 99% of the time.
 
-At this point the device has become owned through the ownership API,
-it absolutely has to have an iommu and an ops. No need to check
-anything.
+> It'd be easier to just have multi-arch series use a stable base (i.e. a
+> release candidate) by default. That'd avoid the undesirable case where merging
+> a shared branch brings with it some random point in another arch's /next
+> history.
 
-Jason
+You're conflating the base of the patch series with the branch it is applied to.
+I'm most definitely not proposing that multi-arch series from x86 contributors
+always be routed through kvm-x86.  It's ultimately the responsibility of the
+maintainers, not the contributors, to avoid funky merges and histories.  If a
+series warrants a dedicated topic branch, then we need to create said topic branch
+off a stable, common base, irrespective of what the contributor based their patches
+on.
+
+If a series from an x86 contributor applies cleanly on kvm-x86/next but not on
+-rc2 (or whatever), then the reverse would also likely be true (if the contributor
+used -rc2 as the base).  In other words, for series with non-trivial modifications
+to other architectures and/or common KVM code, IMO the base used for the _initial_
+posting doesn't matter all that much for us maintainers since such series will
+likely require additional attention no matter what base is used.
+
+On the flip side, the vast majority of "multi-arch" series in KVM tend to be focused
+on a single architecture, with only incidental contact to other architectures and/or
+common KVM code.  Those types of series will likely be routed through their "target"
+arch tree, and so for x86, using kvm-x86/next as the base is preferrable.
+
+My goal with suggesting/prescribing kvm-x86/next to contributors is to make the
+easy things easy.  On my end, that means having _predictable_ submissions and
+minimizing the number of avoidable conflicts.  For contributors, that means having
+a very simple rule/guideline.  "Use kvm-x86/next unless you know better" satisfies
+all those conditions.
+
+> If a different approach makes sense for a particular series then we can
+> discuss it on the list and arrive at something agreeable for all parties
+> involved.
+> 
+> > That means patches that primarily kvm ARM changes should be based on
+> > kvm-x86/next, right?
+> 
+> No, don't do that.
+
++<infinity symbol>
+
+This doc is specifically for KVM x86.
