@@ -2,64 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9323D6B1D92
-	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 09:12:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E1F6B6B1DC4
+	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 09:22:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230378AbjCIIMd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Mar 2023 03:12:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56914 "EHLO
+        id S229546AbjCIIWY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Mar 2023 03:22:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230298AbjCIILp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Mar 2023 03:11:45 -0500
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A09FE1920;
-        Thu,  9 Mar 2023 00:10:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678349416; x=1709885416;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=HSs8JiamAMJ1gh9lxGGRXZ1q0y+gsHyMnNUluMbRLa8=;
-  b=K/hsj44bLUfPrQUrZIp4mlpojTGJresxyjijhNXYOKRx8+HzzTx7lD2c
-   fN+E+l/VA6jIzctitsx9Rbopu4dh+23aqr+MGAjeJxQUOasaoSni9Hm7q
-   BU0UokrhzCh27SeC/s7TPD154azcp6bo0YMsbnqHSqlwkrFD8+Ckl+tYE
-   op26ogolIiz87lQliN4FmPzNb65VyIppQACovS/ErKt2bKCa8Cjgjc4Ka
-   zNC3+6JKTYur0iHwyG+Ukhk4/+5Fpm0qZxVNXYTYaepkLGLOWGSe2vhOo
-   XFZTidPPSheX+R39S/ASZ6AI+OP1LkWq+L6J7cvEYMF2z91ll/3EJOaeg
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10643"; a="364023248"
-X-IronPort-AV: E=Sophos;i="5.98,245,1673942400"; 
-   d="scan'208";a="364023248"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2023 00:09:55 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10643"; a="787471448"
-X-IronPort-AV: E=Sophos;i="5.98,245,1673942400"; 
-   d="scan'208";a="787471448"
-Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by fmsmga002.fm.intel.com with ESMTP; 09 Mar 2023 00:09:47 -0800
-From:   Yi Liu <yi.l.liu@intel.com>
-To:     joro@8bytes.org, alex.williamson@redhat.com, jgg@nvidia.com,
-        kevin.tian@intel.com, robin.murphy@arm.com,
-        baolu.lu@linux.intel.com
-Cc:     cohuck@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
-        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.l.liu@intel.com,
-        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: [PATCH 12/12] iommufd/selftest: Add coverage for IOMMU_HWPT_INVALIDATE ioctl
-Date:   Thu,  9 Mar 2023 00:09:10 -0800
-Message-Id: <20230309080910.607396-13-yi.l.liu@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230309080910.607396-1-yi.l.liu@intel.com>
-References: <20230309080910.607396-1-yi.l.liu@intel.com>
+        with ESMTP id S230200AbjCIIWB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Mar 2023 03:22:01 -0500
+Received: from out-14.mta1.migadu.com (out-14.mta1.migadu.com [IPv6:2001:41d0:203:375::e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7DD5B4219
+        for <kvm@vger.kernel.org>; Thu,  9 Mar 2023 00:19:20 -0800 (PST)
+Date:   Thu, 9 Mar 2023 08:19:05 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1678349958;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=x50v67TYwBiKWgeN27hRP+v0wvobGEIlSfVqgnbcpZE=;
+        b=VhYz7y8T/2f5wHgbuvYDigGr5lA7gNx2UEc+6kPfl51jVXEKmODWQrK+erpNl3I+fYAGk0
+        OLP4W54Mdr1zZDcTnZtBmtEdcQWprwRVwxmeRnoIvopUISYuw3tOVeHyt7tzXXc7thjBxD
+        Sz2a8RbgDpGxbCDWDzaFfHz5kYp6oVc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Bagas Sanjaya <bagasdotme@gmail.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sagi Shahar <sagis@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Peter Shier <pshier@google.com>,
+        Anish Ghulati <aghulati@google.com>,
+        James Houghton <jthoughton@google.com>,
+        Anish Moorthy <amoorthy@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Axel Rasmussen <axelrasmussen@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Ashish Kalra <ashish.kalra@amd.com>,
+        Babu Moger <babu.moger@amd.com>, Chao Gao <chao.gao@intel.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Chenyi Qiang <chenyi.qiang@intel.com>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Guang Zeng <guang.zeng@intel.com>,
+        Hou Wenlong <houwenlong.hwl@antgroup.com>,
+        Jiaxi Chen <jiaxi.chen@linux.intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        Jing Liu <jing2.liu@intel.com>,
+        Junaid Shahid <junaids@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Leonardo Bras <leobras@redhat.com>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Li RongQing <lirongqing@baidu.com>,
+        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Michal Luczaj <mhal@rbox.co>,
+        Mingwei Zhang <mizhang@google.com>,
+        Nikunj A Dadhania <nikunj@amd.com>,
+        Paul Durrant <pdurrant@amazon.com>,
+        Peng Hao <flyingpenghao@gmail.com>,
+        Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>,
+        Robert Hoo <robert.hu@linux.intel.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Wei Wang <wei.w.wang@intel.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Zhenzhong Duan <zhenzhong.duan@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] Documentation/process: Add a maintainer handbook
+ for KVM x86
+Message-ID: <ZAmWefGcsBwcODxW@linux.dev>
+References: <20230309010336.519123-1-seanjc@google.com>
+ <20230309010336.519123-3-seanjc@google.com>
+ <ZAlGeYAmvhPmVmGe@debian.me>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZAlGeYAmvhPmVmGe@debian.me>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,156 +100,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Nicolin Chen <nicolinc@nvidia.com>
+On Thu, Mar 09, 2023 at 09:37:45AM +0700, Bagas Sanjaya wrote:
+> On Wed, Mar 08, 2023 at 05:03:36PM -0800, Sean Christopherson wrote:
+> > +As a general guideline, use ``kvm-x86/next`` even if a patch/series touches
+> > +multiple architectures, i.e. isn't strictly scoped to x86.  Using any of the
+> > +branches from the main KVM tree is usually a less good option as they likely
+> > +won't have many, if any, changes for the next release, i.e. using the main KVM
+> > +tree as a base is more likely to yield conflicts.  And if there are non-trivial
+> > +conflicts with multiple architectures, coordination between maintainers will be
+> > +required no matter what base is used.  Note, this is far from a hard rule, i.e.
+> > +use a different base for multi-arch series if that makes the most sense.
 
-Add a mock_domain_cache_invalidate_user() and a corresponding struct
-iommu_hwpt_invalidate_selftest, to allow to test IOMMU_HWPT_INVALIDATE
-from user space, by using the new IOMMU_TEST_OP_MD_CHECK_IOTLB.
+I don't think this is the best way to coordinate with other architectures.
+Regardless of whether you intended this to be prescriptive, I'm worried most
+folks will follow along and just base patches on kvm-x86/next anyway.
 
-Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
-Signed-off-by: Yi Liu <yi.l.liu@intel.com>
----
- drivers/iommu/iommufd/hw_pagetable.c          | 10 +++++++--
- drivers/iommu/iommufd/iommufd_test.h          | 10 +++++++++
- drivers/iommu/iommufd/selftest.c              | 15 +++++++++++++
- tools/testing/selftests/iommu/iommufd.c       |  8 +++++++
- tools/testing/selftests/iommu/iommufd_utils.h | 21 +++++++++++++++++++
- 5 files changed, 62 insertions(+), 2 deletions(-)
+It'd be easier to just have multi-arch series use a stable base (i.e. a
+release candidate) by default. That'd avoid the undesirable case where merging
+a shared branch brings with it some random point in another arch's /next
+history.
 
-diff --git a/drivers/iommu/iommufd/hw_pagetable.c b/drivers/iommu/iommufd/hw_pagetable.c
-index 0871da848447..15dd1743d888 100644
---- a/drivers/iommu/iommufd/hw_pagetable.c
-+++ b/drivers/iommu/iommufd/hw_pagetable.c
-@@ -339,7 +339,8 @@ int iommufd_hwpt_invalidate(struct iommufd_ucmd *ucmd)
- 	 * data_len should not exceed the size of iommufd_invalidate_buffer.
- 	 */
- 	if (cmd->data_type == IOMMU_HWPT_TYPE_DEFAULT || !cmd->data_len ||
--	    cmd->data_type >= ARRAY_SIZE(iommufd_hwpt_invalidate_info_size))
-+	    (cmd->data_type != IOMMU_HWPT_TYPE_SELFTTEST &&
-+	     cmd->data_type >= ARRAY_SIZE(iommufd_hwpt_invalidate_info_size)))
- 		return -EOPNOTSUPP;
- 
- 	hwpt = iommufd_get_hwpt(ucmd, cmd->hwpt_id);
-@@ -352,7 +353,12 @@ int iommufd_hwpt_invalidate(struct iommufd_ucmd *ucmd)
- 		goto out_put_hwpt;
- 	}
- 
--	klen = iommufd_hwpt_invalidate_info_size[cmd->data_type];
-+	if (cmd->data_type != IOMMU_HWPT_TYPE_SELFTTEST)
-+		klen = iommufd_hwpt_invalidate_info_size[cmd->data_type];
-+#ifdef CONFIG_IOMMUFD_TEST
-+	else
-+		klen = sizeof(struct iommu_hwpt_invalidate_selftest);
-+#endif
- 	if (!klen) {
- 		rc = -EINVAL;
- 		goto out_put_hwpt;
-diff --git a/drivers/iommu/iommufd/iommufd_test.h b/drivers/iommu/iommufd/iommufd_test.h
-index 4b60a6df0428..090e9d6abd87 100644
---- a/drivers/iommu/iommufd/iommufd_test.h
-+++ b/drivers/iommu/iommufd/iommufd_test.h
-@@ -135,4 +135,14 @@ struct iommu_hwpt_selftest {
- 	__u64 test_config;
- };
- 
-+/**
-+ * struct iommu_hwpt_invalidate_selftest
-+ *
-+ * @flags: invalidate flags
-+ */
-+struct iommu_hwpt_invalidate_selftest {
-+#define IOMMU_TEST_INVALIDATE_ALL	(1ULL << 0)
-+	__u64 flags;
-+};
-+
- #endif
-diff --git a/drivers/iommu/iommufd/selftest.c b/drivers/iommu/iommufd/selftest.c
-index a0d57f00f759..fe1caba9e2c5 100644
---- a/drivers/iommu/iommufd/selftest.c
-+++ b/drivers/iommu/iommufd/selftest.c
-@@ -351,9 +351,24 @@ static const struct iommu_ops mock_ops = {
- 		},
- };
- 
-+static void mock_domain_cache_invalidate_user(struct iommu_domain *domain,
-+					      void *user_data)
-+{
-+	struct iommu_hwpt_invalidate_selftest *inv_info = user_data;
-+	struct mock_iommu_domain *mock =
-+		container_of(domain, struct mock_iommu_domain, domain);
-+
-+	if (domain->type != IOMMU_DOMAIN_NESTED || !mock->parent)
-+		return;
-+
-+	if (inv_info->flags & IOMMU_TEST_INVALIDATE_ALL)
-+		mock->iotlb = 0;
-+}
-+
- static struct iommu_domain_ops domain_nested_ops = {
- 	.free = mock_domain_free,
- 	.attach_dev = mock_domain_nop_attach,
-+	.cache_invalidate_user = mock_domain_cache_invalidate_user,
- };
- 
- struct iommu_device mock_iommu_device = {
-diff --git a/tools/testing/selftests/iommu/iommufd.c b/tools/testing/selftests/iommu/iommufd.c
-index 10f1592dc9e7..89a44479835d 100644
---- a/tools/testing/selftests/iommu/iommufd.c
-+++ b/tools/testing/selftests/iommu/iommufd.c
-@@ -126,6 +126,7 @@ TEST_F(iommufd, cmd_length)
- 	TEST_LENGTH(iommu_vfio_ioas, IOMMU_VFIO_IOAS);
- 	TEST_LENGTH(iommu_hw_info, IOMMU_DEVICE_GET_HW_INFO);
- 	TEST_LENGTH(iommu_hwpt_alloc, IOMMU_HWPT_ALLOC);
-+	TEST_LENGTH(iommu_hwpt_invalidate, IOMMU_HWPT_INVALIDATE);
- #undef TEST_LENGTH
- }
- 
-@@ -326,6 +327,13 @@ TEST_F(iommufd_ioas, nested_hwpt_alloc)
- 		EXPECT_ERRNO(EBUSY,
- 			     _test_ioctl_destroy(self->fd, parent_hwpt_id));
- 
-+		/* hwpt_invalidate only supports a user-managed hwpt (nested) */
-+		test_err_cmd_hwpt_invalidate(EINVAL, parent_hwpt_id);
-+		test_cmd_hwpt_invalidate(nested_hwpt_id[0]);
-+		test_cmd_hwpt_check_iotlb(nested_hwpt_id[0], 0);
-+		test_cmd_hwpt_invalidate(nested_hwpt_id[1]);
-+		test_cmd_hwpt_check_iotlb(nested_hwpt_id[1], 0);
-+
- 		/* Attach device to nested_hwpt_id[0] that then will be busy */
- 		test_cmd_mock_domain_replace(self->stdev_id,
- 					     nested_hwpt_id[0]);
-diff --git a/tools/testing/selftests/iommu/iommufd_utils.h b/tools/testing/selftests/iommu/iommufd_utils.h
-index 211798190e5b..b1592b4f2049 100644
---- a/tools/testing/selftests/iommu/iommufd_utils.h
-+++ b/tools/testing/selftests/iommu/iommufd_utils.h
-@@ -167,6 +167,27 @@ static int _test_cmd_hwpt_alloc_nested(int fd, __u32 device_id, __u32 parent_id,
- 		     _test_cmd_hwpt_alloc_nested(self->fd, device_id,         \
- 						 parent_id, hwpt_id))
- 
-+static int _test_cmd_hwpt_invalidate(int fd, __u32 hwpt_id)
-+{
-+	struct iommu_hwpt_invalidate_selftest data = {
-+		.flags = IOMMU_TEST_INVALIDATE_ALL,
-+	};
-+	struct iommu_hwpt_invalidate cmd = {
-+		.size = sizeof(cmd),
-+		.hwpt_id = hwpt_id,
-+		.data_type = IOMMU_HWPT_TYPE_SELFTTEST,
-+		.data_len = sizeof(data),
-+		.data_uptr = (uint64_t)&data,
-+	};
-+
-+	return ioctl(fd, IOMMU_HWPT_INVALIDATE, &cmd);
-+}
-+
-+#define test_cmd_hwpt_invalidate(hwpt_id) \
-+	ASSERT_EQ(0, _test_cmd_hwpt_invalidate(self->fd, hwpt_id))
-+#define test_err_cmd_hwpt_invalidate(_errno, hwpt_id) \
-+	EXPECT_ERRNO(_errno, _test_cmd_hwpt_invalidate(self->fd, hwpt_id))
-+
- static int _test_cmd_access_set_ioas(int fd, __u32 access_id,
- 				     unsigned int ioas_id)
- {
+If a different approach makes sense for a particular series then we can
+discuss it on the list and arrive at something agreeable for all parties
+involved.
+
+> That means patches that primarily kvm ARM changes should be based on
+> kvm-x86/next, right?
+
+No, don't do that.
+
+Patches aimed at KVM/arm64 should be based on a sensible release candidate.
+We tend to contstruct the kvmarm/next with an early-ish release candidate
+(rc2-rc4). For example the 6.3 pull request was based on 6.2-rc4. We use topic
+branches in a slightly different manner than x86, creating ad-hoc branches for
+individual patch series grabbed from the list.
+
+If one has a series that conflicts with/depends on another that is in-flight
+or already picked up then that should be mentioned in the cover letter.
+Ultimately its up to the maintainer(s) to address conflicts, and neither
+Marc nor I are afraid to ask for a rebase/respin if it makes our lives
+easier to glue it all together.
+
 -- 
-2.34.1
-
+Thanks,
+Oliver
