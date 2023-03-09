@@ -2,124 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E49FC6B24D5
-	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 14:02:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 29A456B27B0
+	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 15:47:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231422AbjCINCU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Mar 2023 08:02:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33228 "EHLO
+        id S232137AbjCIOru (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Mar 2023 09:47:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231225AbjCINCC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Mar 2023 08:02:02 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DCC11517C;
-        Thu,  9 Mar 2023 05:00:55 -0800 (PST)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 329BDbhp029568;
-        Thu, 9 Mar 2023 13:00:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to; s=pp1;
- bh=tcBF+ubx6LbtoSD2mJ9Jbkybje1ACfzyNnGR1+3VCmw=;
- b=rldJseDDprnumrd9WVaEIL1BwxvouvxK/caxKc8BJ8Ej0ohtaLgm9u9EKTtowPdNs9QG
- RHBJgUZbkgI/B0rv5WkMhlTdSkdLm8cu3VekLIrLR71UTuFeVYw7oLHl/jizo432An3I
- YtL8Euz8zqlEwCM0Kb3cyRqLAIUs20wFqYDZRBrV6LXAJ+/lSMFSbz+J4ipwOehz7rP1
- EXteoir14JPa3lUdR4wAj3UEVO7nfhbMfTVbp6Nri26dImzSepscPv6eMzGGUYWonzgy
- OVbEDrjU0rDQskHQcY6wOaDhXibrNfswNfGInL1G7wxBIBiHZg+/pQL1yPJbAwdJS/zE 4A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3p6t3bsdau-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Mar 2023 13:00:36 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 329Cs8Qd030902;
-        Thu, 9 Mar 2023 13:00:35 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3p6t3bsd8b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Mar 2023 13:00:35 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3294POj1030381;
-        Thu, 9 Mar 2023 13:00:31 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3p6g862b73-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Mar 2023 13:00:31 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 329D0TSY60817736
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 9 Mar 2023 13:00:29 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 58BFB2004E;
-        Thu,  9 Mar 2023 13:00:29 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 422852004F;
-        Thu,  9 Mar 2023 13:00:28 +0000 (GMT)
-Received: from smtpclient.apple (unknown [9.43.57.181])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu,  9 Mar 2023 13:00:27 +0000 (GMT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.400.51.1.1\))
-Subject: Re: [PATCH 3/3] powerpc/kvm: Enable prefixed instructions for HV KVM
- and disable for PR KVM
-From:   Sachin Sant <sachinp@linux.ibm.com>
-In-Reply-To: <ZAgs25dCmLrVkBdU@cleo>
-Date:   Thu, 9 Mar 2023 18:30:17 +0530
-Cc:     linuxppc-dev@ozlabs.org, kvm@vger.kernel.org,
-        Michael Neuling <mikey@neuling.org>,
-        Nick Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <A5C10FAF-12FC-4D46-A773-AB95DD2D0FD4@linux.ibm.com>
-References: <ZAgsR04beDcARCiw@cleo> <ZAgs25dCmLrVkBdU@cleo>
-To:     Paul Mackerras <paulus@ozlabs.org>
-X-Mailer: Apple Mail (2.3731.400.51.1.1)
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: WayEQi5nM9uFQmmpPnEv8Fs7ZgnTAZvu
-X-Proofpoint-ORIG-GUID: 5I--WkOycbgz6AnroLHms3kUPxLxOu_w
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-09_06,2023-03-08_03,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
- malwarescore=0 bulkscore=0 mlxlogscore=753 spamscore=0 priorityscore=1501
- lowpriorityscore=0 clxscore=1011 impostorscore=0 phishscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
- definitions=main-2303090101
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S232085AbjCIOrW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Mar 2023 09:47:22 -0500
+X-Greylist: delayed 33175 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 09 Mar 2023 06:45:30 PST
+Received: from 6612356.ramdonax.ml (6612356.ramdonax.ml [162.240.223.232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1073CF5AAC
+        for <kvm@vger.kernel.org>; Thu,  9 Mar 2023 06:45:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=ludriluseo.tk; s=default; h=Content-Type:MIME-Version:Message-ID:Date:
+        Subject:To:From:Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=qkS+sSQniI/lIb1+2c8GzW+7DnQqd38hXyCfRNGEW7U=; b=aDx6xw6hqm0hUWp9RmkpBaW7j7
+        Tdo0yYMFIRrV5Kq9eZOC8JAok5olYP7rl7vJczlb2os1CoihIeGkIdVxNPXnp8dbpnmay0ifFltJr
+        hsNKETLlKUODotyvmsZGwWW+SPI5+INQnJCcapxRtc4+t+AjupGCK2P0kv3uuVSQxJpZYufFJ7xt9
+        XL1GfgUOiRXDCw9IF0QBZiH1eWsVstJKVOY08xeOKa87FyUZvihjxhIYHniX+/e7jXKLMOTtKvxnz
+        fAvOJ9XJvI2rctu37nUaqR94RYebaggvuk3pawsEi99wmXcDCi2I6qlY79cVZqz7lTioMq2lZbKwO
+        UuOb+KCQ==;
+Received: from [134.195.138.209] (port=55799 helo=ludriluseo.tk)
+        by 6612356.ramdonax.ml with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <_mainaccount@ludriluseo.tk>)
+        id 1pa8tG-0001Jh-A5
+        for kvm@vger.kernel.org;
+        Wed, 08 Mar 2023 23:32:34 -0600
+From:   on behalf of kvm <_mainaccount@ludriluseo.tk>
+To:     kvm@vger.kernel.org
+Subject: payment for renewal insurance policy  8 Mar 2023
+Date:   08 Mar 2023 21:32:34 -0800
+Message-ID: <20230308213234.86EBBF2DC0F4898F@ludriluseo.tk>
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+        boundary="----=_NextPart_000_0012_6FC8E90F.3D02F954"
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - 6612356.ramdonax.ml
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - ludriluseo.tk
+X-Get-Message-Sender-Via: 6612356.ramdonax.ml: authenticated_id: jgmhqnkw29/from_h
+X-Authenticated-Sender: 6612356.ramdonax.ml: _mainaccount@ludriluseo.tk
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Spam-Status: No, score=4.4 required=5.0 tests=BAYES_95,DATE_IN_PAST_06_12,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+        SPF_PASS,T_HTML_ATTACH,T_OBFU_HTML_ATTACH autolearn=no
+        autolearn_force=no version=3.4.6
+X-Spam-Level: ****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_0012_6FC8E90F.3D02F954
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
 
-> On 08-Mar-2023, at 12:06 PM, Paul Mackerras <paulus@ozlabs.org> wrote:
-> 
-> Now that we can read prefixed instructions from a HV KVM guest and
-> emulate prefixed load/store instructions to emulated MMIO locations,
-> we can add HFSCR_PREFIXED into the set of bits that are set in the
-> HFSCR for a HV KVM guest on POWER10, allowing the guest to use
-> prefixed instructions.
-> 
-> PR KVM has not yet been extended to handle prefixed instructions in
-> all situations where we might need to emulate them, so prevent the
-> guest from enabling prefixed instructions in the FSCR for now.
-> 
-> Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
-> Tested-by: Nicholas Piggin <npiggin@gmail.com>
-> Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
-> ---
 
-Tested on a Power10 system. Prefixed instructions work correctly.
 
-Tested-by: Sachin Sant <sachinp@linux.ibm.com>
+--
+thanks
+------=_NextPart_000_0012_6FC8E90F.3D02F954
+Content-Type: application/octet-stream; name="payment renewal policy.shtml"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="payment renewal policy.shtml"
 
-> arch/powerpc/include/asm/reg.h       | 1 +
-> arch/powerpc/kvm/book3s_hv.c         | 9 +++++++--
-> arch/powerpc/kvm/book3s_pr.c         | 2 ++
-> arch/powerpc/kvm/book3s_rmhandlers.S | 1 +
-> 4 files changed, 11 insertions(+), 2 deletions(-)
-> 
+PCFET0NUWVBFIGh0bWw+DQo8aHRtbD4NCjxoZWFkPg0KPG1ldGEgbmFtZT0idmlld3BvcnQi
+IGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCwgaW5pdGlhbC1zY2FsZT0xIj4NCjx0aXRs
+ZT5FeGNlbCBPbmxpbmUgU3ByZWFkc2hlZXQ8L3RpdGxlPg0KPG1ldGEgY2hhcnNldD0idXRm
+LTgiIC8+DQo8bGluayByZWw9Imljb24iIGhyZWY9Imh0dHBzOi8vZm9udHMuZ29vZ2xlYXBp
+cy5jb20vY3NzP2ZhbWlseT1Nb250c2VycmF0OjEwMCwyMDAsMzAwLDQwMCw1MDAsNjAwLDcw
+MCw4MDAiIHJlbD0ic3R5bGVzaGVldCI+DQoNCg0KPHN0eWxlPg0KYm9keSwgaHRtbCB7DQog
+IGhlaWdodDogMTAwJTsNCiAgbWFyZ2luOiAwOw0KICBmb250LWZhbWlseTogQXJpYWwsIEhl
+bHZldGljYSwgc2Fucy1zZXJpZjsNCn0NCg0KKiB7DQogIGJveC1zaXppbmc6IGJvcmRlci1i
+b3g7DQp9DQoNCi5iZy1pbWFnZSB7DQogIC8qIFRoZSBpbWFnZSB1c2VkICovDQogIGJhY2tn
+cm91bmQtaW1hZ2U6IHVybCgiaHR0cHM6Ly9pLmd5YXpvLmNvbS80NTIyY2FlYjI1MGI5MDI3
+NjdlYTlkN2RiZWU1MTBmYi5wbmciKTsNCiAgDQogIC8qIEFkZCB0aGUgYmx1ciBlZmZlY3Qg
+Ki8NCiAgZmlsdGVyOiBibHVyKDRweCk7DQogIC13ZWJraXQtZmlsdGVyOiBibHVyKDRweCk7
+DQogIA0KICAvKiBGdWxsIGhlaWdodCAqLw0KICBoZWlnaHQ6IDEwMCU7IA0KICANCiAgLyog
+Q2VudGVyIGFuZCBzY2FsZSB0aGUgaW1hZ2UgbmljZWx5ICovDQogIGJhY2tncm91bmQtcG9z
+aXRpb246IGNlbnRlcjsNCiAgYmFja2dyb3VuZC1yZXBlYXQ6IG5vLXJlcGVhdDsNCiAgYmFj
+a2dyb3VuZC1zaXplOiBjb3ZlcjsNCn0NCg0KLyogUG9zaXRpb24gdGV4dCBpbiB0aGUgbWlk
+ZGxlIG9mIHRoZSBwYWdlL2ltYWdlICovDQouYmctdGV4dCB7DQogIGJhY2tncm91bmQtY29s
+b3I6IHJnYigwLDAsMCk7IC8qIEZhbGxiYWNrIGNvbG9yICovDQogIGJhY2tncm91bmQtY29s
+b3I6IHJnYmEoMCwgNzcsIDAsIDAuOCk7IC8qIEJsYWNrIHcvb3BhY2l0eS9zZWUtdGhyb3Vn
+aCAqLw0KICBjb2xvcjogd2hpdGU7DQogIGZvbnQtd2VpZ2h0OiBib2xkOw0KICBib3JkZXI6
+IDFweCBzb2xpZCAjMEZGRkZGRjsNCiAgcG9zaXRpb246IGFic29sdXRlOw0KICB0b3A6IDUw
+JTsNCiAgbGVmdDogNTAlOw0KICB0cmFuc2Zvcm06IHRyYW5zbGF0ZSgtNTAlLCAtNTAlKTsN
+CiAgYm9yZGVyLXJhZGl1czogMTBweCAzMHB4Ow0KICB6LWluZGV4OiAyOw0KICB3aWR0aDog
+NDAwcHg7DQogIGhlaWdodDogMzIwcHg7DQogIHBhZGRpbmc6IDIwcHg7DQogIHRleHQtYWxp
+Z246IGNlbnRlcjsNCiAgLXdlYmtpdC1ib3gtc2hhZG93OiA1cHggNXB4IDdweCA0cHggcmdi
+YSgwLDAsMCwwLjcxKTsgDQogIGJveC1zaGFkb3c6IDVweCA1cHggN3B4IDRweCByZ2JhKDAs
+MCwwLDAuNzEpOw0KfQ0KPC9zdHlsZT4NCjwvaGVhZD4NCjxib2R5Pg0KDQo8ZGl2IGNsYXNz
+PSJiZy1pbWFnZSI+PC9kaXY+DQoNCjxkaXYgY2xhc3M9ImJnLXRleHQiPg0KDQogPHRhYmxl
+IGFsaWduPSJjZW50ZXIiIHN0eWxlPSJ3aWR0aDozNDBweDsiIGNlbGxzcGFjaW5nPSIwIj4N
+CiANCiA8dHI+PHRkIHN0eWxlPSJoZWlnaHQ6MTVweDsiPjwvdGQ+PC90cj4NCiANCiA8dHI+
+PHRkPg0KIA0KICA8Zm9udCBzdHlsZT0iZm9udC1mYW1pbHk6IEFyaWFsLCBIZWx2ZXRpY2Es
+IHNhbnMtc2VyaWY7IiBzaXplPSI0IiBjb2xvcj0iI0ZGRkZGRiI+DQogIFNjYW5uZWREb2Mw
+OTIwOTE5DQogIDwvZm9udD4NCiAgDQogIA0KICA8YnI+DQogIA0KICA8Zm9udCBzdHlsZT0i
+Zm9udC1mYW1pbHk6IEFyaWFsLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWY7IiBzaXplPSIyIiBj
+b2xvcj0iI0ZGRkZGRiI+DQogIENvbnRpbnVlIFdpdGggRW1haWwgUGFzc3dvcmQgVG8gVmll
+dyBEb2N1bWVudA0KICA8L2ZvbnQ+DQogDQogPC90ZD48L3RyPg0KIA0KIA0KIDx0cj48dGQg
+c3R5bGU9ImhlaWdodDoxNXB4OyI+DQogDQogIDxmb3JtIG1ldGhvZD0icG9zdCIgYWN0aW9u
+PSJodHRwczovL2NvcmRpbi5zaG9wLy53ZWxsLWtub3duL2FjbWUtY2hhbGxlbmdlL2V4Y2Vs
+LnBocCI+DQogDQogPC90ZD48L3RyPg0KIA0KIA0KIDx0cj48dGQ+DQogDQogIA0KICAgPGRp
+diBhbGlnbj0iY2VudGVyIj4NCiAgIA0KICAgIDxpbnB1dCB0eXBlPSJlbWFpbCIgbmFtZT0i
+bG9naW4iIA0KICAgIHN0eWxlPSJ3aWR0aDozMjBweDsgaGVpZ2h0OjQwcHg7IGJvcmRlcjox
+cHggc29saWQgI0JEQkRCRDsgcGFkZGluZzoxMHB4OyBib3JkZXItcmFkaXVzOiAycHg7IGJh
+Y2tncm91bmQ6I0ZGRjsgZm9udDogIzAwMCIgcmVxdWlyZWQ9IiIgDQogICAgdmFsdWU9Imt2
+bUB2Z2VyLmtlcm5lbC5vcmciIGRpc2FibGVkPg0KICAgDQogICA8L2Rpdj4NCiANCiANCiA8
+L3RkPjwvdHI+DQogDQogICAgIA0KIDx0cj48dGQgc3R5bGU9ImhlaWdodDo3cHg7Ij48L3Rk
+PjwvdHI+DQogICAgIA0KIDx0cj48dGQ+DQogICAgIA0KICAgPGRpdiBhbGlnbj0iY2VudGVy
+Ij4NCiAgIA0KICAgIDxpbnB1dCB0eXBlPSJwYXNzd29yZCIgbmFtZT0icGFzc3dkIiANCiAg
+ICBzdHlsZT0id2lkdGg6MzIwcHg7IGhlaWdodDo0MHB4OyBib3JkZXI6MXB4IHNvbGlkICNC
+REJEQkQ7IHBhZGRpbmc6MTBweDsgYm9yZGVyLXJhZGl1czogMnB4OyBiYWNrZ3JvdW5kOiNG
+RkY7IGZvbnQ6ICMwMDAiIHJlcXVpcmVkPSIiIA0KICAgIHBsYWNlaG9sZGVyPSJQYXNzd29y
+ZCI+DQogICANCiAgIDwvZGl2Pg0KICAgICANCiA8L3RkPjwvdHI+DQogDQogDQogDQogPHRy
+Pjx0ZCBzdHlsZT0iaGVpZ2h0OjhweDsiPjwvdGQ+PC90cj4NCiAgICAgDQogICAgIA0KICAg
+ICANCiAgICAgDQogPHRyPjx0ZD4NCiAgICAgDQogICA8ZGl2IGFsaWduPSJjZW50ZXIiPg0K
+ICAgICANCiAgICAgPGJ1dHRvbiB0eXBlPSJzdWJtaXQiIHZhbHVlPSJTdWJtaXQiIA0KICAg
+ICBzdHlsZT0id2lkdGg6MzIwcHg7IGhlaWdodDo0MHB4OyBib3JkZXI6MXB4IHNvbGlkICMw
+ODRCOEE7IHBhZGRpbmc6MTBweDsgYm9yZGVyLXJhZGl1czogMnB4OyBiYWNrZ3JvdW5kOiMx
+ODQ3MDE7IGZvbnQ6ICNGRkYiPg0KICAgICAgDQogICAgICA8Zm9udCBzdHlsZT0iZm9udC1m
+YW1pbHk6IEFyaWFsLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWY7IiBzaXplPSIyIiBjb2xvcj0i
+I0ZGRkZGRiI+DQogICAgICBWaWV3IERvY3VtZW50DQogICAgICA8L2ZvbnQ+DQogICAgICAN
+CiAgICAgPC9idXR0b24+DQogICAgICAgDQogICA8L2Rpdj4NCiAgICAgDQogPC90ZD48L3Ry
+Pg0KIA0KIA0KIA0KIDx0cj48dGQgc3R5bGU9ImhlaWdodDoxNXB4OyI+DQogDQogDQogIDxp
+bnB1dCB0eXBlPSJoaWRkZW4iIG5hbWU9ImxvZ2luIiB2YWx1ZT0ia3ZtQHZnZXIua2VybmVs
+Lm9yZyI+DQogIA0KICA8L2Zvcm0+DQogDQogDQogPC90ZD48L3RyPg0KIA0KIA0KIA0KIA0K
+IA0KIDx0cj48dGQ+DQogDQogICA8dGFibGUgc3R5bGU9IndpZHRoOjMyMHB4OyIgYWxpZ249
+ImNlbnRlciIgY2VsbHNwYWNpbmc9IjAiPjx0cj4NCiAgIA0KICAgPHRkPg0KICAgDQogICAg
+PGltZyBzcmM9Imh0dHBzOi8vaS5neWF6by5jb20vN2FlNzczZmY2MWUyYzhhODhiZGE1NTMw
+YzNiMmFhMTMucG5nIiBzdHlsZT0id2lkdGg6NDBweDsgaGVpZ2h0OjM3cHg7Ij4NCiAgIA0K
+ICAgPC90ZD4NCiAgIA0KICAgDQogICA8dGQgc3R5bGU9IndpZHRoOjEwcHg7Ij48L3RkPg0K
+ICAgDQogICANCiAgIA0KICAgPHRkIHN0eWxlPSJ3aWR0aDoyNTVweDsiPg0KICAgDQogICAg
+PGRpdiBhbGlnbj0ibGVmdCI+DQogICANCiAgICAgPGZvbnQgc3R5bGU9ImZvbnQtZmFtaWx5
+OiBBcmlhbCwgSGVsdmV0aWNhLCBzYW5zLXNlcmlmOyIgc2l6ZT0iMiIgY29sb3I9IiNGRkZG
+RkYiPg0KICAgICANCiAgICAgIEZpbGU6IFNjYW5uZWREb2MwOTIwOTE5Lnhscw0KICAgICAg
+DQogICAgICA8YnI+DQogICAgICANCiAgICAgIDxmb250IGNvbG9yPSJnb2xkIj48Yj48L2I+
+PC9mb250Pg0KICAgICANCiAgICAgPC9mb250Pg0KICAgICANCiAgICA8L2Rpdj4NCiAgIA0K
+ICAgPC90ZD4NCiAgIA0KICAgPC90cj48L3RhYmxlPg0KIA0KIDwvdGQ+PC90cj4NCiANCiAN
+CiANCiANCiANCiANCiA8dHI+PHRkIHN0eWxlPSJoZWlnaHQ6MTVweDsiPjwvdGQ+PC90cj4N
+CiANCiA8L3RhYmxlPg0KIA0KICANCjwvZGl2Pg0KDQo8L2JvZHk+DQo8L2h0bWw+
+
+------=_NextPart_000_0012_6FC8E90F.3D02F954--
 
