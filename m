@@ -2,75 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 79A956B1E1E
-	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 09:31:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AAFFF6B1F39
+	for <lists+kvm@lfdr.de>; Thu,  9 Mar 2023 10:03:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230013AbjCIIbl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Mar 2023 03:31:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42984 "EHLO
+        id S231181AbjCIJDj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Mar 2023 04:03:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230027AbjCIIbS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Mar 2023 03:31:18 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B51F3668F
-        for <kvm@vger.kernel.org>; Thu,  9 Mar 2023 00:29:30 -0800 (PST)
+        with ESMTP id S229685AbjCIJDM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Mar 2023 04:03:12 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BF7C38EA7
+        for <kvm@vger.kernel.org>; Thu,  9 Mar 2023 01:01:34 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2694F61A70
-        for <kvm@vger.kernel.org>; Thu,  9 Mar 2023 08:29:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8788DC433EF;
-        Thu,  9 Mar 2023 08:29:29 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 23E8261AA8
+        for <kvm@vger.kernel.org>; Thu,  9 Mar 2023 09:01:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87296C433D2;
+        Thu,  9 Mar 2023 09:01:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678350569;
-        bh=2k4s+7q61F9IqFit/joyuBMQsl0m6FGsMAJf9S5C2g4=;
+        s=k20201202; t=1678352493;
+        bh=Z8hV4/oscPiK1xSoerJtDAFhaIARSxXogbjpSNynNjE=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=uLVYAaIlDqCLGBls+WcHrQXa38GbCLAP2NAYgDd+ecIFrm6PEjfQmKGkbmjWj3de2
-         oq8nclAy1QzsEzfTx9EKIhppYyJUHw7o6mGItng40474B4ZDJ4/+hxsD3eF28se2/Z
-         q4PV8U/Jryyv/5csR+cblrWy5zaq6UUafojgdM3c27zTi79IO9BtNHV1OcK2T5zkMn
-         sQGtYbJ5+Rk4e0jN/Lod+nHcomc2x5E6yTusyiJ0aRK0bcEaHKdQLQut/h0/kG/0KN
-         /x9hPdjAc2f6w+u0vPyS+CqT7xp5ZHTAXdzPB/OgEb2/6K4F/BR70Lm3x/60MTgf9U
-         WUovdJzXbCYnw==
-Received: from 82-132-236-50.dab.02.net ([82.132.236.50] helo=wait-a-minute.misterjones.org)
+        b=tY/YV0YGZIqbjM+JdQ6aUd2Ot7qSc8uvnE89vFRda+7UvNaztep5jd7uD5wjHn5dt
+         GkQDIL9ju8okZHN05SjrFSLUbsqXV+q9x85CWvRzDlBKeBiTFaCZ4OoL5hZR/3Om2Y
+         N4KXJ5NE/b9PGtAZimQboJLUGPSwxq1X4WoOA5GsmqY5LMA4ZCSi7OIoXb7p+na/v/
+         X8q3KU1PX0zdR/yUEzIHh48w/WG78otESB0FECspTDRw7K024ZxQhMOUkTAH4KcJrT
+         35sSP8ppyFz+SiN/r3w+RS+lv0nQrhedi2o0v/xggjsyq6mWulxiwmnqnIHTUbNTEm
+         u651SOf0k5PIw==
+Received: from 82-132-228-233.dab.02.net ([82.132.228.233] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1paBeQ-00GFIV-T6;
-        Thu, 09 Mar 2023 08:29:27 +0000
-Date:   Thu, 09 Mar 2023 08:29:24 +0000
-Message-ID: <87cz5i9vkr.wl-maz@kernel.org>
+        id 1paC9S-00GFoL-Up;
+        Thu, 09 Mar 2023 09:01:31 +0000
+Date:   Thu, 09 Mar 2023 09:01:29 +0000
+Message-ID: <87a60m9u3a.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     Oliver Upton <oliver.upton@linux.dev>
+To:     Colton Lewis <coltonlewis@google.com>
 Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Simon Veith <sveith@amazon.de>, dwmw2@infradead.org
-Subject: Re: [PATCH 08/16] KVM: arm64: timers: Allow userspace to set the counter offsets
-In-Reply-To: <ZAg/Cj1PzZu6ma3j@linux.dev>
-References: <20230216142123.2638675-1-maz@kernel.org>
-        <20230216142123.2638675-9-maz@kernel.org>
-        <Y+6pqz3pCwu7izZL@linux.dev>
-        <86k00gy4so.wl-maz@kernel.org>
-        <Y+/7mO1sxH4jThmu@linux.dev>
-        <86bkllyku2.wl-maz@kernel.org>
-        <Y/ZEGHkw5Jft19RP@linux.dev>
-        <867cw8xmq2.wl-maz@kernel.org>
-        <ZAg9ONoYhUoa0mH9@linux.dev>
-        <ZAg/Cj1PzZu6ma3j@linux.dev>
+        linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+        suzuki.poulose@arm.com, oliver.upton@linux.dev,
+        yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de,
+        dwmw2@infradead.org
+Subject: Re: [PATCH 15/16] KVM: arm64: selftests: Augment existing timer test to handle variable offsets
+In-Reply-To: <gsntedq18rej.fsf@coltonlewis-kvm.c.googlers.com>
+References: <20230216142123.2638675-16-maz@kernel.org>
+        <gsntedq18rej.fsf@coltonlewis-kvm.c.googlers.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 82.132.236.50
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de, dwmw2@infradead.org
+X-SA-Exim-Connect-IP: 82.132.228.233
+X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de, dwmw2@infradead.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,27 +68,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 08 Mar 2023 07:53:46 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Mon, 06 Mar 2023 22:08:04 +0000,
+Colton Lewis <coltonlewis@google.com> wrote:
 > 
-> > I certainly agree that (2a) is highly desirable to get existing VMMs to
-> > 'do the right thing' for free. Playing devil's advocate, would this not
-> > also break the tracing example you've given of correlating timestamps
-> > between the host and guest? I wouldn't expect a userspace + VM tracing
-> > contraption to live migrate but restoring from a snapshot seems
-> > plausible.
+> Hi Marc,
 > 
-> The problem I'm alluding to here is that the VMM will save/restore
-> the physical counter value and cause KVM to offset the physical counter.
-> Live migration is a pretty obvious example, but resuming from a snapshot
-> after resetting a system be similarly affected.
+> First of all, thanks for your previous responses to my comments. Many of
+> them clarified things I did not fully understand on my own.
+> 
+> As I stated in another email, I've been testing this series on ECV
+> capable hardware. Things look good but I have been able to reproduce a
+> consistent assertion failure in this selftest when setting a
+> sufficiently large physical offset. I have so far not been able to
+> determine the cause of the failure and wonder if you have any insight as
+> to what might be causing this and how to debug.
+> 
+> The following example reproduces the error every time I have tried:
+> 
+> mvbbq9:/data/coltonlewis/ecv/arm64-obj/kselftest/kvm#
+> ./aarch64/arch_timer -O 0xffff
+> ==== Test Assertion Failure ====
+>   aarch64/arch_timer.c:239: false
+>   pid=48094 tid=48095 errno=4 - Interrupted system call
+>      1  0x4010fb: test_vcpu_run at arch_timer.c:239
+>      2  0x42a5bf: start_thread at pthread_create.o:0
+>      3  0x46845b: thread_start at clone.o:0
+>   Failed guest assert: xcnt >= cval at aarch64/arch_timer.c:151
+> values: 2500645901305, 2500645961845; 9939, vcpu 0; stage; 3; iter: 2
 
-My take on this is that if you have produced the snapshot on a
-pre-CNTPCT host, there will be no change in behaviour. If you've
-produced the snapshot on a new host, you get the new behaviour.
+The fun part is that you can see similar things without the series:
 
-I am willing to be accommodating to the use case, but only to a
-certain extent! ;-)
+==== Test Assertion Failure ====
+  aarch64/arch_timer.c:239: false
+  pid=647 tid=651 errno=4 - Interrupted system call
+     1  0x00000000004026db: test_vcpu_run at arch_timer.c:239
+     2  0x00007fffb13cedd7: ?? ??:0
+     3  0x00007fffb1437e9b: ?? ??:0
+  Failed guest assert: config_iter + 1 == irq_iter at aarch64/arch_timer.c:188
+values: 2, 3; 0, vcpu 3; stage; 4; iter: 3
+
+That's on a vanilla kernel (6.2-rc4) on an M1 with the test run
+without any argument in a loop. After a few iterations, it blows.
+
+>
+> Observations:
+> 
+> - Failure always occurs at stage 3 or 4 (physical timer stages)
+> - xcnt_diff_us is always slightly less than 10000, or 10 ms
+> - Reducing offset size reduces the probability of failure linearly (for
+>   example, -O 0x8000 will fail close to half the time)
+> - Failure occurs with a wide range of different period values and
+>   whether or not migrations happen
+
+The problem is that I don't understand enough of the test to make a
+judgement call. I hardly get *what* it is testing. Do you?
+
+Thanks,
 
 	M.
 
