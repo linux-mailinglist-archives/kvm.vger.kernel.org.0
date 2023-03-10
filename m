@@ -2,86 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B8B456B4BE5
-	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 17:04:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 32C5A6B4BE2
+	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 17:04:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230353AbjCJQEJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 11:04:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45964 "EHLO
+        id S230293AbjCJQED (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 11:04:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230280AbjCJQDp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Mar 2023 11:03:45 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2E22E20D7;
-        Fri, 10 Mar 2023 07:59:40 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id x20-20020a17090a8a9400b00233ba727724so8132308pjn.1;
-        Fri, 10 Mar 2023 07:59:40 -0800 (PST)
+        with ESMTP id S230183AbjCJQDm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Mar 2023 11:03:42 -0500
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDD6BE9CCA
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 07:59:35 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id u4-20020a170902bf4400b0019e30a57694so3081756pls.20
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 07:59:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678463980;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NWnJVZ8zQQjr3m+ec/YY0RjBIDG3ID5LNYQ1rz1/Oz8=;
-        b=NI0T0Td9A3HNZQN0TP9/Oy9tSn099iWpj+drYAy75MVTOhjeOPgZ5+eWgpjBme9MnG
-         2g+cbSI1nyoDInDo1nyeek5Djxkna4hVmDUuYpInU/uWHiYN3LMIk/tfAIuBxW+2tyn1
-         14nREjpGZtRy88PJ/41qfl+nNe5Zsz3XqtX5nbz9G4XOoa3rKGEP7zGVp0jdI8tC3Q/n
-         AWB53SqB/OZigs/m7mediAezuMDz5MAJHmO4m5lIaKPyc8g4v1NQjspjYMJYcxTxSvqV
-         uNkb3GFBTJ3B6PLJlmI840vrr/kETkiAhnuA+0vKhVIumC2CaAWa6+SEDVNQL5ZxlnQa
-         JoKQ==
+        d=google.com; s=20210112; t=1678463975;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=NNMw7BcXY+4eoUteAKMCyRpwWW6F34CM6NbdoJtrXvg=;
+        b=HxJfqAw/cNOSbH71td2XIuQmwMzdPf1kM72mCHii5Te8y5aACDn5IPmEucKsZ166Uy
+         2PBu63SvPh+NFSnrFGF5j8VH7HIqn/hajxfNDpIRdwTqUnwReM8lW87EvCC0Ryiu+hJV
+         v6LBA1nd5KvHtdaYOYdd6Fn5loE8xN1mK6SIBZcMpj5NFzJn50D6hXbNY4YjUo22SzgO
+         PNzpB513noLHve5WtCxGJ9eBKvFc7DZ4VndbSBguq5iV0c7zS1Yv8mlhoV+UEAQqOl+H
+         unyMqvMDbc+XiE2kqGes7Pm2IT9KfQJn1ZoIQ9NDk4VQCf3r/LlcTrRsbawACD2o74n4
+         Nb7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678463980;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=NWnJVZ8zQQjr3m+ec/YY0RjBIDG3ID5LNYQ1rz1/Oz8=;
-        b=iNvY4ITIt+SJJG+ubuOvqQgqzAxSOOvpF8m8pMm6VSY2PMuqjccC3+HflXONXAvC0t
-         HZE6oqhhWqNs5BecPa1qKy8F7Rbf7ZQ3zZZym5Yu55f06L84tK7CGn19co2RE8Hux4M+
-         fgvfWBXd8ZkC3GI1mwFoa9Q0dn21yr+Gzb6hu9MDM7ggXZpA80mHFFF/aT6CGCXFcFkf
-         2JXY4jkdLxaVPU3Fzg8XUo8Zd+48AWNR0ckuvOspxC5J6PheuI9HBkrl4KGYL/sZd+sN
-         WgogJS6MllN+MApPQuq0R476pFkSv9ATQMFMnhFE6FjH0MkvTJrZa1Ud/bTHDPf0fth6
-         W0Wg==
-X-Gm-Message-State: AO0yUKXHETQXUmwgvqqvduPHpe4QwqQYqcbBH5xEWtemesksenhzXESz
-        62P/+B2/+fwvAFNX3wrQ44Y=
-X-Google-Smtp-Source: AK7set8XFDjfWUFpUZ1jwhLdRFQs6vHNkY0lsEzycNkocnnPuw2epZbY19gvtm05W7ILqpWvzHfolg==
-X-Received: by 2002:a17:903:2291:b0:19e:b988:e81f with SMTP id b17-20020a170903229100b0019eb988e81fmr24925943plh.0.1678463980123;
-        Fri, 10 Mar 2023 07:59:40 -0800 (PST)
-Received: from ?IPV6:2404:f801:0:5:8000::75b? ([2404:f801:9000:1a:efea::75b])
-        by smtp.gmail.com with ESMTPSA id y3-20020a170902d64300b00196025a34b9sm191815plh.159.2023.03.10.07.59.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Mar 2023 07:59:39 -0800 (PST)
-Message-ID: <cdfe4403-edd9-f265-1ea3-2aa57c0edddc@gmail.com>
-Date:   Fri, 10 Mar 2023 23:59:28 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [RFC PATCH V3 13/16] x86/sev: Add Check of #HV event in path
-To:     "Gupta, Pankaj" <pankaj.gupta@amd.com>, luto@kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        seanjc@google.com, pbonzini@redhat.com, jgross@suse.com,
-        tiala@microsoft.com, kirill@shutemov.name,
-        jiangshan.ljs@antgroup.com, peterz@infradead.org,
-        ashish.kalra@amd.com, srutherford@google.com,
-        akpm@linux-foundation.org, anshuman.khandual@arm.com,
-        pawan.kumar.gupta@linux.intel.com, adrian.hunter@intel.com,
-        daniel.sneddon@linux.intel.com, alexander.shishkin@linux.intel.com,
-        sandipan.das@amd.com, ray.huang@amd.com, brijesh.singh@amd.com,
-        michael.roth@amd.com, thomas.lendacky@amd.com,
-        venu.busireddy@oracle.com, sterritt@google.com,
-        tony.luck@intel.com, samitolvanen@google.com, fenghua.yu@intel.com
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org
-References: <20230122024607.788454-1-ltykernel@gmail.com>
- <20230122024607.788454-14-ltykernel@gmail.com>
- <e3c53388-f332-5b52-c724-a42d8ea624a7@amd.com>
- <5061dfee-636c-6b68-8f33-5f32e5bfa093@amd.com>
-From:   Tianyu Lan <ltykernel@gmail.com>
-In-Reply-To: <5061dfee-636c-6b68-8f33-5f32e5bfa093@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        d=1e100.net; s=20210112; t=1678463975;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NNMw7BcXY+4eoUteAKMCyRpwWW6F34CM6NbdoJtrXvg=;
+        b=CM0scV8ZIxVF657S/9a10zzaum9EpXs/KE9esm1OeLdauOSLH1FsdGIaA286MSOWKT
+         naAXXWcEfcX2xEVGKv6Ows6cf/oW35JAFfvYXiGfZHvHrEJYXj0faQctEikEXqA0S3JB
+         sr7IxkS08Ac7LDG67+rP3epZTFZK9rLS2PUnyql70J36llyipSYbdhgDNIDqhrSBbZ8d
+         25YipfdmnGDbxLdfuDgAzfcadwegJ+guJpxJuvl8KysJ4UU7yTNhGjuFco8djqtAeFnt
+         3NVUr/JkMdjIke4UZ7zquxB97e9IZeTKoVCVC8NJO6L5SbH3LGi+aCF9PFoGQEgDKtRK
+         DT5g==
+X-Gm-Message-State: AO0yUKUliLmtPWMqtGKxKDAQ5WmHRrOCnMlCNWltNtf7ffiEESfFqTuW
+        9oRIX8D7FY4Yv72jv1SyDlL6oFXpfmk=
+X-Google-Smtp-Source: AK7set88dLaJpwlCHNxB4XMNSfpy1o7txNTRUcT/WGiLUw6pc1zUSoAoU1SNuN4K+Xt8v2VdmsLE96F/vjo=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a62:cd83:0:b0:5e5:7675:88e3 with SMTP id
+ o125-20020a62cd83000000b005e5767588e3mr10594502pfg.5.1678463975255; Fri, 10
+ Mar 2023 07:59:35 -0800 (PST)
+Date:   Fri, 10 Mar 2023 07:59:34 -0800
+In-Reply-To: <20230310125718.1442088-2-robert.hu@intel.com>
+Mime-Version: 1.0
+References: <20230310125718.1442088-1-robert.hu@intel.com> <20230310125718.1442088-2-robert.hu@intel.com>
+Message-ID: <ZAtT5pFPqjM1Ocq0@google.com>
+Subject: Re: [PATCH 1/3] KVM: VMX: Rename vmx_umip_emulated() to cpu_has_vmx_desc()
+From:   Sean Christopherson <seanjc@google.com>
+To:     Robert Hoo <robert.hu@intel.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        robert.hoo.linux@gmail.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -89,43 +66,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/9/2023 12:18 AM, Gupta, Pankaj wrote:
-> On 3/1/2023 12:11 PM, Gupta, Pankaj wrote:
->> On 1/22/2023 3:46 AM, Tianyu Lan wrote:
-
->>> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
->>> index a8862a2eff67..fe5e5e41433d 100644
->>> --- a/arch/x86/kernel/sev.c
->>> +++ b/arch/x86/kernel/sev.c
->>> @@ -179,6 +179,45 @@ void noinstr __sev_es_ist_enter(struct pt_regs 
->>> *regs)
->>>       this_cpu_write(cpu_tss_rw.x86_tss.ist[IST_INDEX_VC], new_ist);
->>>   }
->>> +static void do_exc_hv(struct pt_regs *regs)
->>> +{
->>> +    /* Handle #HV exception. */
->>> +}
->>> +
->>> +void check_hv_pending(struct pt_regs *regs)
->>> +{
->>> +    if (!cc_platform_has(CC_ATTR_GUEST_SEV_SNP))
->>> +        return;
->>> +
->>> +    if ((regs->flags & X86_EFLAGS_IF) == 0)
->>> +        return;
->>
->> Will this return and prevent guest from executing NMI's
->> while irqs are disabled?
+On Fri, Mar 10, 2023, Robert Hoo wrote:
+> Just rename, no functional changes intended.
 > 
-> I think we need to handle NMI's even when irqs are disabled.
-> 
+> vmx_umip_emulated() comes from the ancient time when there was a
 
-Yes, nice catch!
+No, vmx_umip_emulated() comes from the fact that "cpu_has_vmx_desc()" is
+inscrutable for the relevant code.  There is zero reason to require that readers
+have a priori knowledge of why intercepting descriptor table access instructions
+is relevant to handing CR4.UMIP changes.
 
-> As we reset "no_further_signal" in hv_raw_handle_exception()
-> and return from check_hv_pending() when irqs are disabled, this
-> can result in loss/delay of NMI event?
+If it really bothers someone, we could do
 
-Will fix this in the next version.
+	static inline bool cpu_has_vmx_desc(void)
+	{
+		return vmcs_config.cpu_based_2nd_exec_ctrl &
+			SECONDARY_EXEC_DESC;
+	}
 
-Thanks.
+	static inline bool vmx_umip_emulated(void)
+	{
+		return cpu_has_vmx_desc();
+	}
+
+but I don't see the point since there is no usage for SECONDARY_EXEC_DESC outside
+of UMIP emulation.
