@@ -2,92 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 32C5A6B4BE2
-	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 17:04:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B84986B4CEB
+	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 17:28:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230293AbjCJQED (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 11:04:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45736 "EHLO
+        id S229652AbjCJQ2F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 11:28:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230183AbjCJQDm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Mar 2023 11:03:42 -0500
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDD6BE9CCA
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 07:59:35 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id u4-20020a170902bf4400b0019e30a57694so3081756pls.20
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 07:59:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678463975;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NNMw7BcXY+4eoUteAKMCyRpwWW6F34CM6NbdoJtrXvg=;
-        b=HxJfqAw/cNOSbH71td2XIuQmwMzdPf1kM72mCHii5Te8y5aACDn5IPmEucKsZ166Uy
-         2PBu63SvPh+NFSnrFGF5j8VH7HIqn/hajxfNDpIRdwTqUnwReM8lW87EvCC0Ryiu+hJV
-         v6LBA1nd5KvHtdaYOYdd6Fn5loE8xN1mK6SIBZcMpj5NFzJn50D6hXbNY4YjUo22SzgO
-         PNzpB513noLHve5WtCxGJ9eBKvFc7DZ4VndbSBguq5iV0c7zS1Yv8mlhoV+UEAQqOl+H
-         unyMqvMDbc+XiE2kqGes7Pm2IT9KfQJn1ZoIQ9NDk4VQCf3r/LlcTrRsbawACD2o74n4
-         Nb7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678463975;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NNMw7BcXY+4eoUteAKMCyRpwWW6F34CM6NbdoJtrXvg=;
-        b=CM0scV8ZIxVF657S/9a10zzaum9EpXs/KE9esm1OeLdauOSLH1FsdGIaA286MSOWKT
-         naAXXWcEfcX2xEVGKv6Ows6cf/oW35JAFfvYXiGfZHvHrEJYXj0faQctEikEXqA0S3JB
-         sr7IxkS08Ac7LDG67+rP3epZTFZK9rLS2PUnyql70J36llyipSYbdhgDNIDqhrSBbZ8d
-         25YipfdmnGDbxLdfuDgAzfcadwegJ+guJpxJuvl8KysJ4UU7yTNhGjuFco8djqtAeFnt
-         3NVUr/JkMdjIke4UZ7zquxB97e9IZeTKoVCVC8NJO6L5SbH3LGi+aCF9PFoGQEgDKtRK
-         DT5g==
-X-Gm-Message-State: AO0yUKUliLmtPWMqtGKxKDAQ5WmHRrOCnMlCNWltNtf7ffiEESfFqTuW
-        9oRIX8D7FY4Yv72jv1SyDlL6oFXpfmk=
-X-Google-Smtp-Source: AK7set88dLaJpwlCHNxB4XMNSfpy1o7txNTRUcT/WGiLUw6pc1zUSoAoU1SNuN4K+Xt8v2VdmsLE96F/vjo=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a62:cd83:0:b0:5e5:7675:88e3 with SMTP id
- o125-20020a62cd83000000b005e5767588e3mr10594502pfg.5.1678463975255; Fri, 10
- Mar 2023 07:59:35 -0800 (PST)
-Date:   Fri, 10 Mar 2023 07:59:34 -0800
-In-Reply-To: <20230310125718.1442088-2-robert.hu@intel.com>
-Mime-Version: 1.0
-References: <20230310125718.1442088-1-robert.hu@intel.com> <20230310125718.1442088-2-robert.hu@intel.com>
-Message-ID: <ZAtT5pFPqjM1Ocq0@google.com>
-Subject: Re: [PATCH 1/3] KVM: VMX: Rename vmx_umip_emulated() to cpu_has_vmx_desc()
-From:   Sean Christopherson <seanjc@google.com>
-To:     Robert Hoo <robert.hu@intel.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
-        robert.hoo.linux@gmail.com
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S231489AbjCJQ1q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Mar 2023 11:27:46 -0500
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C13C310D773;
+        Fri, 10 Mar 2023 08:23:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1678465439; x=1710001439;
+  h=from:to:cc:subject:date:message-id;
+  bh=L//xlqufoDi3Y+BynOipec0y5DkvvSVKczMAsPP3L4Y=;
+  b=fQsa6kLS1tLs/ZZKbX++U2LJsaJ0FEp7treqWHclua1TXzlLt8ZDdjps
+   0OLq6Ci37wZAoacVzzszkqAUcnSnf6gh0492myKLbucQFR7OdK254Vxaa
+   9x2u9v3+wZW9kZ7nygt9HOVN4YhN+ukO8WNEFfwcf2bwCg1eKkQDeBxRd
+   j9s3qvZUFMN6J1woOLrl6C4R7FjLR79rJzzX/BMetHfsaIbc16q6Z8jSP
+   +Pd1itzf2igs6TFoU1TOIv5TCu4ZfnOaURfcpJNA30w7bkWKxQeSiHf9r
+   jGU/EOiJxFEKdvotqyIeTEIgDYydAxqdtNkOt75QMZ+tJESUkbKS8f//n
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10645"; a="338318320"
+X-IronPort-AV: E=Sophos;i="5.98,250,1673942400"; 
+   d="scan'208";a="338318320"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2023 08:23:48 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10645"; a="671138170"
+X-IronPort-AV: E=Sophos;i="5.98,250,1673942400"; 
+   d="scan'208";a="671138170"
+Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2023 08:23:46 -0800
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com,
+        Yan Zhao <yan.y.zhao@intel.com>
+Subject: [PATCH] KVM: VMX: fix lockdep warning on posted intr wakeup
+Date:   Fri, 10 Mar 2023 23:59:55 +0800
+Message-Id: <20230310155955.29652-1-yan.y.zhao@intel.com>
+X-Mailer: git-send-email 2.17.1
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 10, 2023, Robert Hoo wrote:
-> Just rename, no functional changes intended.
-> 
-> vmx_umip_emulated() comes from the ancient time when there was a
+Use rcu list to break the possible circular locking dependency reported
+by lockdep.
 
-No, vmx_umip_emulated() comes from the fact that "cpu_has_vmx_desc()" is
-inscrutable for the relevant code.  There is zero reason to require that readers
-have a priori knowledge of why intercepting descriptor table access instructions
-is relevant to handing CR4.UMIP changes.
+path 1, ``sysvec_kvm_posted_intr_wakeup_ipi()`` --> ``pi_wakeup_handler()``
+         -->  ``kvm_vcpu_wake_up()`` --> ``try_to_wake_up()``,
+         the lock sequence is
+         &per_cpu(wakeup_vcpus_on_cpu_lock, cpu) --> &p->pi_lock.
 
-If it really bothers someone, we could do
+path 2, ``schedule()`` --> ``kvm_sched_out()`` --> ``vmx_vcpu_put()`` -->
+        ``vmx_vcpu_pi_put()`` --> ``pi_enable_wakeup_handler()``,
+         the lock sequence is
+         &rq->__lock --> &per_cpu(wakeup_vcpus_on_cpu_lock, cpu).
 
-	static inline bool cpu_has_vmx_desc(void)
-	{
-		return vmcs_config.cpu_based_2nd_exec_ctrl &
-			SECONDARY_EXEC_DESC;
-	}
+path 3, ``task_rq_lock()``,
+        the lock sequence is &p->pi_lock --> &rq->__lock
 
-	static inline bool vmx_umip_emulated(void)
-	{
-		return cpu_has_vmx_desc();
-	}
+lockdep report:
+ Chain exists of:
+   &p->pi_lock --> &rq->__lock --> &per_cpu(wakeup_vcpus_on_cpu_lock, cpu)
 
-but I don't see the point since there is no usage for SECONDARY_EXEC_DESC outside
-of UMIP emulation.
+  Possible unsafe locking scenario:
+
+        CPU0                CPU1
+        ----                ----
+   lock(&per_cpu(wakeup_vcpus_on_cpu_lock, cpu));
+                            lock(&rq->__lock);
+                            lock(&per_cpu(wakeup_vcpus_on_cpu_lock, cpu));
+   lock(&p->pi_lock);
+
+  *** DEADLOCK ***
+
+Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+---
+ arch/x86/kvm/vmx/posted_intr.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
+index 94c38bea60e7..e3ffc45c0a7b 100644
+--- a/arch/x86/kvm/vmx/posted_intr.c
++++ b/arch/x86/kvm/vmx/posted_intr.c
+@@ -90,7 +90,7 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
+ 	 */
+ 	if (pi_desc->nv == POSTED_INTR_WAKEUP_VECTOR) {
+ 		raw_spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
+-		list_del(&vmx->pi_wakeup_list);
++		list_del_rcu(&vmx->pi_wakeup_list);
+ 		raw_spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
+ 	}
+ 
+@@ -153,7 +153,7 @@ static void pi_enable_wakeup_handler(struct kvm_vcpu *vcpu)
+ 	local_irq_save(flags);
+ 
+ 	raw_spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
+-	list_add_tail(&vmx->pi_wakeup_list,
++	list_add_tail_rcu(&vmx->pi_wakeup_list,
+ 		      &per_cpu(wakeup_vcpus_on_cpu, vcpu->cpu));
+ 	raw_spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
+ 
+@@ -219,16 +219,14 @@ void pi_wakeup_handler(void)
+ {
+ 	int cpu = smp_processor_id();
+ 	struct list_head *wakeup_list = &per_cpu(wakeup_vcpus_on_cpu, cpu);
+-	raw_spinlock_t *spinlock = &per_cpu(wakeup_vcpus_on_cpu_lock, cpu);
+ 	struct vcpu_vmx *vmx;
+ 
+-	raw_spin_lock(spinlock);
+-	list_for_each_entry(vmx, wakeup_list, pi_wakeup_list) {
+-
++	rcu_read_lock();
++	list_for_each_entry_rcu(vmx, wakeup_list, pi_wakeup_list) {
+ 		if (pi_test_on(&vmx->pi_desc))
+ 			kvm_vcpu_wake_up(&vmx->vcpu);
+ 	}
+-	raw_spin_unlock(spinlock);
++	rcu_read_unlock();
+ }
+ 
+ void __init pi_init_cpu(int cpu)
+
+base-commit: 89400df96a7570b651404bbc3b7afe627c52a192
+-- 
+2.17.1
+
