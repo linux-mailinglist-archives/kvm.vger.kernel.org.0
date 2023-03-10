@@ -2,150 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CCF2D6B32F9
-	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 01:56:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 13A4D6B3384
+	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 02:10:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229913AbjCJA41 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Mar 2023 19:56:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56558 "EHLO
+        id S229680AbjCJBKB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Mar 2023 20:10:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229872AbjCJA4Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Mar 2023 19:56:25 -0500
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D011CF34DB;
-        Thu,  9 Mar 2023 16:56:12 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BwUwSi4dWfVK+YGBpsvXPzpIYuJLE8Y3H4196m1j58P7Lw3Bob/Zre39QavP4MUsNRvBuNXJiTZBkHGe66W5iJVdWtYrloK/V8ULldne8xtAUf2t8xytI7xpngQkmep+WJ+XiFS3V2fjqCk27p1ceZgAvvtt6vYgfAvgIIOLKvvO5SOkF07nXzfO9vYevHG3/606EI1710w2b8+Jeu8Uo2pEAELR30ErwlFYdknqInjeyjss9QG94qEzBs4WeOLqt/XOXzs0qMvbRfp79rwn8NP200S42VaWHX/P00fGgUKaGpf9nN0jU2RPlyCpp346s7gMkPAoUCytHlL+lo4riQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=16nKaIX3IhG7u+LlTSDYRgjathcc6N6nTWoFEkdZdoM=;
- b=b7FrEnHQjn/pqZxUxfj94XLS9ShZRNIj6iUf0UG44ieNVliBZHP43HXpODzz/46RwJ+D9rAqEycLoV/Ndzx0cQtVSCHGxnaYI0E2fN6kirFstaOWOOuc1Vse7WDjx7+F9/eDJoGOnHcNSegQKdLuCRG0cTDS46Eh4ziOJgmyQmDhHHuNROiHAmQMd+OJ+i0lFAyiDWwJDW/peLfFOepIbHugTcvx9T5zDas2xypjseDVIxi7G7YtTmVcu0v0PM8tiZ/Dwhs49XrdoOs46KHX5PBTbOu+srLixpmMs0SGNcTgpZebqIUzYrSe2DCI1actaRlI8IpkQSykTM3rkaxGag==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=16nKaIX3IhG7u+LlTSDYRgjathcc6N6nTWoFEkdZdoM=;
- b=NsZg6xpRMNfxc38eDjSzVCaoxFlILb9teEQvCxRz1gU98mdXNlyHWQk1fs9qZcovT11g5LJnebOCkk/l1y/FrwFlmmIoID8Uw1nCIpUMTB4x+x5T3VEXEnpOq0Qk6CFhQN1P/3QFPm+b8cljpjXS5HKI8P/vG/C4vBpzUg2hWOI9Kx8Bb/a5v2r1ZuNrtJhvytHgqrJNsKTDX1nfl1pbqFd4ZNwYT/nmE6A/Sq1ig0RGzINeezfpRy9WLRtQxZgKVRaQ5oOacyQFvzJjtg301oxzV4t/YE4VN+9gEiwrwTsWYYeCdFpJdfbAvUiy4n2Kd3jsj1rK43WsxhewZPKkuA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by PH7PR12MB5998.namprd12.prod.outlook.com (2603:10b6:510:1da::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.19; Fri, 10 Mar
- 2023 00:56:10 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::ef6d:fdf6:352f:efd1]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::ef6d:fdf6:352f:efd1%3]) with mapi id 15.20.6178.017; Fri, 10 Mar 2023
- 00:56:10 +0000
-Date:   Thu, 9 Mar 2023 20:56:06 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Yi Liu <yi.l.liu@intel.com>
-Cc:     joro@8bytes.org, alex.williamson@redhat.com, kevin.tian@intel.com,
-        robin.murphy@arm.com, baolu.lu@linux.intel.com, cohuck@redhat.com,
-        eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
-        mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com,
-        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH 01/12] iommu: Add new iommu op to create domains owned by
- userspace
-Message-ID: <ZAqAJgoQ3f0L2Gfo@nvidia.com>
-References: <20230309080910.607396-1-yi.l.liu@intel.com>
- <20230309080910.607396-2-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230309080910.607396-2-yi.l.liu@intel.com>
-X-ClientProxiedBy: SJ0PR03CA0352.namprd03.prod.outlook.com
- (2603:10b6:a03:39c::27) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S229445AbjCJBJ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Mar 2023 20:09:56 -0500
+Received: from mail-yw1-x1133.google.com (mail-yw1-x1133.google.com [IPv6:2607:f8b0:4864:20::1133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3781D7FD6B
+        for <kvm@vger.kernel.org>; Thu,  9 Mar 2023 17:09:51 -0800 (PST)
+Received: by mail-yw1-x1133.google.com with SMTP id 00721157ae682-536cb25982eso68399347b3.13
+        for <kvm@vger.kernel.org>; Thu, 09 Mar 2023 17:09:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1678410590;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F6Z/ryk2HB9ybkzva9NmuuaKEjsMinWP4YEUWXTsROY=;
+        b=e/lNExAyMpC9c4xXlt8T9iR+S4iF9XdtE6imlrAyh7sZhXw/a7Z/dkyYCHAaKc04nX
+         0HcweOSUtwx8rvKK5rvpmf61ub+N5fI9x4NKRA/bL8nXVGtTHk7EPh/5Gwklrim7+Ow2
+         k2Jtjog5AEYIcMPgFu++XZr9iEXmTfYJ7aZBTFHO0aoQ455i3Jeq9tX3ZeiHV00BC9Vu
+         1dbO3p0VSgMhmh1QboDerDoQ7Hnzw8j7k6UjTigoLzQo3rn5/KD7djWY7555ojJiIET9
+         DJ7CrlVtuWSUaFeN89lfwHgKUvZe582jcY5OtHb+afgODuF0UWiqezvZDpHQoIOmgEZa
+         h6Lw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678410590;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=F6Z/ryk2HB9ybkzva9NmuuaKEjsMinWP4YEUWXTsROY=;
+        b=gPTTHaZ3G53gD8o+52IepDXN27zNkFXlNsYYheNIGiDiI3pRllWUCmrpCLBvhCuV/4
+         tDq6KJFu3CHqqsGvyO6t9JDOM7rd7gx01FSrIX1zgUvWZoU6JU+CdNK97X0AO5YH8RUr
+         PQP03pjXPegdu0Q3qezPIb83PWX6JNb9vMVdPi8GzpuEn4eiviFw/gTXNnczC0xPoJSD
+         L8j8cr+p0kID/4DBE+06qBj3j57DUhXYMvUn7dhvIb0FU/f3f4LYCaEOFHh1k0k3twMf
+         FUn0EZplnjodhFuQ5Iuj4sOnP/0l713Z41chdHUmrb03q+XKJqaX/fGPLFXdKqQwxc6c
+         D4EQ==
+X-Gm-Message-State: AO0yUKV+HlxotLjPxvM7NUJrvr2YBzTfRUOyy8mC56Hzmt2/GMCkQj67
+        7JbtaE+yUXzz+BKS7qgnJ1/YFMSHk5eLf90rlxWr/w==
+X-Google-Smtp-Source: AK7set8M99J9D09u9PVi4aPjNx25n5Ke6vClbypiGVlKs7nHyDSy7kgFmMmJaPfo3op4OyQe/3b7zj/WprUaCqUaJbQ=
+X-Received: by 2002:a81:ad44:0:b0:52a:92e9:27c1 with SMTP id
+ l4-20020a81ad44000000b0052a92e927c1mr15319486ywk.10.1678410590074; Thu, 09
+ Mar 2023 17:09:50 -0800 (PST)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH7PR12MB5998:EE_
-X-MS-Office365-Filtering-Correlation-Id: 85ff04f1-d0f2-4602-db6e-08db21023cf2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: /trdMB+F0CJE5kqwHrLVbrmNpTHjnc5B+DkWAKeo4iUVwyweBgn0jXXvuzEDntZSfJ/sC5v+Frn8zNedzjX9iq0d2HjV8+ge+jjfNrnFw4jZgwahDlyG75cFjQOXi1oe5LUOKaG2P8CcNIhrDcDqY46juVgiE1Nv2hEcaNfm5cyo5E6unfW3mvginBCxwIpxacLzJ2gyI3bUtYuygaaCLGLTBAVJE5zp2uiOzuM8nLcC7QY3e3lhx2O8SVfMXtA2ZN87q+W8rJC1epHiqevjUIsiSDJn7oEyLBDtSDyTLvL+iIFJLbXDllZ5gUEVdA3a0qaRxJT+khIAhx7UGphhZ8yPK45+w8KJ8hoNvefaUxyl1Nq7v4s2nZevoVaXn8HwhHvurFRHKqWVqXzPK3dBqGDT/+BGQXYv5EbJqHlnTAR4BYOiLen8wpRNnWdcs7HcFlgolHbRRHMf+NeicRW4+vLlRUt2P27G6CRqaHbyeSkTkZU68Ng2RKoTAX7UxSYsFlIMmhARnIboOVQ+5keJnswFDlEJkZwLu/ghRm3CzdqaC6O4QvDU4X8/uqbcYe1sscNylsYdqzikz/tDb4kc5mhsYAcLO+eYLPLb6cMBljRfPLUkr+JPLYOPHt3zASX50tR1R5Ylsbzvlm2psYBNgQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(136003)(39860400002)(396003)(366004)(376002)(346002)(451199018)(8936002)(36756003)(7416002)(5660300002)(26005)(6506007)(6512007)(6666004)(38100700002)(83380400001)(186003)(2616005)(316002)(86362001)(66556008)(41300700001)(66476007)(6916009)(66946007)(8676002)(4326008)(6486002)(478600001)(2906002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?VuYE+qWekGncWIKOYYoBFLODEN5RmI/Xn26/s8HpkUQQ9+rZ7bpK2j18bWIs?=
- =?us-ascii?Q?kvAVci4wiMyG60sKT9awwdALzUkKUYvLfZrS0A96lS4YYy7i4lSH5gqG2NFr?=
- =?us-ascii?Q?9CRosK3qSL4okBJ49ehlJe5QtezcJG0StjjOMZ/yZzOGWFdQcM8aWRCFvKRm?=
- =?us-ascii?Q?pxQlWFf7OjoLbHHJwhJRM2wLNqrSZ+mWWu+Z8b+FCJOq+1wSVZehSnGK1hWu?=
- =?us-ascii?Q?/u8sw4iJfV5AHU+O9FHOJN+JFZL+e6jWUbmqi6JEAUidCqb6c55uG/tDAZv7?=
- =?us-ascii?Q?IGgYziSs+PffH5oZCPaYFHEMayHq8SwAO4qroadMN+fismqRMoRzm70r7a9W?=
- =?us-ascii?Q?WUx00blNua2Q+vcGNxF6FRzAjZcqRv3qbKOZvLh/wFXrZpAnu0YcYG3jop60?=
- =?us-ascii?Q?hIpu90Su8PgDggf/aoJRbzwFw9qDCs7iIkrzBMFNbbE8uoQEE8sGCqzsaan9?=
- =?us-ascii?Q?cR5OZjTSuEZzKi5vSulXcZfNiNme///FLYRQwskIlUvgQQ81c+jRpiYsaBEV?=
- =?us-ascii?Q?YylzRMdrjbfJICyX+OpQfe1f3+kC0dMWeDgPVw55E1WXrDLt5wl4CaRdEy6h?=
- =?us-ascii?Q?3rY7T+rjaSOdZZnL1+bRdpILWilYmHK10f6UciAsrCjVwgR9d+xiNDe4vQzE?=
- =?us-ascii?Q?uOyMBqfi7nuM0qbPXQn9q/vFJ8WDRHPVrvv0uaZfRnI7AfckEnEzFZGPLopq?=
- =?us-ascii?Q?3TVz8wbuln7GZBRuhXEdCZgukjaq6lZ8E61H9qBaHWQrztgvQ93uG8WEJyYy?=
- =?us-ascii?Q?B3jYoQx9DEF7X3iYwaL0dYVibs6MD8FaKnp0WZZAMmnV93iibqXaG+jbGELz?=
- =?us-ascii?Q?MCRmiE3B2ngt43KapMebwCdBuWaIt08/nbMYWBNwL+KW0KeHEfWStTSeor6k?=
- =?us-ascii?Q?VuZnex5Kj1D28rMG8SbELmeR7xVK6FIEIkO33++YusYADsa0q42TAprSwSg8?=
- =?us-ascii?Q?xhTDHBNQfAyxGNYT6gUmc/5dPMHGUMJD1aohcR/GfmTju0+/qvSZ650NFcad?=
- =?us-ascii?Q?2U754bCob5T5Gx4uy5VcUuBO1M1tUZhQ/pNAZYGJHzm7t6N/U8gzBuvjFd7e?=
- =?us-ascii?Q?XkQD43GqGVRdDbmk6zCWrkMMgZ3GBExQFmPYCORMf9Z77byIzfUUpk2xBiaj?=
- =?us-ascii?Q?KjKRU43VgfiEi9Ykr46hclB4PV858x7ftvZKU9bZJO1OAsopUeLwLM6He2A2?=
- =?us-ascii?Q?aIvGcPH/wXGpovhj5vgQf3Oz/Ciym2yip0ZBIrPaR2mndcsj0j8AI68ZCp56?=
- =?us-ascii?Q?WtdHjeO2AInV9ymNUyAfqDUeSj+P3o4qFXcLjqClB/RG150a3Vv/hhjCFjrH?=
- =?us-ascii?Q?mqGLiSH1vrjCdquFGnWB9s6uIBDhV4vo2tC2DVc4xiBoxezVxpPrFMnx324u?=
- =?us-ascii?Q?Qxop+HP8ElSJ4NMJB5Nev1iFQyvUVybFze4CLtVdn4IWPxHE6iQ3dDUvMY4d?=
- =?us-ascii?Q?IH/oysfdyiiedMLf8ZxnjfueeRmPvwGYPc6nslzvRdn0NqESPGxHF0eIzMH/?=
- =?us-ascii?Q?7VWHcGT8o6Cm8/BxwYRX4t22ryK2mEWCmH907BB5vXN3zIX9xjvWRo1rg80L?=
- =?us-ascii?Q?loaWcv69GgKuCVUlTBw9Qjm+L0CsW5OpRRqlsdua?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 85ff04f1-d0f2-4602-db6e-08db21023cf2
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Mar 2023 00:56:10.1770
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: j1d0Dyw6W7YYTERLH+gxuRmV9PC86lCNEY9zjkkhWybB+a08+k9e58qZs5MqsvdQ
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5998
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+References: <20230306224127.1689967-1-vipinsh@google.com> <20230306224127.1689967-4-vipinsh@google.com>
+ <ZApxh/GYfqev7sHA@google.com> <CAHVum0eQzmLXDxMy3+LpmGxVU7YsT1wRNYkFq9o7sfR2uNK-xA@mail.gmail.com>
+ <ZAqAHiaCz0b2OKJF@google.com>
+In-Reply-To: <ZAqAHiaCz0b2OKJF@google.com>
+From:   Vipin Sharma <vipinsh@google.com>
+Date:   Thu, 9 Mar 2023 17:09:14 -0800
+Message-ID: <CAHVum0dKBQxuCQG0HhpBpN8TqsUCyBaRkLJyAS7g-kLrs4-q5Q@mail.gmail.com>
+Subject: Re: [Patch v4 03/18] KVM: x86/mmu: Track count of pages in KVM MMU
+ page caches globally
+To:     David Matlack <dmatlack@google.com>
+Cc:     seanjc@google.com, pbonzini@redhat.com, bgardon@google.com,
+        jmattson@google.com, mizhang@google.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 09, 2023 at 12:08:59AM -0800, Yi Liu wrote:
-> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-> index 3ef84ee359d2..a269bc62a31c 100644
-> --- a/include/linux/iommu.h
-> +++ b/include/linux/iommu.h
-> @@ -229,6 +229,7 @@ struct iommu_iotlb_gather {
->   *           after use. Return the data buffer if success, or ERR_PTR on
->   *           failure.
->   * @domain_alloc: allocate iommu domain
-> + * @domain_alloc_user: allocate user iommu domain
->   * @probe_device: Add device to iommu driver handling
->   * @release_device: Remove device from iommu driver handling
->   * @probe_finalize: Do final setup work after the device is added to an IOMMU
-> @@ -266,6 +267,9 @@ struct iommu_ops {
->  
->  	/* Domain allocation and freeing by the iommu driver */
->  	struct iommu_domain *(*domain_alloc)(unsigned iommu_domain_type);
-> +	struct iommu_domain *(*domain_alloc_user)(struct device *dev,
-> +						  struct iommu_domain *parent,
-> +						  const void *user_data);
+On Thu, Mar 9, 2023 at 4:56=E2=80=AFPM David Matlack <dmatlack@google.com> =
+wrote:
+>
+> On Thu, Mar 09, 2023 at 04:28:10PM -0800, Vipin Sharma wrote:
+> > On Thu, Mar 9, 2023 at 3:53=E2=80=AFPM David Matlack <dmatlack@google.c=
+om> wrote:
+> > >
+> > > On Mon, Mar 06, 2023 at 02:41:12PM -0800, Vipin Sharma wrote:
+> > > > Create a global counter for total number of pages available
+> > > > in MMU page caches across all VMs. Add mmu_shadow_page_cache
+> > > > pages to this counter.
+> > >
+> > > I think I prefer counting the objects on-demand in mmu_shrink_count()=
+,
+> > > instead of keeping track of the count. Keeping track of the count add=
+s
+> > > complexity to the topup/alloc paths for the sole benefit of the
+> > > shrinker. I'd rather contain that complexity to the shrinker code unl=
+ess
+> > > there is a compelling reason to optimize mmu_shrink_count().
+> > >
+> > > IIRC we discussed this at one point. Was there a reason to take this
+> > > approach that I'm just forgetting?
+> >
+> > To count on demand, we first need to lock on kvm_lock and then for
+> > each VMs iterate through each vCPU, take a lock, and sum the objects
+> > count in caches. When the NUMA support will be introduced in this
+> > series then it means we have to iterate even more caches. We
+> > can't/shouldn't use mutex_trylock() as it will not give the correct
+> > picture and when shrink_scan is called count can be totally different.
+>
+> Yeah good point. Hm, do we need to take the cache mutex to calculate the
+> count though? mmu_shrink_count() is inherently racy (something could get
+> freed or allocated in between count() and scan()). I don't think holding
+> the mutex buys us anything over just reading the count without the
+> mutex.
+>
 
-Since the kernel does the copy from user and manages the zero fill
-compat maybe this user_data have a union like Robin suggested.
+You are right, mutex and percpu_counter both are not not solving
+accuracy problems with the shrinker. So, this can be removed.
 
-But yes, this is the idea.
+> e.g.
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index df8dcb7e5de7..c80a5c52f0ea 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -6739,10 +6739,20 @@ static unsigned long mmu_shrink_scan(struct shrin=
+ker *shrink,
+>  static unsigned long mmu_shrink_count(struct shrinker *shrink,
+>                                       struct shrink_control *sc)
+>  {
+> -       s64 count =3D percpu_counter_sum(&kvm_total_unused_cached_pages);
+> +       struct kvm *kvm, *next_kvm;
+> +       unsigned long count =3D 0;
+>
+> -       WARN_ON(count < 0);
+> -       return count <=3D 0 ? SHRINK_EMPTY : count;
+> +       mutex_lock(&kvm_lock);
+> +       list_for_each_entry_safe(kvm, next_kvm, &vm_list, vm_list) {
+> +               struct kvm_vcpu *vcpu;
+> +               unsigned long i;
+> +
+> +               kvm_for_each_vcpu(i, vcpu, kvm)
+> +                       count +=3D READ_ONCE(vcpu->arch.mmu_shadow_page_c=
+ache.nobjs);
+> +       }
+> +       mutex_unlock(&kvm_lock);
+> +
+> +       return count =3D=3D 0 ? SHRINK_EMPTY : count;
+>
+>  }
+>
+> Then the only concern is an additional acquire of kvm_lock. But it
+> should be fairly quick (quicker than mmu_shrink_scan()). If we can
+> tolerate the kvm_lock overhead of mmu_shrink_scan(), then we should be
+> able to tolerate some here.
+>
+> >
+> > scan_count() API comment says to not do any deadlock check (I don't
+> > know what does that mean) and percpu_counter is very fast when we are
+> > adding/subtracting pages so the effect of using it to keep global
+> > count is very minimal. Since, there is not much impact to using
+> > percpu_count compared to previous one, we ended our discussion with
+> > keeping this per cpu counter.
+>
+> Yeah it's just the code complexity of maintaing
+> kvm_total_unused_cached_pages that I'm hoping to avoid. We have to
+> create the counter, destroy it, and keep it up to date. Some
+> kvm_mmu_memory_caches have to update the counter, and others don't. It's
+> just adds a lot of bookkeeping code that I'm not convinced is worth the
+> it.
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-
-Jason
+Yeah, it will simplify code a lot. Also, we also don't need 100%
+accuracy with Shrinker. I will remove this global counter in the next
+version.
