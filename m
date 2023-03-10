@@ -2,75 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E44886B3440
-	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 03:28:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DAB5F6B3457
+	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 03:38:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229809AbjCJC2z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Mar 2023 21:28:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37898 "EHLO
+        id S230043AbjCJCil (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Mar 2023 21:38:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229614AbjCJC2y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Mar 2023 21:28:54 -0500
-Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C00FA7A9E
-        for <kvm@vger.kernel.org>; Thu,  9 Mar 2023 18:28:52 -0800 (PST)
-Received: by mail-ot1-x333.google.com with SMTP id a4-20020a056830008400b0069432af1380so2181974oto.13
-        for <kvm@vger.kernel.org>; Thu, 09 Mar 2023 18:28:52 -0800 (PST)
+        with ESMTP id S229721AbjCJCii (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Mar 2023 21:38:38 -0500
+Received: from mail-oo1-xc31.google.com (mail-oo1-xc31.google.com [IPv6:2607:f8b0:4864:20::c31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7D5A7DAA
+        for <kvm@vger.kernel.org>; Thu,  9 Mar 2023 18:38:32 -0800 (PST)
+Received: by mail-oo1-xc31.google.com with SMTP id u3-20020a4ad0c3000000b0052541ef0bafso599017oor.5
+        for <kvm@vger.kernel.org>; Thu, 09 Mar 2023 18:38:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678415331;
+        d=google.com; s=20210112; t=1678415912;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3pU6ySJSXj+2B0JGqj0iTBYA4wuiPU2243tS+OTzYls=;
-        b=nUTsMdMLd5wvUp5SCex7ZYoMNlfHOLgJJPnpykv5JPOXWfNcEe14vCzaFOOe2PB9NF
-         77Dehi6f4A+Xn1xQ5MSLILtThT7ZdDp54UnEmwbCiixpBzq1z112M9Zb2zOdbJHGaOKQ
-         mVaWNf8graMWTdHu9j/ty/KQ+eofoWig79+SZncxx6HOZC6b8oUgWWk0mWzCLELo3wmm
-         rRixK4LYuTj8R/i6in0AEVEuc2NvulHoAjg1YPY4vxlWPiRIMqdu3BhmP4HwK5Nv0cY6
-         LJemLecX6iPcZnhiod2ecL+xeFqk3OVRcAvdoF8Zd23oKkqvLfqViOGuWYmdpk3jIMec
-         C9+g==
+        bh=b7t6O2KMMq37bm277QLmLICEVEmQKxMNjlgWb5w3+Mc=;
+        b=L4PRyvqDqpjIbp27s16BnckpH3CpPHu3ePaQhAp0IChSOt2J/srDDyzRbUZ82tyUji
+         DDnnP14YPGgmehOgtlrJNOQQUM1xdfaTt37VcgR0Wfm1x4L+r5cl+wZTqEyYuLTxL7vQ
+         lSumvGPvCs1YCgsDgEFAFU5evSViatfj9K6cv4YOkBdQnxzn0B4gMQnbF80U/VhILVCp
+         GJGc250fixc8dtv5Xt4GBTQQlqrt/GLSSVDLDCjUPaKlmkKNQa23EcPOM3UTGEiRVLJq
+         WBs4BbX1/pque32ZF1kr/ttjboDGkBxZkBUhkRx1Xk3GUIwUo6HKrHe/CsG+SsI2rNLV
+         EzCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678415331;
+        d=1e100.net; s=20210112; t=1678415912;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3pU6ySJSXj+2B0JGqj0iTBYA4wuiPU2243tS+OTzYls=;
-        b=y5WD8bXoP2nLPmMwenyx4JxLhNBb9MnFO0p3XnQKl5bWaxkaakhgxNCi0TBy78lzI+
-         7bK3WpGBJ388N8O5XiOE2i0Wecr2YQkgIHZ7cZMNuH9M4GSt/Mttz4YiX2DPFJcxJxvN
-         OWFWr5kkFTD7La8fBIIoMe0BddM/KzFVABIjPzSJeAhq+GKQNxVNO9qSQ2RpxXKEjIfZ
-         AoYyHdLyjV3fxDHaltkOHElIqkSl7em2spiDpltD8D6IpfDdZakXjCHZl6uGpdC729JC
-         0CvlnPDackLUYR0qZFY5OjNB7gfdxeG0QM0gsNLX3GfIvo1oJJN1ThMmhrOgP1wqpPrj
-         k2mQ==
-X-Gm-Message-State: AO0yUKUfVojFQiY5tBOBRGw43PBNUAywGrrcoCmlajFPnK/SyPYsncD+
-        mz7Wbg7rwvtGuABczd8vC+YjqMZwvSILaVmIjOtbRg==
-X-Google-Smtp-Source: AK7set8yleViLGb59eIMj0H8CbfeqXyQUC4ki+K4L+2iS4etpbofAXP3z+TPCyIgJ6De+4gSCSc2ydhCzJ/gyt/vlYg=
-X-Received: by 2002:a9d:5f87:0:b0:68d:7557:f74c with SMTP id
- g7-20020a9d5f87000000b0068d7557f74cmr8085114oti.7.1678415331372; Thu, 09 Mar
- 2023 18:28:51 -0800 (PST)
+        bh=b7t6O2KMMq37bm277QLmLICEVEmQKxMNjlgWb5w3+Mc=;
+        b=Km1baS7o4V2chSsE7+ez+B/2IVv8Blx5IiYT4rUH/gfCpI0ruW00LnmsGraAl6wuRT
+         RkBWuQp66L2+QBjdz1eu0UmdAjhHgGFiVCfln+NAVWocsHTmCsGOpGyzoVC4ddOC/a/f
+         /o3DAmDXbh4L5+OkkKMQ7B69lxqcaJBt5IVQgrlH2AAEf86eYMmvaQ0SuNUxUBmPoj0V
+         nZDoKokFDmkv2VI/IN4cuk798tTbleTVcOhZFOiYjeRDWyzoNI1WYB0juiWqMaoPx0BO
+         ptbjKKQI2HWNi15UJgSfkclSVbtAUOYpyOny7LznL6qEU3N+MfQrsH8DlGyjyPleuu+y
+         PpoA==
+X-Gm-Message-State: AO0yUKXxbmj75j4UO88knn7/hdpwwG6s/msqRg4qCrNLTH1G2LR/5Vlg
+        wTNAN4cInfSE8uqg+NCdH37ovKC5Fvj1B90yG05Drw==
+X-Google-Smtp-Source: AK7set/JxI6W3C5rLL2FSpjcyauEWtR1JYgVg4F5BJZ5O1LIhvBBHv7xIPcNRRlokD0INeKbpkfd85FMD9vfRVZntzw=
+X-Received: by 2002:a4a:bd92:0:b0:525:23cc:a28e with SMTP id
+ k18-20020a4abd92000000b0052523cca28emr8252023oop.0.1678415911762; Thu, 09 Mar
+ 2023 18:38:31 -0800 (PST)
 MIME-Version: 1.0
-References: <20230215010717.3612794-1-rananta@google.com> <20230215010717.3612794-12-rananta@google.com>
- <CAAeT=FwdkFLzp0S+T7L_ppbaU5VvdfT1Uuubm3cjuDKykJchNQ@mail.gmail.com>
-In-Reply-To: <CAAeT=FwdkFLzp0S+T7L_ppbaU5VvdfT1Uuubm3cjuDKykJchNQ@mail.gmail.com>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Thu, 9 Mar 2023 18:28:40 -0800
-Message-ID: <CAJHc60wW+9hwTFomJVWKwzG+3MUjGNAJe0M82p-266GwhO6cOw@mail.gmail.com>
-Subject: Re: [REPOST PATCH 11/16] selftests: KVM: aarch64: Add vCPU migration
- test for PMU
+References: <20230228062246.1222387-1-jingzhangos@google.com>
+ <20230228062246.1222387-5-jingzhangos@google.com> <CAAeT=Fzm_O-fbk2+jCExtnk7x4XXO1UwiviMmn0BU53A7Ea9WQ@mail.gmail.com>
+In-Reply-To: <CAAeT=Fzm_O-fbk2+jCExtnk7x4XXO1UwiviMmn0BU53A7Ea9WQ@mail.gmail.com>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Thu, 9 Mar 2023 18:38:19 -0800
+Message-ID: <CAAdAUtiSfMUHwBmFwvSpo5TdsdSDiEQWqJacg7YNzU_8b+AkDw@mail.gmail.com>
+Subject: Re: [PATCH v3 4/6] KVM: arm64: Use per guest ID register for ID_AA64DFR0_EL1.PMUVer
 To:     Reiji Watanabe <reijiw@google.com>
-Cc:     Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
-        Ricardo Koller <ricarkol@google.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oupton@google.com>,
+        Will Deacon <will@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,396 +80,231 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 6, 2023 at 7:44=E2=80=AFPM Reiji Watanabe <reijiw@google.com> w=
-rote:
+Hi Reiji,
+
+On Wed, Mar 8, 2023 at 8:42 AM Reiji Watanabe <reijiw@google.com> wrote:
 >
-> Hi Raghu,
+> Hi Jing,
 >
-> On Tue, Feb 14, 2023 at 5:07=E2=80=AFPM Raghavendra Rao Ananta
-> <rananta@google.com> wrote:
+> On Mon, Feb 27, 2023 at 10:23=E2=80=AFPM Jing Zhang <jingzhangos@google.c=
+om> wrote:
 > >
-> > Implement a stress test for KVM by frequently force-migrating the
-> > vCPU to random pCPUs in the system. This would validate the
-> > save/restore functionality of KVM and starting/stopping of
-> > PMU counters as necessary.
+> > With per guest ID registers, PMUver settings from userspace
+> > can be stored in its corresponding ID register.
 > >
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > No functional change intended.
+> >
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
 > > ---
-> >  .../testing/selftests/kvm/aarch64/vpmu_test.c | 195 +++++++++++++++++-
-> >  1 file changed, 193 insertions(+), 2 deletions(-)
+> >  arch/arm64/include/asm/kvm_host.h | 11 ++++---
+> >  arch/arm64/kvm/arm.c              |  6 ----
+> >  arch/arm64/kvm/id_regs.c          | 52 ++++++++++++++++++++++++-------
+> >  include/kvm/arm_pmu.h             |  6 ++--
+> >  4 files changed, 51 insertions(+), 24 deletions(-)
 > >
-> > diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_test.c b/tools/te=
-sting/selftests/kvm/aarch64/vpmu_test.c
-> > index 5c166df245589..0c9d801f4e602 100644
-> > --- a/tools/testing/selftests/kvm/aarch64/vpmu_test.c
-> > +++ b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
-> > @@ -19,9 +19,15 @@
-> >   * higher exception levels (EL2, EL3). Verify this functionality by
-> >   * configuring and trying to count the events for EL2 in the guest.
-> >   *
-> > + * 4. Since the PMU registers are per-cpu, stress KVM by frequently
-> > + * migrating the guest vCPU to random pCPUs in the system, and check
-> > + * if the vPMU is still behaving as expected.
-> > + *
-> >   * Copyright (c) 2022 Google LLC.
-> >   *
-> >   */
-> > +#define _GNU_SOURCE
-> > +
-> >  #include <kvm_util.h>
-> >  #include <processor.h>
-> >  #include <test_util.h>
-> > @@ -30,6 +36,11 @@
-> >  #include <linux/arm-smccc.h>
-> >  #include <linux/bitfield.h>
-> >  #include <linux/bitmap.h>
-> > +#include <stdlib.h>
-> > +#include <pthread.h>
-> > +#include <sys/sysinfo.h>
-> > +
-> > +#include "delay.h"
-> >
-> >  /* The max number of the PMU event counters (excluding the cycle count=
-er) */
-> >  #define ARMV8_PMU_MAX_GENERAL_COUNTERS (ARMV8_PMU_MAX_COUNTERS - 1)
-> > @@ -37,6 +48,8 @@
-> >  /* The max number of event numbers that's supported */
-> >  #define ARMV8_PMU_MAX_EVENTS           64
-> >
-> > +#define msecs_to_usecs(msec)           ((msec) * 1000LL)
-> > +
-> >  /*
-> >   * The macros and functions below for reading/writing PMEV{CNTR,TYPER}=
-<n>_EL0
-> >   * were basically copied from arch/arm64/kernel/perf_event.c.
-> > @@ -265,6 +278,7 @@ enum test_stage {
-> >         TEST_STAGE_COUNTER_ACCESS =3D 1,
-> >         TEST_STAGE_KVM_EVENT_FILTER,
-> >         TEST_STAGE_KVM_EVTYPE_FILTER,
-> > +       TEST_STAGE_VCPU_MIGRATION,
-> >  };
-> >
-> >  struct guest_data {
-> > @@ -275,6 +289,19 @@ struct guest_data {
-> >
-> >  static struct guest_data guest_data;
-> >
-> > +#define VCPU_MIGRATIONS_TEST_ITERS_DEF         1000
-> > +#define VCPU_MIGRATIONS_TEST_MIGRATION_FREQ_MS 2
-> > +
-> > +struct test_args {
-> > +       int vcpu_migration_test_iter;
-> > +       int vcpu_migration_test_migrate_freq_ms;
-> > +};
-> > +
-> > +static struct test_args test_args =3D {
-> > +       .vcpu_migration_test_iter =3D VCPU_MIGRATIONS_TEST_ITERS_DEF,
-> > +       .vcpu_migration_test_migrate_freq_ms =3D VCPU_MIGRATIONS_TEST_M=
-IGRATION_FREQ_MS,
-> > +};
-> > +
-> >  static void guest_sync_handler(struct ex_regs *regs)
-> >  {
-> >         uint64_t esr, ec;
-> > @@ -352,7 +379,6 @@ static bool pmu_event_is_supported(uint64_t event)
-> >                 GUEST_ASSERT_3(!(_tval & mask), _tval, mask, set_expect=
-ed);\
-> >  }
-> >
-> > -
-> >  /*
-> >   * Extra instructions inserted by the compiler would be difficult to c=
-ompensate
-> >   * for, so hand assemble everything between, and including, the PMCR a=
-ccesses
-> > @@ -459,6 +485,13 @@ static void test_event_count(uint64_t event, int p=
-mc_idx, bool expect_count)
-> >         }
-> >  }
-> >
-> > +static void test_basic_pmu_functionality(void)
-> > +{
-> > +       /* Test events on generic and cycle counters */
-> > +       test_instructions_count(0, true);
-> > +       test_cycles_count(true);
-> > +}
-> > +
-> >  /*
-> >   * Check if @mask bits in {PMCNTEN,PMINTEN,PMOVS}{SET,CLR} registers
-> >   * are set or cleared as specified in @set_expected.
-> > @@ -748,6 +781,16 @@ static void guest_evtype_filter_test(void)
-> >         GUEST_ASSERT_2(cnt =3D=3D 0, cnt, typer);
-> >  }
-> >
-> > +static void guest_vcpu_migration_test(void)
-> > +{
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm=
+/kvm_host.h
+> > index f64347eb77c2..effb61a9a855 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -218,6 +218,12 @@ struct kvm_arch {
+> >  #define KVM_ARCH_FLAG_EL1_32BIT                                4
+> >         /* PSCI SYSTEM_SUSPEND enabled for the guest */
+> >  #define KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED           5
 > > +       /*
-> > +        * While the userspace continuously migrates this vCPU to rando=
-m pCPUs,
-> > +        * run basic PMU functionalities and verify the results.
+> > +        * AA64DFR0_EL1.PMUver was set as ID_AA64DFR0_EL1_PMUVer_IMP_DE=
+F
+> > +        * or DFR0_EL1.PerfMon was set as ID_DFR0_EL1_PerfMon_IMPDEF fr=
+om
+> > +        * userspace for VCPUs without PMU.
 > > +        */
-> > +       while (test_args.vcpu_migration_test_iter--)
-> > +               test_basic_pmu_functionality();
-> > +}
-> > +
-> >  static void guest_code(void)
+> > +#define KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU             6
+> >
+> >         unsigned long flags;
+> >
+> > @@ -230,11 +236,6 @@ struct kvm_arch {
+> >
+> >         cpumask_var_t supported_cpus;
+> >
+> > -       struct {
+> > -               u8 imp:4;
+> > -               u8 unimp:4;
+> > -       } dfr0_pmuver;
+> > -
+> >         /* Hypercall features firmware registers' descriptor */
+> >         struct kvm_smccc_features smccc_feat;
+> >
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index c78d68d011cb..fb2de2cb98cb 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -138,12 +138,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned lon=
+g type)
+> >         kvm_arm_set_default_id_regs(kvm);
+> >         kvm_arm_init_hypercalls(kvm);
+> >
+> > -       /*
+> > -        * Initialise the default PMUver before there is a chance to
+> > -        * create an actual PMU.
+> > -        */
+> > -       kvm->arch.dfr0_pmuver.imp =3D kvm_arm_pmu_get_pmuver_limit();
+> > -
+> >         return 0;
+> >
+> >  err_free_cpumask:
+> > diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
+> > index 36859e4caf02..21ec8fc10d79 100644
+> > --- a/arch/arm64/kvm/id_regs.c
+> > +++ b/arch/arm64/kvm/id_regs.c
+> > @@ -21,9 +21,12 @@
+> >  static u8 vcpu_pmuver(const struct kvm_vcpu *vcpu)
 > >  {
-> >         switch (guest_data.test_stage) {
-> > @@ -760,6 +803,9 @@ static void guest_code(void)
-> >         case TEST_STAGE_KVM_EVTYPE_FILTER:
-> >                 guest_evtype_filter_test();
-> >                 break;
-> > +       case TEST_STAGE_VCPU_MIGRATION:
-> > +               guest_vcpu_migration_test();
-> > +               break;
-> >         default:
-> >                 GUEST_ASSERT_1(0, guest_data.test_stage);
+> >         if (kvm_vcpu_has_pmu(vcpu))
+> > -               return vcpu->kvm->arch.dfr0_pmuver.imp;
+> > -
+> > -       return vcpu->kvm->arch.dfr0_pmuver.unimp;
+> > +               return FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMU=
+Ver),
+> > +                               IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1));
+> > +       else if (test_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kv=
+m->arch.flags))
+> > +               return ID_AA64DFR0_EL1_PMUVer_IMP_DEF;
+> > +       else
+> > +               return 0;
+> >  }
+> >
+> >  static u8 perfmon_to_pmuver(u8 perfmon)
+> > @@ -256,10 +259,19 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *v=
+cpu,
+> >         if (val)
+> >                 return -EINVAL;
+> >
+> > -       if (valid_pmu)
+> > -               vcpu->kvm->arch.dfr0_pmuver.imp =3D pmuver;
+> > -       else
+> > -               vcpu->kvm->arch.dfr0_pmuver.unimp =3D pmuver;
+> > +       if (valid_pmu) {
+> > +               IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) &=3D ~ARM64_FEATU=
+RE_MASK(ID_AA64DFR0_EL1_PMUVer);
+> > +               IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) |=3D
+> > +                       FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_P=
+MUVer), pmuver);
+> > +
+> > +               IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) &=3D ~ARM64_FEATURE_M=
+ASK(ID_DFR0_EL1_PerfMon);
+> > +               IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) |=3D
+> > +                       FIELD_PREP(ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfM=
+on), pmuver);
+>
+> The pmuver must be converted to perfmon for ID_DFR0_EL1.
+Yes, wil fix it.
+>
+> Also, I think those registers should be updated atomically, although PMUv=
+er
+> specified by userspace will be normally the same for all vCPUs with
+> PMUv3 configured (I have the same comment for set_id_dfr0_el1()).
+>
+I think there is no race condition here. No corrupted data would be
+set in the field, right?
+>
+> > +       } else if (pmuver =3D=3D ID_AA64DFR0_EL1_PMUVer_IMP_DEF) {
+> > +               set_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm-=
+>arch.flags);
+> > +       } else {
+> > +               clear_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kv=
+m->arch.flags);
+> > +       }
+> >
+> >         return 0;
+> >  }
+> > @@ -296,10 +308,19 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+> >         if (val)
+> >                 return -EINVAL;
+> >
+> > -       if (valid_pmu)
+> > -               vcpu->kvm->arch.dfr0_pmuver.imp =3D perfmon_to_pmuver(p=
+erfmon);
+> > -       else
+> > -               vcpu->kvm->arch.dfr0_pmuver.unimp =3D perfmon_to_pmuver=
+(perfmon);
+> > +       if (valid_pmu) {
+> > +               IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) &=3D ~ARM64_FEATURE_M=
+ASK(ID_DFR0_EL1_PerfMon);
+> > +               IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) |=3D FIELD_PREP(
+> > +                       ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon), perfmo=
+n_to_pmuver(perfmon));
+>
+> The perfmon value should be set for ID_DFR0_EL1 (not pmuver).
+>
+Sure, will fix it.
+> > +
+> > +               IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) &=3D ~ARM64_FEATU=
+RE_MASK(ID_AA64DFR0_EL1_PMUVer);
+> > +               IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) |=3D FIELD_PREP(
+> > +                       ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), per=
+fmon_to_pmuver(perfmon));
+> > +       } else if (perfmon =3D=3D ID_DFR0_EL1_PerfMon_IMPDEF) {
+> > +               set_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm-=
+>arch.flags);
+> > +       } else {
+> > +               clear_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kv=
+m->arch.flags);
+> > +       }
+> >
+> >         return 0;
+> >  }
+> > @@ -543,4 +564,13 @@ void kvm_arm_set_default_id_regs(struct kvm *kvm)
 > >         }
-> > @@ -837,6 +883,7 @@ create_vpmu_vm(void *guest_code, struct kvm_pmu_eve=
-nt_filter *pmu_event_filters)
 > >
-> >         vpmu_vm->vm =3D vm =3D vm_create(1);
-> >         vm_init_descriptor_tables(vm);
+> >         IDREG(kvm, SYS_ID_AA64PFR0_EL1) =3D val;
 > > +
-> >         /* Catch exceptions for easier debugging */
-> >         for (ec =3D 0; ec < ESR_EC_NUM; ec++) {
-> >                 vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT, ec,
-> > @@ -881,6 +928,8 @@ static void run_vcpu(struct kvm_vcpu *vcpu)
-> >         struct ucall uc;
-> >
-> >         sync_global_to_guest(vcpu->vm, guest_data);
-> > +       sync_global_to_guest(vcpu->vm, test_args);
-> > +
-> >         vcpu_run(vcpu);
-> >         switch (get_ucall(vcpu, &uc)) {
-> >         case UCALL_ABORT:
-> > @@ -1098,11 +1147,112 @@ static void run_kvm_evtype_filter_test(void)
-> >         destroy_vpmu_vm(vpmu_vm);
+> > +       /*
+> > +        * Initialise the default PMUver before there is a chance to
+> > +        * create an actual PMU.
+> > +        */
+> > +       IDREG(kvm, SYS_ID_AA64DFR0_EL1) &=3D ~ARM64_FEATURE_MASK(ID_AA6=
+4DFR0_EL1_PMUVer);
+> > +       IDREG(kvm, SYS_ID_AA64DFR0_EL1) |=3D
+> > +               FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
+> > +                          kvm_arm_pmu_get_pmuver_limit());
 > >  }
-> >
-> > +struct vcpu_migrate_data {
-> > +       struct vpmu_vm *vpmu_vm;
-> > +       pthread_t *pt_vcpu;
->
-> Nit: Originally, I wasn't sure what 'pt' stands for.
-> Also, the 'pt_vcpu' made me think this would be a pointer to a vCPU.
-> Perhaps renaming this to 'vcpu_pthread' might be more clear ?
->
-Haha, no problem. I'll change it to vcpu_pthread.
->
-> > +       bool vcpu_done;
-> > +};
-> > +
-> > +static void *run_vcpus_migrate_test_func(void *arg)
-> > +{
-> > +       struct vcpu_migrate_data *migrate_data =3D arg;
-> > +       struct vpmu_vm *vpmu_vm =3D migrate_data->vpmu_vm;
-> > +
-> > +       run_vcpu(vpmu_vm->vcpu);
-> > +       migrate_data->vcpu_done =3D true;
-> > +
-> > +       return NULL;
-> > +}
-> > +
-> > +static uint32_t get_pcpu(void)
-> > +{
-> > +       uint32_t pcpu;
-> > +       unsigned int nproc_conf;
-> > +       cpu_set_t online_cpuset;
-> > +
-> > +       nproc_conf =3D get_nprocs_conf();
-> > +       sched_getaffinity(0, sizeof(cpu_set_t), &online_cpuset);
-> > +
-> > +       /* Randomly find an available pCPU to place the vCPU on */
-> > +       do {
-> > +               pcpu =3D rand() % nproc_conf;
-> > +       } while (!CPU_ISSET(pcpu, &online_cpuset));
-> > +
-> > +       return pcpu;
-> > +}
-> > +
-> > +static int migrate_vcpu(struct vcpu_migrate_data *migrate_data)
->
-> Nit: You might want to pass a pthread_t rather than migrate_data
-> unless the function uses some more fields of the data in the
-> following patches.
->
-The upcoming patch, which introduces multiple-vcpus, moves
-migrate_date into a global array (one element per-vCPU). That patch
-passes only the vcpu index as an arg to migrate_vcpu().
-I originally thought we would embed more stuff into migrate_data, and
-passed this. But I guess I can just pass pthread_t.
-
-> > +{
-> > +       int ret;
-> > +       cpu_set_t cpuset;
-> > +       uint32_t new_pcpu =3D get_pcpu();
-> > +
-> > +       CPU_ZERO(&cpuset);
-> > +       CPU_SET(new_pcpu, &cpuset);
-> > +
-> > +       pr_debug("Migrating vCPU to pCPU: %u\n", new_pcpu);
-> > +
-> > +       ret =3D pthread_setaffinity_np(*migrate_data->pt_vcpu, sizeof(c=
-puset), &cpuset);
-> > +
-> > +       /* Allow the error where the vCPU thread is already finished */
-> > +       TEST_ASSERT(ret =3D=3D 0 || ret =3D=3D ESRCH,
-> > +                   "Failed to migrate the vCPU to pCPU: %u; ret: %d\n"=
-, new_pcpu, ret);
-> > +
-> > +       return ret;
-> > +}
-> > +
-> > +static void *vcpus_migrate_func(void *arg)
-> > +{
-> > +       struct vcpu_migrate_data *migrate_data =3D arg;
-> > +
-> > +       while (!migrate_data->vcpu_done) {
-> > +               usleep(msecs_to_usecs(test_args.vcpu_migration_test_mig=
-rate_freq_ms));
-> > +               migrate_vcpu(migrate_data);
-> > +       }
-> > +
-> > +       return NULL;
-> > +}
-> > +
-> > +static void run_vcpu_migration_test(uint64_t pmcr_n)
-> > +{
-> > +       int ret;
-> > +       struct vpmu_vm *vpmu_vm;
-> > +       pthread_t pt_vcpu, pt_sched;
-> > +       struct vcpu_migrate_data migrate_data =3D {
-> > +               .pt_vcpu =3D &pt_vcpu,
-> > +               .vcpu_done =3D false,
-> > +       };
-> > +
-> > +       __TEST_REQUIRE(get_nprocs() >=3D 2, "At least two pCPUs needed =
-for vCPU migration test");
->
-> Considering that get_pcpu() chooses the target CPU from CPUs returned
-> from sched_getaffinity(), I would think the test should use the number of
-> the bits set in the returned cpu_set_t from sched_getaffinity() here
-> instead of get_nprocs(), as those numbers could be different (e.g.  if th=
-e
-> test runs with taskset with a subset of the CPUs on the system).
->
-I'm not familiar with tasksets, but if you feel the current approach
-could cause problems, I'll switch to your suggestion. Thanks.
->
-> > +
-> > +       guest_data.test_stage =3D TEST_STAGE_VCPU_MIGRATION;
-> > +       guest_data.expected_pmcr_n =3D pmcr_n;
-> > +
-> > +       migrate_data.vpmu_vm =3D vpmu_vm =3D create_vpmu_vm(guest_code,=
- NULL);
-> > +
-> > +       /* Initialize random number generation for migrating vCPUs to r=
-andom pCPUs */
-> > +       srand(time(NULL));
-> > +
-> > +       /* Spawn a vCPU thread */
-> > +       ret =3D pthread_create(&pt_vcpu, NULL, run_vcpus_migrate_test_f=
-unc, &migrate_data);
-> > +       TEST_ASSERT(!ret, "Failed to create the vCPU thread");
-> > +
-> > +       /* Spawn a scheduler thread to force-migrate vCPUs to various p=
-CPUs */
-> > +       ret =3D pthread_create(&pt_sched, NULL, vcpus_migrate_func, &mi=
-grate_data);
->
-> Why do you want to spawn another thread to run vcpus_migrate_func(),
-> rather than calling that from the current thread ?
->
->
-I suppose it should be fine calling from the current thread (unless
-I'm forgetting a reason why I had a similar behavior in arch_timer
-test).
-
-Thank you.
-Raghavendra
-> > +       TEST_ASSERT(!ret, "Failed to create the scheduler thread for mi=
-grating the vCPUs");
-> > +
-> > +       pthread_join(pt_sched, NULL);
-> > +       pthread_join(pt_vcpu, NULL);
-> > +
-> > +       destroy_vpmu_vm(vpmu_vm);
-> > +}
-> > +
-> >  static void run_tests(uint64_t pmcr_n)
-> >  {
-> >         run_counter_access_tests(pmcr_n);
-> >         run_kvm_event_filter_test();
-> >         run_kvm_evtype_filter_test();
-> > +       run_vcpu_migration_test(pmcr_n);
-> >  }
-> >
+> > diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> > index 628775334d5e..eef67b7d9751 100644
+> > --- a/include/kvm/arm_pmu.h
+> > +++ b/include/kvm/arm_pmu.h
+> > @@ -92,8 +92,10 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu=
+);
 > >  /*
-> > @@ -1121,12 +1271,53 @@ static uint64_t get_pmcr_n_limit(void)
-> >         return FIELD_GET(ARMV8_PMU_PMCR_N, pmcr);
-> >  }
+> >   * Evaluates as true when emulating PMUv3p5, and false otherwise.
+> >   */
+> > -#define kvm_pmu_is_3p5(vcpu)                                          =
+ \
+> > -       (vcpu->kvm->arch.dfr0_pmuver.imp >=3D ID_AA64DFR0_EL1_PMUVer_V3=
+P5)
+> > +#define kvm_pmu_is_3p5(vcpu)                                          =
+                         \
+> > +       (kvm_vcpu_has_pmu(vcpu) &&                                     =
+                         \
+>
+> What is the reason for adding this kvm_vcpu_has_pmu() checking ?
+> I don't think this patch's changes necessitated this.
+For the same VM, is it possible that some VCPUs would have PMU, but
+some may not have?
+That's why the kvm_vcpu_has_pmu is added here.
+>
+> > +        FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),         =
+                         \
+> > +                IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1)) >=3D ID_AA64DFR=
+0_EL1_PMUVer_V3P5)
 > >
-> > -int main(void)
-> > +static void print_help(char *name)
-> > +{
-> > +       pr_info("Usage: %s [-h] [-i vcpu_migration_test_iterations] [-m=
- vcpu_migration_freq_ms]\n",
-> > +               name);
-> > +       pr_info("\t-i: Number of iterations of vCPU migrations test (de=
-fault: %u)\n",
-> > +               VCPU_MIGRATIONS_TEST_ITERS_DEF);
-> > +       pr_info("\t-m: Frequency (in ms) of vCPUs to migrate to differe=
-nt pCPU. (default: %u)\n",
-> > +               VCPU_MIGRATIONS_TEST_MIGRATION_FREQ_MS);
-> > +       pr_info("\t-h: print this help screen\n");
-> > +}
-> > +
-> > +static bool parse_args(int argc, char *argv[])
-> > +{
-> > +       int opt;
-> > +
-> > +       while ((opt =3D getopt(argc, argv, "hi:m:")) !=3D -1) {
-> > +               switch (opt) {
-> > +               case 'i':
-> > +                       test_args.vcpu_migration_test_iter =3D
-> > +                               atoi_positive("Nr vCPU migration iterat=
-ions", optarg);
-> > +                       break;
-> > +               case 'm':
-> > +                       test_args.vcpu_migration_test_migrate_freq_ms =
-=3D
-> > +                               atoi_positive("vCPU migration frequency=
-", optarg);
-> > +                       break;
-> > +               case 'h':
-> > +               default:
-> > +                       goto err;
-> > +               }
-> > +       }
-> > +
-> > +       return true;
-> > +
-> > +err:
-> > +       print_help(argv[0]);
-> > +       return false;
-> > +}
-> > +
-> > +int main(int argc, char *argv[])
-> >  {
-> >         uint64_t pmcr_n;
-> >
-> >         TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PMU_V3));
-> >
-> > +       if (!parse_args(argc, argv))
-> > +               exit(KSFT_SKIP);
-> > +
-> >         pmcr_n =3D get_pmcr_n_limit();
-> >         run_tests(pmcr_n);
+> >  u8 kvm_arm_pmu_get_pmuver_limit(void);
 > >
 > > --
-> > 2.39.1.581.gbfd45094c4-goog
+> > 2.39.2.722.g9855ee24e9-goog
+> >
 > >
 >
-> Thanks,
+> Thank you,
 > Reiji
+Thanks,
+Jing
