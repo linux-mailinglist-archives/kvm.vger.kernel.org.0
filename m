@@ -2,119 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 47F8B6B3F92
-	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 13:44:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D1B66B3FAE
+	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 13:52:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229659AbjCJMoF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 07:44:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60086 "EHLO
+        id S230154AbjCJMwG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 07:52:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229544AbjCJMoE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Mar 2023 07:44:04 -0500
-Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A23BE1CA2;
-        Fri, 10 Mar 2023 04:44:01 -0800 (PST)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mx.sberdevices.ru (Postfix) with ESMTP id 053955FD0A;
-        Fri, 10 Mar 2023 15:43:59 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1678452239;
-        bh=Ecj4YziYruX+u/+hpmkRq2EdaLGg+P4N588WctFYdig=;
-        h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-        b=ook6tDDWnDeKQDE3SiRliqr7wNakuTsFfVJFtfTSEWGFqPyjoJeAobM0f4HulMh7y
-         xw9Tp+fdTEGZqGoGHcdIP8auWf4ErQRzpbqZ/Y1FQQIWy3NX4HGLGLHDM5QKz2AxmB
-         sDWU21lDMKO9JVdS2nqe4k7ayVXqll7f5lhUCsGhiBXjVOPyss476HXZOzJAjqiL5v
-         w0yByWVIV6XPIt1bS23Pj68DIyViJ2JmPOP8yGTrZaOC4GVUIZASXjhWSRjBILjKq9
-         hSlQvi8NQg2+PjlyfYlEVVSfqxPqLIbo9hnSNEqQ/eEkOiL2QhCwLVYLnlf3XKsP+o
-         XQJNMY91UNj6g==
-Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
-        by mx.sberdevices.ru (Postfix) with ESMTP;
-        Fri, 10 Mar 2023 15:43:53 +0300 (MSK)
-Message-ID: <d74c1777-645f-82af-fb31-b89021ac6440@sberdevices.ru>
-Date:   Fri, 10 Mar 2023 15:40:51 +0300
+        with ESMTP id S229550AbjCJMwE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Mar 2023 07:52:04 -0500
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BAD910B1E0;
+        Fri, 10 Mar 2023 04:52:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1678452720; x=1709988720;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=xJvBjtXFbTfnxL0oNKT/W4JlLqLJwv/8uOZC3buZbiQ=;
+  b=SG929EYJlfcx5a/2IFs1Ft+uBZbRUEBswylRvWUTgA1I+e+aYKGxmdZa
+   pj9yYHJ91LjGP6OvF3wQ/utM0XxiEaNF/J36bieb66RUpJx+6+pMNOdDd
+   UJTCh8aekTLJ0NFCn6soAS0/uRO0dqmdd9oqhLK+yB2Mzra0Y9JGpQJ+D
+   FdAuimVI6xaPq2wL0NsGOVnd/D7/nTvVooZZbArn+3gMGyUUKrKG84YsT
+   ZCT5QU2sz0M1QMUBi9nYuKOA+hTCl/3vk8uR+HOr+Nptc08Z3WWlGrsB+
+   F8Y+NiOSY8kNaBpFAQ8LjkBdnXXYvIkgSljcIYBorrYvIx8ZHpOh3OQj7
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10644"; a="336738975"
+X-IronPort-AV: E=Sophos;i="5.98,249,1673942400"; 
+   d="scan'208";a="336738975"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2023 04:51:57 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10644"; a="655173436"
+X-IronPort-AV: E=Sophos;i="5.98,249,1673942400"; 
+   d="scan'208";a="655173436"
+Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.254.213.50]) ([10.254.213.50])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2023 04:51:52 -0800
+Message-ID: <9119912c-21d2-263f-ef7a-53e2eb827b18@linux.intel.com>
+Date:   Fri, 10 Mar 2023 20:51:48 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [RFC PATCH v4 0/4] several updates to virtio/vsock
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Cc:     baolu.lu@linux.intel.com, joro@8bytes.org,
+        alex.williamson@redhat.com, jgg@nvidia.com, kevin.tian@intel.com,
+        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
+        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 05/12] iommufd/hw_pagetable: Do not populate user-managed
+ hw_pagetables
 Content-Language: en-US
-To:     Stefano Garzarella <sgarzare@redhat.com>
-CC:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, <kvm@vger.kernel.org>,
-        <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <1804d100-1652-d463-8627-da93cb61144e@sberdevices.ru>
- <20230310090937.s55af2fx56zn4ewu@sgarzare-redhat>
- <15b9df26-bdc1-e139-8df7-62f966c719ed@sberdevices.ru>
- <20230310114000.6ptwpryulbvcqf5m@sgarzare-redhat>
-From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
-In-Reply-To: <20230310114000.6ptwpryulbvcqf5m@sgarzare-redhat>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [172.16.1.6]
-X-ClientProxiedBy: S-MS-EXCH02.sberdevices.ru (172.16.1.5) To
- S-MS-EXCH01.sberdevices.ru (172.16.1.4)
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2023/03/10 09:21:00 #20931590
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-        SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+To:     Nicolin Chen <nicolinc@nvidia.com>, Yi Liu <yi.l.liu@intel.com>
+References: <20230309080910.607396-1-yi.l.liu@intel.com>
+ <20230309080910.607396-6-yi.l.liu@intel.com>
+ <b0ea86fd-8350-f694-a93a-a8ccecd0c8e7@linux.intel.com>
+ <ZArTN9tIDKuvmuje@Asurada-Nvidia>
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <ZArTN9tIDKuvmuje@Asurada-Nvidia>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 10.03.2023 14:40, Stefano Garzarella wrote:
-> On Fri, Mar 10, 2023 at 12:42:13PM +0300, Arseniy Krasnov wrote:
+On 2023/3/10 14:50, Nicolin Chen wrote:
+> On Fri, Mar 10, 2023 at 10:25:10AM +0800, Baolu Lu wrote:
+>> External email: Use caution opening links or attachments
 >>
 >>
->> On 10.03.2023 12:09, Stefano Garzarella wrote:
->>> Hi Arseniy,
+>> On 3/9/23 4:09 PM, Yi Liu wrote:
+>>> From: Nicolin Chen <nicolinc@nvidia.com>
 >>>
->>> On Thu, Mar 09, 2023 at 11:24:42PM +0300, Arseniy Krasnov wrote:
->>>> Hello,
->>>>
->>>> this patchset evolved from previous v2 version (see link below). It does
->>>> several updates to virtio/vsock:
->>>> 1) Changes 'virtio_transport_inc/dec_rx_pkt()' interface. Now instead of
->>>>   using skbuff state ('head' and 'data' pointers) to update 'fwd_cnt'
->>>>   and 'rx_bytes', integer value is passed as an input argument. This
->>>>   makes code more simple, because in this case we don't need to update
->>>>   skbuff state before calling 'virtio_transport_inc/dec_rx_pkt()'. In
->>>>   more common words - we don't need to change skbuff state to update
->>>>   'rx_bytes' and 'fwd_cnt' correctly.
->>>> 2) For SOCK_STREAM, when copying data to user fails, current skbuff is
->>>>   not dropped. Next read attempt will use same skbuff and last offset.
->>>>   Instead of 'skb_dequeue()', 'skb_peek()' + '__skb_unlink()' are used.
->>>>   This behaviour was implemented before skbuff support.
->>>> 3) For SOCK_SEQPACKET it removes unneeded 'skb_pull()' call, because for
->>>>   this type of socket each skbuff is used only once: after removing it
->>>>   from socket's queue, it will be freed anyway.
+>>> A user-managed hw_pagetable does not need to get populated, since it is
+>>> managed by a guest OS. Move the iopt_table_add_domain and list_add_tail
+>>> calls into a helper, where the hwpt pointer will be redirected to its
+>>> hwpt->parent if it's available.
 >>>
->>> thanks for the fixes, I would wait a few days to see if there are any
->>> comments and then I think you can send it on net without RFC.
+>>> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
+>>> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+>>> ---
+>>>    drivers/iommu/iommufd/hw_pagetable.c | 20 ++++++++++++++++++--
+>>>    1 file changed, 18 insertions(+), 2 deletions(-)
 >>>
->>> @Bobby if you can take a look, your ack would be appreciated :-)
->> Ok, thanks for review. I'll wait for several days and also wait until
->> net-next will be opened. Then i'll resend this patchset with net-next
+>>> diff --git a/drivers/iommu/iommufd/hw_pagetable.c b/drivers/iommu/iommufd/hw_pagetable.c
+>>> index 16e92a1c150b..6e45ec0a66fa 100644
+>>> --- a/drivers/iommu/iommufd/hw_pagetable.c
+>>> +++ b/drivers/iommu/iommufd/hw_pagetable.c
+>>> @@ -43,6 +43,23 @@ int iommufd_hw_pagetable_enforce_cc(struct iommufd_hw_pagetable *hwpt)
+>>>        return 0;
+>>>    }
+>>>
+>>> +static int iommufd_hw_pagetable_link_ioas(struct iommufd_hw_pagetable *hwpt)
+>>> +{
+>>> +     int rc;
+>>> +
+>>> +     if (hwpt->parent)
+>>> +             hwpt = hwpt->parent;
+>>> +
+>>> +     if (!list_empty(&hwpt->hwpt_item))
+>>> +             return 0;
+>>
+>> What is above check for? Is it "the hwpt has already been inserted into
+>> the hwpt list of its ioas in another place"?
+>>
+>> If so, is it possible that hwpt will be deleted from the list even when
+>> this user hwpt is still linked to the ioas?
 > 
-> Since they are fixes, they should go with the net tree, not net-next.
-Ah ok, for net tree i can send it no matter that net-next is closed.
+> It means that the hwpt is already linked to the ioas. And the
+> hwpt_item can be only empty after a destroy().
+> 
+> With that being said, after I think it through, perhaps Yi's
+> previous change removing it might be better. So, it could be:
+> 
+> -------------------------------------------------------------------------------
+> +	/*
+> +	 * Only a parent hwpt needs to be linked to the IOAS. And a hwpt->parent
+> +	 * must be linked to the IOAS already, when it's being allocated.
+> +	 */
+>   	if (hwpt->parent)
+> -		hwpt = hwpt->parent;
+> -
+> -	if (!list_empty(&hwpt->hwpt_item))
+>   		return 0;
+>   
+> -------------------------------------------------------------------------------
+> 
+> I was concerned about the case where a device gets attached to
+> the nested hwpt without staging at the parent hwpt first. But,
+> the link between the parent hwpt and the IOAS happened inside
+> the allocation function now, not attach() any more.
 
-Thanks, Arseniy
-> 
-> Cheers,
-> Stefano
-> 
+Yes, it's clearer.
+
+Best regards,
+baolu
