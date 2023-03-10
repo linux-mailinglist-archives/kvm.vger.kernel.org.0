@@ -2,185 +2,250 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 67E216B38B9
-	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 09:32:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0346A6B38F2
+	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 09:40:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229890AbjCJIcP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 03:32:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39772 "EHLO
+        id S230519AbjCJIkm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 03:40:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231129AbjCJIcI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Mar 2023 03:32:08 -0500
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF990E8CFB;
-        Fri, 10 Mar 2023 00:32:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678437122; x=1709973122;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=LM1drhabj4MkaPoMcL158NXTNB4RdBJXD51qOiJYsdY=;
-  b=ZkDqe2aL+0qy9NiPkzeMaL92sCzY37j1ShUmC6oZZAWUHCuRIieOjszR
-   naIq7QWEQNBen5WISFHedX7sdmgIhhy7youuI6eDZkoi52QOlqlOnQ6YM
-   7qso256ZorzBOlm3TwdvJM01Nc5ZgVsxr+oU9awOzo81AZZi5sisxReF3
-   Zwli6+Y+EtEHU1WtVl8N5aJWr26XVjom10jIp2+KPQZFPH5S9rHRz3nMM
-   OmJcjn1691rceYVdddt7jfby8/cAYaqwDm8uOA0aGsCfaqLPz3gNYY7L3
-   ro9+JZC7LQ6MziV5nLsnAUNfOCy/WvopNk74WHbLJUcFF4Qfp294iUgKn
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10644"; a="316332292"
-X-IronPort-AV: E=Sophos;i="5.98,249,1673942400"; 
-   d="scan'208";a="316332292"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2023 00:32:01 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10644"; a="1007041083"
-X-IronPort-AV: E=Sophos;i="5.98,249,1673942400"; 
-   d="scan'208";a="1007041083"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmsmga005.fm.intel.com with ESMTP; 10 Mar 2023 00:32:01 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Fri, 10 Mar 2023 00:32:00 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Fri, 10 Mar 2023 00:32:00 -0800
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21 via Frontend Transport; Fri, 10 Mar 2023 00:32:00 -0800
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.170)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.21; Fri, 10 Mar 2023 00:32:00 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jxe5nzrgdloHPTPCX0OmyUgbavs9AZZc29mlIsuXIaLuSJkdI6YbP4TTXY0Wjyup3Xdt9t0cY9al3F6aMrbM4sLYV+R3tKXsDcyVPWCUFDLZgjLr+3+Ioc/YUdCYU21ZuNNJV/kGj/DcQ3GpIRjPou8ODOG32lYfWkM2NL074FZTbc4iC/MFy4fJKZoRCY4W5pWWzD+mCZpZayZf9DQBbsiqyQOIwGgLPF17LgpihLSM794ED/HgEohMJXwEu/PnwNP8MagQq4brf6nldl17NUokdi0Q2F+Sj1dY587MPVQ0vJejcVrE/WuLT6o/YpelAVCj5sPgIXt0vi0BcxFdEg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LM1drhabj4MkaPoMcL158NXTNB4RdBJXD51qOiJYsdY=;
- b=RbuBxz3/eQbvsI5HJtieT+HZWhbpHezDUatho65EqwW8ZKjF2/+B7/aCZx/ONo8ztrIwSOvxnLl4dBKeckn6IaPkLnLxQ6u8La0ve09z0qP1kT26VU1P5RiSZvui4MD9W3IM1lFI8S+pa9fqwKuS52ZlEHZjGeo41IevLa59fh/fvh0UHDCtegQaZ+h4gvA1slfdW1sVnWmtbsj23UgB9rd7uwNj7ozoLofxueR3jljQVJEqUwtPPJFmKCrygPq5ikL+CnsO4/gkX9UTa1zdDYjCogEPNR6q3Dv04SWPxFbZAbiIVR6AJ9TCkoCktS6OmKSzwtbjsM6bZTTQz/ouBQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by DS0PR11MB6448.namprd11.prod.outlook.com (2603:10b6:8:c3::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6156.28; Fri, 10 Mar
- 2023 08:31:59 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::1aac:b695:f7c5:bcac]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::1aac:b695:f7c5:bcac%8]) with mapi id 15.20.6178.020; Fri, 10 Mar 2023
- 08:31:59 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>
-CC:     "joro@8bytes.org" <joro@8bytes.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Hao, Xudong" <xudong.hao@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>
-Subject: RE: [PATCH v6 17/24] vfio-iommufd: Make vfio_iommufd_bind()
- selectively return devid
-Thread-Topic: [PATCH v6 17/24] vfio-iommufd: Make vfio_iommufd_bind()
- selectively return devid
-Thread-Index: AQHZUcIKuk6IYHvSzE+nbHNPyFcQhK7zsbyg
-Date:   Fri, 10 Mar 2023 08:31:59 +0000
-Message-ID: <BN9PR11MB5276A4EAE39A587765150ED98CBA9@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20230308132903.465159-1-yi.l.liu@intel.com>
- <20230308132903.465159-18-yi.l.liu@intel.com>
-In-Reply-To: <20230308132903.465159-18-yi.l.liu@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|DS0PR11MB6448:EE_
-x-ms-office365-filtering-correlation-id: ad0df086-3cb3-4cb5-b5c6-08db2141ea4f
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ma7mAQweYNfAtNmzfV8PiFg0CmyLXbDpVuq8RovzubSKjQkWiUDlsrFDxmkogjMdANp9Iti+KyzBwZiTCllitUxVDl92/UjLJ37m3VTi+9q8LMtrDOXwwO6VPQp7StD91zdWMQu4dnG9EB9UwsROwpLGWJQNi5RwbRbptwjMnYRhz7dq6BQag1VgInRfDEzn9kAkguk4Hjka6a6U6mXHaLDC3Qw8e1sHo2cXdZwBisxsWqF/5A6+cWO2u5kRUNZ8dFDd1RGxn1lbiExGl810KWi+Aa+lfQUnq+svEL9enJadCtEJmzBnsUNHS0oI8RfbO/IoIkQC6+vGibUL4xTne97Umnornzz85mqhWt14yVNa7eU6Ua+0ao7Qa7ApohjA/q5ofB0itZSlT7ATYzWECAZyuvhf+wsG6O/kMD/vkLzUMNhssA84vQPbopsennwkjD5atHepts6tH9T4aWwcNQM81htb1u6UABN8qxMYj26M2Qs+iwtw/5TfVzKQknyxEqpzKw+I+6XfpDTHy2iPEfD96WyZGz66MSTkarx4HofgKVwLDikeZ6ZUml+AwRjvp++rAIw2JGweFGwjchasp4uNQNdt3Lg/X6V3URBmZ8YN8n8KsXGDSqEHb2bmZbTMheuwMcMsXooBGcWK4O3wCy9P0JbzwYPtIohooNYSHEE6PLi0QiBH594SErBqxt+Vi18Rvr5bvzsQi6Gt2Rhs7w==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(39860400002)(366004)(136003)(346002)(376002)(396003)(451199018)(82960400001)(66476007)(86362001)(122000001)(38100700002)(33656002)(7416002)(38070700005)(66446008)(66556008)(41300700001)(5660300002)(55016003)(71200400001)(4744005)(8676002)(66946007)(76116006)(64756008)(8936002)(4326008)(52536014)(7696005)(186003)(9686003)(26005)(6506007)(478600001)(54906003)(316002)(110136005)(2906002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?PXMipR58/e0ck/pJ/lsqaixge84tAN15yPFaSZUWE+r8T+RErTSGIsIeDZCQ?=
- =?us-ascii?Q?AvD6pFIhFPPzM9g57hfn5Fp0IKzsjqFoXMQptujCHIvV2GddpVOKjB6Rv/wW?=
- =?us-ascii?Q?Z1Lpm6TkqDtxEUk6SZ7O02fRuXWuLQb+ElFkX++omglEjdbHibcGCBde18a5?=
- =?us-ascii?Q?eDhN+w6y7DMyqk+9TA7X0N2cnTCJYPxdfU3oRWXOaVc95Dnl/XvDZWujKFwy?=
- =?us-ascii?Q?qn/dgAQ5LIsHbeAE6YdYK8mFhi9lPzVDvyl8lKfOcKswx+1saEDaWYS+AoXa?=
- =?us-ascii?Q?yvOw8rznUNT46sWRjzoHCGpf6vk8g0LBBBcbWli+yQv1eN3oWPSVuFpk6KdG?=
- =?us-ascii?Q?LJkyp+OuJSkM3VMTGFrz8IBA43KsH3Pxj2sLlAuK9AR4LDMi4sZxG27r4QxB?=
- =?us-ascii?Q?Fmig+XGmCA6Wuij5WXBs5PeFDdvU5Jw2N8MTXP8UpsQXdO1LkDsm7ImnDqsi?=
- =?us-ascii?Q?6Lp4YWheKintdK8LRBnn2IHbL+muMkAqQHTHI+aog5uArO49ulhYXQX6BmQX?=
- =?us-ascii?Q?cke0T3z89rvKmzQtKcnEXL2licE/h5oWEvbj/zocuOLzmbN2ZOuZcHKl54CI?=
- =?us-ascii?Q?EvrvOYsoPYkf+RG0hvIZ/42OMtVunJ8sOGoDBDfXD9ELUUnbyC3w3xAsXg1O?=
- =?us-ascii?Q?s8McRMozhdX2802hF373bJJQxrRDwnnujI0QRkzbrGOj5PgO4c2RahWc8T5o?=
- =?us-ascii?Q?2cHJOYzP+xc3QdiUJhBchpT5VsmaynjPPdP8LUsUtpPFAdNJ6CFse0nZp8fO?=
- =?us-ascii?Q?hLF3D+U6A840qY9ipAHeAntawoZTABwmwsXotmW0IUHT5UC9XgS0TG39cIEo?=
- =?us-ascii?Q?hgIoubqOziPwGwFpmFc4HyAz3R7M/H1+fQQShxVAHC5byXwQ9Ve970k3g7Az?=
- =?us-ascii?Q?BAJizSZvYsU/NBAJ0gSPdpLbFAvLDzAOapl7zNXQl/SpQ/DcCGgGtlourO51?=
- =?us-ascii?Q?UqCQ3zcSri3U12ND/vqt5fXvQ8J7o19YUbWAXaNLWf3F2NiyHKg1QHUjVnEf?=
- =?us-ascii?Q?R4qPdv5BBGOwuSiN8Rdd7Hgs1CFrdK7hTFa5/S3OyMc4l0u4Y/cv9hyZjf3h?=
- =?us-ascii?Q?Hl+AubDQoI5yQEjOT7iA6LDCeCO8GoyMlZXfawSXcSSLAvmpTmyMLXaK38dg?=
- =?us-ascii?Q?2nqnMEcFV+fmyAwSVhbI+I+AwyjIiOtrpG8UvsFzmLeIl57HfISgTX+nWI2a?=
- =?us-ascii?Q?D/ei68WvA/zMkz1WHGvWcYkSc8lYRaNqp0FGBbdoOMsCNLmq7jU8pWVTTer4?=
- =?us-ascii?Q?Y9e0vdZpL5Z8T5/3ENnaqvcy8ZAuWlFY5xz2qHrBtB1BF64b0rpCbZFIUNR4?=
- =?us-ascii?Q?BCjts8JUoCcIgTxwMn0AH/tlXYjWSTgDImZ4Yk/+p/FCdtvn48OXsJ4NsDup?=
- =?us-ascii?Q?qKfORPE3fep9tm4OmuFDpqOyJ0aHAMEiOh/UC6UduAgRwBd4r+F4zAYiuF3f?=
- =?us-ascii?Q?uy/bvhY1D7q8Vt/fO1RgCdigC0N+rV0Y4GrnM7PlHKf1LhIwE8o8BssyotzP?=
- =?us-ascii?Q?EeJTOUZfWoz/woVa34/r7SUfzpLXGeSwJg1CcoeVBCCrAUykO6DFBBOU5SvB?=
- =?us-ascii?Q?ljJeUeRBmzGULQy+bPLvbGMraBNwKM2F9H/tEOGm?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S231386AbjCJIkE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Mar 2023 03:40:04 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7241010A129
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 00:37:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1678437451;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=O8ovMxuqTav+RM59yevfCqZhcFC/qRlWg3JJtflmVmY=;
+        b=GY6G42BoTJlkX5lWNmM1dhaPuFIaCAJ+YouFbQKNy1rnrXdKHUMpUNmWP76FNoyUGn5TTL
+        W9urTHoB1cDDCSuOzGvShowk1hPhYUYS7/I5c6lpyAS3GZRXG7vaU5Q29/8wB4LxUPFjnW
+        FSBFmLFhyIxyaxguvt5tEY7V+m37N1w=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-609-aeJfNG9hNCulPHFvjVCupg-1; Fri, 10 Mar 2023 03:37:30 -0500
+X-MC-Unique: aeJfNG9hNCulPHFvjVCupg-1
+Received: by mail-wm1-f69.google.com with SMTP id az12-20020a05600c600c00b003e8910ec2fdso1526107wmb.6
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 00:37:30 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678437449;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=O8ovMxuqTav+RM59yevfCqZhcFC/qRlWg3JJtflmVmY=;
+        b=5vAMe621vfN1JkZNywiYJ3uzW6QnPy05pRk4t6/WLcZ7BI5q1+O6/RvGpQRY/qDpou
+         0SqFQWkfssjVSgk7fC2BKwCtsegYl+N4WofVbW0nAyZyLmcb5qCBitRtTOrZ6JSPh2Qx
+         jysggIKEsFvQS400uwySqIQny/Q+aKSH1OP8VtfB2/YUHEfElZ4LZcpMSx2pbRHJ3sRS
+         iLLqZaapW1FiSzZKbEXpm15TOEZEAL0l7fKSdV7kzSM6SJLzKS/96morOjOYO8xrsSNy
+         dSLcPDFCI1ggDUsu4ubAfeeSGdWPly8LK20BlDhelv+j6oUaoDIYte0QjNTLvo0PCqe0
+         meow==
+X-Gm-Message-State: AO0yUKUn/V6PITnWS2H6sN1mF58UfnMccuDzbdzNo1kHVc65OchkmH66
+        BHHoIWtA+J15P8iPFfWmBb2In2Afi/qkh+YJXGA38wALwzm3v5I3i5RkDUO9qjCsXy7unQzpkYU
+        Ol4taVQhcLtTT
+X-Received: by 2002:a5d:6605:0:b0:2c7:7701:2578 with SMTP id n5-20020a5d6605000000b002c777012578mr15657386wru.54.1678437449505;
+        Fri, 10 Mar 2023 00:37:29 -0800 (PST)
+X-Google-Smtp-Source: AK7set+y1SLlYCLoZWlLhVUFLLO4mwRgZFYa2PT7ddRAXzE9lqne3QFfWheWewGObdmXBjz49fAnmw==
+X-Received: by 2002:a5d:6605:0:b0:2c7:7701:2578 with SMTP id n5-20020a5d6605000000b002c777012578mr15657381wru.54.1678437449202;
+        Fri, 10 Mar 2023 00:37:29 -0800 (PST)
+Received: from redhat.com ([2.52.9.88])
+        by smtp.gmail.com with ESMTPSA id c14-20020adffb0e000000b002c7107ce17fsm1562448wrr.3.2023.03.10.00.37.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Mar 2023 00:37:28 -0800 (PST)
+Date:   Fri, 10 Mar 2023 03:37:25 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)" 
+        <longpeng2@huawei.com>
+Cc:     Jason Wang <jasowang@redhat.com>, arei.gonglei@huawei.com,
+        yechuan@huawei.com, huangzhichao@huawei.com,
+        virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH] vhost-vdpa: cleanup memory maps when closing vdpa fds
+Message-ID: <20230310033706-mutt-send-email-mst@kernel.org>
+References: <20230131145310.2069-1-longpeng2@huawei.com>
+ <db99245c-606a-2f24-52fe-836a6972437f@redhat.com>
+ <35b94992-0c6b-a190-1fce-5dda9c8dcf4b@huawei.com>
+ <CACGkMEt0Rgkcmt9k4dWsp-qqtPvrM40mtgmSERc0A7Ve1wzKHw@mail.gmail.com>
+ <ad0ab6b8-1e1e-f686-eb5c-78cc63869c54@huawei.com>
+ <CACGkMEsOWmVGA1RYTNZybmzkz53g5cYEkJeMK_9uuQu-ezZcqg@mail.gmail.com>
+ <af95c38d-fdca-aef0-55ae-bbb0baee6029@huawei.com>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ad0df086-3cb3-4cb5-b5c6-08db2141ea4f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Mar 2023 08:31:59.0429
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 4X6oPkTMBEg2IZgMeBeNLfDpojKH7DfB4Fn21ZXaIU0N+MS6Cj5VxSHPtC/2LOpUbC8xM0u9MVAM2OOALK9xKA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB6448
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <af95c38d-fdca-aef0-55ae-bbb0baee6029@huawei.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Liu, Yi L <yi.l.liu@intel.com>
-> Sent: Wednesday, March 8, 2023 9:29 PM
->=20
-> bind_iommufd() will generate an ID to represent this bond, it is needed
-> by userspace for further usage. devid is stored in vfio_device_file to
-> avoid passing devid pointer in multiple places.
+On Wed, Feb 15, 2023 at 01:15:55PM +0800, Longpeng (Mike, Cloud Infrastructure Service Product Dept.) wrote:
+> 
+> 
+> 在 2023/2/15 10:56, Jason Wang 写道:
+> > On Wed, Feb 15, 2023 at 10:49 AM Longpeng (Mike, Cloud Infrastructure
+> > Service Product Dept.) <longpeng2@huawei.com> wrote:
+> > > 
+> > > 
+> > > 
+> > > 在 2023/2/15 10:00, Jason Wang 写道:
+> > > > On Tue, Feb 14, 2023 at 2:28 PM Longpeng (Mike, Cloud Infrastructure
+> > > > Service Product Dept.) <longpeng2@huawei.com> wrote:
+> > > > > 
+> > > > > 
+> > > > > 
+> > > > > 在 2023/2/14 14:16, Jason Wang 写道:
+> > > > > > 
+> > > > > > 在 2023/1/31 22:53, Longpeng(Mike) 写道:
+> > > > > > > From: Longpeng <longpeng2@huawei.com>
+> > > > > > > 
+> > > > > > > We must cleanup all memory maps when closing the vdpa fds, otherwise
+> > > > > > > some critical resources (e.g. memory, iommu map) will leaked if the
+> > > > > > > userspace exits unexpectedly (e.g. kill -9).
+> > > > > > 
+> > > > > > 
+> > > > > > Sounds like a bug of the kernel, should we fix there?
+> > > > > > 
+> > > > > 
+> > > > > For example, the iommu map is setup when QEMU calls VHOST_IOTLB_UPDATE
+> > > > > ioctl and it'll be freed if QEMU calls VHOST_IOTLB_INVALIDATE ioctl.
+> > > > > 
+> > > > > So maybe we release these resources in vdpa framework in kernel is a
+> > > > > suitable choice?
+> > > > 
+> > > > I think I need understand what does "resources" mean here:
+> > > > 
+> > > > For iommu mapping, it should be freed by vhost_vdpa_free_domain() in
+> > > > vhost_vdpa_release()?
+> > > > 
+> > > 
+> > > Please consider the following lifecycle of the vdpa device:
+> > > 
+> > > 1. vhost_vdpa_open
+> > >       vhost_vdpa_alloc_domain
+> > > 
+> > > 2. vhost_vdpa_pa_map
+> > >       pin_user_pages
+> > >       vhost_vdpa_map
+> > >         iommu_map
+> > > 
+> > > 3. kill QEMU
+> > > 
+> > > 4. vhost_vdpa_release
+> > >       vhost_vdpa_free_domain
+> > > 
+> > > In this case, we have no opportunity to invoke unpin_user_pages or
+> > > iommu_unmap to free the memory.
+> > 
+> > We do:
+> > 
+> > vhost_vdpa_cleanup()
+> >      vhost_vdpa_remove_as()
+> >          vhost_vdpa_iotlb_unmap()
+> >              vhost_vdpa_pa_unmap()
+> >                  unpin_user_pages()
+> >                  vhost_vdpa_general_unmap()
+> >                      iommu_unmap()
+> > ?
+> > 
+> Oh, my codebase is linux-6.2-rc2 and the commit c070c1912a8 (vhost-vdpa: fix
+> an iotlb memory leak) already fixed this bug in linux-6.2-rc3.
 
-after removing vfio_iommufd_bind() then the caller can directly get
-the id when calling .bind_iommufd().
+OK I dropped this.
+
+> > Btw, it looks like we should call vhost_vdpa_free_domain() *after*
+> > vhost_vdpa_cleanup() otherwise it's a UAF?
+> > 
+> I think so, the v->domain is set to NULL in vhost_vdpa_free_domain(), it
+> seems would trigger null-pointer access in my case.
+> 
+> > Thanks
+> > 
+> > > 
+> > > > static int vhost_vdpa_release(struct inode *inode, struct file *filep)
+> > > > {
+> > > >           struct vhost_vdpa *v = filep->private_data;
+> > > >           struct vhost_dev *d = &v->vdev;
+> > > > 
+> > > >           mutex_lock(&d->mutex);
+> > > >           filep->private_data = NULL;
+> > > >           vhost_vdpa_clean_irq(v);
+> > > >           vhost_vdpa_reset(v);
+> > > >           vhost_dev_stop(&v->vdev);
+> > > >           vhost_vdpa_free_domain(v);
+> > > >           vhost_vdpa_config_put(v);
+> > > >           vhost_vdpa_cleanup(v);
+> > > >           mutex_unlock(&d->mutex);
+> > > > 
+> > > >           atomic_dec(&v->opened);
+> > > >           complete(&v->completion);
+> > > > 
+> > > >           return 0;
+> > > > }
+> > > > 
+> > > > > 
+> > > > > By the way, Jason, can you reproduce the problem in your machine?
+> > > > > 
+> > > > 
+> > > > Haven't got time in doing this but it should be the responsibility of
+> > > > the author to validate this anyhow.
+> > > > 
+> > > > Thanks
+> > > > 
+> > > > > > Thanks
+> > > > > > 
+> > > > > > 
+> > > > > > > 
+> > > > > > > Signed-off-by: Longpeng <longpeng2@huawei.com>
+> > > > > > > ---
+> > > > > > >     drivers/vhost/vdpa.c | 13 +++++++++++++
+> > > > > > >     1 file changed, 13 insertions(+)
+> > > > > > > 
+> > > > > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> > > > > > > index a527eeeac637..37477cffa5aa 100644
+> > > > > > > --- a/drivers/vhost/vdpa.c
+> > > > > > > +++ b/drivers/vhost/vdpa.c
+> > > > > > > @@ -823,6 +823,18 @@ static void vhost_vdpa_unmap(struct vhost_vdpa *v,
+> > > > > > >             vhost_vdpa_remove_as(v, asid);
+> > > > > > >     }
+> > > > > > > +static void vhost_vdpa_clean_map(struct vhost_vdpa *v)
+> > > > > > > +{
+> > > > > > > +    struct vhost_vdpa_as *as;
+> > > > > > > +    u32 asid;
+> > > > > > > +
+> > > > > > > +    for (asid = 0; asid < v->vdpa->nas; asid++) {
+> > > > > > > +        as = asid_to_as(v, asid);
+> > > > > > > +        if (as)
+> > > > > > > +            vhost_vdpa_unmap(v, &as->iotlb, 0ULL, 0ULL - 1);
+> > > > > > > +    }
+> > > > > > > +}
+> > > > > > > +
+> > > > > > >     static int vhost_vdpa_va_map(struct vhost_vdpa *v,
+> > > > > > >                      struct vhost_iotlb *iotlb,
+> > > > > > >                      u64 iova, u64 size, u64 uaddr, u32 perm)
+> > > > > > > @@ -1247,6 +1259,7 @@ static int vhost_vdpa_release(struct inode
+> > > > > > > *inode, struct file *filep)
+> > > > > > >         vhost_vdpa_clean_irq(v);
+> > > > > > >         vhost_vdpa_reset(v);
+> > > > > > >         vhost_dev_stop(&v->vdev);
+> > > > > > > +    vhost_vdpa_clean_map(v);
+> > > > > > >         vhost_vdpa_free_domain(v);
+> > > > > > >         vhost_vdpa_config_put(v);
+> > > > > > >         vhost_vdpa_cleanup(v);
+> > > > > > 
+> > > > > > .
+> > > > > 
+> > > > 
+> > > > .
+> > > 
+> > 
+> > .
+
