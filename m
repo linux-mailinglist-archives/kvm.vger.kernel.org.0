@@ -2,62 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 812BF6B3CDD
-	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 11:54:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EC6D06B3CDF
+	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 11:54:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230104AbjCJKyb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 05:54:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46472 "EHLO
+        id S230347AbjCJKyh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 05:54:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229981AbjCJKyQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Mar 2023 05:54:16 -0500
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6850E34B1;
-        Fri, 10 Mar 2023 02:54:06 -0800 (PST)
-Received: by mail-pl1-x62e.google.com with SMTP id i5so5149454pla.2;
-        Fri, 10 Mar 2023 02:54:06 -0800 (PST)
+        with ESMTP id S230095AbjCJKyT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Mar 2023 05:54:19 -0500
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B151CFFBC2;
+        Fri, 10 Mar 2023 02:54:08 -0800 (PST)
+Received: by mail-pl1-x634.google.com with SMTP id i3so5126162plg.6;
+        Fri, 10 Mar 2023 02:54:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678445646;
+        d=gmail.com; s=20210112; t=1678445648;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=r8Hr3QtIgBczYQFBm2I7OLr4pniDkf51aghVy6gKg5k=;
-        b=DEtHjBAdk+4Ao8ILVr17mBoLdOTmMBfX95K/sEkKsjA1mMSQkbhefJH838YtAqHSZF
-         lm2VOPMYBKHibdK5A1y/S/rO39ah85Mt1fK/TMYpV5OlXehyihRnKrgI7ljcWtc32+fQ
-         4oN135uBZPPgRJhnw76rGxH/9MtHM13G0LPWbmtspEqtjze349O62oVwF70O5tTo+HnF
-         O+ftDtFH+yR1odivSVCcX+yGzuSoq/3AIefgMypbKG1eXOZb8kc6cLV6ypYdFFtuSAJo
-         3r3VwfSQpLKYQRtuW6L8B8eu6iTFTwFNkgBpicGk0aWaIF2a0f4Wqgtb2ujc/h7ejHRR
-         00eg==
+        bh=G4nlGjUeIFU1ciO0H/3MLCy3YXN9ZRSdwoj+bqo8KVo=;
+        b=eHN8RTG6pL94ZOvOg1K0rftRqP+Sokxzh768c6Gr8ZOf5zmYPhBKN1Y7ifUe1/41Wt
+         8zucL4Mf7ts944+Yu6pwicQkNwHTREwBQe/6tTX74BpL6yP4bVtr/mRYK8BEjcO8yzuY
+         J0kWgEKbFVvA8BV7CF/Q2kMpsfgpPf/rHEah44zT4dBss4+fSt4/KJohWqEVgcc0HgNl
+         AHMfbXKF3moRvT+R2crip9h2ZUqzsuBKb++2reZo4K9DfOjgFvhiPO5pSMuk4zLuYUnS
+         Mek8uCbjc5TrtNbx+XnnNTon9Q+UT7HJnBCAypSnvLnNzOIkqIG7xW5DIyKgIFSs9RUY
+         QRbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678445646;
+        d=1e100.net; s=20210112; t=1678445648;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=r8Hr3QtIgBczYQFBm2I7OLr4pniDkf51aghVy6gKg5k=;
-        b=l18hLU7bmgThKa4cS+Ie+Fq7JkhkiIiBoy1KoC6VTHiHsoWj8DUAKYubwwhedbx14Z
-         69SXfK2s++wvEmoAa8OCopxxbY6Fu2CCxqamLSJNW6nnj4BQ9dCEx8g4gYcS6JbUmVhC
-         iu50+vFlPojuAtZA7uAhHETynp7DO1Z6NB/Kj1RiNxvV9ee3g1NSVjtqn2rOduq+LMok
-         xANF2e6jpcz7rQmTZSinE7GCWWA2FCT23gFDtdZ7SoD1BS9XIFzC39ZMoEiPXzQ0oBVd
-         QjRFY+T5HUvu+PMjaCNbMaQTJthim9lbcpU+mF0yP3DUVTqWN6oe+9A0Cc3Z6tBmaeTW
-         Y09g==
-X-Gm-Message-State: AO0yUKV5PD/Q/Z7tl/t8lHi1LXEVM41aqWSjUeL6YXVdJ3zsuU02K5Vq
-        eyA0y4628VyZ7I9Bznbv8as=
-X-Google-Smtp-Source: AK7set8tpau27kjKDretfW4tbQZtFglfLd0Zw3mMwaYjvCLpxZWX6npZ54l7yPHHme9tuAcnKnCgcQ==
-X-Received: by 2002:a17:903:283:b0:19e:b9f8:1fca with SMTP id j3-20020a170903028300b0019eb9f81fcamr20596720plr.10.1678445646322;
-        Fri, 10 Mar 2023 02:54:06 -0800 (PST)
+        bh=G4nlGjUeIFU1ciO0H/3MLCy3YXN9ZRSdwoj+bqo8KVo=;
+        b=iEltDBHwlI7UrdayJl/Zr1wBStWV+jM4maJHDroycgfLxKGGWDxRWLSyGRjwANFFKk
+         3PBBDvhDT+PDG1EFFSrNxGyM4zRS3atkvM9As1iyb2V2YnH0ba/qP8F4jb4Hc6u+uQ6q
+         9WUauonq3Ce1Lv77mga80w+OudU2k2KnY3p+7QhNxQ5/AyJAUaAHw+MUkoarrY0PAM3g
+         6PHabHhh5AWs0AE31/avRntRA3fe4CXDMIR+XSIGP21vz/sIJsoySuUyuM9OR4wwKzur
+         tq0tZyU9x5ffY36nsNP+krBeeT0tobsvIjA6v0N+Mlw8eVTP5EOIH0Mx2he1Y63TqI7V
+         7Hcw==
+X-Gm-Message-State: AO0yUKVWmhW85XtwCqHz95bsDxFr2MdJSuDnRjD4Z3eDMVEqo5Q7dT1e
+        sggGzMXoe8sYHuhIi691OsrkjYPZ0AohHsu7MQ8=
+X-Google-Smtp-Source: AK7set/EtmriIfUFXfBKPHBSYv6Fhro0WivjxJFQkAz5PClTwyTbZAT3rX3m3TtVI9sVvYJi8n4yZA==
+X-Received: by 2002:a17:902:da90:b0:19c:e405:4446 with SMTP id j16-20020a170902da9000b0019ce4054446mr29539447plx.30.1678445648178;
+        Fri, 10 Mar 2023 02:54:08 -0800 (PST)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id ks3-20020a170903084300b0019cbabf127dsm1174167plb.182.2023.03.10.02.54.04
+        by smtp.gmail.com with ESMTPSA id ks3-20020a170903084300b0019cbabf127dsm1174167plb.182.2023.03.10.02.54.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Mar 2023 02:54:06 -0800 (PST)
+        Fri, 10 Mar 2023 02:54:07 -0800 (PST)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Ravi Bangoria <ravi.bangoria@amd.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 1/5] KVM: x86/pmu: Emulate CTR overflow directly in kvm_pmu_handle_event()
-Date:   Fri, 10 Mar 2023 18:53:42 +0800
-Message-Id: <20230310105346.12302-2-likexu@tencent.com>
+Subject: [PATCH 2/5] KVM: x86/pmu: Add a helper to check if pmc has PEBS mode enabled
+Date:   Fri, 10 Mar 2023 18:53:43 +0800
+Message-Id: <20230310105346.12302-3-likexu@tencent.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230310105346.12302-1-likexu@tencent.com>
 References: <20230310105346.12302-1-likexu@tencent.com>
@@ -75,58 +75,56 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-More and more vPMU emulations are deferred to kvm_pmu_handle_event()
-as it reduces the overhead of repeated execution. The reprogram_counter()
-is only responsible for creating the required perf_event, and naturally
-doesn't include the counter overflow part from emulated instruction events.
-
-Prior to this change, the assignment of pmc->prev_counter always occurred
-after pmc was enabled, and to keep the same semantics, pmc->prev_counter
-always needed to be reset after it has taken effect.
+Add a helper to check if pmc has PEBS mode enabled so that more new
+code may reuse this part and opportunistically drop a pmu reference.
 
 No functional change intended.
 
 Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- arch/x86/kvm/pmu.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ arch/x86/kvm/pmu.c | 3 +--
+ arch/x86/kvm/pmu.h | 7 +++++++
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index a1a79b5f49d7..d1c89a6625a0 100644
+index d1c89a6625a0..01a6b7ffa9b1 100644
 --- a/arch/x86/kvm/pmu.c
 +++ b/arch/x86/kvm/pmu.c
-@@ -418,9 +418,6 @@ static void reprogram_counter(struct kvm_pmc *pmc)
- 	if (!event_is_allowed(pmc))
- 		goto reprogram_complete;
+@@ -191,7 +191,6 @@ static int pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type, u64 config,
+ 				 bool exclude_user, bool exclude_kernel,
+ 				 bool intr)
+ {
+-	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
+ 	struct perf_event *event;
+ 	struct perf_event_attr attr = {
+ 		.type = type,
+@@ -203,7 +202,7 @@ static int pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type, u64 config,
+ 		.exclude_kernel = exclude_kernel,
+ 		.config = config,
+ 	};
+-	bool pebs = test_bit(pmc->idx, (unsigned long *)&pmu->pebs_enable);
++	bool pebs = pebs_is_enabled(pmc);
  
--	if (pmc->counter < pmc->prev_counter)
--		__kvm_perf_overflow(pmc, false);
--
- 	if (eventsel & ARCH_PERFMON_EVENTSEL_PIN_CONTROL)
- 		printk_once("kvm pmu: pin control bit is ignored\n");
+ 	attr.sample_period = get_sample_period(pmc, pmc->counter);
  
-@@ -458,6 +455,13 @@ static void reprogram_counter(struct kvm_pmc *pmc)
- 
- reprogram_complete:
- 	clear_bit(pmc->idx, (unsigned long *)&pmc_to_pmu(pmc)->reprogram_pmi);
-+}
-+
-+static inline void kvm_pmu_handle_pmc_overflow(struct kvm_pmc *pmc)
-+{
-+	if (pmc->counter < pmc->prev_counter)
-+		__kvm_perf_overflow(pmc, false);
-+
- 	pmc->prev_counter = 0;
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index cff0651b030b..db4262fe8814 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -189,6 +189,13 @@ static inline void kvm_pmu_request_counter_reprogram(struct kvm_pmc *pmc)
+ 	kvm_make_request(KVM_REQ_PMU, pmc->vcpu);
  }
  
-@@ -475,6 +479,7 @@ void kvm_pmu_handle_event(struct kvm_vcpu *vcpu)
- 		}
- 
- 		reprogram_counter(pmc);
-+		kvm_pmu_handle_pmc_overflow(pmc);
- 	}
- 
- 	/*
++static inline bool pebs_is_enabled(struct kvm_pmc *pmc)
++{
++	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
++
++	return test_bit(pmc->idx, (unsigned long *)&pmu->pebs_enable);
++}
++
+ void kvm_pmu_deliver_pmi(struct kvm_vcpu *vcpu);
+ void kvm_pmu_handle_event(struct kvm_vcpu *vcpu);
+ int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned pmc, u64 *data);
 -- 
 2.39.2
 
