@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F5DE6B4DBE
-	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 17:57:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 77DC76B4CBC
+	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 17:23:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229639AbjCJQ5f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 11:57:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54980 "EHLO
+        id S231639AbjCJQXn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 11:23:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230397AbjCJQ5L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Mar 2023 11:57:11 -0500
+        with ESMTP id S230181AbjCJQXV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Mar 2023 11:23:21 -0500
 Received: from imap5.colo.codethink.co.uk (imap5.colo.codethink.co.uk [78.40.148.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06F8E136FCB
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 08:54:57 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 951AEFAFBD
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 08:19:14 -0800 (PST)
 Received: from [167.98.27.226] (helo=lawrence-thinkpad.office.codethink.co.uk)
         by imap5.colo.codethink.co.uk with esmtpsa  (Exim 4.94.2 #2 (Debian))
-        id 1pafDs-00H4ad-F4; Fri, 10 Mar 2023 16:04:00 +0000
+        id 1pafDs-00H4ad-Nj; Fri, 10 Mar 2023 16:04:00 +0000
 From:   Lawrence Hunter <lawrence.hunter@codethink.co.uk>
 To:     qemu-devel@nongnu.org
 Cc:     dickon.hood@codethink.co.uk, nazar.kazakov@codethink.co.uk,
@@ -25,9 +25,9 @@ Cc:     dickon.hood@codethink.co.uk, nazar.kazakov@codethink.co.uk,
         bin.meng@windriver.com, pbonzini@redhat.com,
         philipp.tomsich@vrull.eu, kvm@vger.kernel.org,
         Max Chou <max.chou@sifive.com>
-Subject: [PATCH 41/45] crypto: Create sm4_subword
-Date:   Fri, 10 Mar 2023 16:03:42 +0000
-Message-Id: <20230310160346.1193597-42-lawrence.hunter@codethink.co.uk>
+Subject: [PATCH 42/45] crypto: Add SM4 constant parameter CK
+Date:   Fri, 10 Mar 2023 16:03:43 +0000
+Message-Id: <20230310160346.1193597-43-lawrence.hunter@codethink.co.uk>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230310160346.1193597-1-lawrence.hunter@codethink.co.uk>
 References: <20230310160346.1193597-1-lawrence.hunter@codethink.co.uk>
@@ -43,60 +43,43 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Max Chou <max.chou@sifive.com>
 
-    - Share sm4_subword between different targets.
-
 Signed-off-by: Max Chou <max.chou@sifive.com>
 Reviewed-by: Frank Chang <frank.chang@sifive.com>
 ---
- include/crypto/sm4.h           |  8 ++++++++
- target/arm/tcg/crypto_helper.c | 10 ++--------
- 2 files changed, 10 insertions(+), 8 deletions(-)
+ crypto/sm4.c         | 10 ++++++++++
+ include/crypto/sm4.h |  1 +
+ 2 files changed, 11 insertions(+)
 
+diff --git a/crypto/sm4.c b/crypto/sm4.c
+index 9f0cd452c7..2987306cf7 100644
+--- a/crypto/sm4.c
++++ b/crypto/sm4.c
+@@ -47,3 +47,13 @@ uint8_t const sm4_sbox[] = {
+     0x79, 0xee, 0x5f, 0x3e, 0xd7, 0xcb, 0x39, 0x48,
+ };
+ 
++uint32_t const sm4_ck[] = {
++    0x00070e15, 0x1c232a31, 0x383f464d, 0x545b6269,
++    0x70777e85, 0x8c939aa1, 0xa8afb6bd, 0xc4cbd2d9,
++    0xe0e7eef5, 0xfc030a11, 0x181f262d, 0x343b4249,
++    0x50575e65, 0x6c737a81, 0x888f969d, 0xa4abb2b9,
++    0xc0c7ced5, 0xdce3eaf1, 0xf8ff060d, 0x141b2229,
++    0x30373e45, 0x4c535a61, 0x686f767d, 0x848b9299,
++    0xa0a7aeb5, 0xbcc3cad1, 0xd8dfe6ed, 0xf4fb0209,
++    0x10171e25, 0x2c333a41, 0x484f565d, 0x646b7279
++};
 diff --git a/include/crypto/sm4.h b/include/crypto/sm4.h
-index 9bd3ebc62e..de8245d8a7 100644
+index de8245d8a7..382b26d922 100644
 --- a/include/crypto/sm4.h
 +++ b/include/crypto/sm4.h
-@@ -3,4 +3,12 @@
+@@ -2,6 +2,7 @@
+ #define QEMU_SM4_H
  
  extern const uint8_t sm4_sbox[256];
++extern const uint32_t sm4_ck[32];
  
-+static inline uint32_t sm4_subword(uint32_t word)
-+{
-+    return sm4_sbox[word & 0xff] |
-+           sm4_sbox[(word >> 8) & 0xff] << 8 |
-+           sm4_sbox[(word >> 16) & 0xff] << 16 |
-+           sm4_sbox[(word >> 24) & 0xff] << 24;
-+}
-+
- #endif
-diff --git a/target/arm/tcg/crypto_helper.c b/target/arm/tcg/crypto_helper.c
-index d28690321f..58e6c4f779 100644
---- a/target/arm/tcg/crypto_helper.c
-+++ b/target/arm/tcg/crypto_helper.c
-@@ -707,10 +707,7 @@ static void do_crypto_sm4e(uint64_t *rd, uint64_t *rn, uint64_t *rm)
-             CR_ST_WORD(d, (i + 3) % 4) ^
-             CR_ST_WORD(n, i);
- 
--        t = sm4_sbox[t & 0xff] |
--            sm4_sbox[(t >> 8) & 0xff] << 8 |
--            sm4_sbox[(t >> 16) & 0xff] << 16 |
--            sm4_sbox[(t >> 24) & 0xff] << 24;
-+        t = sm4_subword(t);
- 
-         CR_ST_WORD(d, i) ^= t ^ rol32(t, 2) ^ rol32(t, 10) ^ rol32(t, 18) ^
-                             rol32(t, 24);
-@@ -744,10 +741,7 @@ static void do_crypto_sm4ekey(uint64_t *rd, uint64_t *rn, uint64_t *rm)
-             CR_ST_WORD(d, (i + 3) % 4) ^
-             CR_ST_WORD(m, i);
- 
--        t = sm4_sbox[t & 0xff] |
--            sm4_sbox[(t >> 8) & 0xff] << 8 |
--            sm4_sbox[(t >> 16) & 0xff] << 16 |
--            sm4_sbox[(t >> 24) & 0xff] << 24;
-+        t = sm4_subword(t);
- 
-         CR_ST_WORD(d, i) ^= t ^ rol32(t, 13) ^ rol32(t, 23);
-     }
+ static inline uint32_t sm4_subword(uint32_t word)
+ {
 -- 
 2.39.2
 
