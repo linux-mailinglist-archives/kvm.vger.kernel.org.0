@@ -2,58 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 880B96B5313
-	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 22:44:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D90056B5316
+	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 22:44:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231439AbjCJVom (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 16:44:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57930 "EHLO
+        id S232013AbjCJVoo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 16:44:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231895AbjCJVoJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Mar 2023 16:44:09 -0500
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 497C66A1D9
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 13:43:19 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id k17-20020a170902d59100b0019abcf45d75so3398101plh.8
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 13:43:19 -0800 (PST)
+        with ESMTP id S231904AbjCJVoL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Mar 2023 16:44:11 -0500
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 189087D554
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 13:43:21 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id q1-20020a170902dac100b0019f1e3ea83dso416524plx.4
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 13:43:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678484584;
+        d=google.com; s=20210112; t=1678484586;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=R1zMC0FqfyEV/0S9ZnbLP+wjU2iwXROZi5JXQooIbHQ=;
-        b=qFNLiBFLLwtMgF+IeChjoCJa+ve1zT5ko/h9MJUHy8G8CX+5NcXD0Y6sTpwQKG+qXP
-         4NqQn4eVqEyN1HTU7GFiP0F/jBTXTePyXlzK+IWl2IQ6EGzCrtkqnHUUDpWgjSChI0sf
-         lafMTJDPi9IKPx1rvVse3jbOarLoqHrFYV+QEY0OQj5LEG8F18DItVyjpN5xcfAI6RCg
-         lb1AYL8iUu/vqeb6TvGOPRXMRk1NMUUnwF4PPQrqWcmwlrGnqd2UMjgaFilM2hI2dQIa
-         kAQQa4bHO4nfqHbxjuO1rm1hp/ImvvQqskELGWC3DgLpv86gtnF7tdIaG22ZkkjAJjRe
-         2QFA==
+        bh=9q/d7g9qox1x40p0EhyhFdiJHeiHo6UfgDgcUMY2me0=;
+        b=S+PLcRgF3wy1MWeNCthYcvbQ8p4zb1869uJGzKPqf8IHd47ghO2mn5LrvcqpZ7PChJ
+         O8ClBe5JTfp9ZzVAdvjjPyTHmpLw5H/P36z9EqCJ97mX3SvEf6t+pZsjn+zSRW8fcfDS
+         Gg7lVgXuJ+Y6Hze0ASXWtX4lj0pA0Ifa+Sq8cq5zGhPCEMb8wB2uJeQsXoW+g1/g9uBV
+         DmT8vsmv5UZFoj3oWqFu8yIUW1ro+zKTDvLvPFiYJSwJ2xlk9FgfRWbvsn40KM92UvCt
+         N/oy/CZtNllQNQjX1j7F/ZeD5wJy16dR6F4GaGAKIdyvlNql+cGt3T0/l0Icy7z23zig
+         WEsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678484584;
+        d=1e100.net; s=20210112; t=1678484586;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=R1zMC0FqfyEV/0S9ZnbLP+wjU2iwXROZi5JXQooIbHQ=;
-        b=jOQMCsaE6f51r4f/gm++L4LkFZJ97Qme3OyEXQF7T/Du8TWMLGoQGDgyBfjVz5uLB9
-         psqTlQb/ji2KSVfhs/THmqsLz2PfpOzhi9FuKxS6cGTpAY7YRT8HQWk4tr+ds6SP3A4K
-         n6xwFd2KbXTOG3/SfsUMIuqyeV9N3ZCQl1B8N9jcrqeffLUpjDQdlMrjKcXuJsQn0+kl
-         UAxA5iM2Guad2k+vmpt5r/Ia07yqc9EYZLQbfhrHNqcoWQqE+WFBvpp0F1u1K0fkYyyq
-         mfSeywCvNZYeGo++5+6T3LCgYNmRu2DwJlTDy07zbgGjGQgiMQv7ai72ti2fIuLeRTs0
-         yBVg==
-X-Gm-Message-State: AO0yUKUkddTEaQzJtkEPJ++xcOv29lUz/NmeMIaJwR9K87S9GniT5Z1b
-        IM4Q/7bwqGjfO8fAvz+k7QIAxDBf5j4=
-X-Google-Smtp-Source: AK7set8TE4zXGBqQkBmFUJYlcxB6YWIGW3QIa6wDkwV6iROjJa0Me5urReLF/uWyEXu0xpfbwbHaICFKLXE=
+        bh=9q/d7g9qox1x40p0EhyhFdiJHeiHo6UfgDgcUMY2me0=;
+        b=MNlP/wTG46GBiCIreYjxRmM6GyVSRM4V08TbTbr/lYnteDKnOx7ge8yCPB28plwfl0
+         qHu60H5D9wGxgijJju0/xLoG8Clgl3j3VbuN6WTrFBF7oZwfjQvs0NrOE0l6Lx47VWlr
+         BBRH4htZBQy404I2T4t8cXVPDUGm1gzwVlxiDg+EdfdelDpLD2VblvVqpXsSt0HXXd/J
+         uv0YGApyBQ8mM53ioty07ZW+/Ab5GUnaS8do6vYc8Ea0AmRmZjM12PuEAoTRcQjsamSX
+         Dc5A/jfvshjVeVNSkRq7CGbcp3yZxIFGHMGJ6Z/qqoOWuR/fkiC0WBr4zw3gzWflgrMF
+         xhow==
+X-Gm-Message-State: AO0yUKW9RebwehPaRFbcwcF/ygBWqKnnFURqJoOc0nkq7INW3vCdQG4S
+        6TolNufL/vyLW9zi9ZAsQD+2SiJRxi8=
+X-Google-Smtp-Source: AK7set9eBDlBdJkd/u8qVUijL7wqSOFyJWmNtSA05Z5YfjfZdOvP3ULboyA+bUhFSKPyqCoOOkv4QCMEqYI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a62:d14a:0:b0:592:5eb2:84ea with SMTP id
- t10-20020a62d14a000000b005925eb284eamr10759214pfl.4.1678484584488; Fri, 10
- Mar 2023 13:43:04 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:2dcd:b0:237:64dc:5acd with SMTP id
+ q13-20020a17090a2dcd00b0023764dc5acdmr10102509pjm.7.1678484586406; Fri, 10
+ Mar 2023 13:43:06 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 10 Mar 2023 13:42:28 -0800
+Date:   Fri, 10 Mar 2023 13:42:29 -0800
 In-Reply-To: <20230310214232.806108-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230310214232.806108-1-seanjc@google.com>
 X-Mailer: git-send-email 2.40.0.rc1.284.g88254d51c5-goog
-Message-ID: <20230310214232.806108-15-seanjc@google.com>
-Subject: [PATCH v2 14/18] KVM: SVM: Check that the current CPU supports SVM in kvm_is_svm_supported()
+Message-ID: <20230310214232.806108-16-seanjc@google.com>
+Subject: [PATCH v2 15/18] KVM: VMX: Ensure CPU is stable when probing basic
+ VMX support
 From:   Sean Christopherson <seanjc@google.com>
 To:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -74,76 +75,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Check "this" CPU instead of the boot CPU when querying SVM support so that
-the per-CPU checks done during hardware enabling actually function as
-intended, i.e. will detect issues where SVM isn't support on all CPUs.
+Disable migration when probing VMX support during module load to ensure
+the CPU is stable, mostly to match similar SVM logic, where allowing
+migration effective requires deliberately writing buggy code.  As a bonus,
+KVM won't report the wrong CPU to userspace if VMX is unsupported, but in
+practice that is a very, very minor bonus as the only way that reporting
+the wrong CPU would actually matter is if hardware is broken or if the
+system is misconfigured, i.e. if KVM gets migrated from a CPU that _does_
+support VMX to a CPU that does _not_ support VMX.
 
-Disable migration for the use from svm_init() mostly so that the standard
-accessors for the per-CPU data can be used without getting yelled at by
-CONFIG_DEBUG_PREEMPT=y sanity checks.  Preventing the "disabled by BIOS"
-error message from reporting the wrong CPU is largely a bonus, as ensuring
-a stable CPU during module load is a non-goal for KVM.
-
-Link: https://lore.kernel.org/all/ZAdxNgv0M6P63odE@google.com
-Cc: Kai Huang <kai.huang@intel.com>
-Cc: Chao Gao <chao.gao@intel.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/svm.c | 25 +++++++++++++++++++------
- 1 file changed, 19 insertions(+), 6 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 2934f185960d..f04b61c3d9d8 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -520,18 +520,20 @@ static void svm_init_osvw(struct kvm_vcpu *vcpu)
- 		vcpu->arch.osvw.status |= 1;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 158853ab0d1b..374e3ddbd476 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -2766,9 +2766,9 @@ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+ 	return 0;
  }
  
--static bool kvm_is_svm_supported(void)
-+static bool __kvm_is_svm_supported(void)
+-static bool kvm_is_vmx_supported(void)
++static bool __kvm_is_vmx_supported(void)
  {
 -	int cpu = raw_smp_processor_id();
 +	int cpu = smp_processor_id();
-+	struct cpuinfo_x86 *c = &cpu_data(cpu);
-+
- 	u64 vm_cr;
  
--	if (boot_cpu_data.x86_vendor != X86_VENDOR_AMD &&
--	    boot_cpu_data.x86_vendor != X86_VENDOR_HYGON) {
-+	if (c->x86_vendor != X86_VENDOR_AMD &&
-+	    c->x86_vendor != X86_VENDOR_HYGON) {
- 		pr_err("CPU %d isn't AMD or Hygon\n", cpu);
- 		return false;
- 	}
- 
--	if (!boot_cpu_has(X86_FEATURE_SVM)) {
-+	if (!cpu_has(c, X86_FEATURE_SVM)) {
- 		pr_err("SVM not supported by CPU %d\n", cpu);
- 		return false;
- 	}
-@@ -550,9 +552,20 @@ static bool kvm_is_svm_supported(void)
+ 	if (!(cpuid_ecx(1) & feature_bit(VMX))) {
+ 		pr_err("VMX not supported by CPU %d\n", cpu);
+@@ -2784,13 +2784,24 @@ static bool kvm_is_vmx_supported(void)
  	return true;
  }
  
-+static bool kvm_is_svm_supported(void)
++static bool kvm_is_vmx_supported(void)
 +{
 +	bool supported;
 +
 +	migrate_disable();
-+	supported = __kvm_is_svm_supported();
++	supported = __kvm_is_vmx_supported();
 +	migrate_enable();
 +
 +	return supported;
 +}
 +
- static int svm_check_processor_compat(void)
+ static int vmx_check_processor_compat(void)
  {
--	if (!kvm_is_svm_supported())
-+	if (!__kvm_is_svm_supported())
+ 	int cpu = raw_smp_processor_id();
+ 	struct vmcs_config vmcs_conf;
+ 	struct vmx_capability vmx_cap;
+ 
+-	if (!kvm_is_vmx_supported())
++	if (!__kvm_is_vmx_supported())
  		return -EIO;
  
- 	return 0;
+ 	if (setup_vmcs_config(&vmcs_conf, &vmx_cap) < 0) {
 -- 
 2.40.0.rc1.284.g88254d51c5-goog
 
