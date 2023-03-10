@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 81A346B4BF9
-	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 17:06:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C42E36B4C05
+	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 17:06:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230290AbjCJQGW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 11:06:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56974 "EHLO
+        id S231363AbjCJQGp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 11:06:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230287AbjCJQFx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Mar 2023 11:05:53 -0500
+        with ESMTP id S230382AbjCJQF6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Mar 2023 11:05:58 -0500
 Received: from imap5.colo.codethink.co.uk (imap5.colo.codethink.co.uk [78.40.148.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EB0093E38
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 08:04:03 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A8105D77E
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 08:04:07 -0800 (PST)
 Received: from [167.98.27.226] (helo=lawrence-thinkpad.office.codethink.co.uk)
         by imap5.colo.codethink.co.uk with esmtpsa  (Exim 4.94.2 #2 (Debian))
-        id 1pafDj-00H4ad-82; Fri, 10 Mar 2023 16:03:51 +0000
+        id 1pafDj-00H4ad-Gj; Fri, 10 Mar 2023 16:03:51 +0000
 From:   Lawrence Hunter <lawrence.hunter@codethink.co.uk>
 To:     qemu-devel@nongnu.org
 Cc:     dickon.hood@codethink.co.uk, nazar.kazakov@codethink.co.uk,
@@ -24,121 +24,117 @@ Cc:     dickon.hood@codethink.co.uk, nazar.kazakov@codethink.co.uk,
         palmer@dabbelt.com, alistair.francis@wdc.com,
         bin.meng@windriver.com, pbonzini@redhat.com,
         philipp.tomsich@vrull.eu, kvm@vger.kernel.org
-Subject: [PATCH 08/45] target/riscv: Refactor some of the generic vector functionality
-Date:   Fri, 10 Mar 2023 16:03:09 +0000
-Message-Id: <20230310160346.1193597-9-lawrence.hunter@codethink.co.uk>
+Subject: [PATCH 09/45] qemu/bitops.h: Limit rotate amounts
+Date:   Fri, 10 Mar 2023 16:03:10 +0000
+Message-Id: <20230310160346.1193597-10-lawrence.hunter@codethink.co.uk>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230310160346.1193597-1-lawrence.hunter@codethink.co.uk>
 References: <20230310160346.1193597-1-lawrence.hunter@codethink.co.uk>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
-        SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Nazar Kazakov <nazar.kazakov@codethink.co.uk>
+From: Dickon Hood <dickon.hood@codethink.co.uk>
 
-Moves the checks out of `do_opiv{v,x,i}_gvec{,_shift}` functions
-and into the corresponding macros. This enables the functions to be
-reused in proceeding commit without check duplication.
+Rotates have been fixed up to only allow for reasonable rotate amounts
+(ie, no rotates >7 on an 8b value etc.)  This fixes a problem with riscv
+vector rotate instructions.
 
-Signed-off-by: Nazar Kazakov <nazar.kazakov@codethink.co.uk>
+Signed-off-by: Dickon Hood <dickon.hood@codethink.co.uk>
 ---
- target/riscv/insn_trans/trans_rvv.c.inc | 28 +++++++++++--------------
- 1 file changed, 12 insertions(+), 16 deletions(-)
+ include/qemu/bitops.h | 24 ++++++++++++++++--------
+ 1 file changed, 16 insertions(+), 8 deletions(-)
 
-diff --git a/target/riscv/insn_trans/trans_rvv.c.inc b/target/riscv/insn_trans/trans_rvv.c.inc
-index 4106bd6994..bb5e2c5407 100644
---- a/target/riscv/insn_trans/trans_rvv.c.inc
-+++ b/target/riscv/insn_trans/trans_rvv.c.inc
-@@ -1187,9 +1187,6 @@ do_opivv_gvec(DisasContext *s, arg_rmrr *a, GVecGen3Fn *gvec_fn,
-               gen_helper_gvec_4_ptr *fn)
+diff --git a/include/qemu/bitops.h b/include/qemu/bitops.h
+index 03213ce952..c443995b3b 100644
+--- a/include/qemu/bitops.h
++++ b/include/qemu/bitops.h
+@@ -218,7 +218,8 @@ static inline unsigned long find_first_zero_bit(const unsigned long *addr,
+  */
+ static inline uint8_t rol8(uint8_t word, unsigned int shift)
  {
-     TCGLabel *over = gen_new_label();
--    if (!opivv_check(s, a)) {
--        return false;
--    }
- 
-     tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
-     tcg_gen_brcond_tl(TCG_COND_GEU, cpu_vstart, cpu_vl, over);
-@@ -1223,6 +1220,9 @@ static bool trans_##NAME(DisasContext *s, arg_rmrr *a)             \
-         gen_helper_##NAME##_b, gen_helper_##NAME##_h,              \
-         gen_helper_##NAME##_w, gen_helper_##NAME##_d,              \
-     };                                                             \
-+    if (!opivv_check(s, a)) {                                      \
-+        return false;                                              \
-+    }                                                              \
-     return do_opivv_gvec(s, a, tcg_gen_gvec_##SUF, fns[s->sew]);   \
+-    return (word << shift) | (word >> ((8 - shift) & 7));
++    shift &= 7;
++    return (word << shift) | (word >> (8 - shift));
  }
  
-@@ -1282,10 +1282,6 @@ static inline bool
- do_opivx_gvec(DisasContext *s, arg_rmrr *a, GVecGen2sFn *gvec_fn,
-               gen_helper_opivx *fn)
+ /**
+@@ -228,7 +229,8 @@ static inline uint8_t rol8(uint8_t word, unsigned int shift)
+  */
+ static inline uint8_t ror8(uint8_t word, unsigned int shift)
  {
--    if (!opivx_check(s, a)) {
--        return false;
--    }
--
-     if (a->vm && s->vl_eq_vlmax && !(s->vta && s->lmul < 0)) {
-         TCGv_i64 src1 = tcg_temp_new_i64();
- 
-@@ -1307,6 +1303,9 @@ static bool trans_##NAME(DisasContext *s, arg_rmrr *a)             \
-         gen_helper_##NAME##_b, gen_helper_##NAME##_h,              \
-         gen_helper_##NAME##_w, gen_helper_##NAME##_d,              \
-     };                                                             \
-+    if (!opivx_check(s, a)) {                                      \
-+        return false;                                              \
-+    }                                                              \
-     return do_opivx_gvec(s, a, tcg_gen_gvec_##SUF, fns[s->sew]);   \
+-    return (word >> shift) | (word << ((8 - shift) & 7));
++    shift &= 7;
++    return (word >> shift) | (word << (8 - shift));
  }
  
-@@ -1439,10 +1438,6 @@ static inline bool
- do_opivi_gvec(DisasContext *s, arg_rmrr *a, GVecGen2iFn *gvec_fn,
-               gen_helper_opivx *fn, imm_mode_t imm_mode)
+ /**
+@@ -238,7 +240,8 @@ static inline uint8_t ror8(uint8_t word, unsigned int shift)
+  */
+ static inline uint16_t rol16(uint16_t word, unsigned int shift)
  {
--    if (!opivx_check(s, a)) {
--        return false;
--    }
--
-     if (a->vm && s->vl_eq_vlmax && !(s->vta && s->lmul < 0)) {
-         gvec_fn(s->sew, vreg_ofs(s, a->rd), vreg_ofs(s, a->rs2),
-                 extract_imm(s, a->rs1, imm_mode), MAXSZ(s), MAXSZ(s));
-@@ -1460,6 +1455,9 @@ static bool trans_##NAME(DisasContext *s, arg_rmrr *a)             \
-         gen_helper_##OPIVX##_b, gen_helper_##OPIVX##_h,            \
-         gen_helper_##OPIVX##_w, gen_helper_##OPIVX##_d,            \
-     };                                                             \
-+    if (!opivx_check(s, a)) {                                      \
-+        return false;                                              \
-+    }                                                              \
-     return do_opivi_gvec(s, a, tcg_gen_gvec_##SUF,                 \
-                          fns[s->sew], IMM_MODE);                   \
- }
-@@ -1785,10 +1783,6 @@ static inline bool
- do_opivx_gvec_shift(DisasContext *s, arg_rmrr *a, GVecGen2sFn32 *gvec_fn,
-                     gen_helper_opivx *fn)
- {
--    if (!opivx_check(s, a)) {
--        return false;
--    }
--
-     if (a->vm && s->vl_eq_vlmax && !(s->vta && s->lmul < 0)) {
-         TCGv_i32 src1 = tcg_temp_new_i32();
- 
-@@ -1810,7 +1804,9 @@ static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                    \
-         gen_helper_##NAME##_b, gen_helper_##NAME##_h,                     \
-         gen_helper_##NAME##_w, gen_helper_##NAME##_d,                     \
-     };                                                                    \
--                                                                          \
-+    if (!opivx_check(s, a)) {                                             \
-+        return false;                                                     \
-+    }                                                                     \
-     return do_opivx_gvec_shift(s, a, tcg_gen_gvec_##SUF, fns[s->sew]);    \
+-    return (word << shift) | (word >> ((16 - shift) & 15));
++    shift &= 15;
++    return (word << shift) | (word >> (16 - shift));
  }
  
+ /**
+@@ -248,7 +251,8 @@ static inline uint16_t rol16(uint16_t word, unsigned int shift)
+  */
+ static inline uint16_t ror16(uint16_t word, unsigned int shift)
+ {
+-    return (word >> shift) | (word << ((16 - shift) & 15));
++    shift &= 15;
++    return (word >> shift) | (word << (16 - shift));
+ }
+ 
+ /**
+@@ -258,7 +262,8 @@ static inline uint16_t ror16(uint16_t word, unsigned int shift)
+  */
+ static inline uint32_t rol32(uint32_t word, unsigned int shift)
+ {
+-    return (word << shift) | (word >> ((32 - shift) & 31));
++    shift &= 31;
++    return (word << shift) | (word >> (32 - shift));
+ }
+ 
+ /**
+@@ -268,7 +273,8 @@ static inline uint32_t rol32(uint32_t word, unsigned int shift)
+  */
+ static inline uint32_t ror32(uint32_t word, unsigned int shift)
+ {
+-    return (word >> shift) | (word << ((32 - shift) & 31));
++    shift &= 31;
++    return (word >> shift) | (word << (32 - shift));
+ }
+ 
+ /**
+@@ -278,7 +284,8 @@ static inline uint32_t ror32(uint32_t word, unsigned int shift)
+  */
+ static inline uint64_t rol64(uint64_t word, unsigned int shift)
+ {
+-    return (word << shift) | (word >> ((64 - shift) & 63));
++    shift &= 63;
++    return (word << shift) | (word >> (64 - shift));
+ }
+ 
+ /**
+@@ -288,7 +295,8 @@ static inline uint64_t rol64(uint64_t word, unsigned int shift)
+  */
+ static inline uint64_t ror64(uint64_t word, unsigned int shift)
+ {
+-    return (word >> shift) | (word << ((64 - shift) & 63));
++    shift &= 63;
++    return (word >> shift) | (word << (64 - shift));
+ }
+ 
+ /**
 -- 
 2.39.2
 
