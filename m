@@ -2,139 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B84986B4CEB
-	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 17:28:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 24C316B4BF4
+	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 17:06:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229652AbjCJQ2F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 11:28:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47924 "EHLO
+        id S230493AbjCJQGI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 11:06:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53826 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231489AbjCJQ1q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Mar 2023 11:27:46 -0500
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C13C310D773;
-        Fri, 10 Mar 2023 08:23:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678465439; x=1710001439;
-  h=from:to:cc:subject:date:message-id;
-  bh=L//xlqufoDi3Y+BynOipec0y5DkvvSVKczMAsPP3L4Y=;
-  b=fQsa6kLS1tLs/ZZKbX++U2LJsaJ0FEp7treqWHclua1TXzlLt8ZDdjps
-   0OLq6Ci37wZAoacVzzszkqAUcnSnf6gh0492myKLbucQFR7OdK254Vxaa
-   9x2u9v3+wZW9kZ7nygt9HOVN4YhN+ukO8WNEFfwcf2bwCg1eKkQDeBxRd
-   j9s3qvZUFMN6J1woOLrl6C4R7FjLR79rJzzX/BMetHfsaIbc16q6Z8jSP
-   +Pd1itzf2igs6TFoU1TOIv5TCu4ZfnOaURfcpJNA30w7bkWKxQeSiHf9r
-   jGU/EOiJxFEKdvotqyIeTEIgDYydAxqdtNkOt75QMZ+tJESUkbKS8f//n
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10645"; a="338318320"
-X-IronPort-AV: E=Sophos;i="5.98,250,1673942400"; 
-   d="scan'208";a="338318320"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2023 08:23:48 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10645"; a="671138170"
-X-IronPort-AV: E=Sophos;i="5.98,250,1673942400"; 
-   d="scan'208";a="671138170"
-Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2023 08:23:46 -0800
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com,
-        Yan Zhao <yan.y.zhao@intel.com>
-Subject: [PATCH] KVM: VMX: fix lockdep warning on posted intr wakeup
-Date:   Fri, 10 Mar 2023 23:59:55 +0800
-Message-Id: <20230310155955.29652-1-yan.y.zhao@intel.com>
-X-Mailer: git-send-email 2.17.1
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S233562AbjCJQFh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Mar 2023 11:05:37 -0500
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D60D1C321;
+        Fri, 10 Mar 2023 08:03:08 -0800 (PST)
+Received: by mail-pf1-x42b.google.com with SMTP id z11so3941557pfh.4;
+        Fri, 10 Mar 2023 08:03:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1678464188;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FRM1CHPWj5Hky3ZAQSiDMG0dbAi4baYtTfySHDfx8JQ=;
+        b=ljyCo1ovyO4+NmdKbPBVy4fXHW8xT8V6loKZ6JQan/QuvbTRCFw2yvjt/2faboQLSq
+         zXc1drJ3GWX5MxohA/mPBRDSNEpLHGJ+6rzey+C9ctP352wiPIMJ5PIRwt+mVZ0X9zEI
+         jk92ORsjBgHRSlj8vPDnkmx/NKbJEEoHdFCpFlCtnPA7tDhLUflWQ5VGJYdpqQ0JjgXy
+         3tbHtWOlkPazMOSFdzc1PzZ8j8dbTJ/ZPlqVvJVqHqMP7iU+ABnxNn2araYmJAu+eZgy
+         y0PRfjFEh7p+K01r+kJ3vKWzUBNez7JafZRhGsrZ4PxXE4j7zI6f+siLa4otwvIhaabR
+         8qFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678464188;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=FRM1CHPWj5Hky3ZAQSiDMG0dbAi4baYtTfySHDfx8JQ=;
+        b=7Wwg5PTxJZEKuPW2aoT3qL8ZPYL0WgfruleuepyNQi07cT6P6OvG+eY5ncoRX5Jl3y
+         aVgE2b0LFgeeFjQsFFf/22jJluumw8MT3wl57L6ejRsQYARxMU8PVIXMQ6ZoXLotDaxo
+         9+R13bSiUOhaZKdO4+oI2iEyqQbxNSTQtMHfAZvZyFY7Wnl/PfBLmlPl4LlYrhTdUYhs
+         b7hF4qg8K6mu4QVBS393hdbqJhDXGZIF5QXmUGJJXCh6ccrxxZBd6PCEUqOs6U3/nUyG
+         lMh/jgc/002sjGkrQAgJxVzWM6jORxlR0foSLpRsKGnzNOhB+ESnxfwiMWtAcBEJRbTS
+         MI9A==
+X-Gm-Message-State: AO0yUKXxPV5DjRWj8y9YGQ/fd7OL67PE9X+DecYZMUKgatYEsPQIEqx3
+        4NC0ddOPGxuFxzo0+8TlUwk=
+X-Google-Smtp-Source: AK7set90MDVxHF11XNGI4ExxJV62tZ4zuLmeorOUCUEL9sc/WcgkKOmRrK4NOf/qurDPDoNfi06J0Q==
+X-Received: by 2002:a62:3205:0:b0:5dc:e03d:b95 with SMTP id y5-20020a623205000000b005dce03d0b95mr22015611pfy.12.1678464187698;
+        Fri, 10 Mar 2023 08:03:07 -0800 (PST)
+Received: from ?IPV6:2404:f801:0:5:8000::75b? ([2404:f801:9000:18:efec::75b])
+        by smtp.gmail.com with ESMTPSA id f17-20020aa78b11000000b00571cdbd0771sm9980pfd.102.2023.03.10.08.02.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 10 Mar 2023 08:03:07 -0800 (PST)
+Message-ID: <1e620e45-4ab6-ae2a-18f7-d0a5521c6c7f@gmail.com>
+Date:   Sat, 11 Mar 2023 00:02:55 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [RFC PATCH V3 16/16] x86/sev: Fix interrupt exit code paths from
+ #HV exception
+To:     "Gupta, Pankaj" <pankaj.gupta@amd.com>, luto@kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        seanjc@google.com, pbonzini@redhat.com, jgross@suse.com,
+        tiala@microsoft.com, kirill@shutemov.name,
+        jiangshan.ljs@antgroup.com, peterz@infradead.org,
+        ashish.kalra@amd.com, srutherford@google.com,
+        akpm@linux-foundation.org, anshuman.khandual@arm.com,
+        pawan.kumar.gupta@linux.intel.com, adrian.hunter@intel.com,
+        daniel.sneddon@linux.intel.com, alexander.shishkin@linux.intel.com,
+        sandipan.das@amd.com, ray.huang@amd.com, brijesh.singh@amd.com,
+        michael.roth@amd.com, thomas.lendacky@amd.com,
+        venu.busireddy@oracle.com, sterritt@google.com,
+        tony.luck@intel.com, samitolvanen@google.com, fenghua.yu@intel.com
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org
+References: <20230122024607.788454-1-ltykernel@gmail.com>
+ <20230122024607.788454-17-ltykernel@gmail.com>
+ <65f08b1e-ecae-7100-cdbe-79e07ade90e4@amd.com>
+From:   Tianyu Lan <ltykernel@gmail.com>
+In-Reply-To: <65f08b1e-ecae-7100-cdbe-79e07ade90e4@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use rcu list to break the possible circular locking dependency reported
-by lockdep.
+On 2/22/2023 12:44 AM, Gupta, Pankaj wrote:
+>> @@ -2529,3 +2537,25 @@ static int __init snp_init_platform_device(void)
+>>       return 0;
+>>   }
+>>   device_initcall(snp_init_platform_device);
+>> +
+>> +noinstr void irqentry_exit_hv_cond(struct pt_regs *regs, 
+>> irqentry_state_t state)
+>> +{
+> 
+> This code path is being called even for the guest without SNP. Ran
+> a SEV guest and guest crashed in this code path. Checking & returning
+> made guest (non SNP) to boot with some call traces. But this branch 
+> needs to be avoided for non-SNP guests and host as well.
+> 
 
-path 1, ``sysvec_kvm_posted_intr_wakeup_ipi()`` --> ``pi_wakeup_handler()``
-         -->  ``kvm_vcpu_wake_up()`` --> ``try_to_wake_up()``,
-         the lock sequence is
-         &per_cpu(wakeup_vcpus_on_cpu_lock, cpu) --> &p->pi_lock.
+Nice catch! I will fix it in the next version.
 
-path 2, ``schedule()`` --> ``kvm_sched_out()`` --> ``vmx_vcpu_put()`` -->
-        ``vmx_vcpu_pi_put()`` --> ``pi_enable_wakeup_handler()``,
-         the lock sequence is
-         &rq->__lock --> &per_cpu(wakeup_vcpus_on_cpu_lock, cpu).
-
-path 3, ``task_rq_lock()``,
-        the lock sequence is &p->pi_lock --> &rq->__lock
-
-lockdep report:
- Chain exists of:
-   &p->pi_lock --> &rq->__lock --> &per_cpu(wakeup_vcpus_on_cpu_lock, cpu)
-
-  Possible unsafe locking scenario:
-
-        CPU0                CPU1
-        ----                ----
-   lock(&per_cpu(wakeup_vcpus_on_cpu_lock, cpu));
-                            lock(&rq->__lock);
-                            lock(&per_cpu(wakeup_vcpus_on_cpu_lock, cpu));
-   lock(&p->pi_lock);
-
-  *** DEADLOCK ***
-
-Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
----
- arch/x86/kvm/vmx/posted_intr.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-index 94c38bea60e7..e3ffc45c0a7b 100644
---- a/arch/x86/kvm/vmx/posted_intr.c
-+++ b/arch/x86/kvm/vmx/posted_intr.c
-@@ -90,7 +90,7 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
- 	 */
- 	if (pi_desc->nv == POSTED_INTR_WAKEUP_VECTOR) {
- 		raw_spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
--		list_del(&vmx->pi_wakeup_list);
-+		list_del_rcu(&vmx->pi_wakeup_list);
- 		raw_spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
- 	}
- 
-@@ -153,7 +153,7 @@ static void pi_enable_wakeup_handler(struct kvm_vcpu *vcpu)
- 	local_irq_save(flags);
- 
- 	raw_spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
--	list_add_tail(&vmx->pi_wakeup_list,
-+	list_add_tail_rcu(&vmx->pi_wakeup_list,
- 		      &per_cpu(wakeup_vcpus_on_cpu, vcpu->cpu));
- 	raw_spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
- 
-@@ -219,16 +219,14 @@ void pi_wakeup_handler(void)
- {
- 	int cpu = smp_processor_id();
- 	struct list_head *wakeup_list = &per_cpu(wakeup_vcpus_on_cpu, cpu);
--	raw_spinlock_t *spinlock = &per_cpu(wakeup_vcpus_on_cpu_lock, cpu);
- 	struct vcpu_vmx *vmx;
- 
--	raw_spin_lock(spinlock);
--	list_for_each_entry(vmx, wakeup_list, pi_wakeup_list) {
--
-+	rcu_read_lock();
-+	list_for_each_entry_rcu(vmx, wakeup_list, pi_wakeup_list) {
- 		if (pi_test_on(&vmx->pi_desc))
- 			kvm_vcpu_wake_up(&vmx->vcpu);
- 	}
--	raw_spin_unlock(spinlock);
-+	rcu_read_unlock();
- }
- 
- void __init pi_init_cpu(int cpu)
-
-base-commit: 89400df96a7570b651404bbc3b7afe627c52a192
--- 
-2.17.1
-
+Thanks.
