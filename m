@@ -2,60 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B1E06B4D0B
-	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 17:31:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ECACF6B4DE3
+	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 18:02:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231191AbjCJQbL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 11:31:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56132 "EHLO
+        id S231487AbjCJRCV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 12:02:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230496AbjCJQax (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Mar 2023 11:30:53 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB87239CF6
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 08:27:17 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id q24-20020a17090a2e1800b00237c37964d4so4563771pjd.8
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 08:27:17 -0800 (PST)
+        with ESMTP id S231204AbjCJRB6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Mar 2023 12:01:58 -0500
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B616D8A5A
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 09:00:02 -0800 (PST)
+Received: by mail-pf1-x449.google.com with SMTP id a25-20020a056a001d1900b005e82b3dc9f4so3148192pfx.1
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 09:00:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678465637;
+        d=google.com; s=20210112; t=1678467602;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uDeQbGHE1F72EIZi0wu/BDKlKleRXz8RNdduMTKJMtc=;
-        b=JYIfc85H9Lqs5Pdr8vIXKG1AKs+TuV5fULINLbWzKYYKkQYQRIH7ztBbUQN9r+k7ap
-         LVNH+i+VAwi4kzO5lFhZcu+ZFoNhlfmOpLlB+2A8n8pH7wPNcifrk+93olyAVDHYgec0
-         ZbdLv/W4Ysko2Ef4WLBDEM/URxvCYucYoXCFvb+zKhQgKwGXoCipuf5eI1ZIKnnMbUjM
-         In4PrIiWmU+Yl+t+f0+MHfjZyfPB4UhmvxFGKo4YDcWRjPpG3xBAiE8g16YisbACplxU
-         0FKCYt2siqXdvixR/EE6w+oJQKcdMNd9fb4DZ+AG0O1VWfJYaouPaVy5MO4VmNjXZf1X
-         EVqA==
+        bh=96VhZad7fau15RxlhATOVUVG6AhXrzUQgEwbilYaxXk=;
+        b=PhqamPCq0kh+yF3ufPBTjFXe3496VSnG0W5rK2v0utOj9XkQbZD1dO5O+po+IeDBBL
+         PtlP4GZ1vwmQoDNXtsNXpwDkhw+2ZwJy/HIM6+EUPXQJ1zVbVP3LXkDsolaqMqs9lRgL
+         KLOnVcM2XZ1oQpobzY2gI35dLm7cfMD6nd5oVDOXhwKEx7p0PsMMOdiEvyDfjIjFtHuA
+         RPARCpCPP2qbwsTYq9uAnHcJjb9cv3oz/sn6ORVdrXaZVprrrp5lWAalEUV3lH2Ry2X/
+         xkXG/eXpnrbDEQbjVq6YRkr9uwKwFPPYvIX0WIs797BlnFl4N0kRkyHLT8BTvZSqto69
+         anow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678465637;
+        d=1e100.net; s=20210112; t=1678467602;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uDeQbGHE1F72EIZi0wu/BDKlKleRXz8RNdduMTKJMtc=;
-        b=SIml1sFLPTMynR6wxpXZ2kQ9r0HwqrgtZqzsaFLGyeZBYfn/Bp9SR62NSx1wsE6eJx
-         Ke6Miy/jO9S0Cfmd9IPycg/nvfZnXVaV62BNm55Oz+GfjPeeRp8KV4GEdKIO24FLTXBd
-         O0I+N97R4n1dFwP3h9V0h35UcrRPUYg/rN7BRVh3DK8BvCxMDoJPw6AVwW2rnw2LDt0X
-         ClVykx5AoNjE9uzu/dOgZ9r+TP9bp+OlV3LBvGD/EAs6Rg1YUX5I2MnDWmtYxYbudAzp
-         NnzsTzZGoeRdG+VHA3j5sUDXebGlUK2DgriUdgDyFm2rTB5cVt6OmYDu3j1T/2dEJZwJ
-         hREg==
-X-Gm-Message-State: AO0yUKXNj/DVV8Prz3MS9cv1THq2lp4rruFrO8VSHcWnscbOrAkkSmtR
-        mWMhGlv5YPrg8gQDbCPwcMsFERA9Umw=
-X-Google-Smtp-Source: AK7set+sWfpBka85c3Ee+LON7P7HkWKCZd8n0c88n6A/9K8HoirZ5r98uc4q2zZY3vTBxu+uTkUePh0Ht0E=
+        bh=96VhZad7fau15RxlhATOVUVG6AhXrzUQgEwbilYaxXk=;
+        b=kv9UrqUEJnRyk2HbKZxVsafc8D1FIJKkmwfcTM1oUOTZZ2dy/D2K8o/Kv2oo/Bbmn4
+         I7+tvuxpprJpjdztKZuyVCXv2tp9eqWkwSUGGA/awuYKPXBDH24GhAQJP4GPdwvxDkxJ
+         BTcGWCJprHuIGdbyhdH+iuOryR3NzcmnboEuXMP/L1pkIrwzLyKbvG9lEq/dMV1AoSFh
+         Xb4jjsbjn9H65YzJhqGvjmdq26C396Zt/kCKN99K4HOe+tpKK6hC6bdWXYMiNtc2XeV3
+         a+lrIOMc+hQy9f84RTwdJYRnNceJKKGkzMQnyKNLIcti4dBhAYO6nrrma0pFIaC9HDdi
+         v35w==
+X-Gm-Message-State: AO0yUKXT188CLAMSo1dCgwac7Stcyg7I1oBPfK/YtFY6xd3Row3+e8BS
+        IMuZ8tuE1VDczCqawlAPsSjlAsIXmvo=
+X-Google-Smtp-Source: AK7set9h7gaS3jxJCUMG+EcVAtd9dHw0FAmSFp99EKPwLsuL99BYlkQvtJ6TlNqsXjHaT4N6zQQEB0RgkKc=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:7242:0:b0:507:3e33:43e3 with SMTP id
- c2-20020a637242000000b005073e3343e3mr6533904pgn.7.1678465636766; Fri, 10 Mar
- 2023 08:27:16 -0800 (PST)
-Date:   Fri, 10 Mar 2023 08:27:15 -0800
-In-Reply-To: <20230310125718.1442088-4-robert.hu@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a17:90a:420f:b0:234:13d8:ed5b with SMTP id
+ o15-20020a17090a420f00b0023413d8ed5bmr9611955pjg.3.1678467602246; Fri, 10 Mar
+ 2023 09:00:02 -0800 (PST)
+Date:   Fri, 10 Mar 2023 09:00:00 -0800
+In-Reply-To: <20230310155955.29652-1-yan.y.zhao@intel.com>
 Mime-Version: 1.0
-References: <20230310125718.1442088-1-robert.hu@intel.com> <20230310125718.1442088-4-robert.hu@intel.com>
-Message-ID: <ZAtaY8ISOZyXB3V+@google.com>
-Subject: Re: [PATCH 3/3] KVM: VMX: Use the canonical interface to read
- CR4.UMIP bit
+References: <20230310155955.29652-1-yan.y.zhao@intel.com>
+Message-ID: <ZAtiEO/DST05GRRN@google.com>
+Subject: Re: [PATCH] KVM: VMX: fix lockdep warning on posted intr wakeup
 From:   Sean Christopherson <seanjc@google.com>
-To:     Robert Hoo <robert.hu@intel.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
-        robert.hoo.linux@gmail.com
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -67,29 +66,110 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 10, 2023, Robert Hoo wrote:
-> Use kvm_read_cr4_bits() rather than directly read vcpu->arch.cr4, now that
-> we have reg cache layer and defined this wrapper.
+On Fri, Mar 10, 2023, Yan Zhao wrote:
+> Use rcu list to break the possible circular locking dependency reported
+> by lockdep.
+> 
+> path 1, ``sysvec_kvm_posted_intr_wakeup_ipi()`` --> ``pi_wakeup_handler()``
+>          -->  ``kvm_vcpu_wake_up()`` --> ``try_to_wake_up()``,
+>          the lock sequence is
+>          &per_cpu(wakeup_vcpus_on_cpu_lock, cpu) --> &p->pi_lock.
 
-kvm_read_cr4_bits() predates this code by ~7 years.
+Heh, that's an unfortunate naming collision.  It took me a bit of staring to
+realize pi_lock is a scheduler lock, not a posted interrupt lock.
 
-> Although, effectively for CR4.UMIP, it's the same, at present, as it's not
-> guest owned, in case of future changes, here better to use the canonical
-> interface.
+> path 2, ``schedule()`` --> ``kvm_sched_out()`` --> ``vmx_vcpu_put()`` -->
+>         ``vmx_vcpu_pi_put()`` --> ``pi_enable_wakeup_handler()``,
+>          the lock sequence is
+>          &rq->__lock --> &per_cpu(wakeup_vcpus_on_cpu_lock, cpu).
+> 
+> path 3, ``task_rq_lock()``,
+>         the lock sequence is &p->pi_lock --> &rq->__lock
+> 
+> lockdep report:
+>  Chain exists of:
+>    &p->pi_lock --> &rq->__lock --> &per_cpu(wakeup_vcpus_on_cpu_lock, cpu)
+> 
+>   Possible unsafe locking scenario:
+> 
+>         CPU0                CPU1
+>         ----                ----
+>    lock(&per_cpu(wakeup_vcpus_on_cpu_lock, cpu));
+>                             lock(&rq->__lock);
+>                             lock(&per_cpu(wakeup_vcpus_on_cpu_lock, cpu));
+>    lock(&p->pi_lock);
+> 
+>   *** DEADLOCK ***
 
-Practically speaking, UMIP _can't_ be guest owned without breaking UMIP emulation.
-I do like not open coding vcpu->arch.cr4, but I don't particuarly like the changelog.
+I don't think there's a deadlock here.  pi_wakeup_handler() is called from IRQ
+context, pi_enable_wakeup_handler() disable IRQs before acquiring
+wakeup_vcpus_on_cpu_lock, and "cpu" in pi_enable_wakeup_handler() is guaranteed
+to be the current CPU, i.e. the same CPU.  So CPU0 and CPU1 can't be contending
+for the same wakeup_vcpus_on_cpu_lock in this scenario.
 
-This would also be a good time to opportunistically convert the WARN_ON() to a
-WARN_ON_ONCE() (when it fires, it fires a _lot).
+vmx_vcpu_pi_load() does do cross-CPU locking, but finish_task_switch() drops
+rq->__lock before invoking the sched_in notifiers.
 
-This, with a reworded changelog?
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> ---
+>  arch/x86/kvm/vmx/posted_intr.c | 12 +++++-------
+>  1 file changed, 5 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
+> index 94c38bea60e7..e3ffc45c0a7b 100644
+> --- a/arch/x86/kvm/vmx/posted_intr.c
+> +++ b/arch/x86/kvm/vmx/posted_intr.c
+> @@ -90,7 +90,7 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
+>  	 */
+>  	if (pi_desc->nv == POSTED_INTR_WAKEUP_VECTOR) {
+>  		raw_spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
+> -		list_del(&vmx->pi_wakeup_list);
+> +		list_del_rcu(&vmx->pi_wakeup_list);
+>  		raw_spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
 
-	/*
-	 * UMIP emulation relies on intercepting writes to CR4.UMIP, i.e. this
-	 * and other code needs to be updated if UMIP can be guest owned.
-	 */
-	BUILD_BUG_ON(KVM_POSSIBLE_CR4_GUEST_BITS & X86_CR4_UMIP);
+_If_ there is indeed a possible deadlock, there technically needs to be an explicit 
+synchonize_rcu() before freeing the vCPU.  In practice, there are probably multiple
+synchonize_rcu() calls in the destruction path, not to mention that it would take a
+minor miracle for pi_wakeup_handler() to get stalled long enough to achieve a
+use-after-free.
 
-	WARN_ON_ONCE(!kvm_read_cr4_bits(vcpu, X86_CR4_UMIP));
-	return kvm_emulate_instruction(vcpu, 0);
+>  	}
+>  
+> @@ -153,7 +153,7 @@ static void pi_enable_wakeup_handler(struct kvm_vcpu *vcpu)
+>  	local_irq_save(flags);
+>  
+>  	raw_spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
+> -	list_add_tail(&vmx->pi_wakeup_list,
+> +	list_add_tail_rcu(&vmx->pi_wakeup_list,
+>  		      &per_cpu(wakeup_vcpus_on_cpu, vcpu->cpu));
+>  	raw_spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
+
+
+> @@ -219,16 +219,14 @@ void pi_wakeup_handler(void)
+>  {
+>  	int cpu = smp_processor_id();
+>  	struct list_head *wakeup_list = &per_cpu(wakeup_vcpus_on_cpu, cpu);
+> -	raw_spinlock_t *spinlock = &per_cpu(wakeup_vcpus_on_cpu_lock, cpu);
+>  	struct vcpu_vmx *vmx;
+>  
+> -	raw_spin_lock(spinlock);
+> -	list_for_each_entry(vmx, wakeup_list, pi_wakeup_list) {
+> -
+> +	rcu_read_lock();
+
+This isn't strictly necessary, IRQs are disabled.
+
+> +	list_for_each_entry_rcu(vmx, wakeup_list, pi_wakeup_list) {
+>  		if (pi_test_on(&vmx->pi_desc))
+>  			kvm_vcpu_wake_up(&vmx->vcpu);
+>  	}
+> -	raw_spin_unlock(spinlock);
+> +	rcu_read_unlock();
+>  }
+>  
+>  void __init pi_init_cpu(int cpu)
+> 
+> base-commit: 89400df96a7570b651404bbc3b7afe627c52a192
+> -- 
+> 2.17.1
+> 
