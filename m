@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 530716B4C0A
-	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 17:06:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C352F6B4C06
+	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 17:06:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231331AbjCJQGw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 11:06:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50262 "EHLO
+        id S231276AbjCJQGr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 11:06:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230409AbjCJQGE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Mar 2023 11:06:04 -0500
+        with ESMTP id S230389AbjCJQGB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Mar 2023 11:06:01 -0500
 Received: from imap5.colo.codethink.co.uk (imap5.colo.codethink.co.uk [78.40.148.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F32099648
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 08:04:09 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED6F33B3E4
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 08:04:07 -0800 (PST)
 Received: from [167.98.27.226] (helo=lawrence-thinkpad.office.codethink.co.uk)
         by imap5.colo.codethink.co.uk with esmtpsa  (Exim 4.94.2 #2 (Debian))
-        id 1pafDo-00H4ad-Q6; Fri, 10 Mar 2023 16:03:56 +0000
+        id 1pafDp-00H4ad-2e; Fri, 10 Mar 2023 16:03:57 +0000
 From:   Lawrence Hunter <lawrence.hunter@codethink.co.uk>
 To:     qemu-devel@nongnu.org
 Cc:     dickon.hood@codethink.co.uk, nazar.kazakov@codethink.co.uk,
@@ -24,9 +24,9 @@ Cc:     dickon.hood@codethink.co.uk, nazar.kazakov@codethink.co.uk,
         palmer@dabbelt.com, alistair.francis@wdc.com,
         bin.meng@windriver.com, pbonzini@redhat.com,
         philipp.tomsich@vrull.eu, kvm@vger.kernel.org
-Subject: [PATCH 28/45] target/riscv: Expose zvkned cpu property
-Date:   Fri, 10 Mar 2023 16:03:29 +0000
-Message-Id: <20230310160346.1193597-29-lawrence.hunter@codethink.co.uk>
+Subject: [PATCH 29/45] target/riscv: Add zvknh cpu properties
+Date:   Fri, 10 Mar 2023 16:03:30 +0000
+Message-Id: <20230310160346.1193597-30-lawrence.hunter@codethink.co.uk>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230310160346.1193597-1-lawrence.hunter@codethink.co.uk>
 References: <20230310160346.1193597-1-lawrence.hunter@codethink.co.uk>
@@ -44,21 +44,59 @@ From: Nazar Kazakov <nazar.kazakov@codethink.co.uk>
 
 Signed-off-by: Nazar Kazakov <nazar.kazakov@codethink.co.uk>
 ---
- target/riscv/cpu.c | 1 +
- 1 file changed, 1 insertion(+)
+ target/riscv/cpu.c | 11 ++++++++++-
+ target/riscv/cpu.h |  2 ++
+ 2 files changed, 12 insertions(+), 1 deletion(-)
 
 diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index 00e1d007a4..cd87eec919 100644
+index cd87eec919..3ffbdd53cc 100644
 --- a/target/riscv/cpu.c
 +++ b/target/riscv/cpu.c
-@@ -1472,6 +1472,7 @@ static Property riscv_cpu_extensions[] = {
+@@ -111,6 +111,8 @@ static const struct isa_ext_data isa_edata_arr[] = {
+     ISA_EXT_DATA_ENTRY(zvfhmin, true, PRIV_VERSION_1_12_0, ext_zvfhmin),
+     ISA_EXT_DATA_ENTRY(zvkb, true, PRIV_VERSION_1_12_0, ext_zvkb),
+     ISA_EXT_DATA_ENTRY(zvkned, true, PRIV_VERSION_1_12_0, ext_zvkned),
++    ISA_EXT_DATA_ENTRY(zvknha, true, PRIV_VERSION_1_12_0, ext_zvknha),
++    ISA_EXT_DATA_ENTRY(zvknhb, true, PRIV_VERSION_1_12_0, ext_zvknhb),
+     ISA_EXT_DATA_ENTRY(zhinx, true, PRIV_VERSION_1_12_0, ext_zhinx),
+     ISA_EXT_DATA_ENTRY(zhinxmin, true, PRIV_VERSION_1_12_0, ext_zhinxmin),
+     ISA_EXT_DATA_ENTRY(smaia, true, PRIV_VERSION_1_12_0, ext_smaia),
+@@ -1217,7 +1219,7 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+     * In principle zve*x would also suffice here, were they supported
+     * in qemu
+     */
+-    if ((cpu->cfg.ext_zvkb || cpu->cfg.ext_zvkned) &&
++    if ((cpu->cfg.ext_zvkb || cpu->cfg.ext_zvkned || cpu->cfg.ext_zvknha) &&
+         !(cpu->cfg.ext_zve32f || cpu->cfg.ext_zve64f ||
+             cpu->cfg.ext_zve64d || cpu->cfg.ext_v)) {
+         error_setg(
+@@ -1225,6 +1227,13 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+         return;
+     }
  
-     /* Vector cryptography extensions */
-     DEFINE_PROP_BOOL("x-zvkb", RISCVCPU, cfg.ext_zvkb, false),
-+    DEFINE_PROP_BOOL("x-zvkned", RISCVCPU, cfg.ext_zvkned, false),
- 
-     DEFINE_PROP_END_OF_LIST(),
- };
++    if (cpu->cfg.ext_zvknhb &&
++        !(cpu->cfg.ext_zve64f || cpu->cfg.ext_zve64d || cpu->cfg.ext_v)) {
++            error_setg(errp,
++                       "Zvknhb extension requires V or Zve64{f,d} extensions");
++            return;
++    }
++
+ #ifndef CONFIG_USER_ONLY
+     if (cpu->cfg.pmu_num) {
+         if (!riscv_pmu_init(cpu, cpu->cfg.pmu_num) && cpu->cfg.ext_sscofpmf) {
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 4f3b97e0f1..5d101fc405 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -472,6 +472,8 @@ struct RISCVCPUConfig {
+     bool ext_zve64d;
+     bool ext_zvkb;
+     bool ext_zvkned;
++    bool ext_zvknha;
++    bool ext_zvknhb;
+     bool ext_zmmul;
+     bool ext_zvfh;
+     bool ext_zvfhmin;
 -- 
 2.39.2
 
