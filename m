@@ -2,241 +2,283 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 396AB6B497A
-	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 16:13:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 342306B4990
+	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 16:14:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234006AbjCJPNL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 10:13:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47800 "EHLO
+        id S233592AbjCJPOE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 10:14:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234005AbjCJPMo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Mar 2023 10:12:44 -0500
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A8071269A9;
-        Fri, 10 Mar 2023 07:04:14 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=enhHiWhLRGkEzV+Zaw6VxImzQ66SrbILkglIh3RYS3m9bTAVJKY/qQ6izPGZRztVZpHXk5I9AJHPpBcQipPRQRaxGm75H7UgNzeF7F/0gOc/QA+mhb/IFjFdPQZybgzWRFi2wGz91NkVdBW8Tdgusn7EbMju2rLwQcqj+Aretzq5jGndsHtgBGzjk2B5ElolqZq+mZegOi6gPwBwR7BaoylYZh9X0ifRGh8KkcpJIa6q4jGkHIQpq1Ff6PCRpfT9jSQtRgQWfPubSy2mgb7t8jY/sKtNla+NgVarMu5lT2p/j4OddFFqeUKM1HxLU0qIjP9CSL86ZJ233T2s6PG46Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MSGs7GmTCSKxK36gnRJTIiCQAzD/aJeKs1ou4sAq0/k=;
- b=F62ZKwL5KGih+D6jUhqYLFl5o99AGXb2DWw1JCvebNebhv7kSlNFAftE+EYt6Eq14ts0IIC8Y3FQDJBc8XxcuxVMvOdoZfXo9ls6XyfvI/luSp/IzU1GBj54ISsp/tz+R4rACPyh58KwmdqsJtFcBP6Kan+Dw39P/STZVgSC4sjil0iVUNEGgXjIEDOgc/T0bYJhpBopPZEpKU8otm3H7nohoCYbYp/1Ei8qiHgidomAUBZJ32/94pnZJeKEb+5DArCiTJflMz6teFtfrPUG77wLQykxBwZz4xt0/bFDYKzq2soIqMwHzkPRN5OMeh5b3Bx1tuNZ3LV6Lsc4fRYXDA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MSGs7GmTCSKxK36gnRJTIiCQAzD/aJeKs1ou4sAq0/k=;
- b=Frmp4hb0oLrAZr4gWYJ5gF7nV+eCe5xm3Lvgy2BBiWEMBB6jpXQOGAdhCQGUfsEzwlHdvR7pqVva/6XdQm8BNo913HQtHrQpJc/63Z5AnBrFjtXcp6yFkZiTBtDJFSFB3iYhsPcedhXZ3msFPj1gITbJpcJd5j+ChaQ0mUcc4RdfPXKDWNDKoVLMFOV4doUStxO1b+pSg7vvOrY0UBWKhopKSAzM2rFYMOiIaWR+OyKPHIPq9kIBDLQXtqXNL3TXC67OOQdypqDaYdLfqqbMbIV9uCOYDOa2f8/RBR+Y48pHoNObzSvD1hHtevmGofMPDDvwrBXUxeEKPxPX3YszGA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DM6PR12MB4091.namprd12.prod.outlook.com (2603:10b6:5:222::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.19; Fri, 10 Mar
- 2023 15:01:34 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::ef6d:fdf6:352f:efd1]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::ef6d:fdf6:352f:efd1%3]) with mapi id 15.20.6178.017; Fri, 10 Mar 2023
- 15:01:34 +0000
-Date:   Fri, 10 Mar 2023 11:01:31 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: Re: [PATCH v2 10/17] iommufd: Reorganize iommufd_device_attach into
- iommufd_device_change_pt
-Message-ID: <ZAtGS5pZF7fnsCJ6@nvidia.com>
-References: <0-v2-51b9896e7862+8a8c-iommufd_alloc_jgg@nvidia.com>
- <10-v2-51b9896e7862+8a8c-iommufd_alloc_jgg@nvidia.com>
- <BN9PR11MB52760C4E5C89118C1B898DA48CBA9@BN9PR11MB5276.namprd11.prod.outlook.com>
+        with ESMTP id S233343AbjCJPNd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Mar 2023 10:13:33 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5D6DD11E6F6
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 07:04:57 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5EEAC1FB;
+        Fri, 10 Mar 2023 07:04:48 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4AEA33F71A;
+        Fri, 10 Mar 2023 07:04:03 -0800 (PST)
+Date:   Fri, 10 Mar 2023 15:03:52 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Rajnesh Kanwal <rkanwal@rivosinc.com>
+Cc:     atishp@rivosinc.com, apatel@ventanamicro.com, kvm@vger.kernel.org,
+        will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org,
+        andre.przywara@arm.com, jean-philippe@linaro.org
+Subject: Re: [PATCH kvmtool 1/1] Add virtio-transport option and deprecate
+ force-pci and virtio-legacy.
+Message-ID: <ZAtG2Jk6VOOyT0xJ@monolith.localdoman>
+References: <20230306120329.535320-1-rkanwal@rivosinc.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <BN9PR11MB52760C4E5C89118C1B898DA48CBA9@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: SJ0PR13CA0095.namprd13.prod.outlook.com
- (2603:10b6:a03:2c5::10) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM6PR12MB4091:EE_
-X-MS-Office365-Filtering-Correlation-Id: fc149d11-d3d9-46a0-2233-08db217856e0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ptj2NImZaJ5C89zHeDp9aCyY3I4Wi8RyScI8FL6iBE4Xpuur7jGpq6WV7yl9EMP/9VFHpMiOzGOgAd8tZUE1WxMQNmVnvKl62mB48mzwRyYNr4wATyys3qebSFADp3PAE4tXiiyoZRfHzUfTZx76PfLqSekU7jstxgXvk0s0pebv7lz+7RJhObKsjnNFgkounWfGiCeH7fsjIMjbxjhnfaHcUL53Uzxpx889UMG0tsqzfJkUzXtVkAduGrMJyIe6BuqZ/EWqU0uwoakQBke9TafZQ2Q9bxRRAezLl6oDrvDDOZ3KkBwSInG0GAKzOarDdTVO5XP98curd0qWyZDTgfQ/r4xInrLthpaZi8axzW2jjykd1i+aZ2sa4YKWGv2msbg3j45jyUxaO5rzv55IWPsi61ccAn4DNUUjaxqxl8/7ZDh91DWW8GdlpvOYPGP66KjBfbIP5aOwLAJ6/hX1F2ml8cLOgxe5VB0JQyD9eorX1fDnQMSuR+xyN2wrq4xqXvvnuERHbbz2rG2hMKIuyclVkxi63pRWGcRAJ4V3yyjeUcMQtUJ/UxVfmx8aFxQoQzNVylV2ng3x/kZFP1DAB/K7v/u+iXlNiLqwhoOQA/CiYNXr2SUL+iflmpUB8ceT181F4ipWoWQmv77qsRb9nw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(396003)(136003)(39860400002)(376002)(366004)(346002)(451199018)(186003)(6486002)(36756003)(478600001)(316002)(54906003)(86362001)(38100700002)(83380400001)(26005)(41300700001)(6506007)(6666004)(2616005)(5660300002)(8936002)(66946007)(6916009)(66556008)(6512007)(66476007)(8676002)(4326008)(2906002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Q22U1jSU7YqwvI47o/4HCCyj8yWLcWkDX4jILSJgBvcVzSFuYE0ch+ZHatMf?=
- =?us-ascii?Q?Fvn3s5Gva+F+Hgvqldxj9AnNeF1hlZVxKh7i491PFyunoGIk2EfhIK11J0Eh?=
- =?us-ascii?Q?jP9KZhJD5W7/czqu2n6b7cjtQnRmjJx/zGvooHvx+ogiyUKRGxllzxQFzbFn?=
- =?us-ascii?Q?zgkoowbaxb/oYFqhtxiQbB45lbZLCaKQDCpauYPn/psL5WptOkZEaiPXOLRz?=
- =?us-ascii?Q?wvJTNM1GdcfF9oJpPaFLQTmBaOo56ugoe4O2XAqabrDFfeQcC2pRclcwaoN4?=
- =?us-ascii?Q?z6UBpofeWcXcYNwx9dGpBjPFDGHlQzsdAPc1W6MEWSmx741xuzwp+XuOPAd7?=
- =?us-ascii?Q?BC0o4EsnoR0Qyx2SQl6mAGv2sgVjs+cReIt/V2oXHzuRlPu0rV2+c4KvGZaf?=
- =?us-ascii?Q?WhKShHxFP65VF1Q7njh2OwKWPuU1fs0oHXO4GlRBr/bsHOT5tTSEDZGa0+nW?=
- =?us-ascii?Q?h+u1WE1+nEZbDkm3bdUp4PtrbWevqKlaR3RT8yT5aViMe9GXI+iy3yW89kRi?=
- =?us-ascii?Q?X58fxvVVaXTS4MmDLOKaXRBhf5hvBCpJAiiM7o1HpVNd8zYkTpv6GEdCdeXB?=
- =?us-ascii?Q?LPCP9F6crzOoBG5hda0P1JqfOuP3VakhLJJnHKmHZStAGIu+1SNxc60tcuuV?=
- =?us-ascii?Q?YqA06IkIXFGVObUUuXG3Vg+9AWHoiAqZa+EjBRZhbEVvlR6f7IGQQPPUsKSa?=
- =?us-ascii?Q?wPHxP4DqqlF0sSVgE/FrQK1vks6pEnzBT93mAVDkCY3YIJ9OOxNP39l6tpwQ?=
- =?us-ascii?Q?vzSKiXNp0dBead6JyOoTAd2xzchKFWXJKK0zurP3YkqNmO9mG/lwAybBi+ht?=
- =?us-ascii?Q?Tq9i8rGBTwuTzHmyHVSELM5XSCTtMWTfXiPzPGQVAt1ArtnuBu2RwpZ9ikHC?=
- =?us-ascii?Q?nnorTYp73+0EexLbaPe6aXvx05pf4i4UqwEskcfjcm+LXANFafJXHEbTvnot?=
- =?us-ascii?Q?OKjJcnkc6msFqQQZUjXhbaezUigGBwsUFB1drZLMwgkjwyg5endN+2lGJ5O1?=
- =?us-ascii?Q?mJfExuB5ZF/j47Csm5yYVLowZu3IHtHuqkZmHz5yCj6N39a1Xr86H/uYMjbl?=
- =?us-ascii?Q?pzc6nfaldX5x9ZCge8z18eRe7APynzAChRU/mDUMT4IDfc8ZXgXh+e50c42w?=
- =?us-ascii?Q?CFZtqIdEhQJ4Wsi226CZHQhmq957tDcVGlxCzoL1oDMnKkRA3xTId/z7Z9KE?=
- =?us-ascii?Q?PucLOZC83v+0Z+wbZVfuA/Ck49RcnhJw6Mlem9CpDue1cDXcJj1r+VuCY/f9?=
- =?us-ascii?Q?ZaZHs1lDt4JGnmG/0wPPHfWZQ06EA7yhvZB0NaFD5E699aLq3AqkfANN0GzP?=
- =?us-ascii?Q?+kJylDWSNXisRlax2a0RNYU9VK/H8XmqGJeypNFOlOjoMlIOUVM4M7n7QRXJ?=
- =?us-ascii?Q?Ivf1aLCYEhRr4LIQQrQq/p3aDoGopgchjxwg0xBzBLwuQnf0SRjvvZhRs+tX?=
- =?us-ascii?Q?KuDAUW4H2AZzJvTErElmyny8qGF07lrTGkUNSHa0fb0puV/lsHNb/4rzQyKJ?=
- =?us-ascii?Q?DnC5PyhzcMnx8bFhGCaxl+UeaG8wbhvPx5jYSZq7yua9/mSYfV6mh8vlp4hN?=
- =?us-ascii?Q?XeAU8kQUCRJDLn3b2P90U49/CoWjpDepA8l9wB7W?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fc149d11-d3d9-46a0-2233-08db217856e0
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Mar 2023 15:01:34.2721
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2cUvr8RkpS1dYmUtEtFHy5ViCseIBVJ2jvZGpfPn8fHC1/pXpadgp5kRs8y5JAEV
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4091
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230306120329.535320-1-rkanwal@rivosinc.com>
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 10, 2023 at 11:26:42AM +0000, Tian, Kevin wrote:
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Wednesday, March 8, 2023 8:36 AM
-> > 
-> > @@ -379,52 +388,57 @@ static int
-> > iommufd_device_auto_get_domain(struct iommufd_device *idev,
-> > 
-> >  		if (!iommufd_lock_obj(&hwpt->obj))
-> >  			continue;
-> > -		rc = iommufd_device_do_attach(idev, hwpt);
-> > -		iommufd_put_object(&hwpt->obj);
-> > -
-> > -		/*
-> > -		 * -EINVAL means the domain is incompatible with the device.
-> > -		 * Other error codes should propagate to userspace as failure.
-> > -		 * Success means the domain is attached.
-> > -		 */
-> > -		if (rc == -EINVAL)
-> > -			continue;
-> > +		destroy_hwpt = (*do_attach)(idev, hwpt);
-> >  		*pt_id = hwpt->obj.id;
+Hi,
+
+Thank you for doing this!
+
+The patch looks good, some nitpicks below.
+
+On Mon, Mar 06, 2023 at 12:03:29PM +0000, Rajnesh Kanwal wrote:
+> This is a follow-up patch for [0] which introduced --force-pci option
+
+"which proposed the --force-pci [..]"? The way you have worded it makes it
+sound, at least to me, like the patch was already merged.
+
+> for riscv. As per the discussion it was concluded to add virtio-tranport
+> option taking in four options (pci, pci-legacy, mmio, mmio-legacy).
 > 
-> only when succeed?
-
-It isn't necessary, but it can be, it is just more ugly
-
-@@ -461,9 +468,8 @@ iommufd_device_auto_get_domain(struct iommufd_device *idev,
-                if (!iommufd_lock_obj(&hwpt->obj))
-                        continue;
-                destroy_hwpt = (*do_attach)(idev, hwpt);
--               *pt_id = hwpt->obj.id;
--               iommufd_put_object(&hwpt->obj);
-                if (IS_ERR(destroy_hwpt)) {
-+                       iommufd_put_object(&hwpt->obj);
-                        /*
-                         * -EINVAL means the domain is incompatible with the
-                         * device. Other error codes should propagate to
-@@ -474,6 +480,8 @@ iommufd_device_auto_get_domain(struct iommufd_device *idev,
-                                continue;
-                        goto out_unlock;
-                }
-+               *pt_id = hwpt->obj.id;
-+               iommufd_put_object(&hwpt->obj);
-                goto out_unlock;
-        }
-
-but sure lets do it
-
-> > +		if (IS_ERR(destroy_hwpt)) {
-> > +			/*
-> > +			 * -EINVAL means the domain is incompatible with
-> > the
-> > +			 * device. Other error codes should propagate to
-> > +			 * userspace as failure. Success means the domain is
-> > +			 * attached.
-> > +			 */
-> > +			if (PTR_ERR(destroy_hwpt) == -EINVAL)
-> > +				continue;
-> > +			goto out_unlock;
-> > +		}
-> >  		goto out_unlock;
+> With this change force-pci and virtio-legacy are both deprecated and
+> arm's default transport changes from MMIO to PCI as agreed in [0].
+> This is also true for riscv.
 > 
-> two goto's can be merged, if you still want to keep pt_id assignment
-> in original place.
-
-Ah, I don't like that so much stylistically. 
- 
-> >  	}
-> > 
-> > -	hwpt = iommufd_hw_pagetable_alloc(idev->ictx, ioas, idev, true);
-> > +	hwpt = iommufd_hw_pagetable_alloc(idev->ictx, ioas, idev,
-> > +					  immediate_attach);
-> >  	if (IS_ERR(hwpt)) {
-> > -		rc = PTR_ERR(hwpt);
-> > +		destroy_hwpt = ERR_CAST(hwpt);
-> >  		goto out_unlock;
-> >  	}
-> > +
-> > +	if (!immediate_attach) {
-> > +		destroy_hwpt = (*do_attach)(idev, hwpt);
-> > +		if (IS_ERR(destroy_hwpt))
-> > +			goto out_abort;
-> > +	} else {
-> > +		destroy_hwpt = NULL;
-> > +	}
-> > +
+> Nothing changes for other architectures.
 > 
-> Above is a bit confusing.
+> [0]: https://lore.kernel.org/all/20230118172007.408667-1-rkanwal@rivosinc.com/
 > 
-> On one hand we have immediate_attach for drivers which must
-> complete attach before we can add the domain to iopt. From
-> this angle it should always be set when calling
-> iommufd_hw_pagetable_alloc() no matter it's attach or replace.
+> Signed-off-by: Rajnesh Kanwal <rkanwal@rivosinc.com>
+> ---
+>  arm/include/arm-common/kvm-arch.h        |  5 ----
+>  arm/include/arm-common/kvm-config-arch.h |  8 +++----
+>  builtin-run.c                            | 11 +++++++--
+>  include/kvm/kvm-config.h                 |  2 +-
+>  include/kvm/kvm.h                        |  6 +----
+>  include/kvm/virtio.h                     |  2 ++
+>  riscv/include/kvm/kvm-arch.h             |  3 ---
+>  virtio/core.c                            | 29 ++++++++++++++++++++++++
+>  8 files changed, 46 insertions(+), 20 deletions(-)
+> 
+> diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
+> index b2ae373..60eec02 100644
+> --- a/arm/include/arm-common/kvm-arch.h
+> +++ b/arm/include/arm-common/kvm-arch.h
+> @@ -80,11 +80,6 @@
+>  
+>  #define KVM_VM_TYPE		0
+>  
+> -#define VIRTIO_DEFAULT_TRANS(kvm)					\
+> -	((kvm)->cfg.arch.virtio_trans_pci ?				\
+> -	 ((kvm)->cfg.virtio_legacy ? VIRTIO_PCI_LEGACY : VIRTIO_PCI) :	\
+> -	 ((kvm)->cfg.virtio_legacy ? VIRTIO_MMIO_LEGACY : VIRTIO_MMIO))
+> -
+>  #define VIRTIO_RING_ENDIAN	(VIRTIO_ENDIAN_LE | VIRTIO_ENDIAN_BE)
+>  
+>  #define ARCH_HAS_PCI_EXP	1
+> diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
+> index 9949bfe..2e620fd 100644
+> --- a/arm/include/arm-common/kvm-config-arch.h
+> +++ b/arm/include/arm-common/kvm-config-arch.h
+> @@ -7,7 +7,6 @@ struct kvm_config_arch {
+>  	const char	*dump_dtb_filename;
+>  	const char	*vcpu_affinity;
+>  	unsigned int	force_cntfrq;
+> -	bool		virtio_trans_pci;
+>  	bool		aarch32_guest;
+>  	bool		has_pmuv3;
+>  	bool		mte_disabled;
+> @@ -28,9 +27,10 @@ int irqchip_parser(const struct option *opt, const char *arg, int unset);
+>  		     "Specify Generic Timer frequency in guest DT to "		\
+>  		     "work around buggy secure firmware *Firmware should be "	\
+>  		     "updated to program CNTFRQ correctly*"),			\
+> -	OPT_BOOLEAN('\0', "force-pci", &(cfg)->virtio_trans_pci,		\
+> -		    "Force virtio devices to use PCI as their default "		\
+> -		    "transport"),						\
+> +	OPT_CALLBACK_NOOPT('\0', "force-pci", NULL, '\0',			\
 
-I looked at it for a while if we could make replace follow the same
-immediate_attach flow, and it doesn't work right. The problem is we
-can fail at iopt_table_add_domain() which would be after replace is
-done and at that point we are pretty stuck.
+Couldn't you pass &(cfg)->virtio_transport here for the third parameter instead
+of NULL as you do for the other options, to avoid special casing force-pci in
+virtio_tranport_parser()?
 
-The design of replace is that iommu_group_replace_domain() is the last
-failable function in the process.
+> +			   "Force virtio devices to use PCI as their default "	\
+> +			   "transport [Deprecated: Use --virtio-transport "	\
 
-> On the other hand we assume *replace* doesn't work with
-> driver which requires immediate_attach so it's done outside of
-> iommufd_hw_pagetable_alloc().
+Small detail, but the usual way of adding a note to a help text is to use
+curved paranthesis ( "()", see?) instead of square brackets. kvmtool does that
+for the help text for kaslr-seed (see
+arm/aarch64/include/kvm/kvm-config-arch.h). The man pages also use paranthesis.
 
-Replace with an IOAS doesn't work on those drivers. It works OK with a
-HWPT.
+> +			   "option instead]", virtio_tranport_parser, kvm),	\
 
-> I'm unsure any better way of handling this transition phase, but
-> at least some comment would be useful in this part.
+Looks to me like the function name wants to be virtio_tran**s**port_parser()
+(emphasis added), and the current name (without the 's') is a typo.
 
-	/*
-	 * iommufd_hw_pagetable_attach() is called by
-	 * iommufd_hw_pagetable_alloc() in immediate attachment mode, same as
-	 * iommufd_device_do_attach(). So if we are in this mode then we prefer
-	 * to use the immediate_attach path as it supports drivers that can't
-	 * directly allocate a domain.
-	 */
-	bool immediate_attach = do_attach == iommufd_device_do_attach;
+>          OPT_CALLBACK('\0', "irqchip", &(cfg)->irqchip,				\
+>  		     "[gicv2|gicv2m|gicv3|gicv3-its]",				\
+>  		     "Type of interrupt controller to emulate in the guest",	\
+> diff --git a/builtin-run.c b/builtin-run.c
+> index bb7e6e8..50e8796 100644
+> --- a/builtin-run.c
+> +++ b/builtin-run.c
+> @@ -200,8 +200,15 @@ static int mem_parser(const struct option *opt, const char *arg, int unset)
+>  			" rootfs"),					\
+>  	OPT_STRING('\0', "hugetlbfs", &(cfg)->hugetlbfs_path, "path",	\
+>  			"Hugetlbfs path"),				\
+> -	OPT_BOOLEAN('\0', "virtio-legacy", &(cfg)->virtio_legacy,	\
+> -		    "Use legacy virtio transport"),			\
+> +	OPT_CALLBACK_NOOPT('\0', "virtio-legacy",			\
+> +			   &(cfg)->virtio_transport, '\0',		\
+> +			   "Use legacy virtio transport [Deprecated:"	\
+> +			   " Use --virtio-transport option instead]",	\
+> +			   virtio_tranport_parser, NULL),		\
+> +	OPT_CALLBACK('\0', "virtio-transport", &(cfg)->virtio_transport,\
+> +		     "[pci|pci-legacy|mmio|mmio-legacy]",		\
+> +		     "Type of virtio transport",			\
+> +		     virtio_tranport_parser, NULL),			\
+>  									\
+>  	OPT_GROUP("Kernel options:"),					\
+>  	OPT_STRING('k', "kernel", &(cfg)->kernel_filename, "kernel",	\
+> diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
+> index 368e6c7..592b035 100644
+> --- a/include/kvm/kvm-config.h
+> +++ b/include/kvm/kvm-config.h
+> @@ -64,7 +64,7 @@ struct kvm_config {
+>  	bool no_dhcp;
+>  	bool ioport_debug;
+>  	bool mmio_debug;
+> -	bool virtio_legacy;
+> +	int virtio_transport;
 
-Jason
+I was about to suggest changing this to enum virtio_trans virtio_transport,
+but that means including virtio.h in this file, which leads to header
+dependency hell. Let's leave that alone for now :)
+
+>  };
+>  
+>  #endif
+> diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
+> index 3872dc6..7015def 100644
+> --- a/include/kvm/kvm.h
+> +++ b/include/kvm/kvm.h
+> @@ -45,11 +45,7 @@ struct kvm_cpu;
+>  typedef void (*mmio_handler_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data,
+>  				u32 len, u8 is_write, void *ptr);
+>  
+> -/* Archs can override this in kvm-arch.h */
+> -#ifndef VIRTIO_DEFAULT_TRANS
+> -#define VIRTIO_DEFAULT_TRANS(kvm) \
+> -	((kvm)->cfg.virtio_legacy ? VIRTIO_PCI_LEGACY : VIRTIO_PCI)
+> -#endif
+> +#define VIRTIO_DEFAULT_TRANS(kvm) (kvm)->cfg.virtio_transport
+
+Well, the purpose of the define was to allow architectures to override it,
+the way arm did it.
+
+Since all architectures behave the same way now and there is no need for an
+override, how about we drop the macro altogether? We can also remove the
+virtio_trans parameter from virtio_init(), because it already has a
+reference to kvm.
+
+>  
+>  enum {
+>  	KVM_VMSTATE_RUNNING,
+> diff --git a/include/kvm/virtio.h b/include/kvm/virtio.h
+> index 94bddef..4a733f5 100644
+> --- a/include/kvm/virtio.h
+> +++ b/include/kvm/virtio.h
+> @@ -248,4 +248,6 @@ void virtio_set_guest_features(struct kvm *kvm, struct virtio_device *vdev,
+>  void virtio_notify_status(struct kvm *kvm, struct virtio_device *vdev,
+>  			  void *dev, u8 status);
+>  
+> +int virtio_tranport_parser(const struct option *opt, const char *arg, int unset);
+> +
+>  #endif /* KVM__VIRTIO_H */
+> diff --git a/riscv/include/kvm/kvm-arch.h b/riscv/include/kvm/kvm-arch.h
+> index 1e130f5..4106099 100644
+> --- a/riscv/include/kvm/kvm-arch.h
+> +++ b/riscv/include/kvm/kvm-arch.h
+> @@ -46,9 +46,6 @@
+>  
+>  #define KVM_VM_TYPE		0
+>  
+> -#define VIRTIO_DEFAULT_TRANS(kvm) \
+> -	((kvm)->cfg.virtio_legacy ? VIRTIO_MMIO_LEGACY : VIRTIO_MMIO)
+> -
+>  #define VIRTIO_RING_ENDIAN	VIRTIO_ENDIAN_LE
+>  
+>  #define ARCH_HAS_PCI_EXP	1
+> diff --git a/virtio/core.c b/virtio/core.c
+> index ea0e5b6..4b863c7 100644
+> --- a/virtio/core.c
+> +++ b/virtio/core.c
+> @@ -21,6 +21,35 @@ const char* virtio_trans_name(enum virtio_trans trans)
+>  	return "unknown";
+>  }
+>  
+> +int virtio_tranport_parser(const struct option *opt, const char *arg, int unset)
+
+If --virtio-transport is not specified on the kvmtool command line, then
+the default transport is set to VIRTIO_PCI, because that is the first
+member in the virtio_trans enum, and struct kvm is initialized to 0 in
+kvm__new() when it's allocated with calloc.
+
+The above can be obscure for someone who is not familiar with the code. I
+think making the default explicit, by setting kvm->cfg.virtio_transport =
+VIRTIO_PCI in kvm_cmd_run_init(), before the command line arguments are
+parsed, would be clearer.
+
+Thanks,
+Alex
+
+> +{
+> +	enum virtio_trans *type = opt->value;
+> +
+> +	if (!strcmp(opt->long_name, "virtio-transport")) {
+> +		if (!strcmp(arg, "pci")) {
+> +			*type = VIRTIO_PCI;
+> +		} else if (!strcmp(arg, "pci-legacy")) {
+> +			*type = VIRTIO_PCI_LEGACY;
+> +#if defined(CONFIG_ARM) || defined(CONFIG_ARM64) || defined(CONFIG_RISCV)
+> +		} else if (!strcmp(arg, "mmio")) {
+> +			*type = VIRTIO_MMIO;
+> +		} else if (!strcmp(arg, "mmio-legacy")) {
+> +			*type = VIRTIO_MMIO_LEGACY;
+> +#endif
+> +		} else {
+> +			pr_err("virtio-transport: unknown type \"%s\"\n", arg);
+> +			return -1;
+> +		}
+> +	} else if (!strcmp(opt->long_name, "virtio-legacy")) {
+> +		*type = VIRTIO_PCI_LEGACY;
+> +	} else if (!strcmp(opt->long_name, "force-pci")) {
+> +		struct kvm *kvm = opt->ptr;
+> +		kvm->cfg.virtio_transport = VIRTIO_PCI;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  void virt_queue__used_idx_advance(struct virt_queue *queue, u16 jump)
+>  {
+>  	u16 idx = virtio_guest_to_host_u16(queue, queue->vring.used->idx);
+> -- 
+> 2.25.1
+> 
