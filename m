@@ -2,66 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 67E7F6B3DE0
-	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 12:34:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6EE236B3E2B
+	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 12:40:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230394AbjCJLeN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 06:34:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58650 "EHLO
+        id S230520AbjCJLky (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 06:40:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230392AbjCJLeK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Mar 2023 06:34:10 -0500
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEE415A6CD;
-        Fri, 10 Mar 2023 03:34:08 -0800 (PST)
-Received: by mail-pj1-x102d.google.com with SMTP id q31-20020a17090a17a200b0023750b69614so4881583pja.5;
-        Fri, 10 Mar 2023 03:34:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678448048;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gUEAdqF+264y6tlNIPm7sGs8cFITkhpABstRdo7c1DM=;
-        b=MRvkh5/PNs0WAUTuQkUSErisBQ7SsJAicgBMz6NQmzDG4hjoYzDT4DvVMPKDsQp0Ln
-         2XXYoBb64e6AJIQS9sBUzRC0oFKVe93Dch7ihhYyBk75Gkybk8Xc5g551xYhIqSnbeYU
-         0FNmL1uk8Tp9+eEbQJCQRMCFgchDK0xi4JA6v4HHpHYK71B7ZizhuKQFOfU8/5E4HR5p
-         SbxHiCInlm4h2GtMHK7ioKz5BLyOpUHxaaJVz15UugrOC/3OQe8q69NdFiwZckFvnHgk
-         aIHTUgPMnNpvtvxsPJODfkASHHgayhGAswmwbrjk7d2Qjk0YGXpP/9TR+RapSto7d5Tq
-         fKjQ==
+        with ESMTP id S230043AbjCJLkx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Mar 2023 06:40:53 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EC54F6C6B
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 03:40:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1678448406;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=rJwQlAakOokhmQO5hlNSSM0QAOQ7URuACK/mNX+Ecvw=;
+        b=fLh3os5o79QnGlenkthg1cOwdf7xwnD6ApevQ8Rd1cdCzA5Ho31A9HzIixpnu6k0pzi4o9
+        OvunRiap/4gPUvbkNqVVZY2EWHHSRpl8GXxFMqtDqnZlAXk90QaJ6GDBcqw/XeG54gGDn1
+        APMVVaU23aFdNfwqAtO/1CzlTDlOHng=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-206-JPN2rZosM1WPXiG_6sXrQw-1; Fri, 10 Mar 2023 06:40:05 -0500
+X-MC-Unique: JPN2rZosM1WPXiG_6sXrQw-1
+Received: by mail-wm1-f71.google.com with SMTP id p22-20020a7bcc96000000b003e2036a1516so3731030wma.7
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 03:40:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678448048;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gUEAdqF+264y6tlNIPm7sGs8cFITkhpABstRdo7c1DM=;
-        b=QzxhQ0eh9IoXhPNXYXoaUAulFdJnm3t4g2tNOKiO5EaQJGEIpL4Ey1hd454iV2aY9c
-         FBo9ylgcCUl0mAx26ycUTDK6mlLM+qx0ZSkwNzSDBPwXRQVAYcD5/k30S+nrVaA+eG35
-         BRXUUJsYv0Ny1371yn0ZCTvyuBK8S62KpyqWcM17tFh/1ngcKTvNifeoP1aKTomIeSDb
-         C6Rqzr8qWZxUe5nDNEBCQEEWiWvmX+blw/w9lXI2GLwjMxbi1TZegl/htdzgGrralZ4B
-         ZfcdsXcz2I3mtW38+QKhI6KVLNrRkLhHB3qCAVDn5Ip8SMLUtpsG3IoM5ULW4hHPbdPV
-         oQYw==
-X-Gm-Message-State: AO0yUKXgRzIuvaGRXC2tyoWvN131dA4E7cMYIF++1A9rFtjjtzn8LXKP
-        xoWZVvtBpIHJ60BCQUNuRXc=
-X-Google-Smtp-Source: AK7set/OHox9rucqDPJR8yo7aCauRXYUk3HSK2MhXL8vQd/4hyDXGo0VYrHSc03jBfNFe7z2C+EO2g==
-X-Received: by 2002:a17:902:b193:b0:19a:a815:2876 with SMTP id s19-20020a170902b19300b0019aa8152876mr22021968plr.62.1678448048257;
-        Fri, 10 Mar 2023 03:34:08 -0800 (PST)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id a17-20020a170902b59100b00198fde9178csm1242857pls.197.2023.03.10.03.34.06
+        d=1e100.net; s=20210112; t=1678448404;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rJwQlAakOokhmQO5hlNSSM0QAOQ7URuACK/mNX+Ecvw=;
+        b=1WfQe1PabK5I48MfsH+Qcp+3Ea92LXFIN9u13/stP8Ud0wPjl0SSHb+2KlDTTdp/Ij
+         6ihwuOLCQXoMEKpdKSf33hG7/Fd12zWQIbOM65vP/5Wj/YfTFjWeT9sRDdJLojtNoD3u
+         E/nAlQqGJvMGuktq926+D7Gu6h/MfdjKRDdlcuF582QtemN62xJrhI0DxKyYY7yJEYou
+         EwwkIswiMTK+8n+pLFLvuekkC+grp4NrV1+DE4dGwKsxaOc3Lw/E5Hc7EAqd5IN8OgpT
+         fgkA+1cRB9CvvexnUH291WVHsLYh+ZprzmcQUjen/yXbd0i/CAgr3Xxhb4Fc4P3xD9ic
+         Uj4Q==
+X-Gm-Message-State: AO0yUKXMH8UrnN1XWrQ1Z82D0T2oqezRAbXsXEZl9qoeeh6aRNRFahT5
+        fTI2JzYHWA9sKVKz5vf45mDMwqKcIendoFI8Yazn3hFz2Mhd9stvfRXYx5F1213he8JT18QhuZD
+        pHo0psx6FpbET
+X-Received: by 2002:adf:ef10:0:b0:2ca:3576:756d with SMTP id e16-20020adfef10000000b002ca3576756dmr17441603wro.50.1678448404006;
+        Fri, 10 Mar 2023 03:40:04 -0800 (PST)
+X-Google-Smtp-Source: AK7set+RNKqlJyQI+1SQ507spnOBqv3bWEPOICTIm+RgBVN6rKvCG9ALHkeDNEO4/C58wDmMpo7bIA==
+X-Received: by 2002:adf:ef10:0:b0:2ca:3576:756d with SMTP id e16-20020adfef10000000b002ca3576756dmr17441579wro.50.1678448403714;
+        Fri, 10 Mar 2023 03:40:03 -0800 (PST)
+Received: from sgarzare-redhat (host-82-57-51-170.retail.telecomitalia.it. [82.57.51.170])
+        by smtp.gmail.com with ESMTPSA id m4-20020a5d6244000000b002c707b336c9sm2065136wrv.36.2023.03.10.03.40.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Mar 2023 03:34:07 -0800 (PST)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2] KVM: x86/pmu/misc: Fix a typo on kvm_pmu_request_counter_reprogam()
-Date:   Fri, 10 Mar 2023 19:33:49 +0800
-Message-Id: <20230310113349.31799-1-likexu@tencent.com>
-X-Mailer: git-send-email 2.39.2
+        Fri, 10 Mar 2023 03:40:03 -0800 (PST)
+Date:   Fri, 10 Mar 2023 12:40:00 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseniy Krasnov <avkrasnov@sberdevices.ru>
+Cc:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel@sberdevices.ru,
+        oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v4 0/4] several updates to virtio/vsock
+Message-ID: <20230310114000.6ptwpryulbvcqf5m@sgarzare-redhat>
+References: <1804d100-1652-d463-8627-da93cb61144e@sberdevices.ru>
+ <20230310090937.s55af2fx56zn4ewu@sgarzare-redhat>
+ <15b9df26-bdc1-e139-8df7-62f966c719ed@sberdevices.ru>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+In-Reply-To: <15b9df26-bdc1-e139-8df7-62f966c719ed@sberdevices.ru>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,93 +87,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+On Fri, Mar 10, 2023 at 12:42:13PM +0300, Arseniy Krasnov wrote:
+>
+>
+>On 10.03.2023 12:09, Stefano Garzarella wrote:
+>> Hi Arseniy,
+>>
+>> On Thu, Mar 09, 2023 at 11:24:42PM +0300, Arseniy Krasnov wrote:
+>>> Hello,
+>>>
+>>> this patchset evolved from previous v2 version (see link below). It does
+>>> several updates to virtio/vsock:
+>>> 1) Changes 'virtio_transport_inc/dec_rx_pkt()' interface. Now instead of
+>>>   using skbuff state ('head' and 'data' pointers) to update 'fwd_cnt'
+>>>   and 'rx_bytes', integer value is passed as an input argument. This
+>>>   makes code more simple, because in this case we don't need to update
+>>>   skbuff state before calling 'virtio_transport_inc/dec_rx_pkt()'. In
+>>>   more common words - we don't need to change skbuff state to update
+>>>   'rx_bytes' and 'fwd_cnt' correctly.
+>>> 2) For SOCK_STREAM, when copying data to user fails, current skbuff is
+>>>   not dropped. Next read attempt will use same skbuff and last offset.
+>>>   Instead of 'skb_dequeue()', 'skb_peek()' + '__skb_unlink()' are used.
+>>>   This behaviour was implemented before skbuff support.
+>>> 3) For SOCK_SEQPACKET it removes unneeded 'skb_pull()' call, because for
+>>>   this type of socket each skbuff is used only once: after removing it
+>>>   from socket's queue, it will be freed anyway.
+>>
+>> thanks for the fixes, I would wait a few days to see if there are any
+>> comments and then I think you can send it on net without RFC.
+>>
+>> @Bobby if you can take a look, your ack would be appreciated :-)
+>Ok, thanks for review. I'll wait for several days and also wait until
+>net-next will be opened. Then i'll resend this patchset with net-next
 
-Fix a "reprogam" typo in the kvm_pmu_request_counter_reprogam(), which
-should be fixed earlier to follow the meaning of {pmc_}reprogram_counter().
+Since they are fixes, they should go with the net tree, not net-next.
 
-Fixes: 68fb4757e867 ("KVM: x86/pmu: Defer reprogram_counter() to kvm_pmu_handle_event()")
-Signed-off-by: Like Xu <likexu@tencent.com>
----
-v1: https://lore.kernel.org/all/20230308104707.27284-1-likexu@tencent.com
- arch/x86/kvm/pmu.c           | 2 +-
- arch/x86/kvm/pmu.h           | 2 +-
- arch/x86/kvm/svm/pmu.c       | 2 +-
- arch/x86/kvm/vmx/pmu_intel.c | 6 +++---
- 4 files changed, 6 insertions(+), 6 deletions(-)
-
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 7b6c3ba2c8e1..bdeec0ab5e2b 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -646,7 +646,7 @@ static void kvm_pmu_incr_counter(struct kvm_pmc *pmc)
- {
- 	pmc->prev_counter = pmc->counter;
- 	pmc->counter = (pmc->counter + 1) & pmc_bitmask(pmc);
--	kvm_pmu_request_counter_reprogam(pmc);
-+	kvm_pmu_request_counter_reprogram(pmc);
- }
- 
- static inline bool eventsel_match_perf_hw_id(struct kvm_pmc *pmc,
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 79988dafb15b..cff0651b030b 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -183,7 +183,7 @@ static inline void kvm_init_pmu_capability(const struct kvm_pmu_ops *pmu_ops)
- 					     KVM_PMC_MAX_FIXED);
- }
- 
--static inline void kvm_pmu_request_counter_reprogam(struct kvm_pmc *pmc)
-+static inline void kvm_pmu_request_counter_reprogram(struct kvm_pmc *pmc)
- {
- 	set_bit(pmc->idx, pmc_to_pmu(pmc)->reprogram_pmi);
- 	kvm_make_request(KVM_REQ_PMU, pmc->vcpu);
-diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-index cc77a0681800..5fa939e411d8 100644
---- a/arch/x86/kvm/svm/pmu.c
-+++ b/arch/x86/kvm/svm/pmu.c
-@@ -161,7 +161,7 @@ static int amd_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		data &= ~pmu->reserved_bits;
- 		if (data != pmc->eventsel) {
- 			pmc->eventsel = data;
--			kvm_pmu_request_counter_reprogam(pmc);
-+			kvm_pmu_request_counter_reprogram(pmc);
- 		}
- 		return 0;
- 	}
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index e8a3be0b9df9..797fff9dbe80 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -57,7 +57,7 @@ static void reprogram_fixed_counters(struct kvm_pmu *pmu, u64 data)
- 		pmc = get_fixed_pmc(pmu, MSR_CORE_PERF_FIXED_CTR0 + i);
- 
- 		__set_bit(INTEL_PMC_IDX_FIXED + i, pmu->pmc_in_use);
--		kvm_pmu_request_counter_reprogam(pmc);
-+		kvm_pmu_request_counter_reprogram(pmc);
- 	}
- }
- 
-@@ -81,7 +81,7 @@ static void reprogram_counters(struct kvm_pmu *pmu, u64 diff)
- 	for_each_set_bit(bit, (unsigned long *)&diff, X86_PMC_IDX_MAX) {
- 		pmc = intel_pmc_idx_to_pmc(pmu, bit);
- 		if (pmc)
--			kvm_pmu_request_counter_reprogam(pmc);
-+			kvm_pmu_request_counter_reprogram(pmc);
- 	}
- }
- 
-@@ -482,7 +482,7 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 				reserved_bits ^= HSW_IN_TX_CHECKPOINTED;
- 			if (!(data & reserved_bits)) {
- 				pmc->eventsel = data;
--				kvm_pmu_request_counter_reprogam(pmc);
-+				kvm_pmu_request_counter_reprogram(pmc);
- 				return 0;
- 			}
- 		} else if (intel_pmu_handle_lbr_msrs_access(vcpu, msr_info, false))
-
-base-commit: 13738a3647368f7f600b30d241779bcd2a3ebbfd
--- 
-2.39.2
+Cheers,
+Stefano
 
