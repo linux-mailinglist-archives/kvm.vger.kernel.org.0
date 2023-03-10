@@ -2,52 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 41AA96B51AF
-	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 21:19:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A293F6B51B7
+	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 21:22:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231346AbjCJUTQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 15:19:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48294 "EHLO
+        id S230481AbjCJUWX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 15:22:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230168AbjCJUTN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Mar 2023 15:19:13 -0500
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76C454ECE;
-        Fri, 10 Mar 2023 12:18:39 -0800 (PST)
-Received: from [10.46.7.190] (i689701D4.versanet.de [104.151.1.212])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pmenzel)
-        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 649C861CC457B;
-        Fri, 10 Mar 2023 21:18:13 +0100 (CET)
-Message-ID: <18ec6bf2-c19a-5fcf-3d6b-4106e2372af1@molgen.mpg.de>
-Date:   Fri, 10 Mar 2023 21:18:12 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH v14 00/12] Parallel CPU bringup for x86_64
-To:     Tor Vic <torvic9@mailbox.org>
-Cc:     Usama Arif <usama.arif@bytedance.com>, dwmw2@infradead.org,
-        tglx@linutronix.de, kim.phillips@amd.com, brgerst@gmail.com,
-        piotrgorski@cachyos.org, oleksandr@natalenko.name,
-        arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
-        pbonzini@redhat.com, paulmck@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
-        thomas.lendacky@amd.com, seanjc@google.com,
-        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
-        simon.evans@bytedance.com, liangma@liangbit.com
-References: <20230308171328.1562857-1-usama.arif@bytedance.com>
- <16d9f738-18fd-a929-e711-f2a1e757e33f@mailbox.org>
-Content-Language: en-US
-From:   Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <16d9f738-18fd-a929-e711-f2a1e757e33f@mailbox.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        with ESMTP id S230071AbjCJUWV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Mar 2023 15:22:21 -0500
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95B2D17178
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 12:22:19 -0800 (PST)
+Received: by mail-pg1-x549.google.com with SMTP id o3-20020a634e43000000b0050726979a86so1578233pgl.4
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 12:22:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1678479739;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=X5Yz6+HvQPsyWAE0S/8SN4+hADFhL9KVUn5rqZ2PnAM=;
+        b=AwhQ2spe6oVrHhpsgUsMJMehfX9YCFLrc8oa9wNOC/DG4c9P7LVJZKjtkujmuqG7gZ
+         KnteA0zHJ3LkfUCgEmVN1x1Uit6g/o3+iXMYEwqkyaM6HN13nXYTMRFc+DqkC+kgwJxq
+         2QJZeqWXCLpr5S+7Ar3i9PSYS4LCuUI3AI+Lwi/gL/j2EzTUx5EYqCIBzAC/fgIYJUaj
+         qyXHuhEU8Q10IzuklwQaEen3CZzBzF0TL/vSNVPBYyd8qVwUpU805BJ3lfcN6TgihNUj
+         gxnzhqbhTW6cv/Fil7MRsB/XI9zLb1wBbB8X3TgQM9cpAtjdXuU6m7MVuB63M+OcHzd+
+         Uvsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678479739;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=X5Yz6+HvQPsyWAE0S/8SN4+hADFhL9KVUn5rqZ2PnAM=;
+        b=FNqQc52NurHAyJf6TZF5hB/37QGm2bbgGhRCigJtrVv1basC5eb0yvvMKolZz7Dfru
+         eLhPmb3+p+am8iiIj0KdnB2q+3qvCC615Y1hjidyN2iXkfbiB8MeG2woxIYhVuW8nCsT
+         C+r+5HkdESW/znz2Pb26fGKA89DGsO2YuSnK7ljgi6K9xSMFQ0VdNkGtfy+8gF0uOFyb
+         o3cEW1cyjo49EUGiiZka4+hiUett890JqeQ2SyqPyFctyD7J7JIOQ2DHWYG3OzvAazza
+         M61gPjUFsRNVs/klnqhZo8ELWwHMFXV/9YosqpA3Dx/YgD/51/4VWemdRRX5z44Jvku/
+         1Mqw==
+X-Gm-Message-State: AO0yUKXp8PzIWEXY91oBWPwtakNwqCNhiUZkqXIicirEQv9ukp7xtWDl
+        +xTbAAYcIMvorirDW307zjP2r4+oMwA=
+X-Google-Smtp-Source: AK7set+Kfl1r8AuKrlbFGZwMOXERrMBdNazncLPYHv3nVSx6XbvAX61D+uAJEgpJ4IIjgMChMyX+P34e13M=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:7f5c:0:b0:503:7bb8:3c32 with SMTP id
+ p28-20020a637f5c000000b005037bb83c32mr8720176pgn.0.1678479739131; Fri, 10 Mar
+ 2023 12:22:19 -0800 (PST)
+Date:   Fri, 10 Mar 2023 12:22:17 -0800
+In-Reply-To: <9db9bd3a2ade8c436a8b9ab6f61ee8dafa2e072a.camel@linux.intel.com>
+Mime-Version: 1.0
+References: <20230227084547.404871-1-robert.hu@linux.intel.com>
+ <20230227084547.404871-3-robert.hu@linux.intel.com> <ZABPFII40v1nQ2EV@gao-cwp>
+ <9db9bd3a2ade8c436a8b9ab6f61ee8dafa2e072a.camel@linux.intel.com>
+Message-ID: <ZAuRec2NkC3+4jvD@google.com>
+Subject: Re: [PATCH v5 2/5] [Trivial]KVM: x86: Explicitly cast ulong to bool
+ in kvm_set_cr3()
+From:   Sean Christopherson <seanjc@google.com>
+To:     Robert Hoo <robert.hu@linux.intel.com>
+Cc:     Chao Gao <chao.gao@intel.com>, pbonzini@redhat.com,
+        binbin.wu@linux.intel.com, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -55,51 +69,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dear Tor,
+As Chao pointed out, this does not belong in the LAM series.  And FWIW, I highly
+recommend NOT tagging things as Trivial.  If you're wrong and the patch _isn't_
+trivial, it only slows things down.  And if you're right, then expediting the
+patch can't possibly be necessary.
 
-
-Am 10.03.23 um 20:20 schrieb Tor Vic:
-> On 08.03.23 17:13, Usama Arif wrote:
->> The main code change over v13 is to enable parallel bringup for SEV-ES 
->> guests.
-
-[…]
-
->>   .../admin-guide/kernel-parameters.txt         |   3 +
->>   arch/x86/include/asm/cpu.h                    |   1 +
->>   arch/x86/include/asm/processor.h              |   6 +-
->>   arch/x86/include/asm/realmode.h               |   4 +-
->>   arch/x86/include/asm/sev-common.h             |   3 +
->>   arch/x86/include/asm/sev.h                    |   5 +
->>   arch/x86/include/asm/smp.h                    |  18 +-
->>   arch/x86/include/asm/topology.h               |   2 -
->>   arch/x86/kernel/acpi/sleep.c                  |  30 +-
->>   arch/x86/kernel/apic/apic.c                   |   2 +-
->>   arch/x86/kernel/apic/x2apic_cluster.c         | 126 +++---
->>   arch/x86/kernel/asm-offsets.c                 |   1 +
->>   arch/x86/kernel/cpu/common.c                  |   6 +-
->>   arch/x86/kernel/cpu/topology.c                |   2 +-
->>   arch/x86/kernel/head_64.S                     | 162 ++++++--
->>   arch/x86/kernel/smpboot.c                     | 366 +++++++++++++-----
->>   arch/x86/realmode/init.c                      |   3 +
->>   arch/x86/realmode/rm/trampoline_64.S          |  27 +-
->>   arch/x86/xen/smp_pv.c                         |   4 +-
->>   arch/x86/xen/xen-head.S                       |   2 +-
->>   include/linux/cpuhotplug.h                    |   2 +
->>   include/linux/smpboot.h                       |   7 +
->>   kernel/cpu.c                                  |  31 +-
->>   kernel/smpboot.h                              |   2 -
->>   24 files changed, 614 insertions(+), 201 deletions(-)
->>
+On Fri, Mar 03, 2023, Robert Hoo wrote:
+> On Thu, 2023-03-02 at 15:24 +0800, Chao Gao wrote:
+> > > -	bool pcid_enabled = kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE);
+> > > +	bool pcid_enabled = !!kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE);
+> > > 
+> > > 	if (pcid_enabled) {
+> > > 		skip_tlb_flush = cr3 & X86_CR3_PCID_NOFLUSH;
+> > 
+> > pcid_enabled is used only once. You can drop it, i.e.,
+> > 
+> > 	if (kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE)) {
+> > 
+> Emm, that's actually another point.
+> Though I won't object so, wouldn't this be compiler optimized?
 > 
-> On Linux 6.2, Zen2 and Skylake, no issues or boot problems:
-> 
-> Tested-by: Tor Vic <torvic9@mailbox.org>
+> And my point was: honor bool type, though in C implemention it's 0 and
+> !0, it has its own type value: true, false.
+> Implicit type casting always isn't good habit.
 
-Thank you for testing this. It’d be great if you shared the exact timing 
-numbers too. (Just to be sure, did you also test ACPI S3 suspend/resume?)
+I don't disagree, but I also don't particularly want to "fix" one case while
+ignoring the many others, e.g. kvm_handle_invpcid() has the exact same "buggy"
+pattern.
 
+I would be supportive of a patch that adds helpers and then converts all of the
+relevant CR0/CR4 checks though...
 
-Kind regards,
-
-Paul
+diff --git a/arch/x86/kvm/kvm_cache_regs.h b/arch/x86/kvm/kvm_cache_regs.h
+index 4c91f626c058..6e3cb958afdd 100644
+--- a/arch/x86/kvm/kvm_cache_regs.h
++++ b/arch/x86/kvm/kvm_cache_regs.h
+@@ -157,6 +157,14 @@ static inline ulong kvm_read_cr0_bits(struct kvm_vcpu *vcpu, ulong mask)
+        return vcpu->arch.cr0 & mask;
+ }
+ 
++static __always_inline bool kvm_is_cr0_bit_set(struct kvm_vcpu *vcpu,
++                                              unsigned long cr0_bit)
++{
++       BUILD_BUG_ON(!is_power_of_2(cr0_bit));
++
++       return !!kvm_read_cr0_bits(vcpu, cr0_bit);
++}
++
+ static inline ulong kvm_read_cr0(struct kvm_vcpu *vcpu)
+ {
+        return kvm_read_cr0_bits(vcpu, ~0UL);
+@@ -178,6 +186,14 @@ static inline ulong kvm_read_cr3(struct kvm_vcpu *vcpu)
+        return vcpu->arch.cr3;
+ }
+ 
++static __always_inline bool kvm_is_cr4_bit_set(struct kvm_vcpu *vcpu,
++                                              unsigned long cr4_bit)
++{
++       BUILD_BUG_ON(!is_power_of_2(cr4_bit));
++
++       return !!kvm_read_cr4_bits(vcpu, cr4_bit);
++}
++
