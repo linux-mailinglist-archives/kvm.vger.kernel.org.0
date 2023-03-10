@@ -2,214 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BB9BE6B5183
-	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 21:12:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D0A36B518D
+	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 21:15:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231363AbjCJUM6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 15:12:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60968 "EHLO
+        id S231366AbjCJUOn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 15:14:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231300AbjCJUMt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Mar 2023 15:12:49 -0500
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 826E312B95F
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 12:12:48 -0800 (PST)
-Received: by mail-pl1-x649.google.com with SMTP id t11-20020a170902e84b00b0019e399b2efaso3384459plg.11
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 12:12:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678479168;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YRnz4Sg+G65MFb46p+8OMyQr8tQeIQ0btbrTuxLx320=;
-        b=eAWdv4TBjGk6uuaSoapD3D0eZM5LOAvPe+wLJVHdep6ue7Oxbwfwxmyvv3MKDY48jq
-         12eCtyS1WbbYLL12eYsgKfdBmvbOfW7F2jf++kadg693NrYQYYK4efhdDYMZYzMvvR5v
-         NguN+iRc1HJktkOGTqlTCmxc2zYQXUNnCMd+sm+Ed2nsneQ0h8itwEc1pGjYNzbrCBBg
-         3OTJWG3lPQ++fK7IG8640cuBtpJRIxEkO7ItJvx2wxvqrJxvsjGFINJDvtUBNnldI55e
-         TfLlUWEOmGPeKc+AcHEAdViS/7digDYAAdxzTHbDoz/lY3CoObzhtcfpmcbS8a7ngZcl
-         ZSIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678479168;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YRnz4Sg+G65MFb46p+8OMyQr8tQeIQ0btbrTuxLx320=;
-        b=XdrBPZJqoFSAVNT4L4zoYyqzIIZ+Wz4TWTnp3qsYDlLzHHtmwOyehHpqyRRSJGsLJG
-         4P/CSJQH75y8Qzvqgu+m5S5qwU478R930bfY4hzKS/JQUOsS+BAjGR2vcGW8PmdPOsFb
-         8nb1CH6X2hpNw75h65O41/L//BiHuWq3qn1znrtmIQGwg1PcrXCAxe9D/4S8xXU3guYo
-         fWqocEy6dja6ASGqCSdRLtMlWzveoy29cwhlDqfA8k/k76i5kiEWOHfwU+IqFTI6HaDq
-         qX1whhklaZiRgwQGIZPWPL7Gk52d3cW9XYrbzHiWLKKeB6ikOaggrnIxWaeFVij3ZKK8
-         dP2g==
-X-Gm-Message-State: AO0yUKUivxMSYCvc+OOMYzSVDHd2kOWLyXPdkTykQtW/xq+y0cD9R0Q2
-        AXyGv9a2URRYn/bTfP0hGvU/hmCQgaA=
-X-Google-Smtp-Source: AK7set+Rk46AbTSRa1WsaISpnMWQG4qTeqJDk0ECr0zQLcDqrNtKiWu5vc4QoeIg9M9vxvKFef5gqze/Crs=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:291e:0:b0:503:77ce:a1ab with SMTP id
- bt30-20020a63291e000000b0050377cea1abmr9377554pgb.9.1678479168029; Fri, 10
- Mar 2023 12:12:48 -0800 (PST)
-Date:   Fri, 10 Mar 2023 12:12:46 -0800
-In-Reply-To: <20230227084547.404871-4-robert.hu@linux.intel.com>
-Mime-Version: 1.0
-References: <20230227084547.404871-1-robert.hu@linux.intel.com> <20230227084547.404871-4-robert.hu@linux.intel.com>
-Message-ID: <ZAuPPv8PUDX2RBQa@google.com>
-Subject: Re: [PATCH v5 3/5] KVM: x86: Virtualize CR3.LAM_{U48,U57}
-From:   Sean Christopherson <seanjc@google.com>
-To:     Robert Hoo <robert.hu@linux.intel.com>
-Cc:     pbonzini@redhat.com, chao.gao@intel.com, binbin.wu@linux.intel.com,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229933AbjCJUOl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Mar 2023 15:14:41 -0500
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2082.outbound.protection.outlook.com [40.107.94.82])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9352912D41A;
+        Fri, 10 Mar 2023 12:14:31 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=oYEergHLpzL8GYIZ7zSnQj8/MMw2t+kwDMRKgJ2fHxjD/vuu7nxG3o3cGUwnaqf730OhanT59lRaemx2TJE8Hz7J+cr8X5SgJt1RdGQGaAMp/D5ERNBtJqeUuvwxXLBgOp6SzXFmlMR5IV6eK4dQGTXr4pfzM+7A0tYlFm/jUG5E/tn5L3fBTmEL9i9WuvUeisrd5Ma5FEPmK4MrOOrPFa9ksVJ1goHt7jGtyGLXiJnnWTirewtogA9V7eFHYPPyvIeGTL4+2F/yCMFX9Fgw9m74LBtjFHRBBm/ro80XJyMQ5ngXy7ddX3tOLYfaMY2LpZFz+NoGQnJO91H2QU/n4w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Un1BTE4l6FiAD8cn+pXmQYPW47LzK9GxAOMVACcceHc=;
+ b=VdSSIP1jsNgiQajuryGWZ0X2fDfdsHCTNx40xS18uaFggafx0QRE4VWEmYBI6fBw8S5nGHiqoRa9AhM85iVf3TCJONee+IU3GBAEc6Si5Jbiv+J/O/sKN9YP4HCIqTD0Eiltx7E4wzCAFH8hGegZR4FfK1qQMzReq4fr2/YUf/DwcVkqSnjAgNz/bxezwHhKshW39M8jvcZxcHmFf/PdBl59xI7bnrLsltKAVaV9XTTFgVojGkmYtdzt+JkqlE5NBCiaNJ7FzT7oGZB3pPXVpKR9nBmhC8Jr6XoKbwM69qCN6BjwojjK2w0Q3rdUpbGbPpxYzNCs+ikFfUmQ25bJAw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Un1BTE4l6FiAD8cn+pXmQYPW47LzK9GxAOMVACcceHc=;
+ b=EoiMktYIho0EJHCjEyqSD/B4ZFbeC38cqXGPm16F+2tbeRObn2T2EFwBgf3D0kjafkH2fxV/I7hkg6rIjvdMogug7ctykoEPK0qjFd7sf5V591jDHo4RwaifChebGwg4AY30jaIOVoM2fZroq9Rb9BT2qCluDrDyIHgv6Ejp20qXVqMTss6usHro0X31jhG4aRWEGZ1opHd8Ket90kdKNFYyrrBLb52NgF+W0VMRyY4ZlwoEkcdgYLFL2HyZGuF0T2aFnTar1p69h4nZI1NR7sdRT+hYJB4mWtYyrY370UqOlPDpIiLdh210U/3+NnpvmuxCZ3hPPZFslAbuDZ9mqw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by BL3PR12MB6428.namprd12.prod.outlook.com (2603:10b6:208:3b7::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.19; Fri, 10 Mar
+ 2023 20:14:29 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::ef6d:fdf6:352f:efd1]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::ef6d:fdf6:352f:efd1%3]) with mapi id 15.20.6178.017; Fri, 10 Mar 2023
+ 20:14:29 +0000
+Date:   Fri, 10 Mar 2023 16:14:27 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Nicolin Chen <nicolinc@nvidia.com>
+Cc:     kevin.tian@intel.com, joro@8bytes.org, will@kernel.org,
+        robin.murphy@arm.com, alex.williamson@redhat.com, shuah@kernel.org,
+        yi.l.liu@intel.com, linux-kernel@vger.kernel.org,
+        iommu@lists.linux.dev, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, mjrosato@linux.ibm.com,
+        farman@linux.ibm.com
+Subject: Re: [PATCH v4 1/5] vfio: Do not allow !ops->dma_unmap in
+ vfio_pin/unpin_pages()
+Message-ID: <ZAuPo6o9Qk3dlpf0@nvidia.com>
+References: <cover.1678284812.git.nicolinc@nvidia.com>
+ <2dc87ceb7bf02c7f405bde44e9ee9b21398c5228.1678284812.git.nicolinc@nvidia.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2dc87ceb7bf02c7f405bde44e9ee9b21398c5228.1678284812.git.nicolinc@nvidia.com>
+X-ClientProxiedBy: YT4PR01CA0325.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:10a::8) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BL3PR12MB6428:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4f301965-4cba-4cf7-cc51-08db21a40d85
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: dWTbdykJrxjalWNFJh0WomtBAlwToaE4YBBf+LbfEB8wNSFwzfWvj9R9evt8yDjgBRqn6hQ7rg8jvv8W0RSBud2zysIfZyQhPHHulSbzUzAeLqh9i5Ax6CrgEXLAIcnwsh0NorduaqJzyBkYw7p4IDjPkqV3puP1dBFXyJKn0Lv1z0TwLSW0fXqiR7bvIgP949vHwfD3z8FM/I6pDHAsA0+b+OoUtEx8Zti5Tb0g4FfEE8LD0IiCuPRheXpEPdmMwzMuCse52XzvwWSrRCY8KdMD9n6bLABZ0DoH8ihw3l57ZwekXsrYaszx9jON4llccaGXFlL7jIMQuOAgtNv2PklT3ULD5GhTicXiwSwCyl+q/JN93zNxn18J1AUL9GWXhuiYJc6/699t/buUSg+PcOp95Bhh4MjM4smXe7BLcZEf9iTKpgY+uZyOLiNsUiL9yxoj0rQsit1C/lUjFYJpOvEA814vwHdXcKPWMgsrIRcGc8EWgR3xl0fChK1s2JCbozB5R4eX68J8gW6TVmi9sHEn0jH7+ZajMj/VMgGrzGQH1tO11kWDlfEUhO10EJHhm9QnypRRSSHOscyUD+3d/KOpl5H5VkKQnKiWp9lo/guhH8gfPosayhGGgbsPns18Ia/WAz5AOfSRXoeLHwc3iA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(376002)(366004)(346002)(39860400002)(396003)(136003)(451199018)(36756003)(83380400001)(478600001)(6636002)(6506007)(37006003)(316002)(38100700002)(2616005)(6486002)(6512007)(26005)(186003)(41300700001)(2906002)(7416002)(5660300002)(4744005)(66476007)(8936002)(66946007)(8676002)(66556008)(6862004)(4326008)(86362001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?QXJvyRWZVn5UmLMo4uCaV7pID8/Ay9Q1uMT/b9kCHaYrMtrFY3fFDrgVEkE7?=
+ =?us-ascii?Q?SXk1zV/qm26p6z2fuxq71qxXOnAQyc0A6Ko8UDe31PFoOQXn5BKBHRRIpjiT?=
+ =?us-ascii?Q?xtwBeLvVqH0WKorvxsv/tMS3KAwOMefUAd5PSOIlBYeljQdYTxMlUk114I9d?=
+ =?us-ascii?Q?oCg6PE4BU82dZlZmymRF9TXKnn83HWLs6UzQY7qFEt9xW1Y/fAGy8AVBFWwp?=
+ =?us-ascii?Q?T2JWtgOQ89XYWxTzIrIUsR48IjomWw0hHeEuf/tyIw8yyBPCePWx3Zn6Ecp5?=
+ =?us-ascii?Q?07ZA52VyGocTrXbcxIyj7mlpMv9IbhGZPGz23d5B8wUAl0fXvgvpjs4z1dQN?=
+ =?us-ascii?Q?bPkzhwIx0++tKPMkn0THOeuXWhUb+xaQ0A+KynEH7zvD3qLiRN9XWFeuvDH4?=
+ =?us-ascii?Q?egMf5MusnTC8/GSc7hdkW6ZMDPA/0zixkQfMGuCafvkwlbY+k698fy/o7jHR?=
+ =?us-ascii?Q?TKjO88K9uVIFz21an+uQ/9kujHqLYBh2NO1F8/93j1DZ/LkSKXrx6RgZi4/j?=
+ =?us-ascii?Q?5U94gwa7p2NkHmPJ+7GHmECZhbERnAvOFgGoi6a827sIdFQeUBm1bVfNzTu9?=
+ =?us-ascii?Q?LV4KxsWexzs+EkWevAN2uQxYBeGWHc+b8ecGtfbc2eLNPFsyN4HrSvYSvdi6?=
+ =?us-ascii?Q?Se0KrAni6VFn6Ri9xMVv/JzJDgCmf3BsEmWbpbzcf18Wr9OmuooloYmv/uGf?=
+ =?us-ascii?Q?bpy66qVOEBTyZoxJMHegSEkra7YLIlNMmIkmStVkxaYmWGzum7LQ76s83fTb?=
+ =?us-ascii?Q?Jd/t+ZPt4dGF8ORY5Uf1nzOg9Bj1XjNAezmZHNVsJacTfdTWk7VwfNhDEhvK?=
+ =?us-ascii?Q?T5N7aiAyLWPGgaMf/qGwW4iSrMnEtYH/G3zXfGnJdqaAd1UC/Z++bku32MXC?=
+ =?us-ascii?Q?mAmUWHA8b8A8LdVaB/6VUpS7CGnKN5gQcyssibgGymp0vFcNhZ+YoThvZY5+?=
+ =?us-ascii?Q?M/WwXpq1GakDvNt2Aj56VQHCmx1AQuE0gE+ByF8NyrTV1OFkjwoPKlcjEBSu?=
+ =?us-ascii?Q?B5w6EmxR3wIQkFN3YdfV+Ve42fGsASnakjj2SmggzCx368HT8PazEk5g0Evp?=
+ =?us-ascii?Q?FEx2Jyb7+UrbxWSXRerf3xjIalZ93vSA0Au+8DU5mW6pA8lBKZH7+16uUYsB?=
+ =?us-ascii?Q?ySi6dF08urZ3+r5/vMS2QPDcI1Bs5/4JH0jAMrbcAMEqdqZjMEgQdHLkCIh7?=
+ =?us-ascii?Q?o5VLQ+CDEQgMq+VGrLCA4Np7Nkxls7UI7lclQtukhicSgi+nDD9AN15oHQ0A?=
+ =?us-ascii?Q?zjRLQrkQUEzZqFtsexmMxnemN2I0pPMBhkmGuLdVU11fOcEbbTjCQVCWlDko?=
+ =?us-ascii?Q?tK/ItE0j+Y1EfI2ouEwSfdcXHvqRrqudSkrqX50VCcHZxRLM36/EnoWrEE0P?=
+ =?us-ascii?Q?1Ad+6e98SI03rutBAYDJOKyYnwEQ/7MmidJTKxbypAI6xMibKw8rn1vkD0c1?=
+ =?us-ascii?Q?AhoLiKAzwzvaITIj4U19YCNfNY+gKnSTsAqC3CIPNx2xRATcgxiDPXev0ENn?=
+ =?us-ascii?Q?dH/scZZ6AZe2ILuU2qwV/h/TmSS+Tu1XTgnzWOfnJxy7jjkNqElym1iNRPkX?=
+ =?us-ascii?Q?9zLiz1b4hCbQAFRlKO4CVieisRFvRQBukarKfVwx?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4f301965-4cba-4cf7-cc51-08db21a40d85
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Mar 2023 20:14:29.0001
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: k81Vngavi8aOGGYG//ZVwbuqI6TGGOQmLGfE3HaP3hmJHjAKm7sLUyMOW0F/Yo85
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6428
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 27, 2023, Robert Hoo wrote:
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 835426254e76..3efec7f8d8c6 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3699,7 +3699,14 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
->  	int quadrant, i, r;
->  	hpa_t root;
->  
-> -	root_pgd = mmu->get_guest_pgd(vcpu);
-> +	/*
-> +	 * Omit guest_cpuid_has(X86_FEATURE_LAM) check but can unconditionally
-> +	 * strip CR3 LAM bits because they resides in high reserved bits,
-> +	 * with LAM or not, those high bits should be striped anyway when
-> +	 * interpreted to pgd.
-> +	 */
+On Wed, Mar 08, 2023 at 06:25:58AM -0800, Nicolin Chen wrote:
+> A driver that doesn't implement ops->dma_unmap shouldn't be allowed to do
+> vfio_pin/unpin_pages(), though it can use vfio_dma_rw() to access an iova
+> range. Deny !ops->dma_unmap cases in vfio_pin/unpin_pages().
+> 
+> Suggested-by: Kevin Tian <kevin.tian@intel.com>
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> Reviewed-by: Yi Liu <yi.l.liu@intel.com>
+> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
+> ---
+>  drivers/vfio/vfio_main.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 
-This misses the most important part: why it's safe to ignore LAM bits when reusing
-a root.
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
-> +	root_pgd = mmu->get_guest_pgd(vcpu) &
-> +		   ~(X86_CR3_LAM_U48 | X86_CR3_LAM_U57);
-
-Unconditionally clearing LAM bits is unsafe.  At some point the EPTP may define
-bits in the same area that must NOT be omitted from the root cache, e.g. the PWL
-bits in the EPTP _need_ to be incorporated into is_root_usable().
-
-For simplicity, I'm very, very tempted to say we should just leave the LAM bits
-in root.pgd, i.e. force a new root for a CR3+LAM combination.  First and foremost,
-that only matters for shadow paging.  Second, unless a guest kernel allows per-thread
-LAM settings, KVM the extra checks will be benign.  And AIUI, the proposed kernel
-implementation is to apply LAM on a per-MM basis.
-
-And I would much prefer to solve the GFN calculation generically.  E.g. it really
-should be something like this
-
-	root_pgd = mmu->get_guest_pgd(vcpu);
-	root_gfn = mmu->gpte_to_gfn(root_pgd);
-
-but having to set gpte_to_gfn() in the MMU is quite unfortunate, and gpte_to_gfn()
-is technically insufficient for PAE since it relies on previous checks to prevent
-consuming a 64-bit CR3.
-
-I was going to suggest extracting the maximal base addr mask and use that, e.g.
-
-	#define __PT_BASE_ADDR_MASK (((1ULL << 52) - 1) & ~(u64)(PAGE_SIZE-1))
-
-Maybe this?
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index c8ebe542c565..8b2d2a6081b3 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3732,7 +3732,12 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
-        hpa_t root;
- 
-        root_pgd = mmu->get_guest_pgd(vcpu);
--       root_gfn = root_pgd >> PAGE_SHIFT;
-+
-+       /*
-+        * The guest PGD has already been checked for validity, unconditionally
-+        * strip non-address bits when computing the GFN.
-+        */
-+       root_gfn = (root_pgd & __PT_BASE_ADDR_MASK) >> PAGE_SHIFT;
- 
-        if (mmu_check_root(vcpu, root_gfn))
-                return 1;
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index cc58631e2336..c0479cbc2ca3 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -21,6 +21,7 @@ extern bool dbg;
- #endif
- 
- /* Page table builder macros common to shadow (host) PTEs and guest PTEs. */
-+#define __PT_BASE_ADDR_MASK (((1ULL << 52) - 1) & ~(u64)(PAGE_SIZE-1))
- #define __PT_LEVEL_SHIFT(level, bits_per_level)        \
-        (PAGE_SHIFT + ((level) - 1) * (bits_per_level))
- #define __PT_INDEX(address, level, bits_per_level) \
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 57f0b75c80f9..0583bfce3b52 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -62,7 +62,7 @@
- #endif
- 
- /* Common logic, but per-type values.  These also need to be undefined. */
--#define PT_BASE_ADDR_MASK      ((pt_element_t)(((1ULL << 52) - 1) & ~(u64)(PAGE_SIZE-1)))
-+#define PT_BASE_ADDR_MASK      ((pt_element_t)__PT_BASE_ADDR_MASK)
- #define PT_LVL_ADDR_MASK(lvl)  __PT_LVL_ADDR_MASK(PT_BASE_ADDR_MASK, lvl, PT_LEVEL_BITS)
- #define PT_LVL_OFFSET_MASK(lvl)        __PT_LVL_OFFSET_MASK(PT_BASE_ADDR_MASK, lvl, PT_LEVEL_BITS)
- #define PT_INDEX(addr, lvl)    __PT_INDEX(addr, lvl, PT_LEVEL_BITS)
-diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index 1279db2eab44..777f7d443e3b 100644
---- a/arch/x86/kvm/mmu/spte.h
-+++ b/arch/x86/kvm/mmu/spte.h
-@@ -36,7 +36,7 @@ static_assert(SPTE_TDP_AD_ENABLED == 0);
- #ifdef CONFIG_DYNAMIC_PHYSICAL_MASK
- #define SPTE_BASE_ADDR_MASK (physical_mask & ~(u64)(PAGE_SIZE-1))
- #else
--#define SPTE_BASE_ADDR_MASK (((1ULL << 52) - 1) & ~(u64)(PAGE_SIZE-1))
-+#define SPTE_BASE_ADDR_MASK __PT_BASE_ADDR_MASK
- #endif
- 
- #define SPTE_PERM_MASK (PT_PRESENT_MASK | PT_WRITABLE_MASK | shadow_user_mask \
-
->  	root_gfn = root_pgd >> PAGE_SHIFT;
->  
->  	if (mmu_check_root(vcpu, root_gfn))
-> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-> index 0f6455072055..57f39c7492ed 100644
-> --- a/arch/x86/kvm/mmu/paging_tmpl.h
-> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-> @@ -324,7 +324,7 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
->  	trace_kvm_mmu_pagetable_walk(addr, access);
->  retry_walk:
->  	walker->level = mmu->cpu_role.base.level;
-> -	pte           = mmu->get_guest_pgd(vcpu);
-> +	pte           = mmu->get_guest_pgd(vcpu) & ~(X86_CR3_LAM_U48 | X86_CR3_LAM_U57);
-
-This should be unnecessary, gpte_to_gfn() is supposed to strip non-address bits.
-
->  	have_ad       = PT_HAVE_ACCESSED_DIRTY(mmu);
->  
->  #ifdef CONFIG_X86_64
->  	bool pcid_enabled = !!kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE);
->  
-> @@ -1254,14 +1265,26 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
->  	 * stuff CR3, e.g. for RSM emulation, and there is no guarantee that
->  	 * the current vCPU mode is accurate.
->  	 */
-> -	if (kvm_vcpu_is_illegal_gpa(vcpu, cr3))
-> +	if (!kvm_vcpu_is_valid_cr3(vcpu, cr3))
->  		return 1;
->  
->  	if (is_pae_paging(vcpu) && !load_pdptrs(vcpu, cr3))
->  		return 1;
->  
-> -	if (cr3 != kvm_read_cr3(vcpu))
-> -		kvm_mmu_new_pgd(vcpu, cr3);
-> +	old_cr3 = kvm_read_cr3(vcpu);
-> +	if (cr3 != old_cr3) {
-> +		if ((cr3 ^ old_cr3) & ~(X86_CR3_LAM_U48 | X86_CR3_LAM_U57)) {
-> +			kvm_mmu_new_pgd(vcpu, cr3 & ~(X86_CR3_LAM_U48 |
-> +					X86_CR3_LAM_U57));
-
-As above, no change is needed here if LAM is tracked in the PGD.
+Jason
