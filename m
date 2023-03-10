@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8AC4B6B4C18
-	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 17:07:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 47CA36B4C17
+	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 17:07:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231240AbjCJQHK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 11:07:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50850 "EHLO
+        id S230337AbjCJQHH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 11:07:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230462AbjCJQGH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230453AbjCJQGH (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 10 Mar 2023 11:06:07 -0500
 Received: from imap5.colo.codethink.co.uk (imap5.colo.codethink.co.uk [78.40.148.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C14F9DD377
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF760DB4B7
         for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 08:04:10 -0800 (PST)
 Received: from [167.98.27.226] (helo=lawrence-thinkpad.office.codethink.co.uk)
         by imap5.colo.codethink.co.uk with esmtpsa  (Exim 4.94.2 #2 (Debian))
-        id 1pafDm-00H4ad-1C; Fri, 10 Mar 2023 16:03:54 +0000
+        id 1pafDm-00H4ad-9n; Fri, 10 Mar 2023 16:03:54 +0000
 From:   Lawrence Hunter <lawrence.hunter@codethink.co.uk>
 To:     qemu-devel@nongnu.org
 Cc:     dickon.hood@codethink.co.uk, nazar.kazakov@codethink.co.uk,
@@ -25,9 +25,9 @@ Cc:     dickon.hood@codethink.co.uk, nazar.kazakov@codethink.co.uk,
         bin.meng@windriver.com, pbonzini@redhat.com,
         philipp.tomsich@vrull.eu, kvm@vger.kernel.org,
         Lawrence Hunter <lawrence.hunter@codethink.co.uk>
-Subject: [PATCH 18/45] target/riscv: Add vaesef.vs decoding, translation and execution support
-Date:   Fri, 10 Mar 2023 16:03:19 +0000
-Message-Id: <20230310160346.1193597-19-lawrence.hunter@codethink.co.uk>
+Subject: [PATCH 19/45] target/riscv: Add vaesdf.vv decoding, translation and execution support
+Date:   Fri, 10 Mar 2023 16:03:20 +0000
+Message-Id: <20230310160346.1193597-20-lawrence.hunter@codethink.co.uk>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230310160346.1193597-1-lawrence.hunter@codethink.co.uk>
 References: <20230310160346.1193597-1-lawrence.hunter@codethink.co.uk>
@@ -45,103 +45,82 @@ Signed-off-by: Lawrence Hunter <lawrence.hunter@codethink.co.uk>
 ---
  target/riscv/helper.h                        |  1 +
  target/riscv/insn32.decode                   |  1 +
- target/riscv/insn_trans/trans_rvzvkned.c.inc | 20 +++++++++++
- target/riscv/vcrypto_helper.c                | 36 ++++++++++++++++++++
- 4 files changed, 58 insertions(+)
+ target/riscv/insn_trans/trans_rvzvkned.c.inc |  1 +
+ target/riscv/vcrypto_helper.c                | 31 ++++++++++++++++++++
+ 4 files changed, 34 insertions(+)
 
 diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index a402bb5d40..fb30b4d13e 100644
+index fb30b4d13e..c626ddcee1 100644
 --- a/target/riscv/helper.h
 +++ b/target/riscv/helper.h
-@@ -1189,3 +1189,4 @@ DEF_HELPER_6(vandn_vx_w, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vandn_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+@@ -1190,3 +1190,4 @@ DEF_HELPER_6(vandn_vx_d, void, ptr, ptr, tl, ptr, env, i32)
  
  DEF_HELPER_4(vaesef_vv, void, ptr, ptr, env, i32)
-+DEF_HELPER_4(vaesef_vs, void, ptr, ptr, env, i32)
+ DEF_HELPER_4(vaesef_vs, void, ptr, ptr, env, i32)
++DEF_HELPER_4(vaesdf_vv, void, ptr, ptr, env, i32)
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index f68025755a..5d1bb6ccc6 100644
+index 5d1bb6ccc6..e9ccc56915 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -929,3 +929,4 @@ vandn_vx        000001 . ..... ..... 100 ..... 1010111 @r_vm
- 
+@@ -930,3 +930,4 @@ vandn_vx        000001 . ..... ..... 100 ..... 1010111 @r_vm
  # *** RV64 Zvkned vector crypto extension ***
  vaesef_vv       101000 1 ..... 00011 010 ..... 1110111 @r2_vm_1
-+vaesef_vs       101001 1 ..... 00011 010 ..... 1110111 @r2_vm_1
+ vaesef_vs       101001 1 ..... 00011 010 ..... 1110111 @r2_vm_1
++vaesdf_vv       101000 1 ..... 00001 010 ..... 1110111 @r2_vm_1
 diff --git a/target/riscv/insn_trans/trans_rvzvkned.c.inc b/target/riscv/insn_trans/trans_rvzvkned.c.inc
-index 6f3d62bef1..69bf7f9fee 100644
+index 69bf7f9fee..134fd59df8 100644
 --- a/target/riscv/insn_trans/trans_rvzvkned.c.inc
 +++ b/target/riscv/insn_trans/trans_rvzvkned.c.inc
-@@ -69,4 +69,24 @@ static bool vaes_check_vv(DisasContext *s, arg_rmr *a)
-            require_align(a->rs2, s->lmul) &&
-            s->vstart % 4 == 0 && s->sew == MO_32;
- }
-+
-+static bool vaes_check_overlap(DisasContext *s, int vd, int vs2)
-+{
-+    int8_t op_size = s->lmul <= 0 ? 1 : 1 << s->lmul;
-+    return !is_overlapped(vd, op_size, vs2, 1);
-+}
-+
-+static bool vaes_check_vs(DisasContext *s, arg_rmr *a)
-+{
-+    return vaes_check_overlap(s, a->rd, a->rs2) &&
-+           MAXSZ(s) >= (128 / 8) && /* EGW in bytes */
-+           s->cfg_ptr->ext_zvkned == true &&
-+           require_rvv(s) &&
-+           vext_check_isa_ill(s) &&
-+           require_align(a->rd, s->lmul) &&
-+           s->vstart % 4 == 0 &&
-+           s->sew == MO_32;
-+}
-+
+@@ -90,3 +90,4 @@ static bool vaes_check_vs(DisasContext *s, arg_rmr *a)
+ 
  GEN_V_UNMASKED_TRANS(vaesef_vv, vaes_check_vv)
-+GEN_V_UNMASKED_TRANS(vaesef_vs, vaes_check_vs)
+ GEN_V_UNMASKED_TRANS(vaesef_vs, vaes_check_vs)
++GEN_V_UNMASKED_TRANS(vaesdf_vv, vaes_check_vv)
 diff --git a/target/riscv/vcrypto_helper.c b/target/riscv/vcrypto_helper.c
-index bb5ce5b50a..b079b543c7 100644
+index b079b543c7..8f448de86e 100644
 --- a/target/riscv/vcrypto_helper.c
 +++ b/target/riscv/vcrypto_helper.c
-@@ -214,6 +214,42 @@ void HELPER(NAME)(void *vd_vptr, void *vs2_vptr, CPURISCVState *env,      \
-     vext_set_elems_1s(vd, vta, vl * 4, total_elems * 4);                  \
+@@ -181,6 +181,34 @@ static inline void xor_round_key(uint8_t round_state[4][4], uint8_t *round_key)
+     }
  }
  
-+#define GEN_ZVKNED_HELPER_VS(NAME, ...)                                   \
-+void HELPER(NAME)(void *vd_vptr, void *vs2_vptr, CPURISCVState *env,      \
-+                  uint32_t desc)                                          \
-+{                                                                         \
-+    uint64_t *vd = vd_vptr;                                               \
-+    uint64_t *vs2 = vs2_vptr;                                             \
-+    uint32_t vl = env->vl;                                                \
-+    uint32_t total_elems = vext_get_total_elems(env, desc, 4);            \
-+    uint32_t vta = vext_vta(desc);                                        \
-+                                                                          \
-+    for (uint32_t i = env->vstart / 4; i < env->vl / 4; i++) {            \
-+        uint64_t round_key[2] = {                                         \
-+            cpu_to_le64(vs2[0]),                                          \
-+            cpu_to_le64(vs2[1]),                                          \
-+        };                                                                \
-+        uint8_t round_state[4][4];                                        \
-+        cpu_to_le64s(vd + i * 2 + 0);                                     \
-+        cpu_to_le64s(vd + i * 2 + 1);                                     \
-+        for (int j = 0; j < 16; j++) {                                    \
-+            round_state[j / 4][j % 4] = ((uint8_t *)(vd + i * 2))[j];     \
-+        }                                                                 \
-+        __VA_ARGS__;                                                      \
-+        for (int j = 0; j < 16; j++) {                                    \
-+            ((uint8_t *)(vd + i * 2))[j] = round_state[j / 4][j % 4];     \
-+        }                                                                 \
-+        le64_to_cpus(vd + i * 2 + 0);                                     \
-+        le64_to_cpus(vd + i * 2 + 1);                                     \
-+    }                                                                     \
-+    env->vstart = 0;                                                      \
-+    /* set tail elements to 1s */                                         \
-+    vext_set_elems_1s(vd, vta, vl * 4, total_elems * 4);                  \
++static inline void aes_inv_sub_bytes(uint8_t round_state[4][4])
++{
++    for (int j = 0; j < 16; j++) {
++        round_state[j / 4][j % 4] = AES_isbox[round_state[j / 4][j % 4]];
++    }
 +}
 +
- GEN_ZVKNED_HELPER_VV(vaesef_vv, aes_sub_bytes(round_state);
++static inline void aes_inv_shift_bytes(uint8_t round_state[4][4])
++{
++    uint8_t temp;
++    temp = round_state[3][1];
++    round_state[3][1] = round_state[2][1];
++    round_state[2][1] = round_state[1][1];
++    round_state[1][1] = round_state[0][1];
++    round_state[0][1] = temp;
++    temp = round_state[0][2];
++    round_state[0][2] = round_state[2][2];
++    round_state[2][2] = temp;
++    temp = round_state[1][2];
++    round_state[1][2] = round_state[3][2];
++    round_state[3][2] = temp;
++    temp = round_state[0][3];
++    round_state[0][3] = round_state[1][3];
++    round_state[1][3] = round_state[2][3];
++    round_state[2][3] = round_state[3][3];
++    round_state[3][3] = temp;
++}
++
+ #define GEN_ZVKNED_HELPER_VV(NAME, ...)                                   \
+ void HELPER(NAME)(void *vd_vptr, void *vs2_vptr, CPURISCVState *env,      \
+                   uint32_t desc)                                          \
+@@ -253,3 +281,6 @@ GEN_ZVKNED_HELPER_VV(vaesef_vv, aes_sub_bytes(round_state);
+ GEN_ZVKNED_HELPER_VS(vaesef_vs, aes_sub_bytes(round_state);
                      aes_shift_bytes(round_state);
                      xor_round_key(round_state, (uint8_t *)round_key);)
-+GEN_ZVKNED_HELPER_VS(vaesef_vs, aes_sub_bytes(round_state);
-+                    aes_shift_bytes(round_state);
++GEN_ZVKNED_HELPER_VV(vaesdf_vv, aes_inv_shift_bytes(round_state);
++                    aes_inv_sub_bytes(round_state);
 +                    xor_round_key(round_state, (uint8_t *)round_key);)
 -- 
 2.39.2
