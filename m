@@ -2,110 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AC96C6B3B2B
-	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 10:45:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B04F6B3B3B
+	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 10:47:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229893AbjCJJp4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 04:45:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39568 "EHLO
+        id S231166AbjCJJrL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 04:47:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229521AbjCJJpk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Mar 2023 04:45:40 -0500
-Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B10AE59803;
-        Fri, 10 Mar 2023 01:45:21 -0800 (PST)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mx.sberdevices.ru (Postfix) with ESMTP id CAF465FD11;
-        Fri, 10 Mar 2023 12:45:18 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1678441518;
-        bh=EW36SNWQvg1BKtDD9gJdvaX8Y04wId0Q4TebP8o6aG8=;
-        h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-        b=qpTnxxJ3A26CAzrY/8l0xEMzJ4Ka+FFE5sAMhsIWrlfK9f0J+a/fdgtmnEVELAUeo
-         OAxM7IIRT5T1RIULDjO+25D4XN8VZsBdz4moBuxetLZ+Rhq0X+w2NKruLUS6IFL0Ub
-         8TfTd5/NiHUDAcNDI4SX2MjS/x847wP6UvzSe+PtQGv5w7N9gCVV0FB3ubAfqLsSFx
-         ebA9lJMGDA85eX6hCkTqz0r2T8YCJzDeVoUcbHIU8GY+bBgKS96cc8t4camZ7Sywh1
-         UfmMdKnZtV3ipENkf8RG08PRX7D1+i3fT52dgQzC80egH5nPY8BHlrTdYcTV018xi8
-         Zod2LN/kB6Lcg==
-Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
-        by mx.sberdevices.ru (Postfix) with ESMTP;
-        Fri, 10 Mar 2023 12:45:15 +0300 (MSK)
-Message-ID: <15b9df26-bdc1-e139-8df7-62f966c719ed@sberdevices.ru>
-Date:   Fri, 10 Mar 2023 12:42:13 +0300
+        with ESMTP id S230337AbjCJJq5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Mar 2023 04:46:57 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1DC71ADD8
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 01:46:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1678441560;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=EK9itzNwztWEWdddqk8IMFWiym6+vyjgRi28eISez9E=;
+        b=i8sCGw5oHBzJ1hPO5xt0Pjo0Q/DFUX395zov0etcLDQEjYUvM4yILpBy1Pm26FPcVLOe+P
+        1Pj77p/tqZ4cd6EMu44S2hPh2P5o1OgBKfADqTSfozPTbiGvdUeNZDLXFAJPosYDLdup0G
+        RC7kQpdmqSNwAKzRG6IiHq0SEEsywvQ=
+Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com
+ [209.85.161.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-375-3hMAAEN-PrSaOviSNg30Jw-1; Fri, 10 Mar 2023 04:45:58 -0500
+X-MC-Unique: 3hMAAEN-PrSaOviSNg30Jw-1
+Received: by mail-oo1-f71.google.com with SMTP id d201-20020a4a52d2000000b0051faef7ba52so1484646oob.11
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 01:45:58 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678441557;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EK9itzNwztWEWdddqk8IMFWiym6+vyjgRi28eISez9E=;
+        b=6NhMkxEEF9fKQssT4xT+DQ8ZQrCnZP0Qm9D6KWglmbNW00xxN5IazqrMoaJeNkGOud
+         rL8I0A0+kmnag1TOMF0y42HyQdFjZWZ+4Vjbl9US5A6l99wHKpIWRnW5wCuTMN8cCA5c
+         FZrmk5JektOvvarFZpesM7jRpHVDcEzKSfP+RzCanBWap9lBcrokOPaJCVMgXxTmqxJo
+         cuvkLGMGEi/fTx68V7ksu7B5PcDE3Su8sgz5HwLkzxyul9f4hTncqIoNIFrBysDjm2M9
+         MLVbaVsZHpmTmFd23TLVCzO8qkXXzUeHs07ZQ8ct2/ivGjFitTDAH8ck5bMjFf4cho6h
+         sK7Q==
+X-Gm-Message-State: AO0yUKUDIFnmNa/aQR9wc92ZEQqYO94OYd/LpGOB1uZKC9IxWScdoebX
+        J7fLhHctg2KKIlm3ZFlv7Kx3/RhC/N1Bg4scPQ1klfsLMdCYhX6iw/f3EWB0nmqX1NlEqaXtYB6
+        l8JIyp6QacjAz0bX4xZORkmuB0gIN
+X-Received: by 2002:a05:6870:703:b0:172:cef0:4549 with SMTP id ea3-20020a056870070300b00172cef04549mr8547615oab.9.1678441557608;
+        Fri, 10 Mar 2023 01:45:57 -0800 (PST)
+X-Google-Smtp-Source: AK7set8wFTyGoabixP5OFNVzySToAyCse4a2PQn/SiQim9SvqUPTZJzF14tUdNW7G51x0q/0hGPiEqTsuhQVjiiGEfc=
+X-Received: by 2002:a05:6870:703:b0:172:cef0:4549 with SMTP id
+ ea3-20020a056870070300b00172cef04549mr8547605oab.9.1678441557382; Fri, 10 Mar
+ 2023 01:45:57 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [RFC PATCH v4 0/4] several updates to virtio/vsock
-Content-Language: en-US
-To:     Stefano Garzarella <sgarzare@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, <kvm@vger.kernel.org>,
-        <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <1804d100-1652-d463-8627-da93cb61144e@sberdevices.ru>
- <20230310090937.s55af2fx56zn4ewu@sgarzare-redhat>
-From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
-In-Reply-To: <20230310090937.s55af2fx56zn4ewu@sgarzare-redhat>
+References: <20230207120843.1580403-1-sunnanyong@huawei.com>
+ <Y+7G+tiBCjKYnxcZ@nvidia.com> <20230217051158-mutt-send-email-mst@kernel.org>
+ <Y+92c9us3HVjO2Zq@nvidia.com> <CACGkMEsVBhxtpUFs7TrQzAecO8kK_NR+b1EvD2H7MjJ+2aEKJw@mail.gmail.com>
+ <20230310034101-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20230310034101-mutt-send-email-mst@kernel.org>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Fri, 10 Mar 2023 17:45:46 +0800
+Message-ID: <CACGkMEsr3xSa=1WtU35CepWSJ8CK9g4nGXgmHS_9D09LHi7H8g@mail.gmail.com>
+Subject: Re: [PATCH v2] vhost/vdpa: Add MSI translation tables to iommu for
+ software-managed MSI
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Nanyong Sun <sunnanyong@huawei.com>, joro@8bytes.org,
+        will@kernel.org, robin.murphy@arm.com, iommu@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        wangrong68@huawei.com, Cindy Lu <lulu@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [172.16.1.6]
-X-ClientProxiedBy: S-MS-EXCH01.sberdevices.ru (172.16.1.4) To
- S-MS-EXCH01.sberdevices.ru (172.16.1.4)
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2023/03/10 04:38:00 #20931247
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-        SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Mar 10, 2023 at 4:41=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
+>
+> On Mon, Feb 20, 2023 at 10:37:18AM +0800, Jason Wang wrote:
+> > On Fri, Feb 17, 2023 at 8:43 PM Jason Gunthorpe <jgg@nvidia.com> wrote:
+> > >
+> > > On Fri, Feb 17, 2023 at 05:12:29AM -0500, Michael S. Tsirkin wrote:
+> > > > On Thu, Feb 16, 2023 at 08:14:50PM -0400, Jason Gunthorpe wrote:
+> > > > > On Tue, Feb 07, 2023 at 08:08:43PM +0800, Nanyong Sun wrote:
+> > > > > > From: Rong Wang <wangrong68@huawei.com>
+> > > > > >
+> > > > > > Once enable iommu domain for one device, the MSI
+> > > > > > translation tables have to be there for software-managed MSI.
+> > > > > > Otherwise, platform with software-managed MSI without an
+> > > > > > irq bypass function, can not get a correct memory write event
+> > > > > > from pcie, will not get irqs.
+> > > > > > The solution is to obtain the MSI phy base address from
+> > > > > > iommu reserved region, and set it to iommu MSI cookie,
+> > > > > > then translation tables will be created while request irq.
+> > > > >
+> > > > > Probably not what anyone wants to hear, but I would prefer we not=
+ add
+> > > > > more uses of this stuff. It looks like we have to get rid of
+> > > > > iommu_get_msi_cookie() :\
+> > > > >
+> > > > > I'd like it if vdpa could move to iommufd not keep copying stuff =
+from
+> > > > > it..
+> > > >
+> > > > Absolutely but when is that happening?
+> > >
+> > > Don't know, I think it has to come from the VDPA maintainers, Nicolin
+> > > made some drafts but wasn't able to get it beyond that.
+> >
+> > Cindy (cced) will carry on the work.
+> >
+> > Thanks
+>
+> Hmm didn't see anything yet. Nanyong Sun maybe you can take a look?
 
+Just to clarify, Cindy will work on the iommufd conversion for
+vhost-vDPA, the changes are non-trivial and may take time. Before we
+are able to achieve that,  I think we still need something like this
+patch to make vDPA work on software managed MSI platforms.
 
-On 10.03.2023 12:09, Stefano Garzarella wrote:
-> Hi Arseniy,
-> 
-> On Thu, Mar 09, 2023 at 11:24:42PM +0300, Arseniy Krasnov wrote:
->> Hello,
->>
->> this patchset evolved from previous v2 version (see link below). It does
->> several updates to virtio/vsock:
->> 1) Changes 'virtio_transport_inc/dec_rx_pkt()' interface. Now instead of
->>   using skbuff state ('head' and 'data' pointers) to update 'fwd_cnt'
->>   and 'rx_bytes', integer value is passed as an input argument. This
->>   makes code more simple, because in this case we don't need to update
->>   skbuff state before calling 'virtio_transport_inc/dec_rx_pkt()'. In
->>   more common words - we don't need to change skbuff state to update
->>   'rx_bytes' and 'fwd_cnt' correctly.
->> 2) For SOCK_STREAM, when copying data to user fails, current skbuff is
->>   not dropped. Next read attempt will use same skbuff and last offset.
->>   Instead of 'skb_dequeue()', 'skb_peek()' + '__skb_unlink()' are used.
->>   This behaviour was implemented before skbuff support.
->> 3) For SOCK_SEQPACKET it removes unneeded 'skb_pull()' call, because for
->>   this type of socket each skbuff is used only once: after removing it
->>   from socket's queue, it will be freed anyway.
-> 
-> thanks for the fixes, I would wait a few days to see if there are any
-> comments and then I think you can send it on net without RFC.
-> 
-> @Bobby if you can take a look, your ack would be appreciated :-)
-Ok, thanks for review. I'll wait for several days and also wait until
-net-next will be opened. Then i'll resend this patchset with net-next
+Maybe Nanyong can post a new version that addresses the comment so far?
 
-Thanks, Arseniy
-> 
-> Thanks,
-> Stefano
-> 
+Thanks
+
+>
+> > >
+> > > Please have people who need more iommu platform enablement to pick it
+> > > up instead of merging hacks like this..
+> > >
+> > > We are very close to having nested translation on ARM so anyone who i=
+s
+> > > serious about VDPA on ARM is going to need iommufd anyhow.
+> > >
+> > > Jason
+> > >
+>
+
