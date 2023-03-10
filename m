@@ -2,341 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 65B9F6B54BE
-	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 23:44:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 935F76B55A6
+	for <lists+kvm@lfdr.de>; Sat, 11 Mar 2023 00:32:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231863AbjCJWoW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 17:44:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43080 "EHLO
+        id S231666AbjCJXcK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 18:32:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231860AbjCJWnp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Mar 2023 17:43:45 -0500
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 763955274
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 14:42:55 -0800 (PST)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1palQh-0002dF-AE; Fri, 10 Mar 2023 23:41:39 +0100
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1palQf-003Gqb-K3; Fri, 10 Mar 2023 23:41:37 +0100
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1palQe-003uEm-Ud; Fri, 10 Mar 2023 23:41:36 +0100
-From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-To:     Stuart Yoder <stuyoder@gmail.com>,
-        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-        =?utf-8?q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Vinod Koul <vkoul@kernel.org>,
-        Ioana Ciornei <ioana.ciornei@nxp.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Yangbo Lu <yangbo.lu@nxp.com>,
-        Roy Pledge <Roy.Pledge@nxp.com>, Li Yang <leoyang.li@nxp.com>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Richard Cochran <richardcochran@gmail.com>
-Cc:     =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <uwe@kleine-koenig.org>,
-        kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
-        netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Subject: [PATCH 6/6] bus: fsl-mc: Make remove function return void
-Date:   Fri, 10 Mar 2023 23:41:28 +0100
-Message-Id: <20230310224128.2638078-7-u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.39.1
-In-Reply-To: <20230310224128.2638078-1-u.kleine-koenig@pengutronix.de>
-References: <20230310224128.2638078-1-u.kleine-koenig@pengutronix.de>
+        with ESMTP id S231196AbjCJXcG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Mar 2023 18:32:06 -0500
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2085.outbound.protection.outlook.com [40.107.92.85])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1C4113B974;
+        Fri, 10 Mar 2023 15:32:04 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QPIyCttCYdiE9zENEkXtWXl6KLSIp8Lc+I5x94TcUNF7m6GGgEnBmWT0Sj86DbdwuNhqLa3FLBxMfN8OcB4lhiApf/MPuqPLs+4oefJCaK35D5/Ld3Y54DBAcH8Ad7LjlkuSzL3JV9HNuX3daFN5yXoNIFeGzPKAQ2/SfSKbJzZB8E/v39TFvDjwe2b5uBE8Ew0rSE2imX3sICgJ06NHj1wat/qQbVpWmZ3wSvAQrYH0a8pQZTZfnS0DbP7WJhuUlQYE09inFw2D2BC5Xa0PHEnK/NvMpzuMQuNJEHS9nbrkREr81jxQrSLi8A7EjWMSTYF/eWWwc8EtTJ9yQIQIvw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ze65Qvscn1qoKbFtWyDwfgI901QDZEwf8egpz6sTk3g=;
+ b=JEUdt243DL8aasWguhIwnhrUt4lPBdguT7ospnqYxe5+qWND9sTzALv1nVtn7M1PnjM9jPFyJIHgh2Pu1XQqV63XTyQSeP/3yi+2OmLTQCRAvHXUqD94WYnaUqYKqx8vOWyxQWwU4UmSDN00Vg3qw2yW0avJS+imv3ZIlZpwrmGN3Bvp/kXPbbFr5R6+nxC/fSVlNwFRaucYph0MHZQVJAqrfYC1oB7kz5SF+7gaNngFOo5UYwEYVUO7yGH62+rS6FA6/WyvICU8bFJavClodA3hbhjOZmCnxSC36AvsyOwLdQDn82mlQ0gUkNJzJOjCDDk6RqNKFZ0OD2y3axcZZw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=lists.linux.dev smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ze65Qvscn1qoKbFtWyDwfgI901QDZEwf8egpz6sTk3g=;
+ b=ZOOYkaQe7dRqEhIeIGxdcoOYbaYqWtWSnQdk7khfYcoPwH8Sq7wEIACvzwud7YX66ItCcjzqGhLLVav08qt57hMHD7eTSYBfibPo6bnzDn2bIr374C7EsdU4QLeQN+tJzYmzolJ7IgGJepCzYlRobiP6FJ/SAWEkn7wvqG4UA1iNxAvv9PeeWS5Sh3Mm6FHCf3VP9635bPC2eeMf5/aytHI1HHkOGhxyFtjOsNWbzXIKhmnhxci5DpYdx/xSi2yyHXQbRAZMkJV1ob9s8d1aTIWtFG6Z8IA43U3HdWVezNdEK9rxF3oUYZkgY3vamSSlI25qBgWgerdvWmrzcupxFg==
+Received: from MW2PR16CA0059.namprd16.prod.outlook.com (2603:10b6:907:1::36)
+ by PH7PR12MB7892.namprd12.prod.outlook.com (2603:10b6:510:27e::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.19; Fri, 10 Mar
+ 2023 23:32:02 +0000
+Received: from CO1NAM11FT015.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:907:1:cafe::88) by MW2PR16CA0059.outlook.office365.com
+ (2603:10b6:907:1::36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.20 via Frontend
+ Transport; Fri, 10 Mar 2023 23:32:02 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ CO1NAM11FT015.mail.protection.outlook.com (10.13.175.130) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6178.20 via Frontend Transport; Fri, 10 Mar 2023 23:32:02 +0000
+Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Fri, 10 Mar 2023
+ 15:31:47 -0800
+Received: from drhqmail202.nvidia.com (10.126.190.181) by
+ drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.37; Fri, 10 Mar 2023 15:31:46 -0800
+Received: from Asurada-Nvidia (10.127.8.9) by mail.nvidia.com (10.126.190.181)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5 via Frontend
+ Transport; Fri, 10 Mar 2023 15:31:45 -0800
+Date:   Fri, 10 Mar 2023 15:31:44 -0800
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     Yi Liu <yi.l.liu@intel.com>, <joro@8bytes.org>,
+        <alex.williamson@redhat.com>, <kevin.tian@intel.com>,
+        <robin.murphy@arm.com>, <baolu.lu@linux.intel.com>,
+        <cohuck@redhat.com>, <eric.auger@redhat.com>,
+        <kvm@vger.kernel.org>, <mjrosato@linux.ibm.com>,
+        <chao.p.peng@linux.intel.com>, <yi.y.sun@linux.intel.com>,
+        <peterx@redhat.com>, <jasowang@redhat.com>,
+        <shameerali.kolothum.thodi@huawei.com>, <lulu@redhat.com>,
+        <suravee.suthikulpanit@amd.com>, <iommu@lists.linux.dev>,
+        <linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH 05/12] iommufd/hw_pagetable: Do not populate user-managed
+ hw_pagetables
+Message-ID: <ZAu94B2sEw45qPHC@Asurada-Nvidia>
+References: <20230309080910.607396-1-yi.l.liu@intel.com>
+ <20230309080910.607396-6-yi.l.liu@intel.com>
+ <ZAtMyrAOyWV1mDlx@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=10084; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=9mBAd0011vCFVMqmKv0sG8u7xl0d5ng9BqpXGJnY3UY=; b=owEBbQGS/pANAwAKAcH8FHityuwJAcsmYgBkC7IS4iDBmtk6endpHGEPsd8XTh4Wj6zZvJ4+p 3A9Hbr8tomJATMEAAEKAB0WIQR+cioWkBis/z50pAvB/BR4rcrsCQUCZAuyEgAKCRDB/BR4rcrs Cd01B/472HXgkkn1dxwJPe/PvNhCuB9iH9vI0Z1P6W+GYbYOaQK+LurDS+akY5QNd7tjzm4qWfm dZ4bbwuSY/lbJGxiDl3ZPsis0maetj+wnZFrxeVoH6+lNMmDaY8mqcKRjYRudOrP7aHGH7G7SQR o2n7D3BLUtp8aa6N9z87rmGT0CjTgOHoBshxHP2X5C/Mxs0Salc6xzduYSqyA5gqyFx4hwYaGcI vxLxA0+n0+TvBJGthGurOF977Cy8QlSysrsMuNnlOu2h241u2Vmr5ZOt8IqzN4D6e7ZDOOaG7d9 akuL2eJqsYXWXQ/ODB390DjCekbI2cL9jLOdoZn7SuQnOYWF
-X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: kvm@vger.kernel.org
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ZAtMyrAOyWV1mDlx@nvidia.com>
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1NAM11FT015:EE_|PH7PR12MB7892:EE_
+X-MS-Office365-Filtering-Correlation-Id: ed195440-7f18-42e6-4ca9-08db21bfa69f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 8+F1GMzWEnU6cuZ3TPiuNP5Je0bnFBC8ND6YURhaJKQ8sz2Fbtd1+I3+nAfujXYf0+mVpQjHYes5ksuvm8ginceSe7O/EbYrN1mRAfYoTFMnphcd21TyFs029x8OTH9TrYi2HPxeMy6oacLruMdZAvVtwINTxLszJxGeZzZKaPHatDHIdK0y8mf5gCYTW+pFQDq198MotHqOpWoLam5SiCytSnmz9twdKX0Cn8/Mg4mLGVXxCCFgi/i7Q1jbynJgNWCAT7b1Pjciu6IUI8Q9fNkUuK35RL3zSi+T8lyMIPRYPbF5sxo833gjKQdb5ppjFjE1C/gt3rV7tfyN3K/wa2FRDMmwx71oqvU4Hb9AZnY8Xk7MBZ8hwx3AdIVqVqLR1t8Ykgx32QwKGuN5V+fGeyZhx1Xz0/QeT1fAc4Oyc35MWj+OQRrSG+Jqo/f36mI4iUw1qEk6q1a2P9G8QjPoO/f7x6FaUsJZ48NIG0ELTov+ChnLNYUWit8sCBUwIWyxKzjMlJOyhfd6YkXqXDxnVENg62JzTqUuS4WGyK1pTFmtpDJXNflWNgB4o1aLycMEMkL+KjTL8I2gWJLwqt3wwH+s9YbLpg34vpqB2jjJjlf2DK6akv3Vx3nlIiQ1RkToPv4RKBSvmGT8R8phZt4bV2SrV5ZWZMKyZ7lVM8wi5XjWM9D/uEICsK5Ci0FH4O3pBQEUaCl+6JaTbmTdJuKqarmcDu5EGk1tG2FRjkGV3NF7pptfKQDAzvinCTwENHYX
+X-Forefront-Antispam-Report: CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230025)(4636009)(346002)(396003)(39860400002)(136003)(376002)(451199018)(40470700004)(46966006)(36840700001)(40460700003)(55016003)(356005)(6636002)(54906003)(478600001)(5660300002)(7416002)(316002)(6862004)(8936002)(2906002)(70206006)(8676002)(70586007)(4326008)(41300700001)(7636003)(82740400003)(36860700001)(9686003)(40480700001)(86362001)(186003)(33716001)(26005)(82310400005)(83380400001)(426003)(47076005)(336012);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Mar 2023 23:32:02.0203
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: ed195440-7f18-42e6-4ca9-08db21bfa69f
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT015.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7892
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Uwe Kleine-König <uwe@kleine-koenig.org>
+On Fri, Mar 10, 2023 at 11:29:14AM -0400, Jason Gunthorpe wrote:
+> On Thu, Mar 09, 2023 at 12:09:03AM -0800, Yi Liu wrote:
+> > From: Nicolin Chen <nicolinc@nvidia.com>
+> > 
+> > A user-managed hw_pagetable does not need to get populated, since it is
+> > managed by a guest OS. Move the iopt_table_add_domain and list_add_tail
+> > calls into a helper, where the hwpt pointer will be redirected to its
+> > hwpt->parent if it's available.
+> > 
+> > Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
+> > Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> > ---
+> >  drivers/iommu/iommufd/hw_pagetable.c | 20 ++++++++++++++++++--
+> >  1 file changed, 18 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/iommu/iommufd/hw_pagetable.c b/drivers/iommu/iommufd/hw_pagetable.c
+> > index 16e92a1c150b..6e45ec0a66fa 100644
+> > --- a/drivers/iommu/iommufd/hw_pagetable.c
+> > +++ b/drivers/iommu/iommufd/hw_pagetable.c
+> > @@ -43,6 +43,23 @@ int iommufd_hw_pagetable_enforce_cc(struct iommufd_hw_pagetable *hwpt)
+> >  	return 0;
+> >  }
+> >  
+> > +static int iommufd_hw_pagetable_link_ioas(struct iommufd_hw_pagetable *hwpt)
+> > +{
+> > +	int rc;
+> > +
+> > +	if (hwpt->parent)
+> 
+> This should be:
+> 
+>    hwpt->domain->type != IOMMU_DOMAIN_UNMANAGED
+> 
+> Ie if we asked the driver to alloc a domain and it allocated an
+> UNMANAGED domain then it means IOMMUFD manages the mappings and it
+> should be populated from the IOAS.
 
-The value returned by an fsl-mc driver's remove function is mostly
-ignored.  (Only an error message is printed if the value is non-zero
-and then device removal continues unconditionally.)
+OK. That looks better to me.
 
-So change the prototype of the remove function to return no value. This
-way driver authors are not tempted to assume that passing an error to
-the upper layer is a good idea. All drivers are adapted accordingly.
-There is no intended change of behaviour, all callbacks were prepared to
-return 0 before.
+> Arguably drivers should EOPNOTSUPP if presented with a parent in this
+> situation, but still this code should be clear about the purpose.
+> 
+> > +		hwpt = hwpt->parent;
+> 
+> And we definately shouldn't touch the parent. That is already setup
+> and owned by someone else. Just return and don't do anything.
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
----
- drivers/bus/fsl-mc/dprc-driver.c                    | 5 ++---
- drivers/bus/fsl-mc/fsl-mc-allocator.c               | 5 ++---
- drivers/bus/fsl-mc/fsl-mc-bus.c                     | 5 +----
- drivers/crypto/caam/caamalg_qi2.c                   | 4 +---
- drivers/dma/fsl-dpaa2-qdma/dpaa2-qdma.c             | 4 +---
- drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c    | 4 +---
- drivers/net/ethernet/freescale/dpaa2/dpaa2-ptp.c    | 4 +---
- drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c | 4 +---
- drivers/soc/fsl/dpio/dpio-driver.c                  | 4 +---
- drivers/vfio/fsl-mc/vfio_fsl_mc.c                   | 3 +--
- include/linux/fsl/mc.h                              | 2 +-
- 11 files changed, 13 insertions(+), 31 deletions(-)
+Yes.
 
-diff --git a/drivers/bus/fsl-mc/dprc-driver.c b/drivers/bus/fsl-mc/dprc-driver.c
-index ef4f43f67b80..595d4cecd041 100644
---- a/drivers/bus/fsl-mc/dprc-driver.c
-+++ b/drivers/bus/fsl-mc/dprc-driver.c
-@@ -835,13 +835,13 @@ EXPORT_SYMBOL_GPL(dprc_cleanup);
-  * It tears down the interrupts that were configured for the DPRC device.
-  * It destroys the interrupt pool associated with this MC bus.
-  */
--static int dprc_remove(struct fsl_mc_device *mc_dev)
-+static void dprc_remove(struct fsl_mc_device *mc_dev)
- {
- 	struct fsl_mc_bus *mc_bus = to_fsl_mc_bus(mc_dev);
- 
- 	if (!mc_bus->irq_resources) {
- 		dev_err(&mc_dev->dev, "No irq resources, so unbinding the device failed\n");
--		return 0;
-+		return;
- 	}
- 
- 	if (dev_get_msi_domain(&mc_dev->dev))
-@@ -852,7 +852,6 @@ static int dprc_remove(struct fsl_mc_device *mc_dev)
- 	dprc_cleanup(mc_dev);
- 
- 	dev_info(&mc_dev->dev, "DPRC device unbound from driver");
--	return 0;
- }
- 
- static const struct fsl_mc_device_id match_id_table[] = {
-diff --git a/drivers/bus/fsl-mc/fsl-mc-allocator.c b/drivers/bus/fsl-mc/fsl-mc-allocator.c
-index 36f70e5e418b..0ad68099684e 100644
---- a/drivers/bus/fsl-mc/fsl-mc-allocator.c
-+++ b/drivers/bus/fsl-mc/fsl-mc-allocator.c
-@@ -614,19 +614,18 @@ static int fsl_mc_allocator_probe(struct fsl_mc_device *mc_dev)
-  * fsl_mc_allocator_remove - callback invoked when an allocatable device is
-  * being removed from the system
-  */
--static int fsl_mc_allocator_remove(struct fsl_mc_device *mc_dev)
-+static void fsl_mc_allocator_remove(struct fsl_mc_device *mc_dev)
- {
- 	int error;
- 
- 	if (mc_dev->resource) {
- 		error = fsl_mc_resource_pool_remove_device(mc_dev);
- 		if (error < 0)
--			return 0;
-+			return;
- 	}
- 
- 	dev_dbg(&mc_dev->dev,
- 		"Allocatable fsl-mc device unbound from fsl_mc_allocator driver");
--	return 0;
- }
- 
- static const struct fsl_mc_device_id match_id_table[] = {
-diff --git a/drivers/bus/fsl-mc/fsl-mc-bus.c b/drivers/bus/fsl-mc/fsl-mc-bus.c
-index 1531e6101fb1..08b7dc8f2181 100644
---- a/drivers/bus/fsl-mc/fsl-mc-bus.c
-+++ b/drivers/bus/fsl-mc/fsl-mc-bus.c
-@@ -454,11 +454,8 @@ static int fsl_mc_driver_remove(struct device *dev)
- {
- 	struct fsl_mc_driver *mc_drv = to_fsl_mc_driver(dev->driver);
- 	struct fsl_mc_device *mc_dev = to_fsl_mc_device(dev);
--	int error;
- 
--	error = mc_drv->remove(mc_dev);
--	if (error < 0)
--		dev_err(dev, "%s failed: %d\n", __func__, error);
-+	mc_drv->remove(mc_dev);
- 
- 	return 0;
- }
-diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
-index 5c8d35edaa1c..9156bbe038b7 100644
---- a/drivers/crypto/caam/caamalg_qi2.c
-+++ b/drivers/crypto/caam/caamalg_qi2.c
-@@ -5402,7 +5402,7 @@ static int dpaa2_caam_probe(struct fsl_mc_device *dpseci_dev)
- 	return err;
- }
- 
--static int __cold dpaa2_caam_remove(struct fsl_mc_device *ls_dev)
-+static void __cold dpaa2_caam_remove(struct fsl_mc_device *ls_dev)
- {
- 	struct device *dev;
- 	struct dpaa2_caam_priv *priv;
-@@ -5443,8 +5443,6 @@ static int __cold dpaa2_caam_remove(struct fsl_mc_device *ls_dev)
- 	free_percpu(priv->ppriv);
- 	fsl_mc_portal_free(priv->mc_io);
- 	kmem_cache_destroy(qi_cache);
--
--	return 0;
- }
- 
- int dpaa2_caam_enqueue(struct device *dev, struct caam_request *req)
-diff --git a/drivers/dma/fsl-dpaa2-qdma/dpaa2-qdma.c b/drivers/dma/fsl-dpaa2-qdma/dpaa2-qdma.c
-index 8dd40d00a672..a42a37634881 100644
---- a/drivers/dma/fsl-dpaa2-qdma/dpaa2-qdma.c
-+++ b/drivers/dma/fsl-dpaa2-qdma/dpaa2-qdma.c
-@@ -765,7 +765,7 @@ static int dpaa2_qdma_probe(struct fsl_mc_device *dpdmai_dev)
- 	return err;
- }
- 
--static int dpaa2_qdma_remove(struct fsl_mc_device *ls_dev)
-+static void dpaa2_qdma_remove(struct fsl_mc_device *ls_dev)
- {
- 	struct dpaa2_qdma_engine *dpaa2_qdma;
- 	struct dpaa2_qdma_priv *priv;
-@@ -787,8 +787,6 @@ static int dpaa2_qdma_remove(struct fsl_mc_device *ls_dev)
- 	dma_async_device_unregister(&dpaa2_qdma->dma_dev);
- 	kfree(priv);
- 	kfree(dpaa2_qdma);
--
--	return 0;
- }
- 
- static void dpaa2_qdma_shutdown(struct fsl_mc_device *ls_dev)
-diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
-index a62cffaf6ff1..a9676d0dece8 100644
---- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
-+++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
-@@ -5025,7 +5025,7 @@ static int dpaa2_eth_probe(struct fsl_mc_device *dpni_dev)
- 	return err;
- }
- 
--static int dpaa2_eth_remove(struct fsl_mc_device *ls_dev)
-+static void dpaa2_eth_remove(struct fsl_mc_device *ls_dev)
- {
- 	struct device *dev;
- 	struct net_device *net_dev;
-@@ -5073,8 +5073,6 @@ static int dpaa2_eth_remove(struct fsl_mc_device *ls_dev)
- 	dev_dbg(net_dev->dev.parent, "Removed interface %s\n", net_dev->name);
- 
- 	free_netdev(net_dev);
--
--	return 0;
- }
- 
- static const struct fsl_mc_device_id dpaa2_eth_match_id_table[] = {
-diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-ptp.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-ptp.c
-index 90d23ab1ce9d..4497e3c0456d 100644
---- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-ptp.c
-+++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-ptp.c
-@@ -219,7 +219,7 @@ static int dpaa2_ptp_probe(struct fsl_mc_device *mc_dev)
- 	return err;
- }
- 
--static int dpaa2_ptp_remove(struct fsl_mc_device *mc_dev)
-+static void dpaa2_ptp_remove(struct fsl_mc_device *mc_dev)
- {
- 	struct device *dev = &mc_dev->dev;
- 	struct ptp_qoriq *ptp_qoriq;
-@@ -232,8 +232,6 @@ static int dpaa2_ptp_remove(struct fsl_mc_device *mc_dev)
- 	fsl_mc_free_irqs(mc_dev);
- 	dprtc_close(mc_dev->mc_io, 0, mc_dev->mc_handle);
- 	fsl_mc_portal_free(mc_dev->mc_io);
--
--	return 0;
- }
- 
- static const struct fsl_mc_device_id dpaa2_ptp_match_id_table[] = {
-diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-index f4ae4289c41a..21cc4e52425a 100644
---- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-+++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-@@ -3221,7 +3221,7 @@ static void dpaa2_switch_teardown(struct fsl_mc_device *sw_dev)
- 		dev_warn(dev, "dpsw_close err %d\n", err);
- }
- 
--static int dpaa2_switch_remove(struct fsl_mc_device *sw_dev)
-+static void dpaa2_switch_remove(struct fsl_mc_device *sw_dev)
- {
- 	struct ethsw_port_priv *port_priv;
- 	struct ethsw_core *ethsw;
-@@ -3252,8 +3252,6 @@ static int dpaa2_switch_remove(struct fsl_mc_device *sw_dev)
- 	kfree(ethsw);
- 
- 	dev_set_drvdata(dev, NULL);
--
--	return 0;
- }
- 
- static int dpaa2_switch_probe_port(struct ethsw_core *ethsw,
-diff --git a/drivers/soc/fsl/dpio/dpio-driver.c b/drivers/soc/fsl/dpio/dpio-driver.c
-index 09df5302d255..9e3fddd8f5a9 100644
---- a/drivers/soc/fsl/dpio/dpio-driver.c
-+++ b/drivers/soc/fsl/dpio/dpio-driver.c
-@@ -270,7 +270,7 @@ static void dpio_teardown_irqs(struct fsl_mc_device *dpio_dev)
- 	fsl_mc_free_irqs(dpio_dev);
- }
- 
--static int dpaa2_dpio_remove(struct fsl_mc_device *dpio_dev)
-+static void dpaa2_dpio_remove(struct fsl_mc_device *dpio_dev)
- {
- 	struct device *dev;
- 	struct dpio_priv *priv;
-@@ -299,8 +299,6 @@ static int dpaa2_dpio_remove(struct fsl_mc_device *dpio_dev)
- 
- err_open:
- 	fsl_mc_portal_free(dpio_dev->mc_io);
--
--	return 0;
- }
- 
- static const struct fsl_mc_device_id dpaa2_dpio_match_id_table[] = {
-diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-index c89a047a4cd8..f2140e94d41e 100644
---- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-+++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-@@ -570,7 +570,7 @@ static void vfio_fsl_mc_release_dev(struct vfio_device *core_vdev)
- 	mutex_destroy(&vdev->igate);
- }
- 
--static int vfio_fsl_mc_remove(struct fsl_mc_device *mc_dev)
-+static void vfio_fsl_mc_remove(struct fsl_mc_device *mc_dev)
- {
- 	struct device *dev = &mc_dev->dev;
- 	struct vfio_fsl_mc_device *vdev = dev_get_drvdata(dev);
-@@ -578,7 +578,6 @@ static int vfio_fsl_mc_remove(struct fsl_mc_device *mc_dev)
- 	vfio_unregister_group_dev(&vdev->vdev);
- 	dprc_remove_devices(mc_dev, NULL, 0);
- 	vfio_put_device(&vdev->vdev);
--	return 0;
- }
- 
- static const struct vfio_device_ops vfio_fsl_mc_ops = {
-diff --git a/include/linux/fsl/mc.h b/include/linux/fsl/mc.h
-index a86115bc799c..a1b3de87a3d1 100644
---- a/include/linux/fsl/mc.h
-+++ b/include/linux/fsl/mc.h
-@@ -48,7 +48,7 @@ struct fsl_mc_driver {
- 	struct device_driver driver;
- 	const struct fsl_mc_device_id *match_id_table;
- 	int (*probe)(struct fsl_mc_device *dev);
--	int (*remove)(struct fsl_mc_device *dev);
-+	void (*remove)(struct fsl_mc_device *dev);
- 	void (*shutdown)(struct fsl_mc_device *dev);
- 	int (*suspend)(struct fsl_mc_device *dev, pm_message_t state);
- 	int (*resume)(struct fsl_mc_device *dev);
--- 
-2.39.1
-
+Nic
