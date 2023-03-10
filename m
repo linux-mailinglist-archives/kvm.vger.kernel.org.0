@@ -2,124 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 657F36B39F0
-	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 10:15:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E91776B39F7
+	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 10:15:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229639AbjCJJPS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 04:15:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36252 "EHLO
+        id S231307AbjCJJP5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 04:15:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230373AbjCJJO0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Mar 2023 04:14:26 -0500
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80DA9DCF7F;
-        Fri, 10 Mar 2023 01:09:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678439376; x=1709975376;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=mjkXovl93kn3hcIeaYY4ha9QbNT3veElSNEnN/DwLi4=;
-  b=RWcfkfrAvkHkYcHTWdXywM9tS/SYhfiCiN9HuAaBol12oZa5BKnfBzxO
-   a4v9V1gucdVMpQ+/V1t/0MOrviLIxIJTyYbw4hNp/ucABWRaerbBFb7mD
-   Uip3puvE0SIYKPaxoJClN1OV8qdMPDNHpiJeVS+emiobMsoYmcjszdGse
-   Jz0TBiw+q0gbB/3HEfl5zrIdh65+vGbss7wE0tFg7mp3wfgIZXLfR6ZNS
-   PdxeoVTBACNfWshJ2xOFTM8AVWOz8jgV70mWvImG9ewe90A8Yk7uor4eG
-   yiIIq8/LjAYUn1yTYOrxpz0uspMjoNLDbbZIpsgHE8rH5Czpd7uP0WNDv
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10644"; a="422952550"
-X-IronPort-AV: E=Sophos;i="5.98,249,1673942400"; 
-   d="scan'208";a="422952550"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2023 01:09:29 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10644"; a="746636816"
-X-IronPort-AV: E=Sophos;i="5.98,249,1673942400"; 
-   d="scan'208";a="746636816"
-Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
-  by fmsmga004.fm.intel.com with ESMTP; 10 Mar 2023 01:09:18 -0800
-Message-ID: <81e3e68b02528e1720df5ccb43d960e11de17e3c.camel@linux.intel.com>
-Subject: Re: [PATCH v2 2/2] Documentation/process: Add a maintainer handbook
- for KVM x86
-From:   Robert Hoo <robert.hu@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sagi Shahar <sagis@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Peter Shier <pshier@google.com>,
-        Anish Ghulati <aghulati@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        James Houghton <jthoughton@google.com>,
-        Anish Moorthy <amoorthy@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Axel Rasmussen <axelrasmussen@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Ashish Kalra <ashish.kalra@amd.com>,
-        Babu Moger <babu.moger@amd.com>, Chao Gao <chao.gao@intel.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Chenyi Qiang <chenyi.qiang@intel.com>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Guang Zeng <guang.zeng@intel.com>,
-        Hou Wenlong <houwenlong.hwl@antgroup.com>,
-        Jiaxi Chen <jiaxi.chen@linux.intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Jing Liu <jing2.liu@intel.com>,
-        Junaid Shahid <junaids@google.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Leonardo Bras <leobras@redhat.com>,
-        Like Xu <like.xu.linux@gmail.com>,
-        Li RongQing <lirongqing@baidu.com>,
-        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Michal Luczaj <mhal@rbox.co>,
-        Mingwei Zhang <mizhang@google.com>,
-        Nikunj A Dadhania <nikunj@amd.com>,
-        Paul Durrant <pdurrant@amazon.com>,
-        Peng Hao <flyingpenghao@gmail.com>,
-        Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Wei Wang <wei.w.wang@intel.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Zhenzhong Duan <zhenzhong.duan@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Fri, 10 Mar 2023 17:09:17 +0800
-In-Reply-To: <20230309010336.519123-3-seanjc@google.com>
-References: <20230309010336.519123-1-seanjc@google.com>
-         <20230309010336.519123-3-seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-10.el7) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231659AbjCJJPK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Mar 2023 04:15:10 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6EF018143
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 01:09:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1678439384;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=lsjkU85N4FNU0o/oNblF3pwjNhend/N5SR9L0EvjGbM=;
+        b=XsoU7KIq5Y1vCyN0pFbbfCB91HnmnYTjlOwPnarFsZFdptDPVWbvpUHw3J0tYhwYTemlni
+        oITrvRqq3RLKKjnMZl2Chxy7QllhJJNrqn+I2orJjpznTftiIvXMmX5JhbU1ZVYEAt7zIg
+        ICCFQmNh4JTlBcibPRivKoxvAazeRio=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-516-ous9B5JYMQq-ZV_XBTDkrg-1; Fri, 10 Mar 2023 04:09:42 -0500
+X-MC-Unique: ous9B5JYMQq-ZV_XBTDkrg-1
+Received: by mail-wr1-f72.google.com with SMTP id u5-20020a5d6da5000000b002cd82373455so909187wrs.9
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 01:09:42 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678439381;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lsjkU85N4FNU0o/oNblF3pwjNhend/N5SR9L0EvjGbM=;
+        b=2/gm6O51YD5cYdtSj53tT09b+PgFQ4Yzpbg3k2usNYNwC+aGiaPS5uwcnnPtxOQLKG
+         oYxZAGLgCPfquX4z3CUU2uXX/o5tzWwhK/6m8Y9xYyCuIH6Iu33+U8ugtxG87Wh9u2qs
+         Kx0hmlSsTVHIVafaE7NJFGI+Bn3bRWAUcYaDHqsBepbwEJ41421U9vSdduMLvFSuSNf+
+         BVaPHvgNEmoQlh7WETkwECBt1HrcIrREAFtqRL2yo8Thuc/L6NRYcRw3Yt1XGpCO8Uyi
+         GDhW8uoRR25xwMuHZ9xdDMARWX/GuC/1QL6uKBl/xM2m5lY3BfPR2HUGGfryAkovcGhL
+         VMOw==
+X-Gm-Message-State: AO0yUKVf02Hatif56NZyp/fjENBFSEv1loGWWO7ub2zFfg1HQzZF7sNL
+        kywWU4OL7jXNxbm9UxMsxI7zLcoQjaG5QwlqPKFZqyv6aUX2OZ0PrjoEd4Bo8eM1WYmsjHJ3JXj
+        UDQXXUNYzUkdc
+X-Received: by 2002:a05:600c:5493:b0:3ea:edc7:aa59 with SMTP id iv19-20020a05600c549300b003eaedc7aa59mr1966015wmb.32.1678439381606;
+        Fri, 10 Mar 2023 01:09:41 -0800 (PST)
+X-Google-Smtp-Source: AK7set82DcNAbEYxkRgzwkXhtStyGRG6ScEq9WaLV3HetEFKZK8m0CtX+X41h5pDK46UpFBKYqStZQ==
+X-Received: by 2002:a05:600c:5493:b0:3ea:edc7:aa59 with SMTP id iv19-20020a05600c549300b003eaedc7aa59mr1965990wmb.32.1678439381344;
+        Fri, 10 Mar 2023 01:09:41 -0800 (PST)
+Received: from sgarzare-redhat (host-82-57-51-170.retail.telecomitalia.it. [82.57.51.170])
+        by smtp.gmail.com with ESMTPSA id n12-20020a5d67cc000000b002c8476dde7asm1539421wrw.114.2023.03.10.01.09.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Mar 2023 01:09:40 -0800 (PST)
+Date:   Fri, 10 Mar 2023 10:09:37 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseniy Krasnov <avkrasnov@sberdevices.ru>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel@sberdevices.ru,
+        oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v4 0/4] several updates to virtio/vsock
+Message-ID: <20230310090937.s55af2fx56zn4ewu@sgarzare-redhat>
+References: <1804d100-1652-d463-8627-da93cb61144e@sberdevices.ru>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <1804d100-1652-d463-8627-da93cb61144e@sberdevices.ru>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2023-03-08 at 17:03 -0800, Sean Christopherson wrote:
-(...)
-> +Using reverse fir tree for variable declarations isn't strictly
-> required,
-> +though it is still preferred.
-> +
-I googled, but didn't find what's "fir tree". Shed more light?
-I saw Maciej also asked.
-https://lore.kernel.org/kvm/2dfae61c-6ac7-7686-ebd1-6ad4448b2bf8@maciej.szmigiero.name/
+Hi Arseniy,
 
+On Thu, Mar 09, 2023 at 11:24:42PM +0300, Arseniy Krasnov wrote:
+>Hello,
+>
+>this patchset evolved from previous v2 version (see link below). It does
+>several updates to virtio/vsock:
+>1) Changes 'virtio_transport_inc/dec_rx_pkt()' interface. Now instead of
+>   using skbuff state ('head' and 'data' pointers) to update 'fwd_cnt'
+>   and 'rx_bytes', integer value is passed as an input argument. This
+>   makes code more simple, because in this case we don't need to update
+>   skbuff state before calling 'virtio_transport_inc/dec_rx_pkt()'. In
+>   more common words - we don't need to change skbuff state to update
+>   'rx_bytes' and 'fwd_cnt' correctly.
+>2) For SOCK_STREAM, when copying data to user fails, current skbuff is
+>   not dropped. Next read attempt will use same skbuff and last offset.
+>   Instead of 'skb_dequeue()', 'skb_peek()' + '__skb_unlink()' are used.
+>   This behaviour was implemented before skbuff support.
+>3) For SOCK_SEQPACKET it removes unneeded 'skb_pull()' call, because for
+>   this type of socket each skbuff is used only once: after removing it
+>   from socket's queue, it will be freed anyway.
+
+thanks for the fixes, I would wait a few days to see if there are any
+comments and then I think you can send it on net without RFC.
+
+@Bobby if you can take a look, your ack would be appreciated :-)
+
+Thanks,
+Stefano
 
