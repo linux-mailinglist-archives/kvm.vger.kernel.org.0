@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 327276B3A24
-	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 10:17:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 09C8E6B3A2A
+	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 10:17:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229471AbjCJJRk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 04:17:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57338 "EHLO
+        id S229598AbjCJJRm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 04:17:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230232AbjCJJQt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230428AbjCJJQt (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 10 Mar 2023 04:16:49 -0500
 Received: from imap5.colo.codethink.co.uk (imap5.colo.codethink.co.uk [78.40.148.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7242010A4C2
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC8A910A4C3
         for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 01:12:47 -0800 (PST)
 Received: from [167.98.27.226] (helo=lawrence-thinkpad.office.codethink.co.uk)
         by imap5.colo.codethink.co.uk with esmtpsa  (Exim 4.94.2 #2 (Debian))
-        id 1paYnd-00GpVx-9a; Fri, 10 Mar 2023 09:12:29 +0000
+        id 1paYnd-00GpVx-Ha; Fri, 10 Mar 2023 09:12:29 +0000
 From:   Lawrence Hunter <lawrence.hunter@codethink.co.uk>
 To:     qemu-devel@nongnu.org
 Cc:     dickon.hood@codethink.co.uk, nazar.kazakov@codethink.co.uk,
@@ -25,9 +25,9 @@ Cc:     dickon.hood@codethink.co.uk, nazar.kazakov@codethink.co.uk,
         bin.meng@windriver.com, pbonzini@redhat.com,
         philipp.tomsich@vrull.eu, kvm@vger.kernel.org,
         Lawrence Hunter <lawrence.hunter@codethink.co.uk>
-Subject: [PATCH 22/45] target/riscv: Add vaesdm.vs decoding, translation and execution support
-Date:   Fri, 10 Mar 2023 09:11:52 +0000
-Message-Id: <20230310091215.931644-23-lawrence.hunter@codethink.co.uk>
+Subject: [PATCH 23/45] target/riscv: Add vaesz.vs decoding, translation and execution support
+Date:   Fri, 10 Mar 2023 09:11:53 +0000
+Message-Id: <20230310091215.931644-24-lawrence.hunter@codethink.co.uk>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230310091215.931644-1-lawrence.hunter@codethink.co.uk>
 References: <20230310091215.931644-1-lawrence.hunter@codethink.co.uk>
@@ -46,48 +46,46 @@ Signed-off-by: Lawrence Hunter <lawrence.hunter@codethink.co.uk>
  target/riscv/helper.h                        | 1 +
  target/riscv/insn32.decode                   | 1 +
  target/riscv/insn_trans/trans_rvzvkned.c.inc | 1 +
- target/riscv/vcrypto_helper.c                | 4 ++++
- 4 files changed, 7 insertions(+)
+ target/riscv/vcrypto_helper.c                | 2 ++
+ 4 files changed, 5 insertions(+)
 
 diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 9b04f90240..ab0d2a4225 100644
+index ab0d2a4225..58121ba8ad 100644
 --- a/target/riscv/helper.h
 +++ b/target/riscv/helper.h
-@@ -1193,3 +1193,4 @@ DEF_HELPER_4(vaesef_vs, void, ptr, ptr, env, i32)
- DEF_HELPER_4(vaesdf_vv, void, ptr, ptr, env, i32)
+@@ -1194,3 +1194,4 @@ DEF_HELPER_4(vaesdf_vv, void, ptr, ptr, env, i32)
  DEF_HELPER_4(vaesdf_vs, void, ptr, ptr, env, i32)
  DEF_HELPER_4(vaesdm_vv, void, ptr, ptr, env, i32)
-+DEF_HELPER_4(vaesdm_vs, void, ptr, ptr, env, i32)
+ DEF_HELPER_4(vaesdm_vs, void, ptr, ptr, env, i32)
++DEF_HELPER_4(vaesz_vs, void, ptr, ptr, env, i32)
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index cdaa320f19..61f6b81644 100644
+index 61f6b81644..22059ef95b 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -933,3 +933,4 @@ vaesef_vs       101001 1 ..... 00011 010 ..... 1110111 @r2_vm_1
- vaesdf_vv       101000 1 ..... 00001 010 ..... 1110111 @r2_vm_1
+@@ -934,3 +934,4 @@ vaesdf_vv       101000 1 ..... 00001 010 ..... 1110111 @r2_vm_1
  vaesdf_vs       101001 1 ..... 00001 010 ..... 1110111 @r2_vm_1
  vaesdm_vv       101000 1 ..... 00000 010 ..... 1110111 @r2_vm_1
-+vaesdm_vs       101001 1 ..... 00000 010 ..... 1110111 @r2_vm_1
+ vaesdm_vs       101001 1 ..... 00000 010 ..... 1110111 @r2_vm_1
++vaesz_vs        101001 1 ..... 00111 010 ..... 1110111 @r2_vm_1
 diff --git a/target/riscv/insn_trans/trans_rvzvkned.c.inc b/target/riscv/insn_trans/trans_rvzvkned.c.inc
-index 4f1105ce1d..93f0df6b78 100644
+index 93f0df6b78..1f59dbcc68 100644
 --- a/target/riscv/insn_trans/trans_rvzvkned.c.inc
 +++ b/target/riscv/insn_trans/trans_rvzvkned.c.inc
-@@ -93,3 +93,4 @@ GEN_V_UNMASKED_TRANS(vaesef_vs, vaes_check_vs)
- GEN_V_UNMASKED_TRANS(vaesdf_vv, vaes_check_vv)
+@@ -94,3 +94,4 @@ GEN_V_UNMASKED_TRANS(vaesdf_vv, vaes_check_vv)
  GEN_V_UNMASKED_TRANS(vaesdf_vs, vaes_check_vs)
  GEN_V_UNMASKED_TRANS(vaesdm_vv, vaes_check_vv)
-+GEN_V_UNMASKED_TRANS(vaesdm_vs, vaes_check_vs)
+ GEN_V_UNMASKED_TRANS(vaesdm_vs, vaes_check_vs)
++GEN_V_UNMASKED_TRANS(vaesz_vs, vaes_check_vs)
 diff --git a/target/riscv/vcrypto_helper.c b/target/riscv/vcrypto_helper.c
-index f3b9070768..04d5ce5dc0 100644
+index 04d5ce5dc0..41e138ece5 100644
 --- a/target/riscv/vcrypto_helper.c
 +++ b/target/riscv/vcrypto_helper.c
-@@ -323,3 +323,7 @@ GEN_ZVKNED_HELPER_VV(vaesdm_vv, aes_inv_shift_bytes(round_state);
+@@ -327,3 +327,5 @@ GEN_ZVKNED_HELPER_VS(vaesdm_vs, aes_inv_shift_bytes(round_state);
                      aes_inv_sub_bytes(round_state);
                      xor_round_key(round_state, (uint8_t *)round_key);
                      aes_inv_mix_cols(round_state);)
-+GEN_ZVKNED_HELPER_VS(vaesdm_vs, aes_inv_shift_bytes(round_state);
-+                    aes_inv_sub_bytes(round_state);
-+                    xor_round_key(round_state, (uint8_t *)round_key);
-+                    aes_inv_mix_cols(round_state);)
++GEN_ZVKNED_HELPER_VS(vaesz_vs,
++                    xor_round_key(round_state, (uint8_t *)round_key);)
 -- 
 2.39.2
 
