@@ -2,286 +2,320 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E37F6B3459
-	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 03:39:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 26B636B3476
+	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 04:03:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229900AbjCJCje (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Mar 2023 21:39:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52158 "EHLO
+        id S229900AbjCJDDX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Mar 2023 22:03:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229623AbjCJCjd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Mar 2023 21:39:33 -0500
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2057.outbound.protection.outlook.com [40.107.243.57])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A230AF367E;
-        Thu,  9 Mar 2023 18:39:31 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WO7NEXx078v+/oQPc27Vp+luk291kKlQOHtoHkLs6aIoYLDjYBft9vSlJiNDLbVd9eQnCfOr06e70mfkDp2EwFyw/sYSsc0zwzxL6/tE77jfXKFHCEVxnmMMlwepgx5ty1ND9oPTcoKy6tn3oMYiaoCA0FRtk0jegVwQNujQ9nWfYML3V7qRAjbZFEax46Tb650iBAED4AowD6PwPTKTN/f9Cc98vIGJOE69CD/wQ6lNI7eE7aX1FGwbaGRsYhbq4ZQob2VqT8nI05omctIeHTUHgJdmo3Wy2W1+nX1bpeQTX/vwdFcQlWGdfZIfvmp5kKpKcmE6z0LWacHxsqzxeg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ig2HIzg25ZpiqIL9Nz0C0fP5422FqKSNBJHWxd8IAQI=;
- b=X7ds4BD4FbfD3Vy0DOEtaYkpSwmulYo1FbCFlCNlwJX7/gnCNetiC+7wU6ARFzF/vVEkkFfY5xluEOzCXwjWq5f6qL5j/s32j3aAa38KENWau9P38rnjuMeMcXo3cYCOJTXdzRmjQF78xH4yu8L0SOmdmf4HZ7RgDr2aYNkpU0Schs4SiVATQNq3vcq2PhZd+f3aa2SmxjuJcAi7vCYSjnZkKlVWCAcVQHgggdrV6nAwcgx4rTGjwmWGzYNWEj/t277EncFTu9PUfMue/IWBUazOH7gl7qVQJLmqCkXt74RZ5rpRFmvcr6gSk0cnKjMX2VsHy9FiLevUZAOjtkkOxA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ig2HIzg25ZpiqIL9Nz0C0fP5422FqKSNBJHWxd8IAQI=;
- b=ybuteW+CIXlLR5VaXC9J4pc7xEQeNS+5p/DYqsOmloAwtlKxup/HrEEMzmyyj5Crzbi+3LiVLV+gQ+I31A3/rZbgykN7qHFOkGAjnqIt1n/GIoMWvtZhsGzTmFkRPp3KFAxtSV/riMNPdA7SXFXPVMYuCW1zU/8y0+k/fpW4yZk=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB2843.namprd12.prod.outlook.com (2603:10b6:5:48::24) by
- MW4PR12MB6683.namprd12.prod.outlook.com (2603:10b6:303:1e2::5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6178.19; Fri, 10 Mar 2023 02:39:29 +0000
-Received: from DM6PR12MB2843.namprd12.prod.outlook.com
- ([fe80::1185:1d60:8b6e:89d3]) by DM6PR12MB2843.namprd12.prod.outlook.com
- ([fe80::1185:1d60:8b6e:89d3%7]) with mapi id 15.20.6178.019; Fri, 10 Mar 2023
- 02:39:29 +0000
-Message-ID: <95639de5-cf0c-0c8c-5a75-b34447e1b03b@amd.com>
-Date:   Fri, 10 Mar 2023 13:39:16 +1100
+        with ESMTP id S229459AbjCJDDV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Mar 2023 22:03:21 -0500
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D5584FA89;
+        Thu,  9 Mar 2023 19:03:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1678417399; x=1709953399;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=BZeZah513qL1E60hYmDDjs4gL8qSH8hxv+hHhbWYBmc=;
+  b=jHBR1NH/t6yCORPRAM3YrJXZLLfBmJ0Q+6iu0wbnlMmx9Q5qIrLI4PRb
+   rUffhRcf67NB5U7MltZUetpCygUwGlNb7lOG5fUgOYva/HTHrhL5julYM
+   r7OG+0bi+6JZZ2k1hPoJ7UiizoDrMdFupA5Sxpr1rwIIP34uS2JCbdaZT
+   TffY8s0HcXebEDhVvPEoPV9xrGQr+yRYhR+yY2FrEfrVKkFCsG0Jll+EM
+   CiNcB6QYMLzrVMXSrmPMgh2EU1xrDUBLL5A9s+IXcDoiG4zTFy25/XboB
+   62xv5NbC6LJfoDTQvmXL52dcsmjcPu4v3Kqu7F1mAIf1oduh4ppvUDtZl
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10644"; a="422900437"
+X-IronPort-AV: E=Sophos;i="5.98,248,1673942400"; 
+   d="scan'208";a="422900437"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2023 19:03:18 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10644"; a="707855481"
+X-IronPort-AV: E=Sophos;i="5.98,248,1673942400"; 
+   d="scan'208";a="707855481"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.48]) ([10.239.159.48])
+  by orsmga008.jf.intel.com with ESMTP; 09 Mar 2023 19:03:12 -0800
+Message-ID: <a388e79e-2547-a1f3-9e7f-4959c9ccb4e1@linux.intel.com>
+Date:   Fri, 10 Mar 2023 11:02:12 +0800
+MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH v5 16/19] vfio: Add VFIO_DEVICE_BIND_IOMMUFD
-Content-Language: en-US
-To:     Yi Liu <yi.l.liu@intel.com>, alex.williamson@redhat.com,
-        jgg@nvidia.com, kevin.tian@intel.com
-Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
-        eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
-        mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com,
-        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
+ Thunderbird/102.7.1
+Cc:     baolu.lu@linux.intel.com, cohuck@redhat.com, eric.auger@redhat.com,
+        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        peterx@redhat.com, jasowang@redhat.com,
         shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
-        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com
-References: <20230227111135.61728-1-yi.l.liu@intel.com>
- <20230227111135.61728-17-yi.l.liu@intel.com>
-From:   Alexey Kardashevskiy <aik@amd.com>
-In-Reply-To: <20230227111135.61728-17-yi.l.liu@intel.com>
+        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 06/12] iommufd: IOMMU_HWPT_ALLOC allocation with user data
+Content-Language: en-US
+To:     Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org,
+        alex.williamson@redhat.com, jgg@nvidia.com, kevin.tian@intel.com,
+        robin.murphy@arm.com
+References: <20230309080910.607396-1-yi.l.liu@intel.com>
+ <20230309080910.607396-7-yi.l.liu@intel.com>
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <20230309080910.607396-7-yi.l.liu@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SYBPR01CA0008.ausprd01.prod.outlook.com (2603:10c6:10::20)
- To DM6PR12MB2843.namprd12.prod.outlook.com (2603:10b6:5:48::24)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB2843:EE_|MW4PR12MB6683:EE_
-X-MS-Office365-Filtering-Correlation-Id: fc3b467e-81e9-4b9b-067c-08db2110abb0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ly4HBcMNmu717i5WuJmoQfauLYdg26z9aove4yMjUEvqScnqPc4Lk/bcbjg13YK17HMCnaZYD9PXyUcD8Fp+PJM1pUtn1QQtCgEqai1KNvreOeKS7rzn+UeL76xvh9t4SPv4BImz6XsD4Q7od/WldzTK5JhE6FGXLlfVjhSRJ2cY7atEz7Dugw5H818rmI2CPJ0JewSYqG64e5oQBa8ykwcVZBt8ajGwx3CuXG9NhmceqUkuxOPKdKKtFIC0PV/nD947nVR1P+pJYXLNraEWHpRsbvoZLJc/8U8RHSgyD1K2XhU97bkx56dcLGGBJxoTUVEMSDM7+P+POY5Hqd4PzYXxAP2ym14L3yLn13pTq5gAuGwlkVRfj/aFEViFt1PDj5YvY0CGewhpk3WC27M9nIKfMbv6hYJHsQaQoFtRioaU4xVSNscg5hpM5alIfxvo/I7NyP9MWZNJIenjqrkQUz8s3y+HHBCt/y48oSHN661bve5pk5Fgls3+b6i1zD+C0iWuceyIkv51xRMot41h53x4HVoHKLvcM2RqaiGzBxxv8Cx5cyvx6pOvCslIJmneBtM33l/J5wUj2qCR3dfxYwzpq/ITn3BfXooj6Fjjhex0XH3es+LUXMKX2NPXMdhvC71t8gYo0cvXQ7J0AamkjqTl7de9EDzXXvE2S3y0fBEIxTuKspQs7Rxe8TtcOP5l9GrCsXjB+EgUevhYSeso//GzKEFEG1UXNhwXju6mxx4=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2843.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(366004)(346002)(136003)(376002)(39860400002)(396003)(451199018)(36756003)(6486002)(186003)(53546011)(26005)(41300700001)(6666004)(83380400001)(6506007)(6512007)(2616005)(4326008)(8676002)(66556008)(66946007)(2906002)(66476007)(8936002)(7416002)(5660300002)(38100700002)(316002)(31696002)(478600001)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bldSSE5iWm00SHhHbXNEa3U0WmI3VHpZSkhxd1JsZzJCZ0RnOWlQMllmbFN5?=
- =?utf-8?B?TXF3ZlE2cU1ZdHB6K01JMjRGZW1Zbnp3Q2xJQ2hiM0lzNnQ2QXNUQmZtOWdQ?=
- =?utf-8?B?dDhwY1VXYXFUQ2NydFRDNUxBcnNYQTlXNWRzaUNhQ0FKdlVFL2tjS3lHWThm?=
- =?utf-8?B?b2poS1BNR3VldFFEZXk5ZEUrZDBaaURXVDh1bm9CRGcwR1I4Ull2M3lqdmc3?=
- =?utf-8?B?alA3bC9QKzJKOG5RaXU5N0srT3liZVFTb083SU14STRPci9vUGN0WDlLMU1X?=
- =?utf-8?B?aWY5Tit2aVlzcTU3WXBZa2RZZjIyUU5mQjBjY3VaUDhwamFhYllQWThqSXRC?=
- =?utf-8?B?MHYrMWpZWU1WanlqUHpkK2JIdVhoS0FVSjIzY21QTGJoSmFUTXUzRWdYcnhS?=
- =?utf-8?B?WUhSZVUxb0tCRDdWMW8yOG5ucHA1NitablhuRW9nSUd6M28vZlpCaSthRkdB?=
- =?utf-8?B?NjhpR3EyalhudFVLR3dUU2pnL2V5b1lJYTk2ckdZWFBlQXZDc2tCT2dlekFL?=
- =?utf-8?B?R1l6c0Z1U3pPYS91aHJrMnk1SFNGKzllVDhMSGhLd3VzVVM0VWMwb01IbjMz?=
- =?utf-8?B?ODhqcHhtMlduckNSZ1ZGVUhrV2ZpSDdmUUhlenlYdkZwaUVPRmVwaWxreWx6?=
- =?utf-8?B?YzRML2JrK2R0WXlmTmV3cUd0aklISk1hdXBlQ2cwRi8yczkrTlVHRXBSL3Jn?=
- =?utf-8?B?aStpZGZuOVpkSnRrajYrMi9yNnhFV0c4R3VCRjRFcWoyNFdnSW55WjlBSVM0?=
- =?utf-8?B?SkZZQjZQNFRTV3hyVVFiOVhMcE1VNlVJaFNDRlBvTzVpVjBaU1QwQnJSeUdZ?=
- =?utf-8?B?Rk1YNFcrbmZSRWRxa2dRQkhGKzFsYlBvY1JlNHBKRUNydDJPT0liSm8xT2FC?=
- =?utf-8?B?Mk1ZSG5US2hOOTFyUUVsdDRqNjdzNC9SUGY3TDB2NWVVVzdHRk8zME9UaERs?=
- =?utf-8?B?SkJBMCsxaERENlFqb3RMd08vNm5SS0gvZkVqem1UZHVJcG90ZTNKZUhHRU0w?=
- =?utf-8?B?QXN6ZTAwbC9XU0ZOcWhCZmNWdWptdXdhM0ZjSUpLdEQ2bmVqMWlOQUJmdzF1?=
- =?utf-8?B?VWQ1RjZjbk9qdnJ4TG1SQlhsVGxoSDI0NnNKRTBrWkR1MVFBZm90MXNyU1No?=
- =?utf-8?B?M09xZmhQWk5RaVhoYlAyR2Ezbk5CQ2kzVEp3WW1iV2NuY1dZaEtvMnJqSmp2?=
- =?utf-8?B?T0JuYkRGTHNaL2VabFZoOGZSKzBrM2NKU1FIU1NzZ3hPajFWODRHbkM4SUNx?=
- =?utf-8?B?Yk9TVi9MSXU5UjRnSDZzbGJDY1B2dzhabFpXQjgraWpsaWNMVk8xZjZtUHcv?=
- =?utf-8?B?eHlZZHJPUFdaYmx3ZzlWV1NTZWpBcURXRGEvVlZqL3JhcVVmdEowWU02MFBm?=
- =?utf-8?B?Vy9DU25lbDlCMEhVKzhENEVvVC94ODVZWG5BSGZHNFZkeDV3Y1ErVkpMSC9q?=
- =?utf-8?B?MWJ5ejdZNmtwMkdJNStQTy9wbXQ4cFNMS3M4RGF1QlBQSDFVQlZBeXBNV09v?=
- =?utf-8?B?ZXNZSEFwVTVLeGoyTTdnRFp6c0dmRjNDcEMzZzJLSHFOODI1M1hnOSt0VnRQ?=
- =?utf-8?B?VnlMNWVlbFY3dU9LZ252akRhNGRiZGszUUREVmtWQUxCMWdWS3RJVTEva1U1?=
- =?utf-8?B?aUdTSHo3cmNMN2djWWsweFd2TGZteE0wb21Da0lJOXMwMTR2a1ZnbFJUSjVn?=
- =?utf-8?B?cWJodnV2cVYvUlI5UjJoemlnTHNhcVJJRTBVbHFnZXpnTlo3OTAwaThDL0cx?=
- =?utf-8?B?Ri8xRXkxekNsQ3ZOQUIrS2U3V200OTN4ZGxCSWg0dTZ1Qk1YNzJveGlqSGlr?=
- =?utf-8?B?QWdIZi8xdkZSb094cHNpTGpQd3RoTnA5ZU5JOGpOOHNjRi9DN2RqRlFWRUZB?=
- =?utf-8?B?dU5jY3VaQUlHU2ZzUFJwYU5PdEc1UVRzM0dFMENUVmM2MHRmbjJ0L3I1R0hm?=
- =?utf-8?B?Q3I4WjJCK0FRYzZtVGJ0clZ6M2g1QmpTaGNPKzZoY0tIN3hFQldwRkE0eEZ3?=
- =?utf-8?B?elB4OEhydHBTdkNyQnozbzJQOWpTZHpoZjVhNElQRzlRcWxkN2crb2M3N0Jk?=
- =?utf-8?B?VGdpRVBSTjdBWlQxWkNiQzN3ejcxRkxlamhZSnk0aFlzQ0FYaU9BSm1SSzcy?=
- =?utf-8?Q?7FpernCrBSzV3MLib7tEK5ArD?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fc3b467e-81e9-4b9b-067c-08db2110abb0
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2843.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Mar 2023 02:39:29.1221
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RMYt878BYvmEwCyLT48h2U8SZZ+Tu2BuY0xEpQF5LQMBnjL79YM3s9cD/5aOEAqpxIy1Dp8Dgwr8pJPGbzsnaw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6683
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/2/23 22:11, Yi Liu wrote:
-> This adds ioctl for userspace to bind device cdev fd to iommufd.
+On 3/9/23 4:09 PM, Yi Liu wrote:
+> IOMMU_HWPT_ALLOC already supports iommu_domain allocation for usersapce.
+> But it can only allocate hw_pagetables linked with IOAS. There are needs
+> to support hw_pagetable allocation with parameters specified by user. For
+> example, in nested translation, user needs to allocate hw_pagetable for
+> the stage-1 translation (e.g. a single I/O page table or a set of I/O page
+> tables) with user data. It also needs provide a stage-2 hw_pagetable which
+> is linked to the GPA IOAS.
 > 
->      VFIO_DEVICE_BIND_IOMMUFD: bind device to an iommufd, hence gain DMA
-> 			      control provided by the iommufd. open_device
-> 			      op is called after bind_iommufd op.
-> 			      VFIO no iommu mode is indicated by passing
-> 			      a negative iommufd value.
+> This extends IOMMU_HWPT_ALLOC to accept user specified parameter and hwpt
+> ID in @pt_id field. Such as the user-managed stage-1 hwpt, which requires
+> a parent hwpt to point to stage-2 translation.
 > 
+> enum iommu_hwpt_type is defined to differentiate the user parameters use
+> by different usages. For the allocations that don't require user parameter,
+> IOMMU_HWPT_TYPE_DEFAULT is defined for backward compatibility. Other types
+> would be added by future iommu vendor driver extensions.
+> 
+> Co-developed-by: Nicolin Chen <nicolinc@nvidia.com>
+> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
 > Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 > ---
->   drivers/vfio/device_cdev.c | 146 +++++++++++++++++++++++++++++++++++++
->   drivers/vfio/vfio.h        |  17 ++++-
->   drivers/vfio/vfio_main.c   |  54 ++++++++++++--
->   include/linux/iommufd.h    |   6 ++
->   include/uapi/linux/vfio.h  |  34 +++++++++
->   5 files changed, 248 insertions(+), 9 deletions(-)
+>   drivers/iommu/iommufd/hw_pagetable.c | 94 +++++++++++++++++++++++++---
+>   drivers/iommu/iommufd/main.c         |  2 +-
+>   include/uapi/linux/iommufd.h         | 30 +++++++++
+>   3 files changed, 115 insertions(+), 11 deletions(-)
 > 
-> diff --git a/drivers/vfio/device_cdev.c b/drivers/vfio/device_cdev.c
-> index 9e2c1ecaaf4f..37f80e368551 100644
-> --- a/drivers/vfio/device_cdev.c
-> +++ b/drivers/vfio/device_cdev.c
-> @@ -3,6 +3,7 @@
->    * Copyright (c) 2023 Intel Corporation.
->    */
->   #include <linux/vfio.h>
-> +#include <linux/iommufd.h>
->   
->   #include "vfio.h"
->   
-> @@ -45,6 +46,151 @@ int vfio_device_fops_cdev_open(struct inode *inode, struct file *filep)
->   	return ret;
+> diff --git a/drivers/iommu/iommufd/hw_pagetable.c b/drivers/iommu/iommufd/hw_pagetable.c
+> index 6e45ec0a66fa..64e7cf7142e1 100644
+> --- a/drivers/iommu/iommufd/hw_pagetable.c
+> +++ b/drivers/iommu/iommufd/hw_pagetable.c
+> @@ -165,34 +165,106 @@ iommufd_hw_pagetable_alloc(struct iommufd_ctx *ictx, struct iommufd_ioas *ioas,
+>   	return ERR_PTR(rc);
 >   }
 >   
-> +static void vfio_device_get_kvm_safe(struct vfio_device_file *df)
-> +{
-> +	spin_lock(&df->kvm_ref_lock);
-> +	if (!df->kvm)
-> +		goto unlock;
+> +/*
+> + * size of page table type specific data, indexed by
+> + * enum iommu_hwpt_type.
+> + */
+> +static const size_t iommufd_hwpt_alloc_data_size[] = {
+> +	[IOMMU_HWPT_TYPE_DEFAULT] = 0,
+> +};
 > +
-> +	_vfio_device_get_kvm_safe(df->device, df->kvm);
-> +
-> +unlock:
-> +	spin_unlock(&df->kvm_ref_lock);
-> +}
-> +
-> +void vfio_device_cdev_close(struct vfio_device_file *df)
-> +{
-> +	struct vfio_device *device = df->device;
-> +
-> +	mutex_lock(&device->dev_set->lock);
-> +	/*
-> +	 * As df->access_granted writer is under dev_set->lock as well,
-> +	 * so this read no need to use smp_load_acquire() to pair with
-> +	 * smp_store_release() in the caller of vfio_device_open().
-> +	 */
-> +	if (!df->access_granted) {
-> +		mutex_unlock(&device->dev_set->lock);
-> +		return;
-> +	}
-> +	vfio_device_close(df);
-> +	vfio_device_put_kvm(device);
-> +	if (df->iommufd)
-> +		iommufd_ctx_put(df->iommufd);
-> +	mutex_unlock(&device->dev_set->lock);
-> +	vfio_device_unblock_group(device);
-> +}
-> +
-> +static struct iommufd_ctx *vfio_get_iommufd_from_fd(int fd)
-> +{
-> +	struct fd f;
-> +	struct iommufd_ctx *iommufd;
-> +
-> +	f = fdget(fd);
-> +	if (!f.file)
-> +		return ERR_PTR(-EBADF);
-> +
-> +	iommufd = iommufd_ctx_from_file(f.file);
-> +
-> +	fdput(f);
-> +	return iommufd;
-> +}
-> +
-> +long vfio_device_ioctl_bind_iommufd(struct vfio_device_file *df,
-> +				    unsigned long arg)
-> +{
-> +	struct vfio_device *device = df->device;
-> +	struct vfio_device_bind_iommufd bind;
-> +	struct iommufd_ctx *iommufd = NULL;
-> +	unsigned long minsz;
-> +	int ret;
-> +
-> +	minsz = offsetofend(struct vfio_device_bind_iommufd, out_devid);
-> +
-> +	if (copy_from_user(&bind, (void __user *)arg, minsz))
-> +		return -EFAULT;
-> +
-> +	if (bind.argsz < minsz || bind.flags)
-> +		return -EINVAL;
-> +
-> +	if (!device->ops->bind_iommufd)
-> +		return -ENODEV;
-> +
-> +	ret = vfio_device_block_group(device);
-> +	if (ret)
-> +		return ret;
-> +
-> +	mutex_lock(&device->dev_set->lock);
-> +	/*
-> +	 * If already been bound to an iommufd, or already set noiommu
-> +	 * then fail it.
-> +	 */
-> +	if (df->iommufd || df->noiommu) {
-> +		ret = -EINVAL;
-> +		goto out_unlock;
+>   int iommufd_hwpt_alloc(struct iommufd_ucmd *ucmd)
+>   {
+>   	struct iommu_hwpt_alloc *cmd = ucmd->cmd;
+> -	struct iommufd_hw_pagetable *hwpt;
+> +	struct iommufd_hw_pagetable *hwpt, *parent = NULL;
+> +	struct iommufd_object *pt_obj;
+>   	struct iommufd_device *idev;
+>   	struct iommufd_ioas *ioas;
+> +	const struct iommu_ops *ops;
+> +	void *data = NULL;
+> +	u32 klen;
+>   	int rc;
+
+Reverse Christmas tree format. Ditto to other places in this file.
+
+>   
+> -	if (cmd->flags)
+> +	if (cmd->__reserved || cmd->flags)
+>   		return -EOPNOTSUPP;
+>   
+>   	idev = iommufd_get_device(ucmd, cmd->dev_id);
+>   	if (IS_ERR(idev))
+>   		return PTR_ERR(idev);
+>   
+> -	ioas = iommufd_get_ioas(ucmd, cmd->pt_id);
+> -	if (IS_ERR(ioas)) {
+> -		rc = PTR_ERR(ioas);
+> +	ops = dev_iommu_ops(idev->dev);
+> +	if (!ops) {
+> +		rc = -EOPNOTSUPP;
+>   		goto out_put_idev;
+>   	}
+
+No need to check. dev_iommu_ops() will never returns a NULL.
+
+>   
+> +	/* Only support IOMMU_HWPT_TYPE_DEFAULT for now */
+> +	if (cmd->data_type != IOMMU_HWPT_TYPE_DEFAULT) {
+> +		rc = -EINVAL;
+> +		goto out_put_idev;
 > +	}
 > +
-> +	/* iommufd < 0 means noiommu mode */
-> +	if (bind.iommufd < 0) {
-> +		if (!capable(CAP_SYS_RAWIO)) {
-> +			ret = -EPERM;
-> +			goto out_unlock;
+> +	pt_obj = iommufd_get_object(ucmd->ictx, cmd->pt_id, IOMMUFD_OBJ_ANY);
+> +	if (IS_ERR(pt_obj)) {
+> +		rc = -EINVAL;
+> +		goto out_put_idev;
+> +	}
+> +
+> +	switch (pt_obj->type) {
+> +	case IOMMUFD_OBJ_IOAS:
+> +		ioas = container_of(pt_obj, struct iommufd_ioas, obj);
+> +		break;
+> +	case IOMMUFD_OBJ_HW_PAGETABLE:
+> +		/* pt_id points HWPT only when data_type is !IOMMU_HWPT_TYPE_DEFAULT */
+> +		if (cmd->data_type == IOMMU_HWPT_TYPE_DEFAULT) {
+> +			rc = -EINVAL;
+> +			goto out_put_pt;
 > +		}
-> +		df->noiommu = true;
-> +	} else {
-> +		iommufd = vfio_get_iommufd_from_fd(bind.iommufd);
-> +		if (IS_ERR(iommufd)) {
-> +			ret = PTR_ERR(iommufd);
-> +			goto out_unlock;
+> +
+> +		parent = container_of(pt_obj, struct iommufd_hw_pagetable, obj);
+> +		/*
+> +		 * Cannot allocate user-managed hwpt linking to auto_created
+> +		 * hwpt. If the parent hwpt is already a user-managed hwpt,
+> +		 * don't allocate another user-managed hwpt linking to it.
+> +		 */
+> +		if (parent->auto_domain || parent->parent) {
+> +			rc = -EINVAL;
+> +			goto out_put_pt;
 > +		}
+> +		ioas = parent->ioas;
+> +		break;
+> +	default:
+> +		rc = -EINVAL;
+> +		goto out_put_pt;
 > +	}
 > +
-> +	/*
-> +	 * Before the device open, get the KVM pointer currently
-> +	 * associated with the device file (if there is) and obtain
-> +	 * a reference.  This reference is held until device closed.
-> +	 * Save the pointer in the device for use by drivers.
-> +	 */
-> +	vfio_device_get_kvm_safe(df);
+> +	klen = iommufd_hwpt_alloc_data_size[cmd->data_type];
+> +	if (klen) {
+> +		if (!cmd->data_len) {
+> +			rc = -EINVAL;
+> +			goto out_put_pt;
+> +		}
+
+Is the user_data still valid if (cmd->data_len < klen)?
+
 > +
-> +	df->iommufd = iommufd;
-> +	ret = vfio_device_open(df, &bind.out_devid, NULL);
+> +		data = kzalloc(klen, GFP_KERNEL);
+> +		if (!data) {
+> +			rc = -ENOMEM;
+> +			goto out_put_pt;
+> +		}
+> +
+> +		rc = copy_struct_from_user(data, klen,
+> +					   u64_to_user_ptr(cmd->data_uptr),
+> +					   cmd->data_len);
+> +		if (rc)
+> +			goto out_free_data;
+> +	}
+> +
+>   	mutex_lock(&ioas->mutex);
+>   	hwpt = iommufd_hw_pagetable_alloc(ucmd->ictx, ioas, idev,
+> -					  NULL, NULL, false);
+> +					  parent, data, false);
+>   	mutex_unlock(&ioas->mutex);
+>   	if (IS_ERR(hwpt)) {
+>   		rc = PTR_ERR(hwpt);
+> -		goto out_put_ioas;
+> +		goto out_free_data;
+>   	}
+>   
+>   	cmd->out_hwpt_id = hwpt->obj.id;
+> @@ -200,12 +272,14 @@ int iommufd_hwpt_alloc(struct iommufd_ucmd *ucmd)
+>   	if (rc)
+>   		goto out_hwpt;
+>   	iommufd_object_finalize(ucmd->ictx, &hwpt->obj);
+> -	goto out_put_ioas;
+> +	goto out_free_data;
+>   
+>   out_hwpt:
+>   	iommufd_object_abort_and_destroy(ucmd->ictx, &hwpt->obj);
+> -out_put_ioas:
+> -	iommufd_put_object(&ioas->obj);
+> +out_free_data:
+> +	kfree(data);
+> +out_put_pt:
+> +	iommufd_put_object(pt_obj);
+>   out_put_idev:
+>   	iommufd_put_object(&idev->obj);
+>   	return rc;
+> diff --git a/drivers/iommu/iommufd/main.c b/drivers/iommu/iommufd/main.c
+> index f079c0bda46b..7ab1e2c638a1 100644
+> --- a/drivers/iommu/iommufd/main.c
+> +++ b/drivers/iommu/iommufd/main.c
+> @@ -295,7 +295,7 @@ struct iommufd_ioctl_op {
+>   static const struct iommufd_ioctl_op iommufd_ioctl_ops[] = {
+>   	IOCTL_OP(IOMMU_DESTROY, iommufd_destroy, struct iommu_destroy, id),
+>   	IOCTL_OP(IOMMU_HWPT_ALLOC, iommufd_hwpt_alloc, struct iommu_hwpt_alloc,
+> -		 __reserved),
+> +		 data_uptr),
+>   	IOCTL_OP(IOMMU_DEVICE_GET_HW_INFO, iommufd_device_get_hw_info,
+>   		 struct iommu_hw_info, __reserved),
+>   	IOCTL_OP(IOMMU_IOAS_ALLOC, iommufd_ioas_alloc_ioctl,
+> diff --git a/include/uapi/linux/iommufd.h b/include/uapi/linux/iommufd.h
+> index 4ac525897b82..48781ff40a37 100644
+> --- a/include/uapi/linux/iommufd.h
+> +++ b/include/uapi/linux/iommufd.h
+> @@ -347,6 +347,14 @@ struct iommu_vfio_ioas {
+>   };
+>   #define IOMMU_VFIO_IOAS _IO(IOMMUFD_TYPE, IOMMUFD_CMD_VFIO_IOAS)
+>   
+> +/**
+> + * enum iommu_hwpt_type - IOMMU HWPT Type
+> + * @IOMMU_HWPT_TYPE_DEFAULT: default
+> + */
+> +enum iommu_hwpt_type {
+> +	IOMMU_HWPT_TYPE_DEFAULT,
+> +};
+> +
+>   /**
+>    * struct iommu_hwpt_alloc - ioctl(IOMMU_HWPT_ALLOC)
+>    * @size: sizeof(struct iommu_hwpt_alloc)
+> @@ -355,12 +363,31 @@ struct iommu_vfio_ioas {
+>    * @pt_id: The IOAS to connect this HWPT to
+>    * @out_hwpt_id: The ID of the new HWPT
+>    * @__reserved: Must be 0
+> + * @data_type: One of enum iommu_hwpt_type
+> + * @data_len: Length of the type specific data
+> + * @data_uptr: User pointer to the type specific data
+>    *
+>    * Explicitly allocate a hardware page table object. This is the same object
+>    * type that is returned by iommufd_device_attach() and represents the
+>    * underlying iommu driver's iommu_domain kernel object.
+>    *
+>    * A normal HWPT will be created with the mappings from the given IOAS.
+> + * The @data_type for its allocation can be set to IOMMU_HWPT_TYPE_DEFAULT, or
+> + * another type (being listed below) to specialize a kernel-managed HWPT.
+> + *
+> + * A user-managed HWPT will be created from a given parent HWPT via @pt_id, in
+> + * which the parent HWPT must be allocated previously via the same ioctl from a
+> + * given IOAS. The @data_type must not be set to IOMMU_HWPT_TYPE_DEFAULT but a
+> + * pre-defined type corresponding to the underlying IOMMU hardware.
+> + *
+> + * If the @data_type is set to IOMMU_HWPT_TYPE_DEFAULT, both the @data_len and
+> + * the @data_uptr will be ignored. Otherwise, both of them must be given.
+> + *
+> + * +==============================+=====================================+===========+
+> + * | @data_type                   |    Data structure in @data_uptr     |   @pt_id  |
+> + * +------------------------------+-------------------------------------+-----------+
+> + * | IOMMU_HWPT_TYPE_DEFAULT      |               N/A                   |    IOAS   |
+> + * +------------------------------+-------------------------------------+-----------+
+>    */
+>   struct iommu_hwpt_alloc {
+>   	__u32 size;
+> @@ -369,6 +396,9 @@ struct iommu_hwpt_alloc {
+>   	__u32 pt_id;
+>   	__u32 out_hwpt_id;
+>   	__u32 __reserved;
+> +	__u32 data_type;
+> +	__u32 data_len;
+> +	__aligned_u64 data_uptr;
+>   };
+>   #define IOMMU_HWPT_ALLOC _IO(IOMMUFD_TYPE, IOMMUFD_CMD_HWPT_ALLOC)
 
-
-This is unrelated to this patch but reminded me - while debugging QEMU, 
-vfio_assert_device_open() kept firing as I was killing QEMU (which in 
-turn made the kernel close all fds), device->open_count==0 as QEMU was 
-dying before calling ioctl(VFIO_DEVICE_BIND_IOMMUFD) which would call 
-this vfio_device_open() just above. Has this been reported/fixed, just 
-curious?
-
-
-
--- 
-Alexey
-
+Best regards,
+baolu
