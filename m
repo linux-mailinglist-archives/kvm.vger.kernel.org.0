@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 61C1E6B4CA1
-	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 17:19:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FEE56B4DB7
+	for <lists+kvm@lfdr.de>; Fri, 10 Mar 2023 17:57:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231539AbjCJQTj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 11:19:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52078 "EHLO
+        id S231440AbjCJQ5T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 11:57:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231233AbjCJQTQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Mar 2023 11:19:16 -0500
+        with ESMTP id S229827AbjCJQ44 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Mar 2023 11:56:56 -0500
 Received: from imap5.colo.codethink.co.uk (imap5.colo.codethink.co.uk [78.40.148.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF8DE126F00
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 08:14:22 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AA001314CA
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 08:54:34 -0800 (PST)
 Received: from [167.98.27.226] (helo=lawrence-thinkpad.office.codethink.co.uk)
         by imap5.colo.codethink.co.uk with esmtpsa  (Exim 4.94.2 #2 (Debian))
-        id 1pafDr-00H4ad-Aw; Fri, 10 Mar 2023 16:03:59 +0000
+        id 1pafDr-00H4ad-K9; Fri, 10 Mar 2023 16:03:59 +0000
 From:   Lawrence Hunter <lawrence.hunter@codethink.co.uk>
 To:     qemu-devel@nongnu.org
 Cc:     dickon.hood@codethink.co.uk, nazar.kazakov@codethink.co.uk,
@@ -25,63 +25,145 @@ Cc:     dickon.hood@codethink.co.uk, nazar.kazakov@codethink.co.uk,
         bin.meng@windriver.com, pbonzini@redhat.com,
         philipp.tomsich@vrull.eu, kvm@vger.kernel.org,
         Lawrence Hunter <lawrence.hunter@codethink.co.uk>
-Subject: [PATCH 37/45] target/riscv: Add zvkg cpu property
-Date:   Fri, 10 Mar 2023 16:03:38 +0000
-Message-Id: <20230310160346.1193597-38-lawrence.hunter@codethink.co.uk>
+Subject: [PATCH 38/45] target/riscv: Add vgmul.vv decoding, translation and execution support
+Date:   Fri, 10 Mar 2023 16:03:39 +0000
+Message-Id: <20230310160346.1193597-39-lawrence.hunter@codethink.co.uk>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230310160346.1193597-1-lawrence.hunter@codethink.co.uk>
 References: <20230310160346.1193597-1-lawrence.hunter@codethink.co.uk>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Co-authored-by: Nazar Kazakov <nazar.kazakov@codethink.co.uk>
+Signed-off-by: Nazar Kazakov <nazar.kazakov@codethink.co.uk>
 Signed-off-by: Lawrence Hunter <lawrence.hunter@codethink.co.uk>
 ---
- target/riscv/cpu.c | 5 +++--
- target/riscv/cpu.h | 1 +
- 2 files changed, 4 insertions(+), 2 deletions(-)
+ target/riscv/helper.h                      |  2 ++
+ target/riscv/insn32.decode                 |  3 ++
+ target/riscv/insn_trans/trans_rvzvkg.c.inc | 30 +++++++++++++++++++
+ target/riscv/translate.c                   |  1 +
+ target/riscv/vcrypto_helper.c              | 34 ++++++++++++++++++++++
+ 5 files changed, 70 insertions(+)
+ create mode 100644 target/riscv/insn_trans/trans_rvzvkg.c.inc
 
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index c136a17112..79079d517d 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -110,6 +110,7 @@ static const struct isa_ext_data isa_edata_arr[] = {
-     ISA_EXT_DATA_ENTRY(zvfh, true, PRIV_VERSION_1_12_0, ext_zvfh),
-     ISA_EXT_DATA_ENTRY(zvfhmin, true, PRIV_VERSION_1_12_0, ext_zvfhmin),
-     ISA_EXT_DATA_ENTRY(zvkb, true, PRIV_VERSION_1_12_0, ext_zvkb),
-+    ISA_EXT_DATA_ENTRY(zvkg, true, PRIV_VERSION_1_12_0, ext_zvkg),
-     ISA_EXT_DATA_ENTRY(zvkned, true, PRIV_VERSION_1_12_0, ext_zvkned),
-     ISA_EXT_DATA_ENTRY(zvknha, true, PRIV_VERSION_1_12_0, ext_zvknha),
-     ISA_EXT_DATA_ENTRY(zvknhb, true, PRIV_VERSION_1_12_0, ext_zvknhb),
-@@ -1220,8 +1221,8 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
-     * In principle zve*x would also suffice here, were they supported
-     * in qemu
-     */
--    if ((cpu->cfg.ext_zvkb || cpu->cfg.ext_zvkned || cpu->cfg.ext_zvknha ||
--             cpu->cfg.ext_zvksh) &&
-+    if ((cpu->cfg.ext_zvkb || cpu->cfg.ext_zvkg || cpu->cfg.ext_zvkned ||
-+             cpu->cfg.ext_zvknha || cpu->cfg.ext_zvksh) &&
-         !(cpu->cfg.ext_zve32f || cpu->cfg.ext_zve64f ||
-             cpu->cfg.ext_zve64d || cpu->cfg.ext_v)) {
-         error_setg(
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index 3b0f322f3e..40c4e23209 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -471,6 +471,7 @@ struct RISCVCPUConfig {
-     bool ext_zve64f;
-     bool ext_zve64d;
-     bool ext_zvkb;
-+    bool ext_zvkg;
-     bool ext_zvkned;
-     bool ext_zvknha;
-     bool ext_zvknhb;
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 494ebf8cda..680f695e75 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -1206,3 +1206,5 @@ DEF_HELPER_5(vsha2cl_vv, void, ptr, ptr, ptr, env, i32)
+ 
+ DEF_HELPER_5(vsm3me_vv, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(vsm3c_vi, void, ptr, ptr, i32, env, i32)
++
++DEF_HELPER_4(vgmul_vv, void, ptr, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 76802f37db..fdb535906f 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -948,3 +948,6 @@ vsha2cl_vv      101111 1 ..... ..... 010 ..... 1110111 @r_vm_1
+ # *** RV64 Zvksh vector crypto extension ***
+ vsm3me_vv       100000 1 ..... ..... 010 ..... 1110111 @r_vm_1
+ vsm3c_vi        101011 1 ..... ..... 010 ..... 1110111 @r_vm_1
++
++# *** RV64 Zvkg vector crypto extension ***
++vgmul_vv        101000 1 ..... 10001 010 ..... 1110111 @r2_vm_1
+diff --git a/target/riscv/insn_trans/trans_rvzvkg.c.inc b/target/riscv/insn_trans/trans_rvzvkg.c.inc
+new file mode 100644
+index 0000000000..f1e4ea1381
+--- /dev/null
++++ b/target/riscv/insn_trans/trans_rvzvkg.c.inc
+@@ -0,0 +1,30 @@
++/*
++ * RISC-V translation routines for the Zvkg Extension.
++ *
++ * Copyright (C) 2023 SiFive, Inc.
++ * Written by Codethink Ltd and SiFive.
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++static bool vgmul_check(DisasContext *s, arg_rmr *a)
++{
++    return s->cfg_ptr->ext_zvkg == true &&
++            vext_check_isa_ill(s) &&
++            require_rvv(s) &&
++            MAXSZ(s) >= (128 / 8) && /* EGW in bytes */
++            vext_check_ss(s, a->rd, a->rs2, a->vm) &&
++            s->vstart % 4 == 0 && s->sew == MO_32;
++}
++
++GEN_V_UNMASKED_TRANS(vgmul_vv, vgmul_check)
+diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+index 256872ec28..fdb5c3364e 100644
+--- a/target/riscv/translate.c
++++ b/target/riscv/translate.c
+@@ -1087,6 +1087,7 @@ static uint32_t opcode_at(DisasContextBase *dcbase, target_ulong pc)
+ #include "insn_trans/trans_rvzvkned.c.inc"
+ #include "insn_trans/trans_rvzvknh.c.inc"
+ #include "insn_trans/trans_rvzvksh.c.inc"
++#include "insn_trans/trans_rvzvkg.c.inc"
+ #include "insn_trans/trans_privileged.c.inc"
+ #include "insn_trans/trans_svinval.c.inc"
+ #include "decode-xthead.c.inc"
+diff --git a/target/riscv/vcrypto_helper.c b/target/riscv/vcrypto_helper.c
+index 2d8db45740..eb70e2e26c 100644
+--- a/target/riscv/vcrypto_helper.c
++++ b/target/riscv/vcrypto_helper.c
+@@ -800,3 +800,37 @@ void HELPER(vsm3c_vi)(void *vd_vptr, void *vs2_vptr, uint32_t uimm,
+     vext_set_elems_1s(vd_vptr, vta, env->vl * esz, total_elems * esz);
+     env->vstart = 0;
+ }
++
++void HELPER(vgmul_vv)(void *vd_vptr, void *vs2_vptr,
++                       CPURISCVState *env, uint32_t desc)
++{
++    uint64_t *vd = vd_vptr;
++    uint64_t *vs2 = vs2_vptr;
++    uint32_t vta = vext_vta(desc);
++    uint32_t total_elems = vext_get_total_elems(env, desc, 4);
++
++    for (uint32_t i = env->vstart / 4; i < env->vl / 4; i++) {
++        uint64_t Y[2] = {brev8(vd[i * 2 + 0]), brev8(vd[i * 2 + 1])};
++        uint64_t H[2] = {brev8(vs2[i * 2 + 0]), brev8(vs2[i * 2 + 1])};
++        uint64_t Z[2] = {0, 0};
++
++        for (uint j = 0; j < 128; j++) {
++            if ((Y[j / 64] >> (j % 64)) & 1) {
++                Z[0] ^= H[0];
++                Z[1] ^= H[1];
++            }
++            bool reduce = ((H[1] >> 63) & 1);
++            H[1] = H[1] << 1 | H[0] >> 63;
++            H[0] = H[0] << 1;
++            if (reduce) {
++                H[0] ^= 0x87;
++            }
++        }
++
++        vd[i * 2 + 0] = brev8(Z[0]);
++        vd[i * 2 + 1] = brev8(Z[1]);
++    }
++    /* set tail elements to 1s */
++    vext_set_elems_1s(vd, vta, env->vl * 4, total_elems * 4);
++    env->vstart = 0;
++}
 -- 
 2.39.2
 
