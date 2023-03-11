@@ -2,58 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 701C36B569D
-	for <lists+kvm@lfdr.de>; Sat, 11 Mar 2023 01:24:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C1C626B56A4
+	for <lists+kvm@lfdr.de>; Sat, 11 Mar 2023 01:25:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231398AbjCKAYk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 19:24:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46592 "EHLO
+        id S231259AbjCKAZD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 19:25:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231163AbjCKAYB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Mar 2023 19:24:01 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80FFC6B307
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:23:33 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id d3-20020a17090acd0300b00237659aae8dso5055154pju.1
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:23:33 -0800 (PST)
+        with ESMTP id S231356AbjCKAYc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Mar 2023 19:24:32 -0500
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E3A4110529
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:23:47 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id s20-20020a056a00179400b005c4d1dedc1fso3635779pfg.11
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:23:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678494212;
+        d=google.com; s=20210112; t=1678494214;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=Rm109LqJljTWMnqiCeQQyQd+NmHilpchibDoYyZB3Pk=;
-        b=nbQyCIoiLIM7RQJY0KwsZy4MzALtUvpTVM0wdA1nSuVn+9c9kcDfgfjPsaslp3h104
-         zCUflGcnq2a5vqfNqA7G619cjYvpnP0xZenQN8Zu1a1rSrPcdxhIboj4sIXYcbKgkKZF
-         1HiHk172uv/TS/YsLBJ8VPH5ev9KwCQ+n0xy/R2NBWQfRgme2yPjjL66yaKvoymjOp98
-         H7bh6xdjI+pIQvZVpqHMbBcMVNwAe8eRczAgZZ12yOdlAdRqTGG+BqDD+VS/2ZFU4HsK
-         WCauxqGyQpSRdb6mw3BfyWNp7bQTtspy/V2CMSt8fyQjpFLp47jZ/M0grWgr3WRYJApx
-         659g==
+        bh=ESyGipRYk4Ln/Kp6qC+rdgnoNy41fSsqxhODjzs0Phg=;
+        b=nrjkFrHs9nfahticnmpPuzM1CYGMtDvBGeJ80H++4AvdgBokB4ZvMSpboVXR6DnKwz
+         rIrMxNOEpTJIbuDC451LiJD1sJD3A8vuRizVcYrS9DGK3p2ELkmjCt5Z04Ew7mYeQG99
+         abO3WqdodG/z7VlBDvMGTwDpoYnVcdAyUjfitCfgT/YOhex7js+4OGHeNDmUtaacWeFR
+         lakQe7TmqrZXF1uwepDOEl2OXS6bzVd4Nf2hJUarjHWDJiq3nKrS93ZACBW4D6ZXsdik
+         ggHfLj17lKdB6jzVaXg1+OIqfai9+ixjDr2YJPEQHHKfDgh2ts89Xy1knXUupwP/3zLt
+         MYWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678494212;
+        d=1e100.net; s=20210112; t=1678494214;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Rm109LqJljTWMnqiCeQQyQd+NmHilpchibDoYyZB3Pk=;
-        b=kGtUmVdvH7hqNZBgKuwhxn1BLDLwc2shy2SO2SXmxT5UvChTYWGvuVV+QhKDp6e+6v
-         O31W044w4R3uv2iyxlQDDOyzJ8KKo8D6FnXjA1cZH6U9O3sJ8DBfwEGDW12QqzcH5g8s
-         mIAcI/G6Y6i34iGspYoI1XyhIgrvgZ7pyFgUBrqhGwUAphm+/uw5ImSTIQSh1h+HD4Tw
-         HDNGA4XQylvc5kzIfPDUsq59vyY5fMtBYLAm6pbLqGEggblZ0h8wsPLIEJF1s4CfcoQZ
-         VW6ToBlkNwiGiQPFIy2+jRstq1tTpl7N7o9EFn096fBsHDD78bmg1a+7djUpTUBrfh9R
-         63uA==
-X-Gm-Message-State: AO0yUKXRQrBP/qBin30xBidIvDjyQPjHxTvAN37Cqyn7Ep+rjy+Tn8+b
-        ZHVjjdHLILmko8fQiuDrkFouBGZZJz0=
-X-Google-Smtp-Source: AK7set/n6UE/V7iWsKnat8pQjFuFgR5r7U2AsXF3aLCinLAedf3bBdp71x6bUangZ7z1FWvGXbBi6akMf+I=
+        bh=ESyGipRYk4Ln/Kp6qC+rdgnoNy41fSsqxhODjzs0Phg=;
+        b=YMhUjoA0/Mam/+24xShFezcSMeCtMrKjOehgO1ZXaCyElqmNlOe9CgtfKWqTTJ8vfu
+         p3/hWtPOYO/5QMBphQ6y8LRnoMz4hB5gebPU8GPe0dIXYcWLhtFR9Nx4GthATZhJjiKL
+         9ZoMmPxCbM2AZXARAG6qkrKt5syapvGQsvgg2Y1DdEOBivH12OJOZumqJfoypr/qVvtF
+         MTy4QIEUczdcQhSwdylYz+MW9uZLxxeO74bOYmDKAXN318U9e2rWjOUqXLVbQIBthb4/
+         6N/XZhjABS+B6DZuPkLT1Ip6Xz+2RNasDeY/S9ipopuItQ8m6VUEDnQxexUqkX7lM6Y5
+         dXfQ==
+X-Gm-Message-State: AO0yUKWw0l8DrB9HiY7qJtWmMmaxlJYXTXsEus1mF2Xee3xErVtdaN9X
+        tTWYoMZuPHbcbuzIGtmUI/Ii51unhQk=
+X-Google-Smtp-Source: AK7set8ALguNt/xEXYjM2EKJOWmie4pyNNfYyh6xWvVQ0vhlbgx8Y3S01gp5F3vekW87OoBuxJLe6aI201U=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:7515:0:b0:503:20b9:5d88 with SMTP id
- q21-20020a637515000000b0050320b95d88mr8959180pgc.4.1678494212241; Fri, 10 Mar
- 2023 16:23:32 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:90b:1088:b0:237:6178:297d with SMTP id
+ gj8-20020a17090b108800b002376178297dmr10196936pjb.2.1678494214249; Fri, 10
+ Mar 2023 16:23:34 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 10 Mar 2023 16:22:45 -0800
+Date:   Fri, 10 Mar 2023 16:22:46 -0800
 In-Reply-To: <20230311002258.852397-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230311002258.852397-1-seanjc@google.com>
 X-Mailer: git-send-email 2.40.0.rc1.284.g88254d51c5-goog
-Message-ID: <20230311002258.852397-15-seanjc@google.com>
-Subject: [PATCH v2 14/27] KVM: x86: Reject memslot MOVE operations if KVMGT is attached
+Message-ID: <20230311002258.852397-16-seanjc@google.com>
+Subject: [PATCH v2 15/27] drm/i915/gvt: Don't bother removing write-protection
+ on to-be-deleted slot
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -66,7 +67,7 @@ Cc:     kvm@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,68 +75,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Disallow moving memslots if the VM has external page-track users, i.e. if
-KVMGT is being used to expose a virtual GPU to the guest, as KVM doesn't
-correctly handle moving memory regions.
-
-Note, this is potential ABI breakage!  E.g. userspace could move regions
-that aren't shadowed by KVMGT without harming the guest.  However, the
-only known user of KVMGT is QEMU, and QEMU doesn't move generic memory
-regions.  KVM's own support for moving memory regions was also broken for
-multiple years (albeit for an edge case, but arguably moving RAM is
-itself an edge case), e.g. see commit edd4fa37baa6 ("KVM: x86: Allocate
-new rmap and large page tracking when moving memslot").
+When handling a slot "flush", don't call back into KVM to drop write
+protection for gfns in the slot.  Now that KVM rejects attempts to move
+memory slots while KVMGT is attached, the only time a slot is "flushed"
+is when it's being removed, i.e. the memslot and all its write-tracking
+metadata is about to be deleted.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/kvm_page_track.h | 3 +++
- arch/x86/kvm/mmu/page_track.c         | 5 +++++
- arch/x86/kvm/x86.c                    | 7 +++++++
- 3 files changed, 15 insertions(+)
+ drivers/gpu/drm/i915/gvt/kvmgt.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_page_track.h b/arch/x86/include/asm/kvm_page_track.h
-index 0d65ae203fd6..6a287bcbe8a9 100644
---- a/arch/x86/include/asm/kvm_page_track.h
-+++ b/arch/x86/include/asm/kvm_page_track.h
-@@ -77,4 +77,7 @@ kvm_page_track_unregister_notifier(struct kvm *kvm,
- void kvm_page_track_write(struct kvm_vcpu *vcpu, gpa_t gpa, const u8 *new,
- 			  int bytes);
- void kvm_page_track_flush_slot(struct kvm *kvm, struct kvm_memory_slot *slot);
-+
-+bool kvm_page_track_has_external_user(struct kvm *kvm);
-+
- #endif
-diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
-index 39a0863af8b4..1cfc0a0ccc23 100644
---- a/arch/x86/kvm/mmu/page_track.c
-+++ b/arch/x86/kvm/mmu/page_track.c
-@@ -321,3 +321,8 @@ enum pg_level kvm_page_track_max_mapping_level(struct kvm *kvm, gfn_t gfn,
- 	return max_level;
+diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
+index 292750dc819f..577712ea4893 100644
+--- a/drivers/gpu/drm/i915/gvt/kvmgt.c
++++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
+@@ -1644,14 +1644,8 @@ static void kvmgt_page_track_flush_slot(struct kvm *kvm,
+ 
+ 	for (i = 0; i < slot->npages; i++) {
+ 		gfn = slot->base_gfn + i;
+-		if (kvmgt_gfn_is_write_protected(info, gfn)) {
+-			write_lock(&kvm->mmu_lock);
+-			kvm_slot_page_track_remove_page(kvm, slot, gfn,
+-						KVM_PAGE_TRACK_WRITE);
+-			write_unlock(&kvm->mmu_lock);
+-
++		if (kvmgt_gfn_is_write_protected(info, gfn))
+ 			kvmgt_protect_table_del(info, gfn);
+-		}
+ 	}
+ 	mutex_unlock(&info->vgpu_lock);
  }
- EXPORT_SYMBOL_GPL(kvm_page_track_max_mapping_level);
-+
-+bool kvm_page_track_has_external_user(struct kvm *kvm)
-+{
-+	return hlist_empty(&kvm->arch.track_notifier_head.track_notifier_list);
-+}
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 29dd6c97d145..47ac9291cd43 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12484,6 +12484,13 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 				   struct kvm_memory_slot *new,
- 				   enum kvm_mr_change change)
- {
-+	/*
-+	 * KVM doesn't support moving memslots when there are external page
-+	 * trackers attached to the VM, i.e. if KVMGT is in use.
-+	 */
-+	if (change == KVM_MR_MOVE && kvm_page_track_has_external_user(kvm))
-+		return -EINVAL;
-+
- 	if (change == KVM_MR_CREATE || change == KVM_MR_MOVE) {
- 		if ((new->base_gfn + new->npages - 1) > kvm_mmu_max_gfn())
- 			return -EINVAL;
 -- 
 2.40.0.rc1.284.g88254d51c5-goog
 
