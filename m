@@ -2,68 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CC3966B56B9
-	for <lists+kvm@lfdr.de>; Sat, 11 Mar 2023 01:26:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF6D86B56EE
+	for <lists+kvm@lfdr.de>; Sat, 11 Mar 2023 01:46:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231640AbjCKA01 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 19:26:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45314 "EHLO
+        id S229798AbjCKAqZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 19:46:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231518AbjCKAZl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Mar 2023 19:25:41 -0500
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A91C2147746
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:24:22 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id ju20-20020a170903429400b0019ea5ea044aso3670522plb.21
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:24:22 -0800 (PST)
+        with ESMTP id S229697AbjCKAqX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Mar 2023 19:46:23 -0500
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 982DC134AE0
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:46:22 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id ip3-20020a17090b314300b00237c16adf30so5064365pjb.5
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:46:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678494237;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=x2tVYLFtu4+/4LAPARn3E33zkHftYTv9vOX58pVkWHM=;
-        b=eCTAn9KE2O9xKHWOxj1VUE/UZXTx6Y1mDDTMlkwbdR0Y57s9PpUrM5h9i2cHbxsnki
-         t0637AV0rExfo48KvvrqnyadfUnxBMwpuXsf8bzU9+CnuuH5alcmDXRXkCkOTywDKJEk
-         XcU2Ssqaps8aM9ojs9FjhyBohQxSawze04pO8kWuerEOURvl7R99eb/R/ZcwEpa5D8mU
-         TLGucsOnbjVeWTw9U9PMc6v0xVNdb3bFtznClK5hKBNddFaRNaHEDwN47WSFEGxmM3iV
-         bkMq0Bn8TSiu6JuJ5U2kGO4Zf7ybt6AJeJqWZFsgqPjAfErV+ulDY+iqxXYTBp35bmjn
-         a4Pw==
+        d=google.com; s=20210112; t=1678495582;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=n6jB3AffI+mzIeDfH7lhfpRtRWP3b9HQWuNQ7/qAbfQ=;
+        b=PCgmNstkwCq+t9aNKV5H7SBwehSEZfL3UigzGdkYxjcn/GyFQzTrk1CFufFxdbBzNh
+         i/9gLASWq3yoqqRyGlIvmsN/IkOxukWHCTD0bL1z5sR5yZMZxCqSUMfEWJvKDtmLidEl
+         7+ft3ttv03XQlaNbqAW65LJX9HycjJ3vXOThrfLgdQTvLS0HbjzdvhCCuDOEfDfuobVd
+         yya3y4FPNyVCRUg9VXkwBBWrVnDVhyzR9x6dUp/GxF1eXl06TKnKHrBzaP9sOJYhqlRX
+         Iy1Um+3m635nQ/99QzaZNaDWosrLj4t6aQI/hDkit6g6wwv8USSgRcnKqooXCZZXi8PT
+         105Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678494237;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=x2tVYLFtu4+/4LAPARn3E33zkHftYTv9vOX58pVkWHM=;
-        b=cl6yJatbeAstaMRc/W/RCdW6qVi2pTDMl6Bbgpox1RZn1XYYDJma3ZJ6yGdcM4mrUz
-         tT/pkzX32oYAM2yyScXxTufHM9F2r99PvMTrKWV1E08YeonFjSxmeQ4A1oI4zAOKuP2i
-         8tFVBvfHYYDjb3UBpZistwfk3dZMS9pEQZO9mGjBcemz2Ju82flWrlAqcCm9AWOK/ur/
-         epMON47cx674nPeFwAX+2lmd0UN+gbdtv0yDt3/vF4E1HYGEMlk578p2HVkrNbMbe78M
-         cgWdXh6EPjfjxiRdOGbo7h9f8P9SZtUUsCPm6DawX+N6dJcSCJEYv/abah3zniTilYd/
-         3XWA==
-X-Gm-Message-State: AO0yUKWtHAgICVScnChoBzTC3aoPfanJHIAtbkY0HmGS3D7YFwZECFQg
-        5BwVTx2r+dsuXqvYb1xiMWKPVafDd4o=
-X-Google-Smtp-Source: AK7set/9DiEaGFm/frdpvFkcKgynFsB7l9O/lCeTPJ5Btk1PEMlu/T/014QaQyiTK4eR3E2EyTqi6Wr5p4Y=
+        d=1e100.net; s=20210112; t=1678495582;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=n6jB3AffI+mzIeDfH7lhfpRtRWP3b9HQWuNQ7/qAbfQ=;
+        b=PENh4UvIosH0uO9NU/1gVuvrK2i/jWfQv08Yx3iFeHg9P/w4f+9oQ00lZDTFoihPHs
+         vP8GAnDpb1XC4lXSPEwceWoC424u7iAzmVLWBB2WRs7zJidpMbEIvE5f2mPYeZso1qGt
+         jOMGApN3VIgaUgzGAHOW98bPmG5afujPxAkexx6ZJGG2g6gSv60xNc88Mq7yMV+t/OPg
+         tKCoszE3Wuc5LT4zjaBDnu0ogXcC4M1VpkD5wbU8ysu1XM23fCl5cZoX73VMkrejJYWm
+         low3mE9v2XZx9kpQP/6Z0tBaUBOtJiCYOxsFo9VIweIq4UJjKLeYp8rySlPYHbXf7Zow
+         hedg==
+X-Gm-Message-State: AO0yUKVOb6bXNOsMlnV3wG5+wah5iiDC7lhGn7Sl84azzDwfUhgichoT
+        1xq4aueVEjd+lQz5IDaUm3rhY/cinU4=
+X-Google-Smtp-Source: AK7set9HsgPKZIqPKHolTOcqUY5PlcbraVBRRAWBqbFVKD7SSeEuap9r42LOXrLMz5nDYOdc1zUKKG0G7pI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:7783:b0:237:9029:c29b with SMTP id
- v3-20020a17090a778300b002379029c29bmr10323383pjk.0.1678494237678; Fri, 10 Mar
- 2023 16:23:57 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a63:1a1f:0:b0:4f2:8281:8afb with SMTP id
+ a31-20020a631a1f000000b004f282818afbmr9015323pga.4.1678495582183; Fri, 10 Mar
+ 2023 16:46:22 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 10 Mar 2023 16:22:58 -0800
-In-Reply-To: <20230311002258.852397-1-seanjc@google.com>
+Date:   Fri, 10 Mar 2023 16:45:57 -0800
 Mime-Version: 1.0
-References: <20230311002258.852397-1-seanjc@google.com>
 X-Mailer: git-send-email 2.40.0.rc1.284.g88254d51c5-goog
-Message-ID: <20230311002258.852397-28-seanjc@google.com>
-Subject: [PATCH v2 27/27] drm/i915/gvt: Drop final dependencies on KVM
- internal details
+Message-ID: <20230311004618.920745-1-seanjc@google.com>
+Subject: [PATCH v3 00/21] KVM: x86: Disallow writes to feature MSRs post-KVM_RUN
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>
-Cc:     kvm@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-kernel@vger.kernel.org,
-        Yan Zhao <yan.y.zhao@intel.com>,
-        Ben Gardon <bgardon@google.com>
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -75,50 +69,83 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Open code gpa_to_gfn() in kvmgt_page_track_write() and drop KVMGT's
-dependency on kvm_host.h, i.e. include only kvm_page_track.h.  KVMGT
-assumes "gfn == gpa >> PAGE_SHIFT" all over the place, including a few
-lines below in the same function with the same gpa, i.e. there's no
-reason to use KVM's helper for this one case.
+Give feature MSRs that same treatment as CPUID and disallow changing said
+MSRs after KVM_RUN.  Fix a tangentially related bug in the vPMU where KVM
+leaves the vLBRs enabled after userspace disables the guest's entire vPMU.
 
-No functional change intended.
+The bulk of this series is a rework of the vmx_pmu_caps_test, a.k.a.
+the PERF_CAPABILITIES selftests, to expand its coverage.  In addition to
+verifying that KVM rejects changes after KVM_RUN, verify other bits beyond
+full-width writes and the LBR format.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- drivers/gpu/drm/i915/gvt/gvt.h   | 3 ++-
- drivers/gpu/drm/i915/gvt/kvmgt.c | 2 +-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+Note!  There is a sneaky, small, but massive change buried halfway through
+this series that will affect all x86 selftests.  Patch
 
-diff --git a/drivers/gpu/drm/i915/gvt/gvt.h b/drivers/gpu/drm/i915/gvt/gvt.h
-index 2d65800d8e93..53a0a42a50db 100644
---- a/drivers/gpu/drm/i915/gvt/gvt.h
-+++ b/drivers/gpu/drm/i915/gvt/gvt.h
-@@ -34,10 +34,11 @@
- #define _GVT_H_
- 
- #include <uapi/linux/pci_regs.h>
--#include <linux/kvm_host.h>
- #include <linux/vfio.h>
- #include <linux/mdev.h>
- 
-+#include <asm/kvm_page_track.h>
-+
- #include "i915_drv.h"
- #include "intel_gvt.h"
- 
-diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
-index d16aced134b4..798d04481f03 100644
---- a/drivers/gpu/drm/i915/gvt/kvmgt.c
-+++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
-@@ -1599,7 +1599,7 @@ static void kvmgt_page_track_write(gpa_t gpa, const u8 *val, int len,
- 
- 	mutex_lock(&info->vgpu_lock);
- 
--	if (kvmgt_gfn_is_write_protected(info, gpa_to_gfn(gpa)))
-+	if (kvmgt_gfn_is_write_protected(info, gpa >> PAGE_SHIFT))
- 		intel_vgpu_page_track_handler(info, gpa,
- 						     (void *)val, len);
- 
+  Verify KVM preserves userspace writes to "durable" MSRs
+
+adds a KVM_GET_MSRS after every KVM_SET_MSRS that writes a single MSR and
+expects to succeeded.  The intent is to opportunistically verify that KVM
+provides "read what you wrote" for all "durable" MSRs.  The PERF_CAPS test
+was manually verifying this behavior, and while it seems kinda gratuitous,
+the coverage is quite cheap from both a performance and maintenance cost,
+i.e. I can't think of a reason _not_ to do it.
+
+v3:
+ - Collect reviews. [Xiaoyao]
+ - Fix the PMU selftests _before_ introducing the breaking KVM change. [Like]
+ - Actually use kvm_vcpu_has_run()... [Yu]
+
+v2: https://lore.kernel.org/all/20230210003148.2646712-1-seanjc@google.com
+
+v1: https://lore.kernel.org/all/20220805172945.35412-1-seanjc@google.com
+
+Sean Christopherson (21):
+  KVM: x86: Rename kvm_init_msr_list() to clarify it inits multiple
+    lists
+  KVM: x86: Add a helper to query whether or not a vCPU has ever run
+  KVM: x86: Add macros to track first...last VMX feature MSRs
+  KVM: x86: Generate set of VMX feature MSRs using first/last
+    definitions
+  KVM: selftests: Split PMU caps sub-tests to avoid writing MSR after
+    KVM_RUN
+  KVM: x86: Disallow writes to immutable feature MSRs after KVM_RUN
+  KVM: x86/pmu: WARN and bug the VM if PMU is refreshed after vCPU has
+    run
+  KVM: x86/pmu: Zero out LBR capabilities during PMU refresh
+  KVM: selftests: Move 0/initial value PERF_CAPS checks to dedicated
+    sub-test
+  KVM: selftests: Assert that full-width PMC writes are supported if
+    PDCM=1
+  KVM: selftests: Print out failing MSR and value in vcpu_set_msr()
+  KVM: selftests: Verify KVM preserves userspace writes to "durable"
+    MSRs
+  KVM: selftests: Drop now-redundant checks on PERF_CAPABILITIES writes
+  KVM: selftests: Test all fungible features in PERF_CAPABILITIES
+  KVM: selftests: Test all immutable non-format bits in
+    PERF_CAPABILITIES
+  KVM: selftests: Expand negative testing of guest writes to
+    PERF_CAPABILITIES
+  KVM: selftests: Test post-KVM_RUN writes to PERF_CAPABILITIES
+  KVM: selftests: Drop "all done!" printf() from PERF_CAPABILITIES test
+  KVM: selftests: Refactor LBR_FMT test to avoid use of separate macro
+  KVM: selftests: Add negative testcase for PEBS format in
+    PERF_CAPABILITIES
+  KVM: selftests: Verify LBRs are disabled if vPMU is disabled
+
+ arch/x86/kvm/cpuid.c                          |   2 +-
+ arch/x86/kvm/mmu/mmu.c                        |   2 +-
+ arch/x86/kvm/pmu.c                            |   3 +
+ arch/x86/kvm/svm/svm.c                        |   2 +-
+ arch/x86/kvm/vmx/pmu_intel.c                  |  10 +
+ arch/x86/kvm/vmx/vmx.c                        |   8 +-
+ arch/x86/kvm/x86.c                            | 102 ++++---
+ arch/x86/kvm/x86.h                            |  13 +
+ .../selftests/kvm/include/x86_64/processor.h  |  41 ++-
+ .../selftests/kvm/x86_64/vmx_pmu_caps_test.c  | 248 ++++++++++++++----
+ 10 files changed, 341 insertions(+), 90 deletions(-)
+
+
+base-commit: 45dd9bc75d9adc9483f0c7d662ba6e73ed698a0b
 -- 
 2.40.0.rc1.284.g88254d51c5-goog
 
