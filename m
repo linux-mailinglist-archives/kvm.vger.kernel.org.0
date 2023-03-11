@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 228336B5705
-	for <lists+kvm@lfdr.de>; Sat, 11 Mar 2023 01:50:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C217C6B5704
+	for <lists+kvm@lfdr.de>; Sat, 11 Mar 2023 01:50:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231259AbjCKAsI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 19:48:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38488 "EHLO
+        id S231304AbjCKAsd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 19:48:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231138AbjCKArV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Mar 2023 19:47:21 -0500
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78512141606
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:46:50 -0800 (PST)
-Received: by mail-pf1-x44a.google.com with SMTP id fb7-20020a056a002d8700b0061c7b700c6dso3658492pfb.13
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:46:50 -0800 (PST)
+        with ESMTP id S230493AbjCKAro (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Mar 2023 19:47:44 -0500
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98B4114265F
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:47:03 -0800 (PST)
+Received: by mail-pg1-x54a.google.com with SMTP id t185-20020a635fc2000000b00502e332493fso1655057pgb.12
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:47:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678495604;
+        d=google.com; s=20210112; t=1678495606;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=k4NjhMvOz8i60KQi141LzevW2pwEgTqlrWyWCj3rgJ8=;
-        b=q5q2rp0XdgbYt+cOilERZrXszKOvS2r8jQDmCDCMfL70G4frpG5F55N+ggVBRg0IMz
-         g0bJG22iYxgecggNlGgCI+tsoYEdA+BBqB/koX3AsNH0e48OitM+Fm2RCOknRkMk0GhS
-         UTQ174IH0V+jzvsk+pkE0BW7461LDpIuzqzw5Ae6aJRzhabml5Xx60zne5mq089L6JRd
-         nhicKGGuOhPUODOCbYnLtWouPP6YpoPvr0gxC8BYM/YeLUjTf5gHkBcOD2NkFgBxI1ek
-         W7FGXfMTDas+NtLIjnN02R0mDqFC1C2TxasL/D8CHVcUvQnfRXBP/2rlN4ZHZXCP/BKp
-         ruQw==
+        bh=BZgH5Eee9L8XSMp14xmQcQyAmW1Ng+mM4Frav4M8BP8=;
+        b=oDfm8RGtJfI416/t8hlaquI6QMoR4wxUzcfw6CKhAB2RBWVCL1SmwemdG8vpnF0CvJ
+         fTTbQ0GLnEmQu0zQit5uGQpAoptSfwIFDikvaKmcaL6Va2UHNeAaiHC0Z4BcJmZOZfTO
+         jhzLwFGgVX2F+/EsIT9Eq7SRgoWWEjvqKQaBuJxOT9dygHJr2lA8S02HV4MZyCISAYCf
+         ur2XGdzNAYMdzrdlbqm+iIL4ORLD3I3vgYWnRSXVlYByRIOVpHdALznIuIol5S+BOmoJ
+         Xc/oZ9OVUT9VFxlbC065IBwR1FtzkcBcdr99jtBgmkEU10VeljeEb/9awajBkPtOCoIZ
+         u5eQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678495604;
+        d=1e100.net; s=20210112; t=1678495606;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=k4NjhMvOz8i60KQi141LzevW2pwEgTqlrWyWCj3rgJ8=;
-        b=px70P2BK1S7CVf4INzKz77/Yg3rtVtmVniKehfQD4My5+Ut1Bfq1pjBIA0uT1vOyPT
-         sJCJSgS0BCzTFzCjENYLoTqxRCuGH5ilTX9gp9wqnCkTnFi/RkhBtzAZUENZz+Krn4k0
-         1Q6L8JwvkQS9zxWh1fhVSs/1U3EHzEq+hGcXTEVIVQtPMphE+ZQax4eo+R/vQiNdmDnH
-         v/VFIoWMM2OFVKlpH28ggnpuz5hSej9ufMKNSrhQey7feEgD/WYWuI1aPwMe9SNINYvO
-         l4txdk1FK2n4JZqjnUd/IyxXfraHCdLDkyu+GFX4XJNmOz5mPwjdj6SmJZjeC0ja6Y8k
-         kRJA==
-X-Gm-Message-State: AO0yUKUdggMAxnEJbeFYyaII2zXtuFXaGUL98s/H/Q0GSyeL00wwtXnP
-        hyijIyzNaSW14KPT0m6xrCW+7tsAawY=
-X-Google-Smtp-Source: AK7set/S9AhDw3GSh/Df5C1jvHWEN75uHrpzD2xoHdS6qef32PvUE3aUMhP9PUs2c56XZDxqYmPk/72jR3g=
+        bh=BZgH5Eee9L8XSMp14xmQcQyAmW1Ng+mM4Frav4M8BP8=;
+        b=NH5ENEUFh8TfGb6H5E/OBkO/UUsvt9cgDmbJWfkrPavQUVPj8mXicudiKvlGR+7aKx
+         vU7w4vL73W6H31BJwhIITyt0yI9pNg68q7aP7UWJ/f/IgmvLcgw17fF18WcWBLOl9i4T
+         rJ/6wBijFtn6l//uIzyF65t8zKXs+1DgNm4lDOblHTv7E/d7GoELsIuDQBfvEiL/iXh6
+         xj6VofvTGF76zRM/z9k8iXGQIEP+NnA8WyXuWIRdaN0TpJOkqrgGT7Wg/OExT1D3BN4J
+         V05zF784D/IXqZh21n/qY3F8jLRGOAsMkwf814vNlny1mU46yl9vht3IlLoYgbfMQtfE
+         9zqQ==
+X-Gm-Message-State: AO0yUKWgm/a/Mg+S3nE5y2eIkkGPj2kO9VwRpJyZZXbjdGfC6zquZRhQ
+        cp5+gwoO9DlR2qscVPaih0/knk+Ehmg=
+X-Google-Smtp-Source: AK7set867AijtX5RzA06gfubmn9RP+tWssyGJSUx8tZ1dOGPMWCKp7lIg0JZVqgZpd5zDJQme4rN9dz4xQ4=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:744a:0:b0:4fc:27c2:840d with SMTP id
- e10-20020a63744a000000b004fc27c2840dmr8922435pgn.12.1678495604462; Fri, 10
- Mar 2023 16:46:44 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a63:a80c:0:b0:4fc:2369:811 with SMTP id
+ o12-20020a63a80c000000b004fc23690811mr8981769pgf.6.1678495606218; Fri, 10 Mar
+ 2023 16:46:46 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 10 Mar 2023 16:46:09 -0800
+Date:   Fri, 10 Mar 2023 16:46:10 -0800
 In-Reply-To: <20230311004618.920745-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230311004618.920745-1-seanjc@google.com>
 X-Mailer: git-send-email 2.40.0.rc1.284.g88254d51c5-goog
-Message-ID: <20230311004618.920745-13-seanjc@google.com>
-Subject: [PATCH v3 12/21] KVM: selftests: Verify KVM preserves userspace
- writes to "durable" MSRs
+Message-ID: <20230311004618.920745-14-seanjc@google.com>
+Subject: [PATCH v3 13/21] KVM: selftests: Drop now-redundant checks on
+ PERF_CAPABILITIES writes
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -65,7 +65,7 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,51 +73,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Assert that KVM provides "read what you wrote" semantics for all "durable"
-MSRs (for lack of a better name).  The extra coverage is cheap from a
-runtime performance perspective, and verifying the behavior in the common
-helper avoids gratuitous copy+paste in individual tests.
-
-Note, this affects all tests that set MSRs from userspace!
+Now that vcpu_set_msr() verifies the expected "read what was wrote"
+semantics of all durable MSRs, including PERF_CAPABILITIES, drop the
+now-redundant manual checks in the VMX PMU caps test.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../selftests/kvm/include/x86_64/processor.h    | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+ tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c | 6 ------
+ 1 file changed, 6 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 26c8e202a956..52260f6c2465 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -945,12 +945,27 @@ do {										\
- 	}									\
- } while (0)
+diff --git a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
+index 035470b38400..f7a27b5c949b 100644
+--- a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
++++ b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
+@@ -51,10 +51,7 @@ static void test_basic_perf_capabilities(union perf_capabilities host_cap)
+ 	struct kvm_vm *vm = vm_create_with_one_vcpu(&vcpu, NULL);
  
-+/*
-+ * Returns true if KVM should return the last written value when reading an MSR
-+ * from userspace, e.g. the MSR isn't a command MSR, doesn't emulate state that
-+ * is changing, etc.  This is NOT an exhaustive list!  The intent is to filter
-+ * out MSRs that are not durable _and_ that a selftest wants to write.
-+ */
-+static inline bool is_durable_msr(uint32_t msr)
-+{
-+	return msr != MSR_IA32_TSC;
-+}
-+
- #define vcpu_set_msr(vcpu, msr, val)							\
- do {											\
--	uint64_t v = val;								\
-+	uint64_t r, v = val;								\
- 											\
- 	TEST_ASSERT_MSR(_vcpu_set_msr(vcpu, msr, v) == 1,				\
- 			"KVM_SET_MSRS failed on %s, value = 0x%lx", msr, #msr, v);	\
-+	if (!is_durable_msr(msr))							\
-+		break;									\
-+	r = vcpu_get_msr(vcpu, msr);							\
-+	TEST_ASSERT_MSR(r == v, "Set %s to '0x%lx', got back '0x%lx'", msr, #msr, v, r);\
- } while (0)
+ 	vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, 0);
+-	ASSERT_EQ(vcpu_get_msr(vcpu, MSR_IA32_PERF_CAPABILITIES), 0);
+-
+ 	vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, host_cap.capabilities);
+-	ASSERT_EQ(vcpu_get_msr(vcpu, MSR_IA32_PERF_CAPABILITIES), host_cap.capabilities);
  
- void kvm_get_cpu_address_width(unsigned int *pa_bits, unsigned int *va_bits);
+ 	kvm_vm_free(vm);
+ }
+@@ -67,9 +64,6 @@ static void test_fungible_perf_capabilities(union perf_capabilities host_cap)
+ 	/* testcase 1, set capabilities when we have PDCM bit */
+ 	vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, PMU_CAP_FW_WRITES);
+ 
+-	/* check capabilities can be retrieved with KVM_GET_MSR */
+-	ASSERT_EQ(vcpu_get_msr(vcpu, MSR_IA32_PERF_CAPABILITIES), PMU_CAP_FW_WRITES);
+-
+ 	/* check whatever we write with KVM_SET_MSR is _not_ modified */
+ 	vcpu_run(vcpu);
+ 	ASSERT_EQ(vcpu_get_msr(vcpu, MSR_IA32_PERF_CAPABILITIES), PMU_CAP_FW_WRITES);
 -- 
 2.40.0.rc1.284.g88254d51c5-goog
 
