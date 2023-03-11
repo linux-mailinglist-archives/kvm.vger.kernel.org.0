@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DABF16B5990
-	for <lists+kvm@lfdr.de>; Sat, 11 Mar 2023 09:55:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 643B76B59FE
+	for <lists+kvm@lfdr.de>; Sat, 11 Mar 2023 10:20:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230130AbjCKIzG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 11 Mar 2023 03:55:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35274 "EHLO
+        id S230061AbjCKJUk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 11 Mar 2023 04:20:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229737AbjCKIzE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 11 Mar 2023 03:55:04 -0500
+        with ESMTP id S230236AbjCKJUI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 11 Mar 2023 04:20:08 -0500
 Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADF0A457C3;
-        Sat, 11 Mar 2023 00:55:02 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43A541BFE;
+        Sat, 11 Mar 2023 01:19:12 -0800 (PST)
 From:   Thomas Gleixner <tglx@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1678524899;
+        s=2020; t=1678526350;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=eZsxczpcjg5rADjui7vdfCXvmV1MTXwv9SnZW7oGtIc=;
-        b=l1cOG1tk3Ps29rL3Z0tXrKFLlOCMMGN25MzXBRPiPkTFZFRYhhAajHeqVh8miy/93cLHXX
-        xfVvcgFNqueaiFR+HmEx0EtypV/mL3hsdipo7zxPoG145rZ5ea9sQ+6+13tuQihcxhKVut
-        rKugBIn1XpsNBi4OfmMYKHofi6KFWGnk66RLHUn87iwT2p6M4Hjme7OHPWHDGsJljxsP6G
-        w0N7VO1dLtn8TvIpE21eA2msGCsO8woloRERQM/wTBpPgemvtL6hjqFkzpKL/tDq+SFroD
-        lIxzPsJkHaIW7pt+ubpCni68JATtRsIB6P78UF3cQNI92w802f04SIahC3jo6w==
+        bh=TWqLM4GN3BK/H62VxUNFd2Gi4UA41TC1BZfBfm1ijYQ=;
+        b=v9/aWHPS+a0oQNdKOkohbsxF3OQGjJK4oF4UZJmG1JpPdScpCgeSbD3aUQtheAadWw3noD
+        Pk1AamUJqrX3z+6JNVV8BFUtmrA69l3fhK7+BAxMAU3sGFd/xl/POi16hJy6tyoyvFNy10
+        uNVP5RmMTOtln4kfSIIVRo25IBBpxclFTkp7pUrN4J5gTr2p9rQkVfZvSkRlz/Th7QovQa
+        9RTh3LP/li7Eq+CahpY5bzjqkCbSfUxrenFrjnQNVdAv9mv4nZTLyEpEf0OTNs6Ax3t50l
+        ueQAvHh1kSvD2/kQGcMdR2zwPMAfmcjdkjLoXsvBgfBngqq/9VmcA/8VOy+wtg==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1678524899;
+        s=2020e; t=1678526350;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=eZsxczpcjg5rADjui7vdfCXvmV1MTXwv9SnZW7oGtIc=;
-        b=23aWpxNuBQG3Y5qL+0wEufISM7B2IONCANHLQe0/OcgU3NIX45IcsFMwnj/eJTz7H31b3u
-        P104X5KLadgsqUCA==
+        bh=TWqLM4GN3BK/H62VxUNFd2Gi4UA41TC1BZfBfm1ijYQ=;
+        b=Gg6gdghsHftcHwbgLoTMXcSSlhY9KIZhXxkcwQYxHzLhJqOqLch6EOAu0G16/8FUqAb64q
+        YnZJmLEUztqqHnBQ==
 To:     Usama Arif <usama.arif@bytedance.com>, dwmw2@infradead.org,
         kim.phillips@amd.com, brgerst@gmail.com
 Cc:     piotrgorski@cachyos.org, oleksandr@natalenko.name,
@@ -48,13 +48,13 @@ Cc:     piotrgorski@cachyos.org, oleksandr@natalenko.name,
         David Woodhouse <dwmw@amazon.co.uk>,
         Usama Arif <usama.arif@bytedance.com>,
         "Guilherme G . Piccoli" <gpiccoli@igalia.com>
-Subject: Re: [PATCH v14 10/12] x86/smpboot: Send INIT/SIPI/SIPI to secondary
- CPUs in parallel
-In-Reply-To: <20230308171328.1562857-11-usama.arif@bytedance.com>
+Subject: Re: [PATCH v14 05/12] x86/smpboot: Split up native_cpu_up into
+ separate phases and document them
+In-Reply-To: <20230308171328.1562857-6-usama.arif@bytedance.com>
 References: <20230308171328.1562857-1-usama.arif@bytedance.com>
- <20230308171328.1562857-11-usama.arif@bytedance.com>
-Date:   Sat, 11 Mar 2023 10:54:58 +0200
-Message-ID: <87y1o3acrh.ffs@tglx>
+ <20230308171328.1562857-6-usama.arif@bytedance.com>
+Date:   Sat, 11 Mar 2023 11:19:10 +0200
+Message-ID: <87ttyrabn5.ffs@tglx>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -68,26 +68,25 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Mar 08 2023 at 17:13, Usama Arif wrote:
 >  
-> +/* Bringup step one: Send INIT/SIPI to the target AP */
-> +static int native_cpu_kick(unsigned int cpu)
+> +int native_cpu_up(unsigned int cpu, struct task_struct *tidle)
 > +{
-> +	return do_cpu_up(cpu, idle_thread_get(cpu));
+> +	int ret;
+> +
+> +	ret = do_cpu_up(cpu, tidle);
+> +	if (ret)
+> +		return ret;
 
-This idle_thread_get() is not sufficient. bringup_cpu() does:
+In case of error this leaves the warm reset vector dangling.
 
-	struct task_struct *idle = idle_thread_get(cpu);
+> +	ret = do_wait_cpu_initialized(cpu);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = do_wait_cpu_callin(cpu);
+> +	if (ret)
+> +		return ret;
 
-	/*
-	 * Reset stale stack state from the last time this CPU was online.
-	 */
-	scs_task_reset(idle);
-	kasan_unpoison_task_stack(idle);
-
-But with this new model neither the shadow stack gets reset nor the
-kasan unpoisoning happens _before_ the to be kicked CPU starts
-executing.
-
-That needs a new function which does the get() and the above.
+Same for these two error returns.
 
 Thanks,
 
