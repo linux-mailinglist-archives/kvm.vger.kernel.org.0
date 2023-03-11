@@ -2,59 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 53B766B56F9
-	for <lists+kvm@lfdr.de>; Sat, 11 Mar 2023 01:47:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E90336B56F5
+	for <lists+kvm@lfdr.de>; Sat, 11 Mar 2023 01:47:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230502AbjCKArL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 19:47:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37862 "EHLO
+        id S230512AbjCKArQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 19:47:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230360AbjCKAqz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Mar 2023 19:46:55 -0500
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3820613E0B2
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:46:35 -0800 (PST)
-Received: by mail-pf1-x449.google.com with SMTP id b8-20020aa78708000000b005eaa50faa35so3693368pfo.20
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:46:35 -0800 (PST)
+        with ESMTP id S230405AbjCKAq4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Mar 2023 19:46:56 -0500
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBB4D13EBB8
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:46:37 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id m9-20020a170902db0900b0019ea0e227e4so3615986plx.6
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:46:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678495595;
+        d=google.com; s=20210112; t=1678495597;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=fG/gctdmsHG4KFmH0rDrimK5SXVIN8L7Kh/kR2GvG5A=;
-        b=BCXSRihXjCF5gcpGEqZASI3X2u2m382eLGuNLXdp9s9FXaM2NnxlLaov/07yvpjiZI
-         d5dc57wxslbohOAxK7jf/NKVwHIt6oyCqizaYjDuIEe518RQDeiCwgkRz6SEh1xibxxX
-         ySlMYp/aC6gazQyrjwOT5yeD6v4xmZdy3az3oJlb3y4CK8bpbPOhydZ7ceuCu9o9Huz+
-         WtTW8lcLsuNoak4HCLCQKkZsigrLQu+oQDdqSWBVFk+7C+frapYtH+PegbRXJIXk+q4c
-         D7YI+dZaAvhESpu2jak5vyM8eTXpPHNXsdv1vtNYC6FHKPnU6WPGLLsvDasDULfj7KX9
-         wtlg==
+        bh=GrjkB3GbLNCU488mD1o6+a8J9bvUDXMzY1ZmunPEt30=;
+        b=kGctua3b9Ol+gxvKXIEOfldGSTZQksGh7WFY8sbi7ayH9VX5eY0lmQFH/cEwfN8Fda
+         lHQN/eC6wt2hSnbn+QrTdhrGprDYcUeWWUPut1SJMDWpSX2jVzmkZT6Tom5pP9+44jeG
+         D/b2yVuttB3e5qUYJ03jT68wS3LcR47uXDzQrCmfUUsqASAP30otOQGxk3k0sZOgYyd4
+         k1RRpKTpSWpFtaY4X2O9MmVNsmUbDAhkE5hATUcas6+mU9WOQSj3wwDtiYJUMR1FZEdK
+         s650N+K9ZpWOAZPU34XcCYog6+6pNi9DOzL38NLvYnuMIZ7SD0tLeIEf7lV9Xl4atlVx
+         Jy8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678495595;
+        d=1e100.net; s=20210112; t=1678495597;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=fG/gctdmsHG4KFmH0rDrimK5SXVIN8L7Kh/kR2GvG5A=;
-        b=dcMJU5ULurmwIZxtvw5S9hOKesPTHsY+AhjCk0mN5ntlaIN9AABFgPwkqAP/hvg/HH
-         k7BBVozYzabCMMdNWJYGl6aPmlSHkerIympsO/XAybeF3JbzCw23X53PZN+bTDGnnERs
-         OFkCzf8AFb/b7AqV+6Q2OaaoDPpu4RXGRRGfq5tO1jfrwOpSiIL609qBohGPg1GBk0ye
-         yfKDNThBs3/2i/VDruegtGxllPh+q603Qxp1wVuGKMxJsKhu8mOW0ibLVnn9WTsdjPnk
-         7i65i/5DdXbcHvIMIFV48Jjqjn5pv6aLEkIZNSz1Vx8giU2PCAAZZXO3UD2fq5KAYMOz
-         9NHA==
-X-Gm-Message-State: AO0yUKXzve2C29TuTO//8ta2ddRpGL4cBIqzbbcxdsrXdAZZ6SvxLOva
-        1hJ0N79Sx56u+LvXndy4vUgMPVaFX0c=
-X-Google-Smtp-Source: AK7set/8k4ZuMdVVQdkcEV/wb/yLxhP6jK2ME2RuLadTBBF5FTif/SapvdPl8BOgE6/fCrXKesQjcqO3wpo=
+        bh=GrjkB3GbLNCU488mD1o6+a8J9bvUDXMzY1ZmunPEt30=;
+        b=1f3/yq1JevBRPYo49UMpJpvTbrzr3uTZvJT55lD82vvg4sohBKiE8UGcBCjiGS8Er6
+         KiDlJmeaL/v5qEnUCOmV9q1fMRfuFx4RNEysAQ1WIaDf2kgelYydu4bppet0ltRDtt4x
+         h+mX9Heh8LlXfEqWUURUD8l106kTFfrd5sSzI0/Wx8xuRyvMNpVnabVpKD+EWsWPBsxL
+         EbT+FrPw9PEbRIjFWEFiV54CoeqATeLdLzStziBrkDTnDpclgzDmt7Eet7zr8ayLqmX9
+         vqs75A8zyMlpV0JJQ4yedOx1ndOPZRAeV1sPRFNAiZwlWGB3PeuAD6Cnsf+T0BcH2IJ0
+         eLOQ==
+X-Gm-Message-State: AO0yUKW3Hh+OrbIw70ksznorDpQk0N90AoEO5msFiz5gK9Jaal5pZBne
+        ukmVBHRf/GW/jSOIgTWpEkrfs9rpRhs=
+X-Google-Smtp-Source: AK7set8bTZF8ot+69fmxqaQOfk/QNAD3tjdOKkLqGRUSqklDwJaPm+iPoiA3bgdpSiwskoWPIPPDcpGdywU=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a62:8247:0:b0:5a8:bdd2:f99c with SMTP id
- w68-20020a628247000000b005a8bdd2f99cmr11215844pfd.1.1678495595379; Fri, 10
- Mar 2023 16:46:35 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a65:6953:0:b0:501:f894:ae62 with SMTP id
+ w19-20020a656953000000b00501f894ae62mr1277678pgq.4.1678495597406; Fri, 10 Mar
+ 2023 16:46:37 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 10 Mar 2023 16:46:04 -0800
+Date:   Fri, 10 Mar 2023 16:46:05 -0800
 In-Reply-To: <20230311004618.920745-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230311004618.920745-1-seanjc@google.com>
 X-Mailer: git-send-email 2.40.0.rc1.284.g88254d51c5-goog
-Message-ID: <20230311004618.920745-8-seanjc@google.com>
-Subject: [PATCH v3 07/21] KVM: x86/pmu: WARN and bug the VM if PMU is
- refreshed after vCPU has run
+Message-ID: <20230311004618.920745-9-seanjc@google.com>
+Subject: [PATCH v3 08/21] KVM: x86/pmu: Zero out LBR capabilities during PMU refresh
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -73,59 +72,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that KVM disallows changing feature MSRs, i.e. PERF_CAPABILITIES,
-after running a vCPU, WARN and bug the VM if the PMU is refreshed after
-the vCPU has run.
+Zero out the LBR capabilities during PMU refresh to avoid exposing LBRs
+to the guest against userspace's wishes. If userspace modifies the
+guest's CPUID model or invokes KVM_CAP_PMU_CAPABILITY to disable vPMU
+after an initial KVM_SET_CPUID2, but before the first KVM_RUN, KVM will
+retain the previous LBR info due to bailing before refreshing the LBR
+descriptor.
 
-Note, KVM has disallowed CPUID updates after running a vCPU since commit
-feb627e8d6f6 ("KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN"), i.e.
-PERF_CAPABILITIES was the only remaining way to trigger a PMU refresh
-after KVM_RUN.
+Note, this is a very theoretical bug, there is no known use case where a
+VMM would deliberately enable the vPMU via KVM_SET_CPUID2, and then later
+disable the vPMU.
 
-Cc: Like Xu <like.xu.linux@gmail.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/pmu.c |  3 +++
- arch/x86/kvm/x86.c | 10 +++++++++-
- 2 files changed, 12 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/pmu_intel.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 612e6c70ce2e..7e974c4e61b0 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -589,6 +589,9 @@ int kvm_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-  */
- void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
- {
-+	if (KVM_BUG_ON(kvm_vcpu_has_run(vcpu), vcpu->kvm))
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index e8a3be0b9df9..d889bb2a1de5 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -531,6 +531,16 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+ 	pmu->pebs_enable_mask = ~0ull;
+ 	pmu->pebs_data_cfg_mask = ~0ull;
+ 
++	memset(&lbr_desc->records, 0, sizeof(lbr_desc->records));
++
++	/*
++	 * Setting passthrough of LBR MSRs is done only in the VM-Entry loop,
++	 * and PMU refresh is disallowed after the vCPU has run, i.e. this code
++	 * should never be reached while KVM is passing through MSRs.
++	 */
++	if (KVM_BUG_ON(lbr_desc->msr_passthrough, vcpu->kvm))
 +		return;
 +
- 	static_call(kvm_x86_pmu_refresh)(vcpu);
- }
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 219492cd887e..93a7302e4fc3 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3625,9 +3625,17 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		if (data & ~kvm_caps.supported_perf_cap)
- 			return 1;
- 
-+		/*
-+		 * Note, this is not just a performance optimization!  KVM
-+		 * disallows changing feature MSRs after the vCPU has run; PMU
-+		 * refresh will bug the VM if called after the vCPU has run.
-+		 */
-+		if (vcpu->arch.perf_capabilities == data)
-+			break;
-+
- 		vcpu->arch.perf_capabilities = data;
- 		kvm_pmu_refresh(vcpu);
--		return 0;
-+		break;
- 	case MSR_EFER:
- 		return set_efer(vcpu, msr_info);
- 	case MSR_K7_HWCR:
+ 	entry = kvm_find_cpuid_entry(vcpu, 0xa);
+ 	if (!entry || !vcpu->kvm->arch.enable_pmu)
+ 		return;
 -- 
 2.40.0.rc1.284.g88254d51c5-goog
 
