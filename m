@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 120266B56FE
-	for <lists+kvm@lfdr.de>; Sat, 11 Mar 2023 01:47:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CDC46B5701
+	for <lists+kvm@lfdr.de>; Sat, 11 Mar 2023 01:47:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230027AbjCKAqb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 19:46:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36586 "EHLO
+        id S230126AbjCKAqe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 19:46:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229623AbjCKAq1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Mar 2023 19:46:27 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 630F1139D00
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:46:26 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id q9-20020a17090a9f4900b00237d026fc55so5074299pjv.3
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:46:26 -0800 (PST)
+        with ESMTP id S229697AbjCKAq3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Mar 2023 19:46:29 -0500
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BE52139D10
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:46:28 -0800 (PST)
+Received: by mail-pf1-x449.google.com with SMTP id a10-20020a056a000c8a00b005fc6b117942so3621049pfv.2
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:46:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678495586;
+        d=google.com; s=20210112; t=1678495588;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=UCsKlBygaljo69pUMHBC7qjxT0Bam71YbVnLW7zzuTY=;
-        b=bopgSxhYe35UHp/rSiq09olTYF29A1imC6FArKNKFxhlP0K0N0lZ6PLoQ965s5g5Rt
-         NVCHCqPnHGytA8ygpHPGELSoVIp9ofpPVlaUF8GAUXZTHX1yB92x3JO++ljLO35kbtVz
-         rDQ+LNBkzoyarhZecu2C5j5b9GblnHruxlaZU45g+YyY1q63393HbLRSsKxv/bdhth8D
-         i20oGCke767wvQVjjkPHusCU10BkLI2SISNDtkhVDhbsVaA/Oiy6DHfvoE3qcAEdY24M
-         BTGeCxij4o+iNPUCnrCJCqjPtr7fWle3vrLWZiVDTgmi56LSrvUElX2/IvgwFu5nnaUO
-         CtAw==
+        bh=037pUqXeQr7lbfms7Jj3Q4cOJvKKygZOU+H5t+p+MOc=;
+        b=Owkx/G9kjCUuXtpKm84c1IzthMXdx92l6GjzKwTOY0Jh/hetT0yNl2D5JAKzaNCoQj
+         m/0E2Rah7jDMcc3WGS1FqAGQpOBQJmma+gZC6JDfJO1ubESN7hU77dx8hajnvGoPts1+
+         4j1ke8oKdBUh7RGTnqKuAaLX4x78Z9eYYvrTiEcHB/Y2DZBuQ9RT9RzfM8dm0gCG5Zpd
+         RwKJvCo7hg0KKhHb3mKyFsf/Ete3PNUbm0WAZhWE+hhHLBo0EfMi+JAIAjUG7QW3xUFA
+         83D2qsMO89xv/dw3qlpQF+m1c75e2oWk08FKeqrSvxYkW/Vfe2vHiRK0kyRKDai9SOCH
+         C6Qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678495586;
+        d=1e100.net; s=20210112; t=1678495588;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=UCsKlBygaljo69pUMHBC7qjxT0Bam71YbVnLW7zzuTY=;
-        b=G0qo/JGOf3GNwOrEBqbAXBK56rQe6ktX1azPWax+FTcyX8U9QwvHnWlHJna0kA0SPv
-         ciTM+6+tgQ3ub5Gs8X8FRe7zmIPJmhyywplUZlt6ATsVNwJCmGiSIzMhp3fG2Y5NbGCl
-         ZbQPDhHhPuCFNoviowvxtUUVEibebYCP7GYqSZ5T2xW+Zl+DTpaZNhBZYl0rnFv8LTB9
-         HX5/E5gC4JW/ubppj9XuxxR8/u4vBSkqYpjV8sfMKL1wWBe4br8sIUrnKkKq76/t+SvR
-         R7ebr7aMpPT8mVNdKzzGKxAXQfg34d7JHUukE4xQIsKQXaqPMBIkDnernR93fj0Rr6h5
-         MfRA==
-X-Gm-Message-State: AO0yUKWP5ZKcYgYxOOOp3krCHqNyocuZL43ZgWRSQHphV1NAPFwMDuS6
-        foAWFGr6lGzDjjk5vaBE+Q1I67FABvY=
-X-Google-Smtp-Source: AK7set99ZSXAcHXf00oP45I5uaEIdA6QUlelD/iSNJsNSlIOwPxUisVvKHaY+mfZM1joKZnzP/vR49Q3MdA=
+        bh=037pUqXeQr7lbfms7Jj3Q4cOJvKKygZOU+H5t+p+MOc=;
+        b=Kve5u71+eLbRA3uFsHfEWDgNGzUyO5mkwHkqHTkK8aJt7aWZptq8fA59QKOfaAoYy1
+         WBBwSCLY4RU5I9/SRwb/XfhtM3BqYIUfHiJdecOBnTLvCK319Rd11Qm1yXgZXQ5xKbph
+         db+zD86YP7Veg4IQkQ3/arvTAcho5UNIH+x5D4qocCZbmTp5J+aFAaoaXLzmFF5iKCTk
+         hidYz3h7En9HoPaC7urGzhq6ebCEuWSJtijaW8YUyJC5sUFOIgwG1qZ5AsQlHdVev5sz
+         SN3jNzzJZzuwNLxflNTbqNcPxa9Oer+hSNDxfq0Zr3iUbZ4rFfEoPBEiLVthzvZ0RJiD
+         5Gvg==
+X-Gm-Message-State: AO0yUKXxGYltmNN6uLuJmgQsQf+lrHVQSXpxbPWHnPp2hnEP8j8MVtzW
+        rGG3zX0O5LF4O4uRvABcK0BjTWedCE0=
+X-Google-Smtp-Source: AK7set/91VC9PMmHF4FV8Qbg8XLWgHyiljZ2d2gMBIvhfCThKgxYTJlcjU7RdiRpNZzXr0V4H3DqW3QTw6A=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:dd86:b0:233:be3d:8a42 with SMTP id
- l6-20020a17090add8600b00233be3d8a42mr10052365pjv.0.1678495585934; Fri, 10 Mar
- 2023 16:46:25 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a62:79c4:0:b0:622:65eb:f6bd with SMTP id
+ u187-20020a6279c4000000b0062265ebf6bdmr17868pfc.2.1678495587846; Fri, 10 Mar
+ 2023 16:46:27 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 10 Mar 2023 16:45:59 -0800
+Date:   Fri, 10 Mar 2023 16:46:00 -0800
 In-Reply-To: <20230311004618.920745-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230311004618.920745-1-seanjc@google.com>
 X-Mailer: git-send-email 2.40.0.rc1.284.g88254d51c5-goog
-Message-ID: <20230311004618.920745-3-seanjc@google.com>
-Subject: [PATCH v3 02/21] KVM: x86: Add a helper to query whether or not a
- vCPU has ever run
+Message-ID: <20230311004618.920745-4-seanjc@google.com>
+Subject: [PATCH v3 03/21] KVM: x86: Add macros to track first...last VMX
+ feature MSRs
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -73,63 +73,96 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a helper to query if a vCPU has run so that KVM doesn't have to open
-code the check on last_vmentry_cpu being set to a magic value.
+Add macros to track the range of VMX feature MSRs that are emulated by
+KVM to reduce the maintenance cost of extending the set of emulated MSRs.
+
+Note, KVM doesn't necessarily emulate all known/consumed VMX MSRs, e.g.
+PROCBASED_CTLS3 is consumed by KVM to enable IPI virtualization, but is
+not emulated as KVM doesn't emulate/virtualize IPI virtualization for
+nested guests.
 
 No functional change intended.
 
-Suggested-by: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Like Xu <like.xu.linux@gmail.com>
 Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/cpuid.c   | 2 +-
- arch/x86/kvm/mmu/mmu.c | 2 +-
- arch/x86/kvm/x86.h     | 5 +++++
- 3 files changed, 7 insertions(+), 2 deletions(-)
+ arch/x86/kvm/svm/svm.c | 2 +-
+ arch/x86/kvm/vmx/vmx.c | 8 ++++----
+ arch/x86/kvm/x86.h     | 8 ++++++++
+ 3 files changed, 13 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 8f8edeaf8177..448d627ce891 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -420,7 +420,7 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
- 	 * KVM_SET_CPUID{,2} again. To support this legacy behavior, check
- 	 * whether the supplied CPUID data is equal to what's already set.
- 	 */
--	if (vcpu->arch.last_vmentry_cpu != -1) {
-+	if (kvm_vcpu_has_run(vcpu)) {
- 		r = kvm_cpuid_check_equal(vcpu, e2, nent);
- 		if (r)
- 			return r;
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index c8ebe542c565..e5a6d785d77a 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5393,7 +5393,7 @@ void kvm_mmu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 	 * Changing guest CPUID after KVM_RUN is forbidden, see the comment in
- 	 * kvm_arch_vcpu_ioctl().
- 	 */
--	KVM_BUG_ON(vcpu->arch.last_vmentry_cpu != -1, vcpu->kvm);
-+	KVM_BUG_ON(kvm_vcpu_has_run(vcpu), vcpu->kvm);
- }
- 
- void kvm_mmu_reset_context(struct kvm_vcpu *vcpu)
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index b43775490074..a5b9ebd6f2c5 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4107,7 +4107,7 @@ static bool svm_has_emulated_msr(struct kvm *kvm, u32 index)
+ {
+ 	switch (index) {
+ 	case MSR_IA32_MCG_EXT_CTL:
+-	case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_VMFUNC:
++	case KVM_FIRST_EMULATED_VMX_MSR ... KVM_LAST_EMULATED_VMX_MSR:
+ 		return false;
+ 	case MSR_IA32_SMBASE:
+ 		if (!IS_ENABLED(CONFIG_KVM_SMM))
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index bcac3efcde41..56607996f8f4 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -1945,7 +1945,7 @@ static inline bool is_vmx_feature_control_msr_valid(struct vcpu_vmx *vmx,
+ static int vmx_get_msr_feature(struct kvm_msr_entry *msr)
+ {
+ 	switch (msr->index) {
+-	case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_VMFUNC:
++	case KVM_FIRST_EMULATED_VMX_MSR ... KVM_LAST_EMULATED_VMX_MSR:
+ 		if (!nested)
+ 			return 1;
+ 		return vmx_get_vmx_msr(&vmcs_config.nested, msr->index, &msr->data);
+@@ -2030,7 +2030,7 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		msr_info->data = to_vmx(vcpu)->msr_ia32_sgxlepubkeyhash
+ 			[msr_info->index - MSR_IA32_SGXLEPUBKEYHASH0];
+ 		break;
+-	case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_VMFUNC:
++	case KVM_FIRST_EMULATED_VMX_MSR ... KVM_LAST_EMULATED_VMX_MSR:
+ 		if (!nested_vmx_allowed(vcpu))
+ 			return 1;
+ 		if (vmx_get_vmx_msr(&vmx->nested.msrs, msr_info->index,
+@@ -2366,7 +2366,7 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		vmx->msr_ia32_sgxlepubkeyhash
+ 			[msr_index - MSR_IA32_SGXLEPUBKEYHASH0] = data;
+ 		break;
+-	case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_VMFUNC:
++	case KVM_FIRST_EMULATED_VMX_MSR ... KVM_LAST_EMULATED_VMX_MSR:
+ 		if (!msr_info->host_initiated)
+ 			return 1; /* they are read-only */
+ 		if (!nested_vmx_allowed(vcpu))
+@@ -6957,7 +6957,7 @@ static bool vmx_has_emulated_msr(struct kvm *kvm, u32 index)
+ 		 * real mode.
+ 		 */
+ 		return enable_unrestricted_guest || emulate_invalid_guest_state;
+-	case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_VMFUNC:
++	case KVM_FIRST_EMULATED_VMX_MSR ... KVM_LAST_EMULATED_VMX_MSR:
+ 		return nested;
+ 	case MSR_AMD64_VIRT_SPEC_CTRL:
+ 	case MSR_AMD64_TSC_RATIO:
 diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index a8167b47b8c8..754190af1791 100644
+index 754190af1791..4bc483d082ee 100644
 --- a/arch/x86/kvm/x86.h
 +++ b/arch/x86/kvm/x86.h
-@@ -83,6 +83,11 @@ static inline unsigned int __shrink_ple_window(unsigned int val,
- void kvm_service_local_tlb_flush_requests(struct kvm_vcpu *vcpu);
- int kvm_check_nested_events(struct kvm_vcpu *vcpu);
+@@ -40,6 +40,14 @@ void kvm_spurious_fault(void);
+ 	failed;								\
+ })
  
-+static inline bool kvm_vcpu_has_run(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu->arch.last_vmentry_cpu != -1;
-+}
++/*
++ * The first...last VMX feature MSRs that are emulated by KVM.  This may or may
++ * not cover all known VMX MSRs, as KVM doesn't emulate an MSR until there's an
++ * associated feature that KVM supports for nested virtualization.
++ */
++#define KVM_FIRST_EMULATED_VMX_MSR	MSR_IA32_VMX_BASIC
++#define KVM_LAST_EMULATED_VMX_MSR	MSR_IA32_VMX_VMFUNC
 +
- static inline bool kvm_is_exception_pending(struct kvm_vcpu *vcpu)
- {
- 	return vcpu->arch.exception.pending ||
+ #define KVM_DEFAULT_PLE_GAP		128
+ #define KVM_VMX_DEFAULT_PLE_WINDOW	4096
+ #define KVM_DEFAULT_PLE_WINDOW_GROW	2
 -- 
 2.40.0.rc1.284.g88254d51c5-goog
 
