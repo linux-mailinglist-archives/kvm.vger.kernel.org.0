@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 07A3F6B56F8
-	for <lists+kvm@lfdr.de>; Sat, 11 Mar 2023 01:47:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EE5576B56F2
+	for <lists+kvm@lfdr.de>; Sat, 11 Mar 2023 01:47:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230245AbjCKAqp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 19:46:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36942 "EHLO
+        id S230337AbjCKAqy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 19:46:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230093AbjCKAqd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Mar 2023 19:46:33 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D72D13D1F9
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:46:30 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id mp16-20020a17090b191000b0023ab4b5b064so3352591pjb.9
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:46:30 -0800 (PST)
+        with ESMTP id S230028AbjCKAqn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Mar 2023 19:46:43 -0500
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2101813E0BA
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:46:32 -0800 (PST)
+Received: by mail-pf1-x449.google.com with SMTP id w3-20020aa78583000000b005d244af158eso3670347pfn.23
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:46:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678495589;
+        d=google.com; s=20210112; t=1678495591;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=bjAmlz3HqB+H+MWnUu8RY7jRVQBDjdxPFlGV9NdkjQ0=;
-        b=rEdsF7x730kYSTxUbNW+tTzBPVv37BkIJ4qZ6LT+f1AEjjskZKSd6bbHZ22kmA5Ie2
-         zzLz+FWczoChypB6ChImJDDEmhyfJYNW9O9VKb1dWcymfeXQFhhvs7RZBlti6Oy2arZc
-         Bjw1Xh1rvkPuQg5Ry1UV3G033HXiyU5+MDRKvuutgDAHEQhoKEBOhwZVBm4qGJSlhxel
-         kV8wfoBNtyOk4tTR+8/0L74dWhsq+WwCMNyHfFO1w5lvBGZXmXasatDUbZHhqejDuWjT
-         CKKykn0Vgv8CZ+A0OUZI+PDYlUeG/2CT2cw2Uo03g04S3zGiuj+PdtLcfMsL8v3GDLTQ
-         sFbA==
+        bh=/K3SNYnoXPbtGJnYKgYAyon1VCKMrYBBJfg3kvO2j1w=;
+        b=HAXKMJmlAXL3VlLkD8B15Nc2mewXMfn/fVqBuTwrhEKRliaSZuq2QGcmlrcyOVTo1Z
+         4GtTMYDZZ4mW3vD23LMpqxsiLZONLboQddJeoDmBK++P6Zp8X9s6BXjKMsPDqimIKsGL
+         rx80XqlPJgSkdLg7arjnfsW3aYS2qbmw2prNTjObh+IyBnMtUlW3xPqckd6aaXDHjINz
+         m5NAza8F6+ZVgzqf5NMdMbZm846UYwgltZltA42Zl5Nh63gwfe0QN8cUHlnOobdCP9sX
+         iXRKejCmzlbFQHIHjcV5RnEa4yLF5E7e/2XtUTRip6yTlgJkF3Fs2sKYTJ9F0SyBEgGm
+         qKcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678495589;
+        d=1e100.net; s=20210112; t=1678495591;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=bjAmlz3HqB+H+MWnUu8RY7jRVQBDjdxPFlGV9NdkjQ0=;
-        b=KI5+0fmPt+T9HkuH6/AgZq9SKdWkAfUEAicR8TTOQ6yH/lJzseYHMa0WBPx+PQX9Ig
-         mEg03Wd666qb14W/3WYdSESwfQU3S7Jo1CLTdKsVo+y9inOq2ljFiOpj10byitETyxta
-         wdQSrVcHbEfenGL77mSh7c2Pq2r8bxxmxoKWb/F69mKfYd7Z68LrDiW+kFXp40Q9YwPw
-         /6QyrKllHQLcif2I8aMgsQ5qlhXExt5r365iX00NJ+/VxkZG7hG9AZk/tkK22y4g+qH0
-         EXxjXV5y1xIpkjvn3uzsdoqTkTdqA6JxVCc2rftC34sSAXU1DO6zmRjCczJXaMjo0GJ2
-         bvJg==
-X-Gm-Message-State: AO0yUKVk5TT0pa2oVVCM0Zw700/O6XvGAXzAG+wFn3dbECb2X0CF25pp
-        l9HZCRMOaHUWtICHN9pSKn0ZWEFoqYU=
-X-Google-Smtp-Source: AK7set99+kCypvapzRp6HXB60/UBcb3nXr34N4jI+Zgyl8MDz4bjb8ECHz+5Pl0Vo8jOvp/Eu1/vwwz+pxo=
+        bh=/K3SNYnoXPbtGJnYKgYAyon1VCKMrYBBJfg3kvO2j1w=;
+        b=j3ClcxHGJ5KvJmvoCbdnQuuClC8yeqL+K56SsMEwLbJRFdCsNY1UIOyw1KiFdfaZbE
+         Tpeq+Y1BesaaatcZx+XBEDYGPy9UYhrvDszljTreGJvJmOA0ZA55U/c9fguT0HaHcWeo
+         bAE9GO8TAgayMlRJRbtKv/N8OX+Im27NUT8XdZBxQHFbaXlOZXYTqCzKJ+H31ADzhfHv
+         TAhRpAy+dIAPF/lAGD72DedLbpxYUjxandheSRsGui7qgiuj9a4bNDSEI2n8Nh9D3LII
+         YNdpb5OC6x4wBo34MYS7goWzWeYCdI2gI230FXV3OD+MLyT5+o3APV1wckbyZY83hdNm
+         Qwig==
+X-Gm-Message-State: AO0yUKWCfFS13EzKM6UCoO6emt5ekmvjpevMFwjqu2ZiqXIMpd/tGoC/
+        PAtPXzXzNJvq7VnRCm1ijScTV8U76bY=
+X-Google-Smtp-Source: AK7set/6fcyxyyaEUDeDMuzHefFQJJJd/EwplJORjyavhZJxxlgYMcEUkZ5th6QY8PWLVy4HTWtKql2tl30=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:7fcd:b0:19a:7bd4:5b0d with SMTP id
- t13-20020a1709027fcd00b0019a7bd45b0dmr10328292plb.8.1678495589646; Fri, 10
- Mar 2023 16:46:29 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:d18a:b0:234:c035:7749 with SMTP id
+ fu10-20020a17090ad18a00b00234c0357749mr9644225pjb.0.1678495591577; Fri, 10
+ Mar 2023 16:46:31 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 10 Mar 2023 16:46:01 -0800
+Date:   Fri, 10 Mar 2023 16:46:02 -0800
 In-Reply-To: <20230311004618.920745-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230311004618.920745-1-seanjc@google.com>
 X-Mailer: git-send-email 2.40.0.rc1.284.g88254d51c5-goog
-Message-ID: <20230311004618.920745-5-seanjc@google.com>
-Subject: [PATCH v3 04/21] KVM: x86: Generate set of VMX feature MSRs using
- first/last definitions
+Message-ID: <20230311004618.920745-6-seanjc@google.com>
+Subject: [PATCH v3 05/21] KVM: selftests: Split PMU caps sub-tests to avoid
+ writing MSR after KVM_RUN
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -73,109 +73,105 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add VMX MSRs to the runtime list of feature MSRs by iterating over the
-range of emulated MSRs instead of manually defining each MSR in the "all"
-list.  Using the range definition reduces the cost of emulating a new VMX
-MSR, e.g. prevents forgetting to add an MSR to the list.
+Split the PERF_CAPABILITIES subtests into two parts so that the LBR format
+testcases don't execute after KVM_RUN.  Similar to the guest CPUID model,
+KVM will soon disallow changing PERF_CAPABILITIES after KVM_RUN, at which
+point attempting to set the MSR after KVM_RUN will yield false positives
+and/or false negatives depending on what the test is trying to do.
 
-Extracting the VMX MSRs from the "all" list, which is a compile-time
-constant, also shrinks the list to the point where the compiler can
-heavily optimize code that iterates over the list.
+Land the LBR format test in a more generic "immutable features" test in
+anticipation of expanding its scope to other immutable features.
 
-No functional change intended.
-
-Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/x86.c | 53 +++++++++++++++++++---------------------------
- 1 file changed, 22 insertions(+), 31 deletions(-)
+ .../selftests/kvm/x86_64/vmx_pmu_caps_test.c  | 51 +++++++++++--------
+ 1 file changed, 31 insertions(+), 20 deletions(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 7b91f73a837d..7b73a0b45041 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1539,36 +1539,19 @@ static u32 emulated_msrs[ARRAY_SIZE(emulated_msrs_all)];
- static unsigned num_emulated_msrs;
- 
- /*
-- * List of msr numbers which are used to expose MSR-based features that
-- * can be used by a hypervisor to validate requested CPU features.
-+ * List of MSRs that control the existence of MSR-based features, i.e. MSRs
-+ * that are effectively CPUID leafs.  VMX MSRs are also included in the set of
-+ * feature MSRs, but are handled separately to allow expedited lookups.
-  */
--static const u32 msr_based_features_all[] = {
--	MSR_IA32_VMX_BASIC,
--	MSR_IA32_VMX_TRUE_PINBASED_CTLS,
--	MSR_IA32_VMX_PINBASED_CTLS,
--	MSR_IA32_VMX_TRUE_PROCBASED_CTLS,
--	MSR_IA32_VMX_PROCBASED_CTLS,
--	MSR_IA32_VMX_TRUE_EXIT_CTLS,
--	MSR_IA32_VMX_EXIT_CTLS,
--	MSR_IA32_VMX_TRUE_ENTRY_CTLS,
--	MSR_IA32_VMX_ENTRY_CTLS,
--	MSR_IA32_VMX_MISC,
--	MSR_IA32_VMX_CR0_FIXED0,
--	MSR_IA32_VMX_CR0_FIXED1,
--	MSR_IA32_VMX_CR4_FIXED0,
--	MSR_IA32_VMX_CR4_FIXED1,
--	MSR_IA32_VMX_VMCS_ENUM,
--	MSR_IA32_VMX_PROCBASED_CTLS2,
--	MSR_IA32_VMX_EPT_VPID_CAP,
--	MSR_IA32_VMX_VMFUNC,
--
-+static const u32 msr_based_features_all_except_vmx[] = {
- 	MSR_AMD64_DE_CFG,
- 	MSR_IA32_UCODE_REV,
- 	MSR_IA32_ARCH_CAPABILITIES,
- 	MSR_IA32_PERF_CAPABILITIES,
- };
- 
--static u32 msr_based_features[ARRAY_SIZE(msr_based_features_all)];
-+static u32 msr_based_features[ARRAY_SIZE(msr_based_features_all_except_vmx) +
-+			      (KVM_LAST_EMULATED_VMX_MSR - KVM_FIRST_EMULATED_VMX_MSR + 1)];
- static unsigned int num_msr_based_features;
- 
- /*
-@@ -6996,6 +6979,18 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 	return r;
+diff --git a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
+index c280ba1e6572..ac08c0fdd84d 100644
+--- a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
++++ b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
+@@ -41,24 +41,10 @@ static void guest_code(void)
+ 	wrmsr(MSR_IA32_PERF_CAPABILITIES, PMU_CAP_LBR_FMT);
  }
  
-+static void kvm_probe_feature_msr(u32 msr_index)
-+{
-+	struct kvm_msr_entry msr = {
-+		.index = msr_index,
-+	};
-+
-+	if (kvm_get_msr_feature(&msr))
-+		return;
-+
-+	msr_based_features[num_msr_based_features++] = msr_index;
+-int main(int argc, char *argv[])
++static void test_fungible_perf_capabilities(union perf_capabilities host_cap)
+ {
+-	struct kvm_vm *vm;
+ 	struct kvm_vcpu *vcpu;
+-	int ret;
+-	union perf_capabilities host_cap;
+-	uint64_t val;
+-
+-	host_cap.capabilities = kvm_get_feature_msr(MSR_IA32_PERF_CAPABILITIES);
+-	host_cap.capabilities &= (PMU_CAP_FW_WRITES | PMU_CAP_LBR_FMT);
+-
+-	/* Create VM */
+-	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+-
+-	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_PDCM));
+-
+-	TEST_REQUIRE(kvm_cpu_has_p(X86_PROPERTY_PMU_VERSION));
+-	TEST_REQUIRE(kvm_cpu_property(X86_PROPERTY_PMU_VERSION) > 0);
++	struct kvm_vm *vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+ 
+ 	/* testcase 1, set capabilities when we have PDCM bit */
+ 	vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, PMU_CAP_FW_WRITES);
+@@ -70,7 +56,16 @@ int main(int argc, char *argv[])
+ 	vcpu_run(vcpu);
+ 	ASSERT_EQ(vcpu_get_msr(vcpu, MSR_IA32_PERF_CAPABILITIES), PMU_CAP_FW_WRITES);
+ 
+-	/* testcase 2, check valid LBR formats are accepted */
++	kvm_vm_free(vm);
 +}
 +
- static void kvm_probe_msr_to_save(u32 msr_index)
- {
- 	u32 dummy[2];
-@@ -7097,15 +7092,11 @@ static void kvm_init_msr_lists(void)
- 		emulated_msrs[num_emulated_msrs++] = emulated_msrs_all[i];
++static void test_immutable_perf_capabilities(union perf_capabilities host_cap)
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm = vm_create_with_one_vcpu(&vcpu, NULL);
++	uint64_t val;
++	int ret;
++
+ 	vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, 0);
+ 	ASSERT_EQ(vcpu_get_msr(vcpu, MSR_IA32_PERF_CAPABILITIES), 0);
+ 
+@@ -78,8 +73,8 @@ int main(int argc, char *argv[])
+ 	ASSERT_EQ(vcpu_get_msr(vcpu, MSR_IA32_PERF_CAPABILITIES), (u64)host_cap.lbr_format);
+ 
+ 	/*
+-	 * Testcase 3, check that an "invalid" LBR format is rejected.  Only an
+-	 * exact match of the host's format (and 0/disabled) is allowed.
++	 * KVM only supports the host's native LBR format, as well as '0' (to
++	 * disable LBR support).  Verify KVM rejects all other LBR formats.
+ 	 */
+ 	for (val = 1; val <= PMU_CAP_LBR_FMT; val++) {
+ 		if (val == (host_cap.capabilities & PMU_CAP_LBR_FMT))
+@@ -88,7 +83,23 @@ int main(int argc, char *argv[])
+ 		ret = _vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, val);
+ 		TEST_ASSERT(!ret, "Bad LBR FMT = 0x%lx didn't fail", val);
  	}
++	kvm_vm_free(vm);
++}
++
++int main(int argc, char *argv[])
++{
++	union perf_capabilities host_cap;
++
++	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_PDCM));
++
++	TEST_REQUIRE(kvm_cpu_has_p(X86_PROPERTY_PMU_VERSION));
++	TEST_REQUIRE(kvm_cpu_property(X86_PROPERTY_PMU_VERSION) > 0);
++
++	host_cap.capabilities = kvm_get_feature_msr(MSR_IA32_PERF_CAPABILITIES);
++	host_cap.capabilities &= (PMU_CAP_FW_WRITES | PMU_CAP_LBR_FMT);
++
++	test_fungible_perf_capabilities(host_cap);
++	test_immutable_perf_capabilities(host_cap);
  
--	for (i = 0; i < ARRAY_SIZE(msr_based_features_all); i++) {
--		struct kvm_msr_entry msr;
-+	for (i = KVM_FIRST_EMULATED_VMX_MSR; i <= KVM_LAST_EMULATED_VMX_MSR; i++)
-+		kvm_probe_feature_msr(i);
- 
--		msr.index = msr_based_features_all[i];
--		if (kvm_get_msr_feature(&msr))
--			continue;
--
--		msr_based_features[num_msr_based_features++] = msr_based_features_all[i];
--	}
-+	for (i = 0; i < ARRAY_SIZE(msr_based_features_all_except_vmx); i++)
-+		kvm_probe_feature_msr(msr_based_features_all_except_vmx[i]);
+ 	printf("Completed perf capability tests.\n");
+-	kvm_vm_free(vm);
  }
- 
- static int vcpu_mmio_write(struct kvm_vcpu *vcpu, gpa_t addr, int len,
 -- 
 2.40.0.rc1.284.g88254d51c5-goog
 
