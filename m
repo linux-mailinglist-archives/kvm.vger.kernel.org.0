@@ -2,58 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F249A6B5711
-	for <lists+kvm@lfdr.de>; Sat, 11 Mar 2023 01:51:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 228336B5705
+	for <lists+kvm@lfdr.de>; Sat, 11 Mar 2023 01:50:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231218AbjCKArw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 19:47:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37864 "EHLO
+        id S231259AbjCKAsI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 19:48:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230096AbjCKArK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Mar 2023 19:47:10 -0500
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDD4913F183
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:46:43 -0800 (PST)
-Received: by mail-pl1-x649.google.com with SMTP id p10-20020a170902e74a00b0019ec1acba17so3633335plf.0
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:46:43 -0800 (PST)
+        with ESMTP id S231138AbjCKArV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Mar 2023 19:47:21 -0500
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78512141606
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:46:50 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id fb7-20020a056a002d8700b0061c7b700c6dso3658492pfb.13
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:46:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678495602;
+        d=google.com; s=20210112; t=1678495604;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=UlahK4EgI3F4LmN6mIFBVS1s8jM35sN7dKW8KqGf28I=;
-        b=XYfJ0XzSMcF3E1kvv8pyJPBUY1oOTCxtwnj2AeqySuQR1ZfvAKc1SW9iPHhnHJe3Gi
-         XcutjwG0mgZaRNsN46psXVVdRMFDBq81EReYNPudybB7KQX35AkogMA4TCUr/VbuZvJx
-         /Hku8ULfZNkx8JFRFzRKqCm+FH1VdoYEXygr0lWSRV08+fWnuTiTlMkxKw1BJvqob1GB
-         3avYN4po4ipfmpO5vp3/rDjXCawszeDN6tP4Hn6j/nGQ5Mn2rLnkV2CSZ7GHd9sNhr7/
-         o+PPXOXQsCoX2fQ9HR12St5LPalBRdIIsvavz0RQtcWzQFysV3ImhfIBkvx24fD+16hu
-         zjWQ==
+        bh=k4NjhMvOz8i60KQi141LzevW2pwEgTqlrWyWCj3rgJ8=;
+        b=q5q2rp0XdgbYt+cOilERZrXszKOvS2r8jQDmCDCMfL70G4frpG5F55N+ggVBRg0IMz
+         g0bJG22iYxgecggNlGgCI+tsoYEdA+BBqB/koX3AsNH0e48OitM+Fm2RCOknRkMk0GhS
+         UTQ174IH0V+jzvsk+pkE0BW7461LDpIuzqzw5Ae6aJRzhabml5Xx60zne5mq089L6JRd
+         nhicKGGuOhPUODOCbYnLtWouPP6YpoPvr0gxC8BYM/YeLUjTf5gHkBcOD2NkFgBxI1ek
+         W7FGXfMTDas+NtLIjnN02R0mDqFC1C2TxasL/D8CHVcUvQnfRXBP/2rlN4ZHZXCP/BKp
+         ruQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678495602;
+        d=1e100.net; s=20210112; t=1678495604;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=UlahK4EgI3F4LmN6mIFBVS1s8jM35sN7dKW8KqGf28I=;
-        b=u2ki+ML/NB0UwiNIOiLcDGFua7Zp/Umu12UPqLRLdYPDxpwyh3g6DF+iu461B208ag
-         NeA4DSTgb3J2EZhkljItgOBPXT1uyoivTbeCjdDmTV8mPVDFoyklFgH1mWbNxtvRUnyW
-         k/Coxy1ql8iEpTVSr/3HBqD6mX09hpx2q78oUvKVUehQZH79/a5EUt/r2BjDPP4pLL13
-         LU8Z9YvgcIiH/1/excxj8JLxI6u47dXnK0AldGzUYiN2NCUgeuWXkKJHRGD4P2bTH7fi
-         jeHP3qtf/FZrV4eAo33WKnrfCk8rNZAeCCgEUWnXHumA3G81vwTq5lHitb22taHBAD+A
-         mwqA==
-X-Gm-Message-State: AO0yUKW55FvLX5Ei5ErdEBjGCJRbmSzvI1jx9+U0jQlLpwGCQnCPnJcx
-        OiaTkZX1gliZtR/ISGkXiPgQaL4Op+M=
-X-Google-Smtp-Source: AK7set8HwFPz9V2UekB+yM7oEJ6o6fajmdcDwtPEGxNDv9yOe0tK/NfCJPiB1RiF4p0C3VRjGYZd8q16rTg=
+        bh=k4NjhMvOz8i60KQi141LzevW2pwEgTqlrWyWCj3rgJ8=;
+        b=px70P2BK1S7CVf4INzKz77/Yg3rtVtmVniKehfQD4My5+Ut1Bfq1pjBIA0uT1vOyPT
+         sJCJSgS0BCzTFzCjENYLoTqxRCuGH5ilTX9gp9wqnCkTnFi/RkhBtzAZUENZz+Krn4k0
+         1Q6L8JwvkQS9zxWh1fhVSs/1U3EHzEq+hGcXTEVIVQtPMphE+ZQax4eo+R/vQiNdmDnH
+         v/VFIoWMM2OFVKlpH28ggnpuz5hSej9ufMKNSrhQey7feEgD/WYWuI1aPwMe9SNINYvO
+         l4txdk1FK2n4JZqjnUd/IyxXfraHCdLDkyu+GFX4XJNmOz5mPwjdj6SmJZjeC0ja6Y8k
+         kRJA==
+X-Gm-Message-State: AO0yUKUdggMAxnEJbeFYyaII2zXtuFXaGUL98s/H/Q0GSyeL00wwtXnP
+        hyijIyzNaSW14KPT0m6xrCW+7tsAawY=
+X-Google-Smtp-Source: AK7set/S9AhDw3GSh/Df5C1jvHWEN75uHrpzD2xoHdS6qef32PvUE3aUMhP9PUs2c56XZDxqYmPk/72jR3g=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a62:a512:0:b0:593:fcfb:208b with SMTP id
- v18-20020a62a512000000b00593fcfb208bmr11074429pfm.3.1678495602725; Fri, 10
- Mar 2023 16:46:42 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a63:744a:0:b0:4fc:27c2:840d with SMTP id
+ e10-20020a63744a000000b004fc27c2840dmr8922435pgn.12.1678495604462; Fri, 10
+ Mar 2023 16:46:44 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 10 Mar 2023 16:46:08 -0800
+Date:   Fri, 10 Mar 2023 16:46:09 -0800
 In-Reply-To: <20230311004618.920745-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230311004618.920745-1-seanjc@google.com>
 X-Mailer: git-send-email 2.40.0.rc1.284.g88254d51c5-goog
-Message-ID: <20230311004618.920745-12-seanjc@google.com>
-Subject: [PATCH v3 11/21] KVM: selftests: Print out failing MSR and value in vcpu_set_msr()
+Message-ID: <20230311004618.920745-13-seanjc@google.com>
+Subject: [PATCH v3 12/21] KVM: selftests: Verify KVM preserves userspace
+ writes to "durable" MSRs
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -72,64 +73,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Reimplement vcpu_set_msr() as a macro and pretty print the failing MSR
-(when possible) and the value if KVM_SET_MSRS fails instead of using the
-using the standard KVM_IOCTL_ERROR().  KVM_SET_MSRS is somewhat odd in
-that it returns the index of the last successful write, i.e. will be
-'0' on failure barring an entirely different KVM bug.  And for writing
-MSRs, the MSR being written and the value being written are almost always
-relevant to the failure, i.e. just saying "failed!" doesn't help debug.
+Assert that KVM provides "read what you wrote" semantics for all "durable"
+MSRs (for lack of a better name).  The extra coverage is cheap from a
+runtime performance perspective, and verifying the behavior in the common
+helper avoids gratuitous copy+paste in individual tests.
 
-Place the string goo in a separate macro in anticipation of using it to
-further expand MSR testing.
+Note, this affects all tests that set MSRs from userspace!
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../selftests/kvm/include/x86_64/processor.h  | 30 ++++++++++++++-----
- 1 file changed, 23 insertions(+), 7 deletions(-)
+ .../selftests/kvm/include/x86_64/processor.h    | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
 diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 53ffa43c90db..26c8e202a956 100644
+index 26c8e202a956..52260f6c2465 100644
 --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
 +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -928,14 +928,30 @@ static inline void vcpu_clear_cpuid_feature(struct kvm_vcpu *vcpu,
- uint64_t vcpu_get_msr(struct kvm_vcpu *vcpu, uint64_t msr_index);
- int _vcpu_set_msr(struct kvm_vcpu *vcpu, uint64_t msr_index, uint64_t msr_value);
+@@ -945,12 +945,27 @@ do {										\
+ 	}									\
+ } while (0)
  
--static inline void vcpu_set_msr(struct kvm_vcpu *vcpu, uint64_t msr_index,
--				uint64_t msr_value)
--{
--	int r = _vcpu_set_msr(vcpu, msr_index, msr_value);
--
--	TEST_ASSERT(r == 1, KVM_IOCTL_ERROR(KVM_SET_MSRS, r));
--}
 +/*
-+ * Assert on an MSR access(es) and pretty print the MSR name when possible.
-+ * Note, the caller provides the stringified name so that the name of macro is
-+ * printed, not the value the macro resolves to (due to macro expansion).
++ * Returns true if KVM should return the last written value when reading an MSR
++ * from userspace, e.g. the MSR isn't a command MSR, doesn't emulate state that
++ * is changing, etc.  This is NOT an exhaustive list!  The intent is to filter
++ * out MSRs that are not durable _and_ that a selftest wants to write.
 + */
-+#define TEST_ASSERT_MSR(cond, fmt, msr, str, args...)				\
-+do {										\
-+	if (__builtin_constant_p(msr)) {					\
-+		TEST_ASSERT(cond, fmt, str, args);				\
-+	} else if (!(cond)) {							\
-+		char buf[16];							\
-+										\
-+		snprintf(buf, sizeof(buf), "MSR 0x%x", msr);			\
-+		TEST_ASSERT(cond, fmt, buf, args);				\
-+	}									\
-+} while (0)
- 
-+#define vcpu_set_msr(vcpu, msr, val)							\
-+do {											\
-+	uint64_t v = val;								\
-+											\
-+	TEST_ASSERT_MSR(_vcpu_set_msr(vcpu, msr, v) == 1,				\
-+			"KVM_SET_MSRS failed on %s, value = 0x%lx", msr, #msr, v);	\
-+} while (0)
++static inline bool is_durable_msr(uint32_t msr)
++{
++	return msr != MSR_IA32_TSC;
++}
++
+ #define vcpu_set_msr(vcpu, msr, val)							\
+ do {											\
+-	uint64_t v = val;								\
++	uint64_t r, v = val;								\
+ 											\
+ 	TEST_ASSERT_MSR(_vcpu_set_msr(vcpu, msr, v) == 1,				\
+ 			"KVM_SET_MSRS failed on %s, value = 0x%lx", msr, #msr, v);	\
++	if (!is_durable_msr(msr))							\
++		break;									\
++	r = vcpu_get_msr(vcpu, msr);							\
++	TEST_ASSERT_MSR(r == v, "Set %s to '0x%lx', got back '0x%lx'", msr, #msr, v, r);\
+ } while (0)
  
  void kvm_get_cpu_address_width(unsigned int *pa_bits, unsigned int *va_bits);
- bool vm_is_unrestricted_guest(struct kvm_vm *vm);
 -- 
 2.40.0.rc1.284.g88254d51c5-goog
 
