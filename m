@@ -2,55 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AF6D86B56EE
-	for <lists+kvm@lfdr.de>; Sat, 11 Mar 2023 01:46:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A1BD06B56F1
+	for <lists+kvm@lfdr.de>; Sat, 11 Mar 2023 01:47:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229798AbjCKAqZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 19:46:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36490 "EHLO
+        id S229960AbjCKAq2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 19:46:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229697AbjCKAqX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Mar 2023 19:46:23 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 982DC134AE0
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:46:22 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id ip3-20020a17090b314300b00237c16adf30so5064365pjb.5
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:46:22 -0800 (PST)
+        with ESMTP id S229697AbjCKAq0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Mar 2023 19:46:26 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99868134AE0
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:46:24 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id v15-20020a17090a458f00b0023816b2f381so3369324pjg.2
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:46:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678495582;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=n6jB3AffI+mzIeDfH7lhfpRtRWP3b9HQWuNQ7/qAbfQ=;
-        b=PCgmNstkwCq+t9aNKV5H7SBwehSEZfL3UigzGdkYxjcn/GyFQzTrk1CFufFxdbBzNh
-         i/9gLASWq3yoqqRyGlIvmsN/IkOxukWHCTD0bL1z5sR5yZMZxCqSUMfEWJvKDtmLidEl
-         7+ft3ttv03XQlaNbqAW65LJX9HycjJ3vXOThrfLgdQTvLS0HbjzdvhCCuDOEfDfuobVd
-         yya3y4FPNyVCRUg9VXkwBBWrVnDVhyzR9x6dUp/GxF1eXl06TKnKHrBzaP9sOJYhqlRX
-         Iy1Um+3m635nQ/99QzaZNaDWosrLj4t6aQI/hDkit6g6wwv8USSgRcnKqooXCZZXi8PT
-         105Q==
+        d=google.com; s=20210112; t=1678495584;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=e9RojlZ2eL/0VXIqGaaoxFK7jlplkq7U0XdDBwSj9b0=;
+        b=JB4PASMRRmBkJfWFVik95c10a0nFWHxJMxeSDIyWskBg1vNNXKiJJcqABpo2y60OQ7
+         h5i/BrzTISduqrtNislgZQ7HQQSIR469ahJc6DGzNpo+0ZhXvhr45jUuM5LX8aKmUhAh
+         TZbZfNH5h3H4+9SQMivU5BwRnoAy9/6zmbeBSQe97fjqCa338jJwLiJ3Bsbi08QncREq
+         8/M0iDvvjtHsrEEL7no0qzAj+oJIUPnN+0G6zxtiY1UrejZd0uUcwwve63W+QXvcAvF4
+         PWbAqzv8LygI2Rh4p2ngvIM1UFJTAeQZXh5aILnCnAQdJwzPiqPET1zI5jaUZ3iMnHAJ
+         qIcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678495582;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=n6jB3AffI+mzIeDfH7lhfpRtRWP3b9HQWuNQ7/qAbfQ=;
-        b=PENh4UvIosH0uO9NU/1gVuvrK2i/jWfQv08Yx3iFeHg9P/w4f+9oQ00lZDTFoihPHs
-         vP8GAnDpb1XC4lXSPEwceWoC424u7iAzmVLWBB2WRs7zJidpMbEIvE5f2mPYeZso1qGt
-         jOMGApN3VIgaUgzGAHOW98bPmG5afujPxAkexx6ZJGG2g6gSv60xNc88Mq7yMV+t/OPg
-         tKCoszE3Wuc5LT4zjaBDnu0ogXcC4M1VpkD5wbU8ysu1XM23fCl5cZoX73VMkrejJYWm
-         low3mE9v2XZx9kpQP/6Z0tBaUBOtJiCYOxsFo9VIweIq4UJjKLeYp8rySlPYHbXf7Zow
-         hedg==
-X-Gm-Message-State: AO0yUKVOb6bXNOsMlnV3wG5+wah5iiDC7lhGn7Sl84azzDwfUhgichoT
-        1xq4aueVEjd+lQz5IDaUm3rhY/cinU4=
-X-Google-Smtp-Source: AK7set9HsgPKZIqPKHolTOcqUY5PlcbraVBRRAWBqbFVKD7SSeEuap9r42LOXrLMz5nDYOdc1zUKKG0G7pI=
+        d=1e100.net; s=20210112; t=1678495584;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=e9RojlZ2eL/0VXIqGaaoxFK7jlplkq7U0XdDBwSj9b0=;
+        b=Xi2qK6vxciDxqprqZNyaZtgntdVoGTbO7BioTwtqUfgLCKoiYsvpkfSKrggcpvlF5Z
+         PoB39kGMGSi+1kQIHANJCx8RQVePDysgusqxCGXNIKYIPDkQ4aSqLb4dry6A/QvajOXv
+         9Kn2CQijQVYUOdcI6tZPKpEadGxmu9BbdgKpyhMenYLi/VwdAQtKFP9GoltJZUw0sMY9
+         BfUD3aoyrFrwJl0/xZ0d1/jrDFyshg0JmxtiMm+IOFSVdCnuG0oISm0qQ2QrbuzlHXaY
+         3J0xyqPVv65CJh/j/ez1Jvc8RC4VUzqL+71MVQ8bi3OIfu1kiqtSq2UAwj6+hzyyul7A
+         SuhQ==
+X-Gm-Message-State: AO0yUKWia5GWM1vcrqjoD3FdwiWS5c2dO60h/ztytt9mP8uaBupm7VLk
+        QxwaCe8eU4OaVLgUeCnsrGm+bboIf88=
+X-Google-Smtp-Source: AK7set9k5FJ5x2cGUuCVUtFIe6AKIb2HNsSgwAS+Cp/2j2PpVT1yAsMCYwhOE5/lzwV4r1vmLT0pjSezYAw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:1a1f:0:b0:4f2:8281:8afb with SMTP id
- a31-20020a631a1f000000b004f282818afbmr9015323pga.4.1678495582183; Fri, 10 Mar
- 2023 16:46:22 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:902:9a45:b0:19a:b98f:46a0 with SMTP id
+ x5-20020a1709029a4500b0019ab98f46a0mr1605288plv.0.1678495584165; Fri, 10 Mar
+ 2023 16:46:24 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 10 Mar 2023 16:45:57 -0800
+Date:   Fri, 10 Mar 2023 16:45:58 -0800
+In-Reply-To: <20230311004618.920745-1-seanjc@google.com>
 Mime-Version: 1.0
+References: <20230311004618.920745-1-seanjc@google.com>
 X-Mailer: git-send-email 2.40.0.rc1.284.g88254d51c5-goog
-Message-ID: <20230311004618.920745-1-seanjc@google.com>
-Subject: [PATCH v3 00/21] KVM: x86: Disallow writes to feature MSRs post-KVM_RUN
+Message-ID: <20230311004618.920745-2-seanjc@google.com>
+Subject: [PATCH v3 01/21] KVM: x86: Rename kvm_init_msr_list() to clarify it
+ inits multiple lists
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -69,83 +73,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Give feature MSRs that same treatment as CPUID and disallow changing said
-MSRs after KVM_RUN.  Fix a tangentially related bug in the vPMU where KVM
-leaves the vLBRs enabled after userspace disables the guest's entire vPMU.
+Rename kvm_init_msr_list() to kvm_init_msr_lists() to clarify that it
+initializes multiple lists: MSRs to save, emulated MSRs, and feature MSRs.
 
-The bulk of this series is a rework of the vmx_pmu_caps_test, a.k.a.
-the PERF_CAPABILITIES selftests, to expand its coverage.  In addition to
-verifying that KVM rejects changes after KVM_RUN, verify other bits beyond
-full-width writes and the LBR format.
+No functional change intended.
 
-Note!  There is a sneaky, small, but massive change buried halfway through
-this series that will affect all x86 selftests.  Patch
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/x86.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-  Verify KVM preserves userspace writes to "durable" MSRs
-
-adds a KVM_GET_MSRS after every KVM_SET_MSRS that writes a single MSR and
-expects to succeeded.  The intent is to opportunistically verify that KVM
-provides "read what you wrote" for all "durable" MSRs.  The PERF_CAPS test
-was manually verifying this behavior, and while it seems kinda gratuitous,
-the coverage is quite cheap from both a performance and maintenance cost,
-i.e. I can't think of a reason _not_ to do it.
-
-v3:
- - Collect reviews. [Xiaoyao]
- - Fix the PMU selftests _before_ introducing the breaking KVM change. [Like]
- - Actually use kvm_vcpu_has_run()... [Yu]
-
-v2: https://lore.kernel.org/all/20230210003148.2646712-1-seanjc@google.com
-
-v1: https://lore.kernel.org/all/20220805172945.35412-1-seanjc@google.com
-
-Sean Christopherson (21):
-  KVM: x86: Rename kvm_init_msr_list() to clarify it inits multiple
-    lists
-  KVM: x86: Add a helper to query whether or not a vCPU has ever run
-  KVM: x86: Add macros to track first...last VMX feature MSRs
-  KVM: x86: Generate set of VMX feature MSRs using first/last
-    definitions
-  KVM: selftests: Split PMU caps sub-tests to avoid writing MSR after
-    KVM_RUN
-  KVM: x86: Disallow writes to immutable feature MSRs after KVM_RUN
-  KVM: x86/pmu: WARN and bug the VM if PMU is refreshed after vCPU has
-    run
-  KVM: x86/pmu: Zero out LBR capabilities during PMU refresh
-  KVM: selftests: Move 0/initial value PERF_CAPS checks to dedicated
-    sub-test
-  KVM: selftests: Assert that full-width PMC writes are supported if
-    PDCM=1
-  KVM: selftests: Print out failing MSR and value in vcpu_set_msr()
-  KVM: selftests: Verify KVM preserves userspace writes to "durable"
-    MSRs
-  KVM: selftests: Drop now-redundant checks on PERF_CAPABILITIES writes
-  KVM: selftests: Test all fungible features in PERF_CAPABILITIES
-  KVM: selftests: Test all immutable non-format bits in
-    PERF_CAPABILITIES
-  KVM: selftests: Expand negative testing of guest writes to
-    PERF_CAPABILITIES
-  KVM: selftests: Test post-KVM_RUN writes to PERF_CAPABILITIES
-  KVM: selftests: Drop "all done!" printf() from PERF_CAPABILITIES test
-  KVM: selftests: Refactor LBR_FMT test to avoid use of separate macro
-  KVM: selftests: Add negative testcase for PEBS format in
-    PERF_CAPABILITIES
-  KVM: selftests: Verify LBRs are disabled if vPMU is disabled
-
- arch/x86/kvm/cpuid.c                          |   2 +-
- arch/x86/kvm/mmu/mmu.c                        |   2 +-
- arch/x86/kvm/pmu.c                            |   3 +
- arch/x86/kvm/svm/svm.c                        |   2 +-
- arch/x86/kvm/vmx/pmu_intel.c                  |  10 +
- arch/x86/kvm/vmx/vmx.c                        |   8 +-
- arch/x86/kvm/x86.c                            | 102 ++++---
- arch/x86/kvm/x86.h                            |  13 +
- .../selftests/kvm/include/x86_64/processor.h  |  41 ++-
- .../selftests/kvm/x86_64/vmx_pmu_caps_test.c  | 248 ++++++++++++++----
- 10 files changed, 341 insertions(+), 90 deletions(-)
-
-
-base-commit: 45dd9bc75d9adc9483f0c7d662ba6e73ed698a0b
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index f706621c35b8..7b91f73a837d 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -7071,7 +7071,7 @@ static void kvm_probe_msr_to_save(u32 msr_index)
+ 	msrs_to_save[num_msrs_to_save++] = msr_index;
+ }
+ 
+-static void kvm_init_msr_list(void)
++static void kvm_init_msr_lists(void)
+ {
+ 	unsigned i;
+ 
+@@ -9450,7 +9450,7 @@ static int __kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
+ 		kvm_caps.max_guest_tsc_khz = max;
+ 	}
+ 	kvm_caps.default_tsc_scaling_ratio = 1ULL << kvm_caps.tsc_scaling_ratio_frac_bits;
+-	kvm_init_msr_list();
++	kvm_init_msr_lists();
+ 	return 0;
+ 
+ out_unwind_ops:
 -- 
 2.40.0.rc1.284.g88254d51c5-goog
 
