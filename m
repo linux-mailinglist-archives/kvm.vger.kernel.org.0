@@ -2,47 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D8C06B6109
-	for <lists+kvm@lfdr.de>; Sat, 11 Mar 2023 22:37:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FCCB6B610F
+	for <lists+kvm@lfdr.de>; Sat, 11 Mar 2023 22:41:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229827AbjCKVgi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 11 Mar 2023 16:36:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39632 "EHLO
+        id S229713AbjCKVlU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 11 Mar 2023 16:41:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229457AbjCKVgh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 11 Mar 2023 16:36:37 -0500
-Received: from out-43.mta0.migadu.com (out-43.mta0.migadu.com [IPv6:2001:41d0:1004:224b::2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC3F3474C7
-        for <kvm@vger.kernel.org>; Sat, 11 Mar 2023 13:36:35 -0800 (PST)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+        with ESMTP id S229437AbjCKVlS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 11 Mar 2023 16:41:18 -0500
+Received: from out-40.mta1.migadu.com (out-40.mta1.migadu.com [IPv6:2001:41d0:203:375::28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B19662D97
+        for <kvm@vger.kernel.org>; Sat, 11 Mar 2023 13:41:17 -0800 (PST)
+Date:   Sat, 11 Mar 2023 13:41:10 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1678570592;
+        t=1678570875;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=CDvJmKwcQ6mlkbKDImbYY9XC6Sv7fyBerr0ue+LLiOk=;
-        b=R8Bg2lPLvmq62VycO4YPWKiU/8+NozgJtqQPdRaRKapbpdc+OkYIa5ziQsd/+npNvaCypP
-        FKZNag1uHriCnYCbsoEyjsHU1T8WiJHNp/aZ7hzWRGUzlk/P1GpleGTJMhqfeoiDpYL6VL
-        v2Yfi5CwblF4zRltau1qmsL8iaQzkQs=
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=OIfr38RQbr2XXVcmEhQx3zmzDnnSyVR94dBmvVhONCc=;
+        b=IFX7soddA5zpXP8JmmrAoXVD3b+xKHeGFDkDD1KN32IDgVOF4LS54rCLqB9jFaVaTTgJ5K
+        MaAyiPc80JdWLup/UL3P70fZd94rAk2vTXLaZIoEu5MecqYooAO6lf9r7I81VYQBfVRZaY
+        xCSwv4P48PTogn9UHZVaqtHE1HLrrC0=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From:   Oliver Upton <oliver.upton@linux.dev>
-To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        Marc Zyngier <maz@kernel.org>,
-        linux-arm-kernel@lists.infradead.org
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        James Morse <james.morse@arm.com>,
-        Joey Gouly <joey.gouly@arm.com>,
-        Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH v2] KVM: arm64: timers: Convert per-vcpu virtual offset to a global value
-Date:   Sat, 11 Mar 2023 21:36:15 +0000
-Message-Id: <167857054887.1651970.3335887833625425284.b4-ty@linux.dev>
-In-Reply-To: <20230224191640.3396734-1-maz@kernel.org>
-References: <20230224191640.3396734-1-maz@kernel.org>
+To:     pbonzini@redhat.com
+Cc:     maz@kernel.org, reijiw@google.com, joey.gouly@arm.com,
+        james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org
+Subject: [GIT PULL] KVM/arm64 fixes for 6.3, part #1
+Message-ID: <ZAz1duOOOTu+5LW5@thinky-boi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
@@ -53,22 +44,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 24 Feb 2023 19:16:40 +0000, Marc Zyngier wrote:
-> Having a per-vcpu virtual offset is a pain. It needs to be synchronized
-> on each update, and expands badly to a setup where different timers can
-> have different offsets, or have composite offsets (as with NV).
-> 
-> So let's start by replacing the use of the CNTVOFF_EL2 shadow register
-> (which we want to reclaim for NV anyway), and make the virtual timer
-> carry a pointer to a VM-wide offset.
-> 
-> [...]
 
-Applied to kvmarm/fixes, thanks!
+Hi Paolo,
 
-[1/1] KVM: arm64: timers: Convert per-vcpu virtual offset to a global value
-      https://git.kernel.org/kvmarm/kvmarm/c/47053904e182
+First shot at sending a pull request to you, please let me know if anything
+is screwed up :)
+
+A single, important fix for guest timers addressing a bug from the nested
+virtualization prefix that went in 6.3. 
+
+Please pull,
 
 --
-Best,
 Oliver
+
+The following changes since commit fe15c26ee26efa11741a7b632e9f23b01aca4cc6:
+
+  Linux 6.3-rc1 (2023-03-05 14:52:03 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.3-1
+
+for you to fetch changes up to 47053904e18282af4525a02e3e0f519f014fc7f9:
+
+  KVM: arm64: timers: Convert per-vcpu virtual offset to a global value (2023-03-11 02:00:40 -0800)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 6.3, part #1
+
+A single patch to address a rather annoying bug w.r.t. guest timer
+offsetting. Effectively the synchronization of timer offsets between
+vCPUs was broken, leading to inconsistent timer reads within the VM.
+
+----------------------------------------------------------------
+Marc Zyngier (1):
+      KVM: arm64: timers: Convert per-vcpu virtual offset to a global value
+
+ arch/arm64/include/asm/kvm_host.h |  3 +++
+ arch/arm64/kvm/arch_timer.c       | 45 +++++++++------------------------------
+ arch/arm64/kvm/hypercalls.c       |  2 +-
+ include/kvm/arm_arch_timer.h      | 15 +++++++++++++
+ 4 files changed, 29 insertions(+), 36 deletions(-)
