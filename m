@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A16886B56A5
-	for <lists+kvm@lfdr.de>; Sat, 11 Mar 2023 01:25:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A94466B56A7
+	for <lists+kvm@lfdr.de>; Sat, 11 Mar 2023 01:25:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231268AbjCKAZG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Mar 2023 19:25:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43884 "EHLO
+        id S231377AbjCKAZQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Mar 2023 19:25:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230305AbjCKAYe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Mar 2023 19:24:34 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C9E713E53A
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:23:52 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id pl10-20020a17090b268a00b00239ed042afcso5048438pjb.4
-        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:23:51 -0800 (PST)
+        with ESMTP id S231150AbjCKAYf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Mar 2023 19:24:35 -0500
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78CD716300
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:23:54 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id x63-20020a17090a6c4500b00237731465feso3342302pjj.8
+        for <kvm@vger.kernel.org>; Fri, 10 Mar 2023 16:23:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678494218;
+        d=google.com; s=20210112; t=1678494220;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=OMGdyparKm8+Gefw73vC5jleoqDZScQomW9SzOoSMJg=;
-        b=ajb/7CAdzoT35PUWdYahi131IY8cxIXYUmWbU3wxwnKIBxxsHK89VejSvnX9gPFXKV
-         8T8M2MQ5qLFEJwFF7065/DtXjrWK5KDid68DBsbQqdbuHpDsBapRoTQnssTg9iU7v9aO
-         W3O661JIaer2LspHtmzrEw/PzdpLM0tWNomDVlVvK3UMOXkliymk4EGDN1m1+ZzJbIjo
-         z0JXfNMR+7wnIFuzi/4ZXa9UxnYm0l+lrGMAJWIXD0F1irQaKal08+zi3JQ1zRDeUz75
-         gC+HwThfWZZ7qParKjPirjREefLcpYQcsbDTVSHvU3UunCBdpe0aH1RzH5c9Fl9Suirg
-         0Tjw==
+        bh=UJLL0EPUo19me5J0i4EMPHQADwiwXxBwpAy+HnKKqJM=;
+        b=Ezz+fnDWWlBK70CA+7XZnivF8Z50Oo2xZVtUDsT+vPhVst1blCQstri3YU291MrGCd
+         /gIJe4EdZVS2uXwFfhgIdnLH81FvnSdDh9ZOO2wwTY94LJfODrVCfdn5tHlyoc3wozDg
+         DEMhqXCb5vWfrRk8d+aiFLTFqnF64CWPV/X9jcMymnFIgXu/w+WhD9iUivEV5M8xAwDJ
+         WB2G3R1UU7dqnh10DoPBAm5TruGVVgEhIWo5jhXguMT++g5lloBe+oip6RCzH6WDEEva
+         eaaN+vYVq0x2mhYositDUR3O8N2/sjmHQuoCbcFN6jMXtHvoYYojB7nK7rAoEpe7EL5C
+         8JMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678494218;
+        d=1e100.net; s=20210112; t=1678494220;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=OMGdyparKm8+Gefw73vC5jleoqDZScQomW9SzOoSMJg=;
-        b=gHaTeZKOafrlApPSGt4td93dzOZi4+ON86hewL2lkf6PdLikWboG1thibZWh2AzmJ5
-         iVE71eIqSmo0lpx7pBUij1AboeMqNldrbWt/aoz0F4gzsVhtHdH1ws7n5bnO4Y1G7rC1
-         bPTPqcOpTBHJTnktBIRoS1Ovtfc8APNeBV6Ww4UWPUSViDl2gVxvkXVzc0bmTjRazfUo
-         bKUm8WsXr3nIFX8z5SZVaQQJCV/A5USDaTLyRXvkrXET454vD5U2zNtlOHyZjw7BAlFt
-         mMhw5MV2/Oq7xpqRhwBQKbGzHviTPNzE5oS2dkdJJ2K+bNUZDPDtqB3AmdfPRIYY0Jgk
-         6uBQ==
-X-Gm-Message-State: AO0yUKXTlf5/KISnUz/sQfTCub5HFT5mlYuQqZnQHOSPJiI/oO23vue3
-        4c8IvhJQMJlzpMv2Ys/KchLrlm0eI4I=
-X-Google-Smtp-Source: AK7set88pl2QPb1K0bOmfg6auaZYvfaRkd4edAczPhcZ95QVckYZlY7Ht+z9TDRm6nMSKMQOyXp7Q1oMlgc=
+        bh=UJLL0EPUo19me5J0i4EMPHQADwiwXxBwpAy+HnKKqJM=;
+        b=X7fa9EQgHXvRtFUIikM1ciz2DefOxui+bSeNoMruSL6CSWGVqVORtj8m7CHx05hESp
+         Zu7hUp++i5wJaLxgM9vm4k1ZVWS+ha+/EIzWlw2qQI4IRxDlO4w9s35plrQXJ/Fwxxx2
+         iX/MY5xi3zedK5RcAruG12df/P0qvc1xOwTFE/fH2OJkdgm7YruIfoZnzwIPK8awF1g8
+         Zy2zEgm5+5wpCAAOSLC1fOLntsw+7sgEN9F7W561MHpD3FzJQsIroonlwovSrvPgsbKV
+         erRtAoueZOS11Fo7+SmC6ilDm8FjcrjLH+AGUeK5jVSJ8VUOylISq8yjsPnrzxHjCd/q
+         4OMQ==
+X-Gm-Message-State: AO0yUKVyQDRFJmAC9fBAUlU/zeP7YC3VxNMuE6OQRCYYc/ChZ1j7nhSi
+        3BobdSo0aGY55xZLjLFHmr/6nHN9OF4=
+X-Google-Smtp-Source: AK7set9xIsp/owUP+tx5zbIbI7LTvGVXs/oz607/58uRHJkalFPSILRGBF4otBdhDlNEtNvINP9Bd23i5ZM=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:f543:0:b0:4fb:9902:fc4a with SMTP id
- e3-20020a63f543000000b004fb9902fc4amr9411181pgk.10.1678494217911; Fri, 10 Mar
- 2023 16:23:37 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:90b:3889:b0:233:c921:ab7e with SMTP id
+ mu9-20020a17090b388900b00233c921ab7emr1601258pjb.4.1678494219865; Fri, 10 Mar
+ 2023 16:23:39 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 10 Mar 2023 16:22:48 -0800
+Date:   Fri, 10 Mar 2023 16:22:49 -0800
 In-Reply-To: <20230311002258.852397-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230311002258.852397-1-seanjc@google.com>
 X-Mailer: git-send-email 2.40.0.rc1.284.g88254d51c5-goog
-Message-ID: <20230311002258.852397-18-seanjc@google.com>
-Subject: [PATCH v2 17/27] drm/i915/gvt: switch from ->track_flush_slot() to ->track_remove_region()
+Message-ID: <20230311002258.852397-19-seanjc@google.com>
+Subject: [PATCH v2 18/27] KVM: x86: Remove the unused page-track hook track_flush_slot()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -66,7 +66,7 @@ Cc:     kvm@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,76 +76,99 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Yan Zhao <yan.y.zhao@intel.com>
 
-Switch from the poorly named and flawed ->track_flush_slot() to the newly
-introduced ->track_remove_region().  From KVMGT's perspective, the two
-hooks are functionally equivalent, the only difference being that
-->track_remove_region() is called only when KVM is 100% certain the
-memory region will be removed, i.e. is invoked slightly later in KVM's
-memslot modification flow.
+Remove ->track_remove_slot(), there are no longer any users and it's
+unlikely a "flush" hook will ever be the correct API to provide to an
+external page-track user.
 
 Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
 Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-[sean: handle name change, massage changelog, rebase]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- drivers/gpu/drm/i915/gvt/kvmgt.c | 21 +++++++++------------
- 1 file changed, 9 insertions(+), 12 deletions(-)
+ arch/x86/include/asm/kvm_page_track.h | 11 -----------
+ arch/x86/kvm/mmu/page_track.c         | 26 --------------------------
+ arch/x86/kvm/x86.c                    |  2 --
+ 3 files changed, 39 deletions(-)
 
-diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
-index 577712ea4893..9f188b6c3edf 100644
---- a/drivers/gpu/drm/i915/gvt/kvmgt.c
-+++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
-@@ -108,9 +108,8 @@ struct gvt_dma {
+diff --git a/arch/x86/include/asm/kvm_page_track.h b/arch/x86/include/asm/kvm_page_track.h
+index 152c5e7d7868..e5eb98ca4fce 100644
+--- a/arch/x86/include/asm/kvm_page_track.h
++++ b/arch/x86/include/asm/kvm_page_track.h
+@@ -33,16 +33,6 @@ struct kvm_page_track_notifier_node {
+ 	 */
+ 	void (*track_write)(gpa_t gpa, const u8 *new, int bytes,
+ 			    struct kvm_page_track_notifier_node *node);
+-	/*
+-	 * It is called when memory slot is being moved or removed
+-	 * users can drop write-protection for the pages in that memory slot
+-	 *
+-	 * @kvm: the kvm where memory slot being moved or removed
+-	 * @slot: the memory slot being moved or removed
+-	 * @node: this node
+-	 */
+-	void (*track_flush_slot)(struct kvm *kvm, struct kvm_memory_slot *slot,
+-			    struct kvm_page_track_notifier_node *node);
  
- static void kvmgt_page_track_write(gpa_t gpa, const u8 *val, int len,
- 				   struct kvm_page_track_notifier_node *node);
--static void kvmgt_page_track_flush_slot(struct kvm *kvm,
--		struct kvm_memory_slot *slot,
--		struct kvm_page_track_notifier_node *node);
-+static void kvmgt_page_track_remove_region(gfn_t gfn, unsigned long nr_pages,
-+					   struct kvm_page_track_notifier_node *node);
+ 	/*
+ 	 * Invoked when a memory region is removed from the guest.  Or in KVM
+@@ -87,7 +77,6 @@ kvm_page_track_unregister_notifier(struct kvm *kvm,
+ 				   struct kvm_page_track_notifier_node *n);
+ void kvm_page_track_write(struct kvm_vcpu *vcpu, gpa_t gpa, const u8 *new,
+ 			  int bytes);
+-void kvm_page_track_flush_slot(struct kvm *kvm, struct kvm_memory_slot *slot);
+ void kvm_page_track_delete_slot(struct kvm *kvm, struct kvm_memory_slot *slot);
  
- static ssize_t intel_vgpu_show_description(struct mdev_type *mtype, char *buf)
- {
-@@ -680,7 +679,7 @@ static int intel_vgpu_open_device(struct vfio_device *vfio_dev)
- 		return -EEXIST;
- 
- 	vgpu->track_node.track_write = kvmgt_page_track_write;
--	vgpu->track_node.track_flush_slot = kvmgt_page_track_flush_slot;
-+	vgpu->track_node.track_remove_region = kvmgt_page_track_remove_region;
- 	kvm_get_kvm(vgpu->vfio_device.kvm);
- 	kvm_page_track_register_notifier(vgpu->vfio_device.kvm,
- 					 &vgpu->track_node);
-@@ -1631,22 +1630,20 @@ static void kvmgt_page_track_write(gpa_t gpa, const u8 *val, int len,
- 	mutex_unlock(&info->vgpu_lock);
+ bool kvm_page_track_has_external_user(struct kvm *kvm);
+diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
+index d4a8a995276a..907ab8abb452 100644
+--- a/arch/x86/kvm/mmu/page_track.c
++++ b/arch/x86/kvm/mmu/page_track.c
+@@ -278,32 +278,6 @@ void kvm_page_track_write(struct kvm_vcpu *vcpu, gpa_t gpa, const u8 *new,
+ 	kvm_mmu_track_write(vcpu, gpa, new, bytes);
  }
  
--static void kvmgt_page_track_flush_slot(struct kvm *kvm,
--		struct kvm_memory_slot *slot,
--		struct kvm_page_track_notifier_node *node)
-+static void kvmgt_page_track_remove_region(gfn_t gfn, unsigned long nr_pages,
-+					   struct kvm_page_track_notifier_node *node)
+-/*
+- * Notify the node that memory slot is being removed or moved so that it can
+- * drop write-protection for the pages in the memory slot.
+- *
+- * The node should figure out it has any write-protected pages in this slot
+- * by itself.
+- */
+-void kvm_page_track_flush_slot(struct kvm *kvm, struct kvm_memory_slot *slot)
+-{
+-	struct kvm_page_track_notifier_head *head;
+-	struct kvm_page_track_notifier_node *n;
+-	int idx;
+-
+-	head = &kvm->arch.track_notifier_head;
+-
+-	if (hlist_empty(&head->track_notifier_list))
+-		return;
+-
+-	idx = srcu_read_lock(&head->track_srcu);
+-	hlist_for_each_entry_srcu(n, &head->track_notifier_list, node,
+-				srcu_read_lock_held(&head->track_srcu))
+-		if (n->track_flush_slot)
+-			n->track_flush_slot(kvm, slot, n);
+-	srcu_read_unlock(&head->track_srcu, idx);
+-}
+-
+ /*
+  * Notify external page track nodes that a memory region is being removed from
+  * the VM, e.g. so that users can free any associated metadata.
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 0da5ff007d20..59b02650cefc 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12673,8 +12673,6 @@ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+ 				   struct kvm_memory_slot *slot)
  {
- 	unsigned long i;
--	gfn_t gfn;
- 	struct intel_vgpu *info =
- 		container_of(node, struct intel_vgpu, track_node);
- 
- 	mutex_lock(&info->vgpu_lock);
- 
--	for (i = 0; i < slot->npages; i++) {
--		gfn = slot->base_gfn + i;
--		if (kvmgt_gfn_is_write_protected(info, gfn))
--			kvmgt_protect_table_del(info, gfn);
-+	for (i = 0; i < nr_pages; i++) {
-+		if (kvmgt_gfn_is_write_protected(info, gfn + i))
-+			kvmgt_protect_table_del(info, gfn + i);
- 	}
-+
- 	mutex_unlock(&info->vgpu_lock);
+ 	kvm_mmu_zap_all_fast(kvm);
+-
+-	kvm_page_track_flush_slot(kvm, slot);
  }
  
+ static inline bool kvm_guest_apic_has_interrupt(struct kvm_vcpu *vcpu)
 -- 
 2.40.0.rc1.284.g88254d51c5-goog
 
