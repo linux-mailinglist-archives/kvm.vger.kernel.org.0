@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C57E6B69B7
-	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 19:06:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2EAA46B69BF
+	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 19:06:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231905AbjCLSGo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Mar 2023 14:06:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51972 "EHLO
+        id S232084AbjCLSGt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Mar 2023 14:06:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232086AbjCLSFG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Mar 2023 14:05:06 -0400
+        with ESMTP id S232103AbjCLSFI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Mar 2023 14:05:08 -0400
 Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7AED2749E;
-        Sun, 12 Mar 2023 11:00:58 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA0FE3D937;
+        Sun, 12 Mar 2023 11:01:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678644058; x=1710180058;
+  t=1678644060; x=1710180060;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=lC9b+jCMN37urCD3ZweW5IngmqofJ7QkmkiunNN6XdE=;
-  b=Kd9Q/kMMosjTXXRRViAn842CCMJlz+y+PRNzgytPyKNTGIMZkSzXnSlH
-   MwDtOmrzF2/4YTkAKuodgEMKD2YJYB3pBwZ0a+blm6GLY2dvP70dh27Tj
-   XRW8WKjyNI5F1r/VHv0czGYzlJ2sPPy58/5+GC+ajFdul393d3OtDX3DH
-   fGFdMmXmbmJxMqDhB6pABffK5jpmjqMKXuI95v7YivpYNZk1CqsxZ8Q/m
-   RuNKqWddzhhOmhdJFalkGlQoMkjB4nBqH+W+mXbMNpwp9S+qKW0+JgUzu
-   qjEHWx7zKpKomtisCMQxswvvplfWoEnjVD5PqW2/R10I0HfKEe6IMqu7w
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="316660094"
+  bh=k0qDJKrmWE8WRF/8Dkfe7Efw9evpPdNSFlNfJIhNIPw=;
+  b=LatpYKwBmk7K3lPIJ/Lohr7ybqkEFBL8Ow7lGnKcCy+4ax99T2Mep58y
+   2147zGUYTnjt4TUASwO7oGdgBnNHOHpDo6xmRoPuGLYKVKoLcqc0amOZG
+   gZNuEiOA1fNSx1M2ikfd4BwnLiTiW/TnqSWQ6rpFt3l8RS92udYLfJ7BY
+   PIpsyQq61s2E1HIslS2sARj1mLUAyrGqaENrGWi1gQIQIP87pqk4Th/Ac
+   CWHzYgV5ElfM2DooxqeczXH1bRzFh8OKtxMwT/Xkv12C3borQSpH09uuU
+   R0rJhDmEV3laFDu4H78CY+lFy6yL97pmyCApfNILPHeJbwoEEV3bgyIZd
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="316660098"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="316660094"
+   d="scan'208";a="316660098"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 10:58:15 -0700
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 10:58:16 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="742596828"
+X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="742596831"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="742596828"
+   d="scan'208";a="742596831"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 10:58:15 -0700
 From:   isaku.yamahata@intel.com
@@ -47,9 +47,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         David Matlack <dmatlack@google.com>,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>
-Subject: [PATCH v13 098/113] KVM: TDX: Handle TDX PV map_gpa hypercall
-Date:   Sun, 12 Mar 2023 10:57:02 -0700
-Message-Id: <c49aa7b7bbc016b6c8b698ac2ce3b9d866b551f9.1678643052.git.isaku.yamahata@intel.com>
+Subject: [PATCH v13 099/113] KVM: TDX: Handle TDG.VP.VMCALL<GetTdVmCallInfo> hypercall
+Date:   Sun, 12 Mar 2023 10:57:03 -0700
+Message-Id: <8a8a6d4b367deb615f5368fe86085eb2e2f322c6.1678643052.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1678643051.git.isaku.yamahata@intel.com>
 References: <cover.1678643051.git.isaku.yamahata@intel.com>
@@ -66,51 +66,55 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Wire up TDX PV map_gpa hypercall to the kvm/mmu backend.
+Implement TDG.VP.VMCALL<GetTdVmCallInfo> hypercall.  If the input value is
+zero, return success code and zero in output registers.
+
+TDG.VP.VMCALL<GetTdVmCallInfo> hypercall is a subleaf of TDG.VP.VMCALL to
+enumerate which TDG.VP.VMCALL sub leaves are supported.  This hypercall is
+for future enhancement of the Guest-Host-Communication Interface (GHCI)
+specification.  The GHCI version of 344426-001US defines it to require
+input R12 to be zero and to return zero in output registers, R11, R12, R13,
+and R14 so that guest TD enumerates no enhancement.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/tdx.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ arch/x86/kvm/vmx/tdx.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 0c6386fe4684..853cfda99fed 100644
+index 853cfda99fed..10bbac208a9c 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1216,6 +1216,24 @@ static int tdx_emulate_wrmsr(struct kvm_vcpu *vcpu)
+@@ -1216,6 +1216,20 @@ static int tdx_emulate_wrmsr(struct kvm_vcpu *vcpu)
  	return 1;
  }
  
-+static int tdx_map_gpa(struct kvm_vcpu *vcpu)
++static int tdx_get_td_vm_call_info(struct kvm_vcpu *vcpu)
 +{
-+	struct kvm *kvm = vcpu->kvm;
-+	gpa_t gpa = tdvmcall_a0_read(vcpu);
-+	gpa_t size = tdvmcall_a1_read(vcpu);
-+	gpa_t end = gpa + size;
-+
-+	if (!IS_ALIGNED(gpa, PAGE_SIZE) || !IS_ALIGNED(size, PAGE_SIZE) ||
-+	    end < gpa ||
-+	    end > kvm_gfn_shared_mask(kvm) << (PAGE_SHIFT + 1) ||
-+	    kvm_is_private_gpa(kvm, gpa) != kvm_is_private_gpa(kvm, end)) {
++	if (tdvmcall_a0_read(vcpu))
 +		tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_INVALID_OPERAND);
-+		return 1;
++	else {
++		tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_SUCCESS);
++		kvm_r11_write(vcpu, 0);
++		tdvmcall_a0_write(vcpu, 0);
++		tdvmcall_a1_write(vcpu, 0);
++		tdvmcall_a2_write(vcpu, 0);
 +	}
-+
-+	return tdx_vp_vmcall_to_user(vcpu);
++	return 1;
 +}
 +
- static int handle_tdvmcall(struct kvm_vcpu *vcpu)
+ static int tdx_map_gpa(struct kvm_vcpu *vcpu)
  {
- 	if (tdvmcall_exit_type(vcpu))
-@@ -1241,6 +1259,8 @@ static int handle_tdvmcall(struct kvm_vcpu *vcpu)
- 		 * guest TD doesn't make sense.  No argument check is done.
- 		 */
- 		return tdx_vp_vmcall_to_user(vcpu);
-+	case TDG_VP_VMCALL_MAP_GPA:
-+		return tdx_map_gpa(vcpu);
- 	default:
- 		break;
- 	}
+ 	struct kvm *kvm = vcpu->kvm;
+@@ -1252,6 +1266,8 @@ static int handle_tdvmcall(struct kvm_vcpu *vcpu)
+ 		return tdx_emulate_rdmsr(vcpu);
+ 	case EXIT_REASON_MSR_WRITE:
+ 		return tdx_emulate_wrmsr(vcpu);
++	case TDG_VP_VMCALL_GET_TD_VM_CALL_INFO:
++		return tdx_get_td_vm_call_info(vcpu);
+ 	case TDG_VP_VMCALL_REPORT_FATAL_ERROR:
+ 		/*
+ 		 * Exit to userspace device model for tear down.
 -- 
 2.25.1
 
