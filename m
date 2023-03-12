@@ -2,48 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8EE946B649D
+	by mail.lfdr.de (Postfix) with ESMTP id 4249D6B649C
 	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 11:00:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230104AbjCLKAf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Mar 2023 06:00:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37608 "EHLO
+        id S230130AbjCLKAg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Mar 2023 06:00:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229568AbjCLJ7g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Mar 2023 05:59:36 -0400
+        with ESMTP id S230347AbjCLJ7v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Mar 2023 05:59:51 -0400
 Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FDEE515D2
-        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 01:58:41 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACFC955079
+        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 01:58:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678615121; x=1710151121;
+  t=1678615129; x=1710151129;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=gWKOkuF1Ys+mwVmwCpzUR9yutYKFoym7a4BDrlhOb90=;
-  b=CD+kohz7X5imAqKbFGdhvzGzaxhM2rb5faxUpPiKdb7a7zuF2kU87cBO
-   wGadDAl2nC3czvUlKandBr+YKuh4mqqoXkKhBxa6nQ8arClizXml67MXB
-   2PebFkM7Bfq3rZ8NjpzoEQEcc1g/FYfJbU/tI1FovNB7vHz25qNrLtYvX
-   rbWLwW6yc9AJ2E936BeVeskoyP3OYq1/SetevdDIbl/Hx4/JOpbu2Y9KL
-   yb7Hlp/U/+3ZLoh4TS4yrQaXEDYVscjgnRkKfCZLAMlYFvwPClkL91AfX
-   EExzbgfNq3q6KAsEtGeaEgNvwWqaNUh3VX1Llupq5eBMShVQA/i7nnMYU
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="339344700"
+  bh=QcCzJPiJB6CH3hvKLxjC1mAnUN4IHqeWdqOvVb/xrjI=;
+  b=XlmQkwZoNsvRIaLXSOTQw01aw1183neHxXrsg1UAonIB0azpHofr2Ht4
+   IFI4RWRugNP7+m0e+IcxFxCfcz2knb6paODUe8wzYVTcN3J1F2BIxFUtY
+   gd4t4QcGDl6IpsY9fM2MHMgSQR24LzAmGbTdtlU+QTe+Feb9TLj9Wab9A
+   VwwvaNe0SdE6d9Tb/4TtVEPx8LivKZEkwwAu9e9C5TmrqUO5qsFMQzFEs
+   WBpXRbsFlv4Tz8xS8NuV0zCRIvaAwZOt8PxY1FjDBpryTfDBhsLQnAA5z
+   oVl6eBhLm1LKTZzJoTezTuzsTTSnzxeGbvrlccv6XymPvOKGuTywXGWIS
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="339344705"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="339344700"
+   d="scan'208";a="339344705"
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:56:58 -0800
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:56:59 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="1007627334"
+X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="1007627342"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="1007627334"
+   d="scan'208";a="1007627342"
 Received: from jiechen-ubuntu-dev.sh.intel.com ([10.239.154.150])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:56:57 -0800
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:56:58 -0800
 From:   Jason Chen CJ <jason.cj.chen@intel.com>
 To:     kvm@vger.kernel.org
 Cc:     Chuanxiao Dong <chuanxiao.dong@intel.com>
-Subject: [RFC PATCH part-6 06/13] pkvm: x86: Add API to get the max phys address bits
-Date:   Mon, 13 Mar 2023 02:03:38 +0800
-Message-Id: <20230312180345.1778588-7-jason.cj.chen@intel.com>
+Subject: [RFC PATCH part-6 07/13] pkvm: x86: Initialize ept_zero_check
+Date:   Mon, 13 Mar 2023 02:03:39 +0800
+Message-Id: <20230312180345.1778588-8-jason.cj.chen@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230312180345.1778588-1-jason.cj.chen@intel.com>
 References: <20230312180345.1778588-1-jason.cj.chen@intel.com>
@@ -61,65 +61,117 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Chuanxiao Dong <chuanxiao.dong@intel.com>
 
-Add API get_max_physaddr_bits(), this is necessary used to calculate
-the reserved bits for EPT entry.
+ept_zero_check is used to check if a pte entry has any reserved
+bits set, or has any unsupported bit combinations. This is helpful to
+check if this entry can cause EPT misconfig or not during shadowing in
+the later patch.
 
 Signed-off-by: Chuanxiao Dong <chuanxiao.dong@intel.com>
 ---
- arch/x86/kvm/vmx/pkvm/hyp/memory.c | 21 +++++++++++++++++++++
- arch/x86/kvm/vmx/pkvm/hyp/memory.h |  2 ++
- 2 files changed, 23 insertions(+)
+ arch/x86/kvm/vmx/pkvm/hyp/ept.c | 47 +++++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/pkvm/hyp/vmx.h |  7 +++++
+ 2 files changed, 54 insertions(+)
 
-diff --git a/arch/x86/kvm/vmx/pkvm/hyp/memory.c b/arch/x86/kvm/vmx/pkvm/hyp/memory.c
-index 43fc39d44c3d..9a9616ac4cc3 100644
---- a/arch/x86/kvm/vmx/pkvm/hyp/memory.c
-+++ b/arch/x86/kvm/vmx/pkvm/hyp/memory.c
-@@ -10,9 +10,11 @@
- #include "memory.h"
- #include "pgtable.h"
- #include "pkvm_hyp.h"
-+#include "cpu.h"
+diff --git a/arch/x86/kvm/vmx/pkvm/hyp/ept.c b/arch/x86/kvm/vmx/pkvm/hyp/ept.c
+index 641b8252071e..823e255de155 100644
+--- a/arch/x86/kvm/vmx/pkvm/hyp/ept.c
++++ b/arch/x86/kvm/vmx/pkvm/hyp/ept.c
+@@ -26,6 +26,7 @@ static struct pkvm_pgtable host_ept;
+ static pkvm_spinlock_t host_ept_lock = __PKVM_SPINLOCK_UNLOCKED;
  
- unsigned long __page_base_offset;
- unsigned long __symbol_base_offset;
-+static u8 max_physaddr_bits;
+ static struct hyp_pool shadow_ept_pool;
++static struct rsvd_bits_validate ept_zero_check;
  
- unsigned int hyp_memblock_nr;
- struct memblock_region hyp_memory[HYP_MEMBLOCK_REGIONS];
-@@ -285,3 +287,22 @@ int write_gpa(struct kvm_vcpu *vcpu, gpa_t gpa, void *addr, unsigned int bytes)
- {
- 	return copy_gpa(vcpu, gpa, addr, bytes, false);
+ static void flush_tlb_noop(void) { };
+ static void *host_ept_zalloc_page(void)
+@@ -151,16 +152,62 @@ int pkvm_host_ept_unmap(unsigned long vaddr_start, unsigned long phys_start,
+ 	return pkvm_pgtable_unmap(&host_ept, vaddr_start, phys_start, size);
  }
-+
-+u64 get_max_physaddr_bits(void)
-+{
-+	u32 eax, ebx, ecx, edx;
-+
-+	if (max_physaddr_bits)
-+		return max_physaddr_bits;
-+
-+	eax = 0x80000000;
-+	ecx = 0;
-+	native_cpuid(&eax, &ebx, &ecx, &edx);
-+	if (eax >= 0x80000008) {
-+		eax = 0x80000008;
-+		native_cpuid(&eax, &ebx, &ecx, &edx);
-+		max_physaddr_bits = (u8)eax & 0xff;
-+	}
-+
-+	return max_physaddr_bits;
-+}
-diff --git a/arch/x86/kvm/vmx/pkvm/hyp/memory.h b/arch/x86/kvm/vmx/pkvm/hyp/memory.h
-index a95ae5f71841..b1062f3703e3 100644
---- a/arch/x86/kvm/vmx/pkvm/hyp/memory.h
-+++ b/arch/x86/kvm/vmx/pkvm/hyp/memory.h
-@@ -32,4 +32,6 @@ int write_gva(struct kvm_vcpu *vcpu, gva_t gva, void *addr,
- int read_gpa(struct kvm_vcpu *vcpu, gpa_t gpa, void *addr, unsigned int bytes);
- int write_gpa(struct kvm_vcpu *vcpu, gpa_t gpa, void *addr, unsigned int bytes);
  
-+u64 get_max_physaddr_bits(void);
++static void reset_rsvds_bits_mask_ept(struct rsvd_bits_validate *rsvd_check,
++				      u64 pa_bits_rsvd, bool execonly,
++				      int huge_page_level)
++{
++	u64 high_bits_rsvd = pa_bits_rsvd & rsvd_bits(0, 51);
++	u64 large_1g_rsvd = 0, large_2m_rsvd = 0;
++	u64 bad_mt_xwr;
 +
- #endif
++	if (huge_page_level < PG_LEVEL_1G)
++		large_1g_rsvd = rsvd_bits(7, 7);
++	if (huge_page_level < PG_LEVEL_2M)
++		large_2m_rsvd = rsvd_bits(7, 7);
++
++	rsvd_check->rsvd_bits_mask[0][4] = high_bits_rsvd | rsvd_bits(3, 7);
++	rsvd_check->rsvd_bits_mask[0][3] = high_bits_rsvd | rsvd_bits(3, 7);
++	rsvd_check->rsvd_bits_mask[0][2] = high_bits_rsvd | rsvd_bits(3, 6) | large_1g_rsvd;
++	rsvd_check->rsvd_bits_mask[0][1] = high_bits_rsvd | rsvd_bits(3, 6) | large_2m_rsvd;
++	rsvd_check->rsvd_bits_mask[0][0] = high_bits_rsvd;
++
++	/* large page */
++	rsvd_check->rsvd_bits_mask[1][4] = rsvd_check->rsvd_bits_mask[0][4];
++	rsvd_check->rsvd_bits_mask[1][3] = rsvd_check->rsvd_bits_mask[0][3];
++	rsvd_check->rsvd_bits_mask[1][2] = high_bits_rsvd | rsvd_bits(12, 29) | large_1g_rsvd;
++	rsvd_check->rsvd_bits_mask[1][1] = high_bits_rsvd | rsvd_bits(12, 20) | large_2m_rsvd;
++	rsvd_check->rsvd_bits_mask[1][0] = rsvd_check->rsvd_bits_mask[0][0];
++
++	bad_mt_xwr = 0xFFull << (2 * 8);	/* bits 3..5 must not be 2 */
++	bad_mt_xwr |= 0xFFull << (3 * 8);	/* bits 3..5 must not be 3 */
++	bad_mt_xwr |= 0xFFull << (7 * 8);	/* bits 3..5 must not be 7 */
++	bad_mt_xwr |= REPEAT_BYTE(1ull << 2);	/* bits 0..2 must not be 010 */
++	bad_mt_xwr |= REPEAT_BYTE(1ull << 6);	/* bits 0..2 must not be 110 */
++	if (!execonly) {
++		/* bits 0..2 must not be 100 unless VMX capabilities allow it */
++		bad_mt_xwr |= REPEAT_BYTE(1ull << 4);
++	}
++	rsvd_check->bad_mt_xwr = bad_mt_xwr;
++}
++
+ int pkvm_host_ept_init(struct pkvm_pgtable_cap *cap,
+ 		void *ept_pool_base, unsigned long ept_pool_pages)
+ {
+ 	unsigned long pfn = __pkvm_pa(ept_pool_base) >> PAGE_SHIFT;
+ 	int ret;
++	u8 pa_bits;
+ 
+ 	ret = hyp_pool_init(&host_ept_pool, pfn, ept_pool_pages, 0);
+ 	if (ret)
+ 		return ret;
+ 
++	pa_bits = get_max_physaddr_bits();
++	if (!pa_bits)
++		return -EINVAL;
++	reset_rsvds_bits_mask_ept(&ept_zero_check, rsvd_bits(pa_bits, 63),
++				  vmx_has_ept_execute_only(),
++				  fls(cap->allowed_pgsz) - 1);
++
+ 	pkvm_hyp->host_vm.ept = &host_ept;
+ 	return pkvm_pgtable_init(&host_ept, &host_ept_mm_ops, &ept_ops, cap, true);
+ }
+diff --git a/arch/x86/kvm/vmx/pkvm/hyp/vmx.h b/arch/x86/kvm/vmx/pkvm/hyp/vmx.h
+index 13405166bccf..3282f228964d 100644
+--- a/arch/x86/kvm/vmx/pkvm/hyp/vmx.h
++++ b/arch/x86/kvm/vmx/pkvm/hyp/vmx.h
+@@ -6,6 +6,8 @@
+ #ifndef __PKVM_VMX_H
+ #define __PKVM_VMX_H
+ 
++#include "pkvm_hyp.h"
++
+ static inline bool vmx_ept_capability_check(u32 bit)
+ {
+ 	struct vmx_capability *vmx_cap = &pkvm_hyp->vmx_cap;
+@@ -33,6 +35,11 @@ static inline bool vmx_has_invept_context(void)
+ 	return vmx_ept_capability_check(VMX_EPT_EXTENT_CONTEXT_BIT);
+ }
+ 
++static inline bool vmx_has_ept_execute_only(void)
++{
++	return vmx_ept_capability_check(VMX_EPT_EXECUTE_ONLY_BIT);
++}
++
+ static inline u64 pkvm_construct_eptp(unsigned long root_hpa, int level)
+ {
+ 	u64 eptp = 0;
 -- 
 2.25.1
 
