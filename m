@@ -2,68 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CBBA16B64EA
-	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 11:29:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C00C6B6514
+	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 11:49:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229906AbjCLK3X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Mar 2023 06:29:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40876 "EHLO
+        id S229756AbjCLKtw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Mar 2023 06:49:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229614AbjCLK3U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Mar 2023 06:29:20 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97FA837577;
-        Sun, 12 Mar 2023 03:29:19 -0700 (PDT)
+        with ESMTP id S230095AbjCLKtj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Mar 2023 06:49:39 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B44B4A1C4
+        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 03:49:34 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 49D13B8074D;
-        Sun, 12 Mar 2023 10:29:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D83A3C433D2;
-        Sun, 12 Mar 2023 10:29:16 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id BF4CFB80189
+        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 10:49:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83DE4C433D2;
+        Sun, 12 Mar 2023 10:49:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678616956;
-        bh=aSQAHnGftmgjvVgaTHrVDh6VUtyePFdAf7NI0ZkUpFE=;
+        s=k20201202; t=1678618171;
+        bh=B3urysGaJdXsGL+TyngVKPW62/euDarj+hSfjXZ6EuU=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=A1hM2L72FEiLsJdNdKRTCnVOURRRH/9zZF9irtqvQpEkX01wEH+6If3trtpJu7+Hl
-         Pe4gW2xNJk2bLCWr05319WycfTg5fY7SphFt3vgqXsFm+ozWSipiw46UBxfix4JAev
-         YVMkryuxVlI2A3K+g8L8wqzEQMVYiBIEPRw+jVJctfQc/4Ek5kslu/o3A4M0o7pqR0
-         pGcq2Kg3VqE2GYAcZswKhXP/NTX3wv/A787HUJ9VMR126zJRAkX4VOiptOV3odEhO5
-         VeY2ANQesQ8N7ZQYdp0t+uBg3A2hDeFEk/13/NkFd/HqoIf07IVXWhc6jpNDCr1o15
-         NUjUpolPf4FrA==
+        b=oJTtiEk2XUqPC2IcXstrn6D10XhXJepYTsiAVwpmuAm7Vfj90YxsCo8YjEO7Fqo/W
+         qpJ2k1SSDdtUf/iqbkq9JntdvWQKgNl8I18/AqQyB0ZXnPm6nfLd5QxLeXEbNYccVt
+         wBHEk6fMFGnTskIq4O5MyZSBB3iGaeYuwdubITlTp8lZz1pnrovlxdLu24qgwXqQ0/
+         elt2q75bjcFAldIXw0g5ww4Crs+5xhC8BzdAnDPDduLYlGKivn03ngiDr90/P5pK2u
+         s7D6tzu6UwmeGSUn5HKhnB8B08LwQ30x8XFNvmNsnYh6TTJ0HoEHkNXMT1HJsQ91tJ
+         7642WZ6QRht9g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pbIwy-00GyR2-D6;
-        Sun, 12 Mar 2023 10:29:14 +0000
-Date:   Sun, 12 Mar 2023 10:29:11 +0000
-Message-ID: <87edpu5klk.wl-maz@kernel.org>
+        id 1pbJGb-00GyYv-9V;
+        Sun, 12 Mar 2023 10:49:29 +0000
+Date:   Sun, 12 Mar 2023 10:49:28 +0000
+Message-ID: <87cz5e5jnr.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     Mark Brown <broonie@kernel.org>
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: selftests: Add coverage of MTE system registers
-In-Reply-To: <20230308-kvm-arm64-test-mte-regs-v1-1-f92a377e486f@kernel.org>
-References: <20230308-kvm-arm64-test-mte-regs-v1-1-f92a377e486f@kernel.org>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     pbonzini@redhat.com, oupton@google.com, yuzenghui@huawei.com,
+        dmatlack@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        qperret@google.com, catalin.marinas@arm.com,
+        andrew.jones@linux.dev, seanjc@google.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
+        rananta@google.com, bgardon@google.com, ricarkol@gmail.com,
+        Shaoqin Huang <shahuang@redhat.com>
+Subject: Re: [PATCH v6 02/12] KVM: arm64: Add KVM_PGTABLE_WALK ctx->flags for skipping BBM and CMO
+In-Reply-To: <20230307034555.39733-3-ricarkol@google.com>
+References: <20230307034555.39733-1-ricarkol@google.com>
+        <20230307034555.39733-3-ricarkol@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: ricarkol@google.com, pbonzini@redhat.com, oupton@google.com, yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com, rananta@google.com, bgardon@google.com, ricarkol@gmail.com, shahuang@redhat.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,112 +71,151 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 08 Mar 2023 17:12:26 +0000,
-Mark Brown <broonie@kernel.org> wrote:
+On Tue, 07 Mar 2023 03:45:45 +0000,
+Ricardo Koller <ricarkol@google.com> wrote:
 > 
-> Verify that a guest with MTE has access to the MTE registers. Since MTE is
-> enabled as a VM wide capability we need to add support for doing that in
-> the process.
+> Add two flags to kvm_pgtable_visit_ctx, KVM_PGTABLE_WALK_SKIP_BBM and
+> KVM_PGTABLE_WALK_SKIP_CMO, to indicate that the walk should not
+> perform break-before-make (BBM) nor cache maintenance operations
+> (CMO). This will by a future commit to create unlinked tables not
+
+This will *be used*?
+
+> accessible to the HW page-table walker.  This is safe as these
+> unlinked tables are not visible to the HW page-table walker.
+
+I don't think this last sentence makes much sense. The PTW is always
+coherent with the CPU caches and doesn't require cache maintenance
+(CMOs are solely for the pages the PTs point to).
+
+But this makes me question this patch further.
+
+The key observation here is that if you are creating new PTs that
+shadow an existing structure and still points to the same data pages,
+the cache state is independent of the intermediate PT walk, and thus
+CMOs are pointless anyway. So skipping CMOs makes sense.
+
+I agree with the assertion that there is little point in doing BBM
+when *creating* page tables, as all PTs start in an invalid state. But
+then, why do you need to skip it? The invalidation calls are already
+gated on the previous pointer being valid, which I presume won't be
+the case for what you describe here.
+
 > 
-> Signed-off-by: Mark Brown <broonie@kernel.org>
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
 > ---
->  tools/testing/selftests/kvm/aarch64/get-reg-list.c | 33 ++++++++++++++++++++++
->  1 file changed, 33 insertions(+)
+>  arch/arm64/include/asm/kvm_pgtable.h | 18 ++++++++++++++++++
+>  arch/arm64/kvm/hyp/pgtable.c         | 27 ++++++++++++++++-----------
+>  2 files changed, 34 insertions(+), 11 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> index d287dd2cac0a..63d6a9046702 100644
-> --- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> +++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> @@ -42,6 +42,7 @@ struct reg_sublist {
->  	long capability;
->  	int feature;
->  	bool finalize;
-> +	bool enable_capability;
->  	__u64 *regs;
->  	__u64 regs_n;
->  	__u64 *rejects_set;
-> @@ -404,6 +405,18 @@ static void check_supported(struct vcpu_config *c)
->  	}
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index 26a4293726c1..c7a269cad053 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -195,6 +195,12 @@ typedef bool (*kvm_pgtable_force_pte_cb_t)(u64 addr, u64 end,
+>   *					with other software walkers.
+>   * @KVM_PGTABLE_WALK_HANDLE_FAULT:	Indicates the page-table walk was
+>   *					invoked from a fault handler.
+> + * @KVM_PGTABLE_WALK_SKIP_BBM:		Visit and update table entries
+> + *					without Break-before-make
+> + *					requirements.
+> + * @KVM_PGTABLE_WALK_SKIP_CMO:		Visit and update table entries
+> + *					without Cache maintenance
+> + *					operations required.
+
+We have both I and D side CMOs. Is it reasonable to always treat them
+identically?
+
+>   */
+>  enum kvm_pgtable_walk_flags {
+>  	KVM_PGTABLE_WALK_LEAF			= BIT(0),
+> @@ -202,6 +208,8 @@ enum kvm_pgtable_walk_flags {
+>  	KVM_PGTABLE_WALK_TABLE_POST		= BIT(2),
+>  	KVM_PGTABLE_WALK_SHARED			= BIT(3),
+>  	KVM_PGTABLE_WALK_HANDLE_FAULT		= BIT(4),
+> +	KVM_PGTABLE_WALK_SKIP_BBM		= BIT(5),
+> +	KVM_PGTABLE_WALK_SKIP_CMO		= BIT(6),
+>  };
+>  
+>  struct kvm_pgtable_visit_ctx {
+> @@ -223,6 +231,16 @@ static inline bool kvm_pgtable_walk_shared(const struct kvm_pgtable_visit_ctx *c
+>  	return ctx->flags & KVM_PGTABLE_WALK_SHARED;
 >  }
 >  
-> +static void enable_capabilities(struct kvm_vm *vm, struct vcpu_config *c)
+> +static inline bool kvm_pgtable_walk_skip_bbm(const struct kvm_pgtable_visit_ctx *ctx)
 > +{
-> +	struct reg_sublist *s;
-> +
-> +	for_each_sublist(c, s) {
-> +		if (!s->enable_capability)
-> +			continue;
-> +
-> +		vm_enable_cap(vm, s->capability, 1);
-> +	}
+> +	return ctx->flags & KVM_PGTABLE_WALK_SKIP_BBM;
+
+Probably worth wrapping this with an 'unlikely'.
+
 > +}
 > +
->  static bool print_list;
->  static bool print_filtered;
->  static bool fixup_core_regs;
-> @@ -420,6 +433,7 @@ static void run_test(struct vcpu_config *c)
->  	check_supported(c);
->  
->  	vm = vm_create_barebones();
-> +	enable_capabilities(vm, c);
->  	prepare_vcpu_init(c, &init);
->  	vcpu = __vm_vcpu_add(vm, 0);
->  	aarch64_vcpu_setup(vcpu, &init);
-> @@ -1049,6 +1063,13 @@ static __u64 pauth_generic_regs[] = {
->  	ARM64_SYS_REG(3, 0, 2, 3, 1),	/* APGAKEYHI_EL1 */
->  };
->  
-> +static __u64 mte_regs[] = {
-> +	ARM64_SYS_REG(3, 0, 1, 0, 5),	/* RGSR_EL1 */
-> +	ARM64_SYS_REG(3, 0, 1, 0, 6),	/* GCR_EL1 */
-> +	ARM64_SYS_REG(3, 0, 5, 6, 0),	/* TFSR_EL1 */
-> +	ARM64_SYS_REG(3, 0, 5, 6, 1),	/* TFSRE0_EL1 */
-> +};
+> +static inline bool kvm_pgtable_walk_skip_cmo(const struct kvm_pgtable_visit_ctx *ctx)
+> +{
+> +	return ctx->flags & KVM_PGTABLE_WALK_SKIP_CMO;
+
+Same here.
+
+Also, why are these in kvm_pgtable.h? Can't they be moved inside
+pgtable.c and thus have the "inline" attribute dropped?
+
+> +}
 > +
->  #define BASE_SUBLIST \
->  	{ "base", .regs = base_regs, .regs_n = ARRAY_SIZE(base_regs), }
->  #define VREGS_SUBLIST \
-> @@ -1075,6 +1096,9 @@ static __u64 pauth_generic_regs[] = {
->  		.regs		= pauth_generic_regs,			\
->  		.regs_n		= ARRAY_SIZE(pauth_generic_regs),	\
->  	}
-> +#define MTE_SUBLIST \
-> +	{ "mte", .capability = KVM_CAP_ARM_MTE, .enable_capability = true,  \
-> +	  .regs = mte_regs, .regs_n = ARRAY_SIZE(mte_regs), }
+>  /**
+>   * struct kvm_pgtable_walker - Hook into a page-table walk.
+>   * @cb:		Callback function to invoke during the walk.
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index a3246d6cddec..4f703cc4cb03 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -741,14 +741,17 @@ static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
+>  	if (!stage2_try_set_pte(ctx, KVM_INVALID_PTE_LOCKED))
+>  		return false;
 >  
->  static struct vcpu_config vregs_config = {
->  	.sublists = {
-> @@ -1123,6 +1147,14 @@ static struct vcpu_config pauth_pmu_config = {
->  	{0},
->  	},
->  };
-> +static struct vcpu_config mte_config = {
-> +	.sublists = {
-> +	BASE_SUBLIST,
-> +	VREGS_SUBLIST,
-> +	MTE_SUBLIST,
-> +	{0},
-> +	},
-> +};
+> -	/*
+> -	 * Perform the appropriate TLB invalidation based on the evicted pte
+> -	 * value (if any).
+> -	 */
+> -	if (kvm_pte_table(ctx->old, ctx->level))
+> -		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
+> -	else if (kvm_pte_valid(ctx->old))
+> -		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ctx->level);
+> +	if (!kvm_pgtable_walk_skip_bbm(ctx)) {
+> +		/*
+> +		 * Perform the appropriate TLB invalidation based on the
+> +		 * evicted pte value (if any).
+> +		 */
+> +		if (kvm_pte_table(ctx->old, ctx->level))
+
+You're not skipping BBM here. You're skipping the TLB invalidation.
+Not quite the same thing.
+
+> +			kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
+> +		else if (kvm_pte_valid(ctx->old))
+> +			kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu,
+> +				     ctx->addr, ctx->level);
+> +	}
 >  
->  static struct vcpu_config *vcpu_configs[] = {
->  	&vregs_config,
-> @@ -1131,5 +1163,6 @@ static struct vcpu_config *vcpu_configs[] = {
->  	&sve_pmu_config,
->  	&pauth_config,
->  	&pauth_pmu_config,
-> +	&mte_config,
->  };
->  static int vcpu_configs_n = ARRAY_SIZE(vcpu_configs);
-> 
-
-Is there any reason why we sidestep the combinations of MTE with PAuth
-and PMU? I know this leads to an exponential set growth, but this is
-the very purpose of this test, and we found bugs related to this in
-the past.
-
-A good first step would be to be able to build these combinations
-dynamically, and only then add new sublists to the mix.
+>  	if (stage2_pte_is_counted(ctx->old))
+>  		mm_ops->put_page(ctx->ptep);
+> @@ -832,11 +835,13 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+>  		return -EAGAIN;
+>  
+>  	/* Perform CMOs before installation of the guest stage-2 PTE */
+> -	if (mm_ops->dcache_clean_inval_poc && stage2_pte_cacheable(pgt, new))
+> +	if (!kvm_pgtable_walk_skip_cmo(ctx) && mm_ops->dcache_clean_inval_poc &&
+> +	    stage2_pte_cacheable(pgt, new))
+>  		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(new, mm_ops),
+> -						granule);
+> +					       granule);
+>  
+> -	if (mm_ops->icache_inval_pou && stage2_pte_executable(new))
+> +	if (!kvm_pgtable_walk_skip_cmo(ctx) && mm_ops->icache_inval_pou &&
+> +	    stage2_pte_executable(new))
+>  		mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
+>  
+>  	stage2_make_pte(ctx, new);
 
 Thanks,
 
