@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DEAED6B69C7
+	by mail.lfdr.de (Postfix) with ESMTP id 5E9106B69C6
 	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 19:07:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232142AbjCLSHB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Mar 2023 14:07:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49934 "EHLO
+        id S232153AbjCLSHC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Mar 2023 14:07:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232210AbjCLSFS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Mar 2023 14:05:18 -0400
+        with ESMTP id S232277AbjCLSFb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Mar 2023 14:05:31 -0400
 Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D36F5515EB;
-        Sun, 12 Mar 2023 11:01:12 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4560F51C94;
+        Sun, 12 Mar 2023 11:01:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678644072; x=1710180072;
+  t=1678644075; x=1710180075;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=4bCkT9hp0kWQ356DOsOuwBO8jRZcXmHjfK4BPjNXRac=;
-  b=nyhrNPxvP0RhrSnL+443/zn0Wq9ffdUbxUeYVeILUMsPKhyCNCUXgK8v
-   0OAjEsPtnEZFfGa1aoIdQquVfY65tu0MCspw09pb97L79vCwitVrYY8b+
-   bZqwujQg0Gt3L3X55HOzoegYGH0VOjMa/MdTF4yzaKEQfdBHPgNfByUTZ
-   mOFgAH7HjKjt7RKLLBSsMuuODHubDLmyhkIa82NSPduicj+mm47IHyVfV
-   3wn0tsTKpWYTZ4OjapuGejuovjzdQmb/YkHniJEQFG+MRoCZGZ9xK0A1T
-   jBZttVJG7SLw2XktT+Bsbi6RRlZ/U2vp0tjM4ranJXHV5lOaEzbmrf1+f
+  bh=bvpcgAwVpeg7/WO0yoOb3OVe2kFQf5ZCphhJWw13l8E=;
+  b=YrCNnlr4K2GTD7olreGiCs+u1aK/DAqe6Wi2OfWLrhe0m7HMARqWj7cE
+   3AXecXr6YUr4nV/x+BzUZsR3l4pID88811xyCDLxm68z6ZRMZQeNTKAts
+   9NF/X7KvMCpFoUv/St/VAmPZ5WZsiTq+TexlshHY4uWm8v1Ap7BI9Qbx/
+   tmYMDX7KjrsymuyiBA0vmSWdj5nAXZuR9bO3gnDXsgbHO8TP64ZSy3pnd
+   dWunldtJG0oxX/32/9rlyHoSiuTbox/8edWfLVFrha46apZ1mS6GSR28X
+   feF+MhYLCT6Bko8q6GMKSnaN2n1fdqaRxx6seVzdrGjOZDQsMdUx/LnNp
    Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="316660127"
+X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="316660132"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="316660127"
+   d="scan'208";a="316660132"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
   by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 10:58:17 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="742596854"
+X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="742596857"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="742596854"
+   d="scan'208";a="742596857"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 10:58:17 -0700
 From:   isaku.yamahata@intel.com
@@ -47,9 +47,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         David Matlack <dmatlack@google.com>,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>
-Subject: [PATCH v13 106/113] KVM: TDX: Add methods to ignore accesses to TSC
-Date:   Sun, 12 Mar 2023 10:57:10 -0700
-Message-Id: <7d9fe585a5c89b5c84498c671b4966af295d82ca.1678643052.git.isaku.yamahata@intel.com>
+Subject: [PATCH v13 107/113] KVM: TDX: Ignore setting up mce
+Date:   Sun, 12 Mar 2023 10:57:11 -0700
+Message-Id: <65f24d01a65b3ee0de991ecf6af555cf378f5d45.1678643052.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1678643051.git.isaku.yamahata@intel.com>
 References: <cover.1678643051.git.isaku.yamahata@intel.com>
@@ -66,76 +66,42 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-TDX protects TDX guest TSC state from VMM.  Implement access methods to
-ignore guest TSC.
+Because vmx_set_mce function is VMX specific and it cannot be used for TDX.
+Add vt stub to ignore setting up mce for TDX.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/main.c | 44 +++++++++++++++++++++++++++++++++++++----
- 1 file changed, 40 insertions(+), 4 deletions(-)
+ arch/x86/kvm/vmx/main.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 32c992b5ab0d..6ec7b6e5b9c2 100644
+index 6ec7b6e5b9c2..dfa072253397 100644
 --- a/arch/x86/kvm/vmx/main.c
 +++ b/arch/x86/kvm/vmx/main.c
-@@ -828,6 +828,42 @@ static u8 vt_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
- 	return __vmx_get_mt_mask(vcpu, gfn, is_mmio, true);
+@@ -893,6 +893,14 @@ static void vt_cancel_hv_timer(struct kvm_vcpu *vcpu)
  }
+ #endif
  
-+static u64 vt_get_l2_tsc_offset(struct kvm_vcpu *vcpu)
++static void vt_setup_mce(struct kvm_vcpu *vcpu)
 +{
-+	/* TDX doesn't support L2 guest at the moment. */
-+	if (KVM_BUG_ON(is_td_vcpu(vcpu), vcpu->kvm))
-+		return 0;
-+
-+	return vmx_get_l2_tsc_offset(vcpu);
-+}
-+
-+static u64 vt_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu)
-+{
-+	/* TDX doesn't support L2 guest at the moment. */
-+	if (KVM_BUG_ON(is_td_vcpu(vcpu), vcpu->kvm))
-+		return 0;
-+
-+	return vmx_get_l2_tsc_multiplier(vcpu);
-+}
-+
-+static void vt_write_tsc_offset(struct kvm_vcpu *vcpu, u64 offset)
-+{
-+	/* In TDX, tsc offset can't be changed. */
 +	if (is_td_vcpu(vcpu))
 +		return;
 +
-+	vmx_write_tsc_offset(vcpu, offset);
++	vmx_setup_mce(vcpu);
 +}
 +
-+static void vt_write_tsc_multiplier(struct kvm_vcpu *vcpu, u64 multiplier)
-+{
-+	/* In TDX, tsc multiplier can't be changed. */
-+	if (is_td_vcpu(vcpu))
-+		return;
-+
-+	vmx_write_tsc_multiplier(vcpu, multiplier);
-+}
-+
- static void vt_update_cpu_dirty_logging(struct kvm_vcpu *vcpu)
+ static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
  {
- 	if (KVM_BUG_ON(is_td_vcpu(vcpu), vcpu->kvm))
-@@ -986,10 +1022,10 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	if (!is_td(kvm))
+@@ -1049,7 +1057,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.cancel_hv_timer = vt_cancel_hv_timer,
+ #endif
  
- 	.has_wbinvd_exit = cpu_has_vmx_wbinvd_exit,
+-	.setup_mce = vmx_setup_mce,
++	.setup_mce = vt_setup_mce,
  
--	.get_l2_tsc_offset = vmx_get_l2_tsc_offset,
--	.get_l2_tsc_multiplier = vmx_get_l2_tsc_multiplier,
--	.write_tsc_offset = vmx_write_tsc_offset,
--	.write_tsc_multiplier = vmx_write_tsc_multiplier,
-+	.get_l2_tsc_offset = vt_get_l2_tsc_offset,
-+	.get_l2_tsc_multiplier = vt_get_l2_tsc_multiplier,
-+	.write_tsc_offset = vt_write_tsc_offset,
-+	.write_tsc_multiplier = vt_write_tsc_multiplier,
- 
- 	.load_mmu_pgd = vt_load_mmu_pgd,
- 
+ #ifdef CONFIG_KVM_SMM
+ 	.smi_allowed = vt_smi_allowed,
 -- 
 2.25.1
 
