@@ -2,48 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 239186B6450
-	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 10:54:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AA5086B6451
+	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 10:54:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229752AbjCLJyt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Mar 2023 05:54:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35684 "EHLO
+        id S229877AbjCLJyu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Mar 2023 05:54:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229519AbjCLJyq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S229819AbjCLJyq (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sun, 12 Mar 2023 05:54:46 -0400
 Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CE0A37F16
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CC8F37B77
         for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 01:54:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1678614871; x=1710150871;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=cNoWFx8TrJ7UmiR4hV7ITAW/NdzHQpC5Xe8CbDv91tM=;
-  b=kzzDilIYy3RnEr07uy+x5YKhUJax477MGoxSpdFr2OCNWsRTvQ9F30QM
-   N1RLtmVk5V1swZTY9qafQ7TX13LHstSgjC+69wxSYvmzbX1uOAI8TZX78
-   VXGvoHvrdCdDCicrQYhciJTV6Pyrip7umuwac+6UUMHyMpmSUARvi9P4x
-   Ed795TzJjw4DuykrcK4OR050eDGhzjWBGV6g6wmfKbof/MeYb4JIN/puq
-   1HmMvZ8i8VgOA1UVFcPhqE27KlBbOKYvyRFhiGNtjIeZTjeUr+jwaChTb
-   9c7KBDO12zpxbPcP+R6JojBfJ5sHmBmaImhoZehAWjRP8uGkumTyV7xEU
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="316622886"
+  bh=zQzkGqhqPCMmYvziBTiQi/JzM7MyMiSiknMYl8MJe74=;
+  b=JkRpH7TtabYjb1pzVZWGw9C3OkqqmavRBAJWFbuQ52QKa1HMIHn9XEEL
+   EQ5vAwpYAZfXP3dE6b2FbwJpIIekMakM2KJPKLHcDjVd/4beuahirgNgE
+   qJo1clALGpYn1kgxrLcnsAHY34pW1/KF0zXE/YVZdFkCe8n/3oNc6nE6F
+   dBqYnyPc41e45D/BuD4I7NdLPYC8CAm3Muhvi8hQd8Bo7lRa3gQNIMzbO
+   sxcuj1lQtofFu7UkRIq0VnPUlVoOGARAUbv7IKALzh74sHK28TnMcsd7d
+   N7vD2y9v7Kr7aKLBEu3WscIvDo43/DSzW0hbgygc8NUMwascfR8jwO3bL
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="316622892"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="316622886"
+   d="scan'208";a="316622892"
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:54:19 -0800
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:54:21 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="852408947"
+X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="852408954"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="852408947"
+   d="scan'208";a="852408954"
 Received: from jiechen-ubuntu-dev.sh.intel.com ([10.239.154.150])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:54:18 -0800
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:54:20 -0800
 From:   Jason Chen CJ <jason.cj.chen@intel.com>
 To:     kvm@vger.kernel.org
 Cc:     Jason Chen CJ <jason.cj.chen@intel.com>
-Subject: [RFC PATCH part-2 01/17] pkvm: x86: Introduce CONFIG_PKVM_INTEL
-Date:   Mon, 13 Mar 2023 02:00:56 +0800
-Message-Id: <20230312180112.1778254-2-jason.cj.chen@intel.com>
+Subject: [RFC PATCH part-2 02/17] KVM: VMX: Refactor for setup_vmcs_config
+Date:   Mon, 13 Mar 2023 02:00:57 +0800
+Message-Id: <20230312180112.1778254-3-jason.cj.chen@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230312180112.1778254-1-jason.cj.chen@intel.com>
 References: <20230312180112.1778254-1-jason.cj.chen@intel.com>
@@ -59,191 +59,220 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add CONFIG_PKVM_INTEL configuration to enable or disable pKVM feature on
-x86 platform (starting from Intel platform), and do pkvm_init as
-an extension of KVM. Now pkvm_init only reserves memory for pkvm data
-structure and does a quick setup for num_cpus.
-
-New pKVM on Intel platform files are placed under arch/x86/kvm/vmx/pkvm.
+Do refactoring for setup_vmcs_config, leave its major part as
+setup_vmcs_config_common, which can be used by both KVM and pKVM on
+Intel platform.
 
 Signed-off-by: Jason Chen CJ <jason.cj.chen@intel.com>
 ---
- arch/x86/include/asm/kvm_host.h      |  1 +
- arch/x86/kvm/Kconfig                 | 13 +++++++++++
- arch/x86/kvm/Makefile                |  1 +
- arch/x86/kvm/vmx/pkvm/Makefile       |  7 ++++++
- arch/x86/kvm/vmx/pkvm/include/pkvm.h | 15 ++++++++++++
- arch/x86/kvm/vmx/pkvm/pkvm_host.c    | 34 ++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/vmx.c               |  3 +++
- arch/x86/kvm/vmx/vmx.h               |  4 ++++
- arch/x86/kvm/x86.c                   |  5 ++++
- 9 files changed, 83 insertions(+)
+ arch/x86/kvm/vmx/vmx.c | 119 +++++++++++++++++++++++++----------------
+ arch/x86/kvm/vmx/vmx.h |  18 +++++++
+ 2 files changed, 90 insertions(+), 47 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 6aaae18f1854..c3cf849a1370 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1731,6 +1731,7 @@ struct kvm_x86_nested_ops {
- };
- 
- struct kvm_x86_init_ops {
-+	int (*pkvm_init)(void);
- 	int (*cpu_has_kvm_support)(void);
- 	int (*disabled_by_bios)(void);
- 	int (*check_processor_compatibility)(void);
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index fbeaa9ddef59..5a8ae5f80849 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -87,6 +87,19 @@ config KVM_INTEL
- 	  To compile this as a module, choose M here: the module
- 	  will be called kvm-intel.
- 
-+config PKVM_INTEL
-+	bool "pKVM for Intel processors support"
-+	depends on KVM_INTEL=y
-+	depends on X86_64
-+	help
-+	  Provides support for pKVM on Intel processors.
-+
-+	  This will deprivilege the host as a VM running in non-root VMX
-+	  operation mode, and pKVM hypervisor will run in root VMX
-+	  operation mode.
-+
-+	  If unsure, say N.
-+
- config X86_SGX_KVM
- 	bool "Software Guard eXtensions (SGX) Virtualization"
- 	depends on X86_SGX && KVM_INTEL
-diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index 80e3fe184d17..7fbca5cc7c1d 100644
---- a/arch/x86/kvm/Makefile
-+++ b/arch/x86/kvm/Makefile
-@@ -35,6 +35,7 @@ endif
- 
- obj-$(CONFIG_KVM)	+= kvm.o
- obj-$(CONFIG_KVM_INTEL)	+= kvm-intel.o
-+obj-$(CONFIG_PKVM_INTEL) += vmx/pkvm/
- obj-$(CONFIG_KVM_AMD)	+= kvm-amd.o
- 
- AFLAGS_svm/vmenter.o    := -iquote $(obj)
-diff --git a/arch/x86/kvm/vmx/pkvm/Makefile b/arch/x86/kvm/vmx/pkvm/Makefile
-new file mode 100644
-index 000000000000..493bec8501c9
---- /dev/null
-+++ b/arch/x86/kvm/vmx/pkvm/Makefile
-@@ -0,0 +1,7 @@
-+# SPDX-License-Identifier: GPL-2.0
-+
-+ccflags-y += -I $(srctree)/arch/x86/kvm/vmx/pkvm/include
-+
-+pkvm-obj		:= pkvm_host.o
-+
-+obj-$(CONFIG_PKVM_INTEL)	+= $(pkvm-obj)
-diff --git a/arch/x86/kvm/vmx/pkvm/include/pkvm.h b/arch/x86/kvm/vmx/pkvm/include/pkvm.h
-new file mode 100644
-index 000000000000..3fb76665e785
---- /dev/null
-+++ b/arch/x86/kvm/vmx/pkvm/include/pkvm.h
-@@ -0,0 +1,15 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2022 Intel Corporation
-+ */
-+
-+#ifndef _PKVM_H_
-+#define _PKVM_H_
-+
-+struct pkvm_hyp {
-+	int num_cpus;
-+};
-+
-+#define PKVM_PAGES (ALIGN(sizeof(struct pkvm_hyp), PAGE_SIZE) >> PAGE_SHIFT)
-+
-+#endif
-diff --git a/arch/x86/kvm/vmx/pkvm/pkvm_host.c b/arch/x86/kvm/vmx/pkvm/pkvm_host.c
-new file mode 100644
-index 000000000000..7677df6a2b34
---- /dev/null
-+++ b/arch/x86/kvm/vmx/pkvm/pkvm_host.c
-@@ -0,0 +1,34 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2022 Intel Corporation
-+ */
-+
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+
-+#include <pkvm.h>
-+
-+MODULE_LICENSE("GPL");
-+
-+static struct pkvm_hyp *pkvm;
-+
-+static void *pkvm_early_alloc_contig(int pages)
-+{
-+	return alloc_pages_exact(pages << PAGE_SHIFT, GFP_KERNEL | __GFP_ZERO);
-+}
-+
-+__init int pkvm_init(void)
-+{
-+	int ret = 0;
-+
-+	pkvm = pkvm_early_alloc_contig(PKVM_PAGES);
-+	if (!pkvm) {
-+		ret = -ENOMEM;
-+		goto out;
-+	}
-+
-+	pkvm->num_cpus = num_possible_cpus();
-+
-+out:
-+	return ret;
-+}
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 7eec0226d56a..1e55bde497f8 100644
+index 1e55bde497f8..6e9723306992 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -8467,6 +8467,9 @@ static __init int hardware_setup(void)
+@@ -2593,8 +2593,9 @@ static __init u64 adjust_vmx_controls64(u64 ctl_opt, u32 msr)
+ 	return  ctl_opt & allowed;
  }
  
- static struct kvm_x86_init_ops vmx_init_ops __initdata = {
-+#ifdef CONFIG_PKVM_INTEL
-+	.pkvm_init = pkvm_init,
-+#endif
- 	.cpu_has_kvm_support = cpu_has_kvm_support,
- 	.disabled_by_bios = vmx_disabled_by_bios,
- 	.check_processor_compatibility = vmx_check_processor_compat,
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index a3da84f4ea45..8b2c4f1f4c8e 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -752,4 +752,8 @@ static inline bool guest_cpuid_has_evmcs(struct kvm_vcpu *vcpu)
- 	       to_vmx(vcpu)->nested.enlightened_vmcs_enabled;
+-static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+-				    struct vmx_capability *vmx_cap)
++__init int setup_vmcs_config_common(struct vmcs_config *vmcs_conf,
++				struct vmx_capability *vmx_cap,
++				struct vmcs_config_setting *setting)
+ {
+ 	u32 vmx_msr_low, vmx_msr_high;
+ 	u32 _pin_based_exec_control = 0;
+@@ -2604,34 +2605,17 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+ 	u32 _vmexit_control = 0;
+ 	u32 _vmentry_control = 0;
+ 	u64 misc_msr;
+-	int i;
+-
+-	/*
+-	 * LOAD/SAVE_DEBUG_CONTROLS are absent because both are mandatory.
+-	 * SAVE_IA32_PAT and SAVE_IA32_EFER are absent because KVM always
+-	 * intercepts writes to PAT and EFER, i.e. never enables those controls.
+-	 */
+-	struct {
+-		u32 entry_control;
+-		u32 exit_control;
+-	} const vmcs_entry_exit_pairs[] = {
+-		{ VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL,	VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL },
+-		{ VM_ENTRY_LOAD_IA32_PAT,		VM_EXIT_LOAD_IA32_PAT },
+-		{ VM_ENTRY_LOAD_IA32_EFER,		VM_EXIT_LOAD_IA32_EFER },
+-		{ VM_ENTRY_LOAD_BNDCFGS,		VM_EXIT_CLEAR_BNDCFGS },
+-		{ VM_ENTRY_LOAD_IA32_RTIT_CTL,		VM_EXIT_CLEAR_IA32_RTIT_CTL },
+-	};
+ 
+ 	memset(vmcs_conf, 0, sizeof(*vmcs_conf));
+ 
+-	if (adjust_vmx_controls(KVM_REQUIRED_VMX_CPU_BASED_VM_EXEC_CONTROL,
+-				KVM_OPTIONAL_VMX_CPU_BASED_VM_EXEC_CONTROL,
++	if (adjust_vmx_controls(setting->cpu_based_vm_exec_ctrl_req,
++				setting->cpu_based_vm_exec_ctrl_opt,
+ 				MSR_IA32_VMX_PROCBASED_CTLS,
+ 				&_cpu_based_exec_control))
+ 		return -EIO;
+ 	if (_cpu_based_exec_control & CPU_BASED_ACTIVATE_SECONDARY_CONTROLS) {
+-		if (adjust_vmx_controls(KVM_REQUIRED_VMX_SECONDARY_VM_EXEC_CONTROL,
+-					KVM_OPTIONAL_VMX_SECONDARY_VM_EXEC_CONTROL,
++		if (adjust_vmx_controls(setting->secondary_vm_exec_ctrl_req,
++					setting->secondary_vm_exec_ctrl_opt,
+ 					MSR_IA32_VMX_PROCBASED_CTLS2,
+ 					&_cpu_based_2nd_exec_control))
+ 			return -EIO;
+@@ -2677,17 +2661,17 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+ 
+ 	if (_cpu_based_exec_control & CPU_BASED_ACTIVATE_TERTIARY_CONTROLS)
+ 		_cpu_based_3rd_exec_control =
+-			adjust_vmx_controls64(KVM_OPTIONAL_VMX_TERTIARY_VM_EXEC_CONTROL,
++			adjust_vmx_controls64(setting->tertiary_vm_exec_ctrl_opt,
+ 					      MSR_IA32_VMX_PROCBASED_CTLS3);
+ 
+-	if (adjust_vmx_controls(KVM_REQUIRED_VMX_VM_EXIT_CONTROLS,
+-				KVM_OPTIONAL_VMX_VM_EXIT_CONTROLS,
++	if (adjust_vmx_controls(setting->vmexit_ctrl_req,
++				setting->vmexit_ctrl_opt,
+ 				MSR_IA32_VMX_EXIT_CTLS,
+ 				&_vmexit_control))
+ 		return -EIO;
+ 
+-	if (adjust_vmx_controls(KVM_REQUIRED_VMX_PIN_BASED_VM_EXEC_CONTROL,
+-				KVM_OPTIONAL_VMX_PIN_BASED_VM_EXEC_CONTROL,
++	if (adjust_vmx_controls(setting->pin_based_vm_exec_ctrl_req,
++				setting->pin_based_vm_exec_ctrl_opt,
+ 				MSR_IA32_VMX_PINBASED_CTLS,
+ 				&_pin_based_exec_control))
+ 		return -EIO;
+@@ -2698,29 +2682,12 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+ 		SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY))
+ 		_pin_based_exec_control &= ~PIN_BASED_POSTED_INTR;
+ 
+-	if (adjust_vmx_controls(KVM_REQUIRED_VMX_VM_ENTRY_CONTROLS,
+-				KVM_OPTIONAL_VMX_VM_ENTRY_CONTROLS,
++	if (adjust_vmx_controls(setting->vmentry_ctrl_req,
++				setting->vmentry_ctrl_opt,
+ 				MSR_IA32_VMX_ENTRY_CTLS,
+ 				&_vmentry_control))
+ 		return -EIO;
+ 
+-	for (i = 0; i < ARRAY_SIZE(vmcs_entry_exit_pairs); i++) {
+-		u32 n_ctrl = vmcs_entry_exit_pairs[i].entry_control;
+-		u32 x_ctrl = vmcs_entry_exit_pairs[i].exit_control;
+-
+-		if (!(_vmentry_control & n_ctrl) == !(_vmexit_control & x_ctrl))
+-			continue;
+-
+-		pr_warn_once("Inconsistent VM-Entry/VM-Exit pair, entry = %x, exit = %x\n",
+-			     _vmentry_control & n_ctrl, _vmexit_control & x_ctrl);
+-
+-		if (error_on_inconsistent_vmcs_config)
+-			return -EIO;
+-
+-		_vmentry_control &= ~n_ctrl;
+-		_vmexit_control &= ~x_ctrl;
+-	}
+-
+ 	rdmsr(MSR_IA32_VMX_BASIC, vmx_msr_low, vmx_msr_high);
+ 
+ 	/* IA-32 SDM Vol 3B: VMCS size is never greater than 4kB. */
+@@ -2755,6 +2722,64 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+ 	return 0;
  }
  
-+#ifdef CONFIG_PKVM_INTEL
-+int __init pkvm_init(void);
-+#endif
++static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
++				    struct vmx_capability *vmx_cap)
++{
++	int i, ret;
++	struct vmcs_config_setting setting = {
++		.cpu_based_vm_exec_ctrl_req = KVM_REQUIRED_VMX_CPU_BASED_VM_EXEC_CONTROL,
++		.cpu_based_vm_exec_ctrl_opt = KVM_OPTIONAL_VMX_CPU_BASED_VM_EXEC_CONTROL,
++		.secondary_vm_exec_ctrl_req = KVM_REQUIRED_VMX_SECONDARY_VM_EXEC_CONTROL,
++		.secondary_vm_exec_ctrl_opt = KVM_OPTIONAL_VMX_SECONDARY_VM_EXEC_CONTROL,
++		.tertiary_vm_exec_ctrl_opt = KVM_OPTIONAL_VMX_TERTIARY_VM_EXEC_CONTROL,
++		.pin_based_vm_exec_ctrl_req = KVM_REQUIRED_VMX_PIN_BASED_VM_EXEC_CONTROL,
++		.pin_based_vm_exec_ctrl_opt = KVM_OPTIONAL_VMX_PIN_BASED_VM_EXEC_CONTROL,
++		.vmexit_ctrl_req = KVM_REQUIRED_VMX_VM_EXIT_CONTROLS,
++		.vmexit_ctrl_opt = KVM_OPTIONAL_VMX_VM_EXIT_CONTROLS,
++		.vmentry_ctrl_req = KVM_REQUIRED_VMX_VM_ENTRY_CONTROLS,
++		.vmentry_ctrl_opt = KVM_OPTIONAL_VMX_VM_ENTRY_CONTROLS,
++	};
 +
- #endif /* __KVM_X86_VMX_H */
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index a2c299d47e69..84ddeabbf94b 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9312,6 +9312,11 @@ int kvm_arch_init(void *opaque)
- 		return -EOPNOTSUPP;
- 	}
- 
-+	if (ops->pkvm_init && ops->pkvm_init()) {
-+		pr_err_ratelimited("kvm: pkvm init fail\n");
-+		return -EOPNOTSUPP;
++	/*
++	 * LOAD/SAVE_DEBUG_CONTROLS are absent because both are mandatory.
++	 * SAVE_IA32_PAT and SAVE_IA32_EFER are absent because KVM always
++	 * intercepts writes to PAT and EFER, i.e. never enables those controls.
++	 */
++	struct {
++		u32 entry_control;
++		u32 exit_control;
++	} const vmcs_entry_exit_pairs[] = {
++		{ VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL,	VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL },
++		{ VM_ENTRY_LOAD_IA32_PAT,		VM_EXIT_LOAD_IA32_PAT },
++		{ VM_ENTRY_LOAD_IA32_EFER,		VM_EXIT_LOAD_IA32_EFER },
++		{ VM_ENTRY_LOAD_BNDCFGS,		VM_EXIT_CLEAR_BNDCFGS },
++		{ VM_ENTRY_LOAD_IA32_RTIT_CTL,		VM_EXIT_CLEAR_IA32_RTIT_CTL },
++	};
++
++	ret =  setup_vmcs_config_common(vmcs_conf, vmx_cap, &setting);
++	if (ret)
++		return ret;
++
++	for (i = 0; i < ARRAY_SIZE(vmcs_entry_exit_pairs); i++) {
++		u32 n_ctrl = vmcs_entry_exit_pairs[i].entry_control;
++		u32 x_ctrl = vmcs_entry_exit_pairs[i].exit_control;
++
++		if (!(vmcs_conf->vmentry_ctrl & n_ctrl) == !(vmcs_conf->vmexit_ctrl & x_ctrl))
++			continue;
++
++		pr_warn_once("Inconsistent VM-Entry/VM-Exit pair, entry = %x, exit = %x\n",
++				vmcs_conf->vmentry_ctrl & n_ctrl, vmcs_conf->vmexit_ctrl & x_ctrl);
++
++		if (error_on_inconsistent_vmcs_config)
++			return -EIO;
++
++		vmcs_conf->vmentry_ctrl &= ~n_ctrl;
++		vmcs_conf->vmexit_ctrl &= ~x_ctrl;
 +	}
 +
- 	/*
- 	 * KVM explicitly assumes that the guest has an FPU and
- 	 * FXSAVE/FXRSTOR. For example, the KVM_GET_FPU explicitly casts the
++	return ret;
++}
++
+ struct vmcs *alloc_vmcs_cpu(bool shadow, int cpu, gfp_t flags)
+ {
+ 	int node = cpu_to_node(cpu);
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 8b2c4f1f4c8e..e43a833ab1e4 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -591,6 +591,24 @@ static inline u8 vmx_get_rvi(void)
+ #define KVM_OPTIONAL_VMX_TERTIARY_VM_EXEC_CONTROL			\
+ 	(TERTIARY_EXEC_IPI_VIRT)
+ 
++struct vmcs_config_setting {
++	u32 cpu_based_vm_exec_ctrl_req;
++	u32 cpu_based_vm_exec_ctrl_opt;
++	u32 secondary_vm_exec_ctrl_req;
++	u32 secondary_vm_exec_ctrl_opt;
++	u64 tertiary_vm_exec_ctrl_opt;
++	u32 pin_based_vm_exec_ctrl_req;
++	u32 pin_based_vm_exec_ctrl_opt;
++	u32 vmexit_ctrl_req;
++	u32 vmexit_ctrl_opt;
++	u32 vmentry_ctrl_req;
++	u32 vmentry_ctrl_opt;
++};
++
++int setup_vmcs_config_common(struct vmcs_config *vmcs_conf,
++				struct vmx_capability *vmx_cap,
++				struct vmcs_config_setting *setting);
++
+ #define BUILD_CONTROLS_SHADOW(lname, uname, bits)						\
+ static inline void lname##_controls_set(struct vcpu_vmx *vmx, u##bits val)			\
+ {												\
 -- 
 2.25.1
 
