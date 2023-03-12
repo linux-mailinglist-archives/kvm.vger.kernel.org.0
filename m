@@ -2,49 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 439786B649A
-	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 11:00:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EE946B649D
+	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 11:00:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230018AbjCLKAd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Mar 2023 06:00:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36310 "EHLO
+        id S230104AbjCLKAf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Mar 2023 06:00:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229925AbjCLJ7g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S229568AbjCLJ7g (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sun, 12 Mar 2023 05:59:36 -0400
 Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 913064FF34
-        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 01:58:40 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FDEE515D2
+        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 01:58:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678615120; x=1710151120;
+  t=1678615121; x=1710151121;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=K1KU+819iqp7KTVDrt/GU0TX621dA6leqpJtrsZaTo8=;
-  b=mgxZ/k14SBPfNAN+/gSLyus4R6Rtsa5H9BnBhxXweV/fKAuA5QfxdeK2
-   sNVtk1BLxm2GJivLtES6j+6uuRDxLHLqGWLeJm7bDUL8k8vD2ZoKK99/M
-   6qAj5G3+tFham/fPgmbFXtpdj9nwWwyR1rIKqaiA9Q6G4ekxDzEIyzMbS
-   O+GEuICR8J/Old8OUiQRb+Q+VWlvWh1IH5UyQF+tpsHV4XgIpc9zQJnDE
-   88917rRpYYCXzqnutpbR2SIc8oCDMhfpw3VdjZN2ovmbj/0GlI+mo+Z80
-   kghgwI8b7UL5jzdjHv06OPxnXH7IzPmyyOdZHs6hwaWPQrLqLztkn+zsG
+  bh=gWKOkuF1Ys+mwVmwCpzUR9yutYKFoym7a4BDrlhOb90=;
+  b=CD+kohz7X5imAqKbFGdhvzGzaxhM2rb5faxUpPiKdb7a7zuF2kU87cBO
+   wGadDAl2nC3czvUlKandBr+YKuh4mqqoXkKhBxa6nQ8arClizXml67MXB
+   2PebFkM7Bfq3rZ8NjpzoEQEcc1g/FYfJbU/tI1FovNB7vHz25qNrLtYvX
+   rbWLwW6yc9AJ2E936BeVeskoyP3OYq1/SetevdDIbl/Hx4/JOpbu2Y9KL
+   yb7Hlp/U/+3ZLoh4TS4yrQaXEDYVscjgnRkKfCZLAMlYFvwPClkL91AfX
+   EExzbgfNq3q6KAsEtGeaEgNvwWqaNUh3VX1Llupq5eBMShVQA/i7nnMYU
    A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="339344698"
+X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="339344700"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="339344698"
+   d="scan'208";a="339344700"
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:56:57 -0800
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:56:58 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="1007627330"
+X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="1007627334"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="1007627330"
+   d="scan'208";a="1007627334"
 Received: from jiechen-ubuntu-dev.sh.intel.com ([10.239.154.150])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:56:55 -0800
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:56:57 -0800
 From:   Jason Chen CJ <jason.cj.chen@intel.com>
 To:     kvm@vger.kernel.org
-Cc:     Chuanxiao Dong <chuanxiao.dong@intel.com>,
-        Jason Chen CJ <jason.cj.chen@intel.com>
-Subject: [RFC PATCH part-6 05/13] pkvm: x86: Introduce vEPT to record guest EPT information
-Date:   Mon, 13 Mar 2023 02:03:37 +0800
-Message-Id: <20230312180345.1778588-6-jason.cj.chen@intel.com>
+Cc:     Chuanxiao Dong <chuanxiao.dong@intel.com>
+Subject: [RFC PATCH part-6 06/13] pkvm: x86: Add API to get the max phys address bits
+Date:   Mon, 13 Mar 2023 02:03:38 +0800
+Message-Id: <20230312180345.1778588-7-jason.cj.chen@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230312180345.1778588-1-jason.cj.chen@intel.com>
 References: <20230312180345.1778588-1-jason.cj.chen@intel.com>
@@ -62,172 +61,65 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Chuanxiao Dong <chuanxiao.dong@intel.com>
 
-KVM-high manages a guest EPT for its nested VM, which shall be shadowed
-to shadow EPT in pKVM hypervisor.
-
-Introduce a per vcpu pgtable(vEPT) to save the guest EPT related
-information from KVM-high when vmwrite(EPTP).
-
-Each time when a vcpu vmwrites to EPTP, pKVM will setup the vEPT
-according to the new value or just do nothing if it is the same
-with the last one.
+Add API get_max_physaddr_bits(), this is necessary used to calculate
+the reserved bits for EPT entry.
 
 Signed-off-by: Chuanxiao Dong <chuanxiao.dong@intel.com>
-Signed-off-by: Jason Chen CJ <jason.cj.chen@intel.com>
 ---
- arch/x86/kvm/vmx/pkvm/hyp/ept.c      | 33 ++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/pkvm/hyp/ept.h      | 10 +++++++++
- arch/x86/kvm/vmx/pkvm/hyp/memory.c   |  6 +++++
- arch/x86/kvm/vmx/pkvm/hyp/memory.h   |  1 +
- arch/x86/kvm/vmx/pkvm/hyp/nested.c   | 16 ++++++++++++++
- arch/x86/kvm/vmx/pkvm/hyp/pkvm_hyp.h |  3 +++
- 6 files changed, 69 insertions(+)
+ arch/x86/kvm/vmx/pkvm/hyp/memory.c | 21 +++++++++++++++++++++
+ arch/x86/kvm/vmx/pkvm/hyp/memory.h |  2 ++
+ 2 files changed, 23 insertions(+)
 
-diff --git a/arch/x86/kvm/vmx/pkvm/hyp/ept.c b/arch/x86/kvm/vmx/pkvm/hyp/ept.c
-index 0edea266b8bc..641b8252071e 100644
---- a/arch/x86/kvm/vmx/pkvm/hyp/ept.c
-+++ b/arch/x86/kvm/vmx/pkvm/hyp/ept.c
-@@ -297,3 +297,36 @@ int pkvm_shadow_ept_init(struct shadow_ept_desc *desc)
- 
- 	return 0;
- }
-+
-+/*
-+ * virtual_ept_mm_ops is used as the ops for the ept constructed by
-+ * KVM high in host.
-+ * The physical address in this ept is the host VM GPA, which is
-+ * the same with HPA.
-+ */
-+struct pkvm_mm_ops virtual_ept_mm_ops = {
-+	.phys_to_virt = host_gpa2hva,
-+};
-+
-+void pkvm_guest_ept_deinit(struct shadow_vcpu_state *shadow_vcpu)
-+{
-+	struct pkvm_pgtable *vept = &shadow_vcpu->vept;
-+
-+	memset(vept, 0, sizeof(struct pkvm_pgtable));
-+}
-+
-+void pkvm_guest_ept_init(struct shadow_vcpu_state *shadow_vcpu, u64 guest_eptp)
-+{
-+	/*
-+	 * TODO: we just assume guest will use page level the HW supported,
-+	 * it actually need align with KVM high
-+	 */
-+	struct pkvm_pgtable_cap cap = {
-+		.level = pkvm_hyp->ept_cap.level,
-+		.allowed_pgsz = pkvm_hyp->ept_cap.allowed_pgsz,
-+		.table_prot = pkvm_hyp->ept_cap.table_prot,
-+	};
-+
-+	pkvm_pgtable_init(&shadow_vcpu->vept, &virtual_ept_mm_ops, &ept_ops, &cap, false);
-+	shadow_vcpu->vept.root_pa = host_gpa2hpa(guest_eptp & SPTE_BASE_ADDR_MASK);
-+}
-diff --git a/arch/x86/kvm/vmx/pkvm/hyp/ept.h b/arch/x86/kvm/vmx/pkvm/hyp/ept.h
-index 7badcb3dd621..420c9c5816e9 100644
---- a/arch/x86/kvm/vmx/pkvm/hyp/ept.h
-+++ b/arch/x86/kvm/vmx/pkvm/hyp/ept.h
-@@ -22,5 +22,15 @@ int handle_host_ept_violation(unsigned long gpa);
- int pkvm_shadow_ept_pool_init(void *ept_pool_base, unsigned long ept_pool_pages);
- int pkvm_shadow_ept_init(struct shadow_ept_desc *desc);
- void pkvm_shadow_ept_deinit(struct shadow_ept_desc *desc);
-+void pkvm_guest_ept_init(struct shadow_vcpu_state *shadow_vcpu, u64 guest_eptp);
-+void pkvm_guest_ept_deinit(struct shadow_vcpu_state *shadow_vcpu);
- 
-+static inline bool is_valid_eptp(u64 eptp)
-+{
-+	if (!eptp || (eptp == INVALID_GPA))
-+		return false;
-+
-+	/* TODO: other bits check */
-+	return true;
-+}
- #endif
 diff --git a/arch/x86/kvm/vmx/pkvm/hyp/memory.c b/arch/x86/kvm/vmx/pkvm/hyp/memory.c
-index 6a400aef1bd8..43fc39d44c3d 100644
+index 43fc39d44c3d..9a9616ac4cc3 100644
 --- a/arch/x86/kvm/vmx/pkvm/hyp/memory.c
 +++ b/arch/x86/kvm/vmx/pkvm/hyp/memory.c
-@@ -73,6 +73,12 @@ void *host_gpa2hva(unsigned long gpa)
- 	return pkvm_phys_to_virt(gpa);
- }
+@@ -10,9 +10,11 @@
+ #include "memory.h"
+ #include "pgtable.h"
+ #include "pkvm_hyp.h"
++#include "cpu.h"
  
-+unsigned long host_gpa2hpa(unsigned long gpa)
-+{
-+	/* Host VM is using identity mapping so GPA == HPA */
-+	return gpa;
-+}
+ unsigned long __page_base_offset;
+ unsigned long __symbol_base_offset;
++static u8 max_physaddr_bits;
+ 
+ unsigned int hyp_memblock_nr;
+ struct memblock_region hyp_memory[HYP_MEMBLOCK_REGIONS];
+@@ -285,3 +287,22 @@ int write_gpa(struct kvm_vcpu *vcpu, gpa_t gpa, void *addr, unsigned int bytes)
+ {
+ 	return copy_gpa(vcpu, gpa, addr, bytes, false);
+ }
 +
- extern struct pkvm_pgtable_ops mmu_ops;
- static struct pkvm_mm_ops mm_ops = {
- 	.phys_to_virt = host_gpa2hva,
++u64 get_max_physaddr_bits(void)
++{
++	u32 eax, ebx, ecx, edx;
++
++	if (max_physaddr_bits)
++		return max_physaddr_bits;
++
++	eax = 0x80000000;
++	ecx = 0;
++	native_cpuid(&eax, &ebx, &ecx, &edx);
++	if (eax >= 0x80000008) {
++		eax = 0x80000008;
++		native_cpuid(&eax, &ebx, &ecx, &edx);
++		max_physaddr_bits = (u8)eax & 0xff;
++	}
++
++	return max_physaddr_bits;
++}
 diff --git a/arch/x86/kvm/vmx/pkvm/hyp/memory.h b/arch/x86/kvm/vmx/pkvm/hyp/memory.h
-index 4a75d8dff1b3..a95ae5f71841 100644
+index a95ae5f71841..b1062f3703e3 100644
 --- a/arch/x86/kvm/vmx/pkvm/hyp/memory.h
 +++ b/arch/x86/kvm/vmx/pkvm/hyp/memory.h
-@@ -22,6 +22,7 @@ bool mem_range_included(struct mem_range *child, struct mem_range *parent);
+@@ -32,4 +32,6 @@ int write_gva(struct kvm_vcpu *vcpu, gva_t gva, void *addr,
+ int read_gpa(struct kvm_vcpu *vcpu, gpa_t gpa, void *addr, unsigned int bytes);
+ int write_gpa(struct kvm_vcpu *vcpu, gpa_t gpa, void *addr, unsigned int bytes);
  
- #include <linux/kvm_host.h>
- void *host_gpa2hva(unsigned long gpa);
-+unsigned long host_gpa2hpa(unsigned long gpa);
- int gva2gpa(struct kvm_vcpu *vcpu, gva_t gva, gpa_t *gpa,
- 		u32 access, struct x86_exception *exception);
- int read_gva(struct kvm_vcpu *vcpu, gva_t gva, void *addr,
-diff --git a/arch/x86/kvm/vmx/pkvm/hyp/nested.c b/arch/x86/kvm/vmx/pkvm/hyp/nested.c
-index 429bfe7bb309..68eddb459cfa 100644
---- a/arch/x86/kvm/vmx/pkvm/hyp/nested.c
-+++ b/arch/x86/kvm/vmx/pkvm/hyp/nested.c
-@@ -9,6 +9,7 @@
- #include "nested.h"
- #include "cpu.h"
- #include "vmx.h"
-+#include "ept.h"
- #include "debug.h"
- 
- /*
-@@ -704,6 +705,18 @@ static void nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
- 	}
- }
- 
-+static void setup_guest_ept(struct shadow_vcpu_state *shadow_vcpu, u64 guest_eptp)
-+{
-+	struct vmcs12 *vmcs12 = (struct vmcs12 *)shadow_vcpu->cached_vmcs12;
++u64 get_max_physaddr_bits(void);
 +
-+	if (!is_valid_eptp(guest_eptp))
-+		pkvm_guest_ept_deinit(shadow_vcpu);
-+	else if (vmcs12->ept_pointer != guest_eptp) {
-+		pkvm_guest_ept_deinit(shadow_vcpu);
-+		pkvm_guest_ept_init(shadow_vcpu, guest_eptp);
-+	}
-+}
-+
- int handle_vmxon(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
-@@ -908,6 +921,9 @@ int handle_vmwrite(struct kvm_vcpu *vcpu)
- 			if (field >= GUEST_ES_AR_BYTES && field <= GUEST_TR_AR_BYTES)
- 				value &= 0x1f0ff;
- 
-+			if (field == EPT_POINTER)
-+				setup_guest_ept(cur_shadow_vcpu, value);
-+
- 			vmcs12_write_any(vmcs12, field, offset, value);
- 
- 			if (is_emulated_fields(field)) {
-diff --git a/arch/x86/kvm/vmx/pkvm/hyp/pkvm_hyp.h b/arch/x86/kvm/vmx/pkvm/hyp/pkvm_hyp.h
-index a1f3644a4a34..f891660d9085 100644
---- a/arch/x86/kvm/vmx/pkvm/hyp/pkvm_hyp.h
-+++ b/arch/x86/kvm/vmx/pkvm/hyp/pkvm_hyp.h
-@@ -41,6 +41,9 @@ struct shadow_vcpu_state {
- 
- 	struct vcpu_vmx vmx;
- 
-+	/* represents for the virtual EPT configured by kvm-high */
-+	struct pkvm_pgtable vept;
-+
- 	/* assume vmcs02 is one page */
- 	u8 vmcs02[PAGE_SIZE] __aligned(PAGE_SIZE);
- 	u8 cached_vmcs12[VMCS12_SIZE] __aligned(PAGE_SIZE);
+ #endif
 -- 
 2.25.1
 
