@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA6D36B69D1
-	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 19:07:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0247E6B69D2
+	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 19:07:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232177AbjCLSHM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Mar 2023 14:07:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48552 "EHLO
+        id S232194AbjCLSHP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Mar 2023 14:07:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232316AbjCLSFf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Mar 2023 14:05:35 -0400
+        with ESMTP id S232323AbjCLSFg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Mar 2023 14:05:36 -0400
 Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32401521CC;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 325DB521CD;
         Sun, 12 Mar 2023 11:01:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1678644080; x=1710180080;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=VIPx1RHWDVqaqcc5r1WiXZcpi7D/sWrbLLs3e0/kfIA=;
-  b=YxHvdFkIqFqITkw8qewrJfklj+fmEWqW37wcFwnDEkcoY+PcVPgJuqXA
-   hFGK4Rs7xA7MJSinvq6FMtOyThfQqXP/ZtzaoGQeO8CVGGrpqXMd7sl4k
-   ZBEh9uCv8hWCjuYc+ujYtOWXG84O1hBAoA7OuJDGzvd6C24qNR1rMxoLW
-   G9fCn15o5g15CHDFknYyCX1+jCapZkStGMbap3DBh4FjGJjs6Lnno1OgP
-   6S0xxLxHNYNuxNZ5DfLD4K0FDw473P0zRYfXVNjtKiz2RMyCGa6OvaQXE
-   N6rhg3n9xd3bejiLA2ed7OsPPaa0wJjHDqkUHzXThrg2aYrkC8T2XDWf7
+  bh=jHMqhN9ugEGh0NufyWtBJEiXKjl22/YZnuAcWnYx9WU=;
+  b=bFO4DTGlAKvEuL20S8pCVOL4/26nHpF7Qtj728GtzW4gJAm6SUQCnM+F
+   8J1UTeeZD/tvWX5D+AN/nBLKRMPlWc/jC2lIgwz3//3vbMo0YJ6PzKGi7
+   oVuLGB09HLOdE+jspmxfzHrhc43QHp+lka4hXIeTZqOn+j9J6gVf1z9ZE
+   xs3NTdbhkcQeU+PGc2JY+JPUwchjuz3VLlw7hCGz0p5/W+IJuBktLfMT2
+   IqSIQMhMGukowx9U8HAThZuWbrCXglunWEyMDc73njU+xmrYtz46DmMgq
+   91q19AmT6fKKD4pR4xASo0k3m8+H94tiR8X20xwNv20i6POib9LEB6lfr
    A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="316660152"
+X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="316660156"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="316660152"
+   d="scan'208";a="316660156"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
   by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 10:58:19 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="742596875"
+X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="742596878"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="742596875"
+   d="scan'208";a="742596878"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 10:58:18 -0700
 From:   isaku.yamahata@intel.com
@@ -47,9 +47,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         David Matlack <dmatlack@google.com>,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>
-Subject: [PATCH v13 112/113] RFC: KVM: TDX: Make busy with S-EPT on entry bug
-Date:   Sun, 12 Mar 2023 10:57:16 -0700
-Message-Id: <13a767dcac55d2df9a8b747be178452399d5d3b4.1678643052.git.isaku.yamahata@intel.com>
+Subject: [PATCH v13 113/113] [MARKER] the end of (the first phase of) TDX KVM patch series
+Date:   Sun, 12 Mar 2023 10:57:17 -0700
+Message-Id: <af455bd9233d89034be3007550c0209df72914f1.1678643052.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1678643051.git.isaku.yamahata@intel.com>
 References: <cover.1678643051.git.isaku.yamahata@intel.com>
@@ -66,51 +66,64 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-TDX module has mitigation against zero-step attacks or single-step attacks.
-When the TDX module finds repeated EPT violations on the same guest RIP,
-i.e. no advance in guest, it starts to suspect the attack.  The mitigation
-logic on the next entry tries to take the lock of S-EPT.  It may result in
-an error of TDX_OPERAND_BUSY | TDX_OPERAND_ID_SEPT.  As KVM shouldn't
-spuriously zap private S-EPT so that guest can make progress, KVM
-shouldn't cause the TDX module to trigger the mitigation.  Make
-(TDX_OPERAND_BUSY | TDX_OPERAND_ID_SEPT) on entry KVM bug.
+This empty commit is to mark the end of (the first phase of) patch series
+of TDX KVM support.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
-- This patch is RFC because this is only lightly tested and stress test
-  isn't done.
----
- arch/x86/kvm/vmx/tdx.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+ Documentation/virt/kvm/index.rst              |  1 -
+ .../virt/kvm/intel-tdx-layer-status.rst       | 33 -------------------
+ 2 files changed, 34 deletions(-)
+ delete mode 100644 Documentation/virt/kvm/intel-tdx-layer-status.rst
 
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 8e392bc3330b..b668f06bbb64 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1670,8 +1670,20 @@ int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
- {
- 	union tdx_exit_reason exit_reason = to_tdx(vcpu)->exit_reason;
+diff --git a/Documentation/virt/kvm/index.rst b/Documentation/virt/kvm/index.rst
+index 40ffc25f3cd1..eafacbff1f4e 100644
+--- a/Documentation/virt/kvm/index.rst
++++ b/Documentation/virt/kvm/index.rst
+@@ -22,4 +22,3 @@ KVM
  
--	/* See the comment of tdh_sept_seamcall(). */
--	if (unlikely(exit_reason.full == (TDX_OPERAND_BUSY | TDX_OPERAND_ID_SEPT)))
-+	/*
-+	 * See the comment of tdh_sept_seamcall().
-+	 * TDX module has mitigation against zero-step attacks or single-step
-+	 * attacks.  When the TDX module finds repeated EPT violations on the
-+	 * same guest RIP, i.e. no advance in guest, it starts to suspect the
-+	 * attack.  The mitigation logic on the next entry tries to take the
-+	 * lock of S-EPT.  It may result in an error of (TDX_OPERAND_BUSY |
-+	 * TDX_OPERAND_ID_SEPT).  As KVM shouldn't spuriously zap private S-EPT
-+	 * so that guest can make progress, KVM shouldn't cause the TDX module
-+	 * to trigger the mitigation.  Make (TDX_OPERAND_BUSY |
-+	 * TDX_OPERAND_ID_SEPT) on entry KVM bug.
-+	 */
-+	if (KVM_BUG_ON(exit_reason.full == (TDX_OPERAND_BUSY | TDX_OPERAND_ID_SEPT),
-+		       vcpu->kvm))
- 		return 1;
- 
- 	if (unlikely(exit_reason.full == TDX_SEAMCALL_UD)) {
+    intel-tdx
+    tdx-tdp-mmu
+-   intel-tdx-layer-status.rst
+diff --git a/Documentation/virt/kvm/intel-tdx-layer-status.rst b/Documentation/virt/kvm/intel-tdx-layer-status.rst
+deleted file mode 100644
+index 7a16fa284b6f..000000000000
+--- a/Documentation/virt/kvm/intel-tdx-layer-status.rst
++++ /dev/null
+@@ -1,33 +0,0 @@
+-.. SPDX-License-Identifier: GPL-2.0
+-
+-===================================
+-Intel Trust Dodmain Extensions(TDX)
+-===================================
+-
+-Layer status
+-============
+-What qemu can do
+-----------------
+-- TDX VM TYPE is exposed to Qemu.
+-- Qemu can create/destroy guest of TDX vm type.
+-- Qemu can create/destroy vcpu of TDX vm type.
+-- Qemu can populate initial guest memory image.
+-- Qemu can finalize guest TD.
+-- Qemu can start to run vcpu. But vcpu can not make progress yet.
+-
+-Patch Layer status
+-------------------
+-  Patch layer                          Status
+-
+-* TDX, VMX coexistence:                 Applied
+-* TDX architectural definitions:        Applied
+-* TD VM creation/destruction:           Applied
+-* TD vcpu creation/destruction:         Applied
+-* TDX EPT violation:                    Applied
+-* TD finalization:                      Applied
+-* TD vcpu enter/exit:                   Applied
+-* TD vcpu interrupts/exit/hypercall:    Not yet
+-
+-* KVM MMU GPA shared bits:              Applied
+-* KVM TDP refactoring for TDX:          Applied
+-* KVM TDP MMU hooks:                    Applied
 -- 
 2.25.1
 
