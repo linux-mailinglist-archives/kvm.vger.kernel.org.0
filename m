@@ -2,71 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C17A76B64E1
-	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 11:21:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CBBA16B64EA
+	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 11:29:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229946AbjCLKVU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Mar 2023 06:21:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57668 "EHLO
+        id S229906AbjCLK3X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Mar 2023 06:29:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229756AbjCLKVS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Mar 2023 06:21:18 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98632392A9;
-        Sun, 12 Mar 2023 03:21:17 -0700 (PDT)
+        with ESMTP id S229614AbjCLK3U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Mar 2023 06:29:20 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97FA837577;
+        Sun, 12 Mar 2023 03:29:19 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 27EF660EA5;
-        Sun, 12 Mar 2023 10:21:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D709C433D2;
-        Sun, 12 Mar 2023 10:21:16 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 49D13B8074D;
+        Sun, 12 Mar 2023 10:29:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D83A3C433D2;
+        Sun, 12 Mar 2023 10:29:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678616476;
-        bh=j/D7OCr3A6Ye/wZ/o+dAr/WEgQ5exDAy5KhgPofXXFM=;
+        s=k20201202; t=1678616956;
+        bh=aSQAHnGftmgjvVgaTHrVDh6VUtyePFdAf7NI0ZkUpFE=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=lAPfnhPBiBCNTCkuMzDEtJiee2ZP9re4OIfUEE8846ALE1YcKepPf3JlgXciXD3Se
-         5nq2eExflrWtSur1Pk5z0AG2Rquc5w1mUC/gwHFezG2M7Pl3/NCVFbp/SAl7NNwhQL
-         V2/qIpHEKMUZ1bM8fbzB3EHTum9LyxWBDt2qtENYvlL7j4kHtR7pb9GWfoQSS2BOfc
-         5eDGs33fKvoqlvUmd3W+/NerypoKsnCv2KD+pkgsD5iiYfP+EJSexqO6LLe8rzzvPF
-         k7aRVDookS4R1saZ2ZlF9bYT9jCSl8xK/pBcnk2FXMUuqNO4yeFGnoQ8iC0X5/6vgd
-         koTOfGJorq4Lg==
+        b=A1hM2L72FEiLsJdNdKRTCnVOURRRH/9zZF9irtqvQpEkX01wEH+6If3trtpJu7+Hl
+         Pe4gW2xNJk2bLCWr05319WycfTg5fY7SphFt3vgqXsFm+ozWSipiw46UBxfix4JAev
+         YVMkryuxVlI2A3K+g8L8wqzEQMVYiBIEPRw+jVJctfQc/4Ek5kslu/o3A4M0o7pqR0
+         pGcq2Kg3VqE2GYAcZswKhXP/NTX3wv/A787HUJ9VMR126zJRAkX4VOiptOV3odEhO5
+         VeY2ANQesQ8N7ZQYdp0t+uBg3A2hDeFEk/13/NkFd/HqoIf07IVXWhc6jpNDCr1o15
+         NUjUpolPf4FrA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pbIpF-00GyNO-PA;
-        Sun, 12 Mar 2023 10:21:13 +0000
-Date:   Sun, 12 Mar 2023 10:21:12 +0000
-Message-ID: <87fsaa5kyv.wl-maz@kernel.org>
+        id 1pbIwy-00GyR2-D6;
+        Sun, 12 Mar 2023 10:29:14 +0000
+Date:   Sun, 12 Mar 2023 10:29:11 +0000
+Message-ID: <87edpu5klk.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Oliver Upton <oliver.upton@linux.dev>,
+To:     Mark Brown <broonie@kernel.org>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
         James Morse <james.morse@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH 2/2] KVM: Don't enable hardware after a restart/shutdown is initiated
-In-Reply-To: <20230310221414.811690-3-seanjc@google.com>
-References: <20230310221414.811690-1-seanjc@google.com>
-        <20230310221414.811690-3-seanjc@google.com>
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: selftests: Add coverage of MTE system registers
+In-Reply-To: <20230308-kvm-arm64-test-mte-regs-v1-1-f92a377e486f@kernel.org>
+References: <20230308-kvm-arm64-test-mte-regs-v1-1-f92a377e486f@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, anup@brainfault.org, atishp@atishpatra.org, kvm-riscv@lists.infradead.org
+X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,55 +71,114 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 10 Mar 2023 22:14:14 +0000,
-Sean Christopherson <seanjc@google.com> wrote:
+On Wed, 08 Mar 2023 17:12:26 +0000,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> Reject hardware enabling, i.e. VM creation, if a restart/shutdown has
-> been initiated to avoid re-enabling hardware between kvm_reboot() and
-> machine_{halt,power_off,restart}().  The restart case is especially
-> problematic (for x86) as enabling VMX (or clearing GIF in KVM_RUN on
-> SVM) blocks INIT, which results in the restart/reboot hanging as BIOS
-> is unable to wake and rendezvous with APs.
+> Verify that a guest with MTE has access to the MTE registers. Since MTE is
+> enabled as a VM wide capability we need to add support for doing that in
+> the process.
 > 
-> Note, this bug, and the original issue that motivated the addition of
-> kvm_reboot(), is effectively limited to a forced reboot, e.g. `reboot -f`.
-> In a "normal" reboot, userspace will gracefully teardown userspace before
-> triggering the kernel reboot (modulo bugs, errors, etc), i.e. any process
-> that might do ioctl(KVM_CREATE_VM) is long gone.
-> 
-> Fixes: 8e1c18157d87 ("KVM: VMX: Disable VMX when system shutdown")
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
 > ---
->  virt/kvm/kvm_main.c | 17 ++++++++++++++++-
->  1 file changed, 16 insertions(+), 1 deletion(-)
+>  tools/testing/selftests/kvm/aarch64/get-reg-list.c | 33 ++++++++++++++++++++++
+>  1 file changed, 33 insertions(+)
 > 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 6cdfbb2c641b..b2bf4c105181 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -5182,7 +5182,20 @@ static void hardware_disable_all(void)
->  static int hardware_enable_all(void)
->  {
->  	atomic_t failed = ATOMIC_INIT(0);
-> -	int r = 0;
-> +	int r;
+> diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> index d287dd2cac0a..63d6a9046702 100644
+> --- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> +++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> @@ -42,6 +42,7 @@ struct reg_sublist {
+>  	long capability;
+>  	int feature;
+>  	bool finalize;
+> +	bool enable_capability;
+>  	__u64 *regs;
+>  	__u64 regs_n;
+>  	__u64 *rejects_set;
+> @@ -404,6 +405,18 @@ static void check_supported(struct vcpu_config *c)
+>  	}
+>  }
+>  
+> +static void enable_capabilities(struct kvm_vm *vm, struct vcpu_config *c)
+> +{
+> +	struct reg_sublist *s;
 > +
-> +	/*
-> +	 * Do not enable hardware virtualization if the system is going down.
-> +	 * If userspace initiated a forced reboot, e.g. reboot -f, then it's
-> +	 * possible for an in-flight KVM_CREATE_VM to trigger hardware enabling
-> +	 * after kvm_reboot() is called.  Note, this relies on system_state
-> +	 * being set _before_ kvm_reboot(), which is why KVM uses a syscore ops
-> +	 * hook instead of registering a dedicated reboot notifier (the latter
-> +	 * runs before system_state is updated).
-> +	 */
-> +	if (system_state == SYSTEM_HALT || system_state == SYSTEM_POWER_OFF ||
-> +	    system_state == SYSTEM_RESTART)
-> +		return -EBUSY;
+> +	for_each_sublist(c, s) {
+> +		if (!s->enable_capability)
+> +			continue;
+> +
+> +		vm_enable_cap(vm, s->capability, 1);
+> +	}
+> +}
+> +
+>  static bool print_list;
+>  static bool print_filtered;
+>  static bool fixup_core_regs;
+> @@ -420,6 +433,7 @@ static void run_test(struct vcpu_config *c)
+>  	check_supported(c);
+>  
+>  	vm = vm_create_barebones();
+> +	enable_capabilities(vm, c);
+>  	prepare_vcpu_init(c, &init);
+>  	vcpu = __vm_vcpu_add(vm, 0);
+>  	aarch64_vcpu_setup(vcpu, &init);
+> @@ -1049,6 +1063,13 @@ static __u64 pauth_generic_regs[] = {
+>  	ARM64_SYS_REG(3, 0, 2, 3, 1),	/* APGAKEYHI_EL1 */
+>  };
+>  
+> +static __u64 mte_regs[] = {
+> +	ARM64_SYS_REG(3, 0, 1, 0, 5),	/* RGSR_EL1 */
+> +	ARM64_SYS_REG(3, 0, 1, 0, 6),	/* GCR_EL1 */
+> +	ARM64_SYS_REG(3, 0, 5, 6, 0),	/* TFSR_EL1 */
+> +	ARM64_SYS_REG(3, 0, 5, 6, 1),	/* TFSRE0_EL1 */
+> +};
+> +
+>  #define BASE_SUBLIST \
+>  	{ "base", .regs = base_regs, .regs_n = ARRAY_SIZE(base_regs), }
+>  #define VREGS_SUBLIST \
+> @@ -1075,6 +1096,9 @@ static __u64 pauth_generic_regs[] = {
+>  		.regs		= pauth_generic_regs,			\
+>  		.regs_n		= ARRAY_SIZE(pauth_generic_regs),	\
+>  	}
+> +#define MTE_SUBLIST \
+> +	{ "mte", .capability = KVM_CAP_ARM_MTE, .enable_capability = true,  \
+> +	  .regs = mte_regs, .regs_n = ARRAY_SIZE(mte_regs), }
+>  
+>  static struct vcpu_config vregs_config = {
+>  	.sublists = {
+> @@ -1123,6 +1147,14 @@ static struct vcpu_config pauth_pmu_config = {
+>  	{0},
+>  	},
+>  };
+> +static struct vcpu_config mte_config = {
+> +	.sublists = {
+> +	BASE_SUBLIST,
+> +	VREGS_SUBLIST,
+> +	MTE_SUBLIST,
+> +	{0},
+> +	},
+> +};
+>  
+>  static struct vcpu_config *vcpu_configs[] = {
+>  	&vregs_config,
+> @@ -1131,5 +1163,6 @@ static struct vcpu_config *vcpu_configs[] = {
+>  	&sve_pmu_config,
+>  	&pauth_config,
+>  	&pauth_pmu_config,
+> +	&mte_config,
+>  };
+>  static int vcpu_configs_n = ARRAY_SIZE(vcpu_configs);
+> 
 
-Since we now seem to be relying on system_state for most things, is
-there any use for 'kvm_rebooting' other than the ease of evaluation in
-__svm_vcpu_run?
+Is there any reason why we sidestep the combinations of MTE with PAuth
+and PMU? I know this leads to an exponential set growth, but this is
+the very purpose of this test, and we found bugs related to this in
+the past.
+
+A good first step would be to be able to build these combinations
+dynamically, and only then add new sublists to the mix.
+
+Thanks,
 
 	M.
 
