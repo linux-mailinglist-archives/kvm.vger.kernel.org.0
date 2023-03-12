@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C6B096B691D
-	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 18:58:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A7DE6B691F
+	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 18:58:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230489AbjCLR6o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Mar 2023 13:58:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34764 "EHLO
+        id S230325AbjCLR6r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Mar 2023 13:58:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230325AbjCLR57 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Mar 2023 13:57:59 -0400
+        with ESMTP id S230365AbjCLR6J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Mar 2023 13:58:09 -0400
 Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 483265273;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 876BE2718;
         Sun, 12 Mar 2023 10:57:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1678643878; x=1710179878;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=qU21UKhDGbp/a9bzzUyBFiUkgX3HnnnGY5AjP6sc/9s=;
-  b=B+akTnGqA7ZXA9OmjBNQf5o3Rhtja+QlJUjEBjJlPgdmpu/MYPmsVMnM
-   K7LCfL/ZlyUF0ciJ4raAePxVnWvwhExyv/oxScxwMQRzmV+2slWn3vjZk
-   O8LiRBDk178nUAl0CVgANPcLa2QJ8r9ywqvqb1T1pN9X8s6BW9f6rqMiQ
-   rGHvWLRaCgGM5BcUtAc0yshVQThyzDb9OyL0VcPYZff2mlAVedrlJm0kg
-   HmLKp6L7/fvJGLrnXXkdN07u0B9SFxYB8NWGpdLn59E3AneGkp4I8bMMy
-   5F1p/vDtElMGd6qUUiqMC87TrGERddgxA99Pa7xxLBMHJ+UkeKRmNNCYI
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="320863586"
+  bh=DLPNi9jXjbr4HdbjAnuHBOpBxwIVUIeOA5wtFcSAGOI=;
+  b=auMJF7bLbNiUEZCNocfH3rXW+LdKG+KxTDhHHwf2WtDEyClFwUYmr/KZ
+   i/ny1a4FJGcRBsrmufrMyAGUg9CwZ9kHelqRH5+HoCa8vUUNtxu2/HCQs
+   Qq3eMeBhMuWr3nPHM3diwKJC6vcS6INME+8ccZ/mEuRjKD6p+f057V7kp
+   5O1b6noJXtEtsK54BSbGzyAywDykDGQkpOkS0W1gHyIzzx2X8OzbIVGN4
+   Eqvm7/tJTmsfGYA7HEzrcrpe7QNmizAPVYh2QCjDjrfuDThwhQUsv+Sav
+   SQVZ7IpiXBW6bkz2qPW/AJTJ0vcYbaGg5/wDxbGtORLaXiVIoziFFwKrJ
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="320863590"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="320863586"
+   d="scan'208";a="320863590"
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
   by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 10:57:52 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="628396942"
+X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="628396945"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="628396942"
+   d="scan'208";a="628396945"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 10:57:51 -0700
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 10:57:52 -0700
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
@@ -47,9 +47,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         David Matlack <dmatlack@google.com>,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>
-Subject: [PATCH v13 012/113] KVM: TDX: Add helper functions to print TDX SEAMCALL error
-Date:   Sun, 12 Mar 2023 10:55:36 -0700
-Message-Id: <d8463e29541c003fe08a1b1b2d2080334b88312b.1678643052.git.isaku.yamahata@intel.com>
+Subject: [PATCH v13 013/113] [MARKER] The start of TDX KVM patch series: TD VM creation/destruction
+Date:   Sun, 12 Mar 2023 10:55:37 -0700
+Message-Id: <6e976d876fa81b4e25c6f29e74d9c91efdb5c0b6.1678643052.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1678643051.git.isaku.yamahata@intel.com>
 References: <cover.1678643051.git.isaku.yamahata@intel.com>
@@ -66,80 +66,29 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Add helper functions to print out errors from the TDX module in a uniform
-manner.
+This empty commit is to mark the start of patch series of TD VM
+creation/destruction.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/Makefile        |  2 +-
- arch/x86/kvm/vmx/tdx_error.c | 21 +++++++++++++++++++++
- arch/x86/kvm/vmx/tdx_ops.h   |  5 +++++
- 3 files changed, 27 insertions(+), 1 deletion(-)
- create mode 100644 arch/x86/kvm/vmx/tdx_error.c
+ Documentation/virt/kvm/intel-tdx-layer-status.rst | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index 4b01ab842ab7..e3354b784e10 100644
---- a/arch/x86/kvm/Makefile
-+++ b/arch/x86/kvm/Makefile
-@@ -25,7 +25,7 @@ kvm-$(CONFIG_KVM_SMM)	+= smm.o
- kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
- 			   vmx/hyperv.o vmx/nested.o vmx/posted_intr.o vmx/main.o
- kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
--kvm-intel-$(CONFIG_INTEL_TDX_HOST)	+= vmx/tdx.o
-+kvm-intel-$(CONFIG_INTEL_TDX_HOST)	+= vmx/tdx.o vmx/tdx_error.o
+diff --git a/Documentation/virt/kvm/intel-tdx-layer-status.rst b/Documentation/virt/kvm/intel-tdx-layer-status.rst
+index f11ea701dc19..098150da6ea2 100644
+--- a/Documentation/virt/kvm/intel-tdx-layer-status.rst
++++ b/Documentation/virt/kvm/intel-tdx-layer-status.rst
+@@ -16,8 +16,8 @@ Patch Layer status
+   Patch layer                          Status
  
- kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o \
- 			   svm/sev.o svm/hyperv.o
-diff --git a/arch/x86/kvm/vmx/tdx_error.c b/arch/x86/kvm/vmx/tdx_error.c
-new file mode 100644
-index 000000000000..574b72d34e1e
---- /dev/null
-+++ b/arch/x86/kvm/vmx/tdx_error.c
-@@ -0,0 +1,21 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* functions to record TDX SEAMCALL error */
-+
-+#include <linux/kernel.h>
-+#include <linux/bug.h>
-+
-+#include "tdx_ops.h"
-+
-+void pr_tdx_error(u64 op, u64 error_code, const struct tdx_module_output *out)
-+{
-+	if (!out) {
-+		pr_err_ratelimited("SEAMCALL[%lld] failed: 0x%llx\n",
-+				   op, error_code);
-+		return;
-+	}
-+
-+	pr_err_ratelimited("SEAMCALL[%lld] failed: 0x%llx RCX 0x%llx, RDX 0x%llx,"
-+			   " R8 0x%llx, R9 0x%llx, R10 0x%llx, R11 0x%llx\n",
-+			   op, error_code,
-+			   out->rcx, out->rdx, out->r8, out->r9, out->r10, out->r11);
-+}
-diff --git a/arch/x86/kvm/vmx/tdx_ops.h b/arch/x86/kvm/vmx/tdx_ops.h
-index 70e569838e1c..177f444ebbb3 100644
---- a/arch/x86/kvm/vmx/tdx_ops.h
-+++ b/arch/x86/kvm/vmx/tdx_ops.h
-@@ -9,6 +9,7 @@
- #include <asm/cacheflush.h>
- #include <asm/asm.h>
- #include <asm/kvm_host.h>
-+#include <asm/tdx.h>
- 
- #include "tdx_errno.h"
- #include "tdx_arch.h"
-@@ -33,6 +34,10 @@ static inline u64 kvm_seamcall(u64 op, u64 rcx, u64 rdx, u64 r8, u64 r9,
- 	return ret;
- }
- 
-+#ifdef CONFIG_INTEL_TDX_HOST
-+void pr_tdx_error(u64 op, u64 error_code, const struct tdx_module_output *out);
-+#endif
-+
- static inline u64 tdh_mng_addcx(hpa_t tdr, hpa_t addr)
- {
- 	clflush_cache_range(__va(addr), PAGE_SIZE);
+ * TDX, VMX coexistence:                 Applied
+-* TDX architectural definitions:        Applying
+-* TD VM creation/destruction:           Not yet
++* TDX architectural definitions:        Applied
++* TD VM creation/destruction:           Applying
+ * TD vcpu creation/destruction:         Not yet
+ * TDX EPT violation:                    Not yet
+ * TD finalization:                      Not yet
 -- 
 2.25.1
 
