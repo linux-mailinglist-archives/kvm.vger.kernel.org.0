@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 252126B6473
-	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 10:57:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B15536B6474
+	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 10:57:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230219AbjCLJ5Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Mar 2023 05:57:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37900 "EHLO
+        id S230107AbjCLJ5W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Mar 2023 05:57:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbjCLJ4u (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Mar 2023 05:56:50 -0400
+        with ESMTP id S229983AbjCLJ4z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Mar 2023 05:56:55 -0400
 Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44EC05370A
-        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 01:56:19 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B50C95372E
+        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 01:56:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678614979; x=1710150979;
+  t=1678614983; x=1710150983;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=sPyyqVEcrUlAgQrngh8xr8aDfZR/mRlEFehSuIczKRw=;
-  b=Wj76IR6KWCi7cSFOllLzN2mtoE+cuYdEyG2Wm/5e1f+HkpnbjmwA6Uto
-   6ahHrlrKtsc3lLbsMG2nh4LCCDswNUw9QCerlYvgRGG7uNEjDWLPog5f3
-   nUoTBv6TT1CyTiX/hsrNLxB0F7iY5fQLGoH/L4/D9Pt1aDB1JlKGGRdJv
-   QKyXveTMZQ2hJVLr11QVAEVTZcdBqFnkQUgh7jR1IBGwtJZdBU0+sT1Fg
-   0wDkVUU1ze7617egSb9Xn7PoH9z5B/uLgJXW4WZV0OgrjEaC2IVAmQ1yw
-   CSbfhxYO+l8/rpQpeJ0bnVPi/a9aUCDCxLRN+ds+WzLe61N7slbwavtH6
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="316623059"
+  bh=0UXC/P7kOOvt5TTOAefEQzZTDPHNaq6f5o4PmwUXVjo=;
+  b=ZVEOM6fcZN0jR0Nejox60sA4+2ou7Z/hYVkpu2VheyUHwDXepdPPvaMT
+   0B09BlaFnvaHxlYEisbmCUopXhXk9mXc4sV+xnNiUZy8qaKh7okbLBTVc
+   z0TLi8/DxcpJ4sdxtxeu4wddpUFeBQSRONieJra9NnJKjBVxWaUGiJ7LC
+   wI38MNXm8pZrYEqqaEzJtGTSubfp9WbPJm5hh/NqxKnk/x5oAiRmeFLhA
+   8byi1B3lB0KB8bUT7xeibrq10n/dGHxu05YmREeMZZH4sjS0ayGRq9FRR
+   yxaN5hhsAj9gFyMFtK49y7P7NtgjMz+x4uqPASPv5ybcJD7gj5oPe7+yq
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="316623063"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="316623059"
+   d="scan'208";a="316623063"
 Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:55:27 -0800
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:55:28 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="655660844"
+X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="655660849"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="655660844"
+   d="scan'208";a="655660849"
 Received: from jiechen-ubuntu-dev.sh.intel.com ([10.239.154.150])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:55:25 -0800
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:55:27 -0800
 From:   Jason Chen CJ <jason.cj.chen@intel.com>
 To:     kvm@vger.kernel.org
 Cc:     Jason Chen CJ <jason.cj.chen@intel.com>,
         Shaoqin Huang <shaoqin.huang@intel.com>,
         Chuanxiao Dong <chuanxiao.dong@intel.com>
-Subject: [RFC PATCH part-3 18/22] pkvm: x86: Introduce host EPT pgtable support
-Date:   Mon, 13 Mar 2023 02:01:48 +0800
-Message-Id: <20230312180152.1778338-19-jason.cj.chen@intel.com>
+Subject: [RFC PATCH part-3 19/22] pkvm: x86: Create host EPT pgtable in init-finalise hypercall
+Date:   Mon, 13 Mar 2023 02:01:49 +0800
+Message-Id: <20230312180152.1778338-20-jason.cj.chen@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230312180152.1778338-1-jason.cj.chen@intel.com>
 References: <20230312180152.1778338-1-jason.cj.chen@intel.com>
@@ -61,216 +61,296 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-pKVM need to setup host EPT page table to isolate its memory from
-host VM.
+Create host EPT pgtable for pKVM, which ensure host VM keep accessing
+all system memory except pKVM ones - the code/data sections and
+reserved memory of pKVM.
 
-Add ept.c for pKVM, which provide APIs to enable host VM EPT pgtable
-mapping. As buddy page allocator is ready, use it for this host EPT
-pgtable.
+The memory pool of this host EPT pgtable is allocated from pKVM
+reserved memory. All system memory block in hyp_memory[] array is
+firstly mapped in host EPT, the holes among these memory blocks are also
+mapped in case for MMIO accessing. Then the code/data sections and
+reserved memory block of pKVM is unmapped to remove the host
+accessing.
 
-The tlb flush ops is still a TODO for host EPT, which need to shootdown
-all CPUs to make INVEPT.
+After host EPT pgtable got created, set host vcpu's EPT pointer to it.
+
+This patch also makes the init-finalise hypercall take effect at the end
+of pkvm_init.
 
 Signed-off-by: Shaoqin Huang <shaoqin.huang@intel.com>
 Signed-off-by: Chuanxiao Dong <chuanxiao.dong@intel.com>
 Signed-off-by: Jason Chen CJ <jason.cj.chen@intel.com>
 ---
- arch/x86/kvm/vmx/pkvm/hyp/Makefile |   2 +-
- arch/x86/kvm/vmx/pkvm/hyp/ept.c    | 151 +++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/pkvm/hyp/ept.h    |  15 +++
- 3 files changed, 167 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/pkvm/hyp/ept.c           |  2 +
+ arch/x86/kvm/vmx/pkvm/hyp/ept.h           |  5 ++
+ arch/x86/kvm/vmx/pkvm/hyp/init_finalise.c | 98 ++++++++++++++++++++++-
+ arch/x86/kvm/vmx/pkvm/hyp/vmx.h           | 48 +++++++++++
+ arch/x86/kvm/vmx/pkvm/include/pkvm.h      |  1 +
+ arch/x86/kvm/vmx/pkvm/pkvm_host.c         |  2 +-
+ 6 files changed, 153 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/pkvm/hyp/Makefile b/arch/x86/kvm/vmx/pkvm/hyp/Makefile
-index 383ddf75f50e..9a1cb483a55e 100644
---- a/arch/x86/kvm/vmx/pkvm/hyp/Makefile
-+++ b/arch/x86/kvm/vmx/pkvm/hyp/Makefile
-@@ -13,7 +13,7 @@ lib-dir		:= lib
- virt-dir	:= ../../../../../../$(KVM_PKVM)
- 
- pkvm-hyp-y	:= vmx_asm.o vmexit.o memory.o early_alloc.o pgtable.o mmu.o pkvm.o \
--		   init_finalise.o
-+		   init_finalise.o ept.o
- 
- pkvm-hyp-y	+= $(lib-dir)/memset_64.o
- pkvm-hyp-$(CONFIG_RETPOLINE)	+= $(lib-dir)/retpoline.o
 diff --git a/arch/x86/kvm/vmx/pkvm/hyp/ept.c b/arch/x86/kvm/vmx/pkvm/hyp/ept.c
-new file mode 100644
-index 000000000000..fd366cb1570f
---- /dev/null
+index fd366cb1570f..5b7b0d84b457 100644
+--- a/arch/x86/kvm/vmx/pkvm/hyp/ept.c
 +++ b/arch/x86/kvm/vmx/pkvm/hyp/ept.c
-@@ -0,0 +1,151 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2022 Intel Corporation
-+ */
+@@ -12,6 +12,7 @@
+ #include <pkvm.h>
+ #include <gfp.h>
+ 
++#include "pkvm_hyp.h"
+ #include "early_alloc.h"
+ #include "pgtable.h"
+ #include "ept.h"
+@@ -147,5 +148,6 @@ int pkvm_host_ept_init(struct pkvm_pgtable_cap *cap,
+ 	if (ret)
+ 		return ret;
+ 
++	pkvm_hyp->host_vm.ept = &host_ept;
+ 	return pkvm_pgtable_init(&host_ept, &host_ept_mm_ops, &ept_ops, cap, true);
+ }
+diff --git a/arch/x86/kvm/vmx/pkvm/hyp/ept.h b/arch/x86/kvm/vmx/pkvm/hyp/ept.h
+index 26220325feec..43c7e418db6a 100644
+--- a/arch/x86/kvm/vmx/pkvm/hyp/ept.h
++++ b/arch/x86/kvm/vmx/pkvm/hyp/ept.h
+@@ -5,6 +5,11 @@
+ #ifndef __PKVM_EPT_H
+ #define __PKVM_EPT_H
+ 
++#define HOST_EPT_DEF_MEM_PROT   (VMX_EPT_RWX_MASK |				\
++				(MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT))
++#define HOST_EPT_DEF_MMIO_PROT	(VMX_EPT_RWX_MASK |				\
++				(MTRR_TYPE_UNCACHABLE << VMX_EPT_MT_EPTE_SHIFT))
 +
-+#include <linux/types.h>
-+#include <linux/memblock.h>
-+#include <asm/kvm_pkvm.h>
-+#include <mmu.h>
-+#include <mmu/spte.h>
-+
-+#include <pkvm.h>
-+#include <gfp.h>
-+
-+#include "early_alloc.h"
-+#include "pgtable.h"
+ int pkvm_host_ept_map(unsigned long vaddr_start, unsigned long phys_start,
+ 		unsigned long size, int pgsz_mask, u64 prot);
+ int pkvm_host_ept_unmap(unsigned long vaddr_start, unsigned long phys_start,
+diff --git a/arch/x86/kvm/vmx/pkvm/hyp/init_finalise.c b/arch/x86/kvm/vmx/pkvm/hyp/init_finalise.c
+index dc4c0b6213ea..ae10d550448d 100644
+--- a/arch/x86/kvm/vmx/pkvm/hyp/init_finalise.c
++++ b/arch/x86/kvm/vmx/pkvm/hyp/init_finalise.c
+@@ -15,10 +15,13 @@
+ #include "memory.h"
+ #include "pgtable.h"
+ #include "mmu.h"
 +#include "ept.h"
++#include "vmx.h"
+ #include "debug.h"
+ 
+ void *pkvm_mmu_pgt_base;
+ void *pkvm_vmemmap_base;
++void *host_ept_pgt_base;
+ 
+ static int divide_memory_pool(phys_addr_t phys, unsigned long size)
+ {
+@@ -40,6 +43,11 @@ static int divide_memory_pool(phys_addr_t phys, unsigned long size)
+ 	if (!pkvm_mmu_pgt_base)
+ 		return -ENOMEM;
+ 
++	nr_pages = host_ept_pgtable_pages();
++	host_ept_pgt_base = pkvm_early_alloc_contig(nr_pages);
++	if (!host_ept_pgt_base)
++		return -ENOMEM;
 +
-+static struct hyp_pool host_ept_pool;
-+static struct pkvm_pgtable host_ept;
-+
-+static void flush_tlb_noop(void) { };
-+static void *host_ept_zalloc_page(void)
+ 	return 0;
+ }
+ 
+@@ -140,6 +148,77 @@ static int create_mmu_mapping(const struct pkvm_section sections[],
+ 	return 0;
+ }
+ 
++static int create_host_ept_mapping(void)
 +{
-+	return hyp_alloc_pages(&host_ept_pool, 0);
-+}
++	struct memblock_region *reg;
++	int ret, i;
++	unsigned long phys = 0;
++	u64 entry_prot;
 +
-+static void host_ept_get_page(void *vaddr)
-+{
-+	hyp_get_page(&host_ept_pool, vaddr);
-+}
-+
-+static void host_ept_put_page(void *vaddr)
-+{
-+	hyp_put_page(&host_ept_pool, vaddr);
-+}
-+
-+/*TODO: add tlb flush support for host ept */
-+struct pkvm_mm_ops host_ept_mm_ops = {
-+	.phys_to_virt = pkvm_phys_to_virt,
-+	.virt_to_phys = pkvm_virt_to_phys,
-+	.zalloc_page = host_ept_zalloc_page,
-+	.get_page = host_ept_get_page,
-+	.put_page = host_ept_put_page,
-+	.page_count = hyp_page_count,
-+	.flush_tlb = flush_tlb_noop,
-+};
-+
-+static bool ept_entry_present(void *ptep)
-+{
-+	u64 val = *(u64 *)ptep;
-+
-+	return !!(val & VMX_EPT_RWX_MASK);
-+}
-+
-+static bool ept_entry_huge(void *ptep)
-+{
-+	return is_large_pte(*(u64 *)ptep);
-+}
-+
-+static void ept_entry_mkhuge(void *ptep)
-+{
-+	*(u64 *)ptep |= PT_PAGE_SIZE_MASK;
-+}
-+
-+static unsigned long ept_entry_to_phys(void *ptep)
-+{
-+	return *(u64 *)ptep & SPTE_BASE_ADDR_MASK;
-+}
-+
-+static u64 ept_entry_to_prot(void *ptep)
-+{
-+	u64 prot = *(u64 *)ptep & ~(SPTE_BASE_ADDR_MASK);
-+
-+	return prot & ~PT_PAGE_SIZE_MASK;
-+}
-+
-+static int ept_entry_to_index(unsigned long vaddr, int level)
-+{
-+	return SPTE_INDEX(vaddr, level);
-+}
-+
-+static bool ept_entry_is_leaf(void *ptep, int level)
-+{
-+	if (level == PG_LEVEL_4K ||
-+		!ept_entry_present(ptep) ||
-+		ept_entry_huge(ptep))
-+		return true;
-+
-+	return false;
-+
-+}
-+
-+static int ept_level_entry_size(int level)
-+{
-+	return PAGE_SIZE / SPTE_ENT_PER_PAGE;
-+}
-+
-+static int ept_level_to_entries(int level)
-+{
-+	return SPTE_ENT_PER_PAGE;
-+}
-+
-+static unsigned long ept_level_to_size(int level)
-+{
-+	return KVM_HPAGE_SIZE(level);
-+}
-+
-+static void ept_set_entry(void *sptep, u64 spte)
-+{
-+	WRITE_ONCE(*(u64 *)sptep, spte);
-+}
-+
-+struct pkvm_pgtable_ops ept_ops = {
-+	.pgt_entry_present = ept_entry_present,
-+	.pgt_entry_huge = ept_entry_huge,
-+	.pgt_entry_mkhuge = ept_entry_mkhuge,
-+	.pgt_entry_to_phys = ept_entry_to_phys,
-+	.pgt_entry_to_prot = ept_entry_to_prot,
-+	.pgt_entry_to_index = ept_entry_to_index,
-+	.pgt_entry_is_leaf = ept_entry_is_leaf,
-+	.pgt_level_entry_size = ept_level_entry_size,
-+	.pgt_level_to_entries = ept_level_to_entries,
-+	.pgt_level_to_size = ept_level_to_size,
-+	.pgt_set_entry = ept_set_entry,
-+};
-+
-+int pkvm_host_ept_map(unsigned long vaddr_start, unsigned long phys_start,
-+		unsigned long size, int pgsz_mask, u64 prot)
-+{
-+	return pkvm_pgtable_map(&host_ept, vaddr_start, phys_start, size, pgsz_mask, prot);
-+}
-+
-+int pkvm_host_ept_unmap(unsigned long vaddr_start, unsigned long phys_start,
-+		unsigned long size)
-+{
-+	return pkvm_pgtable_unmap(&host_ept, vaddr_start, phys_start, size);
-+}
-+
-+int pkvm_host_ept_init(struct pkvm_pgtable_cap *cap,
-+		void *ept_pool_base, unsigned long ept_pool_pages)
-+{
-+	unsigned long pfn = __pkvm_pa(ept_pool_base) >> PAGE_SHIFT;
-+	int ret;
-+
-+	ret = hyp_pool_init(&host_ept_pool, pfn, ept_pool_pages, 0);
++	ret = pkvm_host_ept_init(&pkvm_hyp->ept_cap,
++			host_ept_pgt_base, host_ept_pgtable_pages());
 +	if (ret)
 +		return ret;
 +
-+	return pkvm_pgtable_init(&host_ept, &host_ept_mm_ops, &ept_ops, cap, true);
++	/*
++	 * Create EPT mapping for memory with WB + RWX property
++	 */
++	entry_prot = HOST_EPT_DEF_MEM_PROT;
++
++	for (i = 0; i < hyp_memblock_nr; i++) {
++		reg = &hyp_memory[i];
++		ret = pkvm_host_ept_map((unsigned long)reg->base,
++				  (unsigned long)reg->base,
++				  (unsigned long)reg->size,
++				  0, entry_prot);
++		if (ret)
++			return ret;
++	}
++
++	/*
++	 * The holes in memblocks are treated as MMIO with the
++	 * mapping UC + RWX.
++	 */
++	entry_prot = HOST_EPT_DEF_MMIO_PROT;
++	for (i = 0; i < hyp_memblock_nr; i++, phys = reg->base + reg->size) {
++		reg = &hyp_memory[i];
++		ret = pkvm_host_ept_map(phys, phys, (unsigned long)reg->base - phys,
++				  0, entry_prot);
++		if (ret)
++			return ret;
++	}
++
++	return 0;
 +}
-diff --git a/arch/x86/kvm/vmx/pkvm/hyp/ept.h b/arch/x86/kvm/vmx/pkvm/hyp/ept.h
++
++static int protect_pkvm_pages(const struct pkvm_section sections[],
++		       int section_sz, phys_addr_t phys, unsigned long size)
++{
++	int i, ret;
++
++	for (i = 0; i < section_sz; i++) {
++		u64 pa, size;
++
++		if (sections[i].type == PKVM_CODE_DATA_SECTIONS) {
++			pa = __pkvm_pa_symbol(sections[i].addr);
++			size = sections[i].size;
++			ret = pkvm_host_ept_unmap(pa, pa, size);
++			if (ret) {
++				pkvm_err("%s: failed to protect section\n", __func__);
++				return ret;
++			}
++		}
++	}
++
++	ret = pkvm_host_ept_unmap(phys, phys, size);
++	if (ret) {
++		pkvm_err("%s: failed to protect reserved memory\n", __func__);
++		return ret;
++	}
++
++	return 0;
++}
++
+ #define TMP_SECTION_SZ	16UL
+ int __pkvm_init_finalise(struct kvm_vcpu *vcpu, struct pkvm_section sections[],
+ 			 int section_sz)
+@@ -151,6 +230,7 @@ int __pkvm_init_finalise(struct kvm_vcpu *vcpu, struct pkvm_section sections[],
+ 	struct pkvm_section tmp_sections[TMP_SECTION_SZ];
+ 	phys_addr_t hyp_mem_base;
+ 	unsigned long hyp_mem_size = 0;
++	u64 eptp;
+ 
+ 	if (pkvm_init)
+ 		goto switch_pgt;
+@@ -188,15 +268,29 @@ int __pkvm_init_finalise(struct kvm_vcpu *vcpu, struct pkvm_section sections[],
+ 	if (ret)
+ 		goto out;
+ 
+-	/* TODO: setup host EPT page table */
++	ret = create_host_ept_mapping();
++	if (ret)
++		goto out;
++
++	ret = protect_pkvm_pages(tmp_sections, section_sz,
++			hyp_mem_base, hyp_mem_size);
++	if (ret)
++		goto out;
+ 
+ 	pkvm_init = true;
+ 
+ switch_pgt:
+-	/* switch mmu, TODO: switch EPT */
++	/* switch mmu */
+ 	vmcs_writel(HOST_CR3, pkvm_hyp->mmu->root_pa);
+ 	pcpu->cr3 = pkvm_hyp->mmu->root_pa;
+ 
++	/* enable ept */
++	eptp = pkvm_construct_eptp(pkvm_hyp->host_vm.ept->root_pa, pkvm_hyp->host_vm.ept->level);
++	secondary_exec_controls_setbit(&pkvm_host_vcpu->vmx, SECONDARY_EXEC_ENABLE_EPT);
++	vmcs_write64(EPT_POINTER, eptp);
++
++	ept_sync_global();
++
+ out:
+ 	return ret;
+ }
+diff --git a/arch/x86/kvm/vmx/pkvm/hyp/vmx.h b/arch/x86/kvm/vmx/pkvm/hyp/vmx.h
 new file mode 100644
-index 000000000000..26220325feec
+index 000000000000..c0a42cc56764
 --- /dev/null
-+++ b/arch/x86/kvm/vmx/pkvm/hyp/ept.h
-@@ -0,0 +1,15 @@
++++ b/arch/x86/kvm/vmx/pkvm/hyp/vmx.h
+@@ -0,0 +1,48 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (C) 2022 Intel Corporation
 + */
-+#ifndef __PKVM_EPT_H
-+#define __PKVM_EPT_H
 +
-+int pkvm_host_ept_map(unsigned long vaddr_start, unsigned long phys_start,
-+		unsigned long size, int pgsz_mask, u64 prot);
-+int pkvm_host_ept_unmap(unsigned long vaddr_start, unsigned long phys_start,
-+		unsigned long size);
-+int pkvm_host_ept_init(struct pkvm_pgtable_cap *cap, void *ept_pool_base,
-+		unsigned long ept_pool_pages);
++#ifndef __PKVM_VMX_H
++#define __PKVM_VMX_H
++
++static inline bool vmx_ept_capability_check(u32 bit)
++{
++	struct vmx_capability *vmx_cap = &pkvm_hyp->vmx_cap;
++
++	return vmx_cap->ept & bit;
++}
++
++static inline bool vmx_ept_has_4levels(void)
++{
++	return vmx_ept_capability_check(VMX_EPT_PAGE_WALK_4_BIT);
++}
++
++static inline bool vmx_ept_has_5levels(void)
++{
++	return vmx_ept_capability_check(VMX_EPT_PAGE_WALK_5_BIT);
++}
++
++static inline bool vmx_ept_has_mt_wb(void)
++{
++	return vmx_ept_capability_check(VMX_EPTP_WB_BIT);
++}
++
++static inline u64 pkvm_construct_eptp(unsigned long root_hpa, int level)
++{
++	u64 eptp = 0;
++
++	if ((level == 4) && vmx_ept_has_4levels())
++		eptp = VMX_EPTP_PWL_4;
++	else if ((level == 5) && vmx_ept_has_5levels())
++		eptp = VMX_EPTP_PWL_5;
++
++	if (vmx_ept_has_mt_wb())
++		eptp |= VMX_EPTP_MT_WB;
++
++	eptp |= (root_hpa & PAGE_MASK);
++
++	return eptp;
++}
 +
 +#endif
+diff --git a/arch/x86/kvm/vmx/pkvm/include/pkvm.h b/arch/x86/kvm/vmx/pkvm/include/pkvm.h
+index 8db295cf80c5..d0a7283b0e19 100644
+--- a/arch/x86/kvm/vmx/pkvm/include/pkvm.h
++++ b/arch/x86/kvm/vmx/pkvm/include/pkvm.h
+@@ -37,6 +37,7 @@ struct pkvm_host_vcpu {
+ 
+ struct pkvm_host_vm {
+ 	struct pkvm_host_vcpu *host_vcpus[CONFIG_NR_CPUS];
++	struct pkvm_pgtable *ept;
+ };
+ 
+ struct pkvm_hyp {
+diff --git a/arch/x86/kvm/vmx/pkvm/pkvm_host.c b/arch/x86/kvm/vmx/pkvm/pkvm_host.c
+index 101b7b190662..4120f9ef2a7e 100644
+--- a/arch/x86/kvm/vmx/pkvm/pkvm_host.c
++++ b/arch/x86/kvm/vmx/pkvm/pkvm_host.c
+@@ -854,7 +854,7 @@ __init int pkvm_init(void)
+ 
+ 	pkvm->num_cpus = num_possible_cpus();
+ 
+-	return 0;
++	return pkvm_init_finalise();
+ 
+ out:
+ 	pkvm_sym(pkvm_hyp) = NULL;
 -- 
 2.25.1
 
