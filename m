@@ -2,103 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D1B86B6478
-	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 10:57:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F7836B6479
+	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 10:57:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230098AbjCLJ5i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Mar 2023 05:57:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37970 "EHLO
+        id S230207AbjCLJ5o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Mar 2023 05:57:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229828AbjCLJ5R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Mar 2023 05:57:17 -0400
+        with ESMTP id S230111AbjCLJ5X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Mar 2023 05:57:23 -0400
 Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 664D455514
-        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 01:56:41 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 882E539BB6
+        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 01:56:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678615001; x=1710151001;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=ZHx5Q6yGYgYk/5ROGjKEVY6OPl0bbNSn2AwjMGwW8x8=;
-  b=V7Fe1oRjQeRdcsn1WhZN+yQBlSbpTNAQ1tNKwBrje33JoFpySmAGS5jG
-   b5e7uX08OXvNprHPEI0LXW6E/6S49apjmC1t5johIqPsqn3Yfg6xrwJEu
-   hm1EePfTnuXEESYx87+ecnledg5U147Z5rqGMk2cizHXXmcUOF5MXS5j/
-   UmkTewQF35wFyv6rsd7eWIPI1k1wACykMfn9dWSn5bcS0wh03xqK9gE2Q
-   DK9ovSV6e2aO5Qp6PX+JUdGf+G7CyC+TnEneGmtkY/60ydV7E/GuZf7HN
-   9si3nGGp+lQ8e6rUx35TvKU9A5mjU9IpOojykbvcayaZwIPkKgMgqqqAm
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="336998070"
+  t=1678615006; x=1710151006;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=/eWJ6e1HlOYoO5fNJod/SpkW+Yfz6UUDH/ixIb2ucl0=;
+  b=g7PugCQOBafZeJyruFvrvXJNf+KPg3r3wbLXagQEejGt/6w+hNPUQdgh
+   vXyaGzG4X/FiuUm4j/H8+CgnbRkLlIdLVE7kS4slTUokn007wz+5xpnfs
+   ep/2Fkkpvsq9GYfNO2znlJgNOicNbTCXt0rfFzVhpG0+lQfuMojkkqylZ
+   AD4fOasPezTEcIFXgK2pexUk1hrBFxHy2+t0ehq59EAgVOG+tb1AI4Hby
+   LBMb5GhsD4eHwso0ImYRLN6bqqlrINY1cOXX++FIxjsDO50cA7+YpsdrK
+   +jJ31vieWflrMNkDB/sZzl83fksJ+70MgfXRA7vTpaWJv6+tNVUqG4LF4
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="336998072"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="336998070"
+   d="scan'208";a="336998072"
 Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:55:50 -0800
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:55:51 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="680677526"
+X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="680677533"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="680677526"
+   d="scan'208";a="680677533"
 Received: from jiechen-ubuntu-dev.sh.intel.com ([10.239.154.150])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:55:49 -0800
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:55:50 -0800
 From:   Jason Chen CJ <jason.cj.chen@intel.com>
 To:     kvm@vger.kernel.org
-Cc:     Jason Chen CJ <jason.cj.chen@intel.com>
-Subject: [RFC PATCH part-4 0/4] Misc
-Date:   Mon, 13 Mar 2023 02:02:40 +0800
-Message-Id: <20230312180244.1778422-1-jason.cj.chen@intel.com>
+Cc:     Jason Chen CJ <jason.cj.chen@intel.com>,
+        Zide Chen <zide.chen@intel.com>
+Subject: [RFC PATCH part-4 1/4] pkvm: x86: Enable VPID for host VM
+Date:   Mon, 13 Mar 2023 02:02:41 +0800
+Message-Id: <20230312180244.1778422-2-jason.cj.chen@intel.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230312180244.1778422-1-jason.cj.chen@intel.com>
+References: <20230312180244.1778422-1-jason.cj.chen@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-0.9 required=5.0 tests=AC_FROM_MANY_DOTS,BAYES_00,
-        DATE_IN_FUTURE_06_12,DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DATE_IN_FUTURE_06_12,
+        DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch set is part-4 of this RFC patches. It contains patches for
-misc functionalities including supporting of VPID, debug and NMI
-handling.
+If VPID is disabled on a guest, upon VM entries, TLB entries associated
+with VPID 0000H will be invalidated. Enable VPID for host VM to improve
+VMX transition overhead.
 
-Enable VPID for host VM in pKVM if the platform supports it, which
-improve VMX transition overhead.
+Signed-off-by: Zide Chen <zide.chen@intel.com>
+Signed-off-by: Jason Chen CJ <jason.cj.chen@intel.com>
+---
+ arch/x86/kvm/vmx/pkvm/hyp/init_finalise.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-Add tmp debug method for pKVM by allowing access Linux printk.
-
-Add nmi support in pKVM, which will record nmi happened in root mode
-then inject to host VM when vmenter. This ensure physical nmi will not
-be lost.
-
-Chuanxiao Dong (1):
-  pkvm: x86: Handle pending nmi in pKVM runtime
-
-Jason Chen CJ (3):
-  pkvm: x86: Enable VPID for host VM
-  pkvm: x86: Add pKVM debug support
-  pkvm: x86: Support get_pcpu_id
-
- arch/x86/include/asm/pkvm_image.h         |  2 +-
- arch/x86/include/asm/pkvm_image_vars.h    |  4 ++
- arch/x86/kvm/Kconfig                      |  8 +++
- arch/x86/kvm/vmx/pkvm/hyp/Makefile        | 10 ++-
- arch/x86/kvm/vmx/pkvm/hyp/cpu.h           | 30 ++++++++
- arch/x86/kvm/vmx/pkvm/hyp/debug.h         |  7 ++
- arch/x86/kvm/vmx/pkvm/hyp/idt.S           | 67 ++++++++++++++++++
- arch/x86/kvm/vmx/pkvm/hyp/init_finalise.c | 28 +++++++-
- arch/x86/kvm/vmx/pkvm/hyp/irq.c           | 60 ++++++++++++++++
- arch/x86/kvm/vmx/pkvm/hyp/mmu.c           | 21 ++++++
- arch/x86/kvm/vmx/pkvm/hyp/mmu.h           |  6 ++
- arch/x86/kvm/vmx/pkvm/hyp/vmexit.c        | 26 +++++++
- arch/x86/kvm/vmx/pkvm/hyp/vmx.h           |  5 ++
- arch/x86/kvm/vmx/pkvm/include/pkvm.h      |  6 ++
- arch/x86/kvm/vmx/pkvm/pkvm_host.c         | 83 ++++++++++++++++++++---
- virt/kvm/pkvm/pkvm.c                      |  6 +-
- 16 files changed, 352 insertions(+), 17 deletions(-)
- create mode 100644 arch/x86/kvm/vmx/pkvm/hyp/cpu.h
- create mode 100644 arch/x86/kvm/vmx/pkvm/hyp/idt.S
- create mode 100644 arch/x86/kvm/vmx/pkvm/hyp/irq.c
-
+diff --git a/arch/x86/kvm/vmx/pkvm/hyp/init_finalise.c b/arch/x86/kvm/vmx/pkvm/hyp/init_finalise.c
+index ae10d550448d..e0c74d5ac2fa 100644
+--- a/arch/x86/kvm/vmx/pkvm/hyp/init_finalise.c
++++ b/arch/x86/kvm/vmx/pkvm/hyp/init_finalise.c
+@@ -289,6 +289,21 @@ int __pkvm_init_finalise(struct kvm_vcpu *vcpu, struct pkvm_section sections[],
+ 	secondary_exec_controls_setbit(&pkvm_host_vcpu->vmx, SECONDARY_EXEC_ENABLE_EPT);
+ 	vmcs_write64(EPT_POINTER, eptp);
+ 
++	/* enable vpid */
++	if (pkvm_hyp->vmcs_config.cpu_based_2nd_exec_ctrl & SECONDARY_EXEC_ENABLE_VPID) {
++		static u16 pkvm_host_vpid = VMX_NR_VPIDS - 1;
++
++		/*
++		 * Fixed VPIDs for the host vCPUs, which implies that it could conflict
++		 * with VPIDs from nested guests.
++		 *
++		 * It's safe because cached mappings used in non-root mode are associated
++		 * with EP4TA, which is managed by pKVM and unique for every guest.
++		 */
++		vmcs_write16(VIRTUAL_PROCESSOR_ID, pkvm_host_vpid--);
++		secondary_exec_controls_setbit(&pkvm_host_vcpu->vmx, SECONDARY_EXEC_ENABLE_VPID);
++	}
++
+ 	ept_sync_global();
+ 
+ out:
 -- 
 2.25.1
 
