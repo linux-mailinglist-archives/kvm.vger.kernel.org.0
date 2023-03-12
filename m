@@ -2,49 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 501E26B6485
-	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 10:59:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 287FA6B6487
+	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 10:59:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229722AbjCLJ7A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Mar 2023 05:59:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37682 "EHLO
+        id S229642AbjCLJ7F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Mar 2023 05:59:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230274AbjCLJ6m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Mar 2023 05:58:42 -0400
+        with ESMTP id S230062AbjCLJ6o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Mar 2023 05:58:44 -0400
 Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C1504FF0A
-        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 01:57:45 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5591E59E40
+        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 01:57:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678615065; x=1710151065;
+  t=1678615067; x=1710151067;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=slVPLvKC8AM8OoFImglfcIlUdtipykfchewhuHyr1w0=;
-  b=S7wu+GwWrik4y2rgtQFpzztmghSKE03V+fepxWVfJcJGHU6EnGWGnDzl
-   NZWUAb2TVuVHS6GWtFLQHtZAbVNBNQEdtG+BLtvyMS0XTQfNLX7TYz/6o
-   IHzQL1SyBjev81hGNXnA0nbXcHilOaN5yTxkboihSqDeCsRdKHo/NDUba
-   /ahnVFLkFzRGo2+h+Zl649P3dMFwP9nBcQrfhhnic+1lTTsnwPkd6au6H
-   zLqiBeFFRzarnA33QChBNUILt+fpMh7ydWiqsJeIUPo+EWnvY1yK0Z9Rn
-   OpfUgfeh9k4Szml6hdfFhmTSgyJHwjNrDsP5dMIKr6Jc7apz5qgrMFUBj
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="336998108"
+  bh=UBORKTSHJG2huhBSPoOas5uLzSZ8D0iXCqIjszww7LU=;
+  b=kn9kwPoi5NNTvWgk+y0G0E0/SW9+AyfeeZQo6lw/UBEA95xFEen+NMOG
+   CZfDZ8ymZx8H5HoADabnmr+IMGNKqxlxw2nN8tU1ocB2kiGB83auGRR4q
+   CfV26HUlHh3rkf+1aF/OQ6jZuuOwfk2RXY1RgQiNE7F8PAPv44TpNID7i
+   ca0iZc1poau/HmOpL+fbm4idSJldESJv2Yqu40DOJIBtHEKtPRwZN6+Tg
+   TjKJvvkns6o9nFyhsWpaFv1syY4yFIqvjPStn4xIk99s4mvtJtNx+Dvj3
+   mCz3oRINwNkfr1IzacJE3H+g5LejyaL1c7nEn/ZfSIauPFJ6BKK665TaM
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="336998112"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="336998108"
+   d="scan'208";a="336998112"
 Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:56:18 -0800
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:56:20 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="680677696"
+X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="680677702"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="680677696"
+   d="scan'208";a="680677702"
 Received: from jiechen-ubuntu-dev.sh.intel.com ([10.239.154.150])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:56:17 -0800
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:56:19 -0800
 From:   Jason Chen CJ <jason.cj.chen@intel.com>
 To:     kvm@vger.kernel.org
-Cc:     Jason Chen CJ <jason.cj.chen@intel.com>,
-        Chuanxiao Dong <chuanxiao.dong@intel.com>
-Subject: [RFC PATCH part-5 08/22] pkvm: x86: Add hash table mapping for shadow vcpu based on vmcs12_pa
-Date:   Mon, 13 Mar 2023 02:02:49 +0800
-Message-Id: <20230312180303.1778492-9-jason.cj.chen@intel.com>
+Cc:     Jason Chen CJ <jason.cj.chen@intel.com>
+Subject: [RFC PATCH part-5 09/22] pkvm: x86: Add VMXON/VMXOFF emulation
+Date:   Mon, 13 Mar 2023 02:02:50 +0800
+Message-Id: <20230312180303.1778492-10-jason.cj.chen@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230312180303.1778492-1-jason.cj.chen@intel.com>
 References: <20230312180303.1778492-1-jason.cj.chen@intel.com>
@@ -60,149 +59,296 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Host VM execute vmptrld(vmcs12) then vmlaunch to launch its guest, while
-pKVM need to get corresponding shadow_vcpu_state based on vmcs12 to do
-vmptrld emulation (real vmcs page of guest - vmcs02 shall be kept in
-shadow_vcpu_state - it will be added in the following patches).
+Host VM keep the capability to launch its guests based on VMX, pKVM
+need to provide VMX emulation for it. This includes emulations for
+different VMX instructions - VMXON/VMXOFF, VMPTRLD/VMCLEAR,
+VMWRITE/VMREAD, and VMRESUME/VMLAUNCH.
 
-Take use of hash table shadow_vcpu_table to build the mapping between
-vmcs12_pa and shadow_vcpu_state. Then pKVM is able to quick find out
-shadow_vcpu_state from vmcs12_pa when emulating vmptrld.
+This patch introduces nested.c, and provide emulation for VMXON and
+VMXOFF vmx instructions for host VM.
+
+The emulation simply does state check and revision id validation for
+vmxarea passed from VMXON/VMXOFF instructions, the physical VMX is kept
+as enabled after the pKVM initialization.
+
+More permission check still leaves as TODO.
 
 Signed-off-by: Jason Chen CJ <jason.cj.chen@intel.com>
-Signed-off-by: Chuanxiao Dong <chuanxiao.dong@intel.com>
 ---
- arch/x86/kvm/vmx/pkvm/hyp/pkvm.c     | 47 +++++++++++++++++++++++++++-
- arch/x86/kvm/vmx/pkvm/hyp/pkvm_hyp.h |  4 +++
- 2 files changed, 50 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/pkvm/hyp/Makefile |   2 +-
+ arch/x86/kvm/vmx/pkvm/hyp/nested.c | 195 +++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/pkvm/hyp/nested.h |  11 ++
+ arch/x86/kvm/vmx/pkvm/hyp/vmexit.c |  12 ++
+ 4 files changed, 219 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/vmx/pkvm/hyp/pkvm.c b/arch/x86/kvm/vmx/pkvm/hyp/pkvm.c
-index b110ac43a792..9efedba2b3c9 100644
---- a/arch/x86/kvm/vmx/pkvm/hyp/pkvm.c
-+++ b/arch/x86/kvm/vmx/pkvm/hyp/pkvm.c
-@@ -3,6 +3,7 @@
-  * Copyright (C) 2022 Intel Corporation
-  */
+diff --git a/arch/x86/kvm/vmx/pkvm/hyp/Makefile b/arch/x86/kvm/vmx/pkvm/hyp/Makefile
+index 7c6f71f18676..660fd611395f 100644
+--- a/arch/x86/kvm/vmx/pkvm/hyp/Makefile
++++ b/arch/x86/kvm/vmx/pkvm/hyp/Makefile
+@@ -12,7 +12,7 @@ ccflags-y += -D__PKVM_HYP__
+ virt-dir	:= ../../../../../../$(KVM_PKVM)
  
-+#include <linux/hashtable.h>
- #include <pkvm.h>
+ pkvm-hyp-y	:= vmx_asm.o vmexit.o memory.o early_alloc.o pgtable.o mmu.o pkvm.o \
+-		   init_finalise.o ept.o idt.o irq.o
++		   init_finalise.o ept.o idt.o irq.o nested.o
  
- #include "pkvm_hyp.h"
-@@ -26,6 +27,10 @@ static struct shadow_vm_ref shadow_vms_ref[MAX_SHADOW_VMS];
- #define SHADOW_VCPU_ARRAY(vm) \
- 	((struct shadow_vcpu_array *)((void *)(vm) + sizeof(struct pkvm_shadow_vm)))
- 
-+#define SHADOW_VCPU_HASH_BITS		10
-+DEFINE_HASHTABLE(shadow_vcpu_table, SHADOW_VCPU_HASH_BITS);
-+static pkvm_spinlock_t shadow_vcpu_table_lock = __PKVM_SPINLOCK_UNLOCKED;
+ ifndef CONFIG_PKVM_INTEL_DEBUG
+ lib-dir		:= lib
+diff --git a/arch/x86/kvm/vmx/pkvm/hyp/nested.c b/arch/x86/kvm/vmx/pkvm/hyp/nested.c
+new file mode 100644
+index 000000000000..f5e2eb8f51c8
+--- /dev/null
++++ b/arch/x86/kvm/vmx/pkvm/hyp/nested.c
+@@ -0,0 +1,195 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2022 Intel Corporation
++ */
 +
- static int allocate_shadow_vm_handle(struct pkvm_shadow_vm *vm)
- {
- 	struct shadow_vm_ref *vm_ref;
-@@ -133,6 +138,37 @@ static void put_shadow_vm(int shadow_vm_handle)
- 	WARN_ON(atomic_dec_if_positive(&vm_ref->refcount) <= 0);
- }
- 
-+static void add_shadow_vcpu_vmcs12_map(struct shadow_vcpu_state *vcpu)
++#include <pkvm.h>
++
++#include "pkvm_hyp.h"
++#include "debug.h"
++
++enum VMXResult {
++	VMsucceed,
++	VMfailValid,
++	VMfailInvalid,
++};
++
++static void nested_vmx_result(enum VMXResult result, int error_number)
 +{
-+	pkvm_spin_lock(&shadow_vcpu_table_lock);
-+	hash_add(shadow_vcpu_table, &vcpu->hnode, vcpu->vmcs12_pa);
-+	pkvm_spin_unlock(&shadow_vcpu_table_lock);
++	u64 rflags = vmcs_readl(GUEST_RFLAGS);
++
++	rflags &= ~(X86_EFLAGS_CF | X86_EFLAGS_PF | X86_EFLAGS_AF |
++			X86_EFLAGS_ZF | X86_EFLAGS_SF | X86_EFLAGS_OF);
++
++	if (result == VMfailValid) {
++		rflags |= X86_EFLAGS_ZF;
++		vmcs_write32(VM_INSTRUCTION_ERROR, error_number);
++	} else if (result == VMfailInvalid) {
++		rflags |= X86_EFLAGS_CF;
++	} else {
++		/* VMsucceed, do nothing */
++	}
++
++	if (result != VMsucceed)
++		pkvm_err("VMX failed: %d/%d", result, error_number);
++
++	vmcs_writel(GUEST_RFLAGS, rflags);
 +}
 +
-+static void remove_shadow_vcpu_vmcs12_map(struct shadow_vcpu_state *vcpu)
++static int get_vmx_mem_address(struct kvm_vcpu *vcpu, unsigned long exit_qualification,
++			u32 vmx_instruction_info, gva_t *ret)
 +{
-+	pkvm_spin_lock(&shadow_vcpu_table_lock);
-+	hash_del(&vcpu->hnode);
-+	pkvm_spin_unlock(&shadow_vcpu_table_lock);
++	gva_t off;
++	struct kvm_segment s;
++
++	/*
++	 * According to Vol. 3B, "Information for VM Exits Due to Instruction
++	 * Execution", on an exit, vmx_instruction_info holds most of the
++	 * addressing components of the operand. Only the displacement part
++	 * is put in exit_qualification (see 3B, "Basic VM-Exit Information").
++	 * For how an actual address is calculated from all these components,
++	 * refer to Vol. 1, "Operand Addressing".
++	 */
++	int  scaling = vmx_instruction_info & 3;
++	int  addr_size = (vmx_instruction_info >> 7) & 7;
++	bool is_reg = vmx_instruction_info & (1u << 10);
++	int  seg_reg = (vmx_instruction_info >> 15) & 7;
++	int  index_reg = (vmx_instruction_info >> 18) & 0xf;
++	bool index_is_valid = !(vmx_instruction_info & (1u << 22));
++	int  base_reg       = (vmx_instruction_info >> 23) & 0xf;
++	bool base_is_valid  = !(vmx_instruction_info & (1u << 27));
++
++	if (is_reg) {
++		/* TODO: inject #UD */
++		return 1;
++	}
++
++	/* Addr = segment_base + offset */
++	/* offset = base + [index * scale] + displacement */
++	off = exit_qualification; /* holds the displacement */
++	if (addr_size == 1)
++		off = (gva_t)sign_extend64(off, 31);
++	else if (addr_size == 0)
++		off = (gva_t)sign_extend64(off, 15);
++	if (base_is_valid)
++		off += vcpu->arch.regs[base_reg];
++	if (index_is_valid)
++		off += vcpu->arch.regs[index_reg] << scaling;
++
++	if (seg_reg == VCPU_SREG_FS)
++		s.base = vmcs_readl(GUEST_FS_BASE);
++	if (seg_reg == VCPU_SREG_GS)
++		s.base = vmcs_readl(GUEST_GS_BASE);
++
++	/* TODO: support more cpu mode beside long mode */
++	/*
++	 * The effective address, i.e. @off, of a memory operand is truncated
++	 * based on the address size of the instruction.  Note that this is
++	 * the *effective address*, i.e. the address prior to accounting for
++	 * the segment's base.
++	 */
++	if (addr_size == 1) /* 32 bit */
++		off &= 0xffffffff;
++	else if (addr_size == 0) /* 16 bit */
++		off &= 0xffff;
++
++	/*
++	 * The virtual/linear address is never truncated in 64-bit
++	 * mode, e.g. a 32-bit address size can yield a 64-bit virtual
++	 * address when using FS/GS with a non-zero base.
++	 */
++	if (seg_reg == VCPU_SREG_FS || seg_reg == VCPU_SREG_GS)
++		*ret = s.base + off;
++	else
++		*ret = off;
++
++	/* TODO: check addr is canonical, otherwise inject #GP/#SS */
++
++	return 0;
 +}
 +
-+s64 find_shadow_vcpu_handle_by_vmcs(unsigned long vmcs12_pa)
++static int nested_vmx_get_vmptr(struct kvm_vcpu *vcpu, gpa_t *vmpointer,
++				int *ret)
 +{
-+	struct shadow_vcpu_state *shadow_vcpu;
-+	s64 handle = -1;
++	struct vcpu_vmx *vmx = to_vmx(vcpu);
++	gva_t gva;
++	struct x86_exception e;
++	int r;
 +
-+	pkvm_spin_lock(&shadow_vcpu_table_lock);
-+	hash_for_each_possible(shadow_vcpu_table, shadow_vcpu, hnode, vmcs12_pa) {
-+		if (shadow_vcpu->vmcs12_pa == vmcs12_pa) {
-+			handle = shadow_vcpu->shadow_vcpu_handle;
-+			break;
++	if (get_vmx_mem_address(vcpu, vmx->exit_qualification,
++			vmcs_read32(VMX_INSTRUCTION_INFO), &gva)) {
++		*ret = 1;
++		return -EINVAL;
++	}
++
++	r = read_gva(vcpu, gva, vmpointer, sizeof(*vmpointer), &e);
++	if (r < 0) {
++		/*TODO: handle memory failure exception */
++		*ret = 1;
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
++static int validate_vmcs_revision_id(struct kvm_vcpu *vcpu, gpa_t vmpointer)
++{
++	struct vmcs_config *vmcs_config = &pkvm_hyp->vmcs_config;
++	u32 rev_id;
++
++	read_gpa(vcpu, vmpointer, &rev_id, sizeof(rev_id));
++
++	return (rev_id == vmcs_config->revision_id);
++}
++
++static bool check_vmx_permission(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_vmx *vmx = to_vmx(vcpu);
++	bool permit = true;
++
++	/*TODO: check more env (cr, cpl) and inject #UD/#GP */
++	if (!vmx->nested.vmxon)
++		permit = false;
++
++	return permit;
++}
++
++int handle_vmxon(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_vmx *vmx = to_vmx(vcpu);
++	gpa_t vmptr;
++	int r;
++
++	/*TODO: check env error(cr, efer, rflags, cpl) */
++	if (vmx->nested.vmxon) {
++		nested_vmx_result(VMfailValid, VMXERR_VMXON_IN_VMX_ROOT_OPERATION);
++	} else {
++		if (nested_vmx_get_vmptr(vcpu, &vmptr, &r)) {
++			nested_vmx_result(VMfailInvalid, 0);
++			return r;
++		} else if (!validate_vmcs_revision_id(vcpu, vmptr)) {
++			nested_vmx_result(VMfailInvalid, 0);
++		} else {
++			vmx->nested.vmxon_ptr = vmptr;
++			vmx->nested.vmxon = true;
++
++			nested_vmx_result(VMsucceed, 0);
 +		}
 +	}
-+	pkvm_spin_unlock(&shadow_vcpu_table_lock);
 +
-+	return handle;
++	return 0;
 +}
 +
- struct shadow_vcpu_state *get_shadow_vcpu(s64 shadow_vcpu_handle)
- {
- 	int shadow_vm_handle = to_shadow_vm_handle(shadow_vcpu_handle);
-@@ -197,6 +233,8 @@ static s64 attach_shadow_vcpu_to_vm(struct pkvm_shadow_vm *vm,
- 	if (!shadow_vcpu->vm)
- 		return -EINVAL;
- 
-+	add_shadow_vcpu_vmcs12_map(shadow_vcpu);
++int handle_vmxoff(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_vmx *vmx = to_vmx(vcpu);
 +
- 	pkvm_spin_lock(&vm->lock);
- 
- 	if (vm->created_vcpus == KVM_MAX_VCPUS) {
-@@ -241,12 +279,14 @@ detach_shadow_vcpu_from_vm(struct pkvm_shadow_vm *vm, s64 shadow_vcpu_handle)
- 
- 	pkvm_spin_unlock(&vm->lock);
- 
--	if (shadow_vcpu)
-+	if (shadow_vcpu) {
-+		remove_shadow_vcpu_vmcs12_map(shadow_vcpu);
- 		/*
- 		 * Paired with the get_shadow_vm when saving the shadow_vm pointer
- 		 * during attaching shadow_vcpu.
- 		 */
- 		put_shadow_vm(shadow_vcpu->vm->shadow_vm_handle);
++	if (check_vmx_permission(vcpu)) {
++		vmx->nested.vmxon = false;
++		vmx->nested.vmxon_ptr = INVALID_GPA;
++
++		nested_vmx_result(VMsucceed, 0);
 +	}
- 
- 	return shadow_vcpu;
- }
-@@ -258,6 +298,7 @@ s64 __pkvm_init_shadow_vcpu(struct kvm_vcpu *hvcpu, int shadow_vm_handle,
- 	struct pkvm_shadow_vm *vm;
- 	struct shadow_vcpu_state *shadow_vcpu;
- 	struct x86_exception e;
-+	unsigned long vmcs12_va;
- 	s64 shadow_vcpu_handle;
- 	int ret;
- 
-@@ -273,6 +314,10 @@ s64 __pkvm_init_shadow_vcpu(struct kvm_vcpu *hvcpu, int shadow_vm_handle,
- 	if (ret < 0)
- 		return -EINVAL;
- 
-+	vmcs12_va = (unsigned long)shadow_vcpu->vmx.vmcs01.vmcs;
-+	if (gva2gpa(hvcpu, vmcs12_va, (gpa_t *)&shadow_vcpu->vmcs12_pa, 0, &e))
-+		return -EINVAL;
 +
- 	vm = get_shadow_vm(shadow_vm_handle);
- 	if (!vm)
- 		return -EINVAL;
-diff --git a/arch/x86/kvm/vmx/pkvm/hyp/pkvm_hyp.h b/arch/x86/kvm/vmx/pkvm/hyp/pkvm_hyp.h
-index f15a49b3be5d..c574831c6d18 100644
---- a/arch/x86/kvm/vmx/pkvm/hyp/pkvm_hyp.h
-+++ b/arch/x86/kvm/vmx/pkvm/hyp/pkvm_hyp.h
-@@ -21,6 +21,9 @@ struct shadow_vcpu_state {
- 
- 	struct pkvm_shadow_vm *vm;
- 
-+	struct hlist_node hnode;
-+	unsigned long vmcs12_pa;
++	return 0;
++}
+diff --git a/arch/x86/kvm/vmx/pkvm/hyp/nested.h b/arch/x86/kvm/vmx/pkvm/hyp/nested.h
+new file mode 100644
+index 000000000000..2d21edaddb25
+--- /dev/null
++++ b/arch/x86/kvm/vmx/pkvm/hyp/nested.h
+@@ -0,0 +1,11 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2022 Intel Corporation
++ */
++#ifndef __PKVM_NESTED_H
++#define __PKVM_NESTED_H
 +
- 	struct vcpu_vmx vmx;
- } __aligned(PAGE_SIZE);
++int handle_vmxon(struct kvm_vcpu *vcpu);
++int handle_vmxoff(struct kvm_vcpu *vcpu);
++
++#endif
+diff --git a/arch/x86/kvm/vmx/pkvm/hyp/vmexit.c b/arch/x86/kvm/vmx/pkvm/hyp/vmexit.c
+index 6b82b6be612c..fa67cab803a8 100644
+--- a/arch/x86/kvm/vmx/pkvm/hyp/vmexit.c
++++ b/arch/x86/kvm/vmx/pkvm/hyp/vmexit.c
+@@ -9,6 +9,7 @@
+ #include "vmexit.h"
+ #include "ept.h"
+ #include "pkvm_hyp.h"
++#include "nested.h"
+ #include "debug.h"
  
-@@ -74,6 +77,7 @@ s64 __pkvm_init_shadow_vcpu(struct kvm_vcpu *hvcpu, int shadow_vm_handle,
- unsigned long __pkvm_teardown_shadow_vcpu(s64 shadow_vcpu_handle);
- struct shadow_vcpu_state *get_shadow_vcpu(s64 shadow_vcpu_handle);
- void put_shadow_vcpu(s64 shadow_vcpu_handle);
-+s64 find_shadow_vcpu_handle_by_vmcs(unsigned long vmcs12_pa);
+ #define CR4	4
+@@ -168,6 +169,7 @@ int pkvm_main(struct kvm_vcpu *vcpu)
  
- extern struct pkvm_hyp *pkvm_hyp;
+ 		vcpu->arch.cr2 = native_read_cr2();
+ 		vcpu->arch.cr3 = vmcs_readl(GUEST_CR3);
++		vcpu->arch.regs[VCPU_REGS_RSP] = vmcs_readl(GUEST_RSP);
  
+ 		vmx->exit_reason.full = vmcs_read32(VM_EXIT_REASON);
+ 		vmx->exit_qualification = vmcs_readl(EXIT_QUALIFICATION);
+@@ -194,6 +196,16 @@ int pkvm_main(struct kvm_vcpu *vcpu)
+ 			handle_write_msr(vcpu);
+ 			skip_instruction = true;
+ 			break;
++		case EXIT_REASON_VMON:
++			pkvm_dbg("CPU%d vmexit reason: VMXON.\n", vcpu->cpu);
++			handle_vmxon(vcpu);
++			skip_instruction = true;
++			break;
++		case EXIT_REASON_VMOFF:
++			pkvm_dbg("CPU%d vmexit reason: VMXOFF.\n", vcpu->cpu);
++			handle_vmxoff(vcpu);
++			skip_instruction = true;
++			break;
+ 		case EXIT_REASON_XSETBV:
+ 			handle_xsetbv(vcpu);
+ 			skip_instruction = true;
 -- 
 2.25.1
 
