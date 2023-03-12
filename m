@@ -2,228 +2,384 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 17A5B6B647D
-	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 10:58:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C3A796B647B
+	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 10:58:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230286AbjCLJ6U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Mar 2023 05:58:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37830 "EHLO
+        id S230268AbjCLJ6A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Mar 2023 05:58:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230156AbjCLJ5w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Mar 2023 05:57:52 -0400
+        with ESMTP id S230075AbjCLJ5j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Mar 2023 05:57:39 -0400
 Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E60B056154
-        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 01:57:21 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EC8A521FF
+        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 01:57:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678615041; x=1710151041;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=r9zfwza+K+yPCsvTWw3Iy8apFTUX+SFR9+1Vu6Pe6fk=;
-  b=VbP0FNQuYqH+tuYaaF79xRpSQcwVp2b89TrcaSjOQ1Uaa6QVE4PhpWwi
-   Ibj73ynziODYpxZelMBRGiKtY3Xt/W+vqYq+Q3IsEFw/9sPTL89eCbCIK
-   uh+4VrrCs8pWDGBbvJr6tLPBQT9V7EqE10eWWi08jNfBwtHKaROSRa1n6
-   Zdnxjyuum5D2/PrOvA5MjJQiAJaI0OIt5c6VLkBaOYzTrP/ax1jARIuIk
-   hKO+IOzbhQpwV2+oUO3iGIpn0IxlCcS9+hNCtC3oeqsrRmaWxCoONwJII
-   OUnFboTiWBBgDuiek8hd3LyR0wfHWavxeGXTaK+gxvVlJ+OwuBDfKmwea
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="336998089"
+  t=1678615027; x=1710151027;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=RA8fIy33RpIDmAXMmuiurXmXddn+qMR4luGDDz2zsmE=;
+  b=hJZRlXvanWXyTOH526zCr5bVcKFwwnLEF65xPwPSV53GU5uEX/Blnjbt
+   90Sg92dD10s/ijQ99hAK/YvhfzHZH1iwwRdQQ5cdgXptwyL2q9rj7XkNv
+   7uyxkwHhudnQh8n3OO7WEBUt4ApfZdVMrnVLGE2yg7lQLlGBAT9kwKZZt
+   lz7hPpvFW2okhrwNxT6Ic7EVW/WqCfyuLYFrFDaTUEApyjkzMC/XUN8YS
+   M/opK0UNxIInqjZkAdVtm8JmJrgJjnLbagZISw4ml9ZI0X8l+bvDq1X8X
+   wp0PshzzzYS381y5bESW5eJmhY2Ah4jLXqU1mmkY8+9RbeIGi0auFywtj
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="336998073"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="336998089"
+   d="scan'208";a="336998073"
 Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:56:09 -0800
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:55:52 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="680677638"
+X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="680677538"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="680677638"
+   d="scan'208";a="680677538"
 Received: from jiechen-ubuntu-dev.sh.intel.com ([10.239.154.150])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:56:08 -0800
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:55:51 -0800
 From:   Jason Chen CJ <jason.cj.chen@intel.com>
 To:     kvm@vger.kernel.org
-Cc:     Jason Chen CJ <jason.cj.chen@intel.com>
-Subject: [RFC PATCH part-5 00/22] VMX emulation
-Date:   Mon, 13 Mar 2023 02:02:41 +0800
-Message-Id: <20230312180303.1778492-1-jason.cj.chen@intel.com>
+Cc:     Jason Chen CJ <jason.cj.chen@intel.com>,
+        Chuanxiao Dong <chuanxiao.dong@intel.com>
+Subject: [RFC PATCH part-4 2/4] pkvm: x86: Add pKVM debug support
+Date:   Mon, 13 Mar 2023 02:02:42 +0800
+Message-Id: <20230312180244.1778422-3-jason.cj.chen@intel.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230312180244.1778422-1-jason.cj.chen@intel.com>
+References: <20230312180244.1778422-1-jason.cj.chen@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-0.9 required=5.0 tests=AC_FROM_MANY_DOTS,BAYES_00,
-        DATE_IN_FUTURE_06_12,DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DATE_IN_FUTURE_06_12,
+        DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch set is part-5 of this RFC patches. It introduces VMX
-emulation for pKVM on Intel platform.
+Add debug option CONFIG_PKVM_INTEL_DEBUG to allow use printk
+in pKVM for debugging purpose.
 
-Host VM wants the capability to run its guest, it needs VMX support.
+Enable this option will do:
+- keep using host GDT/IDT/segment etc.
+- clone host CR3 entries from __page_base_offset
+- no __pkvm prefix for pkvm runtime symbols, so to avoid same
+  variable name definition for hyp_memory, rename hyp_memory in
+  virt/kvm/pkvm/pkvm.c to _hyp_memory
 
-pKVM is designed to emulate VMX for host VM based on shadow vmcs.
-This requires "VMCS shadowing" feature support in VMX secondary
-processor-based VM-Execution controls field [1].
+NOTE: this is a tmp solution for debugging before we design a new
+solution.
 
-One alternative way to emulate VMX is based on enlightened vmcs (evmcs)
-which was introduced by Hyper-V nesting support. evmcs does normal memory
-reads/writes instead of doing VMWRITE/VMREAD instructions, it's a
-flexible SW solution to emulate VMX, and does not need "VMCS shadowing"
-feature support; while making evmcs work for pKVM leads to the
-refactor to KVM Hyper-V code; to avoid change that part of code, we
-choose to use shadow VMCS in this RFC.
+Signed-off-by: Chuanxiao Dong <chuanxiao.dong@intel.com>
+Signed-off-by: Jason Chen CJ <jason.cj.chen@intel.com>
+---
+ arch/x86/include/asm/pkvm_image.h         |  2 +-
+ arch/x86/include/asm/pkvm_image_vars.h    |  4 +++
+ arch/x86/kvm/Kconfig                      |  8 +++++
+ arch/x86/kvm/vmx/pkvm/hyp/Makefile        |  8 ++++-
+ arch/x86/kvm/vmx/pkvm/hyp/debug.h         |  7 ++++
+ arch/x86/kvm/vmx/pkvm/hyp/init_finalise.c | 13 ++++++-
+ arch/x86/kvm/vmx/pkvm/hyp/mmu.c           | 21 ++++++++++++
+ arch/x86/kvm/vmx/pkvm/hyp/mmu.h           |  6 ++++
+ arch/x86/kvm/vmx/pkvm/pkvm_host.c         | 42 +++++++++++++++++++++++
+ virt/kvm/pkvm/pkvm.c                      |  6 ++--
+ 10 files changed, 111 insertions(+), 6 deletions(-)
 
-    +--------------------+   +-----------------+
-    |     host VM        |   |   guest VM      |
-    |                    |   |                 |
-    |        +---------+ |   |                 |
-    |        | vmcs12* | |   |                 |
-    |        +---------+ |   |                 |
-    +--------------------+   +-----------------+
-    +------------------------------------------+       +---------+
-    |     +---------+         +---------+      |       | shadow  |
-    |     | vmcs01* |         | vmcs02* +------+---+-->|  vcpu   |
-    |     +---------+         +---------+      |   |   |  state  |
-    |                      +---------------+   |   |   +---------+
-    |                      | cached_vmcs12 +---+---+
-    | pKVM                 +---------------+   |
-    +------------------------------------------+
-
- [*]vmcs12: virtual vmcs of a nested guest
- [*]vmcs02: vmcs of a nested guest
- [*]vmcs01: vmcs of host VM
-
-"VMCS shadowing" use a shadow vmcs page (vmcs02) to cache vmcs fields
-accessing from host VM through VMWRITE/VMREAD, avoid causing vmexit.
-The fields cached in vmcs02 is pre-defined by VMREAD/VMWRITE bitmap.
-Meanwhile for other fields not in VMREAD/VMWRITE bitmap, accessing from
-host VM cause VMREAD/VMWRITE vmexit, pKVM need to cache them in another
-place - cached_vmcs12 is introduced for this purpose.
-
-The vmcs02 page in root mode is kept in the structure shadow_vcpu_state,
-which allocated then donated from host VM when it initialize vcpus for
-its launched guest (nested). Same for field of cached_vmcs12.
-
-pKVM use vmcs02 with two purposes, one is mentioned above, using it
-as the shadow vmcs page of nested guest when host VM program its vmcs
-fields; the other one is using it as ordinary (or active) vmcs for the
-same guest during the vmlaunch/vmresume.
-
-For a nested guest, during its vmcs programing from host VM, according
-to above, its virtual vmcs (vmcs12) is saved in two places: vmcs02 for
-shadow fields and cached_vmcs12 for no shadow fields. Meanwhile for
-cached_vmcs12, there are also two parts for its fields: one is emulated
-fields, the other one is host state fields. The emulated fields are
-mostly security related control fields which shall be emulated to the
-physical value then fill into vmcs02 before vmcs02 active to do
-vmlaunch/vmresume for the nested guest. The host state fields are
-guest state of host vcpu, it shall be restored to guest state of host
-vcpu vmcs (vmcs01) before return to host VM.
-
-Below is a summary for contents of different vmcs fields in each above
-mentioned vmcs:
-
-              host state      guest state          control
- ---------------------------------------------------------------
- vmcs12:      host VM's     nested guest's     set by host VM
- vmcs02:       pKVM's       nested guest's   set by host VM + pKVM*
- vmcs01:       pKVM's        host VM's          set by pKVM
-
- [*]the security related control fields of vmcs02 is controlled by pKVM
-  (e.g., EPT_POINTER)
-
-Blow show the brief vmcs emulation method for different vmcs fields for
-a nested guest:
-
-                host state      guest state   security related control
- ---------------------------------------------------------------------
- virutal vmcs:  cached_vmcs12*     vmcs02*          emulated*
-
- [*]cached_vmcs12: vmexit then set/get value to/from cached_vmcs12
- [*]vmcs02:        no-vmexit and directly shadow from vmcs02
- [*]emulated:      vmexit then do the emulation
-
-The vmcs02 & cached_vmcs12 is sync back to vmcs12 during VMCLEAR
-emulation, and updated from vmcs12 when emulating VMPTRLD. And before
-the nested guest vmentry(vmlaunch/vmresume emulation), the vmcs02 is
-further sync dirty fields(caused by vmwrite) from cached_vmcs12 and
-update emulated fields through emulation.
-
-INVEPT/INVVPID now is simplify emulated by doing a global INVEPT.
-
-VMX msrs are emulated by pKVM as well to provide the VMX capabilities
-to host VM, features of PT, SMM, shadowing VMCS and vmfunc are filtered
-out.
-
-[1]: SDM: Virtual Machine Control Structures chapter, VMCS TYPES.
-
-Haiwei Li (2):
-  pkvm: x86: Do guest address translation per page granularity
-  pkvm: x86: Add check for guest address translation
-
-Jason Chen CJ (19):
-  pkvm: x86: Add memcpy lib
-  pkvm: x86: Add memory operation APIs for for host VM
-  pkvm: x86: Add hypercalls for shadow_vm/vcpu init & teardown
-  KVM: VMX: Add new kvm_x86_ops vm_free
-  KVM: VMX: Add initialization/teardown for shadow vm/vcpu
-  pkvm: x86: Add hash table mapping for shadow vcpu based on vmcs12_pa
-  pkvm: x86: Add VMXON/VMXOFF emulation
-  KVM: VMX: Add more vmcs and vmcs12 fields definition
-  pkvm: x86: Init vmcs read/write bitmap for vmcs emulation
-  pkvm: x86: Initialize emulated fields for vmcs emulation
-  pkvm: x86: Add msr ops for pKVM hypervisor
-  pkvm: x86: Move _init_host_state_area to pKVM hypervisor
-  pkvm: x86: Add vmcs_load/clear_track APIs
-  pkvm: x86: Add VMPTRLD/VMCLEAR emulation
-  pkvm: x86: Add VMREAD/VMWRITE emulation
-  pkvm: x86: Add VMLAUNCH/VMRESUME emulation
-  pkvm: x86: Add INVEPT/INVVPID emulation
-  pkvm: x86: Initialize msr_bitmap for vmsr
-  pkvm: x86: Add vmx msr emulation
-
-Tina Zhang (1):
-  pkvm: x86: Add has_vmcs_field() API for physical vmx capability check
-
- arch/x86/include/asm/kvm-x86-ops.h            |    1 +
- arch/x86/include/asm/kvm_host.h               |    5 +
- arch/x86/include/asm/kvm_pkvm.h               |   14 +
- arch/x86/include/asm/pkvm_image_vars.h        |    3 +-
- arch/x86/include/asm/vmx.h                    |    4 +
- arch/x86/kvm/vmx/pkvm/hyp/Makefile            |    6 +-
- arch/x86/kvm/vmx/pkvm/hyp/cpu.h               |   23 +
- arch/x86/kvm/vmx/pkvm/hyp/init_finalise.c     |    3 +
- arch/x86/kvm/vmx/pkvm/hyp/lib/memcpy_64.S     |   26 +
- arch/x86/kvm/vmx/pkvm/hyp/memory.c            |  216 ++++
- arch/x86/kvm/vmx/pkvm/hyp/memory.h            |   11 +
- arch/x86/kvm/vmx/pkvm/hyp/nested.c            | 1030 +++++++++++++++++
- arch/x86/kvm/vmx/pkvm/hyp/nested.h            |   27 +
- arch/x86/kvm/vmx/pkvm/hyp/pkvm.c              |  342 ++++++
- arch/x86/kvm/vmx/pkvm/hyp/pkvm_hyp.h          |   82 ++
- .../vmx/pkvm/hyp/pkvm_nested_vmcs_fields.h    |  195 ++++
- arch/x86/kvm/vmx/pkvm/hyp/vmexit.c            |  174 ++-
- arch/x86/kvm/vmx/pkvm/hyp/vmsr.c              |   88 ++
- arch/x86/kvm/vmx/pkvm/hyp/vmsr.h              |   11 +
- arch/x86/kvm/vmx/pkvm/hyp/vmx.c               |   77 ++
- arch/x86/kvm/vmx/pkvm/hyp/vmx.h               |   23 +
- arch/x86/kvm/vmx/pkvm/include/pkvm.h          |    5 +
- arch/x86/kvm/vmx/pkvm/pkvm_constants.c        |    4 +
- arch/x86/kvm/vmx/pkvm/pkvm_host.c             |  181 +--
- arch/x86/kvm/vmx/vmcs12.c                     |    6 +
- arch/x86/kvm/vmx/vmcs12.h                     |   16 +-
- arch/x86/kvm/vmx/vmx.c                        |   14 +-
- arch/x86/kvm/x86.c                            |    1 +
- include/linux/kvm_host.h                      |    8 +
- 29 files changed, 2459 insertions(+), 137 deletions(-)
- create mode 100644 arch/x86/kvm/vmx/pkvm/hyp/lib/memcpy_64.S
- create mode 100644 arch/x86/kvm/vmx/pkvm/hyp/nested.c
- create mode 100644 arch/x86/kvm/vmx/pkvm/hyp/nested.h
- create mode 100644 arch/x86/kvm/vmx/pkvm/hyp/pkvm_nested_vmcs_fields.h
- create mode 100644 arch/x86/kvm/vmx/pkvm/hyp/vmsr.c
- create mode 100644 arch/x86/kvm/vmx/pkvm/hyp/vmsr.h
- create mode 100644 arch/x86/kvm/vmx/pkvm/hyp/vmx.c
-
+diff --git a/arch/x86/include/asm/pkvm_image.h b/arch/x86/include/asm/pkvm_image.h
+index ed026b740a78..5ae6a53177eb 100644
+--- a/arch/x86/include/asm/pkvm_image.h
++++ b/arch/x86/include/asm/pkvm_image.h
+@@ -5,7 +5,7 @@
+ #ifndef __X86_INTEL_PKVM_IMAGE_H
+ #define __X86_INTEL_PKVM_IMAGE_H
+ 
+-#ifdef __PKVM_HYP__
++#if defined(CONFIG_PKVM_INTEL_DEBUG) || defined(__PKVM_HYP__)
+ /* No prefix will be added */
+ #define PKVM_DECLARE(type, f)	type f
+ #define pkvm_sym(sym)		sym
+diff --git a/arch/x86/include/asm/pkvm_image_vars.h b/arch/x86/include/asm/pkvm_image_vars.h
+index a7823dc9b981..598c60302bac 100644
+--- a/arch/x86/include/asm/pkvm_image_vars.h
++++ b/arch/x86/include/asm/pkvm_image_vars.h
+@@ -5,6 +5,8 @@
+ #ifndef __ASM_x86_PKVM_IMAGE_VARS_H
+ #define __ASM_x86_PKVM_IMAGE_VARS_H
+ 
++#ifndef CONFIG_PKVM_INTEL_DEBUG
++
+ #ifdef CONFIG_DYNAMIC_PHYSICAL_MASK
+ PKVM_ALIAS(physical_mask);
+ #endif
+@@ -16,3 +18,5 @@ PKVM_ALIAS(sme_me_mask);
+ PKVM_ALIAS(__default_kernel_pte_mask);
+ 
+ #endif
++
++#endif
+diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+index 5a8ae5f80849..c2f66d3eef37 100644
+--- a/arch/x86/kvm/Kconfig
++++ b/arch/x86/kvm/Kconfig
+@@ -100,6 +100,14 @@ config PKVM_INTEL
+ 
+ 	  If unsure, say N.
+ 
++config PKVM_INTEL_DEBUG
++        bool "Debug pKVM"
++        depends on PKVM_INTEL
++        help
++          Provides debug support for pKVM.
++
++          If unsure, say N.
++
+ config X86_SGX_KVM
+ 	bool "Software Guard eXtensions (SGX) Virtualization"
+ 	depends on X86_SGX && KVM_INTEL
+diff --git a/arch/x86/kvm/vmx/pkvm/hyp/Makefile b/arch/x86/kvm/vmx/pkvm/hyp/Makefile
+index 9a1cb483a55e..a7546e1d0b80 100644
+--- a/arch/x86/kvm/vmx/pkvm/hyp/Makefile
++++ b/arch/x86/kvm/vmx/pkvm/hyp/Makefile
+@@ -9,15 +9,17 @@ ccflags-y += -fno-stack-protector
+ ccflags-y += -D__DISABLE_EXPORTS
+ ccflags-y += -D__PKVM_HYP__
+ 
+-lib-dir		:= lib
+ virt-dir	:= ../../../../../../$(KVM_PKVM)
+ 
+ pkvm-hyp-y	:= vmx_asm.o vmexit.o memory.o early_alloc.o pgtable.o mmu.o pkvm.o \
+ 		   init_finalise.o ept.o
+ 
++ifndef CONFIG_PKVM_INTEL_DEBUG
++lib-dir		:= lib
+ pkvm-hyp-y	+= $(lib-dir)/memset_64.o
+ pkvm-hyp-$(CONFIG_RETPOLINE)	+= $(lib-dir)/retpoline.o
+ pkvm-hyp-$(CONFIG_DEBUG_LIST)	+= $(lib-dir)/list_debug.o
++endif
+ pkvm-hyp-y	+= $(virt-dir)/page_alloc.o
+ 
+ pkvm-obj 	:= $(patsubst %.o,%.pkvm.o,$(pkvm-hyp-y))
+@@ -40,7 +42,11 @@ $(obj)/pkvm.o: $(obj)/pkvm.tmp.o FORCE
+ 	$(call if_changed,pkvmcopy)
+ 
+ quiet_cmd_pkvmcopy = PKVMPCOPY $@
++ifdef CONFIG_PKVM_INTEL_DEBUG
++      cmd_pkvmcopy = $(OBJCOPY) --prefix-symbols= $< $@
++else
+       cmd_pkvmcopy = $(OBJCOPY) --prefix-symbols=__pkvm_ --remove-section=.retpoline_sites --remove-section=.return_sites $< $@
++endif
+ 
+ # Remove ftrace, Shadow Call Stack, and CFI CFLAGS.
+ # This is equivalent to the 'notrace', '__noscs', and '__nocfi' annotations.
+diff --git a/arch/x86/kvm/vmx/pkvm/hyp/debug.h b/arch/x86/kvm/vmx/pkvm/hyp/debug.h
+index 97f633ca0bac..f8f7d00dfb88 100644
+--- a/arch/x86/kvm/vmx/pkvm/hyp/debug.h
++++ b/arch/x86/kvm/vmx/pkvm/hyp/debug.h
+@@ -6,8 +6,15 @@
+ #ifndef _PKVM_DEBUG_H_
+ #define _PKVM_DEBUG_H_
+ 
++#ifdef CONFIG_PKVM_INTEL_DEBUG
++#include <linux/printk.h>
++#define pkvm_dbg(f, x...) pr_debug(f, ## x)
++#define pkvm_info(f, x...) pr_info(f, ## x)
++#define pkvm_err(f, x...) pr_err(f, ## x)
++#else
+ #define pkvm_dbg(x...)
+ #define pkvm_info(x...)
+ #define pkvm_err(x...)
++#endif
+ 
+ #endif
+diff --git a/arch/x86/kvm/vmx/pkvm/hyp/init_finalise.c b/arch/x86/kvm/vmx/pkvm/hyp/init_finalise.c
+index e0c74d5ac2fa..8c585a73237a 100644
+--- a/arch/x86/kvm/vmx/pkvm/hyp/init_finalise.c
++++ b/arch/x86/kvm/vmx/pkvm/hyp/init_finalise.c
+@@ -100,14 +100,24 @@ static int create_mmu_mapping(const struct pkvm_section sections[],
+ 				 int section_sz)
+ {
+ 	unsigned long nr_pages = pkvm_mmu_pgtable_pages();
++	int ret;
++#ifndef CONFIG_PKVM_INTEL_DEBUG
+ 	struct memblock_region *reg;
+-	int ret, i;
++	int i;
++#endif
+ 
+ 	ret = pkvm_early_mmu_init(&pkvm_hyp->mmu_cap,
+ 			pkvm_mmu_pgt_base, nr_pages);
+ 	if (ret)
+ 		return ret;
+ 
++#ifdef CONFIG_PKVM_INTEL_DEBUG
++	/*
++	 * clone host CR3 page mapping from __page_base_offset, it covers both
++	 * direct mapping and symbol mapping for pkvm (same mapping as kernel)
++	 */
++	pkvm_mmu_clone_host(pkvm_hyp->mmu_cap.level, __page_base_offset);
++#else
+ 	/*
+ 	 * Create mapping for the memory in memblocks.
+ 	 * This will include all the memory host kernel can see, as well
+@@ -135,6 +145,7 @@ static int create_mmu_mapping(const struct pkvm_section sections[],
+ 		if (ret)
+ 			return ret;
+ 	}
++#endif
+ 
+ 	ret = pkvm_back_vmemmap(__pkvm_pa(pkvm_vmemmap_base));
+ 	if (ret)
+diff --git a/arch/x86/kvm/vmx/pkvm/hyp/mmu.c b/arch/x86/kvm/vmx/pkvm/hyp/mmu.c
+index 7684d16dd2c9..b32ca706fa4b 100644
+--- a/arch/x86/kvm/vmx/pkvm/hyp/mmu.c
++++ b/arch/x86/kvm/vmx/pkvm/hyp/mmu.c
+@@ -169,7 +169,15 @@ static int fix_pgtable_refcnt(void)
+ 	 * Calculate the max address space, then walk the [0, size) address
+ 	 * range to fixup refcount of every used page.
+ 	 */
++#ifdef CONFIG_PKVM_INTEL_DEBUG
++	/*
++	 * only fix vmmemap range for debug mode, now for 64T memory,
++	 * could be extended if physical memory is bigger than 64T
++	 */
++	size = (SZ_64T / PAGE_SIZE) * sizeof(struct hyp_page);
++#else
+ 	size = pgt_ops->pgt_level_to_size(hyp_mmu.level + 1);
++#endif
+ 
+ 	return pgtable_walk(&hyp_mmu, 0, size, &walker);
+ }
+@@ -228,3 +236,16 @@ int pkvm_later_mmu_init(void *mmu_pool_base, unsigned long mmu_pool_pages)
+ 	 */
+ 	return fix_pgtable_refcnt();
+ }
++
++#ifdef CONFIG_PKVM_INTEL_DEBUG
++void pkvm_mmu_clone_host(int level, unsigned long start_vaddr)
++{
++	int i = mmu_entry_to_index(start_vaddr, level);
++	u64 *ptep = __va(hyp_mmu.root_pa);
++	u64 *host_cr3 = __va(__read_cr3() & PAGE_MASK);
++
++	for (; i < PTRS_PER_PTE; i++)
++		ptep[i] = host_cr3[i];
++
++}
++#endif
+diff --git a/arch/x86/kvm/vmx/pkvm/hyp/mmu.h b/arch/x86/kvm/vmx/pkvm/hyp/mmu.h
+index 6b678ae94b31..218e3d4ef92c 100644
+--- a/arch/x86/kvm/vmx/pkvm/hyp/mmu.h
++++ b/arch/x86/kvm/vmx/pkvm/hyp/mmu.h
+@@ -16,4 +16,10 @@ int pkvm_early_mmu_init(struct pkvm_pgtable_cap *cap,
+ 
+ int pkvm_later_mmu_init(void *mmu_pool_base, unsigned long mmu_pool_pages);
+ 
++#ifdef CONFIG_PKVM_INTEL_DEBUG
++void pkvm_mmu_clone_host(int level, unsigned long start_vaddr);
++#else
++static inline void pkvm_mmu_clone_host(int level, unsigned long start_vaddr) {}
++#endif
++
+ #endif
+diff --git a/arch/x86/kvm/vmx/pkvm/pkvm_host.c b/arch/x86/kvm/vmx/pkvm/pkvm_host.c
+index 4120f9ef2a7e..c7768ee22e57 100644
+--- a/arch/x86/kvm/vmx/pkvm/pkvm_host.c
++++ b/arch/x86/kvm/vmx/pkvm/pkvm_host.c
+@@ -243,11 +243,52 @@ static __init void init_guest_state_area(struct pkvm_host_vcpu *vcpu, int cpu)
+ static __init void _init_host_state_area(struct pkvm_pcpu *pcpu)
+ {
+ 	unsigned long a;
++#ifdef CONFIG_PKVM_INTEL_DEBUG
++	u32 high, low;
++	struct desc_ptr dt;
++	u16 selector;
++	int cpu = raw_smp_processor_id();
++#endif
+ 
+ 	vmcs_writel(HOST_CR0, read_cr0() & ~X86_CR0_TS);
+ 	vmcs_writel(HOST_CR3, pcpu->cr3);
+ 	vmcs_writel(HOST_CR4, native_read_cr4());
+ 
++#ifdef CONFIG_PKVM_INTEL_DEBUG
++	savesegment(cs, selector);
++	vmcs_write16(HOST_CS_SELECTOR, selector);
++	savesegment(ss, selector);
++	vmcs_write16(HOST_SS_SELECTOR, selector);
++	savesegment(ds, selector);
++	vmcs_write16(HOST_DS_SELECTOR, selector);
++	savesegment(es, selector);
++	vmcs_write16(HOST_ES_SELECTOR, selector);
++	savesegment(fs, selector);
++	vmcs_write16(HOST_FS_SELECTOR, selector);
++	rdmsrl(MSR_FS_BASE, a);
++	vmcs_writel(HOST_FS_BASE, a);
++	savesegment(gs, selector);
++	vmcs_write16(HOST_GS_SELECTOR, selector);
++	rdmsrl(MSR_GS_BASE, a);
++	vmcs_writel(HOST_GS_BASE, a);
++
++	vmcs_write16(HOST_TR_SELECTOR, GDT_ENTRY_TSS*8);
++	vmcs_writel(HOST_TR_BASE, (unsigned long)&get_cpu_entry_area(cpu)->tss.x86_tss);
++
++	native_store_gdt(&dt);
++	vmcs_writel(HOST_GDTR_BASE, dt.address);
++	store_idt(&dt);
++	vmcs_writel(HOST_IDTR_BASE, dt.address);
++
++	rdmsr(MSR_IA32_SYSENTER_CS, low, high);
++	vmcs_write32(HOST_IA32_SYSENTER_CS, low);
++
++	rdmsrl(MSR_IA32_SYSENTER_ESP, a);
++	vmcs_writel(HOST_IA32_SYSENTER_ESP, a);
++
++	rdmsrl(MSR_IA32_SYSENTER_EIP, a);
++	vmcs_writel(HOST_IA32_SYSENTER_EIP, a);
++#else
+ 	vmcs_write16(HOST_CS_SELECTOR, __KERNEL_CS);
+ 	vmcs_write16(HOST_SS_SELECTOR, __KERNEL_DS);
+ 	vmcs_write16(HOST_DS_SELECTOR, __KERNEL_DS);
+@@ -261,6 +302,7 @@ static __init void _init_host_state_area(struct pkvm_pcpu *pcpu)
+ 	vmcs_writel(HOST_TR_BASE, (unsigned long)&pcpu->tss);
+ 	vmcs_writel(HOST_GDTR_BASE, (unsigned long)(&pcpu->gdt_page));
+ 	vmcs_writel(HOST_IDTR_BASE, (unsigned long)(&pcpu->idt_page));
++#endif
+ 
+ 	/* MSR area */
+ 	rdmsrl(MSR_EFER, a);
+diff --git a/virt/kvm/pkvm/pkvm.c b/virt/kvm/pkvm/pkvm.c
+index 8a20a662b917..cdc3a8a2fee9 100644
+--- a/virt/kvm/pkvm/pkvm.c
++++ b/virt/kvm/pkvm/pkvm.c
+@@ -10,7 +10,7 @@
+ 
+ #include <asm/kvm_pkvm.h>
+ 
+-static struct memblock_region *hyp_memory = pkvm_sym(hyp_memory);
++static struct memblock_region *_hyp_memory = pkvm_sym(hyp_memory);
+ static unsigned int *hyp_memblock_nr_ptr = &pkvm_sym(hyp_memblock_nr);
+ 
+ phys_addr_t hyp_mem_base;
+@@ -26,7 +26,7 @@ static int cmp_hyp_memblock(const void *p1, const void *p2)
+ 
+ static void __init sort_memblock_regions(void)
+ {
+-	sort(hyp_memory,
++	sort(_hyp_memory,
+ 	     *hyp_memblock_nr_ptr,
+ 	     sizeof(struct memblock_region),
+ 	     cmp_hyp_memblock,
+@@ -41,7 +41,7 @@ static int __init register_memblock_regions(void)
+ 		if (*hyp_memblock_nr_ptr >= HYP_MEMBLOCK_REGIONS)
+ 			return -ENOMEM;
+ 
+-		hyp_memory[*hyp_memblock_nr_ptr] = *reg;
++		_hyp_memory[*hyp_memblock_nr_ptr] = *reg;
+ 		(*hyp_memblock_nr_ptr)++;
+ 	}
+ 	sort_memblock_regions();
 -- 
 2.25.1
 
