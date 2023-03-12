@@ -2,203 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 98AFF6B64B2
-	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 11:02:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C9CD6B6534
+	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 12:06:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230430AbjCLKBr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Mar 2023 06:01:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48432 "EHLO
+        id S230155AbjCLLGo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Mar 2023 07:06:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229897AbjCLKBL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Mar 2023 06:01:11 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C75D3B230
-        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 03:00:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678615206; x=1710151206;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=YRheXSo/nKLE2uNvdJcOougp9+CEOZQwsxyP+V2rrWY=;
-  b=Edz0mOgaNtUBNhZanUH78rkmjGMnZyXdn3bN+9FxkevGuK+REuWag28L
-   ZKKDZ7nNR8VBVbLwikHLo1wqZmiOhrMwwEawDOt6uLP7lelcGoCIPqrri
-   0ywUz/LdD1avmoZJTHv0RJtgAdOPQspZJKOk/NfVt1le1LvZLUkNclP4x
-   FueJ3230ItRP05gBxpJ9y0flImBkDvsd8sdeTi5UWi3s6HiPpwES/ZkM6
-   wDlDiB0syebbnAUy3cLr2xHqLXGLyWONCRJ3Bu+1ujLcMoi4Dw8OFHteG
-   NKN02m/eN+McMsZvIaqJK4kFNeD+KeYcISuc7D8xJGOvqocGOHE0cU9Ec
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="339344763"
-X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="339344763"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:57:35 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="1007627568"
-X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="1007627568"
-Received: from jiechen-ubuntu-dev.sh.intel.com ([10.239.154.150])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:57:34 -0800
-From:   Jason Chen CJ <jason.cj.chen@intel.com>
-To:     kvm@vger.kernel.org
-Cc:     Jason Chen CJ <jason.cj.chen@intel.com>,
-        Chuanxiao Dong <chuanxiao.dong@intel.com>
-Subject: [RFC PATCH part-7 12/12] pkvm: x86: Use page state API in shadow EPT for normal VM
-Date:   Mon, 13 Mar 2023 02:04:15 +0800
-Message-Id: <20230312180415.1778669-13-jason.cj.chen@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230312180415.1778669-1-jason.cj.chen@intel.com>
-References: <20230312180415.1778669-1-jason.cj.chen@intel.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DATE_IN_FUTURE_06_12,
-        DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S230154AbjCLLGk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Mar 2023 07:06:40 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0E304DBE4
+        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 04:06:36 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 6C402B80B08
+        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 11:06:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C9A6C433EF;
+        Sun, 12 Mar 2023 11:06:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1678619194;
+        bh=STfmhEfqkyJ2vMrZ657uq8KqwzA4lQYY107NFbI1jPY=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=FA8Fw89t/f7RnMbAhIOdqvrhQrHi29BK8sqPpPzbgmnAUetRpnDA1lPUuuSK/D/l2
+         OUzkzIqw19WbLUCNtkE5/ZX9X9WmmCbr95rPnSCVWHGx34/jrUB7voaOkKQCBm/YoZ
+         C6JCOCyuaL4Z4SUcQDR9DfGntCRL3Mtv5KoJsZFXh6TTTkYFnHCi2YJUoUkzHfdoSX
+         /ZhmGbjt8/Sq43nBBiv4Q3JCnhlConh4nkmdn7ayh1v8Lp3pmp/aGbcv+37eC7LXT+
+         quz0v2MFgHVjVCMEf0y9lSvBTp7o6G2HJSqrHV3awrTEpRaJ3QVibYKdMjdOIi4FWE
+         v96FRJ9MWbT8w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pbJX5-00GyfN-P6;
+        Sun, 12 Mar 2023 11:06:31 +0000
+Date:   Sun, 12 Mar 2023 11:06:31 +0000
+Message-ID: <87bkky5ivc.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     pbonzini@redhat.com, oupton@google.com, yuzenghui@huawei.com,
+        dmatlack@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        qperret@google.com, catalin.marinas@arm.com,
+        andrew.jones@linux.dev, seanjc@google.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
+        rananta@google.com, bgardon@google.com, ricarkol@gmail.com,
+        Shaoqin Huang <shahuang@redhat.com>
+Subject: Re: [PATCH v6 03/12] KVM: arm64: Add helper for creating unlinked stage2 subtrees
+In-Reply-To: <20230307034555.39733-4-ricarkol@google.com>
+References: <20230307034555.39733-1-ricarkol@google.com>
+        <20230307034555.39733-4-ricarkol@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ricarkol@google.com, pbonzini@redhat.com, oupton@google.com, yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com, rananta@google.com, bgardon@google.com, ricarkol@gmail.com, shahuang@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add map_leaf & free_leaf override helper functions for shadow EPT, and
-use page state API in these helper functions to support shadow EPT
-invalidation, destroy and EPT violation for normal VM.
+On Tue, 07 Mar 2023 03:45:46 +0000,
+Ricardo Koller <ricarkol@google.com> wrote:
+> 
+> Add a stage2 helper, kvm_pgtable_stage2_create_unlinked(), for
+> creating unlinked tables (which is the opposite of
+> kvm_pgtable_stage2_free_unlinked()).  Creating an unlinked table is
+> useful for splitting PMD and PUD blocks into subtrees of PAGE_SIZE
 
-When map a page for a normal VM in shadow EPT, use the share API to mark
-this page is shared which is previously owned by the host VM but now is
-shared between the host VM and the normal VM. And when invalidate or
-destroy shadow EPT, mark this page as unshared which means owned by the
-host VM again.
+Please drop the PMD/PUD verbiage. That's specially confusing when
+everything is described in terms of 'level'
 
-Under the state machine of page state transition, pKVM does not support
-multiple guest pages mapping to same host page, it's conflict with KSM,
-so just disable it under pKVM Kconfig.
+> PTEs.  For example, a PUD can be split into PAGE_SIZE PTEs by first
 
-Signed-off-by: Chuanxiao Dong <chuanxiao.dong@intel.com>
-Signed-off-by: Jason Chen CJ <jason.cj.chen@intel.com>
----
- arch/x86/kvm/Kconfig            |  1 +
- arch/x86/kvm/vmx/pkvm/hyp/ept.c | 60 +++++++++++++++++++++++++++++++--
- arch/x86/kvm/vmx/pkvm/hyp/ept.h |  1 +
- 3 files changed, 59 insertions(+), 3 deletions(-)
+for example: s/a PUD/a level 1 mapping/
 
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index c2f66d3eef37..3eb7a2624245 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -91,6 +91,7 @@ config PKVM_INTEL
- 	bool "pKVM for Intel processors support"
- 	depends on KVM_INTEL=y
- 	depends on X86_64
-+	depends on !KSM
- 	help
- 	  Provides support for pKVM on Intel processors.
- 
-diff --git a/arch/x86/kvm/vmx/pkvm/hyp/ept.c b/arch/x86/kvm/vmx/pkvm/hyp/ept.c
-index 9e5aeb8b239e..f942e2e7f3d8 100644
---- a/arch/x86/kvm/vmx/pkvm/hyp/ept.c
-+++ b/arch/x86/kvm/vmx/pkvm/hyp/ept.c
-@@ -317,6 +317,58 @@ static struct pkvm_mm_ops shadow_ept_mm_ops = {
- 	.flush_tlb = flush_tlb_noop,
- };
- 
-+static int pkvm_shadow_ept_map_leaf(struct pkvm_pgtable *pgt, unsigned long vaddr, int level,
-+				    void *ptep, struct pgt_flush_data *flush_data, void *arg)
-+{
-+	struct pkvm_pgtable_map_data *data = arg;
-+	struct pkvm_pgtable_ops *pgt_ops = pgt->pgt_ops;
-+	unsigned long level_size = pgt_ops->pgt_level_to_size(level);
-+	unsigned long map_phys = data->phys & PAGE_MASK;
-+	int ret;
-+
-+	/*
-+	 * It is possible that another CPU just created same mapping when
-+	 * multiple EPT violations happen on different CPUs.
-+	 */
-+	if (!pgt_ops->pgt_entry_present(ptep)) {
-+		ret = __pkvm_host_share_guest(map_phys, pgt, vaddr, level_size, data->prot);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	/* Increase the physical address for the next mapping */
-+	data->phys += level_size;
-+
-+	return 0;
-+}
-+
-+static int pkvm_shadow_ept_free_leaf(struct pkvm_pgtable *pgt, unsigned long vaddr, int level,
-+				     void *ptep, struct pgt_flush_data *flush_data, void *arg)
-+{
-+	unsigned long phys = pgt->pgt_ops->pgt_entry_to_phys(ptep);
-+	unsigned long size = pgt->pgt_ops->pgt_level_to_size(level);
-+
-+	if (pgt->pgt_ops->pgt_entry_present(ptep)) {
-+		int ret;
-+
-+		/*
-+		 * The pgtable_free_cb in this current page walker is still walking
-+		 * the shadow EPT so cannot allow the  __pkvm_host_unshare_guest()
-+		 * release shadow EPT table pages.
-+		 *
-+		 * The table pages will be freed later by the pgtable_free_cb itself.
-+		 */
-+		pgt->mm_ops->get_page(ptep);
-+		ret = __pkvm_host_unshare_guest(phys, pgt, vaddr, size);
-+		pgt->mm_ops->put_page(ptep);
-+		flush_data->flushtlb |= true;
-+
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
- void pkvm_invalidate_shadow_ept(struct shadow_ept_desc *desc)
- {
- 	struct pkvm_shadow_vm *vm = sept_desc_to_shadow_vm(desc);
-@@ -328,7 +380,7 @@ void pkvm_invalidate_shadow_ept(struct shadow_ept_desc *desc)
- 	if (!is_valid_eptp(desc->shadow_eptp))
- 		goto out;
- 
--	pkvm_pgtable_unmap(sept, 0, size, NULL);
-+	pkvm_pgtable_unmap(sept, 0, size, pkvm_shadow_ept_free_leaf);
- 
- 	flush_ept(desc->shadow_eptp);
- out:
-@@ -343,7 +395,7 @@ void pkvm_shadow_ept_deinit(struct shadow_ept_desc *desc)
- 	pkvm_spin_lock(&vm->lock);
- 
- 	if (desc->shadow_eptp) {
--		pkvm_pgtable_destroy(sept, NULL);
-+		pkvm_pgtable_destroy(sept, pkvm_shadow_ept_free_leaf);
- 
- 		flush_ept(desc->shadow_eptp);
- 
-@@ -459,8 +511,10 @@ pkvm_handle_shadow_ept_violation(struct shadow_vcpu_state *shadow_vcpu, u64 l2_g
- 		unsigned long level_size = pgt_ops->pgt_level_to_size(level);
- 		unsigned long gpa = ALIGN_DOWN(l2_gpa, level_size);
- 		unsigned long hpa = ALIGN_DOWN(host_gpa2hpa(phys), level_size);
-+		u64 prot = gprot & EPT_PROT_MASK;
- 
--		if (!pkvm_pgtable_map(sept, gpa, hpa, level_size, 0, gprot, NULL))
-+		if (!pkvm_pgtable_map(sept, gpa, hpa, level_size, 0,
-+					prot, pkvm_shadow_ept_map_leaf))
- 			ret = PKVM_HANDLED;
- 	}
- out:
-diff --git a/arch/x86/kvm/vmx/pkvm/hyp/ept.h b/arch/x86/kvm/vmx/pkvm/hyp/ept.h
-index 9d7d2c2f9be3..2ad2fab4a88d 100644
---- a/arch/x86/kvm/vmx/pkvm/hyp/ept.h
-+++ b/arch/x86/kvm/vmx/pkvm/hyp/ept.h
-@@ -11,6 +11,7 @@
- 				(MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT))
- #define HOST_EPT_DEF_MMIO_PROT	(VMX_EPT_RWX_MASK |				\
- 				(MTRR_TYPE_UNCACHABLE << VMX_EPT_MT_EPTE_SHIFT))
-+#define EPT_PROT_MASK		(VMX_EPT_RWX_MASK | VMX_EPT_MT_MASK | VMX_EPT_IPAT_BIT)
- 
- enum sept_handle_ret {
- 	PKVM_NOT_HANDLED,
+> creating a fully populated tree, and then use it to replace the PUD in
+> a single step.  This will be used in a subsequent commit for eager
+> huge-page splitting (a dirty-logging optimization).
+> 
+> No functional change intended. This new function will be used in a
+> subsequent commit.
+
+Drop this last sentence, it doesn't say anything that you haven't
+already said.
+
+> 
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h | 28 +++++++++++++++++
+>  arch/arm64/kvm/hyp/pgtable.c         | 46 ++++++++++++++++++++++++++++
+>  2 files changed, 74 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index c7a269cad053..b7b3fc0fa7a5 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -468,6 +468,34 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
+>   */
+>  void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level);
+>  
+> +/**
+> + * kvm_pgtable_stage2_create_unlinked() - Create an unlinked stage-2 paging structure.
+> + * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
+> + * @phys:	Physical address of the memory to map.
+> + * @level:	Starting level of the stage-2 paging structure to be created.
+> + * @prot:	Permissions and attributes for the mapping.
+> + * @mc:		Cache of pre-allocated and zeroed memory from which to allocate
+> + *		page-table pages.
+> + * @force_pte:  Force mappings to PAGE_SIZE granularity.
+> + *
+> + * Returns an unlinked page-table tree. If @force_pte is true or
+> + * @level is 2 (the PMD level), then the tree is mapped up to the
+> + * PAGE_SIZE leaf PTE; the tree is mapped up one level otherwise.
+
+I wouldn't make this "one level" assumption, as this really depends on
+the size of what gets mapped (and future evolution of this code).
+
+> + * This new page-table tree is not reachable (i.e., it is unlinked)
+> + * from the root pgd and it's therefore unreachableby the hardware
+> + * page-table walker. No TLB invalidation or CMOs are performed.
+> + *
+> + * If device attributes are not explicitly requested in @prot, then the
+> + * mapping will be normal, cacheable.
+> + *
+> + * Return: The fully populated (unlinked) stage-2 paging structure, or
+> + * an ERR_PTR(error) on failure.
+
+What guarantees that this new unlinked structure is kept in sync with
+the original one? AFAICT, nothing does.
+
+> + */
+> +kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
+> +					      u64 phys, u32 level,
+> +					      enum kvm_pgtable_prot prot,
+> +					      void *mc, bool force_pte);
+> +
+>  /**
+>   * kvm_pgtable_stage2_map() - Install a mapping in a guest stage-2 page-table.
+>   * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 4f703cc4cb03..6bdfcb671b32 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -1212,6 +1212,52 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
+>  	return kvm_pgtable_walk(pgt, addr, size, &walker);
+>  }
+>  
+> +kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
+> +					      u64 phys, u32 level,
+> +					      enum kvm_pgtable_prot prot,
+> +					      void *mc, bool force_pte)
+> +{
+> +	struct stage2_map_data map_data = {
+> +		.phys		= phys,
+> +		.mmu		= pgt->mmu,
+> +		.memcache	= mc,
+> +		.force_pte	= force_pte,
+> +	};
+> +	struct kvm_pgtable_walker walker = {
+> +		.cb		= stage2_map_walker,
+> +		.flags		= KVM_PGTABLE_WALK_LEAF |
+> +				  KVM_PGTABLE_WALK_SKIP_BBM |
+> +				  KVM_PGTABLE_WALK_SKIP_CMO,
+> +		.arg		= &map_data,
+> +	};
+> +	/* .addr (the IPA) is irrelevant for an unlinked table */
+> +	struct kvm_pgtable_walk_data data = {
+> +		.walker	= &walker,
+> +		.addr	= 0,
+
+Is that always true? What if the caller expect a non-block-aligned
+mapping? You should at least check that phys is aligned to the granule
+size of 'level', or bad stuff may happen.
+
+> +		.end	= kvm_granule_size(level),
+> +	};
+> +	struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
+> +	kvm_pte_t *pgtable;
+> +	int ret;
+> +
+> +	ret = stage2_set_prot_attr(pgt, prot, &map_data.attr);
+> +	if (ret)
+> +		return ERR_PTR(ret);
+> +
+> +	pgtable = mm_ops->zalloc_page(mc);
+> +	if (!pgtable)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	ret = __kvm_pgtable_walk(&data, mm_ops, (kvm_pteref_t)pgtable,
+> +				 level + 1);
+> +	if (ret) {
+> +		kvm_pgtable_stage2_free_unlinked(mm_ops, pgtable, level);
+> +		mm_ops->put_page(pgtable);
+> +		return ERR_PTR(ret);
+> +	}
+> +
+> +	return pgtable;
+> +}
+>  
+>  int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+>  			      struct kvm_pgtable_mm_ops *mm_ops,
+
+	M.
+
 -- 
-2.25.1
-
+Without deviation from the norm, progress is not possible.
