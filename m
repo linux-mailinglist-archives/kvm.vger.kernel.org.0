@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 095756B69C5
-	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 19:07:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F5BC6B69C3
+	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 19:06:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231939AbjCLSG6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Mar 2023 14:06:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51068 "EHLO
+        id S232119AbjCLSG4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Mar 2023 14:06:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232159AbjCLSFO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S232167AbjCLSFO (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sun, 12 Mar 2023 14:05:14 -0400
 Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FC26515D2;
-        Sun, 12 Mar 2023 11:01:06 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42D8E3B668;
+        Sun, 12 Mar 2023 11:01:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678644066; x=1710180066;
+  t=1678644068; x=1710180068;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ZeL5f4tujGKGIY1QCsDr0rFWgQyYSgAkIh+FoL39n4c=;
-  b=Gwk3/7nym6n7D03dyrhQY/9gvuLKi1ENadLfV+uKQYU+N3OkBfvl/f7c
-   cnFNfFkK46abMhdNlBKT2H0xYK5bzTzbRLAwOjCj/A5Ga7mgWJXejLz6Z
-   vxTJH7vV2XIX9vh7nzHGCmNzelm1yVf/8vGCTzyWnwD8UOxvxxVKi6q/X
-   FrFM7U/yAwvd0gSLgF84dsz3gCyz8lWWPVqvesB0fkT6YxzgubDVrKWqp
-   HjP7/c6+Z6kE4gbuEo36wmDNDKhLZQisIoOEq8zm1TR+ba8kxqqjOzO+/
-   eNKNyj8/kvg2MVw8fUAkw/XAdz2bNpFLL64wY9UMZjdkG+2n/wsvqeg+3
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="316660115"
+  bh=QVO5JAqeGqgmVL7v4Ba8+MaKbkXoTcWGM7v1hgKkUYc=;
+  b=QNE0i0hoWaWTNIjHLYSwtd+6F7ffSJad21JJ67C7M+ulLD3dZ6N0Zcm8
+   FAEjKCeYcM4Eg0LscBz+QYGn2t6UryODvZub5hwMj4a1EbdVadjWQlyws
+   S8XU28AKuEr7aqYrytuLuA1n6bR9U1ARYaEgYOHwBadyxM9o222j8xIo/
+   8w5phoCgfG+VymkKMv2xDVPnh6yLmZlFDGvuIAnEp0mr60FZ4NzNDKS7M
+   eu/DW7VLPXoe1xgzrz8fca9znNHQxpErdfD6MZYRVlybHmb9KiIaTdBnD
+   umoeRM3vmpQ3XhvyWTNOTEaq142j7QzhLW5nL3ApDLNioirURfzZiVgdv
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="316660119"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="316660115"
+   d="scan'208";a="316660119"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 10:58:16 -0700
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 10:58:17 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="742596845"
+X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="742596848"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="742596845"
+   d="scan'208";a="742596848"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 10:58:16 -0700
 From:   isaku.yamahata@intel.com
@@ -47,9 +47,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         David Matlack <dmatlack@google.com>,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>
-Subject: [PATCH v13 103/113] KVM: TDX: Add methods to ignore guest instruction emulation
-Date:   Sun, 12 Mar 2023 10:57:07 -0700
-Message-Id: <50b95161cb5e63965a830d6a2727a3ce3a5b7f7c.1678643052.git.isaku.yamahata@intel.com>
+Subject: [PATCH v13 104/113] KVM: TDX: Add a method to ignore dirty logging
+Date:   Sun, 12 Mar 2023 10:57:08 -0700
+Message-Id: <6dff4dcc9843f5bf6d85bdabaf439d670c154fde.1678643052.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1678643051.git.isaku.yamahata@intel.com>
 References: <cover.1678643051.git.isaku.yamahata@intel.com>
@@ -66,67 +66,42 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Because TDX protects TDX guest state from VMM, instructions in guest memory
-cannot be emulated.  Implement methods to ignore guest instruction
-emulator.
+Currently TDX KVM doesn't support tracking dirty pages (yet).  Implement a
+method to ignore it.  Because the flag for kvm memory slot to enable dirty
+logging isn't accepted for TDX, warn on the method is called for TDX.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/main.c | 28 ++++++++++++++++++++++++++--
- 1 file changed, 26 insertions(+), 2 deletions(-)
+ arch/x86/kvm/vmx/main.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 07dfbf9a8b23..59fa63146c8d 100644
+index 59fa63146c8d..c9bbee1b69e9 100644
 --- a/arch/x86/kvm/vmx/main.c
 +++ b/arch/x86/kvm/vmx/main.c
-@@ -332,6 +332,30 @@ static void vt_enable_smi_window(struct kvm_vcpu *vcpu)
+@@ -828,6 +828,14 @@ static u8 vt_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
+ 	return __vmx_get_mt_mask(vcpu, gfn, is_mmio, true);
  }
- #endif
  
-+static bool vt_can_emulate_instruction(struct kvm_vcpu *vcpu, int emul_type,
-+				       void *insn, int insn_len)
++static void vt_update_cpu_dirty_logging(struct kvm_vcpu *vcpu)
 +{
-+	if (is_td_vcpu(vcpu))
-+		return false;
-+
-+	return vmx_can_emulate_instruction(vcpu, emul_type, insn, insn_len);
-+}
-+
-+static int vt_check_intercept(struct kvm_vcpu *vcpu,
-+				 struct x86_instruction_info *info,
-+				 enum x86_intercept_stage stage,
-+				 struct x86_exception *exception)
-+{
-+	/*
-+	 * This call back is triggered by the x86 instruction emulator. TDX
-+	 * doesn't allow guest memory inspection.
-+	 */
 +	if (KVM_BUG_ON(is_td_vcpu(vcpu), vcpu->kvm))
-+		return X86EMUL_UNHANDLEABLE;
++		return;
 +
-+	return vmx_check_intercept(vcpu, info, stage, exception);
++	vmx_update_cpu_dirty_logging(vcpu);
 +}
 +
- static bool vt_apic_init_signal_blocked(struct kvm_vcpu *vcpu)
+ static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
  {
- 	if (is_td_vcpu(vcpu))
-@@ -940,7 +964,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	if (!is_td(kvm))
+@@ -972,7 +980,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.sched_in = vt_sched_in,
  
- 	.load_mmu_pgd = vt_load_mmu_pgd,
+ 	.cpu_dirty_log_size = PML_ENTITY_NUM,
+-	.update_cpu_dirty_logging = vmx_update_cpu_dirty_logging,
++	.update_cpu_dirty_logging = vt_update_cpu_dirty_logging,
  
--	.check_intercept = vmx_check_intercept,
-+	.check_intercept = vt_check_intercept,
- 	.handle_exit_irqoff = vt_handle_exit_irqoff,
- 
- 	.request_immediate_exit = vt_request_immediate_exit,
-@@ -969,7 +993,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.enable_smi_window = vt_enable_smi_window,
- #endif
- 
--	.can_emulate_instruction = vmx_can_emulate_instruction,
-+	.can_emulate_instruction = vt_can_emulate_instruction,
- 	.apic_init_signal_blocked = vt_apic_init_signal_blocked,
- 	.migrate_timers = vmx_migrate_timers,
+ 	.nested_ops = &vmx_nested_ops,
  
 -- 
 2.25.1
