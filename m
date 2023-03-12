@@ -2,87 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3FCCB6B610F
-	for <lists+kvm@lfdr.de>; Sat, 11 Mar 2023 22:41:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 81F496B64C1
+	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 11:12:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229713AbjCKVlU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 11 Mar 2023 16:41:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46218 "EHLO
+        id S229752AbjCLKMp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Mar 2023 06:12:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbjCKVlS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 11 Mar 2023 16:41:18 -0500
-Received: from out-40.mta1.migadu.com (out-40.mta1.migadu.com [IPv6:2001:41d0:203:375::28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B19662D97
-        for <kvm@vger.kernel.org>; Sat, 11 Mar 2023 13:41:17 -0800 (PST)
-Date:   Sat, 11 Mar 2023 13:41:10 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1678570875;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=OIfr38RQbr2XXVcmEhQx3zmzDnnSyVR94dBmvVhONCc=;
-        b=IFX7soddA5zpXP8JmmrAoXVD3b+xKHeGFDkDD1KN32IDgVOF4LS54rCLqB9jFaVaTTgJ5K
-        MaAyiPc80JdWLup/UL3P70fZd94rAk2vTXLaZIoEu5MecqYooAO6lf9r7I81VYQBfVRZaY
-        xCSwv4P48PTogn9UHZVaqtHE1HLrrC0=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     pbonzini@redhat.com
-Cc:     maz@kernel.org, reijiw@google.com, joey.gouly@arm.com,
-        james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-        kvmarm@lists.linux.dev, kvm@vger.kernel.org
-Subject: [GIT PULL] KVM/arm64 fixes for 6.3, part #1
-Message-ID: <ZAz1duOOOTu+5LW5@thinky-boi>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229514AbjCLKMo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Mar 2023 06:12:44 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8F912B9FD;
+        Sun, 12 Mar 2023 03:12:35 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 55809B80B8E;
+        Sun, 12 Mar 2023 10:12:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEE6FC433EF;
+        Sun, 12 Mar 2023 10:12:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1678615953;
+        bh=E7bPVAJB0P+NNUv6wlLhylVPpS+IMeu0U2Tgnih222A=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=hs+B2RdhF8yCtX3AI/64vDPUdob4V//XDNTjqKcYtyv4Fen+yoFEZj3ihh5CcleYc
+         z2XFSLdjys8Ew7++uTpr2WHJgqEuHGir4JBYaEcX83uHiWHkE5FloUTmLC+KAt8mLR
+         XQD/k8UAKWzUkrriU6fnUp8aPltYttnT2a4ulAnT+tO8QQls7+uJ9IeS/UtZSK4gTd
+         ecpFB3RL/AXGLUQLpyx+C6QFc5bSoDXp9IIsfPHBUYiHMTCRwbc1akUZq90QiBhHin
+         xB+6zfedEqXpnd3fJn9an91NO41PV4ElZsu1qFgXIwN3gVFRVonWT2BI91mqD7Bf08
+         x1Kri4o4D+wIA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pbIgo-00GyIX-8j;
+        Sun, 12 Mar 2023 10:12:30 +0000
+Date:   Sun, 12 Mar 2023 10:12:29 +0000
+Message-ID: <87h6uq5lde.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        kvm-riscv@lists.infradead.org
+Subject: Re: [PATCH 1/2] KVM: Use syscore_ops instead of reboot_notifier to hook restart/shutdown
+In-Reply-To: <20230310221414.811690-2-seanjc@google.com>
+References: <20230310221414.811690-1-seanjc@google.com>
+        <20230310221414.811690-2-seanjc@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, anup@brainfault.org, atishp@atishpatra.org, kvm-riscv@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, 10 Mar 2023 22:14:13 +0000,
+Sean Christopherson <seanjc@google.com> wrote:
+> 
+> Use syscore_ops.shutdown to disable hardware virtualization during a
+> reboot instead of using the dedicated reboot_notifier so that KVM disables
+> virtualization _after_ system_state has been updated.  This will allow
+> fixing a race in KVM's handling of a forced reboot where KVM can end up
+> enabling hardware virtualization between kernel_restart_prepare() and
+> machine_restart().
+> 
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Oliver Upton <oliver.upton@linux.dev>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: Zenghui Yu <yuzenghui@huawei.com>
+> Cc: kvmarm@lists.linux.dev
+> Cc: Huacai Chen <chenhuacai@kernel.org>
+> Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+> Cc: Anup Patel <anup@brainfault.org>
+> Cc: Atish Patra <atishp@atishpatra.org>
+> Cc: kvm-riscv@lists.infradead.org
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  virt/kvm/kvm_main.c | 14 +++-----------
+>  1 file changed, 3 insertions(+), 11 deletions(-)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index d255964ec331..6cdfbb2c641b 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -5211,8 +5211,7 @@ static int hardware_enable_all(void)
+>  	return r;
+>  }
+>  
+> -static int kvm_reboot(struct notifier_block *notifier, unsigned long val,
+> -		      void *v)
+> +static void kvm_reboot(void)
+>  {
+>  	/*
+>  	 * Some (well, at least mine) BIOSes hang on reboot if
+> @@ -5223,14 +5222,8 @@ static int kvm_reboot(struct notifier_block *notifier, unsigned long val,
+>  	pr_info("kvm: exiting hardware virtualization\n");
+>  	kvm_rebooting = true;
+>  	on_each_cpu(hardware_disable_nolock, NULL, 1);
+> -	return NOTIFY_OK;
+>  }
+>  
+> -static struct notifier_block kvm_reboot_notifier = {
+> -	.notifier_call = kvm_reboot,
+> -	.priority = 0,
+> -};
+> -
+>  static int kvm_suspend(void)
+>  {
+>  	/*
+> @@ -5261,6 +5254,8 @@ static void kvm_resume(void)
+>  static struct syscore_ops kvm_syscore_ops = {
+>  	.suspend = kvm_suspend,
+>  	.resume = kvm_resume,
+> +	.shutdown = kvm_reboot,
+> +
 
-Hi Paolo,
+nit: consider renaming the kvm_reboot to kvm_shutdown to match the
+syscore structure, and drop the spurious blank line.
 
-First shot at sending a pull request to you, please let me know if anything
-is screwed up :)
+	M.
 
-A single, important fix for guest timers addressing a bug from the nested
-virtualization prefix that went in 6.3. 
-
-Please pull,
-
---
-Oliver
-
-The following changes since commit fe15c26ee26efa11741a7b632e9f23b01aca4cc6:
-
-  Linux 6.3-rc1 (2023-03-05 14:52:03 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.3-1
-
-for you to fetch changes up to 47053904e18282af4525a02e3e0f519f014fc7f9:
-
-  KVM: arm64: timers: Convert per-vcpu virtual offset to a global value (2023-03-11 02:00:40 -0800)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.3, part #1
-
-A single patch to address a rather annoying bug w.r.t. guest timer
-offsetting. Effectively the synchronization of timer offsets between
-vCPUs was broken, leading to inconsistent timer reads within the VM.
-
-----------------------------------------------------------------
-Marc Zyngier (1):
-      KVM: arm64: timers: Convert per-vcpu virtual offset to a global value
-
- arch/arm64/include/asm/kvm_host.h |  3 +++
- arch/arm64/kvm/arch_timer.c       | 45 +++++++++------------------------------
- arch/arm64/kvm/hypercalls.c       |  2 +-
- include/kvm/arm_arch_timer.h      | 15 +++++++++++++
- 4 files changed, 29 insertions(+), 36 deletions(-)
+-- 
+Without deviation from the norm, progress is not possible.
