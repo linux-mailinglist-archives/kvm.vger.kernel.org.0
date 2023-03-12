@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D9A5F6B6596
-	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 12:40:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 163526B65A4
+	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 12:56:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230164AbjCLLj7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Mar 2023 07:39:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34032 "EHLO
+        id S230000AbjCLL4f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Mar 2023 07:56:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229749AbjCLLj6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Mar 2023 07:39:58 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB74E212B3
-        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 04:39:57 -0700 (PDT)
+        with ESMTP id S229550AbjCLL4e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Mar 2023 07:56:34 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 235F9BB85
+        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 04:56:33 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 26A1E60F05
-        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 11:39:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 878F4C433EF;
-        Sun, 12 Mar 2023 11:39:56 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id C0FC2B80B8A
+        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 11:56:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B57FC433EF;
+        Sun, 12 Mar 2023 11:56:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678621196;
-        bh=nTQEFaXwPHlcQkPCQVZJvftVD07EvgyZH7LOw0V8qaI=;
+        s=k20201202; t=1678622190;
+        bh=GjdNFEvsgjOuGRSQP5IqBs2EtvOn1F5RG4CJZaY3gbE=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=caFKuMY4xztGtrCaXjHGbCtE5UcafIkjkgYzpViYmgeRD6PvbHt/+B5eXdWOYudez
-         sjz5aBgMJ8upatQpj3xDeIAP7zLXQFQsxFslD1Haeo4nra74tjGzQIiZeM3IEcNdYS
-         7Sl3VlLhPnJXOYVIPX+N5Hh2p/O6c5w62DEqVy1ZH4mph3/7ofJCfrjqYJnXZ7KroY
-         H+qBnpRzVoQ0JVaZcnIReQOZwPX5qc7SECnFoSzIev6pNT8BXiLkX7gRBtpIoZN/bU
-         rUMvW+HbV5LMLh+wt2mgipkqVttGHO3DhFOMP8F7HbNy1BT/vfkmxUEbE3TzBm29jp
-         yctxtREV1zUfA==
+        b=EKena6GfnLuJa/Dx3oZrHgC4N2COVqaxSmXHEhbbZECMRYpL/UmcXYlzt8HFjJpcO
+         kH0G2yUKeZZTWSt0FuV0kkYuXk0MkIX//b4kqglCZ7CNtZC1js49RUkgHm5bsPnENB
+         4GfVDsXgB6S2Es1wiLU7bDqBLtOmTDCNnFVSHUrtBDHsTzr5r7AjVMQt1aEm/vFk1x
+         eVMYlVP3pFBc68R/WFfurCQ+8Rk4xOh4e1hJAqeAFAvFE9priDiB9HYKrIjOYjGhJg
+         nXwJLsM6h2LqIZ/1CADARb+FAYbZn7xk6UlIRbWNX819WJ+SlslwBdi/dylqOY6pvQ
+         FaJtTOsuFDsZQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pbK3O-00Gyw6-2q;
-        Sun, 12 Mar 2023 11:39:54 +0000
-Date:   Sun, 12 Mar 2023 11:39:53 +0000
-Message-ID: <878rg25hbq.wl-maz@kernel.org>
+        id 1pbKJQ-00Gz1K-8V;
+        Sun, 12 Mar 2023 11:56:28 +0000
+Date:   Sun, 12 Mar 2023 11:56:27 +0000
+Message-ID: <877cvm5gk4.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Ricardo Koller <ricarkol@google.com>
 Cc:     pbonzini@redhat.com, oupton@google.com, yuzenghui@huawei.com,
@@ -48,18 +48,18 @@ Cc:     pbonzini@redhat.com, oupton@google.com, yuzenghui@huawei.com,
         alexandru.elisei@arm.com, suzuki.poulose@arm.com,
         eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
         rananta@google.com, bgardon@google.com, ricarkol@gmail.com,
-        Shaoqin Huang <shahuang@redhat.com>
-Subject: Re: [PATCH v6 07/12] KVM: arm64: Export kvm_are_all_memslots_empty()
-In-Reply-To: <20230307034555.39733-8-ricarkol@google.com>
+        Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH v6 08/12] KVM: arm64: Add KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+In-Reply-To: <20230307034555.39733-9-ricarkol@google.com>
 References: <20230307034555.39733-1-ricarkol@google.com>
-        <20230307034555.39733-8-ricarkol@google.com>
+        <20230307034555.39733-9-ricarkol@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ricarkol@google.com, pbonzini@redhat.com, oupton@google.com, yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com, rananta@google.com, bgardon@google.com, ricarkol@gmail.com, shahuang@redhat.com
+X-SA-Exim-Rcpt-To: ricarkol@google.com, pbonzini@redhat.com, oupton@google.com, yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com, rananta@google.com, bgardon@google.com, ricarkol@gmail.com, oliver.upton@linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -71,23 +71,194 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 07 Mar 2023 03:45:50 +0000,
+On Tue, 07 Mar 2023 03:45:51 +0000,
 Ricardo Koller <ricarkol@google.com> wrote:
 > 
-> Export kvm_are_all_memslots_empty(). This will be used by a future
-> commit when checking before setting a capability.
-
-You're not exporting this function, you  are making it globally
-visible, which is a very different things. Please keep "export"
-description for symbols that are actually exported to modules.
-
+> Add a capability for userspace to specify the eager split chunk size.
+> The chunk size specifies how many pages to break at a time, using a
+> single allocation. Bigger the chunk size, more pages need to be
+> allocated ahead of time.
 > 
-> No functional change intended.
+> Suggested-by: Oliver Upton <oliver.upton@linux.dev>
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> ---
+>  Documentation/virt/kvm/api.rst    | 26 ++++++++++++++++++++++++++
+>  arch/arm64/include/asm/kvm_host.h | 19 +++++++++++++++++++
+>  arch/arm64/kvm/arm.c              | 22 ++++++++++++++++++++++
+>  arch/arm64/kvm/mmu.c              |  3 +++
+>  include/uapi/linux/kvm.h          |  1 +
+>  5 files changed, 71 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 62de0768d6aa..872dae7cfbe0 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -8380,6 +8380,32 @@ structure.
+>  When getting the Modified Change Topology Report value, the attr->addr
+>  must point to a byte where the value will be stored or retrieved from.
+>  
+> +8.40 KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+> +---------------------------------------
+> +
+> +:Capability: KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+> +:Architectures: arm64
+> +:Type: vm
+> +:Parameters: arg[0] is the new chunk size.
 
-I wish people stopped adding this pointless sentence to commit
-messages. All changes have a functional change one way or another,
-unless you are only changing a comment. Yes, I've been guilty of
-writing that too, and I wish I didn't.
+split chunk size?
+
+> +:Returns: 0 on success, -EINVAL if any memslot has been created.
+
+nit: if any memslot was *already* created.
+
+> +
+> +This capability sets the chunk size used in Eager Page Splitting.
+> +
+> +Eager Page Splitting improves the performance of dirty-logging (used
+> +in live migrations) when guest memory is backed by huge-pages.  This
+> +optimization is enabled by default on arm64.
+
+Why enabled by default? It means that systems that do not want to pay
+the extra memory for this have to do an explicit call to disable it.
+I'd rather see this as a buy-in option.
+
+> It avoids splitting
+> +huge-pages (into PAGE_SIZE pages) on fault, by doing it eagerly when
+> +enabling dirty logging (with the KVM_MEM_LOG_DIRTY_PAGES flag for a
+> +memory region), or when using KVM_CLEAR_DIRTY_LOG.
+> +
+> +The chunk size specifies how many pages to break at a time, using a
+> +single allocation for each chunk. Bigger the chunk size, more pages
+> +need to be allocated ahead of time. A good heuristic is to pick the
+> +size of the huge-pages as the chunk size.
+
+How about making this a requirement rather than a heuristic? You could
+also tell userspace what are the block sizes that are acceptable (1G,
+512M, 2M, 64K...) by exposing a 64bit bitmap (each bit describing a
+block size).
+
+> +
+> +If the chunk size (arg[0]) is zero, then no eager page splitting is
+> +performed. The default value PMD size (e.g., 2M when PAGE_SIZE is 4K).
+
+I really dislike exposing the notion of PMD to userspace. Not only
+this is a concept that is mostly foreign to the arm64 architecture,
+this isn't a userspace concept at all. Another reason to talk about
+block sizes (but I really want this to default to 0 and keep the
+current behaviour as the default).
+
+> +
+>  9. Known KVM API problems
+>  =========================
+>  
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index a1892a8f6032..b7755d0cbd4d 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -158,6 +158,25 @@ struct kvm_s2_mmu {
+>  	/* The last vcpu id that ran on each physical CPU */
+>  	int __percpu *last_vcpu_ran;
+>  
+> +#define KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT	PMD_SIZE
+> +	/*
+> +	 * Memory cache used to split
+> +	 * KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE worth of huge pages. It
+> +	 * is used to allocate stage2 page tables while splitting huge
+> +	 * pages. Note that the choice of EAGER_PAGE_SPLIT_CHUNK_SIZE
+> +	 * influences both the capacity of the split page cache, and
+> +	 * how often KVM reschedules. Be wary of raising CHUNK_SIZE
+> +	 * too high.
+> +	 *
+> +	 * A good heuristic to pick CHUNK_SIZE is that it should be
+> +	 * the size of the huge-pages backing guest memory. If not
+> +	 * known, the PMD size (usually 2M) is a good guess.
+
+This is a 4kB-ness. Nothing "usual" about it (and my 16kB hosts
+definitely object!).
+
+> +	 *
+> +	 * Protected by kvm->slots_lock.
+> +	 */
+> +	struct kvm_mmu_memory_cache split_page_cache;
+
+If this is living in kvm_s2_mmu, and that this is a proper memcache,
+why does patch #4 have this horrible 'struct stage2_split_data' that
+uses a 'void *' and carries a kvm_s2_mmu pointer?
+
+Surely, passing the memcache around should be enough (and container_of
+is your forever friend).
+
+> +	uint64_t split_page_chunk_size;
+> +
+>  	struct kvm_arch *arch;
+>  };
+>  
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 3bd732eaf087..3468fee223ae 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -91,6 +91,22 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>  		r = 0;
+>  		set_bit(KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED, &kvm->arch.flags);
+>  		break;
+> +	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
+> +		mutex_lock(&kvm->lock);
+> +		mutex_lock(&kvm->slots_lock);
+> +		/*
+> +		 * To keep things simple, allow changing the chunk
+> +		 * size only if there are no memslots created.
+> +		 */
+> +		if (!kvm_are_all_memslots_empty(kvm)) {
+> +			r = -EINVAL;
+> +		} else {
+> +			r = 0;
+> +			kvm->arch.mmu.split_page_chunk_size = cap->args[0];
+> +		}
+> +		mutex_unlock(&kvm->slots_lock);
+> +		mutex_unlock(&kvm->lock);
+> +		break;
+>  	default:
+>  		r = -EINVAL;
+>  		break;
+> @@ -288,6 +304,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_ARM_PTRAUTH_GENERIC:
+>  		r = system_has_full_ptr_auth();
+>  		break;
+> +	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
+> +		if (kvm)
+> +			r = kvm->arch.mmu.split_page_chunk_size;
+> +		else
+> +			r = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
+> +		break;
+>  	default:
+>  		r = 0;
+>  	}
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index a2800e5c4271..898985b09321 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -756,6 +756,9 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+>  	for_each_possible_cpu(cpu)
+>  		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
+>  
+> +	mmu->split_page_cache.gfp_zero = __GFP_ZERO;
+> +	mmu->split_page_chunk_size = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
+> +
+>  	mmu->pgt = pgt;
+>  	mmu->pgd_phys = __pa(pgt->pgd);
+>  	return 0;
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index d77aef872a0a..af43acdc7901 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1184,6 +1184,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
+>  #define KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP 225
+>  #define KVM_CAP_PMU_EVENT_MASKED_EVENTS 226
+> +#define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 227
+>  
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>  
 
 Thanks,
 
