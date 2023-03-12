@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 77E7F6B6613
-	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 14:01:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 424A06B6697
+	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 14:24:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229515AbjCLNBh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Mar 2023 09:01:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53174 "EHLO
+        id S230200AbjCLNYV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Mar 2023 09:24:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbjCLNBe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Mar 2023 09:01:34 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9079A37F06
-        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 06:01:32 -0700 (PDT)
+        with ESMTP id S230224AbjCLNYS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Mar 2023 09:24:18 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC6FF303D2
+        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 06:23:44 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 47E82B80B4F
-        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 13:01:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B906BC433EF;
-        Sun, 12 Mar 2023 13:01:29 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id D6518B80B18
+        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 13:22:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 994FBC433EF;
+        Sun, 12 Mar 2023 13:22:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678626089;
-        bh=1Krpz6j4z+TXsdSXtawt+riN9oCjZV/jmhx3ZOwAZ4U=;
+        s=k20201202; t=1678627363;
+        bh=2oojGcK9XMIoko0m8o7s0z2Z4DWvZglP3fcAzCm/6rY=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=hnMZWCcdRDuX58WIy/8JvFQzU6GIHIl45Hzx9+Qzb7sGqOnQHGPUn9+U9GgMzDBEZ
-         NGa5W9ub8RzMP0MJ7sCtw+2d6kgZmO8eoTNMqlldlkidubvt/Hiw5UXe+QfRYmotV0
-         U3fx/PdUcOA5hq1FXxwJttWnbHIBPfQzxsOAOMtdOxd9F1HHY1W1n6y9dsUtcRHcUj
-         UTDkPSK/JFa1P8ILbwvftoCNeYsBY/Wvy0Pq4uUi5V7asAJBLg5IeGppTBVAVrRkic
-         togWqyaQRfcxeMGWc+8jkmIVvxm7Omkxmu98YidbOsbj+Pnnjqz1fTdaxkZfwkXurp
-         ZqjPRlJOwHKbQ==
+        b=g3v2EKa08TvXU+KbqPkKHdCjoiMBqwSGyZbt/nahjaVS4gkhiw4oyWvU8GinYdFpp
+         o1P37+mFapE8kuF8tB1dOiaNsrHlF9stcZsF2Tu5jlKMs9fAhyXFoIm1q4w44p7uyp
+         XC5K7jRo4kRCaSElSlS4hvQHH5Ogfx814Yyp4HIxJfvTNu8RQzeBMfWaPh/uQv6Mv4
+         IvY1I6DScV4vIFFsPPFJ5GIVB+plNPLpS3M4QbTn/P4siRLJJ3uFL6003W96ib3mN8
+         57WiY7AzhyS5veTpmeSZpeYpAh3h88ZBQThXbFEuscD/9Ljz/Zm0NbYCMeQ4PYb7zP
+         vN7iy/zCALSng==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pbLKJ-00GzXd-EF;
-        Sun, 12 Mar 2023 13:01:27 +0000
-Date:   Sun, 12 Mar 2023 13:01:26 +0000
-Message-ID: <874jqq5djt.wl-maz@kernel.org>
+        id 1pbLer-00Gztq-DE;
+        Sun, 12 Mar 2023 13:22:41 +0000
+Date:   Sun, 12 Mar 2023 13:22:40 +0000
+Message-ID: <87356a5ckf.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Ricardo Koller <ricarkol@google.com>
 Cc:     pbonzini@redhat.com, oupton@google.com, yuzenghui@huawei.com,
@@ -48,10 +48,10 @@ Cc:     pbonzini@redhat.com, oupton@google.com, yuzenghui@huawei.com,
         alexandru.elisei@arm.com, suzuki.poulose@arm.com,
         eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
         rananta@google.com, bgardon@google.com, ricarkol@gmail.com
-Subject: Re: [PATCH v6 11/12] KVM: arm64: Split huge pages during KVM_CLEAR_DIRTY_LOG
-In-Reply-To: <20230307034555.39733-12-ricarkol@google.com>
+Subject: Re: [PATCH v6 12/12] KVM: arm64: Use local TLBI on permission relaxation
+In-Reply-To: <20230307034555.39733-13-ricarkol@google.com>
 References: <20230307034555.39733-1-ricarkol@google.com>
-        <20230307034555.39733-12-ricarkol@google.com>
+        <20230307034555.39733-13-ricarkol@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -61,8 +61,8 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: ricarkol@google.com, pbonzini@redhat.com, oupton@google.com, yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com, rananta@google.com, bgardon@google.com, ricarkol@gmail.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,72 +70,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 07 Mar 2023 03:45:54 +0000,
+On Tue, 07 Mar 2023 03:45:55 +0000,
 Ricardo Koller <ricarkol@google.com> wrote:
 > 
-> This is the arm64 counterpart of commit cb00a70bd4b7 ("KVM: x86/mmu:
-> Split huge pages mapped by the TDP MMU during KVM_CLEAR_DIRTY_LOG"),
-> which has the benefit of splitting the cost of splitting a memslot
-> across multiple ioctls.
+> From: Marc Zyngier <maz@kernel.org>
+
+Thanks for writing a commit message for my hacks!
+
 > 
-> Split huge pages on the range specified using KVM_CLEAR_DIRTY_LOG.
-> And do not split when enabling dirty logging if
-> KVM_DIRTY_LOG_INITIALLY_SET is set.
+> Broadcasted TLB invalidations (TLBI) are usually less performant than
+
+More precisely, TLBIs targeting the Inner Shareable domain. Also,
+'s/broadcasted/broadcast/', as this is an adjective and not a verb
+indicative of the past tense..
+
+> their local variant. In particular, we observed some implementations
+
+non-shareable rather than local. 'Local' has all sort of odd
+implementation specific meanings (local to *what* is the usual
+question that follows...).
+
+> that take millliseconds to complete parallel broadcasted TLBIs.
 > 
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> ---
->  arch/arm64/kvm/mmu.c | 15 ++++++++++++---
->  1 file changed, 12 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 910aea6bbd1e..d54223b5db97 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1089,8 +1089,8 @@ static void kvm_mmu_split_memory_region(struct kvm *kvm, int slot)
->   * @mask:	The mask of pages at offset 'gfn_offset' in this memory
->   *		slot to enable dirty logging on
->   *
-> - * Writes protect selected pages to enable dirty logging for them. Caller must
-> - * acquire kvm->mmu_lock.
-> + * Splits selected pages to PAGE_SIZE and then writes protect them to enable
-> + * dirty logging for them. Caller must acquire kvm->mmu_lock.
+> It's safe to use local, non-shareable, TLBIs when relaxing permissions
 
-The code does things in the opposite order...
+s/local//
 
->   */
->  void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
->  		struct kvm_memory_slot *slot,
-> @@ -1103,6 +1103,13 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
->  	lockdep_assert_held_write(&kvm->mmu_lock);
->  
->  	stage2_wp_range(&kvm->arch.mmu, start, end);
-> +
-> +	/*
-> +	 * If initially-all-set mode is not set, then huge-pages were already
-> +	 * split when enabling dirty logging: no need to do it again.
-> +	 */
-> +	if (kvm_dirty_log_manual_protect_and_init_set(kvm))
+> on a PTE in the KVM case for a couple of reasons. First, according to
+> the ARM Arm (DDI 0487H.a D5-4913), permission relaxation does not need
+> break-before-make.
 
-This contradicts the comment. Which one is correct?
+This requires some more details, and references to the latest revision
+of the ARM ARM (0487I.a). In that particular revision, the relevant
+information is contained in D8.13.1 "Using break-before-make when
+updating translation table entries", and more importantly in the rule
+R_WHZWS, which states that only a change of output address or block
+size require a BBM.
 
-> +		kvm_mmu_split_huge_pages(kvm, start, end);
->  }
->  
->  static void kvm_send_hwpoison_signal(unsigned long address, short lsb)
-> @@ -1889,7 +1896,9 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
->  		 * this when deleting, moving, disabling dirty logging, or
->  		 * creating the memslot (a nop). Doing it for deletes makes
->  		 * sure we don't leak memory, and there's no need to keep the
-> -		 * cache around for any of the other cases.
-> +		 * cache around for any of the other cases. Keeping the cache
-> +		 * is useful for successive KVM_CLEAR_DIRTY_LOG calls, which is
-> +		 * not handled in this function.
+> Second, the VTTBR_EL2.CnP==0 case, where each PE
+> has its own TLB entry for the same page, is tolerated correctly by KVM
+> when doing permission relaxation. Not having changes broadcasted to
+> all PEs is correct for this case, as it's safe to have other PEs fault
+> on permission on the same page.
 
-Where is it handled then?
-
->  		 */
->  		kvm_mmu_free_memory_cache(&kvm->arch.mmu.split_page_cache);
->  	}
+I'm not sure mentioning CnP is relevant here. If CnP==1, the TLBI will
+nuke the TLB visible by the sibling PE, but not any other. So this is
+always a partial TLB invalidation, irrespective of CnP.
 
 Thanks,
 
