@@ -2,49 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D92F6B6486
-	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 10:59:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 501E26B6485
+	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 10:59:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230160AbjCLJ7C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Mar 2023 05:59:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37696 "EHLO
+        id S229722AbjCLJ7A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Mar 2023 05:59:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230301AbjCLJ6m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230274AbjCLJ6m (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sun, 12 Mar 2023 05:58:42 -0400
 Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1AB653DA2
-        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 01:57:44 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C1504FF0A
+        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 01:57:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678615064; x=1710151064;
+  t=1678615065; x=1710151065;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=WfVlsyeqiZLRjGPauPJDR5knUQSXXh2GYT/MJkvtWbw=;
-  b=K+uOvYZ9UkX2ymIUDMruzhvqzvS1OGp/eFPoROVyz8fyxMZcUFl5101J
-   SDRQgurR8EJtl3kDrahjYLNjaX0XZWbvwocxyeWlsumGWEkzNJkLEOuJ5
-   9h0auGQ3+GklZ52zh4X6D8+7cIEW6b6WOqk46ffA7/n2BR3MI97AU+5Aw
-   FFzmDmcCIbIuygbjkqT5PAjO8dd3q+Jef8kPUCz47tyw9aPfWPACJdAc1
-   o0eoocxKEWkcrX892AXJV0R7ykQOPf9o2leNeBL2i/BuucPq4jNDOi9Qh
-   JMulsHUQsXN0TPdm5DP+4uoRcc1kHwIaWCoj8OSpz46fD/I8ajyppr2ey
+  bh=slVPLvKC8AM8OoFImglfcIlUdtipykfchewhuHyr1w0=;
+  b=S7wu+GwWrik4y2rgtQFpzztmghSKE03V+fepxWVfJcJGHU6EnGWGnDzl
+   NZWUAb2TVuVHS6GWtFLQHtZAbVNBNQEdtG+BLtvyMS0XTQfNLX7TYz/6o
+   IHzQL1SyBjev81hGNXnA0nbXcHilOaN5yTxkboihSqDeCsRdKHo/NDUba
+   /ahnVFLkFzRGo2+h+Zl649P3dMFwP9nBcQrfhhnic+1lTTsnwPkd6au6H
+   zLqiBeFFRzarnA33QChBNUILt+fpMh7ydWiqsJeIUPo+EWnvY1yK0Z9Rn
+   OpfUgfeh9k4Szml6hdfFhmTSgyJHwjNrDsP5dMIKr6Jc7apz5qgrMFUBj
    g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="336998105"
+X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="336998108"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="336998105"
+   d="scan'208";a="336998108"
 Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:56:17 -0800
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:56:18 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="680677688"
+X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="680677696"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="680677688"
+   d="scan'208";a="680677696"
 Received: from jiechen-ubuntu-dev.sh.intel.com ([10.239.154.150])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:56:16 -0800
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:56:17 -0800
 From:   Jason Chen CJ <jason.cj.chen@intel.com>
 To:     kvm@vger.kernel.org
 Cc:     Jason Chen CJ <jason.cj.chen@intel.com>,
         Chuanxiao Dong <chuanxiao.dong@intel.com>
-Subject: [RFC PATCH part-5 07/22] KVM: VMX: Add initialization/teardown for shadow vm/vcpu
-Date:   Mon, 13 Mar 2023 02:02:48 +0800
-Message-Id: <20230312180303.1778492-8-jason.cj.chen@intel.com>
+Subject: [RFC PATCH part-5 08/22] pkvm: x86: Add hash table mapping for shadow vcpu based on vmcs12_pa
+Date:   Mon, 13 Mar 2023 02:02:49 +0800
+Message-Id: <20230312180303.1778492-9-jason.cj.chen@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230312180303.1778492-1-jason.cj.chen@intel.com>
 References: <20230312180303.1778492-1-jason.cj.chen@intel.com>
@@ -60,257 +60,149 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add initialization/teardown for shadow vm & shadow vcpu from corresponding
-kvm_x86_ops.
+Host VM execute vmptrld(vmcs12) then vmlaunch to launch its guest, while
+pKVM need to get corresponding shadow_vcpu_state based on vmcs12 to do
+vmptrld emulation (real vmcs page of guest - vmcs02 shall be kept in
+shadow_vcpu_state - it will be added in the following patches).
 
-The initialization allocates shadow vm or shadow vcpu data structure
-according to the size exposed from pkvm_constants, then hypercall to
-send such data structure's address to pKVM.
-
-The teardown hypercall to pKVM asking for the teardown of corresponding
-shadow vm or shadow vcpu data structure in the hypervisor, then do finally
-free of related memory.
+Take use of hash table shadow_vcpu_table to build the mapping between
+vmcs12_pa and shadow_vcpu_state. Then pKVM is able to quick find out
+shadow_vcpu_state from vmcs12_pa when emulating vmptrld.
 
 Signed-off-by: Jason Chen CJ <jason.cj.chen@intel.com>
 Signed-off-by: Chuanxiao Dong <chuanxiao.dong@intel.com>
 ---
- arch/x86/include/asm/kvm_host.h        |  4 ++
- arch/x86/include/asm/kvm_pkvm.h        | 10 ++++
- arch/x86/kvm/vmx/pkvm/pkvm_constants.c |  4 ++
- arch/x86/kvm/vmx/pkvm/pkvm_host.c      | 76 ++++++++++++++++++++++++++
- arch/x86/kvm/vmx/vmx.c                 | 14 ++++-
- include/linux/kvm_host.h               |  8 +++
- 6 files changed, 114 insertions(+), 2 deletions(-)
+ arch/x86/kvm/vmx/pkvm/hyp/pkvm.c     | 47 +++++++++++++++++++++++++++-
+ arch/x86/kvm/vmx/pkvm/hyp/pkvm_hyp.h |  4 +++
+ 2 files changed, 50 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 3dea471bfca4..74f0954c6899 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1750,6 +1750,10 @@ struct kvm_arch_async_pf {
- 	bool direct_map;
- };
+diff --git a/arch/x86/kvm/vmx/pkvm/hyp/pkvm.c b/arch/x86/kvm/vmx/pkvm/hyp/pkvm.c
+index b110ac43a792..9efedba2b3c9 100644
+--- a/arch/x86/kvm/vmx/pkvm/hyp/pkvm.c
++++ b/arch/x86/kvm/vmx/pkvm/hyp/pkvm.c
+@@ -3,6 +3,7 @@
+  * Copyright (C) 2022 Intel Corporation
+  */
  
-+struct kvm_protected_vm {
-+	int shadow_vm_handle;
-+};
++#include <linux/hashtable.h>
+ #include <pkvm.h>
+ 
+ #include "pkvm_hyp.h"
+@@ -26,6 +27,10 @@ static struct shadow_vm_ref shadow_vms_ref[MAX_SHADOW_VMS];
+ #define SHADOW_VCPU_ARRAY(vm) \
+ 	((struct shadow_vcpu_array *)((void *)(vm) + sizeof(struct pkvm_shadow_vm)))
+ 
++#define SHADOW_VCPU_HASH_BITS		10
++DEFINE_HASHTABLE(shadow_vcpu_table, SHADOW_VCPU_HASH_BITS);
++static pkvm_spinlock_t shadow_vcpu_table_lock = __PKVM_SPINLOCK_UNLOCKED;
 +
- extern u32 __read_mostly kvm_nr_uret_msrs;
- extern u64 __read_mostly host_efer;
- extern bool __read_mostly allow_smaller_maxphyaddr;
-diff --git a/arch/x86/include/asm/kvm_pkvm.h b/arch/x86/include/asm/kvm_pkvm.h
-index 6e8fee717e5d..4e9531d88417 100644
---- a/arch/x86/include/asm/kvm_pkvm.h
-+++ b/arch/x86/include/asm/kvm_pkvm.h
-@@ -6,6 +6,8 @@
- #ifndef _ASM_X86_KVM_PKVM_H
- #define _ASM_X86_KVM_PKVM_H
- 
-+#include <linux/kvm_host.h>
-+
- #ifdef CONFIG_PKVM_INTEL
- 
- #include <linux/memblock.h>
-@@ -131,8 +133,16 @@ static inline int hyp_pre_reserve_check(void)
- 
- u64 hyp_total_reserve_pages(void);
- 
-+int pkvm_init_shadow_vm(struct kvm *kvm);
-+void pkvm_teardown_shadow_vm(struct kvm *kvm);
-+int pkvm_init_shadow_vcpu(struct kvm_vcpu *vcpu);
-+void pkvm_teardown_shadow_vcpu(struct kvm_vcpu *vcpu);
- #else
- static inline void kvm_hyp_reserve(void) {}
-+static inline int pkvm_init_shadow_vm(struct kvm *kvm) { return 0; }
-+static inline void pkvm_teardown_shadow_vm(struct kvm *kvm) {}
-+static inline int pkvm_init_shadow_vcpu(struct kvm_vcpu *vcpu) { return 0; }
-+static inline void pkvm_teardown_shadow_vcpu(struct kvm_vcpu *vcpu) {}
- #endif
- 
- #endif
-diff --git a/arch/x86/kvm/vmx/pkvm/pkvm_constants.c b/arch/x86/kvm/vmx/pkvm/pkvm_constants.c
-index 729147e6b85f..c6dc35b52664 100644
---- a/arch/x86/kvm/vmx/pkvm/pkvm_constants.c
-+++ b/arch/x86/kvm/vmx/pkvm/pkvm_constants.c
-@@ -7,9 +7,13 @@
- #include <linux/bug.h>
- #include <vdso/limits.h>
- #include <buddy_memory.h>
-+#include <vmx/vmx.h>
-+#include "hyp/pkvm_hyp.h"
- 
- int main(void)
+ static int allocate_shadow_vm_handle(struct pkvm_shadow_vm *vm)
  {
- 	DEFINE(PKVM_VMEMMAP_ENTRY_SIZE, sizeof(struct hyp_page));
-+	DEFINE(PKVM_SHADOW_VM_SIZE, sizeof(struct pkvm_shadow_vm) + pkvm_shadow_vcpu_array_size());
-+	DEFINE(PKVM_SHADOW_VCPU_STATE_SIZE, sizeof(struct shadow_vcpu_state));
- 	return 0;
- }
-diff --git a/arch/x86/kvm/vmx/pkvm/pkvm_host.c b/arch/x86/kvm/vmx/pkvm/pkvm_host.c
-index 8ea2d64236d0..2dff1123b61f 100644
---- a/arch/x86/kvm/vmx/pkvm/pkvm_host.c
-+++ b/arch/x86/kvm/vmx/pkvm/pkvm_host.c
-@@ -869,6 +869,82 @@ static __init int pkvm_init_finalise(void)
- 	return ret;
+ 	struct shadow_vm_ref *vm_ref;
+@@ -133,6 +138,37 @@ static void put_shadow_vm(int shadow_vm_handle)
+ 	WARN_ON(atomic_dec_if_positive(&vm_ref->refcount) <= 0);
  }
  
-+int pkvm_init_shadow_vm(struct kvm *kvm)
++static void add_shadow_vcpu_vmcs12_map(struct shadow_vcpu_state *vcpu)
 +{
-+	struct kvm_protected_vm *pkvm = &kvm->pkvm;
-+	size_t shadow_sz;
-+	void *shadow_addr;
-+	int ret;
-+
-+	shadow_sz = PAGE_ALIGN(PKVM_SHADOW_VM_SIZE);
-+	shadow_addr = alloc_pages_exact(shadow_sz, GFP_KERNEL_ACCOUNT);
-+	if (!shadow_addr)
-+		return -ENOMEM;
-+
-+	ret = kvm_hypercall3(PKVM_HC_INIT_SHADOW_VM, (unsigned long)kvm,
-+					  (unsigned long)__pa(shadow_addr), shadow_sz);
-+	if (ret < 0)
-+		goto free_page;
-+
-+	pkvm->shadow_vm_handle = ret;
-+
-+	return 0;
-+free_page:
-+	free_pages_exact(shadow_addr, shadow_sz);
-+	return ret;
++	pkvm_spin_lock(&shadow_vcpu_table_lock);
++	hash_add(shadow_vcpu_table, &vcpu->hnode, vcpu->vmcs12_pa);
++	pkvm_spin_unlock(&shadow_vcpu_table_lock);
 +}
 +
-+void pkvm_teardown_shadow_vm(struct kvm *kvm)
++static void remove_shadow_vcpu_vmcs12_map(struct shadow_vcpu_state *vcpu)
 +{
-+	struct kvm_protected_vm *pkvm = &kvm->pkvm;
-+	unsigned long pa;
-+
-+	pa = kvm_hypercall1(PKVM_HC_TEARDOWN_SHADOW_VM, pkvm->shadow_vm_handle);
-+	if (!pa)
-+		return;
-+
-+	free_pages_exact(__va(pa), PAGE_ALIGN(PKVM_SHADOW_VM_SIZE));
++	pkvm_spin_lock(&shadow_vcpu_table_lock);
++	hash_del(&vcpu->hnode);
++	pkvm_spin_unlock(&shadow_vcpu_table_lock);
 +}
 +
-+int pkvm_init_shadow_vcpu(struct kvm_vcpu *vcpu)
++s64 find_shadow_vcpu_handle_by_vmcs(unsigned long vmcs12_pa)
 +{
-+	struct kvm_protected_vm *pkvm = &vcpu->kvm->pkvm;
-+	struct vcpu_vmx *vmx = to_vmx(vcpu);
-+	s64 shadow_vcpu_handle;
-+	size_t shadow_sz;
-+	void *shadow_addr;
++	struct shadow_vcpu_state *shadow_vcpu;
++	s64 handle = -1;
 +
-+	shadow_sz = PAGE_ALIGN(PKVM_SHADOW_VCPU_STATE_SIZE);
-+	shadow_addr = alloc_pages_exact(shadow_sz, GFP_KERNEL_ACCOUNT);
-+	if (!shadow_addr)
-+		return -ENOMEM;
++	pkvm_spin_lock(&shadow_vcpu_table_lock);
++	hash_for_each_possible(shadow_vcpu_table, shadow_vcpu, hnode, vmcs12_pa) {
++		if (shadow_vcpu->vmcs12_pa == vmcs12_pa) {
++			handle = shadow_vcpu->shadow_vcpu_handle;
++			break;
++		}
++	}
++	pkvm_spin_unlock(&shadow_vcpu_table_lock);
 +
-+	shadow_vcpu_handle = kvm_hypercall4(PKVM_HC_INIT_SHADOW_VCPU,
-+					    pkvm->shadow_vm_handle, (unsigned long)vmx,
-+					    (unsigned long)__pa(shadow_addr), shadow_sz);
-+	if (shadow_vcpu_handle < 0)
-+		goto free_page;
-+
-+	vcpu->pkvm_shadow_vcpu_handle = shadow_vcpu_handle;
-+
-+	return 0;
-+
-+free_page:
-+	free_pages_exact(shadow_addr, shadow_sz);
-+	return -EINVAL;
++	return handle;
 +}
 +
-+void pkvm_teardown_shadow_vcpu(struct kvm_vcpu *vcpu)
-+{
-+	unsigned long pa = kvm_hypercall1(PKVM_HC_TEARDOWN_SHADOW_VCPU,
-+					  vcpu->pkvm_shadow_vcpu_handle);
-+
-+	if (!pa)
-+		return;
-+
-+	free_pages_exact(__va(pa), PAGE_ALIGN(PKVM_SHADOW_VCPU_STATE_SIZE));
-+}
-+
- __init int pkvm_init(void)
+ struct shadow_vcpu_state *get_shadow_vcpu(s64 shadow_vcpu_handle)
  {
- 	int ret = 0, cpu;
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 6e9723306992..61ae4c1c713d 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -48,6 +48,7 @@
- #include <asm/spec-ctrl.h>
- #include <asm/virtext.h>
- #include <asm/vmx.h>
-+#include <asm/kvm_pkvm.h>
+ 	int shadow_vm_handle = to_shadow_vm_handle(shadow_vcpu_handle);
+@@ -197,6 +233,8 @@ static s64 attach_shadow_vcpu_to_vm(struct pkvm_shadow_vm *vm,
+ 	if (!shadow_vcpu->vm)
+ 		return -EINVAL;
  
- #include "capabilities.h"
- #include "cpuid.h"
-@@ -7329,6 +7330,8 @@ static void vmx_vcpu_free(struct kvm_vcpu *vcpu)
- 	free_vpid(vmx->vpid);
- 	nested_vmx_free_vcpu(vcpu);
- 	free_loaded_vmcs(vmx->loaded_vmcs);
++	add_shadow_vcpu_vmcs12_map(shadow_vcpu);
 +
-+	pkvm_teardown_shadow_vcpu(vcpu);
+ 	pkvm_spin_lock(&vm->lock);
+ 
+ 	if (vm->created_vcpus == KVM_MAX_VCPUS) {
+@@ -241,12 +279,14 @@ detach_shadow_vcpu_from_vm(struct pkvm_shadow_vm *vm, s64 shadow_vcpu_handle)
+ 
+ 	pkvm_spin_unlock(&vm->lock);
+ 
+-	if (shadow_vcpu)
++	if (shadow_vcpu) {
++		remove_shadow_vcpu_vmcs12_map(shadow_vcpu);
+ 		/*
+ 		 * Paired with the get_shadow_vm when saving the shadow_vm pointer
+ 		 * during attaching shadow_vcpu.
+ 		 */
+ 		put_shadow_vm(shadow_vcpu->vm->shadow_vm_handle);
++	}
+ 
+ 	return shadow_vcpu;
  }
+@@ -258,6 +298,7 @@ s64 __pkvm_init_shadow_vcpu(struct kvm_vcpu *hvcpu, int shadow_vm_handle,
+ 	struct pkvm_shadow_vm *vm;
+ 	struct shadow_vcpu_state *shadow_vcpu;
+ 	struct x86_exception e;
++	unsigned long vmcs12_va;
+ 	s64 shadow_vcpu_handle;
+ 	int ret;
  
- static int vmx_vcpu_create(struct kvm_vcpu *vcpu)
-@@ -7426,7 +7429,7 @@ static int vmx_vcpu_create(struct kvm_vcpu *vcpu)
- 		WRITE_ONCE(to_kvm_vmx(vcpu->kvm)->pid_table[vcpu->vcpu_id],
- 			   __pa(&vmx->pi_desc) | PID_TABLE_ENTRY_VALID);
+@@ -273,6 +314,10 @@ s64 __pkvm_init_shadow_vcpu(struct kvm_vcpu *hvcpu, int shadow_vm_handle,
+ 	if (ret < 0)
+ 		return -EINVAL;
  
--	return 0;
-+	return pkvm_init_shadow_vcpu(vcpu);
- 
- free_vmcs:
- 	free_loaded_vmcs(vmx->loaded_vmcs);
-@@ -7468,7 +7471,13 @@ static int vmx_vm_init(struct kvm *kvm)
- 			break;
- 		}
- 	}
--	return 0;
++	vmcs12_va = (unsigned long)shadow_vcpu->vmx.vmcs01.vmcs;
++	if (gva2gpa(hvcpu, vmcs12_va, (gpa_t *)&shadow_vcpu->vmcs12_pa, 0, &e))
++		return -EINVAL;
 +
-+	return pkvm_init_shadow_vm(kvm);
-+}
+ 	vm = get_shadow_vm(shadow_vm_handle);
+ 	if (!vm)
+ 		return -EINVAL;
+diff --git a/arch/x86/kvm/vmx/pkvm/hyp/pkvm_hyp.h b/arch/x86/kvm/vmx/pkvm/hyp/pkvm_hyp.h
+index f15a49b3be5d..c574831c6d18 100644
+--- a/arch/x86/kvm/vmx/pkvm/hyp/pkvm_hyp.h
++++ b/arch/x86/kvm/vmx/pkvm/hyp/pkvm_hyp.h
+@@ -21,6 +21,9 @@ struct shadow_vcpu_state {
+ 
+ 	struct pkvm_shadow_vm *vm;
+ 
++	struct hlist_node hnode;
++	unsigned long vmcs12_pa;
 +
-+static void vmx_vm_free(struct kvm *kvm)
-+{
-+	pkvm_teardown_shadow_vm(kvm);
- }
+ 	struct vcpu_vmx vmx;
+ } __aligned(PAGE_SIZE);
  
- static int __init vmx_check_processor_compat(void)
-@@ -8104,6 +8113,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.vm_size = sizeof(struct kvm_vmx),
- 	.vm_init = vmx_vm_init,
- 	.vm_destroy = vmx_vm_destroy,
-+	.vm_free = vmx_vm_free,
+@@ -74,6 +77,7 @@ s64 __pkvm_init_shadow_vcpu(struct kvm_vcpu *hvcpu, int shadow_vm_handle,
+ unsigned long __pkvm_teardown_shadow_vcpu(s64 shadow_vcpu_handle);
+ struct shadow_vcpu_state *get_shadow_vcpu(s64 shadow_vcpu_handle);
+ void put_shadow_vcpu(s64 shadow_vcpu_handle);
++s64 find_shadow_vcpu_handle_by_vmcs(unsigned long vmcs12_pa);
  
- 	.vcpu_precreate = vmx_vcpu_precreate,
- 	.vcpu_create = vmx_vcpu_create,
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 4f26b244f6d0..faab9a30002f 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -390,6 +390,12 @@ struct kvm_vcpu {
- 	 */
- 	struct kvm_memory_slot *last_used_slot;
- 	u64 last_used_slot_gen;
-+
-+	/*
-+	 * Save the handle returned from the pkvm when init a shadow vcpu. This
-+	 * will be used when teardown this shadow vcpu.
-+	 */
-+	s64 pkvm_shadow_vcpu_handle;
- };
+ extern struct pkvm_hyp *pkvm_hyp;
  
- /*
-@@ -805,6 +811,8 @@ struct kvm {
- 	struct notifier_block pm_notifier;
- #endif
- 	char stats_id[KVM_STATS_NAME_SIZE];
-+
-+	struct kvm_protected_vm pkvm;
- };
- 
- #define kvm_err(fmt, ...) \
 -- 
 2.25.1
 
