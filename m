@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D08E06B675F
-	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 15:57:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B43F46B6767
+	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 16:01:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229712AbjCLO5Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Mar 2023 10:57:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34124 "EHLO
+        id S229742AbjCLPBP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Mar 2023 11:01:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229490AbjCLO5Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Mar 2023 10:57:24 -0400
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3FF04D2A8
-        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 07:57:22 -0700 (PDT)
+        with ESMTP id S229516AbjCLPBN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Mar 2023 11:01:13 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D152367C4
+        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 08:01:12 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 10D3ACE069D
-        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 14:57:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AD1FC433D2;
-        Sun, 12 Mar 2023 14:57:19 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id E7366B80C8D
+        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 15:01:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A467AC433EF;
+        Sun, 12 Mar 2023 15:01:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678633039;
-        bh=qJ5BK1F+lRey4DO9Tjmz6kg1okLxjpkyWFTuaPCfnyQ=;
+        s=k20201202; t=1678633269;
+        bh=5Hjd4auKS5618HP+eewfU+0AdaZU72zDi2NyYqVHDlY=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=NKoUh21KgGjhr4+NXfaA+3sBE2xmbHr5kvVF9lfrsYzzvpaUFwOBUCLVSOJTtRITj
-         kD6RagUwSH/Q8bZOZkuYM/5h0Ce++rR75KAafZ9TlvDPO9dpirpuB8N5wtcmQQ293J
-         BUkEPu5rIIgnlrDpI5LHIXwaJeXR8EvcQ//dn6pKvOuXqjQAOD5iJfT5ploT+7Jd6Y
-         eV8iZY981jkaN4MSH0W86QTxbqapD1Po+wZWJ9G3yQMgMuDWdtyiYMPeCaTE+8uDK5
-         w6siGdVyVQ2RfS8OaYB+wxijCs1tvhJClGCj6Os+vp3hLNmMCN+Q4RGGMKbZTF/2rP
-         SOWNsR/N6JQ2g==
+        b=QFzVcnNmQkHAy2qzRJIKWqBfLnfJTtyeEVtooOosL5LfAa6xNh/kUzVbNX/XD2z+0
+         FBtHXs6+EQz89fR7qNK/zb6C+PzHWL7JhP3IN6xwF851W9BjAlTpVI5BSiwm9aXKic
+         XWH4PT/a6ZXoTewvRYNYT9CQDnSw6Ec0YtXMbOxms+D/O1oC87IWF6rGIMMlP8XrHv
+         yDMaoNDeae2d34edWYDWf8Pt1bnYvDzZtDzT7f4HCswyVxWdKduBH23OuNWXtOPtTD
+         T061VqeydftzCxE9/sCCh/e8uJBlp/J1J4nE8hI2R2lsOuZGBG4i1eX2mPB5C4FfVB
+         QCYxOyopJr8pQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pbN8P-00H0t3-Eh;
-        Sun, 12 Mar 2023 14:57:17 +0000
-Date:   Sun, 12 Mar 2023 14:57:17 +0000
-Message-ID: <87zg8i3tma.wl-maz@kernel.org>
+        id 1pbNC7-00H0wB-4Z;
+        Sun, 12 Mar 2023 15:01:07 +0000
+Date:   Sun, 12 Mar 2023 15:01:06 +0000
+Message-ID: <87y1o23tfx.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Reiji Watanabe <reijiw@google.com>
 Cc:     Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
@@ -52,10 +52,10 @@ Cc:     Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
         Jing Zhang <jingzhangos@google.com>,
         Raghavendra Rao Anata <rananta@google.com>,
         Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 1/2] KVM: arm64: PMU: Fix GET_ONE_REG for vPMC regs to return the current value
-In-Reply-To: <20230302055033.3081456-2-reijiw@google.com>
+Subject: Re: [PATCH 2/2] KVM: arm64: PMU: Don't save PMCR_EL0.{C,P} for the vCPU
+In-Reply-To: <20230302055033.3081456-3-reijiw@google.com>
 References: <20230302055033.3081456-1-reijiw@google.com>
-        <20230302055033.3081456-2-reijiw@google.com>
+        <20230302055033.3081456-3-reijiw@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -74,80 +74,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 02 Mar 2023 05:50:32 +0000,
+On Thu, 02 Mar 2023 05:50:33 +0000,
 Reiji Watanabe <reijiw@google.com> wrote:
 > 
-> Have KVM_GET_ONE_REG for vPMU counter (vPMC) registers (PMCCNTR_EL0
-> and PMEVCNTR<n>_EL0) return the sum of the register value in the sysreg
-> file and the current perf event counter value.
+> Presently, when a guest writes 1 to PMCR_EL0.{C,P}, which is WO/RAZ,
+> KVM saves the register value, including these bits.
+> When userspace reads the register using KVM_GET_ONE_REG, KVM returns
+> the saved register value as it is (the saved value might have these
+> bits set).  This could result in userspace setting these bits on the
+> destination during migration.  Consequently, KVM may end up resetting
+> the vPMU counter registers (PMCCNTR_EL0 and/or PMEVCNTR<n>_EL0) to
+> zero on the first KVM_RUN after migration.
 > 
-> Values of vPMC registers are saved in sysreg files on certain occasions.
-> These saved values don't represent the current values of the vPMC
-> registers if the perf events for the vPMCs count events after the save.
-> The current values of those registers are the sum of the sysreg file
-> value and the current perf event counter value.  But, when userspace
-> reads those registers (using KVM_GET_ONE_REG), KVM returns the sysreg
-> file value to userspace (not the sum value).
-> 
-> Fix this to return the sum value for KVM_GET_ONE_REG.
+> Fix this by not saving those bits when a guest writes 1 to those bits.
 > 
 > Signed-off-by: Reiji Watanabe <reijiw@google.com>
 > ---
->  arch/arm64/kvm/sys_regs.c | 21 +++++++++++++++++++--
->  1 file changed, 19 insertions(+), 2 deletions(-)
+>  arch/arm64/kvm/pmu-emul.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index c6cbfe6b854b..c48c053d6146 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -765,6 +765,22 @@ static bool pmu_counter_idx_valid(struct kvm_vcpu *vcpu, u64 idx)
->  	return true;
->  }
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 24908400e190..a5a0a9811ddb 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -538,7 +538,9 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
+>  	if (!kvm_pmu_is_3p5(vcpu))
+>  		val &= ~ARMV8_PMU_PMCR_LP;
 >  
-> +static int get_pmu_evcntr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
-> +			  u64 *val)
-> +{
-> +	u64 idx;
-> +
-> +	if (r->CRn == 9 && r->CRm == 13 && r->Op2 == 0)
-> +		/* PMCCNTR_EL0 */
-> +		idx = ARMV8_PMU_CYCLE_IDX;
-> +	else
-> +		/* PMEVCNTRn_EL0 */
-> +		idx = ((r->CRm & 3) << 3) | (r->Op2 & 7);
-> +
-> +	*val = kvm_pmu_get_counter_value(vcpu, idx);
-> +	return 0;
+> -	__vcpu_sys_reg(vcpu, PMCR_EL0) = val;
+> +	/* The reset bits don't indicate any state, and shouldn't be saved. */
+> +	__vcpu_sys_reg(vcpu, PMCR_EL0) =
+> +				val & ~(ARMV8_PMU_PMCR_C | ARMV8_PMU_PMCR_P);
 
-It is a bit odd not to return an error when no PMU present, but this
-is already filtered out by the top-level accessors.
+nit: assignment on a single line, please.
 
-> +}
-> +
->  static bool access_pmu_evcntr(struct kvm_vcpu *vcpu,
->  			      struct sys_reg_params *p,
->  			      const struct sys_reg_desc *r)
-> @@ -981,7 +997,7 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  /* Macro to expand the PMEVCNTRn_EL0 register */
->  #define PMU_PMEVCNTR_EL0(n)						\
->  	{ PMU_SYS_REG(SYS_PMEVCNTRn_EL0(n)),				\
-> -	  .reset = reset_pmevcntr,					\
-> +	  .reset = reset_pmevcntr, .get_user = get_pmu_evcntr,		\
->  	  .access = access_pmu_evcntr, .reg = (PMEVCNTR0_EL0 + n), }
->  
->  /* Macro to expand the PMEVTYPERn_EL0 register */
-> @@ -1745,7 +1761,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	{ PMU_SYS_REG(SYS_PMCEID1_EL0),
->  	  .access = access_pmceid, .reset = NULL },
->  	{ PMU_SYS_REG(SYS_PMCCNTR_EL0),
-> -	  .access = access_pmu_evcntr, .reset = reset_unknown, .reg = PMCCNTR_EL0 },
-> +	  .access = access_pmu_evcntr, .reset = reset_unknown,
-> +	  .reg = PMCCNTR_EL0, .get_user = get_pmu_evcntr},
->  	{ PMU_SYS_REG(SYS_PMXEVTYPER_EL0),
->  	  .access = access_pmu_evtyper, .reset = NULL },
->  	{ PMU_SYS_REG(SYS_PMXEVCNTR_EL0),
+With that,
 
 Reviewed-by: Marc Zyngier <maz@kernel.org>
+
+Thanks,
 
 	M.
 
