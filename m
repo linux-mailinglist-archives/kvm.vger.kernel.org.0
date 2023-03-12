@@ -2,161 +2,263 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7052C6B6461
-	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 10:55:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DF156B6462
+	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 10:55:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229977AbjCLJzX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Mar 2023 05:55:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36890 "EHLO
+        id S230013AbjCLJz1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Mar 2023 05:55:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229983AbjCLJzJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Mar 2023 05:55:09 -0400
+        with ESMTP id S230033AbjCLJzO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Mar 2023 05:55:14 -0400
 Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C3175071F
-        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 01:55:02 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FB905098E
+        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 01:55:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678614902; x=1710150902;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=D9VPyGKd4LILCREEQjIY0JKQ3OrHW6qI5nhjOmTfMg0=;
-  b=O0V5hhuE+GIp2pz6FR/V2hY+nOQI5/b+z0NOFvL+k7ySx7ELsF+UgmaI
-   w36CHz7PKkJjsX+EIlttCnPIm10qpxfGUFa3CJETDGjH2TEHymI6/YtiZ
-   L8/QcQOKHfndjhspGqXU23ay35RIl3vB3t6dkd3gIxF30sHGQEPbGlaAW
-   cpdoPhMhm1tN2QOJO+kGCQVm9uQ60JeVMTmn9WvsUH5z+3TITdwbHfatM
-   YyDt5hgQUCy4mgAAnLvk0qTs4dVOy7j3E+O0E2II6w156Ig0D77HUEn7w
-   4q0YoXVK3vwiIx72svWrhRHaz1rAKOtM0kJLjunijbjAdb7etzIFBt1P8
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="316623008"
+  t=1678614904; x=1710150904;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=J/6ItArFJTH9kmQzSk1YwxazVQTf5vUT89WXFSoC6jU=;
+  b=fQjABmR8Dkqj5EBhqjpWgv98BjrVLkwEm2pT1e01/s4zLFFPBlWfQw+J
+   c/TgUsFtR0LFt4R7H2k8LFCySl4DkMKspYmubLeI+Y74+97UeFyOLqx/t
+   kF/aXjvt5fTQEU7/DAU0KxRJnLOVP7qpQFxaxDFhsLt17xbHwWP/xidGw
+   4NXCEi29J+xnYek5a5A2cG9fhbzaUp/T6nsQAeV2c5ivvOSKHwMoifiqI
+   IZ0h5Wtdan3Chjw5SRjeKIZzC5IB71SLlSlGw6DDc9jl4dFCGGOfr0WOx
+   Tw2chsswDvFk/FEC06jv1j3uO2Q+gQg1ZLiObj89a/gKYMKNpZ5pypAzq
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="316623012"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="316623008"
+   d="scan'208";a="316623012"
 Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:55:00 -0800
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:55:01 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="655660774"
+X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="655660778"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="655660774"
+   d="scan'208";a="655660778"
 Received: from jiechen-ubuntu-dev.sh.intel.com ([10.239.154.150])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:54:58 -0800
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:54:59 -0800
 From:   Jason Chen CJ <jason.cj.chen@intel.com>
 To:     kvm@vger.kernel.org
-Cc:     Jason Chen CJ <jason.cj.chen@intel.com>
-Subject: [RFC PATCH part-3 00/22] Isolate pKVM & host
-Date:   Mon, 13 Mar 2023 02:01:30 +0800
-Message-Id: <20230312180152.1778338-1-jason.cj.chen@intel.com>
+Cc:     Jason Chen CJ <jason.cj.chen@intel.com>,
+        Shaoqin Huang <shaoqin.huang@intel.com>,
+        Chuanxiao Dong <chuanxiao.dong@intel.com>
+Subject: [RFC PATCH part-3 01/22] pkvm: x86: Define hypervisor runtime VA/PA APIs
+Date:   Mon, 13 Mar 2023 02:01:31 +0800
+Message-Id: <20230312180152.1778338-2-jason.cj.chen@intel.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230312180152.1778338-1-jason.cj.chen@intel.com>
+References: <20230312180152.1778338-1-jason.cj.chen@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-0.9 required=5.0 tests=AC_FROM_MANY_DOTS,BAYES_00,
-        DATE_IN_FUTURE_06_12,DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DATE_IN_FUTURE_06_12,
+        DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch set is part-3 of this RFC patches. It introduces page
-table management for pKVM on Intel platform, and based on it, build
-pKVM's MMU page table and host EPT page table.
+pKVM has its own MMU page table, to maintain the mapping between VA &
+PA under hypervisor runtime (VMX root mode).
 
-pKVM needs isolated address space, so it shall have its own MMU
-page table. At the same time, host VM shall not be able to access
-pKVM's memory, host EPT page table shall be setup for it.
+Setup the translation between VA & PA for hypervisor runtime:
+keep same direct mapping as Linux kernel based on __page_base_offset.
+also keep same pkvm symbol mapping as Linux kernel based on
+__symbol_base_offset.
 
-pKVM requires its own memory pool and memory allocation to setup
-above MMU & EPT page table, it leverages the memory reservation
-mechanism and buddy page allocator from ARM solution.
+direct mapping translation:
+- pkvm_phys_to_virt: phys + __page_base_offset
+- pkvm_virt_to_phys: virt - __page_base_offset
+symbol mapping translation:
+- pkvm_virt_to_symbol_phys: virt - __symbol_base_offset
 
-The setup of MMU/EPT page table is triggered by new added hypercall
-init-finalise after host OS got deprivileged.
+The following patches will setup pKVM's MMU page table based on above
+translation.
 
-After MMU/EPT setup, pKVM can access all system memory, while host VM
-can access most of system memory except ones owned by pKVM.
+Signed-off-by: Shaoqin Huang <shaoqin.huang@intel.com>
+Signed-off-by: Chuanxiao Dong <chuanxiao.dong@intel.com>
+Signed-off-by: Jason Chen CJ <jason.cj.chen@intel.com>
+---
+ arch/x86/include/asm/kvm_pkvm.h      | 18 ++++++++++++++++++
+ arch/x86/kvm/vmx/pkvm/hyp/Makefile   |  2 +-
+ arch/x86/kvm/vmx/pkvm/hyp/memory.c   | 24 ++++++++++++++++++++++++
+ arch/x86/kvm/vmx/pkvm/hyp/memory.h   | 13 +++++++++++++
+ arch/x86/kvm/vmx/pkvm/hyp/vmx_ops.h  |  5 +++--
+ arch/x86/kvm/vmx/pkvm/include/pkvm.h |  5 +++++
+ arch/x86/kvm/vmx/pkvm/pkvm_host.c    | 19 +++++++++++++++++++
+ 7 files changed, 83 insertions(+), 3 deletions(-)
 
-For MMIO access, host EPT only prepared mapping below 4G, for high
-address MMIO access from host VM, needs to build during runtime host EPT
-violation.
-
-Chuanxiao Dong (3):
-  pkvm: x86: Introduce general page table management framework
-  pkvm: x86: Introduce find_mem_range API
-  pkvm: x86: Dynamically handle host MMIO EPT violation
-
-Jason Chen CJ (19):
-  pkvm: x86: Define hypervisor runtime VA/PA APIs
-  pkvm: x86: Add arch specific spinlock
-  pkvm: x86: Add memset lib
-  pkvm: x86: Add buddy page allocator
-  pkvm: x86: Generate pkvm_constants.h for pKVM initialization
-  pkvm: x86: Calculate total reserve page numbers
-  pkvm: x86: Reserve memory for pKVM
-  pkvm: x86: Early alloc from reserved memory
-  pkvm: x86: Initialize MMU/EPT configuration
-  pkvm: x86: Add early allocator based mm_ops
-  pkvm: x86: Define linker script alias for kernel-proper symbol
-  pkvm: x86: Introduce MMU pgtable support
-  pkvm: x86: Add global pkvm_hyp pointer
-  pkvm: x86: Add init-finalise hypercall
-  pkvm: x86: Create MMU pgtable in init-finalise hypercall
-  pkvm: x86: Add vmemmap and switch to buddy page allocator
-  pkvm: x86: Introduce host EPT pgtable support
-  pkvm: x86: Create host EPT pgtable in init-finalise hypercall
-  pkvm: x86: Add pgtable API pkvm_pgtable_lookup
-
- arch/x86/include/asm/kvm_pkvm.h           | 134 ++++++
- arch/x86/include/asm/pkvm_image.h         |   6 +
- arch/x86/include/asm/pkvm_image_vars.h    |  18 +
- arch/x86/include/asm/pkvm_spinlock.h      |  73 +++
- arch/x86/kernel/setup.c                   |   3 +
- arch/x86/kernel/vmlinux.lds.S             |   4 +
- arch/x86/kvm/.gitignore                   |   1 +
- arch/x86/kvm/vmx/pkvm/Makefile            |  20 +
- arch/x86/kvm/vmx/pkvm/hyp/Makefile        |   9 +-
- arch/x86/kvm/vmx/pkvm/hyp/early_alloc.c   |  73 +++
- arch/x86/kvm/vmx/pkvm/hyp/early_alloc.h   |  15 +
- arch/x86/kvm/vmx/pkvm/hyp/ept.c           | 223 +++++++++
- arch/x86/kvm/vmx/pkvm/hyp/ept.h           |  21 +
- arch/x86/kvm/vmx/pkvm/hyp/init_finalise.c | 296 ++++++++++++
- arch/x86/kvm/vmx/pkvm/hyp/lib/memset_64.S |  24 +
- arch/x86/kvm/vmx/pkvm/hyp/memory.c        |  65 +++
- arch/x86/kvm/vmx/pkvm/hyp/memory.h        |  23 +
- arch/x86/kvm/vmx/pkvm/hyp/mmu.c           | 230 +++++++++
- arch/x86/kvm/vmx/pkvm/hyp/mmu.h           |  19 +
- arch/x86/kvm/vmx/pkvm/hyp/pgtable.c       | 560 ++++++++++++++++++++++
- arch/x86/kvm/vmx/pkvm/hyp/pgtable.h       |  81 ++++
- arch/x86/kvm/vmx/pkvm/hyp/pkvm.c          |   8 +
- arch/x86/kvm/vmx/pkvm/hyp/pkvm_hyp.h      |  10 +
- arch/x86/kvm/vmx/pkvm/hyp/vmexit.c        |  36 ++
- arch/x86/kvm/vmx/pkvm/hyp/vmx.h           |  48 ++
- arch/x86/kvm/vmx/pkvm/hyp/vmx_ops.h       |   5 +-
- arch/x86/kvm/vmx/pkvm/include/pkvm.h      |  49 ++
- arch/x86/kvm/vmx/pkvm/pkvm_constants.c    |  15 +
- arch/x86/kvm/vmx/pkvm/pkvm_host.c         | 220 +++++++--
- virt/kvm/pkvm/gfp.h                       |   1 +
- virt/kvm/pkvm/pkvm.c                      |   1 +
- 31 files changed, 2245 insertions(+), 46 deletions(-)
- create mode 100644 arch/x86/include/asm/kvm_pkvm.h
- create mode 100644 arch/x86/include/asm/pkvm_image_vars.h
- create mode 100644 arch/x86/include/asm/pkvm_spinlock.h
- create mode 100644 arch/x86/kvm/vmx/pkvm/hyp/early_alloc.c
- create mode 100644 arch/x86/kvm/vmx/pkvm/hyp/early_alloc.h
- create mode 100644 arch/x86/kvm/vmx/pkvm/hyp/ept.c
- create mode 100644 arch/x86/kvm/vmx/pkvm/hyp/ept.h
- create mode 100644 arch/x86/kvm/vmx/pkvm/hyp/init_finalise.c
- create mode 100644 arch/x86/kvm/vmx/pkvm/hyp/lib/memset_64.S
- create mode 100644 arch/x86/kvm/vmx/pkvm/hyp/memory.c
- create mode 100644 arch/x86/kvm/vmx/pkvm/hyp/memory.h
- create mode 100644 arch/x86/kvm/vmx/pkvm/hyp/mmu.c
- create mode 100644 arch/x86/kvm/vmx/pkvm/hyp/mmu.h
- create mode 100644 arch/x86/kvm/vmx/pkvm/hyp/pgtable.c
- create mode 100644 arch/x86/kvm/vmx/pkvm/hyp/pgtable.h
- create mode 100644 arch/x86/kvm/vmx/pkvm/hyp/pkvm.c
- create mode 100644 arch/x86/kvm/vmx/pkvm/hyp/pkvm_hyp.h
- create mode 100644 arch/x86/kvm/vmx/pkvm/hyp/vmx.h
- create mode 100644 arch/x86/kvm/vmx/pkvm/pkvm_constants.c
-
+diff --git a/arch/x86/include/asm/kvm_pkvm.h b/arch/x86/include/asm/kvm_pkvm.h
+new file mode 100644
+index 000000000000..224143567aaa
+--- /dev/null
++++ b/arch/x86/include/asm/kvm_pkvm.h
+@@ -0,0 +1,18 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2022 Intel Corporation
++ */
++
++#ifndef _ASM_X86_KVM_PKVM_H
++#define _ASM_X86_KVM_PKVM_H
++
++#ifdef CONFIG_PKVM_INTEL
++
++void *pkvm_phys_to_virt(unsigned long phys);
++unsigned long pkvm_virt_to_phys(void *virt);
++
++#define __pkvm_pa(virt)	pkvm_virt_to_phys((void *)(virt))
++#define __pkvm_va(phys)	pkvm_phys_to_virt((unsigned long)(phys))
++#endif
++
++#endif
+diff --git a/arch/x86/kvm/vmx/pkvm/hyp/Makefile b/arch/x86/kvm/vmx/pkvm/hyp/Makefile
+index 5a92067ab05a..970341ab63a3 100644
+--- a/arch/x86/kvm/vmx/pkvm/hyp/Makefile
++++ b/arch/x86/kvm/vmx/pkvm/hyp/Makefile
+@@ -8,7 +8,7 @@ ccflags-y += -D__PKVM_HYP__
+ 
+ lib-dir		:= lib
+ 
+-pkvm-hyp-y	:= vmx_asm.o vmexit.o
++pkvm-hyp-y	:= vmx_asm.o vmexit.o memory.o
+ 
+ pkvm-hyp-$(CONFIG_RETPOLINE)	+= $(lib-dir)/retpoline.o
+ pkvm-hyp-$(CONFIG_DEBUG_LIST)	+= $(lib-dir)/list_debug.o
+diff --git a/arch/x86/kvm/vmx/pkvm/hyp/memory.c b/arch/x86/kvm/vmx/pkvm/hyp/memory.c
+new file mode 100644
+index 000000000000..62dd80947d8e
+--- /dev/null
++++ b/arch/x86/kvm/vmx/pkvm/hyp/memory.c
+@@ -0,0 +1,24 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2022 Intel Corporation
++ */
++
++#include <linux/types.h>
++
++unsigned long __page_base_offset;
++unsigned long __symbol_base_offset;
++
++void *pkvm_phys_to_virt(unsigned long phys)
++{
++	return (void *)__page_base_offset + phys;
++}
++
++unsigned long pkvm_virt_to_phys(void *virt)
++{
++	return (unsigned long)virt - __page_base_offset;
++}
++
++unsigned long pkvm_virt_to_symbol_phys(void *virt)
++{
++	return (unsigned long)virt - __symbol_base_offset;
++}
+diff --git a/arch/x86/kvm/vmx/pkvm/hyp/memory.h b/arch/x86/kvm/vmx/pkvm/hyp/memory.h
+new file mode 100644
+index 000000000000..c2eee487687a
+--- /dev/null
++++ b/arch/x86/kvm/vmx/pkvm/hyp/memory.h
+@@ -0,0 +1,13 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2022 Intel Corporation
++ */
++#ifndef _PKVM_MEMORY_H_
++#define _PKVM_MEMORY_H_
++
++#include <asm/kvm_pkvm.h>
++
++unsigned long pkvm_virt_to_symbol_phys(void *virt);
++#define __pkvm_pa_symbol(x) pkvm_virt_to_symbol_phys((void *)x)
++
++#endif
+diff --git a/arch/x86/kvm/vmx/pkvm/hyp/vmx_ops.h b/arch/x86/kvm/vmx/pkvm/hyp/vmx_ops.h
+index 1692870ee00c..5fc049e4b487 100644
+--- a/arch/x86/kvm/vmx/pkvm/hyp/vmx_ops.h
++++ b/arch/x86/kvm/vmx/pkvm/hyp/vmx_ops.h
+@@ -5,6 +5,7 @@
+ #ifndef _PKVM_VMX_OPS_H_
+ #define _PKVM_VMX_OPS_H_
+ 
++#include "memory.h"
+ #include "debug.h"
+ 
+ #ifdef asm_volatile_goto
+@@ -170,14 +171,14 @@ static __always_inline void vmcs_set_bits(unsigned long field, u32 mask)
+ 
+ static inline void vmcs_clear(struct vmcs *vmcs)
+ {
+-	u64 phys_addr = __pa(vmcs);
++	u64 phys_addr = __pkvm_pa(vmcs);
+ 
+ 	vmx_asm1(vmclear, "m"(phys_addr), vmcs, phys_addr);
+ }
+ 
+ static inline void vmcs_load(struct vmcs *vmcs)
+ {
+-	u64 phys_addr = __pa(vmcs);
++	u64 phys_addr = __pkvm_pa(vmcs);
+ 
+ 	vmx_asm1(vmptrld, "m"(phys_addr), vmcs, phys_addr);
+ }
+diff --git a/arch/x86/kvm/vmx/pkvm/include/pkvm.h b/arch/x86/kvm/vmx/pkvm/include/pkvm.h
+index 59ef09230700..b344165511f7 100644
+--- a/arch/x86/kvm/vmx/pkvm/include/pkvm.h
++++ b/arch/x86/kvm/vmx/pkvm/include/pkvm.h
+@@ -48,6 +48,11 @@ struct pkvm_hyp {
+ #define PKVM_PCPU_PAGES (ALIGN(sizeof(struct pkvm_pcpu), PAGE_SIZE) >> PAGE_SHIFT)
+ #define PKVM_HOST_VCPU_PAGES (ALIGN(sizeof(struct pkvm_host_vcpu), PAGE_SIZE) >> PAGE_SHIFT)
+ 
++extern char __pkvm_text_start[], __pkvm_text_end[];
++
++extern unsigned long pkvm_sym(__page_base_offset);
++extern unsigned long pkvm_sym(__symbol_base_offset);
++
+ PKVM_DECLARE(void, __pkvm_vmx_vmexit(void));
+ PKVM_DECLARE(int, pkvm_main(struct kvm_vcpu *vcpu));
+ 
+diff --git a/arch/x86/kvm/vmx/pkvm/pkvm_host.c b/arch/x86/kvm/vmx/pkvm/pkvm_host.c
+index 1fa273396b9b..9705aebaab2e 100644
+--- a/arch/x86/kvm/vmx/pkvm/pkvm_host.c
++++ b/arch/x86/kvm/vmx/pkvm/pkvm_host.c
+@@ -440,6 +440,21 @@ static __init int pkvm_host_check_and_setup_vmx_cap(struct pkvm_hyp *pkvm)
+ 	return ret;
+ }
+ 
++static __init int pkvm_init_mmu(void)
++{
++	/*
++	 * __page_base_offset stores the offset for pkvm
++	 * to translate VA to a PA.
++	 *
++	 * __symbol_base_offset stores the offset for pkvm
++	 * to translate its symbole's VA to a PA.
++	 */
++	pkvm_sym(__page_base_offset) = (unsigned long)__va(0);
++	pkvm_sym(__symbol_base_offset) = (unsigned long)__pkvm_text_start - __pa_symbol(__pkvm_text_start);
++
++	return 0;
++}
++
+ static __init void init_gdt(struct pkvm_pcpu *pcpu)
+ {
+ 	pcpu->gdt_page = pkvm_gdt_page;
+@@ -693,6 +708,10 @@ __init int pkvm_init(void)
+ 	if (ret)
+ 		goto out_free_pkvm;
+ 
++	ret = pkvm_init_mmu();
++	if (ret)
++		goto out_free_pkvm;
++
+ 	for_each_possible_cpu(cpu) {
+ 		ret = pkvm_setup_pcpu(pkvm, cpu);
+ 		if (ret)
 -- 
 2.25.1
 
