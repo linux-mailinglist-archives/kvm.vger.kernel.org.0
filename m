@@ -2,48 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 37AF76B64AB
-	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 11:01:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A805D6B64AC
+	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 11:01:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230062AbjCLKBb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Mar 2023 06:01:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38116 "EHLO
+        id S230406AbjCLKBe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Mar 2023 06:01:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230259AbjCLKAq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230263AbjCLKAq (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sun, 12 Mar 2023 06:00:46 -0400
 Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF19D28D3E
-        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 01:59:51 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F18E28EAF
+        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 01:59:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1678615192; x=1710151192;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ocM0HJCExkKJa4czxt39Qao85DE2fYbDMboIdASq45E=;
-  b=SgE2AfPU1DhwzOME9PynAfXKfSKWMCb/apG+mNQK8pkxe/uIVXlqsYq9
-   SSzkxGYH26e5UWtnhimFuUBxRzxlLnvKoxj92uhvvP7zFaVfphYFsgmd9
-   pNsn/iFfFtMhVZ8rcMRI0gR1rGYgU1UQcmBjcdEcX5GSyQWmPlAUECuVU
-   TTINPEeN6/eNCjFsBb4AWzLaG2x5S4YA74GGQLjvWDc4bwro5j8ipWwZd
-   NCo25K1AKnk5i34mkcvzusriMdobRR21GM9t+0APOu89A8iDpik7UoOd7
-   PJG1AQ4LfMVStJ/4UNuTEVVPzHCkLgaHM3IOwHGW+AtMm2erwykIouvY7
+  bh=Q8QVjWWt854rblm3zWPTeHz5o8Bkc/A/EBwkze1NAhU=;
+  b=U9E/Zj8V0pjLlkC8Dy/0WErSLXBr1CYr7djoEY28t6KNHQZiOXSvFk9B
+   qCHlzn6yIsyyr1WS01+20up3JM3F+Wi4G/jguH+K8wHa/N905Aj/K0ZUb
+   pcGbL2BoeB/7R0XfV4MZ0Jg+RK+TJVL1j+J+p5aPVq0ovxk+TcxzyTtLO
+   VoYI2SC+ROF8aPvj6+ewogz2O8vhctA4oWTvIx8clPDV7UCQ2rf40brZ9
+   frYIvp4S2Z127e/KaGcilbqeW3ETIeOC0+3h6Lk+4inCYeEMmLA2QwWVn
+   A9fjLiWlO5/855488yIqJfy8WtOp6gCJUWHYfixdnkixH6jImZKRR1Wne
    A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="339344757"
+X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="339344758"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="339344757"
+   d="scan'208";a="339344758"
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:57:29 -0800
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:57:30 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="1007627530"
+X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="1007627540"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="1007627530"
+   d="scan'208";a="1007627540"
 Received: from jiechen-ubuntu-dev.sh.intel.com ([10.239.154.150])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:57:28 -0800
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:57:29 -0800
 From:   Jason Chen CJ <jason.cj.chen@intel.com>
 To:     kvm@vger.kernel.org
-Cc:     Shaoqin Huang <shaoqin.huang@intel.com>
-Subject: [RFC PATCH part-7 07/12] pkvm: x86: Implement __pkvm_hyp_donate_host()
-Date:   Mon, 13 Mar 2023 02:04:10 +0800
-Message-Id: <20230312180415.1778669-8-jason.cj.chen@intel.com>
+Cc:     Shaoqin Huang <shaoqin.huang@intel.com>,
+        Chuanxiao Dong <chuanxiao.dong@intel.com>
+Subject: [RFC PATCH part-7 08/12] pkvm: x86: Donate shadow vm & vcpu pages to hypervisor
+Date:   Mon, 13 Mar 2023 02:04:11 +0800
+Message-Id: <20230312180415.1778669-9-jason.cj.chen@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230312180415.1778669-1-jason.cj.chen@intel.com>
 References: <20230312180415.1778669-1-jason.cj.chen@intel.com>
@@ -61,168 +62,170 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Shaoqin Huang <shaoqin.huang@intel.com>
 
-Provide __pkvm_hyp_donate_host() to transfer the page ownership from
-hypervisor to host. This will be used later when pKVM return memory
-back to host.
+The shadow vm/vcpu pages are allocated in KVM-high, and then be managed by
+pKVM hypervisor, so such page's ownership shall be moved from host VM to
+pKVM hypervisor by __pkvm_host_donate_hyp.
+
+Above is done when doing shadow vm/vcpu initialization, while in shadow
+vm/vcpu teardown, those pages shall return to host VM, by
+__pkvm_hyp_donate_host.
 
 Signed-off-by: Shaoqin Huang <shaoqin.huang@intel.com>
+Signed-off-by: Chuanxiao Dong <chuanxiao.dong@intel.com>
 ---
- arch/x86/kvm/vmx/pkvm/hyp/mem_protect.c | 65 +++++++++++++++++++++++++
- arch/x86/kvm/vmx/pkvm/hyp/mem_protect.h | 14 ++++++
- 2 files changed, 79 insertions(+)
+ arch/x86/kvm/vmx/pkvm/hyp/pkvm.c     | 50 ++++++++++++++++++++++++----
+ arch/x86/kvm/vmx/pkvm/hyp/pkvm_hyp.h |  6 ++++
+ 2 files changed, 49 insertions(+), 7 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/pkvm/hyp/mem_protect.c b/arch/x86/kvm/vmx/pkvm/hyp/mem_protect.c
-index b040a109f87d..fad81f91794c 100644
---- a/arch/x86/kvm/vmx/pkvm/hyp/mem_protect.c
-+++ b/arch/x86/kvm/vmx/pkvm/hyp/mem_protect.c
-@@ -30,6 +30,7 @@ struct pkvm_mem_trans_desc {
- 			u64	addr;
- 		} hyp;
- 	};
-+	u64			prot;
- };
- 
- struct pkvm_mem_transition {
-@@ -64,6 +65,11 @@ static int host_ept_set_owner_locked(phys_addr_t addr, u64 size, pkvm_id owner_i
- 	return ret;
- }
- 
-+static int host_ept_create_idmap_locked(u64 addr, u64 size, int pgsz_mask, u64 prot)
-+{
-+	return pkvm_pgtable_map(pkvm_hyp->host_vm.ept, addr, addr, size, pgsz_mask, prot);
-+}
-+
- static int
- __check_page_state_walker(struct pkvm_pgtable *pgt, unsigned long vaddr,
- 			  unsigned long vaddr_end, int level, void *ptep,
-@@ -120,6 +126,14 @@ static int host_request_donation(const struct pkvm_mem_transition *tx)
- 	return __host_check_page_state_range(addr, size, PKVM_PAGE_OWNED);
- }
- 
-+static int host_ack_donation(const struct pkvm_mem_transition *tx)
-+{
-+	u64 addr = tx->completer.host.addr;
-+	u64 size = tx->size;
-+
-+	return __host_check_page_state_range(addr, size, PKVM_NOPAGE);
-+}
-+
- static int check_donation(const struct pkvm_mem_transition *tx)
+diff --git a/arch/x86/kvm/vmx/pkvm/hyp/pkvm.c b/arch/x86/kvm/vmx/pkvm/hyp/pkvm.c
+index 63004ed6e90e..8a7305e9a68b 100644
+--- a/arch/x86/kvm/vmx/pkvm/hyp/pkvm.c
++++ b/arch/x86/kvm/vmx/pkvm/hyp/pkvm.c
+@@ -96,6 +96,7 @@ int __pkvm_init_shadow_vm(unsigned long kvm_va,
+ 			  size_t shadow_size)
  {
- 	int ret;
-@@ -128,6 +142,9 @@ static int check_donation(const struct pkvm_mem_transition *tx)
- 	case PKVM_ID_HOST:
- 		ret = host_request_donation(tx);
- 		break;
-+	case PKVM_ID_HYP:
-+		ret = 0;
-+		break;
- 	default:
- 		ret = -EINVAL;
- 	}
-@@ -136,6 +153,9 @@ static int check_donation(const struct pkvm_mem_transition *tx)
- 		return ret;
+ 	struct pkvm_shadow_vm *vm;
++	int shadow_vm_handle;
  
- 	switch (tx->completer.id) {
-+	case PKVM_ID_HOST:
-+		ret = host_ack_donation(tx);
-+		break;
- 	case PKVM_ID_HYP:
- 		ret = 0;
- 		break;
-@@ -158,6 +178,15 @@ static int host_initiate_donation(const struct pkvm_mem_transition *tx)
- 		return host_ept_set_owner_locked(addr, size, owner_id);
+ 	if (!PAGE_ALIGNED(shadow_pa) ||
+ 		!PAGE_ALIGNED(shadow_size) ||
+@@ -103,29 +104,48 @@ int __pkvm_init_shadow_vm(unsigned long kvm_va,
+ 					   + pkvm_shadow_vcpu_array_size())))
+ 		return -EINVAL;
+ 
++	if (__pkvm_host_donate_hyp(shadow_pa, shadow_size))
++		return -EINVAL;
++
+ 	vm = pkvm_phys_to_virt(shadow_pa);
+ 
+ 	memset(vm, 0, shadow_size);
+ 	pkvm_spin_lock_init(&vm->lock);
+ 
+ 	vm->host_kvm_va = kvm_va;
++	vm->shadow_size = shadow_size;
+ 
+ 	if (pkvm_shadow_ept_init(&vm->sept_desc))
+-		return -EINVAL;
++		goto undonate;
++
++	shadow_vm_handle = allocate_shadow_vm_handle(vm);
++	if (shadow_vm_handle < 0)
++		goto deinit_shadow_ept;
++
++	return shadow_vm_handle;
+ 
+-	return allocate_shadow_vm_handle(vm);
++deinit_shadow_ept:
++	pkvm_shadow_ept_deinit(&vm->sept_desc);
++undonate:
++	memset(vm, 0, shadow_size);
++	__pkvm_hyp_donate_host(shadow_pa, shadow_size);
++	return -EINVAL;
  }
  
-+static int host_complete_donation(const struct pkvm_mem_transition *tx)
-+{
-+	u64 addr = tx->completer.host.addr;
-+	u64 size = tx->size;
-+	u64 prot = pkvm_mkstate(tx->completer.prot, PKVM_PAGE_OWNED);
-+
-+	return host_ept_create_idmap_locked(addr, size, 0, prot);
-+}
-+
- static int __do_donate(const struct pkvm_mem_transition *tx)
+ unsigned long __pkvm_teardown_shadow_vm(int shadow_vm_handle)
  {
- 	int ret;
-@@ -166,6 +195,9 @@ static int __do_donate(const struct pkvm_mem_transition *tx)
- 	case PKVM_ID_HOST:
- 		ret = host_initiate_donation(tx);
- 		break;
-+	case PKVM_ID_HYP:
-+		ret = 0;
-+		break;
- 	default:
- 		ret = -EINVAL;
- 	}
-@@ -174,6 +206,9 @@ static int __do_donate(const struct pkvm_mem_transition *tx)
- 		return ret;
+ 	struct pkvm_shadow_vm *vm = free_shadow_vm_handle(shadow_vm_handle);
++	unsigned long shadow_size;
  
- 	switch (tx->completer.id) {
-+	case PKVM_ID_HOST:
-+		ret = host_complete_donation(tx);
-+		break;
- 	case PKVM_ID_HYP:
- 		ret = 0;
- 		break;
-@@ -233,3 +268,33 @@ int __pkvm_host_donate_hyp(u64 hpa, u64 size)
+ 	if (!vm)
+ 		return 0;
  
- 	return ret;
+ 	pkvm_shadow_ept_deinit(&vm->sept_desc);
+ 
+-	memset(vm, 0, sizeof(struct pkvm_shadow_vm) + pkvm_shadow_vcpu_array_size());
++	shadow_size = vm->shadow_size;
++	memset(vm, 0, shadow_size);
++
++	WARN_ON(__pkvm_hyp_donate_host(pkvm_virt_to_phys(vm), shadow_size));
+ 
+ 	return pkvm_virt_to_phys(vm);
  }
-+
-+int __pkvm_hyp_donate_host(u64 hpa, u64 size)
-+{
-+	int ret;
-+	u64 hyp_addr = (u64)__pkvm_va(hpa);
-+	struct pkvm_mem_transition donation = {
-+		.size		= size,
-+		.initiator	= {
-+			.id	= PKVM_ID_HYP,
-+			.hyp	= {
-+				.addr	= hyp_addr,
-+			},
-+		},
-+		.completer	= {
-+			.id	= PKVM_ID_HOST,
-+			.host	= {
-+				.addr	= hpa,
-+			},
-+			.prot	= HOST_EPT_DEF_MEM_PROT,
-+		},
-+	};
-+
-+	host_ept_lock();
-+
-+	ret = do_donate(&donation);
-+
-+	host_ept_unlock();
-+
-+	return ret;
-+}
-diff --git a/arch/x86/kvm/vmx/pkvm/hyp/mem_protect.h b/arch/x86/kvm/vmx/pkvm/hyp/mem_protect.h
-index e7e632270688..efb3b3895f58 100644
---- a/arch/x86/kvm/vmx/pkvm/hyp/mem_protect.h
-+++ b/arch/x86/kvm/vmx/pkvm/hyp/mem_protect.h
-@@ -68,4 +68,18 @@ typedef u32 pkvm_id;
-  */
- int __pkvm_host_donate_hyp(u64 hpa, u64 size);
+@@ -321,32 +341,44 @@ s64 __pkvm_init_shadow_vcpu(struct kvm_vcpu *hvcpu, int shadow_vm_handle,
+ 		(pkvm_hyp->vmcs_config.size > PAGE_SIZE))
+ 		return -EINVAL;
  
-+/*
-+ * __pkvm_hyp_donate_host() - Donate pages from hyp to host, then host can
-+ * access these pages.
-+ *
-+ * @hpa:	Start hpa of being donated pages, must be continuous.
-+ * @size:	The size of memory to be donated.
-+ *
-+ * A range of pages [hpa, hpa + size) will be donated from hyp to host. This
-+ * will create mapping in host ept for these pages, and nothing to do with hyp
-+ * mmu. This is paired with __pkvm_host_donate_hyp(), and same as host reclaiming
-+ * these pages back.
-+ */
-+int __pkvm_hyp_donate_host(u64 hpa, u64 size);
++	if (__pkvm_host_donate_hyp(shadow_pa, shadow_size))
++		return -EINVAL;
 +
- #endif
+ 	shadow_vcpu = pkvm_phys_to_virt(shadow_pa);
+ 	memset(shadow_vcpu, 0, shadow_size);
++	shadow_vcpu->shadow_size = shadow_size;
+ 
+ 	ret = read_gva(hvcpu, vcpu_va, &shadow_vcpu->vmx, sizeof(struct vcpu_vmx), &e);
+ 	if (ret < 0)
+-		return -EINVAL;
++		goto undonate;
+ 
+ 	vmcs12_va = (unsigned long)shadow_vcpu->vmx.vmcs01.vmcs;
+ 	if (gva2gpa(hvcpu, vmcs12_va, (gpa_t *)&shadow_vcpu->vmcs12_pa, 0, &e))
+-		return -EINVAL;
++		goto undonate;
+ 
+ 	vm = get_shadow_vm(shadow_vm_handle);
+ 	if (!vm)
+-		return -EINVAL;
++		goto undonate;
+ 
+ 	shadow_vcpu_handle = attach_shadow_vcpu_to_vm(vm, shadow_vcpu);
+ 
+ 	put_shadow_vm(shadow_vm_handle);
+ 
++	if (shadow_vcpu_handle < 0)
++		goto undonate;
++
+ 	return shadow_vcpu_handle;
++undonate:
++	memset(shadow_vcpu, 0, shadow_size);
++	__pkvm_hyp_donate_host(shadow_pa, shadow_size);
++	return -EINVAL;
+ }
+ 
+ unsigned long __pkvm_teardown_shadow_vcpu(s64 shadow_vcpu_handle)
+ {
+ 	int shadow_vm_handle = to_shadow_vm_handle(shadow_vcpu_handle);
+ 	struct shadow_vcpu_state *shadow_vcpu;
++	unsigned long shadow_size;
+ 	struct pkvm_shadow_vm *vm = get_shadow_vm(shadow_vm_handle);
+ 
+ 	if (!vm)
+@@ -359,7 +391,11 @@ unsigned long __pkvm_teardown_shadow_vcpu(s64 shadow_vcpu_handle)
+ 	if (!shadow_vcpu)
+ 		return 0;
+ 
+-	memset(shadow_vcpu, 0, sizeof(struct shadow_vcpu_state));
++	shadow_size = shadow_vcpu->shadow_size;
++	memset(shadow_vcpu, 0, shadow_size);
++	WARN_ON(__pkvm_hyp_donate_host(pkvm_virt_to_phys(shadow_vcpu),
++				       shadow_size));
++
+ 	return pkvm_virt_to_phys(shadow_vcpu);
+ }
+ 
+diff --git a/arch/x86/kvm/vmx/pkvm/hyp/pkvm_hyp.h b/arch/x86/kvm/vmx/pkvm/hyp/pkvm_hyp.h
+index bf5719eefa0e..0a57c19ce4a5 100644
+--- a/arch/x86/kvm/vmx/pkvm/hyp/pkvm_hyp.h
++++ b/arch/x86/kvm/vmx/pkvm/hyp/pkvm_hyp.h
+@@ -38,6 +38,9 @@ struct shadow_vcpu_state {
+ 
+ 	struct pkvm_shadow_vm *vm;
+ 
++	/* The donated size of shadow_vcpu. */
++	unsigned long shadow_size;
++
+ 	struct hlist_node hnode;
+ 	unsigned long vmcs12_pa;
+ 	bool vmcs02_inited;
+@@ -93,6 +96,9 @@ struct pkvm_shadow_vm {
+ 	/* The host's kvm va. */
+ 	unsigned long host_kvm_va;
+ 
++	/* The donated size of shadow_vm. */
++	unsigned long shadow_size;
++
+ 	/*
+ 	 * VM's shadow EPT. All vCPU shares one mapping.
+ 	 * FIXME: a potential security issue if some vCPUs are
 -- 
 2.25.1
 
