@@ -2,48 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 218F16B647F
-	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 10:58:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D680A6B6480
+	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 10:58:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230261AbjCLJ6j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Mar 2023 05:58:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37606 "EHLO
+        id S230304AbjCLJ6m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Mar 2023 05:58:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230263AbjCLJ6A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Mar 2023 05:58:00 -0400
+        with ESMTP id S230209AbjCLJ6E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Mar 2023 05:58:04 -0400
 Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B17656785
-        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 01:57:27 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E160150F9E
+        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 01:57:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678615047; x=1710151047;
+  t=1678615049; x=1710151049;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=8GeyfmjA2v6m5gyxDArFiKnkdq1a+4Fmk3OZAtrfGkw=;
-  b=ZLauv/1/IBAJxR542U74zMgqIspDSOT3VDntxmfmmCkbQspmlYXhUjgL
-   FCRuqa7bM89yLZnsCLMGQFgbuSzbXs2+QPeA0FiAgQ6FXynik/8Z6umgw
-   v9lMxaKAbnL13m2DRQh/7ZSyC5Bb0od3jmAm4owtEhVPv/d/9RW+W8YjG
-   voISDdGKbVXGHW2J6XDV0mUO/8Pj42ZPwpKZ+qdtdHqeH7TW42IJQF91T
-   2r2qyxl5+b4+plVsEOvlVc3hR6KNEKOvO9U2j3eZ/059p2CyNEXK1p3ZL
-   kU5Qm6Lc1u6SL+Kt/istRJXwemf7kAAvLza0EYVfgZ5r/yUkUXLbkhkHF
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="336998091"
+  bh=qAJmt+ZUWNNjJK8RhVCXPSQLKBqL9wM/yJiMzzt0ARs=;
+  b=AFETVo8EHn04sbsO8Vym9z82PqMaAIG4yXeL2oT1Xif0AjG124+yFe4k
+   Jj6tRu6sH8+f8wg94XTJWTol6r6TPbu1rGp489VNPUUa8Ixq/dU5VB7Qp
+   8eyi7Lf3R/HOXSuVcZyXRKdAHWMLMTgpt7mSxYdaD3Yu7e7a3SK2lzsgI
+   eMswedLgLSR70cAerId1vh8tb7+ZWtD7F+/9NcHb9F9hGalwzvNGvjS9P
+   VuYGNW8zcfIn85Gy4+OVdB/iew7YYzQW7L0u7fWh0YDieg6UZcrHPEyNf
+   cAbSdeDw0SDDcqYRwB9voOetBuUum2Jcy9KoOuoa//yt6YGGt7BAol843
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="336998093"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="336998091"
+   d="scan'208";a="336998093"
 Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:56:10 -0800
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:56:11 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="680677643"
+X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="680677646"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="680677643"
+   d="scan'208";a="680677646"
 Received: from jiechen-ubuntu-dev.sh.intel.com ([10.239.154.150])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:56:09 -0800
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 01:56:10 -0800
 From:   Jason Chen CJ <jason.cj.chen@intel.com>
 To:     kvm@vger.kernel.org
 Cc:     Jason Chen CJ <jason.cj.chen@intel.com>
-Subject: [RFC PATCH part-5 01/22] pkvm: x86: Add memcpy lib
-Date:   Mon, 13 Mar 2023 02:02:42 +0800
-Message-Id: <20230312180303.1778492-2-jason.cj.chen@intel.com>
+Subject: [RFC PATCH part-5 02/22] pkvm: x86: Add memory operation APIs for for host VM
+Date:   Mon, 13 Mar 2023 02:02:43 +0800
+Message-Id: <20230312180303.1778492-3-jason.cj.chen@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230312180303.1778492-1-jason.cj.chen@intel.com>
 References: <20230312180303.1778492-1-jason.cj.chen@intel.com>
@@ -59,60 +59,175 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-pKVM need its own memcpy library, it cannot directly use
-arch/x86/lib/memcpy_64.S as it's based on ALTERNATIVE section
-which pKVM does not support yet.
+Add below memory operation APIs for host VM:
+- gva2gpa
+- read_gva/write_gva
+- read_gpa/write_gpa
+such ops will be used later for vmx instruction emulation, for example,
+vmxon instruction will put vmxon area's point in a guest memory, it
+means pKVM need to read its content from a gva.
 
 Signed-off-by: Jason Chen CJ <jason.cj.chen@intel.com>
 ---
- arch/x86/kvm/vmx/pkvm/hyp/Makefile        |  1 +
- arch/x86/kvm/vmx/pkvm/hyp/lib/memcpy_64.S | 26 +++++++++++++++++++++++
- 2 files changed, 27 insertions(+)
+ arch/x86/kvm/vmx/pkvm/hyp/memory.c | 106 +++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/pkvm/hyp/memory.h |  11 +++
+ arch/x86/kvm/vmx/pkvm/hyp/vmexit.c |   1 +
+ 3 files changed, 118 insertions(+)
 
-diff --git a/arch/x86/kvm/vmx/pkvm/hyp/Makefile b/arch/x86/kvm/vmx/pkvm/hyp/Makefile
-index fe852bd43a7e..9c410ec96f45 100644
---- a/arch/x86/kvm/vmx/pkvm/hyp/Makefile
-+++ b/arch/x86/kvm/vmx/pkvm/hyp/Makefile
-@@ -17,6 +17,7 @@ pkvm-hyp-y	:= vmx_asm.o vmexit.o memory.o early_alloc.o pgtable.o mmu.o pkvm.o \
- ifndef CONFIG_PKVM_INTEL_DEBUG
- lib-dir		:= lib
- pkvm-hyp-y	+= $(lib-dir)/memset_64.o
-+pkvm-hyp-y	+= $(lib-dir)/memcpy_64.o
- pkvm-hyp-$(CONFIG_RETPOLINE)	+= $(lib-dir)/retpoline.o
- pkvm-hyp-$(CONFIG_DEBUG_LIST)	+= $(lib-dir)/list_debug.o
- endif
-diff --git a/arch/x86/kvm/vmx/pkvm/hyp/lib/memcpy_64.S b/arch/x86/kvm/vmx/pkvm/hyp/lib/memcpy_64.S
-new file mode 100644
-index 000000000000..b976f646d352
---- /dev/null
-+++ b/arch/x86/kvm/vmx/pkvm/hyp/lib/memcpy_64.S
-@@ -0,0 +1,26 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/* Copyright 2002 Andi Kleen */
+diff --git a/arch/x86/kvm/vmx/pkvm/hyp/memory.c b/arch/x86/kvm/vmx/pkvm/hyp/memory.c
+index d3e479860189..e99fa72cedac 100644
+--- a/arch/x86/kvm/vmx/pkvm/hyp/memory.c
++++ b/arch/x86/kvm/vmx/pkvm/hyp/memory.c
+@@ -6,7 +6,10 @@
+ #include <linux/types.h>
+ #include <asm/kvm_pkvm.h>
+ 
++#include <pkvm.h>
+ #include "memory.h"
++#include "pgtable.h"
++#include "pkvm_hyp.h"
+ 
+ unsigned long __page_base_offset;
+ unsigned long __symbol_base_offset;
+@@ -63,3 +66,106 @@ bool mem_range_included(struct mem_range *child, struct mem_range *parent)
+ {
+ 	return parent->start <= child->start && child->end <= parent->end;
+ }
 +
-+#include <linux/linkage.h>
++void *host_gpa2hva(unsigned long gpa)
++{
++	/* host gpa = hpa */
++	return pkvm_phys_to_virt(gpa);
++}
 +
-+/*
-+ * memcpy - Copy a memory block.
-+ *
-+ * Input:
-+ *  rdi destination
-+ *  rsi source
-+ *  rdx count
-+ *
-+ * Output:
-+ * rax original destination
-+ *
-+ * This is enhanced fast string memcpy. It is faster and
-+ * simpler than old memcpy.
-+ */
++extern struct pkvm_pgtable_ops mmu_ops;
++static struct pkvm_mm_ops mm_ops = {
++	.phys_to_virt = host_gpa2hva,
++};
 +
-+SYM_FUNC_START(memcpy)
-+	movq %rdi, %rax
-+	movq %rdx, %rcx
-+	rep movsb
-+	RET
-+SYM_FUNC_END(memcpy)
++static int check_translation(struct kvm_vcpu *vcpu, gpa_t gpa,
++		u64 prot, u32 access, struct x86_exception *exception)
++{
++	/* TODO: exception for #PF */
++	return 0;
++}
++
++int gva2gpa(struct kvm_vcpu *vcpu, gva_t gva, gpa_t *gpa,
++		u32 access, struct x86_exception *exception)
++{
++	struct pkvm_pgtable guest_mmu;
++	gpa_t _gpa;
++	u64 prot;
++	int pg_level;
++
++	/* caller should ensure exception is not NULL */
++	WARN_ON(exception == NULL);
++
++	memset(exception, 0, sizeof(*exception));
++
++	/*TODO: support other paging mode beside long mode */
++	guest_mmu.root_pa = vcpu->arch.cr3 & PAGE_MASK;
++	pkvm_pgtable_init(&guest_mmu, &mm_ops, &mmu_ops, &pkvm_hyp->mmu_cap, false);
++	pkvm_pgtable_lookup(&guest_mmu, (unsigned long)gva,
++			(unsigned long *)&_gpa, &prot, &pg_level);
++	*gpa = _gpa;
++	if (_gpa == INVALID_ADDR)
++		return -EFAULT;
++
++	return check_translation(vcpu, _gpa, prot, access, exception);
++}
++
++/* only support host VM now */
++static int copy_gva(struct kvm_vcpu *vcpu, gva_t gva, void *addr,
++		unsigned int bytes, struct x86_exception *exception, bool from_guest)
++{
++	u32 access = VMX_AR_DPL(vmcs_read32(GUEST_SS_AR_BYTES)) == 3 ? PFERR_USER_MASK : 0;
++	gpa_t gpa;
++	void *hva;
++	int ret;
++
++	/*FIXME: need check the gva per page granularity */
++	ret = gva2gpa(vcpu, gva, &gpa, access, exception);
++	if (ret)
++		return ret;
++
++	hva = host_gpa2hva(gpa);
++	if (from_guest)
++		memcpy(addr, hva, bytes);
++	else
++		memcpy(hva, addr, bytes);
++
++	return bytes;
++}
++
++int read_gva(struct kvm_vcpu *vcpu, gva_t gva, void *addr,
++		unsigned int bytes, struct x86_exception *exception)
++{
++	return copy_gva(vcpu, gva, addr, bytes, exception, true);
++}
++
++int write_gva(struct kvm_vcpu *vcpu, gva_t gva, void *addr,
++		unsigned int bytes, struct x86_exception *exception)
++{
++	return copy_gva(vcpu, gva, addr, bytes, exception, false);
++}
++
++/* only support host VM now */
++static int copy_gpa(struct kvm_vcpu *vcpu, gpa_t gpa, void *addr,
++		unsigned int bytes, bool from_guest)
++{
++	void *hva;
++
++	hva = host_gpa2hva(gpa);
++	if (from_guest)
++		memcpy(addr, hva, bytes);
++	else
++		memcpy(hva, addr, bytes);
++
++	return bytes;
++}
++
++int read_gpa(struct kvm_vcpu *vcpu, gpa_t gpa, void *addr, unsigned int bytes)
++{
++	return copy_gpa(vcpu, gpa, addr, bytes, true);
++}
++
++int write_gpa(struct kvm_vcpu *vcpu, gpa_t gpa, void *addr, unsigned int bytes)
++{
++	return copy_gpa(vcpu, gpa, addr, bytes, false);
++}
+diff --git a/arch/x86/kvm/vmx/pkvm/hyp/memory.h b/arch/x86/kvm/vmx/pkvm/hyp/memory.h
+index c9175272096b..4a75d8dff1b3 100644
+--- a/arch/x86/kvm/vmx/pkvm/hyp/memory.h
++++ b/arch/x86/kvm/vmx/pkvm/hyp/memory.h
+@@ -20,4 +20,15 @@ struct mem_range {
+ bool find_mem_range(unsigned long addr, struct mem_range *range);
+ bool mem_range_included(struct mem_range *child, struct mem_range *parent);
+ 
++#include <linux/kvm_host.h>
++void *host_gpa2hva(unsigned long gpa);
++int gva2gpa(struct kvm_vcpu *vcpu, gva_t gva, gpa_t *gpa,
++		u32 access, struct x86_exception *exception);
++int read_gva(struct kvm_vcpu *vcpu, gva_t gva, void *addr,
++		unsigned int bytes, struct x86_exception *exception);
++int write_gva(struct kvm_vcpu *vcpu, gva_t gva, void *addr,
++		unsigned int bytes, struct x86_exception *exception);
++int read_gpa(struct kvm_vcpu *vcpu, gpa_t gpa, void *addr, unsigned int bytes);
++int write_gpa(struct kvm_vcpu *vcpu, gpa_t gpa, void *addr, unsigned int bytes);
++
+ #endif
+diff --git a/arch/x86/kvm/vmx/pkvm/hyp/vmexit.c b/arch/x86/kvm/vmx/pkvm/hyp/vmexit.c
+index e8015a6830b0..02224d93384a 100644
+--- a/arch/x86/kvm/vmx/pkvm/hyp/vmexit.c
++++ b/arch/x86/kvm/vmx/pkvm/hyp/vmexit.c
+@@ -154,6 +154,7 @@ int pkvm_main(struct kvm_vcpu *vcpu)
+ 		}
+ 
+ 		vcpu->arch.cr2 = native_read_cr2();
++		vcpu->arch.cr3 = vmcs_readl(GUEST_CR3);
+ 
+ 		vmx->exit_reason.full = vmcs_read32(VM_EXIT_REASON);
+ 		vmx->exit_qualification = vmcs_readl(EXIT_QUALIFICATION);
 -- 
 2.25.1
 
