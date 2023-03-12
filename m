@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E31A96B69A2
-	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 19:06:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 95F5C6B69A5
+	for <lists+kvm@lfdr.de>; Sun, 12 Mar 2023 19:06:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231803AbjCLSGL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Mar 2023 14:06:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51004 "EHLO
+        id S231916AbjCLSGQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Mar 2023 14:06:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231486AbjCLSEW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S231730AbjCLSEW (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sun, 12 Mar 2023 14:04:22 -0400
 Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 387AD212BA;
-        Sun, 12 Mar 2023 11:00:20 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3D304FA91;
+        Sun, 12 Mar 2023 11:00:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678644020; x=1710180020;
+  t=1678644021; x=1710180021;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=oNYcqakr2INbzFwFsy0orbP4e5FuT1Oxq93ALIsMlOo=;
-  b=bmzwJM0ENparPuRjIhBjYTYSClsWdum0KszBAX41kOVKb/eBIU5HrkZL
-   9iNVzFbMJS/Bxz1psod+vLRTd9o5q4hxlhE698/rCab5dQjgsIy6N2jTU
-   aXEfnV7CY7ChZIptBwJmKhZlruzhUysef8OIq5YWpOjU8h7UnMvsHLSXO
-   TMrIbYiCSsWr8KJ/68r7C1KnDuiZOYgBCp98matHNYGx4LtyVA7tk6y48
-   73zaWJhWorRGOP7GaocYQpiEy7PTTwaV88MHB/ET1IiZTOiGGu6zYBcMp
-   3rHY0hjs0O2h5eYAofzVNihna67wVn8eBOSqM6+MWD9qmfZM/wKosjWL+
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="316660024"
+  bh=dq0vDaKcQlMU7fJRLx5kY6CuZnjfXPFdsjykn9QkZ0g=;
+  b=V5pxTb2vHflzBp5Lp/N/w/94dZoBDT5axurSG5CZu8a9Pbahl4BNhuLo
+   WkLsAPnDD7sdQy7ZGPXOnDsLjC3Q9b8DgvP2qijvxa7wywhVS+2ZAAF/J
+   RUJLzW1OQQHYXgQfDu3wCsfId3S+ISH6tn1ifl83dg2Nfs3VXvlIDefJH
+   A8HFTVxpWbE3CYokHEQU6d553AiDO9IHaVgnWVxy0C/iCqXS2r1ItYfSu
+   ECqx7+gHz8Q+OCddJofTI0V5wtctS6sgQaT5nTtD570B3RQ6OiU+hiSsP
+   huiQe3mz+5Bwcx85doZMepgLc14zSjnepm9EohK3TazJEcRx5XShmd9Fm
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="316660028"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="316660024"
+   d="scan'208";a="316660028"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
   by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 10:58:12 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="742596760"
+X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="742596763"
 X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="742596760"
+   d="scan'208";a="742596763"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 10:58:12 -0700
 From:   isaku.yamahata@intel.com
@@ -48,9 +48,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH v13 081/113] KVM: VMX: Move NMI/exception handler to common helper
-Date:   Sun, 12 Mar 2023 10:56:45 -0700
-Message-Id: <a69575ae37d717a450a4001bfbcc7802f1cc8a51.1678643052.git.isaku.yamahata@intel.com>
+Subject: [PATCH v13 082/113] KVM: x86: Split core of hypercall emulation to helper function
+Date:   Sun, 12 Mar 2023 10:56:46 -0700
+Message-Id: <9cc2ae6549169a070f523ef22a886a0715047c96.1678643052.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1678643051.git.isaku.yamahata@intel.com>
 References: <cover.1678643051.git.isaku.yamahata@intel.com>
@@ -67,211 +67,114 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-TDX mostly handles NMI/exception exit mostly the same to VMX case.  The
-difference is how to retrieve exit qualification.  To share the code with
-TDX, move NMI/exception to a common header, common.h.
+By necessity, TDX will use a different register ABI for hypercalls.
+Break out the core functionality so that it may be reused for TDX.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/common.h | 59 +++++++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/vmx.c    | 68 +++++----------------------------------
- 2 files changed, 67 insertions(+), 60 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  4 +++
+ arch/x86/kvm/x86.c              | 54 ++++++++++++++++++++-------------
+ 2 files changed, 37 insertions(+), 21 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/common.h b/arch/x86/kvm/vmx/common.h
-index 39ddead9d2bd..0dcf31e064d0 100644
---- a/arch/x86/kvm/vmx/common.h
-+++ b/arch/x86/kvm/vmx/common.h
-@@ -4,8 +4,67 @@
- 
- #include <linux/kvm_host.h>
- 
-+#include <asm/traps.h>
-+
- #include "posted_intr.h"
- #include "mmu.h"
-+#include "vmcs.h"
-+#include "x86.h"
-+
-+extern unsigned long vmx_host_idt_base;
-+void vmx_do_interrupt_irqoff(unsigned long entry);
-+void vmx_do_nmi_irqoff(void);
-+
-+static inline void vmx_handle_nm_fault_irqoff(struct kvm_vcpu *vcpu)
-+{
-+	/*
-+	 * Save xfd_err to guest_fpu before interrupt is enabled, so the
-+	 * MSR value is not clobbered by the host activity before the guest
-+	 * has chance to consume it.
-+	 *
-+	 * Do not blindly read xfd_err here, since this exception might
-+	 * be caused by L1 interception on a platform which doesn't
-+	 * support xfd at all.
-+	 *
-+	 * Do it conditionally upon guest_fpu::xfd. xfd_err matters
-+	 * only when xfd contains a non-zero value.
-+	 *
-+	 * Queuing exception is done in vmx_handle_exit. See comment there.
-+	 */
-+	if (vcpu->arch.guest_fpu.fpstate->xfd)
-+		rdmsrl(MSR_IA32_XFD_ERR, vcpu->arch.guest_fpu.xfd_err);
-+}
-+
-+static inline void vmx_handle_exception_irqoff(struct kvm_vcpu *vcpu,
-+					       u32 intr_info)
-+{
-+	/* if exit due to PF check for async PF */
-+	if (is_page_fault(intr_info))
-+		vcpu->arch.apf.host_apf_flags = kvm_read_and_reset_apf_flags();
-+	/* if exit due to NM, handle before interrupts are enabled */
-+	else if (is_nm_fault(intr_info))
-+		vmx_handle_nm_fault_irqoff(vcpu);
-+	/* Handle machine checks before interrupts are enabled */
-+	else if (is_machine_check(intr_info))
-+		kvm_machine_check();
-+}
-+
-+static inline void vmx_handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu,
-+							u32 intr_info)
-+{
-+	unsigned int vector = intr_info & INTR_INFO_VECTOR_MASK;
-+	gate_desc *desc = (gate_desc *)vmx_host_idt_base + vector;
-+
-+	if (KVM_BUG(!is_external_intr(intr_info), vcpu->kvm,
-+	    "unexpected VM-Exit interrupt info: 0x%x", intr_info))
-+		return;
-+
-+	kvm_before_interrupt(vcpu, KVM_HANDLING_IRQ);
-+	vmx_do_interrupt_irqoff(gate_offset(desc));
-+	kvm_after_interrupt(vcpu);
-+
-+	vcpu->arch.at_instruction_boundary = true;
-+}
- 
- u8 __vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio, bool check_cr0_cd);
- 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index bbf286a5c338..0c973e9f4a70 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -526,7 +526,7 @@ static inline void vmx_segment_cache_clear(struct vcpu_vmx *vmx)
- 	vmx->segment_cache.bitmask = 0;
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 23dfb9b89980..50e3666ec6f6 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -2102,6 +2102,10 @@ static inline void kvm_clear_apicv_inhibit(struct kvm *kvm,
+ 	kvm_set_or_clear_apicv_inhibit(kvm, reason, false);
  }
  
--static unsigned long host_idt_base;
-+unsigned long vmx_host_idt_base;
++unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
++				      unsigned long a0, unsigned long a1,
++				      unsigned long a2, unsigned long a3,
++				      int op_64_bit);
+ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu);
  
- #if IS_ENABLED(CONFIG_HYPERV)
- static bool __read_mostly enlightened_vmcs = true;
-@@ -4265,7 +4265,7 @@ void vmx_set_constant_host_state(struct vcpu_vmx *vmx)
- 	vmcs_write16(HOST_SS_SELECTOR, __KERNEL_DS);  /* 22.2.4 */
- 	vmcs_write16(HOST_TR_SELECTOR, GDT_ENTRY_TSS*8);  /* 22.2.4 */
- 
--	vmcs_writel(HOST_IDTR_BASE, host_idt_base);   /* 22.2.4 */
-+	vmcs_writel(HOST_IDTR_BASE, vmx_host_idt_base);   /* 22.2.4 */
- 
- 	vmcs_writel(HOST_RIP, (unsigned long)vmx_vmexit); /* 22.2.5 */
- 
-@@ -5162,7 +5162,7 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
- 	intr_info = vmx_get_intr_info(vcpu);
- 
- 	/*
--	 * Machine checks are handled by handle_exception_irqoff(), or by
-+	 * Machine checks are handled by vmx_handle_exception_irqoff(), or by
- 	 * vmx_vcpu_run() if a #MC occurs on VM-Entry.  NMIs are handled by
- 	 * vmx_vcpu_enter_exit().
- 	 */
-@@ -5170,7 +5170,7 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
- 		return 1;
- 
- 	/*
--	 * Queue the exception here instead of in handle_nm_fault_irqoff().
-+	 * Queue the exception here instead of in vmx_handle_nm_fault_irqoff().
- 	 * This ensures the nested_vmx check is not skipped so vmexit can
- 	 * be reflected to L1 (when it intercepts #NM) before reaching this
- 	 * point.
-@@ -6845,59 +6845,6 @@ void vmx_load_eoi_exitmap(struct kvm_vcpu *vcpu, u64 *eoi_exit_bitmap)
- 	vmcs_write64(EOI_EXIT_BITMAP3, eoi_exit_bitmap[3]);
+ int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 error_code,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 84e4b00cc21a..6f8eee8c0f2b 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9767,26 +9767,15 @@ static int complete_hypercall_exit(struct kvm_vcpu *vcpu)
+ 	return kvm_skip_emulated_instruction(vcpu);
  }
  
--void vmx_do_interrupt_irqoff(unsigned long entry);
--void vmx_do_nmi_irqoff(void);
--
--static void handle_nm_fault_irqoff(struct kvm_vcpu *vcpu)
--{
--	/*
--	 * Save xfd_err to guest_fpu before interrupt is enabled, so the
--	 * MSR value is not clobbered by the host activity before the guest
--	 * has chance to consume it.
--	 *
--	 * Do not blindly read xfd_err here, since this exception might
--	 * be caused by L1 interception on a platform which doesn't
--	 * support xfd at all.
--	 *
--	 * Do it conditionally upon guest_fpu::xfd. xfd_err matters
--	 * only when xfd contains a non-zero value.
--	 *
--	 * Queuing exception is done in vmx_handle_exit. See comment there.
--	 */
--	if (vcpu->arch.guest_fpu.fpstate->xfd)
--		rdmsrl(MSR_IA32_XFD_ERR, vcpu->arch.guest_fpu.xfd_err);
--}
--
--static void handle_exception_irqoff(struct kvm_vcpu *vcpu, u32 intr_info)
--{
--	/* if exit due to PF check for async PF */
--	if (is_page_fault(intr_info))
--		vcpu->arch.apf.host_apf_flags = kvm_read_and_reset_apf_flags();
--	/* if exit due to NM, handle before interrupts are enabled */
--	else if (is_nm_fault(intr_info))
--		handle_nm_fault_irqoff(vcpu);
--	/* Handle machine checks before interrupts are enabled */
--	else if (is_machine_check(intr_info))
--		kvm_machine_check();
--}
--
--static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu,
--					     u32 intr_info)
--{
--	unsigned int vector = intr_info & INTR_INFO_VECTOR_MASK;
--	gate_desc *desc = (gate_desc *)host_idt_base + vector;
--
--	if (KVM_BUG(!is_external_intr(intr_info), vcpu->kvm,
--	    "unexpected VM-Exit interrupt info: 0x%x", intr_info))
--		return;
--
--	kvm_before_interrupt(vcpu, KVM_HANDLING_IRQ);
--	vmx_do_interrupt_irqoff(gate_offset(desc));
--	kvm_after_interrupt(vcpu);
--
--	vcpu->arch.at_instruction_boundary = true;
--}
--
- void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu)
+-int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
++unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
++				      unsigned long a0, unsigned long a1,
++				      unsigned long a2, unsigned long a3,
++				      int op_64_bit)
  {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
-@@ -6906,9 +6853,10 @@ void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu)
- 		return;
+-	unsigned long nr, a0, a1, a2, a3, ret;
+-	int op_64_bit;
+-
+-	if (kvm_xen_hypercall_enabled(vcpu->kvm))
+-		return kvm_xen_hypercall(vcpu);
+-
+-	if (kvm_hv_hypercall_enabled(vcpu))
+-		return kvm_hv_hypercall(vcpu);
+-
+-	nr = kvm_rax_read(vcpu);
+-	a0 = kvm_rbx_read(vcpu);
+-	a1 = kvm_rcx_read(vcpu);
+-	a2 = kvm_rdx_read(vcpu);
+-	a3 = kvm_rsi_read(vcpu);
++	unsigned long ret;
  
- 	if (vmx->exit_reason.basic == EXIT_REASON_EXTERNAL_INTERRUPT)
--		handle_external_interrupt_irqoff(vcpu, vmx_get_intr_info(vcpu));
-+		vmx_handle_external_interrupt_irqoff(vcpu,
-+						     vmx_get_intr_info(vcpu));
- 	else if (vmx->exit_reason.basic == EXIT_REASON_EXCEPTION_NMI)
--		handle_exception_irqoff(vcpu, vmx_get_intr_info(vcpu));
-+		vmx_handle_exception_irqoff(vcpu, vmx_get_intr_info(vcpu));
- }
+ 	trace_kvm_hypercall(nr, a0, a1, a2, a3);
  
- /*
-@@ -8202,7 +8150,7 @@ __init int vmx_hardware_setup(void)
- 	int r;
+-	op_64_bit = is_64_bit_hypercall(vcpu);
+ 	if (!op_64_bit) {
+ 		nr &= 0xFFFFFFFF;
+ 		a0 &= 0xFFFFFFFF;
+@@ -9795,11 +9784,6 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+ 		a3 &= 0xFFFFFFFF;
+ 	}
  
- 	store_idt(&dt);
--	host_idt_base = dt.address;
-+	vmx_host_idt_base = dt.address;
+-	if (static_call(kvm_x86_get_cpl)(vcpu) != 0) {
+-		ret = -KVM_EPERM;
+-		goto out;
+-	}
+-
+ 	ret = -KVM_ENOSYS;
  
- 	vmx_setup_user_return_msrs();
- 
+ 	switch (nr) {
+@@ -9858,6 +9842,34 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+ 		ret = -KVM_ENOSYS;
+ 		break;
+ 	}
++	return ret;
++}
++EXPORT_SYMBOL_GPL(__kvm_emulate_hypercall);
++
++int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
++{
++	unsigned long nr, a0, a1, a2, a3, ret;
++	int op_64_bit;
++
++	if (kvm_xen_hypercall_enabled(vcpu->kvm))
++		return kvm_xen_hypercall(vcpu);
++
++	if (kvm_hv_hypercall_enabled(vcpu))
++		return kvm_hv_hypercall(vcpu);
++
++	nr = kvm_rax_read(vcpu);
++	a0 = kvm_rbx_read(vcpu);
++	a1 = kvm_rcx_read(vcpu);
++	a2 = kvm_rdx_read(vcpu);
++	a3 = kvm_rsi_read(vcpu);
++	op_64_bit = is_64_bit_hypercall(vcpu);
++
++	if (static_call(kvm_x86_get_cpl)(vcpu) != 0) {
++		ret = -KVM_EPERM;
++		goto out;
++	}
++
++	ret = __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, op_64_bit);
+ out:
+ 	if (!op_64_bit)
+ 		ret = (u32)ret;
 -- 
 2.25.1
 
