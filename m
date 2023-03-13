@@ -2,61 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BFA6E6B71C5
-	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 09:57:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 80E1A6B71CC
+	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 09:57:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229994AbjCMI50 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Mar 2023 04:57:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44336 "EHLO
+        id S230449AbjCMI5f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Mar 2023 04:57:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229823AbjCMI4t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Mar 2023 04:56:49 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E197523642;
-        Mon, 13 Mar 2023 01:53:36 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id v21so1992778ple.9;
-        Mon, 13 Mar 2023 01:53:36 -0700 (PDT)
+        with ESMTP id S230440AbjCMI4y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Mar 2023 04:56:54 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A762423C61;
+        Mon, 13 Mar 2023 01:53:40 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id a2so12126636plm.4;
+        Mon, 13 Mar 2023 01:53:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678697615;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=D10KgoRJeWJa43EfRHUMcmADuIBznC9qbEV3kZk/zDk=;
-        b=k+8ezgPiCd2gjMbHMWF9jFHSpKTPG3DkkcPHWt1ZYysMo7Ue1sFHMADALvMpbDZ+IX
-         9pIqnTnFneAohs2S33kYWI2mzzluxHAdcXTdEaw/xyG8v3fpUE1L7bfAZgu1oq8kJqVK
-         y2+yYy7gsBn1GYfpM5RvSqAXcQC/ML5l9tTqVsa5wPC3vd24HljOarIJoyFSUUN277/w
-         9co2aentBstey8ImxfoiM84vvyBF05xBHsmmnO4zAUJkfo3H+lZOMDucmeWw/Zqrv1VQ
-         3dlK0zz0zr/wsDiksAy9tjkNMHKDFSrPgzM4pOZpjTUXvW2gMtOa8hahH7sVfENSvYxz
-         6l/g==
+        d=gmail.com; s=20210112; t=1678697617;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xVtL4Mahv24U8m6dcDI6vCl9MV+/3t8GA9cjgeYPo88=;
+        b=IFuE/RKpWgbpue1yFOcu0pv1jDxtZQJW8Y7Vw9ouBUxFVmsGM5WCrXXMLtEvn4JfxL
+         cDrO81S7cmqF2X9NZ9Sgbcyot0PwpVbLzpl9yMNKRLeJ7gYUOezlObWsSAscDv2LYmRI
+         mqAzYYW3t9l4fwfpoiOLGwUOSDAMqQxLnofP5ioEyGYykDhigZsZR9vtvEpkrCydO+iG
+         n8HkJMgJH+Da70QTQnQEybxXOf0A0SdXgNxsO6+iTff+abMnS/kU6nfZsjMVeFV2eMpA
+         jHaAP/iuqzj42xZFvguwof0o4vhu7Ij9+reFqiCqsguQelV/M8Yt3fBBpNegivvCl0dR
+         w5Qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678697615;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=D10KgoRJeWJa43EfRHUMcmADuIBznC9qbEV3kZk/zDk=;
-        b=hLHeIDqb/AMwWXGV392elmOS9qjKQIORIrCsVw6mlljfC5ee6TMtK61DZoU0PFWq/1
-         xYUQwsmXatA2eyBROXsomrUFE6CE1BuGHIsbuWpKXoMFTl0VdU8Td7SI51uRNnG06KC/
-         xZNYAkz+qPFsAWzYAH8GXwAZKMp6ovcoyQTV2fMM95tXPZOCuwG53PCxrTJi1eSrfG8J
-         QzwRmmJatbJs5Wznmzm5C7c0hG8jQ9ZxQ8Ud7LtdO1oHRioEpgwg/ztyrEQGUnPz9Ogf
-         CeaCvbTofVF8sn0nQGJpZezuQ7f91DJnS1vH/eQS1JZjCAyH5q4e5aTFDvgChZgxuINb
-         oscg==
-X-Gm-Message-State: AO0yUKWRxqVSwyJw+wFS67IAuxRwgIpl7g3tHn9WJ3AutygBzoTnDHSd
-        kjx9HnKDRYBD++XpYKlgOgI=
-X-Google-Smtp-Source: AK7set8sZpKdZFScN7cVDMEIN026xKH5/5i7wA/BA3S846W3WLiQa2NA9e1w7nHRtXBOBiIiHVUFtQ==
-X-Received: by 2002:a17:902:7106:b0:19d:1c6e:d31f with SMTP id a6-20020a170902710600b0019d1c6ed31fmr28178918pll.29.1678697615327;
-        Mon, 13 Mar 2023 01:53:35 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1678697617;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xVtL4Mahv24U8m6dcDI6vCl9MV+/3t8GA9cjgeYPo88=;
+        b=KwTuMe2RBFECRReQgttcjZ1xd7esJq2CdWWpzVpLWLTKDmQxcLnlCCyuLZzaZxObeL
+         FiQISmtdcwT/YUhLW6qf8dbXA7y6cKYDo0hf1w6FJ4VTfgMbsJGgE0s/a+kkiHhpB/Xh
+         qSSdhXXGIFovcL5UICQrT7QM8Z0RUV1gJoQ3LHvLiKCpUv7qDY6Ugi2+HM8d1zf+I1Gw
+         L0S3lwx3Y/E/MjLaeN4Rba/g9sbGeFnf/x7MyvwUZ2vIQR7UBi1RFEdGYY4h03J4GuVn
+         gmsGj4tM1IACuK49bEfbieHFLOZuURIUC45OV8gSbnTeb/aT+hiJXCllwzH4chsGF+7j
+         I6mw==
+X-Gm-Message-State: AO0yUKWB5k0x3ISqmvXzUos9K0NBPvoAaQ+TRdEC7Tnw/PCvfyCsOvaJ
+        4kohtsoX0jkwR2Ltqidjocg=
+X-Google-Smtp-Source: AK7set9ZdyeFtt2FTsc+OO9lLDZYcp9kQhe6SEC1tRaUC1+2g85groVXsQlxUdp0MIzAmbHfMbnuDA==
+X-Received: by 2002:a17:902:d483:b0:19a:9055:6658 with SMTP id c3-20020a170902d48300b0019a90556658mr9887872plg.18.1678697617067;
+        Mon, 13 Mar 2023 01:53:37 -0700 (PDT)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id c6-20020a170902d48600b0019ee045a2b3sm4155059plg.308.2023.03.13.01.53.29
+        by smtp.gmail.com with ESMTPSA id c6-20020a170902d48600b0019ee045a2b3sm4155059plg.308.2023.03.13.01.53.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Mar 2023 01:53:31 -0700 (PDT)
+        Mon, 13 Mar 2023 01:53:36 -0700 (PDT)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 0/2] KVM: selftests: Report enable_pmu module value when test is skipped
-Date:   Mon, 13 Mar 2023 16:53:09 +0800
-Message-Id: <20230313085311.25327-1-likexu@tencent.com>
+Subject: [PATCH v2 1/2] KVM: selftests: Add a helper to read kvm boolean module parameters
+Date:   Mon, 13 Mar 2023 16:53:10 +0800
+Message-Id: <20230313085311.25327-2-likexu@tencent.com>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230313085311.25327-1-likexu@tencent.com>
+References: <20230313085311.25327-1-likexu@tencent.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -69,29 +72,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Adequate info can help developers quickly distinguish whether the cause
-is a code flaw or a platform limitation when a test fails or is skipped,
-and this minor patch-set is doing a little work in that direction.
+From: Like Xu <likexu@tencent.com>
 
-Previous:
-https://lore.kernel.org/kvm/20230214084920.59787-1-likexu@tencent.com/
+Add a helper function for reading kvm boolean module parameters values.
+No functional change intended.
 
-V1 -> V2 Changelog:
-- Apply TEST_REQUIRE() to x86_64/vmx_pmu_caps_test as well;
-- Put TEST_REQUIRE() at the very top; (Sean)
+Signed-off-by: Like Xu <likexu@tencent.com>
+---
+ tools/testing/selftests/kvm/include/kvm_util_base.h | 1 +
+ tools/testing/selftests/kvm/lib/kvm_util.c          | 5 +++++
+ 2 files changed, 6 insertions(+)
 
-Like Xu (2):
-  KVM: selftests: Add a helper to read kvm boolean module parameters
-  KVM: selftests: Report enable_pmu module value when test is skipped
-
- tools/testing/selftests/kvm/include/kvm_util_base.h        | 1 +
- tools/testing/selftests/kvm/lib/kvm_util.c                 | 5 +++++
- tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c | 1 +
- tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c     | 1 +
- 4 files changed, 8 insertions(+)
-
-
-base-commit: 13738a3647368f7f600b30d241779bcd2a3ebbfd
+diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+index fbc2a79369b8..a089c356f354 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util_base.h
++++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+@@ -213,6 +213,7 @@ extern const struct vm_guest_mode_params vm_guest_mode_params[];
+ int open_path_or_exit(const char *path, int flags);
+ int open_kvm_dev_path_or_exit(void);
+ 
++bool get_kvm_param_bool(const char *param);
+ bool get_kvm_intel_param_bool(const char *param);
+ bool get_kvm_amd_param_bool(const char *param);
+ 
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index 56d5ea949cbb..fa6d69f73199 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -80,6 +80,11 @@ static bool get_module_param_bool(const char *module_name, const char *param)
+ 	TEST_FAIL("Unrecognized value '%c' for boolean module param", value);
+ }
+ 
++bool get_kvm_param_bool(const char *param)
++{
++	return get_module_param_bool("kvm", param);
++}
++
+ bool get_kvm_intel_param_bool(const char *param)
+ {
+ 	return get_module_param_bool("kvm_intel", param);
 -- 
 2.39.2
 
