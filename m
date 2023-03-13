@@ -2,72 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 58D6A6B7F4D
-	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 18:21:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 693AC6B7F58
+	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 18:23:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231609AbjCMRVY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Mar 2023 13:21:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40078 "EHLO
+        id S231344AbjCMRXW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Mar 2023 13:23:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231600AbjCMRVI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Mar 2023 13:21:08 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03397838B1
-        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 10:19:58 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 79-20020a630452000000b005030840e570so2816655pge.9
-        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 10:19:57 -0700 (PDT)
+        with ESMTP id S231298AbjCMRWx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Mar 2023 13:22:53 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5F5A72B0D
+        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 10:22:00 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id s8-20020a170902b18800b0019c92f56a8aso7572519plr.22
+        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 10:22:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678727932;
+        d=google.com; s=20210112; t=1678728071;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=yDUeyLtnZmXQ74fhIlrEaM77YvYatD22GuV+U9jovtY=;
-        b=D9UwxNmohnrcqApKroF2xG+1MiRU9/wkWfKyoClP/jeHdrwdFOewCO3gkrilfUMqnL
-         0SlYeoi4oOo1tDeZSPNnShudTo4OmYg0qvvTKXAm4qvqFYRFXYPAEoJGgwCIES8admtk
-         qdyU/JAAiIKPuHZ5kSdQw0QUKf+nbXFs5bXm3Iic7R7UliPMbxMED40pSDEF2WJpiHye
-         Dvs4Z55or0XZd573NaVZYoy1K4cu1zCVOcCaIb2s8vSMHjC0FqcBVPJcf7CZ2iabjmYd
-         iW5TFvYTCAru7Dgk14atangzC1v8C79IZGmN9jCxyHOE1LmeVS170dVp988H9NCKGnpl
-         taXw==
+        bh=6T1FQzdq6ySi1rIwhJyo74NnzXWN8IL63XLJcIURd30=;
+        b=NCrllu0cypSlyHtfYfnDii1y8LyzSvcc2SYpEkINqE5iKRucAG5Swb2pBV5/VHDqJp
+         k15ND+xGJzBoEqpqPJnBxygkn2p7oF3VYUZHqjJ+HRSc02ZHRiOrGVZMB9AovrMKQRAw
+         LuE3+eFR/EW9HvUCuLcAvpG1+SK+QPGeNLlNON/OPmFpnL3RViya8NRf3AA/hxxwGwib
+         qgn7TYoyPKMnMc3GfvBgnOW7WnMa2a8PVnjOqJHFbRsXt3WLmXB9O9R6s0O+h2lvGOO7
+         YDqzbMQf6oBxCMTBVuHREGXQHz3euArR6zCyckO+3M1EmdWnXUKYMa7kheZ4k9cK+yu1
+         eifg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678727932;
+        d=1e100.net; s=20210112; t=1678728071;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=yDUeyLtnZmXQ74fhIlrEaM77YvYatD22GuV+U9jovtY=;
-        b=4/R48T/FoyNmOecxAKdI604ptl73VWZ197VZ57XQFyi8z3/CTH4fbMmhmmyV5MOqXG
-         p6hTKud4yGoKdiscBSaafIPeZy5MA8XSmkSHdtrO+E4eWRUSrMTnvsMou1NNI9DgRsPh
-         KdI8wliRveyS6Chuhw8mi+ls5GSFAZhWCzz184lKFwS+D416xfOIeJZDyBseS9VpO0Pj
-         KVAXkabGBz7vRKtB7+eHGsZmx8taI4Su2sDqdMPUAx1q1fNDxZimZzZCQooj6Tykprmu
-         1dKX+JS84ix+oqWKXYjhccFjXYZ9rt/oRd6rXqYZssUvsOf55n3lMtowUyC8xTqvBWpX
-         a6KQ==
-X-Gm-Message-State: AO0yUKViWIsNS0ybWzITYFJqjX/mTD0cy3W52KLeCS0qRwnanvnR2phW
-        zE9eGuXv+9M3mykwHMn+61dKH/nzjmA=
-X-Google-Smtp-Source: AK7set+82XrQZ7jHIENlLFcGDRA9JFrTKocQQ/El0fbbVNnzJnKqR8rueoa0bqralqQh6sEL00jC8955CAw=
+        bh=6T1FQzdq6ySi1rIwhJyo74NnzXWN8IL63XLJcIURd30=;
+        b=Qj5NquSP14QYmRkM3vVbQiWXUkgpeDqy1mdgqyHlyFQ358Q2uzapxweQFLP01sU7pL
+         jxMpyyyJKK0vhEsr1TgWn4sZHGycrJitn8E0gGFDJ4Mj2N7MCXnzUof2r7TzYT85Bw8v
+         ic9Yd4lyPyhgg2fzw+Y9CnTaG7SZeGDFBTSUfn9nOTmrlPJfoaJkhNNpynTHBtjyMcUe
+         m7Oqb1b3By+vOFEgSiE4AJlbe+pcpkqoxYjpSausOgV/JIAOqhCC0N999EUZgyXui3de
+         N0s4Lc0FN+TDwxmGafZ9PTXYzrZMGmrbSd89JKw+HqnlgRtHY3vfQogVQgTzqWMrWjGs
+         L29Q==
+X-Gm-Message-State: AO0yUKXYb+cifsUEpZM0/ddZcuQciyHt7fel9aggO6LciMsfJLb9rbi4
+        0GCMU4a5m03ujZzmMbNVDER6GFAtp5Q=
+X-Google-Smtp-Source: AK7set8B3CeFNCeFlI5qCMlp/uO9ITN1guOuZisHUyY14k69LU+SjjJ6+snECmGiZWES/zdYV86/vdKAdjA=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a62:1d04:0:b0:623:8a88:1bba with SMTP id
- d4-20020a621d04000000b006238a881bbamr1952557pfd.2.1678727932223; Mon, 13 Mar
- 2023 10:18:52 -0700 (PDT)
-Date:   Mon, 13 Mar 2023 10:18:50 -0700
-In-Reply-To: <ce2330db94b05605a0649a3da0595211c5bd71dd.camel@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:2136:b0:590:3182:7ac3 with SMTP id
+ n22-20020a056a00213600b0059031827ac3mr13418688pfj.0.1678728071185; Mon, 13
+ Mar 2023 10:21:11 -0700 (PDT)
+Date:   Mon, 13 Mar 2023 10:21:09 -0700
+In-Reply-To: <CALzav=c3aKNT-7CzkrFC8YCCwj-E16JYWwsmOV-HaLbODG67hQ@mail.gmail.com>
 Mime-Version: 1.0
-References: <20230310214232.806108-1-seanjc@google.com> <20230310214232.806108-6-seanjc@google.com>
- <ce2330db94b05605a0649a3da0595211c5bd71dd.camel@intel.com>
-Message-ID: <ZA9avcHRPoIqZP/n@google.com>
-Subject: Re: [PATCH v2 05/18] x86/reboot: KVM: Disable SVM during reboot via
- virt/KVM reboot callback
+References: <20230313091425.1962708-1-maz@kernel.org> <20230313091425.1962708-2-maz@kernel.org>
+ <ZA9HAQtkCDwFXcsm@google.com> <CALzav=c3aKNT-7CzkrFC8YCCwj-E16JYWwsmOV-HaLbODG67hQ@mail.gmail.com>
+Message-ID: <ZA9bhVQBtgES7Qqi@google.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: Disable interrupts while walking
+ userspace PTs
 From:   Sean Christopherson <seanjc@google.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     "tglx@linutronix.de" <tglx@linutronix.de>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Chao Gao <chao.gao@intel.com>,
-        "andrew.cooper3@citrix.com" <andrew.cooper3@citrix.com>
-Content-Type: text/plain; charset="iso-8859-1"
+To:     David Matlack <dmatlack@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -79,54 +78,81 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 13, 2023, Huang, Kai wrote:
-> On Fri, 2023-03-10 at 13:42 -0800, Sean Christopherson wrote:
-> > Use the virt callback to disable SVM (and set GIF=3D1) during an emerge=
-ncy
-> > instead of blindly attempting to disable SVM.=EF=BF=BD Like the VMX cas=
-e, if KVM
-> > (or an out-of-tree hypervisor) isn't loaded/active, SVM can't be in use=
-.
-> >=20
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+On Mon, Mar 13, 2023, David Matlack wrote:
+> On Mon, Mar 13, 2023 at 8:53=E2=80=AFAM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> >
+> > +David
+> >
+> > On Mon, Mar 13, 2023, Marc Zyngier wrote:
+> > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > > index 7113587222ff..d7b8b25942df 100644
+> > > --- a/arch/arm64/kvm/mmu.c
+> > > +++ b/arch/arm64/kvm/mmu.c
+> > > @@ -666,14 +666,23 @@ static int get_user_mapping_size(struct kvm *kv=
+m, u64 addr)
+> > >                                  CONFIG_PGTABLE_LEVELS),
+> > >               .mm_ops         =3D &kvm_user_mm_ops,
+> > >       };
+> > > +     unsigned long flags;
+> > >       kvm_pte_t pte =3D 0;      /* Keep GCC quiet... */
+> > >       u32 level =3D ~0;
+> > >       int ret;
+> > >
+> > > +     /*
+> > > +      * Disable IRQs so that we hazard against a concurrent
+> > > +      * teardown of the userspace page tables (which relies on
+> > > +      * IPI-ing threads).
+> > > +      */
+> > > +     local_irq_save(flags);
+> > >       ret =3D kvm_pgtable_get_leaf(&pgt, addr, &pte, &level);
+> > > -     VM_BUG_ON(ret);
+> > > -     VM_BUG_ON(level >=3D KVM_PGTABLE_MAX_LEVELS);
+> > > -     VM_BUG_ON(!(pte & PTE_VALID));
+> > > +     local_irq_restore(flags);
+> > > +
+> > > +     /* Oops, the userspace PTs are gone... */
+> > > +     if (ret || level >=3D KVM_PGTABLE_MAX_LEVELS || !(pte & PTE_VAL=
+ID))
+> > > +             return -EFAULT;
+> >
+> > I don't think this should return -EFAULT all the way out to userspace. =
+ Unless
+> > arm64 differs from x86 in terms of how the userspace page tables are ma=
+naged, not
+> > having a valid translation _right now_ doesn't mean that one can't be c=
+reated in
+> > the future, e.g. by way of a subsequent hva_to_pfn().
+> >
+> > FWIW, the approach x86 takes is to install a 4KiB (smallest granuale) t=
+ranslation,
 >=20
-> [...]
->=20
-> > -#if IS_ENABLED(CONFIG_KVM_INTEL)
-> > +#if IS_ENABLED(CONFIG_KVM_INTEL) || IS_ENABLED(CONFIG_KVM_AMD)
-> > =EF=BF=BD/* RCU-protected callback to disable virtualization prior to r=
-eboot. */
-> > =EF=BF=BDstatic cpu_emergency_virt_cb __rcu *cpu_emergency_virt_callbac=
-k;
-> > =EF=BF=BD
-> > @@ -821,7 +821,7 @@ int crashing_cpu =3D -1;
-> > =EF=BF=BD */
-> > =EF=BF=BDvoid cpu_emergency_disable_virtualization(void)
-> > =EF=BF=BD{
-> > -#if IS_ENABLED(CONFIG_KVM_INTEL)
-> > +#if IS_ENABLED(CONFIG_KVM_INTEL) || IS_ENABLED(CONFIG_KVM_AMD)
-> > =EF=BF=BD	cpu_emergency_virt_cb *callback;
-> > =EF=BF=BD
-> > =EF=BF=BD	rcu_read_lock();
-> > @@ -830,8 +830,6 @@ void cpu_emergency_disable_virtualization(void)
-> > =EF=BF=BD		callback();
-> > =EF=BF=BD	rcu_read_unlock();
-> > =EF=BF=BD#endif
-> > -	/* KVM_AMD doesn't yet utilize the common callback. */
-> > -	cpu_emergency_svm_disable();
-> > =EF=BF=BD}
->=20
-> Shouldn't the callback be always present since you want to consider 'out-=
-of-
-> tree' hypervisor case?
+> If I'm reading the ARM code correctly, returning -EFAULT here will
+> have that effect. get_user_mapping_size() is only called by
+> transparent_hugepage_adjust() which returns PAGE_SIZE if
+> get_user_mapping_size() returns anything less than PMD_SIZE.
 
-No?  The kernel doesn't provide any guarantees for out-of-tree code.  I don=
-'t have
-a super strong preference, though I do like the effective documentation the=
- checks
-provide.  Buy more importantly, my understanding is that the x86 maintainer=
-s want
-to limit the exposure for these types of interfaces, e.g. `git grep IS_ENAB=
-LED\(CONFIG_KVM`
-for a variety of hooks that are enabled iff KVM is enabled in the kernel co=
-nfig.
+No, this patch adds
+
++               int sz =3D get_user_mapping_size(kvm, hva);
++
++               if (sz < 0)
++                       return sz;
++
++               if (sz < PMD_SIZE)
++                       return PAGE_SIZE;
++
+
+and=20
+
+                        vma_pagesize =3D transparent_hugepage_adjust(kvm, m=
+emslot,
+                                                                   hva, &pf=
+n,
+                                                                   &fault_i=
+pa);
++
++               if (vma_pagesize < 0) {
++                       ret =3D vma_pagesize;
++                       goto out_unlock;
++               }
