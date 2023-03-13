@@ -2,296 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D88676B856A
-	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 23:56:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4597C6B8645
+	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 00:49:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229698AbjCMW4J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Mar 2023 18:56:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35264 "EHLO
+        id S230018AbjCMXtY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Mar 2023 19:49:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229925AbjCMWzv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Mar 2023 18:55:51 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E22ED92BE1;
-        Mon, 13 Mar 2023 15:55:14 -0700 (PDT)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32DKV8pL004034;
-        Mon, 13 Mar 2023 22:45:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=fbyf9OUU/YPPSXB9llJZh1EYAaEfBal+Tbf5i0+cBxk=;
- b=KhkzeGNS3NIE0OCGxned/cDMqYs1brpI8gioQHcBG6+ZlDgfoRdASgS2o/EZXpFwbuOF
- UuX8GAc07LRvnMp9Zw+FDO1rUl/sdH6z2scj8iHoXgCEc5T5CuTEHhCNelXiv4BvC9kZ
- JbcK/R0WTXWCFaHnlX4UHcwSSJTpbtk2J6TRE5S9oHsbjCKchEXRbmqKwo3VER8CX/o+
- aoyT/jPwn2MxpP0eFT5cC96KxdAw6f8HukZuZMRzamnSe/7G/GgLcuhu3xxYQa++U7IG
- YG/T41AbncShDBirnItfTr6GkjTfTxy8D6ksnTUVs8EQ3osKBSEx95w9pITFK82ER4nz dA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3pa5ubkxa1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Mar 2023 22:45:39 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32DMhVLa030081;
-        Mon, 13 Mar 2023 22:45:39 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3pa5ubkx9k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Mar 2023 22:45:39 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32DCvi5g015761;
-        Mon, 13 Mar 2023 22:45:37 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3p8h96k320-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Mar 2023 22:45:37 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32DMjY1G47513942
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 13 Mar 2023 22:45:34 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 054312005A;
-        Mon, 13 Mar 2023 22:45:34 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C90A42004B;
-        Mon, 13 Mar 2023 22:45:33 +0000 (GMT)
-Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.219.71])
-        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 13 Mar 2023 22:45:33 +0000 (GMT)
-Message-ID: <d6471b717f34b6ae664dc91331246e9676d8c879.camel@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v5] s390x: Add tests for execute-type
- instructions
-From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Date:   Mon, 13 Mar 2023 23:45:33 +0100
-In-Reply-To: <20230313191602.58b16c31@p-imbrenda>
-References: <20230310181131.2138736-1-nsg@linux.ibm.com>
-         <20230313191602.58b16c31@p-imbrenda>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        with ESMTP id S229528AbjCMXtV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Mar 2023 19:49:21 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E63796C8A4;
+        Mon, 13 Mar 2023 16:49:19 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id k18-20020a17090a591200b0023d36e30cb5so517048pji.1;
+        Mon, 13 Mar 2023 16:49:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1678751359;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=veCb5kgkwpfOZhFg24jGViGOhj9MBZ2C2UnSqiBHm5U=;
+        b=UE0h6mJiXvamxHNE9tkWOS7zJojTVeX594dwceoemH58pbPY1cL6zsQskb2Sq3BGFN
+         c0BMpsgqcUN3OEPjySpUoHlr9Hc6wr3dcAlBiNoq+S0s4vaRR4ypnbF63vIUJiWU+EG2
+         LMEC7PqO5YQwQfj+bPzlI9Aa2RTdbzbN60C+X44jb5p1QFQHEy8H6MutxlnKLO79VaJE
+         1FlnLx+q7S+XAxZ1VhxCoC6bOoUWZs6ts/hV5w1A2XC2MwTPmohk1O7+1jEq/RprGERi
+         vKbWGaFO+8vB7049HOCholwiEph8d+3W3/bdon6H11FxVTuultkrRP7AXuCkoBndvPHx
+         g90Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678751359;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=veCb5kgkwpfOZhFg24jGViGOhj9MBZ2C2UnSqiBHm5U=;
+        b=WFxmoWVazH807OKFE5eU/fkour6OlV5wH0WJCwx0PpdIUY3WeAIKFMrCrVNAy0cnPT
+         pOhM7vW3F7eyuYtn00/WemS95fFxafaBRnOTHnC2UWYlhK1RIPT6xP4vyx3/9TDPP+Pn
+         fzgJwwHY2obK6GqZtgqHjwka3xy5cv1ePMdDmyVmRskMMdPEhJyQMAavM69ZzrxcrSly
+         H3KH05P2m8Ed9jM2dQ5se7B/c+sqlrMo5FIevfws6TOnD73ZLjoVBqAJzTTjPDQAWpnM
+         VcP7pqNIR8fs5lbSnu94qpWzZMiY4bLFGti7XAskIAIpOLILS6YCY81E2BHOt9h12gdt
+         iZlA==
+X-Gm-Message-State: AO0yUKVPVEibhTcTqjUMyy8V7xo+WyTqGlEZeinnyeOkveJ16SkcSU28
+        3p2egueYdDZ0hW8R+EBv9Eg=
+X-Google-Smtp-Source: AK7set/CjZAHSn9j/7nDCvM2png4vRlpqlSVmsRAnTLnb7O4nhF+5i2H43foXW1osOGQjAuc8KVIMQ==
+X-Received: by 2002:a17:90b:2318:b0:23b:3662:11ef with SMTP id mt24-20020a17090b231800b0023b366211efmr9334283pjb.36.1678751359156;
+        Mon, 13 Mar 2023 16:49:19 -0700 (PDT)
+Received: from localhost ([192.55.54.55])
+        by smtp.gmail.com with ESMTPSA id v11-20020a17090a458b00b0023d0c2f39f2sm412835pjg.19.2023.03.13.16.49.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Mar 2023 16:49:18 -0700 (PDT)
+Date:   Mon, 13 Mar 2023 16:49:16 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>
+Subject: Re: [PATCH v10 05/16] x86/virt/tdx: Add skeleton to enable TDX on
+ demand
+Message-ID: <20230313234916.GC3922605@ls.amr.corp.intel.com>
+References: <cover.1678111292.git.kai.huang@intel.com>
+ <f150316b975b5ca22c6c4016ffd90db79d657bbf.1678111292.git.kai.huang@intel.com>
+ <20230308222738.GA3419702@ls.amr.corp.intel.com>
+ <96b56c5b8a5876aaf6d5ccbb81bab334b10983eb.camel@intel.com>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: tPjbXk4HNQy9GmnsITndE-e_7-hPSr9X
-X-Proofpoint-ORIG-GUID: K4nwcn7ob-Xe5GkUMvsC7bQ3sSN_9Enx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-13_11,2023-03-13_03,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
- phishscore=0 mlxscore=0 clxscore=1015 impostorscore=0 lowpriorityscore=0
- adultscore=0 spamscore=0 mlxlogscore=999 malwarescore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
- definitions=main-2303130177
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <96b56c5b8a5876aaf6d5ccbb81bab334b10983eb.camel@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2023-03-13 at 19:16 +0100, Claudio Imbrenda wrote:
-> On Fri, 10 Mar 2023 19:11:31 +0100
-> Nina Schoetterl-Glausch <nsg@linux.ibm.com> wrote:
->=20
-> > Test the instruction address used by targets of an execute instruction.
-> > When the target instruction calculates a relative address, the result i=
-s
-> > relative to the target instruction, not the execute instruction.
-> >=20
-> > Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-> > Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-> > ---
-> >=20
-> >=20
-> > v4 -> v5:
-> >  * word align the execute-type instruction, preventing a specification
-> >    exception if the address calculation is wrong, since LLGFRL requires
-> >    word alignment
-> >  * change wording of comment
-> >=20
-> > v3 -> v4:
-> >  * fix nits (thanks Janosch)
-> >  * pickup R-b (thanks Janosch)
-> >=20
-> > v2 -> v3:
-> >  * add some comments (thanks Janosch)
-> >  * add two new tests (drop Nico's R-b)
-> >  * push prefix
-> >=20
-> > v1 -> v2:
-> >  * add test to unittests.cfg and .gitlab-ci.yml
-> >  * pick up R-b (thanks Nico)
-> >=20
-> >=20
-> > TCG does the address calculation relative to the execute instruction.
-> > Everything that has an operand that is relative to the instruction give=
-n by
-> > the immediate in the instruction and goes through in2_ri2 in TCG has th=
-is
-> > problem, because in2_ri2 does the calculation relative to pc_next which=
- is the
-> > address of the EX(RL).
-> > That should make fixing it easier tho.
-> >=20
-> >=20
-> > Range-diff against v4:
-> > 1:  f29ef634 ! 1:  57f8f256 s390x: Add tests for execute-type instructi=
-ons
-> >     @@ s390x/ex.c (new)
-> >      +		"	.popsection\n"
-> >      +
-> >      +		"	llgfrl	%[target],0b\n"
-> >     ++		//align (pad with nop), in case the wrong operand is used
-> >     ++		"	.balignw 4,0x0707\n"
-> >      +		"	exrl	0,0b\n"
-> >      +		: [target] "=3Dd" (target),
-> >      +		  [value] "=3Dd" (value)
-> >     @@ s390x/ex.c (new)
-> >      +		"	.popsection\n"
-> >      +
-> >      +		"	lrl	%[crl_word],0b\n"
-> >     -+		//align (pad with nop), in case the wrong bad operand is used
-> >     ++		//align (pad with nop), in case the wrong operand is used
-> >      +		"	.balignw 4,0x0707\n"
-> >      +		"	exrl	0,0b\n"
-> >      +		"	ipm	%[program_mask]\n"
-> >=20
-> >  s390x/Makefile      |   1 +
-> >  s390x/ex.c          | 172 ++++++++++++++++++++++++++++++++++++++++++++
-> >  s390x/unittests.cfg |   3 +
-> >  .gitlab-ci.yml      |   1 +
-> >  4 files changed, 177 insertions(+)
-> >  create mode 100644 s390x/ex.c
-> >=20
-> > diff --git a/s390x/Makefile b/s390x/Makefile
-> > index 97a61611..6cf8018b 100644
-> > --- a/s390x/Makefile
-> > +++ b/s390x/Makefile
-> > @@ -39,6 +39,7 @@ tests +=3D $(TEST_DIR)/panic-loop-extint.elf
-> >  tests +=3D $(TEST_DIR)/panic-loop-pgm.elf
-> >  tests +=3D $(TEST_DIR)/migration-sck.elf
-> >  tests +=3D $(TEST_DIR)/exittime.elf
-> > +tests +=3D $(TEST_DIR)/ex.elf
-> > =20
-> >  pv-tests +=3D $(TEST_DIR)/pv-diags.elf
-> > =20
-> > diff --git a/s390x/ex.c b/s390x/ex.c
-> > new file mode 100644
-> > index 00000000..f05f8f90
-> > --- /dev/null
-> > +++ b/s390x/ex.c
-> > @@ -0,0 +1,172 @@
-> > +// SPDX-License-Identifier: GPL-2.0-only
-> > +/*
-> > + * Copyright IBM Corp. 2023
-> > + *
-> > + * Test EXECUTE (RELATIVE LONG).
-> > + * These instructions execute a target instruction. The target instruc=
-tion is formed
-> > + * by reading an instruction from memory and optionally modifying some=
- of its bits.
-> > + * The execution of the target instruction is the same as if it was ex=
-ecuted
-> > + * normally as part of the instruction sequence, except for the instru=
-ction
-> > + * address and the instruction-length code.
-> > + */
-> > +
-> > +#include <libcflat.h>
-> > +
-> > +/*
-> > + * BRANCH AND SAVE, register register variant.
-> > + * Saves the next instruction address (address from PSW + length of in=
-struction)
-> > + * to the first register. No branch is taken in this test, because 0 i=
-s
-> > + * specified as target.
-> > + * BASR does *not* perform a relative address calculation with an inte=
-rmediate.
-> > + */
-> > +static void test_basr(void)
-> > +{
-> > +	uint64_t ret_addr, after_ex;
-> > +
-> > +	report_prefix_push("BASR");
-> > +	asm volatile ( ".pushsection .rodata\n"
->=20
-> you use .text.ex_bras in the next test, why not something like that here
-> (and everywhere else) too?
+On Sun, Mar 12, 2023 at 11:08:44PM +0000,
+"Huang, Kai" <kai.huang@intel.com> wrote:
 
-In the test below we branch to the code in .text.ex_bras.
-In all other tests the instruction in .rodata is just an operand of the exe=
-cute instruction,
-and it doesn't get modified.
-As for the bras test having a suffix, I guess it's pretty arbitrary, but si=
-nce it's a handful
-of instructions instead of just one, it felt substantial enough to warrant =
-one.
+> On Wed, 2023-03-08 at 14:27 -0800, Isaku Yamahata wrote:
+> > > +
+> > > +static int try_init_module_global(void)
+> > > +{
+> > > +	int ret;
+> > > +
+> > > +	/*
+> > > +	 * The TDX module global initialization only needs to be done
+> > > +	 * once on any cpu.
+> > > +	 */
+> > > +	spin_lock(&tdx_global_init_lock);
+> > > +
+> > > +	if (tdx_global_init_status & TDX_GLOBAL_INIT_DONE) {
+> > > +		ret = tdx_global_init_status & TDX_GLOBAL_INIT_FAILED ?
+> > > +			-EINVAL : 0;
+> > > +		goto out;
+> > > +	}
+> > > +
+> > > +	/* All '0's are just unused parameters. */
+> > > +	ret = seamcall(TDH_SYS_INIT, 0, 0, 0, 0, NULL, NULL);
+> > > +
+> > > +	tdx_global_init_status = TDX_GLOBAL_INIT_DONE;
+> > > +	if (ret)
+> > > +		tdx_global_init_status |= TDX_GLOBAL_INIT_FAILED;
+> > 
+> > If entropy is lacking (rdrand failure), TDH_SYS_INIT can return TDX_SYS_BUSY.
+> > In such case, we should allow the caller to retry or make this function retry
+> > instead of marking error stickily.
+> 
+> The spec says:
+> 
+> TDX_SYS_BUSY	The operation was invoked when another TDX module
+> 		operation was in progress. The operation may be retried.
+> 
+> So I don't see how entropy is lacking is related to this error.  Perhaps you
+> were mixing up with KEY.CONFIG?
 
->=20
-> > +		"0:	basr	%[ret_addr],0\n"
-> > +		"	.popsection\n"
-> > +
-> > +		"	larl	%[after_ex],1f\n"
-> > +		"	exrl	0,0b\n"
-> > +		"1:\n"
-> > +		: [ret_addr] "=3Dd" (ret_addr),
-> > +		  [after_ex] "=3Dd" (after_ex)
-> > +	);
-> > +
-> > +	report(ret_addr =3D=3D after_ex, "return address after EX");
-> > +	report_prefix_pop();
-> > +}
-> > +
-> > +/*
-> > + * BRANCH RELATIVE AND SAVE.
-> > + * According to PoP (Branch-Address Generation), the address calculate=
-d relative
-> > + * to the instruction address is relative to BRAS when it is the targe=
-t of an
-> > + * execute-type instruction, not relative to the execute-type instruct=
-ion.
-> > + */
-> > +static void test_bras(void)
-> > +{
-> > +	uint64_t after_target, ret_addr, after_ex, branch_addr;
-> > +
-> > +	report_prefix_push("BRAS");
-> > +	asm volatile ( ".pushsection .text.ex_bras, \"x\"\n"
-> > +		"0:	bras	%[ret_addr],1f\n"
-> > +		"	nopr	%%r7\n"
-> > +		"1:	larl	%[branch_addr],0\n"
-> > +		"	j	4f\n"
-> > +		"	.popsection\n"
-> > +
-> > +		"	larl	%[after_target],1b\n"
-> > +		"	larl	%[after_ex],3f\n"
-> > +		"2:	exrl	0,0b\n"
-/*
- * In case the address calculation is correct, we jump by the relative offs=
-et 1b-0b from 0b to 1b.
- * In case the address calculation is relative to the exrl (i.e. a test fai=
-lure),
- * put a valid instruction at the same relative offset from the exrl, so th=
-e test continues in a
- * controlled manner.
- */
-> > +		"3:	larl	%[branch_addr],0\n"
-> > +		"4:\n"
-> > +
-> > +		"	.if (1b - 0b) !=3D (3b - 2b)\n"
-> > +		"	.error	\"right and wrong target must have same offset\"\n"
->=20
-> please explain why briefly (i.e. if the wrong target is executed and
-> the offset mismatches Bad Things=E2=84=A2 happen)
+TDH.SYS.INIT() initializes global canary value.  TDX module is compiled with
+strong stack protector enabled by clang and canary value needs to be
+initialized.  By default, the canary value is stored at
+%fsbase:<STACK_CANARY_OFFSET 0x28>
 
-Ok, see above.
+Although this is a job for libc or language runtime, TDX modules has to do it
+itself because it's stand alone.
 
-[...]
+From tdh_sys_init.c
+_STATIC_INLINE_ api_error_type tdx_init_stack_canary(void)
+{
+    ia32_rflags_t rflags = {.raw = 0};
+    uint64_t canary;
+    if (!ia32_rdrand(&rflags, &canary))
+    {
+        return TDX_SYS_BUSY;
+    }
+...
+    last_page_ptr->stack_canary.canary = canary;
 
 
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
