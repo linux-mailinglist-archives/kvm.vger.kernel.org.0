@@ -2,60 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1DCFB6B807A
-	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 19:27:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 26FFE6B80CD
+	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 19:33:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230445AbjCMS1s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Mar 2023 14:27:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51928 "EHLO
+        id S231522AbjCMSdu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Mar 2023 14:33:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230489AbjCMS13 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Mar 2023 14:27:29 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AE2584F6D;
-        Mon, 13 Mar 2023 11:26:47 -0700 (PDT)
+        with ESMTP id S231489AbjCMSdT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Mar 2023 14:33:19 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FF9E85B21;
+        Mon, 13 Mar 2023 11:31:48 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 740EB6147B;
-        Mon, 13 Mar 2023 18:25:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 43BD0C4339C;
-        Mon, 13 Mar 2023 18:25:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678731958;
-        bh=Ohid4WW4bE1iYiU0aGgJoySObkAyf67Ea/B4BQVbjnM=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=NVCzcmIkQtJwFPXGDf1dscUZxLiG0m86+OdrIZCilckaLjnWwg0De2/7zTcA69CUL
-         HlmRNYuv0qPfguryWWvJgZzyFsQvaEp17XK9wqPDUVp3tiClPn7Yga30ODV9AD5uTA
-         fDyVOiqTXpLA5lfUgc4cTaJ7NFmZVfNaPqm7O7fvDmgKftNyH/rv2uJbzh6aHnLmJJ
-         7j2YdMuYNS7TSMrbjcK/xyhBs0rOX18mMUurPIVzeD1TvEhWGgcX10CVI/opg76Arv
-         bor27gZV4jYEhOZf6uDHZcsbkclDRwRyG6wrGhx9o7NN06GVGBCthfjRYkCbITY9Ns
-         fYjkxJgDyNRCw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2D253C43161;
-        Mon, 13 Mar 2023 18:25:58 +0000 (UTC)
-Subject: Re: [GIT PULL] virtio,vhost,vdpa: bugfixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20230313023139-mutt-send-email-mst@kernel.org>
-References: <20230313023139-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-List-Id: Linux virtualization <virtualization.lists.linux-foundation.org>
-X-PR-Tracked-Message-Id: <20230313023139-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-X-PR-Tracked-Commit-Id: ae43c20da2a77c508715a9c77845b4e87e6a1e25
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: fc89d7fb499b0162e081f434d45e8d1b47e82ece
-Message-Id: <167873195817.6604.15099339670931730243.pr-tracker-bot@kernel.org>
-Date:   Mon, 13 Mar 2023 18:25:58 +0000
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>, lulu@redhat.com,
-        kvm@vger.kernel.org, mst@redhat.com, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, eperezma@redhat.com,
-        leiyang@redhat.com, rongtao@cestc.cn, gautam.dawar@amd.com,
-        elic@nvidia.com
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 60BC661484;
+        Mon, 13 Mar 2023 18:30:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FA3AC433EF;
+        Mon, 13 Mar 2023 18:30:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1678732256;
+        bh=sdMhGh/v0S4uLhhMgXoZcxTftjLcVbQ0JldvEDTZ1yE=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=h/hI9tL/g1oKZX9SamcN3M5/Phk2olRLoatPJFm31YFAUcAsHgxSUO3k5HrcUFBGR
+         oTFlhpdu5AzaDPUsg8JPv2FLzqxqaON2iQZQPmb/f7IuSBmUXQAln9+7wnXBsgdkfo
+         ujvYCBIj/MpDkfXQafdJ925ZIXxw9Js6vvSnB+k8=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     rafael@kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Subject: [PATCH 31/36] vhost-vdpa: vhost_vdpa_alloc_domain() should be using a const struct bus_type *
+Date:   Mon, 13 Mar 2023 19:29:13 +0100
+Message-Id: <20230313182918.1312597-31-gregkh@linuxfoundation.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230313182918.1312597-1-gregkh@linuxfoundation.org>
+References: <20230313182918.1312597-1-gregkh@linuxfoundation.org>
+MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1408; i=gregkh@linuxfoundation.org; h=from:subject; bh=sdMhGh/v0S4uLhhMgXoZcxTftjLcVbQ0JldvEDTZ1yE=; b=owGbwMvMwCRo6H6F97bub03G02pJDCn82TUvbDoStjD0i/1v+vmN+6FAU3bEc8GDO0VEeJmnK n3uEcvoiGVhEGRikBVTZPmyjefo/opDil6Gtqdh5rAygQxh4OIUgIlE/mOYp+sx9Tebv8y3yUbr ta71fL9koRnIzzDfQ/VD509tq8Db9tk3zRNct9fM6dcHAA==
+X-Developer-Key: i=gregkh@linuxfoundation.org; a=openpgp; fpr=F4B60CC5BF78C2214A313DCB3147D40DDB2DFB29
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -63,15 +53,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Mon, 13 Mar 2023 02:31:39 -0400:
+The function, vhost_vdpa_alloc_domain(), has a pointer to a struct
+bus_type, but it should be constant as the function it passes it to
+expects it to be const, and the vhost code does not modify it in any
+way.
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: kvm@vger.kernel.org
+Cc: virtualization@lists.linux-foundation.org
+Cc: netdev@vger.kernel.org
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+Note, this is a patch that is a prepatory cleanup as part of a larger
+series of patches that is working on resolving some old driver core
+design mistakes.  It will build and apply cleanly on top of 6.3-rc2 on
+its own, but I'd prefer if I could take it through my driver-core tree
+so that the driver core changes can be taken through there for 6.4-rc1.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/fc89d7fb499b0162e081f434d45e8d1b47e82ece
+ drivers/vhost/vdpa.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thank you!
-
+diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+index dc12dbd5b43b..08c7cb3399fc 100644
+--- a/drivers/vhost/vdpa.c
++++ b/drivers/vhost/vdpa.c
+@@ -1140,7 +1140,7 @@ static int vhost_vdpa_alloc_domain(struct vhost_vdpa *v)
+ 	struct vdpa_device *vdpa = v->vdpa;
+ 	const struct vdpa_config_ops *ops = vdpa->config;
+ 	struct device *dma_dev = vdpa_get_dma_dev(vdpa);
+-	struct bus_type *bus;
++	const struct bus_type *bus;
+ 	int ret;
+ 
+ 	/* Device want to do DMA by itself */
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.39.2
+
