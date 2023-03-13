@@ -2,229 +2,221 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 044BC6B7142
-	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 09:39:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 02F986B711E
+	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 09:26:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230084AbjCMIjP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Mar 2023 04:39:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41366 "EHLO
+        id S229898AbjCMI0i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Mar 2023 04:26:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229669AbjCMIjN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Mar 2023 04:39:13 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D900C24BEF;
-        Mon, 13 Mar 2023 01:39:12 -0700 (PDT)
+        with ESMTP id S229745AbjCMI0g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Mar 2023 04:26:36 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD52131E25;
+        Mon, 13 Mar 2023 01:26:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678696752; x=1710232752;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
+  t=1678695995; x=1710231995;
+  h=date:from:to:cc:subject:message-id:references:
    in-reply-to:mime-version;
-  bh=TTgLdwT4w573QFbc4FDXv0L2k8BBpYCoI+m9NOWJQbk=;
-  b=SMWioV5qXZHE6xW08Oj2OF7BoLl8gGadgbR9RwPtZROUIBqTD4LZCu50
-   Bd+hmzdfsTMZ+z44eGUNFkoqBaEu1njuKwrtjG0z1OTuztk4fg1hPX8AY
-   i8GUWKbesj+lsCcUX/LiUZktlTgAfZV0Gno4hCDXL6ph6jnWtKC0J+CBu
-   1T1MLpcF8nHtcn/nn14A/XAURHEYD0L1ySwJReYRg4jIHcrYLYYsPKrzz
-   bRkjOAytV12+a6VxEGtOanLiqxJFNDI2LTw6EFYxM9mTCCP5dBIxoMlPd
-   4DVbiIACzaNiou7jVD6s4o4FWt0IgUHyCGj5IQpS+IzlaTluXSnYtX1eL
+  bh=OauyA6OgtywmxWEy/gkShGZgmpNZpVxfVg5d/ahaYE8=;
+  b=GLXOHHj6AJqaf67lSVEb6g/+o6nf0Y9jTjulBbzt0Zc7yVybgHNJaODk
+   0n0F8Q5nio3QlUGuZ/GvlVvSenCFXJI0QL7Ac59BotPr0Msd3acCA84Bg
+   f91GUQr7LtU8xezIOMymIn9oHWgSLXpKIazKnuMK2DrRdhAJZFW5/uZs+
+   XTEyjT+x55iwRR6W3sBT81NBKcOiSkfc8YbleM1KUmDMVN5+1oeR0etVB
+   73KXkHmq6yAfLoGY/UX9JW8UA2eszD8yVnx3D/V0tR+H92Au/YDMQbej/
+   i7fK9k4KGuxhaKzOTPfHK/PtJKGMPYa0U90AvCEP+5gIAhWdM5bazl0Rv
    A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="320944759"
+X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="337112821"
 X-IronPort-AV: E=Sophos;i="5.98,256,1673942400"; 
-   d="scan'208";a="320944759"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2023 01:39:12 -0700
+   d="scan'208";a="337112821"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2023 01:26:35 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="655901956"
+X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="680942310"
 X-IronPort-AV: E=Sophos;i="5.98,256,1673942400"; 
-   d="scan'208";a="655901956"
+   d="scan'208";a="680942310"
 Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga006.jf.intel.com with ESMTP; 13 Mar 2023 01:39:12 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+  by fmsmga007.fm.intel.com with ESMTP; 13 Mar 2023 01:26:34 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
  ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Mon, 13 Mar 2023 01:39:12 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ 15.1.2507.21; Mon, 13 Mar 2023 01:26:34 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21 via Frontend Transport; Mon, 13 Mar 2023 01:39:12 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.171)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ 15.1.2507.21; Mon, 13 Mar 2023 01:26:34 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21 via Frontend Transport; Mon, 13 Mar 2023 01:26:34 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.103)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.21; Mon, 13 Mar 2023 01:39:11 -0700
+ 15.1.2507.21; Mon, 13 Mar 2023 01:26:33 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iJAvQVjhkBljCHNN/kbqkKtb/ldKqMKK7o4d/qELNx8zrLnN9qRY+xLcibXEiT8swY9aXFWYL18DQY82qgpMLwhfagwFkkR4uf2wvzHuosABa03dFk/CeMbJJV1Sb9qGe6ASTl7buNiFEDz3CR1BKL/x5XMH9YHdutpPp7FnRD+MOElfrhBiRroji4UrRJpcDbiVykLRnddJC0h3aU1lVaUL2jA+yRIA+bhqwei9CJOMXkHuqZ6wZjbuKQUWSYnTOEVLPvUVfCenR/WiLhDpIDt5Alvz7Yot7Qm4L6ZB075O5xBbYrvbsU95FtwXLFr0YTkdCZSPorPuaIqoQ/G62w==
+ b=Obflagf3V4aLNxRWZ59imdwowAWx2oHoTleI4Vb6NXOzeOBysl+rYjrZg8QWG9G8/n6MV7obaXihBnMW2aIc0xTncqLiG2V2UMx2jpVgZWakm3OI6oZuCfxdks+Nuhza6ZcsDUXThaVCIBJRFH3tS5zFRfZQBSajEidmNw+e93Oldqx0VZh+gyRBhndL+r4jyLsXaeLEoA9NelPBu8eBI+dGHZ8IROdtZD4mbDvoXo/AJdv7CNSlz5wBKg2tNEcf4cq8+CRp94U9wkuqSMCcITD/3NDUpvGUE377j+ncpsyzEb2R2f/7IAQmAdpEQE3l03+/OKXeUFF207P4wKEKMg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IqE8I3GT+gTnLVqRWIhnIzfwRp34apAJkoBqQBZIzS8=;
- b=VG8Y/vRf1K6yQFv+ufr8qnRa4Tq7fLWbb4UxCuGrNOK2xVbJuGEhwT/EfugeKow9sXsl6eqe+ikWyvcWyB31mC9tM12gnteLAB76rsbARCu650gy3R5l9b7WI7V2qFlnDnTIXqxT+42MDf3Yvwo0MDz6MkLnxR0AIaFu/Nom4GS/ARbxaVsUjlIZlPGp+/U+Oi7PfqBwzk4hqtbM1xQkxs0Lak5rsbooW1jVDuQYyu6XZdRqPwR7tvRdyb7DeWZT3cWqgWENXBrFQhZwQPT+R75ON+AypS8Nsf9ik/7yWV2FvYPDxlTuLtdRv9c9A9iQy7yqUAkc0b90lMQxl760Mg==
+ bh=kI5bcABtk3lCE5O1j7OWlIujpNHAah4/TKB11XxWjqg=;
+ b=adNiSxwo+1wHuyMMqRRFJ0S12aGdXZcNhWoMY6iUpG82/kTK6CCSsrGSShLAztfgJ59IVrUoCmUTMQpdzCUQL4CgAvlLuWFLuEof0lHNomynTUci9zpdO7sNtbdSTYzebBpb0/kKRDQvkxid8Vp2Y4cFJOrUtGneuaE1r4U+YmiDyTtAu1F6td87yoJxkwiojRwiW2EWbPaT/T9oc+zweZ6VHY0t/QG8Gv3i8sNrwYaolq11LTytYj5mmE1FXvRqNbK+vgdyOTm4GwkWArzNx9UJduYVuniD3/98g6tcLEO+TKtYWmvWUpjL7XsxASutlC6J1nENtJi4mlCjwyARUw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- PH8PR11MB7989.namprd11.prod.outlook.com (2603:10b6:510:258::13) with
+Received: from PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
+ by SN7PR11MB7420.namprd11.prod.outlook.com (2603:10b6:806:328::20) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.24; Mon, 13 Mar
- 2023 08:39:09 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::82d2:d341:4138:17ef]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::82d2:d341:4138:17ef%8]) with mapi id 15.20.6178.024; Mon, 13 Mar 2023
- 08:39:09 +0000
-Date:   Mon, 13 Mar 2023 16:15:20 +0800
-From:   Yan Zhao <yan.y.zhao@intel.com>
+ 2023 08:26:30 +0000
+Received: from PH8PR11MB6780.namprd11.prod.outlook.com
+ ([fe80::5cb1:c8ce:6f60:4e09]) by PH8PR11MB6780.namprd11.prod.outlook.com
+ ([fe80::5cb1:c8ce:6f60:4e09%8]) with mapi id 15.20.6178.024; Mon, 13 Mar 2023
+ 08:26:30 +0000
+Date:   Mon, 13 Mar 2023 16:26:54 +0800
+From:   Chao Gao <chao.gao@intel.com>
 To:     Sean Christopherson <seanjc@google.com>
-CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <pbonzini@redhat.com>
-Subject: Re: [PATCH] KVM: VMX: fix lockdep warning on posted intr wakeup
-Message-ID: <ZA7bmJSN32y78lEC@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20230310155955.29652-1-yan.y.zhao@intel.com>
- <ZAtiEO/DST05GRRN@google.com>
+CC:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, <x86@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        Andrew Cooper <Andrew.Cooper3@citrix.com>,
+        Kai Huang <kai.huang@intel.com>
+Subject: Re: [PATCH v2 03/18] x86/reboot: Harden virtualization hooks for
+ emergency reboot
+Message-ID: <ZA7eTpG5tpo5yIo3@gao-cwp>
+References: <20230310214232.806108-1-seanjc@google.com>
+ <20230310214232.806108-4-seanjc@google.com>
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <ZAtiEO/DST05GRRN@google.com>
-X-ClientProxiedBy: PU1PR01CA0002.apcprd01.prod.exchangelabs.com
- (2603:1096:803:15::14) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+In-Reply-To: <20230310214232.806108-4-seanjc@google.com>
+X-ClientProxiedBy: SG2PR02CA0004.apcprd02.prod.outlook.com
+ (2603:1096:3:17::16) To PH8PR11MB6780.namprd11.prod.outlook.com
+ (2603:10b6:510:1cb::11)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|PH8PR11MB7989:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9de026cf-709b-451d-081d-08db239e69de
+X-MS-TrafficTypeDiagnostic: PH8PR11MB6780:EE_|SN7PR11MB7420:EE_
+X-MS-Office365-Filtering-Correlation-Id: e1c89a0c-f774-4f9a-5168-08db239ca58a
 X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ggJXZaCpNMZRHiaDh5karqasVGoyzSu7vUveTbsxKmAEJz1Oen7UNyncCXMUCRlTp8ZsJVaiLPlfSi4YtxJQIRjVw//sgzOQcwgB2pMT9hpi0/0GHFgzh9L+/Uno8taUJBDncT6ntHxiYWwMJXaoC1qisdVMYLqXUkemmSZejKV2J7ay1DlmQLpboSRt4oOSt8f8DbNEdRlo+bQfIcTpVnLwS6jAcbRXYpBdmKrp/K8EN1dDsyqxtzupzShiqAkeWYkjwqqS1SgOddi3MkqpJ0pt6c5aVD1Fwv12huoljU1f1li24Avtzw9fIYmPG1eMj1S8a7ytPcsXbBVX79pKyJo2gD+mZr1kg4FddZ/Ja/Vf6Qz59g88SnVR4lHS9jsBSoeSBJ1BQiaWUfdBWa+BeymWXww3X6+d8b9fbrnMZ0V1Gb32d2budMiSSVE3Kx/FNxObpfENQ1M2bin1C1fRUuXM1X3hzt0ur6uBoPnfoA3nE2AP9xyC+3VR9nX37HZxCua5/dYoFNJCyqupTcZX4Wg3w4m3DOwPFDdORclPTBOazkigJZy7kUrjzZcobma6o8EwosfN4onKC28e/UdHUktRY1CCwsd9QTkyTXozjmT4tE+JJuP6ZMO4oIk/z2hwROb4oBFaGoDsNWo/NGWucg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(396003)(376002)(366004)(39860400002)(346002)(136003)(451199018)(86362001)(186003)(41300700001)(26005)(4326008)(6506007)(6512007)(5660300002)(6916009)(8936002)(316002)(478600001)(8676002)(66946007)(6666004)(6486002)(66556008)(38100700002)(82960400001)(66476007)(3450700001)(2906002)(83380400001);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: idD7naYyeAD219UobyTJzzi8g+3NbnXcjUsR3AtItThCpeXd1hhPZghQ8SNZDw37N/zSEncTePt6ca2WTO0WthbiI3WwyMxQFueQ65+5ThnbP69jkv8J7TgXzWVfZ6tV/eWIVYofWs/bG9PaMO2sMqLwfyxaFeOXOX4WmzL1Az4p+DRDEkSvBqAHleQn+kCQqI3yOh2HXGMQpUMG9XVJaByL46nRSv6lgjund3rKnFREthjcm+c1AgouSnRD77h2clrNEFbFjpKdCsJpqKRUnTYjXTwO0Lja1k+DsUC/n85ZBNaU6gqR+hJ2wG5DfDlYo45LW1SPnDtGGWszBubEla+3aBOH1Bru4Amaohxg2oWhezv3fRQYvz8BOsGFnG2XUb01RdgPQnlqSvLUfn+H0jsaxByTgulc4e+z02PvIsmBxWrM66IMUTjFNOsLMppOemOPBh2hs4gw1CuFkV0p113F1dHy7wtsvuXEqyb/HC8XB1N9vsdsIes2E+3qIRXIJ7G9QYuxiHBEfm7+kkLU3K+x9zUNA6oZyOsObwmy2Vp4Rv/x7s7Cbuo2Zno3HW3leBSbbHFny4fYo4xR23lPMTSu+jhMoYb2H5KVu1nCEBsvDG5qxGzHmk9X1/4Y7F3O43uyZAD6FO8OaM2ILLd0pw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB6780.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(7916004)(346002)(136003)(366004)(376002)(396003)(39860400002)(451199018)(54906003)(41300700001)(478600001)(4326008)(8676002)(66946007)(66556008)(66476007)(8936002)(6916009)(33716001)(86362001)(38100700002)(82960400001)(6512007)(26005)(6486002)(6666004)(9686003)(186003)(7416002)(5660300002)(44832011)(2906002)(316002)(6506007)(83380400001);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?3Q34kXRXFF/cWqJzH12BoEV2CJGh4quCyvBKZDjX0OKvpWfM3T346LDnfDwF?=
- =?us-ascii?Q?OX9wyFzc53CkTxXQlyhG+G7ipdlYEDqMxDOcSDurZPs+NZuxWn0yVyun/VAT?=
- =?us-ascii?Q?F8DhvPhjx8fY7iyUo3mw6KKhW21d2eNKXyVyYOzqMWX79EDO0254jQ0pRnC1?=
- =?us-ascii?Q?nU6zFWufRtrZoa3HzScnbpEYXwxIMHQwXEfzfwU5G4cXzEqaQ6/UO0TZFYB9?=
- =?us-ascii?Q?3ofeVSWZWUPvVUGbbqHFLXI4YtzsVnp5lg2L8nyrdQv+C/wkPBcSbsRFjHog?=
- =?us-ascii?Q?aZjCi+YEzNYJd86KOKXvtQosvto1914vGaIX9CVamNbq2WsTHPgdsHzvNNsE?=
- =?us-ascii?Q?QMXTUIHRzhJFOWy64c900Y7atOaO2yF9y4JnS1/hNeDZiOkP2Y8tltdb9eRB?=
- =?us-ascii?Q?QHfmSfDC2O3e+Zh9dbMhAWLHjzW+k41CMYL8ykLrRdIVZBh0cGql30baoDAh?=
- =?us-ascii?Q?A3MZNfXecgl71ln3DzaBcu2Emt2r6PxUA9BLgnw+hA7/gsqUw8lcDILj3l/5?=
- =?us-ascii?Q?XtYY7QuXH0IcpxZEwt50eR8/jlbgNG3MOXVaRMHwiFL2rRRge/EYv5bCvFrf?=
- =?us-ascii?Q?6R+b0Ycs+dT8ySm62MLvxyz+TPfdMSIjPYwx9Mdjoi38nlgW+6PGam7o27kt?=
- =?us-ascii?Q?wSom3Tj5wX2EUDFXDDdj/tRUUGhZq3IeMcW8FWhOfyjUcgWmakok3Ca4F4eS?=
- =?us-ascii?Q?3CZI41OYmldruy51dwOyx+/bL8OnCqd0k9UVZf0GCY6uZ+Q65v9s+NLu0Mt2?=
- =?us-ascii?Q?WSI3UO3nE4F/vXYQAEyb+9ottbQtfZZqIe7uq0RmUP2pJBiQ/HIdx4ULngif?=
- =?us-ascii?Q?vx1oHBxldLpj7LkBx+Cq2kl3lhrpsFS7BMuXG6UyMPgG4iU/o+RfO9JionZi?=
- =?us-ascii?Q?H693INZ45Q/Eci5VYiD3wVs7nOOEXpA1cYm7axARjLiSEbSIP9IgJUOZuh/F?=
- =?us-ascii?Q?5mI8boitcF4IS5f1s7uZ6Zm4298o9txkfND/deVyPapV4oFuPqQateYk260o?=
- =?us-ascii?Q?ZE9x5B9AFa0m9LSMWlMd1WVsFOqbfLNJ9iENqkC8EgtB+yNcWe4bBEWOzyW2?=
- =?us-ascii?Q?qyt87rDqcFwgtm8iD/OCov8pYDJTVE83lHNaBd2xz4akK0kao5lP6gg6qwxi?=
- =?us-ascii?Q?56J8Hk/WI+TFvxd3bNDcTzg6kRuJ6a+POQ3MED6xw/GK+iAJVDFvM7G0R80n?=
- =?us-ascii?Q?bnUnnlvI9pDECYTMKKBwcql/iO6armFSiLU/pMPe7x/U1GexcPXPUrOrBjv3?=
- =?us-ascii?Q?/h1f+StqITTT/EMwoFIoaiSjPl7stec5ziMfEclb0XrXcf1UCVAZEUFLQzze?=
- =?us-ascii?Q?3mOVnbg672/aAjosn5hoZYsNC0MsDxJraSXnwLefU4YIuW0m2VcqaRy1VnA7?=
- =?us-ascii?Q?xQfH/l/2xvADZjfyV7qWM8NOoBYYMhQs5Wamtu8bzXLuEYiV0eQtUo7I5sIO?=
- =?us-ascii?Q?Z4elvCEQys4NQ15jE/Eo9G/YmAkL7C+IFZj/w2Bwty0o7yOsmuzt6nyKIg4B?=
- =?us-ascii?Q?M5jXTVh6PRtPq24ubi5KF9rSah2lJuWwzRVUj+dY7tUamO7PF0YNuugEk8Qo?=
- =?us-ascii?Q?qqbqWWcuT6Rwt5mwJ4v4ZdPH6ylFLjGQV6lDnwsAyjwVodZuxNDmzXxu8FxK?=
- =?us-ascii?Q?ng=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9de026cf-709b-451d-081d-08db239e69de
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?PvDoX0lB8s1sH8LX5Pb3jR4wBMm0Q6JfQlxmnJF7BfLNAd9+80nSt2REJoMU?=
+ =?us-ascii?Q?ltN/9GfhwiSRhRQWmpX7O55Mk2uCYAcSt9SF4IsilAW3Gef1ETRnL+lEDH9i?=
+ =?us-ascii?Q?ike61s4mnGkM+y8rJ4uPT0+riwOzTHE/2/E/DneNqd1pm3sS5JG8ED/vYFNV?=
+ =?us-ascii?Q?n6wui8A9kWP4D516vzMc6QJZD3iGmpaJ1KGjm/E0euHyj+TGMp6NSLpn79JI?=
+ =?us-ascii?Q?4aB89izlEOXV9B7wsrhz1i2WMx6ajTgICHJAjVPetyzTHM+67+36GUX2Y61d?=
+ =?us-ascii?Q?P+KefeWP+aHwqWBIbNH1Y9QhNXG9IGuALZPHRl3qBAquTozjn2Qf/G71j4Qq?=
+ =?us-ascii?Q?Z4Ja+WvXbHOszveo9H1w6MrDjk2w89SS+c0Jm+1WRAWAE7VBj5bqRnde6OQN?=
+ =?us-ascii?Q?DH7BEebuSrOBdNwuCQytl7kTD/uhu7XdX7UnOVldYTJv3DT9tG3AiPvouMx/?=
+ =?us-ascii?Q?a1mYIqn37qRO02xzNX7MkLqb/LwbcNaUObnT+nJcxIU+hsE5quvuZ0OratFa?=
+ =?us-ascii?Q?EZnW+EOLvdLal34NtUePLsdDxOfFVQhYdZFtxA8EvH3xxVggqZQqFJPQfGzw?=
+ =?us-ascii?Q?KR5uAmPRm6RUoZvtSrVXSqA0feb+J2+T1MYQTgAxlKzfFIlsJjCvMlfn9zUX?=
+ =?us-ascii?Q?SF/QHnJ8hXENmMRBwl69Fm6i4uiXgzJUOyLBx7hQpnCfDGSKEwEGo4LFUOTp?=
+ =?us-ascii?Q?O7cmgUcHIVjwwjtSxnyCCeE9239czjcVTI8oIe5G3wdAOm25B7y5ezxBK53V?=
+ =?us-ascii?Q?SGrSZFfJkIRquOpuFLFxr1ERi6RBUpc+0KnTba3vVrrWW36uSi3PB6W5ZoM8?=
+ =?us-ascii?Q?99CS4WdT8Bd25r/ZDHRZ/rJLNKD+TLOphYWWoknxmw93MKg1/QLz2yWToJ8S?=
+ =?us-ascii?Q?6AD0Geg28X+dcA14tlWHTE42DLQ5rgKyGRJObHLJxlqd8OFnjvHETlakwWgC?=
+ =?us-ascii?Q?M9ETjF2c/Mlvk3f0dwqjdvgHRtZl9zhfxCFPgER44lUG68EL9GaCCE3xHrXh?=
+ =?us-ascii?Q?xqNYOvAydargILAuYDg5z7nME1dS+kxOKApRI7P8aClll9ApY6zqGqVEp6UQ?=
+ =?us-ascii?Q?s14OM73HFJfViaO4NpcyZFmuK0mhyAaxOwT0rEl6jP0wxuD5zJJtNIcNVXTX?=
+ =?us-ascii?Q?0lAZ8lMEk5n2LueLpsIXvPhuG/BekngyWRzaEbP9C/49WBF20mxzZbYv2BlZ?=
+ =?us-ascii?Q?/52am+w+RO1Eja6pBYSIu8ynu5m6zl9vGUnsQpVpwGGmwVIdhVWaWBocpc4c?=
+ =?us-ascii?Q?YO5cl4khXwhVD7XNJupMjOOQDttG1osga43QcZkYi4jFgf8v/WvViP32W3j8?=
+ =?us-ascii?Q?65jsHqSTJyNXKJSpju4gWY+kxAHPe/GfKQx+BQ8MRw4DKc8Q5QL0cYLbDcdu?=
+ =?us-ascii?Q?RrpAiMo3abVnSomVYvQaQiCT3geAaW/o6ipHJlrGckjnqR22XDS4L9Jt9AAb?=
+ =?us-ascii?Q?eoEeFElLUB3MGwV9sS2bHYFCtaTaffhC6lmEHe5Zmx23BcsWlrHkIBaGD0LM?=
+ =?us-ascii?Q?+itinhSk86D9BpQ8bf14WuPiRw0/ileD+pJxXMczd7cNv1nxv+kc/DAJrT2v?=
+ =?us-ascii?Q?f63mdU/vWb5M7WMee8zoKMenGEQvOHxvbOvJLoIc?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: e1c89a0c-f774-4f9a-5168-08db239ca58a
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB6780.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Mar 2023 08:39:09.3207
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Mar 2023 08:26:30.3794
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: tko4m3lAHHEjZqBbe46imlImL1qA3EYku0gRLdgAvebvLf32jKow27fFaD+uQoeu4/LOT/YLV0TSiM6iz/IweA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB7989
+X-MS-Exchange-CrossTenant-UserPrincipalName: ps40XnSN1BQNdxzsUeYyQ1CBxjmupJj8HtIGhusthHjtvTGM+GXVGN+McP4a8Mxd94B/Jd9Ml+yEBiH3DqJstg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB7420
 X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 10, 2023 at 09:00:00AM -0800, Sean Christopherson wrote:
-> On Fri, Mar 10, 2023, Yan Zhao wrote:
-> > Use rcu list to break the possible circular locking dependency reported
-> > by lockdep.
-> > 
-> > path 1, ``sysvec_kvm_posted_intr_wakeup_ipi()`` --> ``pi_wakeup_handler()``
-> >          -->  ``kvm_vcpu_wake_up()`` --> ``try_to_wake_up()``,
-> >          the lock sequence is
-> >          &per_cpu(wakeup_vcpus_on_cpu_lock, cpu) --> &p->pi_lock.
-> 
-> Heh, that's an unfortunate naming collision.  It took me a bit of staring to
-> realize pi_lock is a scheduler lock, not a posted interrupt lock.
-me too :)
+On Fri, Mar 10, 2023 at 01:42:17PM -0800, Sean Christopherson wrote:
+>+void cpu_emergency_register_virt_callback(cpu_emergency_virt_cb *callback)
+>+{
+>+	if (WARN_ON_ONCE(rcu_access_pointer(cpu_emergency_virt_callback)))
+>+		return;
+>+
+>+	rcu_assign_pointer(cpu_emergency_virt_callback, callback);
 
-> 
-> > path 2, ``schedule()`` --> ``kvm_sched_out()`` --> ``vmx_vcpu_put()`` -->
-> >         ``vmx_vcpu_pi_put()`` --> ``pi_enable_wakeup_handler()``,
-> >          the lock sequence is
-> >          &rq->__lock --> &per_cpu(wakeup_vcpus_on_cpu_lock, cpu).
-> > 
-> > path 3, ``task_rq_lock()``,
-> >         the lock sequence is &p->pi_lock --> &rq->__lock
-> > 
-> > lockdep report:
-> >  Chain exists of:
-> >    &p->pi_lock --> &rq->__lock --> &per_cpu(wakeup_vcpus_on_cpu_lock, cpu)
-> > 
-> >   Possible unsafe locking scenario:
-> > 
-> >         CPU0                CPU1
-> >         ----                ----
-> >    lock(&per_cpu(wakeup_vcpus_on_cpu_lock, cpu));
-> >                             lock(&rq->__lock);
-> >                             lock(&per_cpu(wakeup_vcpus_on_cpu_lock, cpu));
-> >    lock(&p->pi_lock);
-> > 
-> >   *** DEADLOCK ***
-> 
-> I don't think there's a deadlock here.  pi_wakeup_handler() is called from IRQ
-> context, pi_enable_wakeup_handler() disable IRQs before acquiring
-> wakeup_vcpus_on_cpu_lock, and "cpu" in pi_enable_wakeup_handler() is guaranteed
-> to be the current CPU, i.e. the same CPU.  So CPU0 and CPU1 can't be contending
-> for the same wakeup_vcpus_on_cpu_lock in this scenario.
-> 
-> vmx_vcpu_pi_load() does do cross-CPU locking, but finish_task_switch() drops
-> rq->__lock before invoking the sched_in notifiers.
-Right. Thanks for this analysis!
-But the path of pi_wakeup_handler() tells lockdep that the lock ordering
-is &p->pi_lock --> &rq->__lock --> &per_cpu(wakeup_vcpus_on_cpu_lock,
-cpu), so the lockdep just complains about it.
+Was it intentional to not call synchronize_rcu() (in the original
+code), different from the un-registration path?
 
+>+}
+>+EXPORT_SYMBOL_GPL(cpu_emergency_register_virt_callback);
+>+
+>+void cpu_emergency_unregister_virt_callback(cpu_emergency_virt_cb *callback)
+>+{
+>+	if (WARN_ON_ONCE(rcu_access_pointer(cpu_emergency_virt_callback) != callback))
+>+		return;
+>+
+>+	rcu_assign_pointer(cpu_emergency_virt_callback, NULL);
+>+	synchronize_rcu();
+>+}
+>+EXPORT_SYMBOL_GPL(cpu_emergency_unregister_virt_callback);
 > 
-> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> > ---
-> >  arch/x86/kvm/vmx/posted_intr.c | 12 +++++-------
-> >  1 file changed, 5 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-> > index 94c38bea60e7..e3ffc45c0a7b 100644
-> > --- a/arch/x86/kvm/vmx/posted_intr.c
-> > +++ b/arch/x86/kvm/vmx/posted_intr.c
-> > @@ -90,7 +90,7 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
-> >  	 */
-> >  	if (pi_desc->nv == POSTED_INTR_WAKEUP_VECTOR) {
-> >  		raw_spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
-> > -		list_del(&vmx->pi_wakeup_list);
-> > +		list_del_rcu(&vmx->pi_wakeup_list);
-> >  		raw_spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
+> static inline void cpu_crash_vmclear_loaded_vmcss(void)
+> {
+>-	crash_vmclear_fn *do_vmclear_operation = NULL;
+>+	cpu_emergency_virt_cb *callback;
 > 
-> _If_ there is indeed a possible deadlock, there technically needs to be an explicit 
-> synchonize_rcu() before freeing the vCPU.  In practice, there are probably multiple
-> synchonize_rcu() calls in the destruction path, not to mention that it would take a
-> minor miracle for pi_wakeup_handler() to get stalled long enough to achieve a
-> use-after-free.
+> 	rcu_read_lock();
+>-	do_vmclear_operation = rcu_dereference(crash_vmclear_loaded_vmcss);
+>-	if (do_vmclear_operation)
+>-		do_vmclear_operation();
+>+	callback = rcu_dereference(cpu_emergency_virt_callback);
+>+	if (callback)
+>+		callback();
+> 	rcu_read_unlock();
+> }
+> #endif
+>diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>index 302086255be6..41095fc864f3 100644
+>--- a/arch/x86/kvm/vmx/vmx.c
+>+++ b/arch/x86/kvm/vmx/vmx.c
+>@@ -8551,8 +8551,7 @@ static void __vmx_exit(void)
+> {
+> 	allow_smaller_maxphyaddr = false;
+> 
+>-	RCU_INIT_POINTER(crash_vmclear_loaded_vmcss, NULL);
+>-	synchronize_rcu();
+>+	cpu_emergency_unregister_virt_callback(crash_vmclear_local_loaded_vmcss);
+> 
+> 	vmx_cleanup_l1d_flush();
+> }
+>@@ -8602,8 +8601,7 @@ static int __init vmx_init(void)
+> 		pi_init_cpu(cpu);
+> 	}
+> 
+>-	rcu_assign_pointer(crash_vmclear_loaded_vmcss,
+>-			   crash_vmclear_local_loaded_vmcss);
+>+	cpu_emergency_register_virt_callback(crash_vmclear_local_loaded_vmcss);
+> 
+> 	vmx_check_vmcs12_offsets();
+> 
+>-- 
+>2.40.0.rc1.284.g88254d51c5-goog
 >
-Yes, I neglected it.
-
-Thanks for the quick and detailed review!
-I will post v2 to fix it.
-
-Yan
-
