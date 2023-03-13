@@ -2,58 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E24B46B7E59
-	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 17:59:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A0F56B7EE5
+	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 18:10:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229925AbjCMQ7A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Mar 2023 12:59:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57572 "EHLO
+        id S230177AbjCMRKZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Mar 2023 13:10:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230039AbjCMQ66 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Mar 2023 12:58:58 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 761FB3BDB1
-        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 09:58:30 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id n33-20020a17090a5aa400b0023b4f444476so1436916pji.3
-        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 09:58:30 -0700 (PDT)
+        with ESMTP id S231669AbjCMRKL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Mar 2023 13:10:11 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9C96231C1
+        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 10:09:44 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-536cb268ab8so139065957b3.17
+        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 10:09:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678726709;
+        d=google.com; s=20210112; t=1678727318;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WoW76m3bvwmTZ8xs2qkv5SM2JmnsotKY8+cFv048dbE=;
-        b=pRe7H9y53cuXvdWbCUjymHm2/u+oD29ozshZ6oS3VPTm/TwCcPiHZM8yArd+tieJAL
-         2yV9kHhzx2fJAbm/ofCApJJZ06DwZ7rXbVmpmwR3zkX2ItZZr4ptDezXFhDFF1bzuAxj
-         urpbkQkIvy0OL0aImRhxMs9JBrHkrBQo/PgPEKsoQBAODav9gGx8hanbgoXfBSXYtIrm
-         d1UT8ziS4zrwux+wClZhCv4ZHRDsD/094z8e2zOCkYQRCAbnINIK8CICKcpcLk/iOMvA
-         Mk06FmaP2dxuqlC4sMCe0RJjf01az+NiX8Z+/1OFaB+yLT5x+sjYmoUSQubbiCvsXR+n
-         kr5w==
+        bh=wOWZvv6KsY6Um3iQTTUFkaHPzlGY80coB0SG7oNO+Zw=;
+        b=b5ONabsAjWKZxLbOivjWXSzeJPtAesI1cLgYh9E4tknpEK7T8irelQP6gsZUDVus2N
+         wvWu0ITC5BakYojDUSt98KBJpOIWvPNUIFMbJxaTWYfs8GxKhfKcIwK1YYHagRZ1JgKI
+         rXtNbp8CTioo3CRelFXIzqgSFii3b/bVaFApXdS96ncOfF8J7QEfefdhm++dBK42JlrW
+         vsDGNoiMLEXtj8SY8dL48N/FuA86ALK0+48NPqGIVDXphd0Tkm6U6BuXihtfPyzpdMzq
+         6JtNxxayGH1YC3yWhV9v6eX+lLpA4+tnqSheV0QW2PwT8H7rFDsWh0bIrbzUXtuNJ8u/
+         ZtoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678726709;
+        d=1e100.net; s=20210112; t=1678727318;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WoW76m3bvwmTZ8xs2qkv5SM2JmnsotKY8+cFv048dbE=;
-        b=ayseLF488gKUHVO83eqL3TQsgtpH1rPSc8P/jNBpFki78xyxbvRik5nZEJC/wH6v1S
-         +/l00OxdQ7xTMslrKdGNyhckd+BlJcLBLYg4pJHXYE4VhSvEvhc3hv/76KRc7ayfWS/J
-         ggpwTVBnAKByEsFBrTHQSRnGcxnhZMib5iiExAn3EP/+EENMptNw65smjrdgkVwMmcPn
-         bBELz+ltTTWz4rjypuSzEskYT1h5o1v6ITW17ZzAq7g7d22/hu0FSQVLsnrP55t8eObz
-         y6p/heDjjoNX/ghiWjqLBtsTX8KhE6R/dv4EtkD8/zp5yfxvneQ8DAMvZC53sk9CkpYW
-         oRNA==
-X-Gm-Message-State: AO0yUKW9LRUcm5kS5VxIAdLomBsy8t451ALlwgDiXMZJh2i9kdxpfflF
-        El71j8rDNlosU4rfFvQnZFaJrrmPj8A=
-X-Google-Smtp-Source: AK7set/Zjdzj/4pezdtemaPeNPXkMeeoAvvxL6bSDB577mJpjxS/MFRW5Ck+bIY5nCRdoEZ8H3otcIZdQSQ=
+        bh=wOWZvv6KsY6Um3iQTTUFkaHPzlGY80coB0SG7oNO+Zw=;
+        b=hpqK8VA8P/B3xohfOlNjObsDYemEA3J9SAf9JyuHN94pOpUiSCJ1DkwGd2UjCSmtyN
+         ySwUtDaxI8VrnaF2mpfnPjnTyRFoXp+8czCkqZzqsZ9tiRng4Al1HOMvFyRnp0SLvGD0
+         0qIhZMm5+46bqRW2ZfzeObY9P4DbaxH8CiwWT84j3S+bX1Dd01Cr5S5gB+DogmlEAeK8
+         uDmI5QJzmUiV+9Zqc906Pl/pbzKOY8T2NkHFtSWQXXfoPrhAl6k8TaJiG7umbQ++/KjJ
+         xajH1JdZ1ah1pzD5ncZLwPAfhTi4tU3UcCz7JgSbaxfouHaS+gX6+Sw8iDjSJ7Gjhb5A
+         MieA==
+X-Gm-Message-State: AO0yUKVqlPpv672dH+PX+f9QenFWuxthqyGcShmGIyxaU2TGAQJaYsSS
+        inyEx1a9b/egY/GaAY42yvr9XbejBxk=
+X-Google-Smtp-Source: AK7set9gzsCbZrrZdrlwi2XqkK69ytQhb4omsoaefIaBznHhiIAh2sMw623jd3fj82OyfGgr4Sfg/JSCSo8=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:7583:b0:19f:8213:ac38 with SMTP id
- j3-20020a170902758300b0019f8213ac38mr1917064pll.3.1678726709348; Mon, 13 Mar
- 2023 09:58:29 -0700 (PDT)
-Date:   Mon, 13 Mar 2023 09:58:27 -0700
-In-Reply-To: <20230312180303.1778492-1-jason.cj.chen@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:2cf:b0:b21:5fb4:c6e6 with SMTP id
+ w15-20020a05690202cf00b00b215fb4c6e6mr9040251ybh.11.1678727318583; Mon, 13
+ Mar 2023 10:08:38 -0700 (PDT)
+Date:   Mon, 13 Mar 2023 10:08:37 -0700
+In-Reply-To: <ZA7eTpG5tpo5yIo3@gao-cwp>
 Mime-Version: 1.0
-References: <20230312180303.1778492-1-jason.cj.chen@intel.com>
-Message-ID: <ZA9WM3xA6Qu5Q43K@google.com>
-Subject: Re: [RFC PATCH part-5 00/22] VMX emulation
+References: <20230310214232.806108-1-seanjc@google.com> <20230310214232.806108-4-seanjc@google.com>
+ <ZA7eTpG5tpo5yIo3@gao-cwp>
+Message-ID: <ZA9YlTknLKRKcCy3@google.com>
+Subject: Re: [PATCH v2 03/18] x86/reboot: Harden virtualization hooks for
+ emergency reboot
 From:   Sean Christopherson <seanjc@google.com>
-To:     Jason Chen CJ <jason.cj.chen@intel.com>
-Cc:     kvm@vger.kernel.org
+To:     Chao Gao <chao.gao@intel.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Andrew Cooper <Andrew.Cooper3@citrix.com>,
+        Kai Huang <kai.huang@intel.com>
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -65,30 +73,21 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 13, 2023, Jason Chen CJ wrote:
-> This patch set is part-5 of this RFC patches. It introduces VMX
-> emulation for pKVM on Intel platform.
+On Mon, Mar 13, 2023, Chao Gao wrote:
+> On Fri, Mar 10, 2023 at 01:42:17PM -0800, Sean Christopherson wrote:
+> >+void cpu_emergency_register_virt_callback(cpu_emergency_virt_cb *callback)
+> >+{
+> >+	if (WARN_ON_ONCE(rcu_access_pointer(cpu_emergency_virt_callback)))
+> >+		return;
+> >+
+> >+	rcu_assign_pointer(cpu_emergency_virt_callback, callback);
 > 
-> Host VM wants the capability to run its guest, it needs VMX support.
+> Was it intentional to not call synchronize_rcu() (in the original
+> code), different from the un-registration path?
 
-No, the host VM only needs a way to request pKVM to run a VM.  If we go down the
-rabbit hole of pKVM on x86, I think we should take the red pill[*] and go all the
-way down said rabbit hole by heavily paravirtualizing the KVM=>pKVM interface.
-
-Except for VMCALL vs. VMMCALL, it should be possible to eliminate all traces of
-VMX and SVM from the interface.  That means no VMCS emulation, no EPT shadowing,
-etc.  As a bonus, any paravirt stuff we do for pKVM x86 would also be usable for
-KVM-on-KVM nested virtualization.
-
-E.g. an idea floating around my head is to add a paravirt paging interface for
-KVM-on-KVM so that L1's (KVM-high in this RFC) doesn't need to maintain its own
-TDP page tables.  I haven't pursued that idea in any real capacity since most
-nested virtualization use cases for KVM involve running an older L1 kernel and/or
-a non-KVM L1 hypervisor, i.e. there's no concrete use case to justify the development
-and maintenance cost.  But if the PV code is "needed" by pKVM anyways...
-
-[*] You take the blue pill, the story ends, you wake up in your bed and believe
-    whatever you want to believe. You take the red pill, you stay in wonderland,
-    and I show you how deep the rabbit hole goes.
-
-    -Morpheus
+Yes, synchronize_rcu() is needed when removing a callback to ensure any in-flight
+invocations of the callback complete before KVM is unloaded, i.e. to prevent
+use-after-free of the KVM module code.  Registering a callback doesn't have the
+same concerns, and adding a synchronize_rcu() wouldn't do anything in terms of
+ensuring virtualization isn't enabled after an emergency restart/shutdown is
+initiated.
