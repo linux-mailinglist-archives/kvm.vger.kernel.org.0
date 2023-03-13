@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 80E1A6B71CC
-	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 09:57:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1DD736B71CB
+	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 09:57:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230449AbjCMI5f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Mar 2023 04:57:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35108 "EHLO
+        id S230013AbjCMI5d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Mar 2023 04:57:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230440AbjCMI4y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Mar 2023 04:56:54 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A762423C61;
-        Mon, 13 Mar 2023 01:53:40 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id a2so12126636plm.4;
-        Mon, 13 Mar 2023 01:53:40 -0700 (PDT)
+        with ESMTP id S229528AbjCMI44 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Mar 2023 04:56:56 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95B1E1F93B;
+        Mon, 13 Mar 2023 01:53:43 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id u3-20020a17090a450300b00239db6d7d47so10897192pjg.4;
+        Mon, 13 Mar 2023 01:53:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678697617;
+        d=gmail.com; s=20210112; t=1678697619;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xVtL4Mahv24U8m6dcDI6vCl9MV+/3t8GA9cjgeYPo88=;
-        b=IFuE/RKpWgbpue1yFOcu0pv1jDxtZQJW8Y7Vw9ouBUxFVmsGM5WCrXXMLtEvn4JfxL
-         cDrO81S7cmqF2X9NZ9Sgbcyot0PwpVbLzpl9yMNKRLeJ7gYUOezlObWsSAscDv2LYmRI
-         mqAzYYW3t9l4fwfpoiOLGwUOSDAMqQxLnofP5ioEyGYykDhigZsZR9vtvEpkrCydO+iG
-         n8HkJMgJH+Da70QTQnQEybxXOf0A0SdXgNxsO6+iTff+abMnS/kU6nfZsjMVeFV2eMpA
-         jHaAP/iuqzj42xZFvguwof0o4vhu7Ij9+reFqiCqsguQelV/M8Yt3fBBpNegivvCl0dR
-         w5Qg==
+        bh=IR/pZ3SxRjS6UwRu99EOH7560cmZiqvK25YsL+XfyKo=;
+        b=SpYpGTZRvn85NG9r8n+lAfl/rJ8ggf9VdySJ/DvkwFbYb9nrM2eJ9nmb5f1ZWF1y3/
+         2tUOTVGwHrjdkWNCax5Uoja2omVEkM2ncJ0RArXlu2XLBEsH3/p2ZyvGM2HD1c7GrLRr
+         bX5oWHkBqhG+9H4olNg6iDADJnNQ6IFJ14xCk+67QGwSco74bPZuEPWQwbdtG9xv4Bte
+         tt97h+xX4v1p3aDAZTEHdGIwZv/quQ/m7nHHhNZP98eFrJLSDenzyAFo2fqAIAMxkVJt
+         L1kNXqY5BlJTJA2xbtTEV2+PWSrwUnUfKj5J5TwhOnlyyZbx3pP1WWFIuPj6I8GjGFBW
+         t/Ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678697617;
+        d=1e100.net; s=20210112; t=1678697619;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xVtL4Mahv24U8m6dcDI6vCl9MV+/3t8GA9cjgeYPo88=;
-        b=KwTuMe2RBFECRReQgttcjZ1xd7esJq2CdWWpzVpLWLTKDmQxcLnlCCyuLZzaZxObeL
-         FiQISmtdcwT/YUhLW6qf8dbXA7y6cKYDo0hf1w6FJ4VTfgMbsJGgE0s/a+kkiHhpB/Xh
-         qSSdhXXGIFovcL5UICQrT7QM8Z0RUV1gJoQ3LHvLiKCpUv7qDY6Ugi2+HM8d1zf+I1Gw
-         L0S3lwx3Y/E/MjLaeN4Rba/g9sbGeFnf/x7MyvwUZ2vIQR7UBi1RFEdGYY4h03J4GuVn
-         gmsGj4tM1IACuK49bEfbieHFLOZuURIUC45OV8gSbnTeb/aT+hiJXCllwzH4chsGF+7j
-         I6mw==
-X-Gm-Message-State: AO0yUKWB5k0x3ISqmvXzUos9K0NBPvoAaQ+TRdEC7Tnw/PCvfyCsOvaJ
-        4kohtsoX0jkwR2Ltqidjocg=
-X-Google-Smtp-Source: AK7set9ZdyeFtt2FTsc+OO9lLDZYcp9kQhe6SEC1tRaUC1+2g85groVXsQlxUdp0MIzAmbHfMbnuDA==
-X-Received: by 2002:a17:902:d483:b0:19a:9055:6658 with SMTP id c3-20020a170902d48300b0019a90556658mr9887872plg.18.1678697617067;
-        Mon, 13 Mar 2023 01:53:37 -0700 (PDT)
+        bh=IR/pZ3SxRjS6UwRu99EOH7560cmZiqvK25YsL+XfyKo=;
+        b=DpXIQC4y0hEpfP1+zlrXgRgVm33H/aeay1/gN2OzC1WXMkZxxUV5TdnFaiFbmdtl+l
+         9amiRs3oPq8jrDqRzVfkrahlOg/mYgybqxN5EFCbA53unXsD+9A3i1Pdu/htX49q6wiJ
+         LhYyH0H9ctZ5hlxFQI3incGvfg5jXv4YEjTplbzGycIzCcwsS5P12PnKQrelJV78aq/D
+         pgjDMmiiBMIC2gi8C/UzD2jjxfXu+vzjkGaAoUHF+mkeMs8GMOeYo3s2axxzwyj7n6Kw
+         HvsM8eGCd63LwYsbfrbO8qgjr6/wo3QeLrv4QDqy4RiFGCAxprWl87snDrCBVl2WbQpc
+         u/sw==
+X-Gm-Message-State: AO0yUKXwRFY1L3EDL76dM07VD71Z+IXs0HqhtVSjeSO0wgYCOm1WZAzK
+        rDQ9HSGUM1OHadfRgIdEApyKDK5Hz19nzw==
+X-Google-Smtp-Source: AK7set/Dgu1lrJP03RIrrG0IDqGHsJmCUfoB1AIXJpyU65D41ESFRP6U915I0LdxMKFUIGrN2PSo7Q==
+X-Received: by 2002:a17:902:a512:b0:19d:1674:c04d with SMTP id s18-20020a170902a51200b0019d1674c04dmr27567274plq.61.1678697619116;
+        Mon, 13 Mar 2023 01:53:39 -0700 (PDT)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id c6-20020a170902d48600b0019ee045a2b3sm4155059plg.308.2023.03.13.01.53.35
+        by smtp.gmail.com with ESMTPSA id c6-20020a170902d48600b0019ee045a2b3sm4155059plg.308.2023.03.13.01.53.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Mar 2023 01:53:36 -0700 (PDT)
+        Mon, 13 Mar 2023 01:53:38 -0700 (PDT)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/2] KVM: selftests: Add a helper to read kvm boolean module parameters
-Date:   Mon, 13 Mar 2023 16:53:10 +0800
-Message-Id: <20230313085311.25327-2-likexu@tencent.com>
+Subject: [PATCH v2 2/2] KVM: selftests: Report enable_pmu module value when test is skipped
+Date:   Mon, 13 Mar 2023 16:53:11 +0800
+Message-Id: <20230313085311.25327-3-likexu@tencent.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230313085311.25327-1-likexu@tencent.com>
 References: <20230313085311.25327-1-likexu@tencent.com>
@@ -74,43 +74,43 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-Add a helper function for reading kvm boolean module parameters values.
-No functional change intended.
+Running x86_64/pmu_event_filter_test or x86_64/vmx_pmu_caps_test
+with enable_pmu globally disabled will report the following into:
+	1..0 # SKIP - Requirement not met: use_intel_pmu() || use_amd_pmu()
+or
+	1..0 # SKIP - Requirement not met: kvm_cpu_has(X86_FEATURE_PDCM)
+this can be confusing, so add a check on kvm.enable_pmu.
 
 Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- tools/testing/selftests/kvm/include/kvm_util_base.h | 1 +
- tools/testing/selftests/kvm/lib/kvm_util.c          | 5 +++++
- 2 files changed, 6 insertions(+)
+ tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c | 1 +
+ tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c     | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index fbc2a79369b8..a089c356f354 100644
---- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -213,6 +213,7 @@ extern const struct vm_guest_mode_params vm_guest_mode_params[];
- int open_path_or_exit(const char *path, int flags);
- int open_kvm_dev_path_or_exit(void);
+diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+index 253e4304bbe3..3cd5fc60717f 100644
+--- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
++++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+@@ -768,6 +768,7 @@ int main(int argc, char *argv[])
+ 	struct kvm_vcpu *vcpu, *vcpu2 = NULL;
+ 	struct kvm_vm *vm;
  
-+bool get_kvm_param_bool(const char *param);
- bool get_kvm_intel_param_bool(const char *param);
- bool get_kvm_amd_param_bool(const char *param);
++	TEST_REQUIRE(get_kvm_param_bool("enable_pmu"));
+ 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_PMU_EVENT_FILTER));
+ 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_PMU_EVENT_MASKED_EVENTS));
  
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 56d5ea949cbb..fa6d69f73199 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -80,6 +80,11 @@ static bool get_module_param_bool(const char *module_name, const char *param)
- 	TEST_FAIL("Unrecognized value '%c' for boolean module param", value);
- }
+diff --git a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
+index c280ba1e6572..2933b1bd754e 100644
+--- a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
++++ b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
+@@ -55,6 +55,7 @@ int main(int argc, char *argv[])
+ 	/* Create VM */
+ 	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
  
-+bool get_kvm_param_bool(const char *param)
-+{
-+	return get_module_param_bool("kvm", param);
-+}
-+
- bool get_kvm_intel_param_bool(const char *param)
- {
- 	return get_module_param_bool("kvm_intel", param);
++	TEST_REQUIRE(get_kvm_param_bool("enable_pmu"));
+ 	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_PDCM));
+ 
+ 	TEST_REQUIRE(kvm_cpu_has_p(X86_PROPERTY_PMU_VERSION));
 -- 
 2.39.2
 
