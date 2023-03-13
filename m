@@ -2,76 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 75AE36B84AE
-	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 23:21:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CD7D6B84B3
+	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 23:23:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229796AbjCMWVs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Mar 2023 18:21:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33978 "EHLO
+        id S229787AbjCMWXX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Mar 2023 18:23:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229617AbjCMWVr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Mar 2023 18:21:47 -0400
-Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EABC21ABC8;
-        Mon, 13 Mar 2023 15:21:41 -0700 (PDT)
-Received: by mail-oi1-x22d.google.com with SMTP id e21so10591826oie.1;
-        Mon, 13 Mar 2023 15:21:41 -0700 (PDT)
+        with ESMTP id S229707AbjCMWXV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Mar 2023 18:23:21 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7335414E81
+        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 15:23:20 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id j3-20020a17090adc8300b0023d09aea4a6so4083098pjv.5
+        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 15:23:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678746101;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fgbx+G1VuVvdcoDypfrTksbqvojX7c9u8OaeQTCHp+c=;
-        b=dBMG8unBS9QSzLmDbpSL9dtXEBefXalSxk+of102VftGEkwkc78Bfmb/I2u1Swgxfy
-         DTytpkB8DI7XElDTWjKh+2QIg4pxax1/euhtAnBwJYy4+z1umo3xEzNb1ig2MIY/IiLD
-         57u6Z/J/SPblUVzttzRp7+qdV2t9ANCaoWZil9Jx21lNxv30dHk8XxLC9TujIIYdV5rf
-         Rr46VHqP+a2UkGOqYtKNtfSH05kYdfGB/2xoTtjbqFQamNuRv4uYPa0PzQOWeFEKDH5v
-         AEa8Fds9uz8AcAZBbnVSvEGZYK1AKaVTTE6sEz8ZM6fSIltIlOwuBsfq9S3ho/ta/4ov
-         8Kkw==
+        d=google.com; s=20210112; t=1678746200;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9l5Ve0UxgoLMBKMksZkfdofXsYRc9aQSH3fLV3MAlQ8=;
+        b=Sd+XqeZjfeCfN+mlYZ7bilJKS6Z5hy0nd1zrxE1d0QkSdbA/9FxyS4/n8nqRwWjkaS
+         4wlBRhfwQejcy9OtyTDeOeBUPZmC3WDTXeKreVji3M6KPVFeejPQ6Bs9GeBTf8F9qAY2
+         J/YJ9MvyXNIQa1LsEx4ffShhGVENHwEBNAJswR4JqdiKeKAKb2CP3EnDfY/O9SvFIaXb
+         cCpBnjFQe6PTBHjly2cqcW9Z9lRZcTRmSiCnVmt9lT6g2AoByiUGUuj1gjXtixx84oFa
+         +68bv+Wa9fTPulXfZS68RELW7AEpYjuRqX27DcXKLGdKeY1PA5gY8dmJZzwD4iYvDiEm
+         piuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678746101;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fgbx+G1VuVvdcoDypfrTksbqvojX7c9u8OaeQTCHp+c=;
-        b=0L0qkNNcxkOxBKTEi+qHdk0IrgmjhVv/34Z6tb2Dx0x4FFTmpKmK6okeC6kxTbrvVZ
-         OR5AghiNIVUNIxRz3XaBrVctvofiQLnSRqrPwldOOUBptZS9SjnVFSkyTfZObm9vW361
-         p81Ek7uP2+PFSSRU/hINqa7kZg7SApCCQ7822b8rA8K8V1aZ/KpWh1TwrmeZfx2KJKdf
-         0Fu+tGoZsbLhduqGDTxa41R22AFIIqTDUBe3JnHzVOAyngtYPUtPE6EYgRoHB1lzx1cQ
-         OGxDHGYjVzXH+wgrYPOC49I3nGF67pUHk+XnPGvvpNGfW8MB+D9ZOAgAgmniYXL3AFdi
-         RnDg==
-X-Gm-Message-State: AO0yUKWs24LPDQH1yy5HUfRdQzkNsRKl7n6k58E4mJ2xzK8FKVaiZ/CL
-        U2N//2RzF1ULHw+gc3hTGWVwopy9cH70wgAgMA==
-X-Google-Smtp-Source: AK7set/33w9YJuxg5L8xT3YGzQvuJq59gpvfncDw0aJqIauMDFaBDwmtkQg9+SmV9XMMn9+ddCx95rjo8gMy8ImjGz4=
-X-Received: by 2002:aca:d19:0:b0:384:d02d:5f07 with SMTP id
- 25-20020aca0d19000000b00384d02d5f07mr8962119oin.10.1678746101065; Mon, 13 Mar
- 2023 15:21:41 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1678746200;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9l5Ve0UxgoLMBKMksZkfdofXsYRc9aQSH3fLV3MAlQ8=;
+        b=f0v+JNn6O7JVn8vELRcHSj6L4d9fsS/MohLlWORsAo3bgyqYFi9i+L4KUjZO6AK7Gm
+         vmbeOqEskMXpHr8EFSLf+gaXmnXihlLXjTi1DqUlbBt47IcfE+Qq6WunJPQVv56pmrfz
+         0HdNydZwoqhBAPnAYz3igBeFaLI7d9yOYZsZJqfaRz9QkCPg0Q01a2hAaWIg9Cl/jmYE
+         caRutPUw1V0DLLQQE7jZq0UCnd1XZSiDlItK73XT9Zf3ghmVeOcxvWUOAvY2x/LDwnMg
+         gYt1vDSxBgaO+ug0Uj5Rbc0S367wtlgpOo4aa409zBT5ipbd4OuBAh1v7Hu0zTkDCEdM
+         3uuQ==
+X-Gm-Message-State: AO0yUKWYDiTdsm8fCKMtHBiG6cJNbUhVoIDedn1m1x1mRush7OlQldXA
+        eo0kt/BbUIjIpasqtisyiGRXMw==
+X-Google-Smtp-Source: AK7set//QUqUX6ZCcfpvgMx+4HW1VhG91pmb65zEKddSQ+I0+3EbP7qVICvv53G6hvCvnF2y+YSlcQ==
+X-Received: by 2002:a17:902:ba92:b0:19b:c61:2867 with SMTP id k18-20020a170902ba9200b0019b0c612867mr25178pls.15.1678746199707;
+        Mon, 13 Mar 2023 15:23:19 -0700 (PDT)
+Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
+        by smtp.gmail.com with ESMTPSA id u15-20020a17090a6a8f00b0023cfa3f7c9fsm63029pjj.10.2023.03.13.15.23.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Mar 2023 15:23:19 -0700 (PDT)
+Date:   Mon, 13 Mar 2023 15:23:15 -0700
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     pbonzini@redhat.com, oupton@google.com, yuzenghui@huawei.com,
+        dmatlack@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        qperret@google.com, catalin.marinas@arm.com,
+        andrew.jones@linux.dev, seanjc@google.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
+        rananta@google.com, bgardon@google.com, ricarkol@gmail.com,
+        Shaoqin Huang <shahuang@redhat.com>
+Subject: Re: [PATCH v6 03/12] KVM: arm64: Add helper for creating unlinked
+ stage2 subtrees
+Message-ID: <ZA+iU4EZvL8B0xgM@google.com>
+References: <20230307034555.39733-1-ricarkol@google.com>
+ <20230307034555.39733-4-ricarkol@google.com>
+ <87bkky5ivc.wl-maz@kernel.org>
 MIME-Version: 1.0
-References: <20230308171328.1562857-1-usama.arif@bytedance.com> <20230308171328.1562857-10-usama.arif@bytedance.com>
-In-Reply-To: <20230308171328.1562857-10-usama.arif@bytedance.com>
-From:   Brian Gerst <brgerst@gmail.com>
-Date:   Mon, 13 Mar 2023 18:21:29 -0400
-Message-ID: <CAMzpN2iz4UzQh7YGOo6vGB2qmpogiCUCTfYpvdeP=_Dm=66BwA@mail.gmail.com>
-Subject: Re: [PATCH v14 09/12] x86/smpboot: Support parallel startup of
- secondary CPUs
-To:     Usama Arif <usama.arif@bytedance.com>
-Cc:     dwmw2@infradead.org, tglx@linutronix.de, kim.phillips@amd.com,
-        piotrgorski@cachyos.org, oleksandr@natalenko.name,
-        arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
-        pbonzini@redhat.com, paulmck@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
-        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
-        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
-        simon.evans@bytedance.com, liangma@liangbit.com,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        "Guilherme G . Piccoli" <gpiccoli@igalia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87bkky5ivc.wl-maz@kernel.org>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,290 +80,166 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 8, 2023 at 12:13=E2=80=AFPM Usama Arif <usama.arif@bytedance.co=
-m> wrote:
->
-> From: David Woodhouse <dwmw@amazon.co.uk>
->
-> Rework the real-mode startup code to allow for APs to be brought up in
-> parallel. This is in two parts:
->
-> 1. Introduce a bit-spinlock to prevent them from all using the real
->    mode stack at the same time.
->
-> 2. Avoid needing to use the global smpboot_control variable to pass
->    each AP its CPU#.
->
-> To achieve the latter, export the cpuid_to_apicid[] array so that each
-> AP can find its own CPU# by searching therein based on its APIC ID.
->
-> Introduce flags in the top bits of smpboot_control which indicate methods
-> by which an AP should find its CPU#. For a serialized bringup, the CPU#
-> is explicitly passed in the low bits of smpboot_control as before. For
-> parallel mode there are flags directing the AP to find its APIC ID in
-> CPUID leaf 0x0b (for X2APIC mode) or CPUID leaf 0x01 where 8 bits are
-> sufficient, then perform the cpuid_to_apicid[] lookup with that.
->
-> Parallel startup may be disabled by a command line option, and also if:
->  =E2=80=A2 AMD SEV-ES is in use, since the AP may not use CPUID that earl=
-y.
->  =E2=80=A2 X2APIC is enabled, but CPUID leaf 0xb is not present and corre=
-ct.
->  =E2=80=A2 X2APIC is not enabled but not even CPUID leaf 0x01 exists.
->
-> Aside from the fact that APs will now look up their CPU# via the
-> newly-exported cpuid_to_apicid[] table, there is no behavioural change
-> intended yet, since new parallel CPUHP states have not =E2=80=94 yet =E2=
-=80=94 been
-> added.
->
-> [ tglx: Initial proof of concept patch with bitlock and APIC ID lookup ]
-> [ dwmw2: Rework and testing, commit message, CPUID 0x1 and CPU0 support ]
-> [ seanc: Fix stray override of initial_gs in common_cpu_up() ]
-> [ Oleksandr Natalenko: reported suspend/resume issue fixed in
->   x86_acpi_suspend_lowlevel ]
-> Co-developed-by: Thomas Gleixner <tglx@linutronix.de>
-> Co-developed-by: Brian Gerst <brgerst@gmail.com>
-> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-> Signed-off-by: Brian Gerst <brgerst@gmail.com>
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> Signed-off-by: Usama Arif <usama.arif@bytedance.com>
-> Tested-by: Paul E. McKenney <paulmck@kernel.org>
-> Tested-by: Kim Phillips <kim.phillips@amd.com>
-> Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-> Tested-by: Guilherme G. Piccoli <gpiccoli@igalia.com>
-> ---
->  .../admin-guide/kernel-parameters.txt         |  3 +
->  arch/x86/include/asm/cpu.h                    |  1 +
->  arch/x86/include/asm/realmode.h               |  3 +
->  arch/x86/include/asm/smp.h                    |  6 ++
->  arch/x86/kernel/acpi/sleep.c                  |  9 ++-
->  arch/x86/kernel/apic/apic.c                   |  2 +-
->  arch/x86/kernel/cpu/topology.c                |  2 +-
->  arch/x86/kernel/head_64.S                     | 64 +++++++++++++++++++
->  arch/x86/kernel/smpboot.c                     | 50 ++++++++++++++-
->  arch/x86/realmode/init.c                      |  3 +
->  arch/x86/realmode/rm/trampoline_64.S          | 27 ++++++--
->  11 files changed, 161 insertions(+), 9 deletions(-)
->
-> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentat=
-ion/admin-guide/kernel-parameters.txt
-> index 6cfa6e3996cf..7bb7020f97e2 100644
-> --- a/Documentation/admin-guide/kernel-parameters.txt
-> +++ b/Documentation/admin-guide/kernel-parameters.txt
-> @@ -3819,6 +3819,9 @@
->
->         nomodule        Disable module load
->
-> +       no_parallel_bringup
-> +                       [X86,SMP] Disable parallel bring-up of secondary =
-cores.
-> +
->         nopat           [X86] Disable PAT (page attribute table extension=
- of
->                         pagetables) support.
->
-> diff --git a/arch/x86/include/asm/cpu.h b/arch/x86/include/asm/cpu.h
-> index 78796b98a544..ef8ba318dca1 100644
-> --- a/arch/x86/include/asm/cpu.h
-> +++ b/arch/x86/include/asm/cpu.h
-> @@ -97,5 +97,6 @@ static inline bool intel_cpu_signatures_match(unsigned =
-int s1, unsigned int p1,
->  extern u64 x86_read_arch_cap_msr(void);
->  int intel_find_matching_signature(void *mc, unsigned int csig, int cpf);
->  int intel_microcode_sanity_check(void *mc, bool print_err, int hdr_type)=
-;
-> +int check_extended_topology_leaf(int leaf);
->
->  #endif /* _ASM_X86_CPU_H */
-> diff --git a/arch/x86/include/asm/realmode.h b/arch/x86/include/asm/realm=
-ode.h
-> index f6a1737c77be..87e5482acd0d 100644
-> --- a/arch/x86/include/asm/realmode.h
-> +++ b/arch/x86/include/asm/realmode.h
-> @@ -52,6 +52,7 @@ struct trampoline_header {
->         u64 efer;
->         u32 cr4;
->         u32 flags;
-> +       u32 lock;
->  #endif
->  };
->
-> @@ -64,6 +65,8 @@ extern unsigned long initial_stack;
->  extern unsigned long initial_vc_handler;
->  #endif
->
-> +extern u32 *trampoline_lock;
-> +
->  extern unsigned char real_mode_blob[];
->  extern unsigned char real_mode_relocs[];
->
-> diff --git a/arch/x86/include/asm/smp.h b/arch/x86/include/asm/smp.h
-> index bf2c51df9e0b..1cf4f1e57570 100644
-> --- a/arch/x86/include/asm/smp.h
-> +++ b/arch/x86/include/asm/smp.h
-> @@ -203,4 +203,10 @@ extern unsigned int smpboot_control;
->
->  #endif /* !__ASSEMBLY__ */
->
-> +/* Control bits for startup_64 */
-> +#define STARTUP_APICID_CPUID_0B        0x80000000
-> +#define STARTUP_APICID_CPUID_01        0x40000000
-> +
-> +#define STARTUP_PARALLEL_MASK (STARTUP_APICID_CPUID_01 | STARTUP_APICID_=
-CPUID_0B)
-> +
->  #endif /* _ASM_X86_SMP_H */
-> diff --git a/arch/x86/kernel/acpi/sleep.c b/arch/x86/kernel/acpi/sleep.c
-> index 1328c221af30..6dfecb27b846 100644
-> --- a/arch/x86/kernel/acpi/sleep.c
-> +++ b/arch/x86/kernel/acpi/sleep.c
-> @@ -16,6 +16,7 @@
->  #include <asm/cacheflush.h>
->  #include <asm/realmode.h>
->  #include <asm/hypervisor.h>
-> +#include <asm/smp.h>
->
->  #include <linux/ftrace.h>
->  #include "../../realmode/rm/wakeup.h"
-> @@ -127,7 +128,13 @@ int x86_acpi_suspend_lowlevel(void)
->          * value is in the actual %rsp register.
->          */
->         current->thread.sp =3D (unsigned long)temp_stack + sizeof(temp_st=
-ack);
-> -       smpboot_control =3D smp_processor_id();
-> +       /*
-> +        * Ensure the CPU knows which one it is when it comes back, if
-> +        * it isn't in parallel mode and expected to work that out for
-> +        * itself.
-> +        */
-> +       if (!(smpboot_control & STARTUP_PARALLEL_MASK))
-> +               smpboot_control =3D smp_processor_id();
->  #endif
->         initial_code =3D (unsigned long)wakeup_long64;
->         saved_magic =3D 0x123456789abcdef0L;
-> diff --git a/arch/x86/kernel/apic/apic.c b/arch/x86/kernel/apic/apic.c
-> index 20d9a604da7c..ac1d7e5da1f2 100644
-> --- a/arch/x86/kernel/apic/apic.c
-> +++ b/arch/x86/kernel/apic/apic.c
-> @@ -2377,7 +2377,7 @@ static int nr_logical_cpuids =3D 1;
->  /*
->   * Used to store mapping between logical CPU IDs and APIC IDs.
->   */
-> -static int cpuid_to_apicid[] =3D {
-> +int cpuid_to_apicid[] =3D {
->         [0 ... NR_CPUS - 1] =3D -1,
->  };
->
-> diff --git a/arch/x86/kernel/cpu/topology.c b/arch/x86/kernel/cpu/topolog=
-y.c
-> index 5e868b62a7c4..1dc20f4dfa6e 100644
-> --- a/arch/x86/kernel/cpu/topology.c
-> +++ b/arch/x86/kernel/cpu/topology.c
-> @@ -32,7 +32,7 @@ EXPORT_SYMBOL(__max_die_per_package);
->  /*
->   * Check if given CPUID extended topology "leaf" is implemented
->   */
-> -static int check_extended_topology_leaf(int leaf)
-> +int check_extended_topology_leaf(int leaf)
->  {
->         unsigned int eax, ebx, ecx, edx;
->
-> diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
-> index 6a8238702eab..c35f7c173832 100644
-> --- a/arch/x86/kernel/head_64.S
-> +++ b/arch/x86/kernel/head_64.S
-> @@ -25,6 +25,7 @@
->  #include <asm/export.h>
->  #include <asm/nospec-branch.h>
->  #include <asm/fixmap.h>
-> +#include <asm/smp.h>
->
->  /*
->   * We are not able to switch in one step to the final KERNEL ADDRESS SPA=
-CE
-> @@ -234,8 +235,61 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify, SYM_=
-L_GLOBAL)
->         ANNOTATE_NOENDBR // above
->
->  #ifdef CONFIG_SMP
-> +       /*
-> +        * For parallel boot, the APIC ID is retrieved from CPUID, and th=
-en
-> +        * used to look up the CPU number.  For booting a single CPU, the
-> +        * CPU number is encoded in smpboot_control.
-> +        *
-> +        * Bit 31       STARTUP_APICID_CPUID_0B flag (use CPUID 0x0b)
-> +        * Bit 30       STARTUP_APICID_CPUID_01 flag (use CPUID 0x01)
-> +        * Bit 0-24     CPU# if STARTUP_APICID_CPUID_xx flags are not set
-> +        */
->         movl    smpboot_control(%rip), %ecx
-> +       testl   $STARTUP_APICID_CPUID_0B, %ecx
-> +       jnz     .Luse_cpuid_0b
-> +       testl   $STARTUP_APICID_CPUID_01, %ecx
-> +       jnz     .Luse_cpuid_01
-> +       andl    $0x0FFFFFFF, %ecx
-> +       jmp     .Lsetup_cpu
-> +
-> +.Luse_cpuid_01:
-> +       mov     $0x01, %eax
-> +       cpuid
-> +       mov     %ebx, %edx
-> +       shr     $24, %edx
-> +       jmp     .Lsetup_AP
->
-> +.Luse_cpuid_0b:
-> +       mov     $0x0B, %eax
-> +       xorl    %ecx, %ecx
-> +       cpuid
-> +
-> +.Lsetup_AP:
-> +       /* EDX contains the APIC ID of the current CPU */
-> +       xorq    %rcx, %rcx
-> +       leaq    cpuid_to_apicid(%rip), %rbx
-> +
-> +.Lfind_cpunr:
-> +       cmpl    (%rbx,%rcx,4), %edx
-> +       jz      .Lsetup_cpu
-> +       inc     %ecx
-> +#ifdef CONFIG_FORCE_NR_CPUS
-> +       cmpl    $NR_CPUS, %ecx
-> +#else
-> +       cmpl    nr_cpu_ids(%rip), %ecx
-> +#endif
-> +       jb      .Lfind_cpunr
-> +
-> +       /*  APIC ID not found in the table. Drop the trampoline lock and =
-bail. */
-> +       movq    trampoline_lock(%rip), %rax
-> +       lock
-> +       btrl    $0, (%rax)
-> +
-> +1:     cli
-> +       hlt
-> +       jmp     1b
-> +
-> +.Lsetup_cpu:
->         /* Get the per cpu offset for the given CPU# which is in ECX */
->         movq    __per_cpu_offset(,%rcx,8), %rdx
->  #else
-> @@ -293,6 +347,14 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify, SYM_=
-L_GLOBAL)
->         shrq    $32, %rdx
->         wrmsr
->
-> +       /* Drop the realmode protection. For the boot CPU the pointer is =
-NULL! */
-> +       movq    trampoline_lock(%rip), %rax
-> +       testq   %rax, %rax
-> +       jz      .Lsetup_idt
-> +       lock
-> +       btrl    $0, (%rax)
-> +
-> +.Lsetup_idt:
+On Sun, Mar 12, 2023 at 11:06:31AM +0000, Marc Zyngier wrote:
+> On Tue, 07 Mar 2023 03:45:46 +0000,
+> Ricardo Koller <ricarkol@google.com> wrote:
+> > 
+> > Add a stage2 helper, kvm_pgtable_stage2_create_unlinked(), for
+> > creating unlinked tables (which is the opposite of
+> > kvm_pgtable_stage2_free_unlinked()).  Creating an unlinked table is
+> > useful for splitting PMD and PUD blocks into subtrees of PAGE_SIZE
+> 
+> Please drop the PMD/PUD verbiage. That's specially confusing when
+> everything is described in terms of 'level'
+> 
+> > PTEs.  For example, a PUD can be split into PAGE_SIZE PTEs by first
+> 
+> for example: s/a PUD/a level 1 mapping/
+> 
+> > creating a fully populated tree, and then use it to replace the PUD in
+> > a single step.  This will be used in a subsequent commit for eager
+> > huge-page splitting (a dirty-logging optimization).
+> > 
+> > No functional change intended. This new function will be used in a
+> > subsequent commit.
+> 
+> Drop this last sentence, it doesn't say anything that you haven't
+> already said.
+> 
+> > 
+> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> > Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_pgtable.h | 28 +++++++++++++++++
+> >  arch/arm64/kvm/hyp/pgtable.c         | 46 ++++++++++++++++++++++++++++
+> >  2 files changed, 74 insertions(+)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> > index c7a269cad053..b7b3fc0fa7a5 100644
+> > --- a/arch/arm64/include/asm/kvm_pgtable.h
+> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> > @@ -468,6 +468,34 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
+> >   */
+> >  void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level);
+> >  
+> > +/**
+> > + * kvm_pgtable_stage2_create_unlinked() - Create an unlinked stage-2 paging structure.
+> > + * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
+> > + * @phys:	Physical address of the memory to map.
+> > + * @level:	Starting level of the stage-2 paging structure to be created.
+> > + * @prot:	Permissions and attributes for the mapping.
+> > + * @mc:		Cache of pre-allocated and zeroed memory from which to allocate
+> > + *		page-table pages.
+> > + * @force_pte:  Force mappings to PAGE_SIZE granularity.
+> > + *
+> > + * Returns an unlinked page-table tree. If @force_pte is true or
+> > + * @level is 2 (the PMD level), then the tree is mapped up to the
+> > + * PAGE_SIZE leaf PTE; the tree is mapped up one level otherwise.
+> 
+> I wouldn't make this "one level" assumption, as this really depends on
+> the size of what gets mapped (and future evolution of this code).
+> 
+> > + * This new page-table tree is not reachable (i.e., it is unlinked)
+> > + * from the root pgd and it's therefore unreachableby the hardware
+> > + * page-table walker. No TLB invalidation or CMOs are performed.
+> > + *
+> > + * If device attributes are not explicitly requested in @prot, then the
+> > + * mapping will be normal, cacheable.
+> > + *
+> > + * Return: The fully populated (unlinked) stage-2 paging structure, or
+> > + * an ERR_PTR(error) on failure.
+> 
+> What guarantees that this new unlinked structure is kept in sync with
+> the original one? AFAICT, nothing does.
+> 
 
-Now that the lock only protects the realmode stack, releasing it can
-happen right after the switch to the idle task stack..
+That should be the job of the caller: kvm_pgtable_stage2_split() in this
+series.
 
---
-Brian Gerst
+> > + */
+> > +kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
+> > +					      u64 phys, u32 level,
+> > +					      enum kvm_pgtable_prot prot,
+> > +					      void *mc, bool force_pte);
+> > +
+> >  /**
+> >   * kvm_pgtable_stage2_map() - Install a mapping in a guest stage-2 page-table.
+> >   * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
+> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > index 4f703cc4cb03..6bdfcb671b32 100644
+> > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > @@ -1212,6 +1212,52 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
+> >  	return kvm_pgtable_walk(pgt, addr, size, &walker);
+> >  }
+> >  
+> > +kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
+> > +					      u64 phys, u32 level,
+> > +					      enum kvm_pgtable_prot prot,
+> > +					      void *mc, bool force_pte)
+> > +{
+> > +	struct stage2_map_data map_data = {
+> > +		.phys		= phys,
+> > +		.mmu		= pgt->mmu,
+> > +		.memcache	= mc,
+> > +		.force_pte	= force_pte,
+> > +	};
+> > +	struct kvm_pgtable_walker walker = {
+> > +		.cb		= stage2_map_walker,
+> > +		.flags		= KVM_PGTABLE_WALK_LEAF |
+> > +				  KVM_PGTABLE_WALK_SKIP_BBM |
+> > +				  KVM_PGTABLE_WALK_SKIP_CMO,
+> > +		.arg		= &map_data,
+> > +	};
+> > +	/* .addr (the IPA) is irrelevant for an unlinked table */
+> > +	struct kvm_pgtable_walk_data data = {
+> > +		.walker	= &walker,
+> > +		.addr	= 0,
+> 
+> Is that always true? What if the caller expect a non-block-aligned
+> mapping? You should at least check that phys is aligned to the granule
+> size of 'level', or bad stuff may happen.
+> 
+
+Good point, it should be true, but I will add a check to fail with
+EINVAL on that case. Will also double check the caller's code to be sure
+mappings are always block-aligned.
+
+> > +		.end	= kvm_granule_size(level),
+> > +	};
+> > +	struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
+> > +	kvm_pte_t *pgtable;
+> > +	int ret;
+> > +
+> > +	ret = stage2_set_prot_attr(pgt, prot, &map_data.attr);
+> > +	if (ret)
+> > +		return ERR_PTR(ret);
+> > +
+> > +	pgtable = mm_ops->zalloc_page(mc);
+> > +	if (!pgtable)
+> > +		return ERR_PTR(-ENOMEM);
+> > +
+> > +	ret = __kvm_pgtable_walk(&data, mm_ops, (kvm_pteref_t)pgtable,
+> > +				 level + 1);
+> > +	if (ret) {
+> > +		kvm_pgtable_stage2_free_unlinked(mm_ops, pgtable, level);
+> > +		mm_ops->put_page(pgtable);
+> > +		return ERR_PTR(ret);
+> > +	}
+> > +
+> > +	return pgtable;
+> > +}
+> >  
+> >  int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+> >  			      struct kvm_pgtable_mm_ops *mm_ops,
+> 
+> 	M.
+> 
+> -- 
+
+ACK on all the other comments.
+
+Thanks,
+Ricardo
+
+> Without deviation from the norm, progress is not possible.
