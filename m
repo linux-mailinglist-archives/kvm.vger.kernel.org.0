@@ -2,101 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 15BE56B7B58
-	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 16:00:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AA8F6B7B69
+	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 16:03:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231616AbjCMPAe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Mar 2023 11:00:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44042 "EHLO
+        id S231599AbjCMPDN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Mar 2023 11:03:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229774AbjCMPAW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Mar 2023 11:00:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B4FF74A54
-        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 07:59:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678719482;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=FHE3OOJsuZE+xWnYqdvV/G93Sb6IxlKdBHzMbjKAbh0=;
-        b=F/CKaci7SbYhkrG4xyqDzld7IzN7J6uc9EDKaJWxxJe+e1Ui7aTKYqxcJt5Tti7MRRS0Ky
-        qmf5hV5zCjPs2qtKuwoaWlTRN8IQUjeBFp4xTIBc3L9YIMJPk0VF+8bIdGzer1osz+e9tv
-        cUgsxykb/YrdrPt1W5tFtu6rHHDxaZo=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-326-Sm96N3PDNtepBxwoUefxCw-1; Mon, 13 Mar 2023 10:56:16 -0400
-X-MC-Unique: Sm96N3PDNtepBxwoUefxCw-1
-Received: by mail-wr1-f72.google.com with SMTP id c30-20020adfa31e000000b002c59b266371so2173208wrb.6
-        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 07:56:04 -0700 (PDT)
+        with ESMTP id S230250AbjCMPDH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Mar 2023 11:03:07 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 405D174DF8
+        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 08:02:30 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id ot8-20020a17090b3b4800b0023b3b695ddeso1719268pjb.5
+        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 08:02:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1678719749;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=l+tH8lYD9x2/FqbeqH0oWvF0Gi+WrvY+7IS1lzP+zYs=;
+        b=n8D68KLWWq8tQn8XxYjWWU/BDuop/hKc0pOUBZvDtn5d7r4dAs/veh4PJ+rjlj07KL
+         cu29BCAB1IDdf0T/RCDxj26joaO6eorfftwZTcLhuLAdKYmNSoMDAXzrzRuitsF+Q9tM
+         aMvVJr2hRlNMyDjDdHILz2rhoLym6W+ZIvksjnzhGkcRRncpTyu9IKfZOprFjYA7MCap
+         Y26mH24RxFuRoJIW5U1szfekcPe6L0grrOr3I0XWCP2xpUFno3hZ7tVlinQd856NOYb+
+         QZOHStb5CXv/OZQ8EMkUdqSzl+f9r1zxSaI7w/skGjuCC0zYVEn1Ctv+NyMXqU7pYHJL
+         sq9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678719361;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FHE3OOJsuZE+xWnYqdvV/G93Sb6IxlKdBHzMbjKAbh0=;
-        b=xinI8QKf1coz4aHfLVOCCLuDbLHWHVf+sjduCLMCWz7bbbhJgM1UvNAkOcASpwuSRJ
-         QRZZ+v1rrykdKYZDyGxDeIsGm5WHc2xq3DotEpt+JRQmhO8aZDxtkOhtGd18CT/go6zc
-         pmPwBXGAnJizvKiVwhmb7FbDMTz/baiz59b+kBZzzPY5Zx8KlxZr/EP0WuDX9tMwhEpk
-         cf6zNvYGL6wF9vUmsLr1C/EjoMKhmnwPiHTMT1Nn8rZNxo3VoSk3GYRtKjgSnqZ3omeZ
-         4+TArWYjqVQHYkzC/WITfQm6qAhtO+zlNLjJlEh1HHGYDi+5k1hvyUf20rrDRydtqDqF
-         dxgA==
-X-Gm-Message-State: AO0yUKX2iNe+3TAwovBMpOkRmWA3kuVxvlHqpJ4/xju6pvtjun9A59lE
-        ltrRQpua7dcjxhGJtZtb/tYoHNO7Z00TNpG82r/xJ6+wHP5KsjI3ko1PaWvnhwlonHK/8wUhYCo
-        FxN5q5RRHTYEnDtiEm1h3iA0=
-X-Received: by 2002:adf:d0cb:0:b0:2ce:a8f0:5e1f with SMTP id z11-20020adfd0cb000000b002cea8f05e1fmr3894675wrh.71.1678719361027;
-        Mon, 13 Mar 2023 07:56:01 -0700 (PDT)
-X-Google-Smtp-Source: AK7set9kStWht/z9BJluI0KCsafCM61vGqXAJpPApSQAOKQWDlv3On5a6xFjOEsCx/pXXKyhOA9FaA==
-X-Received: by 2002:adf:d0cb:0:b0:2ce:a8f0:5e1f with SMTP id z11-20020adfd0cb000000b002cea8f05e1fmr3894665wrh.71.1678719360744;
-        Mon, 13 Mar 2023 07:56:00 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id l8-20020a5d5608000000b002c552c6c8c2sm8135786wrv.87.2023.03.13.07.55.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Mar 2023 07:56:00 -0700 (PDT)
-Message-ID: <18b8e0b5-4622-e559-ab0c-81a778c6e2ce@redhat.com>
-Date:   Mon, 13 Mar 2023 15:55:59 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [kvm-unit-tests PATCH 0/2] x86: Fixes for rdpid test
-Content-Language: en-US
-To:     David Matlack <dmatlack@google.com>
-Cc:     kvm@vger.kernel.org
-References: <20230307005547.607353-1-dmatlack@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20230307005547.607353-1-dmatlack@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        d=1e100.net; s=20210112; t=1678719749;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=l+tH8lYD9x2/FqbeqH0oWvF0Gi+WrvY+7IS1lzP+zYs=;
+        b=W8kT1g5rNpLRcDdzBTKD0DxPSw9vyqsLSVdT4JKYPKVIs5mTM+61IWUYHJuXlfukr5
+         86G1gRCDJR7EkreAXs7HtOkK/WrAY5mzzwDKI3urEU3Dm8fUc7IkrdVtMMY6JhdBjRGa
+         AZ/oTZZeZXDHNRDNxhFwHxiFZnGA0UZVAoGztRF3sLQHI4bHHea4qdvev4wfZzJ8Njzw
+         Gs7vrJkzlWHNjtN7gM4tdTNFsRqzezaTFhsfIq5t+zg5KEIrv/DXvoZnAOSS2/s9aFo6
+         JF+7RJtP7/nseSU8N8QOAuuvQA5Lyz+RNBJKWDTbWjq/aTKcjHOWevM4h14YY+whu0qJ
+         e7wg==
+X-Gm-Message-State: AO0yUKXfFjgYOD14bE8nm3w9qYn3qfSs5vMuDd0VMxoPNm/F6Pmc0rS+
+        oq81uSrSKr6ExDOv8Tdhqsl/58oIIUU=
+X-Google-Smtp-Source: AK7set9/P9VcoKAyPGBT+s9BFnNAj7bBNTRTadNvzfty2TE+20Q7oBhsWJZF6JCCdROoRlN4cXRBFS5+rP4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:1d0c:b0:233:eccf:ea10 with SMTP id
+ c12-20020a17090a1d0c00b00233eccfea10mr12524574pjd.1.1678719749210; Mon, 13
+ Mar 2023 08:02:29 -0700 (PDT)
+Date:   Mon, 13 Mar 2023 08:02:27 -0700
+In-Reply-To: <87fsaa5kyv.wl-maz@kernel.org>
+Mime-Version: 1.0
+References: <20230310221414.811690-1-seanjc@google.com> <20230310221414.811690-3-seanjc@google.com>
+ <87fsaa5kyv.wl-maz@kernel.org>
+Message-ID: <ZA86UINtWH3aw4Mv@google.com>
+Subject: Re: [PATCH 2/2] KVM: Don't enable hardware after a restart/shutdown
+ is initiated
+From:   Sean Christopherson <seanjc@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        kvm-riscv@lists.infradead.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/7/23 01:55, David Matlack wrote:
-> Fix 2 small issues with the rdpid test that is a part of x86/tsc.c.
-> Notably, the test is not currently running since qemu is not configured
-> to advertise RDPID support and fixing that uncovers a bug in the test
-> when compiling with Clang.
+On Sun, Mar 12, 2023, Marc Zyngier wrote:
+> On Fri, 10 Mar 2023 22:14:14 +0000,
+> Sean Christopherson <seanjc@google.com> wrote:
+> > 
+> > Reject hardware enabling, i.e. VM creation, if a restart/shutdown has
+> > been initiated to avoid re-enabling hardware between kvm_reboot() and
+> > machine_{halt,power_off,restart}().  The restart case is especially
+> > problematic (for x86) as enabling VMX (or clearing GIF in KVM_RUN on
+> > SVM) blocks INIT, which results in the restart/reboot hanging as BIOS
+> > is unable to wake and rendezvous with APs.
+> > 
+> > Note, this bug, and the original issue that motivated the addition of
+> > kvm_reboot(), is effectively limited to a forced reboot, e.g. `reboot -f`.
+> > In a "normal" reboot, userspace will gracefully teardown userspace before
+> > triggering the kernel reboot (modulo bugs, errors, etc), i.e. any process
+> > that might do ioctl(KVM_CREATE_VM) is long gone.
+> > 
+> > Fixes: 8e1c18157d87 ("KVM: VMX: Disable VMX when system shutdown")
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  virt/kvm/kvm_main.c | 17 ++++++++++++++++-
+> >  1 file changed, 16 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 6cdfbb2c641b..b2bf4c105181 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -5182,7 +5182,20 @@ static void hardware_disable_all(void)
+> >  static int hardware_enable_all(void)
+> >  {
+> >  	atomic_t failed = ATOMIC_INIT(0);
+> > -	int r = 0;
+> > +	int r;
+> > +
+> > +	/*
+> > +	 * Do not enable hardware virtualization if the system is going down.
+> > +	 * If userspace initiated a forced reboot, e.g. reboot -f, then it's
+> > +	 * possible for an in-flight KVM_CREATE_VM to trigger hardware enabling
+> > +	 * after kvm_reboot() is called.  Note, this relies on system_state
+> > +	 * being set _before_ kvm_reboot(), which is why KVM uses a syscore ops
+> > +	 * hook instead of registering a dedicated reboot notifier (the latter
+> > +	 * runs before system_state is updated).
+> > +	 */
+> > +	if (system_state == SYSTEM_HALT || system_state == SYSTEM_POWER_OFF ||
+> > +	    system_state == SYSTEM_RESTART)
+> > +		return -EBUSY;
 > 
-> David Matlack (2):
->    x86: Run the tsc test with -cpu max
->    x86: Mark RDPID asm volatile to avoid dropping instructions
-> 
->   x86/tsc.c         | 2 +-
->   x86/unittests.cfg | 2 +-
->   2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> 
-> base-commit: e3c5c3ef2524c58023073c0fadde2e8ae3c04ec6
+> Since we now seem to be relying on system_state for most things, is
+> there any use for 'kvm_rebooting' other than the ease of evaluation in
+> __svm_vcpu_run?
 
-Queued, thanks.
+Sadly, yes.  The x86 implementations of emergency_restart(), __crash_kexec() and
+other emergency reboot flows disable virtualization and set 'kvm_rebooting'
+without touching system_state.  VMX and SVM rely on 'kvm_rebooting' being set to
+avoid triggering (another) BUG() during the emergency.
 
-Paolo
-
+On my todo list is to better understand whether or not the other architectures
+that utilize the generic hardware enabling (ARM, RISC-V, MIPS) truly need to disable
+virtualization during a reboot, versus KVM simply being polite.  E.g. on x86, if VMX
+is left enabled, reboot may hang depending on how the reboot is performed.   If
+other architectures really truly need to disable virtualization, then they likely
+need something similar to x86's emergency reboot shenanigans.
