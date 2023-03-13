@@ -2,191 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9CEED6B80FD
-	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 19:45:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 301C26B80EA
+	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 19:41:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230408AbjCMSpd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Mar 2023 14:45:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39944 "EHLO
+        id S231341AbjCMSlq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Mar 2023 14:41:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230173AbjCMSpc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Mar 2023 14:45:32 -0400
-Received: from out-20.mta0.migadu.com (out-20.mta0.migadu.com [IPv6:2001:41d0:1004:224b::14])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CECBB9023
-        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 11:44:56 -0700 (PDT)
-Date:   Mon, 13 Mar 2023 11:38:58 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1678732754;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=2IOpydyYpZ00bNASBI6Lt0s4hb0qO64jhUR+NW29SJk=;
-        b=EB1X8tRCl+FfauVWnZvQlYAVpcjSiJI7ngdVJQfQ73ShqgD327ZnyyXcKIBsM7qC9twWry
-        x92x77y3VLYO7Oowhn8yOY+LcceCwqyuLKOI/2FJeeoUewBgp7u9jBJoFjc8oxY/pnxMPR
-        7wLlF34yBFEzkZPd0tH7EMiCVwLgkIA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Bagas Sanjaya <bagasdotme@gmail.com>,
+        with ESMTP id S231294AbjCMSlk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Mar 2023 14:41:40 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BEAA12F38;
+        Mon, 13 Mar 2023 11:41:06 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id f6-20020a17090ac28600b0023b9bf9eb63so4373801pjt.5;
+        Mon, 13 Mar 2023 11:41:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1678732827;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FJcEThXMBvASmpf8pfcTYJJBOWHOXUgvGhcvNRjTK9w=;
+        b=mAF2PRe3Tw9v89lzR9Z3XggpQAqecTM0Gk41pGPJkf99LGEKCtwihWbdb0mrpYFzVC
+         MO4N87VGH9kKqPyQXbKP44Og0WvCuHP3UIsDRmt8D9UKG9EmQdQyZ24GEy8DUpDyxglJ
+         vzVpwN6bujuzRyFxbgR0GiKR++WrJNy66C9mcl5m3h73y23kQ+bZmosfbV1P3Eev/+ZA
+         4zqZtYO+tv46Akgb4pdqisFTftt45aeG6KJ6q+/w5G7X1t0TKJT8pJiBjZDfTipwY97d
+         j1sj1GmOrkugAj/g4VrU48+vE+AfXUpW9b3Ig9GNspn5TeEb5KrvVbJLvrsls276scgh
+         YNfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678732827;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FJcEThXMBvASmpf8pfcTYJJBOWHOXUgvGhcvNRjTK9w=;
+        b=MADYuJVGjkTKq9bAMDdt/i37gEelV318rI47atr1kAvaueXiqw24Gtoq9+c9vSmpJr
+         lvf97iEaQo0FktJ4lwA7Xdy0EC3UwbrxRqXwt7w+MiDDoVsBdtUgMSctd0zNRpArhEGs
+         ruoQvmBJ1edfj3nDnz2JhrQb0eig9oqwajM+U4471RXH7yXj1CK4bniPBQnMm5OBQnXM
+         G5ThWlxcHN6ggtOYXQFpEhvIXkZYg+JPUU21zt7/98BQn+k2RIggzL7bV2Ww0Q7V1VfD
+         fiWUcBDcBX4J9BApyr6xkS4NFkwPwNS6gKherVFVX9bCY0XGmW8/7yFNOo0EpYe13Pog
+         rb3w==
+X-Gm-Message-State: AO0yUKX3+yRPCl8+E/5vHrGlkl/QE5dEy6mDJwMzIhFX70QElSueejqC
+        L4lBwoueedjAcxLOC6MlFHM=
+X-Google-Smtp-Source: AK7set+vgQiMYh5C4eni0jBrKO5gchwAa7g9isoJ7fTIzAsqCN4BZxXEoEqYT5RsNutZlfd8r7StSQ==
+X-Received: by 2002:a05:6a20:6a03:b0:cc:f9f2:3034 with SMTP id p3-20020a056a206a0300b000ccf9f23034mr36952373pzk.40.1678732826462;
+        Mon, 13 Mar 2023 11:40:26 -0700 (PDT)
+Received: from localhost ([192.55.54.55])
+        by smtp.gmail.com with ESMTPSA id y3-20020a62b503000000b005a75d85c0c7sm70268pfe.51.2023.03.13.11.40.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Mar 2023 11:40:25 -0700 (PDT)
+Date:   Mon, 13 Mar 2023 11:40:24 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     "Wang, Wei W" <wei.w.wang@intel.com>
+Cc:     "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sagi Shahar <sagis@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Peter Shier <pshier@google.com>,
-        Anish Ghulati <aghulati@google.com>,
-        James Houghton <jthoughton@google.com>,
-        Anish Moorthy <amoorthy@google.com>,
-        Ben Gardon <bgardon@google.com>,
+        "Aktas, Erdem" <erdemaktas@google.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Shahar, Sagi" <sagis@google.com>,
         David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Axel Rasmussen <axelrasmussen@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Ashish Kalra <ashish.kalra@amd.com>,
-        Babu Moger <babu.moger@amd.com>, Chao Gao <chao.gao@intel.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Chenyi Qiang <chenyi.qiang@intel.com>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Guang Zeng <guang.zeng@intel.com>,
-        Hou Wenlong <houwenlong.hwl@antgroup.com>,
-        Jiaxi Chen <jiaxi.chen@linux.intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Jing Liu <jing2.liu@intel.com>,
-        Junaid Shahid <junaids@google.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Leonardo Bras <leobras@redhat.com>,
-        Like Xu <like.xu.linux@gmail.com>,
-        Li RongQing <lirongqing@baidu.com>,
-        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Michal Luczaj <mhal@rbox.co>,
-        Mingwei Zhang <mizhang@google.com>,
-        Nikunj A Dadhania <nikunj@amd.com>,
-        Paul Durrant <pdurrant@amazon.com>,
-        Peng Hao <flyingpenghao@gmail.com>,
-        Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>,
-        Robert Hoo <robert.hu@linux.intel.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Wei Wang <wei.w.wang@intel.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Zhenzhong Duan <zhenzhong.duan@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] Documentation/process: Add a maintainer handbook
- for KVM x86
-Message-ID: <ZA9twqv5XQMmgXWb@thinky-boi>
-References: <20230309010336.519123-1-seanjc@google.com>
- <20230309010336.519123-3-seanjc@google.com>
- <ZAlGeYAmvhPmVmGe@debian.me>
- <ZAmWefGcsBwcODxW@linux.dev>
- <ZAoWogdeET5N0mug@google.com>
- <ZA9eHzE5vhnXh+TA@linux.dev>
- <ZA9pfbhypRNPhdN8@google.com>
+        "Huang, Kai" <kai.huang@intel.com>,
+        Zhi Wang <zhi.wang.linux@gmail.com>
+Subject: Re: [PATCH v13 002/113] KVM: x86/vmx: Refactor KVM VMX module
+ init/exit functions
+Message-ID: <20230313184024.GA3922605@ls.amr.corp.intel.com>
+References: <cover.1678643051.git.isaku.yamahata@intel.com>
+ <e4d32af22f0a540c62fffaa17fe478a723e109ea.1678643052.git.isaku.yamahata@intel.com>
+ <DS0PR11MB63735A7EEC68894923925ECEDCB99@DS0PR11MB6373.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZA9pfbhypRNPhdN8@google.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <DS0PR11MB63735A7EEC68894923925ECEDCB99@DS0PR11MB6373.namprd11.prod.outlook.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 13, 2023 at 11:20:45AM -0700, Sean Christopherson wrote:
-> On Mon, Mar 13, 2023, Oliver Upton wrote:
-> > On Thu, Mar 09, 2023 at 09:25:54AM -0800, Sean Christopherson wrote:
-> > > On Thu, Mar 09, 2023, Oliver Upton wrote:
-> > > > On Thu, Mar 09, 2023 at 09:37:45AM +0700, Bagas Sanjaya wrote:
-> > > > > On Wed, Mar 08, 2023 at 05:03:36PM -0800, Sean Christopherson wrote:
-> > > > > > +As a general guideline, use ``kvm-x86/next`` even if a patch/series touches
-> > > > > > +multiple architectures, i.e. isn't strictly scoped to x86.  Using any of the
-> > > > > > +branches from the main KVM tree is usually a less good option as they likely
-> > > > > > +won't have many, if any, changes for the next release, i.e. using the main KVM
-> > > > > > +tree as a base is more likely to yield conflicts.  And if there are non-trivial
-> > > > > > +conflicts with multiple architectures, coordination between maintainers will be
-> > > > > > +required no matter what base is used.  Note, this is far from a hard rule, i.e.
-> > > > > > +use a different base for multi-arch series if that makes the most sense.
-> > > > 
-> > > > I don't think this is the best way to coordinate with other architectures.
-> > > > Regardless of whether you intended this to be prescriptive, I'm worried most
-> > > > folks will follow along and just base patches on kvm-x86/next anyway.
-> > > 
-> > > Probably, but for the target audience (KVM x86 contributors), that's likely the
-> > > least awful base 99% of the time.
+On Mon, Mar 13, 2023 at 02:49:03PM +0000,
+"Wang, Wei W" <wei.w.wang@intel.com> wrote:
+
+> On Monday, March 13, 2023 1:55 AM, isaku.yamahata@intel.com wrote:
+> > Currently, KVM VMX module initialization/exit functions are a single function
+> > each.  Refactor KVM VMX module initialization functions into KVM common
+> > part and VMX part so that TDX specific part can be added cleanly.
+> > Opportunistically refactor module exit function as well.
 > > 
-> > Sorry, I follow this reasoning at all.
+> > The current module initialization flow is,
+> > 0.) Check if VMX is supported,
+> > 1.) hyper-v specific initialization,
+> > 2.) system-wide x86 specific and vendor specific initialization,
+> > 3.) Final VMX specific system-wide initialization,
+> > 4.) calculate the sizes of VMX kvm structure and VMX vcpu structure,
+> > 5.) report those sizes to the KVM common layer and KVM common
+> >     initialization
 > > 
-> > If folks are aiming to make a multi-arch contribution then the architecture
-> > they regularly contribute to has absolutely zero relevance on the series
-> > itself.
-> 
-> There's disconnect between what my brain is thinking and what I wrote.
-> 
-> The intent of the "use kvm-x86/next" guideline is aimed to address series that
-> are almost entirely x86 specific, and only superficially touch common KVM and/or
-> other architectures.  In my experience, the vast, vast majority of "multi-arch"
-> contributions from x86 fall into this category, i.e. aren't truly multi-arch in
-> nature.
-> 
-> If I replace the above paragraph with this, does that address (or at least mitigate
-> to an acceptable level) your concerns?  Inevitably there will still be series that
-> are wrongly based on kvm-x86, but I am more than happy to do the policing.  I
-> obviously can't guarantee that I will be the first to run afoul of a "bad" series,
-> but I do think I can be quick enough to avoid shifting the burden to other
-> maintainers.  And if I'm wrong on either front, you get to say "told you so" and
-> make me submit a patch of shame ;-)
-> 
->   The only exception to using ``kvm-x86/next`` as the base is if a patch/series
->   is a multi-arch series, i.e. has non-trivial modifications to common KVM code
->   and/or has more than superficial changes to other architectures's code.  Multi-
-
-nit: Maybe 'to another architecture's code', since English is an annoying
-language :)
-
->   arch patch/series should instead be based on a common, stable point in KVM's
->   history, e.g. the release candidate upon which ``kvm-x86 next`` is based.  If
->   you're unsure whether a patch/series is truly multi-arch, err on the side of
->   caution and treat it as multi-arch, i.e. use a common base.
-
-LGTM, and sorry for whining without getting across the net effect I was hoping
-for in the language.
-
-> > > > > That means patches that primarily kvm ARM changes should be based on
-> > > > > kvm-x86/next, right?
-> > > > 
-> > > > No, don't do that.
-> > > 
-> > > +<infinity symbol>
-> > > 
-> > > This doc is specifically for KVM x86.
+> > Refactor the KVM VMX module initialization function into functions with a
+> > wrapper function to separate VMX logic in vmx.c from a file, main.c, common
+> > among VMX and TDX.  Introduce a wrapper function for vmx_init().
 > > 
-> > You've also made some suggestions about cross-arch development that do not fit
-> > the development model of other architectures. I have no desire to nitpick
-> > about the x86 process but want the multiarch language to actually set folks up
-> > for success working outside of the KVM/x86 tree.
+> > The KVM architecture common layer allocates struct kvm with reported size for
+> > architecture-specific code.  The KVM VMX module defines its structure as
+> > struct vmx_kvm { struct kvm; VMX specific members;} and uses it as struct vmx
+> > kvm.  Similar for vcpu structure. TDX KVM patches will define TDX specific kvm
+> > and vcpu structures.
+> > 
+> > The current module exit function is also a single function, a combination of
+> > VMX specific logic and common KVM logic.  Refactor it into VMX specific logic
+> > and KVM common logic.  This is just refactoring to keep the VMX specific logic
+> > in vmx.c from main.c.
+> > 
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > ---
+> >  arch/x86/kvm/vmx/main.c    | 51 +++++++++++++++++++++++++++++++++++
+> >  arch/x86/kvm/vmx/vmx.c     | 54 +++++---------------------------------
+> >  arch/x86/kvm/vmx/x86_ops.h | 13 ++++++++-
+> >  3 files changed, 69 insertions(+), 49 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c index
+> > a59559ff140e..3f49e8e38b6b 100644
+> > --- a/arch/x86/kvm/vmx/main.c
+> > +++ b/arch/x86/kvm/vmx/main.c
+> > @@ -165,3 +165,54 @@ struct kvm_x86_init_ops vt_init_ops __initdata = {
+> >  	.runtime_ops = &vt_x86_ops,
+> >  	.pmu_ops = &intel_pmu_ops,
+> >  };
+> > +
+> > +static int __init vt_init(void)
+> > +{
+> > +	unsigned int vcpu_size, vcpu_align;
+> > +	int r;
+> > +
+> > +	if (!kvm_is_vmx_supported())
+> > +		return -EOPNOTSUPP;
+> > +
+> > +	/*
+> > +	 * Note, hv_init_evmcs() touches only VMX knobs, i.e. there's nothing
+> > +	 * to unwind if a later step fails.
+> > +	 */
+> > +	hv_init_evmcs();
+> > +
+> > +	r = kvm_x86_vendor_init(&vt_init_ops);
+> > +	if (r)
+> > +		return r;
+> > +
+> > +	r = vmx_init();
+> > +	if (r)
+> > +		goto err_vmx_init;
+> > +
+> > +	/*
+> > +	 * Common KVM initialization _must_ come last, after this, /dev/kvm is
+> > +	 * exposed to userspace!
+> > +	 */
+> > +	vt_x86_ops.vm_size = sizeof(struct kvm_vmx);
+> > +	vcpu_size = sizeof(struct vcpu_vmx);
+> > +	vcpu_align = __alignof__(struct vcpu_vmx);
+> > +	r = kvm_init(vcpu_size, vcpu_align, THIS_MODULE);
+> > +	if (r)
+> > +		goto err_kvm_init;
+> > +
+> > +	return 0;
+> > +
+> > +err_kvm_init:
+> > +	vmx_exit();
+> > +err_vmx_init:
+> > +	kvm_x86_vendor_exit();
+> > +	return r;
+> > +}
+> > +module_init(vt_init);
 > 
-> Ah, I see where y'all are coming from.  Yeah, I didn't intend for that type of
-> blanket rule, e.g. my comment about this being specifically for KVM x86 was
-> intended to clarify that this doc should NOT be used to determine how to handle
-> non-x86 code.
+> I had a patch to fix a bug here, maybe you can take it:
+> 
+> kvm_x86_vendor_init copies vt_x86_ops to kvm_x86_ops. vt_x86_ops.vm_size
+> needs to be updated before calling kvm_x86_vendor_init so that kvm_x86_ops
+> can get the correct vm_size.
 
-My biggest worry was that whether intentional or not, folks will probably take
-what you've written out of context. Not as though I could completely blame the
-developer in that case, as we have no documented process for arm64 at the
-moment.
+Thanks for catching it.  With your patch, vm_size is always
+max(sizeof struct kvm_vmx, sizeof strut kvm_tdx) even when the admin sets
+kvm_intel.tdx=true and tdx is disabled by error.
 
---
-Thanks,
-Oliver
+option 1: Ignore such waste. Your patch. The difference is small and it's only
+          the error case. Locally I have the following values.
+          sizeof(struct kvm_vmx) = 44576
+          sizeof(struct vcpu_vmx) = 10432
+          sizeof(struct kvm_tdx)= 44632
+          sizeof(struct vcpu_tdx) = 8192
+          I suspect the actual allocation size for struct kvm is same.  That's
+          the reason why I didn't hit problem.
+
+option 2: Explicitly update vm_size after kvm_x86_vendor_init()
+          struct kvm_x86_ops isn't exported.  It would be ugly.
+
+option 3: Allow setup_hardware() to update vm_size.
+          setup_hardware(void) => setup_hardware(unsigned int *vm_size)
+          It's confusing because kvm_x86_ops.vm_size is already initialized.
+
+Let's go with option 1(your patch).
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
