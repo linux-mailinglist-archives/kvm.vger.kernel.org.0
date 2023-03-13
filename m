@@ -2,132 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EDBC66B7F9F
-	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 18:38:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C9986B7FA3
+	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 18:40:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230155AbjCMRiv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Mar 2023 13:38:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57168 "EHLO
+        id S230187AbjCMRkd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Mar 2023 13:40:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229534AbjCMRit (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Mar 2023 13:38:49 -0400
-Received: from out-42.mta1.migadu.com (out-42.mta1.migadu.com [IPv6:2001:41d0:203:375::2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B8A7457F7
-        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 10:38:45 -0700 (PDT)
-Date:   Mon, 13 Mar 2023 17:38:30 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1678729123;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ybjm14aOpi7A3aopxAqo4v6WPM99l74ygtnwOLCEz88=;
-        b=qKL8BE7By0J03+sOQJyOVoPjg1EGaqkkILFMuvPubmJwJo5R2I4Ioa3AvwEaBz6xeymaZv
-        fSiwHIOu2V9lLMl5hGzbssWXHnbWFVtrn7RUibLPjv8SLEBZ3oZbk6sfw51BVun6oviMRP
-        /MmVzX2rgkW/XRE5u55rvZjO02g9bOE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
+        with ESMTP id S230097AbjCMRkb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Mar 2023 13:40:31 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DABA14227;
+        Mon, 13 Mar 2023 10:40:28 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 890F7B811C1;
+        Mon, 13 Mar 2023 17:40:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 228E6C433D2;
+        Mon, 13 Mar 2023 17:40:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1678729225;
+        bh=HGclvf2eMYSO2tUhOiMvSKCDztLmiMtZOfMVb6g6DVk=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=HmZWuJL81X+QwZ5k7rXig9TGU2O6rtggZA1Wyv18AEy74H/w+I50F3BjrViWg3tBC
+         MSiT1FiuUy6TYON8kwfIa11YdTqevEHWpABQuMQlm4GduLoP4ijgCskTYnhjfxGKnw
+         j1Exb8c+QLFy6fGlqXm4ubrz1Xc0hIjcLQMhrxDOCwECaWuaghRrYjZl/PvZEDJR3l
+         fesJmClEcaisFb1zwZBGSHXRdUJkNKnF9bBQmxO9c8bIOB16i15R3qF8tQiUKRn8Ol
+         dx/qAj2c1bfBMY3SbVtUzstOFKWH4mBH2VhhmaQniqYAjUQyfS06fKVeMXkzpwGAC7
+         MGg1XslgtDBQw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pbm9m-00HKV1-MV;
+        Mon, 13 Mar 2023 17:40:22 +0000
+Date:   Mon, 13 Mar 2023 17:40:22 +0000
+Message-ID: <86lek0y2gp.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Bagas Sanjaya <bagasdotme@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sagi Shahar <sagis@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Peter Shier <pshier@google.com>,
-        Anish Ghulati <aghulati@google.com>,
-        James Houghton <jthoughton@google.com>,
-        Anish Moorthy <amoorthy@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Axel Rasmussen <axelrasmussen@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Ashish Kalra <ashish.kalra@amd.com>,
-        Babu Moger <babu.moger@amd.com>, Chao Gao <chao.gao@intel.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Chenyi Qiang <chenyi.qiang@intel.com>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Guang Zeng <guang.zeng@intel.com>,
-        Hou Wenlong <houwenlong.hwl@antgroup.com>,
-        Jiaxi Chen <jiaxi.chen@linux.intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Jing Liu <jing2.liu@intel.com>,
-        Junaid Shahid <junaids@google.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Leonardo Bras <leobras@redhat.com>,
-        Like Xu <like.xu.linux@gmail.com>,
-        Li RongQing <lirongqing@baidu.com>,
-        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Michal Luczaj <mhal@rbox.co>,
-        Mingwei Zhang <mizhang@google.com>,
-        Nikunj A Dadhania <nikunj@amd.com>,
-        Paul Durrant <pdurrant@amazon.com>,
-        Peng Hao <flyingpenghao@gmail.com>,
-        Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>,
-        Robert Hoo <robert.hu@linux.intel.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Wei Wang <wei.w.wang@intel.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Zhenzhong Duan <zhenzhong.duan@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] Documentation/process: Add a maintainer handbook
- for KVM x86
-Message-ID: <ZA9flqMBSlW95S/i@linux.dev>
-References: <20230309010336.519123-1-seanjc@google.com>
- <20230309010336.519123-3-seanjc@google.com>
- <ZAlGeYAmvhPmVmGe@debian.me>
- <ZAmWefGcsBwcODxW@linux.dev>
- <ZAoWogdeET5N0mug@google.com>
- <ZA9eHzE5vhnXh+TA@linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZA9eHzE5vhnXh+TA@linux.dev>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Cc:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>, stable@vger.kernel.org,
+        David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: Disable interrupts while walking userspace PTs
+In-Reply-To: <ZA9HAQtkCDwFXcsm@google.com>
+References: <20230313091425.1962708-1-maz@kernel.org>
+        <20230313091425.1962708-2-maz@kernel.org>
+        <ZA9HAQtkCDwFXcsm@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: seanjc@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, ardb@kernel.org, will@kernel.org, qperret@google.com, stable@vger.kernel.org, dmatlack@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 13, 2023 at 05:32:29PM +0000, Oliver Upton wrote:
-> On Thu, Mar 09, 2023 at 09:25:54AM -0800, Sean Christopherson wrote:
-> > On Thu, Mar 09, 2023, Oliver Upton wrote:
-> > > On Thu, Mar 09, 2023 at 09:37:45AM +0700, Bagas Sanjaya wrote:
-> > > > On Wed, Mar 08, 2023 at 05:03:36PM -0800, Sean Christopherson wrote:
-> > > > > +As a general guideline, use ``kvm-x86/next`` even if a patch/series touches
-> > > > > +multiple architectures, i.e. isn't strictly scoped to x86.  Using any of the
-> > > > > +branches from the main KVM tree is usually a less good option as they likely
-> > > > > +won't have many, if any, changes for the next release, i.e. using the main KVM
-> > > > > +tree as a base is more likely to yield conflicts.  And if there are non-trivial
-> > > > > +conflicts with multiple architectures, coordination between maintainers will be
-> > > > > +required no matter what base is used.  Note, this is far from a hard rule, i.e.
-> > > > > +use a different base for multi-arch series if that makes the most sense.
-> > > 
-> > > I don't think this is the best way to coordinate with other architectures.
-> > > Regardless of whether you intended this to be prescriptive, I'm worried most
-> > > folks will follow along and just base patches on kvm-x86/next anyway.
-> > 
-> > Probably, but for the target audience (KVM x86 contributors), that's likely the
-> > least awful base 99% of the time.
+On Mon, 13 Mar 2023 15:53:37 +0000,
+Sean Christopherson <seanjc@google.com> wrote:
 > 
-> Sorry, I follow this reasoning at all.
+> +David
+> 
+> On Mon, Mar 13, 2023, Marc Zyngier wrote:
+> > We walk the userspace PTs to discover what mapping size was
+> > used there. However, this can race against the userspace tables
+> > being freed, and we end-up in the weeds.
+> > 
+> > Thankfully, the mm code is being generous and will IPI us when
+> > doing so. So let's implement our part of the bargain and disable
+> > interrupts around the walk. This ensures that nothing terrible
+> > happens during that time.
+> > 
+> > We still need to handle the removal of the page tables before
+> > the walk. For that, allow get_user_mapping_size() to return an
+> > error, and make sure this error can be propagated all the way
+> > to the the exit handler.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Cc: stable@vger.kernel.org
+> > ---
+> >  arch/arm64/kvm/mmu.c | 35 ++++++++++++++++++++++++++++-------
+> >  1 file changed, 28 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 7113587222ff..d7b8b25942df 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -666,14 +666,23 @@ static int get_user_mapping_size(struct kvm *kvm, u64 addr)
+> >  				   CONFIG_PGTABLE_LEVELS),
+> >  		.mm_ops		= &kvm_user_mm_ops,
+> >  	};
+> > +	unsigned long flags;
+> >  	kvm_pte_t pte = 0;	/* Keep GCC quiet... */
+> >  	u32 level = ~0;
+> >  	int ret;
+> >  
+> > +	/*
+> > +	 * Disable IRQs so that we hazard against a concurrent
+> > +	 * teardown of the userspace page tables (which relies on
+> > +	 * IPI-ing threads).
+> > +	 */
+> > +	local_irq_save(flags);
+> >  	ret = kvm_pgtable_get_leaf(&pgt, addr, &pte, &level);
+> > -	VM_BUG_ON(ret);
+> > -	VM_BUG_ON(level >= KVM_PGTABLE_MAX_LEVELS);
+> > -	VM_BUG_ON(!(pte & PTE_VALID));
+> > +	local_irq_restore(flags);
+> > +
+> > +	/* Oops, the userspace PTs are gone... */
+> > +	if (ret || level >= KVM_PGTABLE_MAX_LEVELS || !(pte & PTE_VALID))
+> > +		return -EFAULT;
+> 
+> I don't think this should return -EFAULT all the way out to userspace.  Unless
+> arm64 differs from x86 in terms of how the userspace page tables are managed, not
+> having a valid translation _right now_ doesn't mean that one can't be created in
+> the future, e.g. by way of a subsequent hva_to_pfn().
 
-I *don't* follow ...
+I probably took an overly restrictive approach of only looking at the
+issue at hand, where exit_mmap() had already torn down the userspace
+PTs. But I guess there are other ways for this scenario to happen,
+none of which deserve -EFAULT indeed.
+
+> FWIW, the approach x86 takes is to install a 4KiB (smallest granuale) translation,
+> which is safe since there _was_ a valid translation when mmu_lock was acquired and
+> mmu_invalidate_retry() was checked.  It's the primary MMU's responsibility to ensure
+> all secondary MMUs are purged before freeing memory, i.e. worst case should be that
+> KVMs stage-2 translation will be immediately zapped via mmu_notifier.
+
+I'd rather avoid extra work. At this stage, we might as well return
+-EAGAIN and replay the fault. We already do that in a number of racy
+cases, so it fits in the infrastructure.
+
+> KVM ARM also has a bug that might be related: the mmu_seq snapshot needs to be
+> taken _before_ mmap_read_unlock(), otherwise vma_shift may be stale by the time
+> it's consumed.  I believe David is going to submit a patch (I found and "reported"
+> the bug when doing an internal review of "common MMU" stuff).
+
+Huh, that's interesting. David, please post this at your earliest
+convenience. I'd rather squash these all in one go.
+
+Thanks,
+
+	M.
 
 -- 
-Thanks,
-Oliver
+Without deviation from the norm, progress is not possible.
