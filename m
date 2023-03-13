@@ -2,49 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 911B86B7617
-	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 12:35:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 224626B761F
+	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 12:38:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230179AbjCMLe5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Mar 2023 07:34:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37072 "EHLO
+        id S230123AbjCMLiO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Mar 2023 07:38:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230452AbjCMLeq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Mar 2023 07:34:46 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1092AD00;
-        Mon, 13 Mar 2023 04:34:19 -0700 (PDT)
+        with ESMTP id S230071AbjCMLiL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Mar 2023 07:38:11 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCCCD59FD;
+        Mon, 13 Mar 2023 04:38:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678707259; x=1710243259;
-  h=from:to:cc:subject:date:message-id;
-  bh=tMqMRDn9qbbSMIPbslCNua9xCzVDM6s8e/f/VlLQpK0=;
-  b=BIUN2DIR4nwESbFsOJXxeBVa/Kyv1VD74yp7KnMw0JHuNcU4588BedxV
-   42tFsTp/75odx0+SZ0kZsjJ094cE4218vGL9UsR4WOkqlKcczW16tesOu
-   KgjnmIUSP9lzlVkVjIYT3Vt49WlWKuNl/es9bxifRcA0lRMQLG9eu31ue
-   fax2c9GtssNhQP3K4RquNn4R1umG5FG+UmkAUKJEuXUEJVcqx+7C7lFuU
-   nbkSlZqgQORYxUIcU16p8FMfwL2nBEfTYpoqoGyHr6XL0KgUj4QYT0f7F
-   pAmtjGqjI5j9NU8FdZdEPEqsSxyVBcTxSGKQ4USG+6lweqsiw0nogpP+V
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="334599332"
+  t=1678707487; x=1710243487;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=rABYiajc9sK2VZ+YT+KMTLElYh6s//0o9Lj5iIQG1T8=;
+  b=jF4ww7E4hRTfq/KgUMAmaBWee4IkQ5/Usw2bEbaYWj9JPLlDc4GwrcIa
+   I7M2Zoa6kVb4XAuRjp8aL4xZ0jwDeezg7/pXREMBsx1PJALepI2/YeJsr
+   IQCes3yMBBMj5LNfLU92lR607WQ2gQdTk2MmhPB8PTPqDyFV54E3amt1U
+   VDvHNe9p8yqoFk6WELL4W5t9C18cJ2losADmH8SvpjMK7c6wolZaC4lKm
+   8gS7TgFt2r4rszwnPSZjpRutIud/nhghtsGUy/snFNdoCakObujw+Gg8k
+   pJG/7+nTvCORvOBgStYJmCw3uu2y1a2XByYAR8mLpcRvzyTB0xnn1Lfjx
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="337144944"
 X-IronPort-AV: E=Sophos;i="5.98,256,1673942400"; 
-   d="scan'208";a="334599332"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2023 04:34:11 -0700
+   d="scan'208";a="337144944"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2023 04:38:03 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="852735232"
+X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="821929749"
 X-IronPort-AV: E=Sophos;i="5.98,256,1673942400"; 
-   d="scan'208";a="852735232"
-Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2023 04:34:09 -0700
+   d="scan'208";a="821929749"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga001.fm.intel.com with ESMTP; 13 Mar 2023 04:38:02 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Mon, 13 Mar 2023 04:38:02 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Mon, 13 Mar 2023 04:38:02 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21 via Frontend Transport; Mon, 13 Mar 2023 04:38:02 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.21; Mon, 13 Mar 2023 04:38:01 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VZ3aID6PJj9SjFsXeodZHYkz8SUSrbFjCoaWTKbo/l2ETHNuoVzTFdZK2WaiNXJtynAnwC1II9RIEe9vXumnNbZ89WHrqXDbsND0KP3tkR5BCq7p7Hqccaj0G5MaIiWMkszK7upgFsVaY55BVgsVGSShEDjOWHqFGwxEKY6JZ6EghbANhP1maYs4fILCmFdRPlLJo/xiv5mM1GbWY3VHqjVIMU/R+3knQY4aAMDYkCxC9M5tzJOOyZdPO/Vj9nXu3T3dqe9Ec9MA6VAKQBC92WXXDVbW/OPQIq0awkqOkGCaG7wMPXVwznmEcw9xc1e+7MWyd2NdeLPVb1An4yCzDQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rABYiajc9sK2VZ+YT+KMTLElYh6s//0o9Lj5iIQG1T8=;
+ b=SDq5YY/E7PPIdMZAhfzS0GTq8UI56LeSiFzHfKiRBMiyUbtkIpFKmz1jhGy2uQzXYC3+uVbvEiCWftpdBb0JZ4XjFG7bUQw91qCzmr5wLno1Nfhjo7GBWQ9ff395pCYu05ZVYIB68auwTTCqqhG6/dkJZT4EWW8ScCnV0b53Bvnlkq/6QFSNfrFHsegrMEtLZZdcg/g6CxOvR8mGB8G1lzyj5c6q7OC87DlcknzVZO4Nln2nU3qkMqya1absrIx7bjO+V9tmtEjE2tnPr2AVP0VxW2HlQdTovp/qeqbVJlhJf0x9Yuopite6Ygz7VCepXwx/sINZQWMHiJJRUvIH1A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ MN0PR11MB6182.namprd11.prod.outlook.com (2603:10b6:208:3c6::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.24; Mon, 13 Mar
+ 2023 11:37:53 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::82d2:d341:4138:17ef]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::82d2:d341:4138:17ef%8]) with mapi id 15.20.6178.024; Mon, 13 Mar 2023
+ 11:37:53 +0000
+Date:   Mon, 13 Mar 2023 19:14:02 +0800
 From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com,
-        Yan Zhao <yan.y.zhao@intel.com>
-Subject: [PATCH v3] KVM: VMX: fix lockdep warning on posted intr wakeup
-Date:   Mon, 13 Mar 2023 19:10:22 +0800
-Message-Id: <20230313111022.13793-1-yan.y.zhao@intel.com>
-X-Mailer: git-send-email 2.17.1
+To:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC:     <seanjc@google.com>, <pbonzini@redhat.com>
+Subject: Re: [PATCH v2] KVM: VMX: fix lockdep warning on posted intr wakeup
+Message-ID: <ZA8Fev1rPB/78jNk@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20230313094753.8345-1-yan.y.zhao@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20230313094753.8345-1-yan.y.zhao@intel.com>
+X-ClientProxiedBy: SG2PR04CA0181.apcprd04.prod.outlook.com
+ (2603:1096:4:14::19) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|MN0PR11MB6182:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3bc05b31-b037-4b78-0cf3-08db23b7619c
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Z6i3h5gtb/DMusJpBaS6+FQ8Xh9EGa4CVbLfp9XehdgwYOOIiwdEo/obJlQGjBxDVFegN0jrCDC3heDgyMAvZjKy9NLNk3RT0kuo635TGw6RFAqElbuYl7c0iGXiysREoMV4RUI7zVoT622sX7uhshynjTfOiCWWJEn1RhoggTSLka/RKOHhNc3hxovwktDsOhzTOcf7npIk4XSSPsUi3aI4XhZoDYpIU4OY7da9QJfpyPfdcnFMvA4T4SyUA2bKaICgU4/upJRfyMwwKNn7KEkY6HOT06dptWth4fI1x2Lpfr+EaaNxOlQuv92BkFBYISZZ4HjsiE4c36IXWqkGy/iZKxdsi0d1dVKuwE+z6/QwqR3B1FFbJCPV1xehJby7Wbn1duyadYup4SWOTC4+tP58ZGAf2eb2rnTcd78bYdf43dUGMr5Qs4sFme6KKOHMXReJqf8mbHPk/go25eClXNNP78EV8rFgRXgAfVz06SD6qy9zjlPGukSAVkeoBuNmFTnwEHlX2H8g1eENv5LawepTMpfwYyZV36GW0mNclRgC35Qe/jHUBCzmnt+MkVrbZcjIf3DLkTGq/iGYewx8Du4GnHfXR4XxSyMuGSV58GaNE8i1b6ePcHg6ZxIi4PAF
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(396003)(39860400002)(376002)(366004)(136003)(346002)(451199018)(86362001)(558084003)(82960400001)(38100700002)(8676002)(4326008)(66556008)(66476007)(66946007)(8936002)(54906003)(110136005)(41300700001)(478600001)(316002)(6506007)(5660300002)(2906002)(3450700001)(6486002)(186003)(6666004)(6512007)(26005)(966005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?fBn0PXtDXWj6P+OVnpM5jJOvU8KEx1BbOB41zexGZVKfKYv4lYbgRDcB2Sq9?=
+ =?us-ascii?Q?B+RPe6Z2Gc0WY1Ki6nCpY31DsErGa2vJyCFS4lO9ZGdbjeO8foMkFhXa0hO+?=
+ =?us-ascii?Q?wN9dve/gEBEcw78z81onIVZU2iibLbLtXyDdasimakmIRUDqXDifshUhYBle?=
+ =?us-ascii?Q?oNBbrICo23pVcpzMCdxzU3mb8q+CgYBy1eTIHB0E/8f+2uUzlz0U9tvWK4Eq?=
+ =?us-ascii?Q?kH2/Dl0mh3znxFlMC/aYGLcSe5oUsq541t9fL5L5wO2W1Z5lmICtSQHGeUlt?=
+ =?us-ascii?Q?+iYmJ7KLHcS2JvJKMUcWC1aSZD6b6QV5+Gl8UtJQX+xHaKPiLSFTd+JkIiTn?=
+ =?us-ascii?Q?7BLvySGw2iBXuPc9fncQWdHwhg1aUEyeQYx7HYcv76cJWqzn6aQKnAaxpOsc?=
+ =?us-ascii?Q?HWSD1/HyrGuSiiYe2A4llex7F6n/hTF9dHqRwSjZgRT6uvCKK4M5KuPp4qCO?=
+ =?us-ascii?Q?E7wf65MHh1zpQSDmjCK3HHFnDC+f6A7GSiHDwhN8kAwqmzJEgtVUXG6sOTs9?=
+ =?us-ascii?Q?sEOqyBHBcdU9aqXDefPkyl7ixSna1T9SsijTs05b20k0r8HE8gpQgnt3mVzm?=
+ =?us-ascii?Q?FHoHplUBMHYbU7wDM0SiBZhGnfnAAJ+qg3eU4sksUCjJVQ5YO05ZnXI94NbT?=
+ =?us-ascii?Q?195L/IVyJEywOnmfyZETxEPbPAcBB80BrGlUzWdBI2qcbTK6l4wdI/AjnSEK?=
+ =?us-ascii?Q?gOQFo2698E6GVzB882HGSpHEOron2yojjkFzYovXfDcdSUV3MY/LoTxC7jOO?=
+ =?us-ascii?Q?oolAY0yq+Jz5VT7Mj9YE7oFp8qrSKj4imnIm9QtLa5vh+epip/njKdsYRcTU?=
+ =?us-ascii?Q?6S4cJU1gqrMNkQ4vgolBzVaFmSLWqCrgi3liHQQG7KLWNdDb2hALzaK59m9j?=
+ =?us-ascii?Q?E8UdoIEXo+xP0n3z/AygmaiLTwg/jkXrD424u2a44uXGd9dTfpnoRrRE3FLY?=
+ =?us-ascii?Q?+ZXmHOax9OJ9DJKvAeyie8WxHDO4LIEBnTgBbP3jcG6ov74IQBqZBVzcfKKK?=
+ =?us-ascii?Q?9NBT1i8I8N0gjNGubpv7AEarD/N+Cvf4TSveOdn4g9B1e0Y1fn9bBJclk2oR?=
+ =?us-ascii?Q?BpWUFtEXT0OB5Q5u9EtsBLNDboldpBxF5JJwtUVRaEeZwl+xNmNlISHsGfCM?=
+ =?us-ascii?Q?VzPpQkBDNYVuzAUmW0cMhwUafdS1fBWr893ZW3g1h5MW+KjWllH51SZVnr60?=
+ =?us-ascii?Q?31exZrL6yits5bS+9hSjLlRJ80/XC2pLLDwQwkKcgNH8mmt0BsbvTPUSeaIm?=
+ =?us-ascii?Q?thcKRZBY2qmWT0+yzU6BJ8Knb5z3q7+NA9UxpJx1ZDBnek+a8jL72ha/UKdR?=
+ =?us-ascii?Q?bIez9ZJMbdNaXM1+L+QSOMaw681LXVEwqwTjZgEq657PRj5Odqjwux/ajP5s?=
+ =?us-ascii?Q?AUx/hquzAnIpJjOgbR1VCEp4PIgB+pKSnaD/HeRXyB1BwuJSLOZ85evcTc7W?=
+ =?us-ascii?Q?t4B2pzCGII6k136vJ8Ic+o18Hsr5zV0sdEZZH1pN/ZUsANG2JoKU7Wyxf4n1?=
+ =?us-ascii?Q?hmEH29ZUxSkblrLZI1W2r2tfqFSCssfF3zBnysCHG4iSlH4Rns7njPgWHjJX?=
+ =?us-ascii?Q?TDEV6UXHcRdvGJmR/H+Is78RbA18U3jxU4J0CSONlzFc8+DNdneBKYUks9nm?=
+ =?us-ascii?Q?QA=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3bc05b31-b037-4b78-0cf3-08db23b7619c
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Mar 2023 11:37:52.8379
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZPsQJKqe+3lG6B8VWisg2Aef+UbmFwU2jr+MKZ5634+FtRdZDUTomN5JHFfvgEHdtbZjKbuST6atGmZQLQJdVA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR11MB6182
+X-OriginatorOrg: intel.com
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
@@ -54,170 +148,5 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Split a single per_cpu lock on wakeup_list into a sched_in lock and
-a sched_out lock to break the possible circular locking dependency
-reported by lockdep.
-
-The lockdep complains about "possible circular locking dependency
-detected".
-
-Chain exists of:
-   &p->pi_lock --> &rq->__lock --> &per_cpu(wakeup_vcpus_on_cpu_lock, cpu)
-
-  Possible unsafe locking scenario:
-
-        CPU0                CPU1
-        ----                ----
-   lock(&per_cpu(wakeup_vcpus_on_cpu_lock, cpu));
-                            lock(&rq->__lock);
-                            lock(&per_cpu(wakeup_vcpus_on_cpu_lock, cpu));
-   lock(&p->pi_lock);
-
-  *** DEADLOCK ***
-
-path irq,
-        sysvec_kvm_posted_intr_wakeup_ipi() --> pi_wakeup_handler()
-        --> kvm_vcpu_wake_up() --> try_to_wake_up(),
-        the lock order is
-        &per_cpu(wakeup_vcpus_on_cpu_lock, cpu) --> &p->pi_lock.
-
-path sched_out,
-        vcpu_block() --> schedule() --> kvm_sched_out() --> vmx_vcpu_put()
-        --> vmx_vcpu_pi_put() --> pi_enable_wakeup_handler(),
-        the lock order is
-        &rq->__lock --> &per_cpu(wakeup_vcpus_on_cpu_lock, cpu).
-
-However, it is found out that path irq and sched_out are not racing
-because: path irq is in interrupt context, path sched_out is in interrupt
-disabled context, at the same pcpu as path irq.
-
-Consider path sched_out is the very path that tells lockdep the lock
-ordering: &rq->__lock --> &per_cpu(wakeup_vcpus_on_cpu_lock, cpu),
-it's desired for path irq not to hold the same per cpu lock as path
-sched_out.
-
-So, in the patch, a single wakeup_list lock is divided into a sched_in lock
-and a sched_out lock.
-- "path sched_out": add vcpu on pcpu (irq disabled)
-              It takes sched_out lock.
-
-- "path irq": read vcpu list on pcpu (irq context, running on the same pcpu
-              as "path sched_out")
-              It only takes sched_in lock.
-
-- "path sched_in": delete vcpu on previous pCPU.
-                  (irq disabled, running on the same or different pCPU
-                  as "path irq")
-                  It takes sched_in and sched_out lock as it can race
-                  with the other two paths.
-
-The lock ordering after this patch are:
-- &p->pi_lock --> &rq->__lock -->
-  &per_cpu(wakeup_vcpus_on_cpu_lock_out, cpu)
-- &per_cpu(wakeup_vcpus_on_cpu_lock_in, cpu) -->
-  &per_cpu(wakeup_vcpus_on_cpu_lock_out, cpu)
-- &per_cpu(wakeup_vcpus_on_cpu_lock_in, cpu) --> &p->pi_lock
-
-Currently, &rq->__lock is not held in "path sched_in".
-However, if in future "path sched_in" takes &p->pi_lock or &rq->__lock,
-lockdep is able to detect and warn in that case.
-
-Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-[sean: path sched_out and path irq does not race, path sched_in does not
-take &rq->__lock]
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
-v3:
-removed unnecessary blank line changes and delete a improper
-description.
-
-v2:
-switch from rcu to two raw_spin_locks. as rcu may not let the irq
-handler see list removal timely. (sean)
-https://lore.kernel.org/all/20230313094753.8345-1-yan.y.zhao@intel.com/
-
-v1:
-https://lore.kernel.org/all/20230310155955.29652-1-yan.y.zhao@intel.com/
----
- arch/x86/kvm/vmx/posted_intr.c | 29 +++++++++++++++++++----------
- 1 file changed, 19 insertions(+), 10 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-index 94c38bea60e7..f4a5fcb751c1 100644
---- a/arch/x86/kvm/vmx/posted_intr.c
-+++ b/arch/x86/kvm/vmx/posted_intr.c
-@@ -23,13 +23,19 @@
-  */
- static DEFINE_PER_CPU(struct list_head, wakeup_vcpus_on_cpu);
- /*
-- * Protect the per-CPU list with a per-CPU spinlock to handle task migration.
-+ * Protect the per-CPU list with two per-CPU spinlocks to handle task migration.
-+ * IRQs must be disabled when taking the two locks, otherwise deadlock will
-+ * occur if a wakeup IRQ arrives and attempts to acquire the locks.
-+ * ->sched_out() path before a vCPU blocking takes the "out lock", which will not
-+ * be taken in the wakeup IRQ handler that running at the same pCPU as the
-+ * ->sched_out() path.
-  * When a blocking vCPU is awakened _and_ migrated to a different pCPU, the
-  * ->sched_in() path will need to take the vCPU off the list of the _previous_
-- * CPU.  IRQs must be disabled when taking this lock, otherwise deadlock will
-- * occur if a wakeup IRQ arrives and attempts to acquire the lock.
-+ * CPU. It takes both "in lock" and "out lock" to take care of list racing of the
-+ * _previous_ CPU.
-  */
--static DEFINE_PER_CPU(raw_spinlock_t, wakeup_vcpus_on_cpu_lock);
-+static DEFINE_PER_CPU(raw_spinlock_t, wakeup_vcpus_on_cpu_lock_in);
-+static DEFINE_PER_CPU(raw_spinlock_t, wakeup_vcpus_on_cpu_lock_out);
- 
- static inline struct pi_desc *vcpu_to_pi_desc(struct kvm_vcpu *vcpu)
- {
-@@ -89,9 +95,11 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
- 	 * current pCPU if the task was migrated.
- 	 */
- 	if (pi_desc->nv == POSTED_INTR_WAKEUP_VECTOR) {
--		raw_spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
-+		raw_spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock_in, vcpu->cpu));
-+		raw_spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock_out, vcpu->cpu));
- 		list_del(&vmx->pi_wakeup_list);
--		raw_spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
-+		raw_spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock_out, vcpu->cpu));
-+		raw_spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock_in, vcpu->cpu));
- 	}
- 
- 	dest = cpu_physical_id(cpu);
-@@ -152,10 +160,10 @@ static void pi_enable_wakeup_handler(struct kvm_vcpu *vcpu)
- 
- 	local_irq_save(flags);
- 
--	raw_spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
-+	raw_spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock_out, vcpu->cpu));
- 	list_add_tail(&vmx->pi_wakeup_list,
- 		      &per_cpu(wakeup_vcpus_on_cpu, vcpu->cpu));
--	raw_spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
-+	raw_spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock_out, vcpu->cpu));
- 
- 	WARN(pi_desc->sn, "PI descriptor SN field set before blocking");
- 
-@@ -219,7 +227,7 @@ void pi_wakeup_handler(void)
- {
- 	int cpu = smp_processor_id();
- 	struct list_head *wakeup_list = &per_cpu(wakeup_vcpus_on_cpu, cpu);
--	raw_spinlock_t *spinlock = &per_cpu(wakeup_vcpus_on_cpu_lock, cpu);
-+	raw_spinlock_t *spinlock = &per_cpu(wakeup_vcpus_on_cpu_lock_in, cpu);
- 	struct vcpu_vmx *vmx;
- 
- 	raw_spin_lock(spinlock);
-@@ -234,7 +242,8 @@ void pi_wakeup_handler(void)
- void __init pi_init_cpu(int cpu)
- {
- 	INIT_LIST_HEAD(&per_cpu(wakeup_vcpus_on_cpu, cpu));
--	raw_spin_lock_init(&per_cpu(wakeup_vcpus_on_cpu_lock, cpu));
-+	raw_spin_lock_init(&per_cpu(wakeup_vcpus_on_cpu_lock_in, cpu));
-+	raw_spin_lock_init(&per_cpu(wakeup_vcpus_on_cpu_lock_out, cpu));
- }
- 
- bool pi_has_pending_interrupt(struct kvm_vcpu *vcpu)
-
-base-commit: 89400df96a7570b651404bbc3b7afe627c52a192
--- 
-2.17.1
-
+sorry, please review v3 directly.
+https://lore.kernel.org/all/20230313111022.13793-1-yan.y.zhao@intel.com/
