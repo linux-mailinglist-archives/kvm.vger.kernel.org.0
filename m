@@ -2,225 +2,933 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E046A6B6CEA
-	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 01:54:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D35936B6D19
+	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 02:31:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229783AbjCMAyh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Mar 2023 20:54:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51684 "EHLO
+        id S229864AbjCMBba (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Mar 2023 21:31:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229636AbjCMAyd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Mar 2023 20:54:33 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD2AB1631E;
-        Sun, 12 Mar 2023 17:54:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678668871; x=1710204871;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=MhP8aLCxdYuCGAJh4uWM52ksmcCmle4Wn2lkfOHO1dc=;
-  b=CbsjqyogYMUx1Ycd8iTU8V47TMdhzlBqhZ03UYQE1b1wJslapkoxOu2R
-   RuPOtxNuvw60TZwZjyg9iaBTNmePpv/NEklSw+qGUP1Q48Lkv9jYaCx+R
-   Znv0RJCWRqktWflJIOjxgAqyCQXKidyUiem6Pmggd2WnyEa5kXgS0nT8M
-   TKiC5WXU00q0OIXdulrkJiHXwXFRAxxLx+nro+k5T6+GWYev4JdaimEN1
-   vvdBYcTgjYhy+zw7g+isjA/aP6rAi8AkVJj+bQQ8WhOAt1lrQ9NokycE6
-   88DpunzJBVgEqwEwYmUXcllBxuzBhSySD64TPBc+2EZaIlQtaMZ62tymL
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="335732472"
-X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="335732472"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2023 17:54:31 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="671715733"
-X-IronPort-AV: E=Sophos;i="5.98,254,1673942400"; 
-   d="scan'208";a="671715733"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga007.jf.intel.com with ESMTP; 12 Mar 2023 17:54:30 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Sun, 12 Mar 2023 17:54:30 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Sun, 12 Mar 2023 17:54:30 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21 via Frontend Transport; Sun, 12 Mar 2023 17:54:30 -0700
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.45) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.21; Sun, 12 Mar 2023 17:54:29 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Q1rS3s8sRznN/MVegFYbAhOEHKJSkN61UL1fiGc8zgwGJZ45i6RF4nqbP22NmT2hvacXKyvaSLVLMUjUtLdDOw4I0S4t3JDwI+SjyPjn/rUcTKhucJtsya/1GzZyw61LHcH9sD9SfledYCgalph/xj9cYDQmNqjojsiGopAJntRDd0Zqd3APCLjB5O+G2ESEOojOL1i78LzG+id0TY7iuf2wt08xaVPGY4puwmanMW9+/wFsQpF6eZkZLkZoD1LS3YMNokNOEqWD1iPGgbNEr3aTCS+em097OzHDQWMIhFbAjdAj4W6D7BCUH/9tzrVfL3y9ytGTKoXLzM6kBBBqdA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MhP8aLCxdYuCGAJh4uWM52ksmcCmle4Wn2lkfOHO1dc=;
- b=W4aYM610ffMR29pVZN6KP2ym2rgwLgQcfxuymMFhRxGMQynYh/Tykpallyb37jQUd/GfmromHFH8c+RVrx7nHul96/oU0qHF5To0gkChm2lpyZjp4Uyru/RpZ/42e9Y1iZ5nQhxyOCwur5V3SIY6TAjOt111r48O+P3phbXjzK3zHFtyVnGgiWyZUw70sVJf2UP/SHIFs4goGdbmSk/sdaG7Dg2XsBpiQc5z9Suq3GUanigkgJXyyd8ugsskFiEXCxzP3K8dGmrpliHnZKu64QAsGygWg8HNiqb+jW64MOfNA3OVSHRYarYjHrjoK85cfXv8Y2V0mrl6AiM0KykT6w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by SA2PR11MB4889.namprd11.prod.outlook.com (2603:10b6:806:110::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.22; Mon, 13 Mar
- 2023 00:54:27 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::f403:a0a2:e468:c1e9]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::f403:a0a2:e468:c1e9%5]) with mapi id 15.20.6178.024; Mon, 13 Mar 2023
- 00:54:27 +0000
-From:   "Huang, Kai" <kai.huang@intel.com>
-To:     "tglx@linutronix.de" <tglx@linutronix.de>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        "andrew.cooper3@citrix.com" <andrew.cooper3@citrix.com>
-Subject: Re: [PATCH v2 07/18] x86/reboot: Disable virtualization during reboot
- iff callback is registered
-Thread-Topic: [PATCH v2 07/18] x86/reboot: Disable virtualization during
- reboot iff callback is registered
-Thread-Index: AQHZU5lLewEuXoBLxUmZ/uq2XZMwc6735YIA
-Date:   Mon, 13 Mar 2023 00:54:26 +0000
-Message-ID: <4ab086ad30cf5e1ddea863e1a2bcfa21ca72d37e.camel@intel.com>
-References: <20230310214232.806108-1-seanjc@google.com>
-         <20230310214232.806108-8-seanjc@google.com>
-In-Reply-To: <20230310214232.806108-8-seanjc@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Evolution 3.46.4 (3.46.4-1.fc37) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|SA2PR11MB4889:EE_
-x-ms-office365-filtering-correlation-id: e5ce2902-968f-4e99-a1e8-08db235d7edd
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 5fdCLlayHWO/MArpQ3FqgLo0kNcU6CYyBXRszF71/DHY7IJ45hid5U4VE28HCO4Qf02eGZCxyvUzuR6J+sPOzo2FoWQHYGjbl09jNwMnsroEqfbC66zsr69ZmX9rWxP/2W1N5cvM682hl7whghsqKkWgStqptOgG+mmNnamoY7rHGwLcFJPjkXpb3/dtNIZGHX1LZe4EdR0KKfTFkM2rrXwfc6Pp++zlmfL+zGny05+tR/Kx3aeZEl/GI5tg3xAYQ9JaoHlgP5JCqxX6aZ/3LBFa7QJn0j/1YYM27o77XVw3/qPlP0Rz1yj3+y8zVtZ3/hE7wdLjJf6eHFXyLfnkIwr5Bna9us76iLZ7BH9r/wOmaKZMQQGlvHamG4CKVY/80Ws2rMOPURrHGNCwLXG93lftI1VO2UuFGHPrCl3kdHKjculWX6koBhwXvFCL2IOJyGfEw3918gWrNVjSK2D9R7HZzxlZgMTZmWsGP72yILA1wVljyoM7eXhSIugEKU1ID4rff4mf1aTCJQCqN/wEJdvTwkjYbeqC9hx4tYOF5f5mMts3b9Kg9MjaCXg1oOzoxCglSxeBx39wko0Rwd+RnwzSZX6dn1zOZ96JoZ/PFdfH9T1F6CdecsGdLCWzYh/W4Ooj75LnE7Jizhd3J0dg1N68PVQPE6PZzanEijqSSMY37dkX7pkihuWNK0r9bttihUh0sPgrv84/JIjKoLejgw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(376002)(136003)(396003)(346002)(366004)(39860400002)(451199018)(36756003)(110136005)(54906003)(478600001)(71200400001)(5660300002)(316002)(6486002)(7416002)(2906002)(8676002)(8936002)(64756008)(91956017)(76116006)(66556008)(66946007)(66476007)(66446008)(41300700001)(4326008)(122000001)(82960400001)(38070700005)(86362001)(38100700002)(6512007)(186003)(6506007)(2616005)(26005)(83380400001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?WmlCTVFJRUtyQVNlSk5rS1RtSE5ZQVdRMnFwU0dtOTRaaFpodzdvYTlYZjBB?=
- =?utf-8?B?Zm1wdlhzMzA0aHFVdElVaGkxWC9ic3Vpam1aeVVIL2M4bG9LWkVIMHNSd3p5?=
- =?utf-8?B?RlR4Zlo3cnBtRDY4VlcxOGtZSkVpY09Sek1BUndnazVIb2NRZkVPc1M1S3l0?=
- =?utf-8?B?TXcrQlZ4bzF3dGpBcmdNWWRBQXphSEtLQWZ4ZlgvNjNoSE10a1RhdUlocnBo?=
- =?utf-8?B?b2pvSlh0T2Z5SDd6dEQ5MVFEbnUvVTNuSkl1enNsV3I2eUFYUlNBZnFLZWVI?=
- =?utf-8?B?VGNlMGNsZFpULzZoU3NrYUl5aHBnYXhVdzZtdlUzQVNCUTFoa0RqWEJ0Y1hr?=
- =?utf-8?B?Q0dZOW9IUlBYQXdHWitMeEdRdSt1cWlOZkZCV2NDMFFLRWNqU25yOVEyWEVH?=
- =?utf-8?B?NExrOG00am85SDBZTXpwSlpQQnd5anJ3anpuWjJhR0lrdDRUT05QQmdPSnpk?=
- =?utf-8?B?c1NRejlOQ2dtYjRaQndMcHozSUZMN2QyalBqbDFMQ3hYaklTcm5aS0FmbWhq?=
- =?utf-8?B?WVl1WXBvbHhDeVh6b01sV3U2Yml1Yld6RW4xa0tLWDljdGZNMUhUYVpRdmFa?=
- =?utf-8?B?NVRrYVlYSk5MdkxuZ0tSWUJmRFBGVWJRamgyemFiT1ZqNEs0QWtra1ZNZUla?=
- =?utf-8?B?d29LOERidGZWM0FQNktNTlFwLzF1OEZqZTRiTEp3a2Y4aytPNzRnYUU5TTJw?=
- =?utf-8?B?czNwZGh1UDlZcDRRSWJhTHNxNUN3ZnBzaEplYzExc29DWWxBVDN4QlFRTlYy?=
- =?utf-8?B?dmc0VVgwRFQvWDlTaUJ5ZlNGaTAyVkxRNzMvOFFCVG9MU0pPS3pOSVU2V0hJ?=
- =?utf-8?B?cWQ5VWczcVk4di9lKzkzTTVpMWlHRUcxd2wxb2N5eGVTYzdhbGZFaWNZOVJS?=
- =?utf-8?B?aWlKVy9xNENrU3ZVd2cyQUh4SHViTExkaTJ2QzhEd2F2bHhwaXpSc3BVd1N6?=
- =?utf-8?B?SVArSlRMOWNGbFRDZ0NBa1AvNkpkTmpuald6Q1pPRzJ5MTRiVk5WdFJLWXda?=
- =?utf-8?B?U0xKMklxRTF4aXY2czRMeDFYa0RLN2VxZ0M4VG9aY3FjREZGcHd3Ti9iRTI2?=
- =?utf-8?B?YWo3OGNQaDJ1cGczYkI0cmlHSndvaXVBN2V1Q2cwWnBPMVZ4cXhLZitWVXBp?=
- =?utf-8?B?cHdldEV3OEdROW9oV0tZWHJrVG0xK1BVbE1CczFzTzh1NXBNSXJWejFsTTBL?=
- =?utf-8?B?YnJRWmtoUTZ6Qm9YYmZQUzlSRVVVaEhvVExURGJ2SUJTMC9uTngyQ1R4dTZ0?=
- =?utf-8?B?SnhJN0NYSUVSci8xd2tTMm9DNkRlWnRzQXdKNCtpZk5vSzA1c2hqTjJxbHlS?=
- =?utf-8?B?aHoyUjlNWEtYS1dTSjg1NEdHZXBGeCtiR0pZdWY5NGJ2eVdGeWQ3TW1OLzFP?=
- =?utf-8?B?NW1BejFDMkxnNkRVY2IwLzRhKzdsVGUyblpjWEduWUd4bUN3cG1yM3NZVjVL?=
- =?utf-8?B?SmNkVXAyUkVOb1ZMNDF3VmtXWmFCamw5V2dsbXluZ01nd1k5V0J0V2hSdjFl?=
- =?utf-8?B?L0M5QzVZbUExeWNDYUxIQ2E1UXdXVmZIUUFyMFJ5azVSSVRBV1NzU2N3MDVn?=
- =?utf-8?B?RlJJSHE5cVFMU21NWkNjK1AwY3dJVElJQXo5aTBqbzhPclZKRHQ2Zi9QeEJI?=
- =?utf-8?B?NjFMYnI5TmlnRkhEWjJKWUJqWDMvU2JjRlR6RkdBZU9MTGNYOHBiL0gzRUw3?=
- =?utf-8?B?encvYWhuczJOM0k3cVVwcklPbktxKzV5dUlwRFp4amFweUxOVTZyMW5kV0Q4?=
- =?utf-8?B?WmlhSFdFRXAvTEFnS09BRWp2aDdNeU4wRVMyNTdyV0hycjdhZjdxN3R6YUxs?=
- =?utf-8?B?a21YV1psVFU1Yy9lc28ydThNanBXUnMyN0NoWlp3bEdFQmVCdXpuT2oyZnJ0?=
- =?utf-8?B?Y042R0J4QjZETEdyRU4wbmtSVnVYS0ltSUdEdnJ2Z3YySnJFRkNSaGFkcTMw?=
- =?utf-8?B?Q2ZoZGgzc0ZBS05NbnYyUUhKYnlOZ2RhMlJLWEcvMS8xdWNBVmdSWTYrcVRu?=
- =?utf-8?B?c0lYNHp3YkNwSU1NRldzeFRMRVlsKzlKNkE1Si9WY2dFdnJVdVMzTDBkenRa?=
- =?utf-8?B?WWNIT253RHZocVVNMksrRU5CMjBFcnRLRjduWGZyZlRlaXdrb2YzdTVVeXNx?=
- =?utf-8?B?U0hnenlOM05nUnpnd2FaVVNEME4wTUkwd0xubXh1RWt2MDJqU2Z6TWtrYkFq?=
- =?utf-8?B?REE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <25ED2779578D3B4BB64505EBD10E9BEC@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        with ESMTP id S229628AbjCMBb2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Mar 2023 21:31:28 -0400
+Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9C9173A86E;
+        Sun, 12 Mar 2023 18:31:24 -0700 (PDT)
+Received: from loongson.cn (unknown [10.20.42.120])
+        by gateway (Coremail) with SMTP id _____8AxJPzqfA5k1ckLAA--.16456S3;
+        Mon, 13 Mar 2023 09:31:22 +0800 (CST)
+Received: from [10.20.42.120] (unknown [10.20.42.120])
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8AxOL3ofA5kqLlVAA--.16531S3;
+        Mon, 13 Mar 2023 09:31:21 +0800 (CST)
+Subject: Re: [PATCH v3 19/29] LoongArch: KVM: Implement kvm mmu operations
+To:     maobibo <maobibo@loongson.cn>, Paolo Bonzini <pbonzini@redhat.com>
+References: <20230228070057.3687180-1-zhaotianrui@loongson.cn>
+ <20230228070057.3687180-20-zhaotianrui@loongson.cn>
+ <8ba8c05d-af9e-ae3e-c19d-61e1eaf56e19@loongson.cn>
+Cc:     Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Xi Ruoyao <xry111@xry111.site>
+From:   Tianrui Zhao <zhaotianrui@loongson.cn>
+Message-ID: <32d56f21-d18e-56a9-3dc2-01555f90c949@loongson.cn>
+Date:   Mon, 13 Mar 2023 09:31:20 +0800
+User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:45.0) Gecko/20100101
+ Thunderbird/45.4.0
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e5ce2902-968f-4e99-a1e8-08db235d7edd
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Mar 2023 00:54:27.0129
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: nv5DnymvcH0GEI/hSHu32FF5vB4iPPwE3EnIX3v71j4hxABTfNJSOqFOgbQGPguBwhe4ib8Hk/02QBqeyeyVrw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB4889
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <8ba8c05d-af9e-ae3e-c19d-61e1eaf56e19@loongson.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: AQAAf8AxOL3ofA5kqLlVAA--.16531S3
+X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
+X-Coremail-Antispam: 1Uk129KBjvAXoWfXF47ur48Jw13CFWfKFWDtwb_yoW5Jry7uo
+        WfGr4Ikw1xAryUJFWUAry5trWj93ykWrW7AFn5AwsxXF1Yqa4UWFs8Ww4rZrW5CF1Yka4f
+        Aas3Xw10yFWvqwnxn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXasCq-sGcSsGvf
+        J3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnRJU
+        UUPYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2IYs7xG6rWj6s
+        0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
+        Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1l84
+        ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UM2kK
+        e7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zVCFFI
+        0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUAVWUtwAv7VC2z280
+        aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2
+        xFo4CEbIxvr21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC
+        6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s
+        026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF
+        0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0x
+        vE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv
+        6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07j5o7tUUUUU=
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gRnJpLCAyMDIzLTAzLTEwIGF0IDEzOjQyIC0wODAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
-b3RlOg0KPiBBdHRlbXB0IHRvIGRpc2FibGUgdmlydHVhbGl6YXRpb24gZHVyaW5nIGFuIGVtZXJn
-ZW5jeSByZWJvb3QgaWYgYW5kIG9ubHkNCj4gaWYgdGhlcmUgaXMgYSByZWdpc3RlcmVkIHZpcnQg
-Y2FsbGJhY2ssIGkuZS4gaWZmIGEgaHlwZXJ2aXNvciAoS1ZNKSBpcw0KPiBhY3RpdmUuICBJZiB0
-aGVyZSdzIG5vIGFjdGl2ZSBoeXBlcnZpc29yLCB0aGVuIHRoZSBDUFUgY2FuJ3QgYmUgb3BlcmF0
-aW5nDQo+IHdpdGggVk1YIG9yIFNWTSBlbmFibGVkIChiYXJyaW5nIGFuIGVncmVnaW91cyBidWcp
-Lg0KDQpJSVVDLCB0aGlzIHBhdGNoIGlzIHRoZSBmaW5hbCBvbmUgdGhhdCB5b3Ugd2FudCB0byBh
-Y2hpZXZlIGhvdyB0aGUgImRpc2FibGUNCnZpcnR1YWxpemF0aW9uIiBjYWxsYmFjayBzaG91bGQg
-d29yayBpbiB0aGUgbm9uLUtWTSBjb3JlIGtlcm5lbCAodGhlIHJlc3QNCnBhdGNoZXMgYXJlIHJl
-bGF0ZWQgdG8gbW92aW5nIFZNWE9GRiBjb2RlIHRvIEtWTSBhcyB0aGUgY29yZS1rZXJuZWwgbm93
-IGp1c3QNCmNhbGxzIHRoZSBjYWxsYmFjaywgZXRjKS4gwqANCg0KVGhlcmUgYXJlIG1pZGRsZSBz
-dGVwIHBhdGNoZXMgKDItNykgdG8gZXZlbnR1YWxseSBoZWxwIHRvIGdldCB0byB0aGlzIHBvaW50
-LiANCkJ1dCB0byBiZSBob25lc3QsIHBlcnNvbmFsbHksIEkgYW0gbm90IHN1cmUgd2hldGhlciB0
-aG9zZSBwYXRjaGVzIGFyZSBuZWNlc3NhcnksDQppLmUuIHRvIG1lIHRoZXkgYWN0dWFsbHkgY29z
-dCBtb3JlIHRpbWUgdG8gcmV2aWV3IHNpbmNlIEkgaGF2ZSB0byB0aGluayB3aGV0aGVyDQpzdWNo
-IGludGVybWVkaWF0ZSBzdGF0dXMgaXMgcmVhc29uYWJsZSBvciBub3QuICBJIGFtIHdvbmRlcmlu
-ZyB3aGV0aGVyIHdlIGNhbg0KanVzdCBtZXJnZSB0aG9zZSBwYXRjaGVzIHRvZ2V0aGVyIGFzIHNp
-bmdsZSBvbmUsIHNvIGl0J3MgZWFzeSB0byBzZWUgd2hhdCBpcyB0aGUNCmZpbmFsIGdvYWwgdG8g
-YWNoaWV2ZT8NCg0KSnVzdCBteSAyY2VudHMsIG9mIGNvdXJzZS4NCg0KPiANCj4gTm90ZSwgSVJR
-cyBhcmUgZGlzYWJsZWQsIHdoaWNoIHByZXZlbnRzIEtWTSBmcm9tIGNvbWluZyBhbG9uZyBhbmQg
-ZW5hYmxpbmcNCj4gdmlydHVhbGl6YXRpb24gYWZ0ZXIgdGhlIGZhY3QuDQo+IA0KPiBTaWduZWQt
-b2ZmLWJ5OiBTZWFuIENocmlzdG9waGVyc29uIDxzZWFuamNAZ29vZ2xlLmNvbT4NCj4gLS0tDQo+
-ICBhcmNoL3g4Ni9rZXJuZWwvcmVib290LmMgfCA3ICsrKystLS0NCj4gIDEgZmlsZSBjaGFuZ2Vk
-LCA0IGluc2VydGlvbnMoKyksIDMgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvYXJj
-aC94ODYva2VybmVsL3JlYm9vdC5jIGIvYXJjaC94ODYva2VybmVsL3JlYm9vdC5jDQo+IGluZGV4
-IGNiMjY4ZWM3Y2U4NS4uZGQ3ZGVmM2Q0MTQ0IDEwMDY0NA0KPiAtLS0gYS9hcmNoL3g4Ni9rZXJu
-ZWwvcmVib290LmMNCj4gKysrIGIvYXJjaC94ODYva2VybmVsL3JlYm9vdC5jDQo+IEBAIC0yMiw3
-ICsyMiw2IEBADQo+ICAjaW5jbHVkZSA8YXNtL3JlYm9vdF9maXh1cHMuaD4NCj4gICNpbmNsdWRl
-IDxhc20vcmVib290Lmg+DQo+ICAjaW5jbHVkZSA8YXNtL3BjaV94ODYuaD4NCj4gLSNpbmNsdWRl
-IDxhc20vdmlydGV4dC5oPg0KPiAgI2luY2x1ZGUgPGFzbS9jcHUuaD4NCj4gICNpbmNsdWRlIDxh
-c20vbm1pLmg+DQo+ICAjaW5jbHVkZSA8YXNtL3NtcC5oPg0KPiBAQCAtNTY4LDcgKzU2Nyw2IEBA
-IHZvaWQgY3B1X2VtZXJnZW5jeV9kaXNhYmxlX3ZpcnR1YWxpemF0aW9uKHZvaWQpDQo+ICAJCWNh
-bGxiYWNrKCk7DQo+ICAJcmN1X3JlYWRfdW5sb2NrKCk7DQo+ICB9DQo+IC0jZW5kaWYgLyogQ09O
-RklHX0tWTV9JTlRFTCB8fCBDT05GSUdfS1ZNX0FNRCAqLw0KPiAgDQo+ICBzdGF0aWMgdm9pZCBl
-bWVyZ2VuY3lfcmVib290X2Rpc2FibGVfdmlydHVhbGl6YXRpb24odm9pZCkNCj4gIHsNCj4gQEAg
-LTU4NSw3ICs1ODMsNyBAQCBzdGF0aWMgdm9pZCBlbWVyZ2VuY3lfcmVib290X2Rpc2FibGVfdmly
-dHVhbGl6YXRpb24odm9pZCkNCj4gIAkgKiBEbyB0aGUgTk1JIHNob290ZG93biBldmVuIGlmIHZp
-cnR1YWxpemF0aW9uIGlzIG9mZiBvbiBfdGhpc18gQ1BVLCBhcw0KPiAgCSAqIG90aGVyIENQVXMg
-bWF5IGhhdmUgdmlydHVhbGl6YXRpb24gZW5hYmxlZC4NCj4gIAkgKi8NCj4gLQlpZiAoY3B1X2hh
-c192bXgoKSB8fCBjcHVfaGFzX3N2bShOVUxMKSkgew0KPiArCWlmIChyY3VfYWNjZXNzX3BvaW50
-ZXIoY3B1X2VtZXJnZW5jeV92aXJ0X2NhbGxiYWNrKSkgew0KPiAgCQkvKiBTYWZlbHkgZm9yY2Ug
-X3RoaXNfIENQVSBvdXQgb2YgVk1YL1NWTSBvcGVyYXRpb24uICovDQo+ICAJCWNwdV9lbWVyZ2Vu
-Y3lfZGlzYWJsZV92aXJ0dWFsaXphdGlvbigpOw0KPiAgDQo+IEBAIC01OTMsNiArNTkxLDkgQEAg
-c3RhdGljIHZvaWQgZW1lcmdlbmN5X3JlYm9vdF9kaXNhYmxlX3ZpcnR1YWxpemF0aW9uKHZvaWQp
-DQo+ICAJCW5taV9zaG9vdGRvd25fY3B1c19vbl9yZXN0YXJ0KCk7DQo+ICAJfQ0KPiAgfQ0KPiAr
-I2Vsc2UNCj4gK3N0YXRpYyB2b2lkIGVtZXJnZW5jeV9yZWJvb3RfZGlzYWJsZV92aXJ0dWFsaXph
-dGlvbih2b2lkKSB7IH0NCj4gKyNlbmRpZiAvKiBDT05GSUdfS1ZNX0lOVEVMIHx8IENPTkZJR19L
-Vk1fQU1EICovDQo+ICANCj4gIA0KPiAgdm9pZCBfX2F0dHJpYnV0ZV9fKCh3ZWFrKSkgbWFjaF9y
-ZWJvb3RfZml4dXBzKHZvaWQpDQo+IC0tIA0KPiAyLjQwLjAucmMxLjI4NC5nODgyNTRkNTFjNS1n
-b29nDQo+IA0KDQo=
+
+
+
+在 2023年03月07日 10:49, maobibo 写道:
+>
+> 在 2023/2/28 15:00, Tianrui Zhao 写道:
+>> Implement loongarch kvm mmu, it is used to switch gpa to hpa when
+>> guest exit because of address translation exception. This patch
+>> implement allocate gpa page table, search gpa from it and flush guest
+>> gpa in the table.
+>>
+>> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+>> ---
+>>   arch/loongarch/kvm/mmu.c | 821 +++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 821 insertions(+)
+>>   create mode 100644 arch/loongarch/kvm/mmu.c
+>>
+>> diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
+>> new file mode 100644
+>> index 000000000000..049824f8e462
+>> --- /dev/null
+>> +++ b/arch/loongarch/kvm/mmu.c
+>> @@ -0,0 +1,821 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +/*
+>> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
+>> + */
+>> +
+>> +#include <linux/highmem.h>
+>> +#include <linux/hugetlb.h>
+>> +#include <linux/page-flags.h>
+>> +#include <linux/kvm_host.h>
+>> +#include <linux/uaccess.h>
+>> +#include <asm/kvm_host.h>
+>> +#include <asm/mmu_context.h>
+>> +#include <asm/pgalloc.h>
+>> +#include <asm/tlb.h>
+>> +
+>> +/*
+>> + * KVM_MMU_CACHE_MIN_PAGES is the number of GPA page table translation levels
+>> + * for which pages need to be cached.
+>> + */
+>> +#if defined(__PAGETABLE_PMD_FOLDED)
+>> +#define KVM_MMU_CACHE_MIN_PAGES 1
+>> +#else
+>> +#define KVM_MMU_CACHE_MIN_PAGES 2
+>> +#endif
+>> +
+>> +/**
+>> + * kvm_pgd_alloc() - Allocate and initialise a KVM GPA page directory.
+>> + *
+>> + * Allocate a blank KVM GPA page directory (PGD) for representing guest physical
+>> + * to host physical page mappings.
+>> + *
+>> + * Returns:	Pointer to new KVM GPA page directory.
+>> + *		NULL on allocation failure.
+>> + */
+>> +pgd_t *kvm_pgd_alloc(void)
+>> +{
+>> +	pgd_t *pgd;
+>> +
+>> +	pgd = (pgd_t *)__get_free_pages(GFP_KERNEL, 0);
+>> +	if (pgd)
+>> +		pgd_init((void *)pgd);
+>> +
+>> +	return pgd;
+>> +}
+>> +
+>> +/**
+>> + * kvm_walk_pgd() - Walk page table with optional allocation.
+>> + * @pgd:	Page directory pointer.
+>> + * @addr:	Address to index page table using.
+>> + * @cache:	MMU page cache to allocate new page tables from, or NULL.
+>> + *
+>> + * Walk the page tables pointed to by @pgd to find the PTE corresponding to the
+>> + * address @addr. If page tables don't exist for @addr, they will be created
+>> + * from the MMU cache if @cache is not NULL.
+>> + *
+>> + * Returns:	Pointer to pte_t corresponding to @addr.
+>> + *		NULL if a page table doesn't exist for @addr and !@cache.
+>> + *		NULL if a page table allocation failed.
+>> + */
+>> +static pte_t *kvm_walk_pgd(pgd_t *pgd, struct kvm_mmu_memory_cache *cache,
+>> +				unsigned long addr)
+>> +{
+>> +	p4d_t *p4d;
+>> +	pud_t *pud;
+>> +	pmd_t *pmd;
+>> +
+>> +	pgd += pgd_index(addr);
+>> +	if (pgd_none(*pgd)) {
+>> +		/* Not used yet */
+>> +		BUG();
+>> +		return NULL;
+>> +	}
+>> +	p4d = p4d_offset(pgd, addr);
+>> +	pud = pud_offset(p4d, addr);
+>> +	if (pud_none(*pud)) {
+>> +		pmd_t *new_pmd;
+>> +
+>> +		if (!cache)
+>> +			return NULL;
+>> +		new_pmd = kvm_mmu_memory_cache_alloc(cache);
+>> +		pmd_init((void *)new_pmd);
+>> +		pud_populate(NULL, pud, new_pmd);
+>> +	}
+>> +	pmd = pmd_offset(pud, addr);
+>> +	if (pmd_none(*pmd)) {
+>> +		pte_t *new_pte;
+>> +
+>> +		if (!cache)
+>> +			return NULL;
+>> +		new_pte = kvm_mmu_memory_cache_alloc(cache);
+>> +		clear_page(new_pte);
+>> +		pmd_populate_kernel(NULL, pmd, new_pte);
+>> +	}
+>> +	return pte_offset_kernel(pmd, addr);
+>> +}
+>> +
+>> +/* Caller must hold kvm->mm_lock */
+>> +static pte_t *kvm_pte_for_gpa(struct kvm *kvm,
+>> +				struct kvm_mmu_memory_cache *cache,
+>> +				unsigned long addr)
+>> +{
+>> +	return kvm_walk_pgd(kvm->arch.gpa_mm.pgd, cache, addr);
+>> +}
+>> +
+>> +/*
+>> + * kvm_flush_gpa_{pte,pmd,pud,pgd,pt}.
+>> + * Flush a range of guest physical address space from the VM's GPA page tables.
+>> + */
+>> +
+>> +static bool kvm_flush_gpa_pte(pte_t *pte, unsigned long start_gpa,
+>> +				   unsigned long end_gpa, unsigned long *data)
+>> +{
+>> +	int i_min = pte_index(start_gpa);
+>> +	int i_max = pte_index(end_gpa);
+>> +	bool safe_to_remove = (i_min == 0 && i_max == PTRS_PER_PTE - 1);
+>> +	int i;
+>> +
+>> +	for (i = i_min; i <= i_max; ++i) {
+>> +		if (!pte_present(pte[i]))
+>> +			continue;
+>> +
+>> +		set_pte(pte + i, __pte(0));
+>> +		if (data)
+>> +			*data += 1;
+>> +	}
+>> +	return safe_to_remove;
+>> +}
+>> +
+>> +static bool kvm_flush_gpa_pmd(pmd_t *pmd, unsigned long start_gpa,
+>> +				   unsigned long end_gpa, unsigned long *data)
+>> +{
+>> +	pte_t *pte;
+>> +	unsigned long end = ~0ul;
+>> +	int i_min = pmd_index(start_gpa);
+>> +	int i_max = pmd_index(end_gpa);
+>> +	bool safe_to_remove = (i_min == 0 && i_max == PTRS_PER_PMD - 1);
+>> +	int i;
+>> +
+>> +	for (i = i_min; i <= i_max; ++i, start_gpa = 0) {
+>> +		if (!pmd_present(pmd[i]))
+>> +			continue;
+>> +
+>> +		pte = pte_offset_kernel(pmd + i, 0);
+>> +		if (i == i_max)
+>> +			end = end_gpa;
+>> +
+>> +		if (kvm_flush_gpa_pte(pte, start_gpa, end, data)) {
+>> +			pmd_clear(pmd + i);
+>> +			pte_free_kernel(NULL, pte);
+>> +		} else {
+>> +			safe_to_remove = false;
+>> +		}
+>> +	}
+>> +	return safe_to_remove;
+>> +}
+>> +
+>> +static bool kvm_flush_gpa_pud(pud_t *pud, unsigned long start_gpa,
+>> +				   unsigned long end_gpa, unsigned long *data)
+>> +{
+>> +	pmd_t *pmd;
+>> +	unsigned long end = ~0ul;
+>> +	int i_min = pud_index(start_gpa);
+>> +	int i_max = pud_index(end_gpa);
+>> +	bool safe_to_remove = (i_min == 0 && i_max == PTRS_PER_PUD - 1);
+>> +	int i;
+>> +
+>> +	for (i = i_min; i <= i_max; ++i, start_gpa = 0) {
+>> +		if (!pud_present(pud[i]))
+>> +			continue;
+>> +
+>> +		pmd = pmd_offset(pud + i, 0);
+>> +		if (i == i_max)
+>> +			end = end_gpa;
+>> +
+>> +		if (kvm_flush_gpa_pmd(pmd, start_gpa, end, data)) {
+>> +			pud_clear(pud + i);
+>> +			pmd_free(NULL, pmd);
+>> +		} else {
+>> +			safe_to_remove = false;
+>> +		}
+>> +	}
+>> +	return safe_to_remove;
+>> +}
+>> +
+>> +static bool kvm_flush_gpa_pgd(pgd_t *pgd, unsigned long start_gpa,
+>> +				unsigned long end_gpa, unsigned long *data)
+>> +{
+>> +	p4d_t *p4d;
+>> +	pud_t *pud;
+>> +	unsigned long end = ~0ul;
+>> +	int i_min = pgd_index(start_gpa);
+>> +	int i_max = pgd_index(end_gpa);
+>> +	bool safe_to_remove = (i_min == 0 && i_max == PTRS_PER_PGD - 1);
+>> +	int i;
+>> +
+>> +	for (i = i_min; i <= i_max; ++i, start_gpa = 0) {
+>> +		if (!pgd_present(pgd[i]))
+>> +			continue;
+>> +
+>> +		p4d = p4d_offset(pgd, 0);
+>> +		pud = pud_offset(p4d + i, 0);
+>> +		if (i == i_max)
+>> +			end = end_gpa;
+>> +
+>> +		if (kvm_flush_gpa_pud(pud, start_gpa, end, data)) {
+>> +			pgd_clear(pgd + i);
+>> +			pud_free(NULL, pud);
+>> +		} else {
+>> +			safe_to_remove = false;
+>> +		}
+>> +	}
+>> +	return safe_to_remove;
+>> +}
+>> +
+>> +/**
+>> + * kvm_flush_gpa_range() - Flush a range of guest physical addresses.
+>> + * @kvm:	KVM pointer.
+>> + * @start_gfn:	Guest frame number of first page in GPA range to flush.
+>> + * @end_gfn:	Guest frame number of last page in GPA range to flush.
+>> + *
+>> + * Flushes a range of GPA mappings from the GPA page tables.
+>> + *
+>> + * The caller must hold the @kvm->mmu_lock spinlock.
+>> + *
+>> + * Returns:	Whether its safe to remove the top level page directory because
+>> + *		all lower levels have been removed.
+>> + */
+>> +static bool kvm_flush_gpa_range(struct kvm *kvm, gfn_t start_gfn, gfn_t end_gfn, void *data)
+>> +{
+>> +	return kvm_flush_gpa_pgd(kvm->arch.gpa_mm.pgd,
+>> +				start_gfn << PAGE_SHIFT,
+>> +				end_gfn << PAGE_SHIFT, (unsigned long *)data);
+>> +}
+>> +
+>> +/*
+>> + * kvm_mkclean_gpa_pt.
+>> + * Mark a range of guest physical address space clean (writes fault) in the VM's
+>> + * GPA page table to allow dirty page tracking.
+>> + */
+>> +
+>> +static int kvm_mkclean_pte(pte_t *pte, unsigned long start, unsigned long end)
+>> +{
+>> +	int ret = 0;
+>> +	int i_min = pte_index(start);
+>> +	int i_max = pte_index(end);
+>> +	int i;
+>> +	pte_t val;
+>> +
+>> +	for (i = i_min; i <= i_max; ++i) {
+>> +		val = pte[i];
+>> +		if (pte_present(val) && pte_dirty(val)) {
+>> +			set_pte(pte + i, pte_mkclean(val));
+>> +			ret = 1;
+>> +		}
+>> +	}
+>> +	return ret;
+>> +}
+>> +
+>> +static int kvm_mkclean_pmd(pmd_t *pmd, unsigned long start, unsigned long end)
+>> +{
+>> +	int ret = 0;
+>> +	pte_t *pte;
+>> +	unsigned long cur_end = ~0ul;
+>> +	int i_min = pmd_index(start);
+>> +	int i_max = pmd_index(end);
+>> +	int i;
+>> +
+>> +	for (i = i_min; i <= i_max; ++i, start = 0) {
+>> +		if (!pmd_present(pmd[i]))
+>> +			continue;
+>> +
+>> +		pte = pte_offset_kernel(pmd + i, 0);
+>> +		if (i == i_max)
+>> +			cur_end = end;
+>> +
+>> +		ret |= kvm_mkclean_pte(pte, start, cur_end);
+>> +	}
+>> +
+>> +	return ret;
+>> +}
+>> +
+>> +static int kvm_mkclean_pud(pud_t *pud, unsigned long start, unsigned long end)
+>> +{
+>> +	int ret = 0;
+>> +	pmd_t *pmd;
+>> +	unsigned long cur_end = ~0ul;
+>> +	int i_min = pud_index(start);
+>> +	int i_max = pud_index(end);
+>> +	int i;
+>> +
+>> +	for (i = i_min; i <= i_max; ++i, start = 0) {
+>> +		if (!pud_present(pud[i]))
+>> +			continue;
+>> +
+>> +		pmd = pmd_offset(pud + i, 0);
+>> +		if (i == i_max)
+>> +			cur_end = end;
+>> +
+>> +		ret |= kvm_mkclean_pmd(pmd, start, cur_end);
+>> +	}
+>> +	return ret;
+>> +}
+>> +
+>> +static int kvm_mkclean_pgd(pgd_t *pgd, unsigned long start, unsigned long end)
+>> +{
+>> +	int ret = 0;
+>> +	p4d_t *p4d;
+>> +	pud_t *pud;
+>> +	unsigned long cur_end = ~0ul;
+>> +	int i_min = pgd_index(start);
+>> +	int i_max = pgd_index(end);
+>> +	int i;
+>> +
+>> +	for (i = i_min; i <= i_max; ++i, start = 0) {
+>> +		if (!pgd_present(pgd[i]))
+>> +			continue;
+>> +
+>> +		p4d = p4d_offset(pgd, 0);
+>> +		pud = pud_offset(p4d + i, 0);
+>> +		if (i == i_max)
+>> +			cur_end = end;
+>> +
+>> +		ret |= kvm_mkclean_pud(pud, start, cur_end);
+>> +	}
+>> +	return ret;
+>> +}
+>> +
+>> +/**
+>> + * kvm_mkclean_gpa_pt() - Make a range of guest physical addresses clean.
+>> + * @kvm:	KVM pointer.
+>> + * @start_gfn:	Guest frame number of first page in GPA range to flush.
+>> + * @end_gfn:	Guest frame number of last page in GPA range to flush.
+>> + *
+>> + * Make a range of GPA mappings clean so that guest writes will fault and
+>> + * trigger dirty page logging.
+>> + *
+>> + * The caller must hold the @kvm->mmu_lock spinlock.
+>> + *
+>> + * Returns:	Whether any GPA mappings were modified, which would require
+>> + *		derived mappings (GVA page tables & TLB enties) to be
+>> + *		invalidated.
+>> + */
+>> +static int kvm_mkclean_gpa_pt(struct kvm *kvm, gfn_t start_gfn, gfn_t end_gfn)
+>> +{
+>> +	return kvm_mkclean_pgd(kvm->arch.gpa_mm.pgd, start_gfn << PAGE_SHIFT,
+>> +				end_gfn << PAGE_SHIFT);
+>> +}
+>> +
+>> +/**
+>> + * kvm_arch_mmu_enable_log_dirty_pt_masked() - write protect dirty pages
+>> + * @kvm:	The KVM pointer
+>> + * @slot:	The memory slot associated with mask
+>> + * @gfn_offset:	The gfn offset in memory slot
+>> + * @mask:	The mask of dirty pages at offset 'gfn_offset' in this memory
+>> + *		slot to be write protected
+>> + *
+>> + * Walks bits set in mask write protects the associated pte's. Caller must
+>> + * acquire @kvm->mmu_lock.
+>> + */
+>> +void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+>> +		struct kvm_memory_slot *slot,
+>> +		gfn_t gfn_offset, unsigned long mask)
+>> +{
+>> +	gfn_t base_gfn = slot->base_gfn + gfn_offset;
+>> +	gfn_t start = base_gfn +  __ffs(mask);
+>> +	gfn_t end = base_gfn + __fls(mask);
+>> +
+>> +	kvm_mkclean_gpa_pt(kvm, start, end);
+>> +}
+>> +
+>> +void kvm_arch_commit_memory_region(struct kvm *kvm,
+>> +				   struct kvm_memory_slot *old,
+>> +				   const struct kvm_memory_slot *new,
+>> +				   enum kvm_mr_change change)
+>> +{
+>> +	int needs_flush;
+>> +
+>> +	/*
+>> +	 * If dirty page logging is enabled, write protect all pages in the slot
+>> +	 * ready for dirty logging.
+>> +	 *
+>> +	 * There is no need to do this in any of the following cases:
+>> +	 * CREATE:	No dirty mappings will already exist.
+>> +	 * MOVE/DELETE:	The old mappings will already have been cleaned up by
+>> +	 *		kvm_arch_flush_shadow_memslot()
+>> +	 */
+>> +	if (change == KVM_MR_FLAGS_ONLY &&
+>> +	    (!(old->flags & KVM_MEM_LOG_DIRTY_PAGES) &&
+>> +	     new->flags & KVM_MEM_LOG_DIRTY_PAGES)) {
+>> +		spin_lock(&kvm->mmu_lock);
+>> +		/* Write protect GPA page table entries */
+>> +		needs_flush = kvm_mkclean_gpa_pt(kvm, new->base_gfn,
+>> +					new->base_gfn + new->npages - 1);
+>> +		if (needs_flush)
+>> +			kvm_flush_remote_tlbs(kvm);
+>> +		spin_unlock(&kvm->mmu_lock);
+>> +	}
+>> +}
+>> +
+>> +void kvm_arch_flush_shadow_all(struct kvm *kvm)
+>> +{
+>> +	/* Flush whole GPA */
+>> +	kvm_flush_gpa_range(kvm, 0, ~0UL, NULL);
+>> +	/* Flush vpid for each VCPU individually */
+>> +	kvm_flush_remote_tlbs(kvm);
+>> +}
+>> +
+>> +void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+>> +		struct kvm_memory_slot *slot)
+>> +{
+>> +	unsigned long npages;
+>> +
+>> +	/*
+>> +	 * The slot has been made invalid (ready for moving or deletion), so we
+>> +	 * need to ensure that it can no longer be accessed by any guest VCPUs.
+>> +	 */
+>> +
+>> +	npages = 0;
+>> +	spin_lock(&kvm->mmu_lock);
+>> +	/* Flush slot from GPA */
+>> +	kvm_flush_gpa_range(kvm, slot->base_gfn,
+>> +			slot->base_gfn + slot->npages - 1, &npages);
+>> +	/* Let implementation do the rest */
+>> +	if (npages)
+>> +		kvm_flush_remote_tlbs(kvm);
+>> +	spin_unlock(&kvm->mmu_lock);
+>> +}
+>> +
+>> +void _kvm_destroy_mm(struct kvm *kvm)
+>> +{
+>> +	/* It should always be safe to remove after flushing the whole range */
+>> +	WARN_ON(!kvm_flush_gpa_range(kvm, 0, ~0UL, NULL));
+> Only _kvm_destroy_mm cares about return value about function
+> kvm_flush_gpa_range, it always return true since it is flushing
+> the whole range.
+>
+> Can return value of function kvm_flush_gpa_range be defined as void rather
+> than bool?  By this way, safe_to_remove can be removed in function kvm_flush_gpa_pgd
+> etc.
+>
+> Regards
+> Bibo, Mao
+>
+Thanks, It is more suitable to use void return value in 
+kvm_flush_gpa_range, and the safe_to_remove flag can be removed as it 
+has no effect in the function.
+
+Thank
+Tianrui Zhao
+>> +	pgd_free(NULL, kvm->arch.gpa_mm.pgd);
+>> +	kvm->arch.gpa_mm.pgd = NULL;
+>> +}
+>> +
+>> +/*
+>> + * Mark a range of guest physical address space old (all accesses fault) in the
+>> + * VM's GPA page table to allow detection of commonly used pages.
+>> + */
+>> +
+>> +static int kvm_mkold_pte(pte_t *pte, unsigned long start, unsigned long end)
+>> +{
+>> +	int ret = 0;
+>> +	int i_min = pte_index(start);
+>> +	int i_max = pte_index(end);
+>> +	int i;
+>> +	pte_t old, new;
+>> +
+>> +	for (i = i_min; i <= i_max; ++i) {
+>> +		if (!pte_present(pte[i]))
+>> +			continue;
+>> +
+>> +		old = pte[i];
+>> +		new = pte_mkold(old);
+>> +		if (pte_val(new) == pte_val(old))
+>> +			continue;
+>> +		set_pte(pte + i, new);
+>> +		ret = 1;
+>> +	}
+>> +
+>> +	return ret;
+>> +}
+>> +
+>> +static int kvm_mkold_pmd(pmd_t *pmd, unsigned long start, unsigned long end)
+>> +{
+>> +	int ret = 0;
+>> +	pte_t *pte;
+>> +	unsigned long cur_end = ~0ul;
+>> +	int i_min = pmd_index(start);
+>> +	int i_max = pmd_index(end);
+>> +	int i;
+>> +
+>> +	for (i = i_min; i <= i_max; ++i, start = 0) {
+>> +		if (!pmd_present(pmd[i]))
+>> +			continue;
+>> +
+>> +		pte = pte_offset_kernel(pmd + i, 0);
+>> +		if (i == i_max)
+>> +			cur_end = end;
+>> +
+>> +		ret |= kvm_mkold_pte(pte, start, cur_end);
+>> +	}
+>> +
+>> +	return ret;
+>> +}
+>> +
+>> +static int kvm_mkold_pud(pud_t *pud, unsigned long start, unsigned long end)
+>> +{
+>> +	int ret = 0;
+>> +	pmd_t *pmd;
+>> +	unsigned long cur_end = ~0ul;
+>> +	int i_min = pud_index(start);
+>> +	int i_max = pud_index(end);
+>> +	int i;
+>> +
+>> +	for (i = i_min; i <= i_max; ++i, start = 0) {
+>> +		if (!pud_present(pud[i]))
+>> +			continue;
+>> +
+>> +		pmd = pmd_offset(pud + i, 0);
+>> +		if (i == i_max)
+>> +			cur_end = end;
+>> +
+>> +		ret |= kvm_mkold_pmd(pmd, start, cur_end);
+>> +	}
+>> +
+>> +	return ret;
+>> +}
+>> +
+>> +static int kvm_mkold_pgd(pgd_t *pgd, unsigned long start, unsigned long end)
+>> +{
+>> +	int ret = 0;
+>> +	p4d_t *p4d;
+>> +	pud_t *pud;
+>> +	unsigned long cur_end = ~0ul;
+>> +	int i_min = pgd_index(start);
+>> +	int i_max = pgd_index(end);
+>> +	int i;
+>> +
+>> +	for (i = i_min; i <= i_max; ++i, start = 0) {
+>> +		if (!pgd_present(pgd[i]))
+>> +			continue;
+>> +
+>> +		p4d = p4d_offset(pgd, 0);
+>> +		pud = pud_offset(p4d + i, 0);
+>> +		if (i == i_max)
+>> +			cur_end = end;
+>> +
+>> +		ret |= kvm_mkold_pud(pud, start, cur_end);
+>> +	}
+>> +
+>> +	return ret;
+>> +}
+>> +
+>> +bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+>> +{
+>> +	unsigned long npages = 0;
+>> +
+>> +	kvm_flush_gpa_range(kvm, range->start, range->end, &npages);
+>> +	return npages > 0;
+>> +}
+>> +
+>> +bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+>> +{
+>> +	gpa_t gpa = range->start << PAGE_SHIFT;
+>> +	pte_t hva_pte = range->pte;
+>> +	pte_t *ptep = kvm_pte_for_gpa(kvm, NULL, gpa);
+>> +	pte_t old_pte;
+>> +
+>> +	if (!ptep)
+>> +		return false;
+>> +
+>> +	/* Mapping may need adjusting depending on memslot flags */
+>> +	old_pte = *ptep;
+>> +	if (range->slot->flags & KVM_MEM_LOG_DIRTY_PAGES && !pte_dirty(old_pte))
+>> +		hva_pte = pte_mkclean(hva_pte);
+>> +	else if (range->slot->flags & KVM_MEM_READONLY)
+>> +		hva_pte = pte_wrprotect(hva_pte);
+>> +
+>> +	set_pte(ptep, hva_pte);
+>> +
+>> +	/* Replacing an absent or old page doesn't need flushes */
+>> +	if (!pte_present(old_pte) || !pte_young(old_pte))
+>> +		return false;
+>> +
+>> +	/* Pages swapped, aged, moved, or cleaned require flushes */
+>> +	return !pte_present(hva_pte) ||
+>> +	       !pte_young(hva_pte) ||
+>> +	       pte_pfn(old_pte) != pte_pfn(hva_pte) ||
+>> +	       (pte_dirty(old_pte) && !pte_dirty(hva_pte));
+>> +}
+>> +
+>> +bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+>> +{
+>> +	return kvm_mkold_pgd(kvm->arch.gpa_mm.pgd, range->start << PAGE_SHIFT,
+>> +				range->end << PAGE_SHIFT);
+>> +}
+>> +
+>> +bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+>> +{
+>> +	gpa_t gpa = range->start << PAGE_SHIFT;
+>> +	pte_t *ptep = kvm_pte_for_gpa(kvm, NULL, gpa);
+>> +
+>> +	if (ptep && pte_present(*ptep) && pte_young(*ptep))
+>> +		return true;
+>> +
+>> +	return false;
+>> +}
+>> +
+>> +/**
+>> + * kvm_map_page_fast() - Fast path GPA fault handler.
+>> + * @vcpu:		VCPU pointer.
+>> + * @gpa:		Guest physical address of fault.
+>> + * @write:	Whether the fault was due to a write.
+>> + *
+>> + * Perform fast path GPA fault handling, doing all that can be done without
+>> + * calling into KVM. This handles marking old pages young (for idle page
+>> + * tracking), and dirtying of clean pages (for dirty page logging).
+>> + *
+>> + * Returns:	0 on success, in which case we can update derived mappings and
+>> + *		resume guest execution.
+>> + *		-EFAULT on failure due to absent GPA mapping or write to
+>> + *		read-only page, in which case KVM must be consulted.
+>> + */
+>> +static int kvm_map_page_fast(struct kvm_vcpu *vcpu, unsigned long gpa,
+>> +				   bool write)
+>> +{
+>> +	struct kvm *kvm = vcpu->kvm;
+>> +	gfn_t gfn = gpa >> PAGE_SHIFT;
+>> +	pte_t *ptep;
+>> +	kvm_pfn_t pfn = 0;
+>> +	bool pfn_valid = false;
+>> +	int ret = 0;
+>> +
+>> +	spin_lock(&kvm->mmu_lock);
+>> +
+>> +	/* Fast path - just check GPA page table for an existing entry */
+>> +	ptep = kvm_pte_for_gpa(kvm, NULL, gpa);
+>> +	if (!ptep || !pte_present(*ptep)) {
+>> +		ret = -EFAULT;
+>> +		goto out;
+>> +	}
+>> +
+>> +	/* Track access to pages marked old */
+>> +	if (!pte_young(*ptep)) {
+>> +		set_pte(ptep, pte_mkyoung(*ptep));
+>> +		pfn = pte_pfn(*ptep);
+>> +		pfn_valid = true;
+>> +		/* call kvm_set_pfn_accessed() after unlock */
+>> +	}
+>> +	if (write && !pte_dirty(*ptep)) {
+>> +		if (!pte_write(*ptep)) {
+>> +			ret = -EFAULT;
+>> +			goto out;
+>> +		}
+>> +
+>> +		/* Track dirtying of writeable pages */
+>> +		set_pte(ptep, pte_mkdirty(*ptep));
+>> +		pfn = pte_pfn(*ptep);
+>> +		mark_page_dirty(kvm, gfn);
+>> +		kvm_set_pfn_dirty(pfn);
+>> +	}
+>> +
+>> +out:
+>> +	spin_unlock(&kvm->mmu_lock);
+>> +	if (pfn_valid)
+>> +		kvm_set_pfn_accessed(pfn);
+>> +	return ret;
+>> +}
+>> +
+>> +/**
+>> + * kvm_map_page() - Map a guest physical page.
+>> + * @vcpu:		VCPU pointer.
+>> + * @gpa:		Guest physical address of fault.
+>> + * @write:	Whether the fault was due to a write.
+>> + *
+>> + * Handle GPA faults by creating a new GPA mapping (or updating an existing
+>> + * one).
+>> + *
+>> + * This takes care of marking pages young or dirty (idle/dirty page tracking),
+>> + * asking KVM for the corresponding PFN, and creating a mapping in the GPA page
+>> + * tables. Derived mappings (GVA page tables and TLBs) must be handled by the
+>> + * caller.
+>> + *
+>> + * Returns:	0 on success
+>> + *		-EFAULT if there is no memory region at @gpa or a write was
+>> + *		attempted to a read-only memory region. This is usually handled
+>> + *		as an MMIO access.
+>> + */
+>> +static int kvm_map_page(struct kvm_vcpu *vcpu, unsigned long gpa, bool write)
+>> +{
+>> +	bool writeable;
+>> +	int srcu_idx, err = 0, retry_no = 0;
+>> +	unsigned long hva;
+>> +	unsigned long mmu_seq;
+>> +	unsigned long prot_bits;
+>> +	pte_t *ptep, new_pte;
+>> +	kvm_pfn_t pfn;
+>> +	gfn_t gfn = gpa >> PAGE_SHIFT;
+>> +	struct vm_area_struct *vma;
+>> +	struct kvm *kvm = vcpu->kvm;
+>> +	struct kvm_memory_slot *memslot;
+>> +	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
+>> +
+>> +	/* Try the fast path to handle old / clean pages */
+>> +	srcu_idx = srcu_read_lock(&kvm->srcu);
+>> +	err = kvm_map_page_fast(vcpu, gpa, write);
+>> +	if (!err)
+>> +		goto out;
+>> +
+>> +	memslot = gfn_to_memslot(kvm, gfn);
+>> +	hva = gfn_to_hva_memslot_prot(memslot, gfn, &writeable);
+>> +	if (kvm_is_error_hva(hva) || (write && !writeable))
+>> +		goto out;
+>> +
+>> +	/* Let's check if we will get back a huge page backed by hugetlbfs */
+>> +	mmap_read_lock(current->mm);
+>> +	vma = find_vma_intersection(current->mm, hva, hva + 1);
+>> +	if (unlikely(!vma)) {
+>> +		kvm_err("Failed to find VMA for hva 0x%lx\n", hva);
+>> +		mmap_read_unlock(current->mm);
+>> +		err = -EFAULT;
+>> +		goto out;
+>> +	}
+>> +	mmap_read_unlock(current->mm);
+>> +
+>> +	/* We need a minimum of cached pages ready for page table creation */
+>> +	err = kvm_mmu_topup_memory_cache(memcache, KVM_MMU_CACHE_MIN_PAGES);
+>> +	if (err)
+>> +		goto out;
+>> +
+>> +retry:
+>> +	/*
+>> +	 * Used to check for invalidations in progress, of the pfn that is
+>> +	 * returned by pfn_to_pfn_prot below.
+>> +	 */
+>> +	mmu_seq = kvm->mmu_invalidate_seq;
+>> +	/*
+>> +	 * Ensure the read of mmu_invalidate_seq isn't reordered with PTE reads in
+>> +	 * gfn_to_pfn_prot() (which calls get_user_pages()), so that we don't
+>> +	 * risk the page we get a reference to getting unmapped before we have a
+>> +	 * chance to grab the mmu_lock without mmu_invalidate_retry() noticing.
+>> +	 *
+>> +	 * This smp_rmb() pairs with the effective smp_wmb() of the combination
+>> +	 * of the pte_unmap_unlock() after the PTE is zapped, and the
+>> +	 * spin_lock() in kvm_mmu_invalidate_invalidate_<page|range_end>() before
+>> +	 * mmu_invalidate_seq is incremented.
+>> +	 */
+>> +	smp_rmb();
+>> +
+>> +	/* Slow path - ask KVM core whether we can access this GPA */
+>> +	pfn = gfn_to_pfn_prot(kvm, gfn, write, &writeable);
+>> +	if (is_error_noslot_pfn(pfn)) {
+>> +		err = -EFAULT;
+>> +		goto out;
+>> +	}
+>> +
+>> +	spin_lock(&kvm->mmu_lock);
+>> +	/* Check if an invalidation has taken place since we got pfn */
+>> +	if (mmu_invalidate_retry(kvm, mmu_seq)) {
+>> +		/*
+>> +		 * This can happen when mappings are changed asynchronously, but
+>> +		 * also synchronously if a COW is triggered by
+>> +		 * gfn_to_pfn_prot().
+>> +		 */
+>> +		spin_unlock(&kvm->mmu_lock);
+>> +		kvm_set_pfn_accessed(pfn);
+>> +		kvm_release_pfn_clean(pfn);
+>> +		if (retry_no > 100) {
+>> +			retry_no = 0;
+>> +			schedule();
+>> +		}
+>> +		retry_no++;
+>> +		goto retry;
+>> +	}
+>> +
+>> +	/*
+>> +	 * For emulated devices such virtio device, actual cache attribute is
+>> +	 * determined by physical machine.
+>> +	 * For pass through physical device, it should be uncachable
+>> +	 */
+>> +	prot_bits = _PAGE_PRESENT | __READABLE;
+>> +	if (vma->vm_flags & (VM_IO | VM_PFNMAP))
+>> +		prot_bits |= _CACHE_SUC;
+>> +	else
+>> +		prot_bits |= _CACHE_CC;
+>> +
+>> +	if (writeable) {
+>> +		prot_bits |= _PAGE_WRITE;
+>> +		if (write) {
+>> +			prot_bits |= __WRITEABLE;
+>> +			mark_page_dirty(kvm, gfn);
+>> +			kvm_set_pfn_dirty(pfn);
+>> +		}
+>> +	}
+>> +
+>> +	/* Ensure page tables are allocated */
+>> +	ptep = kvm_pte_for_gpa(kvm, memcache, gpa);
+>> +	new_pte = pfn_pte(pfn, __pgprot(prot_bits));
+>> +	set_pte(ptep, new_pte);
+>> +
+>> +	err = 0;
+>> +	spin_unlock(&kvm->mmu_lock);
+>> +	kvm_release_pfn_clean(pfn);
+>> +	kvm_set_pfn_accessed(pfn);
+>> +out:
+>> +	srcu_read_unlock(&kvm->srcu, srcu_idx);
+>> +	return err;
+>> +}
+>> +
+>> +int kvm_handle_mm_fault(struct kvm_vcpu *vcpu, unsigned long gpa, bool write)
+>> +{
+>> +	int ret;
+>> +
+>> +	ret = kvm_map_page(vcpu, gpa, write);
+>> +	if (ret)
+>> +		return ret;
+>> +
+>> +	/* Invalidate this entry in the TLB */
+>> +	return kvm_flush_tlb_gpa(vcpu, gpa);
+>> +}
+>> +
+>> +void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
+>> +{
+>> +
+>> +}
+>> +
+>> +int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>> +				   const struct kvm_memory_slot *old,
+>> +				   struct kvm_memory_slot *new,
+>> +				   enum kvm_mr_change change)
+>> +{
+>> +	return 0;
+>> +}
+>> +
+>> +void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
+>> +					const struct kvm_memory_slot *memslot)
+>> +{
+>> +	kvm_flush_remote_tlbs(kvm);
+>> +}
+
