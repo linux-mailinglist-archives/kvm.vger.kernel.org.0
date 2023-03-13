@@ -2,70 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A0F56B7EE5
-	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 18:10:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A32476B7F3A
+	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 18:18:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230177AbjCMRKZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Mar 2023 13:10:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42850 "EHLO
+        id S231588AbjCMRSD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Mar 2023 13:18:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231669AbjCMRKL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Mar 2023 13:10:11 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9C96231C1
-        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 10:09:44 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-536cb268ab8so139065957b3.17
-        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 10:09:44 -0700 (PDT)
+        with ESMTP id S229811AbjCMRRs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Mar 2023 13:17:48 -0400
+Received: from mail-vs1-xe2a.google.com (mail-vs1-xe2a.google.com [IPv6:2607:f8b0:4864:20::e2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B001A7EA31
+        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 10:17:15 -0700 (PDT)
+Received: by mail-vs1-xe2a.google.com with SMTP id x25so3567079vsj.2
+        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 10:17:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678727318;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wOWZvv6KsY6Um3iQTTUFkaHPzlGY80coB0SG7oNO+Zw=;
-        b=b5ONabsAjWKZxLbOivjWXSzeJPtAesI1cLgYh9E4tknpEK7T8irelQP6gsZUDVus2N
-         wvWu0ITC5BakYojDUSt98KBJpOIWvPNUIFMbJxaTWYfs8GxKhfKcIwK1YYHagRZ1JgKI
-         rXtNbp8CTioo3CRelFXIzqgSFii3b/bVaFApXdS96ncOfF8J7QEfefdhm++dBK42JlrW
-         vsDGNoiMLEXtj8SY8dL48N/FuA86ALK0+48NPqGIVDXphd0Tkm6U6BuXihtfPyzpdMzq
-         6JtNxxayGH1YC3yWhV9v6eX+lLpA4+tnqSheV0QW2PwT8H7rFDsWh0bIrbzUXtuNJ8u/
-         ZtoA==
+        d=google.com; s=20210112; t=1678727792;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=atthlkG+b5FY8NgV5FVLsw/Ng1x3zgIJDT+mNp/s7+c=;
+        b=jj2jmzhM3skZ4z/7JrlVVqfRM7qjYiCJoSr16LkymZJHkG4rLtveTmkas30wAFlcXT
+         I0Pi/w1JEL19Is0/TfeZeh/WhTGUart95C+f2ZBMdeqjdQLcnXGttO58nntAQZ4X8brT
+         W2jzusJu8H/ffmV/+IDtRnJAdYjYUmFfkgivUTECd7V8CGw1p09NZ0IohEn2aAkIKIEc
+         3aGch4p8pDWYrxjr+ZFdsLfMaWO35YxUrU90Af79tc14K4gGaFT3x13oyxTlSrD00Yg5
+         1lABaI4tcGSvGpnUbdsyTr1OoREcbbo4Y10ary27Xqgv9m5tpoTZbNBGuaHFG/Bqj/Dg
+         KODQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678727318;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wOWZvv6KsY6Um3iQTTUFkaHPzlGY80coB0SG7oNO+Zw=;
-        b=hpqK8VA8P/B3xohfOlNjObsDYemEA3J9SAf9JyuHN94pOpUiSCJ1DkwGd2UjCSmtyN
-         ySwUtDaxI8VrnaF2mpfnPjnTyRFoXp+8czCkqZzqsZ9tiRng4Al1HOMvFyRnp0SLvGD0
-         0qIhZMm5+46bqRW2ZfzeObY9P4DbaxH8CiwWT84j3S+bX1Dd01Cr5S5gB+DogmlEAeK8
-         uDmI5QJzmUiV+9Zqc906Pl/pbzKOY8T2NkHFtSWQXXfoPrhAl6k8TaJiG7umbQ++/KjJ
-         xajH1JdZ1ah1pzD5ncZLwPAfhTi4tU3UcCz7JgSbaxfouHaS+gX6+Sw8iDjSJ7Gjhb5A
-         MieA==
-X-Gm-Message-State: AO0yUKVqlPpv672dH+PX+f9QenFWuxthqyGcShmGIyxaU2TGAQJaYsSS
-        inyEx1a9b/egY/GaAY42yvr9XbejBxk=
-X-Google-Smtp-Source: AK7set9gzsCbZrrZdrlwi2XqkK69ytQhb4omsoaefIaBznHhiIAh2sMw623jd3fj82OyfGgr4Sfg/JSCSo8=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:2cf:b0:b21:5fb4:c6e6 with SMTP id
- w15-20020a05690202cf00b00b215fb4c6e6mr9040251ybh.11.1678727318583; Mon, 13
- Mar 2023 10:08:38 -0700 (PDT)
-Date:   Mon, 13 Mar 2023 10:08:37 -0700
-In-Reply-To: <ZA7eTpG5tpo5yIo3@gao-cwp>
-Mime-Version: 1.0
-References: <20230310214232.806108-1-seanjc@google.com> <20230310214232.806108-4-seanjc@google.com>
- <ZA7eTpG5tpo5yIo3@gao-cwp>
-Message-ID: <ZA9YlTknLKRKcCy3@google.com>
-Subject: Re: [PATCH v2 03/18] x86/reboot: Harden virtualization hooks for
- emergency reboot
-From:   Sean Christopherson <seanjc@google.com>
-To:     Chao Gao <chao.gao@intel.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Andrew Cooper <Andrew.Cooper3@citrix.com>,
-        Kai Huang <kai.huang@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        d=1e100.net; s=20210112; t=1678727792;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=atthlkG+b5FY8NgV5FVLsw/Ng1x3zgIJDT+mNp/s7+c=;
+        b=HvBvTkLW/D15bx31QlXS70qlLd0G9UW4jVb5SAEnGd/UcNY7Hs6ytGRMQlCB2IUIhY
+         pnJDRa1AOh6ALeg6tzogz9j2sSuaLhNPr9Ovpa8m2XWY99GMl6Fz4Ky2WzinUqwWjgAz
+         tYOClr/K7pkmxhNltlfriFV9UVJAfoGwc0geO45ywb8jch5AW4XBM3AkLXTEv6SNsuYu
+         Ppai0MPWnjB6ByV66u6uJwYc11VAtdpfH6XQLqfUPSXpv+Tgbx9LjxfyHqY5fR57GsDy
+         sQfWGT9k7tbN8VOGWrEd0eNvliUoP+ni9rhYGf5lQYRC5X8ntghGdMlXq4KjCRjQjdGU
+         sJYQ==
+X-Gm-Message-State: AO0yUKWoSt5jImVikzbPKnLRlxqakUh8s3z4btDcDC6AgLJP/ImhWJc4
+        Uc+hKE+0275SDviod46zb63EGwZf6bHd+ORWQreYiQ==
+X-Google-Smtp-Source: AK7set8T0nOpfvbkpWYW5W/OJm+3odNxN+DJmTGlzQYkjhNXuH4GeNK1jYLVeeVnzm6Yi0FQ93YVVHMVH/aIP4BN+pk=
+X-Received: by 2002:a67:f350:0:b0:423:e6b4:9582 with SMTP id
+ p16-20020a67f350000000b00423e6b49582mr4005065vsm.4.1678727791808; Mon, 13 Mar
+ 2023 10:16:31 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230313091425.1962708-1-maz@kernel.org> <20230313091425.1962708-2-maz@kernel.org>
+ <ZA9HAQtkCDwFXcsm@google.com>
+In-Reply-To: <ZA9HAQtkCDwFXcsm@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Mon, 13 Mar 2023 10:16:05 -0700
+Message-ID: <CALzav=c3aKNT-7CzkrFC8YCCwj-E16JYWwsmOV-HaLbODG67hQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: Disable interrupts while walking
+ userspace PTs
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,21 +78,101 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 13, 2023, Chao Gao wrote:
-> On Fri, Mar 10, 2023 at 01:42:17PM -0800, Sean Christopherson wrote:
-> >+void cpu_emergency_register_virt_callback(cpu_emergency_virt_cb *callback)
-> >+{
-> >+	if (WARN_ON_ONCE(rcu_access_pointer(cpu_emergency_virt_callback)))
-> >+		return;
-> >+
-> >+	rcu_assign_pointer(cpu_emergency_virt_callback, callback);
-> 
-> Was it intentional to not call synchronize_rcu() (in the original
-> code), different from the un-registration path?
+On Mon, Mar 13, 2023 at 8:53=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> +David
+>
+> On Mon, Mar 13, 2023, Marc Zyngier wrote:
+> > We walk the userspace PTs to discover what mapping size was
+> > used there. However, this can race against the userspace tables
+> > being freed, and we end-up in the weeds.
+> >
+> > Thankfully, the mm code is being generous and will IPI us when
+> > doing so. So let's implement our part of the bargain and disable
+> > interrupts around the walk. This ensures that nothing terrible
+> > happens during that time.
+> >
+> > We still need to handle the removal of the page tables before
+> > the walk. For that, allow get_user_mapping_size() to return an
+> > error, and make sure this error can be propagated all the way
+> > to the the exit handler.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Cc: stable@vger.kernel.org
+> > ---
+> >  arch/arm64/kvm/mmu.c | 35 ++++++++++++++++++++++++++++-------
+> >  1 file changed, 28 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 7113587222ff..d7b8b25942df 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -666,14 +666,23 @@ static int get_user_mapping_size(struct kvm *kvm,=
+ u64 addr)
+> >                                  CONFIG_PGTABLE_LEVELS),
+> >               .mm_ops         =3D &kvm_user_mm_ops,
+> >       };
+> > +     unsigned long flags;
+> >       kvm_pte_t pte =3D 0;      /* Keep GCC quiet... */
+> >       u32 level =3D ~0;
+> >       int ret;
+> >
+> > +     /*
+> > +      * Disable IRQs so that we hazard against a concurrent
+> > +      * teardown of the userspace page tables (which relies on
+> > +      * IPI-ing threads).
+> > +      */
+> > +     local_irq_save(flags);
+> >       ret =3D kvm_pgtable_get_leaf(&pgt, addr, &pte, &level);
+> > -     VM_BUG_ON(ret);
+> > -     VM_BUG_ON(level >=3D KVM_PGTABLE_MAX_LEVELS);
+> > -     VM_BUG_ON(!(pte & PTE_VALID));
+> > +     local_irq_restore(flags);
+> > +
+> > +     /* Oops, the userspace PTs are gone... */
+> > +     if (ret || level >=3D KVM_PGTABLE_MAX_LEVELS || !(pte & PTE_VALID=
+))
+> > +             return -EFAULT;
+>
+> I don't think this should return -EFAULT all the way out to userspace.  U=
+nless
+> arm64 differs from x86 in terms of how the userspace page tables are mana=
+ged, not
+> having a valid translation _right now_ doesn't mean that one can't be cre=
+ated in
+> the future, e.g. by way of a subsequent hva_to_pfn().
+>
+> FWIW, the approach x86 takes is to install a 4KiB (smallest granuale) tra=
+nslation,
 
-Yes, synchronize_rcu() is needed when removing a callback to ensure any in-flight
-invocations of the callback complete before KVM is unloaded, i.e. to prevent
-use-after-free of the KVM module code.  Registering a callback doesn't have the
-same concerns, and adding a synchronize_rcu() wouldn't do anything in terms of
-ensuring virtualization isn't enabled after an emergency restart/shutdown is
-initiated.
+If I'm reading the ARM code correctly, returning -EFAULT here will
+have that effect. get_user_mapping_size() is only called by
+transparent_hugepage_adjust() which returns PAGE_SIZE if
+get_user_mapping_size() returns anything less than PMD_SIZE.
+
+> which is safe since there _was_ a valid translation when mmu_lock was acq=
+uired and
+> mmu_invalidate_retry() was checked.  It's the primary MMU's responsibilit=
+y to ensure
+> all secondary MMUs are purged before freeing memory, i.e. worst case shou=
+ld be that
+> KVMs stage-2 translation will be immediately zapped via mmu_notifier.
+>
+> KVM ARM also has a bug that might be related: the mmu_seq snapshot needs =
+to be
+> taken _before_ mmap_read_unlock(), otherwise vma_shift may be stale by th=
+e time
+> it's consumed.  I believe David is going to submit a patch (I found and "=
+reported"
+> the bug when doing an internal review of "common MMU" stuff).
+
+Yeah and RISC-V has that same bug. I'll try to have fixes for each out
+this week.
+
+After that, I'd also like to refactor how ARM and RISC-V calculate the
+host mapping size to match what we do on x86: always walk the host
+page table. This will unify the handling for HugeTLB and THP, avoid
+needing to take the mmap_lock, and we can even share the host page
+table walk code across architectures (Linux's host page table code is
+already common).
