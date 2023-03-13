@@ -2,70 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C9986B7FA3
-	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 18:40:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C38416B7FD3
+	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 18:57:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230187AbjCMRkd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Mar 2023 13:40:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59086 "EHLO
+        id S229864AbjCMR5I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Mar 2023 13:57:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230097AbjCMRkb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Mar 2023 13:40:31 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DABA14227;
-        Mon, 13 Mar 2023 10:40:28 -0700 (PDT)
+        with ESMTP id S229537AbjCMR5H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Mar 2023 13:57:07 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BCF84C6D6;
+        Mon, 13 Mar 2023 10:57:06 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 890F7B811C1;
-        Mon, 13 Mar 2023 17:40:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 228E6C433D2;
-        Mon, 13 Mar 2023 17:40:25 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 47068B811C1;
+        Mon, 13 Mar 2023 17:57:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 034B6C433D2;
+        Mon, 13 Mar 2023 17:57:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678729225;
-        bh=HGclvf2eMYSO2tUhOiMvSKCDztLmiMtZOfMVb6g6DVk=;
+        s=k20201202; t=1678730224;
+        bh=eFp7TWEtaCJ4IREd5Nn0VB8e77L9rWYXxBrgS5//W4c=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=HmZWuJL81X+QwZ5k7rXig9TGU2O6rtggZA1Wyv18AEy74H/w+I50F3BjrViWg3tBC
-         MSiT1FiuUy6TYON8kwfIa11YdTqevEHWpABQuMQlm4GduLoP4ijgCskTYnhjfxGKnw
-         j1Exb8c+QLFy6fGlqXm4ubrz1Xc0hIjcLQMhrxDOCwECaWuaghRrYjZl/PvZEDJR3l
-         fesJmClEcaisFb1zwZBGSHXRdUJkNKnF9bBQmxO9c8bIOB16i15R3qF8tQiUKRn8Ol
-         dx/qAj2c1bfBMY3SbVtUzstOFKWH4mBH2VhhmaQniqYAjUQyfS06fKVeMXkzpwGAC7
-         MGg1XslgtDBQw==
+        b=nHezHnwzVlRd/r0ojenNatH1I7jMw4BA07iPhJjEx5vBqBlqH19+stw5Kwuw3kDrx
+         5efKwsI4zqVE+fiX/eSqAfFTT6hZb2ousH5S7CjtwvCaRxzsGwoh3HRuIkH5E7GAl8
+         K/5IJQ9b7ECDCwC9A6BquVmXt+usKuqN3MFZIaaaiNDRSohAUuN27/jL+G6nQ+SDqf
+         aF/hd+4PTjJnjA3OOSMc3hHnJH4TNSZzw3NsQidscnjljNB86QlIWs3Fc/02OEzUQO
+         PfDZQdJGJnF6Iuq/eQXRnlFb0vD4I7pp+pK26YpM92qKzWuZNSyGMdwBUd/PIQdqDs
+         ObZUU018dqfkQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pbm9m-00HKV1-MV;
-        Mon, 13 Mar 2023 17:40:22 +0000
-Date:   Mon, 13 Mar 2023 17:40:22 +0000
-Message-ID: <86lek0y2gp.wl-maz@kernel.org>
+        id 1pbmPt-00HKeC-If;
+        Mon, 13 Mar 2023 17:57:01 +0000
+Date:   Mon, 13 Mar 2023 17:57:00 +0000
+Message-ID: <86jzzky1oz.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
         Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Will Deacon <will@kernel.org>,
-        Quentin Perret <qperret@google.com>, stable@vger.kernel.org,
-        David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH 1/2] KVM: arm64: Disable interrupts while walking userspace PTs
-In-Reply-To: <ZA9HAQtkCDwFXcsm@google.com>
-References: <20230313091425.1962708-1-maz@kernel.org>
-        <20230313091425.1962708-2-maz@kernel.org>
-        <ZA9HAQtkCDwFXcsm@google.com>
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        kvm-riscv@lists.infradead.org
+Subject: Re: [PATCH 2/2] KVM: Don't enable hardware after a restart/shutdown is initiated
+In-Reply-To: <ZA86UINtWH3aw4Mv@google.com>
+References: <20230310221414.811690-1-seanjc@google.com>
+        <20230310221414.811690-3-seanjc@google.com>
+        <87fsaa5kyv.wl-maz@kernel.org>
+        <ZA86UINtWH3aw4Mv@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seanjc@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, ardb@kernel.org, will@kernel.org, qperret@google.com, stable@vger.kernel.org, dmatlack@google.com
+X-SA-Exim-Rcpt-To: seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, anup@brainfault.org, atishp@atishpatra.org, kvm-riscv@lists.infradead.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,90 +76,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 13 Mar 2023 15:53:37 +0000,
+On Mon, 13 Mar 2023 15:02:27 +0000,
 Sean Christopherson <seanjc@google.com> wrote:
 > 
-> +David
-> 
-> On Mon, Mar 13, 2023, Marc Zyngier wrote:
-> > We walk the userspace PTs to discover what mapping size was
-> > used there. However, this can race against the userspace tables
-> > being freed, and we end-up in the weeds.
-> > 
-> > Thankfully, the mm code is being generous and will IPI us when
-> > doing so. So let's implement our part of the bargain and disable
-> > interrupts around the walk. This ensures that nothing terrible
-> > happens during that time.
-> > 
-> > We still need to handle the removal of the page tables before
-> > the walk. For that, allow get_user_mapping_size() to return an
-> > error, and make sure this error can be propagated all the way
-> > to the the exit handler.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > Cc: stable@vger.kernel.org
-> > ---
-> >  arch/arm64/kvm/mmu.c | 35 ++++++++++++++++++++++++++++-------
-> >  1 file changed, 28 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 7113587222ff..d7b8b25942df 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -666,14 +666,23 @@ static int get_user_mapping_size(struct kvm *kvm, u64 addr)
-> >  				   CONFIG_PGTABLE_LEVELS),
-> >  		.mm_ops		= &kvm_user_mm_ops,
-> >  	};
-> > +	unsigned long flags;
-> >  	kvm_pte_t pte = 0;	/* Keep GCC quiet... */
-> >  	u32 level = ~0;
-> >  	int ret;
-> >  
-> > +	/*
-> > +	 * Disable IRQs so that we hazard against a concurrent
-> > +	 * teardown of the userspace page tables (which relies on
-> > +	 * IPI-ing threads).
-> > +	 */
-> > +	local_irq_save(flags);
-> >  	ret = kvm_pgtable_get_leaf(&pgt, addr, &pte, &level);
-> > -	VM_BUG_ON(ret);
-> > -	VM_BUG_ON(level >= KVM_PGTABLE_MAX_LEVELS);
-> > -	VM_BUG_ON(!(pte & PTE_VALID));
-> > +	local_irq_restore(flags);
-> > +
-> > +	/* Oops, the userspace PTs are gone... */
-> > +	if (ret || level >= KVM_PGTABLE_MAX_LEVELS || !(pte & PTE_VALID))
-> > +		return -EFAULT;
-> 
-> I don't think this should return -EFAULT all the way out to userspace.  Unless
-> arm64 differs from x86 in terms of how the userspace page tables are managed, not
-> having a valid translation _right now_ doesn't mean that one can't be created in
-> the future, e.g. by way of a subsequent hva_to_pfn().
+> On my todo list is to better understand whether or not the other architectures
+> that utilize the generic hardware enabling (ARM, RISC-V, MIPS) truly need to disable
+> virtualization during a reboot, versus KVM simply being polite.  E.g. on x86, if VMX
+> is left enabled, reboot may hang depending on how the reboot is performed.   If
+> other architectures really truly need to disable virtualization, then they likely
+> need something similar to x86's emergency reboot shenanigans.
 
-I probably took an overly restrictive approach of only looking at the
-issue at hand, where exit_mmap() had already torn down the userspace
-PTs. But I guess there are other ways for this scenario to happen,
-none of which deserve -EFAULT indeed.
+At least pre-CCA, there isn't much to do, because there is no such
+thing as "disabling virtualisation". For kexec, the only things we
+need to do are to go back to EL2 in the nVHE case, and in any case to
+put all other CPUs back into the firmware (PSCI CPU_OFF).
 
-> FWIW, the approach x86 takes is to install a 4KiB (smallest granuale) translation,
-> which is safe since there _was_ a valid translation when mmu_lock was acquired and
-> mmu_invalidate_retry() was checked.  It's the primary MMU's responsibility to ensure
-> all secondary MMUs are purged before freeing memory, i.e. worst case should be that
-> KVMs stage-2 translation will be immediately zapped via mmu_notifier.
+CCA may well add other things into the picture, because it is a
+parallel exception level that KVM doesn't really control. That's one
+of the many open questions I have about this "lovely" piece of
+architecture.
 
-I'd rather avoid extra work. At this stage, we might as well return
--EAGAIN and replay the fault. We already do that in a number of racy
-cases, so it fits in the infrastructure.
-
-> KVM ARM also has a bug that might be related: the mmu_seq snapshot needs to be
-> taken _before_ mmap_read_unlock(), otherwise vma_shift may be stale by the time
-> it's consumed.  I believe David is going to submit a patch (I found and "reported"
-> the bug when doing an internal review of "common MMU" stuff).
-
-Huh, that's interesting. David, please post this at your earliest
-convenience. I'd rather squash these all in one go.
-
-Thanks,
+Of course, if we were to completely ignore CCA and instead use the
+underlying HW (aka RME), things would be a lot simpler and we'd be
+back to my original statement...
 
 	M.
 
