@@ -2,77 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D5256B8129
-	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 19:50:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 580436B8141
+	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 19:56:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231342AbjCMSu0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Mar 2023 14:50:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51410 "EHLO
+        id S230063AbjCMS44 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Mar 2023 14:56:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230286AbjCMSuW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Mar 2023 14:50:22 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 824CC22136
-        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 11:49:56 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id k2so6157525pll.8
-        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 11:49:56 -0700 (PDT)
+        with ESMTP id S231564AbjCMS4k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Mar 2023 14:56:40 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6252B3A95
+        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 11:56:36 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id k17-20020a170902d59100b0019abcf45d75so7444509plh.8
+        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 11:56:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678733393;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=25DsBlbnYzgLfbUv0//jnNAcvsBteJ6bqVcMgyivMgw=;
-        b=gzs4hNBq584fUnlxy9MSb9w3ruNF/KkvHH9BbakVZRl8hx23UCyMw+xiTmIZOW+AWl
-         Lp1vOYHORGHjZnAW6DdsNFLVStK8zGBWOoenEal9tPkKzwJDQ7R/r96w12QMsilBYrKB
-         4ozu/gUECfZrue3DSxOmuF8ENBRJ9OxEqvzDNaqBCrDR1Zlp3IEt4gerkyVsCUvugM4p
-         sZIpa5sPICo65qk3kr8blH/sy2hGgn4RqZLJ2YtaAcukGQdW/uv+SmsTzXzpp3/MUB+B
-         PKOQkmJGw589iXJ/V4FqHAcwaQyIqPKG+/Egurbki7dHgeAMmoa8jhxJ2b/ZSJUUXtWx
-         QPeA==
+        d=google.com; s=20210112; t=1678733796;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=EXx+jCvFVnqiF8ZslKAMtaMytcHTldmzSYcO3RbOe10=;
+        b=JIO1DBKAXENWr/6gH5UonUJtMPVFqeHx92t5eJ8UnsIhGhS4LslkaXrS4Vy2jGuYtz
+         hBmcbcYVU26K/R5xRDuDp92MGe97dBwVdbegfNZgwxDpiNHI+eyxEzOeSUAH8kB5kxJT
+         9sor9y1Imsxmk0ohsLRKayK8LYjS/AdaNI+VtF0mA47KixQbaB4Ppf8o6pTOvgiaiQdi
+         CurypTpHTgERKM5Zx2GObOh89sRUzCe0/E6S/Omt8rS6brRY1IA35D8by66WKjPoaSjo
+         +FAAiphO5RKE8yeBE9zLxWDSfaNF01jt60EELxZ2FMKe28ri9zsncwqu/JyFsza1T+RU
+         CO5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678733393;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=25DsBlbnYzgLfbUv0//jnNAcvsBteJ6bqVcMgyivMgw=;
-        b=XOKas8MLJM/4nKaw1Zas/k+S3JCeDq8jTpNZL3Ma+mqRVlzgaqAHf4Ed8DRQgb7zFr
-         +oAurvIFfK5T4IG1BWM6cEdn5NcFE9gE6SD/lR+oKkAFtGY8WM5HYaPukZtwF6M9vNeY
-         wM/mAjJq8Ad9nxJmSHp1+KXUryVcTNS3hokXER0WILmuvIa31RYbKqEF7PSTL+M+aDZW
-         NFDzj1t9yGreUoTtPZ51lyhKzotPvYR/6QAqjXXB5H+6u89rr1pNyNh7nyOxBGPTOKyD
-         LjdEWUEppLIgk3AYK9QFY6pamflrnGXSr3zAdYzfnYmMrYoEWstTS5i/ujCzi9yorKzD
-         x73A==
-X-Gm-Message-State: AO0yUKVjxjxnR8u0WUPzVopOL8IT2RuL0oVo1TUmuzVmENHre9LAE5ue
-        yYO+MABfMc4MuiLsMDYdiJxq8Q==
-X-Google-Smtp-Source: AK7set9OpkTliVZ8owp3VBzDUXbV41ZMbMYgRkxriMP4prz9jiiNGkLY7l5wUxQIrsQcvxeifqikJA==
-X-Received: by 2002:a17:903:430d:b0:1a0:563e:b0d1 with SMTP id jz13-20020a170903430d00b001a0563eb0d1mr198125plb.18.1678733392548;
-        Mon, 13 Mar 2023 11:49:52 -0700 (PDT)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id u19-20020a17090abb1300b00233acae2ce6sm210119pjr.23.2023.03.13.11.49.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Mar 2023 11:49:52 -0700 (PDT)
-Date:   Mon, 13 Mar 2023 11:49:48 -0700
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     pbonzini@redhat.com, oupton@google.com, yuzenghui@huawei.com,
-        dmatlack@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        qperret@google.com, catalin.marinas@arm.com,
-        andrew.jones@linux.dev, seanjc@google.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
-        rananta@google.com, bgardon@google.com, ricarkol@gmail.com,
-        Shaoqin Huang <shahuang@redhat.com>
-Subject: Re: [PATCH v6 02/12] KVM: arm64: Add KVM_PGTABLE_WALK ctx->flags for
- skipping BBM and CMO
-Message-ID: <ZA9wTG6fIx2n4YHi@google.com>
-References: <20230307034555.39733-1-ricarkol@google.com>
- <20230307034555.39733-3-ricarkol@google.com>
- <87cz5e5jnr.wl-maz@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87cz5e5jnr.wl-maz@kernel.org>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        d=1e100.net; s=20210112; t=1678733796;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EXx+jCvFVnqiF8ZslKAMtaMytcHTldmzSYcO3RbOe10=;
+        b=6FEqB4Najh3VvJYrVZHc2VMpJg6bCEJcRQIdEgkh4pIYFt+bkAcKkNGZRfQo/VVIor
+         N/pk8tRK6xNrLjhwG0DSlGsRV4TEwanWs1gWst3aVIKmMpsHVhPFvnsEfcMM1mV4hM7/
+         aAmqnbi08lQvgBI7sEh+6irA/sNDP/05iZ0bUKBBBktSQjEDQhqOHM1UMseofVXOhABN
+         SqoWGzWV/gF1ErzrTQaOg9/1IqOUXygtnoVBSJ0732AdCcABXnAyyHa/q0+pmQeGQXdX
+         qBCrlpUUmXaMjSofgOi5fD7xCLF5XqEjhzOwWkOETRPa3I/O7Vztt61uVqqcu+WAQBLj
+         k4bg==
+X-Gm-Message-State: AO0yUKXBMG3QBD1ypN6c+dOiLvLHRzERs/otvIsnZmtN6fwfEUzMeExi
+        +VuVsOOocRc8sBRRsJJb65qAMoDm3Iw=
+X-Google-Smtp-Source: AK7set/wM5L1+yaNXvtfievXsQ3Jw5zwYOQf1g3rq47++ID+TqnBXcgh3At0w1nD01xukJbviemFvHOdy/o=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:4f61:0:b0:507:4737:cdb5 with SMTP id
+ p33-20020a634f61000000b005074737cdb5mr9411816pgl.8.1678733795768; Mon, 13 Mar
+ 2023 11:56:35 -0700 (PDT)
+Date:   Mon, 13 Mar 2023 18:56:34 +0000
+In-Reply-To: <ZA9twqv5XQMmgXWb@thinky-boi>
+Mime-Version: 1.0
+References: <20230309010336.519123-1-seanjc@google.com> <20230309010336.519123-3-seanjc@google.com>
+ <ZAlGeYAmvhPmVmGe@debian.me> <ZAmWefGcsBwcODxW@linux.dev> <ZAoWogdeET5N0mug@google.com>
+ <ZA9eHzE5vhnXh+TA@linux.dev> <ZA9pfbhypRNPhdN8@google.com> <ZA9twqv5XQMmgXWb@thinky-boi>
+Message-ID: <ZA9x4svW1C/M7kJh@google.com>
+Subject: Re: [PATCH v2 2/2] Documentation/process: Add a maintainer handbook
+ for KVM x86
+From:   Sean Christopherson <seanjc@google.com>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Bagas Sanjaya <bagasdotme@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sagi Shahar <sagis@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Peter Shier <pshier@google.com>,
+        Anish Ghulati <aghulati@google.com>,
+        James Houghton <jthoughton@google.com>,
+        Anish Moorthy <amoorthy@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Axel Rasmussen <axelrasmussen@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Ashish Kalra <ashish.kalra@amd.com>,
+        Babu Moger <babu.moger@amd.com>, Chao Gao <chao.gao@intel.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Chenyi Qiang <chenyi.qiang@intel.com>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Guang Zeng <guang.zeng@intel.com>,
+        Hou Wenlong <houwenlong.hwl@antgroup.com>,
+        Jiaxi Chen <jiaxi.chen@linux.intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        Jing Liu <jing2.liu@intel.com>,
+        Junaid Shahid <junaids@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Leonardo Bras <leobras@redhat.com>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Li RongQing <lirongqing@baidu.com>,
+        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Michal Luczaj <mhal@rbox.co>,
+        Mingwei Zhang <mizhang@google.com>,
+        Nikunj A Dadhania <nikunj@amd.com>,
+        Paul Durrant <pdurrant@amazon.com>,
+        Peng Hao <flyingpenghao@gmail.com>,
+        Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>,
+        Robert Hoo <robert.hu@linux.intel.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Wei Wang <wei.w.wang@intel.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Zhenzhong Duan <zhenzhong.duan@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,163 +120,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Mar 12, 2023 at 10:49:28AM +0000, Marc Zyngier wrote:
-> On Tue, 07 Mar 2023 03:45:45 +0000,
-> Ricardo Koller <ricarkol@google.com> wrote:
+On Mon, Mar 13, 2023, Oliver Upton wrote:
+> On Mon, Mar 13, 2023 at 11:20:45AM -0700, Sean Christopherson wrote:
+> > On Mon, Mar 13, 2023, Oliver Upton wrote:
+> > > On Thu, Mar 09, 2023 at 09:25:54AM -0800, Sean Christopherson wrote:
+> > > > On Thu, Mar 09, 2023, Oliver Upton wrote:
+> > > > > On Thu, Mar 09, 2023 at 09:37:45AM +0700, Bagas Sanjaya wrote:
+> > > > > > On Wed, Mar 08, 2023 at 05:03:36PM -0800, Sean Christopherson wrote:
+> > > > > > > +As a general guideline, use ``kvm-x86/next`` even if a patch/series touches
+> > > > > > > +multiple architectures, i.e. isn't strictly scoped to x86.  Using any of the
+> > > > > > > +branches from the main KVM tree is usually a less good option as they likely
+> > > > > > > +won't have many, if any, changes for the next release, i.e. using the main KVM
+> > > > > > > +tree as a base is more likely to yield conflicts.  And if there are non-trivial
+> > > > > > > +conflicts with multiple architectures, coordination between maintainers will be
+> > > > > > > +required no matter what base is used.  Note, this is far from a hard rule, i.e.
+> > > > > > > +use a different base for multi-arch series if that makes the most sense.
+> > > > > 
+> > > > > I don't think this is the best way to coordinate with other architectures.
+> > > > > Regardless of whether you intended this to be prescriptive, I'm worried most
+> > > > > folks will follow along and just base patches on kvm-x86/next anyway.
+> > > > 
+> > > > Probably, but for the target audience (KVM x86 contributors), that's likely the
+> > > > least awful base 99% of the time.
+> > > 
+> > > Sorry, I follow this reasoning at all.
+> > > 
+> > > If folks are aiming to make a multi-arch contribution then the architecture
+> > > they regularly contribute to has absolutely zero relevance on the series
+> > > itself.
 > > 
-> > Add two flags to kvm_pgtable_visit_ctx, KVM_PGTABLE_WALK_SKIP_BBM and
-> > KVM_PGTABLE_WALK_SKIP_CMO, to indicate that the walk should not
-> > perform break-before-make (BBM) nor cache maintenance operations
-> > (CMO). This will by a future commit to create unlinked tables not
-> 
-> This will *be used*?
-> 
-> > accessible to the HW page-table walker.  This is safe as these
-> > unlinked tables are not visible to the HW page-table walker.
-> 
-> I don't think this last sentence makes much sense. The PTW is always
-> coherent with the CPU caches and doesn't require cache maintenance
-> (CMOs are solely for the pages the PTs point to).
-> 
-> But this makes me question this patch further.
-> 
-> The key observation here is that if you are creating new PTs that
-> shadow an existing structure and still points to the same data pages,
-> the cache state is independent of the intermediate PT walk, and thus
-> CMOs are pointless anyway. So skipping CMOs makes sense.
-> 
-> I agree with the assertion that there is little point in doing BBM
-> when *creating* page tables, as all PTs start in an invalid state. But
-> then, why do you need to skip it? The invalidation calls are already
-> gated on the previous pointer being valid, which I presume won't be
-> the case for what you describe here.
-> 
-
-I need to change the SKIP_BBM name; it's confusing, sorry for that. As
-you noticed below, SKIP_BBM just skips the TLB invalidation step in the
-BBM, so the invalidation still occurs with SKIP_BBM=true.
-
-Thanks for the reviews Marc.
-
+> > There's disconnect between what my brain is thinking and what I wrote.
 > > 
-> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_pgtable.h | 18 ++++++++++++++++++
-> >  arch/arm64/kvm/hyp/pgtable.c         | 27 ++++++++++++++++-----------
-> >  2 files changed, 34 insertions(+), 11 deletions(-)
+> > The intent of the "use kvm-x86/next" guideline is aimed to address series that
+> > are almost entirely x86 specific, and only superficially touch common KVM and/or
+> > other architectures.  In my experience, the vast, vast majority of "multi-arch"
+> > contributions from x86 fall into this category, i.e. aren't truly multi-arch in
+> > nature.
 > > 
-> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> > index 26a4293726c1..c7a269cad053 100644
-> > --- a/arch/arm64/include/asm/kvm_pgtable.h
-> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> > @@ -195,6 +195,12 @@ typedef bool (*kvm_pgtable_force_pte_cb_t)(u64 addr, u64 end,
-> >   *					with other software walkers.
-> >   * @KVM_PGTABLE_WALK_HANDLE_FAULT:	Indicates the page-table walk was
-> >   *					invoked from a fault handler.
-> > + * @KVM_PGTABLE_WALK_SKIP_BBM:		Visit and update table entries
-> > + *					without Break-before-make
-> > + *					requirements.
-> > + * @KVM_PGTABLE_WALK_SKIP_CMO:		Visit and update table entries
-> > + *					without Cache maintenance
-> > + *					operations required.
+> > If I replace the above paragraph with this, does that address (or at least mitigate
+> > to an acceptable level) your concerns?  Inevitably there will still be series that
+> > are wrongly based on kvm-x86, but I am more than happy to do the policing.  I
+> > obviously can't guarantee that I will be the first to run afoul of a "bad" series,
+> > but I do think I can be quick enough to avoid shifting the burden to other
+> > maintainers.  And if I'm wrong on either front, you get to say "told you so" and
+> > make me submit a patch of shame ;-)
+> > 
+> >   The only exception to using ``kvm-x86/next`` as the base is if a patch/series
+> >   is a multi-arch series, i.e. has non-trivial modifications to common KVM code
+> >   and/or has more than superficial changes to other architectures's code.  Multi-
 > 
-> We have both I and D side CMOs. Is it reasonable to always treat them
-> identically?
+> nit: Maybe 'to another architecture's code', since English is an annoying
+> language :)
+
+Gah, was supposed to be just "architectures'".  I don't want to limit the wording
+to just one other architecture, because then I'll get nitpicked on what to do if
+a series touches _two_ architectures.
+
+> >   arch patch/series should instead be based on a common, stable point in KVM's
+> >   history, e.g. the release candidate upon which ``kvm-x86 next`` is based.  If
+> >   you're unsure whether a patch/series is truly multi-arch, err on the side of
+> >   caution and treat it as multi-arch, i.e. use a common base.
 > 
-> >   */
-> >  enum kvm_pgtable_walk_flags {
-> >  	KVM_PGTABLE_WALK_LEAF			= BIT(0),
-> > @@ -202,6 +208,8 @@ enum kvm_pgtable_walk_flags {
-> >  	KVM_PGTABLE_WALK_TABLE_POST		= BIT(2),
-> >  	KVM_PGTABLE_WALK_SHARED			= BIT(3),
-> >  	KVM_PGTABLE_WALK_HANDLE_FAULT		= BIT(4),
-> > +	KVM_PGTABLE_WALK_SKIP_BBM		= BIT(5),
-> > +	KVM_PGTABLE_WALK_SKIP_CMO		= BIT(6),
-> >  };
-> >  
-> >  struct kvm_pgtable_visit_ctx {
-> > @@ -223,6 +231,16 @@ static inline bool kvm_pgtable_walk_shared(const struct kvm_pgtable_visit_ctx *c
-> >  	return ctx->flags & KVM_PGTABLE_WALK_SHARED;
-> >  }
-> >  
-> > +static inline bool kvm_pgtable_walk_skip_bbm(const struct kvm_pgtable_visit_ctx *ctx)
-> > +{
-> > +	return ctx->flags & KVM_PGTABLE_WALK_SKIP_BBM;
-> 
-> Probably worth wrapping this with an 'unlikely'.
-> 
-> > +}
-> > +
-> > +static inline bool kvm_pgtable_walk_skip_cmo(const struct kvm_pgtable_visit_ctx *ctx)
-> > +{
-> > +	return ctx->flags & KVM_PGTABLE_WALK_SKIP_CMO;
-> 
-> Same here.
-> 
-> Also, why are these in kvm_pgtable.h? Can't they be moved inside
-> pgtable.c and thus have the "inline" attribute dropped?
-> 
-> > +}
-> > +
-> >  /**
-> >   * struct kvm_pgtable_walker - Hook into a page-table walk.
-> >   * @cb:		Callback function to invoke during the walk.
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index a3246d6cddec..4f703cc4cb03 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -741,14 +741,17 @@ static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
-> >  	if (!stage2_try_set_pte(ctx, KVM_INVALID_PTE_LOCKED))
-> >  		return false;
-> >  
-> > -	/*
-> > -	 * Perform the appropriate TLB invalidation based on the evicted pte
-> > -	 * value (if any).
-> > -	 */
-> > -	if (kvm_pte_table(ctx->old, ctx->level))
-> > -		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
-> > -	else if (kvm_pte_valid(ctx->old))
-> > -		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ctx->level);
-> > +	if (!kvm_pgtable_walk_skip_bbm(ctx)) {
-> > +		/*
-> > +		 * Perform the appropriate TLB invalidation based on the
-> > +		 * evicted pte value (if any).
-> > +		 */
-> > +		if (kvm_pte_table(ctx->old, ctx->level))
-> 
-> You're not skipping BBM here. You're skipping the TLB invalidation.
-> Not quite the same thing.
-> 
-> > +			kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
-> > +		else if (kvm_pte_valid(ctx->old))
-> > +			kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu,
-> > +				     ctx->addr, ctx->level);
-> > +	}
-> >  
-> >  	if (stage2_pte_is_counted(ctx->old))
-> >  		mm_ops->put_page(ctx->ptep);
-> > @@ -832,11 +835,13 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
-> >  		return -EAGAIN;
-> >  
-> >  	/* Perform CMOs before installation of the guest stage-2 PTE */
-> > -	if (mm_ops->dcache_clean_inval_poc && stage2_pte_cacheable(pgt, new))
-> > +	if (!kvm_pgtable_walk_skip_cmo(ctx) && mm_ops->dcache_clean_inval_poc &&
-> > +	    stage2_pte_cacheable(pgt, new))
-> >  		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(new, mm_ops),
-> > -						granule);
-> > +					       granule);
-> >  
-> > -	if (mm_ops->icache_inval_pou && stage2_pte_executable(new))
-> > +	if (!kvm_pgtable_walk_skip_cmo(ctx) && mm_ops->icache_inval_pou &&
-> > +	    stage2_pte_executable(new))
-> >  		mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
-> >  
-> >  	stage2_make_pte(ctx, new);
-> 
-> Thanks,
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+> LGTM, and sorry for whining without getting across the net effect I was hoping
+> for in the language.
+
+No need to apologize, the whole point of this doc is to try to make everyone's
+lives easier, not just my own.  But mostly my own :-D
