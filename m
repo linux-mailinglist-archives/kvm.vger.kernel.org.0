@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B87A26B6E04
-	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 04:35:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 714966B6E05
+	for <lists+kvm@lfdr.de>; Mon, 13 Mar 2023 04:36:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229987AbjCMDfQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Mar 2023 23:35:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49790 "EHLO
+        id S229668AbjCMDgA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Mar 2023 23:36:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229932AbjCMDfN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Mar 2023 23:35:13 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D003131E28
-        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 20:35:03 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id y2so10605166pjg.3
-        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 20:35:03 -0700 (PDT)
+        with ESMTP id S229504AbjCMDf5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Mar 2023 23:35:57 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB86D31E2C
+        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 20:35:56 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id y2so10606363pjg.3
+        for <kvm@vger.kernel.org>; Sun, 12 Mar 2023 20:35:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678678503;
+        d=google.com; s=20210112; t=1678678556;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=c8b0WhK8vmfgLUxQMk/eTDiK5Km4ElMB+CW7ekOSktw=;
-        b=UI2j7kOxEIcMON0OFYjBjv4HbsUo6ky4Jc7WVZANhbpNuUX/vx8IX2OSLAor1cfimy
-         9z4jZajcCcdDq0PhoccbU8mXIkOXcHx2LNykaZK9F1q48ZpvebWLzp2JHFmohyDpFJpG
-         f0+rePacUSHA6HUY+9dLcrmEgia4fCX65Uj5oXIlUr2ShIVoktgXEEDTzt4sb9bCYi1a
-         THfBpsHmldHZbcf8UImoHCagJaIc2c6ScakEro2NvGYYt8AmpNGkLWvzsCjYx9SW436S
-         B3GHcDC8xhXuaDDvOYWph/LuFDkChMgFHgrDxvR2jtpmNSBzlNK7exlVPwpigJoOwbkR
-         mRwQ==
+        bh=XIVDKNgNNnu7iJidCAmkeAHFjqwKfwXTuL13VCoOInQ=;
+        b=OHPdAgmcGU4QMibOut+sWb1Mt3yexKZ+FGNJSMuSuf/Z8Jt1h6UtKkMXBxGdTHctL9
+         oVIWxgsPVk524AJEpmL1bOqTWCbKlNet6yr5mqfEkSaxAXZoV3Ps4A46yvo0jz7Rdyem
+         x6eXadJTQLU8zjhJ53dciyxBu5LaG0xyzxeooK4zRv0pgYgzDCkYGdcv06QBYzD9e0f5
+         cw7WocKdrsfrBCslixZvrJBQ4Arbn6zpYsP/FFs6i6QCuQ1TY/0p/MoD0X5LNbYXI8j7
+         UK0NO1+vC6kiU7BC3pdxWzjpGfxsEyH6vK35nGbNtG4pr0xFq1cFRPrNoJAo5q8mM683
+         YOKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678678503;
+        d=1e100.net; s=20210112; t=1678678556;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=c8b0WhK8vmfgLUxQMk/eTDiK5Km4ElMB+CW7ekOSktw=;
-        b=axNmAX8yqBiMIKkd8aH8zmTieyif5YOZ47PanqWpSR2yZTMB9nLZCiGq/REctOnZwA
-         NcBBOiFL0ESsWLQ54yPcR7Ix/wwgEVfB7VlLOS5ujo8r9ysqOkG6lx1uwYObaYfk4Sh3
-         KGSNXdpS6mJbEQWaParY2LDJRQt/G39MKXWTEJrGrOqA6Bwh/3BzkBEpT7UgZTCTeq3c
-         9ZUro/2qnUV8VALSqTw38oNbVXPUznT/5Vs0nd4ij/brr2ZECksjsDokMrc7Cq9CClAZ
-         OsCEXEjNfiMzUx2Yr41n2XvLMBkY1grHM2HgSPSmY1R3NSw5iM/d6Tn0zxGF66IiSd71
-         2bkw==
-X-Gm-Message-State: AO0yUKXqZNhKr5cg1hEIs+SxPpjj5BBA94f8BUbs6nbCYG11E3pwIWOd
-        ZY5zb+cSGC33RFT3YyVk4MFuPszBo74SxHyJX6cycg==
-X-Google-Smtp-Source: AK7set+ZYwGulAFTlGElUo5y1U5AO9QzS5d1rkxFf+xh7M7NuFyE3ozmdH71T9UqFQSC06M2dN0/bogbUzkgVc+Hyjs=
+        bh=XIVDKNgNNnu7iJidCAmkeAHFjqwKfwXTuL13VCoOInQ=;
+        b=E0LcL2US9QZiUvGkxyVT2yxE4lwa6k8uWSJOQZqE9kpjK0VXiCkn+rdLjsiMaoKLpQ
+         cLN1MN6i6cX70UBZuUCX32R4bqWmwoWbuv189dbOjgdCPqXRb/PjAvZ6sFgsgUm5iaL0
+         g9zUl90jCUzUNi6Y0lxiE+qGZMONuIdl+jAVdkntBvV5BB2XWvtZ8vJGoBv6by5flPiv
+         9ns98qQpPuvS1TGp0t0wBTPpl0wilG/j7Aw8yME6yAqAyXtQvDXNfRhMsJ4XJx4QiUwQ
+         oOwHlthEbKa6tpbWpWpXgrjHFqt0Bazi/YCfYZq8MKHfk9LFNFd7hsL1uDYeCtU/NsAi
+         eZ9A==
+X-Gm-Message-State: AO0yUKVOA3Z9LGDYb7S+Er2Q/BYvFuZkjZfSut3mgTn6W3wPdCzZKwc9
+        vfc16Aas4m5vOTvh0nTt01LokeubJ4gXqeoVgxE/Vg==
+X-Google-Smtp-Source: AK7set9ytJ+OvrhbrLetsnIDo/dfpOg8EONiPahVU2UwpRmMYqsdRD/mpKfb4P9rmj1BRrcC6/ounfQ9rh5k4KZbWJo=
 X-Received: by 2002:a17:90a:ba03:b0:230:b842:143e with SMTP id
- s3-20020a17090aba0300b00230b842143emr11836291pjr.6.1678678503167; Sun, 12 Mar
- 2023 20:35:03 -0700 (PDT)
+ s3-20020a17090aba0300b00230b842143emr11836800pjr.6.1678678556258; Sun, 12 Mar
+ 2023 20:35:56 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230302055033.3081456-1-reijiw@google.com> <20230302055033.3081456-3-reijiw@google.com>
- <87y1o23tfx.wl-maz@kernel.org>
-In-Reply-To: <87y1o23tfx.wl-maz@kernel.org>
+References: <20230302055033.3081456-1-reijiw@google.com> <87wn3m3ta0.wl-maz@kernel.org>
+In-Reply-To: <87wn3m3ta0.wl-maz@kernel.org>
 From:   Reiji Watanabe <reijiw@google.com>
-Date:   Sun, 12 Mar 2023 20:34:46 -0700
-Message-ID: <CAAeT=FxiYjPyFcvDKWVHhkksDd8FQtq8Nwz3bgWygNwitFsGHQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] KVM: arm64: PMU: Don't save PMCR_EL0.{C,P} for the vCPU
+Date:   Sun, 12 Mar 2023 20:35:39 -0700
+Message-ID: <CAAeT=FzTSboSVB=VJ_mkmkOmMtftjzOaQQfAOwmnUuomOwfiYw@mail.gmail.com>
+Subject: Re: [PATCH 0/2] KVM: arm64: PMU: Preserve vPMC registers properly on migration
 To:     Marc Zyngier <maz@kernel.org>
 Cc:     Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
         kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
@@ -81,52 +80,40 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Hi Marc,
 
-On Sun, Mar 12, 2023 at 8:01=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
+On Sun, Mar 12, 2023 at 8:04=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
 :
 >
-> On Thu, 02 Mar 2023 05:50:33 +0000,
+> On Thu, 02 Mar 2023 05:50:31 +0000,
 > Reiji Watanabe <reijiw@google.com> wrote:
 > >
-> > Presently, when a guest writes 1 to PMCR_EL0.{C,P}, which is WO/RAZ,
-> > KVM saves the register value, including these bits.
-> > When userspace reads the register using KVM_GET_ONE_REG, KVM returns
-> > the saved register value as it is (the saved value might have these
-> > bits set).  This could result in userspace setting these bits on the
-> > destination during migration.  Consequently, KVM may end up resetting
-> > the vPMU counter registers (PMCCNTR_EL0 and/or PMEVCNTR<n>_EL0) to
-> > zero on the first KVM_RUN after migration.
+> > The series fixes two problems in preserving vPMU counter (vPMC)
+> > registers (PMCCNTR_EL0/PMEVCNTR<n>_EL0) during migration.
 > >
-> > Fix this by not saving those bits when a guest writes 1 to those bits.
+> > One of the problems is that KVM may not return the current values
+> > of the vPMC registers for KVM_GET_ONE_REG.
 > >
-> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> > ---
-> >  arch/arm64/kvm/pmu-emul.c | 4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> > index 24908400e190..a5a0a9811ddb 100644
-> > --- a/arch/arm64/kvm/pmu-emul.c
-> > +++ b/arch/arm64/kvm/pmu-emul.c
-> > @@ -538,7 +538,9 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64=
- val)
-> >       if (!kvm_pmu_is_3p5(vcpu))
-> >               val &=3D ~ARMV8_PMU_PMCR_LP;
-> >
-> > -     __vcpu_sys_reg(vcpu, PMCR_EL0) =3D val;
-> > +     /* The reset bits don't indicate any state, and shouldn't be save=
-d. */
-> > +     __vcpu_sys_reg(vcpu, PMCR_EL0) =3D
-> > +                             val & ~(ARMV8_PMU_PMCR_C | ARMV8_PMU_PMCR=
-_P);
+> > The other one might cause KVM to reset the vPMC registers on the
+> > first KVM_RUN on the destination. This is because userspace might
+> > save PMCR_EL0 with PMCR_EL0.{C,P} bits set on the source, and
+> > restore it on the destination.
 >
-> nit: assignment on a single line, please.
+> This looks good to me. Can you please add the relevant Fixes: tags and
+> a Cc: to stable? With that, that'd be a candidate for -rc3, I think.
 
-Yes, I fixed it in v2!
+Thank you for the review!
 
->
-> With that,
->
-> Reviewed-by: Marc Zyngier <maz@kernel.org>
+I posted v2, which addressed the comments above, and the comment
+for the patch-2 (remove the line break).
 
-Thank you!
+Thank you,
 Reiji
+
+
+
+>
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
