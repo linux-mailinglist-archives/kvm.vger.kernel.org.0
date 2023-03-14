@@ -2,74 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EA8CC6B9DEF
-	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 19:10:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 43F6A6B9E1E
+	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 19:19:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229690AbjCNSKl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Mar 2023 14:10:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59080 "EHLO
+        id S229987AbjCNSTQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Mar 2023 14:19:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229464AbjCNSKj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Mar 2023 14:10:39 -0400
-Received: from out-51.mta1.migadu.com (out-51.mta1.migadu.com [IPv6:2001:41d0:203:375::33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 225C619C7B
-        for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 11:10:34 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1678817432;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=z/e8hGKQr30b5ZvdSDvuiuWs97jzQhjwuRhF+vuhvk8=;
-        b=To69XkfxqTbOxl5n49kjumMJ7t3j0izNLm88VXspv8c8B1+4S6tHPjESl9RFvOvz5Jh7DF
-        lkTAuaGZs3L9wVaF4ymnTYNduKWZbOGf4ywCvG2CXyclM04KVH2tsFAlgx56LqPoYUMb4+
-        OJMdIAmSGztCai6SQVzNcJxb7j0U+ik=
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Marc Zyngier <maz@kernel.org>, David Matlack <dmatlack@google.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Sean Christopherson <seanjc@google.com>,
-        stable@vger.kernel.org,
-        Christoffer Dall <c.dall@virtualopensystems.com>,
-        kvmarm@lists.linux.dev, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: Retry fault if vma_lookup() results become invalid
-Date:   Tue, 14 Mar 2023 18:10:18 +0000
-Message-Id: <167881740956.623301.15796552782250010868.b4-ty@linux.dev>
-In-Reply-To: <20230313235454.2964067-1-dmatlack@google.com>
-References: <20230313235454.2964067-1-dmatlack@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S230051AbjCNSTK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Mar 2023 14:19:10 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA00B6230D
+        for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 11:18:55 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 2AFB0B81AD0
+        for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 18:18:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFBFFC4339B;
+        Tue, 14 Mar 2023 18:18:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1678817932;
+        bh=My0qKjylZkeXmptIjgNvTHL0FPeH1/JBYiGK3HqA+Ko=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=LBrhjt/XIWz1B2ALxXNBkHMWdd+HVFNDEtyPA+f2BaFSFRqTYBmyU8cKcdAfCqe3o
+         ZPwJMhoj5nEI4lIOpk5l2kDHyNBPCRzAz41YFTk0zEoGA9zAxbajM0mUnbML70SbsX
+         z9ziiKEEPev+zLa1wUUF/+flhVH34ajRxeLJ/PmAEwbzs1VKudgPyNfK0o8Z2wvrWK
+         E9M8psEg53FsIX/eVsvzSKAa2//TGt3ecb+citG3qrDW5Z8USVaxxzXwY5Rm4qZ7R6
+         KxbCTyVdO3jFaLH98SCYGKXcABFZTXJLJwoaaHd+aS3mJXQ2fxmUz/yvx/2KdVbrB3
+         I2l1bGz6f4JHw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pc9EY-0003h6-EE;
+        Tue, 14 Mar 2023 18:18:50 +0000
+Date:   Tue, 14 Mar 2023 18:18:50 +0000
+Message-ID: <86edprxkl1.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Colton Lewis <coltonlewis@google.com>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+        suzuki.poulose@arm.com, oliver.upton@linux.dev,
+        yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de,
+        dwmw2@infradead.org
+Subject: Re: [PATCH 15/16] KVM: arm64: selftests: Augment existing timer test to handle variable offsets
+In-Reply-To: <gsnta60fcjje.fsf@coltonlewis-kvm.c.googlers.com>
+References: <86o7owyj0a.wl-maz@kernel.org>
+        <gsnta60fcjje.fsf@coltonlewis-kvm.c.googlers.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de, dwmw2@infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 13 Mar 2023 16:54:54 -0700, David Matlack wrote:
-> Read mmu_invalidate_seq before dropping the mmap_lock so that KVM can
-> detect if the results of vma_lookup() (e.g. vma_shift) become stale
-> before it acquires kvm->mmu_lock. This fixes a theoretical bug where a
-> VMA could be changed by userspace after vma_lookup() and before KVM
-> reads the mmu_invalidate_seq, causing KVM to install page table entries
-> based on a (possibly) no-longer-valid vma_shift.
+On Tue, 14 Mar 2023 17:47:01 +0000,
+Colton Lewis <coltonlewis@google.com> wrote:
 > 
-> [...]
+> I'll be looking at it and will keep in mind your questions about my
+> hardware should I find any issues. Yes it has ECV and CNTPOFF but no I
+> didn't try turning it off for this because my issue occured only when
+> setting a physical offset and that can't be done without ECV.
 
-Applied to kvmarm/fixes, thanks!
+And yet this is exactly what these patches do: allow setting a
+physical offset without ECV+CNTPOFF.
 
-[1/1] KVM: arm64: Retry fault if vma_lookup() results become invalid
-      https://git.kernel.org/kvmarm/kvmarm/c/13ec9308a857
+CNTPOFF is only a performance optimisation. It could be that my
+handling of CNTPOFF is buggy, or that your HW is less than stellar, or
+both. Testing the various combinations would certainly help.
 
---
-Best,
-Oliver
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
