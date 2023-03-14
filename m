@@ -2,201 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F55D6B925F
-	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 12:57:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 56CE66B92A8
+	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 13:06:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229687AbjCNL5p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Mar 2023 07:57:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48268 "EHLO
+        id S231764AbjCNMGw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Mar 2023 08:06:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230140AbjCNL5n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Mar 2023 07:57:43 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09FD69CBD4;
-        Tue, 14 Mar 2023 04:56:59 -0700 (PDT)
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32EAWXX6010453;
-        Tue, 14 Mar 2023 11:56:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=sjRjoVyN4hmqa3UgKM3i+zcwVYtKhiHXvv25pR/1sXo=;
- b=GXoY/mcTITaDlpFuXa2KeJxq/rPofxOpAFHrgVfpO+IIXcsDz54dWUDPLTkkWlw6GLhZ
- KsF6VOITSLsu7vsMcv1acEAa3xM+w7ztajj0tseTB8HTFVqxZCNUweDapy83ueZnmxHk
- GEd6R4DdvITvfkSyNjmYxvHn3f5osIrsZTLEOMzZoyzchg/ky80pF7AXa3CR5RIvYkuV
- CP7MSFkNi9sg3YPIQoJIz2JLQPFEscX1+G6P2Pul9ovApUx2pmUsRrYxtaT/fRXicQJJ
- UwMe7MtpJYEGyZoTOsfoZ6Naoyusrazm2iHK4MSA8E0fnLGlqz4BbsZ8XnAWRCphxlCm mw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3paq8y9yap-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 14 Mar 2023 11:56:19 +0000
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32EAWbmR010607;
-        Tue, 14 Mar 2023 11:56:18 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3paq8y9ya6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 14 Mar 2023 11:56:18 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32E6XRQ4029999;
-        Tue, 14 Mar 2023 11:56:16 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3p8gwfcsmg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 14 Mar 2023 11:56:16 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32EBuDG746727560
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 14 Mar 2023 11:56:13 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2BD4D2004E;
-        Tue, 14 Mar 2023 11:56:13 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DD44720043;
-        Tue, 14 Mar 2023 11:56:12 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.56])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 14 Mar 2023 11:56:12 +0000 (GMT)
-Date:   Tue, 14 Mar 2023 12:56:11 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v5] s390x: Add tests for execute-type
- instructions
-Message-ID: <20230314125611.6135af7a@p-imbrenda>
-In-Reply-To: <d6471b717f34b6ae664dc91331246e9676d8c879.camel@linux.ibm.com>
-References: <20230310181131.2138736-1-nsg@linux.ibm.com>
-        <20230313191602.58b16c31@p-imbrenda>
-        <d6471b717f34b6ae664dc91331246e9676d8c879.camel@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        with ESMTP id S231789AbjCNMGj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Mar 2023 08:06:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B08C1DB94
+        for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 05:05:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1678795398;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=wUnI4l1fJIq39Iu/vgThoYTI/vSFozVCmS4t49sYC3A=;
+        b=EUCzvb4qAy8ZKm34CMfNqfylTy4XxznDJ6y7Rvhtu1PMktAYjpq6anW8uZYPjK1pxUOk4z
+        8weiXNH37mvHkou6yChun+H1WFIp20lbPn9Fg+oVnTnHnEDoKxhz7Eh73JxEiTITVYAUPd
+        alnD16CmByHtNCjNV/h9QxFYdmhZO+Y=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-457-dLSejJJQPByT080Bi69ygg-1; Tue, 14 Mar 2023 08:00:06 -0400
+X-MC-Unique: dLSejJJQPByT080Bi69ygg-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1CDDF18E6C5B;
+        Tue, 14 Mar 2023 12:00:04 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C1F2D400F4F;
+        Tue, 14 Mar 2023 12:00:03 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Reima ISHII <ishiir@g.ecc.u-tokyo.ac.jp>, stable@vger.kernel.org
+Subject: [PATCH v2] KVM: nVMX: add missing consistency checks for CR0 and CR4
+Date:   Tue, 14 Mar 2023 08:00:03 -0400
+Message-Id: <20230314120003.3038323-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: OyoDqQVTiAPXmTz4WLspEF9GpTfSVsWH
-X-Proofpoint-ORIG-GUID: UKSYRxWaZfjqhvMfa8c-xwnYJvk_3csZ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-14_04,2023-03-14_02,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- mlxlogscore=999 clxscore=1015 suspectscore=0 adultscore=0
- priorityscore=1501 spamscore=0 lowpriorityscore=0 impostorscore=0
- mlxscore=0 phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2212070000 definitions=main-2303140098
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 13 Mar 2023 23:45:33 +0100
-Nina Schoetterl-Glausch <nsg@linux.ibm.com> wrote:
+The effective values of the guest CR0 and CR4 registers may differ from
+those included in the VMCS12.  In particular, disabling EPT forces
+CR4.PAE=1 and disabling unrestricted guest mode forces CR0.PG=CR0.PE=1.
 
+Therefore, checks on these bits cannot be delegated to the processor
+and must be performed by KVM.
 
-[...]
+Reported-by: Reima ISHII <ishiir@g.ecc.u-tokyo.ac.jp>
+Cc: stable@vger.kernel.org
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/vmx/nested.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-> > > +/*
-> > > + * BRANCH AND SAVE, register register variant.
-> > > + * Saves the next instruction address (address from PSW + length of =
-instruction)
-> > > + * to the first register. No branch is taken in this test, because 0=
- is
-> > > + * specified as target.
-> > > + * BASR does *not* perform a relative address calculation with an in=
-termediate.
-> > > + */
-> > > +static void test_basr(void)
-> > > +{
-> > > +	uint64_t ret_addr, after_ex;
-> > > +
-> > > +	report_prefix_push("BASR");
-> > > +	asm volatile ( ".pushsection .rodata\n" =20
-> >=20
-> > you use .text.ex_bras in the next test, why not something like that here
-> > (and everywhere else) too? =20
->=20
-> In the test below we branch to the code in .text.ex_bras.
-> In all other tests the instruction in .rodata is just an operand of the e=
-xecute instruction,
-> and it doesn't get modified.
-> As for the bras test having a suffix, I guess it's pretty arbitrary, but =
-since it's a handful
-> of instructions instead of just one, it felt substantial enough to warran=
-t one.
->=20
-
-we discussed this offline :)
-
-> >  =20
-> > > +		"0:	basr	%[ret_addr],0\n"
-> > > +		"	.popsection\n"
-> > > +
-> > > +		"	larl	%[after_ex],1f\n"
-> > > +		"	exrl	0,0b\n"
-> > > +		"1:\n"
-> > > +		: [ret_addr] "=3Dd" (ret_addr),
-> > > +		  [after_ex] "=3Dd" (after_ex)
-> > > +	);
-> > > +
-> > > +	report(ret_addr =3D=3D after_ex, "return address after EX");
-> > > +	report_prefix_pop();
-> > > +}
-> > > +
-> > > +/*
-> > > + * BRANCH RELATIVE AND SAVE.
-> > > + * According to PoP (Branch-Address Generation), the address calcula=
-ted relative
-> > > + * to the instruction address is relative to BRAS when it is the tar=
-get of an
-> > > + * execute-type instruction, not relative to the execute-type instru=
-ction.
-> > > + */
-> > > +static void test_bras(void)
-> > > +{
-> > > +	uint64_t after_target, ret_addr, after_ex, branch_addr;
-> > > +
-> > > +	report_prefix_push("BRAS");
-> > > +	asm volatile ( ".pushsection .text.ex_bras, \"x\"\n"
-> > > +		"0:	bras	%[ret_addr],1f\n"
-> > > +		"	nopr	%%r7\n"
-> > > +		"1:	larl	%[branch_addr],0\n"
-> > > +		"	j	4f\n"
-> > > +		"	.popsection\n"
-> > > +
-> > > +		"	larl	%[after_target],1b\n"
-> > > +		"	larl	%[after_ex],3f\n"
-> > > +		"2:	exrl	0,0b\n" =20
-> /*
->  * In case the address calculation is correct, we jump by the relative of=
-fset 1b-0b from 0b to 1b.
->  * In case the address calculation is relative to the exrl (i.e. a test f=
-ailure),
->  * put a valid instruction at the same relative offset from the exrl, so =
-the test continues in a
->  * controlled manner.
->  */
-
-looks good
-
-> > > +		"3:	larl	%[branch_addr],0\n"
-> > > +		"4:\n"
-> > > +
-> > > +		"	.if (1b - 0b) !=3D (3b - 2b)\n"
-> > > +		"	.error	\"right and wrong target must have same offset\"\n" =20
-> >=20
-> > please explain why briefly (i.e. if the wrong target is executed and
-> > the offset mismatches Bad Things=E2=84=A2 happen) =20
->=20
-> Ok, see above.
->=20
-> [...]
->=20
->=20
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index d93c715cda6a..bceb5ad409c6 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -3021,7 +3021,7 @@ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
+ 					struct vmcs12 *vmcs12,
+ 					enum vm_entry_failure_code *entry_failure_code)
+ {
+-	bool ia32e;
++	bool ia32e = !!(vmcs12->vm_entry_controls & VM_ENTRY_IA32E_MODE);
+ 
+ 	*entry_failure_code = ENTRY_FAIL_DEFAULT;
+ 
+@@ -3047,6 +3047,13 @@ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
+ 					   vmcs12->guest_ia32_perf_global_ctrl)))
+ 		return -EINVAL;
+ 
++	if (CC((vmcs12->guest_cr0 & (X86_CR0_PG | X86_CR0_PE)) == X86_CR0_PG))
++		return -EINVAL;
++
++	if (CC(ia32e && !(vmcs12->guest_cr4 & X86_CR4_PAE)) ||
++	    CC(ia32e && !(vmcs12->guest_cr0 & X86_CR0_PG)))
++		return -EINVAL;
++
+ 	/*
+ 	 * If the load IA32_EFER VM-entry control is 1, the following checks
+ 	 * are performed on the field for the IA32_EFER MSR:
+@@ -3058,7 +3065,6 @@ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
+ 	 */
+ 	if (to_vmx(vcpu)->nested.nested_run_pending &&
+ 	    (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_EFER)) {
+-		ia32e = (vmcs12->vm_entry_controls & VM_ENTRY_IA32E_MODE) != 0;
+ 		if (CC(!kvm_valid_efer(vcpu, vmcs12->guest_ia32_efer)) ||
+ 		    CC(ia32e != !!(vmcs12->guest_ia32_efer & EFER_LMA)) ||
+ 		    CC(((vmcs12->guest_cr0 & X86_CR0_PG) &&
+-- 
+2.39.1
 
