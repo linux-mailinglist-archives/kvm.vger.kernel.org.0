@@ -2,143 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 024CA6B9073
-	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 11:45:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 504646B9091
+	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 11:50:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229829AbjCNKpj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Mar 2023 06:45:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46526 "EHLO
+        id S229648AbjCNKuU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Mar 2023 06:50:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229665AbjCNKpi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Mar 2023 06:45:38 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AAAB14EB4
-        for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 03:45:09 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A6472B817B7
-        for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 10:44:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DD02C433D2;
-        Tue, 14 Mar 2023 10:44:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678790673;
-        bh=/zc6dyyYEjbrVXwGWF4uQQkOIFQN/MV9XcG7kVyoU8c=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=huMTdu+PpFBDNANuJEv3Zffu1Vwm5cnJIAQmdYY3MuN25otEzxcnlFhMmkggk2hUo
-         Zg6vJh0QdA9Jnk7zIVTJcZgLygNa22xIIMc2Pcs3GewkKm2ckMzMRdk7bASAm+Eues
-         RAN2IljR//Emad3bmD6suX/b0xnCdzhRS9quJSJdByNALFOBypTAd+axnneC01zyp9
-         mqLwazNT6zD+m68frSOR6bzEC7f4JK/4T7YbjsBWyMJxnlp4Wj6f3OSAsIN4kJmS52
-         zfQ8yCd2HXmxsc+/l1K3ni3SUZUbMnG/6B0ZUMCAF96ZfwPxqmqsZGPZ7TYIDtJlD2
-         EAHAvLIXAshfA==
-Date:   Tue, 14 Mar 2023 10:44:25 +0000
-From:   Conor Dooley <conor@kernel.org>
-To:     Andy Chiu <andy.chiu@sifive.com>
-Cc:     =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
-        linux-riscv@lists.infradead.org, palmer@dabbelt.com,
-        anup@brainfault.org, atishp@atishpatra.org,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        vineetg@rivosinc.com, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, Vincent Chen <vincent.chen@sifive.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Oleg Nesterov <oleg@redhat.com>,
-        Eric Biederman <ebiederm@xmission.com>,
-        Kees Cook <keescook@chromium.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Brown <broonie@kernel.org>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Rolf Eike Beer <eb@emlix.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Alexey Dobriyan <adobriyan@gmail.com>
-Subject: Re: [PATCH -next v14 11/19] riscv: Add ptrace vector support
-Message-ID: <61c440cd-bae9-4984-9d26-d78e9fad2f16@spud>
-References: <20230224170118.16766-1-andy.chiu@sifive.com>
- <20230224170118.16766-12-andy.chiu@sifive.com>
- <87mt4v4clq.fsf@all.your.base.are.belong.to.us>
- <CABgGipU9LjvT6RQ6OfTXm6==pV0KXUjvyTR-FCNC05sfDec+9g@mail.gmail.com>
+        with ESMTP id S230498AbjCNKt6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Mar 2023 06:49:58 -0400
+Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A1A19CFDA;
+        Tue, 14 Mar 2023 03:49:27 -0700 (PDT)
+Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
+        by mx.sberdevices.ru (Postfix) with ESMTP id 16DDD5FD1B;
+        Tue, 14 Mar 2023 13:49:08 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1678790948;
+        bh=O9gE/e3yodgY9/2lXhwQfpuuKkQb1WuGw0jqX7CdLPE=;
+        h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type;
+        b=Olm0J031XNxDpWpsClTgF5zygiodMekRLoQWGsVHm6GDSK4wEesNNXaLKosZTZIQO
+         ibh/Gggnm9e63G+MancnN7GVOib51Jz4Yty5LGp1pEfYPIDIswAr3PWJuWHa1wUXkD
+         YyC4tvb6UfsUi0DJgKdQviCds7q5tRG1VqTJxjIImrMLUueCJ1JC8LnFrSdWwGO+O+
+         BPg0LeFSmW7Nt/TJrx7jy3FD+a/9ZOdAuq90c7alBWg87vdOQ+TviO2LkJ0f2C9a7F
+         v5RplooPIgu513nIni6MH72oLlu/ICJ3AjkKvwYjad1/Vy9C1FIlQz7yG5la1K178C
+         N5YrKn2oraNzA==
+Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
+        by mx.sberdevices.ru (Postfix) with ESMTP;
+        Tue, 14 Mar 2023 13:49:07 +0300 (MSK)
+Message-ID: <677f4431-d678-543c-c4aa-e237f5f36a80@sberdevices.ru>
+Date:   Tue, 14 Mar 2023 13:45:58 +0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="wsNNZ3f2h61Byr8b"
-Content-Disposition: inline
-In-Reply-To: <CABgGipU9LjvT6RQ6OfTXm6==pV0KXUjvyTR-FCNC05sfDec+9g@mail.gmail.com>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Content-Language: en-US
+In-Reply-To: <34d65539-015e-23c8-cf5e-f34bd5795e52@sberdevices.ru>
+To:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>
+CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
+        <avkrasnov@sberdevices.ru>
+From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
+Subject: [PATCH net v4 3/4] virtio/vsock: don't drop skbuff on copy failure
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [172.16.1.6]
+X-ClientProxiedBy: S-MS-EXCH02.sberdevices.ru (172.16.1.5) To
+ S-MS-EXCH01.sberdevices.ru (172.16.1.4)
+X-KSMG-Rule-ID: 4
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Status: not scanned, disabled by settings
+X-KSMG-AntiSpam-Interceptor-Info: not scanned
+X-KSMG-AntiPhishing: not scanned, disabled by settings
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2023/03/14 06:01:00 #20942017
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+This returns behaviour of SOCK_STREAM read as before skbuff usage. When
+copying to user fails current skbuff won't be dropped, but returned to
+sockets's queue. Technically instead of 'skb_dequeue()', 'skb_peek()' is
+called and when skbuff becomes empty, it is removed from queue by
+'__skb_unlink()'.
 
---wsNNZ3f2h61Byr8b
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Fixes: 71dc9ec9ac7d ("virtio/vsock: replace virtio_vsock_pkt with sk_buff")
+Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+ net/vmw_vsock/virtio_transport_common.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-On Tue, Mar 14, 2023 at 06:39:19PM +0800, Andy Chiu wrote:
-> On Thu, Mar 2, 2023 at 7:27=E2=80=AFPM Bj=C3=B6rn T=C3=B6pel <bjorn@kerne=
-l.org> wrote:
-> >
-> > Andy Chiu <andy.chiu@sifive.com> writes:
-> >
-> > > diff --git a/arch/riscv/kernel/ptrace.c b/arch/riscv/kernel/ptrace.c
-> > > index 2ae8280ae475..3c0e01d7f8fb 100644
-> > > --- a/arch/riscv/kernel/ptrace.c
-> > > +++ b/arch/riscv/kernel/ptrace.c
-> > > @@ -83,6 +87,62 @@ static int riscv_fpr_set(struct task_struct *targe=
-t,
-> > >  }
-> > >  #endif
-> > >
-> > > +#ifdef CONFIG_RISCV_ISA_V
-> > > +static int riscv_vr_get(struct task_struct *target,
-> > > +                     const struct user_regset *regset,
-> > > +                     struct membuf to)
-> > > +{
-> > > +     struct __riscv_v_ext_state *vstate =3D &target->thread.vstate;
-> > > +
-> > > +     if (!riscv_v_vstate_query(task_pt_regs(target)))
-> > > +             return -EINVAL;
-> > > +     /*
-> > > +      * Ensure the vector registers have been saved to the memory be=
-fore
-> > > +      * copying them to membuf.
-> > > +      */
-> > > +     if (target =3D=3D current)
-> > > +             riscv_v_vstate_save(current, task_pt_regs(current));
-> > > +
-> > > +     /* Copy vector header from vstate. */
-> > > +     membuf_write(&to, vstate, offsetof(struct __riscv_v_ext_state, =
-datap));
-> > > +     membuf_zero(&to, sizeof(void *));
-> > > +#if __riscv_xlen =3D=3D 32
-> > > +     membuf_zero(&to, sizeof(__u32));
-> > > +#endif
-> >
-> > Remind me why the extra care is needed for 32b?
-> >
->=20
-> That is from the old version of the code and I agree we should remove
-> that.
-
-> Hey Conor, does your Rb still hold after removing this #if,
-> #endif section?
-
-Sure.
-
---wsNNZ3f2h61Byr8b
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZBBQBQAKCRB4tDGHoIJi
-0q0/AP4qrjOdg4BZ8czZIXwP9AB8olebSGPPagBSO9A50HhpCgD+MmTpUZCrAhFP
-UT8+bE+VYtwzLS7zCuUEHQUHd8lqwAY=
-=JWax
------END PGP SIGNATURE-----
-
---wsNNZ3f2h61Byr8b--
+diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+index 9a411475e201..6564192e7f20 100644
+--- a/net/vmw_vsock/virtio_transport_common.c
++++ b/net/vmw_vsock/virtio_transport_common.c
+@@ -364,7 +364,7 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+ 
+ 	spin_lock_bh(&vvs->rx_lock);
+ 	while (total < len && !skb_queue_empty(&vvs->rx_queue)) {
+-		skb = __skb_dequeue(&vvs->rx_queue);
++		skb = skb_peek(&vvs->rx_queue);
+ 
+ 		bytes = len - total;
+ 		if (bytes > skb->len)
+@@ -388,9 +388,8 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+ 			u32 pkt_len = le32_to_cpu(virtio_vsock_hdr(skb)->len);
+ 
+ 			virtio_transport_dec_rx_pkt(vvs, pkt_len);
++			__skb_unlink(skb, &vvs->rx_queue);
+ 			consume_skb(skb);
+-		} else {
+-			__skb_queue_head(&vvs->rx_queue, skb);
+ 		}
+ 	}
+ 
+-- 
+2.25.1
