@@ -2,169 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0278F6B9AB6
-	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 17:09:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 515E66B9B88
+	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 17:31:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230071AbjCNQJg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Mar 2023 12:09:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58712 "EHLO
+        id S230394AbjCNQbz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Mar 2023 12:31:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229904AbjCNQJf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Mar 2023 12:09:35 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C6453B3F6
-        for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 09:09:27 -0700 (PDT)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32EFH40l025071;
-        Tue, 14 Mar 2023 16:09:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : from : to : cc : references : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=YOiWtaNzms3LN/vTqd3NR543A+ISPYIWok1v0FtjtSo=;
- b=EgkOD+Jx4o1zNXT9EJ8iiJdAZNdZ5LgxQ9zuE00lxp65Fn0/kHu3L0E5fNNckCsjh6iM
- RTjmHnB1FTCck15Wq3zmwAdZbnod4KcaZ/nlYGFPDoFxfoqrxM0+jiUgSPBHLwNQRP8a
- cJHhUQGKLuPbnM9nolHFSRGyCBBD3fnsKCa7JoXexXY++fEv5spG0DKe/zc93LFJJ1Yd
- TBRnZf83BE8/HYJJIvw5dKY0U+sWrcGJPRkOySW7IWzU39QeSfDO6tAIQMXqqxiBItYD
- oL3VMYkMmNOqaTuM6qv0+vpcSUmFgwrdCmYmL+rMjjsPbTkJ7aWgXQx+OkwP97qx0Ouz nQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pau6mtc8t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 14 Mar 2023 16:09:12 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32EFH4gH025051;
-        Tue, 14 Mar 2023 16:09:11 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pau6mtc7e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 14 Mar 2023 16:09:11 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32E7mhck018985;
-        Tue, 14 Mar 2023 16:09:09 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3p8h96m0nd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 14 Mar 2023 16:09:09 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32EG957O44171602
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 14 Mar 2023 16:09:05 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7C12020040;
-        Tue, 14 Mar 2023 16:09:05 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 55D822004D;
-        Tue, 14 Mar 2023 16:09:04 +0000 (GMT)
-Received: from [9.171.84.250] (unknown [9.171.84.250])
-        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-        Tue, 14 Mar 2023 16:09:04 +0000 (GMT)
-Message-ID: <8f153115-f12c-8434-79bd-1623555b5875@linux.ibm.com>
-Date:   Tue, 14 Mar 2023 17:09:03 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH v17 06/12] s390x/cpu topology: interception of PTF
- instruction
-Content-Language: en-US
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
-        frankja@linux.ibm.com, berrange@redhat.com, clg@kaod.org
-References: <20230309121511.139152-1-pmorel@linux.ibm.com>
- <20230309121511.139152-7-pmorel@linux.ibm.com>
-In-Reply-To: <20230309121511.139152-7-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 974_Xllzw97pycuPhtllFE7TKvIrFOv5
-X-Proofpoint-GUID: GnYisdVTAyPOdkoOfRXS6u6UXOXtZRqb
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-14_09,2023-03-14_02,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
- lowpriorityscore=0 malwarescore=0 phishscore=0 clxscore=1015
- mlxlogscore=999 priorityscore=1501 bulkscore=0 mlxscore=0 impostorscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2303140134
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229988AbjCNQbr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Mar 2023 12:31:47 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13A455653F;
+        Tue, 14 Mar 2023 09:31:41 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7A78361847;
+        Tue, 14 Mar 2023 16:31:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D989CC433EF;
+        Tue, 14 Mar 2023 16:31:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1678811500;
+        bh=ARC9WBAhBVNF4Tztw+npvVi7tSsxTYJsQSXYXedfHHg=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=qj2EMqg+tWF6I0RiRIFJxaGmxwCo4aQ9Pwt/roF+/gI36ZhlwL2tqAM1P+PmBCf5Z
+         c2FXor5ppSLyGiHzoTNmItOaOC/NGcfdw+uVUHuZxlHyudsqjWT5y/0kUYxlms86PX
+         yqOj1HvKbbWmEofHGXiGeU75lV7OEtZkVum4Fe+LiYBzShRoVvnEn2CwmLuN5F3BSQ
+         szjnOa1MG9n4VrEAljHEYnqeIF3erX2GMQAPCNYsZyQk7G688+wm4qomx9milYSwxE
+         1jW6l8zvArDZRUt/5CU/DcbXAE2+/tXW1/sKrwHoYggaKzVS0YE7AuVZTOYfAi4+r3
+         0XeVxW+WjIHOA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pc7Yo-0001sY-Fs;
+        Tue, 14 Mar 2023 16:31:38 +0000
+Date:   Tue, 14 Mar 2023 16:31:38 +0000
+Message-ID: <86fsa7xpjp.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Will Deacon <will@kernel.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        stable@vger.kernel.org, Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH] KVM: arm64: Retry fault if vma_lookup() results become invalid
+In-Reply-To: <20230313235454.2964067-1-dmatlack@google.com>
+References: <20230313235454.2964067-1-dmatlack@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: dmatlack@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org, mtosatti@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, stable@vger.kernel.org, seanjc@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I am currently developing tests under avocado to help debugging.
+[Dropping Christoffer's 11 year obsolete address...]
 
-And... it helps.
+On Mon, 13 Mar 2023 23:54:54 +0000,
+David Matlack <dmatlack@google.com> wrote:
+> 
+> Read mmu_invalidate_seq before dropping the mmap_lock so that KVM can
+> detect if the results of vma_lookup() (e.g. vma_shift) become stale
+> before it acquires kvm->mmu_lock. This fixes a theoretical bug where a
+> VMA could be changed by userspace after vma_lookup() and before KVM
+> reads the mmu_invalidate_seq, causing KVM to install page table entries
+> based on a (possibly) no-longer-valid vma_shift.
+> 
+> Re-order the MMU cache top-up to earlier in user_mem_abort() so that it
+> is not done after KVM has read mmu_invalidate_seq (i.e. so as to avoid
+> inducing spurious fault retries).
+> 
+> This bug has existed since KVM/ARM's inception. It's unlikely that any
+> sane userspace currently modifies VMAs in such a way as to trigger this
+> race. And even with directed testing I was unable to reproduce it. But a
+> sufficiently motivated host userspace might be able to exploit this
+> race.
+> 
+> Fixes: 94f8e6418d39 ("KVM: ARM: Handle guest faults in KVM")
 
-There is a bug here in s390_topology_set_cpus_entitlement for dedicated 
-CPUs.
+Ah, good luck with that one! :D user_mem_abort() used to be so nice
+and simple at the time! And yet...
 
+> Cc: stable@vger.kernel.org
+> Reported-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: David Matlack <dmatlack@google.com>
 
-On 3/9/23 13:15, Pierre Morel wrote:
-[...]
-> --- a/hw/s390x/cpu-topology.c
-> +++ b/hw/s390x/cpu-topology.c
-> @@ -87,6 +87,84 @@ static void s390_topology_init(MachineState *ms)
->       QTAILQ_INSERT_HEAD(&s390_topology.list, entry, next);
->   }
->   
-> +/**
-> + * s390_topology_set_cpus_entitlement:
-> + * @polarization: polarization requested by the caller
-> + *
-> + * On hotplug or when changing CPU attributes the shadow_entitlement
-> + * is set to hold the entitlement used on a vertical polarization.
-> + * When polarization is horizontal, the entitlement is horizontal too.
-> + */
-> +static void s390_topology_set_cpus_entitlement(int polarization)
-> +{
-> +    CPUState *cs;
-> +
-> +    CPU_FOREACH(cs) {
-> +        CPUS390XState *env = &S390_CPU(cs)->env;
-> +
-> +        if (polarization == S390_CPU_POLARIZATION_HORIZONTAL) {
-> +            env->entitlement = S390_CPU_ENTITLEMENT_HORIZONTAL;
-> +        } else  {
-> +            env->entitlement = env->shadow_entitlement;
-> +        }
-> +    }
-> +}
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
-This should be something like:
+Oliver, how do you want to deal with this one? queue it right now? Or
+wait until the dust settles on my two other patches?
 
-static void s390_topology_set_cpus_entitlement(void)
-{
-     CPUState *cs;
+I don't mind either way, I can either take it as part of the same
+series, or rebase my stuff on it.
 
-     CPU_FOREACH(cs) {
-         CPUS390XState *env = &S390_CPU(cs)->env;
+Thanks,
 
-         if (s390_topology.polarization == 
-S390_CPU_POLARIZATION_HORIZONTAL) {
-             env->entitlement = S390_CPU_ENTITLEMENT_HORIZONTAL;
-         } else if (env->entitlement == S390_CPU_ENTITLEMENT_HORIZONTAL) {
-             if (env->dedicated) {
-                 env->entitlement = S390_CPU_ENTITLEMENT_HIGH;
-             } else {
-                 env->entitlement = env->shadow_entitlement;
-             }
-         }
-     }
-}
+	M.
 
-Sorry.
-
-I provide a new series including the avocado tests.
-
-regards,
-
-Pierre
-
+-- 
+Without deviation from the norm, progress is not possible.
