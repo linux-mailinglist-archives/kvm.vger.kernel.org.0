@@ -2,338 +2,229 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 998936B8672
-	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 00:58:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 142576B86B9
+	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 01:17:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229648AbjCMX6k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Mar 2023 19:58:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51460 "EHLO
+        id S230081AbjCNARn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Mar 2023 20:17:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230022AbjCMX6j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Mar 2023 19:58:39 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE420E04C
-        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 16:58:34 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id rj10so3099100pjb.4
-        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 16:58:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678751914;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PDGcCbApk5SWwy8kMHL+dkdFkrI2nhTDi1PUuQqqAaQ=;
-        b=DryNVkrkPQR7Y8Frs7sEVAlw83RREkA6IF0+9mmWSUQyTMzlEkUFDpbr4pJGIp/QMY
-         rGpI3UYjyL0TbLhkw3wbcC1UXJELK8y+jymeZZDfrTwh4q3VCs1yDk4R0L5FIxoIZ0dZ
-         d8emcyC0X112nr53vG/poiTBbeVJA7H07fI1oNMDakalatUD0omup49Y2VZqf3SxJp6J
-         lbDAIQ+y7olJqs4BKdlNF1ic7r5SlC5+kjwu3yDQPCH1XGzZQAfV0RbsYiAfVoYZ7yAs
-         b9aj/oLomDwuIi/Q5KZ6mDgSsEPA2s2k+IABYOxjgiwWuO6eUAy1BRPLheQQH2xq6Fzs
-         wiOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678751914;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PDGcCbApk5SWwy8kMHL+dkdFkrI2nhTDi1PUuQqqAaQ=;
-        b=3HCSqqLwabPwYTjNX9IKjDqJy3EfohsiKHyOY0MNvRKzD1yYr7SJhSEq+qWJJ0nkxw
-         oBReW5W0PYSb7Qz8T9dyw6OKYRsaFG9NxMhx4I1dj1StrmMjVwg1ZUk+8MqMkzjELS7M
-         M/qLoPacX8gKZ/Ni2OrIdRojfSqZdlh+wQMWRjk97bOLIzEZzOoT25c7+B5ApV7/dMIf
-         XrBONJJUyGHuc8WDpZP8dPKZerKkgJj27fyuybw5qmJDVEIZ+obYbkD1YRmTOLx4e1Ko
-         6xddAFVfufOa87RdDds06/r9cmPMjnyGiDTMDLu7KNngFb+10voOQ+m5uCbptlt7Cecx
-         XGEQ==
-X-Gm-Message-State: AO0yUKWSNaGE3WEAfLn/Fa3CJWE22nwQR5HkK1JQOT+IPBBseJLi0Bsc
-        FyRTmJ5QHd6wURtSJ+X9Jrg2IQ==
-X-Google-Smtp-Source: AK7set/Hu7vqd1wnczHiPPHnEjFdjll2EklIz6df1Wi2Pzcr8jT04QXk+2sps3I4+iud/g2olGWDWg==
-X-Received: by 2002:a17:903:430e:b0:19c:c5d4:afd2 with SMTP id jz14-20020a170903430e00b0019cc5d4afd2mr7340plb.11.1678751914078;
-        Mon, 13 Mar 2023 16:58:34 -0700 (PDT)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id bu11-20020a17090aee4b00b002342ccc8280sm414596pjb.6.2023.03.13.16.58.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Mar 2023 16:58:33 -0700 (PDT)
-Date:   Mon, 13 Mar 2023 16:58:30 -0700
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     pbonzini@redhat.com, oupton@google.com, yuzenghui@huawei.com,
-        dmatlack@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        qperret@google.com, catalin.marinas@arm.com,
-        andrew.jones@linux.dev, seanjc@google.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
-        rananta@google.com, bgardon@google.com, ricarkol@gmail.com,
-        Shaoqin Huang <shahuang@redhat.com>
-Subject: Re: [PATCH v6 04/12] KVM: arm64: Add kvm_pgtable_stage2_split()
-Message-ID: <ZA+4pv6UIDpAp5aY@google.com>
-References: <20230307034555.39733-1-ricarkol@google.com>
- <20230307034555.39733-5-ricarkol@google.com>
- <87a60i5hju.wl-maz@kernel.org>
+        with ESMTP id S229656AbjCNARm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Mar 2023 20:17:42 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17B1A9008D;
+        Mon, 13 Mar 2023 17:17:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1678753061; x=1710289061;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=Fgm2n6prmr4Q3dLSwYLo/YFobR6/+8/s90k9DSjf8Uc=;
+  b=Gf0YBhmAEaJAJ5W9H+EJadi3gnTTP5YM4PoPSXR5hdeag5qTa9w8/oXX
+   W6AkK2O1AOYjWBRqUCY+hk3oDVAr9wei3tPw7BQ/fjlk9IMedTJY16Q7w
+   ahdAyWWSMBotA4uRJ6v/vCGJC07eIJpmSdP6xXu2QYg7Spygl3fLB+x3P
+   RgbF2/8sthIenLFk2oSW1f03SYIi7rKSgus5GXghBSlB/ZckNzZvXEu5V
+   GDDVlFvleiOFWUum6IN5HhroKn9VobcHSZU5NT4xz/tgFM63sVayGVG79
+   9oMKrCow05OnxOWmsUxj/Fc+QPz1iAFyR3aMz6XI4jN6/hGC8wjlPWE25
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10648"; a="316936418"
+X-IronPort-AV: E=Sophos;i="5.98,258,1673942400"; 
+   d="scan'208";a="316936418"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2023 17:17:40 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10648"; a="924701877"
+X-IronPort-AV: E=Sophos;i="5.98,258,1673942400"; 
+   d="scan'208";a="924701877"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga006.fm.intel.com with ESMTP; 13 Mar 2023 17:17:40 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Mon, 13 Mar 2023 17:17:39 -0700
+Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Mon, 13 Mar 2023 17:17:38 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21 via Frontend Transport; Mon, 13 Mar 2023 17:17:38 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.177)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.21; Mon, 13 Mar 2023 17:17:36 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=efD8PrBWHudHCE1+ChLs7TgKAXIhVcoTDN/SoOvx2HhmfHlgvqM4CYFIWAJUaLjXyAS+9+mUFw3F9kJF99tm8X5YvpZ4SlaC2yS+UQDyhUKrraCf53faS9JKWyKmjKhntzeYuPTNE6c5HjpZr9qLmMHbeqMGBN4IPe5AQ6oOFBrxAhlhpJKkxSYsS+rmrPLRyeU6YIC1OFOFEbZIIOWds7gYBBVfdxuWKJpu7NO5kOPh30XXX9CVEuTzcuc47xbwRYNSqdHSUKwmSwqq+1Mei3NjpY39Igl3a0SJVL1kj8DA0kvzhqkWHG3b82TY1RaEu94ggShNt0OVb5faj8xM9w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Fgm2n6prmr4Q3dLSwYLo/YFobR6/+8/s90k9DSjf8Uc=;
+ b=cEgJHyhDcinmZs8J4n2IhCaFnaYOI8E5nOtCJ4F1zXqIN6Ajqcpoev33U9/uaQ9Tr/hRLO2WeosyiGVsJ1DI8ZcSw9CyXKmMeI6ackbzmSOjxQBDOwXIhKAhWioIdHhOxMHjqVguQdq/j8SvO5hqhozXTqEUsj62P5mAoboMqeruF6z3mssE63vll8cczLaf1WmIiFHLw5mmeH3yIq3EytXKlXmCmbxIv4bAx5iNznhrrKfQ+FaI2h7bAnPCabZo5jbiztOVBYHwVTpSdYyP4srXZCGr/2kzf2pOcyxK2B65ENSqoDuQB7at+RJCj707hRwnJ6laiDOnx08So3qPzA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by SA0PR11MB4719.namprd11.prod.outlook.com (2603:10b6:806:95::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.24; Tue, 14 Mar
+ 2023 00:17:02 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::f403:a0a2:e468:c1e9]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::f403:a0a2:e468:c1e9%5]) with mapi id 15.20.6178.024; Tue, 14 Mar 2023
+ 00:17:02 +0000
+From:   "Huang, Kai" <kai.huang@intel.com>
+To:     "Christopherson,, Sean" <seanjc@google.com>
+CC:     "Gao, Chao" <chao.gao@intel.com>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "andrew.cooper3@citrix.com" <andrew.cooper3@citrix.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 14/18] KVM: SVM: Check that the current CPU supports
+ SVM in kvm_is_svm_supported()
+Thread-Topic: [PATCH v2 14/18] KVM: SVM: Check that the current CPU supports
+ SVM in kvm_is_svm_supported()
+Thread-Index: AQHZU5lXMnpUqycUmkKZ0SzG1hqX/q74BPSAgAD2tgCAAHG5gA==
+Date:   Tue, 14 Mar 2023 00:17:02 +0000
+Message-ID: <77284a4e8cd1bedda5ddd9b730a988233e45a419.camel@intel.com>
+References: <20230310214232.806108-1-seanjc@google.com>
+         <20230310214232.806108-15-seanjc@google.com>
+         <eb7ccc4f362ce833600f0096710003188571e4b2.camel@intel.com>
+         <ZA9dbo2ZufqLdHNg@google.com>
+In-Reply-To: <ZA9dbo2ZufqLdHNg@google.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|SA0PR11MB4719:EE_
+x-ms-office365-filtering-correlation-id: c9c77d27-2a0c-421c-02b2-08db24216f3e
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 0F5RRNz4+1VY7bdopBBN5bDiMzelqfd5lVgo2XxlRFEFvhPnaZ9cVvE+5nh5sFAR9GykDzCRFc6BjtgUMLGmsOsDkx42HfuzhAZ6oQzrGaWCizd4MHU7NUVYuk5f6YcT4L4dOvsyQXzJNQwtro1rnhRn5OarrR2aQQpLhbwZePRexiP9DuHBbIM3TzRBWzPKcoeENrTRdot6L/6YAX+HAXsAUxwDh3Vpl/BXs4c+M7K4xSlob7qfotUh7AJK1P/5CeUuLY9IHwkvR5JoWe68gxKAwy/FUjJIqJqR1cmFSwjeSWJs4yzSYA40tjW9pbEhGrlX38+EixrdNu1M9dtOa2thDCEq1cuEw0OLd3zSdfrvS9LBDi78/XsnOp+AYACF+8leVuou6+Zi5IUgHcJNpVtINN9P2Qdsuv+yQ9v+DQMBbFRlLrRYkt1q5xw5Dabs8EyjUKEIObTwRd7Zs9HMhfS+D2sOP2KW0STBEfJoJZJ2AWzyRDHv8MT3UStj0DSRsP4fPrpAgxPjQJ4aSC/hiUnfnHm0x0vLNJiDlcQH8hBWjRm3Fc9R/8RxcB0uo47jBxPwBx4fIR31oogygOBtM+nyLQsYUzDex2Dsubv2zp76REGgvfGdvFjQi2lQXHWWixqu1/DQYBUUg38F3UxBwITFZ80X5219kYlJ/ptjs1hjrFH4pejwizodwGe117H0
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(366004)(136003)(376002)(346002)(396003)(39860400002)(451199018)(54906003)(41300700001)(91956017)(478600001)(66446008)(66476007)(8676002)(66556008)(64756008)(4326008)(66946007)(8936002)(6916009)(76116006)(38070700005)(86362001)(122000001)(38100700002)(36756003)(82960400001)(26005)(966005)(6512007)(71200400001)(186003)(6486002)(5660300002)(7416002)(2906002)(316002)(6506007)(83380400001)(2616005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?YkRaRGc3VGtsNUVFRlY1bHBLSWZCQUVHMnE4R241YVZBZEJodGZlelFUWVBE?=
+ =?utf-8?B?c3I3WDhWOXBnN2Zrdm1JOVRPajNvUTYvc3JPN3dFb0ZHbG1qMjFRUWc2cW9x?=
+ =?utf-8?B?UTlBZTJwTklzdjQwQmN1SHNYQys0RjhoRVU3QVZtallDUHFkUGtjZnVxSHUz?=
+ =?utf-8?B?bjRlbFlNck1kNmhhRGVYVlVIKy9UcGIrMGEyUDY3S0I4Y2c4aDVwMVUvaVhx?=
+ =?utf-8?B?QzFtRkVSbnF6ZGhZd21FR2l3TERLOURlUktjR2pBSHlnVmhJaWVnUTBWWW9D?=
+ =?utf-8?B?cGM1WTV1T1FkS1FCTFlvalg1YU9KUDFjdDA1UzNUUUgzL2JndUFPY1YxZE9H?=
+ =?utf-8?B?T0l6WlZuQjRSYU9ueklxV2xZRU1tZW1DSUpTY2VSaXZ3WEhSeUtvWjlRLzhv?=
+ =?utf-8?B?ZkpJdXkveVlEcjAvNDNDM3d4WVpXWEc5ZXpTY2U1dVczY3J3K1U3WTlvR3d4?=
+ =?utf-8?B?TVpPeGJzbnBlWWdCTjNHVktzNGFoL3lhd3MwcWNTVWpKZ2JsaUpwam0zWDg5?=
+ =?utf-8?B?cVYwRWlEdTM2dHJBMENVVktvZldmU05EcTZJSXB2bEduL3BieXRhcXA4eWFC?=
+ =?utf-8?B?VW5QcEJRMHlEUCs4SnBhSExkMzRVdWdHSWlvRnBpMGV3OGNZQkdyc0o4Rk9k?=
+ =?utf-8?B?SG91YmhCTm9PVHRzMnBXZXV4YklVNmxVK0NURStlcWhLMEhSdm9haTBnejhl?=
+ =?utf-8?B?TWZNVWFVcE1UT29wZjcwdlZYT3pIWFNZSHU0OTZGeUY1dktzdDJNMFJ6d2Jj?=
+ =?utf-8?B?ejVQd1QyQmM1ZU1lMHRkK2czQWJ2WTdxTFhiUUg0N0V4SGZIemI1bXBTV2Zn?=
+ =?utf-8?B?ZnpzNkd5TURDS3c5NUdVNTZqZjRjSEpacjIxR2w5cy9DaGN2STVONHdwQjAy?=
+ =?utf-8?B?bTNkUms3M3pHRitEeVl1b09yUGtSV0JDS2pBVTliVWpZZUZYT1FlbDNVMGxl?=
+ =?utf-8?B?RzluREFZQ3A5ajdSUGJqUGxoOHByOTI4UEJiT1QyUWFyWEt0emVhSnBIMDI1?=
+ =?utf-8?B?YnZyU3hmU25GVUxwOEFsaDhkY0t3Umw2OWZXVlVNcVN4bklzMWxReXZpK0RI?=
+ =?utf-8?B?NlR1Umx4Y1QzdWtqZDdiay9CK2F0dXBNTkhMUmJDUmk0T0ZJWjl5eTFockkx?=
+ =?utf-8?B?Y0h5ZENXc3VEdnJtbHEwSVN4YTRiRmFvTXpkVjdTcEhDUXp4c3ZVNzNnVC81?=
+ =?utf-8?B?S0tlN1NFTjJ0My9hYWxkSkp4aVNFN0EvTmU4aW5FNUdMQ3R0b0dRUEpDbGRP?=
+ =?utf-8?B?TjgrbDhDL1BaN3M5aEZjTFhkRG91TlVPRTFNQTBZQTBhTHg0cEJoVUhYMEJa?=
+ =?utf-8?B?RVl4SlBORkJxOXBiNXp1YkUvdXVEd1VmZEZKNDNiSGp5WUlxRmVkWTY4bU90?=
+ =?utf-8?B?MTNVcEpGZHVRNkNXNGkzc2NtQmNwVGRYaHRSczlHa1VFbE5GbEI5RllHejBD?=
+ =?utf-8?B?TGQ2NkdmU290Z2NVaGlKRlpkcGdqMElDUlFEOVF2VGZzSkhZV3Bpd3crdmRP?=
+ =?utf-8?B?cXhRRUdVNXZiQW9iZS90VjQ4aWZtOExFdzkvQWFEYms0dUFrWVRaSkFkREdL?=
+ =?utf-8?B?ODlwOGVjOUlKN2VjSSs5aTlmRzFXK2lkcEp4R1VLVlhXbC9KS0ZJRUMzb0pw?=
+ =?utf-8?B?Rm8zWEdDTWIrUWloUGt1WDVMVFFZZjd0R2tsK3d1QWZMb29ydnQ0OWdnZ2ty?=
+ =?utf-8?B?Zy9sNHZReEpYYWppMG1hN2tOY3R1Sk9KRmVLaVFoRmlqRmlCa2ljN3FKQnAy?=
+ =?utf-8?B?bmdCS1gwVHBSWTRzMDZvbkpLckphQWVVc3huYzJvZnlFcmpLN09zcmNTWWxa?=
+ =?utf-8?B?VjBTblloQ3R1SnB1elBsUkliQzNOOUlNcHBDTGNSWlpBUHB2REt4aTdjOXlh?=
+ =?utf-8?B?MmdINEJ1WkNhRGxtalRhamFTMFJDSEhzZXAxa3NUQzFlbXdwWG1Nb1ZuN1hQ?=
+ =?utf-8?B?b1NmMTc4ZHcza0FFU0RITjVWL3JPa25YSytIT2JQV0pENjA0eWtMWERmWElz?=
+ =?utf-8?B?S0xUcW1BTjhVRGVYZzZRZGJQR3p1STZKK2tnNm5ucklBY0l0UVBySVlWSTlQ?=
+ =?utf-8?B?UG9sN09icktHUUZzZVFBY3VPK1NFM2ZNOTVEYnJBeE1iNkwrR1NFeGxVSG54?=
+ =?utf-8?B?SjVBbUd2ZkRielU4Nzd1NTNWWkYzTDJCSWZRd01TaVlLNWx5WkRGanVjTTZj?=
+ =?utf-8?B?ekE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <522B0CAC1EB582429CC975C95BE5EB92@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87a60i5hju.wl-maz@kernel.org>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c9c77d27-2a0c-421c-02b2-08db24216f3e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Mar 2023 00:17:02.1600
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 7gMhelracHsiOt6y7zL5KGoWYw2+QHIbbZrC68ixx5PTMWpRqlZFUy0Z1+PrEnjoq6CeVcLVLfJXMna8YacytQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4719
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Mar 12, 2023 at 11:35:01AM +0000, Marc Zyngier wrote:
-> On Tue, 07 Mar 2023 03:45:47 +0000,
-> Ricardo Koller <ricarkol@google.com> wrote:
-> > 
-> > Add a new stage2 function, kvm_pgtable_stage2_split(), for splitting a
-> > range of huge pages. This will be used for eager-splitting huge pages
-> > into PAGE_SIZE pages. The goal is to avoid having to split huge pages
-> > on write-protection faults, and instead use this function to do it
-> > ahead of time for large ranges (e.g., all guest memory in 1G chunks at
-> > a time).
-> > 
-> > No functional change intended. This new function will be used in a
-> > subsequent commit.
-> 
-> Same comment as before about the usefulness of this last sentence.
-> 
-> > 
-> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_pgtable.h |  30 +++++++
-> >  arch/arm64/kvm/hyp/pgtable.c         | 113 +++++++++++++++++++++++++++
-> >  2 files changed, 143 insertions(+)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> > index b7b3fc0fa7a5..40e323a718fc 100644
-> > --- a/arch/arm64/include/asm/kvm_pgtable.h
-> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> > @@ -665,6 +665,36 @@ bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr);
-> >   */
-> >  int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size);
-> >  
-> > +/**
-> > + * kvm_pgtable_stage2_split() - Split a range of huge pages into leaf PTEs pointing
-> > + *				to PAGE_SIZE guest pages.
-> > + * @pgt:	 Page-table structure initialised by kvm_pgtable_stage2_init().
-> > + * @addr:	 Intermediate physical address from which to split.
-> > + * @size:	 Size of the range.
-> > + * @mc:		 Cache of pre-allocated and zeroed memory from which to allocate
-> > + *		 page-table pages.
-> > + * @mc_capacity: Number of pages in @mc.
-> > + *
-> > + * @addr and the end (@addr + @size) are effectively aligned down and up to
-> > + * the top level huge-page block size. This is an example using 1GB
-> > + * huge-pages and 4KB granules.
-> > + *
-> > + *                          [---input range---]
-> > + *                          :                 :
-> > + * [--1G block pte--][--1G block pte--][--1G block pte--][--1G block pte--]
-> > + *                          :                 :
-> > + *                   [--2MB--][--2MB--][--2MB--][--2MB--]
-> > + *                          :                 :
-> > + *                   [ ][ ][:][ ][ ][ ][ ][ ][:][ ][ ][ ]
-> > + *                          :                 :
-> 
-> So here, what alignment do we effectively get?
->
-
-The function tries to split any block that overlaps with the input
-range. Here's another example that might be more helpful:
-
- *                                [---input range---]
- *                                :                 :
- * [--1G block pte--][--2MB--][--2MB--][--1G block pte--][--1G block pte--]
-
-is split like this:
-
- * [--1G block pte--][--2MB--][ ][ ][ ][ ][ ][ ][ ][ ][ ][--1G block pte--]
-                              <-------split range------->
-
-I think I will just use this new description instead.
-
-> > + * Return: 0 on success, negative error code on failure. Note that
-> > + * kvm_pgtable_stage2_split() is best effort: it tries to break as many
-> > + * blocks in the input range as allowed by @mc_capacity.
-> > + */
-> > +int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> > +			     void *mc, u64 mc_capacity);
-> > +
-> >  /**
-> >   * kvm_pgtable_walk() - Walk a page-table.
-> >   * @pgt:	Page-table structure initialised by kvm_pgtable_*_init().
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index 6bdfcb671b32..3149b98d1701 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -1259,6 +1259,119 @@ kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
-> >  	return pgtable;
-> >  }
-> >  
-> > +struct stage2_split_data {
-> > +	struct kvm_s2_mmu		*mmu;
-> > +	void				*memcache;
-> > +	u64				mc_capacity;
-> 
-> Why isn't this a pointer to a *real* memcache structure?
-> 
-
-Mainly because I wanted this function to be like the other pgtable.c
-funtions that use opaque pointers to handle the vhe and nvhe cases. vhe
-uses "struct kvm_mmu_memory_cache" while nvhe uses "struct hyp_pool".
-This series only implements the vhe case but I didn't want to restrict
-kvm_pgtable_stage2_split() to vhe just because of this. Just in case, I
-have not tried it in nvhe.
-
-> > +};
-> > +
-> > +/*
-> > + * Get the number of page-tables needed to replace a block with a
-> > + * fully populated tree, up to the PTE level, at particular level.
-> > + */
-> > +static inline int stage2_block_get_nr_page_tables(u32 level)
-> 
-> Please drop the inline. The compiler will figure it out.
-> 
-> > +{
-> > +	if (WARN_ON_ONCE(level < KVM_PGTABLE_MIN_BLOCK_LEVEL ||
-> > +			 level >= KVM_PGTABLE_MAX_LEVELS))
-> > +		return -EINVAL;
-> 
-> Move this check to the 'default' case below.
-> 
-> > +
-> > +	switch (level) {
-> > +	case 1:
-> > +		return PTRS_PER_PTE + 1;
-> > +	case 2:
-> > +		return 1;
-> 
-> This is odd. Replacing a block by a table always requires
-> 'PTRS_PER_PTE + 1' pages. Why 1? If this is some special treatment for
-> level-2 mappings, please spell it out.
-
-I'm not sure I understand. I'm interpreting "level=X" as in "level X
-entry".  More specifically, using PAGE_SIZE=4096 as an example:
-
-a level 3 entry (a PTE): a 4096 block needs 0 page-table pages
-a level 2 entry: a 2M block needs 1 page-table pages
-a level 1 entry: a 1G block needs 512+1 page-table pages
-
-> 
-> > +	case 3:
-> > +		return 0;
-> > +	default:
-> > +		return -EINVAL;
-> > +	};
-> > +}
-> > +
-> > +static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
-> > +			       enum kvm_pgtable_walk_flags visit)
-> > +{
-> > +	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
-> > +	struct stage2_split_data *data = ctx->arg;
-> > +	kvm_pte_t pte = ctx->old, new, *childp;
-> > +	enum kvm_pgtable_prot prot;
-> > +	void *mc = data->memcache;
-> > +	u32 level = ctx->level;
-> > +	bool force_pte;
-> > +	int nr_pages;
-> > +	u64 phys;
-> > +
-> > +	/* No huge-pages exist at the last level */
-> > +	if (level == KVM_PGTABLE_MAX_LEVELS - 1)
-> > +		return 0;
-> 
-> Why the check for level 3 in the previous function if never get there?
-> 
-
-Was trying to make stage2_block_get_nr_page_tables() useful for other
-cases. It's still correct for other cases to ask how many page-table
-pages are needed for a PTE (stage2_block_get_nr_page_tables(3) -> 0).
-
-> > +
-> > +	/* We only split valid block mappings */
-> > +	if (!kvm_pte_valid(pte))
-> > +		return 0;
-> > +
-> > +	nr_pages = stage2_block_get_nr_page_tables(level);
-> > +	if (nr_pages < 0)
-> > +		return nr_pages;
-> > +
-> > +	if (data->mc_capacity >= nr_pages) {
-> > +		/* Build a tree mapped down to the PTE granularity. */
-> > +		force_pte = true;
-> > +	} else {
-> > +		/*
-> > +		 * Don't force PTEs. This requires a single page of PMDs at the
-> > +		 * PUD level, or a single page of PTEs at the PMD level. If we
-> > +		 * are at the PUD level, the PTEs will be created recursively.
-> > +		 */
-> 
-> I don't understand how you reach this 'single page' conclusion. You
-> need to explain why you get there.
-
-Ack, will expand it.
-
-> 
-> > +		force_pte = false;
-> > +		nr_pages = 1;
-> > +	}
-> > +
-> > +	if (data->mc_capacity < nr_pages)
-> > +		return -ENOMEM;
-> > +
-> > +	phys = kvm_pte_to_phys(pte);
-> > +	prot = kvm_pgtable_stage2_pte_prot(pte);
-> > +
-> > +	childp = kvm_pgtable_stage2_create_unlinked(data->mmu->pgt, phys,
-> > +						    level, prot, mc, force_pte);
-> > +	if (IS_ERR(childp))
-> > +		return PTR_ERR(childp);
-> > +
-> > +	if (!stage2_try_break_pte(ctx, data->mmu)) {
-> > +		kvm_pgtable_stage2_free_unlinked(mm_ops, childp, level);
-> > +		mm_ops->put_page(childp);
-> > +		return -EAGAIN;
-> > +	}
-> > +
-> > +	/*
-> > +	 * Note, the contents of the page table are guaranteed to be made
-> > +	 * visible before the new PTE is assigned because stage2_make_pte()
-> > +	 * writes the PTE using smp_store_release().
-> > +	 */
-> > +	new = kvm_init_table_pte(childp, mm_ops);
-> > +	stage2_make_pte(ctx, new);
-> > +	dsb(ishst);
-> > +	data->mc_capacity -= nr_pages;
-> > +	return 0;
-> > +}
-> > +
-> > +int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> > +			     void *mc, u64 mc_capacity)
-> > +{
-> > +	struct stage2_split_data split_data = {
-> > +		.mmu		= pgt->mmu,
-> > +		.memcache	= mc,
-> > +		.mc_capacity	= mc_capacity,
-> > +	};
-> > +
-> > +	struct kvm_pgtable_walker walker = {
-> > +		.cb	= stage2_split_walker,
-> > +		.flags	= KVM_PGTABLE_WALK_LEAF,
-> > +		.arg	= &split_data,
-> > +	};
-> > +
-> > +	return kvm_pgtable_walk(pgt, addr, size, &walker);
-> > +}
-> > +
-> >  int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
-> >  			      struct kvm_pgtable_mm_ops *mm_ops,
-> >  			      enum kvm_pgtable_stage2_flags flags,
-> 
-> Thanks,
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+T24gTW9uLCAyMDIzLTAzLTEzIGF0IDEwOjI5IC0wNzAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
+b3RlOg0KPiBPbiBNb24sIE1hciAxMywgMjAyMywgSHVhbmcsIEthaSB3cm90ZToNCj4gPiBPbiBG
+cmksIDIwMjMtMDMtMTAgYXQgMTM6NDIgLTA4MDAsIFNlYW4gQ2hyaXN0b3BoZXJzb24gd3JvdGU6
+DQo+ID4gPiBDaGVjayAidGhpcyIgQ1BVIGluc3RlYWQgb2YgdGhlIGJvb3QgQ1BVIHdoZW4gcXVl
+cnlpbmcgU1ZNIHN1cHBvcnQgc28gdGhhdA0KPiA+ID4gdGhlIHBlci1DUFUgY2hlY2tzIGRvbmUg
+ZHVyaW5nIGhhcmR3YXJlIGVuYWJsaW5nIGFjdHVhbGx5IGZ1bmN0aW9uIGFzDQo+ID4gPiBpbnRl
+bmRlZCwgaS5lLiB3aWxsIGRldGVjdCBpc3N1ZXMgd2hlcmUgU1ZNIGlzbid0IHN1cHBvcnQgb24g
+YWxsIENQVXMuDQo+ID4gPiANCj4gPiA+IERpc2FibGUgbWlncmF0aW9uIGZvciB0aGUgdXNlIGZy
+b20gc3ZtX2luaXQoKSBtb3N0bHkgc28gdGhhdCB0aGUgc3RhbmRhcmQNCj4gPiA+IGFjY2Vzc29y
+cyBmb3IgdGhlIHBlci1DUFUgZGF0YSBjYW4gYmUgdXNlZCB3aXRob3V0IGdldHRpbmcgeWVsbGVk
+IGF0IGJ5DQo+ID4gPiBDT05GSUdfREVCVUdfUFJFRU1QVD15IHNhbml0eSBjaGVja3MuICBQcmV2
+ZW50aW5nIHRoZSAiZGlzYWJsZWQgYnkgQklPUyINCj4gPiA+IGVycm9yIG1lc3NhZ2UgZnJvbSBy
+ZXBvcnRpbmcgdGhlIHdyb25nIENQVSBpcyBsYXJnZWx5IGEgYm9udXMsIGFzIGVuc3VyaW5nDQo+
+ID4gPiBhIHN0YWJsZSBDUFUgZHVyaW5nIG1vZHVsZSBsb2FkIGlzIGEgbm9uLWdvYWwgZm9yIEtW
+TS4NCj4gPiA+IA0KPiA+ID4gTGluazogaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvYWxsL1pBZHhO
+Z3YwTTZQNjNvZEVAZ29vZ2xlLmNvbQ0KPiA+ID4gQ2M6IEthaSBIdWFuZyA8a2FpLmh1YW5nQGlu
+dGVsLmNvbT4NCj4gPiA+IENjOiBDaGFvIEdhbyA8Y2hhby5nYW9AaW50ZWwuY29tPg0KPiA+ID4g
+U2lnbmVkLW9mZi1ieTogU2VhbiBDaHJpc3RvcGhlcnNvbiA8c2VhbmpjQGdvb2dsZS5jb20+DQo+
+ID4gDQo+ID4gU2hvdWxkIHdlIGFkZDoNCj4gPiANCj4gPiBGaXhlczogYzgyYTVjNWM1M2M1ICgi
+S1ZNOiB4ODY6IERvIGNvbXBhdGliaWxpdHkgY2hlY2tzIHdoZW4gb25saW5pbmcgQ1BVIikNCj4g
+PiANCj4gPiBBcyB0aGF0IGNvbW1pdCBpbnRyb2R1Y2VkIHVzaW5nIHJhd19zbXBfcHJvY2Vzc29y
+X2lkKCkgdG8gZ2V0IENQVSBpZCBpbg0KPiA+IGt2bV9pc19zdm1fc3VwcG9ydGVkKCkgYW5kIHBy
+aW50IHRoZSBDUFUgaWQgb3V0IGluIGVycm9yIG1lc3NhZ2U/DQo+IA0KPiBNeSB2b3RlIGlzIHRv
+IG5vdCB0byBhZGQgYSBGaXhlcyBiZWNhdXNlIHVzaW5nIHJhd19zbXBfcHJvY2Vzc29yX2lkKCkg
+YW5kIG5vdCBkaXNhYmxpbmcNCj4gbWlncmF0aW9uIGZvciBtb2R1bGUgcHJvYmUgY2FzZSB3YXMg
+ZGVsaWJlcmF0ZSBhbmQgaXMgc2FmZS4gIEkgZG9uJ3Qgd2FudCB0byBnaXZlIHRoZQ0KPiBpbXBy
+ZXNzaW9uIHRoYXQgdGhlIGV4aXN0aW5nIGNvZGUgaXMgZnVuY3Rpb25hbGx5IGJyb2tlbi4gIFRo
+ZSBvbmx5IHF1aXJrIGlzIHRoYXQNCj4gdGhlIHJlcG9ydGluZyBjb3VsZCBiZSBtaXNsZWFkaW5n
+Lg0KPiANCj4gVGhhdCBzYWlkLCBJJ20gbm90IGFnYWluc3QgYWRkaW5nIGEgRml4ZXMgdGFnLCBi
+ZWNhdXNlIEkgY2VydGFpbmx5IGNhbid0IGFyZ3VlDQo+IGFnYWluc3QgdGhlIHJlcG9ydGluZyBi
+ZWluZyBmbGF3ZWQuDQoNClllYWggdGhlIG9ubHkgaXNzdWUgaXMgdGhlIHJlcG9ydGluZy4NCg0K
+QW5kIEkgd2lsbCBsZWF2ZSB0aGlzIHRvIG90aGVycy4NCg0KPiANCj4gPiA+IC0tLQ0KPiA+ID4g
+IGFyY2gveDg2L2t2bS9zdm0vc3ZtLmMgfCAyNSArKysrKysrKysrKysrKysrKysrLS0tLS0tDQo+
+ID4gPiAgMSBmaWxlIGNoYW5nZWQsIDE5IGluc2VydGlvbnMoKyksIDYgZGVsZXRpb25zKC0pDQo+
+ID4gPiANCj4gPiA+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rdm0vc3ZtL3N2bS5jIGIvYXJjaC94
+ODYva3ZtL3N2bS9zdm0uYw0KPiA+ID4gaW5kZXggMjkzNGYxODU5NjBkLi5mMDRiNjFjM2Q5ZDgg
+MTAwNjQ0DQo+ID4gPiAtLS0gYS9hcmNoL3g4Ni9rdm0vc3ZtL3N2bS5jDQo+ID4gPiArKysgYi9h
+cmNoL3g4Ni9rdm0vc3ZtL3N2bS5jDQo+ID4gPiBAQCAtNTIwLDE4ICs1MjAsMjAgQEAgc3RhdGlj
+IHZvaWQgc3ZtX2luaXRfb3N2dyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpDQo+ID4gPiAgCQl2Y3B1
+LT5hcmNoLm9zdncuc3RhdHVzIHw9IDE7DQo+ID4gPiAgfQ0KPiA+ID4gIA0KPiA+ID4gLXN0YXRp
+YyBib29sIGt2bV9pc19zdm1fc3VwcG9ydGVkKHZvaWQpDQo+ID4gPiArc3RhdGljIGJvb2wgX19r
+dm1faXNfc3ZtX3N1cHBvcnRlZCh2b2lkKQ0KPiA+ID4gIHsNCj4gPiA+IC0JaW50IGNwdSA9IHJh
+d19zbXBfcHJvY2Vzc29yX2lkKCk7DQo+ID4gPiArCWludCBjcHUgPSBzbXBfcHJvY2Vzc29yX2lk
+KCk7DQo+ID4gDQo+ID4gU2luY2Ugd2UgaGF2ZSBtYWRlIHN1cmUgX19rdm1faXNfc3ZtX3N1cHBv
+cnRlZCgpIGlzIGFsd2F5cyBwZXJmb3JtZWQgb24gYSBzdGFibGUNCj4gPiBjcHUsIHNob3VsZCB3
+ZSBrZWVwIHVzaW5nIHJhd19zbXBfcHJvY2Vzc29yX2lkKCk/IMOvwr/CvQ0KPiA+IA0KPiA+IEl0
+IGlzIGZhc3RlciB0aGFuIHNtcF9wcm9jZXNzb3JfaWQoKSB3aGVuIENPTkZJR19ERUJVR19QUkVF
+TVBUPXksIGJ1dCB5ZXMgdGhlDQo+ID4gbGF0dGVyIGNhbiBoZWxwIHRvIGNhdGNoIGJ1Zy4NCj4g
+DQo+IE1vc3Qga2VybmVscyB3aXRoIGFueSBhbW91bnQgb2YgQ09ORklHX0RFQlVHXyogb3B0aW9u
+cyBlbmFibGVkIGFyZSBjb21pY2FsbHkgc2xvdw0KPiBhbnl3YXlzLCBJIG11Y2ggcHJlZmVyIGhh
+dmluZyB0aGUgc2FuaXR5IGNoZWNrcyB0aGFuIHRoZSBwZXJmb3JtYW5jZS4NCg0KWWVhaCBmaW5l
+IHRvIG1lLg0KDQo=
