@@ -2,72 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6743E6B91B8
-	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 12:35:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B66316B91CF
+	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 12:38:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231356AbjCNLfU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Mar 2023 07:35:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60560 "EHLO
+        id S231441AbjCNLib convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 14 Mar 2023 07:38:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229793AbjCNLfT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Mar 2023 07:35:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65AFF126FA
-        for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 04:34:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678793667;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kkLCoUCMpqcOHFaJffF6f0n5G6YobYmpdJv/U4OkHBM=;
-        b=Rq69e8VPCEUqdPl0hlSrQOR6y/VvOjhH4fgF6E8xjRVi1eulKM/PuA1SiSA1pUnNUAH5rn
-        Jk+Npv/KpGtVyyKnQP7eZGsRJ5hAxVoIvrzmGfq8i/GPl7u2eOqi2++mBZ7RmGEb8+I8MW
-        hWT3VijMwwjHO4nLgNZGvAeArjtE4lA=
-Received: from mail-vs1-f70.google.com (mail-vs1-f70.google.com
- [209.85.217.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-137-qsV9PNzMMCaTFml4eP2s8w-1; Tue, 14 Mar 2023 07:34:26 -0400
-X-MC-Unique: qsV9PNzMMCaTFml4eP2s8w-1
-Received: by mail-vs1-f70.google.com with SMTP id p13-20020a056102274d00b004215e04e139so4756536vsu.5
-        for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 04:34:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678793666;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kkLCoUCMpqcOHFaJffF6f0n5G6YobYmpdJv/U4OkHBM=;
-        b=CchNYWl1t8xFTxRu0jEJ23tvpZipBE1z60YM1lloGyhdD2GGbqX4fKLhLzPYRLKPUn
-         LeieJbICwYZV86GHh8mtl6t9YOp0OOV4KP2x/xqHS1r7ZmPZRv+QNKrH6h7tmbJfP3ce
-         zKzW6Ix/nuToKjonnF4DxbbTwG+kca2NwKOQC59JJ2FVr1ibekyRXEfMZyZ/i8cO5Ltk
-         L759jSlZNLaPPlecI9qOdZl547u1lR8uEy1euF0dVXGVCAWbH/2ov02FVMbYVsDJ5CcN
-         y9c2uQgAY7deVJGjqJsrlhJpPIXTmtqg44MhyzN5c43y36jFKrKks4ksg+3DcG4+O/9T
-         N+Fw==
-X-Gm-Message-State: AO0yUKWHCPWJsooT1750T+7o1lOvU2xK+ZE3bcyrKA4nRFTFq0KWmIfq
-        qegdLeGCrw2poMWG2xAbTb3eVu8oqFl7geVeAKlHkf2xK4RXdk1+0W25JEhsYUlDlfjwKheJgwH
-        lpLwgRhxeIhTt5Byxfhl+evvrS4sM
-X-Received: by 2002:a05:6102:15a:b0:425:b211:3671 with SMTP id a26-20020a056102015a00b00425b2113671mr427737vsr.1.1678793665923;
-        Tue, 14 Mar 2023 04:34:25 -0700 (PDT)
-X-Google-Smtp-Source: AK7set/w+sR9/GMNzZjM3wzMEhNKJTIhp0f9AHhm3KvhR7TM8JlTerQD5v60MTqgl5o4P2QZ8Cnr8/3wR0nh/OO0yi8=
-X-Received: by 2002:a05:6102:15a:b0:425:b211:3671 with SMTP id
- a26-20020a056102015a00b00425b2113671mr427724vsr.1.1678793665678; Tue, 14 Mar
- 2023 04:34:25 -0700 (PDT)
+        with ESMTP id S231470AbjCNLiT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Mar 2023 07:38:19 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B04A9B2EE;
+        Tue, 14 Mar 2023 04:38:14 -0700 (PDT)
+Received: from lhrpeml100006.china.huawei.com (unknown [172.18.147.206])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4PbWhw6hm9z6J78V;
+        Tue, 14 Mar 2023 19:37:20 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
+ lhrpeml100006.china.huawei.com (7.191.160.224) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Tue, 14 Mar 2023 11:38:11 +0000
+Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
+ lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.021;
+ Tue, 14 Mar 2023 11:38:11 +0000
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Nicolin Chen <nicolinc@nvidia.com>
+CC:     "Xu, Terrence" <terrence.xu@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, Jason Gunthorpe <jgg@nvidia.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        Zhangfei Gao <zhangfei.gao@linaro.org>
+Subject: RE: [PATCH v5 00/19] Add vfio_device cdev for iommufd support
+Thread-Topic: [PATCH v5 00/19] Add vfio_device cdev for iommufd support
+Thread-Index: AQHZSpxHUh/YYv3qukeFp+lKFtoCf67jLB2AgACBDoCAAOlEAIAAn5IAgAIKi/CAAO3wAIAA+kPAgAEQJQCABt1mAIAJIAFQ
+Date:   Tue, 14 Mar 2023 11:38:11 +0000
+Message-ID: <90a277ea100d496b82f8cc84388bbca2@huawei.com>
+References: <20230227111135.61728-1-yi.l.liu@intel.com>
+ <Y/0Cr/tcNCzzIAhi@nvidia.com>
+ <DS0PR11MB7529A422D4361B39CCA3D248C3AC9@DS0PR11MB7529.namprd11.prod.outlook.com>
+ <SA1PR11MB5873479F73CFBAA170717624F0AC9@SA1PR11MB5873.namprd11.prod.outlook.com>
+ <Y/64ejbhMiV77uUA@Asurada-Nvidia>
+ <b7c1f9d5b4b647f0b0686c3b99f3d006@huawei.com>
+ <ZAE2J0I1LiBjWUnm@Asurada-Nvidia>
+ <d59a0262d5bf423c9e49ad4ac6015296@huawei.com>
+ <ZALspPvvLGFuK96F@Asurada-Nvidia> 
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.202.227.178]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-References: <ZAz1duOOOTu+5LW5@thinky-boi>
-In-Reply-To: <ZAz1duOOOTu+5LW5@thinky-boi>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Date:   Tue, 14 Mar 2023 12:34:14 +0100
-Message-ID: <CABgObfY1sL8JMUwf1JeJrmSncKo7OoCZe2sGh8m=XxH1h7Kp5g@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.3, part #1
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     maz@kernel.org, reijiw@google.com, joey.gouly@arm.com,
-        james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-        kvmarm@lists.linux.dev, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,60 +81,143 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Pulled, thanks!
 
-Paolo
 
-On Sat, Mar 11, 2023 at 10:41=E2=80=AFPM Oliver Upton <oliver.upton@linux.d=
-ev> wrote:
->
->
-> Hi Paolo,
->
-> First shot at sending a pull request to you, please let me know if anythi=
-ng
-> is screwed up :)
->
-> A single, important fix for guest timers addressing a bug from the nested
-> virtualization prefix that went in 6.3.
->
-> Please pull,
->
-> --
-> Oliver
->
-> The following changes since commit fe15c26ee26efa11741a7b632e9f23b01aca4c=
-c6:
->
->   Linux 6.3-rc1 (2023-03-05 14:52:03 -0800)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
-marm-fixes-6.3-1
->
-> for you to fetch changes up to 47053904e18282af4525a02e3e0f519f014fc7f9:
->
->   KVM: arm64: timers: Convert per-vcpu virtual offset to a global value (=
-2023-03-11 02:00:40 -0800)
->
-> ----------------------------------------------------------------
-> KVM/arm64 fixes for 6.3, part #1
->
-> A single patch to address a rather annoying bug w.r.t. guest timer
-> offsetting. Effectively the synchronization of timer offsets between
-> vCPUs was broken, leading to inconsistent timer reads within the VM.
->
-> ----------------------------------------------------------------
-> Marc Zyngier (1):
->       KVM: arm64: timers: Convert per-vcpu virtual offset to a global val=
-ue
->
->  arch/arm64/include/asm/kvm_host.h |  3 +++
->  arch/arm64/kvm/arch_timer.c       | 45 +++++++++------------------------=
-------
->  arch/arm64/kvm/hypercalls.c       |  2 +-
->  include/kvm/arm_arch_timer.h      | 15 +++++++++++++
->  4 files changed, 29 insertions(+), 36 deletions(-)
->
+> -----Original Message-----
+> From: Shameerali Kolothum Thodi
+> Sent: 08 March 2023 15:55
+> To: 'Nicolin Chen' <nicolinc@nvidia.com>
+> Cc: Xu, Terrence <terrence.xu@intel.com>; Liu, Yi L <yi.l.liu@intel.com>;
+> Jason Gunthorpe <jgg@nvidia.com>; alex.williamson@redhat.com; Tian,
+> Kevin <kevin.tian@intel.com>; joro@8bytes.org; robin.murphy@arm.com;
+> cohuck@redhat.com; eric.auger@redhat.com; kvm@vger.kernel.org;
+> mjrosato@linux.ibm.com; chao.p.peng@linux.intel.com;
+> yi.y.sun@linux.intel.com; peterx@redhat.com; jasowang@redhat.com;
+> lulu@redhat.com; suravee.suthikulpanit@amd.com;
+> intel-gvt-dev@lists.freedesktop.org; intel-gfx@lists.freedesktop.org;
+> linux-s390@vger.kernel.org; Hao, Xudong <xudong.hao@intel.com>; Zhao,
+> Yan Y <yan.y.zhao@intel.com>
+> Subject: RE: [PATCH v5 00/19] Add vfio_device cdev for iommufd support
+> 
+
+[...]
+> > > > On Thu, Mar 02, 2023 at 09:43:00AM +0000, Shameerali Kolothum
+> > > > Thodi
+> > > > wrote:
+> > > >
+> > > > > Hi Nicolin,
+> > > > >
+> > > > > Thanks for the latest ARM64 branch. Do you have a working Qemu
+> > > > > branch
+> > > > corresponding to the
+> > > > > above one?
+> > > > >
+> > > > > I tried the
+> > > >
+> >
+> https://github.com/nicolinc/qemu/tree/wip/iommufd_rfcv3%2Bnesting%2B
+> > > > smmuv3
+> > > > > but for some reason not able to launch the Guest.
+> > > > >
+> > > > > Please let me know.
+> > > >
+> > > > I do use that branch. It might not be that robust though as it
+> > > > went through a big rebase.
+> > >
+> > > Ok. The issue seems to be quite random in nature and only happens
+> > > when there are multiple vCPUs. Also doesn't look like related to
+> > > VFIO device assignment as I can reproduce Guest hang without it by
+> > > only having nested-smmuv3 and iommufd object.
+> > >
+> > > ./qemu-system-aarch64-iommuf -machine
+> > > virt,gic-version=3,iommu=nested-smmuv3,iommufd=iommufd0 \
+> > -enable-kvm
+> > > -cpu host -m 1G -smp cpus=8,maxcpus=8 \ -object
+> iommufd,id=iommufd0
+> > \
+> > > -bios QEMU_EFI.fd \ -kernel Image-6.2-iommufd \ -initrd
+> > > rootfs-iperf.cpio \ -net none \ -nographic \ -append "rdinit=init
+> > > console=ttyAMA0 root=/dev/vda rw earlycon=pl011,0x9000000" \ -trace
+> > > events=events \ -D trace_iommufd
+> > >
+> > > When the issue happens, no output on terminal as if Qemu is in a
+> > > locked
+> > state.
+> > >
+> > >  Can you try with the followings?
+> > > >
+> > > > --trace "iommufd*" --trace "smmu*" --trace "vfio_*" --trace "pci_*"
+> > > > --trace "msi_*" --trace "nvme_*"
+> > >
+> > > The only trace events with above are this,
+> > >
+> > > iommufd_backend_connect fd=22 owned=1 users=1 (0) smmu_add_mr
+> > > smmuv3-iommu-memory-region-0-0
+> > >
+> > > I haven't debugged this further. Please let me know if issue is
+> > > reproducible with multiple vCPUs at your end. For now will focus on
+> > > VFIO
+> > dev specific tests.
+> >
+> > Oh. My test environment has been a single-core vCPU. So that doesn't
+> > happen to me. Can you try a vanilla QEMU branch that our nesting
+> > branch is rebased on? I took a branch from Yi as the baseline, while
+> > he might take from Eric for the rfcv3.
+> >
+> > I am guessing that it might be an issue in the common tree.
+> 
+> Yes, that looks like the case.
+> I tried with:
+>  commit 13356edb8750("Merge tag 'block-pull-request' of
+> https://gitlab.com/stefanha/qemu into staging")
+> 
+> And issue is still there. So hopefully once we rebase everything it will go
+> away.
+
+Hi Nicolin,
+
+I rebased your latest Qemu branch[1] on top of v7.2.0 and not observed
+the above issue so far. However noticed couple of other issues when
+we try to hot add/remove devices.
+
+(qemu) device_del net1
+qemu-system-aarch64-iommufd: Failed to free id: 4 Inappropriate ioctl for device
+qemu-system-aarch64-iommufd: IOMMU_IOAS_UNMAP failed: No such file or directory
+qemu-system-aarch64-iommufd: vfio_dma_unmap(0xaaaaf587a3d0, 0x8000101000, 0xf000) = -2 (No such file or directory)
+qemu-system-aarch64-iommufd: IOMMU_IOAS_UNMAP failed: No such file or directory
+qemu-system-aarch64-iommufd: vfio_dma_unmap(0xaaaaf587a3d0, 0x8000000000, 0x100000) = -2 (No such file or directory)
+qemu-system-aarch64-iommufd: Failed to free id:1 Device or resource busy
+
+Ignoring the MMIO UNMAP errors, it looks like the object free is
+not proper on dev removal path. I have few quick fixes here 
+for this,
+https://github.com/hisilicon/qemu/tree/private-v7.2.0-iommufd-nesting
+
+With the above, it seems the HWPT/IOAS objects are destroyed properly
+on dev detach path. But when the dev is added back, gets a Qemu seg fault
+and so far I have no clue why that happens.
+
+(qemu) device_add vfio-pci,host=0000:7d:02.1,iommufd=iommufd0,bus=rp1,id=net1
+./qemu_run-iommufd-nested: line 13:  7041 Segmentation fault
+(core dumped) ./qemu-system-aarch64-iommufd
+-machine virt,gic-version=3,iommu=nested-smmuv3,iommufd=iommufd0
+-enable-kvm -cpu host -m 1G -smp cpus=8,maxcpus=8 -object
+iommufd,id=iommufd0 -bios QEMU_EFI_Dec2018.fd -kernel
+Image-iommufd -initrd rootfs-iperf.cpio -device
+ioh3420,id=rp1 -device
+vfio-pci,host=0000:7d:02.1,iommufd=iommufd0,bus=rp1,id=net1 -append
+"rdinit=init console=ttyAMA0 root=/dev/vda rw
+earlycon=pl011,0x9000000" -net none -nographic -trace events=events -D
+trace_iommufd
+
+There are no kernel log/crash and not much useful traces while this happens.
+Understand these are early days and it is not robust in anyway, but please
+let me know if you suspect anything. I will continue debugging and will update
+if anything.
+
+Thanks,
+Shameer
+
+[1] https://github.com/nicolinc/qemu/tree/wip/iommufd_rfcv3%2Bnesting%2Bsmmuv3
+
 
