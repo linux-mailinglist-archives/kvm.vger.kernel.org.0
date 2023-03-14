@@ -2,60 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E708A6B96FB
-	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 14:57:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8325D6B97C4
+	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 15:22:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232535AbjCNN5J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Mar 2023 09:57:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53206 "EHLO
+        id S230457AbjCNOWA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Mar 2023 10:22:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232479AbjCNN4s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Mar 2023 09:56:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E71E2301AC
-        for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 06:55:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678802110;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
-        b=AQKD3DqHaknNG9mqlXRJyB1Ge9bmZkU/31nzU9wFSGOyk5DCksr/vdUYTphUIuG53vOh/m
-        d14UJ6y4lYqlbz4Uspipacb9VMTfrJ6i0gZjysjbFFLEyfcys0SZxaV/mD2ThVBo+Ab3f/
-        3cj7uZDWVZmnD2KDFg0RU+GCioMhRLU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-180-bvPoRr2oPVSlPLWa3EkuEg-1; Tue, 14 Mar 2023 09:55:09 -0400
-X-MC-Unique: bvPoRr2oPVSlPLWa3EkuEg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E8F6F800B23;
-        Tue, 14 Mar 2023 13:55:08 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5F2F62027040;
-        Tue, 14 Mar 2023 13:55:08 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     Vipin Sharma <vipinsh@google.com>
-Cc:     seanjc@google.com, pbonzini@redhat.com, maz@kernel.org,
-        james.morse@arm.com, suzuki.poulose@arm.com,
-        oliver.upton@linux.dev, yuzenghui@huawei.com,
-        borntraeger@linux.ibm.com, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com, david@redhat.com, dmatlack@google.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [Patch v2 0/4] Common KVM exit reason test assertions and exit reason sync
-Date:   Tue, 14 Mar 2023 09:55:07 -0400
-Message-Id: <20230314135507.3064583-1-pbonzini@redhat.com>
-In-Reply-To: <20230204014547.583711-1-vipinsh@google.com>
-References: 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        with ESMTP id S230453AbjCNOVu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Mar 2023 10:21:50 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4721C9FE7C
+        for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 07:21:23 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id p79-20020a25d852000000b00b32573a21a3so12158220ybg.18
+        for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 07:21:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1678803680;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=CrebXHEEgV7/ZJf2x/Xp30WnKkVEGpg7BO+CpYifs0g=;
+        b=Z/YVECleBD8nGbAu6SbQEnuXn/2AxTRkJonR6ApIuqQMYzsOeXeqUkljoMDp4wXcpk
+         jaMs84GSa9o6Uj294RXJbldvhnWuxvmqV5edPGzSl52I1I0TMAt1Qb+yk1LOBBSXB/9M
+         gJLiruVOV7MP+nF39xiZbE7JAE1MsfO67Fi6spn5xdX1mvqiVD58qMWK/bRY6R2lIhRP
+         GlTfeYdNj7GlvRo0t8tGVCdGU0ukNdtyvTpFJ9RM7S4jnzUR6M8gVcQelXFwS/qm17T+
+         H4IZVht6hpP1OXwhAWsf/CPgTSquMsDfWHASomSBCN6rClsdArc1EUexzGeE1BhyFiFD
+         yRmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678803680;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CrebXHEEgV7/ZJf2x/Xp30WnKkVEGpg7BO+CpYifs0g=;
+        b=qBBKDFPg9fH6UlYMNARgaYOnqn4ok2EM8lcqDU+6DT8NA1OXfK0yS4fC5C8jUoJHQR
+         c5A41hrgn/pb/TQlouuwZtufy18nsoJUVkqF9mSymh8a6VaiT39+3onxztEtAcZyD6Q3
+         KwJByG8LuDYwoSLUwBoxcHNe48jCBYz9IONoIMQ6vH+831V83lYNfJM397GILwMlqKKf
+         Ypi1aJN2J0FUH42zdBpZPZ4U4Nsp8VKiDNf0CrA0Jm937ZRwZsgx3DyzWCn5z1cRbxig
+         coReWT/Rf+q2aYFwTKzsViB8QxrWhP75Zxc7L0Txu+o7pe02R9xlTf6yRvSaIIfrAh7l
+         kT5A==
+X-Gm-Message-State: AO0yUKXj1r+dzKRLh6evp3D4Gr65XTWiLJR1PDJ8jqdKR6lIRjdnFg1H
+        vYk3371BX80GYvuEsUnDX4TYYLwhmKg=
+X-Google-Smtp-Source: AK7set8oHKmKT07W1Kf4d/Rl3lQEj+pgJjL8+mi6rKN48pnX5gmJ0qtlpw+W/6zLuxICTN7DMLib+V5gTlQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1024:b0:b4a:3896:bc17 with SMTP id
+ x4-20020a056902102400b00b4a3896bc17mr155132ybt.0.1678803680269; Tue, 14 Mar
+ 2023 07:21:20 -0700 (PDT)
+Date:   Tue, 14 Mar 2023 07:21:18 -0700
+In-Reply-To: <ZBCeH5JB14Gl3wOM@jiechen-ubuntu-dev>
+Mime-Version: 1.0
+References: <20230312180048.1778187-1-jason.cj.chen@intel.com>
+ <ZA9QZcADubkx/3Ev@google.com> <ZBCeH5JB14Gl3wOM@jiechen-ubuntu-dev>
+Message-ID: <ZBCC3qEPHGWnx2JO@google.com>
+Subject: Re: [RFC PATCH part-1 0/5] pKVM on Intel Platform Introduction
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jason Chen CJ <jason.cj.chen@intel.com>
+Cc:     kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -63,8 +66,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Queued, thanks.
+On Tue, Mar 14, 2023, Jason Chen CJ wrote:
+> On Mon, Mar 13, 2023 at 09:33:41AM -0700, Sean Christopherson wrote:
+> 
+> > On Mon, Mar 13, 2023, Jason Chen CJ wrote:
+> > > There are similar use cases on x86 platforms requesting protected
+> > > environment which is isolated from host OS for confidential computing.
+> > 
+> > What exactly are those use cases?  The more details you can provide, the better.
+> > E.g. restricting the isolated VMs to 64-bit mode a la TDX would likely simplify
+> > the pKVM implementation.
+> 
+> Thanks Sean for your comments, I am very appreciated!
+> 
+> We are expected 
 
-Paolo
+Who is "we"?  Unless Intel is making a rather large pivot, I doubt Intel is the
+end customer of pKVM-on-x86.  If you aren't at liberty to say due NDA/confidentiality,
+then please work with whoever you need to in order to get permission to fully
+disclose the use case.  Because realistically, without knowing exactly what is
+in scope and why, this is going nowhere.  
 
+> to run protected VM with general OS and may with pass-thru secure devices support.
 
+Why?  What is the actual use case?
+
+> May I know your suggestion of "utilize SEAM" is to follow TDX SPEC then
+> work out a SW-TDX solution, or just do some leverage from SEAM code?
+
+Throw away TDX and let KVM run its own code in SEAM.
