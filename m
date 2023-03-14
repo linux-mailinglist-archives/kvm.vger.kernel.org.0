@@ -2,159 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 63CFF6B90F6
-	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 12:04:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 36B076B9117
+	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 12:07:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230061AbjCNLD6 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 14 Mar 2023 07:03:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57654 "EHLO
+        id S230345AbjCNLHs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Mar 2023 07:07:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230265AbjCNLDz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Mar 2023 07:03:55 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 884C99CBDF;
-        Tue, 14 Mar 2023 04:03:13 -0700 (PDT)
-Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.201])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4PbVw92GJMz6J7Km;
-        Tue, 14 Mar 2023 19:02:01 +0800 (CST)
-Received: from localhost (10.48.148.120) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Tue, 14 Mar
- 2023 11:02:51 +0000
-Date:   Tue, 14 Mar 2023 11:02:50 +0000
-From:   Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To:     James Morse <james.morse@arm.com>
-CC:     <linux-pm@vger.kernel.org>, <loongarch@lists.linux.dev>,
-        <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
-        <linux-acpi@vger.kernel.org>, <linux-arch@vger.kernel.org>,
-        <linux-ia64@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <x86@kernel.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Lorenzo Pieralisi <lpieralisi@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Borislav Petkov <bp@alien8.de>, H Peter Anvin <hpa@zytor.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        "Suzuki K Poulose" <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Len Brown <lenb@kernel.org>,
-        Rafael Wysocki <rafael@kernel.org>,
-        "WANG Xuerui" <kernel@xen0n.name>,
-        Salil Mehta <salil.mehta@huawei.com>,
-        "Russell King" <linux@armlinux.org.uk>,
-        <kangkang.shen@futurewei.com>
-Subject: Re: [RFC PATCH 00/32] ACPI/arm64: add support for virtual
- cpuhotplug
-Message-ID: <20230314110250.00005685@Huawei.com>
-In-Reply-To: <1f21673e-e5e6-a158-94a4-6ae6724c1f93@arm.com>
-References: <20230203135043.409192-1-james.morse@arm.com>
-        <20230307120050.000032f1@Huawei.com>
-        <1f21673e-e5e6-a158-94a4-6ae6724c1f93@arm.com>
-Followup-To: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        with ESMTP id S229712AbjCNLHr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Mar 2023 07:07:47 -0400
+Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1DDB7C941;
+        Tue, 14 Mar 2023 04:07:17 -0700 (PDT)
+Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
+        by mx.sberdevices.ru (Postfix) with ESMTP id 1614A5FD60;
+        Tue, 14 Mar 2023 14:06:34 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1678791994;
+        bh=uFGjRE3j4zXGby/VPz50ex9laPK7eGiO5HSk7DnBtqc=;
+        h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type;
+        b=D+6neNLvcq2F0mTaKnS3JgbC53RCnVNJaQhxTlMGHK56FI1x7H6pw4gM0Q9Yo9wVw
+         8FBDBPyCOSORW384Hxd0CM910AFcWUeaMt5oDMu1NDpvKzT1Lh2fgSUUF6agtZRpFA
+         71g8hJGb2u7IiDJJlNkAsjcEnNZFO8fxGtn4KC8oeyl2XZXsnjgs4r3GoVa+pPqWHC
+         gDggQ093V6UL04TWuUAIjOcSstYVZqzKvWw8OqPI67yLAa0DQw+e5jBTDz6zVh4EPx
+         0hCJNRQE5pJPMtYxNkGkQJ8ujuZNExoQJzZgQlzRLneFknS57LgnjrhGeqo7fgYCO2
+         Ol0Av5lsmjNXA==
+Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
+        by mx.sberdevices.ru (Postfix) with ESMTP;
+        Tue, 14 Mar 2023 14:06:33 +0300 (MSK)
+Message-ID: <1bfcb7fd-bce3-30cf-8a58-8baa57b7345c@sberdevices.ru>
+Date:   Tue, 14 Mar 2023 14:03:23 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 8BIT
-X-Originating-IP: [10.48.148.120]
-X-ClientProxiedBy: lhrpeml500003.china.huawei.com (7.191.162.67) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Content-Language: en-US
+To:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>
+CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
+        <avkrasnov@sberdevices.ru>
+From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
+Subject: [PATCH RESEND net v4 0/4] several updates to virtio/vsock
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [172.16.1.6]
+X-ClientProxiedBy: S-MS-EXCH02.sberdevices.ru (172.16.1.5) To
+ S-MS-EXCH01.sberdevices.ru (172.16.1.4)
+X-KSMG-Rule-ID: 4
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Status: not scanned, disabled by settings
+X-KSMG-AntiSpam-Interceptor-Info: not scanned
+X-KSMG-AntiPhishing: not scanned, disabled by settings
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2023/03/14 06:01:00 #20942017
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 13 Mar 2023 15:50:52 +0000
-James Morse <james.morse@arm.com> wrote:
+Hello,
 
-> Hi Jonathan,
-> 
-> On 07/03/2023 12:00, Jonathan Cameron wrote:
-> > On Fri,  3 Feb 2023 13:50:11 +0000
-> > James Morse <james.morse@arm.com> wrote:  
-> 
-> >> On a system that supports cpuhotplug the MADT has to describe every possible
-> >> CPU at boot. Under KVM, the vGIC needs to know about every possible vCPU before
-> >> the guest is started.
-> >> With these constraints, virtual-cpuhotplug is really just a hypervisor/firmware
-> >> policy about which CPUs can be brought online.
-> >>
-> >> This series adds support for virtual-cpuhotplug as exactly that: firmware
-> >> policy. This may even work on a physical machine too; for a guest the part of
-> >> firmware is played by the VMM. (typically Qemu).
-> >>
-> >> PSCI support is modified to return 'DENIED' if the CPU can't be brought
-> >> online/enabled yet. The CPU object's _STA method's enabled bit is used to
-> >> indicate firmware's current disposition. If the CPU has its enabled bit clear,
-> >> it will not be registered with sysfs, and attempts to bring it online will
-> >> fail. The notifications that _STA has changed its value then work in the same
-> >> way as physical hotplug, and firmware can cause the CPU to be registered some
-> >> time later, allowing it to be brought online.  
-> 
-> > As we discussed on an LOD call a while back, I think that we need some path to
-> > find out if the guest supports vCPU HP or not so that info can be queried by
-> > an orchestrator / libvirt etc.  In general the entity responsible for allocating
-> > extra vCPUs may not know what support the VM has for this feature.  
-> 
-> I agree. For arm64 this is going to be important if/when there are machines that do
-> physical hotplug of CPUs too.
-> 
-> 
-> > There are various ways we could get this information into the VMM.
-> > My immediate thought is to use one of the ACPI interfaces that lets us write
-> > AML that can set an emulated register. A query to the VMM can check if this
-> > register is set.
-> > 
-> > So options.
-> > 
-> > _OSI() - Deprecated on ARM64 so lets not use that ;)  
-> 
-> News to me, I've only just discovered it!
-> 
-> 
-> > _OSC() - Could add a bit to Table 6.13 Platform-Wide Capabilites in ACPI 6.5 spec.
-> >          Given x86 has a similar online capable bit perhaps this is the best option
-> >          though it is the one that requires a formal code first proposal to ASWG.  
-> 
-> I've had a go at writing this one:
-> https://gitlab.arm.com/linux-arm/linux-jm/-/commit/220b0d8b0261d7467c8705e6f614d57325798859
+this patchset evolved from previous v2 version (see link below). It does
+several updates to virtio/vsock:
+1) Changes 'virtio_transport_inc/dec_rx_pkt()' interface. Now instead of
+   using skbuff state ('head' and 'data' pointers) to update 'fwd_cnt'
+   and 'rx_bytes', integer value is passed as an input argument. This
+   makes code more simple, because in this case we don't need to update
+   skbuff state before calling 'virtio_transport_inc/dec_rx_pkt()'. In
+   more common words - we don't need to change skbuff state to update
+   'rx_bytes' and 'fwd_cnt' correctly.
+2) For SOCK_STREAM, when copying data to user fails, current skbuff is
+   not dropped. Next read attempt will use same skbuff and last offset.
+   Instead of 'skb_dequeue()', 'skb_peek()' + '__skb_unlink()' are used.
+   This behaviour was implemented before skbuff support.
+3) For SOCK_SEQPACKET it removes unneeded 'skb_pull()' call, because for
+   this type of socket each skbuff is used only once: after removing it
+   from socket's queue, it will be freed anyway.
 
-From a quick glance that looks good to me.
+Test for 2) also added:
+Test tries to 'recv()' data to NULL buffer, then does 'recv()' with valid
+buffer. For SOCK_STREAM second 'recv()' must return data, because skbuff
+must not be dropped, but for SOCK_SEQPACKET skbuff will be dropped by
+kernel, and 'recv()' will return EAGAIN.
 
-> 
-> It'll appear in the v1 of the series once the kernel and qemu bits are all lined up again.
+Link to v1 on lore:
+https://lore.kernel.org/netdev/c2d3e204-89d9-88e9-8a15-3fe027e56b4b@sberdevices.ru/
 
-We'll also need to kick off the spec change with a code-first proposal.
-I think current standard way to do that is a bugzilla entry in EDK2 repo 
-https://bugzilla.tianocore.org/buglist.cgi?component=Specification%20Update&product=EDK2%20Code%20First&resolution=---
-and the get someone in ASWG to create equivalent tracking issue in mantis.
+Link to v2 on lore:
+https://lore.kernel.org/netdev/a7ab414b-5e41-c7b6-250b-e8401f335859@sberdevices.ru/
 
-Great if you already have that in hand via relevant ARM folks.
+Link to v3 on lore:
+https://lore.kernel.org/netdev/0abeec42-a11d-3a51-453b-6acf76604f2e@sberdevices.ru/
 
-Jonathan
+Change log:
 
-> 
-> 
-> Thanks,
-> 
-> James
-> 
-> 
-> > _OSC() - Could add a new UUID and put it under a suitable device - maybe all CPUs?
-> >          You could definitely argue this feature is an operating system property.
-> > _DSM() - Similar to OSC but always under a device.
-> >          Whilst can be used for this I'm not sure it really matches intended usecase.
-> > 
-> > Assuming everyone agrees this bit of introspection is useful,
-> > Rafael / other ACPI specialists: Any suggestions on how best to do this?  
-> 
+v1 -> v2:
+ - For SOCK_SEQPACKET call 'skb_pull()' also in case of copy failure or
+   dropping skbuff (when we just waiting message end).
+ - Handle copy failure for SOCK_STREAM in the same manner (plus free
+   current skbuff).
+ - Replace bug repdroducer with new test in vsock_test.c
 
+v2 -> v3:
+ - Replace patch which removes 'skb->len' subtraction from function
+   'virtio_transport_dec_rx_pkt()' with patch which updates functions
+   'virtio_transport_inc/dec_rx_pkt()' by passing integer argument
+   instead of skbuff pointer.
+ - Replace patch which drops skbuff when copying to user fails with
+   patch which changes this behaviour by keeping skbuff in queue until
+   it has no data.
+ - Add patch for SOCK_SEQPACKET which removes redundant 'skb_pull()'
+   call on read.
+ - I remove "Fixes" tag from all patches, because all of them now change
+   code logic, not only fix something.
+
+v3 -> v4:
+ - Update commit messages in all patches except test.
+ - Add "Fixes" tag to all patches except test.
+
+Arseniy Krasnov (4):
+  virtio/vsock: don't use skbuff state to account credit
+  virtio/vsock: remove redundant 'skb_pull()' call
+  virtio/vsock: don't drop skbuff on copy failure
+  test/vsock: copy to user failure test
+
+ net/vmw_vsock/virtio_transport_common.c |  29 +++---
+ tools/testing/vsock/vsock_test.c        | 118 ++++++++++++++++++++++++
+ 2 files changed, 131 insertions(+), 16 deletions(-)
+
+-- 
+2.25.1
