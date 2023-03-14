@@ -2,91 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 33B306B9D31
-	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 18:38:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E6526B9D53
+	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 18:47:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230081AbjCNRit (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Mar 2023 13:38:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59316 "EHLO
+        id S229835AbjCNRrG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Mar 2023 13:47:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229578AbjCNRis (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Mar 2023 13:38:48 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C87683C05;
-        Tue, 14 Mar 2023 10:38:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678815526; x=1710351526;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=VgVMyqR52hv/pd5q0qh+OTN2bW5UJL20CGoQOlOBteg=;
-  b=kBbrr82Qu5e5RxNFdXQQW4nrhnG8kwmD0zRZ8spgT8F8ybHhmdfyzxoz
-   NXhULyLw6eBsMlTm+f+L5+BZTyuN0TI7THSkz1Cwb1W1gBUqN61KjV9JD
-   UqykbfVJsZJBaG2lvAv88UN6zA/RQ/dnuP3wCVhwkfiXnnCnH8g/NYQl4
-   IX93Sj82GVBUqoZ/RDxF0UK4bZGWCzhHghC+VixUFBmJTYCqXQAy0uq/t
-   JVwuQtUZ7VmX9uN9riEHJC9ml5CkjR508bxoStw6tDWAHXORms002NnFu
-   pGSktr00x9f0tIstUW4zplt0BopjScQ0jMEAawzpqxMBN7eU1aCBghvJE
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10649"; a="339862613"
-X-IronPort-AV: E=Sophos;i="5.98,260,1673942400"; 
-   d="scan'208";a="339862613"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2023 10:38:35 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10649"; a="789458862"
-X-IronPort-AV: E=Sophos;i="5.98,260,1673942400"; 
-   d="scan'208";a="789458862"
-Received: from jstavrid-mobl.amr.corp.intel.com (HELO [10.212.216.78]) ([10.212.216.78])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2023 10:38:33 -0700
-Message-ID: <082f3086-b5e1-1842-6039-fb6710df6ca8@intel.com>
-Date:   Tue, 14 Mar 2023 10:38:33 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH v10 05/16] x86/virt/tdx: Add skeleton to enable TDX on
- demand
-Content-Language: en-US
-To:     Isaku Yamahata <isaku.yamahata@gmail.com>
-Cc:     "Huang, Kai" <kai.huang@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "david@redhat.com" <david@redhat.com>,
-        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Chatre, Reinette" <reinette.chatre@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "imammedo@redhat.com" <imammedo@redhat.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "Huang, Ying" <ying.huang@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>
-References: <cover.1678111292.git.kai.huang@intel.com>
- <f150316b975b5ca22c6c4016ffd90db79d657bbf.1678111292.git.kai.huang@intel.com>
- <20230308222738.GA3419702@ls.amr.corp.intel.com>
- <96b56c5b8a5876aaf6d5ccbb81bab334b10983eb.camel@intel.com>
- <20230313234916.GC3922605@ls.amr.corp.intel.com>
- <a62497059fc3f31706a532b822d6c966bd981468.camel@intel.com>
- <20230314040200.GD3922605@ls.amr.corp.intel.com>
- <902b0166-6156-8def-a7a3-f0ce8995fa9c@intel.com>
- <20230314171603.GE3922605@ls.amr.corp.intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <20230314171603.GE3922605@ls.amr.corp.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham
+        with ESMTP id S229743AbjCNRrF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Mar 2023 13:47:05 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E566D9EC2
+        for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 10:47:02 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-538116920c3so172504127b3.15
+        for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 10:47:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1678816022;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=qRi9DieC6fI0xIFZnV2isMARrArMZFITNyhRbutkUcc=;
+        b=J4PHjCO9DVOG2IIZLlEtu8iAXYlOcLbV7OLgpPQBQgsz1pAJ2C2wzdjLLf/1g9eqNo
+         op+2aOnupfVtCdIDSr8M8ID795JGx5VRMC7EFRt19RrKe/E5mck5SseJLTH/G6ZJwztt
+         c8b9gW0D17nzVNM/cEje5+rJUj3q2X+E+w5iM/CQn+goAzvYyxcGEetdW/aRREYr+5lD
+         CHeSbkEjzLGMr3yQafJzkKBHQBE3JZcwTVfuHXPyc1EcyRSpvbuyjIyFFOV4gATWih2L
+         /j2hP/hqEZOy8lSuGeUyoEMF1vH8a2bW1oUcw/c3Fxs2NkCvXGjtlQ9vgiwLtOhJXPxn
+         g0Uw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678816022;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qRi9DieC6fI0xIFZnV2isMARrArMZFITNyhRbutkUcc=;
+        b=B490xVgtEbXCf+mjLVKtUm/+mavJzPOOJGTEUkTaimxL/AfbqfxRClSLi+ReA23tDo
+         pybaiLFABpbktOtgK7O2QYtSdVlukSsMIVZCJXEFvXc/GM13VgaEzN09nh8ynmAb5s2M
+         S2UfqpWIyPa8+UhiKtt9uINMSDE9hfx8uv0B8+KOCdnYifOldia103TLgkSWsrTr+s+M
+         Ed0qUIkKG/7apz2cyyiXN/B1okxdf1FC6mwvaQ7HVGXRxUd+k1GYmCNKO6y6lm/1CoyS
+         V+ENEHpX3E0bv5juc4Dit6mkfTlUmXBZoc1Cc5kXMyuHcAkHwSZQPu3Tui9ttids4kmB
+         Os/Q==
+X-Gm-Message-State: AO0yUKWFhFFeDRH496B+Uzyclai4Fh5dCfmtkmeY4dCx44R26Y1Agjy8
+        j/gOqtEBeQlY2pXieB4VCiPBINliDi3i0625gw==
+X-Google-Smtp-Source: AK7set9HH+M89jKTZ9W9fEUUdg0sgyPEHK/9CryOqrq/dO1DXpdnhKzTTfYNX8+F3GqgglMaiuTDCdAXCZa0pbdFvw==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a5b:38a:0:b0:ac9:cb97:bd0e with SMTP
+ id k10-20020a5b038a000000b00ac9cb97bd0emr19014460ybp.5.1678816022162; Tue, 14
+ Mar 2023 10:47:02 -0700 (PDT)
+Date:   Tue, 14 Mar 2023 17:47:01 +0000
+In-Reply-To: <86o7owyj0a.wl-maz@kernel.org> (message from Marc Zyngier on Mon,
+ 13 Mar 2023 11:43:01 +0000)
+Mime-Version: 1.0
+Message-ID: <gsnta60fcjje.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH 15/16] KVM: arm64: selftests: Augment existing timer test
+ to handle variable offsets
+From:   Colton Lewis <coltonlewis@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+        suzuki.poulose@arm.com, oliver.upton@linux.dev,
+        yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de,
+        dwmw2@infradead.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -94,33 +70,61 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/14/23 10:16, Isaku Yamahata wrote:
->>> TDX 1.5 spec introduced TDX_RND_NO_ENTROPY status code.  For TDX 1.0, let's
->>> postpone it to TDX 1.5 activity.
->> What the heck does this mean?
->>
->> I don't remember seeing any code here that checks for "TDX 1.0" or "TDX
->> 1.5".  That means that this code needs to work with _any_ TDX version.
->>
->> Are features being added to new versions that break code written for old
->> versions?
-> No new feature, but new error code. TDX_RND_NO_ENTROPY, lack of entropy.
-> For TDX 1.0, some APIs return TDX_SYS_BUSY. It can be contention(lock failure)
-> or the lack of entropy.  The caller can't distinguish them.
-> For TDX 1.5, they return TDX_RND_NO_ENTROPY instead of TDX_SYS_BUSY in the case
-> of rdrand/rdseed failure.
-> 
-> Because both TDX_SYS_BUSY and TDX_RND_NO_ENTROPY are recoverable error
-> (bit 63 error=1, bit 62 non_recoverable=0), the caller can check error bit and
-> non_recoverable bit for retry.
+Marc Zyngier <maz@kernel.org> writes:
 
-Oh, that's actually really nice.  It separates out the "RDRAND is empty"
-issue from the "the VMM should have had a lock here" issue.
+> On Fri, 10 Mar 2023 19:26:47 +0000,
+> Colton Lewis <coltonlewis@google.com> wrote:
 
-For now, let's consider TDX_SYS_BUSY to basically indicate a non-fatal
-kernel bug: the kernel called TDX in a way that it shouldn't have.
-We'll treat it in the kernel as non-recoverable.  We'll return an error,
-WARN_ON(), and keep on running.
+>> Marc Zyngier <maz@kernel.org> writes:
 
-A follow-on patch can add generic TDX_RND_NO_ENTROPY retry support to
-the seamcall infrastructure.
+>> >> mvbbq9:/data/coltonlewis/ecv/arm64-obj/kselftest/kvm#
+>> >> ./aarch64/arch_timer -O 0xffff
+>> >> ==== Test Assertion Failure ====
+>> >>    aarch64/arch_timer.c:239: false
+>> >>    pid=48094 tid=48095 errno=4 - Interrupted system call
+>> >>       1  0x4010fb: test_vcpu_run at arch_timer.c:239
+>> >>       2  0x42a5bf: start_thread at pthread_create.o:0
+>> >>       3  0x46845b: thread_start at clone.o:0
+>> >>    Failed guest assert: xcnt >= cval at aarch64/arch_timer.c:151
+>> >> values: 2500645901305, 2500645961845; 9939, vcpu 0; stage; 3; iter: 2
+
+>> > The fun part is that you can see similar things without the series:
+
+>> > ==== Test Assertion Failure ====
+>> >    aarch64/arch_timer.c:239: false
+>> >    pid=647 tid=651 errno=4 - Interrupted system call
+>> >       1  0x00000000004026db: test_vcpu_run at arch_timer.c:239
+>> >       2  0x00007fffb13cedd7: ?? ??:0
+>> >       3  0x00007fffb1437e9b: ?? ??:0
+>> >    Failed guest assert: config_iter + 1 == irq_iter at
+>> > aarch64/arch_timer.c:188
+>> > values: 2, 3; 0, vcpu 3; stage; 4; iter: 3
+
+>> > That's on a vanilla kernel (6.2-rc4) on an M1 with the test run
+>> > without any argument in a loop. After a few iterations, it blows.
+
+> I finally got to the bottom of that one. This is yet another case of
+> the test making the assumption that spurious interrupts don't exist...
+
+That's great!
+
+> Here, the timer interrupt has been masked at the source, but the GIC
+> (or its emulation) can be slow to retire it. So we take it again,
+> spuriously, and account it as a true interrupt. None of the asserts in
+> the timer handler fire because they only check the *previous* state.
+
+> Eventually, the interrupt retires and we progress to the next
+> iteration. But in the meantime, we have incremented the irq counter by
+> the number of spurious events, and the test fails.
+
+> The obvious fix is to check for the timer state in the handler and
+> exit early if the timer interrupt is masked or the timer disabled.
+> With that, I don't see these failures anymore.
+
+> I've folded that into the patch that already deals with some spurious
+> events.
+
+I'll be looking at it and will keep in mind your questions about my
+hardware should I find any issues. Yes it has ECV and CNTPOFF but no I
+didn't try turning it off for this because my issue occured only when
+setting a physical offset and that can't be done without ECV.
