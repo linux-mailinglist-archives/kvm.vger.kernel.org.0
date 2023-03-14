@@ -2,74 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ED1FA6B8A7D
-	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 06:37:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E972C6B8AC7
+	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 06:45:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229977AbjCNFhW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Mar 2023 01:37:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51146 "EHLO
+        id S229552AbjCNFpt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Mar 2023 01:45:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41684 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229496AbjCNFhV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Mar 2023 01:37:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ADB17D091
-        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 22:36:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678772187;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=CUNqowlHsOHTiRljuMolx/A+uVnVqERrix3vDx9FlvY=;
-        b=hqriddXLrPf/fO8qjIoVYYPdx9RrMeqBweeTh3vxyl5vM6XfX4asAGfYSiEXlB4bk1pZxU
-        c/YUdcfPOoJoUhc/xrM+Hu6yh+sZmOHXr1p+NnPiev2dGzrQLaOvafrRlLCXWo5qMaPsdn
-        LGYESD482bHNV+Uum21rOtE8fzAg4h8=
-Received: from mail-oa1-f69.google.com (mail-oa1-f69.google.com
- [209.85.160.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-489-c45Hcc6SPUygzuBmao6e5w-1; Tue, 14 Mar 2023 01:36:26 -0400
-X-MC-Unique: c45Hcc6SPUygzuBmao6e5w-1
-Received: by mail-oa1-f69.google.com with SMTP id 586e51a60fabf-176249fbc56so8422483fac.6
-        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 22:36:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678772185;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CUNqowlHsOHTiRljuMolx/A+uVnVqERrix3vDx9FlvY=;
-        b=acBHrDQPdmQD0R7vCkYe184Nxt9y/DWPbkAY2LHxfPcrt5E3RGipkjHoBRW59NVfhQ
-         fLR0G1uR7p1JBQV7m9MdGtCJ3+Qld97O2BuZYr5wupAw/C3Fo9Nck60j729sDURryAzu
-         c0MS9+eIwD6ebq94aoxDoTNsROdccUvjMfS+EsSWr9o75UEP8wg0USig42uIl6qtsAZG
-         lvSQndFOqIXxpzKD3f7sBesJL7wITqMxdqrfKU6mR3NeLwek886V9CD0TG05TlM7Eb/u
-         TBeBEjPzEDnIirDh7LkEwhDqs7/xGFxzov13cbzRoo9wew5CjML5sPupSWxUpk0y/JHu
-         pYpQ==
-X-Gm-Message-State: AO0yUKVThQzb/ecTYrAohbG/UOMoN69OZ7kGiJ38nDkTRvZzi5CI2uL+
-        oVvQGcIgEXxXoZQc7vZvFtr5YBJrzBNyuAImoB2HhvKkLQ5RZ7hFYQ4Us6RsaZxaoBzZ+N6sR+j
-        eXsYz1jhLjVImqI9m/i6MlJvqh6ZR
-X-Received: by 2002:a9d:60d0:0:b0:688:d1d6:2029 with SMTP id b16-20020a9d60d0000000b00688d1d62029mr12568435otk.2.1678772185641;
-        Mon, 13 Mar 2023 22:36:25 -0700 (PDT)
-X-Google-Smtp-Source: AK7set+kN4AtoVa9aWxyktypjoY9bQX/jqJh/j0S1GrS5sbNhOwjiFrtu8xIdNunTOUI244RxuH+n3UiLO9HYeAQIRc=
-X-Received: by 2002:a9d:60d0:0:b0:688:d1d6:2029 with SMTP id
- b16-20020a9d60d0000000b00688d1d62029mr12568426otk.2.1678772185358; Mon, 13
- Mar 2023 22:36:25 -0700 (PDT)
+        with ESMTP id S229473AbjCNFpr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Mar 2023 01:45:47 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6489C6507C;
+        Mon, 13 Mar 2023 22:45:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1678772746; x=1710308746;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=epevocZi6+E2W/gaN32HI3R84I7en7SETUEfrcRwoM4=;
+  b=L56UdPYeyZEHfLOpoA4cIf+JjM2U1d/YsCIATO3RlG8O3ec1kSpuFPwt
+   7GW+GmAfPgK+4gLk7CDKOcbGqeIoWK7ki0IHGfaP0cFrdBi5en8wWAVIz
+   QBXqtrwTs3Ww6ZnafRpz6QJ4ei3aS1+zbXyve/GipYPhpUqPaDVouOzHA
+   qcJe5z+W+ZoefRFACe5LcP/7+vKQbdT2FzqbDdjcS5LvBphnoUaPgBmRT
+   t/A6MuuDvJ8FbzOVltbDaGFUTxyj28Vm2Uo/1H18PnFrWIoH4eAKRcCe6
+   dz+vH/pi3MfDQhHsHSNcRU68MVgWpHssVUIP6mTjW57fVOYzSY8M8wtru
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10648"; a="339703246"
+X-IronPort-AV: E=Sophos;i="5.98,259,1673942400"; 
+   d="scan'208";a="339703246"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2023 22:45:45 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10648"; a="711382097"
+X-IronPort-AV: E=Sophos;i="5.98,259,1673942400"; 
+   d="scan'208";a="711382097"
+Received: from rahulmur-mobl3.amr.corp.intel.com (HELO [10.212.195.84]) ([10.212.195.84])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2023 22:45:45 -0700
+Message-ID: <902b0166-6156-8def-a7a3-f0ce8995fa9c@intel.com>
+Date:   Mon, 13 Mar 2023 22:45:45 -0700
 MIME-Version: 1.0
-References: <20230302113421.174582-1-sgarzare@redhat.com> <20230302113421.174582-9-sgarzare@redhat.com>
-In-Reply-To: <20230302113421.174582-9-sgarzare@redhat.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Tue, 14 Mar 2023 13:36:13 +0800
-Message-ID: <CACGkMEt1hBcRdh0oQYCs4meRs0mvDu9X9o-zK4aS87hrN+QPxA@mail.gmail.com>
-Subject: Re: [PATCH v2 8/8] vdpa_sim: add support for user VA
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org,
-        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
-        eperezma@redhat.com, netdev@vger.kernel.org, stefanha@redhat.com,
-        linux-kernel@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH v10 05/16] x86/virt/tdx: Add skeleton to enable TDX on
+ demand
+Content-Language: en-US
+To:     Isaku Yamahata <isaku.yamahata@gmail.com>,
+        "Huang, Kai" <kai.huang@intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "david@redhat.com" <david@redhat.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>
+References: <cover.1678111292.git.kai.huang@intel.com>
+ <f150316b975b5ca22c6c4016ffd90db79d657bbf.1678111292.git.kai.huang@intel.com>
+ <20230308222738.GA3419702@ls.amr.corp.intel.com>
+ <96b56c5b8a5876aaf6d5ccbb81bab334b10983eb.camel@intel.com>
+ <20230313234916.GC3922605@ls.amr.corp.intel.com>
+ <a62497059fc3f31706a532b822d6c966bd981468.camel@intel.com>
+ <20230314040200.GD3922605@ls.amr.corp.intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <20230314040200.GD3922605@ls.amr.corp.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,221 +92,24 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 2, 2023 at 7:35=E2=80=AFPM Stefano Garzarella <sgarzare@redhat.=
-com> wrote:
->
-> The new "use_va" module parameter (default: false) is used in
-> vdpa_alloc_device() to inform the vDPA framework that the device
-> supports VA.
->
-> vringh is initialized to use VA only when "use_va" is true and the
-> user's mm has been bound. So, only when the bus supports user VA
-> (e.g. vhost-vdpa).
->
-> vdpasim_mm_work_fn work is used to attach the kthread to the user
-> address space when the .bind_mm callback is invoked, and to detach
-> it when the .unbind_mm callback is invoked.
->
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
->
-> Notes:
->     v2:
->     - `use_va` set to true by default [Eugenio]
->     - supported the new unbind_mm callback [Jason]
->     - removed the unbind_mm call in vdpasim_do_reset() [Jason]
->     - avoided to release the lock while call kthread_flush_work() since w=
-e
->       are now using a mutex to protect the device state
->
->  drivers/vdpa/vdpa_sim/vdpa_sim.h |  1 +
->  drivers/vdpa/vdpa_sim/vdpa_sim.c | 98 +++++++++++++++++++++++++++++++-
->  2 files changed, 97 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.h b/drivers/vdpa/vdpa_sim/vdp=
-a_sim.h
-> index 4774292fba8c..3a42887d05d9 100644
-> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.h
-> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.h
-> @@ -59,6 +59,7 @@ struct vdpasim {
->         struct vdpasim_virtqueue *vqs;
->         struct kthread_worker *worker;
->         struct kthread_work work;
-> +       struct mm_struct *mm_bound;
->         struct vdpasim_dev_attr dev_attr;
->         /* mutex to synchronize virtqueue state */
->         struct mutex mutex;
-> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdp=
-a_sim.c
-> index a28103a67ae7..eda26bc33df5 100644
-> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> @@ -35,10 +35,77 @@ module_param(max_iotlb_entries, int, 0444);
->  MODULE_PARM_DESC(max_iotlb_entries,
->                  "Maximum number of iotlb entries for each address space.=
- 0 means unlimited. (default: 2048)");
->
-> +static bool use_va =3D true;
-> +module_param(use_va, bool, 0444);
-> +MODULE_PARM_DESC(use_va, "Enable/disable the device's ability to use VA"=
-);
-> +
->  #define VDPASIM_QUEUE_ALIGN PAGE_SIZE
->  #define VDPASIM_QUEUE_MAX 256
->  #define VDPASIM_VENDOR_ID 0
->
-> +struct vdpasim_mm_work {
-> +       struct kthread_work work;
-> +       struct mm_struct *mm;
-> +       bool bind;
-> +       int ret;
-> +};
-> +
-> +static void vdpasim_mm_work_fn(struct kthread_work *work)
-> +{
-> +       struct vdpasim_mm_work *mm_work =3D
-> +               container_of(work, struct vdpasim_mm_work, work);
-> +
-> +       mm_work->ret =3D 0;
-> +
-> +       if (mm_work->bind) {
-> +               kthread_use_mm(mm_work->mm);
-> +               //TODO: should we attach the cgroup of the mm owner?
-> +       } else {
-> +               kthread_unuse_mm(mm_work->mm);
-> +       }
-> +}
-> +
-> +static void vdpasim_worker_queue_mm(struct vdpasim *vdpasim,
-> +                                   struct vdpasim_mm_work *mm_work)
-> +{
+On 3/13/23 21:02, Isaku Yamahata wrote:
+>> Then it is a hidden behaviour of the TDX module that is not reflected in the
+>> spec.  I am not sure whether we should handle because: 
+>>
+>> 1) This is an extremely rare case.  Kernel would be basically under attack if
+>> such error happened.  In the current series we don't handle such case in
+>> KEY.CONFIG either but just leave a comment (see patch 13).
+>>
+>> 2) Not sure whether this will be changed in the future.
+>>
+>> So I think we should keep as is.
+> TDX 1.5 spec introduced TDX_RND_NO_ENTROPY status code.  For TDX 1.0, let's
+> postpone it to TDX 1.5 activity.
 
-Nit: we need to tweak the name as it does flush besides queuing the work.
+What the heck does this mean?
 
-> +       struct kthread_work *work =3D &mm_work->work;
-> +
-> +       kthread_init_work(work, vdpasim_mm_work_fn);
-> +       kthread_queue_work(vdpasim->worker, work);
-> +
-> +       kthread_flush_work(work);
-> +}
-> +
-> +static int vdpasim_worker_bind_mm(struct vdpasim *vdpasim,
-> +                                 struct mm_struct *new_mm)
-> +{
-> +       struct vdpasim_mm_work mm_work;
-> +
-> +       mm_work.mm =3D new_mm;
-> +       mm_work.bind =3D true;
-> +
-> +       vdpasim_worker_queue_mm(vdpasim, &mm_work);
-> +
-> +       if (!mm_work.ret)
-> +               vdpasim->mm_bound =3D new_mm;
-> +
-> +       return mm_work.ret;
-> +}
-> +
-> +static void vdpasim_worker_unbind_mm(struct vdpasim *vdpasim)
-> +{
-> +       struct vdpasim_mm_work mm_work;
-> +
-> +       if (!vdpasim->mm_bound)
-> +               return;
-> +
-> +       mm_work.mm =3D vdpasim->mm_bound;
-> +       mm_work.bind =3D false;
+I don't remember seeing any code here that checks for "TDX 1.0" or "TDX
+1.5".  That means that this code needs to work with _any_ TDX version.
 
-Can we simply use mm_work.mm =3D NULL for unbinding?
-
-> +
-> +       vdpasim_worker_queue_mm(vdpasim, &mm_work);
-> +
-> +       vdpasim->mm_bound =3D NULL;
-
-And change the mm_bound in the worker?
-
-Thanks
-
-> +}
->  static struct vdpasim *vdpa_to_sim(struct vdpa_device *vdpa)
->  {
->         return container_of(vdpa, struct vdpasim, vdpa);
-> @@ -59,8 +126,10 @@ static void vdpasim_queue_ready(struct vdpasim *vdpas=
-im, unsigned int idx)
->  {
->         struct vdpasim_virtqueue *vq =3D &vdpasim->vqs[idx];
->         uint16_t last_avail_idx =3D vq->vring.last_avail_idx;
-> +       bool va_enabled =3D use_va && vdpasim->mm_bound;
->
-> -       vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, true, f=
-alse,
-> +       vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, true,
-> +                         va_enabled,
->                           (struct vring_desc *)(uintptr_t)vq->desc_addr,
->                           (struct vring_avail *)
->                           (uintptr_t)vq->driver_addr,
-> @@ -151,7 +220,7 @@ struct vdpasim *vdpasim_create(struct vdpasim_dev_att=
-r *dev_attr,
->         vdpa =3D __vdpa_alloc_device(NULL, ops,
->                                    dev_attr->ngroups, dev_attr->nas,
->                                    dev_attr->alloc_size,
-> -                                  dev_attr->name, false);
-> +                                  dev_attr->name, use_va);
->         if (IS_ERR(vdpa)) {
->                 ret =3D PTR_ERR(vdpa);
->                 goto err_alloc;
-> @@ -571,6 +640,27 @@ static int vdpasim_set_map(struct vdpa_device *vdpa,=
- unsigned int asid,
->         return ret;
->  }
->
-> +static int vdpasim_bind_mm(struct vdpa_device *vdpa, struct mm_struct *m=
-m)
-> +{
-> +       struct vdpasim *vdpasim =3D vdpa_to_sim(vdpa);
-> +       int ret;
-> +
-> +       mutex_lock(&vdpasim->mutex);
-> +       ret =3D vdpasim_worker_bind_mm(vdpasim, mm);
-> +       mutex_unlock(&vdpasim->mutex);
-> +
-> +       return ret;
-> +}
-> +
-> +static void vdpasim_unbind_mm(struct vdpa_device *vdpa)
-> +{
-> +       struct vdpasim *vdpasim =3D vdpa_to_sim(vdpa);
-> +
-> +       mutex_lock(&vdpasim->mutex);
-> +       vdpasim_worker_unbind_mm(vdpasim);
-> +       mutex_unlock(&vdpasim->mutex);
-> +}
-> +
->  static int vdpasim_dma_map(struct vdpa_device *vdpa, unsigned int asid,
->                            u64 iova, u64 size,
->                            u64 pa, u32 perm, void *opaque)
-> @@ -667,6 +757,8 @@ static const struct vdpa_config_ops vdpasim_config_op=
-s =3D {
->         .set_group_asid         =3D vdpasim_set_group_asid,
->         .dma_map                =3D vdpasim_dma_map,
->         .dma_unmap              =3D vdpasim_dma_unmap,
-> +       .bind_mm                =3D vdpasim_bind_mm,
-> +       .unbind_mm              =3D vdpasim_unbind_mm,
->         .free                   =3D vdpasim_free,
->  };
->
-> @@ -701,6 +793,8 @@ static const struct vdpa_config_ops vdpasim_batch_con=
-fig_ops =3D {
->         .get_iova_range         =3D vdpasim_get_iova_range,
->         .set_group_asid         =3D vdpasim_set_group_asid,
->         .set_map                =3D vdpasim_set_map,
-> +       .bind_mm                =3D vdpasim_bind_mm,
-> +       .unbind_mm              =3D vdpasim_unbind_mm,
->         .free                   =3D vdpasim_free,
->  };
->
-> --
-> 2.39.2
->
-
+Are features being added to new versions that break code written for old
+versions?
