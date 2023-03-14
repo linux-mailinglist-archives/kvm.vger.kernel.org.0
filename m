@@ -2,208 +2,470 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 244956B8978
-	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 05:19:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C29E16B8995
+	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 05:26:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229496AbjCNETF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Mar 2023 00:19:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59610 "EHLO
+        id S229648AbjCNE0h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Mar 2023 00:26:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229441AbjCNETC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Mar 2023 00:19:02 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 375527B98A;
-        Mon, 13 Mar 2023 21:18:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678767540; x=1710303540;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=heHYTyn8t+tSgC0zgbCnYcSRmqoeMvBoMKjqJEgqzk0=;
-  b=bB5XMImIb0oxUEdUS2vZEdr20Jdt0Af+5Awg3fZ/xIQpaTWosrf2O7re
-   VmRs5MF+sD/7Y567khN5+cF8qd1TXt3vzPaLAV5IEsAWIjh8f/1kT0zYD
-   E81vLNu586NKp2iRuDbTYLvJ5RkcAapgi7uOGv6DrA9Jn7kTM9rJ1ebxb
-   DXsg35PMPZSMQxFudM0BF8JWcjpd3MtNJY6k2a4o3y2rZ05z05Uk1GwJb
-   9NUhPoSGuauzqEECmXgQBSD6d1dyiIoTc+d244q2A9oCysf99zcXu0x72
-   hc3kQnLPNf2dnptNMd2jrs1qaT+njcfnXKB+DjODBS2gjjxBtbYHR8oHs
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10648"; a="364990275"
-X-IronPort-AV: E=Sophos;i="5.98,258,1673942400"; 
-   d="scan'208";a="364990275"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2023 21:18:59 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10648"; a="743156200"
-X-IronPort-AV: E=Sophos;i="5.98,258,1673942400"; 
-   d="scan'208";a="743156200"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmsmga008.fm.intel.com with ESMTP; 13 Mar 2023 21:18:59 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Mon, 13 Mar 2023 21:18:58 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21 via Frontend Transport; Mon, 13 Mar 2023 21:18:58 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.104)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.21; Mon, 13 Mar 2023 21:18:22 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Hl9AKyACBhOsQxMohfadmqDVDIDpR0a0ZcxpYjH4YIPA3C+XK9+0XCBb89EOMPBPc+Z1lywMEq2dNW3LXE61dyOM3AJAp6/meUtpykj/yRQkMnMfjTwwXDQjK7KPPzqfmiW/cB8SFgrOLVsmF0K6gpjXMygwDtBH5lrlNizl1JvUYDPizKygL9+nea1vHQcjYAsPDLgdEP1m4G8CbN12ym9QlYj6C6J/bzpBmFndXHqk4+sbNlQm/QtHGOP4ou6nR7kRG9qDz/mmEeFfDR+TfCxOOa5/jiHXHLMqKKZ8L37ZE8oNNmDuoV51BbYZeVmAEV3e8mcNKZuSEnETAZTD8g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=m1tq2PJ2uYVf2bfd2auIRJgUPkmkhpjmXQMYrOCBsNw=;
- b=dDvH7xkr9Sw8Qin5L2hGcIWRyTY6i0VyVjA7hp8T30533KsJbIQmN0tBOO/y6C6Hu1AAd7Z6F272sPQSHAuI/I+jHqZBbHIfrj2SIAdsSge1QSfS1rcdsLyU3eVRWr7d7QjvpZBxIxx32gYAcQxwk8AgDOB9fe748zmu4PqkgSllGbX9inT7WuarwNgw3iaKId1I+xHj25q8IPZcgo3sGQGFiYX1y8dOUbAO6VW3dz2uSKixOD7wpL0VHMGD87i1iveVjTTX3wmf/7tLx7qCeFJQ7Wu6tAkhBTfBwjylGEObApu7Celg8HxTcmsQogVLoLcaEZBQaAXTJvfFK0Fsiw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
- by DM4PR11MB5469.namprd11.prod.outlook.com (2603:10b6:5:399::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.25; Tue, 14 Mar
- 2023 04:18:21 +0000
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::6f7:944a:aaad:301f]) by DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::6f7:944a:aaad:301f%8]) with mapi id 15.20.6178.026; Tue, 14 Mar 2023
- 04:18:21 +0000
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     "joro@8bytes.org" <joro@8bytes.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
-Subject: RE: [PATCH 07/12] iommufd: Add IOMMU_HWPT_INVALIDATE
-Thread-Topic: [PATCH 07/12] iommufd: Add IOMMU_HWPT_INVALIDATE
-Thread-Index: AQHZUl6BWo8K/M9cuUy0397Pqa8aG670TNcAgAVllSA=
-Date:   Tue, 14 Mar 2023 04:18:21 +0000
-Message-ID: <DS0PR11MB7529853F52AE5E338A84AFE0C3BE9@DS0PR11MB7529.namprd11.prod.outlook.com>
-References: <20230309080910.607396-1-yi.l.liu@intel.com>
- <20230309080910.607396-8-yi.l.liu@intel.com> <ZAtt4F9zSZxptyZh@nvidia.com>
-In-Reply-To: <ZAtt4F9zSZxptyZh@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS0PR11MB7529:EE_|DM4PR11MB5469:EE_
-x-ms-office365-filtering-correlation-id: 7754de7e-6c73-45d4-4861-08db2443257e
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: OovqPJ+Wmu6ctoEaFSa33uQuf2MkygOumo3u+GJpIrRyLr1pQ+stAGAZXidUMOp/84bqTbnrP/6OP9NPQjmQUDNcG+eXNLrg/F1Q1p1wC1X7oU5MgdKih9cx7BjAP3zybLAdaRkxkWt3qiXWfCc8vQxm/iOByYwRQb7EWwTRDM8Qf8pmNBzMrtcqwxUp3TtypzAJCcEBYeIOhqL71L9Sper720bSTG21jA8vTYM3ife4N8varNjJ0lfiAeflSYhQuygAG00hox/vbOQtdHKPoN3Cbc81GP3YtmEqZOyCLtnfP9eqAHau//a5mkVG6BwPSHF+dlBP8fnfjWI//aIbGoCXWsVWIPOL5Ayd6NY7c2Y801aeTbZIeltb+K4rMMSeoG3hwRVhN2BABKiIWkjLoYHIrIX+Ao1oxP3QtvgvadYIw+saf+e7/lKR1lhCJT4CwmZPPgJH7Hovfk/R4Dd55Sm3GP0XTdIDaiDUa+aUHFM6BlJKh/x65x9hNKQqUKZwIFOXfjnTK2dyq/xyDUQ2SilMAScuXaXXYWBYU3dgY86flZT5GF3FmtfX+i4QwvDGHT7XGfuOwORFHMUihwgwWZJVzyuARYzl3akgner7DanNC+wA/fgZPNO/0tpYuMj/muWG4VK23NqYMSb3o9kmswqNGQWoj4eQQ/bmph0ovMa0F7n9e3ZD+aWeR22aVW/EWm22OE9mMEeFMt/TPknZgA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(376002)(39860400002)(136003)(346002)(396003)(366004)(451199018)(5660300002)(7416002)(83380400001)(186003)(478600001)(26005)(71200400001)(6506007)(7696005)(66446008)(9686003)(54906003)(38070700005)(66476007)(8676002)(66946007)(64756008)(41300700001)(52536014)(66556008)(6916009)(33656002)(4326008)(8936002)(76116006)(316002)(86362001)(38100700002)(55016003)(82960400001)(122000001)(2906002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?NcAxu0bD8W1A6XcwinXiIPHtr1UYKK11kC5oeysj3CfPmC+VCHlMWxgP0srw?=
- =?us-ascii?Q?9LQiPBJEWEHLNhjePoIWFhwg5MF6mx9hg/h/bAhmNAAczvbYWJxPCiYZDepA?=
- =?us-ascii?Q?hg832A8OpqMXPXwY2D3vi4TF7XhP5UUhEpMVjHvh+CDb6qjUzqCP6QYE8Gsf?=
- =?us-ascii?Q?C4A9SJqtXypN6f7yOa8KOKDm4lvbJ9TywnZsTfNzCPtOm+a1rjLFJYVwEyJF?=
- =?us-ascii?Q?1w07f7gie10u1e/8g1EbGLdSEqDR/FBywk+pvjBo3pIleTwZOUzGbMOh8Sun?=
- =?us-ascii?Q?CAWlUS32p2SdUwN7NldDSUDv5cFZh2ZvPq8d3u5kPCMLu8d0RvbRvuAlAzKQ?=
- =?us-ascii?Q?70Ppgl+bckaNe7VWfBnR2uV5QI3GqKo7hlB10X7ZxZtSPF5nBLRLJRRmQ42d?=
- =?us-ascii?Q?rAA6lU6Np951wyAWvh1/0eRJEklhHuhAZPNX6pSQocE8PPkntM0niN8c7DaR?=
- =?us-ascii?Q?IzrexvwEH6/8Azv0QwTjcx7A4PlQC3GdbJDYVRzHN19RTKXgzpTa8IRgIsWo?=
- =?us-ascii?Q?buN9L27KW+Q1WlqNJus4o+b0S9Mdh2zpHma2wTpT+scEHJBVK3F2iiHfjQ8V?=
- =?us-ascii?Q?kgxFSKwLk2D1xpuDAr1QP/dtbG4ReDmM/Dww0ah4w0uHJvGaYJFAkoA1znQO?=
- =?us-ascii?Q?EKuu60jdkzza99Y/Xm0NxyIbMUEa2gHSy2jaD1VSZNj2VQ4IEddZkkpuz9Ep?=
- =?us-ascii?Q?JmU6AlJgRYYRvQXgqwL7El2JQYy7fbQCoRuhqVpfZX2flMK0Or41y71Rq2kp?=
- =?us-ascii?Q?t3fSHbGQhzGC0HTgfX6/g+nzUd1ehqrbIMuWIjt9QChdzimbEjc1s566t+MA?=
- =?us-ascii?Q?+foszKj5r851RQpkuONyiH5GJsWk6bSq011HtxNM4aurI1dl39RVd/83TkI9?=
- =?us-ascii?Q?rQY+jTDVzlDOJi5v5ZbFtlctmgURIYDS+dQ6rSHmJmfcerruX9w6CBazebAC?=
- =?us-ascii?Q?pN9DJTgC2nEBRlrM7owbyoehAOVwspunqV+lCzX2TFTY0L/LF4n2HVC1bLmz?=
- =?us-ascii?Q?PLHuZxTUi8oBcu6vBkCw7AwpjpuhwJ7bsE58SYFZla9Vo1Ga00R+1SaXpkWK?=
- =?us-ascii?Q?9tJS2Z7nCjO4SaJdGqO9kboKvP34edDvHMnd+alZvstpRuCr+BnEu+aIviEb?=
- =?us-ascii?Q?TozF6LMtRuoW/Qy53aIJDqDyrlLP4TQRPoKb83APo+9HCUAoAkxUK9gpvlns?=
- =?us-ascii?Q?Ztf0FHQ6owJe9AvjGjpmJh4aqZgxrefYHZiqK17yIhRK8RujpyN2J+49EwWg?=
- =?us-ascii?Q?DB0te9Z5MBMLscOH6v/cQygV3f3ZTeXBvJp2HAMQR8kYMbHqgnMig8g/weOo?=
- =?us-ascii?Q?4uBX6DWdWEvr8xcdexn+IPw0V92myMB7P8CIIJJh7cGHf8C69tCOKvMYC02Y?=
- =?us-ascii?Q?lMOazgwt5YAvXRZkEiuXX1rJfwwg3pHJlPT4D7kGY9hsteBl5YKoDGYha1IQ?=
- =?us-ascii?Q?wyI97v+Key1Z7GpW2nkuK2zx/i+XZ6QhWWMArMBpi/cNt2muDtWRoDEbg/Yo?=
- =?us-ascii?Q?Ti05tMmhJgCsL+3bI3+szQbiD2YVx34h8MuU/6Y/H81MPHH8RCgTGzs8jzql?=
- =?us-ascii?Q?w4UG5cfJkcfxkI4reG3OemAj6Vr2Ol0QYpuWIB6e?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S229494AbjCNE0f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Mar 2023 00:26:35 -0400
+Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDDC03C2F
+        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 21:26:33 -0700 (PDT)
+Received: by mail-oi1-x235.google.com with SMTP id bp19so10992395oib.4
+        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 21:26:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1678767993;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RizlOsdd/aYe5/sxPksJfTgdJ2usMbmPaZfKYJlzqP8=;
+        b=OGHfqlbL2X0JhHik2cotDldIch+4IHnKeK+c6hVFSXEvkvxxgTA9kdGK1fCPIYTER6
+         Z/NR8KjLCg5sp63OocsaPEPXjoAA4r2/CdPadE0Nmd60Vb+DBFVDztsBjcidgZ3pRr+u
+         HZWUuT//d4zeiESveYYDFmXdTlzlSooaRGjw8sFTphkLaMtbxs7RHAL5JTHfOAcRjo5V
+         NMXPGulfG3H6jCm5qXVOvPCw26htSGtejkkTIUyJk/Pu+T/jxaQJcKLTePEjYv7JZWLe
+         epiAFvCgAalYQMZ7BAytxVkOarl53++86tT4LN/Ip5n77y8FDxKzT52BpRNnyz2eAePr
+         ew9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678767993;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RizlOsdd/aYe5/sxPksJfTgdJ2usMbmPaZfKYJlzqP8=;
+        b=XI6HZuZKsdEGUMH1Rx+S55ni+a4q114PapuGeXL1i1eb/rwyme7YdS/oio/4UgmIht
+         CDreFV8FFKaj1nutSxx4kOXOgqIj0zQDFRwtzQXlESuowDbOSn2+lYohRr9B+LtfHhm0
+         gVi8vb6p17AjX2DKAAUXxNP/uw3I/O2GvAlRy6vv+y/vgdk2V68Y0y3nzfpJ78O32A2d
+         Sb6rpZgCtG2V2k6h10oecR78dtiznUUPuv2gWDPD+yvnhAkk2UoZgT4dgiLQT5Q76VRi
+         snCEr93EoBTEHmwlakvedKCcBzzMSAH644iCBW9vkUXi8tuB7vdpusqsmb/ikgRHgjuP
+         daGg==
+X-Gm-Message-State: AO0yUKWvFl68Q2cbNb3I/hrdyiUzN7fLBT25PEWT+qu0ai9wY2nqqd0M
+        DyHks2RAecfCTRnUMqA/IdXK4gU5YrSki7L2tDhF/g==
+X-Google-Smtp-Source: AK7set/HMwU7DnqhKbspTbSjCWXBtYFmt2i9qoNywruBplqUuXHf6q3b05t1kVZMozlZ3NtoOHs3Dw6Iumu0WxV5ioM=
+X-Received: by 2002:aca:1c09:0:b0:384:2019:c201 with SMTP id
+ c9-20020aca1c09000000b003842019c201mr12035089oic.8.1678767992500; Mon, 13 Mar
+ 2023 21:26:32 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7754de7e-6c73-45d4-4861-08db2443257e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Mar 2023 04:18:21.3342
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: rq19gqdRH6DrIvPyUDjrB6XxujCdaLG7fJd8tyk+m3o07Vo7zvTRa6wcq1cEy+/RUY/0QVTyakJGmajREIOr4g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB5469
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+References: <20230228062246.1222387-1-jingzhangos@google.com>
+ <20230228062246.1222387-6-jingzhangos@google.com> <CAAeT=FyKDe9Fn1o_WUK+EUfZxkxWnYHmnVOD4Eno9aqbWWeOqQ@mail.gmail.com>
+In-Reply-To: <CAAeT=FyKDe9Fn1o_WUK+EUfZxkxWnYHmnVOD4Eno9aqbWWeOqQ@mail.gmail.com>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Mon, 13 Mar 2023 21:26:19 -0700
+Message-ID: <CAAdAUtiJ25gY6LyFueZgRV+riRSKWXza0HF3noXe_o3Sqg58NA@mail.gmail.com>
+Subject: Re: [PATCH v3 5/6] KVM: arm64: Introduce ID register specific descriptor
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oupton@google.com>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Jason Gunthorpe <jgg@nvidia.com>
-> Sent: Saturday, March 11, 2023 1:50 AM
->=20
-> On Thu, Mar 09, 2023 at 12:09:05AM -0800, Yi Liu wrote:
-> > +int iommufd_hwpt_invalidate(struct iommufd_ucmd *ucmd)
-> > +{
-> > +	struct iommu_hwpt_invalidate *cmd =3D ucmd->cmd;
-> > +	struct iommufd_hw_pagetable *hwpt;
-> > +	u64 user_ptr;
-> > +	u32 user_data_len, klen;
-> > +	int rc =3D 0;
+Hi Reiji,
+
+On Sun, Mar 12, 2023 at 9:15=E2=80=AFPM Reiji Watanabe <reijiw@google.com> =
+wrote:
+>
+> Hi Jing,
+>
+> On Mon, Feb 27, 2023 at 10:23=E2=80=AFPM Jing Zhang <jingzhangos@google.c=
+om> wrote:
+> >
+> > Introduce an ID feature register specific descriptor to include ID
+> > register specific fields and callbacks besides its corresponding
+> > general system register descriptor.
+> > New fields for ID register descriptor would be added later when it
+> > is necessary to support a writable ID register.
+> >
+> > No functional change intended.
+> >
+> > Co-developed-by: Reiji Watanabe <reijiw@google.com>
+> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > ---
+> >  arch/arm64/kvm/id_regs.c  | 184 ++++++++++++++++++++++++++++----------
+> >  arch/arm64/kvm/sys_regs.c |   2 +-
+> >  arch/arm64/kvm/sys_regs.h |   1 +
+> >  3 files changed, 138 insertions(+), 49 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
+> > index 21ec8fc10d79..fc0dcd557cbb 100644
+> > --- a/arch/arm64/kvm/id_regs.c
+> > +++ b/arch/arm64/kvm/id_regs.c
+> > @@ -18,6 +18,10 @@
+> >
+> >  #include "sys_regs.h"
+> >
+> > +struct id_reg_desc {
+> > +       const struct sys_reg_desc       reg_desc;
+> > +};
 > > +
-> > +	/*
-> > +	 * For a user-managed HWPT, type should not be
-> IOMMU_HWPT_TYPE_DEFAULT.
-> > +	 * data_len should not exceed the size of
-> iommufd_invalidate_buffer.
-> > +	 */
-> > +	if (cmd->data_type =3D=3D IOMMU_HWPT_TYPE_DEFAULT || !cmd-
-> >data_len ||
-> > +	    cmd->data_type >=3D
-> ARRAY_SIZE(iommufd_hwpt_invalidate_info_size))
-> > +		return -EOPNOTSUPP;
->=20
-> This needs to do the standard check for zeros in unknown trailing data
-> bit. Check that alloc does it too
-
-Maybe it has been covered by the copy_struct_from_user(). Is it?
-
-+	/*
-+	 * Copy the needed fields before reusing the ucmd buffer, this
-+	 * avoids memory allocation in this path.
-+	 */
-+	user_ptr =3D cmd->data_uptr;
-+	user_data_len =3D cmd->data_len;
-+
-+	rc =3D copy_struct_from_user(cmd, klen,
-+				   u64_to_user_ptr(user_ptr), user_data_len);
-
-Regards,
-Yi Liu=20
+> >  static u8 vcpu_pmuver(const struct kvm_vcpu *vcpu)
+> >  {
+> >         if (kvm_vcpu_has_pmu(vcpu))
+> > @@ -326,21 +330,25 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+> >  }
+> >
+> >  /* sys_reg_desc initialiser for known cpufeature ID registers */
+> > -#define ID_SANITISED(name) {                   \
+> > -       SYS_DESC(SYS_##name),                   \
+> > -       .access =3D access_id_reg,                \
+> > -       .get_user =3D get_id_reg,                 \
+> > -       .set_user =3D set_id_reg,                 \
+> > -       .visibility =3D id_visibility,            \
+> > +#define ID_SANITISED(name) {                           \
+> > +       .reg_desc =3D {                                   \
+> > +               SYS_DESC(SYS_##name),                   \
+> > +               .access =3D access_id_reg,                \
+> > +               .get_user =3D get_id_reg,                 \
+> > +               .set_user =3D set_id_reg,                 \
+> > +               .visibility =3D id_visibility,            \
+> > +       },                                              \
+> >  }
+> >
+> >  /* sys_reg_desc initialiser for known cpufeature ID registers */
+> > -#define AA32_ID_SANITISED(name) {              \
+> > -       SYS_DESC(SYS_##name),                   \
+> > -       .access =3D access_id_reg,                \
+> > -       .get_user =3D get_id_reg,                 \
+> > -       .set_user =3D set_id_reg,                 \
+> > -       .visibility =3D aa32_id_visibility,       \
+> > +#define AA32_ID_SANITISED(name) {                      \
+> > +       .reg_desc =3D {                                   \
+> > +               SYS_DESC(SYS_##name),                   \
+> > +               .access =3D access_id_reg,                \
+> > +               .get_user =3D get_id_reg,                 \
+> > +               .set_user =3D set_id_reg,                 \
+> > +               .visibility =3D aa32_id_visibility,       \
+> > +       },                                              \
+> >  }
+> >
+> >  /*
+> > @@ -348,12 +356,14 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+> >   * register with encoding Op0=3D3, Op1=3D0, CRn=3D0, CRm=3Dcrm, Op2=3D=
+op2
+> >   * (1 <=3D crm < 8, 0 <=3D Op2 < 8).
+> >   */
+> > -#define ID_UNALLOCATED(crm, op2) {                     \
+> > -       Op0(3), Op1(0), CRn(0), CRm(crm), Op2(op2),     \
+> > -       .access =3D access_id_reg,                        \
+> > -       .get_user =3D get_id_reg,                         \
+> > -       .set_user =3D set_id_reg,                         \
+> > -       .visibility =3D raz_visibility                    \
+> > +#define ID_UNALLOCATED(crm, op2) {                             \
+> > +       .reg_desc =3D {                                           \
+> > +               Op0(3), Op1(0), CRn(0), CRm(crm), Op2(op2),     \
+> > +               .access =3D access_id_reg,                        \
+> > +               .get_user =3D get_id_reg,                         \
+> > +               .set_user =3D set_id_reg,                         \
+> > +               .visibility =3D raz_visibility                    \
+> > +       },                                                      \
+> >  }
+> >
+> >  /*
+> > @@ -361,15 +371,17 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+> >   * For now, these are exposed just like unallocated ID regs: they appe=
+ar
+> >   * RAZ for the guest.
+> >   */
+> > -#define ID_HIDDEN(name) {                      \
+> > -       SYS_DESC(SYS_##name),                   \
+> > -       .access =3D access_id_reg,                \
+> > -       .get_user =3D get_id_reg,                 \
+> > -       .set_user =3D set_id_reg,                 \
+> > -       .visibility =3D raz_visibility,           \
+> > +#define ID_HIDDEN(name) {                              \
+> > +       .reg_desc =3D {                                   \
+> > +               SYS_DESC(SYS_##name),                   \
+> > +               .access =3D access_id_reg,                \
+> > +               .get_user =3D get_id_reg,                 \
+> > +               .set_user =3D set_id_reg,                 \
+> > +               .visibility =3D raz_visibility,           \
+> > +       },                                              \
+> >  }
+> >
+> > -static const struct sys_reg_desc id_reg_descs[] =3D {
+> > +static const struct id_reg_desc id_reg_descs[KVM_ARM_ID_REG_NUM] =3D {
+> >         /*
+> >          * ID regs: all ID_SANITISED() entries here must have correspon=
+ding
+> >          * entries in arm64_ftr_regs[].
+> > @@ -379,9 +391,13 @@ static const struct sys_reg_desc id_reg_descs[] =
+=3D {
+> >         /* CRm=3D1 */
+> >         AA32_ID_SANITISED(ID_PFR0_EL1),
+> >         AA32_ID_SANITISED(ID_PFR1_EL1),
+> > -       { SYS_DESC(SYS_ID_DFR0_EL1), .access =3D access_id_reg,
+> > -         .get_user =3D get_id_reg, .set_user =3D set_id_dfr0_el1,
+> > -         .visibility =3D aa32_id_visibility, },
+> > +       { .reg_desc =3D {
+> > +               SYS_DESC(SYS_ID_DFR0_EL1),
+> > +               .access =3D access_id_reg,
+> > +               .get_user =3D get_id_reg,
+> > +               .set_user =3D set_id_dfr0_el1,
+> > +               .visibility =3D aa32_id_visibility, },
+> > +       },
+> >         ID_HIDDEN(ID_AFR0_EL1),
+> >         AA32_ID_SANITISED(ID_MMFR0_EL1),
+> >         AA32_ID_SANITISED(ID_MMFR1_EL1),
+> > @@ -410,8 +426,12 @@ static const struct sys_reg_desc id_reg_descs[] =
+=3D {
+> >
+> >         /* AArch64 ID registers */
+> >         /* CRm=3D4 */
+> > -       { SYS_DESC(SYS_ID_AA64PFR0_EL1), .access =3D access_id_reg,
+> > -         .get_user =3D get_id_reg, .set_user =3D set_id_aa64pfr0_el1, =
+},
+> > +       { .reg_desc =3D {
+> > +               SYS_DESC(SYS_ID_AA64PFR0_EL1),
+> > +               .access =3D access_id_reg,
+> > +               .get_user =3D get_id_reg,
+> > +               .set_user =3D set_id_aa64pfr0_el1, },
+> > +       },
+> >         ID_SANITISED(ID_AA64PFR1_EL1),
+> >         ID_UNALLOCATED(4, 2),
+> >         ID_UNALLOCATED(4, 3),
+> > @@ -421,8 +441,12 @@ static const struct sys_reg_desc id_reg_descs[] =
+=3D {
+> >         ID_UNALLOCATED(4, 7),
+> >
+> >         /* CRm=3D5 */
+> > -       { SYS_DESC(SYS_ID_AA64DFR0_EL1), .access =3D access_id_reg,
+> > -         .get_user =3D get_id_reg, .set_user =3D set_id_aa64dfr0_el1, =
+},
+> > +       { .reg_desc =3D {
+> > +               SYS_DESC(SYS_ID_AA64DFR0_EL1),
+> > +               .access =3D access_id_reg,
+> > +               .get_user =3D get_id_reg,
+> > +               .set_user =3D set_id_aa64dfr0_el1, },
+> > +       },
+> >         ID_SANITISED(ID_AA64DFR1_EL1),
+> >         ID_UNALLOCATED(5, 2),
+> >         ID_UNALLOCATED(5, 3),
+> > @@ -461,12 +485,12 @@ static const struct sys_reg_desc id_reg_descs[] =
+=3D {
+> >   */
+> >  int emulate_id_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *param=
+s)
+> >  {
+> > -       const struct sys_reg_desc *r;
+> > +       u32 id;
+> >
+> > -       r =3D find_reg(params, id_reg_descs, ARRAY_SIZE(id_reg_descs));
+> > +       id =3D reg_to_encoding(params);
+> >
+> > -       if (likely(r)) {
+> > -               perform_access(vcpu, params, r);
+> > +       if (likely(is_id_reg(id))) {
+> > +               perform_access(vcpu, params, &id_reg_descs[IDREG_IDX(id=
+)].reg_desc);
+> >         } else {
+> >                 print_sys_reg_msg(params,
+> >                                   "Unsupported guest id_reg access at: =
+%lx [%08lx]\n",
+> > @@ -483,38 +507,102 @@ void kvm_arm_reset_id_regs(struct kvm_vcpu *vcpu=
+)
+> >         unsigned long i;
+> >
+> >         for (i =3D 0; i < ARRAY_SIZE(id_reg_descs); i++)
+> > -               if (id_reg_descs[i].reset)
+> > -                       id_reg_descs[i].reset(vcpu, &id_reg_descs[i]);
+> > +               if (id_reg_descs[i].reg_desc.reset)
+> > +                       id_reg_descs[i].reg_desc.reset(vcpu, &id_reg_de=
+scs[i].reg_desc);
+> >  }
+> >
+> >  int kvm_arm_get_id_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg=
+ *reg)
+> >  {
+> > -       return kvm_sys_reg_get_user(vcpu, reg,
+> > -                                   id_reg_descs, ARRAY_SIZE(id_reg_des=
+cs));
+> > +       u64 __user *uaddr =3D (u64 __user *)(unsigned long)reg->addr;
+> > +       const struct sys_reg_desc *r;
+> > +       struct sys_reg_params params;
+> > +       u64 val;
+> > +       int ret;
+> > +       u32 id;
+> > +
+> > +       if (!index_to_params(reg->id, &params))
+> > +               return -ENOENT;
+> > +       id =3D reg_to_encoding(&params);
+> > +
+> > +       if (!is_id_reg(id))
+> > +               return -ENOENT;
+> > +
+> > +       r =3D &id_reg_descs[IDREG_IDX(id)].reg_desc;
+> > +       if (r->get_user) {
+> > +               ret =3D (r->get_user)(vcpu, r, &val);
+> > +       } else {
+> > +               ret =3D 0;
+> > +               val =3D IDREG(vcpu->kvm, id);
+> > +       }
+> > +
+> > +       if (!ret)
+> > +               ret =3D put_user(val, uaddr);
+> > +
+> > +       return ret;
+> >  }
+> >
+> >  int kvm_arm_set_id_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg=
+ *reg)
+> >  {
+> > -       return kvm_sys_reg_set_user(vcpu, reg,
+> > -                                   id_reg_descs, ARRAY_SIZE(id_reg_des=
+cs));
+> > +       u64 __user *uaddr =3D (u64 __user *)(unsigned long)reg->addr;
+> > +       const struct sys_reg_desc *r;
+> > +       struct sys_reg_params params;
+> > +       u64 val;
+> > +       int ret;
+> > +       u32 id;
+> > +
+> > +       if (!index_to_params(reg->id, &params))
+> > +               return -ENOENT;
+> > +       id =3D reg_to_encoding(&params);
+> > +
+> > +       if (!is_id_reg(id))
+> > +               return -ENOENT;
+> > +
+> > +       if (get_user(val, uaddr))
+> > +               return -EFAULT;
+> > +
+> > +       r =3D &id_reg_descs[IDREG_IDX(id)].reg_desc;
+> > +
+> > +       if (sysreg_user_write_ignore(vcpu, r))
+> > +               return 0;
+> > +
+> > +       if (r->set_user) {
+> > +               ret =3D (r->set_user)(vcpu, r, val);
+> > +       } else {
+> > +               WARN_ONCE(1, "ID register set_user callback is NULL\n")=
+;
+> > +               ret =3D 0;
+> > +       }
+> > +
+> > +       return ret;
+> >  }
+> >
+> >  bool kvm_arm_check_idreg_table(void)
+> >  {
+> > -       return check_sysreg_table(id_reg_descs, ARRAY_SIZE(id_reg_descs=
+), false);
+> > +       unsigned int i;
+> > +
+> > +       for (i =3D 0; i < ARRAY_SIZE(id_reg_descs); i++) {
+> > +               const struct sys_reg_desc *r =3D &id_reg_descs[i].reg_d=
+esc;
+> > +
+> > +               if (IDREG_IDX(reg_to_encoding(r)) !=3D i) {
+>
+> As I mentioned for the previous version of the patch,
+> can we also check if this is an ID register ?
+Sure, will use is_id_reg() to do the checking.
+>
+> > +                       kvm_err("id_reg table %pS entry %d not set corr=
+ectly\n",
+> > +                               &id_reg_descs[i].reg_desc, i);
+> > +                       return false;
+> > +               }
+> > +       }
+> > +
+> > +       return true;
+> >  }
+> >
+> >  int kvm_arm_walk_id_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
+> >  {
+> > -       const struct sys_reg_desc *i2, *end2;
+> > +       const struct id_reg_desc *i2, *end2;
+> >         unsigned int total =3D 0;
+> >         int err;
+> >
+> >         i2 =3D id_reg_descs;
+> >         end2 =3D id_reg_descs + ARRAY_SIZE(id_reg_descs);
+> >
+> > -       while (i2 !=3D end2) {
+> > -               err =3D walk_one_sys_reg(vcpu, i2++, &uind, &total);
+> > +       for (; i2 !=3D end2; i2++) {
+> > +               err =3D walk_one_sys_reg(vcpu, &(i2->reg_desc), &uind, =
+&total);
+> >                 if (err)
+> >                         return err;
+> >         }
+> > @@ -532,12 +620,12 @@ void kvm_arm_set_default_id_regs(struct kvm *kvm)
+> >         u64 val;
+> >
+> >         for (i =3D 0; i < ARRAY_SIZE(id_reg_descs); i++) {
+> > -               id =3D reg_to_encoding(&id_reg_descs[i]);
+> > +               id =3D reg_to_encoding(&id_reg_descs[i].reg_desc);
+> >                 if (WARN_ON_ONCE(!is_id_reg(id)))
+>
+> If kvm_arm_check_idreg_table() checks all entries in the table
+> are an ID register, we can remove this checking from here.
+Agreed.
+>
+> Thank you,
+> Reiji
+>
+>
+> >                         /* Shouldn't happen */
+> >                         continue;
+> >
+> > -               if (id_reg_descs[i].visibility =3D=3D raz_visibility)
+> > +               if (id_reg_descs[i].reg_desc.visibility =3D=3D raz_visi=
+bility)
+> >                         /* Hidden or reserved ID register */
+> >                         continue;
+> >
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 568ebc0fb15c..7b63d9038639 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -2519,7 +2519,7 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
+> >   * Userspace API
+> >   *********************************************************************=
+********/
+> >
+> > -static bool index_to_params(u64 id, struct sys_reg_params *params)
+> > +bool index_to_params(u64 id, struct sys_reg_params *params)
+> >  {
+> >         switch (id & KVM_REG_SIZE_MASK) {
+> >         case KVM_REG_SIZE_U64:
+> > diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+> > index 9231d89889c7..094a7f19d93f 100644
+> > --- a/arch/arm64/kvm/sys_regs.h
+> > +++ b/arch/arm64/kvm/sys_regs.h
+> > @@ -239,6 +239,7 @@ static inline bool is_id_reg(u32 id)
+> >
+> >  void perform_access(struct kvm_vcpu *vcpu, struct sys_reg_params *para=
+ms,
+> >                     const struct sys_reg_desc *r);
+> > +bool index_to_params(u64 id, struct sys_reg_params *params);
+> >  const struct sys_reg_desc *get_reg_by_id(u64 id,
+> >                                          const struct sys_reg_desc tabl=
+e[],
+> >                                          unsigned int num);
+> > --
+> > 2.39.2.722.g9855ee24e9-goog
+> >
+Thanks,
+Jing
