@@ -2,63 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 05CE46B892A
-	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 04:49:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0AC426B8937
+	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 04:57:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229863AbjCNDth (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Mar 2023 23:49:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48284 "EHLO
+        id S229712AbjCND5E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Mar 2023 23:57:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229535AbjCNDtf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Mar 2023 23:49:35 -0400
+        with ESMTP id S229552AbjCND5C (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Mar 2023 23:57:02 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A5B560AA3
-        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 20:48:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EB8587DA4
+        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 20:56:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678765726;
+        s=mimecast20190719; t=1678766181;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=/ptwZll8h87dgHJIgfhW5kVetp/8YFoTfo6N7J2gOEM=;
-        b=fiPObVDvB1HVf/MpxmO3VIxVH6x99CgprdksVMm5QHXthGriIQY+7HUWsUcqhQpl4yv03a
-        9F4rDIg2J8ERaD/0BSD8+MgujtgPEEhlbLgOH7+I0ce20CkQYCN862FHNU0X8ON2lQ2pSZ
-        HoNNlsXuyVXXbOV1cZNULIyUBQW5rTU=
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
- [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=gUTGoKigOjF7lnPsnySj5O1n6jQabFHTwPAHfAEzD+g=;
+        b=G8iyA6zoIJk+7D5kiOqcAOXMLDnjtAq4BXcw9WZ9uXof6vemeot4h2kwJesHIV14DPA0Kz
+        dt0HJ6craUDU9OE/CWcTnr3fpXkMEQEjM7GrDR/3hFlQVSQ/IiZ8g5hv9avISpaIgHugQ5
+        XlDkNpw7ngTjgzghzIERC78xXURFeh8=
+Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
+ [209.85.210.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-607-bg-Q7JjGMfu-HTQNfVTlJA-1; Mon, 13 Mar 2023 23:48:45 -0400
-X-MC-Unique: bg-Q7JjGMfu-HTQNfVTlJA-1
-Received: by mail-ot1-f71.google.com with SMTP id x23-20020a05683000d700b0069438ae848cso7082934oto.21
-        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 20:48:45 -0700 (PDT)
+ us-mta-241-pLXVcOytOOK1spLZFmqDtw-1; Mon, 13 Mar 2023 23:56:20 -0400
+X-MC-Unique: pLXVcOytOOK1spLZFmqDtw-1
+Received: by mail-ot1-f72.google.com with SMTP id v11-20020a05683011cb00b006945a70256dso6893959otq.1
+        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 20:56:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678765724;
+        d=1e100.net; s=20210112; t=1678766179;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/ptwZll8h87dgHJIgfhW5kVetp/8YFoTfo6N7J2gOEM=;
-        b=sdSuFurSIuPGk+92pz9/KfSg6VhD3v7kMVqE2aTulnmvoi8S3UMWCYnMiOvbv3EXJC
-         YDCF39isvvVpCpIuAWbNE45OEecS62aBZvGBZFHl8XePzg+8rWOJwHcEuCihK4sXfil4
-         jxFeJL3PzVRolP8M2W6Xus9a/zn7krsR8pLYZBrWPzoq+89/dZnZfJQHTUwJWYJoWDHb
-         hO/qrBtbGXp0kGXFZV+ZLzKngx8Lv0HtRtxvE+ShB47zJtHPw4L4/FPQF3X/KGXcEROr
-         /qXzj5z/l+KSCd8QXSeikUiI9A7bl6ZGx9ipijlZnn8o+6TU4t3YToKORx66sLTlvrcZ
-         Edqw==
-X-Gm-Message-State: AO0yUKX8t/HbwYd3VTn0ZuxPSqTJnh0FU9SICIBBeCtn2+XBiyXJj/rU
-        o1S21Rd47NUo6hu+QQxNReountE9ubKClgTfzT6hkg1ngxpa4H+F+21u1i2T1JAJc4oST7C44sJ
-        gULCWtEBsTDVQMdcg4WPOYVa9IwoVm9tgF6Aw8rY=
-X-Received: by 2002:a05:6870:1110:b0:17a:adbe:2ba4 with SMTP id 16-20020a056870111000b0017aadbe2ba4mr117862oaf.9.1678765724089;
-        Mon, 13 Mar 2023 20:48:44 -0700 (PDT)
-X-Google-Smtp-Source: AK7set8/3QKP0un3qOoea6zpjo8vUIQsfQbqXMn5cSBIhnA44wMHNQck4apXmRGrPe4GAOAB9DE3FgX6b6IEjtSp9QQ=
-X-Received: by 2002:a05:6870:1110:b0:17a:adbe:2ba4 with SMTP id
- 16-20020a056870111000b0017aadbe2ba4mr117853oaf.9.1678765723868; Mon, 13 Mar
- 2023 20:48:43 -0700 (PDT)
+        bh=gUTGoKigOjF7lnPsnySj5O1n6jQabFHTwPAHfAEzD+g=;
+        b=Ofx5lZQbXk4YSCR0RppJ9nKV6EfuhFc9JPWK2KoHy/YnDUPmNKK5jBVsaNPM5FQB54
+         tO/f6kMxLgbk7DEKpXPDubY8Bs5MERJDHKdshc8m1wV3MO8IQMhyguduGbz2Ei5XOaCL
+         HdtZ7X6481g8etFpZYMn0Ue9zoa6WMGU16Qc3Z9aG3aYMHMJ/BNNziLQv6Ge8j77rOYG
+         Ki+EeBD8qSOIfXOgzXSt0eon2zFNISDcbJtT37pOyciONEzzgmkGlNYSLuz6gWJwtupV
+         cErd+uuuQamDuORVbHu+bj9GJUz+KDntx1tKTMR16kBG5M7N3DxBmJ80IpQYpJQf8Xoz
+         +ydg==
+X-Gm-Message-State: AO0yUKXOLe6k/Izp49UfYM1B9s2UC42qhoXtCuzmiYtUx4RorvodlVhW
+        WS8Uu7tjbHfutK7uIgbeXcLa0+6IkrO+G9RZJ67IYkEf1xjZ5J8NWfThYT3o9mDLUNQ9298Q9Sx
+        8TeFyMyLzjQQyw3w2dtZr0HOFnZ89
+X-Received: by 2002:a9d:1984:0:b0:696:46dd:bec7 with SMTP id k4-20020a9d1984000000b0069646ddbec7mr491244otk.2.1678766179429;
+        Mon, 13 Mar 2023 20:56:19 -0700 (PDT)
+X-Google-Smtp-Source: AK7set/8cD2YJCW/GyAom9yPG1fRPOW6omllIrRCSG8zrwMHOV27MDaBDu6YXAj5Pwq1SwhCEPZrqYs4Ze4SH/NyHBo=
+X-Received: by 2002:a9d:1984:0:b0:696:46dd:bec7 with SMTP id
+ k4-20020a9d1984000000b0069646ddbec7mr491235otk.2.1678766179150; Mon, 13 Mar
+ 2023 20:56:19 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230302113421.174582-1-sgarzare@redhat.com> <20230302113421.174582-3-sgarzare@redhat.com>
-In-Reply-To: <20230302113421.174582-3-sgarzare@redhat.com>
+References: <20230302113421.174582-1-sgarzare@redhat.com> <20230302113421.174582-4-sgarzare@redhat.com>
+In-Reply-To: <20230302113421.174582-4-sgarzare@redhat.com>
 From:   Jason Wang <jasowang@redhat.com>
-Date:   Tue, 14 Mar 2023 11:48:33 +0800
-Message-ID: <CACGkMEttgd82xOxV8WLdSFdfhRLZn68tSaV4APSDh8qXxf4OEw@mail.gmail.com>
-Subject: Re: [PATCH v2 2/8] vhost-vdpa: use bind_mm/unbind_mm device callbacks
+Date:   Tue, 14 Mar 2023 11:56:08 +0800
+Message-ID: <CACGkMEs6cW7LdpCdWQnX4Pif2gGOu=f3bjNeYQ6MVcdQe=X--Q@mail.gmail.com>
+Subject: Re: [PATCH v2 3/8] vringh: replace kmap_atomic() with kmap_local_page()
 To:     Stefano Garzarella <sgarzare@redhat.com>
 Cc:     virtualization@lists.linux-foundation.org,
         Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
@@ -69,8 +69,8 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -80,90 +80,83 @@ X-Mailing-List: kvm@vger.kernel.org
 On Thu, Mar 2, 2023 at 7:34=E2=80=AFPM Stefano Garzarella <sgarzare@redhat.=
 com> wrote:
 >
-> When the user call VHOST_SET_OWNER ioctl and the vDPA device
-> has `use_va` set to true, let's call the bind_mm callback.
-> In this way we can bind the device to the user address space
-> and directly use the user VA.
+> kmap_atomic() is deprecated in favor of kmap_local_page().
+
+It's better to mention the commit or code that introduces this.
+
 >
-> The unbind_mm callback is called during the release after
-> stopping the device.
+> With kmap_local_page() the mappings are per thread, CPU local, can take
+> page-faults, and can be called from any context (including interrupts).
+> Furthermore, the tasks can be preempted and, when they are scheduled to
+> run again, the kernel virtual addresses are restored and still valid.
+>
+> kmap_atomic() is implemented like a kmap_local_page() which also disables
+> page-faults and preemption (the latter only for !PREEMPT_RT kernels,
+> otherwise it only disables migration).
+>
+> The code within the mappings/un-mappings in getu16_iotlb() and
+> putu16_iotlb() don't depend on the above-mentioned side effects of
+> kmap_atomic(),
+
+Note we used to use spinlock to protect simulators (at least until
+patch 7, so we probably need to re-order the patches at least) so I
+think this is only valid when:
+
+The vringh IOTLB helpers are not used in atomic context (e.g spinlock,
+interrupts).
+
+If yes, should we document this? (Or should we introduce a boolean to
+say whether an IOTLB variant can be used in an atomic context)?
+
+Thanks
+
+> so that mere replacements of the old API with the new one
+> is all that is required (i.e., there is no need to explicitly add calls
+> to pagefault_disable() and/or preempt_disable()).
 >
 > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 > ---
 >
 > Notes:
 >     v2:
->     - call the new unbind_mm callback during the release [Jason]
->     - avoid to call bind_mm callback after the reset, since the device
->       is not detaching it now during the reset
+>     - added this patch since checkpatch.pl complained about deprecation
+>       of kmap_atomic() touched by next patch
 >
->  drivers/vhost/vdpa.c | 30 ++++++++++++++++++++++++++++++
->  1 file changed, 30 insertions(+)
+>  drivers/vhost/vringh.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 >
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index dc12dbd5b43b..1ab89fccd825 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -219,6 +219,28 @@ static int vhost_vdpa_reset(struct vhost_vdpa *v)
->         return vdpa_reset(vdpa);
+> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+> index a1e27da54481..0ba3ef809e48 100644
+> --- a/drivers/vhost/vringh.c
+> +++ b/drivers/vhost/vringh.c
+> @@ -1220,10 +1220,10 @@ static inline int getu16_iotlb(const struct vring=
+h *vrh,
+>         if (ret < 0)
+>                 return ret;
+>
+> -       kaddr =3D kmap_atomic(iov.bv_page);
+> +       kaddr =3D kmap_local_page(iov.bv_page);
+>         from =3D kaddr + iov.bv_offset;
+>         *val =3D vringh16_to_cpu(vrh, READ_ONCE(*(__virtio16 *)from));
+> -       kunmap_atomic(kaddr);
+> +       kunmap_local(kaddr);
+>
+>         return 0;
 >  }
+> @@ -1241,10 +1241,10 @@ static inline int putu16_iotlb(const struct vring=
+h *vrh,
+>         if (ret < 0)
+>                 return ret;
 >
-> +static long vhost_vdpa_bind_mm(struct vhost_vdpa *v)
-> +{
-> +       struct vdpa_device *vdpa =3D v->vdpa;
-> +       const struct vdpa_config_ops *ops =3D vdpa->config;
-> +
-> +       if (!vdpa->use_va || !ops->bind_mm)
-> +               return 0;
-> +
-> +       return ops->bind_mm(vdpa, v->vdev.mm);
-> +}
-> +
-> +static void vhost_vdpa_unbind_mm(struct vhost_vdpa *v)
-> +{
-> +       struct vdpa_device *vdpa =3D v->vdpa;
-> +       const struct vdpa_config_ops *ops =3D vdpa->config;
-> +
-> +       if (!vdpa->use_va || !ops->unbind_mm)
-> +               return;
-> +
-> +       ops->unbind_mm(vdpa);
-> +}
-> +
->  static long vhost_vdpa_get_device_id(struct vhost_vdpa *v, u8 __user *ar=
-gp)
->  {
->         struct vdpa_device *vdpa =3D v->vdpa;
-> @@ -711,6 +733,13 @@ static long vhost_vdpa_unlocked_ioctl(struct file *f=
-ilep,
->                 break;
->         default:
->                 r =3D vhost_dev_ioctl(&v->vdev, cmd, argp);
-> +               if (!r && cmd =3D=3D VHOST_SET_OWNER) {
-> +                       r =3D vhost_vdpa_bind_mm(v);
-> +                       if (r) {
-> +                               vhost_dev_reset_owner(&v->vdev, NULL);
-> +                               break;
-> +                       }
-> +               }
-
-Nit: is it better to have a new condition/switch branch instead of
-putting them under default? (as what vring_ioctl did).
-
-Thanks
-
->                 if (r =3D=3D -ENOIOCTLCMD)
->                         r =3D vhost_vdpa_vring_ioctl(v, cmd, argp);
->                 break;
-> @@ -1285,6 +1314,7 @@ static int vhost_vdpa_release(struct inode *inode, =
-struct file *filep)
->         vhost_vdpa_clean_irq(v);
->         vhost_vdpa_reset(v);
->         vhost_dev_stop(&v->vdev);
-> +       vhost_vdpa_unbind_mm(v);
->         vhost_vdpa_free_domain(v);
->         vhost_vdpa_config_put(v);
->         vhost_vdpa_cleanup(v);
+> -       kaddr =3D kmap_atomic(iov.bv_page);
+> +       kaddr =3D kmap_local_page(iov.bv_page);
+>         to =3D kaddr + iov.bv_offset;
+>         WRITE_ONCE(*(__virtio16 *)to, cpu_to_vringh16(vrh, val));
+> -       kunmap_atomic(kaddr);
+> +       kunmap_local(kaddr);
+>
+>         return 0;
+>  }
 > --
 > 2.39.2
 >
