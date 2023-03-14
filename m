@@ -2,63 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 25E366B8917
-	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 04:40:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 05CE46B892A
+	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 04:49:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229830AbjCNDkx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Mar 2023 23:40:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36818 "EHLO
+        id S229863AbjCNDth (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Mar 2023 23:49:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229571AbjCNDks (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Mar 2023 23:40:48 -0400
+        with ESMTP id S229535AbjCNDtf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Mar 2023 23:49:35 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C796FF37
-        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 20:39:56 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A5B560AA3
+        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 20:48:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678765195;
+        s=mimecast20190719; t=1678765726;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+KhYBy1SbrL35uZcxmV9N94m0DcgNaM+uqRNvBlRXOo=;
-        b=PXxkpK9XrIAKlAAXdjb7p7PZa2EMiViPOpmzm3ohR1Uh7ARJEaHm7wLqN92F2Zci6nDJ1b
-        MLnNSTk0nryczqFvyAYw7xE3LUt1L1jy3Lb/0vv8WKtPtZYS310Zr5eMW7aXfYhhUrGBkr
-        ui3ddoFk0OOxgKxtc0Bu/dcyr9EYpWg=
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
- [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=/ptwZll8h87dgHJIgfhW5kVetp/8YFoTfo6N7J2gOEM=;
+        b=fiPObVDvB1HVf/MpxmO3VIxVH6x99CgprdksVMm5QHXthGriIQY+7HUWsUcqhQpl4yv03a
+        9F4rDIg2J8ERaD/0BSD8+MgujtgPEEhlbLgOH7+I0ce20CkQYCN862FHNU0X8ON2lQ2pSZ
+        HoNNlsXuyVXXbOV1cZNULIyUBQW5rTU=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-317-Olaa1SooPa2fAGVJOSZp3Q-1; Mon, 13 Mar 2023 23:39:54 -0400
-X-MC-Unique: Olaa1SooPa2fAGVJOSZp3Q-1
-Received: by mail-oi1-f199.google.com with SMTP id s10-20020a056808208a00b0038445b695f9so6362036oiw.15
-        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 20:39:53 -0700 (PDT)
+ us-mta-607-bg-Q7JjGMfu-HTQNfVTlJA-1; Mon, 13 Mar 2023 23:48:45 -0400
+X-MC-Unique: bg-Q7JjGMfu-HTQNfVTlJA-1
+Received: by mail-ot1-f71.google.com with SMTP id x23-20020a05683000d700b0069438ae848cso7082934oto.21
+        for <kvm@vger.kernel.org>; Mon, 13 Mar 2023 20:48:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678765193;
+        d=1e100.net; s=20210112; t=1678765724;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+KhYBy1SbrL35uZcxmV9N94m0DcgNaM+uqRNvBlRXOo=;
-        b=tL0cTcNf35qa4lA4kcE8AihQeW2n4VzIR2JQaZJmZi3+BdtfeqyTliEYRgYPdKHt3C
-         H683RiBhJ6V2/Ii+t4Y3KxU8LaSOf9IRFYXk8zd2pD18TUXXL36I9TJdXXyxlY/7dbqh
-         eGBIzqqJFXQ9+MCdeE+Ho9AwVIYakcNgB2r0IONywm7ITqcwU1Fh1mfii4Z0EgqNtg3b
-         W3bAixerbAutyIGi8usJ3t+rVDXIk97IloYV1OzD2Y36nH8SkrQzGbxNLpapEkoxBRfw
-         y6J8iEUR5VG2ZvKgyxzkbSOcnEOFYtRGhXPWtWlaZHL1f00uEEpC4ZDDx5wh3itwTd5I
-         OrpQ==
-X-Gm-Message-State: AO0yUKWe6NCNLdEfSB5nmmYl/i97MyHrr7tgsVSp4FnR/du08Ech2oVu
-        0hSfBoI0ruY2Rc/uwv9dAMeNrtgy2EEvbVRUa+1y8+7/FxUbv+WA3ldiH0ijZ8u1okmz2aVF0Qe
-        FzN9OEBdZbjhpMBfHiCO3/UQ5CHv0
-X-Received: by 2002:a05:6871:2315:b0:177:c2fb:8cec with SMTP id sf21-20020a056871231500b00177c2fb8cecmr1799901oab.9.1678765193339;
-        Mon, 13 Mar 2023 20:39:53 -0700 (PDT)
-X-Google-Smtp-Source: AK7set+cFgrKo8wDV2ck1Qw5dHYFA97psqjJwMF030XPXaImHObBym9NO6DrXVSlK3PnFCXSfBC5voQVIZy0kLV1jCI=
-X-Received: by 2002:a05:6871:2315:b0:177:c2fb:8cec with SMTP id
- sf21-20020a056871231500b00177c2fb8cecmr1799898oab.9.1678765193106; Mon, 13
- Mar 2023 20:39:53 -0700 (PDT)
+        bh=/ptwZll8h87dgHJIgfhW5kVetp/8YFoTfo6N7J2gOEM=;
+        b=sdSuFurSIuPGk+92pz9/KfSg6VhD3v7kMVqE2aTulnmvoi8S3UMWCYnMiOvbv3EXJC
+         YDCF39isvvVpCpIuAWbNE45OEecS62aBZvGBZFHl8XePzg+8rWOJwHcEuCihK4sXfil4
+         jxFeJL3PzVRolP8M2W6Xus9a/zn7krsR8pLYZBrWPzoq+89/dZnZfJQHTUwJWYJoWDHb
+         hO/qrBtbGXp0kGXFZV+ZLzKngx8Lv0HtRtxvE+ShB47zJtHPw4L4/FPQF3X/KGXcEROr
+         /qXzj5z/l+KSCd8QXSeikUiI9A7bl6ZGx9ipijlZnn8o+6TU4t3YToKORx66sLTlvrcZ
+         Edqw==
+X-Gm-Message-State: AO0yUKX8t/HbwYd3VTn0ZuxPSqTJnh0FU9SICIBBeCtn2+XBiyXJj/rU
+        o1S21Rd47NUo6hu+QQxNReountE9ubKClgTfzT6hkg1ngxpa4H+F+21u1i2T1JAJc4oST7C44sJ
+        gULCWtEBsTDVQMdcg4WPOYVa9IwoVm9tgF6Aw8rY=
+X-Received: by 2002:a05:6870:1110:b0:17a:adbe:2ba4 with SMTP id 16-20020a056870111000b0017aadbe2ba4mr117862oaf.9.1678765724089;
+        Mon, 13 Mar 2023 20:48:44 -0700 (PDT)
+X-Google-Smtp-Source: AK7set8/3QKP0un3qOoea6zpjo8vUIQsfQbqXMn5cSBIhnA44wMHNQck4apXmRGrPe4GAOAB9DE3FgX6b6IEjtSp9QQ=
+X-Received: by 2002:a05:6870:1110:b0:17a:adbe:2ba4 with SMTP id
+ 16-20020a056870111000b0017aadbe2ba4mr117853oaf.9.1678765723868; Mon, 13 Mar
+ 2023 20:48:43 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230302113421.174582-1-sgarzare@redhat.com> <20230302113421.174582-2-sgarzare@redhat.com>
-In-Reply-To: <20230302113421.174582-2-sgarzare@redhat.com>
+References: <20230302113421.174582-1-sgarzare@redhat.com> <20230302113421.174582-3-sgarzare@redhat.com>
+In-Reply-To: <20230302113421.174582-3-sgarzare@redhat.com>
 From:   Jason Wang <jasowang@redhat.com>
-Date:   Tue, 14 Mar 2023 11:39:42 +0800
-Message-ID: <CACGkMEv24Zw-OUbBBSne21pF7=4XCZ6JGj7Y_cC7cMFYTjbF1Q@mail.gmail.com>
-Subject: Re: [PATCH v2 1/8] vdpa: add bind_mm/unbind_mm callbacks
+Date:   Tue, 14 Mar 2023 11:48:33 +0800
+Message-ID: <CACGkMEttgd82xOxV8WLdSFdfhRLZn68tSaV4APSDh8qXxf4OEw@mail.gmail.com>
+Subject: Re: [PATCH v2 2/8] vhost-vdpa: use bind_mm/unbind_mm device callbacks
 To:     Stefano Garzarella <sgarzare@redhat.com>
 Cc:     virtualization@lists.linux-foundation.org,
         Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
@@ -80,76 +80,90 @@ X-Mailing-List: kvm@vger.kernel.org
 On Thu, Mar 2, 2023 at 7:34=E2=80=AFPM Stefano Garzarella <sgarzare@redhat.=
 com> wrote:
 >
-> These new optional callbacks is used to bind/unbind the device to
-> a specific address space so the vDPA framework can use VA when
-> these callbacks are implemented.
+> When the user call VHOST_SET_OWNER ioctl and the vDPA device
+> has `use_va` set to true, let's call the bind_mm callback.
+> In this way we can bind the device to the user address space
+> and directly use the user VA.
 >
-> Suggested-by: Jason Wang <jasowang@redhat.com>
+> The unbind_mm callback is called during the release after
+> stopping the device.
+>
 > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 > ---
-
-One thing that came into my mind is that after this commit:
-
-commit 5ce995f313ce56c0c62425c3ddc37c5c50fc33db
-Author: Jason Wang <jasowang@redhat.com>
-Date:   Fri May 29 16:02:59 2020 +0800
-
-    vhost: use mmgrab() instead of mmget() for non worker device
-
-    For the device that doesn't use vhost worker and use_mm(), mmget() is
-    too heavy weight and it may brings troubles for implementing mmap()
-    support for vDPA device.
-
-We don't hold the address space after this commit, so the userspace
-mapping could be invalid if the owner exits?
-
-Thanks
-
 >
 > Notes:
 >     v2:
->     - removed `struct task_struct *owner` param (unused for now, maybe
->       useful to support cgroups) [Jason]
->     - add unbind_mm callback [Jason]
+>     - call the new unbind_mm callback during the release [Jason]
+>     - avoid to call bind_mm callback after the reset, since the device
+>       is not detaching it now during the reset
 >
->  include/linux/vdpa.h | 10 ++++++++++
->  1 file changed, 10 insertions(+)
+>  drivers/vhost/vdpa.c | 30 ++++++++++++++++++++++++++++++
+>  1 file changed, 30 insertions(+)
 >
-> diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
-> index 43f59ef10cc9..369c21394284 100644
-> --- a/include/linux/vdpa.h
-> +++ b/include/linux/vdpa.h
-> @@ -290,6 +290,14 @@ struct vdpa_map_file {
->   *                             @vdev: vdpa device
->   *                             @idx: virtqueue index
->   *                             Returns pointer to structure device or er=
-ror (NULL)
-> + * @bind_mm:                   Bind the device to a specific address spa=
-ce
-> + *                             so the vDPA framework can use VA when thi=
-s
-> + *                             callback is implemented. (optional)
-> + *                             @vdev: vdpa device
-> + *                             @mm: address space to bind
-> + * @unbind_mm:                 Unbind the device from the address space
-> + *                             bound using the bind_mm callback. (option=
-al)
-> + *                             @vdev: vdpa device
->   * @free:                      Free resources that belongs to vDPA (opti=
-onal)
->   *                             @vdev: vdpa device
->   */
-> @@ -351,6 +359,8 @@ struct vdpa_config_ops {
->         int (*set_group_asid)(struct vdpa_device *vdev, unsigned int grou=
-p,
->                               unsigned int asid);
->         struct device *(*get_vq_dma_dev)(struct vdpa_device *vdev, u16 id=
-x);
-> +       int (*bind_mm)(struct vdpa_device *vdev, struct mm_struct *mm);
-> +       void (*unbind_mm)(struct vdpa_device *vdev);
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index dc12dbd5b43b..1ab89fccd825 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -219,6 +219,28 @@ static int vhost_vdpa_reset(struct vhost_vdpa *v)
+>         return vdpa_reset(vdpa);
+>  }
 >
->         /* Free device resources */
->         void (*free)(struct vdpa_device *vdev);
+> +static long vhost_vdpa_bind_mm(struct vhost_vdpa *v)
+> +{
+> +       struct vdpa_device *vdpa =3D v->vdpa;
+> +       const struct vdpa_config_ops *ops =3D vdpa->config;
+> +
+> +       if (!vdpa->use_va || !ops->bind_mm)
+> +               return 0;
+> +
+> +       return ops->bind_mm(vdpa, v->vdev.mm);
+> +}
+> +
+> +static void vhost_vdpa_unbind_mm(struct vhost_vdpa *v)
+> +{
+> +       struct vdpa_device *vdpa =3D v->vdpa;
+> +       const struct vdpa_config_ops *ops =3D vdpa->config;
+> +
+> +       if (!vdpa->use_va || !ops->unbind_mm)
+> +               return;
+> +
+> +       ops->unbind_mm(vdpa);
+> +}
+> +
+>  static long vhost_vdpa_get_device_id(struct vhost_vdpa *v, u8 __user *ar=
+gp)
+>  {
+>         struct vdpa_device *vdpa =3D v->vdpa;
+> @@ -711,6 +733,13 @@ static long vhost_vdpa_unlocked_ioctl(struct file *f=
+ilep,
+>                 break;
+>         default:
+>                 r =3D vhost_dev_ioctl(&v->vdev, cmd, argp);
+> +               if (!r && cmd =3D=3D VHOST_SET_OWNER) {
+> +                       r =3D vhost_vdpa_bind_mm(v);
+> +                       if (r) {
+> +                               vhost_dev_reset_owner(&v->vdev, NULL);
+> +                               break;
+> +                       }
+> +               }
+
+Nit: is it better to have a new condition/switch branch instead of
+putting them under default? (as what vring_ioctl did).
+
+Thanks
+
+>                 if (r =3D=3D -ENOIOCTLCMD)
+>                         r =3D vhost_vdpa_vring_ioctl(v, cmd, argp);
+>                 break;
+> @@ -1285,6 +1314,7 @@ static int vhost_vdpa_release(struct inode *inode, =
+struct file *filep)
+>         vhost_vdpa_clean_irq(v);
+>         vhost_vdpa_reset(v);
+>         vhost_dev_stop(&v->vdev);
+> +       vhost_vdpa_unbind_mm(v);
+>         vhost_vdpa_free_domain(v);
+>         vhost_vdpa_config_put(v);
+>         vhost_vdpa_cleanup(v);
 > --
 > 2.39.2
 >
