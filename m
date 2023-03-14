@@ -2,119 +2,201 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EC2B46B91DC
-	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 12:41:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F55D6B925F
+	for <lists+kvm@lfdr.de>; Tue, 14 Mar 2023 12:57:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231443AbjCNLlu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Mar 2023 07:41:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45696 "EHLO
+        id S229687AbjCNL5p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Mar 2023 07:57:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231455AbjCNLls (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Mar 2023 07:41:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C3DA9BE1E
-        for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 04:40:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678794051;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=nvUKdBCqtDsCDJokDequ8gIlKpdN3GQsgjjeCWrl9fk=;
-        b=bUuruULo57o8+2WUi5O3vx5z7z1IHJtgbFujRFgpGWUpFtYtLu6bXjFV5uIJMXp2N1FJX6
-        wnB/jUcMrnx7ccC7w6H2GxBjp3zYMPXIcdmdQxGmvVqHxny5JBdjyk5wXduMFY9RIAZEFA
-        E+O3Na4mH5SYIKTQCQl5V+kcwj4geQw=
-Received: from mail-vs1-f70.google.com (mail-vs1-f70.google.com
- [209.85.217.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-396-yailZkd6PcK42olm1M4ARA-1; Tue, 14 Mar 2023 07:40:50 -0400
-X-MC-Unique: yailZkd6PcK42olm1M4ARA-1
-Received: by mail-vs1-f70.google.com with SMTP id i21-20020a05610221b500b004258d5ee8c4so1821110vsb.0
-        for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 04:40:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678794050;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nvUKdBCqtDsCDJokDequ8gIlKpdN3GQsgjjeCWrl9fk=;
-        b=rAm4clPIppSXi1nSXJghSrF9DMP+ROkt3eu0r2OiN7UH9T5YzZy08BRXSy4wMQ5lIg
-         Q35I6PDln7jbfFdhzfUSZfcQduLGunlvL8WczUQhXrQd+c97Mu/GOf2dNbElWzpfzisS
-         sq+obscsJb4BqCqyNcx/PSWXK2bsoxOxQgdL3l9vTcz8vyhL4iKrgPMxtYwC013B46lD
-         4LTeuZ99fNVPZqZJERzO6qF2cFz9m3zdgsAaq0+tCjWob4iqVl8c4xwghIOXi+3Wkb+x
-         3rIMruMZjLYLChkkXajD1K2v8fVyaic5YDuboV+1hkHbU9TgGZpjpnOrxj4G47IxLNal
-         N52w==
-X-Gm-Message-State: AO0yUKV1lPr+W0zU6PbFoGoDlQ+3WdjI2bfKbTlNgrb/5HckVabaYLYv
-        VwetoCbF59963XF11Ei3t0H+I9q2wIzSSLgBNstCEqZrDdsblrMZ98dhV1ZQxtAMoIy9fNDXLDf
-        3uf0zFOWAyyVQBbuRhhBAxiwOgL4r
-X-Received: by 2002:a67:d08c:0:b0:425:a3a9:a6e8 with SMTP id s12-20020a67d08c000000b00425a3a9a6e8mr1680164vsi.1.1678794050023;
-        Tue, 14 Mar 2023 04:40:50 -0700 (PDT)
-X-Google-Smtp-Source: AK7set8m2YHyzZwKxEeDVZaI9vGT3421ek6caI5yO0ukBXyVOVG8nEWdZx1OXuEsVVYm6GXhA2bwA99fmZZJcza4we0=
-X-Received: by 2002:a67:d08c:0:b0:425:a3a9:a6e8 with SMTP id
- s12-20020a67d08c000000b00425a3a9a6e8mr1680153vsi.1.1678794049787; Tue, 14 Mar
- 2023 04:40:49 -0700 (PDT)
+        with ESMTP id S230140AbjCNL5n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Mar 2023 07:57:43 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09FD69CBD4;
+        Tue, 14 Mar 2023 04:56:59 -0700 (PDT)
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32EAWXX6010453;
+        Tue, 14 Mar 2023 11:56:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=sjRjoVyN4hmqa3UgKM3i+zcwVYtKhiHXvv25pR/1sXo=;
+ b=GXoY/mcTITaDlpFuXa2KeJxq/rPofxOpAFHrgVfpO+IIXcsDz54dWUDPLTkkWlw6GLhZ
+ KsF6VOITSLsu7vsMcv1acEAa3xM+w7ztajj0tseTB8HTFVqxZCNUweDapy83ueZnmxHk
+ GEd6R4DdvITvfkSyNjmYxvHn3f5osIrsZTLEOMzZoyzchg/ky80pF7AXa3CR5RIvYkuV
+ CP7MSFkNi9sg3YPIQoJIz2JLQPFEscX1+G6P2Pul9ovApUx2pmUsRrYxtaT/fRXicQJJ
+ UwMe7MtpJYEGyZoTOsfoZ6Naoyusrazm2iHK4MSA8E0fnLGlqz4BbsZ8XnAWRCphxlCm mw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3paq8y9yap-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 14 Mar 2023 11:56:19 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32EAWbmR010607;
+        Tue, 14 Mar 2023 11:56:18 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3paq8y9ya6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 14 Mar 2023 11:56:18 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32E6XRQ4029999;
+        Tue, 14 Mar 2023 11:56:16 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3p8gwfcsmg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 14 Mar 2023 11:56:16 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32EBuDG746727560
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 14 Mar 2023 11:56:13 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2BD4D2004E;
+        Tue, 14 Mar 2023 11:56:13 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DD44720043;
+        Tue, 14 Mar 2023 11:56:12 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.56])
+        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 14 Mar 2023 11:56:12 +0000 (GMT)
+Date:   Tue, 14 Mar 2023 12:56:11 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Cc:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v5] s390x: Add tests for execute-type
+ instructions
+Message-ID: <20230314125611.6135af7a@p-imbrenda>
+In-Reply-To: <d6471b717f34b6ae664dc91331246e9676d8c879.camel@linux.ibm.com>
+References: <20230310181131.2138736-1-nsg@linux.ibm.com>
+        <20230313191602.58b16c31@p-imbrenda>
+        <d6471b717f34b6ae664dc91331246e9676d8c879.camel@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20230310234304.2908714-1-pbonzini@redhat.com> <ZAvGjCqfKgsSEQhZ@google.com>
-In-Reply-To: <ZAvGjCqfKgsSEQhZ@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Date:   Tue, 14 Mar 2023 12:40:38 +0100
-Message-ID: <CABgObfbwAe3ut18bS2u05pAgDoUvix_N9LKMb1iBcx8xNd9dMQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: nVMX: add missing consistency checks for CR0 and CR4
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Reima ISHII <ishiir@g.ecc.u-tokyo.ac.jp>,
-        stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: OyoDqQVTiAPXmTz4WLspEF9GpTfSVsWH
+X-Proofpoint-ORIG-GUID: UKSYRxWaZfjqhvMfa8c-xwnYJvk_3csZ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-14_04,2023-03-14_02,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ mlxlogscore=999 clxscore=1015 suspectscore=0 adultscore=0
+ priorityscore=1501 spamscore=0 lowpriorityscore=0 impostorscore=0
+ mlxscore=0 phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2212070000 definitions=main-2303140098
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Mar 11, 2023 at 1:17=E2=80=AFAM Sean Christopherson <seanjc@google.=
-com> wrote:
-> > @@ -3047,6 +3047,19 @@ static int nested_vmx_check_guest_state(struct k=
-vm_vcpu *vcpu,
-> >                                          vmcs12->guest_ia32_perf_global=
-_ctrl)))
-> >               return -EINVAL;
-> >
-> > +     if (CC((vmcs12->guest_cr0 & (X86_CR0_PG | X86_CR0_PE)) =3D=3D X86=
-_CR0_PG))
-> > +             return -EINVAL;
-> > +
-> > +#ifdef CONFIG_X86_64
->
-> The #ifdef isn't necessary, attempting to set for a 32-bit host should be=
- rejected
-> by nested_vmx_check_controls() since nested_vmx_setup_ctls_msrs() clears =
-the bit.
-> Ditto for the host logic related to VM_EXIT_HOST_ADDR_SPACE_SIZE, which l=
-ooks
-> suspiciously similar ;-)
+On Mon, 13 Mar 2023 23:45:33 +0100
+Nina Schoetterl-Glausch <nsg@linux.ibm.com> wrote:
 
-Yeah, I noticed that too and decided that the idea could have been to
-allow some dead code elimination on 32-bit kernels, so I copied what
-the host state checks were doing. But if you prefer the more compact
-way I am absolutely not going to complain.
 
-> > +     if (CC(ia32e &&
-> > +            (!(vmcs12->guest_cr4 & X86_CR4_PAE) ||
-> > +             !(vmcs12->guest_cr0 & X86_CR0_PG))))
-> > +             return -EINVAL;
->
-> This is a lot easier to read IMO, and has the advantage of more precisely
-> identifying the failure in the tracepoint.
->
->         if (CC(ia32e && !(vmcs12->guest_cr4 & X86_CR4_PAE)) ||
->             CC(ia32e && !(vmcs12->guest_cr4 & X86_CR0_PG)))
->                 return -EINVAL;
+[...]
 
-Looks good.  I squashed everything in.
+> > > +/*
+> > > + * BRANCH AND SAVE, register register variant.
+> > > + * Saves the next instruction address (address from PSW + length of =
+instruction)
+> > > + * to the first register. No branch is taken in this test, because 0=
+ is
+> > > + * specified as target.
+> > > + * BASR does *not* perform a relative address calculation with an in=
+termediate.
+> > > + */
+> > > +static void test_basr(void)
+> > > +{
+> > > +	uint64_t ret_addr, after_ex;
+> > > +
+> > > +	report_prefix_push("BASR");
+> > > +	asm volatile ( ".pushsection .rodata\n" =20
+> >=20
+> > you use .text.ex_bras in the next test, why not something like that here
+> > (and everywhere else) too? =20
+>=20
+> In the test below we branch to the code in .text.ex_bras.
+> In all other tests the instruction in .rodata is just an operand of the e=
+xecute instruction,
+> and it doesn't get modified.
+> As for the bras test having a suffix, I guess it's pretty arbitrary, but =
+since it's a handful
+> of instructions instead of just one, it felt substantial enough to warran=
+t one.
+>=20
 
-Paolo
+we discussed this offline :)
+
+> >  =20
+> > > +		"0:	basr	%[ret_addr],0\n"
+> > > +		"	.popsection\n"
+> > > +
+> > > +		"	larl	%[after_ex],1f\n"
+> > > +		"	exrl	0,0b\n"
+> > > +		"1:\n"
+> > > +		: [ret_addr] "=3Dd" (ret_addr),
+> > > +		  [after_ex] "=3Dd" (after_ex)
+> > > +	);
+> > > +
+> > > +	report(ret_addr =3D=3D after_ex, "return address after EX");
+> > > +	report_prefix_pop();
+> > > +}
+> > > +
+> > > +/*
+> > > + * BRANCH RELATIVE AND SAVE.
+> > > + * According to PoP (Branch-Address Generation), the address calcula=
+ted relative
+> > > + * to the instruction address is relative to BRAS when it is the tar=
+get of an
+> > > + * execute-type instruction, not relative to the execute-type instru=
+ction.
+> > > + */
+> > > +static void test_bras(void)
+> > > +{
+> > > +	uint64_t after_target, ret_addr, after_ex, branch_addr;
+> > > +
+> > > +	report_prefix_push("BRAS");
+> > > +	asm volatile ( ".pushsection .text.ex_bras, \"x\"\n"
+> > > +		"0:	bras	%[ret_addr],1f\n"
+> > > +		"	nopr	%%r7\n"
+> > > +		"1:	larl	%[branch_addr],0\n"
+> > > +		"	j	4f\n"
+> > > +		"	.popsection\n"
+> > > +
+> > > +		"	larl	%[after_target],1b\n"
+> > > +		"	larl	%[after_ex],3f\n"
+> > > +		"2:	exrl	0,0b\n" =20
+> /*
+>  * In case the address calculation is correct, we jump by the relative of=
+fset 1b-0b from 0b to 1b.
+>  * In case the address calculation is relative to the exrl (i.e. a test f=
+ailure),
+>  * put a valid instruction at the same relative offset from the exrl, so =
+the test continues in a
+>  * controlled manner.
+>  */
+
+looks good
+
+> > > +		"3:	larl	%[branch_addr],0\n"
+> > > +		"4:\n"
+> > > +
+> > > +		"	.if (1b - 0b) !=3D (3b - 2b)\n"
+> > > +		"	.error	\"right and wrong target must have same offset\"\n" =20
+> >=20
+> > please explain why briefly (i.e. if the wrong target is executed and
+> > the offset mismatches Bad Things=E2=84=A2 happen) =20
+>=20
+> Ok, see above.
+>=20
+> [...]
+>=20
+>=20
 
