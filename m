@@ -2,110 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA6066BBD31
-	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 20:24:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 320AE6BBDA1
+	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 20:53:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232285AbjCOTYD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 15:24:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38062 "EHLO
+        id S232916AbjCOTxM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 15:53:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232894AbjCOTXh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 15:23:37 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8F3B9AA19
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 12:23:21 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id pt5-20020a17090b3d0500b0023d3ffe542fso2138667pjb.0
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 12:23:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678908201;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CO8t+zxtFwLc3yJ6bJQPj8GStgQChto9AhidRXWbvKE=;
-        b=AFfpyBBgddR4r+3JtnHbvcqmXuTkhpDMyp586u8nVhbO1w8OEZcY5uo/OF9V598ZLI
-         4rHyH46ovKyA7lnhJHFG6xBBVxETLjL+X9IjtJQHUydXqo4ZUQ7Y5WwNClIPQ1Eh5lQZ
-         zA5Knux19o9U5vhp9sOPU9amPjsWqVXPs766BYzKn+IlghB7VhRAkzLGqDz4B65bhhoA
-         YNqCkknXtoi31iyHYeoVPj0mO+0gmInMgO4IEC2gwezvk4+y57uPy1bVDX0g88G2Wp9I
-         7MVEgckhtqsD0i2BAz6dAWMWBZXBSPIf8Br/5Y4kjpfV2xKcxN6RAqv5yqcr4S5tRhFQ
-         fCyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678908201;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CO8t+zxtFwLc3yJ6bJQPj8GStgQChto9AhidRXWbvKE=;
-        b=ysjlR87AGJ8P+3pbQ0CME104UwS+dtDK7gN573NidRLPXynNMTlVgMpoMCMzohx6Iy
-         sxpOqLoaOAj3eFk5YBnSKUTldYa1pA+9bL9ox3hcSV+cL5Vnnn1PsGW9HAkuF9ej0OdF
-         TPtGCMmOPPNEE/jq5rvqRmCHIeSGIDrYJ6RXxzfRUY9Gt578ccVnCwBuX/xikK7qSMgz
-         nCC8wdynuzM4N/2BdCCgeOhvpxDKNcGIDt97SQbNihnlqt5+t4XLuwOypLcC6J4m4eP4
-         Ap6Ic9FojJQ0OLbFw9crDcqEBZEzEOvRwZ3TRTiQhEiuJ25IQoqOOAxmbqzQK7XfKJp6
-         ky5w==
-X-Gm-Message-State: AO0yUKXB3EOnQBeQbLtO9aajFr+EXlcSXaDMVREWr4qzQzgNOyM0JQAq
-        sekuWvxLTHa6RCQAxsyJvRmlBFOj7Uc=
-X-Google-Smtp-Source: AK7set/JY+rzlbShnVBele6OwSOSpHpEbwghpOgoGyd4CaLNRbbg6Pm7bxlVeohGsEhXPHXSQ02jqVfN9X8=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:f547:b0:19f:2164:9b3b with SMTP id
- h7-20020a170902f54700b0019f21649b3bmr261241plf.13.1678908201457; Wed, 15 Mar
- 2023 12:23:21 -0700 (PDT)
-Date:   Wed, 15 Mar 2023 12:23:20 -0700
-In-Reply-To: <871f7c8b-0f54-7e9c-4253-b3878b010bbf@intel.com>
-Mime-Version: 1.0
-References: <20230311002258.852397-1-seanjc@google.com> <20230311002258.852397-2-seanjc@google.com>
- <DS0PR11MB63733BCF5AEBBF5F38FD2C01DCB99@DS0PR11MB6373.namprd11.prod.outlook.com>
- <871f7c8b-0f54-7e9c-4253-b3878b010bbf@intel.com>
-Message-ID: <ZBIQ1vxLs10UFi3R@google.com>
-Subject: Re: [Intel-gfx] [PATCH v2 01/27] drm/i915/gvt: Verify pfn is "valid"
- before dereferencing "struct page"
-From:   Sean Christopherson <seanjc@google.com>
-To:     Andrzej Hajda <andrzej.hajda@intel.com>
-Cc:     Wei Wang <wei.w.wang@intel.com>,
+        with ESMTP id S229547AbjCOTxK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 15:53:10 -0400
+X-Greylist: delayed 90 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 15 Mar 2023 12:53:07 PDT
+Received: from forwardcorp1c.mail.yandex.net (forwardcorp1c.mail.yandex.net [178.154.239.200])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F297CD539;
+        Wed, 15 Mar 2023 12:53:07 -0700 (PDT)
+Received: from mail-nwsmtp-smtp-corp-main-11.iva.yp-c.yandex.net (mail-nwsmtp-smtp-corp-main-11.iva.yp-c.yandex.net [IPv6:2a02:6b8:c0c:2cab:0:640:424b:0])
+        by forwardcorp1c.mail.yandex.net (Yandex) with ESMTP id E61F05EA33;
+        Wed, 15 Mar 2023 22:51:35 +0300 (MSK)
+Received: from d-tatianin-nix.HomeLAN (unknown [2a02:6b8:b081:b711::1:2a])
+        by mail-nwsmtp-smtp-corp-main-11.iva.yp-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id Tppha50fxuQ0-tgCuJSe1;
+        Wed, 15 Mar 2023 22:51:35 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
+        t=1678909895; bh=Gw2gGaMBR/kL++RD1Kxfdvw3JCgSYG8IVp4wdEhSV38=;
+        h=Message-Id:Date:Cc:Subject:To:From;
+        b=C/aVTJuJ9Y8LoATy0YhpqZpI3gEKyo5EduCRA6y6MbCNz8jmZPIcsOxClrHydUWIp
+         i0ftgx0ObaHdm4VjfQtDoCkhJbzOkqiCOvbMkOYsjEAQJq+AG2jZlyrEwvH2xkAy5Z
+         o/W9xEqnj1ItvZe25tuUGFVUJXED3hKrukONr3fw=
+Authentication-Results: mail-nwsmtp-smtp-corp-main-11.iva.yp-c.yandex.net; dkim=pass header.i=@yandex-team.ru
+From:   Daniil Tatianin <d-tatianin@yandex-team.ru>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Daniil Tatianin <d-tatianin@yandex-team.ru>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Yan Zhao <yan.y.zhao@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Ben Gardon <bgardon@google.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] kvm/x86: actually verify that reading MSR_IA32_UCODE_REV succeeds
+Date:   Wed, 15 Mar 2023 22:51:09 +0300
+Message-Id: <20230315195109.580333-1-d-tatianin@yandex-team.ru>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 15, 2023, Andrzej Hajda wrote:
-> On 13.03.2023 16:37, Wang, Wei W wrote:
-> > On Saturday, March 11, 2023 8:23 AM, Sean Christopherson wrote:
-> > > diff --git a/drivers/gpu/drm/i915/gvt/gtt.c b/drivers/gpu/drm/i915/gvt/gtt.c
-> > > index 4ec85308379a..58b9b316ae46 100644
-> > > --- a/drivers/gpu/drm/i915/gvt/gtt.c
-> > > +++ b/drivers/gpu/drm/i915/gvt/gtt.c
-> > > @@ -1183,6 +1183,10 @@ static int is_2MB_gtt_possible(struct intel_vgpu
-> > > *vgpu,
-> > >   	pfn = gfn_to_pfn(vgpu->vfio_device.kvm, ops->get_pfn(entry));
-> > >   	if (is_error_noslot_pfn(pfn))
-> > >   		return -EINVAL;
-> > > +
-> > > +	if (!pfn_valid(pfn))
-> > > +		return -EINVAL;
-> > > +
-> > 
-> > Merge the two errors in one "if" to have less LOC?
-> > i.e.
-> > if (is_error_noslot_pfn(pfn) || !pfn_valid(pfn))
-> >      return -EINVAL;
-> 
-> you can just replace "if (is_error_noslot_pfn(pfn))" with "if
-> (!pfn_valid(pfn))", it covers both cases.
+...and return KVM_MSR_RET_INVALID otherwise.
 
-Technically, yes, but the two checks are for very different things.  Practically
-speaking, there can never be false negatives without KVM breaking horribly as
-overlap between struct page pfns and KVM's error/noslot would prevent mapping
-legal memory into a KVM guest.  But I'd rather not hide the "did KVM find a valid
-mapping" in the "is this pfn backed by struct page" check, especially since this
-code goes away entirely by the end of the series.
+Found by Linux Verification Center (linuxtesting.org) with the SVACE
+static analysis tool.
+
+Fixes: cd28325249a1 ("KVM: VMX: support MSR_IA32_ARCH_CAPABILITIES as a feature MSR")
+Signed-off-by: Daniil Tatianin <d-tatianin@yandex-team.ru>
+---
+ arch/x86/kvm/x86.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 7713420abab0..7de6939fc371 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1661,7 +1661,8 @@ static int kvm_get_msr_feature(struct kvm_msr_entry *msr)
+ 		msr->data = kvm_caps.supported_perf_cap;
+ 		break;
+ 	case MSR_IA32_UCODE_REV:
+-		rdmsrl_safe(msr->index, &msr->data);
++		if (rdmsrl_safe(msr->index, &msr->data))
++			return KVM_MSR_RET_INVALID;
+ 		break;
+ 	default:
+ 		return static_call(kvm_x86_get_msr_feature)(msr);
+-- 
+2.25.1
+
