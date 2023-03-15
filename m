@@ -2,206 +2,239 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ADA516BB523
-	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 14:49:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D2C16BB528
+	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 14:51:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232713AbjCONtK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 09:49:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40992 "EHLO
+        id S232377AbjCONvH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 09:51:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232481AbjCONs5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 09:48:57 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12FA79E530;
-        Wed, 15 Mar 2023 06:48:30 -0700 (PDT)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32FDkJsl015648;
-        Wed, 15 Mar 2023 13:48:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=iCOz6Ar6Q3g92BPZSKv52XzR3iBWhzJQfPC5li74sKw=;
- b=p89XdMTJnHVSmtWC3HGb66hN07mNKwYIvbO7XTZkNzJ2QIgRGKic4KmXIg/LJw17zZAF
- eDOalYPYsUb7bvpz1OiS/vYpE4Nmp4XO8PmXUQ87EyueY8R1uUry42d3SBwNpc3XEjz6
- f9v0+O3ZyCXpXp7QnvY9SDmpm7B1H5P4rCNKAqJXSjxbKohHCTFQeh4wTXRCSs+rU/Ym
- 0CBgpn7PFPQt6zqGcVwhRll9zz8l6S0uIeC38YA/b6lilfbhJ9G0D7zem+QnXAaqiyY4
- sg+8aabc000unV7AHybv2HljsD8K3fmzguk1OGiAzZBP/GoDPHZ3q7cIWiEUpljmHklc 3w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3pbbqnpbuv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Mar 2023 13:48:15 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32FDNTY6004923;
-        Wed, 15 Mar 2023 13:48:15 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3pbbqnpbuc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Mar 2023 13:48:15 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32FDh8sY008598;
-        Wed, 15 Mar 2023 13:48:13 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3pb29sguxk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Mar 2023 13:48:13 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32FDmAkO18547432
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 15 Mar 2023 13:48:10 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F2FEA2004B;
-        Wed, 15 Mar 2023 13:48:09 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B001920043;
-        Wed, 15 Mar 2023 13:48:09 +0000 (GMT)
-Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.152.224.238])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 15 Mar 2023 13:48:09 +0000 (GMT)
-Message-ID: <117150729a6e95bb5cd4e0aa91e276d426292b1f.camel@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v2 2/3] s390x/spec_ex: Add test
- introducing odd address into PSW
-From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Date:   Wed, 15 Mar 2023 14:48:09 +0100
-In-Reply-To: <20230314162155.45e8c6f1@p-imbrenda>
-References: <20230221174822.1378667-1-nsg@linux.ibm.com>
-         <20230221174822.1378667-3-nsg@linux.ibm.com>
-         <20230314162155.45e8c6f1@p-imbrenda>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        with ESMTP id S231965AbjCONvE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 09:51:04 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4392738037;
+        Wed, 15 Mar 2023 06:51:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1678888263; x=1710424263;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=nJBJ/aCMclCbw4ZFIVmJZs4MxFe8dUNc0h2Y0XdhNDU=;
+  b=W0K3C8HFxKVsoL8H8xVX9dLINI7DsiHRaG/VQdXnkCyPiia8qNqHqzHG
+   zzllFrsyLcZMFfiaWDT8jN6jW1ub0Qn3cNQOBgrjf+36IEzUPQPRQXFuv
+   rCCjr5Fq2bs2BySzvDplqm1RrY4g4BMy+rApzb78GC99mJZAzze/u+GAW
+   mCTaCKXGOLjfZ4XA4bMstr4e/uUJ1lP/droJu4E2MpCRpYbwuVGzn/EAQ
+   IIjQ8KwC59yE02U1aRYENHxawiB0T3dzZ4bHUecXhiD+sqrrK8sCLf9oz
+   f2zN22D+5QW1+Oakl2nRsuCo893wHpeUwdbe1M28b5mIGw4dybpWVlgyU
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10649"; a="365387831"
+X-IronPort-AV: E=Sophos;i="5.98,262,1673942400"; 
+   d="scan'208";a="365387831"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2023 06:51:02 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10649"; a="709691481"
+X-IronPort-AV: E=Sophos;i="5.98,262,1673942400"; 
+   d="scan'208";a="709691481"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orsmga008.jf.intel.com with ESMTP; 15 Mar 2023 06:51:02 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Wed, 15 Mar 2023 06:51:01 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21 via Frontend Transport; Wed, 15 Mar 2023 06:51:01 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.169)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.21; Wed, 15 Mar 2023 06:50:59 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=W0hIhmHtaC0q8iqFG7ctpS8PHLQRwFDl7GGpainzWh580qgHRtqL44ofBnWYRF+eBNP7aQH6S5+C1BPb8IaY/Wb6NakShjyugFjUTws+R5Vx3oz7t0efvnHrex6SYyZEdtQ3alnJ2kF3afsGxthbMW71bhrcRt9wGNdoGlx2Y3HpCiRXmi8Pc1oNjt/VK/6fv4x/F425Ce2yGrq97te0EL5qcAiOjTEu9VaOWUVv24epoN3HVG/EKCfMLCcFsifZBUrUcBgePqKPqY8om84egPzd6SE//EDQM6VeLUevXWZOJyw/ynqdxv7X8I44Ps2CECVOWr6zFlXK5GjRVl01uQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QXW0M3sGtUcOAuux6KosBbyn0joH3gVbWzKqkZq02q0=;
+ b=V8M1UJgWUrpUxpA4lGdFU+Hu5dk7cNawYKj9CfFumUd+YIPpvgiVnCNErySfrpLnO3gXNKOIMDUuKoMd64razUDbTJuZe7eCd6ZdEaUuPMJYLQDzs0Rs2w5kac5oWnOmi5yTpscDJ794zO5DLa5cYropTvcDHVDGXezzwjzLNSy2s4dmsnTa6DBPgn1AB/DtuDnDMlBjgBf2tV5S+u7YeD7ZOFYT1F6F8uBa+B+9DqyxfJ+SqQnePmHNuHNM5howtEQ2dZ1cy/oIDiGwJzMa2kAsmNUGEeoKvkjrUK231DZyqI2aGwkVKaz77kpCa12UCrHBSkuizBvJ3+0Y/6/PAA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB5469.namprd11.prod.outlook.com (2603:10b6:5:399::13)
+ by DS0PR11MB8017.namprd11.prod.outlook.com (2603:10b6:8:115::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.29; Wed, 15 Mar
+ 2023 13:50:58 +0000
+Received: from DM4PR11MB5469.namprd11.prod.outlook.com
+ ([fe80::aa1a:2927:42ee:41c2]) by DM4PR11MB5469.namprd11.prod.outlook.com
+ ([fe80::aa1a:2927:42ee:41c2%4]) with mapi id 15.20.6178.029; Wed, 15 Mar 2023
+ 13:50:58 +0000
+Message-ID: <6c8e55e0-e699-d199-87b7-04c81e7e2493@intel.com>
+Date:   Wed, 15 Mar 2023 21:50:43 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.2
+Subject: Re: [PATCH v2 1/5] iommufd: Add nesting related data structures for
+ Intel VT-d
+Content-Language: en-US
+To:     Yi Liu <yi.l.liu@intel.com>, <joro@8bytes.org>,
+        <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+        <kevin.tian@intel.com>, <robin.murphy@arm.com>,
+        <baolu.lu@linux.intel.com>
+CC:     <cohuck@redhat.com>, <eric.auger@redhat.com>,
+        <nicolinc@nvidia.com>, <kvm@vger.kernel.org>,
+        <mjrosato@linux.ibm.com>, <chao.p.peng@linux.intel.com>,
+        <yi.y.sun@linux.intel.com>, <peterx@redhat.com>,
+        <jasowang@redhat.com>, <shameerali.kolothum.thodi@huawei.com>,
+        <lulu@redhat.com>, <suravee.suthikulpanit@amd.com>,
+        <iommu@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>
+References: <20230309082207.612346-1-yi.l.liu@intel.com>
+ <20230309082207.612346-2-yi.l.liu@intel.com>
+From:   "Liu, Jingqi" <jingqi.liu@intel.com>
+In-Reply-To: <20230309082207.612346-2-yi.l.liu@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SGBP274CA0020.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b0::32)
+ To DM4PR11MB5469.namprd11.prod.outlook.com (2603:10b6:5:399::13)
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 5bAHdCre3gcaCns4Nv5SAZfItvmJj_IU
-X-Proofpoint-ORIG-GUID: KnZX8PJck1ZMQVahcrDKn-2vXFAhAyOk
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-15_06,2023-03-15_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
- adultscore=0 impostorscore=0 suspectscore=0 priorityscore=1501
- malwarescore=0 clxscore=1015 spamscore=0 mlxlogscore=999
- lowpriorityscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2302240000 definitions=main-2303150114
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB5469:EE_|DS0PR11MB8017:EE_
+X-MS-Office365-Filtering-Correlation-Id: 25e1e0a6-0f59-4645-1e06-08db255c4dd8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 6jdr/qQ78+0jYgX+2NLhDNCz/TQ9PvwzxQxAjRY63ohbNE5f5OvBiV89ZRhkGrvBQQryqoiW2UfzbSw5Lc+uUFWT7oehtfEoqnKitaIZOWtmur59uWMmtmhZzH/wvzK1cUEgUJZz5t7fvf/o0N2pFp2ylnJ8vjhlDwoa8M9+DnDM4k5vZHLN+w6ktxp1fx5g/1btHicdCnzs9N9W4PddiNWbj+rUWCZolXk2d+MMO3B9JqnRjHfZDE+fSOShQfaZ5wM5kANeAaLR8tRNPeJXq3mAAPHACjIzN4rJKM1El3XiW5+yAJU+fLKa9OtUiFdubkq9mRfOY8z4VDIy1pDfeSzh6X+zkmrgGNRSjOJMci3F/vxizp89erO0zLburlJ3YhJCn93K5YNQRxbG8SecE8zUALmu1TMXptRsFtf/1nTE3qnJRc1iZN7RD8z+zxNrD24yRkJUYhis870ckgWWArUW5K6077+9V9qcaaZTcC4MiLzoJ3iOuFUpjFeA0KUC57AVXjk1dICxvfNLvFGeOVzkgx8FPr0ULD25p5O+LSsASrjmkSkhggbWRQCbbSldIDjMNaJWMIzKaK+Whtxkp1R/FRVEj/KGviR1NpXglBAvDH3rXN4UMwRcDj41RDxmIALj7AQPNzsTb5vOjlJPek2vO7eOcZAaKX8mBZu8dUt5Z+t6zBW529iCxi9BUUcnMurbPKWrBuVaFkVSk/1W4meMF2EEpz2vwShYqefv+Dc=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5469.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(39860400002)(366004)(396003)(376002)(136003)(346002)(451199018)(36756003)(6486002)(82960400001)(2616005)(186003)(53546011)(6512007)(83380400001)(26005)(6506007)(6666004)(86362001)(8936002)(5660300002)(7416002)(31696002)(41300700001)(4326008)(2906002)(478600001)(38100700002)(8676002)(66476007)(66556008)(316002)(66946007)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Q0YzZW5QSnhPeS8yQnlBVkRTdkJsS3lsVyt0VER5VUEwMUpVUnF3V3BPYkUz?=
+ =?utf-8?B?ZDJGVTMxcE5DTzNkTDlQV1lYN1ZvS2NDcDRQMmJNUFoxaUc2UDYvejJiaVZI?=
+ =?utf-8?B?QVVpbjhHRlZsbklHeHR2YzY5djhjb2ZRK0JHUHBwb0VCNnhVOFZFQldtWm5M?=
+ =?utf-8?B?WDNQRjh6cWJQR0dJdkovS2ZidlF4S295VHZIQ2RuZTNwV1hEYzBTMWpJVnFJ?=
+ =?utf-8?B?aWRhSEpEdG5zSW5lb1ppZXRRd0ZrN29od1dYRTU5U3JRbExyV0pHc3U3dllJ?=
+ =?utf-8?B?bUxxV1l6d1I5bjF3UnE4WGpXQ1dveko1TmVxSngvM1pkQ0FJem1oVmxWaXF5?=
+ =?utf-8?B?bG1DYlVyZWxDZS9lYnI4YUxHdEt6RDI2b3orNHVZUnBzTXNmR01ybmwwN2Zi?=
+ =?utf-8?B?WUJCUGpOZkh1S283Vi9uYnFoQlZGRDhSUUw2MnIrMURKTkI5S25aeHdpa1Z1?=
+ =?utf-8?B?YjZOdVZRV05BR3ZKbVZteUhBUWIvRHRSK0ZhM05iTUZXZjFxNXZTT2FnWFlm?=
+ =?utf-8?B?dWtuR3hkaGQreW9QRFJEbXRibjdDRXJqUjZKVUc2WXhhdW8xS1dFY04xK0hU?=
+ =?utf-8?B?SHJwU1NWUHk2Smt0VENST2hiMGpVRS8vNW1PZ0h0MG44a3RhVTJ5c2dPcll2?=
+ =?utf-8?B?VWhJYmxOSXFJc2lmS3J5WVZKTUhoZytlSEJPZ2pMYkV4T3QySWFOL1E0eUg3?=
+ =?utf-8?B?bU9MTExNelVRMHZKSDhCSWsvZWtRZTcxK01MMFYvbUxsNVo2N3NPajRseVp4?=
+ =?utf-8?B?aWd3SUZlYXdSYmJpODh5Znhudjg1NldETSt6amJsRWlCNXhhVFBQRlc3c05C?=
+ =?utf-8?B?Vjg3MGNBc3FpV0xlK1R1alNTUUdqTEhXTkF2Z0NzcExKckM3aUgxN3dIOERE?=
+ =?utf-8?B?cUhwc3M3dnNIUUVUMVpWUmxzbmhTMGtrQWY0UzhvU05RYzVBaHl5bWh0UVJS?=
+ =?utf-8?B?V3FLVmUvNk8xTzNGZG9TU1QyaXVBaHMvTCtIRStxNS80aDJNSVBlSGZwbUhL?=
+ =?utf-8?B?Z3VEYzVPZWRLQ3ZnRk80TEV6dlMxWVRzVHBRUk5vdE9JOTVSTDBWaXJSb1Ny?=
+ =?utf-8?B?aGVjMDVSVFdlOEl6Y0lXQ2JRQjdQKzQxVTRkTDVHMUFVY3hPVXB0V1pyUjBa?=
+ =?utf-8?B?MjByVlhGU1owTDJLNnVuQTV2Ykh3R0hlQWFBaEtEK1FNc3E5cDdERlhmcC9N?=
+ =?utf-8?B?V3VDQmZqZjhBc2lJQjhONHk5QSttMUJ3czd4bDNaMlZXK1d1eXh1UEJVM3R6?=
+ =?utf-8?B?NXRFYk4xVWR3Vmd4TmhZUFl6emF0bTRMVDFxcjZOS1h6Yjk1UVZGQ21obkFD?=
+ =?utf-8?B?aDhjL3ZyanNjR0lQSW5mM3NSQWs2Qms0YnlvekhCa2ovV3NtL1JYWnNLemht?=
+ =?utf-8?B?RWRJTjBDZitYOGhOMkNTRTkrZzZMVzNmTVhVWWFKeXM2R3F5RFZ1VUI3VTBq?=
+ =?utf-8?B?eWRBeGZqZWMxSjYvYktUVUlmVGQzR1BpN0lHazU2ZDV4cUFrK1lQNjBDZWhE?=
+ =?utf-8?B?OTFjOVU3VHc2NmxBZ2J6VmZMZWxITDFkQ1RWK3MzcGFCZGtNbUQySEVuUmVj?=
+ =?utf-8?B?WmVzS1FHSzZ2Tmg4WEpMSi9GYk5ORU13QXU0TEdSZlcza25Ca29qSkNOVVdK?=
+ =?utf-8?B?c0ZuazExT0VCUzdBcUUrUXlRY0J5VWViNE4zRmt6N2U3bEZhVWljZDlJTlRI?=
+ =?utf-8?B?UFlJWElSL2p3R2VJYnB3QWpSSFArSUZMRUt3bnlnWXBaWmMyeDI3VDd3b3lI?=
+ =?utf-8?B?UUc2ams0NGpmNGpOZDNoWSswVkJpSnRNVkp6QzFJMitDL2Uxb1pSUFJ1MVZH?=
+ =?utf-8?B?YmRTdll4YlBCb3BVNVlFVFIyZ05CdXNCdk1MRlh6WjhaRkkyYkxyc0lpcGQr?=
+ =?utf-8?B?b25vOUQySHZrOTdoSjJyQ1E0NDNzVktqbXpORFRJR2UyZ1l1ZmRpWlRuckVo?=
+ =?utf-8?B?K0lNRXdVcTFKWllleHZFVGZmN3g1b1pEMDNNVDlyU3p0TkRhU1RhVnZmeXhD?=
+ =?utf-8?B?cExlaXRLTnF6Tk9Ta2FsdUs4a0dHZzZwdVNtYUQveDUrOUc0MFZ3SmJQUmE0?=
+ =?utf-8?B?ZVZSUEhZZURKUHR1Qk9BZnNnblVyVVhCZzNhdDhNRUd5TjEwd2NOSzcrN2JL?=
+ =?utf-8?B?dU5sbk9wWHNUdE1ram1NNWJzMTZnbXloZUtkUlN1YTJ4SC91TUJuUnB5amRi?=
+ =?utf-8?B?c2c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 25e1e0a6-0f59-4645-1e06-08db255c4dd8
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB5469.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Mar 2023 13:50:58.1440
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: KJzbd+9lzgd64YXGBAKOnJ4QXU25Mg3WhQjGnd0DUca544N2Y2xoH/P2aVESRaObfg8UCTfbkF3PvIg2NTR2cw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8017
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2023-03-14 at 16:21 +0100, Claudio Imbrenda wrote:
-> On Tue, 21 Feb 2023 18:48:21 +0100
-> Nina Schoetterl-Glausch <nsg@linux.ibm.com> wrote:
->=20
-> > Instructions on s390 must be halfword aligned.
-> > Introducing an odd instruction address into the PSW leads to a
-> > specification exception when attempting to execute the instruction at
-> > the odd address.
-> > Add a test for this.
-> >=20
-> > Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-> > ---
-> >  s390x/spec_ex.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++-
-> >  1 file changed, 49 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/s390x/spec_ex.c b/s390x/spec_ex.c
-> > index 2adc5996..a26c56aa 100644
-> > --- a/s390x/spec_ex.c
-> > +++ b/s390x/spec_ex.c
-> > @@ -88,12 +88,23 @@ static void expect_invalid_psw(struct psw psw)
-> >  	invalid_psw_expected =3D true;
-> >  }
-> > =20
-> > +static void clear_invalid_psw(void)
-> > +{
-> > +	expected_psw =3D PSW(0, 0);
-> > +	invalid_psw_expected =3D false;
-> > +}
-> > +
-> >  static int check_invalid_psw(void)
-> >  {
-> >  	/* Since the fixup sets this to false we check for false here. */
-> >  	if (!invalid_psw_expected) {
-> > +		/*
-> > +		 * Early exception recognition: pgm_int_id =3D=3D 0.
-> > +		 * Late exception recognition: psw address has been
-> > +		 *	incremented by pgm_int_id (unpredictable value)
-> > +		 */
-> >  		if (expected_psw.mask =3D=3D invalid_psw.mask &&
-> > -		    expected_psw.addr =3D=3D invalid_psw.addr)
-> > +		    expected_psw.addr =3D=3D invalid_psw.addr - lowcore.pgm_int_id)
-> >  			return 0;
-> >  		report_fail("Wrong invalid PSW");
-> >  	} else {
-> > @@ -112,6 +123,42 @@ static int psw_bit_12_is_1(void)
-> >  	return check_invalid_psw();
-> >  }
-> > =20
-> > +extern char misaligned_code[];
-> > +asm (  ".balign	2\n"
->=20
-> which section will this end up in?
 
-.text
->=20
-> > +"	. =3D . + 1\n"
-> > +"misaligned_code:\n"
-> > +"	larl	%r0,0\n"
-> > +"	bcr	0xf,%r1\n"
->=20
-> you should just use
->         br %r1
-> it's shorter and easier to understand
+On 3/9/2023 4:22 PM, Yi Liu wrote:
+> Add the following data structures for corresponding ioctls:
+>                 iommu_hwpt_intel_vtd => IOMMU_HWPT_ALLOC
+>                iommu_hw_info_vtd => IOMMU_DEVICE_GET_HW_INFO
+>      iommu_hwpt_invalidate_intel_vtd => IOMMU_HWPT_INVALIDATE
+>
+> Also, add IOMMU_HW_INFO_TYPE_INTEL_VTD and IOMMU_HWPT_TYPE_VTD_S1 to the
+> header and corresponding type/size arrays.
+>
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+>   drivers/iommu/iommufd/hw_pagetable.c |   7 +-
+>   drivers/iommu/iommufd/main.c         |   5 +
+>   include/uapi/linux/iommufd.h         | 136 +++++++++++++++++++++++++++
+>   3 files changed, 147 insertions(+), 1 deletion(-)
+>
+[...]
 
-Yes.
->=20
-> > +);
-> > +
-> > +static int psw_odd_address(void)
-> > +{
-> > +	struct psw odd =3D PSW_WITH_CUR_MASK((uint64_t)&misaligned_code);
-> > +	uint64_t executed_addr;
-> > +
-> > +	expect_invalid_psw(odd);
-> > +	fixup_psw.mask =3D extract_psw_mask();
-> > +	asm volatile ( "xr	%%r0,%%r0\n"
-> > +		"	larl	%%r1,0f\n"
-> > +		"	stg	%%r1,%[fixup_addr]\n"
-> > +		"	lpswe	%[odd_psw]\n"
-> > +		"0:	lr	%[executed_addr],%%r0\n"
-> > +	: [fixup_addr] "=3D&T" (fixup_psw.addr),
-> > +	  [executed_addr] "=3Dd" (executed_addr)
-> > +	: [odd_psw] "Q" (odd)
-> > +	: "cc", "%r0", "%r1"
-> > +	);
-> > +
-> > +	if (!executed_addr) {
-> > +		return check_invalid_psw();
-> > +	} else {
-> > +		assert(executed_addr =3D=3D odd.addr);
-> > +		clear_invalid_psw();
-> > +		report_fail("did not execute unaligned instructions");
-> > +		return 1;
-> > +	}
-> > +}
-> > +
-> >  /* A short PSW needs to have bit 12 set to be valid. */
-> >  static int short_psw_bit_12_is_0(void)
-> >  {
-> > @@ -170,6 +217,7 @@ struct spec_ex_trigger {
-> >  static const struct spec_ex_trigger spec_ex_triggers[] =3D {
-> >  	{ "psw_bit_12_is_1", &psw_bit_12_is_1, false, &fixup_invalid_psw },
-> >  	{ "short_psw_bit_12_is_0", &short_psw_bit_12_is_0, false, &fixup_inva=
-lid_psw },
-> > +	{ "psw_odd_address", &psw_odd_address, false, &fixup_invalid_psw },
-> >  	{ "bad_alignment", &bad_alignment, true, NULL },
-> >  	{ "not_even", &not_even, true, NULL },
-> >  	{ NULL, NULL, false, NULL },
->=20
+> +
+> +/**
+> + * struct iommu_hwpt_intel_vtd - Intel VT-d specific user-managed
+> + *                               stage-1 page table info
+> + * @flags: Combination of enum iommu_hwpt_intel_vtd_flags
+> + * @pgtbl_addr: The base address of the user-managed stage-1 page table.
+> + * @pat: Page attribute table data to compute effective memory type
+> + * @emt: Extended memory type
+> + * @addr_width: The address width of the untranslated addresses that are
+> + *              subjected to the user-managed stage-1 page table.
+> + * @__reserved: Must be 0
+> + *
+> + * The Intel VT-d specific data for creating hw_pagetable to represent
+> + * the user-managed stage-1 page table that is used in nested translation.
+> + *
+> + * In nested translation, the stage-1 page table locates in the address
+> + * space that defined by the corresponding stage-2 page table. Hence the
+> + * stage-1 page table base address value should not be higher than the
+> + * maximum untranslated address of stage-2 page table.
+> + *
+> + * The paging level of the stage-1 page table should be compataible with
+
+s/compataible/compatible
+
+> + * the hardware iommu. Otherwise, the allocation would be failed.
+> + */
+> +struct iommu_hwpt_intel_vtd {
+> +	__u64 flags;
+> +	__u64 pgtbl_addr;
+> +	__u32 pat;
+> +	__u32 emt;
+> +	__u32 addr_width;
+> +	__u32 __reserved;
+>   };
+>   
+
+[...]
+
+> +
+> +/**
+> + * struct iommu_hwpt_invalidate_intel_vtd - Intel VT-d cache invalidation info
+> + * @granularity: One of enum iommu_vtd_qi_granularity.
+> + * @flags: Combination of enum iommu_hwpt_intel_vtd_invalidate_flags
+> + * @__reserved: Must be 0
+> + * @addr: The start address of the addresses to be invalidated.
+> + * @granule_size: Page/block size of the mapping in bytes. It is used to
+> + *                compute the invalidation range togehter with @nb_granules.
+
+s/togehter/together
+
+Thanks,
+Jingqi
 
