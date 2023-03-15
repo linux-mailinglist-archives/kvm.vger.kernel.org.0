@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CB5796BA515
-	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 03:18:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 35E946BA518
+	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 03:18:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230437AbjCOCSW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Mar 2023 22:18:22 -0400
+        id S230445AbjCOCS2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Mar 2023 22:18:28 -0400
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230432AbjCOCSP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Mar 2023 22:18:15 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CF302FCF3
-        for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 19:18:10 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id t25-20020a252d19000000b00b341ad1b626so13196660ybt.19
-        for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 19:18:10 -0700 (PDT)
+        with ESMTP id S230395AbjCOCSQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Mar 2023 22:18:16 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B1532E805
+        for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 19:18:11 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-544570e6d82so54176987b3.23
+        for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 19:18:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678846690;
+        d=google.com; s=20210112; t=1678846691;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BGs+CYQNnAC1/1DAeQ0v9jrMES3obN+k4CgQ4vi5pgY=;
-        b=N7ufsDwje934tbXbl8Sbrp9u5iaWppQN91BjkQvKljW3t0rZNApdhSjeOHF1cc8vvM
-         F6q8JeNIBZ9VNWAT0pj1ZpvqeUND0QdetuJITK3veQuCaRepcAAJ+ZQFIj/qTyQhRLi4
-         aw4O9fii/6pe76Wl6/GWw8CsARM163Mouj02lGG7EXHanePsTdQKCec7GS5YwzEp+KrC
-         jJHDvQf/qCEeVTmnzmUaybRk26khJqjTXW/oMnJtQAnw8l/yewn+Cs7pExByqXfOe+9a
-         GkO7S2yWkio98OaI7g38b1h8m4n2Em/vFRp3zNoFU1qILz+IXRvArUs9HcSEqnlST054
-         17Ww==
+        bh=nTfFnzlVbgHA4yLi91OjwVvIMZq5YobnQNy+0t5Y1os=;
+        b=SbQbTgauOj8SF/qThrELRob6CK7088fdCcev5pgnuA+5goVZf/VLoIpx7OqUGayKlM
+         e4uKHpvIAmfutRl7l641AWGwe/LvcioX6Gu9AnE3aBroPtzBXj7CXTmG+UypGqBOFiSy
+         X9QwL1TCMSgRYe5+MpXevQNvqfgeB2qhMpyTi1n+r0arQEJ1jBDyK3p0IgFqDsLOn/D3
+         fwCUzve3AAjtB/4hP0kX6SzWFsoMCR9sKalBDY19z1Z/5CWY8MyqE6dJkP2RebhTJhEr
+         7ygnzdd0diBDTbe7lzTSfsS3L0CFipjN2K1Oyk6M8OiH9r1RH0ibxntzaitJ1+gFlyZY
+         TZ8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678846690;
+        d=1e100.net; s=20210112; t=1678846691;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BGs+CYQNnAC1/1DAeQ0v9jrMES3obN+k4CgQ4vi5pgY=;
-        b=X80auA4CoeeaM6VcK1Rxm7xUD7cJ83tt+DZ/Qi0v64OvGCAmS18uq527i+kqWIMb8p
-         8iS84lVpjtiuJBfHx6ZsLcGAnOjJJqwU6co7HX72ONhnmMM0aUtxgEajAEbXJ/Gt7dvt
-         G4IJibGJ3+d+Zb+LbxRxOfW0eN5JZJhBJ289q5xv/UboHHaJEnO+emlclfDpcl4hZhB1
-         GnaFe01GBqF2xZPJzbTYi4usMVK5ConIHPPkMkhztl8LVDPQqQLhZmOsIXWgQT+etneS
-         T8nJ2qkICEgtGInm6NVnk8JNMD57FelgyaZDm54sKhb8FD45vZ670EIIHP925vR9c80P
-         XP2A==
-X-Gm-Message-State: AO0yUKWNEa3G9fHApI80s3JZ4k4k3YWisorCbjoLuLnTxhhsdo7fKtnW
-        LmIXfsIOmEslWowFXg71j6SEYQjpzVPSTg==
-X-Google-Smtp-Source: AK7set9eDfxDtnAU4+XBrjluNZ8+vxTrom6dCQjntDZEZQYHy12UouqiKx40BwESlt8EtAu+Ml65kvRn+GXshQ==
+        bh=nTfFnzlVbgHA4yLi91OjwVvIMZq5YobnQNy+0t5Y1os=;
+        b=fHcuq7Irq+oTkJ3Q1F9AwueCieB7Ba5jVyYRlH3tKtQbYXL4xA1p6c1Pc+0UviWCii
+         Bg+cJM6YT3yM5dgXiawFT01I7e1m0Nu/wcKfqx06/Ta+gf32jYig7jvxNQwO5yuws5gh
+         c3jBZpWCMHxuF3+YCgHPZMhj82o8rAs0Zfl337w8QkBp7osOnC4n/ENM/RIoJ6WkJ5a1
+         WS0O0Y/xG5qOAx1uO5OqXeVyrhORWXaVOYxxJar0p1T2uM292KFhgveFfvpc6JBXEWJS
+         QvkZr0m75a5EQCDvQFO8pQ7ESbZYXh7G5kzIkSswwDoHcsEAr0RE9uTIbmPWVFlXGzkR
+         tdPw==
+X-Gm-Message-State: AO0yUKW7QnTEDu8Zz0w7dmDAxV4r8JM5x036kKfMj7IxspejhMRvZxyQ
+        V/YFgdggLhAo/Mi7mEycioWsDqliyM7KwA==
+X-Google-Smtp-Source: AK7set8/aAE7Rd9xJfziTRYdmCtUeLmMv5J5T3P62J+/VebncMoCBFFRoUNLdvxtoxYaShNuBQDN1UFjPf67ZQ==
 X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
- (user=amoorthy job=sendgmr) by 2002:a81:a906:0:b0:52e:d2a7:1ba1 with SMTP id
- g6-20020a81a906000000b0052ed2a71ba1mr26322283ywh.1.1678846689933; Tue, 14 Mar
- 2023 19:18:09 -0700 (PDT)
-Date:   Wed, 15 Mar 2023 02:17:34 +0000
+ (user=amoorthy job=sendgmr) by 2002:a05:6902:728:b0:b48:5eaa:a804 with SMTP
+ id l8-20020a056902072800b00b485eaaa804mr1758041ybt.0.1678846690946; Tue, 14
+ Mar 2023 19:18:10 -0700 (PDT)
+Date:   Wed, 15 Mar 2023 02:17:35 +0000
 In-Reply-To: <20230315021738.1151386-1-amoorthy@google.com>
 Mime-Version: 1.0
 References: <20230315021738.1151386-1-amoorthy@google.com>
 X-Mailer: git-send-email 2.40.0.rc1.284.g88254d51c5-goog
-Message-ID: <20230315021738.1151386-11-amoorthy@google.com>
-Subject: [WIP Patch v2 10/14] KVM: x86: Implement KVM_CAP_MEMORY_FAULT_NOWAIT
+Message-ID: <20230315021738.1151386-12-amoorthy@google.com>
+Subject: [WIP Patch v2 11/14] KVM: arm64: Allow user_mem_abort to return 0 to
+ signal a 'normal' exit
 From:   Anish Moorthy <amoorthy@google.com>
 To:     seanjc@google.com
 Cc:     jthoughton@google.com, kvm@vger.kernel.org,
@@ -67,106 +68,82 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When a memslot has the KVM_MEM_MEMORY_FAULT_EXIT flag set, exit to
-userspace upon encountering a page fault for which the userspace
-page tables do not contain a present mapping.
----
- arch/x86/kvm/mmu/mmu.c | 33 +++++++++++++++++++++++++--------
- arch/x86/kvm/x86.c     |  1 +
- 2 files changed, 26 insertions(+), 8 deletions(-)
+kvm_handle_guest_abort currently just returns 1 if user_mem_abort
+returns 0. Since 1 is the "resume the guest" code, user_mem_abort is
+essentially incapable of triggering a "normal" exit: it can only trigger
+exits by returning a negative value, which indicates an error.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 5e0140db384f6..68bc4ab2bd942 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3214,7 +3214,9 @@ static void kvm_send_hwpoison_signal(struct kvm_memory_slot *slot, gfn_t gfn)
- 	send_sig_mceerr(BUS_MCEERR_AR, (void __user *)hva, PAGE_SHIFT, current);
- }
- 
--static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-+static int kvm_handle_error_pfn(
-+	struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
-+	bool faulted_on_absent_mapping)
+Remove the "if (ret == 0) ret = 1;" statement from
+kvm_handle_guest_abort and refactor user_mem_abort slightly to allow it
+to trigger 'normal' exits by returning 0.
+
+Signed-off-by: Anish Moorthy <amoorthy@google.com>
+---
+ arch/arm64/kvm/mmu.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 7113587222ffe..735044859eb25 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1190,7 +1190,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 			  struct kvm_memory_slot *memslot, unsigned long hva,
+ 			  unsigned long fault_status)
  {
- 	if (is_sigpending_pfn(fault->pfn)) {
- 		kvm_handle_signal_exit(vcpu);
-@@ -3234,7 +3236,11 @@ static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fa
- 		return RET_PF_RETRY;
+-	int ret = 0;
++	int ret = 1;
+ 	bool write_fault, writable, force_pte = false;
+ 	bool exec_fault;
+ 	bool device = false;
+@@ -1281,8 +1281,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	    (logging_active && write_fault)) {
+ 		ret = kvm_mmu_topup_memory_cache(memcache,
+ 						 kvm_mmu_cache_min_pages(kvm));
+-		if (ret)
++		if (ret < 0)
+ 			return ret;
++		else
++			ret = 1;
  	}
  
--	return -EFAULT;
-+	return kvm_memfault_exit_or_efault(
-+		vcpu, fault->gfn * PAGE_SIZE, PAGE_SIZE,
-+		faulted_on_absent_mapping
-+			? KVM_MEMFAULT_REASON_ABSENT_MAPPING
-+			: KVM_MEMFAULT_REASON_UNKNOWN);
+ 	mmu_seq = vcpu->kvm->mmu_invalidate_seq;
+@@ -1305,7 +1307,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 				   write_fault, &writable, NULL);
+ 	if (pfn == KVM_PFN_ERR_HWPOISON) {
+ 		kvm_send_hwpoison_signal(hva, vma_shift);
+-		return 0;
++		return 1;
+ 	}
+ 	if (is_error_noslot_pfn(pfn))
+ 		return -EFAULT;
+@@ -1387,6 +1389,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 					     KVM_PGTABLE_WALK_HANDLE_FAULT |
+ 					     KVM_PGTABLE_WALK_SHARED);
+ 
++	if (ret == 0)
++		ret = 1;
++
+ 	/* Mark the page dirty only if the fault is handled successfully */
+ 	if (writable && !ret) {
+ 		kvm_set_pfn_dirty(pfn);
+@@ -1397,7 +1402,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	read_unlock(&kvm->mmu_lock);
+ 	kvm_set_pfn_accessed(pfn);
+ 	kvm_release_pfn_clean(pfn);
+-	return ret != -EAGAIN ? ret : 0;
++	return ret != -EAGAIN ? ret : 1;
  }
  
- static int kvm_handle_noslot_fault(struct kvm_vcpu *vcpu,
-@@ -4209,7 +4215,9 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
- 	kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, 0, true);
- }
- 
--static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-+static int __kvm_faultin_pfn(
-+	struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
-+	bool fault_on_absent_mapping)
- {
- 	struct kvm_memory_slot *slot = fault->slot;
- 	bool async;
-@@ -4242,9 +4250,15 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ /* Resolve the access fault by making the page young again. */
+@@ -1549,8 +1554,6 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
  	}
  
- 	async = false;
--	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, false, &async,
--					  fault->write, &fault->map_writable,
--					  &fault->hva);
-+
-+	fault->pfn = __gfn_to_pfn_memslot(
-+		slot, fault->gfn,
-+		fault_on_absent_mapping,
-+		false,
-+		fault_on_absent_mapping ? NULL : &async,
-+		fault->write, &fault->map_writable,
-+		&fault->hva);
-+
- 	if (!async)
- 		return RET_PF_CONTINUE; /* *pfn has correct page already */
- 
-@@ -4274,16 +4288,19 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
- 			   unsigned int access)
- {
- 	int ret;
-+	bool fault_on_absent_mapping
-+		= likely(fault->slot) && kvm_slot_fault_on_absent_mapping(fault->slot);
- 
- 	fault->mmu_seq = vcpu->kvm->mmu_invalidate_seq;
- 	smp_rmb();
- 
--	ret = __kvm_faultin_pfn(vcpu, fault);
-+	ret = __kvm_faultin_pfn(
-+		vcpu, fault, fault_on_absent_mapping);
- 	if (ret != RET_PF_CONTINUE)
- 		return ret;
- 
- 	if (unlikely(is_error_pfn(fault->pfn)))
--		return kvm_handle_error_pfn(vcpu, fault);
-+		return kvm_handle_error_pfn(vcpu, fault, fault_on_absent_mapping);
- 
- 	if (unlikely(!fault->slot))
- 		return kvm_handle_noslot_fault(vcpu, fault, access);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index b3c1b2f57e680..41435324b41d7 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4426,6 +4426,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ENABLE_CAP:
- 	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
- 	case KVM_CAP_X86_MEMORY_FAULT_EXIT:
-+	case KVM_CAP_MEMORY_FAULT_NOWAIT:
- 		r = 1;
- 		break;
- 	case KVM_CAP_EXIT_HYPERCALL:
+ 	ret = user_mem_abort(vcpu, fault_ipa, memslot, hva, fault_status);
+-	if (ret == 0)
+-		ret = 1;
+ out:
+ 	if (ret == -ENOEXEC) {
+ 		kvm_inject_pabt(vcpu, kvm_vcpu_get_hfar(vcpu));
 -- 
 2.40.0.rc1.284.g88254d51c5-goog
 
