@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 925616BBB60
+	by mail.lfdr.de (Postfix) with ESMTP id 3EE766BBB5F
 	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 18:50:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232875AbjCORuD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 13:50:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37050 "EHLO
+        id S232855AbjCORuA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 13:50:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232477AbjCORtk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S232421AbjCORtk (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 15 Mar 2023 13:49:40 -0400
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E23DDBC0
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:49:27 -0700 (PDT)
-Received: by mail-wm1-x332.google.com with SMTP id bi20so3217989wmb.2
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:49:27 -0700 (PDT)
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E7AC2B615
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:49:26 -0700 (PDT)
+Received: by mail-wm1-x329.google.com with SMTP id x22so7660096wmj.3
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:49:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1678902565;
+        d=linaro.org; s=google; t=1678902564;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=sjLPfMQH5X3r4H7gOQMwsuYoqZ/Fp9APWUTkT22J5Kc=;
-        b=Xn6Uh6N9KANITQUFkWWaXVfNGpDkDSWJmMDeI0j3hUDYdOqWVJeSLrWsKACn7pLt0Y
-         djbRQd3kQDsZBzMcrJ5DvwSdQVoY88RpewKmQAJ9/zJbCvMEknQjMJR3zekfKPkBWVYc
-         7jG4rN1DEkz+yP99pyFMG8Z3opR0bM39i1rjmNAhxv8eyVkAvvfL4tp7tc6nvs1ucSLY
-         bK11JRChCFSuqvOYsaXTwW881kER9KiDaN40KzeZ86h/cLZE0f8qL6gm+hjvmcJh5+e7
-         OSIQPCNoCFmoYclJNUglofHfTvBiFee/OP4871e9ZbRSkVFiucp3qoxhPbNiE+T2ByOM
-         kqfg==
+        bh=Jq6hxeJvtxl+2hc076HR0v7mq5ZkbtUv1Uhl1DVVlCE=;
+        b=JoW+jfgH2ZSGaEGWNB1c86mJrHTmFwhbNALMh5n0IgddNo1vkrMorDjqVZvR5zDYyB
+         E9D/TRIOKM7zII0KRnTs69PFwi21fI+mmi4y0l+s+TcHEz4bTD7IVx4mhIymk5s+coD7
+         wGyBe3LliNocveapx/qlv2jek+6eEVPeVHepiYeI+7KYQqv7i+fGYtHYFkNRb9JmXRUJ
+         dGOOwPnuVj6PCrbQNUqXEEinXq4f9Fivg6UUQi0y3DXAk2sUoHrjGUG9rGPPts+yij6+
+         S91MVP53BG1C93gVX/WpyA0fmjtHXIZ0jTCb07KyHGfypwOxB3dr418TLIsLPWXw6hfi
+         lM1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678902565;
+        d=1e100.net; s=20210112; t=1678902564;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=sjLPfMQH5X3r4H7gOQMwsuYoqZ/Fp9APWUTkT22J5Kc=;
-        b=GRILmZ8hRFs2HxRwrTVLj4JJ6zYV1ms2vZVjZcPidCedgNNE5TENR8pBw8yTDe4p0t
-         LHP3yiT2Kt4bo4nS+86ZbnCBMYSAXqa9w/coFwHQVLqU1XXEx3S/5F1I5pvfpQefVqTf
-         3/TJbK7G/5jvg/dHzEseJj9B1sgx0NOz3AuFwjv1u7VX+HrmoqSJb5KPcQ5k51Tabs6t
-         I7rOmaywnP+k4Kc3vlmxt7cpygB+7lZiKnPttbyqJv2O3QGizQb5J10KzpFbFQEC1Gcf
-         CNXyaDjI0R8EL/I50DKcwed+YbwQoC83uDBYmx/0RzciMPuZOODblIpaqvciixZGvFKI
-         VNfg==
-X-Gm-Message-State: AO0yUKV9pmcucPYU6NfqjHuLo4x+AsCsDWAQNdkegQEzZb8y9ecnzoKm
-        t070NrWsHFwnNp0+yy2ZBhJKYQ==
-X-Google-Smtp-Source: AK7set9CqdrMF4wn7yEyTG7cEBJqnvRlyc1KKWzAwPET8JjYPLWgo8FvLCSR7+FzI+N3YC1EiujqFA==
-X-Received: by 2002:a05:600c:35cd:b0:3ed:320a:3736 with SMTP id r13-20020a05600c35cd00b003ed320a3736mr3152344wmq.35.1678902565725;
-        Wed, 15 Mar 2023 10:49:25 -0700 (PDT)
+        bh=Jq6hxeJvtxl+2hc076HR0v7mq5ZkbtUv1Uhl1DVVlCE=;
+        b=o+qzDRwJo2ibjqZ3YS7y2Ec+WqOSS+TT6w6q+8V0m7LCwVYOmh5qI9tJgebURhrIq7
+         60YwFxQOQ3j0YZXsgZbh5B1XyfDLVTIJl/GTaH7fHC8ygG4uxpTGC8MRS9BrstWIfcGT
+         lokmay3A3UyLTVLFQmPyrojGNxFUO9rm+gmBJGI3MbQhUtktQ8TVGgO5krmYSvLm5OdY
+         /OLzvjfbcLcsaUWP0GUmv9YrLxqtpiDij+hGIHbncfyuVXNZIc9qx/Hj2KFFhRAQTyH+
+         cMCwuoerObLxCKKNoBTERGXlUw0FmDnuBSbDCXnYj1m6xQN/PXnZNJ9rY2quoJsbSL5p
+         BABw==
+X-Gm-Message-State: AO0yUKXfHDcJsNuLeBjkArNQ7Bo0JCU8htdnGY6E/jzfGzwwPpgShGAo
+        qpal/vHt9oIrDmkz4ejql5GTmg==
+X-Google-Smtp-Source: AK7set8+7+vGSNMfAVAD3aOFQHK1DspDT2fMCXhb1Ossl4jav7nNbjq2ozGoRtLmcVQCfNOfFUZQtQ==
+X-Received: by 2002:a05:600c:34c1:b0:3eb:383c:1876 with SMTP id d1-20020a05600c34c100b003eb383c1876mr18700431wmq.6.1678902564742;
+        Wed, 15 Mar 2023 10:49:24 -0700 (PDT)
 Received: from zen.linaroharston ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id n22-20020a7bcbd6000000b003eb395a8280sm2634653wmi.37.2023.03.15.10.49.22
+        by smtp.gmail.com with ESMTPSA id t8-20020a1c7708000000b003ed2276cd0dsm2502818wmi.38.2023.03.15.10.49.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Mar 2023 10:49:25 -0700 (PDT)
+        Wed, 15 Mar 2023 10:49:22 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id 2A1221FFBD;
+        by zen.linaroharston (Postfix) with ESMTP id 4650A1FFCE;
         Wed, 15 Mar 2023 17:43:44 +0000 (GMT)
 From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To:     qemu-devel@nongnu.org
@@ -114,9 +114,9 @@ Cc:     Akihiko Odaki <akihiko.odaki@gmail.com>,
         Hanna Reitz <hreitz@redhat.com>, Peter Xu <peterx@redhat.com>,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
         =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Subject: [PATCH v2 22/32] iotests: connect stdin to /dev/null when running tests
-Date:   Wed, 15 Mar 2023 17:43:21 +0000
-Message-Id: <20230315174331.2959-23-alex.bennee@linaro.org>
+Subject: [PATCH v2 23/32] iotests: always use a unique sub-directory per test
+Date:   Wed, 15 Mar 2023 17:43:22 +0000
+Message-Id: <20230315174331.2959-24-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230315174331.2959-1-alex.bennee@linaro.org>
 References: <20230315174331.2959-1-alex.bennee@linaro.org>
@@ -135,92 +135,80 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Daniel P. Berrangé <berrange@redhat.com>
 
-Currently the tests have their stdin inherited from the test harness,
-meaning they are connected to a TTY. The QEMU processes spawned by
-certain tests, however, modify TTY settings and if the test exits
-abnormally the settings might not be restored.
+The current test runner is only safe against parallel execution within
+a single instance of the 'check' process, and only if -j is given a
+value greater than 2. This prevents running multiple copies of the
+'check' process for different test scenarios.
 
-The python test harness thus has some logic which will capture the
-initial TTY settings and restore them once all tests are finished.
+This change switches the output / socket directories to always include
+the test name, image format and image protocol. This should allow full
+parallelism of all distinct test scenarios. eg running both qcow2 and
+raw tests at the same time, or both file and nbd tests at the same
+time.
 
-This does not, however, take into account the possibility of many
-copies of the 'check' program running in parallel. With parallel
-execution, a later invokation may save the TTY state that QEMU has
-already modified, and thus restore bad state leaving the TTY
-non-functional.
-
-None of the I/O tests shnould actually be interactive requiring
-user input and so they should not require a TTY at all. To avoid
-this while TTY save/restore complexity we can connect the test
-stdin to /dev/null instead.
+It would be possible to allow for parallelism of the same test scenario
+by including the pid, but that would potentially let many directories
+accumulate over time on failures, so is not done.
 
 Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Acked-by: Hanna Czenczek <hreitz@redhat.com>
 Tested-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20230303160727.3977246-6-berrange@redhat.com>
+Message-Id: <20230303160727.3977246-7-berrange@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/qemu-iotests/testrunner.py | 22 ++--------------------
- 1 file changed, 2 insertions(+), 20 deletions(-)
+ tests/qemu-iotests/testrunner.py | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
 diff --git a/tests/qemu-iotests/testrunner.py b/tests/qemu-iotests/testrunner.py
-index e734800b3d..81519ed6e2 100644
+index 81519ed6e2..7b322272e9 100644
 --- a/tests/qemu-iotests/testrunner.py
 +++ b/tests/qemu-iotests/testrunner.py
-@@ -24,12 +24,10 @@
- import subprocess
- import contextlib
- import json
--import termios
- import shutil
- import sys
- from multiprocessing import Pool
--from contextlib import contextmanager
--from typing import List, Optional, Iterator, Any, Sequence, Dict, \
-+from typing import List, Optional, Any, Sequence, Dict, \
-         ContextManager
+@@ -228,13 +228,11 @@ def find_reference(self, test: str) -> str:
  
- from testenv import TestEnv
-@@ -56,22 +54,6 @@ def file_diff(file1: str, file2: str) -> List[str]:
-         return res
+         return f'{test}.out'
  
+-    def do_run_test(self, test: str, mp: bool) -> TestResult:
++    def do_run_test(self, test: str) -> TestResult:
+         """
+         Run one test
  
--# We want to save current tty settings during test run,
--# since an aborting qemu call may leave things screwed up.
--@contextmanager
--def savetty() -> Iterator[None]:
--    isterm = sys.stdin.isatty()
--    if isterm:
--        fd = sys.stdin.fileno()
--        attr = termios.tcgetattr(fd)
--
--    try:
--        yield
--    finally:
--        if isterm:
--            termios.tcsetattr(fd, termios.TCSADRAIN, attr)
--
--
- class LastElapsedTime(ContextManager['LastElapsedTime']):
-     """ Cache for elapsed time for tests, to show it during new test run
+         :param test: test file path
+-        :param mp: if true, we are in a multiprocessing environment, use
+-                   personal subdirectories for test run
  
-@@ -169,7 +151,6 @@ def __enter__(self) -> 'TestRunner':
-         self._stack = contextlib.ExitStack()
-         self._stack.enter_context(self.env)
-         self._stack.enter_context(self.last_elapsed)
--        self._stack.enter_context(savetty())
-         return self
+         Note: this method may be called from subprocess, so it does not
+         change ``self`` object in any way!
+@@ -257,12 +255,14 @@ def do_run_test(self, test: str, mp: bool) -> TestResult:
  
-     def __exit__(self, exc_type: Any, exc_value: Any, traceback: Any) -> None:
-@@ -294,6 +275,7 @@ def do_run_test(self, test: str, mp: bool) -> TestResult:
-         t0 = time.time()
-         with f_bad.open('w', encoding="utf-8") as f:
-             with subprocess.Popen(args, cwd=str(f_test.parent), env=env,
-+                                  stdin=subprocess.DEVNULL,
-                                   stdout=f, stderr=subprocess.STDOUT) as proc:
-                 try:
-                     proc.wait()
+         args = [str(f_test.resolve())]
+         env = self.env.prepare_subprocess(args)
+-        if mp:
+-            # Split test directories, so that tests running in parallel don't
+-            # break each other.
+-            for d in ['TEST_DIR', 'SOCK_DIR']:
+-                env[d] = os.path.join(env[d], f_test.name)
+-                Path(env[d]).mkdir(parents=True, exist_ok=True)
++
++        # Split test directories, so that tests running in parallel don't
++        # break each other.
++        for d in ['TEST_DIR', 'SOCK_DIR']:
++            env[d] = os.path.join(
++                env[d],
++                f"{self.env.imgfmt}-{self.env.imgproto}-{f_test.name}")
++            Path(env[d]).mkdir(parents=True, exist_ok=True)
+ 
+         test_dir = env['TEST_DIR']
+         f_bad = Path(test_dir, f_test.name + '.out.bad')
+@@ -347,7 +347,7 @@ def run_test(self, test: str,
+             testname = os.path.basename(test)
+             print(f'# running {self.env.imgfmt} {testname}')
+ 
+-        res = self.do_run_test(test, mp)
++        res = self.do_run_test(test)
+ 
+         end = datetime.datetime.now().strftime('%H:%M:%S')
+         self.test_print_one_line(test=test,
 -- 
 2.39.2
 
