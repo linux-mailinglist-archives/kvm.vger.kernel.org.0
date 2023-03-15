@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3AA9F6BA50B
-	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 03:18:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A79C76BA50D
+	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 03:18:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230354AbjCOCSG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Mar 2023 22:18:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42968 "EHLO
+        id S230408AbjCOCSI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Mar 2023 22:18:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230259AbjCOCSF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230030AbjCOCSF (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 14 Mar 2023 22:18:05 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E0D51B2FC
-        for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 19:18:03 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id w14-20020a25ac0e000000b00b369c36c165so11624122ybi.6
-        for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 19:18:03 -0700 (PDT)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DAAFE1B7
+        for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 19:18:04 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-538116920c3so184361677b3.15
+        for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 19:18:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678846682;
+        d=google.com; s=20210112; t=1678846683;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=haIuqGIqek9CbbGDRZAxRpLspxYrTLCM+X7zGvj8v0c=;
-        b=jmVxUlqsWEWjQf0vivVfGEGk2HI2UDoDW5BYuefiRuDnBfYjmbtTgowCnavj37anZP
-         +pPpLAxGFkBuDWThuB3rIvpx0da1EuPSxblGCFpN8LLwy+DMqrFq1Zd3uVHt5NHl/P3b
-         PDi/5WwYzHcddoAdtzbWdfPSIJRIk7Q1plq92xpGa4FMfSQ8tKNLrBed+Xw6tQhqNN9O
-         fShUqHRg6qPefzFHd0yEGY2/S7oaZsoHSAXSOZ4lLBpJoXFfXf9Esi0fbRtyT+AF6xs9
-         HPPWgEgq/oSNj29spPenbiYDIgwqggDY3IU4pwFv9d3ghYOO+hWARShbUmJdvZHDHGmh
-         m0ew==
+        bh=bq+O9a1u8eXgxSzc7ecXz3Zf8cdQRV4ap6Xut1hzXhk=;
+        b=U9+eY6410Erwi3Nr2kPWBuFJFUVXvrUqmUnx9+Q6T8QuHHFPL1HRx44Z38/eKvPTug
+         yjuBTrwjJaJnOjFseVzyoWayTIW3uwUg5W42AelrjE/YO4QOWysu/HZZ15lhW3v987Li
+         G8pc+LqVrlQJq+tvXHt/JbUCJLMi4Ig0G5HzwhhUB6zwGaDBsHT2gMaLEJQsfpv60q1C
+         xnodbWBEueE6LFuxUAzSzj303iIvS8yPAMuDoZKIwVYVVBIh2q1bklguacbGENKaYFNo
+         KKWanb4oYN0szxUUH0a6p8EuXGisuGyJrNPZhOT/nGfDqSoJh9zAElciS3Y8GqwizU1v
+         6i2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678846682;
+        d=1e100.net; s=20210112; t=1678846683;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=haIuqGIqek9CbbGDRZAxRpLspxYrTLCM+X7zGvj8v0c=;
-        b=cOclpfS20h0ZAAQA4Ueln9kfv9QHm/Gp+V9VQhB15se4CUxWMweH1p0lNYOigT4r1M
-         DKiSai8+O9gWBDlIEygVQbz62X4rNqZVYGNo0IZF62CHcr3lFB0jl+Qm6eFKuPK+Pvug
-         Wmw5S2tDQrWaUUuS0la7t2k//gVsJwo+psh1E/CORqW5rUusWjpHA87pJDZX5TAWNc5C
-         QLEUHLnKELlmdBqje242xtx/cxWrtbIXKmD+1U7ETrpNaUTJFOtOo3+xhnaXV/qnEurN
-         pXMWyblXqjTpfUzV/frr3Pej6rRfM5PIvGa+hhMfFs/+JJw6ECg/1chC5Gx7t1fdyhwO
-         8Nfg==
-X-Gm-Message-State: AO0yUKUxXd4OMx0FYhQ75GS+kVxmjNtOyauk5yw6ODbtMJQWTjvquo6B
-        DdtRSrJUHSgXg9Pt7hyGwyXVj/arqh4VZA==
-X-Google-Smtp-Source: AK7set9o3ReXb02KOU8z9vJgD27yzgyAGVIpy2km8Yp0wsPBs2mSvzdsreBDMsF5mJp+WyndDknP/9+69pP6Hg==
+        bh=bq+O9a1u8eXgxSzc7ecXz3Zf8cdQRV4ap6Xut1hzXhk=;
+        b=UCtiomHaKAu9twHEPNtmi9/Xmhkf9JOsrCtLeQJnXgQ9jIH2Gdk0Js4R5e/mTR3asn
+         oA47uOeZfHu6BgyH//jly5qcgvYz9woLl6TgkLKr16L4S408vWMVfYAU39qcntZL44Je
+         kDfFGy9vmHM1Z687d+Wg0QNF0joJwY3Kn5X4ZN1U1nFDWDW1pb6Btqyehnp7pIYsXtJ8
+         qN0vG1V/ITQx6HIZWvN9vZAfkwQywOPIUnJbp6E0Z2Hao1U0w3AYGWoElAGU+zPaZrpb
+         l7QUv1fJnVXe2c8Fw9mKCiQCw0/ISLxee4xngh/45XHih1Zs6voFLUp0Hz4pEnTWfmJV
+         lyhg==
+X-Gm-Message-State: AO0yUKXq61tpDudR4cdJLuGO2kOXmuceBhcgSLekoDkVyHAkOup7uXI2
+        SXBPs82PeRGZb2es7mIE3c4fcm2YwyiIKg==
+X-Google-Smtp-Source: AK7set+IYIxxhg12Snl0iXDFeh1Y7UbmxuAQGbZWEkenjtcCdlqzvQsREZYkPhj+2e/Tx5RxaozB2lwCG3E5zw==
 X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
- (user=amoorthy job=sendgmr) by 2002:a05:6902:1205:b0:b3e:c715:c313 with SMTP
- id s5-20020a056902120500b00b3ec715c313mr1019906ybu.6.1678846682653; Tue, 14
- Mar 2023 19:18:02 -0700 (PDT)
-Date:   Wed, 15 Mar 2023 02:17:26 +0000
+ (user=amoorthy job=sendgmr) by 2002:a81:af1f:0:b0:536:4ad1:f71 with SMTP id
+ n31-20020a81af1f000000b005364ad10f71mr25820691ywh.9.1678846683690; Tue, 14
+ Mar 2023 19:18:03 -0700 (PDT)
+Date:   Wed, 15 Mar 2023 02:17:27 +0000
 In-Reply-To: <20230315021738.1151386-1-amoorthy@google.com>
 Mime-Version: 1.0
 References: <20230315021738.1151386-1-amoorthy@google.com>
 X-Mailer: git-send-email 2.40.0.rc1.284.g88254d51c5-goog
-Message-ID: <20230315021738.1151386-3-amoorthy@google.com>
-Subject: [WIP Patch v2 02/14] KVM: selftests: Use EPOLL in userfaultfd_util
- reader threads and signal errors via TEST_ASSERT
+Message-ID: <20230315021738.1151386-4-amoorthy@google.com>
+Subject: [WIP Patch v2 03/14] KVM: Allow hva_pfn_fast to resolve read-only faults.
 From:   Anish Moorthy <amoorthy@google.com>
 To:     seanjc@google.com
 Cc:     jthoughton@google.com, kvm@vger.kernel.org,
@@ -60,7 +59,7 @@ Cc:     jthoughton@google.com, kvm@vger.kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,166 +67,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-With multiple reader threads POLLing a single UFFD, the test suffers
-from the thundering herd problem: performance degrades as the number of
-reader threads is increased. Solve this issue [1] by switching the
-the polling mechanism to EPOLL + EPOLLEXCLUSIVE.
+hva_to_pfn_fast currently just fails for read-only faults, which is
+unnecessary. Instead, try pinning the page without passing FOLL_WRITE.
+This allows read-only faults to (potentially) be resolved without
+falling back to slow GUP.
 
-Also, change the error-handling convention of uffd_handler_thread_fn.
-Instead of just printing errors and returning early from the polling
-loop, check for them via TEST_ASSERT. "return NULL" is reserved for a
-successful exit from uffd_handler_thread_fn, ie one triggered by a
-write to the exit pipe.
-
-Performance samples generated by the command in [2] are given below.
-
-Num Reader Threads, Paging Rate (POLL), Paging Rate (EPOLL)
-1      249k      185k
-2      201k      235k
-4      186k      155k
-16     150k      217k
-32     89k       198k
-
-[1] Single-vCPU performance does suffer somewhat.
-[2] ./demand_paging_test -u MINOR -s shmem -v 4 -o -r <num readers>
-
+Suggested-by: James Houghton <jthoughton@google.com>
 Signed-off-by: Anish Moorthy <amoorthy@google.com>
-Acked-by: James Houghton <jthoughton@google.com>
 ---
- .../selftests/kvm/demand_paging_test.c        |  1 -
- .../selftests/kvm/lib/userfaultfd_util.c      | 76 +++++++++----------
- 2 files changed, 37 insertions(+), 40 deletions(-)
+ virt/kvm/kvm_main.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
-index fc9c6ac76660c..f8c1831614a9d 100644
---- a/tools/testing/selftests/kvm/demand_paging_test.c
-+++ b/tools/testing/selftests/kvm/demand_paging_test.c
-@@ -13,7 +13,6 @@
- #include <stdio.h>
- #include <stdlib.h>
- #include <time.h>
--#include <poll.h>
- #include <pthread.h>
- #include <linux/userfaultfd.h>
- #include <sys/syscall.h>
-diff --git a/tools/testing/selftests/kvm/lib/userfaultfd_util.c b/tools/testing/selftests/kvm/lib/userfaultfd_util.c
-index 2723ee1e3e1b2..863840d340105 100644
---- a/tools/testing/selftests/kvm/lib/userfaultfd_util.c
-+++ b/tools/testing/selftests/kvm/lib/userfaultfd_util.c
-@@ -16,6 +16,7 @@
- #include <poll.h>
- #include <pthread.h>
- #include <linux/userfaultfd.h>
-+#include <sys/epoll.h>
- #include <sys/syscall.h>
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index d255964ec331e..e38ddda05b261 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2479,7 +2479,7 @@ static inline int check_user_page_hwpoison(unsigned long addr)
+ }
  
- #include "kvm_util.h"
-@@ -32,60 +33,56 @@ static void *uffd_handler_thread_fn(void *arg)
- 	int64_t pages = 0;
- 	struct timespec start;
- 	struct timespec ts_diff;
-+	int epollfd;
-+	struct epoll_event evt;
-+
-+	epollfd = epoll_create(1);
-+	TEST_ASSERT(epollfd >= 0, "Failed to create epollfd.");
-+
-+	evt.events = EPOLLIN | EPOLLEXCLUSIVE;
-+	evt.data.u32 = 0;
-+	TEST_ASSERT(epoll_ctl(epollfd, EPOLL_CTL_ADD, uffd, &evt) == 0,
-+				"Failed to add uffd to epollfd");
-+
-+	evt.events = EPOLLIN;
-+	evt.data.u32 = 1;
-+	TEST_ASSERT(epoll_ctl(epollfd, EPOLL_CTL_ADD, reader_args->pipe, &evt) == 0,
-+				"Failed to add pipe to epollfd");
- 
- 	clock_gettime(CLOCK_MONOTONIC, &start);
- 	while (1) {
- 		struct uffd_msg msg;
--		struct pollfd pollfd[2];
--		char tmp_chr;
- 		int r;
- 
--		pollfd[0].fd = uffd;
--		pollfd[0].events = POLLIN;
--		pollfd[1].fd = reader_args->pipe;
--		pollfd[1].events = POLLIN;
+ /*
+- * The fast path to get the writable pfn which will be stored in @pfn,
++ * The fast path to get the pfn which will be stored in @pfn,
+  * true indicates success, otherwise false is returned.  It's also the
+  * only part that runs if we can in atomic context.
+  */
+@@ -2487,16 +2487,14 @@ static bool hva_to_pfn_fast(unsigned long addr, bool write_fault,
+ 			    bool *writable, kvm_pfn_t *pfn)
+ {
+ 	struct page *page[1];
 -
--		r = poll(pollfd, 2, -1);
--		switch (r) {
--		case -1:
--			pr_info("poll err");
--			continue;
--		case 0:
--			continue;
--		case 1:
--			break;
--		default:
--			pr_info("Polling uffd returned %d", r);
--			return NULL;
--		}
-+		r = epoll_wait(epollfd, &evt, 1, -1);
-+		TEST_ASSERT(
-+			r == 1,
-+			"Unexpected number of events (%d) returned by epoll, errno = %d",
-+			r, errno);
+ 	/*
+ 	 * Fast pin a writable pfn only if it is a write fault request
+ 	 * or the caller allows to map a writable pfn for a read fault
+ 	 * request.
+ 	 */
+-	if (!(write_fault || writable))
+-		return false;
++	unsigned int gup_flags = (write_fault || writable) ? FOLL_WRITE : 0;
  
--		if (pollfd[0].revents & POLLERR) {
--			pr_info("uffd revents has POLLERR");
--			return NULL;
--		}
-+		if (evt.data.u32 == 1) {
-+			char tmp_chr;
+-	if (get_user_page_fast_only(addr, FOLL_WRITE, page)) {
++	if (get_user_page_fast_only(addr, gup_flags, page)) {
+ 		*pfn = page_to_pfn(page[0]);
  
--		if (pollfd[1].revents & POLLIN) {
--			r = read(pollfd[1].fd, &tmp_chr, 1);
-+			TEST_ASSERT(!(evt.events & (EPOLLERR | EPOLLHUP)),
-+						"Reader thread received EPOLLERR or EPOLLHUP on pipe.");
-+			r = read(reader_args->pipe, &tmp_chr, 1);
- 			TEST_ASSERT(r == 1,
--				    "Error reading pipefd in UFFD thread\n");
-+						"Error reading pipefd in uffd reader thread");
- 			return NULL;
- 		}
- 
--		if (!(pollfd[0].revents & POLLIN))
--			continue;
-+		TEST_ASSERT(!(evt.events & (EPOLLERR | EPOLLHUP)),
-+					"Reader thread received EPOLLERR or EPOLLHUP on uffd.");
- 
- 		r = read(uffd, &msg, sizeof(msg));
- 		if (r == -1) {
--			if (errno == EAGAIN)
--				continue;
--			pr_info("Read of uffd got errno %d\n", errno);
--			return NULL;
-+			TEST_ASSERT(errno == EAGAIN,
-+						"Error reading from UFFD: errno = %d", errno);
-+			continue;
- 		}
- 
--		if (r != sizeof(msg)) {
--			pr_info("Read on uffd returned unexpected size: %d bytes", r);
--			return NULL;
--		}
-+		TEST_ASSERT(r == sizeof(msg),
-+					"Read on uffd returned unexpected number of bytes (%d)", r);
- 
- 		if (!(msg.event & UFFD_EVENT_PAGEFAULT))
- 			continue;
-@@ -93,8 +90,9 @@ static void *uffd_handler_thread_fn(void *arg)
- 		if (reader_args->delay)
- 			usleep(reader_args->delay);
- 		r = reader_args->handler(reader_args->uffd_mode, uffd, &msg);
--		if (r < 0)
--			return NULL;
-+		TEST_ASSERT(
-+			r >= 0,
-+			"Reader thread handler function returned negative value %d", r);
- 		pages++;
- 	}
- 
+ 		if (writable)
 -- 
 2.40.0.rc1.284.g88254d51c5-goog
 
