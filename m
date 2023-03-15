@@ -2,70 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BCF3D6BBE63
-	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 22:02:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B3E346BBEA3
+	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 22:12:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231725AbjCOVCn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 17:02:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60172 "EHLO
+        id S231482AbjCOVMt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 17:12:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232409AbjCOVCi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 17:02:38 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55E40A21A8
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 14:02:05 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id p9-20020a17090a930900b00237a7f862dfso1517888pjo.2
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 14:02:05 -0700 (PDT)
+        with ESMTP id S230283AbjCOVMr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 17:12:47 -0400
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B7E179B00;
+        Wed, 15 Mar 2023 14:12:08 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id r19-20020a05600c459300b003eb3e2a5e7bso2174627wmo.0;
+        Wed, 15 Mar 2023 14:12:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678914060;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UoDvobVQiPMq5acwjCe9688yztYKCiKKo2a8h2clq3Y=;
-        b=ABsYD8ivxczrfhW46NqRAYHlkYUpTpC/r4227tqpcgEUGcqmOIJjmJkUXsyslLEZp3
-         h6A5RbNktFzEqVzHBEIkMJCft6k2dqY8WR6mjI6m0voJrU/B3sWSQ+PlVuOXTLPytZ+m
-         02xaQdGzHShm7xD1s3vveeUjSypDW+kpfzfx2tyf8OGH8SA+A2Wo+otnTl3myqa0/Hgg
-         gcnUHxdx1vv/Ldm8vzJ7o+lOMOKa3WDhSFkx1Pq5cm9TieHZO7rIyzZYnAnsAhLKCIKq
-         HByZO7+N7kUN+s1qfw5LCtY8jUR5kpsWzVT21LE24/wuBV5ZHgSnFHLUJBSZbhZ4bXkf
-         ICDg==
+        d=gmail.com; s=20210112; t=1678914726;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2i5cac6o/xZLVm7XeUiTqPlva/u9/ef/H/9FhTqfK9o=;
+        b=cLentCqPxmTvmDUyZbKwCngMuk2qvFHZ5bu/Uf4wRCziSGcYgEOsZer1drCGIZQfP3
+         Sx0Eh/i2KujfDHDKnCv3EgSJBjeR0ic1ZXdMgDein9U99QyjwxZqVhAopzkNXnr7t7N5
+         6L3CE5aR/weZujaZ6Ortiob4ecXB0WEuTH+1G74yn681MrEKCSZkS1H8Vrii+RJKXSvl
+         1Vdkzgb6WvuSJiEjgzKJcmjmd/l8h0KsB1FDRccYVPYIgSNaK1PCbmxZKDXH+lSbg+Fa
+         0/ZAhgPxxrQH+vvFCsrHJb6PysFHWH77dVoIQxE4uud9b1GfLehs2bjtqs25Bi6iHhpb
+         FjiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678914060;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UoDvobVQiPMq5acwjCe9688yztYKCiKKo2a8h2clq3Y=;
-        b=79r1cYUoPYpFPqtb52O0n19ywbt38TWwAQgjf7kJSQsZLGfAY2TK1lFfF0UIU+TLU+
-         W5l+QYy6rBF36OsqV82MD+oQIx5bC/QWDD/mAqpzojazlEYdGR7s5X40vcAk2QSzeSVE
-         0aM3eOrkkOmQ7/waafk13aLsj3dSov5h6WjdR4jTGgscZ88Y8Br1fAPeyoAOOszybNOM
-         Tk+69fbxdGHuWRYCoUvVxRj16Ac4V3WINoy8htIKa45BmQT00ylAaLS/x1m5n0K+ew9D
-         zVeYaEYi3caRkLbIz4N7dhZpAI+dsXAt2GhhIpBXDFp7nslZBhSh5gRti3MKa77gjWWl
-         Zk2g==
-X-Gm-Message-State: AO0yUKUaRXn9B5m3ItT93rqB+y1xPmyBklLPzkitQJe8gTl0jT4le03g
-        YJ1FOvmh62thuidbAR++U3SFLKMUeJs=
-X-Google-Smtp-Source: AK7set9I2d7zMrmbQqwepgi6EVy423MROFM770G/8niG8EsRE4Q4WDIEw2I/e22xzRSKFbKIa6cM2vJUBss=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:d48f:b0:1a0:144b:6489 with SMTP id
- c15-20020a170902d48f00b001a0144b6489mr398143plg.10.1678914059460; Wed, 15 Mar
- 2023 14:00:59 -0700 (PDT)
-Date:   Wed, 15 Mar 2023 14:00:57 -0700
-In-Reply-To: <86ilf3y6u7.wl-maz@kernel.org>
-Mime-Version: 1.0
-References: <20230307034555.39733-1-ricarkol@google.com> <20230307034555.39733-8-ricarkol@google.com>
- <878rg25hbq.wl-maz@kernel.org> <ZA8+31vQA6vcQuK2@google.com> <86ilf3y6u7.wl-maz@kernel.org>
-Message-ID: <ZBIyCQXPVEAkJZES@google.com>
-Subject: Re: [PATCH v6 07/12] KVM: arm64: Export kvm_are_all_memslots_empty()
-From:   Sean Christopherson <seanjc@google.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com,
-        oupton@google.com, yuzenghui@huawei.com, dmatlack@google.com,
-        kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
-        catalin.marinas@arm.com, andrew.jones@linux.dev,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
-        rananta@google.com, bgardon@google.com, ricarkol@gmail.com,
-        Shaoqin Huang <shahuang@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        d=1e100.net; s=20210112; t=1678914726;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2i5cac6o/xZLVm7XeUiTqPlva/u9/ef/H/9FhTqfK9o=;
+        b=tEf1QSFl3YG80A69EEeum4eMDz6GpzH4YEEmdO3IRNTZnak5NY/ZaSncsYDK1SqQ2s
+         ns+nq7W5/IlxP5JqfPH6RYoh5BnihH61RHKaEZLumPa+M/B55dfg5vwaLkXDLk3gZy2T
+         m92jlnv5bBfkTGDbV4GiocfPSjLtybue6m7j2TL7CNhCsGtM+zQqd+h81dWP92xYXF7W
+         UdPdGlXcO6CJWwL98w1UkN57Ptd3PJbfAwi/rXphzMCIiABmjd1vLzX6/CqDBaL2xGDR
+         67jZ/mS/c41zMuFMz5m4zq68Z7ZrgJ+lytbqZuZiW6YeLbLSnM0b2McYZQieeSLD3721
+         WaPg==
+X-Gm-Message-State: AO0yUKVRhdK9ymgEPJ2p6cNIfPg41QT50v6pznp8/mwLrfzhww3Gbrjg
+        I42yBJKTekYCUlAOlJoNJQY=
+X-Google-Smtp-Source: AK7set+Y8+6ubqTJVxlfpG7xBGOOToD283CtFly+Uxd2XpNq7xBq7IOpqPFQu68D4a3Dsfl+LHJN4A==
+X-Received: by 2002:a05:600c:4693:b0:3dc:4b87:a570 with SMTP id p19-20020a05600c469300b003dc4b87a570mr21412739wmo.35.1678914726460;
+        Wed, 15 Mar 2023 14:12:06 -0700 (PDT)
+Received: from suse.localnet (host-79-35-102-94.retail.telecomitalia.it. [79.35.102.94])
+        by smtp.gmail.com with ESMTPSA id v7-20020a05600c214700b003eaf666cbe0sm2963099wml.27.2023.03.15.14.12.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Mar 2023 14:12:05 -0700 (PDT)
+From:   "Fabio M. De Francesco" <fmdefrancesco@gmail.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>,
+        Jason Wang <jasowang@redhat.com>
+Cc:     virtualization@lists.linux-foundation.org,
+        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
+        eperezma@redhat.com, netdev@vger.kernel.org, stefanha@redhat.com,
+        linux-kernel@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH v2 3/8] vringh: replace kmap_atomic() with kmap_local_page()
+Date:   Wed, 15 Mar 2023 22:12:04 +0100
+Message-ID: <1980067.5pFmK94fv0@suse>
+In-Reply-To: <CACGkMEs6cW7LdpCdWQnX4Pif2gGOu=f3bjNeYQ6MVcdQe=X--Q@mail.gmail.com>
+References: <20230302113421.174582-1-sgarzare@redhat.com>
+ <20230302113421.174582-4-sgarzare@redhat.com>
+ <CACGkMEs6cW7LdpCdWQnX4Pif2gGOu=f3bjNeYQ6MVcdQe=X--Q@mail.gmail.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,54 +77,136 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 14, 2023, Marc Zyngier wrote:
-> On Mon, 13 Mar 2023 15:18:55 +0000,
-> Sean Christopherson <seanjc@google.com> wrote:
-> > 
-> > On Sun, Mar 12, 2023, Marc Zyngier wrote:
-> > > On Tue, 07 Mar 2023 03:45:50 +0000,
-> > > Ricardo Koller <ricarkol@google.com> wrote:
-> > > > No functional change intended.
-> > > 
-> > > I wish people stopped adding this pointless sentence to commit
-> > > messages. All changes have a functional change one way or another,
-> > > unless you are only changing a comment.
-> > 
-> > The implied context is that there is no change in runtime functionality, which
-> > does hold true for many changes.  I personally find the annotation helpful, both
-> > for code review and when doing git archaeology.  If a changelog states that the
-> > author doesn't/didn't intend a functional change, then _any_ change in (runtime)
-> > functionality becomes a red flag, and for me, prompts a closer look regardless of
-> > whether or not I have other concerns with the patch/commit.
-> 
-> And I think it lures the reviewer into a false sense of security. No
-> intended change, must be fine. Except when it is not. More often than
-> not, we end-up with seemingly innocent changes that break things.
-> 
-> It is even worse when things get (for good or bad reasons) backported
-> to -stable or an internal tree of some description. "No functional
-> change" can become something very different in another context. How do
-> you communicate this?
+On marted=C3=AC 14 marzo 2023 04:56:08 CET Jason Wang wrote:
+> On Thu, Mar 2, 2023 at 7:34=E2=80=AFPM Stefano Garzarella <sgarzare@redha=
+t.com>=20
+wrote:
+> > kmap_atomic() is deprecated in favor of kmap_local_page().
+>=20
+> It's better to mention the commit or code that introduces this.
+>=20
+> > With kmap_local_page() the mappings are per thread, CPU local, can take
+> > page-faults, and can be called from any context (including interrupts).
+> > Furthermore, the tasks can be preempted and, when they are scheduled to
+> > run again, the kernel virtual addresses are restored and still valid.
+> >=20
+> > kmap_atomic() is implemented like a kmap_local_page() which also disabl=
+es
+> > page-faults and preemption (the latter only for !PREEMPT_RT kernels,
+> > otherwise it only disables migration).
+> >=20
+> > The code within the mappings/un-mappings in getu16_iotlb() and
+> > putu16_iotlb() don't depend on the above-mentioned side effects of
+> > kmap_atomic(),
+>=20
+> Note we used to use spinlock to protect simulators (at least until
+> patch 7, so we probably need to re-order the patches at least) so I
+> think this is only valid when:
+>=20
+> The vringh IOTLB helpers are not used in atomic context (e.g spinlock,
+> interrupts).
 
-For KVM x86, we opt out of AUTOSEL, so barring errors elsewhere in the process,
-a maintainer needs to review such patches at some point.  And again, for me,
-sending a patch to stable that was intended to be a nop is a flag that the backport
-warrants a closer look, e.g. extra justification for why a patch that's (allegedly)
-a nop needs to be backported to stable kernels.
+I'm probably missing some context but it looks that you are saying that=20
+kmap_local_page() is not suited for any use in atomic context (you are=20
+mentioning spinlocks).
 
-I agree it's imperfect, e.g could lead downstream maintainers astray if they view
-the disclaimer as a statement of truth as opposed to be a statement of intent.
-But IMO the good things that come from being able to know the author's intent far
-outweigh the probability of bad things happening because a reviewer and/or downstream
-consumer put too much weight on the statement.
+The commit message (that I know pretty well since it's the exact copy, word=
+ by=20
+word, of my boiler plate commits) explains that kmap_local_page() is perfec=
+tly=20
+usable in atomic context (including interrupts).
 
-My opinion is certainly influenced by having spent far too much time digging through
-historical KVM x86 commits, where it's all too often unclear if a buggy/flawed
-commit was simply a coding goof, versus the commit doing exactly what the author
-intended and being broken because of bad assumptions, incorrect interpretation of
-a spec, etc.  But even with that bias in mind, I still think explicitly declaring
-an author's intent for these types of changes is overall a net positive.
+I don't know this code, however I am not able to see why these vringh IOTLB=
+=20
+helpers cannot work if used under spinlocks. Can you please elaborate a lit=
+tle=20
+more?
 
-Anywho, I don't mean to step on toes and force my preferences down everyone's
-throats, just wanted to provide my reasoning for including the disclaimer and
-encouraging other KVM x86 contributors to do the same.
+> If yes, should we document this? (Or should we introduce a boolean to
+> say whether an IOTLB variant can be used in an atomic context)?
+
+Again, you'll have no problems from the use of kmap_local_page() and so you=
+=20
+don't need any boolean to tell whether or not the code is running in atomic=
+=20
+context.=20
+
+Please take a look at the Highmem documentation which has been recently=20
+reworked and extended by me: https://docs.kernel.org/mm/highmem.html
+
+Anyway, I have been ATK 12 or 13 hours in a row. So I'm probably missing th=
+e=20
+whole picture.
+
+Thanks,=20
+
+=46abio
+
+> Thanks
+>=20
+> > so that mere replacements of the old API with the new one
+> > is all that is required (i.e., there is no need to explicitly add calls
+> > to pagefault_disable() and/or preempt_disable()).
+> >=20
+> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > ---
+> >=20
+> > Notes:
+> >     v2:
+> >     - added this patch since checkpatch.pl complained about deprecation
+> >    =20
+> >       of kmap_atomic() touched by next patch
+> > =20
+> >  drivers/vhost/vringh.c | 8 ++++----
+> >  1 file changed, 4 insertions(+), 4 deletions(-)
+> >=20
+> > diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+> > index a1e27da54481..0ba3ef809e48 100644
+> > --- a/drivers/vhost/vringh.c
+> > +++ b/drivers/vhost/vringh.c
+> > @@ -1220,10 +1220,10 @@ static inline int getu16_iotlb(const struct vri=
+ngh
+> > *vrh,>=20
+> >         if (ret < 0)
+> >        =20
+> >                 return ret;
+> >=20
+> > -       kaddr =3D kmap_atomic(iov.bv_page);
+> > +       kaddr =3D kmap_local_page(iov.bv_page);
+> >=20
+> >         from =3D kaddr + iov.bv_offset;
+> >         *val =3D vringh16_to_cpu(vrh, READ_ONCE(*(__virtio16 *)from));
+> >=20
+> > -       kunmap_atomic(kaddr);
+> > +       kunmap_local(kaddr);
+> >=20
+> >         return 0;
+> > =20
+> >  }
+> >=20
+> > @@ -1241,10 +1241,10 @@ static inline int putu16_iotlb(const struct vri=
+ngh
+> > *vrh,>=20
+> >         if (ret < 0)
+> >        =20
+> >                 return ret;
+> >=20
+> > -       kaddr =3D kmap_atomic(iov.bv_page);
+> > +       kaddr =3D kmap_local_page(iov.bv_page);
+> >=20
+> >         to =3D kaddr + iov.bv_offset;
+> >         WRITE_ONCE(*(__virtio16 *)to, cpu_to_vringh16(vrh, val));
+> >=20
+> > -       kunmap_atomic(kaddr);
+> > +       kunmap_local(kaddr);
+> >=20
+> >         return 0;
+> > =20
+> >  }
+> >=20
+> > --
+> > 2.39.2
+
+
+
+
