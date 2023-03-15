@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DC02B6BBB61
-	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 18:50:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A6A6A6BBB94
+	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 18:59:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232893AbjCORuG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 13:50:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37024 "EHLO
+        id S232303AbjCOR71 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 13:59:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232475AbjCORtk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 13:49:40 -0400
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B590C64E
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:49:22 -0700 (PDT)
-Received: by mail-wr1-x42b.google.com with SMTP id y14so5405809wrq.4
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:49:22 -0700 (PDT)
+        with ESMTP id S232111AbjCOR7Y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 13:59:24 -0400
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0ECF83586
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:59:22 -0700 (PDT)
+Received: by mail-wr1-x435.google.com with SMTP id m2so5321120wrh.6
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:59:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1678902560;
+        d=linaro.org; s=google; t=1678903160;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=25098w81ZdJk4QE1ACGYU4dK9BpaVvc0WWo+YnpOAf4=;
-        b=QN3whXVxLzdtGE51UGwAD23ywKq58FRXPycm/Vc9nh5PPS1Uo13fp3QYfWIulzq4kv
-         iib1JLnABOibWaoZ1Uav2ko4+0gFvDfbeVazxOdZCsd1BY1SZdIm/hpsbkIf7VqmczgT
-         kWW/jaoHTSRuo4U6NXZ+8t5k+GB5PIW5IJVbVA0GiW0WAoFOSuL+0i4kUsdMsDGqaFsv
-         1E6GxNZYvwuc4CyNdkY99R14kDit97mGGDfVpngCHD1PPhrDrqUCbeqCY8dZGsn2ZigU
-         +n827P4xyDA58e3za28F5JhcV3e5EL0nZD6tfz9PLkySG22kozH/+dJ0ciruSBl5dY18
-         sxtA==
+        bh=1+Gk3L/rczHKMe28JnxrdRGaPdgdS8ubf+6dS/l9u58=;
+        b=hkPzoFNd99iXpoYx6FG+w8nHFEN4RMLQo3Cd/YQCkEhmc5tjF3J+qrGi8dzEDcxIRg
+         xxSJt0lMjuB2FnpMF4IRwlqejNRQ4im4R0KTFu+zydbLqjRV10JGlEP//pmLLZ7+dUdY
+         xBgrA25jFkMRoWb1XEyd2EbRdGppNk55CbTUqPsh+raPcGsFUZ6tGSMX9A7b+uuY1YQj
+         Wuw8OpdLzuVXmEWAysxCQfduSbyt+3dWInpwxtxSxSdIIIoyfHGHHjJ+0SqyJbF3ZTUE
+         Qyhu0ciL78Zc2i8Cgkfo5RwJ15AW9YRTAkkpPIdQ4xHqT94hQhOXa4r4u0BpGw7wTOAe
+         sWUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678902560;
+        d=1e100.net; s=20210112; t=1678903160;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=25098w81ZdJk4QE1ACGYU4dK9BpaVvc0WWo+YnpOAf4=;
-        b=xHM9sxrBjbKOGawuHU9Gb1LQBe9GyPFSQAqQIblr56o0Cpg7JfRxme/Rp5E1U9gT77
-         DYOa+DZW3osqnfcaMOyeqTK9E+OeJmUYAWxoJsA7nLf8LAlW40Gew2h5stVIEeR/Sm/C
-         NC87gDx5/2ngiTOESsq5MT4pjgEV3vHarzK6Jq3locN4nNZUaHu5jkCaIqeCUZ5ziFpS
-         ItNFPM0DVRKoOKDAiAlwPjinOXyPubU17JKJ3X4wBawuSOs14uwjIcHda42sXVeoek43
-         viEKFb2fPVcR3QU1Tb6OmZlklb30Uyx7b1D6D/2DCtCDu40g58m3fCmgkQSVcNfVx0iM
-         /Bqg==
-X-Gm-Message-State: AO0yUKXe7QkwOmBAs8pvIf4kTQTnWjyShW2jSK6KEfWK1MQy6fr1kn3+
-        Mv6gCKDNxzBKPbqeVac/OsGOhA==
-X-Google-Smtp-Source: AK7set+zKLqQw1FieiYvterxdkE8mVIrpMUd2TN7Lke7O9MNzTVTzlt4lti0owlJLuWJs402ZKDmIA==
-X-Received: by 2002:a05:6000:1b86:b0:2c5:594f:121d with SMTP id r6-20020a0560001b8600b002c5594f121dmr2723624wru.12.1678902560646;
-        Wed, 15 Mar 2023 10:49:20 -0700 (PDT)
+        bh=1+Gk3L/rczHKMe28JnxrdRGaPdgdS8ubf+6dS/l9u58=;
+        b=mhfq63MYWJVRIvCj9XEPCSlHSh3ixpUj4LSC/iUOmdLJHXwI8q6m6jFbr4X+IxjgQD
+         9c7gmFmOc0aXS5GVH7EvoNi/d0+UWfFmDvScB0TPOO+x4u6+DUTUv576ABS0rYTQRwYc
+         s+GtXxLNVm44caOJAa6i3zLuGnGlSlbFZQ6YgPiVEv5WFlUaxN/0h3vnEExCisszCQkS
+         HqO/wkFtytDZpFpyvgjTzqapk2yjQjMZJdWIfNzDAOR25Lf/pDtMkdRwd26Po3UD3pmZ
+         fUYCD8ct3A9vCdZu7NDz1M40F6tyee+vHAzXVbLbKY2QmbwF52xk7ubxJMbsmaL+cM5j
+         eqBg==
+X-Gm-Message-State: AO0yUKX/PC8FMSnN1jVHqCfPu/BMLoKQnG4Gidgv62vnvYx6la4vwTHS
+        /+c6t6twwW8oOrtbz7OWPSyu6w==
+X-Google-Smtp-Source: AK7set/zrsufmF8RrZGctv1IvMNdQDZqzbPhQicK04ZcvAUgxke5K+K8UyrmrWcXrGXLhhtv3q8bHw==
+X-Received: by 2002:a5d:4586:0:b0:2cf:e65a:a5fc with SMTP id p6-20020a5d4586000000b002cfe65aa5fcmr2674157wrq.8.1678903160472;
+        Wed, 15 Mar 2023 10:59:20 -0700 (PDT)
 Received: from zen.linaroharston ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id p13-20020a056000018d00b002cea974e759sm4992230wrx.88.2023.03.15.10.49.19
+        by smtp.gmail.com with ESMTPSA id x1-20020a5d60c1000000b002cfe63ded49sm5215148wrt.26.2023.03.15.10.59.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Mar 2023 10:49:19 -0700 (PDT)
+        Wed, 15 Mar 2023 10:59:20 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id 9B5881FFBE;
+        by zen.linaroharston (Postfix) with ESMTP id B70CA1FFD1;
         Wed, 15 Mar 2023 17:43:44 +0000 (GMT)
 From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To:     qemu-devel@nongnu.org
@@ -113,13 +113,10 @@ Cc:     Akihiko Odaki <akihiko.odaki@gmail.com>,
         Sunil Muthuswamy <sunilmut@microsoft.com>,
         Hanna Reitz <hreitz@redhat.com>, Peter Xu <peterx@redhat.com>,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        Steven Lee <steven_lee@aspeedtech.com>,
-        Troy Lee <troy_lee@aspeedtech.com>,
-        Howard Chiu <howard_chiu@aspeedtech.com>,
-        Jamin Lin <jamin_lin@aspeedtech.com>
-Subject: [PATCH v2 26/32] contrib/gitdm: Add ASPEED Technology to the domain map
-Date:   Wed, 15 Mar 2023 17:43:25 +0000
-Message-Id: <20230315174331.2959-27-alex.bennee@linaro.org>
+        Milica Lazarevic <milica.lazarevic@syrmia.com>
+Subject: [PATCH v2 27/32] contrib/gitdm: Add SYRMIA to the domain map
+Date:   Wed, 15 Mar 2023 17:43:26 +0000
+Message-Id: <20230315174331.2959-28-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230315174331.2959-1-alex.bennee@linaro.org>
 References: <20230315174331.2959-1-alex.bennee@linaro.org>
@@ -136,32 +133,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We have a number of contributors from this domain which is a corporate
-endeavour.
+The company website lists QEMU amongst the things they work on so I
+assume these are corporate contributions.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Cc: Steven Lee <steven_lee@aspeedtech.com>
-Cc: Troy Lee <troy_lee@aspeedtech.com>
-Cc: Howard Chiu <howard_chiu@aspeedtech.com>
-Cc: Jamin Lin <jamin_lin@aspeedtech.com>
-Reviewed-by: Troy Lee <troy_lee@aspeedtech.com>
-Message-Id: <20230310180332.2274827-4-alex.bennee@linaro.org>
+Cc: Milica Lazarevic <milica.lazarevic@syrmia.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Message-Id: <20230310180332.2274827-6-alex.bennee@linaro.org>
 ---
  contrib/gitdm/domain-map | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/contrib/gitdm/domain-map b/contrib/gitdm/domain-map
-index 8913a886c9..65e40fe8e1 100644
+index 65e40fe8e1..4a988c5b5f 100644
 --- a/contrib/gitdm/domain-map
 +++ b/contrib/gitdm/domain-map
-@@ -5,6 +5,7 @@
- #
- 
- amd.com         AMD
-+aspeedtech.com  ASPEED Technology Inc.
- baidu.com       Baidu
- bytedance.com   ByteDance
- cmss.chinamobile.com China Mobile
+@@ -39,6 +39,7 @@ siemens.com     Siemens
+ sifive.com      SiFive
+ suse.com        SUSE
+ suse.de         SUSE
++syrmia.com      SYRMIA
+ ventanamicro.com Ventana Micro Systems
+ virtuozzo.com   Virtuozzo
+ vrull.eu        VRULL
 -- 
 2.39.2
 
