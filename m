@@ -2,214 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 12C4E6BBD1B
-	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 20:19:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D81C6BBD1F
+	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 20:22:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232760AbjCOTS7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 15:18:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34490 "EHLO
+        id S232789AbjCOTW0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 15:22:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231126AbjCOTSy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 15:18:54 -0400
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E5FC10D4
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 12:18:47 -0700 (PDT)
+        with ESMTP id S231167AbjCOTWY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 15:22:24 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEA3382ABB
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 12:22:22 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 206-20020a2504d7000000b00b3511d10748so15116991ybe.20
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 12:22:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1678907927; x=1710443927;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-transfer-encoding:mime-version:subject;
-  bh=F9iGP9igsKijaS8B/vjog/6xKaUXwaHq94WMpiPMKzQ=;
-  b=Lc+ju48ulihnFKP1cJNRk9qO3nF8TYBhfLy/HiTBDatP25iIkagoBB3g
-   I1Mz23hevg4ZKuwwawhfcflYrCtTSuCLsOQv8YgETwg5/9ZpLzOJwnrm+
-   mxF+MvAasJoBxLsZMMIbJRfVkqJZPKB7jMu1q3tAi4iMo9MLV43efycXq
-   4=;
-X-IronPort-AV: E=Sophos;i="5.98,262,1673913600"; 
-   d="scan'208";a="193763099"
-Subject: RE: [PATCH v2 28/32] contrib/gitdm: add Amazon to the domain map
-Thread-Topic: [PATCH v2 28/32] contrib/gitdm: add Amazon to the domain map
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-3ef535ca.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2023 19:18:44 +0000
-Received: from EX19D007EUA002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-pdx-2a-m6i4x-3ef535ca.us-west-2.amazon.com (Postfix) with ESMTPS id 39AA4614E0;
-        Wed, 15 Mar 2023 19:18:40 +0000 (UTC)
-Received: from EX19D032EUC004.ant.amazon.com (10.252.61.238) by
- EX19D007EUA002.ant.amazon.com (10.252.50.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.24; Wed, 15 Mar 2023 19:18:39 +0000
-Received: from EX19D032EUC002.ant.amazon.com (10.252.61.185) by
- EX19D032EUC004.ant.amazon.com (10.252.61.238) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.24; Wed, 15 Mar 2023 19:18:38 +0000
-Received: from EX19D032EUC002.ant.amazon.com ([fe80::e696:121c:a227:174]) by
- EX19D032EUC002.ant.amazon.com ([fe80::e696:121c:a227:174%3]) with mapi id
- 15.02.1118.024; Wed, 15 Mar 2023 19:18:38 +0000
-From:   "Durrant, Paul" <pdurrant@amazon.co.uk>
-To:     =?utf-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-CC:     Akihiko Odaki <akihiko.odaki@gmail.com>,
-        =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
-        "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
-        Riku Voipio <riku.voipio@iki.fi>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Thomas Huth <thuth@redhat.com>,
-        "Wainer dos Santos Moschetta" <wainersm@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Hao Wu <wuhaotsh@google.com>, Cleber Rosa <crosa@redhat.com>,
-        "Daniel Henrique Barboza" <danielhb413@gmail.com>,
-        Jan Kiszka <jan.kiszka@web.de>,
-        "Aurelien Jarno" <aurelien@aurel32.net>,
-        "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Alexandre Iooss <erdnaxe@crans.org>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>,
-        "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
-        Juan Quintela <quintela@redhat.com>,
-        =?utf-8?B?Q8OpZHJpYyBMZSBHb2F0ZXI=?= <clg@kaod.org>,
-        Darren Kenny <darren.kenny@oracle.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        "Peter Maydell" <peter.maydell@linaro.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Stafford Horne <shorne@gmail.com>,
-        Weiwei Li <liweiwei@iscas.ac.cn>,
-        Sunil V L <sunilvl@ventanamicro.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Thomas Huth <huth@tuxfamily.org>,
-        Vijai Kumar K <vijai@behindbytes.com>,
-        Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
-        "David Gibson" <david@gibson.dropbear.id.au>,
-        Song Gao <gaosong@loongson.cn>,
-        "Paolo Bonzini" <pbonzini@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "Niek Linnenbank" <nieklinnenbank@gmail.com>,
-        Greg Kurz <groug@kaod.org>,
-        "Laurent Vivier" <laurent@vivier.eu>,
-        Qiuhao Li <Qiuhao.Li@outlook.com>,
-        =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@linaro.org>,
-        "Xiaojuan Yang" <yangxiaojuan@loongson.cn>,
-        Mahmoud Mandour <ma.mandourr@gmail.com>,
-        Alexander Bulekov <alxndr@bu.edu>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>,
-        Strahinja Jankovic <strahinja.p.jankovic@gmail.com>,
-        Bandan Das <bsd@redhat.com>,
-        "Alistair Francis" <Alistair.Francis@wdc.com>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        Tyrone Ting <kfting@nuvoton.com>,
-        Kevin Wolf <kwolf@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Beraldo Leal <bleal@redhat.com>,
-        Beniamino Galvani <b.galvani@gmail.com>,
-        Paul Durrant <paul@xen.org>, Bin Meng <bin.meng@windriver.com>,
-        Sunil Muthuswamy <sunilmut@microsoft.com>,
-        Hanna Reitz <hreitz@redhat.com>, Peter Xu <peterx@redhat.com>,
-        "Graf (AWS), Alexander" <graf@amazon.de>,
-        "Woodhouse, David" <dwmw@amazon.co.uk>
-Thread-Index: AQHZV2apTBBYyxjleEWGMj/FoJnYva78Nptg
-Date:   Wed, 15 Mar 2023 19:18:38 +0000
-Message-ID: <387a4403ee92487d821e6f83301b08a9@amazon.co.uk>
-References: <20230315174331.2959-1-alex.bennee@linaro.org>
- <20230315174331.2959-29-alex.bennee@linaro.org>
-In-Reply-To: <20230315174331.2959-29-alex.bennee@linaro.org>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.106.82.26]
+        d=google.com; s=20210112; t=1678908142;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IjQU/FMea+bquT8yzAW8th5tVg0rB5Baq1V5vXqzqGY=;
+        b=Phpx2ynRY3JKv3qNmSvS84Ce3Yws9EzckL7k1b/oWXMGc5kARSVhY/AKXnpnE3P6KN
+         y3QG0khv+ywkkz9ec7yiMmLcLsL5uuaA6nc0EHMPTjnhzCV9yimOWBfe+rpbQGAgEbWT
+         ltaSJIaQv6of2fDWKyxeMMj/9OoaKTN57ksm4/atKr9NXAClBp3udboLzHmxOSyk/sR4
+         QekMzPnMrlKFVYl4wkrSV3RwZRhVTQ2XfjGRWJkzweb4SEC+P+/3AjmeouRHwR3ByRSs
+         PeTQyHoFGDUYa7LG+ElzA0FnD34ozwJxxnvqZ8/VZpCPTy4b+Fa+70f9gO9EC0Kd9Fw/
+         W5sg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678908142;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=IjQU/FMea+bquT8yzAW8th5tVg0rB5Baq1V5vXqzqGY=;
+        b=h77+WHAOTOlnICH9RmIWqT6OiuF324Z2vhPlDWLQEvIDDABkAVlCTFCq1FFwv/IPG2
+         NWvrgE9dr/Lr1FUQ2yVr96a10sODDO8xQeabTPPi5c8MwQHSpPRFKreR9HO7UrLZQnMz
+         k+z13IKY+zQzmM8cN9Y+33J6uzArN3yxGMRJhyhn0em2saIWrsrLHISVgL41z87LykoC
+         TcgtFAYOe7Y4SByarjoFdQGO4d3ZCspXmfWbYjJ7KV/tOBwWW127uLTHdFEK4DAlawFW
+         NTM3zVEaSEssEo7KBE/U83i+ZfPDvysIAnwPqXQodzBvBcFBrlFQdBgF00BqQdjMnCxB
+         hBNg==
+X-Gm-Message-State: AO0yUKWZpKp7q03WQvUcWvxYjkeQAOHf+3sQR3odeYz4388NXWBy2ByO
+        4zvSENrgXghPpCLqzl5KzEvxe3aZX14=
+X-Google-Smtp-Source: AK7set+yPSQMufcBA3Wod7SHFhqapWTyhQvb2TsJYI7z7tzGCh4CGJEUdQrR39DD0blFSJQnc3Zu7+rGGl8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:8f8c:0:b0:b21:a3b8:45cd with SMTP id
+ u12-20020a258f8c000000b00b21a3b845cdmr16322454ybl.0.1678908142135; Wed, 15
+ Mar 2023 12:22:22 -0700 (PDT)
+Date:   Wed, 15 Mar 2023 12:22:20 -0700
+In-Reply-To: <199f404d-c08e-3895-6ce3-36b21514f487@redhat.com>
+Mime-Version: 1.0
+References: <20230131181820.179033-1-bgardon@google.com> <CABgObfaP7P7fk66-EGF-zPEk0H14u3YkM42FRXrEvU=hwFSYgg@mail.gmail.com>
+ <CABgObfYAStAC5FgJfGUiJ=BBFtN7drD+NGHLFJY5fP3hQzVOBw@mail.gmail.com>
+ <CALzav=c-wtJiz9M6hpPtcoBMFvFP5_2BNYoY66NzF-J+8_W6NA@mail.gmail.com>
+ <CABgObfYm6roWVR0myT5rHUWRe7k09TkXgZ7rYAr019QZ80oQXQ@mail.gmail.com> <199f404d-c08e-3895-6ce3-36b21514f487@redhat.com>
+Message-ID: <ZBIa7NQI4qRP6uON@google.com>
+Subject: Re: [PATCH V5 0/2] selftests: KVM: Add a test for eager page splitting
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Peter Xu <peterx@redhat.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Ricardo Koller <ricarkol@google.com>
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-Spam-Status: No, score=-11.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-        USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBbGV4IEJlbm7DqWUgPGFsZXgu
-YmVubmVlQGxpbmFyby5vcmc+DQo+IFNlbnQ6IDE1IE1hcmNoIDIwMjMgMTc6NDMNCj4gVG86IHFl
-bXUtZGV2ZWxAbm9uZ251Lm9yZw0KPiBDYzogQWtpaGlrbyBPZGFraSA8YWtpaGlrby5vZGFraUBn
-bWFpbC5jb20+OyBNYXJjLUFuZHLDqSBMdXJlYXUNCj4gPG1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0
-LmNvbT47IHFlbXUtcmlzY3ZAbm9uZ251Lm9yZzsgUmlrdSBWb2lwaW8NCj4gPHJpa3Uudm9pcGlv
-QGlraS5maT47IElnb3IgTWFtbWVkb3YgPGltYW1tZWRvQHJlZGhhdC5jb20+OyBYaWFvIEd1YW5n
-cm9uZw0KPiA8eGlhb2d1YW5ncm9uZy5lcmljQGdtYWlsLmNvbT47IFRob21hcyBIdXRoIDx0aHV0
-aEByZWRoYXQuY29tPjsgV2FpbmVyIGRvcw0KPiBTYW50b3MgTW9zY2hldHRhIDx3YWluZXJzbUBy
-ZWRoYXQuY29tPjsgRHIuIERhdmlkIEFsYW4gR2lsYmVydA0KPiA8ZGdpbGJlcnRAcmVkaGF0LmNv
-bT47IEFsZXggV2lsbGlhbXNvbiA8YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb20+OyBIYW8NCj4g
-V3UgPHd1aGFvdHNoQGdvb2dsZS5jb20+OyBDbGViZXIgUm9zYSA8Y3Jvc2FAcmVkaGF0LmNvbT47
-IERhbmllbCBIZW5yaXF1ZQ0KPiBCYXJib3phIDxkYW5pZWxoYjQxM0BnbWFpbC5jb20+OyBKYW4g
-S2lzemthIDxqYW4ua2lzemthQHdlYi5kZT47IEF1cmVsaWVuDQo+IEphcm5vIDxhdXJlbGllbkBh
-dXJlbDMyLm5ldD47IHFlbXUtYXJtQG5vbmdudS5vcmc7IE1hcmNlbG8gVG9zYXR0aQ0KPiA8bXRv
-c2F0dGlAcmVkaGF0LmNvbT47IEVkdWFyZG8gSGFia29zdCA8ZWR1YXJkb0BoYWJrb3N0Lm5ldD47
-IEFsZXhhbmRyZQ0KPiBJb29zcyA8ZXJkbmF4ZUBjcmFucy5vcmc+OyBHZXJkIEhvZmZtYW5uIDxr
-cmF4ZWxAcmVkaGF0LmNvbT47IFBhbG1lcg0KPiBEYWJiZWx0IDxwYWxtZXJAZGFiYmVsdC5jb20+
-OyBJbHlhIExlb3Noa2V2aWNoIDxpaWlAbGludXguaWJtLmNvbT47IHFlbXUtDQo+IHBwY0Bub25n
-bnUub3JnOyBKdWFuIFF1aW50ZWxhIDxxdWludGVsYUByZWRoYXQuY29tPjsgQ8OpZHJpYyBMZSBH
-b2F0ZXINCj4gPGNsZ0BrYW9kLm9yZz47IERhcnJlbiBLZW5ueSA8ZGFycmVuLmtlbm55QG9yYWNs
-ZS5jb20+Ow0KPiBrdm1Admdlci5rZXJuZWwub3JnOyBNYXJjZWwgQXBmZWxiYXVtIDxtYXJjZWwu
-YXBmZWxiYXVtQGdtYWlsLmNvbT47IFBldGVyDQo+IE1heWRlbGwgPHBldGVyLm1heWRlbGxAbGlu
-YXJvLm9yZz47IFJpY2hhcmQgSGVuZGVyc29uDQo+IDxyaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8u
-b3JnPjsgU3RhZmZvcmQgSG9ybmUgPHNob3JuZUBnbWFpbC5jb20+OyBXZWl3ZWkNCj4gTGkgPGxp
-d2Vpd2VpQGlzY2FzLmFjLmNuPjsgU3VuaWwgViBMIDxzdW5pbHZsQHZlbnRhbmFtaWNyby5jb20+
-OyBTdGVmYW4NCj4gSGFqbm9jemkgPHN0ZWZhbmhhQHJlZGhhdC5jb20+OyBUaG9tYXMgSHV0aCA8
-aHV0aEB0dXhmYW1pbHkub3JnPjsgVmlqYWkNCj4gS3VtYXIgSyA8dmlqYWlAYmVoaW5kYnl0ZXMu
-Y29tPjsgTGl1IFpoaXdlaQ0KPiA8emhpd2VpX2xpdUBsaW51eC5hbGliYWJhLmNvbT47IERhdmlk
-IEdpYnNvbg0KPiA8ZGF2aWRAZ2lic29uLmRyb3BiZWFyLmlkLmF1PjsgU29uZyBHYW8gPGdhb3Nv
-bmdAbG9vbmdzb24uY24+OyBQYW9sbw0KPiBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPjsg
-TWljaGFlbCBTLiBUc2lya2luIDxtc3RAcmVkaGF0LmNvbT47IE5pZWsNCj4gTGlubmVuYmFuayA8
-bmlla2xpbm5lbmJhbmtAZ21haWwuY29tPjsgR3JlZyBLdXJ6IDxncm91Z0BrYW9kLm9yZz47IExh
-dXJlbnQNCj4gVml2aWVyIDxsYXVyZW50QHZpdmllci5ldT47IFFpdWhhbyBMaSA8UWl1aGFvLkxp
-QG91dGxvb2suY29tPjsgUGhpbGlwcGUNCj4gTWF0aGlldS1EYXVkw6kgPHBoaWxtZEBsaW5hcm8u
-b3JnPjsgWGlhb2p1YW4gWWFuZw0KPiA8eWFuZ3hpYW9qdWFuQGxvb25nc29uLmNuPjsgTWFobW91
-ZCBNYW5kb3VyIDxtYS5tYW5kb3VyckBnbWFpbC5jb20+Ow0KPiBBbGV4YW5kZXIgQnVsZWtvdiA8
-YWx4bmRyQGJ1LmVkdT47IEppYXh1biBZYW5nIDxqaWF4dW4ueWFuZ0BmbHlnb2F0LmNvbT47DQo+
-IHFlbXUtYmxvY2tAbm9uZ251Lm9yZzsgWWFuYW4gV2FuZyA8d2FuZ3lhbmFuNTVAaHVhd2VpLmNv
-bT47IERhdmlkDQo+IFdvb2Rob3VzZSA8ZHdtdzJAaW5mcmFkZWFkLm9yZz47IHFlbXUtczM5MHhA
-bm9uZ251Lm9yZzsgU3RyYWhpbmphIEphbmtvdmljDQo+IDxzdHJhaGluamEucC5qYW5rb3ZpY0Bn
-bWFpbC5jb20+OyBCYW5kYW4gRGFzIDxic2RAcmVkaGF0LmNvbT47IEFsaXN0YWlyDQo+IEZyYW5j
-aXMgPEFsaXN0YWlyLkZyYW5jaXNAd2RjLmNvbT47IEFsZWtzYW5kYXIgUmlrYWxvDQo+IDxhbGVr
-c2FuZGFyLnJpa2Fsb0BzeXJtaWEuY29tPjsgVHlyb25lIFRpbmcgPGtmdGluZ0BudXZvdG9uLmNv
-bT47IEtldmluDQo+IFdvbGYgPGt3b2xmQHJlZGhhdC5jb20+OyBEYXZpZCBIaWxkZW5icmFuZCA8
-ZGF2aWRAcmVkaGF0LmNvbT47IEJlcmFsZG8NCj4gTGVhbCA8YmxlYWxAcmVkaGF0LmNvbT47IEJl
-bmlhbWlubyBHYWx2YW5pIDxiLmdhbHZhbmlAZ21haWwuY29tPjsgUGF1bA0KPiBEdXJyYW50IDxw
-YXVsQHhlbi5vcmc+OyBCaW4gTWVuZyA8YmluLm1lbmdAd2luZHJpdmVyLmNvbT47IFN1bmlsDQo+
-IE11dGh1c3dhbXkgPHN1bmlsbXV0QG1pY3Jvc29mdC5jb20+OyBIYW5uYSBSZWl0eiA8aHJlaXR6
-QHJlZGhhdC5jb20+Ow0KPiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+OyBBbGV4IEJlbm7D
-qWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+OyBHcmFmDQo+IChBV1MpLCBBbGV4YW5kZXIgPGdy
-YWZAYW1hem9uLmRlPjsgRHVycmFudCwgUGF1bCA8cGR1cnJhbnRAYW1hem9uLmNvLnVrPjsNCj4g
-V29vZGhvdXNlLCBEYXZpZCA8ZHdtd0BhbWF6b24uY28udWs+DQo+IFN1YmplY3Q6IFtFWFRFUk5B
-TF0gW1BBVENIIHYyIDI4LzMyXSBjb250cmliL2dpdGRtOiBhZGQgQW1hem9uIHRvIHRoZQ0KPiBk
-b21haW4gbWFwDQo+IA0KPiBDQVVUSU9OOiBUaGlzIGVtYWlsIG9yaWdpbmF0ZWQgZnJvbSBvdXRz
-aWRlIG9mIHRoZSBvcmdhbml6YXRpb24uIERvIG5vdA0KPiBjbGljayBsaW5rcyBvciBvcGVuIGF0
-dGFjaG1lbnRzIHVubGVzcyB5b3UgY2FuIGNvbmZpcm0gdGhlIHNlbmRlciBhbmQga25vdw0KPiB0
-aGUgY29udGVudCBpcyBzYWZlLg0KPiANCj4gDQo+IA0KPiBXZSBoYXZlIG11bHRpcGxlIGNvbnRy
-aWJ1dG9ycyBmcm9tIGJvdGggLmNvLnVrIGFuZCAuY29tIHZlcnNpb25zIG9mDQo+IHRoZSBhZGRy
-ZXNzLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogQWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5h
-cm8ub3JnPg0KPiBDYzogQWxleGFuZGVyIEdyYWYgPGdyYWZAYW1hem9uLmNvbT4NCj4gQ2M6IFBh
-dWwgRHVycmFudCA8cGR1cnJhbnRAYW1hem9uLmNvbT4NCj4gQ2M6IERhdmlkIFdvb29kaG91c2Ug
-PGR3bXdAYW1hem9uLmNvLnVrPg0KPiBSZXZpZXdlZC1ieTogUGhpbGlwcGUgTWF0aGlldS1EYXVk
-w6kgPHBoaWxtZEBsaW5hcm8ub3JnPg0KPiBNZXNzYWdlLUlkOiA8MjAyMzAzMTAxODAzMzIuMjI3
-NDgyNy03LWFsZXguYmVubmVlQGxpbmFyby5vcmc+DQo+IC0tLQ0KPiAgY29udHJpYi9naXRkbS9k
-b21haW4tbWFwIHwgMiArKw0KPiAgMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKQ0KPiAN
-Cj4gZGlmZiAtLWdpdCBhL2NvbnRyaWIvZ2l0ZG0vZG9tYWluLW1hcCBiL2NvbnRyaWIvZ2l0ZG0v
-ZG9tYWluLW1hcA0KPiBpbmRleCA0YTk4OGM1YjVmLi44ZGNlMjc2YTFjIDEwMDY0NA0KPiAtLS0g
-YS9jb250cmliL2dpdGRtL2RvbWFpbi1tYXANCj4gKysrIGIvY29udHJpYi9naXRkbS9kb21haW4t
-bWFwDQo+IEBAIC00LDYgKzQsOCBAQA0KPiAgIyBUaGlzIG1hcHMgZW1haWwgZG9tYWlucyB0byBu
-aWNlIGVhc3kgdG8gcmVhZCBjb21wYW55IG5hbWVzDQo+ICAjDQo+IA0KPiArYW1hem9uLmNvbSAg
-ICAgIEFtYXpvbg0KPiArYW1hem9uLmNvLnVrICAgIEFtYXpvbg0KDQpZb3UgbWlnaHQgd2FudCAn
-YW1hem9uLmRlJyB0b28gYnV0IGFzIGZhciBhcyBpdCBnb2VzLi4uDQoNClJldmlld2VkLWJ5OiBQ
-YXVsIER1cnJhbnQgPHBkdXJyYW50QGFtYXpvbi5jb20+DQoNCj4gIGFtZC5jb20gICAgICAgICBB
-TUQNCj4gIGFzcGVlZHRlY2guY29tICBBU1BFRUQgVGVjaG5vbG9neSBJbmMuDQo+ICBiYWlkdS5j
-b20gICAgICAgQmFpZHUNCj4gLS0NCj4gMi4zOS4yDQoNCg==
+On Wed, Mar 15, 2023, Paolo Bonzini wrote:
+> On 3/15/23 13:24, Paolo Bonzini wrote:
+> > On Tue, Mar 14, 2023 at 5:00=E2=80=AFPM David Matlack <dmatlack@google.=
+com> wrote:
+> > > I wonder if pages are getting swapped, especially if running on a
+> > > workstation. If so, mlock()ing all guest memory VMAs might be
+> > > necessary to be able to assert exact page counts.
+> >=20
+> > I don't think so, it's 100% reproducible and the machine is idle and
+> > only accessed via network. Also has 64 GB of RAM. :)
+>=20
+> It also reproduces on Intel with pml=3D0 and eptad=3D0; the reason is due
+> to the different semantics of dirty bits for page-table pages on AMD
+> and Intel.  Both AMD and eptad=3D0 Intel treat those as writes, therefore
+> more pages are dropped before the repopulation phase when dirty logging
+> is disabled.
+>=20
+> The "missing" page had been included in the population phase because it
+> hosts the page tables for vcpu_args, but repopulation does not need it.
+>=20
+> This fixes it:
+>=20
+> -------------------- 8< ---------------
+> From: Paolo Bonzini <pbonzini@redhat.com>
+> Subject: [PATCH] selftests: KVM: perform the same memory accesses on ever=
+y memstress iteration
+>=20
+> Perform the same memory accesses including the initialization steps
+> that read from args and vcpu_args.  This ensures that the state of
+> KVM's page tables is the same after every iteration, including the
+> pages that host the guest page tables for args and vcpu_args.
+>=20
+> This fixes a failure of dirty_log_page_splitting_test on AMD machines,
+> as well as on Intel if PML and EPT A/D bits are both disabled.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>=20
+> diff --git a/tools/testing/selftests/kvm/lib/memstress.c b/tools/testing/=
+selftests/kvm/lib/memstress.c
+> index 3632956c6bcf..8a429f4c86db 100644
+> --- a/tools/testing/selftests/kvm/lib/memstress.c
+> +++ b/tools/testing/selftests/kvm/lib/memstress.c
+> @@ -56,15 +56,15 @@ void memstress_guest_code(uint32_t vcpu_idx)
+>  	uint64_t page;
+>  	int i;
+> -	rand_state =3D new_guest_random_state(args->random_seed + vcpu_idx);
+> +	while (true) {
+> +		rand_state =3D new_guest_random_state(args->random_seed + vcpu_idx);
+
+Doesn't this partially defeat the randomization that some tests like want? =
+ E.g.
+a test that wants to heavily randomize state will get the same pRNG for eve=
+ry
+iteration.  Seems like we should have a knob to control whether or not each
+iteration needs to be identical.
