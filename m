@@ -2,89 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 326BE6BB8BC
-	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 16:57:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF95E6BB98F
+	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 17:21:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232433AbjCOP4q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 11:56:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52252 "EHLO
+        id S231201AbjCOQVk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 12:21:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232607AbjCOP43 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 11:56:29 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E353B7BA2A;
-        Wed, 15 Mar 2023 08:55:45 -0700 (PDT)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32FELPT8014830;
-        Wed, 15 Mar 2023 15:54:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=4EOlfCmNGvIxiL0ryJUgTnF6FtNfHtl9rkTbZX3ocrk=;
- b=i9bf3inrEekYx1ZFC8hREtUe6IQMeYDC3V7JVw3dmLMjbYKPkc+zZm/rQzvZmXMxvtab
- gU2bcpqM1T8b/o+J9UJvlHv4Y5Bs9sU0lelTqfQ3zTvZKNN8WcAw0U2tFHA+J6BwIjmC
- fD/BhBPbqIdq2hrEvc4cOh+zDugLN66LEEuuvyXI8i40G+o+Ibk+ndRlNWSqhvETQZEs
- qqQDePNu4pEP4Rv+qItykgAsGlcoiPMwO7jIxrBrlnMm3X3JjK7qsGWEflr7qbe/fucb
- 4EneDaDmxDfbTfqyxoyN+OVi0csqYmAbLbj6iSTzXo+prmY7rJnzxj0K/zm+FbuozCp/ eg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pbfq8tuhr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Mar 2023 15:54:54 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32FELaUT015292;
-        Wed, 15 Mar 2023 15:54:53 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pbfq8tugp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Mar 2023 15:54:53 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32F3UQsG008910;
-        Wed, 15 Mar 2023 15:54:51 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-        by ppma04fra.de.ibm.com (PPS) with ESMTPS id 3pb29t0ths-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Mar 2023 15:54:51 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32FFsljJ27525844
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 15 Mar 2023 15:54:47 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C61B320049;
-        Wed, 15 Mar 2023 15:54:47 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 905A020040;
-        Wed, 15 Mar 2023 15:54:47 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 15 Mar 2023 15:54:47 +0000 (GMT)
-From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v3 3/3] s390x/spec_ex: Add test of EXECUTE with odd target address
-Date:   Wed, 15 Mar 2023 16:54:44 +0100
-Message-Id: <20230315155445.1688249-4-nsg@linux.ibm.com>
-X-Mailer: git-send-email 2.37.2
-In-Reply-To: <20230315155445.1688249-1-nsg@linux.ibm.com>
-References: <20230315155445.1688249-1-nsg@linux.ibm.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: nVjc1-KDtWl0zH0ZudaGJeZp37RMxnC9
-X-Proofpoint-GUID: CBJYvU-QXxwqLYo8FkICS8bcZuvDADYP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-15_08,2023-03-15_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
- adultscore=0 clxscore=1015 impostorscore=0 suspectscore=0 mlxlogscore=999
- mlxscore=0 bulkscore=0 lowpriorityscore=0 priorityscore=1501
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2302240000 definitions=main-2303150131
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        with ESMTP id S229751AbjCOQVi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 12:21:38 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 861FA423D
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 09:21:36 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id z4-20020a63e104000000b005033bc79287so4712942pgh.22
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 09:21:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1678897296;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JKTk6fHXe0DcBHYZ7abQpFccg4odhIWL73B59FNN1Xk=;
+        b=JIJTtqfS3TMGnsbFa8g96atWXLD9Hi639HJF8P22QUC+Vb51Lk9yNCn5QWlUY59BCc
+         eptR4lQ3acknGb4WF8ZXNG89vGlBbvoMQqwd4R1MrcO5psAhmtkSb7k4gnVzvgudFdTw
+         avYKauJrNh6tEZckc8zEeWTVtIy4somJPyM0y/bW71369Y2Dua/19SsouijpZn+b4kCl
+         a6qBe1NKaQljePkV/vaMJuAMUt72wGV0sPX9AavXH6ip5x9HhVeK72lING95SHW3UOvC
+         2C4gFKhFmy95spZV+N9HSrT1LGnLu6EO5NNtqJ9hYJYUO3Wu5+0pRtSlgJOXOldW5Jb6
+         dK6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678897296;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JKTk6fHXe0DcBHYZ7abQpFccg4odhIWL73B59FNN1Xk=;
+        b=n0sYzINiyiS1YeoO8gS5Stii2UdyfnsOFd1G71dQxEXIs6E5hxLcHV/VzGvpPbj1Rr
+         D2USm5dvcbTfza2WGbhZWp+il0QkYyhj39iBJiKtW5/LevyVpbWIiKoB1x0M0fZKzDu6
+         apx5EVCmcp9xOEIloVCmebZK6PI1KDJz0W49+ct/pvGHDsB6pjCuOcTTw06QMdk11pXg
+         aBZiQSMBbjC3EFOQyueg7QEm5q3bSnLybzzlfR3gzoQO2MZc/8znx+pxqx+oLiVout7/
+         48M95I7oil/khTgbodt3IxQXluoya+0lS0o/a1SbkRQzB19YHRZl+yF2B0E+l/eBq+eW
+         YRUg==
+X-Gm-Message-State: AO0yUKU7nxcje9S9dN9Gp8H/qa2tHuG20oRff+4HaYdGuEQVQI6i0Obi
+        UNS02XxBuYSJTHU3cWMykpYNaThKbes=
+X-Google-Smtp-Source: AK7set8gPm4g/NvRUZwmci48nYogYWiDAtlDOVIipuNXOmnGWoPg5uKaBoV4za1AXTOtQ2HQrJ0TchlLCME=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:2344:b0:1a0:561c:7276 with SMTP id
+ c4-20020a170903234400b001a0561c7276mr84640plh.1.1678897295968; Wed, 15 Mar
+ 2023 09:21:35 -0700 (PDT)
+Date:   Wed, 15 Mar 2023 09:21:34 -0700
+In-Reply-To: <ZBGRJaV3tDTVyE/q@yzhao56-desk.sh.intel.com>
+Mime-Version: 1.0
+References: <20230311002258.852397-1-seanjc@google.com> <20230311002258.852397-21-seanjc@google.com>
+ <ZBGRJaV3tDTVyE/q@yzhao56-desk.sh.intel.com>
+Message-ID: <ZBHwjm2heYeE40xl@google.com>
+Subject: Re: [PATCH v2 20/27] KVM: x86/mmu: Use page-track notifiers iff there
+ are external users
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>, kvm@vger.kernel.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+        Ben Gardon <bgardon@google.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -92,59 +72,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The EXECUTE instruction executes the instruction at the given target
-address. This address must be halfword aligned, otherwise a
-specification exception occurs.
-Add a test for this.
+On Wed, Mar 15, 2023, Yan Zhao wrote:
+> Nit: there is a typo in the commit header: "iff" -> "if"
+> 
+> > -void kvm_page_track_write(struct kvm_vcpu *vcpu, gpa_t gpa, const u8 *new,
+> > -			  int bytes)
+> > +void __kvm_page_track_write(struct kvm *kvm, gpa_t gpa, const u8 *new, int bytes)
+> Line length is 81 characters. A little longer than 80 :)
+> 
+> > +static inline bool kvm_page_track_has_external_user(struct kvm *kvm) { return false; }
+> This line is also too long.
 
-Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
----
- s390x/spec_ex.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+The 80 character limit is a "soft" limit these days, e.g. checkpatch only complains
+if a line is 100+.  In KVM x86, the preferred style is to treat the 80 char limit
+as "firm", for lack of a better word.  E.g. let a line run over if it's just a
+char or two and there's no other wrapping in the declaration, but don't create long
+lines just because checkpatch no longer yells.
 
-diff --git a/s390x/spec_ex.c b/s390x/spec_ex.c
-index 83b8c58e..5fa05dba 100644
---- a/s390x/spec_ex.c
-+++ b/s390x/spec_ex.c
-@@ -177,6 +177,30 @@ static int short_psw_bit_12_is_0(void)
- 	return 0;
- }
- 
-+static int odd_ex_target(void)
-+{
-+	uint64_t pre_target_addr;
-+	int to = 0, from = 0x0dd;
-+
-+	asm volatile ( ".pushsection .text.ex_odd\n"
-+		"	.balign	2\n"
-+		"pre_odd_ex_target:\n"
-+		"	. = . + 1\n"
-+		"	lr	%[to],%[from]\n"
-+		"	.popsection\n"
-+
-+		"	larl	%[pre_target_addr],pre_odd_ex_target\n"
-+		"	ex	0,1(%[pre_target_addr])\n"
-+		: [pre_target_addr] "=&a" (pre_target_addr),
-+		  [to] "+d" (to)
-+		: [from] "d" (from)
-+	);
-+
-+	assert((pre_target_addr + 1) & 1);
-+	report(to != from, "did not perform ex with odd target");
-+	return 0;
-+}
-+
- static int bad_alignment(void)
- {
- 	uint32_t words[5] __attribute__((aligned(16)));
-@@ -218,6 +242,7 @@ static const struct spec_ex_trigger spec_ex_triggers[] = {
- 	{ "psw_bit_12_is_1", &psw_bit_12_is_1, false, &fixup_invalid_psw },
- 	{ "short_psw_bit_12_is_0", &short_psw_bit_12_is_0, false, &fixup_invalid_psw },
- 	{ "psw_odd_address", &psw_odd_address, false, &fixup_invalid_psw },
-+	{ "odd_ex_target", &odd_ex_target, true, NULL },
- 	{ "bad_alignment", &bad_alignment, true, NULL },
- 	{ "not_even", &not_even, true, NULL },
- 	{ NULL, NULL, false, NULL },
--- 
-2.39.1
-
+There's obviously a fair bit of subjectivity, but the guideline has worked well
+so far (hopefully I didn't just jinx us).
