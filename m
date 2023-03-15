@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 64F4F6BA5D3
-	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 05:00:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 995F26BA5E1
+	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 05:07:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229631AbjCOEAx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 00:00:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48162 "EHLO
+        id S230266AbjCOEHC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 00:07:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229488AbjCOEAv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 00:00:51 -0400
-Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 174543402C
-        for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 21:00:48 -0700 (PDT)
-Received: by mail-yb1-xb30.google.com with SMTP id p203so10681535ybb.13
-        for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 21:00:48 -0700 (PDT)
+        with ESMTP id S229624AbjCOEHA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 00:07:00 -0400
+Received: from mail-yw1-x112b.google.com (mail-yw1-x112b.google.com [IPv6:2607:f8b0:4864:20::112b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9434741B48
+        for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 21:06:57 -0700 (PDT)
+Received: by mail-yw1-x112b.google.com with SMTP id 00721157ae682-541a05e4124so157272527b3.1
+        for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 21:06:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1678852847;
+        d=sifive.com; s=google; t=1678853217;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9WrhLd5JpQXyC1TC5SJTwH36/6Kisk6CvI+ttYQeoGw=;
-        b=aNJEfZ9wDlkkKLtCBaMQVsBAtRZxjQ6xiRPe7YfCYJFAY9BMHJtSDFcx0Wl5mt+thO
-         Mna9rA+BruhqE4HZdv/PxiS0AepZkEkzcSaAoOSaOxGYBExMnNg8cC08VzrMnvn7mCa5
-         HJO/7FiE+7t57r/EoEgY57ahklGk61AWCYcAOG/pnHxUlwTsoAZHiiIIFwRt6A33IVIc
-         wCFcEIjTjpx32xfKk4fXxr2Z5HwR2/Cu3ExURQtHGWEIFka4qELu1yGOSHxgrlmaCjm5
-         XmTrWdQb/BtX+P8flotDE1Wn2vpMzDQTcqR4Fbl/WRzC+m5MnMR5fgifAdUwdJJZbToJ
-         E44g==
+        bh=Enn/P/P0Dso5wyT4aOyOrnfmbLXABI8oREO5fJsikhQ=;
+        b=hvN2KLy5T3SiSflrjJRxvuPv6nrBSuZh0KCh1TLM1iOfBtnTVDVpijqPBclk9AqrZC
+         RWU1x3EwowxRny2TX18oNDlOLVjIEptbfT/ZIXkOHxLJW82+qgIweO8QSiUNPI0ZKtmy
+         +MZMBAnW20W/0q3qD0dxafJWZbbnrH8eR2sxWpjBnby3jrLPzC+6lEGBMPF3MdHnFCkq
+         3eoBNeER9FIAEBbZZlDb6ZmC/d4GBa5wG4aGazYyjfdNbkoe+ZHo8YCGNe5uQWvWPHOH
+         BrnEDNdQRfjygRVovr93C9KmlF87Jr9lwYVWp5DPxUEXAvhVEMq9u75mdKSuT2/u5EIv
+         cSHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678852847;
+        d=1e100.net; s=20210112; t=1678853217;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9WrhLd5JpQXyC1TC5SJTwH36/6Kisk6CvI+ttYQeoGw=;
-        b=0XyrVeqcXWx/xWsV400o+W+AS5rD4xgQDVwXFWeKceg+co7ItMv17Siipzpknp7GLG
-         grJsOxjcbjfZbCK15o9QL9g0dBQ55ZdWcOdGpwKVWkEOhHn5tLJHHw9sQ/M8xLXXSL/m
-         9YhSklrTgR1GZTNTPdsqYV/7fct8Q93+ZChpFU2U5aU+5bgKHfIJFFAY4uykFzqKnSgl
-         XM/+5yyw72a+Z2F5BNCtq4NTzV2jNaB7mlU32JOIoe7d0ley3/9pWTuhSzTWkY6QnTXP
-         DXVXf5k/8JX0mEVA62jgFpVm4T03m5Y0Raf2PStk5e2tcKRyzS+b1j4Wx0eUPfqk/tBX
-         /TqQ==
-X-Gm-Message-State: AO0yUKUZuXbYBRP79EY+WQugAy2UwJ+QxtIRb182StUWxlekAijLG7q5
-        Cc9NLkQBE/qohBOaEcgtRjcydsV7+CbeeWKN+jm6tw==
-X-Google-Smtp-Source: AK7set8FN7Fl+EdfStWhaZjOKKUlUjOUuyD6IGOXuU2yOmG7x+jOvErH2Y6sTBDP51O3X1FdharwIQFn38dF6rP1Pw4=
-X-Received: by 2002:a5b:2cc:0:b0:a02:a3a6:78fa with SMTP id
- h12-20020a5b02cc000000b00a02a3a678famr19780355ybp.12.1678852847167; Tue, 14
- Mar 2023 21:00:47 -0700 (PDT)
+        bh=Enn/P/P0Dso5wyT4aOyOrnfmbLXABI8oREO5fJsikhQ=;
+        b=ss2h8tlog8fPJG4A3UrNZI9z+TmIh8zXIC0yD8H4iFgydRaacFisk94bbKsm4Fjphw
+         z0Pq5FvX523v2KsF6e6ENwyA+AVEtsbwT7qj497nggG1H4yKwC2A2JL13FS6dfu9Bnc8
+         uThlztpU5gRfjKUnNksPpgIKwLNsG8QEjE5ynsDA1rStHAaqBL0Y37i/yAq3mNJDFjBo
+         noscy864qz3l6r8o6gBERI7ZJteOWH9sXlHklwCVJdlI2r5Znvc8R5zQwVhQ9A9cN1Ml
+         pXGmzYh4dlJ95+t7X+MGk2iSQogvHVK0USG/IFD/gtZXj0KucC5rZqySEiH6cM17xmlm
+         2cfw==
+X-Gm-Message-State: AO0yUKUUGX2MVIN0sB/dI3/7ktzPtJF3uR4zaRBFDr+Vy5k5Qg7grrR+
+        l/2TYeYiTsj+wND4WcGaQuKOW64ISVxiNblPbHKfbA==
+X-Google-Smtp-Source: AK7set/QwXaVUBibhg3kuLxzvNSAgDNGKXWiCcNO7ggyml88RawJoFRbknRBYj2sneiztp2sYM11S74xbEM9Te/QxWM=
+X-Received: by 2002:a81:ad63:0:b0:52a:9f66:80c6 with SMTP id
+ l35-20020a81ad63000000b0052a9f6680c6mr25994436ywk.9.1678853216765; Tue, 14
+ Mar 2023 21:06:56 -0700 (PDT)
 MIME-Version: 1.0
 References: <20230224170118.16766-1-andy.chiu@sifive.com> <20230224170118.16766-9-andy.chiu@sifive.com>
- <Y/6HmORLbsFWsEbu@spud>
-In-Reply-To: <Y/6HmORLbsFWsEbu@spud>
+ <87r0u74dac.fsf@all.your.base.are.belong.to.us>
+In-Reply-To: <87r0u74dac.fsf@all.your.base.are.belong.to.us>
 From:   Andy Chiu <andy.chiu@sifive.com>
-Date:   Wed, 15 Mar 2023 12:00:00 +0800
-Message-ID: <CABgGipWBGgs-enRr=_HToW4wxTVGeUnJ4imLagdwThFiQ4xG2w@mail.gmail.com>
+Date:   Wed, 15 Mar 2023 12:05:00 +0800
+Message-ID: <CABgGipXQcLvcSqHWoaZZEMW+7cwxEyOYPAEvr5cCtJMPFGva0w@mail.gmail.com>
 Subject: Re: [PATCH -next v14 08/19] riscv: Introduce struct/helpers to
  save/restore per-task Vector state
-To:     Conor Dooley <conor@kernel.org>
+To:     =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
 Cc:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
         anup@brainfault.org, atishp@atishpatra.org,
         kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
@@ -76,92 +76,85 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 1, 2023 at 7:00=E2=80=AFAM Conor Dooley <conor@kernel.org> wrot=
-e:
+On Thu, Mar 2, 2023 at 7:13=E2=80=AFPM Bj=C3=B6rn T=C3=B6pel <bjorn@kernel.=
+org> wrote:
 >
-> On Fri, Feb 24, 2023 at 05:01:07PM +0000, Andy Chiu wrote:
-> > From: Greentime Hu <greentime.hu@sifive.com>
-> >
-> > Add vector state context struct to be added later in thread_struct. And
-> > prepare low-level helper functions to save/restore vector contexts.
-> >
-> > This include Vector Regfile and CSRs holding dynamic configuration stat=
-e
-> > (vstart, vl, vtype, vcsr). The Vec Register width could be implementati=
-on
-> > defined, but same for all processes, so that is saved separately.
-> >
-> > This is not yet wired into final thread_struct - will be done when
-> > __switch_to actually starts doing this in later patches.
-> >
-> > Given the variable (and potentially large) size of regfile, they are
-> > saved in dynamically allocated memory, pointed to by datap pointer in
-> > __riscv_v_ext_state.
-> >
-> > Co-developed-by: Vincent Chen <vincent.chen@sifive.com>
-> > Signed-off-by: Vincent Chen <vincent.chen@sifive.com>
-> > Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
-> > Signed-off-by: Vineet Gupta <vineetg@rivosinc.com>
-> > [vineetg: merged bits from 2 different patches]
-> > Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
-> > [andy.chiu: use inline asm to save/restore context, remove asm vaiant]
-> > ---
-> >  arch/riscv/include/asm/vector.h      | 84 ++++++++++++++++++++++++++++
-> >  arch/riscv/include/uapi/asm/ptrace.h | 17 ++++++
-> >  2 files changed, 101 insertions(+)
-> >
+> Andy Chiu <andy.chiu@sifive.com> writes:
+>
 > > diff --git a/arch/riscv/include/asm/vector.h b/arch/riscv/include/asm/v=
 ector.h
 > > index 692d3ee2d2d3..9c025f2efdc3 100644
 > > --- a/arch/riscv/include/asm/vector.h
 > > +++ b/arch/riscv/include/asm/vector.h
-> > @@ -12,6 +12,9 @@
-> >
-> >  #include <asm/hwcap.h>
-> >  #include <asm/csr.h>
-> > +#include <asm/asm.h>
-> > +
-> > +#define CSR_STR(x) __ASM_STR(x)
->
-> TBH, I'm not really sure what this definition adds.
->
-
-Agree, I'm going to drop this #define and use __ASM_STR directly.
-However, we should not replace the inline asm to csr_read because
-csr_read clobbers memory and we don't.
-
-> >  extern unsigned long riscv_v_vsize;
-> >  void riscv_v_setup_vsize(void);
-> > @@ -21,6 +24,26 @@ static __always_inline bool has_vector(void)
-> >       return riscv_has_extension_likely(RISCV_ISA_EXT_v);
+> > @@ -31,11 +54,72 @@ static __always_inline void riscv_v_disable(void)
+> >       csr_clear(CSR_SSTATUS, SR_VS);
 > >  }
 > >
-> > +static inline void __riscv_v_vstate_clean(struct pt_regs *regs)
+> > +static __always_inline void __vstate_csr_save(struct __riscv_v_ext_sta=
+te *dest)
 > > +{
-> > +     regs->status =3D (regs->status & ~(SR_VS)) | SR_VS_CLEAN;
+> > +     asm volatile (
+> > +             "csrr   %0, " CSR_STR(CSR_VSTART) "\n\t"
+> > +             "csrr   %1, " CSR_STR(CSR_VTYPE) "\n\t"
+> > +             "csrr   %2, " CSR_STR(CSR_VL) "\n\t"
+> > +             "csrr   %3, " CSR_STR(CSR_VCSR) "\n\t"
+> > +             : "=3Dr" (dest->vstart), "=3Dr" (dest->vtype), "=3Dr" (de=
+st->vl),
+> > +               "=3Dr" (dest->vcsr) : :);
 > > +}
 > > +
-> > +static inline void riscv_v_vstate_off(struct pt_regs *regs)
+> > +static __always_inline void __vstate_csr_restore(struct __riscv_v_ext_=
+state *src)
 > > +{
-> > +     regs->status =3D (regs->status & ~SR_VS) | SR_VS_OFF;
->
-> Inconsistent use of brackets here compared to the other items.
-> They're not actually needed anywhere here, are they?
->
-
-Yes, there is no need for brackets at SR_VS because it expands to one
-constant value.
-
-
-
-
+> > +     asm volatile (
+> > +             "vsetvl  x0, %2, %1\n\t"
+> > +             "csrw   " CSR_STR(CSR_VSTART) ", %0\n\t"
+> > +             "csrw   " CSR_STR(CSR_VCSR) ", %3\n\t"
+> > +             : : "r" (src->vstart), "r" (src->vtype), "r" (src->vl),
+> > +                 "r" (src->vcsr) :);
 > > +}
 > > +
-> > +static inline void riscv_v_vstate_on(struct pt_regs *regs)
+> > +static inline void __riscv_v_vstate_save(struct __riscv_v_ext_state *s=
+ave_to, void *datap)
 > > +{
-> > +     regs->status =3D (regs->status & ~(SR_VS)) | SR_VS_INITIAL;
+> > +     riscv_v_enable();
+> > +     __vstate_csr_save(save_to);
+> > +     asm volatile (
+> > +             "vsetvli        t4, x0, e8, m8, ta, ma\n\t"
+> > +             "vse8.v         v0, (%0)\n\t"
+> > +             "add            %0, %0, t4\n\t"
+> > +             "vse8.v         v8, (%0)\n\t"
+> > +             "add            %0, %0, t4\n\t"
+> > +             "vse8.v         v16, (%0)\n\t"
+> > +             "add            %0, %0, t4\n\t"
+> > +             "vse8.v         v24, (%0)\n\t"
+> > +             : : "r" (datap) : "t4", "memory");
+> > +     riscv_v_disable();
 > > +}
+> > +
+> > +static inline void __riscv_v_vstate_restore(struct __riscv_v_ext_state=
+ *restore_from,
+> > +                                 void *datap)
+> > +{
+> > +     riscv_v_enable();
+> > +     asm volatile (
+> > +             "vsetvli        t4, x0, e8, m8, ta, ma\n\t"
+> > +             "vle8.v         v0, (%0)\n\t"
+> > +             "add            %0, %0, t4\n\t"
+> > +             "vle8.v         v8, (%0)\n\t"
+> > +             "add            %0, %0, t4\n\t"
+> > +             "vle8.v         v16, (%0)\n\t"
+> > +             "add            %0, %0, t4\n\t"
+> > +             "vle8.v         v24, (%0)\n\t"
+> > +             : : "r" (datap) : "t4");
 >
-> Other than that, this seems fine? I only really had a quick check of the
-> asm though, so with the brackets thing fixed up:
-> Acked-by: Conor Dooley <conor.dooley@microchip.com>
+> Nit/question: For both enable/disable; Any reason to clobber t4, instead
+> of using a scratch reg?
+>
+
+Yes, it is better to use a scratch register here in order to gain
+benefit from inline asm.
+
+> Bj=C3=B6rn
+
+Andy
