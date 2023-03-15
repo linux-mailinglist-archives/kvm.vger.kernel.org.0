@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 566C46BBB28
-	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 18:44:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 866EF6BBB2B
+	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 18:44:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232314AbjCORoF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 13:44:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54540 "EHLO
+        id S232487AbjCORoL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 13:44:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232364AbjCORny (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 13:43:54 -0400
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71F059270C
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:43:48 -0700 (PDT)
-Received: by mail-wm1-x336.google.com with SMTP id bh21-20020a05600c3d1500b003ed1ff06fb0so1819378wmb.3
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:43:48 -0700 (PDT)
+        with ESMTP id S232469AbjCORn4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 13:43:56 -0400
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1342E6188E
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:43:50 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id l1so18036691wry.12
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:43:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1678902227;
+        d=linaro.org; s=google; t=1678902228;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RIvbfo0IIlc3X5pccePnUec4yCPh7dln0aorBfnrbhQ=;
-        b=QRGJf3yo39nlVeahj8Lp9NaZDSwquXrLTwIb/t4B9gkjzWQDgqBKG8QTo09F8dXsZ7
-         hB1H/PN0GN8IwDvY8VOdymgBj36108d1Jb74hOi4HT9fZOdKBsOxzyB1UPIT47YLy56x
-         /gqBIA2Zwb+Rkoph5ksfCL+dbcU1ZrYmGN1CH6PFmWiNygiPwJvX4hSSyUAQQuTiX7Aj
-         9fXSVtZIu1D5tfuG2QmL5VD4CWddpUjUVCS3wYfGZKpvDKCjXEcRygCr1o8h2HdC6Ipm
-         hTaxNl8n03dxk/hDwgXtbLuE6CGVSuH0x4fKDmu6hxqkZwyGclbL5zj88b6Cmn12gV51
-         skug==
+        bh=T6RLGTHhC06sRuIM9yfET4lS4kZArz0/fxEXCzYoxfU=;
+        b=fAC659xuS6VIrapKxVxZijPxvTJ+M200zdixFycQ4ZQyCE4xdogcjlbnx5ylO7raI3
+         Mioeq5gUp2xatTrlLObKIjRJiIZMkGK40hLku5wD95hLvWh8+yaj28gM9ventjH2lb0Y
+         QboltHkPqa+zUNYNrbYNNeuyKZkfJmNq7i2BJSQIXHFqleW/XJULqIehs8MS8aQwPOxO
+         zq5eWntd2e7g0ldMaXZWNx2PSK2pEMTq+XjR/9yli77fxfdhlFci6n5E/cy7yIVxUJcH
+         DJQvGxC+QJtA3fqGC/CJa+HTivt+S5cx7DlcqQp7mewTUvXI3sNk/LYFVG3A3DRdobXp
+         LhTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678902227;
+        d=1e100.net; s=20210112; t=1678902228;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=RIvbfo0IIlc3X5pccePnUec4yCPh7dln0aorBfnrbhQ=;
-        b=q4qS/AmX8z3Sub46leoAB/3oUf4e7MqlC3ajEMFvJJn0GuBvA2wThRHZ/HpX7zGHLo
-         UdL/BXB14VHV2QGtTbKIGQBaFkprS8sCZ9HybR+yTWwjCnoLaqvpkAj6FULCVdXGNmxD
-         cppOur4DwQjGbtAToFYBOTys4n5Znka1pGfGyGsFEv0IkF0ynGrTPX/9C1Yp0zFlZChF
-         z1C6uO5GLhlpoQLN2Zgb6Imb4y3VxJQzetfshL3dBE+MGi+LcNu6Kf7thhhCmHzEyvgo
-         ds0iEQB9ELqckiGnqCvaoRdN5aWI2gS8NIXJXGsSH+cxTGKI9JDw+1bIK1WFRyDbQ4Zr
-         65Jw==
-X-Gm-Message-State: AO0yUKXKILWsgTUZ2so0UGboA3vxKMKsCBPTzL0lHzJi+SBUi9SiUBA2
-        AYG5EdMlM1XxCbTSKYT4zByCUQ==
-X-Google-Smtp-Source: AK7set9f0XMr7oGynhnye8x2SLeIft+bzBIK2xRCx6/Zyw8zRbB5YYvhQyHi2KbmFiBzIIBjDeP7MA==
-X-Received: by 2002:a05:600c:cc6:b0:3ed:2949:9847 with SMTP id fk6-20020a05600c0cc600b003ed29499847mr8736758wmb.10.1678902226964;
-        Wed, 15 Mar 2023 10:43:46 -0700 (PDT)
+        bh=T6RLGTHhC06sRuIM9yfET4lS4kZArz0/fxEXCzYoxfU=;
+        b=7Z+ucVrXC/nSRhv+Pi1DCSDCq9Y2wihDFjf72Bke8LpMRFVjptYQhWnvQ/1wo4ip5Z
+         feBCVODNt6GX8HIBgcUm5zdzhFCuTBOvo4WIESdxgNJ3vDek9/XuJo7m0hCl++yJ88oJ
+         /gHXccEyX8dU3NdMTItqZ2l1JI8K4ml1SFZSh81nl6g7uGVVhhuzU3pEc6iBQl1vFwJH
+         ot8UPq/5op1nG7Alj+/R0EANOISzxRhIGfSR7+/XqmpL2vtbkchbLTRJr/uvT+TlVrZA
+         qxTyRjExrBxmqe1H/rf/kW5E4genif6of3y8wXtVuIzcSeIz2ueHyGK+i7CByW1BadCW
+         XcLA==
+X-Gm-Message-State: AO0yUKUhgC8JO76RcB8WihsB8Et0/eWQfP3PLNunLTQ2vhQ5r+034KtI
+        l3NKx2AbuqKQTyy1TQgFTflFzw==
+X-Google-Smtp-Source: AK7set/nCJetFyvazGsKb2tomM/gH7sSBDxssaTg4H1Cyj3ggomOEZpQm0BzSLHJoICiFQQSqXit/Q==
+X-Received: by 2002:a5d:50cf:0:b0:2d1:14fa:8048 with SMTP id f15-20020a5d50cf000000b002d114fa8048mr1349774wrt.39.1678902228561;
+        Wed, 15 Mar 2023 10:43:48 -0700 (PDT)
 Received: from zen.linaroharston ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id u25-20020a7bc059000000b003e21f959453sm2460976wmc.32.2023.03.15.10.43.44
+        by smtp.gmail.com with ESMTPSA id e6-20020adffc46000000b002c561805a4csm5253750wrs.45.2023.03.15.10.43.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Mar 2023 10:43:45 -0700 (PDT)
+        Wed, 15 Mar 2023 10:43:47 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id C9E531FFCB;
+        by zen.linaroharston (Postfix) with ESMTP id E53981FFCC;
         Wed, 15 Mar 2023 17:43:43 +0000 (GMT)
 From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To:     qemu-devel@nongnu.org
@@ -114,9 +114,9 @@ Cc:     Akihiko Odaki <akihiko.odaki@gmail.com>,
         Hanna Reitz <hreitz@redhat.com>, Peter Xu <peterx@redhat.com>,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
         =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Subject: [PATCH v2 19/32] iotests: allow test discovery before building
-Date:   Wed, 15 Mar 2023 17:43:18 +0000
-Message-Id: <20230315174331.2959-20-alex.bennee@linaro.org>
+Subject: [PATCH v2 20/32] iotests: strip subdir path when listing tests
+Date:   Wed, 15 Mar 2023 17:43:19 +0000
+Message-Id: <20230315174331.2959-21-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230315174331.2959-1-alex.bennee@linaro.org>
 References: <20230315174331.2959-1-alex.bennee@linaro.org>
@@ -135,68 +135,41 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Daniel P. Berrangé <berrange@redhat.com>
 
-The 'check' script can be invoked in "dry run" mode, in which case it
-merely does test discovery and prints out all their names. Despite only
-doing test discovery it still validates that the various QEMU binaries
-can be found. This makes it impossible todo test discovery prior to
-building QEMU. This is a desirable feature to support, because it will
-let meson discover tests.
+When asking 'check' to list individual tests by invoking it in dry run
+mode, it prints the paths to the tests relative to the base of the
+I/O test directory.
 
-Fortunately the code in the TestEnv constructor is ordered in a way
-that makes this fairly trivial to achieve. We can just short circuit
-the constructor after the basic directory paths have been set.
+When asking 'check' to run an individual test, however, it mandates that
+only the unqualified test name is given, without any path prefix. This
+inconsistency makes it harder to ask for a list of tests and then invoke
+each one.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Thus the test listing code is change to flatten the test names, by
+printing only the base name, which can be directly invoked.
+
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
 Acked-by: Hanna Czenczek <hreitz@redhat.com>
 Tested-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20230303160727.3977246-3-berrange@redhat.com>
+Message-Id: <20230303160727.3977246-4-berrange@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/qemu-iotests/check      | 3 ++-
- tests/qemu-iotests/testenv.py | 7 ++++++-
- 2 files changed, 8 insertions(+), 2 deletions(-)
+ tests/qemu-iotests/check | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-index da7e8a87fe..bb294ef556 100755
+index bb294ef556..f2e9d27dcf 100755
 --- a/tests/qemu-iotests/check
 +++ b/tests/qemu-iotests/check
-@@ -145,7 +145,8 @@ if __name__ == '__main__':
-                   aiomode=args.aiomode, cachemode=args.cachemode,
-                   imgopts=args.imgopts, misalign=args.misalign,
-                   debug=args.debug, valgrind=args.valgrind,
--                  gdb=args.gdb, qprint=args.print)
-+                  gdb=args.gdb, qprint=args.print,
-+                  dry_run=args.dry_run)
+@@ -184,7 +184,7 @@ if __name__ == '__main__':
+         sys.exit(str(e))
  
-     if len(sys.argv) > 1 and sys.argv[-len(args.tests)-1] == '--':
-         if not args.tests:
-diff --git a/tests/qemu-iotests/testenv.py b/tests/qemu-iotests/testenv.py
-index aa9d735414..9a37ad9152 100644
---- a/tests/qemu-iotests/testenv.py
-+++ b/tests/qemu-iotests/testenv.py
-@@ -178,7 +178,8 @@ def __init__(self, source_dir: str, build_dir: str,
-                  debug: bool = False,
-                  valgrind: bool = False,
-                  gdb: bool = False,
--                 qprint: bool = False) -> None:
-+                 qprint: bool = False,
-+                 dry_run: bool = False) -> None:
-         self.imgfmt = imgfmt
-         self.imgproto = imgproto
-         self.aiomode = aiomode
-@@ -218,6 +219,10 @@ def __init__(self, source_dir: str, build_dir: str,
-         self.build_root = os.path.join(self.build_iotests, '..', '..')
- 
-         self.init_directories()
-+
-+        if dry_run:
-+            return
-+
-         self.init_binaries()
- 
-         self.malloc_perturb_ = os.getenv('MALLOC_PERTURB_',
+     if args.dry_run:
+-        print('\n'.join(tests))
++        print('\n'.join([os.path.basename(t) for t in tests]))
+     else:
+         with TestRunner(env, tap=args.tap,
+                         color=args.color) as tr:
 -- 
 2.39.2
 
