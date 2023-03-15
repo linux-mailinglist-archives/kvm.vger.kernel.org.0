@@ -2,294 +2,431 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C9EC06BAEFB
-	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 12:14:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CAC8A6BAF29
+	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 12:24:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232000AbjCOLOG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 07:14:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55604 "EHLO
+        id S231652AbjCOLY0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 07:24:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231976AbjCOLNk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 07:13:40 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CAFC87D87;
-        Wed, 15 Mar 2023 04:11:58 -0700 (PDT)
+        with ESMTP id S231732AbjCOLYH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 07:24:07 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0CAD8A387
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 04:23:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678878718; x=1710414718;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=Lmd27cf0aOTpd3JU2Te1/IOCUs9uarvwjNPa9aL8T9o=;
-  b=io6mcgmaAW39834RWO6owJwtvl8xHjvbhqPhQGYZue2ftPkU3xU6hfeP
-   GVjpP4sz79X9wSiLO3+PrVbih1s1c4rHq9JKgYJxq+iBPamh1koLjPH1O
-   NnfUNXk26/lVDWcOans0V6rTNVir/EcQiurOcsy7/4RZIzyP9mF8Cw8tk
-   IA1PZRO0gppGm+SvMS1wxunLulGnhF1tf4/gXRTs/LhV1IHUlFnuWddKu
-   IH0f+GWWZGVLjsHkK6Cljo7L/jCtCWiR7u74SiaUbx0ET2GagFQBT8Q0V
-   m1iWIkb3BJJhJcLUDtE17zL72uslZBcMUfXZLgVSbZqpvEUe9TfffhZKl
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10649"; a="326032149"
+  t=1678879385; x=1710415385;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=tM6sVShfVwJm8Jiwg1qsltn43HMFVbHqnNZDSAW07rQ=;
+  b=bzH8W0wKkkWRQjXU6+GCnwLCmUOCzBStlZepfRpWhDFmkDrPwpo3uNL/
+   psqoOiauTs+Sa7qyAPGsInNHDI6DhnhwHGk6luzF5bOVcuntLs6T5+cRf
+   5wihcDDtfn0GSBO3zzAFePDocd4zvskxf3E7mO/GUuN2gdiUNvwsuTeuo
+   3n07zLYlRVydpOJo4ArB5zWLnu9uVt3EGZ/XAXvvRZawUcaWdlumrXnIQ
+   WKVwwbWgDqV/Y0RQrvYqfJN1vrjlL4Y7UjhA+u+jb3UmEp5ySShgD18K/
+   TtYbR0AXBT6kydcTZYy5HhEpXYUj5npSvOymwMcnQFHwY7mMsCApyb8mY
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10649"; a="402545464"
 X-IronPort-AV: E=Sophos;i="5.98,262,1673942400"; 
-   d="scan'208";a="326032149"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2023 04:10:15 -0700
+   d="scan'208";a="402545464"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2023 04:21:47 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10649"; a="681803684"
+X-IronPort-AV: E=McAfee;i="6500,9779,10649"; a="709655470"
 X-IronPort-AV: E=Sophos;i="5.98,262,1673942400"; 
-   d="scan'208";a="681803684"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmsmga007.fm.intel.com with ESMTP; 15 Mar 2023 04:10:15 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Wed, 15 Mar 2023 04:10:15 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21 via Frontend Transport; Wed, 15 Mar 2023 04:10:15 -0700
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.176)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.21; Wed, 15 Mar 2023 04:10:15 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aMcBdJ84s6PgWxt1/XyedRIpdf7E/Ll3N4a41yAzGnbvhj12/0+DCmax8PDUHCmjGBUrU1EUHNjbjXPSqGlp5HftMDInrHmkZn0OyIerDc4oaKxBB+2bZM/gd59CtEG6ZuGDS1Yc060SARV5ZMKdVbNdUMBk2Bb9rHlasuc75dWKUwGweR7TM3sLGj5TBCLchw2SboY9Qtu9fXuqs9GaAV76rtucjYZ8zO1R8JlhYA2/MsCZ6LdOc6gjJRF4LRrhX/rDoCFFu36XXi9jdMloir/7FmpEk5zBoZ908ZvjitYL1oOhsGTdiKXBoes5MfC+0f2o2iwvcAhjh1avnfuHhw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Lmd27cf0aOTpd3JU2Te1/IOCUs9uarvwjNPa9aL8T9o=;
- b=mmp0HTjlniFQf3lx8Eub6ariI5mobNnoGVNHG/H6hGfKtZrCE5rPbGEIOWCXXGMtE5rSwMzcbR3GN3pmSLqeYvI7E7neJ4DNzyDAgEm1bWoGX8hSRHd+/rkLKbtjakEcih6GIeU085vsTsXWHC++MNHhLoDiwwTM7gYL5g7YwCad0SosCS3R/Od8x2fGCs9nfJ+mPE5VKdmGyPkTDxweWLIojjtKSZKNEVCq1LNGvkvUnDXw6W1fuEtpWsfJpPR1cSxddPm76pphpDeAZopgESTAqzn0HRSfyIghIZ2GhNr1t0RfCGexEhM76uO7IJW4oKAWqoOWAf0/3PenuVqgKQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by PH0PR11MB7563.namprd11.prod.outlook.com (2603:10b6:510:286::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.20; Wed, 15 Mar
- 2023 11:10:11 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::f403:a0a2:e468:c1e9]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::f403:a0a2:e468:c1e9%5]) with mapi id 15.20.6178.024; Wed, 15 Mar 2023
- 11:10:11 +0000
-From:   "Huang, Kai" <kai.huang@intel.com>
-To:     "Hansen, Dave" <dave.hansen@intel.com>,
-        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "david@redhat.com" <david@redhat.com>,
-        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Chatre, Reinette" <reinette.chatre@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "imammedo@redhat.com" <imammedo@redhat.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "Huang, Ying" <ying.huang@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>
-Subject: Re: [PATCH v10 05/16] x86/virt/tdx: Add skeleton to enable TDX on
- demand
-Thread-Topic: [PATCH v10 05/16] x86/virt/tdx: Add skeleton to enable TDX on
- demand
-Thread-Index: AQHZUDU50M/RwoyayES+lzw7MeI2g67xefUAgAZUzQCAAZ2qAIAAIeiAgADqJACAAUSFAA==
-Date:   Wed, 15 Mar 2023 11:10:11 +0000
-Message-ID: <a02f304ea0e62180e07e2eb63eaf2411b702c672.camel@intel.com>
-References: <cover.1678111292.git.kai.huang@intel.com>
-         <f150316b975b5ca22c6c4016ffd90db79d657bbf.1678111292.git.kai.huang@intel.com>
-         <20230308222738.GA3419702@ls.amr.corp.intel.com>
-         <96b56c5b8a5876aaf6d5ccbb81bab334b10983eb.camel@intel.com>
-         <20230313234916.GC3922605@ls.amr.corp.intel.com>
-         <a62497059fc3f31706a532b822d6c966bd981468.camel@intel.com>
-         <5c4a28c8-f17d-7395-cc63-3cbd9b31befb@intel.com>
-In-Reply-To: <5c4a28c8-f17d-7395-cc63-3cbd9b31befb@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Evolution 3.46.4 (3.46.4-1.fc37) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|PH0PR11MB7563:EE_
-x-ms-office365-filtering-correlation-id: 8172567c-58cc-45b8-7a15-08db2545d85e
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: MU4o7EKaYK8fZ79dBDBd/kUWJaCl8/JbfBsfe8hr7zH0dbkZG0Q7KxQw/4sGOXsAqbaPFFC21bIMomRKHT5O+rxL6tYhaQVfxKDZvfpQZxeip0Car+0Bjc8XPrZJjB4TUsr+EN409Y/wT3KWB2AgU5UsMqU+wWxWAtQxe8aZSunaj7Rb2am5gfqBV45+pCrU14ArEsDy+7E4mFktTRmoVkxLYgY3MsAn7i90w1pDsdCeKvG4Pg8As4nUqstsq6EIOPlP87ac3LEXRPESkvX4sP8F/dKDFJXNqDCKviis3gZ/On1hmf4atgpfhtyV27zcEJjSqp9KpYTpDX5ouxxkrvhHLn74a3FnGV5stpISC/bqtrS0rBclquAyUl8ru+t5OVRZIZy5JdfACucm1NKs8bIv7gc0FLrXLuVqLPGfoUlV44PNsCiSFNd48M+KHT7ksFxameyS2ij6yrYJZxN79bhMArskvnsjFQlBHzd4iZWXMcGpgzjB3aTYahMYv4Kd/xtDgEfZTRdp2tUr65FbuOp+nkFmPXXsOYLVQ3j0NXv29cS8PFsc72eQamWW44ESYEBj+jjGpoVZzk2y91/s6hVobh21uCx7CwfvRgRrjJFKB2CSChDNkcPGsj4I36q8pMaRZ8oaX9owLW0C3K1/YX5N16gouVHqxcUYC5MFEpkN/HrnOk2DjWy4yjEnW5vUBWGatJiEjcjxxmdSljhaNA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(39860400002)(376002)(346002)(366004)(136003)(396003)(451199018)(82960400001)(5660300002)(7416002)(36756003)(86362001)(66476007)(83380400001)(186003)(66946007)(478600001)(6512007)(26005)(6506007)(53546011)(2616005)(6486002)(71200400001)(66556008)(91956017)(316002)(110136005)(76116006)(66446008)(38070700005)(64756008)(41300700001)(54906003)(38100700002)(8676002)(8936002)(4326008)(2906002)(122000001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?UXJFUTdYR2RDVVVCYTY1aVdWNWpJMUtUOEpmNFNDRWt5d1pSTjRNSmJaU25h?=
- =?utf-8?B?V2tCR0lFUllBWmw3dWgzaXFvWk52YXl5S0UwNGJGMGhDV3pFalpqT3RvbStZ?=
- =?utf-8?B?bktPK0RLU2czbDNXYVgwbXFSWHlRVlh3YUo3U3R0NlM0eURrbU5xY0g5YllR?=
- =?utf-8?B?eVFXeHBUOWpDR3QzMk0vSTk0cllib0RnMDFpZTV4cmVPSzdDZDEwL0dZMFZz?=
- =?utf-8?B?aW1KTEdXYjA4YVFGSGQwaWFmN0U2MWN2TzBoQW9XbCtFQWpXV1B5TXVPMmkz?=
- =?utf-8?B?WTdBMHZtNkVidGZZczFVQ1NRUjdNTnZOSEpVaDFBL2tiMjVuczBENnBOQVdB?=
- =?utf-8?B?ZDJrczFCbnJSSzBhbjFHWTJZcnJLOW0yeUVyMGpUZExYTml2NG90N3pLQjJX?=
- =?utf-8?B?NXVZcHhGTWxPaTdwQ0k1SWNleFlCMEtxT2tFTXNGdFNQd2I2TllrQ3JMOUJr?=
- =?utf-8?B?T05aSmgvbUtTaVdUTGpuL1dvUldJZmJhSHdEUVpXYXRQOXlVSjNwWndidStw?=
- =?utf-8?B?VndKZEo2Z0hGRjEyWjFnOURpZDNpa1RRdlUrOUQ0QUNyd0pOdFFsNFVnWllR?=
- =?utf-8?B?OWZPOEV4cURZT1pwTC9CR3BrSmtRaDMwSVVjS1pHbWdlekU1U2FuUXdQNm93?=
- =?utf-8?B?SXdMRVh6Z2s1YmtGNDlQelM1dkJzd3NmZThDcmJtamJrMjRIaGtBSlJHZ0pK?=
- =?utf-8?B?SzlUdWFNdllMZkQ1SjM3cVVVRjdFM21mOTFBelU1ZWdnSDVYZHFVcjhEcCtR?=
- =?utf-8?B?N0cydmxKZitCT25KZ3k2VHNlNGJJNHhKcFA4azZLTlppdUExdWw1RllPZlJS?=
- =?utf-8?B?eHVPaHRQY1phNlFWeWpuSDBTdkhWNmlyd0loWG1EN1h6TEw2MitjS0tVYmJO?=
- =?utf-8?B?QmVsQXVVUFRFOGxDV2hYTVYyQVVUZmZzQ3QwUStQZVdNaWlqbTJFb1E2TlFa?=
- =?utf-8?B?QnRCVGpsTGNOMXRmMkZjclhLK2lnV0Fzc01NUXVFMnloVDBnR3RSUEpWYU9H?=
- =?utf-8?B?dENaTU0rU1daOVBFMkpHL0tpaDJKaTF4NUhFMmJiM0NEZUMyeXd4c0RmSUh1?=
- =?utf-8?B?THo0a2RtZVBlcU82YUdBRXJwdFE2WnB2N3ZVTW5IbzRKQWZsamplamZmMjgy?=
- =?utf-8?B?Rmt5NnR6ajBJSlZiUFY0WTl0c2NnbmxOZTZSS0d5d2N6S0RINGpOdmIrdlVI?=
- =?utf-8?B?UDVCVVpxSWdCVVJQcUg1RHZVRjErNlNwTkZCdEY3RGtINEFpZnhtUUxOY1NZ?=
- =?utf-8?B?SlJ0VlNENUttTGx0SThFN2hxazhINks3Q0lqc1Y5YXBvRjVQR0FPM0xJRnN5?=
- =?utf-8?B?WklzMmhZbnVyM25PWWl6eW5VY3RXaW1ISStuWlhERVRMSDFKa0RHQWR1dlEw?=
- =?utf-8?B?UGpoK1pjWTM4WFlUczdCbytLeCtzU01FcEYvWksyeWtFVVpyTmdCd3B3c1FD?=
- =?utf-8?B?VTVmNDdzeFlsOVoxZjc5TjBZVE01b3pEWGM2bG9XN2pWeFArbG9MTUQ2UVZw?=
- =?utf-8?B?T3dpd1MvdHFCRWlYZWxaYzdXeHZFUFNpQytFckxyT0hFZWQ1SzMvdmUyYnEy?=
- =?utf-8?B?ZjRkZ2hQZmh0cWplKy9sTFlmZ2JFVno3bG92MzMzRnRZUVZmUmUrQnZxc1VZ?=
- =?utf-8?B?YmZmZUNxeVV0b25BbmNmMUo3Sk5LaCtaNnhjbi9EUzNpQWNPWnlielJvQzZz?=
- =?utf-8?B?aVhCK2tUdXJyNFVqNGx3aUNWUzdNcytTaFR2RUwrUDRpYkg1cHVoN3pwaDBo?=
- =?utf-8?B?dGdyOTdva0dkZEQrOTV1bWVLeGhIcFo0eEFwcDZkZjJnN3QwUFVnSVRtRlZm?=
- =?utf-8?B?dWs1WGdRRHhiOVFiL1FkYlBETWxSdm9KV0tIaVU2SmZIK1RyM28xZ0pHTkdn?=
- =?utf-8?B?QWg5SVBGMzlob08wUEFlaFFLY2JnN3ZjVjN3ZUZMZHJpcHE5YVJZZkJVQVBK?=
- =?utf-8?B?Sk8wVEVDZ2NWcUhnQmpGbFc4ZmdWNlM0Zk5tSVVWaGQrZjh6Tnl6N0h5K2pF?=
- =?utf-8?B?SjlrdENIa1FPczRiMWVubVNQNmViN3FrTUl2RTRYM0hQUGJ3WW5xUUtFWjNy?=
- =?utf-8?B?VGNBZ2YvUFowc1llcm5WNDQ0dzc5K0JlSlU2SVB2NE1wNDBNS1pWQjJvcmxO?=
- =?utf-8?B?dnRqVTYxMExmNENXQ2ZnMkxTRUtZdDczSnBJOVR3eGNQZWRTZXlKcGo4c0Jv?=
- =?utf-8?B?dnc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <364173ADEE4EB541851302EE6646845E@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+   d="scan'208";a="709655470"
+Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
+  by orsmga008.jf.intel.com with ESMTP; 15 Mar 2023 04:21:44 -0700
+Received: from kbuild by b613635ddfff with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pcPCS-0007dP-0V;
+        Wed, 15 Mar 2023 11:21:44 +0000
+Date:   Wed, 15 Mar 2023 19:21:39 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+        kvm@vger.kernel.org, Robert Hu <robert.hu@intel.com>,
+        Farrah Chen <farrah.chen@intel.com>,
+        Danmei Wei <danmei.wei@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: [kvm:queue 24/34] arch/x86/kvm/vmx/vmx.c:2328:3: error: expected
+ expression
+Message-ID: <202303151912.oZ6SGd90-lkp@intel.com>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8172567c-58cc-45b8-7a15-08db2545d85e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Mar 2023 11:10:11.5629
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: DF7ax4BeLqJ4hW19IkV1IU1Qxw5Y9gjpEKzy3zBlcTbiNsc862BT//BQnE6BK/ISU3+bWWOBxP+37zeeYoDR/Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB7563
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gVHVlLCAyMDIzLTAzLTE0IGF0IDA4OjQ4IC0wNzAwLCBEYXZlIEhhbnNlbiB3cm90ZToNCj4g
-T24gMy8xMy8yMyAxODo1MCwgSHVhbmcsIEthaSB3cm90ZToNCj4gPiBPbiBNb24sIDIwMjMtMDMt
-MTMgYXQgMTY6NDkgLTA3MDAsIElzYWt1IFlhbWFoYXRhIHdyb3RlOg0KPiA+ID4gT24gU3VuLCBN
-YXIgMTIsIDIwMjMgYXQgMTE6MDg6NDRQTSArMDAwMCwNCj4gPiA+ICJIdWFuZywgS2FpIiA8a2Fp
-Lmh1YW5nQGludGVsLmNvbT4gd3JvdGU6DQo+ID4gPiANCj4gPiA+ID4gT24gV2VkLCAyMDIzLTAz
-LTA4IGF0IDE0OjI3IC0wODAwLCBJc2FrdSBZYW1haGF0YSB3cm90ZToNCj4gPiA+ID4gPiA+ICsN
-Cj4gPiA+ID4gPiA+ICtzdGF0aWMgaW50IHRyeV9pbml0X21vZHVsZV9nbG9iYWwodm9pZCkNCj4g
-PiA+ID4gPiA+ICt7DQo+ID4gPiA+ID4gPiArICAgICAgIGludCByZXQ7DQo+ID4gPiA+ID4gPiAr
-DQo+ID4gPiA+ID4gPiArICAgICAgIC8qDQo+ID4gPiA+ID4gPiArICAgICAgICAqIFRoZSBURFgg
-bW9kdWxlIGdsb2JhbCBpbml0aWFsaXphdGlvbiBvbmx5IG5lZWRzIHRvIGJlIGRvbmUNCj4gPiA+
-ID4gPiA+ICsgICAgICAgICogb25jZSBvbiBhbnkgY3B1Lg0KPiA+ID4gPiA+ID4gKyAgICAgICAg
-Ki8NCj4gPiA+ID4gPiA+ICsgICAgICAgc3Bpbl9sb2NrKCZ0ZHhfZ2xvYmFsX2luaXRfbG9jayk7
-DQo+ID4gPiA+ID4gPiArDQo+ID4gPiA+ID4gPiArICAgICAgIGlmICh0ZHhfZ2xvYmFsX2luaXRf
-c3RhdHVzICYgVERYX0dMT0JBTF9JTklUX0RPTkUpIHsNCj4gPiA+ID4gPiA+ICsgICAgICAgICAg
-ICAgICByZXQgPSB0ZHhfZ2xvYmFsX2luaXRfc3RhdHVzICYgVERYX0dMT0JBTF9JTklUX0ZBSUxF
-RCA/DQo+ID4gPiA+ID4gPiArICAgICAgICAgICAgICAgICAgICAgICAtRUlOVkFMIDogMDsNCj4g
-PiA+ID4gPiA+ICsgICAgICAgICAgICAgICBnb3RvIG91dDsNCj4gPiA+ID4gPiA+ICsgICAgICAg
-fQ0KPiA+ID4gPiA+ID4gKw0KPiA+ID4gPiA+ID4gKyAgICAgICAvKiBBbGwgJzAncyBhcmUganVz
-dCB1bnVzZWQgcGFyYW1ldGVycy4gKi8NCj4gPiA+ID4gPiA+ICsgICAgICAgcmV0ID0gc2VhbWNh
-bGwoVERIX1NZU19JTklULCAwLCAwLCAwLCAwLCBOVUxMLCBOVUxMKTsNCj4gPiA+ID4gPiA+ICsN
-Cj4gPiA+ID4gPiA+ICsgICAgICAgdGR4X2dsb2JhbF9pbml0X3N0YXR1cyA9IFREWF9HTE9CQUxf
-SU5JVF9ET05FOw0KPiA+ID4gPiA+ID4gKyAgICAgICBpZiAocmV0KQ0KPiA+ID4gPiA+ID4gKyAg
-ICAgICAgICAgICAgIHRkeF9nbG9iYWxfaW5pdF9zdGF0dXMgfD0gVERYX0dMT0JBTF9JTklUX0ZB
-SUxFRDsNCj4gPiA+ID4gPiANCj4gPiA+ID4gPiBJZiBlbnRyb3B5IGlzIGxhY2tpbmcgKHJkcmFu
-ZCBmYWlsdXJlKSwgVERIX1NZU19JTklUIGNhbiByZXR1cm4gVERYX1NZU19CVVNZLg0KPiA+ID4g
-PiA+IEluIHN1Y2ggY2FzZSwgd2Ugc2hvdWxkIGFsbG93IHRoZSBjYWxsZXIgdG8gcmV0cnkgb3Ig
-bWFrZSB0aGlzIGZ1bmN0aW9uIHJldHJ5DQo+ID4gPiA+ID4gaW5zdGVhZCBvZiBtYXJraW5nIGVy
-cm9yIHN0aWNraWx5Lg0KPiA+ID4gPiANCj4gPiA+ID4gVGhlIHNwZWMgc2F5czoNCj4gPiA+ID4g
-DQo+ID4gPiA+IFREWF9TWVNfQlVTWSAgICAgICAgVGhlIG9wZXJhdGlvbiB3YXMgaW52b2tlZCB3
-aGVuIGFub3RoZXIgVERYIG1vZHVsZQ0KPiA+ID4gPiAgICAgICAgICAgICBvcGVyYXRpb24gd2Fz
-IGluIHByb2dyZXNzLiBUaGUgb3BlcmF0aW9uIG1heSBiZSByZXRyaWVkLg0KPiA+ID4gPiANCj4g
-PiA+ID4gU28gSSBkb24ndCBzZWUgaG93IGVudHJvcHkgaXMgbGFja2luZyBpcyByZWxhdGVkIHRv
-IHRoaXMgZXJyb3IuICBQZXJoYXBzIHlvdQ0KPiA+ID4gPiB3ZXJlIG1peGluZyB1cCB3aXRoIEtF
-WS5DT05GSUc/DQo+ID4gPiANCj4gPiA+IFRESC5TWVMuSU5JVCgpIGluaXRpYWxpemVzIGdsb2Jh
-bCBjYW5hcnkgdmFsdWUuICBURFggbW9kdWxlIGlzIGNvbXBpbGVkIHdpdGgNCj4gPiA+IHN0cm9u
-ZyBzdGFjayBwcm90ZWN0b3IgZW5hYmxlZCBieSBjbGFuZyBhbmQgY2FuYXJ5IHZhbHVlIG5lZWRz
-IHRvIGJlDQo+ID4gPiBpbml0aWFsaXplZC4gIEJ5IGRlZmF1bHQsIHRoZSBjYW5hcnkgdmFsdWUg
-aXMgc3RvcmVkIGF0DQo+ID4gPiAlZnNiYXNlOjxTVEFDS19DQU5BUllfT0ZGU0VUIDB4Mjg+DQo+
-ID4gPiANCj4gPiA+IEFsdGhvdWdoIHRoaXMgaXMgYSBqb2IgZm9yIGxpYmMgb3IgbGFuZ3VhZ2Ug
-cnVudGltZSwgVERYIG1vZHVsZXMgaGFzIHRvIGRvIGl0DQo+ID4gPiBpdHNlbGYgYmVjYXVzZSBp
-dCdzIHN0YW5kIGFsb25lLg0KPiA+ID4gDQo+ID4gPiBGcm9tIHRkaF9zeXNfaW5pdC5jDQo+ID4g
-PiBfU1RBVElDX0lOTElORV8gYXBpX2Vycm9yX3R5cGUgdGR4X2luaXRfc3RhY2tfY2FuYXJ5KHZv
-aWQpDQo+ID4gPiB7DQo+ID4gPiAgICAgaWEzMl9yZmxhZ3NfdCByZmxhZ3MgPSB7LnJhdyA9IDB9
-Ow0KPiA+ID4gICAgIHVpbnQ2NF90IGNhbmFyeTsNCj4gPiA+ICAgICBpZiAoIWlhMzJfcmRyYW5k
-KCZyZmxhZ3MsICZjYW5hcnkpKQ0KPiA+ID4gICAgIHsNCj4gPiA+ICAgICAgICAgcmV0dXJuIFRE
-WF9TWVNfQlVTWTsNCj4gPiA+ICAgICB9DQo+ID4gPiAuLi4NCj4gPiA+ICAgICBsYXN0X3BhZ2Vf
-cHRyLT5zdGFja19jYW5hcnkuY2FuYXJ5ID0gY2FuYXJ5Ow0KPiA+ID4gDQo+ID4gPiANCj4gPiAN
-Cj4gPiBUaGVuIGl0IGlzIGEgaGlkZGVuIGJlaGF2aW91ciBvZiB0aGUgVERYIG1vZHVsZSB0aGF0
-IGlzIG5vdCByZWZsZWN0ZWQgaW4gdGhlDQo+ID4gc3BlYy4NCj4gDQo+IFRoaXMgaXMgdHJ1ZS4g
-IENvdWxkIHlvdSBwbGVhc2UgZ28gYXNrIHRoZSBURFggbW9kdWxlIGZvbGtzIHRvIGZpeCB0aGlz
-IHVwPw0KDQpTdXJlIHdpbGwgZG8uDQoNClRvIG1ha2Ugc3VyZSwgeW91IG1lYW4gd2Ugc2hvdWxk
-IGFzayBURFggbW9kdWxlIGd1eXMgdG8gYWRkIHRoZSBuZXcNClREWF9STkRfTk9fRU5UUk9QWSBl
-cnJvciBjb2RlIHRvIFREWCBtb2R1bGUgMS4wPw0KDQoiYW5vdGhlciBURFggbW9kdWxlIG9wZXJh
-dGlvbiB3YXMgaW4gcHJvZ3Jlc3MiIGFuZCAicnVubmluZyBvdXQgb2YgZW50cm9weSIgYXJlDQpk
-aWZmZXJlbnQgdGhpbmcgYW5kIHNob3VsZCBub3QgYmUgbWl4ZWQgdG9nZXRoZXIgSU1ITy4NCg0K
-PiANCj4gPiBJIGFtIG5vdCBzdXJlIHdoZXRoZXIgd2Ugc2hvdWxkIGhhbmRsZSBiZWNhdXNlOg0K
-PiA+IA0KPiA+IDEpIFRoaXMgaXMgYW4gZXh0cmVtZWx5IHJhcmUgY2FzZS4gIEtlcm5lbCB3b3Vs
-ZCBiZSBiYXNpY2FsbHkgdW5kZXIgYXR0YWNrIGlmDQo+ID4gc3VjaCBlcnJvciBoYXBwZW5lZC4g
-IEluIHRoZSBjdXJyZW50IHNlcmllcyB3ZSBkb24ndCBoYW5kbGUgc3VjaCBjYXNlIGluDQo+ID4g
-S0VZLkNPTkZJRyBlaXRoZXIgYnV0IGp1c3QgbGVhdmUgYSBjb21tZW50IChzZWUgcGF0Y2ggMTMp
-Lg0KPiANCj4gUmFyZSwgeWVzLiAgVW5kZXIgYXR0YWNrPyAgSSdtIG5vdCBzdXJlIHdoZXJlIHlv
-dSBnZXQgdGhhdCBmcm9tLiAgTG9vaw0KPiBhdCB0aGUgU0RNOg0KPiANCj4gPiBVbmRlciBoZWF2
-eSBsb2FkLCB3aXRoIG11bHRpcGxlIGNvcmVzIGV4ZWN1dGluZyBSRFJBTkQgaW4gcGFyYWxsZWws
-IGl0IGlzIHBvc3NpYmxlLCB0aG91Z2ggdW5saWtlbHksIGZvciB0aGUgZGVtYW5kDQo+ID4gb2Yg
-cmFuZG9tIG51bWJlcnMgYnkgc29mdHdhcmUgcHJvY2Vzc2VzL3RocmVhZHMgdG8gZXhjZWVkIHRo
-ZSByYXRlIGF0IHdoaWNoIHRoZSByYW5kb20gbnVtYmVyIGdlbmVyYXRvcg0KPiA+IGhhcmR3YXJl
-IGNhbiBzdXBwbHkgdGhlbS4gVGhpcyB3aWxsIGxlYWQgdG8gdGhlIFJEUkFORCBpbnN0cnVjdGlv
-biByZXR1cm5pbmcgbm8gZGF0YSB0cmFuc2l0b3JpbHkuIFRoZSBSRFJBTkQNCj4gPiBpbnN0cnVj
-dGlvbiBpbmRpY2F0ZXMgdGhlIG9jY3VycmVuY2Ugb2YgdGhpcyByYXJlIHNpdHVhdGlvbiBieSBj
-bGVhcmluZyB0aGUgQ0YgZmxhZy4NCj4gDQo+IFRoYXQgZG9lc24ndCB0YWxrIGFib3V0IGF0dGFj
-a3MuDQoNClRoYW5rcyBmb3IgY2l0aW5nIHRoZSBkb2N1bWVudGF0aW9uLiAgSSBjaGVja2VkIHRo
-ZSBrZXJuZWwgY29kZSBiZWZvcmUgYW5kIGl0DQpzZWVtcyBjdXJyZW50bHkgdGhlcmUncyBubyBj
-b2RlIHRvIGNhbGwgUkRSQU5EIHZlcnkgZnJlcXVlbnRseS4gIEJ1dCB5ZXMgd2UNCnNob3VsZCBu
-b3Qgc2F5ICJ1bmRlciBhdHRhY2siLiAgSSBoYXZlIHNvbWUgb2xkIG1lbW9yeSB0aGF0IHNvbWVv
-bmUgc2FpZCBzbw0KKG1heWJlIG1lPykuDQoNCj4gDQo+ID4gMikgTm90IHN1cmUgd2hldGhlciB0
-aGlzIHdpbGwgYmUgY2hhbmdlZCBpbiB0aGUgZnV0dXJlLg0KPiA+IA0KPiA+IFNvIEkgdGhpbmsg
-d2Ugc2hvdWxkIGtlZXAgYXMgaXMuDQo+IA0KPiBURFhfU1lTX0JVU1kgcmVhbGx5IGlzIG1pc3Np
-bmcgc29tZSBudWFuY2UuICBZb3UgKlJFQUxMWSogd2FudCB0byByZXRyeQ0KPiBSRFJBTkQgZmFp
-bHVyZXMuIMKgDQo+IA0KDQpPSy4gIEFncmVlZC4gIFRoZW4gSSB0aGluayB0aGUgVERILlNZUy5L
-RVkuQ09ORklHIHNob3VsZCByZXRyeSB3aGVuIHJ1bm5pbmcgb3V0DQpvZiBlbnRyb3B5IHRvby4N
-Cg0KPiBCdXQsIGlmIHlvdSBoYXZlIFZNTSBsb2NraW5nIGFuZCBkb24ndCBleHBlY3QgdHdvDQo+
-IHVzZXJzIGNhbGxpbmcgaW50byB0aGUgVERYIG1vZHVsZSB0aGVuIFREWF9TWVNfQlVTWSBmcm9t
-IGEgYnVzeSAqbW9kdWxlKg0KPiBpcyBhIGJhZCAoYW5kIHByb2JhYmx5IGZhdGFsKSBzaWduYWwu
-DQoNClllcyB3ZSBoYXZlIGEgbG9jayB0byBwcm90ZWN0IFRESC5TWVMuSU5JVCBmcm9tIGJlaW5n
-IGNhbGxlZCBpbiBwYXJhbGxlbC4gIFcvbw0KdGhpcyBlbnRyb3B5IHRoaW5nIFREWF9TWVNfQlVT
-WSBzaG91bGQgbmV2ZXIgaGFwcGVuLg0KDQo+IA0KPiBJIHN1c3BlY3Qgd2Ugc2hvdWxkIGp1c3Qg
-dGhyb3cgYSBmZXcgcmV0cmllcyBpbiB0aGUgc2VhbWNhbGwoKQ0KPiBpbmZyYXN0cnVjdHVyZSB0
-byByZXRyeSBpbiB0aGUgY2FzZSBvZiBURFhfU1lTX0JVU1kuICBJdCdsbCB0YWtlIGNhcmUgb2YN
-Cj4gUkRSQU5EIGZhaWx1cmVzLiAgSWYgYSByZXRyeSBsb29wIGZhaWxzIHRvIHJlc29sdmUgaXQs
-IHRoZW4gd2Ugc2hvdWxkDQo+IHByb2JhYmx5IGR1bXAgYSB3YXJuaW5nIGFuZCByZXR1cm4gYW4g
-ZXJyb3IuDQo+IA0KPiBKdXN0IGRvIHRoaXMgb25jZSwgaW4gY29tbW9uIGNvZGUuDQoNCkkgY2Fu
-IGRvLiAgSnVzdCB3YW50IHRvIG1ha2Ugc3VyZSBkbyB5b3Ugd2FudCB0byByZXRyeSBURFhfU1lT
-X0JVU1ksIG9yIHJldHJ5DQpURFhfUk5EX05PX0VOVFJPUFkgKGlmIHdlIHdhbnQgdG8gYXNrIFRE
-WCBtb2R1bGUgZ3V5cyB0byBjaGFuZ2UgdG8gcmV0dXJuIHRoaXMNCnZhbHVlKT8NCg0KQWxzbywg
-ZXZlbiB3ZSByZXRyeSBlaXRoZXIgVERYX1NZU19CVVNZIG9yIFREWF9STkRfTk9fRU5UUk9QWSBp
-biBjb21tb24gDQpzZWFtY2FsbCgpIGNvZGUsIGl0IGRvZXNuJ3QgaGFuZGxlIHRoZSBUREguU1lT
-LktFWS5DT05GSUcsIGJlY2F1c2Ugc2FkbHkgdGhpcw0KU0VBTUNBTEwgcmV0dXJucyBhIGRpZmZl
-cmVudCBlcnJvciBjb2RlOg0KDQpURFhfS0VZX0dFTkVSQVRJT05fRkFJTEVECUZhaWxlZCB0byBn
-ZW5lcmF0ZSBhIHJhbmRvbSBrZXkuIFRoaXMgaXPCoA0KCQkJCXR5cGljYWxseSBjYXVzZWQgYnkg
-YW4gZW50cm9weSBlcnJvciBvZiB0aGUNCgkJCQlDUFUncyByYW5kb20gbnVtYmVyIGdlbmVyYXRv
-ciwgYW5kIG1heQ0KCQkJCWJlIGltcGFjdGVkIGJ5IFJEU0VFRCwgUkRSQU5EIG9yIFBDT05GSUcN
-CgkJCQlleGVjdXRpbmcgb24gb3RoZXIgTFBzLiBUaGUgb3BlcmF0aW9uIHNob3VsZCBiZQ0KCQkJ
-CXJldHJpZWQuDQoNCg==
+tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+head:   95b9779c1758f03cf494e8550d6249a40089ed1c
+commit: c7ed946b95cbd4c0e37479df320daf6af7e86906 [24/34] kvm: vmx: Add IA32_FLUSH_CMD guest support
+config: x86_64-randconfig-a014 (https://download.01.org/0day-ci/archive/20230315/202303151912.oZ6SGd90-lkp@intel.com/config)
+compiler: clang version 14.0.6 (https://github.com/llvm/llvm-project f28c006a5895fc0e329fe15fead81e37457cb1d1)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://git.kernel.org/pub/scm/virt/kvm/kvm.git/commit/?id=c7ed946b95cbd4c0e37479df320daf6af7e86906
+        git remote add kvm https://git.kernel.org/pub/scm/virt/kvm/kvm.git
+        git fetch --no-tags kvm queue
+        git checkout c7ed946b95cbd4c0e37479df320daf6af7e86906
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash
+
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202303151912.oZ6SGd90-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> arch/x86/kvm/vmx/vmx.c:2328:3: error: expected expression
+                   bool guest_flush_l1d = guest_cpuid_has(vcpu,
+                   ^
+>> arch/x86/kvm/vmx/vmx.c:2331:9: error: use of undeclared identifier 'guest_flush_l1d'
+                                              guest_flush_l1d,
+                                              ^
+   2 errors generated.
+
+
+vim +2328 arch/x86/kvm/vmx/vmx.c
+
+  2168	
+  2169	/*
+  2170	 * Writes msr value into the appropriate "register".
+  2171	 * Returns 0 on success, non-0 otherwise.
+  2172	 * Assumes vcpu_load() was already called.
+  2173	 */
+  2174	static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+  2175	{
+  2176		struct vcpu_vmx *vmx = to_vmx(vcpu);
+  2177		struct vmx_uret_msr *msr;
+  2178		int ret = 0;
+  2179		u32 msr_index = msr_info->index;
+  2180		u64 data = msr_info->data;
+  2181		u32 index;
+  2182	
+  2183		switch (msr_index) {
+  2184		case MSR_EFER:
+  2185			ret = kvm_set_msr_common(vcpu, msr_info);
+  2186			break;
+  2187	#ifdef CONFIG_X86_64
+  2188		case MSR_FS_BASE:
+  2189			vmx_segment_cache_clear(vmx);
+  2190			vmcs_writel(GUEST_FS_BASE, data);
+  2191			break;
+  2192		case MSR_GS_BASE:
+  2193			vmx_segment_cache_clear(vmx);
+  2194			vmcs_writel(GUEST_GS_BASE, data);
+  2195			break;
+  2196		case MSR_KERNEL_GS_BASE:
+  2197			vmx_write_guest_kernel_gs_base(vmx, data);
+  2198			break;
+  2199		case MSR_IA32_XFD:
+  2200			ret = kvm_set_msr_common(vcpu, msr_info);
+  2201			/*
+  2202			 * Always intercepting WRMSR could incur non-negligible
+  2203			 * overhead given xfd might be changed frequently in
+  2204			 * guest context switch. Disable write interception
+  2205			 * upon the first write with a non-zero value (indicating
+  2206			 * potential usage on dynamic xfeatures). Also update
+  2207			 * exception bitmap to trap #NM for proper virtualization
+  2208			 * of guest xfd_err.
+  2209			 */
+  2210			if (!ret && data) {
+  2211				vmx_disable_intercept_for_msr(vcpu, MSR_IA32_XFD,
+  2212							      MSR_TYPE_RW);
+  2213				vcpu->arch.xfd_no_write_intercept = true;
+  2214				vmx_update_exception_bitmap(vcpu);
+  2215			}
+  2216			break;
+  2217	#endif
+  2218		case MSR_IA32_SYSENTER_CS:
+  2219			if (is_guest_mode(vcpu))
+  2220				get_vmcs12(vcpu)->guest_sysenter_cs = data;
+  2221			vmcs_write32(GUEST_SYSENTER_CS, data);
+  2222			break;
+  2223		case MSR_IA32_SYSENTER_EIP:
+  2224			if (is_guest_mode(vcpu)) {
+  2225				data = nested_vmx_truncate_sysenter_addr(vcpu, data);
+  2226				get_vmcs12(vcpu)->guest_sysenter_eip = data;
+  2227			}
+  2228			vmcs_writel(GUEST_SYSENTER_EIP, data);
+  2229			break;
+  2230		case MSR_IA32_SYSENTER_ESP:
+  2231			if (is_guest_mode(vcpu)) {
+  2232				data = nested_vmx_truncate_sysenter_addr(vcpu, data);
+  2233				get_vmcs12(vcpu)->guest_sysenter_esp = data;
+  2234			}
+  2235			vmcs_writel(GUEST_SYSENTER_ESP, data);
+  2236			break;
+  2237		case MSR_IA32_DEBUGCTLMSR: {
+  2238			u64 invalid;
+  2239	
+  2240			invalid = data & ~vmx_get_supported_debugctl(vcpu, msr_info->host_initiated);
+  2241			if (invalid & (DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR)) {
+  2242				kvm_pr_unimpl_wrmsr(vcpu, msr_index, data);
+  2243				data &= ~(DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR);
+  2244				invalid &= ~(DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR);
+  2245			}
+  2246	
+  2247			if (invalid)
+  2248				return 1;
+  2249	
+  2250			if (is_guest_mode(vcpu) && get_vmcs12(vcpu)->vm_exit_controls &
+  2251							VM_EXIT_SAVE_DEBUG_CONTROLS)
+  2252				get_vmcs12(vcpu)->guest_ia32_debugctl = data;
+  2253	
+  2254			vmcs_write64(GUEST_IA32_DEBUGCTL, data);
+  2255			if (intel_pmu_lbr_is_enabled(vcpu) && !to_vmx(vcpu)->lbr_desc.event &&
+  2256			    (data & DEBUGCTLMSR_LBR))
+  2257				intel_pmu_create_guest_lbr_event(vcpu);
+  2258			return 0;
+  2259		}
+  2260		case MSR_IA32_BNDCFGS:
+  2261			if (!kvm_mpx_supported() ||
+  2262			    (!msr_info->host_initiated &&
+  2263			     !guest_cpuid_has(vcpu, X86_FEATURE_MPX)))
+  2264				return 1;
+  2265			if (is_noncanonical_address(data & PAGE_MASK, vcpu) ||
+  2266			    (data & MSR_IA32_BNDCFGS_RSVD))
+  2267				return 1;
+  2268	
+  2269			if (is_guest_mode(vcpu) &&
+  2270			    ((vmx->nested.msrs.entry_ctls_high & VM_ENTRY_LOAD_BNDCFGS) ||
+  2271			     (vmx->nested.msrs.exit_ctls_high & VM_EXIT_CLEAR_BNDCFGS)))
+  2272				get_vmcs12(vcpu)->guest_bndcfgs = data;
+  2273	
+  2274			vmcs_write64(GUEST_BNDCFGS, data);
+  2275			break;
+  2276		case MSR_IA32_UMWAIT_CONTROL:
+  2277			if (!msr_info->host_initiated && !vmx_has_waitpkg(vmx))
+  2278				return 1;
+  2279	
+  2280			/* The reserved bit 1 and non-32 bit [63:32] should be zero */
+  2281			if (data & (BIT_ULL(1) | GENMASK_ULL(63, 32)))
+  2282				return 1;
+  2283	
+  2284			vmx->msr_ia32_umwait_control = data;
+  2285			break;
+  2286		case MSR_IA32_SPEC_CTRL:
+  2287			if (!msr_info->host_initiated &&
+  2288			    !guest_has_spec_ctrl_msr(vcpu))
+  2289				return 1;
+  2290	
+  2291			if (kvm_spec_ctrl_test_value(data))
+  2292				return 1;
+  2293	
+  2294			vmx->spec_ctrl = data;
+  2295			if (!data)
+  2296				break;
+  2297	
+  2298			/*
+  2299			 * For non-nested:
+  2300			 * When it's written (to non-zero) for the first time, pass
+  2301			 * it through.
+  2302			 *
+  2303			 * For nested:
+  2304			 * The handling of the MSR bitmap for L2 guests is done in
+  2305			 * nested_vmx_prepare_msr_bitmap. We should not touch the
+  2306			 * vmcs02.msr_bitmap here since it gets completely overwritten
+  2307			 * in the merging. We update the vmcs01 here for L1 as well
+  2308			 * since it will end up touching the MSR anyway now.
+  2309			 */
+  2310			vmx_disable_intercept_for_msr(vcpu,
+  2311						      MSR_IA32_SPEC_CTRL,
+  2312						      MSR_TYPE_RW);
+  2313			break;
+  2314		case MSR_IA32_TSX_CTRL:
+  2315			if (!msr_info->host_initiated &&
+  2316			    !(vcpu->arch.arch_capabilities & ARCH_CAP_TSX_CTRL_MSR))
+  2317				return 1;
+  2318			if (data & ~(TSX_CTRL_RTM_DISABLE | TSX_CTRL_CPUID_CLEAR))
+  2319				return 1;
+  2320			goto find_uret_msr;
+  2321		case MSR_IA32_PRED_CMD:
+  2322			ret = vmx_set_msr_ia32_cmd(vcpu, msr_info,
+  2323						   guest_has_pred_cmd_msr(vcpu),
+  2324						   PRED_CMD_IBPB,
+  2325						   X86_FEATURE_IBPB);
+  2326			break;
+  2327		case MSR_IA32_FLUSH_CMD:
+> 2328			bool guest_flush_l1d = guest_cpuid_has(vcpu,
+  2329							       X86_FEATURE_FLUSH_L1D);
+  2330			ret = vmx_set_msr_ia32_cmd(vcpu, msr_info,
+> 2331						   guest_flush_l1d,
+  2332						   L1D_FLUSH,
+  2333						   X86_FEATURE_FLUSH_L1D);
+  2334			break;
+  2335		case MSR_IA32_CR_PAT:
+  2336			if (!kvm_pat_valid(data))
+  2337				return 1;
+  2338	
+  2339			if (is_guest_mode(vcpu) &&
+  2340			    get_vmcs12(vcpu)->vm_exit_controls & VM_EXIT_SAVE_IA32_PAT)
+  2341				get_vmcs12(vcpu)->guest_ia32_pat = data;
+  2342	
+  2343			if (vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_IA32_PAT) {
+  2344				vmcs_write64(GUEST_IA32_PAT, data);
+  2345				vcpu->arch.pat = data;
+  2346				break;
+  2347			}
+  2348			ret = kvm_set_msr_common(vcpu, msr_info);
+  2349			break;
+  2350		case MSR_IA32_MCG_EXT_CTL:
+  2351			if ((!msr_info->host_initiated &&
+  2352			     !(to_vmx(vcpu)->msr_ia32_feature_control &
+  2353			       FEAT_CTL_LMCE_ENABLED)) ||
+  2354			    (data & ~MCG_EXT_CTL_LMCE_EN))
+  2355				return 1;
+  2356			vcpu->arch.mcg_ext_ctl = data;
+  2357			break;
+  2358		case MSR_IA32_FEAT_CTL:
+  2359			if (!is_vmx_feature_control_msr_valid(vmx, msr_info))
+  2360				return 1;
+  2361	
+  2362			vmx->msr_ia32_feature_control = data;
+  2363			if (msr_info->host_initiated && data == 0)
+  2364				vmx_leave_nested(vcpu);
+  2365	
+  2366			/* SGX may be enabled/disabled by guest's firmware */
+  2367			vmx_write_encls_bitmap(vcpu, NULL);
+  2368			break;
+  2369		case MSR_IA32_SGXLEPUBKEYHASH0 ... MSR_IA32_SGXLEPUBKEYHASH3:
+  2370			/*
+  2371			 * On real hardware, the LE hash MSRs are writable before
+  2372			 * the firmware sets bit 0 in MSR 0x7a ("activating" SGX),
+  2373			 * at which point SGX related bits in IA32_FEATURE_CONTROL
+  2374			 * become writable.
+  2375			 *
+  2376			 * KVM does not emulate SGX activation for simplicity, so
+  2377			 * allow writes to the LE hash MSRs if IA32_FEATURE_CONTROL
+  2378			 * is unlocked.  This is technically not architectural
+  2379			 * behavior, but it's close enough.
+  2380			 */
+  2381			if (!msr_info->host_initiated &&
+  2382			    (!guest_cpuid_has(vcpu, X86_FEATURE_SGX_LC) ||
+  2383			    ((vmx->msr_ia32_feature_control & FEAT_CTL_LOCKED) &&
+  2384			    !(vmx->msr_ia32_feature_control & FEAT_CTL_SGX_LC_ENABLED))))
+  2385				return 1;
+  2386			vmx->msr_ia32_sgxlepubkeyhash
+  2387				[msr_index - MSR_IA32_SGXLEPUBKEYHASH0] = data;
+  2388			break;
+  2389		case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_VMFUNC:
+  2390			if (!msr_info->host_initiated)
+  2391				return 1; /* they are read-only */
+  2392			if (!nested_vmx_allowed(vcpu))
+  2393				return 1;
+  2394			return vmx_set_vmx_msr(vcpu, msr_index, data);
+  2395		case MSR_IA32_RTIT_CTL:
+  2396			if (!vmx_pt_mode_is_host_guest() ||
+  2397				vmx_rtit_ctl_check(vcpu, data) ||
+  2398				vmx->nested.vmxon)
+  2399				return 1;
+  2400			vmcs_write64(GUEST_IA32_RTIT_CTL, data);
+  2401			vmx->pt_desc.guest.ctl = data;
+  2402			pt_update_intercept_for_msr(vcpu);
+  2403			break;
+  2404		case MSR_IA32_RTIT_STATUS:
+  2405			if (!pt_can_write_msr(vmx))
+  2406				return 1;
+  2407			if (data & MSR_IA32_RTIT_STATUS_MASK)
+  2408				return 1;
+  2409			vmx->pt_desc.guest.status = data;
+  2410			break;
+  2411		case MSR_IA32_RTIT_CR3_MATCH:
+  2412			if (!pt_can_write_msr(vmx))
+  2413				return 1;
+  2414			if (!intel_pt_validate_cap(vmx->pt_desc.caps,
+  2415						   PT_CAP_cr3_filtering))
+  2416				return 1;
+  2417			vmx->pt_desc.guest.cr3_match = data;
+  2418			break;
+  2419		case MSR_IA32_RTIT_OUTPUT_BASE:
+  2420			if (!pt_can_write_msr(vmx))
+  2421				return 1;
+  2422			if (!intel_pt_validate_cap(vmx->pt_desc.caps,
+  2423						   PT_CAP_topa_output) &&
+  2424			    !intel_pt_validate_cap(vmx->pt_desc.caps,
+  2425						   PT_CAP_single_range_output))
+  2426				return 1;
+  2427			if (!pt_output_base_valid(vcpu, data))
+  2428				return 1;
+  2429			vmx->pt_desc.guest.output_base = data;
+  2430			break;
+  2431		case MSR_IA32_RTIT_OUTPUT_MASK:
+  2432			if (!pt_can_write_msr(vmx))
+  2433				return 1;
+  2434			if (!intel_pt_validate_cap(vmx->pt_desc.caps,
+  2435						   PT_CAP_topa_output) &&
+  2436			    !intel_pt_validate_cap(vmx->pt_desc.caps,
+  2437						   PT_CAP_single_range_output))
+  2438				return 1;
+  2439			vmx->pt_desc.guest.output_mask = data;
+  2440			break;
+  2441		case MSR_IA32_RTIT_ADDR0_A ... MSR_IA32_RTIT_ADDR3_B:
+  2442			if (!pt_can_write_msr(vmx))
+  2443				return 1;
+  2444			index = msr_info->index - MSR_IA32_RTIT_ADDR0_A;
+  2445			if (index >= 2 * vmx->pt_desc.num_address_ranges)
+  2446				return 1;
+  2447			if (is_noncanonical_address(data, vcpu))
+  2448				return 1;
+  2449			if (index % 2)
+  2450				vmx->pt_desc.guest.addr_b[index / 2] = data;
+  2451			else
+  2452				vmx->pt_desc.guest.addr_a[index / 2] = data;
+  2453			break;
+  2454		case MSR_IA32_PERF_CAPABILITIES:
+  2455			if (data && !vcpu_to_pmu(vcpu)->version)
+  2456				return 1;
+  2457			if (data & PMU_CAP_LBR_FMT) {
+  2458				if ((data & PMU_CAP_LBR_FMT) !=
+  2459				    (kvm_caps.supported_perf_cap & PMU_CAP_LBR_FMT))
+  2460					return 1;
+  2461				if (!cpuid_model_is_consistent(vcpu))
+  2462					return 1;
+  2463			}
+  2464			if (data & PERF_CAP_PEBS_FORMAT) {
+  2465				if ((data & PERF_CAP_PEBS_MASK) !=
+  2466				    (kvm_caps.supported_perf_cap & PERF_CAP_PEBS_MASK))
+  2467					return 1;
+  2468				if (!guest_cpuid_has(vcpu, X86_FEATURE_DS))
+  2469					return 1;
+  2470				if (!guest_cpuid_has(vcpu, X86_FEATURE_DTES64))
+  2471					return 1;
+  2472				if (!cpuid_model_is_consistent(vcpu))
+  2473					return 1;
+  2474			}
+  2475			ret = kvm_set_msr_common(vcpu, msr_info);
+  2476			break;
+  2477	
+  2478		default:
+  2479		find_uret_msr:
+  2480			msr = vmx_find_uret_msr(vmx, msr_index);
+  2481			if (msr)
+  2482				ret = vmx_set_guest_uret_msr(vmx, msr, data);
+  2483			else
+  2484				ret = kvm_set_msr_common(vcpu, msr_info);
+  2485		}
+  2486	
+  2487		/* FB_CLEAR may have changed, also update the FB_CLEAR_DIS behavior */
+  2488		if (msr_index == MSR_IA32_ARCH_CAPABILITIES)
+  2489			vmx_update_fb_clear_dis(vcpu, vmx);
+  2490	
+  2491		return ret;
+  2492	}
+  2493	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
