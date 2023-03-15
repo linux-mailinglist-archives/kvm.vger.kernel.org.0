@@ -2,84 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E0FB6BC03A
-	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 23:55:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 916BD6BC035
+	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 23:54:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232495AbjCOWzS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 18:55:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53554 "EHLO
+        id S232727AbjCOWyT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 18:54:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232574AbjCOWzO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 18:55:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F04EE22787
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 15:54:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678920801;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=PmBI1DpvKaVXYXtA6gtpu5ckoov61ccQSRAX+aljBe0=;
-        b=UHzgbVPcVB/geUuo6e2MCgogV9jjNhRDW1tqSIXihzmaWfKgfeUEfYYYNqOUBtzK5hqvXs
-        8f2454ixsxiQ16TYcl1EzNBSODyqACVhAD58LDffbq1mBN3Z8CG0foERkNhTPscCQLNlCm
-        yakFp5IgsAU2mB+qETW76jCfT/V0s8Q=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-173-sVRHDUHoO6mlnh19GjAseA-1; Wed, 15 Mar 2023 18:53:19 -0400
-X-MC-Unique: sVRHDUHoO6mlnh19GjAseA-1
-Received: by mail-il1-f198.google.com with SMTP id j24-20020a056e02219800b00322f108a4cfso29361ila.2
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 15:53:19 -0700 (PDT)
+        with ESMTP id S231127AbjCOWyR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 18:54:17 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF7A99763
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 15:53:42 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id np13-20020a17090b4c4d00b0023d3f0949d4so2832757pjb.6
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 15:53:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1678920821;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5IjZBzmYfOxuUAk9Wp5OhIFThytGtbjuPg10gNWTiKg=;
+        b=X710boA9PzUplR36EbJVYxlgU9RIibRuaPj4iN/Wb8gbsQ1YhtJrm3VwiSCCojuXeY
+         vGOMq9qQPnCcPFPOKX78tRTAMsBjLOqOiE6s5CkZqOB1+aEGy2QN4TFABssKFl3W/p1m
+         mxwNLqYid90p/PlEkCPASmIXyqGQpYBYZbNCQ4tPu8YnQS5AnZq+ljOtzqmNhASgFmTC
+         tcigX5oluffGxEV5WwrpY5QONuhzkJN8atG5CxsqlPpyzRRmBwIq6U4kKUA5M+KD11tm
+         Vsd2lvyyBw1cSQnJBa5gY3+Z+tIIqHuNenKDQ954bJ4tWEZgN9OMFdzwITGoeZI6LAG4
+         V2Mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678920794;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PmBI1DpvKaVXYXtA6gtpu5ckoov61ccQSRAX+aljBe0=;
-        b=kHtXTJRzeEyFbXctMOhz0iikf12Zhc0PT0iHq7kD/aLzybDBxhvHEMcEtLTVGX7i83
-         6S+7BwDPhF6yzlwNFFwygJxN4EvV4WLpZ4stsDsQ/Wm0yiwP42B77Dwnxpyp8zSnpsI9
-         n1peIWzbaadco4b1HhjFQA5XBshEvGU2nKn5d91L0zBktYCj12hpJ9wiu8EcnapxQjHv
-         wFuhyJ88daujRe0u0YSCx9BbZF1P0RzCQx0cIU4CNxG4xJs9e9vFzFSIexlTKOh25lNI
-         Io3aqWFeXOjzBgDxgvQtrdcPOuBrdgp1+O0vnKbFIJBHJ5WfeYeuCvRf6nHuLd6/RQoH
-         xOGw==
-X-Gm-Message-State: AO0yUKXG4+zECTewTs2riwePix7/nMTILDZXRK9XzRLj3lKgq3SeeY4r
-        in2rAh16rVLuEdrJUaHWB3SI0nlc3xhxQQI4PW2Qc3GRhy5F8jhkio3Om7gCID4fmmxEUMhn0dq
-        NZFLSDL2VMf/D
-X-Received: by 2002:a92:da05:0:b0:323:70c:ba7a with SMTP id z5-20020a92da05000000b00323070cba7amr6320945ilm.0.1678920794162;
-        Wed, 15 Mar 2023 15:53:14 -0700 (PDT)
-X-Google-Smtp-Source: AK7set+yni0unT0KaphMd3Dk9lb2xPshPnISgvaAGSRatSEhctfH2YsA/aYF25RNbXHTAq4r4BmLNg==
-X-Received: by 2002:a92:da05:0:b0:323:70c:ba7a with SMTP id z5-20020a92da05000000b00323070cba7amr6320918ilm.0.1678920793895;
-        Wed, 15 Mar 2023 15:53:13 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id x1-20020a0566380ca100b003c5157c8b2csm209087jad.47.2023.03.15.15.53.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Mar 2023 15:53:12 -0700 (PDT)
-Date:   Wed, 15 Mar 2023 16:53:11 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yi Liu <yi.l.liu@intel.com>
-Cc:     jgg@nvidia.com, kevin.tian@intel.com, joro@8bytes.org,
-        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
-        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
-        peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
-        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com
-Subject: Re: [PATCH v6 12/24] vfio/pci: Allow passing zero-length fd array
- in VFIO_DEVICE_PCI_HOT_RESET
-Message-ID: <20230315165311.01f32bfe.alex.williamson@redhat.com>
-In-Reply-To: <20230308132903.465159-13-yi.l.liu@intel.com>
-References: <20230308132903.465159-1-yi.l.liu@intel.com>
-        <20230308132903.465159-13-yi.l.liu@intel.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        d=1e100.net; s=20210112; t=1678920821;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5IjZBzmYfOxuUAk9Wp5OhIFThytGtbjuPg10gNWTiKg=;
+        b=eJKasiRMT+/17zzr/t0L4j/Z9tw8lLnLUAJWD7gV9JrRhHguZJsst8oclbsj15jBVA
+         uPYV4iSp8GqPiWMSP6JTS+1YPhmUJ7RG4O5WjXx2nihp/2ShzXetc9jBcjUDhPiAENvz
+         BCGOmffTPAwqYBMvOQKl/6CQTvH5fTzW+RDFMFiSruM3yX8+RUPUMzDPros7cKrZ9ZMP
+         ez9QDSip3b/h3uhKTGZEojtSkMhnshUZH1xvE7TUWvs7wR9dcF2rZSMx9j7ilV3qvCMQ
+         vOwO+9KShbqhVvgvcTBxh+QneGU6jBFMB5n9JNMGt/IM9e4kvLc3Dr6Hgw5pzLxzkD7V
+         IPBA==
+X-Gm-Message-State: AO0yUKWMjGbjzmXtu/si7rY05w2+RTKqB+inuSgpA7+0pkKD+aFlPpJ8
+        /FoOomRNIrtjwoAKAor/hhXYa5du5sg=
+X-Google-Smtp-Source: AK7set8tX2kO0D/KT+tsILppg4BLvkxjQlZpG+8xkPe1JsJ5viaTykbZT3C8Woss1pFF9vrbc5j0C1x/1nc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:eb08:b0:23b:4e6e:aed9 with SMTP id
+ j8-20020a17090aeb0800b0023b4e6eaed9mr472733pjz.9.1678920820723; Wed, 15 Mar
+ 2023 15:53:40 -0700 (PDT)
+Date:   Wed, 15 Mar 2023 15:53:39 -0700
+In-Reply-To: <20230127133601.1165472-1-yu.c.zhang@linux.intel.com>
+Mime-Version: 1.0
+References: <20230127133601.1165472-1-yu.c.zhang@linux.intel.com>
+Message-ID: <ZBJMc24vyL3X9RHa@google.com>
+Subject: Re: [PATCH] KVM: selftest: Add dependency rules in makefile for C
+ source code
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yu Zhang <yu.c.zhang@linux.intel.com>
+Cc:     pbonzini@redhat.com, shuah@kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -87,46 +67,114 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed,  8 Mar 2023 05:28:51 -0800
-Yi Liu <yi.l.liu@intel.com> wrote:
+On Fri, Jan 27, 2023, Yu Zhang wrote:
+> Currently, KVM selftests have to run "make clean && make" to rebuild the
+> entire test suite each time a header file is modified. Define "-MD" as
+> an EXTRA_CFLAGS, so we can generate the dependency rules for each target
+> object, whose prerequisites contains the source file and the included header
+> files as well. And including those dependency files in KVM selftests' makefile
+> will release us from such annoyance.
+> 
+> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> ---
+>  tools/testing/selftests/kvm/Makefile | 21 ++++++++++++++++++---
+>  1 file changed, 18 insertions(+), 3 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index 1750f91dd936..b329e0d1a460 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -180,6 +180,8 @@ TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(ARCH_DIR))
+>  TEST_GEN_PROGS_EXTENDED += $(TEST_GEN_PROGS_EXTENDED_$(ARCH_DIR))
+>  LIBKVM += $(LIBKVM_$(ARCH_DIR))
+>  
+> +OVERRIDE_TARGETS = 1
+> +
+>  # lib.mak defines $(OUTPUT), prepends $(OUTPUT)/ to $(TEST_GEN_PROGS), and most
+>  # importantly defines, i.e. overwrites, $(CC) (unless `make -e` or `make CC=`,
+>  # which causes the environment variable to override the makefile).
+> @@ -198,9 +200,11 @@ CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
+>  	-fno-builtin-memcmp -fno-builtin-memcpy -fno-builtin-memset \
+>  	-fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
+>  	-I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
+> -	-I$(<D) -Iinclude/$(ARCH_DIR) -I ../rseq -I.. $(EXTRA_CFLAGS) \
+> +	-I$(<D) -Iinclude/$(ARCH_DIR) -I ../rseq -I.. \
+>  	$(KHDR_INCLUDES)
+>  
+> +EXTRA_CFLAGS += -MD
+> +
+>  no-pie-option := $(call try-run, echo 'int main(void) { return 0; }' | \
+>          $(CC) -Werror $(CFLAGS) -no-pie -x c - -o "$$TMP", -no-pie)
+>  
+> @@ -218,11 +222,22 @@ LIBKVM_S_OBJ := $(patsubst %.S, $(OUTPUT)/%.o, $(LIBKVM_S))
+>  LIBKVM_STRING_OBJ := $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM_STRING))
+>  LIBKVM_OBJS = $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ) $(LIBKVM_STRING_OBJ)
+>  
+> -EXTRA_CLEAN += $(LIBKVM_OBJS) cscope.*
+> +TEST_GEN_OBJ = $(patsubst %, %.o, $(TEST_GEN_PROGS))
+> +TEST_GEN_OBJ += $(patsubst %, %.o, $(TEST_GEN_PROGS_EXTENDED))
+> +TEST_DEP_FILES = $(patsubst %.o, %.d, $(TEST_GEN_OBJ))
+> +TEST_DEP_FILES += $(patsubst %.o, %.d, $(LIBKVM_OBJS))
+> +-include $(TEST_DEP_FILES)
+> +
+> +$(TEST_GEN_PROGS) $(TEST_GEN_PROGS_EXTENDED): %: %.o
+> +	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $< $(LIBKVM_OBJS) $(LDLIBS) -o $@
 
-> This is another method to issue PCI hot reset for the users that bounds
-> device to a positive iommufd value. In such case, iommufd is a proof of
-> device ownership. By passing a zero-length fd array, user indicates kernel
-> to do ownership check with the bound iommufd. All the opened devices within
-> the affected dev_set should have been bound to the same iommufd. This is
-> simpler and faster as user does not need to pass a set of fds and kernel
-> no need to search the device within the given fds.
+Do we actually need to omit -MD here?  IIUC, it just means that the .d file will
+get redundantly generated when building the final executable.  I would much prefer
+to build everything with the same options unless there's a good reason not to,
+e.g. this patch doesn't feed -MD into the LIBKVM_STRING_OBJ target, which seems
+wrong.
 
-Couldn't this same idea apply to containers?
+I.e. why not simply
 
-I'm afraid this proposal reduces or eliminates the handshake we have
-with userspace between VFIO_DEVICE_GET_PCI_HOT_RESET_INFO and
-VFIO_DEVICE_PCI_HOT_RESET, which could promote userspace to ignore the
-_INFO ioctl altogether, resulting in drivers that don't understand the
-scope of the reset.  Is it worth it?  What do we really gain?
+---
+ tools/testing/selftests/kvm/Makefile | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index d80141969cd1..382d95455f89 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -682,6 +682,11 @@ struct vfio_pci_hot_reset_info {
->   * The ownership can be proved by:
->   *   - An array of group fds
->   *   - An array of device fds
-> + *   - A zero-length array
-> + *
-> + * In the last case all affected devices which are opened by this user
-> + * must have been bound to a same iommufd_ctx.  This approach is only
-> + * available for devices bound to positive iommufd.
->   *
->   * Return: 0 on success, -errno on failure.
->   */
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 152c1a988e42..faaf65aa7621 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -182,6 +182,8 @@ TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(ARCH_DIR))
+ TEST_GEN_PROGS_EXTENDED += $(TEST_GEN_PROGS_EXTENDED_$(ARCH_DIR))
+ LIBKVM += $(LIBKVM_$(ARCH_DIR))
+ 
++OVERRIDE_TARGETS = 1
++
+ # lib.mak defines $(OUTPUT), prepends $(OUTPUT)/ to $(TEST_GEN_PROGS), and most
+ # importantly defines, i.e. overwrites, $(CC) (unless `make -e` or `make CC=`,
+ # which causes the environment variable to override the makefile).
+@@ -196,7 +198,7 @@ else
+ LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/$(ARCH)/include
+ endif
+ CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
+-	-Wno-gnu-variable-sized-type-not-at-end \
++	-Wno-gnu-variable-sized-type-not-at-end -MD \
+ 	-fno-builtin-memcmp -fno-builtin-memcpy -fno-builtin-memset \
+ 	-fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
+ 	-I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
+@@ -223,7 +225,18 @@ LIBKVM_S_OBJ := $(patsubst %.S, $(OUTPUT)/%.o, $(LIBKVM_S))
+ LIBKVM_STRING_OBJ := $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM_STRING))
+ LIBKVM_OBJS = $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ) $(LIBKVM_STRING_OBJ)
+ 
+-EXTRA_CLEAN += $(LIBKVM_OBJS) cscope.*
++TEST_GEN_OBJ = $(patsubst %, %.o, $(TEST_GEN_PROGS))
++TEST_GEN_OBJ += $(patsubst %, %.o, $(TEST_GEN_PROGS_EXTENDED))
++TEST_DEP_FILES = $(patsubst %.o, %.d, $(TEST_GEN_OBJ))
++TEST_DEP_FILES += $(patsubst %.o, %.d, $(LIBKVM_OBJS))
++-include $(TEST_DEP_FILES)
++
++$(TEST_GEN_PROGS) $(TEST_GEN_PROGS_EXTENDED): %: %.o
++	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $< $(LIBKVM_OBJS) $(LDLIBS) -o $@
++$(TEST_GEN_OBJ): %.o: %.c
++	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
++
++EXTRA_CLEAN += $(LIBKVM_OBJS) $(TEST_DEP_FILES) $(TEST_GEN_OBJ) cscope.*
+ 
+ x := $(shell mkdir -p $(sort $(dir $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ))))
+ $(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c
 
-There's no introspection that this feature is supported, is that why
-containers are not considered?  ie. if the host supports vfio cdevs, it
-necessarily must support vfio-pci hot reset w/ a zero-length array?
-Thanks,
-
-Alex
+base-commit: 95b9779c1758f03cf494e8550d6249a40089ed1c
+-- 
 
