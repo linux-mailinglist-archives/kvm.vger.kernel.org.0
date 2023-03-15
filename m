@@ -2,68 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AC7D36BB9C2
-	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 17:36:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D5BC86BBA47
+	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 17:54:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232153AbjCOQgJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 12:36:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36634 "EHLO
+        id S230172AbjCOQyi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 12:54:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231600AbjCOQgH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 12:36:07 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 525606FFDE
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 09:36:00 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id a17-20020a056a001d1100b00625760338c5so2613837pfx.14
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 09:36:00 -0700 (PDT)
+        with ESMTP id S232310AbjCOQyf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 12:54:35 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E88342BE5
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 09:54:32 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id h15-20020a056a001a4f00b0062300619e03so6244127pfv.18
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 09:54:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678898159;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NegWPg0Lvu/eZQrAwDtVNiRiSWTeZSjojzDjsuosPPc=;
-        b=BkH9SMl/ovE+tHe9ijLaPoKPfnV2DrNAdNrzrXh1m8LlB/f5FxmvR/HRDZR3c1w1A3
-         cOf0fVC4GNvJzrnvOVu6wVHS7+4ukone5w6im9iyzAdRyie06dCZ2udJSzeA6225lUoo
-         sacBkvtFTrBLv2WrTnh+6vHnk4ma2oSeYdxCs21gd5LwGlyiQG+Q2E+2tFQUCW4MbIJg
-         k3AG1p4789Hl82bAmoPtUnSNhVOnzU8J++T3tVf5Ub2zU8wqAo3EY2U3X1ABTcg+7/98
-         ceJCVzI92/fQW1ISQmFgwFQtcNdME1j6WDiKpVlaLO1foc5/WQ+lgB/v0CT4eRpsdqXJ
-         nmfA==
+        d=google.com; s=20210112; t=1678899271;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/VfOj1PxwZtE3fiW4+Wbi4dS2kE6Vdmar5BqVI1M2z0=;
+        b=BEqSBnWJskRuRBspuN6FxAXPBhQk21kw/QwpQhD+OPlE7HMQ4t4minhZOXyoQwEo3F
+         tt1stwO6FYs5bIqkpXIeC3XJ7m3dYjzvRiWySWCR3r6wfBOkC/PEY+WXuc80rxFKt27c
+         KOzAcFEhGzqEsuuAhRKgnxCk70qP0LpFveG9jRbnMqvf2vKnfdjPpL0HesVOOclo4OxM
+         BOLJ9w1PyWUHlGa3ORpqrIvOBdmK89BmWv3pPnitmBb3dg57lPujpJr63O9FjhdqQL5K
+         HCjCfb3bzmtH+GiUm5c46uiyfcwSwwsV223MDV86CcsaaHgcmDJ0bQMYtI4p/yIpPisc
+         6r5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678898159;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=NegWPg0Lvu/eZQrAwDtVNiRiSWTeZSjojzDjsuosPPc=;
-        b=VDG8vehkzTxCj2zS2XWlGzZqjJjsPaaxAhgGJt2iIlYO4sUg6rF5M3JNWEHBypByRc
-         mRwEtOUK0uwWLmlWeRfh7XnUUZGXSaKHa3Oj7UBauEuAPsBJ7TmwT51JO1TYj9aRU/Tg
-         1C2zz4Q724pJYA/tq9IY8yryocXlUMf99H0Hxs3X2sNKNMOUBYzvTfGkApjK5AvK0Tc5
-         2CDqM2tNYcTaRcAYvVXAMoMp9YKefQjlHSHwG5mDlZ47WmP8GoKgr6VmZmL9rS+Cxy75
-         bi4zMmqvR+mf8PGqJXFrxCG0wXq7qBGz/mUwsiIupz0Rd4fy//y6w9RmklLiSQLBISDV
-         4ETA==
-X-Gm-Message-State: AO0yUKV1Ky3IO9uU2GEXmCONMEzmMbQC4ggqWJuXG7gr2DkaaZjKqKNG
-        OR4s/0kgCQ+aNLdpTimGcFrxDpisY1A=
-X-Google-Smtp-Source: AK7set/G4MhxVu3xt4Lnxfnwt7snTSRIg9+6tosFgbiW6f3GfKcKwqYtkNeDgzEMxq/6VJK79MDNUGNvt14=
+        d=1e100.net; s=20210112; t=1678899271;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/VfOj1PxwZtE3fiW4+Wbi4dS2kE6Vdmar5BqVI1M2z0=;
+        b=0s6Rc7KVa4SP4R9a3N4RDJcJWDtWRmTglZVdjf6pez2RtrTC22q6io8p5A/7L5hD2m
+         oGxmG8+9FPLw2LRVvjsZ+GQbGNMZ8HAsxQoYuWUWVmK64oq8QRXhSwpNCyKhFSCJLIuB
+         CKY0j43gMbrvou0nITEEntjvhsfgPXf9EyrrbVpJj497kgROIzVtZk6dSSN30/r50UUK
+         HcDbsvyJSbDaJ3N5B8NNcKcTkw3IrNgk7SrBuT8m63KTOQXOSKrzpDoOeN+/7shaqABX
+         rVL2G5tT7DNICewF/GvL7FDiKHsu7QU13KO1Pds+qLXitU19ab1/WbnZLqGXL8Sva3Sn
+         bNrg==
+X-Gm-Message-State: AO0yUKUOLNhLAo9X4q4rGYrWBlo/veob+qPegh5xzoOHqdIrcBevqhC6
+        Xl8nxN/ciKayuzgzfHtzmLLXT4igjNU=
+X-Google-Smtp-Source: AK7set8uXr2sovLYtbxUeraNaTKwMoaMEQm3jr5Cs9656uq3YKkYAaDETqng8wyzyCVhZ2HsOOop/4RwRyc=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:ff25:0:b0:507:3e33:4390 with SMTP id
- k37-20020a63ff25000000b005073e334390mr94688pgi.6.1678898159630; Wed, 15 Mar
- 2023 09:35:59 -0700 (PDT)
-Date:   Wed, 15 Mar 2023 09:35:58 -0700
-In-Reply-To: <CA+wubQAXBFthBhsNqWDtY=Qf4-FtfJ3dojJctXXg=iokXJRbmg@mail.gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a65:5c43:0:b0:4f1:cd3a:3e83 with SMTP id
+ v3-20020a655c43000000b004f1cd3a3e83mr122328pgr.3.1678899271499; Wed, 15 Mar
+ 2023 09:54:31 -0700 (PDT)
+Date:   Wed, 15 Mar 2023 09:54:30 -0700
+In-Reply-To: <ZBGfmLuORj+ZBziv@yzhao56-desk.sh.intel.com>
 Mime-Version: 1.0
-References: <20230310125718.1442088-1-robert.hu@intel.com> <20230310125718.1442088-3-robert.hu@intel.com>
- <ZAtW7PF/1yhgBwYP@google.com> <CA+wubQAXBFthBhsNqWDtY=Qf4-FtfJ3dojJctXXg=iokXJRbmg@mail.gmail.com>
-Message-ID: <ZBHz7kL7wSRZzvKk@google.com>
-Subject: Re: [PATCH 2/3] KVM: VMX: Remove a unnecessary cpu_has_vmx_desc()
- check in vmx_set_cr4()
+References: <20230311002258.852397-1-seanjc@google.com> <20230311002258.852397-21-seanjc@google.com>
+ <ZBGfmLuORj+ZBziv@yzhao56-desk.sh.intel.com>
+Message-ID: <ZBH4RizqdigXeYte@google.com>
+Subject: Re: [PATCH v2 20/27] KVM: x86/mmu: Use page-track notifiers iff there
+ are external users
 From:   Sean Christopherson <seanjc@google.com>
-To:     Robert Hoo <robert.hoo.linux@gmail.com>
-Cc:     Robert Hoo <robert.hu@intel.com>, pbonzini@redhat.com,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>, kvm@vger.kernel.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+        Ben Gardon <bgardon@google.com>
+Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,50 +72,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Mar 11, 2023, Robert Hoo wrote:
-> Sean Christopherson <seanjc@google.com> =E4=BA=8E2023=E5=B9=B43=E6=9C=881=
-1=E6=97=A5=E5=91=A8=E5=85=AD 00:12=E5=86=99=E9=81=93=EF=BC=9A
-> >
-> > On Fri, Mar 10, 2023, Robert Hoo wrote:
-> > > Remove the unnecessary cpu_has_vmx_desc() check for emulating UMIP.
-> >
-> > It's not unnecessary.  See commit 64f7a11586ab ("KVM: vmx: update sec e=
-xec controls
-> > for UMIP iff emulating UMIP").  Dropping the check will cause KVM to ex=
-ecute
-> >
-> >         secondary_exec_controls_clearbit(vmx, SECONDARY_EXEC_DESC);
-> >
-> > on CPUs that don't have SECONDARY_VM_EXEC_CONTROL.
->=20
-> Sorry I don't follow you.
-> My point is that, given it has passed kvm_is_valid_cr4() (in kvm_set_cr4(=
-)),
-> we can assert boot_cpu_has(X86_FEATURE_UMIP)  and vmx_umip_emulated() mus=
-t be
-> at least one true.
+On Wed, Mar 15, 2023, Yan Zhao wrote:
+> On Fri, Mar 10, 2023 at 04:22:51PM -0800, Sean Christopherson wrote:
+> > Disable the page-track notifier code at compile time if there are no
+> > external users, i.e. if CONFIG_KVM_EXTERNAL_WRITE_TRACKING=n.  KVM itself
+> > now hooks emulated writes directly instead of relying on the page-track
+> > mechanism.
+> > 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  arch/x86/include/asm/kvm_host.h       |  2 ++
+> >  arch/x86/include/asm/kvm_page_track.h |  2 ++
+> >  arch/x86/kvm/mmu/page_track.c         |  9 ++++-----
+> >  arch/x86/kvm/mmu/page_track.h         | 29 +++++++++++++++++++++++----
+> >  4 files changed, 33 insertions(+), 9 deletions(-)
+> > 
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index 1a4225237564..a3423711e403 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -1265,7 +1265,9 @@ struct kvm_arch {
+> >  	 * create an NX huge page (without hanging the guest).
+> >  	 */
+> >  	struct list_head possible_nx_huge_pages;
+> > +#ifdef CONFIG_KVM_EXTERNAL_WRITE_TRACKING
+> >  	struct kvm_page_track_notifier_head track_notifier_head;
+> > +#endif
+> >  	/*
+> >  	 * Protects marking pages unsync during page faults, as TDP MMU page
+> >  	 * faults only take mmu_lock for read.  For simplicity, the unsync
+> > diff --git a/arch/x86/include/asm/kvm_page_track.h b/arch/x86/include/asm/kvm_page_track.h
+> > index deece45936a5..53c2adb25a07 100644
+> > --- a/arch/x86/include/asm/kvm_page_track.h
+> > +++ b/arch/x86/include/asm/kvm_page_track.h
+> The "#ifdef CONFIG_KVM_EXTERNAL_WRITE_TRACKING" can be moved to the
+> front of this file?
+> All the structures are only exposed for external users now.
 
-This assertion is wrong for the case where guest.CR4.UMIP=3D0.  The below c=
-ode is
-not guarded with a check on guest.CR4.UMIP.  If the vmx_umip_emulated() che=
-ck goes
-away and guest.CR4.UMIP=3D0, KVM will attempt to write secondary controls.
+Huh.  I've no idea why I didn't do that.  IIRC, the entire reason past me wrapped
+track_notifier_head in an #ifdef was to allow this change in kvm_page_track.h.
 
-Technically, now that controls_shadow exists, KVM won't actually do a VMWRI=
-TE,
-but I most definitely don't want to rely on controls_shadow for functional
-correctness.  And controls_shadow aside, the "vmx_umip_emulated()" effectiv=
-ely
-serves as documentation for why KVM is mucking with UMIP when it's obviousl=
-y not
-supported in hardware.
+I'll do this in the next version unless I discover an edge case I'm overlooking.
 
-	if (!boot_cpu_has(X86_FEATURE_UMIP) && vmx_umip_emulated()) {
-		if (cr4 & X86_CR4_UMIP) {
-			secondary_exec_controls_setbit(vmx, SECONDARY_EXEC_DESC);
-			hw_cr4 &=3D ~X86_CR4_UMIP;
-		} else if (!is_guest_mode(vcpu) ||
-			!nested_cpu_has2(get_vmcs12(vcpu), SECONDARY_EXEC_DESC)) {
-			secondary_exec_controls_clearbit(vmx, SECONDARY_EXEC_DESC);
-		}
-	}
+Thanks yet again!
