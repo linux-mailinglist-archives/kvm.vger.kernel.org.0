@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 706246BBB24
-	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 18:43:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5145A6BBB26
+	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 18:44:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232303AbjCORn6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 13:43:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54388 "EHLO
+        id S229459AbjCORoB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 13:44:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232246AbjCORnw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 13:43:52 -0400
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EECA6158AA
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:43:45 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id bg16-20020a05600c3c9000b003eb34e21bdfso1592181wmb.0
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:43:45 -0700 (PDT)
+        with ESMTP id S232286AbjCORnx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 13:43:53 -0400
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6564685A45
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:43:47 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id m18-20020a05600c3b1200b003ed2a3d635eso1817518wms.4
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:43:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1678902224;
+        d=linaro.org; s=google; t=1678902226;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=n2lqvTUuUPDyKzIrsP16s/eYBb9PuaeW9Nb5YqUgavw=;
-        b=LIp+fyzYsr1PkYiEm7gbcx1B1sBzNXTJuwtFxRcoiSddXx0bTYiRbX5j+lLUqWIw8W
-         H5qZNkdj4kR1dxg1fK+bR8TohBNHv/pzMkREtdrLCcP7nnNvAFB25jIYVWSPQKpxBs+8
-         /hJNOp5krYGHqxbJvCnpZTg1b9cU2Ht0PdKKRFGW4YOGUvFgQB+ub8wT/ZrfOdMIDplI
-         136lgdbi2SGphMeZM4ZCYjrF8VxJvTdIo3jxhSP1sxi71i4dhKnkQcjVVbovbNVjDtkO
-         W9WQwK8+mH1g8kCYmffpLkDG+ltccljeA81ickL8VInlRPDrhxqr8uWMh/66t6V/GQUZ
-         MmMw==
+        bh=tRC8fgG8iCpSOIjOKosXJGOasPWQrMaIPqKcrWrmcng=;
+        b=VQbrP+MTqADomaAy83LQX3Sb8C/F2JGpTQDwlL7fwIeSng+kOD3KCMgWkKwyr1SetB
+         RzNji2xn+BRaa9A1+47nZlrZNoq8A4lph97gVOleHHn5L5yNM/8DA6aE1xRH0vXZzQ6w
+         YGs9mb4pBs+XPv8996ljoHmxW1bzIEsUyqX1N1Dq+Q3ZMcsku4oeSHUP0H8fr3iaUh1d
+         +jOW5R1ACfT4GPaLhNR8Hds5JdNPPDK61e5sL5cp5fpAO4pAkQ1MfkvuK1aBBIT+MOUT
+         5K8emUAH8v9z4AMYV544ZQchOuJqkcH/Ai2PokRZDFw1BTo11a2Y68uIIfIHE8F/Ndv0
+         NXmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678902224;
+        d=1e100.net; s=20210112; t=1678902226;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=n2lqvTUuUPDyKzIrsP16s/eYBb9PuaeW9Nb5YqUgavw=;
-        b=TMUvUmttOWfcLkMoocWq2ntaUSdRMwyGcza32Ngc5wPxLNaEyoG3030fEU4onl0suM
-         HA7Sq1deh/WPPXPDN/wsFKV8EM/uvzPAngNV6G/BVONoMbOLh1irZkzaGg1lISJP9y1M
-         73O00iLaMSnUZRF89lzN0F01w+N7FY6B+rHyQF+OgkKKOJdg15W4mh3AO96FNAkKsu9x
-         L7S9t0vo758ulNHFzGsSlQI30fdeHqAM7nJEorMJYhArSOPo/MRU9eqo8nb9rw6eo6W9
-         xbZHRYlFDIP7sirGKm8rkulNEeVLGZ0GQVceaC1Pu9jIAT3fqYyqolxog7DnUdPLLm2J
-         aLEg==
-X-Gm-Message-State: AO0yUKWoXYF83M1WNYl9EWF3leZyI/p5i2ow1OnM5glgQgBGvWIl35xk
-        E9s9dzqZdkw4H4+pkvP+G77pNQ==
-X-Google-Smtp-Source: AK7set/V0TtSO4e7MAc+9is5Xqoc2dUXvwUSQZtY/ABalmrlPm39omiQX/433j9W1nISXeTSpB0wDQ==
-X-Received: by 2002:a05:600c:3b82:b0:3ed:3457:4e82 with SMTP id n2-20020a05600c3b8200b003ed34574e82mr3037826wms.30.1678902224524;
-        Wed, 15 Mar 2023 10:43:44 -0700 (PDT)
+        bh=tRC8fgG8iCpSOIjOKosXJGOasPWQrMaIPqKcrWrmcng=;
+        b=VAEK9hAjgsKpPoxMSaOouCwFI4htdLPuO46LG/7OXTdytek6mJ5dSP8LtcufFtZMW3
+         U+pYciQTUO62m1qITwfS1GSLgP6YkXYc9+EE+IZoamKgJ03cZfCzrwvbjfBv4VTpE44o
+         KFf7XhkJnyTeWwfOJHwG3wG075sZub0TC2CF8AHuvBPpC1avukDWw90AbCjClKkNNYQZ
+         RG+ubaul25cwOdv84Zwo8CqYlrnmL4jSXmCkiIJLAhUkKZ8ETZnnQY6tLn26H78JUzr0
+         V7XFQXWhcwN6UA/YxrHashX3tgiMJc6T51V7Mc3lSRuDA9tFcWVs63eZHju/n7DAyPXx
+         +iKg==
+X-Gm-Message-State: AO0yUKVHlDj7+FquLwQZ57MVfd9kwgAa94xmj8vSVZvMaEWXq5Lh+BFl
+        r+pg7WL1BUv8Qc62TEskAz38/w==
+X-Google-Smtp-Source: AK7set/meUh/5KgFTBvT2GG7lQLaA45vQRG5bfumoEJyiqV4RwJt6ZIG1omC0BVQ9oeoqIR4Fi2g4Q==
+X-Received: by 2002:a05:600c:354e:b0:3ed:377b:19cc with SMTP id i14-20020a05600c354e00b003ed377b19ccmr1767245wmq.0.1678902225812;
+        Wed, 15 Mar 2023 10:43:45 -0700 (PDT)
 Received: from zen.linaroharston ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id c7-20020a05600c0ac700b003eb5ce1b734sm2562105wmr.7.2023.03.15.10.43.43
+        by smtp.gmail.com with ESMTPSA id n7-20020a05600c294700b003ebf9e36cd6sm2539979wmd.26.2023.03.15.10.43.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Mar 2023 10:43:43 -0700 (PDT)
+        Wed, 15 Mar 2023 10:43:45 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id 484EF1FFBE;
+        by zen.linaroharston (Postfix) with ESMTP id 6D4C51FFC8;
         Wed, 15 Mar 2023 17:43:43 +0000 (GMT)
 From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To:     qemu-devel@nongnu.org
@@ -113,9 +113,9 @@ Cc:     Akihiko Odaki <akihiko.odaki@gmail.com>,
         Sunil Muthuswamy <sunilmut@microsoft.com>,
         Hanna Reitz <hreitz@redhat.com>, Peter Xu <peterx@redhat.com>,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v2 15/32] *: Add missing includes of qemu/plugin.h
-Date:   Wed, 15 Mar 2023 17:43:14 +0000
-Message-Id: <20230315174331.2959-16-alex.bennee@linaro.org>
+Subject: [PATCH v2 16/32] include/qemu: Split out plugin-event.h
+Date:   Wed, 15 Mar 2023 17:43:15 +0000
+Message-Id: <20230315174331.2959-17-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230315174331.2959-1-alex.bennee@linaro.org>
 References: <20230315174331.2959-1-alex.bennee@linaro.org>
@@ -134,82 +134,94 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-This had been pulled in from hw/core/cpu.h,
-but that will be removed.
+The usage in hw/core/cpu.h only requires QEMU_PLUGIN_EV_MAX.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Message-Id: <20230310195252.210956-6-richard.henderson@linaro.org>
-[AJB: also syscall-trace.h]
+Message-Id: <20230310195252.210956-7-richard.henderson@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- include/user/syscall-trace.h | 1 +
- accel/tcg/cpu-exec-common.c  | 1 +
- cpu.c                        | 1 +
- linux-user/exit.c            | 1 +
- linux-user/syscall.c         | 1 +
- 5 files changed, 5 insertions(+)
+ include/hw/core/cpu.h       |  2 +-
+ include/qemu/plugin-event.h | 26 ++++++++++++++++++++++++++
+ include/qemu/plugin.h       | 17 +----------------
+ 3 files changed, 28 insertions(+), 17 deletions(-)
+ create mode 100644 include/qemu/plugin-event.h
 
-diff --git a/include/user/syscall-trace.h b/include/user/syscall-trace.h
-index c5a220da34..90bda7631c 100644
---- a/include/user/syscall-trace.h
-+++ b/include/user/syscall-trace.h
-@@ -11,6 +11,7 @@
- #define SYSCALL_TRACE_H
- 
- #include "exec/user/abitypes.h"
-+#include "qemu/plugin.h"
- #include "trace/trace-root.h"
- 
- /*
-diff --git a/accel/tcg/cpu-exec-common.c b/accel/tcg/cpu-exec-common.c
-index 176ea57281..e7962c9348 100644
---- a/accel/tcg/cpu-exec-common.c
-+++ b/accel/tcg/cpu-exec-common.c
-@@ -21,6 +21,7 @@
- #include "sysemu/cpus.h"
- #include "sysemu/tcg.h"
- #include "exec/exec-all.h"
-+#include "qemu/plugin.h"
- 
- bool tcg_allowed;
- 
-diff --git a/cpu.c b/cpu.c
-index 567b23af46..849bac062c 100644
---- a/cpu.c
-+++ b/cpu.c
-@@ -42,6 +42,7 @@
- #include "hw/core/accel-cpu.h"
- #include "trace/trace-root.h"
- #include "qemu/accel.h"
-+#include "qemu/plugin.h"
- 
- uintptr_t qemu_host_page_size;
- intptr_t qemu_host_page_mask;
-diff --git a/linux-user/exit.c b/linux-user/exit.c
-index fd49d76f45..3017d28a3c 100644
---- a/linux-user/exit.c
-+++ b/linux-user/exit.c
-@@ -21,6 +21,7 @@
- #include "gdbstub/syscalls.h"
- #include "qemu.h"
- #include "user-internals.h"
-+#include "qemu/plugin.h"
- #ifdef CONFIG_GPROF
- #include <sys/gmon.h>
- #endif
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 24cea6fb6a..27871641f4 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -22,6 +22,7 @@
- #include "qemu/path.h"
- #include "qemu/memfd.h"
+diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
+index 75689bff02..821e937020 100644
+--- a/include/hw/core/cpu.h
++++ b/include/hw/core/cpu.h
+@@ -30,7 +30,7 @@
+ #include "qemu/rcu_queue.h"
  #include "qemu/queue.h"
-+#include "qemu/plugin.h"
- #include "target_mman.h"
- #include <elf.h>
- #include <endian.h>
+ #include "qemu/thread.h"
+-#include "qemu/plugin.h"
++#include "qemu/plugin-event.h"
+ #include "qom/object.h"
+ 
+ typedef int (*WriteCoreDumpFunction)(const void *buf, size_t size,
+diff --git a/include/qemu/plugin-event.h b/include/qemu/plugin-event.h
+new file mode 100644
+index 0000000000..7056d8427b
+--- /dev/null
++++ b/include/qemu/plugin-event.h
+@@ -0,0 +1,26 @@
++/*
++ * Copyright (C) 2017, Emilio G. Cota <cota@braap.org>
++ *
++ * License: GNU GPL, version 2 or later.
++ *   See the COPYING file in the top-level directory.
++ */
++#ifndef QEMU_PLUGIN_EVENT_H
++#define QEMU_PLUGIN_EVENT_H
++
++/*
++ * Events that plugins can subscribe to.
++ */
++enum qemu_plugin_event {
++    QEMU_PLUGIN_EV_VCPU_INIT,
++    QEMU_PLUGIN_EV_VCPU_EXIT,
++    QEMU_PLUGIN_EV_VCPU_TB_TRANS,
++    QEMU_PLUGIN_EV_VCPU_IDLE,
++    QEMU_PLUGIN_EV_VCPU_RESUME,
++    QEMU_PLUGIN_EV_VCPU_SYSCALL,
++    QEMU_PLUGIN_EV_VCPU_SYSCALL_RET,
++    QEMU_PLUGIN_EV_FLUSH,
++    QEMU_PLUGIN_EV_ATEXIT,
++    QEMU_PLUGIN_EV_MAX, /* total number of plugin events we support */
++};
++
++#endif /* QEMU_PLUGIN_EVENT_H */
+diff --git a/include/qemu/plugin.h b/include/qemu/plugin.h
+index e0ebedef84..6bf4bce188 100644
+--- a/include/qemu/plugin.h
++++ b/include/qemu/plugin.h
+@@ -12,24 +12,9 @@
+ #include "qemu/error-report.h"
+ #include "qemu/queue.h"
+ #include "qemu/option.h"
++#include "qemu/plugin-event.h"
+ #include "exec/memopidx.h"
+ 
+-/*
+- * Events that plugins can subscribe to.
+- */
+-enum qemu_plugin_event {
+-    QEMU_PLUGIN_EV_VCPU_INIT,
+-    QEMU_PLUGIN_EV_VCPU_EXIT,
+-    QEMU_PLUGIN_EV_VCPU_TB_TRANS,
+-    QEMU_PLUGIN_EV_VCPU_IDLE,
+-    QEMU_PLUGIN_EV_VCPU_RESUME,
+-    QEMU_PLUGIN_EV_VCPU_SYSCALL,
+-    QEMU_PLUGIN_EV_VCPU_SYSCALL_RET,
+-    QEMU_PLUGIN_EV_FLUSH,
+-    QEMU_PLUGIN_EV_ATEXIT,
+-    QEMU_PLUGIN_EV_MAX, /* total number of plugin events we support */
+-};
+-
+ /*
+  * Option parsing/processing.
+  * Note that we can load an arbitrary number of plugins.
 -- 
 2.39.2
 
