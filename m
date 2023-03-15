@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 53FAB6BBB27
-	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 18:44:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D06376BBB2A
+	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 18:44:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232490AbjCORoE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 13:44:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54500 "EHLO
+        id S232495AbjCORoH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 13:44:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54586 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232297AbjCORnx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 13:43:53 -0400
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 649505B5DF
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:43:47 -0700 (PDT)
-Received: by mail-wr1-x42f.google.com with SMTP id j2so18045207wrh.9
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:43:47 -0700 (PDT)
+        with ESMTP id S232424AbjCORnz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 13:43:55 -0400
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FD0790B4A
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:43:48 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id ay8so7857721wmb.1
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:43:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1678902225;
+        d=linaro.org; s=google; t=1678902226;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UVMGZ9W+Y+8un4w4HSts32m5VZ1Mq2mPxSxu1YHDmSY=;
-        b=X/6TnPJT6tqTp8EMSaOU8VaZjDmCUXTULuB0vNEzfzgPxpnVgqWPTa6PXxP3yGbYx4
-         Vc7nVRjfam/KU+VrTGF/gzOqSPOYnvq/AhcN2KyGjMktpgXD8da2wHwYpuKSavipbSoV
-         S2ie8EDVfHIhao5VhCIflW2KM5UNrnSpdMJ7W+mej+yVQcOS7le/MwL6Fzs89gCVfrNL
-         82LzZVGb67x7RwufXHGwizCn8VXBa6F5RdqRD3N6t4OtWZ3VDChYx2WMlk/kza4ooRHV
-         vPz6ZGN9U8vdj+uAFLVoggn2+wKvFxFicMJOMtUhXlmvIfqMvHecMKxry0QaN2lNqoXl
-         uwfg==
+        bh=ugIkozbEBGsoB+Byq329AMY9/YRtl8pDzh0Lm83ecO8=;
+        b=tIL+RIXFEqvWvEoWx4NCa5UNyBZ5FgdDamUhA7TfuhyAyUWKPI7fQ+jTGj857GkDDt
+         08o7Qt8ZCXFHs02L94g/4uYZtzgnSb/3kOagKIdp4HsCoOVszm8hb92m/WAS3Ae7Li7W
+         THFfpbFcY/pBknstK7P+sA8AiV15PIe2xWHB1rKercXae8TgYEyF3SY8ZceZl5Eb8w+t
+         5tYX8wnTFx9j1dF4uSkw9yxW170JPTe4pYGp3HL3JkreMfUrM76Jw2/SrRX6rmkP0s0c
+         LrRDA7/jQw1+IDpSHLyuK16mHqnpRlZybQF37SbosnmzGm7EP306QhrgN6KP0vu5bBSB
+         JeUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678902225;
+        d=1e100.net; s=20210112; t=1678902226;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UVMGZ9W+Y+8un4w4HSts32m5VZ1Mq2mPxSxu1YHDmSY=;
-        b=wdhMB5NBlBfrnc7OfPkSoeKNVCUWacXzEKUTSxiZXhArTGTKM3quBxrrQUgmCfr2+W
-         6UwR0E1TtqoqPbB4hhPjlPGjVerSdf4uuC2JNSHnOayVL+wb8DD/YCNCp02je0WeyG/R
-         4T2Qqhqqvrk+jyn6ev4atL3UnveDqFnBFq6NB7r/oXEgcwuAwPxT1myCcg1gbKd+Ekzn
-         HB0mj3+YN11ljlQiZ4GDz2ilEZuco1jipEPYK4zh0o3fWfPVsg8z34Hd+qXuRz31XFqv
-         LT1tbZNmEfqCcXPwRWW7/Ey5U81/kU5D/1ndtxEnkEPQzQ2fYhkydbPC5s9DfuvL+MFf
-         4pLQ==
-X-Gm-Message-State: AO0yUKVCfsAD7KbOEB3LSwP4PYRGLr32xxrJvQGkfVvBHVzuCL+gzPX5
-        U24r7DwTNdpeHNd8kBxBGWup/A==
-X-Google-Smtp-Source: AK7set+wMJs0I78AplJYwBwvoIo2BY5fZYSJFjnxECQvSxVToY0v82YBBubDO5mNzgeMF3+b4+92IA==
-X-Received: by 2002:adf:ed04:0:b0:2cf:f061:4910 with SMTP id a4-20020adfed04000000b002cff0614910mr2554914wro.42.1678902225762;
-        Wed, 15 Mar 2023 10:43:45 -0700 (PDT)
+        bh=ugIkozbEBGsoB+Byq329AMY9/YRtl8pDzh0Lm83ecO8=;
+        b=XjR+UyFSZu2g5PbSlQwuoAg4sgrnqkmLa2nQcFvVbwrn5RweN4jWfI6e7glqgELAhh
+         kswU5f2K93Y6H1VvGO1QSu51tvWdIs7Og+0RzkrBiEewRtVE4gKesB8OU43ax7Bw9Di4
+         Ys6QYQ/uPmRwYhHTIKGhW8HM0seTd3mzD0erg969hKxSIEneJE8L8Daqy5L95AEMtjx3
+         zmZjV5AUKwJoGOeI8VrRRPjRktGNsFXsdeQKOoiTd91QcDeOQEjyflklCic3TZCi8y/j
+         zJhRavIyHcVr5XS3ug2u7HJc9mg1IuijpA1Zt7Mk8pbZE5+P99cose5wTb+1SuxLyprY
+         zHGQ==
+X-Gm-Message-State: AO0yUKUsIipaKbGDMR2I7SNT5nxpBysTlv4CcGoXaYQSUcGWU4k2U6ou
+        STvdUaURtg5ZI4sgQr9/uTOeuw==
+X-Google-Smtp-Source: AK7set/T+4wJT4x2oAa5J0wviU40HKUZVVYUlJyiSGs9J69Tx74TXF1+lWgpMvu/I/TY+BFOEJM3/g==
+X-Received: by 2002:a05:600c:45d2:b0:3ed:1fa1:73c5 with SMTP id s18-20020a05600c45d200b003ed1fa173c5mr12234807wmo.27.1678902226686;
+        Wed, 15 Mar 2023 10:43:46 -0700 (PDT)
 Received: from zen.linaroharston ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id n4-20020a5d6b84000000b002cfe685bfd6sm5115143wrx.108.2023.03.15.10.43.44
+        by smtp.gmail.com with ESMTPSA id a5-20020a056000100500b002cea299a575sm5090202wrx.101.2023.03.15.10.43.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 15 Mar 2023 10:43:45 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id 8D4BF1FFC9;
+        by zen.linaroharston (Postfix) with ESMTP id AC4E31FFCA;
         Wed, 15 Mar 2023 17:43:43 +0000 (GMT)
 From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To:     qemu-devel@nongnu.org
@@ -112,10 +112,11 @@ Cc:     Akihiko Odaki <akihiko.odaki@gmail.com>,
         Paul Durrant <paul@xen.org>, Bin Meng <bin.meng@windriver.com>,
         Sunil Muthuswamy <sunilmut@microsoft.com>,
         Hanna Reitz <hreitz@redhat.com>, Peter Xu <peterx@redhat.com>,
-        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v2 17/32] include/qemu/plugin: Inline qemu_plugin_disable_mem_helpers
-Date:   Wed, 15 Mar 2023 17:43:16 +0000
-Message-Id: <20230315174331.2959-18-alex.bennee@linaro.org>
+        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+        =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Subject: [PATCH v2 18/32] iotests: explicitly pass source/build dir to 'check' command
+Date:   Wed, 15 Mar 2023 17:43:17 +0000
+Message-Id: <20230315174331.2959-19-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230315174331.2959-1-alex.bennee@linaro.org>
 References: <20230315174331.2959-1-alex.bennee@linaro.org>
@@ -132,66 +133,116 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Daniel P. Berrangé <berrange@redhat.com>
 
-Now that we've broken the include loop with cpu.h,
-we can bring this inline.
+The 'check' script has some rather dubious logic whereby it assumes
+that if invoked as a symlink, then it is running from a separate
+source tree and build tree, otherwise it assumes the current working
+directory is a combined source and build tree.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Message-Id: <20230310195252.210956-8-richard.henderson@linaro.org>
+This doesn't work if you want to invoke the 'check' script using
+its full source tree path while still using a split source and build
+tree layout. This would be a typical situation with meson if you ask
+it to find the 'check' script path using files('check').
+
+Rather than trying to make the logic more magical, add support for
+explicitly passing the dirs using --source-dir and --build-dir. If
+either is omitted the current logic is maintained.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Acked-by: Hanna Czenczek <hreitz@redhat.com>
+Tested-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20230303160727.3977246-2-berrange@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- include/qemu/plugin.h |  6 +++++-
- plugins/core.c        | 11 -----------
- 2 files changed, 5 insertions(+), 12 deletions(-)
+ tests/qemu-iotests/check      | 25 +++++++++++++++++++++++--
+ tests/qemu-iotests/testenv.py | 13 ++++---------
+ 2 files changed, 27 insertions(+), 11 deletions(-)
 
-diff --git a/include/qemu/plugin.h b/include/qemu/plugin.h
-index 6bf4bce188..bc0781cab8 100644
---- a/include/qemu/plugin.h
-+++ b/include/qemu/plugin.h
-@@ -14,6 +14,7 @@
- #include "qemu/option.h"
- #include "qemu/plugin-event.h"
- #include "exec/memopidx.h"
-+#include "hw/core/cpu.h"
+diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+index 9bdda1394e..da7e8a87fe 100755
+--- a/tests/qemu-iotests/check
++++ b/tests/qemu-iotests/check
+@@ -26,9 +26,23 @@ from findtests import TestFinder
+ from testenv import TestEnv
+ from testrunner import TestRunner
  
- /*
-  * Option parsing/processing.
-@@ -204,7 +205,10 @@ void qemu_plugin_atexit_cb(void);
++def get_default_path(follow_link=False):
++    """
++    Try to automagically figure out the path we are running from.
++    """
++    # called from the build tree?
++    if os.path.islink(sys.argv[0]):
++        if follow_link:
++            return os.path.dirname(os.readlink(sys.argv[0]))
++        else:
++            return os.path.dirname(os.path.abspath(sys.argv[0]))
++    else:  # or source tree?
++        return os.getcwd()
  
- void qemu_plugin_add_dyn_cb_arr(GArray *arr);
+ def make_argparser() -> argparse.ArgumentParser:
+-    p = argparse.ArgumentParser(description="Test run options")
++    p = argparse.ArgumentParser(
++        description="Test run options",
++        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
  
--void qemu_plugin_disable_mem_helpers(CPUState *cpu);
-+static inline void qemu_plugin_disable_mem_helpers(CPUState *cpu)
-+{
-+    cpu->plugin_mem_cbs = NULL;
-+}
+     p.add_argument('-n', '--dry-run', action='store_true',
+                    help='show me, do not run tests')
+@@ -113,6 +127,11 @@ def make_argparser() -> argparse.ArgumentParser:
+                        'middle of the process.')
+     g_sel.add_argument('tests', metavar='TEST_FILES', nargs='*',
+                        help='tests to run, or "--" followed by a command')
++    g_sel.add_argument('--build-dir', default=get_default_path(),
++                       help='Path to iotests build directory')
++    g_sel.add_argument('--source-dir',
++                       default=get_default_path(follow_link=True),
++                       help='Path to iotests build directory')
  
- /**
-  * qemu_plugin_user_exit(): clean-up callbacks before calling exit callbacks
-diff --git a/plugins/core.c b/plugins/core.c
-index 04632886b9..9912f2cfdb 100644
---- a/plugins/core.c
-+++ b/plugins/core.c
-@@ -553,17 +553,6 @@ void qemu_plugin_user_postfork(bool is_child)
-     }
- }
+     return p
  
--
--/*
-- * Call this function after longjmp'ing to the main loop. It's possible that the
-- * last instruction of a TB might have used helpers, and therefore the
-- * "disable" instruction will never execute because it ended up as dead code.
-- */
--void qemu_plugin_disable_mem_helpers(CPUState *cpu)
--{
--    cpu->plugin_mem_cbs = NULL;
--}
--
- static bool plugin_dyn_cb_arr_cmp(const void *ap, const void *bp)
- {
-     return ap == bp;
+@@ -120,7 +139,9 @@ def make_argparser() -> argparse.ArgumentParser:
+ if __name__ == '__main__':
+     args = make_argparser().parse_args()
+ 
+-    env = TestEnv(imgfmt=args.imgfmt, imgproto=args.imgproto,
++    env = TestEnv(source_dir=args.source_dir,
++                  build_dir=args.build_dir,
++                  imgfmt=args.imgfmt, imgproto=args.imgproto,
+                   aiomode=args.aiomode, cachemode=args.cachemode,
+                   imgopts=args.imgopts, misalign=args.misalign,
+                   debug=args.debug, valgrind=args.valgrind,
+diff --git a/tests/qemu-iotests/testenv.py b/tests/qemu-iotests/testenv.py
+index a864c74b12..aa9d735414 100644
+--- a/tests/qemu-iotests/testenv.py
++++ b/tests/qemu-iotests/testenv.py
+@@ -170,7 +170,8 @@ def root(*names: str) -> str:
+             if not isxfile(b):
+                 sys.exit('Not executable: ' + b)
+ 
+-    def __init__(self, imgfmt: str, imgproto: str, aiomode: str,
++    def __init__(self, source_dir: str, build_dir: str,
++                 imgfmt: str, imgproto: str, aiomode: str,
+                  cachemode: Optional[str] = None,
+                  imgopts: Optional[str] = None,
+                  misalign: bool = False,
+@@ -211,14 +212,8 @@ def __init__(self, imgfmt: str, imgproto: str, aiomode: str,
+         # which are needed to initialize some environment variables. They are
+         # used by init_*() functions as well.
+ 
+-        if os.path.islink(sys.argv[0]):
+-            # called from the build tree
+-            self.source_iotests = os.path.dirname(os.readlink(sys.argv[0]))
+-            self.build_iotests = os.path.dirname(os.path.abspath(sys.argv[0]))
+-        else:
+-            # called from the source tree
+-            self.source_iotests = os.getcwd()
+-            self.build_iotests = self.source_iotests
++        self.source_iotests = source_dir
++        self.build_iotests = build_dir
+ 
+         self.build_root = os.path.join(self.build_iotests, '..', '..')
+ 
 -- 
 2.39.2
 
