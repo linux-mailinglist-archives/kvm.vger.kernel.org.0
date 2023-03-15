@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3EE766BBB5F
-	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 18:50:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 564786BBB2E
+	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 18:44:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232855AbjCORuA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 13:50:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36648 "EHLO
+        id S232536AbjCORoU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 13:44:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232421AbjCORtk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 13:49:40 -0400
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E7AC2B615
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:49:26 -0700 (PDT)
-Received: by mail-wm1-x329.google.com with SMTP id x22so7660096wmj.3
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:49:26 -0700 (PDT)
+        with ESMTP id S232477AbjCORn4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 13:43:56 -0400
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61F7114208
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:43:50 -0700 (PDT)
+Received: by mail-wm1-x32a.google.com with SMTP id c8-20020a05600c0ac800b003ed2f97a63eso1574459wmr.3
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:43:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1678902564;
+        d=linaro.org; s=google; t=1678902229;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Jq6hxeJvtxl+2hc076HR0v7mq5ZkbtUv1Uhl1DVVlCE=;
-        b=JoW+jfgH2ZSGaEGWNB1c86mJrHTmFwhbNALMh5n0IgddNo1vkrMorDjqVZvR5zDYyB
-         E9D/TRIOKM7zII0KRnTs69PFwi21fI+mmi4y0l+s+TcHEz4bTD7IVx4mhIymk5s+coD7
-         wGyBe3LliNocveapx/qlv2jek+6eEVPeVHepiYeI+7KYQqv7i+fGYtHYFkNRb9JmXRUJ
-         dGOOwPnuVj6PCrbQNUqXEEinXq4f9Fivg6UUQi0y3DXAk2sUoHrjGUG9rGPPts+yij6+
-         S91MVP53BG1C93gVX/WpyA0fmjtHXIZ0jTCb07KyHGfypwOxB3dr418TLIsLPWXw6hfi
-         lM1A==
+        bh=sQqjfUQatIxdKkk1mS9vZHLNSiIHLiR1rCd25SjEL8w=;
+        b=XznwCmfFONn50XJBkdukTR3kRWoDjilt1BeLxR2JZE5yxxl82IMwB9MIrWM67kHRpx
+         ANp8HqjvO5QQdUmn5moo3SDGYRjEGkn4JWYU/t/NGeosWPuyijvwxKrF/7n0SWXBJjXR
+         H2eJrsDyl8SOaFC4AcpB3EKp2PyMRZc2Ybda1OzbLbWuBHk262BNDsz95me2FnsV7IZm
+         FMkdknNAVWs3S8ceZmnCnK563TbL3tPi6k0jtkZU9lfnxRGNw+dg/TdWMRe7oBq33MnE
+         HRcAWalTYkaMCnIuORFCyQCYFe9SdzUX4HX3CSkqXLKpc4kil2Z+WWIQ4v7xGSlIQe0d
+         q41w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678902564;
+        d=1e100.net; s=20210112; t=1678902229;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Jq6hxeJvtxl+2hc076HR0v7mq5ZkbtUv1Uhl1DVVlCE=;
-        b=o+qzDRwJo2ibjqZ3YS7y2Ec+WqOSS+TT6w6q+8V0m7LCwVYOmh5qI9tJgebURhrIq7
-         60YwFxQOQ3j0YZXsgZbh5B1XyfDLVTIJl/GTaH7fHC8ygG4uxpTGC8MRS9BrstWIfcGT
-         lokmay3A3UyLTVLFQmPyrojGNxFUO9rm+gmBJGI3MbQhUtktQ8TVGgO5krmYSvLm5OdY
-         /OLzvjfbcLcsaUWP0GUmv9YrLxqtpiDij+hGIHbncfyuVXNZIc9qx/Hj2KFFhRAQTyH+
-         cMCwuoerObLxCKKNoBTERGXlUw0FmDnuBSbDCXnYj1m6xQN/PXnZNJ9rY2quoJsbSL5p
-         BABw==
-X-Gm-Message-State: AO0yUKXfHDcJsNuLeBjkArNQ7Bo0JCU8htdnGY6E/jzfGzwwPpgShGAo
-        qpal/vHt9oIrDmkz4ejql5GTmg==
-X-Google-Smtp-Source: AK7set8+7+vGSNMfAVAD3aOFQHK1DspDT2fMCXhb1Ossl4jav7nNbjq2ozGoRtLmcVQCfNOfFUZQtQ==
-X-Received: by 2002:a05:600c:34c1:b0:3eb:383c:1876 with SMTP id d1-20020a05600c34c100b003eb383c1876mr18700431wmq.6.1678902564742;
-        Wed, 15 Mar 2023 10:49:24 -0700 (PDT)
+        bh=sQqjfUQatIxdKkk1mS9vZHLNSiIHLiR1rCd25SjEL8w=;
+        b=ubPyY4LKocQ6dggI1Wk5Vh0H554TZrwA8YlQAK1mvfxOCGmjCvIkniT9nGm8rv2oKv
+         YMDrrCIjqhQOOL0+HPwCcRU5xrgPF0mXAQJ+ZF3u9XaMHZM8amHx+pJk3qHDObV/WO5/
+         t76UO1i8uW0owXE0dLquU05Vo5yJnRwjnc4OxNl0++kdYix/6wr+d7JbiLdwKynpVdgs
+         7UQ48/24Khr6HCwZ/4L4SoEIROnogVusEpziDSOfyLOs+Y+gBm/Wzctf+1XOioFHY+pB
+         Q6hQQCYGVIaA2RnSM1o98+Pfhpjrmq9tKK8MtzWlDlybhMd8fxz7/6BaPbFBU+xzS2pz
+         JMUA==
+X-Gm-Message-State: AO0yUKUzEbLh01HW6LbbaIpFINZ28yFYwi/ledFF80SG74E9isN51ZIQ
+        VLjUFTHrXZzaCM1ZBqCPHOc1Hw==
+X-Google-Smtp-Source: AK7set9LuUIhKU6kk9tdCegJVIMu5mWEMbP1y+0HMXKeGMpA9W5c40o7/Dwwn27J4H75Z13JnC6hpQ==
+X-Received: by 2002:a05:600c:45d2:b0:3ed:2a8f:e6dd with SMTP id s18-20020a05600c45d200b003ed2a8fe6ddmr7442941wmo.6.1678902229285;
+        Wed, 15 Mar 2023 10:43:49 -0700 (PDT)
 Received: from zen.linaroharston ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id t8-20020a1c7708000000b003ed2276cd0dsm2502818wmi.38.2023.03.15.10.49.21
+        by smtp.gmail.com with ESMTPSA id 4-20020a05600c024400b003eb966d39desm2600527wmj.2.2023.03.15.10.43.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Mar 2023 10:49:22 -0700 (PDT)
+        Wed, 15 Mar 2023 10:43:47 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id 4650A1FFCE;
+        by zen.linaroharston (Postfix) with ESMTP id 62DC01FFCF;
         Wed, 15 Mar 2023 17:43:44 +0000 (GMT)
 From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To:     qemu-devel@nongnu.org
@@ -114,9 +114,9 @@ Cc:     Akihiko Odaki <akihiko.odaki@gmail.com>,
         Hanna Reitz <hreitz@redhat.com>, Peter Xu <peterx@redhat.com>,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
         =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Subject: [PATCH v2 23/32] iotests: always use a unique sub-directory per test
-Date:   Wed, 15 Mar 2023 17:43:22 +0000
-Message-Id: <20230315174331.2959-24-alex.bennee@linaro.org>
+Subject: [PATCH v2 24/32] iotests: register each I/O test separately with meson
+Date:   Wed, 15 Mar 2023 17:43:23 +0000
+Message-Id: <20230315174331.2959-25-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230315174331.2959-1-alex.bennee@linaro.org>
 References: <20230315174331.2959-1-alex.bennee@linaro.org>
@@ -135,80 +135,85 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Daniel P. Berrangé <berrange@redhat.com>
 
-The current test runner is only safe against parallel execution within
-a single instance of the 'check' process, and only if -j is given a
-value greater than 2. This prevents running multiple copies of the
-'check' process for different test scenarios.
+Currently meson registers a single test that invokes an entire group of
+I/O tests, hiding the test granularity from meson. There are various
+downsides of doing this
 
-This change switches the output / socket directories to always include
-the test name, image format and image protocol. This should allow full
-parallelism of all distinct test scenarios. eg running both qcow2 and
-raw tests at the same time, or both file and nbd tests at the same
-time.
+ * You cannot ask 'meson test' to invoke a single I/O test
+ * The meson test timeout can't be applied to the individual
+   tests
+ * Meson only gets a pass/fail for the overall I/O test group
+   not individual tests
+ * If a CI job gets killed by the GitLab timeout, we don't
+   get visibility into how far through the I/O tests
+   execution got.
 
-It would be possible to allow for parallelism of the same test scenario
-by including the pid, but that would potentially let many directories
-accumulate over time on failures, so is not done.
+This switches meson to perform test discovery by invoking 'check' in
+dry-run mode. It then registers one meson test case for each I/O
+test. Parallel execution remains disabled since the I/O tests do not
+use self contained execution environments and thus conflict with
+each other.
 
 Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Acked-by: Hanna Czenczek <hreitz@redhat.com>
 Tested-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20230303160727.3977246-7-berrange@redhat.com>
+Message-Id: <20230303160727.3977246-8-berrange@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/qemu-iotests/testrunner.py | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ tests/qemu-iotests/meson.build | 35 ++++++++++++++++++++++++++++------
+ 1 file changed, 29 insertions(+), 6 deletions(-)
 
-diff --git a/tests/qemu-iotests/testrunner.py b/tests/qemu-iotests/testrunner.py
-index 81519ed6e2..7b322272e9 100644
---- a/tests/qemu-iotests/testrunner.py
-+++ b/tests/qemu-iotests/testrunner.py
-@@ -228,13 +228,11 @@ def find_reference(self, test: str) -> str:
+diff --git a/tests/qemu-iotests/meson.build b/tests/qemu-iotests/meson.build
+index 323a4acb6a..a162f683ef 100644
+--- a/tests/qemu-iotests/meson.build
++++ b/tests/qemu-iotests/meson.build
+@@ -32,16 +32,39 @@ foreach k, v : emulators
+   endif
+ endforeach
  
-         return f'{test}.out'
- 
--    def do_run_test(self, test: str, mp: bool) -> TestResult:
-+    def do_run_test(self, test: str) -> TestResult:
-         """
-         Run one test
- 
-         :param test: test file path
--        :param mp: if true, we are in a multiprocessing environment, use
--                   personal subdirectories for test run
- 
-         Note: this method may be called from subprocess, so it does not
-         change ``self`` object in any way!
-@@ -257,12 +255,14 @@ def do_run_test(self, test: str, mp: bool) -> TestResult:
- 
-         args = [str(f_test.resolve())]
-         env = self.env.prepare_subprocess(args)
--        if mp:
--            # Split test directories, so that tests running in parallel don't
--            # break each other.
--            for d in ['TEST_DIR', 'SOCK_DIR']:
--                env[d] = os.path.join(env[d], f_test.name)
--                Path(env[d]).mkdir(parents=True, exist_ok=True)
++qemu_iotests_check_cmd = files('check')
 +
-+        # Split test directories, so that tests running in parallel don't
-+        # break each other.
-+        for d in ['TEST_DIR', 'SOCK_DIR']:
-+            env[d] = os.path.join(
-+                env[d],
-+                f"{self.env.imgfmt}-{self.env.imgproto}-{f_test.name}")
-+            Path(env[d]).mkdir(parents=True, exist_ok=True)
- 
-         test_dir = env['TEST_DIR']
-         f_bad = Path(test_dir, f_test.name + '.out.bad')
-@@ -347,7 +347,7 @@ def run_test(self, test: str,
-             testname = os.path.basename(test)
-             print(f'# running {self.env.imgfmt} {testname}')
- 
--        res = self.do_run_test(test, mp)
-+        res = self.do_run_test(test)
- 
-         end = datetime.datetime.now().strftime('%H:%M:%S')
-         self.test_print_one_line(test=test,
+ foreach format, speed: qemu_iotests_formats
+   if speed == 'quick'
+     suites = 'block'
+   else
+     suites = ['block-' + speed, speed]
+   endif
+-  test('qemu-iotests ' + format, sh, args: [files('../check-block.sh'), format],
+-       depends: qemu_iotests_binaries, env: qemu_iotests_env,
+-       protocol: 'tap',
+-       suite: suites,
+-       timeout: 0,
+-       is_parallel: false)
++
++  args = ['-tap', '-' + format]
++  if speed == 'quick'
++      args += ['-g', 'auto']
++  endif
++
++  rc = run_command(
++      [qemu_iotests_check_cmd] + args + ['-n'],
++      check: true,
++  )
++
++  foreach item: rc.stdout().strip().split()
++      args = ['-tap', '-' + format, item,
++              '--source-dir', meson.current_source_dir(),
++              '--build-dir', meson.current_build_dir()]
++      # Some individual tests take as long as 45 seconds
++      # Bump the timeout to 3 minutes for some headroom
++      # on slow machines to minimize spurious failures
++      test('io-' + format + '-' + item,
++           qemu_iotests_check_cmd,
++           args: args,
++           depends: qemu_iotests_binaries,
++           env: qemu_iotests_env,
++           protocol: 'tap',
++           timeout: 180,
++           suite: suites)
++  endforeach
+ endforeach
 -- 
 2.39.2
 
