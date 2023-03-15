@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 531FB6BBFA1
-	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 23:11:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F3E86BBFAD
+	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 23:18:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231928AbjCOWLR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 18:11:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51120 "EHLO
+        id S232223AbjCOWSG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 18:18:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230197AbjCOWLQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 18:11:16 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67C5D51C93
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 15:11:14 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-541a39df9f4so106204417b3.20
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 15:11:14 -0700 (PDT)
+        with ESMTP id S232516AbjCOWSE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 18:18:04 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D39F18B26
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 15:18:03 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id t30-20020a056a00139e00b006228307e71bso52829pfg.0
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 15:18:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678918273;
+        d=google.com; s=20210112; t=1678918682;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gCEVwhMsnCNBhroQq0PksbnuOcAT6DZi9De9lSt4IwU=;
-        b=UoCusXmLUWCe6yj0B3xqAo/e2gP0N3l66LAiPV7qbv1FXtcqD8hON9ildeCpsWSyns
-         9HvXarlx5C5NN3zftMPb7YQZw0u95t+MR/v9AFKQP+o+gHanxi//X71O0uStrHXqX4/Q
-         OnzqXqJPxSE/0R9uw3lz52EoSwn0x8gALTxQwBRj93QNNAQLcHXUnvXMXDBxfe2DhLZQ
-         hgkSTNrThiVng5IytZ/P1Jc1MRGEfxjzy2jQ67FCEUQzq36W/H71+Zqn7ae6SJO2nNEt
-         pwgW5Xygxj2fK9cSkq9zPIPif8Q/FiYqS4is28kVLt8utmM3okTkVKlSgzWQg7LEHnOv
-         BvFA==
+        bh=MvteDYHsbT9OEr0aq2wdfkYZ5XUVGpFjX1APZCsfOXA=;
+        b=ZPYt8KMXd0uMxI+PxwCFJKwxxitCAIk9LSlZwyGS1P4qAdlt02cvhT0FiokxNE3ARR
+         jhFxSwtS7FIpkh9eWW3mh7Kuqjwlc0ME2MSHiF3jxNJpEcAHV2n2sgVBFhk/wVYdu7th
+         iCETTFBtT8vPh/Lq6MWh1SF6j5hoHTd0NJYZkFsbYy/AE+BvpDnKJLqBZbZcMuMdN6Jo
+         tM5FhSxpATFTHI6PBxsZLs1dQCgLGDS5gHD3b85i3CFfAy+Rm5iI/7GdTbwo0xyK292o
+         1oIq/xNjyYt4OjmM8FBVfAc4bumO0zLPEfN2yyE/GahPpoMejypjJdMS7MUF2DqBpNm8
+         /pMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678918273;
+        d=1e100.net; s=20210112; t=1678918682;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gCEVwhMsnCNBhroQq0PksbnuOcAT6DZi9De9lSt4IwU=;
-        b=5f9oopb1lt5DvoIj7A5f3XWQHKqCr25F5HYDuF6UogNhnpNpq3TXGNkNgOuGoT8pUP
-         /W8sqXfGBGX5luWeZXInVqsanymYI4RTR9JJXVCoKLwwdjH+SP6U7IUGx088uLzGX24K
-         nWmBvt8LMPZHXGOjMlYVjc4yAoMMPnuHNLfBcLCZalOrlAFgCzK8iw+5UAk/sOzEPLpq
-         XN9b/me8SHENYgH8Y0skJCF3EtX2uaGGlY9A0LvuPyTR3aNAF3GyT6/hND1qihiMK42O
-         pkDP/+Ic09XaZcKyghGs99WWWNWftkIMb/B26x4tbBY48PIRBcsZpy+A6GSYxXAmq0/8
-         UY6w==
-X-Gm-Message-State: AO0yUKWXHVGZ1LGLGh7h8I+fHsUUXDC5meLZdWnmllXstqbbPjRJZQIb
-        5cQLRt7UKqb6DXAMyxjSBNdHtXDMEHI=
-X-Google-Smtp-Source: AK7set9scqUadowaVlc0TWWMBSscLvdaL3SvbEDl4+28cp+izN7KJ3h05ZnpUGy+GyG+po/ozmVdQolkEWA=
+        bh=MvteDYHsbT9OEr0aq2wdfkYZ5XUVGpFjX1APZCsfOXA=;
+        b=RO3ew9YexaQooR1dH3F5C7lCf34GIT9vQELJlNw47x6vXnz+KTJHZCXgQZBWXDldyW
+         rdZfjyC6yk2ooRk/FM2LxsWyqTryYt30lyZAq5jgKb4sYIwYOTtJ62Pvk/mXz7XJnKVM
+         nyBYtvoMgAyNsXKA4popU3ajaXx8fzplkORlK5TpLNwQJXXtywtoclmFyXqA62VZRkPR
+         BpDPympX1LXZQD0fVg33jNu9tH7XHahz2iM96GMXk6Gth270nmKyvF4vxiseVsLcwh3V
+         IENRPUyEu658drFuSrk2uy9ml/jrvROEaLnLILkiYSeFVsVDZfLPdf6jFSsU0pY5WaH8
+         /L3g==
+X-Gm-Message-State: AO0yUKW+TSoKVKq//N1AlwYaH8R9CvG6YZiDrYNV7gq0sci+saCzmtvk
+        h0RjZkT7rVSKNvIaYTFWbmiCwOg88HQ=
+X-Google-Smtp-Source: AK7set88u7q7Wr8ez/4JnUvQ+fnn1pMvVwVXQbEbFK6+/7ZjhsMDk40RDVANoVxJ/gAQEunDlMAsjdK7+A0=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:d84d:0:b0:541:69bc:8626 with SMTP id
- n13-20020a81d84d000000b0054169bc8626mr888877ywl.10.1678918273681; Wed, 15 Mar
- 2023 15:11:13 -0700 (PDT)
-Date:   Wed, 15 Mar 2023 15:11:12 -0700
-In-Reply-To: <20230201194604.11135-4-minipli@grsecurity.net>
+ (user=seanjc job=sendgmr) by 2002:a65:61a9:0:b0:4fd:72f3:5859 with SMTP id
+ i9-20020a6561a9000000b004fd72f35859mr401818pgv.2.1678918682510; Wed, 15 Mar
+ 2023 15:18:02 -0700 (PDT)
+Date:   Wed, 15 Mar 2023 15:18:01 -0700
+In-Reply-To: <20230201194604.11135-5-minipli@grsecurity.net>
 Mime-Version: 1.0
-References: <20230201194604.11135-1-minipli@grsecurity.net> <20230201194604.11135-4-minipli@grsecurity.net>
-Message-ID: <ZBJCgG5leMwT22o8@google.com>
-Subject: Re: [PATCH v3 3/6] KVM: x86: Do not unload MMU roots when only
- toggling CR0.WP
+References: <20230201194604.11135-1-minipli@grsecurity.net> <20230201194604.11135-5-minipli@grsecurity.net>
+Message-ID: <ZBJEGfmv42MA6bKh@google.com>
+Subject: Re: [PATCH v3 4/6] KVM: x86: Make use of kvm_read_cr*_bits() when
+ testing bits
 From:   Sean Christopherson <seanjc@google.com>
 To:     Mathias Krause <minipli@grsecurity.net>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -59,7 +59,7 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,107 +67,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Can you tweak the shortlog to something like this?  I want to make it very clear
-that this applies only to the TDP case (more below).  I did a double take when I
-first read the subject :-)
-
-  KVM: x86: Do not unload MMU roots when only toggling CR0.WP with TDP enabled
-
 On Wed, Feb 01, 2023, Mathias Krause wrote:
-> There is no need to unload the MMU roots for a direct MMU role when only
-> CR0.WP has changed -- the paging structures are still valid, only the
-> permission bitmap needs to be updated.
+> Make use of the kvm_read_cr{0,4}_bits() helper functions when we only
+> want to know the state of certain bits instead of the whole register.
 > 
-> One heavy user of toggling CR0.WP is grsecurity's KERNEXEC feature to
-> implement kernel W^X.
+> This not only makes the intend cleaner, it also avoids a VMREAD in case
+> the tested bits aren't guest owned.
 > 
-> The optimization brings a huge performance gain for this case as the
-> following micro-benchmark running 'ssdd 10 50000' from rt-tests[1] on a
-> grsecurity L1 VM shows (runtime in seconds, lower is better):
-> 
->                        legacy     TDP    shadow
-> kvm.git/queue          11.55s   13.91s    75.2s
-> kvm.git/queue+patch     7.32s    7.31s    74.6s
-> 
-> For legacy MMU this is ~36% faster, for TTP MMU even ~47% faster. Also
-> TDP and legacy MMU now both have around the same runtime which vanishes
-> the need to disable TDP MMU for grsecurity.
-> 
-> Shadow MMU sees no measurable difference and is still slow, as expected.
-> 
-> [1] https://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git
-> 
-> Co-developed-by: Sean Christopherson <seanjc@google.com>
-
-No need for this, I just threw a snippet at you as part of code review.  And IMO,
-if someone goes through the pain of running benchmarks, they get full credit no
-matter what ;-)
-
 > Signed-off-by: Mathias Krause <minipli@grsecurity.net>
 > ---
-> v2: handle the CR0.WP case directly in kvm_post_set_cr0() and only for
-> the direct MMU role -- Sean
+>  arch/x86/kvm/pmu.c     | 4 ++--
+>  arch/x86/kvm/vmx/vmx.c | 4 ++--
+>  2 files changed, 4 insertions(+), 4 deletions(-)
 > 
-> I re-ran the benchmark and it's even faster than with my patch, as the
-> critical path is now the first one handled and is now inline. Thanks a
-> lot for the suggestion, Sean!
-> 
->  arch/x86/kvm/x86.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 508074e47bc0..f09bfc0a3cc1 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -902,6 +902,15 @@ EXPORT_SYMBOL_GPL(load_pdptrs);
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index d939d3b84e6f..d9922277df67 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -439,9 +439,9 @@ int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned idx, u64 *data)
+>  	if (!pmc)
+>  		return 1;
 >  
->  void kvm_post_set_cr0(struct kvm_vcpu *vcpu, unsigned long old_cr0, unsigned long cr0)
->  {
-> +	/*
-> +	 * Toggling just CR0.WP doesn't invalidate page tables per se, only the
-> +	 * permission bits.
-> +	 */
-> +	if (vcpu->arch.mmu->root_role.direct && (cr0 ^ old_cr0) == X86_CR0_WP) {
+> -	if (!(kvm_read_cr4(vcpu) & X86_CR4_PCE) &&
+> +	if (!(kvm_read_cr4_bits(vcpu, X86_CR4_PCE)) &&
 
-Past me was wrong, which is a very good thing in this case.  Per the APM,
+Purely as an FYI, I proposed adding helpers to query single CR0/CR4 bits in a
+separate thread[*].  No need to do anything on your end, I'll plan on applying
+this patch first and will handle whatever conflicts arise.
 
-  The host hCR0.WP bit is ignored under nested paging.
-
-which means that CR0.WP doesn't need to be incorporated into the role.  Ha!  And
-really-past me even wrote a very nice comment to call that out in commit 31e96bc63655
-("KVM: nSVM: Add a comment to document why nNPT uses vmcb01, not vCPU state").
-
-Double ha!  That's all moot, because if this code is reached for a nested MMU,
-it means L2 is active and the CR0 being changed is gCR0, not L1's hCR0.
-
-So more simply, this can be
-
-	if (tdp_enabled && (cr0 ^ old_cr0) == X86_CR0_WP)
-
-or if we want to exempt non-paging mode for the shadow MMU as well...
-
-	if ((cr0 ^ old_cr0) == X86_CR0_WP && (tdp_enabled || !(cr0 & X86_CR0_PG)))
-
-Actually, if we bother to check CR0.PG, then we might as well get greedy and
-skip _all_ updates when paging is disabled.  E.g. end up with this over two
-patches?  First one exempts the tdp_enabled case, second one completely exempts
-paging disabled.
-
-	/*
-	 * CR0.WP is incorporated into the MMU role, but only for non-nested,
-	 * indirect shadow MMUs.  If paging is disabled, no updates are needed
-	 * as there are no permission bits to emulate.  If TDP is enabled, the
-	 * MMU's metadata needs to be updated, e.g. so that emulating guest
-	 * translations does the right thing, but there's no need to unload the
-	 * root as CR0.WP doesn't affect SPTEs when TDP is enabled.
-	 */
-	if ((cr0 ^ old_cr0) == X86_CR0_WP) {
-		if (!(cr0 & X86_CR0_PG))
-			return;
-
-		if (tdp_enabled) {
-			kvm_init_mmu(vcpu);
-			return;
-		}
-	}
-
+[*] https://lore.kernel.org/all/ZAuRec2NkC3+4jvD@google.com
