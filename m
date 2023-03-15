@@ -2,105 +2,299 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 14C446BBB83
-	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 18:57:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D468D6BBBB5
+	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 19:09:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232005AbjCOR5e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 13:57:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50650 "EHLO
+        id S232049AbjCOSJ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 14:09:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230124AbjCOR5c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 13:57:32 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5D6E2C64C;
-        Wed, 15 Mar 2023 10:57:31 -0700 (PDT)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32FHgf6v038090;
-        Wed, 15 Mar 2023 17:57:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=2L9voBsmfYrGPUbXcC4Da6Sws5+0ftbCvBKodcR+X8Y=;
- b=YPwBk6BCQGukzruEtG9oqQmlemjBEPaM4AQ+n2+tuAAsM7rSMeo5RevAtalrX5JbIyTa
- UR7bIwscDReM6RPDjWTEmaDPrICWCWDVhYNtxJDTP8w8KGMkjKgWH3t3xU08X/ZcM55L
- FEQurLuN+PcwkZsQ8OkWcye65TIVzA4vk9zhJTswBAGMKk43rEPinjmb7aSiIt6UMtKa
- WfM/2eM43eC1dwCoaso+ivSisdcI9NQKX3ibpkKDtPEu5g53y5zuvhjoIzX9D+4Wsqvc
- b5zurjl4Op+WikAvOW/ozlRHcqZ0edeo85u3Qgt4EO5zXPYuaFo1Rx+mkYbX+mr9Yapr Uw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pbf9fy3vm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Mar 2023 17:57:31 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32FHurN6030984;
-        Wed, 15 Mar 2023 17:57:31 GMT
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pbf9fy3va-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Mar 2023 17:57:30 +0000
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32FGLApd018985;
-        Wed, 15 Mar 2023 17:57:30 GMT
-Received: from smtprelay06.dal12v.mail.ibm.com ([9.208.130.100])
-        by ppma03dal.us.ibm.com (PPS) with ESMTPS id 3pb29pdpyv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Mar 2023 17:57:30 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-        by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32FHvSc57471804
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 15 Mar 2023 17:57:28 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 543D958053;
-        Wed, 15 Mar 2023 17:57:28 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 70FBD58043;
-        Wed, 15 Mar 2023 17:57:27 +0000 (GMT)
-Received: from [9.60.85.43] (unknown [9.60.85.43])
-        by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 15 Mar 2023 17:57:27 +0000 (GMT)
-Message-ID: <3accd046-0dee-db7c-7e60-287bf2792a8e@linux.ibm.com>
-Date:   Wed, 15 Mar 2023 13:57:26 -0400
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH] s390/vfio_ap: fix memory leak in vfio_ap device driver
-Content-Language: en-US
-To:     freude@linux.ibm.com
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, jjherne@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, borntraeger@linux.ibm.com
-References: <20230315153932.165031-1-akrowiak@linux.ibm.com>
- <b9be5d298de3ca70f8fa86a1b58cb4f2@linux.ibm.com>
-From:   Anthony Krowiak <akrowiak@linux.ibm.com>
-In-Reply-To: <b9be5d298de3ca70f8fa86a1b58cb4f2@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 3pRQytibEx_EBahlmUqJwos3yI27kAd8
-X-Proofpoint-ORIG-GUID: m-DXF8pXbb5dq_D-H5YCrHF2iWipyk1U
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-15_09,2023-03-15_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
- clxscore=1015 priorityscore=1501 mlxscore=0 malwarescore=0 adultscore=0
- impostorscore=0 mlxlogscore=889 lowpriorityscore=0 spamscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2302240000
- definitions=main-2303150147
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231803AbjCOSJY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 14:09:24 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D799F1ACDD
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 11:09:16 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4732161E16
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 18:09:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91D27C433D2;
+        Wed, 15 Mar 2023 18:09:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1678903755;
+        bh=n1Gm8WyKESAHbLrBKI8Bo/ZR0B6WLk3xcnK6GWodGPg=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=XHOjfAmQs+IL488WY7pW6HXsF/JhGIpNBFCTc+c/9qtUbYLrgdru/B0pf/nnqvrY2
+         D8DrikfGxa8ydTv1xI4cVbzpeGrROY/lDJNcglfh2YNUpePrSN6op3CVrbWREi6d+F
+         7H3xfGZ8eqn5a3YTW0brrDo0kAdqJTvea3JOzejXfMFZUu5oP1rk9p5KnmvtAZlIsz
+         BINHJj9/rOrRvZdUFX7Juh1bR0wraBL/IpJgBpQAsDg+NkehUyI9vHnvRZQUIXcSwy
+         YcBP1+hWb8aBIaG4HGz1eQf9KyCJPGLpdHJGlXQDxnLUjgczxXzz4gpfIgKxsqAAr7
+         fSdqfPNOgNZWw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pcVYn-000MER-9q;
+        Wed, 15 Mar 2023 18:09:13 +0000
+Date:   Wed, 15 Mar 2023 18:09:12 +0000
+Message-ID: <86cz59yjhz.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     pbonzini@redhat.com, oupton@google.com, yuzenghui@huawei.com,
+        dmatlack@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        qperret@google.com, catalin.marinas@arm.com,
+        andrew.jones@linux.dev, seanjc@google.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
+        rananta@google.com, bgardon@google.com, ricarkol@gmail.com,
+        Shaoqin Huang <shahuang@redhat.com>
+Subject: Re: [PATCH v6 04/12] KVM: arm64: Add kvm_pgtable_stage2_split()
+In-Reply-To: <ZA+4pv6UIDpAp5aY@google.com>
+References: <20230307034555.39733-1-ricarkol@google.com>
+        <20230307034555.39733-5-ricarkol@google.com>
+        <87a60i5hju.wl-maz@kernel.org>
+        <ZA+4pv6UIDpAp5aY@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ricarkol@google.com, pbonzini@redhat.com, oupton@google.com, yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com, rananta@google.com, bgardon@google.com, ricarkol@gmail.com, shahuang@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-snip ...
+On Mon, 13 Mar 2023 23:58:30 +0000,
+Ricardo Koller <ricarkol@google.com> wrote:
+> 
+> On Sun, Mar 12, 2023 at 11:35:01AM +0000, Marc Zyngier wrote:
+> > On Tue, 07 Mar 2023 03:45:47 +0000,
+> > Ricardo Koller <ricarkol@google.com> wrote:
+> > > 
+> > > Add a new stage2 function, kvm_pgtable_stage2_split(), for splitting a
+> > > range of huge pages. This will be used for eager-splitting huge pages
+> > > into PAGE_SIZE pages. The goal is to avoid having to split huge pages
+> > > on write-protection faults, and instead use this function to do it
+> > > ahead of time for large ranges (e.g., all guest memory in 1G chunks at
+> > > a time).
+> > > 
+> > > No functional change intended. This new function will be used in a
+> > > subsequent commit.
+> > 
+> > Same comment as before about the usefulness of this last sentence.
+> > 
+> > > 
+> > > Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> > > Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_pgtable.h |  30 +++++++
+> > >  arch/arm64/kvm/hyp/pgtable.c         | 113 +++++++++++++++++++++++++++
+> > >  2 files changed, 143 insertions(+)
+> > > 
+> > > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> > > index b7b3fc0fa7a5..40e323a718fc 100644
+> > > --- a/arch/arm64/include/asm/kvm_pgtable.h
+> > > +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> > > @@ -665,6 +665,36 @@ bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr);
+> > >   */
+> > >  int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size);
+> > >  
+> > > +/**
+> > > + * kvm_pgtable_stage2_split() - Split a range of huge pages into leaf PTEs pointing
+> > > + *				to PAGE_SIZE guest pages.
+> > > + * @pgt:	 Page-table structure initialised by kvm_pgtable_stage2_init().
+> > > + * @addr:	 Intermediate physical address from which to split.
+> > > + * @size:	 Size of the range.
+> > > + * @mc:		 Cache of pre-allocated and zeroed memory from which to allocate
+> > > + *		 page-table pages.
+> > > + * @mc_capacity: Number of pages in @mc.
+> > > + *
+> > > + * @addr and the end (@addr + @size) are effectively aligned down and up to
+> > > + * the top level huge-page block size. This is an example using 1GB
+> > > + * huge-pages and 4KB granules.
+> > > + *
+> > > + *                          [---input range---]
+> > > + *                          :                 :
+> > > + * [--1G block pte--][--1G block pte--][--1G block pte--][--1G block pte--]
+> > > + *                          :                 :
+> > > + *                   [--2MB--][--2MB--][--2MB--][--2MB--]
+> > > + *                          :                 :
+> > > + *                   [ ][ ][:][ ][ ][ ][ ][ ][:][ ][ ][ ]
+> > > + *                          :                 :
+> > 
+> > So here, what alignment do we effectively get?
+> >
+> 
+> The function tries to split any block that overlaps with the input
+> range. Here's another example that might be more helpful:
+> 
+>  *                                [---input range---]
+>  *                                :                 :
+>  * [--1G block pte--][--2MB--][--2MB--][--1G block pte--][--1G block pte--]
+> 
+> is split like this:
+> 
+>  * [--1G block pte--][--2MB--][ ][ ][ ][ ][ ][ ][ ][ ][ ][--1G block pte--]
+>                               <-------split range------->
+> 
+> I think I will just use this new description instead.
+> 
+> > > + * Return: 0 on success, negative error code on failure. Note that
+> > > + * kvm_pgtable_stage2_split() is best effort: it tries to break as many
+> > > + * blocks in the input range as allowed by @mc_capacity.
+> > > + */
+> > > +int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> > > +			     void *mc, u64 mc_capacity);
+> > > +
+> > >  /**
+> > >   * kvm_pgtable_walk() - Walk a page-table.
+> > >   * @pgt:	Page-table structure initialised by kvm_pgtable_*_init().
+> > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > > index 6bdfcb671b32..3149b98d1701 100644
+> > > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > > @@ -1259,6 +1259,119 @@ kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
+> > >  	return pgtable;
+> > >  }
+> > >  
+> > > +struct stage2_split_data {
+> > > +	struct kvm_s2_mmu		*mmu;
+> > > +	void				*memcache;
+> > > +	u64				mc_capacity;
+> > 
+> > Why isn't this a pointer to a *real* memcache structure?
+> > 
+> 
+> Mainly because I wanted this function to be like the other pgtable.c
+> funtions that use opaque pointers to handle the vhe and nvhe cases. vhe
+> uses "struct kvm_mmu_memory_cache" while nvhe uses "struct hyp_pool".
+> This series only implements the vhe case but I didn't want to restrict
+> kvm_pgtable_stage2_split() to vhe just because of this. Just in case, I
+> have not tried it in nvhe.
 
+Do you really mean nVHE here? or do you actually mean pKVM? The former
+shouldn't be any different from VHE (the PT code runs in the same
+context, give or take), and it is only the latter that is using
+something else altogether.
 
-> I needed some indirections to follow what exactly happens here and how 
-> you
-> fix it, but finally I got it.
-> Reviewed-by: Harald Freudenberger <freude@linux.ibm.com>
+And since pKVM cannot really do page splitting in the normal KVM
+sense, this code shouldn't even be there!
 
-Sorry about the indirections. Thanks for the review.
+> 
+> > > +};
+> > > +
+> > > +/*
+> > > + * Get the number of page-tables needed to replace a block with a
+> > > + * fully populated tree, up to the PTE level, at particular level.
+> > > + */
+> > > +static inline int stage2_block_get_nr_page_tables(u32 level)
+> > 
+> > Please drop the inline. The compiler will figure it out.
+> > 
+> > > +{
+> > > +	if (WARN_ON_ONCE(level < KVM_PGTABLE_MIN_BLOCK_LEVEL ||
+> > > +			 level >= KVM_PGTABLE_MAX_LEVELS))
+> > > +		return -EINVAL;
+> > 
+> > Move this check to the 'default' case below.
+> > 
+> > > +
+> > > +	switch (level) {
+> > > +	case 1:
+> > > +		return PTRS_PER_PTE + 1;
+> > > +	case 2:
+> > > +		return 1;
+> > 
+> > This is odd. Replacing a block by a table always requires
+> > 'PTRS_PER_PTE + 1' pages. Why 1? If this is some special treatment for
+> > level-2 mappings, please spell it out.
+> 
+> I'm not sure I understand. I'm interpreting "level=X" as in "level X
+> entry".  More specifically, using PAGE_SIZE=4096 as an example:
+> 
+> a level 3 entry (a PTE): a 4096 block needs 0 page-table pages
+> a level 2 entry: a 2M block needs 1 page-table pages
+> a level 1 entry: a 1G block needs 512+1 page-table pages
 
+Ah, gotcha. I was reasoning at the block level, not at the entry
+level. Maybe some extra idiot-proof explanation would help here for
+the next time I look at this after having paged it out.
+
+> 
+> > 
+> > > +	case 3:
+> > > +		return 0;
+> > > +	default:
+> > > +		return -EINVAL;
+> > > +	};
+> > > +}
+> > > +
+> > > +static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> > > +			       enum kvm_pgtable_walk_flags visit)
+> > > +{
+> > > +	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+> > > +	struct stage2_split_data *data = ctx->arg;
+> > > +	kvm_pte_t pte = ctx->old, new, *childp;
+> > > +	enum kvm_pgtable_prot prot;
+> > > +	void *mc = data->memcache;
+> > > +	u32 level = ctx->level;
+> > > +	bool force_pte;
+> > > +	int nr_pages;
+> > > +	u64 phys;
+> > > +
+> > > +	/* No huge-pages exist at the last level */
+> > > +	if (level == KVM_PGTABLE_MAX_LEVELS - 1)
+> > > +		return 0;
+> > 
+> > Why the check for level 3 in the previous function if never get there?
+> > 
+> 
+> Was trying to make stage2_block_get_nr_page_tables() useful for other
+> cases. It's still correct for other cases to ask how many page-table
+> pages are needed for a PTE (stage2_block_get_nr_page_tables(3) -> 0).
+
+Right. I don't mind either way, but the double check somehow tickled
+me.
+
+> > > +
+> > > +	/* We only split valid block mappings */
+> > > +	if (!kvm_pte_valid(pte))
+> > > +		return 0;
+> > > +
+> > > +	nr_pages = stage2_block_get_nr_page_tables(level);
+> > > +	if (nr_pages < 0)
+> > > +		return nr_pages;
+> > > +
+> > > +	if (data->mc_capacity >= nr_pages) {
+> > > +		/* Build a tree mapped down to the PTE granularity. */
+> > > +		force_pte = true;
+> > > +	} else {
+> > > +		/*
+> > > +		 * Don't force PTEs. This requires a single page of PMDs at the
+> > > +		 * PUD level, or a single page of PTEs at the PMD level. If we
+> > > +		 * are at the PUD level, the PTEs will be created recursively.
+> > > +		 */
+> > 
+> > I don't understand how you reach this 'single page' conclusion. You
+> > need to explain why you get there.
+> 
+> Ack, will expand it.
+
+Thanks. The above explanation you gave helped, so something long these
+lines would be good.
+
+Cheers,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
