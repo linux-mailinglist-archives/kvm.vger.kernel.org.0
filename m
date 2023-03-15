@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E91916BB626
-	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 15:35:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8580D6BB622
+	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 15:35:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231879AbjCOOfj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 10:35:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35838 "EHLO
+        id S232003AbjCOOf1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 10:35:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232088AbjCOOfg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 10:35:36 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 850F029E3D
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 07:35:30 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32FDdTYs030714;
-        Wed, 15 Mar 2023 14:35:18 GMT
+        with ESMTP id S231879AbjCOOf0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 10:35:26 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2306415177
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 07:35:25 -0700 (PDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32FDtUGe023159;
+        Wed, 15 Mar 2023 14:35:19 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=3eu0zFICVookgj1YRxiGpwqJlzDHo02+NaMVsBUQU+k=;
- b=oK9ZTNY5O+Uc38p4JMgI3AUQ9KgIXN+/yx+3clmHH5HG2M/nmj+TOVOJSPng9r6griha
- 7JeTiCkzzVND7QpQyowRl8G9TNI4sbB3rZ/f1Smt2K2Nva0iSjUaY6+Y9oQzu4sLE+n7
- hFdsujrMXNGrbRHLRpTTULu2rZbyBeBv3DcfsJq3F4DU1bNeORc606CZekBT3yJoQ9ah
- QsxYfH1aA324XzZklh96gjMWwBroamJOH8hYjeR/jyDIMjiaIQnODWY5KkNsC5FKM+Qz
- OBNVovLhmNBeqLaEuZURn1ObRGl4YBKUCMplVqdGYbwKVs7T+FPqYU/Q9z9NJXKOq58g rw== 
+ bh=nh4UkelZCZgKn56/i8Mm3XOFEFRLGgInyMowtH3ITEU=;
+ b=dDBs2U4pWWKfWNKsYl4xRgnnAZyJZFAhhI33dXtNjfOf937RRv/tddbinLRcVOHbBKZR
+ wzC/S6mzPO/kBkjq7jbpgFzxh7s4Wmb2NK2RR+h/O9H1jb3T/rIcgrQOk0Q7BoeBAvsM
+ gsFomdr/7tWIrpYcN2xB5K5z1Oj2Y0poxmmyhVuBj5JauXDC5DVUI96pUgXSjrDVQ69b
+ M141W98L7nm6LU3khHm+i4/omxXBI11Zq3amTYYU5ftmvSQPamlwWRrDQmoBtBNybtJq
+ EdIyiQgFJ+oefO6lq7vlWdNl0PiyZIbXy4SOgBq2lrXVk3DSoU7hJAIk+WWkw/pjYTKv zA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pbdb7n34e-1
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3pbfavh7e2-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Mar 2023 14:35:17 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32FD0MuW010855;
-        Wed, 15 Mar 2023 14:35:17 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pbdb7n33h-1
+        Wed, 15 Mar 2023 14:35:19 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32FDuhUo030910;
+        Wed, 15 Mar 2023 14:35:19 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3pbfavh7d1-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Mar 2023 14:35:17 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32FECjlo008595;
-        Wed, 15 Mar 2023 14:35:15 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3pb29sgwjg-1
+        Wed, 15 Mar 2023 14:35:19 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32EN7YDN003737;
+        Wed, 15 Mar 2023 14:35:16 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+        by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3pb29t0r2r-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Mar 2023 14:35:15 +0000
+        Wed, 15 Mar 2023 14:35:16 +0000
 Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32FEZBEI19726904
+        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32FEZD2B43712994
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 15 Mar 2023 14:35:11 GMT
+        Wed, 15 Mar 2023 14:35:13 GMT
 Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B919E2004F;
+        by IMSVA (Postfix) with ESMTP id 3C7FF20040;
+        Wed, 15 Mar 2023 14:35:13 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D76E62004E;
         Wed, 15 Mar 2023 14:35:11 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 618FE20040;
-        Wed, 15 Mar 2023 14:35:10 +0000 (GMT)
 Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com.com (unknown [9.171.95.209])
         by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 15 Mar 2023 14:35:10 +0000 (GMT)
+        Wed, 15 Mar 2023 14:35:11 +0000 (GMT)
 From:   Pierre Morel <pmorel@linux.ibm.com>
 To:     qemu-s390x@nongnu.org
 Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
@@ -66,25 +66,25 @@ Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
         marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
         seiden@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
         frankja@linux.ibm.com, berrange@redhat.com, clg@kaod.org
-Subject: [PATCH v18 04/17] s390x/sclp: reporting the maximum nested topology entries
-Date:   Wed, 15 Mar 2023 15:34:49 +0100
-Message-Id: <20230315143502.135750-5-pmorel@linux.ibm.com>
+Subject: [PATCH v18 05/17] s390x/cpu topology: resetting the Topology-Change-Report
+Date:   Wed, 15 Mar 2023 15:34:50 +0100
+Message-Id: <20230315143502.135750-6-pmorel@linux.ibm.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20230315143502.135750-1-pmorel@linux.ibm.com>
 References: <20230315143502.135750-1-pmorel@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ngFSFiUZJZtn0GNivnQ1B3My8DuWY3hH
-X-Proofpoint-ORIG-GUID: 17CwBHxaF0-rO3Gp-6Mf6oqdcnwDT48p
+X-Proofpoint-GUID: pPPruMTw1psU2S0G2hmGAs85Eo84TKPN
+X-Proofpoint-ORIG-GUID: AFDJkWKPQA9pzdHd63Ce5vhzwLlzjqQK
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
  definitions=2023-03-15_07,2023-03-15_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- mlxlogscore=999 bulkscore=0 priorityscore=1501 mlxscore=0 adultscore=0
- malwarescore=0 impostorscore=0 clxscore=1015 spamscore=0 suspectscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2302240000 definitions=main-2303150118
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
+ malwarescore=0 bulkscore=0 priorityscore=1501 impostorscore=0 adultscore=0
+ mlxscore=0 lowpriorityscore=0 clxscore=1015 mlxlogscore=999 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2302240000
+ definitions=main-2303150118
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
@@ -94,63 +94,143 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The maximum nested topology entries is used by the guest to
-know how many nested topology are available on the machine.
-
-Let change the MNEST value from 2 to 4 in the SCLP READ INFO
-structure now that we support books and drawers.
+During a subsystem reset the Topology-Change-Report is cleared
+by the machine.
+Let's ask KVM to clear the Modified Topology Change Report (MTCR)
+bit of the SCA in the case of a subsystem reset.
 
 Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-Reviewed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- include/hw/s390x/sclp.h | 5 +++--
- hw/s390x/sclp.c         | 5 +++++
- 2 files changed, 8 insertions(+), 2 deletions(-)
+ include/hw/s390x/cpu-topology.h |  1 +
+ target/s390x/cpu.h              |  1 +
+ target/s390x/kvm/kvm_s390x.h    |  1 +
+ hw/s390x/cpu-topology.c         | 11 +++++++++++
+ hw/s390x/s390-virtio-ccw.c      |  3 +++
+ target/s390x/cpu-sysemu.c       | 13 +++++++++++++
+ target/s390x/kvm/kvm.c          | 17 +++++++++++++++++
+ 7 files changed, 47 insertions(+)
 
-diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
-index 712fd68123..902252b319 100644
---- a/include/hw/s390x/sclp.h
-+++ b/include/hw/s390x/sclp.h
-@@ -112,12 +112,13 @@ typedef struct CPUEntry {
- } QEMU_PACKED CPUEntry;
+diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topology.h
+index 7a1dd6b136..fa42236dfa 100644
+--- a/include/hw/s390x/cpu-topology.h
++++ b/include/hw/s390x/cpu-topology.h
+@@ -60,6 +60,7 @@ static inline void s390_topology_setup_cpu(MachineState *ms,
  
- #define SCLP_READ_SCP_INFO_FIXED_CPU_OFFSET     128
--#define SCLP_READ_SCP_INFO_MNEST                2
-+#define SCLP_READ_SCP_INFO_MNEST                4
- typedef struct ReadInfo {
-     SCCBHeader h;
-     uint16_t rnmax;
-     uint8_t rnsize;
--    uint8_t  _reserved1[16 - 11];       /* 11-15 */
-+    uint8_t  _reserved1[15 - 11];       /* 11-14 */
-+    uint8_t stsi_parm;                  /* 15-15 */
-     uint16_t entries_cpu;               /* 16-17 */
-     uint16_t offset_cpu;                /* 18-19 */
-     uint8_t  _reserved2[24 - 20];       /* 20-23 */
-diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-index eff74479f4..d339cbb7e4 100644
---- a/hw/s390x/sclp.c
-+++ b/hw/s390x/sclp.c
-@@ -20,6 +20,7 @@
- #include "hw/s390x/event-facility.h"
- #include "hw/s390x/s390-pci-bus.h"
- #include "hw/s390x/ipl.h"
-+#include "hw/s390x/cpu-topology.h"
+ extern S390Topology s390_topology;
+ int s390_socket_nb(S390CPU *cpu);
++void s390_topology_reset(void);
  
- static inline SCLPDevice *get_sclp_device(void)
+ static inline int s390_std_socket(int n, CpuTopology *smp)
  {
-@@ -123,6 +124,10 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
-         return;
-     }
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index 61210303e4..9842c36c80 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -642,6 +642,7 @@ typedef struct SysIBTl_cpu {
+ QEMU_BUILD_BUG_ON(sizeof(SysIBTl_cpu) != 16);
  
+ void insert_stsi_15_1_x(S390CPU *cpu, int sel2, uint64_t addr, uint8_t ar);
++void s390_cpu_topology_set_changed(bool changed);
+ 
+ /* MMU defines */
+ #define ASCE_ORIGIN           (~0xfffULL) /* segment table origin             */
+diff --git a/target/s390x/kvm/kvm_s390x.h b/target/s390x/kvm/kvm_s390x.h
+index f9785564d0..649dae5948 100644
+--- a/target/s390x/kvm/kvm_s390x.h
++++ b/target/s390x/kvm/kvm_s390x.h
+@@ -47,5 +47,6 @@ void kvm_s390_crypto_reset(void);
+ void kvm_s390_restart_interrupt(S390CPU *cpu);
+ void kvm_s390_stop_interrupt(S390CPU *cpu);
+ void kvm_s390_set_diag318(CPUState *cs, uint64_t diag318_info);
++int kvm_s390_topology_set_mtcr(uint64_t attr);
+ 
+ #endif /* KVM_S390X_H */
+diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+index 36c8c687b8..45462b01fe 100644
+--- a/hw/s390x/cpu-topology.c
++++ b/hw/s390x/cpu-topology.c
+@@ -87,6 +87,17 @@ static void s390_topology_init(MachineState *ms)
+     QTAILQ_INSERT_HEAD(&s390_topology.list, entry, next);
+ }
+ 
++/**
++ * s390_topology_reset:
++ *
++ * Generic reset for CPU topology, calls s390_topology_reset()
++ * to reset the kernel Modified Topology Change Record.
++ */
++void s390_topology_reset(void)
++{
++    s390_cpu_topology_set_changed(false);
++}
++
+ /**
+  * s390_topology_cpu_default:
+  * @cpu: pointer to a S390CPU
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 9df60ac447..7e6d88e23c 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -123,6 +123,9 @@ static void subsystem_reset(void)
+             device_cold_reset(dev);
+         }
+     }
 +    if (s390_has_topology()) {
-+        read_info->stsi_parm = SCLP_READ_SCP_INFO_MNEST;
++        s390_topology_reset();
++    }
+ }
+ 
+ static int virtio_ccw_hcall_notify(const uint64_t *args)
+diff --git a/target/s390x/cpu-sysemu.c b/target/s390x/cpu-sysemu.c
+index 948e4bd3e0..9d41acfe1a 100644
+--- a/target/s390x/cpu-sysemu.c
++++ b/target/s390x/cpu-sysemu.c
+@@ -306,3 +306,16 @@ void s390_do_cpu_set_diag318(CPUState *cs, run_on_cpu_data arg)
+         kvm_s390_set_diag318(cs, arg.host_ulong);
+     }
+ }
++
++void s390_cpu_topology_set_changed(bool changed)
++{
++    int ret;
++
++    if (kvm_enabled()) {
++        ret = kvm_s390_topology_set_mtcr(changed);
++        if (ret) {
++            error_report("Failed to set Modified Topology Change Report: %s",
++                         strerror(-ret));
++        }
++    }
++}
+diff --git a/target/s390x/kvm/kvm.c b/target/s390x/kvm/kvm.c
+index 5ea358cbb0..bc953151ce 100644
+--- a/target/s390x/kvm/kvm.c
++++ b/target/s390x/kvm/kvm.c
+@@ -2592,6 +2592,23 @@ int kvm_s390_get_zpci_op(void)
+     return cap_zpci_op;
+ }
+ 
++int kvm_s390_topology_set_mtcr(uint64_t attr)
++{
++    struct kvm_device_attr attribute = {
++        .group = KVM_S390_VM_CPU_TOPOLOGY,
++        .attr  = attr,
++    };
++
++    if (!s390_has_feat(S390_FEAT_CONFIGURATION_TOPOLOGY)) {
++        return 0;
++    }
++    if (!kvm_vm_check_attr(kvm_state, KVM_S390_VM_CPU_TOPOLOGY, attr)) {
++        return -ENOTSUP;
 +    }
 +
-     /* CPU information */
-     prepare_cpu_entries(machine, entries_start, &cpu_count);
-     read_info->entries_cpu = cpu_to_be16(cpu_count);
++    return kvm_vm_ioctl(kvm_state, KVM_SET_DEVICE_ATTR, &attribute);
++}
++
+ void kvm_arch_accel_class_init(ObjectClass *oc)
+ {
+ }
 -- 
 2.31.1
 
