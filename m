@@ -2,69 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D17726BB84C
-	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 16:44:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D03B6BB8B6
+	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 16:56:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232848AbjCOPoY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 11:44:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32992 "EHLO
+        id S232246AbjCOP4l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 11:56:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232746AbjCOPoJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 11:44:09 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72A883608A
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 08:43:56 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id z31-20020a25a122000000b00b38d2b9a2e9so12493106ybh.3
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 08:43:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678895035;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3yOC9GAxlzabl02b1RPWrLKpddDwW/XjKQVoaxOI5Fs=;
-        b=irQd1i8q+ogxqHs1vTXLJdSkvIHIEjzr7qUucu06Sgiu0iqFVDzwkLGWwE/5+BJi3u
-         6x81/zfQBxCitIQAf3coqjNffjMF2giXqZqeQ3fUEzvbnC8ZZOaaGRa//Lv7hWE/T0lm
-         uXIg/SVhvpzL2sLnGaz9nq/6dVVCLsP/geOkOjiBXmLThQVBDWJZ6kVyOkAy1zxLyrN9
-         4BdD7rV4Ga3aqZoQmq41NA9S1kX9L2axC6+613IdBeT6Pu9LjrduwTelFtHof8kLxpU8
-         fG/JWVzp6PxwsZA82T79bPMPUjMk8rJPnVs8W+Z3FrrIfL/q8W1VVzIoYtiFjr8k4i8Z
-         1UGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678895035;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3yOC9GAxlzabl02b1RPWrLKpddDwW/XjKQVoaxOI5Fs=;
-        b=Sib1uaVG+nwoCtwXX5hLyuPgPAq9ckbMeAuBxPB9iSQh3Y9pdOwoNgIl1Kyz0q+dDI
-         c2zzgZ/PNh6mO32s0vorhonYIeaN0aH2/c5T7BSxJqjW0YEhvn/KkwfxxsRP7ZdReW2a
-         zsQiiQeFlRsB3uQaYMWLds3eGIaEtMH6T6rC43G7J2LMRmgp7ivE6CBRq4sMZt+yItTx
-         1La5HmcpqmdXG0ZkoDQjMg2Rt2L4lM/2ey5PP39URl0a4wPr28jnclUt1VaukxrUAlQS
-         WRbhRbH9juCYE0fB8FZzlcq4vyI7BRfoi4BUtgS1OavzrwaGru5vRp/dagbfOQLFO/ko
-         m0CQ==
-X-Gm-Message-State: AO0yUKUUgQSCQB9aTd8iypGcN5PwULC49Wm4ap7iN2ZHWr5OUOj3qLjR
-        RIOOP1iBdCKIXJgNchllwxUPwPHQtNI=
-X-Google-Smtp-Source: AK7set/m8ThOIuQfxnThk6YIlQaIAC0QfTqKlvtfDwDkFgfpYMWOGBpJSb01Yl38Gvzl13a7oAZAuDELZsQ=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:d302:0:b0:541:359c:103a with SMTP id
- y2-20020a81d302000000b00541359c103amr192124ywi.8.1678895035645; Wed, 15 Mar
- 2023 08:43:55 -0700 (PDT)
-Date:   Wed, 15 Mar 2023 08:43:54 -0700
-In-Reply-To: <ZBF72+flVlEbfg70@yzhao56-desk.sh.intel.com>
-Mime-Version: 1.0
-References: <20230311002258.852397-1-seanjc@google.com> <20230311002258.852397-15-seanjc@google.com>
- <ZBF72+flVlEbfg70@yzhao56-desk.sh.intel.com>
-Message-ID: <ZBHnugUe0SSmQKGI@google.com>
-Subject: Re: [PATCH v2 14/27] KVM: x86: Reject memslot MOVE operations if
- KVMGT is attached
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>, kvm@vger.kernel.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-kernel@vger.kernel.org,
-        Ben Gardon <bgardon@google.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        with ESMTP id S232693AbjCOP4c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 11:56:32 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37CBF1E2A2;
+        Wed, 15 Mar 2023 08:55:52 -0700 (PDT)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32FELRFA014979;
+        Wed, 15 Mar 2023 15:54:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=m7eMhkPTzO+FbF0Ri57YweWw90fZ5qOrmev7e+6bwcI=;
+ b=Km2Ba3UDIvm1tqr6Y3NwHc0T/K8udjhJvXd78YJ14AS62nnJXzA2jFS2pE3LyC7APTbb
+ z3i5Xx4tB5FQatsaQ9JX7UD7vP4UdIYCRUBedwFUj6ykme/t2dR9oULxH+v+3e5POOKd
+ AMudMUlM8mRuCK+cQBwBf8lMN3rvodEuj5EZMBrbzjJEr3DuoTMCiizWg4HLd4wBdnYh
+ gUQWTqrHKi7vkpfBJNov+QmyWi3t2aDPPpqAoSW+IwRyXZjABOoChiL5SMTZFzWAoF0G
+ 1p7puI+ZtU2ZDkEnS+sYoTlNZUoHrMFH039Ei0jmDzYmbdTRvNX3eLxsSuW8/1aIIzYQ DQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pbfq8tuh0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 15 Mar 2023 15:54:52 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32FELjYY015866;
+        Wed, 15 Mar 2023 15:54:52 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pbfq8tufx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 15 Mar 2023 15:54:52 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32FDxPsU021703;
+        Wed, 15 Mar 2023 15:54:50 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3pb29ss0d1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 15 Mar 2023 15:54:50 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32FFsk8l22282850
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 15 Mar 2023 15:54:46 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 967FE20049;
+        Wed, 15 Mar 2023 15:54:46 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6024520043;
+        Wed, 15 Mar 2023 15:54:46 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Wed, 15 Mar 2023 15:54:46 +0000 (GMT)
+From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>
+Cc:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v3 0/3] s390x: Add misaligned instruction tests
+Date:   Wed, 15 Mar 2023 16:54:41 +0100
+Message-Id: <20230315155445.1688249-1-nsg@linux.ibm.com>
+X-Mailer: git-send-email 2.37.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: lC2eSSFQbhbRFNQENaEsdtNELXr1670S
+X-Proofpoint-GUID: QGlTqbpeZVN0jfflDSco4SsvbnSnZo19
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-15_08,2023-03-15_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
+ adultscore=0 clxscore=1015 impostorscore=0 suspectscore=0 mlxlogscore=999
+ mlxscore=0 bulkscore=0 lowpriorityscore=0 priorityscore=1501
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2302240000 definitions=main-2303150131
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,62 +89,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 15, 2023, Yan Zhao wrote:
-> On Fri, Mar 10, 2023 at 04:22:45PM -0800, Sean Christopherson wrote:
-> > Disallow moving memslots if the VM has external page-track users, i.e. if
-> > KVMGT is being used to expose a virtual GPU to the guest, as KVM doesn't
-> > correctly handle moving memory regions.
-> > 
-> > Note, this is potential ABI breakage!  E.g. userspace could move regions
-> > that aren't shadowed by KVMGT without harming the guest.  However, the
-> > only known user of KVMGT is QEMU, and QEMU doesn't move generic memory
-> > regions.  KVM's own support for moving memory regions was also broken for
-> > multiple years (albeit for an edge case, but arguably moving RAM is
-> > itself an edge case), e.g. see commit edd4fa37baa6 ("KVM: x86: Allocate
-> > new rmap and large page tracking when moving memslot").
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ...
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 29dd6c97d145..47ac9291cd43 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -12484,6 +12484,13 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
-> >  				   struct kvm_memory_slot *new,
-> >  				   enum kvm_mr_change change)
-> >  {
-> > +	/*
-> > +	 * KVM doesn't support moving memslots when there are external page
-> > +	 * trackers attached to the VM, i.e. if KVMGT is in use.
-> > +	 */
-> > +	if (change == KVM_MR_MOVE && kvm_page_track_has_external_user(kvm))
-> > +		return -EINVAL;
-> Hmm, will page track work correctly on moving memslots when there's no
-> external users?
-> 
-> in case of KVM_MR_MOVE,
-> kvm_prepare_memory_region(kvm, old, new, change)
->   |->kvm_arch_prepare_memory_region(kvm, old, new, change)
->        |->kvm_alloc_memslot_metadata(kvm, new)
->             |->memset(&slot->arch, 0, sizeof(slot->arch));
->             |->kvm_page_track_create_memslot(kvm, slot, npages)
-> The new->arch.arch.gfn_write_track will be fresh empty.
-> 
-> 
-> kvm_arch_commit_memory_region(kvm, old, new, change);
->   |->kvm_arch_free_memslot(kvm, old);
->        |->kvm_page_track_free_memslot(slot);
-> The old->arch.gfn_write_track is freed afterwards.
-> 
-> So, in theory, the new GFNs are not write tracked though the old ones are.
-> 
-> Is that acceptable for the internal page-track user?
+Instructions on s390 must be halfword aligned.
+Add two tests for that.
+These currently fail when using TCG.
 
-It works because KVM zaps all SPTEs when a memslot is moved, i.e. the fact that
-KVM loses the write-tracking counts is benign.  I suspect no VMM actually does
-does KVM_MR_MOVE in conjunction with shadow paging, but the ongoing maintenance
-cost of supporting KVM_MR_MOVE is quite low at this point, so trying to rip it
-out isn't worth the pain of having to deal with potential ABI breakage.
+v3 -> v2:
+ * pick up R-b (thanks Janosch)
+ * use br instead of bcr (thanks Claudio)
+ * use text section instead of rodata for ex target (thanks Claudio)
+ * fix label position (thanks Claudio)
 
-Though in hindsight I wish I had tried disallowed moving memslots instead of
-fixing the various bugs a few years back. :-(
+v1 -> v2:
+ * rebase
+ * use PSW macros
+ * simplify odd psw test (thanks Claudio)
+ * rename some identifiers
+ * pick up R-b (thanks Claudio)
+
+Nina Schoetterl-Glausch (3):
+  s390x/spec_ex: Use PSW macro
+  s390x/spec_ex: Add test introducing odd address into PSW
+  s390x/spec_ex: Add test of EXECUTE with odd target address
+
+ s390x/spec_ex.c | 85 +++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 76 insertions(+), 9 deletions(-)
+
+Range-diff against v2:
+1:  d82f4fb6 ! 1:  6ae1eb7d s390x/spec_ex: Use PSW macro
+    @@ Commit message
+         Replace explicit psw definition by PSW macro.
+         No functional change intended.
+     
+    +    Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+         Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+     
+      ## s390x/spec_ex.c ##
+2:  e537797f ! 2:  a0d02438 s390x/spec_ex: Add test introducing odd address into PSW
+    @@ s390x/spec_ex.c: static int psw_bit_12_is_1(void)
+     +"	. = . + 1\n"
+     +"misaligned_code:\n"
+     +"	larl	%r0,0\n"
+    -+"	bcr	0xf,%r1\n"
+    ++"	br	%r1\n"
+     +);
+     +
+     +static int psw_odd_address(void)
+3:  dc552880 ! 3:  e771deeb s390x/spec_ex: Add test of EXECUTE with odd target address
+    @@ s390x/spec_ex.c: static int short_psw_bit_12_is_0(void)
+     +	uint64_t pre_target_addr;
+     +	int to = 0, from = 0x0dd;
+     +
+    -+	asm volatile ( ".pushsection .rodata\n"
+    -+		"pre_odd_ex_target:\n"
+    ++	asm volatile ( ".pushsection .text.ex_odd\n"
+     +		"	.balign	2\n"
+    ++		"pre_odd_ex_target:\n"
+     +		"	. = . + 1\n"
+     +		"	lr	%[to],%[from]\n"
+     +		"	.popsection\n"
+
+base-commit: e3c5c3ef2524c58023073c0fadde2e8ae3c04ec6
+-- 
+2.39.1
+
