@@ -2,82 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 320AE6BBDA1
-	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 20:53:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A96F6BBDB2
+	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 20:57:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232916AbjCOTxM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 15:53:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33890 "EHLO
+        id S232974AbjCOT53 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 15:57:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229547AbjCOTxK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 15:53:10 -0400
-X-Greylist: delayed 90 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 15 Mar 2023 12:53:07 PDT
-Received: from forwardcorp1c.mail.yandex.net (forwardcorp1c.mail.yandex.net [178.154.239.200])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F297CD539;
-        Wed, 15 Mar 2023 12:53:07 -0700 (PDT)
-Received: from mail-nwsmtp-smtp-corp-main-11.iva.yp-c.yandex.net (mail-nwsmtp-smtp-corp-main-11.iva.yp-c.yandex.net [IPv6:2a02:6b8:c0c:2cab:0:640:424b:0])
-        by forwardcorp1c.mail.yandex.net (Yandex) with ESMTP id E61F05EA33;
-        Wed, 15 Mar 2023 22:51:35 +0300 (MSK)
-Received: from d-tatianin-nix.HomeLAN (unknown [2a02:6b8:b081:b711::1:2a])
-        by mail-nwsmtp-smtp-corp-main-11.iva.yp-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id Tppha50fxuQ0-tgCuJSe1;
-        Wed, 15 Mar 2023 22:51:35 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
-        t=1678909895; bh=Gw2gGaMBR/kL++RD1Kxfdvw3JCgSYG8IVp4wdEhSV38=;
-        h=Message-Id:Date:Cc:Subject:To:From;
-        b=C/aVTJuJ9Y8LoATy0YhpqZpI3gEKyo5EduCRA6y6MbCNz8jmZPIcsOxClrHydUWIp
-         i0ftgx0ObaHdm4VjfQtDoCkhJbzOkqiCOvbMkOYsjEAQJq+AG2jZlyrEwvH2xkAy5Z
-         o/W9xEqnj1ItvZe25tuUGFVUJXED3hKrukONr3fw=
-Authentication-Results: mail-nwsmtp-smtp-corp-main-11.iva.yp-c.yandex.net; dkim=pass header.i=@yandex-team.ru
-From:   Daniil Tatianin <d-tatianin@yandex-team.ru>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Daniil Tatianin <d-tatianin@yandex-team.ru>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] kvm/x86: actually verify that reading MSR_IA32_UCODE_REV succeeds
-Date:   Wed, 15 Mar 2023 22:51:09 +0300
-Message-Id: <20230315195109.580333-1-d-tatianin@yandex-team.ru>
-X-Mailer: git-send-email 2.25.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S230134AbjCOT50 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 15:57:26 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52FBF14992
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 12:57:25 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id n203-20020a25dad4000000b0091231592671so21326510ybf.1
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 12:57:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1678910244;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=t0VuZOXGCp21EgyUi4sXnOhOFTS9jJF8Mnh7KUFr9qc=;
+        b=hEkSXcAhJCOiR/8RIzc/6jiqDNeU6+gZnt11cCFESKFs6nzUDHV743zvo0uWLeF39a
+         Qolz+KvOZ2c/MTCRHPldPWxr7w/7NlREa7Um9mGMHrm7yVzmX02qzCULdnz6qwEfHF4m
+         JyFjIqR1kgTjqXLYjfanMIkFG0pP+Q/fzI7KGxVuBiiNjkgjy1o4u0ojf0mcGFg/gz3D
+         hnhRSFl5zsm/H/7uG8iodhOu4/M1tWz33yHAPyDNsQrOCTQgYBls+OJcB8OgCadAmQX1
+         LeEh9IET3+IEaiRXM0OBwG+05rr+V3WSGnS86ZbmopJhiU7zSMwM/FLSU6HYyZa75d0c
+         cTlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678910244;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=t0VuZOXGCp21EgyUi4sXnOhOFTS9jJF8Mnh7KUFr9qc=;
+        b=RcqvuutmvyYjVpbJrEeGAdOD020h9Jrdu1LMF6Cy6ENAmJ+kZrYrrqNHfNrQa1CA3K
+         UwIBymP/3YLbhEpuDZ9N+bQFv7g0GDfzDnyk5pbnXkgs+3YJDnU81iOQoaog7qiUwm/1
+         vppU676NeSbTBoPc/m8s7qe+bF/MaRXuXerFdLqOcQn0NG5IyoHITI9D5d4+I+D5sJT5
+         G1EfMiGdfzrpp8Rm8e2WsINN+GZX2lgtqlP72VoTM7S54GlO3Dqk0JmX44d+SOoyL6Eg
+         NZ/pQ1f3tCzmlg4X4Lp3guhmAnxXluLJ4i5GZAwqnBP2F1CbhPKxfxuugvkGxnfXrxLc
+         U0Ng==
+X-Gm-Message-State: AO0yUKV7Ml7Ygcc94RKluVswP3at26mr+9pV7tnDbCjLWU9ZYy9CO/et
+        tkYq5xceTR03GT7Hmos++sIQUtHCzMY=
+X-Google-Smtp-Source: AK7set9tQKA1DM8rbX+ez6TfYLy9b430NMIoXlhV3hPmwwwd3eU52O7LCjCHfQqXo/rQnaJf9X6nvdVum5U=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:9888:0:b0:a88:ba7:59b with SMTP id
+ l8-20020a259888000000b00a880ba7059bmr26597302ybo.9.1678910244519; Wed, 15 Mar
+ 2023 12:57:24 -0700 (PDT)
+Date:   Wed, 15 Mar 2023 12:57:22 -0700
+In-Reply-To: <20230202165950.483430-1-sveith@amazon.de>
+Mime-Version: 1.0
+References: <f3a957786a82bdd41fe558c40ec93c3fb9ea2ee2.camel@infradead.org> <20230202165950.483430-1-sveith@amazon.de>
+Message-ID: <ZBIjImc+xEMhJkQM@google.com>
+Subject: Re: [PATCH v2] KVM: x86: add KVM_VCPU_TSC_VALUE attribute
+From:   Sean Christopherson <seanjc@google.com>
+To:     Simon Veith <sveith@amazon.de>
+Cc:     dwmw2@infradead.org, dff@amazon.com, jmattson@google.com,
+        joro@8bytes.org, kvm@vger.kernel.org, oupton@google.com,
+        pbonzini@redhat.com, tglx@linutronix.de, vkuznets@redhat.com,
+        wanpengli@tencent.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-...and return KVM_MSR_RET_INVALID otherwise.
+Please don't send vN+1 In-Reply-To vN, the threading messes up lore and other
+tooling, and becomes really problematic for humans when N gets large.
 
-Found by Linux Verification Center (linuxtesting.org) with the SVACE
-static analysis tool.
+On Thu, Feb 02, 2023, Simon Veith wrote:
+> In the case of live migration, using the KVM_VCPU_TSC_OFFSET approach to
+> preserve the TSC value and apply a known offset would require
+> duplicating the TSC scaling computations in userspace to account for
+> frequency differences between source and destination TSCs.
+> 
+> Hence, if userspace wants to set the TSC to some known value without
+> having to deal with TSC scaling, and while also being resilient against
+> scheduling delays, neither KVM_SET_MSRS nor KVM_VCPU_TSC_VALUE are
+> suitable options.
 
-Fixes: cd28325249a1 ("KVM: VMX: support MSR_IA32_ARCH_CAPABILITIES as a feature MSR")
-Signed-off-by: Daniil Tatianin <d-tatianin@yandex-team.ru>
----
- arch/x86/kvm/x86.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 7713420abab0..7de6939fc371 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1661,7 +1661,8 @@ static int kvm_get_msr_feature(struct kvm_msr_entry *msr)
- 		msr->data = kvm_caps.supported_perf_cap;
- 		break;
- 	case MSR_IA32_UCODE_REV:
--		rdmsrl_safe(msr->index, &msr->data);
-+		if (rdmsrl_safe(msr->index, &msr->data))
-+			return KVM_MSR_RET_INVALID;
- 		break;
- 	default:
- 		return static_call(kvm_x86_get_msr_feature)(msr);
--- 
-2.25.1
-
+Requiring userspace to handle certain aspects of TSC scaling doesn't seem
+particularly onerous, at least not relative to all the other time insanity.  In
+other words, why should KVM take on more complexity and a mostly-redundant uAPI?
