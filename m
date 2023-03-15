@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C71EF6BA512
-	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 03:18:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A9C36BA513
+	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 03:18:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230371AbjCOCSR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Mar 2023 22:18:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43132 "EHLO
+        id S230393AbjCOCST (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Mar 2023 22:18:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230255AbjCOCSI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Mar 2023 22:18:08 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BA6B22CB5
+        with ESMTP id S230414AbjCOCSK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Mar 2023 22:18:10 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 196832F78F
         for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 19:18:08 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 204-20020a2514d5000000b00a3637aea9e1so19133669ybu.17
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-536d63d17dbso186987597b3.22
         for <kvm@vger.kernel.org>; Tue, 14 Mar 2023 19:18:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678846687;
+        d=google.com; s=20210112; t=1678846688;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yfFTGhbbVraDRgVNXHu8uvOvYJ9e5XPaW8umznc0CcA=;
-        b=iuPFeNQCLIKVWv/PcGHPSOQF56F84Z4k6pPGo0DhTV127D1hJTtMM4gCrWjMuL5kRT
-         m2Ic2ugK52Um0iz4hpxkEYyFnEchVCLlI1OD/bE0XEmAzddQ/0Af0m/wcu0ceOniHJL8
-         GtuxDu170BEQ8m1x+ZGwUWOiXs3VL9khy0XLBscsfq6UdfMwA95HDdxASJuGKo7tMd1E
-         69rAtrdkNEAvjcQXcjLHzQTPRJG7zEn4PvIAxEcrswUatNFATsZOvLt0Qv23jKg2cnLC
-         L9YMXDOb8x6OqbR3DF8hZ+XI/k8ZpuBHq451/BJlxUmFn3RUZsJCwjQEJPwlXtgd3bwZ
-         zYhg==
+        bh=PspZCzUKPaFAOpAxbY2Ovw8whn5Lj6qp2h/+W5rl0Nw=;
+        b=FtE7NUPPDAZpU6HMOhKHMXQBEef1ltjt6HKkrMzk5UsmDjG/njjxE3SprJYef0Focc
+         AIAMROMVhqSkeyvtuYlgsa6lJAuppz2Ob7/BimDublG2szvI4SEyODT3W8zk9cNqsFNO
+         0dv4g6sMXbtJu0FlA61QnAVYyqBwzmEGbDtq2i5uHvzQh85TkLfOoPpsXS/fb3E1vB2u
+         iGnkzZGosWXQlViwny1o7mDgq7pu2POm3+xzgXX2RClZf4JZ4ao7JADJQ6zjHNDK85Qr
+         AmNWleJd2pTJ0xqb60nbRQMxC70E8f9lVNlI+MUr47mZICtk8BmM4sJSxV/Y5PMMU1BG
+         l9Dw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678846687;
+        d=1e100.net; s=20210112; t=1678846688;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yfFTGhbbVraDRgVNXHu8uvOvYJ9e5XPaW8umznc0CcA=;
-        b=BMKe9q9FEqiOQm68jqszBEKoxGSIILc6vg88aWXnhF6+CEdAP6gDWhxSI68v1zjsbG
-         RFENgC0i06v10dYt1ifIYYd61vA24PGF14OGDmUurJ4VlpooNy10k/9mlB2FZWDtDQtS
-         VQP6i21LITP/PNIC9P2mDvEiiXLJ8H7OxjgB+nEJPgidoJbPaFIk7uaKv/Km7tM172Xi
-         1hHAz5rrf8Jozm/jjJ5UaOeruzlU/AGEHoSe0o6ndUzlADaylRgFyfoz0IPQMZgp4JL/
-         n1Pytf81XOsi+VaFGRZ/ffJr6O8b/+fm89Os3AwVxTzKsuxd0S+5uhgDT0f+Pv9SdNMJ
-         lqDg==
-X-Gm-Message-State: AO0yUKVzptEfDwfojAIKXvltmy4HAXuFqxDyDI9PqhY9MheQTEiOrsDC
-        mcKDEi1oREWDhYJF1ndIuCBOSS0F/OQFcQ==
-X-Google-Smtp-Source: AK7set9NS3+w2A3CePKXQBzZnfMtJpEuyDhal2sNJnOm7hnztem4I38hnaHSRurYYAV88qWsTKdT9/k8B6I1wQ==
+        bh=PspZCzUKPaFAOpAxbY2Ovw8whn5Lj6qp2h/+W5rl0Nw=;
+        b=C7jMocixYhpS9fBfBYh2+7O4WwLXOHLQArjnDx17vHf1z3yjwNG1IVg6V3eBcJ1YW3
+         nKS7T5uDrCfWPK7QJxeGzfijMWX83ISI22bOJQAC6Doxpa941Hmw/9q19IC0S1uX80hA
+         iClID4xeYxHdq3zLe6cJ7W0nCpWBpFmjmwBBauIJPBI4AFXfE2t5eS94zrlWawv2w+KJ
+         TinnmwVqCTkKpyxwj7yPRfgJWgjbfIzyYt/RxqPsnFAOSg2tQ71eeEIoQUC4/p1qsHQ3
+         yXayMsO5Wp1eaWgKc8fiUZMA8gQBtDKunPzygZ5I03hofsGFm27dcov/uBYdTPWpzNaY
+         TDXw==
+X-Gm-Message-State: AO0yUKXcfwYung/PjJXj1pG0CfdUMv7tvrZKDPPotmhxGrllDFhNAFNE
+        eEqcMJx6Y7vwpaFEQT+Z+J/elkm0OnJTBQ==
+X-Google-Smtp-Source: AK7set88lixFsKzxi/PrTdCTgM6mm48cFhmYViig7GrUjxGvtnUZfp8R/105AQWd8fUvHaeveJivsDp2ITohTw==
 X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
- (user=amoorthy job=sendgmr) by 2002:a81:ef01:0:b0:541:66a2:dd93 with SMTP id
- o1-20020a81ef01000000b0054166a2dd93mr9094443ywm.3.1678846687407; Tue, 14 Mar
- 2023 19:18:07 -0700 (PDT)
-Date:   Wed, 15 Mar 2023 02:17:31 +0000
+ (user=amoorthy job=sendgmr) by 2002:a05:6902:1024:b0:b4a:3896:bc17 with SMTP
+ id x4-20020a056902102400b00b4a3896bc17mr1226573ybt.0.1678846688254; Tue, 14
+ Mar 2023 19:18:08 -0700 (PDT)
+Date:   Wed, 15 Mar 2023 02:17:32 +0000
 In-Reply-To: <20230315021738.1151386-1-amoorthy@google.com>
 Mime-Version: 1.0
 References: <20230315021738.1151386-1-amoorthy@google.com>
 X-Mailer: git-send-email 2.40.0.rc1.284.g88254d51c5-goog
-Message-ID: <20230315021738.1151386-8-amoorthy@google.com>
-Subject: [WIP Patch v2 07/14] KVM: x86: Implement memory fault exit for setup_vmgexit_scratch
+Message-ID: <20230315021738.1151386-9-amoorthy@google.com>
+Subject: [WIP Patch v2 08/14] KVM: x86: Implement memory fault exit for FNAME(fetch)
 From:   Anish Moorthy <amoorthy@google.com>
 To:     seanjc@google.com
 Cc:     jthoughton@google.com, kvm@vger.kernel.org,
@@ -68,24 +68,24 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 ---
- arch/x86/kvm/svm/sev.c | 4 +++-
+ arch/x86/kvm/mmu/paging_tmpl.h | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index c25aeb550cd97..c042d385350de 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -2683,7 +2683,9 @@ static int setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
- 			pr_err("vmgexit: kvm_read_guest for scratch area failed\n");
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 57f0b75c80f9d..ed996dccc03bf 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -717,7 +717,9 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+ 	}
  
- 			kvfree(scratch_va);
--			return -EFAULT;
-+			return kvm_memfault_exit_or_efault(
-+				&svm->vcpu, scratch_gpa_beg, len,
-+				KVM_MEMFAULT_REASON_UNKNOWN);
- 		}
+ 	if (WARN_ON_ONCE(it.level != fault->goal_level))
+-		return -EFAULT;
++		return kvm_memfault_exit_or_efault(
++			vcpu, fault->gfn * PAGE_SIZE, KVM_PAGES_PER_HPAGE(fault->goal_level),
++			KVM_MEMFAULT_REASON_UNKNOWN);
  
- 		/*
+ 	ret = mmu_set_spte(vcpu, fault->slot, it.sptep, gw->pte_access,
+ 			   base_gfn, fault->pfn, fault);
 -- 
 2.40.0.rc1.284.g88254d51c5-goog
 
