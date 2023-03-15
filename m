@@ -2,218 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D73856BB659
-	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 15:43:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 820C16BB73F
+	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 16:13:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232277AbjCOOnT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 10:43:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47488 "EHLO
+        id S232921AbjCOPNp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 11:13:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231976AbjCOOnR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 10:43:17 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5905487D81
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 07:43:15 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=irpuwgrHpbmQ7G2290p1vCaev6WnaO2969cSy9U2qqo9S6fnMbz5OB6bmA8SD1yJ0AVjPXqw37Jts0O3h4j09XRNZBKoZLoUSkN6NNiNZE/GtdtDNwZFwwAuPIy8MiSusknZzy2IT4tetIN5u6iIdVGQ9hn6hzzkcEG5vt9YrS/O5RpG4oyZkbIvJLTkj2hW9jaJRvLvFaflaBBTwzUtd0oB9GF/gRoVkj9M4VqYVWvZjMfD5MvFO8sRnDZ8B5RHmLx3dxwVeHSjbRUnasN8pcA5wZps+/iKi2+jfX/TuqcXmDJ7KA8l9kWl7UcS0xl6lVHttkaIWFrIZUP4wM9tww==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WM51ZlsU//Ujj6y+kB7GsxYAQPQa2C0MTiBeQBhuc7k=;
- b=jMi9bpldVqpWqf9PVvIZHuOZTM62eT3CF3DIbetpnU+6y7ZR06vxv47JZ7neZGe4pFGWlkQzoSnu07w8PMK7eOZbXPcms7pVQUYkljFvOUubCv0dUhnzz1RdKhiNWuStLTr/0XX82wOTB9TqTv81vg7wkELjWEe4L9cIfcPbaGI6ZhlVWmf09xvb1btc7mT8MEo/Mlv06KjxX7WbblH24swg1Om2VK6Y8xumMQjZzT5YZbVZcjn1Wi77FzUjsCDvcgLfsVse+vB66ybrR5pZYG4IKAzrZ3JsE+GkWnbK6hx0FNn205qKiuLg+m4aVbEa3h8VkWQ6cBWd4MH1b5m+WA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WM51ZlsU//Ujj6y+kB7GsxYAQPQa2C0MTiBeQBhuc7k=;
- b=3B2lnDPio67YQQlT5lNs7hbZP92XagJ2+qppTHRmK0q/cZvKFkNXJnSOduvEnxVapuEQlwF3ulOM1wWh1OIMR9sKqyalx6j+c+q+rLZtfnHyF+61zSRlUf7zrNnQ3yux/VOp2N6g0v4LyCvVIpCxSFTuUT4E1+M6Qz/wFSnkP7M=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from MW3PR12MB4553.namprd12.prod.outlook.com (2603:10b6:303:2c::19)
- by SJ0PR12MB6968.namprd12.prod.outlook.com (2603:10b6:a03:47b::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.29; Wed, 15 Mar
- 2023 14:43:13 +0000
-Received: from MW3PR12MB4553.namprd12.prod.outlook.com
- ([fe80::3490:de56:de08:46f6]) by MW3PR12MB4553.namprd12.prod.outlook.com
- ([fe80::3490:de56:de08:46f6%9]) with mapi id 15.20.6178.029; Wed, 15 Mar 2023
- 14:43:13 +0000
-Message-ID: <ffa6ed49-d6e0-04ec-5e0d-93f2e28cbd99@amd.com>
-Date:   Wed, 15 Mar 2023 09:43:08 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Reply-To: babu.moger@amd.com
-Subject: Re: [PATCH v2 0/5] target/i386: Update AMD EPYC CPU Models
-Content-Language: en-US
-From:   "Moger, Babu" <babu.moger@amd.com>
-To:     "Moger, Babu" <bmoger@amd.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>
-Cc:     "mtosatti@redhat.com" <mtosatti@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>,
-        "imammedo@redhat.com" <imammedo@redhat.com>,
-        "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
-        "yang.zhong@intel.com" <yang.zhong@intel.com>,
-        "jing2.liu@intel.com" <jing2.liu@intel.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "Roth, Michael" <Michael.Roth@amd.com>,
-        "Huang2, Wei" <Wei.Huang2@amd.com>
-References: <20230106185700.28744-1-babu.moger@amd.com>
- <20230127075149-mutt-send-email-mst@kernel.org>
- <8df55f5e-afd1-ab04-c7da-8ac70a8f9453@amd.com>
- <26a70833-b9fb-d975-4c90-3adaaa497bd2@amd.com>
-In-Reply-To: <26a70833-b9fb-d975-4c90-3adaaa497bd2@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: CH0PR08CA0019.namprd08.prod.outlook.com
- (2603:10b6:610:33::24) To MW3PR12MB4553.namprd12.prod.outlook.com
- (2603:10b6:303:2c::19)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW3PR12MB4553:EE_|SJ0PR12MB6968:EE_
-X-MS-Office365-Filtering-Correlation-Id: ed85c242-2130-43bf-d2d7-08db25639a7d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: L7c1wFibJortsnzHU1Z5MLK/TqdWj2b9Oo/8D5cCGMHP+OxbNjtfkBgZDl8tlfi9UEzXNMowBp01LX7ZbOsYtaypT3WHyet42zfQg2aQn9SCxybI1r+Cm56fzoavaQSv3FnHw6R58hkzigmSb/9jVCe1uaTy0hzGsQbCTAPOpJYrH2h+7V2yvZei0kiAs4A3VRzv97A6OjiK6Dz8JWtPaR0wQQOcUzS/7+alO7PqCj6GE0VSvsVBz+iXJXzNnS+5lwDgFmi6UKvZ+sYw+S4eYb0oHlwtFi00PqsQQngn9QoYVZr8T42TEmSZYW+K8jBXacDk65RllKmweCDp7T5MvDSqF4HgmN7Y66pRMPqGd1rQqi66h4GIaLVbqV+vFdz61vUB2eS9stvt2iZVTgGCaOjfBuaf/qMPj+aFzL8MZTIVZEzDMT8EyY/ueXTueuQVRj1dLwYwkLvoRhDnaf0TAAZBxmWylN3QdrWULho2ZmeH5BUWen2mLGNuyLemk/dayhhCygw5JazaZML9q5KMIlZtxbZH58TQr0FyAYEKqTEJ3pv5thC1+jG//MHdzVpAJmhdIRg0SFhZPP92HgFGgSK4Vc7sLe8i25pWHe4bC+z1j7rsorNwG+/8aGKQIwwRs1B/SHKdZmju+vOCDVRRGXVW8H78yNCK1/ovLqGWKc5E87Z+e7eSuJrNulLa1mSfHk0rI+blVXGhgDOhvPQQt2WDiFuI9dQJSznfOns1fB/U0Rp89eVZZMIdhYlKe37BqCUQZNzXrk5b/RB7oAxFVzYV0xwI/Ntbo0gUtOCcTQU=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR12MB4553.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(396003)(376002)(346002)(39860400002)(366004)(136003)(451199018)(31686004)(7416002)(41300700001)(8936002)(5660300002)(3450700001)(15650500001)(2906002)(38100700002)(31696002)(86362001)(36756003)(478600001)(66946007)(66476007)(8676002)(66556008)(966005)(6486002)(6666004)(4326008)(2616005)(54906003)(83380400001)(110136005)(316002)(186003)(6512007)(53546011)(26005)(6506007)(170073001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?M1hjRXV6dlg4MXk4SlYweC9ORGo1a2J1K3V1dCt0emVWcTFsVGNpZ3dmeVg1?=
- =?utf-8?B?SmJuUHQ0ZHhFekpkdTJTbW9LNDlQQnVEc0kxUmlIZlVkSW96MGI3VFZnOHcy?=
- =?utf-8?B?clRiemxCUGZ0S1ZrWXpueTZzUmViZ2E4b3ZVby9qUW5XWHlVaFlOclpaU2tX?=
- =?utf-8?B?VThtekNzQktac0xqT2dQaDJva3N1bVdDRFZVdWNQV1JaZThPS093eFpEdWpV?=
- =?utf-8?B?T2FHN3BJRUhrSVVEYmlQSkRQMkgyREtzL2o4bUJ4d1lkeXhoaSs1dy90K0Zh?=
- =?utf-8?B?RW92dTRmKzk1emRuT3J3L2FFUlJZM3ViQ0l5Rm5Zc1pXVjBNMU9aWlpjTk5K?=
- =?utf-8?B?MU00ci9oTTJqdW02aDJnRVhOc3NBd1JTT1BOVVp1SG9DeDRrVUJxVHVybnZl?=
- =?utf-8?B?SEgxMURPRGVJR2tFYlRNeTV4WEF1bkR6SDFMMUdOQWdXRDFCNG4rNitnbWdJ?=
- =?utf-8?B?c0dFWVBzNnhWSmpDQ2grbzc4SlovMGFFeTB0dXc4Yi9YWWlqV29RY21QQXlJ?=
- =?utf-8?B?dEZXcGhBYUZtWVNQNUdlbkNwOVo5akhhSCt2QUY4SkZCMVVqZTd0Y1dlQWhX?=
- =?utf-8?B?RnVSTGQ5NlZ6Q0lrRzlrZ1h1NmxQUnVPQVBJWkZIYlRvVk51K3R5VlJJa2JS?=
- =?utf-8?B?Smh2ZDZ6OVlYTm0yN0UrNnVrUStpMVVWK0lWaXN1WjBENWVYb240TXFNOXBJ?=
- =?utf-8?B?Rm45VDUwUTAzcFNzTGJvL05mVThwdjBZRjFXUThQbUNrQ0p2WGJ3YTFHN0xv?=
- =?utf-8?B?eStLS2pxZC82SjU2SDdOSU1CN2Y4NSs4MUtXSHE5RmtzMnlJZG1qd2lWRzVv?=
- =?utf-8?B?THUrcXdoUlpFSHFxbnFxN1l2ZXhkcXZVNkF5K0JWd2dUb1VPQSs3U1pNd2NS?=
- =?utf-8?B?MG01dG9wclBHZHlFVmhZMjdnR1haQ2NIZGZRWkJXRGxnNS9veXQ1cTFkSmZh?=
- =?utf-8?B?bzVvNEt2WmhaWHhzWHY1bFFvVm5GV1NnK1U0a1l1NjFpcE12WTJVSU9MZlB0?=
- =?utf-8?B?WTk0NHB6c0NEMEFXNUdMSURXbnl0YVBmVDVvN0FnWVdlamV4Um8yN0szck1r?=
- =?utf-8?B?enRuSVd2a2NxQ1FOcFBxVE5HYmVOWithdi9CQTNzOG5KNlBBZklHVkNBV3pB?=
- =?utf-8?B?ZTdjL29qNG9XTW9FTVVZemRiSWFhK0NtSmtwSmcxZkNFRmhGYzRiRTh0RFRT?=
- =?utf-8?B?NVd2TFZqWTVnN09LejZtKzhtNmZEMVJLTEtvN1V0bUdBdDNROW1kZldsd1g0?=
- =?utf-8?B?ZDExaHh6aFNiNWh6SmVlSGl6TXlidGtQd2lZN3RZTS8rWTZ5MHY1N3dOOTZm?=
- =?utf-8?B?RUZZUFNrc1k2NEV4UDJGZGdhRHdtT2piWkdHa09FajJ1Mk9UYWRFWFZSbktT?=
- =?utf-8?B?dERCdGNUcWNHRllpeEdKbVdBRG1NVHpTOGY4amU5ME41Q0UrWnVGL3p4NFEz?=
- =?utf-8?B?UkV0d1VOOWFma01SQ2dGM203WEV1UnV1RmF6NEd4VzQwUWRiaTNyelYycG16?=
- =?utf-8?B?eHNySkxYREUyVTlHeGVDYXJaaC9rQWJrODY4Z0lWYS9abUJPSkNONmV2cnln?=
- =?utf-8?B?MkFoWW1MYkgxOFkrYjA3OGRVcjk1Z0NGYnBUNjFWaTlkWkhpdWcybE1jZGdv?=
- =?utf-8?B?OWdhQTFHSWtkQjJjM2NXcUdQWXdiMU1kNHFCcnJ6NTQzK3R0MUkwdTdyR1pJ?=
- =?utf-8?B?Nit6M2lZaVBrVXFYOHVyL0d1cXk4ZTNUSDh4dFlBa093cGxDVTI3TVBhN0U5?=
- =?utf-8?B?L1ZCWURwaHVDbXppMENHQVVhZlRhTW5SSVFlZE1jOHhSdjVMNlBOa21qTHpF?=
- =?utf-8?B?RGR4bHF5MzIwLy9OZ3cyYjVEbVFLK3VhMmJYM0dEeVpqVnBWbGpqbWVMRFBT?=
- =?utf-8?B?QlR1WittamNCZFZKdEVmaTZxcCs0ZGh5VmVJTEFmZEdzbkp6bWhucUNiSmlP?=
- =?utf-8?B?aE1uLzhWYVRKbVBCUTFlUlpOV0R4WTFpN0lQV1F6bzFndWNqWEsvRXJoQ1BX?=
- =?utf-8?B?UlVZNGxqcXZ3bDlzUzBRR1FyZTc2YmRqTjc2MFRkVmFudTBFR09sUmIyRFNL?=
- =?utf-8?B?NDFtSkRzdEp4OWdpRnNqeVdDOS9scE5wZys2TG8vMmF1dEFuTFFXSWRrSDFq?=
- =?utf-8?Q?6GwL7w/OksXxRCMRPzs+kAeiM?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ed85c242-2130-43bf-d2d7-08db25639a7d
-X-MS-Exchange-CrossTenant-AuthSource: MW3PR12MB4553.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Mar 2023 14:43:12.9483
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dsCGiRsH9a++nFXFDuUxJDhFACnOomXkPk6NHfvTwP4K7Bn+VCMTtHHF2gI+Ki5v
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6968
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S232772AbjCOPNn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 11:13:43 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2AC41E293
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 08:13:40 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id n203-20020a25dad4000000b0091231592671so20540840ybf.1
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 08:13:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1678893219;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=igb29Lv6teQ/KLxEPbILcI69WT+IeDSiIl02ryINK0U=;
+        b=qwx+pwGWTkfuBIFZ8WJJIlE22H6OxlI4L+byyyu7CpI+6kNCjD5QcFUWkE849GJGnk
+         w/QbXXS4/3a2Z7I0UKpf3OW6Mp4RexCo5T1LV3ot7X9oXXR/IDb4BIFmAgJ+lTukS4R9
+         7I1yrA0w2HyUSHOds9PXcpR3yvpLs4jT+sFJ33OaBrYM0HyJfhySfiih3+jYblrp8joN
+         EnbUrasj0tSqJborj2MP4+ejpZ9at2WQvxVZZpIYfe5+J7zUbW7v1bPjdoWmBMycNtHL
+         z2zGhnR5fZfIQ7zvf98mHBmrSxUKlVpsbwoj3Yw+jZRk0IL2UOkNjDaBgWmgA9zQJNO1
+         wliw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678893219;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=igb29Lv6teQ/KLxEPbILcI69WT+IeDSiIl02ryINK0U=;
+        b=c9eoUZp8TAAuRtU28dsj5LuuMGkWk6gdhHYNve/FsW3y7vqVWQbokpdHygAmV6nXhG
+         rC4KtfZN56PLCwl/IB9w/GjzUiEdDIcE40c1iSe6yQPpS6aHLb6bpWTTzuhCU92oSEMM
+         g33pf/iVJzHnkpss9TTw4UA8Ykqxcu80/KbEKbeByK6UDK4PgsHWJTVHcldKHtjwI6h3
+         XUJvkIAcbPeVOuO72IKFbG3TUcpKg+ZZS5zc/tpGXKB4DSdZZlIOIqaIH5D3kzx74uS6
+         nXInioyniKgls1e8qDGD6c+eeZAJYlguwB9qncGRyFgq9KRE2ELTXf6nEBoPJoTr7MM5
+         0nwA==
+X-Gm-Message-State: AO0yUKUdamISC7WwHBWLu7GuiVFb3T4TxirQF3PngFBLcswS0UM99p/2
+        JLCstxA8UGjpW/5VQa+V5wHGlqDbII0=
+X-Google-Smtp-Source: AK7set92lEDFc7yP4SaEhv7nzCL2HlcwCZvuRQrW8ZqYLEa9wbXKpFtBlkwMtMCw7w58n3f+4HvOUaVGDM8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:ca4f:0:b0:541:7237:6e6b with SMTP id
+ y15-20020a81ca4f000000b0054172376e6bmr200343ywk.0.1678893219401; Wed, 15 Mar
+ 2023 08:13:39 -0700 (PDT)
+Date:   Wed, 15 Mar 2023 08:13:37 -0700
+In-Reply-To: <ZBGFXrpSXpF5NUlV@yzhao56-desk.sh.intel.com>
+Mime-Version: 1.0
+References: <20230311002258.852397-1-seanjc@google.com> <20230311002258.852397-20-seanjc@google.com>
+ <ZBGFXrpSXpF5NUlV@yzhao56-desk.sh.intel.com>
+Message-ID: <ZBHgoS/4R35KByOp@google.com>
+Subject: Re: [PATCH v2 19/27] KVM: x86/mmu: Move KVM-only page-track
+ declarations to internal header
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>, kvm@vger.kernel.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+        Ben Gardon <bgardon@google.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
-Any plans to merge these patches to v8.0 release.
-Thanks
-Babu
-
-On 3/1/23 14:01, Moger, Babu wrote:
-> Gentle ping again. Hope this patch doesn't get lost.
-> Thanks
-> Babu
+On Wed, Mar 15, 2023, Yan Zhao wrote:
+> On Fri, Mar 10, 2023 at 04:22:50PM -0800, Sean Christopherson wrote:
+> > Bury the declaration of the page-track helpers that are intended only for
+> > internal KVM use in a "private" header.  In addition to guarding against
+> > unwanted usage of the internal-only helpers, dropping their definitions
+> > avoids exposing other structures that should be KVM-internal, e.g. for
+> > memslots.  This is a baby step toward making kvm_host.h a KVM-internal
+> > header in the very distant future.
+> > 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  arch/x86/include/asm/kvm_page_track.h | 26 ++++-----------------
+> >  arch/x86/kvm/mmu/mmu.c                |  3 ++-
+> >  arch/x86/kvm/mmu/page_track.c         |  8 +------
+> >  arch/x86/kvm/mmu/page_track.h         | 33 +++++++++++++++++++++++++++
+> >  arch/x86/kvm/x86.c                    |  1 +
+> >  5 files changed, 42 insertions(+), 29 deletions(-)
+> >  create mode 100644 arch/x86/kvm/mmu/page_track.h
+> > 
+> > diff --git a/arch/x86/include/asm/kvm_page_track.h b/arch/x86/include/asm/kvm_page_track.h
+> > index e5eb98ca4fce..deece45936a5 100644
+> > --- a/arch/x86/include/asm/kvm_page_track.h
+> > +++ b/arch/x86/include/asm/kvm_page_track.h
 > 
-> On 1/31/23 14:21, Moger, Babu wrote:
->>
->>> -----Original Message-----
->>> From: Michael S. Tsirkin <mst@redhat.com>
->>> Sent: Friday, January 27, 2023 6:53 AM
->>> To: Moger, Babu <Babu.Moger@amd.com>
->>> Cc: pbonzini@redhat.com; mtosatti@redhat.com; kvm@vger.kernel.org;
->>> marcel.apfelbaum@gmail.com; imammedo@redhat.com;
->>> richard.henderson@linaro.org; yang.zhong@intel.com; jing2.liu@intel.com;
->>> vkuznets@redhat.com; Roth, Michael <Michael.Roth@amd.com>; Huang2, Wei
->>> <Wei.Huang2@amd.com>
->>> Subject: Re: [PATCH v2 0/5] target/i386: Update AMD EPYC CPU Models
->>>
->>> On Fri, Jan 06, 2023 at 12:56:55PM -0600, Babu Moger wrote:
->>>> This series adds following changes.
->>>> a. Allow versioned CPUs to specify new cache_info pointers.
->>>> b. Add EPYC-v4, EPYC-Rome-v3 and EPYC-Milan-v2 fixing the
->>>>     cache_info.complex_indexing.
->>>> c. Introduce EPYC-Milan-v2 by adding few missing feature bits.
->>>
->>> Acked-by: Michael S. Tsirkin <mst@redhat.com>
->>
->> Michael, Thank you
->>
->>>
->>> who's merging this btw?
->>> target/i386/cpu.c doesn't have an official maintainer in MAINTAINERS ...
->>
->> I thought Paolo might pick this up.
->>
->> Thanks
->> Babu
->>
->>>
->>>> ---
->>>> v2:
->>>>    Refreshed the patches on top of latest master.
->>>>    Changed the feature NULL_SELECT_CLEARS_BASE to NULL_SEL_CLR_BASE
->>> to
->>>>    match the kernel name.
->>>>    https://lore.kernel.org/kvm/20221205233235.622491-3-
->>> kim.phillips@amd.com/
->>>>
->>>> v1:
->>> https://lore.kernel.org/kvm/167001034454.62456.7111414518087569436.stgit
->>> @bmoger-ubuntu/
->>>>
->>>>
->>>> Babu Moger (3):
->>>>    target/i386: Add a couple of feature bits in 8000_0008_EBX
->>>>    target/i386: Add feature bits for CPUID_Fn80000021_EAX
->>>>    target/i386: Add missing feature bits in EPYC-Milan model
->>>>
->>>> Michael Roth (2):
->>>>    target/i386: allow versioned CPUs to specify new cache_info
->>>>    target/i386: Add new EPYC CPU versions with updated cache_info
->>>>
->>>>   target/i386/cpu.c | 252
->>> +++++++++++++++++++++++++++++++++++++++++++++-
->>>>   target/i386/cpu.h |  12 +++
->>>>   2 files changed, 259 insertions(+), 5 deletions(-)
->>>>
->>>> --
->>>> 2.34.1
->>
-> 
+> A curious question:
+> are arch/x86/include/asm/kvm_*.h all expected to be external accessible?
 
--- 
-Thanks
-Babu Moger
+Depends on what you mean by "expected".  Currently, yes, everything in there is
+globally visible.  But the vast majority of structs, defines, functions, etc. aren't
+intended for external non-KVM consumption, things ended up being globally visible
+largely through carelessness and/or a lack of a forcing function.
+
+E.g. there is absolutely no reason anything outside of KVM should need
+arch/x86/include/asm/kvm-x86-ops.h, but it landed in asm/ because, at the time it
+was added, nothing would be harmed by making kvm-x86-ops.h "public" and we didn't
+scrutinize the patches well enough.
+
+My primary motivation for this series is to (eventually) get to a state where only
+select symbols/defines/etc. are exposed by KVM to the outside world, and everything
+else is internal only.  The end goal of tightly restricting KVM's global API is to
+allow concurrently loading multiple instances of kvm.ko so that userspace can
+upgrade/rollback KVM without needed to move VMs off the host, i.e. by performing
+intrahost migration between differenate instances of KVM on the same host.  To do
+that safely, anything that is visible outside of KVM needs to be compatible across
+different instances of KVM, e.g. if kvm_vcpu is "public" then a KVM upgrade/rollback
+wouldn't be able to touch "struct kvm_vcpu" in any way.  We'll definitely want to be
+able to modify things like the vCPU structures, thus the push to restrict the API.
+
+But even if we never realize that end goal, IMO drastically reducing KVM's "public"
+API surface is worthy goal in and of itself.
