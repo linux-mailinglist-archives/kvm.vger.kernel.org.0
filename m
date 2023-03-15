@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E960E6BBB5E
+	by mail.lfdr.de (Postfix) with ESMTP id 0146F6BBB5B
 	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 18:50:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232817AbjCORt6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 13:49:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36618 "EHLO
+        id S232713AbjCORtw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 13:49:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231290AbjCORtk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 13:49:40 -0400
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3EB6199CD
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:49:23 -0700 (PDT)
-Received: by mail-wm1-x331.google.com with SMTP id m18-20020a05600c3b1200b003ed2a3d635eso1827730wms.4
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:49:23 -0700 (PDT)
+        with ESMTP id S232147AbjCORti (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 13:49:38 -0400
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4A21241F4
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:49:24 -0700 (PDT)
+Received: by mail-wm1-x330.google.com with SMTP id o11-20020a05600c4fcb00b003eb33ea29a8so1831152wmq.1
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:49:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1678902562;
+        d=linaro.org; s=google; t=1678902563;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Fw0yP+1ZBc/H2+o37ZgzxeatA+xGyE5UatghhgQrblQ=;
-        b=PK6Qx2aRoV5zGR34fqA44kbG5SL34c4aG9XoK14NFI1vNkR58VJFp6iYJzwahWraro
-         WMzZ0OnyjAvroGfTigg2jjF70WRV1+CvKYr/3QxYVd84QD6/l8fbHjEcR9amdzMVo2y5
-         GOmXm43nw1k7zoMiC72SJipwi2L3Z1Wq2fZZ8kcJGr2oAYYN1ae5XxLTAb9llw4pD75F
-         rk4aBg0g/Q/ambXEU/vM56V0n4Mr469XXlsGI/S8s2LlCx/373glwaCnhoOG75vMAHNC
-         cKHL7HEGo+8UTHu//jsY9h3gdCK8T2JPZ+Vk7GSHWhM37IJuuMhbkeTA9xoZr3m93bPC
-         eCLg==
+        bh=CJUdD1KDNN10uHV14kT9b5pVemIcBVsEPAiKGCkA3/I=;
+        b=ZiJwizY+BEQyfg+Q/JLMGsdkQBe18LLAHEYUWqsiE2UzVpoafO6VnoUkgfIPF1UF2C
+         AvHMfi1Zr4Gw+gU/glYhKQrPHig6ofDlVVSvHAknUmPOMV+KsOyu1ap5MFw86PoVzZFW
+         hRlf689u9iXJwNoLzIh4+flVAro/FQfytj2H61FRa0BWvwNGSYnYylvMS/e2dsBa+uYf
+         CdquL8gPnq9mTBiAINiXTynie2t6fwHS67wIcfJ6ZsSjj/Y/hgKw8TjhzQ5V3bDGJo3p
+         peJrW+oyDPqBXVDrJXAHlvdp3/ngS+p7onB5PHuDMel60FN8u/BKxfjngHNycMIUH5CZ
+         5NFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678902562;
+        d=1e100.net; s=20210112; t=1678902563;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Fw0yP+1ZBc/H2+o37ZgzxeatA+xGyE5UatghhgQrblQ=;
-        b=ozPGVlUzSyDmHghd5IT/bKnNIhVdWxaTx0jbSlMfHGcyLsGaX9479zu1cUo926sPHI
-         hzIUAMVNerdGOKHRYpybiV9z1CklZGHLxtNS0uYmK3JbxMJLehui5E3dl+b66ddFJeuE
-         JAXAIkoPFP0YSgc7LgLRaq1VLVuI7SSmoucJybOd1WDoqiha3ZPwjHqkyaomOvfUtZU0
-         Gaonwwb0iih3MtjEF4jEMpu4kvZHoEWpyBh4R8Jt0h3iVJ1sv71242VXMWaIPbxzo40D
-         gR2Gc2z3teU1dquBkQ6VdKOOMK5wVcgRAH4/8hqZ0iGz9Jal4DCFogXD5h+0cCVG5BTc
-         h3kQ==
-X-Gm-Message-State: AO0yUKVRqzxq5C3NlHCTFKcF3S1ywqK6chWyv/ecA2MUUPIGm9Xbg+li
-        vwrt2w0n2aJ+TGZEt6961/ymow==
-X-Google-Smtp-Source: AK7set+9tTnIiQ8OrC2YjJzoPKpiOia23IRE+7BDnXFLCbUFl2v0rbWH5IJ6secCAdDaaUvPQvuPQQ==
-X-Received: by 2002:a05:600c:4590:b0:3df:1673:90b6 with SMTP id r16-20020a05600c459000b003df167390b6mr18850717wmo.39.1678902562456;
-        Wed, 15 Mar 2023 10:49:22 -0700 (PDT)
+        bh=CJUdD1KDNN10uHV14kT9b5pVemIcBVsEPAiKGCkA3/I=;
+        b=L7viVrfzhZqdkn4QZgdNBgrtwjwlkllm1nWNkY3+oDdvwVdzEaAfSnoZE3j7nHfOyp
+         nD2RRYjAqcHdxAhGwlckI826aWn71y4RF0iDFA34cOcp/SVfyQA5IAxaC6C7piBml+Ye
+         cKV7cNPeztYENnXE84KC5c3VLiX/mqYzXgzIjJ7mYfAx/irSKlvO/YfLMeiAgdzfLqej
+         M0/ibyBt4tTS92qF7NxwVR+sgFJz7meotpglW8kbTnhjdTfRcM71iTUGvBn3bMxLGHXV
+         r00GWtmp3dcm7TzaWwTnJ6sXBQ6cyZ4ggP67ObyfjQhNUCpfaRiTscvOFB60KCiTVH3M
+         wR1w==
+X-Gm-Message-State: AO0yUKXG+aQq45tzJ2q3ClUTwM7ncrb1fLAGNC9k9x+ww6h67xU3aFI+
+        5vQDL7YnGNO1FwA1PWSz0bwMfg==
+X-Google-Smtp-Source: AK7set/SqHuK6PEIsW6F6a7dde4PpYY9pyyZZEy/OPTtCssSDeS8nLFAk0KOyc38M7fngm1jtMAPMQ==
+X-Received: by 2002:a05:600c:4452:b0:3ed:2709:2edf with SMTP id v18-20020a05600c445200b003ed27092edfmr10925367wmn.13.1678902563350;
+        Wed, 15 Mar 2023 10:49:23 -0700 (PDT)
 Received: from zen.linaroharston ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id c9-20020a7bc009000000b003ed3084669asm2602107wmb.14.2023.03.15.10.49.20
+        by smtp.gmail.com with ESMTPSA id p18-20020adfe612000000b002c3f9404c45sm5219633wrm.7.2023.03.15.10.49.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Mar 2023 10:49:21 -0700 (PDT)
+        Wed, 15 Mar 2023 10:49:22 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id D228C1FFD2;
+        by zen.linaroharston (Postfix) with ESMTP id F30251FFD3;
         Wed, 15 Mar 2023 17:43:44 +0000 (GMT)
 From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To:     qemu-devel@nongnu.org
@@ -113,12 +113,11 @@ Cc:     Akihiko Odaki <akihiko.odaki@gmail.com>,
         Sunil Muthuswamy <sunilmut@microsoft.com>,
         Hanna Reitz <hreitz@redhat.com>, Peter Xu <peterx@redhat.com>,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        Alexander Graf <graf@amazon.com>,
-        Paul Durrant <pdurrant@amazon.com>,
-        David Wooodhouse <dwmw@amazon.co.uk>
-Subject: [PATCH v2 28/32] contrib/gitdm: add Amazon to the domain map
-Date:   Wed, 15 Mar 2023 17:43:27 +0000
-Message-Id: <20230315174331.2959-29-alex.bennee@linaro.org>
+        Guo Ren <guoren@kernel.org>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Subject: [PATCH v2 29/32] contrib/gitdm: add Alibaba to the domain-map
+Date:   Wed, 15 Mar 2023 17:43:28 +0000
+Message-Id: <20230315174331.2959-30-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230315174331.2959-1-alex.bennee@linaro.org>
 References: <20230315174331.2959-1-alex.bennee@linaro.org>
@@ -135,32 +134,60 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We have multiple contributors from both .co.uk and .com versions of
-the address.
+This replaces the previous attempt to add c-sky.com. Group everything
+under Alibaba now.
+
+Added as requested by LIU Zhiwei.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Cc: Alexander Graf <graf@amazon.com>
-Cc: Paul Durrant <pdurrant@amazon.com>
-Cc: David Wooodhouse <dwmw@amazon.co.uk>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Message-Id: <20230310180332.2274827-7-alex.bennee@linaro.org>
+Acked-by: Guo Ren <guoren@kernel.org>
+Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Reviewed-by: LIU Zhiwei <zhiwei_liu@linux.alibaba.com>
+Message-Id: <20230310180332.2274827-8-alex.bennee@linaro.org>
 ---
- contrib/gitdm/domain-map | 2 ++
- 1 file changed, 2 insertions(+)
+ contrib/gitdm/domain-map        | 1 +
+ contrib/gitdm/group-map-alibaba | 7 +++++++
+ gitdm.config                    | 1 +
+ 3 files changed, 9 insertions(+)
+ create mode 100644 contrib/gitdm/group-map-alibaba
 
 diff --git a/contrib/gitdm/domain-map b/contrib/gitdm/domain-map
-index 4a988c5b5f..8dce276a1c 100644
+index 8dce276a1c..0b6c77eee0 100644
 --- a/contrib/gitdm/domain-map
 +++ b/contrib/gitdm/domain-map
-@@ -4,6 +4,8 @@
+@@ -4,6 +4,7 @@
  # This maps email domains to nice easy to read company names
  #
  
-+amazon.com      Amazon
-+amazon.co.uk    Amazon
++linux.alibaba.com Alibaba
+ amazon.com      Amazon
+ amazon.co.uk    Amazon
  amd.com         AMD
- aspeedtech.com  ASPEED Technology Inc.
- baidu.com       Baidu
+diff --git a/contrib/gitdm/group-map-alibaba b/contrib/gitdm/group-map-alibaba
+new file mode 100644
+index 0000000000..0ebbe6b06e
+--- /dev/null
++++ b/contrib/gitdm/group-map-alibaba
+@@ -0,0 +1,7 @@
++#
++# Alibaba contributors including its subsidiaries 
++#
++
++# c-sky.com, now part of T-Head, wholly-owned entity of Alibaba Group
++ren_guo@c-sky.com
++zhiwei_liu@c-sky.com
+diff --git a/gitdm.config b/gitdm.config
+index 907ffde017..df4ba829ca 100644
+--- a/gitdm.config
++++ b/gitdm.config
+@@ -31,6 +31,7 @@ EmailMap contrib/gitdm/domain-map
+ # identifiable corporate emails. Please keep this list sorted.
+ #
+ 
++GroupMap contrib/gitdm/group-map-alibaba Alibaba
+ GroupMap contrib/gitdm/group-map-cadence Cadence Design Systems
+ GroupMap contrib/gitdm/group-map-codeweavers CodeWeavers
+ GroupMap contrib/gitdm/group-map-facebook Facebook
 -- 
 2.39.2
 
