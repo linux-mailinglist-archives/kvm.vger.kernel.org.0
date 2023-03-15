@@ -2,153 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D5D3B6BBE26
-	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 21:50:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BC106BBE5A
+	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 22:00:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232332AbjCOUuk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 16:50:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46368 "EHLO
+        id S232825AbjCOVAP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 17:00:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232285AbjCOUug (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 16:50:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E62951DBA9
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 13:49:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678913392;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6t0t5Iv2bD47uL2A95ufn+9Sx0u6l51PcnjxQgGARxw=;
-        b=DvGq0K+REpnni7o6iUVTvzSeCi+PthgoKjsb2QP/ulib62MEMSq+vK7R2cloyoTAmUAVec
-        dHP6NWcB6Toie1z70MOlHPUp6Z6do9D7EbXUXPw83Nr121RZ8wbwaAo8BARKSVIEVzECFa
-        DC2d7bgQo2u+RZBsr/FP1ZDpsUKRrKA=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-547-RkieqCg8Pyeta5RWE_bPgA-1; Wed, 15 Mar 2023 16:49:48 -0400
-X-MC-Unique: RkieqCg8Pyeta5RWE_bPgA-1
-Received: by mail-wm1-f72.google.com with SMTP id l17-20020a05600c1d1100b003ed29ba093cso1196069wms.6
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 13:49:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678913387;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6t0t5Iv2bD47uL2A95ufn+9Sx0u6l51PcnjxQgGARxw=;
-        b=Wr6xxa9hx0BCVbA3LwE69GwZ2ZxL/aRq1rEJunigmAnc+w1yrfNdYpkGePiBqCGO9y
-         LoxQhgyLR/3a9sTlB+kQzG/x4FxfzOgopYHvFhTW1CR34y/RwAHLVHUBW3OhjqNB73Gf
-         eRIn/Xfn+P/AgguU/gMW+mfAROTZCbMtMG4XAp2KBHGCP5tdnb+s1Kfj6yJ+OwIcddwY
-         yYubqdUzcrCYHWZO9DlUGLD3PuEIz3NMURoo0sI/CitOfsIx1rRMg4Ts0KGhsGZEm53d
-         ZKQZKKqTBL+LIA492lJpRYcrMRkXHymYYPo2iZ+oNxuzz8c6gTe4qDCsve6pb5Oh1utY
-         xM/A==
-X-Gm-Message-State: AO0yUKWHmYDssIM4kS3fSuela0buqHeOpAH6ENFaVUO5uqHKh0U/n9eH
-        q/tvkhwaw5To1acQMUGTncv6rX92M2cqasYfNacK+gQwlpwAGVkLCrMHDY/eWMGMKYchclaHcHt
-        wmk03HwHfGzkT
-X-Received: by 2002:adf:fc87:0:b0:2cb:5b58:74a with SMTP id g7-20020adffc87000000b002cb5b58074amr3005977wrr.56.1678913387487;
-        Wed, 15 Mar 2023 13:49:47 -0700 (PDT)
-X-Google-Smtp-Source: AK7set/f3Yj/rHER0QrCQC6NJ2Yg4faXcicmXXK9BRt3t8AK+QzAEoTQFerFOG9rD+XVbf7VoSg1lg==
-X-Received: by 2002:adf:fc87:0:b0:2cb:5b58:74a with SMTP id g7-20020adffc87000000b002cb5b58074amr3005964wrr.56.1678913387123;
-        Wed, 15 Mar 2023 13:49:47 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id bg7-20020a05600c3c8700b003eb2e33f327sm8517638wmb.2.2023.03.15.13.49.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Mar 2023 13:49:46 -0700 (PDT)
-Message-ID: <2164b29f-ab4e-c08d-58e8-adccdb9124ae@redhat.com>
-Date:   Wed, 15 Mar 2023 21:49:45 +0100
+        with ESMTP id S232654AbjCOU7s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 16:59:48 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA5026F62B;
+        Wed, 15 Mar 2023 13:59:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1678913985; x=1710449985;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=hb7D1RXhRsrwRGeWcZ1vlY8kv9USBsZ/ZzQZjyvq4g4=;
+  b=ksslGtIRpoWFPafgl+eJxGNFSbT9xphvRcCGDyTf2KmPxuZ5Msw0XATY
+   GPaSdKzBm9ZmC8Jnk/nhIqlDcQkY5zzvPn9voTYcqBzfynps1aE0dBdot
+   sFvyQnLSs8ppVDTKVTa/SfRelZxI6EbHQ/HqP/RaNnPOl3Hwsk//cxjer
+   1IgnSWSxGgC7M7yDS0COmRtZgL6gHmHkpzigvPAED3VUNfFFpw4UAvvOM
+   TPhJ0EEpvwoCEIaX09Ucn600XcT50A1l3TMii0NEP337zqB8WyjRFbxKW
+   4LgiGxaDuSzTAkWTSB8tPQ3o5qdFQZD64H8t/+KWa98oq9uYCXKFFLEFX
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10650"; a="326176495"
+X-IronPort-AV: E=Sophos;i="5.98,262,1673942400"; 
+   d="scan'208";a="326176495"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2023 13:59:38 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10650"; a="853747209"
+X-IronPort-AV: E=Sophos;i="5.98,262,1673942400"; 
+   d="scan'208";a="853747209"
+Received: from rchatre-ws.ostc.intel.com ([10.54.69.144])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2023 13:59:38 -0700
+From:   Reinette Chatre <reinette.chatre@intel.com>
+To:     jgg@nvidia.com, yishaih@nvidia.com,
+        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+        alex.williamson@redhat.com
+Cc:     tglx@linutronix.de, darwi@linutronix.de, kvm@vger.kernel.org,
+        dave.jiang@intel.com, jing2.liu@intel.com, ashok.raj@intel.com,
+        fenghua.yu@intel.com, tom.zanussi@linux.intel.com,
+        reinette.chatre@intel.com, linux-kernel@vger.kernel.org
+Subject: [RFC PATCH 0/8] vfio/pci: Support dynamic allocation of MSI-X interrupts
+Date:   Wed, 15 Mar 2023 13:59:20 -0700
+Message-Id: <cover.1678911529.git.reinette.chatre@intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH V5 0/2] selftests: KVM: Add a test for eager page
- splitting
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Peter Xu <peterx@redhat.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Ricardo Koller <ricarkol@google.com>
-References: <20230131181820.179033-1-bgardon@google.com>
- <CABgObfaP7P7fk66-EGF-zPEk0H14u3YkM42FRXrEvU=hwFSYgg@mail.gmail.com>
- <CABgObfYAStAC5FgJfGUiJ=BBFtN7drD+NGHLFJY5fP3hQzVOBw@mail.gmail.com>
- <CALzav=c-wtJiz9M6hpPtcoBMFvFP5_2BNYoY66NzF-J+8_W6NA@mail.gmail.com>
- <CABgObfYm6roWVR0myT5rHUWRe7k09TkXgZ7rYAr019QZ80oQXQ@mail.gmail.com>
- <199f404d-c08e-3895-6ce3-36b21514f487@redhat.com>
- <ZBIa7NQI4qRP6uON@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <ZBIa7NQI4qRP6uON@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/15/23 20:22, Sean Christopherson wrote:
-> On Wed, Mar 15, 2023, Paolo Bonzini wrote:
->> On 3/15/23 13:24, Paolo Bonzini wrote:
->>> On Tue, Mar 14, 2023 at 5:00 PM David Matlack <dmatlack@google.com> wrote:
->>>> I wonder if pages are getting swapped, especially if running on a
->>>> workstation. If so, mlock()ing all guest memory VMAs might be
->>>> necessary to be able to assert exact page counts.
->>>
->>> I don't think so, it's 100% reproducible and the machine is idle and
->>> only accessed via network. Also has 64 GB of RAM. :)
->>
->> It also reproduces on Intel with pml=0 and eptad=0; the reason is due
->> to the different semantics of dirty bits for page-table pages on AMD
->> and Intel.  Both AMD and eptad=0 Intel treat those as writes, therefore
->> more pages are dropped before the repopulation phase when dirty logging
->> is disabled.
->>
->> The "missing" page had been included in the population phase because it
->> hosts the page tables for vcpu_args, but repopulation does not need it.
->>
->> This fixes it:
->>
->> -------------------- 8< ---------------
->> From: Paolo Bonzini <pbonzini@redhat.com>
->> Subject: [PATCH] selftests: KVM: perform the same memory accesses on every memstress iteration
->>
->> Perform the same memory accesses including the initialization steps
->> that read from args and vcpu_args.  This ensures that the state of
->> KVM's page tables is the same after every iteration, including the
->> pages that host the guest page tables for args and vcpu_args.
->>
->> This fixes a failure of dirty_log_page_splitting_test on AMD machines,
->> as well as on Intel if PML and EPT A/D bits are both disabled.
->>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->>
->> diff --git a/tools/testing/selftests/kvm/lib/memstress.c b/tools/testing/selftests/kvm/lib/memstress.c
->> index 3632956c6bcf..8a429f4c86db 100644
->> --- a/tools/testing/selftests/kvm/lib/memstress.c
->> +++ b/tools/testing/selftests/kvm/lib/memstress.c
->> @@ -56,15 +56,15 @@ void memstress_guest_code(uint32_t vcpu_idx)
->>   	uint64_t page;
->>   	int i;
->> -	rand_state = new_guest_random_state(args->random_seed + vcpu_idx);
->> +	while (true) {
->> +		rand_state = new_guest_random_state(args->random_seed + vcpu_idx);
-> 
-> Doesn't this partially defeat the randomization that some tests like want?  E.g.
-> a test that wants to heavily randomize state will get the same pRNG for every
-> iteration.  Seems like we should have a knob to control whether or not each
-> iteration needs to be identical.
+== Cover letter ==
 
-Yes, this wasn't really a full patch, just to prove what the bug is.
+Qemu allocates interrupts incrementally at the time the guest unmasks an
+interrupt, for example each time a Linux guest runs request_irq().
 
-One possibility to avoid adding a new knob is to do something like:
+Dynamic allocation of MSI-X interrupts was not possible until v6.2 [1].
+This prompted Qemu to, when allocating a new interrupt, first release all
+previously allocated interrupts (including disable of MSI-X) followed
+by re-allocation of all interrupts that includes the new interrupt.
+Please see [2] for a detailed discussion about this issue.
 
-unsigned iteration = 0;
-rand_state = new_guest_random_state(args->random_seed
-	+ vcpu_idx + iteration++);
+Releasing and re-allocating interrupts may be acceptable if all
+interrupts are unmasked during device initialization. If unmasking of
+interrupts occur during runtime this may result in lost interrupts.
+For example, consider an accelerator device with multiple work queues,
+each work queue having a dedicated interrupt. A work queue can be
+enabled at any time with its associated interrupt unmasked while other
+work queues are already active. Having all interrupts released and MSI-X
+disabled to enable the new work queue will impact active work queues.
 
-Paolo
+This series builds on the recent interrupt sub-system core changes
+that added support for dynamic MSI-X allocation after initial MSI-X
+enabling.
+
+Add support for dynamic MSI-X allocation to vfio-pci. A flag
+indicating lack of support for dynamic allocation already exist:
+VFIO_IRQ_INFO_NORESIZE and has always been set for MSI and MSI-X. With
+support for dynamic MSI-X the flag is cleared for MSI-X, enabling
+Qemu to modify its behavior.
+
+== Why is this an RFC ? ==
+
+vfio support for dynamic MSI-X needs to work with existing user space
+as well as upcoming user space that takes advantage of this feature.
+I would appreciate guidance on the expectations and requirements
+surrounding error handling when considering existing user space.
+
+For example, consider the following scenario:
+Start: Consider a passthrough device that supports 10 MSI-X interrupts
+	(0 to 9) and existing Qemu allocated interrupts 0 to 4.
+
+Scenario: Qemu (hypothetically) attempts to associate a new action to
+	interrupts 0 to 7. Early checking of this range in
+	vfio_set_irqs_validate_and_prepare() will pass since it
+	is a valid range for the device. What happens after the
+	early checking is considered next:
+
+Current behavior (before this series): Since the provided range, 0 - 7,
+	exceeds the allocated range, no action will be taken on existing
+	allocated interrupts 0 - 4 and the Qemu request will fail without
+	making any state changes.
+
+New behavior (with this series): Since vfio supports dynamic MSI-X new
+	interrupts will be allocated for vectors 5, 6, and 7. Please note
+	that this changes the behavior encountered by unmodified Qemu: new
+	interrupts are allocated instead of returning an error. Even more,
+	since the range provided by Qemu spans 0 - 7, a failure during
+	allocation of 5, 6, or 7 will result in release of entire range.
+
+This series aims to maintain existing error behavior for MSI (please see
+"vfio/pci: Remove interrupt context counter") but I would appreciate your
+guidance on whether existing error behavior should be maintained for MSI-X
+and how to do so if it is a requirement.
+
+Any feedback is appreciated
+
+Reinette
+
+[1] commit 34026364df8e ("PCI/MSI: Provide post-enable dynamic allocation interfaces for MSI-X")
+[2] https://lore.kernel.org/kvm/MWHPR11MB188603D0D809C1079F5817DC8C099@MWHPR11MB1886.namprd11.prod.outlook.com/#t
+
+Reinette Chatre (8):
+  vfio/pci: Consolidate irq cleanup on MSI/MSI-X disable
+  vfio/pci: Remove negative check on unsigned vector
+  vfio/pci: Prepare for dynamic interrupt context storage
+  vfio/pci: Use xarray for interrupt context storage
+  vfio/pci: Remove interrupt context counter
+  vfio/pci: Move to single error path
+  vfio/pci: Support dynamic MSI-x
+  vfio/pci: Clear VFIO_IRQ_INFO_NORESIZE for MSI-X
+
+ drivers/vfio/pci/vfio_pci_core.c  |   3 +-
+ drivers/vfio/pci/vfio_pci_intrs.c | 376 ++++++++++++++++++++++--------
+ include/linux/vfio_pci_core.h     |   3 +-
+ include/uapi/linux/vfio.h         |   3 +
+ 4 files changed, 286 insertions(+), 99 deletions(-)
+
+
+base-commit: eeac8ede17557680855031c6f305ece2378af326
+-- 
+2.34.1
 
