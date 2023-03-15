@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 85CE26BBB23
-	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 18:43:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ABBD96BBB5A
+	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 18:50:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232248AbjCORnz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 13:43:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54188 "EHLO
+        id S232694AbjCORtv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 13:49:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231397AbjCORns (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 13:43:48 -0400
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E796D5BDA2
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:43:38 -0700 (PDT)
-Received: by mail-wm1-x329.google.com with SMTP id x22so7649038wmj.3
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:43:38 -0700 (PDT)
+        with ESMTP id S232237AbjCORti (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 13:49:38 -0400
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27F1340E8
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:49:25 -0700 (PDT)
+Received: by mail-wm1-x32d.google.com with SMTP id m35so3582040wms.4
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:49:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1678902217;
+        d=linaro.org; s=google; t=1678902563;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YPoCJ+dE6YMmOqr0FAgUbXJaGmEIUyPWQuUb/ZSLc9g=;
-        b=jdedHlnhUNE4+CsTwbFjKObJlKqM2Xm0R5l7lyo3JQ8AY2or1KdcfjKOG/r+9T2Ryj
-         Bu4YYIF4c/We3inxKUZaD3Kj5R7utk73BUIUNh71dn2cjw8V6Hf2G3CeT67af7d4Zk95
-         HkRqm714xOI+lCEkyk6y4d/cuBC+dYpIi5QFjwH0/uXYlLc6Dc8HOVw+U09hYTV9DPik
-         LouDFFbIQag9zwimNgYibhf2mKjdqv5Yg15yf5pYGM5PnPjA80YtFnyVxZTWozWx/Z+F
-         5tmkZdH9KnLwDvoJdJPwvT92N6zgd9VWbpHxsVrzrlBsVFKSsLjoCgSuR2OtGzH+f23R
-         lpQA==
+        bh=ppSEIztWs3xXXlNFmxb7gCAEPQ7PlB98pYGLeW4YOYE=;
+        b=WIO3ei+bYW7ojkqoukS+1PJLDudVTHC6RYsQF8hYA5vEQyo2CFtShEbvs0+omK2dcf
+         dHIPYNEucLD1qgZ+YHpLk4QZww4ts2+QRHBBgu0XqttzygMdHCzbwYEsrivMNNjuxO1/
+         Hf0+uxEmKTqMHLJ+Je7miLs8erttyjnqU6BbkoSC348P+JhGOwmce8mbog/KJ4iT/R64
+         tHF+IPu69rmbHK07Bj60SYaxfQL8BCKlxQNtnPuUUZMjGGCNnT9Kqh3Bf57bLjwHvIEB
+         2seWWKTdwhhNbvJeHp5W9sgHtv/0lOHROuPzyjsycDYf/r7QZ/c3B6KPiMFKhkj9zO6x
+         I8AQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678902217;
+        d=1e100.net; s=20210112; t=1678902563;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=YPoCJ+dE6YMmOqr0FAgUbXJaGmEIUyPWQuUb/ZSLc9g=;
-        b=32ohFkKgMI19Z+rWV5kprHU4DrhBm1c7gWGQuK+ayvxgKav3nAcGmAUGdEQ2E4vqzz
-         1zuiSCq4EaVATxoqxE0fq2gYhNpCfbKuxKa1FepjGN4KXdoG4g42+2m2T/qBZ7cKbOz+
-         sPg9qbty9klH2vFQlH+r92KYb0yBdPy6jZW7rWjARPzk/K0FvA0otq3k2BtJ6Ps0bxdR
-         cXipo3/Jp7LIdTDyHC5pSVfWssSaH4a/vwI9JroPqWIn8ABJ1bVHyYQUwW72zyPlsqF1
-         ItDVmbCvnsv4nv3LGOH2pkr2C1VlqTUrB7kHeV2hiHD0dQIDCpyHDdECuuAv45ZMTO2A
-         AqwQ==
-X-Gm-Message-State: AO0yUKXD1RC3uOp2SYeewtoAAM6XXQjga2JnjKlw/nOfguwhShho7xJD
-        +xLkdE/c/OIQVhVnHHGU7VOn4Q==
-X-Google-Smtp-Source: AK7set8afN0DIYtX2brUYnzAy0E41FLMyrhNG9rpjOgIPg5Rwx7wv0IMr3mCjb+wfe5QNOhbjQYtOg==
-X-Received: by 2002:a05:600c:1e02:b0:3ed:31f5:11e with SMTP id ay2-20020a05600c1e0200b003ed31f5011emr3323797wmb.5.1678902217401;
-        Wed, 15 Mar 2023 10:43:37 -0700 (PDT)
+        bh=ppSEIztWs3xXXlNFmxb7gCAEPQ7PlB98pYGLeW4YOYE=;
+        b=cKaTk6mcY4aeoaXJNkfA2ZTjdH8ErUd8gE8V5q4qz2+YR+yAwGBVz+KpyxBelGqhmA
+         2aacNSiGW4AIdknSk7/hIhqP+OEO/E3UmF5DNqEBfLB7L+cdXYq8m6s/Xs09knLntSNZ
+         xlM9WVET9AM25P0cwcDG7hXHld9mG3QWIlMwdyRCRJNu7EHdXeuccFrNs2TbhoVUGqMF
+         GkDdjVDq7FMPPSpqrwk2+nqhrMNpOA1JdFckF4/Xb3zUn5D/ovfQF97yLqVbqf9sOVfh
+         mOYfdkADpQjZfGTUBJUKmYypJKEStMNYD4F9DNzD6zTtS2SiHJHAasvh2bBFJrl2rYzi
+         uadw==
+X-Gm-Message-State: AO0yUKWy2mhGyyhHa6+IbX9L96l9JMLQ+6134A/Hqod+G62mEfhcV3qp
+        D+ML1BG5iKWYtVpdzQM+ReJ6XA==
+X-Google-Smtp-Source: AK7set+JYvMR70JtFfX1kCSrzwqWSYlcBlKVoOvXWPZWJyDWAaD4ET92OU/0CvN70RO8bGPmmBMuqA==
+X-Received: by 2002:a05:600c:1548:b0:3ed:252e:869f with SMTP id f8-20020a05600c154800b003ed252e869fmr10413534wmg.13.1678902563579;
+        Wed, 15 Mar 2023 10:49:23 -0700 (PDT)
 Received: from zen.linaroharston ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id e25-20020a05600c219900b003ed1fa34bd3sm2505608wme.13.2023.03.15.10.43.34
+        by smtp.gmail.com with ESMTPSA id a5-20020a056000100500b002cea299a575sm5100861wrx.101.2023.03.15.10.49.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Mar 2023 10:43:35 -0700 (PDT)
+        Wed, 15 Mar 2023 10:49:22 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id 2998A1FFB7;
+        by zen.linaroharston (Postfix) with ESMTP id 45E101FFC0;
         Wed, 15 Mar 2023 17:43:32 +0000 (GMT)
 From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To:     qemu-devel@nongnu.org
@@ -113,9 +113,9 @@ Cc:     Akihiko Odaki <akihiko.odaki@gmail.com>,
         Sunil Muthuswamy <sunilmut@microsoft.com>,
         Hanna Reitz <hreitz@redhat.com>, Peter Xu <peterx@redhat.com>,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v2 08/32] tests/tcg: disable pauth for aarch64 gdb tests
-Date:   Wed, 15 Mar 2023 17:43:07 +0000
-Message-Id: <20230315174331.2959-9-alex.bennee@linaro.org>
+Subject: [PATCH v2 09/32] include/exec: fix kerneldoc definition
+Date:   Wed, 15 Mar 2023 17:43:08 +0000
+Message-Id: <20230315174331.2959-10-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230315174331.2959-1-alex.bennee@linaro.org>
 References: <20230315174331.2959-1-alex.bennee@linaro.org>
@@ -132,30 +132,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-You need a very new gdb to be able to run with pauth support otherwise
-your likely to hit asserts and aborts. Disable pauth for now until we
-can properly probe support in gdb.
+The kerneldoc processor complains about the mismatched variable name.
+Fix it.
 
-Message-Id: <20230310103123.2118519-10-alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20230310103123.2118519-11-alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/tcg/aarch64/Makefile.target | 2 ++
- 1 file changed, 2 insertions(+)
+ include/exec/memory.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefile.target
-index 9e91a20b0d..8ffde3b0ed 100644
---- a/tests/tcg/aarch64/Makefile.target
-+++ b/tests/tcg/aarch64/Makefile.target
-@@ -84,6 +84,8 @@ TESTS += sha512-vector
- ifeq ($(HOST_GDB_SUPPORTS_ARCH),y)
- GDB_SCRIPT=$(SRC_PATH)/tests/guest-debug/run-test.py
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 6fa0b071f0..15ade918ba 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -1738,7 +1738,7 @@ void memory_region_notify_iommu_one(IOMMUNotifier *notifier,
+  *
+  * @notifier: the notifier to be notified
+  */
+-void memory_region_unmap_iommu_notifier_range(IOMMUNotifier *n);
++void memory_region_unmap_iommu_notifier_range(IOMMUNotifier *notifier);
  
-+run-gdbstub-%: QEMU_OPTS=-cpu max,pauth=off
-+
- run-gdbstub-sysregs: sysregs
- 	$(call run-test, $@, $(GDB_SCRIPT) \
- 		--gdb $(HAVE_GDB_BIN) \
+ 
+ /**
 -- 
 2.39.2
 
