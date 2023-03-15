@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BC106BBE5A
-	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 22:00:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A0796BBE51
+	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 22:00:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232825AbjCOVAP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 17:00:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59162 "EHLO
+        id S232569AbjCOVAA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 17:00:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232654AbjCOU7s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 16:59:48 -0400
+        with ESMTP id S232513AbjCOU7o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 16:59:44 -0400
 Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA5026F62B;
-        Wed, 15 Mar 2023 13:59:44 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3290E80902;
+        Wed, 15 Mar 2023 13:59:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678913985; x=1710449985;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=hb7D1RXhRsrwRGeWcZ1vlY8kv9USBsZ/ZzQZjyvq4g4=;
-  b=ksslGtIRpoWFPafgl+eJxGNFSbT9xphvRcCGDyTf2KmPxuZ5Msw0XATY
-   GPaSdKzBm9ZmC8Jnk/nhIqlDcQkY5zzvPn9voTYcqBzfynps1aE0dBdot
-   sFvyQnLSs8ppVDTKVTa/SfRelZxI6EbHQ/HqP/RaNnPOl3Hwsk//cxjer
-   1IgnSWSxGgC7M7yDS0COmRtZgL6gHmHkpzigvPAED3VUNfFFpw4UAvvOM
-   TPhJ0EEpvwoCEIaX09Ucn600XcT50A1l3TMii0NEP337zqB8WyjRFbxKW
-   4LgiGxaDuSzTAkWTSB8tPQ3o5qdFQZD64H8t/+KWa98oq9uYCXKFFLEFX
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10650"; a="326176495"
+  t=1678913983; x=1710449983;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=XbkcLI4n2teEQCC6ULXx558MPH5O1I8KLnT+xl6+hk8=;
+  b=C02qq4gruf8QbbXjO8v1TxzvrvQdFoTdPu+2Jz5BiyP7nekRuH403AGt
+   vpn6uk3Y/weqlDNIpwO1ui5lZm7BWwjB4bA46zFM0v2kpm7T9rFQEMa4a
+   vnTxEvwiG3q29YnDJqGXxU4lrOHvVtjbolP5h8Ayo+ymiQSbGoAll/hP/
+   sCwDxThJZjqbvc6VMNSCDsXuNgaRiEzuxZH6d1LhGfXxDdbYFZn3bbZul
+   DV8JJl52mEYDoSY83vAOC+haZgJU15dUjQQM0BH+HXYFzdIZ7zNncsG7Z
+   HnVkF6yj5h0X/+HBIShvPaWhbHzIasgquJkFlhY0Rsd83He7HT6ul+eqD
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10650"; a="326176500"
 X-IronPort-AV: E=Sophos;i="5.98,262,1673942400"; 
-   d="scan'208";a="326176495"
+   d="scan'208";a="326176500"
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
   by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2023 13:59:38 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10650"; a="853747209"
+X-IronPort-AV: E=McAfee;i="6500,9779,10650"; a="853747211"
 X-IronPort-AV: E=Sophos;i="5.98,262,1673942400"; 
-   d="scan'208";a="853747209"
+   d="scan'208";a="853747211"
 Received: from rchatre-ws.ostc.intel.com ([10.54.69.144])
   by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2023 13:59:38 -0700
 From:   Reinette Chatre <reinette.chatre@intel.com>
@@ -46,10 +46,12 @@ Cc:     tglx@linutronix.de, darwi@linutronix.de, kvm@vger.kernel.org,
         dave.jiang@intel.com, jing2.liu@intel.com, ashok.raj@intel.com,
         fenghua.yu@intel.com, tom.zanussi@linux.intel.com,
         reinette.chatre@intel.com, linux-kernel@vger.kernel.org
-Subject: [RFC PATCH 0/8] vfio/pci: Support dynamic allocation of MSI-X interrupts
-Date:   Wed, 15 Mar 2023 13:59:20 -0700
-Message-Id: <cover.1678911529.git.reinette.chatre@intel.com>
+Subject: [RFC PATCH 1/8] vfio/pci: Consolidate irq cleanup on MSI/MSI-X disable
+Date:   Wed, 15 Mar 2023 13:59:21 -0700
+Message-Id: <0da0db5b65804bf6ff2c8448e7b9dea9462e5c34.1678911529.git.reinette.chatre@intel.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <cover.1678911529.git.reinette.chatre@intel.com>
+References: <cover.1678911529.git.reinette.chatre@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -62,95 +64,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-== Cover letter ==
+vfio_msi_disable() releases all previously allocated state
+associated with each interrupt before disabling MSI/MSI-X.
 
-Qemu allocates interrupts incrementally at the time the guest unmasks an
-interrupt, for example each time a Linux guest runs request_irq().
+vfio_msi_disable() iterates twice over the interrupt state:
+first directly with a for loop to do virqfd cleanup, followed
+by another for loop within vfio_msi_set_block() that releases
+the interrupt and its state using vfio_msi_set_vector_signal().
 
-Dynamic allocation of MSI-X interrupts was not possible until v6.2 [1].
-This prompted Qemu to, when allocating a new interrupt, first release all
-previously allocated interrupts (including disable of MSI-X) followed
-by re-allocation of all interrupts that includes the new interrupt.
-Please see [2] for a detailed discussion about this issue.
+Simplify interrupt cleanup by iterating over allocated interrupts
+once.
 
-Releasing and re-allocating interrupts may be acceptable if all
-interrupts are unmasked during device initialization. If unmasking of
-interrupts occur during runtime this may result in lost interrupts.
-For example, consider an accelerator device with multiple work queues,
-each work queue having a dedicated interrupt. A work queue can be
-enabled at any time with its associated interrupt unmasked while other
-work queues are already active. Having all interrupts released and MSI-X
-disabled to enable the new work queue will impact active work queues.
+Signed-off-by: Reinette Chatre <reinette.chatre@intel.com>
+---
+ drivers/vfio/pci/vfio_pci_intrs.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-This series builds on the recent interrupt sub-system core changes
-that added support for dynamic MSI-X allocation after initial MSI-X
-enabling.
-
-Add support for dynamic MSI-X allocation to vfio-pci. A flag
-indicating lack of support for dynamic allocation already exist:
-VFIO_IRQ_INFO_NORESIZE and has always been set for MSI and MSI-X. With
-support for dynamic MSI-X the flag is cleared for MSI-X, enabling
-Qemu to modify its behavior.
-
-== Why is this an RFC ? ==
-
-vfio support for dynamic MSI-X needs to work with existing user space
-as well as upcoming user space that takes advantage of this feature.
-I would appreciate guidance on the expectations and requirements
-surrounding error handling when considering existing user space.
-
-For example, consider the following scenario:
-Start: Consider a passthrough device that supports 10 MSI-X interrupts
-	(0 to 9) and existing Qemu allocated interrupts 0 to 4.
-
-Scenario: Qemu (hypothetically) attempts to associate a new action to
-	interrupts 0 to 7. Early checking of this range in
-	vfio_set_irqs_validate_and_prepare() will pass since it
-	is a valid range for the device. What happens after the
-	early checking is considered next:
-
-Current behavior (before this series): Since the provided range, 0 - 7,
-	exceeds the allocated range, no action will be taken on existing
-	allocated interrupts 0 - 4 and the Qemu request will fail without
-	making any state changes.
-
-New behavior (with this series): Since vfio supports dynamic MSI-X new
-	interrupts will be allocated for vectors 5, 6, and 7. Please note
-	that this changes the behavior encountered by unmodified Qemu: new
-	interrupts are allocated instead of returning an error. Even more,
-	since the range provided by Qemu spans 0 - 7, a failure during
-	allocation of 5, 6, or 7 will result in release of entire range.
-
-This series aims to maintain existing error behavior for MSI (please see
-"vfio/pci: Remove interrupt context counter") but I would appreciate your
-guidance on whether existing error behavior should be maintained for MSI-X
-and how to do so if it is a requirement.
-
-Any feedback is appreciated
-
-Reinette
-
-[1] commit 34026364df8e ("PCI/MSI: Provide post-enable dynamic allocation interfaces for MSI-X")
-[2] https://lore.kernel.org/kvm/MWHPR11MB188603D0D809C1079F5817DC8C099@MWHPR11MB1886.namprd11.prod.outlook.com/#t
-
-Reinette Chatre (8):
-  vfio/pci: Consolidate irq cleanup on MSI/MSI-X disable
-  vfio/pci: Remove negative check on unsigned vector
-  vfio/pci: Prepare for dynamic interrupt context storage
-  vfio/pci: Use xarray for interrupt context storage
-  vfio/pci: Remove interrupt context counter
-  vfio/pci: Move to single error path
-  vfio/pci: Support dynamic MSI-x
-  vfio/pci: Clear VFIO_IRQ_INFO_NORESIZE for MSI-X
-
- drivers/vfio/pci/vfio_pci_core.c  |   3 +-
- drivers/vfio/pci/vfio_pci_intrs.c | 376 ++++++++++++++++++++++--------
- include/linux/vfio_pci_core.h     |   3 +-
- include/uapi/linux/vfio.h         |   3 +
- 4 files changed, 286 insertions(+), 99 deletions(-)
-
-
-base-commit: eeac8ede17557680855031c6f305ece2378af326
+diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
+index bffb0741518b..6a9c6a143cc3 100644
+--- a/drivers/vfio/pci/vfio_pci_intrs.c
++++ b/drivers/vfio/pci/vfio_pci_intrs.c
+@@ -426,10 +426,9 @@ static void vfio_msi_disable(struct vfio_pci_core_device *vdev, bool msix)
+ 	for (i = 0; i < vdev->num_ctx; i++) {
+ 		vfio_virqfd_disable(&vdev->ctx[i].unmask);
+ 		vfio_virqfd_disable(&vdev->ctx[i].mask);
++		vfio_msi_set_vector_signal(vdev, i, -1, msix);
+ 	}
+ 
+-	vfio_msi_set_block(vdev, 0, vdev->num_ctx, NULL, msix);
+-
+ 	cmd = vfio_pci_memory_lock_and_enable(vdev);
+ 	pci_free_irq_vectors(pdev);
+ 	vfio_pci_memory_unlock_and_restore(vdev, cmd);
 -- 
 2.34.1
 
