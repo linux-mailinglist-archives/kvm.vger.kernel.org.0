@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 866EF6BBB2B
-	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 18:44:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B3CB6BBB2C
+	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 18:44:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232487AbjCORoL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 13:44:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54638 "EHLO
+        id S232524AbjCORoO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 13:44:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232469AbjCORn4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 13:43:56 -0400
-Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1342E6188E
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:43:50 -0700 (PDT)
-Received: by mail-wr1-x432.google.com with SMTP id l1so18036691wry.12
+        with ESMTP id S232468AbjCORnz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 13:43:55 -0400
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E70316F629
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:43:49 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id m35so3571504wms.4
         for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:43:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1678902228;
+        d=linaro.org; s=google; t=1678902229;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=T6RLGTHhC06sRuIM9yfET4lS4kZArz0/fxEXCzYoxfU=;
-        b=fAC659xuS6VIrapKxVxZijPxvTJ+M200zdixFycQ4ZQyCE4xdogcjlbnx5ylO7raI3
-         Mioeq5gUp2xatTrlLObKIjRJiIZMkGK40hLku5wD95hLvWh8+yaj28gM9ventjH2lb0Y
-         QboltHkPqa+zUNYNrbYNNeuyKZkfJmNq7i2BJSQIXHFqleW/XJULqIehs8MS8aQwPOxO
-         zq5eWntd2e7g0ldMaXZWNx2PSK2pEMTq+XjR/9yli77fxfdhlFci6n5E/cy7yIVxUJcH
-         DJQvGxC+QJtA3fqGC/CJa+HTivt+S5cx7DlcqQp7mewTUvXI3sNk/LYFVG3A3DRdobXp
-         LhTg==
+        bh=yN/kmP3UzMt/cUifiAR045QSMUEZthdjOX5czXccge4=;
+        b=MntRw3lNrCOMEFZIS1dZ1813x3vJDF1WzRC21hMt60g8mZz+fLhlUSzAhtLkn3k4Ze
+         yM/vtKHnDC9htC8OB6T4wN0Rpj+yXIh4eEJnL9TSlekacLZidKLbDkzhDRIyGDQ+sRcF
+         LlHkgwvc+i0RYO5L8EtXFr8ehGJLuG3yeB8DNoYQJI5UrZsebC7RLx3l9YPGfF5lmFiu
+         HY6doygFty2WcMjZmHv7nKZeo/YtCceCz/kXamcmF0MzKfnwuvbRreflYJ/k/jexm1Ji
+         VvD6qMx3BPKvhpljANB7/WapKxL8D0Snzawjq/4Ty9Oq7ir0s6ZgeHA/bbtY8d78+a+e
+         +ZPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678902228;
+        d=1e100.net; s=20210112; t=1678902229;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=T6RLGTHhC06sRuIM9yfET4lS4kZArz0/fxEXCzYoxfU=;
-        b=7Z+ucVrXC/nSRhv+Pi1DCSDCq9Y2wihDFjf72Bke8LpMRFVjptYQhWnvQ/1wo4ip5Z
-         feBCVODNt6GX8HIBgcUm5zdzhFCuTBOvo4WIESdxgNJ3vDek9/XuJo7m0hCl++yJ88oJ
-         /gHXccEyX8dU3NdMTItqZ2l1JI8K4ml1SFZSh81nl6g7uGVVhhuzU3pEc6iBQl1vFwJH
-         ot8UPq/5op1nG7Alj+/R0EANOISzxRhIGfSR7+/XqmpL2vtbkchbLTRJr/uvT+TlVrZA
-         qxTyRjExrBxmqe1H/rf/kW5E4genif6of3y8wXtVuIzcSeIz2ueHyGK+i7CByW1BadCW
-         XcLA==
-X-Gm-Message-State: AO0yUKUhgC8JO76RcB8WihsB8Et0/eWQfP3PLNunLTQ2vhQ5r+034KtI
-        l3NKx2AbuqKQTyy1TQgFTflFzw==
-X-Google-Smtp-Source: AK7set/nCJetFyvazGsKb2tomM/gH7sSBDxssaTg4H1Cyj3ggomOEZpQm0BzSLHJoICiFQQSqXit/Q==
-X-Received: by 2002:a5d:50cf:0:b0:2d1:14fa:8048 with SMTP id f15-20020a5d50cf000000b002d114fa8048mr1349774wrt.39.1678902228561;
-        Wed, 15 Mar 2023 10:43:48 -0700 (PDT)
+        bh=yN/kmP3UzMt/cUifiAR045QSMUEZthdjOX5czXccge4=;
+        b=P0rMzpSV8/H6n5GD8HX8OJdMZdrUfPe8jb2HdHV20c9EE5e64L0yIAeBx0540UFHM+
+         26X0rWBljn+PRyC2V6WhkHe2fTvNWjdnTtb4c8qpuiVPUrgi8Y05LKacxTLd/6/ERjdG
+         fxeu/2FFdPr9j3Ehjll9bUs7ywQabjzj82xThBloKUjZRCvJNh/vfKP0P69D82DE8an+
+         E6bdPIb6mK3X4G18v7M+5qn7k4ZP4UPZJDQ6LEH+qYmTF4fSoCoGmbkeqfAYlkM40GUT
+         oVH6ycJggRHNkGDSULIw/6EVOjsKX61WPynOJrX9wnG48sPcRoCWQXlokWEuUptmSmT5
+         Y42g==
+X-Gm-Message-State: AO0yUKUNXklpN/ijD+8ksWcdixjl9B/wVcGfzTTeenEGl4am3mbhvPwI
+        r5SIiT6RnaoskxWAQuebOHzAxg==
+X-Google-Smtp-Source: AK7set9esCrwmxWtpjhIpHb9F9AjwhmW/LnMk7PpVO78vlhI0oVx/btBNZR1xTzxYFNXMqmeyTMYDg==
+X-Received: by 2002:a05:600c:1546:b0:3ed:22f2:554c with SMTP id f6-20020a05600c154600b003ed22f2554cmr11406696wmg.29.1678902229234;
+        Wed, 15 Mar 2023 10:43:49 -0700 (PDT)
 Received: from zen.linaroharston ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id e6-20020adffc46000000b002c561805a4csm5253750wrs.45.2023.03.15.10.43.45
+        by smtp.gmail.com with ESMTPSA id l4-20020a1c7904000000b003ed1ff06faasm2469232wme.19.2023.03.15.10.43.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 15 Mar 2023 10:43:47 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id E53981FFCC;
-        Wed, 15 Mar 2023 17:43:43 +0000 (GMT)
+        by zen.linaroharston (Postfix) with ESMTP id 0C44A1FFCD;
+        Wed, 15 Mar 2023 17:43:44 +0000 (GMT)
 From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     Akihiko Odaki <akihiko.odaki@gmail.com>,
@@ -114,9 +114,9 @@ Cc:     Akihiko Odaki <akihiko.odaki@gmail.com>,
         Hanna Reitz <hreitz@redhat.com>, Peter Xu <peterx@redhat.com>,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
         =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Subject: [PATCH v2 20/32] iotests: strip subdir path when listing tests
-Date:   Wed, 15 Mar 2023 17:43:19 +0000
-Message-Id: <20230315174331.2959-21-alex.bennee@linaro.org>
+Subject: [PATCH v2 21/32] iotests: print TAP protocol version when reporting tests
+Date:   Wed, 15 Mar 2023 17:43:20 +0000
+Message-Id: <20230315174331.2959-22-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230315174331.2959-1-alex.bennee@linaro.org>
 References: <20230315174331.2959-1-alex.bennee@linaro.org>
@@ -135,41 +135,35 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Daniel P. Berrangé <berrange@redhat.com>
 
-When asking 'check' to list individual tests by invoking it in dry run
-mode, it prints the paths to the tests relative to the base of the
-I/O test directory.
+Recently meson started complaining that TAP test reports don't include
+the TAP protocol version. While this warning is bogus and has since been
+removed from Meson, it looks like good practice to include this header
+going forward. The GLib library test harness has started unconditionally
+printing the version, so this brings the I/O tests into line.
 
-When asking 'check' to run an individual test, however, it mandates that
-only the unqualified test name is given, without any path prefix. This
-inconsistency makes it harder to ask for a list of tests and then invoke
-each one.
-
-Thus the test listing code is change to flatten the test names, by
-printing only the base name, which can be directly invoked.
-
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
 Acked-by: Hanna Czenczek <hreitz@redhat.com>
 Tested-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20230303160727.3977246-4-berrange@redhat.com>
+Message-Id: <20230303160727.3977246-5-berrange@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/qemu-iotests/check | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/qemu-iotests/testrunner.py | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-index bb294ef556..f2e9d27dcf 100755
---- a/tests/qemu-iotests/check
-+++ b/tests/qemu-iotests/check
-@@ -184,7 +184,7 @@ if __name__ == '__main__':
-         sys.exit(str(e))
+diff --git a/tests/qemu-iotests/testrunner.py b/tests/qemu-iotests/testrunner.py
+index 5a771da86e..e734800b3d 100644
+--- a/tests/qemu-iotests/testrunner.py
++++ b/tests/qemu-iotests/testrunner.py
+@@ -391,6 +391,7 @@ def run_tests(self, tests: List[str], jobs: int = 1) -> bool:
+         casenotrun = []
  
-     if args.dry_run:
--        print('\n'.join(tests))
-+        print('\n'.join([os.path.basename(t) for t in tests]))
-     else:
-         with TestRunner(env, tap=args.tap,
-                         color=args.color) as tr:
+         if self.tap:
++            print('TAP version 13')
+             self.env.print_env('# ')
+             print('1..%d' % len(tests))
+         else:
 -- 
 2.39.2
 
