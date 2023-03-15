@@ -2,136 +2,287 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 93E256BBAD0
-	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 18:25:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E59CE6BBB1C
+	for <lists+kvm@lfdr.de>; Wed, 15 Mar 2023 18:43:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231942AbjCORZo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 13:25:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59776 "EHLO
+        id S231135AbjCORnn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 13:43:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230332AbjCORZl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 13:25:41 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB46525E1F;
-        Wed, 15 Mar 2023 10:25:39 -0700 (PDT)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32FHC6U9017486;
-        Wed, 15 Mar 2023 17:25:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=mime-version : date :
- from : to : cc : subject : reply-to : in-reply-to : references :
- message-id : content-type : content-transfer-encoding; s=pp1;
- bh=bqXdSA4gmJf83mPxDDULhIgnmTET1iw6/02WOGu6qBk=;
- b=iYgTYmWYFUCqgGqR4xzaxqoSesru94n3yvzojsBf02d5vkbAImwbCKFAFVgGPq2SFcVT
- Zc10UOpuwIeaONJICEeABNYaHFLFHXJ5dvRSTN7Z0dtIQgSeHbKPtJPnXkGU3DX1g8xX
- 6NmZhb1v+G0SS+dMhDv6faYQFs/ginCaVMr6+l9s+3rBEFm65G0PrUD6Owgp3WJkIriL
- vE+Y7BfqOtRxtQ/O63bmqq5RFJfoVB40Lm2Qlcn7JMxAdzAvdLpELz0i7YdRakYqXeXS
- 9w5u1bHFLPQq45vOqUTMboJu8hfB0q+UdLiDVDf3P0EQDXlnIMXX85WO13yUe1+A0uSs Aw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pbj740am9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Mar 2023 17:25:39 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32FHCJ5r018632;
-        Wed, 15 Mar 2023 17:25:38 GMT
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pbj740akm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Mar 2023 17:25:38 +0000
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32FH6dqF031172;
-        Wed, 15 Mar 2023 17:25:37 GMT
-Received: from smtprelay05.wdc07v.mail.ibm.com ([9.208.129.117])
-        by ppma01wdc.us.ibm.com (PPS) with ESMTPS id 3pb29r4f0g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Mar 2023 17:25:37 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-        by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32FHPahK31457994
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 15 Mar 2023 17:25:36 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F2A7E5805C;
-        Wed, 15 Mar 2023 17:25:35 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5206958058;
-        Wed, 15 Mar 2023 17:25:35 +0000 (GMT)
-Received: from ltc.linux.ibm.com (unknown [9.5.196.140])
-        by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 15 Mar 2023 17:25:35 +0000 (GMT)
+        with ESMTP id S232263AbjCORni (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 13:43:38 -0400
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCFCB5B5DF
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:43:33 -0700 (PDT)
+Received: by mail-wr1-x42c.google.com with SMTP id m2so5281974wrh.6
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 10:43:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1678902212;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/XTY7Vej4MUrTa8LspO1+ukvYwDV/OHswwb9kes0OzE=;
+        b=yIBaYpO9SVHF8PMRT+qACgJZQRCtdy6+ReHSwzZAuCaur7+nit3E9JutB15ZF0/kdr
+         VofCVammynhfLSiVdOtPx2+Fs3Gh4F+aZgoFVyfUWBRUdGZxQIo2CgKyXWxE8Iohivlr
+         /kWfI72Li6Yj146bsWAfHJIAVI4OHHVwEsTYb4kMh9jCXkaPDy9AaWE230CXB2e3gqrH
+         NuqzCMt61t7t03oNYvGGLkL5BFMGP1upUH3gYSDGgjSYZJSKtvXmnzMxJIfbk5+VdTCI
+         u3T6u5RqvmZOyaM5rPyw5/49mYLChMcBxwAv0GH29JFRTQAo/RrAHaKU24YUxNS1VdSk
+         9f/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678902212;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/XTY7Vej4MUrTa8LspO1+ukvYwDV/OHswwb9kes0OzE=;
+        b=3olO5FD0xFiuhcsojtNxL48ZiDtAUmCBZQa5ZyVSJY01px539Rg0DVAdPJ+KhC+iN6
+         /KxE9lzIOtMMeywyyLCYL/wy4KyIQma/ietUpQ11JdOiHUjMCduIHzLneWNpUVQQ2hSa
+         djE2oW74KyVFfmmSZDHlYXjpXN4MKRfT3sZ+5xLtFgOq/prpKj8Uu3ywg5TggenRQmF4
+         hyqv8hlp/sKBf5u0FkyZpJy3+/l6B+PVjU3OEvBBy+0asO1vpjozPbqGHZDjUhiz54rS
+         qmbAsnH9KvqF9HQJvaD2C7XtTSCxrk3TS+j8dZn+ewBWV86Iy1sMCdEbx0hucm0JBAaL
+         AL9Q==
+X-Gm-Message-State: AO0yUKV+TqNpH/WwrBPlJLIIgmmNcz95aH7GQNh0B792WHRIBoHR/HCf
+        Mj+ZisSRPhrWClc8zdHhsdn0aw==
+X-Google-Smtp-Source: AK7set+kxVVetDpesm8lpaWpK6B5lzlGQGJj1LS2qIbxt6rClkMRkKkVpZEEuHxuuaNp+NpDHKLMDQ==
+X-Received: by 2002:adf:eb8b:0:b0:2cf:ee9d:ce2f with SMTP id t11-20020adfeb8b000000b002cfee9dce2fmr2717945wrn.19.1678902211988;
+        Wed, 15 Mar 2023 10:43:31 -0700 (PDT)
+Received: from zen.linaroharston ([85.9.250.243])
+        by smtp.gmail.com with ESMTPSA id u3-20020a5d5143000000b002c70c99db74sm5125243wrt.86.2023.03.15.10.43.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Mar 2023 10:43:31 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+        by zen.linaroharston (Postfix) with ESMTP id 35C221FFB7;
+        Wed, 15 Mar 2023 17:43:31 +0000 (GMT)
+From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To:     qemu-devel@nongnu.org
+Cc:     Akihiko Odaki <akihiko.odaki@gmail.com>,
+        =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+        qemu-riscv@nongnu.org, Riku Voipio <riku.voipio@iki.fi>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Wainer dos Santos Moschetta <wainersm@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Hao Wu <wuhaotsh@google.com>, Cleber Rosa <crosa@redhat.com>,
+        Daniel Henrique Barboza <danielhb413@gmail.com>,
+        Jan Kiszka <jan.kiszka@web.de>,
+        Aurelien Jarno <aurelien@aurel32.net>, qemu-arm@nongnu.org,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Alexandre Iooss <erdnaxe@crans.org>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Ilya Leoshkevich <iii@linux.ibm.com>, qemu-ppc@nongnu.org,
+        Juan Quintela <quintela@redhat.com>,
+        =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+        Darren Kenny <darren.kenny@oracle.com>, kvm@vger.kernel.org,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Stafford Horne <shorne@gmail.com>,
+        Weiwei Li <liweiwei@iscas.ac.cn>,
+        Sunil V L <sunilvl@ventanamicro.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Thomas Huth <huth@tuxfamily.org>,
+        Vijai Kumar K <vijai@behindbytes.com>,
+        Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Song Gao <gaosong@loongson.cn>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Niek Linnenbank <nieklinnenbank@gmail.com>,
+        Greg Kurz <groug@kaod.org>, Laurent Vivier <laurent@vivier.eu>,
+        Qiuhao Li <Qiuhao.Li@outlook.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        Xiaojuan Yang <yangxiaojuan@loongson.cn>,
+        Mahmoud Mandour <ma.mandourr@gmail.com>,
+        Alexander Bulekov <alxndr@bu.edu>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>, qemu-block@nongnu.org,
+        Yanan Wang <wangyanan55@huawei.com>,
+        David Woodhouse <dwmw2@infradead.org>, qemu-s390x@nongnu.org,
+        Strahinja Jankovic <strahinja.p.jankovic@gmail.com>,
+        Bandan Das <bsd@redhat.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Tyrone Ting <kfting@nuvoton.com>,
+        Kevin Wolf <kwolf@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Beraldo Leal <bleal@redhat.com>,
+        Beniamino Galvani <b.galvani@gmail.com>,
+        Paul Durrant <paul@xen.org>, Bin Meng <bin.meng@windriver.com>,
+        Sunil Muthuswamy <sunilmut@microsoft.com>,
+        Hanna Reitz <hreitz@redhat.com>, Peter Xu <peterx@redhat.com>,
+        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: [PATCH v2 00/32] tweaks and fixes for 8.0-rc1 (tests, plugins, docs)
+Date:   Wed, 15 Mar 2023 17:42:59 +0000
+Message-Id: <20230315174331.2959-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Date:   Wed, 15 Mar 2023 18:25:34 +0100
-From:   Harald Freudenberger <freude@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, jjherne@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, borntraeger@linux.ibm.com
-Subject: Re: [PATCH] s390/vfio_ap: fix memory leak in vfio_ap device driver
-Reply-To: freude@linux.ibm.com
-Mail-Reply-To: freude@linux.ibm.com
-In-Reply-To: <20230315153932.165031-1-akrowiak@linux.ibm.com>
-References: <20230315153932.165031-1-akrowiak@linux.ibm.com>
-Message-ID: <b9be5d298de3ca70f8fa86a1b58cb4f2@linux.ibm.com>
-X-Sender: freude@linux.ibm.com
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 6h2Pzb7nBv1MTOxSFrtCzJgv--NFTbbH
-X-Proofpoint-ORIG-GUID: VJZLKbXykvzvXzQu4UE-4DiBcxp-8qdV
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-15_08,2023-03-15_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- mlxlogscore=999 malwarescore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 phishscore=0 adultscore=0 priorityscore=1501
- bulkscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2302240000 definitions=main-2303150142
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023-03-15 16:39, Tony Krowiak wrote:
-> The device release callback function invoked to release the matrix 
-> device
-> uses the dev_get_drvdata(device *dev) function to retrieve the
-> pointer to the vfio_matrix_dev object in order to free its storage. The
-> problem is, this object is not stored as drvdata with the device; since 
-> the
-> kfree function will accept a NULL pointer, the memory for the
-> vfio_matrix_dev object is never freed.
-> 
-> Since the device being released is contained within the vfio_matrix_dev
-> object, the container_of macro will be used to retrieve its pointer.
-> 
-> Fixes: 1fde573413b5 ("s390: vfio-ap: base implementation of VFIO AP
-> device driver")
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> ---
->  drivers/s390/crypto/vfio_ap_drv.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/s390/crypto/vfio_ap_drv.c
-> b/drivers/s390/crypto/vfio_ap_drv.c
-> index 997b524bdd2b..15e9de9f4574 100644
-> --- a/drivers/s390/crypto/vfio_ap_drv.c
-> +++ b/drivers/s390/crypto/vfio_ap_drv.c
-> @@ -54,8 +54,9 @@ static struct ap_driver vfio_ap_drv = {
-> 
->  static void vfio_ap_matrix_dev_release(struct device *dev)
->  {
-> -	struct ap_matrix_dev *matrix_dev = dev_get_drvdata(dev);
-> -
-> +	struct ap_matrix_dev *matrix_dev = container_of(dev,
-> +							struct ap_matrix_dev,
-> +							device);
->  	kfree(matrix_dev);
->  }
+As usual for softfreeze I switch from my usual maintainer trees to
+collecting up miscellaneous fixes and tweaks as we stabilise the
+build. I was intending to send it as a PR but I had to squash a number
+of CI failures by adding stuff to:
 
-I needed some indirections to follow what exactly happens here and how 
-you
-fix it, but finally I got it.
-Reviewed-by: Harald Freudenberger <freude@linux.ibm.com>
+      *: Add missing includes of qemu/error-report.h
+      *: Add missing includes of qemu/plugin.h
+
+so I thought it was worth another spin and I can cut the PR from this
+if the reviews are ok.
+
+Since v1:
+  - grabbed Daniel's iotest cleanup for CI
+  - new version of Richard's plugin fix
+  - a number of gitdm updates
+
+I've left:
+  tests/tcg: disable pauth for aarch64 gdb tests
+
+in for now, but I can easily drop it for the PR as it seems the
+consensus is there will be stable updates to gdb that no longer crash
+on our pauth support.
+
+The following still need review:
+
+ - contrib/gitdm: add more individual contributors (1 acks, 1 sobs)
+ - tests/tcg: add some help output for running individual tests
+ - include/qemu: add documentation for memory callbacks
+ - gitlab: update centos-8-stream job
+ - scripts/ci: update gitlab-runner playbook to handle CentOS
+ - tests/docker: all add DOCKER_BUILDKIT to RUNC environment
+
+Alex Bennée (16):
+  tests/docker: all add DOCKER_BUILDKIT to RUNC environment
+  scripts/ci: add libslirp-devel to build-environment
+  scripts/ci: update gitlab-runner playbook to handle CentOS
+  gitlab: update centos-8-stream job
+  include/qemu: add documentation for memory callbacks
+  tests/tcg: add some help output for running individual tests
+  tests/tcg: disable pauth for aarch64 gdb tests
+  include/exec: fix kerneldoc definition
+  tests/avocado: don't use tags to define drive
+  contrib/gitdm: Add ASPEED Technology to the domain map
+  contrib/gitdm: Add SYRMIA to the domain map
+  contrib/gitdm: add Amazon to the domain map
+  contrib/gitdm: add Alibaba to the domain-map
+  contrib/gitdm: add revng to domain map
+  contrib/gitdm: add more individual contributors
+  contrib/gitdm: add group map for AMD
+
+Daniel P. Berrangé (8):
+  iotests: explicitly pass source/build dir to 'check' command
+  iotests: allow test discovery before building
+  iotests: strip subdir path when listing tests
+  iotests: print TAP protocol version when reporting tests
+  iotests: connect stdin to /dev/null when running tests
+  iotests: always use a unique sub-directory per test
+  iotests: register each I/O test separately with meson
+  iotests: remove the check-block.sh script
+
+Marcin Juszkiewicz (1):
+  tests/avocado: update AArch64 tests to Alpine 3.17.2
+
+Richard Henderson (7):
+  tcg: Clear plugin_mem_cbs on TB exit
+  tcg: Drop plugin_gen_disable_mem_helpers from tcg_gen_exit_tb
+  include/qemu/plugin: Remove QEMU_PLUGIN_ASSERT
+  *: Add missing includes of qemu/error-report.h
+  *: Add missing includes of qemu/plugin.h
+  include/qemu: Split out plugin-event.h
+  include/qemu/plugin: Inline qemu_plugin_disable_mem_helpers
+
+ include/exec/memory.h                         |  2 +-
+ include/hw/core/cpu.h                         |  2 +-
+ include/qemu/plugin-event.h                   | 26 ++++++++
+ include/qemu/plugin.h                         | 27 ++-------
+ include/qemu/qemu-plugin.h                    | 47 +++++++++++++--
+ include/user/syscall-trace.h                  |  1 +
+ accel/accel-softmmu.c                         |  2 +-
+ accel/tcg/cpu-exec-common.c                   |  3 +
+ accel/tcg/cpu-exec.c                          |  5 +-
+ block/monitor/block-hmp-cmds.c                |  1 +
+ cpu.c                                         |  1 +
+ dump/dump.c                                   |  1 +
+ dump/win_dump.c                               |  1 +
+ gdbstub/gdbstub.c                             |  1 +
+ hw/arm/collie.c                               |  2 +
+ hw/arm/cubieboard.c                           |  1 +
+ hw/arm/musicpal.c                             |  2 +
+ hw/arm/npcm7xx_boards.c                       |  2 +
+ hw/arm/nseries.c                              |  2 +
+ hw/arm/omap_sx1.c                             |  2 +
+ hw/arm/orangepi.c                             |  1 +
+ hw/arm/palm.c                                 |  2 +
+ hw/core/loader.c                              |  1 +
+ hw/core/machine-smp.c                         |  2 +
+ hw/i386/kvm/xen_xenstore.c                    |  1 +
+ hw/i386/sgx.c                                 |  1 +
+ hw/intc/apic.c                                |  1 +
+ hw/loongarch/acpi-build.c                     |  1 +
+ hw/loongarch/virt.c                           |  2 +
+ hw/m68k/next-cube.c                           |  1 +
+ hw/m68k/q800.c                                |  1 +
+ hw/m68k/virt.c                                |  1 +
+ hw/mem/memory-device.c                        |  1 +
+ hw/mem/sparse-mem.c                           |  1 +
+ hw/openrisc/boot.c                            |  1 +
+ hw/ppc/spapr_softmmu.c                        |  2 +
+ hw/riscv/opentitan.c                          |  1 +
+ hw/riscv/shakti_c.c                           |  1 +
+ hw/riscv/virt-acpi-build.c                    |  1 +
+ hw/vfio/display.c                             |  1 +
+ hw/vfio/igd.c                                 |  1 +
+ hw/vfio/migration.c                           |  1 +
+ linux-user/elfload.c                          |  1 +
+ linux-user/exit.c                             |  1 +
+ linux-user/syscall.c                          |  1 +
+ migration/dirtyrate.c                         |  1 +
+ migration/exec.c                              |  1 +
+ plugins/core.c                                | 11 ----
+ target/i386/cpu.c                             |  1 +
+ target/i386/host-cpu.c                        |  1 +
+ target/i386/sev.c                             |  1 +
+ target/i386/whpx/whpx-apic.c                  |  1 +
+ target/mips/cpu.c                             |  1 +
+ target/s390x/cpu-sysemu.c                     |  1 +
+ target/s390x/cpu_models.c                     |  1 +
+ target/s390x/diag.c                           |  2 +
+ tcg/tcg-op.c                                  |  1 -
+ .../custom-runners/centos-stream-8-x86_64.yml | 18 ++----
+ contrib/gitdm/domain-map                      |  7 ++-
+ contrib/gitdm/group-map-alibaba               |  7 +++
+ contrib/gitdm/group-map-amd                   |  8 +++
+ contrib/gitdm/group-map-individuals           |  1 +
+ gitdm.config                                  |  2 +
+ .../org.centos/stream/8/build-environment.yml |  1 +
+ scripts/ci/setup/gitlab-runner.yml            | 20 ++++++-
+ tests/avocado/machine_aarch64_virt.py         |  8 +--
+ tests/avocado/tuxrun_baselines.py             | 60 ++++++++-----------
+ tests/check-block.sh                          | 43 -------------
+ tests/docker/Makefile.include                 |  2 +-
+ tests/qemu-iotests/check                      | 30 ++++++++--
+ tests/qemu-iotests/meson.build                | 35 +++++++++--
+ tests/qemu-iotests/testenv.py                 | 20 +++----
+ tests/qemu-iotests/testrunner.py              | 43 ++++---------
+ tests/tcg/Makefile.target                     |  7 +++
+ tests/tcg/aarch64/Makefile.target             |  2 +
+ ui/cocoa.m                                    |  1 +
+ 76 files changed, 305 insertions(+), 193 deletions(-)
+ create mode 100644 include/qemu/plugin-event.h
+ create mode 100644 contrib/gitdm/group-map-alibaba
+ create mode 100644 contrib/gitdm/group-map-amd
+ delete mode 100755 tests/check-block.sh
+
+-- 
+2.39.2
+
