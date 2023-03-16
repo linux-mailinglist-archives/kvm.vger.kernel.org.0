@@ -2,343 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A9A16BC26B
-	for <lists+kvm@lfdr.de>; Thu, 16 Mar 2023 01:27:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 66CEF6BC270
+	for <lists+kvm@lfdr.de>; Thu, 16 Mar 2023 01:28:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232464AbjCPA1J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 20:27:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56972 "EHLO
+        id S232951AbjCPA2T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 20:28:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230266AbjCPA1H (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 20:27:07 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D02F90B48;
-        Wed, 15 Mar 2023 17:27:05 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id h12-20020a17090aea8c00b0023d1311fab3so4007065pjz.1;
-        Wed, 15 Mar 2023 17:27:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678926425;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=7kp2ykOHqeXEhJ5HQKyydNdoEh9q1zt7bKLuqihsZ2Y=;
-        b=SVYElEYJ3abksE2LMCHs0pMJFxFSAJeyI1thaodhHM7qY6Mn3VvbsipGx2MlNZYopj
-         423bdMvbxXdDcoRob1c8bYYiFul/weRVZ9G6gDRqCO5Jn+8td9LHLVOV8iY3gmSb7tAv
-         jqwsa9ZCIfBfuVSnNwXiNC5of1CNagRRH6wEPNItiae+96kpLBuVRVR88B53YrzZoCrN
-         WxGV5CSgvyguGskVICERfkNOnGAPAy+/9CchKwMMfCyHxbCV0WmDYoOTb2esdcaGbyga
-         d/mTdGihoKs+a8UsR60Ooo1d7vJwq2DKnarpObc1Ajc/d872FCrLWe02f8Rlciyt7F0u
-         cDWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678926425;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7kp2ykOHqeXEhJ5HQKyydNdoEh9q1zt7bKLuqihsZ2Y=;
-        b=mzkCR3vVebq1gu5ydG4QHq9cvvp5fnkOcM00B53ce7kMI4cWoDzV3+z6YvXa4e1akU
-         UMGLbV956meA7iBKbP8Dlcc4Rqhc2OD6lJQBB6frR4AnZDkFtwe5m8dDHffr4lZc+73+
-         4umkh+Y/kRTzfnrxggJZpaAhjOGHmUEhRvSP1cBtUNVUy8z8T/cO3yPIAQn2fzLTvZqI
-         z17J0eHJghkKNQ8QCVbjXrJGcpoaLYrZjQIQu3MXbOVlxfI+f/0x5/RSNdNP5kUoIquy
-         ciJZmMo9vgVi0vmaSd0fnWOKjWXnhneaZB76mG7CGT8BI+HfKHLG6S8tZRuLL217jQSE
-         J6Zw==
-X-Gm-Message-State: AO0yUKWfkRqnsftTs3mw4fthWOD8M2LSsUOBqjen2cQ30D6zeBkhU8Sd
-        wfZlxolPh2Erf0SgHhNFUfs=
-X-Google-Smtp-Source: AK7set//+89O4/dHP8vaW5p1mnNOS9+pc+0VfoN591ACXpJ1Pf2/fyshQPP7RlF7KLOEx9yDAYYfhw==
-X-Received: by 2002:a17:903:2012:b0:19e:baa6:5860 with SMTP id s18-20020a170903201200b0019ebaa65860mr1075959pla.2.1678926424694;
-        Wed, 15 Mar 2023 17:27:04 -0700 (PDT)
-Received: from localhost ([192.55.54.55])
-        by smtp.gmail.com with ESMTPSA id io21-20020a17090312d500b001a075503ab8sm2406935plb.132.2023.03.15.17.27.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Mar 2023 17:27:03 -0700 (PDT)
-Date:   Wed, 15 Mar 2023 17:27:02 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     "Huang, Kai" <kai.huang@intel.com>
-Cc:     "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Aktas, Erdem" <erdemaktas@google.com>,
-        "dmatlack@google.com" <dmatlack@google.com>,
+        with ESMTP id S232894AbjCPA2R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 20:28:17 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2084.outbound.protection.outlook.com [40.107.237.84])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B1159CFD4;
+        Wed, 15 Mar 2023 17:28:14 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XYf9MJOk59JySwVzu4dQxyd2SrKf5CLRV8+zAzdCym67/MTeqmr81YVIvJiHw8duWiqrLpcIQMkKpYAZQsAlNDudxO0SQeQboCJMZUzOCYOqPlKmB8jyRWzr+khKmnfthbZFq68PXbe+MlSIWnZlT4AVup9cwfdemiZTrq9Mqf4qFNwF90NWWU2Gwcdq+sMApiawQGzlg6zflWv35e8VGnhJ54+BjjPrOcurCRH0tVxTwE0IQeVfqdxcXEbAL/Yhn3Xqs4Z86vn+UPXDmu0u64qzR2r4pBzmMKUGW+/yBED3kFQ/q4psFfp5ul2AqQ55RruiVWkwvpZwFhB32nwHfw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TWy47GqZKWEDZcAHHZ9VMCtkQEh2YuJzZFZYivc7QLA=;
+ b=Sto9sXyO2CKbKp4JXrHSs38+OMDH2Al1T+vdnEYyqdOhjmw3nIZbV+uvWnBhkFAeKy1YzDzdCARmD3JbZ8Ypo4lAiCR0zWyPXPqMyA5NwyShaRbRJc3CuvjHwJk3kKLGyFmxr7A/gQCdL9LWUsLcNfpw9RnJzO7hukUrK9JQ0SqXoTUWpwJo3i3zpoWnWeJ4PyvUAFnzyp3emeA407NViFPk9dZm9tt4UJ8uaYBIvXmQT/UE5aLxNmJUFyDI0iJsMFjM7BwCkLce1Hxh+GczacXzXd9B9TWBqcpnqNJOnGbkJ8qU5hWAJjQNQ2I5qgnR5a0lxPnUWT1Kp5n2QW+4EQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TWy47GqZKWEDZcAHHZ9VMCtkQEh2YuJzZFZYivc7QLA=;
+ b=b6AN+j+5PmGY+/EPG8/1LA66+gP0m6FqCDk7unCmKo6+Hf2BEuDRsbDO8rwY6C3QV6DiVtXYW9rxW3MmQnhV/7AjkTNKjTGSMqqn5r1iRrYSv7mvbY/VgBfQMM/23cxV+mdILr+XQIdZgLlomvX+EKOJcjH5w6TIf5DrNJaVf1d8RCiS2DV3RXI7sULbqcBMgmq25SjT4PtNgfVoMEY+gAd6fZrRxhtwccOj/lKYWoR6NQ2qRcgn/ANFzGDW2fp/wuzYxl9cIi9kl/oM0/HCtsLDZQngF4+AB8h4iqKQmkLZjFVtApkOuFskaAxC0i+SgmeNn98vbV6M1ayBZyNrRg==
+Received: from BN6PR17CA0037.namprd17.prod.outlook.com (2603:10b6:405:75::26)
+ by MW6PR12MB8705.namprd12.prod.outlook.com (2603:10b6:303:24c::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.29; Thu, 16 Mar
+ 2023 00:28:12 +0000
+Received: from BN8NAM11FT079.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:405:75:cafe::f9) by BN6PR17CA0037.outlook.office365.com
+ (2603:10b6:405:75::26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.29 via Frontend
+ Transport; Thu, 16 Mar 2023 00:28:12 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ BN8NAM11FT079.mail.protection.outlook.com (10.13.177.61) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6199.17 via Frontend Transport; Thu, 16 Mar 2023 00:28:11 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Wed, 15 Mar 2023
+ 17:28:05 -0700
+Received: from drhqmail201.nvidia.com (10.126.190.180) by
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.37; Wed, 15 Mar 2023 17:28:05 -0700
+Received: from Asurada-Nvidia (10.127.8.9) by mail.nvidia.com (10.126.190.180)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37 via Frontend
+ Transport; Wed, 15 Mar 2023 17:28:04 -0700
+Date:   Wed, 15 Mar 2023 17:28:03 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+CC:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "zhi.wang.linux@gmail.com" <zhi.wang.linux@gmail.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>
-Subject: Re: [PATCH v13 003/113] KVM: TDX: Initialize the TDX module when
- loading the KVM intel kernel module
-Message-ID: <20230316002702.GA197448@ls.amr.corp.intel.com>
-References: <cover.1678643051.git.isaku.yamahata@intel.com>
- <44f7fe9f235e29f2193eaac5890a4dede22c324c.1678643052.git.isaku.yamahata@intel.com>
- <20ebae70fd625f8a0fe87f98c25613a2d4dc5792.camel@intel.com>
- <20230315072711.GF3922605@ls.amr.corp.intel.com>
- <8ee89a1376babf0a5dbc2feb614890b7e2ccf2f8.camel@intel.com>
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "joro@8bytes.org" <joro@8bytes.org>
+Subject: Re: [PATCH v1 1/5] iommufd: Create access in
+ vfio_iommufd_emulated_bind()
+Message-ID: <ZBJikzhnIrEa0nN1@Asurada-Nvidia>
+References: <20230308131340.459224-1-yi.l.liu@intel.com>
+ <20230308131340.459224-2-yi.l.liu@intel.com>
+ <BN9PR11MB52766F9DA462F5C7BC23654F8CBA9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZBDCCYLJn32Yk/eI@Asurada-Nvidia>
+ <BN9PR11MB52766160C546FA5075B191258CBF9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZBFj8AZ4gWOW1PQs@Asurada-Nvidia>
+ <BN9PR11MB5276FDB32A40B521C0E351E68CBF9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <DS0PR11MB75295B8B4352698CB165B300C3BF9@DS0PR11MB7529.namprd11.prod.outlook.com>
+ <BN9PR11MB52761ADF0DBE0D81AD856BB58CBC9@BN9PR11MB5276.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <8ee89a1376babf0a5dbc2feb614890b7e2ccf2f8.camel@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <BN9PR11MB52761ADF0DBE0D81AD856BB58CBC9@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT079:EE_|MW6PR12MB8705:EE_
+X-MS-Office365-Filtering-Correlation-Id: d9b6156e-1504-429b-cc41-08db25b55337
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Spmhp2sJ8GhnHP/Iei+BjxLT+mlxWZk4BpW2WwLvKdRlCt1+joDHevJp8vXmq8BL09WS9ymfNp6mvSL8oNE10HLimU4v9a/SgH6CwT3nxKsu5thSmN2vJREp2i+512lI9wDb5Rx5T8m401+yjsG6H7gyjflE+pyjDUL28T+1r8URcx+JZWHtM1s0R1FTD3j93UmC+nbOHwrHZh/AICoUXKHRsrAIS4eI5MaOIFBsts3FRDE8ojlXAr/J2dEdwv1cn8hB6LkGTFfTtXSIZYjoBQ9DoEsbd96cygO9KsPeoWDf1MIeuMSbmnwk6WD5x9pypV7yzy2n/hDGo/cT3K+2P9A/T8k+c1UczMBRONe/T/Yk0LDbepItAjgRAF9lCT8AniuDtGGzHdJcisfTU8z72YKhaamVYfiKUCcoy0bCyUkpygicbaHoR+CA0/r9YtFsaSxpluF0kItvFJPzxX+hiIzxVwMskjqR6evt5gW/5i8H000S0i1BwK8EPs9pz31S7IEEba7gFl9CI3YnLl6EV9dgZYPxaRxMmS9LVxnXDbu+PrMVRjSYRLYSn7A8fCuJNxn5kFiH/2DeCwJ345YRDJF/d7JW81cm5xEz6gDQwiu35v8cawGEvEkZE5p9mfYFkiRV4Aj9B+5KnYF54/QTmpR0DBnEAg6lgvL+sVjkXhCOKjqNxDAutKSub7+xGoM0VzXSNDPI+CyYbGFggMxY5QCc7nzPsYwQ0V0BCCysTepwkVFc5KcF/SD5fzwvPZvy
+X-Forefront-Antispam-Report: CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230025)(4636009)(396003)(346002)(136003)(376002)(39860400002)(451199018)(36840700001)(46966006)(40470700004)(83380400001)(478600001)(426003)(47076005)(336012)(186003)(9686003)(54906003)(70586007)(70206006)(316002)(8676002)(6916009)(41300700001)(4326008)(36860700001)(8936002)(5660300002)(7416002)(40460700003)(26005)(7636003)(2906002)(82740400003)(356005)(55016003)(33716001)(86362001)(82310400005)(40480700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Mar 2023 00:28:11.6656
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: d9b6156e-1504-429b-cc41-08db25b55337
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT079.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB8705
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 15, 2023 at 09:46:00AM +0000,
-"Huang, Kai" <kai.huang@intel.com> wrote:
+On Thu, Mar 16, 2023 at 12:17:11AM +0000, Tian, Kevin wrote:
 
+> > > > > > > > @@ -449,33 +450,18 @@ iommufd_access_create(struct
+> > > > iommufd_ctx
+
+> > > > > > > >       refcount_inc(&access->obj.users);
+> > > > > > > > +     mutex_init(&access->ioas_lock);
+> > > > > > > >       access->ictx = ictx;
+> > > > > > > >       iommufd_ctx_get(ictx);
+> > > > > > >
+> > > > > > > this refcnt get should be moved to the start given next patch
+> > > > > > > removes the reference in the caller side.
+> >
+> > This change is ok but seems not necessary.
+> >
+> > Yes, vfio_iommufd_emulated_bind() will not have reference on the
+> > ictx after the next patch. However, it gets reference only because it
+> > wants to store it in vfio_device. Now, it does not store it. So no get.
+> > I think the caller of vfio_iommufd_emulated_bind() should ensure
+> > the ictx is valid. Also check the physical device bind. So maybe not
+> > necessary to get ictx before calling iommufd_access_create(). This is
+> > the same with the vfio_iommufd_physical_bind() which calls
+> > iommufd_device_bind() without ictx get, and iommufd_device_bind()
+> > also gets ictx in the end.
+> >
 > 
-> > > 
-> > > I think you should use hardware_enable_all(), and just do something similar to
-> > > below in vmx_hardware_enable():
-> > 
-> > The use of hardware_enable_all() make us circle back to refactoring KVM
-> > hardware initialization topic.  I'd like to stay away from it for now for TDX.
-> 
-> Sean's series to improve hardware enable has been merged to upstream already.  
+> You are right. I overlooked the fact that ictx is already held by the
+> caller of bind.
 
-I revised the patch and I can use hardware_enable_all().
+I am dropping it then :)
 
-> > +	for_each_online_cpu(cpu) {
-> > +		if (smp_call_on_cpu(cpu, tdx_cpu_enable_cpu, NULL, false)) {
-> > +			r = -EIO;
-> > +			break;
-> > +		}
-> > +	}
-> > +	if (!r)
-> > +		r = tdx_module_setup();
-> > +	on_each_cpu(tdx_vmxoff_cpu, NULL, 1);
-> > +	cpus_read_unlock();
-> > +
-> > +	return r;
-> > +}
-> 
-> I think you can merge next patch with this one because they are kinda related.  
-> 
-> Putting them together allows people to review more easily.
-
-Finally I come up with the version that uses kvm_hardware_enable_all().
-that doesn't issue cpus_read_lock().
-I had to patch tdx_cpu_enable(). I'll reply to the patch itself.
-
-
-From 38774fc6e2bc5f0eddd0a0ab035ba8e712ee5ff2 Mon Sep 17 00:00:00 2001
-Message-Id: <38774fc6e2bc5f0eddd0a0ab035ba8e712ee5ff2.1678926122.git.isaku.yamahata@intel.com>
-In-Reply-To: <d2aa2142665b8204b628232ab615c98090371c99.1678926122.git.isaku.yamahata@intel.com>
-References: <d2aa2142665b8204b628232ab615c98090371c99.1678926122.git.isaku.yamahata@intel.com>
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-Date: Tue, 22 Feb 2022 14:44:15 -0800
-Subject: [PATCH] KVM: TDX: Initialize the TDX module when loading the
- KVM intel kernel module
-
-TDX requires several initialization steps for KVM to create guest TDs.
-Detect CPU feature, enable VMX (TDX is based on VMX) on all online CPUs,
-detect the TDX module availability, initialize it and disable VMX.
-
-To enable VMX on all online CPUs, utilize kvm_hardware_enable_all() that
-calls hardware_enable() methods.  The method also initialize each CPU for
-TDX.  TDX requires to call a TDX initialization function per logical
-processor (LP) before the LP uses TDX.  When CPU is onlined, call the TDX
-LP initialization API when cpu is onlined.  If it failed refuse onlininig
-of the cpu for simplicity instead of TDX avoiding the LP.
-
-There are several options on when to initialize the TDX module.  A.) kernel
-module loading time, B.) the first guest TD creation time.  A.) was chosen.
-With B.), a user may hit an error of the TDX initialization when trying to
-create the first guest TD.  The machine that fails to initialize the TDX
-module can't boot any guest TD further.  Such failure is undesirable and a
-surprise because the user expects that the machine can accommodate guest
-TD, but actually not.  So A.) is better than B.).
-
-Introduce a module parameter, kvm_intel.tdx, to explicitly enable TDX KVM
-support.  It's off by default to keep same behavior for those who don't use
-TDX.  Implement hardware_setup method to detect TDX feature of CPU and
-initialize TDX module.
-
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
----
- arch/x86/kvm/Makefile      |  1 +
- arch/x86/kvm/vmx/main.c    | 34 ++++++++++++++++++++++++++--
- arch/x86/kvm/vmx/tdx.c     | 46 ++++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/x86_ops.h |  8 +++++++
- arch/x86/kvm/x86.c         | 10 +++++++++
- 5 files changed, 97 insertions(+), 2 deletions(-)
- create mode 100644 arch/x86/kvm/vmx/tdx.c
-
-diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index 0e894ae23cbc..4b01ab842ab7 100644
---- a/arch/x86/kvm/Makefile
-+++ b/arch/x86/kvm/Makefile
-@@ -25,6 +25,7 @@ kvm-$(CONFIG_KVM_SMM)	+= smm.o
- kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
- 			   vmx/hyperv.o vmx/nested.o vmx/posted_intr.o vmx/main.o
- kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
-+kvm-intel-$(CONFIG_INTEL_TDX_HOST)	+= vmx/tdx.o
- 
- kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o \
- 			   svm/sev.o svm/hyperv.o
-diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 3f49e8e38b6b..f7bfa9888d9e 100644
---- a/arch/x86/kvm/vmx/main.c
-+++ b/arch/x86/kvm/vmx/main.c
-@@ -6,6 +6,36 @@
- #include "nested.h"
- #include "pmu.h"
- 
-+static bool enable_tdx __ro_after_init;
-+module_param_named(tdx, enable_tdx, bool, 0444);
-+
-+static int vt_hardware_enable(void)
-+{
-+	int ret;
-+
-+	ret = vmx_hardware_enable();
-+	if (ret || !enable_tdx)
-+		return ret;
-+
-+	ret = tdx_cpu_enable();
-+	if (ret)
-+		vmx_hardware_disable();
-+	return ret;
-+}
-+
-+static __init int vt_hardware_setup(void)
-+{
-+	int ret;
-+
-+	ret = vmx_hardware_setup();
-+	if (ret)
-+		return ret;
-+
-+	enable_tdx = enable_tdx && !tdx_hardware_setup(&vt_x86_ops);
-+
-+	return 0;
-+}
-+
- #define VMX_REQUIRED_APICV_INHIBITS		       \
- (						       \
-        BIT(APICV_INHIBIT_REASON_DISABLE)|	       \
-@@ -24,7 +54,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 
- 	.hardware_unsetup = vmx_hardware_unsetup,
- 
--	.hardware_enable = vmx_hardware_enable,
-+	.hardware_enable = vt_hardware_enable,
- 	.hardware_disable = vmx_hardware_disable,
- 	.has_emulated_msr = vmx_has_emulated_msr,
- 
-@@ -159,7 +189,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- };
- 
- struct kvm_x86_init_ops vt_init_ops __initdata = {
--	.hardware_setup = vmx_hardware_setup,
-+	.hardware_setup = vt_hardware_setup,
- 	.handle_intel_pt_intr = NULL,
- 
- 	.runtime_ops = &vt_x86_ops,
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-new file mode 100644
-index 000000000000..f13fdf71430b
---- /dev/null
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -0,0 +1,46 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <linux/cpu.h>
-+
-+#include <asm/tdx.h>
-+
-+#include "capabilities.h"
-+#include "x86_ops.h"
-+#include "x86.h"
-+
-+#undef pr_fmt
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
-+static int __init tdx_module_setup(void)
-+{
-+	int ret;
-+
-+	ret = tdx_enable();
-+	if (ret) {
-+		pr_info("Failed to initialize TDX module.\n");
-+		return ret;
-+	}
-+
-+	pr_info("TDX is supported.\n");
-+	return 0;
-+}
-+
-+int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
-+{
-+	int r = 0;
-+
-+	if (!enable_ept) {
-+		pr_warn("Cannot enable TDX with EPT disabled\n");
-+		return -EINVAL;
-+	}
-+
-+	/* tdx_enable() in tdx_module_setup() requires cpus lock. */
-+	cpus_read_lock();
-+	r = kvm_hardware_enable_all();
-+	if (!r) {
-+		r = tdx_module_setup();
-+		kvm_hardware_disable_all();
-+	}
-+	cpus_read_unlock();
-+
-+	return r;
-+}
-diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-index 051b5c4b5c2f..f59e5197836a 100644
---- a/arch/x86/kvm/vmx/x86_ops.h
-+++ b/arch/x86/kvm/vmx/x86_ops.h
-@@ -20,6 +20,8 @@ bool kvm_is_vmx_supported(void);
- int __init vmx_init(void);
- void vmx_exit(void);
- 
-+__init int vmx_hardware_setup(void);
-+
- extern struct kvm_x86_ops vt_x86_ops __initdata;
- extern struct kvm_x86_init_ops vt_init_ops __initdata;
- 
-@@ -133,4 +135,10 @@ void vmx_cancel_hv_timer(struct kvm_vcpu *vcpu);
- #endif
- void vmx_setup_mce(struct kvm_vcpu *vcpu);
- 
-+#ifdef CONFIG_INTEL_TDX_HOST
-+int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
-+#else
-+static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return -ENOSYS; }
-+#endif
-+
- #endif /* __KVM_X86_VMX_X86_OPS_H */
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 2125fcaa3973..b264012a8478 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9435,6 +9435,16 @@ static int __kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
- 
- 	kvm_init_pmu_capability(ops->pmu_ops);
- 
-+	/*
-+	 * TDX requires those methods to enable VMXON by
-+	 * kvm_hardware_enable/disable_all()
-+	 */
-+	static_call_update(kvm_x86_check_processor_compatibility,
-+			   ops->runtime_ops->check_processor_compatibility);
-+	static_call_update(kvm_x86_hardware_enable,
-+			   ops->runtime_ops->hardware_enable);
-+	static_call_update(kvm_x86_hardware_disable,
-+			   ops->runtime_ops->hardware_disable);
- 	r = ops->hardware_setup();
- 	if (r != 0)
- 		goto out_mmu_exit;
--- 
-2.25.1
-
-
-
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+Nic
