@@ -2,217 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 855586BD04D
-	for <lists+kvm@lfdr.de>; Thu, 16 Mar 2023 13:56:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DB34B6BD055
+	for <lists+kvm@lfdr.de>; Thu, 16 Mar 2023 13:59:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230162AbjCPM4n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Mar 2023 08:56:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57700 "EHLO
+        id S229838AbjCPM7k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Mar 2023 08:59:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230152AbjCPM4c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Mar 2023 08:56:32 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4E4CA0B26;
-        Thu, 16 Mar 2023 05:56:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678971373; x=1710507373;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=ss+PjQUhxjU+laSJWlhUlqNe75tvnb7MmIudub+LfG4=;
-  b=YbXOpAsDStqgqsVG9XZCVoekyHYx51Kdd9NUMewD9U51z8WMvj8E6fqs
-   lRbnGv8UKjNoijk0aZfiGUiUYk5mgaWNJ863hszSXN4gAbmX3pRjaPi9t
-   r+52wNZHCMJe24DHPwCkpG8fX38z8Oc5t211tXH34ErljEyvCCL+IUrXp
-   UCimLLVz3mO36etYUrhkOJfJ7kpooe10ZlKWi0xDnwUefYIvlqfZvMplL
-   6WrW7y9YFLOKgV8FmZmOccGNq8ZgF6TOZw5j5bKt4r7qhWjcbZktC4w4S
-   NiYZMhPGUMmCvpXt0QdETp+9HovOuN2qi/OqvBlZZ2ZQoP6I1OQgg/Arm
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10650"; a="336668267"
-X-IronPort-AV: E=Sophos;i="5.98,265,1673942400"; 
-   d="scan'208";a="336668267"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2023 05:56:11 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10650"; a="790277919"
-X-IronPort-AV: E=Sophos;i="5.98,265,1673942400"; 
-   d="scan'208";a="790277919"
-Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by fmsmga002.fm.intel.com with ESMTP; 16 Mar 2023 05:56:10 -0700
-From:   Yi Liu <yi.l.liu@intel.com>
-To:     alex.williamson@redhat.com, jgg@nvidia.com, kevin.tian@intel.com
-Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
-        eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
-        mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com,
-        yi.l.liu@intel.com, yi.y.sun@linux.intel.com, peterx@redhat.com,
-        jasowang@redhat.com, shameerali.kolothum.thodi@huawei.com,
-        lulu@redhat.com, suravee.suthikulpanit@amd.com,
-        intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
-        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com
-Subject: [PATCH v7 22/22] docs: vfio: Add vfio device cdev description
-Date:   Thu, 16 Mar 2023 05:55:34 -0700
-Message-Id: <20230316125534.17216-23-yi.l.liu@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230316125534.17216-1-yi.l.liu@intel.com>
-References: <20230316125534.17216-1-yi.l.liu@intel.com>
+        with ESMTP id S229744AbjCPM7h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Mar 2023 08:59:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FFE1B7892
+        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 05:58:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1678971440;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=aX2QqFfdjp7jgV9E+zVgtvevlOLcc7y3m2q5zGbplzo=;
+        b=D88Po9uHdf3MNwtBr54+APDmE8NJGrVeiHNay34FljH4yx5dsxyNhnydze7DvSuxmZzoYA
+        Wlg2dkcVZI5oT+H7JQ9mz0PV7GUhB4t5/wfnVsXO6JfnCprgiRLVxXAl0UEvaS/OkSa2lL
+        IFqNNVh4f8VY4mo+gPFuq7wUErCE/g8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-42-01_oZoozNNW7hOauhG_0vQ-1; Thu, 16 Mar 2023 08:57:19 -0400
+X-MC-Unique: 01_oZoozNNW7hOauhG_0vQ-1
+Received: by mail-wm1-f72.google.com with SMTP id t1-20020a7bc3c1000000b003dfe223de49so2586701wmj.5
+        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 05:57:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678971438;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aX2QqFfdjp7jgV9E+zVgtvevlOLcc7y3m2q5zGbplzo=;
+        b=f66Yjzf33sTsouanc8obLctcm0v4V9D5IE6x2Emvn0gL90C6o1JAFCVobMPSOiUp7/
+         Xo7dkPDChZS24e0vTBDu2vcbM/VjGvM6pR086dIC3SsAJEex+iVokZyfLBSTESi5byeg
+         Q3hP9IkCjzCwGciS/FFIC07DeN71CHIfyIVxqmHvFGSUtwEGfU8LqoMBtHG6aetUrOKZ
+         rrRld2xAv3pcFQ/A7iH1oHp1ixUlUOsuB1oIbrji/PkD9tFctSAqbKk39UOcBQn3y34p
+         HCysa1PNZ9/VLqbWuf50AE5HH/f6cMq6TaZ+dIVS7jCS609GWW8n4q0VD/n32yV6mk1x
+         Y42g==
+X-Gm-Message-State: AO0yUKUhlNQj2n2DM+/EzNn2SYOve9Qbz5UoZHz7XkTGGpe/HXMPIy5Y
+        AV9M8xmQWIRpG/BcOlXkS5qMXI3Xmf3R/tUNhS9qNJyOoSpsuwDgIIV+L02qwVdsWEPdJuQV+Lw
+        Z2s+nZCj6CJKS
+X-Received: by 2002:a05:6000:10c:b0:2d2:d324:e44f with SMTP id o12-20020a056000010c00b002d2d324e44fmr271726wrx.16.1678971438287;
+        Thu, 16 Mar 2023 05:57:18 -0700 (PDT)
+X-Google-Smtp-Source: AK7set/DVuxydZAtFqlh7no9cHVi1OrO/XtGtV8WY3e053BaX8Z97CrWK9FOKJ8lXi4bbekIK4OFJw==
+X-Received: by 2002:a05:6000:10c:b0:2d2:d324:e44f with SMTP id o12-20020a056000010c00b002d2d324e44fmr271709wrx.16.1678971438008;
+        Thu, 16 Mar 2023 05:57:18 -0700 (PDT)
+Received: from ?IPV6:2a09:80c0:192:0:5dac:bf3d:c41:c3e7? ([2a09:80c0:192:0:5dac:bf3d:c41:c3e7])
+        by smtp.gmail.com with ESMTPSA id x8-20020a5d60c8000000b002cea8664304sm7175075wrt.91.2023.03.16.05.57.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Mar 2023 05:57:17 -0700 (PDT)
+Message-ID: <6467e120-67d4-84c6-20cc-c6426ea9e877@redhat.com>
+Date:   Thu, 16 Mar 2023 13:57:16 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH v10 03/16] x86/virt/tdx: Make INTEL_TDX_HOST depend on
+ X86_X2APIC
+Content-Language: en-US
+To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     linux-mm@kvack.org, dave.hansen@intel.com, peterz@infradead.org,
+        tglx@linutronix.de, seanjc@google.com, pbonzini@redhat.com,
+        dan.j.williams@intel.com, rafael.j.wysocki@intel.com,
+        kirill.shutemov@linux.intel.com, ying.huang@intel.com,
+        reinette.chatre@intel.com, len.brown@intel.com,
+        tony.luck@intel.com, ak@linux.intel.com, isaku.yamahata@intel.com,
+        chao.gao@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+        bagasdotme@gmail.com, sagis@google.com, imammedo@redhat.com
+References: <cover.1678111292.git.kai.huang@intel.com>
+ <d1e1295070bf6b34180978748e2d4be337c24e57.1678111292.git.kai.huang@intel.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <d1e1295070bf6b34180978748e2d4be337c24e57.1678111292.git.kai.huang@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This gives notes for userspace applications on device cdev usage.
+On 06.03.23 15:13, Kai Huang wrote:
+> TDX capable platforms are locked to X2APIC mode and cannot fall back to
+> the legacy xAPIC mode when TDX is enabled by the BIOS.  TDX host support
+> requires x2APIC.  Make INTEL_TDX_HOST depend on X86_X2APIC.
+> 
+> Link: https://lore.kernel.org/lkml/ba80b303-31bf-d44a-b05d-5c0f83038798@intel.com/
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> Reviewed-by: Dave Hansen <dave.hansen@linux.intel.com>
+> ---
 
-Signed-off-by: Yi Liu <yi.l.liu@intel.com>
----
- Documentation/driver-api/vfio.rst | 125 ++++++++++++++++++++++++++++++
- 1 file changed, 125 insertions(+)
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-diff --git a/Documentation/driver-api/vfio.rst b/Documentation/driver-api/vfio.rst
-index 363e12c90b87..287e1bdede04 100644
---- a/Documentation/driver-api/vfio.rst
-+++ b/Documentation/driver-api/vfio.rst
-@@ -239,6 +239,123 @@ group and can access them as follows::
- 	/* Gratuitous device reset and go... */
- 	ioctl(device, VFIO_DEVICE_RESET);
- 
-+IOMMUFD and vfio_iommu_type1
-+----------------------------
-+
-+IOMMUFD is the new user API to manage I/O page tables from userspace.
-+It intends to be the portal of delivering advanced userspace DMA
-+features (nested translation [5], PASID [6], etc.) while being backward
-+compatible with the vfio_iommu_type1 driver.  Eventually vfio_iommu_type1
-+will be deprecated.
-+
-+With the backward compatibility, no change is required for legacy VFIO
-+drivers or applications to connect a VFIO device to IOMMUFD.
-+
-+	When CONFIG_IOMMUFD_VFIO_CONTAINER=n, VFIO container still provides
-+	/dev/vfio/vfio which connects to vfio_iommu_type1.  To disable VFIO
-+	container and vfio_iommu_type1, the administrator could symbol link
-+	/dev/vfio/vfio to /dev/iommu to enable VFIO container emulation
-+	in IOMMUFD.
-+
-+	When CONFIG_IOMMUFD_VFIO_CONTAINER=y, IOMMUFD directly provides
-+	/dev/vfio/vfio while the VFIO container and vfio_iommu_type1 are
-+	explicitly disabled.
-+
-+VFIO Device cdev
-+----------------
-+
-+Traditionally user acquires a device fd via VFIO_GROUP_GET_DEVICE_FD
-+in a VFIO group.
-+
-+With CONFIG_VFIO_DEVICE_CDEV=y the user can now acquire a device fd
-+by directly opening a character device /dev/vfio/devices/vfioX where
-+"X" is the number allocated uniquely by VFIO for registered devices.
-+
-+The cdev only works with IOMMUFD.  Both VFIO drivers and applications
-+must adapt to the new cdev security model which requires using
-+VFIO_DEVICE_BIND_IOMMUFD to claim DMA ownership before starting to
-+actually use the device.  Once BIND succeeds then a VFIO device can
-+be fully accessed by the user.
-+
-+VFIO device cdev doesn't rely on VFIO group/container/iommu drivers.
-+Hence those modules can be fully compiled out in an environment
-+where no legacy VFIO application exists.
-+
-+So far SPAPR does not support IOMMUFD yet.  So it cannot support device
-+cdev neither.
-+
-+Device cdev Example
-+-------------------
-+
-+Assume user wants to access PCI device 0000:6a:01.0::
-+
-+	$ ls /sys/bus/pci/devices/0000:6a:01.0/vfio-dev/
-+	vfio0
-+
-+This device is therefore represented as vfio0.  The user can verify
-+its existence::
-+
-+	$ ls -l /dev/vfio/devices/vfio0
-+	crw------- 1 root root 511, 0 Feb 16 01:22 /dev/vfio/devices/vfio0
-+	$ cat /sys/bus/pci/devices/0000:6a:01.0/vfio-dev/vfio0/dev
-+	511:0
-+	$ ls -l /dev/char/511\:0
-+	lrwxrwxrwx 1 root root 21 Feb 16 01:22 /dev/char/511:0 -> ../vfio/devices/vfio0
-+
-+Then provide the user with access to the device if unprivileged
-+operation is desired::
-+
-+	$ chown user:user /dev/vfio/devices/vfio0
-+
-+Finally the user could get cdev fd by::
-+
-+	cdev_fd = open("/dev/vfio/devices/vfio0", O_RDWR);
-+
-+An opened cdev_fd doesn't give the user any permission of accessing
-+the device except binding the cdev_fd to an iommufd.  After that point
-+then the device is fully accessible including attaching it to an
-+IOMMUFD IOAS/HWPT to enable userspace DMA::
-+
-+	struct vfio_device_bind_iommufd bind = {
-+		.argsz = sizeof(bind),
-+		.flags = 0,
-+	};
-+	struct iommu_ioas_alloc alloc_data  = {
-+		.size = sizeof(alloc_data),
-+		.flags = 0,
-+	};
-+	struct vfio_device_attach_iommufd_pt attach_data = {
-+		.argsz = sizeof(attach_data),
-+		.flags = 0,
-+	};
-+	struct iommu_ioas_map map = {
-+		.size = sizeof(map),
-+		.flags = IOMMU_IOAS_MAP_READABLE |
-+			 IOMMU_IOAS_MAP_WRITEABLE |
-+			 IOMMU_IOAS_MAP_FIXED_IOVA,
-+		.__reserved = 0,
-+	};
-+
-+	iommufd = open("/dev/iommu", O_RDWR);
-+
-+	bind.iommufd = iommufd; // negative value means vfio-noiommu mode
-+	ioctl(cdev_fd, VFIO_DEVICE_BIND_IOMMUFD, &bind);
-+
-+	ioctl(iommufd, IOMMU_IOAS_ALLOC, &alloc_data);
-+	attach_data.pt_id = alloc_data.out_ioas_id;
-+	ioctl(cdev_fd, VFIO_DEVICE_ATTACH_IOMMUFD_PT, &attach_data);
-+
-+	/* Allocate some space and setup a DMA mapping */
-+	map.user_va = (int64_t)mmap(0, 1024 * 1024, PROT_READ | PROT_WRITE,
-+				    MAP_PRIVATE | MAP_ANONYMOUS, 0, 0);
-+	map.iova = 0; /* 1MB starting at 0x0 from device view */
-+	map.length = 1024 * 1024;
-+	map.ioas_id = alloc_data.out_ioas_id;;
-+
-+	ioctl(iommufd, IOMMU_IOAS_MAP, &map);
-+
-+	/* Other device operations as stated in "VFIO Usage Example" */
-+
- VFIO User API
- -------------------------------------------------------------------------------
- 
-@@ -566,3 +683,11 @@ This implementation has some specifics:
- 				\-0d.1
- 
- 	00:1e.0 PCI bridge: Intel Corporation 82801 PCI Bridge (rev 90)
-+
-+.. [5] Nested translation is an IOMMU feature which supports two stage
-+   address translations.  This improves the address translation efficiency
-+   in IOMMU virtualization.
-+
-+.. [6] PASID stands for Process Address Space ID, introduced by PCI
-+   Express.  It is a prerequisite for Shared Virtual Addressing (SVA)
-+   and Scalable I/O Virtualization (Scalable IOV).
 -- 
-2.34.1
+Thanks,
+
+David / dhildenb
 
