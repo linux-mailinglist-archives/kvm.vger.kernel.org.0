@@ -2,66 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 422A56BD9AD
-	for <lists+kvm@lfdr.de>; Thu, 16 Mar 2023 20:58:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A86886BD9C4
+	for <lists+kvm@lfdr.de>; Thu, 16 Mar 2023 21:03:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230104AbjCPT6Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Mar 2023 15:58:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41808 "EHLO
+        id S230152AbjCPUDJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Mar 2023 16:03:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230079AbjCPT6N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Mar 2023 15:58:13 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96B01C2DB2
-        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 12:57:31 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 204-20020a2514d5000000b00a3637aea9e1so2944258ybu.17
-        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 12:57:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678996646;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6hZkF2wD5S148YOwsLKgyhW8hSKyz5z+vIxAoDqNEoU=;
-        b=ppopHHPSmlauEReZkK5sf465mFh6p3Uf5alXDjm/6jJiPejFz3RHB7aixjA2ozrvOi
-         LjIiAi2RABPxvySD7Ql+1dTFgTiDAABrEGBxcuHmTvN2QnJJqaMEmm//EYMn+z2kO/bY
-         CmbWGysimF0nov7NS8ciC0fRQ5IaNXJlk2BHJr3BmSi1LabFKkFEwy90ULpt9//mAQem
-         ttXH3ONv2j2YWZoLkIcJ2UTDoJ6pR2hXdifOR4fdTv/7X7W4WnprLdJyiCr/i3PL3YKK
-         allvt39YWr14dR2/4YRKS+ACYy7NUzOxfL0NeLmQ6PYa/DALfNx3f2DPgXpkhnnpw7b+
-         UwgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678996646;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6hZkF2wD5S148YOwsLKgyhW8hSKyz5z+vIxAoDqNEoU=;
-        b=zGzWll8tQN06enUu6XAUbu44yBHALxxUyhahB9HE3wkvDUV7WZvPMPdTDNjrve4VDt
-         Z3d+3aXyORxI2+LJdq+zzEVVH1tbKduymngopSfD84hrnorjnDmRyb1byW9vWtSDLk/k
-         Y06ONEI+MKlX/3fg+6S/PSfstRlICz2qeZUbaiMAZBg/+elA1vjPC0q0xufuGGbemuP3
-         Ja4cTxpRDopLIbKH4n9azhvtNWy5NJEmccZQ/IPjZuXA6W2Tf+GbFdJnSt8ehqnGfitZ
-         6cRpjcSYyvpDBeprbdhbQAxYFKZn7v7awOi1QoZ0KfJ/jUY0j+Ka74AKzJhY4ELUhMhy
-         sYLg==
-X-Gm-Message-State: AO0yUKXcCNqr1qsqt1kayN2o1QYL3mHI0/r7Uvdl1yxQxYNrCsNJulDq
-        I0NhEWm3PVS4/jc59F94UjRIXxEJv80=
-X-Google-Smtp-Source: AK7set90USqlvs8yez6D/amNzNA42LXhWOo0jeJaT0oOsHZyg7uk4XQQlogtskg3otXzxSL5LVe+YTvWptQ=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:208:b0:a98:bd27:91de with SMTP id
- j8-20020a056902020800b00a98bd2791demr28961776ybs.7.1678996646536; Thu, 16 Mar
- 2023 12:57:26 -0700 (PDT)
-Date:   Thu, 16 Mar 2023 19:57:24 +0000
-In-Reply-To: <6b9e8589281c4d2bae46eba36f77afe7@huawei.com>
-Mime-Version: 1.0
-References: <20230316154554.1237-1-shameerali.kolothum.thodi@huawei.com>
- <ZBNLnp7c1JvDsmHm@google.com> <6b9e8589281c4d2bae46eba36f77afe7@huawei.com>
-Message-ID: <ZBN0pFN/nF8G3fWl@google.com>
-Subject: Re: [PATCH] KVM: Add the missing stub function for kvm_dirty_ring_check_request()
-From:   Sean Christopherson <seanjc@google.com>
-To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "gshan@redhat.com" <gshan@redhat.com>,
-        "maz@kernel.org" <maz@kernel.org>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        with ESMTP id S230206AbjCPUDC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Mar 2023 16:03:02 -0400
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4AEDE6FED
+        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 13:02:42 -0700 (PDT)
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32GJcsVP007164;
+        Thu, 16 Mar 2023 20:02:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2022-7-12; bh=K2tTRCBTFgWKZRE+CjN2+VcYa2XGwn2b4xFiJselsG0=;
+ b=09vjdVOOV0aBRLqD42WNQnkHUeiqm3K6gZdGio8OXHg46Fd3dsrUEys+0vUCxfTVgm6j
+ xXiqaPLNXMkrK+Y4inf6uNPIEbjy8pR8sfKAMoYR9pNKwSivyR6eNUCoElEhwC7udJuj
+ MX9RW8TeItrTOcbW6Y3zB/PahnBOwhH7FHk678ikc2pfTPuvKXvpUuc2gwIMl6HXKvcb
+ Oeeeqhth7IduZvYlYb7TK0WzGmTt13+U5c0aeSG/wrJmE7SrGW5Q8kvqQj6iEDg3fsLw
+ KqjfN0BgyJ+Ak3qALmrP+yZYnN4byLfskJJUU6qWQ+TAfH4d0N/+Qz5Nzgx2sAcyYwtl pA== 
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3pbs29t4aq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 16 Mar 2023 20:02:30 +0000
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 32GJPNh0020511;
+        Thu, 16 Mar 2023 20:02:29 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3pbq46u5xd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 16 Mar 2023 20:02:29 +0000
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32GK2TML028656;
+        Thu, 16 Mar 2023 20:02:29 GMT
+Received: from joaomart-mac.uk.oracle.com (dhcp-10-175-172-105.vpn.oracle.com [10.175.172.105])
+        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3pbq46u5v8-1;
+        Thu, 16 Mar 2023 20:02:28 +0000
+From:   Joao Martins <joao.m.martins@oracle.com>
+To:     iommu@lists.linux.dev
+Cc:     Joerg Roedel <joro@8bytes.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Vasant Hegde <vasant.hegde@amd.com>,
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
+        kvm@vger.kernel.org, Joao Martins <joao.m.martins@oracle.com>
+Subject: [PATCH v2 0/2] iommu/amd: Fix GAM IRTEs affinity and GALog restart
+Date:   Thu, 16 Mar 2023 20:02:17 +0000
+Message-Id: <20230316200219.42673-1-joao.m.martins@oracle.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-16_13,2023-03-16_02,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxscore=0 phishscore=0
+ suspectscore=0 spamscore=0 malwarescore=0 mlxlogscore=692 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2303150002
+ definitions=main-2303160152
+X-Proofpoint-GUID: GItetolSoMqg8DIMyiq862UGiwdLBd3J
+X-Proofpoint-ORIG-GUID: GItetolSoMqg8DIMyiq862UGiwdLBd3J
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,23 +76,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 16, 2023, Shameerali Kolothum Thodi wrote:
-> > From: Sean Christopherson [mailto:seanjc@google.com]
-> > On Thu, Mar 16, 2023, Shameer Kolothum wrote:
-> > > The stub for !CONFIG_HAVE_KVM_DIRTY_RING case is missing.
-> > 
-> > No stub is needed.  kvm_dirty_ring_check_request() isn't called from
-> > common code,
-> > and should not (and isn't unless I'm missing something) be called from arch
-> > code
-> > unless CONFIG_HAVE_KVM_DIRTY_RING=y.
-> > 
-> > x86 and arm64 are the only users, and they both select
-> > HAVE_KVM_DIRTY_RING
-> > unconditionally when KVM is enabled.
-> 
-> Yes, it is at present not called from anywhere other than x86 and arm64.
-> But I still think since it is a common helper, better to have a stub.
+Hey,
 
-Why?  It buys us nothing other than dead code, and even worse it could let a bug
-that would otherwise be caught during build time escape to run time.
+This small series expands from v1 with one more patch:
+
+Patch 1) Fix affinity changes to already-in-guest-mode IRTEs which would
+         otherwise be nops.
+
+Patch 2) Handle the GALog overflow condition by restarting it
+
+I have a follow-up 3-patch series but being an potential optimization[0]
+I prefer making it separate. This series just tackles bugs.
+
+Comments appreciated.
+
+Thanks,
+	Joao
+
+Changes since v1[1]:
+- Adjust commit message in first patch (Suravee)
+- Add Rb in the first patch (Suravee)
+
+[0] https://lore.kernel.org/linux-iommu/b39d505c-8d2b-d90b-f52d-ceabde8225cf@oracle.com/
+[1] https://lore.kernel.org/linux-iommu/20230208131938.39898-1-joao.m.martins@oracle.com/
+
+Joao Martins (2):
+  iommu/amd: Don't block updates to GATag if guest mode is on
+  iommu/amd: Handle GALog overflows
+
+ drivers/iommu/amd/amd_iommu.h |  1 +
+ drivers/iommu/amd/init.c      | 24 ++++++++++++++++++++++++
+ drivers/iommu/amd/iommu.c     | 11 +++++++++--
+ 3 files changed, 34 insertions(+), 2 deletions(-)
+
+-- 
+2.17.2
+
