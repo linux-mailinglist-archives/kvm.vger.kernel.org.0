@@ -2,169 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E20806BD857
-	for <lists+kvm@lfdr.de>; Thu, 16 Mar 2023 19:46:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C9F46BD8AD
+	for <lists+kvm@lfdr.de>; Thu, 16 Mar 2023 20:13:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229707AbjCPSq2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Mar 2023 14:46:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49352 "EHLO
+        id S230131AbjCPTNG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Mar 2023 15:13:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229644AbjCPSq1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Mar 2023 14:46:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBA9A60D63
-        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 11:45:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678992338;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=msB9Vqg/JhQndpd4enpDX7wLYe89HC8KUPhwlSyu4MY=;
-        b=Z3CwF+grJMnG7gnbuW48sWwUL9lHI2fCCA0GuhM7kD/bDgJ+vC+tVRdMGTL6m+8inD/CD8
-        E9VE8FBcCdagUi+HgsZHynB6UP+c9T9XxhdUKdok9kX4SsSjctW9L17nb8AA+wA43DEpux
-        oOtO/RIJQiNBVLBeP4YwffbXBISvSco=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-652-_miWvsI-P5y3iM1Hpx5XwQ-1; Thu, 16 Mar 2023 14:45:36 -0400
-X-MC-Unique: _miWvsI-P5y3iM1Hpx5XwQ-1
-Received: by mail-io1-f71.google.com with SMTP id a21-20020a5d9595000000b0074c9dc19e16so1335963ioo.15
-        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 11:45:36 -0700 (PDT)
+        with ESMTP id S230125AbjCPTNF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Mar 2023 15:13:05 -0400
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 446D937731
+        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 12:12:58 -0700 (PDT)
+Received: by mail-io1-f70.google.com with SMTP id u23-20020a6be917000000b007532ab65c70so1259149iof.12
+        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 12:12:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678992335;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=msB9Vqg/JhQndpd4enpDX7wLYe89HC8KUPhwlSyu4MY=;
-        b=O9Erlq7Jqm/I3FQNERhfbpG0MGc1EDkwshV7Ov4PVYWgcFf7oa9CPNFTQnF6oeC7LK
-         3Bj+guDDSO5kJnDUkjiGmbjpOpOufRQmImMoCLR7ZVpoKWUA8pLM3eo26sYoLSi582iD
-         qzdgbCPHYp0xje/Y47LcDcxUCgzyDIDxXKlHRLvR1LWT4i0Dq7J7jIXfGTlPo6ZcjavV
-         fztTHSi7gL30wTfjDokWcUHzhiAY2LEbs/jpYsHF15VzGqvf2Uk9hJB28pHy2K4cyLE3
-         hS2aHoFDCokeM9VpIzjVdB1HV1MPX48gk7LtEp46HesdPE9Fq2nH2JYFAz2w6PGWt7rk
-         4DQA==
-X-Gm-Message-State: AO0yUKUb8vrT+Cruf/gq2SpsAtAgoJwcz9Zeh4JiM9CrZlVY0q9EBHo/
-        ukm//K+zN+HIHd9emPcM46qCM1d+CK30ydgZT2KaISozquLHOvO1XQSUsoOEfnjqL8hDKZD4ltS
-        tBya57ShMjNuL
-X-Received: by 2002:a92:d091:0:b0:315:365d:534f with SMTP id h17-20020a92d091000000b00315365d534fmr8191860ilh.19.1678992335752;
-        Thu, 16 Mar 2023 11:45:35 -0700 (PDT)
-X-Google-Smtp-Source: AK7set9qQgqeAlftnpNauE2CjihQfPZJZ5OsDTnDHp/jf0ze+wvxzL6P4lb2qI9dZoMDXrMloIqAiw==
-X-Received: by 2002:a92:d091:0:b0:315:365d:534f with SMTP id h17-20020a92d091000000b00315365d534fmr8191844ilh.19.1678992335398;
-        Thu, 16 Mar 2023 11:45:35 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id m14-20020a02c88e000000b004050767f779sm2680270jao.164.2023.03.16.11.45.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Mar 2023 11:45:34 -0700 (PDT)
-Date:   Thu, 16 Mar 2023 12:45:32 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Hao, Xudong" <xudong.hao@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>
-Subject: Re: [PATCH v6 12/24] vfio/pci: Allow passing zero-length fd array
- in VFIO_DEVICE_PCI_HOT_RESET
-Message-ID: <20230316124532.30839a94.alex.williamson@redhat.com>
-In-Reply-To: <BN9PR11MB5276300FCAAF8BF7B4E03BA48CBF9@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20230308132903.465159-1-yi.l.liu@intel.com>
-        <20230308132903.465159-13-yi.l.liu@intel.com>
-        <20230315165311.01f32bfe.alex.williamson@redhat.com>
-        <BN9PR11MB5276300FCAAF8BF7B4E03BA48CBF9@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        d=1e100.net; s=20210112; t=1678993977;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=U7xPE9eHjZFiRatnko2u5b3DgPyVKb9Z04I4THxWcHA=;
+        b=YGrMsRPMZNg3LEJfT3iF6Giq1CDHIDF8Yc2bTOBOHwtzGBoxKyiJ26kfluk6dxvyDj
+         ea+7uorz3YUcrNx5z7qebiijsOKbgcE1e1qXjIcaFoe2r9+xlhEV23JEeyAVR/3qbhmd
+         5uRfQrRJ6EjeJUTk8qDqlVFmqs5+clv5eJjia0RBOGMcJJnwZgZPF4sUg34balKMF4SR
+         9h2oN6dlXeXWhAUAlB3O8rkgUfM23MTBslDXfNj+BB20V2VbWqechlDWQ97Hifykfg7s
+         zo1jTsuooQlf18iJRl7cg+rybwrcyG3to53V6AGSyFuTN/v951D5r3vfrKGY3oMpRpCM
+         hULA==
+X-Gm-Message-State: AO0yUKVGYOW7IDP6eawJrlhbiXN2UkBcksZu3gbqpQkTm8O21gbFgKiI
+        VJgiOCLayb5MJsiGDNplWLOyZ/BamjI2SVQ342Wcw7D7ZR2z
+X-Google-Smtp-Source: AK7set8iENLiJJcuU7KGbv5SPcslX1Xx8ih7ZxAYfEeQTB2zuyrWs36a2NISGBtPQ+8fuCG/DGR7CBdQCLGobTFBZ47UUIQ60c/S
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-Received: by 2002:a5d:9a96:0:b0:745:c41a:8f0f with SMTP id
+ c22-20020a5d9a96000000b00745c41a8f0fmr69348iom.2.1678993977437; Thu, 16 Mar
+ 2023 12:12:57 -0700 (PDT)
+Date:   Thu, 16 Mar 2023 12:12:57 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000009af47405f7093fc6@google.com>
+Subject: [syzbot] [kvm?] WARNING in kvm_arch_vcpu_ioctl_run (4)
+From:   syzbot <syzbot+8accb43ddc6bd1f5713a@syzkaller.appspotmail.com>
+To:     bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        jarkko@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-sgx@vger.kernel.org,
+        mingo@redhat.com, pbonzini@redhat.com, seanjc@google.com,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+        SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 15 Mar 2023 23:31:23 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
+Hello,
 
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Thursday, March 16, 2023 6:53 AM
-> > 
-> > On Wed,  8 Mar 2023 05:28:51 -0800
-> > Yi Liu <yi.l.liu@intel.com> wrote:
-> >   
-> > > This is another method to issue PCI hot reset for the users that bounds
-> > > device to a positive iommufd value. In such case, iommufd is a proof of
-> > > device ownership. By passing a zero-length fd array, user indicates kernel
-> > > to do ownership check with the bound iommufd. All the opened devices  
-> > within  
-> > > the affected dev_set should have been bound to the same iommufd. This is
-> > > simpler and faster as user does not need to pass a set of fds and kernel
-> > > no need to search the device within the given fds.  
-> > 
-> > Couldn't this same idea apply to containers?  
-> 
-> User is allowed to create multiple containers. Looks we don't have a way
-> to check whether multiple containers belong to the same user today.
+syzbot found the following issue on:
 
-No, but a common configuration is that all devices are in the same
-container, ie. no-vIOMMU, and it's also rather common that when we have
-multi-function devices, all functions are within the same IOMMU group
-and therefore necessarily require the same address space and therefore
-container.
+HEAD commit:    ee3f96b16468 Merge tag 'nfsd-6.3-1' of git://git.kernel.or..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=11622f64c80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=cab35c936731a347
+dashboard link: https://syzkaller.appspot.com/bug?extid=8accb43ddc6bd1f5713a
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15bd61acc80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17402eb0c80000
 
-> > I'm afraid this proposal reduces or eliminates the handshake we have
-> > with userspace between VFIO_DEVICE_GET_PCI_HOT_RESET_INFO and
-> > VFIO_DEVICE_PCI_HOT_RESET, which could promote userspace to ignore the
-> > _INFO ioctl altogether, resulting in drivers that don't understand the
-> > scope of the reset.  Is it worth it?  What do we really gain?  
-> 
-> Jason raised the concern whether GET_PCI_HOT_RESET_INFO is actually
-> useful today.
-> 
-> It's an interface on opened device. So the tiny difference is whether the
-> user knows the device is resettable when calling GET_INFO or later when
-> actually calling PCI_HOT_RESET.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/a7ac3e540d6d/disk-ee3f96b1.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/604b5042d73d/vmlinux-ee3f96b1.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/5a6d400b42b5/bzImage-ee3f96b1.xz
 
-No, GET_PCI_HOT_RESET_INFO conveys not only whether a PCI_HOT_RESET can
-be performed, but equally important the scope of the reset, ie. which
-devices are affected by the reset.  If we de-emphasize the INFO
-portion, then this easily gets confused as just a variant of
-VFIO_DEVICE_RESET, which is explicitly a device-level cscope reset.  In
-fact, I'd say the interface is not only trying to validate that the
-user has sufficient privileges for the reset, but that they explicitly
-acknowledge the scope of the reset.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+8accb43ddc6bd1f5713a@syzkaller.appspotmail.com
 
-> and with this series we also allow reset on affected devices which are not
-> opened. Such dynamic cannot be reflected in static GET_INFO. More
-> suitable a try-and-fail style.
+kvm_intel: KVM_SET_TSS_ADDR needs to be called before running vCPU
+kvm_intel: set kvm_intel.dump_invalid_vmcs=1 to dump internal KVM state.
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 5082 at arch/x86/kvm/x86.c:11060 kvm_arch_vcpu_ioctl_run+0x2464/0x2af0 arch/x86/kvm/x86.c:11060
+Modules linked in:
+CPU: 0 PID: 5082 Comm: syz-executor178 Not tainted 6.2.0-syzkaller-13115-gee3f96b16468 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/16/2023
+RIP: 0010:kvm_arch_vcpu_ioctl_run+0x2464/0x2af0 arch/x86/kvm/x86.c:11060
+Code: 74 c3 00 e9 2f de ff ff 48 c7 c7 80 45 78 8e e8 02 74 c3 00 e9 a9 dc ff ff e8 38 f8 71 00 0f 0b e9 6c e0 ff ff e8 2c f8 71 00 <0f> 0b e9 a4 e0 ff ff e8 20 f8 71 00 be 08 00 00 00 65 48 8b 1c 25
+RSP: 0018:ffffc90003b4fcb0 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: 0000000000000001 RCX: 0000000000000000
+RDX: ffff8880236e0000 RSI: ffffffff81130274 RDI: 0000000000000005
+RBP: ffff888021798000 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000000 R12: 0000000000000000
+R13: ffffc90003bfac90 R14: ffff88802319a8c0 R15: ffff8880217982ec
+FS:  000055555600f300(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 0000000073d95000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ kvm_vcpu_ioctl+0x574/0xfe0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4099
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x197/0x210 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7ff9dc1b2289
+Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffcad58a378 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007ff9dc1b2289
+RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000005
+RBP: 00007ff9dc175ce0 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007ff9dc175d70
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+ </TASK>
 
-Resets have side-effects, obviously, so this isn't the sort of thing we
-can simply ask the user to probe for.  I agree that dynamics can
-change, the GET_PCI_HOT_RESET_INFO is a point in time, isolated
-functions on the same bus can change ownership.  However, in practice,
-and in its primary use case with GPUs without isolation, it's
-sufficiently static.  So I think this is a mischaracterization.  Thanks,
 
-Alex
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
