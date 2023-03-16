@@ -2,245 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C7BF6BC2D3
-	for <lists+kvm@lfdr.de>; Thu, 16 Mar 2023 01:33:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D45CE6BC2D9
+	for <lists+kvm@lfdr.de>; Thu, 16 Mar 2023 01:35:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233419AbjCPAdX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 20:33:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35070 "EHLO
+        id S233349AbjCPAfQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 20:35:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233235AbjCPAcO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 20:32:14 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B7419EF53
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 17:31:39 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id a10-20020a056a000c8a00b005fc6b117942so182315pfv.2
-        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 17:31:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678926692;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YxU1hhaZ4SyfL9lxoIcMNBPPAq0yfPS0xuipesTDclo=;
-        b=W0G3AmVBhmaEPW1mzeOzfktEstHk/ayT4Fca4WpYB+uqnQXqFONecZpHfNEM3EVkI8
-         dMoU+aBolGRnKrvqkSWbCeJFkilUlbcTqWcVH0y2O7kmHEk9EOK0BEV0KFKuPFrnCkbs
-         QOotzJYDWHJggJes5/KIvM96osSnaCvae3qKB3LUHRBB+uNwEOmmHmd8zvTbRGoEVjUL
-         rVFdyBsTEprlo4ciiWa3+M8yKhD16Tn+oY0bqfI0h7Rz5RgpgT08FQynab2lujb51lp7
-         x7X7TlFctPEGFqxyshGyufJ1XL1Zen+FPj5jvwOG/5BAnYWpY1i72h9z5SjlNs7jYsNa
-         hwdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678926692;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YxU1hhaZ4SyfL9lxoIcMNBPPAq0yfPS0xuipesTDclo=;
-        b=HtQkUBXFUS2HTZIXWGFsaiunVzhqF2Su3MnXcSeaScsmO8BhN0WOaOitUtLupzQXFg
-         ouUNBzUhvGQqAqubNi6KsaA6iNTe+iDeBvdlZ+Rg/DmB9N6VR/imJLCDs5NyW99Jn75S
-         CepKH0KNU7JFoiCEHPyqdNqZFE7VoWdi40tTfwjYi3uhA86uo8iF7eMX+OqVLrvnGm5N
-         tmKM9xl+YmVoY9McegfH7SwADFprYIZHgpffQd0FeXkV95PbMpmjw8DoddRzP9wdJA3o
-         4oyI0Vsi0QG0PqSCCwVm5ku0vstEKCX5u/QZNeieMTpJiaZwiv+SsSBsyEpbJh0KwKLk
-         qPew==
-X-Gm-Message-State: AO0yUKX7cHNIMNFHYeCklwVK6ZvXcMDxEIgNgEWxmRvpOYAsoh2BHT2/
-        anpC3vfUsUPn1hHAqcuN+C84FGoiFbrcuUknN0LmVE2CUrj3PvtasYJNYKuel+jPisso8nOK5CH
-        +5JhjVMjMz/Mmm36nltaFJFP/ED8Jwru4wVfnQJBTYrOGZXIscc1SlENykB9kg4UHmPzWW/M=
-X-Google-Smtp-Source: AK7set/r1L80ZGqvN1Jqjj7ZwUbt+f+1AOqGwiuE9AJvattpTxM2ZIa1Wyqx7LP6pavKwLlYqhK3jR4rdgiNHjRokg==
-X-Received: from ackerleytng-cloudtop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1f5f])
- (user=ackerleytng job=sendgmr) by 2002:a65:530d:0:b0:502:fd12:83ce with SMTP
- id m13-20020a65530d000000b00502fd1283cemr347381pgq.5.1678926691968; Wed, 15
- Mar 2023 17:31:31 -0700 (PDT)
-Date:   Thu, 16 Mar 2023 00:31:03 +0000
-In-Reply-To: <cover.1678926164.git.ackerleytng@google.com>
-Mime-Version: 1.0
-References: <cover.1678926164.git.ackerleytng@google.com>
-X-Mailer: git-send-email 2.40.0.rc2.332.ga46443480c-goog
-Message-ID: <90aaa4ab85fa5e3d5641793e2a4873282eb16556.1678926164.git.ackerleytng@google.com>
-Subject: [RFC PATCH 10/10] KVM: selftests: Test KVM exit behavior for private memory/access
-From:   Ackerley Tng <ackerleytng@google.com>
-To:     kvm@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, qemu-devel@nongnu.org
-Cc:     aarcange@redhat.com, ak@linux.intel.com, akpm@linux-foundation.org,
-        arnd@arndb.de, bfields@fieldses.org, bp@alien8.de,
-        chao.p.peng@linux.intel.com, corbet@lwn.net, dave.hansen@intel.com,
-        david@redhat.com, ddutile@redhat.com, dhildenb@redhat.com,
-        hpa@zytor.com, hughd@google.com, jlayton@kernel.org,
-        jmattson@google.com, joro@8bytes.org, jun.nakajima@intel.com,
-        kirill.shutemov@linux.intel.com, linmiaohe@huawei.com,
-        luto@kernel.org, mail@maciej.szmigiero.name, mhocko@suse.com,
-        michael.roth@amd.com, mingo@redhat.com, naoya.horiguchi@nec.com,
-        pbonzini@redhat.com, qperret@google.com, rppt@kernel.org,
-        seanjc@google.com, shuah@kernel.org, steven.price@arm.com,
-        tabba@google.com, tglx@linutronix.de, vannapurve@google.com,
-        vbabka@suse.cz, vkuznets@redhat.com, wanpengli@tencent.com,
-        wei.w.wang@intel.com, x86@kernel.org, yu.c.zhang@linux.intel.com,
-        Ackerley Tng <ackerleytng@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S233493AbjCPAez (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 20:34:55 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2060d.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe5b::60d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F566A9095;
+        Wed, 15 Mar 2023 17:33:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eo679m0dWIaJ4qFJmYk2pAZW3BLZPwFYvVt5b7+0i+6sQfr5f1tgdaW+gDSQKDGOp2fTSLkph/tk3e/pCinKjZtAw0mHePG7VHVFncIcBI6puOtla6AK7xZQUQWukAmN1GpU3dhcHpGLcTlIPdDW2CkJ6mLZn98euWwT805xj6dVhhr0+ZBMJ1fZEXwUAfWmyGqrzLEy7GwAKpvornfjiVuLxoEUdQ6kzsNt3ceEc7Jl4kN7Na7tnTr5XPiLkbbzy8zsDBwuFz/J9OHIW8qT0GFVpFH5DQ23pFmCMApx02k90A8cZ+vuNT6aT823Sq9CLvggNW47F1ca3LoI2Mi2zA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=33B6XREyMQcmfv+Q4YX892Beq/6N4/SKTLkDK3aodEk=;
+ b=WH7gU2fWQ01GOYQKWCroejZ/vKjvT3++Rp1BBDXCFkQu4HqEz0betShsjy+f3Ix8bg1t1DY18Cak5Ga2inC+yLRoQP/pCn2bsKOj5/1gwFVSHgeCzTh8gK3cnVwScvmMeLlkRozPtuFZrZyLWD808Y7ub0Q5uWSIHxxIOtAmEAh1BFrlNxO7gePQBfqa7ONjSO7j9lYQwthlRZ6omlVtbYZDMlJuvNdNvLib/f0+/CQY6aYFc3nZSLywUV/2lpORzXdmH1KiPSp0Nvl9vzosRUKhLP1cYKT50xE3ydXaJKIcHlQRCtIul1ERPfs/boRxg5QJibXv3yWZ6iRu/mLh+Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=33B6XREyMQcmfv+Q4YX892Beq/6N4/SKTLkDK3aodEk=;
+ b=V5XU6OV1afY2BfVkljejKd95OjzjCAjvYGIwodGmxPX3zO6OzlRTNIdOklzybaazosXnvY4F3Dv5wfkx/6zTIcRA+TVM5e3pVabqDEpvCKoA0s+HpBi8Vm2BGq+y740uNOAKm9rBQDh4A173Fv31hX6vYGXQvRfP6z21HevvmETBProX1XLSplqbtauLkbYHEHsPK09BZebvnEIHpRMbC1HVuATq7ZvKrJfyVHmo5qj/Nw/izHF8GnKrJXBSj/Ys5KrA3lyr1fQnnRxhyxK1iRJDo/3aZSfUgr2mKA3pIiI51DMclhxoXxJX8HK62xFZtOsqLUtCjb+xNAckF/6dzw==
+Received: from DS7PR05CA0102.namprd05.prod.outlook.com (2603:10b6:8:56::22) by
+ IA1PR12MB6113.namprd12.prod.outlook.com (2603:10b6:208:3eb::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6178.26; Thu, 16 Mar 2023 00:32:53 +0000
+Received: from DM6NAM11FT006.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:8:56:cafe::73) by DS7PR05CA0102.outlook.office365.com
+ (2603:10b6:8:56::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.29 via Frontend
+ Transport; Thu, 16 Mar 2023 00:32:53 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ DM6NAM11FT006.mail.protection.outlook.com (10.13.173.104) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6199.11 via Frontend Transport; Thu, 16 Mar 2023 00:32:52 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Wed, 15 Mar 2023
+ 17:32:44 -0700
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Wed, 15 Mar
+ 2023 17:32:44 -0700
+Received: from Asurada-Nvidia (10.127.8.9) by mail.nvidia.com (10.129.68.7)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5 via Frontend
+ Transport; Wed, 15 Mar 2023 17:32:42 -0700
+Date:   Wed, 15 Mar 2023 17:32:41 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+CC:     Jason Gunthorpe <jgg@nvidia.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>
+Subject: Re: [PATCH v1 1/5] iommufd: Create access in
+ vfio_iommufd_emulated_bind()
+Message-ID: <ZBJjqfdUehQyJhJM@Asurada-Nvidia>
+References: <20230308131340.459224-1-yi.l.liu@intel.com>
+ <20230308131340.459224-2-yi.l.liu@intel.com>
+ <ZAtqlnCk7uccR5E7@nvidia.com>
+ <ZBAuXo166M+z8b3z@Asurada-Nvidia>
+ <ZBEY49XtiFUImfe4@Asurada-Nvidia>
+ <BN9PR11MB5276738DC59AC1B4A66AB3C38CBF9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZBFmh2iAqGGb8CjK@Asurada-Nvidia>
+ <BN9PR11MB52765D7977F987960072482E8CBF9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZBGJzefTm4p/ReIu@Asurada-Nvidia>
+ <DS0PR11MB752992285621A36585AEAB2BC3BF9@DS0PR11MB7529.namprd11.prod.outlook.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <DS0PR11MB752992285621A36585AEAB2BC3BF9@DS0PR11MB7529.namprd11.prod.outlook.com>
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT006:EE_|IA1PR12MB6113:EE_
+X-MS-Office365-Filtering-Correlation-Id: a748221f-a16f-4a4d-cd10-08db25b5fad1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: bKFRgn2QdMVW5TKLaItOFN0YYmmgs9MdTA6W4nVh3H8ukBVjDGOEZ1T2yehmfawqiaSenuEvsfRcufwOUAGR4G0ragsW7mWBTNxEXwDof5dSqCuihvBJz0WnpohRNgiPbKnw0E4h5l20tBC2m5QQnC+LCKJLjOhvi3RdgxoH+KhARkLL4Shh7gDAl/5sYXLJYPogl5V9O8N+qOYH61deivpdBy8te7bcpdHj4TjGTyRavh0N7Awy9B4j8+/QEQO6DsOG7Cj8wA9//eom/epajX5f+uvZgppaKCEmqlkUrlLbgjlcEszZ9tr1qza6Q26yrf49WuLf8lsgtGkssMdX1glxtDpWF2Qo80JpElZxN7baR7Bqy2R6Wid5mrdTetpXSh/GRbqEwEgKeaPNH7mmfmY0JZ3zETMrkFMj/zoiXskHMUTY8Ez5kRPTebnGrdmT73tEDZ3ulNqp4kWSUYIeW+VyXkovXQdaRi32j4AMXX+b2ars1gZ1Eng8HX4WrzV5EiYak1Oi0zuImUnj2/P3GXFfU5+pBqByqVmHnoQhkndGHpGA9SgqSupJgRpqJFgFLluQCws97jBJH5RQ4TRn1m88AUJKPxd9hasoJkdIeYHL2M/lEoRn+ZhDGomclJc9PtVXgT1+vRl2bA7AKBLuEeHG+3orsAhLqxPb7jB8Us4kixDVpGspsliSiHvI6S7i80x0//TR+/HZqp5NuO47jHCSJKaX/ikniMm4/Xj+M1Dsr3V4sjfrmJkWydfcx+FA7LsxjRNG4cuqzIB+X8LjlLtP9nD8eOOZ7MrXcc2c3ha46oQjsiKLWSbqNWMdkj9IB8bK38Q/ip3fztIuBxKEQQ==
+X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230025)(4636009)(136003)(376002)(39860400002)(346002)(396003)(451199018)(36840700001)(40470700004)(46966006)(356005)(36860700001)(7636003)(82740400003)(7416002)(8936002)(41300700001)(2906002)(5660300002)(40480700001)(55016003)(33716001)(82310400005)(9686003)(86362001)(186003)(26005)(478600001)(54906003)(83380400001)(336012)(426003)(47076005)(316002)(70206006)(966005)(6916009)(40460700003)(4326008)(70586007)(8676002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Mar 2023 00:32:52.9012
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: a748221f-a16f-4a4d-cd10-08db25b5fad1
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT006.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6113
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-"Testing private access when memslot gets deleted" tests the behavior
-of KVM when a private memslot gets deleted while the VM is using the
-private memslot. When KVM looks up the deleted (slot = NULL) memslot,
-KVM should exit to userspace with KVM_EXIT_MEMORY_FAULT.
+On Wed, Mar 15, 2023 at 12:18:01PM +0000, Liu, Yi L wrote:
+> > OK. Basically I followed what Jason suggested by having three
+> > APIs and combined Kevin's inputs about the difference between
+> > the attach/replace(). I also updated the replace changes, and
+> > rebased all nesting (infrastructure, VT-d and SMMU):
+> > https://github.com/nicolinc/iommufd/commits/wip/iommufd_nesting-03142023
+> >
+> > The major three changes for those APIs:
+> > [1] This adds iommufd_access_attach() in this series:
+> >     "iommufd: Create access in vfio_iommufd_emulated_bind()"
+> >
+> > https://github.com/nicolinc/iommufd/commit/34fba7509429380f828fb23dc
+> > ca5ceaeb40e22b5
+> > [2] This adds iommufd_access_detach() in the cdev series:
+> >     "iommufd/device: Add iommufd_access_detach() API"
+> >
+> > https://github.com/nicolinc/iommufd/commit/4110522146ca1fc0d5321c04a
+> > 097e2c9d9e26af4
+> > [3] This adds iommufd_access_replace() in the replace series:
+> >     "iommufd: Add iommufd_access_replace() API"
+> >
+> > https://github.com/nicolinc/iommufd/commit/36507fa9f0f42cf1a5bebe7c9
+> > bc2bf319b7654a8
+> >
+> > Please check if they look okay, so that Yi can integrate them
+> > accordingly to the emulated/cdev series.
+> 
+> Thanks. I'll start to integrate after ack from Kevin or Jason. btw.
+> Below is my latest code (rebased on top of rc-2). 😊
+> 
+> https://github.com/yiliu1765/iommufd/tree/wip/vfio_device_cdev_v7_candidate
 
-In the second test, upon a private access to non-private memslot, KVM
-should also exit to userspace with KVM_EXIT_MEMORY_FAULT.
+Jason is travelling per his email in the iommufd group. Perhaps
+Kevin can help us here. After that, we can integrate a version
+and (if necessary) rework a bit after Jason comes back. Overall
+I think they are pretty close to what Jason suggested.
 
-Signed-off-by: Ackerley Tng <ackerleytng@google.com>
----
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../kvm/x86_64/private_mem_kvm_exits_test.c   | 124 ++++++++++++++++++
- 2 files changed, 125 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/private_mem_kvm_exits_test.c
-
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index bafee3c43b2e..0ad588852a1d 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -80,6 +80,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/nested_exceptions_test
- TEST_GEN_PROGS_x86_64 += x86_64/platform_info_test
- TEST_GEN_PROGS_x86_64 += x86_64/pmu_event_filter_test
- TEST_GEN_PROGS_x86_64 += x86_64/private_mem_conversions_test
-+TEST_GEN_PROGS_x86_64 += x86_64/private_mem_kvm_exits_test
- TEST_GEN_PROGS_x86_64 += x86_64/set_boot_cpu_id
- TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
- TEST_GEN_PROGS_x86_64 += x86_64/smaller_maxphyaddr_emulation_test
-diff --git a/tools/testing/selftests/kvm/x86_64/private_mem_kvm_exits_test.c b/tools/testing/selftests/kvm/x86_64/private_mem_kvm_exits_test.c
-new file mode 100644
-index 000000000000..c8667dfbbf0a
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/private_mem_kvm_exits_test.c
-@@ -0,0 +1,124 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2022, Google LLC.
-+ */
-+#include "kvm_util_base.h"
-+#include <linux/kvm.h>
-+#include <pthread.h>
-+#include <stdint.h>
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "test_util.h"
-+
-+/* Arbitrarily selected to avoid overlaps with anything else */
-+#define EXITS_TEST_GVA 0xc0000000
-+#define EXITS_TEST_GPA EXITS_TEST_GVA
-+#define EXITS_TEST_NPAGES 1
-+#define EXITS_TEST_SIZE (EXITS_TEST_NPAGES * PAGE_SIZE)
-+#define EXITS_TEST_SLOT 10
-+
-+static uint64_t guest_repeatedly_read(void)
-+{
-+	volatile uint64_t value;
-+
-+	while (true)
-+		value = *((uint64_t *) EXITS_TEST_GVA);
-+
-+	return value;
-+}
-+
-+static uint32_t run_vcpu_get_exit_reason(struct kvm_vcpu *vcpu)
-+{
-+	vcpu_run(vcpu);
-+
-+	return vcpu->run->exit_reason;
-+}
-+
-+const struct vm_shape protected_vm_shape = {
-+	.mode = VM_MODE_DEFAULT,
-+	.type = KVM_X86_PROTECTED_VM,
-+};
-+
-+static void test_private_access_memslot_deleted(void)
-+{
-+	struct kvm_vm *vm;
-+	struct kvm_vcpu *vcpu;
-+	pthread_t vm_thread;
-+	void *thread_return;
-+	uint32_t exit_reason;
-+
-+	vm = vm_create_shape_with_one_vcpu(protected_vm_shape, &vcpu,
-+					   guest_repeatedly_read);
-+
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-+				    EXITS_TEST_GPA, EXITS_TEST_SLOT,
-+				    EXITS_TEST_NPAGES,
-+				    KVM_MEM_PRIVATE);
-+
-+	virt_map(vm, EXITS_TEST_GVA, EXITS_TEST_GPA, EXITS_TEST_NPAGES);
-+
-+	/* Request to access page privately */
-+	vm_mem_map_shared_or_private(vm, EXITS_TEST_GPA, EXITS_TEST_SIZE, false);
-+
-+	pr_info("Testing private access when memslot gets deleted\n");
-+
-+	pthread_create(&vm_thread, NULL,
-+		       (void *(*)(void *))run_vcpu_get_exit_reason,
-+		       (void *)vcpu);
-+
-+	vm_mem_region_delete(vm, EXITS_TEST_SLOT);
-+
-+	pthread_join(vm_thread, &thread_return);
-+	exit_reason = (uint32_t)(uint64_t)thread_return;
-+
-+	ASSERT_EQ(exit_reason, KVM_EXIT_MEMORY_FAULT);
-+	ASSERT_EQ(vcpu->run->memory.flags, KVM_MEMORY_EXIT_FLAG_PRIVATE);
-+	ASSERT_EQ(vcpu->run->memory.gpa, EXITS_TEST_GPA);
-+	ASSERT_EQ(vcpu->run->memory.size, EXITS_TEST_SIZE);
-+
-+	pr_info("\t ... PASSED\n");
-+
-+	kvm_vm_free(vm);
-+}
-+
-+static void test_private_access_memslot_not_private(void)
-+{
-+	struct kvm_vm *vm;
-+	struct kvm_vcpu *vcpu;
-+	uint32_t exit_reason;
-+
-+	vm = vm_create_shape_with_one_vcpu(protected_vm_shape, &vcpu,
-+					   guest_repeatedly_read);
-+
-+	/* Add a non-private memslot (flags = 0) */
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-+				    EXITS_TEST_GPA, EXITS_TEST_SLOT,
-+				    EXITS_TEST_NPAGES, 0);
-+
-+	virt_map(vm, EXITS_TEST_GVA, EXITS_TEST_GPA, EXITS_TEST_NPAGES);
-+
-+	/* Request to access page privately */
-+	vm_set_memory_attributes(vm, EXITS_TEST_GPA, EXITS_TEST_SIZE,
-+				 KVM_MEMORY_ATTRIBUTE_PRIVATE);
-+
-+	pr_info("Testing private access to non-private memslot\n");
-+
-+	exit_reason = run_vcpu_get_exit_reason(vcpu);
-+
-+	ASSERT_EQ(exit_reason, KVM_EXIT_MEMORY_FAULT);
-+	ASSERT_EQ(vcpu->run->memory.flags, KVM_MEMORY_EXIT_FLAG_PRIVATE);
-+	ASSERT_EQ(vcpu->run->memory.gpa, EXITS_TEST_GPA);
-+	ASSERT_EQ(vcpu->run->memory.size, EXITS_TEST_SIZE);
-+
-+	pr_info("\t ... PASSED\n");
-+
-+	kvm_vm_free(vm);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	TEST_REQUIRE(kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_PROTECTED_VM));
-+
-+	test_private_access_memslot_deleted();
-+	test_private_access_memslot_not_private();
-+}
--- 
-2.40.0.rc2.332.ga46443480c-goog
-
+Thanks
+Nic
