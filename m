@@ -2,465 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E68596BC45A
-	for <lists+kvm@lfdr.de>; Thu, 16 Mar 2023 04:18:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B401F6BC4B7
+	for <lists+kvm@lfdr.de>; Thu, 16 Mar 2023 04:28:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229751AbjCPDR5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 23:17:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56912 "EHLO
+        id S229902AbjCPD2u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 23:28:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229588AbjCPDRy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 23:17:54 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C02D797FEF;
-        Wed, 15 Mar 2023 20:17:52 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id l9-20020a17090a3f0900b0023d32684e7fso4779237pjc.1;
-        Wed, 15 Mar 2023 20:17:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678936672;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LYb17I8BCPb2EFCzQSFjEgo4PHKuxc2T5i8Z/xiebA4=;
-        b=E8U5/GZGqf3PByeid13InXXn4yaA6mYkYAaRr4fA6KmG/G4JAE1adzFwf2wj3BZvTY
-         /yXaHRsZ5jOtgGU1d6kX96WbE/YW29boqiX5kjWkwqD+nFVvsIJBEZa7b87TwspDREfL
-         cbVDg09EGwfBvveCQMmUARNe3neGAOlN0yjCCP3IFsdlOGycMynTi1Y0Fje7qDJ/NKCk
-         DFgkh/MmTxTfQopkqbPvE6Jr/h6416FFHcX/7jESbvqqRMGEQk/Gnlw24etaowuVqrBX
-         yFHUVeaHbZLczegrZWCRaNt4RNmNX9DVxHFXsCIjbezLkrhtVv849ftT9SVWGqsOCWzr
-         pYdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678936672;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LYb17I8BCPb2EFCzQSFjEgo4PHKuxc2T5i8Z/xiebA4=;
-        b=JBY2QIOyl40auFnQOH60IyXybBaAKjdX2P/qR/+O7dRKtrKFVwYPU2wR5txwErZAnP
-         V1uS5Wro9wgvJ4iA8X4PKR0ipLdx4zqZdL7UTaLyE4x0F+JkXd48wYPL/rlc3rpCXWrv
-         A+n7CeWEgtJLBbCwnLGscUl19qWF5kVCTTYXoy94jjJUXsrCHx58gMWpKAlW+vwQdOzl
-         PX8q6YLHDIRFZtkC3xf+oljOBAtqUu2BnOdNUyIlxMoFyRKWzF5JxvgCkwKOJI7cmlwN
-         9lDcb0HYrfehrGziQZNVZysmqlCDpNQLXwO9BgrVuNTbwkzDnVN56UsuJMMV5OWGiNSf
-         1pCQ==
-X-Gm-Message-State: AO0yUKUrgYhE0HiJqiVFhFXYr4kIrqWuCKx/HEkZfQTWp2cux3AdkeEr
-        EfiVamOaZFHaiU0xS7Khtdo=
-X-Google-Smtp-Source: AK7set880WVudiccd4PFvawdxw6XmcT4cOtGB44ikAvMX6mjuioU29HtYJF9WCF6J4D6e35ixwEY3g==
-X-Received: by 2002:a17:903:41d2:b0:1a0:57df:864f with SMTP id u18-20020a17090341d200b001a057df864fmr2268728ple.16.1678936672140;
-        Wed, 15 Mar 2023 20:17:52 -0700 (PDT)
-Received: from bobo.ozlabs.ibm.com (121-44-69-75.tpgi.com.au. [121.44.69.75])
-        by smtp.gmail.com with ESMTPSA id b7-20020a1709027e0700b0019a7bb18f98sm4331859plm.48.2023.03.15.20.17.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Mar 2023 20:17:51 -0700 (PDT)
-From:   Nicholas Piggin <npiggin@gmail.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Nicholas Piggin <npiggin@gmail.com>, Shuah Khan <shuah@kernel.org>,
-        linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Subject: [PATCH 2/2] KVM: PPC: Add basic framework tests for kvm selftests
-Date:   Thu, 16 Mar 2023 13:17:32 +1000
-Message-Id: <20230316031732.3591455-3-npiggin@gmail.com>
-X-Mailer: git-send-email 2.37.2
-In-Reply-To: <20230316031732.3591455-1-npiggin@gmail.com>
-References: <20230316031732.3591455-1-npiggin@gmail.com>
+        with ESMTP id S229802AbjCPD2I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 23:28:08 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2070.outbound.protection.outlook.com [40.107.93.70])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25253A6BF2;
+        Wed, 15 Mar 2023 20:26:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KOsi/itVVw/x8yOWi8s7ve9XdWtLJdukXi9ICS//P8UrK1UhwnVi7T519I1uUFQ+6dtjV8pRLQHoNcdVjraKSBp9d9McCS2dXyOXm97IPmkjO4hth+zLs8FnylIr2r9lx9y1dlKubRIS1B3J+mJ75FKqHyfo9TG6iOqZWhzzWIYD+gsAFFCgAWbcjvyYqCDfAH1BYeGcitw7KBar8JGszzmd83dy0YjqHBauBAf11FedG4Cb+Q6RJ86smPDx+lHvse0xYemAAZYDt0Xg5dcbHmdJihv1UeG3oGogBRlGD1wa251O8kAVgakUv47Th7Z+VmW+b2tzqUQ9Xxoqp9lRXQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Xjz9HlfDeQfkutRQrHX2DaiJ8PSumZ6IzmSLMVPNbbY=;
+ b=Y4FoZvS4bxtk2ERWtNzEPD0HWr1Pza/oan8A9WkZx9qvfVe/lsdl/fOhQWELCaixcrxxRyNZIkg9kCDtq73iZhg837cJU+9dmYlDSrdVR1xqcpBtjPcm10DEc9F2/AYrN2VYILlecbYpjsbgOjwBHpGsK7a9BGVcMZwvIh7DjCVXkm0ApFz1XREXMf0hWx5BLQ01ta2D53A502/h0e1gLRCBUjoayj5ojF1zEtVHGWMsBKL3+Yg0Tm6lOXnO8thvfRWc1OFHXePKWEVRSuC8IWAxIwORcH9Hy5ryH/z/8HmEb8+izNrLB2wU3qOlgxsgCmgDAmIZfCynzg6qbMiu4A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Xjz9HlfDeQfkutRQrHX2DaiJ8PSumZ6IzmSLMVPNbbY=;
+ b=OCkW8XFCkbNzvhbCY9SJdULO0J7tOwDzVXbDLhth+oeSan3dw/tQdBR7Ox8GbBe2md3q1uVx7Q0BqhcKjSdhOq6OubeSevFLPCqIiG5clQw/z3+tn92kCcao6L/TTvFcoeNke+XaLoKn0lgb5r08JDrejNNa3nJV6zidsiO1MP17pNoBFSAJ+rj6ewYQGgRsAlw/2I+vKYTdSx55jgpUzabqOpMaa7UJevYfokbcnYvRjNf5ELkzijUkqvDN7lR8wytgiqD3MPDQuu3qw2pmfUVFI++pShWCmSKDrFIJXnHXOnfl36qjO3ztVwuenhDmvfJKOGeH7Brk7MeSMnsHlg==
+Received: from BN9PR03CA0714.namprd03.prod.outlook.com (2603:10b6:408:ef::29)
+ by PH0PR12MB8052.namprd12.prod.outlook.com (2603:10b6:510:28b::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.24; Thu, 16 Mar
+ 2023 03:26:09 +0000
+Received: from BN8NAM11FT018.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:ef:cafe::41) by BN9PR03CA0714.outlook.office365.com
+ (2603:10b6:408:ef::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.30 via Frontend
+ Transport; Thu, 16 Mar 2023 03:26:09 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ BN8NAM11FT018.mail.protection.outlook.com (10.13.176.89) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6178.18 via Frontend Transport; Thu, 16 Mar 2023 03:26:08 +0000
+Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Wed, 15 Mar 2023
+ 20:25:59 -0700
+Received: from drhqmail201.nvidia.com (10.126.190.180) by
+ drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.37; Wed, 15 Mar 2023 20:25:59 -0700
+Received: from Asurada-Nvidia (10.127.8.9) by mail.nvidia.com (10.126.190.180)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37 via Frontend
+ Transport; Wed, 15 Mar 2023 20:25:58 -0700
+Date:   Wed, 15 Mar 2023 20:25:56 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>
+CC:     Jason Gunthorpe <jgg@nvidia.com>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>
+Subject: Re: [PATCH v1 1/5] iommufd: Create access in
+ vfio_iommufd_emulated_bind()
+Message-ID: <ZBKMROKplWlHc5Fw@Asurada-Nvidia>
+References: <20230308131340.459224-1-yi.l.liu@intel.com>
+ <20230308131340.459224-2-yi.l.liu@intel.com>
+ <ZAtqlnCk7uccR5E7@nvidia.com>
+ <ZBAuXo166M+z8b3z@Asurada-Nvidia>
+ <ZBEY49XtiFUImfe4@Asurada-Nvidia>
+ <BN9PR11MB5276738DC59AC1B4A66AB3C38CBF9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZBFmh2iAqGGb8CjK@Asurada-Nvidia>
+ <BN9PR11MB52765D7977F987960072482E8CBF9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZBGJzefTm4p/ReIu@Asurada-Nvidia>
+ <BL1PR11MB52710B5DCB08214EF4542D098CBC9@BL1PR11MB5271.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <BL1PR11MB52710B5DCB08214EF4542D098CBC9@BL1PR11MB5271.namprd11.prod.outlook.com>
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT018:EE_|PH0PR12MB8052:EE_
+X-MS-Office365-Filtering-Correlation-Id: 024343b4-fb13-4094-ea4c-08db25ce2f60
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 0M5y9LugdroxIkRTdEIyZgDzLchqUUocODj7VHp7qyG9AQD3yRuQkfH0lAGACFYqzQKB67bzLMbp5ZCZvKSMqnEFRLA9wRFTesWUdHQeg4HfyRUatnlEZ05slEl5M2JpuIhnJBSC9dx97iYjHu1X4fKg+EgCJ9jmgqDCPCnPVvV3mRXF+e/9RBAGwb5BG/zBLsYmNeb1AP5YIAmsn9HYHL3snQyMdxyLb7RePzydQ0fncyDIn9Ez0dZmvLbeDqOVxi94U+8zRmZUa9lmXHq0GFeIdJ3H31MrheM488/noAbooQW85BD0KZ9Q5xP6rni/XNl8V5iXoGDNXqiV9FHR+GjC4PZg3ANL6oR76EiPuD4KolEmtjpU0O3Cx44urX8K/rdFIn8/osrNiuejf7+NyUO6FQ4V/O3utZyUQO8FyI+p3y2o8MmLFnzmyhLxWAEci0fVZbo3sx5dabuko0Cjk5WWRTb/mC81+GbfzotHKLrO1q11s5y6QoWFPWUqyRAPenq+jXC62fPwXxjeAeyQMuT5eaJBh7OmuMOj8Go4sAau5gG8/fqBs2MoMJIY5w3aajcV3LJUg7KT8vAdjdvtVkqKa0NlTaWv7nxGaheOq9DjnxnLA3LfKC6R4+XKJQKIOcJoTBUF3f3y+zKdB4rhvgG8FUu+PirpJZhw01xdkLCAQNzqOVWNdQLvSWxzi21B3Xse4bTBnf45W6+aQo5SczIrZ9h9BnjCNa3pK6vJ8IDXvQQc9X2y+dV2jpVtgvXu
+X-Forefront-Antispam-Report: CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230025)(4636009)(39860400002)(346002)(136003)(376002)(396003)(451199018)(46966006)(40470700004)(36840700001)(40460700003)(478600001)(426003)(47076005)(70586007)(7636003)(82310400005)(82740400003)(33716001)(5660300002)(8936002)(86362001)(7416002)(4744005)(356005)(2906002)(110136005)(8676002)(41300700001)(316002)(26005)(4326008)(55016003)(186003)(54906003)(336012)(36860700001)(40480700001)(9686003)(70206006);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Mar 2023 03:26:08.9397
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 024343b4-fb13-4094-ea4c-08db25ce2f60
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT018.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB8052
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add some tests that exercise basic functions of the kvm selftests
-framework, guest creation, ucalls, hcalls, copying data between guest
-and host, interrupts and page faults.
+On Thu, Mar 16, 2023 at 02:53:50AM +0000, Tian, Kevin wrote:
 
-These don't test KVM so much, but were useful when developing the
-selftests support for powerpc.
+> > Please check if they look okay, so that Yi can integrate them
+> > accordingly to the emulated/cdev series.
+> 
+> this split looks reasonable to me. Go ahead.
 
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
- tools/testing/selftests/kvm/Makefile          |   2 +
- .../selftests/kvm/include/powerpc/hcall.h     |   4 +-
- .../testing/selftests/kvm/powerpc/null_test.c | 186 ++++++++++++++++++
- .../selftests/kvm/powerpc/rtas_hcall.c        | 146 ++++++++++++++
- 4 files changed, 337 insertions(+), 1 deletion(-)
- create mode 100644 tools/testing/selftests/kvm/powerpc/null_test.c
- create mode 100644 tools/testing/selftests/kvm/powerpc/rtas_hcall.c
+Thanks for the review! I will address those comments and renew
+those commits by the end of the day.
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 081cee3ecc0c..1d9eb4f3284d 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -180,6 +180,8 @@ TEST_GEN_PROGS_riscv += kvm_page_table_test
- TEST_GEN_PROGS_riscv += set_memory_region_test
- TEST_GEN_PROGS_riscv += kvm_binary_stats_test
- 
-+TEST_GEN_PROGS_powerpc += powerpc/null_test
-+TEST_GEN_PROGS_powerpc += powerpc/rtas_hcall
- TEST_GEN_PROGS_powerpc += demand_paging_test
- TEST_GEN_PROGS_powerpc += dirty_log_test
- TEST_GEN_PROGS_powerpc += kvm_create_max_vcpus
-diff --git a/tools/testing/selftests/kvm/include/powerpc/hcall.h b/tools/testing/selftests/kvm/include/powerpc/hcall.h
-index bbad5904f37a..cbcaf180c427 100644
---- a/tools/testing/selftests/kvm/include/powerpc/hcall.h
-+++ b/tools/testing/selftests/kvm/include/powerpc/hcall.h
-@@ -11,7 +11,9 @@
- #define H_UCALL	0
- #define UCALL_R4_UCALL	0x5715 // regular ucall, r5 contains ucall pointer
- #define UCALL_R4_EXCPT	0x1b0f // other exception, r5 contains vector, r6,7 SRRs
--			       // R4==0 is a simple asm exit
-+#define UCALL_R4_SIMPLE	0x0000 // simple exit usable by asm with no ucall data
-+
-+#define H_RTAS		0xf000
- 
- int64_t hcall0(uint64_t token);
- int64_t hcall1(uint64_t token, uint64_t arg1);
-diff --git a/tools/testing/selftests/kvm/powerpc/null_test.c b/tools/testing/selftests/kvm/powerpc/null_test.c
-new file mode 100644
-index 000000000000..ee3cf20a5cf3
---- /dev/null
-+++ b/tools/testing/selftests/kvm/powerpc/null_test.c
-@@ -0,0 +1,186 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Tests for guest creation, run, ucall, interrupt, and vm dumping.
-+ */
-+
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+#include <fcntl.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/ioctl.h>
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "kselftest.h"
-+#include "processor.h"
-+
-+extern void guest_code_asm(void);
-+asm(".global guest_code_asm");
-+asm(".balign 4");
-+asm("guest_code_asm:");
-+asm("li 3,0"); // H_UCALL
-+asm("li 4,0"); // UCALL_R4_SIMPLE
-+asm("sc 1");
-+
-+static void guest_code_ucall(void)
-+{
-+	GUEST_DONE();
-+}
-+
-+static void guest_code_trap(void)
-+{
-+	asm volatile("trap");
-+}
-+
-+static void guest_code_dsi(void)
-+{
-+	*(volatile int *)0;
-+}
-+
-+static void test_asm(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	int ret;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code_asm);
-+
-+	ret = _vcpu_run(vcpu);
-+
-+	TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
-+	TEST_ASSERT(get_ucall(vcpu, NULL) == UCALL_NONE,
-+		    "Invalid guest done status: exit_reason=%s\n",
-+		    exit_reason_str(vcpu->run->exit_reason));
-+
-+	kvm_vm_free(vm);
-+}
-+
-+static void test_ucall(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	int ret;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code_ucall);
-+
-+	ret = _vcpu_run(vcpu);
-+
-+	TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
-+	TEST_ASSERT(get_ucall(vcpu, NULL) == UCALL_DONE,
-+		    "Invalid guest done status: exit_reason=%s\n",
-+		    exit_reason_str(vcpu->run->exit_reason));
-+
-+	kvm_vm_free(vm);
-+}
-+
-+static bool got_trap;
-+static bool trap_handler(struct kvm_vcpu *vcpu, unsigned trap)
-+{
-+	if (trap == 0x700) {
-+		got_trap = true;
-+		return true;
-+	}
-+	return false;
-+}
-+
-+static void test_trap(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	int ret;
-+
-+	interrupt_handler = trap_handler;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code_trap);
-+
-+	ret = _vcpu_run(vcpu);
-+
-+	TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
-+	TEST_ASSERT(got_trap,
-+		    "Invalid guest done status: exit_reason=%s\n",
-+		    exit_reason_str(vcpu->run->exit_reason));
-+
-+	kvm_vm_free(vm);
-+
-+	interrupt_handler = NULL;
-+}
-+
-+static bool got_dsi;
-+static bool dsi_handler(struct kvm_vcpu *vcpu, unsigned trap)
-+{
-+	if (trap == 0x300) {
-+		got_dsi = true;
-+		return true;
-+	}
-+	return false;
-+}
-+
-+static void test_dsi(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	int ret;
-+
-+	interrupt_handler = dsi_handler;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code_dsi);
-+
-+	ret = _vcpu_run(vcpu);
-+
-+	TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
-+	TEST_ASSERT(got_dsi,
-+		    "Invalid guest done status: exit_reason=%s\n",
-+		    exit_reason_str(vcpu->run->exit_reason));
-+
-+	vm_dump(stderr, vm, 2);
-+
-+	kvm_vm_free(vm);
-+
-+	interrupt_handler = NULL;
-+}
-+
-+static void test_dump(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	int ret;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code_ucall);
-+
-+	ret = _vcpu_run(vcpu);
-+	TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
-+
-+	printf("Testing vm_dump...\n");
-+	vm_dump(stderr, vm, 2);
-+
-+	kvm_vm_free(vm);
-+}
-+
-+
-+struct testdef {
-+	const char *name;
-+	void (*test)(void);
-+} testlist[] = {
-+	{ "null asm test", test_asm},
-+	{ "null ucall test", test_ucall},
-+	{ "trap test", test_trap},
-+	{ "page fault test", test_dsi},
-+	{ "vm dump test", test_dump},
-+};
-+
-+int main(int argc, char *argv[])
-+{
-+	int idx;
-+
-+	ksft_print_header();
-+
-+	ksft_set_plan(ARRAY_SIZE(testlist));
-+
-+	for (idx = 0; idx < ARRAY_SIZE(testlist); idx++) {
-+		testlist[idx].test();
-+		ksft_test_result_pass("%s\n", testlist[idx].name);
-+	}
-+
-+	ksft_finished();	/* Print results and exit() accordingly */
-+}
-diff --git a/tools/testing/selftests/kvm/powerpc/rtas_hcall.c b/tools/testing/selftests/kvm/powerpc/rtas_hcall.c
-new file mode 100644
-index 000000000000..17a580d7fa55
---- /dev/null
-+++ b/tools/testing/selftests/kvm/powerpc/rtas_hcall.c
-@@ -0,0 +1,146 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Test the KVM H_RTAS hcall and copying buffers between guest and host.
-+ */
-+
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+#include <fcntl.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/ioctl.h>
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "kselftest.h"
-+#include "hcall.h"
-+
-+struct rtas_args {
-+	__be32 token;
-+	__be32 nargs;
-+	__be32 nret;
-+	__be32 args[16];
-+        __be32 *rets;     /* Pointer to return values in args[]. */
-+};
-+
-+static void guest_code(void)
-+{
-+	struct rtas_args r;
-+	int64_t rc;
-+
-+	r.token = cpu_to_be32(0xdeadbeef);
-+	r.nargs = cpu_to_be32(3);
-+	r.nret = cpu_to_be32(2);
-+	r.rets = &r.args[3];
-+	r.args[0] = cpu_to_be32(0x1000);
-+	r.args[1] = cpu_to_be32(0x1001);
-+	r.args[2] = cpu_to_be32(0x1002);
-+	rc = hcall1(H_RTAS, (uint64_t)&r);
-+	GUEST_ASSERT(rc == 0);
-+	GUEST_ASSERT_1(be32_to_cpu(r.rets[0]) == 0xabc, be32_to_cpu(r.rets[0]));
-+	GUEST_ASSERT_1(be32_to_cpu(r.rets[1]) == 0x123, be32_to_cpu(r.rets[1]));
-+
-+	GUEST_DONE();
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_regs regs;
-+	struct rtas_args *r;
-+	vm_vaddr_t rtas_vaddr;
-+	struct ucall uc;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	uint64_t tmp;
-+	int ret;
-+
-+	ksft_print_header();
-+
-+	ksft_set_plan(1);
-+
-+	/* Create VM */
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-+
-+	printf("Running H_RTAS guest vcpu.\n");
-+
-+	ret = _vcpu_run(vcpu);
-+	TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
-+	switch ((tmp = get_ucall(vcpu, &uc))) {
-+	case UCALL_NONE:
-+		break; // good
-+	case UCALL_DONE:
-+		TEST_FAIL("Unexpected final guest exit %lu\n", tmp);
-+		break;
-+	case UCALL_ABORT:
-+		REPORT_GUEST_ASSERT_N(uc, "values: %lu (0x%lx)\n",
-+				      GUEST_ASSERT_ARG(uc, 0),
-+				      GUEST_ASSERT_ARG(uc, 0));
-+		break;
-+	default:
-+		TEST_FAIL("Unexpected guest exit %lu\n", tmp);
-+	}
-+
-+	TEST_ASSERT(vcpu->run->exit_reason == KVM_EXIT_PAPR_HCALL,
-+		    "Expected PAPR_HCALL exit, got %s\n",
-+		    exit_reason_str(vcpu->run->exit_reason));
-+	TEST_ASSERT(vcpu->run->papr_hcall.nr == H_RTAS,
-+		    "Expected H_RTAS exit, got %lld\n",
-+		    vcpu->run->papr_hcall.nr);
-+
-+	printf("Got H_RTAS exit.\n");
-+
-+	vcpu_regs_get(vcpu, &regs);
-+	rtas_vaddr = regs.gpr[4];
-+	printf("H_RTAS rtas_args at gEA=0x%lx\n", rtas_vaddr);
-+
-+	r = addr_gva2hva(vm, rtas_vaddr);
-+
-+	TEST_ASSERT(r->token == cpu_to_be32(0xdeadbeef),
-+		    "Expected RTAS token 0xdeadbeef, got 0x%x\n",
-+		    be32_to_cpu(r->token));
-+	TEST_ASSERT(r->nargs == cpu_to_be32(3),
-+		    "Expected RTAS nargs 3, got %u\n",
-+		    be32_to_cpu(r->nargs));
-+	TEST_ASSERT(r->nret == cpu_to_be32(2),
-+		    "Expected RTAS nret 2, got %u\n",
-+		    be32_to_cpu(r->nret));
-+	TEST_ASSERT(r->args[0] == cpu_to_be32(0x1000),
-+		    "Expected args[0] to be 0x1000, got 0x%x\n",
-+		    be32_to_cpu(r->args[0]));
-+	TEST_ASSERT(r->args[1] == cpu_to_be32(0x1001),
-+		    "Expected args[1] to be 0x1001, got 0x%x\n",
-+		    be32_to_cpu(r->args[1]));
-+	TEST_ASSERT(r->args[2] == cpu_to_be32(0x1002),
-+		    "Expected args[2] to be 0x1002, got 0x%x\n",
-+		    be32_to_cpu(r->args[2]));
-+
-+	printf("Guest rtas_args is correct, setting rets.\n");
-+
-+	r->args[3] = cpu_to_be32(0xabc);
-+	r->args[4] = cpu_to_be32(0x123);
-+
-+	regs.gpr[3] = 0;
-+	vcpu_regs_set(vcpu, &regs);
-+
-+	printf("Running H_RTAS guest vcpu again (hcall return H_SUCCESS).\n");
-+
-+	ret = _vcpu_run(vcpu);
-+	TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
-+	switch ((tmp = get_ucall(vcpu, &uc))) {
-+	case UCALL_DONE:
-+		printf("Got final guest exit.\n");
-+		break;
-+	case UCALL_ABORT:
-+		REPORT_GUEST_ASSERT_N(uc, "values: %lu (0x%lx)\n",
-+				      GUEST_ASSERT_ARG(uc, 0),
-+				      GUEST_ASSERT_ARG(uc, 0));
-+		break;
-+	default:
-+		TEST_FAIL("Unexpected guest exit %lu\n", tmp);
-+	}
-+
-+	kvm_vm_free(vm);
-+
-+	ksft_test_result_pass("%s\n", "null test");
-+	ksft_finished();	/* Print results and exit() accordingly */
-+}
--- 
-2.37.2
-
+Thanks
+Nic
