@@ -2,77 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DE0D46BC27E
-	for <lists+kvm@lfdr.de>; Thu, 16 Mar 2023 01:31:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C7BF6BC2D3
+	for <lists+kvm@lfdr.de>; Thu, 16 Mar 2023 01:33:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233006AbjCPAbH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 20:31:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33622 "EHLO
+        id S233419AbjCPAdX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 20:33:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231701AbjCPAbG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 20:31:06 -0400
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FD7F88DAF;
-        Wed, 15 Mar 2023 17:31:05 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id s17so30476pgv.4;
-        Wed, 15 Mar 2023 17:31:05 -0700 (PDT)
+        with ESMTP id S233235AbjCPAcO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 20:32:14 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B7419EF53
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 17:31:39 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id a10-20020a056a000c8a00b005fc6b117942so182315pfv.2
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 17:31:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678926665;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9KhrkJGSUOYiiVfotnNQfrQRu80N+GO4LCzY8Gnj/3w=;
-        b=WB/xmzCsZRZtBIneo/AO01OwGLTrzzIQLgaUwzbND73RDg+PHC/zVOVnq3CrJHOlSc
-         ++cFP2P+wFQzuZ+g4e04Dyj8WZQ+4n96gQNzpFvGmSzaWeTUsAdiTRyQbOpZKqVxn+oY
-         yDP1LnIiYSeyvlhR53U5wE9LM2tyWJj94g4OSGAygyMlAbKEQ71n8+B5ZowXN07WRJXa
-         NMD2sh4JrrS4pFPy59RNoGDrvKU+oRHnx49Dh2cg8t6dfAi5HnruloXaNPpXQISEiyCz
-         HERy92y62Nn80x7R9As/vuFZlznBDV6PYVD/9oUjdujytkNa9Ym3pRrTqDKxVqRJGsZf
-         WWSQ==
+        d=google.com; s=20210112; t=1678926692;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YxU1hhaZ4SyfL9lxoIcMNBPPAq0yfPS0xuipesTDclo=;
+        b=W0G3AmVBhmaEPW1mzeOzfktEstHk/ayT4Fca4WpYB+uqnQXqFONecZpHfNEM3EVkI8
+         dMoU+aBolGRnKrvqkSWbCeJFkilUlbcTqWcVH0y2O7kmHEk9EOK0BEV0KFKuPFrnCkbs
+         QOotzJYDWHJggJes5/KIvM96osSnaCvae3qKB3LUHRBB+uNwEOmmHmd8zvTbRGoEVjUL
+         rVFdyBsTEprlo4ciiWa3+M8yKhD16Tn+oY0bqfI0h7Rz5RgpgT08FQynab2lujb51lp7
+         x7X7TlFctPEGFqxyshGyufJ1XL1Zen+FPj5jvwOG/5BAnYWpY1i72h9z5SjlNs7jYsNa
+         hwdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678926665;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9KhrkJGSUOYiiVfotnNQfrQRu80N+GO4LCzY8Gnj/3w=;
-        b=js+Cl8h99J0yPqmReJpu0tKaVSlXPJJlD04vbQtHDXUVhba02JrO9s/Xk0Rj0b9v5+
-         K9/N35FGiTXjL8LT7hFQPhKroUlIBcb0/Oj1cKdRbmjEF/e0/+65/6D9SCXZK3zUnRqu
-         HCj57iwRyWnbypOX3NYbsk57efGFIcoReggH9OXM26i1NXUala6izbTp2REe4GULThYn
-         wVz+pSbcmbrJb02EiDE+fR4l5ZkF8MC8dKcHCU4xjzjoAe/Fy2JJ5WXkau5eWG6EJYT7
-         6DTweOp9AijE1S4wPKlbiI+Ls66NdyBvcFkXk073L1tvs8CL9txpNo9ECw1+8vEVmsI6
-         0Llg==
-X-Gm-Message-State: AO0yUKVUjZ4Y+rn8qfBYx7fgmDq8v+PcTllfj6GbnnUpTG94PhmTGEsg
-        1OpN4jydK+2GLlMAOBTwg9o=
-X-Google-Smtp-Source: AK7set/esHi5avqDM2fH/I0qVxsmqc3WYu3IkEKKVsSeLWv7mYXWdyRBXofbNOj9imT11r//7zi6Ow==
-X-Received: by 2002:aa7:9591:0:b0:625:290:e303 with SMTP id z17-20020aa79591000000b006250290e303mr1504683pfj.14.1678926664681;
-        Wed, 15 Mar 2023 17:31:04 -0700 (PDT)
-Received: from localhost ([192.55.54.55])
-        by smtp.gmail.com with ESMTPSA id e4-20020a62ee04000000b00587fda4a260sm4100324pfi.9.2023.03.15.17.31.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Mar 2023 17:31:04 -0700 (PDT)
-Date:   Wed, 15 Mar 2023 17:31:02 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-mm@kvack.org, dave.hansen@intel.com, peterz@infradead.org,
-        tglx@linutronix.de, seanjc@google.com, pbonzini@redhat.com,
-        dan.j.williams@intel.com, rafael.j.wysocki@intel.com,
-        kirill.shutemov@linux.intel.com, ying.huang@intel.com,
-        reinette.chatre@intel.com, len.brown@intel.com,
-        tony.luck@intel.com, ak@linux.intel.com, isaku.yamahata@intel.com,
-        chao.gao@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        david@redhat.com, bagasdotme@gmail.com, sagis@google.com,
-        imammedo@redhat.com, isaku.yamahata@gmail.com
-Subject: Re: [PATCH v10 05/16] x86/virt/tdx: Add skeleton to enable TDX on
- demand
-Message-ID: <20230316003102.GB197448@ls.amr.corp.intel.com>
-References: <cover.1678111292.git.kai.huang@intel.com>
- <f150316b975b5ca22c6c4016ffd90db79d657bbf.1678111292.git.kai.huang@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f150316b975b5ca22c6c4016ffd90db79d657bbf.1678111292.git.kai.huang@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        d=1e100.net; s=20210112; t=1678926692;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YxU1hhaZ4SyfL9lxoIcMNBPPAq0yfPS0xuipesTDclo=;
+        b=HtQkUBXFUS2HTZIXWGFsaiunVzhqF2Su3MnXcSeaScsmO8BhN0WOaOitUtLupzQXFg
+         ouUNBzUhvGQqAqubNi6KsaA6iNTe+iDeBvdlZ+Rg/DmB9N6VR/imJLCDs5NyW99Jn75S
+         CepKH0KNU7JFoiCEHPyqdNqZFE7VoWdi40tTfwjYi3uhA86uo8iF7eMX+OqVLrvnGm5N
+         tmKM9xl+YmVoY9McegfH7SwADFprYIZHgpffQd0FeXkV95PbMpmjw8DoddRzP9wdJA3o
+         4oyI0Vsi0QG0PqSCCwVm5ku0vstEKCX5u/QZNeieMTpJiaZwiv+SsSBsyEpbJh0KwKLk
+         qPew==
+X-Gm-Message-State: AO0yUKX7cHNIMNFHYeCklwVK6ZvXcMDxEIgNgEWxmRvpOYAsoh2BHT2/
+        anpC3vfUsUPn1hHAqcuN+C84FGoiFbrcuUknN0LmVE2CUrj3PvtasYJNYKuel+jPisso8nOK5CH
+        +5JhjVMjMz/Mmm36nltaFJFP/ED8Jwru4wVfnQJBTYrOGZXIscc1SlENykB9kg4UHmPzWW/M=
+X-Google-Smtp-Source: AK7set/r1L80ZGqvN1Jqjj7ZwUbt+f+1AOqGwiuE9AJvattpTxM2ZIa1Wyqx7LP6pavKwLlYqhK3jR4rdgiNHjRokg==
+X-Received: from ackerleytng-cloudtop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1f5f])
+ (user=ackerleytng job=sendgmr) by 2002:a65:530d:0:b0:502:fd12:83ce with SMTP
+ id m13-20020a65530d000000b00502fd1283cemr347381pgq.5.1678926691968; Wed, 15
+ Mar 2023 17:31:31 -0700 (PDT)
+Date:   Thu, 16 Mar 2023 00:31:03 +0000
+In-Reply-To: <cover.1678926164.git.ackerleytng@google.com>
+Mime-Version: 1.0
+References: <cover.1678926164.git.ackerleytng@google.com>
+X-Mailer: git-send-email 2.40.0.rc2.332.ga46443480c-goog
+Message-ID: <90aaa4ab85fa5e3d5641793e2a4873282eb16556.1678926164.git.ackerleytng@google.com>
+Subject: [RFC PATCH 10/10] KVM: selftests: Test KVM exit behavior for private memory/access
+From:   Ackerley Tng <ackerleytng@google.com>
+To:     kvm@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, qemu-devel@nongnu.org
+Cc:     aarcange@redhat.com, ak@linux.intel.com, akpm@linux-foundation.org,
+        arnd@arndb.de, bfields@fieldses.org, bp@alien8.de,
+        chao.p.peng@linux.intel.com, corbet@lwn.net, dave.hansen@intel.com,
+        david@redhat.com, ddutile@redhat.com, dhildenb@redhat.com,
+        hpa@zytor.com, hughd@google.com, jlayton@kernel.org,
+        jmattson@google.com, joro@8bytes.org, jun.nakajima@intel.com,
+        kirill.shutemov@linux.intel.com, linmiaohe@huawei.com,
+        luto@kernel.org, mail@maciej.szmigiero.name, mhocko@suse.com,
+        michael.roth@amd.com, mingo@redhat.com, naoya.horiguchi@nec.com,
+        pbonzini@redhat.com, qperret@google.com, rppt@kernel.org,
+        seanjc@google.com, shuah@kernel.org, steven.price@arm.com,
+        tabba@google.com, tglx@linutronix.de, vannapurve@google.com,
+        vbabka@suse.cz, vkuznets@redhat.com, wanpengli@tencent.com,
+        wei.w.wang@intel.com, x86@kernel.org, yu.c.zhang@linux.intel.com,
+        Ackerley Tng <ackerleytng@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,110 +84,163 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 07, 2023 at 03:13:50AM +1300,
-Kai Huang <kai.huang@intel.com> wrote:
+"Testing private access when memslot gets deleted" tests the behavior
+of KVM when a private memslot gets deleted while the VM is using the
+private memslot. When KVM looks up the deleted (slot = NULL) memslot,
+KVM should exit to userspace with KVM_EXIT_MEMORY_FAULT.
 
-> +static int try_init_module_global(void)
-> +{
-> +	int ret;
-> +
-> +	/*
-> +	 * The TDX module global initialization only needs to be done
-> +	 * once on any cpu.
-> +	 */
-> +	spin_lock(&tdx_global_init_lock);
+In the second test, upon a private access to non-private memslot, KVM
+should also exit to userspace with KVM_EXIT_MEMORY_FAULT.
 
-
-If I use tdx_cpu_enable() via kvm hardware_enable_all(), this function is called
-in the context IPI callback and the lockdep complains.  Here is my patch to
-address it
-
-From 0c4022ffe8cd68dfb455c418eb65538e4e100115 Mon Sep 17 00:00:00 2001
-Message-Id: <0c4022ffe8cd68dfb455c418eb65538e4e100115.1678926123.git.isaku.yamahata@intel.com>
-In-Reply-To: <d2aa2142665b8204b628232ab615c98090371c99.1678926122.git.isaku.yamahata@intel.com>
-References: <d2aa2142665b8204b628232ab615c98090371c99.1678926122.git.isaku.yamahata@intel.com>
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-Date: Wed, 15 Mar 2023 14:26:37 -0700
-Subject: [PATCH] x86/virt/vmx/tdx: Use raw spin lock instead of spin lock
-
-tdx_cpu_enable() can be called by IPI handler.  The lockdep complains about
-spin lock as follows.  Use raw spin lock.
-
-=============================
-[ BUG: Invalid wait context ]
-6.3.0-rc1-tdx-kvm-upstream+ #389 Not tainted
------------------------------
-swapper/154/0 is trying to lock:
-ffffffffa7875e58 (tdx_global_init_lock){....}-{3:3}, at: tdx_cpu_enable+0x67/0x180
-other info that might help us debug this:
-context-{2:2}
-no locks held by swapper/154/0.
-stack backtrace:
-Call Trace:
- <IRQ>
- dump_stack_lvl+0x64/0xb0
- dump_stack+0x10/0x20
- __lock_acquire+0x912/0xc30
- lock_acquire.part.0+0x99/0x220
- lock_acquire+0x60/0x170
- _raw_spin_lock_irqsave+0x43/0x70
- tdx_cpu_enable+0x67/0x180
- vt_hardware_enable+0x3b/0x60
- kvm_arch_hardware_enable+0xe7/0x2e0
- hardware_enable_nolock+0x33/0x80
- __flush_smp_call_function_queue+0xc4/0x590
- generic_smp_call_function_single_interrupt+0x1a/0xb0
- __sysvec_call_function+0x48/0x200
- sysvec_call_function+0xad/0xd0
- </IRQ>
-
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Signed-off-by: Ackerley Tng <ackerleytng@google.com>
 ---
- arch/x86/virt/vmx/tdx/tdx.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../kvm/x86_64/private_mem_kvm_exits_test.c   | 124 ++++++++++++++++++
+ 2 files changed, 125 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/private_mem_kvm_exits_test.c
 
-diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index 2ee37a5dedcf..e1c8ffad7406 100644
---- a/arch/x86/virt/vmx/tdx/tdx.c
-+++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -41,7 +41,7 @@ static u32 tdx_guest_keyid_start __ro_after_init;
- static u32 tdx_nr_guest_keyids __ro_after_init;
- 
- static unsigned int tdx_global_init_status;
--static DEFINE_SPINLOCK(tdx_global_init_lock);
-+static DEFINE_RAW_SPINLOCK(tdx_global_init_lock);
- #define TDX_GLOBAL_INIT_DONE	_BITUL(0)
- #define TDX_GLOBAL_INIT_FAILED	_BITUL(1)
- 
-@@ -349,6 +349,7 @@ static void tdx_trace_seamcalls(u64 level)
- 
- static int try_init_module_global(void)
- {
-+	unsigned long flags;
- 	u64 tsx_ctrl;
- 	int ret;
- 
-@@ -356,7 +357,7 @@ static int try_init_module_global(void)
- 	 * The TDX module global initialization only needs to be done
- 	 * once on any cpu.
- 	 */
--	spin_lock(&tdx_global_init_lock);
-+	raw_spin_lock_irqsave(&tdx_global_init_lock, flags);
- 
- 	if (tdx_global_init_status & TDX_GLOBAL_INIT_DONE) {
- 		ret = tdx_global_init_status & TDX_GLOBAL_INIT_FAILED ?
-@@ -373,7 +374,7 @@ static int try_init_module_global(void)
- 	if (ret)
- 		tdx_global_init_status |= TDX_GLOBAL_INIT_FAILED;
- out:
--	spin_unlock(&tdx_global_init_lock);
-+	raw_spin_unlock_irqrestore(&tdx_global_init_lock, flags);
- 
- 	if (ret) {
- 		if (trace_boot_seamcalls)
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index bafee3c43b2e..0ad588852a1d 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -80,6 +80,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/nested_exceptions_test
+ TEST_GEN_PROGS_x86_64 += x86_64/platform_info_test
+ TEST_GEN_PROGS_x86_64 += x86_64/pmu_event_filter_test
+ TEST_GEN_PROGS_x86_64 += x86_64/private_mem_conversions_test
++TEST_GEN_PROGS_x86_64 += x86_64/private_mem_kvm_exits_test
+ TEST_GEN_PROGS_x86_64 += x86_64/set_boot_cpu_id
+ TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
+ TEST_GEN_PROGS_x86_64 += x86_64/smaller_maxphyaddr_emulation_test
+diff --git a/tools/testing/selftests/kvm/x86_64/private_mem_kvm_exits_test.c b/tools/testing/selftests/kvm/x86_64/private_mem_kvm_exits_test.c
+new file mode 100644
+index 000000000000..c8667dfbbf0a
+--- /dev/null
++++ b/tools/testing/selftests/kvm/x86_64/private_mem_kvm_exits_test.c
+@@ -0,0 +1,124 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (C) 2022, Google LLC.
++ */
++#include "kvm_util_base.h"
++#include <linux/kvm.h>
++#include <pthread.h>
++#include <stdint.h>
++#include "kvm_util.h"
++#include "processor.h"
++#include "test_util.h"
++
++/* Arbitrarily selected to avoid overlaps with anything else */
++#define EXITS_TEST_GVA 0xc0000000
++#define EXITS_TEST_GPA EXITS_TEST_GVA
++#define EXITS_TEST_NPAGES 1
++#define EXITS_TEST_SIZE (EXITS_TEST_NPAGES * PAGE_SIZE)
++#define EXITS_TEST_SLOT 10
++
++static uint64_t guest_repeatedly_read(void)
++{
++	volatile uint64_t value;
++
++	while (true)
++		value = *((uint64_t *) EXITS_TEST_GVA);
++
++	return value;
++}
++
++static uint32_t run_vcpu_get_exit_reason(struct kvm_vcpu *vcpu)
++{
++	vcpu_run(vcpu);
++
++	return vcpu->run->exit_reason;
++}
++
++const struct vm_shape protected_vm_shape = {
++	.mode = VM_MODE_DEFAULT,
++	.type = KVM_X86_PROTECTED_VM,
++};
++
++static void test_private_access_memslot_deleted(void)
++{
++	struct kvm_vm *vm;
++	struct kvm_vcpu *vcpu;
++	pthread_t vm_thread;
++	void *thread_return;
++	uint32_t exit_reason;
++
++	vm = vm_create_shape_with_one_vcpu(protected_vm_shape, &vcpu,
++					   guest_repeatedly_read);
++
++	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
++				    EXITS_TEST_GPA, EXITS_TEST_SLOT,
++				    EXITS_TEST_NPAGES,
++				    KVM_MEM_PRIVATE);
++
++	virt_map(vm, EXITS_TEST_GVA, EXITS_TEST_GPA, EXITS_TEST_NPAGES);
++
++	/* Request to access page privately */
++	vm_mem_map_shared_or_private(vm, EXITS_TEST_GPA, EXITS_TEST_SIZE, false);
++
++	pr_info("Testing private access when memslot gets deleted\n");
++
++	pthread_create(&vm_thread, NULL,
++		       (void *(*)(void *))run_vcpu_get_exit_reason,
++		       (void *)vcpu);
++
++	vm_mem_region_delete(vm, EXITS_TEST_SLOT);
++
++	pthread_join(vm_thread, &thread_return);
++	exit_reason = (uint32_t)(uint64_t)thread_return;
++
++	ASSERT_EQ(exit_reason, KVM_EXIT_MEMORY_FAULT);
++	ASSERT_EQ(vcpu->run->memory.flags, KVM_MEMORY_EXIT_FLAG_PRIVATE);
++	ASSERT_EQ(vcpu->run->memory.gpa, EXITS_TEST_GPA);
++	ASSERT_EQ(vcpu->run->memory.size, EXITS_TEST_SIZE);
++
++	pr_info("\t ... PASSED\n");
++
++	kvm_vm_free(vm);
++}
++
++static void test_private_access_memslot_not_private(void)
++{
++	struct kvm_vm *vm;
++	struct kvm_vcpu *vcpu;
++	uint32_t exit_reason;
++
++	vm = vm_create_shape_with_one_vcpu(protected_vm_shape, &vcpu,
++					   guest_repeatedly_read);
++
++	/* Add a non-private memslot (flags = 0) */
++	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
++				    EXITS_TEST_GPA, EXITS_TEST_SLOT,
++				    EXITS_TEST_NPAGES, 0);
++
++	virt_map(vm, EXITS_TEST_GVA, EXITS_TEST_GPA, EXITS_TEST_NPAGES);
++
++	/* Request to access page privately */
++	vm_set_memory_attributes(vm, EXITS_TEST_GPA, EXITS_TEST_SIZE,
++				 KVM_MEMORY_ATTRIBUTE_PRIVATE);
++
++	pr_info("Testing private access to non-private memslot\n");
++
++	exit_reason = run_vcpu_get_exit_reason(vcpu);
++
++	ASSERT_EQ(exit_reason, KVM_EXIT_MEMORY_FAULT);
++	ASSERT_EQ(vcpu->run->memory.flags, KVM_MEMORY_EXIT_FLAG_PRIVATE);
++	ASSERT_EQ(vcpu->run->memory.gpa, EXITS_TEST_GPA);
++	ASSERT_EQ(vcpu->run->memory.size, EXITS_TEST_SIZE);
++
++	pr_info("\t ... PASSED\n");
++
++	kvm_vm_free(vm);
++}
++
++int main(int argc, char *argv[])
++{
++	TEST_REQUIRE(kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_PROTECTED_VM));
++
++	test_private_access_memslot_deleted();
++	test_private_access_memslot_not_private();
++}
 -- 
-2.25.1
+2.40.0.rc2.332.ga46443480c-goog
 
-
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
