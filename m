@@ -2,128 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C9F46BD8AD
-	for <lists+kvm@lfdr.de>; Thu, 16 Mar 2023 20:13:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E65F6BD8BB
+	for <lists+kvm@lfdr.de>; Thu, 16 Mar 2023 20:17:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230131AbjCPTNG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Mar 2023 15:13:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58276 "EHLO
+        id S229868AbjCPTRt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Mar 2023 15:17:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230125AbjCPTNF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Mar 2023 15:13:05 -0400
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 446D937731
-        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 12:12:58 -0700 (PDT)
-Received: by mail-io1-f70.google.com with SMTP id u23-20020a6be917000000b007532ab65c70so1259149iof.12
-        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 12:12:58 -0700 (PDT)
+        with ESMTP id S229808AbjCPTRs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Mar 2023 15:17:48 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19972B1EC9
+        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 12:17:47 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id o10-20020a17090ac08a00b0023f3196fa6fso1134308pjs.2
+        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 12:17:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1678994266;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TJcbWDGDY7mW2UZ8+dFYqV06yFsfykcIM5oQQgMomTE=;
+        b=NXIQoi3YBWb27fNIE5+YxwwobwjsnMUlQCThLejvGIka8X9iKT1GPt141RafmdDhvJ
+         Q1yQwnKxMawq65in8Dcskl0DbfPNT11jbIOrGadjZV/UCMTs/yuH812+5+U30Z66QnyT
+         HkUxGY5+kGA3AtIxFr5v9jTPb9iXv6f98VnwwB+Bzm8SRrIGyFvbkfbc8/xRNJxr+bwM
+         tOuADhijReGR7kTsHXr1YtDuCn8+YgJfv8fMSHPoAQtQ9TtOTWqiHUqi8w0znTR851GE
+         bsNlnjrMYY9xN3gIFdMpAxSJuHJl50OBqvj5Re8bwjTuB2gF/zf+OdPk5JGRqOKVGY3u
+         32og==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678993977;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=U7xPE9eHjZFiRatnko2u5b3DgPyVKb9Z04I4THxWcHA=;
-        b=YGrMsRPMZNg3LEJfT3iF6Giq1CDHIDF8Yc2bTOBOHwtzGBoxKyiJ26kfluk6dxvyDj
-         ea+7uorz3YUcrNx5z7qebiijsOKbgcE1e1qXjIcaFoe2r9+xlhEV23JEeyAVR/3qbhmd
-         5uRfQrRJ6EjeJUTk8qDqlVFmqs5+clv5eJjia0RBOGMcJJnwZgZPF4sUg34balKMF4SR
-         9h2oN6dlXeXWhAUAlB3O8rkgUfM23MTBslDXfNj+BB20V2VbWqechlDWQ97Hifykfg7s
-         zo1jTsuooQlf18iJRl7cg+rybwrcyG3to53V6AGSyFuTN/v951D5r3vfrKGY3oMpRpCM
-         hULA==
-X-Gm-Message-State: AO0yUKVGYOW7IDP6eawJrlhbiXN2UkBcksZu3gbqpQkTm8O21gbFgKiI
-        VJgiOCLayb5MJsiGDNplWLOyZ/BamjI2SVQ342Wcw7D7ZR2z
-X-Google-Smtp-Source: AK7set8iENLiJJcuU7KGbv5SPcslX1Xx8ih7ZxAYfEeQTB2zuyrWs36a2NISGBtPQ+8fuCG/DGR7CBdQCLGobTFBZ47UUIQ60c/S
-MIME-Version: 1.0
-X-Received: by 2002:a5d:9a96:0:b0:745:c41a:8f0f with SMTP id
- c22-20020a5d9a96000000b00745c41a8f0fmr69348iom.2.1678993977437; Thu, 16 Mar
- 2023 12:12:57 -0700 (PDT)
-Date:   Thu, 16 Mar 2023 12:12:57 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000009af47405f7093fc6@google.com>
-Subject: [syzbot] [kvm?] WARNING in kvm_arch_vcpu_ioctl_run (4)
-From:   syzbot <syzbot+8accb43ddc6bd1f5713a@syzkaller.appspotmail.com>
-To:     bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        jarkko@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-sgx@vger.kernel.org,
-        mingo@redhat.com, pbonzini@redhat.com, seanjc@google.com,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-        SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-        version=3.4.6
+        d=1e100.net; s=20210112; t=1678994266;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=TJcbWDGDY7mW2UZ8+dFYqV06yFsfykcIM5oQQgMomTE=;
+        b=I63EWJa4tpTO1TCdY4daco1YjcDlgyHrFLg1UL8Te76HwbYahx6cIXfhDWCouF94VH
+         JZgQzg7VQPjRnBLkxfscSq55fWU+Ljmrn5NdGnY9oz9EILaHeQ6qfh3+jvhSo54zLKKU
+         LI3q3jy+auUs33Q6a/R4PwfkvorcqB9h8QxvyPLCq4T/W+1VWWMp3FXO4UyskwZJS6OR
+         fVs9Bg/cgN3vxl096c3XP4o8SIPvFZiCs0o/3JKDNV8zhwJ0eXeczJ9iTihSyRgI3lMA
+         +QC4iY9rpTvLAKCze3JEqWQnMJiT12UEMyV/RDs0KF0ht3Nui7Hxe64hGYWgoT1xksQR
+         AMKA==
+X-Gm-Message-State: AO0yUKW8L3uceJX/YsapG7pFrzXCKIOcUBuHFLYGbGiA+SO4gnL6VM5p
+        spR1Q8eAk03UaF75MR2EwwPQaURxxuU=
+X-Google-Smtp-Source: AK7set9O/4knFRyTM8/eHnkpwXDC/N3CPpiLPCHA3JrSy8khWhbEwCudTVlbz9cm5U2vbO9zvEYs7/JAUnw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:218b:b0:625:c7de:48c1 with SMTP id
+ h11-20020a056a00218b00b00625c7de48c1mr2123151pfi.4.1678994266635; Thu, 16 Mar
+ 2023 12:17:46 -0700 (PDT)
+Date:   Thu, 16 Mar 2023 19:17:45 +0000
+In-Reply-To: <0a42f824d24946ab86bcc6efa31b2863@huawei.com>
+Mime-Version: 1.0
+References: <0a42f824d24946ab86bcc6efa31b2863@huawei.com>
+Message-ID: <ZBNrWZQhMX8AHzWM@google.com>
+Subject: Re: WARNING in kvm_arch_vcpu_ioctl_run
+From:   Sean Christopherson <seanjc@google.com>
+To:     "zhangjianguo (A)" <zhangjianguo18@huawei.com>
+Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Renxuming <renxuming@huawei.com>,
+        "Wangyuan (Ethan)" <wangyuan38@huawei.com>,
+        "Ligang (J)" <stuart.li@huawei.com>,
+        yuzenghui <yuzenghui@huawei.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
++LKML (lore isn't picking this up for some reason) and a real subject
 
-syzbot found the following issue on:
+On Thu, Mar 16, 2023, zhangjianguo (A) wrote:
+> Hi all,
+>=20
+> Install the 6.3.0-rc1 kernel on the x86 server, and execute the https://s=
+yzkaller.appspot.com/text?tag=3DReproC&x=3D14b34300880000 test case, the ca=
+ll trace appears.
+>=20
+> [  +0.000028] ------------[ cut here ]------------
+> [  +0.000002] WARNING: CPU: 36 PID: 73250 at arch/x86/kvm/x86.c:11060 kvm=
+_arch_vcpu_ioctl_run+0x482/0x4b0 [kvm]
+> [  +0.000086] Modules linked in: openvswitch nf_conncount nf_nat nf_connt=
+rack nf_defrag_ipv6 nf_defrag_ipv4 libcrc32c ebtable_filter ebtables ip6tab=
+le_filter ip6_tables iptable_filter ip_tables intel_rapl_msr intel_rapl_com=
+mon sb_edac x86_pkg_temp_thermal coretemp kvm_intel kvm irqbypass rapl inte=
+l_cstate ixgbe ses intel_uncore mei_me enclosure pcspkr i2c_i801 mdio sunrp=
+c mei intel_pch_thermal i2c_smbus joydev lpc_ich dca sg acpi_power_meter dr=
+m vhost_net tun vhost fuse vhost_iotlb tap ext4 mbcache jbd2 sd_mod crct10d=
+if_pclmul ipmi_si ahci crc32_pclmul crc32c_intel libahci ipmi_devintf ghash=
+_clmulni_intel mpt3sas libata sha512_ssse3 ipmi_msghandler wdat_wdt raid_cl=
+ass scsi_transport_sas dm_mod br_netfilter bridge stp llc nvme nvme_core t1=
+0_pi crc64_rocksoft_generic crc64_rocksoft crc64 nbd
+> [  +0.000077] CPU: 36 PID: 73250 Comm: run_vcpu_ioctrl Not tainted 6.3.0-=
+rc1+ #2
+> [  +0.000004] Hardware name: Huawei RH2288 V3/BC11HGSB0, BIOS 3.87 02/02/=
+2018
+> [  +0.000002] RIP: 0010:kvm_arch_vcpu_ioctl_run+0x482/0x4b0 [kvm]
+> [  +0.000002] Call Trace:
+> [  +0.000003]  <TASK>
+> [  +0.000003]  kvm_vcpu_ioctl+0x279/0x680 [kvm]
+> [  +0.000047]  ? vfs_write+0x2c8/0x3d0
+> [  +0.000006]  __x64_sys_ioctl+0x8f/0xc0
+> [  +0.000006]  do_syscall_64+0x3f/0x90
+> [  +0.000007]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
+> [  +0.000002]  </TASK>
+> [  +0.000002] ---[ end trace 0000000000000000 ]---
+>=20
+> |        } else {
+> |                WARN_ON_ONCE(vcpu->arch.pio.count);
+> |                WARN_ON_ONCE(vcpu->mmio_needed);      // where the splat=
+ triggered
+> |        }
 
-HEAD commit:    ee3f96b16468 Merge tag 'nfsd-6.3-1' of git://git.kernel.or..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=11622f64c80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=cab35c936731a347
-dashboard link: https://syzkaller.appspot.com/bug?extid=8accb43ddc6bd1f5713a
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15bd61acc80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17402eb0c80000
+The splat occurs due to a longstanding (literally since KVM's inception) sh=
+ortcoming
+in KVM's uAPI.  On an emulated MMIO write, KVM finishes the instruction bef=
+ore
+exiting to userspace.  This is necessary given how KVM's uAPI works, as out=
+side
+of REP string instructions, KVM doesn't provide a way to restart an instruc=
+tion
+that partially completed before the MMIO was encountered.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/a7ac3e540d6d/disk-ee3f96b1.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/604b5042d73d/vmlinux-ee3f96b1.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/5a6d400b42b5/bzImage-ee3f96b1.xz
+For the vast majority of _emulated_ instructions, this doesn't cause proble=
+ms as
+there is a single memory accesses, i.e. any exceptions on the instruction w=
+ill
+occur _before_ the MMIO write.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+8accb43ddc6bd1f5713a@syzkaller.appspotmail.com
+What's happening here is that a PUSHA triggers an MMIO write and then runs =
+past
+the segment limit, resulting in a #SS after the MMIO is queued.  KVM inject=
+s the
+#SS (well, tries to) and thus loses track of the MMIO, but never clears mmi=
+o_needed.
 
-kvm_intel: KVM_SET_TSS_ADDR needs to be called before running vCPU
-kvm_intel: set kvm_intel.dump_invalid_vmcs=1 to dump internal KVM state.
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 5082 at arch/x86/kvm/x86.c:11060 kvm_arch_vcpu_ioctl_run+0x2464/0x2af0 arch/x86/kvm/x86.c:11060
-Modules linked in:
-CPU: 0 PID: 5082 Comm: syz-executor178 Not tainted 6.2.0-syzkaller-13115-gee3f96b16468 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/16/2023
-RIP: 0010:kvm_arch_vcpu_ioctl_run+0x2464/0x2af0 arch/x86/kvm/x86.c:11060
-Code: 74 c3 00 e9 2f de ff ff 48 c7 c7 80 45 78 8e e8 02 74 c3 00 e9 a9 dc ff ff e8 38 f8 71 00 0f 0b e9 6c e0 ff ff e8 2c f8 71 00 <0f> 0b e9 a4 e0 ff ff e8 20 f8 71 00 be 08 00 00 00 65 48 8b 1c 25
-RSP: 0018:ffffc90003b4fcb0 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: 0000000000000001 RCX: 0000000000000000
-RDX: ffff8880236e0000 RSI: ffffffff81130274 RDI: 0000000000000005
-RBP: ffff888021798000 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000000 R12: 0000000000000000
-R13: ffffc90003bfac90 R14: ffff88802319a8c0 R15: ffff8880217982ec
-FS:  000055555600f300(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 0000000073d95000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- kvm_vcpu_ioctl+0x574/0xfe0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4099
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:870 [inline]
- __se_sys_ioctl fs/ioctl.c:856 [inline]
- __x64_sys_ioctl+0x197/0x210 fs/ioctl.c:856
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7ff9dc1b2289
-Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffcad58a378 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007ff9dc1b2289
-RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000005
-RBP: 00007ff9dc175ce0 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007ff9dc175d70
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
+There's a second bug here that results in failed VM-Enter when KVM tries to=
+ inject
+the #SS: KVM doesn't ignore drop error code when the vCPU is in Real Mode. =
+ This
+too is a longstanding bug that has likely escaped notice because no real wo=
+rk code
+runs in Real Mode _and_ gracefully handles exceptions.
 
+My plan, pending testing, is to suppress the MMIO write + exception scenari=
+o since
+the bug has been around for 15+ years without anyone noticing, let alone ca=
+ring.
+Fixing it properly would be a heck of a lot of complexity and code churn fo=
+r no
+real benefit.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+And for the Real Mode exception bug, unless I'm missing something, the erro=
+r code
+can simply be suppressed when queueing the exception.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 237c483b1230..b3bf3a0d74ab 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -646,6 +646,9 @@ static void kvm_multiple_exception(struct kvm_vcpu *vcp=
+u,
+=20
+        kvm_make_request(KVM_REQ_EVENT, vcpu);
+=20
++       /* Real Mode exceptions do not report error codes. */
++       has_error &=3D is_protmode(vcpu);
++
+        /*
+         * If the exception is destined for L2 and isn't being reinjected,
+         * morph it to a VM-Exit if L1 wants to intercept the exception.  A
+@@ -8883,6 +8886,8 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gp=
+a_t cr2_or_gpa,
+        }
+=20
+        if (ctxt->have_exception) {
++               WARN_ON_ONCE(vcpu->mmio_needed && !vcpu->mmio_is_write);
++               vcpu->mmio_needed =3D false;
+                r =3D 1;
+                inject_emulated_exception(vcpu);
+        } else if (vcpu->arch.pio.count) {
+
