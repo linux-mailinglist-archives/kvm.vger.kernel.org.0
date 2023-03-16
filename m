@@ -2,217 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ED3A96BC8C1
-	for <lists+kvm@lfdr.de>; Thu, 16 Mar 2023 09:18:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 08CBB6BC8C8
+	for <lists+kvm@lfdr.de>; Thu, 16 Mar 2023 09:19:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229970AbjCPISQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Mar 2023 04:18:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43112 "EHLO
+        id S230139AbjCPITR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Mar 2023 04:19:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229686AbjCPISO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Mar 2023 04:18:14 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4419BA7AAF;
-        Thu, 16 Mar 2023 01:17:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678954669; x=1710490669;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=oO1jpgjoT5YaamSNiLRYXDePLug0FnwuFVkPX/tD/kU=;
-  b=cQky4X27bhc7SoUEepquO8qhzW6J3W75Ao0EAvDTEM1v+U0ojTjHEAD1
-   EkPI4yWiRPn6ZcRIgg6T/12hCyxG9ArxE2i2Fo6x0g/u6PesUHnir1hMe
-   9ny784m2Ef2GrDwYtxDqe1r845ylDoZDDgsRTyAPqUqmxhJLRNwlvmx23
-   23Zw2wiK6zlPFZiYdWNjTB73cNT+92rS0s1/gkMOVRrtfBwRxYqPKPvcL
-   nzaP9OpZHj1IKHJsH/hPOO7bq6TTLuUEJ/9mN5/+L/ffq3ows6m110d79
-   +dpJNCZ9rHfu8hLKyAc/eA/1tyCRq8MCcBC5Jmkwae933+Wk7SCNfLzj6
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10650"; a="424194796"
-X-IronPort-AV: E=Sophos;i="5.98,265,1673942400"; 
-   d="scan'208";a="424194796"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2023 01:16:39 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10650"; a="768843560"
-X-IronPort-AV: E=Sophos;i="5.98,265,1673942400"; 
-   d="scan'208";a="768843560"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by FMSMGA003.fm.intel.com with ESMTP; 16 Mar 2023 01:16:38 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Thu, 16 Mar 2023 01:16:37 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21 via Frontend Transport; Thu, 16 Mar 2023 01:16:37 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.43) by
- edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.21; Thu, 16 Mar 2023 01:16:37 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TNeNe+dHgKUva5U+HGod9oOvSNev1gKrPk0ybdf3yBesWZZ19pgZhxpOFSEQyjgvuMIcPOnVip8MPFdQHdebUFfHltqFMZoxHHDJWzfVhSj33C7bhzVTPHjsYE4hGSE+zy9un1qs0EompLl7XeRTIgf+RvNCHRKhbkQi94Tg8gnp0g/3bYSxcUiLWJZOO8+0FNkXlWZYpxp5LyQ2Xn03r6/vysgTCg41TmHvVZMsy+bxu7zD/WQa9JlxXgV/SLEJKwAxyxNNGJynTS7M8tKq9ELBt9/I+DENvI5u8tIO98Z0tw183BWS6leugY8LMqr4MiX7fD6OtD0+TtXyCIL9cA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IuX1HRJaqHdr4WgWQZOtnJ7XmshuFJka1hJrETCJL7I=;
- b=KreXIRGTxtaUZj/cKkP8WIF5WZozH9pjvqJYrEdaxCdCcpbB+EquQFdyUOCPvMItH4ISeI5YG+XZsInFQy21EmrHpRxEq2q3mcBm27Ga9JUKq2pBjn6Yaeaau99aq9OWconY4lgNuVaQpNMq9P1frmndq1bfQAQ/UUaN5H0uZhD2PgVichS4K6xaCyRkdyXAuaMgowt+enRwOJGU9I6IVRyrMg/Z6YliR3m1W7aEPG7wqJ3c7qe0dvf/vCzKPOYyn3hSzMJ2/8FpWJhbL6kiEBMqehSMMz9zbGjIm+0vwUKeRsdDhFCRd/RCYLQwaKcaKSjcdC6mdeeBLcjJbtNoXA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by CH0PR11MB5235.namprd11.prod.outlook.com (2603:10b6:610:e2::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.31; Thu, 16 Mar
- 2023 08:16:35 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::1aac:b695:f7c5:bcac]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::1aac:b695:f7c5:bcac%9]) with mapi id 15.20.6178.031; Thu, 16 Mar 2023
- 08:16:35 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>
-CC:     "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
-Subject: RE: [PATCH v2 2/4] iommu: Add new iommu op to get iommu hardware
- information
-Thread-Topic: [PATCH v2 2/4] iommu: Add new iommu op to get iommu hardware
- information
-Thread-Index: AQHZUlxYm6GOmk6wmUW710g04eg+cq79GCcg
-Date:   Thu, 16 Mar 2023 08:16:35 +0000
-Message-ID: <BN9PR11MB5276C6A0F26954A42B8C23498CBC9@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20230309075358.571567-1-yi.l.liu@intel.com>
- <20230309075358.571567-3-yi.l.liu@intel.com>
-In-Reply-To: <20230309075358.571567-3-yi.l.liu@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|CH0PR11MB5235:EE_
-x-ms-office365-filtering-correlation-id: 28cfea90-0660-4a7d-ca48-08db25f6c243
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Anf907dIVwlfi5pp3yJ28QhyiOkBHi3aKvP6DqihGYOHiWaYyRZktIoNFHn4ZrVQh2QiC9uRHZ2sIUbSbWCO+2LWKje7YbaKXO3jIFZrD9u7vjvQ5+e0fnWuILOvxDi7Ze+VQU45aD1/jwKWO9NIso3o2IspZrYKcXaixFfPxY9m8pKpTdlFwY8kRG8BHQ0xhxKRwW7kRrJqvJVOYwaROP+nHKOhRluIx8die+acnzR8P4XDiYT8uFvExeEFwlZAJwkrUmu5HdTeBkCw9JGD8LpSgK7+I41F53tyW+2SiDta8FizMmRa9GNs15F+mSfoIspHEyCLJOkqEIGBA7Fu79+9RhiOlAGPkWDZj+vUf6Nh9vxdbwcT1lAqztqCEZ/MSN4vKzFy8HDri6Ejf6Q3Yd1aCxW4JEcAX9adMnXX1PNAIv7LDzCnvImwYgwlp7aiIx9CDgi3kAmikjjbMcAr5Hw8HKXf5HtvVPKS81KsJoWqc1Uo0ae/nNvogXz8NWIA9mLewAk7gKIsCmMb24eHFuXBVPsR3WxvYe3MQlYK5xQYC06ia8KmC6G9z82/a0MKmQvsAtRMpESpIocgOxGvdmsawLDVeW5UsH/UiyB8osum9c26jNBeDJbJR/bJDz8WvNhUJMz1wLVude+9/fJsVwL9OMvzVFG5ojncpezY3ERrKcjhLYvKW+cG/UGRMgtPS9/OtRSBUEIffIsTzU6yJ0l2mcBvNGD3qCOThCkr0FBSSnF10leQRXqouQCcEnJq
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(366004)(346002)(136003)(39860400002)(376002)(396003)(451199018)(38100700002)(38070700005)(86362001)(122000001)(82960400001)(33656002)(2906002)(41300700001)(7416002)(52536014)(4326008)(8936002)(5660300002)(55016003)(76116006)(186003)(9686003)(6506007)(83380400001)(26005)(316002)(110136005)(54906003)(64756008)(66556008)(66946007)(71200400001)(478600001)(7696005)(66476007)(8676002)(66446008);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?YjQ5+MdMU3rXNyElva1yFH0X+cMVVJzSGk54MuAtArv79RsXRavxONv2mlv3?=
- =?us-ascii?Q?ncckNsVYz3EQPnHnVIksigT74ePnvnhB+CjXWdHtgXw3aaZ37cn63HGI6/L9?=
- =?us-ascii?Q?YIiLJ44fLalPWfagSt2KFXd0CUXSjc6h/B3nup8EDmdZi6PXwk88zQ5fLu5G?=
- =?us-ascii?Q?mRl6/DTROQSoCixnguhtjksB7p1c2vSkYmF4nSoqB//QwOpuMpNuqLbkdPWV?=
- =?us-ascii?Q?x0mrUqUdl1CZeVYSBdyPZaUUtUbnSUu3l+uXmiYU/KTEo/MUwNkUrMX/JlLA?=
- =?us-ascii?Q?Fg/7CjmRTmjqXq9gMRgD4eINhRBmoo45dOkZN/jIqh3EXXr/O0ttL90DD7VS?=
- =?us-ascii?Q?jsW4396KDtDN2MXTnYKhTmQB7tmvhs21skXIFhhjICv5QXS3GqvjdJ0ZZSjm?=
- =?us-ascii?Q?ULaSWWzW683e50InJD+YO1HviU63RTeYsrFGuYpFhjbLRXp38q7VedLzI8jV?=
- =?us-ascii?Q?co3qwZXr6rsywwj/lqhkz/I+XHRURZpJfhUaiqw+3sN+jtmlAcq1u+VAWEV9?=
- =?us-ascii?Q?3bi5LPbFbzRrM9dLpnGCWOfBfoOyTTGmEnIC/O6sEmT89HK6tizvzSRJ1Rb+?=
- =?us-ascii?Q?qAKvM2ETtJNF+dPw8D/M3KAheMXBNh1Riu1MTDcelxVfTT9RbgT2k320pXXg?=
- =?us-ascii?Q?65N5yzbMQhVlHeYa9FLeyjdbgYamVVVTnpaNZQrVTa+pWiEkXXmwwNmBmd+O?=
- =?us-ascii?Q?/cxnYno+xLmkhF17FzO7T3AHfF/Bg0636Ll7zCvIT8cRjglAUXm4hdgIUtsc?=
- =?us-ascii?Q?xNCeabb7f/G3N1JiRAKTkGavij0h/yQSq2OqAgK13HziPpTyR+QkEMSjEzm0?=
- =?us-ascii?Q?wCrTn6Eo3qSAsW56rB1A0vBNkPwq0cl+ew/NVJTH9GR0UojYFlYYTT8RfLCi?=
- =?us-ascii?Q?6MsW7mM2KXdsEw7nUoCoXpvq90aZ7agdM23fau9JL7qs/0OB9jffsfZPoOPC?=
- =?us-ascii?Q?ZKtbEJIxyovt+xgDv1Rq9rPQs3khfT4teWDRHeQO/6fjIdx3YZdMQfG9ay9X?=
- =?us-ascii?Q?HJRl4a90+qKnpU/r2rzvYboni5ZGL1PiZhWKxjLlbqqU7op1ehIXVUbRrkPw?=
- =?us-ascii?Q?SGmcZXE1bfwi6l/udf4lk9CMwcuikZALR5i9Lxy/67/6AOxoS/UiT9SZGPnJ?=
- =?us-ascii?Q?jU+h0FNwg7PdEXF94AYJd/jAB3FRl4UGZW85vC4NFST2jafu3uM1YiWVs90C?=
- =?us-ascii?Q?xcPSUgdHOLA3jG/4sDsWRbX1lmXRY+yoXpFR9m9ZY3DBqYxAV4lhNoNLcEjF?=
- =?us-ascii?Q?BhVZtZOQ1p95oKN/xIf21KiwKj3UmnyXoqro9EPbxKeZx45kH8YzXKYojvFV?=
- =?us-ascii?Q?kcX9uQaeMk63fmZJlzPGUoitcVxR+NgYqWAqL97iTsNZP7sUny4cj+UC9/ZC?=
- =?us-ascii?Q?uXdoL6zQXuUEfz7dk+cQj3eVNzn91nFzCwXmHizTruPMmvMMjBjDbmQ0qmvQ?=
- =?us-ascii?Q?Y830UIScH+R8A7Q/hypoyHfTV8fajG7Ijf0h8C2mkMyLKiaEcF5+Hz7WODBR?=
- =?us-ascii?Q?zNCBD9HXPOGxYniNQXjfvdYg6hdfrv8vOvXzeGwvnUE7oRl1oQdNwpPCvEqr?=
- =?us-ascii?Q?15onFcrzko48y3Jyfmn1G6WMH6ffDbiD4cxC2LJG?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S229799AbjCPITO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Mar 2023 04:19:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD2AF2BF1A
+        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 01:18:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1678954653;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7tgpDQ21wRopkfuNLBenzw1X+XTk1gkyJI+wV3gp8bc=;
+        b=S1qn/6v7Ja79Na/SrxZ9nWggckWAZxPlTrRtqyY0O0PbpZcVrqsgw0hGLbvDILwMid0iyw
+        P/B3nV3PmafHs0KjOT0UED2vSJEkMcd0q8a4snRf0oM7vxjwSjlv+BsRz7C0O07DMUvvkj
+        Dqrq25Tn+D9mziEhHWTUVCQOV/J3QXU=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-643-CVSXV7NlPzqMMdKuDB34qA-1; Thu, 16 Mar 2023 04:17:31 -0400
+X-MC-Unique: CVSXV7NlPzqMMdKuDB34qA-1
+Received: by mail-wm1-f69.google.com with SMTP id t1-20020a7bc3c1000000b003dfe223de49so2261100wmj.5
+        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 01:17:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678954650;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7tgpDQ21wRopkfuNLBenzw1X+XTk1gkyJI+wV3gp8bc=;
+        b=VT1axXvx2+tzAvf//sue3QudNgYE3FHsNyoteFpgW2J87hM+6gl9PFpAuUBDmx42FU
+         3DxiB/ti9BXEMJdmY3VZgP2sGTwSW+6LjvLlhpocNKXt/tKR2gjngKhP2YcWr9vIz2cM
+         T7b59TF5uhYL3aIga3JiwMXkf7VD4iHhugQRkm68PYcodDMpYuFzbtkBmqXsF9uUZj8G
+         t6EDQSlnPPUflS2/C7Y7/XcNd/dLfLEiP775Y4rp9i9oJPJXNkyrARZ2ocPppEgXlxa9
+         jaZ/Z9o30aVe6BQfh1ZmsuOSOS8sAcbwfhdQIwTUYmKgOSd1lYFuGc8+xacNt352yycJ
+         HDig==
+X-Gm-Message-State: AO0yUKW3ZvfXalUQ1Awbw+mtjNDBstDCE1zXTVDV4Eo+vk5eiqDn2fY9
+        8+n1heVN57dOn/PUgh1YahLeod2iWo6ot1MPvK3+/Oytsk+G3M9/ywoL+GFiinaT+ElDX0MDAGa
+        b+sLt33jS5U0R
+X-Received: by 2002:a05:600c:3c8f:b0:3ea:bc08:b63e with SMTP id bg15-20020a05600c3c8f00b003eabc08b63emr21673834wmb.2.1678954650291;
+        Thu, 16 Mar 2023 01:17:30 -0700 (PDT)
+X-Google-Smtp-Source: AK7set8yAXCmTlyMF4pVppmWMDqyhk0GT12h+rEm72RHUQ1OCYbXiPEGJgmkVgwCqUMwdNOtrDJ3tw==
+X-Received: by 2002:a05:600c:3c8f:b0:3ea:bc08:b63e with SMTP id bg15-20020a05600c3c8f00b003eabc08b63emr21673814wmb.2.1678954650016;
+        Thu, 16 Mar 2023 01:17:30 -0700 (PDT)
+Received: from sgarzare-redhat (host-82-57-51-170.retail.telecomitalia.it. [82.57.51.170])
+        by smtp.gmail.com with ESMTPSA id l26-20020a05600c2cda00b003dd1bd0b915sm4353875wmc.22.2023.03.16.01.17.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Mar 2023 01:17:29 -0700 (PDT)
+Date:   Thu, 16 Mar 2023 09:17:25 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     virtualization@lists.linux-foundation.org,
+        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
+        eperezma@redhat.com, netdev@vger.kernel.org, stefanha@redhat.com,
+        linux-kernel@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH v2 1/8] vdpa: add bind_mm/unbind_mm callbacks
+Message-ID: <20230316081725.2gwfgptm3lkoptwt@sgarzare-redhat>
+References: <20230302113421.174582-1-sgarzare@redhat.com>
+ <20230302113421.174582-2-sgarzare@redhat.com>
+ <CACGkMEv24Zw-OUbBBSne21pF7=4XCZ6JGj7Y_cC7cMFYTjbF1Q@mail.gmail.com>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 28cfea90-0660-4a7d-ca48-08db25f6c243
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Mar 2023 08:16:35.4149
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: yirhpbO4Pvqyq2WwB4esYVGjJAvM0E/lZqRzOg45syO+43VnU9Ntc+GNj2jEUFJKSPbejfBSG4k4JDvZOvAiDg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR11MB5235
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACGkMEv24Zw-OUbBBSne21pF7=4XCZ6JGj7Y_cC7cMFYTjbF1Q@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Liu, Yi L <yi.l.liu@intel.com>
-> Sent: Thursday, March 9, 2023 3:54 PM
-> @@ -222,6 +223,11 @@ struct iommu_iotlb_gather {
->  /**
->   * struct iommu_ops - iommu ops and capabilities
->   * @capable: check capability
-> + * @hw_info: IOMMU hardware information. The type of the returned data
-> is
-> + *           defined in include/uapi/linux/iommufd.h. The data buffer is
+On Tue, Mar 14, 2023 at 11:39:42AM +0800, Jason Wang wrote:
+>On Thu, Mar 2, 2023 at 7:34 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
+>>
+>> These new optional callbacks is used to bind/unbind the device to
+>> a specific address space so the vDPA framework can use VA when
+>> these callbacks are implemented.
+>>
+>> Suggested-by: Jason Wang <jasowang@redhat.com>
+>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>> ---
+>
+>One thing that came into my mind is that after this commit:
+>
+>commit 5ce995f313ce56c0c62425c3ddc37c5c50fc33db
+>Author: Jason Wang <jasowang@redhat.com>
+>Date:   Fri May 29 16:02:59 2020 +0800
+>
+>    vhost: use mmgrab() instead of mmget() for non worker device
+>
+>    For the device that doesn't use vhost worker and use_mm(), mmget() is
+>    too heavy weight and it may brings troubles for implementing mmap()
+>    support for vDPA device.
+>
+>We don't hold the address space after this commit, so the userspace
+>mapping could be invalid if the owner exits?
 
-"The type of the returned data is marked by @driver_type".
+Thanks for mentioning it, I'll take a look at it!
 
-"defined in include/uapi/linux/iommufd.h" should belong to the comment
-of @driver_type
+In case maybe I should do a mmget (or get_task_mm) in vhost-vdpa before
+calling the callback, or in the parent driver inside the callback, but
+it seems duplicating code.
 
-> + *           allocated in the IOMMU driver and the caller should free it
-> + *           after use. Return the data buffer if success, or ERR_PTR on
-> + *           failure.
->   * @domain_alloc: allocate iommu domain
->   * @probe_device: Add device to iommu driver handling
->   * @release_device: Remove device from iommu driver handling
-> @@ -246,11 +252,17 @@ struct iommu_iotlb_gather {
->   * @remove_dev_pasid: Remove any translation configurations of a specifi=
-c
->   *                    pasid, so that any DMA transactions with this pasi=
-d
->   *                    will be blocked by the hardware.
-> + * @driver_type: One of enum iommu_hw_info_type. This is used in the
-> hw_info
-> + *               reporting path. For the drivers that supports it, a uni=
-que
-> + *               type should be defined. For the driver that does not su=
-pport
-> + *               it, this field is the IOMMU_HW_INFO_TYPE_DEFAULT that i=
-s 0.
-> + *               Hence, such drivers do not need to care this field.
+Thanks,
+Stefano
 
-The meaning of "driver_type" is much broader than reporting hw_info.
+>
+>Thanks
+>
+>>
+>> Notes:
+>>     v2:
+>>     - removed `struct task_struct *owner` param (unused for now, maybe
+>>       useful to support cgroups) [Jason]
+>>     - add unbind_mm callback [Jason]
+>>
+>>  include/linux/vdpa.h | 10 ++++++++++
+>>  1 file changed, 10 insertions(+)
+>>
+>> diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
+>> index 43f59ef10cc9..369c21394284 100644
+>> --- a/include/linux/vdpa.h
+>> +++ b/include/linux/vdpa.h
+>> @@ -290,6 +290,14 @@ struct vdpa_map_file {
+>>   *                             @vdev: vdpa device
+>>   *                             @idx: virtqueue index
+>>   *                             Returns pointer to structure device or error (NULL)
+>> + * @bind_mm:                   Bind the device to a specific address space
+>> + *                             so the vDPA framework can use VA when this
+>> + *                             callback is implemented. (optional)
+>> + *                             @vdev: vdpa device
+>> + *                             @mm: address space to bind
+>> + * @unbind_mm:                 Unbind the device from the address space
+>> + *                             bound using the bind_mm callback. (optional)
+>> + *                             @vdev: vdpa device
+>>   * @free:                      Free resources that belongs to vDPA (optional)
+>>   *                             @vdev: vdpa device
+>>   */
+>> @@ -351,6 +359,8 @@ struct vdpa_config_ops {
+>>         int (*set_group_asid)(struct vdpa_device *vdev, unsigned int group,
+>>                               unsigned int asid);
+>>         struct device *(*get_vq_dma_dev)(struct vdpa_device *vdev, u16 idx);
+>> +       int (*bind_mm)(struct vdpa_device *vdev, struct mm_struct *mm);
+>> +       void (*unbind_mm)(struct vdpa_device *vdev);
+>>
+>>         /* Free device resources */
+>>         void (*free)(struct vdpa_device *vdev);
+>> --
+>> 2.39.2
+>>
+>
 
-let's be accurate to call it as "hw_info_type". and while we have two
-separate fields for one feature where is the check enforced on whether
-both are provided?
-
-Is it simpler to return the type directly in @hw_info?
-
-btw IOMMU_HW_INFO_TYPE_DEFAULT also sounds misleading.
-'default' implies hw_info still available but in a default format.
-
-probably it's clearer to call it IOMMU_HW_INFO_TYPE_NONE.
