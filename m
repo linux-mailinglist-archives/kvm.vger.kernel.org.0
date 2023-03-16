@@ -2,64 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C4156BD97C
-	for <lists+kvm@lfdr.de>; Thu, 16 Mar 2023 20:47:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 32D576BD959
+	for <lists+kvm@lfdr.de>; Thu, 16 Mar 2023 20:36:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230084AbjCPTrk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Mar 2023 15:47:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54190 "EHLO
+        id S230323AbjCPTgZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Mar 2023 15:36:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229455AbjCPTri (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Mar 2023 15:47:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1355296F01
-        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 12:46:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678996016;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=bdTdOJ6+s2GcSWJg3glgRqHLDbFvhpyQGCderohXZ7Y=;
-        b=XjI1oi58qQie7zaWm2zkqjkSdMjU8YyOl3zl5K6oIBUZ9KNj+xZtoQgwxoJR2ERmYLSNdh
-        gG8t67vXDdXmPRoycRRQe9NK0vbKIitS3fXR6E0Kkhsrd7XvHWXEtooupX7dWdj+hyNyEO
-        Ru875XXLX/sgF8MzLuF2EPfrwYCncfA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-86-sl2LBpVNMXS-1l3sltPdWw-1; Thu, 16 Mar 2023 15:46:52 -0400
-X-MC-Unique: sl2LBpVNMXS-1l3sltPdWw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2179C884EC3;
-        Thu, 16 Mar 2023 19:46:52 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.38])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 92E5D2166B26;
-        Thu, 16 Mar 2023 19:46:51 +0000 (UTC)
-Date:   Thu, 16 Mar 2023 15:24:23 -0400
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Sam Li <faithilikerun@gmail.com>
-Cc:     qemu-devel@nongnu.org, damien.lemoal@opensource.wdc.com,
-        Hanna Reitz <hreitz@redhat.com>, hare@suse.de,
-        qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, dmitry.fomichev@wdc.com,
-        Cornelia Huck <cohuck@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Kevin Wolf <kwolf@redhat.com>,
-        Raphael Norwitz <raphael.norwitz@nutanix.com>
-Subject: Re: [PATCH v7 0/4] Add zoned storage emulation to virtio-blk driver
-Message-ID: <20230316192423.GG63600@fedora>
-References: <20230310105431.64271-1-faithilikerun@gmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="g/veVqzWPfdd0/XF"
-Content-Disposition: inline
-In-Reply-To: <20230310105431.64271-1-faithilikerun@gmail.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        with ESMTP id S230325AbjCPTgW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Mar 2023 15:36:22 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 809E576160
+        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 12:36:17 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-536d63d17dbso25688687b3.22
+        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 12:36:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1678995376;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yLXQDEpA7yMBHY3pvsFbW1lWjQMlNDrFYkskb+8dWQw=;
+        b=PrB4vwvW5iv11UJZpooT7rvslKfDWjKGT7LJSCkScrFN77cNUoEu4Is6TyO/uq1pM8
+         rUVfMYnae2iHqUz0IOi0o+jheqTLS1yi3io9ANUg3z3mal53hfvKcgD993sjQSDsSTfr
+         fnV9U2X+NoLTmyLVPe9vlekbkFI9tWk1H2wLrizaagkhUfgFCW43xmu+fHBEgSbLNh3M
+         gtsPAC/1ahNIRRZ5MIiF3R7f71M/IWqrO4V61dxBBQ80ccXd1IHlka9of+rNFJEFToqZ
+         k3tvrTBHPoHCJzJHDOqbzPyG0eoqQDUJP71H7wAWSLHS+YxFzmPcMHU5RrHfrGVAkw5O
+         DwcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678995376;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yLXQDEpA7yMBHY3pvsFbW1lWjQMlNDrFYkskb+8dWQw=;
+        b=sNrmIOhayf/kvzsUXZpIKCdQGxz9XM61ZblZH7JHx3w3l+4dpr3n5SWr00pPqIOETn
+         MEB/+vP9sZDj6wH0FDsHR8k7BCyxLrGcgYOuF3vTZgF2VMQJJD0HOQLPq/1cXf0eENqn
+         ihLXzUiZzixCNro7n6rk4LJQLZ/UHzFkScYJ852hkjoerMpVbI/vREwfZE4qEBlUX1yr
+         QZvVhL8aSyiDe23L8U8Gg89OdF2u/VY8JTIUrwsdBll6YGYmKUx+bICuF30PNVlcg2ti
+         wwz726NfdQO4u9Z5Xoz6ujb7QWdPbTxBKybjUDe0AEpJBO6iQPnFmOcEqxa/ndKftx7e
+         Wupg==
+X-Gm-Message-State: AO0yUKXRaqOkBTWGF5+RJZAgPiMNFYUsfZHlc7qb/PZx0q4IZEEVBjkf
+        0zBd2yGwgjGMoh+X370LCaHsZ1badUs=
+X-Google-Smtp-Source: AK7set/jMiOWZ6MfnT/kZfZ9gW4uYomOjI9N6aA3TvUYokg/XSTvTQoJd1TbVa2nB7q5J71HLZCidR+AbOg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:4005:0:b0:544:6455:e023 with SMTP id
+ l5-20020a814005000000b005446455e023mr2927636ywn.10.1678995376823; Thu, 16 Mar
+ 2023 12:36:16 -0700 (PDT)
+Date:   Thu, 16 Mar 2023 19:36:15 +0000
+In-Reply-To: <0000000000009af47405f7093fc6@google.com>
+Mime-Version: 1.0
+References: <0000000000009af47405f7093fc6@google.com>
+Message-ID: <ZBNvrx3Q9Wa3WqXL@google.com>
+Subject: Re: [syzbot] [kvm?] WARNING in kvm_arch_vcpu_ioctl_run (4)
+From:   Sean Christopherson <seanjc@google.com>
+To:     syzbot <syzbot+8accb43ddc6bd1f5713a@syzkaller.appspotmail.com>
+Cc:     bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        jarkko@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-sgx@vger.kernel.org,
+        mingo@redhat.com, pbonzini@redhat.com,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,51 +69,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Mar 16, 2023, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    ee3f96b16468 Merge tag 'nfsd-6.3-1' of git://git.kernel.or..
+> git tree:       upstream
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=11622f64c80000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=cab35c936731a347
+> dashboard link: https://syzkaller.appspot.com/bug?extid=8accb43ddc6bd1f5713a
+> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15bd61acc80000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17402eb0c80000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/a7ac3e540d6d/disk-ee3f96b1.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/604b5042d73d/vmlinux-ee3f96b1.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/5a6d400b42b5/bzImage-ee3f96b1.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+8accb43ddc6bd1f5713a@syzkaller.appspotmail.com
+> 
+> kvm_intel: KVM_SET_TSS_ADDR needs to be called before running vCPU
+> kvm_intel: set kvm_intel.dump_invalid_vmcs=1 to dump internal KVM state.
+> ------------[ cut here ]------------
+> WARNING: CPU: 0 PID: 5082 at arch/x86/kvm/x86.c:11060 kvm_arch_vcpu_ioctl_run+0x2464/0x2af0 arch/x86/kvm/x86.c:11060
+> Modules linked in:
+> CPU: 0 PID: 5082 Comm: syz-executor178 Not tainted 6.2.0-syzkaller-13115-gee3f96b16468 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/16/2023
+> RIP: 0010:kvm_arch_vcpu_ioctl_run+0x2464/0x2af0 arch/x86/kvm/x86.c:11060
 
---g/veVqzWPfdd0/XF
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Same thing reported by another syzkaller instance, I'll post fixes in the not too
+distant future.
 
-On Fri, Mar 10, 2023 at 06:54:27PM +0800, Sam Li wrote:
-> This patch adds zoned storage emulation to the virtio-blk driver.
->=20
-> The patch implements the virtio-blk ZBD support standardization that is
-> recently accepted by virtio-spec. The link to related commit is at
->=20
-> https://github.com/oasis-tcs/virtio-spec/commit/b4e8efa0fa6c8d844328090ad=
-15db65af8d7d981
->=20
-> The Linux zoned device code that implemented by Dmitry Fomichev has been
-> released at the latest Linux version v6.3-rc1.
->=20
-> Aside: adding zoned=3Don alike options to virtio-blk device will be
-> considered as following-ups in future.
->=20
-> v6:
-> - update headers to v6.3-rc1
-
-Hi Sam,
-I had some minor comments but overall this looks good. Looking forward
-to merging it soon!
-
-Thanks,
-Stefan
-
---g/veVqzWPfdd0/XF
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmQTbOcACgkQnKSrs4Gr
-c8iN3gf/cTsBjYPDxFs2/VXzgYz1TXBEUx7BWJNxiaoZHbU04tw6KYTM2O6qNPql
-kZF3eyAsin3lrIx7JpcPzyKOPycw2G+5aCdGcpGz5dtGPI4ux5j7dB2dixF++XDL
-y85GkodKuGraq6Iv1aEkUZk+ibF19/V/OI/YKcBnydhSYwOo8lW1qDsUA8hdSr6V
-cDG+gPS6wxyrgLZQW1/bBKzr0Kwq+VFvDFEmT/qvgKQwmjiG+sv71Xz2NX2nqNJj
-SMgXCIHAZZo4HAwxBQf/lj30GiqodJHdXt82m8uCeKzG/+zKzH2fS/LorsQtS4do
-xtYAPuhVMZFPVxb8TkI4Z6kLrDZARw==
-=K3sE
------END PGP SIGNATURE-----
-
---g/veVqzWPfdd0/XF--
-
+https://lore.kernel.org/all/ZBNrWZQhMX8AHzWM@google.com
