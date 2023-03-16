@@ -2,201 +2,238 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 756F56BC3FE
-	for <lists+kvm@lfdr.de>; Thu, 16 Mar 2023 03:52:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C2956BC409
+	for <lists+kvm@lfdr.de>; Thu, 16 Mar 2023 03:54:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229751AbjCPCwb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Mar 2023 22:52:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49802 "EHLO
+        id S229784AbjCPCyW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Mar 2023 22:54:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229482AbjCPCw3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Mar 2023 22:52:29 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05593CC312;
-        Wed, 15 Mar 2023 19:52:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678935147; x=1710471147;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=zJ/gNJYVAtt6P+L++s93h3igd3jARFiF/uA7kXShLxE=;
-  b=epSSdTmhLNWnsWklHozrLiXzK5GCCkpdqXDbIEEp4SORHBz0oGbao9yz
-   THDA6WhLz4QbwrZCIUayLd0c9U+GchE9HByTns6QCYZ2d8RBKxs1f9XMg
-   peOBrrBsx+ne5ba3SiM6Ee5pS32XMC3fjrnJsdmBTLy2HlqNQhVq/gzgA
-   lm9OtyDICQGMfUVH6cE3mfvJrF1KC9G1pQ7khMmWF+19TagxgQnGoHbaf
-   a6k1YrUUc3esLmq3IXm+RHtF9MO6HOIMqk5clJ7BQiXfp5OSxu8lNxY2u
-   vLTzDiwPSk2980Z84tyrwz+6O29I+dqHPoZDBZTQ5CxQitwA2XlYlBgUV
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10650"; a="317524440"
-X-IronPort-AV: E=Sophos;i="5.98,264,1673942400"; 
-   d="scan'208";a="317524440"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2023 19:52:27 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10650"; a="748684434"
-X-IronPort-AV: E=Sophos;i="5.98,264,1673942400"; 
-   d="scan'208";a="748684434"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmsmga004.fm.intel.com with ESMTP; 15 Mar 2023 19:52:27 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Wed, 15 Mar 2023 19:52:26 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Wed, 15 Mar 2023 19:52:26 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21 via Frontend Transport; Wed, 15 Mar 2023 19:52:26 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
- edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.21; Wed, 15 Mar 2023 19:52:26 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MrVWXQvLPtSuMleQh4iiIMR6BlCnzIWB0Xc3xq8tx1PMNuPhfBHHPu65H0Es3fEfadLVB14CV9XdUYacuKxYuVLDSE5UikDV8lo5EwcZilZJASYIjUU16IHxRae1ki65q3DM7J0gNySSjDrxD9rP0P/V1Y5B0XSRWB167bwV2rhIF7LGNdmfrDRW6UCo3SWQB3aohs2ehMFdKsf7t2YR+jKuLfk4Wj+6ExhfokPDTZZlPrBZkDgEyUySKr+e/hoQ9AXxlpLVLL2bmFcqWkXqDeCwn/VUgEZ1NAjy5A3C3df55qJI2jrDpMvC7Vn7+wo1QtS2PU90iVHZcti28mniHQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zJ/gNJYVAtt6P+L++s93h3igd3jARFiF/uA7kXShLxE=;
- b=HPotj8rGHp4mX5Amoz1pGIQygnygnw51qtnaYys84M6PHeLTOTovbqFQg8WRFQZWmZg2ffKSE+ABd1+TEjiAr8+nHMcbXSlzfiXciSd1u9NzTD2sKysUmuNsG/lpR3iLvpzR9JgDS5r9njWINdNLi0HrM0PGXx7w8x03gyb9ebUmJBBobkPd2EsqDDalUrSou9wgU0kKKf5hQxlZP5JvZMaHKa1036Y60UE6153DDkOiyj414UiQPxeRCJ4ASwJH+f1XjlXqMJunBw+v32ldGgpn6RjYqDeUzr0ZFnznGd3P6eLjCaXPtjMX2faGbJZz83ZWFZ8Cb0Ep3lJde87aTg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by PH8PR11MB6832.namprd11.prod.outlook.com (2603:10b6:510:22c::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.24; Thu, 16 Mar
- 2023 02:52:24 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::f403:a0a2:e468:c1e9]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::f403:a0a2:e468:c1e9%5]) with mapi id 15.20.6178.024; Thu, 16 Mar 2023
- 02:52:24 +0000
-From:   "Huang, Kai" <kai.huang@intel.com>
-To:     "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "david@redhat.com" <david@redhat.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "Chatre, Reinette" <reinette.chatre@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "imammedo@redhat.com" <imammedo@redhat.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "Huang, Ying" <ying.huang@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>
-Subject: Re: [PATCH v10 05/16] x86/virt/tdx: Add skeleton to enable TDX on
- demand
-Thread-Topic: [PATCH v10 05/16] x86/virt/tdx: Add skeleton to enable TDX on
- demand
-Thread-Index: AQHZUDU50M/RwoyayES+lzw7MeI2g678nMEAgAAlggCAAAH6gA==
-Date:   Thu, 16 Mar 2023 02:52:23 +0000
-Message-ID: <dfc6dd51ee07f75fedb5d0ee99402a33168954ae.camel@intel.com>
-References: <cover.1678111292.git.kai.huang@intel.com>
-         <f150316b975b5ca22c6c4016ffd90db79d657bbf.1678111292.git.kai.huang@intel.com>
-         <20230316003102.GB197448@ls.amr.corp.intel.com>
-         <20230316024516.GA259042@ls.amr.corp.intel.com>
-In-Reply-To: <20230316024516.GA259042@ls.amr.corp.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Evolution 3.46.4 (3.46.4-1.fc37) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|PH8PR11MB6832:EE_
-x-ms-office365-filtering-correlation-id: 40ae4275-18f3-43ba-039d-08db25c9782c
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: HxikGBBE2RgDup01os4nMTWO+yU2/GbSIQ/gjCAtgpvNINk6TPX2eb+Ilx/K0caNM2Z/Dhh4GNGW4pxvtpno4ctfgevzqeePNnKcp3KnoFWTICyw07UVBl2wEkIihBMbNEVNeNcMUGsWmTXMAusHEIC0XG9U48uaF7NLCbWtkzc4YsTsgt2yxn7g+R2WXjKkiEteAuLLQ7mdNK/T1tD6SiYgMWGodxsfb4UcZFffzuiG3Lz/3XLVv9fcd4YvlHEAfCIJLKfhj3NDtRXch2espM4RxFuy1cGvvFXO6Ldsz8DZxpkhAJstLMvHNZJTaN7lMDVi/RwgokiuLhpv88E8mub0ulmpWtRWBrlGU8CGHqRJajq6SagIFZ0f8dYCqSkaQrXAMCxPwN91AODsS3miafjk6AQdSIZ31VLqH3khAIl1Pk390fSkt3Ldi98fPk0XVoxHmdjifpA9M6Zgkgf6EtTa5bCS0XD50BETdiXrmoXhyVLH6KjLcTPjSd7uJ8voV9zjiDHoig7tesui93sU9dbRlzd0dX4HOnyOd7ejGxTTiCakS2AuDpuZ6wgmztSBGbBTY6AAH4US8v144uD3zEaad8c4D1+VoWh3psEkemxyC9bQyiM9ITswhf+aBZbYIj9u+B+M+clpiZ9ynaIKr5CWfFmzYLjI5tAzp1OqwX6JpQ7UJMqDnCbg97HftVd11Ph4CDTwjYrBNbjT21WfKQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(396003)(346002)(376002)(39860400002)(136003)(366004)(451199018)(186003)(2616005)(7416002)(6512007)(26005)(6506007)(83380400001)(8936002)(8676002)(82960400001)(38100700002)(5660300002)(6486002)(38070700005)(4744005)(4326008)(64756008)(66556008)(66476007)(66446008)(76116006)(2906002)(71200400001)(41300700001)(91956017)(122000001)(54906003)(6916009)(36756003)(478600001)(86362001)(66946007)(316002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?VlVIdzJOQ2NmdEFWR015YUt1TmNmOHVLOFZ3ZmtSeXdiT2NWdkd3STY3MXlM?=
- =?utf-8?B?V25TdzNYMlVJblFLajNSRTRqcUk5cWg3UzBFVjhMY2YxV0diZHBaZUZSYUhu?=
- =?utf-8?B?QjJndStkWFJPb1Excm5BZEVTU1hGbW1TK2hzUHpKUy9zbWE5NUhXZktQdGVT?=
- =?utf-8?B?bzdxckNCSnRRNVp1d2dSU29yc1d1WjVqSlMyczFndm1JS1FESDJDQi8rUmZJ?=
- =?utf-8?B?blF5V0tsRWIzdFBKQTduOExTUnZKdjAvNnBleXUwR1lXYWVQRlE2QVVDK1VK?=
- =?utf-8?B?OElPWm9LODdjNmY5MDkzcjhYRTl5ZVRJRFlZZ0lESnZmVkVnN2JKTDZ5ejli?=
- =?utf-8?B?aE1LNlVHc3ozZUN1VzBoWkNFUVlWcUNrZkExMENRa2xDNmFmRWRxU1B3VGNs?=
- =?utf-8?B?cXBDL0dVbG82N1N1WXZwTGFUUEJ4ZVpvRWhSSERYVjI4cXRaYmhuQlFhT1RJ?=
- =?utf-8?B?UUVGdnMvOC8ySnNPY2J5bHZuYjVIYUFYQmttZ2JMR1NYb2xzVCticEJ4T3JI?=
- =?utf-8?B?YmdPL21PSmgzUTQ3T2MxalBJOXlCTUsvYS9zUnBJRTZnOXZySkQxb1NWM1dT?=
- =?utf-8?B?RHVzTFpWSEVOdVdRUWEwbmlUMXZlN1dZblNvSWhFMXhlZm43Z1VySVgrblA3?=
- =?utf-8?B?Z3IvS01QRGFUZUk4UHNIcHJvZ2hvdExTQmxQY21IOTFtTzF3MXBqOElKbmlD?=
- =?utf-8?B?SkQ2RUptZ28zTXE1R1JVdHFURDBkZ3V3YUFQajRqWm9JckxHcHlRN2FmWU5n?=
- =?utf-8?B?MGZHSm9JcW0yM0lUN2w5NDFyUGhmRDVQeVorV1V6SmRMMXFYblFpSzNUaXdi?=
- =?utf-8?B?T01xbWVUVXpmZlJOQkVHdktJd0FEVktVS2c0NTRUSDlSVFhDYmw5NFZCOW9D?=
- =?utf-8?B?MjBzaEZBSkVKK1RDRmF5aGRsdjR2TXZodlQvK3NXWVNuS2F4YzdHZTNqNTBT?=
- =?utf-8?B?Z25TdFNzQUtYbDNOaWFzbHNJSU5NSjJIdXVsd2dyTDhQY29lWEF2bGNkZThC?=
- =?utf-8?B?RlJSV01oRHoydzFpQzE5dzhPbWg5d2k2cnpURHhGZG1tM2w3UUpFM0d0cmVF?=
- =?utf-8?B?RktsUGpOKyt2S3FaWlhFQlFUSmZkeU56QlZuOUt5UnRsSXJUeXgxTFRRZis0?=
- =?utf-8?B?U2hra2pEMjVlUE9Ld0NPYXVNZFYrSVd0OGRYaXVqclZPZU5oNzBDVzlnZGlz?=
- =?utf-8?B?Z0poNldEWGJKQ0x6VzV3eTF3aWs4dFNXQmNpbTRhSUdTNDllQUtZaTBWWUJu?=
- =?utf-8?B?eE9UMVZhbHdDMEtMblk0NFlyTXF6aWRaQXRwQjZhVHlFQmlXMkdrcVBlWUlL?=
- =?utf-8?B?bGJ3ZzFjRjZWaGVPOXpKRDRwRjJEeEFyNVZBNDFQZWlJQ0RZWHpqelZXcnVX?=
- =?utf-8?B?bUhVMzE3YzFEdm5tTlhIbkpCQTVZRnZ1YnB5WlliRDhvYnRldGVXNDBISEc1?=
- =?utf-8?B?b0RlZDhPd1JHa3EzUGdmUTBocXhHTXh1ZEpRVFpqdUlJNUZ4UVA1NmRsNDAr?=
- =?utf-8?B?WXhLd3g4VzZQU3hIWTdhcVpBbUNzQmRla3BRQWdUUTJoaUg5eGJpZXE1Y2tI?=
- =?utf-8?B?cFd0bXBHbmdETW94b1QzcVBkM2MzOHRaQy9mejl1bGV5SmFYQWtPVmFZaU12?=
- =?utf-8?B?eTRpbzcyaXRJOFJ1MzM3ZC9RcE1PVDE2VUhQZ0ZEZEdaTU9XZmhjR1l2eTBN?=
- =?utf-8?B?VXQ0c01NOENaVG9hZ0VWRHY2TmxCQzdrcGFNMWJkVjdRbWZHQmdPK0ZxMkQz?=
- =?utf-8?B?ZGVrT3lwd2dyc1FTaU5qSmFKMXgreGttcG9ya1pRV1hsRlNvdnVXL2ozOXdy?=
- =?utf-8?B?Njh0Rjc0bXNPUzBvSXRpQ2J1bFJzK2hXS3FYVzdjVWI4RG9wa05rQ09ZV2xp?=
- =?utf-8?B?Ti8vc284S2JsVlpTWVQ5TTRnV2tnN2QzMVdBTU4xbkd5V0M1TkFXTHRTcXFJ?=
- =?utf-8?B?VGlaZUdCZUwveU1HNnRpZk9Rd09EMXlrYWdFVEdXenhmMTZBemgveEF1ZnJj?=
- =?utf-8?B?UDExNFNjSVhlVEZGUnlOcHB0ZStqS3lGZjduYmttWkdKTWpuNWxGeTQwZGQr?=
- =?utf-8?B?MnNjOGtoK04rNkFrU2g5YVJtQ3F4U2dvZlcxZFVSVk9ER2Z4UVNaZ2l5UDNG?=
- =?utf-8?B?d2FUL2RjRzVCWlpXNTF0VENmNkxrcE1OUVdIaGN0MWYybGRBbVF1NVNRVm9J?=
- =?utf-8?B?Qnc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <8F913A0B5E7F1941BA07BD151DCC10B7@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        with ESMTP id S229488AbjCPCyU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Mar 2023 22:54:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86D26421F
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 19:53:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1678935213;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=gdlQPC7yz/m2am6Hi3QZ8CmOMLMG1uw0u8+kdReVc7M=;
+        b=JF4MfK0L7iXyLSiQpftXx1Xxg/4vl+3DpKa6QRKhLCa9c5VzJW8hDf9MVUjs2qXsr2b2QK
+        VfvarzlqilvS0OuJ5mfN0jBVMy9jmMRQKMpLcEh3WRVWx13oM8vX79IhJOUfzj+mLvuPgV
+        L3uyoehB97BlRUdxEuh43NS1coVlv8A=
+Received: from mail-oa1-f71.google.com (mail-oa1-f71.google.com
+ [209.85.160.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-549-UB91ruILME67dBSR-BT5Bg-1; Wed, 15 Mar 2023 22:53:32 -0400
+X-MC-Unique: UB91ruILME67dBSR-BT5Bg-1
+Received: by mail-oa1-f71.google.com with SMTP id 586e51a60fabf-177b0f40c4eso376988fac.12
+        for <kvm@vger.kernel.org>; Wed, 15 Mar 2023 19:53:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678935212;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gdlQPC7yz/m2am6Hi3QZ8CmOMLMG1uw0u8+kdReVc7M=;
+        b=O8e9tTAolpoVsLumoNTs85uhqzFoZJsV++hVMJKDHeEIQPvu4S3bQqyl96299tB1+s
+         yWjvyAv3CRCEkYPPtdx8qmQgBoQ5RwFVH/M2snw2WXr9meoLGFZbvvgPVCiG+zC53BCT
+         QKYqeY3QvFU7y/OYUovmNU8b9kH1b+oR3nE2zOLzKLlTnoyHUTl72WKIxO8lkZog4g4t
+         Zd3jR9hBvH6OBAIB9jdKGErVw1RDoPOzfAtwlcXGcZxK61cQUfOdkuYrndsB8nVS0t+Z
+         5PnHnzDUlQkV7SSMvHXnhWjH/3k6ZjLL7pX620a05XZb4ObhuU8sOumTYC6rZo+s/24/
+         xEmg==
+X-Gm-Message-State: AO0yUKWrtlvT1j+v2AD8TNySTgSojVAm6e/9mKMYNjdtIYRHAyOWx7zy
+        OXvGYR9xrX6lztggIM+kbONOx3LbLhDVnWtFpMm38JtMnOQoc7QWu2gnJ/skKnF0dNSA7n8Vd+P
+        jKh7aWTfAgwV/CcDZ60aHGnL5vYs6
+X-Received: by 2002:a05:6870:1186:b0:177:a0bc:98a9 with SMTP id 6-20020a056870118600b00177a0bc98a9mr6699731oau.9.1678935211890;
+        Wed, 15 Mar 2023 19:53:31 -0700 (PDT)
+X-Google-Smtp-Source: AK7set9mpCYvaphlPTeZJOJP1a6RC9D9m33+RNA0qM1X7uQUCsLgljp0msZ/cp+9t9yokEnoSi/KsX7Dzv94vXqh9Eg=
+X-Received: by 2002:a05:6870:1186:b0:177:a0bc:98a9 with SMTP id
+ 6-20020a056870118600b00177a0bc98a9mr6699722oau.9.1678935211629; Wed, 15 Mar
+ 2023 19:53:31 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 40ae4275-18f3-43ba-039d-08db25c9782c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Mar 2023 02:52:23.7705
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 1KEWAc+7SXOSvmxtxFtjceF5hoKqj9OHC6gdbcBComYT20If+gyMlK3Qu8S2cIIbjtLjs4LbhtVPdCeWM/KxVA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6832
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20230302113421.174582-1-sgarzare@redhat.com> <20230302113421.174582-4-sgarzare@redhat.com>
+ <CACGkMEs6cW7LdpCdWQnX4Pif2gGOu=f3bjNeYQ6MVcdQe=X--Q@mail.gmail.com> <1980067.5pFmK94fv0@suse>
+In-Reply-To: <1980067.5pFmK94fv0@suse>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Thu, 16 Mar 2023 10:53:20 +0800
+Message-ID: <CACGkMEuTrqvBs3tn8_LQo-Trn0nZdT4sDRiVNR0xt4zaoyMFEw@mail.gmail.com>
+Subject: Re: [PATCH v2 3/8] vringh: replace kmap_atomic() with kmap_local_page()
+To:     "Fabio M. De Francesco" <fmdefrancesco@gmail.com>
+Cc:     Stefano Garzarella <sgarzare@redhat.com>,
+        virtualization@lists.linux-foundation.org,
+        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
+        eperezma@redhat.com, netdev@vger.kernel.org, stefanha@redhat.com,
+        linux-kernel@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQo+ID4gIA0KPiA+IEBAIC0zNTYsNyArMzU3LDcgQEAgc3RhdGljIGludCB0cnlfaW5pdF9tb2R1
-bGVfZ2xvYmFsKHZvaWQpDQo+ID4gIAkgKiBUaGUgVERYIG1vZHVsZSBnbG9iYWwgaW5pdGlhbGl6
-YXRpb24gb25seSBuZWVkcyB0byBiZSBkb25lDQo+ID4gIAkgKiBvbmNlIG9uIGFueSBjcHUuDQo+
-ID4gIAkgKi8NCj4gPiAtCXNwaW5fbG9jaygmdGR4X2dsb2JhbF9pbml0X2xvY2spOw0KPiA+ICsJ
-cmF3X3NwaW5fbG9ja19pcnFzYXZlKCZ0ZHhfZ2xvYmFsX2luaXRfbG9jaywgZmxhZ3MpOw0KPiAN
-Cj4gQXMgaGFyZHdhcmVfZW5hYmxlX2FsbCgpIHVzZXMgY3B1c19yZWFkX2xvY2soKSwgaXJxc2F2
-ZSBpc24ndCBuZWVkZWQuDQo+IHRoaXMgbGluZSBzaG91bGQgYmUgcmF3X3NwaW5fbG9jaygpLg0K
-PiANCg0KT0suICBJIG1pc3NlZCB0aGF0IGluIFBSRUVNUFRfUlQga2VybmVsIHRoZSBzcGlubG9j
-ayBpcyBjb252ZXJ0ZWQgdG8gc2xlZXBpbmcNCmxvY2suICBTbyBJJ2xsIGNoYW5nZSB0byB1c2Ug
-cmF3X3NwaW5fbG9jaygpIGFzIHdlIHRhbGtlZC4gIFRoYW5rcy4NCg0K
+On Thu, Mar 16, 2023 at 5:12=E2=80=AFAM Fabio M. De Francesco
+<fmdefrancesco@gmail.com> wrote:
+>
+> On marted=C3=AC 14 marzo 2023 04:56:08 CET Jason Wang wrote:
+> > On Thu, Mar 2, 2023 at 7:34=E2=80=AFPM Stefano Garzarella <sgarzare@red=
+hat.com>
+> wrote:
+> > > kmap_atomic() is deprecated in favor of kmap_local_page().
+> >
+> > It's better to mention the commit or code that introduces this.
+> >
+> > > With kmap_local_page() the mappings are per thread, CPU local, can ta=
+ke
+> > > page-faults, and can be called from any context (including interrupts=
+).
+> > > Furthermore, the tasks can be preempted and, when they are scheduled =
+to
+> > > run again, the kernel virtual addresses are restored and still valid.
+> > >
+> > > kmap_atomic() is implemented like a kmap_local_page() which also disa=
+bles
+> > > page-faults and preemption (the latter only for !PREEMPT_RT kernels,
+> > > otherwise it only disables migration).
+> > >
+> > > The code within the mappings/un-mappings in getu16_iotlb() and
+> > > putu16_iotlb() don't depend on the above-mentioned side effects of
+> > > kmap_atomic(),
+> >
+> > Note we used to use spinlock to protect simulators (at least until
+> > patch 7, so we probably need to re-order the patches at least) so I
+> > think this is only valid when:
+> >
+> > The vringh IOTLB helpers are not used in atomic context (e.g spinlock,
+> > interrupts).
+>
+> I'm probably missing some context but it looks that you are saying that
+> kmap_local_page() is not suited for any use in atomic context (you are
+> mentioning spinlocks).
+>
+> The commit message (that I know pretty well since it's the exact copy, wo=
+rd by
+> word, of my boiler plate commits) explains that kmap_local_page() is perf=
+ectly
+> usable in atomic context (including interrupts).
+
+Thanks for the confirmation, I misread the change log and thought it
+said it can't be used in interrupts.
+
+>
+> I don't know this code, however I am not able to see why these vringh IOT=
+LB
+> helpers cannot work if used under spinlocks. Can you please elaborate a l=
+ittle
+> more?
+
+My fault, see above.
+
+>
+> > If yes, should we document this? (Or should we introduce a boolean to
+> > say whether an IOTLB variant can be used in an atomic context)?
+>
+> Again, you'll have no problems from the use of kmap_local_page() and so y=
+ou
+> don't need any boolean to tell whether or not the code is running in atom=
+ic
+> context.
+>
+> Please take a look at the Highmem documentation which has been recently
+> reworked and extended by me: https://docs.kernel.org/mm/highmem.html
+
+This is really helpful.
+
+>
+> Anyway, I have been ATK 12 or 13 hours in a row. So I'm probably missing =
+the
+> whole picture.
+
+It's me that misses the movitiation of kmap_local().
+
+Thanks
+
+>
+> Thanks,
+>
+> Fabio
+>
+> > Thanks
+> >
+> > > so that mere replacements of the old API with the new one
+> > > is all that is required (i.e., there is no need to explicitly add cal=
+ls
+> > > to pagefault_disable() and/or preempt_disable()).
+> > >
+> > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > > ---
+> > >
+> > > Notes:
+> > >     v2:
+> > >     - added this patch since checkpatch.pl complained about deprecati=
+on
+> > >
+> > >       of kmap_atomic() touched by next patch
+> > >
+> > >  drivers/vhost/vringh.c | 8 ++++----
+> > >  1 file changed, 4 insertions(+), 4 deletions(-)
+> > >
+> > > diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+> > > index a1e27da54481..0ba3ef809e48 100644
+> > > --- a/drivers/vhost/vringh.c
+> > > +++ b/drivers/vhost/vringh.c
+> > > @@ -1220,10 +1220,10 @@ static inline int getu16_iotlb(const struct v=
+ringh
+> > > *vrh,>
+> > >         if (ret < 0)
+> > >
+> > >                 return ret;
+> > >
+> > > -       kaddr =3D kmap_atomic(iov.bv_page);
+> > > +       kaddr =3D kmap_local_page(iov.bv_page);
+> > >
+> > >         from =3D kaddr + iov.bv_offset;
+> > >         *val =3D vringh16_to_cpu(vrh, READ_ONCE(*(__virtio16 *)from))=
+;
+> > >
+> > > -       kunmap_atomic(kaddr);
+> > > +       kunmap_local(kaddr);
+> > >
+> > >         return 0;
+> > >
+> > >  }
+> > >
+> > > @@ -1241,10 +1241,10 @@ static inline int putu16_iotlb(const struct v=
+ringh
+> > > *vrh,>
+> > >         if (ret < 0)
+> > >
+> > >                 return ret;
+> > >
+> > > -       kaddr =3D kmap_atomic(iov.bv_page);
+> > > +       kaddr =3D kmap_local_page(iov.bv_page);
+> > >
+> > >         to =3D kaddr + iov.bv_offset;
+> > >         WRITE_ONCE(*(__virtio16 *)to, cpu_to_vringh16(vrh, val));
+> > >
+> > > -       kunmap_atomic(kaddr);
+> > > +       kunmap_local(kaddr);
+> > >
+> > >         return 0;
+> > >
+> > >  }
+> > >
+> > > --
+> > > 2.39.2
+>
+>
+>
+>
+
