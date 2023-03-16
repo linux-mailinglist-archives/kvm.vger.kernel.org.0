@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A87396BDB78
-	for <lists+kvm@lfdr.de>; Thu, 16 Mar 2023 23:21:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F79B6BDB77
+	for <lists+kvm@lfdr.de>; Thu, 16 Mar 2023 23:21:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230060AbjCPWVo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Mar 2023 18:21:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60648 "EHLO
+        id S229982AbjCPWVU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Mar 2023 18:21:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60684 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229887AbjCPWVm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Mar 2023 18:21:42 -0400
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92C0274A48
-        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 15:21:15 -0700 (PDT)
-Received: by mail-wr1-x42c.google.com with SMTP id t15so2864440wrz.7
-        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 15:21:15 -0700 (PDT)
+        with ESMTP id S230077AbjCPWVS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Mar 2023 18:21:18 -0400
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75BE7B0B99
+        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 15:21:16 -0700 (PDT)
+Received: by mail-wr1-x431.google.com with SMTP id o7so2871981wrg.5
+        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 15:21:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1679005274;
+        d=bytedance.com; s=google; t=1679005275;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jZOcJlN4hsoET9GB1lz88zELWFf4YxBH7A+4Yjdmpg0=;
-        b=jHDfLcCchiqdnozdtUvd3AIzSPgmu8CKRQyfMZhtMflGqrA4sIZVBV11LttR2/WRVQ
-         j6CPPcpqg4vZd+OlXmy1/pRWVAisVuiFqwtLTvO3oTeuan72LXYJ+1Q3PFcPJeLFsUqL
-         MER8KlDOQBcISMTImXF1w3+CZsw9iemukQHpHNfzDc3RIdfsWm+EXE9sTiubnYMTyZRr
-         vkbmS4MJljqZGRK2MUKVO8rbpMle2zqdi6M34Fc9tWxSr2HU5waK82B5J9QwG22kAwB/
-         CehZoT7fehMX1KmYU3h8N0EhL9xS5LaSrZiNtTY9aH7km5ZeZJYR6ywGwK8T23gdWHjn
-         VrWA==
+        bh=ySNFLglM8SJEJlQ1FHHmy3ZddsPF9igYAJti/ai7CSk=;
+        b=E8lXhN7xCG0/Utl/fWZI1ZNtGqI9EJIVGD+gymWMWoRdPZAPfvFi+5QKhLol1oOGHn
+         BpYddX/YMFiEjf0YMIdZHef4jpIdVZzFrtXEM+6qB29huW2jgbb2mnXjVF3wKR8EhvD9
+         Xzixo1CR0PuIHdZiKI/ReOwtirzLrxUlWuGfc73YebJwwIICs7XRmdiUi5G1JO+Bs55z
+         84uOF5NsaJ9x8USZRZHm+RPpwK9gX9dCuqASSP+NT8+etsVloO37LzZ8ldj+/Mz5yzrj
+         MFnCA11jiCSq0o8Cb0RjIg0Ds/3zIiecSY6GeEgKiOPQXAUuOB0lKRPtRBXgejW4EsAX
+         kz+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679005274;
+        d=1e100.net; s=20210112; t=1679005275;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jZOcJlN4hsoET9GB1lz88zELWFf4YxBH7A+4Yjdmpg0=;
-        b=fqfaApqzufypdkaDDHuqgDbk617xLKUqNcLNOiHjS0CEQIsG6R/gFZ74By612JElUl
-         yVtEFG0bSlg1jvXXXHXnophm29JwZ5ApZ+LgCP1RDwTJuv489MJTDOZFHErdHASmaIgC
-         SHu+oM9GqhNiB9qcYzOo2LQRyiwjTJ1S/42qZLKLsSMzKXu61BsrcZLAcaWOlAvNwnac
-         XlqKsb75Pt1/UvH9DyRO8hu1L2fIgk0+X3Tm3A7tnvoWCGKpn+w61L4vIeaE6g/xzESR
-         p1I6qqKOSxoNDOUoK62OaAUmlrVUUsyB3Thz0Wvs5LyFzn0LQ02QzuhawGyu1vls4HnN
-         pZ1g==
-X-Gm-Message-State: AO0yUKXOG2ZlzGn6o225aTOgXL7IjHcIjMmdB3RhAJ7yWB5w5J+8FGy8
-        mB6DAnDwF/JV6gduaw1LsAzvaA==
-X-Google-Smtp-Source: AK7set8/JMm1BD3p/e7ex+3Zw/5k1J2dt9JTTu01hxcYcndc0IEXCkt8Lgt35mwniZI7VpeZ1a3zlQ==
-X-Received: by 2002:a5d:530d:0:b0:2cf:e2f3:ef46 with SMTP id e13-20020a5d530d000000b002cfe2f3ef46mr5192145wrv.52.1679005273994;
-        Thu, 16 Mar 2023 15:21:13 -0700 (PDT)
+        bh=ySNFLglM8SJEJlQ1FHHmy3ZddsPF9igYAJti/ai7CSk=;
+        b=ZQdIShPR8+VfONwTSzkXu9AORa9A3OWNNhkzO9Mw98hjriJCKbPUw1PB9hdoBob9Gl
+         H3mdPURosccnhvYfUZxXUKqEsZ/z4z2sEGuG/7so1cSps3LclVrttrz+Wf2sm7ZQp2jy
+         1MbnFcuKfNtNSauygq3olArsiRts+tArbQLZny8TyEC+qt+dBQYsJbJ4sJy7hcVljLEO
+         dwiHXfvooCHNhPc+BfTSWBFDqHW+CWbKEiIrik1HzqE1hBHhbaw96dsv8ByaHxflCZqC
+         jvvBtP7Vup3oybScq98QDPFBfPy0COHcfSUIoj7sDVAoMgd0nzjmjHNWTBqW1OEE2qZ9
+         JVTg==
+X-Gm-Message-State: AO0yUKXmOqbgEYs1NTqJVHM/Axtylaezne7G+Al5ZLEKCI+ypfDn1jtq
+        WXecuzLl/YXhcz5mqE48a7hhig==
+X-Google-Smtp-Source: AK7set+5XqXeOAvFgIKV6Ij+vs6zqUV01x3VUSIjYxvswKndHN4sQ8p7UD2jILuKmlOr7o+vOWiDdQ==
+X-Received: by 2002:adf:dcc2:0:b0:2ce:aa2d:c625 with SMTP id x2-20020adfdcc2000000b002ceaa2dc625mr5869244wrm.22.1679005274770;
+        Thu, 16 Mar 2023 15:21:14 -0700 (PDT)
 Received: from usaari01.cust.communityfibre.co.uk ([2a02:6b6a:b566:0:4b87:78c3:3abe:7b0d])
-        by smtp.gmail.com with ESMTPSA id f9-20020adff989000000b002cea392f000sm439256wrr.69.2023.03.16.15.21.13
+        by smtp.gmail.com with ESMTPSA id f9-20020adff989000000b002cea392f000sm439256wrr.69.2023.03.16.15.21.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Mar 2023 15:21:13 -0700 (PDT)
+        Thu, 16 Mar 2023 15:21:14 -0700 (PDT)
 From:   Usama Arif <usama.arif@bytedance.com>
 To:     dwmw2@infradead.org, tglx@linutronix.de, kim.phillips@amd.com,
         brgerst@gmail.com
@@ -63,9 +63,9 @@ Cc:     piotrgorski@cachyos.org, oleksandr@natalenko.name,
         simon.evans@bytedance.com, liangma@liangbit.com,
         gpiccoli@igalia.com, David Woodhouse <dwmw@amazon.co.uk>,
         Usama Arif <usama.arif@bytedance.com>
-Subject: [PATCH v15 02/12] cpu/hotplug: Move idle_thread_get() to <linux/smpboot.h>
-Date:   Thu, 16 Mar 2023 22:20:59 +0000
-Message-Id: <20230316222109.1940300-3-usama.arif@bytedance.com>
+Subject: [PATCH v15 03/12] cpu/hotplug: Add dynamic parallel bringup states before CPUHP_BRINGUP_CPU
+Date:   Thu, 16 Mar 2023 22:21:00 +0000
+Message-Id: <20230316222109.1940300-4-usama.arif@bytedance.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230316222109.1940300-1-usama.arif@bytedance.com>
 References: <20230316222109.1940300-1-usama.arif@bytedance.com>
@@ -73,7 +73,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -82,153 +83,130 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-Instead of relying purely on the special-case wrapper in bringup_cpu()
-to pass the idle thread to __cpu_up(), expose idle_thread_get() so that
-the architecture code can obtain it directly when necessary.
+There is often significant latency in the early stages of CPU bringup,
+and time is wasted by waking each CPU (e.g. with SIPI/INIT/INIT on x86)
+and then waiting for it to respond before moving on to the next.
 
-This will be useful when the existing __cpu_up() is split into multiple
-phases, only *one* of which will actually need the idle thread.
+Allow a platform to register a set of pre-bringup CPUHP states to which
+each CPU can be stepped in parallel, thus absorbing some of that latency.
 
-If the architecture code is to register its new pre-bringup states with
-the cpuhp core, having a special-case wrapper to pass extra arguments is
-non-trivial and it's easier just to let the arch register its function
-pointer to be invoked with the standard API.
+There is a subtlety here: even with an empty CPUHP_BP_PARALLEL_DYN step,
+this means that *all* CPUs are brought through the prepare states and to
+CPUHP_BP_PREPARE_DYN before any of them are taken to CPUHP_BRINGUP_CPU
+and then are allowed to run for themselves to CPUHP_ONLINE.
 
-To reduce duplication, move the shadow stack reset and kasan unpoisoning
-into idle_thread_get() too.
+So any combination of prepare/start calls which depend on A-B ordering
+for each CPU in turn, such as the X2APIC code which used to allocate a
+cluster mask 'just in case' and store it in a global variable in the
+prep stage, then potentially consume that preallocated structure from
+the AP and set the global pointer to NULL to be reallocated in
+CPUHP_X2APIC_PREPARE for the next CPU... would explode horribly.
+
+Any platform enabling the CPUHP_BP_PARALLEL_DYN steps must be reviewed
+and tested to ensure that such issues do not exist, and the existing
+behaviour of bringing CPUs to CPUHP_BP_PREPARE_DYN and then immediately
+to CPUHP_BRINGUP_CPU and CPUHP_ONLINE only one at a time does not change
+unless such a state is registered.
+
+Note that the new parallel stages do *not* yet bring each AP to the
+CPUHP_BRINGUP_CPU state at the same time, only to the new states which
+exist before it. The final loop in bringup_nonboot_cpus() is untouched,
+bringing each AP in turn from the final PARALLEL_DYN state (or all the
+way from CPUHP_OFFLINE) to CPUHP_BRINGUP_CPU and then waiting for that
+AP to do its own processing and reach CPUHP_ONLINE before releasing the
+next.
+
+Parallelising that part by bringing them all to CPUHP_BRINGUP_CPU
+and then waiting for them all is an exercise for the future.
 
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
 Signed-off-by: Usama Arif <usama.arif@bytedance.com>
 Tested-by: Paul E. McKenney <paulmck@kernel.org>
 Tested-by: Kim Phillips <kim.phillips@amd.com>
 Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
 Tested-by: Guilherme G. Piccoli <gpiccoli@igalia.com>
 ---
- include/linux/smpboot.h | 10 ++++++++++
- kernel/cpu.c            | 13 +++----------
- kernel/smpboot.c        | 11 ++++++++++-
- kernel/smpboot.h        |  2 --
- 4 files changed, 23 insertions(+), 13 deletions(-)
+ include/linux/cpuhotplug.h |  2 ++
+ kernel/cpu.c               | 31 +++++++++++++++++++++++++++++--
+ 2 files changed, 31 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/smpboot.h b/include/linux/smpboot.h
-index 9d1bc65d226c..df6417703e4c 100644
---- a/include/linux/smpboot.h
-+++ b/include/linux/smpboot.h
-@@ -5,6 +5,16 @@
- #include <linux/types.h>
+diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
+index 6c6859bfc454..e5a73ae6ccc0 100644
+--- a/include/linux/cpuhotplug.h
++++ b/include/linux/cpuhotplug.h
+@@ -133,6 +133,8 @@ enum cpuhp_state {
+ 	CPUHP_MIPS_SOC_PREPARE,
+ 	CPUHP_BP_PREPARE_DYN,
+ 	CPUHP_BP_PREPARE_DYN_END		= CPUHP_BP_PREPARE_DYN + 20,
++	CPUHP_BP_PARALLEL_DYN,
++	CPUHP_BP_PARALLEL_DYN_END		= CPUHP_BP_PARALLEL_DYN + 4,
+ 	CPUHP_BRINGUP_CPU,
  
- struct task_struct;
-+
-+#ifdef CONFIG_GENERIC_SMP_IDLE_THREAD
-+struct task_struct *idle_thread_get(unsigned int cpu, bool unpoison);
-+#else
-+static inline struct task_struct *idle_thread_get(unsigned int cpu, bool unpoison)
-+{
-+	return NULL;
-+}
-+#endif
-+
- /* Cookie handed to the thread_fn*/
- struct smpboot_thread_data;
- 
+ 	/*
 diff --git a/kernel/cpu.c b/kernel/cpu.c
-index 6c0a92ca6bb5..6b3dccb4a888 100644
+index 6b3dccb4a888..6ccc64defd47 100644
 --- a/kernel/cpu.c
 +++ b/kernel/cpu.c
-@@ -31,7 +31,6 @@
- #include <linux/smpboot.h>
- #include <linux/relay.h>
- #include <linux/slab.h>
--#include <linux/scs.h>
- #include <linux/percpu-rwsem.h>
- #include <linux/cpuset.h>
- #include <linux/random.h>
-@@ -588,15 +587,9 @@ static int bringup_wait_for_ap(unsigned int cpu)
+@@ -1497,8 +1497,30 @@ int bringup_hibernate_cpu(unsigned int sleep_cpu)
  
- static int bringup_cpu(unsigned int cpu)
+ void bringup_nonboot_cpus(unsigned int setup_max_cpus)
  {
--	struct task_struct *idle = idle_thread_get(cpu);
-+	struct task_struct *idle = idle_thread_get(cpu, true);
- 	int ret;
++	unsigned int n = setup_max_cpus - num_online_cpus();
+ 	unsigned int cpu;
  
--	/*
--	 * Reset stale stack state from the last time this CPU was online.
--	 */
--	scs_task_reset(idle);
--	kasan_unpoison_task_stack(idle);
--
- 	/*
- 	 * Some architectures have to walk the irq descriptors to
- 	 * setup the vector space for the cpu which comes online.
-@@ -614,7 +607,7 @@ static int bringup_cpu(unsigned int cpu)
- 
- static int finish_cpu(unsigned int cpu)
- {
--	struct task_struct *idle = idle_thread_get(cpu);
-+	struct task_struct *idle = idle_thread_get(cpu, false);
- 	struct mm_struct *mm = idle->active_mm;
- 
- 	/*
-@@ -1378,7 +1371,7 @@ static int _cpu_up(unsigned int cpu, int tasks_frozen, enum cpuhp_state target)
- 
- 	if (st->state == CPUHP_OFFLINE) {
- 		/* Let it fail before we try to bring the cpu up */
--		idle = idle_thread_get(cpu);
-+		idle = idle_thread_get(cpu, false);
- 		if (IS_ERR(idle)) {
- 			ret = PTR_ERR(idle);
- 			goto out;
-diff --git a/kernel/smpboot.c b/kernel/smpboot.c
-index 2c7396da470c..24e81c725e7b 100644
---- a/kernel/smpboot.c
-+++ b/kernel/smpboot.c
-@@ -11,6 +11,7 @@
- #include <linux/slab.h>
- #include <linux/sched.h>
- #include <linux/sched/task.h>
-+#include <linux/scs.h>
- #include <linux/export.h>
- #include <linux/percpu.h>
- #include <linux/kthread.h>
-@@ -27,12 +28,20 @@
-  */
- static DEFINE_PER_CPU(struct task_struct *, idle_threads);
- 
--struct task_struct *idle_thread_get(unsigned int cpu)
-+struct task_struct *idle_thread_get(unsigned int cpu, bool unpoison)
- {
- 	struct task_struct *tsk = per_cpu(idle_threads, cpu);
- 
- 	if (!tsk)
- 		return ERR_PTR(-ENOMEM);
++	/*
++	 * An architecture may have registered parallel pre-bringup states to
++	 * which each CPU may be brought in parallel. For each such state,
++	 * bring N CPUs to it in turn before the final round of bringing them
++	 * online.
++	 */
++	if (n > 0) {
++		enum cpuhp_state st = CPUHP_BP_PARALLEL_DYN;
 +
-+	if (unpoison) {
-+		/*
-+		 * Reset stale stack state from last time this CPU was online.
-+		 */
-+		scs_task_reset(tsk);
-+		kasan_unpoison_task_stack(tsk);
++		while (st <= CPUHP_BP_PARALLEL_DYN_END && cpuhp_hp_states[st].name) {
++			int i = n;
++
++			for_each_present_cpu(cpu) {
++				cpu_up(cpu, st);
++				if (!--i)
++					break;
++			}
++			st++;
++		}
 +	}
- 	return tsk;
- }
- 
-diff --git a/kernel/smpboot.h b/kernel/smpboot.h
-index 34dd3d7ba40b..60c609318ad6 100644
---- a/kernel/smpboot.h
-+++ b/kernel/smpboot.h
-@@ -5,11 +5,9 @@
- struct task_struct;
- 
- #ifdef CONFIG_GENERIC_SMP_IDLE_THREAD
--struct task_struct *idle_thread_get(unsigned int cpu);
- void idle_thread_set_boot_cpu(void);
- void idle_threads_init(void);
- #else
--static inline struct task_struct *idle_thread_get(unsigned int cpu) { return NULL; }
- static inline void idle_thread_set_boot_cpu(void) { }
- static inline void idle_threads_init(void) { }
- #endif
++
+ 	for_each_present_cpu(cpu) {
+ 		if (num_online_cpus() >= setup_max_cpus)
+ 			break;
+@@ -1875,6 +1897,10 @@ static int cpuhp_reserve_state(enum cpuhp_state state)
+ 		step = cpuhp_hp_states + CPUHP_BP_PREPARE_DYN;
+ 		end = CPUHP_BP_PREPARE_DYN_END;
+ 		break;
++	case CPUHP_BP_PARALLEL_DYN:
++		step = cpuhp_hp_states + CPUHP_BP_PARALLEL_DYN;
++		end = CPUHP_BP_PARALLEL_DYN_END;
++		break;
+ 	default:
+ 		return -EINVAL;
+ 	}
+@@ -1899,14 +1925,15 @@ static int cpuhp_store_callbacks(enum cpuhp_state state, const char *name,
+ 	/*
+ 	 * If name is NULL, then the state gets removed.
+ 	 *
+-	 * CPUHP_AP_ONLINE_DYN and CPUHP_BP_PREPARE_DYN are handed out on
++	 * CPUHP_AP_ONLINE_DYN and CPUHP_BP_P*_DYN are handed out on
+ 	 * the first allocation from these dynamic ranges, so the removal
+ 	 * would trigger a new allocation and clear the wrong (already
+ 	 * empty) state, leaving the callbacks of the to be cleared state
+ 	 * dangling, which causes wreckage on the next hotplug operation.
+ 	 */
+ 	if (name && (state == CPUHP_AP_ONLINE_DYN ||
+-		     state == CPUHP_BP_PREPARE_DYN)) {
++		     state == CPUHP_BP_PREPARE_DYN ||
++		     state == CPUHP_BP_PARALLEL_DYN)) {
+ 		ret = cpuhp_reserve_state(state);
+ 		if (ret < 0)
+ 			return ret;
 -- 
 2.25.1
 
