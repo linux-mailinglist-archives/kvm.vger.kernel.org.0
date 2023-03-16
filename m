@@ -2,145 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C7D56BD0EF
-	for <lists+kvm@lfdr.de>; Thu, 16 Mar 2023 14:36:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E094C6BD1BB
+	for <lists+kvm@lfdr.de>; Thu, 16 Mar 2023 15:06:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230367AbjCPNgB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Mar 2023 09:36:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59778 "EHLO
+        id S231124AbjCPOGm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Mar 2023 10:06:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230064AbjCPNgA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Mar 2023 09:36:00 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4500C89F31;
-        Thu, 16 Mar 2023 06:35:57 -0700 (PDT)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32GD5al9021234;
-        Thu, 16 Mar 2023 13:35:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=cFCy7+czhdeqmxtnGMI0ww6ksJYdj1svGXXnkjCaQpc=;
- b=LV2vMsOsapASlEdcrCo7vdyYSbFOd4VdFg8nMdkcrRGMTtO663EdYqZM9aW9wr6Mv834
- IOqf+MyKwBUX2dxil1Vhxtu37CFsQpTmxsyLb8mEQqf0hnAY4WVi/2IpbFPf9yCazJ2w
- L1zwpXDwW8XyjivNFrY0r9rnNtfznpQV9e25cf8S+/o0JYec4aIVOZ2WZ8K5/evQBtJQ
- 8yTOD7lJR1SujYKbFtSHLyjWKhGedHz6EHUOIAlC/+Y9gxh+45fq2Osmb4gSg+Z6XVFn
- KUu3I4HNfjACawak5oIZhx1g+UObaxDdApkMOYJu4iyyxhtDCdKXXgNCiCxvoLn2on/Y gg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pbsv4evj0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 16 Mar 2023 13:35:55 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32GDDshG005486;
-        Thu, 16 Mar 2023 13:35:53 GMT
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pbsv4evhg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 16 Mar 2023 13:35:53 +0000
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32GDUmRD026780;
-        Thu, 16 Mar 2023 13:35:52 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([9.208.130.97])
-        by ppma03dal.us.ibm.com (PPS) with ESMTPS id 3pbs9yuk0c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 16 Mar 2023 13:35:52 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-        by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32GDZpGr29098308
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 16 Mar 2023 13:35:51 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2E6275805F;
-        Thu, 16 Mar 2023 13:35:51 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7E0D558051;
-        Thu, 16 Mar 2023 13:35:50 +0000 (GMT)
-Received: from [9.65.241.229] (unknown [9.65.241.229])
-        by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 16 Mar 2023 13:35:50 +0000 (GMT)
-Message-ID: <1e3fc059-09ac-100e-6a37-9b7f459cfb99@linux.ibm.com>
-Date:   Thu, 16 Mar 2023 09:35:50 -0400
+        with ESMTP id S230457AbjCPOGf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Mar 2023 10:06:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1F40D58B6
+        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 07:05:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1678975548;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=/8g7fUH4/RipZKQITUlU71WoFZ3ij/ncUi8oVz8ATl0=;
+        b=V4MoRlZ0MAfD+Bm+9ys7ABPX5bsVuODnqbM8wg5HcRl/JcYkpLpXyOwy1FJkOnvRTqHR2I
+        WOb97Pn7kVeTVV1UGZjH8C56WVZwk2IQPdC1eRKy+rLs5nscAxY0K/j3ZNLrqRfgAOAlxE
+        tTuMT6WXWlAQgPJYQ2/bdb8TIe5kdbY=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-173-kxZo_iKQPka5mMEey_-6_Q-1; Thu, 16 Mar 2023 10:05:44 -0400
+X-MC-Unique: kxZo_iKQPka5mMEey_-6_Q-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 882991C087A0;
+        Thu, 16 Mar 2023 14:05:44 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6B00A40D1C5;
+        Thu, 16 Mar 2023 14:05:44 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] KVM fixes for Linux 6.3-rc3
+Date:   Thu, 16 Mar 2023 10:05:43 -0400
+Message-Id: <20230316140543.3253564-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH] s390/vfio_ap: fix memory leak in vfio_ap device driver
-Content-Language: en-US
-To:     Heiko Carstens <hca@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, jjherne@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, borntraeger@linux.ibm.com
-References: <20230315153932.165031-1-akrowiak@linux.ibm.com>
- <ZBLV1P2AkWdHht2r@osiris>
-From:   Anthony Krowiak <akrowiak@linux.ibm.com>
-In-Reply-To: <ZBLV1P2AkWdHht2r@osiris>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: XMnyB3a_lDxDNxAzU4yybmwA9NLkYLS7
-X-Proofpoint-ORIG-GUID: beCzohS0q9kd_Xl6fa_EvuRRAOMThVd8
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-16_09,2023-03-16_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
- clxscore=1015 suspectscore=0 mlxscore=0 malwarescore=0 mlxlogscore=999
- lowpriorityscore=0 phishscore=0 priorityscore=1501 impostorscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303150002 definitions=main-2303160111
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Linus,
 
-On 3/16/23 4:39 AM, Heiko Carstens wrote:
-> On Wed, Mar 15, 2023 at 11:39:32AM -0400, Tony Krowiak wrote:
->> The device release callback function invoked to release the matrix device
->> uses the dev_get_drvdata(device *dev) function to retrieve the
->> pointer to the vfio_matrix_dev object in order to free its storage. The
->> problem is, this object is not stored as drvdata with the device; since the
->> kfree function will accept a NULL pointer, the memory for the
->> vfio_matrix_dev object is never freed.
->>
->> Since the device being released is contained within the vfio_matrix_dev
->> object, the container_of macro will be used to retrieve its pointer.
->>
->> Fixes: 1fde573413b5 ("s390: vfio-ap: base implementation of VFIO AP device driver")
->> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
->> ---
->>   drivers/s390/crypto/vfio_ap_drv.c | 5 +++--
->>   1 file changed, 3 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/s390/crypto/vfio_ap_drv.c b/drivers/s390/crypto/vfio_ap_drv.c
->> index 997b524bdd2b..15e9de9f4574 100644
->> --- a/drivers/s390/crypto/vfio_ap_drv.c
->> +++ b/drivers/s390/crypto/vfio_ap_drv.c
->> @@ -54,8 +54,9 @@ static struct ap_driver vfio_ap_drv = {
->>   
->>   static void vfio_ap_matrix_dev_release(struct device *dev)
->>   {
->> -	struct ap_matrix_dev *matrix_dev = dev_get_drvdata(dev);
->> -
->> +	struct ap_matrix_dev *matrix_dev = container_of(dev,
->> +							struct ap_matrix_dev,
->> +							device);
->>   	kfree(matrix_dev);
-> Could you keep this code more readable, including adding the missing
-> blank line after the declaration, please? Something like:
->
-> static void vfio_ap_matrix_dev_release(struct device *dev)
-> {
-> 	struct ap_matrix_dev *matrix_dev;
->
-> 	matrix_dev = container_of(dev, struct ap_matrix_dev, device);
-> 	kfree(matrix_dev);
-> }
->
-> Thanks!
+The following changes since commit eeac8ede17557680855031c6f305ece2378af326:
 
+  Linux 6.3-rc2 (2023-03-12 16:36:44 -0700)
 
-Will do.
+are available in the Git repository at:
 
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to f3e707413dbe3920a972d0c2b51175180e7de36b:
+
+  KVM: selftests: Sync KVM exit reasons in selftests (2023-03-14 10:20:10 -0400)
+
+----------------------------------------------------------------
+ARM64:
+
+* Address a rather annoying bug w.r.t. guest timer offsetting.  The
+  synchronization of timer offsets between vCPUs was broken, leading to
+  inconsistent timer reads within the VM.
+
+x86:
+
+* New tests for the slow path of the EVTCHNOP_send Xen hypercall
+
+* Add missing nVMX consistency checks for CR0 and CR4
+
+* Fix bug that broke AMD GATag on 512 vCPU machines
+
+Selftests:
+
+* Skip hugetlb tests if huge pages are not available
+
+* Sync KVM exit reasons
+
+----------------------------------------------------------------
+David Woodhouse (2):
+      KVM: selftests: Use enum for test numbers in xen_shinfo_test
+      KVM: selftests: Add EVTCHNOP_send slow path test to xen_shinfo_test
+
+Marc Zyngier (1):
+      KVM: arm64: timers: Convert per-vcpu virtual offset to a global value
+
+Paolo Bonzini (4):
+      Merge tag 'kvmarm-fixes-6.3-1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD
+      KVM: nVMX: add missing consistency checks for CR0 and CR4
+      KVM: nVMX: remove unnecessary #ifdef
+      selftests: KVM: skip hugetlb tests if huge pages are not available
+
+Rong Tao (2):
+      KVM: VMX: Fix indentation coding style issue
+      KVM: VMX: Use tabs instead of spaces for indentation
+
+Sean Christopherson (5):
+      KVM: SVM: Fix a benign off-by-one bug in AVIC physical table mask
+      KVM: SVM: WARN if GATag generation drops VM or vCPU ID information
+      KVM: selftests: Move the guts of kvm_hypercall() to a separate macro
+      KVM: selftests: Add helpers to make Xen-style VMCALL/VMMCALL hypercalls
+      KVM: selftests: Add macro to generate KVM exit reason strings
+
+Suravee Suthikulpanit (1):
+      KVM: SVM: Modify AVIC GATag to support max number of 512 vCPUs
+
+Vipin Sharma (3):
+      KVM: selftests: Make vCPU exit reason test assertion common
+      KVM: selftests: Print expected and actual exit reason in KVM exit reason assert
+      KVM: selftests: Sync KVM exit reasons in selftests
+
+ arch/arm64/include/asm/kvm_host.h                  |   3 +
+ arch/arm64/kvm/arch_timer.c                        |  45 +---
+ arch/arm64/kvm/hypercalls.c                        |   2 +-
+ arch/x86/include/asm/svm.h                         |  12 +-
+ arch/x86/kvm/svm/avic.c                            |  37 +++-
+ arch/x86/kvm/vmx/nested.c                          |  18 +-
+ arch/x86/kvm/vmx/vmenter.S                         |   4 +-
+ arch/x86/kvm/vmx/vmx.c                             |  12 +-
+ include/kvm/arm_arch_timer.h                       |  15 ++
+ tools/testing/selftests/kvm/aarch64/psci_test.c    |   4 +-
+ tools/testing/selftests/kvm/include/test_util.h    |   9 +
+ .../selftests/kvm/include/x86_64/processor.h       |   2 +
+ tools/testing/selftests/kvm/lib/kvm_util.c         |  67 +++---
+ .../selftests/kvm/lib/s390x/diag318_test_handler.c |   3 +-
+ tools/testing/selftests/kvm/lib/test_util.c        |  25 ++-
+ tools/testing/selftests/kvm/lib/x86_64/processor.c |  39 ++--
+ tools/testing/selftests/kvm/s390x/sync_regs_test.c |  15 +-
+ .../testing/selftests/kvm/set_memory_region_test.c |   6 +-
+ tools/testing/selftests/kvm/x86_64/amx_test.c      |   8 +-
+ .../selftests/kvm/x86_64/cr4_cpuid_sync_test.c     |   8 +-
+ tools/testing/selftests/kvm/x86_64/debug_regs.c    |   2 +-
+ .../testing/selftests/kvm/x86_64/flds_emulation.h  |   5 +-
+ tools/testing/selftests/kvm/x86_64/hyperv_clock.c  |   7 +-
+ tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c  |   8 +-
+ .../testing/selftests/kvm/x86_64/hyperv_features.c |  14 +-
+ tools/testing/selftests/kvm/x86_64/hyperv_ipi.c    |   6 +-
+ .../testing/selftests/kvm/x86_64/hyperv_svm_test.c |   7 +-
+ .../selftests/kvm/x86_64/hyperv_tlb_flush.c        |  14 +-
+ .../testing/selftests/kvm/x86_64/kvm_clock_test.c  |   5 +-
+ tools/testing/selftests/kvm/x86_64/kvm_pv_test.c   |   5 +-
+ .../selftests/kvm/x86_64/monitor_mwait_test.c      |   9 +-
+ .../selftests/kvm/x86_64/nested_exceptions_test.c  |   5 +-
+ .../selftests/kvm/x86_64/platform_info_test.c      |  14 +-
+ .../selftests/kvm/x86_64/pmu_event_filter_test.c   |   6 +-
+ tools/testing/selftests/kvm/x86_64/smm_test.c      |   9 +-
+ tools/testing/selftests/kvm/x86_64/state_test.c    |   8 +-
+ .../selftests/kvm/x86_64/svm_int_ctl_test.c        |   8 +-
+ .../kvm/x86_64/svm_nested_shutdown_test.c          |   7 +-
+ .../kvm/x86_64/svm_nested_soft_inject_test.c       |   6 +-
+ .../testing/selftests/kvm/x86_64/svm_vmcall_test.c |   6 +-
+ .../testing/selftests/kvm/x86_64/sync_regs_test.c  |  25 +--
+ .../selftests/kvm/x86_64/triple_fault_event_test.c |   9 +-
+ .../selftests/kvm/x86_64/tsc_scaling_sync.c        |   6 +-
+ .../selftests/kvm/x86_64/ucna_injection_test.c     |  22 +-
+ .../selftests/kvm/x86_64/userspace_io_test.c       |   6 +-
+ .../selftests/kvm/x86_64/userspace_msr_exit_test.c |  22 +-
+ .../selftests/kvm/x86_64/vmx_apic_access_test.c    |  11 +-
+ .../kvm/x86_64/vmx_close_while_nested_test.c       |   5 +-
+ .../selftests/kvm/x86_64/vmx_dirty_log_test.c      |   7 +-
+ .../vmx_exception_with_invalid_guest_state.c       |   4 +-
+ .../kvm/x86_64/vmx_invalid_nested_guest_state.c    |   4 +-
+ .../kvm/x86_64/vmx_nested_tsc_scaling_test.c       |   6 +-
+ .../kvm/x86_64/vmx_preemption_timer_test.c         |   8 +-
+ .../selftests/kvm/x86_64/vmx_tsc_adjust_test.c     |   6 +-
+ .../testing/selftests/kvm/x86_64/xapic_ipi_test.c  |   6 +-
+ .../testing/selftests/kvm/x86_64/xen_shinfo_test.c | 228 +++++++++++----------
+ .../testing/selftests/kvm/x86_64/xen_vmcall_test.c |   5 +-
+ 57 files changed, 354 insertions(+), 511 deletions(-)
 
