@@ -2,64 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F50B6BF1F6
-	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 20:54:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4AC006BF235
+	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 21:15:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229601AbjCQTyD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Mar 2023 15:54:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42546 "EHLO
+        id S229987AbjCQUPt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Mar 2023 16:15:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229516AbjCQTyC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Mar 2023 15:54:02 -0400
+        with ESMTP id S229985AbjCQUPs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Mar 2023 16:15:48 -0400
 Received: from mail-ua1-x92f.google.com (mail-ua1-x92f.google.com [IPv6:2607:f8b0:4864:20::92f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A63E13FB84
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 12:53:41 -0700 (PDT)
-Received: by mail-ua1-x92f.google.com with SMTP id g23so4090967uak.7
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 12:53:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 326FB3E1CA
+        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 13:15:46 -0700 (PDT)
+Received: by mail-ua1-x92f.google.com with SMTP id g23so4128627uak.7
+        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 13:15:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679082820;
+        d=google.com; s=20210112; t=1679084145;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=c75j1XnsYdf+cmNatU3jyf9cEv226es2tGse5jsbB64=;
-        b=SdREXCBVG6hQgEu1Ge/cv/gqnJSELpuGQ0zuIP6tMFbnbDgg7AzlIhLCpXYjratNW7
-         YNzxgg49MN325317BD4vbp0etqYpyTbIGijJeWuXkH33FaybMy71jTivfamZ6g05Xsy6
-         lTUtL+wuvqjJIjHDimyigck0He9l+ZN4UuXQdk/1KSclol8N0dXgEA9CLIws5QSN410k
-         3162JIkMqDGS3w0l3aQPqxYDidcepsEcIvWRie2cuLS+ShscWUoysa37+IG/6p7GjNrG
-         AgPrtu1rEMbrpksk9YDyo/44F3S8/1V1iXlBbYs1KR9bKTW0W17+ZeIFmf63hK5h3+1o
-         vwHw==
+        bh=gpiNCoQ2+ECAu0Qa5pXam+DH/IOK5zHBsyO0KdSU/oc=;
+        b=hScem/ZE+Fh4HebuH/sjBZHvum8pkYFP8oz9K1wUYdqmlBew6kVS2kCWNYZMOYqtgT
+         yoA8cuwWJi2P3CKlukCgoUukJsPXh6V3mluUIdO931Jtwa+PslAhlAFkl/hdPtmcNeZk
+         /p2Vrj+MWCdbMVC5NT8fyxFZz/c76YVZ6baE7coPoc28iLo0AkRv5B3VGQBb5JeO+zbK
+         cOlPKVwTSaxHR37BF6+6FbbK84fLsOShVJd9ykXG6zte0A/To7XNdwkX5OUqZHs10+/G
+         ZChiiNZ+7SJuj5Zkj0ad8iSSb2IEF1N1qDbnYrwFGPej2p9/0g08EnlB2KeqIzkN8GSS
+         1wlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679082820;
+        d=1e100.net; s=20210112; t=1679084145;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=c75j1XnsYdf+cmNatU3jyf9cEv226es2tGse5jsbB64=;
-        b=K4F0J3obPaPSb8gmFhJkbtKy+VohDqjcW3DgWg0Typ4lZuzZlmKZBTmgq3B9c7RUli
-         IRoomxiJF7fo/FK49SxRrKi7CZkElDVCkKF4Tij8jYBd3+gxgCcGR6B2+D4XtWvvaFan
-         xc5ZZUvkUEwWV2mRhiVWVRDUp4P9Va9MRCo8jXGxOnJb0z7LikvZrFvgvqh2X7nw9zDu
-         xu65ewWa1PvlP1M+3vOhLXLB4IrZOxWXXrDbwbL0LfsR3kK6yNUL8cy+RKdSy8maJRt1
-         nZ9NSLDIE1LbNS5qdIt3Cci8cI8wO6wq3yHfREm96IOOibyu4fTipe73xX/JnzTig/aJ
-         gKlA==
-X-Gm-Message-State: AO0yUKVgm97xarXBu2++ifVqC/1Ot+qYC8IQpBSuXPhby7NXupR5S9pv
-        4ezRqSruKxZKKOR0UUEX0gMxeTkHLe0zHl6zQsa+skzFLEYBoFzH3xN6bg==
-X-Google-Smtp-Source: AK7set98lOnL8GVsd7oqZGcpKk5si2Uwm+R55RG8VPalV6rBbmKglYyotak+Jgflg8C07XaV/C4sWj2+rhevGYaReng=
-X-Received: by 2002:a05:6122:1819:b0:431:bc30:7182 with SMTP id
- ay25-20020a056122181900b00431bc307182mr939694vkb.9.1679082820242; Fri, 17 Mar
- 2023 12:53:40 -0700 (PDT)
+        bh=gpiNCoQ2+ECAu0Qa5pXam+DH/IOK5zHBsyO0KdSU/oc=;
+        b=QRz9W+ENeu0RHNck/2Xg9j8StivFCCRqr/jXktADb3qYrjeAwmwoJfzXIDUoBCc3Bt
+         1foUExw4DPE6T93SmoCcESxMGtKJbhdpuzrXJGjZD392Rcaf5C+7tSCegptxRhAqtIE/
+         JOaxj8vlEX+4xV2eBo1nYcmgUzrzoI4gatB7xJ/4AWP5GV7p/prrqC43vIz3noAoJSqd
+         S1+miLfJC/mimEAVWZDjNReCsQ5kUZ0DoCg8eah6PgiAzUsF7YMFVXk++HaynLiTuI+Y
+         lD21bY0oMieZKSlZgkkHxaJfJlc58iKxUXfKJUkl4FOANl3ndZl7sg4ogb9weBTtBE/i
+         utXQ==
+X-Gm-Message-State: AO0yUKUSxxFKfWVnMyO7vwdKUt8kZCNeQSYHZVCwM+8pUM9f+JBFcmAo
+        rxyaaqHxCA5KVZs+qV9KgXx13E02Lv6cHBNqnPSybw==
+X-Google-Smtp-Source: AK7set8VH+bybk41rZnQA1UUNEOAoDNfeVoj3v7pMoyS/o+C+onCHqHbHYjEy01UQZkDxPNot53wGKWxLFamjf7Wx70=
+X-Received: by 2002:a1f:72cf:0:b0:40f:f3e1:53c with SMTP id
+ n198-20020a1f72cf000000b0040ff3e1053cmr756714vkc.1.1679084145260; Fri, 17 Mar
+ 2023 13:15:45 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230315021738.1151386-1-amoorthy@google.com> <ZBSmz0JAgTrsF608@linux.dev>
- <ZBStyKk6H73/0z2r@google.com> <CALzav=dBJyr373jnBF_-uLJfZMwHOsKSVSR2u4xr83etjp6Daw@mail.gmail.com>
- <ZBS3UbrWFZJzLzOq@linux.dev> <CALzav=fuZRrrMWHR+tRJ7R9hUDHyzhdBJ_Ak2V622TjRpFLoLw@mail.gmail.com>
-In-Reply-To: <CALzav=fuZRrrMWHR+tRJ7R9hUDHyzhdBJ_Ak2V622TjRpFLoLw@mail.gmail.com>
+References: <20230315021738.1151386-1-amoorthy@google.com> <20230315021738.1151386-10-amoorthy@google.com>
+ <ZBS4o75PVHL4FQqw@linux.dev>
+In-Reply-To: <ZBS4o75PVHL4FQqw@linux.dev>
 From:   Anish Moorthy <amoorthy@google.com>
-Date:   Fri, 17 Mar 2023 12:53:04 -0700
-Message-ID: <CAF7b7mpwJ55vhmVfy0-_Nosgd+GZfno_HT1QQHg-952kvXW_5Q@mail.gmail.com>
-Subject: Re: [WIP Patch v2 00/14] Avoiding slow get-user-pages via memory
- fault exit
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>, jthoughton@google.com,
-        kvm@vger.kernel.org, maz@kernel.org,
-        Isaku Yamahata <isaku.yamahata@gmail.com>
+Date:   Fri, 17 Mar 2023 13:15:09 -0700
+Message-ID: <CAF7b7mr9oJfY7Y2PQtHDRyM5-mtXYFamW3mR5_Ap8a4TjG34LQ@mail.gmail.com>
+Subject: Re: [WIP Patch v2 09/14] KVM: Introduce KVM_CAP_MEMORY_FAULT_NOWAIT
+ without implementation
+To:     Oliver Upton <oliver.upton@linux.dev>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     jthoughton@google.com, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
@@ -73,99 +71,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 17, 2023 at 12:00=E2=80=AFPM David Matlack <dmatlack@google.com=
-> wrote:
->
-> On Fri, Mar 17, 2023 at 11:54=E2=80=AFAM Oliver Upton <oliver.upton@linux=
-.dev> wrote:
-> >
-> > David,
-> >
-> > On Fri, Mar 17, 2023 at 11:46:58AM -0700, David Matlack wrote:
-> > > On Fri, Mar 17, 2023 at 11:13=E2=80=AFAM Sean Christopherson <seanjc@=
-google.com> wrote:
-> > > >
-> > > > On Fri, Mar 17, 2023, Oliver Upton wrote:
-> > > > > On Wed, Mar 15, 2023 at 02:17:24AM +0000, Anish Moorthy wrote:
-> > > > > > Hi Sean, here's what I'm planing to send up as v2 of the scalab=
-le
-> > > > > > userfaultfd series.
-> > > > >
-> > > > > I don't see a ton of value in sending a targeted posting of a ser=
-ies to the
-> > > > > list.
-> > >
-> > > But isn't it already generating value as you were able to weigh in an=
-d
-> > > provide feedback on technical aspects that you would not have been
-> > > otherwise able to if Anish had just messaged Sean?
-> >
-> > No, I only happened upon this series looking at lore. My problem is tha=
-t
-> > none of the affected maintainers or reviewers were cc'ed on the series.
-> >
-> > > > > IOW, just CC all of the appropriate reviewers+maintainers. I prom=
-ise,
-> > > > > we won't bite.
-> > >
-> > > I disagree. While I think it's fine to reach out to someone off-list
-> > > to discuss a specific question, if you're going to message all
-> > > reviewers and maintainers, you should also CC the mailing list. That
-> > > allows more people to follow along and weigh in if necessary.
-> >
-> > I think there may be a slight disconnect here :) I'm in no way encourag=
-ing
-> > off-list discussion and instead asking that mail on the list arrives in
-> > the right folks' inboxes.
-> >
-> > Posting an RFC on the list was absolutely the right thing to do.
->
-> Doh. I misunderstood what you meant. We are in violent agreement!
+On Fri, Mar 17, 2023 at 11:59=E2=80=AFAM Oliver Upton <oliver.upton@linux.d=
+ev> wrote:
 
-Noted. Also, thanks Oliver and Isaku for paying attention to the
-series despite it being obscure.
+> > +  #define KVM_MEM_ABSENT_MAPPING_FAULT (1UL << 2)
+>
+> call it KVM_MEM_EXIT_ABSENT_MAPPING
+> ...
+> I'm not a fan of this architecture-specific dependency. Userspace is alre=
+ady
+> explicitly opting in to this behavior by way of the memslot flag. These s=
+ort
+> of exits are entirely orthogonal to the -EFAULT conversion earlier in the
+> series.
 
-On Fri, Mar 17, 2023 at 11:13=E2=80=AFAM Sean Christopherson <seanjc@google=
+I'm not a fan of the semantics varying between architectures either:
+but the reason I have it like that (and that the EFAULT conversions
+exist in this series in the first place) is (a) not having
+KVM_CAP_MEMORY_FAULT_EXIT implemented for arm and (b) Sean's following
+statement from https://lore.kernel.org/kvm/Y%2FfS0eab7GG0NVKS@google.com/
+
+On Thu, Feb 23, 2023 at 12:55=E2=80=AFPM Sean Christopherson <seanjc@google=
 .com> wrote:
 >
-> On Fri, Mar 17, 2023, Oliver Upton wrote:
-> > > Still unsure if needs conversion
-> > > --------------------------------
-> > > * __kvm_read_guest_atomic
-> > >   The EFAULT might be propagated though FNAME(sync_page)?
-> > > * kvm_write_guest_offset_cached (virt/kvm/kvm_main.c:3226)
-> > > * __kvm_write_guest_page
-> > >   Called from kvm_write_guest_offset_cached: if that needs change, th=
-is does too
-> >
-> > The low-level accessors are common across architectures and can be call=
-ed from
-> > other contexts besides a vCPU. Is it possible for the caller to catch -=
-EFAULT
-> > and convert that into an exit?
->
-> Ya, as things stand today, the conversions _must_ be performed at the cal=
-ler, as
-> there are (sadly) far too many flows where KVM squashes the error.  E.g. =
-almost
-> all of x86's paravirt code just suppresses user memory faults :-(
->
-> Anish, when we discussed this off-list, what I meant by limiting the inti=
-al support
-> to existing -EFAULT cases was limiting support to existing cases where KV=
-M directly
-> returns -EFAULT to userspace, not to all existing cases where -EFAULT is =
-ever
-> returned _within KVM_ while handling KVM_RUN.  My apologies if I didn't m=
-ake that clear.
+> The new memslot flag should depend on KVM_CAP_MEMORY_FAULT_EXIT, but
+> KVM_CAP_MEMORY_FAULT_EXIT should be a standalone thing, i.e. should conve=
+rt "all"
+> guest-memory -EFAULTS to KVM_CAP_MEMORY_FAULT_EXIT.  All in quotes becaus=
+e I would
+> likely be ok with a partial conversion for the initial implementation if =
+there
+> are paths that would require an absurd amount of work to convert.
 
-Don't worry, we eventually got there off-list :)
-
-This brings us back to my original set of questions. As has already
-been pointed out, I'll have to revisit my "Confident that needs
-conversion" changes and tweak them so that the vCPU exit is populated
-only for the call sites where the -EFAULT makes it to userspace. I
-still want feedback on if I've mis-identified any of the functions in
-my "EFAULT does not propagate to userspace" list and whether there are
-functions/callers in the "Still unsure if needs conversion" which do
-have return paths to KVM_RUN.
+The best way that I thought of how to do that was to have one cap
+(KVM_CAP_MEMORY_FAULT_NOWAIT) to make KVM -EFAULT without calling slow
+GUP, and KVM_CAP_MEMORY_FAULT_EXIT to transform efaults to useful vm
+exits. But if you think the two are really orthogonal, then we need to
+resolve the apparent disagreement.
