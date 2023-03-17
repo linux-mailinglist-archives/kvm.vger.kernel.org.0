@@ -2,101 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BCC586BF6B1
-	for <lists+kvm@lfdr.de>; Sat, 18 Mar 2023 00:52:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C4316BF6BA
+	for <lists+kvm@lfdr.de>; Sat, 18 Mar 2023 01:00:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230025AbjCQXwP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Mar 2023 19:52:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42700 "EHLO
+        id S229987AbjCRAAN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Mar 2023 20:00:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229560AbjCQXwN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Mar 2023 19:52:13 -0400
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 515C76C68A
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 16:52:02 -0700 (PDT)
-Received: by mail-yb1-xb2c.google.com with SMTP id e194so7444947ybf.1
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 16:52:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679097121;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eQMD/29uw8RUz0fNzK2trwLryR+NGIrIQSt625LLiR4=;
-        b=TS6enXcAOm38L7QvT+K/jT3x16hmeT+y+4kagaEDckdmpRvnOeAsbBSaoxSgJNrMG9
-         hSDoMP05VscGo4LbTYECC5AxoNaVqnnTnHAs/iWsoKurGamEavoev9wvQFzc5ajoajeu
-         DYLeXS21zZR/OdOOW6HSDWhDHkm0jkfxTu0QoA9CnKv9CUV4sjRRndhJhVmkIO1l+wiO
-         zZFvqMqBj5ylb0eGeV9fiDugpe8fq+UHlDR1JCe/RfaO4Rm5ay4W9VOz4jkfVIkbHLVr
-         BGzYpR9cO24ehDUEE1+X4CiHtCVUjxXxZNeZLMWIFUHSXrcjpQHtzE7T714PnT4ICFBm
-         QduA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679097121;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eQMD/29uw8RUz0fNzK2trwLryR+NGIrIQSt625LLiR4=;
-        b=pxqrHiTFLMN953jFdMchfeIVIqUty9Y1+T+oqL4epBRVHbv8MB4jvP96B43IbGUhbo
-         NHUKxbMmgYuihY4DzJUlKsVf5fiqSmbHLfOi9/+FlmvF/8yycwCBeUaVz73lQy3A7BcR
-         7ID5XsAwc+SQNo3AF0QwKzvzkwG5jd9TgSHRih8cqwC+QJshTuXqMjoChFT1OL7y4T5Q
-         9KQETWwrmA9MH6GKdSUEDHG4j2Neoun+2QODcOTwGDDMLR8S7WSNT0JL1MI3LGi8u+je
-         kTrs4jYqs8XF86iCr6WkJ3cLQzixk0gKrt5MMG9WHA/9X+u25DXPv8mGfConKEjd12jA
-         e04g==
-X-Gm-Message-State: AO0yUKUBOSrosXgr9MLceaj7C2qzpG2KqfvYlQMKaCz1+kuqBhBu4h1d
-        UTuD9x41Q+ojod3WraxaWAiijR5BB8NcsCLGyOvyGw==
-X-Google-Smtp-Source: AK7set/6K0VHPQzMrr66R5AXYXA3YJNzCDyiJiEWzDsvRDdmZ6ptCgflUF6JxqibsYXvfUTKehd9lDdnM5vVfI53kFo=
-X-Received: by 2002:a5b:181:0:b0:acd:7374:f15b with SMTP id
- r1-20020a5b0181000000b00acd7374f15bmr187259ybl.13.1679097121136; Fri, 17 Mar
- 2023 16:52:01 -0700 (PDT)
+        with ESMTP id S229516AbjCRAAL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Mar 2023 20:00:11 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56BAE1D923;
+        Fri, 17 Mar 2023 17:00:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1679097610; x=1710633610;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=54+9w11FyBycDMrEZnRqQoNXdQMiD2O9yYzVr/7CDsE=;
+  b=E1CRz8qVrHkWcSzqfkYt8BYbuc/94A28XjDBKhF9AAyCjWGbyDklAgYo
+   U84iq5HS7Zyeq2MurMN0JaCDPn7/UtHWvuy+DxgZctLn0CErCl2GxkArN
+   3FmiISFGq3bw3ttDakddI1neuU/+QZGTG/ErxhJ+uWNLN4ARr9ezyzWTX
+   3DuLoWSNRgp82ChV8bHk2wFGRd8//hemY1bo0C3Ab6GCaS2MRv0/3tRR1
+   QS5/OkXlqlbDFmI4B+imiNUoItjkcxobn8nVlKeb1nHFU5kUpOP4T9jPY
+   Iw6VNFCC9iXqWx9JXVMmjsWdB2ZQZ02LwOJ2tIcwNhjwi9MNl1zBhFSp7
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10652"; a="400964714"
+X-IronPort-AV: E=Sophos;i="5.98,270,1673942400"; 
+   d="scan'208";a="400964714"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2023 17:00:09 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10652"; a="712932148"
+X-IronPort-AV: E=Sophos;i="5.98,270,1673942400"; 
+   d="scan'208";a="712932148"
+Received: from mupadhya-mobl1.amr.corp.intel.com (HELO desk) ([10.209.15.93])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2023 17:00:09 -0700
+Date:   Fri, 17 Mar 2023 16:59:59 -0700
+From:   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To:     Nathan Chancellor <nathan@kernel.org>
+Cc:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        Ben Serebrin <serebrin@google.com>,
+        Peter Shier <pshier@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/3] kvm: vmx: Add IA32_FLUSH_CMD guest support
+Message-ID: <20230317235959.buk3y25iwllscrbe@desk>
+References: <20230201132905.549148-1-eesposit@redhat.com>
+ <20230201132905.549148-2-eesposit@redhat.com>
+ <20230317190432.GA863767@dev-arch.thelio-3990X>
+ <20230317225345.z5chlrursjfbz52o@desk>
+ <20230317231401.GA4100817@dev-arch.thelio-3990X>
 MIME-Version: 1.0
-References: <20230211014626.3659152-1-vipinsh@google.com> <ZBTwX5790zwl5721@google.com>
-In-Reply-To: <ZBTwX5790zwl5721@google.com>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Fri, 17 Mar 2023 16:51:25 -0700
-Message-ID: <CAHVum0fw2RXfqLNMbAFHbwh1P-O0JjnDCUTco9zt18mBi4Pk-Q@mail.gmail.com>
-Subject: Re: [Patch v3 0/7] Optimize clear dirty log
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     pbonzini@redhat.com, bgardon@google.com, dmatlack@google.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230317231401.GA4100817@dev-arch.thelio-3990X>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 17, 2023 at 3:57=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Fri, Feb 10, 2023, Vipin Sharma wrote:
-> > This patch series has optimized control flow of clearing dirty log and
-> > improved its performance by ~40% (2% more than v2).
-> >
-> > It also got rid of many variants of the handle_changed_spte family of
-> > functions and converged logic to one handle_changed_spte() function. It
-> > also remove tdp_mmu_set_spte_no_[acc_track|dirty_log] and various
-> > booleans for controlling them.
-> >
-> > v3:
-> > - Tried to do better job at writing commit messages.
->
-> LOL, that's the spirit!
->
-> Did a cursory glance, looks good.  I'll do a more thorough pass next week=
- and get
-> it queued up if all goes well.  No need for a v4 at this point, I'll fixu=
-p David's
-> various nits when applying.  I'll also add a link in patch 2 to the discu=
-ssion
+On Fri, Mar 17, 2023 at 04:14:01PM -0700, Nathan Chancellor wrote:
+> On Fri, Mar 17, 2023 at 03:53:45PM -0700, Pawan Gupta wrote:
+> > On Fri, Mar 17, 2023 at 12:04:32PM -0700, Nathan Chancellor wrote:
+> > > Hi Emanuele,
+> > > 
+> > > On Wed, Feb 01, 2023 at 08:29:03AM -0500, Emanuele Giuseppe Esposito wrote:
+> > > > Expose IA32_FLUSH_CMD to the guest if the guest CPUID enumerates
+> > > > support for this MSR. As with IA32_PRED_CMD, permission for
+> > > > unintercepted writes to this MSR will be granted to the guest after
+> > > > the first non-zero write.
+> > > > 
+> > > > Signed-off-by: Jim Mattson <jmattson@google.com>
+> > > > Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
+> > > > ---
+> > > >  arch/x86/kvm/vmx/nested.c |  3 ++
+> > > >  arch/x86/kvm/vmx/vmx.c    | 70 +++++++++++++++++++++++++--------------
+> > > >  2 files changed, 48 insertions(+), 25 deletions(-)
+> > > > 
+> > > > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> > > > index 557b9c468734..075b5ade7c80 100644
+> > > > --- a/arch/x86/kvm/vmx/nested.c
+> > > > +++ b/arch/x86/kvm/vmx/nested.c
+> > > > @@ -654,6 +654,9 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
+> > > >  	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
+> > > >  					 MSR_IA32_PRED_CMD, MSR_TYPE_W);
+> > > >  
+> > > > +	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
+> > > > +					 MSR_IA32_FLUSH_CMD, MSR_TYPE_W);
+> > > > +
+> > > >  	kvm_vcpu_unmap(vcpu, &vmx->nested.msr_bitmap_map, false);
+> > > >  
+> > > >  	vmx->nested.force_msr_bitmap_recalc = false;
+> > > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > > > index c788aa382611..9a78ea96a6d7 100644
+> > > > --- a/arch/x86/kvm/vmx/vmx.c
+> > > > +++ b/arch/x86/kvm/vmx/vmx.c
+> > > > @@ -2133,6 +2133,39 @@ static u64 vmx_get_supported_debugctl(struct kvm_vcpu *vcpu, bool host_initiated
+> > > >  	return debugctl;
+> > > >  }
+> > > >  
+> > > > +static int vmx_set_msr_ia32_cmd(struct kvm_vcpu *vcpu,
+> > > > +				struct msr_data *msr_info,
+> > > > +				bool guest_has_feat, u64 cmd,
+> > > > +				int x86_feature_bit)
+> > > > +{
+> > > > +	if (!msr_info->host_initiated && !guest_has_feat)
+> > > > +		return 1;
+> > > > +
+> > > > +	if (!(msr_info->data & ~cmd))
+> > 
+> > Looks like this is doing a reverse check. Shouldn't this be as below:
+> 
+> That diff on top of next-20230317 appears to resolve the issue for me
+> and my L1 guest can spawn an L2 guest without any issues (which is the
+> extent of my KVM testing).
 
-Yeah, he is too demanding! :p
+Great!
 
-> about why we determined that bypassing __tdp_mmu_set_spte() is safe; that=
-'s critical
-> information that isn't captured in the changelog.
+> Is this a problem for the SVM version? It has the same check it seems,
+> although I did not have any issues on my AMD test platform (but I guess
+> that means that the system has the support?).
 
-Thanks!
+IIUC, SVM version also needs to be fixed.
+
+> I assume this will just be squashed into the original change but if not:
+
+Thats what I think, and if its too late to be squashed I will send a
+formal patch. Maintainers?
+
+> Tested-by: Nathan Chancellor <nathan@kernel.org>
+> 
+> Cheers,
+> Nathan
+> 
+> > ---
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index f88578407494..e8d9033559c4 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -2141,7 +2141,7 @@ static int vmx_set_msr_ia32_cmd(struct kvm_vcpu *vcpu,
+> >  	if (!msr_info->host_initiated && !guest_has_feat)
+> >  		return 1;
+> >  
+> > -	if (!(msr_info->data & ~cmd))
+> > +	if (msr_info->data & ~cmd)
+> >  		return 1;
+> >  	if (!boot_cpu_has(x86_feature_bit))
+> >  		return 1;
