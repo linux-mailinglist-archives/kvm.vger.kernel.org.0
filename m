@@ -2,105 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E7B76BF0D2
-	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 19:38:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 972706BF0FD
+	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 19:47:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229621AbjCQSif (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Mar 2023 14:38:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47586 "EHLO
+        id S229798AbjCQSrb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Mar 2023 14:47:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230308AbjCQSi3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Mar 2023 14:38:29 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8165A558B;
-        Fri, 17 Mar 2023 11:38:23 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 68520B8268B;
-        Fri, 17 Mar 2023 18:38:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2631BC433D2;
-        Fri, 17 Mar 2023 18:38:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1679078300;
-        bh=3evC/H1IWweU6IKTFkngiSrFDaZSqyZnEsOOVz+Z9Jg=;
-        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-        b=o/U7xcPmPMbRDgMydSj4RGzoKjEQpQvF8eTJeKoXBg3pZv2xKoVJDbo/BMm7HnINl
-         j7ZfURb+hP2FP7L5n/aJLw/Eyjp+tJ0ILLVyYL20R2ezsDqKs01CL4UwILNjW6FBr0
-         PHsXtsufITHsPUmlXQUTJ4goBfUDKxYCfxanLuQItF5mH4K2qTMNH5baDFuDEn9O4D
-         yto8/RwnSOWH0D52sq1kDYOK5ggwuxxh7G63K3jT4CoZCTQxcQcVrlBBiyvL8LJHyl
-         Ztj13v5MjABWnWsTAz6X3RrXjMPfF53c5L+IvhEadfWfCfqyidzPwSpmnQL5ekG90m
-         FRShO7uDycCTQ==
-Received: by paulmck-ThinkPad-P72.home (Postfix, from userid 1000)
-        id A2D731540381; Fri, 17 Mar 2023 11:38:19 -0700 (PDT)
-Date:   Fri, 17 Mar 2023 11:38:19 -0700
-From:   "Paul E. McKenney" <paulmck@kernel.org>
-To:     Boqun Feng <boqun.feng@gmail.com>
-Cc:     rcu@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
-        Waiman Long <longman@redhat.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-        Joel Fernandes <joel@joelfernandes.org>,
-        Shuah Khan <shuah@kernel.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        seanjc@google.com, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        kernel test robot <oliver.sang@intel.com>
-Subject: Re: [PATCH rcu 3/7] locking: Reduce the number of locks in ww_mutex
- stress tests
-Message-ID: <2e8a6800-78e7-42bf-b4ff-5d7ef43511c5@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <20230317031339.10277-1-boqun.feng@gmail.com>
- <20230317031339.10277-4-boqun.feng@gmail.com>
+        with ESMTP id S229616AbjCQSr3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Mar 2023 14:47:29 -0400
+Received: from mail-ua1-x933.google.com (mail-ua1-x933.google.com [IPv6:2607:f8b0:4864:20::933])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F4004C927F
+        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 11:47:25 -0700 (PDT)
+Received: by mail-ua1-x933.google.com with SMTP id x33so3965706uaf.12
+        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 11:47:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1679078845;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V+Qmht/GxJ6JFAAlohGr3Nij8kDTEBI3rBBvyi6NDiM=;
+        b=dzzLUy55WOMSH/m1iD/RSl5QH/2jc2XpMnkhU0PDNVCq5Ku06GX292BDqizWXpg9lE
+         heH0TnmAvBiDRN2uhM0M1vMrTKzVNqIv9jsKUAr71Ryy3qQpoO1xyAQlSwbX2lQmB/7+
+         Q6CoOCUwk8ngneiwNMo6Cu4tPrgPja7S+FYs8nNGCSoQ6fmyzBqvmEbtCOBAZwC4Kxtc
+         aoJfUK+d46Ig7gvo4zSjye5uycndnFLJMGpZ2B7RBnK0LzPt2Bgik8r6aqskiiwpkW0G
+         RBBZtP5TMZWakTgBRfz6aTBOYSGacW8uSn7yOggvzcbIlwV8/TmKC74SLAnLjfp+yz5C
+         tMug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679078845;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=V+Qmht/GxJ6JFAAlohGr3Nij8kDTEBI3rBBvyi6NDiM=;
+        b=QYl/zT1kkG/PRze2vqgECtx7B2che5ED6+o2HjNL7mfmcX4HzN6+XGNLBOwqfCsRhx
+         aiWPM2BEQkodpUcwcrEgbW36+8R8ubWc/WFJcCDFe2sNg7FUib+0oz+7lt+rLIN2vJxr
+         79P57T3nnQfF79fqEDCCAaLDIxwwin11AK4DXS0eV8cAkjaOBBOzmD35rkMVOINlQ89o
+         Kowa4uAqjM0ddGzpEWbag66Qq/cOVDPf5KLnriP174+BlhwLNP2U3tlgkTEAclHa3KjB
+         TB9kaSMxxyeoK/OAAEHNgE9NW9kBlGGtfo1YR7xWPaGOoLdIkVGwS1MILcA4A0gyYXMI
+         OwXw==
+X-Gm-Message-State: AO0yUKVCr+VvZXlnm+UAu2CjvUWKGmYLy7Nn24B9bTTe4LccT069Zumb
+        yekbSY4szjKVmxPONctygTNbh9gn/adV/ycZb93a9w==
+X-Google-Smtp-Source: AK7set8arpUSNgclIO10ass1x4j2DR/zlPhJgCvUb/cRyCR23P7THdXguFcDbSipZxasdZzsalbO8V7DVH8rnRAKu1k=
+X-Received: by 2002:ab0:6cf1:0:b0:68a:702a:2494 with SMTP id
+ l17-20020ab06cf1000000b0068a702a2494mr266702uai.0.1679078844905; Fri, 17 Mar
+ 2023 11:47:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230317031339.10277-4-boqun.feng@gmail.com>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20230315021738.1151386-1-amoorthy@google.com> <ZBSmz0JAgTrsF608@linux.dev>
+ <ZBStyKk6H73/0z2r@google.com>
+In-Reply-To: <ZBStyKk6H73/0z2r@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Fri, 17 Mar 2023 11:46:58 -0700
+Message-ID: <CALzav=dBJyr373jnBF_-uLJfZMwHOsKSVSR2u4xr83etjp6Daw@mail.gmail.com>
+Subject: Re: [WIP Patch v2 00/14] Avoiding slow get-user-pages via memory
+ fault exit
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        Anish Moorthy <amoorthy@google.com>, jthoughton@google.com,
+        kvm@vger.kernel.org, maz@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 16, 2023 at 08:13:35PM -0700, Boqun Feng wrote:
-> The stress test in test_ww_mutex_init() uses 4095 locks since
-> lockdep::reference has 12 bits, and since we are going to reduce it to
-> 11 bits to support lock_sync(), and 2047 is still a reasonable number of
-> the max nesting level for locks, so adjust the test.
-> 
-> Reported-by: kernel test robot <oliver.sang@intel.com>
-> Link: https://lore.kernel.org/oe-lkp/202302011445.9d99dae2-oliver.sang@intel.com
-> Signed-off-by: Boqun Feng <boqun.feng@gmail.com>
+On Fri, Mar 17, 2023 at 11:13=E2=80=AFAM Sean Christopherson <seanjc@google=
+.com> wrote:
+>
+> On Fri, Mar 17, 2023, Oliver Upton wrote:
+> > On Wed, Mar 15, 2023 at 02:17:24AM +0000, Anish Moorthy wrote:
+> > > Hi Sean, here's what I'm planing to send up as v2 of the scalable
+> > > userfaultfd series.
+> >
+> > I don't see a ton of value in sending a targeted posting of a series to=
+ the
+> > list.
 
-Tested-by: Paul E. McKenney <paulmck@kernel.org>
+But isn't it already generating value as you were able to weigh in and
+provide feedback on technical aspects that you would not have been
+otherwise able to if Anish had just messaged Sean?
 
-> ---
->  kernel/locking/test-ww_mutex.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/kernel/locking/test-ww_mutex.c b/kernel/locking/test-ww_mutex.c
-> index 29dc253d03af..93cca6e69860 100644
-> --- a/kernel/locking/test-ww_mutex.c
-> +++ b/kernel/locking/test-ww_mutex.c
-> @@ -659,7 +659,7 @@ static int __init test_ww_mutex_init(void)
->  	if (ret)
->  		return ret;
->  
-> -	ret = stress(4095, hweight32(STRESS_ALL)*ncpus, STRESS_ALL);
-> +	ret = stress(2047, hweight32(STRESS_ALL)*ncpus, STRESS_ALL);
->  	if (ret)
->  		return ret;
->  
-> -- 
-> 2.39.2
-> 
+> > IOW, just CC all of the appropriate reviewers+maintainers. I promise,
+> > we won't bite.
+
+I disagree. While I think it's fine to reach out to someone off-list
+to discuss a specific question, if you're going to message all
+reviewers and maintainers, you should also CC the mailing list. That
+allows more people to follow along and weigh in if necessary.
+
+>
+> +1.  And though I discourage off-list review, if something is really trul=
+y not
+> ready for public review, e.g. will do more harm than good by causing conf=
+using,
+> then just send the patches off-list.  Half measures like this will just m=
+ake folks
+> grumpy.
+
+In this specific case, Anish very clearly laid out the reason for
+sending the patches and asked very specific directed questions in the
+cover letter and called it out as WIP. Yes "WIP" should have been
+"RFC" but other than that should anything have been different?
