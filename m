@@ -2,138 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3500D6BEF28
-	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 18:06:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 272066BEF43
+	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 18:11:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229840AbjCQRGE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Mar 2023 13:06:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45390 "EHLO
+        id S230252AbjCQRKa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Mar 2023 13:10:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229970AbjCQRFp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Mar 2023 13:05:45 -0400
-Received: from mail-yw1-x112e.google.com (mail-yw1-x112e.google.com [IPv6:2607:f8b0:4864:20::112e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5056D3BC5A
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 10:05:21 -0700 (PDT)
-Received: by mail-yw1-x112e.google.com with SMTP id 00721157ae682-536af432ee5so106504157b3.0
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 10:05:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679072720;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mFnOJ5LuKHmOyMvm2OqEa+8kheq2ORsU1yGkgX6NxSs=;
-        b=awiejcVT3NtjE0Ko5FlZGis/mZm+5yuLoA91/HP6ebhWkW3Kah0s+C2GZXN8Ish/H+
-         6SYAkqZ2/TseaDkMorXt8AwGlq6YkvMzqV87eUzcf5/oYp5VX3laT9Md3dLcSavg2Mcm
-         4H2k2z1W2zhlULD0HJa126jtvsxc36QKJQmMHLhoO0/ndSb8SkZJzDQBZ0q4w/2gq7VQ
-         WQ0PFhhMG3jpU22Uwl001bBPcBZ7aJ+6EiUbdaNQ6RrQReOTqoALcYcgXi1ZhQNszu0K
-         rgiVOqT/gcI4DO4k+GXIhav0v8eINifiRQsmnJQsFChHRqDorf+t58VcxwdI0YO3e6xo
-         nApg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679072720;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mFnOJ5LuKHmOyMvm2OqEa+8kheq2ORsU1yGkgX6NxSs=;
-        b=YO+m3zRgXuUPyw6/uuuOMncwwpXGRAYFgJcVGWqT0q7EYpZq35d6NPjUs+/voGC69N
-         8mj4AM1GWgJ+jLflz6SNUUKctXmeCz+NDPkBEL0CJt3gI8AnMNjzu4cwm2ZQpZDsv9HQ
-         RJ6Sce+WJj/HYwj2YiWd7M+GlL0Ff43qSg1FQMTlsYtd1WbOz6qR1Tq+9qGd0I1Y7vw5
-         j+U77vXA5qmNi1oSWcKYqhWYWE/Sih8y1uH/fEbq0yINrUizNFFxWzRbiRUHSRk+ZJ2N
-         ZCi2mkAduCmLhAygB8uqOuZLXq62wOBlj3nOOiAd/aKFbIblq3HYLt2we27AG5W7NBix
-         dtZQ==
-X-Gm-Message-State: AO0yUKVWOAob8B4cf3TLouthCBsitfDm5e4yJT51dPPu/C/03VkyODmF
-        dshSyPQXR0vSpbK8dZn7yIh2x7NZDNLlOHOYeo0IIA==
-X-Google-Smtp-Source: AK7set//QAk4aSOFhrr3SxZVO3ksc023SPy4sQoFHdqMA1mGTlXnNkFpaQvCaIuc543hMBCKQfBJttutWUiaG79gI24=
-X-Received: by 2002:a81:d84d:0:b0:541:69bc:8626 with SMTP id
- n13-20020a81d84d000000b0054169bc8626mr4949791ywl.10.1679072719598; Fri, 17
- Mar 2023 10:05:19 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230316222752.1911001-1-coltonlewis@google.com> <20230316222752.1911001-2-coltonlewis@google.com>
-In-Reply-To: <20230316222752.1911001-2-coltonlewis@google.com>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Fri, 17 Mar 2023 10:04:43 -0700
-Message-ID: <CAHVum0diwWqa38naQaybdJVszKHcxPiHj8a7T305h2TNER35Ew@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] KVM: selftests: Provide generic way to read system counter
+        with ESMTP id S230313AbjCQRKK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Mar 2023 13:10:10 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A196497D4
+        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 10:09:45 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id BE118B82653
+        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 17:09:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E1FCC433EF;
+        Fri, 17 Mar 2023 17:09:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1679072982;
+        bh=4CTH4rBxEXVY5v/WEtmokaUGJ626djZ1Fv+YitxfAlI=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=QLIEMMh7gOR0ExBHs0bxvkmcS9oD0FOzoY6rtvivXvR6hUugWa9lZ9qTLL8/TLSnK
+         mTFoMtSoX8SnAV9F+0rSJavQbRYquiEN181F9Pg0WjU4+e+V/GGRmzlcXMCvtvyQOe
+         UB+G73FOIjnuNCvmCr2HPf+G3IjxhIby87TYt5HegFV99Kl+mFnWiCQOayaBLKiwD/
+         ooxVKCL+7L38hPkxHd2AQOVI3FPtxhDyZnhE8gOrQbOBlETWNWmQXoXYBGBbHn1s9s
+         ZvUTvmLvbwFYEQtNB0AiPGMwBL1h5Dh/IGE9IJP0iUJ9JsK+8b1RHewj5BndG1bb/L
+         NwjiFGjtk/Seg==
+Received: from [89.213.33.168] (helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pdDaG-0010UA-1Y;
+        Fri, 17 Mar 2023 17:09:40 +0000
+Date:   Fri, 17 Mar 2023 17:09:39 +0000
+Message-ID: <87y1nvgv8s.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
 To:     Colton Lewis <coltonlewis@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
         Sean Christopherson <seanjc@google.com>,
         David Matlack <dmatlack@google.com>,
+        Vipin Sharma <vipinsh@google.com>,
         Andrew Jones <andrew.jones@linux.dev>,
-        Marc Zyngier <maz@kernel.org>, Ben Gardon <bgardon@google.com>,
+        Ben Gardon <bgardon@google.com>,
         Ricardo Koller <ricarkol@google.com>,
         Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Subject: Re: [PATCH v2 1/2] KVM: selftests: Provide generic way to read system counter
+In-Reply-To: <20230316222752.1911001-2-coltonlewis@google.com>
+References: <20230316222752.1911001-1-coltonlewis@google.com>
+        <20230316222752.1911001-2-coltonlewis@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 89.213.33.168
+X-SA-Exim-Rcpt-To: coltonlewis@google.com, pbonzini@redhat.com, shuah@kernel.org, seanjc@google.com, dmatlack@google.com, vipinsh@google.com, andrew.jones@linux.dev, bgardon@google.com, ricarkol@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 16, 2023 at 3:29=E2=80=AFPM Colton Lewis <coltonlewis@google.co=
-m> wrote:
->
+On Thu, 16 Mar 2023 22:27:51 +0000,
+Colton Lewis <coltonlewis@google.com> wrote:
+> 
 > Provide a generic function to read the system counter from the guest
 > for timing purposes. A common and important way to measure guest
 > performance is to measure the amount of time different actions take in
 > the guest. Provide also a mathematical conversion from cycles to
 > nanoseconds and a macro for timing individual statements.
->
+> 
 > Substitute the previous custom implementation of a similar function in
-
-May be specify specific name:  guest_read_system_counter()
-
 > system_counter_offset_test with this new implementation.
->
+> 
 > Signed-off-by: Colton Lewis <coltonlewis@google.com>
 > ---
 >  .../testing/selftests/kvm/include/kvm_util.h  | 15 ++++++++++
 >  tools/testing/selftests/kvm/lib/kvm_util.c    | 30 +++++++++++++++++++
 >  .../kvm/system_counter_offset_test.c          | 10 ++-----
 >  3 files changed, 47 insertions(+), 8 deletions(-)
->
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testi=
-ng/selftests/kvm/include/kvm_util.h
+> 
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
 > index c9286811a4cb..8b478eabee4c 100644
 > --- a/tools/testing/selftests/kvm/include/kvm_util.h
 > +++ b/tools/testing/selftests/kvm/include/kvm_util.h
 > @@ -10,4 +10,19 @@
 >  #include "kvm_util_base.h"
 >  #include "ucall_common.h"
->
+> 
 > +#if defined(__aarch64__) || defined(__x86_64__)
 > +
 > +uint64_t cycles_read(void);
 > +double cycles_to_ns(struct kvm_vcpu *vcpu, double cycles);
 > +
-> +#define MEASURE_CYCLES(x)                      \
-> +       ({                                      \
-> +               uint64_t start;                 \
-> +               start =3D cycles_read();          \
-> +               x;                              \
-> +               cycles_read() - start;          \
-> +       })
+> +#define MEASURE_CYCLES(x)			\
+> +	({					\
+> +		uint64_t start;			\
+> +		start = cycles_read();		\
+> +		x;				\
+
+You insert memory accesses inside a sequence that has no dependency
+with it. On a weakly ordered memory system, there is absolutely no
+reason why the memory access shouldn't be moved around. What do you
+exactly measure in that case?
+
+> +		cycles_read() - start;		\
+
+I also question the usefulness of this exercise. You're comparing the
+time it takes for a multi-GHz system to put a write in a store buffer
+(assuming it didn't miss in the TLBs) vs a counter that gets updated
+at a frequency of a few tens of MHz.
+
+My guts feeling is that this results in a big fat zero most of the
+time, but I'm happy to be explained otherwise.
+
+> +	})
 > +
-
-MEASURE_CYCLES should be moved to the next patch where it is getting
-used. Does it have to be macro or can it be replaced with a function?
-
 > +#endif
 > +
 >  #endif /* SELFTEST_KVM_UTIL_H */
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/s=
-elftests/kvm/lib/kvm_util.c
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
 > index 3ea24a5f4c43..780481a92efe 100644
 > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
 > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -2135,3 +2135,34 @@ void __attribute((constructor)) kvm_selftest_init(=
-void)
->
->         kvm_selftest_arch_init();
+> @@ -2135,3 +2135,34 @@ void __attribute((constructor)) kvm_selftest_init(void)
+> 
+>  	kvm_selftest_arch_init();
 >  }
 > +
 > +#if defined(__aarch64__)
@@ -142,29 +144,20 @@ void)
 > +
 > +uint64_t cycles_read(void)
 > +{
-> +       return timer_get_cntct(VIRTUAL);
+> +	return timer_get_cntct(VIRTUAL);
 > +}
 > +
 > +double cycles_to_ns(struct kvm_vcpu *vcpu, double cycles)
 > +{
-> +       return cycles * (1e9 / timer_get_cntfrq());
-> +}
-> +
-> +#elif defined(__x86_64__)
-> +
-> +#include "processor.h"
-> +
-> +uint64_t cycles_read(void)
-> +{
-> +       return rdtsc();
-> +}
-> +
-> +double cycles_to_ns(struct kvm_vcpu *vcpu, double cycles)
-> +{
-> +       uint64_t tsc_khz =3D __vcpu_ioctl(vcpu, KVM_GET_TSC_KHZ, NULL);
-> +
-> +       return cycles * (1e9 / (tsc_khz * 1000));
-> +}
-> +#endif
+> +	return cycles * (1e9 / timer_get_cntfrq());
 
-As Andrew noted,  these should be in the respective processor files.
+We already have all the required code to deal with ns conversions
+using a multiplier and a shift, avoiding floating point like the
+plague it is. Please reuse the kernel code for this, as you're quite
+likely to only measure the time it takes for KVM to trap the FP
+registers and perform a FP/SIMD switch...
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
