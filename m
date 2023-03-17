@@ -2,156 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B92F16BF39A
-	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 22:11:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B0C876BF3C9
+	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 22:25:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229787AbjCQVLZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Mar 2023 17:11:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41770 "EHLO
+        id S229772AbjCQVZD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Mar 2023 17:25:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229509AbjCQVLY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Mar 2023 17:11:24 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9C0333CFC
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 14:11:22 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id n203-20020a25dad4000000b0091231592671so6374378ybf.1
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 14:11:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679087482;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=WQhD8cecG2lw7f4ASBIhYK1IsLLuRaNhUnK57Izlu3U=;
-        b=jBtf/Lll6PR9MHdfL1x0pC39HEwrPWpmRrFzvqVF7UlMMd8i4/hP1y0+L6fF3THf3P
-         wEaKAXmK1cs62qjKoNYfxxab7hni9OYTk8gkip+iurgAgqY3NyHrrBvvcaT7dydF5gWy
-         ie+sFGneLF6nLeiRHZ+uFkhtk75zn0Y6NYk5twxcfsURDUqkZ21r29I3ZTeQUf8PIBjU
-         crB8+SzXpx0rNLmOqMBhtICD/fLgqeh15WYGeYr9psNhS7slXyvzK/QLjNP4uQQkNPjq
-         8j4TzZoDocPQlLCddT9N39T0Z9lXUnBU5NvlzjphFq8V+ZFO6JaLOzcO+SubFV7h54gQ
-         BPaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679087482;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WQhD8cecG2lw7f4ASBIhYK1IsLLuRaNhUnK57Izlu3U=;
-        b=cZUVuTL/X2vys9kFun7w1jNjtumJaD9Do7/tskfIlRvA64jwyMyqeM0OMcKexMNn/0
-         RMzaMiYbnsjau7UBt9UM5Yw0kjXvyjVbgoF+x3PA4aDlcIJmSX+3FluVITd1vDHQtode
-         z6GyHK9XfKohkhBJgK9JgI+GIXTN3sQuLRih10V6A1/I7IK5LOp6Xutgt1IXzVS7ZsLZ
-         sA7ZgAMpUBpCtT+8oaqkIwGmvuZqbh7mXcZ7wTWXmVOGa58fC6M36FnYxOivPvpSB/Pb
-         slCUVTeDnUOKMSqFpS8pIuu4I1EY/S2YrejKA4acVBuGsyBNhfpfU1BDR9X+Ja2NRKog
-         PUmw==
-X-Gm-Message-State: AO0yUKX3oV1/0B/NDRX8dC+5RSIFNdfOHN2x5jRb1Buf03XrruMyEe7H
-        PLvU301HlrUxzJcim1eoebwOJvfGzwqS/Q==
-X-Google-Smtp-Source: AK7set+SNiTmP2J+IL8lUhNwhFNEIbJIkL/PTyLj01bi/FQZoOtY+P7EHKBhm7n4KUmvvVxo+kVpWzxe0kT5Pg==
-X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a05:6902:120b:b0:b51:2cba:b971 with SMTP
- id s11-20020a056902120b00b00b512cbab971mr567372ybu.10.1679087482088; Fri, 17
- Mar 2023 14:11:22 -0700 (PDT)
-Date:   Fri, 17 Mar 2023 14:11:06 -0700
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.40.0.rc2.332.ga46443480c-goog
-Message-ID: <20230317211106.1234484-1-dmatlack@google.com>
-Subject: [PATCH] KVM: RISC-V: Retry fault if vma_lookup() results become invalid
-From:   David Matlack <dmatlack@google.com>
-To:     Anup Patel <anup@brainfault.org>
-Cc:     Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Alexander Graf <graf@amazon.com>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        David Matlack <dmatlack@google.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229488AbjCQVZC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Mar 2023 17:25:02 -0400
+Received: from mail.zytor.com (unknown [IPv6:2607:7c80:54:3::138])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 759F2193D3;
+        Fri, 17 Mar 2023 14:24:03 -0700 (PDT)
+Received: from [127.0.0.1] ([73.223.221.228])
+        (authenticated bits=0)
+        by mail.zytor.com (8.17.1/8.17.1) with ESMTPSA id 32HLNbaT3792533
+        (version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+        Fri, 17 Mar 2023 14:23:38 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 32HLNbaT3792533
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+        s=2023030901; t=1679088218;
+        bh=oAMmjE4TJMzJZO8CTkjR8XIl4V/fQ3mJbXZowitqlb0=;
+        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+        b=W1SzppQDiWjH53UF6Xj/2S6hsuz/feCxq/q4OGI2bnZ6hMq/WRlkszEEzWbCRsREY
+         Y3fjmYL6v7PlLZku4pFYKTcc3/0mYFyWRfdHwPl7QgPmKSoOJLA8quPrvjXKtX9xey
+         IRebH6o6PKcMQ0HaPISdDHLON5vWN4HOaa32mO4Uxpjy30GGUwLzXl90N7w0VaGIeT
+         pEl5kouv8Xdx1caYHtLj1X1kCSHJYo31cOtGRMf47zjC+7EZhBZU7ATss9BWUqgvM1
+         q0JP6pFclqiUgFp26vpP8IxnWUQKbB24CP09SFxgm+AleYbWDNH6Zn7Qwf79X9Rz9C
+         TtDt5znrsC8MA==
+Date:   Fri, 17 Mar 2023 14:23:36 -0700
+From:   "H. Peter Anvin" <hpa@zytor.com>
+To:     Lai Jiangshan <jiangshanlai@gmail.com>, andrew.cooper3@citrix.com
+CC:     Xin Li <xin3.li@intel.com>, linux-kernel@vger.kernel.org,
+        x86@kernel.org, kvm@vger.kernel.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        peterz@infradead.org, seanjc@google.com, pbonzini@redhat.com,
+        ravi.v.shankar@intel.com
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v5_28/34=5D_x86/fred=3A_fixup_fault_?= =?US-ASCII?Q?on_ERETU_by_jumping_to_fred=5Fentrypoint=5Fuser?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <CAJhGHyAdyqWp_W3yHMn0euYG9TMctpSmNnqr_e+=FR3rN5UzpA@mail.gmail.com>
+References: <20230307023946.14516-1-xin3.li@intel.com> <20230307023946.14516-29-xin3.li@intel.com> <CAJhGHyC6LgCwdDTkiy2TaQ8wzBQQfrx8ni7fY8vH-bUT2kR8pg@mail.gmail.com> <ed318bd6-25b2-efcf-0cc4-c57699f6654a@citrix.com> <CAJhGHyAdyqWp_W3yHMn0euYG9TMctpSmNnqr_e+=FR3rN5UzpA@mail.gmail.com>
+Message-ID: <7F650B5F-7FD5-4DDD-9614-5AF0102CDBF1@zytor.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Read mmu_invalidate_seq before dropping the mmap_lock so that KVM can
-detect if the results of vma_lookup() (e.g. vma_shift) become stale
-before it acquires kvm->mmu_lock. This fixes a theoretical bug where a
-VMA could be changed by userspace after vma_lookup() and before KVM
-reads the mmu_invalidate_seq, causing KVM to install page table entries
-based on a (possibly) no-longer-valid vma_shift.
+On March 17, 2023 6:02:52 AM PDT, Lai Jiangshan <jiangshanlai@gmail=2Ecom> =
+wrote:
+>On Fri, Mar 17, 2023 at 5:56=E2=80=AFPM <andrew=2Ecooper3@citrix=2Ecom> w=
+rote:
+>>
+>> On 17/03/2023 9:39 am, Lai Jiangshan wrote:
+>> >> +#ifdef CONFIG_X86_FRED
+>> >> +static bool ex_handler_eretu(const struct exception_table_entry *fi=
+xup,
+>> >> +                            struct pt_regs *regs, unsigned long err=
+or_code)
+>> >> +{
+>> >> +       struct pt_regs *uregs =3D (struct pt_regs *)(regs->sp - offs=
+etof(struct pt_regs, ip));
+>> >> +       unsigned short ss =3D uregs->ss;
+>> >> +       unsigned short cs =3D uregs->cs;
+>> >> +
+>> >> +       fred_info(uregs)->edata =3D fred_event_data(regs);
+>> >> +       uregs->ssx =3D regs->ssx;
+>> >> +       uregs->ss =3D ss;
+>> >> +       uregs->csx =3D regs->csx;
+>> >> +       uregs->current_stack_level =3D 0;
+>> >> +       uregs->cs =3D cs;
+>> > Hello
+>> >
+>> > If the ERETU instruction had tried to return from NMI to ring3 and ju=
+st faulted,
+>> > is NMI still blocked?
+>> >
+>> > We know that IRET unconditionally enables NMI, but I can't find any c=
+lue in the
+>> > FRED's manual=2E
+>> >
+>> > In the pseudocode of ERETU in the manual, it seems that NMI is only e=
+nabled when
+>> > ERETU succeeds with bit28 in csx set=2E  If so, this code will fail t=
+o reenable
+>> > NMI if bit28 is not explicitly re-set in csx=2E
+>>
+>> IRET clearing NMI blocking is the source of an immense amount of grief,
+>> and ultimately the reason why Linux and others can't use supervisor
+>> shadow stacks at the moment=2E
+>>
+>> Changing this property, so NMIs only get unblocked on successful
+>> execution of an ERET{S,U}, was a key demand of the FRED spec=2E
+>>
+>> i=2Ee=2E until you have successfully ERET*'d, you're still logically in=
+ the
+>> NMI handler and NMIs need to remain blocked even when handling the #GP
+>> from a bad ERET=2E
+>>
+>
+>Handling of the #GP for a bad ERETU can be rescheduled=2E It is not
+>OK to reschedule with NMI blocked=2E
+>
+>I think "regs->nmi =3D 1;" (not uregs->nmi) can fix the problem=2E
+>
 
-Re-order the MMU cache top-up to earlier in user_mem_abort() so that it
-is not done after KVM has read mmu_invalidate_seq (i.e. so as to avoid
-inducing spurious fault retries).
+You are quite correct, since what we want here is to emulate having taken =
+the fault in user space =E2=80=93 which meant that NMI would have been re-e=
+nabled by the never-executed return=2E
 
-It's unlikely that any sane userspace currently modifies VMAs in such a
-way as to trigger this race. And even with directed testing I was unable
-to reproduce it. But a sufficiently motivated host userspace might be
-able to exploit this race.
+I think the "best" solution is:
 
-Note KVM/ARM had the same bug and was fixed in a separate, near
-identical patch (see Link).
+regs->nmi =3D uregs->nmi;
+uregs->nmi =3D 0;
 
-Link: https://lore.kernel.org/kvm/20230313235454.2964067-1-dmatlack@google.com/
-Fixes: 9955371cc014 ("RISC-V: KVM: Implement MMU notifiers")
-Cc: stable@vger.kernel.org
-Signed-off-by: David Matlack <dmatlack@google.com>
----
-Note: Compile-tested only.
+=2E=2E=2E as enabling NMI is expected to have a performance penalty (being=
+ the less common case, an implementation which has a performance difference=
+ at all would want to optimize the non-NMI case), and I believe the compile=
+r should be able to at least mostly fold those operations into ones it is d=
+oing anyway=2E
 
- arch/riscv/kvm/mmu.c | 25 ++++++++++++++++---------
- 1 file changed, 16 insertions(+), 9 deletions(-)
-
-diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
-index 78211aed36fa..46d692995830 100644
---- a/arch/riscv/kvm/mmu.c
-+++ b/arch/riscv/kvm/mmu.c
-@@ -628,6 +628,13 @@ int kvm_riscv_gstage_map(struct kvm_vcpu *vcpu,
- 			!(memslot->flags & KVM_MEM_READONLY)) ? true : false;
- 	unsigned long vma_pagesize, mmu_seq;
- 
-+	/* We need minimum second+third level pages */
-+	ret = kvm_mmu_topup_memory_cache(pcache, gstage_pgd_levels);
-+	if (ret) {
-+		kvm_err("Failed to topup G-stage cache\n");
-+		return ret;
-+	}
-+
- 	mmap_read_lock(current->mm);
- 
- 	vma = vma_lookup(current->mm, hva);
-@@ -648,6 +655,15 @@ int kvm_riscv_gstage_map(struct kvm_vcpu *vcpu,
- 	if (vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE)
- 		gfn = (gpa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
- 
-+	/*
-+	 * Read mmu_invalidate_seq so that KVM can detect if the results of
-+	 * vma_lookup() or gfn_to_pfn_prot() become stale priort to acquiring
-+	 * kvm->mmu_lock.
-+	 *
-+	 * Rely on mmap_read_unlock() for an implicit smp_rmb(), which pairs
-+	 * with the smp_wmb() in kvm_mmu_invalidate_end().
-+	 */
-+	mmu_seq = kvm->mmu_invalidate_seq;
- 	mmap_read_unlock(current->mm);
- 
- 	if (vma_pagesize != PUD_SIZE &&
-@@ -657,15 +673,6 @@ int kvm_riscv_gstage_map(struct kvm_vcpu *vcpu,
- 		return -EFAULT;
- 	}
- 
--	/* We need minimum second+third level pages */
--	ret = kvm_mmu_topup_memory_cache(pcache, gstage_pgd_levels);
--	if (ret) {
--		kvm_err("Failed to topup G-stage cache\n");
--		return ret;
--	}
--
--	mmu_seq = kvm->mmu_invalidate_seq;
--
- 	hfn = gfn_to_pfn_prot(kvm, gfn, is_write, &writable);
- 	if (hfn == KVM_PFN_ERR_HWPOISON) {
- 		send_sig_mceerr(BUS_MCEERR_AR, (void __user *)hva,
-
-base-commit: eeac8ede17557680855031c6f305ece2378af326
--- 
-2.40.0.rc2.332.ga46443480c-goog
 
