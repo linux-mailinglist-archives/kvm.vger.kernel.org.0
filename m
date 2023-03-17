@@ -2,149 +2,230 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A7376BE8EC
-	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 13:12:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F12D6BE920
+	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 13:21:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229542AbjCQMMR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Mar 2023 08:12:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55464 "EHLO
+        id S229863AbjCQMVu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Mar 2023 08:21:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229939AbjCQMMO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Mar 2023 08:12:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFB7D1C30D
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 05:11:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679055085;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=VdyWJZv8vhAFDbVlVpAgxslKT4rLXftuJGVINjtZsvM=;
-        b=aJDcFbUROquPXUKo9w8C56fBPn8iu5IzU+OUyjszX+NGEkTDr5tXIA8icom4bTK/ezK5BM
-        Ho5UcR9qX+ghLZgIEAjky0A2f44CYCw+ltOb+YUUYhrNdvdfKjXq+u8HGlXUtlWsTVThEt
-        R9kU+VLDSVAsRVNW+6c9qCxXT6OyQz8=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-501-Hx89QbqtNK6cT1JnAVyMrA-1; Fri, 17 Mar 2023 08:11:24 -0400
-X-MC-Unique: Hx89QbqtNK6cT1JnAVyMrA-1
-Received: by mail-wm1-f71.google.com with SMTP id p21-20020a05600c1d9500b003ed34032a01so2188588wms.2
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 05:11:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679055083;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VdyWJZv8vhAFDbVlVpAgxslKT4rLXftuJGVINjtZsvM=;
-        b=CF7IvQ85cX4ZqHKF1LvHneE7r3yJeN502mniCmevtAuNQcjNci/0WiEIt1yubY4s8K
-         ug62OadBFZ0FCdmgYCyAsvdXSu01T0GmaGQLrR/ObybzLP/vcFTDh/b3rgUSdyHcwiyu
-         RZq4KBUPiOV/pyez3SJMbsqOUOsq00FLg/f7qnBXXn693pPhssrKUiXGP+IgID0C4+QP
-         Cjz8nu6H9ZnMBt6UELzddZRQ9QvJgIcJu8c5SwYdgTLHxzhBZjEtyzdCxqoLR4U2Kuwa
-         l+M9I/uf7dHSrXZb3n+wOozEqT6NrySLw9puMzGb/aLlzQMwFdDh71Aepqb0ToDvpNz/
-         nPsA==
-X-Gm-Message-State: AO0yUKXbp3gSTVLdBMDptPPQNREl1AHci11hmQqiXSy/JeK4QO5xdja7
-        q1GIGpd8Vp27uVxcPGt5Pqck4+Q6AjokamUfdateMbBWNDEGSdUftGFn9F0BeyyQzhXX1UcEgEw
-        0iiutW5dBunW3
-X-Received: by 2002:a05:6000:110a:b0:2ce:a93d:41a7 with SMTP id z10-20020a056000110a00b002cea93d41a7mr6815322wrw.40.1679055083545;
-        Fri, 17 Mar 2023 05:11:23 -0700 (PDT)
-X-Google-Smtp-Source: AK7set+Drn8o6/nNTBEgK8SgVpgvMd4RO9wUeVwEOco0AOkK3H0Ve2COt2l+fdAqjqS7xNs1SwZQWg==
-X-Received: by 2002:a05:6000:110a:b0:2ce:a93d:41a7 with SMTP id z10-20020a056000110a00b002cea93d41a7mr6815266wrw.40.1679055083247;
-        Fri, 17 Mar 2023 05:11:23 -0700 (PDT)
-Received: from [192.168.0.3] (ip-109-43-176-33.web.vodafone.de. [109.43.176.33])
-        by smtp.gmail.com with ESMTPSA id u4-20020a5d4344000000b002c5526234d2sm1861459wrr.8.2023.03.17.05.11.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Mar 2023 05:11:22 -0700 (PDT)
-Message-ID: <5f003318-c22d-b13b-3976-94b0f874c720@redhat.com>
-Date:   Fri, 17 Mar 2023 13:11:17 +0100
+        with ESMTP id S229554AbjCQMVs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Mar 2023 08:21:48 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8D561E9E1;
+        Fri, 17 Mar 2023 05:21:47 -0700 (PDT)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32HBwq5e023681;
+        Fri, 17 Mar 2023 12:21:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=LTRsb1ISSTQPtaDxjiSKhC3K76sdODi81mYcXSFGiIg=;
+ b=dEIqdP1qBzlB56SmRX3HZxLQuIbHZ0ya0hc/LF5WSYSnnRNfNF7xBR9+xfeZDPtgNu6W
+ xo1okPahSvxNktX5RhNE/K5ZNkaUqPj8GTn1AtvCXDge9yOMazUVAhQWNtlwAf5rlLqC
+ QIkpJuSOLdvBilSPh9IDAOL5JW4TR7Yss2Y6+QAV1gJUy+JQKByflJlgRlEKPKQOdPkd
+ kZAzYf4V8ifPcTXvgoWfEwSDMgR5NvJz/61S6RM3Oll0Xj8w3Mzxr2mUScAx4K+k7dB7
+ 5T7oDzQW7e8ZMJSRGVUCsb/4bn/gvy4S7xgd8bIKlBOffdja8irzY0P1WQ4KaFC2mXB1 Hw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pcqte8mrv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Mar 2023 12:21:46 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32HBxB6N025328;
+        Fri, 17 Mar 2023 12:21:46 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pcqte8mrb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Mar 2023 12:21:46 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32H7Gedc029280;
+        Fri, 17 Mar 2023 12:21:44 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3pbskt24hc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Mar 2023 12:21:44 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32HCLeGc19399244
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 17 Mar 2023 12:21:41 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D5B0E2004B;
+        Fri, 17 Mar 2023 12:21:40 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 67EC420040;
+        Fri, 17 Mar 2023 12:21:40 +0000 (GMT)
+Received: from [9.171.8.117] (unknown [9.171.8.117])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 17 Mar 2023 12:21:40 +0000 (GMT)
+Message-ID: <22fbb4e1-ea18-6acb-7b96-0a8cd46dad37@linux.ibm.com>
+Date:   Fri, 17 Mar 2023 13:21:39 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [PATCH v2 06/32] include/qemu: add documentation for memory
- callbacks
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [kvm-unit-tests PATCH v3 2/3] s390x/spec_ex: Add test introducing
+ odd address into PSW
+To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20230315155445.1688249-1-nsg@linux.ibm.com>
+ <20230315155445.1688249-3-nsg@linux.ibm.com>
+ <b6705072-de79-614d-d5fc-c78f1b65196f@linux.ibm.com>
+ <fb8fa41ddef9aff66c2ea0facf5bc2a6315e2c0e.camel@linux.ibm.com>
 Content-Language: en-US
-To:     =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        qemu-devel@nongnu.org
-Cc:     Akihiko Odaki <akihiko.odaki@gmail.com>,
-        =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
-        qemu-riscv@nongnu.org, Riku Voipio <riku.voipio@iki.fi>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Wainer dos Santos Moschetta <wainersm@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Hao Wu <wuhaotsh@google.com>, Cleber Rosa <crosa@redhat.com>,
-        Daniel Henrique Barboza <danielhb413@gmail.com>,
-        Jan Kiszka <jan.kiszka@web.de>,
-        Aurelien Jarno <aurelien@aurel32.net>, qemu-arm@nongnu.org,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Alexandre Iooss <erdnaxe@crans.org>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>, qemu-ppc@nongnu.org,
-        Juan Quintela <quintela@redhat.com>,
-        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
-        Darren Kenny <darren.kenny@oracle.com>, kvm@vger.kernel.org,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Stafford Horne <shorne@gmail.com>,
-        Weiwei Li <liweiwei@iscas.ac.cn>,
-        Sunil V L <sunilvl@ventanamicro.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Vijai Kumar K <vijai@behindbytes.com>,
-        Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Song Gao <gaosong@loongson.cn>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Niek Linnenbank <nieklinnenbank@gmail.com>,
-        Greg Kurz <groug@kaod.org>, Laurent Vivier <laurent@vivier.eu>,
-        Qiuhao Li <Qiuhao.Li@outlook.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
-        Xiaojuan Yang <yangxiaojuan@loongson.cn>,
-        Mahmoud Mandour <ma.mandourr@gmail.com>,
-        Alexander Bulekov <alxndr@bu.edu>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>, qemu-block@nongnu.org,
-        Yanan Wang <wangyanan55@huawei.com>,
-        David Woodhouse <dwmw2@infradead.org>, qemu-s390x@nongnu.org,
-        Strahinja Jankovic <strahinja.p.jankovic@gmail.com>,
-        Bandan Das <bsd@redhat.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        Tyrone Ting <kfting@nuvoton.com>,
-        Kevin Wolf <kwolf@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Beraldo Leal <bleal@redhat.com>,
-        Beniamino Galvani <b.galvani@gmail.com>,
-        Paul Durrant <paul@xen.org>, Bin Meng <bin.meng@windriver.com>,
-        Sunil Muthuswamy <sunilmut@microsoft.com>,
-        Hanna Reitz <hreitz@redhat.com>, Peter Xu <peterx@redhat.com>
-References: <20230315174331.2959-1-alex.bennee@linaro.org>
- <20230315174331.2959-7-alex.bennee@linaro.org>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20230315174331.2959-7-alex.bennee@linaro.org>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <fb8fa41ddef9aff66c2ea0facf5bc2a6315e2c0e.camel@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: I2b1Q436vbVAFKXKiowkc5HFEBWhawHi
+X-Proofpoint-ORIG-GUID: Gj_am7GU3A_jQTL4IGKUu64qulsazwpU
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-17_06,2023-03-16_02,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
+ suspectscore=0 adultscore=0 spamscore=0 impostorscore=0 mlxlogscore=999
+ phishscore=0 bulkscore=0 priorityscore=1501 clxscore=1015 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2303150002
+ definitions=main-2303170081
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/03/2023 18.43, Alex Bennée wrote:
-> Some API documentation was missed, rectify that.
+On 3/17/23 11:51, Nina Schoetterl-Glausch wrote:
+> On Fri, 2023-03-17 at 10:26 +0100, Janosch Frank wrote:
+>> On 3/15/23 16:54, Nina Schoetterl-Glausch wrote:
+>>> Instructions on s390 must be halfword aligned.
+>>> Introducing an odd instruction address into the PSW leads to a
+>>> specification exception when attempting to execute the instruction at
+>>> the odd address.
+>>> Add a test for this.
+>>>
+>>> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+>>
+>> Acked-by: Janosch Frank <frankja@linux.ibm.com>
+>>
+>> Some nits below.
+>>
+>>> ---
+>>>    s390x/spec_ex.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++-
+>>>    1 file changed, 49 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/s390x/spec_ex.c b/s390x/spec_ex.c
+>>> index 2adc5996..83b8c58e 100644
+>>> --- a/s390x/spec_ex.c
+>>> +++ b/s390x/spec_ex.c
+>>> @@ -88,12 +88,23 @@ static void expect_invalid_psw(struct psw psw)
+>>>    	invalid_psw_expected = true;
+>>>    }
+>>>    
+>>> +static void clear_invalid_psw(void)
+>>> +{
+>>> +	expected_psw = PSW(0, 0);
+>>> +	invalid_psw_expected = false;
+>>> +}
+>>> +
+>>>    static int check_invalid_psw(void)
+>>>    {
+>>>    	/* Since the fixup sets this to false we check for false here. */
+>>>    	if (!invalid_psw_expected) {
+>>> +		/*
+>>> +		 * Early exception recognition: pgm_int_id == 0.
+>>> +		 * Late exception recognition: psw address has been
+>>> +		 *	incremented by pgm_int_id (unpredictable value)
+>>> +		 */
+>>>    		if (expected_psw.mask == invalid_psw.mask &&
+>>> -		    expected_psw.addr == invalid_psw.addr)
+>>> +		    expected_psw.addr == invalid_psw.addr - lowcore.pgm_int_id)
+>>>    			return 0;
+>>>    		report_fail("Wrong invalid PSW");
+>>>    	} else {
+>>> @@ -112,6 +123,42 @@ static int psw_bit_12_is_1(void)
+>>>    	return check_invalid_psw();
+>>>    }
+>>>    
+>>> +extern char misaligned_code[];
+>>> +asm (  ".balign	2\n"
+>>
+>> Is the double space intended?
 > 
-> Fixes: https://gitlab.com/qemu-project/qemu/-/issues/1497
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->   include/qemu/qemu-plugin.h | 47 ++++++++++++++++++++++++++++++++++----
->   1 file changed, 43 insertions(+), 4 deletions(-)
+> Yes, so stuff lines up.
+ahhh, right.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+>> Looking at the file itself some asm blocks have no space before the "("
+>> and some have one.
+> 
+> In spec_ex.c? Where?
+
+Should have said: "after the (" but seems like the point doesn't matter 
+anyway just fixup the xgr.
+
+> 
+>>
+>>> +"	. = . + 1\n"
+>>> +"misaligned_code:\n"
+>>> +"	larl	%r0,0\n"
+>>> +"	br	%r1\n"
+>>> +);
+>>
+>> Any reason this is not indented?
+> 
+> You mean the whole asm block, so it looks more like a function body to the misaligned_code symbol?
+> I'm indifferent about it, can do that if you think it's nicer.
+> 
+>>
+>>> +
+>>> +static int psw_odd_address(void)
+>>> +{
+>>> +	struct psw odd = PSW_WITH_CUR_MASK((uint64_t)&misaligned_code);
+>>> +	uint64_t executed_addr;
+>>> +
+>>> +	expect_invalid_psw(odd);
+>>> +	fixup_psw.mask = extract_psw_mask();
+>>> +	asm volatile ( "xr	%%r0,%%r0\n"
+>>
+>> While it will likely never make a difference I'd still use xgr here
+>> instead of xr.
+> 
+> Yes, needs xgr.
+>>
+>>> +		"	larl	%%r1,0f\n"
+>>> +		"	stg	%%r1,%[fixup_addr]\n"
+>>> +		"	lpswe	%[odd_psw]\n"
+>>> +		"0:	lr	%[executed_addr],%%r0\n"
+>>> +	: [fixup_addr] "=&T" (fixup_psw.addr),
+>>> +	  [executed_addr] "=d" (executed_addr)
+>>> +	: [odd_psw] "Q" (odd)
+>>> +	: "cc", "%r0", "%r1"
+>>> +	);
+>>> +
+>>> +	if (!executed_addr) {
+>>> +		return check_invalid_psw();
+>>> +	} else {
+>>> +		assert(executed_addr == odd.addr);
+>>> +		clear_invalid_psw();
+>>> +		report_fail("did not execute unaligned instructions");
+>>> +		return 1;
+>>> +	}
+>>> +}
+>>> +
+>>>    /* A short PSW needs to have bit 12 set to be valid. */
+>>>    static int short_psw_bit_12_is_0(void)
+>>>    {
+>>> @@ -170,6 +217,7 @@ struct spec_ex_trigger {
+>>>    static const struct spec_ex_trigger spec_ex_triggers[] = {
+>>>    	{ "psw_bit_12_is_1", &psw_bit_12_is_1, false, &fixup_invalid_psw },
+>>>    	{ "short_psw_bit_12_is_0", &short_psw_bit_12_is_0, false, &fixup_invalid_psw },
+>>> +	{ "psw_odd_address", &psw_odd_address, false, &fixup_invalid_psw },
+>>>    	{ "bad_alignment", &bad_alignment, true, NULL },
+>>>    	{ "not_even", &not_even, true, NULL },
+>>>    	{ NULL, NULL, false, NULL },
+>>
+> 
 
