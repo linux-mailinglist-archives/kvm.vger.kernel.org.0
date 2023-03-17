@@ -2,165 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B6B746BED1F
-	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 16:38:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C67E6BED4A
+	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 16:47:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229808AbjCQPiT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Mar 2023 11:38:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47024 "EHLO
+        id S231350AbjCQPrN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Mar 2023 11:47:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231401AbjCQPiC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Mar 2023 11:38:02 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26171C9241;
-        Fri, 17 Mar 2023 08:37:11 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32HFKPPp026371;
-        Fri, 17 Mar 2023 15:37:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=a7ntQJbQPgOXMde984PVzuSXXsFFIyQM34l6dBw4vVQ=;
- b=WWLTP32JqPgj6sZfwUOBcEcOqULIsWJeb14sbJYgbWZgphielDkmTrk4b0GIeQKXyDLo
- bQpMwaCMYknIuj1NqzGpunETwuHZST/J5Iyydh0QN/A0t1WFo1e9BQlAgod9Sh1WPguR
- 7VJBsQdJZrlC/wz3U2eHfwU+4EgP64iJqFADpib/ClGwob8uAlP13B/3009qjzzDnPGg
- mroQ6G9zxJRlVRgJQcQkXQx5U02cwHqD/+TsyZWqdM37Fxpbyr11UijOSdumexwTNgWy
- /AD8XSn4dtrkBZTgwk6UPVPNbpe50Q7d0+726+E2EOTWllSsf5Q3TbGiIagfay99Yp1V 4A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pctrvgdua-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Mar 2023 15:37:03 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32HFL3LI026765;
-        Fri, 17 Mar 2023 15:37:02 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pctrvgdsy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Mar 2023 15:37:02 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32HEV1oq029586;
-        Fri, 17 Mar 2023 15:37:00 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma04fra.de.ibm.com (PPS) with ESMTPS id 3pbs5ssydf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Mar 2023 15:37:00 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32HFavYB25559638
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 17 Mar 2023 15:36:57 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 167D62004B;
-        Fri, 17 Mar 2023 15:36:57 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8C4482004D;
-        Fri, 17 Mar 2023 15:36:56 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.171.92.234])
-        by smtpav04.fra02v.mail.ibm.com (Postfix) with SMTP;
-        Fri, 17 Mar 2023 15:36:56 +0000 (GMT)
-Date:   Fri, 17 Mar 2023 16:36:54 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Thomas Huth <thuth@redhat.com>
-Cc:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, Ilya Leoshkevich <iii@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v3 3/3] s390x/spec_ex: Add test of
- EXECUTE with odd target address
-Message-ID: <20230317163654.211830c0@p-imbrenda>
-In-Reply-To: <8deaddfe-dc69-ec3c-4c8c-a76ee17e6513@redhat.com>
-References: <20230315155445.1688249-1-nsg@linux.ibm.com>
-        <20230315155445.1688249-4-nsg@linux.ibm.com>
-        <86aa2246-07ff-8fb9-ad97-3b68e8b8f109@redhat.com>
-        <8deaddfe-dc69-ec3c-4c8c-a76ee17e6513@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        with ESMTP id S230031AbjCQPrM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Mar 2023 11:47:12 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89A4AB32AC
+        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 08:47:02 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 043F1601C3
+        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 15:47:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5D26C433D2;
+        Fri, 17 Mar 2023 15:47:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1679068021;
+        bh=12zZKHOmdvjfV4b8aAhGOw58PKPbYKo3hyQtwGB9kH4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=RGWS4Rlh6YFCbXnctrhVWv7Ykcq54wAf0H5U1Tl24lkPq9+EDAXqOp8EYBgGJiKcy
+         9oeGW+NxZmZ+1ig0Dv8MhddFAYiPQsB1aOgo4ed0Iw+jdlsulNlE4awVPBqf5oFfLl
+         vB7Wjffm8tzRjy6v5BWc0/sNZh7NKF5HXxMynCwg4b7Lf2qLIfKW0MRE5gBrVcPwbt
+         OdNPHgECAur9yQOGf+r95wWpB8izSNJWncG+mI4fL/XYxZYRABEuEc6oBeyKIDXNzz
+         GRwg+IbeogaDaVmdUYuWxSL9fCTJxOr6U9ySRBMWpKn/mGD+h30v6R1ZzuzzteDTb7
+         18ANVBp7ud9Bw==
+Date:   Fri, 17 Mar 2023 08:46:58 -0700
+From:   Nathan Chancellor <nathan@kernel.org>
+To:     Andy Chiu <andy.chiu@sifive.com>
+Cc:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
+        anup@brainfault.org, atishp@atishpatra.org,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        vineetg@rivosinc.com, greentime.hu@sifive.com,
+        guoren@linux.alibaba.com, Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>
+Subject: Re: [PATCH -next v15 19/19] riscv: Enable Vector code to be built
+Message-ID: <20230317154658.GA1122384@dev-arch.thelio-3990X>
+References: <20230317113538.10878-1-andy.chiu@sifive.com>
+ <20230317113538.10878-20-andy.chiu@sifive.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: QvWd8gBWadeFXVb1N7AxST5BJEgR72-D
-X-Proofpoint-GUID: GrIWu-o-o3tgsj3-d-jDxxUO_HLJwg6F
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-17_10,2023-03-16_02,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- lowpriorityscore=0 suspectscore=0 bulkscore=0 malwarescore=0 clxscore=1015
- adultscore=0 impostorscore=0 phishscore=0 mlxscore=0 priorityscore=1501
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303150002 definitions=main-2303170103
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230317113538.10878-20-andy.chiu@sifive.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 17 Mar 2023 15:11:35 +0100
-Thomas Huth <thuth@redhat.com> wrote:
+Hi Andy,
 
-> On 17/03/2023 15.09, Thomas Huth wrote:
-> > On 15/03/2023 16.54, Nina Schoetterl-Glausch wrote: =20
-> >> The EXECUTE instruction executes the instruction at the given target
-> >> address. This address must be halfword aligned, otherwise a
-> >> specification exception occurs.
-> >> Add a test for this.
-> >>
-> >> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-> >> ---
-> >> =C2=A0 s390x/spec_ex.c | 25 +++++++++++++++++++++++++
-> >> =C2=A0 1 file changed, 25 insertions(+)
-> >>
-> >> diff --git a/s390x/spec_ex.c b/s390x/spec_ex.c
-> >> index 83b8c58e..5fa05dba 100644
-> >> --- a/s390x/spec_ex.c
-> >> +++ b/s390x/spec_ex.c
-> >> @@ -177,6 +177,30 @@ static int short_psw_bit_12_is_0(void)
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
-> >> =C2=A0 }
-> >> +static int odd_ex_target(void)
-> >> +{
-> >> +=C2=A0=C2=A0=C2=A0 uint64_t pre_target_addr;
-> >> +=C2=A0=C2=A0=C2=A0 int to =3D 0, from =3D 0x0dd;
-> >> +
-> >> +=C2=A0=C2=A0=C2=A0 asm volatile ( ".pushsection .text.ex_odd\n"
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "=C2=A0=C2=A0=C2=A0 .balig=
-n=C2=A0=C2=A0=C2=A0 2\n"
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "pre_odd_ex_target:\n"
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "=C2=A0=C2=A0=C2=A0 . =3D =
-. + 1\n"
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "=C2=A0=C2=A0=C2=A0 lr=C2=
-=A0=C2=A0=C2=A0 %[to],%[from]\n"
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "=C2=A0=C2=A0=C2=A0 .popse=
-ction\n"
-> >> +
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "=C2=A0=C2=A0=C2=A0 larl=
-=C2=A0=C2=A0=C2=A0 %[pre_target_addr],pre_odd_ex_target\n"
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "=C2=A0=C2=A0=C2=A0 ex=C2=
-=A0=C2=A0=C2=A0 0,1(%[pre_target_addr])\n"
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 : [pre_target_addr] "=3D&a=
-" (pre_target_addr),
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [to] "+d" (to)
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 : [from] "d" (from)
-> >> +=C2=A0=C2=A0=C2=A0 );
-> >> +
-> >> +=C2=A0=C2=A0=C2=A0 assert((pre_target_addr + 1) & 1);
-> >> +=C2=A0=C2=A0=C2=A0 report(to !=3D from, "did not perform ex with odd =
-target");
-> >> +=C2=A0=C2=A0=C2=A0 return 0;
-> >> +} =20
-> >=20
-> > Can this be triggered with KVM, or is this just a test for TCG? =20
->=20
-> With "triggered" I mean: Can this cause an interception in KVM?
+On Fri, Mar 17, 2023 at 11:35:38AM +0000, Andy Chiu wrote:
+> From: Guo Ren <guoren@linux.alibaba.com>
+> 
+> This patch adds a config which enables vector feature from the kernel
+> space.
+> 
+> Support for RISC_V_ISA_V is limited to GNU-assembler for now, as LLVM
+> has not acquired the functionality to selectively change the arch option
+> in assembly code. This is still under review at
+>     https://reviews.llvm.org/D123515
+> 
+> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+> Co-developed-by: Greentime Hu <greentime.hu@sifive.com>
+> Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
+> Suggested-by: Vineet Gupta <vineetg@rivosinc.com>
+> Suggested-by: Atish Patra <atishp@atishpatra.org>
+> Co-developed-by: Andy Chiu <andy.chiu@sifive.com>
+> Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
+> ---
+>  arch/riscv/Kconfig  | 20 ++++++++++++++++++++
+>  arch/riscv/Makefile |  6 +++++-
+>  2 files changed, 25 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+> index c736dc8e2593..bf9aba2f2811 100644
+> --- a/arch/riscv/Kconfig
+> +++ b/arch/riscv/Kconfig
+> @@ -436,6 +436,26 @@ config RISCV_ISA_SVPBMT
+>  
+>  	   If you don't know what to do here, say Y.
+>  
+> +config TOOLCHAIN_HAS_V
+> +	bool
+> +	default y
+> +	depends on !64BIT || $(cc-option,-mabi=lp64 -march=rv64iv)
+> +	depends on !32BIT || $(cc-option,-mabi=ilp32 -march=rv32iv)
+> +	depends on LLD_VERSION >= 140000 || LD_VERSION >= 23800
+> +	depends on AS_IS_GNU
 
-AFAIK no, but KVM and TCG are not the only things we might want to test.
+Consider hoisting this 'depends on AS_IS_GNU' into its own configuration
+option, as the same dependency is present in CONFIG_TOOLCHAIN_HAS_ZBB
+for the exact same reason, with no comment as to why. By having a shared
+dependency configuration option, we can easily update it when that
+change is merged into LLVM proper and gain access to the current and
+future options that depend on it. I imagine something like:
 
-we are aware of the TCG tests, and we would like to also keep the KVM
-unit tests.
+config AS_HAS_OPTION_ARCH
+    bool
+    default y
+    # https://reviews.llvm.org/D123515
+    depends on AS_IS_GNU
 
->=20
->   Thomas
->=20
+config TOOLCHAIN_HAS_ZBB
+    bool
+    default y
+    depends on !64BIT || $(cc-option,-mabi=lp64 -march=rv64ima_zbb)
+    depends on !32BIT || $(cc-option,-mabi=ilp32 -march=rv32ima_zbb)
+    depends on LLD_VERSION >= 150000 || LD_VERSION >= 23900
+    depends on AS_HAS_OPTION_ARCH
 
+config TOOLCHAIN_HAS_V
+    bool
+    default y
+    depends on !64BIT || $(cc-option,-mabi=lp64 -march=rv64iv)
+    depends on !32BIT || $(cc-option,-mabi=ilp32 -march=rv32iv)
+    depends on LLD_VERSION >= 140000 || LD_VERSION >= 23800
+    depends on AS_HAS_OPTION_ARCH
+
+It would be nice if it was a hard error for LLVM like GCC so that we
+could just dynamically check support via as-instr but a version check is
+not the end of the world when we know the versions.
+
+  $ cat test.s
+  .option arch, +v
+
+  $ cat test-invalid.s
+  .option arch, +vv
+
+  $ clang --target=riscv64-linux-gnu -c -o /dev/null test.s
+  test.s:1:13: warning: unknown option, expected 'push', 'pop', 'rvc', 'norvc', 'relax' or 'norelax'
+  .option arch, +v
+              ^
+
+  $ clang --target=riscv64-linux-gnu -c -o /dev/null test-invalid.s
+  test-invalid.s:1:13: warning: unknown option, expected 'push', 'pop', 'rvc', 'norvc', 'relax' or 'norelax'
+  .option arch, +vv
+              ^
+
+  $ riscv64-linux-gcc -c -o /dev/null test.s
+
+  $ riscv64-linux-gcc -c -o /dev/null test-invalid.s
+  test-invalid.s: Assembler messages:
+  test-invalid.s:1: Error: unknown ISA extension `vv' in .option arch `+vv'
+
+As a side note, 'bool + default y' is the same as 'def_bool y', if you
+wanted to same some space.
+
+Cheers,
+Nathan
+
+> +config RISCV_ISA_V
+> +	bool "VECTOR extension support"
+> +	depends on TOOLCHAIN_HAS_V
+> +	depends on FPU
+> +	select DYNAMIC_SIGFRAME
+> +	default y
+> +	help
+> +	  Say N here if you want to disable all vector related procedure
+> +	  in the kernel.
+> +
+> +	  If you don't know what to do here, say Y.
+> +
+>  config TOOLCHAIN_HAS_ZBB
+>  	bool
+>  	default y
+> diff --git a/arch/riscv/Makefile b/arch/riscv/Makefile
+> index 6203c3378922..84a50cfaedf9 100644
+> --- a/arch/riscv/Makefile
+> +++ b/arch/riscv/Makefile
+> @@ -56,6 +56,7 @@ riscv-march-$(CONFIG_ARCH_RV32I)	:= rv32ima
+>  riscv-march-$(CONFIG_ARCH_RV64I)	:= rv64ima
+>  riscv-march-$(CONFIG_FPU)		:= $(riscv-march-y)fd
+>  riscv-march-$(CONFIG_RISCV_ISA_C)	:= $(riscv-march-y)c
+> +riscv-march-$(CONFIG_RISCV_ISA_V)	:= $(riscv-march-y)v
+>  
+>  # Newer binutils versions default to ISA spec version 20191213 which moves some
+>  # instructions from the I extension to the Zicsr and Zifencei extensions.
+> @@ -65,7 +66,10 @@ riscv-march-$(toolchain-need-zicsr-zifencei) := $(riscv-march-y)_zicsr_zifencei
+>  # Check if the toolchain supports Zihintpause extension
+>  riscv-march-$(CONFIG_TOOLCHAIN_HAS_ZIHINTPAUSE) := $(riscv-march-y)_zihintpause
+>  
+> -KBUILD_CFLAGS += -march=$(subst fd,,$(riscv-march-y))
+> +# Remove F,D,V from isa string for all. Keep extensions between "fd" and "v" by
+> +# keep non-v and multi-letter extensions out with the filter ([^v_]*)
+> +KBUILD_CFLAGS += -march=$(shell echo $(riscv-march-y) | sed  -E 's/(rv32ima|rv64ima)fd([^v_]*)v?/\1\2/')
+> +
+>  KBUILD_AFLAGS += -march=$(riscv-march-y)
+>  
+>  KBUILD_CFLAGS += -mno-save-restore
+> -- 
+> 2.17.1
+> 
