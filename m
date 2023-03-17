@@ -2,76 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 15E956BE041
-	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 05:44:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D12096BE04C
+	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 05:51:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229620AbjCQEox (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Mar 2023 00:44:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36628 "EHLO
+        id S229669AbjCQEvN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Mar 2023 00:51:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229516AbjCQEov (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Mar 2023 00:44:51 -0400
+        with ESMTP id S229494AbjCQEvL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Mar 2023 00:51:11 -0400
 Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5438A42BF2;
-        Thu, 16 Mar 2023 21:44:50 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BB6C60415;
+        Thu, 16 Mar 2023 21:51:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1679028290; x=1710564290;
+  t=1679028670; x=1710564670;
   h=date:from:to:cc:subject:message-id:reply-to:references:
    in-reply-to:mime-version;
-  bh=5mn8lbC7Q+P15hmZ4YHeHqhtKn3gzPQk3Cz+G1Y443Y=;
-  b=FCEqsxeLfNrgVQ4KV30z1L/lUGiSDg1JlYBLHdnyWfpkKAdnJcy4rYRL
-   6JjM+sBH1G4YC7e1TOMumPgcZWm3c/Ar39fOdaGetsbYigiyhvMU0fSaN
-   4VzCVCOG1LpNH9ZwmReE8V/HNqiv7+s4Zn87aRrJPurMSTuShdCRE6br7
-   TcuW2U/l839np7Wwysh2YHa5Eq7YmkKgAGsHMLx2ETb/DEiJBaktrTpro
-   l2PZHo3kO0JLaJ04ViCocdLiN9yL9mtVt4CaVG5dhrpJAgn2N9VVkCOmE
-   gTdy5KRBPSClvacPchS49UVBDl3AXI9rsrgZsiIfz56MphIWQMhpliWTv
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10651"; a="318574511"
+  bh=9EEQgdX2oaLbhKAYABENQ5C+/+9aU0ZoIZgnyh1xnOc=;
+  b=kmofd85FuThufAXLzOK45v2nz57z3JHE2JHdPoRdrPgWhNp0ADxhPCyG
+   nHempE25od28sitURpDHJpPs9gMGyEXpqTYRbst1fIcvvHFdtWs0gRFnC
+   AL7U2xL0jtIj1Gzk2R/ui68mtU9059HmVlqP886Z+4GtjkCdHG8qsILYG
+   wRtQGYjtj/782gje0l0o/P97XfU/gGJyjpLDA6m2xlbgQ4WjD3Zq0HBco
+   v8x+vRMOL+8xaDUaFFvZuYMgjuDOpkrt3+DQg6jzP3i08tArK0CKWvK5i
+   gQXorE4OaR6mTSLdWqNJzpHAs4IETcciDGqPHyVRHhKIRSmB2YkH1W31l
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10651"; a="318575403"
 X-IronPort-AV: E=Sophos;i="5.98,267,1673942400"; 
-   d="scan'208";a="318574511"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2023 21:44:50 -0700
+   d="scan'208";a="318575403"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2023 21:51:09 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10651"; a="749124596"
+X-IronPort-AV: E=McAfee;i="6600,9927,10651"; a="712613050"
 X-IronPort-AV: E=Sophos;i="5.98,267,1673942400"; 
-   d="scan'208";a="749124596"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmsmga004.fm.intel.com with ESMTP; 16 Mar 2023 21:44:49 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+   d="scan'208";a="712613050"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orsmga001.jf.intel.com with ESMTP; 16 Mar 2023 21:51:09 -0700
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Thu, 16 Mar 2023 21:44:49 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ 15.1.2507.21; Thu, 16 Mar 2023 21:51:08 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21 via Frontend Transport; Thu, 16 Mar 2023 21:44:49 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.44) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ 15.1.2507.21 via Frontend Transport; Thu, 16 Mar 2023 21:51:08 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.174)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.21; Thu, 16 Mar 2023 21:44:49 -0700
+ 15.1.2507.21; Thu, 16 Mar 2023 21:51:07 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KRta1a13iTFoKbIfQyS2hVKPn3T2L7bLKOtsRmp18ef0FROGVOSNkPXcqjhxlwWxPXZTDXU/AHZT1qt2U9TeFQPecbfIlWPTZsEyiNvjyjpx0mcQ2dBKhfN1gCDjf+AM4UwlBVrG8H0F+wmJ0TUo1XGkwvo3mSOL8669matHMGIr1KUPccya9RQEpjjqcnVj8gwyZSDuHlujkcojB6JpsubfG6DT3raieZw3SQAWRELLgJUpnCy0NaMQIWtnmQcIaq7fyDWxbqExHmJ3DFnZR1yIVK+qIyJgOFFlN3Y77P0MIMTwpzuGLQ+vfMoFr9TxG0/sGGwRYEobDxg2A+CQ3A==
+ b=kzdt+POe35Pghul9VAIck71sx5sibYRcaiy+ZTYD2i8KNbw0mYIuEu/Su691y52gYqvvSg0vWEW3yywJNGbROrk24y29F7i6Q0Y8yVyvllGQfhcYS5DM0viNFqfjhF3irOYE74b0VylbiRIvI1htSyGUtHQaoA8SH9pOXiR0agOnlrpwk8zJW+k77pA4/E2GwxR2huun+IdLWxLyLm0h8L8R8MbCOwAxdnbOB4wwyuefrbEeXrF3MUaP/Ca5PIeObzuZSYmHNWMSOfbA8PasRyEqJT0k49tU0RVMvuGT6QVIiGA0UG7YK5oUUfeJxXocsFLPtBK/dVH97OXUXoEfPg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Svx4MikXRjfT6oh/loZLJeZpRlxpTGZqou3jIiw3JBs=;
- b=YX8KSwwCXEyrOVnNjuBDzdZUUTgkziSWCJLdsLKk4bkeIyhRoD/5LvB25+pTDsFAHwJcLwekBRfHuCQfm39yDboHJIQ3MRGBgRbt4qt3T32M7HyS5oURtmhvm1iCm2dBqjYb6+wgUaFDasMGUwMCrZWzLwKHDkvx4SHs9YRu/6AZd6EksPPOVCjYiPMa++8uwuu2p2RVE2hgI5ZJxNO+WaHhSB9gek55swMot4OZYY1Dq2/mIaO7JUcW9akE5OjDCcHc0vMlHdWo+Hd9cpaM6dSP/hXIvnVezsrNwans43R7U36Kavr5WqL27vBYsbr7Hdj2YJkbWellSwwmsQxIJg==
+ bh=cSAb8agYrX6RPZXpR7CScrXTUobM18Hhp1uulere2qY=;
+ b=hYiNiGKAjkNOUWZ+SsLw1w0y6f47pcmYSDehBo/VMwpgjKJBrpnPBCg6hjy3MTmaT0/Pw+5TdKohpqlIrQ5nPvKesetg7kBpVTPeSl2YxwTdDBO3LqYgABIqbm3Gkwc6j5k/GC8VjahHr/TN2OgS1HAzNCipjAT7dKeLDRpER9gviA0nPTtMcoajiuUKeuKtyJEQQ5BuZfY2kJTBBzmy0Mwljq4zswLUgyDycwW5quNvFiGvvdqWCjDiEJZpbY3ZQkTNqWAaYa2CIkQJGNmko918B9sxJtsNtRNIALXA/9TDbQ0hkuaMZXunL4o+zINDRkqUCB/BMansJjJh/v2dgg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
 Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- BN9PR11MB5387.namprd11.prod.outlook.com (2603:10b6:408:11c::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.35; Fri, 17 Mar
- 2023 04:44:46 +0000
+ DS0PR11MB8019.namprd11.prod.outlook.com (2603:10b6:8:12e::18) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6178.35; Fri, 17 Mar 2023 04:51:04 +0000
 Received: from DS7PR11MB5966.namprd11.prod.outlook.com
  ([fe80::b00e:ac74:158e:1c7e]) by DS7PR11MB5966.namprd11.prod.outlook.com
  ([fe80::b00e:ac74:158e:1c7e%4]) with mapi id 15.20.6178.026; Fri, 17 Mar 2023
- 04:44:46 +0000
-Date:   Fri, 17 Mar 2023 12:20:09 +0800
+ 04:51:04 +0000
+Date:   Fri, 17 Mar 2023 12:26:26 +0800
 From:   Yan Zhao <yan.y.zhao@intel.com>
 To:     Sean Christopherson <seanjc@google.com>
 CC:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -80,67 +79,67 @@ CC:     Paolo Bonzini <pbonzini@redhat.com>,
         <intel-gvt-dev@lists.freedesktop.org>,
         <intel-gfx@lists.freedesktop.org>, <linux-kernel@vger.kernel.org>,
         Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH v2 01/27] drm/i915/gvt: Verify pfn is "valid" before
- dereferencing "struct page"
-Message-ID: <ZBPqeVIqfKF5ctrO@yzhao56-desk.sh.intel.com>
+Subject: Re: [PATCH v2 03/27] drm/i915/gvt: remove interface
+ intel_gvt_is_valid_gfn
+Message-ID: <ZBPr8jx6HfAPxdsO@yzhao56-desk.sh.intel.com>
 Reply-To: Yan Zhao <yan.y.zhao@intel.com>
 References: <20230311002258.852397-1-seanjc@google.com>
- <20230311002258.852397-2-seanjc@google.com>
+ <20230311002258.852397-4-seanjc@google.com>
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20230311002258.852397-2-seanjc@google.com>
-X-ClientProxiedBy: SG2PR02CA0037.apcprd02.prod.outlook.com
- (2603:1096:3:18::25) To DS7PR11MB5966.namprd11.prod.outlook.com
+In-Reply-To: <20230311002258.852397-4-seanjc@google.com>
+X-ClientProxiedBy: SG2PR02CA0022.apcprd02.prod.outlook.com
+ (2603:1096:3:17::34) To DS7PR11MB5966.namprd11.prod.outlook.com
  (2603:10b6:8:71::6)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|BN9PR11MB5387:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8a2be59b-e35a-47ea-bf71-08db26a2555b
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|DS0PR11MB8019:EE_
+X-MS-Office365-Filtering-Correlation-Id: f7e5197d-7f0b-4953-f3e7-08db26a336be
 X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: /WUFojJSa+7wEOFhZrjPU+8wcYSjgVdvgqR45Yi7eg9Rv9mxwddj5hxff8FgmSOVmsgd496RfXWxhaM5Bp+5D1yBVZ9kg+zVVvWR3exwrVaCzAqm2Q6+bcj0T3CFol/MHlBdudI58KfJ4SwcuADo8bnwXF2jtfYpgMohGORCxN+WOfGRgiWAdZRPcSUHw9eLCEsfS+CWlgOuiQFawpcfjtkTuJ7ngPXprxOB41/2z9tVEr3hmIz1EQFJpf2a93hqNGv4Lf7DX5GPH5nUFh1ZEreAomsntvhq7kff24CSlQQRa6C6QtGWOrCDVoVaMFbVU08vmkk5W6/0opWFtQuo2bWJz9XUfLQVmXtFzXwdR7Fv7YiwBgkLSyGgeGXfRjWLAG9L0G/2MaXpqFVYPK/Zb556NjIobl2XIdx/69Imla4B832BStSdjGzIkHPHjPUYFY6HVhowdRX4zU/1wCBRacQZHvlYRHpyrXoCWEiBKpcuaI9BClOsMxAY+tMdP6a3TheeWkkUWdP/lfS71iGF0INI0p9s/DtL4jCiwQSnH0gzUlyEuPO7f2V2GtAhBNkUMVRojH7K3TvDM2rMNw9zn4/sD9H/lbUTZGLC/yME7bFRSqfbYFkr7N0DklrlRrXTE4DWX6UeLy0tRsfoto22vA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(396003)(136003)(376002)(346002)(39860400002)(366004)(451199018)(8936002)(5660300002)(41300700001)(86362001)(38100700002)(82960400001)(3450700001)(2906002)(26005)(6506007)(6512007)(478600001)(6486002)(4326008)(6666004)(6916009)(8676002)(66476007)(66556008)(66946007)(54906003)(186003)(316002);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: AioC2CUBD5d0D3dqGiSvBzsG8zO9krbHdTCZF8IbgkmgHt17D2fG8W2LERSzDu/Cy/+GhCM5m2KShyDE7nqK+8/oV2Adkwd2C797krRn7kkhNKuNBQoMJDWyXCewZTqpT3yRDnoCwMgHrZ4RtGUrtU4eH0LWDnkKPRWMU8eHIgyELvrTRC3mhyUaUgKs2fvp45bctpd1fKOU0mZEsOmwu97cytpE2mY9Pw2npQw9vDFgEIL9VTrj8Z98rzbF09Brf7JMGYkPTeL/KcTRqazunQWghoa/S8FsS8XCK7muWaQM8usebwc5QReTsQXGH2iAP1KTORwbFEDsLBYVbG04Dt2fuRh0KZh7wYEppy5lrWr4ydq7CxprWtECmpN4DY/Foyd40d+DjwPpKdg9YPis9xEH+Ae39948mDhu5sLFfR9sKGo2qQUyHGPUmv1rhsL05BGSgq2FNIo9LTThL/6pG0pqHsKF0RTGTuxGQonK7kzzuK0LSGikPFdFNfHaTDZnG0Nl0vnGUU+UZHuKtszqAJELyp/376k3i8JuMqvJd3dspecv5blYoAyUf/zrfxqIewCRoPnbvJyVjJ65DuZoM6pb9rk2zl01TNbvjAqD4OIpgc/GnRcxvlSnSlIRi3ARHTWb/gYMJ4YWVkDPhQVEtQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(346002)(366004)(39860400002)(376002)(136003)(396003)(451199018)(6512007)(6506007)(6666004)(186003)(26005)(38100700002)(86362001)(2906002)(3450700001)(82960400001)(8936002)(41300700001)(5660300002)(8676002)(6916009)(66476007)(66946007)(4326008)(66556008)(6486002)(316002)(54906003)(83380400001)(478600001);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?lWvOSsvYaC2Ie1v28pcXNp8Ek8uVRQ0a+TYmG+sY8mNTt46JtQwlpS6R1Ly5?=
- =?us-ascii?Q?9NrA6iia3CKeG6Nt2Cc3miFOPGCdEwEMzHM4A55JPeP74usJIV+mUc16Gt7P?=
- =?us-ascii?Q?nhrxoctVRo1flPDmWVpNmcR0OWVriNlCRpod8p7eTlmeyL79twhJ0XcI1GT5?=
- =?us-ascii?Q?/eSp9OGNY8qoZk0A9waJv4g63j5/aWkGRP+oArESKRxOnyx6YlhMiysSXBkD?=
- =?us-ascii?Q?S1fGKbn1X0rewaKpUa+nOO8oufgd4Uen2aow/pg4LHxzSt//1bc96CQGPs87?=
- =?us-ascii?Q?s5OmVSM2MiAGogMzKfSi9rgH9r2R9lFH6ngzOPKQ3E9Wp7L12PCF5BVlvAPi?=
- =?us-ascii?Q?QEn/1QsPlNgpwGCapemNvAb+yIKl7jw7SxCWboVFDn6fpjn8ydxMiMNxeFH4?=
- =?us-ascii?Q?KL7e887kXSRoDF4MEvTGHK5AOqLS4TVC6nOxeh8aOV/9xv4qiZ6I+bRjtFWv?=
- =?us-ascii?Q?cLaXoADY1cr1Ab9E9du8kM+7+kuJ02pEJIoYMU760GrVCvRqZoKLUUBBGjq3?=
- =?us-ascii?Q?P/hX2wqZXWVUmL9f1GwHk5oZNuQZr2dwrsHvddeovoJe+ntgrcG1wRZ7OqHH?=
- =?us-ascii?Q?5TvPok0nL1TDq6deVlhbLTSYSAupo60cpfAszHTk+Yq4lbnGBoYyPYo2cPR4?=
- =?us-ascii?Q?Qskjid/7N8cYxst22kYeWbajuTDr+FSMbhnZ3BaJ4nokKG5anKA9YP9sX7tw?=
- =?us-ascii?Q?Q8aMxr9f0cBkUl3VxCqwwG0T6IDHlg/zxf37cpOAohDViBFkgi/pn2WEA2X6?=
- =?us-ascii?Q?RbCXpOIDDWvJkQNcQmzpzWXEwzXgkBs10YK/aXpp7NsrOl5ORkwtPij7KJX5?=
- =?us-ascii?Q?l9lH8lWEYzhVmsGnyWqNCtEHtyicJa5M5at6ID+As7wZNdAkehhsSh/uRBqI?=
- =?us-ascii?Q?Ohng+KwdpkSDWPTPwI1gBv+csiutn0ywcrjqTV8qbyeZdY1O4SApfuDlX9Cz?=
- =?us-ascii?Q?bJw/sobmzugzAGVUcnd+mI188et7c8/acIwN1DpzIYVRzNb+CjCVeBSGne+O?=
- =?us-ascii?Q?1/XU/BXc0Yjd+xftJwbfK4ASVv6grt2OlcxeAYEMpre+3mnHiF004xd/pU4R?=
- =?us-ascii?Q?7/tXfs1LvOI0j72Tl2r/taA5BgGbu8CRAWolz/WxnlRD456J55iYQ+PM/lQA?=
- =?us-ascii?Q?yqIUj19PUVodpnNIdtXepWYBGGUtNqNROSHtU084X970Q+6sw64mJqoGLQXU?=
- =?us-ascii?Q?tjlAr310eOS/RPrxorHuJZeMDWZ2mxnV2EC6EuBcm204bi6q3HeoeO+tzCaw?=
- =?us-ascii?Q?O+8KI3Rj/b4JJt1cYrOSs0SplzT//GAUnwLTvJDr1mTcQHqxxcGnD8x9fxrZ?=
- =?us-ascii?Q?db937riH0L8JMgyJ168IukEuWH9MgSs3XFWmxWNwkobSJ1ZL650Z6nsr+y7n?=
- =?us-ascii?Q?JA4jvLBsZNQcHpDPmrS+RQhXTzDcMeKSZsPX+o7yy+tEmOBzoRBcWeYPq+Xg?=
- =?us-ascii?Q?t/SS4aVVR2mbiXhiRo04QZKaRCR+FntyGBablXyn3oPx/ppATDjSet7+g+G9?=
- =?us-ascii?Q?6bsaPE3uEgD9PYW4QiwxMbnMXjA/CmMlfYzr7HdgiUFl+Lr2omQa/ZylWMU+?=
- =?us-ascii?Q?OFVX8t2/NBOXllUcfhrnpGRd1HTGpztbXWJv3mrgM2TiMfWv9HJKftgTFBno?=
- =?us-ascii?Q?SQ=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8a2be59b-e35a-47ea-bf71-08db26a2555b
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?WU/0erwvd8yrbxj22H64qsDXEu4TMmog43wuAY861s/+2iQ5BzWiKL2IUWeL?=
+ =?us-ascii?Q?U9QR7RoBNxfKcJOIQhZTFg/SGQSNMBbbgi/VmM9wUYrZ9sWSyTdIXhfm5Z7Y?=
+ =?us-ascii?Q?gzOnAgnJQ5Cs07H5gxLC9pD5tPl8DZk5C00jiCCsa5sgFEDMwAMGm1xzR/W2?=
+ =?us-ascii?Q?QE6lRpzSwdrr+hnaxjxTHJPuN12/DnaLUlDf/Ap67/UTPJn3t+iaNE+NPLNL?=
+ =?us-ascii?Q?X/rkF5ekjpJ+8S15h6Sz9edvc+38ZR+LQHVx0cQHRwk9On3rJi+r9DJd5G6r?=
+ =?us-ascii?Q?yWvKWf1707i1FXJ4LX4SU+p72wVcGVU+xE2DcNB2f8gF1ahwzaky+gY9ev/e?=
+ =?us-ascii?Q?P8jj6ERAqCuKXl5cWvoA3YdBUKg6MZilwRTxwsZngwcdbeipr1DqU5P/vdlv?=
+ =?us-ascii?Q?OPnpU8r2XlPYy4guzBJXkAw71XakCrZ9lKchN+P70mdgYhrmhk7Cj2yBIZJj?=
+ =?us-ascii?Q?3tdU7ZDnxpuOg7fKRKm2YFoeFQ50aQVioNHkb3ChyhY2PF67/mGqEq57b/DT?=
+ =?us-ascii?Q?zyiJN3lwMCeaZyBC5Ie5adBHO/GOyFh4g3oVytqq96ZfoYgIiPjv0DemKsx8?=
+ =?us-ascii?Q?taOYZDMukA+nXH4Lv9Jp2aZZSloxDIpJyw6cG4a+aw6UN30N+hg0aH4w8Ddl?=
+ =?us-ascii?Q?CbwImcTswVil9O+Dc+2hsajotIYHLcahlYaeWgL4mgwtK+WoDXE7OSfDFgWi?=
+ =?us-ascii?Q?QQ/q7P6Pkp5nGD9Pu48tuwi5C/j7rObUtLRKbrcwP49B8iEzBE8OElh27tuL?=
+ =?us-ascii?Q?X2khuB5z3UVxNLOi6plj6Di4CH8xouBO4j+UAjPhDCi21cjB6VP6LyL5VWoV?=
+ =?us-ascii?Q?NdHgOHi6pgs6xXhK6LDGcH/hat4BeXppYMJDk5Q1ERB2Q55bZwzRZRtyJSuM?=
+ =?us-ascii?Q?7+X6YnG2bVrsfvTOWcnKXGjYs15wEOXO/fQUK+GSEyp3NamKfAIGmUEBlx4y?=
+ =?us-ascii?Q?QedgaTU4yL4NX1O4yrsvW24aIMdimI7bHY/0EFxFyjcu3I5NRUrQcTuas/nd?=
+ =?us-ascii?Q?xt7v43l/RG/0+YSZAgXjJkisbAuQysWyGqb7HeSVLiUQKPCCTxbaAKRySYW3?=
+ =?us-ascii?Q?eYn5W1OwL5CZjctMsHBEz7+QpYrHBOOh8IOhYa11jfN0WfcHu5KNGLQ8F+2U?=
+ =?us-ascii?Q?wx1hZfPWXM3m6y4IQKsqfUWkl6+minNLE8ZCxkV6MGE1ehDTfg+NSHXInbpO?=
+ =?us-ascii?Q?goy1lpfBZuVdWaRdXp8Of8/nD1LalQ6w/V+3rQ6e6MxiPS3K5JRLTBclsM80?=
+ =?us-ascii?Q?tZgRO9XLJJhBOHuye1+UMpXUadU0hUw5jZUcasl5ClcUnfJDPP0pF6XSoR4G?=
+ =?us-ascii?Q?8pOpuReIUT6dsw0crHQXPDX3ba0u8VSHPzyv5aAJOwC666H8nx8ERcQYm2Om?=
+ =?us-ascii?Q?wV6L0kCRPdnui+vKr2w00HXY0GvDEV7kKb7HT7ru2qomdYdoLAxjvr5HyLW+?=
+ =?us-ascii?Q?I63+u5bOu0uKoulmpwT4OI4PiENLivZsZX/S6/Yqj+L2vPA0TuXtUXw33JDK?=
+ =?us-ascii?Q?oIS6l2/XDX3+yEimmIsu/QCTpqE3bM0h5czu146AWC8uCqSChBYJK2EeCZ3H?=
+ =?us-ascii?Q?3IrsVfz7d9U+C5cVUJpRA/dmVzzBG+xb87Omi3oRxOyeksP4gdBRQNZ1/VpI?=
+ =?us-ascii?Q?0Q=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: f7e5197d-7f0b-4953-f3e7-08db26a336be
 X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Mar 2023 04:44:46.3878
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Mar 2023 04:51:04.6815
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0sCV1HXg0qUWHoIP09DJpHwgIymRgJqLvM/YPkIqq70rLc33aI3LcqUMT/MGEuNAz6SGhqPLfd8IZhJ+uOTOhA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR11MB5387
+X-MS-Exchange-CrossTenant-UserPrincipalName: szZdF/YNgJULLdeX/eut2ULWa9dD/dSaLFgOZHBF3G4Gd007PtOOZiokLnus4o5CLOcMJn8879hlRTXZgA7hIA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8019
 X-OriginatorOrg: intel.com
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
@@ -152,36 +151,122 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Reviewed-by: Yan Zhao <yan.y.zhao@intel.com>
+Tested-by: Yan Zhao <yan.y.zhao@intel.com>
 
-On Fri, Mar 10, 2023 at 04:22:32PM -0800, Sean Christopherson wrote:
-> Check that the pfn found by gfn_to_pfn() is actually backed by "struct
-> page" memory prior to retrieving and dereferencing the page.  KVM
-> supports backing guest memory with VM_PFNMAP, VM_IO, etc., and so
-> there is no guarantee the pfn returned by gfn_to_pfn() has an associated
-> "struct page".
+On Fri, Mar 10, 2023 at 04:22:34PM -0800, Sean Christopherson wrote:
+> From: Yan Zhao <yan.y.zhao@intel.com>
 > 
-> Fixes: b901b252b6cf ("drm/i915/gvt: Add 2M huge gtt support")
+> Currently intel_gvt_is_valid_gfn() is called in two places:
+> (1) shadowing guest GGTT entry
+> (2) shadowing guest PPGTT leaf entry,
+> which was introduced in commit cc753fbe1ac4
+> ("drm/i915/gvt: validate gfn before set shadow page entry").
+> 
+> However, now it's not necessary to call this interface any more, because
+> a. GGTT partial write issue has been fixed by
+>    commit bc0686ff5fad
+>    ("drm/i915/gvt: support inconsecutive partial gtt entry write")
+>    commit 510fe10b6180
+>    ("drm/i915/gvt: fix a bug of partially write ggtt enties")
+> b. PPGTT resides in normal guest RAM and we only treat 8-byte writes
+>    as valid page table writes. Any invalid GPA found is regarded as
+>    an error, either due to guest misbehavior/attack or bug in host
+>    shadow code.
+>    So,rather than do GFN pre-checking and replace invalid GFNs with
+>    scratch GFN and continue silently, just remove the pre-checking and
+>    abort PPGTT shadowing on error detected.
+> c. GFN validity check is still performed in
+>    intel_gvt_dma_map_guest_page() --> gvt_pin_guest_page().
+>    It's more desirable to call VFIO interface to do both validity check
+>    and mapping.
+>    Calling intel_gvt_is_valid_gfn() to do GFN validity check from KVM side
+>    while later mapping the GFN through VFIO interface is unnecessarily
+>    fragile and confusing for unaware readers.
+> 
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> [sean: remove now-unused local variables]
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  drivers/gpu/drm/i915/gvt/gtt.c | 4 ++++
->  1 file changed, 4 insertions(+)
+>  drivers/gpu/drm/i915/gvt/gtt.c | 36 +---------------------------------
+>  1 file changed, 1 insertion(+), 35 deletions(-)
 > 
 > diff --git a/drivers/gpu/drm/i915/gvt/gtt.c b/drivers/gpu/drm/i915/gvt/gtt.c
-> index 4ec85308379a..58b9b316ae46 100644
+> index 58b9b316ae46..f30922c55a0c 100644
 > --- a/drivers/gpu/drm/i915/gvt/gtt.c
 > +++ b/drivers/gpu/drm/i915/gvt/gtt.c
-> @@ -1183,6 +1183,10 @@ static int is_2MB_gtt_possible(struct intel_vgpu *vgpu,
->  	pfn = gfn_to_pfn(vgpu->vfio_device.kvm, ops->get_pfn(entry));
->  	if (is_error_noslot_pfn(pfn))
->  		return -EINVAL;
-> +
-> +	if (!pfn_valid(pfn))
-> +		return -EINVAL;
-> +
->  	return PageTransHuge(pfn_to_page(pfn));
->  }
+> @@ -49,22 +49,6 @@
+>  static bool enable_out_of_sync = false;
+>  static int preallocated_oos_pages = 8192;
 >  
+> -static bool intel_gvt_is_valid_gfn(struct intel_vgpu *vgpu, unsigned long gfn)
+> -{
+> -	struct kvm *kvm = vgpu->vfio_device.kvm;
+> -	int idx;
+> -	bool ret;
+> -
+> -	if (!test_bit(INTEL_VGPU_STATUS_ATTACHED, vgpu->status))
+> -		return false;
+> -
+> -	idx = srcu_read_lock(&kvm->srcu);
+> -	ret = kvm_is_visible_gfn(kvm, gfn);
+> -	srcu_read_unlock(&kvm->srcu, idx);
+> -
+> -	return ret;
+> -}
+> -
+>  /*
+>   * validate a gm address and related range size,
+>   * translate it to host gm address
+> @@ -1333,11 +1317,9 @@ static int ppgtt_populate_shadow_entry(struct intel_vgpu *vgpu,
+>  static int ppgtt_populate_spt(struct intel_vgpu_ppgtt_spt *spt)
+>  {
+>  	struct intel_vgpu *vgpu = spt->vgpu;
+> -	struct intel_gvt *gvt = vgpu->gvt;
+> -	const struct intel_gvt_gtt_pte_ops *ops = gvt->gtt.pte_ops;
+>  	struct intel_vgpu_ppgtt_spt *s;
+>  	struct intel_gvt_gtt_entry se, ge;
+> -	unsigned long gfn, i;
+> +	unsigned long i;
+>  	int ret;
+>  
+>  	trace_spt_change(spt->vgpu->id, "born", spt,
+> @@ -1354,13 +1336,6 @@ static int ppgtt_populate_spt(struct intel_vgpu_ppgtt_spt *spt)
+>  			ppgtt_generate_shadow_entry(&se, s, &ge);
+>  			ppgtt_set_shadow_entry(spt, &se, i);
+>  		} else {
+> -			gfn = ops->get_pfn(&ge);
+> -			if (!intel_gvt_is_valid_gfn(vgpu, gfn)) {
+> -				ops->set_pfn(&se, gvt->gtt.scratch_mfn);
+> -				ppgtt_set_shadow_entry(spt, &se, i);
+> -				continue;
+> -			}
+> -
+>  			ret = ppgtt_populate_shadow_entry(vgpu, spt, i, &ge);
+>  			if (ret)
+>  				goto fail;
+> @@ -2335,14 +2310,6 @@ static int emulate_ggtt_mmio_write(struct intel_vgpu *vgpu, unsigned int off,
+>  		m.val64 = e.val64;
+>  		m.type = e.type;
+>  
+> -		/* one PTE update may be issued in multiple writes and the
+> -		 * first write may not construct a valid gfn
+> -		 */
+> -		if (!intel_gvt_is_valid_gfn(vgpu, gfn)) {
+> -			ops->set_pfn(&m, gvt->gtt.scratch_mfn);
+> -			goto out;
+> -		}
+> -
+>  		ret = intel_gvt_dma_map_guest_page(vgpu, gfn, PAGE_SIZE,
+>  						   &dma_addr);
+>  		if (ret) {
+> @@ -2359,7 +2326,6 @@ static int emulate_ggtt_mmio_write(struct intel_vgpu *vgpu, unsigned int off,
+>  		ops->clear_present(&m);
+>  	}
+>  
+> -out:
+>  	ggtt_set_guest_entry(ggtt_mm, &e, g_gtt_index);
+>  
+>  	ggtt_get_host_entry(ggtt_mm, &e, g_gtt_index);
 > -- 
 > 2.40.0.rc1.284.g88254d51c5-goog
 > 
