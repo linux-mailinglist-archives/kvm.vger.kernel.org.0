@@ -2,70 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 469D66BF497
-	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 22:51:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 63F7F6BF4AA
+	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 22:54:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229984AbjCQVvL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Mar 2023 17:51:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51806 "EHLO
+        id S231213AbjCQVxY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Mar 2023 17:53:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229765AbjCQVvK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Mar 2023 17:51:10 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1149C9311D
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 14:50:28 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id u22-20020a17090abb1600b0023f0575ebf0so4186220pjr.9
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 14:50:28 -0700 (PDT)
+        with ESMTP id S230452AbjCQVxW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Mar 2023 17:53:22 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76CF2D0E50;
+        Fri, 17 Mar 2023 14:53:00 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id lr16-20020a17090b4b9000b0023f187954acso6673032pjb.2;
+        Fri, 17 Mar 2023 14:53:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679089824;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hdPge4bhOsWQbmZrwme423W7WRqdyrCd2AvtA/fj7QE=;
-        b=JjO9xXnuzRjj/hog2yauNL3Qa2MgKCq4BsIPDmJncgc/6aX+NME2UlKmXBIYDHFKxS
-         9792UxcJIeSpn7RUTUwSdGIrs9fpLjw3PQP0/EJhaWCl817jLBLImfFQ8sVoJuiJXYBl
-         NMB7JtV0gsG0JY8ZiyQ5zntbmMMQEI3Ru22Q8ySxpKaMsL01/l3SuocSdB3/VBgLA/Yd
-         fmi9ttlr60sW8yVLCY1nlGOmxydV2Rqf0mBDzACq9LiOqB0U9Q6/tKgZIEWyu5ipQTEk
-         RT8kHme7zjCqPosF6+GzRn+DkhjdUPkbwMZN7oXhyUXgyKckU3YpzHJiqcz+GYYfalBZ
-         2eMg==
+        d=gmail.com; s=20210112; t=1679089978;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4poqTf05FiPQHsMRuHP+xbWISjWPqpxmI37fFELJAGs=;
+        b=ARGbcukXCyyo8jyVnWbuRYt/PGdiQXSlT3xZxNST4aeJvEf6CjBW3f9uVm4iAy/Okk
+         7wWpC4apGT+uEyGiBiTVZB/Jfv7nhEaSvrTztYZAgMcOg3GllNldv/wwrMXrli1G/x0Z
+         AUcKepLXGJOqPIyR1khQMONOTqI6f+0d86l1ssDBzAHWbeO3JTnn5shOa2E1sSZwFAok
+         iekn0QRh+Aqih5SQU6IXdSWzEOOSEtR+ve1ZLGWYn5CHzc1xph5Iupc7FOogPQfsSwOH
+         sp/cz3edsNFlmZFzYVXmwPRPQn29CyIpEFUH3wkzpeCFe3otvUB22GGbm0a3iHD6+165
+         g8sQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679089824;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=hdPge4bhOsWQbmZrwme423W7WRqdyrCd2AvtA/fj7QE=;
-        b=xzaCGWCkPhskwOFRcogMsJxBusxkzmrFSEltKma1R3JA5IOIYzAxqypcK7+7aQmy+W
-         2yL7nqYFSAQddTGrMwKmPHEI/YllkhkHknuq4D2mxpILzo+ZT2OcllRSIaorrczaedv+
-         DPhqq42je50si25Mmiwv7N3mxFDRosWjWOLDD4oh1xhkPDfmjIxS7GrKYYV/Mm8oysbq
-         4uk+0MQMrEQ/pwQSoCD63J3wQBvyPmI9jNKhgdBy+X9csRlJdjBCnhryUeWkIx6ZA+lI
-         JcqNF4Wev75IsQV1MsoT0aQQXgRoqDBTze8KBz5S9bEt263mZP/Vf02K+7XFCb5R8rBv
-         C1ug==
-X-Gm-Message-State: AO0yUKUVcntDe7FniO2Ygudk7DOfW9gyTnl73MY3ywGtG0jaaT0exQ8W
-        4kXZZML1g099X9nW1UFrtCO0YoX6GRE=
-X-Google-Smtp-Source: AK7set/OHXHCF1av/YaQbLQdhw0lrpqh12uV5bz+F/t2BLB40XOviSVPWewE3R8ZPxfDrxeo8bytR57GTyM=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:a3c8:b0:19f:2af0:466a with SMTP id
- q8-20020a170902a3c800b0019f2af0466amr3332378plb.4.1679089824069; Fri, 17 Mar
- 2023 14:50:24 -0700 (PDT)
-Date:   Fri, 17 Mar 2023 14:50:22 -0700
-In-Reply-To: <CAF7b7mrTa735kDaEsJQSHTt7gpWy_QZEtsgsnKoe6c21s0jDVw@mail.gmail.com>
-Mime-Version: 1.0
-References: <20230315021738.1151386-1-amoorthy@google.com> <20230315021738.1151386-5-amoorthy@google.com>
- <20230317000226.GA408922@ls.amr.corp.intel.com> <CAF7b7mrTa735kDaEsJQSHTt7gpWy_QZEtsgsnKoe6c21s0jDVw@mail.gmail.com>
-Message-ID: <ZBTgnjXJvR8jtc4i@google.com>
-Subject: Re: [WIP Patch v2 04/14] KVM: x86: Add KVM_CAP_X86_MEMORY_FAULT_EXIT
- and associated kvm_run field
-From:   Sean Christopherson <seanjc@google.com>
-To:     Anish Moorthy <amoorthy@google.com>
-Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>, jthoughton@google.com,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        d=1e100.net; s=20210112; t=1679089978;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4poqTf05FiPQHsMRuHP+xbWISjWPqpxmI37fFELJAGs=;
+        b=fhTgWzjEwu4KqmrgCNWzEOUmSYRvChjOOHlPUUCxOO3VrWIsln2vsQu5Bx2S4JYY8W
+         r9WClW+GGSLxghtP5RkjX0QGFuX3Dw6p7PBqhBYf+yxuJJ1zpARYvtwMRDtbD0E+OuZm
+         T4BFmrl0WTf9L9mpiP3h2jHjeBwoZPebXhER2KXiureZB7lEU7tQ69iZfJnXPK69HPdV
+         HJ4BgtlVzo7UVkeDwmQg7gcSqa/BwdrV+vK3FTBtU6/CbSd72bbYdHq6sjEG4aZ8oN1B
+         e+pXThUtH57zCl8xTLpjFQJcMa64CHCTV92eV6+7SjNVEtm7RRDy4PhIN3sot3+xTcFs
+         yK+w==
+X-Gm-Message-State: AO0yUKXAgkGMP+A+e3Q/zHZ0IOzWWQaQCxQ3hmfjJKvf0LD8tkRiC0pb
+        9cilK5Gb0aieuvDbL99IjZI=
+X-Google-Smtp-Source: AK7set/caK4qYFgs6zEDm+RZ2wHn9RMnd08MMGlpv81ljN3yUqSFSEDTg8AkDU/YU9Ddsqv4n4BeLw==
+X-Received: by 2002:a17:902:fa0b:b0:1a1:956e:5417 with SMTP id la11-20020a170902fa0b00b001a1956e5417mr5910746plb.22.1679089978238;
+        Fri, 17 Mar 2023 14:52:58 -0700 (PDT)
+Received: from localhost (ec2-54-67-115-33.us-west-1.compute.amazonaws.com. [54.67.115.33])
+        by smtp.gmail.com with ESMTPSA id p12-20020a1709028a8c00b001a198422025sm1990339plo.125.2023.03.17.14.52.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Mar 2023 14:52:57 -0700 (PDT)
+Date:   Fri, 17 Mar 2023 21:52:56 +0000
+From:   Bobby Eshleman <bobbyeshleman@gmail.com>
+To:     Arseniy Krasnov <avkrasnov@sberdevices.ru>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel@sberdevices.ru, oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v1] virtio/vsock: allocate multiple skbuffs on tx
+Message-ID: <ZBThOG/nISvqbllq@bullseye>
+References: <2c52aa26-8181-d37a-bccd-a86bd3cbc6e1@sberdevices.ru>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2c52aa26-8181-d37a-bccd-a86bd3cbc6e1@sberdevices.ru>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,63 +78,100 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 17, 2023, Anish Moorthy wrote:
-> On Thu, Mar 16, 2023 at 5:02=E2=80=AFPM Isaku Yamahata <isaku.yamahata@gm=
-ail.com> wrote:
-> > > +inline int kvm_memfault_exit_or_efault(
-> > > +     struct kvm_vcpu *vcpu, uint64_t gpa, uint64_t len, uint64_t exi=
-t_flags)
-> > > +{
-> > > +     if (!(vcpu->kvm->memfault_exit_reasons & exit_flags))
-> > > +             return -EFAULT;
-> > > +     vcpu->run->exit_reason =3D KVM_EXIT_MEMORY_FAULT;
-> > > +     vcpu->run->memory_fault.gpa =3D gpa;
-> > > +     vcpu->run->memory_fault.len =3D len;
-> > > +     vcpu->run->memory_fault.flags =3D exit_flags;
-> > > +     return -1;
-> >
-> > Why -1? 0? Anyway enum exit_fastpath_completion is x86 kvm mmu internal
-> > convention. As WIP, it's okay for now, though.
->=20
-> The -1 isn't to indicate a failure in this function itself, but to
-> allow callers to substitute this for "return -EFAULT." A return code
-> of zero would mask errors and cause KVM to proceed in ways that it
-> shouldn't. For instance, "setup_vmgexit_scratch" uses it like this
->=20
-> if (kvm_read_guest(svm->vcpu.kvm, scratch_gpa_beg, scratch_va, len)) {
->     ...
-> -  return -EFAULT;
-> + return kvm_memfault_exit_or_efault(...);
-> }
->=20
-> and looking at one of its callers (sev_handle_vmgexit) shows how a
-> return code of zero would cause a different control flow
->=20
-> case SVM_VMGEXIT_MMIO_READ:
-> ret =3D setup_vmgexit_scratch(svm, true, control->exit_info_2);
-> if (ret)
->     break;
->=20
-> ret =3D ret =3D kvm_sev_es_mmio_read(vcpu,
+On Fri, Mar 17, 2023 at 01:38:39PM +0300, Arseniy Krasnov wrote:
+> This adds small optimization for tx path: instead of allocating single
+> skbuff on every call to transport, allocate multiple skbuffs until
+> credit space allows, thus trying to send as much as possible data without
+> return to af_vsock.c.
 
-Hmm, I generally agree with Isaku, the helper should really return 0.  Retu=
-rning
--1 might work, but it'll likely confuse userspace, and will definitely conf=
-use
-KVM developers.
+Hey Arseniy, I really like this optimization. I have a few
+questions/comments below.
 
-The "0 means exit to userspace" behavior is definitely a pain though, and i=
-s likely
-going to make this all extremely fragile.
+> 
+> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+> ---
+>  net/vmw_vsock/virtio_transport_common.c | 45 +++++++++++++++++--------
+>  1 file changed, 31 insertions(+), 14 deletions(-)
+> 
+> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> index 6564192e7f20..cda587196475 100644
+> --- a/net/vmw_vsock/virtio_transport_common.c
+> +++ b/net/vmw_vsock/virtio_transport_common.c
+> @@ -196,7 +196,8 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+>  	const struct virtio_transport *t_ops;
+>  	struct virtio_vsock_sock *vvs;
+>  	u32 pkt_len = info->pkt_len;
+> -	struct sk_buff *skb;
+> +	u32 rest_len;
+> +	int ret;
+>  
+>  	info->type = virtio_transport_get_type(sk_vsock(vsk));
+>  
+> @@ -216,10 +217,6 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+>  
+>  	vvs = vsk->trans;
+>  
+> -	/* we can send less than pkt_len bytes */
+> -	if (pkt_len > VIRTIO_VSOCK_MAX_PKT_BUF_SIZE)
+> -		pkt_len = VIRTIO_VSOCK_MAX_PKT_BUF_SIZE;
+> -
+>  	/* virtio_transport_get_credit might return less than pkt_len credit */
+>  	pkt_len = virtio_transport_get_credit(vvs, pkt_len);
+>  
+> @@ -227,17 +224,37 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+>  	if (pkt_len == 0 && info->op == VIRTIO_VSOCK_OP_RW)
+>  		return pkt_len;
+>  
+> -	skb = virtio_transport_alloc_skb(info, pkt_len,
+> -					 src_cid, src_port,
+> -					 dst_cid, dst_port);
+> -	if (!skb) {
+> -		virtio_transport_put_credit(vvs, pkt_len);
+> -		return -ENOMEM;
+> -	}
+> +	rest_len = pkt_len;
+>  
+> -	virtio_transport_inc_tx_pkt(vvs, skb);
+> +	do {
+> +		struct sk_buff *skb;
+> +		size_t skb_len;
+> +
+> +		skb_len = min_t(u32, VIRTIO_VSOCK_MAX_PKT_BUF_SIZE, rest_len);
+> +
+> +		skb = virtio_transport_alloc_skb(info, skb_len,
+> +						 src_cid, src_port,
+> +						 dst_cid, dst_port);
+> +		if (!skb) {
+> +			ret = -ENOMEM;
+> +			goto out;
+> +		}
 
-I wonder if we can get away with returning -EFAULT, but still filling vcpu-=
->run
-with KVM_EXIT_MEMORY_FAULT and all the other metadata.  That would likely s=
-implify
-the implementation greatly, and would let KVM fill vcpu->run unconditonally=
-.  KVM
-would still need a capability to advertise support to userspace, but usersp=
-ace
-wouldn't need to opt in.  I think this may have been my very original thoug=
-h, and
-I just never actually wrote it down...
+In this case, if a previous round of the loop succeeded with send_pkt(),
+I think that we may still want to return the number of bytes that have
+successfully been sent so far?
+
+>  
+> -	return t_ops->send_pkt(skb);
+> +		virtio_transport_inc_tx_pkt(vvs, skb);
+> +
+> +		ret = t_ops->send_pkt(skb);
+> +
+> +		if (ret < 0)
+> +			goto out;
+
+Ditto here.
+
+> +
+> +		rest_len -= skb_len;
+> +	} while (rest_len);
+> +
+> +	return pkt_len;
+> +
+> +out:
+> +	virtio_transport_put_credit(vvs, rest_len);
+> +	return ret;
+>  }
+>  
+>  static bool virtio_transport_inc_rx_pkt(struct virtio_vsock_sock *vvs,
+> -- 
+> 2.25.1
