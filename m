@@ -2,55 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D8266BF599
-	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 23:58:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B7FAA6BF5E3
+	for <lists+kvm@lfdr.de>; Sat, 18 Mar 2023 00:01:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229478AbjCQW6o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Mar 2023 18:58:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53390 "EHLO
+        id S230098AbjCQXBc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Mar 2023 19:01:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231163AbjCQW62 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Mar 2023 18:58:28 -0400
+        with ESMTP id S229794AbjCQXBb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Mar 2023 19:01:31 -0400
 Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEC71DCA78
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 15:57:52 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-544570e6d82so61412787b3.23
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 15:57:52 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D02BE6E97
+        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 16:01:00 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-536cb268ab8so61117617b3.17
+        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 16:01:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679093857;
+        d=google.com; s=20210112; t=1679093997;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1wbejF6WrsjCe87RU/Xd7e9XyaptMO+MaTPmYflDm1U=;
-        b=bm5wqx0ban4lY8hIwbljSzbz8TfcNuxcuzBm1DdU6Vy8zgql+DvjtdZYHx3B+wGlYF
-         WJCZowqfsDnfZ90nQCGu73e1bsJCtrtvYMwECfcEaAYAaNhbCTPmYIEfCpNHR6IApnak
-         VmapZFDWlTySnymFyvnfx19NKfULC76Rsvln8pSyKQX27SrpM+z/DU2czDyKxVi+fLG1
-         AcVgBz1lNu+9EgSc1KjLJdmqaHq7NcCVNWSelzVrt7QKeuXItlqqmp+6fcDTB6qAjk6A
-         bnHeNlVf8zkkowG1kMLI1AIuSgm9kIBJwBRg3jKovEEzajDYRyp65LGb0llsIWU3yq0D
-         B+hA==
+        bh=YapDD/Mt0aXDSOcci2EIiKNoTAf7rjZX7MnhdGB50Ks=;
+        b=bjhGrbJw6Bt1WWmyjlVZdivoCSpFKu8WVIQ/OytX1BEqB0QCrGTIfTVNpP8hwD9a1R
+         eaGeUJs1eLAu8UNcFTyqK8BfY21TpL+Z7JNb36ilp4xnihazWCdDU4HqsrroM0LUjKBl
+         DaEtELyXdxd1CuJm5i5fNhwl8D53d0y61LN82gJ3kVeY2LXSgvuz782j+G5aR43YxZf6
+         J0jRR0XFc/ba9JbrH0aEOakVlz55wwLznPjvrY4h94ajMIuMlWzYeYNGuMdsOrT8EtzO
+         6h0FnbkgeZfyhkrD8VCw6LnffVEBWh3ciC3mORs8DFqf5DGQlrqE7dcZEfJqVw2no+Tw
+         5X2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679093857;
+        d=1e100.net; s=20210112; t=1679093997;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1wbejF6WrsjCe87RU/Xd7e9XyaptMO+MaTPmYflDm1U=;
-        b=dRALIrw2tLipReTcRtyW+GQ2+wmLDmmUoXkR4fDlFhs95TrFuHFDqLqCSOLUnz+u+T
-         +lwImf91cn7+NO52BD1H7E8FD89rebrlNdhqdWtIgSyb8mD/bjnzRti0VL8wkzIsuhnj
-         TArU32dfr9QPFkEK4qrbrO12mOvf3PNkosnw9j1/jjY4YbTM0WoiWrNsBBC+YdbBoHQf
-         5GRagiSBn+715WsVFhkH49ZmrU5wK5X7kePtoiRXW8sGflN4Jw+dQ5o91o6wCBf2qEPf
-         ubjwF6iKk1x0li2tXJKJV336NINd7Jjt3nggG5RK1JKSapgSgVe6snZajUc0Ria1mxY2
-         XW6w==
-X-Gm-Message-State: AO0yUKVrniNsx8vuMtnDgwmyUSfqNEAEotyrdzr4W02jAZ4iXvJL8xBA
-        +hbLM3Ra4k09GZPQbOPHhNd9py/dHbs=
-X-Google-Smtp-Source: AK7set8q9jbMPRYAhzwVa7g6qA/qgYzUtg6eOkwnDsctJFiRF82CyIrW3bd6I0gwZxJpOZqjrfNoDbV3TG4=
+        bh=YapDD/Mt0aXDSOcci2EIiKNoTAf7rjZX7MnhdGB50Ks=;
+        b=K4iyQvH0//mUuY9jCw9gPQWulVN+jyBeALXZiDISJsyWICZXVK4svWjx4cePlyhuX0
+         h1Th1BwVTZVnsizSfM/keHnSQDWCqmBKjg+jMnX9nVmOETEzkzw1062t1POzo4jPChR0
+         PrQhjLSUC21zfCED1F0IfDXD+/ESwW4NJ9YkBC6/u4p8QpUgdWiIIFdLQOqtba22rGkY
+         SaMm2pp6Xm8Ij2hrYghvJbAznVFugq4eS21LInTiqxzYVdFR8V13YtRFWdtab4hs3fIq
+         T++rjGZVb08pRVNYJ2FdD8XXPcPuTa3tkto/+i01Y3MOGPwj9Jb++BsF9QAbBJt4SaGN
+         7Lzg==
+X-Gm-Message-State: AO0yUKVb11oUmJv0rxh4NgQ5Z+FFWhZY6q7/W0PVEs9FPzIoUBK50Pqo
+        3BoobXJV7F/TGmQTuIW4GLgGAJqa1h8=
+X-Google-Smtp-Source: AK7set/MGcnP3rj5T0NCU4SLVSPbm5HIm0Rp33HZlnjaoKcp3W0jYyKSuLF1f3HAgHy2M6OYQNehVhe3Lk4=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:431b:0:b0:544:94fe:4244 with SMTP id
- q27-20020a81431b000000b0054494fe4244mr5755178ywa.10.1679093857310; Fri, 17
- Mar 2023 15:57:37 -0700 (PDT)
-Date:   Fri, 17 Mar 2023 15:57:35 -0700
-In-Reply-To: <20230211014626.3659152-1-vipinsh@google.com>
+ (user=seanjc job=sendgmr) by 2002:a81:b284:0:b0:533:99bb:c296 with SMTP id
+ q126-20020a81b284000000b0053399bbc296mr5278110ywh.5.1679093996982; Fri, 17
+ Mar 2023 15:59:56 -0700 (PDT)
+Date:   Fri, 17 Mar 2023 15:59:55 -0700
+In-Reply-To: <20230211014626.3659152-3-vipinsh@google.com>
 Mime-Version: 1.0
-References: <20230211014626.3659152-1-vipinsh@google.com>
-Message-ID: <ZBTwX5790zwl5721@google.com>
-Subject: Re: [Patch v3 0/7] Optimize clear dirty log
+References: <20230211014626.3659152-1-vipinsh@google.com> <20230211014626.3659152-3-vipinsh@google.com>
+Message-ID: <ZBTw6ymNg0gYxhtW@google.com>
+Subject: Re: [Patch v3 2/7] KVM: x86/mmu: Atomically clear SPTE dirty state in
+ the clear-dirty-log flow
 From:   Sean Christopherson <seanjc@google.com>
 To:     Vipin Sharma <vipinsh@google.com>
 Cc:     pbonzini@redhat.com, bgardon@google.com, dmatlack@google.com,
@@ -67,21 +68,19 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Fri, Feb 10, 2023, Vipin Sharma wrote:
-> This patch series has optimized control flow of clearing dirty log and
-> improved its performance by ~40% (2% more than v2).
-> 
-> It also got rid of many variants of the handle_changed_spte family of
-> functions and converged logic to one handle_changed_spte() function. It
-> also remove tdp_mmu_set_spte_no_[acc_track|dirty_log] and various
-> booleans for controlling them.
->
-> v3:
-> - Tried to do better job at writing commit messages.
+> @@ -1677,8 +1670,13 @@ bool kvm_tdp_mmu_clear_dirty_slot(struct kvm *kvm,
+>  static void clear_dirty_pt_masked(struct kvm *kvm, struct kvm_mmu_page *root,
+>  				  gfn_t gfn, unsigned long mask, bool wrprot)
+>  {
+> +	/*
+> +	 * Either all SPTEs in TDP MMU will need write protection or none. This
+> +	 * contract will not be modified for TDP MMU pages.
+> +	 */
+> +	u64 clear_bit = (wrprot || !kvm_ad_enabled()) ? PT_WRITABLE_MASK :
+> +							shadow_dirty_mask;
 
-LOL, that's the spirit!
+Switching from spte_ad_need_write_protect() to kvm_ad_enabled() belongs in a
+separate.  In the unlikely event that the above assertion/contracts is invalid,
+then any issues should bisect to the switch, not to a much more complex patch.
 
-Did a cursory glance, looks good.  I'll do a more thorough pass next week and get
-it queued up if all goes well.  No need for a v4 at this point, I'll fixup David's
-various nits when applying.  I'll also add a link in patch 2 to the discussion
-about why we determined that bypassing __tdp_mmu_set_spte() is safe; that's critical
-information that isn't captured in the changelog.
+I'll make that happen when applying.
