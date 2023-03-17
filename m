@@ -2,190 +2,347 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3367D6BDD34
-	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 00:52:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A4E06BDD4C
+	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 01:02:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229549AbjCPXwj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Mar 2023 19:52:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53672 "EHLO
+        id S229832AbjCQACc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Mar 2023 20:02:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbjCPXwh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Mar 2023 19:52:37 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDFA3DC091;
-        Thu, 16 Mar 2023 16:52:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1679010756; x=1710546756;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=pTtPl3uzY0hnS5pt7pR3ZhSP0AHMjEf6waK4ZgFlTjY=;
-  b=XD/mzLbxJ4hiEoJZ51OCE67p+nuy3xThEBguuXcQcmP1NO7k8RT8b338
-   Vrx/MSbjNuY9td9IFYHQAgqhZX25X0B1nGuz4yws2aNPWX0q/KkUXeyte
-   6ccSSpqaxtPscVdkJaUXCW1yl/ELgxOCqpPmtZS+EY8IsQIfzNqeZEfdv
-   mIn6Eu0Ev+VXhKKLVMTR4d2yP6zHqnkqgYpk7tFR2RaAPLgKshyOTYYsg
-   zLl0QBf+el29ECxLLIjufE1jvPosAEsh1tD5tEdU1jWseTsQc0oKI4HPr
-   OIOM40xq1ehFHN18JwoE635E9SKZKl6czRC9mqwOIYe4TaqWx0l6wzZwE
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10651"; a="321993241"
-X-IronPort-AV: E=Sophos;i="5.98,267,1673942400"; 
-   d="scan'208";a="321993241"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2023 16:52:36 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10651"; a="769151735"
-X-IronPort-AV: E=Sophos;i="5.98,267,1673942400"; 
-   d="scan'208";a="769151735"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by FMSMGA003.fm.intel.com with ESMTP; 16 Mar 2023 16:52:35 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Thu, 16 Mar 2023 16:52:35 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Thu, 16 Mar 2023 16:52:35 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21 via Frontend Transport; Thu, 16 Mar 2023 16:52:34 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.106)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.21; Thu, 16 Mar 2023 16:52:34 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=erfepD+J2+gVs3+3bwu/OBh/SRs4gIOJ+V5Hu0krGBp6CMoEkE/vbQCVHeLIouJ40446Dyc8MhSzQzSiYqkd8nmKFpMG54CF740tfrAZFRb3gfJnF20fakd2bmeNE3n/Nr5GCNfHZtqpf1br7Db8GBmf38gjhhoaD4amGO879dtvL673R62zovisG+gjQV7A+ZXs/iWbcC2MJnEDfhxaUAonwkWHZtuXYszHAzApD/fizurbizJrV5N99Q2oJugY3RbfCMDaDLOqltpZC5QpkXAs5B265aOg4sSmORZj7sRcp7lHBgyt8QMogUz3q6dOCBxRdwoH5epytzFtxxFqWw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pTtPl3uzY0hnS5pt7pR3ZhSP0AHMjEf6waK4ZgFlTjY=;
- b=ZAFOVpUgTZqFwCXUSCdKUbEfSpGIitbCFjgQ3jQ3F5ZiATQAopGl5ZJCTIye3Ho3soY8zG5QjBLoIfRwC3634A/f0PADSRmWPdyiy/SrDAhUll0HPqj6rbrV448NRukmHq5PagDqLeCDx716WrB8O2ZqQgi+gLOxSHTgBcdadghou4C+he1tuZjgHEmIc5D2+tyafOVQGfGgYHXu3ewymzq/gsXclPoGEQfYO24MLsw5DOsZaf8kVaHB/mH24FQnAt8n44HA5uqWWiQkhPWTT9vzeStu50/+3FH9PD8kkw/iGbiiEx+TKsZ8dPZGv2PyPndN/0VibY8mp2xczGlKAA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by CH3PR11MB7795.namprd11.prod.outlook.com (2603:10b6:610:120::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.24; Thu, 16 Mar
- 2023 23:52:32 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::1aac:b695:f7c5:bcac]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::1aac:b695:f7c5:bcac%8]) with mapi id 15.20.6178.035; Thu, 16 Mar 2023
- 23:52:32 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     "Chatre, Reinette" <reinette.chatre@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-CC:     "jgg@nvidia.com" <jgg@nvidia.com>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "darwi@linutronix.de" <darwi@linutronix.de>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "Liu, Jing2" <jing2.liu@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Yu, Fenghua" <fenghua.yu@intel.com>,
-        "tom.zanussi@linux.intel.com" <tom.zanussi@linux.intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [RFC PATCH 0/8] vfio/pci: Support dynamic allocation of MSI-X
- interrupts
-Thread-Topic: [RFC PATCH 0/8] vfio/pci: Support dynamic allocation of MSI-X
- interrupts
-Thread-Index: AQHZV4EkZaZAGPPvtUSaSe7HIBZWbK799WQAgAAcbICAAAJeMA==
-Date:   Thu, 16 Mar 2023 23:52:32 +0000
-Message-ID: <BN9PR11MB5276C1DE988777A97FC5D2A78CBC9@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <cover.1678911529.git.reinette.chatre@intel.com>
- <20230316155646.07ae266f.alex.williamson@redhat.com>
- <4d72821b-36a2-70c9-ee58-f7a21b13510f@intel.com>
-In-Reply-To: <4d72821b-36a2-70c9-ee58-f7a21b13510f@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|CH3PR11MB7795:EE_
-x-ms-office365-filtering-correlation-id: 9084e603-e794-4053-a855-08db26798274
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: D+ftqh7nL1xjLhODcmiyNfsD1Gn8ptoFZ2N69CdbpOP9TYkyuzea0VWFQQj6OFH4x0P7AqXN6PHxVLPfxLo9T3dF/f/ElfObODiPg8fi5KBr9TvjJtdnLHKupuZNqTyvncf+Nw7Uau1ghYoamoojduqSAhzLTPDRp9tFbvtJiKAM2aVGoO+A3XnD17KNsxBuUUQzzD7JYExhBZCJ2ddEkm9LWF7TssV9QN/ukaR22OdegOO0qu7btYbjt4IcGAhC4Ft9vtYhasbtWwx2D0XomVHFQK7iYJNWp8Icpr8O2BDcU28xTafh7FcgBrzaB2ZYlLzz1O7+/DRZCiiUCmMr2RGbV7zwmKZaQNk/DGJ+Dp8ftX1RxtXwBqXEmX1KTj8Sg/P/EJc9SoItgJjGJvhIgH0YBJfME5/AYshAszzjdMyDWN1Uh0SSBUx/Ol6MBpaAj/KZd0EnMrdWj7dKg4RBsErI0WxmRaAYcJ9v5bkvJT09YzowLAS559afMOOHkpvuTC78fHvCKt/K3XkQCJgvYQNz/KBcH8b7NxqPzV4W2SYuQRpb3SjTeTODWvYM7K8GUQ2EEqEgn33BT9DW7NOBM1fFd5vIdrmtbqIxAbPfWgjpFb4VQr7+r5AOoooFbHx1S4ei8nS694ZUWJJt60pbFsGDhq5e55tzXuRgkXx6Cyt+Rp84pAei4EzNHvfyVSK93bF4ub+KDhiwe9DYn9u0kQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(376002)(136003)(366004)(346002)(39860400002)(396003)(451199018)(76116006)(82960400001)(54906003)(478600001)(66446008)(8936002)(66476007)(66946007)(41300700001)(66556008)(64756008)(8676002)(4326008)(55016003)(86362001)(38100700002)(316002)(122000001)(33656002)(9686003)(52536014)(26005)(71200400001)(110136005)(38070700005)(7696005)(186003)(5660300002)(6506007)(4744005)(83380400001)(2906002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?VStlRGFYQVo3ci9RcW5BenJ5MnRwa3JFVUFLcm5qVDBFaDdjSlFMTzdjR2xK?=
- =?utf-8?B?U0tHMFB5MC9DY0R0cGZQRFMzaTJySWR0MnZWWWdUd2wwVDFLN3VyUENpNm4x?=
- =?utf-8?B?bmhmSTdaeVpCNld2dW50MXdDQ3I5SGg0TGsxWlpqOUpHRldBQmY2cWprMEc3?=
- =?utf-8?B?VWRuWmhzdlNWYzlPTzgyTE1Ib09sSVVBSVBVVlZsbGJVcmVhT0RxbU5pTVRt?=
- =?utf-8?B?TUNYWllGZ3VFdnJ6NjJDVlBScVpYRkRCdkZEWjdVR1RlUmErSTcvK0pMQ3dD?=
- =?utf-8?B?ZlloYXZ4UjFZV3Y3NUNBMzFKTE5wOGpuQUIwL3B2bjJOMjYrVEtIUnZjZ3I5?=
- =?utf-8?B?ekpIcm85VTlORlFSbDdodit6RVZpckVhTGp4UXQ3K3VDcHNxMFcxQ01WT21j?=
- =?utf-8?B?SkRFUS9xTVRGb2JvQytQUFhlVnFQR1Z6RmVmOFpwNC8wZWIralViTUhGV3pJ?=
- =?utf-8?B?TTROQTJtV3VBeUI5TzRSWVlPYVlicnJlNE5BNk40K3pwUUt2MkkyYlozcnFr?=
- =?utf-8?B?Vk1LRUpFUEdNbk03NVhBTUI4aXVqcnVkeU1JSy8xZ0dXSUo3Y1dHZ2NFMGhP?=
- =?utf-8?B?eTI0S0sra2xtYlFCNWVSK29kdXdLRVVpNGIwUzVwZjZCRDg2azE2KzJSb1Bo?=
- =?utf-8?B?T1p2V0t6VUxSd0Y3RkFwNGpLeFNpTzJJbGlnVFM5cjFFQmhqa1Q0WmdrQy9y?=
- =?utf-8?B?QUx6N2c0eXM3ZlNEVUJIZE1EYTlSaDBWZS9VRUlsUlFQVkVOVzQ3c1dLYklB?=
- =?utf-8?B?NGlUcW93N045WCt1NkF0TjVqWmcyMCtXV1QxQ1BsdGI3YzNVUGVoTkNrTVF5?=
- =?utf-8?B?TWgwU01Yb3ZPejNVZ0RFUVNQOE9ZVnQ5ZHBjMHVKb3dNeDlJdWo3NjBCM1Ar?=
- =?utf-8?B?M1B2UkwzNlFWTjhyRmt2aXFKV1JQdDg1NHBaQnEydVlvREZxaHRBWFBBNUZF?=
- =?utf-8?B?MVdyRURjNG5NTVREMXp2bjJ0bjJvS0dKQ2o3dWVVa0V6Z3Zod2FDRnFIQ252?=
- =?utf-8?B?OU5qamlxUTdaL1psVlZtZTdJQlB1Y25NTFVyTk83dHJIVFlhSWlLbWRxUXpX?=
- =?utf-8?B?bTVzZm1WZHJybWdvQ002MkpWbU9ybHdESGcySGJkSGRkVklNRlIwTlg3T3BV?=
- =?utf-8?B?WDF3M25QOHZmN0xpZHRmdHh3WldVTlIvT1JqYitZMUdrbDdQZmVyV3NUZ3hh?=
- =?utf-8?B?VDllSnk3cDZuU014MXpqM01QRWFHUnNVS25QTzVicUk2Zmp4M1Jhc1M2dTBS?=
- =?utf-8?B?QnErbml2YnpjMGZ4ZDBlT2Q4bS9mK2NkaHBVcTNQMzU1Y05RbHFNeWRRUXVr?=
- =?utf-8?B?RVBDZE9mL3Urd2YrYk5tdU9KNC83ZmtKOG1CbHo4dUNxWmNHd1MrRCtZc3Ez?=
- =?utf-8?B?clpNWjFPYldGYVVsVy9aeXphaEI4YndsOXVOeVc5VXhLTkhzZEFBanJ3YnBW?=
- =?utf-8?B?Z3ZnZGx0d3lUa21hNzNvTktGRWVTZ2t0TUVjYW11WERYK2RSZ2tLSUlZSDVN?=
- =?utf-8?B?V0dXNGhXZ3dOWmZUdExkRGEyT3loa2RpYUNQZ3Ixaks2Rml0MU1STm14Mzhs?=
- =?utf-8?B?NFN2bDQ2Z3duOENjTE9aT1Rpdm5lYkhhN2dhbmxFMGZnMUFka3ZTR1l4NW12?=
- =?utf-8?B?Wlh1LzA1NjNuM1hrTDlQcmplUDhEWGlzNFFkSHN6T2ZBYndmR0NrbHhSUzZH?=
- =?utf-8?B?b2pHUVZRSlhVSVp4ZVdDV3REMFh6NHpyTTUzRWMwbUZWbkdWdGIzMmJxOFlo?=
- =?utf-8?B?eVE1cm1SNmVuSm5YUC9WWVRqcnVXNGM3YldSLzg2QTdWV3YydHZGNHhza2dw?=
- =?utf-8?B?N2ZFcnJDN1EvZzYyRURCbXBSN2E3emZWK3Y4MGdHVi9tOEo1MXNZNTdKWnJ3?=
- =?utf-8?B?SzhhQjAxWi9OcFdrc1FoNHBjTFFBY2VrWXpodVByOUVGYTl3L1o4TE5hS0s0?=
- =?utf-8?B?aU5MSlJKa2E3cmxLS1FvTnJMeWpuaVNRRVNlT2k2Q0ZmM1M1bDcwWUNwTDlT?=
- =?utf-8?B?aDlHSE9HbWdndGsvUlZPVGp4STJVWjlKRVJ4QnNDNC9pNFA0TFRqTHhqSG1I?=
- =?utf-8?B?NzZZdmhIdDFzS1FRRjZ3Zi84UTdUQ0Npb0RJdEJJM0dqVkE0MUZPQlhlOENC?=
- =?utf-8?Q?4cdvHA3uKGwcjLxo0Kxli7aKx?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        with ESMTP id S229436AbjCQACb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Mar 2023 20:02:31 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EADEE2765
+        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 17:02:29 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id bc12so2914478plb.0
+        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 17:02:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1679011349;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2CzypZrzuWfhutXM9cUGMct3IxtRSPGh7WrBeRV/saM=;
+        b=TvCH8bD/Ld3BofqCGFhqXUfhJlWP8rnVZKNNJJ5V1jFfwuJglVla5206ithFE2zSxI
+         jbpK6eH9A+Ro9Cfx1HP3KFJyrwgh0poYQSvPJRLw6seCReX47udMG9r06TGVbzLtd6iW
+         +ANApBfqm8JPCZeOmjwvWJjcp7BZ1ukpfDh9coyx48jo2nmFq/1zAq8pJJlkAR9FS4dW
+         /KzYT7gvTDKx8sbUHR3F+XDiuAeatmlcajXyG8PWdRSGqmSHvY0fN46dgD8K0hwc11JI
+         A6MT2bzdNSmoYsgb6VWmv3vd2GSxXFOJHyYrGMB9goVhS2FBLNyTGzYetRiXVlqEdV5p
+         EyiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679011349;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2CzypZrzuWfhutXM9cUGMct3IxtRSPGh7WrBeRV/saM=;
+        b=7T7nO2XXGLbbZfqhesZXbft0xlsustVureVqy+oXlSN+mk2RUYps+YokTGTZllCqxp
+         EOWvunqgGlXYsvREj7J7kK21VWi6Tb4qqCZ1izDbIUIjR062ZFImA3H7NGFqWBUAmShG
+         kORBXDHsu2fZwZusYPMWyDtCQBQ2Nua5PpZaeJojDOkD+akTABamQ2voN8J+I3skimuB
+         wLbGysUenl92lQJ7cJ0OPHP03p3+QOPqKu8AlytP4lKeRXV1EnARYKNZK+lVeZskgkOU
+         tQ7C0ulVdXuRKRIIRT2hBXjNPunFdQH+8ZAwqaJSY99Yl6HQrvrrFcE7Bt+KcafUV+pE
+         jHFw==
+X-Gm-Message-State: AO0yUKUyBsxWkx9Kq0fjH/6hldfIQbsEg1mDnO0acuNjaigdRNKE4DQV
+        3jtRccipr/DKkefXteMvHds=
+X-Google-Smtp-Source: AK7set8IxkNDvltJDT014rblq87JJS9guX4TlpsE+wGCTDMUbmxhv2jBMmN/pAo3am66wFBLOnMSlg==
+X-Received: by 2002:a17:90a:1c6:b0:231:24c1:8028 with SMTP id 6-20020a17090a01c600b0023124c18028mr5991922pjd.29.1679011348585;
+        Thu, 16 Mar 2023 17:02:28 -0700 (PDT)
+Received: from localhost ([192.55.54.55])
+        by smtp.gmail.com with ESMTPSA id co10-20020a17090afe8a00b0023b5566f744sm3757924pjb.39.2023.03.16.17.02.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Mar 2023 17:02:27 -0700 (PDT)
+Date:   Thu, 16 Mar 2023 17:02:26 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Anish Moorthy <amoorthy@google.com>
+Cc:     seanjc@google.com, jthoughton@google.com, kvm@vger.kernel.org,
+        isaku.yamahata@gmail.com
+Subject: Re: [WIP Patch v2 04/14] KVM: x86: Add KVM_CAP_X86_MEMORY_FAULT_EXIT
+ and associated kvm_run field
+Message-ID: <20230317000226.GA408922@ls.amr.corp.intel.com>
+References: <20230315021738.1151386-1-amoorthy@google.com>
+ <20230315021738.1151386-5-amoorthy@google.com>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9084e603-e794-4053-a855-08db26798274
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Mar 2023 23:52:32.4170
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: BJiJTybKeooz8qR1jRGvfwZruzOLGlxhs4XCJtSIF3mU6nwAQyZRzBhtKdQNyU/TRmzumcas5KTVlHb8Zz7AAA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7795
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230315021738.1151386-5-amoorthy@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBGcm9tOiBDaGF0cmUsIFJlaW5ldHRlIDxyZWluZXR0ZS5jaGF0cmVAaW50ZWwuY29tPg0KPiBT
-ZW50OiBGcmlkYXksIE1hcmNoIDE3LCAyMDIzIDc6MzggQU0NCj4gDQo+ID4gQmFzZWQgb24gYWJv
-dmUsIHRoZXJlIHJlYWxseSBjYW4gbmV2ZXIgYmUgYW4gZXJyb3IgaWYgd2UgZXhwZWN0IHRoZQ0K
-PiA+IGRldmljZSB0byB3b3JrLCBzbyBJIHRoaW5rIHRoZXJlJ3MgYSBtaXNyZWFkIG9mIHRoZSBj
-dXJyZW50IHN0YXR1cy4NCj4gPiBEeW5hbWljIE1TSS1YIHN1cHBvcnQgc2hvdWxkIHNpbXBseSBy
-ZWR1Y2UgdGhlIGRpc3J1cHRpb24gYW5kIGNoYW5jZQ0KPiA+IG9mIGxvc3QgaW50ZXJydXB0cyBh
-dCB0aGUgZGV2aWNlLCBidXQgdGhlIHBvaW50cyB3aGVyZSB3ZSByaXNrIHRoYXQNCj4gPiB0aGUg
-aG9zdCBjYW5ub3QgcHJvdmlkZSB0aGUgY29uZmlndXJhdGlvbiB3ZSBuZWVkIGFyZSB0aGUgc2Ft
-ZS4NCj4gDQo+IFRoYW5rIHlvdSB2ZXJ5IG11Y2ggQWxleC4gSW4gdGhpcyBjYXNlLCBwbGVhc2Ug
-ZG8gY29uc2lkZXIgdGhpcw0KPiBzdWJtaXNzaW9uIGFzIGEgc3VibWlzc2lvbiBmb3IgaW5jbHVz
-aW9uLiBJJ2QgYmUgaGFwcHkgdG8gcmVzdWJtaXQNCj4gd2l0aG91dCB0aGUgIlJGQyIgcHJlZml4
-IGlmIHRoYXQgaXMgcHJlZmVycmVkLg0KPiANCg0KV2l0aCB0aGF0IGRvIHdlIHN0aWxsIHdhbnQg
-dG8ga2VlcCB0aGUgZXJyb3IgYmVoYXZpb3IgZm9yIE1TST8NCg0KSWYgbm8gcGF0Y2g1IGNhbiBi
-ZSBzaW1wbGlmaWVkIGUuZy4gbm8gbmVlZCBvZiB2ZmlvX2lycV9jdHhfcmFuZ2VfYWxsb2NhdGVk
-KCkNCmFuZCBNU0kvTVNJLVggZXJyb3IgYmVoYXZpb3JzIGJlY29tZSBjb25zaXN0ZW50Lg0K
+On Wed, Mar 15, 2023 at 02:17:28AM +0000,
+Anish Moorthy <amoorthy@google.com> wrote:
+
+> Memory fault exits allow KVM to return useful information from
+> KVM_RUN instead of having to -EFAULT when a guest memory access goes
+> wrong. Document the intent and API of the new capability, and introduce
+> helper functions which will be useful in places where it needs to be
+> implemented.
+> 
+> Also allow the capability to be enabled, even though that won't
+> currently *do* anything: implementations at the relevant -EFAULT sites
+> will performed in subsequent commits.
+> ---
+>  Documentation/virt/kvm/api.rst | 37 ++++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/x86.c             |  1 +
+>  include/linux/kvm_host.h       | 16 +++++++++++++++
+>  include/uapi/linux/kvm.h       | 16 +++++++++++++++
+>  tools/include/uapi/linux/kvm.h | 15 ++++++++++++++
+>  virt/kvm/kvm_main.c            | 28 +++++++++++++++++++++++++
+>  6 files changed, 113 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 62de0768d6aa5..f9ca18bbec879 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6636,6 +6636,19 @@ array field represents return values. The userspace should update the return
+>  values of SBI call before resuming the VCPU. For more details on RISC-V SBI
+>  spec refer, https://github.com/riscv/riscv-sbi-doc.
+>  
+> +::
+> +
+> +		/* KVM_EXIT_MEMORY_FAULT */
+> +		struct {
+> +			__u64 flags;
+> +			__u64 gpa;
+> +			__u64 len; /* in bytes */
+> +		} memory_fault;
+> +
+> +Indicates a memory fault on the guest physical address range [gpa, gpa + len).
+> +flags is a bitfield describing the reasons(s) for the fault. See
+> +KVM_CAP_X86_MEMORY_FAULT_EXIT for more details.
+> +
+>  ::
+>  
+>      /* KVM_EXIT_NOTIFY */
+> @@ -7669,6 +7682,30 @@ This capability is aimed to mitigate the threat that malicious VMs can
+>  cause CPU stuck (due to event windows don't open up) and make the CPU
+>  unavailable to host or other VMs.
+>  
+> +7.34 KVM_CAP_X86_MEMORY_FAULT_EXIT
+> +----------------------------------
+> +
+> +:Architectures: x86
+
+Why x86 specific?
+
+> +:Parameters: args[0] is a bitfield specifying what reasons to exit upon.
+> +:Returns: 0 on success, -EINVAL if unsupported or if unrecognized exit reason
+> +          specified.
+> +
+> +This capability transforms -EFAULTs returned by KVM_RUN in response to guest
+> +memory accesses into VM exits (KVM_EXIT_MEMORY_FAULT), with 'gpa' and 'len'
+> +describing the problematic range of memory and 'flags' describing the reason(s)
+> +for the fault.
+> +
+> +The implementation is currently incomplete. Please notify the maintainers if you
+> +come across a case where it needs to be implemented.
+> +
+> +Through args[0], the capability can be set on a per-exit-reason basis.
+> +Currently, the only exit reasons supported are
+> +
+> +1. KVM_MEMFAULT_REASON_UNKNOWN (1 << 0)
+> +
+> +Memory fault exits with a reason of UNKNOWN should not be depended upon: they
+> +may be added, removed, or reclassified under a stable reason.
+> +
+>  8. Other capabilities.
+>  ======================
+>  
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index f706621c35b86..b3c1b2f57e680 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -4425,6 +4425,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_VAPIC:
+>  	case KVM_CAP_ENABLE_CAP:
+>  	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
+> +	case KVM_CAP_X86_MEMORY_FAULT_EXIT:
+>  		r = 1;
+>  		break;
+>  	case KVM_CAP_EXIT_HYPERCALL:
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 8ada23756b0ec..d3ccfead73e42 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -805,6 +805,7 @@ struct kvm {
+>  	struct notifier_block pm_notifier;
+>  #endif
+>  	char stats_id[KVM_STATS_NAME_SIZE];
+> +	uint64_t memfault_exit_reasons;
+>  };
+>  
+>  #define kvm_err(fmt, ...) \
+> @@ -2278,4 +2279,19 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
+>  /* Max number of entries allowed for each kvm dirty ring */
+>  #define  KVM_DIRTY_RING_MAX_ENTRIES  65536
+>  
+> +/*
+> + * If memory fault exits are enabled for any of the reasons given in exit_flags
+> + * then sets up a KVM_EXIT_MEMORY_FAULT for the given guest physical address,
+> + * length, and flags and returns -1.
+> + * Otherwise, returns -EFAULT
+> + */
+> +inline int kvm_memfault_exit_or_efault(
+> +	struct kvm_vcpu *vcpu, uint64_t gpa, uint64_t len, uint64_t exit_flags);
+> +
+> +/*
+> + * Checks that all of the bits specified in 'reasons' correspond to known
+> + * memory fault exit reasons.
+> + */
+> +bool kvm_memfault_exit_flags_valid(uint64_t reasons);
+> +
+>  #endif
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index d77aef872a0a0..0ba1d7f01346e 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -264,6 +264,7 @@ struct kvm_xen_exit {
+>  #define KVM_EXIT_RISCV_SBI        35
+>  #define KVM_EXIT_RISCV_CSR        36
+>  #define KVM_EXIT_NOTIFY           37
+> +#define KVM_EXIT_MEMORY_FAULT     38
+>  
+>  /* For KVM_EXIT_INTERNAL_ERROR */
+>  /* Emulate instruction failed. */
+> @@ -505,6 +506,17 @@ struct kvm_run {
+>  #define KVM_NOTIFY_CONTEXT_INVALID	(1 << 0)
+>  			__u32 flags;
+>  		} notify;
+> +		/* KVM_EXIT_MEMORY_FAULT */
+> +		struct {
+> +			/*
+> +			 * Indicates a memory fault on the guest physical address range
+> +			 * [gpa, gpa + len). flags is a bitfield describing the reasons(s)
+> +			 * for the fault.
+> +			 */
+> +			__u64 flags;
+> +			__u64 gpa;
+> +			__u64 len; /* in bytes */
+> +		} memory_fault;
+>  		/* Fix the size of the union. */
+>  		char padding[256];
+>  	};
+> @@ -1184,6 +1196,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
+>  #define KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP 225
+>  #define KVM_CAP_PMU_EVENT_MASKED_EVENTS 226
+> +#define KVM_CAP_X86_MEMORY_FAULT_EXIT 227
+>  
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>  
+> @@ -2237,4 +2250,7 @@ struct kvm_s390_zpci_op {
+>  /* flags for kvm_s390_zpci_op->u.reg_aen.flags */
+>  #define KVM_S390_ZPCIOP_REGAEN_HOST    (1 << 0)
+>  
+> +/* Exit reasons for KVM_EXIT_MEMORY_FAULT */
+> +#define KVM_MEMFAULT_REASON_UNKNOWN (1 << 0)
+> +
+>  #endif /* __LINUX_KVM_H */
+> diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
+> index 55155e262646e..2b468345f25c3 100644
+> --- a/tools/include/uapi/linux/kvm.h
+> +++ b/tools/include/uapi/linux/kvm.h
+> @@ -264,6 +264,7 @@ struct kvm_xen_exit {
+>  #define KVM_EXIT_RISCV_SBI        35
+>  #define KVM_EXIT_RISCV_CSR        36
+>  #define KVM_EXIT_NOTIFY           37
+> +#define KVM_EXIT_MEMORY_FAULT     38
+>  
+>  /* For KVM_EXIT_INTERNAL_ERROR */
+>  /* Emulate instruction failed. */
+> @@ -505,6 +506,17 @@ struct kvm_run {
+>  #define KVM_NOTIFY_CONTEXT_INVALID	(1 << 0)
+>  			__u32 flags;
+>  		} notify;
+> +		/* KVM_EXIT_MEMORY_FAULT */
+> +		struct {
+> +			/*
+> +			 * Indicates a memory fault on the guest physical address range
+> +			 * [gpa, gpa + len). flags is a bitfield describing the reasons(s)
+> +			 * for the fault.
+> +			 */
+> +			__u64 flags;
+> +			__u64 gpa;
+> +			__u64 len; /* in bytes */
+> +		} memory_fault;
+>  		/* Fix the size of the union. */
+>  		char padding[256];
+>  	};
+> @@ -2228,4 +2240,7 @@ struct kvm_s390_zpci_op {
+>  /* flags for kvm_s390_zpci_op->u.reg_aen.flags */
+>  #define KVM_S390_ZPCIOP_REGAEN_HOST    (1 << 0)
+>  
+> +/* Exit reasons for KVM_EXIT_MEMORY_FAULT */
+> +#define KVM_MEMFAULT_REASON_UNKNOWN (1 << 0)
+> +
+>  #endif /* __LINUX_KVM_H */
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index e38ddda05b261..00aec43860ff1 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1142,6 +1142,7 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
+>  	spin_lock_init(&kvm->mn_invalidate_lock);
+>  	rcuwait_init(&kvm->mn_memslots_update_rcuwait);
+>  	xa_init(&kvm->vcpu_array);
+> +	kvm->memfault_exit_reasons = 0;
+>  
+>  	INIT_LIST_HEAD(&kvm->gpc_list);
+>  	spin_lock_init(&kvm->gpc_lock);
+> @@ -4671,6 +4672,14 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
+>  
+>  		return r;
+>  	}
+> +	case KVM_CAP_X86_MEMORY_FAULT_EXIT: {
+> +		if (!kvm_vm_ioctl_check_extension(kvm, KVM_CAP_X86_MEMORY_FAULT_EXIT))
+> +			return -EINVAL;
+> +		else if (!kvm_memfault_exit_flags_valid(cap->args[0]))
+> +			return -EINVAL;
+> +		kvm->memfault_exit_reasons = cap->args[0];
+> +		return 0;
+> +	}
+
+Is KVM_CAP_X86_MEMORY_FAULT_EXIT really specific to x86?
+If so, this should go to kvm_vm_ioctl_enable_cap() in arch/x86/kvm/x86.c.
+(Or make it non-arch specific.)
+
+
+>  	default:
+>  		return kvm_vm_ioctl_enable_cap(kvm, cap);
+>  	}
+> @@ -6172,3 +6181,22 @@ int kvm_vm_create_worker_thread(struct kvm *kvm, kvm_vm_thread_fn_t thread_fn,
+>  
+>  	return init_context.err;
+>  }
+> +
+> +inline int kvm_memfault_exit_or_efault(
+> +	struct kvm_vcpu *vcpu, uint64_t gpa, uint64_t len, uint64_t exit_flags)
+> +{
+> +	if (!(vcpu->kvm->memfault_exit_reasons & exit_flags))
+> +		return -EFAULT;
+> +	vcpu->run->exit_reason = KVM_EXIT_MEMORY_FAULT;
+> +	vcpu->run->memory_fault.gpa = gpa;
+> +	vcpu->run->memory_fault.len = len;
+> +	vcpu->run->memory_fault.flags = exit_flags;
+> +	return -1;
+
+Why -1? 0? Anyway enum exit_fastpath_completion is x86 kvm mmu internal
+convention. As WIP, it's okay for now, though.
+
+
+> +}
+> +
+> +bool kvm_memfault_exit_flags_valid(uint64_t reasons)
+> +{
+> +	uint64_t valid_flags = KVM_MEMFAULT_REASON_UNKNOWN;
+> +
+> +	return !(reasons & !valid_flags);
+> +}
+> -- 
+> 2.40.0.rc1.284.g88254d51c5-goog
+> 
+
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
