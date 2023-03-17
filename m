@@ -2,205 +2,402 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C67E6BED4A
-	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 16:47:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AE0436BED8F
+	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 17:00:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231350AbjCQPrN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Mar 2023 11:47:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34124 "EHLO
+        id S231130AbjCQQAe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Mar 2023 12:00:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230031AbjCQPrM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Mar 2023 11:47:12 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89A4AB32AC
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 08:47:02 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 043F1601C3
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 15:47:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5D26C433D2;
-        Fri, 17 Mar 2023 15:47:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1679068021;
-        bh=12zZKHOmdvjfV4b8aAhGOw58PKPbYKo3hyQtwGB9kH4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=RGWS4Rlh6YFCbXnctrhVWv7Ykcq54wAf0H5U1Tl24lkPq9+EDAXqOp8EYBgGJiKcy
-         9oeGW+NxZmZ+1ig0Dv8MhddFAYiPQsB1aOgo4ed0Iw+jdlsulNlE4awVPBqf5oFfLl
-         vB7Wjffm8tzRjy6v5BWc0/sNZh7NKF5HXxMynCwg4b7Lf2qLIfKW0MRE5gBrVcPwbt
-         OdNPHgECAur9yQOGf+r95wWpB8izSNJWncG+mI4fL/XYxZYRABEuEc6oBeyKIDXNzz
-         GRwg+IbeogaDaVmdUYuWxSL9fCTJxOr6U9ySRBMWpKn/mGD+h30v6R1ZzuzzteDTb7
-         18ANVBp7ud9Bw==
-Date:   Fri, 17 Mar 2023 08:46:58 -0700
-From:   Nathan Chancellor <nathan@kernel.org>
-To:     Andy Chiu <andy.chiu@sifive.com>
-Cc:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
-        anup@brainfault.org, atishp@atishpatra.org,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        vineetg@rivosinc.com, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Rix <trix@redhat.com>
-Subject: Re: [PATCH -next v15 19/19] riscv: Enable Vector code to be built
-Message-ID: <20230317154658.GA1122384@dev-arch.thelio-3990X>
-References: <20230317113538.10878-1-andy.chiu@sifive.com>
- <20230317113538.10878-20-andy.chiu@sifive.com>
+        with ESMTP id S231466AbjCQQAa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Mar 2023 12:00:30 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3BBA560D6C
+        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 09:00:25 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A9D9B13D5;
+        Fri, 17 Mar 2023 09:01:08 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4C6B73F885;
+        Fri, 17 Mar 2023 09:00:23 -0700 (PDT)
+Date:   Fri, 17 Mar 2023 16:00:12 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Rajnesh Kanwal <rkanwal@rivosinc.com>
+Cc:     atishp@rivosinc.com, apatel@ventanamicro.com, kvm@vger.kernel.org,
+        will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org,
+        andre.przywara@arm.com, jean-philippe@linaro.org
+Subject: Re: [PATCH v2 kvmtool] Add virtio-transport option and deprecate
+ force-pci and virtio-legacy.
+Message-ID: <ZBSOjLC/V6iWHGmA@monolith.localdoman>
+References: <20230315171238.300572-1-rkanwal@rivosinc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230317113538.10878-20-andy.chiu@sifive.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+In-Reply-To: <20230315171238.300572-1-rkanwal@rivosinc.com>
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andy,
+Hi,
 
-On Fri, Mar 17, 2023 at 11:35:38AM +0000, Andy Chiu wrote:
-> From: Guo Ren <guoren@linux.alibaba.com>
+On Wed, Mar 15, 2023 at 05:12:38PM +0000, Rajnesh Kanwal wrote:
+> This is a follow-up patch for [0] which proposed the --force-pci option
+> for riscv. As per the discussion it was concluded to add virtio-tranport
+> option taking in four options (pci, pci-legacy, mmio, mmio-legacy).
 > 
-> This patch adds a config which enables vector feature from the kernel
-> space.
+> With this change force-pci and virtio-legacy are both deprecated and
+> arm's default transport changes from MMIO to PCI as agreed in [0].
+> This is also true for riscv.
 > 
-> Support for RISC_V_ISA_V is limited to GNU-assembler for now, as LLVM
-> has not acquired the functionality to selectively change the arch option
-> in assembly code. This is still under review at
->     https://reviews.llvm.org/D123515
+> Nothing changes for other architectures.
 > 
-> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
-> Co-developed-by: Greentime Hu <greentime.hu@sifive.com>
-> Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
-> Suggested-by: Vineet Gupta <vineetg@rivosinc.com>
-> Suggested-by: Atish Patra <atishp@atishpatra.org>
-> Co-developed-by: Andy Chiu <andy.chiu@sifive.com>
-> Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
+> [0]: https://lore.kernel.org/all/20230118172007.408667-1-rkanwal@rivosinc.com/
+> 
+> Signed-off-by: Rajnesh Kanwal <rkanwal@rivosinc.com>
+>     
+
+The changes between patch versions should come after the triple dash, not
+before it, that way it won't show up in git log when the patch gets merged.
+
+> V2:
+>     - Removed VIRTIO_DEFAULT_TRANS macro.
+>     - Replaced `[]` with `()` in cmdline arguments notes.
+>     - Fixed virtio_tranport_parser -> virtio_transport_parser
+> 
+> v1: https://lore.kernel.org/all/20230306120329.535320-1-rkanwal@rivosinc.com/
+> 
 > ---
->  arch/riscv/Kconfig  | 20 ++++++++++++++++++++
->  arch/riscv/Makefile |  6 +++++-
->  2 files changed, 25 insertions(+), 1 deletion(-)
+>  arm/include/arm-common/kvm-arch.h        |  5 ----
+>  arm/include/arm-common/kvm-config-arch.h |  8 +++----
+>  builtin-run.c                            | 11 +++++++--
+>  include/kvm/kvm-config.h                 |  2 +-
+>  include/kvm/kvm.h                        |  6 -----
+>  include/kvm/virtio.h                     |  2 ++
+>  riscv/include/kvm/kvm-arch.h             |  3 ---
+>  virtio/9p.c                              |  2 +-
+>  virtio/balloon.c                         |  2 +-
+>  virtio/blk.c                             |  2 +-
+>  virtio/console.c                         |  2 +-
+>  virtio/core.c                            | 30 ++++++++++++++++++++++++
+>  virtio/net.c                             |  4 ++--
+>  virtio/rng.c                             |  2 +-
+>  virtio/scsi.c                            |  2 +-
+>  virtio/vsock.c                           |  2 +-
+>  16 files changed, 55 insertions(+), 30 deletions(-)
 > 
-> diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-> index c736dc8e2593..bf9aba2f2811 100644
-> --- a/arch/riscv/Kconfig
-> +++ b/arch/riscv/Kconfig
-> @@ -436,6 +436,26 @@ config RISCV_ISA_SVPBMT
+> diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
+> index b2ae373..60eec02 100644
+> --- a/arm/include/arm-common/kvm-arch.h
+> +++ b/arm/include/arm-common/kvm-arch.h
+> @@ -80,11 +80,6 @@
 >  
->  	   If you don't know what to do here, say Y.
+>  #define KVM_VM_TYPE		0
 >  
-> +config TOOLCHAIN_HAS_V
-> +	bool
-> +	default y
-> +	depends on !64BIT || $(cc-option,-mabi=lp64 -march=rv64iv)
-> +	depends on !32BIT || $(cc-option,-mabi=ilp32 -march=rv32iv)
-> +	depends on LLD_VERSION >= 140000 || LD_VERSION >= 23800
-> +	depends on AS_IS_GNU
+> -#define VIRTIO_DEFAULT_TRANS(kvm)					\
+> -	((kvm)->cfg.arch.virtio_trans_pci ?				\
+> -	 ((kvm)->cfg.virtio_legacy ? VIRTIO_PCI_LEGACY : VIRTIO_PCI) :	\
+> -	 ((kvm)->cfg.virtio_legacy ? VIRTIO_MMIO_LEGACY : VIRTIO_MMIO))
+> -
+>  #define VIRTIO_RING_ENDIAN	(VIRTIO_ENDIAN_LE | VIRTIO_ENDIAN_BE)
+>  
+>  #define ARCH_HAS_PCI_EXP	1
+> diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
+> index 9949bfe..87f5035 100644
+> --- a/arm/include/arm-common/kvm-config-arch.h
+> +++ b/arm/include/arm-common/kvm-config-arch.h
+> @@ -7,7 +7,6 @@ struct kvm_config_arch {
+>  	const char	*dump_dtb_filename;
+>  	const char	*vcpu_affinity;
+>  	unsigned int	force_cntfrq;
+> -	bool		virtio_trans_pci;
+>  	bool		aarch32_guest;
+>  	bool		has_pmuv3;
+>  	bool		mte_disabled;
+> @@ -28,9 +27,10 @@ int irqchip_parser(const struct option *opt, const char *arg, int unset);
+>  		     "Specify Generic Timer frequency in guest DT to "		\
+>  		     "work around buggy secure firmware *Firmware should be "	\
+>  		     "updated to program CNTFRQ correctly*"),			\
+> -	OPT_BOOLEAN('\0', "force-pci", &(cfg)->virtio_trans_pci,		\
+> -		    "Force virtio devices to use PCI as their default "		\
+> -		    "transport"),						\
+> +	OPT_CALLBACK_NOOPT('\0', "force-pci", NULL, '\0',			\
+> +			   "Force virtio devices to use PCI as their default "	\
+> +			   "transport (Deprecated: Use --virtio-transport "	\
+> +			   "option instead)", virtio_transport_parser, kvm),	\
+>          OPT_CALLBACK('\0', "irqchip", &(cfg)->irqchip,				\
+>  		     "[gicv2|gicv2m|gicv3|gicv3-its]",				\
+>  		     "Type of interrupt controller to emulate in the guest",	\
+> diff --git a/builtin-run.c b/builtin-run.c
+> index bb7e6e8..f2f179d 100644
+> --- a/builtin-run.c
+> +++ b/builtin-run.c
+> @@ -200,8 +200,15 @@ static int mem_parser(const struct option *opt, const char *arg, int unset)
+>  			" rootfs"),					\
+>  	OPT_STRING('\0', "hugetlbfs", &(cfg)->hugetlbfs_path, "path",	\
+>  			"Hugetlbfs path"),				\
+> -	OPT_BOOLEAN('\0', "virtio-legacy", &(cfg)->virtio_legacy,	\
+> -		    "Use legacy virtio transport"),			\
+> +	OPT_CALLBACK_NOOPT('\0', "virtio-legacy",			\
+> +			   &(cfg)->virtio_transport, '\0',		\
+> +			   "Use legacy virtio transport (Deprecated:"	\
+> +			   " Use --virtio-transport option instead)",	\
+> +			   virtio_transport_parser, NULL),		\
+> +	OPT_CALLBACK('\0', "virtio-transport", &(cfg)->virtio_transport,\
+> +		     "[pci|pci-legacy|mmio|mmio-legacy]",		\
 
-Consider hoisting this 'depends on AS_IS_GNU' into its own configuration
-option, as the same dependency is present in CONFIG_TOOLCHAIN_HAS_ZBB
-for the exact same reason, with no comment as to why. By having a shared
-dependency configuration option, we can easily update it when that
-change is merged into LLVM proper and gain access to the current and
-future options that depend on it. I imagine something like:
+While that is true for arm/arm64/riscv, those options are not available for
+other architectures and attempting to set virtio-transport to mmio or
+mmio-legacy will result in an error:
 
-config AS_HAS_OPTION_ARCH
-    bool
-    default y
-    # https://reviews.llvm.org/D123515
-    depends on AS_IS_GNU
+  Error: virtio-transport: unknown type "mmio"
 
-config TOOLCHAIN_HAS_ZBB
-    bool
-    default y
-    depends on !64BIT || $(cc-option,-mabi=lp64 -march=rv64ima_zbb)
-    depends on !32BIT || $(cc-option,-mabi=ilp32 -march=rv32ima_zbb)
-    depends on LLD_VERSION >= 150000 || LD_VERSION >= 23900
-    depends on AS_HAS_OPTION_ARCH
+That's when attempting to run lkvm on x86. You can solve that by doing what
+--mem does, something like:
 
-config TOOLCHAIN_HAS_V
-    bool
-    default y
-    depends on !64BIT || $(cc-option,-mabi=lp64 -march=rv64iv)
-    depends on !32BIT || $(cc-option,-mabi=ilp32 -march=rv32iv)
-    depends on LLD_VERSION >= 140000 || LD_VERSION >= 23800
-    depends on AS_HAS_OPTION_ARCH
+diff --git a/builtin-run.c b/builtin-run.c
+index f2f179dcb495..a32e186587c5 100644
+--- a/builtin-run.c
++++ b/builtin-run.c
+@@ -162,6 +162,12 @@ static int mem_parser(const struct option *opt, const char *arg, int unset)
+        " in megabytes (M)"
+ #endif
 
-It would be nice if it was a hard error for LLVM like GCC so that we
-could just dynamically check support via as-instr but a version check is
-not the end of the world when we know the versions.
++#if defined(CONFIG_ARM) || defined(CONFIG_ARM64) || defined(CONFIG_RISCV)
++#define VIRTIO_TRANS_OPT_HELP_SHORT    "[pci|pci-legacy|mmio|mmio-legacy]"
++#else
++#define VIRTIO_TRANS_OPT_HELP_SHORT    "[pci|pci-legacy]"
++#endif
++
+ #define BUILD_OPTIONS(name, cfg, kvm)                                  \
+        struct option name[] = {                                        \
+        OPT_GROUP("Basic options:"),                                    \
+@@ -206,7 +212,7 @@ static int mem_parser(const struct option *opt, const char *arg, int unset)
+                           " Use --virtio-transport option instead)",   \
+                           virtio_transport_parser, NULL),              \
+        OPT_CALLBACK('\0', "virtio-transport", &(cfg)->virtio_transport,\
+-                    "[pci|pci-legacy|mmio|mmio-legacy]",               \
++                    VIRTIO_TRANS_OPT_HELP_SHORT,                       \
+                     "Type of virtio transport",                        \
+                     virtio_transport_parser, NULL),                    \
 
-  $ cat test.s
-  .option arch, +v
+Otherwise, looks good.
 
-  $ cat test-invalid.s
-  .option arch, +vv
+Thanks,
+Alex
 
-  $ clang --target=riscv64-linux-gnu -c -o /dev/null test.s
-  test.s:1:13: warning: unknown option, expected 'push', 'pop', 'rvc', 'norvc', 'relax' or 'norelax'
-  .option arch, +v
-              ^
-
-  $ clang --target=riscv64-linux-gnu -c -o /dev/null test-invalid.s
-  test-invalid.s:1:13: warning: unknown option, expected 'push', 'pop', 'rvc', 'norvc', 'relax' or 'norelax'
-  .option arch, +vv
-              ^
-
-  $ riscv64-linux-gcc -c -o /dev/null test.s
-
-  $ riscv64-linux-gcc -c -o /dev/null test-invalid.s
-  test-invalid.s: Assembler messages:
-  test-invalid.s:1: Error: unknown ISA extension `vv' in .option arch `+vv'
-
-As a side note, 'bool + default y' is the same as 'def_bool y', if you
-wanted to same some space.
-
-Cheers,
-Nathan
-
-> +config RISCV_ISA_V
-> +	bool "VECTOR extension support"
-> +	depends on TOOLCHAIN_HAS_V
-> +	depends on FPU
-> +	select DYNAMIC_SIGFRAME
-> +	default y
-> +	help
-> +	  Say N here if you want to disable all vector related procedure
-> +	  in the kernel.
+> +		     "Type of virtio transport",			\
+> +		     virtio_transport_parser, NULL),			\
+>  									\
+>  	OPT_GROUP("Kernel options:"),					\
+>  	OPT_STRING('k', "kernel", &(cfg)->kernel_filename, "kernel",	\
+> diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
+> index 368e6c7..592b035 100644
+> --- a/include/kvm/kvm-config.h
+> +++ b/include/kvm/kvm-config.h
+> @@ -64,7 +64,7 @@ struct kvm_config {
+>  	bool no_dhcp;
+>  	bool ioport_debug;
+>  	bool mmio_debug;
+> -	bool virtio_legacy;
+> +	int virtio_transport;
+>  };
+>  
+>  #endif
+> diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
+> index 3872dc6..eb23e2f 100644
+> --- a/include/kvm/kvm.h
+> +++ b/include/kvm/kvm.h
+> @@ -45,12 +45,6 @@ struct kvm_cpu;
+>  typedef void (*mmio_handler_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data,
+>  				u32 len, u8 is_write, void *ptr);
+>  
+> -/* Archs can override this in kvm-arch.h */
+> -#ifndef VIRTIO_DEFAULT_TRANS
+> -#define VIRTIO_DEFAULT_TRANS(kvm) \
+> -	((kvm)->cfg.virtio_legacy ? VIRTIO_PCI_LEGACY : VIRTIO_PCI)
+> -#endif
+> -
+>  enum {
+>  	KVM_VMSTATE_RUNNING,
+>  	KVM_VMSTATE_PAUSED,
+> diff --git a/include/kvm/virtio.h b/include/kvm/virtio.h
+> index 94bddef..0e8c7a6 100644
+> --- a/include/kvm/virtio.h
+> +++ b/include/kvm/virtio.h
+> @@ -248,4 +248,6 @@ void virtio_set_guest_features(struct kvm *kvm, struct virtio_device *vdev,
+>  void virtio_notify_status(struct kvm *kvm, struct virtio_device *vdev,
+>  			  void *dev, u8 status);
+>  
+> +int virtio_transport_parser(const struct option *opt, const char *arg, int unset);
 > +
-> +	  If you don't know what to do here, say Y.
+>  #endif /* KVM__VIRTIO_H */
+> diff --git a/riscv/include/kvm/kvm-arch.h b/riscv/include/kvm/kvm-arch.h
+> index 1e130f5..4106099 100644
+> --- a/riscv/include/kvm/kvm-arch.h
+> +++ b/riscv/include/kvm/kvm-arch.h
+> @@ -46,9 +46,6 @@
+>  
+>  #define KVM_VM_TYPE		0
+>  
+> -#define VIRTIO_DEFAULT_TRANS(kvm) \
+> -	((kvm)->cfg.virtio_legacy ? VIRTIO_MMIO_LEGACY : VIRTIO_MMIO)
+> -
+>  #define VIRTIO_RING_ENDIAN	VIRTIO_ENDIAN_LE
+>  
+>  #define ARCH_HAS_PCI_EXP	1
+> diff --git a/virtio/9p.c b/virtio/9p.c
+> index 19b66df..b809bcd 100644
+> --- a/virtio/9p.c
+> +++ b/virtio/9p.c
+> @@ -1552,7 +1552,7 @@ int virtio_9p__init(struct kvm *kvm)
+>  
+>  	list_for_each_entry(p9dev, &devs, list) {
+>  		r = virtio_init(kvm, p9dev, &p9dev->vdev, &p9_dev_virtio_ops,
+> -				VIRTIO_DEFAULT_TRANS(kvm), PCI_DEVICE_ID_VIRTIO_9P,
+> +				kvm->cfg.virtio_transport, PCI_DEVICE_ID_VIRTIO_9P,
+>  				VIRTIO_ID_9P, PCI_CLASS_9P);
+>  		if (r < 0)
+>  			return r;
+> diff --git a/virtio/balloon.c b/virtio/balloon.c
+> index 3a73432..01d1982 100644
+> --- a/virtio/balloon.c
+> +++ b/virtio/balloon.c
+> @@ -279,7 +279,7 @@ int virtio_bln__init(struct kvm *kvm)
+>  	memset(&bdev.config, 0, sizeof(struct virtio_balloon_config));
+>  
+>  	r = virtio_init(kvm, &bdev, &bdev.vdev, &bln_dev_virtio_ops,
+> -			VIRTIO_DEFAULT_TRANS(kvm), PCI_DEVICE_ID_VIRTIO_BLN,
+> +			kvm->cfg.virtio_transport, PCI_DEVICE_ID_VIRTIO_BLN,
+>  			VIRTIO_ID_BALLOON, PCI_CLASS_BLN);
+>  	if (r < 0)
+>  		return r;
+> diff --git a/virtio/blk.c b/virtio/blk.c
+> index 2d06391..f3c34f3 100644
+> --- a/virtio/blk.c
+> +++ b/virtio/blk.c
+> @@ -329,7 +329,7 @@ static int virtio_blk__init_one(struct kvm *kvm, struct disk_image *disk)
+>  	list_add_tail(&bdev->list, &bdevs);
+>  
+>  	r = virtio_init(kvm, bdev, &bdev->vdev, &blk_dev_virtio_ops,
+> -			VIRTIO_DEFAULT_TRANS(kvm), PCI_DEVICE_ID_VIRTIO_BLK,
+> +			kvm->cfg.virtio_transport, PCI_DEVICE_ID_VIRTIO_BLK,
+>  			VIRTIO_ID_BLOCK, PCI_CLASS_BLK);
+>  	if (r < 0)
+>  		return r;
+> diff --git a/virtio/console.c b/virtio/console.c
+> index d29319c..11a22a9 100644
+> --- a/virtio/console.c
+> +++ b/virtio/console.c
+> @@ -229,7 +229,7 @@ int virtio_console__init(struct kvm *kvm)
+>  		return 0;
+>  
+>  	r = virtio_init(kvm, &cdev, &cdev.vdev, &con_dev_virtio_ops,
+> -			VIRTIO_DEFAULT_TRANS(kvm), PCI_DEVICE_ID_VIRTIO_CONSOLE,
+> +			kvm->cfg.virtio_transport, PCI_DEVICE_ID_VIRTIO_CONSOLE,
+>  			VIRTIO_ID_CONSOLE, PCI_CLASS_CONSOLE);
+>  	if (r < 0)
+>  		return r;
+> diff --git a/virtio/core.c b/virtio/core.c
+> index ea0e5b6..568243a 100644
+> --- a/virtio/core.c
+> +++ b/virtio/core.c
+> @@ -21,6 +21,36 @@ const char* virtio_trans_name(enum virtio_trans trans)
+>  	return "unknown";
+>  }
+>  
+> +int virtio_transport_parser(const struct option *opt, const char *arg, int unset)
+> +{
+> +	enum virtio_trans *type = opt->value;
+> +	struct kvm *kvm;
 > +
->  config TOOLCHAIN_HAS_ZBB
->  	bool
->  	default y
-> diff --git a/arch/riscv/Makefile b/arch/riscv/Makefile
-> index 6203c3378922..84a50cfaedf9 100644
-> --- a/arch/riscv/Makefile
-> +++ b/arch/riscv/Makefile
-> @@ -56,6 +56,7 @@ riscv-march-$(CONFIG_ARCH_RV32I)	:= rv32ima
->  riscv-march-$(CONFIG_ARCH_RV64I)	:= rv64ima
->  riscv-march-$(CONFIG_FPU)		:= $(riscv-march-y)fd
->  riscv-march-$(CONFIG_RISCV_ISA_C)	:= $(riscv-march-y)c
-> +riscv-march-$(CONFIG_RISCV_ISA_V)	:= $(riscv-march-y)v
->  
->  # Newer binutils versions default to ISA spec version 20191213 which moves some
->  # instructions from the I extension to the Zicsr and Zifencei extensions.
-> @@ -65,7 +66,10 @@ riscv-march-$(toolchain-need-zicsr-zifencei) := $(riscv-march-y)_zicsr_zifencei
->  # Check if the toolchain supports Zihintpause extension
->  riscv-march-$(CONFIG_TOOLCHAIN_HAS_ZIHINTPAUSE) := $(riscv-march-y)_zihintpause
->  
-> -KBUILD_CFLAGS += -march=$(subst fd,,$(riscv-march-y))
-> +# Remove F,D,V from isa string for all. Keep extensions between "fd" and "v" by
-> +# keep non-v and multi-letter extensions out with the filter ([^v_]*)
-> +KBUILD_CFLAGS += -march=$(shell echo $(riscv-march-y) | sed  -E 's/(rv32ima|rv64ima)fd([^v_]*)v?/\1\2/')
+> +	if (!strcmp(opt->long_name, "virtio-transport")) {
+> +		if (!strcmp(arg, "pci")) {
+> +			*type = VIRTIO_PCI;
+> +		} else if (!strcmp(arg, "pci-legacy")) {
+> +			*type = VIRTIO_PCI_LEGACY;
+> +#if defined(CONFIG_ARM) || defined(CONFIG_ARM64) || defined(CONFIG_RISCV)
+> +		} else if (!strcmp(arg, "mmio")) {
+> +			*type = VIRTIO_MMIO;
+> +		} else if (!strcmp(arg, "mmio-legacy")) {
+> +			*type = VIRTIO_MMIO_LEGACY;
+> +#endif
+> +		} else {
+> +			pr_err("virtio-transport: unknown type \"%s\"\n", arg);
+> +			return -1;
+> +		}
+> +	} else if (!strcmp(opt->long_name, "virtio-legacy")) {
+> +		*type = VIRTIO_PCI_LEGACY;
+> +	} else if (!strcmp(opt->long_name, "force-pci")) {
+> +		kvm = opt->ptr;
+> +		kvm->cfg.virtio_transport = VIRTIO_PCI;
+> +	}
 > +
->  KBUILD_AFLAGS += -march=$(riscv-march-y)
+> +	return 0;
+> +}
+> +
+>  void virt_queue__used_idx_advance(struct virt_queue *queue, u16 jump)
+>  {
+>  	u16 idx = virtio_guest_to_host_u16(queue, queue->vring.used->idx);
+> diff --git a/virtio/net.c b/virtio/net.c
+> index a5e0cea..8749ebf 100644
+> --- a/virtio/net.c
+> +++ b/virtio/net.c
+> @@ -928,10 +928,10 @@ done:
 >  
->  KBUILD_CFLAGS += -mno-save-restore
+>  static int virtio_net__init_one(struct virtio_net_params *params)
+>  {
+> -	int i, r;
+> +	enum virtio_trans trans = params->kvm->cfg.virtio_transport;
+>  	struct net_dev *ndev;
+>  	struct virtio_ops *ops;
+> -	enum virtio_trans trans = VIRTIO_DEFAULT_TRANS(params->kvm);
+> +	int i, r;
+>  
+>  	ndev = calloc(1, sizeof(struct net_dev));
+>  	if (ndev == NULL)
+> diff --git a/virtio/rng.c b/virtio/rng.c
+> index 63ab8fc..8f85d5e 100644
+> --- a/virtio/rng.c
+> +++ b/virtio/rng.c
+> @@ -173,7 +173,7 @@ int virtio_rng__init(struct kvm *kvm)
+>  	}
+>  
+>  	r = virtio_init(kvm, rdev, &rdev->vdev, &rng_dev_virtio_ops,
+> -			VIRTIO_DEFAULT_TRANS(kvm), PCI_DEVICE_ID_VIRTIO_RNG,
+> +			kvm->cfg.virtio_transport, PCI_DEVICE_ID_VIRTIO_RNG,
+>  			VIRTIO_ID_RNG, PCI_CLASS_RNG);
+>  	if (r < 0)
+>  		goto cleanup;
+> diff --git a/virtio/scsi.c b/virtio/scsi.c
+> index 0286b86..893dfe6 100644
+> --- a/virtio/scsi.c
+> +++ b/virtio/scsi.c
+> @@ -264,7 +264,7 @@ static int virtio_scsi_init_one(struct kvm *kvm, struct disk_image *disk)
+>  	list_add_tail(&sdev->list, &sdevs);
+>  
+>  	r = virtio_init(kvm, sdev, &sdev->vdev, &scsi_dev_virtio_ops,
+> -			VIRTIO_DEFAULT_TRANS(kvm), PCI_DEVICE_ID_VIRTIO_SCSI,
+> +			kvm->cfg.virtio_transport, PCI_DEVICE_ID_VIRTIO_SCSI,
+>  			VIRTIO_ID_SCSI, PCI_CLASS_BLK);
+>  	if (r < 0)
+>  		return r;
+> diff --git a/virtio/vsock.c b/virtio/vsock.c
+> index 18b45f3..a108e63 100644
+> --- a/virtio/vsock.c
+> +++ b/virtio/vsock.c
+> @@ -285,7 +285,7 @@ static int virtio_vsock_init_one(struct kvm *kvm, u64 guest_cid)
+>  	list_add_tail(&vdev->list, &vdevs);
+>  
+>  	r = virtio_init(kvm, vdev, &vdev->vdev, &vsock_dev_virtio_ops,
+> -		    VIRTIO_DEFAULT_TRANS(kvm), PCI_DEVICE_ID_VIRTIO_VSOCK,
+> +		    kvm->cfg.virtio_transport, PCI_DEVICE_ID_VIRTIO_VSOCK,
+>  		    VIRTIO_ID_VSOCK, PCI_CLASS_VSOCK);
+>  	if (r < 0)
+>  	    return r;
 > -- 
-> 2.17.1
+> 2.25.1
 > 
