@@ -2,73 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1097C6BE85C
+	by mail.lfdr.de (Postfix) with ESMTP id 82BF66BE85D
 	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 12:38:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230197AbjCQLiI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Mar 2023 07:38:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55614 "EHLO
+        id S230267AbjCQLiR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Mar 2023 07:38:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230241AbjCQLhr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Mar 2023 07:37:47 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 661C6E1FED
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 04:37:20 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id le6so4965046plb.12
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 04:37:20 -0700 (PDT)
+        with ESMTP id S230315AbjCQLiA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Mar 2023 07:38:00 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FEEFDDF19
+        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 04:37:34 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id ja10so4993982plb.5
+        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 04:37:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1679053034;
+        d=sifive.com; s=google; t=1679053043;
         h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=NcKTsCTSmNOhC0Xny21sgBkTMqUxDz8AQSzRNkwiV+c=;
-        b=LAnYMr8AniVKHebGhBlbV/2nzpRatI7lW9XonCtjrl2kftaZP/1/PiCjWoGUqdEDFW
-         MgsnXwJsDEWp+YFA6tceWNzcL/qJ/75pYcJWglJIUL1gRZDqZbDDzkb+LSu4TrHDgMdX
-         u/nKZIXYRdisfr7tgm3OTyljtPU4m8v+j4M6h96ikhEC7EEXB2yfnVRawT/RJVvhqRUz
-         iYkHLvy76ACzb97ywLtW6gM/acbJRBxvD0uWvdo2tGrp5fT85UjNIES1PomkMrVMdp74
-         yjVya0iKKnSz4vo7xTQrlqS1lyLtzokHdm5dm9NqoFQ04k4YPgxKNPecurklk+Ivfmqc
-         lOsA==
+        bh=SzDj22VZq4DuUmdGqxaRJpqCPr36IFzM6hXF/DUz2kc=;
+        b=g343i0PNAGUsu9Yp3it24c/WsvNVXZZ1yDzDKRvpI7H7ITMyu1tk5GU8DRzP+SPk5a
+         pMXLEbG5a2Z228EjTWd5/DUA4VX+z2c3+auq36WWSQ68lKv+swgii4E4q0ZHylQE8o32
+         IWrWgtBDFEzxFZH3llDp3Qadaq75omd11/FIUrTfTISqup/1ZrKzSx44HbQsNHoZN4Ae
+         sUnkAk12uVSu2SXZG0FytlXv6jGvb+ZkvuU4BFa2frK2ipqxRYuDLq6ndoOWsddO+WMO
+         g+b6xsEU6L8nsOR8z3Jwkwu8yJPenhTtW58xH9euaP3hMdYipSe45ccQRBsolqTQBKrg
+         da4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679053034;
+        d=1e100.net; s=20210112; t=1679053043;
         h=references:in-reply-to:message-id:date:subject:cc:to:from
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NcKTsCTSmNOhC0Xny21sgBkTMqUxDz8AQSzRNkwiV+c=;
-        b=6YM1y2G4k6LhHrH1Q0tX/11MR5Hpw12pEHH9TzCOKdAoMawZPTqT1pvnCn14I9nOu2
-         cxThyAKJBw2voDtSfj4ti5b/59fx2EqEN1s/KOTkk/7iGXH6gz/nAOxPuMjMrYFNvK3L
-         vBMyclXRVEK0BDAB83kzCLtkIKXwGGYYIpV7ow/goiXRlqjWdAnWrZ/HLirkemndzSbx
-         vQEKhiTAGvK+NLG5tjpkT6JVzRUsxRsBp0A9nu+1FjfDShFUGBxkdEnJ05Ggfx94yOsW
-         LL2+DmtuBjRWWTqgHx+2yHGTnkBaru1O4R5G6C/BYiHdHGu9ro/tVQGy4pUF6NIxLV7W
-         ckEA==
-X-Gm-Message-State: AO0yUKV8UEHn2rrE95ebvFENTXKICWLAsDxTu/svUvqpRJg5ULxWLetq
-        ynPCz6S6BIZM+VO5p2QL35zoYQ==
-X-Google-Smtp-Source: AK7set/mxVr12xBwqvn4nHRgAfEiBiEHjZfBQMOzh8WHQXZt2LI3VSTLxV6Al1KQ3YU7Q7p2y7x7cg==
-X-Received: by 2002:a17:90b:1e11:b0:23d:1e5f:eea6 with SMTP id pg17-20020a17090b1e1100b0023d1e5feea6mr8134234pjb.24.1679053034131;
-        Fri, 17 Mar 2023 04:37:14 -0700 (PDT)
+        bh=SzDj22VZq4DuUmdGqxaRJpqCPr36IFzM6hXF/DUz2kc=;
+        b=6jYlxij7VZT64WTiOuNA/vGPSEGIqeHOVEbfDpfO2QSNG6JAujZ7grAT71tJ1IbFPe
+         kopsBfOOt7kdJWcwKI7Iv4P1ntw27Z6mqtF/q6vZJd4QtZwLF1L6PZksbsTB193fx62E
+         mWAMQfCiBTaPBqACyg3epsxHKGcGLuroyOX+29JmAlsmPF6H09pQTC9cZmYOWH2dWJmg
+         5XtAzJBttRQzllatKpxn9fDQo/EhsU0X0qtGcQnhiBVyqiYtPM7t5zEK/i06I22KiZ4I
+         bDh8WyHx9RVRcDyLMzoz+ZlcHSfamEvPbr2r4nIepbqDAX127UUejfytyFrg+U1JbKJg
+         Ho+g==
+X-Gm-Message-State: AO0yUKUf1FgbUpDpTMbyNhfpBkE7MZtzMbupV3NdCaB5YWOr6nMpX3By
+        +RFaUnlyJkUzZphSwLMklwogTQ==
+X-Google-Smtp-Source: AK7set9YWMlcdG/lepnLF+FCviLNVJL9YgfBHFcT+J+Nu4Ldg+1gS1wYeMCC0ehXiwFxD+56/bje6w==
+X-Received: by 2002:a17:90b:4f8c:b0:233:c301:32b3 with SMTP id qe12-20020a17090b4f8c00b00233c30132b3mr7939735pjb.3.1679053042886;
+        Fri, 17 Mar 2023 04:37:22 -0700 (PDT)
 Received: from hsinchu25.internal.sifive.com (59-124-168-89.hinet-ip.hinet.net. [59.124.168.89])
-        by smtp.gmail.com with ESMTPSA id n63-20020a17090a2cc500b0023d3845b02bsm1188740pjd.45.2023.03.17.04.37.10
+        by smtp.gmail.com with ESMTPSA id n63-20020a17090a2cc500b0023d3845b02bsm1188740pjd.45.2023.03.17.04.37.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Mar 2023 04:37:13 -0700 (PDT)
+        Fri, 17 Mar 2023 04:37:22 -0700 (PDT)
 From:   Andy Chiu <andy.chiu@sifive.com>
 To:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
         anup@brainfault.org, atishp@atishpatra.org,
         kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
 Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, Nick Knight <nick.knight@sifive.com>,
-        Vincent Chen <vincent.chen@sifive.com>,
-        Ruinland Tsai <ruinland.tsai@sifive.com>,
-        Andy Chiu <andy.chiu@sifive.com>,
+        guoren@linux.alibaba.com, Andy Chiu <andy.chiu@sifive.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>, Guo Ren <guoren@kernel.org>,
-        Sunil V L <sunilvl@ventanamicro.com>,
-        Kefeng Wang <wangkefeng.wang@huawei.com>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Jisheng Zhang <jszhang@kernel.org>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        Heiko Stuebner <heiko.stuebner@vrull.eu>,
         Conor Dooley <conor.dooley@microchip.com>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        Peter Zijlstra <peterz@infradead.org>
-Subject: [PATCH -next v15 09/19] riscv: Add task switch support for vector
-Date:   Fri, 17 Mar 2023 11:35:28 +0000
-Message-Id: <20230317113538.10878-10-andy.chiu@sifive.com>
+        Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+        Liao Chang <liaochang1@huawei.com>,
+        Jisheng Zhang <jszhang@kernel.org>,
+        Vincent Chen <vincent.chen@sifive.com>,
+        Guo Ren <guoren@kernel.org>,
+        =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@rivosinc.com>,
+        Xianting Tian <xianting.tian@linux.alibaba.com>,
+        Mattias Nissler <mnissler@rivosinc.com>,
+        Richard Henderson <richard.henderson@linaro.org>
+Subject: [PATCH -next v15 10/19] riscv: Allocate user's vector context in the first-use trap
+Date:   Fri, 17 Mar 2023 11:35:29 +0000
+Message-Id: <20230317113538.10878-11-andy.chiu@sifive.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230317113538.10878-1-andy.chiu@sifive.com>
 References: <20230317113538.10878-1-andy.chiu@sifive.com>
@@ -82,190 +83,228 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Greentime Hu <greentime.hu@sifive.com>
+Vector unit is disabled by default for all user processes. Thus, a
+process will take a trap (illegal instruction) into kernel at the first
+time when it uses Vector. Only after then, the kernel allocates V
+context and starts take care of the context for that user process.
 
-This patch adds task switch support for vector. It also supports all
-lengths of vlen.
-
-Suggested-by: Andrew Waterman <andrew@sifive.com>
-Co-developed-by: Nick Knight <nick.knight@sifive.com>
-Signed-off-by: Nick Knight <nick.knight@sifive.com>
-Co-developed-by: Guo Ren <guoren@linux.alibaba.com>
-Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
-Co-developed-by: Vincent Chen <vincent.chen@sifive.com>
-Signed-off-by: Vincent Chen <vincent.chen@sifive.com>
-Co-developed-by: Ruinland Tsai <ruinland.tsai@sifive.com>
-Signed-off-by: Ruinland Tsai <ruinland.tsai@sifive.com>
-Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
-Signed-off-by: Vineet Gupta <vineetg@rivosinc.com>
+Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+Link: https://lore.kernel.org/r/3923eeee-e4dc-0911-40bf-84c34aee962d@linaro.org
 Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
 ---
- arch/riscv/include/asm/processor.h   |  1 +
- arch/riscv/include/asm/switch_to.h   |  3 +++
- arch/riscv/include/asm/thread_info.h |  3 +++
- arch/riscv/include/asm/vector.h      | 38 ++++++++++++++++++++++++++++
- arch/riscv/kernel/process.c          | 18 +++++++++++++
- 5 files changed, 63 insertions(+)
+ arch/riscv/include/asm/insn.h   | 29 +++++++++++
+ arch/riscv/include/asm/vector.h |  2 +
+ arch/riscv/kernel/traps.c       | 14 ++++-
+ arch/riscv/kernel/vector.c      | 90 +++++++++++++++++++++++++++++++++
+ 4 files changed, 133 insertions(+), 2 deletions(-)
 
-diff --git a/arch/riscv/include/asm/processor.h b/arch/riscv/include/asm/processor.h
-index 94a0590c6971..f0ddf691ac5e 100644
---- a/arch/riscv/include/asm/processor.h
-+++ b/arch/riscv/include/asm/processor.h
-@@ -39,6 +39,7 @@ struct thread_struct {
- 	unsigned long s[12];	/* s[0]: frame pointer */
- 	struct __riscv_d_ext_state fstate;
- 	unsigned long bad_cause;
-+	struct __riscv_v_ext_state vstate;
- };
- 
- /* Whitelist the fstate from the task_struct for hardened usercopy */
-diff --git a/arch/riscv/include/asm/switch_to.h b/arch/riscv/include/asm/switch_to.h
-index 4b96b13dee27..a727be723c56 100644
---- a/arch/riscv/include/asm/switch_to.h
-+++ b/arch/riscv/include/asm/switch_to.h
-@@ -8,6 +8,7 @@
- 
- #include <linux/jump_label.h>
- #include <linux/sched/task_stack.h>
-+#include <asm/vector.h>
- #include <asm/hwcap.h>
- #include <asm/processor.h>
- #include <asm/ptrace.h>
-@@ -78,6 +79,8 @@ do {							\
- 	struct task_struct *__next = (next);		\
- 	if (has_fpu())					\
- 		__switch_to_fpu(__prev, __next);	\
-+	if (has_vector())					\
-+		__switch_to_vector(__prev, __next);	\
- 	((last) = __switch_to(__prev, __next));		\
- } while (0)
- 
-diff --git a/arch/riscv/include/asm/thread_info.h b/arch/riscv/include/asm/thread_info.h
-index f704c8dd57e0..9e28c0199030 100644
---- a/arch/riscv/include/asm/thread_info.h
-+++ b/arch/riscv/include/asm/thread_info.h
-@@ -80,6 +80,9 @@ struct thread_info {
- 	.preempt_count	= INIT_PREEMPT_COUNT,	\
- }
- 
-+void arch_release_task_struct(struct task_struct *tsk);
-+int arch_dup_task_struct(struct task_struct *dst, struct task_struct *src);
+diff --git a/arch/riscv/include/asm/insn.h b/arch/riscv/include/asm/insn.h
+index 8d5c84f2d5ef..4e1505cef8aa 100644
+--- a/arch/riscv/include/asm/insn.h
++++ b/arch/riscv/include/asm/insn.h
+@@ -137,6 +137,26 @@
+ #define RVG_OPCODE_JALR		0x67
+ #define RVG_OPCODE_JAL		0x6f
+ #define RVG_OPCODE_SYSTEM	0x73
++#define RVG_SYSTEM_CSR_OFF	20
++#define RVG_SYSTEM_CSR_MASK	GENMASK(12, 0)
 +
- #endif /* !__ASSEMBLY__ */
++/* parts of opcode for RVF, RVD and RVQ */
++#define RVFDQ_FL_FS_WIDTH_OFF	12
++#define RVFDQ_FL_FS_WIDTH_MASK	GENMASK(3, 0)
++#define RVFDQ_FL_FS_WIDTH_W	2
++#define RVFDQ_FL_FS_WIDTH_D	3
++#define RVFDQ_LS_FS_WIDTH_Q	4
++#define RVFDQ_OPCODE_FL		0x07
++#define RVFDQ_OPCODE_FS		0x27
++
++/* parts of opcode for RVV */
++#define RVV_OPCODE_VECTOR	0x57
++#define RVV_VL_VS_WIDTH_8	0
++#define RVV_VL_VS_WIDTH_16	5
++#define RVV_VL_VS_WIDTH_32	6
++#define RVV_VL_VS_WIDTH_64	7
++#define RVV_OPCODE_VL		RVFDQ_OPCODE_FL
++#define RVV_OPCODE_VS		RVFDQ_OPCODE_FS
  
+ /* parts of opcode for RVC*/
+ #define RVC_OPCODE_C0		0x0
+@@ -304,6 +324,15 @@ static __always_inline bool riscv_insn_is_branch(u32 code)
+ 	(RVC_X(x_, RVC_B_IMM_7_6_OPOFF, RVC_B_IMM_7_6_MASK) << RVC_B_IMM_7_6_OFF) | \
+ 	(RVC_IMM_SIGN(x_) << RVC_B_IMM_SIGN_OFF); })
+ 
++#define RVG_EXTRACT_SYSTEM_CSR(x) \
++	({typeof(x) x_ = (x); RV_X(x_, RVG_SYSTEM_CSR_OFF, RVG_SYSTEM_CSR_MASK); })
++
++#define RVFDQ_EXTRACT_FL_FS_WIDTH(x) \
++	({typeof(x) x_ = (x); RV_X(x_, RVFDQ_FL_FS_WIDTH_OFF, \
++				   RVFDQ_FL_FS_WIDTH_MASK); })
++
++#define RVV_EXRACT_VL_VS_WIDTH(x) RVFDQ_EXTRACT_FL_FS_WIDTH(x)
++
  /*
+  * Get the immediate from a J-type instruction.
+  *
 diff --git a/arch/riscv/include/asm/vector.h b/arch/riscv/include/asm/vector.h
-index c7143b7d64d1..3bfa223facd0 100644
+index 3bfa223facd0..09f8dbad3dee 100644
 --- a/arch/riscv/include/asm/vector.h
 +++ b/arch/riscv/include/asm/vector.h
-@@ -11,6 +11,9 @@
- #ifdef CONFIG_RISCV_ISA_V
+@@ -20,6 +20,7 @@
  
- #include <linux/stringify.h>
-+#include <linux/sched.h>
-+#include <linux/sched/task_stack.h>
-+#include <asm/ptrace.h>
- #include <asm/hwcap.h>
- #include <asm/csr.h>
- #include <asm/asm.h>
-@@ -123,6 +126,38 @@ static inline void __riscv_v_vstate_restore(struct __riscv_v_ext_state *restore_
- 	riscv_v_disable();
- }
+ extern unsigned long riscv_v_vsize;
+ void riscv_v_setup_vsize(void);
++bool riscv_v_first_use_handler(struct pt_regs *regs);
  
-+static inline void riscv_v_vstate_save(struct task_struct *task,
-+				       struct pt_regs *regs)
-+{
-+	if ((regs->status & SR_VS) == SR_VS_DIRTY) {
-+		struct __riscv_v_ext_state *vstate = &task->thread.vstate;
-+
-+		__riscv_v_vstate_save(vstate, vstate->datap);
-+		__riscv_v_vstate_clean(regs);
-+	}
-+}
-+
-+static inline void riscv_v_vstate_restore(struct task_struct *task,
-+					  struct pt_regs *regs)
-+{
-+	if ((regs->status & SR_VS) != SR_VS_OFF) {
-+		struct __riscv_v_ext_state *vstate = &task->thread.vstate;
-+
-+		__riscv_v_vstate_restore(vstate, vstate->datap);
-+		__riscv_v_vstate_clean(regs);
-+	}
-+}
-+
-+static inline void __switch_to_vector(struct task_struct *prev,
-+				      struct task_struct *next)
-+{
-+	struct pt_regs *regs;
-+
-+	regs = task_pt_regs(prev);
-+	riscv_v_vstate_save(prev, regs);
-+	riscv_v_vstate_restore(next, task_pt_regs(next));
-+}
-+
- #else /* ! CONFIG_RISCV_ISA_V  */
- 
+ static __always_inline bool has_vector(void)
+ {
+@@ -163,6 +164,7 @@ static inline void __switch_to_vector(struct task_struct *prev,
  struct pt_regs;
-@@ -131,6 +166,9 @@ static __always_inline bool has_vector(void) { return false; }
+ 
+ static __always_inline bool has_vector(void) { return false; }
++static inline bool riscv_v_first_use_handler(struct pt_regs *regs) { return false; }
  static inline bool riscv_v_vstate_query(struct pt_regs *regs) { return false; }
  #define riscv_v_vsize (0)
  #define riscv_v_setup_vsize()	 		do {} while (0)
-+#define riscv_v_vstate_save(task, regs)		do {} while (0)
-+#define riscv_v_vstate_restore(task, regs)	do {} while (0)
-+#define __switch_to_vector(__prev, __next)	do {} while (0)
- #define riscv_v_vstate_off(regs)		do {} while (0)
- #define riscv_v_vstate_on(regs)			do {} while (0)
- 
-diff --git a/arch/riscv/kernel/process.c b/arch/riscv/kernel/process.c
-index 774ffde386ab..44ca0be58ce7 100644
---- a/arch/riscv/kernel/process.c
-+++ b/arch/riscv/kernel/process.c
+diff --git a/arch/riscv/kernel/traps.c b/arch/riscv/kernel/traps.c
+index f6fda94e8e59..2a98fe74274e 100644
+--- a/arch/riscv/kernel/traps.c
++++ b/arch/riscv/kernel/traps.c
 @@ -24,6 +24,7 @@
- #include <asm/switch_to.h>
+ #include <asm/processor.h>
+ #include <asm/ptrace.h>
  #include <asm/thread_info.h>
- #include <asm/cpuidle.h>
 +#include <asm/vector.h>
  
- register unsigned long gp_in_global __asm__("gp");
+ int show_unhandled_signals = 1;
  
-@@ -147,12 +148,28 @@ void flush_thread(void)
- 	fstate_off(current, task_pt_regs(current));
- 	memset(&current->thread.fstate, 0, sizeof(current->thread.fstate));
- #endif
-+#ifdef CONFIG_RISCV_ISA_V
-+	/* Reset vector state */
-+	riscv_v_vstate_off(task_pt_regs(current));
-+	kfree(current->thread.vstate.datap);
-+	memset(&current->thread.vstate, 0, sizeof(struct __riscv_v_ext_state));
-+#endif
+@@ -135,8 +136,17 @@ DO_ERROR_INFO(do_trap_insn_misaligned,
+ 	SIGBUS, BUS_ADRALN, "instruction address misaligned");
+ DO_ERROR_INFO(do_trap_insn_fault,
+ 	SIGSEGV, SEGV_ACCERR, "instruction access fault");
+-DO_ERROR_INFO(do_trap_insn_illegal,
+-	SIGILL, ILL_ILLOPC, "illegal instruction");
++
++asmlinkage __visible __trap_section void do_trap_insn_illegal(struct pt_regs *regs)
++{
++	if (has_vector() && user_mode(regs)) {
++		if (riscv_v_first_use_handler(regs))
++			return;
++	}
++	do_trap_error(regs, SIGILL, ILL_ILLOPC, regs->epc,
++		      "Oops - illegal instruction");
 +}
 +
-+void arch_release_task_struct(struct task_struct *tsk)
+ DO_ERROR_INFO(do_trap_load_fault,
+ 	SIGSEGV, SEGV_ACCERR, "load access fault");
+ #ifndef CONFIG_RISCV_M_MODE
+diff --git a/arch/riscv/kernel/vector.c b/arch/riscv/kernel/vector.c
+index 082baf2a061f..f13d2f3d77fb 100644
+--- a/arch/riscv/kernel/vector.c
++++ b/arch/riscv/kernel/vector.c
+@@ -4,9 +4,19 @@
+  * Author: Andy Chiu <andy.chiu@sifive.com>
+  */
+ #include <linux/export.h>
++#include <linux/sched/signal.h>
++#include <linux/types.h>
++#include <linux/slab.h>
++#include <linux/sched.h>
++#include <linux/uaccess.h>
+ 
++#include <asm/thread_info.h>
++#include <asm/processor.h>
++#include <asm/insn.h>
+ #include <asm/vector.h>
+ #include <asm/csr.h>
++#include <asm/ptrace.h>
++#include <asm/bug.h>
+ 
+ unsigned long riscv_v_vsize __read_mostly;
+ EXPORT_SYMBOL_GPL(riscv_v_vsize);
+@@ -19,3 +29,83 @@ void riscv_v_setup_vsize(void)
+ 	riscv_v_disable();
+ }
+ 
++static bool insn_is_vector(u32 insn_buf)
 +{
-+	/* Free the vector context of datap. */
-+	if (has_vector())
-+		kfree(tsk->thread.vstate.datap);
- }
- 
- int arch_dup_task_struct(struct task_struct *dst, struct task_struct *src)
- {
- 	fstate_save(src, task_pt_regs(src));
- 	*dst = *src;
-+	/* clear entire V context, including datap for a new task */
-+	memset(&dst->thread.vstate, 0, sizeof(struct __riscv_v_ext_state));
++	u32 opcode = insn_buf & __INSN_OPCODE_MASK;
++	bool is_vector = false;
++	u32 width, csr;
 +
- 	return 0;
- }
- 
-@@ -185,6 +202,7 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
- 		childregs->a0 = 0; /* Return value of fork() */
- 		p->thread.ra = (unsigned long)ret_from_fork;
- 	}
-+	riscv_v_vstate_off(childregs);
- 	p->thread.sp = (unsigned long)childregs; /* kernel sp */
- 	return 0;
- }
++	/*
++	 * All V-related instructions, including CSR operations are 4-Byte. So,
++	 * do not handle if the instruction length is not 4-Byte.
++	 */
++	if (unlikely(GET_INSN_LENGTH(insn_buf) != 4))
++		return false;
++
++	switch (opcode) {
++	case RVV_OPCODE_VECTOR:
++		is_vector = true;
++		break;
++	case RVV_OPCODE_VL:
++	case RVV_OPCODE_VS:
++		width = RVV_EXRACT_VL_VS_WIDTH(insn_buf);
++		if (width == RVV_VL_VS_WIDTH_8 || width == RVV_VL_VS_WIDTH_16 ||
++		    width == RVV_VL_VS_WIDTH_32 || width == RVV_VL_VS_WIDTH_64)
++			is_vector = true;
++		break;
++	case RVG_OPCODE_SYSTEM:
++		csr = RVG_EXTRACT_SYSTEM_CSR(insn_buf);
++		if ((csr >= CSR_VSTART && csr <= CSR_VCSR) ||
++		    (csr >= CSR_VL && csr <= CSR_VLENB))
++			is_vector = true;
++		break;
++	}
++	return is_vector;
++}
++
++static int riscv_v_thread_zalloc(void)
++{
++	void *datap;
++
++	datap = kzalloc(riscv_v_vsize, GFP_KERNEL);
++	if (!datap)
++		return -ENOMEM;
++	current->thread.vstate.datap = datap;
++	memset(&current->thread.vstate, 0, offsetof(struct __riscv_v_ext_state,
++						    datap));
++	return 0;
++}
++
++bool riscv_v_first_use_handler(struct pt_regs *regs)
++{
++	__user u32 *epc = (u32 *)regs->epc;
++	u32 insn = (u32)regs->badaddr;
++
++	/* If V has been enabled then it is not the first-use trap */
++	if (riscv_v_vstate_query(regs))
++		return false;
++
++	/* Get the instruction */
++	if (!insn) {
++		if (__get_user(insn, epc))
++			return false;
++	}
++	/* Filter out non-V instructions */
++	if (!insn_is_vector(insn))
++		return false;
++
++	/* Sanity check. datap should be null by the time of the first-use trap */
++	WARN_ON(current->thread.vstate.datap);
++	/*
++	 * Now we sure that this is a V instruction. And it executes in the
++	 * context where VS has been off. So, try to allocate the user's V
++	 * context and resume execution.
++	 */
++	if (riscv_v_thread_zalloc()) {
++		force_sig(SIGKILL);
++		return true;
++	}
++	riscv_v_vstate_on(regs);
++	return true;
++}
++
 -- 
 2.17.1
 
