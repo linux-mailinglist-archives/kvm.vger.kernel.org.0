@@ -2,135 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A4276BEAC3
-	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 15:12:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DC22B6BEB8C
+	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 15:41:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230035AbjCQOM0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Mar 2023 10:12:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51400 "EHLO
+        id S229951AbjCQOll (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Mar 2023 10:41:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41448 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229971AbjCQOMZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Mar 2023 10:12:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15C7260AAB
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 07:11:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679062300;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/idMOlH3j3khBngSypGuD3NSbDuaGpvt2I83Bzbdzhg=;
-        b=bmwnsG0yRLH9SbyBEpGDgtaeR05IBLHGjrMH01Be4Lj/+i/Nn+l6HSiXbfvFceBWaP38oW
-        M5+0zYOQDdH2bcLMLxvGl2CPxnXM1m9GdejVE44j7DOf0eOnE9i0QMelDIz0ELMiHcISmu
-        kpfnE3E/+3syOHYW2LAraG2tHjuKMtI=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-202-nqw4dQLLNfiRwDm4vjtkGA-1; Fri, 17 Mar 2023 10:11:38 -0400
-X-MC-Unique: nqw4dQLLNfiRwDm4vjtkGA-1
-Received: by mail-wr1-f69.google.com with SMTP id o3-20020a5d6483000000b002cc4fe0f7fcso835332wri.7
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 07:11:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679062297;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/idMOlH3j3khBngSypGuD3NSbDuaGpvt2I83Bzbdzhg=;
-        b=MClHNmwWgb1fRxhwwHO7BNweLHTNkXWrdrT+8fSSGwQwpBBYSYCGH1K2DrSL9M7pYK
-         rtY7ZuZEf2QFC0hIGn1FaQjcTnbFMxwpxDocZTW1JzWu3NaRzkIL5qewHz1Jiv7Iyuc1
-         lCwvfioZYiDw149wsQmNZomFekiRNRc4HJQAIrFjHLmqaXA/n/+yP7mbrEnYYyfH7Ay3
-         TURAEX3Ww3gWkPt3f0gtNce1kDYFQ5HM/tiP3i4X5fX2mQzb7o/fgUqD0BsmOw4EJbqZ
-         mpRZV0AcjJfASjdcmG2OOCMEdbnRDkZrcNdV7pbjPgndeKDJD71SCZyXY+AyakfFKMYB
-         ZRLg==
-X-Gm-Message-State: AO0yUKXCF9MoJbQ+0FC8Cn7xFff/n1YWztW0CxM0hDn+YScFmh2BrZ39
-        6gTkVtltEvHp2WlUgvg7lQJBOH8nZtdUh5QTft9xgUecTMF5A+rnHaBNfmUInWPZR5iJrs5zVGg
-        snaXY054twLZ+Ade4CkX2ml0=
-X-Received: by 2002:adf:ee82:0:b0:2c9:b9bf:e20c with SMTP id b2-20020adfee82000000b002c9b9bfe20cmr2446406wro.2.1679062297777;
-        Fri, 17 Mar 2023 07:11:37 -0700 (PDT)
-X-Google-Smtp-Source: AK7set8VV5hpf0OyaSrG3QwT/NFHugVc8teY0e6S4hDgw5s/BMbRRrMTQif6dAKPo0QEL2ukYcMVSw==
-X-Received: by 2002:adf:ee82:0:b0:2c9:b9bf:e20c with SMTP id b2-20020adfee82000000b002c9b9bfe20cmr2446387wro.2.1679062297542;
-        Fri, 17 Mar 2023 07:11:37 -0700 (PDT)
-Received: from [192.168.0.3] (ip-109-43-176-33.web.vodafone.de. [109.43.176.33])
-        by smtp.gmail.com with ESMTPSA id n2-20020adffe02000000b002cfeffb442bsm2054306wrr.57.2023.03.17.07.11.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Mar 2023 07:11:36 -0700 (PDT)
-Message-ID: <8deaddfe-dc69-ec3c-4c8c-a76ee17e6513@redhat.com>
-Date:   Fri, 17 Mar 2023 15:11:35 +0100
+        with ESMTP id S229601AbjCQOlk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Mar 2023 10:41:40 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFC7F2A9BC;
+        Fri, 17 Mar 2023 07:41:39 -0700 (PDT)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32HEBmJO001349;
+        Fri, 17 Mar 2023 14:41:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=xzRMuyDn6hf/ghFyAbo0ebYcwEYyC6G5ahm92wwHahg=;
+ b=D2jHeLOZv/BMT1gnnaP73IQQV4La4/oUZ/d5EbDuDZUkMPXHCerCwWOFG0nrVBU6GNPo
+ SZaVe8HhSQ3CzUYpp1wsFiRv9XYxQTY96MprKwoA59qUVGHLKHvb3C0p7hJZL7rMhe2k
+ x8Ici8oUoyIRbvI+vMBgrwBpaQ9CP2ykI6jwoMHFbPkVtCll9Kuv93SQiGUN/RMfQZFk
+ cyuKypbMgzldVXow4BTpJK0JERxLjGQ83bQ6/xLRgQIXAWsh5P5vh/TAhkP1B0y4KwFu
+ Hala0s8WUdGSpnQ96NnHRkEL14xdIVSAJJ+xkjKP8w3Ys5sL23vODTKvRdF4wNNjle4x AA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pcsrk0vxs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Mar 2023 14:41:39 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32HEBoJ5001427;
+        Fri, 17 Mar 2023 14:41:39 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pcsrk0vwd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Mar 2023 14:41:38 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32HCmOEl028037;
+        Fri, 17 Mar 2023 14:41:36 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+        by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3pbsyxsuwp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Mar 2023 14:41:36 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32HEfWge22413910
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 17 Mar 2023 14:41:32 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BEA782004E;
+        Fri, 17 Mar 2023 14:41:32 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4FEFF20043;
+        Fri, 17 Mar 2023 14:41:32 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.171.92.234])
+        by smtpav07.fra02v.mail.ibm.com (Postfix) with SMTP;
+        Fri, 17 Mar 2023 14:41:32 +0000 (GMT)
+Date:   Fri, 17 Mar 2023 15:41:30 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Cc:     Janosch Frank <frankja@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v4 0/3] s390x: Add misaligned instruction
+ tests
+Message-ID: <20230317154130.1e8da3dd@p-imbrenda>
+In-Reply-To: <20230317133253.965010-1-nsg@linux.ibm.com>
+References: <20230317133253.965010-1-nsg@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [kvm-unit-tests PATCH v3 3/3] s390x/spec_ex: Add test of EXECUTE
- with odd target address
-Content-Language: en-US
-From:   Thomas Huth <thuth@redhat.com>
-To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, Ilya Leoshkevich <iii@linux.ibm.com>
-References: <20230315155445.1688249-1-nsg@linux.ibm.com>
- <20230315155445.1688249-4-nsg@linux.ibm.com>
- <86aa2246-07ff-8fb9-ad97-3b68e8b8f109@redhat.com>
-In-Reply-To: <86aa2246-07ff-8fb9-ad97-3b68e8b8f109@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: b41rhW41EYbPVt7Tl-L0UNwL6jmY6Tdt
+X-Proofpoint-ORIG-GUID: UKLmKTaGY9ILkl-DJASi05qc_RpDxLa8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-17_09,2023-03-16_02,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
+ impostorscore=0 malwarescore=0 spamscore=0 mlxscore=0 lowpriorityscore=0
+ clxscore=1015 mlxlogscore=999 priorityscore=1501 bulkscore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2303150002
+ definitions=main-2303170096
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/03/2023 15.09, Thomas Huth wrote:
-> On 15/03/2023 16.54, Nina Schoetterl-Glausch wrote:
->> The EXECUTE instruction executes the instruction at the given target
->> address. This address must be halfword aligned, otherwise a
->> specification exception occurs.
->> Add a test for this.
->>
->> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
->> ---
->>   s390x/spec_ex.c | 25 +++++++++++++++++++++++++
->>   1 file changed, 25 insertions(+)
->>
->> diff --git a/s390x/spec_ex.c b/s390x/spec_ex.c
->> index 83b8c58e..5fa05dba 100644
->> --- a/s390x/spec_ex.c
->> +++ b/s390x/spec_ex.c
->> @@ -177,6 +177,30 @@ static int short_psw_bit_12_is_0(void)
->>       return 0;
->>   }
->> +static int odd_ex_target(void)
->> +{
->> +    uint64_t pre_target_addr;
->> +    int to = 0, from = 0x0dd;
->> +
->> +    asm volatile ( ".pushsection .text.ex_odd\n"
->> +        "    .balign    2\n"
->> +        "pre_odd_ex_target:\n"
->> +        "    . = . + 1\n"
->> +        "    lr    %[to],%[from]\n"
->> +        "    .popsection\n"
->> +
->> +        "    larl    %[pre_target_addr],pre_odd_ex_target\n"
->> +        "    ex    0,1(%[pre_target_addr])\n"
->> +        : [pre_target_addr] "=&a" (pre_target_addr),
->> +          [to] "+d" (to)
->> +        : [from] "d" (from)
->> +    );
->> +
->> +    assert((pre_target_addr + 1) & 1);
->> +    report(to != from, "did not perform ex with odd target");
->> +    return 0;
->> +}
+On Fri, 17 Mar 2023 14:32:50 +0100
+Nina Schoetterl-Glausch <nsg@linux.ibm.com> wrote:
+
+> Instructions on s390 must be halfword aligned.
+> Add two tests for that.
+> These currently fail when using TCG, Ilya Leoshkevich <iii@linux.ibm.com>
+> posted fixes to the qemu mailing list.
+
+Whole series:
+
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
+
 > 
-> Can this be triggered with KVM, or is this just a test for TCG?
-
-With "triggered" I mean: Can this cause an interception in KVM?
-
-  Thomas
+> v3 -> v4:
+>  * zero whole register with xgr (thanks Janosch)
+>  * pick up tags (thanks Janosch)
+> 
+> v2 -> v3:
+>  * pick up R-b (thanks Janosch)
+>  * use br instead of bcr (thanks Claudio)
+>  * use text section instead of rodata for ex target (thanks Claudio)
+>  * fix label position (thanks Claudio)
+> 
+> v1 -> v2:
+>  * rebase
+>  * use PSW macros
+>  * simplify odd psw test (thanks Claudio)
+>  * rename some identifiers
+>  * pick up R-b (thanks Claudio)
+> 
+> Nina Schoetterl-Glausch (3):
+>   s390x/spec_ex: Use PSW macro
+>   s390x/spec_ex: Add test introducing odd address into PSW
+>   s390x/spec_ex: Add test of EXECUTE with odd target address
+> 
+>  s390x/spec_ex.c | 85 +++++++++++++++++++++++++++++++++++++++++++------
+>  1 file changed, 76 insertions(+), 9 deletions(-)
+> 
+> Range-diff against v3:
+> 1:  6ae1eb7d = 1:  c00f8aa2 s390x/spec_ex: Use PSW macro
+> 2:  a0d02438 ! 2:  d9e3f6e0 s390x/spec_ex: Add test introducing odd address into PSW
+>     @@ Commit message
+>          the odd address.
+>          Add a test for this.
+>      
+>     +    Acked-by: Janosch Frank <frankja@linux.ibm.com>
+>          Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+>      
+>       ## s390x/spec_ex.c ##
+>     @@ s390x/spec_ex.c: static int psw_bit_12_is_1(void)
+>      +
+>      +	expect_invalid_psw(odd);
+>      +	fixup_psw.mask = extract_psw_mask();
+>     -+	asm volatile ( "xr	%%r0,%%r0\n"
+>     ++	asm volatile ( "xgr	%%r0,%%r0\n"
+>      +		"	larl	%%r1,0f\n"
+>      +		"	stg	%%r1,%[fixup_addr]\n"
+>      +		"	lpswe	%[odd_psw]\n"
+> 3:  e771deeb ! 3:  7ea75611 s390x/spec_ex: Add test of EXECUTE with odd target address
+>     @@ Commit message
+>          specification exception occurs.
+>          Add a test for this.
+>      
+>     +    Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+>          Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+>      
+>       ## s390x/spec_ex.c ##
+> 
+> base-commit: 20de8c3b54078ebc3df0b47344f9ce55bf52b7a5
 
