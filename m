@@ -2,91 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DC22B6BEB8C
-	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 15:41:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D20796BECBE
+	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 16:17:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229951AbjCQOll (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Mar 2023 10:41:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41448 "EHLO
+        id S231428AbjCQPRe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Mar 2023 11:17:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229601AbjCQOlk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Mar 2023 10:41:40 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFC7F2A9BC;
-        Fri, 17 Mar 2023 07:41:39 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32HEBmJO001349;
-        Fri, 17 Mar 2023 14:41:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=xzRMuyDn6hf/ghFyAbo0ebYcwEYyC6G5ahm92wwHahg=;
- b=D2jHeLOZv/BMT1gnnaP73IQQV4La4/oUZ/d5EbDuDZUkMPXHCerCwWOFG0nrVBU6GNPo
- SZaVe8HhSQ3CzUYpp1wsFiRv9XYxQTY96MprKwoA59qUVGHLKHvb3C0p7hJZL7rMhe2k
- x8Ici8oUoyIRbvI+vMBgrwBpaQ9CP2ykI6jwoMHFbPkVtCll9Kuv93SQiGUN/RMfQZFk
- cyuKypbMgzldVXow4BTpJK0JERxLjGQ83bQ6/xLRgQIXAWsh5P5vh/TAhkP1B0y4KwFu
- Hala0s8WUdGSpnQ96NnHRkEL14xdIVSAJJ+xkjKP8w3Ys5sL23vODTKvRdF4wNNjle4x AA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pcsrk0vxs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Mar 2023 14:41:39 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32HEBoJ5001427;
-        Fri, 17 Mar 2023 14:41:39 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pcsrk0vwd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Mar 2023 14:41:38 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32HCmOEl028037;
-        Fri, 17 Mar 2023 14:41:36 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-        by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3pbsyxsuwp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Mar 2023 14:41:36 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32HEfWge22413910
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 17 Mar 2023 14:41:32 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BEA782004E;
-        Fri, 17 Mar 2023 14:41:32 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4FEFF20043;
-        Fri, 17 Mar 2023 14:41:32 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.171.92.234])
-        by smtpav07.fra02v.mail.ibm.com (Postfix) with SMTP;
-        Fri, 17 Mar 2023 14:41:32 +0000 (GMT)
-Date:   Fri, 17 Mar 2023 15:41:30 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Cc:     Janosch Frank <frankja@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v4 0/3] s390x: Add misaligned instruction
- tests
-Message-ID: <20230317154130.1e8da3dd@p-imbrenda>
-In-Reply-To: <20230317133253.965010-1-nsg@linux.ibm.com>
-References: <20230317133253.965010-1-nsg@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        with ESMTP id S231751AbjCQPRX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Mar 2023 11:17:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79D35399EC
+        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 08:16:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679066167;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=rao+xNWRizX0LhN/4wRd+0JAP8O4y7cKTfv6w4e7mjg=;
+        b=Jm4S42/kbzBOuNOeiBAvMkCCgjY7U5hkgELWKioMy6BnKVRP6PbULVop/mWT1Wnyq0T+ti
+        bZsmqlkItrQLFBr2S3+qCBfvz5OUS61UctA/QPOTzim98XAgmx5eNLZpkw3R8GDdg2pObk
+        LN/pk/v34MMp597aCBlx5mZsuJg4CPo=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-588-VIzzCpp3MweKPXbOjWIF5Q-1; Fri, 17 Mar 2023 11:16:05 -0400
+X-MC-Unique: VIzzCpp3MweKPXbOjWIF5Q-1
+Received: by mail-io1-f70.google.com with SMTP id z6-20020a056602080600b007407df88db0so2655943iow.23
+        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 08:16:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679066161;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rao+xNWRizX0LhN/4wRd+0JAP8O4y7cKTfv6w4e7mjg=;
+        b=3IFHNC+PGnK5TiN0CN3Hz+RQnYgqG+Hk/gXlniWYloSSPD2kxh+Wpr7IWpVGNLhJUc
+         bJBInhI4cqF28O0s0q8rkyu8jqu1nWHOFAmxUkaUs/8TDdH+gMhhP4z7VxlIktgigdWd
+         HsIlfl5acnLEZRRMCmGrzWlN7M+FQvBfetB0X5Szl6F+isgrV85OX7zr8/UFTgfjw1Az
+         3HDwgjuqWMRcFyefxyxNeVR+0apVMXfCnNWZX/47MmcHAGuIrbJAVAA4MqecNpJtBPLx
+         DHUtmMctccjGG2zH1FYrPiQyj2mFZ3E6KufE0ei8gPN8ryRXbXhDWIpVzvkTLMSKZANI
+         KGTQ==
+X-Gm-Message-State: AO0yUKXg4JBxeoBx/ghr2LtEAYTkxiD+B107LnC9pt3/Dtml/5CtXFH1
+        gzfTxHDqoW1XXsT60+l7E0KFFp4nDeZfM7YXTHM5mH4fTG9zdZ5wfvNdWfFHKsNTPqVzQ4Z+x3u
+        OWt7l46wfaKSx
+X-Received: by 2002:a92:d6c4:0:b0:323:29e2:a19 with SMTP id z4-20020a92d6c4000000b0032329e20a19mr121701ilp.19.1679066161234;
+        Fri, 17 Mar 2023 08:16:01 -0700 (PDT)
+X-Google-Smtp-Source: AK7set80NGJKORot4gljugv8vYBR/BBkOhmUyaZ4ioD6GUgk2kD4aof7c53go0lOXTZ/o0x4VYZ9Cw==
+X-Received: by 2002:a92:d6c4:0:b0:323:29e2:a19 with SMTP id z4-20020a92d6c4000000b0032329e20a19mr121668ilp.19.1679066160983;
+        Fri, 17 Mar 2023 08:16:00 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id i7-20020a05663815c700b00406147dad72sm761750jat.104.2023.03.17.08.15.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Mar 2023 08:16:00 -0700 (PDT)
+Date:   Fri, 17 Mar 2023 09:15:57 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>
+Subject: Re: [PATCH v6 12/24] vfio/pci: Allow passing zero-length fd array
+ in VFIO_DEVICE_PCI_HOT_RESET
+Message-ID: <20230317091557.196638a6.alex.williamson@redhat.com>
+In-Reply-To: <BN9PR11MB5276D5A71E43EA4CDD1C960A8CBD9@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20230308132903.465159-1-yi.l.liu@intel.com>
+        <20230308132903.465159-13-yi.l.liu@intel.com>
+        <20230315165311.01f32bfe.alex.williamson@redhat.com>
+        <BN9PR11MB5276300FCAAF8BF7B4E03BA48CBF9@BN9PR11MB5276.namprd11.prod.outlook.com>
+        <20230316124532.30839a94.alex.williamson@redhat.com>
+        <BN9PR11MB5276F7879E428080D2B214D98CBC9@BN9PR11MB5276.namprd11.prod.outlook.com>
+        <20230316182256.6659bbbd.alex.williamson@redhat.com>
+        <BN9PR11MB5276D5A71E43EA4CDD1C960A8CBD9@BN9PR11MB5276.namprd11.prod.outlook.com>
+Organization: Red Hat
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: b41rhW41EYbPVt7Tl-L0UNwL6jmY6Tdt
-X-Proofpoint-ORIG-GUID: UKLmKTaGY9ILkl-DJASi05qc_RpDxLa8
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-17_09,2023-03-16_02,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
- impostorscore=0 malwarescore=0 spamscore=0 mlxscore=0 lowpriorityscore=0
- clxscore=1015 mlxlogscore=999 priorityscore=1501 bulkscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2303150002
- definitions=main-2303170096
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -94,74 +108,81 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 17 Mar 2023 14:32:50 +0100
-Nina Schoetterl-Glausch <nsg@linux.ibm.com> wrote:
+On Fri, 17 Mar 2023 00:57:23 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
 
-> Instructions on s390 must be halfword aligned.
-> Add two tests for that.
-> These currently fail when using TCG, Ilya Leoshkevich <iii@linux.ibm.com>
-> posted fixes to the qemu mailing list.
+> > From: Alex Williamson
+> > Sent: Friday, March 17, 2023 8:23 AM
+> > 
+> > On Thu, 16 Mar 2023 23:29:21 +0000
+> > "Tian, Kevin" <kevin.tian@intel.com> wrote:
+> >   
+> > > > From: Alex Williamson
+> > > > Sent: Friday, March 17, 2023 2:46 AM
+> > > >
+> > > > On Wed, 15 Mar 2023 23:31:23 +0000
+> > > > "Tian, Kevin" <kevin.tian@intel.com> wrote:
+> > > >  
+> > > > > > From: Alex Williamson <alex.williamson@redhat.com>
+> > > > > > Sent: Thursday, March 16, 2023 6:53 AM
+> > > > > > I'm afraid this proposal reduces or eliminates the handshake we have
+> > > > > > with userspace between VFIO_DEVICE_GET_PCI_HOT_RESET_INFO  
+> > and  
+> > > > > > VFIO_DEVICE_PCI_HOT_RESET, which could promote userspace to  
+> > ignore  
+> > > > the  
+> > > > > > _INFO ioctl altogether, resulting in drivers that don't understand the
+> > > > > > scope of the reset.  Is it worth it?  What do we really gain?  
+> > > > >
+> > > > > Jason raised the concern whether GET_PCI_HOT_RESET_INFO is actually
+> > > > > useful today.
+> > > > >
+> > > > > It's an interface on opened device. So the tiny difference is whether the
+> > > > > user knows the device is resettable when calling GET_INFO or later  
+> > when  
+> > > > > actually calling PCI_HOT_RESET.  
+> > > >
+> > > > No, GET_PCI_HOT_RESET_INFO conveys not only whether a  
+> > PCI_HOT_RESET  
+> > > > can
+> > > > be performed, but equally important the scope of the reset, ie. which
+> > > > devices are affected by the reset.  If we de-emphasize the INFO
+> > > > portion, then this easily gets confused as just a variant of
+> > > > VFIO_DEVICE_RESET, which is explicitly a device-level cscope reset.  In
+> > > > fact, I'd say the interface is not only trying to validate that the
+> > > > user has sufficient privileges for the reset, but that they explicitly
+> > > > acknowledge the scope of the reset.
+> > > >  
+> > >
+> > > IMHO the usefulness of scope is if it's discoverable by the management
+> > > stack which then can try to assign devices with affected reset to a same
+> > > user.  
+> > 
+> > Disagree, the user needs to know the scope of reset.  Take for instance
+> > two function of a device configured onto separate buses within a VM.
+> > The VMM needs to know that a hot-reset of one will reset the other.
+> > That's not obvious to the VMM without some understanding of PCI/e
+> > topology and analysis of the host system.  The info ioctl simplifies
+> > that discovery for the VMM and the handshake of passing the affected
+> > groups makes sure that the info ioctl remains relevant.  
+> 
+> If that is the intended usage then I don't see why this proposal will
+> promote userspace to ignore the _INFO ioctl. It should be always
+> queried no matter how the reset ioctl itself is designed. The motivation
+> of calling _INFO is not from the reset ioctl asking for an array of fds.
 
-Whole series:
+The VFIO_DEVICE_PCI_HOT_RESET ioctl requires a set of group (or cdev)
+fds that encompass the set of affected devices reported by the
+VFIO_DEVICE_GET_PCI_HOT_RESET_INFO ioctl, so I don't agree with the
+last sentence above.
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+This proposal seems to be based on some confusion about the difference
+between VFIO_DEVICE_RESET and VFIO_DEVICE_PCI_HOT_RESET, and therefore
+IMO, proliferates that confusion by making the scope argument optional,
+which I see as a key difference.  This therefore makes the behavior of
+the ioctl less intuitive, easier to get wrong, and I expect we'll see
+users unitentionally resetting devices beyond the desired scope if the
+group/device fd array is allowed to be empty.  Thanks,
 
-
-> 
-> v3 -> v4:
->  * zero whole register with xgr (thanks Janosch)
->  * pick up tags (thanks Janosch)
-> 
-> v2 -> v3:
->  * pick up R-b (thanks Janosch)
->  * use br instead of bcr (thanks Claudio)
->  * use text section instead of rodata for ex target (thanks Claudio)
->  * fix label position (thanks Claudio)
-> 
-> v1 -> v2:
->  * rebase
->  * use PSW macros
->  * simplify odd psw test (thanks Claudio)
->  * rename some identifiers
->  * pick up R-b (thanks Claudio)
-> 
-> Nina Schoetterl-Glausch (3):
->   s390x/spec_ex: Use PSW macro
->   s390x/spec_ex: Add test introducing odd address into PSW
->   s390x/spec_ex: Add test of EXECUTE with odd target address
-> 
->  s390x/spec_ex.c | 85 +++++++++++++++++++++++++++++++++++++++++++------
->  1 file changed, 76 insertions(+), 9 deletions(-)
-> 
-> Range-diff against v3:
-> 1:  6ae1eb7d = 1:  c00f8aa2 s390x/spec_ex: Use PSW macro
-> 2:  a0d02438 ! 2:  d9e3f6e0 s390x/spec_ex: Add test introducing odd address into PSW
->     @@ Commit message
->          the odd address.
->          Add a test for this.
->      
->     +    Acked-by: Janosch Frank <frankja@linux.ibm.com>
->          Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
->      
->       ## s390x/spec_ex.c ##
->     @@ s390x/spec_ex.c: static int psw_bit_12_is_1(void)
->      +
->      +	expect_invalid_psw(odd);
->      +	fixup_psw.mask = extract_psw_mask();
->     -+	asm volatile ( "xr	%%r0,%%r0\n"
->     ++	asm volatile ( "xgr	%%r0,%%r0\n"
->      +		"	larl	%%r1,0f\n"
->      +		"	stg	%%r1,%[fixup_addr]\n"
->      +		"	lpswe	%[odd_psw]\n"
-> 3:  e771deeb ! 3:  7ea75611 s390x/spec_ex: Add test of EXECUTE with odd target address
->     @@ Commit message
->          specification exception occurs.
->          Add a test for this.
->      
->     +    Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
->          Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
->      
->       ## s390x/spec_ex.c ##
-> 
-> base-commit: 20de8c3b54078ebc3df0b47344f9ce55bf52b7a5
+Alex
 
