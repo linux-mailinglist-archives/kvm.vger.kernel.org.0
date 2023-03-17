@@ -2,124 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 70FEB6BEDF4
-	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 17:21:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E2EA66BEE82
+	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 17:38:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230343AbjCQQVD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Mar 2023 12:21:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59592 "EHLO
+        id S230110AbjCQQiM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Mar 2023 12:38:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230261AbjCQQVC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Mar 2023 12:21:02 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72E0B26C3A
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 09:21:00 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id x4-20020a170902ec8400b001a1a5f6f272so1501929plg.1
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 09:21:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679070060;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7o24l6fiOGywvlphm2ivpMOdYXRizefraPoQnT9L//E=;
-        b=Q6gE273gkihi8mp0lUkxiT8ezb4i1bDN5mWojYXiFSbCt1gdV+GSm119e73GRHWveU
-         BX7oyl+NnMHXsGN0MoPCc5ADNRD9sMejdGVqQyg1BFFO+uKHTSqgfBCRkwOUFIMy3VRm
-         e9vrQ82Ak82Vfdr9u6yGZj6llbXvEMnk70DuJ6YhG9BhuixwafqpMoEX7hMO/92chbuY
-         bowzGc908/CczWahD6JUJnaErwDYpFxrNsajMOceS8iF7nwQloz2BK0RucdP6gGBXynX
-         TFjqAiKOslA8OqK+bdesF3cFxwkvsaaR83lJqgaTZQjWZJ8ETLkbSOmv3RxQ5lOu3Quv
-         FfgQ==
+        with ESMTP id S230203AbjCQQiJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Mar 2023 12:38:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2EDDE5015
+        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 09:37:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679071030;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=/y8zeyjefSkAOA8QaVCpOrFBrFGYMJHgyLbILMS2iqI=;
+        b=Itg1dqZFtmvV3Hi3nAKcNbD0tFFUWhaV68GVG4OkNjDGec9x46VhWSMFBRNvsTsmJyaYeK
+        c8/C1EZNtiwUbKMffADm7yJShx9I11B3uTti+6aBSxcCQ0EZizYUbDLyY4JdTuGrWW5XCr
+        okAU7QkClBks+nPvmv+kYZglChNTqdc=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-57-y6bOqFewNo-83eMZv65nqQ-1; Fri, 17 Mar 2023 12:37:09 -0400
+X-MC-Unique: y6bOqFewNo-83eMZv65nqQ-1
+Received: by mail-wm1-f69.google.com with SMTP id bd26-20020a05600c1f1a00b003ed23f09060so2113487wmb.3
+        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 09:37:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679070060;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7o24l6fiOGywvlphm2ivpMOdYXRizefraPoQnT9L//E=;
-        b=2dt/lwAClznl7pAqHLDIvwnSsLNsOLlq3wJaS2nH65AKYgscGfsrq/+up57T1Dtl3E
-         x8Cw3+alutKTFJVMrmUCtfO58apr4HbMcgiYFj9d0tsp2+xxSW5kZT7WvG7VRByY5gP5
-         l1K7wpzhq0jLtYmFp3IgEG6o5FIhWpql1LUlFB6be8xfs4XdwKM2oW+p7HAwNFRiKIdA
-         wjfOQ6Nupn1rvVDefZ57ldJoD8GpOPVQnm8kiUwD1+Q7WHw5OrMRr3MiMGhmAY4pqa4N
-         AtourQ3XZOIKzN8DG/y/USwaajTHa8D6cuB98f/1K9//pqJuXtMPLmHn8XTw7+EXAOtS
-         QFfA==
-X-Gm-Message-State: AO0yUKX2EyfluqRnUb2n5QtwAV93KZURicGTbxrWSmXcGvenVBdH9wER
-        5njiHHFDk4Gf9gJEL68uS7DAbxnT97c=
-X-Google-Smtp-Source: AK7set/8zojERNqCXTgL/pFzMwr+KZPa+uB5aM7ijsiHAnfP0EdMkqyDGbo32YXbT/II5YP93V991/QrGl8=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:17a7:b0:23d:34db:f5be with SMTP id
- q36-20020a17090a17a700b0023d34dbf5bemr2467306pja.4.1679070059931; Fri, 17 Mar
- 2023 09:20:59 -0700 (PDT)
-Date:   Fri, 17 Mar 2023 09:20:58 -0700
-In-Reply-To: <ZBQaFRdRawenuEan@yzhao56-desk.sh.intel.com>
-Mime-Version: 1.0
-References: <20230311002258.852397-1-seanjc@google.com> <20230311002258.852397-17-seanjc@google.com>
- <ZBQaFRdRawenuEan@yzhao56-desk.sh.intel.com>
-Message-ID: <ZBSTapUu+VzWmIfQ@google.com>
-Subject: Re: [PATCH v2 16/27] KVM: x86: Add a new page-track hook to handle
- memslot deletion
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>, kvm@vger.kernel.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-kernel@vger.kernel.org,
-        Ben Gardon <bgardon@google.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        d=1e100.net; s=20210112; t=1679071028;
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/y8zeyjefSkAOA8QaVCpOrFBrFGYMJHgyLbILMS2iqI=;
+        b=KXTNM8Xls8Pb0pDroHeNgv+0Z04Ev9Z1dKXCwFhtfXdcoEMxTEfIj8ZBTcGjOYuqSE
+         wp6TyNrB/gQP5EJjoIwCKVFFu/5N56xHNde3O0oGfL7fw1DrJ75O2Sm/yJaq2aYyAmGg
+         uemC+HyBeF0gHPldEJ8lDCCAvbJRw4DdUjnlyxYXU7SwnAIptC+QlVhcncTUsBb73WAz
+         voAWR5NY4cDXg3LS3GhfxMfqvA1osthsMtr0uNILdNOASzYHOQl79pFsbqrxGDHbBMKb
+         ohi+QHZzcF0MOvnIfPWQV0qG0BFimYNZGmjJ0z1Nq3pWopby+9SY5axbpIMi2RCDGp/s
+         2P8g==
+X-Gm-Message-State: AO0yUKUvC7/bQuOu+qe59FjvvyfHf4jbXHNilkNx+bjFQpxDkyJfl09q
+        byUrKa5SAsrgbGfDQRoJiouUpM2dUX569P3nvDV3eakaNGpO0N1N2qz/iZspphuMx/rEwkGX5I9
+        ac/tfmXDEj9FgfC2y9hgWbSk=
+X-Received: by 2002:a05:600c:1ca3:b0:3ed:2606:d236 with SMTP id k35-20020a05600c1ca300b003ed2606d236mr16059363wms.38.1679071028477;
+        Fri, 17 Mar 2023 09:37:08 -0700 (PDT)
+X-Google-Smtp-Source: AK7set9Ka1YJT0wlT1v41EY76h2N25wauHSUbnsUXmKdCysd1FXD0NvtHiK6LvC3TM0IMjwUTmDwSQ==
+X-Received: by 2002:a05:600c:1ca3:b0:3ed:2606:d236 with SMTP id k35-20020a05600c1ca300b003ed2606d236mr16059346wms.38.1679071028165;
+        Fri, 17 Mar 2023 09:37:08 -0700 (PDT)
+Received: from [192.168.8.107] (tmo-099-146.customers.d1-online.com. [80.187.99.146])
+        by smtp.gmail.com with ESMTPSA id l26-20020a05600c2cda00b003dd1bd0b915sm8514948wmc.22.2023.03.17.09.37.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 17 Mar 2023 09:37:07 -0700 (PDT)
+Message-ID: <d9d18828-596f-cd92-887d-aa3c7cbb6e6f@redhat.com>
+Date:   Fri, 17 Mar 2023 17:37:05 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Content-Language: en-US
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Ilya Leoshkevich <iii@linux.ibm.com>
+References: <20230315155445.1688249-1-nsg@linux.ibm.com>
+ <20230315155445.1688249-4-nsg@linux.ibm.com>
+ <86aa2246-07ff-8fb9-ad97-3b68e8b8f109@redhat.com>
+ <8deaddfe-dc69-ec3c-4c8c-a76ee17e6513@redhat.com>
+ <20230317163654.211830c0@p-imbrenda>
+From:   Thomas Huth <thuth@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v3 3/3] s390x/spec_ex: Add test of EXECUTE
+ with odd target address
+In-Reply-To: <20230317163654.211830c0@p-imbrenda>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,RCVD_IN_SORBS_WEB,SPF_HELO_NONE,
+        SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 17, 2023, Yan Zhao wrote:
-> On Fri, Mar 10, 2023 at 04:22:47PM -0800, Sean Christopherson wrote:
-> > From: Yan Zhao <yan.y.zhao@intel.com>
-> > 
-> > Add a new page-track hook, track_remove_region(), that is called when a
-> > memslot DELETE operation is about to be committed.  The "remove" hook
-> > will be used by KVMGT and will effectively replace the existing
-> > track_flush_slot() altogether now that KVM itself doesn't rely on the
-> > "flush" hook either.
-> > 
-> > The "flush" hook is flawed as it's invoked before the memslot operation
-> > is guaranteed to succeed, i.e. KVM might ultimately keep the existing
-> > memslot without notifying external page track users, a.k.a. KVMGT.  In
-> > practice, this can't currently happen on x86, but there are no guarantees
-> > that won't change in the future, not to mention that "flush" does a very
-> > poor job of describing what is happening.
-> > 
-> > Pass in the gfn+nr_pages instead of the slot itself so external users,
-> > i.e. KVMGT, don't need to exposed to KVM internals (memslots).  This will
-> > help set the stage for additional cleanups to the page-track APIs.
-> > 
-> > Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
-> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> > Co-developed-by: Sean Christopherson <seanjc@google.com>
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ...
+On 17/03/2023 16.36, Claudio Imbrenda wrote:
+> On Fri, 17 Mar 2023 15:11:35 +0100
+> Thomas Huth <thuth@redhat.com> wrote:
 > 
-> > +void kvm_page_track_delete_slot(struct kvm *kvm, struct kvm_memory_slot *slot)
-> > +{
-> > +	struct kvm_page_track_notifier_head *head;
-> > +	struct kvm_page_track_notifier_node *n;
-> > +	int idx;
-> > +
-> > +	head = &kvm->arch.track_notifier_head;
-> > +
-> > +	if (hlist_empty(&head->track_notifier_list))
-> > +		return;
-> > +
-> > +	idx = srcu_read_lock(&head->track_srcu);
-> > +	hlist_for_each_entry_srcu(n, &head->track_notifier_list, node,
-> > +				srcu_read_lock_held(&head->track_srcu))
-> Sorry, not sure why the alignment here is not right.
-> Patchwork just sent me a mail to complain about it.
-> Would you mind helping fix it in the next version?
+>> On 17/03/2023 15.09, Thomas Huth wrote:
+>>> On 15/03/2023 16.54, Nina Schoetterl-Glausch wrote:
+>>>> The EXECUTE instruction executes the instruction at the given target
+>>>> address. This address must be halfword aligned, otherwise a
+>>>> specification exception occurs.
+>>>> Add a test for this.
+>>>>
+>>>> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+>>>> ---
+>>>>    s390x/spec_ex.c | 25 +++++++++++++++++++++++++
+>>>>    1 file changed, 25 insertions(+)
+>>>>
+>>>> diff --git a/s390x/spec_ex.c b/s390x/spec_ex.c
+>>>> index 83b8c58e..5fa05dba 100644
+>>>> --- a/s390x/spec_ex.c
+>>>> +++ b/s390x/spec_ex.c
+>>>> @@ -177,6 +177,30 @@ static int short_psw_bit_12_is_0(void)
+>>>>        return 0;
+>>>>    }
+>>>> +static int odd_ex_target(void)
+>>>> +{
+>>>> +    uint64_t pre_target_addr;
+>>>> +    int to = 0, from = 0x0dd;
+>>>> +
+>>>> +    asm volatile ( ".pushsection .text.ex_odd\n"
+>>>> +        "    .balign    2\n"
+>>>> +        "pre_odd_ex_target:\n"
+>>>> +        "    . = . + 1\n"
+>>>> +        "    lr    %[to],%[from]\n"
+>>>> +        "    .popsection\n"
+>>>> +
+>>>> +        "    larl    %[pre_target_addr],pre_odd_ex_target\n"
+>>>> +        "    ex    0,1(%[pre_target_addr])\n"
+>>>> +        : [pre_target_addr] "=&a" (pre_target_addr),
+>>>> +          [to] "+d" (to)
+>>>> +        : [from] "d" (from)
+>>>> +    );
+>>>> +
+>>>> +    assert((pre_target_addr + 1) & 1);
+>>>> +    report(to != from, "did not perform ex with odd target");
+>>>> +    return 0;
+>>>> +}
+>>>
+>>> Can this be triggered with KVM, or is this just a test for TCG?
+>>
+>> With "triggered" I mean: Can this cause an interception in KVM?
+> 
+> AFAIK no, but KVM and TCG are not the only things we might want to test.
 
-Ah, it's off by two spaces, should be 
+Ok, fair, KVM unit tests are not for KVM only anymore since quite a while, 
+so if this is helpful elsewhere, I'm fine with this.
 
-	hlist_for_each_entry_srcu(n, &head->track_notifier_list, node,
-				  srcu_read_lock_held(&head->track_srcu))
+Acked-by: Thomas Huth <thuth@redhat.com>
 
-I'll get it fixed in the next version.
