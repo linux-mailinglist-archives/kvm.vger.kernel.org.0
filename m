@@ -2,65 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 04E766BE1DD
-	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 08:25:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7EDA36BE1E3
+	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 08:27:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230329AbjCQHZj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Mar 2023 03:25:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50338 "EHLO
+        id S230234AbjCQH1E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Mar 2023 03:27:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230308AbjCQHZ0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Mar 2023 03:25:26 -0400
+        with ESMTP id S229532AbjCQH1C (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Mar 2023 03:27:02 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 631AB37569
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 00:24:38 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A738475A66
+        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 00:26:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679037877;
+        s=mimecast20190719; t=1679037980;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=xW5YRWUqoI7YaHI7gPZKm4zvNmnVkp4WxZPUXFEvJBo=;
-        b=OnDUM4ca2p/TJYhsHtnYSvFbnWlXbO5i6hGFsmuk7AQBj/mfd3vZZQ33Gjfb+Tb76tW3la
-        pup2VhwgRTcOuDOgB4HkRgKL04ZyMWznPmJvAOi0KYdQxhgTuDlbBbF6fr/jyuPK8MSGMn
-        Z2GkYYpcIsGO1T50laN6BD5OnPIPWvY=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=HqrnyekWZtj3autRtqGDoL7x0MtC0GOcxCuc87fpusU=;
+        b=cwqTXZ6Rf74awlOSXm30HQtAMEbGYIqy6g9ONZEL/6Obr36tmsNChL72QgAajhJ/6V/l8B
+        ZIywMCqnc65ZvcGuIarBCBRY4sa8WFo+x0+My3mYbrEGFCDSUDto4BXtesvQCpIvMrJx9x
+        ujnqI2r5XxU1Fu1ZEKJRL48xKjnEv+g=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-367-3iQg6cx3MvuAuskM3JSXtw-1; Fri, 17 Mar 2023 03:24:35 -0400
-X-MC-Unique: 3iQg6cx3MvuAuskM3JSXtw-1
-Received: by mail-wm1-f69.google.com with SMTP id n38-20020a05600c3ba600b003ed29a0b729so1873289wms.9
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 00:24:35 -0700 (PDT)
+ us-mta-643-JLensYKlN1Wh_hrfm2Mo8w-1; Fri, 17 Mar 2023 03:26:17 -0400
+X-MC-Unique: JLensYKlN1Wh_hrfm2Mo8w-1
+Received: by mail-wm1-f72.google.com with SMTP id m28-20020a05600c3b1c00b003ed307fddadso3867703wms.4
+        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 00:26:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679037874;
+        d=1e100.net; s=20210112; t=1679037976;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xW5YRWUqoI7YaHI7gPZKm4zvNmnVkp4WxZPUXFEvJBo=;
-        b=AuU8Xgn/bAS6fhqA30n8aTm2QRurW0gQGkwILQmzj16uun5ooIYTVcbbX4+jPE3gwo
-         yBMkOVsRSjR9kYVYnsTeR1GNZa1bE+vF2Vav3PFiEp/3xCXoDlh3gw4VyeApX2E3PlMc
-         dcv5VTnB2nk/KuiMNh9JsGQNzhLAVs9QxbTsAng/ilsTSb9U2lDFa/1gBjR9ziS99pA8
-         2rDDb4N5VHdm20zoAJ3bOcbLQo/1NqCZoK44R27NvXqew6PLDDOdXSmvfNIAS0k3ANCd
-         22Wau70Y2UdGEg7NJMIVKX2kyGb1RhkwKMaB2ofxq2GUvq+X9D2OE9Zmlv2uoT2fWaa6
-         Qwmw==
-X-Gm-Message-State: AO0yUKWemqYrolImtKSXYbdElmGQx0CbOsHnuwEtRr3hHfktvbQ7tYB3
-        OxOPzSiKrPzmw0L26jHaudTiPDisgDw7ymwjAF891V428fB9XiHHo6hpgQdZlVrn3fGJsfuu1LI
-        G+IlbQjYb7AR5
-X-Received: by 2002:a5d:4d06:0:b0:2c7:daa:1c56 with SMTP id z6-20020a5d4d06000000b002c70daa1c56mr5851951wrt.4.1679037874684;
-        Fri, 17 Mar 2023 00:24:34 -0700 (PDT)
-X-Google-Smtp-Source: AK7set+aVAxUwOvFA/ilN/jNay4xxCe5XpeNTShUolDwE3ogiowCBRVEg+sW7qmY2hMDnR5uIw2AZQ==
-X-Received: by 2002:a5d:4d06:0:b0:2c7:daa:1c56 with SMTP id z6-20020a5d4d06000000b002c70daa1c56mr5851904wrt.4.1679037874240;
-        Fri, 17 Mar 2023 00:24:34 -0700 (PDT)
+        bh=HqrnyekWZtj3autRtqGDoL7x0MtC0GOcxCuc87fpusU=;
+        b=QMhSy4v9qh4m/+5xlxcqZZv7EMnwrAWt9PJCtEBE+QpXBaSIz+/zWfoe2bvbvk8+ZH
+         JtK8GxQ+ktkhdiUl1WCEuHftlKsPGpqXAzghNVQmcIUs9ydUE3mrPlD/sAtVK9XxAo30
+         HgaA63a3CK+hEz4aLN+dzCp2QSwEyHJDIQhO3cU4x1FP2ajfQZ/3aqvaGVLwKmO1eDTd
+         kQhcO2vhoLObkx7cfeldDXBjI5ZGwQU6egnJnWAke3/LWZ3F4pbEuMMH4oIJhyPKmGat
+         vc1w3yaPjqJp9BdpdMG8qMp3eGEOQ5+m7nUPPa5wLSpYfuKUq0eoK65kiXJZ0ZkOfxRp
+         UGSA==
+X-Gm-Message-State: AO0yUKUtHZsrWV87429ipQYPEWZpIXOVgySada3Zh0y6r0erVz4LiWor
+        61KQPKVPyqTbgc7zzxXKD3q63MfOYPgmqvWyrJvV+kbAb8S+GTYuwwL3K7V0Ev4yVHO7RAtUdBN
+        Hbwil6GOU4Ch7
+X-Received: by 2002:a05:600c:4fce:b0:3ed:24f6:1089 with SMTP id o14-20020a05600c4fce00b003ed24f61089mr16092854wmq.15.1679037976078;
+        Fri, 17 Mar 2023 00:26:16 -0700 (PDT)
+X-Google-Smtp-Source: AK7set/Gl8eTfcazshyynddIacq5+dgKonMcbVTvMaTdoQMnA6FrXfJgH39r0LtsNqEKcjgiAOfLyA==
+X-Received: by 2002:a05:600c:4fce:b0:3ed:24f6:1089 with SMTP id o14-20020a05600c4fce00b003ed24f61089mr16092826wmq.15.1679037975745;
+        Fri, 17 Mar 2023 00:26:15 -0700 (PDT)
 Received: from [192.168.0.3] (ip-109-43-176-33.web.vodafone.de. [109.43.176.33])
-        by smtp.gmail.com with ESMTPSA id y1-20020a5d4ac1000000b002ceaeb24c0asm1262440wrs.58.2023.03.17.00.24.29
+        by smtp.gmail.com with ESMTPSA id c22-20020a7bc856000000b003dc42d48defsm1479979wml.6.2023.03.17.00.26.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Mar 2023 00:24:32 -0700 (PDT)
-Message-ID: <95ef3696-f934-376e-ee88-687477a32242@redhat.com>
-Date:   Fri, 17 Mar 2023 08:24:28 +0100
+        Fri, 17 Mar 2023 00:26:14 -0700 (PDT)
+Message-ID: <e3e19ba8-6574-c989-ad02-25fabe5956f9@redhat.com>
+Date:   Fri, 17 Mar 2023 08:26:09 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.13.0
-Subject: Re: [PATCH v2 05/32] gitlab: update centos-8-stream job
+Subject: Re: [PATCH v2 31/32] contrib/gitdm: add more individual contributors
 Content-Language: en-US
 To:     =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
         qemu-devel@nongnu.org
@@ -120,11 +120,15 @@ Cc:     Akihiko Odaki <akihiko.odaki@gmail.com>,
         Beniamino Galvani <b.galvani@gmail.com>,
         Paul Durrant <paul@xen.org>, Bin Meng <bin.meng@windriver.com>,
         Sunil Muthuswamy <sunilmut@microsoft.com>,
-        Hanna Reitz <hreitz@redhat.com>, Peter Xu <peterx@redhat.com>
+        Hanna Reitz <hreitz@redhat.com>, Peter Xu <peterx@redhat.com>,
+        Bernhard Beschow <shentey@gmail.com>,
+        Amarjargal Gundjalam <amarjargal16@gmail.com>,
+        Bin Meng <bmeng@tinylab.org>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>
 References: <20230315174331.2959-1-alex.bennee@linaro.org>
- <20230315174331.2959-6-alex.bennee@linaro.org>
+ <20230315174331.2959-32-alex.bennee@linaro.org>
 From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20230315174331.2959-6-alex.bennee@linaro.org>
+In-Reply-To: <20230315174331.2959-32-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -138,20 +142,30 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 15/03/2023 18.43, Alex Bennée wrote:
-> A couple of clean-ups here:
-> 
->    - inherit from the custom runners job for artefacts
-
-I know, it's a difference between BE and AE, but in case you want to be 
-consistent with the yml: s/artefacts/artifacts/
-
->    - call check-avocado directly
->    - add some comments to the top about setup
+> I've only added the names explicitly acked.
 > 
 > Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> Cc: Bernhard Beschow <shentey@gmail.com>
+> Cc: Amarjargal Gundjalam <amarjargal16@gmail.com>
+> Cc: Bin Meng <bmeng@tinylab.org>
+> Cc: Jason A. Donenfeld <Jason@zx2c4.com>
+> Cc: Strahinja Jankovic <strahinja.p.jankovic@gmail.com>
+> Acked-by: Bernhard Beschow <shentey@gmail.com>
+> Message-Id: <20230310180332.2274827-10-alex.bennee@linaro.org>
 > ---
->   .../custom-runners/centos-stream-8-x86_64.yml  | 18 ++++++------------
->   1 file changed, 6 insertions(+), 12 deletions(-)
+>   contrib/gitdm/group-map-individuals | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/contrib/gitdm/group-map-individuals b/contrib/gitdm/group-map-individuals
+> index e2263a5ee3..3264c7383d 100644
+> --- a/contrib/gitdm/group-map-individuals
+> +++ b/contrib/gitdm/group-map-individuals
+> @@ -38,3 +38,4 @@ paul@nowt.org
+>   git@xen0n.name
+>   simon@simonsafar.com
+>   research_trasio@irq.a4lg.com
+> +shentey@gmail.com
 
+FWIW:
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 
