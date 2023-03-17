@@ -2,121 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 779DA6BE4D7
-	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 10:05:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CCAC6BE500
+	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 10:10:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230426AbjCQJFk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Mar 2023 05:05:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52212 "EHLO
+        id S230160AbjCQJKM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Mar 2023 05:10:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231993AbjCQJFQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Mar 2023 05:05:16 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7326310DE47;
-        Fri, 17 Mar 2023 02:03:55 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id AF559B82546;
-        Fri, 17 Mar 2023 09:03:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61E38C433D2;
-        Fri, 17 Mar 2023 09:03:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1679043832;
-        bh=RrbCxRQbeYh+QHF+SQ74FvWDUfJeosjdXICD/8hIBR0=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=LkYEb5vLxw9Pnphh2sN+xstLaO1E8fOa8cuAwYfKL+3NIAbTObJvfmjcAmjQxqsLv
-         CpvtLKj8vbYdaViupwyXxgujt12LuBAPg5UqqBCDENNXHSy39O1FUnYM+OLdAzckNm
-         dL1a/HcC1vCJMyVbsfN3z++Kq23lYYBA/pR2M3DYLYD7O7Sl9T7YF0tkODYBkzj3N1
-         1Opcm/BJ6MIvr7POaOJkskIrG3uo7r0W9kCN9PQ/o7kvOYvORZh/ow5aiFWGhvh5UW
-         /14GSRz/beCTNJqYdPSe5m6GCrz7lERRSVF8HdtSpfEIdD/w5azEMBJfQC/7XW4nOh
-         szugRJkAY8v3A==
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1pd606-000tA9-51;
-        Fri, 17 Mar 2023 09:03:50 +0000
+        with ESMTP id S231742AbjCQJKH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Mar 2023 05:10:07 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F1DB30FC;
+        Fri, 17 Mar 2023 02:10:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1679044205; x=1710580205;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Y/mA9juw6Wk0h1jZipjb8f6HQJ6J3W6r/nV9wFA+39w=;
+  b=It4JmmxAA71WbjHhbiKnSBbk+Rjm6VQrHM2tUlK1kpAniGR0x+o0XJUZ
+   UVdmB2+jMRKFzjPHSdtofXuR4aNlpGXLRCHwk4c8RqTYZtPwzLir+quUU
+   8/GkC+KsCKLhUxO75NtIcRuLuTEb5wCwiq0GO+iFE87/NsvevqINxngZi
+   gsKykButcfouXsKZaKxSjjURX2Nl4w9b3Ub+B8BUIRuY0dqDN6UJciiIS
+   1OcEJhMROC7MpRPnbFP7nFu/sSWJxST4bmK+/oG41fa8i8VBXHQmDRQ+y
+   v/jbBsvCf2oallEBTKBpojGhVDyD+SxOhn7Tow8WhFOhkLTef2PVeVL5L
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10651"; a="340581205"
+X-IronPort-AV: E=Sophos;i="5.98,268,1673942400"; 
+   d="scan'208";a="340581205"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2023 02:10:04 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10651"; a="710428979"
+X-IronPort-AV: E=Sophos;i="5.98,268,1673942400"; 
+   d="scan'208";a="710428979"
+Received: from xliu2-mobl1.ccr.corp.intel.com (HELO localhost) ([10.255.29.180])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2023 02:09:58 -0700
+Date:   Fri, 17 Mar 2023 17:09:53 +0800
+From:   Yu Zhang <yu.c.zhang@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Yu Zhang <yu.c.zhang@linux.intel.com>, pbonzini@redhat.com,
+        shuah@kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: selftest: Add dependency rules in makefile for C
+ source code
+Message-ID: <20230317090953.qkduwduutcam4ho2@linux.intel.com>
+References: <20230127133601.1165472-1-yu.c.zhang@linux.intel.com>
+ <ZBJMc24vyL3X9RHa@google.com>
 MIME-Version: 1.0
-Date:   Fri, 17 Mar 2023 09:03:50 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Will Deacon <will@kernel.org>,
-        Quentin Perret <qperret@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        David Matlack <dmatlack@google.com>, stable@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] KVM: arm64: Disable interrupts while walking
- userspace PTs
-In-Reply-To: <ZBOpVLEPEJazjyGD@linux.dev>
-References: <20230316174546.3777507-1-maz@kernel.org>
- <20230316174546.3777507-2-maz@kernel.org> <ZBOpVLEPEJazjyGD@linux.dev>
-User-Agent: Roundcube Webmail/1.4.13
-Message-ID: <760caa64691576b728c224bbbfdd18a4@kernel.org>
-X-Sender: maz@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, ardb@kernel.org, will@kernel.org, qperret@google.com, seanjc@google.com, dmatlack@google.com, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZBJMc24vyL3X9RHa@google.com>
+User-Agent: NeoMutt/20171215
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023-03-16 23:42, Oliver Upton wrote:
-> Marc,
-> 
-> On Thu, Mar 16, 2023 at 05:45:45PM +0000, Marc Zyngier wrote:
->> We walk the userspace PTs to discover what mapping size was
->> used there. However, this can race against the userspace tables
->> being freed, and we end-up in the weeds.
->> 
->> Thankfully, the mm code is being generous and will IPI us when
->> doing so. So let's implement our part of the bargain and disable
->> interrupts around the walk. This ensures that nothing terrible
->> happens during that time.
->> 
->> We still need to handle the removal of the page tables before
->> the walk. For that, allow get_user_mapping_size() to return an
->> error, and make sure this error can be propagated all the way
->> to the the exit handler.
->> 
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> Cc: stable@vger.kernel.org
-> 
-> Looks good. I've squashed in this meaningless diff to make use of an 
-> existing
-> helper.
-> 
-> 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index e95593736ae3..3b9d4d24c361 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -691,7 +691,7 @@ static int get_user_mapping_size(struct kvm *kvm, 
-> u64 addr)
->  		return -EFAULT;
-> 
->  	/* Oops, the userspace PTs are gone... Replay the fault */
-> -	if (!(pte & PTE_VALID))
-> +	if (!kvm_pte_valid(pte))
->  		return -EAGAIN;
+> Do we actually need to omit -MD here?  IIUC, it just means that the .d file will
+> get redundantly generated when building the final executable.  I would much prefer
+> to build everything with the same options unless there's a good reason not to,
+> e.g. this patch doesn't feed -MD into the LIBKVM_STRING_OBJ target, which seems
+> wrong.
 
-Sure, LGTM.
+No, we don't. I added "-MD" in EXTRA_CFLAGS, so that only .o files would
+be impacted when generating dependency files. But it is unnecessary.
 
-Thanks,
+As to the LIBKVM_STRING_OBJ target, it is my negligence. :)
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+I tried your suggested fix, and it works fine. Will send out v2(based on
+selftests branch of github.com/kvm-x86/linux). Thanks!
+
+B.R.
+Yu
+> 
+> I.e. why not simply
+> 
+> ---
+>  tools/testing/selftests/kvm/Makefile | 17 +++++++++++++++--
+>  1 file changed, 15 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index 152c1a988e42..faaf65aa7621 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -182,6 +182,8 @@ TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(ARCH_DIR))
+>  TEST_GEN_PROGS_EXTENDED += $(TEST_GEN_PROGS_EXTENDED_$(ARCH_DIR))
+>  LIBKVM += $(LIBKVM_$(ARCH_DIR))
+>  
+> +OVERRIDE_TARGETS = 1
+> +
+>  # lib.mak defines $(OUTPUT), prepends $(OUTPUT)/ to $(TEST_GEN_PROGS), and most
+>  # importantly defines, i.e. overwrites, $(CC) (unless `make -e` or `make CC=`,
+>  # which causes the environment variable to override the makefile).
+> @@ -196,7 +198,7 @@ else
+>  LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/$(ARCH)/include
+>  endif
+>  CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
+> -	-Wno-gnu-variable-sized-type-not-at-end \
+> +	-Wno-gnu-variable-sized-type-not-at-end -MD \
+>  	-fno-builtin-memcmp -fno-builtin-memcpy -fno-builtin-memset \
+>  	-fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
+>  	-I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
+> @@ -223,7 +225,18 @@ LIBKVM_S_OBJ := $(patsubst %.S, $(OUTPUT)/%.o, $(LIBKVM_S))
+>  LIBKVM_STRING_OBJ := $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM_STRING))
+>  LIBKVM_OBJS = $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ) $(LIBKVM_STRING_OBJ)
+>  
+> -EXTRA_CLEAN += $(LIBKVM_OBJS) cscope.*
+> +TEST_GEN_OBJ = $(patsubst %, %.o, $(TEST_GEN_PROGS))
+> +TEST_GEN_OBJ += $(patsubst %, %.o, $(TEST_GEN_PROGS_EXTENDED))
+> +TEST_DEP_FILES = $(patsubst %.o, %.d, $(TEST_GEN_OBJ))
+> +TEST_DEP_FILES += $(patsubst %.o, %.d, $(LIBKVM_OBJS))
+> +-include $(TEST_DEP_FILES)
+> +
+> +$(TEST_GEN_PROGS) $(TEST_GEN_PROGS_EXTENDED): %: %.o
+> +	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $< $(LIBKVM_OBJS) $(LDLIBS) -o $@
+> +$(TEST_GEN_OBJ): %.o: %.c
+> +	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
+> +
+> +EXTRA_CLEAN += $(LIBKVM_OBJS) $(TEST_DEP_FILES) $(TEST_GEN_OBJ) cscope.*
+>  
+>  x := $(shell mkdir -p $(sort $(dir $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ))))
+>  $(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c
+> 
+> base-commit: 95b9779c1758f03cf494e8550d6249a40089ed1c
+> -- 
+> 
