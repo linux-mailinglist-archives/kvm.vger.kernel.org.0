@@ -2,71 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0376B6BF54E
-	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 23:44:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 81D816BF551
+	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 23:45:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229778AbjCQWot (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Mar 2023 18:44:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36444 "EHLO
+        id S230443AbjCQWpj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Mar 2023 18:45:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229541AbjCQWos (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Mar 2023 18:44:48 -0400
-Received: from mail-ua1-x92f.google.com (mail-ua1-x92f.google.com [IPv6:2607:f8b0:4864:20::92f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C913BDD06
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 15:44:47 -0700 (PDT)
-Received: by mail-ua1-x92f.google.com with SMTP id m5so4328503uae.11
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 15:44:47 -0700 (PDT)
+        with ESMTP id S229680AbjCQWph (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Mar 2023 18:45:37 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 329ECC4E87
+        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 15:45:36 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-540e3b152a3so60437367b3.2
+        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 15:45:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679093086;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wMoW7IaGrOuG3tLDTSz1LptM3iWWmGYJ7XjQZj/iTVI=;
-        b=SBSCADU+yStdMahSN2OyhFXyd8MfjEo9+xwwAHORSLPJYVNKDURAS586/wLWkjlte+
-         mlJnpBpF8PoDC0O8BvHihxw30uBG9LjPq7acJNZMIvaBepIwIail3YqQmhr4ppxZO2RL
-         F1aK7tLTP8lKa/ODjxISle1g3e7/trn0HLOwOn+f0gvpG60cSDxj9Y4Pl4NK1zLGC+6y
-         h3RL9UqODe91icjSY5QYsjouKpGiMZl0yrEWYRZRVGCiYXqG7sH9ejY1Z607tzzzDvNX
-         lPuotiUhUkB3sqKK6CBgdm1h+SmUe/0GDkIchRDr8VWkXBuF6enX/ryjSgyjwXNFGavS
-         OfYQ==
+        d=google.com; s=20210112; t=1679093135;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AqXgfygPxY7mlBkz79u7U4DZ9eg5UFKA4PQmqAP4PgA=;
+        b=FS9j79UgbkR5WomZl1V+D/BZ18ux3cKkPrPE1xL79TJdXfSc6OJgU40eeuVyAKJ3Tj
+         +Lpy2cAqJGS6KxS6u2jG8S2wXPlE7zhJr+BfQKFoYXxXbaUCIxHWF0cEQHYJyokA5vxn
+         5nVfHr/0IHzTV6XHM0zCYxe7JyIzTYv6aEjYIaNOA5kCg5+vsAzbG/Rt1jxtg+9DSX+P
+         egWsAzef+3K/hz4zEFZsvaTybnC8scu1PqLSI4MHyBWuORiAdkAyfKGqW34FD9S+NnQ+
+         fHMrN4EJ0/BhvvFqw9sIFVx8KBni/HRsD02Bp27qrd9sXDKrDZIbxeKKhbI8g9aO5Cx2
+         X5BA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679093086;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wMoW7IaGrOuG3tLDTSz1LptM3iWWmGYJ7XjQZj/iTVI=;
-        b=h4uqpTvN2glqKsqS/TfG3Sy10Fa+hu3vtJhVIv46fpqg+WnqQmRbqnfffUzcTAV8KG
-         hz2khC4ZKiAf2ZVhunxJinOmlJfGdGubTYz5BmtttjmCsyP2y23cxoW7XXnYQ1Z+yzGk
-         azrKx988sq9QL7ORAr+hpXn2aB/7foyzPev0G6WBV4rSH0vKY//VY+b0x7PUtwz9Sgg0
-         NF5gvyBaIM0Pi+2gHdRpm6bKmH3DW3K3sfYc0Oa825kYBpIaaMhdvnBLQbtOR0vb7d3f
-         AwUbum1LE3Pwk8lZvvrmdxxxZzR/uT27888G79o5Fch+i8rJYQ2k5ypp3Gr8oc7CXlo8
-         3rKw==
-X-Gm-Message-State: AO0yUKW/Pdfw65ruGfMbl33H85aWh5q7/Uua+Yt6CrCcl8nk3OSI33kr
-        Bz7W6DpT8Lz5rQeSNJdPxL2n97ahkNcJ7vGmXU8h6qmVqQV/j3e+LgJWbw==
-X-Google-Smtp-Source: AK7set9zmhRAV9CcOsfYEpXonLWW/9Hhp5NEtB52djg9ZxbmjzOdTQdQqKA5Gqc0mwVshJKlrw1DzGIj3khd6xYE3LM=
-X-Received: by 2002:a05:6122:789:b0:432:595b:1cea with SMTP id
- k9-20020a056122078900b00432595b1ceamr178685vkr.7.1679093086022; Fri, 17 Mar
- 2023 15:44:46 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230315021738.1151386-1-amoorthy@google.com> <20230315021738.1151386-5-amoorthy@google.com>
- <20230317000226.GA408922@ls.amr.corp.intel.com> <CAF7b7mrTa735kDaEsJQSHTt7gpWy_QZEtsgsnKoe6c21s0jDVw@mail.gmail.com>
- <ZBTgnjXJvR8jtc4i@google.com>
-In-Reply-To: <ZBTgnjXJvR8jtc4i@google.com>
-From:   Anish Moorthy <amoorthy@google.com>
-Date:   Fri, 17 Mar 2023 15:44:09 -0700
-Message-ID: <CAF7b7mqnvLe8tw_6-cW1b2Bk8YB9qP=7BsOOJK3q-tAyDkarww@mail.gmail.com>
-Subject: Re: [WIP Patch v2 04/14] KVM: x86: Add KVM_CAP_X86_MEMORY_FAULT_EXIT
- and associated kvm_run field
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>, jthoughton@google.com,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        d=1e100.net; s=20210112; t=1679093135;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AqXgfygPxY7mlBkz79u7U4DZ9eg5UFKA4PQmqAP4PgA=;
+        b=N+M0jN6PqSa8QYohh0/lNF3PkuSZHnKiOOJzFJQfoulV/IOWL8pYO/2enP/+7hek5c
+         GYYQpW7fPZdCIjYAw5U5FTrBI4xMKSOBQo05+S5GiM0nMzhNJeNJybdS2TrGj9ZvkVlI
+         YX1IjC0UkHqCjy+uySNQKeUPoRkZCwhUaeJfTKjCJjtSIqvhWDOwP2y3nbdlQVqhUZom
+         2LwxUF06mrcdYrYk/ELfBEt4Zo5opWx/6ns2/zYzf029IES/RpPDV3zVQzUmlItaQd7T
+         JSQ7amnxUh8sXLVvDM/s6cHxMWPRutXfH0KQvu1UbJZ46L2I2IyPYML2calrqdGseysB
+         nYWA==
+X-Gm-Message-State: AO0yUKX4CcSFv6wsteAtg4EawYjJc5rJmFFrtY6y55VzTmPn78ChroPL
+        MxiWH94Z9+s9zQOuH9lGy4O/SoZO5Pw=
+X-Google-Smtp-Source: AK7set9jKryMTfEz0aawEcOiBhZ6L+WdPDV54k6PbMiRGY8l6TCBteaEhikFo/LyZLfGVBpL9Spv4wSGraI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:9786:0:b0:a58:af0b:5150 with SMTP id
+ i6-20020a259786000000b00a58af0b5150mr94019ybo.3.1679093135255; Fri, 17 Mar
+ 2023 15:45:35 -0700 (PDT)
+Date:   Fri, 17 Mar 2023 15:45:33 -0700
+In-Reply-To: <20230217193336.15278-3-minipli@grsecurity.net>
+Mime-Version: 1.0
+References: <20230217193336.15278-1-minipli@grsecurity.net> <20230217193336.15278-3-minipli@grsecurity.net>
+Message-ID: <ZBTtjTFPCRtK0Cy8@google.com>
+Subject: Re: [PATCH v2 2/2] KVM: Shrink struct kvm_mmu_memory_cache
+From:   Sean Christopherson <seanjc@google.com>
+To:     Mathias Krause <minipli@grsecurity.net>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,35 +66,10 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 17, 2023 at 2:50=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
-> I wonder if we can get away with returning -EFAULT, but still filling vcp=
-u->run
-> with KVM_EXIT_MEMORY_FAULT and all the other metadata.  That would likely=
- simplify
-> the implementation greatly, and would let KVM fill vcpu->run unconditonal=
-ly.  KVM
-> would still need a capability to advertise support to userspace, but user=
-space
-> wouldn't need to opt in.  I think this may have been my very original tho=
-ugh, and
-> I just never actually wrote it down...
+On Fri, Feb 17, 2023, Mathias Krause wrote:
+> Move the 'capacity' member around to make use of the padding hole on 64
 
-Oh, good to know that's actually an option. I thought of that too, but
-assumed that returning a negative error code was a no-go for a proper
-vCPU exit. But if that's not true then I think it's the obvious
-solution because it precludes any uncaught behavior-change bugs.
+Nit, 'nobjs' is the field that gets moved in this version.  No need for another
+version, I can fix up when applying.
 
-A couple of notes
-1. Since we'll likely miss some -EFAULT returns, we'll need to make
-sure that the user can check for / doesn't see a stale
-kvm_run::memory_fault field when a missed -EFAULT makes it to
-userspace. It's a small and easy-to-fix detail, but I thought I'd
-point it out.
-2. I don't think this would simplify the series that much, since we
-still need to find the call sites returning -EFAULT to userspace and
-populate memory_fault only in those spots to avoid populating it for
--EFAULTs which don't make it to userspace. We *could* relax that
-condition and just document that memory_fault should be ignored when
-KVM_RUN does not return -EFAULT... but I don't think that's a good
-solution from a coder/maintainer perspective.
+If no one objects, I'll plan on taking this through kvm-x86/generic.
