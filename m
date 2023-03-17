@@ -2,133 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CCAC6BE500
-	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 10:10:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DDCF6BE5BA
+	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 10:36:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230160AbjCQJKM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Mar 2023 05:10:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33508 "EHLO
+        id S231328AbjCQJgB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Mar 2023 05:36:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231742AbjCQJKH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Mar 2023 05:10:07 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F1DB30FC;
-        Fri, 17 Mar 2023 02:10:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1679044205; x=1710580205;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Y/mA9juw6Wk0h1jZipjb8f6HQJ6J3W6r/nV9wFA+39w=;
-  b=It4JmmxAA71WbjHhbiKnSBbk+Rjm6VQrHM2tUlK1kpAniGR0x+o0XJUZ
-   UVdmB2+jMRKFzjPHSdtofXuR4aNlpGXLRCHwk4c8RqTYZtPwzLir+quUU
-   8/GkC+KsCKLhUxO75NtIcRuLuTEb5wCwiq0GO+iFE87/NsvevqINxngZi
-   gsKykButcfouXsKZaKxSjjURX2Nl4w9b3Ub+B8BUIRuY0dqDN6UJciiIS
-   1OcEJhMROC7MpRPnbFP7nFu/sSWJxST4bmK+/oG41fa8i8VBXHQmDRQ+y
-   v/jbBsvCf2oallEBTKBpojGhVDyD+SxOhn7Tow8WhFOhkLTef2PVeVL5L
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10651"; a="340581205"
-X-IronPort-AV: E=Sophos;i="5.98,268,1673942400"; 
-   d="scan'208";a="340581205"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2023 02:10:04 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10651"; a="710428979"
-X-IronPort-AV: E=Sophos;i="5.98,268,1673942400"; 
-   d="scan'208";a="710428979"
-Received: from xliu2-mobl1.ccr.corp.intel.com (HELO localhost) ([10.255.29.180])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2023 02:09:58 -0700
-Date:   Fri, 17 Mar 2023 17:09:53 +0800
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Yu Zhang <yu.c.zhang@linux.intel.com>, pbonzini@redhat.com,
-        shuah@kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: selftest: Add dependency rules in makefile for C
- source code
-Message-ID: <20230317090953.qkduwduutcam4ho2@linux.intel.com>
-References: <20230127133601.1165472-1-yu.c.zhang@linux.intel.com>
- <ZBJMc24vyL3X9RHa@google.com>
+        with ESMTP id S229603AbjCQJfy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Mar 2023 05:35:54 -0400
+X-Greylist: delayed 700 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 17 Mar 2023 02:35:52 PDT
+Received: from mail.docworker.pl (mail.docworker.pl [94.177.230.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D9C6DDF35
+        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 02:35:52 -0700 (PDT)
+Received: by mail.docworker.pl (Postfix, from userid 1002)
+        id D081B87FCE; Fri, 17 Mar 2023 10:15:51 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=docworker.pl; s=mail;
+        t=1679044556; bh=F9Uuk9o83BVy7SpscM/nJos6FHfnp2pKrNUqPErj3yg=;
+        h=Date:From:To:Subject:From;
+        b=Y9Wg1pGtWbJs3/LdPdU8ol/9UnnsJuOO9lREWtg5l0XQMPeQmdlpvNHaC7FH4jDdX
+         RnmWI/z2x7JDK5LJi+LiBXX0RxPqZ/bjdGPN5cbHWtMsYFvqOh8coIElrJy6Vq6pvV
+         ddsGtQPQ9i3NoS8r3NoMCFwvyCowHU4xZcYB5EwjI9cjb6os35tOoXMdNz0uiUM5at
+         tkSRll+3snvNdladIIRmZun2xy8Fodghk/DUpq9x1o6jXCMoquD5eDALqSXM5W7686
+         AoSuawLX/8G9/7tMXUJo28RsiAzHS+TokOcLO1L7B17qX9qUHeceTCchFPfHUJN1JU
+         nN/qmY8DtqXcA==
+Received: by mail.docworker.pl for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 09:15:34 GMT
+Message-ID: <20230317084500-0.1.i.2s0l.0.3ec38tfvc1@docworker.pl>
+Date:   Fri, 17 Mar 2023 09:15:34 GMT
+From:   =?UTF-8?Q? "Mi=C5=82osz_G=C3=B3recki" ?= 
+        <milosz.gorecki@docworker.pl>
+To:     <kvm@vger.kernel.org>
+Subject: Zapytanie ofertowe 
+X-Mailer: mail.docworker.pl
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZBJMc24vyL3X9RHa@google.com>
-User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: Yes, score=5.7 required=5.0 tests=BAYES_20,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_SBL_CSS,SPF_HELO_NONE,
+        SPF_PASS,URIBL_BLOCKED,URIBL_CSS_A,URIBL_DBL_SPAM autolearn=no
+        autolearn_force=no version=3.4.6
+X-Spam-Report: *  2.5 URIBL_DBL_SPAM Contains a spam URL listed in the Spamhaus DBL
+        *      blocklist
+        *      [URIs: docworker.pl]
+        *  0.0 URIBL_BLOCKED ADMINISTRATOR NOTICE: The query to URIBL was
+        *      blocked.  See
+        *      http://wiki.apache.org/spamassassin/DnsBlocklists#dnsbl-block
+        *      for more information.
+        *      [URIs: docworker.pl]
+        *  3.3 RCVD_IN_SBL_CSS RBL: Received via a relay in Spamhaus SBL-CSS
+        *      [94.177.230.24 listed in zen.spamhaus.org]
+        *  0.1 URIBL_CSS_A Contains URL's A record listed in the Spamhaus CSS
+        *      blocklist
+        *      [URIs: docworker.pl]
+        * -0.0 BAYES_20 BODY: Bayes spam probability is 5 to 20%
+        *      [score: 0.1997]
+        * -0.0 SPF_PASS SPF: sender matches SPF record
+        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
+        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
+        *       valid
+        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
+        *      envelope-from domain
+        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
+        *      author's domain
+        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+X-Spam-Level: *****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> Do we actually need to omit -MD here?  IIUC, it just means that the .d file will
-> get redundantly generated when building the final executable.  I would much prefer
-> to build everything with the same options unless there's a good reason not to,
-> e.g. this patch doesn't feed -MD into the LIBKVM_STRING_OBJ target, which seems
-> wrong.
+Szanowni Pa=C5=84stwo,
 
-No, we don't. I added "-MD" in EXTRA_CFLAGS, so that only .o files would
-be impacted when generating dependency files. But it is unnecessary.
+Od blisko 8 lat skutecznie wspieramy naszych partner=C3=B3w w pozyskiwani=
+u klient=C3=B3w. =C5=9Awiadczymy us=C5=82ug=C4=99 generowania lead=C3=B3w=
+ z kilkoma unikalnymi cechami jak gwarancja realnego uruchomienia rozm=C3=
+=B3w lub wymiana kontaktu. Nadmieni=C4=99 tak=C5=BCe, i=C5=BC kontakty pr=
+zekazywane s=C4=85 na wy=C5=82=C4=85czno=C5=9B=C4=87.
 
-As to the LIBKVM_STRING_OBJ target, it is my negligence. :)
+Je=C5=9Bli w chwili obecnej poszukujecie Pa=C5=84stwo nowych zapyta=C5=84=
+ i lead=C3=B3w sprzeda=C5=BCowych prosz=C4=99 o kontakt lub wskazanie ter=
+minu rozmowy.
 
-I tried your suggested fix, and it works fine. Will send out v2(based on
-selftests branch of github.com/kvm-x86/linux). Thanks!
 
-B.R.
-Yu
-> 
-> I.e. why not simply
-> 
-> ---
->  tools/testing/selftests/kvm/Makefile | 17 +++++++++++++++--
->  1 file changed, 15 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index 152c1a988e42..faaf65aa7621 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -182,6 +182,8 @@ TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(ARCH_DIR))
->  TEST_GEN_PROGS_EXTENDED += $(TEST_GEN_PROGS_EXTENDED_$(ARCH_DIR))
->  LIBKVM += $(LIBKVM_$(ARCH_DIR))
->  
-> +OVERRIDE_TARGETS = 1
-> +
->  # lib.mak defines $(OUTPUT), prepends $(OUTPUT)/ to $(TEST_GEN_PROGS), and most
->  # importantly defines, i.e. overwrites, $(CC) (unless `make -e` or `make CC=`,
->  # which causes the environment variable to override the makefile).
-> @@ -196,7 +198,7 @@ else
->  LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/$(ARCH)/include
->  endif
->  CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
-> -	-Wno-gnu-variable-sized-type-not-at-end \
-> +	-Wno-gnu-variable-sized-type-not-at-end -MD \
->  	-fno-builtin-memcmp -fno-builtin-memcpy -fno-builtin-memset \
->  	-fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
->  	-I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
-> @@ -223,7 +225,18 @@ LIBKVM_S_OBJ := $(patsubst %.S, $(OUTPUT)/%.o, $(LIBKVM_S))
->  LIBKVM_STRING_OBJ := $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM_STRING))
->  LIBKVM_OBJS = $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ) $(LIBKVM_STRING_OBJ)
->  
-> -EXTRA_CLEAN += $(LIBKVM_OBJS) cscope.*
-> +TEST_GEN_OBJ = $(patsubst %, %.o, $(TEST_GEN_PROGS))
-> +TEST_GEN_OBJ += $(patsubst %, %.o, $(TEST_GEN_PROGS_EXTENDED))
-> +TEST_DEP_FILES = $(patsubst %.o, %.d, $(TEST_GEN_OBJ))
-> +TEST_DEP_FILES += $(patsubst %.o, %.d, $(LIBKVM_OBJS))
-> +-include $(TEST_DEP_FILES)
-> +
-> +$(TEST_GEN_PROGS) $(TEST_GEN_PROGS_EXTENDED): %: %.o
-> +	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $< $(LIBKVM_OBJS) $(LDLIBS) -o $@
-> +$(TEST_GEN_OBJ): %.o: %.c
-> +	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
-> +
-> +EXTRA_CLEAN += $(LIBKVM_OBJS) $(TEST_DEP_FILES) $(TEST_GEN_OBJ) cscope.*
->  
->  x := $(shell mkdir -p $(sort $(dir $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ))))
->  $(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c
-> 
-> base-commit: 95b9779c1758f03cf494e8550d6249a40089ed1c
-> -- 
-> 
+Pozdrawiam serdecznie
+Mi=C5=82osz G=C3=B3recki
