@@ -2,77 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 21A316BF556
-	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 23:51:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DFFAE6BF560
+	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 23:54:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230001AbjCQWvU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Mar 2023 18:51:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43518 "EHLO
+        id S230104AbjCQWyG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Mar 2023 18:54:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229517AbjCQWvS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Mar 2023 18:51:18 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5082D2958
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 15:51:17 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id u22-20020a17090abb1600b0023f0575ebf0so4233795pjr.9
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 15:51:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679093477;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4VE1iHzPcbBwBz+W0Z9mQD/JqfyWws+rYI7qgbnqJ24=;
-        b=X76aa+88Lm0L9+nU2RY+oehLL+uZeQVHQ3lC33fRrcs4GJusd37CvBwg1npPcZuoaQ
-         geREk9EiZdCWI05TYiItxbL4xwUD0KX4ewcUdMQxy6mozPkZZ9hdUB5ZX48FQcJHEIgE
-         D406GoLPyRJ72qWqM0BvN0tFwhzqrdH5hMXwPMv4L3Ag0G0Db+OJcUvN7XaIEeNC0fqT
-         nGimFLuSMn1Iy3Lkf/Yhppd3jHT/h9XrqhtKWczlD0dYnYyORTiqHdsqw+r7ZZX10edv
-         IVQQzB1vyTsZOy44ltfKd3dH7zBB/8zfkdtZzPilYnqCIp9BGBKAv8vrcEBGxPbC+Rhr
-         n89A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679093477;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4VE1iHzPcbBwBz+W0Z9mQD/JqfyWws+rYI7qgbnqJ24=;
-        b=laKeAcxZGdrsY0jMbiV0IcQAjmbEug6y5J8Z2y2QztFrbTHVuSZFD4eNN3eL6X8IXp
-         v7jiWsff1vAntS1nypO2w7zyAHQpV1Bk0/rhLCqDGTPEPA6UZ9EOr3qDr+rH/WMDzARi
-         w18Pr1eRFfqXsN+jCAftF8ZyTtiOtkrTq3VPlY+xDsC6AxYOe319znD0rKknz572ltH3
-         HdY4gCtKvovNFJWrkAUhOQ+jBc6CJxVxv/jDzkA3pOhiXLzIwZdyp16M/EJsjjreC3xL
-         OIkEpElI1khEitxrZ+uc17ichB47bL+96jKcNdfaoGoRft9ULR2LvAfFjugpRbikdJiL
-         FZCw==
-X-Gm-Message-State: AO0yUKWRgM2mezKPdOLt1KOF/MwQVzAtceTKDC+ZlMIA9R8SZmHvFgSG
-        SEG2m74WVl6A0xsaqQR0WPomSq2c/F8=
-X-Google-Smtp-Source: AK7set975D5NqLPdB4ZrC43vRYKFxW38+uf7o5sjFi/RTDild/JZiSzUxzFBE+SLKor52v495Stt9b2HaPI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:a0b:b0:23b:419d:8efe with SMTP id
- gg11-20020a17090b0a0b00b0023b419d8efemr2761563pjb.3.1679093477360; Fri, 17
- Mar 2023 15:51:17 -0700 (PDT)
-Date:   Fri, 17 Mar 2023 15:51:15 -0700
-In-Reply-To: <20230211014626.3659152-8-vipinsh@google.com>
-Mime-Version: 1.0
-References: <20230211014626.3659152-1-vipinsh@google.com> <20230211014626.3659152-8-vipinsh@google.com>
-Message-ID: <ZBTu40/IYurmQi5N@google.com>
-Subject: Re: [Patch v3 7/7] KVM: x86/mmu: Merge all handle_changed_pte* functions.
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vipin Sharma <vipinsh@google.com>
-Cc:     pbonzini@redhat.com, bgardon@google.com, dmatlack@google.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229517AbjCQWyE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Mar 2023 18:54:04 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 500F725955;
+        Fri, 17 Mar 2023 15:53:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1679093631; x=1710629631;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=nm/onngr/hNyUfZ1KuqYPFOT9I1SZoxU4Q8GAtLmZnA=;
+  b=WB/mxvmRiPX/TA+UlJXUoL1lTVgqH+LA/wSmpt9Q6eCzLECqyFBxujvW
+   ZsjDwCtFl4jhVxIFbA7+zYuSYR7ZeHDVbtldBvPp4/S7AeM+lhMQ1iuJ0
+   bAtvUFMeJJ5k+KYZZcMJDKuScJ8xq4XdLlWc7jsqnpzEcXE5zYOiROd2P
+   fTz4dQ4ICJYvc5XsImIIGnIctT48jlKxIOPjjlqCuF3wSBFhTdDPQDZmk
+   fJ09ZxBOq8TNJAoLxB8l5q0HOj3/NlceomryfBzLTivdRjS4PeXdLJ5ui
+   S5VtnFnfYkJLpECDIGT/uxumYiZRnpknS+mrbFwSEtlVet+0gTbe3987B
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10652"; a="318778257"
+X-IronPort-AV: E=Sophos;i="5.98,270,1673942400"; 
+   d="scan'208";a="318778257"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2023 15:53:50 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10652"; a="673719714"
+X-IronPort-AV: E=Sophos;i="5.98,270,1673942400"; 
+   d="scan'208";a="673719714"
+Received: from mupadhya-mobl1.amr.corp.intel.com (HELO desk) ([10.209.15.93])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2023 15:53:50 -0700
+Date:   Fri, 17 Mar 2023 15:53:45 -0700
+From:   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To:     Nathan Chancellor <nathan@kernel.org>
+Cc:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        Ben Serebrin <serebrin@google.com>,
+        Peter Shier <pshier@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/3] kvm: vmx: Add IA32_FLUSH_CMD guest support
+Message-ID: <20230317225345.z5chlrursjfbz52o@desk>
+References: <20230201132905.549148-1-eesposit@redhat.com>
+ <20230201132905.549148-2-eesposit@redhat.com>
+ <20230317190432.GA863767@dev-arch.thelio-3990X>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230317190432.GA863767@dev-arch.thelio-3990X>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 10, 2023, Vipin Sharma wrote:
-> @@ -1301,7 +1283,7 @@ bool kvm_tdp_mmu_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
->  	/*
->  	 * No need to handle the remote TLB flush under RCU protection, the
->  	 * target SPTE _must_ be a leaf SPTE, i.e. cannot result in freeing a
-> -	 * shadow page.  See the WARN on pfn_changed in __handle_changed_spte().
-> +	 * shadow page. See the WARN on pfn_changed in handle_changed_spte().
+On Fri, Mar 17, 2023 at 12:04:32PM -0700, Nathan Chancellor wrote:
+> Hi Emanuele,
+> 
+> On Wed, Feb 01, 2023 at 08:29:03AM -0500, Emanuele Giuseppe Esposito wrote:
+> > Expose IA32_FLUSH_CMD to the guest if the guest CPUID enumerates
+> > support for this MSR. As with IA32_PRED_CMD, permission for
+> > unintercepted writes to this MSR will be granted to the guest after
+> > the first non-zero write.
+> > 
+> > Signed-off-by: Jim Mattson <jmattson@google.com>
+> > Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
+> > ---
+> >  arch/x86/kvm/vmx/nested.c |  3 ++
+> >  arch/x86/kvm/vmx/vmx.c    | 70 +++++++++++++++++++++++++--------------
+> >  2 files changed, 48 insertions(+), 25 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> > index 557b9c468734..075b5ade7c80 100644
+> > --- a/arch/x86/kvm/vmx/nested.c
+> > +++ b/arch/x86/kvm/vmx/nested.c
+> > @@ -654,6 +654,9 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
+> >  	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
+> >  					 MSR_IA32_PRED_CMD, MSR_TYPE_W);
+> >  
+> > +	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
+> > +					 MSR_IA32_FLUSH_CMD, MSR_TYPE_W);
+> > +
+> >  	kvm_vcpu_unmap(vcpu, &vmx->nested.msr_bitmap_map, false);
+> >  
+> >  	vmx->nested.force_msr_bitmap_recalc = false;
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index c788aa382611..9a78ea96a6d7 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -2133,6 +2133,39 @@ static u64 vmx_get_supported_debugctl(struct kvm_vcpu *vcpu, bool host_initiated
+> >  	return debugctl;
+> >  }
+> >  
+> > +static int vmx_set_msr_ia32_cmd(struct kvm_vcpu *vcpu,
+> > +				struct msr_data *msr_info,
+> > +				bool guest_has_feat, u64 cmd,
+> > +				int x86_feature_bit)
+> > +{
+> > +	if (!msr_info->host_initiated && !guest_has_feat)
+> > +		return 1;
+> > +
+> > +	if (!(msr_info->data & ~cmd))
 
-I was just starting to think you're an ok person, and then I find out you're a
-heretic that only puts a single space after periods.  ;-)
+Looks like this is doing a reverse check. Shouldn't this be as below:
+
+---
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index f88578407494..e8d9033559c4 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -2141,7 +2141,7 @@ static int vmx_set_msr_ia32_cmd(struct kvm_vcpu *vcpu,
+ 	if (!msr_info->host_initiated && !guest_has_feat)
+ 		return 1;
+ 
+-	if (!(msr_info->data & ~cmd))
++	if (msr_info->data & ~cmd)
+ 		return 1;
+ 	if (!boot_cpu_has(x86_feature_bit))
+ 		return 1;
