@@ -2,448 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2163A6BE7F5
-	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 12:23:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 831CE6BE806
+	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 12:26:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229784AbjCQLX4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Mar 2023 07:23:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36240 "EHLO
+        id S230001AbjCQL0e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Mar 2023 07:26:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229523AbjCQLXz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Mar 2023 07:23:55 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E9B7199D5;
-        Fri, 17 Mar 2023 04:23:53 -0700 (PDT)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32HArSsb027900;
-        Fri, 17 Mar 2023 11:23:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : content-transfer-encoding : mime-version; s=pp1;
- bh=/W8SY+Dm5JHX1qzntUjXw2uscqJTEVruGZMSifc4pZg=;
- b=sNOkmlIyWXbkjwERJ9nrnQ4oBXGGIraDW7+JU6NYvRPxlqkllXZGRfBCy5MXNLlp6Nmf
- tOh14AbOYXgq9cmvjJ0hfeJSKqTUAEYLG+gzCZMiT+o8l9wp9sRWYQBIqLYuNO8kO8BU
- b92NVWIYo4M5Jfzf6MLX8BOw9StWh23VgJXMjMx3uxHrOJ3Xu4Bsmm3XlTXbc4+y3p4X
- k/Zp2kapo1pfIcYg5L2ysPhdMNRjMAXJBP4oUXhDVZOBqjI4ANE6VTO0EkJcULW+LjHn
- l2vRMv5+cDB1dmzrR2KgnGmyHwJSVeJIkFzIMx+4dqm+tEXxSKbcWXy8MdWUVHXudsS5 JA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3pcpurgpmm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Mar 2023 11:23:52 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32HAt84j000691;
-        Fri, 17 Mar 2023 11:23:51 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3pcpurgpks-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Mar 2023 11:23:51 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32GHUhc7024411;
-        Fri, 17 Mar 2023 11:23:49 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3pbsmbhpyr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Mar 2023 11:23:49 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32HBNkLg27656732
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 17 Mar 2023 11:23:46 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3711D2004B;
-        Fri, 17 Mar 2023 11:23:46 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EFB0020049;
-        Fri, 17 Mar 2023 11:23:45 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 17 Mar 2023 11:23:45 +0000 (GMT)
-From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v6] s390x: Add tests for execute-type instructions
-Date:   Fri, 17 Mar 2023 12:23:39 +0100
-Message-Id: <20230317112339.774659-1-nsg@linux.ibm.com>
-X-Mailer: git-send-email 2.37.2
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: b_vEN9LON6GIRUYvH99np6ZOlhtHdrEn
-X-Proofpoint-ORIG-GUID: Dh_2lj6eD882E0a67XfNI7Hl7fgv8Ies
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S229716AbjCQL0d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Mar 2023 07:26:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6F5E618A1
+        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 04:25:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679052344;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3eg+W4V459K453HHEWu6+WOIdJvDrwAbatlv4pe/Z8I=;
+        b=UvI3CvoZS23vEwro0+w5S8/472Ud4iqTJvkJ9QG1fcPhDGjm8hRIibekVY2Zk3qnMteQgl
+        DmBvDEXu9qofknOjgwqbziYcWIEpG3T+EbkgYJlscwsFRXSqPsjFvJ+8JWc01FMqPkmo0u
+        ANLlODHD49iLBhn3GkzjadTR8KCd08M=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-244-kqnS9LIBMEG1ddGJ0wrhdQ-1; Fri, 17 Mar 2023 07:25:40 -0400
+X-MC-Unique: kqnS9LIBMEG1ddGJ0wrhdQ-1
+Received: by mail-wm1-f71.google.com with SMTP id k18-20020a05600c1c9200b003ed2a3f101fso4123576wms.9
+        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 04:25:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679052339;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3eg+W4V459K453HHEWu6+WOIdJvDrwAbatlv4pe/Z8I=;
+        b=Ck/xUGFoR4EPLt196XooomP0xLJ58MYS6WtNDLIRNC0CvA5o2IZBKWYqWWGE/XiruL
+         S6xAqRnkBdgeRmT5lCWzKBCQxJGYU1Vl5VsuMVV28yLwKTTBMyMk6FdpjJEmPIT2RS2f
+         LXWpKm+TMdOc79O4h7b7hdL49mzX+p6VW40QuI6oiI4PMWuuiyaQ+vlu61BsBpvas4Gt
+         RiWC99X7nurLOMGtB1roeQhglvagd65A+1VHDc6TDhred6enp6qLnnPz4fXUEy0xBuAB
+         hImJ3wb+i2BURuRzN/Uo64WdD8QtiKCI6bUTaeoxYezYyPCbDi2ZTvN+Nh+HOqQg2nMV
+         RSvA==
+X-Gm-Message-State: AO0yUKWXehU9OlQ3YQvBc8NhHYrgigkiEyaalqbhwdSKpTYBIs41N5II
+        X39jEDtDEEE38cY7SvyoMLehmSi9QWEMznGGJ0qrT9vtVNT4amuJaytv27UIfNdp34oPVgyAQNg
+        pdwlHv1QwbRc8
+X-Received: by 2002:adf:ecc4:0:b0:2c5:510b:8f9c with SMTP id s4-20020adfecc4000000b002c5510b8f9cmr7021024wro.52.1679052339554;
+        Fri, 17 Mar 2023 04:25:39 -0700 (PDT)
+X-Google-Smtp-Source: AK7set9FZ5f9vlrQw7xgnuvkWSEFXAo8AQG5rmR3D2Ycyj5yA2kbAhnhVzi4UvMN5l8xZtTnmtbeRA==
+X-Received: by 2002:adf:ecc4:0:b0:2c5:510b:8f9c with SMTP id s4-20020adfecc4000000b002c5510b8f9cmr7021010wro.52.1679052339284;
+        Fri, 17 Mar 2023 04:25:39 -0700 (PDT)
+Received: from sgarzare-redhat (host-82-57-51-170.retail.telecomitalia.it. [82.57.51.170])
+        by smtp.gmail.com with ESMTPSA id r10-20020adfce8a000000b002cefcac0c62sm1770714wrn.9.2023.03.17.04.25.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Mar 2023 04:25:38 -0700 (PDT)
+Date:   Fri, 17 Mar 2023 12:25:36 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Eugenio Perez Martin <eperezma@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        virtualization@lists.linux-foundation.org,
+        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
+        netdev@vger.kernel.org, stefanha@redhat.com,
+        linux-kernel@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH v2 4/8] vringh: support VA with iotlb
+Message-ID: <20230317112536.t7gm4dop5cafgvoe@sgarzare-redhat>
+References: <20230302113421.174582-1-sgarzare@redhat.com>
+ <20230302113421.174582-5-sgarzare@redhat.com>
+ <CAJaqyWdeEzKnYuX-c348vVg0PpUH4y-e1dSLhRvYem=MEDKE=Q@mail.gmail.com>
+ <CAGxU2F7GZxMwLNsAebaPx61MoePYYmFS1q66An-EDhq4u+a9ng@mail.gmail.com>
+ <CAJaqyWcAfyANeShsdV55vVkK=sHxGNVef7E7jj-CqTL7SbqhCg@mail.gmail.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-17_06,2023-03-16_02,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 phishscore=0
- mlxscore=0 clxscore=1015 lowpriorityscore=0 malwarescore=0 adultscore=0
- impostorscore=0 suspectscore=0 bulkscore=0 priorityscore=1501
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303150002 definitions=main-2303170075
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJaqyWcAfyANeShsdV55vVkK=sHxGNVef7E7jj-CqTL7SbqhCg@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Test the instruction address used by targets of an execute instruction.
-When the target instruction calculates a relative address, the result is
-relative to the target instruction, not the execute instruction.
+On Fri, Mar 17, 2023 at 10:49:27AM +0100, Eugenio Perez Martin wrote:
+>On Thu, Mar 16, 2023 at 5:07 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
+>>
+>> On Fri, Mar 3, 2023 at 3:39 PM Eugenio Perez Martin <eperezma@redhat.com> wrote:
+>> >
+>> > On Thu, Mar 2, 2023 at 12:35 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
+>> > >
+>> > > vDPA supports the possibility to use user VA in the iotlb messages.
+>> > > So, let's add support for user VA in vringh to use it in the vDPA
+>> > > simulators.
+>> > >
+>> > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>> > > ---
+>> > >
+>> > > Notes:
+>> > >     v2:
+>> > >     - replace kmap_atomic() with kmap_local_page() [see previous patch]
+>> > >     - fix cast warnings when build with W=1 C=1
+>> > >
+>> > >  include/linux/vringh.h            |   5 +-
+>> > >  drivers/vdpa/mlx5/net/mlx5_vnet.c |   2 +-
+>> > >  drivers/vdpa/vdpa_sim/vdpa_sim.c  |   4 +-
+>> > >  drivers/vhost/vringh.c            | 247 ++++++++++++++++++++++++------
+>> > >  4 files changed, 205 insertions(+), 53 deletions(-)
+>> > >
+>>
+>> [...]
+>>
+>> >
+>> > It seems to me iotlb_translate_va and iotlb_translate_pa are very
+>> > similar, their only difference is that the argument is that iov is
+>> > iovec instead of bio_vec. And how to fill it, obviously.
+>> >
+>> > It would be great to merge both functions, only differing with a
+>> > conditional on vrh->use_va, or generics, or similar. Or, if following
+>> > the style of the rest of vringh code, to provide a callback to fill
+>> > iovec (although I like conditional more).
+>> >
+>> > However I cannot think of an easy way to perform that without long
+>> > macros or type erasure.
+>>
+>> Thank you for pushing me :-)
+>> I finally managed to avoid code duplication (partial patch attached,
+>> but not yet fully tested).
+>>
+>> @Jason: with this refactoring I removed copy_to_va/copy_to_pa, so I
+>> also avoided getu16_iotlb_va/pa.
+>>
+>> I will send the full patch in v3, but I would like to get your opinion
+>> first ;-)
+>>
+>>
+>>
+>> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+>> index 0ba3ef809e48..71dd67700e36 100644
+>> --- a/drivers/vhost/vringh.c
+>> +++ b/drivers/vhost/vringh.c
+>> @@ -1096,8 +1096,7 @@ EXPORT_SYMBOL(vringh_need_notify_kern);
+>>
+>>  static int iotlb_translate(const struct vringh *vrh,
+>>                            u64 addr, u64 len, u64 *translated,
+>> -                          struct bio_vec iov[],
+>> -                          int iov_size, u32 perm)
+>> +                          void *iov, int iov_size, bool iovec, u32 perm)
+>
+>I think this is an improvement, but we're doing type erasure here. I
+>don't think it is a big deal since the function is not exported, it's
+>pretty contained in this file, so I'd ack this version too. I'm just
+>throwing ideas here:
+>
+>a) typedef the union {iovec, bio_vec} and use that type in the parameter.
+>
+>As a drawback, that union feels out of place in this file. Is this the
+>only place where it is needed? I don't see other similar uses in the
+>kernel.
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
----
+iov_iter has something similar, but they are const pointers, so IIUC
+it is not supposed to be used to set the bvec contents, just iterate it.
 
+Anyway I thought something similar and should be doable, but since
+it was internal API I went to type erasure.
 
-v5 -> v6:
- * fix section for exrl targets (thanks Claudio)
- * add comments (thanks Claudio)
+>
+>b) To convert from iov to bio_iov at return
+>The drawback is the extra processing if the compiler is not smart
+>enough to inline it. I prefer the previous one but I didn't want to
+>omit it, just in case.
 
-v4 -> v5:
- * word align the execute-type instruction, preventing a specification
-   exception if the address calculation is wrong, since LLGFRL requires
-   word alignment
- * change wording of comment
+Yep, I prefer too the previous one, so let's go in that direction for
+v3 ;-)
 
-v3 -> v4:
- * fix nits (thanks Janosch)
- * pickup R-b (thanks Janosch)
-
-v2 -> v3:
- * add some comments (thanks Janosch)
- * add two new tests (drop Nico's R-b)
- * push prefix
-
-v1 -> v2:
- * add test to unittests.cfg and .gitlab-ci.yml
- * pick up R-b (thanks Nico)
-
-
-See https://patchew.org/QEMU/20230316210751.302423-1-iii@linux.ibm.com/
-for TCG fixes.
-
-
-Range-diff against v5:
-1:  57f8f256 ! 1:  3893f723 s390x: Add tests for execute-type instructions
-    @@ s390x/ex.c (new)
-     +#include <libcflat.h>
-     +
-     +/*
-    ++ * Accesses to the operand of execute-type instructions are instruction fetches.
-    ++ * Minimum alignment is two, since the relative offset is specified by number of halfwords.
-    ++ */
-    ++asm (  ".pushsection .text.exrl_targets,\"x\"\n"
-    ++"	.balign	2\n"
-    ++"	.popsection\n"
-    ++);
-    ++
-    ++/*
-     + * BRANCH AND SAVE, register register variant.
-     + * Saves the next instruction address (address from PSW + length of instruction)
-     + * to the first register. No branch is taken in this test, because 0 is
-    @@ s390x/ex.c (new)
-     +	uint64_t ret_addr, after_ex;
-     +
-     +	report_prefix_push("BASR");
-    -+	asm volatile ( ".pushsection .rodata\n"
-    ++	asm volatile ( ".pushsection .text.exrl_targets\n"
-     +		"0:	basr	%[ret_addr],0\n"
-     +		"	.popsection\n"
-     +
-    @@ s390x/ex.c (new)
-     +	uint64_t after_target, ret_addr, after_ex, branch_addr;
-     +
-     +	report_prefix_push("BRAS");
-    -+	asm volatile ( ".pushsection .text.ex_bras, \"x\"\n"
-    ++	asm volatile ( ".pushsection .text.exrl_targets\n"
-     +		"0:	bras	%[ret_addr],1f\n"
-     +		"	nopr	%%r7\n"
-     +		"1:	larl	%[branch_addr],0\n"
-    @@ s390x/ex.c (new)
-     +		"	larl	%[after_target],1b\n"
-     +		"	larl	%[after_ex],3f\n"
-     +		"2:	exrl	0,0b\n"
-    ++/*
-    ++ * In case the address calculation is correct, we jump by the relative offset 1b-0b from 0b to 1b.
-    ++ * In case the address calculation is relative to the exrl (i.e. a test failure),
-    ++ * put a valid instruction at the same relative offset from the exrl, so the test continues in a
-    ++ * controlled manner.
-    ++ */
-     +		"3:	larl	%[branch_addr],0\n"
-     +		"4:\n"
-     +
-    @@ s390x/ex.c (new)
-     +	uint64_t target, addr;
-     +
-     +	report_prefix_push("LARL");
-    -+	asm volatile ( ".pushsection .rodata\n"
-    ++	asm volatile ( ".pushsection .text.exrl_targets\n"
-     +		"0:	larl	%[addr],0\n"
-     +		"	.popsection\n"
-     +
-    @@ s390x/ex.c (new)
-     +	uint64_t target, value;
-     +
-     +	report_prefix_push("LLGFRL");
-    -+	asm volatile ( ".pushsection .rodata\n"
-    ++	asm volatile ( ".pushsection .text.exrl_targets\n"
-     +		"	.balign	4\n"
-    ++		 //operand of llgfrl must be word aligned
-     +		"0:	llgfrl	%[value],0\n"
-     +		"	.popsection\n"
-     +
-    @@ s390x/ex.c (new)
-     +	uint32_t program_mask, cc, crl_word;
-     +
-     +	report_prefix_push("CRL");
-    -+	asm volatile ( ".pushsection .rodata\n"
-    ++	asm volatile ( ".pushsection .text.exrl_targets\n"
-     +		 //operand of crl must be word aligned
-     +		 "	.balign	4\n"
-     +		"0:	crl	%[crl_word],0\n"
-
- s390x/Makefile      |   1 +
- s390x/ex.c          | 188 ++++++++++++++++++++++++++++++++++++++++++++
- s390x/unittests.cfg |   3 +
- .gitlab-ci.yml      |   1 +
- 4 files changed, 193 insertions(+)
- create mode 100644 s390x/ex.c
-
-diff --git a/s390x/Makefile b/s390x/Makefile
-index 97a61611..6cf8018b 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -39,6 +39,7 @@ tests += $(TEST_DIR)/panic-loop-extint.elf
- tests += $(TEST_DIR)/panic-loop-pgm.elf
- tests += $(TEST_DIR)/migration-sck.elf
- tests += $(TEST_DIR)/exittime.elf
-+tests += $(TEST_DIR)/ex.elf
- 
- pv-tests += $(TEST_DIR)/pv-diags.elf
- 
-diff --git a/s390x/ex.c b/s390x/ex.c
-new file mode 100644
-index 00000000..dbd8030d
---- /dev/null
-+++ b/s390x/ex.c
-@@ -0,0 +1,188 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright IBM Corp. 2023
-+ *
-+ * Test EXECUTE (RELATIVE LONG).
-+ * These instructions execute a target instruction. The target instruction is formed
-+ * by reading an instruction from memory and optionally modifying some of its bits.
-+ * The execution of the target instruction is the same as if it was executed
-+ * normally as part of the instruction sequence, except for the instruction
-+ * address and the instruction-length code.
-+ */
-+
-+#include <libcflat.h>
-+
-+/*
-+ * Accesses to the operand of execute-type instructions are instruction fetches.
-+ * Minimum alignment is two, since the relative offset is specified by number of halfwords.
-+ */
-+asm (  ".pushsection .text.exrl_targets,\"x\"\n"
-+"	.balign	2\n"
-+"	.popsection\n"
-+);
-+
-+/*
-+ * BRANCH AND SAVE, register register variant.
-+ * Saves the next instruction address (address from PSW + length of instruction)
-+ * to the first register. No branch is taken in this test, because 0 is
-+ * specified as target.
-+ * BASR does *not* perform a relative address calculation with an intermediate.
-+ */
-+static void test_basr(void)
-+{
-+	uint64_t ret_addr, after_ex;
-+
-+	report_prefix_push("BASR");
-+	asm volatile ( ".pushsection .text.exrl_targets\n"
-+		"0:	basr	%[ret_addr],0\n"
-+		"	.popsection\n"
-+
-+		"	larl	%[after_ex],1f\n"
-+		"	exrl	0,0b\n"
-+		"1:\n"
-+		: [ret_addr] "=d" (ret_addr),
-+		  [after_ex] "=d" (after_ex)
-+	);
-+
-+	report(ret_addr == after_ex, "return address after EX");
-+	report_prefix_pop();
-+}
-+
-+/*
-+ * BRANCH RELATIVE AND SAVE.
-+ * According to PoP (Branch-Address Generation), the address calculated relative
-+ * to the instruction address is relative to BRAS when it is the target of an
-+ * execute-type instruction, not relative to the execute-type instruction.
-+ */
-+static void test_bras(void)
-+{
-+	uint64_t after_target, ret_addr, after_ex, branch_addr;
-+
-+	report_prefix_push("BRAS");
-+	asm volatile ( ".pushsection .text.exrl_targets\n"
-+		"0:	bras	%[ret_addr],1f\n"
-+		"	nopr	%%r7\n"
-+		"1:	larl	%[branch_addr],0\n"
-+		"	j	4f\n"
-+		"	.popsection\n"
-+
-+		"	larl	%[after_target],1b\n"
-+		"	larl	%[after_ex],3f\n"
-+		"2:	exrl	0,0b\n"
-+/*
-+ * In case the address calculation is correct, we jump by the relative offset 1b-0b from 0b to 1b.
-+ * In case the address calculation is relative to the exrl (i.e. a test failure),
-+ * put a valid instruction at the same relative offset from the exrl, so the test continues in a
-+ * controlled manner.
-+ */
-+		"3:	larl	%[branch_addr],0\n"
-+		"4:\n"
-+
-+		"	.if (1b - 0b) != (3b - 2b)\n"
-+		"	.error	\"right and wrong target must have same offset\"\n"
-+		"	.endif\n"
-+		: [after_target] "=d" (after_target),
-+		  [ret_addr] "=d" (ret_addr),
-+		  [after_ex] "=d" (after_ex),
-+		  [branch_addr] "=d" (branch_addr)
-+	);
-+
-+	report(after_target == branch_addr, "address calculated relative to BRAS");
-+	report(ret_addr == after_ex, "return address after EX");
-+	report_prefix_pop();
-+}
-+
-+/*
-+ * LOAD ADDRESS RELATIVE LONG.
-+ * If it is the target of an execute-type instruction, the address is relative
-+ * to the LARL.
-+ */
-+static void test_larl(void)
-+{
-+	uint64_t target, addr;
-+
-+	report_prefix_push("LARL");
-+	asm volatile ( ".pushsection .text.exrl_targets\n"
-+		"0:	larl	%[addr],0\n"
-+		"	.popsection\n"
-+
-+		"	larl	%[target],0b\n"
-+		"	exrl	0,0b\n"
-+		: [target] "=d" (target),
-+		  [addr] "=d" (addr)
-+	);
-+
-+	report(target == addr, "address calculated relative to LARL");
-+	report_prefix_pop();
-+}
-+
-+/* LOAD LOGICAL RELATIVE LONG.
-+ * If it is the target of an execute-type instruction, the address is relative
-+ * to the LLGFRL.
-+ */
-+static void test_llgfrl(void)
-+{
-+	uint64_t target, value;
-+
-+	report_prefix_push("LLGFRL");
-+	asm volatile ( ".pushsection .text.exrl_targets\n"
-+		"	.balign	4\n"
-+		 //operand of llgfrl must be word aligned
-+		"0:	llgfrl	%[value],0\n"
-+		"	.popsection\n"
-+
-+		"	llgfrl	%[target],0b\n"
-+		//align (pad with nop), in case the wrong operand is used
-+		"	.balignw 4,0x0707\n"
-+		"	exrl	0,0b\n"
-+		: [target] "=d" (target),
-+		  [value] "=d" (value)
-+	);
-+
-+	report(target == value, "loaded correct value");
-+	report_prefix_pop();
-+}
-+
-+/*
-+ * COMPARE RELATIVE LONG
-+ * If it is the target of an execute-type instruction, the address is relative
-+ * to the CRL.
-+ */
-+static void test_crl(void)
-+{
-+	uint32_t program_mask, cc, crl_word;
-+
-+	report_prefix_push("CRL");
-+	asm volatile ( ".pushsection .text.exrl_targets\n"
-+		 //operand of crl must be word aligned
-+		 "	.balign	4\n"
-+		"0:	crl	%[crl_word],0\n"
-+		"	.popsection\n"
-+
-+		"	lrl	%[crl_word],0b\n"
-+		//align (pad with nop), in case the wrong operand is used
-+		"	.balignw 4,0x0707\n"
-+		"	exrl	0,0b\n"
-+		"	ipm	%[program_mask]\n"
-+		: [program_mask] "=d" (program_mask),
-+		  [crl_word] "=d" (crl_word)
-+		:: "cc"
-+	);
-+
-+	cc = program_mask >> 28;
-+	report(!cc, "operand compared to is relative to CRL");
-+	report_prefix_pop();
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	report_prefix_push("ex");
-+	test_basr();
-+	test_bras();
-+	test_larl();
-+	test_llgfrl();
-+	test_crl();
-+	report_prefix_pop();
-+
-+	return report_summary();
-+}
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index d97eb5e9..b61faf07 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -215,3 +215,6 @@ file = migration-skey.elf
- smp = 2
- groups = migration
- extra_params = -append '--parallel'
-+
-+[execute]
-+file = ex.elf
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index ad7949c9..a999f64a 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -275,6 +275,7 @@ s390x-kvm:
-   - ACCEL=kvm ./run_tests.sh
-       selftest-setup intercept emulator sieve sthyi diag10 diag308 pfmf
-       cmm vector gs iep cpumodel diag288 stsi sclp-1g sclp-3g css skrf sie
-+      execute
-       | tee results.txt
-   - grep -q PASS results.txt && ! grep -q FAIL results.txt
-  only:
-
-base-commit: 20de8c3b54078ebc3df0b47344f9ce55bf52b7a5
--- 
-2.39.1
+Thanks,
+Stefano
 
