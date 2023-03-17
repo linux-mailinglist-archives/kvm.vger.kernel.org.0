@@ -2,67 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D7AC6BDD77
-	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 01:18:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0076C6BDD8A
+	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 01:23:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229534AbjCQASt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Mar 2023 20:18:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58256 "EHLO
+        id S229455AbjCQAXw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Mar 2023 20:23:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229494AbjCQASs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Mar 2023 20:18:48 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B558A6B322
-        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 17:18:43 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id g5-20020a25a485000000b009419f64f6afso3540506ybi.2
-        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 17:18:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679012323;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PY77Rzcg4DWFnbejM3BKQQs/9thRJmaRph59FVbPZ+E=;
-        b=kTuzpzhmAxc3vOkHOiu5pkiHBngjEXKsni5CASpSsbgZaYRjKPYLj0tBtA8GdwAnEe
-         vC7QZjHDzuHdyfYiaRDH6Js6zSnrMbhoMunX54yF6O6dfopyAgzRp8Ohpz8lMprG5wWk
-         BFv9HPD8A0MryVOBhrXlNAATxZeDE3MvcF6gF+SFG4BUM0tEE1ZHYWCbt+50OPq+QGuk
-         +5anY1Zk8qmcyQO3HcMgO8FGzdkqqtCb+vTOsH5cv85j4csjm8/WzkunmyvXj3q74whi
-         U/y7UW02Ta20wElu14YuKvjR0eg//0HJjF6WUyaDevdaarRJR9M4qOK4MmWvmcZSjFHa
-         JrFA==
+        with ESMTP id S229436AbjCQAXu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Mar 2023 20:23:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91E7F6EBA2
+        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 17:23:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679012581;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=XSyAHP79zbLTHByO1UMWkwG5VhqMvodcFmqqMUfSNXU=;
+        b=G5iAY90fvDh3VZrLRrZDMlpBWYaAHZtVo9BYOHAk3hCzxfL97jt4niJ/Xg1wpgYrKE3DYu
+        VU/dj5pMr65G4JCUBy8jkTJeqQmt/0U5XgaP5l0Ca87bKYncW58F0ueeln28aQilXD6FLO
+        YEEBYTy4Pef/W3x0+uVlvnL5M08YvAc=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-612-dFOgjMZqMgq8zhlvxa5_EA-1; Thu, 16 Mar 2023 20:23:00 -0400
+X-MC-Unique: dFOgjMZqMgq8zhlvxa5_EA-1
+Received: by mail-io1-f71.google.com with SMTP id n42-20020a056602342a00b0074cde755b99so1757742ioz.16
+        for <kvm@vger.kernel.org>; Thu, 16 Mar 2023 17:23:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679012323;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PY77Rzcg4DWFnbejM3BKQQs/9thRJmaRph59FVbPZ+E=;
-        b=0uwm5kk9jxKI2I+ptPZqPb2bMK65HyLmdaUV89CW3fOQTetnkYsEyU2fTAwdvNze00
-         uXcMoRkUGnV9zz6VhU21vM8y+OEYN9C1Lv68krTBy1uka9sSydmhLGG7FSnBQE/ThuCw
-         DDto4hH9p2svpuJVfQaEADpJLECb4uYfVKQcurwCNQFo6EGNfo1JEy7pjv72ie6llFfH
-         U285Fd8z/iYfwMSZEGNQ4lnzWtN/mKP3YumWbVULjRfSBbVCbQrJpN9mBMmspwRV4Y/U
-         EQvRq1xLEc2qadUi45AdWgEDUIxHv/PrWnl7ANPDsIuLpmGtJ7yR1nCs4MKnPt5jM05G
-         SqNg==
-X-Gm-Message-State: AO0yUKUmxcvHvVMSf91z8Dorc88Fs7pyHUZEISHgYB/9qFQ1RY4hjB0N
-        +89b0ifK3aXJnWBvku8Yopo+lb5R/+M=
-X-Google-Smtp-Source: AK7set+yejSTUmS5wVMiE/M73+saIrm0DTV5k5jeq04iIp4ZNvSX7g5sbnDDJRkG2hqYC7hu3jM4XvbihS8=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:151:b0:afa:d8b5:8e82 with SMTP id
- p17-20020a056902015100b00afad8b58e82mr27161358ybh.6.1679012322869; Thu, 16
- Mar 2023 17:18:42 -0700 (PDT)
-Date:   Fri, 17 Mar 2023 00:18:41 +0000
-In-Reply-To: <a026b6ddf62843129193842d80edd182@huawei.com>
-Mime-Version: 1.0
-References: <20230316154554.1237-1-shameerali.kolothum.thodi@huawei.com>
- <ZBNLnp7c1JvDsmHm@google.com> <6b9e8589281c4d2bae46eba36f77afe7@huawei.com>
- <ZBN0pFN/nF8G3fWl@google.com> <a026b6ddf62843129193842d80edd182@huawei.com>
-Message-ID: <ZBOx4b1yUpnxu/I1@google.com>
-Subject: Re: [PATCH] KVM: Add the missing stub function for kvm_dirty_ring_check_request()
-From:   Sean Christopherson <seanjc@google.com>
-To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        d=1e100.net; s=20210112; t=1679012579;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XSyAHP79zbLTHByO1UMWkwG5VhqMvodcFmqqMUfSNXU=;
+        b=hyHqT//tTeX7U6h5YqsCt/y+xOvXavIVcxp/7gmEI91vtGFqNb0UqWwzmKNIAx6Jqf
+         7BTvU9AgcorCN3+RaCbElrwG7BBcFAbQXxuVmLC4vIn/+z7cY/WI2jY2vavAD6Z5lPhC
+         wuUxyZaSTNM+v042VUXwItN1whXSlH2s+O0O7637KqNGpxgkbdFEmOz0kfcwRgCTyIII
+         tQE8mdRt7Iflyikqraw0188CXfbsf9bspbrSiHv/ACf9wRmOT/Nev2rfOqeL48eNOqSD
+         rOXCb+QehnCVKFfqPQL6upLuiwBP/6OV8fI6pRBOjMyjic3LCjrlhrdP+07gIGN/VCGq
+         1w4g==
+X-Gm-Message-State: AO0yUKVwi1yaP1dCfpBR7VTgjnfzPgRjTZY9741+AaBtto63+JLXTYZa
+        MWt7uyG08hFZaVU0bQKWnyUEYQZsUADzgjde4yJ/CCTERB2Dx+IwTbHkynXEgPAcErJYdV8rzNW
+        r2SqJh5+ZzGiU
+X-Received: by 2002:a05:6e02:1151:b0:317:eef2:f5cc with SMTP id o17-20020a056e02115100b00317eef2f5ccmr8697406ill.10.1679012579505;
+        Thu, 16 Mar 2023 17:22:59 -0700 (PDT)
+X-Google-Smtp-Source: AK7set/iT+8IeRFfmQPOt1YsJVElfStX87uq3MIp8yFcWKSg+oPhoPMe5gX/E9CYwiObV9svKZZ9jA==
+X-Received: by 2002:a05:6e02:1151:b0:317:eef2:f5cc with SMTP id o17-20020a056e02115100b00317eef2f5ccmr8697382ill.10.1679012579260;
+        Thu, 16 Mar 2023 17:22:59 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id q16-20020a0566380d1000b003c2b76fcdf2sm230584jaj.52.2023.03.16.17.22.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Mar 2023 17:22:58 -0700 (PDT)
+Date:   Thu, 16 Mar 2023 18:22:56 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "gshan@redhat.com" <gshan@redhat.com>,
-        "maz@kernel.org" <maz@kernel.org>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>
+Subject: Re: [PATCH v6 12/24] vfio/pci: Allow passing zero-length fd array
+ in VFIO_DEVICE_PCI_HOT_RESET
+Message-ID: <20230316182256.6659bbbd.alex.williamson@redhat.com>
+In-Reply-To: <BN9PR11MB5276F7879E428080D2B214D98CBC9@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20230308132903.465159-1-yi.l.liu@intel.com>
+        <20230308132903.465159-13-yi.l.liu@intel.com>
+        <20230315165311.01f32bfe.alex.williamson@redhat.com>
+        <BN9PR11MB5276300FCAAF8BF7B4E03BA48CBF9@BN9PR11MB5276.namprd11.prod.outlook.com>
+        <20230316124532.30839a94.alex.williamson@redhat.com>
+        <BN9PR11MB5276F7879E428080D2B214D98CBC9@BN9PR11MB5276.namprd11.prod.outlook.com>
+Organization: Red Hat
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,32 +106,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 16, 2023, Shameerali Kolothum Thodi wrote:
-> > From: Sean Christopherson [mailto:seanjc@google.com]
-> > On Thu, Mar 16, 2023, Shameerali Kolothum Thodi wrote:
-> > > > From: Sean Christopherson [mailto:seanjc@google.com] On Thu, Mar 16,
-> > > > 2023, Shameer Kolothum wrote:
-> > > > > The stub for !CONFIG_HAVE_KVM_DIRTY_RING case is missing.
-> > > >
-> > > > No stub is needed.  kvm_dirty_ring_check_request() isn't called from
-> > > > common code, and should not (and isn't unless I'm missing something)
-> > > > be called from arch code unless CONFIG_HAVE_KVM_DIRTY_RING=y.
-> > > >
-> > > > x86 and arm64 are the only users, and they both select
-> > > > HAVE_KVM_DIRTY_RING unconditionally when KVM is enabled.
-> > >
-> > > Yes, it is at present not called from anywhere other than x86 and arm64.
-> > > But I still think since it is a common helper, better to have a stub.
-> > 
-> > Why?  It buys us nothing other than dead code, and even worse it could let
-> > a bug that would otherwise be caught during build time escape to run time.
-> 
-> Agree, it buys nothing now:) It just came up while I was playing with a custom
-> build without HAVE_KVM_DIRTY_RING. Since all other functions there has a stub
-> just thought it would make it easier for future common usage. We could very well
-> leave it till that comes up as well.
+On Thu, 16 Mar 2023 23:29:21 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
 
-Stubs are typically only added when they are strictly necessary.  Providing a stub
-would make things "easier" in the sense that it could theoretically avoid a build
-error, but as above, in many cases we _want_ build errors when new code behaves
-in a way that diverges from what's expected/established.
+> > From: Alex Williamson
+> > Sent: Friday, March 17, 2023 2:46 AM
+> > 
+> > On Wed, 15 Mar 2023 23:31:23 +0000
+> > "Tian, Kevin" <kevin.tian@intel.com> wrote:
+> >   
+> > > > From: Alex Williamson <alex.williamson@redhat.com>
+> > > > Sent: Thursday, March 16, 2023 6:53 AM
+> > > > I'm afraid this proposal reduces or eliminates the handshake we have
+> > > > with userspace between VFIO_DEVICE_GET_PCI_HOT_RESET_INFO and
+> > > > VFIO_DEVICE_PCI_HOT_RESET, which could promote userspace to ignore  
+> > the  
+> > > > _INFO ioctl altogether, resulting in drivers that don't understand the
+> > > > scope of the reset.  Is it worth it?  What do we really gain?  
+> > >
+> > > Jason raised the concern whether GET_PCI_HOT_RESET_INFO is actually
+> > > useful today.
+> > >
+> > > It's an interface on opened device. So the tiny difference is whether the
+> > > user knows the device is resettable when calling GET_INFO or later when
+> > > actually calling PCI_HOT_RESET.  
+> > 
+> > No, GET_PCI_HOT_RESET_INFO conveys not only whether a PCI_HOT_RESET
+> > can
+> > be performed, but equally important the scope of the reset, ie. which
+> > devices are affected by the reset.  If we de-emphasize the INFO
+> > portion, then this easily gets confused as just a variant of
+> > VFIO_DEVICE_RESET, which is explicitly a device-level cscope reset.  In
+> > fact, I'd say the interface is not only trying to validate that the
+> > user has sufficient privileges for the reset, but that they explicitly
+> > acknowledge the scope of the reset.
+> >   
+> 
+> IMHO the usefulness of scope is if it's discoverable by the management
+> stack which then can try to assign devices with affected reset to a same
+> user.
+
+Disagree, the user needs to know the scope of reset.  Take for instance
+two function of a device configured onto separate buses within a VM.
+The VMM needs to know that a hot-reset of one will reset the other.
+That's not obvious to the VMM without some understanding of PCI/e
+topology and analysis of the host system.  The info ioctl simplifies
+that discovery for the VMM and the handshake of passing the affected
+groups makes sure that the info ioctl remains relevant.
+
+OTOH, I really haven't seen any evidence that the null-array concept
+provides significant simplification for userspace, especially without
+compromising the user's understanding of the scope of the provided
+reset.  Thanks,
+
+Alex
+
