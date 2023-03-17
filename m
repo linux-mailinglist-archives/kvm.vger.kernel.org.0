@@ -2,80 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 425766BF4CC
-	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 23:00:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C32F06BF4D4
+	for <lists+kvm@lfdr.de>; Fri, 17 Mar 2023 23:04:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230359AbjCQV7l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Mar 2023 17:59:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39506 "EHLO
+        id S230044AbjCQWEJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Mar 2023 18:04:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229729AbjCQV7i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Mar 2023 17:59:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3E7037B73
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 14:58:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679090319;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=pOoNggaNrRU0x9UPOrR6/pBGLjWwIZnTfEp906MOxHQ=;
-        b=YsER/Tb+znqBvxWe2+jtIq9XBK6L3cBlCUIkmc2i33JoSol9DsQBSDHh4m9FPUQGgT0lVk
-        rhystcivFcivDtpnjCX2nKei/uX55hF5kHJ/N3TsVBtOnlWKdaQbmWasdI2c7pZrqkIo98
-        YGt8dH+bzpDdObZn2yTybTROHLJ0Ubs=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-629-YX4NQYbdNXeznwHWnhT6qg-1; Fri, 17 Mar 2023 17:58:38 -0400
-X-MC-Unique: YX4NQYbdNXeznwHWnhT6qg-1
-Received: by mail-io1-f70.google.com with SMTP id u23-20020a6be917000000b007532ab65c70so2996101iof.12
-        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 14:58:38 -0700 (PDT)
+        with ESMTP id S229769AbjCQWEI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Mar 2023 18:04:08 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AD3A2E80A
+        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 15:03:57 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id i26-20020aa796fa000000b006261da7aeceso1714796pfq.5
+        for <kvm@vger.kernel.org>; Fri, 17 Mar 2023 15:03:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1679090636;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7C3PJuu97/IUN2lM+itL189yjrDJAkAtzdO1nAsVKvY=;
+        b=FWGgeZvK63Q1WB/XlhKAN68MH8trZ+PjZ1SV8UWcuXV2KXhVMI0v7cNIoOOCt8kmkQ
+         kgoewKJzgTCT153lbLNPBKBuGIoIpcdEkLwUwjlWP7/+K/sarIAoCQ6Nbt+8TnpOqMzD
+         xQUxgUCu7PAvy8Xj90dCNZzSGtSDE6vGeFfA/V+Gnt/RPqx94gx9yxh1z15vbCkf5COa
+         XfyFr04LXrcbCZiK72fcJsWnhuDD6Tu5HvOowxc622yDSXGrp1RPKsRUW6mB6N/t0JcI
+         TFCbYeJDW3+mfzyX+M2T81G796CYRdZSjGqtlEi7EEEKBgiTR5nDxeIhfyShrnJsbyFO
+         fQYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679090317;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pOoNggaNrRU0x9UPOrR6/pBGLjWwIZnTfEp906MOxHQ=;
-        b=xRh5dYDlDf9uoa/HJtb2XtkMzyp+T5wjYHvUHnAyVxQgSzltVGhCZSJvRTKgq+VgY3
-         xKSBnPtF78Fm+WzHqyeXkEzqybkJWcXWhrRLCATUqkxxIyT4vv8jZ8IBqaBBwruTNaqs
-         lhpxcEDLOE63Tw3qOVtI3utmrtfmt8mnIi6AJqHwbXbouFeun5m1BdJcqNdei+gXX1V0
-         Xay0pyqk70ihpFR61PbeMFdx+yVGws0Dviow6CRIXOAttKVbh8rT53xdFzJcqOt1VsWT
-         +yixmM/MDd2ZwDioPbKzz63JTeN/x9Ewjgfka65HwD6xc4CCX/BJrcANgTE8IRi0FDCe
-         j72w==
-X-Gm-Message-State: AO0yUKXdnMCgs9DKnYbQiim6LiXycTb3As/xEHHnTqDiNLBh4ZYx1eCX
-        kAHxaRJusznM+RU6A6sDHbXZ2IzXn1kFlSfTCrWR+YFln6Fw5iFadjWcyRqV5VFr8LRck6PvBZi
-        LZ3ieXxomBlik
-X-Received: by 2002:a05:6e02:550:b0:323:d3ab:8f3c with SMTP id i16-20020a056e02055000b00323d3ab8f3cmr109529ils.17.1679090317669;
-        Fri, 17 Mar 2023 14:58:37 -0700 (PDT)
-X-Google-Smtp-Source: AK7set9VVVPJI7uenkc0uouzZj+lprsl9rrHy1K7vPeTJcTp+oi7cJhm4bIy7aWKArni6GiKxTzF7g==
-X-Received: by 2002:a05:6e02:550:b0:323:d3ab:8f3c with SMTP id i16-20020a056e02055000b00323d3ab8f3cmr109509ils.17.1679090317295;
-        Fri, 17 Mar 2023 14:58:37 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id g2-20020a92c7c2000000b003159b6d97d6sm894668ilk.52.2023.03.17.14.58.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Mar 2023 14:58:36 -0700 (PDT)
-Date:   Fri, 17 Mar 2023 15:58:35 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Reinette Chatre <reinette.chatre@intel.com>
-Cc:     jgg@nvidia.com, yishaih@nvidia.com,
-        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
-        tglx@linutronix.de, darwi@linutronix.de, kvm@vger.kernel.org,
-        dave.jiang@intel.com, jing2.liu@intel.com, ashok.raj@intel.com,
-        fenghua.yu@intel.com, tom.zanussi@linux.intel.com,
-        linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 7/8] vfio/pci: Support dynamic MSI-x
-Message-ID: <20230317155835.79165907.alex.williamson@redhat.com>
-In-Reply-To: <591ce11f4a33e022fc9242324ebdc077202bedaf.1678911529.git.reinette.chatre@intel.com>
-References: <cover.1678911529.git.reinette.chatre@intel.com>
-        <591ce11f4a33e022fc9242324ebdc077202bedaf.1678911529.git.reinette.chatre@intel.com>
-Organization: Red Hat
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        d=1e100.net; s=20210112; t=1679090636;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=7C3PJuu97/IUN2lM+itL189yjrDJAkAtzdO1nAsVKvY=;
+        b=yxK3RRVEPhEsC7Cbj7Rd+gfliIJqApTjsb1stryCDl6R+cs742WfoCumROM4ayATbo
+         gsxG7ZbTbAs3OpOsY7ZAHAPPsoXWrOBoA2NaQXuPEXX2K7p70Bj0hXXY0U0C37tj0xDv
+         fUDUoCnu2HQilG7pYEG1nqK3aYWgjhz46fZmt/sLaA/1kKt6waF84Hc2AI6vLSGDmteQ
+         KKh0IsxjHsAUvP//YiUFexcilekglqSF6nZT+aJ11eIsX9s8ZBRLXh+7uRlV1FlI/P3q
+         FLcl2dsmHu4EOdTUmtIHPW0Q8Vvnyb3ypPDIGe8GTVdhRaZw6hVO3387rvQ5UjkapWVt
+         gOHg==
+X-Gm-Message-State: AO0yUKXSbGFlMZqDmFgVnMeZpwsVYepz0UA+KURZjvENt0S2NfK3NjfW
+        vauEvsL7aCOUpYo8Ky8Ko8jbMSLzzXA=
+X-Google-Smtp-Source: AK7set+VzqqNiIO1L9ALKARbx1rDsnA3JwjovSMCxTLDOQdu7hGMjzpjYDlM+0wJnuoxCZGZeHQmam0Cf8Y=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:ca08:b0:23b:349d:a159 with SMTP id
+ x8-20020a17090aca0800b0023b349da159mr1425777pjt.3.1679090636594; Fri, 17 Mar
+ 2023 15:03:56 -0700 (PDT)
+Date:   Fri, 17 Mar 2023 15:03:55 -0700
+In-Reply-To: <CAF7b7mpwJ55vhmVfy0-_Nosgd+GZfno_HT1QQHg-952kvXW_5Q@mail.gmail.com>
+Mime-Version: 1.0
+References: <20230315021738.1151386-1-amoorthy@google.com> <ZBSmz0JAgTrsF608@linux.dev>
+ <ZBStyKk6H73/0z2r@google.com> <CALzav=dBJyr373jnBF_-uLJfZMwHOsKSVSR2u4xr83etjp6Daw@mail.gmail.com>
+ <ZBS3UbrWFZJzLzOq@linux.dev> <CALzav=fuZRrrMWHR+tRJ7R9hUDHyzhdBJ_Ak2V622TjRpFLoLw@mail.gmail.com>
+ <CAF7b7mpwJ55vhmVfy0-_Nosgd+GZfno_HT1QQHg-952kvXW_5Q@mail.gmail.com>
+Message-ID: <ZBTjyzOl58ITmkNk@google.com>
+Subject: Re: [WIP Patch v2 00/14] Avoiding slow get-user-pages via memory
+ fault exit
+From:   Sean Christopherson <seanjc@google.com>
+To:     Anish Moorthy <amoorthy@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>, jthoughton@google.com,
+        kvm@vger.kernel.org, maz@kernel.org,
+        Isaku Yamahata <isaku.yamahata@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -83,228 +74,81 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 15 Mar 2023 13:59:27 -0700
-Reinette Chatre <reinette.chatre@intel.com> wrote:
+On Fri, Mar 17, 2023, Anish Moorthy wrote:
+> On Fri, Mar 17, 2023 at 12:00=E2=80=AFPM David Matlack <dmatlack@google.c=
+om> wrote:
+> > > The low-level accessors are common across architectures and can be ca=
+lled from
+> > > other contexts besides a vCPU. Is it possible for the caller to catch=
+ -EFAULT
+> > > and convert that into an exit?
+> >
+> > Ya, as things stand today, the conversions _must_ be performed at the c=
+aller, as
+> > there are (sadly) far too many flows where KVM squashes the error.  E.g=
+. almost
+> > all of x86's paravirt code just suppresses user memory faults :-(
+> >
+> > Anish, when we discussed this off-list, what I meant by limiting the in=
+tial support
+> > to existing -EFAULT cases was limiting support to existing cases where =
+KVM directly
+> > returns -EFAULT to userspace, not to all existing cases where -EFAULT i=
+s ever
+> > returned _within KVM_ while handling KVM_RUN.  My apologies if I didn't=
+ make that clear.
+>=20
+> Don't worry, we eventually got there off-list :)
+>=20
+> This brings us back to my original set of questions. As has already
+> been pointed out, I'll have to revisit my "Confident that needs
+> conversion" changes and tweak them so that the vCPU exit is populated
+> only for the call sites where the -EFAULT makes it to userspace. I
+> still want feedback on if I've mis-identified any of the functions in
+> my "EFAULT does not propagate to userspace" list and whether there are
+> functions/callers in the "Still unsure if needs conversion" which do
+> have return paths to KVM_RUN.
 
-> Recently introduced pci_msix_alloc_irq_at() and pci_msix_free_irq()
-> enables an individual MSI-X index to be allocated and freed after
-> MSI-X enabling.
-> 
-> Support dynamic MSI-X by keeping the association between allocated
-> interrupt and vfio interrupt context. Allocate new context together
-> with the new interrupt if no interrupt context exist for an MSI-X
-> interrupt. Similarly, release an interrupt with its context.
-> 
-> Signed-off-by: Reinette Chatre <reinette.chatre@intel.com>
-> ---
-> 
-> Guidance is appreciated on expectations regarding maintaining
-> existing error behavior. Earlier patch introduced the
-> vfio_irq_ctx_range_allocated() helper to maintain existing error
-> behavior. Now, this helper needs to be disabled for MSI-X. User
-> space not wanting to dynamically allocate MSI-X interrupts, but
-> providing invalid range when providing a new ACTION will now
-> obtain new interrupts or new failures (potentially including freeing
-> of existing interrupts) if the allocation of the new interrupts fail.
-> 
->  drivers/vfio/pci/vfio_pci_intrs.c | 101 ++++++++++++++++++++++++------
->  1 file changed, 83 insertions(+), 18 deletions(-)
-> 
-> diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-> index b375a12885ba..954a70575802 100644
-> --- a/drivers/vfio/pci/vfio_pci_intrs.c
-> +++ b/drivers/vfio/pci/vfio_pci_intrs.c
-> @@ -55,6 +55,18 @@ struct vfio_pci_irq_ctx *vfio_irq_ctx_get(struct vfio_pci_core_device *vdev,
->  	return xa_load(&vdev->ctx, index);
->  }
->  
-> +static void vfio_irq_ctx_free(struct vfio_pci_core_device *vdev,
-> +			      unsigned long index)
-> +{
-> +	struct vfio_pci_irq_ctx *ctx;
-> +
-> +	ctx = xa_load(&vdev->ctx, index);
-> +	if (ctx) {
-> +		xa_erase(&vdev->ctx, index);
-> +		kfree(ctx);
-> +	}
-> +}
+As you've probably gathered from the type of feedback you're receiving, ide=
+ntifying
+the conversion touchpoints isn't going to be the long pole of this series. =
+ Correctly
+identifying all of the touchpoints may not be easy, but fixing any cases we=
+ get wrong
+will likely be straightforward.  And realistically, no matter how many eyeb=
+alls look
+at the code, odds are good we'll miss at least one case.  In other words, d=
+on't worry
+too much about getting all the touchpoints correct on the first version.  G=
+etting the
+uAPI right is much more important.
 
-The only places calling this have a known valid ctx, so it seems
-redundant that we xa_load it again.  Should ctx be a function arg to
-reduce this to simply xa_erase() + kfree()?
+And rather than rely on code review to get things right, we should be able =
+to
+detect issues programmatically.  E.g. use fault injection to make gup() and=
+/or
+uaccess fail (might even be wired up already?), and hack in a WARN in the K=
+VM_RUN
+path to assert that KVM_EXIT_MEMORY_FAULT is filled if the return code is -=
+EFAULT
+(assuming we go don't try to get KVM to return 0 everywhere), e.g. somethin=
+g like
+the below would at least flag the "misses", although debug could still prov=
+e to be
+annoying.
 
-> +
->  static void vfio_irq_ctx_free_all(struct vfio_pci_core_device *vdev)
->  {
->  	struct vfio_pci_irq_ctx *ctx;
-> @@ -430,33 +442,63 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_core_device *vdev,
->  {
->  	struct pci_dev *pdev = vdev->pdev;
->  	struct vfio_pci_irq_ctx *ctx;
-> +	struct msi_map msix_map = {};
->  	struct eventfd_ctx *trigger;
-> +	bool new_ctx;
->  	int irq, ret;
->  	u16 cmd;
->  
->  	ctx = vfio_irq_ctx_get(vdev, vector);
-> -	if (!ctx)
-> +	/* Only MSI-X allows dynamic allocation. */
-> +	if (!msix && !ctx)
->  		return -EINVAL;
-> +
->  	irq = pci_irq_vector(pdev, vector);
-> +	/* Context and interrupt are always allocated together. */
-> +	WARN_ON((ctx && irq == -EINVAL) || (!ctx && irq != -EINVAL));
->  
-> -	if (ctx->trigger) {
-> +	if (ctx && ctx->trigger) {
->  		irq_bypass_unregister_producer(&ctx->producer);
->  
->  		cmd = vfio_pci_memory_lock_and_enable(vdev);
->  		free_irq(irq, ctx->trigger);
-> +		if (msix) {
-> +			msix_map.index = vector;
-> +			msix_map.virq = irq;
-> +			pci_msix_free_irq(pdev, msix_map);
-> +			irq = -EINVAL;
-> +		}
->  		vfio_pci_memory_unlock_and_restore(vdev, cmd);
->  		kfree(ctx->name);
->  		eventfd_ctx_put(ctx->trigger);
->  		ctx->trigger = NULL;
-> +		if (msix) {
-> +			vfio_irq_ctx_free(vdev, vector);
-> +			ctx = NULL;
-> +		}
->  	}
->  
->  	if (fd < 0)
->  		return 0;
->  
-> +	if (!ctx) {
-> +		ret = vfio_irq_ctx_alloc_single(vdev, vector);
-> +		if (ret)
-> +			return ret;
-> +		ctx = vfio_irq_ctx_get(vdev, vector);
-
-This suggests vfio_irq_ctx_alloc_single() should return ctx.
-
-> +		if (!ctx) {
-> +			ret = -EINVAL;
-> +			goto out_free_ctx;
-> +		}
-> +		new_ctx = true;
-> +	}
-> +
->  	ctx->name = kasprintf(GFP_KERNEL_ACCOUNT, "vfio-msi%s[%d](%s)",
->  			      msix ? "x" : "", vector, pci_name(pdev));
-> -	if (!ctx->name)
-> -		return -ENOMEM;
-> +	if (!ctx->name) {
-> +		ret = -ENOMEM;
-> +		goto out_free_ctx;
-> +	}
->  
->  	trigger = eventfd_ctx_fdget(fd);
->  	if (IS_ERR(trigger)) {
-> @@ -464,25 +506,38 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_core_device *vdev,
->  		goto out_free_name;
->  	}
->  
-> -	/*
-> -	 * The MSIx vector table resides in device memory which may be cleared
-> -	 * via backdoor resets. We don't allow direct access to the vector
-> -	 * table so even if a userspace driver attempts to save/restore around
-> -	 * such a reset it would be unsuccessful. To avoid this, restore the
-> -	 * cached value of the message prior to enabling.
-> -	 */
->  	cmd = vfio_pci_memory_lock_and_enable(vdev);
->  	if (msix) {
-> -		struct msi_msg msg;
-> -
-> -		get_cached_msi_msg(irq, &msg);
-> -		pci_write_msi_msg(irq, &msg);
-> +		if (irq == -EINVAL) {
-> +			msix_map = pci_msix_alloc_irq_at(pdev, vector, NULL);
-
-It looks to me like we need to support MSI-X with both NORESIZE
-behavior and dynamic allocation based on pci_msix_can_alloc_dyn().
-It's not entirely clear to me where this is and isn't supported, but
-the existence of the test helper suggests we can't assume support.
-
-
-> +			if (msix_map.index < 0) {
-> +				vfio_pci_memory_unlock_and_restore(vdev, cmd);
-> +				ret = msix_map.index;
-> +				goto out_put_eventfd_ctx;
-> +			}
-> +			irq = msix_map.virq;
-> +		} else {
-> +			/*
-> +			 * The MSIx vector table resides in device memory which
-> +			 * may be cleared via backdoor resets. We don't allow
-> +			 * direct access to the vector table so even if a
-> +			 * userspace driver attempts to save/restore around
-> +			 * such a reset it would be unsuccessful. To avoid
-> +			 * this, restore the cached value of the message prior
-> +			 * to enabling.
-> +			 */
-> +			struct msi_msg msg;
-> +
-> +			get_cached_msi_msg(irq, &msg);
-> +			pci_write_msi_msg(irq, &msg);
-> +		}
-
-I don't follow when this latter branch is ever taken in the new flow.
-It's stated earlier that ctx and irq are coupled, and I believe so is
-trigger.  So if we had a previous ctx and irq (and trigger), we removed
-it and irq is now always -EINVAL here.  Thanks,
-
-Alex
-
->  	}
->  
->  	ret = request_irq(irq, vfio_msihandler, 0, ctx->name, trigger);
-> -	vfio_pci_memory_unlock_and_restore(vdev, cmd);
->  	if (ret)
-> -		goto out_put_eventfd_ctx;
-> +		goto out_free_irq_locked;
-> +
-> +	vfio_pci_memory_unlock_and_restore(vdev, cmd);
->  
->  	ctx->producer.token = trigger;
->  	ctx->producer.irq = irq;
-> @@ -498,11 +553,21 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_core_device *vdev,
->  
->  	return 0;
->  
-> +out_free_irq_locked:
-> +	if (msix && new_ctx) {
-> +		msix_map.index = vector;
-> +		msix_map.virq = irq;
-> +		pci_msix_free_irq(pdev, msix_map);
-> +	}
-> +	vfio_pci_memory_unlock_and_restore(vdev, cmd);
->  out_put_eventfd_ctx:
->  	eventfd_ctx_put(trigger);
->  out_free_name:
->  	kfree(ctx->name);
->  	ctx->name = NULL;
-> +out_free_ctx:
-> +	if (msix && new_ctx)
-> +		vfio_irq_ctx_free(vdev, vector);
->  	return ret;
->  }
->  
-> @@ -512,7 +577,7 @@ static int vfio_msi_set_block(struct vfio_pci_core_device *vdev, unsigned start,
->  	int i, ret = 0;
->  	unsigned int j;
->  
-> -	if (!vfio_irq_ctx_range_allocated(vdev, start, count))
-> +	if (!msix && !vfio_irq_ctx_range_allocated(vdev, start, count))
->  		return -EINVAL;
->  
->  	for (i = 0, j = start; i < count && !ret; i++, j++) {
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 67b890e54cf1..cccae0ad1436 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4100,6 +4100,8 @@ static long kvm_vcpu_ioctl(struct file *filp,
+                }
+                r =3D kvm_arch_vcpu_ioctl_run(vcpu);
+                trace_kvm_userspace_exit(vcpu->run->exit_reason, r);
++               WARN_ON(r =3D=3D -EFAULT &&
++                       vcpu->run->exit_reason =3D=3D KVM_EXIT_MEMORY_FAULT=
+);
+                break;
+        }
+        case KVM_GET_REGS: {
 
