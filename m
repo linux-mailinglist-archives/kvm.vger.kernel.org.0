@@ -2,78 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 157B06BF7F2
-	for <lists+kvm@lfdr.de>; Sat, 18 Mar 2023 06:13:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C879C6BF85D
+	for <lists+kvm@lfdr.de>; Sat, 18 Mar 2023 07:33:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229943AbjCRFN1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 18 Mar 2023 01:13:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55218 "EHLO
+        id S230137AbjCRGdr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 18 Mar 2023 02:33:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229517AbjCRFN0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 18 Mar 2023 01:13:26 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2273455A4;
-        Fri, 17 Mar 2023 22:13:25 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id o11so7416158ple.1;
-        Fri, 17 Mar 2023 22:13:25 -0700 (PDT)
+        with ESMTP id S229575AbjCRGdp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 18 Mar 2023 02:33:45 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6438C24116;
+        Fri, 17 Mar 2023 23:33:43 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id l9-20020a17090a3f0900b0023d32684e7fso9555312pjc.1;
+        Fri, 17 Mar 2023 23:33:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679116404;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vp4nrXm1X0DRjVSq3iwlTb4e7n7mV7oF4ktjLlYr7kI=;
-        b=bLjj9lGgZpmi+5FdHB64/F5xCOboYww86flECThggnpLYmZZA5HqQTRQcFCfg+10a9
-         gaz0V+wmOBm7A4cV7oLOCRDbxttum/0tzDarTuJxSZ6b0oQFZkkdZCaIn52+gfS9b2Yf
-         ts32C0rszSNrP3uxXG8IdM/ODszWZAHT7PALtVns+aiy/RgUeeDJACOY+FyFgOggJsCW
-         3jmRnpxXRZt66+1XPq+2yFozVuTkCwGg+SKIJkvcZ+kSuSwAEGRfREOmD8Z3OMxHC6Wp
-         ED2E75u8Bob8l5+LtugWgjavAYlz579OG/4/c6aVO+NkY3Xv6UcxQ0mOKdJ/I/g3GwRF
-         Zcow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679116404;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20210112; t=1679121223;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Vp4nrXm1X0DRjVSq3iwlTb4e7n7mV7oF4ktjLlYr7kI=;
-        b=eeRykUxBYJ4uCXDzh2z12yw0KqfONz6VrMRaRM80DS9tmGVb8pYksZjEJOuJ8YaZV3
-         syHlIOJMM7z4jl6URiAUfOAyui+Agt8fXvcvsFNprdQv2e9f6AtMs/mAuIyQntggs2T9
-         oE1xT22IJeBNYacrsSy7oCnZPUD9KIhRCV1KzrElYoGqAc6W1pXme2ss9T3nI5Twzs/M
-         cI04bwejD2ACjIkjduliYiOs+xUO/+MRUh6FkF/qNOf51Q/aICYimWJo3tEduGwLtAYp
-         L0mPy+EWyN7VGOoL2j1f45DSFrCT/XJtpBZS+qsXrerGSfTkIwGYQLqsb4oL2zrD+gEN
-         GIsw==
-X-Gm-Message-State: AO0yUKWYJX4Axz2VXbaLQN+MuUyvaiSY+VpIvunQ1zooNW808U/aiAsX
-        jIdg+5nDm83m2RnHSUVeUqw=
-X-Google-Smtp-Source: AK7set/soYLT1CHxH7Zm0HB+kkpyXNgNLr1rZsO1BZXpOWuxHpdfWc2Pxx1BGwMWxRV9sT22pll0Hw==
-X-Received: by 2002:a17:903:1d0:b0:19d:1d32:fc7 with SMTP id e16-20020a17090301d000b0019d1d320fc7mr11937833plh.51.1679116404399;
-        Fri, 17 Mar 2023 22:13:24 -0700 (PDT)
-Received: from localhost ([192.55.54.55])
-        by smtp.gmail.com with ESMTPSA id q20-20020a170902b11400b0019251e959b1sm2350530plr.262.2023.03.17.22.13.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Mar 2023 22:13:23 -0700 (PDT)
-Date:   Fri, 17 Mar 2023 22:13:22 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
-        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        nikunj.dadhania@amd.com, isaku.yamahata@gmail.com
-Subject: Re: [PATCH RFC v8 03/56] KVM: x86: Add platform hooks for private
- memory invalidations
-Message-ID: <20230318051322.GF408922@ls.amr.corp.intel.com>
-References: <20230220183847.59159-1-michael.roth@amd.com>
- <20230220183847.59159-4-michael.roth@amd.com>
+        bh=0kGhEEWrhLYeTtU2Bv6lz7VXigjqaU4IzIFbxg6rvM0=;
+        b=FBL0NdrFcTtVowhrBPqcyYigisj6uc2l1vdqX3qK/PGnBtOKzdjj0R3T2oTrd3NhfU
+         U8d+TLKw0php2Q2slPwPIylSFfVWIbnZJvR164rfa3GlnLjcrIzWYzKmJoGN8Adf0iyg
+         D58WWD/t8oc7vOd+vSlN9ToQeldXpfNnOZ0DWAKPBk0oJFPah7voCATtlPUL76vdeNSW
+         K6pocOk6A1gCVJcVw9RnGFZigBxsRwID109k2RqS5Th82ILMOKPIEAZZIfI1B19H480V
+         eanchH1ILubLO1R4AQ6vThvUl7KvxMqshSvsNDHClyCbF6QKC2by3XptwfgRaQRsBsdF
+         XN2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679121223;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0kGhEEWrhLYeTtU2Bv6lz7VXigjqaU4IzIFbxg6rvM0=;
+        b=Ql83fxq6KIyeQp8VW4yIDPIydEmgjcyu1p6n7yDALYAUEJil0iYAb8tsh7rqJEoLnk
+         sGfdfvr2zkbAF7KtE/LFnyxQc5SYsu6hq+f7v3R9jHipvxBUB6fN9gRFIV74CB94WVxX
+         qrv0w/ivev/SOVi3ISmZs2i8lFHUE4o3ns+bPesSo2Sj8btWWgr72+ptXcvqw94nyPO/
+         13Ljx2voXvCGJdUf0/DesD7Zt7CVMdqVDIc7DeCaacMrc8gFrk6ft24yuGhvfeOr+AUp
+         BYJS8DIKlfIkRiwTR4Tkj9jkFk39W7sLCW3h2l1XvswaEoYrNZh0V1itF65FPOA6wiaX
+         JUzQ==
+X-Gm-Message-State: AO0yUKXvIXUkAfZXn4AyyQCpmOvuFskzUYhjmw9buC2iHK816CmPNWWj
+        gWyB5r5pri/hK6wiOhwagIT1Yci32ozTYuCzk6M=
+X-Google-Smtp-Source: AK7set8iH3ILskrWrZgxfDPT0iW2Owd9Wy/7osipvBJJ8qCjWuPuLZvNSkzuc7Kh22apoE4MUanqGkfTlEiPeqZ4MpY=
+X-Received: by 2002:a17:90a:f2c4:b0:23d:1121:f211 with SMTP id
+ gt4-20020a17090af2c400b0023d1121f211mr2841345pjb.5.1679121222740; Fri, 17 Mar
+ 2023 23:33:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230220183847.59159-4-michael.roth@amd.com>
+References: <20230307023946.14516-1-xin3.li@intel.com> <20230307023946.14516-23-xin3.li@intel.com>
+ <CAJhGHyADXz-3PCFS3M_7TJ8qLGJ=4NcV9aBWrpjemuXB_SnMGg@mail.gmail.com> <5D679723-D84F-42F0-AD8A-8BD1A38FB6CD@zytor.com>
+In-Reply-To: <5D679723-D84F-42F0-AD8A-8BD1A38FB6CD@zytor.com>
+From:   Lai Jiangshan <jiangshanlai@gmail.com>
+Date:   Sat, 18 Mar 2023 14:33:30 +0800
+Message-ID: <CAJhGHyC0_1xJD2R03-NoRVpMXFTHR4v8CdzyJOZe_k0rdv=NfQ@mail.gmail.com>
+Subject: Re: [PATCH v5 22/34] x86/fred: FRED initialization code
+To:     "H. Peter Anvin" <hpa@zytor.com>
+Cc:     Xin Li <xin3.li@intel.com>, linux-kernel@vger.kernel.org,
+        x86@kernel.org, kvm@vger.kernel.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        peterz@infradead.org, andrew.cooper3@citrix.com, seanjc@google.com,
+        pbonzini@redhat.com, ravi.v.shankar@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -84,25 +72,86 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 20, 2023 at 12:37:54PM -0600,
-Michael Roth <michael.roth@amd.com> wrote:
+On Sat, Mar 18, 2023 at 5:32=E2=80=AFAM H. Peter Anvin <hpa@zytor.com> wrot=
+e:
+>
+> On March 17, 2023 6:35:57 AM PDT, Lai Jiangshan <jiangshanlai@gmail.com> =
+wrote:
+> >Hello
+> >
+> >
+> >Comments in cpu_init_fred_exceptions() seem scarce for understanding.
+> >
+> >On Tue, Mar 7, 2023 at 11:07=E2=80=AFAM Xin Li <xin3.li@intel.com> wrote=
+:
+> >
+> >> +/*
+> >> + * Initialize FRED on this CPU. This cannot be __init as it is called
+> >> + * during CPU hotplug.
+> >> + */
+> >> +void cpu_init_fred_exceptions(void)
+> >> +{
+> >> +       wrmsrl(MSR_IA32_FRED_CONFIG,
+> >> +              FRED_CONFIG_ENTRYPOINT(fred_entrypoint_user) |
+> >> +              FRED_CONFIG_REDZONE(8) | /* Reserve for CALL emulation =
+*/
+> >> +              FRED_CONFIG_INT_STKLVL(0));
+> >
+> >What is it about "Reserve for CALL emulation"?
+> >
+> >I guess it relates to X86_TRAP_BP. In entry_64.S:
+> >
+> >        .if \vector =3D=3D X86_TRAP_BP
+> >                /*
+> >                 * If coming from kernel space, create a 6-word gap to a=
+llow the
+> >                 * int3 handler to emulate a call instruction.
+> >                 */
+> >
+> >> +
+> >> +       wrmsrl(MSR_IA32_FRED_STKLVLS,
+> >> +              FRED_STKLVL(X86_TRAP_DB,  1) |
+> >> +              FRED_STKLVL(X86_TRAP_NMI, 2) |
+> >> +              FRED_STKLVL(X86_TRAP_MC,  2) |
+> >> +              FRED_STKLVL(X86_TRAP_DF,  3));
+> >
+> >Why each exception here needs a stack level > 0?
+> >Especially for X86_TRAP_DB and X86_TRAP_NMI.
+> >
+> >Why does or why does not X86_TRAP_VE have a stack level > 0?
+> >
+> >X86_TRAP_DF is the highest stack level, is it accidental
+> >or deliberate?
+> >
+> >Thanks
+> >Lai
+> >
+>
+> Yes, the extra redzone space is there to allow for the call emulation wit=
+hout having to adjust the stack frame "manually".
+>
+> In theory we could enable it only while code patching is in progress, but=
+ that would probably just result in stack overflows becoming utterly imposs=
+ible to debug as we have to consider the worst case.
+>
+> The purpose of separate stacks for NMI, #DB and #MC *in the kernel* (reme=
+mber that user space faults are always taken on stack level 0) is to avoid =
+overflowing the kernel stack. #DB in the kernel would imply the use of a ke=
+rnel debugger.
 
-> In some cases, like with SEV-SNP, guest memory needs to be updated in a
-> platform-specific manner before it can be safely freed back to the host.
-> Add hooks to wire up handling of this sort to the invalidation notifiers
-> for restricted memory.
-> 
-> Also issue invalidations of all allocated pages during notifier/memslot
-> unbinding so that the pages are not left in an unusable state when
-> they eventually get freed back to the host upon FD release.
+Could you add it to the code, please? I think it can help other reviewers.
 
-I'm just curios. Could you please elaborate?
-Unbind is happen only when memory slot is delete or vm is destroyed.  In the
-case of memory slot deletion, the gpa region is zapped via
-kvm_arch_commit_memory_region().  In the case of VM destroy, we have
-kvm_flush_shadow_all() which calls
-kvm_arch_flush_shadow_all() =>kvm_mmu_zap_all().  Doesn't it work?
+If there is no other concrete reason other than overflowing for
+assigning NMI and #DB with a stack level > 0, #VE should also
+be assigned with a stack level > 0, and #BP too. #VE can happen
+anytime and anywhere, so it is subject to overflowing too.
 
-Thanks,
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+>
+>
+> #DF is the highest level because a #DF means "something went wrong *while=
+ delivering an exception*." The number of cases for which that can happen w=
+ith FRED is drastically reduced and basically amount to "the stack you poin=
+ted me to is broken."
+>
+> Thus, you basically always want to change stacks on #DF, which means it s=
+hould be at the highest level.
