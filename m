@@ -2,69 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 614E56BFC1C
-	for <lists+kvm@lfdr.de>; Sat, 18 Mar 2023 19:11:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 17F686BFC3C
+	for <lists+kvm@lfdr.de>; Sat, 18 Mar 2023 20:06:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229765AbjCRSLc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 18 Mar 2023 14:11:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49146 "EHLO
+        id S229568AbjCRTGQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 18 Mar 2023 15:06:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229473AbjCRSLb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 18 Mar 2023 14:11:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2985631E20
-        for <kvm@vger.kernel.org>; Sat, 18 Mar 2023 11:10:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679163041;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:mime-version:mime-version:
-         content-type:content-type; bh=+GjR7fSCNL8SDsgzOekp2fTkL2g0P5AjbEUKio71uEs=;
-        b=Zv+Qmbo6ZedDheLJyhMYWhRnWuEFjujBkFmjwevZF0O3PIuGJG273rGKkU28rz5wjxKMFH
-        2I6TguR3sBieJWJDYuIIuDmruW8/LGJ5f283OU7lezw60YPEQEpPLUzlLQm/7jhhAj8wHh
-        0hJpOornSOPtbMMA6ICOXW0GUrtQnXY=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-244-Az03IoCYM4-thbmkm_Md2Q-1; Sat, 18 Mar 2023 14:10:39 -0400
-X-MC-Unique: Az03IoCYM4-thbmkm_Md2Q-1
-Received: by mail-wm1-f69.google.com with SMTP id 1-20020a05600c024100b003ec8023ac4eso3086572wmj.0
-        for <kvm@vger.kernel.org>; Sat, 18 Mar 2023 11:10:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679163038;
-        h=mime-version:message-id:date:reply-to:user-agent:subject:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+GjR7fSCNL8SDsgzOekp2fTkL2g0P5AjbEUKio71uEs=;
-        b=Lb7Z5r0xQDQJR1iYMGOSSyLI/N8eXHK/8i5kGYX6KjQdMqyq6BJl+q3aFMYJxhi/6w
-         bafp+VJGJJ/g8vcYnhFmN3VZqfQ70qmTmyhDFsMaIrzWebQhD35O2f7ox2EsQxAOPDrw
-         05Fjj9pWdmw0qN8CRRoUIVG/pG4Ru5g6pjjcCWBR32/vowhW3PbzsRAB+2DVcec/8tKa
-         Pydb60Eum1C/qgrG2bWLIQ/HGOg1XsMKMDCwIKmT104dF0/LfIBExEETFuZIb6brz3q+
-         Yidy+h1P+Lw2AK13nfRR2Ou9Y0gypp5MOMW2iFv4LB2UQM3oivZaxSo94bsZE2IZsg15
-         ZBzw==
-X-Gm-Message-State: AO0yUKVvNpf22Z0sUKltsXT64uDiDvHf/sp8tCBTVT8RM4jfQsEFphtm
-        h66kj92yBGtJb/Gq7Vjq90RmQ9cKCflQ0dulTfvAa+pUoIQcDuhkYyRUCOJs58DIFB+MXiXh28b
-        1wXsOEQwijMe9
-X-Received: by 2002:a05:600c:46c7:b0:3d3:49db:9b25 with SMTP id q7-20020a05600c46c700b003d349db9b25mr27429703wmo.26.1679163038640;
-        Sat, 18 Mar 2023 11:10:38 -0700 (PDT)
-X-Google-Smtp-Source: AK7set8xkg8OfKGxHO9gdyd5K3dDqlSysUY5qzN0XBMec8uJZ5R3AcuDriQrl+mm0GU7oHsEYYF/mw==
-X-Received: by 2002:a05:600c:46c7:b0:3d3:49db:9b25 with SMTP id q7-20020a05600c46c700b003d349db9b25mr27429691wmo.26.1679163038394;
-        Sat, 18 Mar 2023 11:10:38 -0700 (PDT)
-Received: from redhat.com (62.117.238.225.dyn.user.ono.com. [62.117.238.225])
-        by smtp.gmail.com with ESMTPSA id k3-20020a7bc403000000b003ed1f69c967sm11311267wmi.9.2023.03.18.11.10.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 18 Mar 2023 11:10:37 -0700 (PDT)
-From:   Juan Quintela <quintela@redhat.com>
-To:     qemu-devel@nongnu.org, kvm-devel <kvm@vger.kernel.org>
-Subject: Should I record QEMU developers fortnightly call?
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
-Reply-To: quintela@redhat.com
-Date:   Sat, 18 Mar 2023 19:10:37 +0100
-Message-ID: <87sfe2j5gi.fsf@secure.mitica>
+        with ESMTP id S229488AbjCRTGQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 18 Mar 2023 15:06:16 -0400
+Received: from raptorengineering.com (mail.raptorengineering.com [23.155.224.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A25B0132DD
+        for <kvm@vger.kernel.org>; Sat, 18 Mar 2023 12:06:14 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.rptsys.com (Postfix) with ESMTP id 7D78737E3A91F5;
+        Sat, 18 Mar 2023 14:06:13 -0500 (CDT)
+Received: from mail.rptsys.com ([127.0.0.1])
+        by localhost (vali.starlink.edu [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id vOHgNumnWw4D; Sat, 18 Mar 2023 14:06:11 -0500 (CDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.rptsys.com (Postfix) with ESMTP id E149037E3A91F1;
+        Sat, 18 Mar 2023 14:06:10 -0500 (CDT)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.rptsys.com E149037E3A91F1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=raptorengineering.com; s=B8E824E6-0BE2-11E6-931D-288C65937AAD;
+        t=1679166370; bh=tFEPMhwT34mK+wj8HRIYX2GIZdNKI6YHgf1brhfccmY=;
+        h=Date:From:To:Message-ID:MIME-Version;
+        b=PoMVTuDZc1o5xO9fmDK9sCAyFnT/Icm6H51WwPWnaukwPqRdP+s/xsxSXx06rngxP
+         QRjA3iyhCNMfcYMfergEfdRDvmcKmfN9H4K3oT+T8H0Ps16sp6J1RLfUss0LEvsP6i
+         NiXThxKLqBm/t8L6ITQKMeyzx+T6fWghj58s4Xv0=
+X-Virus-Scanned: amavisd-new at rptsys.com
+Received: from mail.rptsys.com ([127.0.0.1])
+        by localhost (vali.starlink.edu [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id VYnaHQQPHGN4; Sat, 18 Mar 2023 14:06:10 -0500 (CDT)
+Received: from vali.starlink.edu (localhost [127.0.0.1])
+        by mail.rptsys.com (Postfix) with ESMTP id B72FA37E3A91EE;
+        Sat, 18 Mar 2023 14:06:10 -0500 (CDT)
+Date:   Sat, 18 Mar 2023 14:06:10 -0500 (CDT)
+From:   Timothy Pearson <tpearson@raptorengineering.com>
+To:     Timothy Pearson <tpearson@raptorengineering.com>
+Cc:     Michael Ellerman <mpe@ellerman.id.au>, kvm <kvm@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+Message-ID: <2099448392.25626899.1679166370571.JavaMail.zimbra@raptorengineeringinc.com>
+In-Reply-To: <1816556668.17777469.1678390100763.JavaMail.zimbra@raptorengineeringinc.com>
+References: <8398361.16996856.1678123793664.JavaMail.zimbra@raptorengineeringinc.com> <87bkl2ywz2.fsf@mpe.ellerman.id.au> <1816556668.17777469.1678390100763.JavaMail.zimbra@raptorengineeringinc.com>
+Subject: Re: [PATCH v2 0/4] Reenable VFIO support on POWER systems
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Mailer: Zimbra 8.5.0_GA_3042 (ZimbraWebClient - GC111 (Linux)/8.5.0_GA_3042)
+Thread-Topic: Reenable VFIO support on POWER systems
+Thread-Index: 5A2fst0q4NGeOTQFqq+CS6XF3WZlK3dFiO0I
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -72,15 +63,43 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-Hi
 
-I got asked several times if we have a record of previous QEMU calls.
-I think that we don't discuss anything that prevent us for recording the
-calls. But they have never been recorded in the past.  Could we discuss
-if should record them and make the recordings available, or not?
+----- Original Message -----
+> From: "Timothy Pearson" <tpearson@raptorengineering.com>
+> To: "Michael Ellerman" <mpe@ellerman.id.au>
+> Cc: "Timothy Pearson" <tpearson@raptorengineering.com>, "kvm" <kvm@vger.kernel.org>, "linuxppc-dev"
+> <linuxppc-dev@lists.ozlabs.org>
+> Sent: Thursday, March 9, 2023 1:28:20 PM
+> Subject: Re: [PATCH v2 0/4] Reenable VFIO support on POWER systems
 
-Is there anyone that has any strong opinion in any of the two
-directions?
+> ----- Original Message -----
+>> From: "Michael Ellerman" <mpe@ellerman.id.au>
+>> To: "Timothy Pearson" <tpearson@raptorengineering.com>, "kvm"
+>> <kvm@vger.kernel.org>
+>> Cc: "linuxppc-dev" <linuxppc-dev@lists.ozlabs.org>
+>> Sent: Thursday, March 9, 2023 5:40:01 AM
+>> Subject: Re: [PATCH v2 0/4] Reenable VFIO support on POWER systems
+> 
+>> Timothy Pearson <tpearson@raptorengineering.com> writes:
+>>> This patch series reenables VFIO support on POWER systems.  It
+>>> is based on Alexey Kardashevskiys's patch series, rebased and
+>>> successfully tested under QEMU with a Marvell PCIe SATA controller
+>>> on a POWER9 Blackbird host.
+>>>
+>>> Alexey Kardashevskiy (3):
+>>>   powerpc/iommu: Add "borrowing" iommu_table_group_ops
+>>>   powerpc/pci_64: Init pcibios subsys a bit later
+>>>   powerpc/iommu: Add iommu_ops to report capabilities and allow blocking
+>>>     domains
+>> 
+>> As sent the patches had lost Alexey's authorship (no From: line), I
+>> fixed it up when applying so the first 3 are authored by Alexey.
+>> 
+>> cheers
+> 
+> Thanks for catching that, it wasn't intentional.  Probably used a wrong Git
+> command...
 
-Thanks, Juan.
+Just wanted to touch base on the patches, since they're still listed as Under Review on patchwork.  Are we good to go for the 6.4 merge window?
 
+Thanks!
