@@ -2,168 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CF6C36CC765
-	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 18:02:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F3BE36CC790
+	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 18:10:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233411AbjC1QCj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Mar 2023 12:02:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33122 "EHLO
+        id S233150AbjC1QK3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Mar 2023 12:10:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233406AbjC1QCf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Mar 2023 12:02:35 -0400
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BB7CEC75
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 09:02:28 -0700 (PDT)
-Received: by mail-wr1-x42f.google.com with SMTP id y14so12782875wrq.4
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 09:02:28 -0700 (PDT)
+        with ESMTP id S232762AbjC1QKX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Mar 2023 12:10:23 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A27DBA;
+        Tue, 28 Mar 2023 09:10:07 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id z18so7502058pgj.13;
+        Tue, 28 Mar 2023 09:10:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1680019347;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6MbnN+0f617dsehwYtlh7IWt8dwxE1cjBMBOmowF/jo=;
-        b=VJZ0iiE81gahmAHh33wdnxu9f+fm7PWswjCh7eESenZk4qw+MBxuSDrdCRJA0VrjEI
-         +C7aKvPD13wY3jABL63HkqOa9uMkiu9Mbn2+aR07oiNg+xMVJQrsjvj4hLMsKVcydEBY
-         nwiqU5BDc6N6afTuF03JZqD8tCyzkYo3IEfdUUPofFV4GZMfjkRzf6rM6AHXt6J9wY2r
-         HMQigzyW+2RXu4nay6XAGfMfQXkEWxNc2j8yR2sEAbCMcg6+rBtCdJvepi60ZidtWN9n
-         c0gEDCsuxeLXDQAbKpXAHz6BYiGfYjVotey3OfXSQsTFqFBrXE/2h/6xbGPnvH2z/hHT
-         0Cpw==
+        d=gmail.com; s=20210112; t=1680019807;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wJiKI9TnWzLmHi6C68IeZ+7MBHHTSu9CAEUNVVcXEnM=;
+        b=EBBgDVp5A/GqLJnvspK0XT7CNEATCRF2/0a1orkWSA1avZBU+sI2HGou2ex7aSGaov
+         cCOE9kHWEDYhyngnfLiraSjkg+wnbwoHXtf2VTKhHHHKrsPrFyvZUENcQ4wXL3kH0aGN
+         aL8QMmeKLageaUZhllDGpC5T6pRVNcXPvlveXK/zFR27SvLJJAobGwre0HwTsh5tJ7Ew
+         iY26ZBVBsLL1NxR/+8KCHcrnKKlVJDPKcCUevSAtcCEFThODlEDTbP2C4UgVh9Npi5M8
+         IZrMFAlh758uhQESLRkBikQA23Zrr1CJvwIBcB3c4gegNTnXCdlk3rmUjkCjyUbCICvR
+         rpMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680019347;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6MbnN+0f617dsehwYtlh7IWt8dwxE1cjBMBOmowF/jo=;
-        b=lL8R9ot5IHYDbAP5wgMVAJPZ8FF4MOFFoEtWlWtD4woulGUT/6jqKnA1Fuz12opFoz
-         gXLMpOw0sPauOnAbDwEJmotjg0F+XNlJlq8WhV4qLgxlMh8WCQF7ZM57RouX2spgsVGq
-         yQdql0Yi88qrCKb1vSzJYfy7el5pCfB8TurZOfvUpSTm2mzyRMadarnhqETfC4k5l+7r
-         H75saiIYImDqa/JAQb8RS8OJsquw7I81OsSRf1dadFgbLcOs2iqOsLyQfS0Y3XLOGHos
-         RRiPNxxRwVOXWkhJU2bxO3JGs6l3ytmj9IqELzrZTl0o6l9KC/oR7gMeFgZrBxdc19gb
-         9BqA==
-X-Gm-Message-State: AAQBX9ekG3tlMKOfHRR883187LxmOEg1KNXup2nNrHPHkJ8Gk1YBNQpe
-        zJrh1qE0WJV2tg3s9tha8ANL3w==
-X-Google-Smtp-Source: AKy350ZFQOfZ6NGkv37Y8Zyt4NAfhytXhLygwXOKe3bf5X+CGLXdwq0Za3H95yZDpyNDB1L/YK+wcg==
-X-Received: by 2002:adf:f4c2:0:b0:2ce:ad40:7705 with SMTP id h2-20020adff4c2000000b002cead407705mr13934370wrp.25.1680019346740;
-        Tue, 28 Mar 2023 09:02:26 -0700 (PDT)
-Received: from localhost.localdomain ([176.187.210.212])
-        by smtp.gmail.com with ESMTPSA id f11-20020a5d4dcb000000b002cfe3f842c8sm27713200wru.56.2023.03.28.09.02.24
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 28 Mar 2023 09:02:26 -0700 (PDT)
-From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-To:     qemu-devel@nongnu.org
-Cc:     Eduardo Habkost <eduardo@habkost.net>, kvm@vger.kernel.org,
-        qemu-s390x@nongnu.org, Fabiano Rosas <farosas@suse.de>,
-        David Hildenbrand <david@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Greg Kurz <groug@kaod.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Ilya Leoshkevich <iii@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
-        Daniel Henrique Barboza <danielhb413@gmail.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Yanan Wang <wangyanan55@huawei.com>, qemu-ppc@nongnu.org,
-        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        qemu-arm@nongnu.org,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH-for-8.0 3/3] softmmu: Restore use of CPU watchpoint for all accelerators
-Date:   Tue, 28 Mar 2023 18:02:03 +0200
-Message-Id: <20230328160203.13510-4-philmd@linaro.org>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20230328160203.13510-1-philmd@linaro.org>
-References: <20230328160203.13510-1-philmd@linaro.org>
+        d=1e100.net; s=20210112; t=1680019807;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wJiKI9TnWzLmHi6C68IeZ+7MBHHTSu9CAEUNVVcXEnM=;
+        b=UiTIRfVrnrh4y5eSPBs49uiacNlRSip7Ky9Q5gt5SULTjubhUvXsS+ZzcqUqdZ5+AQ
+         ACF9QUIjx8lsY1y5vjbTbG6VjJAAxHdUyW0itJYI/0wNI7gr+212td9+Zx6HtYrWXSWv
+         1IhXmCZ5OaFbgsPY3PMFOksYrF0/rphog+nrxjPS3wOAu3lHHb4glRz8aL45vfL/EP39
+         5JAJGpA8QCLsM27qrhMcCVhSRuRIaSYIWgD0Y1sCLUFI2WbD+oHAP2RiGfOxpY9ieaLG
+         Eowo1lvsHELFWQy+4TdsjEOiKNPLxaOydeV5LmfAIzOIFFntDG8ISDY09bBqnmadahyx
+         mujQ==
+X-Gm-Message-State: AAQBX9cwBL34be5awiB5aAxnXLd7DbcgJI7PU1UGv8OM3jQjUwYLTDhB
+        Pe+qPYimWNj8YQ/9fdPRiN0=
+X-Google-Smtp-Source: AKy350ZZkx2gxZ83pBMCw3pl3b7TNfCvbj4qE/D6y+DPEJppd29r6iK+7Iuar6PfmANY6VmdGpDeZQ==
+X-Received: by 2002:a62:18d5:0:b0:625:ff85:21ec with SMTP id 204-20020a6218d5000000b00625ff8521ecmr15186860pfy.26.1680019806894;
+        Tue, 28 Mar 2023 09:10:06 -0700 (PDT)
+Received: from localhost (ec2-54-67-115-33.us-west-1.compute.amazonaws.com. [54.67.115.33])
+        by smtp.gmail.com with ESMTPSA id j24-20020aa78dd8000000b0062d7d3d7346sm4703336pfr.20.2023.03.28.09.10.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Mar 2023 09:10:06 -0700 (PDT)
+Date:   Sat, 18 Mar 2023 11:38:38 +0000
+From:   Bobby Eshleman <bobbyeshleman@gmail.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>
+Subject: Re: [PATCH net] virtio/vsock: fix leak due to missing skb owner
+Message-ID: <ZBWivg3d7G/ETqqo@bullseye>
+References: <20230327-vsock-fix-leak-v1-1-3fede367105f@bytedance.com>
+ <jinx5oduhddyyaxnreey2riem3s7ju5zuszddmoiie6dcnyiiy@fr4cg33vi7aq>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <jinx5oduhddyyaxnreey2riem3s7ju5zuszddmoiie6dcnyiiy@fr4cg33vi7aq>
+X-Spam-Status: No, score=1.9 required=5.0 tests=DATE_IN_PAST_96_XX,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
+        autolearn_force=no version=3.4.6
+X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CPU watchpoints can be use by non-TCG accelerators.
+On Tue, Mar 28, 2023 at 09:58:00AM +0200, Stefano Garzarella wrote:
+> On Mon, Mar 27, 2023 at 10:01:05PM +0000, Bobby Eshleman wrote:
+> > This patch sets the owner for the skb when being sent from a socket and
+> > so solves the leak caused when virtio_transport_purge_skbs() finds
+> > skb->sk is always NULL and therefore never matches it with the current
+> > socket. Setting the owner upon allocation fixes this.
+> > 
+> > Fixes: 71dc9ec9ac7d ("virtio/vsock: replace virtio_vsock_pkt with sk_buff")
+> > Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+> > Reported-by: Cong Wang <xiyou.wangcong@gmail.com>
+> > Link: https://lore.kernel.org/all/ZCCbATwov4U+GBUv@pop-os.localdomain/
+> > ---
+> > net/vmw_vsock/virtio_transport_common.c | 3 +++
+> > 1 file changed, 3 insertions(+)
+> > 
+> > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> > index 957cdc01c8e8..2a2f0c1a9fbd 100644
+> > --- a/net/vmw_vsock/virtio_transport_common.c
+> > +++ b/net/vmw_vsock/virtio_transport_common.c
+> > @@ -94,6 +94,9 @@ virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
+> > 					 info->op,
+> > 					 info->flags);
+> > 
+> > +	if (info->vsk)
+> > +		skb_set_owner_w(skb, sk_vsock(info->vsk));
+> > +
+> 
+> Should we do the same also in virtio_transport_recv_pkt()?
+> 
+> The skb in that cases is allocated in drivers/vhost/vsock.c and
+> net/vmw_vsock/virtio_transport.c using directly
+> virtio_vsock_alloc_skb(), because we don't know in advance which socket
+> it belongs to.
+> 
+> Then in virtio_transport_recv_pkt() we look for the socket and queue it
+> up. This should also solve the problem in vsock_loopback.c where we move
+> skb from one socket to another.
+> 
 
-KVM uses them:
+That's a great point, skb_set_owner_r() in recv_pkt() will do all of the
+right accounting when called by vsock_loopback_work.
 
-  $ git grep CPUWatchpoint|fgrep kvm
-  target/arm/kvm64.c:1558:        CPUWatchpoint *wp = find_hw_watchpoint(cs, debug_exit->far);
-  target/i386/kvm/kvm.c:5216:static CPUWatchpoint hw_watchpoint;
-  target/ppc/kvm.c:443:static CPUWatchpoint hw_watchpoint;
-  target/s390x/kvm/kvm.c:139:static CPUWatchpoint hw_watchpoint;
+I'll add that in a v2.
 
-See for example commit e4482ab7e3 ("target-arm: kvm - add support
-for HW assisted debug"):
-
-     This adds basic support for HW assisted debug. The ioctl interface
-     to KVM allows us to pass an implementation defined number of break
-     and watch point registers. [...]
-
-This partially reverts commit 2609ec2868e6c286e755a73b4504714a0296a.
-
-Fixes: 2609ec2868 ("softmmu: Extract watchpoint API from physmem.c")
-Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
----
- include/hw/core/cpu.h | 2 +-
- softmmu/watchpoint.c  | 4 ++++
- softmmu/meson.build   | 2 +-
- 3 files changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-index ce312745d5..397fd3ac68 100644
---- a/include/hw/core/cpu.h
-+++ b/include/hw/core/cpu.h
-@@ -949,7 +949,7 @@ static inline bool cpu_breakpoint_test(CPUState *cpu, vaddr pc, int mask)
-     return false;
- }
- 
--#if !defined(CONFIG_TCG) || defined(CONFIG_USER_ONLY)
-+#if defined(CONFIG_USER_ONLY)
- static inline int cpu_watchpoint_insert(CPUState *cpu, vaddr addr, vaddr len,
-                                         int flags, CPUWatchpoint **watchpoint)
- {
-diff --git a/softmmu/watchpoint.c b/softmmu/watchpoint.c
-index 9d6ae68499..5350163385 100644
---- a/softmmu/watchpoint.c
-+++ b/softmmu/watchpoint.c
-@@ -104,6 +104,8 @@ void cpu_watchpoint_remove_all(CPUState *cpu, int mask)
-     }
- }
- 
-+#ifdef CONFIG_TCG
-+
- /*
-  * Return true if this watchpoint address matches the specified
-  * access (ie the address range covered by the watchpoint overlaps
-@@ -220,3 +222,5 @@ void cpu_check_watchpoint(CPUState *cpu, vaddr addr, vaddr len,
-         }
-     }
- }
-+
-+#endif /* CONFIG_TCG */
-diff --git a/softmmu/meson.build b/softmmu/meson.build
-index 0180577517..1a7c7ac089 100644
---- a/softmmu/meson.build
-+++ b/softmmu/meson.build
-@@ -5,11 +5,11 @@ specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: [files(
-   'physmem.c',
-   'qtest.c',
-   'dirtylimit.c',
-+  'watchpoint.c',
- )])
- 
- specific_ss.add(when: ['CONFIG_SOFTMMU', 'CONFIG_TCG'], if_true: [files(
-   'icount.c',
--  'watchpoint.c',
- )])
- 
- softmmu_ss.add(files(
--- 
-2.38.1
-
+Thanks,
+Bobby
