@@ -2,55 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BEF5F6C032D
-	for <lists+kvm@lfdr.de>; Sun, 19 Mar 2023 17:35:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 40BC86C03E0
+	for <lists+kvm@lfdr.de>; Sun, 19 Mar 2023 19:49:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231228AbjCSQf3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 19 Mar 2023 12:35:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42384 "EHLO
+        id S229864AbjCSStp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 19 Mar 2023 14:49:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229486AbjCSQe4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 19 Mar 2023 12:34:56 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8153D53F;
-        Sun, 19 Mar 2023 09:34:18 -0700 (PDT)
-Received: from zn.tnic (p5de8e687.dip0.t-ipconnect.de [93.232.230.135])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id AD3F91EC067D;
-        Sun, 19 Mar 2023 17:34:14 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1679243654;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=oQqxL3BHw5WjuWqun2syN57FSJzoyI2jQrk/HbbPWhs=;
-        b=pqEwETfaj31dpAz2SEYSWfvU3WeBzG4lX8oZzUyb/EtHCHrnN4e+cfPaekUjGZ8SBiLJJd
-        d1DJ2QpKdRIeoydJx+SuRzEIaZ2w3eBxtrIhSGGgWTcRelmavWlZ7879Seb5jaxbE6Z+Qm
-        +GMiBj8HPxvSZjAvuffKs7s8PsJaneU=
-Date:   Sun, 19 Mar 2023 17:34:09 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Usama Arif <usama.arif@bytedance.com>
-Cc:     dwmw2@infradead.org, tglx@linutronix.de, kim.phillips@amd.com,
-        brgerst@gmail.com, piotrgorski@cachyos.org,
-        oleksandr@natalenko.name, arjan@linux.intel.com, mingo@redhat.com,
-        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
-        pbonzini@redhat.com, paulmck@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
-        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
-        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
-        simon.evans@bytedance.com, liangma@liangbit.com,
-        gpiccoli@igalia.com, David Woodhouse <dwmw@amazon.co.uk>
-Subject: Re: [PATCH v15 02/12] cpu/hotplug: Move idle_thread_get() to
- <linux/smpboot.h>
-Message-ID: <20230319163409.GBZBc5gTU94IdrucNL@fat_crate.local>
-References: <20230316222109.1940300-1-usama.arif@bytedance.com>
- <20230316222109.1940300-3-usama.arif@bytedance.com>
+        with ESMTP id S229639AbjCSSto (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 19 Mar 2023 14:49:44 -0400
+Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF4D81025B;
+        Sun, 19 Mar 2023 11:49:40 -0700 (PDT)
+Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
+        by mx.sberdevices.ru (Postfix) with ESMTP id D3C565FD08;
+        Sun, 19 Mar 2023 21:49:38 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1679251778;
+        bh=g3ARJtrmBWONb2FJm1F1Bs7nZK9URSKi6RexbFHQdI8=;
+        h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type;
+        b=Ik48EtjBkcg/ushrwSQlDs35ZT64ySBHD1qFJogAnXLRbNkt8ZTFNmq/tmNSY22UY
+         tsRMVC8PcJrOEC8ziTYXnc6SmeMth1qow7KbJryBm84cbuVlNKU9wspv4iVYxHEqVP
+         oFnZyg1Jx8KN2eC0ClfU0JxwAAj2QcHsOUTWYRnwaVD8F6Qq54OXYsmJRo7MoYHUuK
+         hLy+4nVX46Y+zkFMXIpT74r2MbzYrou8KFgHhEhejHedKbKSCFWWAq0ixtS+4MkYGj
+         ghroOtH4yhQP6bTL5i0IPqx5L/c0uzXWnIFd5aeWrwiWCVIvh4IxWrohlWKflQ0cdb
+         iutxGl2RrzgRg==
+Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
+        by mx.sberdevices.ru (Postfix) with ESMTP;
+        Sun, 19 Mar 2023 21:49:34 +0300 (MSK)
+Message-ID: <ea5725eb-6cb5-cf15-2938-34e335a442fa@sberdevices.ru>
+Date:   Sun, 19 Mar 2023 21:46:10 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230316222109.1940300-3-usama.arif@bytedance.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Content-Language: en-US
+To:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>
+CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
+        <avkrasnov@sberdevices.ru>
+From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
+Subject: [RFC PATCH v2] virtio/vsock: allocate multiple skbuffs on tx
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [172.16.1.6]
+X-ClientProxiedBy: S-MS-EXCH01.sberdevices.ru (172.16.1.4) To
+ S-MS-EXCH01.sberdevices.ru (172.16.1.4)
+X-KSMG-Rule-ID: 4
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Status: not scanned, disabled by settings
+X-KSMG-AntiSpam-Interceptor-Info: not scanned
+X-KSMG-AntiPhishing: not scanned, disabled by settings
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2023/03/19 16:43:00 #20974059
+X-KSMG-AntiVirus-Status: Clean, skipped
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
@@ -60,45 +70,104 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 16, 2023 at 10:20:59PM +0000, Usama Arif wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
-> 
-> Instead of relying purely on the special-case wrapper in bringup_cpu()
-> to pass the idle thread to __cpu_up(), expose idle_thread_get() so that
-> the architecture code can obtain it directly when necessary.
-> 
-> This will be useful when the existing __cpu_up() is split into multiple
-> phases, only *one* of which will actually need the idle thread.
-> 
-> If the architecture code is to register its new pre-bringup states with
-> the cpuhp core, having a special-case wrapper to pass extra arguments is
-> non-trivial and it's easier just to let the arch register its function
-> pointer to be invoked with the standard API.
-> 
-> To reduce duplication, move the shadow stack reset and kasan unpoisoning
+This adds small optimization for tx path: instead of allocating single
+skbuff on every call to transport, allocate multiple skbuff's until
+credit space allows, thus trying to send as much as possible data without
+return to af_vsock.c.
 
-I was wondering what "shadow stack" as that set is not upstream yet. You mean
-"shadow call stack" which is apparently something else,
-compiler-generated, purely software thing.
+Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+---
+ Link to v1:
+ https://lore.kernel.org/netdev/2c52aa26-8181-d37a-bccd-a86bd3cbc6e1@sberdevices.ru/
 
-> into idle_thread_get() too.
+ Changelog:
+ v1 -> v2:
+ - If sent something, return number of bytes sent (even in
+   case of error). Return error only if failed to sent first
+   skbuff.
 
-Frankly, I don't think resetting shadow call stack and kasan state
-belongs in a function which returns the idle thread. Even more so if you
-have to add an @unpoison param which is false sometimes and sometimes
-true, depending on where you call the function.
+ net/vmw_vsock/virtio_transport_common.c | 53 ++++++++++++++++++-------
+ 1 file changed, 39 insertions(+), 14 deletions(-)
 
-I think you should have a helper
-
-	tsk_reset_stacks(struct task_struct *tsk);
-
-or so which is called where @unpoison == true instead of having a getter
-function do something unrelated too.
-
-Thx.
-
+diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+index 6564192e7f20..3fdf1433ec28 100644
+--- a/net/vmw_vsock/virtio_transport_common.c
++++ b/net/vmw_vsock/virtio_transport_common.c
+@@ -196,7 +196,8 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+ 	const struct virtio_transport *t_ops;
+ 	struct virtio_vsock_sock *vvs;
+ 	u32 pkt_len = info->pkt_len;
+-	struct sk_buff *skb;
++	u32 rest_len;
++	int ret;
+ 
+ 	info->type = virtio_transport_get_type(sk_vsock(vsk));
+ 
+@@ -216,10 +217,6 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+ 
+ 	vvs = vsk->trans;
+ 
+-	/* we can send less than pkt_len bytes */
+-	if (pkt_len > VIRTIO_VSOCK_MAX_PKT_BUF_SIZE)
+-		pkt_len = VIRTIO_VSOCK_MAX_PKT_BUF_SIZE;
+-
+ 	/* virtio_transport_get_credit might return less than pkt_len credit */
+ 	pkt_len = virtio_transport_get_credit(vvs, pkt_len);
+ 
+@@ -227,17 +224,45 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+ 	if (pkt_len == 0 && info->op == VIRTIO_VSOCK_OP_RW)
+ 		return pkt_len;
+ 
+-	skb = virtio_transport_alloc_skb(info, pkt_len,
+-					 src_cid, src_port,
+-					 dst_cid, dst_port);
+-	if (!skb) {
+-		virtio_transport_put_credit(vvs, pkt_len);
+-		return -ENOMEM;
+-	}
++	ret = 0;
++	rest_len = pkt_len;
++
++	do {
++		struct sk_buff *skb;
++		size_t skb_len;
++
++		skb_len = min_t(u32, VIRTIO_VSOCK_MAX_PKT_BUF_SIZE, rest_len);
++
++		skb = virtio_transport_alloc_skb(info, skb_len,
++						 src_cid, src_port,
++						 dst_cid, dst_port);
++		if (!skb) {
++			ret = -ENOMEM;
++			break;
++		}
++
++		virtio_transport_inc_tx_pkt(vvs, skb);
++
++		ret = t_ops->send_pkt(skb);
++
++		if (ret < 0)
++			break;
+ 
+-	virtio_transport_inc_tx_pkt(vvs, skb);
++		rest_len -= skb_len;
++	} while (rest_len);
+ 
+-	return t_ops->send_pkt(skb);
++	/* Don't call this function with zero as argument:
++	 * it tries to acquire spinlock and such argument
++	 * makes this call useless.
++	 */
++	if (rest_len)
++		virtio_transport_put_credit(vvs, rest_len);
++
++	/* Return number of bytes, if any data has been sent. */
++	if (rest_len != pkt_len)
++		ret = pkt_len - rest_len;
++
++	return ret;
+ }
+ 
+ static bool virtio_transport_inc_rx_pkt(struct virtio_vsock_sock *vvs,
 -- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+2.25.1
