@@ -2,40 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AC5386C03E8
-	for <lists+kvm@lfdr.de>; Sun, 19 Mar 2023 19:53:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 32B026C03EC
+	for <lists+kvm@lfdr.de>; Sun, 19 Mar 2023 19:54:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229771AbjCSSxB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 19 Mar 2023 14:53:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57544 "EHLO
+        id S229816AbjCSSyf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 19 Mar 2023 14:54:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229460AbjCSSw7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 19 Mar 2023 14:52:59 -0400
+        with ESMTP id S229460AbjCSSyd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 19 Mar 2023 14:54:33 -0400
 Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAF4518B21;
-        Sun, 19 Mar 2023 11:52:57 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 837FB196BE;
+        Sun, 19 Mar 2023 11:54:32 -0700 (PDT)
 Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mx.sberdevices.ru (Postfix) with ESMTP id 4DB515FD08;
-        Sun, 19 Mar 2023 21:52:56 +0300 (MSK)
+        by mx.sberdevices.ru (Postfix) with ESMTP id D9CD05FD0B;
+        Sun, 19 Mar 2023 21:54:30 +0300 (MSK)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1679251976;
-        bh=rNqOAJGw/6GrUIXjEJsOP/jJqHM6rXH03ASMfQB3ny8=;
+        s=mail; t=1679252070;
+        bh=4xeEPECpVnpzfQf1fesctV2AnA8LeKYtLCBEiuPhocg=;
         h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type;
-        b=ka82PZ1Q9aVD7cB3sDdLTy71ODRwZNutmhO6ol185+GIWegzLpRNaAoV9K/xk5n1L
-         UPg/QlrrpPxhAZrN1Yj65nljpC9BW+MtA8vuPnrSK6SBBUuawf7/rxbmjE/dy//PwF
-         NDIZIQZjahfb8kWwKklkrSawJgUdWdDE/8Z8i/ioWAbOq9uTPBiJLhG6U+EBf4dnMa
-         I/ErzW9jp3e/8EB+JV29toqJMHRWLrV+g2wRla3Evtp/83qQrZqDSPEhDID0r96d4/
-         SHDiPb417TNv8pQoVo6dIfwmnPlwWFU57BFyU9qNl1FcDfj8M72H/4n+SWmEvAxALO
-         GD8hW2Am/CUEQ==
+        b=akgHfvv8AkVLHgeCDpICG7WM0q3/HjV+IbSmam+sMzpXSE0xxLodG4Y1ZxKLOWZA2
+         PBhBsJbTchNoIJfSBv45e0YwBoSNjYbrFoM+A9dw5y+dYgSHXOksoyTsSlmgJRhq0t
+         hDPPb27+rrFfkVMqQ52mBFjK/RQ0qo5VBnLqIoU+6FWkJ2aRGddlfQrpqchr895ZVi
+         Kr/Bx5/gMQx9dvMfF+u0SAXCqg7RNrJdxpUrpMuBBfg/LXFCJeGxiHMTPMLvU5FHs4
+         hRtNG3VjTcbNPqfu6ZTUjjwE8iFGWChJLo6v1Q78dlD8X1qrkniM95ca7qKB9NgV9S
+         AZl93kgvL5/zw==
 Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
         by mx.sberdevices.ru (Postfix) with ESMTP;
-        Sun, 19 Mar 2023 21:52:55 +0300 (MSK)
-Message-ID: <e141e6f1-00ae-232c-b840-b146bdb10e99@sberdevices.ru>
-Date:   Sun, 19 Mar 2023 21:49:36 +0300
+        Sun, 19 Mar 2023 21:54:30 +0300 (MSK)
+Message-ID: <63445f2f-a0bb-153c-0e15-74a09ea26dc1@sberdevices.ru>
+Date:   Sun, 19 Mar 2023 21:51:06 +0300
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.7.1
 Content-Language: en-US
+In-Reply-To: <e141e6f1-00ae-232c-b840-b146bdb10e99@sberdevices.ru>
 To:     Stefan Hajnoczi <stefanha@redhat.com>,
         Stefano Garzarella <sgarzare@redhat.com>,
         "David S. Miller" <davem@davemloft.net>,
@@ -48,11 +49,11 @@ CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
         <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
         <avkrasnov@sberdevices.ru>
 From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
-Subject: [RFC PATCH v1 0/3] fix header length on skb merging
+Subject: [RFC PATCH v1 1/3] virtio/vsock: fix header length on skb merging
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [172.16.1.6]
-X-ClientProxiedBy: S-MS-EXCH01.sberdevices.ru (172.16.1.4) To
+X-ClientProxiedBy: S-MS-EXCH02.sberdevices.ru (172.16.1.5) To
  S-MS-EXCH01.sberdevices.ru (172.16.1.4)
 X-KSMG-Rule-ID: 4
 X-KSMG-Message-Action: clean
@@ -70,47 +71,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+This fixes header length calculation of skbuff during data appending to
+it. When such skbuff is processed in dequeue callbacks, e.g. 'skb_pull()'
+is called on it, 'skb->len' is dynamic value, so it is impossible to use
+it in header, because value from header must be permanent for valid
+credit calculation ('rx_bytes'/'fwd_cnt').
 
-this patchset fixes skbuff merging during rx path. Problem fires when
-we are trying to append data to skbuff which is processed in dequeue
-callback at the same time. Dequeue callback calls 'skb_pull()' which
-changes 'skb->len'. While appending data, this dynamic 'skb->len' will
-be used to update length in header of last skbuff. This is wrong, because
-length in header is used to update credit parameters ('rx_bytes' and
-'fwd_cnt') and must be constant. To set valid length in header of last
-skbuff after appending new data to it, we need to sum header values from
-both last and new skbuff.
-
-This bug was introduced by:
 Fixes: 077706165717 ("virtio/vsock: don't use skbuff state to account credit")
+Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+---
+ net/vmw_vsock/virtio_transport_common.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I really forgot about this branch in rx path when implemented patch
-above.
-
-This patchset contains 3 patches:
-1) Fix itself.
-2) Patch with WARN() as kernel part of reproducer. I've added error
-   return from dequeue callback if this bug fires, otherwise you'll
-   get busyloop in kernel: callback always returns 0, but rx loop in
-   af_vsock.c sees that rx_bytes is non-zero thus trying to call
-   dequeue callback again and again.
-3) Patch with reproducer in vsock_test.c. It looks like new test, but
-   i'm not sure how to test this branch (appending data to last skbuff)
-   of virtio transport. So only way to detect problem is WARN() in 2).
-
-May be, it will be good practice to add some WARN() checks like in 2)
-to different parts of virtio/vsock, because such bugs are difficult to
-detect.
-
-Arseniy Krasnov (3):
-  virtio/vsock: fix header length on skb merging
-  virtio/vsock: add WARN() for invalid state of socket
-  test/vsock: skbuff merging test
-
- net/vmw_vsock/virtio_transport_common.c |  9 ++-
- tools/testing/vsock/vsock_test.c        | 81 +++++++++++++++++++++++++
- 2 files changed, 89 insertions(+), 1 deletion(-)
-
+diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+index 6d15cd4d090a..3c75986e16c2 100644
+--- a/net/vmw_vsock/virtio_transport_common.c
++++ b/net/vmw_vsock/virtio_transport_common.c
+@@ -1091,7 +1091,7 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
+ 			memcpy(skb_put(last_skb, skb->len), skb->data, skb->len);
+ 			free_pkt = true;
+ 			last_hdr->flags |= hdr->flags;
+-			last_hdr->len = cpu_to_le32(last_skb->len);
++			le32_add_cpu(&last_hdr->len, len);
+ 			goto out;
+ 		}
+ 	}
 -- 
 2.25.1
