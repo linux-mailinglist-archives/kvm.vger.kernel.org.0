@@ -2,183 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 92AC46C03F3
-	for <lists+kvm@lfdr.de>; Sun, 19 Mar 2023 19:57:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C5846C089D
+	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 02:37:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229922AbjCSS5S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 19 Mar 2023 14:57:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35190 "EHLO
+        id S229527AbjCTBhO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 19 Mar 2023 21:37:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229460AbjCSS5Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 19 Mar 2023 14:57:16 -0400
-Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0905EF749;
-        Sun, 19 Mar 2023 11:57:15 -0700 (PDT)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mx.sberdevices.ru (Postfix) with ESMTP id 5A8B35FD08;
-        Sun, 19 Mar 2023 21:57:13 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1679252233;
-        bh=Ur4jg6uAteONoMZU6lu41Y3TNMOYC8XZYn3Gott3yvA=;
-        h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type;
-        b=hYExZj62rdKq/kQoxBw7vhVqZHzrMPXS1mzbZUM2WEuHSuQ/bJRIYnObuLlGDJCWE
-         RprVYm7OatuydeKkYwb//Xd/1WrhwHmxOtE/vb2wOroGtpRHfJDkmz17mSaZh5MMF0
-         Rn3QFlZpThxJTfYYb26aF1dYPinMORmCLDncowCImhUZZeT4LvlBA2IsV4B7Vr0Nqt
-         Xr6fg0FEAj0bPrEyYshWwA/7Znku/iattGIP8hLcIMSLejHJw54W70PevOQ9s4OeJw
-         088jv1DKn99uKPCMdv5/OidUKYx8v+ek+1SECxKtSnqcMW7fQKhKd288HOCaQ4BPYH
-         y2Eh1Vt8bJXJQ==
-Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
-        by mx.sberdevices.ru (Postfix) with ESMTP;
-        Sun, 19 Mar 2023 21:57:13 +0300 (MSK)
-Message-ID: <14ca87d1-3e07-85e9-d11c-39789a9d17d4@sberdevices.ru>
-Date:   Sun, 19 Mar 2023 21:53:54 +0300
+        with ESMTP id S229460AbjCTBhA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 19 Mar 2023 21:37:00 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 275AD83E2
+        for <kvm@vger.kernel.org>; Sun, 19 Mar 2023 18:30:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1679275857; x=1710811857;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=fkHt2Ce2ACGLliuAehK41bbTOcWCsmf3hrwIL24gmRE=;
+  b=ZRvl3nVA2Fb47cNWVmgZUQljXj4eMRZfrWczL1fFZlgs046Q3kImKt/J
+   EtW9hGJF6nD2Rn6f7H9LAwEsSXJEMZ2E9ow6t5qv8OI2QMPD25akQFyF1
+   6ustERir0LJtMtJazaT/xe1aUV4k5f5rxE7imXp++zIRCTCAzNzqvp1ov
+   fCZgCGOYOcy5CLqHikwvR642K51ZqNM5+MfK9LUtp+22F7O+Vktx/ELC3
+   bRtmGpay6Q8zOGhtIqwX5+5H3IyN8i1EYMNd9Qy3Tz/eumpK3j7NpqId7
+   Y/ZcVVaO7VOQz94His0+b3xT1oRHQLjPTQ9xUdkjax6STfZ3vwfVz1/dW
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10654"; a="424828726"
+X-IronPort-AV: E=Sophos;i="5.98,274,1673942400"; 
+   d="scan'208";a="424828726"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2023 18:30:56 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10654"; a="770003878"
+X-IronPort-AV: E=Sophos;i="5.98,274,1673942400"; 
+   d="scan'208";a="770003878"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.0.239]) ([10.238.0.239])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2023 18:30:54 -0700
+Message-ID: <e8a9c4de-c3d9-7d7b-b041-f6d5f1961a73@linux.intel.com>
+Date:   Mon, 20 Mar 2023 09:30:52 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Content-Language: en-US
-In-Reply-To: <e141e6f1-00ae-232c-b840-b146bdb10e99@sberdevices.ru>
-To:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>
-CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
-        <avkrasnov@sberdevices.ru>
-From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
-Subject: [RFC PATCH v1 3/3] test/vsock: skbuff merging test
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: Re: [PATCH v6 1/7] KVM: x86: Explicitly cast ulong to bool in
+ kvm_set_cr3()
+To:     kvm@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com
+Cc:     chao.gao@intel.com, robert.hu@linux.intel.com
+References: <20230319084927.29607-1-binbin.wu@linux.intel.com>
+ <20230319084927.29607-2-binbin.wu@linux.intel.com>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20230319084927.29607-2-binbin.wu@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [172.16.1.6]
-X-ClientProxiedBy: S-MS-EXCH01.sberdevices.ru (172.16.1.4) To
- S-MS-EXCH01.sberdevices.ru (172.16.1.4)
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2023/03/19 16:43:00 #20974059
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This adds test which checks case when data of newly received skbuff is
-appended to the last skbuff in the socket's queue.
+I will drop this patch in this LAM KVM enabling patch series per Sean's 
+comments in V5.
 
-This test is actual only for virtio transport.
 
-Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
----
- tools/testing/vsock/vsock_test.c | 81 ++++++++++++++++++++++++++++++++
- 1 file changed, 81 insertions(+)
-
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index 3de10dbb50f5..00216c52d8b6 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -968,6 +968,82 @@ static void test_seqpacket_inv_buf_server(const struct test_opts *opts)
- 	test_inv_buf_server(opts, false);
- }
- 
-+static void test_stream_virtio_skb_merge_client(const struct test_opts *opts)
-+{
-+	ssize_t res;
-+	int fd;
-+
-+	fd = vsock_stream_connect(opts->peer_cid, 1234);
-+	if (fd < 0) {
-+		perror("connect");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	res = send(fd, "HELLO", strlen("HELLO"), 0);
-+	if (res != strlen("HELLO")) {
-+		fprintf(stderr, "unexpected send(2) result %zi\n", res);
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	control_writeln("SEND0");
-+	/* Peer reads part of first packet. */
-+	control_expectln("REPLY0");
-+
-+	/* Send second skbuff, it will be merged. */
-+	res = send(fd, "WORLD", strlen("WORLD"), 0);
-+	if (res != strlen("WORLD")) {
-+		fprintf(stderr, "unexpected send(2) result %zi\n", res);
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	control_writeln("SEND1");
-+	/* Peer reads merged skbuff packet. */
-+	control_expectln("REPLY1");
-+
-+	close(fd);
-+}
-+
-+static void test_stream_virtio_skb_merge_server(const struct test_opts *opts)
-+{
-+	unsigned char buf[64];
-+	ssize_t res;
-+	int fd;
-+
-+	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
-+	if (fd < 0) {
-+		perror("accept");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	control_expectln("SEND0");
-+
-+	/* Read skbuff partially. */
-+	res = recv(fd, buf, 2, 0);
-+	if (res != 2) {
-+		fprintf(stderr, "expected recv(2) failure, got %zi\n", res);
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	control_writeln("REPLY0");
-+	control_expectln("SEND1");
-+
-+	res = recv(fd, buf, sizeof(buf), 0);
-+	if (res != 8) {
-+		fprintf(stderr, "expected recv(2) failure, got %zi\n", res);
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	res = recv(fd, buf, sizeof(buf), MSG_DONTWAIT);
-+	if (res != -1) {
-+		fprintf(stderr, "expected recv(2) success, got %zi\n", res);
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	control_writeln("REPLY1");
-+
-+	close(fd);
-+}
-+
- static struct test_case test_cases[] = {
- 	{
- 		.name = "SOCK_STREAM connection reset",
-@@ -1038,6 +1114,11 @@ static struct test_case test_cases[] = {
- 		.run_client = test_seqpacket_inv_buf_client,
- 		.run_server = test_seqpacket_inv_buf_server,
- 	},
-+	{
-+		.name = "SOCK_STREAM virtio skb merge",
-+		.run_client = test_stream_virtio_skb_merge_client,
-+		.run_server = test_stream_virtio_skb_merge_server,
-+	},
- 	{},
- };
- 
--- 
-2.25.1
+On 3/19/2023 4:49 PM, Binbin Wu wrote:
+> From: Robert Hoo <robert.hu@linux.intel.com>
+>
+> kvm_read_cr4_bits() returns ulong, explicitly cast it bool when assign to a
+> bool variable.
+>
+> Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
+> ---
+>   arch/x86/kvm/x86.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 810cbe3b3ba6..410327e7eb55 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1238,7 +1238,7 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
+>   	bool skip_tlb_flush = false;
+>   	unsigned long pcid = 0;
+>   #ifdef CONFIG_X86_64
+> -	bool pcid_enabled = kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE);
+> +	bool pcid_enabled = !!kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE);
+>   
+>   	if (pcid_enabled) {
+>   		skip_tlb_flush = cr3 & X86_CR3_PCID_NOFLUSH;
