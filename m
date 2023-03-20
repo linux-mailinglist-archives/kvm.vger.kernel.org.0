@@ -2,72 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 843166C1FAF
-	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 19:28:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A155A6C204D
+	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 19:49:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229823AbjCTS2C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Mar 2023 14:28:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51046 "EHLO
+        id S230476AbjCTStT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Mar 2023 14:49:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231168AbjCTS1W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Mar 2023 14:27:22 -0400
-Received: from mail-ua1-x92b.google.com (mail-ua1-x92b.google.com [IPv6:2607:f8b0:4864:20::92b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2ECEB41B42
-        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 11:20:13 -0700 (PDT)
-Received: by mail-ua1-x92b.google.com with SMTP id i22so8564964uat.8
-        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 11:20:13 -0700 (PDT)
+        with ESMTP id S230288AbjCTSss (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Mar 2023 14:48:48 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4946F3B21B
+        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 11:41:52 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id k17-20020a170902d59100b0019abcf45d75so7464384plh.8
+        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 11:41:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679336412;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Iqr7dqeCu3WuwYcjyIEJKpkp1we1G6oozoTi9KflYfw=;
-        b=U/l+BtAb13glvSZD1gnQjmc58AGU+zB2xfK1EqwDRN7ROuY74uxdF3IsbYHH2ZBbij
-         JazuWbnXF0MNOOS+O1M0QiZ/YWT90WyHM9e4lQYf4znuot++tSQmbBNhiBNzichas8zV
-         a/5b+dyZ+MIoeuiL6HT6LxUs06xdQq7WeMwVzukLyMI9NTSGSglvq5pyrw7D2905i4pa
-         Wuvjz2MEWXHACp8vL+VPanZ+12TStjQQdXWp2UPZW8PIjYaA5IvLO23uIw2vLx/a2X9F
-         WEYmORTA1o5HjhnNVDWuXzPkiUwqYdPuwHpedYKNfcecNj+Lvw5CMURYid+JSIi+4eyq
-         tDWA==
+        d=google.com; s=20210112; t=1679337690;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AGeXag6D9kuvOFx10JcqNN4G7nzKqx8n4sK14frGlkY=;
+        b=U9P4ktn0YkzcsNkjKO3O3Ey5KGceaGAI7p8ldXV5RZsiQx9D4pGgPcVlI5C5vcEaYi
+         7ZFwggQRCDcnL66/e8kG6/yQPeRqQkJ7tSSaWU6/M4thn/MQl3cr4eFvjv3DTepgVjmP
+         AfGzt3REUcyAZDjcMXz71BUJb0TOBK3sMUTx/VlSYrmtGgsDuO3EggSfIlYDOHw6+pBF
+         BQNiej9HV/+MHQez+BeYly6UZuuNT4NgTYuIvFarBCrpOezD+q6wLcky0yinYb0u9QyT
+         cr6jS7cjEoGgb1PSgJv0kqBU/GkCjFDI0qZz8inr6QOpPMZJnojb6MGHtuSCWIDBXJZK
+         M9vg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679336412;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Iqr7dqeCu3WuwYcjyIEJKpkp1we1G6oozoTi9KflYfw=;
-        b=0RoA28qsdTuyzsd6RHfSj7/jUiPCn3qS3YL0biJt9DeyDPCqFOrzefdCFOb5yN0nQ1
-         eFDuNRkBJpFTcqC0rCtSaqazHAXp9bsW4hfqF59Rc82QlBGFPetncHRJXxpnTkuuS7/7
-         j9z3hClLTecFUd5XEV96p5PHARFiPuC2D9bOPo26zlB1+iJSwvz0Z27cU+sNzPVW8d7D
-         j1UxNIdt629v9e/bVrAS4KLhqp9t6f9bl7kGw5mdLY57QTmZcozLOwszF4PkLOb2j8Ae
-         76pq3a6PHUvNMxEa8w8FCE4eKlOv2TwuxWiD7wRb8yLjXdqMUGBZFmj4swB+nTDYFdRT
-         JB7g==
-X-Gm-Message-State: AO0yUKUeqYZfyVmNn1uKPvyOu0FbDPypxGUq98U6MSd1TJ5GTVmwivqL
-        G5TG6AbMCsB/molS4hJo+6SfOu2w8KkQeYjiYVT3Qg==
-X-Google-Smtp-Source: AK7set9Op4pDW/dPGGPc4Qei66Ay/8m0gFEvEAoS3SvEakdmFx60+M4OiiimSlLREQzHLk55ouK95TYSngn0gDbP2mI=
-X-Received: by 2002:a05:6122:181b:b0:401:8087:3693 with SMTP id
- ay27-20020a056122181b00b0040180873693mr109603vkb.10.1679336411631; Mon, 20
- Mar 2023 11:20:11 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230315021738.1151386-1-amoorthy@google.com> <20230315021738.1151386-5-amoorthy@google.com>
- <20230317000226.GA408922@ls.amr.corp.intel.com> <CAF7b7mrTa735kDaEsJQSHTt7gpWy_QZEtsgsnKoe6c21s0jDVw@mail.gmail.com>
- <ZBTgnjXJvR8jtc4i@google.com> <CAF7b7mqnvLe8tw_6-cW1b2Bk8YB9qP=7BsOOJK3q-tAyDkarww@mail.gmail.com>
- <ZBiBkwIF4YHnphPp@google.com>
-In-Reply-To: <ZBiBkwIF4YHnphPp@google.com>
-From:   Anish Moorthy <amoorthy@google.com>
-Date:   Mon, 20 Mar 2023 11:19:35 -0700
-Message-ID: <CAF7b7mrQBA3Po47Vvy5LOdMPHkDo=DVPsWXYOt9-pU8ndeds3A@mail.gmail.com>
-Subject: Re: [WIP Patch v2 04/14] KVM: x86: Add KVM_CAP_X86_MEMORY_FAULT_EXIT
- and associated kvm_run field
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>, jthoughton@google.com,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        d=1e100.net; s=20210112; t=1679337690;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AGeXag6D9kuvOFx10JcqNN4G7nzKqx8n4sK14frGlkY=;
+        b=4dRaBBE8j6YFyzMwJdjM8msh3KvSnvx9eMSUTf5Ee9HQ/qbh1UYZMaw5PjlaNCradP
+         5c6xSkk001svyV47nB0uetXTg0acdNqN2rJ0MLreiv4QXe9v3CLz0IEDdKmezWQW241W
+         zIW2pO2tYODO0mrnNmrYE8+kDDcOb93eNHbBJMj/gSYcsoVijk1rm+cX5ZkLxZ88c+Wd
+         AmF7GZeD40e4KXbdBPsTxB3mZwWc53/t5OSKI2CASRDd4xJjnroAeG979YdFoejbAEqE
+         6E8YISuNEh3z46ufCNFdzQ2qdkdHNny4bEOdHtcI4KEhxQa2WEbhr7YPEmFRuhGyZQHE
+         +xfQ==
+X-Gm-Message-State: AO0yUKXqksJJn1mqkZRd6ymd+u+x+Mpbp8r7f7/A0lFEBwlQMfUPZ9jM
+        Vu1PNyi5f7975FSko5dcHLBEoQkJi/E=
+X-Google-Smtp-Source: AK7set/pLysGBEI7iu4qioNRYT41BiTPna9N6cshhvM7P4GCwyT22Eawv1P1/8/vvJ5fs130lwI3yr6ZPlY=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:db09:b0:1a0:4be5:ccea with SMTP id
+ m9-20020a170902db0900b001a04be5cceamr6937261plx.9.1679337690302; Mon, 20 Mar
+ 2023 11:41:30 -0700 (PDT)
+Date:   Mon, 20 Mar 2023 11:41:28 -0700
+In-Reply-To: <20230202182809.1929122-10-bgardon@google.com>
+Mime-Version: 1.0
+References: <20230202182809.1929122-1-bgardon@google.com> <20230202182809.1929122-10-bgardon@google.com>
+Message-ID: <ZBio2Cs7UrkkilTc@google.com>
+Subject: Re: [PATCH 09/21] KVM: x86/MMU: Move paging_tmpl.h includes to shadow_mmu.c
+From:   Sean Christopherson <seanjc@google.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Ricardo Koller <ricarkol@google.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,139 +70,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 20, 2023 at 8:53=E2=80=AFAM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Fri, Mar 17, 2023, Anish Moorthy wrote:
-> > On Fri, Mar 17, 2023 at 2:50=E2=80=AFPM Sean Christopherson <seanjc@goo=
-gle.com> wrote:
-> > > I wonder if we can get away with returning -EFAULT, but still filling=
- vcpu->run
-> > > with KVM_EXIT_MEMORY_FAULT and all the other metadata.  That would li=
-kely simplify
-> > > the implementation greatly, and would let KVM fill vcpu->run uncondit=
-onally.  KVM
-> > > would still need a capability to advertise support to userspace, but =
-userspace
-> > > wouldn't need to opt in.  I think this may have been my very original=
- though, and
-> > > I just never actually wrote it down...
-> >
-> > Oh, good to know that's actually an option. I thought of that too, but
-> > assumed that returning a negative error code was a no-go for a proper
-> > vCPU exit. But if that's not true then I think it's the obvious
-> > solution because it precludes any uncaught behavior-change bugs.
-> >
-> > A couple of notes
-> > 1. Since we'll likely miss some -EFAULT returns, we'll need to make
-> > sure that the user can check for / doesn't see a stale
-> > kvm_run::memory_fault field when a missed -EFAULT makes it to
-> > userspace. It's a small and easy-to-fix detail, but I thought I'd
-> > point it out.
->
-> Ya, this is the main concern for me as well.  I'm not as confident that i=
-t's
-> easy-to-fix/avoid though.
->
-> > 2. I don't think this would simplify the series that much, since we
-> > still need to find the call sites returning -EFAULT to userspace and
-> > populate memory_fault only in those spots to avoid populating it for
-> > -EFAULTs which don't make it to userspace.
->
-> Filling kvm_run::memory_fault even if KVM never exits to userspace is per=
-fectly
-> ok.  It's not ideal, but it's ok.
+First off, I apologize for not giving this feedback in the RFC.  I didn't think
+too hard about the impliciations of moving paging_tmpl.h until I actually looked
+at the code.
 
-Right- I was just pointing out that doing so could mislead readers of
-the code if they assume that kvm_run::memory_fault is populated iff it
-was going to be associated w/ an exit to userspace," which I know I
-would.
+On Thu, Feb 02, 2023, Ben Gardon wrote:
+> Move the integration point for paging_tmpl.h to shadow_mmu.c since
+> paging_tmpl.h is ostensibly part of the Shadow MMU.
 
-> > We *could* relax that condition and just document that memory_fault sho=
-uld be
-> > ignored when KVM_RUN does not return -EFAULT... but I don't think that'=
-s a
-> > good solution from a coder/maintainer perspective.
->
-> You've got things backward.  memory_fault _must_ be ignored if KVM doesn'=
-t return
-> the associated "magic combo", where the magic value is either "0+KVM_EXIT=
-_MEMORY_FAULT"
-> or "-EFAULT+KVM_EXIT_MEMORY_FAULT".
+Ostensibly indeed.  While a simple majority of paging_tmpl.h is indeed unique to
+the shadow MMU, all of the guest walker code needs to exist independent of the
+shadow MMU.  And that code is signficant both in terms of lines of code, and
+more importantly in terms of understanding its role in KVM at large.
 
-I think we're saying the same thing- I was using "should" to mean "must."
+This is essentially the same mess that eventually led the cpu_role vs. root_role
+cleanup, and I think we should figure out a way to give paging_tmpl.h similar
+treatment.  E.g. split paging_tmpl.h itself in some way.
 
-> Filling kvm_run::memory_fault but not exiting to userspace is ok because =
-userspace
-> never sees the data, i.e. userspace is completely unaware.  This behavior=
- is not
-> ideal from a KVM perspective as allowing KVM to fill the kvm_run union wi=
-thout
-> exiting to userspace can lead to other bugs, e.g. effective corruption of=
- the
-> kvm_run union
+Unfortunately, this is a sticking point for me.  If the code movement were minor
+and/or cleaner in nature (definitely not your fault, simply the reality of the
+code base), I might feel differently.  But as it stands, there is a lot of churn
+to get to an endpoint that has significant flaws.
 
-Ooh, I didn't think of the corruption issue here: thanks for pointing it ou=
-t.
+So while I love the idea of separating the MMU implementations from the common
+MMU logic, because the guest walker stuff is a lynchpin of sorts, e.g. splitting
+out the guest walker logic could go hand-in-hand with reworking guest_mmu, I don't
+want to take this series as is.
 
-> but at least from a uABI perspective, the behavior is acceptable.
-
-This does complicate things for KVM implementation though, right? In
-particular, we'd have to make sure that KVM_RUN never conditionally
-modifies its return value/exit reason based on reads from kvm_run:
-that seems like a slightly weird thing to do, but I don't want to
-assume anything here.
-
-Anyways, unless that's not (and never will be) a problem, allowing
-corruption of kvm_run seems very risky.
-
-> The reverse, userspace consuming kvm_run::memory_fault without being expl=
-icitly
-> told the data is valid, is not ok/safe.  KVM's contract is that fields co=
-ntained
-> in kvm_run's big union are valid if and only if KVM returns '0' and the a=
-ssociated
-> exit reason is set in kvm_run::exit_reason.
->
-> From an ABI perspective, I don't see anything fundamentally wrong with be=
-nding
-> that rule slightly by saying that kvm_run::memory_fault is valid if KVM r=
-eturns
-> -EFAULT+KVM_EXIT_MEMORY_FAULT.  It won't break existing userspace that is=
- unaware
-> of KVM_EXIT_MEMORY_FAULT, and userspace can precisely check for the combi=
-nation.
->
-> My big concern with piggybacking -EFAULT is that userspace will be fed st=
-ale if
-> KVM exits with -EFAULT in a patch that _doesn't_ fill kvm_run::memory_fau=
-lt.
-> Returning a negative error code isn't hazardous in and of itself, e.g. KV=
-M has
-> had bugs in the past where KVM returns '0' but doesn't fill kvm_run::exit=
-_reason.
-> The big danger is that KVM has existing paths that return -EFAULT, i.e. w=
-e can
-> introduce bugs simply by doing nothing, whereas returning '0' would large=
-ly be
-> limited to new code.
->
-> The counter-argument is that propagating '0' correctly up the stack carri=
-es its
-> own risk due to plenty of code correctly treating '0' as "success" and no=
-t "exit
-> to userspace".
->
-> And we can mitigate the risk of using -EFAULT.  E.g. fill in kvm_run::mem=
-ory_fault
-> even if we are 99.9999% confident the -EFAULT can't get out to userspace =
-in the
-> context of KVM_RUN, and set kvm_run::exit_reason to some arbitrary value =
-at the
-> start of KVM_RUN to prevent reusing memory_fault from a previous userspac=
-e exit.
-
-Right, this is what I had in mind when I called this "small and
-easy-to-fix." Piggybacking -EFAULT seems like the right thing to do to
-me, but I'm still uneasy about possibly corrupting kvm_run for masked
--EFAULTS.
+Sadly, as much as I'm itching to dive in and do a bit of exploration, I am woefully
+short on bandwidth right now, so all I can do is say no.  Sorry :-(
